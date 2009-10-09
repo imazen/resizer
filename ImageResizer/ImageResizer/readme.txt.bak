@@ -37,12 +37,9 @@ Changelog, by version
 Changes since RC1
 ************************************
 
-Fixed rare bug where rounding causes Bitmap to be initialized with a dimension of 0, and causes a Parameter exception. 
-Ocurred when resizing an image to < 2px in height or width (usually happens with 2x1000 size images, etc).
+Fixed bug where rounding causes Bitmap to be initialized with a dimension of 0, and causes a Parameter exception
+Fixed typo (Missing else): SaveToNonSeekableStream causes a GDI error.
 Added regression test for 500x2 image resized to 100px wide.
-
-Fixed typo (missing else) in SaveToNonSeekableStream. This method is for extensibility, and is not used by the Resizer directly.
-This method is now tested and part of the Regression tests (HandlerTest.ashx).
 
 
 TODO: Demo other usage scenarios 

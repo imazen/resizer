@@ -76,7 +76,6 @@ namespace fbs.ImageResizer
         }
         /// <summary>
         /// Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
-        /// 
         /// </summary>
         /// <param name="sourceFile"></param>
         /// <param name="targetFile"></param>
@@ -130,7 +129,7 @@ namespace fbs.ImageResizer
         /// <summary>
         /// Generates a resized bitmap from the specifed source file and the specified querystring. Understands width/height and maxwidth/maxheight.
         /// Throws either an ArgumentException or IOException if the source image is invalid.
-        /// 
+        /// Always use ImageOutputSettings to save images, since Image.Save doesn't work well for GIF or PNGs, and needs custom params for Jpegs.
         /// </summary>
         /// 
         /// <returns></returns>
@@ -162,6 +161,7 @@ namespace fbs.ImageResizer
         }
         /// <summary>
         /// Creates a new bitmap of the required size, and draws the specified image (with border, background, padding, and shadow).
+        /// Always use ImageOutputSettings to save images, since Image.Save doesn't work well for GIF or PNGs, and needs custom params for Jpegs.
         /// </summary>
         /// <param name="src"></param>
         /// <param name="q"></param>
@@ -190,7 +190,7 @@ namespace fbs.ImageResizer
                     if (page > 0)
                     {
                         src.SelectActiveFrame(FrameDimension.Page, page);
-                       //Causes problems: src.MakeTransparent(); //Needed, since this seems to be lost after a call to SelectActiveFrame
+                       //Causes problems: src.MakeTransparent(); 
                     }
                 }
                 if (frame > 0)
@@ -204,7 +204,7 @@ namespace fbs.ImageResizer
                     if (frame > 0)
                     {
                         src.SelectActiveFrame(FrameDimension.Time, frame);
-                       //Causes problems:  src.MakeTransparent(); //Needed, since this seems to be lost after a call to SelectActiveFrame
+                       //Causes problems:  src.MakeTransparent();
                     }
 
                 }
@@ -294,13 +294,16 @@ namespace fbs.ImageResizer
             if (PolygonMath.GetBoundingBox(size.imageTarget).Size.Equals(box))
             {
                 //The image is taking the entire space. Round down, as System.Drawing does.
-                b = new Bitmap((int)Math.Floor(box.Width), (int)Math.Floor(box.Height), PixelFormat.Format32bppArgb);
+                //June 3: added Math.Max(1,) to prevent Invalid Parameter error on < 1px images. Also need to fix in ResizeSettings.. otherwise
+                //the image data won't be put in the right place either.
+                b = new Bitmap((int)Math.Max(1,Math.Floor(box.Width)), (int)Math.Max(1,Math.Floor(box.Height)), PixelFormat.Format32bppArgb);
 
             }
             else
             {
+                //June 3: added Math.Max(1,) to prevent Invalid Parameter error on < 1px images.
                 //It isn't taking up all the space - Space around the image is expected. Leaving normal rounding in place - flooring would do as much harm as good on average.
-                b = new Bitmap((int)Math.Round(box.Width), (int)Math.Round(box.Height), PixelFormat.Format32bppArgb);
+                b = new Bitmap((int)Math.Max(1,Math.Round(box.Width)), (int)Math.Max(1,Math.Round(box.Height)), PixelFormat.Format32bppArgb);
             }
 
             //Create graphics handle
