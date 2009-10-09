@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="SampleProject">
+</Property><Property Name="Solution File" Value="C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\SampleProject\SampleProject.sln">
+</Property><Property Name="User Options File" Value="C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\SampleProject\SampleProject.suo">
+</Property><Property Name="Date" Value="Friday, November 14, 2008">
+</Property><Property Name="Time" Value="11:14 AM">
+</Property></Properties><Event ErrorLevel="0" Project="" Source="SampleProject.sln" Description="File successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\SampleProject\Backup\SampleProject.sln">
+</Event><Event ErrorLevel="0" Project="" Source="SampleProject.suo" Description="File successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\SampleProject\Backup\SampleProject.suo">
+</Event><Event ErrorLevel="0" Project="SampleProject" Source="SampleProject.csproj" Description="Project file successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\SampleProject\Backup\SampleProject.csproj">
+</Event><Event ErrorLevel="0" Project="SampleProject" Source="SampleProject.csproj.user" Description="Project user file successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\SampleProject\Backup\SampleProject.csproj.user">
+</Event><Event ErrorLevel="0" Project="SampleProject" Source="Default.aspx.cs" Description="File successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\SampleProject\Backup\Default.aspx.cs">
+</Event><Event ErrorLevel="0" Project="SampleProject" Source="Default.aspx.designer.cs" Description="File successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\SampleProject\Backup\Default.aspx.designer.cs">
+</Event><Event ErrorLevel="0" Project="SampleProject" Source="Properties\AssemblyInfo.cs" Description="File successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\SampleProject\Backup\Properties\AssemblyInfo.cs">
+</Event><Event ErrorLevel="0" Project="SampleProject" Source="image.jpg" Description="File successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\SampleProject\Backup\image.jpg">
+</Event><Event ErrorLevel="0" Project="SampleProject" Source="Default.aspx" Description="File successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\SampleProject\Backup\Default.aspx">
+</Event><Event ErrorLevel="0" Project="SampleProject" Source="Web.config" Description="File successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\SampleProject\Backup\Web.config">
+</Event><Event ErrorLevel="0" Project="SampleProject" Source="SampleProject.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="SampleProject" Source="SampleProject.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="" Source="SampleProject.sln" Description="Solution converted successfully">
+</Event><Event ErrorLevel="3" Project="" Source="SampleProject.sln" Description="Converted">
+</Event><Event ErrorLevel="0" Project="SampleProject" Source="SampleProject.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event></UpgradeLog>

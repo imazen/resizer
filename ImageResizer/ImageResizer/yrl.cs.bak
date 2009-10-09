@@ -126,12 +126,6 @@ namespace fbs
             //crashes on ~$lioFlatFile.rtf
             PathType pathtype = GetPathType(path);
             if (pathtype == PathType.Root) return yrl.Root;
-			
-			//OSX Mono uses physical paths in the unix style - fools the comparison. So, to handle physical paths right, we have to try that first.
-			
-			yrl test = FromPhysicalString(path);
-			if (test != null) return test;
-			
             if (pathtype == PathType.File || pathtype == PathType.PathForwardslashPath)
             {
                 return FromYrlString(path);
