@@ -47,7 +47,10 @@ using System.Collections.Specialized;
 
 namespace fbs.ImageResizer
 {
-    class ImageManager
+    /// <summary>
+    /// Provides methods for generating resizied images, and for reading and writing them to disk.
+    /// </summary>
+    public class ImageManager
     {
         /// <summary>
         /// Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
@@ -61,7 +64,7 @@ namespace fbs.ImageResizer
             using (Bitmap thumb = GenerateImage(sourceFile, queryString))
             {
                 //Determine desired output format
-                System.Drawing.Imaging.ImageFormat outputType = GetOutputType(System.IO.Path.GetExtension(targetFile));
+                System.Drawing.Imaging.ImageFormat outputType = ToImageFormat(System.IO.Path.GetExtension(targetFile));
 
                 //Open stream and save format.
                 System.IO.FileStream fs = new FileStream(targetFile, FileMode.Create, FileAccess.Write);
@@ -110,7 +113,7 @@ namespace fbs.ImageResizer
         /// </summary>
         /// <param name="requestUrl"></param>
         /// <returns></returns>
-        public static System.Drawing.Imaging.ImageFormat GetOutputType(string extension)
+        public static System.Drawing.Imaging.ImageFormat ToImageFormat(string extension)
         {
             switch (extension.ToLower().Trim('.').Trim())
             {
