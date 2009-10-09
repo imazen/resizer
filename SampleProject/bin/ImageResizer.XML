@@ -409,39 +409,6 @@
             Return the child nodes
             </summary>
         </member>
-        <member name="T:fbs.ImageResizer.Animation.GifCreator">
-            <summary>
-            Provides methods for creating application and graphics blocks needed to write a animated Gif.
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.Animation.GifCreator.CreateGraphicControlExtensionBlock(System.Int32)">
-            <summary>
-             Written before each frame - specifies the frame's delay and the index of the transparent color (0)
-            </summary>
-            <param name="delay"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.Animation.GifCreator.CreateGraphicControlExtensionBlock(System.Int32,System.Byte)">
-            <summary>
-            Written before each frame - specifies the frame's delay and the index of the transparent color
-            </summary>
-            <param name="delay"></param>
-            <param name="transparentColorIndex"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.Animation.GifCreator.CreateLoopBlock">
-            <summary>
-            Creates a Loop Block (Netscape appliation extension) for infinite looping. Written after the last frame's image data
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.Animation.GifCreator.CreateLoopBlock(System.Int32)">
-            <summary>
-            Creates a Loop block for the specified number of repeats. Written after the last frame's image data
-            </summary>
-            <param name="numberOfRepeatings"></param>
-            <returns></returns>
-        </member>
         <member name="T:fbs.ImageResizer.InterceptModule">
             <summary>
             Monitors incoming image requests. Image requests that request resizing are processed. The resized images are immediately written to disk, and 
@@ -518,6 +485,14 @@
             <param name="targetFile"></param>
             <param name="request"></param>
         </member>
+        <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.Web.HttpPostedFile,System.String,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
+            </summary>
+            <param name="sourceFile"></param>
+            <param name="targetFile"></param>
+            <param name="request"></param>
+        </member>
         <member name="M:fbs.ImageResizer.ImageManager.HasResizingDirective(System.Collections.Specialized.NameValueCollection)">
             <summary>
             Returns true if the specified querystring collection uses a resizing command
@@ -533,6 +508,15 @@
             <returns></returns>
         </member>
         <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.String,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Generates a resized bitmap from the specifed source file and the specified querystring. Understands width/height and maxwidth/maxheight.
+            Throws either an ArgumentException or IOException if the source image is invalid.
+            Always use ImageOutputSettings to save images, since Image.Save doesn't work well for GIF or PNGs, and needs custom params for Jpegs.
+            </summary>
+            
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.Web.HttpPostedFile,System.Collections.Specialized.NameValueCollection)">
             <summary>
             Generates a resized bitmap from the specifed source file and the specified querystring. Understands width/height and maxwidth/maxheight.
             Throws either an ArgumentException or IOException if the source image is invalid.
@@ -1690,28 +1674,6 @@
             <summary>
             A callback method that will perform the resize and update the file. This doesn't need paramaters since an anonymous function can be used.
             </summary>
-        </member>
-        <member name="T:fbs.ImageResizer.Animation.GifClass">
-            <summary>
-            Dissects a GIF image into its component parts.
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.Animation.AnimatedImageManager.BuildImage(System.String,System.String,System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
-            This is the only method that supports animated GIF output. GDI has no native support for animated GIFs, so we have to take a different code path.
-            </summary>
-            <param name="sourceFile"></param>
-            <param name="targetFile"></param>
-            <param name="request"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.Animation.AnimatedImageManager.getById(System.Drawing.Imaging.PropertyItem[],System.Int32)">
-            <summary>
-            Returns the first PropertyItem with a matching ID
-            </summary>
-            <param name="items"></param>
-            <param name="id"></param>
-            <returns></returns>
         </member>
     </members>
 </doc>
