@@ -49,6 +49,7 @@ using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using System.Text;
+using System.Security.Principal;
 
 
 namespace fbs.ImageResizer
@@ -95,9 +96,18 @@ namespace fbs.ImageResizer
             HttpApplication app = sender as HttpApplication;
             if (app != null && app.Context != null && app.Context.Request != null)
             {
-                
+                string filePath = app.Context.Request.FilePath;
+
+                //Allows users to append .cd to all their image URLs instead of doing wildcard mapping.
+                string altExtension = ConfigurationManager.AppSettings["ResizeExtension"];
+                if (!string.IsNullOrEmpty(altExtension) && filePath.EndsWith(altExtension, StringComparison.OrdinalIgnoreCase))
+                {
+                    //Remove extension from filePath, since otherwise IsAcceptedImageType() will fail.
+                    filePath = filePath.Substring(0, filePath.Length - altExtension.Length).TrimEnd('.');
+                }
+
                 //Is this an image request? Checks the file extension for .jpg, .png, .tiff, etc.
-                if (ImageOutputSettings.IsAcceptedImageType(app.Context.Request.FilePath))
+                if (ImageOutputSettings.IsAcceptedImageType(filePath))
                 {
                     //Init the caching settings. These only take effect if the image is actually resized
                     //CustomFolders.cs can override these during processPath
@@ -119,7 +129,7 @@ namespace fbs.ImageResizer
                     //Call CustomFolders.cs to do resize(w,h,f)/ parsing and any other custom syntax.
                     //The real virtual path should be returned (with the resize() stuff removed)
                     //And q should be populated with the querystring values
-                    string basePath = CustomFolders.processPath(app.Context.Request.Path, q);
+                    string basePath = CustomFolders.processPath(filePath + app.Context.Request.PathInfo, q);
 
                     
                     //If the path has changed, this will circumvent the URL auth system.
@@ -143,6 +153,11 @@ namespace fbs.ImageResizer
                     //Checks for thumnail, format, width, height, maxwidth, maxheight and a lot more
                     if (ImageManager.getBestInstance().HasResizingDirective(q))
                     {
+                        if (!UrlAuthorizationModule.CheckUrlAccessForPrincipal(basePath, app.Context.User as IPrincipal, "GET"))
+                        {
+                            throw new HttpException(403, "Access denied.");
+                        }
+
                         //Build a URL using the new basePath and the new Querystring q
                         yrl current = new yrl(basePath);
                         current.QueryString = q;

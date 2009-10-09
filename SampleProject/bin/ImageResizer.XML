@@ -4,169 +4,6 @@
         <name>ImageResizer</name>
     </assembly>
     <members>
-        <member name="T:fbs.ImageResizer.ImageOutputSettings">
-            <summary>
-            Extracts the image output and encoding settings from the querystring. 
-            Handles the saving of Image instances to a Stream using the .SaveImage method
-            Doesn't handle animated image files - only single frames. (Neither does GDI)
-            </summary>
-        </member>
-        <!-- Badly formed XML comment ignored for member "M:fbs.ImageResizer.ImageOutputSettings.parseFromQuerystring(System.Drawing.Imaging.ImageFormat,System.Collections.Specialized.NameValueCollection)" -->
-        <member name="F:fbs.ImageResizer.ImageOutputSettings.Quality">
-            <summary>
-            The Jpeg compression quality. 90 is the best setting. 
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ImageOutputSettings.Colors">
-            <summary>
-            The number of colors to use. Only applicable for png, gif, and bmp photos where palletes can be used.
-            The default is -1, which means "as much color fidelity as possible". 
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ImageOutputSettings.Dither">
-            <summary>
-            Enables dithering for PNG8 and GIF
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetFinalExtension">
-            <summary>
-            Returns the file extension for the current OutputFormat
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetContentType">
-            <summary>
-            Returns the content type for the current OutputFormat
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveImageToNonSeekableStream(System.IO.Stream,System.Drawing.Image)">
-            <summary>
-            Safe for use with non-seekable streams. Writes the Png memory to an intermediate MemoryStream.
-            Does use more memory on PNGs. FileStreams are seekable.
-            </summary>
-            <param name="s"></param>
-            <param name="i"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveImage(System.IO.Stream,System.Drawing.Image)">
-            <summary>
-            Requires a seekable string for Png encoding. Use SaveImageToNonSeekableStream for non-seekable streams.
-            </summary>
-            <param name="s"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetSupportedOutputFormat(System.Drawing.Imaging.ImageFormat)">
-            <summary>
-            If the specified ImageFormat is not supported for output, ImageFormat.Jpeg is returned.
-            </summary>
-            <param name="format"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetRequestedType(System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            Returns the ImageFormat requested in the querystring.
-            </summary>
-            <param name="q"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetImageFormatFromPhysicalPath(System.String)">
-            <summary>
-            Returns the ImageFormat enumeration value based on the extension in the specified physical path.
-            </summary>
-            <param name="path"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetImageFormatFromExtension(System.String)">
-            <summary>
-            Returns an ImageFormat instance from the specfied extension. Supports jpg, jpeg, bmp, gif, png, tiff, and tff.
-            returns null if not recognized.
-            </summary>
-            <param name="ext"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetExtensionFromImageFormat(System.Drawing.Imaging.ImageFormat)">
-            <summary>
-            Returns an string instance from the specfied ImageFormat. Supports jpg, bmp, gif, png, and tiff,
-            Returns null if not recognized.
-            </summary>
-            <param name="ext"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.IsAcceptedImageType(System.String)">
-            <summary>
-            Returns true if the extension on the virtual path 'path' is one of the accepted types
-            </summary>
-            <param name="path"></param>
-            <returns></returns>
-        </member>
-        <member name="F:fbs.ImageResizer.ImageOutputSettings._acceptedImageExtensions">
-            <summary>
-            Returns a list of (lowercase invariant) image extensions that the module works with.
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetContentTypeFromImageFormat(System.Drawing.Imaging.ImageFormat)">
-            <summary>
-            Supports Png, Jpeg, Gif, Bmp, and Tiff.
-            </summary>
-            <param name="format"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveJpeg(System.Drawing.Image,System.Int32,System.IO.Stream)">
-            <summary>
-            Saves the specified image to the specified stream using jpeg compression of the specified quality.
-            </summary>
-            <param name="b"></param>
-            <param name="quality">A number between 0 and 100. Defaults to 90 if passed a negative number. Numbers over 100 are truncated to 100. 
-            90 is a *very* good setting.
-            </param>
-            <param name="target"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.SavePng(System.Drawing.Image,System.IO.Stream,System.Byte)">
-            <summary>
-            Requires seekable stream, i.e. MemoryString or FileStream
-            </summary>
-            <param name="img"></param>
-            <param name="target"></param>
-            <param name="colors"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.SavePng(System.Drawing.Image,System.IO.Stream)">
-            <summary>
-            Requires seekable stream, i.e. MemoryString or FileStream
-            </summary>
-            <param name="img"></param>
-            <param name="target"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveBmp(System.Drawing.Image,System.IO.Stream,System.Byte)">
-            <summary>
-            Saves the bitmap 
-            </summary>
-            <param name="img"></param>
-            <param name="target"></param>
-            <param name="colors"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetBitsNeededForColorDepth(System.Byte)">
-            <summary>
-            Returns how many bits are required to store the specified number of colors. Performs a Log2() on the value.
-            </summary>
-            <param name="colors"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetImageCodeInfo(System.String)">
-            <summary>
-            Returns the first ImageCodeInfo instance with the specified mime type. Returns null if there are no matches.
-            </summary>
-            <param name="mimeType"></param>
-            <returns></returns>
-        </member>
-        <member name="P:fbs.ImageResizer.ImageOutputSettings.OutputFormat">
-            <summary>
-            If you set this to an unsupported output format (anything other than png, gif, or jpg), it will be the same as settting it to Jpeg. Input is autocorrected.
-            </summary>
-        </member>
-        <member name="P:fbs.ImageResizer.ImageOutputSettings.SupportsTransparency">
-            <summary>
-            Returns true if the desired output type supports transparency.
-            </summary>
-        </member>
         <member name="T:fbs.ImageResizer.WatermarkSettings">
             <summary>
             Provides extensibility points for drawing watermarks and even modifying resizing/image settings
@@ -191,6 +28,547 @@
             </summary>
             <param name="b"></param>
             <param name="g"></param>
+        </member>
+        <member name="T:ImageQuantization.OctreeQuantizer">
+            <summary>
+            Quantize using an Octree
+            </summary>
+        </member>
+        <member name="T:ImageQuantization.Quantizer">
+            <summary>
+            Summary description for Class1.
+            </summary>
+        </member>
+        <member name="M:ImageQuantization.Quantizer.#ctor(System.Boolean)">
+            <summary>
+            Construct the quantizer
+            </summary>
+            <param name="singlePass">If true, the quantization only needs to loop through the source pixels once</param>
+            <remarks>
+            If you construct this class with a true value for singlePass, then the code will, when quantizing your image,
+            only call the 'QuantizeImage' function. If two passes are required, the code will call 'InitialQuantizeImage'
+            and then 'QuantizeImage'.
+            </remarks>
+        </member>
+        <member name="F:ImageQuantization.Quantizer.fourPass">
+            <summary>
+            If true, image is re-paletted after quantization, and dithering occurs on a separate frame from the source.
+            </summary>
+        </member>
+        <member name="M:ImageQuantization.Quantizer.Quantize(System.Drawing.Image)">
+            <summary>
+            Quantize an image and return the resulting output bitmap
+            </summary>
+            <param name="source">The image to quantize</param>
+            <returns>A quantized version of the image</returns>
+        </member>
+        <member name="M:ImageQuantization.Quantizer.FirstPass(System.Drawing.Imaging.BitmapData,System.Int32,System.Int32)">
+            <summary>
+            Execute the first pass through the pixels in the image
+            </summary>
+            <param name="sourceData">The source data</param>
+            <param name="width">The width in pixels of the image</param>
+            <param name="height">The height in pixels of the image</param>
+        </member>
+        <member name="M:ImageQuantization.Quantizer.SecondPass(System.Drawing.Imaging.BitmapData,System.Drawing.Imaging.BitmapData,System.Drawing.Bitmap,System.Int32,System.Int32,System.Drawing.Rectangle)">
+            <summary>
+            Execute a second pass through the bitmap. If dithering is enabled, sourceData will be modified. 
+            </summary>
+            <param name="sourceData">The source bitmap, locked into memory</param>
+            <param name="intermediate">The intermediate bitmap, used for 4-pass quantization. If specified, output will not actually be modified</param>
+            <param name="output">The output bitmap</param>
+            <param name="width">The width in pixels of the image</param>
+            <param name="height">The height in pixels of the image</param>
+            <param name="bounds">The bounding rectangle</param>
+        </member>
+        <member name="M:ImageQuantization.Quantizer.InitialQuantizePixel(ImageQuantization.Quantizer.Color32)">
+            <summary>
+            Override this to process the pixel in the first pass of the algorithm
+            </summary>
+            <param name="pixel">The pixel to quantize</param>
+            <remarks>
+            This function need only be overridden if your quantize algorithm needs two passes,
+            such as an Octree quantizer.
+            </remarks>
+        </member>
+        <member name="M:ImageQuantization.Quantizer.QuantizePixel(ImageQuantization.Quantizer.Color32)">
+            <summary>
+            Override this to process the pixel in the second pass of the algorithm
+            </summary>
+            <param name="pixel">The pixel to quantize</param>
+            <returns>The quantized value</returns>
+        </member>
+        <member name="M:ImageQuantization.Quantizer.GetPalette(System.Drawing.Imaging.ColorPalette)">
+            <summary>
+            Retrieve the palette for the quantized image
+            </summary>
+            <param name="original">Any old palette, this is overrwritten</param>
+            <returns>The new color palette</returns>
+        </member>
+        <member name="F:ImageQuantization.Quantizer._singlePass">
+            <summary>
+            Flag used to indicate whether a single pass or two passes are needed for quantization.
+            </summary>
+        </member>
+        <member name="T:ImageQuantization.Quantizer.Color32">
+            <summary>
+            Struct that defines a 32 bpp colour
+            </summary>
+            <remarks>
+            This struct is used to read data from a 32 bits per pixel image
+            in memory, and is ordered in this manner as this is the way that
+            the data is layed out in memory
+            </remarks>
+        </member>
+        <member name="F:ImageQuantization.Quantizer.Color32.Blue">
+            <summary>
+            Holds the blue component of the colour
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.Quantizer.Color32.Green">
+            <summary>
+            Holds the green component of the colour
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.Quantizer.Color32.Red">
+            <summary>
+            Holds the red component of the colour
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.Quantizer.Color32.Alpha">
+            <summary>
+            Holds the alpha component of the colour
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.Quantizer.Color32.ARGB">
+            <summary>
+            Permits the color32 to be treated as an int32
+            </summary>
+        </member>
+        <member name="P:ImageQuantization.Quantizer.Color32.Color">
+            <summary>
+            Return the color for this Color32 object
+            </summary>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Construct the octree quantizer
+            </summary>
+            <remarks>
+            The Octree quantizer is a two pass algorithm. The initial pass sets up the octree,
+            the second pass quantizes a color based on the nodes in the tree
+            </remarks>
+            <param name="maxColors">The maximum number of colors to return</param>
+            <param name="maxColorBits">The number of significant bits</param>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Reset">
+            <summary>
+            Clears the octree
+            </summary>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Reset(System.Int32,System.Int32)">
+            <summary>
+            Clears the octree and reconfigures color settings
+            </summary>
+            <param name="maxColors"></param>
+            <param name="maxColorBits"></param>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.InitialQuantizePixel(ImageQuantization.Quantizer.Color32)">
+            <summary>
+            Process the pixel in the first pass of the algorithm
+            </summary>
+            <param name="pixel">The pixel to quantize</param>
+            <remarks>
+            This function need only be overridden if your quantize algorithm needs two passes,
+            such as an Octree quantizer.
+            </remarks>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.DitherMatrix">
+            <summary>
+            a Floyd-Steinberg dither matrix
+            new float[,] {{0,0,0},
+            {0,0,0.44f},
+            {0.19f,0.31f,0.06f}};
+            </summary>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.QuantizePixel(ImageQuantization.Quantizer.Color32)">
+            <summary>
+            Override this to process the pixel in the second pass of the algorithm
+            </summary>
+            <param name="pixel">The pixel to quantize</param>
+            <returns>The quantized value</returns>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.GetPalette(System.Drawing.Imaging.ColorPalette)">
+            <summary>
+            Retrieve the palette for the quantized image
+            </summary>
+            <param name="original">Any old palette, this is overrwritten</param>
+            <returns>The new color palette</returns>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer._octree">
+            <summary>
+            Stores the tree
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer._maxColors">
+            <summary>
+            Maximum allowed color depth
+            </summary>
+        </member>
+        <member name="P:ImageQuantization.OctreeQuantizer.Dither">
+            <summary>
+            Uses a Floyd-Steinberg dither
+            </summary>
+        </member>
+        <member name="T:ImageQuantization.OctreeQuantizer.Octree">
+            <summary>
+            Class which does the actual quantization
+            </summary>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Octree.#ctor(System.Int32)">
+            <summary>
+            Construct the octree
+            </summary>
+            <param name="maxColorBits">The maximum number of significant bits in the image</param>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Octree.AddColor(ImageQuantization.Quantizer.Color32)">
+            <summary>
+            Add a given color value to the octree
+            </summary>
+            <param name="pixel"></param>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Octree.Reduce">
+            <summary>
+            Reduce the depth of the tree
+            </summary>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Octree.TrackPrevious(ImageQuantization.OctreeQuantizer.Octree.OctreeNode)">
+            <summary>
+            Keep track of the previous node that was quantized
+            </summary>
+            <param name="node">The node last quantized</param>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Octree.Palletize(System.Int32)">
+            <summary>
+            Convert the nodes in the octree to a palette with a maximum of colorCount colors
+            </summary>
+            <param name="colorCount">The maximum number of colors</param>
+            <returns>An arraylist with the palettized colors</returns>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Octree.GetPaletteIndex(ImageQuantization.Quantizer.Color32)">
+            <summary>
+            Get the palette index for the passed color
+            </summary>
+            <param name="pixel"></param>
+            <returns></returns>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.Octree.mask">
+            <summary>
+            Mask used when getting the appropriate pixels for a given node
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.Octree._root">
+            <summary>
+            The root of the octree
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.Octree._leafCount">
+            <summary>
+            Number of leaves in the tree
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.Octree._reducibleNodes">
+            <summary>
+            Array of reducible nodes
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.Octree._maxColorBits">
+            <summary>
+            Maximum number of significant bits in the image
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.Octree._previousNode">
+            <summary>
+            Store the last node quantized
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.Octree._previousColor">
+            <summary>
+            Cache the previous color quantized
+            </summary>
+        </member>
+        <member name="P:ImageQuantization.OctreeQuantizer.Octree.Leaves">
+            <summary>
+            Get/Set the number of leaves in the tree
+            </summary>
+        </member>
+        <member name="P:ImageQuantization.OctreeQuantizer.Octree.ReducibleNodes">
+            <summary>
+            Return the array of reducible nodes
+            </summary>
+        </member>
+        <member name="T:ImageQuantization.OctreeQuantizer.Octree.OctreeNode">
+            <summary>
+            Class which encapsulates each node in the tree
+            </summary>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.#ctor(System.Int32,System.Int32,ImageQuantization.OctreeQuantizer.Octree)">
+            <summary>
+            Construct the node
+            </summary>
+            <param name="level">The level in the tree = 0 - 7</param>
+            <param name="colorBits">The number of significant color bits in the image</param>
+            <param name="octree">The tree to which this node belongs</param>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.AddColor(ImageQuantization.Quantizer.Color32,System.Int32,System.Int32,ImageQuantization.OctreeQuantizer.Octree)">
+            <summary>
+            Add a color into the tree
+            </summary>
+            <param name="pixel">The color</param>
+            <param name="colorBits">The number of significant color bits</param>
+            <param name="level">The level in the tree</param>
+            <param name="octree">The tree to which this node belongs</param>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.Reduce">
+            <summary>
+            Reduce this node by removing all of its children
+            </summary>
+            <returns>The number of leaves removed</returns>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.ConstructPalette(System.Collections.ArrayList,System.Int32@)">
+            <summary>
+            Traverse the tree, building up the color palette
+            </summary>
+            <param name="palette">The palette</param>
+            <param name="paletteIndex">The current palette index</param>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.GetPaletteIndex(ImageQuantization.Quantizer.Color32,System.Int32)">
+            <summary>
+            Return the palette index for the passed color
+            </summary>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.FindClosestMatch(ImageQuantization.Quantizer.Color32)">
+            <summary>
+            Added may 19-09. Should help with dithering.
+            </summary>
+            <param name="pixel"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.Increment(ImageQuantization.Quantizer.Color32)">
+            <summary>
+            Increment the pixel count and add to the color information
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.Octree.OctreeNode._leaf">
+            <summary>
+            Flag indicating that this is a leaf node
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.Octree.OctreeNode._pixelCount">
+            <summary>
+            Number of pixels in this node
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.Octree.OctreeNode._red">
+            <summary>
+            Red component
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.Octree.OctreeNode._green">
+            <summary>
+            Green Component
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.Octree.OctreeNode._blue">
+            <summary>
+            Blue component
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.Octree.OctreeNode._children">
+            <summary>
+            Pointers to any child nodes
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.Octree.OctreeNode._nextReducible">
+            <summary>
+            Pointer to next reducible node
+            </summary>
+        </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.Octree.OctreeNode._paletteIndex">
+            <summary>
+            The index of this node in the palette
+            </summary>
+        </member>
+        <member name="P:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.NextReducible">
+            <summary>
+            Get/Set the next reducible node
+            </summary>
+        </member>
+        <member name="P:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.Children">
+            <summary>
+            Return the child nodes
+            </summary>
+        </member>
+        <member name="T:fbs.ImageResizer.Animation.GifCreator">
+            <summary>
+            Provides methods for creating application and graphics blocks needed to write a animated Gif.
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.Animation.GifCreator.CreateGraphicControlExtensionBlock(System.Int32)">
+            <summary>
+             Written before each frame - specifies the frame's delay and the index of the transparent color (0)
+            </summary>
+            <param name="delay"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.Animation.GifCreator.CreateGraphicControlExtensionBlock(System.Int32,System.Byte)">
+            <summary>
+            Written before each frame - specifies the frame's delay and the index of the transparent color
+            </summary>
+            <param name="delay"></param>
+            <param name="transparentColorIndex"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.Animation.GifCreator.CreateLoopBlock">
+            <summary>
+            Creates a Loop Block (Netscape appliation extension) for infinite looping. Written after the last frame's image data
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.Animation.GifCreator.CreateLoopBlock(System.Int32)">
+            <summary>
+            Creates a Loop block for the specified number of repeats. Written after the last frame's image data
+            </summary>
+            <param name="numberOfRepeatings"></param>
+            <returns></returns>
+        </member>
+        <member name="T:fbs.ImageResizer.InterceptModule">
+            <summary>
+            Monitors incoming image requests. Image requests that request resizing are processed. The resized images are immediately written to disk, and 
+            the request is rewritten to the disk-cached resized version. This way IIS can handle the actual serving of the file.
+            The disk-cache directory is protected through URL authorization.
+            See CustomFolders.cs for any type of URL rewriting 
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.InterceptModule.System#Web#IHttpModule#Init(System.Web.HttpApplication)">
+            <summary>
+            Called when the app is initialized
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.InterceptModule.CheckRequest_PostAuthorizeRequest(System.Object,System.EventArgs)">
+            <summary>
+            This is where we filter requests and intercet those that want resizing performed.
+            We first check for image extensions... 
+            If it is one, then we run it through the CustomFolders methods to see if if there is custom resizing for it..
+            If there still aren't any querystring params after that, then we ignore the request.
+            If the file doesn't exist, we also ignore the request. They're going to cause a 404 anyway.
+            
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.InterceptModule.getCachedVersionFilename(fbs.yrl)">
+            <summary>
+            Builds the physical path for the cached version, using the hashcode of the normalized URL.
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.InterceptModule.ResizeRequest(System.Web.HttpContext,fbs.yrl)">
+            <summary>
+            Generates the resized image to disk (if needed), then rewrites the request to that location.
+            Perform 404 checking before calling this method. Assumes file exists.
+            Called during PostAuthorizeRequest
+            </summary>
+            <param name="r"></param>
+            <param name="extension"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.InterceptModule.context_PreSendRequestHeaders(System.Object,System.EventArgs)">
+            <summary>
+            We don't actually send the data - but we still want to control the headers on the data.
+            PreSendRequestHeaders allows us to change the content-type and cache headers at excatly the last
+            second. We populate the headers from context.Items["FinalContentType"],
+            context.Items["ContentExpires"], and context.Items["FinalCachedFile"].
+            This also indirectly enables server-side mem caching. (HttpCacheability.Public does it)
+            We set the file dependency to FinalCachedFile so changes are update quickly server-side
+            - however, clients will not check for updates until ContentExpires occurs.
+             
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="T:fbs.ImageResizer.ImageManager">
+            <summary>
+            Provides methods for generating resizied images, and for reading and writing them to disk.
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageManager.getBestInstance">
+            <summary>
+            Looks for AnimatedImageManager and returns an instance of that if possible. Otherwise, returns an 
+            ImageManager instance.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.String,System.String,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
+            </summary>
+            <param name="sourceFile"></param>
+            <param name="targetFile"></param>
+            <param name="request"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageManager.HasResizingDirective(System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Returns true if the specified querystring collection uses a resizing command
+            </summary>
+            <param name="q"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageManager.IsOneSpecified(System.String[])">
+            <summary>
+            Returns true if one or more of the arguments has a non-null or non-empty value
+            </summary>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.String,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Generates a resized bitmap from the specifed source file and the specified querystring. Understands width/height and maxwidth/maxheight.
+            Throws either an ArgumentException or IOException if the source image is invalid.
+            Always use ImageOutputSettings to save images, since Image.Save doesn't work well for GIF or PNGs, and needs custom params for Jpegs.
+            </summary>
+            
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.Drawing.Bitmap,System.Drawing.Imaging.ImageFormat,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Creates a new bitmap of the required size, and draws the specified image (with border, background, padding, and shadow).
+            Always use ImageOutputSettings to save images, since Image.Save doesn't work well for GIF or PNGs, and needs custom params for Jpegs.
+            </summary>
+            <param name="src"></param>
+            <param name="q"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.Drawing.Bitmap,fbs.ImageResizer.ResizeSettings,fbs.ImageResizer.ImageSettings,fbs.ImageResizer.ImageFilter,fbs.ImageResizer.ImageOutputSettings,fbs.ImageResizer.WatermarkSettings)">
+            <summary>
+            Creates a new bitmap of the required size, and draws the specified image (with border, background, padding, and shadow).
+            Accepts parallelagrams, so rotation and skew is permitted.
+            Use SelectActiveFrame() to select the right frame prior to calling BuildImage
+            </summary>
+            <param name="page">The page or frame. Use 0 for default.</param>
+            <param name="watermark">Optional, can be null. Plugin for watermarking code</param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageManager.DrawOuterGradient(System.Drawing.Graphics,System.Drawing.PointF[],System.Drawing.Color,System.Drawing.Color,System.Single)">
+            <summary>
+            Draws a gradient around the specified polygon. Fades from 'inner' to 'outer' over a distance of 'width' pixels. 
+            </summary>
+            <param name="g"></param>
+            <param name="poly"></param>
+            <param name="inner"></param>
+            <param name="outer"></param>
+            <param name="width"></param>
         </member>
         <member name="T:fbs.yrl">
             <summary>
@@ -583,267 +961,285 @@
             Indeterminant form
             </summary>
         </member>
-        <member name="T:ImageQuantization.Quantizer">
+        <member name="T:fbs.ImageResizer.CustomFolders">
             <summary>
-            Summary description for Class1.
+            Here is where you can set up custom image size defaults for folders (or any pattern you want). You can also perform URL rewriting on your images.
             </summary>
         </member>
-        <member name="M:ImageQuantization.Quantizer.#ctor(System.Boolean)">
+        <member name="M:fbs.ImageResizer.CustomFolders.processPath(System.String,System.Collections.Specialized.NameValueCollection)">
             <summary>
-            Construct the quantizer
-            </summary>
-            <param name="singlePass">If true, the quantization only needs to loop through the source pixels once</param>
-            <remarks>
-            If you construct this class with a true value for singlePass, then the code will, when quantizing your image,
-            only call the 'QuantizeImage' function. If two passes are required, the code will call 'InitialQuantizeImage'
-            and then 'QuantizeImage'.
-            </remarks>
-        </member>
-        <member name="F:ImageQuantization.Quantizer.fourPass">
-            <summary>
-            If true, image is re-paletted after quantization, and dithering occurs on a separate frame from the source.
-            </summary>
-        </member>
-        <member name="M:ImageQuantization.Quantizer.Quantize(System.Drawing.Image)">
-            <summary>
-            Quantize an image and return the resulting output bitmap
-            </summary>
-            <param name="source">The image to quantize</param>
-            <returns>A quantized version of the image</returns>
-        </member>
-        <member name="M:ImageQuantization.Quantizer.FirstPass(System.Drawing.Imaging.BitmapData,System.Int32,System.Int32)">
-            <summary>
-            Execute the first pass through the pixels in the image
-            </summary>
-            <param name="sourceData">The source data</param>
-            <param name="width">The width in pixels of the image</param>
-            <param name="height">The height in pixels of the image</param>
-        </member>
-        <member name="M:ImageQuantization.Quantizer.SecondPass(System.Drawing.Imaging.BitmapData,System.Drawing.Imaging.BitmapData,System.Drawing.Bitmap,System.Int32,System.Int32,System.Drawing.Rectangle)">
-            <summary>
-            Execute a second pass through the bitmap. If dithering is enabled, sourceData will be modified. 
-            </summary>
-            <param name="sourceData">The source bitmap, locked into memory</param>
-            <param name="intermediate">The intermediate bitmap, used for 4-pass quantization. If specified, output will not actually be modified</param>
-            <param name="output">The output bitmap</param>
-            <param name="width">The width in pixels of the image</param>
-            <param name="height">The height in pixels of the image</param>
-            <param name="bounds">The bounding rectangle</param>
-        </member>
-        <member name="M:ImageQuantization.Quantizer.InitialQuantizePixel(ImageQuantization.Quantizer.Color32)">
-            <summary>
-            Override this to process the pixel in the first pass of the algorithm
-            </summary>
-            <param name="pixel">The pixel to quantize</param>
-            <remarks>
-            This function need only be overridden if your quantize algorithm needs two passes,
-            such as an Octree quantizer.
-            </remarks>
-        </member>
-        <member name="M:ImageQuantization.Quantizer.QuantizePixel(ImageQuantization.Quantizer.Color32)">
-            <summary>
-            Override this to process the pixel in the second pass of the algorithm
-            </summary>
-            <param name="pixel">The pixel to quantize</param>
-            <returns>The quantized value</returns>
-        </member>
-        <member name="M:ImageQuantization.Quantizer.GetPalette(System.Drawing.Imaging.ColorPalette)">
-            <summary>
-            Retrieve the palette for the quantized image
-            </summary>
-            <param name="original">Any old palette, this is overrwritten</param>
-            <returns>The new color palette</returns>
-        </member>
-        <member name="F:ImageQuantization.Quantizer._singlePass">
-            <summary>
-            Flag used to indicate whether a single pass or two passes are needed for quantization.
-            </summary>
-        </member>
-        <member name="T:ImageQuantization.Quantizer.Color32">
-            <summary>
-            Struct that defines a 32 bpp colour
-            </summary>
-            <remarks>
-            This struct is used to read data from a 32 bits per pixel image
-            in memory, and is ordered in this manner as this is the way that
-            the data is layed out in memory
-            </remarks>
-        </member>
-        <member name="F:ImageQuantization.Quantizer.Color32.Blue">
-            <summary>
-            Holds the blue component of the colour
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.Quantizer.Color32.Green">
-            <summary>
-            Holds the green component of the colour
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.Quantizer.Color32.Red">
-            <summary>
-            Holds the red component of the colour
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.Quantizer.Color32.Alpha">
-            <summary>
-            Holds the alpha component of the colour
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.Quantizer.Color32.ARGB">
-            <summary>
-            Permits the color32 to be treated as an int32
-            </summary>
-        </member>
-        <member name="P:ImageQuantization.Quantizer.Color32.Color">
-            <summary>
-            Return the color for this Color32 object
-            </summary>
-        </member>
-        <member name="T:fbs.ImageResizer.DiskCacheException">
-            <summary>
-            Indicates a problem with disk caching. Causes include a missing (or too small) ImageDiskCacheDir setting, and severe I/O locking preventing 
-            the cache dir from being cleaned at all.
-            </summary>
-        </member>
-        <member name="T:fbs.ImageResizer.DiskCache">
-            <summary>
-            Provides methods for creating, maintaining, and securing the disk cache. 
-            Extending this to work for database-sourced (or anything) vs disk-source data 
-            could be done by making alternative UpdateCachedVersionIfNeeded and IsCachedVersionValid
-            methods that accept DateTime instances instead of filenames. 
+            Called for all image requests during PostAuthorizeRequest. 
+            
+            Any custom URL syntaxes can be parsed here - just populate 'q' with the resulting data.
+            
+            This method returns the 'real' path of the image, i.e. /app/img/file.jpg will be returned for /app/img/resize(50,50,jpg)/file.jpg
+            
+            Should be very fast - don't make and I/O or database calls here.
+            AllowURLRewriting must be enabled if you want to return something other than 'filePath'. You can still populate the querystring without this setting.
+            AllowURLRewriting is required for the /resize(50,50,jpg)/ syntax. 
+            
+            This is the only method the rest of the the image resizer touches. If you don't care for the applyDefaults(), applyOverrides(), and resize(w,h,f) syntax,
+            feel free to delete everything else in this class and provide your own implementation of this method.
             
             </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.DiskCache.webConfigFile">
-            <summary>
-            This string contains the contents of a web.conig file that sets URL authorization to "deny all" inside the current directory.
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.DiskCache.UpdateCachedVersionIfNeeded(System.String,System.String,fbs.ImageResizer.DiskCache.CacheUpdateCallback,System.Int32)">
-            <summary>
-            Checks if an update is needed on the specified file... calls the method if needed.
-            Fixed: Implement locking to prevent I/O conflicts on concurrent inital request
-            Returns false if a lock on the source file could not be acquired within fileLockTimeout ms. -1 for indefinite wait - not reccomended!
-            Only one resize operation can be performed on a source file at a time. This method enforces that, and should eliminte costly I/O 'access denied' messages.
-            Of course, locking based on source filename also eliminates writing contention on cached files..
-            </summary>
-            <param name="sourceFilename"></param>
-            <param name="cachedFilename"></param>
-            <param name="updateCallback"></param>
-        </member>
-        <member name="F:fbs.ImageResizer.DiskCache.fileLocks">
-            <summary>
-            The only objects in this collection should be for open files. 
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.DiskCache.IsCachedVersionValid(System.String,System.String)">
-            <summary>
-            Assumes localSourceFile exists. Returns true if localCachedFile exists and matches the last write time of localSourceFile.
-            </summary>
-            <param name="localSourceFile">full physical path of original file</param>
-            <param name="cachedFilename">full physical path of cached file.</param>
+            <param name="filePath"></param>
+            <param name="q"></param>
             <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.DiskCache.IsCachedVersionValid(System.DateTime,System.String)">
+        <member name="M:fbs.ImageResizer.CustomFolders.applyDefaults(System.String,System.Collections.Specialized.NameValueCollection)">
             <summary>
-             Returns true if localCachedFile exists and matches sourceDataModifiedUTC.
+            Settings inserted here are overridden by the querystring values. (q gets overwritten with a copy of the original querystring, so only untouched parameters can be changed)
+            q is populated with the original querystring values to start.
             </summary>
-            <param name="sourceDataModifiedUTC"></param>
-            <param name="localCachedFile"></param>
+            <param name="filePath">The virtual domain-relative path (/app/folder/file.jpg). Doesn't include the querystring.</param>
+        </member>
+        <member name="M:fbs.ImageResizer.CustomFolders.applyOverrides(System.String,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Settings inserted here override the querystring values.
+            </summary>
+            <param name="filePath">The virtual domain-relative path (/app/folder/file.jpg). Doesn't include the querystring.</param>
+        </member>
+        <member name="M:fbs.ImageResizer.CustomFolders.resizeMatch(System.String,System.String,System.Collections.Specialized.NameValueCollection,System.Int32,System.Int32,System.String)">
+            <summary>
+            If substring is found within 'path', q["maxwidth"], q["maxheight"], and q["format"] are set to the specified values.
+            Use -1 or null to omit a value.
+            </summary>
+            <param name="path"></param>
+            <param name="substring"></param>
+            <param name="q"></param>
+            <param name="maxwidth"></param>
+            <param name="maxheight"></param>
+            <param name="format"></param>
+        </member>
+        <member name="F:fbs.ImageResizer.CustomFolders.resizeFolder">
+            <summary>
+            Matches /resize(x,y,f)/ syntax
+            Fixed Bug - will replace both slashes.. make first a lookbehind
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.CustomFolders.parseResizeFolderSyntax(System.String,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Parses and removes the resize folder syntax "resize(x,y,f)/" from the specified file path. 
+            Places settings into the referenced querystring
+            </summary>
+            <param name="path"></param>
+            <param name="query">The collection to place parsed values into</param>
             <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.DiskCache.PrepareCacheDir">
+        <member name="T:fbs.ImageResizer.ImageOutputSettings">
             <summary>
-            Creates the directory for caching if needed, and performs 'garbage collection'
-            Throws a DiskCacheException if the cache direcotry isn't specified in web.config
-            Creates a web.config file in the caching directory to prevent direct access.
+            Extracts the image output and encoding settings from the querystring. 
+            Handles the saving of Image instances to a Stream using the .SaveImage method
+            Doesn't handle animated image files - only single frames. (Neither does GDI)
             </summary>
-            <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.DiskCache.GetCacheDir">
+        <!-- Badly formed XML comment ignored for member "M:fbs.ImageResizer.ImageOutputSettings.parseFromQuerystring(System.Drawing.Imaging.ImageFormat,System.Collections.Specialized.NameValueCollection)" -->
+        <member name="F:fbs.ImageResizer.ImageOutputSettings.Quality">
             <summary>
-            Returns the physical path of the image cache dir. Calcualted from AppSettings["ImageDiskCacheDir"] (yrl form). throws an exception if missing
+            The Jpeg compression quality. 90 is the best setting. 
             </summary>
-            <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.DiskCache.TrimDirectoryFiles(System.String,System.Int32,System.Int32)">
+        <member name="F:fbs.ImageResizer.ImageOutputSettings.Colors">
             <summary>
-            Deletes least-used files from the directory (if needed)
-            Throws an exception if cleanup fails.
-            Returns true if any files were deleted.
+            The number of colors to use. Only applicable for png, gif, and bmp photos where palletes can be used.
+            The default is -1, which means "as much color fidelity as possible". 
             </summary>
-            <param name="dir">The directory to clean up</param>
-            <param name="maxCount">The maximum number of files to leave in the directory. Does nothing if this is less than 0</param>
-            <param name="deleteExtra">How many extra files to delete if deletions are required</param>
-            <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.DiskCache.CompareFiles(System.Collections.Generic.KeyValuePair{System.String,System.DateTime},System.Collections.Generic.KeyValuePair{System.String,System.DateTime})">
+        <member name="F:fbs.ImageResizer.ImageOutputSettings.Dither">
             <summary>
-            Compares the file dates on the arguments
+            Enables dithering for PNG8 and GIF
             </summary>
-            <param name="x"></param>
-            <param name="y"></param>
-            <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.DiskCache.RoughCompare(System.DateTime,System.DateTime)">
+        <member name="F:fbs.ImageResizer.ImageOutputSettings.DisableCustomQuantization">
             <summary>
-            Returns true if both dates are equal (to the nearest 200th of a second)
+            Prevents custom quantization for GIFs, 8-bit PNGs, and 8-bit BMPs. When disabled, the default GDI quantization is used, which 
+            produces poor-quality web-palette images. 
+            The default quantization is faster, and sometimes is the only method that works 
+            (such as in a low-trust environment or where the Marshal class is banned)
             </summary>
-            <param name="modifiedOn"></param>
-            <param name="dateTime"></param>
-            <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.DiskCache.ClearCacheDir">
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetFinalExtension">
             <summary>
-            Clears the cache directory. Returns true if successful. (In-use files make this rare).
+            Returns the file extension for the current OutputFormat
             </summary>
             <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.DiskCache.GetMaxWidth">
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetContentType">
             <summary>
-            Returns the value of AppSettings["ImageResizerMaxWidth"], or 640 if the setting is missing
+            Returns the content type for the current OutputFormat
             </summary>
             <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.DiskCache.GetMaxHeight">
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveImageToNonSeekableStream(System.IO.Stream,System.Drawing.Image)">
             <summary>
-            Returns the value of AppSettings["ImageResizerMaxHeight"], or 480 if the setting is missing
+            Safe for use with non-seekable streams. Writes the Png memory to an intermediate MemoryStream.
+            Does use more memory on PNGs. FileStreams are seekable.
             </summary>
+            <param name="s"></param>
+            <param name="i"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveImage(System.IO.Stream,System.Drawing.Image)">
+            <summary>
+            Requires a seekable string for Png encoding. Use SaveImageToNonSeekableStream for non-seekable streams.
+            </summary>
+            <param name="s"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetSupportedOutputFormat(System.Drawing.Imaging.ImageFormat)">
+            <summary>
+            If the specified ImageFormat is not supported for output, ImageFormat.Jpeg is returned.
+            </summary>
+            <param name="format"></param>
             <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.DiskCache.GetMaxCachedFiles">
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetRequestedType(System.Collections.Specialized.NameValueCollection)">
             <summary>
-            Returns the value of required setting AppSettings["MaxCachedImages"], or 400 if it is missing. An event will be logged if it is missing.
+            Returns the ImageFormat requested in the querystring.
             </summary>
+            <param name="q"></param>
             <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.DiskCache.CacheDirExists">
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetImageFormatFromPhysicalPath(System.String)">
             <summary>
-            Returns true if the image caching directory (GetCacheDir()) exists.
+            Returns the ImageFormat enumeration value based on the extension in the specified physical path.
             </summary>
+            <param name="path"></param>
             <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.DiskCache.GetCacheDirFilesCount">
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetImageFormatFromExtension(System.String)">
             <summary>
-            Returns the number of files inside the image cache directory (recursive traversal)
+            Returns an ImageFormat instance from the specfied extension. Supports jpg, jpeg, bmp, gif, png, tiff, and tff.
+            returns null if not recognized.
             </summary>
+            <param name="ext"></param>
             <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.DiskCache.GetCacheDirTotalSize">
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetExtensionFromImageFormat(System.Drawing.Imaging.ImageFormat)">
             <summary>
-            Returns the summation of the size of the indiviual files in the image cache directory (recursive traversal)
+            Returns an string instance from the specfied ImageFormat. Supports jpg, bmp, gif, png, and tiff,
+            Returns null if not recognized.
             </summary>
+            <param name="ext"></param>
             <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.DiskCache.GetAverageCachedFileSize">
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.IsAcceptedImageType(System.String)">
             <summary>
-            Returns the average size of a file in the image cache directory. Expensive, calls GetCacheDirFilesCount() and GetCacheDirTotalSize()
+            Returns true if the extension on the virtual path 'path' is one of the accepted types
             </summary>
+            <param name="path"></param>
             <returns></returns>
         </member>
-        <member name="T:fbs.ImageResizer.DiskCache.CacheUpdateCallback">
+        <member name="F:fbs.ImageResizer.ImageOutputSettings._acceptedImageExtensions">
             <summary>
-            A callback method that will perform the resize and update the file. This doesn't need paramaters since an anonymous function can be used.
+            Returns a list of (lowercase invariant) image extensions that the module works with.
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetContentTypeFromImageFormat(System.Drawing.Imaging.ImageFormat)">
+            <summary>
+            Supports Png, Jpeg, Gif, Bmp, and Tiff.
+            </summary>
+            <param name="format"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveJpeg(System.Drawing.Image,System.Int32,System.IO.Stream)">
+            <summary>
+            Saves the specified image to the specified stream using jpeg compression of the specified quality.
+            </summary>
+            <param name="b"></param>
+            <param name="quality">A number between 0 and 100. Defaults to 90 if passed a negative number. Numbers over 100 are truncated to 100. 
+            90 is a *very* good setting.
+            </param>
+            <param name="target"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveGif(System.Drawing.Image,System.IO.Stream,System.Byte,System.Boolean)">
+            <summary>
+            Colors argument has no effect when  useGdiQuantization is true.
+            </summary>
+            <param name="img"></param>
+            <param name="target"></param>
+            <param name="colors"></param>
+            <param name="useGdiQuantization"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.SavePng(System.Drawing.Image,System.IO.Stream,System.Byte,System.Boolean)">
+            <summary>
+            Requires seekable stream, i.e. MemoryString or FileStream. Colors argument has no effect when  useGdiQuantization is true.
+            </summary>
+            <param name="img"></param>
+            <param name="target"></param>
+            <param name="colors"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveIndexed(System.Drawing.Imaging.ImageFormat,System.Drawing.Image,System.IO.Stream,System.Byte,System.Boolean,System.Boolean,System.Int32,System.Boolean)">
+            <summary>
+            Colors, dither, fourPass, and ditherPercent arguments have no effect when  useGdiQuantization is true.
+            </summary>
+            <param name="format"></param>
+            <param name="img"></param>
+            <param name="target"></param>
+            <param name="colors"></param>
+            <param name="dither"></param>
+            <param name="fourPass"></param>
+            <param name="ditherPercent"></param>
+            <param name="useGdiQuantization"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.SavePng(System.Drawing.Image,System.IO.Stream)">
+            <summary>
+            Requires seekable stream, i.e. MemoryString or FileStream
+            </summary>
+            <param name="img"></param>
+            <param name="target"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveBmp(System.Drawing.Image,System.IO.Stream,System.Byte,System.Boolean)">
+            <summary>
+            Saves the bitmap. colors argument has no effect when useGdiQuantization is true.
+            </summary>
+            <param name="img"></param>
+            <param name="target"></param>
+            <param name="colors"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetBitsNeededForColorDepth(System.Byte)">
+            <summary>
+            Returns how many bits are required to store the specified number of colors. Performs a Log2() on the value.
+            </summary>
+            <param name="colors"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetImageCodeInfo(System.String)">
+            <summary>
+            Returns the first ImageCodeInfo instance with the specified mime type. Returns null if there are no matches.
+            </summary>
+            <param name="mimeType"></param>
+            <returns></returns>
+        </member>
+        <member name="P:fbs.ImageResizer.ImageOutputSettings.OutputFormat">
+            <summary>
+            If you set this to an unsupported output format (anything other than png, gif, or jpg), it will be the same as settting it to Jpeg. Input is autocorrected.
+            </summary>
+        </member>
+        <member name="P:fbs.ImageResizer.ImageOutputSettings.SupportsTransparency">
+            <summary>
+            Returns true if the desired output type supports transparency.
+            </summary>
+        </member>
+        <member name="T:fbs.ImageResizer.ImageSettings">
+            <summary>
+            TODO: later implement border, padding, and shadow support
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageSettings.parseFromQuerystring(System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            bgcolor=(transparent/white)
+            paddingColor=(transparent/white)
+            paddingWidth=x
+            borderWidth=x
+            borderColor=black
+            shadowWidth=x
+            shadowColor=black
+            shadowOffset(x,y)|both
+            </summary>
+            <param name="q"></param>
+        </member>
+        <member name="T:fbs.ImageResizer.ImageFilter">
+            <summary>
+            Eventually I will extend this class to allow grayscale, brightness, alpha, and possibly contrast adjustment.
             </summary>
         </member>
         <member name="M:fbs.ImageResizer.PolygonMath.RoundPoints(System.Drawing.PointF[])">
@@ -1148,518 +1544,152 @@
             The polygon space that will be required (includes letterboxing space). All 4 points are clockwise.
             </summary>
         </member>
-        <member name="T:ImageQuantization.OctreeQuantizer">
+        <member name="T:fbs.ImageResizer.DiskCacheException">
             <summary>
-            Quantize using an Octree
+            Indicates a problem with disk caching. Causes include a missing (or too small) ImageDiskCacheDir setting, and severe I/O locking preventing 
+            the cache dir from being cleaned at all.
             </summary>
         </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.#ctor(System.Int32,System.Int32)">
+        <member name="T:fbs.ImageResizer.DiskCache">
             <summary>
-            Construct the octree quantizer
-            </summary>
-            <remarks>
-            The Octree quantizer is a two pass algorithm. The initial pass sets up the octree,
-            the second pass quantizes a color based on the nodes in the tree
-            </remarks>
-            <param name="maxColors">The maximum number of colors to return</param>
-            <param name="maxColorBits">The number of significant bits</param>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.Reset">
-            <summary>
-            Clears the octree
-            </summary>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.Reset(System.Int32,System.Int32)">
-            <summary>
-            Clears the octree and reconfigures color settings
-            </summary>
-            <param name="maxColors"></param>
-            <param name="maxColorBits"></param>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.InitialQuantizePixel(ImageQuantization.Quantizer.Color32)">
-            <summary>
-            Process the pixel in the first pass of the algorithm
-            </summary>
-            <param name="pixel">The pixel to quantize</param>
-            <remarks>
-            This function need only be overridden if your quantize algorithm needs two passes,
-            such as an Octree quantizer.
-            </remarks>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer.DitherMatrix">
-            <summary>
-            a Floyd-Steinberg dither matrix
-            new float[,] {{0,0,0},
-            {0,0,0.44f},
-            {0.19f,0.31f,0.06f}};
-            </summary>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.QuantizePixel(ImageQuantization.Quantizer.Color32)">
-            <summary>
-            Override this to process the pixel in the second pass of the algorithm
-            </summary>
-            <param name="pixel">The pixel to quantize</param>
-            <returns>The quantized value</returns>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.GetPalette(System.Drawing.Imaging.ColorPalette)">
-            <summary>
-            Retrieve the palette for the quantized image
-            </summary>
-            <param name="original">Any old palette, this is overrwritten</param>
-            <returns>The new color palette</returns>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer._octree">
-            <summary>
-            Stores the tree
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer._maxColors">
-            <summary>
-            Maximum allowed color depth
-            </summary>
-        </member>
-        <member name="P:ImageQuantization.OctreeQuantizer.Dither">
-            <summary>
-            Uses a Floyd-Steinberg dither
-            </summary>
-        </member>
-        <member name="T:ImageQuantization.OctreeQuantizer.Octree">
-            <summary>
-            Class which does the actual quantization
-            </summary>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.Octree.#ctor(System.Int32)">
-            <summary>
-            Construct the octree
-            </summary>
-            <param name="maxColorBits">The maximum number of significant bits in the image</param>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.Octree.AddColor(ImageQuantization.Quantizer.Color32)">
-            <summary>
-            Add a given color value to the octree
-            </summary>
-            <param name="pixel"></param>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.Octree.Reduce">
-            <summary>
-            Reduce the depth of the tree
-            </summary>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.Octree.TrackPrevious(ImageQuantization.OctreeQuantizer.Octree.OctreeNode)">
-            <summary>
-            Keep track of the previous node that was quantized
-            </summary>
-            <param name="node">The node last quantized</param>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.Octree.Palletize(System.Int32)">
-            <summary>
-            Convert the nodes in the octree to a palette with a maximum of colorCount colors
-            </summary>
-            <param name="colorCount">The maximum number of colors</param>
-            <returns>An arraylist with the palettized colors</returns>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.Octree.GetPaletteIndex(ImageQuantization.Quantizer.Color32)">
-            <summary>
-            Get the palette index for the passed color
-            </summary>
-            <param name="pixel"></param>
-            <returns></returns>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer.Octree.mask">
-            <summary>
-            Mask used when getting the appropriate pixels for a given node
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer.Octree._root">
-            <summary>
-            The root of the octree
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer.Octree._leafCount">
-            <summary>
-            Number of leaves in the tree
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer.Octree._reducibleNodes">
-            <summary>
-            Array of reducible nodes
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer.Octree._maxColorBits">
-            <summary>
-            Maximum number of significant bits in the image
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer.Octree._previousNode">
-            <summary>
-            Store the last node quantized
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer.Octree._previousColor">
-            <summary>
-            Cache the previous color quantized
-            </summary>
-        </member>
-        <member name="P:ImageQuantization.OctreeQuantizer.Octree.Leaves">
-            <summary>
-            Get/Set the number of leaves in the tree
-            </summary>
-        </member>
-        <member name="P:ImageQuantization.OctreeQuantizer.Octree.ReducibleNodes">
-            <summary>
-            Return the array of reducible nodes
-            </summary>
-        </member>
-        <member name="T:ImageQuantization.OctreeQuantizer.Octree.OctreeNode">
-            <summary>
-            Class which encapsulates each node in the tree
-            </summary>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.#ctor(System.Int32,System.Int32,ImageQuantization.OctreeQuantizer.Octree)">
-            <summary>
-            Construct the node
-            </summary>
-            <param name="level">The level in the tree = 0 - 7</param>
-            <param name="colorBits">The number of significant color bits in the image</param>
-            <param name="octree">The tree to which this node belongs</param>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.AddColor(ImageQuantization.Quantizer.Color32,System.Int32,System.Int32,ImageQuantization.OctreeQuantizer.Octree)">
-            <summary>
-            Add a color into the tree
-            </summary>
-            <param name="pixel">The color</param>
-            <param name="colorBits">The number of significant color bits</param>
-            <param name="level">The level in the tree</param>
-            <param name="octree">The tree to which this node belongs</param>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.Reduce">
-            <summary>
-            Reduce this node by removing all of its children
-            </summary>
-            <returns>The number of leaves removed</returns>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.ConstructPalette(System.Collections.ArrayList,System.Int32@)">
-            <summary>
-            Traverse the tree, building up the color palette
-            </summary>
-            <param name="palette">The palette</param>
-            <param name="paletteIndex">The current palette index</param>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.GetPaletteIndex(ImageQuantization.Quantizer.Color32,System.Int32)">
-            <summary>
-            Return the palette index for the passed color
-            </summary>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.FindClosestMatch(ImageQuantization.Quantizer.Color32)">
-            <summary>
-            Added may 19-09. Should help with dithering.
-            </summary>
-            <param name="pixel"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.Increment(ImageQuantization.Quantizer.Color32)">
-            <summary>
-            Increment the pixel count and add to the color information
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer.Octree.OctreeNode._leaf">
-            <summary>
-            Flag indicating that this is a leaf node
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer.Octree.OctreeNode._pixelCount">
-            <summary>
-            Number of pixels in this node
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer.Octree.OctreeNode._red">
-            <summary>
-            Red component
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer.Octree.OctreeNode._green">
-            <summary>
-            Green Component
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer.Octree.OctreeNode._blue">
-            <summary>
-            Blue component
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer.Octree.OctreeNode._children">
-            <summary>
-            Pointers to any child nodes
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer.Octree.OctreeNode._nextReducible">
-            <summary>
-            Pointer to next reducible node
-            </summary>
-        </member>
-        <member name="F:ImageQuantization.OctreeQuantizer.Octree.OctreeNode._paletteIndex">
-            <summary>
-            The index of this node in the palette
-            </summary>
-        </member>
-        <member name="P:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.NextReducible">
-            <summary>
-            Get/Set the next reducible node
-            </summary>
-        </member>
-        <member name="P:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.Children">
-            <summary>
-            Return the child nodes
-            </summary>
-        </member>
-        <member name="T:fbs.ImageResizer.ImageManager">
-            <summary>
-            Provides methods for generating resizied images, and for reading and writing them to disk.
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageManager.getBestInstance">
-            <summary>
-            Looks for AnimatedImageManager and returns an instance of that if possible. Otherwise, returns an 
-            ImageManager instance.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.String,System.String,System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
+            Provides methods for creating, maintaining, and securing the disk cache. 
+            Extending this to work for database-sourced (or anything) vs disk-source data 
+            could be done by making alternative UpdateCachedVersionIfNeeded and IsCachedVersionValid
+            methods that accept DateTime instances instead of filenames. 
             
             </summary>
-            <param name="sourceFile"></param>
-            <param name="targetFile"></param>
-            <param name="request"></param>
         </member>
-        <member name="M:fbs.ImageResizer.ImageManager.HasResizingDirective(System.Collections.Specialized.NameValueCollection)">
+        <member name="F:fbs.ImageResizer.DiskCache.webConfigFile">
             <summary>
-            Returns true if the specified querystring collection uses a resizing command
+            This string contains the contents of a web.conig file that sets URL authorization to "deny all" inside the current directory.
             </summary>
-            <param name="q"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.DiskCache.UpdateCachedVersionIfNeeded(System.String,System.String,fbs.ImageResizer.DiskCache.CacheUpdateCallback,System.Int32)">
+            <summary>
+            Checks if an update is needed on the specified file... calls the method if needed.
+            Fixed: Implement locking to prevent I/O conflicts on concurrent inital request
+            Returns false if a lock on the source file could not be acquired within fileLockTimeout ms. -1 for indefinite wait - not reccomended!
+            Only one resize operation can be performed on a source file at a time. This method enforces that, and should eliminte costly I/O 'access denied' messages.
+            Of course, locking based on source filename also eliminates writing contention on cached files..
+            </summary>
+            <param name="sourceFilename"></param>
+            <param name="cachedFilename"></param>
+            <param name="updateCallback"></param>
+        </member>
+        <member name="F:fbs.ImageResizer.DiskCache.fileLocks">
+            <summary>
+            The only objects in this collection should be for open files. 
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.DiskCache.IsCachedVersionValid(System.String,System.String)">
+            <summary>
+            Assumes localSourceFile exists. Returns true if localCachedFile exists and matches the last write time of localSourceFile.
+            </summary>
+            <param name="localSourceFile">full physical path of original file</param>
+            <param name="cachedFilename">full physical path of cached file.</param>
             <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.ImageManager.IsOneSpecified(System.String[])">
+        <member name="M:fbs.ImageResizer.DiskCache.IsCachedVersionValid(System.DateTime,System.String)">
             <summary>
-            Returns true if one or more of the arguments has a non-null or non-empty value
+             Returns true if localCachedFile exists and matches sourceDataModifiedUTC.
             </summary>
-            <param name="args"></param>
+            <param name="sourceDataModifiedUTC"></param>
+            <param name="localCachedFile"></param>
             <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.String,System.Collections.Specialized.NameValueCollection)">
+        <member name="M:fbs.ImageResizer.DiskCache.PrepareCacheDir">
             <summary>
-            Generates a resized bitmap from the specifed source file and the specified querystring. Understands width/height and maxwidth/maxheight.
-            Throws either an ArgumentException or IOException if the source image is invalid.
-            
-            </summary>
-            
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.Drawing.Bitmap,System.Drawing.Imaging.ImageFormat,System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            Creates a new bitmap of the required size, and draws the specified image (with border, background, padding, and shadow).
-            </summary>
-            <param name="src"></param>
-            <param name="q"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.Drawing.Bitmap,fbs.ImageResizer.ResizeSettings,fbs.ImageResizer.ImageSettings,fbs.ImageResizer.ImageFilter,fbs.ImageResizer.ImageOutputSettings,fbs.ImageResizer.WatermarkSettings)">
-            <summary>
-            Creates a new bitmap of the required size, and draws the specified image (with border, background, padding, and shadow).
-            Accepts parallelagrams, so rotation and skew is permitted.
-            Use SelectActiveFrame() to select the right frame prior to calling BuildImage
-            </summary>
-            <param name="page">The page or frame. Use 0 for default.</param>
-            <param name="watermark">Optional, can be null. Plugin for watermarking code</param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageManager.DrawOuterGradient(System.Drawing.Graphics,System.Drawing.PointF[],System.Drawing.Color,System.Drawing.Color,System.Single)">
-            <summary>
-            Draws a gradient around the specified polygon. Fades from 'inner' to 'outer' over a distance of 'width' pixels. 
-            </summary>
-            <param name="g"></param>
-            <param name="poly"></param>
-            <param name="inner"></param>
-            <param name="outer"></param>
-            <param name="width"></param>
-        </member>
-        <member name="T:fbs.ImageResizer.CustomFolders">
-            <summary>
-            Here is where you can set up custom image size defaults for folders (or any pattern you want). You can also perform URL rewriting on your images.
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.CustomFolders.processPath(System.String,System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            Called for all image requests during PostAuthorizeRequest. 
-            
-            Any custom URL syntaxes can be parsed here - just populate 'q' with the resulting data.
-            
-            This method returns the 'real' path of the image, i.e. /app/img/file.jpg will be returned for /app/img/resize(50,50,jpg)/file.jpg
-            
-            Should be very fast - don't make and I/O or database calls here.
-            AllowURLRewriting must be enabled if you want to return something other than 'filePath'. You can still populate the querystring without this setting.
-            AllowURLRewriting is required for the /resize(50,50,jpg)/ syntax. 
-            
-            This is the only method the rest of the the image resizer touches. If you don't care for the applyDefaults(), applyOverrides(), and resize(w,h,f) syntax,
-            feel free to delete everything else in this class and provide your own implementation of this method.
-            
-            </summary>
-            <param name="filePath"></param>
-            <param name="q"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.CustomFolders.applyDefaults(System.String,System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            Settings inserted here are overridden by the querystring values. (q gets overwritten with a copy of the original querystring, so only untouched parameters can be changed)
-            q is populated with the original querystring values to start.
-            </summary>
-            <param name="filePath">The virtual domain-relative path (/app/folder/file.jpg). Doesn't include the querystring.</param>
-        </member>
-        <member name="M:fbs.ImageResizer.CustomFolders.applyOverrides(System.String,System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            Settings inserted here override the querystring values.
-            </summary>
-            <param name="filePath">The virtual domain-relative path (/app/folder/file.jpg). Doesn't include the querystring.</param>
-        </member>
-        <member name="M:fbs.ImageResizer.CustomFolders.resizeMatch(System.String,System.String,System.Collections.Specialized.NameValueCollection,System.Int32,System.Int32,System.String)">
-            <summary>
-            If substring is found within 'path', q["maxwidth"], q["maxheight"], and q["format"] are set to the specified values.
-            Use -1 or null to omit a value.
-            </summary>
-            <param name="path"></param>
-            <param name="substring"></param>
-            <param name="q"></param>
-            <param name="maxwidth"></param>
-            <param name="maxheight"></param>
-            <param name="format"></param>
-        </member>
-        <member name="F:fbs.ImageResizer.CustomFolders.resizeFolder">
-            <summary>
-            Matches /resize(x,y,f)/ syntax
-            Fixed Bug - will replace both slashes.. make first a lookbehind
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.CustomFolders.parseResizeFolderSyntax(System.String,System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            Parses and removes the resize folder syntax "resize(x,y,f)/" from the specified file path. 
-            Places settings into the referenced querystring
-            </summary>
-            <param name="path"></param>
-            <param name="query">The collection to place parsed values into</param>
-            <returns></returns>
-        </member>
-        <member name="T:fbs.ImageResizer.InterceptModule">
-            <summary>
-            Monitors incoming image requests. Image requests that request resizing are processed. The resized images are immediately written to disk, and 
-            the request is rewritten to the disk-cached resized version. This way IIS can handle the actual serving of the file.
-            The disk-cache directory is protected through URL authorization.
-            See CustomFolders.cs for any type of URL rewriting 
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.InterceptModule.System#Web#IHttpModule#Init(System.Web.HttpApplication)">
-            <summary>
-            Called when the app is initialized
-            </summary>
-            <param name="context"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.InterceptModule.CheckRequest_PostAuthorizeRequest(System.Object,System.EventArgs)">
-            <summary>
-            This is where we filter requests and intercet those that want resizing performed.
-            We first check for image extensions... 
-            If it is one, then we run it through the CustomFolders methods to see if if there is custom resizing for it..
-            If there still aren't any querystring params after that, then we ignore the request.
-            If the file doesn't exist, we also ignore the request. They're going to cause a 404 anyway.
-            
-            </summary>
-            <param name="sender"></param>
-            <param name="e"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.InterceptModule.getCachedVersionFilename(fbs.yrl)">
-            <summary>
-            Builds the physical path for the cached version, using the hashcode of the normalized URL.
-            </summary>
-            <param name="request"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.InterceptModule.ResizeRequest(System.Web.HttpContext,fbs.yrl)">
-            <summary>
-            Generates the resized image to disk (if needed), then rewrites the request to that location.
-            Perform 404 checking before calling this method. Assumes file exists.
-            Called during PostAuthorizeRequest
-            </summary>
-            <param name="r"></param>
-            <param name="extension"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.InterceptModule.context_PreSendRequestHeaders(System.Object,System.EventArgs)">
-            <summary>
-            We don't actually send the data - but we still want to control the headers on the data.
-            PreSendRequestHeaders allows us to change the content-type and cache headers at excatly the last
-            second. We populate the headers from context.Items["FinalContentType"],
-            context.Items["ContentExpires"], and context.Items["FinalCachedFile"].
-            This also indirectly enables server-side mem caching. (HttpCacheability.Public does it)
-            We set the file dependency to FinalCachedFile so changes are update quickly server-side
-            - however, clients will not check for updates until ContentExpires occurs.
-             
-            </summary>
-            <param name="sender"></param>
-            <param name="e"></param>
-        </member>
-        <member name="T:fbs.ImageResizer.ImageSettings">
-            <summary>
-            TODO: later implement border, padding, and shadow support
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageSettings.parseFromQuerystring(System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            bgcolor=(transparent/white)
-            paddingColor=(transparent/white)
-            paddingWidth=x
-            borderWidth=x
-            borderColor=black
-            shadowWidth=x
-            shadowColor=black
-            shadowOffset(x,y)|both
-            </summary>
-            <param name="q"></param>
-        </member>
-        <member name="T:fbs.ImageResizer.ImageFilter">
-            <summary>
-            Eventually I will extend this class to allow grayscale, brightness, alpha, and possibly contrast adjustment.
-            </summary>
-        </member>
-        <member name="T:fbs.ImageResizer.Animation.GifCreator">
-            <summary>
-            Provides methods for creating application and graphics blocks needed to write a animated Gif.
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.Animation.GifCreator.CreateGraphicControlExtensionBlock(System.Int32)">
-            <summary>
-             Written before each frame - specifies the frame's delay and the index of the transparent color (0)
-            </summary>
-            <param name="delay"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.Animation.GifCreator.CreateGraphicControlExtensionBlock(System.Int32,System.Byte)">
-            <summary>
-            Written before each frame - specifies the frame's delay and the index of the transparent color
-            </summary>
-            <param name="delay"></param>
-            <param name="transparentColorIndex"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.Animation.GifCreator.CreateLoopBlock">
-            <summary>
-            Creates a Loop Block (Netscape appliation extension) for infinite looping. Written after the last frame's image data
+            Creates the directory for caching if needed, and performs 'garbage collection'
+            Throws a DiskCacheException if the cache direcotry isn't specified in web.config
+            Creates a web.config file in the caching directory to prevent direct access.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.Animation.GifCreator.CreateLoopBlock(System.Int32)">
+        <member name="M:fbs.ImageResizer.DiskCache.GetCacheDir">
             <summary>
-            Creates a Loop block for the specified number of repeats. Written after the last frame's image data
+            Returns the physical path of the image cache dir. Calcualted from AppSettings["ImageDiskCacheDir"] (yrl form). throws an exception if missing
             </summary>
-            <param name="numberOfRepeatings"></param>
             <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.DiskCache.TrimDirectoryFiles(System.String,System.Int32,System.Int32)">
+            <summary>
+            Deletes least-used files from the directory (if needed)
+            Throws an exception if cleanup fails.
+            Returns true if any files were deleted.
+            </summary>
+            <param name="dir">The directory to clean up</param>
+            <param name="maxCount">The maximum number of files to leave in the directory. Does nothing if this is less than 0</param>
+            <param name="deleteExtra">How many extra files to delete if deletions are required</param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.DiskCache.CompareFiles(System.Collections.Generic.KeyValuePair{System.String,System.DateTime},System.Collections.Generic.KeyValuePair{System.String,System.DateTime})">
+            <summary>
+            Compares the file dates on the arguments
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.DiskCache.RoughCompare(System.DateTime,System.DateTime)">
+            <summary>
+            Returns true if both dates are equal (to the nearest 200th of a second)
+            </summary>
+            <param name="modifiedOn"></param>
+            <param name="dateTime"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.DiskCache.ClearCacheDir">
+            <summary>
+            Clears the cache directory. Returns true if successful. (In-use files make this rare).
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.DiskCache.GetMaxWidth">
+            <summary>
+            Returns the value of AppSettings["ImageResizerMaxWidth"], or 640 if the setting is missing
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.DiskCache.GetMaxHeight">
+            <summary>
+            Returns the value of AppSettings["ImageResizerMaxHeight"], or 480 if the setting is missing
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.DiskCache.GetMaxCachedFiles">
+            <summary>
+            Returns the value of required setting AppSettings["MaxCachedImages"], or 400 if it is missing. An event will be logged if it is missing.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.DiskCache.CacheDirExists">
+            <summary>
+            Returns true if the image caching directory (GetCacheDir()) exists.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.DiskCache.GetCacheDirFilesCount">
+            <summary>
+            Returns the number of files inside the image cache directory (recursive traversal)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.DiskCache.GetCacheDirTotalSize">
+            <summary>
+            Returns the summation of the size of the indiviual files in the image cache directory (recursive traversal)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.DiskCache.GetAverageCachedFileSize">
+            <summary>
+            Returns the average size of a file in the image cache directory. Expensive, calls GetCacheDirFilesCount() and GetCacheDirTotalSize()
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:fbs.ImageResizer.DiskCache.CacheUpdateCallback">
+            <summary>
+            A callback method that will perform the resize and update the file. This doesn't need paramaters since an anonymous function can be used.
+            </summary>
         </member>
         <member name="T:fbs.ImageResizer.Animation.GifClass">
             <summary>

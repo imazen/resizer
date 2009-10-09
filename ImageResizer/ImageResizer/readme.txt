@@ -34,6 +34,17 @@ EXIF data is removed - by design. EXIF data bloats the image file, and can somet
 
 Changelog, by version
 
+Changes since RC2 (v2.1a)
+************************************
+
+Added manual URL authorization using the ASP.NET UrlAuthorizationModule API. AllowURLRewriting no longer circumvents URL authroization.
+
+Added DisableCustomQuantization setting to allow GIFs to be generated on servers where the Marshal class is prohibited.
+
+Added ResizeExtension=".cd" so IIS5 & 6 configuration is optional. Users can append .cd to the end of the image URL instead of adding a wildcard mapping.
+Added dithering.
+
+
 Changes since RC1
 ************************************
 
