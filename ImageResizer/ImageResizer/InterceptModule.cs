@@ -25,6 +25,7 @@
  * from http://nathanaeljones.com/. If nathanaeljones.com is no longer running, and a download
  * cannot be purchased, then you may extract the code.
  * 
+ * Disclaimer of warranty and limitation of liability continued at http://nathanaeljones.com/11151_Image_Resizer_License
  **/
 
 //Clear the image cache before upgrading.. .not sure why it's needed, but images appear corrupted...
