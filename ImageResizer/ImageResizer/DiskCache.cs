@@ -49,64 +49,93 @@ namespace fbs.ImageResizer
     }
     /// <summary>
     /// Provides methods for creating, maintaining, and securing the disk cache. 
+    /// Extending this to work for database-sourced (or anything) vs disk-source data 
+    /// could be done by making alternative UpdateCachedVersionIfNeeded and IsCachedVersionValid
+    /// methods that accept DateTime instances instead of filenames. 
+    /// 
     /// </summary>
     public class DiskCache
     {
+        private static long filesUpdatedSinceCleanup = 0;
+        private static bool hasCleanedUp = false;
         /// <summary>
         /// A callback method that will perform the resize and update the file. This doesn't need paramaters since an anonymous function can be used.
         /// </summary>
         public delegate void CacheUpdateCallback();
         /// <summary>
         /// Checks if an update is needed on the specified file... calls the method if needed.
-        /// TODO: Implement locking to prevent I/O conflicts on concurrent inital request
+        /// Fixed: Implement locking to prevent I/O conflicts on concurrent inital request
+        /// Returns false if a lock on the source file could not be acquired within fileLockTimeout ms. -1 for indefinite wait - not reccomended!
+        /// Only one resize operation can be performed on a source file at a time. This method enforces that, and should eliminte costly I/O 'access denied' messages.
+        /// Of course, locking based on source filename also eliminates writing contention on cached files..
         /// </summary>
         /// <param name="sourceFilename"></param>
         /// <param name="cachedFilename"></param>
         /// <param name="updateCallback"></param>
-        public static void UpdateCachedVersionIfNeeded(string sourceFilename, string cachedFilename, CacheUpdateCallback updateCallback)
+        public static bool UpdateCachedVersionIfNeeded(string sourceFilename, string cachedFilename, CacheUpdateCallback updateCallback, int fileLockTimeout)
         {
             PrepareCacheDir();
-            //TODO - implement locking so concurrent requests for the same file don't cause an I/O issue.
+            //Fixed - implement locking so concurrent requests for the same file don't cause an I/O issue.
             if (!IsCachedVersionValid(sourceFilename, cachedFilename))
             {
+                //Create or obtain a blank object for locking purposes. Store or retrieve using the filename as a key.
                 string key = sourceFilename.ToLower();
 
                 object fileLock = null;
-                lock (fileLocks)
+                lock (fileLocks) //We have to lock the dictionary, since otherwise two locks for the same file could be created and assigned at the same time. (i.e, between ContainsKey and the assignment)
                 {
                     if (fileLocks.ContainsKey(key))
                         fileLock = fileLocks[key];
                     else
                         fileLocks[key] = fileLock = new Object();//make new lock
                 }
-                
-                lock (fileLock)
+                //We should now have an exclusive lock for this filename.  We're only going to hold this thread open for fileLockTimeout ms - too many threads blocked kills performance.
+                //We don't use a standard lock{}, since that could block as long as the underlying I/O calls.
+                if (System.Threading.Monitor.TryEnter(fileLock,fileLockTimeout))
                 {
-
-                    if (!IsCachedVersionValid(sourceFilename, cachedFilename))
+                    try
                     {
-                        updateCallback();
-                       
-                        //Update the write time to match - this is how we know whether they are in sync.
-                        System.IO.File.SetLastWriteTimeUtc(cachedFilename, System.IO.File.GetLastWriteTimeUtc(sourceFilename));
+                        if (!IsCachedVersionValid(sourceFilename, cachedFilename))
+                        {
+                            updateCallback();
+                            filesUpdatedSinceCleanup++;
+                            //Update the write time to match - this is how we know whether they are in sync.
+                            System.IO.File.SetLastWriteTimeUtc(cachedFilename, System.IO.File.GetLastWriteTimeUtc(sourceFilename));
+                        }
+                    }
+                    finally
+                    {
+                        //release lock
+                        System.Threading.Monitor.Exit(fileLock);
                     }
                 }
-                //Attempt cleanup of lock object.
+                else
+                {
+                    //Only one resize operation on a source file occurs at a time.
+                    //fileLockTimeout was not enough to acquire a lock on the file
+                    return false;
+                }
+                //Attempt cleanup of lock objects. TryEnter() failes if there is anybody else holding the lock at that moment
                 if (System.Threading.Monitor.TryEnter(fileLocks))
                 {
                     try
                     {
-                        if (System.Threading.Monitor.TryEnter(fileLock))
+                        if (System.Threading.Monitor.TryEnter(fileLock)) //Try entering on the file-specific lock. 
                         {
-                            try{ fileLocks.Remove(key);  }
+                            try{ fileLocks.Remove(key);  } //It succeeds, so no-one else is locking on it - clean it up.
                             finally { System.Threading.Monitor.Exit(fileLock); }
                         }
                     }
                     finally { System.Threading.Monitor.Exit(fileLocks); }
                 }
+                //Ideally the only objects in fileLocks will be open operations now.
                 
             }
+            return true;
         }
+        /// <summary>
+        /// The only objects in this collection should be for open files. 
+        /// </summary>
         private static Dictionary<String, Object> fileLocks = new Dictionary<string, object>();
 
         private static void LogWarning(String message)
@@ -129,6 +158,8 @@ namespace fbs.ImageResizer
             if (localCachedFile == null) return false;
             if (!System.IO.File.Exists(localCachedFile)) return false;
 
+            if ("true".Equals(ConfigurationManager.AppSettings["DiskCacheAlwaysInvalid"], StringComparison.OrdinalIgnoreCase))
+                return false;
 
             //When we save thumbnail files to disk, we set the write time to that of the source file.
             //This allows us to track if the source file has changed.
@@ -136,6 +167,26 @@ namespace fbs.ImageResizer
             DateTime cached = System.IO.File.GetLastWriteTimeUtc(localCachedFile);
             DateTime source = System.IO.File.GetLastWriteTimeUtc(localSourceFile);
             return RoughCompare(cached, source);
+        }
+        /// <summary>
+        ///  Returns true if localCachedFile exists and matches sourceDataModifiedUTC.
+        /// </summary>
+        /// <param name="sourceDataModifiedUTC"></param>
+        /// <param name="localCachedFile"></param>
+        /// <returns></returns>
+        public static bool IsCachedVersionValid(DateTime sourceDataModifiedUTC, string localCachedFile)
+        {
+            if (localCachedFile == null) return false;
+            if (!System.IO.File.Exists(localCachedFile)) return false;
+
+            if ("true".Equals(ConfigurationManager.AppSettings["DiskCacheAlwaysInvalid"], StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            //When we save thumbnail files to disk, we set the write time to that of the source file.
+            //This allows us to track if the source file has changed.
+
+            DateTime cached = System.IO.File.GetLastWriteTimeUtc(localCachedFile);
+            return RoughCompare(cached, sourceDataModifiedUTC);
         }
 
         /// <summary>
@@ -172,7 +223,12 @@ namespace fbs.ImageResizer
 
             //Perform cleanup if needed. Clear 1/10 of the files if we are running low.
             int maxCount = GetMaxCachedFiles();
-            TrimDirectoryFiles(dir, maxCount - 1, (maxCount / 10));
+            //Only test for cleanup if we've added 1/15 of the quota since last check. This may make things a little less precise, but provides a 
+            //huge perfomance boost - GetFiles() can be very slow on some machines
+            if (filesUpdatedSinceCleanup > maxCount / 15 || !hasCleanedUp)
+            {
+                TrimDirectoryFiles(dir, maxCount - 1, (maxCount / 10));
+            }
 
         }
 
@@ -207,9 +263,11 @@ namespace fbs.ImageResizer
             if (maxCount < 0) return false;
 
             // if (deleteExtra > maxCount) throw warning
-
+            
             string[] files = System.IO.Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
             if (files.Length <= maxCount) return false;
+
+           
 
             //Oops, look like we have to clean up a little.
 
@@ -255,6 +313,9 @@ namespace fbs.ImageResizer
 
                 }
             }
+
+            hasCleanedUp = true;
+            filesUpdatedSinceCleanup = 0;
             return deletedSome;
         }
         /// <summary>

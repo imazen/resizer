@@ -36,6 +36,80 @@ namespace fbs.ImageResizer
 {
     public class PolygonMath
     {
+        /// <summary>
+        /// Rounds the elements of the specified array [not used]
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        public static PointF[] RoundPoints(PointF[] a)
+        {
+            
+            ForEach(a, delegate(object o){
+                PointF p = (PointF)o;
+                p.X = (float)Math.Round(p.X);
+                p.Y = (float)Math.Round(p.Y);
+                return p;
+            });
+            return a;
+        }
+        /// <summary>
+        /// Rounds the elements of the specified array [not used]
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        public static PointF[,] RoundPoints(PointF[,] a)
+        {
+            
+            ForEach(a, delegate(object o)
+            {
+                PointF p = (PointF)o;
+                p.X = (float)Math.Round(p.X);
+                p.Y = (float)Math.Round(p.Y);
+                return p;
+            });
+            return a;
+        }
+
+        public delegate object ForEachFunction(object o);
+        /// <summary>
+        /// Modifies the specified array by applying the specified function to each element.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static void ForEach(Array a, ForEachFunction func)
+        {
+            long[] ix = new long[a.Rank];
+            //Init index
+            for (int i = 0; i < ix.Length;i++) ix[i] = a.GetLowerBound(i);
+
+            //Loop through all items
+            for (long i = 0; i < a.LongLength; i++){
+                a.SetValue(func(a.GetValue(ix)),ix);
+
+                //Increment ix, the index
+                for (int j = 0; j < ix.Length; j++)
+                {
+                    if (ix[j] < a.GetUpperBound(j))
+                    {
+                        ix[j]++;
+                        break; //We're done incrementing.
+                    }
+                    else
+                    {
+                        //Ok, reset this one and increment the next.
+                        ix[j] = a.GetLowerBound(j);
+                        //If this is the last dimension, assert
+                        //that we are at the last element
+                        if (j == ix.Length - 1)
+                        {
+                            if (i < a.LongLength - 1) throw new Exception();
+                        }
+                        continue;
+                    }
+                }
+            }
+            return;
+        }
 
         /// <summary>
         /// Rotates the specified polygon around the origin. 
@@ -214,7 +288,7 @@ namespace fbs.ImageResizer
             PathGradientBrush b = new PathGradientBrush(path);
             b.CenterColor = inner;
             b.CenterPoint = pt;
-            b.WrapMode = WrapMode.TileFlipXY;
+            b.WrapMode = WrapMode.Clamp;
             //All outer colors are the same.
             Color[] colors = new Color[path.Length];
             for (int i = 0; i < colors.Length; i++) colors[i] = outer;
@@ -262,12 +336,35 @@ namespace fbs.ImageResizer
         /// The adjacent edges are perpendicular to 'poly'. Point 1 of each parallelogram will match the respective point in 'poly'
         /// Points are clockwise.
         ///
+        /// TODO - some rounding issues going on, not exact numbers here
         /// </summary>
         /// <param name="inner"></param>
         /// <param name="outer"></param>
         /// <returns></returns>
         public static PointF[,] GetCorners(PointF[] poly, float width)
         {
+            //Build the widths array.
+            float[] widths = new float[poly.Length];
+            for(int i = 0; i < widths.Length;i++) widths[i] = width;
+            //Call
+            return GetCorners(poly,widths);
+        }
+        /// <summary>
+        /// Returns an array of parallelograms. These parallelgrams are the 'corners' outside each vertex in 'poly'.
+        /// The adjacent edges are perpendicular to 'poly'. Point 1 of each parallelogram will match the respective point in 'poly'
+        /// Points are clockwise.
+        /// 
+        /// Each float in widths[] corresponds to the point in poly[]. This is the distance to go perpendicularly from 
+        /// the line beween poly[i] and poly[i +1].
+        /// 
+        /// </summary>
+        /// <param name="poly"></param>
+        /// <param name="widths"></param>
+        /// <returns></returns>
+        public static PointF[,] GetCorners(PointF[] poly, float[] widths)
+        {
+            if (poly.Length != widths.Length) throw new ArgumentException();
+
             PointF[,] corners = new PointF[poly.Length, 4];
             int end = (poly.Length - 1); //the last index in the array
             for (int i = 0; i < poly.Length; i++)
@@ -278,12 +375,15 @@ namespace fbs.ImageResizer
                 PointF prev = (i > 0) ? poly[i - 1] : poly[i + end];
                 PointF current = poly[i];
 
+                float prevWidth = (i > 0) ? widths[i-1] : widths[i + end];
+                float width = widths[i];
+
                 //Radians = pi/(180*degrees)
                 //Degrees = radians*180/pi
                 //Get vectors perpendicular to next and prev, with lengths of 'offset'.
                 PointF pP = ChangeMagnitude(
                     RotateVector(new PointF(prev.X - current.X, prev.Y - current.Y), Math.PI / 2) //rotate 90 clockwise.
-                    , width); //scale to offset length.
+                    , prevWidth); //scale to offset length.
 
                 PointF pN = ChangeMagnitude(
                     RotateVector(new PointF(next.X - current.X, next.Y - current.Y), Math.PI / -2) //rotate 90 counter-clockwise.
@@ -309,7 +409,7 @@ namespace fbs.ImageResizer
         {
             //Just grab the sides between the corners.
             PointF[,] corners = GetCorners(poly, width);
-            PointF[,] sides = new PointF[corners.Length, 4];
+            PointF[,] sides = new PointF[corners.GetUpperBound(0) + 1, 4];
             for (int i = 0; i <= corners.GetUpperBound(0); i++)
             {
                 int next = (i < corners.GetUpperBound(0)) ? i + 1 : i - corners.GetUpperBound(0);
@@ -322,6 +422,7 @@ namespace fbs.ImageResizer
         }
         /// <summary>
         /// Expands all sides on the specified polygon by the specified offset. Assumes the polygon is concave.
+        /// Returns a new polygon
         /// </summary>
         /// <param name="quad"></param>
         /// <param name="offset"></param>
@@ -331,11 +432,30 @@ namespace fbs.ImageResizer
             PointF[,] corners = GetCorners(poly, offset);
             PointF[] newPoly = new PointF[poly.Length];
             for (int i = 0; i <= corners.GetUpperBound(0); i++)
-                newPoly[i] = corners[i, 3]; //Just grab the outer corner
+                newPoly[i] = corners[i, 2]; //Just grab the outer corner
 
             return newPoly;
 
         }
+        /// <summary>
+        /// Expands all sides on the specified polygon by the specified offsets. Assumes the polygon is concave.
+        /// Returns a new polygon.
+        /// 
+        /// </summary>
+        /// <param name="quad"></param>
+        /// <param name="offsets">An array the same size as poly[], with the distances to expand the edges. Edges are between i and i+1</param>
+        /// <returns></returns>
+        public static PointF[] InflatePoly(PointF[] poly, float[] offsets)
+        {
+            PointF[,] corners = GetCorners(poly, offsets);
+            PointF[] newPoly = new PointF[poly.Length];
+            for (int i = 0; i <= corners.GetUpperBound(0); i++)
+                newPoly[i] = corners[i, 2]; //Just grab the outer corner
+
+            return newPoly;
+
+        }
+      
         /// <summary>
         /// Moves 'inner' so that the center of its bounding box equals the center of the bounding box of 'outer'
         /// </summary>
@@ -349,6 +469,11 @@ namespace fbs.ImageResizer
            
             return MovePoly(NormalizePoly(inner), new PointF((outBox.Width - inBox.Width) / 2 + outBox.X,
                                                     (outBox.Height - inBox.Height) / 2 + outBox.Y));
+        }
+
+        public static Rectangle ToRectangle(RectangleF r)
+        {
+            return new Rectangle((int)Math.Round(r.X), (int)Math.Round(r.Y), (int)Math.Round(r.Width),(int)Math.Round( r.Height));
         }
     }
 }

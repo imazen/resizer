@@ -178,7 +178,10 @@ namespace ImageQuantization
                     {
                         // Check if this is the same as the last pixel. If so use that value
                         // rather than calculating it again. This is an inexpensive optimisation.
-                        if (Marshal.ReadByte(pPreviousPixel) != Marshal.ReadByte(pSourcePixel))
+                        // Nathanael: 2-11-09 changed from ReadByte to ReadInt32 on both.
+                        // Otherwise this comparison may return true if only the blue component is the 
+                        // same in 2 subsequent pixels.
+                        if (Marshal.ReadInt32(pPreviousPixel) != Marshal.ReadInt32(pSourcePixel))
                         {
                             // Quantize the pixel
                             pixelValue = QuantizePixel(new Color32(pSourcePixel));

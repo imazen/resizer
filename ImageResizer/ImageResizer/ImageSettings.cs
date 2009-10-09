@@ -33,6 +33,7 @@ using System.Text;
 using System.Drawing;
 using System.Collections.Specialized;
 using System.Drawing.Imaging;
+using System.Globalization;
 
 namespace fbs.ImageResizer
 {
@@ -42,6 +43,25 @@ namespace fbs.ImageResizer
     public class ImageSettings
     {
         public ImageSettings() { }
+
+        public Color parseColor(NameValueCollection q, string key, Color defaultValue)
+        {
+            if (!string.IsNullOrEmpty(q[key]))
+            {
+                //try hex first
+                int val;
+                if (int.TryParse(q[key], System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out val))
+                {
+                    return System.Drawing.ColorTranslator.FromHtml("#" + q[key]);
+                }
+                else
+                {
+                    Color c = System.Drawing.ColorTranslator.FromHtml(q[key]);
+                    return (c.IsEmpty) ? defaultValue : c;
+                }
+            }
+            return defaultValue;
+        }
 
         public ImageSettings(NameValueCollection q)
         {
@@ -81,6 +101,19 @@ namespace fbs.ImageResizer
         /// <param name="q"></param>
         public void parseFromQuerystring(NameValueCollection q)
         {
+            bgcolor = this.parseColor(q, "bgcolor", bgcolor);
+            paddingColor = this.parseColor(q, "paddingColor", paddingColor);
+            borderColor = this.parseColor(q, "borderColor", borderColor);
+            shadowColor = this.parseColor(q, "shadowColor", shadowColor);
+            paddingWidth = ResizeSettings.getFloat(q, "paddingWidth", paddingWidth);
+            borderWidth = ResizeSettings.getFloat(q, "borderWidth", borderWidth);
+            shadowWidth = ResizeSettings.getFloat(q, "shadowWidth", shadowWidth);
+
+            if (!string.IsNullOrEmpty(q["shadowOffset"]))
+            {
+                double[] coords = ResizeSettings.parseList(q["shadowOffset"], 0);
+                if (coords.Length == 2) shadowOffset = new PointF((float)coords[0], (float)coords[1]);
+            }
         }
 
     }

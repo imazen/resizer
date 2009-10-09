@@ -60,7 +60,7 @@ namespace fbs.ImageResizer
         /// <param name="text"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        private double[] parseList(string text, double defaultValue){
+        public static double[] parseList(string text, double defaultValue){
             text = text.Trim(' ','(',')');
             string[] parts = text.Split(new char[]{','}, StringSplitOptions.None);
             double[] vals = new double[parts.Length];
@@ -71,14 +71,14 @@ namespace fbs.ImageResizer
             }
             return vals;
         }
-        private  int getInt(NameValueCollection q, string name, int defaultValue)
+        public static  int getInt(NameValueCollection q, string name, int defaultValue)
         {
             int temp = defaultValue;
             if (!string.IsNullOrEmpty(q[name]))
                 int.TryParse(q[name], out temp);
             return temp;
         }
-        private float getFloat(NameValueCollection q, string name, float defaultValue)
+        public static float getFloat(NameValueCollection q, string name, float defaultValue)
         {
             float temp = defaultValue;
             if (!string.IsNullOrEmpty(q[name]))
@@ -98,7 +98,7 @@ namespace fbs.ImageResizer
             this.height = getFloat(q, "height", this.height);
             this.maxwidth = getFloat(q, "maxwidth", this.maxwidth);
             this.maxheight = getFloat(q, "maxheight", this.maxheight);
-            //this.rotate = (double)getFloat(q, "rotate", (float)this.rotate);
+            this.rotate = (double)getFloat(q, "rotate", (float)this.rotate);
 
             if (q["stretch"] != null)
             {
@@ -145,18 +145,38 @@ namespace fbs.ImageResizer
             string sFlip = q["flip"];
             if (!string.IsNullOrEmpty(sFlip))
             {
-                if ("none".Equals(sFlip, StringComparison.OrdinalIgnoreCase))
-                    flip = RotateFlipType.RotateNoneFlipNone;
-                else if (sFlip.Equals("h", StringComparison.OrdinalIgnoreCase))
-                    flip = RotateFlipType.RotateNoneFlipX;
-                else if (sFlip.Equals("v", StringComparison.OrdinalIgnoreCase))
-                    flip = RotateFlipType.RotateNoneFlipY;
-                else if (sFlip.Equals("both", StringComparison.OrdinalIgnoreCase))
-                    flip = RotateFlipType.RotateNoneFlipXY;
-               // else
-                   // throw new ArgumentOutOfRangeException("flip", "Must be one of the following: none, h, v, or both. Found " + sFlip);
+                flip = parseFlip(sFlip);
             }
 
+
+            string ssFlip = q["sourceFlip"];
+            if (!string.IsNullOrEmpty(ssFlip))
+            {
+                sourceFlip = parseFlip(ssFlip);
+            }
+        }
+        /// <summary>
+        /// Returns RotateNoneFlipNone if not a recognize value.
+        /// </summary>
+        /// <param name="sFlip"></param>
+        /// <returns></returns>
+        private static RotateFlipType parseFlip(string sFlip)
+        {
+            
+            if (!string.IsNullOrEmpty(sFlip))
+            {
+                if ("none".Equals(sFlip, StringComparison.OrdinalIgnoreCase))
+                    return RotateFlipType.RotateNoneFlipNone;
+                else if (sFlip.Equals("h", StringComparison.OrdinalIgnoreCase))
+                    return RotateFlipType.RotateNoneFlipX;
+                else if (sFlip.Equals("v", StringComparison.OrdinalIgnoreCase))
+                    return RotateFlipType.RotateNoneFlipY;
+                else if (sFlip.Equals("both", StringComparison.OrdinalIgnoreCase))
+                    return RotateFlipType.RotateNoneFlipXY;
+                // else
+                // throw new ArgumentOutOfRangeException("flip", "Must be one of the following: none, h, v, or both. Found " + sFlip);
+            }
+            return RotateFlipType.RotateNoneFlipNone;
         }
         public float width = -1;
         public float height = -1;
@@ -167,7 +187,14 @@ namespace fbs.ImageResizer
         /// </summary>
         public double rotate = 0;
 
+        /// <summary>
+        /// Applied last, after all effects. 
+        /// </summary>
         public RotateFlipType flip = RotateFlipType.RotateNoneFlipNone;
+        /// <summary>
+        /// Flips the source image prior to processing. 
+        /// </summary>
+        public RotateFlipType sourceFlip = RotateFlipType.RotateNoneFlipNone;
 
 
         public enum CropMode
@@ -196,8 +223,8 @@ namespace fbs.ImageResizer
             double x1 = c[0],  y1 = c[1],  x2 = c[2],  y2 = c[3];
 
             //allow negative offsets 
-            if (x1 <= 0) x1 += imageSize.Width;
-            if (y1 <= 0) y1 += imageSize.Height;
+            if (x1 < 0) x1 += imageSize.Width;
+            if (y1 < 0) y1 += imageSize.Height;
             if (x2 <= 0) x2 += imageSize.Width;
             if (y2 <= 0) y2 += imageSize.Height;
             
