@@ -230,8 +230,22 @@ namespace fbs.ImageResizer
             //Find the size
             SizeF box = PolygonMath.GetBoundingBox(all).Size;
 
-            //Create new bitmap using calculated size
-            Bitmap b = new Bitmap((int)Math.Round(box.Width), (int)Math.Round(box.Height), PixelFormat.Format32bppArgb);
+            Bitmap b;
+            //Create new bitmap using calculated size. 
+            //OLD idea: Potential problem, rounding max crop or leave space. However, floating-point values should only occur on rotations.
+            //4-23-09, FALSE, floating point values can occur anytime scaling takes place. 
+            //Fixed by using Floor instead of Round
+            if (PolygonMath.GetBoundingBox(size.imageTarget).Size.Equals(box))
+            {
+                //The image is taking the entire space. Round down, as System.Drawing does.
+                b = new Bitmap((int)Math.Floor(box.Width), (int)Math.Floor(box.Height), PixelFormat.Format32bppArgb);
+
+            }
+            else
+            {
+                //It isn't taking up all the space - Space around the image is expected. Leaving normal rounding in place - flooring would do as much harm as good on average.
+                b = new Bitmap((int)Math.Round(box.Width), (int)Math.Round(box.Height), PixelFormat.Format32bppArgb);
+            }
 
             //Create graphics handle
             Graphics g = Graphics.FromImage(b);
@@ -279,6 +293,7 @@ namespace fbs.ImageResizer
 
                 if (!PolygonMath.GetBoundingBox(size.imageTarget).Size.Equals(box))
                 {
+
                     //Inflate half a pixel to remove white border caused by GDI+ error
                    //Doesn't work! size.imageTarget = PolygonMath.InflatePoly(size.imageTarget, 1F);
                   /* Doesn't work either:

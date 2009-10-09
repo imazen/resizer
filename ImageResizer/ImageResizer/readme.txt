@@ -1,10 +1,33 @@
 ﻿Possible issues
 
-GIF/PNG quantitization may not work on x64 - 
+Seems to be working: GIF/PNG quantitization may not work on x64 - 
 
-Content-location for the original image is being sent on IIS7, but not IIS5.1 
+Unable to reproduce: Content-location for the original image is being sent on IIS7, but not IIS5.1 
 
-EXIF data is removed.
+By design: EXIF data is removed.
+
+4-23-09
+Added DisableCacheCleanup command, and made MaxCachedImages < 0 behave the same as DisableCacheCleanup=true
+
+Fixed rounding error that could cause a pixel line on the right and/or bottom sides of the image. Rare floating point rounding error.
+
+This fix will be going into the 2.0 beta, but you can apply it yourself.
+
+Line 237 of ImageManger.cs
+
+Replace
+Bitmap b = new Bitmap((int)Math.Round(box.Width), (int)Math.Round(box.Height), PixelFormat.Format32bppArgb);
+with
+Bitmap b = new Bitmap((int)Math.Floor(box.Width), (int)Math.Floor(box.Height), PixelFormat.Format32bppArgb);
+instead.
+
+I looked for other places the bug could affect, but I think this is it. System.Drawing is truncating floating point values before rounding, so values very close to .5 can be rounded incorrectly.
+This image was resizing to 150x42.527472527472527472527472527473. System.Drawing was rounding down, and the image size was rounding up.
+
+
+~
+Added YRL fix.
+
 
 2-2-09
 

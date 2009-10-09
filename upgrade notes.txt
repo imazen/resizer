@@ -1,3 +1,6 @@
+Upgrade notes available online at
+
+http://nathanaeljones.com/11171_Image_Resizer_1_2_Upgrade_Notes
 It is recommended that you delete the /imagecache/ folder when changing versions. 
 
 The default behavior when both ?width=x&height=y are specified has changed. See the sample project Default.aspx

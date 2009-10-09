@@ -223,13 +223,15 @@ namespace fbs.ImageResizer
 
             //Perform cleanup if needed. Clear 1/10 of the files if we are running low.
             int maxCount = GetMaxCachedFiles();
-            //Only test for cleanup if we've added 1/15 of the quota since last check. This may make things a little less precise, but provides a 
-            //huge perfomance boost - GetFiles() can be very slow on some machines
-            if (filesUpdatedSinceCleanup > maxCount / 15 || !hasCleanedUp)
-            {
-                TrimDirectoryFiles(dir, maxCount - 1, (maxCount / 10));
+            if (!"true".Equals(ConfigurationManager.AppSettings["DisableCacheCleanup"], StringComparison.OrdinalIgnoreCase) || maxCount < 0)
+            {  
+                //Only test for cleanup if we've added 1/15 of the quota since last check. This may make things a little less precise, but provides a 
+                //huge perfomance boost - GetFiles() can be very slow on some machines
+                if (filesUpdatedSinceCleanup > maxCount / 15 || !hasCleanedUp)
+                {
+                    TrimDirectoryFiles(dir, maxCount - 1, (maxCount / 10));
+                }
             }
-
         }
 
         /// <summary>
