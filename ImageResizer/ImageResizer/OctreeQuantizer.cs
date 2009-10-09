@@ -29,16 +29,28 @@ namespace ImageQuantization
 		/// <param name="maxColorBits">The number of significant bits</param>
 		public OctreeQuantizer ( int maxColors , int maxColorBits ) : base ( false )
 		{
-			if ( maxColors > 255 )
-				throw new ArgumentOutOfRangeException ( "maxColors" , maxColors , "The number of colors should be less than 256" ) ;
-
-			if ( ( maxColorBits < 1 ) | ( maxColorBits > 8 ) )
-				throw new ArgumentOutOfRangeException ( "maxColorBits" , maxColorBits , "This should be between 1 and 8" ) ;
-
-			// Construct the octree
-			_octree = new Octree ( maxColorBits  ) ;
-			_maxColors = maxColors ;
+            Reset(maxColors, maxColorBits);
 		}
+        public override void Reset()
+        {
+            base.Reset();
+            Reset(_maxColors, _maxColorBits);
+        }
+        private int _maxColorBits = 8;
+        public void Reset( int maxColors , int maxColorBits)
+        {
+           
+            if (maxColors > 255)
+                throw new ArgumentOutOfRangeException("maxColors", maxColors, "The number of colors should be less than 256");
+
+            if ((maxColorBits < 1) | (maxColorBits > 8))
+                throw new ArgumentOutOfRangeException("maxColorBits", maxColorBits, "This should be between 1 and 8");
+
+            _maxColorBits = maxColorBits;
+            // Construct the octree
+            _octree = new Octree(maxColorBits);
+            _maxColors = maxColors;
+        }
 
 		/// <summary>
 		/// Process the pixel in the first pass of the algorithm
@@ -54,6 +66,28 @@ namespace ImageQuantization
 			_octree.AddColor ( pixel ) ;
 		}
 
+        private ColorPalette _lastPalette;
+        private const bool TransparencyAtZero = true;
+        protected bool _dither = false;
+        /// <summary>
+        /// Uses a Floyd-Steinberg dither
+        /// </summary>
+        public bool Dither
+        {
+            get { return _dither; }
+            set { _dither = value; }
+        }
+        /// <summary>
+        /// a Floyd-Steinberg dither matrix
+        /// new float[,] {{0,0,0},
+        /// {0,0,0.44f},
+        /// {0.19f,0.31f,0.06f}};
+        /// </summary>
+        public float[,] DitherMatrix = new float[,] {{0,0,0},
+                                                            {0,0,0.44f},
+                                                            {0.19f,0.31f,0.06f}};
+
+        public float DitherPercent = .3f;
 		/// <summary>
 		/// Override this to process the pixel in the second pass of the algorithm
 		/// </summary>
@@ -61,15 +95,59 @@ namespace ImageQuantization
 		/// <returns>The quantized value</returns>
 		protected override byte QuantizePixel ( Color32 pixel )
 		{
-			byte	paletteIndex = (byte)_maxColors ;	// The color at [_maxColors] is set to transparent
+			byte	paletteIndex;	// The color at [_maxColors] is set to transparent
+            
             //TODO: Other sources claim only the first pallete color can be transparent
             //Quote: Second, I've found a solution for preserving GIF transparency when invoking Image::Save(...). The .NET (tested on v2.0) 
             //GIF encoder considers transparent the first color found in the palette, so I've changed some methods (replace them with the supplied ones):
 
 			// Get the palette index if this non-transparent
-			if ( pixel.Alpha > 0 )
-				paletteIndex = (byte)_octree.GetPaletteIndex ( pixel ) ;
+            if (pixel.Alpha > 0)
+            {
+                paletteIndex = (byte)_octree.GetPaletteIndex(pixel);
+                
 
+                //For dithering we need to track 6 pixels. 
+
+                //To dither, we find the error (difference from real pixel to the palette color), and subtract it from the next pixel. When that color is paletted, 
+                //The dither occurs.
+                //The issue is that error adjustments build up, so you're never working off the original color. Hopefully this doesn't cause issues.
+                if (Dither)
+                {
+                    Color n = _lastPalette.Entries[paletteIndex]; //The palette version
+                    //Calculate error for the current pixel
+                    int errorR = n.R - pixel.Red;
+                    int errorG = n.G - pixel.Green;
+                    int errorB = n.B - pixel.Blue;
+                    int errorA = n.A - pixel.Alpha;
+
+
+                    for (int y = 1; y < 3;y++)
+                        for (int x = 0; x < 3; x++){
+                            float adjust = DitherMatrix[y, x] * DitherPercent;//How much of the error should be passed on (in negative form) the this neighbor pixel
+                            if (adjust != 0)
+                            {
+                               
+                                AdjustNeighborSource(x - 1, y - 1, (int)((float)errorR * adjust * -1), 
+                                                                   (int)((float)errorG * adjust * -1), 
+                                                                   (int)((float)errorB * adjust * -1), 
+                                                                   (int)((float)errorA * adjust * -1));
+                                   
+                            }
+                        }
+                    
+                }
+
+                if (TransparencyAtZero) paletteIndex++;
+            }
+            else
+            {
+                if (TransparencyAtZero)
+                    paletteIndex = 0;
+                else
+                    paletteIndex = (byte)_maxColors;
+            }
+                   
 			return paletteIndex ;
 		}
 
@@ -85,13 +163,18 @@ namespace ImageQuantization
 
 			// Then convert the palette based on those colors
 			for ( int index = 0 ; index < palette.Count ; index++ )
-				original.Entries[index] = (Color)palette[index] ;
+				original.Entries[index + (TransparencyAtZero ? 1 : 0)] = (Color)palette[index] ;
 
 			// Add the transparent color (May need to be inserted at 0, not 255)
-			original.Entries[_maxColors] = Color.FromArgb ( 0 , 0 , 0 , 0 ) ;
+			if (TransparencyAtZero)
+                original.Entries[0] = Color.FromArgb(0, 0, 0, 0);
+            else
+                original.Entries[_maxColors] = Color.FromArgb ( 0 , 0 , 0 , 0 ) ;
 
+            _lastPalette = original; //may-18-2009, ndj: Saving a reference so we can lookup error amounts from QuantizePixel
 			return original ;
 		}
+        
 
 		/// <summary>
 		/// Stores the tree
@@ -423,10 +506,24 @@ namespace ImageQuantization
 							( ( pixel.Green & mask[level] ) >> ( shift - 1 ) ) |
 							( ( pixel.Blue & mask[level] ) >> ( shift ) ) ;
 
-						if ( null != _children[index] )
-							paletteIndex = _children[index].GetPaletteIndex ( pixel , level + 1 ) ;
-						else
-							throw new Exception ( "Didn't expect this!" ) ;
+                        if (null != _children[index])
+                            paletteIndex = _children[index].GetPaletteIndex(pixel, level + 1);
+                        else
+                        {
+                            //NDJ May-18-09: Occurrs when dithering is enabled, since dithering causes new colors to appear in the image
+                            //throw new Exception("Didn't expect this!");
+                            //Find any other one nearby.
+                            for (int i = 0; i < _children.Length; i++)
+                            {
+                                if (null != _children[i])
+                                {
+                                    paletteIndex = _children[i].GetPaletteIndex(pixel, level + 1);
+                                    break;
+                                }
+
+                            }
+                               
+                        }
 					}
 
 					return paletteIndex ;

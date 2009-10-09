@@ -49,7 +49,23 @@ namespace fbs.ImageResizer
             if (!string.IsNullOrEmpty(q["quality"]))
                 if (int.TryParse(q["quality"], out quality))
                     this.Quality = quality;
-            
+
+            if (!string.IsNullOrEmpty(q["dither"])){
+                if ("true".Equals(q["dither"], StringComparison.OrdinalIgnoreCase))
+                    this.Dither = true;
+                else if ("4pass".Equals(q["dither"], StringComparison.OrdinalIgnoreCase))
+                    this.FourPassDither = true;
+                else
+                {
+                    int dither;
+                    if (int.TryParse(q["dither"], out dither))
+                    {
+                        DitherPercent = dither;
+                        Dither = true;
+                    }
+                }
+
+            }
 
         }
 
@@ -72,6 +88,13 @@ namespace fbs.ImageResizer
         /// The default is -1, which means "as much color fidelity as possible". 
         /// </summary>
         public int Colors = -1;
+
+        /// <summary>
+        /// Enables dithering for PNG8 and GIF
+        /// </summary>
+        public bool Dither = false;
+        public bool FourPassDither = false;
+        public int DitherPercent = 30;
 
         /// <summary>
         /// Returns the file extension for the current OutputFormat
@@ -129,15 +152,15 @@ namespace fbs.ImageResizer
                 if (useMax)
                     ImageOutputSettings.SavePng(i, s);
                 else
-                    ImageOutputSettings.SavePng(i, s, colors);
+                    ImageOutputSettings.SaveIndexed(ImageFormat.Png, i, s, colors, Dither || FourPassDither, FourPassDither,DitherPercent);
             }
             else if (OutputFormat == ImageFormat.Gif)
             {
 
                 if (useMax)
-                    ImageOutputSettings.SaveGif(i, s, 255);
+                    ImageOutputSettings.SaveIndexed(ImageFormat.Gif, i, s, 255, Dither || FourPassDither, FourPassDither, DitherPercent);
                 else
-                    ImageOutputSettings.SaveGif(i, s, colors);
+                    ImageOutputSettings.SaveIndexed(ImageFormat.Gif, i, s, colors, Dither || FourPassDither, FourPassDither, DitherPercent);
             }
             
         }
@@ -368,6 +391,21 @@ namespace fbs.ImageResizer
         }
         public static void SaveGif(Image img, Stream target, byte colors)
         {
+            SaveIndexed(ImageFormat.Gif, img, target, colors,false,false,0);
+        }
+        /// <summary>
+        /// Requires seekable stream, i.e. MemoryString or FileStream
+        /// </summary>
+        /// <param name="img"></param>
+        /// <param name="target"></param>
+        /// <param name="colors"></param>
+        public static void SavePng(Image img, Stream target, byte colors)
+        {
+            SaveIndexed(ImageFormat.Png, img, target, colors,false,false,0);
+            
+        }
+        public static void SaveIndexed(System.Drawing.Imaging.ImageFormat format, Image img, Stream target, byte colors, bool dither, bool fourPass, int ditherPercent)
+        {
             //image/gif
             //  The parameter list requires 0 bytes.
             //NeoQuant may be the best, but it's too slow
@@ -379,28 +417,17 @@ namespace fbs.ImageResizer
             //TODO: add Octree and Grayscale quantizer
             //TODO: Preserve transparency
 
-
-            OctreeQuantizer quantizer = new OctreeQuantizer(colors, GetBitsNeededForColorDepth(colors));
-            using (Bitmap quantized = quantizer.Quantize(img))
-            {
-                quantized.Save(target, System.Drawing.Imaging.ImageFormat.Gif);
-            }
-        }
-        /// <summary>
-        /// Requires seekable stream, i.e. MemoryString or FileStream
-        /// </summary>
-        /// <param name="img"></param>
-        /// <param name="target"></param>
-        /// <param name="colors"></param>
-        public static void SavePng(Image img, Stream target, byte colors)
-        {
             //image/png
             //  The parameter list requires 0 bytes.
             OctreeQuantizer quantizer = new OctreeQuantizer(colors, GetBitsNeededForColorDepth(colors));
+            quantizer.Dither = dither;
+            quantizer.fourPass = fourPass;
+            quantizer.DitherPercent = (float)ditherPercent / 100;
             using (Bitmap quantized = quantizer.Quantize(img))
             {
-                quantized.Save(target, System.Drawing.Imaging.ImageFormat.Png);
+                quantized.Save(target, format);
             }
+
         }
         /// <summary>
         /// Requires seekable stream, i.e. MemoryString or FileStream

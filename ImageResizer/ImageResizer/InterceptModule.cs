@@ -48,6 +48,7 @@ using System.Diagnostics;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 
+
 namespace fbs.ImageResizer
 {
     /// <summary>
@@ -188,7 +189,7 @@ namespace fbs.ImageResizer
                 delegate(){
                     //This runs if the update is needed. This delegate is preventing from running in more
                     //than one thread at a time for the specified source file (current.Local)
-                    ImageManager.BuildImage(current.Local, cachedFile, current.QueryString);
+                    AnimatedImageManager.BuildImage(current.Local, cachedFile, current.QueryString);
                 },30000);
 
             //If a co-occurring resize has the file locked for more than 30 seconds, quit with an error.
