@@ -18,6 +18,8 @@
         
     <img id="Img2" src="image.jpg?maxwidth=100" runat="server" />
     <img id="Img3" src="image.jpg?maxwidth=50" runat="server" />
+    <img id="Img1" src="image.jpg?width=50&height=50" runat="server" />
+    <img id="Img4" src="image.jpg?width=50&height=50&crop=auto" runat="server" />
     </div>
     </form>
 </body>
