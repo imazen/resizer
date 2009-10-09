@@ -21,6 +21,11 @@
             The default is -1, which means "as much color fidelity as possible". 
             </summary>
         </member>
+        <member name="F:fbs.ImageResizer.ImageOutputSettings.Dither">
+            <summary>
+            Enables dithering for PNG8 and GIF
+            </summary>
+        </member>
         <member name="M:fbs.ImageResizer.ImageOutputSettings.GetFinalExtension">
             <summary>
             Returns the file extension for the current OutputFormat
@@ -582,11 +587,12 @@
             <param name="width">The width in pixels of the image</param>
             <param name="height">The height in pixels of the image</param>
         </member>
-        <member name="M:ImageQuantization.Quantizer.SecondPass(System.Drawing.Imaging.BitmapData,System.Drawing.Bitmap,System.Int32,System.Int32,System.Drawing.Rectangle)">
+        <member name="M:ImageQuantization.Quantizer.SecondPass(System.Drawing.Imaging.BitmapData,System.Drawing.Imaging.BitmapData,System.Drawing.Bitmap,System.Int32,System.Int32,System.Drawing.Rectangle)">
             <summary>
-            Execute a second pass through the bitmap
+            Execute a second pass through the bitmap. If dithering is enabled, sourceData will be modified. 
             </summary>
             <param name="sourceData">The source bitmap, locked into memory</param>
+            <param name="intermediate">The intermediate bitmap, used for 4-pass quantization. If specified, output will not actually be modified</param>
             <param name="output">The output bitmap</param>
             <param name="width">The width in pixels of the image</param>
             <param name="height">The height in pixels of the image</param>
@@ -1136,6 +1142,14 @@
             such as an Octree quantizer.
             </remarks>
         </member>
+        <member name="F:ImageQuantization.OctreeQuantizer.DitherMatrix">
+            <summary>
+            a Floyd-Steinberg dither matrix
+            new float[,] {{0,0,0},
+            {0,0,0.44f},
+            {0.19f,0.31f,0.06f}};
+            </summary>
+        </member>
         <member name="M:ImageQuantization.OctreeQuantizer.QuantizePixel(ImageQuantization.Quantizer.Color32)">
             <summary>
             Override this to process the pixel in the second pass of the algorithm
@@ -1158,6 +1172,11 @@
         <member name="F:ImageQuantization.OctreeQuantizer._maxColors">
             <summary>
             Maximum allowed color depth
+            </summary>
+        </member>
+        <member name="P:ImageQuantization.OctreeQuantizer.Dither">
+            <summary>
+            Uses a Floyd-Steinberg dither
             </summary>
         </member>
         <member name="T:ImageQuantization.OctreeQuantizer.Octree">
@@ -1350,6 +1369,7 @@
         <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.String,System.String,System.Collections.Specialized.NameValueCollection)">
             <summary>
             Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
+            
             </summary>
             <param name="sourceFile"></param>
             <param name="targetFile"></param>
@@ -1542,6 +1562,15 @@
             <summary>
             Eventually I will extend this class to allow grayscale, brightness, alpha, and possibly contrast adjustment.
             </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.AnimatedImageManager.BuildImage(System.String,System.String,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
+            This is the only method that supports animated GIF output. GDI has no native support for animated GIFs, so we have to take a different code path.
+            </summary>
+            <param name="sourceFile"></param>
+            <param name="targetFile"></param>
+            <param name="request"></param>
         </member>
     </members>
 </doc>

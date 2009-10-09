@@ -15,6 +15,11 @@
     <h3>Rounding should be the same between the image resizer and GDI. They differ by default.</h3>
     <p>Problem manifests itself as a black line at the bottom of images with troublesome decimal sizes (aspect ratio).</p>
     <img src="rounding-error.jpg?width=150" runat="server" />
+    <h3>Frames after 0 have black instead of transparency</h3>
+     <img id="Img1" src="2_computers.gif" runat="server" /><img id="Img2" src="2_computers.gif?time=5" runat="server" />
+     <img id="Img3" src="2_computers.gif?time=10" runat="server" />
+     <img id="Img4" src="2_computers.gif?time=15" runat="server" />
+     
     </div>
     </form>
 </body>

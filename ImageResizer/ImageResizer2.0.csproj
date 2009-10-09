@@ -60,6 +60,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ImageResizer\AnimatedImageManager.cs" />
+    <Compile Include="ImageResizer\GifClass.cs" />
+    <Compile Include="ImageResizer\GifCreator.cs" />
     <Compile Include="ImageResizer\ImageOutputSettings.cs" />
     <Compile Include="ImageResizer\CustomFolders.cs" />
     <Compile Include="ImageResizer\DiskCache.cs" />

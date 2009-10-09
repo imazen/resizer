@@ -55,6 +55,7 @@ namespace fbs.ImageResizer
     {
         /// <summary>
         /// Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
+        /// 
         /// </summary>
         /// <param name="sourceFile"></param>
         /// <param name="targetFile"></param>
@@ -165,7 +166,7 @@ namespace fbs.ImageResizer
         /// <returns></returns>
         public static Bitmap BuildImage(Bitmap src, int pageIndex, int timeIndex,ResizeSettings resize, ImageSettings opts, ImageFilter adjustments, ImageOutputSettings output)
         {
-            /* Broken: Transparency is not maintained. GDI seems to have trouble with color palettes after frame 0
+            /* Broken: Transparency is not maintained. GDI seems to have trouble with color palettes after frame 0 */
             //Support page selection in a .tiff document.
             if (pageIndex > 0)
             {
@@ -197,7 +198,7 @@ namespace fbs.ImageResizer
                 }
 
             }
-             */
+             
             if (resize.sourceFlip != RotateFlipType.RotateNoneFlipNone)
                 src.RotateFlip(resize.sourceFlip); //Flipping has to be done on the original - it can't be done as part of the DrawImage or later, after the borders are drawn.
             
@@ -270,7 +271,7 @@ namespace fbs.ImageResizer
                 //It isn't taking up all the space - Space around the image is expected. Leaving normal rounding in place - flooring would do as much harm as good on average.
                 b = new Bitmap((int)Math.Round(box.Width), (int)Math.Round(box.Height), PixelFormat.Format32bppArgb);
             }
-
+            
             //Create graphics handle
             Graphics g = Graphics.FromImage(b);
             using (g)
@@ -397,5 +398,6 @@ namespace fbs.ImageResizer
         }
 
 
+        
     }
 }

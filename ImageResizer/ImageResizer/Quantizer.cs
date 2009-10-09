@@ -35,6 +35,14 @@ namespace ImageQuantization
             _pixelSize = Marshal.SizeOf(typeof (Color32));
         }
 
+        public virtual void Reset()
+        {
+            this.secondPassIntermediate = null;
+            this.secondPassX = 0;
+            this.secondPassY = 0;
+          
+        }
+        public bool fourPass = false;
         /// <summary>
         /// Quantize an image and return the resulting output bitmap
         /// </summary>
@@ -66,9 +74,22 @@ namespace ImageQuantization
 
             }
 
+            Bitmap copy2 = null;
+            if (fourPass)
+            {
+                copy2 = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+                using (Graphics g = Graphics.FromImage(copy2))
+                {
+                    g.PageUnit = GraphicsUnit.Pixel;
+                    g.DrawImage(source, bounds);
+                }
+            }
+
+
+
             // Define a pointer to the bitmap data
             BitmapData sourceData = null;
-
+            BitmapData intermediateData = null;
             try
             {
                 // Get the source image bits and lock into memory
@@ -86,14 +107,33 @@ namespace ImageQuantization
                 // as there's no way to construct a new, empty palette.
                 output.Palette = GetPalette(output.Palette);
 
+                if (!fourPass)
+                {
+                    // Then call the second pass which actually does the conversion
+                    SecondPass(sourceData, null, output, width, height, bounds);
+                }
+                else
+                {
+                    intermediateData = copy2.LockBits(bounds, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
-                // Then call the second pass which actually does the conversion
-                SecondPass(sourceData, output, width, height, bounds);
+                    SecondPass(sourceData, intermediateData, output, width, height, bounds);
+
+                    //NDJ- trying quad pass for better results (adjusts for dithering)
+                    FirstPass(intermediateData, width, height);
+                    output.Palette = GetPalette(output.Palette);
+                    SecondPass(intermediateData, null,output, width, height, bounds);
+
+                }
+                /*
+                Reset();
+                
+                */
             }
             finally
             {
                 // Ensure that the bits are unlocked
                 copy.UnlockBits(sourceData);
+                if (intermediateData != null) copy2.UnlockBits(intermediateData);
             }
 
             // Last but not least, return the output bitmap
@@ -130,22 +170,29 @@ namespace ImageQuantization
             }
         }
 
+        //For dithering - 5-18-09 ndj
+        private BitmapData secondPassIntermediate;
+        private int secondPassX;
+        private int secondPassY;
+
         /// <summary>
-        /// Execute a second pass through the bitmap
+        /// Execute a second pass through the bitmap. If dithering is enabled, sourceData will be modified. 
         /// </summary>
         /// <param name="sourceData">The source bitmap, locked into memory</param>
+        /// <param name="intermediate">The intermediate bitmap, used for 4-pass quantization. If specified, output will not actually be modified</param>
         /// <param name="output">The output bitmap</param>
         /// <param name="width">The width in pixels of the image</param>
         /// <param name="height">The height in pixels of the image</param>
         /// <param name="bounds">The bounding rectangle</param>
-        protected virtual void SecondPass(BitmapData sourceData, Bitmap output, int width, int height, Rectangle bounds)
+        protected virtual void SecondPass(BitmapData sourceData, BitmapData intermediate, Bitmap output, int width, int height, Rectangle bounds)
         {
+            secondPassIntermediate = (intermediate != null) ? intermediate : sourceData;// Not thread safe.... But nothing here is anyways...//For dithering - 5-18-09 ndj
             BitmapData outputData = null;
-
+            
             try
             {
                 // Lock the output bitmap into memory
-                outputData = output.LockBits(bounds, ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
+                if (intermediate == null) outputData = output.LockBits(bounds, ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
 
                 // Define the source data pointers. The source row is a byte to
                 // keep addition of the stride value easier (as this is in bytes)
@@ -154,7 +201,8 @@ namespace ImageQuantization
                 IntPtr pPreviousPixel = pSourcePixel;
 
                 // Now define the destination data pointers
-                IntPtr pDestinationRow = outputData.Scan0;
+                IntPtr pDestinationRow = IntPtr.Zero;
+                if (intermediate == null) pDestinationRow = outputData.Scan0;
                 IntPtr pDestinationPixel = pDestinationRow;
 
                 // And convert the first pixel, so that I have values going into the loop
@@ -162,26 +210,28 @@ namespace ImageQuantization
                 byte pixelValue = QuantizePixel(new Color32(pSourcePixel));
 
                 // Assign the value of the first pixel
-                Marshal.WriteByte(pDestinationPixel, pixelValue);
+                if (intermediate == null) Marshal.WriteByte(pDestinationPixel, pixelValue);
 
                 // Loop through each row
                 for (int row = 0; row < height; row++)
                 {
+                    secondPassY = row;  //For dithering - 5-18-09 ndj
                     // Set the source pixel to the first pixel in this row
                     pSourcePixel = pSourceRow;
 
                     // And set the destination pixel pointer to the first pixel in the row
-                    pDestinationPixel = pDestinationRow;
+                    if (intermediate == null) pDestinationPixel = pDestinationRow;
 
                     // Loop through each pixel on this scan line
                     for (int col = 0; col < width; col++)
                     {
+                        secondPassX = col; //For dithering - 5-18-09 ndj
                         // Check if this is the same as the last pixel. If so use that value
                         // rather than calculating it again. This is an inexpensive optimisation.
                         // Nathanael: 2-11-09 changed from ReadByte to ReadInt32 on both.
                         // Otherwise this comparison may return true if only the blue component is the 
                         // same in 2 subsequent pixels.
-                        if (Marshal.ReadInt32(pPreviousPixel) != Marshal.ReadInt32(pSourcePixel))
+                        if (Marshal.ReadInt32(pPreviousPixel) != Marshal.ReadInt32(pSourcePixel) || (intermediate != null))
                         {
                             // Quantize the pixel
                             pixelValue = QuantizePixel(new Color32(pSourcePixel));
@@ -191,10 +241,10 @@ namespace ImageQuantization
                         }
 
                         // And set the pixel in the output
-                        Marshal.WriteByte(pDestinationPixel, pixelValue);
+                        if (intermediate == null) Marshal.WriteByte(pDestinationPixel, pixelValue);
 
                         pSourcePixel = (IntPtr)((long)pSourcePixel + _pixelSize);
-                        pDestinationPixel = (IntPtr)((long)pDestinationPixel + 1);
+                        if (intermediate == null) pDestinationPixel = (IntPtr)((long)pDestinationPixel + 1);
 
                     }
 
@@ -202,15 +252,47 @@ namespace ImageQuantization
                     pSourceRow = (IntPtr)((long)pSourceRow + sourceData.Stride);
 
                     // And to the destination row
-                    pDestinationRow = (IntPtr)((long)pDestinationRow + outputData.Stride);
+                    if (intermediate == null) pDestinationRow = (IntPtr)((long)pDestinationRow + outputData.Stride);
                 }
             }
             finally
             {
                 // Ensure that I unlock the output bits
-                output.UnlockBits(outputData);
+                if (intermediate == null) output.UnlockBits(outputData);
+                secondPassIntermediate = null;
             }
         }
+       
+        //Can only be called from QuantizePixel... Expects sourceData to be locked.
+        //This is how dithering is done... 
+        //5-18-09 ndj
+        protected void AdjustNeighborSource(int offsetX, int offsetY, int deltaR, int deltaG, int deltaB, int deltaA)
+        {
+            if (secondPassIntermediate == null) return;
+            int x = secondPassX + offsetX;
+            int y = secondPassY + offsetY;
+            if (x < 0 || x >= secondPassIntermediate.Width) return; //do nothing;
+            if (y < 0 || y >= secondPassIntermediate.Height) return; //do nothing
+            IntPtr p = (IntPtr)((long)secondPassIntermediate.Scan0 + ((long)y * (long)secondPassIntermediate.Stride) + (_pixelSize * x));
+            //Read the original color
+            Color32 c = new Color32(p);
+
+            c.Red = ToByte((int)c.Red + deltaR);
+            c.Green = ToByte((int)c.Green + deltaG);
+            c.Blue = ToByte((int)c.Blue + deltaB);
+            c.Alpha = ToByte((int)c.Alpha + deltaA);
+            
+            Marshal.StructureToPtr(c, p, true); //False to not dispose old block. Since no reference to it exists (I believe PtrToStructure from Color32 copies, not references), this should be safe
+  
+        }
+        //Truncates an int to a byte. 5-18-09 ndj
+        protected byte ToByte(int i)
+        {
+            if (i < 0) return 0;
+            if (i > 255) return 255;
+            return (byte)i;
+        }
+        
 
         /// <summary>
         /// Override this to process the pixel in the first pass of the algorithm
@@ -261,7 +343,7 @@ namespace ImageQuantization
             public Color32(IntPtr pSourcePixel)
             {
               this = (Color32) Marshal.PtrToStructure(pSourcePixel, typeof(Color32));
-                           
+                          
             }
 
             /// <summary>
