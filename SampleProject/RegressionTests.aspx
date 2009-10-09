@@ -44,6 +44,27 @@
 <img id="Img16" runat="server" src="red-leaf.jpg?width=300" />
 </div>
 
+        <h3>This image (5x527) should appear in 3 sizes. 
+        </h3>
+        <p>Due to GDI bug, the middle one will be a pixel thinner than it should be... But the real bug is if one doesn't appear... then
+        we may have an error (dimension < 1px).</p>
+ 
+<img src="horizontal-line.gif" runat="server" />
+<img id="Img18" src="horizontal-line.gif?width=200" runat="server" />
+<img id="Img17" src="horizontal-line.gif?width=50" runat="server" />
+
+        <h3>Handler Test</h3>
+        <img src="HandlerTest.ashx" runat="server" />
+        
+        
+        <h3>IIS Configuration-free mode (.jpg.ashx)</h3>
+        <img id="Img20" src="rose-leaf.jpg.ashx?width=400" runat="server" />
+        
+        <h3>Security test</h3>
+        <img id="Img19" style="border:1px solid black;" src="resize(50,50)/Protected/rose-leaf.jpg" runat="server" />
+        <img id="Img21" style="border:1px solid black;" src="Protected/resize(50,50)/rose-leaf.jpg" runat="server" />
+        <img id="Img22" style="border:1px solid black;" src="Protected/rose-leaf.jpg.cd?width=50" runat="server" />
+        <p>There are three images referenced above... they should not appear.</p>
     </div>
     
   

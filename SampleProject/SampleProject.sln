@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleProject", "SampleProject.csproj", "{7F18EEA5-0D97-43A0-9BEA-4AD6DE5FF0E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer2.0", "..\ImageResizer\ImageResizer2.0.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer2.1", "..\ImageResizer\ImageResizer2.1.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
