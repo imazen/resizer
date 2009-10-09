@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ImageResizer</RootNamespace>
-    <AssemblyName>ImageResizer</AssemblyName>
+    <AssemblyName>ImageResizer1.1a</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,10 +36,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomDefaultHandler.cs" />
-    <Compile Include="ImageResizingHandler.cs" />
+    <Compile Include="ImageResizer\DiskCache.cs" />
+    <Compile Include="ImageResizer\ImageManager.cs" />
+    <Compile Include="ImageResizer\InterceptModule.cs" />
+    <Compile Include="ImageResizer\yrl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="yrl.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
