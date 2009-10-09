@@ -44,27 +44,42 @@ using System.Drawing.Imaging;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Collections.Specialized;
+using System.Text.RegularExpressions;
 
 namespace fbs.ImageResizer
 {
-    class InterceptModule:System.Web.IHttpModule
+    /// <summary>
+    /// Monitors incoming image requests. Image requests that request resizing are processed. The resized images are immediately written to disk, and 
+    /// the request is rewritten to the disk-cached resized version. This way IIS can handle the actual serving of the file.
+    /// The disk-cache directory is protected through URL authorization.
+    /// </summary>
+    public class InterceptModule:System.Web.IHttpModule
     {
-        void System.Web.IHttpModule.Dispose(){}
-
+        
         /// <summary>
         /// Called when the app is initialized
         /// </summary>
         /// <param name="context"></param>
         void System.Web.IHttpModule.Init(System.Web.HttpApplication context)
         {
+            //We wait until after URL auth happens for security.
             context.PostAuthorizeRequest += new EventHandler(CheckRequest);
+            //This is where we set content-type and caching headers. content-type headers don't match the 
+            //file extension when format= or thumbnail= is used, so we have to override them
             context.PreSendRequestHeaders += new EventHandler(context_PreSendRequestHeaders);
         }
+        void System.Web.IHttpModule.Dispose() { }
 
 
+       
 
         /// <summary>
-        /// This is where we filter requests and intercet those that want resizing performed
+        /// This is where we filter requests and intercet those that want resizing performed.
+        /// We first check for image extensions... 
+        /// If it is one, then we run it through the CustomFolders methods to see if if there is custom resizing for it..
+        /// If there aren't any querystring params or "resize(x,y,f)/" in the path after that, then we ignore the request.
+        /// If the file doesn't exist, we ignore the request.
+        /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -78,14 +93,34 @@ namespace fbs.ImageResizer
                 string extension = System.IO.Path.GetExtension(app.Context.Request.FilePath).ToLowerInvariant().Trim('.');
                 if (AcceptedImageExtensions.Contains(extension))
                 {
-                    yrl current = CustomURLs.customizeURL(yrl.Current);
-                    //Here is the where 
+                    string basePath = app.Context.Request.Path;
+                    NameValueCollection q = new NameValueCollection();
 
+                    //Parse and remove resize(x,y,f) already in URL
+                    basePath = parseResizeFolderSyntax(basePath, q);
 
-                    //Is the querystring requesting a resize?
-                    NameValueCollection q = current.QueryString;
-                    if (IsOneSpecified(q["thumbnail"], q["format"], q["width"], q["height"], q["maxwidth"], q["maxheight"]))
+                    //Set folder resizing defaults (adds in resize(x,y) folder)
+                    basePath = CustomFolders.folderDefaults(basePath);
+
+                    //Parse and remove resize(x,y,f) added by folderDefaults
+                    basePath =  parseResizeFolderSyntax(basePath, q);
+
+                    //Overwrite with querystring values.
+                    foreach (string k in app.Context.Request.QueryString)
+                         q[k] = app.Context.Request.QueryString[k];
+
+                    //Set folder resizing overrides (overrides the querystring)
+                    basePath = CustomFolders.folderOverrides(basePath);
+
+                    //Parse and remove resize(x,y,f) added by folderOverrides. Override existing values in q
+                    basePath = parseResizeFolderSyntax(basePath, q);
+
+                    //See if resizing is wanted
+                    if (IsOneSpecified(q["thumbnail"], q["format"], q["width"], q["height"], q["maxwidth"], q["maxheight"], q["quality"]))
                     {
+                        yrl current = new yrl(basePath);
+                        current.QueryString = q;
+
                         //Does the physical file exist?
                         if (current.FileExists)
                         {
@@ -96,6 +131,50 @@ namespace fbs.ImageResizer
                 }
             }
         }
+
+
+        /// <summary>
+        /// Matches /resize(x,y,f)/ syntax
+        /// Fixed Bug - will replace both slashes.. make first a lookbehind
+        /// </summary>
+        private static Regex resizeFolder = new Regex(@"(?<=^|\/)resize\(\s*(?<maxwidth>\d+)\s*,\s*(?<maxheight>\d+)\s*(?:,\s*(?<format>jpg|png|gif)\s*)?\)\/", RegexOptions.Compiled
+           | RegexOptions.IgnoreCase);
+
+        /// <summary>
+        /// Parses and removes the resize folder syntax "resize(x,y,f)/" from the specified file path. 
+        /// Places settings into the referenced querystring
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public string parseResizeFolderSyntax(string path, NameValueCollection q)
+        {
+            Match m = resizeFolder.Match(path);
+            if (m.Success)
+            {
+                int maxwidth = -1;
+                int.TryParse(m.Groups["maxwidth"].Value, out maxwidth);
+                int maxheight = -1;
+                int.TryParse(m.Groups["maxheight"].Value, out maxheight);
+                string format = null;
+                if (m.Groups["format"].Captures.Count > 0)
+                {
+                    format = m.Groups["format"].Captures[0].Value;
+                }
+                //Remove resize folder from URL
+                path = resizeFolder.Replace(path, "");
+                //Add values to querystring
+                if (maxwidth > 0) q["maxwidth"] = maxwidth.ToString();
+                if (maxheight > 0) q["maxheight"] = maxheight.ToString();
+                if (format != null) q["format"] = format;
+
+                //Call recursive - We want to pull all resize() folders out, otherwise they would allow overriding folderOverrides
+                return parseResizeFolderSyntax(path, q);
+            }
+
+            return path;
+        }
+
 
         /// <summary>
         /// Returns true if one or more of the arguments has a non-null or non-empty value

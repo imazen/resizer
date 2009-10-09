@@ -39,18 +39,30 @@ using System.IO;
 namespace fbs.ImageResizer
 {
     /// <summary>
-    /// Indicates a problem with disk caching. Causes include a missing (or too small) ImageDiskCacheDir setting, and severe I/O locking preventing the cache dir from being cleaned at all.
+    /// Indicates a problem with disk caching. Causes include a missing (or too small) ImageDiskCacheDir setting, and severe I/O locking preventing 
+    /// the cache dir from being cleaned at all.
     /// </summary>
     public class DiskCacheException : Exception
     {
         public DiskCacheException(string message):base(message){}
         public DiskCacheException(string message, Exception innerException) : base(message, innerException) { }
     }
+    /// <summary>
+    /// Provides methods for creating, maintaining, and securing the disk cache. 
+    /// </summary>
     public class DiskCache
     {
-
+        /// <summary>
+        /// A callback method that will perform the resize and update the file. This doesn't need paramaters since an anonymous function can be used.
+        /// </summary>
         public delegate void CacheUpdateCallback();
-
+        /// <summary>
+        /// Checks if an update is needed on the specified file... calls the method if needed.
+        /// TODO: Implement locking to prevent I/O conflicts on concurrent inital request
+        /// </summary>
+        /// <param name="sourceFilename"></param>
+        /// <param name="cachedFilename"></param>
+        /// <param name="updateCallback"></param>
         public static void UpdateCachedVersionIfNeeded(string sourceFilename, string cachedFilename, CacheUpdateCallback updateCallback)
         {
             PrepareCacheDir();
@@ -92,26 +104,42 @@ namespace fbs.ImageResizer
             return RoughCompare(cached, source);
         }
 
+        /// <summary>
+        /// This string contains the contents of a web.conig file that sets URL authorization to "deny all" inside the current directory.
+        /// </summary>
+        private const string webConfigFile =
+            "<?xml version=\"1.0\"?>" +
+            "<configuration xmlns=\"http://schemas.microsoft.com/.NetConfiguration/v2.0\">" +
+            "<system.web><authorization>" +
+            "<deny users=\"*\" />" +
+            "</authorization></system.web></configuration>";
+
 
         /// <summary>
         /// Creates the directory for caching if needed, and performs 'garbage collection'
         /// Throws a DiskCacheException if the cache direcotry isn't specified in web.config
+        /// Creates a web.config file in the caching directory to prevent direct access.
         /// </summary>
         /// <returns></returns>
         public static void PrepareCacheDir()
         {
             string dir = GetCacheDir();
-            if (!string.IsNullOrEmpty(dir))
+
+            //Create the cache directory if it doesn't exist.
+            if (!System.IO.Directory.Exists(dir))
+                System.IO.Directory.CreateDirectory(dir);
+
+            //Add URL authorization protection using a web.config file.
+            yrl wc = yrl.Combine(new yrl(dir), new yrl("Web.config"));
+            if (!wc.FileExists)
             {
-                if (!System.IO.Directory.Exists(dir))
-                {
-                    System.IO.Directory.CreateDirectory(dir);
-                }
-
-                int maxCount = GetMaxCachedFiles();
-
-                TrimDirectoryFiles(dir, maxCount - 1, (maxCount / 10));
+                System.IO.File.WriteAllText(wc.Local, webConfigFile);
             }
+
+            //Perform cleanup if needed. Clear 1/10 of the files if we are running low.
+            int maxCount = GetMaxCachedFiles();
+            TrimDirectoryFiles(dir, maxCount - 1, (maxCount / 10));
+
         }
 
         /// <summary>
