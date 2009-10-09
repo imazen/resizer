@@ -163,9 +163,8 @@
     <p>It's ugly, but GIFs only get 1 bit for transparency.</p>
     <img id="Img1" src="saturn_256.png?format=gif" runat="server" />
 
-     <h3>Transparency is maintained while resizing GIFs, but other animated frames are not</h3>
+     <h3>Transparency is maintained while resizing GIFs</h3>
      <p>Here we upscale a normally tiny GIF</p>
-     <img id="Img54" src="2_computers.gif?format=png" runat="server" />
      <img src="2_computers.gif?width=300&scale=both" runat="server" />
      
     <br />

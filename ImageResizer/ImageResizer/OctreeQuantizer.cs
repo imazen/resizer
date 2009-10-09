@@ -5,6 +5,8 @@
   PARTICULAR PURPOSE. 
   
     This is sample code and is freely distributable. 
+ * 
+ * Heavily modified by Nathanael Jones - I've left it under the same license
 */ 
 using System;
 using System.Collections;
@@ -31,12 +33,20 @@ namespace ImageQuantization
 		{
             Reset(maxColors, maxColorBits);
 		}
+        /// <summary>
+        /// Clears the octree
+        /// </summary>
         public override void Reset()
         {
             base.Reset();
             Reset(_maxColors, _maxColorBits);
         }
         private int _maxColorBits = 8;
+        /// <summary>
+        /// Clears the octree and reconfigures color settings
+        /// </summary>
+        /// <param name="maxColors"></param>
+        /// <param name="maxColorBits"></param>
         public void Reset( int maxColors , int maxColorBits)
         {
            
@@ -67,7 +77,7 @@ namespace ImageQuantization
 		}
 
         private ColorPalette _lastPalette;
-        private const bool TransparencyAtZero = true;
+        private const bool TransparencyAtZero = true; //Works much better than transparency at 255
         protected bool _dither = false;
         /// <summary>
         /// Uses a Floyd-Steinberg dither
@@ -165,7 +175,7 @@ namespace ImageQuantization
 			for ( int index = 0 ; index < palette.Count ; index++ )
 				original.Entries[index + (TransparencyAtZero ? 1 : 0)] = (Color)palette[index] ;
 
-			// Add the transparent color (May need to be inserted at 0, not 255)
+			// Add the transparent color (Needs to be inserted at 0, not 255)
 			if (TransparencyAtZero)
                 original.Entries[0] = Color.FromArgb(0, 0, 0, 0);
             else
@@ -512,22 +522,49 @@ namespace ImageQuantization
                         {
                             //NDJ May-18-09: Occurrs when dithering is enabled, since dithering causes new colors to appear in the image
                             //throw new Exception("Didn't expect this!");
-                            //Find any other one nearby.
-                            for (int i = 0; i < _children.Length; i++)
-                            {
-                                if (null != _children[i])
-                                {
-                                    paletteIndex = _children[i].GetPaletteIndex(pixel, level + 1);
-                                    break;
-                                }
-
-                            }
-                               
+                            //Find closest one nearby
+                            OctreeNode n = FindClosestMatch(pixel);
+                            if (n != null)  paletteIndex = n._paletteIndex;
                         }
 					}
 
 					return paletteIndex ;
 				}
+                /// <summary>
+                /// Added may 19-09. Should help with dithering.
+                /// </summary>
+                /// <param name="pixel"></param>
+                /// <returns></returns>
+                public OctreeNode FindClosestMatch(Color32 pixel)
+                {
+                    if (_leaf) return this;
+
+                    long min = long.MaxValue; //The shortest distance found.
+                    OctreeNode closest = null; //The closest node found
+
+                    for (int i = 0; i < _children.Length; i++)
+                    {
+                        if (null != _children[i])
+                        {
+                            long distance = sqr((long)pixel.Red - _children[i]._red) + //No need for Math.Abs when squaring
+                                            sqr((long)pixel.Green - _children[i]._green) +
+                                           sqr((long)pixel.Blue - _children[i]._blue);
+
+                            if (distance < min)
+                            {
+                                distance = min;
+                                closest = _children[i];
+                            }
+                        }
+
+                    }
+                    return closest;
+
+                }
+                private long sqr(long l)
+                {
+                    return l * l;
+                }
 
 				/// <summary>
 				/// Increment the pixel count and add to the color information

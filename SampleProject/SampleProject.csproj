@@ -45,7 +45,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ContrastTestBorder.aspx" />
     <Content Include="Dithering.aspx" />
     <Content Include="image.jpg" />
     <Content Include="Default.aspx" />
@@ -53,13 +52,6 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ContrastTestBorder.aspx.cs">
-      <DependentUpon>ContrastTestBorder.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="ContrastTestBorder.aspx.designer.cs">
-      <DependentUpon>ContrastTestBorder.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
       <DependentUpon>Default.aspx</DependentUpon>

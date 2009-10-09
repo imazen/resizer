@@ -6,7 +6,9 @@
     <members>
         <member name="T:fbs.ImageResizer.ImageOutputSettings">
             <summary>
-            Extracts the image output and encoding settings from the querystring. Handles the saving of Image instances to a Stream using the .SaveImage method
+            Extracts the image output and encoding settings from the querystring. 
+            Handles the saving of Image instances to a Stream using the .SaveImage method
+            Doesn't handle animated image files - only single frames. (Neither does GDI)
             </summary>
         </member>
         <!-- Badly formed XML comment ignored for member "M:fbs.ImageResizer.ImageOutputSettings.parseFromQuerystring(System.Drawing.Imaging.ImageFormat,System.Collections.Specialized.NameValueCollection)" -->
@@ -164,6 +166,31 @@
             <summary>
             Returns true if the desired output type supports transparency.
             </summary>
+        </member>
+        <member name="T:fbs.ImageResizer.WatermarkSettings">
+            <summary>
+            Provides extensibility points for drawing watermarks and even modifying resizing/image settings
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.WatermarkSettings.#ctor(System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Creates a new WatermarkSettings class
+            </summary>
+            <param name="q"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.WatermarkSettings.ModifySettings(fbs.ImageResizer.ResizeSettings,fbs.ImageResizer.ImageSettings,fbs.ImageResizer.ImageFilter,fbs.ImageResizer.ImageOutputSettings)">
+            <summary>
+            Executed prior to resizing. Permits modifications of geometry and effect settings
+            </summary>
+            <param name="rs"></param>
+            <param name="opts"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.WatermarkSettings.Process(System.Drawing.Bitmap,System.Drawing.Graphics)">
+            <summary>
+            Modify this to do watermarks. Executing after resizing is complete
+            </summary>
+            <param name="b"></param>
+            <param name="g"></param>
         </member>
         <member name="T:fbs.yrl">
             <summary>
@@ -571,6 +598,11 @@
             only call the 'QuantizeImage' function. If two passes are required, the code will call 'InitialQuantizeImage'
             and then 'QuantizeImage'.
             </remarks>
+        </member>
+        <member name="F:ImageQuantization.Quantizer.fourPass">
+            <summary>
+            If true, image is re-paletted after quantization, and dithering occurs on a separate frame from the source.
+            </summary>
         </member>
         <member name="M:ImageQuantization.Quantizer.Quantize(System.Drawing.Image)">
             <summary>
@@ -1132,6 +1164,18 @@
             <param name="maxColors">The maximum number of colors to return</param>
             <param name="maxColorBits">The number of significant bits</param>
         </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Reset">
+            <summary>
+            Clears the octree
+            </summary>
+        </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Reset(System.Int32,System.Int32)">
+            <summary>
+            Clears the octree and reconfigures color settings
+            </summary>
+            <param name="maxColors"></param>
+            <param name="maxColorBits"></param>
+        </member>
         <member name="M:ImageQuantization.OctreeQuantizer.InitialQuantizePixel(ImageQuantization.Quantizer.Color32)">
             <summary>
             Process the pixel in the first pass of the algorithm
@@ -1306,6 +1350,13 @@
             Return the palette index for the passed color
             </summary>
         </member>
+        <member name="M:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.FindClosestMatch(ImageQuantization.Quantizer.Color32)">
+            <summary>
+            Added may 19-09. Should help with dithering.
+            </summary>
+            <param name="pixel"></param>
+            <returns></returns>
+        </member>
         <member name="M:ImageQuantization.OctreeQuantizer.Octree.OctreeNode.Increment(ImageQuantization.Quantizer.Color32)">
             <summary>
             Increment the pixel count and add to the color information
@@ -1366,6 +1417,13 @@
             Provides methods for generating resizied images, and for reading and writing them to disk.
             </summary>
         </member>
+        <member name="M:fbs.ImageResizer.ImageManager.getBestInstance">
+            <summary>
+            Looks for AnimatedImageManager and returns an instance of that if possible. Otherwise, returns an 
+            ImageManager instance.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.String,System.String,System.Collections.Specialized.NameValueCollection)">
             <summary>
             Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
@@ -1406,12 +1464,14 @@
             <param name="q"></param>
             <returns></returns>
         </member>
-        <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.Drawing.Bitmap,System.Int32,System.Int32,fbs.ImageResizer.ResizeSettings,fbs.ImageResizer.ImageSettings,fbs.ImageResizer.ImageFilter,fbs.ImageResizer.ImageOutputSettings)">
+        <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.Drawing.Bitmap,fbs.ImageResizer.ResizeSettings,fbs.ImageResizer.ImageSettings,fbs.ImageResizer.ImageFilter,fbs.ImageResizer.ImageOutputSettings,fbs.ImageResizer.WatermarkSettings)">
             <summary>
             Creates a new bitmap of the required size, and draws the specified image (with border, background, padding, and shadow).
             Accepts parallelagrams, so rotation and skew is permitted.
+            Use SelectActiveFrame() to select the right frame prior to calling BuildImage
             </summary>
-            <param name="pageIndex">The page or frame. Use 0 for default.</param>
+            <param name="page">The page or frame. Use 0 for default.</param>
+            <param name="watermark">Optional, can be null. Plugin for watermarking code</param>
             <returns></returns>
         </member>
         <member name="M:fbs.ImageResizer.ImageManager.DrawOuterGradient(System.Drawing.Graphics,System.Drawing.PointF[],System.Drawing.Color,System.Drawing.Color,System.Single)">
@@ -1456,7 +1516,12 @@
             </summary>
             <param name="filePath">The virtual domain-relative path (/app/folder/file.jpg). Doesn't include the querystring.</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:fbs.ImageResizer.CustomFolders.applyOverrides(System.String,System.Collections.Specialized.NameValueCollection)" -->
+        <member name="M:fbs.ImageResizer.CustomFolders.applyOverrides(System.String,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Settings inserted here override the querystring values.
+            </summary>
+            <param name="filePath">The virtual domain-relative path (/app/folder/file.jpg). Doesn't include the querystring.</param>
+        </member>
         <member name="M:fbs.ImageResizer.CustomFolders.resizeMatch(System.String,System.String,System.Collections.Specialized.NameValueCollection,System.Int32,System.Int32,System.String)">
             <summary>
             If substring is found within 'path', q["maxwidth"], q["maxheight"], and q["format"] are set to the specified values.
@@ -1563,7 +1628,45 @@
             Eventually I will extend this class to allow grayscale, brightness, alpha, and possibly contrast adjustment.
             </summary>
         </member>
-        <member name="M:fbs.ImageResizer.AnimatedImageManager.BuildImage(System.String,System.String,System.Collections.Specialized.NameValueCollection)">
+        <member name="T:fbs.ImageResizer.Animation.GifCreator">
+            <summary>
+            Provides methods for creating application and graphics blocks needed to write a animated Gif.
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.Animation.GifCreator.CreateGraphicControlExtensionBlock(System.Int32)">
+            <summary>
+             Written before each frame - specifies the frame's delay and the index of the transparent color (0)
+            </summary>
+            <param name="delay"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.Animation.GifCreator.CreateGraphicControlExtensionBlock(System.Int32,System.Byte)">
+            <summary>
+            Written before each frame - specifies the frame's delay and the index of the transparent color
+            </summary>
+            <param name="delay"></param>
+            <param name="transparentColorIndex"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.Animation.GifCreator.CreateLoopBlock">
+            <summary>
+            Creates a Loop Block (Netscape appliation extension) for infinite looping. Written after the last frame's image data
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.Animation.GifCreator.CreateLoopBlock(System.Int32)">
+            <summary>
+            Creates a Loop block for the specified number of repeats. Written after the last frame's image data
+            </summary>
+            <param name="numberOfRepeatings"></param>
+            <returns></returns>
+        </member>
+        <member name="T:fbs.ImageResizer.Animation.GifClass">
+            <summary>
+            Dissects a GIF image into its component parts.
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.Animation.AnimatedImageManager.BuildImage(System.String,System.String,System.Collections.Specialized.NameValueCollection)">
             <summary>
             Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
             This is the only method that supports animated GIF output. GDI has no native support for animated GIFs, so we have to take a different code path.
@@ -1571,6 +1674,14 @@
             <param name="sourceFile"></param>
             <param name="targetFile"></param>
             <param name="request"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.Animation.AnimatedImageManager.getById(System.Drawing.Imaging.PropertyItem[],System.Int32)">
+            <summary>
+            Returns the first PropertyItem with a matching ID
+            </summary>
+            <param name="items"></param>
+            <param name="id"></param>
+            <returns></returns>
         </member>
     </members>
 </doc>

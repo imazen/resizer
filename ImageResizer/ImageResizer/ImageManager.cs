@@ -45,6 +45,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Collections.Specialized;
 using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
+using System.Reflection;
 
 namespace fbs.ImageResizer
 {
@@ -53,6 +55,25 @@ namespace fbs.ImageResizer
     /// </summary>
     public class ImageManager
     {
+        public ImageManager()
+        {
+        }
+        /// <summary>
+        /// Looks for AnimatedImageManager and returns an instance of that if possible. Otherwise, returns an 
+        /// ImageManager instance.
+        /// </summary>
+        /// <returns></returns>
+        public static ImageManager getBestInstance()
+        {
+            //Allow the copy&paste plugin of a better ImageManager
+            Type aim = Type.GetType("fbs.ImageResizer.Animation.AnimatedImageManager", false, true);
+            if (aim != null)
+            {
+                return Activator.CreateInstance(aim) as ImageManager;
+            }
+            return new ImageManager();
+
+        }
         /// <summary>
         /// Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
         /// 
@@ -60,8 +81,9 @@ namespace fbs.ImageResizer
         /// <param name="sourceFile"></param>
         /// <param name="targetFile"></param>
         /// <param name="request"></param>
-        public static void BuildImage(string sourceFile, string targetFile, NameValueCollection queryString)
+        public virtual void BuildImage(string sourceFile, string targetFile, NameValueCollection queryString)
         {
+            //Allow AnimatedImageManager to be added without changing code - plugin style
             //Resize image 
             using (Bitmap thumb = BuildImage(sourceFile, queryString))
             {
@@ -82,12 +104,14 @@ namespace fbs.ImageResizer
         /// </summary>
         /// <param name="q"></param>
         /// <returns></returns>
-        public static bool HasResizingDirective(NameValueCollection q)
+        public virtual bool HasResizingDirective(NameValueCollection q)
         {
-            return IsOneSpecified(q["format"], q["thumbnail"], q["maxwidth"], q["maxheight"],
+            return IsOneSpecified(q["format"],q["dither"], q["thumbnail"], q["maxwidth"], q["maxheight"],
                 q["width"], q["height"],
                 q["scale"], q["stretch"], q["crop"], q["page"], q["time"], q["quality"], q["colors"], q["bgcolor"],
-                q["rotate"], q["flip"], q["sourceFlip"], q["paddingWidth"], q["paddingColor"], q["ignoreicc"]);
+                q["rotate"], q["flip"], q["sourceFlip"], q["borderWidth"],
+                q["borderColor"], q["paddingWidth"], q["paddingColor"], q["ignoreicc"],
+                q["shadowColor"],q["shadowOffset"],q["shadowWidth"],q["frame"],q["page"]);
         }
 
         /// <summary>
@@ -95,7 +119,7 @@ namespace fbs.ImageResizer
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        private static bool IsOneSpecified(params String[] args)
+        private  bool IsOneSpecified(params String[] args)
         {
             foreach (String s in args) if (!string.IsNullOrEmpty(s)) return true;
             return false;
@@ -110,7 +134,7 @@ namespace fbs.ImageResizer
         /// </summary>
         /// 
         /// <returns></returns>
-        public static Bitmap BuildImage(string sourceFile, NameValueCollection q)
+        public virtual Bitmap BuildImage(string sourceFile, NameValueCollection q)
         {
             bool useICM = true;
             if ("true".Equals(q["ignoreicc"], StringComparison.OrdinalIgnoreCase)) useICM = false;
@@ -142,18 +166,54 @@ namespace fbs.ImageResizer
         /// <param name="src"></param>
         /// <param name="q"></param>
         /// <returns></returns>
-        public static Bitmap BuildImage(Bitmap src, ImageFormat originalFormat, NameValueCollection q)
+        public virtual Bitmap BuildImage(Bitmap src, ImageFormat originalFormat, NameValueCollection q)
         {
             int page = 0;
             if (!string.IsNullOrEmpty(q["page"]) && !int.TryParse(q["page"], out page))
                 page = 0;
 
-            int time = 0;
-            if (!string.IsNullOrEmpty(q["time"]) && !int.TryParse(q["time"], out time))
-                time = 0;
+            int frame = 0;
+            if (!string.IsNullOrEmpty(q["frame"]) && !int.TryParse(q["frame"], out frame))
+                frame = 0;
+
+            page--; frame--; //So users can use 1-based numbers
+
+            /* Fixed GIF transparency*/
+            //Support page selection in a .tiff document.
+            try
+            {
+                if (page > 0)
+                {
+                    //Stay on the last frame if out of bounds
+                    page = (page >= src.GetFrameCount(FrameDimension.Page)) ? src.GetFrameCount(FrameDimension.Page) - 1 : page;
+
+                    if (page > 0)
+                    {
+                        src.SelectActiveFrame(FrameDimension.Page, page);
+                       //Causes problems: src.MakeTransparent(); //Needed, since this seems to be lost after a call to SelectActiveFrame
+                    }
+                }
+                if (frame > 0)
+                {
+                    if (frame >= src.GetFrameCount(FrameDimension.Time))
+
+                        //Out of bounds.
+                        //Use last index
+                        frame = src.GetFrameCount(FrameDimension.Time) - 1;
+
+                    if (frame > 0)
+                    {
+                        src.SelectActiveFrame(FrameDimension.Time, frame);
+                       //Causes problems:  src.MakeTransparent(); //Needed, since this seems to be lost after a call to SelectActiveFrame
+                    }
+
+                }
+            }
+            catch (ExternalException) { } //When somebody tries &frame or &page on a single-frame image
+            
 
 
-            return BuildImage(src, page,time, new ResizeSettings(q), new ImageSettings(q), new ImageFilter(q), new ImageOutputSettings(originalFormat,q));
+            return BuildImage(src, new ResizeSettings(q), new ImageSettings(q), new ImageFilter(q),  new ImageOutputSettings(originalFormat, q),new WatermarkSettings(q));
         }
 
 
@@ -161,54 +221,25 @@ namespace fbs.ImageResizer
         /// <summary>
         /// Creates a new bitmap of the required size, and draws the specified image (with border, background, padding, and shadow).
         /// Accepts parallelagrams, so rotation and skew is permitted.
+        /// Use SelectActiveFrame() to select the right frame prior to calling BuildImage
         /// </summary>
-        /// <param name="pageIndex">The page or frame. Use 0 for default.</param>
+        /// <param name="page">The page or frame. Use 0 for default.</param>
+        /// <param name="watermark">Optional, can be null. Plugin for watermarking code</param>
         /// <returns></returns>
-        public static Bitmap BuildImage(Bitmap src, int pageIndex, int timeIndex,ResizeSettings resize, ImageSettings opts, ImageFilter adjustments, ImageOutputSettings output)
+        public virtual Bitmap BuildImage(Bitmap src, ResizeSettings resize, ImageSettings opts, ImageFilter adjustments, ImageOutputSettings output, WatermarkSettings watermark)
         {
-            /* Broken: Transparency is not maintained. GDI seems to have trouble with color palettes after frame 0 */
-            //Support page selection in a .tiff document.
-            if (pageIndex > 0)
-            {
-                if (pageIndex >= src.GetFrameCount(FrameDimension.Page))
-                
-                    //Out of bounds.
-                    //Use last index
-                    pageIndex = src.GetFrameCount(FrameDimension.Page) - 1;
+            if (watermark != null) watermark.ModifySettings(resize, opts,adjustments,output);
 
-                if (pageIndex > 0)
-                {
-
-                    src.SelectActiveFrame(FrameDimension.Page, pageIndex);
-                    src.MakeTransparent(); //Needed, since this seems to be lost after a call to SelectActiveFrame
-                }
-            }
-            if (timeIndex > 0)
-            {
-                if (timeIndex >= src.GetFrameCount(FrameDimension.Time))
-
-                    //Out of bounds.
-                    //Use last index
-                    timeIndex = src.GetFrameCount(FrameDimension.Time) - 1;
-
-                if (timeIndex > 0)
-                {    
-                    src.SelectActiveFrame(FrameDimension.Time, timeIndex);
-                    src.MakeTransparent(); //Needed, since this seems to be lost after a call to SelectActiveFrame
-                }
-
-            }
-             
             if (resize.sourceFlip != RotateFlipType.RotateNoneFlipNone)
                 src.RotateFlip(resize.sourceFlip); //Flipping has to be done on the original - it can't be done as part of the DrawImage or later, after the borders are drawn.
-            
+
             /*Color background, float borderWidth, Color borderColor,
             float shadowWidth, Color shadowColor, PointF shadowOffset,
             Color paddingColor, Bitmap src, RectangleF sourceArea, PointF[] imageTarget, PointF[] targetSpace, ImageAttributes imageAdjustments)*/
-            
 
-            ResizeSettings.ImageSizingData size = resize.CalculateSizingData(new SizeF(src.Width,src.Height),new SizeF((float)DiskCache.GetMaxWidth(),(float)DiskCache.GetMaxHeight()));
-         
+
+            ResizeSettings.ImageSizingData size = resize.CalculateSizingData(new SizeF(src.Width, src.Height), new SizeF((float)DiskCache.GetMaxWidth(), (float)DiskCache.GetMaxHeight()));
+
             //Calculate required space for everything
             PointF[] all = size.targetArea;
 
@@ -216,7 +247,7 @@ namespace fbs.ImageResizer
             //Add required space for border and padding
             if (opts.borderWidth > 0) all = PolygonMath.InflatePoly(all, opts.borderWidth);
             if (opts.paddingWidth > 0) all = PolygonMath.InflatePoly(size.targetArea, opts.paddingWidth);
-            
+
             //For later use. The inside of the shadow
             PointF[] insideShadow = all;
 
@@ -234,7 +265,7 @@ namespace fbs.ImageResizer
             shadowBorderOffset.Y *= -1;
 
             //Adjust insideShadow
-            insideShadow = PolygonMath.InflatePoly(PolygonMath.MovePoly(insideShadow,shadowBorderOffset), new float[]{
+            insideShadow = PolygonMath.InflatePoly(PolygonMath.MovePoly(insideShadow, shadowBorderOffset), new float[]{
                  - opts.shadowOffset.Y,
                  + opts.shadowOffset.X,
                  + opts.shadowOffset.Y,
@@ -242,15 +273,15 @@ namespace fbs.ImageResizer
             });
 
 
-            
+
             //Rebase things so we are starting at 0,0;
             size.imageTarget = PolygonMath.MovePoly(size.imageTarget, shadowBorderOffset);
             size.targetArea = PolygonMath.MovePoly(size.targetArea, shadowBorderOffset);
             //Inflate for padding
             if (opts.paddingWidth > 0) size.targetArea = PolygonMath.InflatePoly(size.targetArea, opts.paddingWidth);
-           
 
-            
+
+
 
             //Find the size
             SizeF box = PolygonMath.GetBoundingBox(all).Size;
@@ -271,7 +302,7 @@ namespace fbs.ImageResizer
                 //It isn't taking up all the space - Space around the image is expected. Leaving normal rounding in place - flooring would do as much harm as good on average.
                 b = new Bitmap((int)Math.Round(box.Width), (int)Math.Round(box.Height), PixelFormat.Format32bppArgb);
             }
-            
+
             //Create graphics handle
             Graphics g = Graphics.FromImage(b);
             using (g)
@@ -283,10 +314,10 @@ namespace fbs.ImageResizer
                 g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
                 g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
                 g.CompositingMode = CompositingMode.SourceOver;
-                
+
                 //If the image doesn't support transparency, we need to fill the background color now.
                 Color background = opts.bgcolor;
-                if (background == Color.Transparent) 
+                if (background == Color.Transparent)
                     //Only set the bgcolor if the image isn't taking the whole area.
                     if (!output.SupportsTransparency && !PolygonMath.GetBoundingBox(size.imageTarget).Size.Equals(box))
                         background = Color.White;
@@ -304,7 +335,7 @@ namespace fbs.ImageResizer
                 {
                     //Offsets may show inside the shadow - so we have to fix that
                     g.FillPolygon(new SolidBrush(opts.shadowColor),
-                        PolygonMath.InflatePoly(insideShadow,1)); //Inflate 1 for FillPolgyon rounding errors.
+                        PolygonMath.InflatePoly(insideShadow, 1)); //Inflate 1 for FillPolgyon rounding errors.
 
                     //Then we can draw the outer gradient
                     DrawOuterGradient(g, insideShadow,
@@ -316,30 +347,9 @@ namespace fbs.ImageResizer
                 if (!paddingColor.Equals(opts.bgcolor) && paddingColor != Color.Transparent)
                     g.FillPolygon(new SolidBrush(paddingColor), size.targetArea);
 
-                if (!PolygonMath.GetBoundingBox(size.imageTarget).Size.Equals(box))
-                {
 
-                    //Inflate half a pixel to remove white border caused by GDI+ error
-                   //Doesn't work! size.imageTarget = PolygonMath.InflatePoly(size.imageTarget, 1F);
-                  /* Doesn't work either:
-                   * size.sourceRect.X++;
-                    size.sourceRect.Y++;
-                    size.sourceRect.Width -= 2;
-                    size.sourceRect.Height -= 2;
-                   */
-                }
-
-                //Must use == to compart SizeF and Size ... Equals() failes to compare properly
-               /*Doesn't help either: if (PolygonMath.GetBoundingBox(size.imageTarget).Size.Equals(box) && size.sourceRect.Size == src.Size)
-                {
-                    g.DrawImage(src, PolygonMath.ToRectangle(PolygonMath.GetBoundingBox(size.imageTarget)));
-                   
-                }
-                else
-                {*/
-                    //Draw image
-                    g.DrawImage(src, PolygonMath.getParallelogram(size.imageTarget), size.sourceRect, GraphicsUnit.Pixel);//, adjustments.getImageAttributes()
-                //}
+                g.DrawImage(src, PolygonMath.getParallelogram(size.imageTarget), size.sourceRect, GraphicsUnit.Pixel);//, adjustments.getImageAttributes()
+               
 
                 //Draw border
                 if (opts.borderWidth > 0)
@@ -357,6 +367,7 @@ namespace fbs.ImageResizer
                 if (resize.flip != RotateFlipType.RotateNoneFlipNone)
                     b.RotateFlip(resize.flip);
 
+                if (watermark != null) watermark.Process(b, g);
 
                 return b;
             }
@@ -371,7 +382,7 @@ namespace fbs.ImageResizer
         /// <param name="inner"></param>
         /// <param name="outer"></param>
         /// <param name="width"></param>
-        public static void DrawOuterGradient(Graphics g, PointF[] poly, Color inner, Color outer, float width)
+        public virtual void DrawOuterGradient(Graphics g, PointF[] poly, Color inner, Color outer, float width)
         {
             
             PointF[,] corners = PolygonMath.RoundPoints(PolygonMath.GetCorners(poly, width));

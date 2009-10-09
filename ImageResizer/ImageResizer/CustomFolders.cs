@@ -21,6 +21,7 @@ namespace fbs.ImageResizer
     /// </summary>
     public static class CustomFolders
     {
+
         /*
          * Changes from version 1.2
          * 
@@ -110,7 +111,6 @@ namespace fbs.ImageResizer
         }
         /// <summary>
         /// Settings inserted here override the querystring values.
-
         /// </summary>
         /// <param name="filePath">The virtual domain-relative path (/app/folder/file.jpg). Doesn't include the querystring.</param>
         private static string applyOverrides(string filePath, NameValueCollection q)

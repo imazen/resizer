@@ -1,4 +1,32 @@
-﻿using System;
+﻿/**
+ * Written by Nathanael Jones 
+ * http://nathanaeljones.com
+ * nathanael.jones@gmail.com
+ * 
+ * Although I typically release my components for free, I decided to charge a 
+ * 'download fee' for this one to help support my other open-source projects. 
+ * Don't worry, this component is still open-source, and the license permits 
+ * source redistribution as part of a larger system. However, I'm asking that 
+ * people who want to integrate this component purchase the download instead 
+ * of ripping it out of another open-source project. My free to non-free LOC 
+ * (lines of code) ratio is still over 40 to 1, and I plan on keeping it that 
+ * way. I trust this will keep everybody happy.
+ * 
+ * By purchasing the download, you are permitted to 
+ * 
+ * 1) Modify and use the component in all of your projects. 
+ * 
+ * 2) Redistribute the source code as part of another project, provided 
+ * the component is less than 5% of the project (in lines of code), 
+ * and you keep this information attached.
+ * 
+ * 3) If you received the source code as part of another open source project, 
+ * you cannot extract it (by itself) for use in another project without purchasing a download 
+ * from http://nathanaeljones.com/. If nathanaeljones.com is no longer running, and a download
+ * cannot be purchased, then you may extract the code.
+ * 
+ **/
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections.Specialized;
@@ -10,7 +38,9 @@ using System.IO;
 namespace fbs.ImageResizer
 {
     /// <summary>
-    /// Extracts the image output and encoding settings from the querystring. Handles the saving of Image instances to a Stream using the .SaveImage method
+    /// Extracts the image output and encoding settings from the querystring. 
+    /// Handles the saving of Image instances to a Stream using the .SaveImage method
+    /// Doesn't handle animated image files - only single frames. (Neither does GDI)
     /// </summary>
     public class ImageOutputSettings
     {
@@ -234,6 +264,7 @@ namespace fbs.ImageResizer
                 case "png": return  ImageFormat.Png;
                 case "tiff": return ImageFormat.Tiff;
                 case "tff": return ImageFormat.Tiff;
+                case "tif": return ImageFormat.Tiff;
                   
             }
             return null;
@@ -250,7 +281,7 @@ namespace fbs.ImageResizer
             if (format == ImageFormat.Png) return "png";
             if (format == ImageFormat.Bmp) return "bmp";
             if (format == ImageFormat.Gif) return "gif";
-            if (format == ImageFormat.Tiff) return "tiff";
+            if (format == ImageFormat.Tiff) return "tif";
             return null;
         }
         /// <summary>
@@ -266,7 +297,7 @@ namespace fbs.ImageResizer
         /// <summary>
         /// Returns a list of (lowercase invariant) image extensions that the module works with.
         /// </summary>
-        private static IList<String> _acceptedImageExtensions = new List<String>(new String[] { "jpg", "jpeg", "bmp", "gif", "png", "tff","tiff" });
+        private static IList<String> _acceptedImageExtensions = new List<String>(new String[] { "jpg", "jpeg", "bmp", "gif", "png", "tff","tiff","tif" });
 
         /// <summary>
         /// Supports Png, Jpeg, Gif, Bmp, and Tiff.
@@ -301,24 +332,6 @@ namespace fbs.ImageResizer
 
         // http://msdn.microsoft.com/en-us/library/ms533846(VS.85).aspx
 
-
-       
-            //handle ICC profile correctly...
-
-
-
-
-            //colors
-            //palette
-            //bit depth
-            //background color
-
-
-            //if target is a jpeg, set a default background color.
-            //if a ba
-
-
-
             //Per-pixel filters:
             //http://www.codeproject.com/KB/GDI-plus/csharpgraphicfilters11.aspx
 
@@ -331,7 +344,6 @@ namespace fbs.ImageResizer
              */
 
 
-
             //alpha = 0-100
             //      = fade(20,60),angle(0)
 
@@ -339,7 +351,6 @@ namespace fbs.ImageResizer
             //http://www.codeproject.com/KB/GDI-plus/imgresizoutperfgdiplus.aspx
 
             //return null;
-
 
             // http://msdn.microsoft.com/en-us/library/ms533846(VS.85).aspx
        // }
