@@ -62,8 +62,9 @@ namespace ImageQuantization
 		protected override byte QuantizePixel ( Color32 pixel )
 		{
 			byte	paletteIndex = (byte)_maxColors ;	// The color at [_maxColors] is set to transparent
-
-            
+            //TODO: Other sources claim only the first pallete color can be transparent
+            //Quote: Second, I've found a solution for preserving GIF transparency when invoking Image::Save(...). The .NET (tested on v2.0) 
+            //GIF encoder considers transparent the first color found in the palette, so I've changed some methods (replace them with the supplied ones):
 
 			// Get the palette index if this non-transparent
 			if ( pixel.Alpha > 0 )
@@ -86,7 +87,7 @@ namespace ImageQuantization
 			for ( int index = 0 ; index < palette.Count ; index++ )
 				original.Entries[index] = (Color)palette[index] ;
 
-			// Add the transparent color
+			// Add the transparent color (May need to be inserted at 0, not 255)
 			original.Entries[_maxColors] = Color.FromArgb ( 0 , 0 , 0 , 0 ) ;
 
 			return original ;

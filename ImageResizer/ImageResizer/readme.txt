@@ -6,6 +6,15 @@ Unable to reproduce: Content-location for the original image is being sent on II
 
 By design: EXIF data is removed.
 
+5-15-09
+Fixed aspect ratio issue if both maxwidth, width, and height are specified.
+
+Problems with
+http://nathanaeljones.com/content/00011221_ImageResizervsPhotoshop/quality-original.jpg?width=600&thumbnail=gif&maxwidth=229
+but this works
+http://nathanaeljones.com/content/00011221_ImageResizervsPhotoshop/quality-original.jpg?width=600&format=gif&maxwidth=229
+
+
 4-23-09
 Added DisableCacheCleanup command, and made MaxCachedImages < 0 behave the same as DisableCacheCleanup=true
 
