@@ -52,8 +52,7 @@ namespace fbs.ImageResizer
         //stretch=fill 
 
         //rotate=degrees
-        //flip=h|v|both
-
+   
         /// <summary>
         /// Parses lists in the form "3,4,5,2,5" and "(3,4,40,50)". If a number cannot be parsed (i.e, number 2 in "5,,2,3") defaultValue is used.
         /// </summary>

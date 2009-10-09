@@ -14,12 +14,40 @@
     <img src="red-leaf.jpg?width=600&quality=90&thumbnail=jpg&maxwidth=200" runat="server" />
     <h3>Rounding should be the same between the image resizer and GDI. They differ by default.</h3>
     <p>Problem manifests itself as a black line at the bottom of images with troublesome decimal sizes (aspect ratio).</p>
-    <img src="rounding-error.jpg?width=150" runat="server" />
+    <img src="rounding-error.png?width=150" runat="server" />
     <h3>Frames after 0 have black instead of transparency</h3>
-     <img id="Img1" src="2_computers.gif" runat="server" /><img id="Img2" src="2_computers.gif?time=5" runat="server" />
-     <img id="Img3" src="2_computers.gif?time=10" runat="server" />
-     <img id="Img4" src="2_computers.gif?time=15" runat="server" />
+     <img id="Img1" src="2_computers.gif" runat="server" /><img id="Img2" src="2_computers.gif?frame=4" runat="server" />
+     <img id="Img3" src="2_computers.gif?frame=8" runat="server" />
+     <img id="Img4" src="2_computers.gif?frame=12" runat="server" />
+     <h3>All frames look the same - Some gifs</h3>
+     <img src="optical.gif" runat="server" />
+      <img id="Img5" src="optical.gif?frame=2" runat="server" />
+       <img id="Img6" src="optical.gif?frame=4" runat="server" />
+      <h3>Resizing loses transparency</h3>
+      <div style="background-color:Yellow;">
+          <img id="Img7" src="2_computers.gif" runat="server" /><img id="Img8" src="2_computers.gif?width=20&scale=both" runat="server" />
+     <img id="Img9" src="2_computers.gif?frame=8" runat="server" />
+     <img id="Img10" src="2_computers.gif?frame=12" runat="server" />
+     <img id="Img11" src="clock2.gif" runat="server" />
+     <img id="Img12" src="clock2.gif?width=40" runat="server" />
      
+          </div>
+        <h3>Tiff files should be converted page-by-page</h3>
+
+         <img id="Img15" src="sample.tif?page=1&width=200" runat="server" />
+         <img id="Img14" src="sample.tif?page=2&width=200" runat="server" />
+         <img id="Img13" src="sample.tif?page=3&width=200" runat="server" />
+         
+         <h3>There should be a 50% opaque white 1px border on this image. Anything more is a bug</h3>
+        
+         <div style="background-color:Black; padding:30px">
+<img id="Img16" runat="server" src="red-leaf.jpg?width=300" />
+</div>
+
+    </div>
+    
+  
+
     </div>
     </form>
 </body>

@@ -5,7 +5,8 @@
   PARTICULAR PURPOSE. 
   
     This is sample code and is freely distributable. 
-*/ 
+ * Heavily modified by Nathanael Jones - I've left it under the same license
+*/
 
 using System;
 using System.Drawing;
@@ -42,6 +43,9 @@ namespace ImageQuantization
             this.secondPassY = 0;
           
         }
+        /// <summary>
+        /// If true, image is re-paletted after quantization, and dithering occurs on a separate frame from the source.
+        /// </summary>
         public bool fourPass = false;
         /// <summary>
         /// Quantize an image and return the resulting output bitmap

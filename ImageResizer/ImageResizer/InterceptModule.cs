@@ -47,6 +47,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
+using System.Security.Cryptography;
+using System.Text;
 
 
 namespace fbs.ImageResizer
@@ -139,7 +141,7 @@ namespace fbs.ImageResizer
                     //See if resizing is wanted (i.e. one of the querystring commands is present).
                     //Called after processPath so processPath can add them if needed.
                     //Checks for thumnail, format, width, height, maxwidth, maxheight and a lot more
-                    if (ImageManager.HasResizingDirective(q))
+                    if (ImageManager.getBestInstance().HasResizingDirective(q))
                     {
                         //Build a URL using the new basePath and the new Querystring q
                         yrl current = new yrl(basePath);
@@ -163,10 +165,32 @@ namespace fbs.ImageResizer
         /// <returns></returns>
         protected string getCachedVersionFilename(yrl request)
         {
+            bool useSHAHash = true;
+
             string dir = DiskCache.GetCacheDir();
             if (dir == null) return null;
             //Build the physical path of the cached version, using the hashcode of the normalized URL.
-            return dir.TrimEnd('/', '\\') + "\\" + request.ToString().ToLower().GetHashCode().ToString() + "." + new ImageOutputSettings(request).GetFinalExtension();
+
+            if (useSHAHash)
+            {
+                SHA256 h = System.Security.Cryptography.SHA256.Create();
+                byte[] hash = h.ComputeHash(new System.Text.UTF8Encoding().GetBytes(request.ToString().ToLower()));
+                //Can't use base64 hash... filesystem has case-insensitive lookup.
+                //Would use base32, but too much code to bloat the resizer. Simple base16 encoding is fine
+                return dir.TrimEnd('/', '\\') + "\\" + Base16Encode(hash) + "." + new ImageOutputSettings(request).GetFinalExtension();
+            }
+            else
+            {
+                return dir.TrimEnd('/', '\\') + "\\" + request.ToString().ToLower().GetHashCode().ToString() + "." + new ImageOutputSettings(request).GetFinalExtension();
+            }
+        }
+
+        protected string Base16Encode(byte[] bytes)
+        {
+            StringBuilder sb = new StringBuilder(bytes.Length * 2);
+            foreach (byte b in bytes)
+                sb.Append(b.ToString("x").PadLeft(2, '0'));
+            return sb.ToString();
         }
 
         
@@ -179,6 +203,10 @@ namespace fbs.ImageResizer
         /// <param name="extension"></param>
         protected virtual void ResizeRequest(HttpContext context, yrl current)
         {
+
+            Stopwatch s = new Stopwatch();
+            s.Start();
+
             //This is where the cached version goes
             string cachedFile = getCachedVersionFilename(current);
 
@@ -187,9 +215,10 @@ namespace fbs.ImageResizer
             //Make sure the resized image is in the disk cache.
             bool succeeded = DiskCache.UpdateCachedVersionIfNeeded(current.Local, cachedFile,
                 delegate(){
+
                     //This runs if the update is needed. This delegate is preventing from running in more
                     //than one thread at a time for the specified source file (current.Local)
-                    AnimatedImageManager.BuildImage(current.Local, cachedFile, current.QueryString);
+                    ImageManager.getBestInstance().BuildImage(current.Local, cachedFile, current.QueryString);
                 },30000);
 
             //If a co-occurring resize has the file locked for more than 30 seconds, quit with an error.
@@ -207,6 +236,8 @@ namespace fbs.ImageResizer
             context.Items["FinalContentType"] = contentType;
             context.Items["FinalCachedFile"] = cachedFile;
 
+            s.Stop();
+            context.Items["ResizingTime"] = s.ElapsedMilliseconds;
 
             //Rewrite to cached, resized image.
             context.RewritePath(virtualPath, false);
@@ -244,6 +275,13 @@ namespace fbs.ImageResizer
                 context.Response.Cache.SetCacheability(HttpCacheability.Public);
                 context.Response.Cache.SetLastModifiedFromFileDependencies();
                 context.Response.Cache.SetValidUntilExpires(false);
+
+                 //Uncomment only on Cassini.. Doesn't work anywhere else, could force the managed code path in IIS6 
+               /* if (context.Items["ResizingTime"] != null)
+                {
+                    context.Response.AddHeader("ResizingAndSavingTimeMs", context.Items["ResizingTime"].ToString());
+                }*/
+                
             }
 
         }
