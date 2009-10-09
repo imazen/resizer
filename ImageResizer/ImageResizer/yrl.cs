@@ -305,6 +305,10 @@ namespace fbs
         public enum PathType
         {
             /// <summary>
+            /// \\server\share\
+            /// </summary>
+            UNCPath,
+            /// <summary>
             /// A path like '\temp\file.htm'
             /// </summary>
             BackslashPath,
@@ -359,6 +363,10 @@ namespace fbs
             int firsttilde = path.IndexOf('~');
             int firstcolon = path.IndexOf(':');
             int firstdoubleforwardslash = path.IndexOf("//");
+            if (firstbackslash == 0 && path[1] == '\\')
+            {
+                return PathType.UNCPath;
+            }
             if (firstbackslash == 0 && firstforwardslash < 0 && firstcolon < 0)
             {
                 return PathType.BackslashPath;

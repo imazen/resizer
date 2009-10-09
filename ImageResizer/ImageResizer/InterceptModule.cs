@@ -93,7 +93,7 @@ namespace fbs.ImageResizer
             {
                 //Is this an image request?
                 string extension = System.IO.Path.GetExtension(app.Context.Request.FilePath).ToLowerInvariant().Trim('.');
-                if (AcceptedImageExtensions.Contains(extension))
+                if (ImageOutputSettings.AcceptedImageExtensions.Contains(extension))
                 {
                     //Init the caching settings so CustomFolders can override them. These only take effect if the image is actually resized
                     app.Context.Items["ContentExpires"] = DateTime.Now.AddHours(24); //Default to 24 hours
@@ -101,7 +101,7 @@ namespace fbs.ImageResizer
                     if (!string.IsNullOrEmpty(cacheSetting)){
                         double f;
                         if (double.TryParse(cacheSetting,out f)){
-                            if (f > 0)
+                            if (f >= 0)
                                 app.Context.Items["ContentExpires"] = DateTime.Now.AddMinutes(f);
                             else
                                 app.Context.Items["ContentExpires"] = null;
@@ -142,7 +142,7 @@ namespace fbs.ImageResizer
                     basePath = parseResizeFolderSyntax(basePath, q);
 
                     //See if resizing is wanted
-                    if (IsOneSpecified(q["thumbnail"], q["format"], q["width"], q["height"], q["maxwidth"], q["maxheight"], q["quality"]))
+                    if (IsOneSpecified(q["thumbnail"], q["format"], q["width"], q["stretch"], q["scale"], q["crop"], q["height"], q["maxwidth"], q["maxheight"], q["quality"]))
                     {
                         yrl current = new yrl(basePath);
                         current.QueryString = q;
@@ -165,6 +165,7 @@ namespace fbs.ImageResizer
         /// </summary>
         private static Regex resizeFolder = new Regex(@"(?<=^|\/)resize\(\s*(?<maxwidth>\d+)\s*,\s*(?<maxheight>\d+)\s*(?:,\s*(?<format>jpg|png|gif)\s*)?\)\/", RegexOptions.Compiled
            | RegexOptions.IgnoreCase);
+        //
 
         /// <summary>
         /// Parses and removes the resize folder syntax "resize(x,y,f)/" from the specified file path. 
@@ -211,16 +212,7 @@ namespace fbs.ImageResizer
             foreach (String s in args) if (!string.IsNullOrEmpty(s)) return true;
             return false;
         }
-        private static IList<String> _acceptedImageExtensions = new List<String>(new String[] { "jpg", "jpeg", "bmp", "gif", "png" });
-        /// <summary>
-        /// Returns a list of (lowercase invariant) image extensions that the module works with.
-        /// Not thread safe for writes. A shared collection is used.
-        /// </summary>
-        public static IList<String> AcceptedImageExtensions{
-            get{
-                return _acceptedImageExtensions;
-            }
-        }
+
         /// <summary>
         /// Builds the physical path for the cached version, using the hashcode of the normalized URL.
         /// </summary>
@@ -231,34 +223,9 @@ namespace fbs.ImageResizer
             string dir = DiskCache.GetCacheDir();
             if (dir == null) return null;
             //Build the physical path of the cached version, using the hashcode of the normalized URL.
-            return dir.TrimEnd('/', '\\') + "\\" + request.ToString().ToLower().GetHashCode().ToString() + "." + GetOutputExtension(request);
+            return dir.TrimEnd('/', '\\') + "\\" + request.ToString().ToLower().GetHashCode().ToString() + "." + new ImageOutputSettings(request).GetFinalExtension();
         }
 
-        /// <summary>
-        /// Returns the appropriate file extension for the specified request. Looks at ?thumbnail=jpg, format=jpg etc. Looks at the original extension last. If the format is not an accepted output format, jpeg is used 
-        /// </summary>
-        /// <param name="requestUrl"></param>
-        /// <returns></returns>
-        public static string GetOutputExtension(yrl r)
-        {
-            string type = "";
-            //Use the value from 'thumbnail' if available.
-            if (!string.IsNullOrEmpty(r["thumbnail"])) type = r["thumbnail"].ToLowerInvariant().Trim();
-            //If that didn't work, try using the value from 'format'
-            if (string.IsNullOrEmpty(type) && !string.IsNullOrEmpty(r["format"])) type = r["format"].ToLowerInvariant().Trim();
-            
-            List<String> formats = new List<string>(new string[]{"png","gif","jpg","jpeg"});
-            
-            if (!formats.Contains(type)){
-                type = r.Extension.ToLowerInvariant().Trim('.').Trim();
-                if (!formats.Contains(type)){
-                    return "jpg"; //The default if we didn't recognize any of them as valid output formats. For example, if a .bmp file is requested, it will simply be converted to .jpg. We don't serve .bmp files.
-                }
-            }
-            //Consolidate jpeg->jpg
-            if (type.Equals("jpeg", StringComparison.OrdinalIgnoreCase)) type = "jpg";
-            return type;
-        }
         /// <summary>
         /// Locates the physicaal location of the incoming request and makes sure the resized version is in the cache
         /// </summary>
@@ -269,7 +236,7 @@ namespace fbs.ImageResizer
             DiskCache.UpdateCachedVersionIfNeeded(current.Local, cachedFile,
                 delegate()
                 {
-                    ImageManager.ResizeImage(current.Local, cachedFile, current.QueryString);
+                    ImageManager.BuildImage(current.Local, cachedFile, current.QueryString);
                 });
             return true;
         }
@@ -298,26 +265,12 @@ namespace fbs.ImageResizer
             //Get domain-relative path of cached file.
             string virtualPath = yrl.GetAppFolderName().TrimEnd(new char[] { '/' }) + "/" + yrl.FromPhysicalString(cachedFile).ToString();
 
-            
-
-
-
             //Add content-type headers (they're not added correctly when the URL extension is wrong)
             //Determine content-type string;
-            string contentType = "image/jpeg";
-
-            switch (GetOutputExtension(current))
-            {
-                case "png":
-                    contentType = "image/x-png";
-                    break;
-                case "gif":
-                    contentType = "image/gif";
-                    break;
-            }
+            string contentType = new ImageOutputSettings(current).GetContentType();
+            
             context.Items["FinalContentType"] = contentType;
             context.Items["FinalCachedFile"] = cachedFile;
-
 
 
             //Rewrite to cached, resized image.

@@ -69,11 +69,45 @@ namespace fbs.ImageResizer
             //TODO - implement locking so concurrent requests for the same file don't cause an I/O issue.
             if (!IsCachedVersionValid(sourceFilename, cachedFilename))
             {
-                updateCallback();
-                //Update the write time to match - this is how we know whether they are in sync.
-                System.IO.File.SetLastWriteTimeUtc(cachedFilename, System.IO.File.GetLastWriteTimeUtc(sourceFilename));
+                string key = sourceFilename.ToLower();
+
+                object fileLock = null;
+                lock (fileLocks)
+                {
+                    if (fileLocks.ContainsKey(key))
+                        fileLock = fileLocks[key];
+                    else
+                        fileLocks[key] = fileLock = new Object();//make new lock
+                }
+                
+                lock (fileLock)
+                {
+
+                    if (!IsCachedVersionValid(sourceFilename, cachedFilename))
+                    {
+                        updateCallback();
+                       
+                        //Update the write time to match - this is how we know whether they are in sync.
+                        System.IO.File.SetLastWriteTimeUtc(cachedFilename, System.IO.File.GetLastWriteTimeUtc(sourceFilename));
+                    }
+                }
+                //Attempt cleanup of lock object.
+                if (System.Threading.Monitor.TryEnter(fileLocks))
+                {
+                    try
+                    {
+                        if (System.Threading.Monitor.TryEnter(fileLock))
+                        {
+                            try{ fileLocks.Remove(key);  }
+                            finally { System.Threading.Monitor.Exit(fileLock); }
+                        }
+                    }
+                    finally { System.Threading.Monitor.Exit(fileLocks); }
+                }
+                
             }
         }
+        private static Dictionary<String, Object> fileLocks = new Dictionary<string, object>();
 
         private static void LogWarning(String message)
         {
@@ -338,6 +372,9 @@ namespace fbs.ImageResizer
             }
             return false;
         }
+
+        
+
         /// <summary>
         /// Returns the number of files inside the image cache directory (recursive traversal)
         /// </summary>
