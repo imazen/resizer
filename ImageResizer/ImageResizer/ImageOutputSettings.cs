@@ -34,6 +34,7 @@ using ImageQuantization;
 using System.Drawing.Imaging;
 using System.Drawing;
 using System.IO;
+using System.Configuration;
 
 namespace fbs.ImageResizer
 {
@@ -45,15 +46,25 @@ namespace fbs.ImageResizer
     public class ImageOutputSettings
     {
         public ImageOutputSettings(ImageFormat targetFormat) {
+            setCustomQuantizationDefault();
             this.OutputFormat = targetFormat;
         }
         public ImageOutputSettings(yrl request)
         {
+            setCustomQuantizationDefault(); 
             parseFromQuerystring(ImageOutputSettings.GetImageFormatFromExtension(request.Extension), request.QueryString);
         }
         public ImageOutputSettings(ImageFormat originalFormat, NameValueCollection q)
         {
+            setCustomQuantizationDefault();
             parseFromQuerystring(originalFormat, q);
+           
+        }
+
+        private void setCustomQuantizationDefault()
+        {
+            DisableCustomQuantization =
+                ("true".Equals(ConfigurationManager.AppSettings["DisableCustomQuantization"], StringComparison.OrdinalIgnoreCase));
         }
 
         /// thumbnail|format=jpg|jpeg|png|gif|bmp (default original)
@@ -127,6 +138,14 @@ namespace fbs.ImageResizer
         public int DitherPercent = 30;
 
         /// <summary>
+        /// Prevents custom quantization for GIFs, 8-bit PNGs, and 8-bit BMPs. When disabled, the default GDI quantization is used, which 
+        /// produces poor-quality web-palette images. 
+        /// The default quantization is faster, and sometimes is the only method that works 
+        /// (such as in a low-trust environment or where the Marshal class is banned)
+        /// </summary>
+        public bool DisableCustomQuantization = false;
+
+        /// <summary>
         /// Returns the file extension for the current OutputFormat
         /// </summary>
         /// <returns></returns>
@@ -160,7 +179,11 @@ namespace fbs.ImageResizer
                     ms.WriteTo(s);
                 }
             }
-            SaveImage(s, i);
+            else
+            {
+                SaveImage(s, i);
+            }
+           //June 3: Fixed typo: SaveImage(s,i) was duplicated here... without an else statement
         }
 
         /// <summary>
@@ -182,15 +205,15 @@ namespace fbs.ImageResizer
                 if (useMax)
                     ImageOutputSettings.SavePng(i, s);
                 else
-                    ImageOutputSettings.SaveIndexed(ImageFormat.Png, i, s, colors, Dither || FourPassDither, FourPassDither,DitherPercent);
+                    ImageOutputSettings.SaveIndexed(ImageFormat.Png, i, s, colors, Dither || FourPassDither, FourPassDither,DitherPercent,DisableCustomQuantization);
             }
             else if (OutputFormat == ImageFormat.Gif)
             {
 
                 if (useMax)
-                    ImageOutputSettings.SaveIndexed(ImageFormat.Gif, i, s, 255, Dither || FourPassDither, FourPassDither, DitherPercent);
+                    ImageOutputSettings.SaveIndexed(ImageFormat.Gif, i, s, 255, Dither || FourPassDither, FourPassDither, DitherPercent,DisableCustomQuantization);
                 else
-                    ImageOutputSettings.SaveIndexed(ImageFormat.Gif, i, s, colors, Dither || FourPassDither, FourPassDither, DitherPercent);
+                    ImageOutputSettings.SaveIndexed(ImageFormat.Gif, i, s, colors, Dither || FourPassDither, FourPassDither, DitherPercent,DisableCustomQuantization);
             }
             
         }
@@ -400,22 +423,40 @@ namespace fbs.ImageResizer
             encoderParameters.Param[0] = new System.Drawing.Imaging.EncoderParameter(System.Drawing.Imaging.Encoder.Quality, (long)quality);
             b.Save(target, GetImageCodeInfo("image/jpeg"), encoderParameters);
         }
-        public static void SaveGif(Image img, Stream target, byte colors)
-        {
-            SaveIndexed(ImageFormat.Gif, img, target, colors,false,false,0);
-        }
         /// <summary>
-        /// Requires seekable stream, i.e. MemoryString or FileStream
+        /// Colors argument has no effect when  useGdiQuantization is true.
         /// </summary>
         /// <param name="img"></param>
         /// <param name="target"></param>
         /// <param name="colors"></param>
-        public static void SavePng(Image img, Stream target, byte colors)
+        /// <param name="useGdiQuantization"></param>
+        public static void SaveGif(Image img, Stream target, byte colors, bool useGdiQuantization)
         {
-            SaveIndexed(ImageFormat.Png, img, target, colors,false,false,0);
+            SaveIndexed(ImageFormat.Gif, img, target, colors,false,false,0,useGdiQuantization);
+        }
+        /// <summary>
+        /// Requires seekable stream, i.e. MemoryString or FileStream. Colors argument has no effect when  useGdiQuantization is true.
+        /// </summary>
+        /// <param name="img"></param>
+        /// <param name="target"></param>
+        /// <param name="colors"></param>
+        public static void SavePng(Image img, Stream target, byte colors, bool useGdiQuantization)
+        {
+            SaveIndexed(ImageFormat.Png, img, target, colors,false,false,0, useGdiQuantization);
             
         }
-        public static void SaveIndexed(System.Drawing.Imaging.ImageFormat format, Image img, Stream target, byte colors, bool dither, bool fourPass, int ditherPercent)
+        /// <summary>
+        /// Colors, dither, fourPass, and ditherPercent arguments have no effect when  useGdiQuantization is true.
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="img"></param>
+        /// <param name="target"></param>
+        /// <param name="colors"></param>
+        /// <param name="dither"></param>
+        /// <param name="fourPass"></param>
+        /// <param name="ditherPercent"></param>
+        /// <param name="useGdiQuantization"></param>
+        public static void SaveIndexed(System.Drawing.Imaging.ImageFormat format, Image img, Stream target, byte colors, bool dither, bool fourPass, int ditherPercent, bool useGdiQuantization)
         {
             //image/gif
             //  The parameter list requires 0 bytes.
@@ -428,15 +469,23 @@ namespace fbs.ImageResizer
             //TODO: add Octree and Grayscale quantizer
             //TODO: Preserve transparency
 
-            //image/png
-            //  The parameter list requires 0 bytes.
-            OctreeQuantizer quantizer = new OctreeQuantizer(colors, GetBitsNeededForColorDepth(colors));
-            quantizer.Dither = dither;
-            quantizer.fourPass = fourPass;
-            quantizer.DitherPercent = (float)ditherPercent / 100;
-            using (Bitmap quantized = quantizer.Quantize(img))
+            if (useGdiQuantization)
             {
-                quantized.Save(target, format);
+                img.Save(target, format);
+                //TODO - handle changing the color count of img to match 'colors'
+            }
+            else
+            {
+                //image/png
+                //  The parameter list requires 0 bytes.
+                OctreeQuantizer quantizer = new OctreeQuantizer(colors, GetBitsNeededForColorDepth(colors));
+                quantizer.Dither = dither;
+                quantizer.fourPass = fourPass;
+                quantizer.DitherPercent = (float)ditherPercent / 100;
+                using (Bitmap quantized = quantizer.Quantize(img))
+                {
+                    quantized.Save(target, format);
+                }
             }
 
         }
@@ -459,19 +508,26 @@ namespace fbs.ImageResizer
             img.Save(target, ImageFormat.Bmp);
         }
         /// <summary>
-        /// Saves the bitmap 
+        /// Saves the bitmap. colors argument has no effect when useGdiQuantization is true.
         /// </summary>
         /// <param name="img"></param>
         /// <param name="target"></param>
         /// <param name="colors"></param>
-        public static void SaveBmp(Image img, Stream target, byte colors)
+        public static void SaveBmp(Image img, Stream target, byte colors, bool useGdiQuantization)
         {
-            //  image/bmp
-            //  The parameter list requires 0 bytes.
-            OctreeQuantizer quantizer = new OctreeQuantizer(colors, GetBitsNeededForColorDepth(colors));
-            using (Bitmap quantized = quantizer.Quantize(img))
+            if (useGdiQuantization)
             {
-                quantized.Save(target, System.Drawing.Imaging.ImageFormat.Bmp);
+                img.Save(target, ImageFormat.Bmp); //Add color support later
+            }
+            else
+            {
+                //  image/bmp
+                //  The parameter list requires 0 bytes.
+                OctreeQuantizer quantizer = new OctreeQuantizer(colors, GetBitsNeededForColorDepth(colors));
+                using (Bitmap quantized = quantizer.Quantize(img))
+                {
+                    quantized.Save(target, System.Drawing.Imaging.ImageFormat.Bmp);
+                }
             }
         }
         /// <summary>

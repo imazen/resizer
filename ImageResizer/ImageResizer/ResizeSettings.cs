@@ -446,6 +446,13 @@ namespace fbs.ImageResizer
                 }
                 
             }
+
+            //June 3: Ensure no dimension of targetSize or areaSize is less than 1px;
+            areaSize.Width = Math.Max(1, areaSize.Width);
+            areaSize.Height = Math.Max(1, areaSize.Height);
+            targetSize.Width = Math.Max(1, targetSize.Width);
+            targetSize.Height = Math.Max(1, targetSize.Height);
+
             
             ImageSizingData isd = new ImageSizingData();
             //Determine the source rectangle
