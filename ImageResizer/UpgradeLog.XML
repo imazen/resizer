@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="ImageResizing">
+</Property><Property Name="Solution File" Value="C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\ImageResizer\ImageResizing.sln">
+</Property><Property Name="User Options File" Value="C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\ImageResizer\ImageResizing.suo">
+</Property><Property Name="Date" Value="Friday, November 14, 2008">
+</Property><Property Name="Time" Value="10:34 AM">
+</Property></Properties><Event ErrorLevel="0" Project="" Source="ImageResizing.sln" Description="File successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\ImageResizer\Backup\ImageResizing.sln">
+</Event><Event ErrorLevel="0" Project="" Source="ImageResizing.suo" Description="File successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\ImageResizer\Backup\ImageResizing.suo">
+</Event><Event ErrorLevel="0" Project="ImageResizer1.1" Source="ImageResizer1.1.csproj" Description="Project file successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\ImageResizer\Backup\ImageResizer1.1.csproj">
+</Event><Event ErrorLevel="0" Project="ImageResizer1.1" Source="ImageResizer1.1.csproj.user" Description="Project user file successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\ImageResizer\Backup\ImageResizer1.1.csproj.user">
+</Event><Event ErrorLevel="0" Project="ImageResizer1.1" Source="ImageResizer\DiskCache.cs" Description="File successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\ImageResizer\Backup\ImageResizer\DiskCache.cs">
+</Event><Event ErrorLevel="0" Project="ImageResizer1.1" Source="ImageResizer\ImageManager.cs" Description="File successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\ImageResizer\Backup\ImageResizer\ImageManager.cs">
+</Event><Event ErrorLevel="0" Project="ImageResizer1.1" Source="ImageResizer\InterceptModule.cs" Description="File successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\ImageResizer\Backup\ImageResizer\InterceptModule.cs">
+</Event><Event ErrorLevel="0" Project="ImageResizer1.1" Source="ImageResizer\yrl.cs" Description="File successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\ImageResizer\Backup\ImageResizer\yrl.cs">
+</Event><Event ErrorLevel="0" Project="ImageResizer1.1" Source="Properties\AssemblyInfo.cs" Description="File successfully backed up as C:\Users\NathanaelJones\Desktop\ImageResizer1.1a-11-13-2008\ImageResizer1.1\ImageResizer\Backup\Properties\AssemblyInfo.cs">
+</Event><Event ErrorLevel="0" Project="ImageResizer1.1" Source="ImageResizer1.1.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="ImageResizer1.1" Source="ImageResizer1.1.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="" Source="ImageResizing.sln" Description="Solution converted successfully">
+</Event><Event ErrorLevel="3" Project="" Source="ImageResizing.sln" Description="Converted">
+</Event><Event ErrorLevel="0" Project="ImageResizer1.1" Source="ImageResizer1.1.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event></UpgradeLog>

@@ -12,8 +12,8 @@
     <h1>Displaying the same image in different sizes</h1>
     <img src="image.jpg" runat="server" />
     
-    <img src="resize(100,100)/image.jpg?thumbnail=jpg" runat="server" />
-    <img src="~/resize(50,50,png)/image.jpg?thumbnail=jpg" runat="server" />
+    <img src="image.jpg?thumbnail=jpg&width=100" runat="server" />
+    <img src="image.jpg?thumbnail=jpg&width=50" runat="server" />
     </div>
     </form>
 </body>

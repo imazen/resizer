@@ -78,16 +78,19 @@ namespace fbs.ImageResizer
                 string extension = System.IO.Path.GetExtension(app.Context.Request.FilePath).ToLowerInvariant().Trim('.');
                 if (AcceptedImageExtensions.Contains(extension))
                 {
+                    yrl current = CustomURLs.customizeURL(yrl.Current);
+                    //Here is the where 
+
 
                     //Is the querystring requesting a resize?
-                    NameValueCollection q = app.Context.Request.QueryString;
+                    NameValueCollection q = current.QueryString;
                     if (IsOneSpecified(q["thumbnail"], q["format"], q["width"], q["height"], q["maxwidth"], q["maxheight"]))
                     {
                         //Does the physical file exist?
-                        if (yrl.Current.FileExists)
+                        if (current.FileExists)
                         {
                             //It's for image resizing.
-                            ResizeRequest(app.Context, extension);
+                            ResizeRequest(app.Context,current, extension);
                         }
                     }
                 }
@@ -158,9 +161,9 @@ namespace fbs.ImageResizer
         /// </summary>
         /// <param name="r"></param>
         /// <param name="extension"></param>
-        private void ResizeRequest(HttpContext context, string extension)
+        private void ResizeRequest(HttpContext context, yrl current, string extension)
         {
-            yrl current = yrl.Current;
+          
 
             //This is where the cached version goes
             string cachedFile = getCachedVersionFilename(current);
