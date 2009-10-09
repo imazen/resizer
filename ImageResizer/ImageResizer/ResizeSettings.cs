@@ -349,6 +349,19 @@ namespace fbs.ImageResizer
                 double maxwidth = this.maxwidth;
                 double maxheight = this.maxheight;
 
+                //Eliminate cases where both a value and a max value are specified.
+                if (maxwidth > 0 && width > 0)
+                {
+                    width = Math.Min(maxwidth, width); 
+                    maxwidth = -1;
+                }
+                if (maxheight > 0 && height > 0)
+                {
+                    height = Math.Min(maxheight, height);
+                    maxheight = -1;
+                }
+                //Do sizing logic
+
                 if (width > 0 || height > 0)
                 {   
                     //If only one is specified, calculate the other from 

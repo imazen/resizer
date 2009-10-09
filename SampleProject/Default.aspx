@@ -162,13 +162,11 @@
     <h3>Transparent PNGs can be converted to transparent GIFs</h3>
     <p>It's ugly, but GIFs only get 1 bit for transparency.</p>
     <img id="Img1" src="saturn_256.png?format=gif" runat="server" />
-   <%--<h2>Single frames can be extracted from animated GIFs with &amp;page=x</h2>
-    <img id="Img2" src="2_computers.gif" runat="server" />
-    <img id="Img3" src="2_computers.gif?page=0" runat="server" />
-    <img id="Img4" src="2_computers.gif?page=1" runat="server" />
-    <img id="Img53" src="2_computers.gif?page=2" runat="server" />
-     --%> 
-     
+
+     <h3>Transparency is maintained while resizing GIFs, but other animated frames are not</h3>
+     <p>Here we upscale a normally tiny GIF</p>
+     <img id="Img54" src="2_computers.gif?format=png" runat="server" />
+     <img src="2_computers.gif?width=300&scale=both" runat="server" />
      
     <br />
     

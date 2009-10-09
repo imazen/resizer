@@ -85,7 +85,7 @@ namespace fbs.ImageResizer
         {
             return IsOneSpecified(q["format"], q["thumbnail"], q["maxwidth"], q["maxheight"],
                 q["width"], q["height"],
-                q["scale"], q["stretch"], q["crop"], q["page"], q["quality"], q["colors"], q["bgcolor"],
+                q["scale"], q["stretch"], q["crop"], q["page"], q["time"], q["quality"], q["colors"], q["bgcolor"],
                 q["rotate"], q["flip"], q["sourceFlip"], q["paddingWidth"], q["paddingColor"], q["ignoreicc"]);
         }
 
@@ -147,7 +147,12 @@ namespace fbs.ImageResizer
             if (!string.IsNullOrEmpty(q["page"]) && !int.TryParse(q["page"], out page))
                 page = 0;
 
-            return BuildImage(src, page, new ResizeSettings(q), new ImageSettings(q), new ImageFilter(q), new ImageOutputSettings(originalFormat,q));
+            int time = 0;
+            if (!string.IsNullOrEmpty(q["time"]) && !int.TryParse(q["time"], out time))
+                time = 0;
+
+
+            return BuildImage(src, page,time, new ResizeSettings(q), new ImageSettings(q), new ImageFilter(q), new ImageOutputSettings(originalFormat,q));
         }
 
 
@@ -158,22 +163,41 @@ namespace fbs.ImageResizer
         /// </summary>
         /// <param name="pageIndex">The page or frame. Use 0 for default.</param>
         /// <returns></returns>
-        public static Bitmap BuildImage(Bitmap src, int pageIndex, ResizeSettings resize, ImageSettings opts, ImageFilter adjustments, ImageOutputSettings output)
+        public static Bitmap BuildImage(Bitmap src, int pageIndex, int timeIndex,ResizeSettings resize, ImageSettings opts, ImageFilter adjustments, ImageOutputSettings output)
         {
+            /* Broken: Transparency is not maintained. GDI seems to have trouble with color palettes after frame 0
             //Support page selection in a .tiff document.
             if (pageIndex > 0)
             {
                 if (pageIndex >= src.GetFrameCount(FrameDimension.Page))
-                {
+                
                     //Out of bounds.
                     //Use last index
                     pageIndex = src.GetFrameCount(FrameDimension.Page) - 1;
-                }
+
                 if (pageIndex > 0)
                 {
+
                     src.SelectActiveFrame(FrameDimension.Page, pageIndex);
+                    src.MakeTransparent(); //Needed, since this seems to be lost after a call to SelectActiveFrame
                 }
             }
+            if (timeIndex > 0)
+            {
+                if (timeIndex >= src.GetFrameCount(FrameDimension.Time))
+
+                    //Out of bounds.
+                    //Use last index
+                    timeIndex = src.GetFrameCount(FrameDimension.Time) - 1;
+
+                if (timeIndex > 0)
+                {    
+                    src.SelectActiveFrame(FrameDimension.Time, timeIndex);
+                    src.MakeTransparent(); //Needed, since this seems to be lost after a call to SelectActiveFrame
+                }
+
+            }
+             */
             if (resize.sourceFlip != RotateFlipType.RotateNoneFlipNone)
                 src.RotateFlip(resize.sourceFlip); //Flipping has to be done on the original - it can't be done as part of the DrawImage or later, after the borders are drawn.
             
