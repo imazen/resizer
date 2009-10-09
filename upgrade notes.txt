@@ -1,0 +1,3 @@
+It is recommended that you delete the /imagecache/ folder when changing versions. 
+
+The default behavior when both ?width=x&height=y are specified has changed. See the sample project Default.aspx

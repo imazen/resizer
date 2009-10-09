@@ -39,7 +39,7 @@ namespace fbs.ImageResizer
             if (requested != null) OutputFormat = requested;
 
             //Parse colors
-            int colors = 90;
+            int colors = -1;
             if (!string.IsNullOrEmpty(q["colors"]))
                 if (int.TryParse(q["colors"], out colors))
                     this.Colors = colors;
@@ -89,14 +89,35 @@ namespace fbs.ImageResizer
         {
             return ImageOutputSettings.GetContentTypeFromImageFormat(OutputFormat);
         }
+
         /// <summary>
-        /// Requires a seekable string for Png encoding. 
+        /// Safe for use with non-seekable streams. Writes the Png memory to an intermediate MemoryStream.
+        /// Does use more memory on PNGs. FileStreams are seekable.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="i"></param>
+        public void SaveImageToNonSeekableStream(Stream s, Image i)
+        {
+            if (OutputFormat == ImageFormat.Png)
+            {
+                //Write to an intermediate, seekable memory stream (PNG compression requires it)
+                using (MemoryStream ms = new MemoryStream(2048))
+                {
+                    SaveImage(ms, i);
+                    ms.WriteTo(s);
+                }
+            }
+            SaveImage(s, i);
+        }
+
+        /// <summary>
+        /// Requires a seekable string for Png encoding. Use SaveImageToNonSeekableStream for non-seekable streams.
         /// </summary>
         /// <param name="s"></param>
         public void SaveImage(Stream s, Image i )
         {
             bool useMax = (Colors < 0);
-            byte colors = (byte)Math.Max(Math.Min(this.Colors, 1), 255);
+            byte colors = (byte)Math.Min(Math.Max(this.Colors, 1), 255);
 
             if (OutputFormat == ImageFormat.Jpeg)
             {
@@ -209,20 +230,21 @@ namespace fbs.ImageResizer
             if (format == ImageFormat.Tiff) return "tiff";
             return null;
         }
-        
+        /// <summary>
+        /// Returns true if the extension on the virtual path 'path' is one of the accepted types
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static bool IsAcceptedImageType(string path){
+            string extension = System.IO.Path.GetExtension(path).ToLowerInvariant().Trim('.');
+            return _acceptedImageExtensions.Contains(extension);
 
-        private static IList<String> _acceptedImageExtensions = new List<String>(new String[] { "jpg", "jpeg", "bmp", "gif", "png", "tff","tiff" });
+        }
         /// <summary>
         /// Returns a list of (lowercase invariant) image extensions that the module works with.
-        /// Not thread safe for writes. A shared collection is used.
         /// </summary>
-        public static IList<String> AcceptedImageExtensions
-        {
-            get
-            {
-                return _acceptedImageExtensions;
-            }
-        }
+        private static IList<String> _acceptedImageExtensions = new List<String>(new String[] { "jpg", "jpeg", "bmp", "gif", "png", "tff","tiff" });
+
         /// <summary>
         /// Supports Png, Jpeg, Gif, Bmp, and Tiff.
         /// </summary>

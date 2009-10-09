@@ -1,0 +1,1 @@
+The documentation is available online at http://nathanaeljones.com/products/asp-net-image-resizer/

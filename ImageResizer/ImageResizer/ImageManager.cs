@@ -64,6 +64,7 @@ namespace fbs.ImageResizer
             //Resize image 
             using (Bitmap thumb = BuildImage(sourceFile, queryString))
             {
+                //Determines output format, includes code for saving in a variety of formats.
                 ImageOutputSettings ios = new ImageOutputSettings(ImageOutputSettings.GetImageFormatFromPhysicalPath(sourceFile),queryString);
 
                 //Open stream and save format.
@@ -75,20 +76,50 @@ namespace fbs.ImageResizer
             }
         }
 
+        /// <summary>
+        /// Returns true if the specified querystring collection uses a resizing command
+        /// </summary>
+        /// <param name="q"></param>
+        /// <returns></returns>
+        public static bool HasResizingDirective(NameValueCollection q)
+        {
+            return IsOneSpecified(q["format"], q["thumbnail"], q["maxwidth"], q["maxheight"],
+                q["width"], q["height"],
+                q["scale"], q["stretch"], q["crop"], q["page"], q["quality"], q["colors"], q["bgcolor"],
+                q["rotate"], q["flip"], q["sourceFlip"], q["paddingWidth"], q["paddingColor"], q["ignoreicc"]);
+        }
+
+        /// <summary>
+        /// Returns true if one or more of the arguments has a non-null or non-empty value
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        private static bool IsOneSpecified(params String[] args)
+        {
+            foreach (String s in args) if (!string.IsNullOrEmpty(s)) return true;
+            return false;
+        }
 
 
 
         /// <summary>
         /// Generates a resized bitmap from the specifed source file and the specified querystring. Understands width/height and maxwidth/maxheight.
         /// Throws either an ArgumentException or IOException if the source image is invalid.
+        /// 
         /// </summary>
+        /// 
         /// <returns></returns>
         public static Bitmap BuildImage(string sourceFile, NameValueCollection q)
         {
+            bool useICM = true;
+            if ("true".Equals(q["ignoreicc"], StringComparison.OrdinalIgnoreCase)) useICM = false;
+
+
+
             System.Drawing.Bitmap b = null;
             try
             {
-                b = new System.Drawing.Bitmap(sourceFile);
+                b = new System.Drawing.Bitmap(sourceFile,useICM);
             }
             catch (ArgumentException ae)
             {
@@ -143,38 +174,61 @@ namespace fbs.ImageResizer
                     src.SelectActiveFrame(FrameDimension.Page, pageIndex);
                 }
             }
-            if (resize.flip != RotateFlipType.RotateNoneFlipNone)
-                src.RotateFlip(resize.flip); //Flipping has to be done on the original - it can't be done as part of the DrawImage or later, after the borders are drawn.
+            if (resize.sourceFlip != RotateFlipType.RotateNoneFlipNone)
+                src.RotateFlip(resize.sourceFlip); //Flipping has to be done on the original - it can't be done as part of the DrawImage or later, after the borders are drawn.
             
             /*Color background, float borderWidth, Color borderColor,
             float shadowWidth, Color shadowColor, PointF shadowOffset,
             Color paddingColor, Bitmap src, RectangleF sourceArea, PointF[] imageTarget, PointF[] targetSpace, ImageAttributes imageAdjustments)*/
             
+
             ResizeSettings.ImageSizingData size = resize.CalculateSizingData(new SizeF(src.Width,src.Height),new SizeF((float)DiskCache.GetMaxWidth(),(float)DiskCache.GetMaxHeight()));
-            //Inflate for padding
-            size.targetArea = PolygonMath.InflatePoly(size.targetArea, opts.paddingWidth);
+         
+            //Calculate required space for everything
+            PointF[] all = size.targetArea;
 
-            //Calculate required space:
-            RectangleF box = PolygonMath.GetBoundingBox(size.targetArea);
+
             //Add required space for border and padding
-            box.X -= opts.borderWidth;
-            box.Y -=  opts.borderWidth;
-            box.Width += opts.borderWidth;
-            box.Height += opts.borderWidth;
-            //And shadow
-            if (opts.shadowWidth > 0)
-            {
-                box.X += Math.Max(0, opts.shadowWidth - opts.shadowOffset.X);
-                box.Y += Math.Max(0, opts.shadowWidth - opts.shadowOffset.Y);
-                box.Width += Math.Max(0, opts.shadowWidth + opts.shadowOffset.X);
-                box.Height += Math.Max(0, opts.shadowWidth + opts.shadowOffset.Y);
-            }
+            if (opts.borderWidth > 0) all = PolygonMath.InflatePoly(all, opts.borderWidth);
+            if (opts.paddingWidth > 0) all = PolygonMath.InflatePoly(size.targetArea, opts.paddingWidth);
+            
+            //For later use. The inside of the shadow
+            PointF[] insideShadow = all;
+
+            //shadow is trickier
+            if (opts.shadowWidth > 0) all = PolygonMath.InflatePoly(all, new float[]{
+                Math.Max(0, opts.shadowWidth - opts.shadowOffset.Y),
+                Math.Max(0, opts.shadowWidth + opts.shadowOffset.X),
+                Math.Max(0, opts.shadowWidth + opts.shadowOffset.Y),
+                Math.Max(0, opts.shadowWidth - opts.shadowOffset.X)
+            });
+
+            //Find how much we need to move imageArea (and imageTarget) so that all is at 0,0.
+            PointF shadowBorderOffset = PolygonMath.GetBoundingBox(all).Location;
+            shadowBorderOffset.X *= -1;
+            shadowBorderOffset.Y *= -1;
+
+            //Adjust insideShadow
+            insideShadow = PolygonMath.InflatePoly(PolygonMath.MovePoly(insideShadow,shadowBorderOffset), new float[]{
+                 - opts.shadowOffset.Y,
+                 + opts.shadowOffset.X,
+                 + opts.shadowOffset.Y,
+                 - opts.shadowOffset.X
+            });
 
 
+            
             //Rebase things so we are starting at 0,0;
-            size.imageTarget = PolygonMath.MovePoly(size.imageTarget, new PointF(-box.X, -box.Y));
-            size.targetArea = PolygonMath.MovePoly(size.targetArea, new PointF(-box.X, -box.Y));
-            box.X = 0; box.Y = 0;
+            size.imageTarget = PolygonMath.MovePoly(size.imageTarget, shadowBorderOffset);
+            size.targetArea = PolygonMath.MovePoly(size.targetArea, shadowBorderOffset);
+            //Inflate for padding
+            if (opts.paddingWidth > 0) size.targetArea = PolygonMath.InflatePoly(size.targetArea, opts.paddingWidth);
+           
+
+            
+
+            //Find the size
+            SizeF box = PolygonMath.GetBoundingBox(all).Size;
 
             //Create new bitmap using calculated size
             Bitmap b = new Bitmap((int)Math.Round(box.Width), (int)Math.Round(box.Height), PixelFormat.Format32bppArgb);
@@ -189,12 +243,17 @@ namespace fbs.ImageResizer
                 g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
                 g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
                 g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-
+                g.CompositingMode = CompositingMode.SourceOver;
+                
                 //If the image doesn't support transparency, we need to fill the background color now.
                 Color background = opts.bgcolor;
-                if (background == Color.Transparent && !output.SupportsTransparency) background = Color.White;
+                if (background == Color.Transparent) 
+                    //Only set the bgcolor if the image isn't taking the whole area.
+                    if (!output.SupportsTransparency && !PolygonMath.GetBoundingBox(size.imageTarget).Size.Equals(box))
+                        background = Color.White;
                 //Fill background
-                g.Clear(background); //Does this work for Color.Transparent?
+                if (background != Color.Transparent) //This causes increased aliasing at the edges - i.e., a faint white border that is even more pronounced than usual.
+                    g.Clear(background); //Does this work for Color.Transparent? -- 
 
                 Color paddingColor = opts.paddingColor;
                 //Inherit color
@@ -202,9 +261,14 @@ namespace fbs.ImageResizer
 
 
                 //Draw shadow
-                if (opts.shadowWidth > 0)
+                if (opts.shadowWidth > 0 && opts.shadowColor != Color.Transparent)
                 {
-                    DrawOuterGradient(g, PolygonMath.MovePoly(PolygonMath.InflatePoly(size.targetArea, opts.borderWidth + opts.paddingWidth), opts.shadowOffset),
+                    //Offsets may show inside the shadow - so we have to fix that
+                    g.FillPolygon(new SolidBrush(opts.shadowColor),
+                        PolygonMath.InflatePoly(insideShadow,1)); //Inflate 1 for FillPolgyon rounding errors.
+
+                    //Then we can draw the outer gradient
+                    DrawOuterGradient(g, insideShadow,
                                     opts.shadowColor, Color.Transparent, opts.shadowWidth);
                 }
 
@@ -213,24 +277,50 @@ namespace fbs.ImageResizer
                 if (!paddingColor.Equals(opts.bgcolor) && paddingColor != Color.Transparent)
                     g.FillPolygon(new SolidBrush(paddingColor), size.targetArea);
 
+                if (!PolygonMath.GetBoundingBox(size.imageTarget).Size.Equals(box))
+                {
+                    //Inflate half a pixel to remove white border caused by GDI+ error
+                   //Doesn't work! size.imageTarget = PolygonMath.InflatePoly(size.imageTarget, 1F);
+                  /* Doesn't work either:
+                   * size.sourceRect.X++;
+                    size.sourceRect.Y++;
+                    size.sourceRect.Width -= 2;
+                    size.sourceRect.Height -= 2;
+                   */
+                }
 
-                //Draw image
-                g.DrawImage(src, PolygonMath.getParallelogram(size.imageTarget), size.sourceRect, GraphicsUnit.Pixel, adjustments.getImageAttributes());
-
+                //Must use == to compart SizeF and Size ... Equals() failes to compare properly
+               /*Doesn't help either: if (PolygonMath.GetBoundingBox(size.imageTarget).Size.Equals(box) && size.sourceRect.Size == src.Size)
+                {
+                    g.DrawImage(src, PolygonMath.ToRectangle(PolygonMath.GetBoundingBox(size.imageTarget)));
+                   
+                }
+                else
+                {*/
+                    //Draw image
+                    g.DrawImage(src, PolygonMath.getParallelogram(size.imageTarget), size.sourceRect, GraphicsUnit.Pixel);//, adjustments.getImageAttributes()
+                //}
 
                 //Draw border
                 if (opts.borderWidth > 0)
                 {
                     Pen p = new Pen(opts.borderColor, opts.borderWidth);
-                    p.Alignment = System.Drawing.Drawing2D.PenAlignment.Outset;
-                    p.LineJoin = System.Drawing.Drawing2D.LineJoin.Round;
+                    p.Alignment = System.Drawing.Drawing2D.PenAlignment.Right;
+                    p.LineJoin = System.Drawing.Drawing2D.LineJoin.Miter;
                     g.DrawPolygon(p, size.targetArea);
                 }
+
                 //Commit changes.
                 g.Flush(FlushIntention.Flush);
+
+                //The last flipping.
+                if (resize.flip != RotateFlipType.RotateNoneFlipNone)
+                    b.RotateFlip(resize.flip);
+
+
+                return b;
             }
 
-            return b;
         }
 
         /// <summary>
@@ -243,22 +333,27 @@ namespace fbs.ImageResizer
         /// <param name="width"></param>
         public static void DrawOuterGradient(Graphics g, PointF[] poly, Color inner, Color outer, float width)
         {
-            PointF[,] corners = PolygonMath.GetCorners(poly, width);
-            PointF[,] sides = PolygonMath.GetSides(poly, width);
+            
+            PointF[,] corners = PolygonMath.RoundPoints(PolygonMath.GetCorners(poly, width));
+            PointF[,] sides = PolygonMath.RoundPoints(PolygonMath.GetSides(poly, width));
+            //Overlapping these causes darker areas... Dont use InflatePoly
 
             //Paint corners
             for (int i = 0; i <= corners.GetUpperBound(0); i++)
             {
-                Brush b = PolygonMath.GenerateRadialBrush(inner, outer, corners[i, 0], width);
-                g.FillPolygon(b, PolygonMath.GetSubArray(corners, i));
+                PointF[] pts = PolygonMath.GetSubArray(corners, i);
+                Brush b = PolygonMath.GenerateRadialBrush(inner, outer, pts[0], width + 1);
+                
+                g.FillPolygon(b, pts);
             }
             //Paint sides
             for (int i = 0; i <= sides.GetUpperBound(0); i++)
             {
-                LinearGradientBrush b = new LinearGradientBrush(sides[i, 3], sides[i, 0], inner, outer);
+                PointF[] pts = PolygonMath.GetSubArray(sides, i);
+                LinearGradientBrush b = new LinearGradientBrush(pts[3], pts[0], inner, outer);
                 b.SetSigmaBellShape(1);
                 b.WrapMode = WrapMode.TileFlipXY;
-                g.FillPolygon(b,PolygonMath.GetSubArray(sides, i));
+                g.FillPolygon(b,pts);
             }
         }
 
