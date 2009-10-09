@@ -1,0 +1,3 @@
+Upgrade notes available online at
+
+http://nathanaeljones.com/11171_Image_Resizer_1_2_Upgrade_Notes
