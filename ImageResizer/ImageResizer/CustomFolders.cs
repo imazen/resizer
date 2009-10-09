@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 namespace fbs.ImageResizer
 {
     /// <summary>
-    /// Here is where you can set up custom image size defaults for folders (or any pattern you want).
+    /// Here is where you can set up custom image size defaults for folders (or any pattern you want). You can also perform URL rewriting on your images.
     /// </summary>
     public static class CustomFolders
     {
@@ -20,6 +20,10 @@ namespace fbs.ImageResizer
         {
             //You can make certain folders default to certain dimensions.
             //return imagePath.Replace("/productThumbnails/","/resize(50,50)/productThumbnails/");
+
+            //You can also configure or disable client caching.
+            //context.Items["ContentExpires"] = DateTime.Now.AddHours(5);
+            //or context.Items["ContentExpires"] = null
             return filePath;
         }
         /// <summary>

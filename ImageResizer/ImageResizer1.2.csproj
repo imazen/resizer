@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ImageResizer</RootNamespace>
-    <AssemblyName>ImageResizer1.1a</AssemblyName>
+    <AssemblyName>ImageResizer1.2</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
@@ -34,7 +34,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>.\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -56,7 +56,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ImageResizer\CustomURLs.cs" />
+    <Compile Include="ImageResizer\CustomFolders.cs" />
     <Compile Include="ImageResizer\DiskCache.cs" />
     <Compile Include="ImageResizer\ImageManager.cs" />
     <Compile Include="ImageResizer\InterceptModule.cs" />

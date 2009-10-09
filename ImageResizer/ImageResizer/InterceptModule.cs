@@ -27,6 +27,8 @@
  * 
  **/
 
+//Clear the image cache before upgrading.. .not sure why it's needed, but images appear corrupted...
+
 using System;
 using System.Data;
 using System.Configuration;
@@ -83,7 +85,7 @@ namespace fbs.ImageResizer
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void CheckRequest(object sender, EventArgs e)
+        protected virtual void CheckRequest(object sender, EventArgs e)
         {
             //Get the http context
             HttpApplication app = sender as HttpApplication;
@@ -93,11 +95,35 @@ namespace fbs.ImageResizer
                 string extension = System.IO.Path.GetExtension(app.Context.Request.FilePath).ToLowerInvariant().Trim('.');
                 if (AcceptedImageExtensions.Contains(extension))
                 {
+                    //Init the caching settings so CustomFolders can override them. These only take effect if the image is actually resized
+                    app.Context.Items["ContentExpires"] = DateTime.Now.AddHours(24); //Default to 24 hours
+                    string cacheSetting = ConfigurationManager.AppSettings["ImageResizerClientCacheMinutes"];
+                    if (!string.IsNullOrEmpty(cacheSetting)){
+                        double f;
+                        if (double.TryParse(cacheSetting,out f)){
+                            if (f > 0)
+                                app.Context.Items["ContentExpires"] = DateTime.Now.AddMinutes(f);
+                            else
+                                app.Context.Items["ContentExpires"] = null;
+                        }
+                    }
+                    
+
                     string basePath = app.Context.Request.Path;
                     NameValueCollection q = new NameValueCollection();
 
                     //Parse and remove resize(x,y,f) already in URL
                     basePath = parseResizeFolderSyntax(basePath, q);
+                    //If user specified resize(x,y) in the path, this will circumvent the URL auth system.
+                    if (!basePath.Equals(app.Context.Request.Path))
+                    {
+                        //Make sure the resize() notation is allowed.
+                        string allow = ConfigurationManager.AppSettings["AllowFolderResizeNotation"];
+                        if (string.IsNullOrEmpty(allow) || allow.Equals("false", StringComparison.OrdinalIgnoreCase)){
+                            return; //Skip the request
+                        }
+                        
+                    }
 
                     //Set folder resizing defaults (adds in resize(x,y) folder)
                     basePath = CustomFolders.folderDefaults(basePath);
@@ -181,7 +207,7 @@ namespace fbs.ImageResizer
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        private bool IsOneSpecified(params String[] args){
+        protected bool IsOneSpecified(params String[] args){
             foreach (String s in args) if (!string.IsNullOrEmpty(s)) return true;
             return false;
         }
@@ -190,7 +216,7 @@ namespace fbs.ImageResizer
         /// Returns a list of (lowercase invariant) image extensions that the module works with.
         /// Not thread safe for writes. A shared collection is used.
         /// </summary>
-        protected static IList<String> AcceptedImageExtensions{
+        public static IList<String> AcceptedImageExtensions{
             get{
                 return _acceptedImageExtensions;
             }
@@ -200,7 +226,7 @@ namespace fbs.ImageResizer
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        private string getCachedVersionFilename(yrl request)
+        protected string getCachedVersionFilename(yrl request)
         {
             string dir = DiskCache.GetCacheDir();
             if (dir == null) return null;
@@ -233,14 +259,27 @@ namespace fbs.ImageResizer
             if (type.Equals("jpeg", StringComparison.OrdinalIgnoreCase)) type = "jpg";
             return type;
         }
-
+        /// <summary>
+        /// Locates the physicaal location of the incoming request and makes sure the resized version is in the cache
+        /// </summary>
+        /// <param name="current"></param>
+        /// <param name="cacheFile"></param>
+        protected virtual bool MakeResizedVersion(yrl current, string cachedFile)
+        {
+            DiskCache.UpdateCachedVersionIfNeeded(current.Local, cachedFile,
+                delegate()
+                {
+                    ImageManager.ResizeImage(current.Local, cachedFile, current.QueryString);
+                });
+            return true;
+        }
         /// <summary>
         /// Generates the resized image to disk (if needed), then rewrites the request to that location.
         /// Perform 404 checking before calling this method. Assumes file exists.
         /// </summary>
         /// <param name="r"></param>
         /// <param name="extension"></param>
-        private void ResizeRequest(HttpContext context, yrl current, string extension)
+        protected virtual void ResizeRequest(HttpContext context, yrl current, string extension)
         {
           
 
@@ -250,11 +289,11 @@ namespace fbs.ImageResizer
             //Disk caching is good for images because they change much less often than the application restarts.
 
             //Make sure the resized image is in the disk cache.
-            DiskCache.UpdateCachedVersionIfNeeded(current.Local, cachedFile, 
-                delegate()
-                {
-                    ImageManager.ResizeImage(current.Local, cachedFile, current.QueryString);
-                });
+            //Returns false if the request is not supposed to be handled by the module.
+            if (!MakeResizedVersion(current, cachedFile))
+            {
+                return;
+            }
 
             //Get domain-relative path of cached file.
             string virtualPath = yrl.GetAppFolderName().TrimEnd(new char[] { '/' }) + "/" + yrl.FromPhysicalString(cachedFile).ToString();
@@ -285,7 +324,7 @@ namespace fbs.ImageResizer
             context.RewritePath(virtualPath, false);
         }
 
-        void context_PreSendRequestHeaders(object sender, EventArgs e)
+        protected void context_PreSendRequestHeaders(object sender, EventArgs e)
         {
             HttpApplication app = sender as HttpApplication;
             HttpContext context = (app != null) ? app.Context : null;
@@ -298,7 +337,9 @@ namespace fbs.ImageResizer
                 //Add caching headers
                 context.Response.AddFileDependency(context.Items["FinalCachedFile"].ToString());
 
-                context.Response.Cache.SetExpires(DateTime.Now.AddHours(24));
+                if (context.Items["ContentExpires"] != null)
+                    context.Response.Cache.SetExpires((DateTime)context.Items["ContentExpires"]);
+
                 //Enables in-memory caching
                 context.Response.Cache.SetCacheability(HttpCacheability.Public);
                 context.Response.Cache.SetLastModifiedFromFileDependencies();
