@@ -269,7 +269,11 @@ namespace fbs.ImageResizer
             // if (deleteExtra > maxCount) throw warning
             
             string[] files = System.IO.Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
-            if (files.Length <= maxCount) return false;
+            if (files.Length <= maxCount)
+            {
+                hasCleanedUp = true;
+                return false;
+            }
 
            
 
