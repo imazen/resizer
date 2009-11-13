@@ -34,6 +34,14 @@ EXIF data is removed - by design. EXIF data bloats the image file, and can somet
 
 Changelog, by version
 
+Changes since 2.1a
+********************************************
+Fixed performance bug in DiskCache cause directory listings to run every image request. 
+
+Line 273, was returning without setting hasCleanedUp=true. Fixed.
+
+Added PerfTests project to stress test the resizing and re-encoding portions of the module.
+
 Changes since RC2 (v2.1a)
 ************************************
 
@@ -41,7 +49,8 @@ Added manual URL authorization using the ASP.NET UrlAuthorizationModule API. All
 
 Added DisableCustomQuantization setting to allow GIFs to be generated on servers where the Marshal class is prohibited.
 
-Added ResizeExtension=".cd" so IIS5 & 6 configuration is optional. Users can append .cd to the end of the image URL instead of adding a wildcard mapping.
+Added ResizeExtension=".axd" so IIS5 & 6 configuration is optional. Users can append .axd to the end of the image URL instead of adding a wildcard mapping.
+
 Added dithering.
 
 
