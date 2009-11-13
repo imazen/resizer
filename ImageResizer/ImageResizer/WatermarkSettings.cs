@@ -44,8 +44,16 @@ namespace fbs.ImageResizer
         /// <param name="b"></param>
         /// <param name="g"></param>
         public virtual void Process(Bitmap b, Graphics g){
+            TrialWatermark(b,g);
+        }
 
-          //  DrawString(b, g, "Trial", FontFamily.GenericSansSerif, Color.FromArgb(50,Color.White));
+        private void TrialWatermark(Bitmap b, Graphics g)
+        {
+            //Only executes when built using "Trial Version" configuration
+#if TRIAL
+            if (new Random().Next(4) < 2)
+                this.DrawString(b, g, "Unlicensed", FontFamily.GenericSansSerif, Color.FromArgb(70, Color.White));
+#endif
         }
 
         public virtual void DrawString(Bitmap b, Graphics g, String text, FontFamily ff, Color c)
