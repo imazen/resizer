@@ -42,6 +42,9 @@ Line 273, was returning without setting hasCleanedUp=true. Fixed.
 
 Added PerfTests project to stress test the resizing and re-encoding portions of the module.
 
+
+Modified solution to have "Trial Version" configuration so I don't have to comment the code....
+
 Changes since RC2 (v2.1a)
 ************************************
 

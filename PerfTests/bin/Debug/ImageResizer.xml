@@ -4,6 +4,31 @@
         <name>ImageResizer</name>
     </assembly>
     <members>
+        <member name="T:fbs.ImageResizer.WatermarkSettings">
+            <summary>
+            Provides extensibility points for drawing watermarks and even modifying resizing/image settings
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.WatermarkSettings.#ctor(System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Creates a new WatermarkSettings class
+            </summary>
+            <param name="q"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.WatermarkSettings.ModifySettings(fbs.ImageResizer.ResizeSettings,fbs.ImageResizer.ImageSettings,fbs.ImageResizer.ImageFilter,fbs.ImageResizer.ImageOutputSettings)">
+            <summary>
+            Executed prior to resizing. Permits modifications of geometry and effect settings
+            </summary>
+            <param name="rs"></param>
+            <param name="opts"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.WatermarkSettings.Process(System.Drawing.Bitmap,System.Drawing.Graphics)">
+            <summary>
+            Modify this to do watermarks. Executing after resizing is complete
+            </summary>
+            <param name="b"></param>
+            <param name="g"></param>
+        </member>
         <member name="T:ImageQuantization.OctreeQuantizer">
             <summary>
             Quantize using an Octree
@@ -384,6 +409,62 @@
             Return the child nodes
             </summary>
         </member>
+        <member name="T:fbs.ImageResizer.InterceptModule">
+            <summary>
+            Monitors incoming image requests. Image requests that request resizing are processed. The resized images are immediately written to disk, and 
+            the request is rewritten to the disk-cached resized version. This way IIS can handle the actual serving of the file.
+            The disk-cache directory is protected through URL authorization.
+            See CustomFolders.cs for any type of URL rewriting 
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.InterceptModule.System#Web#IHttpModule#Init(System.Web.HttpApplication)">
+            <summary>
+            Called when the app is initialized
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.InterceptModule.CheckRequest_PostAuthorizeRequest(System.Object,System.EventArgs)">
+            <summary>
+            This is where we filter requests and intercet those that want resizing performed.
+            We first check for image extensions... 
+            If it is one, then we run it through the CustomFolders methods to see if if there is custom resizing for it..
+            If there still aren't any querystring params after that, then we ignore the request.
+            If the file doesn't exist, we also ignore the request. They're going to cause a 404 anyway.
+            
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.InterceptModule.getCachedVersionFilename(fbs.yrl)">
+            <summary>
+            Builds the physical path for the cached version, using the hashcode of the normalized URL.
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.InterceptModule.ResizeRequest(System.Web.HttpContext,fbs.yrl)">
+            <summary>
+            Generates the resized image to disk (if needed), then rewrites the request to that location.
+            Perform 404 checking before calling this method. Assumes file exists.
+            Called during PostAuthorizeRequest
+            </summary>
+            <param name="r"></param>
+            <param name="extension"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.InterceptModule.context_PreSendRequestHeaders(System.Object,System.EventArgs)">
+            <summary>
+            We don't actually send the data - but we still want to control the headers on the data.
+            PreSendRequestHeaders allows us to change the content-type and cache headers at excatly the last
+            second. We populate the headers from context.Items["FinalContentType"],
+            context.Items["ContentExpires"], and context.Items["FinalCachedFile"].
+            This also indirectly enables server-side mem caching. (HttpCacheability.Public does it)
+            We set the file dependency to FinalCachedFile so changes are update quickly server-side
+            - however, clients will not check for updates until ContentExpires occurs.
+             
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
         <member name="T:fbs.ImageResizer.ImageManager">
             <summary>
             Provides methods for generating resizied images, and for reading and writing them to disk.
@@ -472,670 +553,6 @@
             <param name="inner"></param>
             <param name="outer"></param>
             <param name="width"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.RoundPoints(System.Drawing.PointF[])">
-            <summary>
-            Rounds the elements of the specified array [not used]
-            </summary>
-            <param name="a"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.RoundPoints(System.Drawing.PointF[0:,0:])">
-            <summary>
-            Rounds the elements of the specified array [not used]
-            </summary>
-            <param name="a"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.ForEach(System.Array,fbs.ImageResizer.PolygonMath.ForEachFunction)">
-            <summary>
-            Modifies the specified array by applying the specified function to each element.
-            </summary>
-            <param name="array"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.RotatePoly(System.Drawing.PointF[],System.Double)">
-            <summary>
-            Rotates the specified polygon around the origin. 
-            </summary>
-            <param name="rect"></param>
-            <param name="degrees"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.ToPoly(System.Drawing.RectangleF)">
-            <summary>
-            Returns a clockwise array of points on the rectangle.
-            Point 0 is top-left.
-            </summary>
-            <param name="rect"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.NormalizePoly(System.Drawing.PointF[])">
-            <summary>
-            Moves the polygon so that the upper-left corner of its bounding box is located at 0,0.
-            </summary>
-            <param name="poly"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.RotateVector(System.Drawing.PointF,System.Double)">
-            <summary>
-            Rotates the specified point around the origin.
-            </summary>
-            <param name="v"></param>
-            <param name="radians"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.ChangeMagnitude(System.Drawing.PointF,System.Single)">
-            <summary>
-            Returns a modified version of the specified vector with the desired length.
-            </summary>
-            <param name="v"></param>
-            <param name="length"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.GetBoundingBox(System.Drawing.PointF[])">
-            <summary>
-            Returns a bounding box for the specified set of points.
-            </summary>
-            <param name="points"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.MovePoly(System.Drawing.PointF[],System.Drawing.PointF)">
-            <summary>
-            Returns a modified version of the array, with each element being offset by the specified amount.
-            </summary>
-            <param name="offset"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.ArraysEqual(System.Drawing.PointF[],System.Drawing.PointF[])">
-            <summary>
-            Returns true if the member elements of the specified arrays match, and the arrays 
-            are of the same length.
-            </summary>
-            <param name="a1"></param>
-            <param name="a2"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.getParallelogram(System.Drawing.PointF[])">
-            <summary>
-            Moves element 4 to spot 3 and truncates to 3 elements.
-            For compatiblity with Graphics.DrawImage
-            </summary>
-            <param name="quad"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.GetSubArray(System.Drawing.PointF[0:,0:],System.Int32)">
-            <summary>
-            Grabs a single-dimension array from a 2 dimensional array, using the specified primary index.
-            </summary>
-            <param name="array"></param>
-            <param name="index"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.GenerateRadialBrush(System.Drawing.Color,System.Drawing.Color,System.Drawing.PointF,System.Single)">
-            <summary>
-            Approximates a radial brush using a high-rez PathGradientBrush.
-            </summary>
-            <param name="inner"></param>
-            <param name="outer"></param>
-            <param name="pt"></param>
-            <param name="width"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.ScaleInside(System.Drawing.SizeF,System.Drawing.SizeF)">
-            <summary>
-            Scales 'fitInside' to fit inside 'bounding' while maintaining aspect ratio. Upscales and downscales.
-            </summary>
-            <param name="bounding"></param>
-            <param name="fitInside"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.FitsInside(System.Drawing.SizeF,System.Drawing.SizeF)">
-            <summary>
-            Returns true if 'inner' fits inside or equals 'outer'
-            </summary>
-            <param name="inner"></param>
-            <param name="outer"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.GetCorners(System.Drawing.PointF[],System.Single)">
-             <summary>
-             Returns an array of parallelograms. These parallelgrams are the 'corners' outside each vertex in 'poly'.
-             The adjacent edges are perpendicular to 'poly'. Point 1 of each parallelogram will match the respective point in 'poly'
-             Points are clockwise.
-            
-             TODO - some rounding issues going on, not exact numbers here
-             </summary>
-             <param name="inner"></param>
-             <param name="outer"></param>
-             <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.GetCorners(System.Drawing.PointF[],System.Single[])">
-            <summary>
-            Returns an array of parallelograms. These parallelgrams are the 'corners' outside each vertex in 'poly'.
-            The adjacent edges are perpendicular to 'poly'. Point 1 of each parallelogram will match the respective point in 'poly'
-            Points are clockwise.
-            
-            Each float in widths[] corresponds to the point in poly[]. This is the distance to go perpendicularly from 
-            the line beween poly[i] and poly[i +1].
-            
-            </summary>
-            <param name="poly"></param>
-            <param name="widths"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.GetSides(System.Drawing.PointF[],System.Single)">
-            <summary>
-            Returns an array of parallelograms. These parallelgrams are the 'sides' bounding the polygon.
-            Points are clockwise. Point 1 is the top-left outer point, point 2 the top-right, point 3 the bottom-right, and point 4 the bottom-left.
-            </summary>
-            <param name="poly"></param>
-            <param name="width"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.InflatePoly(System.Drawing.PointF[],System.Single)">
-            <summary>
-            Expands all sides on the specified polygon by the specified offset. Assumes the polygon is concave.
-            Returns a new polygon
-            </summary>
-            <param name="quad"></param>
-            <param name="offset"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.InflatePoly(System.Drawing.PointF[],System.Single[])">
-            <summary>
-            Expands all sides on the specified polygon by the specified offsets. Assumes the polygon is concave.
-            Returns a new polygon.
-            
-            </summary>
-            <param name="quad"></param>
-            <param name="offsets">An array the same size as poly[], with the distances to expand the edges. Edges are between i and i+1</param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.PolygonMath.CenterInside(System.Drawing.PointF[],System.Drawing.PointF[])">
-            <summary>
-            Moves 'inner' so that the center of its bounding box equals the center of the bounding box of 'outer'
-            </summary>
-            <param name="inner"></param>
-            <param name="outer"></param>
-            <returns></returns>
-        </member>
-        <member name="T:fbs.ImageResizer.WatermarkSettings">
-            <summary>
-            Provides extensibility points for drawing watermarks and even modifying resizing/image settings
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.WatermarkSettings.#ctor(System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            Creates a new WatermarkSettings class
-            </summary>
-            <param name="q"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.WatermarkSettings.ModifySettings(fbs.ImageResizer.ResizeSettings,fbs.ImageResizer.ImageSettings,fbs.ImageResizer.ImageFilter,fbs.ImageResizer.ImageOutputSettings)">
-            <summary>
-            Executed prior to resizing. Permits modifications of geometry and effect settings
-            </summary>
-            <param name="rs"></param>
-            <param name="opts"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.WatermarkSettings.Process(System.Drawing.Bitmap,System.Drawing.Graphics)">
-            <summary>
-            Modify this to do watermarks. Executing after resizing is complete
-            </summary>
-            <param name="b"></param>
-            <param name="g"></param>
-        </member>
-        <member name="T:fbs.ImageResizer.InterceptModule">
-            <summary>
-            Monitors incoming image requests. Image requests that request resizing are processed. The resized images are immediately written to disk, and 
-            the request is rewritten to the disk-cached resized version. This way IIS can handle the actual serving of the file.
-            The disk-cache directory is protected through URL authorization.
-            See CustomFolders.cs for any type of URL rewriting 
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.InterceptModule.System#Web#IHttpModule#Init(System.Web.HttpApplication)">
-            <summary>
-            Called when the app is initialized
-            </summary>
-            <param name="context"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.InterceptModule.CheckRequest_PostAuthorizeRequest(System.Object,System.EventArgs)">
-            <summary>
-            This is where we filter requests and intercet those that want resizing performed.
-            We first check for image extensions... 
-            If it is one, then we run it through the CustomFolders methods to see if if there is custom resizing for it..
-            If there still aren't any querystring params after that, then we ignore the request.
-            If the file doesn't exist, we also ignore the request. They're going to cause a 404 anyway.
-            
-            </summary>
-            <param name="sender"></param>
-            <param name="e"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.InterceptModule.getCachedVersionFilename(fbs.yrl)">
-            <summary>
-            Builds the physical path for the cached version, using the hashcode of the normalized URL.
-            </summary>
-            <param name="request"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.InterceptModule.ResizeRequest(System.Web.HttpContext,fbs.yrl)">
-            <summary>
-            Generates the resized image to disk (if needed), then rewrites the request to that location.
-            Perform 404 checking before calling this method. Assumes file exists.
-            Called during PostAuthorizeRequest
-            </summary>
-            <param name="r"></param>
-            <param name="extension"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.InterceptModule.context_PreSendRequestHeaders(System.Object,System.EventArgs)">
-            <summary>
-            We don't actually send the data - but we still want to control the headers on the data.
-            PreSendRequestHeaders allows us to change the content-type and cache headers at excatly the last
-            second. We populate the headers from context.Items["FinalContentType"],
-            context.Items["ContentExpires"], and context.Items["FinalCachedFile"].
-            This also indirectly enables server-side mem caching. (HttpCacheability.Public does it)
-            We set the file dependency to FinalCachedFile so changes are update quickly server-side
-            - however, clients will not check for updates until ContentExpires occurs.
-             
-            </summary>
-            <param name="sender"></param>
-            <param name="e"></param>
-        </member>
-        <member name="T:fbs.ImageResizer.CustomFolders">
-            <summary>
-            Here is where you can set up custom image size defaults for folders (or any pattern you want). You can also perform URL rewriting on your images.
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.CustomFolders.processPath(System.String,System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            Called for all image requests during PostAuthorizeRequest. 
-            
-            Any custom URL syntaxes can be parsed here - just populate 'q' with the resulting data.
-            
-            This method returns the 'real' path of the image, i.e. /app/img/file.jpg will be returned for /app/img/resize(50,50,jpg)/file.jpg
-            
-            Should be very fast - don't make and I/O or database calls here.
-            AllowURLRewriting must be enabled if you want to return something other than 'filePath'. You can still populate the querystring without this setting.
-            AllowURLRewriting is required for the /resize(50,50,jpg)/ syntax. 
-            
-            This is the only method the rest of the the image resizer touches. If you don't care for the applyDefaults(), applyOverrides(), and resize(w,h,f) syntax,
-            feel free to delete everything else in this class and provide your own implementation of this method.
-            
-            </summary>
-            <param name="filePath"></param>
-            <param name="q"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.CustomFolders.applyDefaults(System.String,System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            Settings inserted here are overridden by the querystring values. (q gets overwritten with a copy of the original querystring, so only untouched parameters can be changed)
-            q is populated with the original querystring values to start.
-            </summary>
-            <param name="filePath">The virtual domain-relative path (/app/folder/file.jpg). Doesn't include the querystring.</param>
-        </member>
-        <member name="M:fbs.ImageResizer.CustomFolders.applyOverrides(System.String,System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            Settings inserted here override the querystring values.
-            </summary>
-            <param name="filePath">The virtual domain-relative path (/app/folder/file.jpg). Doesn't include the querystring.</param>
-        </member>
-        <member name="M:fbs.ImageResizer.CustomFolders.resizeMatch(System.String,System.String,System.Collections.Specialized.NameValueCollection,System.Int32,System.Int32,System.String)">
-            <summary>
-            If substring is found within 'path', q["maxwidth"], q["maxheight"], and q["format"] are set to the specified values.
-            Use -1 or null to omit a value.
-            </summary>
-            <param name="path"></param>
-            <param name="substring"></param>
-            <param name="q"></param>
-            <param name="maxwidth"></param>
-            <param name="maxheight"></param>
-            <param name="format"></param>
-        </member>
-        <member name="F:fbs.ImageResizer.CustomFolders.resizeFolder">
-            <summary>
-            Matches /resize(x,y,f)/ syntax
-            Fixed Bug - will replace both slashes.. make first a lookbehind
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.CustomFolders.parseResizeFolderSyntax(System.String,System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            Parses and removes the resize folder syntax "resize(x,y,f)/" from the specified file path. 
-            Places settings into the referenced querystring
-            </summary>
-            <param name="path"></param>
-            <param name="query">The collection to place parsed values into</param>
-            <returns></returns>
-        </member>
-        <member name="T:fbs.ImageResizer.ImageSettings">
-            <summary>
-            TODO: later implement border, padding, and shadow support
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageSettings.parseFromQuerystring(System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            bgcolor=(transparent/white)
-            paddingColor=(transparent/white)
-            paddingWidth=x
-            borderWidth=x
-            borderColor=black
-            shadowWidth=x
-            shadowColor=black
-            shadowOffset(x,y)|both
-            </summary>
-            <param name="q"></param>
-        </member>
-        <member name="T:fbs.ImageResizer.ImageFilter">
-            <summary>
-            Eventually I will extend this class to allow grayscale, brightness, alpha, and possibly contrast adjustment.
-            </summary>
-        </member>
-        <member name="T:fbs.ImageResizer.ImageOutputSettings">
-            <summary>
-            Extracts the image output and encoding settings from the querystring. 
-            Handles the saving of Image instances to a Stream using the .SaveImage method
-            Doesn't handle animated image files - only single frames. (Neither does GDI)
-            </summary>
-        </member>
-        <!-- Badly formed XML comment ignored for member "M:fbs.ImageResizer.ImageOutputSettings.parseFromQuerystring(System.Drawing.Imaging.ImageFormat,System.Collections.Specialized.NameValueCollection)" -->
-        <member name="F:fbs.ImageResizer.ImageOutputSettings.Quality">
-            <summary>
-            The Jpeg compression quality. 90 is the best setting. 
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ImageOutputSettings.Colors">
-            <summary>
-            The number of colors to use. Only applicable for png, gif, and bmp photos where palletes can be used.
-            The default is -1, which means "as much color fidelity as possible". 
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ImageOutputSettings.Dither">
-            <summary>
-            Enables dithering for PNG8 and GIF
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ImageOutputSettings.DisableCustomQuantization">
-            <summary>
-            Prevents custom quantization for GIFs, 8-bit PNGs, and 8-bit BMPs. When disabled, the default GDI quantization is used, which 
-            produces poor-quality web-palette images. 
-            The default quantization is faster, and sometimes is the only method that works 
-            (such as in a low-trust environment or where the Marshal class is banned)
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetFinalExtension">
-            <summary>
-            Returns the file extension for the current OutputFormat
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetContentType">
-            <summary>
-            Returns the content type for the current OutputFormat
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveImageToNonSeekableStream(System.IO.Stream,System.Drawing.Image)">
-            <summary>
-            Safe for use with non-seekable streams. Writes the Png memory to an intermediate MemoryStream.
-            Does use more memory on PNGs. FileStreams are seekable.
-            </summary>
-            <param name="s"></param>
-            <param name="i"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveImage(System.IO.Stream,System.Drawing.Image)">
-            <summary>
-            Requires a seekable string for Png encoding. Use SaveImageToNonSeekableStream for non-seekable streams.
-            </summary>
-            <param name="s"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetSupportedOutputFormat(System.Drawing.Imaging.ImageFormat)">
-            <summary>
-            If the specified ImageFormat is not supported for output, ImageFormat.Jpeg is returned.
-            </summary>
-            <param name="format"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetRequestedType(System.Collections.Specialized.NameValueCollection)">
-            <summary>
-            Returns the ImageFormat requested in the querystring.
-            </summary>
-            <param name="q"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetImageFormatFromPhysicalPath(System.String)">
-            <summary>
-            Returns the ImageFormat enumeration value based on the extension in the specified physical path.
-            </summary>
-            <param name="path"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetImageFormatFromExtension(System.String)">
-            <summary>
-            Returns an ImageFormat instance from the specfied extension. Supports jpg, jpeg, bmp, gif, png, tiff, and tff.
-            returns null if not recognized.
-            </summary>
-            <param name="ext"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetExtensionFromImageFormat(System.Drawing.Imaging.ImageFormat)">
-            <summary>
-            Returns an string instance from the specfied ImageFormat. Supports jpg, bmp, gif, png, and tiff,
-            Returns null if not recognized.
-            </summary>
-            <param name="ext"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.IsAcceptedImageType(System.String)">
-            <summary>
-            Returns true if the extension on the virtual path 'path' is one of the accepted types
-            </summary>
-            <param name="path"></param>
-            <returns></returns>
-        </member>
-        <member name="F:fbs.ImageResizer.ImageOutputSettings._acceptedImageExtensions">
-            <summary>
-            Returns a list of (lowercase invariant) image extensions that the module works with.
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetContentTypeFromImageFormat(System.Drawing.Imaging.ImageFormat)">
-            <summary>
-            Supports Png, Jpeg, Gif, Bmp, and Tiff.
-            </summary>
-            <param name="format"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveJpeg(System.Drawing.Image,System.Int32,System.IO.Stream)">
-            <summary>
-            Saves the specified image to the specified stream using jpeg compression of the specified quality.
-            </summary>
-            <param name="b"></param>
-            <param name="quality">A number between 0 and 100. Defaults to 90 if passed a negative number. Numbers over 100 are truncated to 100. 
-            90 is a *very* good setting.
-            </param>
-            <param name="target"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveGif(System.Drawing.Image,System.IO.Stream,System.Byte,System.Boolean)">
-            <summary>
-            Colors argument has no effect when  useGdiQuantization is true.
-            </summary>
-            <param name="img"></param>
-            <param name="target"></param>
-            <param name="colors"></param>
-            <param name="useGdiQuantization"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.SavePng(System.Drawing.Image,System.IO.Stream,System.Byte,System.Boolean)">
-            <summary>
-            Requires seekable stream, i.e. MemoryString or FileStream. Colors argument has no effect when  useGdiQuantization is true.
-            </summary>
-            <param name="img"></param>
-            <param name="target"></param>
-            <param name="colors"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveIndexed(System.Drawing.Imaging.ImageFormat,System.Drawing.Image,System.IO.Stream,System.Byte,System.Boolean,System.Boolean,System.Int32,System.Boolean)">
-            <summary>
-            Colors, dither, fourPass, and ditherPercent arguments have no effect when  useGdiQuantization is true.
-            </summary>
-            <param name="format"></param>
-            <param name="img"></param>
-            <param name="target"></param>
-            <param name="colors"></param>
-            <param name="dither"></param>
-            <param name="fourPass"></param>
-            <param name="ditherPercent"></param>
-            <param name="useGdiQuantization"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.SavePng(System.Drawing.Image,System.IO.Stream)">
-            <summary>
-            Requires seekable stream, i.e. MemoryString or FileStream
-            </summary>
-            <param name="img"></param>
-            <param name="target"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveBmp(System.Drawing.Image,System.IO.Stream,System.Byte,System.Boolean)">
-            <summary>
-            Saves the bitmap. colors argument has no effect when useGdiQuantization is true.
-            </summary>
-            <param name="img"></param>
-            <param name="target"></param>
-            <param name="colors"></param>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetBitsNeededForColorDepth(System.Byte)">
-            <summary>
-            Returns how many bits are required to store the specified number of colors. Performs a Log2() on the value.
-            </summary>
-            <param name="colors"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetImageCodeInfo(System.String)">
-            <summary>
-            Returns the first ImageCodeInfo instance with the specified mime type. Returns null if there are no matches.
-            </summary>
-            <param name="mimeType"></param>
-            <returns></returns>
-        </member>
-        <member name="P:fbs.ImageResizer.ImageOutputSettings.OutputFormat">
-            <summary>
-            If you set this to an unsupported output format (anything other than png, gif, or jpg), it will be the same as settting it to Jpeg. Input is autocorrected.
-            </summary>
-        </member>
-        <member name="P:fbs.ImageResizer.ImageOutputSettings.SupportsTransparency">
-            <summary>
-            Returns true if the desired output type supports transparency.
-            </summary>
-        </member>
-        <member name="T:fbs.ImageResizer.ResizeSettings">
-            <summary>
-            Extracts all of the resizing, cropping, stretching, rotation, and flipping settings.
-            Merges the data in CalculateSizingData and returns the source rect, target poly, and target area poly. Flipping must be done separately.
-            </summary>
-        </member>
-        <member name="M:fbs.ImageResizer.ResizeSettings.parseList(System.String,System.Double)">
-            <summary>
-            Parses lists in the form "3,4,5,2,5" and "(3,4,40,50)". If a number cannot be parsed (i.e, number 2 in "5,,2,3") defaultValue is used.
-            </summary>
-            <param name="text"></param>
-            <param name="defaultValue"></param>
-            <returns></returns>
-        </member>
-        <member name="M:fbs.ImageResizer.ResizeSettings.parseFromQuerystring(System.Collections.Specialized.NameValueCollection)">
-            Understands width, height, maxwidth, maxheight, rotate=deg, 
-            stretch=fill, (stretches images)
-            stretch=proportionally(default) (letterboxes image with background color instead of stretching), 
-            crop=none (default)
-            crop=auto (minimally crops to preserve aspect ratio), and
-            crop=(x,y,x2,y2) (crops the source image to the specified rectangle)
-        </member>
-        <member name="M:fbs.ImageResizer.ResizeSettings.parseFlip(System.String)">
-            <summary>
-            Returns RotateNoneFlipNone if not a recognize value.
-            </summary>
-            <param name="sFlip"></param>
-            <returns></returns>
-        </member>
-        <member name="F:fbs.ImageResizer.ResizeSettings.rotate">
-            <summary>
-            Degrees of rotation to apply
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ResizeSettings.flip">
-            <summary>
-            Applied last, after all effects. 
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ResizeSettings.sourceFlip">
-            <summary>
-            Flips the source image prior to processing. 
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ResizeSettings.crop">
-            <summary>
-            Crop settings. Defaults to None - letterboxing is used if stretch=p. 
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ResizeSettings.stretch">
-            <summary>
-            Whether to preserve aspect ratio or stretch.
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ResizeSettings.scale">
-            <summary>
-            Whether to downscale, upscale, or allow both on images
-            </summary>
-        </member>
-        <!-- Badly formed XML comment ignored for member "M:fbs.ImageResizer.ResizeSettings.CalculateSizingData(System.Drawing.SizeF,System.Drawing.SizeF)" -->
-        <member name="F:fbs.ImageResizer.ResizeSettings.CropMode.None">
-            <summary>
-            Default. No cropping - uses letterboxing if strecth=proportionally and both width and height are specified.
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ResizeSettings.CropMode.Auto">
-            <summary>
-            Minimally crops to preserve aspect ratio if stretch=proportionally.
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ResizeSettings.CropMode.Custom">
-            <summary>
-            Crops using the custom crop rectangle. Letterboxes if stretch=proportionally and both widht and height are specified.
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ResizeSettings.StretchMode.Proportionally">
-            <summary>
-            Maintains aspect ratio. Default.
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ResizeSettings.StretchMode.Fill">
-            <summary>
-            Skews image to fit the new aspect ratio defined by 'width' and 'height'
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ResizeSettings.ScaleMode.DownscaleOnly">
-            <summary>
-            The default. Only downsamples images - never enlarges. If an image is smaller than 'width' and 'height', the image coordinates are used instead.
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ResizeSettings.ScaleMode.UpscaleOnly">
-            <summary>
-            Only upscales (zooms) images - never downsamples except to meet web.config restrictions. If an image is larger than 'width' and 'height', the image coordinates are used instead.
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ResizeSettings.ScaleMode.Both">
-            <summary>
-            Upscales and downscales images according to 'width' and 'height', within web.config restrictions.
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ResizeSettings.ImageSizingData.sourceRect">
-            <summary>
-            The rectangular area of the original image to use
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ResizeSettings.ImageSizingData.imageTarget">
-            <summary>
-            The polygon on the new image to draw the image to. All 4 points are clockwise.
-            </summary>
-        </member>
-        <member name="F:fbs.ImageResizer.ResizeSettings.ImageSizingData.targetArea">
-            <summary>
-            The polygon space that will be required (includes letterboxing space). All 4 points are clockwise.
-            </summary>
         </member>
         <member name="T:fbs.yrl">
             <summary>
@@ -1526,6 +943,589 @@
         <member name="F:fbs.yrl.PathType.Invalid">
             <summary>
             Indeterminant form
+            </summary>
+        </member>
+        <member name="T:fbs.ImageResizer.CustomFolders">
+            <summary>
+            Here is where you can set up custom image size defaults for folders (or any pattern you want). You can also perform URL rewriting on your images.
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.CustomFolders.processPath(System.String,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Called for all image requests during PostAuthorizeRequest. 
+            
+            Any custom URL syntaxes can be parsed here - just populate 'q' with the resulting data.
+            
+            This method returns the 'real' path of the image, i.e. /app/img/file.jpg will be returned for /app/img/resize(50,50,jpg)/file.jpg
+            
+            Should be very fast - don't make and I/O or database calls here.
+            AllowURLRewriting must be enabled if you want to return something other than 'filePath'. You can still populate the querystring without this setting.
+            AllowURLRewriting is required for the /resize(50,50,jpg)/ syntax. 
+            
+            This is the only method the rest of the the image resizer touches. If you don't care for the applyDefaults(), applyOverrides(), and resize(w,h,f) syntax,
+            feel free to delete everything else in this class and provide your own implementation of this method.
+            
+            </summary>
+            <param name="filePath"></param>
+            <param name="q"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.CustomFolders.applyDefaults(System.String,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Settings inserted here are overridden by the querystring values. (q gets overwritten with a copy of the original querystring, so only untouched parameters can be changed)
+            q is populated with the original querystring values to start.
+            </summary>
+            <param name="filePath">The virtual domain-relative path (/app/folder/file.jpg). Doesn't include the querystring.</param>
+        </member>
+        <member name="M:fbs.ImageResizer.CustomFolders.applyOverrides(System.String,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Settings inserted here override the querystring values.
+            </summary>
+            <param name="filePath">The virtual domain-relative path (/app/folder/file.jpg). Doesn't include the querystring.</param>
+        </member>
+        <member name="M:fbs.ImageResizer.CustomFolders.resizeMatch(System.String,System.String,System.Collections.Specialized.NameValueCollection,System.Int32,System.Int32,System.String)">
+            <summary>
+            If substring is found within 'path', q["maxwidth"], q["maxheight"], and q["format"] are set to the specified values.
+            Use -1 or null to omit a value.
+            </summary>
+            <param name="path"></param>
+            <param name="substring"></param>
+            <param name="q"></param>
+            <param name="maxwidth"></param>
+            <param name="maxheight"></param>
+            <param name="format"></param>
+        </member>
+        <member name="F:fbs.ImageResizer.CustomFolders.resizeFolder">
+            <summary>
+            Matches /resize(x,y,f)/ syntax
+            Fixed Bug - will replace both slashes.. make first a lookbehind
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.CustomFolders.parseResizeFolderSyntax(System.String,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Parses and removes the resize folder syntax "resize(x,y,f)/" from the specified file path. 
+            Places settings into the referenced querystring
+            </summary>
+            <param name="path"></param>
+            <param name="query">The collection to place parsed values into</param>
+            <returns></returns>
+        </member>
+        <member name="T:fbs.ImageResizer.ImageOutputSettings">
+            <summary>
+            Extracts the image output and encoding settings from the querystring. 
+            Handles the saving of Image instances to a Stream using the .SaveImage method
+            Doesn't handle animated image files - only single frames. (Neither does GDI)
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:fbs.ImageResizer.ImageOutputSettings.parseFromQuerystring(System.Drawing.Imaging.ImageFormat,System.Collections.Specialized.NameValueCollection)" -->
+        <member name="F:fbs.ImageResizer.ImageOutputSettings.Quality">
+            <summary>
+            The Jpeg compression quality. 90 is the best setting. 
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ImageOutputSettings.Colors">
+            <summary>
+            The number of colors to use. Only applicable for png, gif, and bmp photos where palletes can be used.
+            The default is -1, which means "as much color fidelity as possible". 
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ImageOutputSettings.Dither">
+            <summary>
+            Enables dithering for PNG8 and GIF
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ImageOutputSettings.DisableCustomQuantization">
+            <summary>
+            Prevents custom quantization for GIFs, 8-bit PNGs, and 8-bit BMPs. When disabled, the default GDI quantization is used, which 
+            produces poor-quality web-palette images. 
+            The default quantization is faster, and sometimes is the only method that works 
+            (such as in a low-trust environment or where the Marshal class is banned)
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetFinalExtension">
+            <summary>
+            Returns the file extension for the current OutputFormat
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetContentType">
+            <summary>
+            Returns the content type for the current OutputFormat
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveImageToNonSeekableStream(System.IO.Stream,System.Drawing.Image)">
+            <summary>
+            Safe for use with non-seekable streams. Writes the Png memory to an intermediate MemoryStream.
+            Does use more memory on PNGs. FileStreams are seekable.
+            </summary>
+            <param name="s"></param>
+            <param name="i"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveImage(System.IO.Stream,System.Drawing.Image)">
+            <summary>
+            Requires a seekable string for Png encoding. Use SaveImageToNonSeekableStream for non-seekable streams.
+            </summary>
+            <param name="s"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetSupportedOutputFormat(System.Drawing.Imaging.ImageFormat)">
+            <summary>
+            If the specified ImageFormat is not supported for output, ImageFormat.Jpeg is returned.
+            </summary>
+            <param name="format"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetRequestedType(System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Returns the ImageFormat requested in the querystring.
+            </summary>
+            <param name="q"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetImageFormatFromPhysicalPath(System.String)">
+            <summary>
+            Returns the ImageFormat enumeration value based on the extension in the specified physical path.
+            </summary>
+            <param name="path"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetImageFormatFromExtension(System.String)">
+            <summary>
+            Returns an ImageFormat instance from the specfied extension. Supports jpg, jpeg, bmp, gif, png, tiff, and tff.
+            returns null if not recognized.
+            </summary>
+            <param name="ext"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetExtensionFromImageFormat(System.Drawing.Imaging.ImageFormat)">
+            <summary>
+            Returns an string instance from the specfied ImageFormat. Supports jpg, bmp, gif, png, and tiff,
+            Returns null if not recognized.
+            </summary>
+            <param name="ext"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.IsAcceptedImageType(System.String)">
+            <summary>
+            Returns true if the extension on the virtual path 'path' is one of the accepted types
+            </summary>
+            <param name="path"></param>
+            <returns></returns>
+        </member>
+        <member name="F:fbs.ImageResizer.ImageOutputSettings._acceptedImageExtensions">
+            <summary>
+            Returns a list of (lowercase invariant) image extensions that the module works with.
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetContentTypeFromImageFormat(System.Drawing.Imaging.ImageFormat)">
+            <summary>
+            Supports Png, Jpeg, Gif, Bmp, and Tiff.
+            </summary>
+            <param name="format"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveJpeg(System.Drawing.Image,System.Int32,System.IO.Stream)">
+            <summary>
+            Saves the specified image to the specified stream using jpeg compression of the specified quality.
+            </summary>
+            <param name="b"></param>
+            <param name="quality">A number between 0 and 100. Defaults to 90 if passed a negative number. Numbers over 100 are truncated to 100. 
+            90 is a *very* good setting.
+            </param>
+            <param name="target"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveGif(System.Drawing.Image,System.IO.Stream,System.Byte,System.Boolean)">
+            <summary>
+            Colors argument has no effect when  useGdiQuantization is true.
+            </summary>
+            <param name="img"></param>
+            <param name="target"></param>
+            <param name="colors"></param>
+            <param name="useGdiQuantization"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.SavePng(System.Drawing.Image,System.IO.Stream,System.Byte,System.Boolean)">
+            <summary>
+            Requires seekable stream, i.e. MemoryString or FileStream. Colors argument has no effect when  useGdiQuantization is true.
+            </summary>
+            <param name="img"></param>
+            <param name="target"></param>
+            <param name="colors"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveIndexed(System.Drawing.Imaging.ImageFormat,System.Drawing.Image,System.IO.Stream,System.Byte,System.Boolean,System.Boolean,System.Int32,System.Boolean)">
+            <summary>
+            Colors, dither, fourPass, and ditherPercent arguments have no effect when  useGdiQuantization is true.
+            </summary>
+            <param name="format"></param>
+            <param name="img"></param>
+            <param name="target"></param>
+            <param name="colors"></param>
+            <param name="dither"></param>
+            <param name="fourPass"></param>
+            <param name="ditherPercent"></param>
+            <param name="useGdiQuantization"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.SavePng(System.Drawing.Image,System.IO.Stream)">
+            <summary>
+            Requires seekable stream, i.e. MemoryString or FileStream
+            </summary>
+            <param name="img"></param>
+            <param name="target"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.SaveBmp(System.Drawing.Image,System.IO.Stream,System.Byte,System.Boolean)">
+            <summary>
+            Saves the bitmap. colors argument has no effect when useGdiQuantization is true.
+            </summary>
+            <param name="img"></param>
+            <param name="target"></param>
+            <param name="colors"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetBitsNeededForColorDepth(System.Byte)">
+            <summary>
+            Returns how many bits are required to store the specified number of colors. Performs a Log2() on the value.
+            </summary>
+            <param name="colors"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageOutputSettings.GetImageCodeInfo(System.String)">
+            <summary>
+            Returns the first ImageCodeInfo instance with the specified mime type. Returns null if there are no matches.
+            </summary>
+            <param name="mimeType"></param>
+            <returns></returns>
+        </member>
+        <member name="P:fbs.ImageResizer.ImageOutputSettings.OutputFormat">
+            <summary>
+            If you set this to an unsupported output format (anything other than png, gif, or jpg), it will be the same as settting it to Jpeg. Input is autocorrected.
+            </summary>
+        </member>
+        <member name="P:fbs.ImageResizer.ImageOutputSettings.SupportsTransparency">
+            <summary>
+            Returns true if the desired output type supports transparency.
+            </summary>
+        </member>
+        <member name="T:fbs.ImageResizer.ImageSettings">
+            <summary>
+            TODO: later implement border, padding, and shadow support
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageSettings.parseFromQuerystring(System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            bgcolor=(transparent/white)
+            paddingColor=(transparent/white)
+            paddingWidth=x
+            borderWidth=x
+            borderColor=black
+            shadowWidth=x
+            shadowColor=black
+            shadowOffset(x,y)|both
+            </summary>
+            <param name="q"></param>
+        </member>
+        <member name="T:fbs.ImageResizer.ImageFilter">
+            <summary>
+            Eventually I will extend this class to allow grayscale, brightness, alpha, and possibly contrast adjustment.
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.RoundPoints(System.Drawing.PointF[])">
+            <summary>
+            Rounds the elements of the specified array [not used]
+            </summary>
+            <param name="a"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.RoundPoints(System.Drawing.PointF[0:,0:])">
+            <summary>
+            Rounds the elements of the specified array [not used]
+            </summary>
+            <param name="a"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.ForEach(System.Array,fbs.ImageResizer.PolygonMath.ForEachFunction)">
+            <summary>
+            Modifies the specified array by applying the specified function to each element.
+            </summary>
+            <param name="array"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.RotatePoly(System.Drawing.PointF[],System.Double)">
+            <summary>
+            Rotates the specified polygon around the origin. 
+            </summary>
+            <param name="rect"></param>
+            <param name="degrees"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.ToPoly(System.Drawing.RectangleF)">
+            <summary>
+            Returns a clockwise array of points on the rectangle.
+            Point 0 is top-left.
+            </summary>
+            <param name="rect"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.NormalizePoly(System.Drawing.PointF[])">
+            <summary>
+            Moves the polygon so that the upper-left corner of its bounding box is located at 0,0.
+            </summary>
+            <param name="poly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.RotateVector(System.Drawing.PointF,System.Double)">
+            <summary>
+            Rotates the specified point around the origin.
+            </summary>
+            <param name="v"></param>
+            <param name="radians"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.ChangeMagnitude(System.Drawing.PointF,System.Single)">
+            <summary>
+            Returns a modified version of the specified vector with the desired length.
+            </summary>
+            <param name="v"></param>
+            <param name="length"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.GetBoundingBox(System.Drawing.PointF[])">
+            <summary>
+            Returns a bounding box for the specified set of points.
+            </summary>
+            <param name="points"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.MovePoly(System.Drawing.PointF[],System.Drawing.PointF)">
+            <summary>
+            Returns a modified version of the array, with each element being offset by the specified amount.
+            </summary>
+            <param name="offset"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.ArraysEqual(System.Drawing.PointF[],System.Drawing.PointF[])">
+            <summary>
+            Returns true if the member elements of the specified arrays match, and the arrays 
+            are of the same length.
+            </summary>
+            <param name="a1"></param>
+            <param name="a2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.getParallelogram(System.Drawing.PointF[])">
+            <summary>
+            Moves element 4 to spot 3 and truncates to 3 elements.
+            For compatiblity with Graphics.DrawImage
+            </summary>
+            <param name="quad"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.GetSubArray(System.Drawing.PointF[0:,0:],System.Int32)">
+            <summary>
+            Grabs a single-dimension array from a 2 dimensional array, using the specified primary index.
+            </summary>
+            <param name="array"></param>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.GenerateRadialBrush(System.Drawing.Color,System.Drawing.Color,System.Drawing.PointF,System.Single)">
+            <summary>
+            Approximates a radial brush using a high-rez PathGradientBrush.
+            </summary>
+            <param name="inner"></param>
+            <param name="outer"></param>
+            <param name="pt"></param>
+            <param name="width"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.ScaleInside(System.Drawing.SizeF,System.Drawing.SizeF)">
+            <summary>
+            Scales 'fitInside' to fit inside 'bounding' while maintaining aspect ratio. Upscales and downscales.
+            </summary>
+            <param name="bounding"></param>
+            <param name="fitInside"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.FitsInside(System.Drawing.SizeF,System.Drawing.SizeF)">
+            <summary>
+            Returns true if 'inner' fits inside or equals 'outer'
+            </summary>
+            <param name="inner"></param>
+            <param name="outer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.GetCorners(System.Drawing.PointF[],System.Single)">
+             <summary>
+             Returns an array of parallelograms. These parallelgrams are the 'corners' outside each vertex in 'poly'.
+             The adjacent edges are perpendicular to 'poly'. Point 1 of each parallelogram will match the respective point in 'poly'
+             Points are clockwise.
+            
+             TODO - some rounding issues going on, not exact numbers here
+             </summary>
+             <param name="inner"></param>
+             <param name="outer"></param>
+             <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.GetCorners(System.Drawing.PointF[],System.Single[])">
+            <summary>
+            Returns an array of parallelograms. These parallelgrams are the 'corners' outside each vertex in 'poly'.
+            The adjacent edges are perpendicular to 'poly'. Point 1 of each parallelogram will match the respective point in 'poly'
+            Points are clockwise.
+            
+            Each float in widths[] corresponds to the point in poly[]. This is the distance to go perpendicularly from 
+            the line beween poly[i] and poly[i +1].
+            
+            </summary>
+            <param name="poly"></param>
+            <param name="widths"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.GetSides(System.Drawing.PointF[],System.Single)">
+            <summary>
+            Returns an array of parallelograms. These parallelgrams are the 'sides' bounding the polygon.
+            Points are clockwise. Point 1 is the top-left outer point, point 2 the top-right, point 3 the bottom-right, and point 4 the bottom-left.
+            </summary>
+            <param name="poly"></param>
+            <param name="width"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.InflatePoly(System.Drawing.PointF[],System.Single)">
+            <summary>
+            Expands all sides on the specified polygon by the specified offset. Assumes the polygon is concave.
+            Returns a new polygon
+            </summary>
+            <param name="quad"></param>
+            <param name="offset"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.InflatePoly(System.Drawing.PointF[],System.Single[])">
+            <summary>
+            Expands all sides on the specified polygon by the specified offsets. Assumes the polygon is concave.
+            Returns a new polygon.
+            
+            </summary>
+            <param name="quad"></param>
+            <param name="offsets">An array the same size as poly[], with the distances to expand the edges. Edges are between i and i+1</param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.PolygonMath.CenterInside(System.Drawing.PointF[],System.Drawing.PointF[])">
+            <summary>
+            Moves 'inner' so that the center of its bounding box equals the center of the bounding box of 'outer'
+            </summary>
+            <param name="inner"></param>
+            <param name="outer"></param>
+            <returns></returns>
+        </member>
+        <member name="T:fbs.ImageResizer.ResizeSettings">
+            <summary>
+            Extracts all of the resizing, cropping, stretching, rotation, and flipping settings.
+            Merges the data in CalculateSizingData and returns the source rect, target poly, and target area poly. Flipping must be done separately.
+            </summary>
+        </member>
+        <member name="M:fbs.ImageResizer.ResizeSettings.parseList(System.String,System.Double)">
+            <summary>
+            Parses lists in the form "3,4,5,2,5" and "(3,4,40,50)". If a number cannot be parsed (i.e, number 2 in "5,,2,3") defaultValue is used.
+            </summary>
+            <param name="text"></param>
+            <param name="defaultValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ResizeSettings.parseFromQuerystring(System.Collections.Specialized.NameValueCollection)">
+            Understands width, height, maxwidth, maxheight, rotate=deg, 
+            stretch=fill, (stretches images)
+            stretch=proportionally(default) (letterboxes image with background color instead of stretching), 
+            crop=none (default)
+            crop=auto (minimally crops to preserve aspect ratio), and
+            crop=(x,y,x2,y2) (crops the source image to the specified rectangle)
+        </member>
+        <member name="M:fbs.ImageResizer.ResizeSettings.parseFlip(System.String)">
+            <summary>
+            Returns RotateNoneFlipNone if not a recognize value.
+            </summary>
+            <param name="sFlip"></param>
+            <returns></returns>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.rotate">
+            <summary>
+            Degrees of rotation to apply
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.flip">
+            <summary>
+            Applied last, after all effects. 
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.sourceFlip">
+            <summary>
+            Flips the source image prior to processing. 
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.crop">
+            <summary>
+            Crop settings. Defaults to None - letterboxing is used if stretch=p. 
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.stretch">
+            <summary>
+            Whether to preserve aspect ratio or stretch.
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.scale">
+            <summary>
+            Whether to downscale, upscale, or allow both on images
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:fbs.ImageResizer.ResizeSettings.CalculateSizingData(System.Drawing.SizeF,System.Drawing.SizeF)" -->
+        <member name="F:fbs.ImageResizer.ResizeSettings.CropMode.None">
+            <summary>
+            Default. No cropping - uses letterboxing if strecth=proportionally and both width and height are specified.
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.CropMode.Auto">
+            <summary>
+            Minimally crops to preserve aspect ratio if stretch=proportionally.
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.CropMode.Custom">
+            <summary>
+            Crops using the custom crop rectangle. Letterboxes if stretch=proportionally and both widht and height are specified.
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.StretchMode.Proportionally">
+            <summary>
+            Maintains aspect ratio. Default.
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.StretchMode.Fill">
+            <summary>
+            Skews image to fit the new aspect ratio defined by 'width' and 'height'
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.ScaleMode.DownscaleOnly">
+            <summary>
+            The default. Only downsamples images - never enlarges. If an image is smaller than 'width' and 'height', the image coordinates are used instead.
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.ScaleMode.UpscaleOnly">
+            <summary>
+            Only upscales (zooms) images - never downsamples except to meet web.config restrictions. If an image is larger than 'width' and 'height', the image coordinates are used instead.
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.ScaleMode.Both">
+            <summary>
+            Upscales and downscales images according to 'width' and 'height', within web.config restrictions.
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.ImageSizingData.sourceRect">
+            <summary>
+            The rectangular area of the original image to use
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.ImageSizingData.imageTarget">
+            <summary>
+            The polygon on the new image to draw the image to. All 4 points are clockwise.
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.ImageSizingData.targetArea">
+            <summary>
+            The polygon space that will be required (includes letterboxing space). All 4 points are clockwise.
             </summary>
         </member>
         <member name="T:fbs.ImageResizer.DiskCacheException">
