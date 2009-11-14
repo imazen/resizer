@@ -34,7 +34,7 @@ EXIF data is removed - by design. EXIF data bloats the image file, and can somet
 
 Changelog, by version
 
-Changes since 2.1a
+Changes since 2.1a (v2.1b)
 ********************************************
 Fixed performance bug in DiskCache cause directory listings to run every image request. 
 
