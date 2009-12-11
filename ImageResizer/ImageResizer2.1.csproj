@@ -54,7 +54,7 @@
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Trial Version|AnyCPU' ">
-    <OutputPath>bin\Trial Version\</OutputPath>
+    <OutputPath>Trial Version\</OutputPath>
     <DefineConstants>TRACE;TRIAL</DefineConstants>
     <DocumentationFile>ImageResizer.XML</DocumentationFile>
     <Optimize>true</Optimize>
