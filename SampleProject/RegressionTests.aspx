@@ -23,9 +23,10 @@
      <img src="optical.gif" runat="server" />
       <img id="Img5" src="optical.gif?frame=2" runat="server" />
        <img id="Img6" src="optical.gif?frame=4" runat="server" />
+       
       <h3>Resizing loses transparency</h3>
       <div style="background-color:Yellow;">
-          <img id="Img7" src="2_computers.gif" runat="server" /><img id="Img8" src="2_computers.gif?width=20&scale=both" runat="server" />
+     <img id="Img7" src="2_computers.gif" runat="server" /><img id="Img8" src="2_computers.gif?width=20&scale=both" runat="server" />
      <img id="Img9" src="2_computers.gif?frame=8" runat="server" />
      <img id="Img10" src="2_computers.gif?frame=12" runat="server" />
      <img id="Img11" src="clock2.gif" runat="server" />
