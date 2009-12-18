@@ -74,11 +74,11 @@ namespace fbs.ImageResizer
         /// <param name="sourceFilename"></param>
         /// <param name="cachedFilename"></param>
         /// <param name="updateCallback"></param>
-        public static bool UpdateCachedVersionIfNeeded(string sourceFilename, string cachedFilename, CacheUpdateCallback updateCallback, int fileLockTimeout)
+        public static bool UpdateCachedVersionIfNeeded(string sourceFilename, string cachedFilename, CacheUpdateCallback updateCallback, int fileLockTimeout, Boolean ignoreModifiedDate)
         {
             PrepareCacheDir();
             //Fixed - implement locking so concurrent requests for the same file don't cause an I/O issue.
-            if (!IsCachedVersionValid(sourceFilename, cachedFilename))
+            if ((ignoreModifiedDate && IsCachedVersionValid(cachedFilename)) || !IsCachedVersionValid(sourceFilename, cachedFilename))
             {
                 //Create or obtain a blank object for locking purposes. Store or retrieve using the filename as a key.
                 string key = sourceFilename.ToLower();
@@ -97,12 +97,12 @@ namespace fbs.ImageResizer
                 {
                     try
                     {
-                        if (!IsCachedVersionValid(sourceFilename, cachedFilename))
+                        if ((ignoreModifiedDate && IsCachedVersionValid(cachedFilename)) || !IsCachedVersionValid(sourceFilename, cachedFilename))
                         {
                             updateCallback();
                             filesUpdatedSinceCleanup++;
                             //Update the write time to match - this is how we know whether they are in sync.
-                            System.IO.File.SetLastWriteTimeUtc(cachedFilename, System.IO.File.GetLastWriteTimeUtc(sourceFilename));
+                            if (ignoreModifiedDate) System.IO.File.SetLastWriteTimeUtc(cachedFilename, System.IO.File.GetLastWriteTimeUtc(sourceFilename));
                         }
                     }
                     finally
@@ -149,14 +149,14 @@ namespace fbs.ImageResizer
             HttpContext.Current.Trace.Warn("ImageResizer", e.Message, e);// Event.CreateExceptionEvent(e).SaveAsync();
         }
 
-
         /// <summary>
         /// Assumes localSourceFile exists. Returns true if localCachedFile exists and matches the last write time of localSourceFile.
         /// </summary>
         /// <param name="localSourceFile">full physical path of original file</param>
         /// <param name="cachedFilename">full physical path of cached file.</param>
         /// <returns></returns>
-        public static bool IsCachedVersionValid(string localSourceFile, string localCachedFile){
+        public static bool IsCachedVersionValid(string localSourceFile, string localCachedFile)
+        {
             if (localCachedFile == null) return false;
             if (!System.IO.File.Exists(localCachedFile)) return false;
 
@@ -169,6 +169,22 @@ namespace fbs.ImageResizer
             DateTime cached = System.IO.File.GetLastWriteTimeUtc(localCachedFile);
             DateTime source = System.IO.File.GetLastWriteTimeUtc(localSourceFile);
             return RoughCompare(cached, source);
+        }
+
+
+        /// <summary>
+        /// Assumes localSourceFile exists. Returns true if localCachedFile exists and DiskCacheAlwaysInvalid is false.
+        /// </summary>
+        /// <param name="localSourceFile">full physical path of original file</param>
+        /// <param name="cachedFilename">full physical path of cached file.</param>
+        /// <returns></returns>
+        public static bool IsCachedVersionValid(string localCachedFile){
+            if (localCachedFile == null) return false;
+            if (!System.IO.File.Exists(localCachedFile)) return false;
+
+            if ("true".Equals(ConfigurationManager.AppSettings["DiskCacheAlwaysInvalid"], StringComparison.OrdinalIgnoreCase))
+                return false;
+            return true;
         }
         /// <summary>
         ///  Returns true if localCachedFile exists and matches sourceDataModifiedUTC.
