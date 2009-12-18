@@ -76,6 +76,9 @@ namespace fbs.ImageResizer
         /// <param name="q"></param>
         public void parseFromQuerystring(ImageFormat originalFormat, NameValueCollection q)
         {
+            //Default to Jpeg if null (like extensionless requests) (dec-11-09)
+            if (originalFormat == null) originalFormat = ImageFormat.Jpeg;
+
             ImageFormat requested = GetRequestedType(q);
             //Use the original image type if the requested type is not present.
             if (requested == null) requested = originalFormat;
