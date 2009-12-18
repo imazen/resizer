@@ -171,7 +171,7 @@ namespace fbs.ImageResizer
 
                         if (virtualFile)
                         {
-                            if (HostingEnvironment.VirtualPathProvider.FileExists(current.Virtual))
+                            if (HostingEnvironment.VirtualPathProvider.FileExists(getVPPSafePath(current)))
                                 ResizeRequest(app.Context, current);
                         }
                         else
@@ -186,6 +186,11 @@ namespace fbs.ImageResizer
             }
         }
 
+
+        protected String getVPPSafePath(yrl y)
+        {
+            return yrl.GetAppFolderName().TrimEnd(new char[] { '/' }) + "/" + y.BaseFile;
+        }
 
 
         /// <summary>
@@ -239,7 +244,7 @@ namespace fbs.ImageResizer
 
             Boolean virtualFile = "true".Equals(ConfigurationManager.AppSettings["ImageResizerUseVirtualPathProvider"], StringComparison.OrdinalIgnoreCase);
 
-            VirtualFile vf = virtualFile ? HostingEnvironment.VirtualPathProvider.GetFile(current.Virtual) : null;
+            VirtualFile vf = virtualFile ? HostingEnvironment.VirtualPathProvider.GetFile(getVPPSafePath(current)) : null;
             
 
             //This is where the cached version goes

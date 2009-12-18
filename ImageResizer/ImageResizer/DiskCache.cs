@@ -102,7 +102,7 @@ namespace fbs.ImageResizer
                             updateCallback();
                             filesUpdatedSinceCleanup++;
                             //Update the write time to match - this is how we know whether they are in sync.
-                            if (ignoreModifiedDate) System.IO.File.SetLastWriteTimeUtc(cachedFilename, System.IO.File.GetLastWriteTimeUtc(sourceFilename));
+                            if (!ignoreModifiedDate) System.IO.File.SetLastWriteTimeUtc(cachedFilename, System.IO.File.GetLastWriteTimeUtc(sourceFilename));
                         }
                     }
                     finally
