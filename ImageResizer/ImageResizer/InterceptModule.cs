@@ -132,10 +132,10 @@ namespace fbs.ImageResizer
                     //And q should be populated with the querystring values
                     string basePath = CustomFolders.processPath(filePath + app.Context.Request.PathInfo, q);
 
-                    
+                    //dec-11-09  discontinuing AllowURLRewriting and AllowFolderResizeNotation
                     //If the path has changed, this will circumvent the URL auth system.
                     //Make sure the user has explicity allowed it through web.config
-                    if (!basePath.Equals(app.Context.Request.Path))
+                   if (!basePath.Equals(app.Context.Request.Path))
                     {
                         //Make sure the resize() notation is allowed.
                         string allow = ConfigurationManager.AppSettings["AllowURLRewriting"];
@@ -143,12 +143,13 @@ namespace fbs.ImageResizer
                         if (string.IsNullOrEmpty(allow) || allow.Equals("false", StringComparison.OrdinalIgnoreCase)){
                             return; //Skip the request
                         }
-                        //Prevent access to the /imagecache/ directory (URL auth won't be protecting it now)
-                        if (new yrl(basePath).Local.StartsWith(DiskCache.GetCacheDir(), StringComparison.OrdinalIgnoreCase))
+                        //No longer needed with UrlAuth module: Prevent access to the /imagecache/ directory (URL auth won't be protecting it now)
+                        //if (new yrl(basePath).Local.StartsWith(DiskCache.GetCacheDir(), StringComparison.OrdinalIgnoreCase))
                         {
                             throw new HttpException(403, "Access denied to image cache folder.");
                         }
                     }
+
                     //See if resizing is wanted (i.e. one of the querystring commands is present).
                     //Called after processPath so processPath can add them if needed.
                     //Checks for thumnail, format, width, height, maxwidth, maxheight and a lot more
@@ -163,9 +164,22 @@ namespace fbs.ImageResizer
                         yrl current = new yrl(basePath);
                         current.QueryString = q;
 
+                        
                         //If the file exists, resize it
-                        if (current.FileExists)  
-                            ResizeRequest(app.Context,current);
+                        //dec-11-09 changed to use vpp
+                        Boolean virtualFile = "true".Equals(ConfigurationManager.AppSettings["ImageResizerUseVirtualPathProvider"], StringComparison.OrdinalIgnoreCase);
+
+                        if (virtualFile)
+                        {
+                            if (HostingEnvironment.VirtualPathProvider.FileExists(current.Virtual))
+                                ResizeRequest(app.Context, current);
+                        }
+                        else
+                        {
+                            if (current.FileExists)
+                                ResizeRequest(app.Context, current);
+                        }
+
                         
                     }
                 }
@@ -223,6 +237,11 @@ namespace fbs.ImageResizer
             Stopwatch s = new Stopwatch();
             s.Start();
 
+            Boolean virtualFile = "true".Equals(ConfigurationManager.AppSettings["ImageResizerUseVirtualPathProvider"], StringComparison.OrdinalIgnoreCase);
+
+            VirtualFile vf = virtualFile ? HostingEnvironment.VirtualPathProvider.GetFile(current.Virtual) : null;
+            
+
             //This is where the cached version goes
             string cachedFile = getCachedVersionFilename(current);
 
@@ -234,8 +253,15 @@ namespace fbs.ImageResizer
 
                     //This runs if the update is needed. This delegate is preventing from running in more
                     //than one thread at a time for the specified source file (current.Local)
-                    ImageManager.getBestInstance().BuildImage(current.Local, cachedFile, current.QueryString);
-                },30000);
+                    
+                    if (vf != null){ //For VPP use
+                        ImageManager.getBestInstance().BuildImage(vf, cachedFile, current.QueryString);
+                    }else{
+                        ImageManager.getBestInstance().BuildImage(current.Local, cachedFile, current.QueryString);
+                    }
+
+                },30000,
+                virtualFile); //When virtualFile is true, modified dates aren't checked (there aren't any!).
 
             //If a co-occurring resize has the file locked for more than 30 seconds, quit with an error.
             if (!succeeded)
