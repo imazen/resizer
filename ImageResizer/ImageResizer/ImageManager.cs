@@ -99,6 +99,32 @@ namespace fbs.ImageResizer
                 }
             }
         }
+
+        /// <summary>
+        /// Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
+        /// </summary>
+        /// <param name="sourceFile"></param>
+        /// <param name="targetFile"></param>
+        /// <param name="request"></param>
+        public virtual void BuildImage(VirtualFile sourceFile, string targetFile, NameValueCollection queryString)
+        {
+            //Allow AnimatedImageManager to be added without changing code - plugin style
+            //Resize image 
+            using (Bitmap thumb = BuildImage(sourceFile, queryString))
+            {
+                //Determines output format, includes code for saving in a variety of formats.
+                ImageOutputSettings ios = new ImageOutputSettings(ImageOutputSettings.GetImageFormatFromPhysicalPath(sourceFile.VirtualPath), queryString);
+
+                //Open stream and save format.
+                System.IO.FileStream fs = new FileStream(targetFile, FileMode.Create, FileAccess.Write);
+                using (fs)
+                {
+                    ios.SaveImage(fs, thumb);
+                }
+            }
+        }
+
+
         /// <summary>
         /// Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
         /// </summary>
@@ -217,6 +243,44 @@ namespace fbs.ImageResizer
                 }
             }
         }
+
+        /// <summary>
+        /// Generates a resized bitmap from the specifed source file and the specified querystring. Understands width/height and maxwidth/maxheight.
+        /// Throws either an ArgumentException or IOException if the source image is invalid.
+        /// Always use ImageOutputSettings to save images, since Image.Save doesn't work well for GIF or PNGs, and needs custom params for Jpegs.
+        /// </summary>
+        /// 
+        /// <returns></returns>
+        public virtual Bitmap BuildImage(VirtualFile file, NameValueCollection q)
+        {
+            bool useICM = true;
+            if ("true".Equals(q["ignoreicc"], StringComparison.OrdinalIgnoreCase)) useICM = false;
+
+            using (Stream s = file.Open())
+            {
+
+                System.Drawing.Bitmap b = null;
+                try
+                {
+                    b = new System.Drawing.Bitmap(s, useICM);
+                }
+                catch (ArgumentException ae)
+                {
+                    ae.Data.Add("path", file.VirtualPath);
+                    ae.Data.Add("possiblereason",
+                        "File may be corrupted, empty, or may contain a PNG image file with a single dimension greater than 65,535 pixels.");
+                    throw ae;
+                }
+                if (b == null) throw new IOException("Could not read the specified image! Image invalid or something.");
+
+                using (b)
+                {
+                    return BuildImage(b, ImageOutputSettings.GetImageFormatFromPhysicalPath(file.VirtualPath), q);
+                }
+            }
+        }
+
+
 
         /// <summary>
         /// Creates a new bitmap of the required size, and draws the specified image (with border, background, padding, and shadow).
