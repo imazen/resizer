@@ -200,25 +200,44 @@ namespace fbs.ImageResizer
         /// <returns></returns>
         protected string getCachedVersionFilename(yrl request)
         {
-            bool useSHAHash = true;
-
             string dir = DiskCache.GetCacheDir();
             if (dir == null) return null;
             //Build the physical path of the cached version, using the hashcode of the normalized URL.
 
-            if (useSHAHash)
-            {
-                SHA256 h = System.Security.Cryptography.SHA256.Create();
-                byte[] hash = h.ComputeHash(new System.Text.UTF8Encoding().GetBytes(request.ToString().ToLower()));
-                //Can't use base64 hash... filesystem has case-insensitive lookup.
-                //Would use base32, but too much code to bloat the resizer. Simple base16 encoding is fine
-                return dir.TrimEnd('/', '\\') + "\\" + Base16Encode(hash) + "." + new ImageOutputSettings(request).GetFinalExtension();
-            }
-            else
-            {
-                return dir.TrimEnd('/', '\\') + "\\" + request.ToString().ToLower().GetHashCode().ToString() + "." + new ImageOutputSettings(request).GetFinalExtension();
-            }
+            SHA256 h = System.Security.Cryptography.SHA256.Create();
+            byte[] hash = h.ComputeHash(new System.Text.UTF8Encoding().GetBytes(request.ToString().ToLower()));
+
+            //If configured, place files in subfolders.
+            string subfolder = getSubfolder(hash);
+            subfolder = subfolder != null ? subfolder + "\\" : "";
+
+            //Can't use base64 hash... filesystem has case-insensitive lookup.
+            //Would use base32, but too much code to bloat the resizer. Simple base16 encoding is fine
+            return dir.TrimEnd('/', '\\') + "\\" + subfolder + Base16Encode(hash) + "." + new ImageOutputSettings(request).GetFinalExtension();
         }
+        /// <summary>
+        /// Returns a string for the subfolder name. The bits used are from the end of the hash - this should make
+        /// the hashes in each directory more unique, and speed up performance (8.3 filename calculations are slow when lots of files share the same first 6 chars.
+        /// Returns null if not configured. Rounds ImageCacheSubfolders up to the nearest power of two.
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        protected string getSubfolder(byte[] hash)
+        {
+            if (string.IsNullOrEmpty(ConfigurationManager.AppSettings["ImageCacheSubfolders"])) return null;
+            int subfolders = 0;
+            if (int.TryParse(ConfigurationManager.AppSettings["ImageCacheSubfolders"],out subfolders))
+            {
+                int bits = (int)Math.Ceiling(Math.Log(subfolders, 2));
+                Debug.Assert(bits > 0);
+                Debug.Assert(bits <= hash.Length);
+                byte[] subfolder = new byte[bits];
+                Array.Copy(hash,hash.Length - bits,subfolder,0,bits);
+                return Base16Encode(subfolder);
+            }
+            return null;
+        }
+
 
         protected string Base16Encode(byte[] bytes)
         {

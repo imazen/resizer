@@ -99,6 +99,11 @@ namespace fbs.ImageResizer
                     {
                         if ((ignoreModifiedDate && IsCachedVersionValid(cachedFilename)) || !IsCachedVersionValid(sourceFilename, cachedFilename))
                         {
+                            //Create subdirectory if needed.
+                            if (!Directory.Exists(Path.GetDirectoryName(cachedFilename)))
+                            {
+                                Directory.CreateDirectory(Path.GetDirectoryName(cachedFilename));
+                            }
                             updateCallback();
                             filesUpdatedSinceCleanup++;
                             //Update the write time to match - this is how we know whether they are in sync.
@@ -424,16 +429,16 @@ namespace fbs.ImageResizer
             return 1680;
         }
         /// <summary>
-        /// Returns the value of required setting AppSettings["MaxCachedImages"], or 400 if it is missing. An event will be logged if it is missing.
+        /// Returns the value of required setting AppSettings["MaxCachedImages"], or 8000 if it is missing. An event will be logged if it is missing.
         /// </summary>
         /// <returns></returns>
         public static int GetMaxCachedFiles()
         {
             string limit = ConfigurationManager.AppSettings["MaxCachedImages"];
-            int maxCount = 400;
+            int maxCount = 8000;
             if (!int.TryParse(limit, out maxCount))
             {
-                maxCount = 400;
+                maxCount = 8000;
                 LogWarning("No value specified for application setting MaxCachedImages. Defaulting to " + maxCount.ToString() + ". A maximum of " + maxCount.ToString() + " images will be allowed in the cache (cycling will occurr).");
             }
             return maxCount;
@@ -448,12 +453,7 @@ namespace fbs.ImageResizer
             string dir = GetCacheDir();
             if (!string.IsNullOrEmpty(dir))
             {
-                if (!System.IO.Directory.Exists(dir))
-                {
-                    return false;
-                }
-
-                return true;
+                return System.IO.Directory.Exists(dir);
             }
             return false;
         }
