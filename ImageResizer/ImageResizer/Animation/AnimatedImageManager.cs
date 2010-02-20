@@ -10,6 +10,10 @@ namespace fbs.ImageResizer.Animation
 {
     public class AnimatedImageManager : ImageManager
     {
+        public static AnimatedImageManager()
+        {
+            ImageManager.RegisterUpgrade(new AnimatedImageManager());
+        }
         public AnimatedImageManager()
         {
         }
