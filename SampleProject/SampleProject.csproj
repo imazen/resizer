@@ -76,13 +76,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ImageResizer\ImageResizer2.1.csproj">
-      <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
-      <Name>ImageResizer2.1</Name>
-    </ProjectReference>
+    <Content Include="Protected\Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Protected\Web.config" />
+    <ProjectReference Include="..\ImageResizer\ImageResizer.csproj">
+      <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
+      <Name>ImageResizer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v9.0\WebApplications\Microsoft.WebApplication.targets" Condition="" />
