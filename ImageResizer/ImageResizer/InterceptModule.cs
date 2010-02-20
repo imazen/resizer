@@ -145,21 +145,27 @@ namespace fbs.ImageResizer
                         }
                         //No longer needed with UrlAuth module: Prevent access to the /imagecache/ directory (URL auth won't be protecting it now)
                         //if (new yrl(basePath).Local.StartsWith(DiskCache.GetCacheDir(), StringComparison.OrdinalIgnoreCase))
-                        {
-                            throw new HttpException(403, "Access denied to image cache folder.");
-                        }
+                        //{
+                        //    throw new HttpException(403, "Access denied to image cache folder.");
+                        //}
                     }
-
+                   
                     //See if resizing is wanted (i.e. one of the querystring commands is present).
                     //Called after processPath so processPath can add them if needed.
                     //Checks for thumnail, format, width, height, maxwidth, maxheight and a lot more
                     if (ImageManager.getBestInstance().HasResizingDirective(q))
                     {
-                        if (!UrlAuthorizationModule.CheckUrlAccessForPrincipal(basePath, app.Context.User as IPrincipal, "GET"))
+                        IPrincipal user = app.Context.User as IPrincipal;
+
+                        // no user (must be anonymous...).. Or authentication doesn't work for this suffix. 
+                        if (user == null)
+                            user = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), new string[0]);
+
+                        if (!UrlAuthorizationModule.CheckUrlAccessForPrincipal(basePath, user, "GET"))
                         {
                             throw new HttpException(403, "Access denied.");
                         }
-
+                  
                         //Build a URL using the new basePath and the new Querystring q
                         yrl current = new yrl(basePath);
                         current.QueryString = q;
