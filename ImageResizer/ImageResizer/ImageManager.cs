@@ -57,6 +57,14 @@ namespace fbs.ImageResizer
     /// </summary>
     public class ImageManager
     {
+        private static ImageManager _bestInstance = null;
+        /// <summary>
+        /// Allow other classes to override.
+        /// </summary>
+        /// <param name="replacement"></param>
+        public static void RegisterUpgrade(ImageManager replacement){
+            _bestInstance = replacement;
+        }
         public ImageManager()
         {
         }
@@ -68,12 +76,8 @@ namespace fbs.ImageResizer
         public static ImageManager getBestInstance()
         {
             //Allow the copy&paste plugin of a better ImageManager
-            Type aim = Type.GetType("fbs.ImageResizer.Animation.AnimatedImageManager", false, true);
-            if (aim != null)
-            {
-                return Activator.CreateInstance(aim) as ImageManager;
-            }
-            return new ImageManager();
+            if (_bestInstance == null) _bestInstance = new ImageManager();
+            return _bestInstance;
 
         }
         /// <summary>
