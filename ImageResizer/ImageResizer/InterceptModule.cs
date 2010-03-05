@@ -157,15 +157,18 @@ namespace fbs.ImageResizer
                     {
                         IPrincipal user = app.Context.User as IPrincipal;
 
-                        // no user (must be anonymous...).. Or authentication doesn't work for this suffix. 
-                        if (user == null)
-                            user = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), new string[0]);
-
-                        if (!UrlAuthorizationModule.CheckUrlAccessForPrincipal(basePath, user, "GET"))
+                        if ("true".Equals(ConfigurationManager.AppSettings["DisableImageURLAuthorization"], StringComparison.OrdinalIgnoreCase))
                         {
-                            throw new HttpException(403, "Access denied.");
+
+                            // no user (must be anonymous...).. Or authentication doesn't work for this suffix. 
+                            if (user == null)
+                                user = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), new string[0]);
+
+                            if (!UrlAuthorizationModule.CheckUrlAccessForPrincipal(basePath, user, "GET"))
+                            {
+                                throw new HttpException(403, "Access denied.");
+                            }
                         }
-                  
                         //Build a URL using the new basePath and the new Querystring q
                         yrl current = new yrl(basePath);
                         current.QueryString = q;
@@ -204,7 +207,7 @@ namespace fbs.ImageResizer
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        protected string getCachedVersionFilename(yrl request)
+        public string getCachedVersionFilename(yrl request)
         {
             string dir = DiskCache.GetCacheDir();
             if (dir == null) return null;
@@ -215,11 +218,11 @@ namespace fbs.ImageResizer
 
             //If configured, place files in subfolders.
             string subfolder = getSubfolder(hash);
-            subfolder = subfolder != null ? subfolder + "\\" : "";
+            subfolder = subfolder != null ? subfolder + System.IO.Path.DirectorySeparatorChar: "";
 
             //Can't use base64 hash... filesystem has case-insensitive lookup.
             //Would use base32, but too much code to bloat the resizer. Simple base16 encoding is fine
-            return dir.TrimEnd('/', '\\') + "\\" + subfolder + Base16Encode(hash) + "." + new ImageOutputSettings(request).GetFinalExtension();
+            return dir.TrimEnd('/', '\\') + System.IO.Path.DirectorySeparatorChar  + subfolder + Base16Encode(hash) + "." + new ImageOutputSettings(request).GetFinalExtension();
         }
         /// <summary>
         /// Returns a string for the subfolder name. The bits used are from the end of the hash - this should make
@@ -234,11 +237,13 @@ namespace fbs.ImageResizer
             int subfolders = 0;
             if (int.TryParse(ConfigurationManager.AppSettings["ImageCacheSubfolders"],out subfolders))
             {
-                int bits = (int)Math.Ceiling(Math.Log(subfolders, 2));
+                int bits = (int)Math.Ceiling(Math.Log(subfolders, 2)); //Log2 to find the number of bits. round up.
                 Debug.Assert(bits > 0);
-                Debug.Assert(bits <= hash.Length);
-                byte[] subfolder = new byte[bits];
-                Array.Copy(hash,hash.Length - bits,subfolder,0,bits);
+                Debug.Assert(bits <= hash.Length * 8);
+
+                byte[] subfolder = new byte[(int)Math.Ceiling((double)bits / 8.0)]; //Round up to bytes.
+                Array.Copy(hash,hash.Length - subfolder.Length,subfolder,0,subfolder.Length);
+                subfolder[0] = (byte)((int)subfolder[0] >> ((subfolder.Length * 8) - bits)); //Set extra bits to 0.
                 return Base16Encode(subfolder);
             }
             return null;
