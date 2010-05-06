@@ -373,7 +373,7 @@ namespace fbs.ImageResizer
 
             //Add required space for border and padding
             if (opts.borderWidth > 0) all = PolygonMath.InflatePoly(all, opts.borderWidth);
-            if (opts.paddingWidth > 0) all = PolygonMath.InflatePoly(size.targetArea, opts.paddingWidth);
+            if (opts.paddingWidth > 0) all = PolygonMath.InflatePoly(all, opts.paddingWidth);
 
             //For later use. The inside of the shadow
             PointF[] insideShadow = all;
@@ -485,9 +485,9 @@ namespace fbs.ImageResizer
                 if (opts.borderWidth > 0)
                 {
                     Pen p = new Pen(opts.borderColor, opts.borderWidth);
-                    p.Alignment = System.Drawing.Drawing2D.PenAlignment.Right;
+                    p.Alignment = System.Drawing.Drawing2D.PenAlignment.Center; //PenAlignment.Center is the only supported mode.
                     p.LineJoin = System.Drawing.Drawing2D.LineJoin.Miter;
-                    g.DrawPolygon(p, size.targetArea);
+                    g.DrawPolygon(p, PolygonMath.InflatePoly(size.targetArea,(float)(opts.borderWidth / 2.0))); //I hope GDI rounds the same way as .NET.. Otherwise there may be an off-by-one error..
                 }
 
                 //Commit changes.
