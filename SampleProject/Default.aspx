@@ -42,6 +42,12 @@
     title="Upscaled from 100px to 200px using ?scale=both&width=200" />
     <br />
     The slight blur around the edges is a bug in Graphics.DrawImage(). You can control the color by setting <strong>&amp;bgcolor=color|hex</strong>.
+    
+    <p>Upscaling the canvas is sometimes desired instead of upscaling the image when it is smaller than the requested size. Yse <strong>?scale=upscalecanvas</strong> to achieve this effect.</p>
+    <img src="tractor-tiny.jpg?scale=upscalecanvas&width=200&borderColor=black&borderWidth=2" runat="server" 
+    title="?scale=upscalecanvas&width=200" />
+    
+    
     <h2>Cropping</h2>
     <p>To enable cropping, you can use <strong>&amp;crop=auto</strong>, which minimally crops and centers to preserve aspect ratio, or custom cropping.</p>
     <p><strong>&amp;crop=(x1,y1,x2,y2)</strong> specifies the rectangle to crop on the image. You can still resize and modify the cropped portion 
@@ -114,6 +120,8 @@
     <strong>&amp;borderColor=color|hex</strong>.</p>
     <img id="Img19" src="grass.jpg?maxwidth=200&paddingColor=white&paddingwidth=20&borderWidth=8&borderColor=808080" runat="server"
       title="With ?maxwidth=200&borderWidth=8&borderColor=808080&paddingwidth=20"/>
+    
+    
     
     <h1>Output format</h1>
     <p>GIF, JPG, and PNG output is supported. BMP and TIFF input fils are additionally supported, and every format can be converted to any other format with <strong>&amp;format=jpg|png|gif</strong></p>

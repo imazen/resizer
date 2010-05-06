@@ -389,6 +389,12 @@
             Provides methods for generating resizied images, and for reading and writing them to disk.
             </summary>
         </member>
+        <member name="M:fbs.ImageResizer.ImageManager.RegisterUpgrade(fbs.ImageResizer.ImageManager)">
+            <summary>
+            Allow other classes to override.
+            </summary>
+            <param name="replacement"></param>
+        </member>
         <member name="M:fbs.ImageResizer.ImageManager.getBestInstance">
             <summary>
             Looks for AnimatedImageManager and returns an instance of that if possible. Otherwise, returns an 
@@ -397,6 +403,14 @@
             <returns></returns>
         </member>
         <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.String,System.String,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
+            </summary>
+            <param name="sourceFile"></param>
+            <param name="targetFile"></param>
+            <param name="request"></param>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.Web.Hosting.VirtualFile,System.String,System.Collections.Specialized.NameValueCollection)">
             <summary>
             Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
             </summary>
@@ -436,6 +450,15 @@
             <returns></returns>
         </member>
         <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.Web.HttpPostedFile,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Generates a resized bitmap from the specifed source file and the specified querystring. Understands width/height and maxwidth/maxheight.
+            Throws either an ArgumentException or IOException if the source image is invalid.
+            Always use ImageOutputSettings to save images, since Image.Save doesn't work well for GIF or PNGs, and needs custom params for Jpegs.
+            </summary>
+            
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.ImageManager.BuildImage(System.Web.Hosting.VirtualFile,System.Collections.Specialized.NameValueCollection)">
             <summary>
             Generates a resized bitmap from the specifed source file and the specified querystring. Understands width/height and maxwidth/maxheight.
             Throws either an ArgumentException or IOException if the source image is invalid.
@@ -716,6 +739,15 @@
             Builds the physical path for the cached version, using the hashcode of the normalized URL.
             </summary>
             <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.InterceptModule.getSubfolder(System.Byte[])">
+            <summary>
+            Returns a string for the subfolder name. The bits used are from the end of the hash - this should make
+            the hashes in each directory more unique, and speed up performance (8.3 filename calculations are slow when lots of files share the same first 6 chars.
+            Returns null if not configured. Rounds ImageCacheSubfolders up to the nearest power of two.
+            </summary>
+            <param name="hash"></param>
             <returns></returns>
         </member>
         <member name="M:fbs.ImageResizer.InterceptModule.ResizeRequest(System.Web.HttpContext,fbs.yrl)">
@@ -1120,6 +1152,11 @@
         <member name="F:fbs.ImageResizer.ResizeSettings.ScaleMode.Both">
             <summary>
             Upscales and downscales images according to 'width' and 'height', within web.config restrictions.
+            </summary>
+        </member>
+        <member name="F:fbs.ImageResizer.ResizeSettings.ScaleMode.UpscaleCanvas">
+            <summary>
+            When the image is smaller than the requested size, padding is added instead of stretching the image
             </summary>
         </member>
         <member name="F:fbs.ImageResizer.ResizeSettings.ImageSizingData.sourceRect">
@@ -1548,7 +1585,7 @@
             This string contains the contents of a web.conig file that sets URL authorization to "deny all" inside the current directory.
             </summary>
         </member>
-        <member name="M:fbs.ImageResizer.DiskCache.UpdateCachedVersionIfNeeded(System.String,System.String,fbs.ImageResizer.DiskCache.CacheUpdateCallback,System.Int32)">
+        <member name="M:fbs.ImageResizer.DiskCache.UpdateCachedVersionIfNeeded(System.String,System.String,fbs.ImageResizer.DiskCache.CacheUpdateCallback,System.Int32,System.Boolean)">
             <summary>
             Checks if an update is needed on the specified file... calls the method if needed.
             Fixed: Implement locking to prevent I/O conflicts on concurrent inital request
@@ -1568,6 +1605,14 @@
         <member name="M:fbs.ImageResizer.DiskCache.IsCachedVersionValid(System.String,System.String)">
             <summary>
             Assumes localSourceFile exists. Returns true if localCachedFile exists and matches the last write time of localSourceFile.
+            </summary>
+            <param name="localSourceFile">full physical path of original file</param>
+            <param name="cachedFilename">full physical path of cached file.</param>
+            <returns></returns>
+        </member>
+        <member name="M:fbs.ImageResizer.DiskCache.IsCachedVersionValid(System.String)">
+            <summary>
+            Assumes localSourceFile exists. Returns true if localCachedFile exists and DiskCacheAlwaysInvalid is false.
             </summary>
             <param name="localSourceFile">full physical path of original file</param>
             <param name="cachedFilename">full physical path of cached file.</param>
@@ -1642,7 +1687,7 @@
         </member>
         <member name="M:fbs.ImageResizer.DiskCache.GetMaxCachedFiles">
             <summary>
-            Returns the value of required setting AppSettings["MaxCachedImages"], or 400 if it is missing. An event will be logged if it is missing.
+            Returns the value of required setting AppSettings["MaxCachedImages"], or 8000 if it is missing. An event will be logged if it is missing.
             </summary>
             <returns></returns>
         </member>

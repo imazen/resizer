@@ -136,6 +136,8 @@ namespace fbs.ImageResizer
                     this.scale = ScaleMode.UpscaleOnly;
                 else if (q["scale"].Equals("downscaleonly", StringComparison.OrdinalIgnoreCase))
                     this.scale = ScaleMode.DownscaleOnly;
+                else if (q["scale"].Equals("upscalecanvas", StringComparison.OrdinalIgnoreCase))
+                    this.scale = ScaleMode.UpscaleCanvas;
                 else
                 {
                     //invalid value
@@ -276,7 +278,11 @@ namespace fbs.ImageResizer
             /// <summary>
             /// Upscales and downscales images according to 'width' and 'height', within web.config restrictions.
             /// </summary>
-            Both
+            Both,
+            /// <summary>
+            /// When the image is smaller than the requested size, padding is added instead of stretching the image
+            /// </summary>
+            UpscaleCanvas
         }
         /// <summary>
         /// Whether to downscale, upscale, or allow both on images
@@ -445,6 +451,20 @@ namespace fbs.ImageResizer
 
                     }
                 }
+                else if (scale == ScaleMode.UpscaleCanvas)
+                {
+                    //Same as downscaleonly, except areaSize isn't changed.
+                    if (PolygonMath.FitsInside(imageSize, targetSize))
+                    {
+                        //The image is smaller or equal to its target polygon. Use original image coordinates instead.
+
+                        if (!PolygonMath.FitsInside(imageSize, finalSizeBounds)) //Check web.config 'finalSizeBounds' and scale to fit.
+                            targetSize = PolygonMath.ScaleInside(imageSize, finalSizeBounds);
+                        else
+                            targetSize = imageSize;
+                    }
+                
+                }
                 
             }
 
@@ -465,7 +485,7 @@ namespace fbs.ImageResizer
                 SizeF sourceSize = PolygonMath.ScaleInside(areaSize, imageSize);
                 //Center
                 isd.sourceRect = new RectangleF((imageSize.Width - sourceSize.Width) / 2, (imageSize.Height - sourceSize.Height) / 2, sourceSize.Width, sourceSize.Height);
-                //Restore targetSize to match areaSize
+                //Restore targetSize to match areaSize //Warning - crop always forces scale=both.
                 targetSize = areaSize;
             }
             isd.imageTarget = PolygonMath.NormalizePoly(PolygonMath.RotatePoly(PolygonMath.ToPoly(new RectangleF(new PointF(0, 0), targetSize)), this.rotate));
