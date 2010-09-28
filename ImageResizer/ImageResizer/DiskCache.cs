@@ -223,6 +223,8 @@ namespace fbs.ImageResizer
             "</authorization></system.web></configuration>";
 
 
+        private static readonly object webConfigSyncObj = new object();
+
         /// <summary>
         /// Creates the directory for caching if needed, and performs 'garbage collection'
         /// Throws a DiskCacheException if the cache direcotry isn't specified in web.config
@@ -239,10 +241,16 @@ namespace fbs.ImageResizer
 
             //Add URL authorization protection using a web.config file.
             yrl wc = yrl.Combine(new yrl(dir), new yrl("Web.config"));
-            if (!wc.FileExists)
-            {
-                System.IO.File.WriteAllText(wc.Local, webConfigFile);
+            if (!wc.FileExists) {
+                lock (webConfigSyncObj) {
+                    if (!wc.FileExists){
+                        System.IO.File.WriteAllText(wc.Local, webConfigFile);
+                    }
+                }
             }
+
+
+
 
             //Perform cleanup if needed. Clear 1/10 of the files if we are running low.
             int maxCount = GetMaxCachedFiles();
