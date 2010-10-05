@@ -36,7 +36,7 @@ namespace fbs.ImageResizer
         /// 
         /// This method returns the 'real' path of the image, i.e. /app/img/file.jpg will be returned for /app/img/resize(50,50,jpg)/file.jpg
         /// 
-        /// Should be very fast - don't make and I/O or database calls here.
+        /// Should be very fast - don't make any I/O or database calls here.
         /// AllowURLRewriting must be enabled if you want to return something other than 'filePath'. You can still populate the querystring without this setting.
         /// AllowURLRewriting is required for the /resize(50,50,jpg)/ syntax. 
         /// 
