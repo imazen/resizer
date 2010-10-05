@@ -177,18 +177,32 @@ namespace fbs.ImageResizer
                         //If the file exists, resize it
                         //dec-11-09 changed to use vpp
                         Boolean virtualFile = "true".Equals(ConfigurationManager.AppSettings["ImageResizerUseVirtualPathProvider"], StringComparison.OrdinalIgnoreCase);
+                        //Fall back mode - only use virtual path provider as a fallback if the file doesn't exist - recommended setting.
+                        Boolean virtualFileFallBack = "true".Equals(ConfigurationManager.AppSettings["ImageResizerUseVirtualPathProviderAsFallback"], StringComparison.OrdinalIgnoreCase);
 
-                        if (virtualFile)
-                        {
-                            if (HostingEnvironment.VirtualPathProvider.FileExists(getVPPSafePath(current)))
-                                ResizeRequest(app.Context, current);
-                        }
-                        else
+                        if (virtualFileFallBack)
                         {
                             if (current.FileExists)
                                 ResizeRequest(app.Context, current);
-                        }
+                                //Fall back to the virtual path provider in case it is using a different data store
+                            else if (HostingEnvironment.VirtualPathProvider.FileExists(getVPPSafePath(current)))
+                                ResizeRequest(app.Context, current);
 
+                        }
+                        else
+                        {
+                            //Try using the virtual path provid
+                            if (virtualFile)
+                            {
+                                if (HostingEnvironment.VirtualPathProvider.FileExists(getVPPSafePath(current)))
+                                    ResizeRequest(app.Context, current);
+                            }
+                            else
+                            {
+                                if (current.FileExists)
+                                    ResizeRequest(app.Context, current);
+                            }
+                        }
                         
                     }
                 }
@@ -272,31 +286,73 @@ namespace fbs.ImageResizer
             Stopwatch s = new Stopwatch();
             s.Start();
 
+            //Override normal behavior with virtualpathprovider
             Boolean virtualFile = "true".Equals(ConfigurationManager.AppSettings["ImageResizerUseVirtualPathProvider"], StringComparison.OrdinalIgnoreCase);
+
+            //Fall back mode - only use virtual path provider as a fallback if the file doesn't exist - recommended setting.
+            Boolean virtualFileFallBack = "true".Equals(ConfigurationManager.AppSettings["ImageResizerUseVirtualPathProviderAsFallback"], StringComparison.OrdinalIgnoreCase);
+
+            
 
             VirtualFile vf = virtualFile ? HostingEnvironment.VirtualPathProvider.GetFile(getVPPSafePath(current)) : null;
             
+            //In fallback mode, only create vf if the file doesn't exist.
+            if (vf == null && virtualFileFallBack){
+                if (!File.Exists(current.Local)) vf = HostingEnvironment.VirtualPathProvider.GetFile(getVPPSafePath(current));
+            }
+                
 
             //This is where the cached version goes
             string cachedFile = getCachedVersionFilename(current);
 
+            //Find out if we have a modified date that we can work with
+            bool hasModifiedDate = (vf == null) || vf is IVirtualFileWithModifiedDate;
+            if (hasModifiedDate)
+            {
+                DateTime modDate = ((IVirtualFileWithModifiedDate)vf).ModifiedDateUTC;
+                if (modDate == DateTime.MinValue || modDate == DateTime.MaxValue)
+                {
+                    hasModifiedDate = false; //Skip modified date checking if the file
+                }
+            }
+
             //Disk caching is good for images because they change much less often than the application restarts.
 
             //Make sure the resized image is in the disk cache.
-            bool succeeded = DiskCache.UpdateCachedVersionIfNeeded(current.Local, cachedFile,
-                delegate(){
+            bool succeeded = DiskCache.UpdateCachedVersionIfNeeded(delegate()
+                {
+                    if (vf == null)
+                    {
+                        return System.IO.File.GetLastWriteTimeUtc(current.Local);
+                    }
+                    else if (hasModifiedDate)
+                    {
+                        return ((IVirtualFileWithModifiedDate)vf).ModifiedDateUTC;
+                    }
+                    else
+                    {
+                        //Won't be called, no modified date available.
+                        return DateTime.MinValue;
+                    }
+                }, 
+                cachedFile,
+                delegate()
+                {
 
                     //This runs if the update is needed. This delegate is preventing from running in more
                     //than one thread at a time for the specified source file (current.Local)
-                    
-                    if (vf != null){ //For VPP use
+
+                    if (vf != null)
+                    { //For VPP use
                         ImageManager.getBestInstance().BuildImage(vf, cachedFile, current.QueryString);
-                    }else{
+                    }
+                    else
+                    {
                         ImageManager.getBestInstance().BuildImage(current.Local, cachedFile, current.QueryString);
                     }
 
-                },30000,
-                virtualFile); //When virtualFile is true, modified dates aren't checked (there aren't any!).
+                }, 30000,
+                !hasModifiedDate); //When hasModifiedDate is false, modified dates aren't checked (there aren't any!).
 
             //If a co-occurring resize has the file locked for more than 30 seconds, quit with an error.
             if (!succeeded)
