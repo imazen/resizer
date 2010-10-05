@@ -64,6 +64,8 @@ namespace fbs.ImageResizer
         /// A callback method that will perform the resize and update the file. This doesn't need paramaters since an anonymous function can be used.
         /// </summary>
         public delegate void CacheUpdateCallback();
+
+        public delegate DateTime GetSourceModifiedDateUTC();
         /// <summary>
         /// Checks if an update is needed on the specified file... calls the method if needed.
         /// Fixed: Implement locking to prevent I/O conflicts on concurrent inital request
@@ -74,14 +76,14 @@ namespace fbs.ImageResizer
         /// <param name="sourceFilename"></param>
         /// <param name="cachedFilename"></param>
         /// <param name="updateCallback"></param>
-        public static bool UpdateCachedVersionIfNeeded(string sourceFilename, string cachedFilename, CacheUpdateCallback updateCallback, int fileLockTimeout, Boolean ignoreModifiedDate)
+        public static bool UpdateCachedVersionIfNeeded(GetSourceModifiedDateUTC getSourceModifiedDateUTC, string cachedFilename, CacheUpdateCallback updateCallback, int fileLockTimeout, Boolean ignoreModifiedDate)
         {
             PrepareCacheDir();
             //Fixed - implement locking so concurrent requests for the same file don't cause an I/O issue.
-            if ((ignoreModifiedDate && IsCachedVersionValid(cachedFilename)) || !IsCachedVersionValid(sourceFilename, cachedFilename))
+            if ((ignoreModifiedDate && IsCachedVersionValid(cachedFilename)) || !IsCachedVersionValid(getSourceModifiedDateUTC(), cachedFilename))
             {
                 //Create or obtain a blank object for locking purposes. Store or retrieve using the filename as a key.
-                string key = sourceFilename.ToLower();
+                string key = cachedFilename.ToLower();
 
                 object fileLock = null;
                 lock (fileLocks) //We have to lock the dictionary, since otherwise two locks for the same file could be created and assigned at the same time. (i.e, between ContainsKey and the assignment)
@@ -97,7 +99,7 @@ namespace fbs.ImageResizer
                 {
                     try
                     {
-                        if ((ignoreModifiedDate && IsCachedVersionValid(cachedFilename)) || !IsCachedVersionValid(sourceFilename, cachedFilename))
+                        if ((ignoreModifiedDate && IsCachedVersionValid(cachedFilename)) || !IsCachedVersionValid(getSourceModifiedDateUTC(), cachedFilename))
                         {
                             //Create subdirectory if needed.
                             if (!Directory.Exists(Path.GetDirectoryName(cachedFilename)))
@@ -107,7 +109,7 @@ namespace fbs.ImageResizer
                             updateCallback();
                             filesUpdatedSinceCleanup++;
                             //Update the write time to match - this is how we know whether they are in sync.
-                            if (!ignoreModifiedDate) System.IO.File.SetLastWriteTimeUtc(cachedFilename, System.IO.File.GetLastWriteTimeUtc(sourceFilename));
+                            if (!ignoreModifiedDate) System.IO.File.SetLastWriteTimeUtc(cachedFilename,getSourceModifiedDateUTC());
                         }
                     }
                     finally
@@ -211,7 +213,7 @@ namespace fbs.ImageResizer
             DateTime cached = System.IO.File.GetLastWriteTimeUtc(localCachedFile);
             return RoughCompare(cached, sourceDataModifiedUTC);
         }
-
+    
         /// <summary>
         /// This string contains the contents of a web.conig file that sets URL authorization to "deny all" inside the current directory.
         /// </summary>
