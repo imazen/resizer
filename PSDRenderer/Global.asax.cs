@@ -5,7 +5,7 @@ using System.Web.Security;
 using System.Web.SessionState;
 using System.Web.Hosting;
 
-namespace DatabaseSampleCSharp
+namespace PsdRenderer
 {
     public class Global : System.Web.HttpApplication
     {
