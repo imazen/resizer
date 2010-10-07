@@ -112,6 +112,7 @@ namespace Endogine.Codecs.Photoshop
                 return (float)(((int)this._data[x + y * this.Layer.Width * 2]) << 8 + this._data[x + y * this.Layer.Width * 2 + 1]) / 65535;
             else if (true || this.Layer.BitsPerPixel == 8)
                 return (float)this._data[x + y * this.Layer.Width] / 255;
+            throw new NotImplementedException();
         }
         public void SetPixel(int x, int y, float value)
         {
