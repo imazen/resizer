@@ -47,6 +47,7 @@ namespace fbs.ImageResizer
     /// </summary>
     public class ImageOutputSettings
     {
+
         public ImageOutputSettings(ImageFormat targetFormat) {
             setCustomQuantizationDefault();
             this.OutputFormat = targetFormat;
@@ -274,29 +275,9 @@ namespace fbs.ImageResizer
             return GetImageFormatFromExtension(System.IO.Path.GetExtension(path));
         }
 
-        /// <summary>
-        /// Returns an ImageFormat instance from the specfied extension. Supports jpg, jpeg, bmp, gif, png, tiff, and tff.
-        /// returns null if not recognized.
-        /// </summary>
-        /// <param name="ext"></param>
-        /// <returns></returns>
-        public static ImageFormat GetImageFormatFromExtension(string ext)
-        {
-            ext = ext.Trim(' ','.').ToLowerInvariant();
-            switch (ext)
-            {
-                case "jpg": return ImageFormat.Jpeg; 
-                case "bmp": return ImageFormat.Bmp;
-                case "gif": return ImageFormat.Gif;
-                case "jpeg": return ImageFormat.Jpeg; 
-                case "png": return  ImageFormat.Png;
-                case "tiff": return ImageFormat.Tiff;
-                case "tff": return ImageFormat.Tiff;
-                case "tif": return ImageFormat.Tiff;
-                  
-            }
-            return null;
-        }
+ 
+
+
         /// <summary>
         /// Returns an string instance from the specfied ImageFormat. Supports jpg, bmp, gif, png, and tiff,
         /// Returns null if not recognized.
@@ -319,13 +300,47 @@ namespace fbs.ImageResizer
         /// <returns></returns>
         public static bool IsAcceptedImageType(string path){
             string extension = System.IO.Path.GetExtension(path).ToLowerInvariant().Trim('.');
-            return _acceptedImageExtensions.Contains(extension);
+            return acceptedImageExtensions.ContainsKey(extension);
 
         }
         /// <summary>
         /// Returns a list of (lowercase invariant) image extensions that the module works with.
         /// </summary>
-        private static IList<String> _acceptedImageExtensions = new List<String>(new String[] { "jpg", "jpeg", "bmp", "gif", "png", "tff","tiff","tif" });
+        private static IDictionary<String,ImageFormat> _acceptedImageExtensions = null;
+        static IDictionary<String,ImageFormat> acceptedImageExtensions{
+            get{
+                if (_acceptedImageExtensions == null) {
+                    _acceptedImageExtensions = new Dictionary<String,ImageFormat>();
+                    AddAcceptedImageExtension("jpg",ImageFormat.Jpeg);
+                    AddAcceptedImageExtension("jpeg",ImageFormat.Jpeg);
+                    AddAcceptedImageExtension("bmp",ImageFormat.Bmp);
+                    AddAcceptedImageExtension("gif",ImageFormat.Gif);
+                    AddAcceptedImageExtension("png",ImageFormat.Png);
+                    AddAcceptedImageExtension("tiff",ImageFormat.Tiff);
+                    AddAcceptedImageExtension("tif",ImageFormat.Tiff);
+                    AddAcceptedImageExtension("tff",ImageFormat.Tiff);
+                } 
+                return _acceptedImageExtensions;
+            }
+        }
+
+        /// <summary>
+        /// Returns an ImageFormat instance from the specfied extension. Supports jpg, jpeg, bmp, gif, png, tiff, and tff.
+        /// returns null if not recognized.
+        /// </summary>
+        /// <param name="ext"></param>
+        /// <returns></returns>
+        public static ImageFormat GetImageFormatFromExtension(string ext)
+        {
+            ext = ext.Trim(' ', '.').ToLowerInvariant();
+            if (!acceptedImageExtensions.ContainsKey(ext)) return null;
+            return acceptedImageExtensions[ext];
+        }
+
+        public static void AddAcceptedImageExtension(string extension, ImageFormat matchingFormat){
+            //In case first call is to this method, use the property. Will be recursive, but that's fine, since it won't be null.
+            acceptedImageExtensions.Add(extension.TrimStart('.',' ').ToLowerInvariant(),matchingFormat);
+        }
 
         /// <summary>
         /// Supports Png, Jpeg, Gif, Bmp, and Tiff.
