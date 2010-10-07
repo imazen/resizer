@@ -468,7 +468,7 @@ namespace PhotoshopFile
         m_layers.Add(new Layer(reader, this));
       }
 
-      PaintDotNet.Threading.PrivateThreadPool threadPool = new PaintDotNet.Threading.PrivateThreadPool();
+      PrivateThreadPool threadPool = new PrivateThreadPool();
 
       foreach (Layer layer in m_layers)
       {
@@ -515,7 +515,7 @@ namespace PhotoshopFile
         writer.Write(numberOfLayers);
 
         // Finish compute-bound operations before embarking on the sequential save
-        PaintDotNet.Threading.PrivateThreadPool threadPool = new PaintDotNet.Threading.PrivateThreadPool();
+        PrivateThreadPool threadPool = new PrivateThreadPool();
         foreach (Layer layer in m_layers)
         {
           layer.PrepareSave(threadPool);
