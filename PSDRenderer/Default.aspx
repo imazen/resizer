@@ -9,7 +9,13 @@
 <body>
     <form id="form1" runat="server">
     <div>
-      <img src="~/1001.psd.png" runat="server" />
+      <img src="~/1001.psd.png" runat="server" usemap="#planetmap" />
+
+<map name="planetmap">
+<asp:Literal ID="mapdata" runat="server" Mode="PassThrough" />
+
+</map>
+
     </div>
     </form>
 </body>
