@@ -18,8 +18,9 @@ namespace PsdRenderer
 
     public interface ITextLayer
     {
-        string name{get;}
-        Rectangle rect { get; }
-        string text { get; }
+        string Name{get;}
+        Rectangle Rect { get; }
+        string Text { get; }
+        bool Visible { get; }
     }
 }

@@ -99,7 +99,55 @@ namespace PsdRenderer
             return ms;
         }
 
+        public static IList<ITextLayer> getTextLayers(string virtualPath)
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
 
+            //Renderer object
+            IPsdRenderer renderer = null;
+            //The querystring-specified renderer name
+            string sRenderer = null;
+            if (HttpContext.Current.Request.QueryString["renderer"] != null) sRenderer = HttpContext.Current.Request.QueryString["renderer"].ToLowerInvariant();
+            //Build the correct renderer
+            if (("graphicsmill").Equals(sRenderer))
+                renderer = new GraphicsMillRenderer();
+            else
+                renderer = new PsdPluginRenderer();
+
+            IList<ITextLayer> layers = null;
+
+
+            //Open the file.
+            using (Stream s = System.IO.File.OpenRead(getPhysicalPath(virtualPath)))
+            {
+                //Time just the parsing/rendering
+                Stopwatch swRender = new Stopwatch();
+                swRender.Start();
+
+                //Use the selected renderer to parse the file and compose the layers, using this delegate callback to determine which layers to show.
+                layers = renderer.GetTextLayers(s);
+                //How fast?
+                swRender.Stop();
+                HttpContext.Current.Trace.Write("Using decoder " + renderer.ToString() + ", enumerating layers took " + swRender.ElapsedMilliseconds.ToString() + "ms");
+
+            }
+            IList<ITextLayer> filtered = new List<ITextLayer>();
+            //Which layers do we show?
+            string showLayersWith = "12288";
+            if (HttpContext.Current.Request.QueryString["showlayerswith"] != null) showLayersWith = HttpContext.Current.Request.QueryString["showlayerswith"];
+
+            for (int i = 0; i < layers.Count; i++){
+                bool add = layers[i].Visible ;
+                if (!add && (layers[i].Name.Contains(showLayersWith))) add = true;
+                if (add) filtered.Add(layers[i]);
+            }
+            
+            sw.Stop();
+            HttpContext.Current.Trace.Write("Total time for enumerating, including file reading: " + sw.ElapsedMilliseconds.ToString() + "ms");
+            return filtered;
+
+        }
 
         /// <summary>
         /// Returns DateTime.MinValue if there are no rows, or no values on the row.
@@ -135,7 +183,7 @@ namespace PsdRenderer
             return (System.IO.Path.GetFileName(virtualPath).ToLowerInvariant().Contains(".psd."));
         }
 
-        string getPhysicalPath(string virtualPath)
+        static string  getPhysicalPath(string virtualPath)
         {
             int ix = virtualPath.ToLowerInvariant().LastIndexOf(".psd");
             return HttpContext.Current.Request.MapPath(virtualPath.Substring(0, ix + 4));

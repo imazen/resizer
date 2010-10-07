@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using PsdRenderer;
 
 namespace PSDRenderer
 {
@@ -10,7 +11,11 @@ namespace PSDRenderer
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            IList<ITextLayer> layers = PsdRenderer.PsdProvider.getTextLayers("~/1001.psd");
+            foreach (ITextLayer l in layers){
+                mapdata.Text += "\n<area shape=\"rect\" coords=\"" + l.Rect.X + "," + l.Rect.Y + "," + l.Rect.Right + "," + l.Rect.Bottom + "\" href=\"#\" alt=\"" + l.Name + "\" />";
 
+            }
         }
     }
 }
