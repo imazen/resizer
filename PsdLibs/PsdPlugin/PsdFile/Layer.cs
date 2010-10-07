@@ -957,7 +957,7 @@ namespace PhotoshopFile
 
     ///////////////////////////////////////////////////////////////////////////
 
-    public void PrepareSave(PaintDotNet.Threading.PrivateThreadPool threadPool)
+    public void PrepareSave(PrivateThreadPool threadPool)
     {
       foreach (Channel ch in m_channels)
       {
