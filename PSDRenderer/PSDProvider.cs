@@ -10,7 +10,9 @@ using System.Data.SqlClient;
 using System.Configuration;
 using Aurigma.GraphicsMill.Codecs;
 using System.Diagnostics;
-namespace DatabaseSampleCSharp
+using fbs.ImageResizer;
+using fbs;
+namespace PsdRenderer
 {
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
@@ -43,56 +45,56 @@ namespace DatabaseSampleCSharp
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            // Create the resultBitmap object which contains merged bitmap, 
-            // and the currentBitmap object which contains current bitmap during iteration. 
-            // These object enable you to operate with layers.
-            Aurigma.GraphicsMill.Bitmap resultBitmap = new Aurigma.GraphicsMill.Bitmap();
-            Aurigma.GraphicsMill.Bitmap currentBitmap = new Aurigma.GraphicsMill.Bitmap();
 
-            // Create advanced PSD reader object to read .psd files.
-            Aurigma.GraphicsMill.Codecs.AdvancedPsdReader psdReader = new Aurigma.GraphicsMill.Codecs.AdvancedPsdReader(getPhysicalPath(virtualPath));
+            //Renderer object
+            IPsdRenderer renderer = null;
+            //The querystring-specified renderer name
+            string sRenderer = null;
+            if (HttpContext.Current.Request.QueryString["renderer"] != null) sRenderer = HttpContext.Current.Request.QueryString["renderer"].ToLowerInvariant();
+            //Build the correct renderer
+            if (("graphicsmill").Equals(sRenderer))
+                renderer = new GraphicsMillRenderer();
+            else
+                renderer = new PsdPluginRenderer();
+            
+            //Bitmap we will render to
+            System.Drawing.Bitmap b = null;
 
-
-            // Load the background layer which you will put other layers on. 
-            // Remember that the layer on zero position should be skiped 
-            // because it contains merged bitmap.
-            Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame frame;
-            frame = (Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame)psdReader.LoadFrame(1);
-            frame.GetBitmap(resultBitmap);
-
+            //Which layers do we show?
             string showLayersWith = "12288";
             if (HttpContext.Current.Request.QueryString["showlayerswith"] != null) showLayersWith = HttpContext.Current.Request.QueryString["showlayerswith"];
 
-            //This code merges the rest layers with the background layer one by one.
-            for (int i = 2; i < psdReader.FrameCount; i++)
-            {
-                frame = (Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame)psdReader.LoadFrame(i);
+            //Open the file.
+            using (Stream s = System.IO.File.OpenRead(getPhysicalPath(virtualPath))){
+                //Time just the parsing/rendering
+                Stopwatch swRender = new Stopwatch();
+                swRender.Start();
 
-                // Do not forget to verify the unknown layer type.  
-                if (frame.Type != Aurigma.GraphicsMill.Codecs.PsdFrameType.Unknown)
-                {
-                    bool showFrame =  frame.Visible; 
-                    if (!showFrame){
-                        if (i < 6 || frame.Name.Contains(showLayersWith)) showFrame = true;
-                    }
-                    if (showFrame){
-                        // Extract the current image from the layer.
-                        frame.GetBitmap(currentBitmap);
+                //Use the selected renderer to parse the file and compose the layers, using this delegate callback to determine which layers to show.
+                b = renderer.Render(s,
+                    delegate(int index, string name, bool visibleNow)
+                    {
+                        if (visibleNow) return true;
+                        return (index < 6 || name.Contains(showLayersWith));
+                    });
+                //How fast?
+                swRender.Stop();
+                HttpContext.Current.Trace.Write("Using encoder " + renderer.ToString() + ", rendering stream to a composed Bitmap instance took " + swRender.ElapsedMilliseconds.ToString() + "ms");
 
-                        // Draw current layer on the result bitmap. 
-                        // Also check out if the layer is visible or not.
-                        // If the layer is invisible we skip it.
-                        currentBitmap.Draw(resultBitmap, frame.Left, frame.Top, frame.Width, frame.Height, Aurigma.GraphicsMill.Transforms.CombineMode.Alpha, 1, Aurigma.GraphicsMill.Transforms.InterpolationMode.HighQuality);
-                    }
-                }
             }
+            //Memory stream for encoding the file
             MemoryStream ms = new MemoryStream();
-            // Save the result bitmap into file. 
-            resultBitmap.Save(ms, new PngEncoderOptions());
-            ms.Seek(0, SeekOrigin.Begin);
-            // Clean up.
-            psdReader.Close();
+            //Encode image to memory stream, then seek the stream to byte 0
+            using (b)
+            {
+                //Use whatever settings appear in the URL 
+                ImageOutputSettings ios = new ImageOutputSettings(yrl.Current);
+                ios.SaveImage(ms, b);
+                ms.Seek(0, SeekOrigin.Begin); //Reset stream for reading
+            }
+
             sw.Stop();
+            HttpContext.Current.Trace.Write("Total time, including encoding: " + sw.ElapsedMilliseconds.ToString() + "ms");
 
             return ms;
         }
@@ -158,7 +160,7 @@ namespace DatabaseSampleCSharp
         public override VirtualFile GetFile(string virtualPath)
         {
             if (PSDExists(virtualPath))
-                return new PsdFile(virtualPath, this);
+                return new PsdVirtualFile(virtualPath, this);
             else
                 return Previous.GetFile(virtualPath);
         }
@@ -176,7 +178,7 @@ namespace DatabaseSampleCSharp
 
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Minimal)]
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.Minimal)]
-    public class PsdFile : VirtualFile, fbs.ImageResizer.IVirtualFileWithModifiedDate
+    public class PsdVirtualFile : VirtualFile, fbs.ImageResizer.IVirtualFileWithModifiedDate
     {
   
         private PsdProvider provider;
@@ -195,7 +197,7 @@ namespace DatabaseSampleCSharp
             }
         }
 
-        public PsdFile(string virtualPath, PsdProvider provider)
+        public PsdVirtualFile(string virtualPath, PsdProvider provider)
             : base(virtualPath)
         {
             this.provider = provider;

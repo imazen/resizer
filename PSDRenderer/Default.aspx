@@ -9,7 +9,7 @@
 <body>
     <form id="form1" runat="server">
     <div>
-    
+      <img src="~/1001.psd.png" runat="server" />
     </div>
     </form>
 </body>
