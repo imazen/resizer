@@ -1,0 +1,231 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Aurigma.GraphicsMill.Codecs.AdvancedPsd</name>
+        <version>5.5.3555.25960</version>
+        <fullname>Aurigma.GraphicsMill.Codecs.AdvancedPsd, Version=5.5.3555.25960, Culture=neutral, PublicKeyToken=af7154c50c505858</fullname>
+    </assembly>
+    <members>
+        <member name="T:Aurigma.GraphicsMill.AdvancedPsdLibraryModule" draft="yes">
+            <summary>This class represents Advanced PSD module.</summary>
+        </member>
+        <member name="M:Aurigma.GraphicsMill.AdvancedPsdLibraryModule.{dtor}" draft="yes">
+            <summary>Enables using delete operator in C++ applications. It is strongly not recommended to use it directly.</summary>
+        </member>
+        <member name="M:Aurigma.GraphicsMill.AdvancedPsdLibraryModule.Dispose(System.Boolean)">
+            <exclude />
+        </member>
+        <member name="M:Aurigma.GraphicsMill.AdvancedPsdLibraryModule.Finalize">
+            <exclude />
+        </member>
+        <member name="M:Aurigma.GraphicsMill.AdvancedPsdLibraryModule.ShutDown" draft="yes">
+            <summary>Explicitly deinitializes Advanced PSD module and releases all the temporary files created by this module.</summary>
+            <remarks>Call this method after disposing all the created Advanced PSD objects and releasing all resources.</remarks>
+        </member>
+        <member name="N:Aurigma.GraphicsMill.Codecs" draft="yes">
+            <summary>The <see cref="N:Aurigma.GraphicsMill.Codecs" /> namespace contains classes intended to work with files that have one or more images (frames) inside, such as multipage TIFF files, animated GIF, etc. These classes support a lot of file formats and allow to work with metadata.</summary>
+        </member>
+        <member name="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame">
+            <summary>Represents PSD raster layer.</summary>
+            <remarks><para>Raster layers are base kind of PSD layers. Even text layers can be represented as raster ones. PSD file always keeps the rasterized version of such layer and the information like text string, font settings, etc. are kept as a metadata of the layer.</para><para>To be able to distinguish raster layers from text layers, use the <see cref="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame.Type" /> property. If it equals to <see cref="F:Aurigma.GraphicsMill.Codecs.PsdFrameType.Text" />, you should cast this layer to <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame" />. </para><para>PSD file can store such layers which cannot be recognized by Advanced PSD add-on. For example, it cannot handle adjustment layers, vector masks, etc. In this case the <see cref="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame.Type" /> property will equal to <see cref="F:Aurigma.GraphicsMill.Codecs.PsdFrameType.Unknown" />. It makes sense to verify the type of the layer before you try to extract anything from it to avoid unknown layers.</para></remarks>
+            <threadsafety static="true" instance="true" />
+        </member>
+        <member name="M:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame.{dtor}" draft="yes">
+            <summary>Enables using delete operator in C++ applications. It is strongly not recommended to use it directly.</summary>
+        </member>
+        <member name="M:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame.CreateEmptyEncoderOptions">
+            <exclude />
+        </member>
+        <member name="M:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame.#ctor" draft="yes">
+            <summary>Creates and initializes new <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame" /> class instance.</summary>
+            <remarks>Currently the Advanced PSD add-on can only read PSD files. You cannot write such files, that's why on practice you need not create frames explicitly using constructors.</remarks>
+            <overloads><summary>Creates and initializes new <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame" /> class instance.</summary><remarks>Currently the Advanced PSD add-on can only read PSD files. You cannot write such files, that's why on practice you need not create frames explicitly using constructors.</remarks></overloads>
+        </member>
+        <member name="M:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame.#ctor(Aurigma.GraphicsMill.Bitmap)" draft="yes">
+            <summary>Creates new <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame" /> class instance and initializes it by the specified bitmap.</summary>
+            <param name="bitmap"><see cref="T:Aurigma.GraphicsMill.Bitmap" /> class instance which should be associated with this frame. To put another bitmap into frame, you should use <see cref="M:Aurigma.GraphicsMill.Codecs.Frame.SetBitmap(Aurigma.GraphicsMill.Bitmap)" /> method.</param>
+            <remarks><para>Currently the Advanced PSD add-on can only read PSD files. You cannot write such files, that's why on practice you need not create frames explicitly using constructors.</para></remarks>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame.Type">
+            <summary>Gets the type of the layer.</summary>
+            <value><see cref="T:Aurigma.GraphicsMill.Codecs.PsdFrameType" /> value which specifies whether the current PSD layer is raster, text, or anything else.</value>
+            <remarks><para>If this property equals to <see cref="F:Aurigma.GraphicsMill.Codecs.PsdFrameType.Text" />, you should cast this frame instance to <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame" /> class to be able to get access to text properties of the layer.</para></remarks>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame.Visible">
+            <summary>Gets the value specifying whether the layer represented by this frame is visible.</summary>
+            <value>A <see cref="T:System.Boolean" /> value that specifies whether the layer represented by this frame is visible.</value>
+        </member>
+        <member name="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader" draft="yes">
+            <summary>This class is used to read PSD files layer by layer.</summary>
+            <remarks><para>PSD file format is popular for creating graphics design templates for web sites as well as for printing production. The great feature of PSD format is that it allows to keep image separated by so-called <i>layers</i>. It enables designers to easily modify only one piece of image without having to change the entire image. Also, the layer can be easily hidden/shown with a single click. </para><para>Advanced PSD add-on supports two kinds of layers: raster and text ones. Raster layers contain an image (bitmap). Text layers contain a text string as well as font and paragraph settings as well as a number of other information which helps to render the text string. Also, text layers always contain rasterized text string (i.e. they can be interpreted as a particular case of raster layers). In fact PSD files can store other kinds of layers (such as vector masks, adjustment layers, etc), however Advanced PSD add-on does not support them and they are treated as <i>unknown</i>.</para><para>This way PSD files are convenient to use as templates for personalized graphics. The idea is very simple: the designer creates a template and when it is necessary to print or generate the personalized image, the software replaces some layers which contain the personal information by the custom data. For example, if you are building an application which prepares business cards, you can let users to change the company logo, first and last name of the person, their position, phone number, etc.  </para><para><see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader" /> has the same structure as any other reader object in Graphics Mill. To get layers (in terms of Graphics Mill, frames) you should use the <c>foreach</c> statement or the <see cref="M:Aurigma.GraphicsMill.Codecs.FormatReader.LoadFrame(System.Int32)" /> method. This way you will get instances of the <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame" /> object. To extract the bitmap from that object, use the <see cref="M:Aurigma.GraphicsMill.Codecs.Frame.GetBitmap(Aurigma.GraphicsMill.Bitmap)" /> method. </para><para>If the layer is text, you can extract the text information from it. To do it, you need to make sure that the frame has a text type, check out the value of the <see cref="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame.Type" /> property. If it equals to <see cref="F:Aurigma.GraphicsMill.Codecs.PsdFrameType.Text" />, you can cast this frame to <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame" /> which exposes all necessary text settings.</para><note><para>When you use Advanced PSD add-on you should remember that it supports only limited subset of PSD files. A lot of PSD features are not supported. That's why you should not expect that you can process arbitrary PSD file 100% correctly. You need to prepare PSD templates keeping in mind limitations of the Advanced PSD add-on.</para><para>Another caveat concerns the text rendering. If you render the text string yourself using the Graphics Mill drawing means, you may find out that the result is slightly different than in Photoshop. The problem is that Graphics Mill uses standard Microsoft font rasterizer. At the same time, Adobe has their own font rasterizer which is used in all their products. Therefore you will never get per-pixel accuracy. In particular, the width of the string rendered by Photoshop and Graphics Mill may vary on few pixels. Nonetheless in most tasks it does not make problems. </para></note></remarks>
+            <threadsafety static="true" instance="true" />
+        </member>
+        <member name="M:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader.{dtor}" draft="yes">
+            <summary>Enables using delete operator in C++ applications. It is strongly not recommended to use it directly.</summary>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader.AdobeResources" draft="yes">
+            <summary>Gets Adobe image resource blocks from file. Not currently implemented, so NULL is always returned.</summary>
+        </member>
+        <member name="M:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader.Clone">
+            <summary>Creates a full copy of this <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader" /> object.</summary>
+            <returns><see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader" /> object containing full copy of the current object.</returns>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader.CodecPriority">
+            <summary>Returns the priority of the codec.</summary>
+            <value>The priority of the codec.</value>
+            <remarks><para>Graphics Mill uses this value to resolve the conflict when several codec classes are used to load the same file format. It will choose the codec class which has the higher priority.</para></remarks>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader.Exif">
+            <summary>Gets EXIF data collection from file.</summary>
+            <value><see cref="T:Aurigma.GraphicsMill.Codecs.ExifDictionary" /> class instance that contains EXIF data collection obtained from the file.</value>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader.Height">
+            <summary>Gets the height of the PSD image.</summary>
+            <value>An integer value specifying the height of entire PSD image.</value>
+            <remarks><para>This property returns the height of the entire image which it will have after you merge all layers. Typically each layer has different dimensions (less or equal to this one).</para></remarks>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader.Iptc">
+            <summary>Gets IPTC data collection from file.</summary>
+            <value><see cref="T:Aurigma.GraphicsMill.Codecs.IptcDictionary" /> class instance that contains IPTC data collection obtained from the file.</value>
+        </member>
+        <member name="M:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader.#ctor" draft="yes">
+            <summary>Creates and initializes new <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader" /> class instance.</summary>
+            <overloads><summary>Creates and initializes new <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader" /> class instance.</summary></overloads>
+        </member>
+        <member name="M:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader.#ctor(System.String)" draft="yes">
+            <summary>Creates and initializes new <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader" /> class instance. It also opens this reader on specified file.</summary>
+            <param name="fileName">Name of the file to open the reader on.</param>
+        </member>
+        <member name="M:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader.#ctor(System.IO.Stream)" draft="yes">
+            <summary>Creates and initializes new <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader" /> class instance. It also opens this reader on specified stream.</summary>
+            <param name="stream"><see cref="T:System.IO.Stream" /> class instance to open the reader on.</param>
+        </member>
+        <member name="M:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader.OnCheckForSupport(System.IO.Stream)">
+            <exclude />
+        </member>
+        <member name="M:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader.OnClose">
+            <exclude />
+        </member>
+        <member name="M:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader.OnFrameLoad(System.Int32)">
+            <exclude />
+        </member>
+        <member name="M:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader.OnOpen">
+            <exclude />
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader.Width">
+            <summary>Gets the width of the PSD image.</summary>
+            <value>An integer value specifying the width of entire PSD image.</value>
+            <remarks><para>This property returns the width of the entire image which it will have after you merge all layers. Typically each layer has different dimensions (less or equal to this one).</para></remarks>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader.Xmp" draft="yes">
+            <summary>Gets XMP metadata from file. Not currently implemented, so NULL is always returned.</summary>
+        </member>
+        <member name="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame" draft="yes">
+            <summary>Represents PSD text layer.</summary>
+            <remarks><para>The text layer is a particular case of a raster layer. It always contains the bitmap with rasterized text string, as well as: </para><list type="bullet"><item><description>The text string itself (the <see cref="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.Text" /> property). </description></item><item><description>The font settings (the <see cref="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.Font" /> property). </description></item><item><description>Paragraph settings (such properties as <see cref="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.LeftIndent" />, <see cref="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.RightIndent" />, <see cref="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.Justification" />, and others). </description></item><item><description>The text color (the <see cref="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.Color" /> property). </description></item><item><description>The text box (the <see cref="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.TextBox" /> property). </description></item></list><para>Typically you get an instance of this class in the following way: </para><list type="number"><item><description>Iterate through the PSD file layers (you will get them as <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame" />).</description></item><item><description>Check the <see cref="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame.Type" /> property value. </description></item><item><description>If it is <see cref="F:Aurigma.GraphicsMill.Codecs.PsdFrameType.Text" />, cast the frame class to <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame" />.</description></item></list></remarks>
+            <threadsafety static="true" instance="true" />
+        </member>
+        <member name="M:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.{dtor}" draft="yes">
+            <summary>Enables using delete operator in C++ applications. It is strongly not recommended to use it directly.</summary>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.Color">
+            <summary>Gets/sets a color of the text string stored in this layer.</summary>
+            <value><see cref="T:Aurigma.GraphicsMill.Color" /> value which specifies the color of the text string stored in this layer.</value>
+            <remarks><para>Actual type of the color depends on the color space of the PSD file. E.g for RGB image it will be <see cref="T:Aurigma.GraphicsMill.RgbColor" />, and for CMYK it will be <see cref="T:Aurigma.GraphicsMill.CmykColor" />.</para></remarks>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.FirstLineIndent">
+            <summary>Gets/sets the first line indent of this layer paragraph settings.</summary>
+            <value>An integer value which specifies the first line indent of this layer paragraph settings.</value>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.Font">
+            <summary>Gets/sets the font settings of the text string stored in this layer.</summary>
+            <value><see cref="T:Aurigma.GraphicsMill.Drawing.Font" /> class instance which contains the font settings of the text string stored in this layer.</value>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.Justification">
+            <summary>Gets/sets the justification of the text string inside the paragraph.</summary>
+            <value><see cref="T:Aurigma.GraphicsMill.Codecs.PsdTextJustification" /> value which specifies how the text is justified in the layer.</value>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.LeftIndent">
+            <summary>Gets/sets the left margin indent of this layer paragraph settings.</summary>
+            <value>An integer value which specifies the left margin indent of this layer paragraph settings.</value>
+        </member>
+        <member name="M:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.#ctor">
+            <summary>Creates and initializes new <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame" /> class instance.</summary>
+            <remarks>Currently the Advanced PSD add-on can only read PSD files. You cannot write such files, that's why on practice you need not create frames explicitly using constructors.</remarks>
+            <overloads><summary>Creates and initializes new <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame" /> class instance.</summary><remarks>Currently the Advanced PSD add-on can only read PSD files. You cannot write such files, that's why on practice you need not create frames explicitly using constructors.</remarks></overloads>
+        </member>
+        <member name="M:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.#ctor(Aurigma.GraphicsMill.Bitmap)">
+            <summary>Creates new <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame" /> class instance and initializes it by the specified bitmap.</summary>
+            <param name="bitmap"><see cref="T:Aurigma.GraphicsMill.Bitmap" /> class instance which should be associated with this frame. To put another bitmap into frame, you should use <see cref="M:Aurigma.GraphicsMill.Codecs.Frame.SetBitmap(Aurigma.GraphicsMill.Bitmap)" /> method.</param>
+            <remarks><para>Currently the Advanced PSD add-on can only read PSD files. You cannot write such files, that's why on practice you need not create frames explicitly using constructors.</para></remarks>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.RightIndent">
+            <summary>Gets/sets the right margin indent of this layer paragraph settings.</summary>
+            <value>An integer value which specifies the right margin indent of this layer paragraph settings.</value>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.SpaceAfterParagraph">
+            <summary>Gets/sets the value which specifies the space after each paragraph in the layer.</summary>
+            <value>An integer value which specifies the space after each paragraph in the layer.</value>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.SpaceBeforeParagraph">
+            <summary>Gets/sets the value which specifies the space before each paragraph in the layer.</summary>
+            <value>An integer value which specifies the space before each paragraph in the layer.</value>
+            <remarks><note>This value is not applied for the very first paragraph (i.e. no empty space should be inserted above the entire layer).</note></remarks>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.Text">
+            <summary>Gets/sets the text string stored in this layer.</summary>
+            <value>The text string stored in this layer.</value>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.TextBox">
+            <summary>Gets/sets the boundaries of the text field of this layer.</summary>
+            <value><see cref="T:System.Drawing.RectangleF" /> class instance which contains the boundaries of the text field.</value>
+            <remarks><para>You should distinguish coordinates/dimensions of the text layer and the text box. The text layer coordinates/dimensions specify the bounding rectangle for the visible part of the layer. The text box specifies the area which the designer of the PSD file assigns for the text. The text is aligned relatively this box and if the text is multiline, it is used to break words into strings. If the text string exceeds this box, it should be clipped.</para></remarks>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.TextBrush">
+            <summary>Gets the brush object which represents the text color.</summary>
+            <value><see cref="T:Aurigma.GraphicsMill.Drawing.SolidBrush" /> which has the same color as specified by the <see cref="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.Color" /> property.</value>
+            <remarks><para>This property is more convenient to use than the <see cref="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.Color" /> when you are drawing the text string with <see cref="M:Aurigma.GraphicsMill.Drawing.GdiGraphics.DrawString(System.String,Aurigma.GraphicsMill.Drawing.Font,Aurigma.GraphicsMill.Drawing.Pen,Aurigma.GraphicsMill.Drawing.Brush,System.Int32,System.Int32)" />. </para></remarks>
+        </member>
+        <member name="P:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame.Type">
+            <summary>Gets a type of the frame.</summary>
+            <value>Always returns <see cref="F:Aurigma.GraphicsMill.Codecs.PsdFrameType.Text" />.</value>
+        </member>
+        <member name="T:Aurigma.GraphicsMill.Codecs.PsdFrameType">
+            <summary>Contains possible types of PSD layers (i.e. frames of <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdReader" />).</summary>
+            <remarks><para>Text layers can be interpreted as raster ones which include additional meta-information about the text stored in this frame (like the text string, font and paragraph settings, etc). You can get the bitmap from such frames which will contain rasterized text string.</para><para>When you iterate through frames of the PSD file, be sure to skip unknown layers. It is necessary to avoid problems with extracting bitmaps which are not available in such layers.</para></remarks>
+        </member>
+        <member name="F:Aurigma.GraphicsMill.Codecs.PsdFrameType.Raster">
+            <summary>Raster layer (presented by the <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame" /> class instance).</summary>
+        </member>
+        <member name="F:Aurigma.GraphicsMill.Codecs.PsdFrameType.Text">
+            <summary>Text layer (presented by the <see cref="T:Aurigma.GraphicsMill.Codecs.AdvancedPsdTextFrame" /> class instance).</summary>
+        </member>
+        <member name="F:Aurigma.GraphicsMill.Codecs.PsdFrameType.Unknown">
+            <summary>Unsupported type of layer (like adjustment layers, etc).</summary>
+        </member>
+        <member name="T:Aurigma.GraphicsMill.Codecs.PsdTextJustification">
+            <summary>Contains all possible types of justifications of text in the PSD text layer.</summary>
+        </member>
+        <member name="F:Aurigma.GraphicsMill.Codecs.PsdTextJustification.All">
+            <summary>Double-sided justification. If the last string in the paragraph is incomplete, it is also aligned to both left and right sides.</summary>
+        </member>
+        <member name="F:Aurigma.GraphicsMill.Codecs.PsdTextJustification.Center">
+            <summary>Center justification.</summary>
+        </member>
+        <member name="F:Aurigma.GraphicsMill.Codecs.PsdTextJustification.LastCenter">
+            <summary>Double-sided justification. If the last string in the paragraph is incomplete, it is centered.</summary>
+        </member>
+        <member name="F:Aurigma.GraphicsMill.Codecs.PsdTextJustification.LastLeft">
+            <summary>Double-sided justification. If the last string in the paragraph is incomplete, it is aligned to the left side.</summary>
+        </member>
+        <member name="F:Aurigma.GraphicsMill.Codecs.PsdTextJustification.LastRight">
+            <summary>Double-sided justification. If the last string in the paragraph is incomplete, it is aligned to the right side.</summary>
+        </member>
+        <member name="F:Aurigma.GraphicsMill.Codecs.PsdTextJustification.Left">
+            <summary>Left justification.</summary>
+        </member>
+        <member name="F:Aurigma.GraphicsMill.Codecs.PsdTextJustification.Right">
+            <summary>Right justification.</summary>
+        </member>
+    </members>
+</doc>

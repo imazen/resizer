@@ -1,0 +1,1 @@
+﻿Expose a delegate that controls whether the VirtualPathProvider path is taken or not.
