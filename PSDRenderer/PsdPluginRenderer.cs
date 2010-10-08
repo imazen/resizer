@@ -12,7 +12,7 @@ namespace PsdRenderer
 {
     public class PsdPluginRenderer: IPsdRenderer
     {
-        public Bitmap Render(Stream s, RenderLayerDelegate showLayerCallback)
+        public Bitmap Render(Stream s, out IList<ITextLayer> textLayers, RenderLayerDelegate showLayerCallback)
         {
             PsdFile file = new PsdFile();
             file.Load(s);
@@ -36,6 +36,7 @@ namespace PsdRenderer
                     }
                 }
             }
+            textLayers = getTextLayers(file);
             return b;
         }
 
@@ -44,50 +45,33 @@ namespace PsdRenderer
         {
             PsdFile file = new PsdFile();
             file.Load(s);
+            return getTextLayers(file);
+        }
+        private IList<ITextLayer> getTextLayers(PsdFile file)
+        {
             List<ITextLayer> items = new List<ITextLayer>(file.Layers.Count);
-
             for (int i = 1; i < file.Layers.Count; i++)
             {
                 List<PhotoshopFile.Layer.AdjustmentLayerInfo> adjustments = file.Layers[i].AdjustmentInfo;
-                for (int j = 0; j < adjustments.Count; j++){
-                    if (adjustments[j].Key.Equals("TySh")){
-                        items.Add(new TextLayer(file.Layers[i]));
+                for (int j = 0; j < adjustments.Count; j++)
+                {
+                    if (adjustments[j].Key.Equals("TySh"))
+                    {
+                        items.Add(new TextLayer(file.Layers[i],i));
                     }
                 }
             }
             return items;
         }
 
-        class TextLayer : ITextLayer
+        class TextLayer : TextLayerBase
         {
-            private string _name = null, _text = null;
-            private Rectangle _rect = Rectangle.Empty;
-            private bool _visible = false;
-            public TextLayer(Layer layer)
+            public TextLayer(Layer layer, int index)
             {
                 _name = layer.Name;
                 _rect = layer.Rect;
                 _visible = layer.Visible;
-            }
-            public string Name
-            {
-                get { return _name; }
-            }
-
-            public Rectangle Rect
-            {
-                get { return _rect; }
-            }
-
-            public string Text
-            {
-                get { return _text; }
-            }
-
-
-            public bool Visible
-            {
-                get { return _visible; }
+                _index = index;
             }
         }
 

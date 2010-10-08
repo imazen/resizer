@@ -10,8 +10,8 @@
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PSDRenderer</RootNamespace>
-    <AssemblyName>PSDRenderer</AssemblyName>
+    <RootNamespace>PsdRenderer</RootNamespace>
+    <AssemblyName>PsdRenderer</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -57,6 +57,7 @@
   <ItemGroup>
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="PerfTest.aspx" />
     <Content Include="Scripts\jquery-1.4.1-vsdoc.js" />
     <Content Include="Scripts\jquery-1.4.1.js" />
     <Content Include="Scripts\jquery-1.4.1.min.js" />
@@ -72,6 +73,14 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MemCachedFile.cs" />
+    <Compile Include="PerfTest.aspx.cs">
+      <DependentUpon>PerfTest.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PerfTest.aspx.designer.cs">
+      <DependentUpon>PerfTest.aspx</DependentUpon>
+    </Compile>
     <Compile Include="PsdPluginRenderer.cs" />
     <Compile Include="GraphicsMillRenderer.cs" />
     <Compile Include="PsdProvider.cs" />
@@ -109,7 +118,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>58980</DevelopmentServerPort>
+          <DevelopmentServerPort>54300</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>
