@@ -12,6 +12,7 @@ using Aurigma.GraphicsMill.Codecs;
 using System.Diagnostics;
 using fbs.ImageResizer;
 using fbs;
+using System.Collections.Specialized;
 namespace PsdRenderer
 {
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
@@ -36,59 +37,90 @@ namespace PsdRenderer
             _connectionString = ConfigurationManager.ConnectionStrings["database"].ConnectionString;
         }
         /// <summary>
+        /// Returns the renderer object selected in the querystring
+        /// </summary>
+        /// <returns></returns>
+        public static IPsdRenderer GetSelectedRenderer(NameValueCollection queryString)
+        {
+            //Renderer object
+            IPsdRenderer renderer = null;
+            //The querystring-specified renderer name
+            string sRenderer = null;
+            if (queryString["renderer"] != null) sRenderer = queryString["renderer"].ToLowerInvariant();
+            //Build the correct renderer
+            if (("graphicsmill").Equals(sRenderer))
+                renderer = new GraphicsMillRenderer();
+            else
+                renderer = new PsdPluginRenderer();
+            return renderer;
+        }
+
+        /// <summary>
+        /// Creates a callback that can be used to filter layer visibility.
+        /// </summary>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        private static RenderLayerDelegate BuildLayerCallback(NameValueCollection queryString)
+        {
+            //Which layers do we show?
+            string showLayersWith = "1";
+            if (queryString["showlayerswith"] != null) showLayersWith = queryString["showlayerswith"];
+
+            return delegate(int index, string name, bool visibleNow)
+            {
+                if (visibleNow) return true;
+                return (index < 6 || name.Contains(showLayersWith));
+            };
+        }
+
+        public Stream getStream(string virtualPath)
+        {
+            return getStream(virtualPath, HttpContext.Current.Request.QueryString);
+        }
+        /// <summary>
         /// Returns a stream to the 
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Stream getStream(string virtualPath)
+        public static Stream getStream(string virtualPath, NameValueCollection queryString)
         {
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
             //Renderer object
-            IPsdRenderer renderer = null;
-            //The querystring-specified renderer name
-            string sRenderer = null;
-            if (HttpContext.Current.Request.QueryString["renderer"] != null) sRenderer = HttpContext.Current.Request.QueryString["renderer"].ToLowerInvariant();
-            //Build the correct renderer
-            if (("graphicsmill").Equals(sRenderer))
-                renderer = new GraphicsMillRenderer();
-            else
-                renderer = new PsdPluginRenderer();
+            IPsdRenderer renderer = GetSelectedRenderer(queryString);
             
             //Bitmap we will render to
             System.Drawing.Bitmap b = null;
 
-            //Which layers do we show?
-            string showLayersWith = "12288";
-            if (HttpContext.Current.Request.QueryString["showlayerswith"] != null) showLayersWith = HttpContext.Current.Request.QueryString["showlayerswith"];
-
-            //Open the file.
-            using (Stream s = System.IO.File.OpenRead(getPhysicalPath(virtualPath))){
+            MemCachedFile file = MemCachedFile.GetCachedFile(getPhysicalPath(virtualPath));
+            using (Stream s = file.GetStream()){
                 //Time just the parsing/rendering
                 Stopwatch swRender = new Stopwatch();
                 swRender.Start();
 
+                IList<ITextLayer> textLayers = null;
                 //Use the selected renderer to parse the file and compose the layers, using this delegate callback to determine which layers to show.
-                b = renderer.Render(s,
-                    delegate(int index, string name, bool visibleNow)
-                    {
-                        if (visibleNow) return true;
-                        return (index < 6 || name.Contains(showLayersWith));
-                    });
+                b = renderer.Render(s, out textLayers, BuildLayerCallback(queryString));
+
+                //Save text layers for later use
+                file.setSubkey("textlayers_" + renderer.ToString(), textLayers);
+
                 //How fast?
                 swRender.Stop();
                 HttpContext.Current.Trace.Write("Using encoder " + renderer.ToString() + ", rendering stream to a composed Bitmap instance took " + swRender.ElapsedMilliseconds.ToString() + "ms");
-
             }
+
             //Memory stream for encoding the file
             MemoryStream ms = new MemoryStream();
             //Encode image to memory stream, then seek the stream to byte 0
             using (b)
             {
+                yrl y = new yrl(virtualPath);
+                y.QueryString = queryString;
                 //Use whatever settings appear in the URL 
-                ImageOutputSettings ios = new ImageOutputSettings(yrl.Current);
+                ImageOutputSettings ios = new ImageOutputSettings(y);
                 ios.SaveImage(ms, b);
                 ms.Seek(0, SeekOrigin.Begin); //Reset stream for reading
             }
@@ -99,48 +131,46 @@ namespace PsdRenderer
             return ms;
         }
 
-        public static IList<ITextLayer> getTextLayers(string virtualPath)
+        public static IList<ITextLayer> getVisibleTextLayers(string virtualPath, NameValueCollection queryString)
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
             //Renderer object
-            IPsdRenderer renderer = null;
-            //The querystring-specified renderer name
-            string sRenderer = null;
-            if (HttpContext.Current.Request.QueryString["renderer"] != null) sRenderer = HttpContext.Current.Request.QueryString["renderer"].ToLowerInvariant();
-            //Build the correct renderer
-            if (("graphicsmill").Equals(sRenderer))
-                renderer = new GraphicsMillRenderer();
-            else
-                renderer = new PsdPluginRenderer();
-
-            IList<ITextLayer> layers = null;
-
-
-            //Open the file.
-            using (Stream s = System.IO.File.OpenRead(getPhysicalPath(virtualPath)))
-            {
-                //Time just the parsing/rendering
+            IPsdRenderer renderer = GetSelectedRenderer(queryString);
+            //File
+            MemCachedFile file = MemCachedFile.GetCachedFile(getPhysicalPath(virtualPath));
+            //key
+            string dataKey = "textlayers_" + renderer.ToString();
+           
+            //Try getting from the cache first
+            IList<ITextLayer> layers =file.getSubkey(dataKey) as IList<ITextLayer>;
+            if (layers == null){
+                //Time just the parsing
                 Stopwatch swRender = new Stopwatch();
                 swRender.Start();
 
-                //Use the selected renderer to parse the file and compose the layers, using this delegate callback to determine which layers to show.
-                layers = renderer.GetTextLayers(s);
+                layers = renderer.GetTextLayers(file.GetStream());
+                //Save to cache for later
+                file.setSubkey(dataKey,layers);
+
                 //How fast?
                 swRender.Stop();
-                HttpContext.Current.Trace.Write("Using decoder " + renderer.ToString() + ", enumerating layers took " + swRender.ElapsedMilliseconds.ToString() + "ms");
-
+                HttpContext.Current.Trace.Write("Using decoder " + renderer.ToString() + ",parsing file and enumerating layers took " + swRender.ElapsedMilliseconds.ToString() + "ms");
             }
+
+
+            //Now, time to filter layers to those that would be showing on the image right now.
             IList<ITextLayer> filtered = new List<ITextLayer>();
-            //Which layers do we show?
-            string showLayersWith = "12288";
-            if (HttpContext.Current.Request.QueryString["showlayerswith"] != null) showLayersWith = HttpContext.Current.Request.QueryString["showlayerswith"];
+            
+            //Generate a callback just like the one used in the renderer for filtering
+            RenderLayerDelegate callback = BuildLayerCallback(queryString);
 
             for (int i = 0; i < layers.Count; i++){
-                bool add = layers[i].Visible ;
-                if (!add && (layers[i].Name.Contains(showLayersWith))) add = true;
-                if (add) filtered.Add(layers[i]);
+                if (callback(layers[i].Index, layers[i].Name, layers[i].Visible))
+                {
+                    filtered.Add(layers[i]);
+                }
             }
             
             sw.Stop();
