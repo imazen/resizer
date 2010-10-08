@@ -88,6 +88,10 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ImageResizer\ImageResizer.csproj">
+      <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
+      <Name>ImageResizer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PsdVirtualPathProvider\PsdVirtualPathProvider.csproj">
       <Project>{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}</Project>
       <Name>PsdVirtualPathProvider</Name>
