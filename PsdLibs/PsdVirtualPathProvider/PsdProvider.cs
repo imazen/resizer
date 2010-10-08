@@ -34,7 +34,7 @@ namespace PsdRenderer
             : base()
         {
             //Override connection string here
-            _connectionString = ConfigurationManager.ConnectionStrings["database"].ConnectionString;
+            //_connectionString = ConfigurationManager.ConnectionStrings["database"].ConnectionString;
         }
         /// <summary>
         /// Returns the renderer object selected in the querystring
@@ -109,7 +109,7 @@ namespace PsdRenderer
 
                 //How fast?
                 swRender.Stop();
-                HttpContext.Current.Trace.Write("Using encoder " + renderer.ToString() + ", rendering stream to a composed Bitmap instance took " + swRender.ElapsedMilliseconds.ToString() + "ms");
+                trace("Using encoder " + renderer.ToString() + ", rendering stream to a composed Bitmap instance took " + swRender.ElapsedMilliseconds.ToString() + "ms");
             }
 
             //Memory stream for encoding the file
@@ -117,18 +117,25 @@ namespace PsdRenderer
             //Encode image to memory stream, then seek the stream to byte 0
             using (b)
             {
-                yrl y = new yrl(virtualPath);
-                y.QueryString = queryString;
                 //Use whatever settings appear in the URL 
-                ImageOutputSettings ios = new ImageOutputSettings(y);
+                ImageOutputSettings ios = new ImageOutputSettings(ImageOutputSettings.GetImageFormatFromExtension(System.IO.Path.GetExtension(virtualPath)),queryString);
                 ios.SaveImage(ms, b);
                 ms.Seek(0, SeekOrigin.Begin); //Reset stream for reading
             }
 
             sw.Stop();
-            HttpContext.Current.Trace.Write("Total time, including encoding: " + sw.ElapsedMilliseconds.ToString() + "ms");
+            trace("Total time, including encoding: " + sw.ElapsedMilliseconds.ToString() + "ms");
 
             return ms;
+        }
+
+
+        private static void trace(string msg)
+        {
+            if (HttpContext.Current == null)
+                System.Diagnostics.Debug.Write(msg);
+            else
+                HttpContext.Current.Trace.Write(msg);
         }
 
         public static IList<ITextLayer> getVisibleTextLayers(string virtualPath, NameValueCollection queryString)
@@ -156,7 +163,7 @@ namespace PsdRenderer
 
                 //How fast?
                 swRender.Stop();
-                HttpContext.Current.Trace.Write("Using decoder " + renderer.ToString() + ",parsing file and enumerating layers took " + swRender.ElapsedMilliseconds.ToString() + "ms");
+                trace("Using decoder " + renderer.ToString() + ",parsing file and enumerating layers took " + swRender.ElapsedMilliseconds.ToString() + "ms");
             }
 
 
@@ -174,7 +181,7 @@ namespace PsdRenderer
             }
             
             sw.Stop();
-            HttpContext.Current.Trace.Write("Total time for enumerating, including file reading: " + sw.ElapsedMilliseconds.ToString() + "ms");
+            trace("Total time for enumerating, including file reading: " + sw.ElapsedMilliseconds.ToString() + "ms");
             return filtered;
 
         }
@@ -216,7 +223,15 @@ namespace PsdRenderer
         static string  getPhysicalPath(string virtualPath)
         {
             int ix = virtualPath.ToLowerInvariant().LastIndexOf(".psd");
-            return HttpContext.Current.Request.MapPath(virtualPath.Substring(0, ix + 4));
+            string str = virtualPath.Substring(0, ix + 4);
+            if (HttpContext.Current != null)
+            {
+                return HttpContext.Current.Request.MapPath(str);
+            }
+            else
+            {
+                return str.TrimStart('~','/').Replace('/','\\');
+            }
         }
 
 
