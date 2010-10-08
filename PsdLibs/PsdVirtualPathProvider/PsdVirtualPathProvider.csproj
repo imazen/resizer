@@ -42,6 +42,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -56,10 +58,6 @@
     <ProjectReference Include="..\..\ImageResizer\ImageResizer.csproj">
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Endogine\Endogine.Codecs.Photoshop\Endogine.Codecs.Photoshop.csproj">
-      <Project>{DBD4EB61-B00C-4DDF-B71C-E48CD9DE8B95}</Project>
-      <Name>Endogine.Codecs.Photoshop</Name>
     </ProjectReference>
     <ProjectReference Include="..\PsdPlugin\PsdFile\PsdFile.csproj">
       <Project>{DB6A1DE3-FAEB-451B-8EDB-D557B149BC8A}</Project>

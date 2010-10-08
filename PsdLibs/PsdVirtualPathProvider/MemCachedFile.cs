@@ -82,22 +82,39 @@ namespace PsdRenderer
             }
 
             sw.Stop();
-            HttpContext.Current.Trace.Write("MemCachedFile loaded file into memory in " + sw.ElapsedMilliseconds + "ms");
+            if (HttpContext.Current != null)
+                HttpContext.Current.Trace.Write("MemCachedFile loaded file into memory in " + sw.ElapsedMilliseconds + "ms");
         }
         private string path = null;
         private byte[] data = null;
+        private static Dictionary<string, MemCachedFile> _fallbackCache = new Dictionary<string, MemCachedFile>();
 
         public static MemCachedFile GetCachedFile(string physicalPath){
             string key = getCacheKey(physicalPath);
             MemCachedFile file = null;
-            if (HttpContext.Current.Cache[key] != null)
+            if (HttpContext.Current != null)
             {
-                file = (MemCachedFile)HttpContext.Current.Cache[key];
+                if (HttpContext.Current.Cache[key] != null)
+                {
+                    file = (MemCachedFile)HttpContext.Current.Cache[key];
+                }
+                else
+                {
+                    file = new MemCachedFile(physicalPath);
+                    HttpContext.Current.Cache.Insert(key, file, new CacheDependency(physicalPath));
+                }
             }
             else
             {
-                file = new MemCachedFile(physicalPath);
-                HttpContext.Current.Cache.Insert(key, file, new CacheDependency(physicalPath));
+                //Has no invalidation, but this is only used for benchmarks. Only runs when there is no http session.
+                lock(_fallbackCache){
+                    if (_fallbackCache.ContainsKey(key)) file = _fallbackCache[key];
+                    else
+                    {
+                        file = new MemCachedFile(physicalPath);
+                        _fallbackCache[key] = file;
+                    }
+                }
             }
             return file;
         }
