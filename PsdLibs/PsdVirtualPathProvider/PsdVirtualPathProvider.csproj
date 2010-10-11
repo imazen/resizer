@@ -8,7 +8,7 @@
     <ProjectGuid>{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PsdVirtualPathProvider</RootNamespace>
+    <RootNamespace>PsdRenderer</RootNamespace>
     <AssemblyName>PsdRenderer</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

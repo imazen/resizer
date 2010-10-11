@@ -7,7 +7,7 @@ using PsdRenderer;
 using System.Collections.Specialized;
 using fbs;
 
-namespace PSDRenderer
+namespace PsdSampleProject
 {
     public partial class _Default : System.Web.UI.Page
     {

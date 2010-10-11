@@ -5,14 +5,14 @@ using System.Web.Security;
 using System.Web.SessionState;
 using System.Web.Hosting;
 
-namespace PsdRenderer
+namespace PsdSampleProject
 {
     public class Global : System.Web.HttpApplication
     {
 
         protected void Application_Start(object sender, EventArgs e)
         {
-            HostingEnvironment.RegisterVirtualPathProvider(new PsdProvider());
+            HostingEnvironment.RegisterVirtualPathProvider(new PsdRenderer.PsdProvider());
         }
 
         protected void Session_Start(object sender, EventArgs e)
