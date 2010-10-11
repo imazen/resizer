@@ -87,6 +87,9 @@ namespace PsdRenderer
         }
         private string path = null;
         private byte[] data = null;
+        /// <summary>
+        /// Used only when there is not http session.
+        /// </summary>
         private static Dictionary<string, MemCachedFile> _fallbackCache = new Dictionary<string, MemCachedFile>();
 
         public static MemCachedFile GetCachedFile(string physicalPath){
