@@ -82,7 +82,11 @@ namespace PhotoshopFile
     }
 
     ///////////////////////////////////////////////////////////////////////////
-
+    /// <summary>
+    /// Decodes the main, composed layer of a PSD file into a bitmap with no transparency.
+    /// </summary>
+    /// <param name="psdFile"></param>
+    /// <returns></returns>
     public static Bitmap DecodeImage(PsdFile psdFile)
     {
       Bitmap bitmap = new Bitmap(psdFile.Columns, psdFile.Rows, PixelFormat.Format32bppArgb);
@@ -125,6 +129,7 @@ namespace PhotoshopFile
             pCurrPixel->Red = pixelColor.R;
             pCurrPixel->Green = pixelColor.G;
             pCurrPixel->Blue = pixelColor.B;
+            
 
             pCurrPixel += 1;
           }
@@ -195,14 +200,20 @@ namespace PhotoshopFile
 
     /////////////////////////////////////////////////////////////////////////// 
 
+    /// <summary>
+    /// Decodes a layer to create a bitmap with transparency.
+    /// </summary>
+    /// <param name="layer"></param>
+    /// <returns></returns>
     public static Bitmap DecodeImage(Layer layer)
     {
-      if (layer.Rect.Width == 0 || layer.Rect.Height == 0)
-      {
-        return null;
-      }
+      int width = layer.Rect.Width;
+      int height = layer.Rect.Height;
 
-      Bitmap bitmap = new Bitmap(layer.Rect.Width, layer.Rect.Height, PixelFormat.Format32bppArgb);
+      if (width == 0 || height == 0) return null;
+      
+
+      Bitmap bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
 
 #if TEST
       for (int y = 0; y < layer.Rect.Height; y++)
@@ -222,36 +233,59 @@ namespace PhotoshopFile
 
 #else
 
-      Rectangle r = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
+      Rectangle r = new Rectangle(0, 0, width, height);
       BitmapData bd = bitmap.LockBits(r, ImageLockMode.ReadWrite, bitmap.PixelFormat);
+
+      LayerWrapper l = new LayerWrapper(layer);
 
       unsafe
       {
         byte* pCurrRowPixel = (byte*)bd.Scan0.ToPointer();
 
-        for (int y = 0; y < layer.Rect.Height; y++)
+        for (int y = 0; y < height; y++)
         {
-          int rowIndex = y * layer.Rect.Width;
+          int rowIndex = y * width;
           PixelData* pCurrPixel = (PixelData*)pCurrRowPixel;
-          for (int x = 0; x < layer.Rect.Width; x++)
+          for (int x = 0; x < width; x++)
           {
             int pos = rowIndex + x;
 
-            Color pixelColor = GetColor(layer, pos);
-
-            if (layer.SortedChannels.ContainsKey(-2))
+            //Fast path for RGB mode, somewhat inlined.
+            if (l.colorMode == PsdFile.ColorModes.RGB)
             {
-                int maskAlpha = GetColor(layer.MaskData, x, y);
-                int oldAlpha = pixelColor.A;
+                //Add alpha channel if it exists.
+                if (l.hasalpha) 
+                    pCurrPixel->Alpha = l.alphabytes[pos];
+                else
+                    pCurrPixel->Alpha = 255;
+                //Apply mask if present.
+                if (l.hasmask)
+                    pCurrPixel->Alpha = (byte)((pCurrPixel->Alpha * GetMaskValue(layer.MaskData, x, y)) / 255);
+                
 
-                int newAlpha = (oldAlpha * maskAlpha) / 255;
-                pixelColor = Color.FromArgb(newAlpha,pixelColor);
+                pCurrPixel->Red = l.ch0bytes[pos];
+                pCurrPixel->Green = l.ch1bytes[pos];
+                pCurrPixel->Blue = l.ch2bytes[pos];
+
             }
+            else
+            {
+                Color pixelColor = GetColor(l, pos);
 
-            pCurrPixel->Alpha = pixelColor.A;
-            pCurrPixel->Red = pixelColor.R;
-            pCurrPixel->Green = pixelColor.G;
-            pCurrPixel->Blue = pixelColor.B;
+                if (l.hasmask)
+                {
+                    int maskAlpha = GetMaskValue(layer.MaskData, x, y);
+                    int oldAlpha = pixelColor.A;
+
+                    int newAlpha = (oldAlpha * maskAlpha) / 255;
+                    pixelColor = Color.FromArgb(newAlpha, pixelColor);
+                }
+
+                pCurrPixel->Alpha = pixelColor.A;
+                pCurrPixel->Red = pixelColor.R;
+                pCurrPixel->Green = pixelColor.G;
+                pCurrPixel->Blue = pixelColor.B;
+            }
 
             pCurrPixel += 1;
           }
@@ -264,68 +298,116 @@ namespace PhotoshopFile
 
       return bitmap;
     }
+    /// <summary>
+    /// This class caches direct references to objects used for every pixel, bypassing b-tree lookups and dereferencing.
+    /// </summary>
+    private class LayerWrapper
+    {
+        public LayerWrapper(Layer l)
+        {
+            colorMode = l.PsdFile.ColorMode;
+            hasalpha = l.SortedChannels.ContainsKey(-1);
+            hasmask = l.SortedChannels.ContainsKey(-2);
+            hasch0 = l.SortedChannels.ContainsKey(0);
+            hasch1 = l.SortedChannels.ContainsKey(1);
+            hasch2 = l.SortedChannels.ContainsKey(2);
+            hasch3 = l.SortedChannels.ContainsKey(3);
+            if (hasalpha) alphabytes = l.SortedChannels[-1].ImageData;
+            if (hasmask) mask = l.MaskData;
+            if (hasch0) ch0bytes = l.SortedChannels[0].ImageData;
+            if (hasch1) ch1bytes = l.SortedChannels[1].ImageData;
+            if (hasch2) ch2bytes = l.SortedChannels[2].ImageData;
+            if (hasch3) ch3bytes = l.SortedChannels[3].ImageData;
+            colorModeData = l.PsdFile.ColorModeData;
+        }
+        public PsdFile.ColorModes colorMode;
+        public byte[] colorModeData;
+        public byte[] alphabytes;
+        public Layer.Mask mask;
+        public byte[] ch0bytes;
+        public byte[] ch1bytes;
+        public byte[] ch2bytes;
+        public byte[] ch3bytes;
+        public bool hasalpha;
+        public bool hasmask;
+        public bool hasch0;
+        public bool hasch1;
+        public bool hasch2;
+        public bool hasch3;
+    }
 
     /////////////////////////////////////////////////////////////////////////// 
-
-    private static Color GetColor(Layer layer, int pos)
+    /// <summary>
+    /// Builds a color instance from the specified layer and position. Adds alpha value if channel exists.
+    /// </summary>
+    /// <param name="layer"></param>
+    /// <param name="pos"></param>
+    /// <returns></returns>
+    private static Color GetColor(LayerWrapper layer, int pos)
     {
       Color c = Color.White;
 
-      switch (layer.PsdFile.ColorMode)
+      switch (layer.colorMode)
       {
         case PsdFile.ColorModes.RGB:
-          c = Color.FromArgb(layer.SortedChannels[0].ImageData[pos],
-                             layer.SortedChannels[1].ImageData[pos],
-                             layer.SortedChannels[2].ImageData[pos]);
+          c = Color.FromArgb(layer.ch0bytes[pos],
+                             layer.ch1bytes[pos],
+                             layer.ch2bytes[pos]);
           break;
         case PsdFile.ColorModes.CMYK:
-          c = CMYKToRGB(layer.SortedChannels[0].ImageData[pos],
-                        layer.SortedChannels[1].ImageData[pos],
-                        layer.SortedChannels[2].ImageData[pos],
-                        layer.SortedChannels[3].ImageData[pos]);
+          c = CMYKToRGB(layer.ch0bytes[pos],
+                        layer.ch1bytes[pos],
+                        layer.ch2bytes[pos],
+                        layer.ch3bytes[pos]);
           break;
         case PsdFile.ColorModes.Multichannel:
-          c = CMYKToRGB(layer.SortedChannels[0].ImageData[pos],
-                        layer.SortedChannels[1].ImageData[pos],
-                        layer.SortedChannels[2].ImageData[pos],
+          c = CMYKToRGB(layer.ch0bytes[pos],
+                        layer.ch1bytes[pos],
+                        layer.ch2bytes[pos],
                         0);
           break;
         case PsdFile.ColorModes.Bitmap:
-          byte bwValue = ImageDecoder.GetBitmapValue(layer.SortedChannels[0].ImageData, pos);
+          byte bwValue = ImageDecoder.GetBitmapValue(layer.ch0bytes, pos);
           c = Color.FromArgb(bwValue, bwValue, bwValue);
           break;
         case PsdFile.ColorModes.Grayscale:
         case PsdFile.ColorModes.Duotone:
-          c = Color.FromArgb(layer.SortedChannels[0].ImageData[pos],
-                             layer.SortedChannels[0].ImageData[pos],
-                             layer.SortedChannels[0].ImageData[pos]);
+          c = Color.FromArgb(layer.ch0bytes[pos],
+                             layer.ch0bytes[pos],
+                             layer.ch0bytes[pos]);
           break;
         case PsdFile.ColorModes.Indexed:
           {
-            int index = (int)layer.SortedChannels[0].ImageData[pos];
-            c = Color.FromArgb((int)layer.PsdFile.ColorModeData[index],
-                             layer.PsdFile.ColorModeData[index + 256],
-                             layer.PsdFile.ColorModeData[index + 2 * 256]);
+              int index = (int)layer.ch0bytes[pos];
+            c = Color.FromArgb((int)layer.colorModeData[index],
+                             layer.colorModeData[index + 256],
+                             layer.colorModeData[index + 2 * 256]);
           }
           break;
         case PsdFile.ColorModes.Lab:
           {
-            c = LabToRGB(layer.SortedChannels[0].ImageData[pos],
-                         layer.SortedChannels[1].ImageData[pos],
-                         layer.SortedChannels[2].ImageData[pos]);
+              c = LabToRGB(layer.ch0bytes[pos],
+                         layer.ch1bytes[pos],
+                         layer.ch2bytes[pos]);
           }
           break;
       }
 
-      if (layer.SortedChannels.ContainsKey(-1))
-        c = Color.FromArgb(layer.SortedChannels[-1].ImageData[pos], c);
+      if (layer.hasalpha)
+        c = Color.FromArgb(layer.alphabytes[pos], c);
 
       return c;
     }
 
     /////////////////////////////////////////////////////////////////////////// 
-
-    private static int GetColor(Layer.Mask mask, int x, int y)
+    /// <summary>
+    /// Returns the alpha value of the mask at the specified coordinates
+    /// </summary>
+    /// <param name="mask"></param>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    private static int GetMaskValue(Layer.Mask mask, int x, int y)
     {
       int c = 255;
       
