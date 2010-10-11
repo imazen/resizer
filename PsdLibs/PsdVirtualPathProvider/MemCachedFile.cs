@@ -55,6 +55,7 @@ namespace PsdRenderer
         /// <param name="physicalPath"></param>
         MemCachedFile(string physicalPath)
         {
+            
             Stopwatch sw = new Stopwatch();
             sw.Start();
 

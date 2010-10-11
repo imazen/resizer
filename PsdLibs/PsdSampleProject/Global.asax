@@ -1,1 +1,1 @@
-﻿<%@ Application Codebehind="Global.asax.cs" Inherits="PsdRenderer.Global" Language="C#" %>
+﻿<%@ Application Codebehind="Global.asax.cs" Inherits="PsdSampleProject.Global" Language="C#" %>

@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PSDRenderer {
+namespace PsdSampleProject {
     
     
     public partial class _Default {
