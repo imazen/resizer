@@ -115,7 +115,6 @@ namespace fbs.ImageResizer
             }
 
         }
-
         public ImageFormat OriginalFormat = null;
         private ImageFormat _outputFormat = ImageFormat.Jpeg;
         /// <summary>

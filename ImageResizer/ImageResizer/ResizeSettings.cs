@@ -180,6 +180,19 @@ namespace fbs.ImageResizer
             }
             return RotateFlipType.RotateNoneFlipNone;
         }
+        /// <summary>
+        /// Returns true if all settings are at their defaults
+        /// </summary>
+        public bool IsEmpty
+        {
+            get
+            {
+                return width == -1 && height == -1 && maxwidth == -1 && maxheight == -1 && rotate == 0 && flip == RotateFlipType.RotateNoneFlipNone &&
+                    sourceFlip == RotateFlipType.RotateNoneFlipNone && crop == CropMode.None && customCropCoordinates == null &&
+                    stretch == StretchMode.Proportionally && scale == ScaleMode.DownscaleOnly;
+            }
+        }
+
         public float width = -1;
         public float height = -1;
         public float maxwidth = -1;
