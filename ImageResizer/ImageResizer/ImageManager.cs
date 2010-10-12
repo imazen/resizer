@@ -128,6 +128,30 @@ namespace fbs.ImageResizer
             }
         }
 
+        /// <summary>
+        /// Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
+        /// </summary>
+        /// <param name="sourceFile"></param>
+        /// <param name="targetFile"></param>
+        /// <param name="request"></param>
+        public virtual void BuildImage(IVirtualBitmapFile sourceFile, string targetFile, NameValueCollection queryString)
+        {
+            ImageFormat originalFormat = ImageOutputSettings.GetImageFormatFromPhysicalPath(sourceFile.VirtualPath);
+            //Allow AnimatedImageManager to be added without changing code - plugin style
+            //Resize image 
+            using (Bitmap thumb = BuildImage(sourceFile.GetBitmap(), originalFormat, queryString))
+            {
+                //Determines output format, includes code for saving in a variety of formats.
+                ImageOutputSettings ios = new ImageOutputSettings(originalFormat, queryString);
+
+                //Open stream and save format.
+                System.IO.FileStream fs = new FileStream(targetFile, FileMode.Create, FileAccess.Write);
+                using (fs)
+                {
+                    ios.SaveImage(fs, thumb);
+                }
+            }
+        }
 
         /// <summary>
         /// Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
@@ -476,8 +500,7 @@ namespace fbs.ImageResizer
                 //Draw padding around image if needed.
                 if (!paddingColor.Equals(opts.bgcolor) && paddingColor != Color.Transparent)
                     g.FillPolygon(new SolidBrush(paddingColor), size.targetArea);
-
-
+                
                 g.DrawImage(src, PolygonMath.getParallelogram(size.imageTarget), size.sourceRect, GraphicsUnit.Pixel);//, adjustments.getImageAttributes()
                
 

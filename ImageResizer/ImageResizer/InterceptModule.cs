@@ -157,7 +157,7 @@ namespace fbs.ImageResizer
                     {
                         IPrincipal user = app.Context.User as IPrincipal;
 
-                        if ("true".Equals(ConfigurationManager.AppSettings["DisableImageURLAuthorization"], StringComparison.OrdinalIgnoreCase))
+                        if ("true".Equals(ConfigurationManager.AppSettings["DisableImageURLAuthorization"], StringComparison.OrdinalIgnoreCase)) //TODO: Is this right?
                         {
 
                             // no user (must be anonymous...).. Or authentication doesn't work for this suffix. 
@@ -173,36 +173,21 @@ namespace fbs.ImageResizer
                         yrl current = new yrl(basePath);
                         current.QueryString = q;
 
-                        
-                        //If the file exists, resize it
-                        //dec-11-09 changed to use vpp
+                        //Override normal behavior with virtualpathprovider
                         Boolean virtualFile = "true".Equals(ConfigurationManager.AppSettings["ImageResizerUseVirtualPathProvider"], StringComparison.OrdinalIgnoreCase);
+
                         //Fall back mode - only use virtual path provider as a fallback if the file doesn't exist - recommended setting.
                         Boolean virtualFileFallBack = "true".Equals(ConfigurationManager.AppSettings["ImageResizerUseVirtualPathProviderAsFallback"], StringComparison.OrdinalIgnoreCase);
 
-                        if (virtualFileFallBack)
-                        {
-                            if (current.FileExists)
-                                ResizeRequest(app.Context, current);
-                                //Fall back to the virtual path provider in case it is using a different data store
-                            else if (HostingEnvironment.VirtualPathProvider.FileExists(getVPPSafePath(current)))
-                                ResizeRequest(app.Context, current);
+                        
+                        //If the file exists, resize it
+                        if (current.FileExists)
+                            ResizeRequest(app.Context, current);
+                            //Fall back to the virtual path provider in case it is using a different data store
+                        else if ((virtualFile || virtualFileFallBack) && HostingEnvironment.VirtualPathProvider.FileExists(getVPPSafePath(current)))
+                            ResizeRequest(app.Context, current);
 
-                        }
-                        else
-                        {
-                            //Try using the virtual path provid
-                            if (virtualFile)
-                            {
-                                if (HostingEnvironment.VirtualPathProvider.FileExists(getVPPSafePath(current)))
-                                    ResizeRequest(app.Context, current);
-                            }
-                            else
-                            {
-                                if (current.FileExists)
-                                    ResizeRequest(app.Context, current);
-                            }
-                        }
+                        
                         
                     }
                 }
@@ -297,9 +282,9 @@ namespace fbs.ImageResizer
             VirtualFile vf = virtualFile ? HostingEnvironment.VirtualPathProvider.GetFile(getVPPSafePath(current)) : null;
             
             //In fallback mode, only create vf if the file doesn't exist.
-            if (vf == null && virtualFileFallBack){
+            if (vf == null && virtualFileFallBack) 
                 if (!File.Exists(current.Local)) vf = HostingEnvironment.VirtualPathProvider.GetFile(getVPPSafePath(current));
-            }
+            
                 
 
             //This is where the cached version goes
@@ -343,8 +328,12 @@ namespace fbs.ImageResizer
                     //than one thread at a time for the specified source file (current.Local)
 
                     if (vf != null)
-                    { //For VPP use
-                        ImageManager.getBestInstance().BuildImage(vf, cachedFile, current.QueryString);
+                    {   //For VPP use.
+                        //Use bitmap interface if available
+                        if (vf is IVirtualBitmapFile)
+                            ImageManager.getBestInstance().BuildImage((IVirtualBitmapFile)vf, cachedFile, current.QueryString);
+                        else
+                            ImageManager.getBestInstance().BuildImage(vf, cachedFile, current.QueryString);
                     }
                     else
                     {
