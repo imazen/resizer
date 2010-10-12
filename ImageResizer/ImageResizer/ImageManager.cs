@@ -188,7 +188,7 @@ namespace fbs.ImageResizer
                 q["scale"], q["stretch"], q["crop"], q["page"], q["time"], q["quality"], q["colors"], q["bgcolor"],
                 q["rotate"], q["flip"], q["sourceFlip"], q["borderWidth"],
                 q["borderColor"], q["paddingWidth"], q["paddingColor"], q["ignoreicc"],
-                q["shadowColor"],q["shadowOffset"],q["shadowWidth"],q["frame"],q["page"]);
+                q["shadowColor"], q["shadowOffset"], q["shadowWidth"], q["frame"], q["page"], q["useresizingpipeline"]);
         }
 
         /// <summary>
