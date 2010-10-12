@@ -88,30 +88,7 @@ namespace PsdRenderer
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            //Renderer object
-            IPsdRenderer renderer = GetSelectedRenderer(queryString);
-            
-            //Bitmap we will render to
-            System.Drawing.Bitmap b = null;
-
-            MemCachedFile file = MemCachedFile.GetCachedFile(getPhysicalPath(virtualPath));
-            using (Stream s = file.GetStream()){
-                //Time just the parsing/rendering
-                Stopwatch swRender = new Stopwatch();
-                swRender.Start();
-
-                IList<ITextLayer> textLayers = null;
-                //Use the selected renderer to parse the file and compose the layers, using this delegate callback to determine which layers to show.
-                b = renderer.Render(s, out textLayers, BuildLayerCallback(queryString));
-
-                //Save text layers for later use
-                file.setSubkey("textlayers_" + renderer.ToString(), textLayers);
-
-                //How fast?
-                swRender.Stop();
-                trace("Using encoder " + renderer.ToString() + ", rendering stream to a composed Bitmap instance took " + swRender.ElapsedMilliseconds.ToString() + "ms");
-            }
-
+            System.Drawing.Bitmap b = getBitmap(virtualPath, queryString);
             //Memory stream for encoding the file
             MemoryStream ms = new MemoryStream();
             //Encode image to memory stream, then seek the stream to byte 0
@@ -127,6 +104,42 @@ namespace PsdRenderer
             trace("Total time, including encoding: " + sw.ElapsedMilliseconds.ToString() + "ms");
 
             return ms;
+        }
+        public System.Drawing.Bitmap getBitmap(string virtualPath){
+            return getBitmap(virtualPath,HttpContext.Current.Request.QueryString);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static System.Drawing.Bitmap getBitmap(string virtualPath, NameValueCollection queryString)
+        {
+            //Renderer object
+            IPsdRenderer renderer = GetSelectedRenderer(queryString);
+
+            //Bitmap we will render to
+            System.Drawing.Bitmap b = null;
+
+            MemCachedFile file = MemCachedFile.GetCachedFile(getPhysicalPath(virtualPath));
+            using (Stream s = file.GetStream())
+            {
+                //Time just the parsing/rendering
+                Stopwatch swRender = new Stopwatch();
+                swRender.Start();
+
+                IList<ITextLayer> textLayers = null;
+                //Use the selected renderer to parse the file and compose the layers, using this delegate callback to determine which layers to show.
+                b = renderer.Render(s, out textLayers, BuildLayerCallback(queryString));
+
+                //Save text layers for later use
+                file.setSubkey("textlayers_" + renderer.ToString(), textLayers);
+
+                //How fast?
+                swRender.Stop();
+                trace("Using encoder " + renderer.ToString() + ", rendering stream to a composed Bitmap instance took " + swRender.ElapsedMilliseconds.ToString() + "ms");
+            }
+            return b;
         }
 
 
@@ -271,7 +284,7 @@ namespace PsdRenderer
 
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Minimal)]
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.Minimal)]
-    public class PsdVirtualFile : VirtualFile, fbs.ImageResizer.IVirtualFileWithModifiedDate
+    public class PsdVirtualFile : VirtualFile, IVirtualFileWithModifiedDate, IVirtualBitmapFile
     {
   
         private PsdProvider provider;
@@ -297,10 +310,15 @@ namespace PsdRenderer
         }
 
         /// <summary>
-        /// Returns a stream to the database blob associated with the id
+        /// Returns a stream of the encoded file bitmap using the current request querystring.
         /// </summary>
         /// <returns></returns>
         public override Stream Open(){ return provider.getStream(this.VirtualPath);}
+        /// <summary>
+        /// Returns a composed bitmap of the file using request querystring paramaters.
+        /// </summary>
+        /// <returns></returns>
+        public System.Drawing.Bitmap GetBitmap() { return provider.getBitmap(this.VirtualPath); }
 
         /// <summary>
         /// Returns the last modified date of the row. Cached for performance.
