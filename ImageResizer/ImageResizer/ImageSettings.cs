@@ -68,6 +68,17 @@ namespace fbs.ImageResizer
         {
             parseFromQuerystring(q);
         }
+                /// <summary>
+        /// Returns true if all settings are at their defaults
+        /// </summary>
+        public bool IsEmpty
+        {
+            get
+            {
+                return bgcolor == Color.Transparent && paddingColor == Color.Transparent && borderColor == Color.Transparent && shadowColor == Color.Transparent &&
+                    paddingWidth == 0 && borderWidth == 0 && shadowWidth == 0 && shadowOffset.X == 0 && shadowOffset.Y == 0;
+            }
+        }
         public Color bgcolor = Color.Transparent;
         public Color paddingColor = Color.Transparent;
         public Color borderColor = Color.Transparent;
@@ -137,7 +148,16 @@ namespace fbs.ImageResizer
         {
             return null;
         }
-        
+         /// <summary>
+        /// Returns true if all settings are at their defaults, and no proccessing is to occurr.
+        /// </summary>
+        public bool IsEmpty
+        {
+            get
+            {
+                return true;
+            }
+        }
 
         public static ImageAttributes GetGrayscaleTransform()
         {

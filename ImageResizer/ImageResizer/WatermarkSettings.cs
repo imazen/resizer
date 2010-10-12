@@ -30,6 +30,17 @@ namespace fbs.ImageResizer
         }
 
         /// <summary>
+        /// Returns true if all settings are at their defaults and no proccessing is to occur.
+        /// </summary>
+        public bool IsEmpty
+        {
+            get
+            {
+                return true; //Change this, should return false if any code is in ModifySettings or Process
+            }
+        }
+
+        /// <summary>
         /// Executed prior to resizing. Permits modifications of geometry and effect settings
         /// </summary>
         /// <param name="rs"></param>
