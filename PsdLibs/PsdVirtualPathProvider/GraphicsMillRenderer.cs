@@ -81,7 +81,7 @@ namespace PsdRenderer
             //Read PSD file
             using (Aurigma.GraphicsMill.Codecs.AdvancedPsdReader psdReader = new Aurigma.GraphicsMill.Codecs.AdvancedPsdReader(s))
             {
-                for (int i = 2; i < psdReader.FrameCount; i++) //Start at 2, first real frame
+                for (int i = 1; i < psdReader.FrameCount; i++) //Start at 1, background frame
                 {
                     using (Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame frame = (Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame)psdReader.LoadFrame(i))
                     {

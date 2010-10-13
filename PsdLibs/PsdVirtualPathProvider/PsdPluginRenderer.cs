@@ -51,7 +51,7 @@ namespace PsdRenderer
         private IList<IPsdLayer> getLayers(PsdFile file)
         {
             List<IPsdLayer> items = new List<IPsdLayer>(file.Layers.Count);
-            for (int i = 1; i < file.Layers.Count; i++)
+            for (int i = 0; i < file.Layers.Count; i++)
             {
                 items.Add(new TextLayer(file.Layers[i],i));
             }
