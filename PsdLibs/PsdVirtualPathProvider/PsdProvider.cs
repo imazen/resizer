@@ -14,6 +14,7 @@ using fbs.ImageResizer;
 using fbs;
 using System.Collections.Specialized;
 using System.Drawing;
+using System.Drawing.Imaging;
 namespace PsdRenderer
 {
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
@@ -21,21 +22,10 @@ namespace PsdRenderer
     public class PsdProvider : VirtualPathProvider
     {
 
-        string _pathPrefix = "~/databaseimages/";
-        string _connectionString = null;
-        string _binaryQueryString = 
-            "SELECT Content FROM Images WHERE ImageID=@id";
-        string _modifiedDateQuery = 
-            "Select ModifiedDate, CreatedDate From Images WHERE ImageID=@id";
-        string _existsQuery = "Select COUNT(ImageID) From Images WHERE ImageID=@id";
-
-        private System.Data.SqlDbType idType = System.Data.SqlDbType.Int;
 
         public PsdProvider()
             : base()
         {
-            //Override connection string here
-            //_connectionString = ConfigurationManager.ConnectionStrings["database"].ConnectionString;
         }
         /// <summary>
         /// Returns the renderer object selected in the querystring
@@ -64,19 +54,59 @@ namespace PsdRenderer
         private static RenderLayerDelegate BuildLayerCallback(NameValueCollection queryString)
         {
             //Which layers do we show?
-            string showLayersWith = "1";
-            if (queryString["showlayerswith"] != null) showLayersWith = queryString["showlayerswith"];
+            PsdCommandSearcher searcher = new PsdCommandSearcher(new PsdCommandBuilder(queryString));
 
             return delegate(int index, string name, bool visibleNow)
             {
-                if (visibleNow) return true;
-                return (index < 6 || name.Contains(showLayersWith));
+                Nullable<bool> show = (searcher.getVisibility(name));
+                if (show == null) return visibleNow;
+                else return show.Value;
             };
         }
+        /// <summary>
+        /// Mixes the specified color (using the included alpha value as a weight) into the bitmap, leaving the bitmap's original alpha values untouched.
+        /// </summary>
+        /// <param name="b"></param>
+        /// <param name="c"></param>
+        private static void ColorBitmap(Bitmap b, Color c)
+        {
+            double weightedR = c.R * c.A;
+            double weightedG = c.G * c.A;
+            double weightedB = c.B * c.A;
+            double originalWeight = 255 - c.A;
+
+            int width = b.Width; int height = b.Height;
+            BitmapData bd = b.LockBits(new Rectangle(0,0,width,height), ImageLockMode.ReadWrite, b.PixelFormat);
+            unsafe
+            {
+                byte* pCurrRowPixel = (byte*)bd.Scan0.ToPointer();
+                for (int y = 0; y < height; y++)
+                {
+                    int rowIndex = y * width;
+                    PhotoshopFile.ImageDecoder.PixelData* pCurrPixel = (PhotoshopFile.ImageDecoder.PixelData*)pCurrRowPixel;
+                    for (int x = 0; x < width; x++)
+                    {
+                        pCurrPixel->Red = (byte)(((double)pCurrPixel->Red * originalWeight + weightedR) / 255);
+                        pCurrPixel->Green = (byte)(((double)pCurrPixel->Green * originalWeight + weightedG) / 255);
+                        pCurrPixel->Blue = (byte)(((double)pCurrPixel->Blue * originalWeight + weightedB) / 255);
+                        pCurrPixel += 1;
+                    }
+                    pCurrRowPixel += bd.Stride;
+                }
+            }
+
+            b.UnlockBits(bd);
+        }
+
         private static ModifyLayerDelegate BuildModifyLayerCallback(NameValueCollection queryString)
         {
+            PsdCommandSearcher searcher = new PsdCommandSearcher(new PsdCommandBuilder(queryString));
+
             return delegate(int index, string name, Bitmap b)
             {
+                Nullable<Color> color = searcher.getColor(name);
+                //Blend color into bitmap
+                if (color != null)  ColorBitmap(b, color.Value);
                 return b;
             };
         }
@@ -145,6 +175,7 @@ namespace PsdRenderer
                 //Save layers for later use
                 file.setSubkey("layers_" + renderer.ToString(), layers);
 
+
                 //How fast?
                 swRender.Stop();
                 trace("Using encoder " + renderer.ToString() + ", rendering stream to a composed Bitmap instance took " + swRender.ElapsedMilliseconds.ToString() + "ms");
@@ -152,7 +183,7 @@ namespace PsdRenderer
             return b;
         }
 
-
+ 
 
         private static void trace(string msg)
         {
@@ -160,6 +191,11 @@ namespace PsdRenderer
                 System.Diagnostics.Debug.Write(msg);
             else
                 HttpContext.Current.Trace.Write(msg);
+        }
+
+        public static Size getPsdSize(string virtualPath, NameValueCollection queryString)
+        {
+            return getAllLayers(virtualPath, queryString)[0].Rect.Size;
         }
 
         public static IList<IPsdLayer> getAllLayers(string virtualPath, NameValueCollection queryString)
@@ -232,15 +268,6 @@ namespace PsdRenderer
         /// <returns></returns>
         public DateTime getDateModifiedUtc(string virtualPath){
             return System.IO.File.GetLastWriteTimeUtc(getPhysicalPath(virtualPath));
-        }
-
-        public SqlConnection GetConnectionObj(){
-            return new SqlConnection(_connectionString);
-        }
-
-        protected override void Initialize()
-        {
-
         }
 
 

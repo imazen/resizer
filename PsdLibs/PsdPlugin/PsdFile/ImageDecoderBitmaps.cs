@@ -47,7 +47,7 @@ namespace PhotoshopFile
     /////////////////////////////////////////////////////////////////////////// 
 
 #if !TEST
-    private struct PixelData
+    public struct PixelData
     {
       public byte Blue;
       public byte Green;
