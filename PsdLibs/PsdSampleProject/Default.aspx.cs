@@ -13,8 +13,8 @@ namespace PsdSampleProject
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            IList<ITextLayer> layers = PsdRenderer.PsdProvider.getVisibleTextLayers("~/1001.psd",Request.QueryString);
-            foreach (ITextLayer l in layers){
+            IList<IPsdLayer> layers = PsdRenderer.PsdProvider.getVisibleTextLayers("~/1001.psd",Request.QueryString);
+            foreach (IPsdLayer l in layers){
                 mapdata.Text += "\n<area shape=\"rect\" coords=\"" + l.Rect.X + "," + l.Rect.Y + "," + l.Rect.Right + "," + l.Rect.Bottom + "\" href=\"#\" alt=\"" + l.Name + "\" />";
 
             }

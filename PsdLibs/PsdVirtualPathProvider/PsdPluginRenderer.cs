@@ -12,7 +12,7 @@ namespace PsdRenderer
 {
     public class PsdPluginRenderer: IPsdRenderer
     {
-        public Bitmap Render(Stream s, out IList<ITextLayer> textLayers, RenderLayerDelegate showLayerCallback)
+        public Bitmap Render(Stream s, out IList<IPsdLayer> layers, RenderLayerDelegate showLayerCallback, ModifyLayerDelegate modifyLayer)
         {
             PsdFile file = new PsdFile();
             file.Load(s);
@@ -31,40 +31,34 @@ namespace PsdRenderer
                 {
                     if (showLayerCallback(i,file.Layers[i].Name,file.Layers[i].Visible)){
                         using (Bitmap frame = ImageDecoder.DecodeImage(file.Layers[i])){
-                            g.DrawImage(frame,file.Layers[i].Rect);
+                            using (Bitmap modifiedFrame = modifyLayer(i,file.Layers[i].Name,frame))
+                                g.DrawImage(frame,file.Layers[i].Rect);
                         }
                     }
                 }
             }
-            textLayers = getTextLayers(file);
+            layers = getLayers(file);
             return b;
         }
 
        
-        public IList<ITextLayer> GetTextLayers(Stream s)
+        public IList<IPsdLayer> GetLayers(Stream s)
         {
             PsdFile file = new PsdFile();
             file.Load(s);
-            return getTextLayers(file);
+            return getLayers(file);
         }
-        private IList<ITextLayer> getTextLayers(PsdFile file)
+        private IList<IPsdLayer> getLayers(PsdFile file)
         {
-            List<ITextLayer> items = new List<ITextLayer>(file.Layers.Count);
+            List<IPsdLayer> items = new List<IPsdLayer>(file.Layers.Count);
             for (int i = 1; i < file.Layers.Count; i++)
             {
-                List<PhotoshopFile.Layer.AdjustmentLayerInfo> adjustments = file.Layers[i].AdjustmentInfo;
-                for (int j = 0; j < adjustments.Count; j++)
-                {
-                    if (adjustments[j].Key.Equals("TySh"))
-                    {
-                        items.Add(new TextLayer(file.Layers[i],i));
-                    }
-                }
+                items.Add(new TextLayer(file.Layers[i],i));
             }
             return items;
         }
 
-        class TextLayer : TextLayerBase
+        class TextLayer : PsdLayerBase
         {
             public TextLayer(Layer layer, int index)
             {
@@ -72,6 +66,15 @@ namespace PsdRenderer
                 _rect = layer.Rect;
                 _visible = layer.Visible;
                 _index = index;
+
+                List<PhotoshopFile.Layer.AdjustmentLayerInfo> adjustments = layer.AdjustmentInfo;
+                for (int j = 0; j < adjustments.Count; j++)
+                {
+                    if (adjustments[j].Key.Equals("TySh"))
+                    {
+                        this._isTextLayer = true;
+                    }
+                }
             }
         }
 

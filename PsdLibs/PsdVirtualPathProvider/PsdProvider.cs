@@ -13,6 +13,7 @@ using System.Diagnostics;
 using fbs.ImageResizer;
 using fbs;
 using System.Collections.Specialized;
+using System.Drawing;
 namespace PsdRenderer
 {
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
@@ -72,6 +73,15 @@ namespace PsdRenderer
                 return (index < 6 || name.Contains(showLayersWith));
             };
         }
+        private static ModifyLayerDelegate BuildModifyLayerCallback(NameValueCollection queryString)
+        {
+            return delegate(int index, string name, Bitmap b)
+            {
+                return b;
+            };
+        }
+
+
 
         public Stream getStream(string virtualPath)
         {
@@ -128,12 +138,12 @@ namespace PsdRenderer
                 Stopwatch swRender = new Stopwatch();
                 swRender.Start();
 
-                IList<ITextLayer> textLayers = null;
+                IList<IPsdLayer> layers = null;
                 //Use the selected renderer to parse the file and compose the layers, using this delegate callback to determine which layers to show.
-                b = renderer.Render(s, out textLayers, BuildLayerCallback(queryString));
+                b = renderer.Render(s, out layers, BuildLayerCallback(queryString), BuildModifyLayerCallback(queryString));
 
-                //Save text layers for later use
-                file.setSubkey("textlayers_" + renderer.ToString(), textLayers);
+                //Save layers for later use
+                file.setSubkey("layers_" + renderer.ToString(), layers);
 
                 //How fast?
                 swRender.Stop();
@@ -141,6 +151,7 @@ namespace PsdRenderer
             }
             return b;
         }
+
 
 
         private static void trace(string msg)
@@ -151,7 +162,7 @@ namespace PsdRenderer
                 HttpContext.Current.Trace.Write(msg);
         }
 
-        public static IList<ITextLayer> getVisibleTextLayers(string virtualPath, NameValueCollection queryString)
+        public static IList<IPsdLayer> getAllLayers(string virtualPath, NameValueCollection queryString)
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -161,18 +172,19 @@ namespace PsdRenderer
             //File
             MemCachedFile file = MemCachedFile.GetCachedFile(getPhysicalPath(virtualPath));
             //key
-            string dataKey = "textlayers_" + renderer.ToString();
-           
+            string dataKey = "layers_" + renderer.ToString();
+
             //Try getting from the cache first
-            IList<ITextLayer> layers =file.getSubkey(dataKey) as IList<ITextLayer>;
-            if (layers == null){
+            IList<IPsdLayer> layers = file.getSubkey(dataKey) as IList<IPsdLayer>;
+            if (layers == null)
+            {
                 //Time just the parsing
                 Stopwatch swRender = new Stopwatch();
                 swRender.Start();
 
-                layers = renderer.GetTextLayers(file.GetStream());
+                layers = renderer.GetLayers(file.GetStream());
                 //Save to cache for later
-                file.setSubkey(dataKey,layers);
+                file.setSubkey(dataKey, layers);
 
                 //How fast?
                 swRender.Stop();
@@ -180,21 +192,34 @@ namespace PsdRenderer
             }
 
 
+            sw.Stop();
+            trace("Total time for enumerating, including file reading: " + sw.ElapsedMilliseconds.ToString() + "ms");
+            return layers;
+        }
+        public static IList<IPsdLayer> getVisibleTextLayers(string virtualPath, NameValueCollection queryString)
+        {
+            
+            //Get all layers
+            IList<IPsdLayer> layers = getAllLayers(virtualPath, queryString);
+
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             //Now, time to filter layers to those that would be showing on the image right now.
-            IList<ITextLayer> filtered = new List<ITextLayer>();
+            IList<IPsdLayer> filtered = new List<IPsdLayer>();
             
             //Generate a callback just like the one used in the renderer for filtering
             RenderLayerDelegate callback = BuildLayerCallback(queryString);
 
             for (int i = 0; i < layers.Count; i++){
-                if (callback(layers[i].Index, layers[i].Name, layers[i].Visible))
+                if (layers[i].IsTextLayer && callback(layers[i].Index, layers[i].Name, layers[i].Visible))
                 {
                     filtered.Add(layers[i]);
                 }
             }
             
             sw.Stop();
-            trace("Total time for enumerating, including file reading: " + sw.ElapsedMilliseconds.ToString() + "ms");
+            trace("Time for filtering layers: " + sw.ElapsedMilliseconds.ToString() + "ms");
             return filtered;
 
         }
