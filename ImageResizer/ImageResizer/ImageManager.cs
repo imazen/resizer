@@ -528,6 +528,69 @@ namespace fbs.ImageResizer
         }
 
         /// <summary>
+        /// Doesn't support rotation or flipping. Translate a point on the original bitmap to a point on the new bitmap. If the original point no longer exists, returns Empty
+        /// </summary>
+        /// <returns></returns>
+         public virtual PointF TranslatePoint(PointF sourcePoint, SizeF originalSize, NameValueCollection q)
+         {
+            return TranslatePoint(sourcePoint, originalSize, new ResizeSettings(q), new ImageSettings(q), new ImageFilter(q), new ImageOutputSettings(ImageFormat.Jpeg, q), new WatermarkSettings(q));
+         }
+         
+        /// <summary>
+        /// Doesn't support rotation or flipping. Translate a point on the original bitmap to a point on the new bitmap. If the original point no longer exists, returns Empty
+        /// </summary>
+        /// <returns></returns>
+        public virtual PointF TranslatePoint(PointF sourcePoint, SizeF originalSize, ResizeSettings resize, ImageSettings opts, ImageFilter adjustments, ImageOutputSettings output, WatermarkSettings watermark)
+        {
+            if (watermark != null) watermark.ModifySettings(resize, opts, adjustments, output);
+
+
+            ResizeSettings.ImageSizingData size = resize.CalculateSizingData(originalSize, new SizeF((float)DiskCache.GetMaxWidth(), (float)DiskCache.GetMaxHeight()));
+
+            //Calculate required space for everything
+            PointF[] all = size.targetArea;
+
+            //Add required space for border and padding
+            if (opts.borderWidth > 0) all = PolygonMath.InflatePoly(all, opts.borderWidth);
+            if (opts.paddingWidth > 0) all = PolygonMath.InflatePoly(all, opts.paddingWidth);
+
+            //shadow is trickier
+            if (opts.shadowWidth > 0) all = PolygonMath.InflatePoly(all, new float[]{
+                Math.Max(0, opts.shadowWidth - opts.shadowOffset.Y),
+                Math.Max(0, opts.shadowWidth + opts.shadowOffset.X),
+                Math.Max(0, opts.shadowWidth + opts.shadowOffset.Y),
+                Math.Max(0, opts.shadowWidth - opts.shadowOffset.X)
+            });
+
+            //Find how much we need to move imageArea (and imageTarget) so that all is at 0,0.
+            PointF shadowBorderOffset = PolygonMath.GetBoundingBox(all).Location;
+            shadowBorderOffset.X *= -1;
+            shadowBorderOffset.Y *= -1;
+
+
+            //Rebase things so we are starting at 0,0;
+            size.imageTarget = PolygonMath.MovePoly(size.imageTarget, shadowBorderOffset);
+            size.targetArea = PolygonMath.MovePoly(size.targetArea, shadowBorderOffset);
+            //Inflate for padding
+            if (opts.paddingWidth > 0) size.targetArea = PolygonMath.InflatePoly(size.targetArea, opts.paddingWidth);
+
+
+            //Find the size of the target area
+            RectangleF target = PolygonMath.GetBoundingBox(size.imageTarget);
+
+            //If not showing, return empty
+            if (!size.sourceRect.Contains(sourcePoint)) return PointF.Empty;
+
+            return new PointF(target.X + (target.Width / size.sourceRect.Width) * (sourcePoint.X - size.sourceRect.X),
+                                 target.Y + (target.Height / size.sourceRect.Height) * (sourcePoint.Y - size.sourceRect.Y));
+
+        }
+
+
+
+
+
+        /// <summary>
         /// Draws a gradient around the specified polygon. Fades from 'inner' to 'outer' over a distance of 'width' pixels. 
         /// </summary>
         /// <param name="g"></param>
