@@ -537,7 +537,7 @@ namespace fbs.ImageResizer
          }
          
         /// <summary>
-        /// Doesn't support rotation or flipping. Translate a point on the original bitmap to a point on the new bitmap. If the original point no longer exists, returns Empty
+        /// Doesn't support rotation or flipping. Translate a point on the original bitmap to a point on the new bitmap. If the original point no longer exists, returns the closest point
         /// </summary>
         /// <returns></returns>
         public virtual PointF TranslatePoint(PointF sourcePoint, SizeF originalSize, ResizeSettings resize, ImageSettings opts, ImageFilter adjustments, ImageOutputSettings output, WatermarkSettings watermark)
@@ -578,8 +578,14 @@ namespace fbs.ImageResizer
             //Find the size of the target area
             RectangleF target = PolygonMath.GetBoundingBox(size.imageTarget);
 
-            //If not showing, return empty
-            if (!size.sourceRect.Contains(sourcePoint)) return PointF.Empty;
+            //If not showing, pull inside box to closest point
+            if (!size.sourceRect.Contains(sourcePoint))
+            {
+               sourcePoint.X = Math.Max(sourcePoint.X,size.sourceRect.X);
+               sourcePoint.Y = Math.Max(sourcePoint.Y,size.sourceRect.Y);
+               sourcePoint.X = Math.Min(sourcePoint.X,size.sourceRect.Right);
+               sourcePoint.Y = Math.Min(sourcePoint.Y,size.sourceRect.Bottom);
+            }
 
             return new PointF(target.X + (target.Width / size.sourceRect.Width) * (sourcePoint.X - size.sourceRect.X),
                                  target.Y + (target.Height / size.sourceRect.Height) * (sourcePoint.Y - size.sourceRect.Y));
