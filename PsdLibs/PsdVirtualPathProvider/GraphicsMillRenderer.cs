@@ -8,7 +8,15 @@ namespace PsdRenderer
 {
     public class GraphicsMillRenderer: IPsdRenderer
     {
-        public System.Drawing.Bitmap Render(Stream s, out IList<ITextLayer> textLayers,  RenderLayerDelegate showLayerCallback)
+        /// <summary>
+        /// Ignores modifyLayer - not supported by this renderer.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="textLayers"></param>
+        /// <param name="showLayerCallback"></param>
+        /// <param name="modifyLayer"></param>
+        /// <returns></returns>
+        public System.Drawing.Bitmap Render(Stream s, out IList<IPsdLayer> layers, RenderLayerDelegate showLayerCallback, ModifyLayerDelegate modifyLayer)
         {
             // Create the resultBitmap object which contains merged bitmap, 
             // and the currentBitmap object which contains current bitmap during iteration. 
@@ -29,32 +37,33 @@ namespace PsdRenderer
                         frame.GetBitmap(resultBitmap);
                     }
 
-                    //List of text layers
-                    textLayers = new List<ITextLayer>();
+                    //List of layers
+                    layers = new List<IPsdLayer>();
 
                     //This code merges the rest layers with the background layer one by one.
                     for (int i = 2; i < psdReader.FrameCount; i++)
                     {
                         using (frame = (Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame)psdReader.LoadFrame(i))
                         {
-                            //Add text layers
-                            if (frame.Type == PsdFrameType.Text)
-                            {
-                                textLayers.Add(new TextLayer(frame, i + 1));
-                            }
+
                             // Do not forget to verify the unknown layer type.  
                             if (frame.Type != Aurigma.GraphicsMill.Codecs.PsdFrameType.Unknown)
                             {
+                                //Add layers
+                                layers.Add(new PsdLayer(frame, i + 1));
+
                                 bool showFrame = showLayerCallback(i - 1, frame.Name, frame.Visible); //Subtract 1 from index so layer 0 is the background layer
                                 if (showFrame)
                                 {
                                     // Extract the current image from the layer.
                                     frame.GetBitmap(currentBitmap);
-
+                                   
                                     // Draw current layer on the result bitmap. 
                                     // Also check out if the layer is visible or not.
                                     // If the layer is invisible we skip it.
-                                    currentBitmap.Draw(resultBitmap, frame.Left, frame.Top, frame.Width, frame.Height, Aurigma.GraphicsMill.Transforms.CombineMode.Alpha, 1, Aurigma.GraphicsMill.Transforms.InterpolationMode.HighQuality);
+                                    currentBitmap.Draw(currentBitmap, frame.Left, frame.Top, frame.Width, frame.Height, Aurigma.GraphicsMill.Transforms.CombineMode.Alpha, 1, Aurigma.GraphicsMill.Transforms.InterpolationMode.HighQuality);
+                                    
+                                   
                                 }
                             }
                         }
@@ -65,10 +74,10 @@ namespace PsdRenderer
         }
 
        
-        public IList<ITextLayer> GetTextLayers(Stream s)
+        public IList<IPsdLayer> GetLayers(Stream s)
         {
-            //List of text layers
-            IList<ITextLayer> textLayers = new List<ITextLayer>();
+            //List of  layers
+            IList<IPsdLayer> layers = new List<IPsdLayer>();
             //Read PSD file
             using (Aurigma.GraphicsMill.Codecs.AdvancedPsdReader psdReader = new Aurigma.GraphicsMill.Codecs.AdvancedPsdReader(s))
             {
@@ -76,25 +85,22 @@ namespace PsdRenderer
                 {
                     using (Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame frame = (Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame)psdReader.LoadFrame(i))
                     {
-                        //Add text layers
-                        if (frame.Type == PsdFrameType.Text)
-                        {
-                            textLayers.Add(new TextLayer(frame, i + 1));
-                        }
+                        layers.Add(new PsdLayer(frame, i + 1));
                     }
                 }
             }
-            return textLayers;
+            return layers;
         }
 
-        class TextLayer : TextLayerBase
+        class PsdLayer : PsdLayerBase
         {
-            public TextLayer(Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame frame, int index)
+            public PsdLayer(Aurigma.GraphicsMill.Codecs.AdvancedPsdFrame frame, int index)
             {
                 _name = frame.Name;
                 _rect = new System.Drawing.Rectangle(frame.Left, frame.Top, frame.Width, frame.Height);
                 _visible = frame.Visible;
                 _index = index;
+                _isTextLayer = (frame.Type == PsdFrameType.Text);
             }
         }
     }

@@ -7,31 +7,36 @@ using fbs.ImageResizer;
 namespace PsdRenderer
 {
     public delegate bool RenderLayerDelegate(int index, string Name, bool visibleNow);
+    public delegate Bitmap ModifyLayerDelegate(int index, string Name, Bitmap layer);
     public interface IPsdRenderer
     {
         
 
-         Bitmap Render(Stream s, out IList<ITextLayer> textLayers, RenderLayerDelegate showLayerCallback);
+         Bitmap Render(Stream s, out IList<IPsdLayer> layers, RenderLayerDelegate showLayerCallback, ModifyLayerDelegate modifyLayer);
 
-         IList<ITextLayer> GetTextLayers(Stream s);
+         IList<IPsdLayer> GetLayers(Stream s);
     }
 
-    public interface ITextLayer
+    public interface IPsdLayer
     {
         int Index { get; }
         string Name{get;}
         Rectangle Rect { get; }
         string Text { get; }
         bool Visible { get; }
+        bool IsTextLayer { get; }
     }
 
-    public class TextLayerBase : ITextLayer
+    public class PsdLayerBase : IPsdLayer
     {
         protected string _name = null;
         protected string _text = null;
         protected Rectangle _rect = Rectangle.Empty;
         protected bool _visible = false;
         protected int _index  = 0;
+        protected bool _isTextLayer = false;
+
+        public bool IsTextLayer { get { return _isTextLayer; } }
 
         public string Name
         {
