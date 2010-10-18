@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseSampleCSharp", "DatabaseSampleCSharp.csproj", "{1CED61F7-E4DA-4D45-A937-5F268C60697A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer", "..\ImageResizer\ImageResizer.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VPPTest", "..\VPPTest\VPPTest.csproj", "{7F18EEA5-0D97-43A0-9BEA-4AD6DE5FF0E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PSDRenderer", "..\PSDRenderer\PSDRenderer.csproj", "{6DB3505B-B1DB-4F09-A6FD-3860011BE577}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,12 +14,6 @@ Global
 		Trial Version|Any CPU = Trial Version|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1CED61F7-E4DA-4D45-A937-5F268C60697A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1CED61F7-E4DA-4D45-A937-5F268C60697A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1CED61F7-E4DA-4D45-A937-5F268C60697A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1CED61F7-E4DA-4D45-A937-5F268C60697A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1CED61F7-E4DA-4D45-A937-5F268C60697A}.Trial Version|Any CPU.ActiveCfg = Release|Any CPU
-		{1CED61F7-E4DA-4D45-A937-5F268C60697A}.Trial Version|Any CPU.Build.0 = Release|Any CPU
 		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -32,6 +26,12 @@ Global
 		{7F18EEA5-0D97-43A0-9BEA-4AD6DE5FF0E2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7F18EEA5-0D97-43A0-9BEA-4AD6DE5FF0E2}.Trial Version|Any CPU.ActiveCfg = Release|Any CPU
 		{7F18EEA5-0D97-43A0-9BEA-4AD6DE5FF0E2}.Trial Version|Any CPU.Build.0 = Release|Any CPU
+		{6DB3505B-B1DB-4F09-A6FD-3860011BE577}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DB3505B-B1DB-4F09-A6FD-3860011BE577}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DB3505B-B1DB-4F09-A6FD-3860011BE577}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DB3505B-B1DB-4F09-A6FD-3860011BE577}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DB3505B-B1DB-4F09-A6FD-3860011BE577}.Trial Version|Any CPU.ActiveCfg = Release|Any CPU
+		{6DB3505B-B1DB-4F09-A6FD-3860011BE577}.Trial Version|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
