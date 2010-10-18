@@ -386,11 +386,11 @@ namespace fbs.ImageResizer
                     //If only one is specified, calculate the other from 
                     if (width > 0)
                     {
-                        if (height < 0) height = (float)(width / imageRatio);
+                        if (height < 0) height = (width / imageRatio);
                     }
                     else if (height > 0)
                     {
-                        if (width < 0) width = (float)(height * imageRatio);
+                        if (width < 0) width = (height * imageRatio);
                     }
                     //Store result
                     targetSize = new SizeF((float)width,(float) height);

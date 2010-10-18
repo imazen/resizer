@@ -393,7 +393,7 @@ namespace fbs.ImageResizer
 
             //Calculate required space for everything
             PointF[] all = size.targetArea;
-
+            
 
             //Add required space for border and padding
             if (opts.borderWidth > 0) all = PolygonMath.InflatePoly(all, opts.borderWidth);
@@ -432,30 +432,24 @@ namespace fbs.ImageResizer
             if (opts.paddingWidth > 0) size.targetArea = PolygonMath.InflatePoly(size.targetArea, opts.paddingWidth);
 
 
+            //At this point, we have fractional values throughout. Bitmaps must be integer widths and heights
+            //The following values are fractional, and used in the drawing.
+            //size.imageTarget
+            //size.targetArea
+            //insideShadow
+            //all (must be larger or equal to imageTarget to prevent cropping)
+            size.imageTarget = PolygonMath.RoundPoints(size.imageTarget);
+            size.targetArea = PolygonMath.RoundPoints(size.targetArea);
+            insideShadow = PolygonMath.RoundPoints(insideShadow);
+            all = PolygonMath.RoundPoints(all);
 
 
             //Find the size
             SizeF box = PolygonMath.GetBoundingBox(all).Size;
 
-            Bitmap b;
             //Create new bitmap using calculated size. 
-            //OLD idea: Potential problem, rounding max crop or leave space. However, floating-point values should only occur on rotations.
-            //4-23-09, FALSE, floating point values can occur anytime scaling takes place. 
-            //Fixed by using Floor instead of Round
-            if (PolygonMath.GetBoundingBox(size.imageTarget).Size.Equals(box))
-            {
-                //The image is taking the entire space. Round down, as System.Drawing does.
-                //June 3: added Math.Max(1,) to prevent Invalid Parameter error on < 1px images. Also need to fix in ResizeSettings.. otherwise
-                //the image data won't be put in the right place either.
-                b = new Bitmap((int)Math.Max(1,Math.Floor(box.Width)), (int)Math.Max(1,Math.Floor(box.Height)), PixelFormat.Format32bppArgb);
-
-            }
-            else
-            {
-                //June 3: added Math.Max(1,) to prevent Invalid Parameter error on < 1px images.
-                //It isn't taking up all the space - Space around the image is expected. Leaving normal rounding in place - flooring would do as much harm as good on average.
-                b = new Bitmap((int)Math.Max(1,Math.Round(box.Width)), (int)Math.Max(1,Math.Round(box.Height)), PixelFormat.Format32bppArgb);
-            }
+            Bitmap b = new Bitmap((int)Math.Max(1, box.Width), (int)Math.Max(1, box.Height), PixelFormat.Format32bppArgb);
+            
 
             //Create graphics handle
             Graphics g = Graphics.FromImage(b);
@@ -574,6 +568,16 @@ namespace fbs.ImageResizer
             //Inflate for padding
             if (opts.paddingWidth > 0) size.targetArea = PolygonMath.InflatePoly(size.targetArea, opts.paddingWidth);
 
+            //At this point, we have fractional values throughout. Bitmaps must be integer widths and heights
+            //The following values are fractional, and used in the drawing.
+            //size.imageTarget
+            //size.targetArea
+            //insideShadow
+            //all (must be larger or equal to imageTarget to prevent cropping)
+            size.imageTarget = PolygonMath.RoundPoints(size.imageTarget);
+            size.targetArea = PolygonMath.RoundPoints(size.targetArea);
+            all = PolygonMath.RoundPoints(all);
+
 
             //Find the size of the target area
             RectangleF target = PolygonMath.GetBoundingBox(size.imageTarget);
@@ -639,28 +643,21 @@ namespace fbs.ImageResizer
             //Inflate for padding
             if (opts.paddingWidth > 0) size.targetArea = PolygonMath.InflatePoly(size.targetArea, opts.paddingWidth);
 
+            //At this point, we have fractional values throughout. Bitmaps must be integer widths and heights
+            //The following values are fractional, and used in the drawing.
+            //size.imageTarget
+            //size.targetArea
+            //insideShadow
+            //all (must be larger or equal to imageTarget to prevent cropping)
+            size.imageTarget = PolygonMath.RoundPoints(size.imageTarget);
+            size.targetArea = PolygonMath.RoundPoints(size.targetArea);
+            all = PolygonMath.RoundPoints(all);
+
 
             //Find the size of the new image
             RectangleF box = PolygonMath.GetBoundingBox(all);
 
-            //Create new bitmap using calculated size. 
-            //OLD idea: Potential problem, rounding max crop or leave space. However, floating-point values should only occur on rotations.
-            //4-23-09, FALSE, floating point values can occur anytime scaling takes place. 
-            //Fixed by using Floor instead of Round
-            if (PolygonMath.GetBoundingBox(size.imageTarget).Size.Equals(box))
-            {
-                //The image is taking the entire space. Round down, as System.Drawing does.
-                //June 3: added Math.Max(1,) to prevent Invalid Parameter error on < 1px images. Also need to fix in ResizeSettings.. otherwise
-                //the image data won't be put in the right place either.
-                return new Size((int)Math.Max(1, Math.Floor(box.Width)), (int)Math.Max(1, Math.Floor(box.Height)));
-
-            }
-            else
-            {
-                //June 3: added Math.Max(1,) to prevent Invalid Parameter error on < 1px images.
-                //It isn't taking up all the space - Space around the image is expected. Leaving normal rounding in place - flooring would do as much harm as good on average.
-                return new Size((int)Math.Max(1, Math.Round(box.Width)), (int)Math.Max(1, Math.Round(box.Height)));
-            }
+            return new Size((int)Math.Max(1, box.Width), (int)Math.Max(1, box.Height));
         }
 
        

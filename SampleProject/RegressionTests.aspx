@@ -45,6 +45,12 @@
 <img id="Img16" runat="server" src="red-leaf.jpg?width=300" />
 </div>
 
+<h3>No clipping should occur (original, followed by resized)</h3>
+<div style="background-color:white; padding:30px">
+<img id="Img23" src="218.gif" runat="server" />
+<br />
+<img src="218.gif?maxheight=50" runat="server" />
+</div>
         <h3>This image (5x527) should appear in 3 sizes. 
         </h3>
         <p>Due to GDI bug, the middle one will be a pixel thinner than it should be... But the real bug is if one doesn't appear... then
