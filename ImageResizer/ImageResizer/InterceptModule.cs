@@ -157,7 +157,7 @@ namespace fbs.ImageResizer
                     {
                         IPrincipal user = app.Context.User as IPrincipal;
 
-                        if ("true".Equals(ConfigurationManager.AppSettings["DisableImageURLAuthorization"], StringComparison.OrdinalIgnoreCase)) //TODO: Is this right?
+                        if (!"true".Equals(ConfigurationManager.AppSettings["DisableImageURLAuthorization"], StringComparison.OrdinalIgnoreCase)) //Fixed Oct. 18, 2010, - setting was inverted, missing !
                         {
 
                             // no user (must be anonymous...).. Or authentication doesn't work for this suffix. 
