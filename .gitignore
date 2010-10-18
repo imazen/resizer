@@ -4,3 +4,4 @@ Debug/
 imagecache/
 *.suo
 *.user
+*.csproj.user
