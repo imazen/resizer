@@ -54,6 +54,16 @@ namespace PhotoshopFile
       }
       return val;
     }
+
+    public override double ReadDouble()
+    {
+        double val = base.ReadDouble();
+        unsafe
+        {
+            SwapBytes((byte*)&val, 8);
+        }
+        return val;
+    }
     public override int ReadInt32()
     {
       int val = base.ReadInt32();
@@ -116,6 +126,78 @@ namespace PhotoshopFile
 
       return new string(c);
     }
+    /// <summary>
+    /// Does not support code points past 255
+    /// </summary>
+    /// <returns></returns>
+    public string ReadPSDUnicodeString()
+    {
+        string s = "";
+        int nLength = (int)this.ReadUInt32();
+        //ndj's version:
+        //return System.Text.UTF32Encoding.BigEndianUnicode.GetString(base.ReadBytes(nLength));
+       
+        for (int i = 0; i < nLength * 2; i++)
+        {
+            
+            char c = base.ReadChar();
+            if (i % 2 == 1 && c != 0)
+                s += c;
+        }
+
+        if (s.Length == 1 && s[0] == 0)
+        {
+            //String of a single null character, 
+            return null;
+        }
+
+        return s;
+    }
+
+    public string ReadTdTaString()
+    {
+        StringBuilder sb = new StringBuilder(4096);
+        //int nLength = (int)this.ReadUInt32();
+        char c;
+        while (BytesToEnd > 0)
+        {
+            c = base.ReadChar();
+            if (c != 0x0) sb.Append(c);
+            if (c == '>' && sb[sb.Length - 2] == '>' && sb[sb.Length - 3] == '\n')
+            {
+                //we hit the end.
+                break;
+            }
+        }
+        return sb.ToString();
+    }
+
+    public long BytesToEnd
+    {
+        get
+        {
+            return (this.BaseStream.Length - this.BaseStream.Position);
+        }
+    }
+ 
+
+ 
+
+    
+
+    /// <summary>
+    /// Standard ReadPSDChars() keeps reading until it has numBytes chars that are != 0. This one doesn't care
+    /// </summary>
+    /// <param name="numBytes"></param>
+    /// <returns></returns>
+    public char[] ReadPSDChars(int numBytes)
+    {
+        char[] chars = new char[numBytes];
+        for (int i = 0; i < numBytes; i++)
+            chars[i] = (char)this.ReadByte();
+        return chars;
+    }
+
 
     //////////////////////////////////////////////////////////////////
 
@@ -129,6 +211,11 @@ namespace PhotoshopFile
       }
     }
 
+
+    public bool CanReadByte()
+    {
+        return BytesToEnd > 0;
+    }
   }
 
   //////////////////////////////////////////////////////////////////
