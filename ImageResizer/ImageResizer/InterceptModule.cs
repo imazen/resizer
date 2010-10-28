@@ -55,6 +55,32 @@ using System.Security.Principal;
 
 namespace fbs.ImageResizer
 {
+    public class UrlEventArgs : EventArgs
+    {
+        protected string _virtualPath;
+        protected NameValueCollection _queryString;
+
+        public UrlEventArgs(string virtualPath, NameValueCollection queryString)
+        {
+            this._virtualPath = virtualPath;
+            this._queryString = queryString;
+        }
+
+        public NameValueCollection QueryString
+        {
+            get { return _queryString; }
+            set { _queryString = value; }
+        }
+        public string VirtualPath
+        {
+            get { return _virtualPath; }
+            set { _virtualPath = value; }
+        }
+    }
+
+    public delegate void UrlRewritingHook(UrlEventArgs e, InterceptModule sender);
+
+
     /// <summary>
     /// Monitors incoming image requests. Image requests that request resizing are processed. The resized images are immediately written to disk, and 
     /// the request is rewritten to the disk-cached resized version. This way IIS can handle the actual serving of the file.
@@ -77,9 +103,53 @@ namespace fbs.ImageResizer
             context.PreSendRequestHeaders += new EventHandler(context_PreSendRequestHeaders);
         }
         void System.Web.IHttpModule.Dispose() { }
+        /// <summary>
+        /// Fired during PostAuthorizeRequest, after ResizeExtension has been removed.
+        /// Fired before CustomFolders and other URL rewriting events.
+        /// <para>Only fired on accepted image types: ImageOutputSettings.IsAcceptedImageType()</para>
+        /// </summary>
+        public static event UrlRewritingHook PreCustomFoldersRewrite;
+        /// <summary>
+        /// Fired during PostAuthorizeRequest, after PreCustomFoldersRewrite.
+        /// Any changes made here (which conflict) will be overwritten by the the current querystring values. I.e, this is a good place to specify default settings.
+        /// <para>Only fired on accepted image types: ImageOutputSettings.IsAcceptedImageType()</para>
+        /// </summary>
+        public static event UrlRewritingHook PreCustomFoldersDefaults;
+        /// <summary>
+        /// Fired after all other rewrite events and CustomFolders.cs 
+        /// <para>Only fired on accepted image types: ImageOutputSettings.IsAcceptedImageType()</para>
+        /// </summary>
+        public static event UrlRewritingHook PostCustomFoldersRewrite;
 
 
-       
+        /// <summary>
+        /// Manages URL rewriting hooks
+        /// </summary>
+        /// <param name="e"></param>
+        protected void processPath(UrlEventArgs e)
+        {
+            //Fire first event (results will stay in e)
+            if (PreCustomFoldersRewrite != null) PreCustomFoldersRewrite(e, this);
+            
+            //Copy querystring for use in 'defaults' even
+            NameValueCollection copy = new NameValueCollection(e.QueryString); //Copy so we can later overwrite q with the original values.
+            
+            //Fire defaults event.
+            if (PreCustomFoldersDefaults != null) PreCustomFoldersDefaults(e, this);
+
+            //Overwrite with querystring values again - this is what makes applyDefaults applyDefaults, vs. being applyOverrides.
+            foreach (string k in copy)
+                e.QueryString[k] = copy[k];
+
+            
+            //Call CustomFolders.cs to do resize(w,h,f)/ parsing and any other custom syntax.
+            //The real virtual path should be returned (with the resize() stuff removed)
+            //And q should be populated with the querystring values
+            e.VirtualPath = CustomFolders.processPath(e.VirtualPath, e.QueryString);
+
+            //Fire final event
+            if (PostCustomFoldersRewrite != null) PostCustomFoldersRewrite(e, this);
+        }
 
         /// <summary>
         /// This is where we filter requests and intercet those that want resizing performed.
@@ -127,10 +197,15 @@ namespace fbs.ImageResizer
                     //Copy the querystring
                     NameValueCollection q = new NameValueCollection(app.Context.Request.QueryString);
 
-                    //Call CustomFolders.cs to do resize(w,h,f)/ parsing and any other custom syntax.
-                    //The real virtual path should be returned (with the resize() stuff removed)
-                    //And q should be populated with the querystring values
-                    string basePath = CustomFolders.processPath(filePath + app.Context.Request.PathInfo, q);
+                    //Call events and CustomFolders.cs to do resize(w,h,f)/ parsing and any other custom syntax.
+                    UrlEventArgs ue = new UrlEventArgs(filePath + app.Context.Request.PathInfo, q); //Create event object
+
+                    //Modify event object
+                    processPath(ue); 
+                    
+                    //Pull data back out of event object
+                    string basePath = ue.VirtualPath;
+                    q = ue.QueryString;
 
                     //dec-11-09  discontinuing AllowURLRewriting and AllowFolderResizeNotation
                     //If the path has changed, this will circumvent the URL auth system.
@@ -143,11 +218,6 @@ namespace fbs.ImageResizer
                         if (string.IsNullOrEmpty(allow) || allow.Equals("false", StringComparison.OrdinalIgnoreCase)){
                             return; //Skip the request
                         }
-                        //No longer needed with UrlAuth module: Prevent access to the /imagecache/ directory (URL auth won't be protecting it now)
-                        //if (new yrl(basePath).Local.StartsWith(DiskCache.GetCacheDir(), StringComparison.OrdinalIgnoreCase))
-                        //{
-                        //    throw new HttpException(403, "Access denied to image cache folder.");
-                        //}
                     }
                    
                     //See if resizing is wanted (i.e. one of the querystring commands is present).
@@ -179,7 +249,9 @@ namespace fbs.ImageResizer
                         //Fall back mode - only use virtual path provider as a fallback if the file doesn't exist - recommended setting.
                         Boolean virtualFileFallBack = "true".Equals(ConfigurationManager.AppSettings["ImageResizerUseVirtualPathProviderAsFallback"], StringComparison.OrdinalIgnoreCase);
 
-                        
+                        //Store modified querystring in request for use by VirtualPathProviders
+                        app.Context.Items["modifiedQueryString"] = q;
+
                         //If the file exists, resize it
                         if (current.FileExists)
                             ResizeRequest(app.Context, current);
@@ -292,7 +364,7 @@ namespace fbs.ImageResizer
 
             //Find out if we have a modified date that we can work with
             bool hasModifiedDate = (vf == null) || vf is IVirtualFileWithModifiedDate;
-            if (hasModifiedDate)
+            if (hasModifiedDate && vf != null)
             {
                 DateTime modDate = ((IVirtualFileWithModifiedDate)vf).ModifiedDateUTC;
                 if (modDate == DateTime.MinValue || modDate == DateTime.MaxValue)
