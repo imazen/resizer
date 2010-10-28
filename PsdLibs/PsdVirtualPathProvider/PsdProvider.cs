@@ -8,7 +8,6 @@ using System.IO;
 using System.Data.Sql;
 using System.Data.SqlClient;
 using System.Configuration;
-using Aurigma.GraphicsMill.Codecs;
 using System.Diagnostics;
 using fbs.ImageResizer;
 using fbs;
@@ -35,14 +34,15 @@ namespace PsdRenderer
         {
             //Renderer object
             IPsdRenderer renderer = null;
-            //The querystring-specified renderer name
-            string sRenderer = null;
-            if (queryString["renderer"] != null) sRenderer = queryString["renderer"].ToLowerInvariant();
-            //Build the correct renderer
-            if (("graphicsmill").Equals(sRenderer))
-                renderer = new GraphicsMillRenderer();
-            else
-                renderer = new PsdPluginRenderer();
+            ////The querystring-specified renderer name
+            //string sRenderer = null;
+            //if (queryString["renderer"] != null) sRenderer = queryString["renderer"].ToLowerInvariant();
+            ////Build the correct renderer
+            //if (("graphicsmill").Equals(sRenderer))
+            //    renderer = new GraphicsMillRenderer();
+            //else
+            //There is only ONE renderer now
+            renderer = new PsdPluginRenderer();
             return renderer;
         }
 

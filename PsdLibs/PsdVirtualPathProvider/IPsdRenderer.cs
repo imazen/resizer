@@ -1,5 +1,4 @@
-﻿using Aurigma.GraphicsMill.Codecs;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Drawing;
 using System.Collections.Generic;

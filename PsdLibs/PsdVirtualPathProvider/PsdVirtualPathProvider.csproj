@@ -34,14 +34,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Aurigma.GraphicsMill, Version=5.5.5.0, Culture=neutral, PublicKeyToken=af7154c50c505858, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\Aurigma\Graphics Mill 5.5 for .NET\Binaries\Aurigma.GraphicsMill.dll</HintPath>
-    </Reference>
-    <Reference Include="Aurigma.GraphicsMill.Codecs.AdvancedPsd, Version=5.5.3915.25706, Culture=neutral, PublicKeyToken=af7154c50c505858, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\Aurigma\Graphics Mill 5.5 for .NET\Binaries\Aurigma.GraphicsMill.Codecs.AdvancedPsd.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -49,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GraphicsMillRenderer.cs" />
     <Compile Include="IPsdRenderer.cs" />
     <Compile Include="MemCachedFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
