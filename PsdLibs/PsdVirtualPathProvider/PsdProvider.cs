@@ -111,11 +111,21 @@ namespace PsdRenderer
             };
         }
 
+        public NameValueCollection QueryString
+        {
+            get
+            {
+                if (HttpContext.Current.Items["modifiedQueryString"] != null) 
+                    return (NameValueCollection)HttpContext.Current.Items["modifiedQueryString"];
+                else 
+                    return HttpContext.Current.Request.QueryString;
+            }
+        }
 
 
         public Stream getStream(string virtualPath)
         {
-            return getStream(virtualPath, HttpContext.Current.Request.QueryString);
+            return getStream(virtualPath, QueryString);
         }
         /// <summary>
         /// Returns a stream to the 
@@ -146,7 +156,7 @@ namespace PsdRenderer
             return ms;
         }
         public System.Drawing.Bitmap getBitmap(string virtualPath){
-            return getBitmap(virtualPath,HttpContext.Current.Request.QueryString);
+            return getBitmap(virtualPath,QueryString);
         }
         /// <summary>
         /// 

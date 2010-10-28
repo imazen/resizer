@@ -49,7 +49,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DiskCache.cs" />
     <Compile Include="GraphicsMillRenderer.cs" />
     <Compile Include="IPsdRenderer.cs" />
     <Compile Include="MemCachedFile.cs" />
