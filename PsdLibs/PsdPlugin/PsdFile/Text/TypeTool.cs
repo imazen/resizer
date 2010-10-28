@@ -26,16 +26,20 @@
 *
 * HEADER_END*/
 
+
+//Only used by Photoshop 5.0 files
+
+
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
 using PhotoshopFile;
 
-namespace Endogine.Codecs.Photoshop.LayerResources
+namespace PhotoshopFile
 {
     [Description("tySh")]
-    public class TypeTool : LayerResource
+    public class TypeTool : PhotoshopFile.Layer.AdjustmentLayerInfo
     {
         public class FontInfo
         {
@@ -67,17 +71,17 @@ namespace Endogine.Codecs.Photoshop.LayerResources
 
         public List<FontInfo> FontInfos;
 
-        public TypeTool()
+        public TypeTool(PhotoshopFile.Layer.AdjustmentLayerInfo info)
         {
-        }
-        public TypeTool(BinaryReverseReader areader)
-            : base(areader)
-        {
-            BinaryReverseReader reader = this.GetDataReader();
+            this.m_data = info.Data;
+            this.m_key = info.Key;
+            this.m_layer = info.Layer;
+
+            BinaryReverseReader reader = this.DataReader;
             ushort Version = reader.ReadUInt16(); //1= Photoshop 5.0
 
             for (int i = 0; i < 6; i++) //2D transform matrix
-                reader.ReadPSDDouble();
+                reader.ReadDouble();
 
 
             //Font info:
@@ -134,9 +138,6 @@ namespace Endogine.Codecs.Photoshop.LayerResources
             byte AntiAlias = reader.ReadByte();
         }
 
-        protected override void SubWrite(BinaryPSDWriter writer)
-        {
-            //TODO:
-        }
+    
     }
 }

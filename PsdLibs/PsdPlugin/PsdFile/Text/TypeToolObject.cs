@@ -32,11 +32,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
 using PhotoshopFile;
+using System.Drawing;
+using System.Diagnostics;
 
-namespace Endogine.Codecs.Photoshop.LayerResources
+namespace PhotoshopFile
 {
     [Description("TySh")]
-    public class TypeToolObject : LayerResource
+    public class TypeToolObject : PhotoshopFile.Layer.AdjustmentLayerInfo
     {
         public class Matrix2D
         {
@@ -50,155 +52,67 @@ namespace Endogine.Codecs.Photoshop.LayerResources
             { }
             public Matrix2D(BinaryReverseReader r)
             {
-                this.M11 = r.ReadPSDDouble();
-                this.M12 = r.ReadPSDDouble();
-                this.M13 = r.ReadPSDDouble();
-                this.M21 = r.ReadPSDDouble();
-                this.M22 = r.ReadPSDDouble();
-                this.M23 = r.ReadPSDDouble();
+                this.M11 = r.ReadDouble();
+                this.M12 = r.ReadDouble();
+                this.M13 = r.ReadDouble();
+                this.M21 = r.ReadDouble();
+                this.M22 = r.ReadDouble();
+                this.M23 = r.ReadDouble();
             }
         }
 
-        //[XmlIgnoreAttribute()]
         public Matrix2D Transform;
-        [XmlIgnoreAttribute()]
-        public Descriptor TextDescriptor;
-        ////[XmlIgnoreAttribute()]
         public DynVal TxtDescriptor;
         [XmlIgnoreAttribute()]
         public DynVal WarpDescriptor;
         [XmlIgnoreAttribute()]
-        public ERectangleF WarpRect;
+        public RectangleF WarpRect;
 
-        public TypeToolObject()
+        public TypeToolObject(PhotoshopFile.Layer.AdjustmentLayerInfo info)
         {
-        }
+            this.m_data = info.Data;
+            this.m_key = info.Key;
+            this.m_layer = info.Layer;
+            
+            BinaryReverseReader r = this.DataReader;
 
-        public TypeToolObject(BinaryReverseReader reader)
-            : base(reader)
-        {
-            BinaryReverseReader r = this.GetDataReader();
+            ushort PhotshopVersion = r.ReadUInt16(); //2 bytes, =1 Photoshop 6 (not 5)
 
-            ushort Version = r.ReadUInt16(); //1= Photoshop 5.0
+            this.Transform = new Matrix2D(r); //six doubles (48 bytes)
 
-            this.Transform = new Matrix2D(r);
+            ushort TextVersion = r.ReadUInt16(); //2 bytes, =50. For Photoshop 6.0.
+            uint DescriptorVersion = r.ReadUInt32(); //4 bytes,=16. For Photoshop 6.0.
 
-            ushort TextDescriptorVersion = r.ReadUInt16(); //=50. For Photoshop 6.0.
-            if (true)
-                this.TxtDescriptor = new DynVal(r, true);
-            else
+
+            this.TxtDescriptor = DynVal.ReadDescriptor(r); //Text descriptor
+
+            ushort WarpVersion = r.ReadUInt16(); //2 bytes, =1. For Photoshop 6.0.
+            uint WarpDescriptorVersion = r.ReadUInt32(); //4 bytes, =16. For Photoshop 6.0.
+
+            
+
+
+            string desc = this.TxtDescriptor.getString();
+
+            this.WarpDescriptor = DynVal.ReadDescriptor(r); //Warp descriptor
+            this.Data = r.ReadBytes((int)r.BytesToEnd); //17 bytes???? All zeroes?
+            if (Data.Length != 17 || !(Array.TrueForAll(Data, b => b == 0)))
             {
-                uint XTextDescriptorVersion = r.ReadUInt32(); //=16. For Photoshop 6.0.
-                this.TextDescriptor = new Descriptor(r);
+                string s = ReadableBinary.CreateHexEditorString(Data);
+                Debug.Write(s);
             }
-            this.Data = r.ReadBytes((int)r.BytesToEnd);
+           
+            //this.WarpRect = new RectangleF();
+            //WarpRect.X = (float)r.ReadDouble();
+            //WarpRect.Y = (float)r.ReadDouble();
+            //this.Data.
+            //WarpRect.Width = (float)r.ReadDouble() - WarpRect.X;
+            //WarpRect.Height = (float)r.ReadDouble() - WarpRect.Y;
 
-            ////ushort WarpDescriptorVersion = r.ReadUInt16(); //=50. For Photoshop 6.0.
-            ////uint XWarpDescriptorVersion = r.ReadUInt32(); //=16. For Photoshop 6.0.
-            ////Descriptor warpDescriptor = new Descriptor(r);
-            //this.WarpDescriptor = new DynVal(r, true);
-
-            //this.WarpRect = ERectangleF.FromLTRB((float)r.ReadPSDDouble(), (float)r.ReadPSDDouble(), (float)r.ReadPSDDouble(), (float)r.ReadPSDDouble());
-            ////this.WarpRect.Left = r.ReadPSDDouble();
-            ////double warpRectTop = r.ReadPSDDouble();
-            ////double warpRectRight = r.ReadPSDDouble();
-            ////double warpRectBottom = r.ReadPSDDouble();
-
-            //this.Data = null;
+            //this.Data = r.ReadBytes((int)r.BytesToEnd);
         }
 
        
 
-        public class Descriptor
-        {
-            public class Item
-            {
-                [XmlAttributeAttribute()]
-                public string ID;
-                [XmlAttributeAttribute()]
-                public string Value;
-                public string Data;
-
-                public Item()
-                { }
-                public bool Read(BinaryReverseReader r)
-                {
-                    this.ID = "";
-                    while (true)
-                    {
-                        char c = r.ReadChar();
-                        if (c == 0x0a)
-                            break;
-                        this.ID += c;
-                    }
-                    byte[] buffer = new byte[255];
-                    int bufPos = 0;
-                    int nearEndCnt = 0;
-                    while (true)
-                    {
-                        byte b = r.ReadByte();
-                        buffer[bufPos++] = b;
-                        if (b == 0x2f)
-                            break;
-                        if (b <= 0x00)
-                        {
-                            nearEndCnt++;
-                            if (nearEndCnt == 12)
-                                break;
-                        }
-                        else
-                            nearEndCnt = 0;
-                    }
-
-                    if (this.ID.Contains(" "))
-                    {
-                        int index = this.ID.IndexOf(" ");
-                        this.Value = this.ID.Substring(index + 1);
-                        this.ID = this.ID.Remove(index);
-                    }
-
-                    int endPos = bufPos - nearEndCnt - 1;
-                    //See if it's only 0x09's:
-                    for (int i = 0; i < endPos; i++)
-                    {
-                        if (buffer[i] != 0x09)
-                        {
-                            this.Data = Endogine.Serialization.ReadableBinary.CreateHexEditorString(buffer, 0, endPos);
-                            break;
-                        }
-                    }
-
-                    return (nearEndCnt == 0);
-                }
-            }
-
-            public List<Item> Items;
-
-            public Descriptor()
-            {
-            }
-            public Descriptor(BinaryReverseReader r)
-            {
-                uint version = r.ReadUInt32(); //?
-                r.BaseStream.Position += 6; //?
-                string type = new string(r.ReadPSDChars(4));
-                uint unknown1 = r.ReadUInt32(); //?
-                uint unknown2 = r.ReadUInt32(); //?
-                string resType1 = new string(r.ReadPSDChars(4));
-                string resType2 = new string(r.ReadPSDChars(4));
-
-                string uniName = r.ReadPSDUnicodeString();
-                while (r.ReadByte() != 0x2f)
-                    ;
-                this.Items = new List<Item>();
-                while (true)
-                {
-                    Item item = new Item();
-                    this.Items.Add(item);
-                    if (item.Read(r) == false)
-                        break;
-                }
-            }
-        }
     }
 }

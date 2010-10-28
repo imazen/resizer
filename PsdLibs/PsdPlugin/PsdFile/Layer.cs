@@ -593,29 +593,32 @@ namespace PhotoshopFile
 
     public class AdjustmentLayerInfo
     {
-      private Layer m_layer;
+        protected Layer m_layer;
       /// <summary>
       /// The layer to which this info belongs
       /// </summary>
-      internal Layer Layer
+      public Layer Layer
       {
         get { return m_layer; }
       }
 
-      private string m_key;
+      protected string m_key;
       public string Key
       {
         get { return m_key; }
         set { m_key = value; }
       }
 
-      private byte[] m_data;
+      protected byte[] m_data;
       public byte[] Data
       {
         get { return m_data; }
         set { m_data = value; }
       }
 
+      protected AdjustmentLayerInfo()
+      {
+      }
       public AdjustmentLayerInfo(string key, Layer layer)
       {
         m_key = key;
