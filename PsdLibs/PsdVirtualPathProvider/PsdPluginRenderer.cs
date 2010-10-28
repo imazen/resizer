@@ -73,6 +73,14 @@ namespace PsdRenderer
                     if (adjustments[j].Key.Equals("TySh"))
                     {
                         this._isTextLayer = true;
+                        TypeToolObject tto = new TypeToolObject(adjustments[j]);
+
+                    }
+                    if (adjustments[j].Key.Equals("tySh"))
+                    {
+                        this._isTextLayer = true;
+                        TypeTool tto = new TypeTool(adjustments[j]);
+
                     }
                 }
             }

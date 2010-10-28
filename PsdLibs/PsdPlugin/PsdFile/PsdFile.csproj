@@ -77,6 +77,14 @@
     <Compile Include="PrivateThreadPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PsdFile.cs" />
+    <Compile Include="Text\DynVal.cs" />
+    <Compile Include="Text\ReadableBinary.cs" />
+    <Compile Include="Text\TdTaParser.cs" />
+    <Compile Include="Text\Token.cs" />
+    <Compile Include="Text\TypeTool.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Text\TypeToolObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -96,7 +104,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Text\" />
+    <EmbeddedResource Include="FourCC.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
