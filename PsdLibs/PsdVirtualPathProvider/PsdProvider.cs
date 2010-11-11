@@ -14,6 +14,8 @@ using fbs;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Drawing.Imaging;
+using PhotoshopFile;
+using PhotoshopFile.Text;
 namespace PsdRenderer
 {
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
@@ -51,7 +53,7 @@ namespace PsdRenderer
         /// </summary>
         /// <param name="queryString"></param>
         /// <returns></returns>
-        private static RenderLayerDelegate BuildLayerCallback(NameValueCollection queryString)
+        private static ShowLayerDelegate BuildLayerCallback(NameValueCollection queryString)
         {
             //Which layers do we show?
             PsdCommandSearcher searcher = new PsdCommandSearcher(new PsdCommandBuilder(queryString));
@@ -98,16 +100,32 @@ namespace PsdRenderer
             b.UnlockBits(bd);
         }
 
-        private static ModifyLayerDelegate BuildModifyLayerCallback(NameValueCollection queryString)
+        private static ComposeLayerDelegate BuildModifyLayerCallback(NameValueCollection queryString)
         {
             PsdCommandSearcher searcher = new PsdCommandSearcher(new PsdCommandBuilder(queryString));
 
-            return delegate(int index, string name, Bitmap b)
+            return delegate(Graphics g, Bitmap b, object layer)
             {
-                Nullable<Color> color = searcher.getColor(name);
-                //Blend color into bitmap
-                if (color != null)  ColorBitmap(b, color.Value);
-                return b;
+                PhotoshopFile.Layer l = (PhotoshopFile.Layer)layer;
+                //See if this layer is supposed to be re-colored.
+                Nullable<Color> color = searcher.getColor(l.Name);
+
+
+                //See if we need to re-draw this text layer
+                Nullable<bool> redraw = searcher.getRedraw(l.Name);
+                if (redraw != null && redraw == true)
+                {
+                    //Re-draw the text directly, ignoring the bitmap
+                    new TextLayerRenderer(l).Render(g, color, searcher.getReplacementText(l.Name));
+                }
+                else
+                {
+                    //Draw the existing bitmap
+                    //Blend color into bitmap
+                    if (color != null) ColorBitmap(b, color.Value);
+                    //Draw image
+                    g.DrawImage(b, l.Rect);
+                }
             };
         }
 
@@ -255,7 +273,7 @@ namespace PsdRenderer
             IList<IPsdLayer> filtered = new List<IPsdLayer>();
             
             //Generate a callback just like the one used in the renderer for filtering
-            RenderLayerDelegate callback = BuildLayerCallback(queryString);
+            ShowLayerDelegate callback = BuildLayerCallback(queryString);
 
             for (int i = 0; i < layers.Count; i++){
                 if (layers[i].IsTextLayer && callback(layers[i].Index, layers[i].Name, layers[i].Visible))
