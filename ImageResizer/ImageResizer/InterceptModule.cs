@@ -238,7 +238,15 @@ namespace fbs.ImageResizer
                             {
                                 throw new HttpException(403, "Access denied.");
                             }
+
                         }
+
+                        //Even if DisableImageURLAuthorization = true, we still want to prevent access to the /imagecache/ directory
+                        if (new yrl(basePath).Local.StartsWith(DiskCache.GetCacheDir(), StringComparison.OrdinalIgnoreCase))
+                        {
+                            throw new HttpException(403, "Access denied to image cache folder.");
+                        }
+
                         //Build a URL using the new basePath and the new Querystring q
                         yrl current = new yrl(basePath);
                         current.QueryString = q;
