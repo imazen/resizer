@@ -1,4 +1,5 @@
 /ImageResizer.XML
-/ImageResizer.csproj
+/*.suo
+/*.csproj.user
 /ImageResizer.dll
 /ImageResizer.pdb
