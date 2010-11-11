@@ -1,0 +1,55 @@
+
+EngineDict.DocumentResources and
+EngineDict.ResourceDict both seem to contain identical trees. Strange. 
+
+I guess I'll pict ResourceDict and ignore DocumentResources.
+I'll refer to the tree structure they both contain as ResourceGlob.
+
+ResourceGlob.FontSet[] 
+
+Font{ Name$, Script:0,FontType:1,Synthetic:0}. 
+
+ResourceGlob.StyleSheetSet[]
+
+StyleSheet{ 
+  Name$, 
+  StyleSheetData{
+     Font:index,FontSize:int(points),FauxBold:bool,FauxItalic:bool,Underline:bool,Strikethrough:bool,StyleRunAlignment
+   FillColor{},StrokeColor{},FillFlag:bool,StrokeFlag:bool,OutlineWidth:1
+  }
+}
+
+Color{Type:1,Values[1,0,0,0]} 
+
+
+EngineDict.Editor.Text (text data), unicode string.
+
+EngineDict.ParagraphRun.DefaultRunData (Default Paragraph object)
+			RunArray[] (array of Paragraph objects)
+			RunLengthArray: [12] (array of lengths that the array items refer to)
+			IsJoinable:1
+Paragraph{
+	.ParagraphSheet.DefaultStyleSheet = 0
+	.Adjustments
+}
+
+
+EngineDict.StyleRun.	DefaultRunData (Default StyleSheet object)
+EngineDict.StyleRun.	RunArray[] (Array of StyleSheet objects)
+			RunLengthArray: [12] (array of lengths that the array items refer to)
+			IsJoinable:2
+
+
+Since no settings ever seem to be ommited, I think the only resource we have to resolve is Fonts, from ResourceDict.
+
+
+The DefaultStyleSheet settings don't come into play except when adding text, and we are just going to use the existing font anyhow.
+
+Start with DefaultRunData
+Copy the run array item over top, replacing arrays, merging dicts
+
+Compare DocumentResources and ResourceDict - are they always identical?
+
+
+
+DefaultStyleSheet and Font integer references - which set do they reference? 

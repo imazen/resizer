@@ -35,31 +35,33 @@ using PhotoshopFile;
 using System.Drawing;
 using System.Diagnostics;
 
-namespace PhotoshopFile
+namespace PhotoshopFile.Text
 {
+    public class Matrix2D
+    {
+        public double M11;
+        public double M12;
+        public double M13;
+        public double M21;
+        public double M22;
+        public double M23;
+        public Matrix2D()
+        { }
+        public Matrix2D(BinaryReverseReader r)
+        {
+            this.M11 = r.ReadDouble();
+            this.M12 = r.ReadDouble();
+            this.M13 = r.ReadDouble();
+            this.M21 = r.ReadDouble();
+            this.M22 = r.ReadDouble();
+            this.M23 = r.ReadDouble();
+        }
+    }
+
     [Description("TySh")]
     public class TypeToolObject : PhotoshopFile.Layer.AdjustmentLayerInfo
     {
-        public class Matrix2D
-        {
-            public double M11;
-            public double M12;
-            public double M13;
-            public double M21;
-            public double M22;
-            public double M23;
-            public Matrix2D()
-            { }
-            public Matrix2D(BinaryReverseReader r)
-            {
-                this.M11 = r.ReadDouble();
-                this.M12 = r.ReadDouble();
-                this.M13 = r.ReadDouble();
-                this.M21 = r.ReadDouble();
-                this.M22 = r.ReadDouble();
-                this.M23 = r.ReadDouble();
-            }
-        }
+
 
         public Matrix2D Transform;
         public DynVal TxtDescriptor;
@@ -67,6 +69,17 @@ namespace PhotoshopFile
         public DynVal WarpDescriptor;
         [XmlIgnoreAttribute()]
         public RectangleF WarpRect;
+        public TdTaStylesheetReader StylesheetReader;
+        public Dictionary<string, object> engineData;
+        public Boolean isTextHorizontal
+        {
+            get
+            {
+                return ((string)TxtDescriptor.Children.Find(c => c.Name.Equals("Orientation", StringComparison.InvariantCultureIgnoreCase)).Value)
+                     .Equals("Orientation.Horizontal", StringComparison.InvariantCultureIgnoreCase);
+            }
+        }
+
 
         public TypeToolObject(PhotoshopFile.Layer.AdjustmentLayerInfo info)
         {
@@ -89,10 +102,10 @@ namespace PhotoshopFile
             ushort WarpVersion = r.ReadUInt16(); //2 bytes, =1. For Photoshop 6.0.
             uint WarpDescriptorVersion = r.ReadUInt32(); //4 bytes, =16. For Photoshop 6.0.
 
-            
+            engineData = (Dictionary<string, object>)TxtDescriptor.Children.Find(c => c.Name == "EngineData").Value;
+            StylesheetReader = new TdTaStylesheetReader(engineData);
 
-
-            string desc = this.TxtDescriptor.getString();
+            //string desc = this.TxtDescriptor.getString();
 
             this.WarpDescriptor = DynVal.ReadDescriptor(r); //Warp descriptor
             this.Data = r.ReadBytes((int)r.BytesToEnd); //17 bytes???? All zeroes?
