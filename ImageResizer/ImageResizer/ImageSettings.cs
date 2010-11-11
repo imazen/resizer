@@ -35,6 +35,7 @@ using System.Drawing;
 using System.Collections.Specialized;
 using System.Drawing.Imaging;
 using System.Globalization;
+using System.Drawing.Drawing2D;
 
 namespace fbs.ImageResizer
 {
@@ -146,7 +147,9 @@ namespace fbs.ImageResizer
         }
         public ImageAttributes getImageAttributes()
         {
-            return null;
+            ImageAttributes ia = new ImageAttributes();
+            ia.SetWrapMode(WrapMode.TileFlipXY);
+            return ia;
         }
          /// <summary>
         /// Returns true if all settings are at their defaults, and no proccessing is to occurr.
