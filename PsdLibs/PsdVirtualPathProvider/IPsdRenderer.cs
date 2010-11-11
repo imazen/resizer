@@ -5,13 +5,13 @@ using System.Collections.Generic;
 using fbs.ImageResizer;
 namespace PsdRenderer
 {
-    public delegate bool RenderLayerDelegate(int index, string Name, bool visibleNow);
-    public delegate Bitmap ModifyLayerDelegate(int index, string Name, Bitmap layer);
+    public delegate bool ShowLayerDelegate(int index, string Name, bool visibleNow);
+    public delegate void ComposeLayerDelegate(Graphics g,Bitmap bitmap,  object layer);
     public interface IPsdRenderer
     {
-        
 
-         Bitmap Render(Stream s, out IList<IPsdLayer> layers, RenderLayerDelegate showLayerCallback, ModifyLayerDelegate modifyLayer);
+
+        Bitmap Render(Stream s, out IList<IPsdLayer> layers, ShowLayerDelegate showLayerCallback, ComposeLayerDelegate modifyLayer);
 
          IList<IPsdLayer> GetLayers(Stream s);
     }
