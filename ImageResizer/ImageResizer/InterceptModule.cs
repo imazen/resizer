@@ -78,7 +78,7 @@ namespace fbs.ImageResizer
         }
     }
 
-    public delegate void UrlRewritingHook(UrlEventArgs e, InterceptModule sender);
+    public delegate void UrlRewritingHook(InterceptModule sender, UrlEventArgs e);
 
 
     /// <summary>
@@ -131,13 +131,13 @@ namespace fbs.ImageResizer
         protected void processPath(UrlEventArgs e)
         {
             //Fire first event (results will stay in e)
-            if (Rewrite != null) Rewrite(e, this);
+            if (Rewrite != null) Rewrite( this,e);
             
             //Copy querystring for use in 'defaults' even
             NameValueCollection copy = new NameValueCollection(e.QueryString); //Copy so we can later overwrite q with the original values.
             
             //Fire defaults event.
-            if (RewriteDefaults != null) RewriteDefaults(e, this);
+            if (RewriteDefaults != null) RewriteDefaults(this,e);
 
             //Overwrite with querystring values again - this is what makes applyDefaults applyDefaults, vs. being applyOverrides.
             foreach (string k in copy)
@@ -150,7 +150,7 @@ namespace fbs.ImageResizer
             e.VirtualPath = CustomFolders.processPath(e.VirtualPath, e.QueryString);
 
             //Fire final event
-            if (PostRewrite != null) PostRewrite(e, this);
+            if (PostRewrite != null) PostRewrite(this,e);
         }
 
         /// <summary>
