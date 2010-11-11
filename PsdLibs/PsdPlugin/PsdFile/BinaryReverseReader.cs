@@ -179,9 +179,30 @@ namespace PhotoshopFile
             return (this.BaseStream.Length - this.BaseStream.Position);
         }
     }
- 
 
- 
+
+    
+    public System.Drawing.Color ReadPSDColor(int bits, bool alpha)
+    {
+        if (bits == 8)
+        {
+            int a = (int)base.ReadByte();
+            if (!alpha)
+                a = 255;
+            return System.Drawing.Color.FromArgb(a, this.ReadByte(), this.ReadByte(), this.ReadByte());
+        }
+        else
+        {
+            this.BaseStream.Position += 2; //Always?
+            ushort a = ushort.MaxValue;
+            if (alpha)
+                a = this.ReadUInt16();
+            ushort r = this.ReadUInt16();
+            ushort g = this.ReadUInt16();
+            ushort b = this.ReadUInt16();
+            return System.Drawing.Color.FromArgb((int)a >> 8, (int)r >> 8, (int)g >> 8, (int)b >> 8);
+        }
+    }
 
     
 

@@ -37,6 +37,7 @@ using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Threading;
+using PhotoshopFile.Text;
 
 namespace PhotoshopFile
 {
@@ -644,6 +645,8 @@ namespace PhotoshopFile
         m_data = reader.ReadBytes((int)dataLength);
       }
 
+
+
       public void Save(BinaryReverseWriter writer)
       {
         Debug.WriteLine("AdjustmentLayerInfo Save started at " + writer.BaseStream.Position.ToString());
@@ -943,7 +946,13 @@ namespace PhotoshopFile
       {
         try
         {
-          m_adjustmentInfo.Add(new AdjustmentLayerInfo(reader, this));
+            AdjustmentLayerInfo ali = new AdjustmentLayerInfo(reader, this);
+            if (ali.Key.Equals("lrFX"))
+            {
+                //A sub-key - we want to merge its sub-layer info items with this dict.
+                m_adjustmentInfo.AddRange(new Effects(ali)._resources.Values);
+            } else 
+                m_adjustmentInfo.Add(ali); // Just add the items
         }
         catch
         {

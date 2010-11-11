@@ -36,7 +36,7 @@ using System.Text;
 using System.ComponentModel;
 using PhotoshopFile;
 
-namespace PhotoshopFile
+namespace PhotoshopFile.Text
 {
     [Description("tySh")]
     public class TypeTool : PhotoshopFile.Layer.AdjustmentLayerInfo
@@ -68,7 +68,7 @@ namespace PhotoshopFile
                     this.DesignVectors.Add(r.ReadUInt32());
             }
         }
-
+        public Matrix2D Transform;
         public List<FontInfo> FontInfos;
 
         public TypeTool(PhotoshopFile.Layer.AdjustmentLayerInfo info)
@@ -80,8 +80,10 @@ namespace PhotoshopFile
             BinaryReverseReader reader = this.DataReader;
             ushort Version = reader.ReadUInt16(); //1= Photoshop 5.0
 
-            for (int i = 0; i < 6; i++) //2D transform matrix
-                reader.ReadDouble();
+
+            //2D transform matrix (6 doubles)
+            Transform = new Matrix2D(reader);
+
 
 
             //Font info:

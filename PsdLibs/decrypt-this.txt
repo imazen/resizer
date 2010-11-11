@@ -1,759 +1,553 @@
 
-
 (Descriptor) TextLayer:null
-	(String) Text:Italy
+	(String) Text:Switzerland
 	(Enumerated) textGridding:textGridding.None
 	(Enumerated) Orientation:Orientation.Horizontal
 	(Enumerated) AntiAliasedPICTAcquire:AntiAlias.antiAliasSharp
-	(Integer) TextIndex:3
-	(tdta) EngineData:
-0000:00 00 21 98 0A 0A 3C 3C   0A   ..!.....  .
-		(None) 	/EngineDict:null
-		(None) Editor:null
-		(None) Text: 0000:28 FE FF 00 49 00 74 00   61 00 6C 00 79 00 0D 29     (þÿ.I.t.  a.l.y..)  
-		(None) ParagraphRun:null
-		(None) DefaultRunData:null
-		(None) ParagraphSheet:null
-		(None) DefaultStyleSheet:0
-		(None) Properties:null
-		(None) Adjustments:null
-		(None) Axis:[ 1.0 0.0 1.0 ]
-		(None) XY:[ 0.0 0.0 ]
-		(None) RunArray:[
-		(None) ParagraphSheet:null
-		(None) DefaultStyleSheet:0
-		(None) Properties:null
-		(None) Justification:0
-		(None) FirstLineIndent:0.0
-		(None) StartIndent:0.0
-		(None) EndIndent:0.0
-		(None) SpaceBefore:0.0
-		(None) SpaceAfter:0.0
-		(None) AutoHyphenate:true
-		(None) HyphenatedWordSize:6
-		(None) PreHyphen:2
-		(None) PostHyphen:2
-		(None) ConsecutiveHyphens:8
-		(None) Zone:36.0
-		(None) WordSpacing:[ 0.8 1.0 1.33 ]
-		(None) LetterSpacing:[ 0.0 0.0 0.0 ]
-		(None) GlyphSpacing:[ 1.0 1.0 1.0 ]
-		(None) AutoLeading:1.2
-		(None) LeadingType:0
-		(None) Hanging:false
-		(None) Burasagari:false
-		(None) KinsokuOrder:0
-		(None) EveryLineComposer:false
-		(None) Adjustments:null
-		(None) Axis:[ 1.0 0.0 1.0 ]
-		(None) XY:[ 0.0 0.0 ]
-		(None) RunLengthArray:[ 6 ]
-		(None) IsJoinable:1
-		(None) StyleRun:null
-		(None) DefaultRunData:null
-		(None) StyleSheet:null
-		(None) StyleSheetData:null
-		(None) RunArray:[
-		(None) StyleSheet:null
-		(None) StyleSheetData:null
-		(None) Font:0
-		(None) FontSize:14.0
-		(None) FauxBold:false
-		(None) FauxItalic:false
-		(None) AutoLeading:true
-		(None) Leading:16.8
-		(None) HorizontalScale:1.0
-		(None) VerticalScale:1.0
-		(None) Tracking:0
-		(None) AutoKerning:true
-		(None) Kerning:0
-		(None) BaselineShift:0.0
-		(None) FontCaps:0
-		(None) FontBaseline:0
-		(None) Underline:false
-		(None) Strikethrough:false
-		(None) Ligatures:true
-		(None) DLigatures:false
-		(None) BaselineDirection:1
-		(None) Tsume:0.0
-		(None) StyleRunAlignment:2
-		(None) Language:0
-		(None) NoBreak:false
-		(None) FillColor:null
-		(None) Type:1
-		(None) Values:[ 1.0 0.0 0.20001 0.79999 ]
-		(None) StrokeColor:null
-		(None) Type:1
-		(None) Values:[ 1.0 0.91373 0.91373 0.91373 ]
-		(None) FillFlag:true
-		(None) StrokeFlag:false
-		(None) FillFirst:false
-		(None) YUnderline:1
-		(None) OutlineWidth:1.0
-		(None) RunLengthArray:[ 6 ]
-		(None) IsJoinable:2
-		(None) GridInfo:null
-		(None) GridIsOn:false
-		(None) ShowGrid:false
-		(None) GridSize:18.0
-		(None) GridLeading:22.0
-		(None) GridColor:null
-		(None) Type:1
-		(None) Values:[ 0.0 0.0 0.0 1.0 ]
-		(None) GridLeadingFillColor:null
-		(None) Type:1
-		(None) Values:[ 0.0 0.0 0.0 1.0 ]
-		(None) AlignLineHeightToGridFlags:false
-		(None) AntiAlias:4
-		(None) UseFractionalGlyphWidths:true
-		(None) Rendered:null
-		(None) Version:1
-		(None) Shapes:null
-		(None) WritingDirection:0
-		(None) Children:[
-		(None) ShapeType:1
-		(None) Procession:0
-		(None) Lines:null
-		(None) WritingDirection:0
-		(None) Children:[ ]
-		(None) Cookie:null
-		(None) Photoshop:null
-		(None) ShapeType:1
-		(None) BoxBounds:[ 0.0 0.0 55.5 35.0 ]
-		(None) Base:null
-		(None) ShapeType:1
-		(None) TransformPoint0:[ 1.0 0.0 ]
-		(None) TransformPoint1:[ 0.0 1.0 ]
-		(None) TransformPoint2:[ 0.0 0.0 ]
-		(None) ResourceDict:null
-		(None) KinsokuSet:[
-		(None) Name:ÿPhotoshopKinsokuHard
-		(None) NoStart: 0000:28 FE FF 30 01 30 02 FF   0C FF 0E 30 FB FF 1A FF     (þÿ0.0.ÿ  .ÿ.0ûÿ.ÿ   0010:1B FF 1F FF 01 30 FC 20   15 20 19 20 1D FF 09 30     .ÿ.ÿ.0ü   . . .ÿ.0   0020:15 FF 3D FF 5D 30 09 30   0B 30 0D 30 0F 30 11 30     .ÿ=ÿ]0.0  .0.0.0.0   0030:FD 30 FE 30 9D 30 7E 30   05 30 41 30 43 30 45 30     ý0þ0.0~0  .0A0C0E0   0040:47 30 49 30 63 30 92 30   26 30 21 30 7D 30 A1 30     G0I0c0.0  .0!0}0¡0   0050:A3 30 A5 30 A7 30 A9 30   C3 30 E3 30 E5 30 E7 30     £0¥0§0©0  Ã0ã0å0ç0   0060:EE 30 F5 30 F6 30 3A 30   53 00 3F 00 21 00 5C 29     î0õ0ö0:0  S.?.!.\)   0070:00 5D 00 7D 00 2C 00 2E   00 3A 00 3B 21 03 21 09     .].}.,..  .:.;!.!.   0080:00 A2 FF 05 20 30 29   .¢ÿ. 0)
-		(None) NoEnd:(þÿ  ÿ0ÿ;ÿ[00
-		(None) Keep: 0000:28 FE FF 20 15 20 25 29     (þÿ . %)  
-		(None) Hanging: 0000:28 FE FF 30 01 30 02 00   2E 00 2C 29   (þÿ0.0..  ..,)
-		(None) Name:ÿPhotoshopKinsokuSoft
-		(None) NoStart: 0000:28 FE FF 30 01 30 02 FF   0C FF 0E 30 FB FF 1A FF     (þÿ0.0.ÿ  .ÿ.0ûÿ.ÿ   0010:1B FF 1F FF 01 20 19 20   1D FF 09 30 15 FF 3D FF     .ÿ.ÿ. .   .ÿ.0.ÿ=ÿ   0020:5D 30 09 30 0B 30 0D 30   0F 30 11 30 FD 30 FE 30     ]0.0.0.0  .0.0ý0þ0   0030:9D 30 7E 30 05 29   .0~0.)
-		(None) NoEnd:(þÿ  ÿ0ÿ;ÿ[00
-		(None) Keep: 0000:28 FE FF 20 15 20 25 29     (þÿ . %)  
-		(None) Hanging: 0000:28 FE FF 30 01 30 02 00   2E 00 2C 29   (þÿ0.0..  ..,)
-		(None) MojiKumiSet:[
-		(None) InternalName:ÿPhotoshop6MojiKumiSet1
-		(None) InternalName:ÿPhotoshop6MojiKumiSet2
-		(None) InternalName:ÿPhotoshop6MojiKumiSet3
-		(None) InternalName:ÿPhotoshop6MojiKumiSet4
-		(None) TheNormalStyleSheet:0
-		(None) TheNormalParagraphSheet:0
-		(None) ParagraphSheetSet:[
-		(None) Name:ÿNormal RGB
-		(None) DefaultStyleSheet:0
-		(None) Properties:null
-		(None) Justification:0
-		(None) FirstLineIndent:0.0
-		(None) StartIndent:0.0
-		(None) EndIndent:0.0
-		(None) SpaceBefore:0.0
-		(None) SpaceAfter:0.0
-		(None) AutoHyphenate:true
-		(None) HyphenatedWordSize:6
-		(None) PreHyphen:2
-		(None) PostHyphen:2
-		(None) ConsecutiveHyphens:8
-		(None) Zone:36.0
-		(None) WordSpacing:[ 0.8 1.0 1.33 ]
-		(None) LetterSpacing:[ 0.0 0.0 0.0 ]
-		(None) GlyphSpacing:[ 1.0 1.0 1.0 ]
-		(None) AutoLeading:1.2
-		(None) LeadingType:0
-		(None) Hanging:false
-		(None) Burasagari:false
-		(None) KinsokuOrder:0
-		(None) EveryLineComposer:false
-		(None) StyleSheetSet:[
-		(None) Name:ÿNormal RGB
-		(None) StyleSheetData:null
-		(None) Font:1
-		(None) FontSize:12.0
-		(None) FauxBold:false
-		(None) FauxItalic:false
-		(None) AutoLeading:true
-		(None) Leading:0.0
-		(None) HorizontalScale:1.0
-		(None) VerticalScale:1.0
-		(None) Tracking:0
-		(None) AutoKerning:true
-		(None) Kerning:0
-		(None) BaselineShift:0.0
-		(None) FontCaps:0
-		(None) FontBaseline:0
-		(None) Underline:false
-		(None) Strikethrough:false
-		(None) Ligatures:true
-		(None) DLigatures:false
-		(None) BaselineDirection:2
-		(None) Tsume:0.0
-		(None) StyleRunAlignment:2
-		(None) Language:0
-		(None) NoBreak:false
-		(None) FillColor:null
-		(None) Type:1
-		(None) Values:[ 1.0 0.0 0.0 0.0 ]
-		(None) StrokeColor:null
-		(None) Type:1
-		(None) Values:[ 1.0 0.0 0.0 0.0 ]
-		(None) FillFlag:true
-		(None) StrokeFlag:false
-		(None) FillFirst:true
-		(None) YUnderline:1
-		(None) OutlineWidth:1.0
-		(None) FontSet:[
-		(None) Name:ÿVerdana-Bold
-		(None) Script:0
-		(None) FontType:1
-		(None) Synthetic:0
-		(None) Name:ÿTimesNewRomanPSMT
-		(None) Script:0
-		(None) FontType:1
-		(None) Synthetic:0
-		(None) Name:ÿAdobeInvisFont
-		(None) Script:0
-		(None) FontType:0
-		(None) Synthetic:0
-		(None) SuperscriptSize:0.583
-		(None) SuperscriptPosition:0.333
-		(None) SubscriptSize:0.583
-		(None) SubscriptPosition:0.333
-		(None) SmallCapSize:0.7
-		(None) DocumentResources:null
-		(None) KinsokuSet:[
-		(None) Name:ÿPhotoshopKinsokuHard
-		(None) NoStart: 0000:28 FE FF 30 01 30 02 FF   0C FF 0E 30 FB FF 1A FF     (þÿ0.0.ÿ  .ÿ.0ûÿ.ÿ   0010:1B FF 1F FF 01 30 FC 20   15 20 19 20 1D FF 09 30     .ÿ.ÿ.0ü   . . .ÿ.0   0020:15 FF 3D FF 5D 30 09 30   0B 30 0D 30 0F 30 11 30     .ÿ=ÿ]0.0  .0.0.0.0   0030:FD 30 FE 30 9D 30 7E 30   05 30 41 30 43 30 45 30     ý0þ0.0~0  .0A0C0E0   0040:47 30 49 30 63 30 92 30   26 30 21 30 7D 30 A1 30     G0I0c0.0  .0!0}0¡0   0050:A3 30 A5 30 A7 30 A9 30   C3 30 E3 30 E5 30 E7 30     £0¥0§0©0  Ã0ã0å0ç0   0060:EE 30 F5 30 F6 30 3A 30   53 00 3F 00 21 00 5C 29     î0õ0ö0:0  S.?.!.\)   0070:00 5D 00 7D 00 2C 00 2E   00 3A 00 3B 21 03 21 09     .].}.,..  .:.;!.!.   0080:00 A2 FF 05 20 30 29   .¢ÿ. 0)
-		(None) NoEnd:(þÿ  ÿ0ÿ;ÿ[00
-		(None) Keep: 0000:28 FE FF 20 15 20 25 29     (þÿ . %)  
-		(None) Hanging: 0000:28 FE FF 30 01 30 02 00   2E 00 2C 29   (þÿ0.0..  ..,)
-		(None) Name:ÿPhotoshopKinsokuSoft
-		(None) NoStart: 0000:28 FE FF 30 01 30 02 FF   0C FF 0E 30 FB FF 1A FF     (þÿ0.0.ÿ  .ÿ.0ûÿ.ÿ   0010:1B FF 1F FF 01 20 19 20   1D FF 09 30 15 FF 3D FF     .ÿ.ÿ. .   .ÿ.0.ÿ=ÿ   0020:5D 30 09 30 0B 30 0D 30   0F 30 11 30 FD 30 FE 30     ]0.0.0.0  .0.0ý0þ0   0030:9D 30 7E 30 05 29   .0~0.)
-		(None) NoEnd:(þÿ  ÿ0ÿ;ÿ[00
-		(None) Keep: 0000:28 FE FF 20 15 20 25 29     (þÿ . %)  
-		(None) Hanging: 0000:28 FE FF 30 01 30 02 00   2E 00 2C 29   (þÿ0.0..  ..,)
-		(None) MojiKumiSet:[
-		(None) InternalName:ÿPhotoshop6MojiKumiSet1
-		(None) InternalName:ÿPhotoshop6MojiKumiSet2
-		(None) InternalName:ÿPhotoshop6MojiKumiSet3
-		(None) InternalName:ÿPhotoshop6MojiKumiSet4
-		(None) TheNormalStyleSheet:0
-		(None) TheNormalParagraphSheet:0
-		(None) ParagraphSheetSet:[
-		(None) Name:ÿNormal RGB
-		(None) DefaultStyleSheet:0
-		(None) Properties:null
-		(None) Justification:0
-		(None) FirstLineIndent:0.0
-		(None) StartIndent:0.0
-		(None) EndIndent:0.0
-		(None) SpaceBefore:0.0
-		(None) SpaceAfter:0.0
-		(None) AutoHyphenate:true
-		(None) HyphenatedWordSize:6
-		(None) PreHyphen:2
-		(None) PostHyphen:2
-		(None) ConsecutiveHyphens:8
-		(None) Zone:36.0
-		(None) WordSpacing:[ 0.8 1.0 1.33 ]
-		(None) LetterSpacing:[ 0.0 0.0 0.0 ]
-		(None) GlyphSpacing:[ 1.0 1.0 1.0 ]
-		(None) AutoLeading:1.2
-		(None) LeadingType:0
-		(None) Hanging:false
-		(None) Burasagari:false
-		(None) KinsokuOrder:0
-		(None) EveryLineComposer:false
-		(None) StyleSheetSet:[
-		(None) Name:ÿNormal RGB
-		(None) StyleSheetData:null
-		(None) Font:1
-		(None) FontSize:12.0
-		(None) FauxBold:false
-		(None) FauxItalic:false
-		(None) AutoLeading:true
-		(None) Leading:0.0
-		(None) HorizontalScale:1.0
-		(None) VerticalScale:1.0
-		(None) Tracking:0
-		(None) AutoKerning:true
-		(None) Kerning:0
-		(None) BaselineShift:0.0
-		(None) FontCaps:0
-		(None) FontBaseline:0
-		(None) Underline:false
-		(None) Strikethrough:false
-		(None) Ligatures:true
-		(None) DLigatures:false
-		(None) BaselineDirection:2
-		(None) Tsume:0.0
-		(None) StyleRunAlignment:2
-		(None) Language:0
-		(None) NoBreak:false
-		(None) FillColor:null
-		(None) Type:1
-		(None) Values:[ 1.0 0.0 0.0 0.0 ]
-		(None) StrokeColor:null
-		(None) Type:1
-		(None) Values:[ 1.0 0.0 0.0 0.0 ]
-		(None) FillFlag:true
-		(None) StrokeFlag:false
-		(None) FillFirst:true
-		(None) YUnderline:1
-		(None) OutlineWidth:1.0
-		(None) FontSet:[
-		(None) Name:ÿVerdana-Bold
-		(None) Script:0
-		(None) FontType:1
-		(None) Synthetic:0
-		(None) Name:ÿTimesNewRomanPSMT
-		(None) Script:0
-		(None) FontType:1
-		(None) Synthetic:0
-		(None) Name:ÿAdobeInvisFont
-		(None) Script:0
-		(None) FontType:0
-		(None) Synthetic:0
-		(None) SuperscriptSize:0.583
-		(None) SuperscriptPosition:0.333
-		(None) SubscriptSize:0.583
-		(None) SubscriptPosition:0.333
-		(None) SmallCapSize:0.7
-
-
-
-
-	/EngineDict
-	<<
-		/Editor
-		<<
-			/Text (þÿ		>>
-		/ParagraphRun
-		<<
-			/DefaultRunData
-			<<
-				/ParagraphSheet
-				<<
-					/DefaultStyleSheet 0
-					/Properties
-					<<
-					>>
-				>>
-				/Adjustments
-				<<
-					/Axis [ 1.0 0.0 1.0 ]
-					/XY [ 0.0 0.0 ]
-				>>
-			>>
-			/RunArray [
-			<<
-				/ParagraphSheet
-				<<
-					/DefaultStyleSheet 0
-					/Properties
-					<<
-						/Justification 2
-						/FirstLineIndent 0.0
-						/StartIndent 0.0
-						/EndIndent 0.0
-						/SpaceBefore 0.0
-						/SpaceAfter 0.0
-						/AutoHyphenate true
-						/HyphenatedWordSize 6
-						/PreHyphen 2
-						/PostHyphen 2
-						/ConsecutiveHyphens 8
-						/Zone 36.0
-						/WordSpacing [ .8 1.0 1.33 ]
-						/LetterSpacing [ 0.0 0.0 0.0 ]
-						/GlyphSpacing [ 1.0 1.0 1.0 ]
-						/AutoLeading 1.2
-						/LeadingType 0
-						/Hanging false
-						/Burasagari false
-						/KinsokuOrder 0
-						/EveryLineComposer false
-					>>
-				>>
-				/Adjustments
-				<<
-					/Axis [ 1.0 0.0 1.0 ]
-					/XY [ 0.0 0.0 ]
-				>>
-			>>
-			]
-			/RunLengthArray [ 10 ]
-			/IsJoinable 1
-		>>
-		/StyleRun
-		<<
-			/DefaultRunData
-			<<
-				/StyleSheet
-				<<
-					/StyleSheetData
-					<<
-					>>
-				>>
-			>>
-			/RunArray [
-			<<
-				/StyleSheet
-				<<
-					/StyleSheetData
-					<<
-						/Font 0
-						/FontSize 12.49509
-						/FauxBold false
-						/FauxItalic false
-						/AutoLeading false
-						/Leading 12.49509
-						/HorizontalScale 1.5
-						/VerticalScale 1.0
-						/Tracking 0
-						/AutoKerning true
-						/Kerning 0
-						/BaselineShift 0.0
-						/FontCaps 0
-						/FontBaseline 0
-						/Underline false
-						/Strikethrough false
-						/Ligatures true
-						/DLigatures false
-						/BaselineDirection 2
-						/Tsume 0.0
-						/StyleRunAlignment 2
-						/Language 15
-						/NoBreak true
-						/FillColor
-						<<
-							/Type 1
-							/Values [ 1.0 .99216 .99216 .97253 ]
-						>>
-						/StrokeColor
-						<<
-							/Type 1
-							/Values [ 1.0 .98038 .97647 .97647 ]
-						>>
-						/FillFlag true
-						/StrokeFlag false
-						/FillFirst false
-						/YUnderline 1
-						/OutlineWidth .02083
-					>>
-				>>
-			>>
-			]
-			/RunLengthArray [ 10 ]
-			/IsJoinable 2
-		>>
-		/GridInfo
-		<<
-			/GridIsOn false
-			/ShowGrid false
-			/GridSize 18.0
-			/GridLeading 22.0
-			/GridColor
-			<<
-				/Type 1
-				/Values [ 0.0 0.0 0.0 1.0 ]
-			>>
-			/GridLeadingFillColor
-			<<
-				/Type 1
-				/Values [ 0.0 0.0 0.0 1.0 ]
-			>>
-			/AlignLineHeightToGridFlags false
-		>>
-		/AntiAlias 0
-		/UseFractionalGlyphWidths false
-		/Rendered
-		<<
-			/Version 1
-			/Shapes
-			<<
-				/WritingDirection 0
-				/Children [
-				<<
-					/ShapeType 0
-					/Procession 0
-					/Lines
-					<<
-						/WritingDirection 0
-						/Children [ ]
-					>>
-					/Cookie
-					<<
-						/Photoshop
-						<<
-							/ShapeType 0
-							/PointBase [ 0.0 0.0 ]
-							/Base
-							<<
-								/ShapeType 0
-								/TransformPoint0 [ 1.0 0.0 ]
-								/TransformPoint1 [ 0.0 1.0 ]
-								/TransformPoint2 [ 0.0 0.0 ]
-							>>
-						>>
-					>>
-				>>
-				]
-			>>
-		>>
-	>>
-	/ResourceDict
-	<<
-		/KinsokuSet [
-		<<
-			/Name (þÿH			/NoStart (þÿ00ÿÿ0ûÿÿÿÿ0ü   ÿ	0ÿ=ÿ]0	00
-000ý0þ00ž00A0C0E0G0I0c0ƒ0…0‡0Ž0¡0£0¥0§0©0Ã0ã0å0ç0î0õ0ö0›0œ.			/NoEnd (þÿ  ÿ0ÿ;ÿ[00
-000			/Keep (þÿ  %)
-			/Hanging (þÿ00		>>
-		<<
-			/Name (þÿS			/NoStart (þÿ00ÿÿ0ûÿÿÿÿ  ÿ	0ÿ=ÿ]0	00
-000ý0þ00ž0)
-			/NoEnd (þÿ  ÿ0ÿ;ÿ[00
-000)
-			/Keep (þÿ  %)
-			/Hanging (þÿ00		>>
-		]
-		/MojiKumiSet [
-		<<
-			/InternalName (þÿm		>>
-		<<
-			/InternalName (þÿm		>>
-		<<
-			/InternalName (þÿm		>>
-		<<
-			/InternalName (þÿm		>>
-		]
-		/TheNormalStyleSheet 0
-		/TheNormalParagraphSheet 0
-		/ParagraphSheetSet [
-		<<
-			/Name (þÿ			/DefaultStyleSheet 0
-			/Properties
-			<<
-				/Justification 0
-				/FirstLineIndent 0.0
-				/StartIndent 0.0
-				/EndIndent 0.0
-				/SpaceBefore 0.0
-				/SpaceAfter 0.0
-				/AutoHyphenate true
-				/HyphenatedWordSize 6
-				/PreHyphen 2
-				/PostHyphen 2
-				/ConsecutiveHyphens 8
-				/Zone 36.0
-				/WordSpacing [ .8 1.0 1.33 ]
-				/LetterSpacing [ 0.0 0.0 0.0 ]
-				/GlyphSpacing [ 1.0 1.0 1.0 ]
-				/AutoLeading 1.2
-				/LeadingType 0
-				/Hanging false
-				/Burasagari false
-				/KinsokuOrder 0
-				/EveryLineComposer false
-			>>
-		>>
-		]
-		/StyleSheetSet [
-		<<
-			/Name (þÿ			/StyleSheetData
-			<<
-				/Font 1
-				/FontSize 12.0
-				/FauxBold false
-				/FauxItalic false
-				/AutoLeading true
-				/Leading 0.0
-				/HorizontalScale 1.0
-				/VerticalScale 1.0
-				/Tracking 0
-				/AutoKerning true
-				/Kerning 0
-				/BaselineShift 0.0
-				/FontCaps 0
-				/FontBaseline 0
-				/Underline false
-				/Strikethrough false
-				/Ligatures true
-				/DLigatures false
-				/BaselineDirection 2
-				/Tsume 0.0
-				/StyleRunAlignment 2
-				/Language 0
-				/NoBreak false
-				/FillColor
-				<<
-					/Type 1
-					/Values [ 1.0 0.0 0.0 0.0 ]
-				>>
-				/StrokeColor
-				<<
-					/Type 1
-					/Values [ 1.0 0.0 0.0 0.0 ]
-				>>
-				/FillFlag true
-				/StrokeFlag false
-				/FillFirst true
-				/YUnderline 1
-				/OutlineWidth 1.0
-			>>
-		>>
-		]
-		/FontSet [
-		<<
-			/Name (þÿ			/Script 0
-			/FontType 1
-			/Synthetic 0
-		>>
-		<<
-			/Name (þÿT)
-			/Script 0
-			/FontType 1
-			/Synthetic 0
-		>>
-		<<
-			/Name (þÿ			/Script 0
-			/FontType 0
-			/Synthetic 0
-		>>
-		]
-		/SuperscriptSize .583
-		/SuperscriptPosition .333
-		/SubscriptSize .583
-		/SubscriptPosition .333
-		/SmallCapSize .7
-	>>
-	/DocumentResources
-	<<
-		/KinsokuSet [
-		<<
-			/Name (þÿH			/NoStart (þÿ00ÿÿ0ûÿÿÿÿ0ü   ÿ	0ÿ=ÿ]0	00
-000ý0þ00ž00A0C0E0G0I0c0ƒ0…0‡0Ž0¡0£0¥0§0©0Ã0ã0å0ç0î0õ0ö0›0œ.			/NoEnd (þÿ  ÿ0ÿ;ÿ[00
-000			/Keep (þÿ  %)
-			/Hanging (þÿ00		>>
-		<<
-			/Name (þÿS			/NoStart (þÿ00ÿÿ0ûÿÿÿÿ  ÿ	0ÿ=ÿ]0	00
-000ý0þ00ž0)
-			/NoEnd (þÿ  ÿ0ÿ;ÿ[00
-000)
-			/Keep (þÿ  %)
-			/Hanging (þÿ00		>>
-		]
-		/MojiKumiSet [
-		<<
-			/InternalName (þÿm		>>
-		<<
-			/InternalName (þÿm		>>
-		<<
-			/InternalName (þÿm		>>
-		<<
-			/InternalName (þÿm		>>
-		]
-		/TheNormalStyleSheet 0
-		/TheNormalParagraphSheet 0
-		/ParagraphSheetSet [
-		<<
-			/Name (þÿ			/DefaultStyleSheet 0
-			/Properties
-			<<
-				/Justification 0
-				/FirstLineIndent 0.0
-				/StartIndent 0.0
-				/EndIndent 0.0
-				/SpaceBefore 0.0
-				/SpaceAfter 0.0
-				/AutoHyphenate true
-				/HyphenatedWordSize 6
-				/PreHyphen 2
-				/PostHyphen 2
-				/ConsecutiveHyphens 8
-				/Zone 36.0
-				/WordSpacing [ .8 1.0 1.33 ]
-				/LetterSpacing [ 0.0 0.0 0.0 ]
-				/GlyphSpacing [ 1.0 1.0 1.0 ]
-				/AutoLeading 1.2
-				/LeadingType 0
-				/Hanging false
-				/Burasagari false
-				/KinsokuOrder 0
-				/EveryLineComposer false
-			>>
-		>>
-		]
-		/StyleSheetSet [
-		<<
-			/Name (þÿ			/StyleSheetData
-			<<
-				/Font 1
-				/FontSize 12.0
-				/FauxBold false
-				/FauxItalic false
-				/AutoLeading true
-				/Leading 0.0
-				/HorizontalScale 1.0
-				/VerticalScale 1.0
-				/Tracking 0
-				/AutoKerning true
-				/Kerning 0
-				/BaselineShift 0.0
-				/FontCaps 0
-				/FontBaseline 0
-				/Underline false
-				/Strikethrough false
-				/Ligatures true
-				/DLigatures false
-				/BaselineDirection 2
-				/Tsume 0.0
-				/StyleRunAlignment 2
-				/Language 0
-				/NoBreak false
-				/FillColor
-				<<
-					/Type 1
-					/Values [ 1.0 0.0 0.0 0.0 ]
-				>>
-				/StrokeColor
-				<<
-					/Type 1
-					/Values [ 1.0 0.0 0.0 0.0 ]
-				>>
-				/FillFlag true
-				/StrokeFlag false
-				/FillFirst true
-				/YUnderline 1
-				/OutlineWidth 1.0
-			>>
-		>>
-		]
-		/FontSet [
-		<<
-			/Name (þÿ			/Script 0
-			/FontType 1
-			/Synthetic 0
-		>>
-		<<
-			/Name (þÿT)
-			/Script 0
-			/FontType 1
-			/Synthetic 0
-		>>
-		<<
-			/Name (þÿ			/Script 0
-			/FontType 0
-			/Synthetic 0
-		>>
-		]
-		/SuperscriptSize .583
-		/SuperscriptPosition .333
-		/SubscriptSize .583
-		/SubscriptPosition .333
-		/SmallCapSize .7
+	(Integer) TextIndex:8
+	(tdta) EngineData:System.Collections.Generic.Dictionary`2[System.String,System.Object]
+		{
+			EngineDict:
+			{
+				Editor:
+				{
+					Text:(
+0000:FE FF 00 53 00 77 00 69   00 74 00 7A 00 65 00 72     þÿ.S.w.i  .t.z.e.r  
+0010:00 6C 00 61 00 6E 00 64   00 0D   .l.a.n.d  ..),
+				},
+				ParagraphRun:
+				{
+					DefaultRunData:
+					{
+						ParagraphSheet:
+						{
+							DefaultStyleSheet:0,
+							Properties:
+							{
+							},
+						},
+						Adjustments:
+						{
+							Axis:[1,0,1],
+							XY:[0,0],
+						},
+					},
+					RunArray:[
+					{
+						ParagraphSheet:
+						{
+							DefaultStyleSheet:0,
+							Properties:
+							{
+								Justification:0,
+								FirstLineIndent:0,
+								StartIndent:0,
+								EndIndent:0,
+								SpaceBefore:0,
+								SpaceAfter:0,
+								AutoHyphenate:True,
+								HyphenatedWordSize:6,
+								PreHyphen:2,
+								PostHyphen:2,
+								ConsecutiveHyphens:8,
+								Zone:36,
+								WordSpacing:[0.8,1,1.33],
+								LetterSpacing:[0,0,0],
+								GlyphSpacing:[1,1,1],
+								AutoLeading:1.2,
+								LeadingType:0,
+								Hanging:False,
+								Burasagari:False,
+								KinsokuOrder:0,
+								EveryLineComposer:False,
+							},
+						},
+						Adjustments:
+						{
+							Axis:[1,0,1],
+							XY:[0,0],
+						},
+					}],
+					RunLengthArray:[12],
+					IsJoinable:1,
+				},
+				StyleRun:
+				{
+					DefaultRunData:
+					{
+						StyleSheet:
+						{
+							StyleSheetData:
+							{
+							},
+						},
+					},
+					RunArray:[
+					{
+						StyleSheet:
+						{
+							StyleSheetData:
+							{
+								Font:0,
+								FontSize:14,
+								FauxBold:False,
+								FauxItalic:False,
+								AutoLeading:True,
+								Leading:16.8,
+								HorizontalScale:1,
+								VerticalScale:1,
+								Tracking:0,
+								AutoKerning:True,
+								Kerning:0,
+								BaselineShift:0,
+								FontCaps:0,
+								FontBaseline:0,
+								Underline:False,
+								Strikethrough:False,
+								Ligatures:True,
+								DLigatures:False,
+								BaselineDirection:1,
+								Tsume:0,
+								StyleRunAlignment:2,
+								Language:0,
+								NoBreak:False,
+								FillColor:
+								{
+									Type:1,
+									Values:[1,0,0.20001,0.79999],
+								},
+								StrokeColor:
+								{
+									Type:1,
+									Values:[1,0.91373,0.91373,0.91373],
+								},
+								FillFlag:True,
+								StrokeFlag:False,
+								FillFirst:False,
+								YUnderline:1,
+								OutlineWidth:1,
+							},
+						},
+					}],
+					RunLengthArray:[12],
+					IsJoinable:2,
+				},
+				GridInfo:
+				{
+					GridIsOn:False,
+					ShowGrid:False,
+					GridSize:18,
+					GridLeading:22,
+					GridColor:
+					{
+						Type:1,
+						Values:[0,0,0,1],
+					},
+					GridLeadingFillColor:
+					{
+						Type:1,
+						Values:[0,0,0,1],
+					},
+					AlignLineHeightToGridFlags:False,
+				},
+				AntiAlias:4,
+				UseFractionalGlyphWidths:True,
+				Rendered:
+				{
+					Version:1,
+					Shapes:
+					{
+						WritingDirection:0,
+						Children:[
+						{
+							ShapeType:1,
+							Procession:0,
+							Lines:
+							{
+								WritingDirection:0,
+								Children:[],
+							},
+							Cookie:
+							{
+								Photoshop:
+								{
+									ShapeType:1,
+									BoxBounds:[0,0,102.5,17.66667],
+									Base:
+									{
+										ShapeType:1,
+										TransformPoint0:[1,0],
+										TransformPoint1:[0,1],
+										TransformPoint2:[0,0],
+									},
+								},
+							},
+						}],
+					},
+				},
+			},
+			ResourceDict:
+			{
+				KinsokuSet:[
+				{
+					Name:(
+0000:FE FF 00 50 00 68 00 6F   00 74 00 6F 00 73 00 68     þÿ.P.h.o  .t.o.s.h  
+0010:00 6F 00 70 00 4B 00 69   00 6E 00 73 00 6F 00 6B     .o.p.K.i  .n.s.o.k  
+0020:00 75 00 48 00 61 00 72   00 64   .u.H.a.r  .d),
+					NoStart:(
+0000:FE FF 30 01 30 02 FF 0C   FF 0E 30 FB FF 1A FF 1B     þÿ0.0.ÿ.  ÿ.0ûÿ.ÿ.  
+0010:FF 1F FF 01 30 FC 20 15   20 19 20 1D FF 09 30 15     ÿ.ÿ.0ü .   . .ÿ.0.  
+0020:FF 3D FF 5D 30 09 30 0B   30 0D 30 0F 30 11 30 FD     ÿ=ÿ]0.0.  0.0.0.0ý  
+0030:30 FE 30 9D 30 9E 30 05   30 41 30 43 30 45 30 47     0þ0.0.0.  0A0C0E0G  
+0040:30 49 30 63 30 83 30 85   30 87 30 8E 30 A1 30 A3     0I0c0.0.  0.0.0¡0£  
+0050:30 A5 30 A7 30 A9 30 C3   30 E3 30 E5 30 E7 30 EE     0¥0§0©0Ã  0ã0å0ç0î  
+0060:30 F5 30 F6 30 9B 30 9C   00 3F 00 21 00 29 00 5D     0õ0ö0.0.  .?.!.).]  
+0070:00 7D 00 2C 00 2E 00 3A   00 3B 21 03 21 09 00 A2     .}.,...:  .;!.!..¢  
+0080:FF 05 20 30   ÿ. 0),
+					NoEnd:(
+0000:FE FF 20 18 20 1C FF 08   30 14 FF 3B FF 5B 30 08     þÿ . .ÿ.  0.ÿ;ÿ[0.  
+0010:30 0A 30 0C 30 0E 30 10   00 5C 28 00 5B 00 7B FF     0.0.0.0.  .\(.[.{ÿ  
+0020:E5 FF 04 00 A3 FF 20 00   A7 30 12 FF 03   åÿ..£ÿ .  §0.ÿ.),
+					Keep:(
+0000:FE FF 20 15 20 25   þÿ . %),
+					Hanging:(
+0000:FE FF 30 01 30 02 00 2E   00 2C   þÿ0.0...  .,),
+				},
+				{
+					Name:(
+0000:FE FF 00 50 00 68 00 6F   00 74 00 6F 00 73 00 68     þÿ.P.h.o  .t.o.s.h  
+0010:00 6F 00 70 00 4B 00 69   00 6E 00 73 00 6F 00 6B     .o.p.K.i  .n.s.o.k  
+0020:00 75 00 53 00 6F 00 66   00 74   .u.S.o.f  .t),
+					NoStart:(
+0000:FE FF 30 01 30 02 FF 0C   FF 0E 30 FB FF 1A FF 1B     þÿ0.0.ÿ.  ÿ.0ûÿ.ÿ.  
+0010:FF 1F FF 01 20 19 20 1D   FF 09 30 15 FF 3D FF 5D     ÿ.ÿ. . .  ÿ.0.ÿ=ÿ]  
+0020:30 09 30 0B 30 0D 30 0F   30 11 30 FD 30 FE 30 9D     0.0.0.0.  0.0ý0þ0.  
+0030:30 9E 30 05   0.0.),
+					NoEnd:(
+0000:FE FF 20 18 20 1C FF 08   30 14 FF 3B FF 5B 30 08     þÿ . .ÿ.  0.ÿ;ÿ[0.  
+0010:30 0A 30 0C 30 0E 30 10     0.0.0.0.  ),
+					Keep:(
+0000:FE FF 20 15 20 25   þÿ . %),
+					Hanging:(
+0000:FE FF 30 01 30 02 00 2E   00 2C   þÿ0.0...  .,),
+				}],
+				MojiKumiSet:[
+				{
+					InternalName:(
+0000:FE FF 00 50 00 68 00 6F   00 74 00 6F 00 73 00 68     þÿ.P.h.o  .t.o.s.h  
+0010:00 6F 00 70 00 36 00 4D   00 6F 00 6A 00 69 00 4B     .o.p.6.M  .o.j.i.K  
+0020:00 75 00 6D 00 69 00 53   00 65 00 74 00 31   .u.m.i.S  .e.t.1),
+				},
+				{
+					InternalName:(
+0000:FE FF 00 50 00 68 00 6F   00 74 00 6F 00 73 00 68     þÿ.P.h.o  .t.o.s.h  
+0010:00 6F 00 70 00 36 00 4D   00 6F 00 6A 00 69 00 4B     .o.p.6.M  .o.j.i.K  
+0020:00 75 00 6D 00 69 00 53   00 65 00 74 00 32   .u.m.i.S  .e.t.2),
+				},
+				{
+					InternalName:(
+0000:FE FF 00 50 00 68 00 6F   00 74 00 6F 00 73 00 68     þÿ.P.h.o  .t.o.s.h  
+0010:00 6F 00 70 00 36 00 4D   00 6F 00 6A 00 69 00 4B     .o.p.6.M  .o.j.i.K  
+0020:00 75 00 6D 00 69 00 53   00 65 00 74 00 33   .u.m.i.S  .e.t.3),
+				},
+				{
+					InternalName:(
+0000:FE FF 00 50 00 68 00 6F   00 74 00 6F 00 73 00 68     þÿ.P.h.o  .t.o.s.h  
+0010:00 6F 00 70 00 36 00 4D   00 6F 00 6A 00 69 00 4B     .o.p.6.M  .o.j.i.K  
+0020:00 75 00 6D 00 69 00 53   00 65 00 74 00 34   .u.m.i.S  .e.t.4),
+				}],
+				TheNormalStyleSheet:0,
+				TheNormalParagraphSheet:0,
+				ParagraphSheetSet:[
+				{
+					Name:(
+0000:FE FF 00 4E 00 6F 00 72   00 6D 00 61 00 6C 00 20     þÿ.N.o.r  .m.a.l.   
+0010:00 52 00 47 00 42   .R.G.B),
+					DefaultStyleSheet:0,
+					Properties:
+					{
+						Justification:0,
+						FirstLineIndent:0,
+						StartIndent:0,
+						EndIndent:0,
+						SpaceBefore:0,
+						SpaceAfter:0,
+						AutoHyphenate:True,
+						HyphenatedWordSize:6,
+						PreHyphen:2,
+						PostHyphen:2,
+						ConsecutiveHyphens:8,
+						Zone:36,
+						WordSpacing:[0.8,1,1.33],
+						LetterSpacing:[0,0,0],
+						GlyphSpacing:[1,1,1],
+						AutoLeading:1.2,
+						LeadingType:0,
+						Hanging:False,
+						Burasagari:False,
+						KinsokuOrder:0,
+						EveryLineComposer:False,
+					},
+				}],
+				StyleSheetSet:[
+				{
+					Name:(
+0000:FE FF 00 4E 00 6F 00 72   00 6D 00 61 00 6C 00 20     þÿ.N.o.r  .m.a.l.   
+0010:00 52 00 47 00 42   .R.G.B),
+					StyleSheetData:
+					{
+						Font:1,
+						FontSize:12,
+						FauxBold:False,
+						FauxItalic:False,
+						AutoLeading:True,
+						Leading:0,
+						HorizontalScale:1,
+						VerticalScale:1,
+						Tracking:0,
+						AutoKerning:True,
+						Kerning:0,
+						BaselineShift:0,
+						FontCaps:0,
+						FontBaseline:0,
+						Underline:False,
+						Strikethrough:False,
+						Ligatures:True,
+						DLigatures:False,
+						BaselineDirection:2,
+						Tsume:0,
+						StyleRunAlignment:2,
+						Language:0,
+						NoBreak:False,
+						FillColor:
+						{
+							Type:1,
+							Values:[1,0,0,0],
+						},
+						StrokeColor:
+						{
+							Type:1,
+							Values:[1,0,0,0],
+						},
+						FillFlag:True,
+						StrokeFlag:False,
+						FillFirst:True,
+						YUnderline:1,
+						OutlineWidth:1,
+					},
+				}],
+				FontSet:[
+				{
+					Name:(
+0000:FE FF 00 56 00 65 00 72   00 64 00 61 00 6E 00 61     þÿ.V.e.r  .d.a.n.a  
+0010:00 2D 00 42 00 6F 00 6C   00 64   .-.B.o.l  .d),
+					Script:0,
+					FontType:1,
+					Synthetic:0,
+				},
+				{
+					Name:(
+0000:FE FF 00 54 00 69 00 6D   00 65 00 73 00 4E 00 65     þÿ.T.i.m  .e.s.N.e  
+0010:00 77 00 52 00 6F 00 6D   00 61 00 6E 00 50 00 53     .w.R.o.m  .a.n.P.S  
+0020:00 4D 00 54   .M.T),
+					Script:0,
+					FontType:1,
+					Synthetic:0,
+				},
+				{
+					Name:(
+0000:FE FF 00 41 00 64 00 6F   00 62 00 65 00 49 00 6E     þÿ.A.d.o  .b.e.I.n  
+0010:00 76 00 69 00 73 00 46   00 6F 00 6E 00 74   .v.i.s.F  .o.n.t),
+					Script:0,
+					FontType:0,
+					Synthetic:0,
+				}],
+				SuperscriptSize:0.583,
+				SuperscriptPosition:0.333,
+				SubscriptSize:0.583,
+				SubscriptPosition:0.333,
+				SmallCapSize:0.7,
+			},
+			DocumentResources:
+			{
+				KinsokuSet:[
+				{
+					Name:(
+0000:FE FF 00 50 00 68 00 6F   00 74 00 6F 00 73 00 68     þÿ.P.h.o  .t.o.s.h  
+0010:00 6F 00 70 00 4B 00 69   00 6E 00 73 00 6F 00 6B     .o.p.K.i  .n.s.o.k  
+0020:00 75 00 48 00 61 00 72   00 64   .u.H.a.r  .d),
+					NoStart:(
+0000:FE FF 30 01 30 02 FF 0C   FF 0E 30 FB FF 1A FF 1B     þÿ0.0.ÿ.  ÿ.0ûÿ.ÿ.  
+0010:FF 1F FF 01 30 FC 20 15   20 19 20 1D FF 09 30 15     ÿ.ÿ.0ü .   . .ÿ.0.  
+0020:FF 3D FF 5D 30 09 30 0B   30 0D 30 0F 30 11 30 FD     ÿ=ÿ]0.0.  0.0.0.0ý  
+0030:30 FE 30 9D 30 9E 30 05   30 41 30 43 30 45 30 47     0þ0.0.0.  0A0C0E0G  
+0040:30 49 30 63 30 83 30 85   30 87 30 8E 30 A1 30 A3     0I0c0.0.  0.0.0¡0£  
+0050:30 A5 30 A7 30 A9 30 C3   30 E3 30 E5 30 E7 30 EE     0¥0§0©0Ã  0ã0å0ç0î  
+0060:30 F5 30 F6 30 9B 30 9C   00 3F 00 21 00 29 00 5D     0õ0ö0.0.  .?.!.).]  
+0070:00 7D 00 2C 00 2E 00 3A   00 3B 21 03 21 09 00 A2     .}.,...:  .;!.!..¢  
+0080:FF 05 20 30   ÿ. 0),
+					NoEnd:(
+0000:FE FF 20 18 20 1C FF 08   30 14 FF 3B FF 5B 30 08     þÿ . .ÿ.  0.ÿ;ÿ[0.  
+0010:30 0A 30 0C 30 0E 30 10   00 5C 28 00 5B 00 7B FF     0.0.0.0.  .\(.[.{ÿ  
+0020:E5 FF 04 00 A3 FF 20 00   A7 30 12 FF 03   åÿ..£ÿ .  §0.ÿ.),
+					Keep:(
+0000:FE FF 20 15 20 25   þÿ . %),
+					Hanging:(
+0000:FE FF 30 01 30 02 00 2E   00 2C   þÿ0.0...  .,),
+				},
+				{
+					Name:(
+0000:FE FF 00 50 00 68 00 6F   00 74 00 6F 00 73 00 68     þÿ.P.h.o  .t.o.s.h  
+0010:00 6F 00 70 00 4B 00 69   00 6E 00 73 00 6F 00 6B     .o.p.K.i  .n.s.o.k  
+0020:00 75 00 53 00 6F 00 66   00 74   .u.S.o.f  .t),
+					NoStart:(
+0000:FE FF 30 01 30 02 FF 0C   FF 0E 30 FB FF 1A FF 1B     þÿ0.0.ÿ.  ÿ.0ûÿ.ÿ.  
+0010:FF 1F FF 01 20 19 20 1D   FF 09 30 15 FF 3D FF 5D     ÿ.ÿ. . .  ÿ.0.ÿ=ÿ]  
+0020:30 09 30 0B 30 0D 30 0F   30 11 30 FD 30 FE 30 9D     0.0.0.0.  0.0ý0þ0.  
+0030:30 9E 30 05   0.0.),
+					NoEnd:(
+0000:FE FF 20 18 20 1C FF 08   30 14 FF 3B FF 5B 30 08     þÿ . .ÿ.  0.ÿ;ÿ[0.  
+0010:30 0A 30 0C 30 0E 30 10     0.0.0.0.  ),
+					Keep:(
+0000:FE FF 20 15 20 25   þÿ . %),
+					Hanging:(
+0000:FE FF 30 01 30 02 00 2E   00 2C   þÿ0.0...  .,),
+				}],
+				MojiKumiSet:[
+				{
+					InternalName:(
+0000:FE FF 00 50 00 68 00 6F   00 74 00 6F 00 73 00 68     þÿ.P.h.o  .t.o.s.h  
+0010:00 6F 00 70 00 36 00 4D   00 6F 00 6A 00 69 00 4B     .o.p.6.M  .o.j.i.K  
+0020:00 75 00 6D 00 69 00 53   00 65 00 74 00 31   .u.m.i.S  .e.t.1),
+				},
+				{
+					InternalName:(
+0000:FE FF 00 50 00 68 00 6F   00 74 00 6F 00 73 00 68     þÿ.P.h.o  .t.o.s.h  
+0010:00 6F 00 70 00 36 00 4D   00 6F 00 6A 00 69 00 4B     .o.p.6.M  .o.j.i.K  
+0020:00 75 00 6D 00 69 00 53   00 65 00 74 00 32   .u.m.i.S  .e.t.2),
+				},
+				{
+					InternalName:(
+0000:FE FF 00 50 00 68 00 6F   00 74 00 6F 00 73 00 68     þÿ.P.h.o  .t.o.s.h  
+0010:00 6F 00 70 00 36 00 4D   00 6F 00 6A 00 69 00 4B     .o.p.6.M  .o.j.i.K  
+0020:00 75 00 6D 00 69 00 53   00 65 00 74 00 33   .u.m.i.S  .e.t.3),
+				},
+				{
+					InternalName:(
+0000:FE FF 00 50 00 68 00 6F   00 74 00 6F 00 73 00 68     þÿ.P.h.o  .t.o.s.h  
+0010:00 6F 00 70 00 36 00 4D   00 6F 00 6A 00 69 00 4B     .o.p.6.M  .o.j.i.K  
+0020:00 75 00 6D 00 69 00 53   00 65 00 74 00 34   .u.m.i.S  .e.t.4),
+				}],
+				TheNormalStyleSheet:0,
+				TheNormalParagraphSheet:0,
+				ParagraphSheetSet:[
+				{
+					Name:(
+0000:FE FF 00 4E 00 6F 00 72   00 6D 00 61 00 6C 00 20     þÿ.N.o.r  .m.a.l.   
+0010:00 52 00 47 00 42   .R.G.B),
+					DefaultStyleSheet:0,
+					Properties:
+					{
+						Justification:0,
+						FirstLineIndent:0,
+						StartIndent:0,
+						EndIndent:0,
+						SpaceBefore:0,
+						SpaceAfter:0,
+						AutoHyphenate:True,
+						HyphenatedWordSize:6,
+						PreHyphen:2,
+						PostHyphen:2,
+						ConsecutiveHyphens:8,
+						Zone:36,
+						WordSpacing:[0.8,1,1.33],
+						LetterSpacing:[0,0,0],
+						GlyphSpacing:[1,1,1],
+						AutoLeading:1.2,
+						LeadingType:0,
+						Hanging:False,
+						Burasagari:False,
+						KinsokuOrder:0,
+						EveryLineComposer:False,
+					},
+				}],
+				StyleSheetSet:[
+				{
+					Name:(
+0000:FE FF 00 4E 00 6F 00 72   00 6D 00 61 00 6C 00 20     þÿ.N.o.r  .m.a.l.   
+0010:00 52 00 47 00 42   .R.G.B),
+					StyleSheetData:
+					{
+						Font:1,
+						FontSize:12,
+						FauxBold:False,
+						FauxItalic:False,
+						AutoLeading:True,
+						Leading:0,
+						HorizontalScale:1,
+						VerticalScale:1,
+						Tracking:0,
+						AutoKerning:True,
+						Kerning:0,
+						BaselineShift:0,
+						FontCaps:0,
+						FontBaseline:0,
+						Underline:False,
+						Strikethrough:False,
+						Ligatures:True,
+						DLigatures:False,
+						BaselineDirection:2,
+						Tsume:0,
+						StyleRunAlignment:2,
+						Language:0,
+						NoBreak:False,
+						FillColor:
+						{
+							Type:1,
+							Values:[1,0,0,0],
+						},
+						StrokeColor:
+						{
+							Type:1,
+							Values:[1,0,0,0],
+						},
+						FillFlag:True,
+						StrokeFlag:False,
+						FillFirst:True,
+						YUnderline:1,
+						OutlineWidth:1,
+					},
+				}],
+				FontSet:[
+				{
+					Name:(
+0000:FE FF 00 56 00 65 00 72   00 64 00 61 00 6E 00 61     þÿ.V.e.r  .d.a.n.a  
+0010:00 2D 00 42 00 6F 00 6C   00 64   .-.B.o.l  .d),
+					Script:0,
+					FontType:1,
+					Synthetic:0,
+				},
+				{
+					Name:(
+0000:FE FF 00 54 00 69 00 6D   00 65 00 73 00 4E 00 65     þÿ.T.i.m  .e.s.N.e  
+0010:00 77 00 52 00 6F 00 6D   00 61 00 6E 00 50 00 53     .w.R.o.m  .a.n.P.S  
+0020:00 4D 00 54   .M.T),
+					Script:0,
+					FontType:1,
+					Synthetic:0,
+				},
+				{
+					Name:(
+0000:FE FF 00 41 00 64 00 6F   00 62 00 65 00 49 00 6E     þÿ.A.d.o  .b.e.I.n  
+0010:00 76 00 69 00 73 00 46   00 6F 00 6E 00 74   .v.i.s.F  .o.n.t),
+					Script:0,
+					FontType:0,
+					Synthetic:0,
+				}],
+				SuperscriptSize:0.583,
+				SuperscriptPosition:0.333,
+				SubscriptSize:0.583,
+				SubscriptPosition:0.333,
+				SmallCapSize:0.7,
+			},
+		}

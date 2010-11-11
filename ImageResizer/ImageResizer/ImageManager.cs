@@ -495,9 +495,11 @@ namespace fbs.ImageResizer
                 if (!paddingColor.Equals(opts.bgcolor) && paddingColor != Color.Transparent)
                     g.FillPolygon(new SolidBrush(paddingColor), size.targetArea);
                 
-                g.DrawImage(src, PolygonMath.getParallelogram(size.imageTarget), size.sourceRect, GraphicsUnit.Pixel);//, adjustments.getImageAttributes()
-               
-
+                using (ImageAttributes ia = adjustments.getImageAttributes()){
+                    ia.SetWrapMode(WrapMode.TileFlipXY);
+                    g.DrawImage(src, PolygonMath.getParallelogram(size.imageTarget), size.sourceRect, GraphicsUnit.Pixel, ia);
+                }
+                
                 //Draw border
                 if (opts.borderWidth > 0)
                 {
