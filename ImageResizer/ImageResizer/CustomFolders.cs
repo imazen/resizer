@@ -21,8 +21,6 @@ namespace fbs.ImageResizer
     /// </summary>
     public static class CustomFolders
     {
-        //public delegate string ProcessPath(string virtualPath, NameValueCollection queryString);
-
 
         /*
          * Changes from version 1.2
@@ -83,8 +81,6 @@ namespace fbs.ImageResizer
         /// <param name="filePath">The virtual domain-relative path (/app/folder/file.jpg). Doesn't include the querystring.</param>
         private static string applyDefaults(string filePath, NameValueCollection q)
         {
-            if (filePath.ToLowerInvariant().Contains(".psd.")) q["useresizingpipeline"] = "true";
-
 
             //Parse and remove the resize folder syntax from the URL. InterceptModule enforces AllowURLRewriting setting - we don't deal with it here.
             string path = parseResizeFolderSyntax(filePath, q);

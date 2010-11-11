@@ -96,7 +96,7 @@ namespace fbs.ImageResizer
         /// <param name="context"></param>
         void System.Web.IHttpModule.Init(System.Web.HttpApplication context)
         {
-            //We wait until after URL auth happens for security.
+            //We wait until after URL auth happens for security. (although we authorize again since we are doing URL rewriting)
             context.PostAuthorizeRequest += new EventHandler(CheckRequest_PostAuthorizeRequest);
             //This is where we set content-type and caching headers. content-type headers don't match the 
             //file extension when format= or thumbnail= is used, so we have to override them
@@ -106,20 +106,22 @@ namespace fbs.ImageResizer
         /// <summary>
         /// Fired during PostAuthorizeRequest, after ResizeExtension has been removed.
         /// Fired before CustomFolders and other URL rewriting events.
-        /// <para>Only fired on accepted image types: ImageOutputSettings.IsAcceptedImageType()</para>
+        /// <para>Only fired on accepted image types: ImageOutputSettings.IsAcceptedImageType(). 
+        /// You can add acceptable image extentions using ImageOutputSettings, or you can add an 
+        /// extra extension in the URL and remove it here. Example: .psd.jpg</para>
         /// </summary>
-        public static event UrlRewritingHook PreCustomFoldersRewrite;
+        public static event UrlRewritingHook Rewrite;
         /// <summary>
-        /// Fired during PostAuthorizeRequest, after PreCustomFoldersRewrite.
+        /// Fired during PostAuthorizeRequest, after Rewrite.
         /// Any changes made here (which conflict) will be overwritten by the the current querystring values. I.e, this is a good place to specify default settings.
         /// <para>Only fired on accepted image types: ImageOutputSettings.IsAcceptedImageType()</para>
         /// </summary>
-        public static event UrlRewritingHook PreCustomFoldersDefaults;
+        public static event UrlRewritingHook RewriteDefaults;
         /// <summary>
         /// Fired after all other rewrite events and CustomFolders.cs 
         /// <para>Only fired on accepted image types: ImageOutputSettings.IsAcceptedImageType()</para>
         /// </summary>
-        public static event UrlRewritingHook PostCustomFoldersRewrite;
+        public static event UrlRewritingHook PostRewrite;
 
 
         /// <summary>
@@ -129,13 +131,13 @@ namespace fbs.ImageResizer
         protected void processPath(UrlEventArgs e)
         {
             //Fire first event (results will stay in e)
-            if (PreCustomFoldersRewrite != null) PreCustomFoldersRewrite(e, this);
+            if (Rewrite != null) Rewrite(e, this);
             
             //Copy querystring for use in 'defaults' even
             NameValueCollection copy = new NameValueCollection(e.QueryString); //Copy so we can later overwrite q with the original values.
             
             //Fire defaults event.
-            if (PreCustomFoldersDefaults != null) PreCustomFoldersDefaults(e, this);
+            if (RewriteDefaults != null) RewriteDefaults(e, this);
 
             //Overwrite with querystring values again - this is what makes applyDefaults applyDefaults, vs. being applyOverrides.
             foreach (string k in copy)
@@ -148,7 +150,7 @@ namespace fbs.ImageResizer
             e.VirtualPath = CustomFolders.processPath(e.VirtualPath, e.QueryString);
 
             //Fire final event
-            if (PostCustomFoldersRewrite != null) PostCustomFoldersRewrite(e, this);
+            if (PostRewrite != null) PostRewrite(e, this);
         }
 
         /// <summary>
