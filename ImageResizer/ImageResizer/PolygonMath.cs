@@ -471,7 +471,11 @@ namespace fbs.ImageResizer
             return MovePoly(NormalizePoly(inner), new PointF((outBox.Width - inBox.Width) / 2 + outBox.X,
                                                     (outBox.Height - inBox.Height) / 2 + outBox.Y));
         }
-
+        /// <summary>
+        /// Rounds a floating-point rectangle to an integer rectangle using System.Round
+        /// </summary>
+        /// <param name="r"></param>
+        /// <returns></returns>
         public static Rectangle ToRectangle(RectangleF r)
         {
             return new Rectangle((int)Math.Round(r.X), (int)Math.Round(r.Y), (int)Math.Round(r.Width),(int)Math.Round( r.Height));
