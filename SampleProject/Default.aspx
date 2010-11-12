@@ -43,9 +43,9 @@
     <br />
     The slight blur around the edges is a bug in Graphics.DrawImage(). You can control the color by setting <strong>&amp;bgcolor=color|hex</strong>.
     
-    <p>Upscaling the canvas is sometimes desired instead of upscaling the image when it is smaller than the requested size. Yse <strong>?scale=upscalecanvas</strong> to achieve this effect.</p>
+    <p>Upscaling the canvas is sometimes desired instead of upscaling the image when it is smaller than the requested size. Use <strong>?scale=upscalecanvas</strong> to achieve this effect.</p>
     <img src="tractor-tiny.jpg?scale=upscalecanvas&width=200&borderColor=black&borderWidth=2" runat="server" 
-    title="?scale=upscalecanvas&width=200" />
+    title="?scale=upscalecanvas&width=200&borderColor=black&borderWidth=2" />
     
     
     <h2>Cropping</h2>
@@ -181,8 +181,7 @@
     <h2>/resize(width,height,format)/ syntax</h2>
     <p>For the URL-conscious, you can replace <strong>img/image.jpg?maxwidth=x&amp;maxheight=y</strong> with
      <strong>img/resize(x,y)/image.jpg</strong>. A third argument, format, is also allowed.</p>
-     <p><em>However</em>, enabling this (AllowURLRewriting) will make the ASP.NET URL authorization system unable to match URLs.... But that only affects you if you set permissions in web.config.</p>
-      
+  
     </div>
     </form>
 </body>

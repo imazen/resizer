@@ -64,8 +64,8 @@
         <img src="HandlerTest.ashx" runat="server" />
         
         
-        <h3>IIS Configuration-free mode (.jpg.axd)</h3>
-        <img id="Img20" src="rose-leaf.jpg.axd?width=400" runat="server" />
+        <h3>IIS Configuration-free mode (.jpg.ashx)</h3>
+        <img id="Img20" src="rose-leaf.jpg.ashx?width=400" runat="server" />
         
         <h3>Security test</h3>
         <img id="Img19" style="border:1px solid black;" src="resize(50,50)/Protected/rose-leaf.jpg" runat="server" />
