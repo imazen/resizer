@@ -1,14 +1,10 @@
-﻿
-**
-
+﻿**
 Overview of source files
-
 **
 
 InterceptModule.cs  Handles interception of incoming requests, and ties the DiskCache, CustomFolders, and ImageManager classes together.
 
-ImageManager.cs     Exposes a BuildImage method that performs a series of operations on one images and returns another. Operations can 
-    be specified via querystring or Settings classes. Uses Settings classes internally to parse querystring info.
+ImageManager.cs     Exposes a BuildImage method that performs a series of operations on one images and returns another. Operations can be specified via querystring or Settings classes. Uses Settings classes internally to parse querystring info.
 
 DiskCache.cs        Handles disk caching, cleanup
 
@@ -34,6 +30,53 @@ EXIF data is removed - by design. EXIF data bloats the image file, and can somet
 
 Changelog, by version
 
+Changes since 2.1b (v2.6)  
+**************************************
+2 rendering bug fixes, 2 compatibility bug fixes, 
+1 concurrency bug fixed (can occur a maximum of once per installation)
+1 URL authorization security fix,  affecting only custom builds AFTER v2.1b. Customers using the standard download aren't affected.
+**********************************************
+Fixed bug where a NullReference exception would occur if the Authentication module didn't process the request. All requests appear anonymous now in that situation.
+Fixed rounding bug and added regression test. New behavior is to round ALL values before performing drawing, but AFTER math is done. Was previously trimming a line of pixels off certain images.
+Fixed border bug where border was drawn over top of padding. 
+Fixed threading bug with creating the web.config file. Two concurrent requests would cause an exception.
+Fixed bug where no URL Authorization was occuring UNLESS DisableImageURLAuthorization=TRUE in web.config (This bug did not exist in v2.1b, only in custom versions sent to customers between Mar. 19 and Nov. 11)
+Fixed SecurityException errors occuring on GoDaddy and in other low-trust environments: changed the Animation plugin to use static methods insead of reflection. Users of the animation plugin, contact me for an updated version.
+
+
+New Features in v2.6!
+----
+Added support for splitting the image cache into subfolders, allowing scalability to millions of images:
+Set "ImageCacheSubfolders" to the number of required folders.
+
+Added support for resizing images from VirtualPathProviders. 
+
+Set either
+ImageResizerUseVirtualPathProvider
+or
+ImageResizerUseVirtualPathProviderAsFallback
+to true to enable the functionality. In Fallback mode, the virtual path provider is only called if no physical file exists.
+
+Added support for implementing cache-friendly database-driven image resizing using a VirtualPathProvider.
+
+Added IVirtualFileWithModified and IVirtualBitmapFile. Allows custom virtual path providers to be cache-friendly and even send bitmaps directly to the image resizer. Great for implementing new image formats.
+
+Added &scale=UpscaleCanvas mode. Instead of upscaling the image, the canvas expands to the specified Width and Height.
+
+Added DisableImageURLAuthorization setting. Set to TRUE to disable additional URL authorization checking within the resizer (imagecache is still protected).
+
+Added BuildImage overloads with VirtualFile support
+
+Added static event hooks for URL rewriting on images (replaces CustomFolders.cs, although CustomFolders.cs still works). 
+CustomFolders.cs will be removed in the next major revision.
+
+Added the ability to specify custom extension/ImageFormat mappings, in case your jpegs are named .cow or .pig for some strange reason.
+
+Added TranslatePoint methods to allow simulation of a resize (useful for image map generation).
+Added Size GetFinalSize() methods to ImageManager.cs for determining the resulting size of an image.
+
+Performance boost: modified DiskUtil.UpdateCachedVersionIfNeeded to use 'cachedFile' instead of 'sourceFile' as lock/sync key.
+
 Changes since 2.1a (v2.1b)
 ********************************************
 Fixed performance bug in DiskCache cause directory listings to run every image request. 
@@ -52,7 +95,7 @@ Added manual URL authorization using the ASP.NET UrlAuthorizationModule API. All
 
 Added DisableCustomQuantization setting to allow GIFs to be generated on servers where the Marshal class is prohibited.
 
-Added ResizeExtension=".axd" so IIS5 & 6 configuration is optional. Users can append .axd to the end of the image URL instead of adding a wildcard mapping.
+Added ResizeExtension=".ashx" so IIS5 & 6 configuration is optional. Users can append .ashx to the end of the image URL instead of adding a wildcard mapping.
 
 Added dithering.
 
