@@ -377,7 +377,7 @@ namespace fbs.ImageResizer
         /// <returns></returns>
         private static bool RoughCompare(DateTime d1, DateTime d2)
         {
-            return (new TimeSpan((long)Math.Abs(d1.Ticks - d2.Ticks)).Milliseconds <= 5);
+            return (new TimeSpan((long)Math.Abs(d1.Ticks - d2.Ticks)).TotalMilliseconds <= 5);
         }
 
 
