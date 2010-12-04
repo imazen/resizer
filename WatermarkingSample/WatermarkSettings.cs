@@ -69,6 +69,10 @@ namespace fbs.ImageResizer
         /// <param name="g"></param>
         public virtual void Process(Bitmap b, Graphics g){
             if (watermark != null){
+                char[] invalid =System.IO.Path.GetInvalidFileNameChars();
+                string s = ""; foreach (char c in invalid) s += c;
+                if (watermark.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) > -1) throw new ArgumentException("watermark query string value cannot include any of the following characters: " + s);
+
                 //Load the file specified in the querystring, assuming it is in the root. "?watermark=file.jpg"
                 Bitmap wb = GetMemCachedBitmap(HttpContext.Current.Server.MapPath("~/" + watermark));
                 //Only draw watermark if the watermark is smaller than the image
