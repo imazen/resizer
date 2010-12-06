@@ -7,7 +7,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DatabaseSampleCSharp {
+namespace AmazonS3Sharp
+{
     
     
     public partial class _Default {
