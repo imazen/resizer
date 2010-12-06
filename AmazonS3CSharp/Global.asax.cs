@@ -4,8 +4,9 @@ using System.Web;
 using System.Web.Security;
 using System.Web.SessionState;
 using System.Web.Hosting;
+using fbs.ImageResizer;
 
-namespace DatabaseSampleCSharp
+namespace AmazonS3Sharp
 {
     public class Global : System.Web.HttpApplication
     {

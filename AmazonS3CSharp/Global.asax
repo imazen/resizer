@@ -1,1 +1,1 @@
-﻿<%@ Application Codebehind="Global.asax.cs" Inherits="DatabaseSampleCSharp.Global" Language="C#" %>
+﻿<%@ Application Codebehind="Global.asax.cs" Inherits="AmazonS3Sharp.Global" Language="C#" %>

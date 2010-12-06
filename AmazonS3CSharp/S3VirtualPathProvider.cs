@@ -39,7 +39,7 @@ using System.Data.Sql;
 using System.Data.SqlClient;
 using System.Configuration;
 using LitS3;
-namespace DatabaseSampleCSharp
+namespace fbs.ImageResizer
 {
     /// <summary>
     /// Class to allow modifying the bucket and key request path
@@ -454,8 +454,15 @@ namespace DatabaseSampleCSharp
         public override Stream Open() { 
             MemoryStream ms = new MemoryStream(4096); //4kb is a good starting point.
             //Synchronously download
-            provider.Service.GetObject(bucket, key,ms);
+            try
+            {
+                provider.Service.GetObject(bucket, key, ms);
+            }catch (S3Exception se){
+                if (se.ErrorCode == S3ErrorCode.NoSuchKey) throw new HttpException(404,"S3 File not found",se);
+                else if (se.ErrorCode == S3ErrorCode.AccessDenied) throw new HttpException(403,"Access Denied - file may not exist",se);
+            }
             ms.Seek(0, SeekOrigin.Begin); //Reset to beginning
+			//TODO: handle file not found error, throw cachable exception
             return ms;
         }
 
