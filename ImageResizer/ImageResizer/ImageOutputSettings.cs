@@ -298,28 +298,33 @@ namespace fbs.ImageResizer
         /// <param name="path"></param>
         /// <returns></returns>
         public static bool IsAcceptedImageType(string path){
-            string extension = System.IO.Path.GetExtension(path).ToLowerInvariant().Trim('.');
-            return acceptedImageExtensions.ContainsKey(extension);
-
+            lock (_syncExts) {
+                string extension = System.IO.Path.GetExtension(path).ToLowerInvariant().Trim('.');
+                return acceptedImageExtensions.ContainsKey(extension);
+            }
         }
+
+        private static object _syncExts = new object();
         /// <summary>
         /// Returns a list of (lowercase invariant) image extensions that the module works with.
         /// </summary>
         private static IDictionary<String,ImageFormat> _acceptedImageExtensions = null;
-        static IDictionary<String,ImageFormat> acceptedImageExtensions{
+        private static IDictionary<String,ImageFormat> acceptedImageExtensions{
             get{
-                if (_acceptedImageExtensions == null) {
-                    _acceptedImageExtensions = new Dictionary<String,ImageFormat>();
-                    AddAcceptedImageExtension("jpg",ImageFormat.Jpeg);
-                    AddAcceptedImageExtension("jpeg",ImageFormat.Jpeg);
-                    AddAcceptedImageExtension("bmp",ImageFormat.Bmp);
-                    AddAcceptedImageExtension("gif",ImageFormat.Gif);
-                    AddAcceptedImageExtension("png",ImageFormat.Png);
-                    AddAcceptedImageExtension("tiff",ImageFormat.Tiff);
-                    AddAcceptedImageExtension("tif",ImageFormat.Tiff);
-                    AddAcceptedImageExtension("tff",ImageFormat.Tiff);
-                } 
-                return _acceptedImageExtensions;
+                lock (_syncExts) {
+                    if (_acceptedImageExtensions == null) {
+                        _acceptedImageExtensions = new Dictionary<String, ImageFormat>();
+                        addAcceptedImageExtension("jpg", ImageFormat.Jpeg);
+                        addAcceptedImageExtension("jpeg", ImageFormat.Jpeg);
+                        addAcceptedImageExtension("bmp", ImageFormat.Bmp);
+                        addAcceptedImageExtension("gif", ImageFormat.Gif);
+                        addAcceptedImageExtension("png", ImageFormat.Png);
+                        addAcceptedImageExtension("tiff", ImageFormat.Tiff);
+                        addAcceptedImageExtension("tif", ImageFormat.Tiff);
+                        addAcceptedImageExtension("tff", ImageFormat.Tiff);
+                    }
+                    return _acceptedImageExtensions;
+                }
             }
         }
 
@@ -331,14 +336,26 @@ namespace fbs.ImageResizer
         /// <returns></returns>
         public static ImageFormat GetImageFormatFromExtension(string ext)
         {
-            ext = ext.Trim(' ', '.').ToLowerInvariant();
-            if (!acceptedImageExtensions.ContainsKey(ext)) return null;
-            return acceptedImageExtensions[ext];
+            lock (_syncExts) {
+                ext = ext.Trim(' ', '.').ToLowerInvariant();
+                if (!acceptedImageExtensions.ContainsKey(ext)) return null;
+                return acceptedImageExtensions[ext];
+            }
+        }
+        /// <summary>
+        /// NOT thread-safe! 
+        /// </summary>
+        /// <param name="extension"></param>
+        /// <param name="matchingFormat"></param>
+        private static void addAcceptedImageExtension(string extension, ImageFormat matchingFormat) {
+            //In case first call is to this method, use the property. Will be recursive, but that's fine, since it won't be null.
+            acceptedImageExtensions.Add(extension.TrimStart('.', ' ').ToLowerInvariant(), matchingFormat);
         }
 
         public static void AddAcceptedImageExtension(string extension, ImageFormat matchingFormat){
-            //In case first call is to this method, use the property. Will be recursive, but that's fine, since it won't be null.
-            acceptedImageExtensions.Add(extension.TrimStart('.',' ').ToLowerInvariant(),matchingFormat);
+            lock (_syncExts) {//In case first call is to this method, use the property. Will be recursive, but that's fine, since it won't be null.
+                acceptedImageExtensions.Add(extension.TrimStart('.', ' ').ToLowerInvariant(), matchingFormat);
+            }
         }
 
         /// <summary>
