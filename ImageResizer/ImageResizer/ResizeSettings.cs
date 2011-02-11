@@ -354,7 +354,7 @@ namespace fbs.ImageResizer
                 if (!PolygonMath.FitsInside(targetSize, finalSizeBounds))
                 {
                     //Scale down to fit. Doesn't matter what the scale setting is... No dimensions were specified.
-                    areaSize = targetSize = PolygonMath.ScaleInside(targetSize, finalSizeBounds);
+                    areaSize = targetSize = PolygonMath.DownScaleInside(targetSize, finalSizeBounds);
                 }
 
             }else{
@@ -368,7 +368,7 @@ namespace fbs.ImageResizer
                 double maxwidth = this.maxwidth;
                 double maxheight = this.maxheight;
 
-                //Eliminate cases where both a value and a max value are specified.
+                //Eliminate cases where both a value and a max value are specified: use the smaller value for the width/height 
                 if (maxwidth > 0 && width > 0)
                 {
                     width = Math.Min(maxwidth, width); 
@@ -381,35 +381,24 @@ namespace fbs.ImageResizer
                 }
                 //Do sizing logic
 
-                if (width > 0 || height > 0)
+                if (width > 0 || height > 0) //In this case, either (or both) width and height were specified
                 {   
                     //If only one is specified, calculate the other from 
                     if (width > 0)
                     {
                         if (height < 0) height = (width / imageRatio);
+                        if (maxheight > 0 && height > maxheight) height = maxheight; //Crop to maxheight value
+
                     }
                     else if (height > 0)
                     {
                         if (width < 0) width = (height * imageRatio);
+                        if (maxheight > 0 && height > maxheight) height = maxheight; //Crop to maxheight value
                     }
                     //Store result
                     targetSize = new SizeF((float)width,(float) height);
-                    //Apply maxwidth/maxheight to result if present. Uses aspect ratio from width and height if only one is present. 
-                    //A maxwidth and height or maxheight and width values will behave like maxwidth and maxheight always.
-                    if (maxwidth > 0 || maxheight > 0)
-                    {
-                        double userWoh = width / height;
-                        //Calculate the missing max bounds (if one *is* missing), using aspect ratio from 'width' and 'height'
-                        if (maxheight > 0 && maxwidth <= 0)
-                            maxwidth = maxheight * userWoh;
-                        else if (maxwidth > 0 && maxheight <= 0)
-                            maxheight = maxwidth / userWoh;
-                        //Scale to fit inside the bounds
-                        targetSize = PolygonMath.ScaleInside(targetSize, new SizeF((float)maxwidth, (float)maxheight));
-
-                    }
                 }
-                else
+                else //In this case, only maxwidth and/or maxheight were specified.
                 {
                     //Calculate the missing max bounds (if one *is* missing), using aspect ratio of the image
                     if (maxheight > 0 && maxwidth <= 0)

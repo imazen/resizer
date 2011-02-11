@@ -299,7 +299,7 @@ namespace fbs.ImageResizer
         }
 
         /// <summary>
-        /// Scales 'fitInside' to fit inside 'bounding' while maintaining aspect ratio. Upscales and downscales.
+        /// Scales 'inner' to fit inside 'bounding' while maintaining aspect ratio. Upscales and downscales.
         /// </summary>
         /// <param name="bounding"></param>
         /// <param name="fitInside"></param>
@@ -319,6 +319,19 @@ namespace fbs.ImageResizer
                 //Height is higher, or aspect ratios are identical.
                 return new SizeF((float)(bounding.Width), (float)(bounding.Width / innerRatio));
             }
+        }
+
+        /// <summary>
+        /// Scales 'inner' to fit inside 'bounding' while maintaining aspect ratio. Only downscales.
+        /// </summary>
+        /// <param name="bounding"></param>
+        /// <param name="fitInside"></param>
+        /// <returns></returns>
+        public static SizeF DownScaleInside(SizeF inner, SizeF bounding)
+        {
+            SizeF result = ScaleInside(inner, bounding);
+            if (result.Width > inner.Width) return inner;
+            else return result;
         }
         /// <summary>
         /// Returns true if 'inner' fits inside or equals 'outer'
