@@ -509,6 +509,10 @@ namespace fbs.ImageResizer
                     g.DrawPolygon(p, PolygonMath.InflatePoly(size.targetArea,(float)(opts.borderWidth / 2.0))); //I hope GDI rounds the same way as .NET.. Otherwise there may be an off-by-one error..
                 }
 
+                //Should occur before last flipping..
+                if (watermark != null) watermark.Process(b, g, PolygonMath.GetBoundingBox(size.imageTarget));
+
+
                 //Commit changes.
                 g.Flush(FlushIntention.Flush);
 
@@ -516,8 +520,7 @@ namespace fbs.ImageResizer
                 if (resize.flip != RotateFlipType.RotateNoneFlipNone)
                     b.RotateFlip(resize.flip);
 
-                if (watermark != null) watermark.Process(b, g);
-
+               
                 return b;
             }
 
