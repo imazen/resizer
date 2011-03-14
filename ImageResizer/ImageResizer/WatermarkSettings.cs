@@ -21,14 +21,14 @@ namespace fbs.ImageResizer
     /// </summary>
     public class WatermarkSettings
     {
-        public string watermarkFile = "~/image001.png";
-        public SizeF watermarkSize = new SizeF(200, 73);
-        public Boolean valuesPercentages = false;
+        public string watermarkDir = "~/watermarks";
+        public SizeF watermarkSize = new SizeF(1, 1);
+        public Boolean valuesPercentages = true;
         public Boolean keepAspectRatio = true;
-        public SizeF topLeftPadding = new SizeF(10, 10);
-        public SizeF bottomRightPadding = new SizeF(70, 5);
-        public Boolean hideIfTooSmall = true;
-        public System.Drawing.ContentAlignment align = ContentAlignment.BottomRight;
+        public SizeF topLeftPadding = new SizeF(0, 0);
+        public SizeF bottomRightPadding = new SizeF(0, 0);
+        public Boolean hideIfTooSmall = false;
+        public System.Drawing.ContentAlignment align = ContentAlignment.MiddleCenter;
  
         string watermark = null;
         /// <summary>
@@ -78,73 +78,82 @@ namespace fbs.ImageResizer
         /// <param name="g"></param>
         public virtual void Process(Bitmap b, Graphics g, RectangleF imageBox)
         {
+            TrialWatermark(b, g);
 
-            if ("true".Equals(watermark, StringComparison.OrdinalIgnoreCase))
-            {
-                //Load the file specified in the querystring,
-                Bitmap wb = GetMemCachedBitmap(HttpContext.Current.Server.MapPath(watermarkFile));
+            if (string.IsNullOrEmpty(watermark)) return;
 
-                //If percentages, resolve to pixels
-                if (valuesPercentages){
-                    watermarkSize.Height *= imageBox.Height;
-                    watermarkSize.Width *= imageBox.Width;
-                    topLeftPadding.Height *= imageBox.Height;
-                    topLeftPadding.Width *= imageBox.Width;
-                    bottomRightPadding.Height *= imageBox.Height;
-                    bottomRightPadding.Width *= imageBox.Width;
-                }
+            if (watermark.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) > -1 ||
+                watermark.IndexOfAny(new char[]{'\\','/'}) > -1)
+                throw new ArgumentException("Watermark value contained invalid file name characters: " + watermark);
 
-                //Keep aspect ratio
-                if (keepAspectRatio) watermarkSize = PolygonMath.ScaleInside(wb.Size, watermarkSize);
-                
-
-                //Floor all values
-                watermarkSize = new SizeF((float)Math.Floor(watermarkSize.Width), (float)Math.Floor(watermarkSize.Height));
-                topLeftPadding = new SizeF((float)Math.Floor(topLeftPadding.Width), (float)Math.Floor(topLeftPadding.Height));
-                bottomRightPadding = new SizeF((float)Math.Floor(bottomRightPadding.Width), (float)Math.Floor(bottomRightPadding.Height));
+            //Combine the directory with the 
+            watermark = yrl.Combine(new yrl(watermarkDir), new yrl(watermark)).Virtual;
 
 
-                //Check boundingbox
-                SizeF watermarkBoundingBox = new SizeF(watermarkSize.Width + topLeftPadding.Width + bottomRightPadding.Width,
-                    watermarkSize.Height + topLeftPadding.Height + bottomRightPadding.Height);
+            //Load the file specified in the querystring,
+            Bitmap wb = GetMemCachedBitmap(HttpContext.Current.Server.MapPath(watermark));
 
-                //Don't draw the watermark if it is too small.
-                if (!PolygonMath.FitsInside(watermarkSize, imageBox.Size) && hideIfTooSmall) return;
-
-                
-
-                float innerWidth = (float)Math.Floor(imageBox.Width - topLeftPadding.Width - bottomRightPadding.Width);
-                float innerHeight = (float)Math.Floor(imageBox.Height - topLeftPadding.Height - bottomRightPadding.Height);
-
-                float x = 0;
-                float y = 0;
-
-                if (align == ContentAlignment.BottomCenter || align == ContentAlignment.BottomLeft || align == ContentAlignment.BottomRight)
-                    y = (innerHeight - watermarkSize.Height) + topLeftPadding.Height;
-
-                if (align == ContentAlignment.MiddleCenter || align == ContentAlignment.MiddleLeft || align == ContentAlignment.MiddleRight)
-                    y = (innerHeight - watermarkSize.Height) / 2 + topLeftPadding.Height;
-                
-                if (align == ContentAlignment.TopCenter || align == ContentAlignment.TopLeft || align == ContentAlignment.TopRight)
-                    y = topLeftPadding.Height;
-
-
-                if (align == ContentAlignment.BottomRight || align == ContentAlignment.MiddleRight || align == ContentAlignment.TopRight)
-                    x = (innerWidth - watermarkSize.Width) + topLeftPadding.Width;
-
-                if (align == ContentAlignment.BottomCenter || align == ContentAlignment.MiddleCenter || align == ContentAlignment.TopCenter)
-                    x = (innerWidth - watermarkSize.Width) / 2 + topLeftPadding.Width;
-
-                if (align == ContentAlignment.BottomLeft || align == ContentAlignment.MiddleLeft || align == ContentAlignment.TopLeft)
-                    x = topLeftPadding.Width;
-
-                //Draw watermark
-                g.DrawImage(wb, new Rectangle((int)(x + imageBox.X), (int)(y + imageBox.Y), (int)watermarkSize.Width, (int)watermarkSize.Height));
-
+            //If percentages, resolve to pixels
+            if (valuesPercentages){
+                watermarkSize.Height *= imageBox.Height;
+                watermarkSize.Width *= imageBox.Width;
+                topLeftPadding.Height *= imageBox.Height;
+                topLeftPadding.Width *= imageBox.Width;
+                bottomRightPadding.Height *= imageBox.Height;
+                bottomRightPadding.Width *= imageBox.Width;
             }
 
+            //Keep aspect ratio
+            if (keepAspectRatio) watermarkSize = PolygonMath.ScaleInside(wb.Size, watermarkSize);
+                
 
-            TrialWatermark(b, g);
+            //Floor all values
+            watermarkSize = new SizeF((float)Math.Floor(watermarkSize.Width), (float)Math.Floor(watermarkSize.Height));
+            topLeftPadding = new SizeF((float)Math.Floor(topLeftPadding.Width), (float)Math.Floor(topLeftPadding.Height));
+            bottomRightPadding = new SizeF((float)Math.Floor(bottomRightPadding.Width), (float)Math.Floor(bottomRightPadding.Height));
+
+
+            //Check boundingbox
+            SizeF watermarkBoundingBox = new SizeF(watermarkSize.Width + topLeftPadding.Width + bottomRightPadding.Width,
+                watermarkSize.Height + topLeftPadding.Height + bottomRightPadding.Height);
+
+            //Don't draw the watermark if it is too small.
+            if (!PolygonMath.FitsInside(watermarkSize, imageBox.Size) && hideIfTooSmall) return;
+
+                
+
+            float innerWidth = (float)Math.Floor(imageBox.Width - topLeftPadding.Width - bottomRightPadding.Width);
+            float innerHeight = (float)Math.Floor(imageBox.Height - topLeftPadding.Height - bottomRightPadding.Height);
+
+            float x = 0;
+            float y = 0;
+
+            if (align == ContentAlignment.BottomCenter || align == ContentAlignment.BottomLeft || align == ContentAlignment.BottomRight)
+                y = (innerHeight - watermarkSize.Height) + topLeftPadding.Height;
+
+            if (align == ContentAlignment.MiddleCenter || align == ContentAlignment.MiddleLeft || align == ContentAlignment.MiddleRight)
+                y = (innerHeight - watermarkSize.Height) / 2 + topLeftPadding.Height;
+                
+            if (align == ContentAlignment.TopCenter || align == ContentAlignment.TopLeft || align == ContentAlignment.TopRight)
+                y = topLeftPadding.Height;
+
+
+            if (align == ContentAlignment.BottomRight || align == ContentAlignment.MiddleRight || align == ContentAlignment.TopRight)
+                x = (innerWidth - watermarkSize.Width) + topLeftPadding.Width;
+
+            if (align == ContentAlignment.BottomCenter || align == ContentAlignment.MiddleCenter || align == ContentAlignment.TopCenter)
+                x = (innerWidth - watermarkSize.Width) / 2 + topLeftPadding.Width;
+
+            if (align == ContentAlignment.BottomLeft || align == ContentAlignment.MiddleLeft || align == ContentAlignment.TopLeft)
+                x = topLeftPadding.Width;
+
+            //Draw watermark
+            g.DrawImage(wb, new Rectangle((int)(x + imageBox.X), (int)(y + imageBox.Y), (int)watermarkSize.Width, (int)watermarkSize.Height));
+
+            
+
+
+            
         }
 
         private void TrialWatermark(Bitmap b, Graphics g)
