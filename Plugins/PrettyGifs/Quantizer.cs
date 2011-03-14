@@ -13,7 +13,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
-namespace ImageQuantization
+namespace fbs.ImageResizer.Plugins.PrettyGifs
 {
     /// <summary>
     /// Summary description for Class1.
