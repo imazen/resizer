@@ -13,7 +13,7 @@ using System.Collections;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace ImageQuantization
+namespace fbs.ImageResizer.Plugins.PrettyGifs
 {
 	/// <summary>
 	/// Quantize using an Octree
