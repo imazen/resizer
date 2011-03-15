@@ -1,0 +1,46 @@
+﻿# URL Rewriting
+
+Event Rewrite
+Event RewriteDefaults (all values are overriden by the pre-existing values)
+Event PostRewrite
+
+#Additional file extension support
+
+Add new accepted extension
+
+#Additional command support
+
+Add querystring key that triggers resizing
+
+#Authorization
+
+AuthorizePath - called after PostRewrite
+
+# Watermarking
+
+Gets querystring and .config access
+Can modify settings before resizing
+Can modify the bitmap (given bitmap, graphics, and image rect)
+
+# Simple image filters
+
+(grayscale, brightness, etc)
+Modify the ImageAttributes used to copy the image.
+
+# Image effects (borders, shadows)
+
+?
+
+
+# Image decoders
+
+Always implemented as VPPs?
+
+# Image Encoders
+
+PrettyGifs
+
+? Icon?
+
+
+
