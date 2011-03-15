@@ -1,0 +1,34 @@
+﻿
+
+- Readers
+S3Reader - Loads files from an amazon S3 backend.
+ZipReader - Can read images from Zip files.
+SqlReader - Loads files from a SQL database.
+RemoteSiteReader - Loads images from a remote site over HTTP
+
+- Readers that 
+PsdReader - Convert PSD files to jpeg, png, or GIF on the fly
+PsdComposer - Re-compose PSD files on-the-fly. Rewrite text layers, hide/show layers. Minimal support for text layer effects.
+
+- Caches
+DiskCache - Caches resized images to disk for huge speed gains, using invisible request rewriting.
+S3Cache - Caches resized images to S3 for scalability - but uses redirects.
+SqlCache - not built
+
+
+
+Plugins:
+PrettyGIFs - Octree quantization and dithering for GIFs and 8-bit PNGs
+
+AnimatedGifs - Resize GIF movies on the fly. PrettyGIFs plugin suggested. Slow on first request.
+
+
+
+
+
+Interfaces
+
+ICache
+
+
+Cairo/AForge resizing backends in the future? AForge uses the Bitmap class, so that's probably a safe choice.

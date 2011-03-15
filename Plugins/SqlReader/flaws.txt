@@ -1,0 +1,1 @@
+﻿No support for reading the blob mime-type from the database. The image format must be specified in the URL, like /databaseimages/34.jpg

@@ -5,14 +5,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{BB8EEB97-6550-4780-97B2-B0F2FCD80970}</ProjectGuid>
+    <ProjectGuid>{D97EA32A-0845-4E00-9C4D-68C5B93A1869}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>fbs.ImageResizer.Plugins.PrettyGifs</RootNamespace>
-    <AssemblyName>ImageResizer.PrettyGifs</AssemblyName>
+    <RootNamespace>fbs.ImageResizer.Plugins.AnimatedGifs</RootNamespace>
+    <AssemblyName>fbs.ImageResizer.Plugins.AnimatedGifs</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,10 +37,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
-    <Compile Include="OctreeQuantizer.cs" />
+    <Compile Include="AnimatedImageManager.cs" />
+    <Compile Include="GifClass.cs" />
+    <Compile Include="GifCreator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Quantizer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\fbs.ImageResizer.csproj">
+      <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
+      <Name>fbs.ImageResizer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
