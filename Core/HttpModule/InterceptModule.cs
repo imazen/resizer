@@ -51,13 +51,14 @@ using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using System.Text;
 using System.Security.Principal;
+using fbs.ImageResizer.Caching;
 
 
 namespace fbs.ImageResizer
 {
 
     /// <summary>
-    /// Monitors incoming image requests. Image requests that request resizing are processed. The resized images are immediately written to disk, and 
+    /// Monitors incoming image requests. Image requests that request resizing are processed. The resized images are immediately cached, and 
     /// the request is rewritten to the disk-cached resized version. This way IIS can handle the actual serving of the file.
     /// The disk-cache directory is protected through URL authorization.
     /// </summary>
@@ -72,8 +73,9 @@ namespace fbs.ImageResizer
         {
             //We wait until after URL auth happens for security. (although we authorize again since we are doing URL rewriting)
             context.PostAuthorizeRequest += new EventHandler(CheckRequest_PostAuthorizeRequest);
-            //This is where we set content-type and caching headers. content-type headers don't match the 
-            //file extension when format= or thumbnail= is used, so we have to override them
+
+            //This is where we set content-type and caching headers. content-type often don't match the
+            //file extension, so we have to override them
             context.PreSendRequestHeaders += new EventHandler(context_PreSendRequestHeaders);
 
             //Load configuration data
@@ -94,68 +96,71 @@ namespace fbs.ImageResizer
         /// <param name="e"></param>
         protected virtual void CheckRequest_PostAuthorizeRequest(object sender, EventArgs e)
         {
-            //Get the http context, and only intercept requests where the Request object is actually populated
+            //Skip requests if the Request object isn't populated
             HttpApplication app = sender as HttpApplication;
-            if (app != null && app.Context != null && app.Context.Request != null)
+            if (app == null) return;
+            if (app.Context == null) return;
+            if (app.Context.Request == null) return;
+            
+
+            //Copy FilePath so we can modify it
+            string filePath = app.Context.Request.FilePath; //Doesn't include pathInfo
+
+            //Allows users to append .ashx to all their image URLs instead of doing wildcard mapping.
+            string altExtension = Configuration.get("rewriting.fakeExtension",".ashx");
+                
+                
+            //Remove extension from filePath, since otherwise IsAcceptedImageType() will fail.
+            if (!string.IsNullOrEmpty(altExtension) && filePath.EndsWith(altExtension, StringComparison.OrdinalIgnoreCase))
+                filePath = filePath.Substring(0, filePath.Length - altExtension.Length).TrimEnd('.');
+                
+
+            //Is this an image request? Checks the file extension for .jpg, .png, .tiff, etc.
+            if (Configuration.IsAcceptedImageType(filePath))
             {
-                //Copy FilePath so we can modify it
-                string filePath = app.Context.Request.FilePath; //Doesn't include pathInfo
+                //Copy the querystring so we can mod it to death without messing up other stuff.
+                NameValueCollection q = new NameValueCollection(app.Context.Request.QueryString);
 
-                //Allows users to append .ashx to all their image URLs instead of doing wildcard mapping.
-                string altExtension = Configuration.get("rewriting.fakeExtension",".ashx");
-                
-                
-                //Remove extension from filePath, since otherwise IsAcceptedImageType() will fail.
-                if (!string.IsNullOrEmpty(altExtension) && filePath.EndsWith(altExtension, StringComparison.OrdinalIgnoreCase))
-                    filePath = filePath.Substring(0, filePath.Length - altExtension.Length).TrimEnd('.');
-                
-
-                //Is this an image request? Checks the file extension for .jpg, .png, .tiff, etc.
-                if (Configuration.IsAcceptedImageType(filePath))
-                {
-                    //Copy the querystring so we can mod it to death without messing up other stuff.
-                    NameValueCollection q = new NameValueCollection(app.Context.Request.QueryString);
-
-                    //Call events to do resize(w,h,f)/ parsing and any other custom syntax.
-                    UrlEventArgs ue = new UrlEventArgs(filePath + app.Context.Request.PathInfo, q); //Includes pathinfo
-                    Configuration.FireRewritingEvents(this,ue); 
+                //Call events to do resize(w,h,f)/ parsing and any other custom syntax.
+                UrlEventArgs ue = new UrlEventArgs(filePath + app.Context.Request.PathInfo, q); //Includes pathinfo
+                Configuration.FireRewritingEvents(this,ue); 
                     
-                    //Pull data back out of event object
-                    string basePath = ue.VirtualPath;
-                    q = ue.QueryString;
+                //Pull data back out of event object
+                string basePath = ue.VirtualPath;
+                q = ue.QueryString;
 
-                    //See if resizing is wanted (i.e. one of the querystring commands is present).
-                    //Called after processPath so processPath can add them if needed.
-                    //Checks for thumnail, format, width, height, maxwidth, maxheight and a lot more
-                    if (Configuration.HasResizingDirective(q))
-                    {
-                        //Who's the user
-                        IPrincipal user = app.Context.User as IPrincipal;
+                //See if resizing is wanted (i.e. one of the querystring commands is present).
+                //Called after processPath so processPath can add them if needed.
+                //Checks for thumnail, format, width, height, maxwidth, maxheight and a lot more
+                if (Configuration.HasResizingDirective(q))
+                {
+                    //Who's the user
+                    IPrincipal user = app.Context.User as IPrincipal;
 
-                        // no user (must be anonymous...).. Or authentication doesn't work for this suffix. Whatever, just avoid a nullref in the UrlAuthorizationModule
-                        if (user == null)
-                            user = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), new string[0]);
+                    // no user (must be anonymous...).. Or authentication doesn't work for this suffix. Whatever, just avoid a nullref in the UrlAuthorizationModule
+                    if (user == null)
+                        user = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), new string[0]);
 
-                        //Run the rewritten path past the auth system again
-                        if (!UrlAuthorizationModule.CheckUrlAccessForPrincipal(basePath, user, "GET"))  throw new HttpException(403, "Access denied.");
+                    //Run the rewritten path past the auth system again
+                    if (!UrlAuthorizationModule.CheckUrlAccessForPrincipal(basePath, user, "GET"))  throw new HttpException(403, "Access denied.");
 
-                        //Allow user code to deny access.
-                        Configuration.FirePostAuthorize(this, new UrlEventArgs(basePath, new NameValueCollection(q)));
+                    //Allow user code to deny access.
+                    Configuration.FirePostAuthorize(this, new UrlEventArgs(basePath, new NameValueCollection(q)));
                         
-                        //Store the modified querystring in request for use by VirtualPathProviders
-                        app.Context.Items["modifiedQueryString"] = q;
+                    //Store the modified querystring in request for use by VirtualPathProviders
+                    app.Context.Items["modifiedQueryString"] = q;
 
-                        //Build a URL using the new basePath and the new Querystring 
-                        yrl current = new yrl(basePath);
-                        current.QueryString = q;
+                    //Build a URL using the new basePath and the new Querystring 
+                    yrl current = new yrl(basePath);
+                    current.QueryString = q;
 
-                        //If the file or virtual file exists, resize it
-                        if (current.FileExists || (Configuration.VppUsage != VppUsageOption.Never && HostingEnvironment.VirtualPathProvider.FileExists(getVPPSafePath(current))))
-                            ResizeRequest(app.Context, current);
+                    //If the file or virtual file exists, resize it
+                    if (current.FileExists || (Configuration.VppUsage != VppUsageOption.Never && HostingEnvironment.VirtualPathProvider.FileExists(getVPPSafePath(current))))
+                        ResizeRequest(app.Context, current);
 
-                    }
                 }
             }
+            
         }
 
 
@@ -206,8 +211,8 @@ namespace fbs.ImageResizer
             e.CacheKey = current.ToString();
             e.ContentType = new ImageOutputSettings(current).GetContentType();
             e.HasModifiedDate = hasModifiedDate;
-            //Add delegate for retrieving the modified date
-            e.GetModifiedDateUTC = new CacheEventArgs.ModifiedDateDelegate(delegate() {
+            //Add delegate for retrieving the modified date of the source file. s
+            e.GetModifiedDateUTC = new ICacheEventArgs.ModifiedDateDelegate(delegate() {
                 if (vf == null) 
                     return System.IO.File.GetLastWriteTimeUtc(current.Local);
                 else if (hasModifiedDate) 
@@ -215,21 +220,15 @@ namespace fbs.ImageResizer
                 else return DateTime.MinValue; //Won't be called, no modified date available.
             });
             //Add delegate for writing the data stream
-            e.ResizeImageToStream = new CacheEventArgs.ResizeImageDelegate(delegate(Stream stream) {
+            e.ResizeImageToStream = new ICacheEventArgs.ResizeImageDelegate(delegate(Stream stream) {
                 //This runs on a cache miss or cache invalid. This delegate is preventing from running in more
                 //than one thread at a time for the specified source file (current.Local)
+
                 if (vf != null)
-                {   
-                    //Use bitmap interface if available
-                    if (vf is IVirtualBitmapFile)
-                        ImageManager.getBestInstance().BuildImage((IVirtualBitmapFile)vf, stream, current.QueryString);
-                    else
-                        ImageManager.getBestInstance().BuildImage(vf, stream, current.QueryString);
-                }
+                    ImageBuilder.Instance.Build(vf, stream, new ResizeSettingsCollection(current.QueryString));
                 else
-                {
-                    ImageManager.getBestInstance().BuildImage(current.Local, stream, current.QueryString);
-                }
+                    ImageBuilder.Instance.Build(current.Local, new ResizeSettingsCollection(current.QueryString));
+
             });
 
             //Pass the rest of the work off to the caching module. It will handle rewriting/redirecting and everything. 

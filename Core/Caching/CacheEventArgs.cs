@@ -3,37 +3,29 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace fbs.ImageResizer {
-    public class CacheEventArgs : fbs.ImageResizer.Interfaces.ICacheEventArgs1 {
+namespace fbs.ImageResizer.Caching {
+    public class CacheEventArgs : ICacheEventArgs {
 
         public CacheEventArgs() { }
-        /// <summary>
-        /// A callback method that will resize and encode the image into a stream.
-        /// </summary>
-        public delegate void ResizeImageDelegate(Stream s);
+
+
+
+        private ICacheEventArgs.ModifiedDateDelegate getModifiedDateUTC;
         /// <summary>
         /// A callback method to return the last modified date of the source file if available, or DateTime.MinValue if not.
         /// </summary>
         /// <returns></returns>
-        public delegate DateTime ModifiedDateDelegate();
-
-
-        private ModifiedDateDelegate getModifiedDateUTC;
-        /// <summary>
-        /// A callback method to return the last modified date of the source file if available, or DateTime.MinValue if not.
-        /// </summary>
-        /// <returns></returns>
-        public ModifiedDateDelegate GetModifiedDateUTC
+        public ICacheEventArgs.ModifiedDateDelegate GetModifiedDateUTC
         {
           get { return getModifiedDateUTC; }
           set { getModifiedDateUTC = value; }
         }
 
-        private ResizeImageDelegate resizeImageToStream;
+        private ICacheEventArgs.ResizeImageDelegate resizeImageToStream;
         /// <summary>
         /// A callback method that will resize and encode the image into a stream.
         /// </summary>
-        public ResizeImageDelegate ResizeImageToStream
+        public ICacheEventArgs.ResizeImageDelegate ResizeImageToStream
         {
           get { return resizeImageToStream; }
           set { resizeImageToStream = value; }

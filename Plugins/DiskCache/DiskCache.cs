@@ -37,6 +37,7 @@ using System.Web;
 using System.Configuration;
 using fbs;
 using System.IO;
+using fbs.ImageResizer.Caching;
 
 namespace fbs.ImageResizer.Plugins.DiskCache
 {

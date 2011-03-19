@@ -77,21 +77,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Interfaces\CacheEventArgs.cs" />
+    <Compile Include="Caching\CacheEventArgs.cs" />
     <Compile Include="Configuration\Configuration.cs" />
     <Compile Include="Configuration\ResizerConfigurationSection.cs" />
-    <Compile Include="Interfaces\ICache.cs" />
-    <Compile Include="ImageOutputSettings.cs" />
-    <Compile Include="ImageManager.cs" />
-    <Compile Include="ImageSettings.cs" />
-    <Compile Include="InterceptModule.cs" />
-    <Compile Include="Interfaces\ICacheEventArgs.cs" />
-    <Compile Include="Interfaces\IVirtualBitmapFile.cs" />
-    <Compile Include="PolygonMath.cs" />
-    <Compile Include="ResizeSettings.cs" />
-    <Compile Include="Interfaces\IVirtualFileWithModifiedDate.cs" />
-    <Compile Include="UrlHasher.cs" />
-    <Compile Include="yrl.cs" />
+    <Compile Include="Caching\ICache.cs" />
+    <Compile Include="Resizing\Enumerations.cs" />
+    <Compile Include="Resizing\ImageOutputSettings.cs" />
+    <Compile Include="Resizing\ImageBuilder.cs" />
+    <Compile Include="Resizing\ImageSettings.cs" />
+    <Compile Include="HttpModule\InterceptModule.cs" />
+    <Compile Include="Caching\ICacheEventArgs.cs" />
+    <Compile Include="Resizing\ImageState.cs" />
+    <Compile Include="Resizing\IVirtualBitmapFile.cs" />
+    <Compile Include="Resizing\ImageBuilderExtension.cs" />
+    <Compile Include="Utils\PolygonMath.cs" />
+    <Compile Include="Resizing\IVirtualFileWithModifiedDate.cs" />
+    <Compile Include="Resizing\ResizeSettingsCollection.cs" />
+    <Compile Include="Utils\UrlHasher.cs" />
+    <Compile Include="Utils\Utils.cs" />
+    <Compile Include="Utils\yrl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -130,6 +134,9 @@
     <None Include="sample.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Encoding\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

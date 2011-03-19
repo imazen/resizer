@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections.Specialized;
 using System.Configuration;
+using fbs.ImageResizer.Caching;
+using System.Drawing;
 
 namespace fbs.ImageResizer {
     public class UrlEventArgs : EventArgs {
@@ -111,9 +113,7 @@ namespace fbs.ImageResizer {
 
         
         public static VppUsageOption VppUsage;
-        public static float MaxWidth;
-        public static float MaxHeight;
-
+        public static SizeF MaxSize;
 
         /// <summary>
         /// Fires URL rewriting event in order, collecting the result in 'e'
@@ -163,6 +163,53 @@ namespace fbs.ImageResizer {
         }
 
         internal static ICache GetCachingModule(System.Web.HttpContext context, yrl current) {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns true if the specified querystring collection uses a resizing command
+        /// </summary>
+        /// <param name="q"></param>
+        /// <returns></returns>
+        public virtual bool HasResizingDirective(NameValueCollection q) {
+            return IsOneSpecified(q["format"], q["dither"], q["thumbnail"], q["maxwidth"], q["maxheight"],
+                q["width"], q["height"],
+                q["scale"], q["stretch"], q["crop"], q["page"], q["time"], q["quality"], q["colors"], q["bgcolor"],
+                q["rotate"], q["flip"], q["sourceFlip"], q["borderWidth"],
+                q["borderColor"], q["paddingWidth"], q["paddingColor"], q["ignoreicc"],
+                q["shadowColor"], q["shadowOffset"], q["shadowWidth"], q["frame"], q["page"], q["useresizingpipeline"]);
+        }
+
+
+        /// <summary>
+        /// Returns true if one or more of the arguments has a non-null or non-empty value
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        private bool IsOneSpecified(params String[] args) {
+            foreach (String s in args) if (!string.IsNullOrEmpty(s)) return true;
+            return false;
+        }
+
+
+        private static IList<object> plugins = new List<object>();
+
+        public static void RegisterPlugin(object plugin) {
+            lock (plugins) {
+                plugins.Add(plugin);
+            }
+        }
+        public static IList<string> GetRegisteredPlugins() {
+            lock (plugins) {
+                List<string> splugins = new List<string>();
+                foreach (object o in plugins)
+                    splugins.Add(o.GetType().FullName);
+                return splugins;
+            }
+        }
+
+
+        internal static IEnumerable<Interfaces.ImageBuilderExtension> GetImageManagerExtensions() {
             throw new NotImplementedException();
         }
     }

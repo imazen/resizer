@@ -22,6 +22,17 @@ namespace PsdRenderer
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
     public class PsdReader : VirtualPathProvider
     {
+        /// <summary>
+        /// Registers the PsdReader plugin as a virtual path provider.
+        /// </summary>
+        /// <returns></returns>
+        public static PsdReader Install() {
+            PsdReader r = new PsdReader();
+            HostingEnvironment.RegisterVirtualPathProvider(r);
+            Configuration.RegisterPlugin(r);
+            return r;
+        }
+
         public PsdReader() : base()
         {
         }
@@ -30,34 +41,30 @@ namespace PsdRenderer
         /// Allows reading from the querystring, using context.Items["modifiedQueryString"] and falling back to Request.Querystring if it is missing.
         /// This behavior allows the reader to read values that have been changed by the rewrite events
         /// </summary>
-        public NameValueCollection QueryString
+        protected NameValueCollection queryString
         {
             get
             {
-                if (HttpContext.Current.Items["modifiedQueryString"] != null) 
-                    return (NameValueCollection)HttpContext.Current.Items["modifiedQueryString"];
-                else 
-                    return HttpContext.Current.Request.QueryString;
+                if (HttpContext.Current.Items["modifiedQueryString"] != null)
+                    return new NameValueCollection((NameValueCollection)HttpContext.Current.Items["modifiedQueryString"]);
+                else
+                    return new NameValueCollection(HttpContext.Current.Request.QueryString);
             }
         }
 
 
-        public Stream getStream(string virtualPath)
-        {
-            return getStream(virtualPath, QueryString);
-        }
         /// <summary>
-        /// Returns an re-encoded stream of the PSD, using whatever extension was appeneded after .psd
+        /// Returns an re-encoded stream of the PSD, using whatever extension was appeneded after .psd, or, if &format was specified, that encoding
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Stream getStream(string virtualPath, NameValueCollection queryString)
+        public Stream getStream(string virtualPath)
         {
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            System.Drawing.Bitmap b = getBitmap(virtualPath, queryString);
+            System.Drawing.Bitmap b = getBitmap(virtualPath);
             //Memory stream for encoding the file
             MemoryStream ms = new MemoryStream();
             //Encode image to memory stream, then seek the stream to byte 0
@@ -74,15 +81,13 @@ namespace PsdRenderer
 
             return ms;
         }
-        public System.Drawing.Bitmap getBitmap(string virtualPath){
-            return getBitmap(virtualPath,QueryString);
-        }
+        
         /// <summary>
         /// 
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public System.Drawing.Bitmap getBitmap(string virtualPath, NameValueCollection queryString)
+        public System.Drawing.Bitmap getBitmap(string virtualPath)
         {
 
             //Bitmap we will render to
@@ -104,7 +109,7 @@ namespace PsdRenderer
 
                 //How fast?
                 swRender.Stop();
-                trace("Rendering PSD to a Bitmap instance took " + swRender.ElapsedMilliseconds.ToString() + "ms");
+                trace("Parsing and rendering PSD to a Bitmap instance took " + swRender.ElapsedMilliseconds.ToString() + "ms");
             }
             return b;
         }
@@ -158,23 +163,15 @@ namespace PsdRenderer
         static string  getPhysicalPath(string virtualPath)
         {
             string str = stripFakeExtension(virtualPath);
-            if (HttpContext.Current != null)
-            {
-                return HttpContext.Current.Request.MapPath(str);
-            }
-            else
-            {
-                return str.TrimStart('~','/').Replace('/','\\');
-            }
+            if (HttpContext.Current != null) return HttpContext.Current.Request.MapPath(str);
+            else return str.TrimStart('~','/').Replace('/','\\');
         }
 
 
         public override bool FileExists(string virtualPath)
         {
             if (IsPathVirtual(virtualPath))
-            {
                 return Previous.FileExists(stripFakeExtension(virtualPath));
-            }
             else
                 return Previous.FileExists(virtualPath);
         }
