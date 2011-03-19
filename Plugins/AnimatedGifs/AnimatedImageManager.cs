@@ -8,11 +8,11 @@ using System.Collections.Specialized;
 using System.Drawing;
 namespace fbs.ImageResizer.Plugins.AnimatedGifs
 {
-    public class AnimatedImageManager : ImageManager
+    public class AnimatedImageManager : ImageBuilder
     {
         public static AnimatedImageManager()
         {
-            ImageManager.RegisterUpgrade(new AnimatedImageManager());
+            ImageBuilder.RegisterUpgrade(new AnimatedImageManager());
         }
         public AnimatedImageManager()
         {

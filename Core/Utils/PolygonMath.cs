@@ -113,7 +113,7 @@ namespace fbs.ImageResizer
         }
 
         /// <summary>
-        /// Rotates the specified polygon around the origin. 
+        /// Rotates the specified polygon (or set of points) around the origin. 
         /// </summary>
         /// <param name="rect"></param>
         /// <param name="degrees"></param>
@@ -125,6 +125,21 @@ namespace fbs.ImageResizer
                 pts[i] = RotateVector(poly[i], degrees * Math.PI / 180);
             return pts;
         }
+
+        /// <summary>
+        /// Rotates the specified polygon (or set of points) around the origin. 
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="degrees"></param>
+        /// <returns></returns>
+        public static PointF[] RotatePoly(PointF[] poly, double degrees, PointF origin) {
+            PointF[] pts = new PointF[poly.Length];
+            for (int i = 0; i < poly.Length; i++)
+                pts[i] = RotateVector(poly[i], degrees * Math.PI / 180,origin);
+            return pts;
+        }
+
+
         /// <summary>
         /// Returns a clockwise array of points on the rectangle.
         /// Point 0 is top-left.
@@ -167,6 +182,25 @@ namespace fbs.ImageResizer
             return new PointF(
                 (float)(Math.Cos(radians) * v.X - Math.Sin(radians) * v.Y),
                 (float)(Math.Sin(radians) * v.X + Math.Cos(radians) * v.Y));
+        }
+
+                /// <summary>
+        /// Rotates the specified point around the specified origin.
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="radians"></param>
+        /// <returns></returns>
+        public static PointF RotateVector(PointF v, double radians, PointF origin)
+        {
+            /**2D Rotation
+             *  A point <x,y> can be rotated around the origin <0,0> by running it through the following equations 
+             * to get the new point <x',y'> :
+             * x' = cos(theta)*x - sin(theta)*y //cos(90) or cos(-90) = 0
+             * y' = sin(theta)*x + cos(theta)*y //sin(90) or sin(-90) = +/- 1
+             */
+            return new PointF(
+                (float)(Math.Cos(radians) * (v.X - origin.X) - Math.Sin(radians) * (v.Y - origin.Y)) + origin.X,
+                (float)(Math.Sin(radians) *  (v.X - origin.X) + Math.Cos(radians) *  (v.Y - origin.Y)) + origin.Y);
         }
 
 
