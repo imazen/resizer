@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Configuration;
 using fbs.ImageResizer.Caching;
 using System.Drawing;
+using fbs.ImageResizer.Resizing;
 
 namespace fbs.ImageResizer {
     public class UrlEventArgs : EventArgs {
@@ -113,7 +114,7 @@ namespace fbs.ImageResizer {
 
         
         public static VppUsageOption VppUsage;
-        public static SizeF MaxSize;
+        public static Size MaxSize;
 
         /// <summary>
         /// Fires URL rewriting event in order, collecting the result in 'e'
@@ -209,7 +210,7 @@ namespace fbs.ImageResizer {
         }
 
 
-        internal static IEnumerable<Interfaces.ImageBuilderExtension> GetImageManagerExtensions() {
+        internal static IEnumerable<ImageBuilderExtension> GetImageManagerExtensions() {
             throw new NotImplementedException();
         }
     }

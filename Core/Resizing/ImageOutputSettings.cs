@@ -63,6 +63,11 @@ namespace fbs.ImageResizer
            
         }
 
+        public ImageOutputSettings(Bitmap source, ResizeSettingsCollection settings) {
+            setCustomQuantizationDefault();
+            parseFromQuerystring(source.RawFormat, settings);
+        }
+
         private void setCustomQuantizationDefault()
         {
             DisableCustomQuantization =
@@ -307,6 +312,8 @@ namespace fbs.ImageResizer
         /// Returns a list of (lowercase invariant) image extensions that the module works with.
         /// </summary>
         private static IDictionary<String,ImageFormat> _acceptedImageExtensions = null;
+        private Bitmap source;
+        private ResizeSettingsCollection settings;
         private static IDictionary<String,ImageFormat> acceptedImageExtensions{
             get{
                 lock (_syncExts) {
