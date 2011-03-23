@@ -4,22 +4,28 @@ using System.Text;
 using System.Drawing;
 using System.Collections.Specialized;
 using System.Globalization;
+using fbs.ImageResizer.Resizing;
+using System.Drawing.Drawing2D;
 
 namespace fbs.ImageResizer {
     class Utils {
 
-        public static Color parseColor(NameValueCollection q, string key, Color defaultValue) {
-            if (!string.IsNullOrEmpty(q[key])) {
+        public static Color parseColor(string value, Color defaultValue) {
+            if (!string.IsNullOrEmpty(value)) {
                 //try hex first
                 int val;
-                if (int.TryParse(q[key], System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out val)) {
-                    return System.Drawing.ColorTranslator.FromHtml("#" + q[key]);
+                if (int.TryParse(value, System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out val)) {
+                    return System.Drawing.ColorTranslator.FromHtml("#" + value);
                 } else {
-                    Color c = System.Drawing.ColorTranslator.FromHtml(q[key]);
+                    Color c = System.Drawing.ColorTranslator.FromHtml(value);
                     return (c.IsEmpty) ? defaultValue : c;
                 }
             }
             return defaultValue;
+        }
+
+        public static string writeColor(Color value) {
+            return System.Drawing.ColorTranslator.ToHtml(value).TrimStart('#');
         }
         /// <summary>
         /// Parses lists in the form "3,4,5,2,5" and "(3,4,40,50)". If a number cannot be parsed (i.e, number 2 in "5,,2,3") defaultValue is used.
@@ -154,6 +160,23 @@ namespace fbs.ImageResizer {
         }
 
 
+        public static BoxPadding parsePadding(string value) {
+            //Default to none if null
+            if (string.IsNullOrEmpty(value)) return BoxPadding.Empty;
+
+            double[] coords = parseList(value, 0);
+            if (coords.Length == 1) return new BoxPadding(coords[0]);
+            if (coords.Length == 4) return new BoxPadding(coords[0], coords[1], coords[2], coords[3]);
+
+            return BoxPadding.Empty; //Unrecognized value;
+        }
+
+        public static string writePadding(BoxPadding p) {
+            if (p.All != -1) return p.all.ToString(); //Easy
+
+            return "(" + p.left + "," + p.top + "," + p.right + "," + p.bottom + ")";
+
+        }
 
         /// <summary>
         /// Draws a gradient around the specified polygon. Fades from 'inner' to 'outer' over a distance of 'width' pixels. 
@@ -163,7 +186,7 @@ namespace fbs.ImageResizer {
         /// <param name="inner"></param>
         /// <param name="outer"></param>
         /// <param name="width"></param>
-        public virtual void DrawOuterGradient(Graphics g, PointF[] poly, Color inner, Color outer, float width) {
+        public static void DrawOuterGradient(Graphics g, PointF[] poly, Color inner, Color outer, float width) {
 
             PointF[,] corners = PolygonMath.RoundPoints(PolygonMath.GetCorners(poly, width));
             PointF[,] sides = PolygonMath.RoundPoints(PolygonMath.GetSides(poly, width));
@@ -187,5 +210,13 @@ namespace fbs.ImageResizer {
         }
 
 
+
+        internal static PointF parsePointF(string p) {
+            throw new NotImplementedException();
+        }
+
+        internal static string writeColor(Color value) {
+            throw new NotImplementedException();
+        }
     }
 }

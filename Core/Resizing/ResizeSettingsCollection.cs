@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections.Specialized;
 using System.Drawing;
+using fbs.ImageResizer.Resizing;
 
 namespace fbs.ImageResizer {
     public class ResizeSettingsCollection : NameValueCollection {
+        
         public ResizeSettingsCollection() : base() { }
         public ResizeSettingsCollection(NameValueCollection col) : base(col) { }
 
@@ -87,7 +89,6 @@ namespace fbs.ImageResizer {
                 }
             }
         }
-
         public PointF CropTopLeft {
             get {
                 return new PointF((float)CropValues[0], (float)CropValues[1]);
@@ -103,6 +104,47 @@ namespace fbs.ImageResizer {
             }
             set {
                 CropValues = new double[] {CropValues[0], CropValues[1], value.X, value.Y };
+            }
+        }
+
+        public Color BackgroundColor {
+            get { return Utils.parseColor(this[ "bgcolor"], Color.Transparent); }
+            set { this["bgcolor"] = Utils.writeColor(value); }
+        }
+
+
+        public Color PaddingColor {
+            get { return Utils.parseColor(this["paddingColor"], Color.Transparent); }
+            set { this["paddingColor"] = Utils.writeColor(value); }
+        }
+        public BoxPadding Padding {
+            get {
+                return Utils.parsePadding(this["paddingWidth"]);
+            }
+            set {
+                this["paddingWidth"] = Utils.writePadding(value);
+            }
+        }
+
+        public BoxPadding Margin {
+            get {
+                return Utils.parsePadding(this["margin"]);
+            }
+            set {
+                this["margin"] = Utils.writePadding(value);
+            }
+        }
+
+        public Color BorderColor {
+            get { return Utils.parseColor(this["borderColor"], Color.Transparent); }
+            set { this["borderColor"] = Utils.writeColor(value); }
+        }
+        public BoxPadding Border {
+            get {
+                return Utils.parsePadding(this["borderWidth"]);
+            }
+            set {
+                this["borderWidth"] = Utils.writePadding(value);
             }
         }
 

@@ -527,5 +527,9 @@ namespace fbs.ImageResizer
         {
             return new Rectangle((int)Math.Round(r.X), (int)Math.Round(r.Y), (int)Math.Round(r.Width),(int)Math.Round( r.Height));
         }
+
+        public static Size RoundPoints(SizeF sizeF) {
+            return new Size((int)Math.Round(sizeF.Width), (int)Math.Round(sizeF.Height));
+        }
     }
 }

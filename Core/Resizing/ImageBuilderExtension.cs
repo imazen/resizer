@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace fbs.ImageResizer {
+namespace fbs.ImageResizer.Resizing {
     /// <summary>
-    /// Provides a useable base class that can be used to modify the behavior of the ImageBuilder.Build method.
+    /// Provides a useable base class that can be used to modify the behavior of ImageBuilder.
+    /// When registered with an ImageBuilder instance, the ImageBuilder will call the corresponding methods on the extension prior to executing its own methods. 
     /// </summary>
-    public class ImageBuilderExtension {
+    public class ImageBuilderExtension : AbstractImageProcessor{
     }
 }

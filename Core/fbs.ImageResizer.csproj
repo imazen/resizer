@@ -90,6 +90,7 @@
     <Compile Include="Resizing\ImageState.cs" />
     <Compile Include="Resizing\IVirtualBitmapFile.cs" />
     <Compile Include="Resizing\ImageBuilderExtension.cs" />
+    <Compile Include="Resizing\Layout.cs" />
     <Compile Include="Utils\PolygonMath.cs" />
     <Compile Include="Resizing\IVirtualFileWithModifiedDate.cs" />
     <Compile Include="Resizing\ResizeSettingsCollection.cs" />
