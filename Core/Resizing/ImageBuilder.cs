@@ -50,6 +50,9 @@ using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using fbs.ImageResizer.Resizing;
+using fbs.ImageResizer.Encoding;
+using fbs.ImageResizer.Util;
+using fbs.ImageResizer.Configuration;
 
 namespace fbs.ImageResizer
 {
@@ -65,17 +68,17 @@ namespace fbs.ImageResizer
         /// Allows subclasses to be used instead of ImageManager. Replacements must override the Create method and call their own constructor instead.
         /// </summary>
         /// <param name="replacement"></param>
-        public static void UpgradeInstance(ImageBuilder replacement){
+        public static void Replace(ImageBuilder replacement){
             lock(_bestInstanceSync) _bestInstance = replacement;
         }
         
-        public static ImageBuilder getBestInstance() { return Instance;}
+        public static ImageBuilder getBestInstance() { return Current;}
 
         /// <summary>
         /// Returns a shared instance of ImageManager, or a subclass if it has been upgraded
         /// </summary>
         /// <returns></returns>
-        public static ImageBuilder Instance
+        public static ImageBuilder Current
         {
             get {
                 if (_bestInstance == null)
@@ -86,23 +89,20 @@ namespace fbs.ImageResizer
                 return _bestInstance;
             }
         }
-
         /// <summary>
-        /// Create a new instance of ImageBuilder using the specified extensions. Extension methods will be fired in the order they exist in the collection.
+        /// Creates a new ImageBuilder instance with no extensions.
         /// </summary>
-        /// <param name="extensions"></param>
-        public ImageBuilder(IEnumerable<ImageBuilderExtension> extensions) {
-            base.exts = new List<AbstractImageProcessor>();
-            if (extensions != null) foreach (ImageBuilderExtension e in extensions) ((List<AbstractImageProcessor>)exts).Add(e);
+        public ImageBuilder() :base(){
         }
 
         /// <summary>
         /// Create a new instance of ImageBuilder using the specified extensions. Extension methods will be fired in the order they exist in the collection.
         /// </summary>
         /// <param name="extensions"></param>
-        public ImageBuilder(IEnumerable<AbstractImageProcessor> extensions): base(extensions){
-           
+        public ImageBuilder(IEnumerable<ImageBuilderExtension> extensions):base(extensions){
         }
+
+        
         /// <summary>
         /// Creates another instance of the class using the specified extensions. Subclasses should override this and point to their own constructor.
         /// </summary>
@@ -111,7 +111,10 @@ namespace fbs.ImageResizer
         public virtual ImageBuilder Create(IEnumerable<ImageBuilderExtension> extensions) {
             return new ImageBuilder(extensions);
         }
-
+        /// <summary>
+        /// Copies the instance along with extensions. Subclass must override this.
+        /// </summary>
+        /// <returns></returns>
         public virtual ImageBuilder Copy(){
             return new ImageBuilder(exts);
         }
@@ -157,7 +160,12 @@ namespace fbs.ImageResizer
             if (source is string) {
                 string path = source as string;
                 try {
-                    b = new System.Drawing.Bitmap(path, useICM);
+                    try {
+                        b = new System.Drawing.Bitmap(path, useICM);
+                    } catch (Exception e) {
+                        b = LoadImageFailed(e, path, useICM);
+                        if (b == null) throw e; //If none of the extensions loaded the image, throw the exception anyhow.
+                    }
                 } catch (ArgumentException ae) {
                     ae.Data.Add("path", path);
                     ae.Data.Add("possiblereason",loadFailureReasons);
@@ -189,7 +197,12 @@ namespace fbs.ImageResizer
 
                 using (s) {
                     try {
-                        b = new System.Drawing.Bitmap(s, useICM);
+                        try {
+                            b = new System.Drawing.Bitmap(s, useICM);
+                        } catch (Exception e) {
+                            b = LoadImageFailed(e, s, useICM);
+                            if (b == null) throw e; //If none of the extensions loaded the image, throw the exception anyhow.
+                        }
                     } catch (ArgumentException ae) {
                         ae.Data.Add("path", path);
                         ae.Data.Add("possiblereason", loadFailureReasons);
@@ -206,6 +219,8 @@ namespace fbs.ImageResizer
             }
             throw new ArgumentException("Paramater source may only be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.", "source");
         }
+
+        
 
         /// <summary>
         /// Builds a bitmap as if it were destined for a PNG (transparency is preserved)
@@ -240,6 +255,7 @@ namespace fbs.ImageResizer
                 
                 //Write to Physical file
                 if (dest is string) {
+                    
                     System.IO.FileStream fs = new FileStream((string)dest, FileMode.Create, FileAccess.Write);
                     using (fs) {
                         buildToStream(b, fs, s);
@@ -266,10 +282,10 @@ namespace fbs.ImageResizer
         /// <param name="dest"></param>
         /// <param name="settings"></param>
         protected virtual void buildToStream(Bitmap source, Stream dest, ResizeSettingsCollection settings) {
-            ImageOutputSettings ios = new ImageOutputSettings(source, settings);
-            using (Bitmap b = buildToBitmap(source, settings,ios.SupportsTransparency)) {//Determines output format, includes code for saving in a variety of formats.
-                //Saves to stream
-                ios.SaveImage(dest, b);
+            IImageEncoder e = Config.Current.GetEncoder(source, settings);
+            using (Bitmap b = buildToBitmap(source, settings,e.SupportsTransparency)) {//Determines output format, includes code for saving in a variety of formats.
+                //Save to stream
+                e.Write(b, dest);
             }
         }
         /// <summary>
@@ -281,7 +297,18 @@ namespace fbs.ImageResizer
         /// <returns></returns>
         protected virtual Bitmap buildToBitmap(Bitmap source, ResizeSettingsCollection settings, bool transparencySupported) {
             Bitmap b = null;
-            using (ImageState state = new ImageState(settings, source.Size, Configuration.MaxSize,transparencySupported)) {
+            SizeLimits l = null;
+            if (l.TotalBehavior == SizeLimits.TotalSizeBehavior.ThrowException) {
+                //We have to perform a test run for this:
+                using (ImageState state = new ImageState(new ResizeSettingsCollection(settings),
+                                    source.Size, l, transparencySupported)) {
+                    //Generic processing of ImageState instances.
+                    Process(state);
+                    //Too large?
+                    l.ValidateTotalSize(state.finalSize); //Throws a SizeLimitException if too large
+                }
+            }
+            using (ImageState state = new ImageState(settings, source.Size, l,transparencySupported)) {
                 state.sourceBitmap = source;
 
                 //Generic processing of ImageState instances.
@@ -302,7 +329,6 @@ namespace fbs.ImageResizer
             BeginProcess(s);
             PrepareSourceBitmap(s);  // We select the page/frame and flip the source bitmap here
             PostPrepareSourceBitmap(s);
-            Layout(s);  // Layout all elements and determine how much room we need
             PrepareDestinationBitmap(s); //Create a bitmap and graphics object based on s.destSize
             Render(s); //Render using the graphics object
             RenderComplete(s);
@@ -425,7 +451,7 @@ namespace fbs.ImageResizer
                 float shadowWidth = Utils.getFloat(s.settings,"shadowWidth",0);
 
 
-                PointF shadowOffset = Utils.parsePointF(s.settings["shadowOffset"]);
+                PointF shadowOffset = Utils.parsePointF(s.settings["shadowOffset"], new PointF(0,0));
 
                 //For drawing purposes later
                 s.layout.AddInvisiblePolygon("shadowInner", PolygonMath.MovePoly(s.layout.LastRing.points,shadowOffset));
@@ -596,17 +622,21 @@ namespace fbs.ImageResizer
             if (s.settings.Flip != RotateFlipType.RotateNoneFlipNone)
                 s.destBitmap.RotateFlip(s.settings.Flip);
 
+            s.finalSize = s.destBitmap.Size;
         }
        
 
         /// <summary>
-        /// Doesn't support rotation or flipping. Translate a point on the original bitmap to a point on the new bitmap. If the original point no longer exists, returns Empty
+        /// Doesn't support flipping. Translate a point on the original bitmap to a point on the new bitmap. If the original point no longer exists, returns Empty
         /// </summary>
         /// <returns></returns>
-         public virtual PointF TranslatePoint(PointF sourcePoint, SizeF originalSize, NameValueCollection q)
-         {
-            
-         }
+        public virtual PointF[] TranslatePoints(PointF[] sourcePoints, Size originalSize, ResizeSettingsCollection q) {
+            ImageState s = new ImageState(q, originalSize, Configuration.MaxSize, true);
+            s.layout.AddInvisiblePolygon("points", sourcePoints);
+            Process(s);
+            return s.layout["points"];
+
+        }
          
 
 
@@ -614,8 +644,11 @@ namespace fbs.ImageResizer
         /// Gets the final size of an image
         /// </summary>
         /// <returns></returns>
-        public virtual Size GetFinalSize(SizeF originalSize, NameValueCollection q)
+        public virtual Size GetFinalSize(Size originalSize, ResizeSettingsCollection q)
         {
+            ImageState s = new ImageState(q, originalSize, Configuration.MaxSize, true);
+            Process(s);
+            return s.finalSize;
         }
 
   

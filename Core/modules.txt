@@ -1,34 +1,39 @@
 ﻿
 
+
 - Readers
-S3Reader - Loads files from an amazon S3 backend.
+S3Reader - Loads and resizes files from an amazon S3 backend.
 ZipReader - Can read images from Zip files.
 SqlReader - Loads files from a SQL database.
-RemoteSiteReader - Loads images from a remote site over HTTP
+RemoteSiteReader - Loads images from a remote site over HTTP (not built)
+AzureReader - Loads images from Azure blob storage. (not built)
 
 - Readers that 
 PsdReader - Convert PSD files to jpeg, png, or GIF on the fly
-PsdComposer - Re-compose PSD files on-the-fly. Rewrite text layers, hide/show layers. Minimal support for text layer effects.
+PsdComposer - Re-compose PSD files on-the-fly. Rewrite text layers, hide/show layers. Minimal support for layer effects, only glow and solid fill at the moment.
 
 - Caches
+NoCache - Serves images directly from memory. Not for production use.
 DiskCache - Caches resized images to disk for huge speed gains, using invisible request rewriting.
-S3Cache - Caches resized images to S3 for scalability - but uses redirects.
-SqlCache - not built
-
+S3Cache - Caches resized images to S3 for scalability - but uses redirects. (not built)
+SqlCache - Caches resized images to SQL (not built)
+AzureCache - Caches resized images to Azure's blob storage (not built)
 
 
 Plugins:
-PrettyGIFs - Octree quantization and dithering for GIFs and 8-bit PNGs
 
-AnimatedGifs - Resize GIF movies on the fly. PrettyGIFs plugin suggested. Slow on first request.
-
-
-
+PrettyGIFs - Octree quantization and dithering for GIFs and 8-bit PNGs. Slightly lower than DefaultEncoder, but offers a fastMode option that uses the original image palette to speed up processing times. (feature not yet added)
+AnimatedGifs - Resize GIF movies on the fly. PrettyGIFs plugin suggested. Caching is very important with this plugin due to long (.5s) processing times on long animations.
+WatermarkOverlay - overlay a transparent PNG on any image using the querystring. Flexible alignment and scaling options.
 
 
 Interfaces
 
 ICache
-
+IImageEncoder
+IPlugin
+AbstractImageProcessor
+IVirtualBitmapFile
+IVirtualFileWithModifiedDate
 
 Cairo/AForge resizing backends in the future? AForge uses the Bitmap class, so that's probably a safe choice.

@@ -4,6 +4,7 @@ using System.Text;
 using System.Collections.Specialized;
 using System.Drawing;
 using fbs.ImageResizer.Resizing;
+using fbs.ImageResizer.Util;
 
 namespace fbs.ImageResizer {
     public class ResizeSettingsCollection : NameValueCollection {
@@ -147,6 +148,18 @@ namespace fbs.ImageResizer {
                 this["borderWidth"] = Utils.writePadding(value);
             }
         }
+
+        public string Format {
+            get {
+                if (!string.IsNullOrEmpty(this["format"])) return this["format"];
+                return this["thumbnail"];
+            }
+            set {
+                this["format"] = value;
+                this["thumbnail"] = null;
+            }
+        }
+        
 
         public RectangleF getCustomCropSourceRect(SizeF imageSize) {
             double[] c = CropValues;

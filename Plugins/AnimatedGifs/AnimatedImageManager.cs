@@ -10,81 +10,50 @@ namespace fbs.ImageResizer.Plugins.AnimatedGifs
 {
     public class AnimatedImageManager : ImageBuilder
     {
-        public static AnimatedImageManager()
+        public static void Install()
         {
-            ImageBuilder.RegisterUpgrade(new AnimatedImageManager());
+            ImageBuilder.UpgradeInstance(new AnimatedImageManager());
+            Configuration.RegisterPlugin(new AnimatedImageManager());
         }
-        public AnimatedImageManager()
+        public AnimatedImageManager() :base()
         {
+        }
+        public AnimatedImageManager(IEnumerable<Resizing.ImageBuilderExtension> extensions)
+            : base(extensions) {
         }
 
-          /// <summary>
-        /// Takes sourceFile, resizes it, and saves it to targetFile using the querystring values in request.
-        /// This is the only method that supports animated GIF output. GDI has no native support for animated GIFs, so we have to take a different code path.
+        public override ImageBuilder  Copy()
+        {
+            return new AnimatedImageManager(exts);
+        }
+        public override ImageBuilder Create(IEnumerable<Resizing.ImageBuilderExtension> extensions) {
+            return new AnimatedImageManager(extensions);
+        }
+        /// <summary>
+        /// We cannot fix buildToBitmap, only buildToStream
         /// </summary>
-        /// <param name="sourceFile"></param>
-        /// <param name="targetFile"></param>
-        /// <param name="request"></param>
-        public override void BuildImage(string sourceFile, string targetFile, NameValueCollection queryString)
-        {
-            bool useICM = true;
-            if ("true".Equals(queryString["ignoreicc"], StringComparison.OrdinalIgnoreCase)) useICM = false;
-
-            //Load image
-            System.Drawing.Bitmap b = null;
-            try
-            {
-                b = new System.Drawing.Bitmap(sourceFile,useICM);
-            }
-            catch (ArgumentException ae)
-            {
-                ae.Data.Add("path", sourceFile);
-                ae.Data.Add("possiblereason",
-                    "File may be corrupted, empty, or may contain a PNG image file with a single dimension greater than 65,535 pixels.");
-                throw ae;
-            }
-            if (b == null) throw new IOException("Could not read the specified image! Image invalid or something.");
-            
-
-            //Resize image 
-            using (b)
-            {
-                //Determines output format, includes code for saving in a variety of formats.
-                ImageOutputSettings ios = new ImageOutputSettings(ImageOutputSettings.GetImageFormatFromPhysicalPath(sourceFile),queryString);
-                if (ios.OutputFormat == ImageFormat.Gif && queryString["frame"] == null && b.FrameDimensionsList != null && b.FrameDimensionsList.Length > 0)
-                {
-                    try
-                    {
-                        if (b.GetFrameCount(FrameDimension.Time) > 1)
-                        {
-                            WriteAnimatedGif(b, targetFile, ios, queryString);
-                            return;
-                        }
+        /// <param name="source"></param>
+        /// <param name="dest"></param>
+        /// <param name="settings"></param>
+        protected override void buildToStream(Bitmap source, Stream dest, ResizeSettingsCollection settings) {
+            IImageEncoder ios = Configuration.Config.Current.GetEncoder(source, settings);
+            //Determines output format, includes code for saving in a variety of formats.
+            if (ios.OutputFormat == ImageFormat.Gif && settings["frame"] == null && source.FrameDimensionsList != null && source.FrameDimensionsList.Length > 0) {
+                try {
+                    if (source.GetFrameCount(FrameDimension.Time) > 1) {
+                        WriteAnimatedGif(source,dest, ios, settings);
+                        return;
                     }
-                    catch (System.Runtime.InteropServices.ExternalException)
-                    {
-                    }
+                } catch (System.Runtime.InteropServices.ExternalException) {
                 }
-                    
-                //Open stream and save format.
-                System.IO.FileStream fs = new FileStream(targetFile, FileMode.Create, FileAccess.Write);
-                using (fs)
-                {
-                    ios.SaveImage(fs,BuildImage(b,ios.OriginalFormat,queryString));
-                }
-                
             }
-        }
-        private  void WriteAnimatedGif(Bitmap src, string targetFile, ImageOutputSettings ios, NameValueCollection queryString)
-        {
-            System.IO.FileStream fs = new FileStream(targetFile, FileMode.Create, FileAccess.Write);
-            using (fs)
-            {
-               WriteAnimatedGif(src,fs,ios,queryString);
-            }
-        }
 
-        private  void WriteAnimatedGif(Bitmap src, FileStream output, ImageOutputSettings ios, NameValueCollection queryString)
+
+            base.buildToStream(source, dest, settings);
+
+        }
+        
+        private  void WriteAnimatedGif(Bitmap src, Stream output, IImageEncoder ios, NameValueCollection queryString)
         {
             //http://www.fileformat.info/format/gif/egff.htm
             //http://www.fileformat.info/format/gif/spec/44ed77668592476fb7a682c714a68bac/view.htm
@@ -114,9 +83,7 @@ namespace fbs.ImageResizer.Plugins.AnimatedGifs
                     // http://radio.weblogs.com/0122832/2005/10/20.html
                     //src.MakeTransparent(); This call makes some GIFs replicate the first image on all frames.. i.e. SelectActiveFrame doesn't work.
                     
-                    using (Bitmap b = BuildImage(src, new ResizeSettings(queryString), 
-                        new ImageSettings(queryString), new ImageFilter(queryString), ios, new WatermarkSettings(queryString)))
-                    {
+                    using (Bitmap b = this.buildToBitmap(src,new ResizeSettingsCollection(queryString),true)){
                         //Useful to check if animation is occuring - sometimes the problem isn't the output file, but the input frames are 
                         //all the same.
                         //for (var i = 0; i < b.Height; i++) b.SetPixel(frame * 10, i, Color.Green);

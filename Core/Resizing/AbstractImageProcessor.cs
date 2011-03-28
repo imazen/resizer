@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Drawing;
+using System.IO;
 
 namespace fbs.ImageResizer.Resizing {
     /// <summary>
@@ -11,14 +13,14 @@ namespace fbs.ImageResizer.Resizing {
     public class AbstractImageProcessor {
 
         public AbstractImageProcessor() {
-            exts = new List<AbstractImageProcessor>();
+            exts = new List<ImageBuilderExtension>();
         }
         /// <summary>
         /// Creates a new AbstractImageProcessor which will run the specified extensions with each method call.
         /// </summary>
         /// <param name="extensions"></param>
-        public AbstractImageProcessor(IEnumerable<AbstractImageProcessor> extensions) {
-            exts = new List<AbstractImageProcessor>(extensions != null ? extensions : new AbstractImageProcessor[] { }); 
+        public AbstractImageProcessor(IEnumerable<ImageBuilderExtension> extensions) {
+            exts = new List<ImageBuilderExtension>(extensions != null ? extensions : new ImageBuilderExtension[] { }); 
         }
 
         /// <summary>
@@ -29,7 +31,7 @@ namespace fbs.ImageResizer.Resizing {
             lock (extsLock) {
                 //Should clone extensions, then add to the new copy, then assign back the the value. 
                 //Must be thread safe
-                List<AbstractImageProcessor> newList = new List<AbstractImageProcessor>(exts);
+                List<ImageBuilderExtension> newList = new List<ImageBuilderExtension>(exts);
                 newList.Add(extension);
                 exts = newList;
             }
@@ -39,7 +41,7 @@ namespace fbs.ImageResizer.Resizing {
         /// <summary>
         /// Contains the set of extensions that are called for every method. 
         /// </summary>
-        protected IEnumerable<AbstractImageProcessor> exts;
+        protected IEnumerable<ImageBuilderExtension> exts;
         private object extsLock = new object();
 
         /// <summary>
@@ -50,6 +52,37 @@ namespace fbs.ImageResizer.Resizing {
         protected virtual void PreLoadImage(ref object source, ResizeSettingsCollection settings) {
             foreach (AbstractImageProcessor p in exts) p.PreLoadImage(ref source, settings);
         }
+
+        /// <summary>
+        /// Extensions are executed until one extension returns a non-null value. 
+        /// This is taken to mean that the error has been resolved.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="path"></param>
+        /// <param name="useICM"></param>
+        protected virtual Bitmap LoadImageFailed(Exception e, string path, bool useICM) {
+            foreach (AbstractImageProcessor p in exts) {
+                Bitmap b = p.LoadImageFailed(e, path, useICM);
+                if (b != null) return b;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Extensions are executed until one extension returns a non-null value. 
+        /// This is taken to mean that the error has been resolved.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="path"></param>
+        /// <param name="useICM"></param>
+        protected virtual Bitmap LoadImageFailed(Exception e, Stream s, bool useICM) {
+            foreach (AbstractImageProcessor p in exts) {
+                Bitmap b = p.LoadImageFailed(e, s, useICM);
+                if (b != null) return b;
+            }
+            return null;
+        }
+
         /// <summary>
         /// Extend this to allow additional types of destination objects to be accepted by transforming them into either a bitmap or a stream
         /// </summary>
