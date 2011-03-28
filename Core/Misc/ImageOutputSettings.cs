@@ -37,7 +37,7 @@ using System.Drawing;
 using System.IO;
 using System.Configuration;
 
-namespace fbs.ImageResizer
+namespace fbs.ImageResizer.Misc
 {
     /// <summary>
     /// Extracts the image output and encoding settings from the querystring. 

@@ -7,7 +7,7 @@ using System.Globalization;
 using fbs.ImageResizer.Resizing;
 using System.Drawing.Drawing2D;
 
-namespace fbs.ImageResizer {
+namespace fbs.ImageResizer.Util {
     class Utils {
 
         public static Color parseColor(string value, Color defaultValue) {
@@ -170,11 +170,18 @@ namespace fbs.ImageResizer {
 
             return BoxPadding.Empty; //Unrecognized value;
         }
+        public static PointF parsePointF(string value, PointF defaultValue) {
+            if (string.IsNullOrEmpty(value)) return defaultValue;
+            double[] coords = parseList(value, 0);
+            if (coords.Length == 2) return new PointF((float)coords[0], (float)coords[1]);
+            return defaultValue; //Unrecognized value;
+        }
+
 
         public static string writePadding(BoxPadding p) {
-            if (p.All != -1) return p.all.ToString(); //Easy
+            if (p.All != -1) return p.All.ToString(); //Easy
 
-            return "(" + p.left + "," + p.top + "," + p.right + "," + p.bottom + ")";
+            return "(" + p.Left + "," + p.Top + "," + p.Right + "," + p.Bottom + ")";
 
         }
 
@@ -211,12 +218,6 @@ namespace fbs.ImageResizer {
 
 
 
-        internal static PointF parsePointF(string p) {
-            throw new NotImplementedException();
-        }
-
-        internal static string writeColor(Color value) {
-            throw new NotImplementedException();
-        }
+        
     }
 }

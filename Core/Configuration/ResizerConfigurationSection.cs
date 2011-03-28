@@ -5,39 +5,13 @@ using System.Configuration;
 using System.Collections.Specialized;
 using System.Xml;
 
-namespace fbs.ImageResizer {
+namespace fbs.ImageResizer.Configuration {
 
-
-    public enum VppUsageOption {
-        Fallback, Never, Always
-    }
-
+    /// <summary>
+    /// Handles reading the imageresizer section from Web.Config
+    /// </summary>
     public class ResizerConfigurationSection : ConfigurationSection {
-
-        /// <summary>
-        /// The maximum width an image may be resized to
-        /// </summary>
-        [ConfigurationProperty("maxWidth", IsRequired = false, DefaultValue = 4000)]
-        public int MaxWidth {
-            get {
-                return (int)base["maxWidth"];
-            }
-            set {
-                base["maxWidth"] = value;
-            }
-        }
-        /// <summary>
-        /// The maximum height an image may be resized to
-        /// </summary>
-        [ConfigurationProperty("maxHeight", IsRequired = false, DefaultValue = 4000)]
-        public int MaxHeight {
-            get {
-                return (int)base["maxHeight"];
-            }
-            set {
-                base["maxHeight"] = value;
-            }
-        }
+        
         /// <summary>
         /// Whether images are accessed directly from the file system or through virtual path providers.
         /// </summary>

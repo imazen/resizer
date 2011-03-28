@@ -13,10 +13,10 @@ namespace fbs.ImageResizer.Resizing {
     /// </summary>
     public class ImageState :IDisposable {
 
-        public ImageState(ResizeSettingsCollection settings, Size originalSize, Size maxSize, bool transparencySupported) {
+        public ImageState(ResizeSettingsCollection settings, Size originalSize, SizeLimits limits, bool transparencySupported) {
             this.settings = settings;
             this.originalSize = originalSize;
-            this.maxSize = maxSize;
+            this.limits = limits;
             this.supportsTransparency = transparencySupported;
         }
         /// <summary>
@@ -30,11 +30,8 @@ namespace fbs.ImageResizer.Resizing {
         public Size originalSize;
 
 
-        /// <summary>
-        /// The maximum dimensions permitted by the configuration settings. Only applied to the image itself - borders can have unlimited dimensions.
-        /// 2 passes would be nedded to apply these dimensions to the final bitmap - they must be adjusted after layout is calculated. Could introduce bugs.
-        /// </summary>
-        public Size maxSize;
+
+        public SizeLimits limits;
 
         /// <summary>
         /// Rendering choices can depend on whether the output format supports transparency.

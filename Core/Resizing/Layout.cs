@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
+using fbs.ImageResizer.Util;
 
 namespace fbs.ImageResizer.Resizing {
     public class LayoutBuilder {
@@ -97,7 +98,7 @@ namespace fbs.ImageResizer.Resizing {
         /// <param name="padding"></param>
         /// <returns></returns>
         public PointSet AddRing(string name, BoxPadding padding) {
-            return AddRing(name, PolygonMath.InflatePoly(LastRing.points,padding.GetEdgeOffsets());
+            return AddRing(name, PolygonMath.InflatePoly(LastRing.points, padding.GetEdgeOffsets()));
         }
         public PointSet AddInvisiblePolygon(string name, PointF[] points) {
             PointSet ps = new PointSet(points);

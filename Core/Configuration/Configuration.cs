@@ -7,7 +7,7 @@ using fbs.ImageResizer.Caching;
 using System.Drawing;
 using fbs.ImageResizer.Resizing;
 
-namespace fbs.ImageResizer {
+namespace fbs.ImageResizer.Configuration {
     public class UrlEventArgs : EventArgs {
         protected string _virtualPath;
         protected NameValueCollection _queryString;
