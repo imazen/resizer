@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Web;
+using System.Collections.Specialized;
 
 namespace fbs.ImageResizer.Caching {
     /// <summary>
@@ -20,13 +22,26 @@ namespace fbs.ImageResizer.Caching {
 
 
         /// <summary>
-        /// A string, which can contain any kind of data, which should be used as the basis for the cache key
+        /// A string derived from the request, which can contain any kind of data. To get a cache key that varies with the source modified date, 
+        /// it should be combined with the value of GetModifiedDateUTC() and hashed.
         /// </summary>
-        string CacheKey { get; }
+        string RequestKey { get; }
         /// <summary>
-        /// The content-type of the data
+        /// The rewritten querystring. Can be useful for caching systems that accept querystring arguments.
         /// </summary>
-        string ContentType { get; }
+        NameValueCollection RewrittenQuerystring { get; }
+
+        /// <summary>
+        /// A file extension appropriate for the resulting data. May be different than the extension on the original request.
+        /// </summary>
+        string SuggestedExtension { get; }
+
+        /// <summary>
+        /// The content-type of the data, among other things. Set ResponseHeaders.ApplyDuringPreSendRequestHeaders to automatically
+        /// write caching headers based on ResponseHeaders values.
+        /// Caching systems that use redirects may use this data as hints when configuring caching on the remote server.
+        /// </summary>
+        IResponseHeaders ResponseHeaders { get; set; }
         /// <summary>
         /// A delegate that returns the modified date of the source data.
         /// </summary>
@@ -39,5 +54,6 @@ namespace fbs.ImageResizer.Caching {
         /// A callback method that will resize, encode, and write the data to the given stream.
         /// </summary>
         ResizeImageDelegate ResizeImageToStream { get; }
+
     }
 }

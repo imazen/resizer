@@ -160,5 +160,14 @@ namespace fbs.ImageResizer.Resizing {
             foreach (PointSet ps in ringList)
                 if (ps.flags != PointFlags.Ignored) ps.points = PolygonMath.RoundPoints(ps.points);
         }
+        /// <summary>
+        /// Scales all rings and invisible polygons by the specified factor, around the specified point.
+        /// </summary>
+        /// <param name="factor"></param>
+        /// <param name="origin"></param>
+        public void Scale(double factor, PointF origin) {
+            foreach (PointSet ps in ringList)
+                if (ps.flags != PointFlags.Ignored) ps.points = PolygonMath.ScalePoints(ps.points, factor, origin);
+        }
     }
 }

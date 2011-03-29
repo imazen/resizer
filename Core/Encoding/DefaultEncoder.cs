@@ -69,8 +69,8 @@ namespace fbs.ImageResizer.Encoding {
 
             //What format was specified?
             ImageFormat requestedFormat = GetRequestedFormat(settings.Format, originalFormat); //fallback to originalFormat if not specified.
-            if (requestedFormat == null || !IsValidOutputFormat(requestedFormat))
-                throw new ArgumentException("An unrecognized or unsupported output format (" + settings.Format + ") was specified in 'settings'.");
+            if (!IsValidOutputFormat(requestedFormat))
+                throw new ArgumentException("An unrecognized or unsupported output format (" + (settings.Format != null ? settings.Format : "(null)") + ") was specified in 'settings'.");
 
             //Ok, we've found our format.
             this.OutputFormat = requestedFormat;

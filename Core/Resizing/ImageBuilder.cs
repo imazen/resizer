@@ -99,7 +99,7 @@ namespace fbs.ImageResizer
         /// Create a new instance of ImageBuilder using the specified extensions. Extension methods will be fired in the order they exist in the collection.
         /// </summary>
         /// <param name="extensions"></param>
-        public ImageBuilder(IEnumerable<ImageBuilderExtension> extensions):base(extensions){
+        public ImageBuilder(IEnumerable<ImageBuilderExtension> extensions, IEncoderProvider writer ):base(extensions){
         }
 
         
@@ -108,15 +108,15 @@ namespace fbs.ImageResizer
         /// </summary>
         /// <param name="extensions"></param>
         /// <returns></returns>
-        public virtual ImageBuilder Create(IEnumerable<ImageBuilderExtension> extensions) {
-            return new ImageBuilder(extensions);
+        public virtual ImageBuilder Create(IEnumerable<ImageBuilderExtension> extensions, IEncoderProvider writer) {
+            return new ImageBuilder(extensions,writer);
         }
         /// <summary>
         /// Copies the instance along with extensions. Subclass must override this.
         /// </summary>
         /// <returns></returns>
         public virtual ImageBuilder Copy(){
-            return new ImageBuilder(exts);
+            return new ImageBuilder(this.exts,this.writer);
         }
 
 
@@ -289,6 +289,16 @@ namespace fbs.ImageResizer
             }
         }
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        public virtual IImageEncoder GetEncoder(Bitmap source, ResizeSettingsCollection settings) {
+            return Config.Current.GetEncoder(source, settings); 
+        }
+
+        /// <summary>
         /// Override this when you need to override the behavior of Bitmap processing. 
         /// Not for external use.
         /// </summary>
@@ -297,18 +307,7 @@ namespace fbs.ImageResizer
         /// <returns></returns>
         protected virtual Bitmap buildToBitmap(Bitmap source, ResizeSettingsCollection settings, bool transparencySupported) {
             Bitmap b = null;
-            SizeLimits l = null;
-            if (l.TotalBehavior == SizeLimits.TotalSizeBehavior.ThrowException) {
-                //We have to perform a test run for this:
-                using (ImageState state = new ImageState(new ResizeSettingsCollection(settings),
-                                    source.Size, l, transparencySupported)) {
-                    //Generic processing of ImageState instances.
-                    Process(state);
-                    //Too large?
-                    l.ValidateTotalSize(state.finalSize); //Throws a SizeLimitException if too large
-                }
-            }
-            using (ImageState state = new ImageState(settings, source.Size, l,transparencySupported)) {
+            using (ImageState state = new ImageState(settings, source.Size, transparencySupported)) {
                 state.sourceBitmap = source;
 
                 //Generic processing of ImageState instances.
@@ -646,7 +645,7 @@ namespace fbs.ImageResizer
         /// <returns></returns>
         public virtual Size GetFinalSize(Size originalSize, ResizeSettingsCollection q)
         {
-            ImageState s = new ImageState(q, originalSize, Configuration.MaxSize, true);
+            ImageState s = new ImageState(q, originalSize, true);
             Process(s);
             return s.finalSize;
         }
@@ -679,12 +678,6 @@ namespace fbs.ImageResizer
             SizeF areaSize = new SizeF(-1, -1);
             if (!dimensionSpecified) {
                 areaSize = targetSize = s.copySize; //No dimension - use original size if possible - within web.config bounds.
-                //Checks against the web.config bounds ('finalSizeBounds')
-                if (!PolygonMath.FitsInside(targetSize, s.maxSize)) {
-                    //Scale down to fit. Doesn't matter what the scale setting is... No dimensions were specified.
-                    areaSize = targetSize = PolygonMath.DownScaleInside(targetSize, s.maxSize);
-                }
-
             } else {
                 //A dimension was specified. 
                 //We first calculate the largest size the image can be under the width/height/maxwidth/maxheight restrictions.
@@ -735,11 +728,6 @@ namespace fbs.ImageResizer
 
                 //We now have targetSize. targetSize will only be a different aspect ratio if both 'width' and 'height' are specified.
 
-                //Checks against the web.config bounds ('finalSizeBounds')
-                if (!PolygonMath.FitsInside(targetSize, s.maxSize)) {
-                    //Scale down to fit using existing aspect ratio.
-                    targetSize = PolygonMath.ScaleInside(targetSize, s.maxSize);
-                }
                 //This will be the area size also
                 areaSize = targetSize;
 
@@ -752,19 +740,12 @@ namespace fbs.ImageResizer
                 if (s.settings.Scale == ScaleMode.DownscaleOnly) {
                     if (PolygonMath.FitsInside(s.copySize, targetSize)) {
                         //The image is smaller or equal to its target polygon. Use original image coordinates instead.
-
-                        if (!PolygonMath.FitsInside(s.copySize, s.maxSize)) //Check web.config 'finalSizeBounds' and scale to fit.
-                            areaSize = targetSize = PolygonMath.ScaleInside(s.copySize, s.maxSize);
-                        else
-                            areaSize = targetSize = s.copySize;
+                        areaSize = targetSize = s.copySize;
                     }
                 } else if (s.settings.Scale == ScaleMode.UpscaleOnly) {
                     if (!PolygonMath.FitsInside(s.copySize, targetSize)) {
                         //The image is larger than its target. Use original image coordintes instead
-                        if (!PolygonMath.FitsInside(s.copySize, s.maxSize)) //Check web.config 'finalSizeBounds' and scale to fit.
-                            areaSize = targetSize = PolygonMath.ScaleInside(s.copySize, s.maxSize);
-                        else
-                            areaSize = targetSize = s.copySize;
+                        areaSize = targetSize = s.copySize;
 
                     }
                 } else if (s.settings.Scale == ScaleMode.UpscaleCanvas) {
@@ -850,5 +831,6 @@ namespace fbs.ImageResizer
         }
       
         #endregion
+
     }
 }

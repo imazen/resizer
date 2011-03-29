@@ -13,10 +13,9 @@ namespace fbs.ImageResizer.Resizing {
     /// </summary>
     public class ImageState :IDisposable {
 
-        public ImageState(ResizeSettingsCollection settings, Size originalSize, SizeLimits limits, bool transparencySupported) {
+        public ImageState(ResizeSettingsCollection settings, Size originalSize, bool transparencySupported) {
             this.settings = settings;
             this.originalSize = originalSize;
-            this.limits = limits;
             this.supportsTransparency = transparencySupported;
         }
         /// <summary>
@@ -29,9 +28,6 @@ namespace fbs.ImageResizer.Resizing {
         /// </summary>
         public Size originalSize;
 
-
-
-        public SizeLimits limits;
 
         /// <summary>
         /// Rendering choices can depend on whether the output format supports transparency.

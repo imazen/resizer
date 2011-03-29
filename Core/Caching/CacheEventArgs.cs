@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Collections.Specialized;
 
 namespace fbs.ImageResizer.Caching {
     public class CacheEventArgs : ICacheEventArgs {
 
         public CacheEventArgs() { }
 
-
-
-        private ICacheEventArgs.ModifiedDateDelegate getModifiedDateUTC;
+        protected ICacheEventArgs.ModifiedDateDelegate getModifiedDateUTC;
         /// <summary>
         /// A callback method to return the last modified date of the source file if available, or DateTime.MinValue if not.
         /// </summary>
@@ -21,7 +20,7 @@ namespace fbs.ImageResizer.Caching {
           set { getModifiedDateUTC = value; }
         }
 
-        private ICacheEventArgs.ResizeImageDelegate resizeImageToStream;
+        protected ICacheEventArgs.ResizeImageDelegate resizeImageToStream;
         /// <summary>
         /// A callback method that will resize and encode the image into a stream.
         /// </summary>
@@ -31,35 +30,46 @@ namespace fbs.ImageResizer.Caching {
           set { resizeImageToStream = value; }
         }
 
-
-        private string contentType = null;
+        protected string requestKey = null;
         /// <summary>
-        /// The mime-type of the encoded image
+        /// A value derived from the request. Can be used as a cache key. 
         /// </summary>
-        public string ContentType
+        public string RequestKey
         {
-            get { return contentType; }
-            set { contentType = value; }
-        }
-       
-        private string cacheKey = null;
-        /// <summary>
-        /// A string to use as a cache key. May be hashed for normalization purposes.
-        /// </summary>
-        public string CacheKey
-        {
-          get { return cacheKey; }
-          set { cacheKey = value; }
+            get { return requestKey; }
+            set { requestKey = value; }
         }
 
+        protected string suggestedExtension = null;
 
-        private bool hasModifiedDate;
+        public string SuggestedExtension {
+            get { return suggestedExtension; }
+            set { suggestedExtension = value; }
+        }
+
+        protected bool hasModifiedDate;
         /// <summary>
         /// True if the source file/record has a modified date
         /// </summary>
         public bool HasModifiedDate {
             get { return hasModifiedDate; }
             set { hasModifiedDate = value; }
+        }
+
+
+        protected IResponseHeaders responseHeaders = new ResponseHeaders();
+
+        public IResponseHeaders ResponseHeaders {
+            get { return responseHeaders; }
+            set { responseHeaders = value; }
+        }
+
+
+        protected NameValueCollection rewrittenQuerystring;
+
+        public NameValueCollection RewrittenQuerystring {
+            get { return rewrittenQuerystring; }
+            set { rewrittenQuerystring = value; }
         }
     }
 }
