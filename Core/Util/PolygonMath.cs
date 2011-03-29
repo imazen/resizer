@@ -139,6 +139,16 @@ namespace fbs.ImageResizer.Util
             return pts;
         }
 
+        public static PointF[] ScalePoints(PointF[] poly, double factor, PointF origin) {
+            PointF[] pts = new PointF[poly.Length];
+            for (int i = 0; i < poly.Length; i++)
+                pts[i] = ScalePoint(poly[i], factor, origin);
+            return pts;
+        }
+        public static PointF ScalePoint(PointF point, double factor, PointF origin) {
+            return new PointF((float)((point.X - origin.X) * factor + origin.X),
+                               (float)((point.Y - origin.Y) * factor + origin.Y));
+        }
 
         /// <summary>
         /// Returns a clockwise array of points on the rectangle.
@@ -531,5 +541,7 @@ namespace fbs.ImageResizer.Util
         public static Size RoundPoints(SizeF sizeF) {
             return new Size((int)Math.Round(sizeF.Width), (int)Math.Round(sizeF.Height));
         }
+
+
     }
 }

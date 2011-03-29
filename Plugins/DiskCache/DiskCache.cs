@@ -77,7 +77,7 @@ namespace fbs.ImageResizer.Plugins.DiskCache
         /// <summary>
         /// Uses the defaults from the imageresizer.diskcache configuration section
         /// </summary>
-        public DiskCache(){
+        public DiskCache(Configuration c){
             debugMode = Configuration.get("diskcache.debugMode",false);
             autoClean = Configuration.get("diskcache.autoClean",false);
             dir = Configuration.get("diskcache.dir","~/imagecache");

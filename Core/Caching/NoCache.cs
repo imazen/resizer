@@ -4,9 +4,10 @@ using System.Text;
 
 namespace fbs.ImageResizer.Caching {
     public class NoCache :ICache {
-        public void Process(System.Web.HttpContext current, CacheEventArgs e) {
-            current.Response.ContentType = e.ContentType;
-            e.ResizeImageToStream(current.Response.OutputStream);
+        public void Process(System.Web.HttpContext context, CacheEventArgs e) {
+            e.ResponseHeaders.ApplyToResponse(e.ResponseHeaders, context);
+            
+            e.ResizeImageToStream(context.Response.OutputStream);
             
         }
     }
