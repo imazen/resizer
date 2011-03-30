@@ -7,18 +7,19 @@ using System.Collections.Specialized;
 
 namespace fbs.ImageResizer.Caching {
     /// <summary>
+    /// A callback method that will resize, encode, and write the data to the given stream.
+    /// </summary>
+    public delegate void ResizeImageDelegate(Stream s);
+    /// <summary>
+    /// A callback method to return the last modified date of the source file if available, or DateTime.MinValue if not available.
+    /// </summary>
+    /// <returns></returns>
+    public delegate DateTime ModifiedDateDelegate();
+
+    /// <summary>
     /// A collection of data and callbacks that can be passed to a caching object.
     /// </summary>
-    public interface ICacheEventArgs {
-        /// <summary>
-        /// A callback method that will resize, encode, and write the data to the given stream.
-        /// </summary>
-        public delegate void ResizeImageDelegate(Stream s);
-        /// <summary>
-        /// A callback method to return the last modified date of the source file if available, or DateTime.MinValue if not available.
-        /// </summary>
-        /// <returns></returns>
-        public delegate DateTime ModifiedDateDelegate();
+    public interface IResponseArgs {
 
 
         /// <summary>

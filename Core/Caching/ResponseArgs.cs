@@ -5,26 +5,26 @@ using System.IO;
 using System.Collections.Specialized;
 
 namespace fbs.ImageResizer.Caching {
-    public class CacheEventArgs : ICacheEventArgs {
+    public class ResponseArgs : IResponseArgs {
 
-        public CacheEventArgs() { }
+        public ResponseArgs() { }
 
-        protected ICacheEventArgs.ModifiedDateDelegate getModifiedDateUTC;
+        protected ModifiedDateDelegate getModifiedDateUTC;
         /// <summary>
         /// A callback method to return the last modified date of the source file if available, or DateTime.MinValue if not.
         /// </summary>
         /// <returns></returns>
-        public ICacheEventArgs.ModifiedDateDelegate GetModifiedDateUTC
+        public ModifiedDateDelegate GetModifiedDateUTC
         {
           get { return getModifiedDateUTC; }
           set { getModifiedDateUTC = value; }
         }
 
-        protected ICacheEventArgs.ResizeImageDelegate resizeImageToStream;
+        protected ResizeImageDelegate resizeImageToStream;
         /// <summary>
         /// A callback method that will resize and encode the image into a stream.
         /// </summary>
-        public ICacheEventArgs.ResizeImageDelegate ResizeImageToStream
+        public ResizeImageDelegate ResizeImageToStream
         {
           get { return resizeImageToStream; }
           set { resizeImageToStream = value; }

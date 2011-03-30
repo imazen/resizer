@@ -5,9 +5,11 @@ using fbs.ImageResizer.Encoding;
 using fbs.ImageResizer.Resizing;
 using fbs.ImageResizer.Caching;
 using fbs.ImageResizer.Plugins;
+using System.Configuration;
+using fbs.ImageResizer.Configuration;
 
 namespace fbs.ImageResizer.Configuration {
-    public class Config : IEncoderProvider{
+    public class Config : IEncoderProvider, ICacheProvider{
 
         #region Singleton code, .Current,
         private static Config _singleton = null;
@@ -27,12 +29,7 @@ namespace fbs.ImageResizer.Configuration {
             }
         }
         #endregion
-
-        //Generic read/write configuration access
-
-        
-
-        protected void Init() {
+        public Config() {
             imageBuilderExtensions = new SafeList<ImageBuilderExtension>();
             imageEncoders = new SafeList<IImageEncoder>();
 
@@ -41,25 +38,22 @@ namespace fbs.ImageResizer.Configuration {
             allPlugins = new SafeList<IPlugin>();
 
 
-            _imageBuilder = new ImageBuilder();
-            imageBuilderExtensions.Changed += new SafeList<ImageBuilderExtension>.ChangedHandler(imageBuilderExtensions_Changed);
-            imageEncoders.Changed += new SafeList<IImageEncoder>.ChangedHandler(imageEncoders_Changed);
-
-
-            urlModifyingPlugins.Changed += new SafeList<IUrlPlugin>.ChangedHandler(urlModifyingPlugins_Changed);
-
+            //Whenever the extensions change, the image builder instance has to be replaced.
+            imageBuilderExtensions.Changed += new SafeList<ImageBuilderExtension>.ChangedHandler(delegate(SafeList<ImageBuilderExtension> s) {
+                InvalidateImageBuilder();
+            });
+            imageEncoders.Changed += new SafeList<IImageEncoder>.ChangedHandler(delegate(SafeList<IImageEncoder> s) {
+                //InvalidateImageBuilder();
+            });
         }
 
-        void urlModifyingPlugins_Changed(SafeList<IUrlPlugin> sender) {
-            InvalidateUrlData();
-        }
-
-        void imageEncoders_Changed(SafeList<IImageEncoder> sender) {
-            InvalidateImageBuilder(); //Why? Nothing has changed
-        }
-
-        void imageBuilderExtensions_Changed(SafeList<ImageBuilderExtension> sender) {
-            InvalidateImageBuilder();
+        private IPipelineConfig pipeline = null;
+        /// <summary>
+        /// Access and modify settings related to the HttpModule pipline. Register URL rewriting hooks, etc.
+        /// </summary>
+        public IPipelineConfig Pipeline {
+            get { return pipeline; }
+            set { pipeline = value; }
         }
 
         #region ImageBuilder singleton code .CurrentImageBuilder .UpgradeImageBuilder .InvalidateImageBuilder
@@ -95,33 +89,7 @@ namespace fbs.ImageResizer.Configuration {
         }
         #endregion
 
-        protected volatile List<string> _supportedDirectives = null;
-        protected volatile List<string> _supportedExtensions = null;
-       
 
-        protected object _cachedUrlDataSync = new object();
-        protected void InvalidateUrlData() {
-            lock (_cachedUrlDataSync) {
-                _supportedDirectives = null;
-                _supportedExtensions = null;
-            }
-        }
-        protected void CacheUrlData() {
-            lock (_cachedUrlDataSync) {
-                List<string> directives = new List<string>(24);
-                List<string> exts = new List<string>(24);
-                foreach (IUrlPlugin p in UrlModifyingPlugins) {
-                    exts.AddRange(p.GetSupportedFileExtensions());
-                    directives.AddRange(p.GetSupportedQuerystringKeys());
-                }
-                directives.Sort(StringComparer.OrdinalIgnoreCase);
-                exts.Sort(StringComparer.OrdinalIgnoreCase);
-                _supportedDirectives = directives;
-                _supportedExtensions = exts;
-            }
-        }
-        
-        
 
         protected SafeList<ImageBuilderExtension> imageBuilderExtensions = null;
         /// <summary>
@@ -170,15 +138,74 @@ namespace fbs.ImageResizer.Configuration {
 
 
 
-        //URL rewriting hooks
-        //header rewrite hooks
-        //cache control?
 
-        //collection: accepted image extensions
-        //collection: accpeted querystring arguments
+        /// <summary>
+        /// Removes the specified plugin from AllPlugins, UrlModifyingPlugins, CachingSystems, ImageEncoders, and ImageBuiderExtensions, based
+        /// on which interfaces the instance implements.
+        /// Plugins may register event handlers and modify settings - thus you should use the plugin's method to uninstall them vs. using this method.
+        /// </summary>
+        /// <param name="plugin"></param>
+        public void RemovePlugin(IPlugin plugin) {
+            AllPlugins.Remove(plugin);
+            if (plugin is IUrlPlugin) UrlModifyingPlugins.Remove(plugin as IUrlPlugin);
+            if (plugin is ICache) CachingSystems.Remove(plugin as ICache);
+            if (plugin is IImageEncoder) ImageEncoders.Remove(plugin as IImageEncoder);
+            if (plugin is ImageBuilderExtension) ImageBuilderExtensions.Remove(plugin as ImageBuilderExtension);
+        }
 
 
-        //IPlugin collection, keyed by shortname
 
+
+
+
+        private volatile ResizerConfigurationSection configuration;
+        private object configurationLock = new object();
+        /// <summary>
+        /// The ResizeConfigrationSection is not thread safe, and should not be modified
+        /// Dynamically loads the ConfigurationSection from web.config when accessed for the first time. 
+        /// </summary>
+        protected ResizerConfigurationSection cs {
+            get {
+                if (configuration == null) {
+                    lock (configurationLock) {
+                        if (configuration == null) {
+                            ResizerConfigurationSection tmpConf = (ResizerConfigurationSection)System.Configuration.ConfigurationManager.GetSection("imageresizer");
+                            configuration = tmpConf;
+                        }
+                    }
+                }
+                return configuration;
+            }
+        }
+
+
+
+        public string get(string selector, string defaultValue) {
+            return cs.get(selector, defaultValue);
+        }
+        public int get(string selector, int defaultValue) {
+            int i;
+            string s = cs.get(selector, defaultValue.ToString());
+            if (int.TryParse(s, out i)) return i;
+            else throw new ConfigurationException("Error in imageresizer configuration section: Invalid integer at " + selector + ":" + s);
+        }
+
+        public bool get(string selector, bool defaultValue) {
+            string s = cs.get(selector, defaultValue.ToString());
+
+            if ("true".Equals(s, StringComparison.OrdinalIgnoreCase) ||
+                "1".Equals(s, StringComparison.OrdinalIgnoreCase) ||
+                "yes".Equals(s, StringComparison.OrdinalIgnoreCase) ||
+                "on".Equals(s, StringComparison.OrdinalIgnoreCase)) return true;
+            else if ("false".Equals(s, StringComparison.OrdinalIgnoreCase) ||
+                "0".Equals(s, StringComparison.OrdinalIgnoreCase) ||
+                "no".Equals(s, StringComparison.OrdinalIgnoreCase) ||
+                "off".Equals(s, StringComparison.OrdinalIgnoreCase)) return false;
+            else throw new ConfigurationException("Error in imageresizer configuration section: Invalid boolean at " + selector + ":" + s);
+        }
+
+        public ICache GetCachingSystem(System.Web.HttpContext context, IResponseArgs args) {
+            throw new NotImplementedException();
+        }
     }
 }

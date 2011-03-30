@@ -10,11 +10,11 @@ namespace fbs.ImageResizer.Plugins {
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
-        public IPlugin Install(Config c);
-        public bool Uninstall(Config c);
+        IPlugin Install(Config c);
+        bool Uninstall(Config c);
         /// <summary>
         /// The short name of the plugin. Should match the plugin namespace and default class.
         /// </summary>
-        public string ShortName { get; }
+        string ShortName { get; }
     }
 }

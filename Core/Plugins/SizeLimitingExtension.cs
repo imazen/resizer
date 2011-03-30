@@ -6,7 +6,7 @@ using System.Drawing;
 using fbs.ImageResizer.Configuration;
 
 namespace fbs.ImageResizer.Plugins {
-    public class SizeLimitingModule:AbstractImageProcessor, IPlugin {
+    public class SizeLimitingModule:ImageBuilderExtension, IPlugin {
         public SizeLimitingModule(SizeLimits l) {
             this.l = l;
         }
@@ -28,23 +28,19 @@ namespace fbs.ImageResizer.Plugins {
         }
 
         public IPlugin Install(Config c) {
-            throw new NotImplementedException();
+            c.AllPlugins.Add(this);
+            c.ImageBuilderExtensions.Add(this);
+            return this;
         }
 
         public bool Uninstall(Config c) {
-            throw new NotImplementedException();
+            c.RemovePlugin(this);
+            return true;
         }
 
         public string ShortName {
-            get { throw new NotImplementedException(); }
+            get { return this.GetType().Name; }
         }
 
-        public IEnumerable<string> GetSupportedFileExtensions() {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<string> GetSupportedQuerystringKeys() {
-            throw new NotImplementedException();
-        }
     }
 }
