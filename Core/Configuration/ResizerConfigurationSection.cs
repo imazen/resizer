@@ -4,6 +4,7 @@ using System.Text;
 using System.Configuration;
 using System.Collections.Specialized;
 using System.Xml;
+using fbs.ImageResizer.Configuration;
 
 namespace fbs.ImageResizer.Configuration {
 

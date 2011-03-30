@@ -120,10 +120,11 @@ namespace fbs.ImageResizer.Caching {
 
         private List<CacheDependency> dependencies = new List<CacheDependency>();
 
-        protected List<CacheDependency> ServerCacheDependencies {
+        public List<CacheDependency> ServerCacheDependencies {
             get { return dependencies; }
             set { dependencies = value; }
         }
-    
+
+
     }
 }

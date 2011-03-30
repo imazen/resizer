@@ -14,6 +14,6 @@ namespace fbs.ImageResizer.Caching {
         /// </summary>
         /// <param name="current"></param>
         /// <param name="e"></param>
-        void Process(HttpContext current, ICacheEventArgs e);
+        void Process(HttpContext current, IResponseArgs e);
     }
 }

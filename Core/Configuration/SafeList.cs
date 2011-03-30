@@ -80,13 +80,15 @@ namespace fbs.ImageResizer.Configuration {
         /// Removes the item from the list
         /// </summary>
         /// <param name="item"></param>
-        public void Remove(T item) {
+        public bool Remove(T item) {
             lock (writeLock) {
                 IList<T> newList = GetList();
-                newList.Remove(item);
+                bool removed = newList.Remove(item);
+                if (!removed) return false; //The item didn't exist, don't fire changed events.
                 items = new ReadOnlyCollection<T>(newList);
             }
             FireChanged();
+            return true;
         }
 
 

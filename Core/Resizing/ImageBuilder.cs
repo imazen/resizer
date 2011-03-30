@@ -53,6 +53,7 @@ using fbs.ImageResizer.Resizing;
 using fbs.ImageResizer.Encoding;
 using fbs.ImageResizer.Util;
 using fbs.ImageResizer.Configuration;
+using fbs.ImageResizer.Plugins;
 
 namespace fbs.ImageResizer
 {
@@ -60,46 +61,40 @@ namespace fbs.ImageResizer
     /// Provides methods for generating resizied images, and for reading and writing them to disk.
     /// Use ImageManager.Instance to get the default instance, or use ImageManager.Instance.Create() to control which extensions are used.
     /// </summary>
-    public class ImageBuilder : AbstractImageProcessor
+    public class ImageBuilder : AbstractImageProcessor, IUrlPlugin
     {
-        private static ImageBuilder _bestInstance = null;
-        private static object _bestInstanceSync = new object();
         /// <summary>
-        /// Allows subclasses to be used instead of ImageManager. Replacements must override the Create method and call their own constructor instead.
+        /// Handles the encoder selection and provision proccess.
         /// </summary>
-        /// <param name="replacement"></param>
-        public static void Replace(ImageBuilder replacement){
-            lock(_bestInstanceSync) _bestInstance = replacement;
-        }
-        
-        public static ImageBuilder getBestInstance() { return Current;}
+        protected IEncoderProvider writer = null;
+        /// <summary>
+        /// Handles the encoder selection and provision proccess.
+        /// </summary>
+        public IEncoderProvider EncoderProvider { get { return writer; } }
 
         /// <summary>
-        /// Returns a shared instance of ImageManager, or a subclass if it has been upgraded
+        /// Returns a shared instance of ImageBuilder or a subclass, equivalent to  Config.Current.CurrentImageBuilder
         /// </summary>
         /// <returns></returns>
         public static ImageBuilder Current
         {
             get {
-                if (_bestInstance == null)
-                    lock (_bestInstanceSync)
-                        if (_bestInstance == null)
-                            _bestInstance = new ImageBuilder(Configuration.GetImageManagerExtensions());
-
-                return _bestInstance;
+                return Config.Current.CurrentImageBuilder;
             }
         }
         /// <summary>
         /// Creates a new ImageBuilder instance with no extensions.
         /// </summary>
-        public ImageBuilder() :base(){
+        public ImageBuilder(IEncoderProvider writer) :base(){
+            this.writer = writer;
         }
 
         /// <summary>
         /// Create a new instance of ImageBuilder using the specified extensions. Extension methods will be fired in the order they exist in the collection.
         /// </summary>
         /// <param name="extensions"></param>
-        public ImageBuilder(IEnumerable<ImageBuilderExtension> extensions, IEncoderProvider writer ):base(extensions){
+        public ImageBuilder(IEnumerable<ImageBuilderExtension> extensions, IEncoderProvider writer):base(extensions){
+            this.writer = writer;
         }
 
         
@@ -112,7 +107,7 @@ namespace fbs.ImageResizer
             return new ImageBuilder(extensions,writer);
         }
         /// <summary>
-        /// Copies the instance along with extensions. Subclass must override this.
+        /// Copies the instance along with extensions. Subclasses must override this.
         /// </summary>
         /// <returns></returns>
         public virtual ImageBuilder Copy(){
@@ -424,7 +419,7 @@ namespace fbs.ImageResizer
         }
 
 
-        override void LayoutPadding(ImageState s) {
+        protected override void LayoutPadding(ImageState s) {
             base.LayoutPadding(s);
 
             //We need to add padding
@@ -433,7 +428,7 @@ namespace fbs.ImageResizer
             }
         }
 
-        override void LayoutBorder(ImageState s) {
+        protected override void LayoutBorder(ImageState s) {
             base.LayoutBorder(s);
 
             //And borders
@@ -521,9 +516,13 @@ namespace fbs.ImageResizer
             g.CompositingMode = CompositingMode.SourceOver;
         }
 
-
+        /// <summary>
+        /// Sets the background color if needed or requested
+        /// </summary>
+        /// <param name="s"></param>
         protected override void RenderBackground(ImageState s) {
             base.RenderBackground(s);
+
             Graphics g = s.destGraphics;
 
             //If the image doesn't support transparency, we need to fill the background color now.
@@ -630,7 +629,7 @@ namespace fbs.ImageResizer
         /// </summary>
         /// <returns></returns>
         public virtual PointF[] TranslatePoints(PointF[] sourcePoints, Size originalSize, ResizeSettingsCollection q) {
-            ImageState s = new ImageState(q, originalSize, Configuration.MaxSize, true);
+            ImageState s = new ImageState(q, originalSize, true);
             s.layout.AddInvisiblePolygon("points", sourcePoints);
             Process(s);
             return s.layout["points"];
@@ -753,10 +752,7 @@ namespace fbs.ImageResizer
                     if (PolygonMath.FitsInside(s.copySize, targetSize)) {
                         //The image is smaller or equal to its target polygon. Use original image coordinates instead.
 
-                        if (!PolygonMath.FitsInside(s.copySize, s.maxSize)) //Check web.config 'finalSizeBounds' and scale to fit.
-                            targetSize = PolygonMath.ScaleInside(s.copySize, s.maxSize);
-                        else
-                            targetSize = s.copySize;
+                        targetSize = s.copySize;
                     }
 
                 }
@@ -792,45 +788,23 @@ namespace fbs.ImageResizer
 
 
 
-        #region Legacy BuildImage overloads
+        private readonly string[] _supportedFileExtensions = new string[]
+             {"bmp","gif","exif","png","tif","tiff","tff","jpg","jpeg", "jpe","jif","jfif","jfi"};
 
-                public virtual Bitmap BuildImage(Bitmap src, ImageFormat originalFormat, NameValueCollection q)
-        {
-            ResizeSettingsCollection c = new ResizeSettingsCollection(q);
-            c.SetDefaultImageFormat(ImageOutputSettings.GetExtensionFromImageFormat(originalFormat));
-            return Build(src, c);
+        public virtual IEnumerable<string> GetSupportedFileExtensions() {
+            return _supportedFileExtensions;
         }
-
-        /// <summary>
-        /// Generates a resized bitmap from the specifed source file and the specified querystring. Understands width/height and maxwidth/maxheight.
-        /// Throws either an ArgumentException or IOException if the source image is invalid.
-        /// Always use ImageOutputSettings to save images, since Image.Save doesn't work well for GIF or PNGs, and needs custom params for Jpegs.
-        /// </summary>
-        /// 
-        /// <returns></returns>
-        public virtual Bitmap BuildImage(string sourceFile, NameValueCollection queryString) {
-            return Build(sourceFile, new ResizeSettingsCollection(queryString));
+        //TODO: Move to external: dither, time, quality, colors
+        private readonly string[] _supportedQuerystringKeys = new string[]{
+                    "format", "thumbnail", "maxwidth", "maxheight",
+                "width", "height",
+                "scale", "stretch", "crop", "page", "bgcolor",
+                "rotate", "flip", "sourceFlip", "borderWidth",
+                "borderColor", "paddingWidth", "paddingColor", "ignoreicc",
+                "shadowColor", "shadowOffset", "shadowWidth", "frame", "useresizingpipeline"};
+    
+        public virtual IEnumerable<string> GetSupportedQuerystringKeys() {
+            return _supportedQuerystringKeys;
         }
-        public virtual Bitmap BuildImage(HttpPostedFile sourceFile, NameValueCollection queryString) {
-            return Build(sourceFile, new ResizeSettingsCollection(queryString));
-        }
-        public virtual Bitmap BuildImage(VirtualFile sourceFile, NameValueCollection queryString) {
-            return Build(sourceFile, new ResizeSettingsCollection(queryString));
-        }
-        public virtual void BuildImage(string sourceFile, string targetFile, NameValueCollection queryString) {
-            Build(sourceFile, targetFile, new ResizeSettingsCollection(queryString));
-        }
-        public virtual void BuildImage(VirtualFile sourceFile, string targetFile, NameValueCollection queryString) {
-            Build(sourceFile, targetFile, new ResizeSettingsCollection(queryString));
-        }
-        public virtual void BuildImage(IVirtualBitmapFile sourceFile, string targetFile, NameValueCollection queryString) {
-            Build(sourceFile, targetFile, new ResizeSettingsCollection(queryString));
-        }
-        public virtual void BuildImage(HttpPostedFile sourceFile, string targetFile, NameValueCollection queryString) {
-            Build(sourceFile, targetFile, new ResizeSettingsCollection(queryString));
-        }
-      
-        #endregion
-
     }
 }

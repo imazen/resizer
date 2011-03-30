@@ -77,26 +77,42 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Caching\CacheEventArgs.cs" />
-    <Compile Include="Configuration\Configuration.cs" />
+    <Compile Include="Caching\ResponseArgs.cs" />
+    <Compile Include="Caching\ICacheProvider.cs" />
+    <Compile Include="Caching\IResponseHeaders.cs" />
+    <Compile Include="Caching\NoCache.cs" />
+    <Compile Include="Caching\ResponseHeaders.cs" />
+    <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Configuration\Enumerations.cs" />
+    <Compile Include="Configuration\PipelineConfig.cs" />
+    <Compile Include="Configuration\IPipelineConfig.cs" />
+    <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Configuration\ResizerConfigurationSection.cs" />
     <Compile Include="Caching\ICache.cs" />
+    <Compile Include="Configuration\SafeList.cs" />
+    <Compile Include="Encoding\DefaultEncoder.cs" />
+    <Compile Include="Encoding\IEncoderProvider.cs" />
+    <Compile Include="Encoding\IImageEncoder.cs" />
+    <Compile Include="Plugins\IUrlPlugin.cs" />
+    <Compile Include="Plugins\SizeLimitingExtension.cs" />
+    <Compile Include="Resizing\AbstractImageProcessor.cs" />
+    <Compile Include="Resizing\BoxPadding.cs" />
     <Compile Include="Resizing\Enumerations.cs" />
-    <Compile Include="Resizing\ImageOutputSettings.cs" />
     <Compile Include="Resizing\ImageBuilder.cs" />
-    <Compile Include="Resizing\ImageSettings.cs" />
-    <Compile Include="HttpModule\InterceptModule.cs" />
-    <Compile Include="Caching\ICacheEventArgs.cs" />
+    <Compile Include="Misc\ImageFilter.cs" />
+    <Compile Include="InterceptModule.cs" />
+    <Compile Include="Caching\IResponseArgs.cs" />
     <Compile Include="Resizing\ImageState.cs" />
     <Compile Include="Resizing\IVirtualBitmapFile.cs" />
     <Compile Include="Resizing\ImageBuilderExtension.cs" />
     <Compile Include="Resizing\Layout.cs" />
-    <Compile Include="Utils\PolygonMath.cs" />
+    <Compile Include="Plugins\SizeLimits.cs" />
+    <Compile Include="Util\PolygonMath.cs" />
     <Compile Include="Resizing\IVirtualFileWithModifiedDate.cs" />
     <Compile Include="Resizing\ResizeSettingsCollection.cs" />
-    <Compile Include="Utils\UrlHasher.cs" />
-    <Compile Include="Utils\Utils.cs" />
-    <Compile Include="Utils\yrl.cs" />
+    <Compile Include="Util\UrlHasher.cs" />
+    <Compile Include="Util\Utils.cs" />
+    <Compile Include="Util\yrl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -137,7 +153,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Encoding\" />
+    <Folder Include="Diagnostic\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

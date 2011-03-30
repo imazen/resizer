@@ -53,16 +53,14 @@ using System.Text;
 using System.Security.Principal;
 using fbs.ImageResizer.Caching;
 using fbs.ImageResizer.Configuration;
-using fbs.ImageResizer.HttpModule;
+using fbs.ImageResizer.Configuration;
 using fbs.ImageResizer.Encoding;
 
 
 namespace fbs.ImageResizer {
 
     /// <summary>
-    /// Monitors incoming image requests. Image requests that request resizing are processed. The resized images are immediately cached, and 
-    /// the request is rewritten to the disk-cached resized version. This way IIS can handle the actual serving of the file.
-    /// The disk-cache directory is protected through URL authorization.
+    /// Monitors incoming image requests. Image requests that request resizing are processed, cached, and served.
     /// </summary>
     public class InterceptModule : System.Web.IHttpModule {
 
@@ -80,14 +78,15 @@ namespace fbs.ImageResizer {
 
         }
         void System.Web.IHttpModule.Dispose() { }
-
-        protected IPipelineConfig conf { get { return Config.Current; } }
+        /// <summary>
+        /// Current configuration. Same as Config.Current.Pipeline
+        /// </summary>
+        protected IPipelineConfig conf { get { return Config.Current.Pipeline; } }
 
         /// <summary>
-        /// This is where we filter requests and intercet those that want resizing performed.
-        /// We first check for image extensions... 
-        /// If it is one, then we run it through the CustomFolders methods to see if if there is custom resizing for it..
-        /// If there still aren't any querystring params after that, then we ignore the request.
+        /// This is where we filter requests and intercept those that want resizing performed.
+        /// We first strip FakeExtension, then verify the remaining file extension is supported for decoding.
+        /// We fire URL rewriting events. If the result includes any supported querystring params afterwards, we process the request. Otherwise we let it fall back to IIS/ASP.NET.
         /// If the file doesn't exist, we also ignore the request. They're going to cause a 404 anyway.
         /// 
         /// </summary>
@@ -100,6 +99,7 @@ namespace fbs.ImageResizer {
             if (app.Context == null) return;
             if (app.Context.Request == null) return;
 
+            conf.FirePostAuthorizeRequest(this, app.Context);
 
             //Copy FilePath so we can modify it
             string filePath = app.Context.Request.FilePath; //Doesn't include pathInfo
@@ -120,7 +120,7 @@ namespace fbs.ImageResizer {
 
                 //Call events to do resize(w,h,f)/ parsing and any other custom syntax.
                 UrlEventArgs ue = new UrlEventArgs(filePath + app.Context.Request.PathInfo, q); //Includes pathinfo
-                conf.FireRewritingEvents(this, ue);
+                conf.FireRewritingEvents(this, app.Context,ue);
 
                 //Pull data back out of event object
                 string basePath = ue.VirtualPath;
@@ -141,7 +141,7 @@ namespace fbs.ImageResizer {
                     if (!UrlAuthorizationModule.CheckUrlAccessForPrincipal(basePath, user, "GET")) throw new HttpException(403, "Access denied.");
 
                     //Allow user code to deny access.
-                    conf.FirePostAuthorize(this, new UrlEventArgs(basePath, new NameValueCollection(q)));
+                    conf.FirePostAuthorizeImage(this, app.Context, new UrlEventArgs(basePath, new NameValueCollection(q)));
 
                     //Store the modified querystring in request for use by VirtualPathProviders
                     app.Context.Items[conf.ModifiedQueryStringKey] = q; // app.Context.Items["modifiedQueryString"] = q;
@@ -173,8 +173,8 @@ namespace fbs.ImageResizer {
         /// Perform 404 checking before calling this method. Assumes file exists.
         /// Called during PostAuthorizeRequest
         /// </summary>
-        /// <param name="r"></param>
-        /// <param name="extension"></param>
+        /// <param name="context"></param>
+        /// <param name="current"></param>
         protected virtual void ResizeRequest(HttpContext context, yrl current) {
             Stopwatch s = new Stopwatch();
             s.Start();
@@ -199,14 +199,14 @@ namespace fbs.ImageResizer {
             IImageEncoder guessedEncoder = conf.GetImageBuilder().GetEncoder(null,settings);
 
             //Build CacheEventArgs
-            CacheEventArgs e = new CacheEventArgs();
+            ResponseArgs e = new ResponseArgs();
             e.RequestKey = current.ToString();
             e.RewrittenQuerystring = settings;
             e.ResponseHeaders.ContentType = guessedEncoder.MimeType;
             e.SuggestedExtension = guessedEncoder.Extension;
             e.HasModifiedDate = hasModifiedDate;
             //Add delegate for retrieving the modified date of the source file. s
-            e.GetModifiedDateUTC = new ICacheEventArgs.ModifiedDateDelegate(delegate() {
+            e.GetModifiedDateUTC = new ModifiedDateDelegate(delegate() {
                 if (vf == null)
                     return System.IO.File.GetLastWriteTimeUtc(current.Local);
                 else if (hasModifiedDate)
@@ -214,7 +214,7 @@ namespace fbs.ImageResizer {
                 else return DateTime.MinValue; //Won't be called, no modified date available.
             });
             //Add delegate for writing the data stream
-            e.ResizeImageToStream = new ICacheEventArgs.ResizeImageDelegate(delegate(Stream stream) {
+            e.ResizeImageToStream = new ResizeImageDelegate(delegate(Stream stream) {
                 //This runs on a cache miss or cache invalid. This delegate is preventing from running in more
                 //than one thread at a time for the specified source file (current.Local)
 
@@ -225,37 +225,39 @@ namespace fbs.ImageResizer {
 
             });
             
-            //Last minute stuff before we hand the request off to the caching system.
+            
+            context.Items[conf.ResponseArgsKey] = e; //store in context items
 
-            PreProcess(context, e);
+            //Fire events (for client-side caching plugins)
+            conf.FirePreHandleImage(this, context, e);
 
             //Pass the rest of the work off to the caching module. It will handle rewriting/redirecting and everything. 
             //We handle request headers based on what is found in context.Items
-            conf.GetCachingModule(context, current.ToString()).Process(context, e);
+            conf.GetCacheProvider().GetCachingSystem(context, e).Process(context, e);
 
             s.Stop();
             context.Items["ResizingTime"] = s.ElapsedMilliseconds;
 
         }
 
-        private void PreProcess(HttpContext context, CacheEventArgs e) {
-            context.Items[conf.RequestCacheArgsKey] = e; //store in context items
+        private void PreProcess(HttpContext context, ResponseArgs e) {
+            context.Items[conf.ResponseArgsKey] = e; //store in context items
 
 
-            //Determine the client caching settings (server time zone, not utc)
-            string cacheSetting = Configuration.get("clientcache.minutes", null);
-            if (!string.IsNullOrEmpty(cacheSetting)) {
-                double f;
-                if (double.TryParse(cacheSetting, out f) && f > 0)
-                    e.ResponseHeaders.Expires = DateTime.Now.AddMinutes(f);
-            } else {
-                e.ResponseHeaders.Expires = DateTime.Now.AddHours(24); //Default to 24 hours
-            }
+            ////Determine the client caching settings (server time zone, not utc)
+            //string cacheSetting = conf.get("clientcache.minutes", null);
+            //if (!string.IsNullOrEmpty(cacheSetting)) {
+            //    double f;
+            //    if (double.TryParse(cacheSetting, out f) && f > 0)
+            //        e.ResponseHeaders.Expires = DateTime.Now.AddMinutes(f);
+            //} else {
+            //    e.ResponseHeaders.Expires = DateTime.Now.AddHours(24); //Default to 24 hours
+            //}
 
-            //Set last modified date
-            if (e.HasModifiedDate) e.ResponseHeaders.LastModified = e.GetModifiedDateUTC();
+            ////Set last modified date
+            //if (e.HasModifiedDate) e.ResponseHeaders.LastModified = e.GetModifiedDateUTC();
 
-            conf.FirePreProcessRequest(context,e);
+            conf.FirePreHandleImage(this,context,e);
         }
         /// <summary>
         /// We don't actually send the data - but we still want to control the headers on the data.
@@ -272,9 +274,9 @@ namespace fbs.ImageResizer {
             if (app.Context.Request == null) return;
             HttpContext context = app.Context;
             //Skip requests if we don't have an object to work with.
-            if (context.Items[conf.RequestCacheArgsKey] == null) return;
+            if (context.Items[conf.ResponseArgsKey] == null) return;
             //Try to cast the object.
-            ICacheEventArgs obj = context.Items[conf.RequestCacheArgsKey] as ICacheEventArgs;
+            IResponseArgs obj = context.Items[conf.ResponseArgsKey] as IResponseArgs;
             if (obj == null) return;
             //Apply the headers
             if (obj.ResponseHeaders.ApplyDuringPreSendRequestHeaders)

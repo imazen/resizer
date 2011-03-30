@@ -5,9 +5,10 @@ using System.Drawing.Imaging;
 using System.Drawing;
 using System.IO;
 using System.Collections.Specialized;
+using fbs.ImageResizer.Plugins;
 
 namespace fbs.ImageResizer.Encoding {
-    public class DefaultEncoder :IImageEncoder {
+    public class DefaultEncoder :IImageEncoder, IUrlPlugin {
         /// <summary>
         /// Tries to parse an ImageFormat from the settings.Format value.
         /// If an unrecogized format is specified, returns null.
@@ -194,12 +195,18 @@ namespace fbs.ImageResizer.Encoding {
                         _imageExtensions = new Dictionary<String, ImageFormat>();
                         addImageExtension("jpg", ImageFormat.Jpeg);
                         addImageExtension("jpeg", ImageFormat.Jpeg);
+                        addImageExtension("jpe", ImageFormat.Jpeg);
+                        addImageExtension("jif", ImageFormat.Jpeg);
+                        addImageExtension("jfif", ImageFormat.Jpeg);
+                        addImageExtension("jfi", ImageFormat.Jpeg);
+                        addImageExtension("exif", ImageFormat.Jpeg);
                         addImageExtension("bmp", ImageFormat.Bmp);
                         addImageExtension("gif", ImageFormat.Gif);
                         addImageExtension("png", ImageFormat.Png);
                         addImageExtension("tif", ImageFormat.Tiff);
                         addImageExtension("tiff", ImageFormat.Tiff);
                         addImageExtension("tff", ImageFormat.Tiff);
+                        //"bmp","gif","exif","png","tif","tiff","tff","jpg","jpeg", "jpe","jif","jfif","jfi"
                     }
                     return _imageExtensions;
                 }
@@ -357,5 +364,23 @@ namespace fbs.ImageResizer.Encoding {
 
 
 
+        /// <summary>
+        /// Returns a collection of the 
+        /// </summary>
+        /// <returns></returns>
+        public virtual IEnumerable<string> GetSupportedFileExtensions() {
+            ////Filter the imageExtensions dict using IsValidOutputFormat.
+            //List<string> exts = new List<string>(10);
+            //foreach (KeyValuePair<string, ImageFormat> p in DefaultEncoder.imageExtensions) {
+            //    if (IsValidOutputFormat(p.Value)) exts.Add(p.Key);
+            //}
+            //DefaultEncoder.
+            //return exts;
+            return null;
+        }
+
+        public virtual IEnumerable<string> GetSupportedQuerystringKeys() {
+            return new string[] { "quality", "format", "thumbnail" };
+        }
     }
 }
