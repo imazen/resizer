@@ -38,6 +38,7 @@ using System.Configuration;
 using fbs;
 using System.IO;
 using fbs.ImageResizer.Caching;
+using fbs.ImageResizer.Configuration;
 
 namespace fbs.ImageResizer.Plugins.DiskCache
 {
@@ -77,13 +78,13 @@ namespace fbs.ImageResizer.Plugins.DiskCache
         /// <summary>
         /// Uses the defaults from the imageresizer.diskcache configuration section
         /// </summary>
-        public DiskCache(Configuration c){
-            debugMode = Configuration.get("diskcache.debugMode",false);
-            autoClean = Configuration.get("diskcache.autoClean",false);
-            dir = Configuration.get("diskcache.dir","~/imagecache");
-            maxImagesPerFolder =  Configuration.get("diskcache.maxImagesPerFolder", 8000);
-            subfolders = Configuration.get("diskcache.subfolders",0);
-            fileLockTimeout = Configuration.get("diskcache.fileLockTimeout", 10000); //10s
+        public DiskCache(Config c){
+            debugMode = c.get("diskcache.debugMode",false);
+            autoClean = c.get("diskcache.autoClean",false);
+            dir = c.get("diskcache.dir","~/imagecache");
+            maxImagesPerFolder =  c.get("diskcache.maxImagesPerFolder", 8000);
+            subfolders = c.get("diskcache.subfolders",0);
+            fileLockTimeout = c.get("diskcache.fileLockTimeout", 10000); //10s
         }
        
         /// <summary>
@@ -112,7 +113,7 @@ namespace fbs.ImageResizer.Plugins.DiskCache
         private long filesUpdatedSinceCleanup = 0;
         private bool hasCleanedUp = false;
 
-        public void Process(HttpContext context, CacheEventArgs e) {
+        public void Process(HttpContext context, IResponseArgs e) {
             string cachedFilename = null; //Build using hash utils
         
         /// <summary>
@@ -189,8 +190,6 @@ namespace fbs.ImageResizer.Plugins.DiskCache
             }
 
             context.Items["FinalCachedFile"] = cachedFilename;
-            context.Items["FinalContentType"] = e.ContentType;
-            
 
             //Now it is time to rewrite the request to serve from the cache
             //Get domain-relative path of cached file.
@@ -309,16 +308,15 @@ namespace fbs.ImageResizer.Plugins.DiskCache
 
 
 
-
+            //TODO: fix cleanup system
             //Perform cleanup if needed. Clear 1/10 of the files if we are running low.
-            int maxCount = GetMaxCachedFiles();
-            if (this.maxImagesPerFolder > 0  && this.autoClean)
+            if (maxImagesPerFolder > 0  && this.autoClean)
             {  
                 //Only test for cleanup if we've added 1/15 of the quota since last check. This may make things a little less precise, but provides a 
                 //huge perfomance boost - GetFiles() can be very slow on some machines
-                if (filesUpdatedSinceCleanup > maxCount / 15 || !hasCleanedUp)
+                if (filesUpdatedSinceCleanup > maxImagesPerFolder / 15 || !hasCleanedUp)
                 {
-                    TrimDirectoryFiles(dir, maxCount - 1, (maxCount / 10));
+                    TrimDirectoryFiles(dir, maxImagesPerFolder - 1, (maxImagesPerFolder / 10));
                 }
             }
         }
@@ -340,7 +338,7 @@ namespace fbs.ImageResizer.Plugins.DiskCache
 
             // if (deleteExtra > maxCount) throw warning
             
-            string[] files = System.IO.Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
+            string[] files = System.IO.Directory.GetFiles(dir, "*", SearchOption.TopDirectoryOnly);
             if (files.Length <= maxCount)
             {
                 hasCleanedUp = true;

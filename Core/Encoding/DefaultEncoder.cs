@@ -63,7 +63,7 @@ namespace fbs.ImageResizer.Encoding {
             this.Quality = jpegQuality;
         }
 
-        public DefaultEncoder(Image original, ResizeSettingsCollection settings) {
+        public DefaultEncoder(Image original, ResizeSettings settings) {
             //What format was the image originally (used as a fallback).
             ImageFormat originalFormat = GetOriginalFormat(original);
             if (!IsValidOutputFormat(originalFormat)) originalFormat = ImageFormat.Jpeg;//No valid info available about the original format. Use Jpeg.
@@ -84,7 +84,7 @@ namespace fbs.ImageResizer.Encoding {
 
         }
         
-        public virtual IImageEncoder CreateIfSuitable(Image original, ResizeSettingsCollection settings) {
+        public virtual IImageEncoder CreateIfSuitable(Image original, ResizeSettings settings) {
             ImageFormat requestedFormat = GetRequestedFormat(settings.Format, ImageFormat.Jpeg);
             if (requestedFormat == null || !IsValidOutputFormat(requestedFormat)) return null; //An unsupported format was explicitly specified.
             return new DefaultEncoder(original, settings);

@@ -13,7 +13,7 @@ namespace fbs.ImageResizer.Resizing {
     /// </summary>
     public class ImageState :IDisposable {
 
-        public ImageState(ResizeSettingsCollection settings, Size originalSize, bool transparencySupported) {
+        public ImageState(ResizeSettings settings, Size originalSize, bool transparencySupported) {
             this.settings = settings;
             this.originalSize = originalSize;
             this.supportsTransparency = transparencySupported;
@@ -21,7 +21,7 @@ namespace fbs.ImageResizer.Resizing {
         /// <summary>
         /// The commands to apply to the bitmap
         /// </summary>
-        public ResizeSettingsCollection settings;
+        public ResizeSettings settings;
 
         /// <summary>
         /// The original size of the source bitmap. Use this instead of accessing the bitmap directly for this information, since the bitmap may not always be available

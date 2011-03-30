@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace fbs.ImageResizer
+namespace fbs.ImageResizer.Plugins
 {
     public interface IVirtualFileWithModifiedDate
     {

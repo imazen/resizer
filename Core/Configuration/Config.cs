@@ -132,7 +132,7 @@ namespace fbs.ImageResizer.Configuration {
         /// <param name="originalImage"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public IImageEncoder GetEncoder(System.Drawing.Image originalImage, ResizeSettingsCollection settings) {
+        public IImageEncoder GetEncoder(System.Drawing.Image originalImage, ResizeSettings settings) {
            return new DefaultEncoder().CreateIfSuitable(originalImage, settings);
         }
 
