@@ -128,7 +128,7 @@ namespace fbs.ImageResizer
         /// <param name="source">May  be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream</param>
         /// <param name="settings">Will ignore ICC profile if ?ignoreicc=true.</param>
         /// <returns></returns>
-        public virtual Bitmap LoadImage(object source, ResizeSettingsCollection settings) {
+        public virtual Bitmap LoadImage(object source, ResizeSettings settings) {
 
             //Fire PreLoadImage(source,settings)
             this.PreLoadImage(ref source, settings);
@@ -223,7 +223,7 @@ namespace fbs.ImageResizer
         /// <param name="source"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public virtual Bitmap Build(object source, ResizeSettingsCollection settings) {
+        public virtual Bitmap Build(object source, ResizeSettings settings) {
             BitmapHolder bh = new BitmapHolder();
             Build(source, bh, settings);
             return bh.bitmap;
@@ -235,8 +235,8 @@ namespace fbs.ImageResizer
         /// <param name="source">May be an instance of string (a physical path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.</param>
         /// <param name="dest">May be a physical path (string), or a Stream instance</param>
         /// <param name="settings"></param>
-        public virtual void Build(object source, object dest, ResizeSettingsCollection settings) {
-            ResizeSettingsCollection s = new ResizeSettingsCollection(settings);
+        public virtual void Build(object source, object dest, ResizeSettings settings) {
+            ResizeSettings s = new ResizeSettings(settings);
 
             Bitmap b = null; 
             try {
@@ -276,7 +276,7 @@ namespace fbs.ImageResizer
         /// <param name="source"></param>
         /// <param name="dest"></param>
         /// <param name="settings"></param>
-        protected virtual void buildToStream(Bitmap source, Stream dest, ResizeSettingsCollection settings) {
+        protected virtual void buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
             IImageEncoder e = Config.Current.GetEncoder(source, settings);
             using (Bitmap b = buildToBitmap(source, settings,e.SupportsTransparency)) {//Determines output format, includes code for saving in a variety of formats.
                 //Save to stream
@@ -289,7 +289,7 @@ namespace fbs.ImageResizer
         /// <param name="source"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public virtual IImageEncoder GetEncoder(Bitmap source, ResizeSettingsCollection settings) {
+        public virtual IImageEncoder GetEncoder(Bitmap source, ResizeSettings settings) {
             return Config.Current.GetEncoder(source, settings); 
         }
 
@@ -300,7 +300,7 @@ namespace fbs.ImageResizer
         /// <param name="source"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        protected virtual Bitmap buildToBitmap(Bitmap source, ResizeSettingsCollection settings, bool transparencySupported) {
+        protected virtual Bitmap buildToBitmap(Bitmap source, ResizeSettings settings, bool transparencySupported) {
             Bitmap b = null;
             using (ImageState state = new ImageState(settings, source.Size, transparencySupported)) {
                 state.sourceBitmap = source;
@@ -383,7 +383,7 @@ namespace fbs.ImageResizer
             if (s.sourceBitmap == null) return; //Nothing to do if there is no bitmap
 
             Bitmap src = s.sourceBitmap;
-            ResizeSettingsCollection q = s.settings;
+            ResizeSettings q = s.settings;
 
             int page = 0;
             if (!string.IsNullOrEmpty(q["page"]) && !int.TryParse(q["page"], out page))
@@ -628,7 +628,7 @@ namespace fbs.ImageResizer
         /// Doesn't support flipping. Translate a point on the original bitmap to a point on the new bitmap. If the original point no longer exists, returns Empty
         /// </summary>
         /// <returns></returns>
-        public virtual PointF[] TranslatePoints(PointF[] sourcePoints, Size originalSize, ResizeSettingsCollection q) {
+        public virtual PointF[] TranslatePoints(PointF[] sourcePoints, Size originalSize, ResizeSettings q) {
             ImageState s = new ImageState(q, originalSize, true);
             s.layout.AddInvisiblePolygon("points", sourcePoints);
             Process(s);
@@ -642,7 +642,7 @@ namespace fbs.ImageResizer
         /// Gets the final size of an image
         /// </summary>
         /// <returns></returns>
-        public virtual Size GetFinalSize(Size originalSize, ResizeSettingsCollection q)
+        public virtual Size GetFinalSize(Size originalSize, ResizeSettings q)
         {
             ImageState s = new ImageState(q, originalSize, true);
             Process(s);

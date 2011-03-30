@@ -15,7 +15,7 @@ namespace fbs.ImageResizer.Encoding {
         /// <param name="originalImage">A source image used to provide hinting for palette generation and for determining the fallback image format. Leave it null if not available.</param>
         /// <param name="settings">Output format settings, among others. </param>
         /// <returns></returns>
-        IImageEncoder CreateIfSuitable(Image originalImage, ResizeSettingsCollection settings);
+        IImageEncoder CreateIfSuitable(Image originalImage, ResizeSettings settings);
 
         /// <summary>
         /// Encodes the image to the specified stream, 

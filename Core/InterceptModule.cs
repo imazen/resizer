@@ -55,6 +55,7 @@ using fbs.ImageResizer.Caching;
 using fbs.ImageResizer.Configuration;
 using fbs.ImageResizer.Configuration;
 using fbs.ImageResizer.Encoding;
+using fbs.ImageResizer.Plugins;
 
 
 namespace fbs.ImageResizer {
@@ -195,7 +196,7 @@ namespace fbs.ImageResizer {
                 }
             }
 
-            ResizeSettingsCollection settings =new ResizeSettingsCollection(current.QueryString);
+            ResizeSettings settings =new ResizeSettings(current.QueryString);
             IImageEncoder guessedEncoder = conf.GetImageBuilder().GetEncoder(null,settings);
 
             //Build CacheEventArgs

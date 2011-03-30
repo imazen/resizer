@@ -5,7 +5,7 @@ using fbs.ImageResizer.Resizing;
 using System.Drawing;
 using fbs.ImageResizer.Configuration;
 
-namespace fbs.ImageResizer.Plugins {
+namespace fbs.ImageResizer.Plugins.SizeLimiting {
     public class SizeLimitingModule:ImageBuilderExtension, IPlugin {
         public SizeLimitingModule(SizeLimits l) {
             this.l = l;

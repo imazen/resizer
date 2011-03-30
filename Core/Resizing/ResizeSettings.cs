@@ -7,10 +7,10 @@ using fbs.ImageResizer.Resizing;
 using fbs.ImageResizer.Util;
 
 namespace fbs.ImageResizer {
-    public class ResizeSettingsCollection : NameValueCollection {
+    public class ResizeSettings : NameValueCollection {
         
-        public ResizeSettingsCollection() : base() { }
-        public ResizeSettingsCollection(NameValueCollection col) : base(col) { }
+        public ResizeSettings() : base() { }
+        public ResizeSettings(NameValueCollection col) : base(col) { }
 
         public int get(string name, int defaultValue){ return Utils.getInt(this,name,defaultValue);}
         public void set(string name, int value) { this[name] = value.ToString();}

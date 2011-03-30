@@ -49,7 +49,7 @@ namespace fbs.ImageResizer.Resizing {
         /// </summary>
         /// <param name="source"></param>
         /// <param name="settings"></param>
-        protected virtual void PreLoadImage(ref object source, ResizeSettingsCollection settings) {
+        protected virtual void PreLoadImage(ref object source, ResizeSettings settings) {
             foreach (AbstractImageProcessor p in exts) p.PreLoadImage(ref source, settings);
         }
 
@@ -88,7 +88,7 @@ namespace fbs.ImageResizer.Resizing {
         /// </summary>
         /// <param name="dest"></param>
         /// <param name="settings"></param>
-        protected virtual void PreAcquireStream(ref object dest, ResizeSettingsCollection settings) {
+        protected virtual void PreAcquireStream(ref object dest, ResizeSettings settings) {
             foreach (AbstractImageProcessor p in exts) p.PreAcquireStream(ref dest, settings);
         }
 
