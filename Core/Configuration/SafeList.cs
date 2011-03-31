@@ -90,7 +90,27 @@ namespace fbs.ImageResizer.Configuration {
             FireChanged();
             return true;
         }
+        /// <summary>
+        /// Returns the first item in the list. May return null if the list is empty.
+        /// </summary>
+        public T First {
+            get {
+                ReadOnlyCollection<T> copy = items; //So we can do logic without getting an index invalid exception
+                if (copy.Count > 0) return copy[0];
+                else return default(T);
+            }
+        }
 
+        /// <summary>
+        /// Returns the first item in the list. May return null if the list is empty.
+        /// </summary>
+        public T Last {
+            get {
+                ReadOnlyCollection<T> copy = items; //So we can do logic without getting an index invalid exception
+                if (copy.Count > 0) return copy[copy.Count -1];
+                else return default(T);
+            }
+        }
 
         /// <summary>
         /// Adds the specified item to the beginning of the list

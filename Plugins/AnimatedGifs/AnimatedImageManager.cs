@@ -6,28 +6,37 @@ using System.IO;
 using System.Drawing.Imaging;
 using System.Collections.Specialized;
 using System.Drawing;
+using fbs.ImageResizer.Resizing;
+using fbs.ImageResizer.Encoding;
 namespace fbs.ImageResizer.Plugins.AnimatedGifs
 {
-    public class AnimatedImageManager : ImageBuilder
+    public class AnimatedImageManager : ImageBuilder, IPlugin
     {
-        public static void Install()
-        {
-            ImageBuilder.UpgradeInstance(new AnimatedImageManager());
-            Configuration.RegisterPlugin(new AnimatedImageManager());
-        }
-        public AnimatedImageManager() :base()
-        {
-        }
-        public AnimatedImageManager(IEnumerable<Resizing.ImageBuilderExtension> extensions)
-            : base(extensions) {
+        public IPlugin Install(Configuration.Config c) {
+            c.add_plugin(this);
+            c.UpgradeImageBuilder(this);
+            return this;
         }
 
-        public override ImageBuilder  Copy()
-        {
-            return new AnimatedImageManager(exts);
+        public bool Uninstall(Configuration.Config c) {
+            c.remove_plugin(this);
+            c.UpgradeImageBuilder(base.Create(exts, writer));
+            return true;
         }
-        public override ImageBuilder Create(IEnumerable<Resizing.ImageBuilderExtension> extensions) {
-            return new AnimatedImageManager(extensions);
+
+        public AnimatedImageManager(IEncoderProvider writer) :base(writer)
+        {
+        }
+        public AnimatedImageManager(IEnumerable<ImageBuilderExtension> extensions, IEncoderProvider writer)
+            : base(extensions,writer) {
+        }
+
+        public virtual override ImageBuilder  Copy()
+        {
+            return new AnimatedImageManager(exts,writer);
+        }
+        public virtual override ImageBuilder Create(IEnumerable<ImageBuilderExtension> extensions, IEncoderProvider writer) {
+            return new AnimatedImageManager(extensions, writer);
         }
         /// <summary>
         /// We cannot fix buildToBitmap, only buildToStream
@@ -35,10 +44,12 @@ namespace fbs.ImageResizer.Plugins.AnimatedGifs
         /// <param name="source"></param>
         /// <param name="dest"></param>
         /// <param name="settings"></param>
-        protected override void buildToStream(Bitmap source, Stream dest, ResizeSettingsCollection settings) {
-            IImageEncoder ios = Configuration.Config.Current.GetEncoder(source, settings);
+        protected override void buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
+            IEncoder ios = Configuration.Config.Current.EncoderProvider.GetEncoder(source, settings);
             //Determines output format, includes code for saving in a variety of formats.
-            if (ios.OutputFormat == ImageFormat.Gif && settings["frame"] == null && source.FrameDimensionsList != null && source.FrameDimensionsList.Length > 0) {
+            if (ios.MimeType.Equals("image/gif", StringComparison.OrdinalIgnoreCase) && //If it's a GIF
+                settings["frame"] == null &&    //With no frame specifier
+                source.FrameDimensionsList != null && source.FrameDimensionsList.Length > 0) { //With multiple frames
                 try {
                     if (source.GetFrameCount(FrameDimension.Time) > 1) {
                         WriteAnimatedGif(source,dest, ios, settings);
@@ -53,7 +64,7 @@ namespace fbs.ImageResizer.Plugins.AnimatedGifs
 
         }
         
-        private  void WriteAnimatedGif(Bitmap src, Stream output, IImageEncoder ios, NameValueCollection queryString)
+        private  void WriteAnimatedGif(Bitmap src, Stream output, IEncoder ios, ResizeSettings queryString)
         {
             //http://www.fileformat.info/format/gif/egff.htm
             //http://www.fileformat.info/format/gif/spec/44ed77668592476fb7a682c714a68bac/view.htm
@@ -83,12 +94,12 @@ namespace fbs.ImageResizer.Plugins.AnimatedGifs
                     // http://radio.weblogs.com/0122832/2005/10/20.html
                     //src.MakeTransparent(); This call makes some GIFs replicate the first image on all frames.. i.e. SelectActiveFrame doesn't work.
                     
-                    using (Bitmap b = this.buildToBitmap(src,new ResizeSettingsCollection(queryString),true)){
+                    using (Bitmap b = this.buildToBitmap(src,queryString,true)){
                         //Useful to check if animation is occuring - sometimes the problem isn't the output file, but the input frames are 
                         //all the same.
                         //for (var i = 0; i < b.Height; i++) b.SetPixel(frame * 10, i, Color.Green);
                         // b.Save(memoryStream, ImageFormat.Gif);
-                        ios.SaveImage(memoryStream, b); //Allows quantization and dithering
+                        ios.Write(b, memoryStream); //Allows quantization and dithering
                     }
                     
                     GifClass gif = new GifClass();
@@ -157,6 +168,8 @@ namespace fbs.ImageResizer.Plugins.AnimatedGifs
               return pi.Value[0] + (pi.Value[1] << 8);
           }
 
+
+          
     }
     
 }

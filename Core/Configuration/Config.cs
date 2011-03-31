@@ -9,7 +9,7 @@ using System.Configuration;
 using fbs.ImageResizer.Configuration;
 
 namespace fbs.ImageResizer.Configuration {
-    public class Config : IEncoderProvider, ICacheProvider{
+    public class Config : IEncoderProvider{
 
         #region Singleton code, .Current,
         private static Config _singleton = null;
@@ -29,9 +29,10 @@ namespace fbs.ImageResizer.Configuration {
             }
         }
         #endregion
+
         public Config() {
             imageBuilderExtensions = new SafeList<ImageBuilderExtension>();
-            imageEncoders = new SafeList<IImageEncoder>();
+            imageEncoders = new SafeList<IEncoder>();
 
             cachingSystems = new SafeList<ICache>();
             urlModifyingPlugins = new SafeList<IUrlPlugin>();
@@ -42,16 +43,59 @@ namespace fbs.ImageResizer.Configuration {
             imageBuilderExtensions.Changed += new SafeList<ImageBuilderExtension>.ChangedHandler(delegate(SafeList<ImageBuilderExtension> s) {
                 InvalidateImageBuilder();
             });
-            imageEncoders.Changed += new SafeList<IImageEncoder>.ChangedHandler(delegate(SafeList<IImageEncoder> s) {
+            imageEncoders.Changed += new SafeList<IEncoder>.ChangedHandler(delegate(SafeList<IEncoder> s) {
                 //InvalidateImageBuilder();
             });
+
+            pipeline = new PipelineConfig(this);
+
+            //Load default plugins
+            new DefaultEncoder().Install(this);
+            new NoCache().Install(this);
+
+            //Load plugins from web.config
+            //TODO:
+
+
         }
 
-        private IPipelineConfig pipeline = null;
+        protected IPlugin CreatePluginByName(string name) {
+            Type t = null;
+
+            string convention = "fbs.ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.');
+            string alternate = "fbs.ImageResizer.Plugins." + name.TrimStart('.');
+
+            //If there is a dot or period, try the exact name first.
+            bool looksQualified = (name.IndexOfAny(new char[] { '.', ',' }) > -1);
+            if (looksQualified)
+                t = Type.GetType(name, false, true); 
+            //Try the default convention, with the namespace and plugin class name identical
+            if (t == null)
+                t = Type.GetType(convention,false,true);
+            //Try the exact name if we didn't already try it
+            if (t == null && !looksQualified)
+                t = Type.GetType(name, false, true);
+            //Try some other stuff...
+            if (t == null)
+                t = Type.GetType(alternate, false, true);
+            
+            //Ok, time to fail.
+            if (t == null) 
+                throw new PluginLoadException("Failed to load plugin using: \"" + name + "\", \"" + convention + "\", and \"" + alternate + "\". Verify the plugin DLL is located in /bin, and that the name is spelled correctly.");
+
+            object plugin = Activator.CreateInstance(t, false);
+
+            if (!(plugin is IPlugin))
+                throw new PluginLoadException("Specified plugin doesn't implement IPlugin as required: " + t.ToString());
+
+            return plugin as IPlugin;
+        }
+
+        private PipelineConfig pipeline = null;
         /// <summary>
         /// Access and modify settings related to the HttpModule pipline. Register URL rewriting hooks, etc.
         /// </summary>
-        public IPipelineConfig Pipeline {
+        public PipelineConfig Pipeline {
             get { return pipeline; }
             set { pipeline = value; }
         }
@@ -97,11 +141,11 @@ namespace fbs.ImageResizer.Configuration {
         /// </summary>
         public SafeList<ImageBuilderExtension> ImageBuilderExtensions {get { return imageBuilderExtensions; } }
 
-        protected SafeList<IImageEncoder> imageEncoders = null;
+        protected SafeList<IEncoder> imageEncoders = null;
         /// <summary>
-        /// Currently registered IImageEncoders. 
+        /// Currently registered IEncoders. 
         /// </summary>
-        public SafeList<IImageEncoder> ImageEncoders {get { return imageEncoders; }}
+        public SafeList<IEncoder> ImageEncoders {get { return imageEncoders; }}
 
         protected SafeList<ICache> cachingSystems = null;
         /// <summary>
@@ -122,38 +166,54 @@ namespace fbs.ImageResizer.Configuration {
         public SafeList<IPlugin> AllPlugins { get { return allPlugins;}}
 
 
-        
-        //CacheSelector event
-
+        public IEncoderProvider EncoderProvider { get { return this; } }
+    
         /// <summary>
         /// Returns an instance of the first encoder that claims to be able to handle the specified settings.
-        /// The most recently registered encoder is queried first.
+        /// Returns null if no encoders are available.
         /// </summary>
         /// <param name="originalImage"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public IImageEncoder GetEncoder(System.Drawing.Image originalImage, ResizeSettings settings) {
-           return new DefaultEncoder().CreateIfSuitable(originalImage, settings);
+        public IEncoder GetEncoder(System.Drawing.Image originalImage, ResizeSettings settings) {
+            foreach (IEncoder e in this.ImageEncoders) {
+                IEncoder result = e.CreateIfSuitable(originalImage, settings);
+                if (result != null) return result;
+            }
+            return null;
         }
 
 
 
-
         /// <summary>
+        /// For use only by plugins during .Uninstall.
         /// Removes the specified plugin from AllPlugins, UrlModifyingPlugins, CachingSystems, ImageEncoders, and ImageBuiderExtensions, based
         /// on which interfaces the instance implements.
         /// Plugins may register event handlers and modify settings - thus you should use the plugin's method to uninstall them vs. using this method.
         /// </summary>
         /// <param name="plugin"></param>
-        public void RemovePlugin(IPlugin plugin) {
-            AllPlugins.Remove(plugin);
+        public void remove_plugin(object plugin) {
+            if (plugin is IPlugin) AllPlugins.Remove(plugin as IPlugin);
             if (plugin is IUrlPlugin) UrlModifyingPlugins.Remove(plugin as IUrlPlugin);
             if (plugin is ICache) CachingSystems.Remove(plugin as ICache);
-            if (plugin is IImageEncoder) ImageEncoders.Remove(plugin as IImageEncoder);
+            if (plugin is IEncoder) ImageEncoders.Remove(plugin as IEncoder);
             if (plugin is ImageBuilderExtension) ImageBuilderExtensions.Remove(plugin as ImageBuilderExtension);
         }
 
-
+        /// <summary>
+        /// For use only by plugins during .Install. Call Plugin.Install instead of this method.
+        /// Adds the specified plugin to AllPlugins, UrlModifyingPlugins, CachingSystems, ImageEncoders, and ImageBuiderExtensions, based
+        /// on which interfaces the instance implements. For ICache and IEncoder, the plugin is inserted at the beginning of CachingSystems and ImageEncoders respectively.
+        /// Plugins may register event handlers and modify settings - thus you should use the plugin's method to uninstall them vs. using this method.
+        /// </summary>
+        /// <param name="plugin"></param>
+        public void add_plugin(IPlugin plugin) {
+            AllPlugins.Add(plugin);
+            if (plugin is IUrlPlugin) UrlModifyingPlugins.Add(plugin as IUrlPlugin);
+            if (plugin is ICache) CachingSystems.AddFirst(plugin as ICache);
+            if (plugin is IEncoder) ImageEncoders.AddFirst(plugin as IEncoder);
+            if (plugin is ImageBuilderExtension) ImageBuilderExtensions.Add(plugin as ImageBuilderExtension);
+        }
 
 
 
@@ -204,8 +264,5 @@ namespace fbs.ImageResizer.Configuration {
             else throw new ConfigurationException("Error in imageresizer configuration section: Invalid boolean at " + selector + ":" + s);
         }
 
-        public ICache GetCachingSystem(System.Web.HttpContext context, IResponseArgs args) {
-            throw new NotImplementedException();
-        }
     }
 }
