@@ -16,13 +16,13 @@ namespace fbs.ImageResizer.Plugins.SizeLimiting {
         public IPlugin Install(Config c) {
             //Load SizeLimits
 
-            c.AllPlugins.Add(this);
-            c.ImageBuilderExtensions.Add(this);
+            c.Plugins.AllPlugins.Add(this);
+            c.Plugins.ImageBuilderExtensions.Add(this);
             return this;
         }
 
         public bool Uninstall(Config c) {
-            c.remove_plugin(this);
+            c.Plugins.remove_plugin(this);
             return true;
         }
 

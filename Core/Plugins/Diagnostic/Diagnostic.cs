@@ -6,7 +6,7 @@ namespace fbs.ImageResizer.Plugins.Diagnostic {
     public class Diagnostic :IPlugin{
         public IPlugin Install(Configuration.Config c) {
             c.Pipeline.PostAuthorizeRequestStart += Pipeline_PostAuthorizeRequestStart;
-            c.add_plugin(this);
+            c.Plugins.add_plugin(this);
             return this;
         }
 

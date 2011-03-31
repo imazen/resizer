@@ -6,11 +6,24 @@ namespace fbs.ImageResizer.Configuration.Issues {
     public class Issue : IIssue {
         public Issue() {
         }
-        public Issue(string source,string message, string details, int importance) {
+        public Issue(string message) {
+            summary = message;
+        }
+        public Issue(string message, string details, IssueSeverity severity) {
+            this.summary = message;
+            this.details = details;
+            this.severity = severity;
+        }
+        public Issue(string message, IssueSeverity severity) {
+            this.summary = message;
+            this.severity = severity;
+        }
+
+        public Issue(string source, string message, string details, IssueSeverity severity) {
             this.source = source;
             this.summary = message;
             this.details = details;
-            this.importance = importance;
+            this.severity = severity;
         }
 
         private string source;
@@ -20,9 +33,7 @@ namespace fbs.ImageResizer.Configuration.Issues {
             set { source = value; }
         }
 
-        public Issue(string message) {
-            summary = message;
-        }
+        
         private string summary = null;
 
         public string Summary {
@@ -35,12 +46,23 @@ namespace fbs.ImageResizer.Configuration.Issues {
             get { return details; }
             set { details = value; }
         }
-        private int importance = 0;
-        private string p;
+        private IssueSeverity severity = IssueSeverity.Warning;
 
-        public int Importance {
-            get { return importance; }
-            set { importance = value; }
+        public IssueSeverity Severity {
+            get { return severity; }
+            set { severity = value; }
+        }
+
+        public override int GetHashCode() {
+            StringBuilder sb = new StringBuilder(160);
+            if (source != null) sb.Append(source);
+            sb.Append('|');
+            if (summary != null) sb.Append(summary);
+            sb.Append('|');
+            if (details != null) sb.Append(details);
+            sb.Append('|');
+            sb.Append((int)severity);
+            return sb.ToString().GetHashCode();
         }
     }
 }

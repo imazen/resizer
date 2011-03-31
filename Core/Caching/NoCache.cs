@@ -16,7 +16,7 @@ namespace fbs.ImageResizer.Caching {
         /// <param name="c"></param>
         /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
-            c.add_plugin(this); return this;
+            c.Plugins.add_plugin(this); return this;
         }
         /// <summary>
         /// Removes the plugin. 
@@ -24,7 +24,7 @@ namespace fbs.ImageResizer.Caching {
         /// <param name="c"></param>
         /// <returns></returns>
         public bool Uninstall(Configuration.Config c) {
-            c.remove_plugin(this); return true;
+            c.Plugins.remove_plugin(this); return true;
         }
 
         /// <summary>
@@ -39,5 +39,9 @@ namespace fbs.ImageResizer.Caching {
 
 
 
+
+        public bool CanProcess(System.Web.HttpContext current, IResponseArgs e) {
+            return true;
+        }
     }
 }

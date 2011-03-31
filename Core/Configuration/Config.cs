@@ -8,9 +8,10 @@ using fbs.ImageResizer.Plugins;
 using System.Configuration;
 using fbs.ImageResizer.Configuration;
 using fbs.ImageResizer.Configuration.Xml;
+using System.Web;
 
 namespace fbs.ImageResizer.Configuration {
-    public class Config : IEncoderProvider{
+    public class Config {
 
         #region Singleton code, .Current,
         private static Config _singleton = null;
@@ -32,21 +33,14 @@ namespace fbs.ImageResizer.Configuration {
         #endregion
 
         public Config() {
-            imageBuilderExtensions = new SafeList<ImageBuilderExtension>();
-            imageEncoders = new SafeList<IEncoder>();
 
-            cachingSystems = new SafeList<ICache>();
-            urlModifyingPlugins = new SafeList<IUrlPlugin>();
-            allPlugins = new SafeList<IPlugin>();
-
+            plugins = new PluginConfig(this);
 
             //Whenever the extensions change, the image builder instance has to be replaced.
-            imageBuilderExtensions.Changed += new SafeList<ImageBuilderExtension>.ChangedHandler(delegate(SafeList<ImageBuilderExtension> s) {
+            plugins.ImageBuilderExtensions.Changed += delegate(SafeList<ImageBuilderExtension> s) {
                 InvalidateImageBuilder();
-            });
-            imageEncoders.Changed += new SafeList<IEncoder>.ChangedHandler(delegate(SafeList<IEncoder> s) {
-                //InvalidateImageBuilder();
-            });
+            };
+
 
             pipeline = new PipelineConfig(this);
 
@@ -54,42 +48,21 @@ namespace fbs.ImageResizer.Configuration {
             new DefaultEncoder().Install(this);
             new NoCache().Install(this);
 
-            //Load plugins from web.config
-            //TODO:
-
+            //Load plugins on the first request, unless they are already loaded.
+            pipeline.OnFirstRequest += delegate(IHttpModule sender, HttpContext context) {
+                Plugins.LoadPlugins();
+            };
 
         }
 
-        protected IPlugin CreatePluginByName(string name) {
-            Type t = null;
+        
 
-            string convention = "fbs.ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.');
-            string alternate = "fbs.ImageResizer.Plugins." + name.TrimStart('.');
-
-            //If there is a dot or period, try the exact name first.
-            bool looksQualified = (name.IndexOfAny(new char[] { '.', ',' }) > -1);
-            if (looksQualified)
-                t = Type.GetType(name, false, true); 
-            //Try the default convention, with the namespace and plugin class name identical
-            if (t == null)
-                t = Type.GetType(convention,false,true);
-            //Try the exact name if we didn't already try it
-            if (t == null && !looksQualified)
-                t = Type.GetType(name, false, true);
-            //Try some other stuff...
-            if (t == null)
-                t = Type.GetType(alternate, false, true);
-            
-            //Ok, time to fail.
-            if (t == null) 
-                throw new PluginLoadException("Failed to load plugin using: \"" + name + "\", \"" + convention + "\", and \"" + alternate + "\". Verify the plugin DLL is located in /bin, and that the name is spelled correctly.");
-
-            object plugin = Activator.CreateInstance(t, false);
-
-            if (!(plugin is IPlugin))
-                throw new PluginLoadException("Specified plugin doesn't implement IPlugin as required: " + t.ToString());
-
-            return plugin as IPlugin;
+        protected PluginConfig plugins = null;
+        /// <summary>
+        /// Access and modify plugins
+        /// </summary>
+        public PluginConfig Plugins {
+            get { return plugins; }
         }
 
         private PipelineConfig pipeline = null;
@@ -98,7 +71,6 @@ namespace fbs.ImageResizer.Configuration {
         /// </summary>
         public PipelineConfig Pipeline {
             get { return pipeline; }
-            set { pipeline = value; }
         }
 
         #region ImageBuilder singleton code .CurrentImageBuilder .UpgradeImageBuilder .InvalidateImageBuilder
@@ -109,7 +81,7 @@ namespace fbs.ImageResizer.Configuration {
         /// </summary>
         /// <param name="replacement"></param>
         public void UpgradeImageBuilder(ImageBuilder replacement) {
-            lock (_imageBuilderSync) _imageBuilder = replacement.Create(imageBuilderExtensions, this);
+            lock (_imageBuilderSync) _imageBuilder = replacement.Create(plugins.ImageBuilderExtensions, plugins);
         }
 
         /// <summary>
@@ -122,7 +94,7 @@ namespace fbs.ImageResizer.Configuration {
                 if (_imageBuilder == null)
                     lock (_imageBuilderSync)
                         if (_imageBuilder == null)
-                            _imageBuilder = new ImageBuilder(imageBuilderExtensions,this);
+                            _imageBuilder = new ImageBuilder(plugins.ImageBuilderExtensions,plugins);
 
                 return _imageBuilder;
             }
@@ -130,91 +102,10 @@ namespace fbs.ImageResizer.Configuration {
 
 
         protected void InvalidateImageBuilder() {
-            lock (_imageBuilderSync) _imageBuilder = _imageBuilder.Create(imageBuilderExtensions, this);
+            lock (_imageBuilderSync) _imageBuilder = _imageBuilder.Create(plugins.ImageBuilderExtensions, plugins);
         }
         #endregion
 
-
-
-        protected SafeList<ImageBuilderExtension> imageBuilderExtensions = null;
-        /// <summary>
-        /// Currently registered set of ImageBuilderExtensions. 
-        /// </summary>
-        public SafeList<ImageBuilderExtension> ImageBuilderExtensions {get { return imageBuilderExtensions; } }
-
-        protected SafeList<IEncoder> imageEncoders = null;
-        /// <summary>
-        /// Currently registered IEncoders. 
-        /// </summary>
-        public SafeList<IEncoder> ImageEncoders {get { return imageEncoders; }}
-
-        protected SafeList<ICache> cachingSystems = null;
-        /// <summary>
-        /// Currently registered ICache instances
-        /// </summary>
-        public SafeList<ICache> CachingSystems { get { return cachingSystems; }}
-
-        protected SafeList<IUrlPlugin> urlModifyingPlugins = null;
-        /// <summary>
-        /// Plugins which accept new querystring arguments or new file extensions are registered here.
-        /// </summary>
-        public SafeList<IUrlPlugin> UrlModifyingPlugins { get { return urlModifyingPlugins; } }
-
-        protected SafeList<IPlugin> allPlugins = null;
-        /// <summary>
-        /// All plugins should be registered here. Used for diagnostic purposes.
-        /// </summary>
-        public SafeList<IPlugin> AllPlugins { get { return allPlugins;}}
-
-
-        public IEncoderProvider EncoderProvider { get { return this; } }
-    
-        /// <summary>
-        /// Returns an instance of the first encoder that claims to be able to handle the specified settings.
-        /// Returns null if no encoders are available.
-        /// </summary>
-        /// <param name="originalImage"></param>
-        /// <param name="settings"></param>
-        /// <returns></returns>
-        public IEncoder GetEncoder(System.Drawing.Image originalImage, ResizeSettings settings) {
-            foreach (IEncoder e in this.ImageEncoders) {
-                IEncoder result = e.CreateIfSuitable(originalImage, settings);
-                if (result != null) return result;
-            }
-            return null;
-        }
-
-
-
-        /// <summary>
-        /// For use only by plugins during .Uninstall.
-        /// Removes the specified plugin from AllPlugins, UrlModifyingPlugins, CachingSystems, ImageEncoders, and ImageBuiderExtensions, based
-        /// on which interfaces the instance implements.
-        /// Plugins may register event handlers and modify settings - thus you should use the plugin's method to uninstall them vs. using this method.
-        /// </summary>
-        /// <param name="plugin"></param>
-        public void remove_plugin(object plugin) {
-            if (plugin is IPlugin) AllPlugins.Remove(plugin as IPlugin);
-            if (plugin is IUrlPlugin) UrlModifyingPlugins.Remove(plugin as IUrlPlugin);
-            if (plugin is ICache) CachingSystems.Remove(plugin as ICache);
-            if (plugin is IEncoder) ImageEncoders.Remove(plugin as IEncoder);
-            if (plugin is ImageBuilderExtension) ImageBuilderExtensions.Remove(plugin as ImageBuilderExtension);
-        }
-
-        /// <summary>
-        /// For use only by plugins during .Install. Call Plugin.Install instead of this method.
-        /// Adds the specified plugin to AllPlugins, UrlModifyingPlugins, CachingSystems, ImageEncoders, and ImageBuiderExtensions, based
-        /// on which interfaces the instance implements. For ICache and IEncoder, the plugin is inserted at the beginning of CachingSystems and ImageEncoders respectively.
-        /// Plugins may register event handlers and modify settings - thus you should use the plugin's method to uninstall them vs. using this method.
-        /// </summary>
-        /// <param name="plugin"></param>
-        public void add_plugin(IPlugin plugin) {
-            AllPlugins.Add(plugin);
-            if (plugin is IUrlPlugin) UrlModifyingPlugins.Add(plugin as IUrlPlugin);
-            if (plugin is ICache) CachingSystems.AddFirst(plugin as ICache);
-            if (plugin is IEncoder) ImageEncoders.AddFirst(plugin as IEncoder);
-            if (plugin is ImageBuilderExtension) ImageBuilderExtensions.Add(plugin as ImageBuilderExtension);
-        }
 
 
 
@@ -230,7 +121,7 @@ namespace fbs.ImageResizer.Configuration {
                 if (configuration == null) {
                     lock (configurationLock) {
                         if (configuration == null) {
-                            ResizerConfigurationSection tmpConf = (ResizerConfigurationSection)System.Configuration.ConfigurationManager.GetSection("imageresizer");
+                            ResizerConfigurationSection tmpConf = (ResizerConfigurationSection)System.Configuration.ConfigurationManager.GetSection("resizing");
                             configuration = tmpConf;
                         }
                     }
@@ -239,7 +130,14 @@ namespace fbs.ImageResizer.Configuration {
             }
         }
 
+        private void SaveConfiguration() {
+            //System.Configuration.Configuration webConfig =
+            //     System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("/Temp");
+            //TODO: check IsLocked
+            //((ResizerConfigurationSection)webConfig.GetSection("resizing")).replaceRootNode(cs.getCopyOfRootNode());
 
+            //webConfig.SaveAs("c:\\webConfig.xml", ConfigurationSaveMode.Modified);
+        }
 
         public string get(string selector, string defaultValue) {
             return cs.getAttr(selector, defaultValue);

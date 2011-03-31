@@ -14,7 +14,7 @@ namespace fbs.ImageResizer.Configuration.Xml {
     /// <summary>
     /// Handles reading the &lt;resizer&gt; section from Web.Config
     /// </summary>
-    public class ResizerConfigurationSection : ConfigurationSection, IIssueProvider, IIssueReceiver {
+    public class ResizerConfigurationSection : ConfigurationSection {
         protected object nSync = new object();
         protected volatile Node n = new Node("resizer");
         protected volatile XmlDocument xmlDoc = new XmlDocument();
@@ -56,28 +56,28 @@ namespace fbs.ImageResizer.Configuration.Xml {
 
 
         /// <summary>
-        /// Called for each child element not specified declaratibely
+        /// Called for each child element not specified declaratively
         /// </summary>
         /// <param name="elementName"></param>
         /// <param name="reader"></param>
         /// <returns></returns>
         protected override bool OnDeserializeUnrecognizedElement(string elementName, System.Xml.XmlReader reader) {
             lock(nSync){
-                n.Children.Add(new Node(xmlDoc.ReadNode(reader) as XmlElement, this));
+                n.Children.Add(new Node(xmlDoc.ReadNode(reader) as XmlElement, sink));
             }
             return true;
         }
 
-
-
-        protected volatile List<IIssue> issues = new List<IIssue>();
-        protected object issuesSync = new object();
-        public IEnumerable<IIssue> GetIssues() {
-            lock (issuesSync) return new List<IIssue>(issues);
+        protected override bool SerializeToXmlElement(XmlWriter writer, string elementName) {
+            if (n.IsEmpty) return false;
+            XmlElement e = null;
+            lock (nSync) e = n.ToXmlElement();
+            writer.WriteRaw(e.OuterXml);
+            return true;
         }
 
-        public void AcceptIssue(IIssue i) {
-            lock(issuesSync) issues.Add(i);
-        }
+        protected IssueSink sink = new IssueSink("ResizerConfigurationSection");
+        public IssueSink IssueSink { get { return sink; } }
+
     }
 }

@@ -7,6 +7,6 @@ namespace fbs.ImageResizer.Configuration.Issues {
         string Source { get; }
         string Summary { get; }
         string Details { get; }
-        int Importance { get; }
+        IssueSeverity Severity { get; }
     }
 }

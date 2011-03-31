@@ -13,13 +13,13 @@ namespace fbs.ImageResizer.Plugins.AnimatedGifs
     public class AnimatedImageManager : ImageBuilder, IPlugin
     {
         public IPlugin Install(Configuration.Config c) {
-            c.add_plugin(this);
+            c.Plugins.add_plugin(this);
             c.UpgradeImageBuilder(this);
             return this;
         }
 
         public bool Uninstall(Configuration.Config c) {
-            c.remove_plugin(this);
+            c.Plugins.remove_plugin(this);
             c.UpgradeImageBuilder(base.Create(exts, writer));
             return true;
         }
@@ -45,7 +45,7 @@ namespace fbs.ImageResizer.Plugins.AnimatedGifs
         /// <param name="dest"></param>
         /// <param name="settings"></param>
         protected override void buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
-            IEncoder ios = Configuration.Config.Current.EncoderProvider.GetEncoder(source, settings);
+            IEncoder ios = Configuration.Config.Current.Plugins.EncoderProvider.GetEncoder(source, settings);
             //Determines output format, includes code for saving in a variety of formats.
             if (ios.MimeType.Equals("image/gif", StringComparison.OrdinalIgnoreCase) && //If it's a GIF
                 settings["frame"] == null &&    //With no frame specifier

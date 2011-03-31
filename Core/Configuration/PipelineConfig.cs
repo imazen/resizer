@@ -13,7 +13,7 @@ namespace fbs.ImageResizer.Configuration {
         public PipelineConfig(Config c) {
             this.c = c;
 
-            c.UrlModifyingPlugins.Changed += new SafeList<IUrlPlugin>.ChangedHandler(urlModifyingPlugins_Changed);
+            c.Plugins.UrlModifyingPlugins.Changed += new SafeList<IUrlPlugin>.ChangedHandler(urlModifyingPlugins_Changed);
             
         }
 
@@ -39,7 +39,7 @@ namespace fbs.ImageResizer.Configuration {
             Dictionary<string, bool> exts = new Dictionary<string, bool>(24,StringComparer.OrdinalIgnoreCase);
             IEnumerable<string> vals = null;
             //Check the plugins
-            foreach (IUrlPlugin p in c.UrlModifyingPlugins) {
+            foreach (IUrlPlugin p in c.Plugins.UrlModifyingPlugins) {
 
                 vals = p.GetSupportedFileExtensions();
                 if (vals != null) 
@@ -156,6 +156,10 @@ namespace fbs.ImageResizer.Configuration {
         }
 
         /// <summary>
+        /// Fired once, on the first PostAuthorizeRequest event.
+        /// </summary>
+        public event RequestHook OnFirstRequest;
+        /// <summary>
         /// Fires during the PostAuthorizeRequest phase, prior to any module-specific logic.
         /// Executes for every request to the website. Use only as a last resort. Other events occur only for image requests, and thus have lower overhead.
         /// </summary>
@@ -194,8 +198,22 @@ namespace fbs.ImageResizer.Configuration {
 
         public event CacheSelectionDelegate SelectCachingSystem;
 
+        protected volatile bool firedFirstRequest = false;
+        protected object firedFirstRequestSync = new object();
+
         public void FirePostAuthorizeRequest(System.Web.IHttpModule sender, System.Web.HttpContext httpContext) {
+            //The one-time event
+            if (!firedFirstRequest) {
+                lock (firedFirstRequestSync) {
+                    if (!firedFirstRequest) {
+                        firedFirstRequest = true;
+                        if (OnFirstRequest != null) OnFirstRequest(sender, httpContext);
+                    }
+                }
+            }
+            //And the main event
             if (PostAuthorizeRequestStart != null) PostAuthorizeRequestStart(sender, httpContext);
+                   
         }
 
         public void FireRewritingEvents(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
@@ -226,7 +244,7 @@ namespace fbs.ImageResizer.Configuration {
 
 
         public ICache GetCachingSystem(System.Web.HttpContext context, IResponseArgs args) {
-            ICache defaultCache = c.CachingSystems.First;
+            ICache defaultCache = c.Plugins.CachingSystems.First;
 
             CacheSelectionEventArgs e = new CacheSelectionEventArgs(context, args, defaultCache);
             if (SelectCachingSystem != null) SelectCachingSystem(this, e);
