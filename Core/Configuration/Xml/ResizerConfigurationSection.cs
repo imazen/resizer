@@ -6,63 +6,55 @@ using System.Collections.Specialized;
 using System.Xml;
 using fbs.ImageResizer.Configuration;
 using System.Xml.XPath;
+using fbs.ImageResizer.Configuration.Xml;
+using fbs.ImageResizer.Configuration.Issues;
 
-namespace fbs.ImageResizer.Configuration {
+namespace fbs.ImageResizer.Configuration.Xml {
 
     /// <summary>
-    /// Handles reading the imageresizer section from Web.Config
+    /// Handles reading the &lt;resizer&gt; section from Web.Config
     /// </summary>
-    public class ResizerConfigurationSection : ConfigurationSection {
-
-        public string getAttr(string selector, string defaultValue) {
-
-            //Convert to XPath
-            // pipeline.fakeExtension becomes
-            // /resizer/pipeline/@fakeExtension
-               
-            string s = selector;
-            int lastDot = s.LastIndexOf('.');
-            if (lastDot < 0) throw new ArgumentException("Selector must specify the attribute name, in the form element.child.attribute");
-
-            //Fix the attribute selector
-            s = s.Substring(0, lastDot) + "/@" + s.Substring(lastDot + 1);
-            //Trim leading dots
-            s = s.TrimStart('.');
-            //Convert dots
-            s = s.Replace('.', '/');
-            //Prepend document selector
-            s = "/resizer/" + s;
-
-            lock (docSync) {
-                initDoc();
-                XmlNode n = doc.SelectSingleNode(s);
-                return n.Value;
-            }
-
-        }
+    public class ResizerConfigurationSection : ConfigurationSection, IIssueProvider, IIssueReceiver {
+        protected object nSync = new object();
+        protected volatile Node n = new Node("resizer");
+        protected volatile XmlDocument xmlDoc = new XmlDocument();
 
 
         /// <summary>
-        /// Get/set configuration values in the form element.attribute, as direct children of the imageresizer configuration section.
+        /// Returns the specified subtree, deep copied so it can be used without locking.
         /// </summary>
         /// <param name="selector"></param>
         /// <returns></returns>
-
-
-        protected object docSync = new object();
-        protected volatile XmlDocument doc = null;
-        /// <summary>
-        /// Initializes the 'doc' XmlDocument with a root node named 'resizer'
-        /// </summary>
-        protected void initDoc() {
-            if (doc != null) return;
-            doc = new XmlDocument();
-            //Create xml declaration
-            doc.InsertBefore(doc.CreateXmlDeclaration("1.0", "utf-8", null), doc.DocumentElement);
-            //Root node.
-            doc.AppendChild(doc.CreateElement("resizer"));
-            
+        public Node getCopyOfNode(string selector) {
+            lock(nSync){
+                Node r = n.queryFirst(selector);
+                return (r != null) ? r.deepCopy() : null;
+            }
         }
+
+        public Node getCopyOfRootNode() {
+            lock (nSync) {
+                return n.deepCopy();
+            }
+        }
+        public void replaceRootNode(Node n) {
+            lock (nSync) {
+                this.n = n;
+            }
+        }
+        public string getAttr(string selector, string defaultValue) {
+            lock (nSync) {
+                string v = n.queryAttr(selector);
+                return v != null ? v : defaultValue;
+            }
+        }
+        public void setAttr(string selector, string value) {
+            lock (nSync) {
+                n.setAttr(selector, value);
+            }
+        }
+
+
         /// <summary>
         /// Called for each child element not specified declaratibely
         /// </summary>
@@ -70,17 +62,22 @@ namespace fbs.ImageResizer.Configuration {
         /// <param name="reader"></param>
         /// <returns></returns>
         protected override bool OnDeserializeUnrecognizedElement(string elementName, System.Xml.XmlReader reader) {
-            lock(docSync){
-                initDoc(); //Verify the doc is initialized
-                //Add it under the root <resizer> node.
-                XmlNode n = doc.ReadNode(reader);
-                doc.DocumentElement.AppendChild(n);
+            lock(nSync){
+                n.Children.Add(new Node(xmlDoc.ReadNode(reader) as XmlElement, this));
             }
-             return true;
+            return true;
         }
 
 
 
+        protected volatile List<IIssue> issues = new List<IIssue>();
+        protected object issuesSync = new object();
+        public IEnumerable<IIssue> GetIssues() {
+            lock (issuesSync) return new List<IIssue>(issues);
+        }
 
+        public void AcceptIssue(IIssue i) {
+            lock(issuesSync) issues.Add(i);
+        }
     }
 }

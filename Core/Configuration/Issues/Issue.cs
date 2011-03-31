@@ -6,10 +6,18 @@ namespace fbs.ImageResizer.Configuration.Issues {
     public class Issue : IIssue {
         public Issue() {
         }
-        public Issue(string message, string details, int importance) {
+        public Issue(string source,string message, string details, int importance) {
+            this.source = source;
             this.summary = message;
             this.details = details;
             this.importance = importance;
+        }
+
+        private string source;
+
+        public string Source {
+            get { return source; }
+            set { source = value; }
         }
 
         public Issue(string message) {
