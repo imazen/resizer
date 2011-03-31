@@ -128,7 +128,7 @@ namespace fbs.ImageResizer.Configuration {
 
 
         public string FakeExtension {
-            get { return c.get("rewriting.fakeExtension",".ashx"); }
+            get { return c.get("resizer.pipeline.fakeExtension",".ashx"); }
         }
 
         public string ModifiedQueryStringKey {
@@ -140,8 +140,12 @@ namespace fbs.ImageResizer.Configuration {
         }
 
         public VppUsageOption VppUsage {
-            get { throw new NotImplementedException(); }
+            get { throw new NotImplementedException();
+
+                //should default to VppUsageOption.Fallback
+            }
         }
+
 
         public ImageBuilder GetImageBuilder() {
             return c.CurrentImageBuilder;
