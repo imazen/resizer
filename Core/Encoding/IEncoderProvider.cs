@@ -4,6 +4,6 @@ using System.Text;
 
 namespace fbs.ImageResizer.Encoding {
     public interface IEncoderProvider {
-        IImageEncoder GetEncoder(System.Drawing.Image originalImage, ResizeSettings settings);
+        IEncoder GetEncoder(System.Drawing.Image originalImage, ResizeSettings settings);
     }
 }

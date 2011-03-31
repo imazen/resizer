@@ -277,7 +277,7 @@ namespace fbs.ImageResizer
         /// <param name="dest"></param>
         /// <param name="settings"></param>
         protected virtual void buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
-            IImageEncoder e = Config.Current.GetEncoder(source, settings);
+            IEncoder e = Config.Current.GetEncoder(source, settings);
             using (Bitmap b = buildToBitmap(source, settings,e.SupportsTransparency)) {//Determines output format, includes code for saving in a variety of formats.
                 //Save to stream
                 e.Write(b, dest);
@@ -289,7 +289,7 @@ namespace fbs.ImageResizer
         /// <param name="source"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public virtual IImageEncoder GetEncoder(Bitmap source, ResizeSettings settings) {
+        public virtual IEncoder GetEncoder(Bitmap source, ResizeSettings settings) {
             return Config.Current.GetEncoder(source, settings); 
         }
 

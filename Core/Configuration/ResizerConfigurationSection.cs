@@ -95,6 +95,10 @@ namespace fbs.ImageResizer.Configuration {
         protected override bool OnDeserializeUnrecognizedElement(string elementName, System.Xml.XmlReader reader) {
             NameValueCollection attrs = new NameValueCollection();
 
+            XmlDocument d = new XmlDocument();
+            d.ReadNode(reader);
+
+
             // check to see if the current node has attributes
              if (reader.HasAttributes)
              {

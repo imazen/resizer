@@ -11,32 +11,12 @@ namespace fbs.ImageResizer.Configuration {
         Fallback, Never, Always
     }
 
-    public class UrlEventArgs : EventArgs, IUrlEventArgs {
-        protected string _virtualPath;
-        protected NameValueCollection _queryString;
-
-        public UrlEventArgs(string virtualPath, NameValueCollection queryString) {
-            this._virtualPath = virtualPath;
-            this._queryString = queryString;
-        }
-
-        public NameValueCollection QueryString {
-            get { return _queryString; }
-            set { _queryString = value; }
-        }
-        public string VirtualPath {
-            get { return _virtualPath; }
-            set { _virtualPath = value; }
-        }
-    }
-    public interface IUrlEventArgs {
-        NameValueCollection QueryString { get; set; }
-        string VirtualPath { get; set; }
-    }
 
     public delegate void RequestHook(IHttpModule sender, HttpContext context);
     public delegate void UrlRewritingHook(IHttpModule sender, HttpContext context, IUrlEventArgs e);
     public delegate void PreHandleImageHook(IHttpModule sender, HttpContext context, IResponseArgs e);
+    public delegate void CacheSelectionDelegate(object sender, ICacheSelectionEventArgs e);
+
 
     public interface IPipelineConfig {
         /// <summary>

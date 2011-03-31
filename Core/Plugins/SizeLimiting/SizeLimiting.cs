@@ -6,11 +6,26 @@ using System.Drawing;
 using fbs.ImageResizer.Configuration;
 
 namespace fbs.ImageResizer.Plugins.SizeLimiting {
-    public class SizeLimitingModule:ImageBuilderExtension, IPlugin {
-        public SizeLimitingModule(SizeLimits l) {
-            this.l = l;
+    /// <summary>
+    /// Implements app-wide size limits on image size
+    /// </summary>
+    public class SizeLimiting : ImageBuilderExtension, IPlugin {
+        public SizeLimiting() {
         }
-        protected SizeLimits l;
+        protected SizeLimits l = null;
+        public IPlugin Install(Config c) {
+            //Load SizeLimits
+
+            c.AllPlugins.Add(this);
+            c.ImageBuilderExtensions.Add(this);
+            return this;
+        }
+
+        public bool Uninstall(Config c) {
+            c.remove_plugin(this);
+            return true;
+        }
+
 
         protected override void PostLayoutImage(ImageState s) {
             base.PostLayoutImage(s);
@@ -22,25 +37,12 @@ namespace fbs.ImageResizer.Plugins.SizeLimiting {
 
             double scaleFactor = wFactor > hFactor ? wFactor : hFactor;
             if (scaleFactor > 1) {
-                //The bounding box exceeds the ImageSize. 
+                //The bounding box exceeds the ImageSize. Scale down until it fits.
                 s.layout.Scale(1 / scaleFactor, new PointF(0, 0));
             }
         }
 
-        public IPlugin Install(Config c) {
-            c.AllPlugins.Add(this);
-            c.ImageBuilderExtensions.Add(this);
-            return this;
-        }
 
-        public bool Uninstall(Config c) {
-            c.RemovePlugin(this);
-            return true;
-        }
-
-        public string ShortName {
-            get { return this.GetType().Name; }
-        }
 
     }
 }

@@ -8,7 +8,7 @@ using System.Collections.Specialized;
 using fbs.ImageResizer.Caching;
 
 namespace fbs.ImageResizer.Configuration {
-    public class PipelineConfig : IPipelineConfig{
+    public class PipelineConfig : IPipelineConfig, ICacheProvider{
         protected Config c;
         public PipelineConfig(Config c) {
             this.c = c;
@@ -147,8 +147,8 @@ namespace fbs.ImageResizer.Configuration {
             return c.CurrentImageBuilder;
         }
 
-        public Caching.ICacheProvider GetCacheProvider() {
-            return c;
+        public ICacheProvider GetCacheProvider() {
+            return this;
         }
 
         /// <summary>
@@ -188,6 +188,8 @@ namespace fbs.ImageResizer.Configuration {
         /// </summary>
         public event PreHandleImageHook PreHandleImage;
 
+        public event CacheSelectionDelegate SelectCachingSystem;
+
         public void FirePostAuthorizeRequest(System.Web.IHttpModule sender, System.Web.HttpContext httpContext) {
             if (PostAuthorizeRequestStart != null) PostAuthorizeRequestStart(sender, httpContext);
         }
@@ -216,6 +218,15 @@ namespace fbs.ImageResizer.Configuration {
 
         public void FirePreHandleImage(System.Web.IHttpModule sender, System.Web.HttpContext context, IResponseArgs e) {
             if (PreHandleImage != null) PreHandleImage(sender, context, e);
+        }
+
+
+        public ICache GetCachingSystem(System.Web.HttpContext context, IResponseArgs args) {
+            ICache defaultCache = c.CachingSystems.First;
+
+            CacheSelectionEventArgs e = new CacheSelectionEventArgs(context, args, defaultCache);
+            if (SelectCachingSystem != null) SelectCachingSystem(this, e);
+            return e.SelectedCache;
         }
     }
 }

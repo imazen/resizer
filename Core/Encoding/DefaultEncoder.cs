@@ -8,7 +8,7 @@ using System.Collections.Specialized;
 using fbs.ImageResizer.Plugins;
 
 namespace fbs.ImageResizer.Encoding {
-    public class DefaultEncoder :IImageEncoder, IUrlPlugin {
+    public class DefaultEncoder :IEncoder, IUrlPlugin, IPlugin {
         /// <summary>
         /// Tries to parse an ImageFormat from the settings.Format value.
         /// If an unrecogized format is specified, returns null.
@@ -84,7 +84,7 @@ namespace fbs.ImageResizer.Encoding {
 
         }
         
-        public virtual IImageEncoder CreateIfSuitable(Image original, ResizeSettings settings) {
+        public virtual IEncoder CreateIfSuitable(Image original, ResizeSettings settings) {
             ImageFormat requestedFormat = GetRequestedFormat(settings.Format, ImageFormat.Jpeg);
             if (requestedFormat == null || !IsValidOutputFormat(requestedFormat)) return null; //An unsupported format was explicitly specified.
             return new DefaultEncoder(original, settings);
@@ -381,6 +381,16 @@ namespace fbs.ImageResizer.Encoding {
 
         public virtual IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "quality", "format", "thumbnail" };
+        }
+
+        public IPlugin Install(Configuration.Config c) {
+            c.add_plugin(this);
+            return this;
+        }
+
+        public bool Uninstall(Configuration.Config c) {
+            c.remove_plugin(this);
+            return true;
         }
     }
 }

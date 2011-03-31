@@ -6,15 +6,16 @@ using fbs.ImageResizer.Configuration;
 namespace fbs.ImageResizer.Plugins {
     public interface IPlugin {
         /// <summary>
-        /// The plugin should save a reference to the Config instance 
+        /// Installs the plugin in the specified Config instance. The plugin must handle all the work of loading settings, registering the plugin etc.
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
         IPlugin Install(Config c);
-        bool Uninstall(Config c);
         /// <summary>
-        /// The short name of the plugin. Should match the plugin namespace and default class.
+        /// Uninstalls the plugin. Should reverse all changes made during Install
         /// </summary>
-        string ShortName { get; }
+        /// <param name="c"></param>
+        /// <returns></returns>
+        bool Uninstall(Config c);
     }
 }
