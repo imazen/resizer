@@ -384,12 +384,12 @@ namespace fbs.ImageResizer.Encoding {
         }
 
         public IPlugin Install(Configuration.Config c) {
-            c.add_plugin(this);
+            c.Plugins.add_plugin(this);
             return this;
         }
 
         public bool Uninstall(Configuration.Config c) {
-            c.remove_plugin(this);
+            c.Plugins.remove_plugin(this);
             return true;
         }
     }

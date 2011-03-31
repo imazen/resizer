@@ -9,7 +9,7 @@ using System.Collections.ObjectModel;
 namespace fbs.ImageResizer.Configuration.Xml {
     /// <summary>
     /// No support for namespaces, no intention of eventual serialization.
-    /// Everything is case-insensitive, but preserves case
+    /// Everything is case-insensitive, but preserves case. Not thread safe.
     /// </summary>
     public class Node {
         public Node(string localName) {
@@ -237,5 +237,32 @@ namespace fbs.ImageResizer.Configuration.Xml {
             return n;
         }
 
+        /// <summary>
+        /// Returns true if the element has neither attributes nor children.
+        /// </summary>
+        public bool IsEmpty {
+            get {
+                return (attrs == null || attrs.Count == 0) && (children == null || children.Count == 0);
+            }
+        }
+        public XmlElement ToXmlElement() {
+            return ToXmlElement(new XmlDocument());
+        }
+        public XmlElement ToXmlElement(XmlDocument doc) {
+            XmlElement e = doc.CreateElement(this.Name);
+            //Copy attrs
+            if (attrs != null)
+                foreach(string key in attrs){
+                    XmlAttribute a = doc.CreateAttribute(key);
+                    a.Value = this[key];
+                    e.Attributes.Append(a);
+                }
+            //Copy childen.
+            if (children != null)
+                foreach (Node c in children) 
+                    e.AppendChild(c.ToXmlElement(doc));
+
+            return e;
+        }
     }
 }
