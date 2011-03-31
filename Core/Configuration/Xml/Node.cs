@@ -97,20 +97,24 @@ namespace fbs.ImageResizer.Configuration.Xml {
         /// <summary>
         /// Queryies the subtree for the specified attribute on the specified element. Example selector: element.element.attrname
         /// Assumes that the last segment of the selector is an attribute name. 
-        /// Throws an ArgumentException if there is only one segment ( element )
+        /// Throws an ArgumentException if there is only one segment ( element ).
+        /// Uses the cache.
         /// </summary>
         /// <param name="selector"></param>
         /// <returns></returns>
         public string queryAttr(string selector) {
+            KeyValuePair<string, string> parsed = parseAttributeName(selector);
+            return queryAttr(parsed.Key, parsed.Value);
+        }
+
+        protected KeyValuePair<string, string> parseAttributeName(string selector) {
             selector = selector.Trim('.');
             int lastDot = selector.LastIndexOf('.');
             if (lastDot < 0) throw new ArgumentException("Selector must include an attribute name, like element.attrname. Was given '" + selector + "'");
             string nodeSelector = selector.Substring(0, lastDot);
             string attrName = selector.Substring(lastDot + 1);
-
-            return queryAttr(nodeSelector, attrName);
+            return new KeyValuePair<string, string>(nodeSelector, attrName);
         }
-
 
         public string queryAttr(string nodeSelector, string attrName) {
             Node n = queryFirst(nodeSelector);
@@ -120,14 +124,30 @@ namespace fbs.ImageResizer.Configuration.Xml {
 
         public Node queryFirst(string selector) {
             ICollection<Node> results = query(selector);
-            if (results != null && results.Count > 0) return results[0];
+            if (results != null && results.Count > 0) foreach(Node n in results) return n; //Return the first node.
             return null;
         }
+        /// <summary>
+        /// Sets the specified attribute value, creating parent elements if needed. Clears the query cache.
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <param name="attrValue"></param>
+        public void setAttr(string selector, string attrValue) {
 
+            KeyValuePair<string, string> parsed = parseAttributeName(selector);
+            setAttr(parsed.Key, parsed.Value, attrValue);
+        }
+        /// <summary>
+        /// Sets the specified attribute value, creating parent elements if needed. Clears the query cache.
+        /// </summary>
+        /// <param name="nodeSelector"></param>
+        /// <param name="attrName"></param>
+        /// <param name="attrValue"></param>
         public void setAttr(string nodeSelector, string attrName, string attrValue) {
             Node n = queryFirst(nodeSelector);
             if (n == null) n = makeNodeTree(nodeSelector);
             n.Attrs[attrName] = attrValue;
+            this.clearQueryCache();
         }
         /// <summary>
         /// Traverses the specified path, creating any missing elements along the way. Uses existing nodes if found.
@@ -158,18 +178,18 @@ namespace fbs.ImageResizer.Configuration.Xml {
         /// </summary>
         /// <param name="selector"></param>
         /// <returns></returns>
-        public ICollection<Node> cachedQuery(string selector) {
+        public ICollection<Node> query(string selector) {
             
             if (_cachedResults.ContainsKey(selector)) return _cachedResults[selector];
             //cache miss
-            ICollection<Node> results = _cachedResults[selector] = new ReadOnlyCollection<Node>(query(selector) as IList<Node>);
+            ICollection<Node> results = _cachedResults[selector] = new ReadOnlyCollection<Node>(queryUncached(selector) as IList<Node>);
             return results;
         }
         public void clearQueryCache() {
             _cachedResults = new Dictionary<string, ICollection<Node>>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public ICollection<Node> query(string selector) {
+        public ICollection<Node> queryUncached(string selector) {
             if (children == null || children.Count == 0) return null;
 
             selector = selector.Trim('.'); //Trim leading and trailing dots
@@ -199,6 +219,22 @@ namespace fbs.ImageResizer.Configuration.Xml {
                 }
             }
             return results; 
+        }
+        /// <summary>
+        /// Makes a recusive copy of the subtree, keeping no duplicate references to mutable types.
+        /// </summary>
+        /// <returns></returns>
+        public Node deepCopy() {
+            Node n = new Node(this.name);
+            //copy attrs
+            foreach (string key in this.Attrs.AllKeys) {
+                n[key] = this[key];
+            }
+            //copy children recursive
+            foreach (Node c in this.Children) {
+                n.Children.Add(c.deepCopy());
+            }
+            return n;
         }
 
     }

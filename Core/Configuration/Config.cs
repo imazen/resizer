@@ -7,6 +7,7 @@ using fbs.ImageResizer.Caching;
 using fbs.ImageResizer.Plugins;
 using System.Configuration;
 using fbs.ImageResizer.Configuration;
+using fbs.ImageResizer.Configuration.Xml;
 
 namespace fbs.ImageResizer.Configuration {
     public class Config : IEncoderProvider{
@@ -241,17 +242,17 @@ namespace fbs.ImageResizer.Configuration {
 
 
         public string get(string selector, string defaultValue) {
-            return cs.get(selector, defaultValue);
+            return cs.getAttr(selector, defaultValue);
         }
         public int get(string selector, int defaultValue) {
             int i;
-            string s = cs.get(selector, defaultValue.ToString());
+            string s = cs.getAttr(selector, defaultValue.ToString());
             if (int.TryParse(s, out i)) return i;
             else throw new ConfigurationException("Error in imageresizer configuration section: Invalid integer at " + selector + ":" + s);
         }
 
         public bool get(string selector, bool defaultValue) {
-            string s = cs.get(selector, defaultValue.ToString());
+            string s = cs.getAttr(selector, defaultValue.ToString());
 
             if ("true".Equals(s, StringComparison.OrdinalIgnoreCase) ||
                 "1".Equals(s, StringComparison.OrdinalIgnoreCase) ||
@@ -262,6 +263,28 @@ namespace fbs.ImageResizer.Configuration {
                 "no".Equals(s, StringComparison.OrdinalIgnoreCase) ||
                 "off".Equals(s, StringComparison.OrdinalIgnoreCase)) return false;
             else throw new ConfigurationException("Error in imageresizer configuration section: Invalid boolean at " + selector + ":" + s);
+        }
+        /// <summary>
+        /// Returns a deep copy of the specified node
+        /// </summary>
+        /// <param name="n"></param>
+        public Node getNode(string selector) {
+            return cs.getCopyOfNode(selector);
+        }
+
+        /// <summary>
+        /// Returns a deep copy if the current state of the configuration tree (starting with the 'resizer' element as the root)
+        /// </summary>
+        /// <param name="n"></param>
+        public Node getConfigXml(Node n) {
+            return cs.getCopyOfRootNode();
+        }
+        /// <summary>
+        /// Replaces the configuration tree with the specified alternative
+        /// </summary>
+        /// <param name="n"></param>
+        public void setConfigXml(Node n) {
+            cs.replaceRootNode(n);
         }
 
     }
