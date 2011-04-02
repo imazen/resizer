@@ -101,6 +101,8 @@
     <Compile Include="Configuration\UrlEventArgs.cs" />
     <Compile Include="Configuration\Xml\Node.cs" />
     <Compile Include="Configuration\Xml\Selector.cs" />
+    <Compile Include="Plugins\IFileExtensionPlugin.cs" />
+    <Compile Include="Plugins\Trial\Trial.cs" />
     <Compile Include="Plugins\Diagnostic\Diagnostic.cs" />
     <Compile Include="Plugins\Diagnostic\DiagnosticPage.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
@@ -110,13 +112,12 @@
     <Compile Include="Encoding\DefaultEncoder.cs" />
     <Compile Include="Encoding\IEncoderProvider.cs" />
     <Compile Include="Encoding\IEncoder.cs" />
-    <Compile Include="Plugins\IUrlPlugin.cs" />
+    <Compile Include="Plugins\IQuerystringPlugin.cs" />
     <Compile Include="Plugins\SizeLimiting\SizeLimiting.cs" />
     <Compile Include="Resizing\AbstractImageProcessor.cs" />
     <Compile Include="Resizing\BoxPadding.cs" />
     <Compile Include="Resizing\Enumerations.cs" />
     <Compile Include="Resizing\ImageBuilder.cs" />
-    <Compile Include="Misc\ImageFilter.cs" />
     <Compile Include="InterceptModule.cs" />
     <Compile Include="Caching\IResponseArgs.cs" />
     <Compile Include="Resizing\ImageState.cs" />
@@ -169,7 +170,9 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Misc\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

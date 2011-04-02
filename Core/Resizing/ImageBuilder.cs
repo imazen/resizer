@@ -61,7 +61,7 @@ namespace fbs.ImageResizer
     /// Provides methods for generating resizied images, and for reading and writing them to disk.
     /// Use ImageManager.Instance to get the default instance, or use ImageManager.Instance.Create() to control which extensions are used.
     /// </summary>
-    public class ImageBuilder : AbstractImageProcessor, IUrlPlugin
+    public class ImageBuilder : AbstractImageProcessor, IQuerystringPlugin
     {
         /// <summary>
         /// Handles the encoder selection and provision proccess.

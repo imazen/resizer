@@ -20,7 +20,8 @@ namespace fbs.ImageResizer.Configuration {
             imageBuilderExtensions = new SafeList<ImageBuilderExtension>();
             imageEncoders = new SafeList<IEncoder>();
             cachingSystems = new SafeList<ICache>();
-            urlModifyingPlugins = new SafeList<IUrlPlugin>();
+            querystringPlugins = new SafeList<IQuerystringPlugin>();
+            fileExtensionPlugins = new SafeList<IFileExtensionPlugin>();
             allPlugins = new SafeList<IPlugin>();
         }
 
@@ -156,11 +157,19 @@ namespace fbs.ImageResizer.Configuration {
         /// </summary>
         public SafeList<ICache> CachingSystems { get { return cachingSystems; } }
 
-        protected SafeList<IUrlPlugin> urlModifyingPlugins = null;
+        protected SafeList<IQuerystringPlugin> querystringPlugins = null;
         /// <summary>
-        /// Plugins which accept new querystring arguments or new file extensions are registered here.
+        /// Plugins which accept querystring arguments are registered here.
         /// </summary>
-        public SafeList<IUrlPlugin> UrlModifyingPlugins { get { return urlModifyingPlugins; } }
+        public SafeList<IQuerystringPlugin> QuerystringPlugins { get { return querystringPlugins; } }
+
+
+        protected SafeList<IFileExtensionPlugin> fileExtensionPlugins = null;
+        /// <summary>
+        /// Plugins which accept new file extensions (in the url) are registered here.
+        /// </summary>
+        public SafeList<IFileExtensionPlugin> FileExtensionPlugins { get { return fileExtensionPlugins; } }
+
 
         protected SafeList<IPlugin> allPlugins = null;
         /// <summary>
@@ -190,14 +199,15 @@ namespace fbs.ImageResizer.Configuration {
 
         /// <summary>
         /// For use only by plugins during .Uninstall.
-        /// Removes the specified plugin from AllPlugins, UrlModifyingPlugins, CachingSystems, ImageEncoders, and ImageBuiderExtensions, based
+        /// Removes the specified plugin from AllPlugins, QuerystringPlugins, CachingSystems, ImageEncoders, and ImageBuiderExtensions, based
         /// on which interfaces the instance implements.
         /// Plugins may register event handlers and modify settings - thus you should use the plugin's method to uninstall them vs. using this method.
         /// </summary>
         /// <param name="plugin"></param>
         public void remove_plugin(object plugin) {
             if (plugin is IPlugin) AllPlugins.Remove(plugin as IPlugin);
-            if (plugin is IUrlPlugin) UrlModifyingPlugins.Remove(plugin as IUrlPlugin);
+            if (plugin is IQuerystringPlugin) QuerystringPlugins.Remove(plugin as IQuerystringPlugin);
+            if (plugin is IFileExtensionPlugin) FileExtensionPlugins.Remove(plugin as IFileExtensionPlugin);
             if (plugin is ICache) CachingSystems.Remove(plugin as ICache);
             if (plugin is IEncoder) ImageEncoders.Remove(plugin as IEncoder);
             if (plugin is ImageBuilderExtension) ImageBuilderExtensions.Remove(plugin as ImageBuilderExtension);
@@ -205,14 +215,15 @@ namespace fbs.ImageResizer.Configuration {
 
         /// <summary>
         /// For use only by plugins during .Install. Call Plugin.Install instead of this method.
-        /// Adds the specified plugin to AllPlugins, UrlModifyingPlugins, CachingSystems, ImageEncoders, and ImageBuiderExtensions, based
+        /// Adds the specified plugin to AllPlugins, QuerystringPlugins, CachingSystems, ImageEncoders, and ImageBuiderExtensions, based
         /// on which interfaces the instance implements. For ICache and IEncoder, the plugin is inserted at the beginning of CachingSystems and ImageEncoders respectively.
         /// Plugins may register event handlers and modify settings - thus you should use the plugin's method to uninstall them vs. using this method.
         /// </summary>
         /// <param name="plugin"></param>
         public void add_plugin(IPlugin plugin) {
             AllPlugins.Add(plugin);
-            if (plugin is IUrlPlugin) UrlModifyingPlugins.Add(plugin as IUrlPlugin);
+            if (plugin is IQuerystringPlugin) QuerystringPlugins.Add(plugin as IQuerystringPlugin);
+            if (plugin is IFileExtensionPlugin) FileExtensionPlugins.Add(plugin as IFileExtensionPlugin);
             if (plugin is ICache) CachingSystems.AddFirst(plugin as ICache);
             if (plugin is IEncoder) ImageEncoders.AddFirst(plugin as IEncoder);
             if (plugin is ImageBuilderExtension) ImageBuilderExtensions.Add(plugin as ImageBuilderExtension);

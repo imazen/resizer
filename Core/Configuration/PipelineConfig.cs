@@ -14,11 +14,11 @@ namespace fbs.ImageResizer.Configuration {
         public PipelineConfig(Config c) {
             this.c = c;
 
-            c.Plugins.UrlModifyingPlugins.Changed += new SafeList<IUrlPlugin>.ChangedHandler(urlModifyingPlugins_Changed);
+            c.Plugins.QuerystringPlugins.Changed += new SafeList<IQuerystringPlugin>.ChangedHandler(urlModifyingPlugins_Changed);
             
         }
 
-        protected void urlModifyingPlugins_Changed(SafeList<IUrlPlugin> sender) {
+        protected void urlModifyingPlugins_Changed(SafeList<IQuerystringPlugin> sender) {
             lock (_cachedUrlDataSync) {
                 _cachedDirectives = null;
                 _cachedExtensions = null;
@@ -40,18 +40,20 @@ namespace fbs.ImageResizer.Configuration {
             Dictionary<string, bool> exts = new Dictionary<string, bool>(24,StringComparer.OrdinalIgnoreCase);
             IEnumerable<string> vals = null;
             //Check the plugins
-            foreach (IUrlPlugin p in c.Plugins.UrlModifyingPlugins) {
-
-                vals = p.GetSupportedFileExtensions();
-                if (vals != null) 
-                    foreach (string e in vals)
-                        exts[e.TrimStart('.')] = true;
+            foreach (IQuerystringPlugin p in c.Plugins.QuerystringPlugins) {
 
                 vals = p.GetSupportedQuerystringKeys();
                 if (vals != null)
                     foreach (string s in vals)
                         directives[s] = true;
             }
+            foreach (IFileExtensionPlugin p in c.Plugins.FileExtensionPlugins) {
+                vals = p.GetSupportedFileExtensions();
+                if (vals != null)
+                    foreach (string e in vals)
+                        exts[e.TrimStart('.')] = true;
+            }
+
 
             //Now check the imagebuider instance
             ImageBuilder b = c.CurrentImageBuilder;
@@ -84,7 +86,7 @@ namespace fbs.ImageResizer.Configuration {
             }
         }
         /// <summary>
-        /// Returns a unqiue copy of the image extensions supported by the pipeline. Performs a cached query to all registered IUrlPlugin instances.
+        /// Returns a unqiue copy of the image extensions supported by the pipeline. Performs a cached query to all registered IQuerystringPlugin instances.
         /// </summary>
         public ICollection<string> AcceptedImageExtensions {
             get {
@@ -92,7 +94,7 @@ namespace fbs.ImageResizer.Configuration {
             }
         }
         /// <summary>
-        /// Returns a unqiue copy of all querystring keys supported by the pipeline. Performs a cached query to all registered IUrlPlugin instances.
+        /// Returns a unqiue copy of all querystring keys supported by the pipeline. Performs a cached query to all registered IQuerystringPlugin instances.
         /// </summary>
         public ICollection<string> SupportedQuerystringKeys {
             get {
@@ -176,7 +178,7 @@ namespace fbs.ImageResizer.Configuration {
         /// Fired during PostAuthorizeRequest, after ResizeExtension has been removed.
         /// On fired on requests with extensions that match supported image types.
         /// <para> 
-        /// You can add additonal supported image extentions by registering a plugin that implementes IUrlPlugin, or you can add an 
+        /// You can add additonal supported image extentions by registering a plugin that implementes IQuerystringPlugin, or you can add an 
         /// extra extension in the URL and remove it here. Example: .psd.jpg</para>
         /// </summary>
         public event UrlRewritingHook Rewrite;
