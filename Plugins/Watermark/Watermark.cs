@@ -13,13 +13,15 @@ using System.Text;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Web;
+using fbs.ImageResizer.Util;
+using fbs.ImageResizer.Resizing;
 
-namespace fbs.ImageResizer
+namespace fbs.ImageResizer.Plugins.Watermark.Watermark
 {
     /// <summary>
     /// Provides extensibility points for drawing watermarks and even modifying resizing/image settings
     /// </summary>
-    public class WatermarkSettings
+    public class WatermarkSettings : ImageBuilderExtension, IPlugin, IUrlPlugin
     {
         public string watermarkDir = "~/watermarks";
         public SizeF watermarkSize = new SizeF(1, 1);
@@ -41,49 +43,30 @@ namespace fbs.ImageResizer
         }
 
         /// <summary>
-        /// Returns true if all settings are at their defaults and no proccessing is to occur.
+        /// Loads a bitmap, cached using asp.net's cache
         /// </summary>
-        public bool IsEmpty
-        {
-            get
-            {
-                return watermark == null; //Change this, should return false if any code is in ModifySettings or Process
-            }
-        }
-
+        /// <param name="localfile"></param>
+        /// <returns></returns>
         public Bitmap GetMemCachedBitmap(string localfile)
         {
             string key = localfile.ToLowerInvariant();
             Bitmap b = HttpContext.Current.Cache[key] as Bitmap;
             if (b != null) return b;
 
-            b = new Bitmap(localfile);
+            b = ImageBuilder.Current.LoadImage(localfile,new ResizeSettings());
             HttpContext.Current.Cache.Insert(key, b, new System.Web.Caching.CacheDependency(localfile));
             return b;
         }
 
-        /// <summary>
-        /// Executed prior to resizing. Permits modifications of geometry and effect settings
-        /// </summary>
-        /// <param name="rs"></param>
-        /// <param name="opts"></param>
-        public virtual void ModifySettings(ResizeSettings rs, ImageSettings opts, ImageFilter adjustments, ImageOutputSettings ios)
-        {
-        }
 
-        /// <summary>
-        /// Modify this to do watermarks. Executing after resizing is complete
-        /// </summary>
-        /// <param name="b"></param>
-        /// <param name="g"></param>
-        public virtual void Process(Bitmap b, Graphics g, RectangleF imageBox)
-        {
-            TrialWatermark(b, g);
+        protected override RequestedAction RenderOverlays(ImageState s) {
+            Graphics g = s.destGraphics;
+            RectangleF imageBox = PolygonMath.GetBoundingBox(s.layout["image"]);
 
-            if (string.IsNullOrEmpty(watermark)) return;
+            if (string.IsNullOrEmpty(watermark)) return RequestedAction.None;
 
             if (watermark.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) > -1 ||
-                watermark.IndexOfAny(new char[]{'\\','/'}) > -1)
+                watermark.IndexOfAny(new char[] { '\\', '/' }) > -1)
                 throw new ArgumentException("Watermark value contained invalid file name characters: " + watermark);
 
             //Combine the directory with the 
@@ -94,7 +77,7 @@ namespace fbs.ImageResizer
             Bitmap wb = GetMemCachedBitmap(HttpContext.Current.Server.MapPath(watermark));
 
             //If percentages, resolve to pixels
-            if (valuesPercentages){
+            if (valuesPercentages) {
                 watermarkSize.Height *= imageBox.Height;
                 watermarkSize.Width *= imageBox.Width;
                 topLeftPadding.Height *= imageBox.Height;
@@ -105,7 +88,7 @@ namespace fbs.ImageResizer
 
             //Keep aspect ratio
             if (keepAspectRatio) watermarkSize = PolygonMath.ScaleInside(wb.Size, watermarkSize);
-                
+
 
             //Floor all values
             watermarkSize = new SizeF((float)Math.Floor(watermarkSize.Width), (float)Math.Floor(watermarkSize.Height));
@@ -118,9 +101,9 @@ namespace fbs.ImageResizer
                 watermarkSize.Height + topLeftPadding.Height + bottomRightPadding.Height);
 
             //Don't draw the watermark if it is too small.
-            if (!PolygonMath.FitsInside(watermarkSize, imageBox.Size) && hideIfTooSmall) return;
+            if (!PolygonMath.FitsInside(watermarkSize, imageBox.Size) && hideIfTooSmall) return RequestedAction.None;
 
-                
+
 
             float innerWidth = (float)Math.Floor(imageBox.Width - topLeftPadding.Width - bottomRightPadding.Width);
             float innerHeight = (float)Math.Floor(imageBox.Height - topLeftPadding.Height - bottomRightPadding.Height);
@@ -133,7 +116,7 @@ namespace fbs.ImageResizer
 
             if (align == ContentAlignment.MiddleCenter || align == ContentAlignment.MiddleLeft || align == ContentAlignment.MiddleRight)
                 y = (innerHeight - watermarkSize.Height) / 2 + topLeftPadding.Height;
-                
+
             if (align == ContentAlignment.TopCenter || align == ContentAlignment.TopLeft || align == ContentAlignment.TopRight)
                 y = topLeftPadding.Height;
 
@@ -150,33 +133,10 @@ namespace fbs.ImageResizer
             //Draw watermark
             g.DrawImage(wb, new Rectangle((int)(x + imageBox.X), (int)(y + imageBox.Y), (int)watermarkSize.Width, (int)watermarkSize.Height));
 
-            
+     
 
-
-            
+            return RequestedAction.None;
         }
 
-        private void TrialWatermark(Bitmap b, Graphics g)
-        {
-            //Only executes when built using "Trial Version" configuration
-#if TRIAL
-            if (new Random().Next(4) < 2)
-                this.DrawString(b, g, "Unlicensed", FontFamily.GenericSansSerif, Color.FromArgb(70, Color.White));
-#endif
-        }
-
-        public virtual void DrawString(Bitmap b, Graphics g, String text, FontFamily ff, Color c)
-        {
-            SizeF size = g.MeasureString(text, new Font(ff, 32));
-            double difX = (size.Width - b.Width) / -size.Width;
-
-            double difY = (size.Height - b.Height) / -size.Height;
-            float finalFontSize = 32 + (float)(32 * Math.Min(difX, difY));
-            SizeF finalSize = g.MeasureString(text, new Font(ff, finalFontSize));
-
-            g.DrawString(text, new Font(ff, finalFontSize), new SolidBrush(c),
-                new PointF((b.Width - finalSize.Width) / 2, (b.Height - finalSize.Height) / 2));
-            g.Flush();
-        }
     }
 }
