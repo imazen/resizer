@@ -12,7 +12,7 @@ namespace fbs.ImageResizer.Caching {
             this.ApplyToResponse = new ApplyResponseHeadersDelegate(ResponseHeaders.DefaultApplyToResponseMethod);
         }
 
-        protected Boolean applyDuringPreSendRequestHeaders;
+        protected Boolean applyDuringPreSendRequestHeaders = true;
        
         public Boolean ApplyDuringPreSendRequestHeaders {
             get { return applyDuringPreSendRequestHeaders; }
@@ -103,7 +103,7 @@ namespace fbs.ImageResizer.Caching {
         }
 
 
-        protected NameValueCollection defaultHeaders;
+        protected NameValueCollection defaultHeaders = new NameValueCollection();
 
         public NameValueCollection DefaultHeaders {
             get { return defaultHeaders; }
@@ -111,7 +111,7 @@ namespace fbs.ImageResizer.Caching {
         }
 
 
-        protected NameValueCollection headers;
+        protected NameValueCollection headers = new NameValueCollection();
 
         public NameValueCollection Headers {
             get { return headers; }

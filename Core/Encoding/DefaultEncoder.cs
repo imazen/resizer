@@ -365,17 +365,10 @@ namespace fbs.ImageResizer.Encoding {
 
 
         /// <summary>
-        /// Returns a collection of the 
+        /// DefaultEncoder supports only the extensions supported by ImageBuilder, no more. These are source file extensions, not destination ones.
         /// </summary>
         /// <returns></returns>
         public virtual IEnumerable<string> GetSupportedFileExtensions() {
-            ////Filter the imageExtensions dict using IsValidOutputFormat.
-            //List<string> exts = new List<string>(10);
-            //foreach (KeyValuePair<string, ImageFormat> p in DefaultEncoder.imageExtensions) {
-            //    if (IsValidOutputFormat(p.Value)) exts.Add(p.Key);
-            //}
-            //DefaultEncoder.
-            //return exts;
             return null;
         }
 

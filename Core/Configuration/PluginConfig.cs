@@ -78,7 +78,7 @@ namespace fbs.ImageResizer.Configuration {
             Type t = GetPluginType(name);
             if (t == null) return; //Failed to acquire type
             foreach (IPlugin p in GetPluginsByType(t))
-                p.Uninstall(c);
+                if (!p.Uninstall(c)) AcceptIssue(new Issue("Plugin " + t.FullName + " reported a failed uninstall attempt triggered by a <remove name=\"" + name + "\" />.", IssueSeverity.Error));
         }
         protected void addPluginByName(string name) {
             IPlugin p = CreatePluginByName(name);
@@ -90,11 +90,11 @@ namespace fbs.ImageResizer.Configuration {
             if ("caches".Equals(type, StringComparison.OrdinalIgnoreCase)) t = typeof(ICache);
             if ("imagebuilderextensions".Equals(type, StringComparison.OrdinalIgnoreCase)) t = typeof(ImageBuilderExtension);
             if ("all".Equals(type, StringComparison.OrdinalIgnoreCase) || type == null) t = typeof(IPlugin);
-            if (t == null) this.AcceptIssue(new Issue("Plugins", "Unrecognized type value \"" + type + "\" in clearPluginsByType(type).", "", IssueSeverity.ConfigurationError));
+            if (t == null) this.AcceptIssue(new Issue("Unrecognized type value \"" + type + "\" in <clear type=\"" + type + "\" />.", IssueSeverity.ConfigurationError));
             else {
                 IList<IPlugin> results = GetPluginsByType(t);
                 foreach (IPlugin p in results)
-                    p.Uninstall(c);
+                    if (!p.Uninstall(c)) AcceptIssue(new Issue("Plugin " + p.GetType().FullName + " reported a failed uninstall attempt triggered by a <clear type=\"" + type + "\" />.", IssueSeverity.Error));
             }
         }
 
@@ -120,7 +120,7 @@ namespace fbs.ImageResizer.Configuration {
 
             //Ok, time to fail.
             if (t == null) {
-                this.AcceptIssue(new Issue("Plugins", "Failed to load plugin by name \"" + name + "\"",
+                this.AcceptIssue(new Issue( "Failed to load plugin by name \"" + name + "\"",
                     "Attempted using \"" + name + "\", \"" + convention + "\", and \"" + alternate + "\". \n" +
                     "Verify the plugin DLL is located in /bin, and that the name is spelled correctly.", IssueSeverity.ConfigurationError));
             }

@@ -85,6 +85,7 @@
     <Compile Include="Configuration\CacheSelectionEventArgs.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\ICacheSelectionEventArgs.cs" />
+    <Compile Include="Configuration\IssueGatherer.cs" />
     <Compile Include="Configuration\Issues\IIssue.cs" />
     <Compile Include="Configuration\Issues\IIssueProvider.cs" />
     <Compile Include="Configuration\Issues\IIssueReceiver.cs" />
@@ -95,11 +96,11 @@
     <Compile Include="Configuration\PipelineConfig.cs" />
     <Compile Include="Configuration\IPipelineConfig.cs" />
     <Compile Include="Configuration\PluginConfig.cs" />
-    <Compile Include="Configuration\PluginLoadException.cs" />
     <Compile Include="Configuration\UrlEventArgs.cs" />
     <Compile Include="Configuration\Xml\Node.cs" />
     <Compile Include="Configuration\Xml\Selector.cs" />
     <Compile Include="Plugins\Diagnostic\Diagnostic.cs" />
+    <Compile Include="Plugins\Diagnostic\DiagnosticPage.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Configuration\Xml\ResizerConfigurationSection.cs" />
     <Compile Include="Caching\ICache.cs" />

@@ -181,8 +181,10 @@ namespace fbs.ImageResizer.Configuration.Xml {
         public ICollection<Node> query(string selector) {
             
             if (_cachedResults.ContainsKey(selector)) return _cachedResults[selector];
+
+            IList<Node> uncachedResults = queryUncached(selector) as IList<Node>;
             //cache miss
-            ICollection<Node> results = _cachedResults[selector] = new ReadOnlyCollection<Node>(queryUncached(selector) as IList<Node>);
+            ICollection<Node> results = _cachedResults[selector] = uncachedResults != null ? new ReadOnlyCollection<Node>(uncachedResults) : null;
             return results;
         }
         public void clearQueryCache() {

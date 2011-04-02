@@ -31,11 +31,11 @@ namespace fbs.ImageResizer.Plugins.AnimatedGifs
             : base(extensions,writer) {
         }
 
-        public virtual override ImageBuilder  Copy()
+        public override ImageBuilder  Copy()
         {
             return new AnimatedImageManager(exts,writer);
         }
-        public virtual override ImageBuilder Create(IEnumerable<ImageBuilderExtension> extensions, IEncoderProvider writer) {
+        public override ImageBuilder Create(IEnumerable<ImageBuilderExtension> extensions, IEncoderProvider writer) {
             return new AnimatedImageManager(extensions, writer);
         }
         /// <summary>

@@ -33,8 +33,10 @@ namespace fbs.ImageResizer.Caching {
         /// <param name="context"></param>
         /// <param name="e"></param>
         public void Process(System.Web.HttpContext context, IResponseArgs e) {
+            context.Response.StatusCode = 200;
             e.ResponseHeaders.ApplyToResponse(e.ResponseHeaders, context);
-            e.ResizeImageToStream(context.Response.OutputStream);    
+            e.ResizeImageToStream(context.Response.OutputStream);
+            context.Response.End();
         }
 
 
