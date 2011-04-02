@@ -40,7 +40,7 @@ namespace fbs.ImageResizer {
         }
 
         public double Rotate                        { get { 
-            return get("rotate", -1);               } set {   
+            return get("rotate", 0);               } set {   
             set("rotate",value);                    } }
 
         public RotateFlipType Flip                      { get {

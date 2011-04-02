@@ -222,7 +222,7 @@ namespace fbs.ImageResizer {
                 if (vf != null)
                     conf.GetImageBuilder().Build(vf, stream, settings);
                 else
-                    conf.GetImageBuilder().Build(current.Local, settings);
+                    conf.GetImageBuilder().Build(current.Local, stream, settings);
 
             });
             

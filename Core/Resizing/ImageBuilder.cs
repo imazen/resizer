@@ -323,6 +323,7 @@ namespace fbs.ImageResizer
             BeginProcess(s);
             PrepareSourceBitmap(s);  // We select the page/frame and flip the source bitmap here
             PostPrepareSourceBitmap(s);
+            Layout(s); //Layout everything
             PrepareDestinationBitmap(s); //Create a bitmap and graphics object based on s.destSize
             Render(s); //Render using the graphics object
             RenderComplete(s);
@@ -366,6 +367,8 @@ namespace fbs.ImageResizer
             PostRenderEffects(s);
             RenderPadding(s);
             PostRenderPadding(s);
+            CreateImageAttribues(s);
+            PostCreateImageAttributes(s);
             RenderImage(s);
             PostRenderImage(s);
             RenderBorder(s);
