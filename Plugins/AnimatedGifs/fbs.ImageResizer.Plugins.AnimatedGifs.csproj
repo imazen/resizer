@@ -37,7 +37,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AnimatedImageManager.cs" />
+    <Compile Include="AnimatedGifs.cs" />
     <Compile Include="GifClass.cs" />
     <Compile Include="GifCreator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
