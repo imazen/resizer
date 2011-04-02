@@ -16,22 +16,30 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using PhotoshopFile;
 using PhotoshopFile.Text;
+using fbs.ImageResizer.Plugins;
+using fbs.ImageResizer.Configuration;
+using fbs.ImageResizer.Encoding;
 namespace PsdRenderer
 {
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
-    public class PsdReader : VirtualPathProvider
+    public class PsdReader : VirtualPathProvider, IPlugin
     {
         /// <summary>
         /// Registers the PsdReader plugin as a virtual path provider.
         /// </summary>
         /// <returns></returns>
-        public static PsdReader Install() {
-            PsdReader r = new PsdReader();
-            HostingEnvironment.RegisterVirtualPathProvider(r);
-            Configuration.RegisterPlugin(r);
-            return r;
+        public IPlugin Install(Config c) {
+            HostingEnvironment.RegisterVirtualPathProvider(this);
+            c.Plugins.add_plugin(this);
+            return this;
         }
+        public bool Uninstall(Config c) {
+            c.Plugins.remove_plugin(this);
+            return false;//Cannot truly remove a VPP
+        }
+
+
 
         public PsdReader() : base()
         {
@@ -70,9 +78,9 @@ namespace PsdRenderer
             //Encode image to memory stream, then seek the stream to byte 0
             using (b)
             {
-                //Use whatever settings appear in the URL 
-                ImageOutputSettings ios = new ImageOutputSettings(ImageOutputSettings.GetImageFormatFromExtension(System.IO.Path.GetExtension(virtualPath)),queryString);
-                ios.SaveImage(ms, b);
+                //Use whatever settings appear in the URL. TODO: may need to fix this, doesn't use path right.
+                IEncoder ios = Config.Current.Plugins.EncoderProvider.GetEncoder(b, new ResizeSettings(queryString));
+                ios.Write(b, ms);
                 ms.Seek(0, SeekOrigin.Begin); //Reset stream for reading
             }
 
@@ -148,7 +156,7 @@ namespace PsdRenderer
         /// </returns>
         bool IsPathVirtual(string virtualPath)
         {
-            return (System.IO.Path.GetFileName(virtualPath).LastIndexOf(".psd.", StringComparison.OrdinalIgnoreCase) > -1;
+            return System.IO.Path.GetFileName(virtualPath).LastIndexOf(".psd.", StringComparison.OrdinalIgnoreCase) > -1;
         }
         /// <summary>
         /// Strips everything after .psd off.

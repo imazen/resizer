@@ -7,6 +7,7 @@ using fbs.ImageResizer.Caching;
 using fbs.ImageResizer.Plugins;
 using System.Configuration;
 using fbs.ImageResizer.Configuration;
+using fbs.ImageResizer.Configuration.Issues;
 using fbs.ImageResizer.Configuration.Xml;
 using System.Web;
 
@@ -33,7 +34,7 @@ namespace fbs.ImageResizer.Configuration {
         #endregion
 
         public Config() {
-
+            //Init plugins module
             plugins = new PluginConfig(this);
 
             //Whenever the extensions change, the image builder instance has to be replaced.
@@ -41,7 +42,7 @@ namespace fbs.ImageResizer.Configuration {
                 InvalidateImageBuilder();
             };
 
-
+            //Relys on plugins, must init second
             pipeline = new PipelineConfig(this);
 
             //Load default plugins
@@ -107,9 +108,6 @@ namespace fbs.ImageResizer.Configuration {
         #endregion
 
 
-
-
-
         private volatile ResizerConfigurationSection configuration;
         private object configurationLock = new object();
         /// <summary>
@@ -129,6 +127,11 @@ namespace fbs.ImageResizer.Configuration {
                 return configuration;
             }
         }
+        public IssueSink configurationSectionIssues { get { return cs.IssueSink; } }
+        /// <summary>
+        /// Returns a list of all issues reported by the resizing core, as well as by all the plugins
+        /// </summary>
+        public IIssueProvider AllIssues { get { return new IssueGatherer(this); } }
 
         private void SaveConfiguration() {
             //System.Configuration.Configuration webConfig =

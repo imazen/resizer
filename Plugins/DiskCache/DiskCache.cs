@@ -513,5 +513,9 @@ namespace fbs.ImageResizer.Plugins.DiskCache
         }
 
 
+
+        public bool CanProcess(HttpContext current, IResponseArgs e) {
+            return true;//Add support for nocache
+        }
     }
 }

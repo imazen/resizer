@@ -6,6 +6,7 @@ using fbs.ImageResizer.Plugins;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using fbs.ImageResizer.Caching;
+using fbs.ImageResizer.Configuration.Issues;
 
 namespace fbs.ImageResizer.Configuration {
     public class PipelineConfig : IPipelineConfig, ICacheProvider{
@@ -79,7 +80,7 @@ namespace fbs.ImageResizer.Configuration {
         protected Dictionary<string, bool> getCachedExtensions(){
             lock (_cachedUrlDataSync) {
                 _cacheUrlData();
-                return _cachedDirectives;
+                return _cachedExtensions;
             }
         }
         /// <summary>
@@ -128,7 +129,7 @@ namespace fbs.ImageResizer.Configuration {
 
 
         public string FakeExtension {
-            get { return c.get("resizer.pipeline.fakeExtension",".ashx"); }
+            get { return c.get("pipeline.fakeExtension",".ashx"); }
         }
 
         public string ModifiedQueryStringKey {
@@ -140,9 +141,15 @@ namespace fbs.ImageResizer.Configuration {
         }
 
         public VppUsageOption VppUsage {
-            get { throw new NotImplementedException();
-
-                //should default to VppUsageOption.Fallback
+            get {
+                string value = c.get("pipeline.vppUsage", null);
+                if (value == null) return VppUsageOption.Fallback;
+                try {
+                    return (VppUsageOption)Enum.Parse(typeof(VppUsageOption), value, true);
+                } catch (ArgumentException ae) {
+                    c.configurationSectionIssues.AcceptIssue(new Issue("Failed to parse pipleine.vppUsage. Invalid value \"" + value + "\".", IssueSeverity.ConfigurationError));
+                    return VppUsageOption.Fallback;
+                }
             }
         }
 

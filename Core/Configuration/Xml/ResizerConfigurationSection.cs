@@ -9,7 +9,7 @@ using System.Xml.XPath;
 using fbs.ImageResizer.Configuration.Xml;
 using fbs.ImageResizer.Configuration.Issues;
 
-namespace fbs.ImageResizer.Configuration.Xml {
+namespace fbs.ImageResizer {
 
     /// <summary>
     /// Handles reading the &lt;resizer&gt; section from Web.Config
