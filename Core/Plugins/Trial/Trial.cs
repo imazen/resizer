@@ -1,0 +1,88 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using fbs.ImageResizer.Resizing;
+using fbs.ImageResizer.Configuration;
+using System.Threading;
+using System.Drawing;
+using fbs.ImageResizer.Util;
+
+namespace fbs.ImageResizer.Plugins.Trial {
+    /// <summary>
+    /// Can be used by plugins to implement 'trial version' functionality
+    /// </summary>
+    public class Trial:ImageBuilderExtension, IPlugin {
+        public Trial() {
+        }
+        public static void InstallPermanent(Config c){
+            //Re-install every request if it is removed
+            c.Pipeline.PreHandleImage += new PreHandleImageHook(Pipeline_PreHandleImage);
+            //Install it.
+            if (c.Plugins.GetPluginsByType(typeof(Trial)).Count == 0) new Trial().Install(c);
+        }
+
+        static void Pipeline_PreHandleImage(System.Web.IHttpModule sender, System.Web.HttpContext context, Caching.IResponseArgs e) {
+            if (Config.Current.Plugins.GetPluginsByType(typeof(Trial)).Count == 0) new Trial().Install(Config.Current);
+        }
+
+        public IPlugin Install(Config c) {
+            c.Plugins.add_plugin(this);
+            return this;
+        }
+
+        /// <summary>
+        /// The Trial plugin cannot be removed using this method.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public bool Uninstall(Config c) {
+            return false; 
+        }
+
+        public enum TrialWatermarkMode {
+            After500,
+            Always,
+            Randomly
+
+        }
+        private static volatile int requestCount = 0;
+
+        protected override RequestedAction PreFlushChanges(ImageState s) {
+            if (s.destGraphics == null) return RequestedAction.None;
+
+
+            Interlocked.Increment(ref requestCount); //Track request count
+
+            string mode = Config.Current.get("trial.watermarkMode","After500");
+            TrialWatermarkMode m = TrialWatermarkMode.After500;
+            if ("always".Equals(mode, StringComparison.OrdinalIgnoreCase)) m = TrialWatermarkMode.Always;
+            if ("randomly".Equals(mode, StringComparison.OrdinalIgnoreCase)) m = TrialWatermarkMode.Randomly;
+
+            bool applyWatermark = (m == TrialWatermarkMode.Always);
+            if (m == TrialWatermarkMode.After500 && requestCount > 500) applyWatermark = true;
+            if (m == TrialWatermarkMode.Randomly) applyWatermark = (new Random(requestCount).Next(0, 41) < 10); //25% chance
+
+            if (!applyWatermark) return RequestedAction.None;
+
+            DrawString(PolygonMath.GetBoundingBox(s.layout["image"]), s.destGraphics, "Unlicensed", FontFamily.GenericSansSerif, Color.FromArgb(70, Color.White));
+
+      
+
+            return RequestedAction.None;
+        }
+
+      public virtual void DrawString(RectangleF area, Graphics g, String text, FontFamily ff, Color c)
+        {
+            SizeF size = g.MeasureString(text, new Font(ff, 32));
+            double difX = (size.Width - area.Width) / -size.Width;
+
+            double difY = (size.Height - area.Height) / -size.Height;
+            float finalFontSize = 32 + (float)(32 * Math.Min(difX, difY));
+            SizeF finalSize = g.MeasureString(text, new Font(ff, finalFontSize));
+
+            g.DrawString(text, new Font(ff, finalFontSize), new SolidBrush(c),
+                new PointF((area.Width - finalSize.Width) / 2 + area.Left, (area.Height - finalSize.Height) / 2 + area.Height));
+            g.Flush();
+        }
+    }
+}
