@@ -10,41 +10,26 @@ using fbs.ImageResizer.Resizing;
 using fbs.ImageResizer.Encoding;
 namespace fbs.ImageResizer.Plugins.AnimatedGifs
 {
-    public class AnimatedImageManager : ImageBuilder, IPlugin
+    public class AnimatedGifs : AbstractImageProcessor, IPlugin
     {
+        public AnimatedGifs(){}
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
-            c.UpgradeImageBuilder(this);
             return this;
         }
 
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
-            c.UpgradeImageBuilder(base.Create(exts, writer));
             return true;
         }
 
-        public AnimatedImageManager(IEncoderProvider writer) :base(writer)
-        {
-        }
-        public AnimatedImageManager(IEnumerable<ImageBuilderExtension> extensions, IEncoderProvider writer)
-            : base(extensions,writer) {
-        }
-
-        public override ImageBuilder  Copy()
-        {
-            return new AnimatedImageManager(exts,writer);
-        }
-        public override ImageBuilder Create(IEnumerable<ImageBuilderExtension> extensions, IEncoderProvider writer) {
-            return new AnimatedImageManager(extensions, writer);
-        }
         /// <summary>
         /// We cannot fix buildToBitmap, only buildToStream
         /// </summary>
         /// <param name="source"></param>
         /// <param name="dest"></param>
         /// <param name="settings"></param>
-        protected override void buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
+        protected override RequestedAction OnBuildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
             IEncoder ios = Configuration.Config.Current.Plugins.EncoderProvider.GetEncoder(source, settings);
             //Determines output format, includes code for saving in a variety of formats.
             if (ios.MimeType.Equals("image/gif", StringComparison.OrdinalIgnoreCase) && //If it's a GIF
@@ -53,15 +38,12 @@ namespace fbs.ImageResizer.Plugins.AnimatedGifs
                 try {
                     if (source.GetFrameCount(FrameDimension.Time) > 1) {
                         WriteAnimatedGif(source,dest, ios, settings);
-                        return;
+                        return RequestedAction.Cancel;
                     }
                 } catch (System.Runtime.InteropServices.ExternalException) {
                 }
             }
-
-
-            base.buildToStream(source, dest, settings);
-
+            return RequestedAction.None;
         }
         
         private  void WriteAnimatedGif(Bitmap src, Stream output, IEncoder ios, ResizeSettings queryString)
