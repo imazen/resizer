@@ -8,7 +8,7 @@ using fbs.ImageResizer.Resizing;
 using System.Drawing.Drawing2D;
 
 namespace fbs.ImageResizer.Util {
-    class Utils {
+    public class Utils {
 
         public static Color parseColor(string value, Color defaultValue) {
             if (!string.IsNullOrEmpty(value)) {
@@ -159,7 +159,11 @@ namespace fbs.ImageResizer.Util {
             throw new NotImplementedException("Unrecognized CropMode value: " + mode.ToString());
         }
 
-
+        /// <summary>
+        /// Parses padding, allowing syntax (all) and (left, top, right, bottom). Parens are optional.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static BoxPadding parsePadding(string value) {
             //Default to none if null
             if (string.IsNullOrEmpty(value)) return BoxPadding.Empty;
