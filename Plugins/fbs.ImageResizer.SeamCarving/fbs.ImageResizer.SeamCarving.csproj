@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}</ProjectGuid>
+    <ProjectGuid>{7AEFB877-A720-4929-880C-1090A71C83EB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>fbs.ImageResizer.Plugins.Watermark</RootNamespace>
-    <AssemblyName>fbs.ImageResizer.Plugins.Watermark</AssemblyName>
+    <RootNamespace>fbs.ImageResizer.SeamCarving</RootNamespace>
+    <AssemblyName>fbs.ImageResizer.SeamCarving</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,21 +31,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="SEAMonster">
+      <HintPath>C:\Users\Administrator\Downloads\SEAMonster_0.1\SEAMonster.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SeamCarving.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Watermark.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Core\fbs.ImageResizer.csproj">
-      <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
-      <Name>fbs.ImageResizer</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
