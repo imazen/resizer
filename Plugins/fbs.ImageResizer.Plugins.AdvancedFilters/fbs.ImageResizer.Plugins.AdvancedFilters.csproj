@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}</ProjectGuid>
+    <ProjectGuid>{961A7785-80E0-4AB9-A406-FD7E2A9FA9D9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>fbs.ImageResizer.Plugins.Watermark</RootNamespace>
-    <AssemblyName>fbs.ImageResizer.Plugins.Watermark</AssemblyName>
+    <RootNamespace>fbs.ImageResizer.Plugins.AdvancedFilters</RootNamespace>
+    <AssemblyName>fbs.ImageResizer.Plugins.AdvancedFilters</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,15 +31,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AForge">
+      <HintPath>C:\Users\Administrator\Downloads\AForge.NET Framework-2.1.5\Release\AForge.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Imaging">
+      <HintPath>C:\Users\Administrator\Downloads\AForge.NET Framework-2.1.5\Release\AForge.Imaging.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Imaging.Formats">
+      <HintPath>C:\Users\Administrator\Downloads\AForge.NET Framework-2.1.5\Release\AForge.Imaging.Formats.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdvancedFilters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Watermark.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\fbs.ImageResizer.csproj">
