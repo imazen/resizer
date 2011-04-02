@@ -66,11 +66,11 @@ namespace fbs.ImageResizer
         /// <summary>
         /// Handles the encoder selection and provision proccess.
         /// </summary>
-        protected IEncoderProvider writer = null;
+        protected IEncoderProvider encoderProvider = null;
         /// <summary>
         /// Handles the encoder selection and provision proccess.
         /// </summary>
-        public IEncoderProvider EncoderProvider { get { return writer; } }
+        public IEncoderProvider EncoderProvider { get { return encoderProvider; } }
 
         /// <summary>
         /// Returns a shared instance of ImageBuilder or a subclass, equivalent to  Config.Current.CurrentImageBuilder
@@ -86,15 +86,15 @@ namespace fbs.ImageResizer
         /// Creates a new ImageBuilder instance with no extensions.
         /// </summary>
         public ImageBuilder(IEncoderProvider writer) :base(){
-            this.writer = writer;
+            this.encoderProvider = writer;
         }
 
         /// <summary>
         /// Create a new instance of ImageBuilder using the specified extensions. Extension methods will be fired in the order they exist in the collection.
         /// </summary>
         /// <param name="extensions"></param>
-        public ImageBuilder(IEnumerable<ImageBuilderExtension> extensions, IEncoderProvider writer):base(extensions){
-            this.writer = writer;
+        public ImageBuilder(IEnumerable<ImageBuilderExtension> extensions, IEncoderProvider encoderProvider):base(extensions){
+            this.encoderProvider = encoderProvider;
         }
 
         
@@ -111,7 +111,7 @@ namespace fbs.ImageResizer
         /// </summary>
         /// <returns></returns>
         public virtual ImageBuilder Copy(){
-            return new ImageBuilder(this.exts,this.writer);
+            return new ImageBuilder(this.exts,this.encoderProvider);
         }
 
 
@@ -283,15 +283,6 @@ namespace fbs.ImageResizer
                 e.Write(b, dest);
             }
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="settings"></param>
-        /// <returns></returns>
-        public virtual IEncoder GetEncoder(Bitmap source, ResizeSettings settings) {
-            return Config.Current.Plugins.GetEncoder(source, settings); 
-        }
 
         /// <summary>
         /// Override this when you need to override the behavior of Bitmap processing. 
@@ -299,9 +290,12 @@ namespace fbs.ImageResizer
         /// </summary>
         /// <param name="source"></param>
         /// <param name="settings"></param>
+        /// <param name="transparencySupported">True if the output method will support transparency. If false, the image should be provided a matte color</param>
         /// <returns></returns>
         protected virtual Bitmap buildToBitmap(Bitmap source, ResizeSettings settings, bool transparencySupported) {
-            Bitmap b = null;
+            Bitmap b = base.buildToBitmap(source,settings,transparencySupported);
+            if (b != null) return b; //Allow extensions to replace the method wholesale.
+
             using (ImageState state = new ImageState(settings, source.Size, transparencySupported)) {
                 state.sourceBitmap = source;
 
@@ -317,25 +311,25 @@ namespace fbs.ImageResizer
 
         /// <summary>
         /// Processes an ImageState instance. Used by Build, GetFinalSize, and TranslatePoint. 
+        /// Can be overriden by a plugin with the OnProcess methid
         /// </summary>
         /// <param name="s"></param>
         public virtual void Process(ImageState s){
-            BeginProcess(s);
+            if (OnProcess(s) == RequestedAction.Cancel) return;
             PrepareSourceBitmap(s);  // We select the page/frame and flip the source bitmap here
             PostPrepareSourceBitmap(s);
             Layout(s); //Layout everything
             PrepareDestinationBitmap(s); //Create a bitmap and graphics object based on s.destSize
             Render(s); //Render using the graphics object
-            RenderComplete(s);
             ProcessFinalBitmap(s); //Perform the final flipping of the bitmap.
             EndProcess(s);
         }
         /// <summary>
-        /// Handles the layout phase of Processing
+        /// Process.3: Handles the layout phase of Processing
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void Layout(ImageState s){
-            BeginLayout(s);
+        protected override RequestedAction Layout(ImageState s) {
+            if (base.Layout(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
             FlipExistingPoints(s);
             LayoutImage(s);
             PostLayoutImage(s);
@@ -354,13 +348,14 @@ namespace fbs.ImageResizer
             LayoutRound(s);
             PostLayoutRound(s);
             EndLayout(s);
+            return RequestedAction.None;
         }
         /// <summary>
         /// Handles the rendering phase of processing
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void Render(ImageState s){
-            BeginRender(s);
+        protected virtual RequestedAction Render(ImageState s) {
+            if (base.Render(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
             RenderBackground(s);
             PostRenderBackground(s);
             RenderEffects(s);
@@ -373,17 +368,24 @@ namespace fbs.ImageResizer
             PostRenderImage(s);
             RenderBorder(s);
             PostRenderBorder(s);
+            PreRenderOverlays(s);
             RenderOverlays(s);
-            PostRenderOverlays(s);
-            EndRender(s);
+            PreFlushChanges(s);
+            FlushChanges(s);
+            PostFlushChanges(s);
+            return RequestedAction.None;
         }
 
-
-        protected override void  PrepareSourceBitmap(ImageState s)
+        /// <summary>
+        /// Process.1 Switches the bitmap to the correct frame or page, and applies source flipping commands
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        protected override RequestedAction PrepareSourceBitmap(ImageState s)
         {
- 	        base.PrepareSourceBitmap(s); //Call extensions
+            if (base.PrepareSourceBitmap(s) == RequestedAction.Cancel) return RequestedAction.Cancel ; //Call extensions
 
-            if (s.sourceBitmap == null) return; //Nothing to do if there is no bitmap
+            if (s.sourceBitmap == null) return RequestedAction.None ; //Nothing to do if there is no bitmap
 
             Bitmap src = s.sourceBitmap;
             ResizeSettings q = s.settings;
@@ -418,31 +420,34 @@ namespace fbs.ImageResizer
                 s.sourceBitmap.RotateFlip(s.settings.SourceFlip);
                 s.originalSize = s.sourceBitmap.Size;
             }
-            
+            return RequestedAction.None;
         }
 
 
-        protected override void LayoutPadding(ImageState s) {
-            base.LayoutPadding(s);
+        protected override RequestedAction LayoutPadding(ImageState s) {
+            if (base.LayoutPadding(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
             //We need to add padding
             if (!s.settings.Padding.IsEmpty) {
                 s.layout.AddRing("padding",  s.settings.Padding);
             }
+            return RequestedAction.None;
         }
 
-        protected override void LayoutBorder(ImageState s) {
-            base.LayoutBorder(s);
+        protected override RequestedAction LayoutBorder(ImageState s) {
+            if (base.LayoutBorder(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
             //And borders
             if (!s.settings.Border.IsEmpty) {
                 s.layout.AddRing("border", s.settings.Border);
             }
+            return RequestedAction.None;
         }
 
-        protected override void  LayoutEffects(ImageState s)
+        protected override RequestedAction LayoutEffects(ImageState s)
         {
- 	         base.LayoutEffects(s);
+            if (base.LayoutEffects(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
+
             //Clone last ring, then offset it.
             if (s.settings["shadowWidth"] != null) {
                 float shadowWidth = Utils.getFloat(s.settings,"shadowWidth",0);
@@ -461,48 +466,52 @@ namespace fbs.ImageResizer
                     Math.Max(0, shadowWidth - shadowOffset.X)
                 }));
             }
+            return RequestedAction.None;
         }
 
-        protected override void  LayoutRound(ImageState s)
+        protected override RequestedAction LayoutRound(ImageState s)
         {
- 	        base.LayoutRound(s);
+            if (base.LayoutRound(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
             //Todo, round points here.
             //s.layout.Round();
+            return RequestedAction.None;
         }
-        
-        protected override void  LayoutRotate(ImageState s)
+
+        protected override RequestedAction LayoutRotate(ImageState s)
         {
- 	         base.LayoutRotate(s);
+            if (base.LayoutRotate(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
             //Now, rotate all rings.
             s.layout.Rotate(s.settings.Rotate, new PointF(0, 0));
-
+            return RequestedAction.None;
         }
-        protected override void  LayoutNormalize(ImageState s)
+        protected override RequestedAction LayoutNormalize(ImageState s)
         {
- 	        base.LayoutNormalize(s);
+            if (base.LayoutNormalize(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
             //Normalize all the rings
             s.layout.Normalize(new PointF(0, 0));
+            return RequestedAction.None;
         }
-        
 
-        protected override void  EndLayout(ImageState s)
+
+        protected override RequestedAction EndLayout(ImageState s)
         {
- 	         base.EndLayout(s);
+            if (base.EndLayout(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
             //Calculates a bounding box around all the rings in the layout, then rounds that size. Creates a 1x1 pixel destSize value at minimum.
             s.destSize = PolygonMath.RoundPoints(s.layout.GetBoundingBox().Size);
             s.destSize = new Size((int)Math.Max(1, s.destSize.Width), (int)Math.Max(1, s.destSize.Height));
+            return RequestedAction.None;
         }
 
         /// <summary>
         /// Creates a bitmap of s.destSize dimensions, intializes a graphics object for it, and configures all the default settings.
         /// </summary>
         /// <param name="s"></param>
-        protected override void  PrepareDestinationBitmap(ImageState s)
+        protected override RequestedAction  PrepareDestinationBitmap(ImageState s)
         {
- 	         base.PrepareDestinationBitmap(s);
+            if (base.PrepareDestinationBitmap(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
 
-             if (s.sourceBitmap == null) return;
+             if (s.sourceBitmap == null) return RequestedAction.None;
 
             //Create new bitmap using calculated size. 
             s.destBitmap = new Bitmap(s.destSize.Width,s.destSize.Height, PixelFormat.Format32bppArgb);
@@ -517,14 +526,15 @@ namespace fbs.ImageResizer
             g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
             g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
             g.CompositingMode = CompositingMode.SourceOver;
+            return RequestedAction.None;
         }
 
         /// <summary>
         /// Sets the background color if needed or requested
         /// </summary>
         /// <param name="s"></param>
-        protected override void RenderBackground(ImageState s) {
-            base.RenderBackground(s);
+        protected override RequestedAction RenderBackground(ImageState s) {
+            if (base.RenderBackground(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
             Graphics g = s.destGraphics;
 
@@ -539,11 +549,11 @@ namespace fbs.ImageResizer
             //Fill background
             if (background != Color.Transparent) //This causes increased aliasing at the edges - i.e., a faint white border that is even more pronounced than usual.
                 g.Clear(background); //Does this work for Color.Transparent? -- 
-
+            return RequestedAction.None;
         }
 
-        protected override void RenderEffects(ImageState s) {
-            base.RenderEffects(s);
+        protected override RequestedAction RenderEffects(ImageState s) {
+            if (base.RenderEffects(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
 
             //parse shadow
@@ -551,7 +561,7 @@ namespace fbs.ImageResizer
             int shadowWidth = Utils.getInt(s.settings, "shadowWidth", -1);
 
             //Skip on transparent or 0-width shadow
-            if (shadowColor == Color.Transparent || shadowWidth <= 0) return; 
+            if (shadowColor == Color.Transparent || shadowWidth <= 0) return RequestedAction.None; 
 
             //Offsets may show inside the shadow - so we have to fix that
             s.destGraphics.FillPolygon(new SolidBrush(shadowColor),
@@ -561,11 +571,11 @@ namespace fbs.ImageResizer
             Utils.DrawOuterGradient(s.destGraphics, s.layout["shadowInner"],
                              shadowColor, Color.Transparent, shadowWidth);
 
-
+            return RequestedAction.None;
         }
 
-        protected override void RenderPadding(ImageState s) {
-            base.RenderPadding(s);
+        protected override RequestedAction RenderPadding(ImageState s) {
+            if (base.RenderPadding(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
             Color paddingColor = s.settings.PaddingColor;
             //Inherit color
@@ -574,27 +584,29 @@ namespace fbs.ImageResizer
             if (!paddingColor.Equals(s.settings.BackgroundColor) && paddingColor != Color.Transparent)
                 s.destGraphics.FillPolygon(new SolidBrush(paddingColor), s.layout["padding"]);
 
-
+            return RequestedAction.None;
         }
 
-        protected override void CreateImageAttribues(ImageState s) {
-            base.CreateImageAttribues(s);
+        protected override RequestedAction CreateImageAttribues(ImageState s) {
+            if (base.CreateImageAttribues(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
             if (s.copyAttibutes == null) s.copyAttibutes = new ImageAttributes();
+            return RequestedAction.None;
         }
 
-        protected override void RenderImage(ImageState s) {
-            base.RenderImage(s);
+        protected override RequestedAction RenderImage(ImageState s) {
+            if (base.RenderImage(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
             s.copyAttibutes.SetWrapMode(WrapMode.TileFlipXY);
             s.destGraphics.DrawImage(s.sourceBitmap, PolygonMath.getParallelogram(s.layout["image"]), s.copyRect, GraphicsUnit.Pixel, s.copyAttibutes);
 
+            return RequestedAction.None;
         }
 
-        protected override void RenderBorder(ImageState s) {
-            base.RenderBorder(s);
+        protected override RequestedAction RenderBorder(ImageState s) {
+            if (base.RenderBorder(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
             //Draw border
-            if (s.settings.Border.IsEmpty) return;
+            if (s.settings.Border.IsEmpty) return RequestedAction.None;
 
             if (s.settings.Border.All <= 0) throw new NotImplementedException("Separate border widths have not yet been implemented");
 
@@ -603,27 +615,30 @@ namespace fbs.ImageResizer
             p.LineJoin = System.Drawing.Drawing2D.LineJoin.Miter;
             s.destGraphics.DrawPolygon(p, PolygonMath.InflatePoly(s.layout["border"], (float)(s.settings.Border.All / -2.0))); //I hope GDI rounds the same way as .NET.. Otherwise there may be an off-by-one error..
 
+            return RequestedAction.None;
         }
 
 
-        protected override void EndRender(ImageState s) {
-            base.EndRender(s);
+        protected override RequestedAction FlushChanges(ImageState s) {
+            if (base.FlushChanges(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
-            if (s.destGraphics == null) return;
+            if (s.destGraphics == null) return RequestedAction.None;
             //Commit changes.
             s.destGraphics.Flush(FlushIntention.Flush);
             s.destGraphics.Dispose();
             s.destGraphics = null;
+            return RequestedAction.None;
         }
 
-        protected override void ProcessFinalBitmap(ImageState s) {
-            base.ProcessFinalBitmap(s);
+        protected override RequestedAction ProcessFinalBitmap(ImageState s) {
+            if (base.ProcessFinalBitmap(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
             //The last flipping.
             if (s.settings.Flip != RotateFlipType.RotateNoneFlipNone)
                 s.destBitmap.RotateFlip(s.settings.Flip);
 
             s.finalSize = s.destBitmap.Size;
+            return RequestedAction.None;
         }
        
 
@@ -636,7 +651,6 @@ namespace fbs.ImageResizer
             s.layout.AddInvisiblePolygon("points", sourcePoints);
             Process(s);
             return s.layout["points"];
-
         }
          
 
@@ -661,7 +675,9 @@ namespace fbs.ImageResizer
        /// Populates copyRect, as well as Rings image and imageArea
        /// </summary>
        /// <param name="s"></param>
-        protected override void LayoutImage(ImageState s) {
+        protected override RequestedAction LayoutImage(ImageState s) {
+            if (base.LayoutImage(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
+
             //Use the crop size if present.
             s.copyRect = new RectangleF(new PointF(0,0),s.originalSize);
             if (s.settings.CropMode == CropMode.Custom) {
@@ -787,6 +803,7 @@ namespace fbs.ImageResizer
             //Center imageArea around 'image'
             s.layout["imageArea"] = PolygonMath.CenterInside(s.layout["imageArea"], s.layout["image"]);
 
+            return RequestedAction.None;
         }
 
 

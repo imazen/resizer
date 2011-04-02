@@ -11,9 +11,11 @@ namespace fbs.ImageResizer.Resizing {
     /// Each method of AbstractImageProcessor loops through all extensions and executes the same method on each. Provides a sort of multiple-inheritance mechanisim.
     /// </summary>
     public class AbstractImageProcessor {
-
+        /// <summary>
+        /// Creates a new AbstractImageProcessor with no extensions
+        /// </summary>
         public AbstractImageProcessor() {
-            exts = new List<ImageBuilderExtension>();
+            exts = null;
         }
         /// <summary>
         /// Creates a new AbstractImageProcessor which will run the specified extensions with each method call.
@@ -24,33 +26,18 @@ namespace fbs.ImageResizer.Resizing {
         }
 
         /// <summary>
-        /// It is best to only call this method on the same thread that created the instance, and only prior to other threads being able to access the instance.
-        /// </summary>
-        /// <param name="extension"></param>
-        public virtual void AddExtension(ImageBuilderExtension extension) {
-            lock (extsLock) {
-                //Should clone extensions, then add to the new copy, then assign back the the value. 
-                //Must be thread safe
-                List<ImageBuilderExtension> newList = new List<ImageBuilderExtension>(exts);
-                newList.Add(extension);
-                exts = newList;
-            }
-        }
-
-
-        /// <summary>
         /// Contains the set of extensions that are called for every method. 
         /// </summary>
-        protected IEnumerable<ImageBuilderExtension> exts;
-        private object extsLock = new object();
+        protected volatile IEnumerable<ImageBuilderExtension> exts;
 
         /// <summary>
-        /// Extend this to allow additional types of source objects to be accepted by transforming them into accepted types. 
+        /// Extend this to allow additional types of source objects to be accepted by transforming them into accepted types, such as Image, Bitmap,
+        /// Stream, or a physical path
         /// </summary>
         /// <param name="source"></param>
         /// <param name="settings"></param>
         protected virtual void PreLoadImage(ref object source, ResizeSettings settings) {
-            foreach (AbstractImageProcessor p in exts) p.PreLoadImage(ref source, settings);
+            if (exts != null) foreach (AbstractImageProcessor p in exts) p.PreLoadImage(ref source, settings);
         }
 
         /// <summary>
@@ -61,6 +48,7 @@ namespace fbs.ImageResizer.Resizing {
         /// <param name="path"></param>
         /// <param name="useICM"></param>
         protected virtual Bitmap LoadImageFailed(Exception e, string path, bool useICM) {
+            if (exts == null) return null;
             foreach (AbstractImageProcessor p in exts) {
                 Bitmap b = p.LoadImageFailed(e, path, useICM);
                 if (b != null) return b;
@@ -73,9 +61,10 @@ namespace fbs.ImageResizer.Resizing {
         /// This is taken to mean that the error has been resolved.
         /// </summary>
         /// <param name="e"></param>
-        /// <param name="path"></param>
+        /// <param name="s"></param>
         /// <param name="useICM"></param>
         protected virtual Bitmap LoadImageFailed(Exception e, Stream s, bool useICM) {
+            if (exts == null) return null;
             foreach (AbstractImageProcessor p in exts) {
                 Bitmap b = p.LoadImageFailed(e, s, useICM);
                 if (b != null) return b;
@@ -84,316 +73,527 @@ namespace fbs.ImageResizer.Resizing {
         }
 
         /// <summary>
-        /// Extend this to allow additional types of destination objects to be accepted by transforming them into either a bitmap or a stream
+        /// Extend this to allow additional types of *destination* objects to be accepted by transforming them into either a bitmap or a stream.
         /// </summary>
         /// <param name="dest"></param>
         /// <param name="settings"></param>
         protected virtual void PreAcquireStream(ref object dest, ResizeSettings settings) {
-            foreach (AbstractImageProcessor p in exts) p.PreAcquireStream(ref dest, settings);
+            if (exts != null) foreach (AbstractImageProcessor p in exts) p.PreAcquireStream(ref dest, settings);
+        }
+        /// <summary>
+        /// Called for Build() calls that want the result encoded. (Not for Bitmap Build(source,settings) calls.
+        /// Only override this method if you need to replace the behavior of image encoding and image processing together, such as adding support
+        /// for resizing multi-page TIFF files or animated GIFs.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="dest"></param>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        protected virtual RequestedAction OnBuildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
+            if (exts != null) 
+                foreach (AbstractImageProcessor p in exts) 
+                    if (p.OnBuildToStream(source, dest, settings) == RequestedAction.Cancel) 
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
+        }
+        /// <summary>
+        /// Most calls funnel through here. Default behavior configures an ImageState instance and calls Process(imageState); 
+        /// Shouldn't be overriden for any reason I can think of - use the appropriate virtual method under Process().
+        /// If an extension returns a Bitmap instance, it will be used instead of the default behavior.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="settings"></param>
+        /// <param name="transparencySupported"></param>
+        /// <returns></returns>
+        protected virtual Bitmap buildToBitmap(Bitmap source, ResizeSettings settings, bool transparencySupported) {
+            if (exts != null) {
+                foreach (AbstractImageProcessor p in exts) {
+                    Bitmap b = p.buildToBitmap(source, settings, transparencySupported);
+                    if (b != null) return b;
+                }
+            }
+            return null;
         }
 
         /// <summary>
-        /// 1) Occurs before Proccessing begins. Can be used to add points to translate (for image maps), and also to modify the settings 
+        /// Process.0 First step of the Process() method. Can replace the entire Process method if RequestAction.Cancel is returned.
+        /// Can be used to add points to translate (for image maps), and also to modify the settings 
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void BeginProcess(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.BeginProcess(s);
+        protected virtual RequestedAction OnProcess(ImageState s) {
+            if (exts != null) foreach (AbstractImageProcessor p in exts) if (p.OnProcess(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 2) Switches the bitmap to the correct frame or page, and applies source flipping commands.
+        /// Process.1 Switches the bitmap to the correct frame or page, and applies source flipping commands.
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void PrepareSourceBitmap(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PrepareSourceBitmap(s);
+        protected virtual RequestedAction PrepareSourceBitmap(ImageState s) {
+            if (exts != null) foreach (AbstractImageProcessor p in exts) if (p.PrepareSourceBitmap(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
         /// <summary>
-        /// 3) Extend this to apply any pre-processing to the source bitmap that needs to occur before Layout begins
+        /// Process.2 Extend this to apply any pre-processing to the source bitmap that needs to occur before Layout begins
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void PostPrepareSourceBitmap(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PostPrepareSourceBitmap(s);
+        protected virtual RequestedAction PostPrepareSourceBitmap(ImageState s) {
+            if (exts != null) foreach (AbstractImageProcessor p in exts) if (p.PostPrepareSourceBitmap(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 4) Layout is beginnging. This is the last point at which points to translate should be added.
+        /// Process.3(Layout).0: This is the last point at which points to translate should be added.
+        /// Only return RequestedAction.Cancel if you wish to replace the entire Layout sequence logic.
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void BeginLayout(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.BeginLayout(s);
+        protected virtual RequestedAction Layout(ImageState s) {
+            if (exts != null) foreach (AbstractImageProcessor p in exts) if (p.Layout(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 5) This is where the points in the layout are flipped the same way the source bitmap was flipped (unless their flags specify otherwise)
+        /// Process.3(Layout).1: This is where the points in the layout are flipped the same way the source bitmap was flipped (unless their flags specify otherwise)
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void FlipExistingPoints(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.FlipExistingPoints(s);
+        protected virtual RequestedAction FlipExistingPoints(ImageState s) {
+            if (exts != null) foreach (AbstractImageProcessor p in exts) if (p.FlipExistingPoints(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 6) Rings image and imageArea are added to layout. 
+        /// Process.3(Layout).2: Rings 'image' and 'imageArea' are added to the layout. 
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void LayoutImage(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.LayoutImage(s);
+        protected virtual RequestedAction LayoutImage(ImageState s) {
+            if (exts != null) foreach (AbstractImageProcessor p in exts) if (p.LayoutImage(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 7) Add rings here to insert them between the image area and the padding
+        /// Process.3(Layout).3: Add rings here to insert them between the image area and the padding
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void PostLayoutImage(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PostLayoutImage(s);
+        protected virtual RequestedAction PostLayoutImage(ImageState s) {
+            if (exts != null) foreach (AbstractImageProcessor p in exts) if (p.PostLayoutImage(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 8) Ring "padding" is added to the layout
+        /// Process.3(Layout).4: Ring "padding" is added to the layout
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void LayoutPadding(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.LayoutPadding(s);
+        protected virtual RequestedAction LayoutPadding(ImageState s) {
+            if (exts != null) foreach (AbstractImageProcessor p in exts) if (p.LayoutPadding(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 9) Add rings here to insert them between the padding and the border
+        /// Process.3(Layout).5: Add rings here to insert them between the padding and the border
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void PostLayoutPadding(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PostLayoutPadding(s);
+        protected virtual RequestedAction PostLayoutPadding(ImageState s) {
+            if (exts != null) 
+                foreach (AbstractImageProcessor p in exts) 
+                    if (p.PostLayoutPadding(s) == RequestedAction.Cancel) 
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 10) Ring "border" is added to the layout
+        /// Process.3(Layout).6: Ring "border" is added to the layout
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void LayoutBorder(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.LayoutBorder(s);
+        protected virtual RequestedAction LayoutBorder(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.LayoutBorder(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 11) Add rings here to insert them between the border and the effect rings
+        /// Process.3(Layout).7: Add rings here to insert them between the border and the effect rings
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void PostLayoutBorder(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PostLayoutBorder(s);
+        protected virtual RequestedAction PostLayoutBorder(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PostLayoutBorder(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 12) Effects such as 'shadow' are added here.
+        /// Process.3(Layout).8: Effects such as 'shadow' are added here.
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void LayoutEffects(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.LayoutEffects(s);
+        protected virtual RequestedAction LayoutEffects(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.LayoutEffects(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 13) Add rings here to insert them between the effects and the margin
+        /// Process.3(Layout).9: Add rings here to insert them between the effects and the margin
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void PostLayoutEffects(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PostLayoutEffects(s);
+        protected virtual RequestedAction PostLayoutEffects(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PostLayoutEffects(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 14) Margins are added to the layout
+        /// Process.3(Layout).10: Margins are added to the layout
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void LayoutMargin(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.LayoutMargin(s);
+        protected virtual RequestedAction LayoutMargin(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.LayoutMargin(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 15) Add rings here to insert them around the margin. Rings will be outermost
+        /// Process.3(Layout).11: Add rings here to insert them around the margin. Rings will be outermost
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void PostLayoutMargin(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PostLayoutMargin(s);
+        protected virtual RequestedAction PostLayoutMargin(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PostLayoutMargin(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// Occurs when the layout is rotated. May occur anywhere betweeen BeginLayout and EndLayotu
+        /// Process.3(Layout).anytime: Occurs when the layout is rotated. May be called anytime during Layout()
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void LayoutRotate(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.LayoutRotate(s);
+        protected virtual RequestedAction LayoutRotate(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.LayoutRotate(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// Occurs after the layout is rotated. May occur anywhere betweeen BeginLayout and EndLayotu
+        /// Process.3(Layout).anytime: Occurs after the layout is rotated. May be called anytime during Layout()
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void PostLayoutRotate(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PostLayoutRotate(s);
+        protected virtual RequestedAction PostLayoutRotate(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PostLayoutRotate(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// Occurs when the layout is normalized to 0,0. May occur anywhere betweeen BeginLayout and EndLayotu
+        /// Process.3(Layout).anytime: Occurs when the layout is normalized to 0,0. May be called anytime during Layout()
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void LayoutNormalize(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.LayoutNormalize(s);
+        protected virtual RequestedAction LayoutNormalize(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.LayoutNormalize(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// Occurs after the layout is normalized. May occur anywhere betweeen BeginLayout and EndLayotu
+        /// Process.3(Layout).anytime: Occurs after the layout is normalized. May be called anytime during Layout()
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void PostLayoutNormalize(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PostLayoutNormalize(s);
+        protected virtual RequestedAction PostLayoutNormalize(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PostLayoutNormalize(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// Occurs when the layout point values are rounded to integers. May occur anywhere betweeen BeginLayout and EndLayotu
+        /// Process.3(Layout).anytime: Occurs when the layout point values are rounded to integers. May be called anytime during Layout()
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void LayoutRound(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.LayoutRound(s);
+        protected virtual RequestedAction LayoutRound(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.LayoutRound(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// Occurs after the layout point values are rounded to integers. May occur anywhere betweeen BeginLayout and EndLayotu
+        /// Process.3(Layout).anytime: Occurs after the layout point values are rounded to integers. May be called anytime during Layout()
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void PostLayoutRound(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PostLayoutRound(s);
+        protected virtual RequestedAction PostLayoutRound(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PostLayoutRound(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 16) Occurs once layout has finished. No more changes should occur to points or rings in the layout after this method. destSize is calculated here.
+        /// Process.3(Layout).12: Occurs once layout has finished. No more changes should occur to points or rings in the layout after this method. destSize is calculated here.
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void EndLayout(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.EndLayout(s);
+        protected virtual RequestedAction EndLayout(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.EndLayout(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
         /// <summary>
-        /// 17) The destination bitmap is created and sized based destSize. A graphics object is initialized for rendering.
+        /// Process.4: The destination bitmap is created and sized based destSize. A graphics object is initialized for rendering.
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void PrepareDestinationBitmap(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PrepareDestinationBitmap(s);
+        protected virtual RequestedAction PrepareDestinationBitmap(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PrepareDestinationBitmap(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
         /// <summary>
-        /// 18) Rendering is ready to start
+        /// Process.5(Render) Rendering. Do not return RequestedAction.Cancel unless  you want to replace the entire rendering system.
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void BeginRender(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.BeginRender(s);
+        protected virtual RequestedAction Render(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.Render(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
         /// <summary>
-        /// 19) The background color is rendered
+        /// Process.5(Render).1 The background color is rendered
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void RenderBackground(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.RenderBackground(s);
+        protected virtual RequestedAction RenderBackground(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.RenderBackground(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
-        
-        protected virtual void PostRenderBackground(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PostRenderBackground(s);
+        /// <summary>
+        /// Process.5(Render).2 After the background color is rendered
+        /// </summary>
+        /// <param name="s"></param>
+        protected virtual RequestedAction PostRenderBackground(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PostRenderBackground(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 21) Effects, such as shadow, are rendered
+        /// Process.5(Render).3 Effects (such as a drop shadow or outer glow) are rendered
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void RenderEffects(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.RenderEffects(s);
-        }
-
-        protected virtual void PostRenderEffects(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PostRenderEffects(s);
+        protected virtual RequestedAction RenderEffects(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.RenderEffects(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
         /// <summary>
-        /// 23) The padding is rendered
+        /// Process.5(Render).4 After outer effects are rendered
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void RenderPadding(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.RenderPadding(s);
-        }
-
-        protected virtual void PostRenderPadding(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PostRenderPadding(s);
+        protected virtual RequestedAction PostRenderEffects(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PostRenderEffects(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
         /// <summary>
-        /// 25) An ImageAttributes instance is created if it doesn't already exist.
+        /// Process.5(Render).5 Image padding is drawn
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void CreateImageAttribues(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.CreateImageAttribues(s);
+        protected virtual RequestedAction RenderPadding(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.RenderPadding(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
         /// <summary>
-        /// 26) The ImageAttributes instance exists and can be modified or replaced.
+        /// Process.5(Render).6 After image padding is drawn
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void PostCreateImageAttributes(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PostCreateImageAttributes(s);
+        protected virtual RequestedAction PostRenderPadding(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PostRenderPadding(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
+        }
+        /// <summary>
+        /// Process.5(Render).7: An ImageAttributes instance is created if it doesn't already exist.
+        /// </summary>
+        /// <param name="s"></param>
+        protected virtual RequestedAction CreateImageAttribues(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.CreateImageAttribues(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
+        }
+        /// <summary>
+        /// Process.5(Render).8: The ImageAttributes instance exists and can be modified or replaced.
+        /// </summary>
+        /// <param name="s"></param>
+        protected virtual RequestedAction PostCreateImageAttributes(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PostCreateImageAttributes(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
 
         /// <summary>
-        /// 27) The image is copied to the destination parallelogram specified by ring 'image'
+        /// Process.5(Render).9: The image is copied to the destination parallelogram specified by ring 'image'. 
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void RenderImage(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.RenderImage(s);
-        }
-        protected virtual void PostRenderImage(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PostRenderImage(s);
+        protected virtual RequestedAction RenderImage(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.RenderImage(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
         /// <summary>
-        /// 29) The border is rendered
+        /// Process.5(Render).10: After the image is drawn
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void RenderBorder(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.RenderBorder(s);
+        protected virtual RequestedAction PostRenderImage(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PostRenderImage(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
-
-        protected virtual void PostRenderBorder(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PostRenderBorder(s);
-        }
-
         /// <summary>
-        /// 31) watermarks can be rendered here.
+        /// Process.5(Render).11: The border is rendered
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void RenderOverlays(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.RenderOverlays(s);
+        protected virtual RequestedAction RenderBorder(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.RenderBorder(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
-
-        protected virtual void PostRenderOverlays(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.PostRenderOverlays(s);
-        }
-
         /// <summary>
-        /// 33) Changes are flushed to the bitmap here and the graphics object is destroyed.
+        /// Process.5(Render).12: After the border is drawn
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void EndRender(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.EndRender(s);
-        }
-
-        /// <summary>
-        /// 34) Changes have been flushed to the bitmap, but the final bitmap has not been flipped yet.
-        /// </summary>
-        /// <param name="s"></param>
-        protected virtual void RenderComplete(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.RenderComplete(s);
+        protected virtual RequestedAction PostRenderBorder(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PostRenderBorder(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 35) Non-rendering changes to the bitmap object occur here, such as flipping. The graphics object is unavailable.
+        /// Process.5(Render).13: Any last-minute changes before watermarking or overlays are applied
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void ProcessFinalBitmap(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.ProcessFinalBitmap(s);
+        protected virtual RequestedAction PreRenderOverlays(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PreRenderOverlays(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
 
         /// <summary>
-        /// 36) Layout and rendering are both complete.
+        /// Process.5(Render).14: Watermarks can be rendered here. All image processing should be done
         /// </summary>
         /// <param name="s"></param>
-        protected virtual void EndProcess(ImageState s) {
-            foreach (AbstractImageProcessor p in exts) p.EndProcess(s);
+        protected virtual RequestedAction RenderOverlays(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.RenderOverlays(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
+        }
+        /// <summary>
+        /// Process.5(Render).15: Called before changes are flushed and the graphics object is destroyed.
+        /// </summary>
+        /// <param name="s"></param>
+        protected virtual RequestedAction PreFlushChanges(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PreFlushChanges(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
+        }
+
+        /// <summary>
+        /// Process.5(Render).16: Changes are flushed to the bitmap here and the graphics object is destroyed.
+        /// </summary>
+        /// <param name="s"></param>
+        protected virtual RequestedAction FlushChanges(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.FlushChanges(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
+        }
+
+        /// <summary>
+        /// Process.5(Render).17: Changes have been flushed to the bitmap, but the final bitmap has not been flipped yet.
+        /// </summary>
+        /// <param name="s"></param>
+        protected virtual RequestedAction PostFlushChanges(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PostFlushChanges(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
+        }
+
+        /// <summary>
+        /// Process.6: Non-rendering changes to the bitmap object occur here, such as flipping. The graphics object is unavailable.
+        /// </summary>
+        /// <param name="s"></param>
+        protected virtual RequestedAction ProcessFinalBitmap(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.ProcessFinalBitmap(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
+        }
+
+        /// <summary>
+        /// Process.7: Layout and rendering are both complete.
+        /// </summary>
+        /// <param name="s"></param>
+        protected virtual RequestedAction EndProcess(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.EndProcess(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
         }
     }
 }

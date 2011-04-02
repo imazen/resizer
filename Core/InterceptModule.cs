@@ -197,7 +197,7 @@ namespace fbs.ImageResizer {
             }
 
             ResizeSettings settings =new ResizeSettings(current.QueryString);
-            IEncoder guessedEncoder = conf.GetImageBuilder().GetEncoder(null,settings);
+            IEncoder guessedEncoder = conf.GetImageBuilder().EncoderProvider.GetEncoder(null,settings);
 
             //Build CacheEventArgs
             ResponseArgs e = new ResponseArgs();

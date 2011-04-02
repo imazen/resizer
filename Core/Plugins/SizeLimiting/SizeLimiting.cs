@@ -27,7 +27,7 @@ namespace fbs.ImageResizer.Plugins.SizeLimiting {
         }
 
 
-        protected override void PostLayoutImage(ImageState s) {
+        protected override RequestedAction PostLayoutImage(ImageState s) {
             base.PostLayoutImage(s);
 
             SizeF box = s.layout.GetBoundingBox().Size;
@@ -40,6 +40,8 @@ namespace fbs.ImageResizer.Plugins.SizeLimiting {
                 //The bounding box exceeds the ImageSize. Scale down until it fits.
                 s.layout.Scale(1 / scaleFactor, new PointF(0, 0));
             }
+
+            return RequestedAction.None;
         }
 
 
