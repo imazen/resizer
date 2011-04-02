@@ -8,7 +8,7 @@ using System.Collections.Specialized;
 using fbs.ImageResizer.Plugins;
 
 namespace fbs.ImageResizer.Encoding {
-    public class DefaultEncoder :IEncoder, IUrlPlugin, IPlugin {
+    public class DefaultEncoder :IEncoder, IQuerystringPlugin, IPlugin {
         /// <summary>
         /// Tries to parse an ImageFormat from the settings.Format value.
         /// If an unrecogized format is specified, returns null.
