@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Image Resizing Module")]
-[assembly: AssemblyDescription("Allows dynamic resizing, cropping, and manipulation of images server-side")]
+[assembly: AssemblyDescription("Allows server-side resizing, cropping, and manipulation of images")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Nathanael Jones")]
 [assembly: AssemblyProduct("ImageResizer")]
-[assembly: AssemblyCopyright("Copyright 2010 Nathanael Jones")]
+[assembly: AssemblyCopyright("Copyright 2011 Nathanael Jones")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -31,6 +31,6 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:/*
-[assembly: AssemblyVersion("2.6.0.0")]
+[assembly: AssemblyVersion("3.0.0.*")]
 [assembly: AssemblyFileVersion("2.6.*.*")]
-[assembly: AssemblyInformationalVersion("v2.6")]
+[assembly: AssemblyInformationalVersion("v3a")]
