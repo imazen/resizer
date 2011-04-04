@@ -9,49 +9,6 @@ using fbs.ImageResizer.Plugins;
 
 namespace fbs.ImageResizer.Encoding {
     public class DefaultEncoder :IEncoder, IQuerystringPlugin, IPlugin {
-        /// <summary>
-        /// Tries to parse an ImageFormat from the settings.Format value.
-        /// If an unrecogized format is specified, returns null.
-        /// If an unsupported format is specified, it is returned.
-        /// If *no* format is specified, returns defaultValue.
-        /// </summary>
-        /// <param name="settings"></param>
-        /// <param name="defaultValue"></param>
-        /// <returns></returns>
-        public virtual ImageFormat GetRequestedFormat(string format, ImageFormat defaultValue) {
-            ImageFormat f = null;
-            if (!string.IsNullOrEmpty(format)){
-                f = DefaultEncoder.GetImageFormatFromExtension(format);
-                return f;
-            }
-            //Fallback. No encoder was explicitly specified, so let's try to infer it from the image data.
-            return defaultValue;
-
-        }
-        /// <summary>
-        /// Attempts to determine the ImageFormat of the source image. First attempts to parse the path, if a string is present in original.Tag. 
-        /// Falls back to using original.RawFormat. Returns null if both 'original' is null.
-        /// RawFormat has a bad reputation, so this may return unexpected values, like MemoryBitmap or something in some situations.
-        /// </summary>
-        /// <param name="img">The image we are encoding</param>
-        /// <param name="original">The source image that was loaded from a stream</param>
-        /// <returns></returns>
-        public virtual ImageFormat GetOriginalFormat(Image original){
-            if (original == null) return null;
-            //Try to parse the original file extension first.
-            string path = original.Tag as string;
-            //We have a path? Parse it!
-            if (path != null) {
-                ImageFormat f = DefaultEncoder.GetImageFormatFromPhysicalPath(path);
-                if (f != null) return f; //From the path
-            }
-            //Ok, I guess it there (a) wasn't a path, or (b), it didn't have a recognizeable extension
-            return original.RawFormat;
-        }
-
-
-
-
 
         public DefaultEncoder() {
         }
@@ -156,6 +113,46 @@ namespace fbs.ImageResizer.Encoding {
 
 
         #region Static methods
+        /// <summary>
+        /// Tries to parse an ImageFormat from the settings.Format value.
+        /// If an unrecogized format is specified, returns null.
+        /// If an unsupported format is specified, it is returned.
+        /// If *no* format is specified, returns defaultValue.
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public static ImageFormat GetRequestedFormat(string format, ImageFormat defaultValue) {
+            ImageFormat f = null;
+            if (!string.IsNullOrEmpty(format)) {
+                f = DefaultEncoder.GetImageFormatFromExtension(format);
+                return f;
+            }
+            //Fallback. No encoder was explicitly specified, so let's try to infer it from the image data.
+            return defaultValue;
+
+        }
+        /// <summary>
+        /// Attempts to determine the ImageFormat of the source image. First attempts to parse the path, if a string is present in original.Tag. 
+        /// Falls back to using original.RawFormat. Returns null if both 'original' is null.
+        /// RawFormat has a bad reputation, so this may return unexpected values, like MemoryBitmap or something in some situations.
+        /// </summary>
+        /// <param name="img">The image we are encoding</param>
+        /// <param name="original">The source image that was loaded from a stream</param>
+        /// <returns></returns>
+        public static ImageFormat GetOriginalFormat(Image original) {
+            if (original == null) return null;
+            //Try to parse the original file extension first.
+            string path = original.Tag as string;
+            //We have a path? Parse it!
+            if (path != null) {
+                ImageFormat f = DefaultEncoder.GetImageFormatFromPhysicalPath(path);
+                if (f != null) return f; //From the path
+            }
+            //Ok, I guess it there (a) wasn't a path, or (b), it didn't have a recognizeable extension
+            return original.RawFormat;
+        }
+
         /// <summary>
         /// Returns the ImageFormat enumeration value based on the extension in the specified physical path. Extensions can lie, just a guess.
         /// </summary>
@@ -364,13 +361,7 @@ namespace fbs.ImageResizer.Encoding {
 
 
 
-        /// <summary>
-        /// DefaultEncoder supports only the extensions supported by ImageBuilder, no more. These are source file extensions, not destination ones.
-        /// </summary>
-        /// <returns></returns>
-        public virtual IEnumerable<string> GetSupportedFileExtensions() {
-            return null;
-        }
+     
 
         public virtual IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "quality", "format", "thumbnail" };
