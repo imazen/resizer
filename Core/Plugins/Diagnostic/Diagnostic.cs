@@ -14,7 +14,9 @@ namespace fbs.ImageResizer.Plugins.Diagnostic {
         }
 
         void Pipeline_PostAuthorizeRequestStart(System.Web.IHttpModule sender, System.Web.HttpContext context) {
-            if (context.Request.FilePath.EndsWith("/resizer.info", StringComparison.OrdinalIgnoreCase)) new DiagnosticPage(c).Send(context);
+            if (context.Request.FilePath.EndsWith("/resizer.info", StringComparison.OrdinalIgnoreCase)) {
+                context.RemapHandler(new DiagnosticPageHandler(c));
+            } 
         }
 
         public bool Uninstall(Configuration.Config c) {
