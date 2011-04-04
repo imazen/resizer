@@ -312,7 +312,7 @@ namespace fbs.ImageResizer.Plugins.DiskCache
             //Perform cleanup if needed. Clear 1/10 of the files if we are running low.
             if (maxImagesPerFolder > 0  && this.autoClean)
             {  
-                //Only test for cleanup if we've added 1/15 of the quota since last check. This may make things a little less precise, but provides a 
+                //Only test for cleanup if we've added (subfolders)/15 of the quota since last check. This may make things a little less precise, but provides a 
                 //huge perfomance boost - GetFiles() can be very slow on some machines
                 if (filesUpdatedSinceCleanup > maxImagesPerFolder / 15 || !hasCleanedUp)
                 {
