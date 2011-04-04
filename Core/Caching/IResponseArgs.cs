@@ -5,7 +5,7 @@ using System.IO;
 using System.Web;
 using System.Collections.Specialized;
 
-namespace fbs.ImageResizer.Caching {
+namespace ImageResizer.Caching {
     /// <summary>
     /// A callback method that will resize, encode, and write the data to the given stream.
     /// </summary>

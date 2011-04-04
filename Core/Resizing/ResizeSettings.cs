@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections.Specialized;
 using System.Drawing;
-using fbs.ImageResizer.Resizing;
-using fbs.ImageResizer.Util;
+using ImageResizer.Resizing;
+using ImageResizer.Util;
 
-namespace fbs.ImageResizer {
+namespace ImageResizer {
     public class ResizeSettings : NameValueCollection {
         
         public ResizeSettings() : base() { }

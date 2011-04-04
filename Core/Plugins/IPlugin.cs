@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using fbs.ImageResizer.Configuration;
+using ImageResizer.Configuration;
 
-namespace fbs.ImageResizer.Plugins {
+namespace ImageResizer.Plugins {
     public interface IPlugin {
         /// <summary>
         /// Installs the plugin in the specified Config instance. The plugin must handle all the work of loading settings, registering the plugin etc.

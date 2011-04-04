@@ -4,7 +4,7 @@ using System.Text;
 using System.Drawing;
 using System.IO;
 
-namespace fbs.ImageResizer.Resizing {
+namespace ImageResizer.Resizing {
     /// <summary>
     /// Provides a dual-purpose base class. Extensions can inherit and override certain methods.
     /// ImageBuilder inherits this method to utilize its extension invocation code. 

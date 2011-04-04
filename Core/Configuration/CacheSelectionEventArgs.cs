@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using fbs.ImageResizer.Caching;
+using ImageResizer.Caching;
 
-namespace fbs.ImageResizer.Configuration {
+namespace ImageResizer.Configuration {
     class CacheSelectionEventArgs :ICacheSelectionEventArgs{
         private System.Web.HttpContext context;
 

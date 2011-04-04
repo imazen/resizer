@@ -1,25 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer", "fbs.ImageResizer.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer", "ImageResizer.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer.Plugins.AnimatedGifs", "..\Plugins\AnimatedGifs\fbs.ImageResizer.Plugins.AnimatedGifs.csproj", "{D97EA32A-0845-4E00-9C4D-68C5B93A1869}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.AnimatedGifs", "..\Plugins\AnimatedGifs\ImageResizer.Plugins.AnimatedGifs.csproj", "{D97EA32A-0845-4E00-9C4D-68C5B93A1869}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer.Plugins.DiskCache", "..\Plugins\DiskCache\fbs.ImageResizer.Plugins.DiskCache.csproj", "{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.DiskCache", "..\Plugins\DiskCache\ImageResizer.Plugins.DiskCache.csproj", "{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer.Plugins.PsdReader", "..\Plugins\PsdReader\fbs.ImageResizer.Plugins.PsdReader.csproj", "{BCF28DA2-AF29-4C09-B37D-059F40FC9B95}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PsdReader", "..\Plugins\PsdReader\ImageResizer.Plugins.PsdReader.csproj", "{BCF28DA2-AF29-4C09-B37D-059F40FC9B95}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PsdFile", "..\Plugins\PsdLibs\PsdPlugin\PsdFile\PsdFile.csproj", "{DB6A1DE3-FAEB-451B-8EDB-D557B149BC8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer.Plugins.Watermark", "..\Plugins\Watermark\fbs.ImageResizer.Plugins.Watermark.csproj", "{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Watermark", "..\Plugins\Watermark\ImageResizer.Plugins.Watermark.csproj", "{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer.Plugins.SimpleFilters", "..\Plugins\SimpleFilters\fbs.ImageResizer.Plugins.SimpleFilters.csproj", "{2A7D72F6-6DCB-4260-A921-6C7A6FC77812}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.SimpleFilters", "..\Plugins\SimpleFilters\ImageResizer.Plugins.SimpleFilters.csproj", "{2A7D72F6-6DCB-4260-A921-6C7A6FC77812}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer.Plugins.AdvancedFilters", "..\Plugins\AdvancedFilters\fbs.ImageResizer.Plugins.AdvancedFilters.csproj", "{961A7785-80E0-4AB9-A406-FD7E2A9FA9D9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.AdvancedFilters", "..\Plugins\AdvancedFilters\ImageResizer.Plugins.AdvancedFilters.csproj", "{961A7785-80E0-4AB9-A406-FD7E2A9FA9D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer.Plugins.Controls", "..\Plugins\Controls\fbs.ImageResizer.Plugins.Controls.csproj", "{3A0477AB-0EC1-4D4F-BFD9-7F81157E1073}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Controls", "..\Plugins\Controls\ImageResizer.Plugins.Controls.csproj", "{3A0477AB-0EC1-4D4F-BFD9-7F81157E1073}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer.Plugins.PrettyGifs", "..\Plugins\PrettyGifs\fbs.ImageResizer.Plugins.PrettyGifs.csproj", "{BB8EEB97-6550-4780-97B2-B0F2FCD80970}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PrettyGifs", "..\Plugins\PrettyGifs\ImageResizer.Plugins.PrettyGifs.csproj", "{BB8EEB97-6550-4780-97B2-B0F2FCD80970}"
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Test", "C:\Users\Administrator\Documents\resizer-test\Test\", "{F6DD0FA2-DEFC-461B-8BC6-99DD6A7A2808}"
 	ProjectSection(WebsiteProperties) = preProject

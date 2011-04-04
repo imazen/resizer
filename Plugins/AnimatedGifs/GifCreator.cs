@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-namespace fbs.ImageResizer.Plugins.AnimatedGifs
+namespace ImageResizer.Plugins.AnimatedGifs
 {
     public enum GIFVersion
     {

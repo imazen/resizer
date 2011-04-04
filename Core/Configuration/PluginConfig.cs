@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using fbs.ImageResizer.Encoding;
-using fbs.ImageResizer.Plugins;
-using fbs.ImageResizer.Caching;
-using fbs.ImageResizer.Resizing;
-using fbs.ImageResizer.Configuration.Xml;
-using fbs.ImageResizer.Configuration.Issues;
+using ImageResizer.Encoding;
+using ImageResizer.Plugins;
+using ImageResizer.Caching;
+using ImageResizer.Resizing;
+using ImageResizer.Configuration.Xml;
+using ImageResizer.Configuration.Issues;
 
-namespace fbs.ImageResizer.Configuration {
+namespace ImageResizer.Configuration {
     public class PluginConfig :IssueSink, IEncoderProvider {
 
         public override IEnumerable<IIssue> GetIssues() {
@@ -116,8 +116,8 @@ namespace fbs.ImageResizer.Configuration {
         protected Type GetPluginType(string name) {
             Type t = null;
 
-            string convention = "fbs.ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.');
-            string alternate = "fbs.ImageResizer.Plugins." + name.TrimStart('.');
+            string convention = "ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.');
+            string alternate = "ImageResizer.Plugins." + name.TrimStart('.');
 
             //If there is a dot or period, try the exact name first.
             bool looksQualified = (name.IndexOfAny(new char[] { '.', ',' }) > -1);

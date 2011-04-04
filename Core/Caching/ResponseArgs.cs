@@ -4,7 +4,7 @@ using System.Text;
 using System.IO;
 using System.Collections.Specialized;
 
-namespace fbs.ImageResizer.Caching {
+namespace ImageResizer.Caching {
     public class ResponseArgs : IResponseArgs {
 
         public ResponseArgs() { }

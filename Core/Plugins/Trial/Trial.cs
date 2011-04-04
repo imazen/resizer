@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using fbs.ImageResizer.Resizing;
-using fbs.ImageResizer.Configuration;
+using ImageResizer.Resizing;
+using ImageResizer.Configuration;
 using System.Threading;
 using System.Drawing;
-using fbs.ImageResizer.Util;
+using ImageResizer.Util;
 
-namespace fbs.ImageResizer.Plugins.Trial {
+namespace ImageResizer.Plugins.Trial {
     /// <summary>
     /// Can be used by plugins to implement 'trial version' functionality
     /// </summary>

@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{961A7785-80E0-4AB9-A406-FD7E2A9FA9D9}</ProjectGuid>
+    <ProjectGuid>{D97EA32A-0845-4E00-9C4D-68C5B93A1869}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>fbs.ImageResizer.Plugins.AdvancedFilters</RootNamespace>
-    <AssemblyName>fbs.ImageResizer.Plugins.AdvancedFilters</AssemblyName>
+    <RootNamespace>ImageResizer.Plugins.AnimatedGifs</RootNamespace>
+    <AssemblyName>ImageResizer.Plugins.AnimatedGifs</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,27 +31,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AForge">
-      <HintPath>C:\Users\Administrator\Downloads\AForge.NET Framework-2.1.5\Release\AForge.dll</HintPath>
-    </Reference>
-    <Reference Include="AForge.Imaging">
-      <HintPath>C:\Users\Administrator\Downloads\AForge.NET Framework-2.1.5\Release\AForge.Imaging.dll</HintPath>
-    </Reference>
-    <Reference Include="AForge.Imaging.Formats">
-      <HintPath>C:\Users\Administrator\Downloads\AForge.NET Framework-2.1.5\Release\AForge.Imaging.Formats.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdvancedFilters.cs" />
+    <Compile Include="AnimatedGifs.cs" />
+    <Compile Include="GifClass.cs" />
+    <Compile Include="GifCreator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\fbs.ImageResizer.csproj">
+    <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
-      <Name>fbs.ImageResizer</Name>
+      <Name>ImageResizer</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -4,10 +4,10 @@ using System.Text;
 using System.Drawing;
 using System.Collections.Specialized;
 using System.Globalization;
-using fbs.ImageResizer.Resizing;
+using ImageResizer.Resizing;
 using System.Drawing.Drawing2D;
 
-namespace fbs.ImageResizer.Util {
+namespace ImageResizer.Util {
     public class Utils {
 
         public static Color parseColor(string value, Color defaultValue) {

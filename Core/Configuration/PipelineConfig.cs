@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using fbs.ImageResizer.Configuration;
-using fbs.ImageResizer.Plugins;
+using ImageResizer.Configuration;
+using ImageResizer.Plugins;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using fbs.ImageResizer.Caching;
-using fbs.ImageResizer.Configuration.Issues;
+using ImageResizer.Caching;
+using ImageResizer.Configuration.Issues;
 
-namespace fbs.ImageResizer.Configuration {
+namespace ImageResizer.Configuration {
     public class PipelineConfig : IPipelineConfig, ICacheProvider{
         protected Config c;
         public PipelineConfig(Config c) {

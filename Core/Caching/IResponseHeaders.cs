@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.Caching;
 using System.Collections.Specialized;
 
-namespace fbs.ImageResizer.Caching {
+namespace ImageResizer.Caching {
     
     public delegate void ApplyResponseHeadersDelegate(IResponseHeaders headers, HttpContext context);
     /// <summary>

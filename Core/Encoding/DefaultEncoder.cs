@@ -5,9 +5,9 @@ using System.Drawing.Imaging;
 using System.Drawing;
 using System.IO;
 using System.Collections.Specialized;
-using fbs.ImageResizer.Plugins;
+using ImageResizer.Plugins;
 
-namespace fbs.ImageResizer.Encoding {
+namespace ImageResizer.Encoding {
     public class DefaultEncoder :IEncoder, IQuerystringPlugin, IPlugin {
 
         public DefaultEncoder() {

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
-using fbs.ImageResizer.Util;
+using ImageResizer.Util;
 
-namespace fbs.ImageResizer.Resizing {
+namespace ImageResizer.Resizing {
     public class LayoutBuilder {
         [Flags()]
         public enum PointFlags {

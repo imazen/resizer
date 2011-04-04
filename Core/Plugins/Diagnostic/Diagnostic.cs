@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using fbs.ImageResizer.Configuration;
+using ImageResizer.Configuration;
 
-namespace fbs.ImageResizer.Plugins.Diagnostic {
+namespace ImageResizer.Plugins.Diagnostic {
     public class Diagnostic :IPlugin{
         Config c;
         public IPlugin Install(Configuration.Config c) {

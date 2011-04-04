@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace fbs.ImageResizer.Configuration.Xml {
+namespace ImageResizer.Configuration.Xml {
     public class Selector:List<string> {
         public Selector(List<string> items) {
             this.AddRange(items);

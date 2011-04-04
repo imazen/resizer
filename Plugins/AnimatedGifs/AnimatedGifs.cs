@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using fbs.ImageResizer;
+using ImageResizer;
 using System.IO;
 using System.Drawing.Imaging;
 using System.Collections.Specialized;
 using System.Drawing;
-using fbs.ImageResizer.Resizing;
-using fbs.ImageResizer.Encoding;
-namespace fbs.ImageResizer.Plugins.AnimatedGifs
+using ImageResizer.Resizing;
+using ImageResizer.Encoding;
+namespace ImageResizer.Plugins.AnimatedGifs
 {
     public class AnimatedGifs : AbstractImageProcessor, IPlugin
     {

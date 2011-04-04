@@ -8,7 +8,7 @@
     <ProjectGuid>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>fbs.ImageResizer</RootNamespace>
+    <RootNamespace>ImageResizer</RootNamespace>
     <AssemblyName>ImageResizer</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>

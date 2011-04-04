@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using fbs.ImageResizer.Caching;
-using fbs.ImageResizer.Configuration;
+using ImageResizer.Caching;
+using ImageResizer.Configuration;
 using System.Collections.Specialized;
 using System.Web;
 
-namespace fbs.ImageResizer.Configuration {
+namespace ImageResizer.Configuration {
     public enum VppUsageOption {
         Fallback, Never, Always
     }
