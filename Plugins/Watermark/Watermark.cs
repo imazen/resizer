@@ -138,5 +138,17 @@ namespace fbs.ImageResizer.Plugins.Watermark.Watermark
             return RequestedAction.None;
         }
 
+
+        public IPlugin Install(Configuration.Config c) {
+            throw new NotImplementedException();
+        }
+
+        public bool Uninstall(Configuration.Config c) {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<string> GetSupportedQuerystringKeys() {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -13,33 +13,34 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PsdFile", "..\Plugins\PsdLi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer.Plugins.Watermark", "..\Plugins\Watermark\fbs.ImageResizer.Plugins.Watermark.csproj", "{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Test", "..\Samples\Test\", "{E1C047F0-068C-4857-87C8-158D5AAE4AAD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer.Plugins.SimpleFilters", "..\Plugins\SimpleFilters\fbs.ImageResizer.Plugins.SimpleFilters.csproj", "{2A7D72F6-6DCB-4260-A921-6C7A6FC77812}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer.Plugins.AdvancedFilters", "..\Plugins\AdvancedFilters\fbs.ImageResizer.Plugins.AdvancedFilters.csproj", "{961A7785-80E0-4AB9-A406-FD7E2A9FA9D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer.Plugins.Controls", "..\Plugins\Controls\fbs.ImageResizer.Plugins.Controls.csproj", "{3A0477AB-0EC1-4D4F-BFD9-7F81157E1073}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer.Plugins.PrettyGifs", "..\Plugins\PrettyGifs\fbs.ImageResizer.Plugins.PrettyGifs.csproj", "{BB8EEB97-6550-4780-97B2-B0F2FCD80970}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Test", "C:\Users\Administrator\Documents\resizer-test\Test\", "{F6DD0FA2-DEFC-461B-8BC6-99DD6A7A2808}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv2.0"
 		ProjectReferences = "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}|ImageResizer.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/Test"
-		Debug.AspNetCompiler.PhysicalPath = "..\Samples\Test\"
+		Debug.AspNetCompiler.PhysicalPath = "C:\Users\Administrator\Documents\resizer-test\Test\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\Test\"
 		Debug.AspNetCompiler.Updateable = "true"
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.VirtualPath = "/Test"
-		Release.AspNetCompiler.PhysicalPath = "..\Samples\Test\"
+		Release.AspNetCompiler.PhysicalPath = "C:\Users\Administrator\Documents\resizer-test\Test\"
 		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\Test\"
 		Release.AspNetCompiler.Updateable = "true"
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "51806"
-		DefaultWebSiteLanguage = "Visual C#"
+		VWDPort = "49312"
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer.Plugins.SimpleFilters", "..\Plugins\fbs.ImageResizer.Plugins.SimpleFilters\fbs.ImageResizer.Plugins.SimpleFilters.csproj", "{2A7D72F6-6DCB-4260-A921-6C7A6FC77812}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer.Plugins.AdvancedFilters", "..\Plugins\fbs.ImageResizer.Plugins.AdvancedFilters\fbs.ImageResizer.Plugins.AdvancedFilters.csproj", "{961A7785-80E0-4AB9-A406-FD7E2A9FA9D9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fbs.ImageResizer.SeamCarving", "..\Plugins\fbs.ImageResizer.SeamCarving\fbs.ImageResizer.SeamCarving.csproj", "{7AEFB877-A720-4929-880C-1090A71C83EB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,12 +85,6 @@ Global
 		{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}.Trial Version|Any CPU.ActiveCfg = Release|Any CPU
 		{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}.Trial Version|Any CPU.Build.0 = Release|Any CPU
-		{E1C047F0-068C-4857-87C8-158D5AAE4AAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E1C047F0-068C-4857-87C8-158D5AAE4AAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E1C047F0-068C-4857-87C8-158D5AAE4AAD}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{E1C047F0-068C-4857-87C8-158D5AAE4AAD}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{E1C047F0-068C-4857-87C8-158D5AAE4AAD}.Trial Version|Any CPU.ActiveCfg = Debug|Any CPU
-		{E1C047F0-068C-4857-87C8-158D5AAE4AAD}.Trial Version|Any CPU.Build.0 = Debug|Any CPU
 		{2A7D72F6-6DCB-4260-A921-6C7A6FC77812}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2A7D72F6-6DCB-4260-A921-6C7A6FC77812}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A7D72F6-6DCB-4260-A921-6C7A6FC77812}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -102,12 +97,24 @@ Global
 		{961A7785-80E0-4AB9-A406-FD7E2A9FA9D9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{961A7785-80E0-4AB9-A406-FD7E2A9FA9D9}.Trial Version|Any CPU.ActiveCfg = Release|Any CPU
 		{961A7785-80E0-4AB9-A406-FD7E2A9FA9D9}.Trial Version|Any CPU.Build.0 = Release|Any CPU
-		{7AEFB877-A720-4929-880C-1090A71C83EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7AEFB877-A720-4929-880C-1090A71C83EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7AEFB877-A720-4929-880C-1090A71C83EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7AEFB877-A720-4929-880C-1090A71C83EB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7AEFB877-A720-4929-880C-1090A71C83EB}.Trial Version|Any CPU.ActiveCfg = Release|Any CPU
-		{7AEFB877-A720-4929-880C-1090A71C83EB}.Trial Version|Any CPU.Build.0 = Release|Any CPU
+		{3A0477AB-0EC1-4D4F-BFD9-7F81157E1073}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A0477AB-0EC1-4D4F-BFD9-7F81157E1073}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A0477AB-0EC1-4D4F-BFD9-7F81157E1073}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A0477AB-0EC1-4D4F-BFD9-7F81157E1073}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A0477AB-0EC1-4D4F-BFD9-7F81157E1073}.Trial Version|Any CPU.ActiveCfg = Release|Any CPU
+		{3A0477AB-0EC1-4D4F-BFD9-7F81157E1073}.Trial Version|Any CPU.Build.0 = Release|Any CPU
+		{BB8EEB97-6550-4780-97B2-B0F2FCD80970}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB8EEB97-6550-4780-97B2-B0F2FCD80970}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB8EEB97-6550-4780-97B2-B0F2FCD80970}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB8EEB97-6550-4780-97B2-B0F2FCD80970}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB8EEB97-6550-4780-97B2-B0F2FCD80970}.Trial Version|Any CPU.ActiveCfg = Release|Any CPU
+		{BB8EEB97-6550-4780-97B2-B0F2FCD80970}.Trial Version|Any CPU.Build.0 = Release|Any CPU
+		{F6DD0FA2-DEFC-461B-8BC6-99DD6A7A2808}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6DD0FA2-DEFC-461B-8BC6-99DD6A7A2808}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6DD0FA2-DEFC-461B-8BC6-99DD6A7A2808}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6DD0FA2-DEFC-461B-8BC6-99DD6A7A2808}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{F6DD0FA2-DEFC-461B-8BC6-99DD6A7A2808}.Trial Version|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6DD0FA2-DEFC-461B-8BC6-99DD6A7A2808}.Trial Version|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
