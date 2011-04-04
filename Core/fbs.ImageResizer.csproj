@@ -98,13 +98,14 @@
     <Compile Include="Configuration\PipelineConfig.cs" />
     <Compile Include="Configuration\IPipelineConfig.cs" />
     <Compile Include="Configuration\PluginConfig.cs" />
+    <Compile Include="Configuration\ReverseEnumerator.cs" />
     <Compile Include="Configuration\UrlEventArgs.cs" />
     <Compile Include="Configuration\Xml\Node.cs" />
     <Compile Include="Configuration\Xml\Selector.cs" />
     <Compile Include="Plugins\IFileExtensionPlugin.cs" />
     <Compile Include="Plugins\Trial\Trial.cs" />
     <Compile Include="Plugins\Diagnostic\Diagnostic.cs" />
-    <Compile Include="Plugins\Diagnostic\DiagnosticPage.cs" />
+    <Compile Include="Plugins\Diagnostic\DiagnosticPageHandler.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Configuration\Xml\ResizerConfigurationSection.cs" />
     <Compile Include="Caching\ICache.cs" />
