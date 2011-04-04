@@ -253,7 +253,14 @@ namespace fbs.ImageResizer.Configuration {
 
 
         public ICache GetCachingSystem(System.Web.HttpContext context, IResponseArgs args) {
-            ICache defaultCache = c.Plugins.CachingSystems.First;
+            ICache defaultCache = null;
+            //Grab the first cache that claims it can process the request.
+            foreach (ICache cache in c.Plugins.CachingSystems) {
+                if (cache.CanProcess(context, args)) {
+                    defaultCache = cache;
+                    break;
+                }
+            }
 
             CacheSelectionEventArgs e = new CacheSelectionEventArgs(context, args, defaultCache);
             if (SelectCachingSystem != null) SelectCachingSystem(this, e);
