@@ -10,6 +10,16 @@ using fbs.ImageResizer.Configuration.Issues;
 
 namespace fbs.ImageResizer.Configuration {
     public class PluginConfig :IssueSink, IEncoderProvider {
+
+        public override IEnumerable<IIssue> GetIssues() {
+            List<IIssue> issues = new List<IIssue>(base.GetIssues());
+            //Verify all plugins are registered as IPlugins also.
+            //Verify there is something other than NoCache registered
+            if (c.Plugins.CachingSystems.First is NoCache)
+                issues.Add(new Issue("NoCache is only for development usage, and cannot scale to production use."));
+            
+            return issues;
+        }
         protected Config c;
         /// <summary>
         /// Creates a new plugin config section, attached to the specified parent
@@ -51,7 +61,7 @@ namespace fbs.ImageResizer.Configuration {
         /// Not thread safe. Performs actual work.
         /// </summary>
         protected void loadPluginsInternal() {
-            Node plugins = c.getNode("plugins");
+            Node plugins = c.getNode("plugins"); 
             if (plugins == null) return;
             foreach (Node n in plugins.Children) {
                 if (n.Name.Equals("add", StringComparison.OrdinalIgnoreCase)) 
@@ -66,11 +76,15 @@ namespace fbs.ImageResizer.Configuration {
                 }
             }
         }
-
+        /// <summary>
+        /// Returns the subset of AllPlugins which implement the specified type or interface
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public IList<IPlugin> GetPluginsByType(Type type) {
             List<IPlugin> results = new List<IPlugin>();
             foreach (IPlugin p in AllPlugins)
-                if (p.GetType().IsAssignableFrom(type)) //Like instance of. Can be a subclass
+                if (type.IsAssignableFrom(p.GetType())) //Like instance of. Can be a subclass
                     results.Add(p); 
             return results;
         }
@@ -188,6 +202,7 @@ namespace fbs.ImageResizer.Configuration {
         /// <param name="settings"></param>
         /// <returns></returns>
         public IEncoder GetEncoder(System.Drawing.Image originalImage, ResizeSettings settings) {
+            
             foreach (IEncoder e in this.ImageEncoders) {
                 IEncoder result = e.CreateIfSuitable(originalImage, settings);
                 if (result != null) return result;
