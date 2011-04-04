@@ -15,7 +15,7 @@ namespace fbs.ImageResizer.Configuration {
     public class Config {
 
         #region Singleton code, .Current,
-        private static Config _singleton = null;
+        private static volatile Config _singleton = null;
         private static object _singletonLock = new object();
         /// <summary>
         /// Gets the current config instance. 
@@ -53,6 +53,7 @@ namespace fbs.ImageResizer.Configuration {
             pipeline.OnFirstRequest += delegate(IHttpModule sender, HttpContext context) {
                 Plugins.LoadPlugins();
             };
+            
 
         }
 
@@ -177,7 +178,7 @@ namespace fbs.ImageResizer.Configuration {
         /// Returns a deep copy if the current state of the configuration tree (starting with the 'resizer' element as the root)
         /// </summary>
         /// <param name="n"></param>
-        public Node getConfigXml(Node n) {
+        public Node getConfigXml() {
             return cs.getCopyOfRootNode();
         }
         /// <summary>
