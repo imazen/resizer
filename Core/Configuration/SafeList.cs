@@ -159,5 +159,15 @@ namespace fbs.ImageResizer.Configuration {
         {
             return ((IEnumerable)items).GetEnumerator();
         }
+
+        public IEnumerable<T> Reversed {
+            get {
+                return new ReverseEnumerable<T>(items);
+            }
+        }
+
+
     }
+
+  
 }
