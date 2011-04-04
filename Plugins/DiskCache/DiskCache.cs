@@ -35,12 +35,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Web;
 using System.Configuration;
-using fbs;
+using ImageResizer.Util;
 using System.IO;
-using fbs.ImageResizer.Caching;
-using fbs.ImageResizer.Configuration;
+using ImageResizer.Caching;
+using ImageResizer.Configuration;
 
-namespace fbs.ImageResizer.Plugins.DiskCache
+namespace ImageResizer.Plugins.DiskCache
 {
     /// <summary>
     /// Indicates a problem with disk caching. Causes include a missing (or too small) ImageDiskCacheDir setting, and severe I/O locking preventing 

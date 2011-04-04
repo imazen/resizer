@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using fbs.ImageResizer.Resizing;
+using ImageResizer.Resizing;
 using System.Drawing.Imaging;
 using System.Drawing;
 
-namespace fbs.ImageResizer.Plugins.SimpleFilters {
+namespace ImageResizer.Plugins.SimpleFilters {
     public class SimpleFilters : ImageBuilderExtension, IPlugin, IQuerystringPlugin {
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);

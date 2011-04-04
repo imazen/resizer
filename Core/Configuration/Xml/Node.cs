@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections.Specialized;
 using System.Xml;
-using fbs.ImageResizer.Configuration.Issues;
+using ImageResizer.Configuration.Issues;
 using System.Collections.ObjectModel;
 
-namespace fbs.ImageResizer.Configuration.Xml {
+namespace ImageResizer.Configuration.Xml {
     /// <summary>
     /// No support for namespaces, no intention of eventual serialization.
     /// Everything is case-insensitive, but preserves case. Not thread safe.

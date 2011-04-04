@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using fbs.ImageResizer.Encoding;
+using ImageResizer.Encoding;
 using System.Drawing.Imaging;
 using System.Drawing;
-using fbs.ImageResizer;
+using ImageResizer;
 using System.IO;
 
-namespace fbs.ImageResizer.Plugins.PrettyGifs {
+namespace ImageResizer.Plugins.PrettyGifs {
     public class PrettyGifs :IEncoder, IPlugin, IQuerystringPlugin {
         public PrettyGifs() { }
 

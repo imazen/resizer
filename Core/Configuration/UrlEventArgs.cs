@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections.Specialized;
 using System.Web;
-using fbs.ImageResizer.Caching;
+using ImageResizer.Caching;
 
-namespace fbs.ImageResizer.Configuration {
+namespace ImageResizer.Configuration {
     public class UrlEventArgs : EventArgs, IUrlEventArgs {
         protected string _virtualPath;
         protected NameValueCollection _queryString;

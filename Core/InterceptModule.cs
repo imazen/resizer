@@ -40,7 +40,6 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.Drawing;
-using fbs;
 using System.IO;
 using System.Web.Hosting;
 using System.Drawing.Imaging;
@@ -51,14 +50,14 @@ using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using System.Text;
 using System.Security.Principal;
-using fbs.ImageResizer.Caching;
-using fbs.ImageResizer.Configuration;
-using fbs.ImageResizer.Configuration;
-using fbs.ImageResizer.Encoding;
-using fbs.ImageResizer.Plugins;
+using ImageResizer.Caching;
+using ImageResizer.Configuration;
+using ImageResizer.Encoding;
+using ImageResizer.Plugins;
+using ImageResizer.Util;
 
 
-namespace fbs.ImageResizer {
+namespace ImageResizer {
 
     /// <summary>
     /// Monitors incoming image requests. Image requests that request resizing are processed, cached, and served.

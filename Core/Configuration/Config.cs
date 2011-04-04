@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using fbs.ImageResizer.Encoding;
-using fbs.ImageResizer.Resizing;
-using fbs.ImageResizer.Caching;
-using fbs.ImageResizer.Plugins;
+using ImageResizer.Encoding;
+using ImageResizer.Resizing;
+using ImageResizer.Caching;
+using ImageResizer.Plugins;
 using System.Configuration;
-using fbs.ImageResizer.Configuration;
-using fbs.ImageResizer.Configuration.Issues;
-using fbs.ImageResizer.Configuration.Xml;
+using ImageResizer.Configuration;
+using ImageResizer.Configuration.Issues;
+using ImageResizer.Configuration.Xml;
 using System.Web;
 
-namespace fbs.ImageResizer.Configuration {
+namespace ImageResizer.Configuration {
     public class Config {
 
         #region Singleton code, .Current,

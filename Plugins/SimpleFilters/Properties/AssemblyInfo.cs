@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("fbs.ImageResizer.Plugins.SimpleFilters")]
+[assembly: AssemblyTitle("ImageResizer.Plugins.SimpleFilters")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("fbs.ImageResizer.Plugins.SimpleFilters")]
+[assembly: AssemblyProduct("ImageResizer.Plugins.SimpleFilters")]
 [assembly: AssemblyCopyright("Copyright ©  2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

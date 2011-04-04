@@ -4,7 +4,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Security.Cryptography;
 
-namespace fbs.ImageResizer.Util {
+namespace ImageResizer.Util {
     public class UrlHasher {
         public UrlHasher() {
         }

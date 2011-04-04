@@ -39,7 +39,6 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.Drawing;
-using fbs;
 using System.IO;
 using System.Web.Hosting;
 using System.Drawing.Imaging;
@@ -49,13 +48,13 @@ using System.Collections.Specialized;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using System.Reflection;
-using fbs.ImageResizer.Resizing;
-using fbs.ImageResizer.Encoding;
-using fbs.ImageResizer.Util;
-using fbs.ImageResizer.Configuration;
-using fbs.ImageResizer.Plugins;
+using ImageResizer.Resizing;
+using ImageResizer.Encoding;
+using ImageResizer.Util;
+using ImageResizer.Configuration;
+using ImageResizer.Plugins;
 
-namespace fbs.ImageResizer
+namespace ImageResizer
 {
     /// <summary>
     /// Provides methods for generating resizied images, and for reading and writing them to disk.

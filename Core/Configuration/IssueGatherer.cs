@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using fbs.ImageResizer.Configuration.Issues;
-using fbs.ImageResizer.Plugins;
+using ImageResizer.Configuration.Issues;
+using ImageResizer.Plugins;
 
-namespace fbs.ImageResizer.Configuration {
+namespace ImageResizer.Configuration {
     public class IssueGatherer:IIssueProvider {
         Config c = null;
         /// <summary>

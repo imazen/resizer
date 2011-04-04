@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace fbs.ImageResizer.Configuration.Issues {
+namespace ImageResizer.Configuration.Issues {
     public class IssueSink:IIssueProvider,IIssueReceiver {
 
         protected string defaultSource = null;

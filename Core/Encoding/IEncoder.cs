@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 using System.IO;
-using fbs.ImageResizer.Configuration;
+using ImageResizer.Configuration;
 
-namespace fbs.ImageResizer.Encoding {
+namespace ImageResizer.Encoding {
     public interface IEncoder {
 
         /// <summary>

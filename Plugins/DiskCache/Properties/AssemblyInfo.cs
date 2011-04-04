@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("fbs.ImageResizer.Plugins.DiskCache")]
+[assembly: AssemblyTitle("ImageResizer.Plugins.DiskCache")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("fbs.ImageResizer.Plugins.DiskCache")]
+[assembly: AssemblyProduct("ImageResizer.Plugins.DiskCache")]
 [assembly: AssemblyCopyright("Copyright ©  2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

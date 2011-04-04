@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Web;
 
-namespace fbs.ImageResizer.Caching {
+namespace ImageResizer.Caching {
     public class NoCacheHandler :IHttpHandler{
         private IResponseArgs e;
 

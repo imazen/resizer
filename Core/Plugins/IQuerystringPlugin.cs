@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace fbs.ImageResizer.Plugins {
+namespace ImageResizer.Plugins {
     public interface IQuerystringPlugin {
         /// <summary>
         /// If the plugin reads any values from the querystring, the names of the keys should be specified here. 

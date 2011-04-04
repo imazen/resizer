@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Web;
-using fbs.ImageResizer.Configuration;
-using fbs.ImageResizer.Configuration.Issues;
+using ImageResizer.Configuration;
+using ImageResizer.Configuration.Issues;
 using System.Web.Hosting;
 using System.Reflection;
 
-namespace fbs.ImageResizer.Plugins.Diagnostic {
+namespace ImageResizer.Plugins.Diagnostic {
     public class DiagnosticPageHandler : IHttpHandler {
         Config c;
         public DiagnosticPageHandler(Config c) {

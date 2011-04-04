@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace fbs.ImageResizer.Resizing {
+namespace ImageResizer.Resizing {
     public class BoxPadding {
         public BoxPadding(BoxPadding original) {
             this.top = original.top;

@@ -13,7 +13,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
-namespace fbs.ImageResizer.Plugins.PrettyGifs
+namespace ImageResizer.Plugins.PrettyGifs
 {
     /// <summary>
     /// Summary description for Class1.

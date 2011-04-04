@@ -9,16 +9,16 @@ using System.Data.Sql;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Diagnostics;
-using fbs.ImageResizer;
-using fbs;
+using ImageResizer;
+using ImageResizer.Util;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Drawing.Imaging;
 using PhotoshopFile;
 using PhotoshopFile.Text;
-using fbs.ImageResizer.Plugins;
-using fbs.ImageResizer.Configuration;
-using fbs.ImageResizer.Encoding;
+using ImageResizer.Plugins;
+using ImageResizer.Configuration;
+using ImageResizer.Encoding;
 namespace PsdRenderer
 {
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]

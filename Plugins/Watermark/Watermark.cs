@@ -13,10 +13,10 @@ using System.Text;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Web;
-using fbs.ImageResizer.Util;
-using fbs.ImageResizer.Resizing;
+using ImageResizer.Util;
+using ImageResizer.Resizing;
 
-namespace fbs.ImageResizer.Plugins.Watermark.Watermark
+namespace ImageResizer.Plugins.Watermark.Watermark
 {
     /// <summary>
     /// Provides extensibility points for drawing watermarks and even modifying resizing/image settings

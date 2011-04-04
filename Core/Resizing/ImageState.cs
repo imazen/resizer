@@ -4,7 +4,7 @@ using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace fbs.ImageResizer.Resizing {
+namespace ImageResizer.Resizing {
     /// <summary>
     /// Encapsulates the state of an image being resized. 
     /// Can be used to simulate a resize as well as actually perform one.

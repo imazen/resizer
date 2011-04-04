@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-namespace fbs.ImageResizer.Plugins.AnimatedGifs
+namespace ImageResizer.Plugins.AnimatedGifs
 {
     /// <summary>
     /// Dissects a GIF image into its component parts.

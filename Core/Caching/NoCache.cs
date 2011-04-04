@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using fbs.ImageResizer.Plugins;
+using ImageResizer.Plugins;
 
-namespace fbs.ImageResizer.Caching {
+namespace ImageResizer.Caching {
     /// <summary>
     /// Default cache when DiskCache isn't installed. 
     /// Useful for debugging purposes but unsuited for production use, and will use large quanities of RAM. (Scales to fewer than 5 concurrent requests).

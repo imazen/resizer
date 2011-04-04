@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using fbs.ImageResizer.Resizing;
+using ImageResizer.Resizing;
 using System.Drawing;
-using fbs.ImageResizer.Configuration;
+using ImageResizer.Configuration;
 
-namespace fbs.ImageResizer.Plugins.SizeLimiting {
+namespace ImageResizer.Plugins.SizeLimiting {
     /// <summary>
     /// Implements app-wide size limits on image size
     /// </summary>

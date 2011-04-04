@@ -23,7 +23,7 @@ using System.Web.Hosting;
 
 //System.Web.VirtualPathUtility
 
-namespace fbs
+namespace ImageResizer.Util
 {
 
 

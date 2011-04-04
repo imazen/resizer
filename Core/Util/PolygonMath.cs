@@ -33,7 +33,7 @@ using System.Text;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace fbs.ImageResizer.Util
+namespace ImageResizer.Util
 {
     public class PolygonMath
     {

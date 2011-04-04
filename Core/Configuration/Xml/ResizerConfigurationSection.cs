@@ -4,12 +4,12 @@ using System.Text;
 using System.Configuration;
 using System.Collections.Specialized;
 using System.Xml;
-using fbs.ImageResizer.Configuration;
+using ImageResizer.Configuration;
 using System.Xml.XPath;
-using fbs.ImageResizer.Configuration.Xml;
-using fbs.ImageResizer.Configuration.Issues;
+using ImageResizer.Configuration.Xml;
+using ImageResizer.Configuration.Issues;
 
-namespace fbs.ImageResizer {
+namespace ImageResizer {
 
     /// <summary>
     /// Handles reading the &lt;resizer&gt; section from Web.Config

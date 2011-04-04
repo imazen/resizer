@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace fbs.ImageResizer.Caching {
+namespace ImageResizer.Caching {
     /// <summary>
     /// Provides cache selection logic
     /// </summary>

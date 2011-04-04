@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace fbs.ImageResizer {
+namespace ImageResizer {
 
     public enum ScaleMode {
         /// <summary>
@@ -49,7 +49,7 @@ namespace fbs.ImageResizer {
     }
 
 }
-namespace fbs.ImageResizer.Resizing {
+namespace ImageResizer.Resizing {
     public enum RequestedAction {
         /// <summary>
         /// Does nothing

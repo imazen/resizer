@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace fbs.ImageResizer.Configuration.Issues {
+namespace ImageResizer.Configuration.Issues {
     public enum IssueSeverity {
         /// <summary>
         /// Security and stability issues.

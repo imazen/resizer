@@ -7,7 +7,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-namespace fbs.ImageResizer.Plugins.Controls {
+namespace ImageResizer.Plugins.Controls {
     [DefaultProperty("Text")]
     [ToolboxData("<{0}:ServerControl1 runat=server></{0}:ServerControl1>")]
     public class ServerControl1 : WebControl {

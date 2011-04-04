@@ -4,7 +4,7 @@ using System.Text;
 using System.Collections.ObjectModel;
 using System.Collections;
 
-namespace fbs.ImageResizer.Configuration {
+namespace ImageResizer.Configuration {
   public class ReverseEnumerable<T>:IEnumerable<T> {
         private ReadOnlyCollection<T> _collection;
         public ReverseEnumerable(ReadOnlyCollection<T> collection){
