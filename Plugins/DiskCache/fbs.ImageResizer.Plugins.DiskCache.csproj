@@ -37,6 +37,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CleanupWorker.cs" />
     <Compile Include="DiskCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
