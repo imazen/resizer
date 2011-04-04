@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SEAMonsterClient", "SEAMonsterClient\SEAMonsterClient.csproj", "{E3C83128-FD6E-4721-BBA0-A1FC93CF868E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SEAMonster", "SEAMonster\SEAMonster.csproj", "{F67B0831-B84B-4667-8665-9C12183DAE6F}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs06.codeplex.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = SEAMonster\\SEAMonster.csproj
+		SccProjectName1 = SEAMonster
+		SccLocalPath1 = SEAMonster
+		SccProjectUniqueName2 = SEAMonsterClient\\SEAMonsterClient.csproj
+		SccProjectName2 = SEAMonsterClient
+		SccLocalPath2 = SEAMonsterClient
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E3C83128-FD6E-4721-BBA0-A1FC93CF868E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3C83128-FD6E-4721-BBA0-A1FC93CF868E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3C83128-FD6E-4721-BBA0-A1FC93CF868E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3C83128-FD6E-4721-BBA0-A1FC93CF868E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F67B0831-B84B-4667-8665-9C12183DAE6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F67B0831-B84B-4667-8665-9C12183DAE6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F67B0831-B84B-4667-8665-9C12183DAE6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F67B0831-B84B-4667-8665-9C12183DAE6F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

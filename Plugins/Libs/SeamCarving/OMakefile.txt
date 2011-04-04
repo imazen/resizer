@@ -1,0 +1,26 @@
+
+BYTE_ENABLED = false
+NATIVE_ENABLED = true
+
+OCAMLOPTFLAGS += -dtypes -unsafe
+OCAMLFLAGS += -I +camlimages
+
+OCAML_OTHER_LIBS[] =
+	graphics
+	ci_core
+	ci_jpeg
+	ci_png
+
+OCamlProgram(carve, cmdline_resizer seamcarving sobel energyBias gradientHist carve)
+OCamlProgram(expand, cmdline_resizer seamcarving seaminsertion sobel energyBias gradientHist expand)
+
+PROGRAMS[] =
+	carve
+	expand
+
+.DEFAULT: $(PROGRAMS)
+
+.PHONY: clean
+clean:
+	rm -f $(filter-proper-targets $(ls R, .))
+	rm -f *.annot *.s
