@@ -200,7 +200,7 @@ namespace fbs.ImageResizer.Configuration.Xml {
             //Get the first item
             string nextBit = (nextDot > -1) ? selector.Substring(0, nextDot) : selector;
             //Get the remainder of the query
-            string remainder = selector.Substring(nextDot + 1);
+            string remainder = (nextDot > -1) ? selector.Substring(nextDot + 1) : null;
 
 
             List<Node> results = null;
@@ -212,7 +212,7 @@ namespace fbs.ImageResizer.Configuration.Xml {
                         results.Add(n);
                     } else {
                         //Execute subquery and add results
-                        ICollection<Node> subQueryResults = n.query(remainder);
+                        ICollection<Node> subQueryResults = n.queryUncached(remainder);
                         if (subQueryResults != null) {
                             if (results == null) results = new List<Node>();
                             results.AddRange(subQueryResults);
@@ -265,6 +265,9 @@ namespace fbs.ImageResizer.Configuration.Xml {
                     e.AppendChild(c.ToXmlElement(doc));
 
             return e;
+        }
+        public override string ToString() {
+            return ToXmlElement(new XmlDocument()).OuterXml.Replace(">", ">\n");
         }
     }
 }
