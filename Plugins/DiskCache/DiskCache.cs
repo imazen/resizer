@@ -39,6 +39,7 @@ using ImageResizer.Util;
 using System.IO;
 using ImageResizer.Caching;
 using ImageResizer.Configuration;
+using System.Web.Hosting;
 
 namespace ImageResizer.Plugins.DiskCache
 {
@@ -53,18 +54,14 @@ namespace ImageResizer.Plugins.DiskCache
     }
     /// <summary>
     /// Provides methods for creating, maintaining, and securing the disk cache. 
-    /// Extending this to work for database-sourced (or anything) vs disk-source data 
-    /// could be done by making alternative UpdateCachedVersionIfNeeded and IsCachedVersionValid
-    /// methods that accept DateTime instances instead of filenames. 
-    /// 
     /// </summary>
-    public class DiskCache: ICache
+    public class DiskCache: ICache, IPlugin
     {
         protected string dir;
         protected int subfolders;
         bool autoClean;
         int maxImagesPerFolder;
-        bool debugMode;
+        bool disabled;
         int fileLockTimeout;
 
         public DiskCache(string dir, int subfolders, bool autoClean, int maxImagesPerFolder, bool debugMode, int fileLockTimeout){
@@ -76,19 +73,34 @@ namespace ImageResizer.Plugins.DiskCache
             this.fileLockTimeout = fileLockTimeout;
         }
         /// <summary>
-        /// Uses the defaults from the imageresizer.diskcache configuration section
+        /// Uses the defaults from the resizing.diskcache configuration section
         /// </summary>
         public DiskCache(Config c){
-            debugMode = c.get("diskcache.debugMode",false);
+            disabled = c.get("diskcache.disable",false);
             autoClean = c.get("diskcache.autoClean",false);
             dir = c.get("diskcache.dir","~/imagecache");
             maxImagesPerFolder =  c.get("diskcache.maxImagesPerFolder", 8000);
             subfolders = c.get("diskcache.subfolders",0);
             fileLockTimeout = c.get("diskcache.fileLockTimeout", 10000); //10s
         }
-       
+        public string CacheDir{
+            get{
+                return dir;
+            }
+            set{
+                dir = value;
+                virtualDir = string.IsNullOrEmpty(dir) ? null : dir.Replace("~",HostingEnvironment.ApplicationVirtualPath);
+            }
+        }
+        protected string virtualDir  = null;
+        public string VirtualCacheDir{get{return virtualDir;}}
+
+        public bool IsConfigurationValid(){
+            return !string.IsNullOrEmpty(CacheDir);
+        }
+
         /// <summary>
-        /// Returns the physical path of the image cache dir. Calcualted from imageresizer.diskcache.dir (yrl form). throws an exception if missing
+        /// Returns the physical path of the image cache dir. Calculated from imageresizer.diskcache.dir (yrl form). throws an exception if missing
         /// </summary>
         /// <returns></returns>
         public string GetCacheDir()
@@ -100,43 +112,43 @@ namespace ImageResizer.Plugins.DiskCache
             return conv.Local;
         }
         
-        /// <summary>
-        /// Returns the maxium number of images that can be cached per folder
-        /// </summary>
-        /// <returns></returns>
-        public  int GetMaxCachedFilesPerFolder()
-        {
-            return maxImagesPerFolder;
-        }
-
+        
 
         private long filesUpdatedSinceCleanup = 0;
         private bool hasCleanedUp = false;
 
-        public void Process(HttpContext context, IResponseArgs e) {
-            string cachedFilename = null; //Build using hash utils
-        
+        public bool CanProcess(HttpContext current, IResponseArgs e) {
+            return IsConfigurationValid();//Add support for nocache
+        }
+
+        public string getRelativeCachedFilename(IResponseArgs e) {
+            return new UrlHasher().hash(e.RequestKey,subfolders,"/") + '.' + e.SuggestedExtension;
+        }
         /// <summary>
-        /// Checks if an update is needed on the specified file... calls the method if needed.
-        /// Fixed: Implement locking to prevent I/O conflicts on concurrent inital request
-        /// Returns false if a lock on the source file could not be acquired within fileLockTimeout ms. -1 for indefinite wait - not reccomended!
-        /// Only one resize operation can be performed on a source file at a time. This method enforces that, and should eliminte costly I/O 'access denied' messages.
-        /// Of course, locking based on source filename also eliminates writing contention on cached files..
+        /// The only objects in this collection should be for open files. 
         /// </summary>
+        private static Dictionary<String, Object> fileLocks = new Dictionary<string, object>(StringComparer.Ordinal);
+
+
+        public void Process(HttpContext context, IResponseArgs e) {
+            string relativePath = getRelativeCachedFilename(e); //Relative to the cache directory. Not relative to the app or domain root
+            string virtualPath = VirtualCacheDir.TrimEnd('/') + '/' + relativePath; //Relative to the domain
+            string physicalPath = HostingEnvironment.MapPath(virtualPath); //Physical path
+               
+        
              PrepareCacheDir();
             //Fixed - implement locking so concurrent requests for the same file don't cause an I/O issue.
-            if ((!e.HasModifiedDate && IsCachedVersionValid(cachedFilename)) || !IsCachedVersionValid(e.GetModifiedDateUTC(), cachedFilename))
+            if ((!e.HasModifiedDate && Exists(relativePath,physicalPath)) || !IsCachedVersionValid(e.GetModifiedDateUTC(), relativePath,physicalPath))
             {
                 //Create or obtain a blank object for locking purposes. Store or retrieve using the filename as a key.
-                string key = cachedFilename.ToLower();
+                string key = relativePath.ToUpperInvariant();
 
                 object fileLock = null;
-                lock (fileLocks) //We have to lock the dictionary, since otherwise two locks for the same file could be created and assigned at the same time. (i.e, between ContainsKey and the assignment)
+                lock (fileLocks) //We have to lock the dictionary, since otherwise two locks for the same file could be created and assigned at the same time. (i.e, between TryGetValue and the assignment)
                 {
-                    if (fileLocks.ContainsKey(key))
-                        fileLock = fileLocks[key];
-                    else
-                        fileLocks[key] = fileLock = new Object();//make new lock
+                    //If it doesn't exist
+                    if (!fileLocks.TryGetValue(key, out fileLock))
+                        fileLocks[key] = fileLock = new Object(); //make a new lock!
                 }
                 //We should now have an exclusive lock for this filename.  We're only going to hold this thread open for fileLockTimeout ms - too many threads blocked kills performance.
                 //We don't use a standard lock{}, since that could block as long as the underlying I/O calls.
@@ -145,20 +157,22 @@ namespace ImageResizer.Plugins.DiskCache
                     try
                     {
                         DateTime modDate = e.HasModifiedDate ? e.GetModifiedDateUTC() : DateTime.MinValue;
-                        if ((!e.HasModifiedDate && IsCachedVersionValid(cachedFilename)) || !IsCachedVersionValid(modDate, cachedFilename))
+                        if ((!e.HasModifiedDate && Exists(physicalPath)) || !IsCachedVersionValid(modDate, physicalPath))
                         {
                             //Create subdirectory if needed.
-                            if (!Directory.Exists(Path.GetDirectoryName(cachedFilename))) Directory.CreateDirectory(Path.GetDirectoryName(cachedFilename));
+                            if (!Directory.Exists(Path.GetDirectoryName(physicalPath))) Directory.CreateDirectory(Path.GetDirectoryName(physicalPath));
                             
                             //Open stream 
-                            System.IO.FileStream fs = new FileStream(cachedFilename, FileMode.Create, FileAccess.Write);
+                            System.IO.FileStream fs = new FileStream(physicalPath, FileMode.Create, FileAccess.Write);
                             using (fs) {
                                 //Run callback to process and encode image
                                 e.ResizeImageToStream(fs);
                             }
                             filesUpdatedSinceCleanup++;
                             //Update the write time to match - this is how we know whether they are in sync.
-                            if (e.HasModifiedDate) System.IO.File.SetLastWriteTimeUtc(cachedFilename,modDate);
+                            if (e.HasModifiedDate) System.IO.File.SetLastWriteTimeUtc(physicalPath,modDate);
+                            System.IO.File.SetCreationTimeUtc(physicalPath, DateTime.UtcNow);
+                            //TODO: tell the cache index what we have done
                         }
                     }
                     finally
@@ -171,7 +185,7 @@ namespace ImageResizer.Plugins.DiskCache
                 {
                     //Only one resize operation on a source file occurs at a time.
                     //fileLockTimeout was not enough to acquire a lock on the file
-                    throw new ApplicationException("Failed to acquire a lock on file \"" + cachedFilename + "\" within " + fileLockTimeout + "ms. Image resizing failed.");
+                    throw new ApplicationException("Failed to acquire a lock on file \"" + physicalPath + "\" within " + fileLockTimeout + "ms. Image resizing failed.");
                 }
                 //Attempt cleanup of lock objects. TryEnter() failes if there is anybody else holding the lock at that moment
                 if (System.Threading.Monitor.TryEnter(fileLocks))
@@ -189,63 +203,22 @@ namespace ImageResizer.Plugins.DiskCache
                 //Ideally the only objects in fileLocks will be open operations now.
             }
 
-            context.Items["FinalCachedFile"] = cachedFilename;
+            context.Items["FinalCachedFile"] = physicalPath;
 
-            //Now it is time to rewrite the request to serve from the cache
-            //Get domain-relative path of cached file.
-            string virtualPath = yrl.GetAppFolderName().TrimEnd(new char[] { '/' }) + "/" + yrl.FromPhysicalString(cachedFilename).ToString();
-
+            
             //Rewrite to cached, resized image.
             context.RewritePath(virtualPath, false);
 
         }
-        /// <summary>
-        /// The only objects in this collection should be for open files. 
-        /// </summary>
-        private static Dictionary<String, Object> fileLocks = new Dictionary<string, object>();
 
-        private static void LogWarning(String message)
-        {
-            HttpContext.Current.Trace.Warn("ImageResizer", message);
-        }
-        private static void LogException(Exception e)
-        {
-            HttpContext.Current.Trace.Warn("ImageResizer", e.Message, e);// Event.CreateExceptionEvent(e).SaveAsync();
-        }
-
-        /// <summary>
-        /// Assumes localSourceFile exists. Returns true if localCachedFile exists and matches the last write time of localSourceFile.
-        /// </summary>
-        /// <param name="localSourceFile">full physical path of original file</param>
-        /// <param name="cachedFilename">full physical path of cached file.</param>
-        /// <returns></returns>
-        public bool IsCachedVersionValid(string localSourceFile, string localCachedFile)
-        {
-            if (debugMode) return false;
-            if (localCachedFile == null) return false;
-            if (!System.IO.File.Exists(localCachedFile)) return false;
-
-            
-
-            //When we save thumbnail files to disk, we set the write time to that of the source file.
-            //This allows us to track if the source file has changed.
-
-            DateTime cached = System.IO.File.GetLastWriteTimeUtc(localCachedFile);
-            DateTime source = System.IO.File.GetLastWriteTimeUtc(localSourceFile);
-            return RoughCompare(cached, source);
-        }
 
         
         /// <summary>
-        /// Assumes localSourceFile exists. Returns true if localCachedFile exists and DiskCacheAlwaysInvalid is false.
+        /// Returns true if the specified file exists. 
         /// </summary>
-        /// <param name="localSourceFile">full physical path of original file</param>
-        /// <param name="cachedFilename">full physical path of cached file.</param>
         /// <returns></returns>
-        public bool IsCachedVersionValid(string localCachedFile){
-            if (debugMode) return false;
-
-            if (localCachedFile == null) return false;
+        public bool Exists(string localCachedFile){
+            if (string.IsNullOrEmpty(localCachedFile)) return false;
             if (!System.IO.File.Exists(localCachedFile)) return false;
             return true;
         }
@@ -257,17 +230,27 @@ namespace ImageResizer.Plugins.DiskCache
         /// <returns></returns>
         public bool IsCachedVersionValid(DateTime sourceDataModifiedUTC, string localCachedFile)
         {
-            if (debugMode) return false;
-            if (localCachedFile == null) return false;
-            if (!System.IO.File.Exists(localCachedFile)) return false;
+            if (string.IsNullOrEmpty(localCachedFile)) return false;
+            if (!Exists(localCachedFile)) return false;
 
 
-            //When we save thumbnail files to disk, we set the write time to that of the source file.
+            //When we save cached files to disk, we set the write time to that of the source file.
             //This allows us to track if the source file has changed.
 
             DateTime cached = System.IO.File.GetLastWriteTimeUtc(localCachedFile);
             return RoughCompare(cached, sourceDataModifiedUTC);
         }
+        /// <summary>
+        /// Returns true if both dates are equal (to the nearest 200th of a second)
+        /// </summary>
+        /// <param name="modifiedOn"></param>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        private static bool RoughCompare(DateTime d1, DateTime d2) {
+            return Math.Abs(d1.Ticks - d2.Ticks) < TimeSpan.TicksPerMillisecond * 5;
+        }
+
+
     
         /// <summary>
         /// This string contains the contents of a web.conig file that sets URL authorization to "deny all" inside the current directory.
@@ -292,14 +275,15 @@ namespace ImageResizer.Plugins.DiskCache
         {
             string dir = GetCacheDir();
 
-            //Create the cache directory if it doesn't exist.
-            if (!System.IO.Directory.Exists(dir))
-                System.IO.Directory.CreateDirectory(dir);
+
 
             //Add URL authorization protection using a web.config file.
             yrl wc = yrl.Combine(new yrl(dir), new yrl("Web.config"));
             if (!wc.FileExists) {
                 lock (webConfigSyncObj) {
+                    //Create the cache directory if it doesn't exist.
+                    if (!System.IO.Directory.Exists(dir))
+                        System.IO.Directory.CreateDirectory(dir);
                     if (!wc.FileExists){
                         System.IO.File.WriteAllText(wc.Local, webConfigFile);
                     }
@@ -307,146 +291,6 @@ namespace ImageResizer.Plugins.DiskCache
             }
 
 
-
-            //TODO: fix cleanup system
-            //Perform cleanup if needed. Clear 1/10 of the files if we are running low.
-            if (maxImagesPerFolder > 0  && this.autoClean)
-            {  
-                //Only test for cleanup if we've added (subfolders)/15 of the quota since last check. This may make things a little less precise, but provides a 
-                //huge perfomance boost - GetFiles() can be very slow on some machines
-                if (filesUpdatedSinceCleanup > maxImagesPerFolder / 15 || !hasCleanedUp)
-                {
-                    TrimDirectoryFiles(dir, maxImagesPerFolder - 1, (maxImagesPerFolder / 10));
-                }
-            }
-        }
-
-        
-
-        /// <summary>
-        /// Deletes least-used files from the directory (if needed)
-        /// Throws an exception if cleanup fails.
-        /// Returns true if any files were deleted.
-        /// </summary>
-        /// <param name="dir">The directory to clean up</param>
-        /// <param name="maxCount">The maximum number of files to leave in the directory. Does nothing if this is less than 0</param>
-        /// <param name="deleteExtra">How many extra files to delete if deletions are required</param>
-        /// <returns></returns>
-        public bool TrimDirectoryFiles(string dir, int maxCount, int deleteExtra)
-        {
-            if (maxCount < 0) return false;
-
-            // if (deleteExtra > maxCount) throw warning
-            
-            string[] files = System.IO.Directory.GetFiles(dir, "*", SearchOption.TopDirectoryOnly);
-            if (files.Length <= maxCount)
-            {
-                hasCleanedUp = true;
-                return false;
-            }
-
-           
-
-            //Oops, look like we have to clean up a little.
-
-            List<KeyValuePair<string, DateTime>> fileinfo = new List<KeyValuePair<string, DateTime>>(files.Length);
-
-            //Sory by last access time
-            foreach (string s in files)
-            {
-                fileinfo.Add(new KeyValuePair<string, DateTime>(s, System.IO.File.GetLastAccessTimeUtc(s)));
-            }
-            fileinfo.Sort(CompareFiles);
-
-
-            int deleteCount = files.Length - maxCount + deleteExtra;
-
-            bool deletedSome = false;
-            //Delete files, Least recently used order
-            for (int i = 0; i < deleteCount && i < fileinfo.Count; i++)
-            {
-                //Never delete .config files
-                if (System.IO.Path.GetExtension(fileinfo[i].Key).Equals("config", StringComparison.OrdinalIgnoreCase)){
-                    deleteCount++; //Just delete an extra file instead...
-                    continue;
-                }
-                //All other files can be deleted.
-                try
-                {
-                    System.IO.File.Delete(fileinfo[i].Key);
-                    deletedSome = true;
-                }
-                catch (IOException ioe)
-                {
-                    if (i >= fileinfo.Count - 1)
-                    {
-                        //Looks like we're at the end.
-                        throw new DiskCacheException("Couldn't delete enough files to make room for new images. Please increase MaxCachedFiles or solve I/O isses/", ioe);
-                       
-                    }
-
-                    //Try an extra candidate to make up for this missing one
-                    deleteCount++;
-                    LogException(ioe);
-
-                }
-            }
-
-            hasCleanedUp = true;
-            filesUpdatedSinceCleanup = 0;
-            return deletedSome;
-        }
-        /// <summary>
-        /// Compares the file dates on the arguments
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        private static int CompareFiles(KeyValuePair<string, DateTime> x, KeyValuePair<string, DateTime> y)
-        {
-            return x.Value.CompareTo(y.Value);
-        }
-
-
-        /// <summary>
-        /// Returns true if both dates are equal (to the nearest 200th of a second)
-        /// </summary>
-        /// <param name="modifiedOn"></param>
-        /// <param name="dateTime"></param>
-        /// <returns></returns>
-        private static bool RoughCompare(DateTime d1, DateTime d2)
-        {
-            return (new TimeSpan((long)Math.Abs(d1.Ticks - d2.Ticks)).TotalMilliseconds <= 5);
-        }
-
-
-
-        /// <summary>
-        /// Returns true if successful, false if not.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="identifier"></param>
-        /// <returns></returns>
-       /* public static bool SendDiskCache(HttpContext context, string identifier)
-        {
-            string filename = GetFilenameFromId(identifier);
-            if (filename == null) return false;
-            if (!System.IO.File.Exists(filename)) return false;
-
-            context.Response.TransmitFile(filename);
-            return true;
-        }*/
-
-        /// <summary>
-        /// Clears the cache directory. Returns true if successful. (In-use files make this rare).
-        /// </summary>
-        /// <returns></returns>
-        public bool ClearCacheDir()
-        {
-            return TrimDirectoryFiles(GetCacheDir(), 0, 0);
-        }
-        
-      
 
         /// <summary>
         /// Returns true if the image caching directory (GetCacheDir()) exists.
@@ -462,60 +306,20 @@ namespace ImageResizer.Plugins.DiskCache
             return false;
         }
 
-        
 
-        /// <summary>
-        /// Returns the number of files inside the image cache directory (recursive traversal)
-        /// </summary>
-        /// <returns></returns>
-        public int GetCacheDirFilesCount()
-        {
-            if (CacheDirExists())
-            {
-                string dir = GetCacheDir();
-                string[] files = System.IO.Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
-                return files.Length;
-            }
-            return 0;
-        }
-        /// <summary>
-        /// Returns the summation of the size of the indiviual files in the image cache directory (recursive traversal)
-        /// </summary>
-        /// <returns></returns>
-        public long GetCacheDirTotalSize()
-        {
-            if (CacheDirExists())
-            {
-                string dir = GetCacheDir();
-                long totalSize = 0;
-                string[] files = System.IO.Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
-                foreach (string s in files)
-                {
 
-                    FileInfo fi = new FileInfo(s);
-                    totalSize += fi.Length;
-                }
-                return totalSize;
-            }
-            return 0;
 
-        }
-        /// <summary>
-        /// Returns the average size of a file in the image cache directory. Expensive, calls GetCacheDirFilesCount() and GetCacheDirTotalSize()
-        /// </summary>
-        /// <returns></returns>
-        public int GetAverageCachedFileSize()
-        {
-            double files = GetCacheDirFilesCount();
-            if (files < 1) return 0;
 
-            return (int)Math.Round((double)GetCacheDirTotalSize() / files);
+
+
+
+
+        public IPlugin Install(Config c) {
+            throw new NotImplementedException();
         }
 
-
-
-        public bool CanProcess(HttpContext current, IResponseArgs e) {
-            return true;//Add support for nocache
+        public bool Uninstall(Config c) {
+            throw new NotImplementedException();
         }
     }
 }

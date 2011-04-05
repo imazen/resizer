@@ -17,10 +17,10 @@ namespace ImageResizer.Util {
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public string getCachedVersionFilename(yrl request, int subfolders, string dirSeparator) {
+        public string hash(string data, int subfolders, string dirSeparator) {
             
             SHA256 h = System.Security.Cryptography.SHA256.Create();
-            byte[] hash = h.ComputeHash(new System.Text.UTF8Encoding().GetBytes(request.ToString().ToLower()));
+            byte[] hash = h.ComputeHash(new System.Text.UTF8Encoding().GetBytes(data));
 
             //If configured, place files in subfolders.
             string subfolder = "";
