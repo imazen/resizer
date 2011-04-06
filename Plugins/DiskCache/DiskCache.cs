@@ -64,7 +64,7 @@ namespace ImageResizer.Plugins.DiskCache
         bool disabled;
         int fileLockTimeout;
 
-        public DiskCache(string dir, int subfolders, bool autoClean, int maxImagesPerFolder, bool debugMode, int fileLockTimeout){
+        public DiskCache(string virtualDir, int subfolders, bool autoClean, int maxImagesPerFolder, bool debugMode, int fileLockTimeout){
             this.dir = dir;
             this.subfolders = subfolders;
             this.autoClean = autoClean;
@@ -83,6 +83,17 @@ namespace ImageResizer.Plugins.DiskCache
             subfolders = c.get("diskcache.subfolders",0);
             fileLockTimeout = c.get("diskcache.fileLockTimeout", 10000); //10s
         }
+
+
+
+        public IPlugin Install(Config c) {
+            throw new NotImplementedException();
+        }
+
+        public bool Uninstall(Config c) {
+            throw new NotImplementedException();
+        }
+
         public string CacheDir{
             get{
                 return dir;
@@ -99,20 +110,7 @@ namespace ImageResizer.Plugins.DiskCache
             return !string.IsNullOrEmpty(CacheDir);
         }
 
-        /// <summary>
-        /// Returns the physical path of the image cache dir. Calculated from imageresizer.diskcache.dir (yrl form). throws an exception if missing
-        /// </summary>
-        /// <returns></returns>
-        public string GetCacheDir()
-        {
-            yrl conv = (!string.IsNullOrEmpty(dir)) ? conv = yrl.FromString(dir) : null;
-
-            if (yrl.IsNullOrEmpty(conv))  throw new DiskCacheException("The 'diskcache.dir' setting has an invalid value. A directory name is required for image caching to work.");
-            
-            return conv.Local;
-        }
-        
-        
+  
 
         private long filesUpdatedSinceCleanup = 0;
         private bool hasCleanedUp = false;
@@ -121,87 +119,17 @@ namespace ImageResizer.Plugins.DiskCache
             return IsConfigurationValid();//Add support for nocache
         }
 
-        public string getRelativeCachedFilename(IResponseArgs e) {
-            return new UrlHasher().hash(e.RequestKey,subfolders,"/") + '.' + e.SuggestedExtension;
-        }
-        /// <summary>
-        /// The only objects in this collection should be for open files. 
-        /// </summary>
-        private static Dictionary<String, Object> fileLocks = new Dictionary<string, object>(StringComparer.Ordinal);
-
 
         public void Process(HttpContext context, IResponseArgs e) {
-            string relativePath = getRelativeCachedFilename(e); //Relative to the cache directory. Not relative to the app or domain root
-            string virtualPath = VirtualCacheDir.TrimEnd('/') + '/' + relativePath; //Relative to the domain
-            string physicalPath = HostingEnvironment.MapPath(virtualPath); //Physical path
-               
-        
-             PrepareCacheDir();
-            //Fixed - implement locking so concurrent requests for the same file don't cause an I/O issue.
-            if ((!e.HasModifiedDate && Exists(relativePath,physicalPath)) || !IsCachedVersionValid(e.GetModifiedDateUTC(), relativePath,physicalPath))
-            {
-                //Create or obtain a blank object for locking purposes. Store or retrieve using the filename as a key.
-                string key = relativePath.ToUpperInvariant();
 
-                object fileLock = null;
-                lock (fileLocks) //We have to lock the dictionary, since otherwise two locks for the same file could be created and assigned at the same time. (i.e, between TryGetValue and the assignment)
-                {
-                    //If it doesn't exist
-                    if (!fileLocks.TryGetValue(key, out fileLock))
-                        fileLocks[key] = fileLock = new Object(); //make a new lock!
-                }
-                //We should now have an exclusive lock for this filename.  We're only going to hold this thread open for fileLockTimeout ms - too many threads blocked kills performance.
-                //We don't use a standard lock{}, since that could block as long as the underlying I/O calls.
-                if (System.Threading.Monitor.TryEnter(fileLock,fileLockTimeout))
-                {
-                    try
-                    {
-                        DateTime modDate = e.HasModifiedDate ? e.GetModifiedDateUTC() : DateTime.MinValue;
-                        if ((!e.HasModifiedDate && Exists(physicalPath)) || !IsCachedVersionValid(modDate, physicalPath))
-                        {
-                            //Create subdirectory if needed.
-                            if (!Directory.Exists(Path.GetDirectoryName(physicalPath))) Directory.CreateDirectory(Path.GetDirectoryName(physicalPath));
-                            
-                            //Open stream 
-                            System.IO.FileStream fs = new FileStream(physicalPath, FileMode.Create, FileAccess.Write);
-                            using (fs) {
-                                //Run callback to process and encode image
-                                e.ResizeImageToStream(fs);
-                            }
-                            filesUpdatedSinceCleanup++;
-                            //Update the write time to match - this is how we know whether they are in sync.
-                            if (e.HasModifiedDate) System.IO.File.SetLastWriteTimeUtc(physicalPath,modDate);
-                            System.IO.File.SetCreationTimeUtc(physicalPath, DateTime.UtcNow);
-                            //TODO: tell the cache index what we have done
-                        }
-                    }
-                    finally
-                    {
-                        //release lock
-                        System.Threading.Monitor.Exit(fileLock);
-                    }
-                }
-                else
-                {
-                    //Only one resize operation on a source file occurs at a time.
-                    //fileLockTimeout was not enough to acquire a lock on the file
-                    throw new ApplicationException("Failed to acquire a lock on file \"" + physicalPath + "\" within " + fileLockTimeout + "ms. Image resizing failed.");
-                }
-                //Attempt cleanup of lock objects. TryEnter() failes if there is anybody else holding the lock at that moment
-                if (System.Threading.Monitor.TryEnter(fileLocks))
-                {
-                    try
-                    {
-                        if (System.Threading.Monitor.TryEnter(fileLock)) //Try entering on the file-specific lock. 
-                        {
-                            try{ fileLocks.Remove(key);  } //It succeeds, so no-one else is locking on it - clean it up.
-                            finally { System.Threading.Monitor.Exit(fileLock); }
-                        }
-                    }
-                    finally { System.Threading.Monitor.Exit(fileLocks); }
-                }
-                //Ideally the only objects in fileLocks will be open operations now.
-            }
+            //Query for the modified date of the source file. If the source file changes on us, we (may) end up saving the newer version in the cache properly, but with an older modified date.
+            //This will not cause any problems from a behavioral standpoint - the next request for the image will cause the file to be overwritten and the modified date updated.
+            DateTime modDate = e.HasModifiedDate ? e.GetModifiedDateUTC() : DateTime.MinValue;
+
+            CheckWebConfigEvery5(physicalPath);
+
+            string physicalPath = new CustomDiskCache().GetCachedPath(e.RequestKey, e.SuggestedExtension, e.ResizeImageToStream, modDate, fileLockTimeout);
+
 
             context.Items["FinalCachedFile"] = physicalPath;
 
@@ -212,114 +140,80 @@ namespace ImageResizer.Plugins.DiskCache
         }
 
 
-        
-        /// <summary>
-        /// Returns true if the specified file exists. 
-        /// </summary>
-        /// <returns></returns>
-        public bool Exists(string localCachedFile){
-            if (string.IsNullOrEmpty(localCachedFile)) return false;
-            if (!System.IO.File.Exists(localCachedFile)) return false;
-            return true;
-        }
-        /// <summary>
-        ///  Returns true if localCachedFile exists and matches sourceDataModifiedUTC.
-        /// </summary>
-        /// <param name="sourceDataModifiedUTC"></param>
-        /// <param name="localCachedFile"></param>
-        /// <returns></returns>
-        public bool IsCachedVersionValid(DateTime sourceDataModifiedUTC, string localCachedFile)
-        {
-            if (string.IsNullOrEmpty(localCachedFile)) return false;
-            if (!Exists(localCachedFile)) return false;
-
-
-            //When we save cached files to disk, we set the write time to that of the source file.
-            //This allows us to track if the source file has changed.
-
-            DateTime cached = System.IO.File.GetLastWriteTimeUtc(localCachedFile);
-            return RoughCompare(cached, sourceDataModifiedUTC);
-        }
-        /// <summary>
-        /// Returns true if both dates are equal (to the nearest 200th of a second)
-        /// </summary>
-        /// <param name="modifiedOn"></param>
-        /// <param name="dateTime"></param>
-        /// <returns></returns>
-        private static bool RoughCompare(DateTime d1, DateTime d2) {
-            return Math.Abs(d1.Ticks - d2.Ticks) < TimeSpan.TicksPerMillisecond * 5;
-        }
-
-
-    
         /// <summary>
         /// This string contains the contents of a web.conig file that sets URL authorization to "deny all" inside the current directory.
         /// </summary>
-        private const string webConfigFile =
+        protected const string defaultWebConfigContents =
             "<?xml version=\"1.0\"?>" +
             "<configuration xmlns=\"http://schemas.microsoft.com/.NetConfiguration/v2.0\">" +
             "<system.web><authorization>" +
             "<deny users=\"*\" />" +
             "</authorization></system.web></configuration>";
 
+        protected virtual string getNewWebConfigContents() {
+            return defaultWebConfigContents;
+        }
 
-        private static readonly object webConfigSyncObj = new object();
 
+        private readonly object _webConfigSyncObj = new object();
+
+        private volatile DateTime _lastCheckedWebConfig = DateTime.MinValue;
+        private volatile bool _checkedWebConfigOnce = false;
         /// <summary>
-        /// Creates the directory for caching if needed, and performs 'garbage collection'
-        /// Throws a DiskCacheException if the cache direcotry isn't specified in web.config
-        /// Creates a web.config file in the caching directory to prevent direct access.
+        /// Verifies a Web.config file is present in the specified directory every 5 minutes that the function is called
         /// </summary>
         /// <returns></returns>
-        public void PrepareCacheDir()
-        {
-            string dir = GetCacheDir();
-
-
-
-            //Add URL authorization protection using a web.config file.
-            yrl wc = yrl.Combine(new yrl(dir), new yrl("Web.config"));
-            if (!wc.FileExists) {
-                lock (webConfigSyncObj) {
-                    //Create the cache directory if it doesn't exist.
-                    if (!System.IO.Directory.Exists(dir))
-                        System.IO.Directory.CreateDirectory(dir);
-                    if (!wc.FileExists){
-                        System.IO.File.WriteAllText(wc.Local, webConfigFile);
-                    }
+        public void CheckWebConfigEvery5(string physicalPath) {
+            if (_lastCheckedWebConfig < DateTime.UtcNow.Subtract(new TimeSpan(0, 5, 0))) {
+                lock (_webConfigSyncObj) {
+                    if (_lastCheckedWebConfig < DateTime.UtcNow.Subtract(new TimeSpan(0, 5, 0)))
+                        _checkWebConfig(physicalPath);
                 }
             }
-
+        }
 
 
         /// <summary>
-        /// Returns true if the image caching directory (GetCacheDir()) exists.
+        /// If CheckWebConfig has never executed, it is executed immediately, but only once. 
+        /// Verifies a Web.config file is present in the specified directory, and creates it if needed.
         /// </summary>
-        /// <returns></returns>
-        public bool CacheDirExists()
-        {
-            string dir = GetCacheDir();
-            if (!string.IsNullOrEmpty(dir))
-            {
-                return System.IO.Directory.Exists(dir);
+        /// <param name="physicalPath"></param>
+        protected void CheckWebConfigOnce(string physicalPath) {
+            if (_checkedWebConfigOnce) return;
+            lock (_webConfigSyncObj) {
+                if (_checkedWebConfigOnce) return;
+                _checkWebConfig(physicalPath);
             }
-            return false;
+        }
+        public void CheckWebConfig(string physicalPath) {
+            lock (_webConfigSyncObj) {
+                _checkWebConfig(physicalPath);
+            }
+        }
+        /// <summary>
+        /// Should only be called inside a lock. Creates the cache dir and the web.config file if they are missing. Updates
+        /// _lastCheckedWebConfig and _checkedWebConfigOnce
+        /// </summary>
+        /// <param name="physicalPath"></param>
+        protected void _checkWebConfig(string physicalPath){
+            try {
+                string webConfigPath = physicalPath.TrimEnd('/', '\\') + System.IO.Path.DirectorySeparatorChar + "Web.config";
+                if (System.IO.File.Exists(webConfigPath)) return; //Already exists, quit
+
+
+                //Web.config doesn't exist? make sure the directory exists!
+                if (!System.IO.Directory.Exists(physicalPath))
+                    System.IO.Directory.CreateDirectory(physicalPath);
+
+                //Create the Web.config file
+                System.IO.File.WriteAllText(webConfigPath, getNewWebConfigContents());
+                
+            } finally {
+                _lastCheckedWebConfig = DateTime.UtcNow;
+                _checkedWebConfigOnce = true;
+            }
         }
 
 
-
-
-
-
-
-
-
-        public IPlugin Install(Config c) {
-            throw new NotImplementedException();
-        }
-
-        public bool Uninstall(Config c) {
-            throw new NotImplementedException();
-        }
     }
 }
