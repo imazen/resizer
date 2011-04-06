@@ -1,55 +1,88 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 namespace ImageResizer.Plugins.DiskCache {
     public class CacheIndex {
-        
-
-    }
-
-
-    /// <summary>
-    /// Represents a cached view of a folder of cached items
-    /// </summary>
-    public class CachedFolder {
-        private volatile bool isPopulated = false;
-
-        public bool IsPopulated {
-            get { return isPopulated; }
-            set { isPopulated = value; }
-        }
-
-        protected Dictionary<string, CachedFolder> folders = new Dictionary<string, CachedFolder>(StringComparer.OrdinalIgnoreCase);
-
-        protected Dictionary<string, CachedFileInfo> files = new Dictionary<string, CachedFileInfo>(StringComparer.OrdinalIgnoreCase);
-
         /// <summary>
-        /// Returns null if (a) the file doesn't exist, or (b) the file isn't populated. Calling code should always fall back to filesystem calls on a null result.
+        /// Returns true if the specified file exists on the filesystem.
         /// </summary>
         /// <param name="relativePath"></param>
+        /// <param name="physicalPath"></param>
+        /// <param name="doubleCheck">True to *always* check with System.IO, even if the cache says that the file exists</param>
         /// <returns></returns>
-        public CachedFileInfo getFileInfo(string relativePath) {
-            int slash = relativePath.IndexOf('/');
-            if (slash < 0) {
-                CachedFileInfo f;
-                if (files.TryGetValue(relativePath, out f)) return f; //cache hit
-            } else {
-                //Try to access subfolder
-                string folder = relativePath.Substring(0, slash);
-                CachedFolder f;
-                if (!folders.TryGetValue(folder, out f)) f = null;
-                //Recurse if possible
-                if (f != null) return f.getFileInfo(relativePath.Substring(slash + 1));
-            }
-            return null; //cache miss or file not found
+        public bool Exists(string relativePath, string physicalPath, bool doubleCheck) {
+
+        }
+        /// <summary>
+        /// Returns true if the specified file has the specified modified date.
+        /// </summary>
+        /// <param name="modDate"></param>
+        /// <param name="relativePath"></param>
+        /// <param name="physicalPath"></param>
+        /// <param name="doubleCheckExists">True to *always* verify the file exists with System.IO, even if the cache says the file exists</param>
+        /// <returns></returns>
+        public bool ModifiedMatches(DateTime modDate, string relativePath, string physicalPath, bool doubleCheckExists) {
+        }
+        /// <summary>
+        /// Updates the dates on the specified file
+        /// </summary>
+        /// <param name="relativePath"></param>
+        /// <param name="modDate"></param>
+        /// <param name="createdDate"></param>
+        /// <returns></returns>
+        public bool UpdateTimes(string relativePath, DateTime modDate, DateTime createdDate) {
+        }
+        /// <summary>
+        /// Updates the 'accessed' date on the specified file
+        /// </summary>
+        /// <param name="relativePath"></param>
+        public void UsedFile(string relativePath) {
+
         }
 
-    }
+        public void AddFile(string relativePath, CachedFileInfo info) {
+        }
+        public bool RemoveFile(string relativePath) {
+        }
+        public CachedFolder GetCopy(string relativePath) {
+        }
 
-    public class CachedFileInfo {
-        public volatile DateTime modifiedUtc = DateTime.MinValue;
-        public volatile DateTime accessedUtc = DateTime.MinValue;
-        public volatile DateTime updatedUtc = DateTime.MinValue;
+
+        /// <summary>
+        /// Returns true if the specified file exists. 
+        /// </summary>
+        /// <returns></returns>
+        public bool Exists(string localCachedFile) {
+            if (!System.IO.File.Exists(localCachedFile)) return false;
+            return true;
+        }
+        /// <summary>
+        ///  Returns true if localCachedFile exists and matches sourceDataModifiedUTC.
+        /// </summary>
+        /// <param name="sourceDataModifiedUTC"></param>
+        /// <param name="localCachedFile"></param>
+        /// <returns></returns>
+        public bool IsCachedVersionValid(DateTime sourceDataModifiedUTC, string localCachedFile) {
+            if (string.IsNullOrEmpty(localCachedFile)) return false;
+            if (!Exists(localCachedFile)) return false;
+
+
+            //When we save cached files to disk, we set the write time to that of the source file.
+            //This allows us to track if the source file has changed.
+
+            DateTime cached = System.IO.File.GetLastWriteTimeUtc(localCachedFile);
+            return RoughCompare(cached, sourceDataModifiedUTC);
+        }
+        /// <summary>
+        /// Returns true if both dates are equal (to the nearest 200th of a second)
+        /// </summary>
+        /// <param name="modifiedOn"></param>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        protected static bool RoughCompare(DateTime d1, DateTime d2) {
+            return Math.Abs(d1.Ticks - d2.Ticks) < TimeSpan.TicksPerMillisecond * 5;
+        }
     }
 }
