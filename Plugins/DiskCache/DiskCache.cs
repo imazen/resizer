@@ -52,168 +52,244 @@ namespace ImageResizer.Plugins.DiskCache
         public DiskCacheException(string message):base(message){}
         public DiskCacheException(string message, Exception innerException) : base(message, innerException) { }
     }
+
+
+
     /// <summary>
     /// Provides methods for creating, maintaining, and securing the disk cache. 
     /// </summary>
     public class DiskCache: ICache, IPlugin
     {
-        protected string dir;
-        protected int subfolders;
-        bool autoClean;
-        int maxImagesPerFolder;
-        bool disabled;
-        int fileLockTimeout;
+        private int subfolders = 32;
+        /// <summary>
+        /// Controls how many subfolders to use for disk caching. Rounded to the next power of to. (1->2, 3->4, 5->8, 9->16, 17->32, 33->64, 65->128,129->256,etc.)
+        /// NTFS does not handle more than 8,000 files per folder well. Larger folders also make cleanup more resource-intensive.
+        /// Defaults to 32, which combined with the default setting of 400 images per folder, allows for scalability to 12,800 actively used image versions. 
+        /// For example, given a desired cache size of 100,000 items, this should be set to 256.
+        /// </summary>
+        public int Subfolders {
+            get { return subfolders; }
+            set { BeforeSettingChanged(); subfolders = value; }
+        }
 
-        public DiskCache(string virtualDir, int subfolders, bool autoClean, int maxImagesPerFolder, bool debugMode, int fileLockTimeout){
-            this.dir = dir;
-            this.subfolders = subfolders;
-            this.autoClean = autoClean;
-            this.maxImagesPerFolder = maxImagesPerFolder;
-            this.debugMode = debugMode;
-            this.fileLockTimeout = fileLockTimeout;
+        private bool enabled = true;
+        /// <summary>
+        /// Allows disk caching to be disabled for debuginng purposes. Defaults to true.
+        /// </summary>
+        public bool Enabled {
+            get { return enabled; }
+            set { BeforeSettingChanged(); enabled = value; }
+        }
+
+
+        private bool autoClean = false;
+        /// <summary>
+        /// If true, items from the cache folder will be automatically 'garbage collected' if the cache size limits are exceeded.
+        /// Defaults to false.
+        /// </summary>
+        public bool AutoClean {
+            get { return autoClean; }
+            set { BeforeSettingChanged();  autoClean = value; }
+        }
+        private CleanupStrategy cleanupStrategy = new CleanupStrategy();
+        /// <summary>
+        /// Only relevant when AutoClean=true. Settings about how background cache cleanup are performed.
+        /// </summary>
+        public CleanupStrategy CleanupStrategy {
+            get { return cleanupStrategy; }
+            set { BeforeSettingChanged(); cleanupStrategy = value; }
+        }
+
+
+        protected int cacheAccessTimeout = 15000;
+        /// <summary>
+        /// How many milliseconds to wait for a cached item to be available. Values below 0 are set to 0.
+        /// </summary>
+        public int CacheAccessTimeout {
+            get { return cacheAccessTimeout; }
+            set { BeforeSettingChanged(); cacheAccessTimeout = Math.Max(value,0); }
+        }
+
+        private bool hashModifiedDate = true;
+        /// <summary>
+        /// If true, when a source file is changed, a new file will be created instead of overwriting the old cached file.
+        /// This helps prevent file lock contention on high-traffic servers. Defaults to true. 
+        /// Changes the hash function, so you should delete the cache folder whenever this setting is modified.
+        /// </summary>
+        public bool HashModifiedDate {
+            get { return hashModifiedDate; }
+            set { BeforeSettingChanged(); hashModifiedDate = value; }
+        }
+
+        protected string virtualDir =  HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/imagecache";
+        /// <summary>
+        /// Sets the location of the cache directory. 
+        /// Can be a virtual path (like /App/imagecache) or an application-relative path (like ~/imagecache, the default).
+        /// Relative paths are assummed to be relative to the application root.
+        /// All values are converted to virtual path format upon assignment (/App/imagecache)
+        /// Will throw an InvalidOperationException if changed after the plugin is installed.
+        /// </summary>
+        public string VirtualCacheDir { 
+            get { 
+                return virtualDir; 
+            }
+            set {
+                BeforeSettingChanged();
+                virtualDir =  string.IsNullOrEmpty(value) ? null : value;
+                if (virtualDir != null){
+                    //Default to application-relative path if no leading slash is present. 
+                    //Resolve the tilde if present.
+                    if (virtualDir.StartsWith("~")) virtualDir = HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + virtualDir.Substring(1);
+                    else if (!virtualDir.StartsWith("/")) virtualDir =  HostingEnvironment.ApplicationVirtualPath.TrimEnd('/')  + "/" + virtualDir;
+                }
+                
+            }
         }
         /// <summary>
-        /// Uses the defaults from the resizing.diskcache configuration section
+        /// Returns the physical path of the cache directory specified in VirtualCacheDir.
         /// </summary>
-        public DiskCache(Config c){
-            disabled = c.get("diskcache.disable",false);
-            autoClean = c.get("diskcache.autoClean",false);
-            dir = c.get("diskcache.dir","~/imagecache");
-            maxImagesPerFolder =  c.get("diskcache.maxImagesPerFolder", 8000);
-            subfolders = c.get("diskcache.subfolders",0);
-            fileLockTimeout = c.get("diskcache.fileLockTimeout", 10000); //10s
+        public string PhysicalCacheDir {
+            get {
+                if (!string.IsNullOrEmpty(VirtualCacheDir)) return HostingEnvironment.MapPath(VirtualCacheDir);
+                return null;
+            }
+        }
+        /// <summary>
+        /// Throws an exception if the class is already modified
+        /// </summary>
+        protected void BeforeSettingChanged() {
+            if (_started) throw new InvalidOperationException("DiskCache settings may not be adjusted after it is started.");
+        }
+        /// <summary>
+        /// Creates a DiskCache instance at the specified location. Must be installed as a plugin to be operational.
+        /// </summary>
+        /// <param name="virtualDir"></param>
+        public DiskCache(string virtualDir){
+            VirtualCacheDir = virtualDir;
+        }
+        /// <summary>
+        /// Uses the defaults from the resizing.diskcache section in the specified configuration.
+        /// Throws an invalid operation exception if the DiskCache is already started.
+        /// </summary>
+        public void LoadSettings(Config c){
+            Subfolders = c.get("diskcache.subfolders", Subfolders);
+            Enabled = c.get("diskcache.enabled", Enabled);
+            AutoClean = c.get("diskcache.autoClean", AutoClean);
+            VirtualCacheDir = c.get("diskcache.dir", VirtualCacheDir);
+            HashModifiedDate = c.get("diskcache.hashModifiedDate", HashModifiedDate);
+            CacheAccessTimeout = c.get("diskcache.cacheAccessTimeout", CacheAccessTimeout);
         }
 
 
-
+        /// <summary>
+        /// Loads the settings from 'c', starts the cache, and registers the plugin.
+        /// Will throw an invalidoperationexception if already started.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public IPlugin Install(Config c) {
-            throw new NotImplementedException();
+            LoadSettings(c);
+            Start();
+            c.Plugins.add_plugin(this);
+            return this;
         }
 
         public bool Uninstall(Config c) {
-            throw new NotImplementedException();
+            c.Plugins.remove_plugin(this);
+            return this.Stop();
         }
 
-        public string CacheDir{
-            get{
-                return dir;
-            }
-            set{
-                dir = value;
-                virtualDir = string.IsNullOrEmpty(dir) ? null : dir.Replace("~",HostingEnvironment.ApplicationVirtualPath);
-            }
-        }
-        protected string virtualDir  = null;
-        public string VirtualCacheDir{get{return virtualDir;}}
 
+        /// <summary>
+        /// Returns true if the configured settings are valid.
+        /// </summary>
+        /// <returns></returns>
         public bool IsConfigurationValid(){
-            return !string.IsNullOrEmpty(CacheDir);
+            return !string.IsNullOrEmpty(VirtualCacheDir) && this.Enabled;
         }
 
-  
 
-        private long filesUpdatedSinceCleanup = 0;
-        private bool hasCleanedUp = false;
+
+        
+        protected CustomDiskCache cache = null;
+        protected CleanupManager cleaner = null;
+        protected WebConfigWriter writer = null;
+
+        protected readonly object _startSync = new object();
+        protected volatile bool _started = false;
+        /// <summary>
+        /// Returns true if the DiskCache instance is operational.
+        /// </summary>
+        public bool Started { get { return _started; } }
+        /// <summary>
+        /// Attempts to start the DiskCache using the current settings. Returns true if succesful or if already started. Returns false on a configuration error.
+        /// Called by Install()
+        /// </summary>
+        public bool Start() {
+            if (!IsConfigurationValid()) return false;
+            lock (_startSync) {
+                if (_started) return true;
+                if (!IsConfigurationValid()) return false;
+
+                //Init the writer.
+                writer = new WebConfigWriter(PhysicalCacheDir);
+                //Init the inner cache
+                cache = new CustomDiskCache(PhysicalCacheDir, Subfolders, HashModifiedDate);
+                //Init the cleanup strategy
+                if (AutoClean && cleanupStrategy == null) cleanupStrategy = new CleanupStrategy(); //Default settings if null
+                //Init the cleanup worker
+                if (AutoClean) cleaner = new CleanupManager(cache, cleanupStrategy);
+
+                //Started successfully
+                _started = true;
+                return true;
+            }
+        }
+        /// <summary>
+        /// Returns true if stopped succesfully. Cannot be restarted
+        /// </summary>
+        /// <returns></returns>
+        public bool Stop() {
+            if (cleaner != null) cleaner.Dispose();
+            cleaner = null;
+            return true;
+        }
 
         public bool CanProcess(HttpContext current, IResponseArgs e) {
-            return IsConfigurationValid();//Add support for nocache
+            return Started;//Add support for nocache
         }
 
 
         public void Process(HttpContext context, IResponseArgs e) {
 
-            //Query for the modified date of the source file. If the source file changes on us, we (may) end up saving the newer version in the cache properly, but with an older modified date.
-            //This will not cause any problems from a behavioral standpoint - the next request for the image will cause the file to be overwritten and the modified date updated.
+            //Query for the modified date of the source file. If the source file changes on us during the write,
+            //we (may) end up saving the newer version in the cache properly, but with an older modified date.
+            //This will not cause any actual problems from a behavioral standpoint - the next request for the 
+            //image will cause the file to be overwritten and the modified date updated.
             DateTime modDate = e.HasModifiedDate ? e.GetModifiedDateUTC() : DateTime.MinValue;
 
-            CheckWebConfigEvery5(physicalPath);
+            //Verify web.config exists in the cache folder.
+            writer.CheckWebConfigEvery5();
 
-            string physicalPath = new CustomDiskCache().GetCachedPath(e.RequestKey, e.SuggestedExtension, e.ResizeImageToStream, modDate, fileLockTimeout);
+            //Cache the data to disk and return a path.
+            CacheResult r = cache.GetCachedFile(e.RequestKey, e.SuggestedExtension, e.ResizeImageToStream, modDate, CacheAccessTimeout);
+
+            //Fail
+            if (r.Result == CacheQueryResult.Failed) 
+                throw new ApplicationException("Failed to acquire a lock on file \"" + r.PhysicalPath + "\" within " + CacheAccessTimeout + "ms. Caching failed.");
 
 
-            context.Items["FinalCachedFile"] = physicalPath;
+            context.Items["FinalCachedFile"] = r.PhysicalPath;
 
-            
+
+            //Calculate the virtual path
+            string virtualPath = VirtualCacheDir.TrimEnd('/') + '/' + r.RelativePath.Replace('\\', '/').TrimStart('/');
+
             //Rewrite to cached, resized image.
             context.RewritePath(virtualPath, false);
-
         }
 
 
-        /// <summary>
-        /// This string contains the contents of a web.conig file that sets URL authorization to "deny all" inside the current directory.
-        /// </summary>
-        protected const string defaultWebConfigContents =
-            "<?xml version=\"1.0\"?>" +
-            "<configuration xmlns=\"http://schemas.microsoft.com/.NetConfiguration/v2.0\">" +
-            "<system.web><authorization>" +
-            "<deny users=\"*\" />" +
-            "</authorization></system.web></configuration>";
-
-        protected virtual string getNewWebConfigContents() {
-            return defaultWebConfigContents;
-        }
-
-
-        private readonly object _webConfigSyncObj = new object();
-
-        private volatile DateTime _lastCheckedWebConfig = DateTime.MinValue;
-        private volatile bool _checkedWebConfigOnce = false;
-        /// <summary>
-        /// Verifies a Web.config file is present in the specified directory every 5 minutes that the function is called
-        /// </summary>
-        /// <returns></returns>
-        public void CheckWebConfigEvery5(string physicalPath) {
-            if (_lastCheckedWebConfig < DateTime.UtcNow.Subtract(new TimeSpan(0, 5, 0))) {
-                lock (_webConfigSyncObj) {
-                    if (_lastCheckedWebConfig < DateTime.UtcNow.Subtract(new TimeSpan(0, 5, 0)))
-                        _checkWebConfig(physicalPath);
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// If CheckWebConfig has never executed, it is executed immediately, but only once. 
-        /// Verifies a Web.config file is present in the specified directory, and creates it if needed.
-        /// </summary>
-        /// <param name="physicalPath"></param>
-        protected void CheckWebConfigOnce(string physicalPath) {
-            if (_checkedWebConfigOnce) return;
-            lock (_webConfigSyncObj) {
-                if (_checkedWebConfigOnce) return;
-                _checkWebConfig(physicalPath);
-            }
-        }
-        public void CheckWebConfig(string physicalPath) {
-            lock (_webConfigSyncObj) {
-                _checkWebConfig(physicalPath);
-            }
-        }
-        /// <summary>
-        /// Should only be called inside a lock. Creates the cache dir and the web.config file if they are missing. Updates
-        /// _lastCheckedWebConfig and _checkedWebConfigOnce
-        /// </summary>
-        /// <param name="physicalPath"></param>
-        protected void _checkWebConfig(string physicalPath){
-            try {
-                string webConfigPath = physicalPath.TrimEnd('/', '\\') + System.IO.Path.DirectorySeparatorChar + "Web.config";
-                if (System.IO.File.Exists(webConfigPath)) return; //Already exists, quit
-
-
-                //Web.config doesn't exist? make sure the directory exists!
-                if (!System.IO.Directory.Exists(physicalPath))
-                    System.IO.Directory.CreateDirectory(physicalPath);
-
-                //Create the Web.config file
-                System.IO.File.WriteAllText(webConfigPath, getNewWebConfigContents());
-                
-            } finally {
-                _lastCheckedWebConfig = DateTime.UtcNow;
-                _checkedWebConfigOnce = true;
-            }
-        }
-
-
+       
     }
 }

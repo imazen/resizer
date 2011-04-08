@@ -11,6 +11,17 @@ namespace ImageResizer.Plugins.DiskCache {
             accessedUtc = f.LastAccessTimeUtc;
             updatedUtc = f.CreationTimeUtc;
         }
+        /// <summary>
+        /// Uses old.AccessedUtc if it is newer than FileInfo.LastAccessTimeUtc
+        /// </summary>
+        /// <param name="f"></param>
+        /// <param name="old"></param>
+        public CachedFileInfo(FileInfo f, CachedFileInfo old) {
+            modifiedUtc = f.LastWriteTimeUtc;
+            accessedUtc = f.LastAccessTimeUtc;
+            if (old != null && accessedUtc < old.accessedUtc) accessedUtc = old.accessedUtc; //Use the larger value
+            updatedUtc = f.CreationTimeUtc;
+        }
 
         public CachedFileInfo(DateTime modifiedDate, DateTime createdDate) {
             this.modifiedUtc = modifiedDate;
@@ -27,21 +38,21 @@ namespace ImageResizer.Plugins.DiskCache {
             this.updatedUtc = f.updatedUtc;
             this.accessedUtc = accessedDate;
         }
-        private volatile DateTime modifiedUtc = DateTime.MinValue;
+        private  DateTime modifiedUtc = DateTime.MinValue;
         /// <summary>
         /// The modified date of the source file that the cached file is based on.
         /// </summary>
         public DateTime ModifiedUtc {
             get { return modifiedUtc; }
         }
-        private volatile DateTime accessedUtc = DateTime.MinValue;
+        private  DateTime accessedUtc = DateTime.MinValue;
         /// <summary>
         /// The last time the file was accessed.
         /// </summary>
         public DateTime AccessedUtc {
             get { return accessedUtc; }
         }
-        private volatile DateTime updatedUtc = DateTime.MinValue;
+        private  DateTime updatedUtc = DateTime.MinValue;
         /// <summary>
         /// The Created date of the cached file - the last time the cached file was written to
         /// </summary>
