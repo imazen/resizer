@@ -10,7 +10,8 @@ namespace ImageResizer.Plugins.DiskCache {
     /// Provides locking based on a string key. 
     /// Locks are local to the LockProvider instance.
     /// The class handles disposing of unused locks. Generally used for 
-    /// coordinating writes to files (of which there can be millions).
+    /// coordinating writes to files (of which there can be millions). Only keeps key/lock pairs in memory which are in use.
+    /// Thread-safe.
     /// </summary>
     public class LockProvider {
 
@@ -24,15 +25,15 @@ namespace ImageResizer.Plugins.DiskCache {
         /// </summary>
         protected object createLock = new object();
         /// <summary>
-        /// Attempts to execute the 'success' callback inside a lock based on 'key'. 
-        /// If the lock cannot be acquired within 'timoutMs', 'failure' is executed. 
-        /// In a worst-case scenario, it could take up to twice as long as 'timeoutMs' for 'failure' to execute.
+        /// Attempts to execute the 'success' callback inside a lock based on 'key'.  If successful, returns true.
+        /// If the lock cannot be acquired within 'timoutMs', returns false
+        /// In a worst-case scenario, it could take up to twice as long as 'timeoutMs' to return false.
         /// </summary>
         /// <param name="key"></param>
         /// <param name="success"></param>
         /// <param name="failure"></param>
         /// <param name="timeoutMs"></param>
-        public void TryLock(string key, LockCallback success, LockCallback failure, int timeoutMs){
+        public bool TryExecute(string key, int timeoutMs, LockCallback success){
             //Record when we started. We don't want an infinite loop.
             DateTime startedAt = DateTime.UtcNow;
 
@@ -76,15 +77,13 @@ namespace ImageResizer.Plugins.DiskCache {
                         System.Threading.Monitor.Exit(itemLock);//release lock
                     }
                 } else {
-                    failure(); //Call failure on timeout
-                    return; //Someone else had the lock, they can clean it up.
+                    return false; //Someone else had the lock, they can clean it up.
                 }
 
                 //Are we out of time, still having an invalid lock?
                 if (!validLock && Math.Abs(DateTime.UtcNow.Subtract(startedAt).TotalMilliseconds) > timeoutMs) {
                     //We failed to get a valid lock in time. 
-                    failure();
-                    return;
+                    return false;
                 }
 
             
@@ -119,6 +118,7 @@ namespace ImageResizer.Plugins.DiskCache {
                 }
             }
             // Ideally the only objects in 'locks' will be open operations now.
+            return true;
         }
     }
 }

@@ -37,9 +37,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CleanupWorker.cs" />
+    <Compile Include="Index\CachedFileInfo.cs" />
+    <Compile Include="Index\CachedFolder.cs" />
+    <Compile Include="Index\CacheIndex.cs" />
+    <Compile Include="CacheResult.cs" />
+    <Compile Include="Cleanup\CleanupManager.cs" />
+    <Compile Include="Cleanup\CleanupQueue.cs" />
+    <Compile Include="Cleanup\CleanupWorker.cs" />
+    <Compile Include="Cleanup\CleanupWorkItem.cs" />
+    <Compile Include="CustomDiskCache.cs" />
     <Compile Include="DiskCache.cs" />
+    <Compile Include="Cleanup\CleanupStrategy.cs" />
+    <Compile Include="LockProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebConfigWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">

@@ -1,45 +1,68 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using ImageResizer.Plugins.DiskCache.Cleanup;
 
 namespace ImageResizer.Plugins.DiskCache {
-    public enum WorkItemType {
-        UpdateCacheRecord,
-        PopulateFolderCache,
 
-    }
-    /// <summary>
-    /// Cleanup strategy
-    /// 
-    /// After a file is added to the cache, add a work item to the queue to verify that folder is within the limits.
-    /// On startup, populate the cache index with data.
-    /// 
-    /// //OnBeforeWrite
-    /// //AfterWriteFile - 
-    /// 
-    /// </summary>
-    public class CleanupWorker {
-        public CleanupWorker(CacheIndex index, LockProvider locks) {
+   
+    public class CleanupManager:IDisposable {
+        protected CustomDiskCache cache = null;
+        protected CleanupStrategy cs = null;
+        protected CleanupQueue queue = null;
+        protected CleanupWorker worker = null;
+        
+
+        public CleanupManager(CustomDiskCache cache, CleanupStrategy cs) {
+            this.cache = cache;
+            this.cs = cs;
+            queue = new CleanupQueue();
+            //Called each request
+            cache.CacheResultReturned += delegate(CustomDiskCache sender, CacheResult r) {
+                if (r.Result == CacheQueryResult.Miss)
+                    this.AddedFile(r.RelativePath); //It was either updated or added.
+                else
+                    this.BeLazy();
+            };
+            //Called when the filesystem changes unexpectedly.
+            cache.Index.FileDisappeared += delegate(string relativePath, string physicalPath) {
+                //Stop everything ASAP and start a brand new cleaning run.
+                queue.ReplaceWith(new CleanupWorkItem(CleanupWorkItem.Kind.CleanFolderRecursive, "", cache.PhysicalCachePath));
+            };
+
+            worker = new CleanupWorker(cs,queue,cache);
         }
-        private int minimumAgeForCleanup;
+        
+
+        
+
         /// <summary>
-        /// The minimum age a file must have to be cleaned up. (in minutes) (age = createdUtc vs NowUtc difference)
+        /// Notifies the CleanupManager that a request is in process. Helps CleanupManager optimize background work so it doesn't interfere with request processing.
         /// </summary>
-        public int MinimumAgeForCleanup {
-            get { return minimumAgeForCleanup; }
-            set { minimumAgeForCleanup = value; }
+        public void BeLazy() {
+            worker.BeLazy();
+        }
+        /// <summary>
+        /// Notifies the CleanupManager that a file was added under the specified relative path. Allows CleanupManager to detect when a folder needs cleanup work.
+        /// </summary>
+        /// <param name="relativePath"></param>
+        public void AddedFile(string relativePath) {
+            int slash = relativePath.LastIndexOf('/');
+            string folder = slash > -1 ? relativePath.Substring(0, slash) : "";
+            char c = System.IO.Path.DirectorySeparatorChar;
+            queue.Queue(new CleanupWorkItem(CleanupWorkItem.Kind.CleanFolderRecursive, folder, cache.PhysicalCachePath.TrimEnd(c) + c + folder.Replace('/',c).Replace('\\',c).Trim(c)));
+            worker.MayHaveWork();
         }
 
-
-
-        public void UpdatedFile(string relativePath) {
+        public void CleanAll() {
+            queue.Queue(new CleanupWorkItem(CleanupWorkItem.Kind.CleanFolderRecursive, "", cache.PhysicalCachePath));
+            worker.MayHaveWork();
         }
-        public void UsedFile(string relativePath) {
-        }
+        
 
-        public void DoWorkSegment() {
-            //Should work on only one subfolder at a time.
-
+        public void Dispose() {
+            worker.Dispose();
         }
     }
    
