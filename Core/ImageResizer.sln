@@ -42,6 +42,12 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Test", "C:\Users\Administra
 		VWDPort = "49312"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Caption", "..\Plugins\ImageResizer.Plugins.Caption\ImageResizer.Plugins.Caption.csproj", "{DCFE9D91-E008-4DB0-9A53-3146B0551FC7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.DiskCache.Tests", "..\Tests\ImageResizer.Plugins.DiskCache.Tests\ImageResizer.Plugins.DiskCache.Tests.csproj", "{B4C23DCB-4247-4647-A01C-AD829EC31DFA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.RequestLimiting", "..\Plugins\ImageResizer.Plugins.RequestLimiting\ImageResizer.Plugins.RequestLimiting.csproj", "{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -115,6 +121,24 @@ Global
 		{F6DD0FA2-DEFC-461B-8BC6-99DD6A7A2808}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{F6DD0FA2-DEFC-461B-8BC6-99DD6A7A2808}.Trial Version|Any CPU.ActiveCfg = Debug|Any CPU
 		{F6DD0FA2-DEFC-461B-8BC6-99DD6A7A2808}.Trial Version|Any CPU.Build.0 = Debug|Any CPU
+		{DCFE9D91-E008-4DB0-9A53-3146B0551FC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCFE9D91-E008-4DB0-9A53-3146B0551FC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCFE9D91-E008-4DB0-9A53-3146B0551FC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCFE9D91-E008-4DB0-9A53-3146B0551FC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCFE9D91-E008-4DB0-9A53-3146B0551FC7}.Trial Version|Any CPU.ActiveCfg = Release|Any CPU
+		{DCFE9D91-E008-4DB0-9A53-3146B0551FC7}.Trial Version|Any CPU.Build.0 = Release|Any CPU
+		{B4C23DCB-4247-4647-A01C-AD829EC31DFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4C23DCB-4247-4647-A01C-AD829EC31DFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4C23DCB-4247-4647-A01C-AD829EC31DFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4C23DCB-4247-4647-A01C-AD829EC31DFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4C23DCB-4247-4647-A01C-AD829EC31DFA}.Trial Version|Any CPU.ActiveCfg = Release|Any CPU
+		{B4C23DCB-4247-4647-A01C-AD829EC31DFA}.Trial Version|Any CPU.Build.0 = Release|Any CPU
+		{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}.Trial Version|Any CPU.ActiveCfg = Release|Any CPU
+		{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}.Trial Version|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
