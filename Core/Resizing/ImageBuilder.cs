@@ -763,7 +763,7 @@ namespace ImageResizer
         public virtual IEnumerable<string> GetSupportedFileExtensions() {
             return _supportedFileExtensions;
         }
-        //TODO: Move to external: dither, time, quality, colors
+       
         private readonly string[] _supportedQuerystringKeys = new string[]{
                     "format", "thumbnail", "maxwidth", "maxheight",
                 "width", "height",

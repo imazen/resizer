@@ -1,0 +1,28 @@
+﻿List of potential problem areas, best items to test.
+
+
+ResponseHeaders.DefaultApplyToResponseMethod
+
+Configuration.Issues.IssueSink
+Configuration.Xml.* (everything)
+Configuration.Config.cs (how does it work with no config???)
+''.get ... Shouldn't these log issues instead of throwing exceptions?
+
+We need to test the system by throwing all kinds of wrong and messed up configuration data at it.
+
+PluginConfig.GetPluginType
+PluginConfig.removeBy, clearBy
+
+SafeList
+ReverseEnumerator
+DefaultEncoder.AcceptedImageExtensions
+
+validate issues are raised properly
+
+
+ImageBuilder
+LayoutBuilder (needs docs updated)
+ResizeSettings (needs 'normalization' method and improved querystring parsing)
+Utils
+
+InterceptModule
