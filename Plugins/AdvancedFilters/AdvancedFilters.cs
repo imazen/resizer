@@ -4,7 +4,7 @@ using System.Text;
 using ImageResizer;
 using ImageResizer.Resizing;
 namespace ImageResizer.Plugins.AdvancedFilters {
-    public class AdvancedFilters:ImageBuilderExtension, IPlugin {
+    public class AdvancedFilters:BuilderExtension, IPlugin {
 
         public IPlugin Install(Configuration.Config c) {
             throw new NotImplementedException();

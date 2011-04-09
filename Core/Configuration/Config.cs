@@ -38,7 +38,7 @@ namespace ImageResizer.Configuration {
             plugins = new PluginConfig(this);
 
             //Whenever the extensions change, the image builder instance has to be replaced.
-            plugins.ImageBuilderExtensions.Changed += delegate(SafeList<ImageBuilderExtension> s) {
+            plugins.ImageBuilderExtensions.Changed += delegate(SafeList<BuilderExtension> s) {
                 InvalidateImageBuilder();
             };
 

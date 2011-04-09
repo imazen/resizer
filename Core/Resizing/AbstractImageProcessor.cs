@@ -6,7 +6,9 @@ using System.IO;
 
 namespace ImageResizer.Resizing {
     /// <summary>
-    /// Provides a dual-purpose base class. Extensions can inherit and override certain methods.
+    /// Not for external use. Inherit from ImageBuilderExtension
+    /// Dual-purpose base class for both ImageBuilder and ImageBuilderExtension
+    ///  Extensions can inherit and override certain methods.
     /// ImageBuilder inherits this method to utilize its extension invocation code. 
     /// Each method of AbstractImageProcessor loops through all extensions and executes the same method on each. Provides a sort of multiple-inheritance mechanisim.
     /// </summary>
@@ -21,14 +23,14 @@ namespace ImageResizer.Resizing {
         /// Creates a new AbstractImageProcessor which will run the specified extensions with each method call.
         /// </summary>
         /// <param name="extensions"></param>
-        public AbstractImageProcessor(IEnumerable<ImageBuilderExtension> extensions) {
-            exts = new List<ImageBuilderExtension>(extensions != null ? extensions : new ImageBuilderExtension[] { }); 
+        public AbstractImageProcessor(IEnumerable<BuilderExtension> extensions) {
+            exts = new List<BuilderExtension>(extensions != null ? extensions : new BuilderExtension[] { }); 
         }
 
         /// <summary>
         /// Contains the set of extensions that are called for every method. 
         /// </summary>
-        protected volatile IEnumerable<ImageBuilderExtension> exts;
+        protected volatile IEnumerable<BuilderExtension> exts;
 
         /// <summary>
         /// Extend this to allow additional types of source objects to be accepted by transforming them into accepted types, such as Image, Bitmap,

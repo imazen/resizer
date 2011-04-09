@@ -101,6 +101,7 @@
     <Compile Include="Configuration\UrlEventArgs.cs" />
     <Compile Include="Configuration\Xml\Node.cs" />
     <Compile Include="Configuration\Xml\Selector.cs" />
+    <Compile Include="Plugins\DropShadow\DropShadow.cs" />
     <Compile Include="Plugins\IFileExtensionPlugin.cs" />
     <Compile Include="Plugins\Trial\Trial.cs" />
     <Compile Include="Plugins\Diagnostic\Diagnostic.cs" />

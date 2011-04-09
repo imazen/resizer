@@ -11,7 +11,7 @@ namespace ImageResizer.Plugins.Trial {
     /// <summary>
     /// Can be used by plugins to implement 'trial version' functionality
     /// </summary>
-    public class Trial:ImageBuilderExtension, IPlugin {
+    public class Trial:BuilderExtension, IPlugin {
         public Trial() {
         }
         public static void InstallPermanent(Config c){

@@ -9,7 +9,7 @@ namespace ImageResizer.Plugins.SizeLimiting {
     /// <summary>
     /// Implements app-wide size limits on image size
     /// </summary>
-    public class SizeLimiting : ImageBuilderExtension, IPlugin {
+    public class SizeLimiting : BuilderExtension, IPlugin {
         public SizeLimiting() {
         }
         protected SizeLimits l = null;
