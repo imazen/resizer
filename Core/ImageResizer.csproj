@@ -123,8 +123,8 @@
     <Compile Include="Caching\IResponseArgs.cs" />
     <Compile Include="Resizing\ImageState.cs" />
     <Compile Include="Plugins\IVirtualBitmapFile.cs" />
-    <Compile Include="Resizing\ImageBuilderExtension.cs" />
-    <Compile Include="Resizing\Layout.cs" />
+    <Compile Include="Resizing\BuilderExtension.cs" />
+    <Compile Include="Resizing\LayoutBuilder.cs" />
     <Compile Include="Plugins\SizeLimiting\SizeLimits.cs" />
     <Compile Include="Util\PolygonMath.cs" />
     <Compile Include="Plugins\IVirtualFileWithModifiedDate.cs" />
@@ -165,6 +165,7 @@
     <Content Include="extending.txt" />
     <Content Include="modules.txt" />
     <Content Include="readme.txt" />
+    <Content Include="totest.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sample.config">

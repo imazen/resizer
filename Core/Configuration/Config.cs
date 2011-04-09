@@ -42,7 +42,7 @@ namespace ImageResizer.Configuration {
                 InvalidateImageBuilder();
             };
 
-            //Relys on plugins, must init second
+            //Relies on plugins, must init second
             pipeline = new PipelineConfig(this);
 
             //Load default plugins
