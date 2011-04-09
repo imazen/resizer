@@ -4,7 +4,7 @@ using System.Text;
 using ImageResizer.Resizing;
 
 namespace ImageResizer.Plugins.Caption {
-    public class Caption:ImageBuilderExtension,IPlugin,IQuerystringPlugin {
+    public class Caption:BuilderExtension,IPlugin,IQuerystringPlugin {
         //Accepts 
         //caption=text
         //caption.align=left|right|center

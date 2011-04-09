@@ -74,24 +74,19 @@ namespace ImageResizer
         /// Returns a shared instance of ImageBuilder or a subclass, equivalent to  Config.Current.CurrentImageBuilder
         /// </summary>
         /// <returns></returns>
-        public static ImageBuilder Current
-        {
-            get {
-                return Config.Current.CurrentImageBuilder;
-            }
-        }
+        public static ImageBuilder Current {get{ return Config.Current.CurrentImageBuilder; }}
         /// <summary>
         /// Creates a new ImageBuilder instance with no extensions.
         /// </summary>
-        public ImageBuilder(IEncoderProvider writer) :base(){
-            this.encoderProvider = writer;
+        public ImageBuilder(IEncoderProvider encoderProvider): base() {
+                this.encoderProvider = encoderProvider;
         }
 
         /// <summary>
         /// Create a new instance of ImageBuilder using the specified extensions. Extension methods will be fired in the order they exist in the collection.
         /// </summary>
         /// <param name="extensions"></param>
-        public ImageBuilder(IEnumerable<ImageBuilderExtension> extensions, IEncoderProvider encoderProvider):base(extensions){
+        public ImageBuilder(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider):base(extensions){
             this.encoderProvider = encoderProvider;
         }
 
@@ -101,7 +96,7 @@ namespace ImageResizer
         /// </summary>
         /// <param name="extensions"></param>
         /// <returns></returns>
-        public virtual ImageBuilder Create(IEnumerable<ImageBuilderExtension> extensions, IEncoderProvider writer) {
+        public virtual ImageBuilder Create(IEnumerable<BuilderExtension> extensions, IEncoderProvider writer) {
             return new ImageBuilder(extensions,writer);
         }
         /// <summary>
@@ -352,7 +347,7 @@ namespace ImageResizer
         /// Handles the rendering phase of processing
         /// </summary>
         /// <param name="s"></param>
-        protected virtual RequestedAction Render(ImageState s) {
+        protected override RequestedAction Render(ImageState s) {
             if (base.Render(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
             RenderBackground(s);
             PostRenderBackground(s);
@@ -442,30 +437,7 @@ namespace ImageResizer
             return RequestedAction.None;
         }
 
-        protected override RequestedAction LayoutEffects(ImageState s)
-        {
-            if (base.LayoutEffects(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
-
-            //Clone last ring, then offset it.
-            if (s.settings["shadowWidth"] != null) {
-                float shadowWidth = Utils.getFloat(s.settings,"shadowWidth",0);
-
-
-                PointF shadowOffset = Utils.parsePointF(s.settings["shadowOffset"], new PointF(0,0));
-
-                //For drawing purposes later
-                s.layout.AddInvisiblePolygon("shadowInner", PolygonMath.MovePoly(s.layout.LastRing.points,shadowOffset));
-
-                //For layout purposes
-                s.layout.AddRing("shadow",PolygonMath.InflatePoly(s.layout.LastRing.points, new float[]{
-                    Math.Max(0, shadowWidth - shadowOffset.Y),
-                    Math.Max(0, shadowWidth + shadowOffset.X),
-                    Math.Max(0, shadowWidth + shadowOffset.Y),
-                    Math.Max(0, shadowWidth - shadowOffset.X)
-                }));
-            }
-            return RequestedAction.None;
-        }
+        
 
         protected override RequestedAction LayoutRound(ImageState s)
         {
@@ -550,27 +522,6 @@ namespace ImageResizer
             return RequestedAction.None;
         }
 
-        protected override RequestedAction RenderEffects(ImageState s) {
-            if (base.RenderEffects(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
-
-
-            //parse shadow
-            Color shadowColor = Utils.parseColor(s.settings["shadowColor"], Color.Transparent);
-            int shadowWidth = Utils.getInt(s.settings, "shadowWidth", -1);
-
-            //Skip on transparent or 0-width shadow
-            if (shadowColor == Color.Transparent || shadowWidth <= 0) return RequestedAction.None; 
-
-            //Offsets may show inside the shadow - so we have to fix that
-            s.destGraphics.FillPolygon(new SolidBrush(shadowColor),
-                PolygonMath.InflatePoly(s.layout["shadowInner"], 1)); //Inflate 1 for FillPolgyon rounding errors.
-
-            //Then we can draw the outer gradient
-            Utils.DrawOuterGradient(s.destGraphics, s.layout["shadowInner"],
-                             shadowColor, Color.Transparent, shadowWidth);
-
-            return RequestedAction.None;
-        }
 
         protected override RequestedAction RenderPadding(ImageState s) {
             if (base.RenderPadding(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
@@ -818,8 +769,7 @@ namespace ImageResizer
                 "width", "height",
                 "scale", "stretch", "crop", "page", "bgcolor",
                 "rotate", "flip", "sourceFlip", "borderWidth",
-                "borderColor", "paddingWidth", "paddingColor", "ignoreicc",
-                "shadowColor", "shadowOffset", "shadowWidth", "frame", "useresizingpipeline"};
+                "borderColor", "paddingWidth", "paddingColor", "ignoreicc", "frame", "useresizingpipeline"};
     
         public virtual IEnumerable<string> GetSupportedQuerystringKeys() {
             return _supportedQuerystringKeys;

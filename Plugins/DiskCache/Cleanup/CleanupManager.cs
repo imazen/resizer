@@ -48,6 +48,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// </summary>
         /// <param name="relativePath"></param>
         public void AddedFile(string relativePath) {
+            //TODO: this is bad. Cache checking is expensive, and should be delayed a lot
             int slash = relativePath.LastIndexOf('/');
             string folder = slash > -1 ? relativePath.Substring(0, slash) : "";
             char c = System.IO.Path.DirectorySeparatorChar;

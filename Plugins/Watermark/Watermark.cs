@@ -21,7 +21,7 @@ namespace ImageResizer.Plugins.Watermark.Watermark
     /// <summary>
     /// Provides extensibility points for drawing watermarks and even modifying resizing/image settings
     /// </summary>
-    public class WatermarkSettings : ImageBuilderExtension, IPlugin, IQuerystringPlugin
+    public class WatermarkSettings : BuilderExtension, IPlugin, IQuerystringPlugin
     {
         public string watermarkDir = "~/watermarks";
         public SizeF watermarkSize = new SizeF(1, 1);

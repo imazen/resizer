@@ -6,7 +6,7 @@ using System.Drawing.Imaging;
 using System.Drawing;
 
 namespace ImageResizer.Plugins.SimpleFilters {
-    public class SimpleFilters : ImageBuilderExtension, IPlugin, IQuerystringPlugin {
+    public class SimpleFilters : BuilderExtension, IPlugin, IQuerystringPlugin {
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             return this;
