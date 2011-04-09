@@ -2,7 +2,11 @@ Upgrade notes are available online at
 
 http://nathanaeljones.com/products/asp-net-image-resizer/
 
+
+
 It is recommended that you delete the /imagecache/ folder when changing versions. 
+
+
 
 Also, pay attention to required changes in your web.config settings.
 
