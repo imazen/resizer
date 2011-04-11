@@ -131,7 +131,6 @@
     <Compile Include="Resizing\ResizeSettings.cs" />
     <Compile Include="Util\UrlHasher.cs" />
     <Compile Include="Util\Utils.cs" />
-    <Compile Include="Util\yrl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

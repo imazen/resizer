@@ -17,6 +17,7 @@ namespace ImageResizer.Caching {
 
         public void ProcessRequest(HttpContext context) {
             context.Response.StatusCode = 200;
+            context.Response.BufferOutput = true; //Same as .Buffer. Allows bitmaps to be disposed quicker.
             e.ResponseHeaders.ApplyDuringPreSendRequestHeaders = false;
             e.ResponseHeaders.ApplyToResponse(e.ResponseHeaders, context);
             e.ResizeImageToStream(context.Response.OutputStream);
