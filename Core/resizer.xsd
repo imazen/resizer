@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="resizerSchema"
+    targetNamespace="http://imageresizingin.net/resizer.xsd"
+    elementFormDefault="unqualified"
+    xmlns="http://imageresizingin.net/resizer.xsd"
+    xmlns:mstns="http://imageresizingin.net/resizer.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  
+  <xs:element name="resizer">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="pipeline" minOccurs="0">
+          <xs:complexType>
+            <xs:attribute name="fakeExtension" type="xs:string" use="optional" />
+            <xs:attribute name="vppUsage" use="optional" >
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="Fallback" />
+                  <xs:enumeration value="Always" />
+                  <xs:enumeration value="Never" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            
+            
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="maxsize">
+          <xs:complexType>
+            <xs:attribute name="imageSize" type="xs:string" use="required" />
+            <xs:attribute name="totalSize" type="xs:string" use="required" />
+            <xs:attribute name="imageSizeBehvaior" type="xs:string" use="required" />
+            <xs:attribute name="totalSizeBehavior" type="xs:string" use="required" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="clientcache">
+          <xs:complexType>
+            <xs:attribute name="minutes" type="xs:unsignedByte" use="required" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="diskcache">
+          <xs:complexType>
+            <xs:attribute name="disable" type="xs:boolean" use="required" />
+            <xs:attribute name="dir" type="xs:string" use="required" />
+            <xs:attribute name="subfolders" type="xs:unsignedByte" use="required" />
+            <xs:attribute name="autoClean" type="xs:boolean" use="required" />
+            <xs:attribute name="maxImagesPerFolder" type="xs:unsignedInt" use="required" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="plugins">
+          <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="add">
+                <xs:complexType>
+                  <xs:attribute name="name" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="remove">
+                <xs:complexType>
+                  <xs:attribute name="name" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="clear">
+                <xs:complexType>
+                  <xs:attribute name="type" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+              
+            </xs:choice>
+              
+          </xs:complexType>
+        </xs:element>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+
+
