@@ -15,6 +15,7 @@ using System.Drawing;
 using System.Web;
 using ImageResizer.Util;
 using ImageResizer.Resizing;
+using System.Web.Hosting;
 
 namespace ImageResizer.Plugins.Watermark.Watermark
 {
@@ -70,11 +71,11 @@ namespace ImageResizer.Plugins.Watermark.Watermark
                 throw new ArgumentException("Watermark value contained invalid file name characters: " + watermark);
 
             //Combine the directory with the 
-            watermark = yrl.Combine(new yrl(watermarkDir), new yrl(watermark)).Virtual;
+            watermark = watermarkDir.TrimEnd('/') + '/' + watermark.TrimStart('/');
 
 
             //Load the file specified in the querystring,
-            Bitmap wb = GetMemCachedBitmap(HttpContext.Current.Server.MapPath(watermark));
+            Bitmap wb = GetMemCachedBitmap(HostingEnvironment.MapPath(watermark));
 
             //If percentages, resolve to pixels
             if (valuesPercentages) {
