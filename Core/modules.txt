@@ -1,9 +1,8 @@
-﻿
+
 
 
 - Readers
 S3Reader - Loads and resizes files from an amazon S3 backend.
-ZipReader - Can read images from Zip files.
 SqlReader - Loads files from a SQL database.
 RemoteSiteReader - Loads images from a remote site over HTTP (not built)
 AzureReader - Loads images from Azure blob storage. (not built)
