@@ -139,15 +139,15 @@ namespace ImageResizer.Util
             return pts;
         }
 
-        public static PointF[] ScalePoints(PointF[] poly, double factor, PointF origin) {
+        public static PointF[] ScalePoints(PointF[] poly, double xfactor, double yfactor, PointF origin) {
             PointF[] pts = new PointF[poly.Length];
             for (int i = 0; i < poly.Length; i++)
-                pts[i] = ScalePoint(poly[i], factor, origin);
+                pts[i] = ScalePoint(poly[i], xfactor,yfactor, origin);
             return pts;
         }
-        public static PointF ScalePoint(PointF point, double factor, PointF origin) {
-            return new PointF((float)((point.X - origin.X) * factor + origin.X),
-                               (float)((point.Y - origin.Y) * factor + origin.Y));
+        public static PointF ScalePoint(PointF point, double xfactor, double yfactor, PointF origin) {
+            return new PointF((float)((point.X - origin.X) * xfactor + origin.X),
+                               (float)((point.Y - origin.Y) * yfactor + origin.Y));
         }
 
         /// <summary>

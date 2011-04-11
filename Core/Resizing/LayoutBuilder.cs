@@ -167,7 +167,30 @@ namespace ImageResizer.Resizing {
         /// <param name="origin"></param>
         public void Scale(double factor, PointF origin) {
             foreach (PointSet ps in ringList)
-                if (ps.flags != PointFlags.Ignored) ps.points = PolygonMath.ScalePoints(ps.points, factor, origin);
+                if (ps.flags != PointFlags.Ignored) ps.points = PolygonMath.ScalePoints(ps.points, factor,factor, origin);
         }
+
+        /// <summary>
+        /// Translates and scales all rings and invisible polygons as specified. 
+        /// </summary>
+        /// <param name="factor"></param>
+        /// <param name="origin"></param>
+        public void Shift(RectangleF from, RectangleF to) {
+
+            PointF fromOrigin = new PointF(from.X + (from.Width /2), from.Y + (from.Height /2));
+            PointF toOrigin = new PointF(to.X + (to.Width /2), to.Y + (to.Height /2));
+            
+            PointF offset = new PointF(toOrigin.X - fromOrigin.X,toOrigin.Y - fromOrigin.Y);
+            double xd = to.Width / from.Width;
+            double yd = to.Height / from.Height;
+
+            //Offset points
+            foreach (PointSet ps in ringList)
+                if (ps.flags != PointFlags.Ignored) ps.points = PolygonMath.MovePoly(ps.points,offset );
+            //Scale points
+            foreach (PointSet ps in ringList)
+                if (ps.flags != PointFlags.Ignored) ps.points = PolygonMath.ScalePoints(ps.points, xd,yd, toOrigin );
+        }
+
     }
 }
