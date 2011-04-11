@@ -26,14 +26,17 @@ namespace ImageResizer.Configuration {
                 if (_singleton == null)
                     lock (_singletonLock)
                         if (_singleton == null)
-                            _singleton = new Config();
+                            _singleton = new Config(null);
 
                 return _singleton;
             }
         }
         #endregion
 
-        public Config() {
+        public Config(ResizerConfigurationSection config) {
+
+            this.configuration = config;
+
             //Init plugins module
             plugins = new PluginConfig(this);
 
@@ -120,7 +123,7 @@ namespace ImageResizer.Configuration {
                 if (configuration == null) {
                     lock (configurationLock) {
                         if (configuration == null) {
-                            ResizerConfigurationSection tmpConf = (ResizerConfigurationSection)System.Configuration.ConfigurationManager.GetSection("resizing");
+                            ResizerConfigurationSection tmpConf = (ResizerConfigurationSection)System.Configuration.ConfigurationManager.GetSection("resizer");
                             configuration = tmpConf;
                         }
                     }

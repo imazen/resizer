@@ -15,6 +15,16 @@ namespace ImageResizer {
     /// Handles reading the &lt;resizer&gt; section from Web.Config
     /// </summary>
     public class ResizerConfigurationSection : ConfigurationSection {
+        public ResizerConfigurationSection() {
+        }
+
+        public ResizerConfigurationSection(Node root) {
+            n = root;
+        }
+        public ResizerConfigurationSection(string xml) {
+
+            n = Node.FromXmlFragment(xml,sink);
+        }
         protected object nSync = new object();
         protected volatile Node n = new Node("resizer");
         protected volatile XmlDocument xmlDoc = new XmlDocument();
