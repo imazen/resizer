@@ -3,14 +3,15 @@
   <testPackage shadowCopy="false" debug="false">
     <files>
       <file>ImageResizer.Plugins.DiskCache.Tests\bin\Debug\ImageResizer.Plugins.DiskCache.Tests.dll</file>
+      <file>Core\bin\Debug\ImageResizer.Tests.dll</file>
     </files>
     <hintDirectories />
     <excludedFrameworkIds />
     <properties />
   </testPackage>
   <testFilters>
-    <testFilter filterName="AutoSave" filterExpr="" />
-    <testFilter filterName="LastRun" filterExpr="" />
+    <testFilter filterName="AutoSave" filterExpr="Id: df2a7346ca724e42" />
+    <testFilter filterName="LastRun" filterExpr="Id: df2a7346ca724e42" />
   </testFilters>
   <extensionSpecifications />
   <reportDirectory>C:\Users\Administrator\AppData\Roaming\Gallio\Icarus\Reports</reportDirectory>

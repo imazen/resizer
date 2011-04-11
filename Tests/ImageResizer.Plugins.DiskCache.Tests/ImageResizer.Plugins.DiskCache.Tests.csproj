@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CachedFolderTest.cs" />
+    <Compile Include="CustomDiskCacheTest.cs" />
     <Compile Include="LockProviderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
