@@ -28,3 +28,5 @@ Utils
 InterceptModule
 
 Verify filenames with a & are handled properly
+
+start with an image that has a 1px outer border of black and resize it, verifying that a border of 30% black or more remains.
