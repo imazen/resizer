@@ -28,6 +28,15 @@ namespace ImageResizer.Util {
             return path.ToString();
         }
 
+        /// <summary>
+        /// Like fromQuerystring, but permits the leading '?' to be omitted.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static NameValueCollection fromQuerystringFriendly(string path) {
+            if (path.IndexOf('?') < 0) path = '?' + path;
+            return fromQuerystring(path);
+        }
         public static NameValueCollection fromQuerystring(string path) {
             NameValueCollection c = new NameValueCollection();
             int firstdelimiter = path.IndexOf('?');
