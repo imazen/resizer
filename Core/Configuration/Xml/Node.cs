@@ -269,5 +269,19 @@ namespace ImageResizer.Configuration.Xml {
         public override string ToString() {
             return ToXmlElement(new XmlDocument()).OuterXml.Replace(">", ">\n");
         }
+
+        public static Node FromXmlFragment(string xml, IssueSink sink) {
+            NameTable nt = new NameTable();
+
+            XmlNamespaceManager nsmanager = new XmlNamespaceManager(nt);
+            XmlParserContext context =
+                new XmlParserContext(nt, nsmanager, "elem", XmlSpace.None, System.Text.Encoding.UTF8);
+            XmlTextReader reader = new XmlTextReader(xml, XmlNodeType.Element, context);
+
+
+            Node n = new Node(new XmlDocument().ReadNode(reader) as XmlElement, sink);
+            reader.Close();
+            return n;
+        }
     }
 }
