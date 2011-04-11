@@ -11,6 +11,8 @@ namespace ImageResizer {
         
         public ResizeSettings() : base() { }
         public ResizeSettings(NameValueCollection col) : base(col) { }
+        public ResizeSettings(string queryString) : base(Utils.fromQuerystringFriendly(queryString)) { }
+
 
         public int get(string name, int defaultValue){ return Utils.getInt(this,name,defaultValue);}
         public void set(string name, int value) { this[name] = value.ToString();}
