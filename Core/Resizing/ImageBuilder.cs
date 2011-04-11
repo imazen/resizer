@@ -57,7 +57,7 @@ namespace ImageResizer
 {
     /// <summary>
     /// Provides methods for generating resizied images, and for reading and writing them to disk.
-    /// Use ImageManager.Instance to get the default instance, or use ImageManager.Instance.Create() to control which extensions are used.
+    /// Use ImageManager.Create to get the default instance, or use ImageManager.Instance.Create() to control which extensions are used.
     /// </summary>
     public class ImageBuilder : AbstractImageProcessor, IQuerystringPlugin
     {
@@ -83,7 +83,7 @@ namespace ImageResizer
         }
 
         /// <summary>
-        /// Create a new instance of ImageBuilder using the specified extensions. Extension methods will be fired in the order they exist in the collection.
+        /// Create a new instance of ImageBuilder using the specified extensions and encoder provider. Extension methods will be fired in the order they exist in the collection.
         /// </summary>
         /// <param name="extensions"></param>
         public ImageBuilder(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider):base(extensions){
@@ -208,14 +208,15 @@ namespace ImageResizer
             throw new ArgumentException("Paramater source may only be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.", "source");
         }
 
-        
+
 
         /// <summary>
-        /// Builds a bitmap as if it were destined for a PNG (transparency is preserved)
+        /// Resizes and processes the specified source image and returns a bitmap of the result.
+        /// This method assumes that transparency will be supported in the final output format, and therefore does not apply a matte color. Use &bgcolor to specify a background color
+        /// if you use this method with a non-transparent format such as Jpeg.
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="settings"></param>
-        /// <returns></returns>
+        /// <param name="source">May be an instance of string (a physical path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.</param>
+        /// <param name="settings">Resizing and processing command to apply to the.</param>
         public virtual Bitmap Build(object source, ResizeSettings settings) {
             BitmapHolder bh = new BitmapHolder();
             Build(source, bh, settings);
@@ -223,11 +224,11 @@ namespace ImageResizer
         }
 
         /// <summary>
-        /// All Build() calls funnel through here. 
+        /// Resizes and processes the specified source image and stores the encoded result in the specified destination. 
         /// </summary>
         /// <param name="source">May be an instance of string (a physical path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.</param>
-        /// <param name="dest">May be a physical path (string), or a Stream instance</param>
-        /// <param name="settings"></param>
+        /// <param name="dest">May be a physical path (string), or a Stream instance. Does not have to be seekable.</param>
+        /// <param name="settings">Resizing and processing command to apply to the.</param>
         public virtual void Build(object source, object dest, ResizeSettings settings) {
             ResizeSettings s = new ResizeSettings(settings);
 
@@ -506,6 +507,9 @@ namespace ImageResizer
         protected override RequestedAction RenderBackground(ImageState s) {
             if (base.RenderBackground(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
+            //Skip this when we are doing simulations
+            if (s.destGraphics == null) return RequestedAction.None;
+
             Graphics g = s.destGraphics;
 
             //If the image doesn't support transparency, we need to fill the background color now.
@@ -526,6 +530,10 @@ namespace ImageResizer
         protected override RequestedAction RenderPadding(ImageState s) {
             if (base.RenderPadding(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
+            //Skip this when we are doing simulations
+            if (s.destGraphics == null) return RequestedAction.None;
+
+
             Color paddingColor = s.settings.PaddingColor;
             //Inherit color
             if (paddingColor.Equals(Color.Transparent)) paddingColor = s.settings.BackgroundColor;
@@ -545,6 +553,9 @@ namespace ImageResizer
         protected override RequestedAction RenderImage(ImageState s) {
             if (base.RenderImage(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
+            //Skip this when we are doing simulations
+            if (s.destGraphics == null) return RequestedAction.None;
+
             s.copyAttibutes.SetWrapMode(WrapMode.TileFlipXY);
             s.destGraphics.DrawImage(s.sourceBitmap, PolygonMath.getParallelogram(s.layout["image"]), s.copyRect, GraphicsUnit.Pixel, s.copyAttibutes);
 
@@ -553,6 +564,9 @@ namespace ImageResizer
 
         protected override RequestedAction RenderBorder(ImageState s) {
             if (base.RenderBorder(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
+
+            //Skip this when we are doing simulations
+            if (s.destGraphics == null) return RequestedAction.None;
 
             //Draw border
             if (s.settings.Border.IsEmpty) return RequestedAction.None;
@@ -581,6 +595,12 @@ namespace ImageResizer
 
         protected override RequestedAction ProcessFinalBitmap(ImageState s) {
             if (base.ProcessFinalBitmap(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
+
+            //The default if we are doing a simulation
+
+            s.finalSize = s.destSize;
+            //Skip this when we are doing simulations
+            if (s.destBitmap == null) return RequestedAction.None;
 
             //The last flipping.
             if (s.settings.Flip != RotateFlipType.RotateNoneFlipNone)
@@ -621,7 +641,7 @@ namespace ImageResizer
 
 
        /// <summary>
-       /// Populates copyRect, as well as Rings image and imageArea
+       /// Populates copyRect, as well as Rings image and imageArea. Translates and scales any existing rings as if they existed on the original bitmap.
        /// </summary>
        /// <param name="s"></param>
         protected override RequestedAction LayoutImage(ImageState s) {
@@ -744,6 +764,9 @@ namespace ImageResizer
                 //Restore targetSize to match areaSize //Warning - crop always forces scale=both.
                 targetSize = areaSize;
             }
+
+            //Translate and scale all existing rings
+            s.layout.Shift(new RectangleF(0, 0, s.originalSize.Width, s.originalSize.Height), new RectangleF(new Point(0, 0), targetSize));
 
             s.layout.AddRing("image", PolygonMath.ToPoly(new RectangleF(new PointF(0, 0), targetSize)));
 
