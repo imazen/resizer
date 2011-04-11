@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ImageResizer.Plugins.S3Reader")]
+[assembly: AssemblyTitle("S3Cache")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("ImageResizer.Plugins.S3Reader")]
+[assembly: AssemblyProduct("S3Cache")]
 [assembly: AssemblyCopyright("Copyright ©  2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("8edaeb47-7067-4c77-aa1b-ffbeeab5e81d")]
+[assembly: Guid("72df6db6-b9b3-424b-a818-cb9577ed0279")]
 
 // Version information for an assembly consists of the following four values:
 //

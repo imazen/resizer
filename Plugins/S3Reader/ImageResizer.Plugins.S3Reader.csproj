@@ -5,12 +5,12 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{E0BA4510-C4FF-49D6-9F7E-DB90E816A083}</ProjectGuid>
+    <ProjectGuid>{A3B6F984-D500-40F1-B836-C02B46FCF14D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>fbs.ImageResizer.Plugins.S3Reader</RootNamespace>
-    <AssemblyName>fbs.ImageResizer.Plugins.S3Reader</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <RootNamespace>ImageResizer.Plugins.S3Reader</RootNamespace>
+    <AssemblyName>ImageResizer.Plugins.S3Reader</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -32,12 +32,29 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="S3File.cs" />
+    <Compile Include="S3PathEventArgs.cs" />
+    <Compile Include="S3Reader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="S3VirtualPathProvider.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\ImageResizer.csproj">
+      <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
+      <Name>ImageResizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Libs\LitS3-1.0.1\LitS3\LitS3.csproj">
+      <Project>{C564E026-D515-4E8B-ADED-36087E89443E}</Project>
+      <Name>LitS3</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
