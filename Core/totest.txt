@@ -26,3 +26,5 @@ ResizeSettings (needs 'normalization' method and improved querystring parsing)
 Utils
 
 InterceptModule
+
+Verify filenames with a & are handled properly

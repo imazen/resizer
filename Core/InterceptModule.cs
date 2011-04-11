@@ -121,8 +121,8 @@ namespace ImageResizer {
                 UrlEventArgs ue = new UrlEventArgs(filePath + app.Context.Request.PathInfo, q); //Includes pathinfo
                 conf.FireRewritingEvents(this, app.Context,ue);
 
-                //Pull data back out of event object
-                string basePath = ue.VirtualPath;
+                //Pull data back out of event object, resolving app-relative paths
+                string virtualPath = fixPath(ue.VirtualPath);
                 q = ue.QueryString;
 
                 //See if resizing is wanted (i.e. one of the querystring commands is present).
@@ -137,31 +137,44 @@ namespace ImageResizer {
                         user = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), new string[0]);
 
                     //Run the rewritten path past the auth system again
-                    if (!UrlAuthorizationModule.CheckUrlAccessForPrincipal(basePath, user, "GET")) throw new HttpException(403, "Access denied.");
+                    if (!UrlAuthorizationModule.CheckUrlAccessForPrincipal(virtualPath, user, "GET")) throw new HttpException(403, "Access denied.");
 
-                    //Allow user code to deny access.
-                    conf.FirePostAuthorizeImage(this, app.Context, new UrlEventArgs(basePath, new NameValueCollection(q)));
+                    //Allow user code to deny access, but not modify the url or querystring.
+                    conf.FirePostAuthorizeImage(this, app.Context, new UrlEventArgs(virtualPath, new NameValueCollection(q)));
 
                     //Store the modified querystring in request for use by VirtualPathProviders
                     app.Context.Items[conf.ModifiedQueryStringKey] = q; // app.Context.Items["modifiedQueryString"] = q;
 
-                    //Build a URL using the new basePath and the new Querystring 
-                    yrl current = new yrl(basePath);
-                    current.QueryString = q;
+                    
+                    //Does the file exist?
+                    bool existsPhysically = (conf.VppUsage != VppUsageOption.Always) && System.IO.File.Exists(HostingEnvironment.MapPath(virtualPath));
 
-                    //If the file or virtual file exists, resize it
-                    if (conf.VppUsage != VppUsageOption.Always && current.FileExists ||
-                        (conf.VppUsage != VppUsageOption.Never && HostingEnvironment.VirtualPathProvider.FileExists(getVPPSafePath(current))))
-                        ResizeRequest(app.Context, current);
+                    //Mutually exclusive with existsPhysically. 
+                    bool existsVirtually = (conf.VppUsage != VppUsageOption.Never && !existsPhysically) && HostingEnvironment.VirtualPathProvider.FileExists(virtualPath);
+                    //Create the virtual file instance only if (a) VppUsage=always, and it exists virtually, or (b) VppUsage=fallback, and it only exists virtually
+                    VirtualFile vf = existsVirtually ? HostingEnvironment.VirtualPathProvider.GetFile(virtualPath) : null;
+
+                    //Only process files that exists
+                    if (existsPhysically || existsVirtually)
+                        ResizeRequest(app.Context, virtualPath, q, vf);
+
 
                 }
             }
 
         }
 
+        /// <summary>
+        /// Turns relative paths into domain-relative paths.
+        /// Turns app-relative paths into domain relative paths.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
+        protected String fixPath(string virtualPath) {
 
-        protected String getVPPSafePath(yrl y) {
-            return yrl.GetAppFolderName().TrimEnd(new char[] { '/' }) + "/" + y.BaseFile;
+            if (virtualPath.StartsWith("~")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/" + virtualPath.TrimStart('/');
+            if (!virtualPath.StartsWith("/")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/" + virtualPath;
+            return virtualPath;
         }
 
 
@@ -174,14 +187,9 @@ namespace ImageResizer {
         /// </summary>
         /// <param name="context"></param>
         /// <param name="current"></param>
-        protected virtual void ResizeRequest(HttpContext context, yrl current) {
+        protected virtual void ResizeRequest(HttpContext context, string virtualPath, NameValueCollection queryString, VirtualFile vf) {
             Stopwatch s = new Stopwatch();
             s.Start();
-
-            //Create our virtual file (if needed/wanted)
-            VirtualFile vf = null;
-            if (conf.VppUsage == VppUsageOption.Always || (conf.VppUsage == VppUsageOption.Fallback && !File.Exists(current.Local)))
-                vf = HostingEnvironment.VirtualPathProvider.GetFile(getVPPSafePath(current));
 
 
             //Find out if we have a modified date that we can work with
@@ -194,12 +202,12 @@ namespace ImageResizer {
                 }
             }
 
-            ResizeSettings settings =new ResizeSettings(current.QueryString);
+            ResizeSettings settings =new ResizeSettings(queryString);
             IEncoder guessedEncoder = conf.GetImageBuilder().EncoderProvider.GetEncoder(null,settings);
 
             //Build CacheEventArgs
             ResponseArgs e = new ResponseArgs();
-            e.RequestKey = current.ToString();
+            e.RequestKey = virtualPath + Utils.toQuerystring(queryString);
             e.RewrittenQuerystring = settings;
             e.ResponseHeaders.ContentType = guessedEncoder.MimeType;
             e.SuggestedExtension = guessedEncoder.Extension;
@@ -207,7 +215,7 @@ namespace ImageResizer {
             //Add delegate for retrieving the modified date of the source file. s
             e.GetModifiedDateUTC = new ModifiedDateDelegate(delegate() {
                 if (vf == null)
-                    return System.IO.File.GetLastWriteTimeUtc(current.Local);
+                    return System.IO.File.GetLastWriteTimeUtc(HostingEnvironment.MapPath(virtualPath));
                 else if (hasModifiedDate)
                     return modDate;
                 else return DateTime.MinValue; //Won't be called, no modified date available.
@@ -220,7 +228,7 @@ namespace ImageResizer {
                 if (vf != null)
                     conf.GetImageBuilder().Build(vf, stream, settings);
                 else
-                    conf.GetImageBuilder().Build(current.Local, stream, settings);
+                    conf.GetImageBuilder().Build(HostingEnvironment.MapPath(virtualPath), stream, settings);
 
             });
             
