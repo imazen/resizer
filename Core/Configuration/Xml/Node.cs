@@ -162,6 +162,7 @@ namespace ImageResizer.Configuration.Xml {
                 //Add it if doesn't exist
                 if (results == null || results.Count == 0) {
                     Node newNode = new Node(part);
+                    if (n.children == null) n.children = new List<Node>();
                     n.Children.Add(newNode);
                     n = newNode;
                 } else {
@@ -232,10 +233,12 @@ namespace ImageResizer.Configuration.Xml {
             foreach (string key in this.Attrs.AllKeys) {
                 n[key] = this[key];
             }
+            
             //copy children recursive
-            foreach (Node c in this.Children) {
-                n.Children.Add(c.deepCopy());
-            }
+            if (this.children != null)
+                foreach (Node c in this.Children)
+                    n.Children.Add(c.deepCopy());
+            
             return n;
         }
 
