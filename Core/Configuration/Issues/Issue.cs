@@ -64,5 +64,14 @@ namespace ImageResizer.Configuration.Issues {
             sb.Append((int)severity);
             return sb.ToString().GetHashCode();
         }
+
+        public override string ToString() {
+            return Source + "(" + Severity.ToString() + "):\t" + Summary +
+                    ("\n" + Details).Replace("\n", "\n\t\t\t") + "\n";
+        }
+        public override bool Equals(object obj) {
+            if (obj == null) return base.Equals(obj);
+            return GetHashCode() == obj.GetHashCode();
+        }
     }
 }
