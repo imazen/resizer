@@ -7,6 +7,9 @@ using ImageResizer.Caching;
 using ImageResizer.Resizing;
 using ImageResizer.Configuration.Xml;
 using ImageResizer.Configuration.Issues;
+using System.Reflection;
+using System.Diagnostics;
+using System.Collections;
 
 namespace ImageResizer.Configuration {
     public class PluginConfig :IssueSink, IEncoderProvider {
@@ -15,8 +18,11 @@ namespace ImageResizer.Configuration {
             List<IIssue> issues = new List<IIssue>(base.GetIssues());
             //Verify all plugins are registered as IPlugins also.
             //Verify there is something other than NoCache registered
-            if (c.Plugins.CachingSystems.First is NoCache)
+            if (c.Plugins.CachingSystems.First is ImageResizer.Plugins.Basic.NoCache)
                 issues.Add(new Issue("NoCache is only for development usage, and cannot scale to production use."));
+
+            if (c.Plugins.ImageEncoders.First is ImageResizer.Plugins.Basic.DefaultEncoder)
+                issues.Add(new Issue("DefaultEncoder produces poor GIF and 8-bit PNG results. PrettyGIFs is suggested."));
             
             return issues;
         }
@@ -65,11 +71,11 @@ namespace ImageResizer.Configuration {
             if (plugins == null) return;
             foreach (Node n in plugins.Children) {
                 if (n.Name.Equals("add", StringComparison.OrdinalIgnoreCase)) 
-                    addPluginByName(n["name"]);
+                    add_plugin_by_name(n["name"]);
                 else if (n.Name.Equals("remove", StringComparison.OrdinalIgnoreCase))
-                    removePluginsByName(n["name"]);
+                    remove_plugins_by_name(n["name"]);
                 else if (n.Name.Equals("clear", StringComparison.OrdinalIgnoreCase))
-                    clearPluginsByType(n["type"]);
+                    clear_plugins_by_type(n["type"]);
                 else {
                     this.AcceptIssue(new Issue("Plugins", "Unexpected element <" + n.Name + "> in <plugins></plugins>.",
                                                 "Element XML: " + n.ToXmlElement().OuterXml, IssueSeverity.Warning));
@@ -89,21 +95,21 @@ namespace ImageResizer.Configuration {
             return results;
         }
 
-        protected void removePluginsByName(string name) {
-            Type t = GetPluginType(name);
+        public void remove_plugins_by_name(string name) {
+            Type t = get_plugin_type(name);
             if (t == null) return; //Failed to acquire type
             foreach (IPlugin p in GetPluginsByType(t))
                 if (!p.Uninstall(c)) AcceptIssue(new Issue("Plugin " + t.FullName + " reported a failed uninstall attempt triggered by a <remove name=\"" + name + "\" />.", IssueSeverity.Error));
         }
-        protected void addPluginByName(string name) {
+        public void add_plugin_by_name(string name) {
             IPlugin p = CreatePluginByName(name);
             p.Install(c);
         }
-        protected void clearPluginsByType(string type) {
+        public void clear_plugins_by_type(string type) {
             Type t = null;
             if ("encoders".Equals(type, StringComparison.OrdinalIgnoreCase)) t = typeof(IEncoder);
             if ("caches".Equals(type, StringComparison.OrdinalIgnoreCase)) t = typeof(ICache);
-            if ("imagebuilderextensions".Equals(type, StringComparison.OrdinalIgnoreCase)) t = typeof(BuilderExtension);
+            if ("extensions".Equals(type, StringComparison.OrdinalIgnoreCase)) t = typeof(BuilderExtension);
             if ("all".Equals(type, StringComparison.OrdinalIgnoreCase) || type == null) t = typeof(IPlugin);
             if (t == null) this.AcceptIssue(new Issue("Unrecognized type value \"" + type + "\" in <clear type=\"" + type + "\" />.", IssueSeverity.ConfigurationError));
             else {
@@ -113,36 +119,93 @@ namespace ImageResizer.Configuration {
             }
         }
 
-        protected Type GetPluginType(string name) {
+        public Type get_plugin_type(string searchName) {
             Type t = null;
 
-            string convention = "ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.');
-            string alternate = "ImageResizer.Plugins." + name.TrimStart('.');
+            int commaAt = searchName.IndexOf(',');
+            int dotAt = searchName.IndexOf('.');
 
             //If there is a dot or period, try the exact name first.
-            bool looksQualified = (name.IndexOfAny(new char[] { '.', ',' }) > -1);
-            if (looksQualified)
-                t = Type.GetType(name, false, true);
-            //Try the default convention, with the namespace and plugin class name identical
-            if (t == null)
-                t = Type.GetType(convention, false, true);
-            //Try the exact name if we didn't already try it
-            if (t == null && !looksQualified)
-                t = Type.GetType(name, false, true);
-            //Try some other stuff...
-            if (t == null)
-                t = Type.GetType(alternate, false, true);
+            if (dotAt > -1 || commaAt > -1)
+                t = Type.GetType(searchName, false, true);
 
-            //Ok, time to fail.
+            if (t != null) return t;
+
+            //Split the name and assembly apart
+            string assembly = commaAt > -1 ? searchName.Substring(commaAt) : null;
+            string name = commaAt > -1 ? searchName.Substring(0, commaAt) : searchName;
+
+            //Without the assembly specified, does it still have a name?
+            bool hasDot = name.IndexOf('.') > -1;
+
+            List<string> alternateNames = new List<string>();
+            //ImageResizer.Plugins.Basic.DefaultEncoder
+            if (hasDot) alternateNames.Add(name);
+            //DefaultEncoder, NoCache, etc.
+            alternateNames.Add("ImageResizer.Plugins.Basic." + name.TrimStart('.'));
+            //AnimatedGifs
+            if (!hasDot) alternateNames.Add("ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.') + "Plugin");
+            //AnimatedGifsPlugin
+            if (!hasDot && name.EndsWith("Plugin")) 
+                alternateNames.Add("ImageResizer.Plugins." + name.Substring(0,name.Length - 6).Trim('.') + "." + name.Trim('.'));
+            //Basic.DefaultEncoder
+            alternateNames.Add("ImageResizer.Plugins." + name.TrimStart('.'));
+            //For the depreciated convention of naming the plugin namespace and class the same.
+            if (!hasDot) alternateNames.Add("ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.'));
+            //Plugins.Basic.DefaultEncoder
+            alternateNames.Add("ImageResizer." + name.TrimStart('.'));
+            //PluginWithNoNamespace
+            if (!hasDot) alternateNames.Add(name);
+
+            List<string> assemblies = new List<string>();
+            //1) If an assembly was specified, search it first
+            if (assembly != null) assemblies.Add(assembly);
+            //2) Follow by searching the Core, the currently executing assembly
+            assemblies.Add(""); // Defaults to current assembly
+            //3) Next, add all assemblies that have "ImageResizer" in their name 
+            List<string> otherAssemblies = new List<string>();
+             //Add ImageResizer-related assemblies first
+            foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies()) {
+                string aname = a.FullName;
+                if (aname.IndexOf("ImageResizer", StringComparison.OrdinalIgnoreCase) > -1) assemblies.Add(", " + aname);
+                else 
+                    otherAssemblies.Add(", " + aname);
+            }
+            //4) Last, add all remaining assemblies
+            assemblies.AddRange(otherAssemblies);
+
+            //Now multiply 
+            List<string> qualifiedNames = new List<string>(assemblies.Count * alternateNames.Count);
+
+            //For each assembly, try each namespace-qualified class name.
+            foreach (string assemblyName in assemblies) {
+                foreach (string className in alternateNames)
+                    qualifiedNames.Add(className + assemblyName);
+            }
+
+
+            //Now, try them all.
+            foreach (string s in qualifiedNames) {
+                if (t != null) return t;
+                Debug.WriteLine("Trying " + s);
+                t = Type.GetType(s, false, true);
+                if (t != null) Debug.WriteLine("Success!");
+            }
+
+
+            //Ok, time to log problem.
             if (t == null) {
-                this.AcceptIssue(new Issue( "Failed to load plugin by name \"" + name + "\"",
-                    "Attempted using \"" + name + "\", \"" + convention + "\", and \"" + alternate + "\". \n" +
-                    "Verify the plugin DLL is located in /bin, and that the name is spelled correctly.", IssueSeverity.ConfigurationError));
+                StringBuilder attempts = new StringBuilder();
+                foreach (string s in qualifiedNames)
+                    attempts.Append(", \"" + s + "\"");
+                this.AcceptIssue(new Issue( "Failed to load plugin by name \"" + searchName + "\"",
+                    "Verify the plugin DLL is located in /bin, and that the name is spelled correctly. \n" +
+                    "Attempted using \"" + searchName + "\"" + attempts.ToString() + ".", IssueSeverity.ConfigurationError));
             }
             return t;
         }
         protected IPlugin CreatePluginByName(string name) {
-            Type t = GetPluginType(name);
+            Type t = get_plugin_type(name);
             object plugin = Activator.CreateInstance(t, false);
 
             if (!(plugin is IPlugin))
@@ -247,5 +310,28 @@ namespace ImageResizer.Configuration {
 
 
 
+
+        public void RemoveAllPlugins() {
+            //Follow uninstall protocol
+            foreach (IPlugin p in AllPlugins)
+                p.Uninstall(c);
+
+            IList[] collections = new IList[]{AllPlugins.GetCollection(),QuerystringPlugins.GetCollection(),FileExtensionPlugins.GetCollection()
+                                                ,CachingSystems.GetCollection(),ImageEncoders.GetCollection(),ImageBuilderExtensions.GetCollection()};
+            //Then check all collections, logging an issue if they aren't empty.
+
+            foreach(IList coll in collections){
+                if (coll.Count > 0){
+                    string items = "";
+                    foreach(object item in coll)
+                        items += item.ToString() + ", ";
+
+                    this.AcceptIssue(new Issue("Collection " + coll.ToString() + " was not empty after RemoveAllPlugins() executed!",
+                                        "Remaining items: " + items, IssueSeverity.Error));
+                }
+
+            }
+            
+        }
     }
 }
