@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace ImageResizer.Configuration.Xml {
+    /// <summary>
+    /// Encapsulates a node/attribute selection query, such as "node.node.attribute"
+    /// </summary>
     public class Selector:List<string> {
         public Selector(List<string> items) {
             this.AddRange(items);
