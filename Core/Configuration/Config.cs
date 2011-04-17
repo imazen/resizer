@@ -117,14 +117,15 @@ namespace ImageResizer.Configuration {
         /// <summary>
         /// The ResizeConfigrationSection is not thread safe, and should not be modified
         /// Dynamically loads the ConfigurationSection from web.config when accessed for the first time. 
+        /// If the resizer node doesn't exist, an empty configuration object is created with just the root resizer node.
         /// </summary>
         protected ResizerConfigurationSection cs {
             get {
                 if (configuration == null) {
                     lock (configurationLock) {
                         if (configuration == null) {
-                            ResizerConfigurationSection tmpConf = (ResizerConfigurationSection)System.Configuration.ConfigurationManager.GetSection("resizer");
-                            configuration = tmpConf;
+                            ResizerConfigurationSection section = System.Configuration.ConfigurationManager.GetSection("resizer") as ResizerConfigurationSection;
+                            configuration = section != null ? section : new ResizerConfigurationSection();
                         }
                     }
                 }
