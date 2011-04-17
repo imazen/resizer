@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Plugins;
+using ImageResizer.Caching;
 
-namespace ImageResizer.Caching {
+namespace ImageResizer.Plugins.Basic {
     /// <summary>
     /// Default cache when DiskCache isn't installed. 
     /// Useful for debugging purposes but unsuited for production use, and will use large quanities of RAM. (Scales to fewer than 5 concurrent requests).

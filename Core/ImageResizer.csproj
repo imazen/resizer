@@ -77,11 +77,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Caching\NoCacheHandler.cs" />
+    <Compile Include="Plugins\Basic\ClientCache.cs" />
+    <Compile Include="Plugins\Basic\NoCacheHandler.cs" />
     <Compile Include="Caching\ResponseArgs.cs" />
     <Compile Include="Caching\ICacheProvider.cs" />
     <Compile Include="Caching\IResponseHeaders.cs" />
-    <Compile Include="Caching\NoCache.cs" />
+    <Compile Include="Plugins\Basic\NoCache.cs" />
     <Compile Include="Caching\ResponseHeaders.cs" />
     <Compile Include="Configuration\CacheSelectionEventArgs.cs" />
     <Compile Include="Configuration\Config.cs" />
@@ -101,20 +102,20 @@
     <Compile Include="Configuration\UrlEventArgs.cs" />
     <Compile Include="Configuration\Xml\Node.cs" />
     <Compile Include="Configuration\Xml\Selector.cs" />
-    <Compile Include="Plugins\DropShadow\DropShadow.cs" />
+    <Compile Include="Plugins\Basic\DropShadow.cs" />
     <Compile Include="Plugins\IFileExtensionPlugin.cs" />
-    <Compile Include="Plugins\Trial\Trial.cs" />
-    <Compile Include="Plugins\Diagnostic\Diagnostic.cs" />
-    <Compile Include="Plugins\Diagnostic\DiagnosticPageHandler.cs" />
+    <Compile Include="Plugins\Basic\Trial.cs" />
+    <Compile Include="Plugins\Basic\Diagnostic.cs" />
+    <Compile Include="Plugins\Basic\DiagnosticPageHandler.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Configuration\Xml\ResizerConfigurationSection.cs" />
     <Compile Include="Caching\ICache.cs" />
     <Compile Include="Configuration\SafeList.cs" />
-    <Compile Include="Encoding\DefaultEncoder.cs" />
+    <Compile Include="Plugins\Basic\DefaultEncoder.cs" />
     <Compile Include="Encoding\IEncoderProvider.cs" />
     <Compile Include="Encoding\IEncoder.cs" />
     <Compile Include="Plugins\IQuerystringPlugin.cs" />
-    <Compile Include="Plugins\SizeLimiting\SizeLimiting.cs" />
+    <Compile Include="Plugins\Basic\SizeLimiting.cs" />
     <Compile Include="Resizing\AbstractImageProcessor.cs" />
     <Compile Include="Resizing\BoxPadding.cs" />
     <Compile Include="Resizing\Enumerations.cs" />
@@ -125,7 +126,7 @@
     <Compile Include="Plugins\IVirtualBitmapFile.cs" />
     <Compile Include="Resizing\BuilderExtension.cs" />
     <Compile Include="Resizing\LayoutBuilder.cs" />
-    <Compile Include="Plugins\SizeLimiting\SizeLimits.cs" />
+    <Compile Include="Plugins\Basic\SizeLimits.cs" />
     <Compile Include="Util\PolygonMath.cs" />
     <Compile Include="Plugins\IVirtualFileWithModifiedDate.cs" />
     <Compile Include="Resizing\ResizeSettings.cs" />
@@ -163,6 +164,7 @@
   <ItemGroup>
     <Content Include="extending.txt" />
     <Content Include="modules.txt" />
+    <Content Include="Plugins\Basic\caching.txt" />
     <Content Include="totest.txt" />
   </ItemGroup>
   <ItemGroup>

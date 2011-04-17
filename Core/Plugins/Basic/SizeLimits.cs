@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 
-namespace ImageResizer.Plugins.SizeLimiting {
+namespace ImageResizer.Plugins.Basic {
     public class SizeLimits {
 
         public class SizeLimitException : ApplicationException {

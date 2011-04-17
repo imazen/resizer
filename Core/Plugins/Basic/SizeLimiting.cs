@@ -5,7 +5,7 @@ using ImageResizer.Resizing;
 using System.Drawing;
 using ImageResizer.Configuration;
 
-namespace ImageResizer.Plugins.SizeLimiting {
+namespace ImageResizer.Plugins.Basic {
     /// <summary>
     /// Implements app-wide size limits on image size
     /// </summary>

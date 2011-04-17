@@ -6,8 +6,9 @@ using System.Drawing;
 using System.IO;
 using System.Collections.Specialized;
 using ImageResizer.Plugins;
+using ImageResizer.Encoding;
 
-namespace ImageResizer.Encoding {
+namespace ImageResizer.Plugins.Basic {
     public class DefaultEncoder :IEncoder, IQuerystringPlugin, IPlugin {
 
         public DefaultEncoder() {

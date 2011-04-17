@@ -7,7 +7,7 @@ using System.Threading;
 using System.Drawing;
 using ImageResizer.Util;
 
-namespace ImageResizer.Plugins.Trial {
+namespace ImageResizer.Plugins.Basic {
     /// <summary>
     /// Can be used by plugins to implement 'trial version' functionality
     /// </summary>
