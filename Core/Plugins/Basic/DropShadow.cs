@@ -5,7 +5,7 @@ using ImageResizer.Resizing;
 using ImageResizer.Util;
 using System.Drawing;
 
-namespace ImageResizer.Plugins.DropShadow {
+namespace ImageResizer.Plugins.Basic {
     /// <summary>
     /// Adds drop shadow capabilities
     /// </summary>

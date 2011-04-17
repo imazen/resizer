@@ -49,8 +49,8 @@ namespace ImageResizer.Configuration {
             pipeline = new PipelineConfig(this);
 
             //Load default plugins
-            new DefaultEncoder().Install(this);
-            new NoCache().Install(this);
+            new ImageResizer.Plugins.Basic.DefaultEncoder().Install(this);
+            new ImageResizer.Plugins.Basic.NoCache().Install(this);
 
             //Load plugins on the first request, unless they are already loaded.
             pipeline.OnFirstRequest += delegate(IHttpModule sender, HttpContext context) {
@@ -107,7 +107,7 @@ namespace ImageResizer.Configuration {
 
 
         protected void InvalidateImageBuilder() {
-            lock (_imageBuilderSync) _imageBuilder = _imageBuilder.Create(plugins.ImageBuilderExtensions, plugins);
+            lock (_imageBuilderSync) if (_imageBuilder != null) _imageBuilder = _imageBuilder.Create(plugins.ImageBuilderExtensions, plugins);
         }
         #endregion
 
@@ -136,15 +136,6 @@ namespace ImageResizer.Configuration {
         /// Returns a list of all issues reported by the resizing core, as well as by all the plugins
         /// </summary>
         public IIssueProvider AllIssues { get { return new IssueGatherer(this); } }
-
-        private void SaveConfiguration() {
-            //System.Configuration.Configuration webConfig =
-            //     System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("/Temp");
-            //TODO: check IsLocked
-            //((ResizerConfigurationSection)webConfig.GetSection("resizing")).replaceRootNode(cs.getCopyOfRootNode());
-
-            //webConfig.SaveAs("c:\\webConfig.xml", ConfigurationSaveMode.Modified);
-        }
 
         public string get(string selector, string defaultValue) {
             return cs.getAttr(selector, defaultValue);

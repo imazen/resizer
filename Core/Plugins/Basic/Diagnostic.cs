@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Configuration;
+using ImageResizer.Plugins;
 
-namespace ImageResizer.Plugins.Diagnostic {
+namespace ImageResizer.Plugins.Basic {
     public class Diagnostic :IPlugin{
         Config c;
         public IPlugin Install(Configuration.Config c) {

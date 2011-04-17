@@ -7,7 +7,7 @@ using ImageResizer.Configuration.Issues;
 using System.Web.Hosting;
 using System.Reflection;
 
-namespace ImageResizer.Plugins.Diagnostic {
+namespace ImageResizer.Plugins.Basic {
     public class DiagnosticPageHandler : IHttpHandler {
         Config c;
         public DiagnosticPageHandler(Config c) {

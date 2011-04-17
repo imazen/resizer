@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Web;
+using ImageResizer.Caching;
 
-namespace ImageResizer.Caching {
+namespace ImageResizer.Plugins.Basic {
     public class NoCacheHandler :IHttpHandler{
         private IResponseArgs e;
 

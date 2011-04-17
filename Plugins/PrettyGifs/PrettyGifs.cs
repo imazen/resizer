@@ -5,7 +5,9 @@ using ImageResizer.Encoding;
 using System.Drawing.Imaging;
 using System.Drawing;
 using ImageResizer;
+using ImageResizer.Plugins;
 using System.IO;
+using ImageResizer.Plugins.Basic;
 
 namespace ImageResizer.Plugins.PrettyGifs {
     public class PrettyGifs :IEncoder, IPlugin, IQuerystringPlugin {
@@ -15,7 +17,7 @@ namespace ImageResizer.Plugins.PrettyGifs {
         public PrettyGifs(Image original, ResizeSettings settings) {
             ResizeSettings q = settings;
             //Parse output format
-            OutputFormat = GetFormatIfSuitable(original, settings);
+            OutputFormat = GetFormatIfSuitable(original, settings); 
             //Parse colors
             int colors = -1;
             if (!string.IsNullOrEmpty(q["colors"]))

@@ -18,7 +18,7 @@ namespace ImageResizer.Encoding {
         IEncoder CreateIfSuitable(Image originalImage, ResizeSettings settings);
 
         /// <summary>
-        /// Encodes the image to the specified stream, 
+        /// Encodes the image to the specified stream 
         /// </summary>
         /// <param name="s"></param>
         void Write(Image i, Stream s);
