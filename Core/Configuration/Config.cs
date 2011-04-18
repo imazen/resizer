@@ -51,6 +51,7 @@ namespace ImageResizer.Configuration {
             //Load default plugins
             new ImageResizer.Plugins.Basic.DefaultEncoder().Install(this);
             new ImageResizer.Plugins.Basic.NoCache().Install(this);
+            new ImageResizer.Plugins.Basic.ClientCache().Install(this);
 
             //Load plugins on the first request, unless they are already loaded.
             pipeline.OnFirstRequest += delegate(IHttpModule sender, HttpContext context) {
@@ -165,6 +166,24 @@ namespace ImageResizer.Configuration {
                 new Issue("Invalid boolean value in imageresizer configuration section, " + selector + ":" + s, IssueSeverity.ConfigurationError));
             return defaultValue;
         }
+
+        public T get<T>(string selector, T defaultValue) where T : Enum {    
+            string value = get(selector, null);
+            if (value == null) return defaultValue;
+            try {
+                return (T)Enum.Parse(typeof(T), value, true);
+            } catch (ArgumentException) {
+                //Build a list of valid names for the enumeration
+                string[] validNames = Enum.GetNames(typeof(T));
+                string valid = "";
+                for (int i = 0; i < validNames.Length; i++)
+                    valid += (i == validNames.Length -1) ? ", and " + validNames[i] : ((i != 0) ? ", " : "") + validNames[i];
+
+                configurationSectionIssues.AcceptIssue(new Issue("Failed to parse " + selector + ". Invalid value \"" + value + "\".", "Valid values are " + valid, IssueSeverity.ConfigurationError));
+                return defaultValue;
+            }    
+        }
+
         /// <summary>
         /// Returns a deep copy of the specified node
         /// </summary>
