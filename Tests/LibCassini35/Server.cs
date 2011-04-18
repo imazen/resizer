@@ -24,7 +24,7 @@ using System.Web;
 using System.Web.Hosting;
 
 namespace LibCassini {
-    class Server : MarshalByRefObject {
+    public class Server : MarshalByRefObject {
         int _port;
         string _virtualPath;
         string _physicalPath;

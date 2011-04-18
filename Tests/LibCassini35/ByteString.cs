@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace LibCassini {
-    class ByteString {
+    public class ByteString {
         byte[] _bytes;
         int _offset;
         int _length;
