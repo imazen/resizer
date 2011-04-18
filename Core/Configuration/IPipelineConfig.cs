@@ -49,10 +49,10 @@ namespace ImageResizer.Configuration {
         VppUsageOption VppUsage { get; }
 
         /// <summary>
-        /// The fake extension to strip from incoming requests before verifying they are the correct type of request for the pipeline to process.
-        /// Should include a leading ".";
+        /// A list of fake extensions to strip from incoming requests before verifying they are the correct type of request for the pipeline to process.
+        /// Should include leading periods;
         /// </summary>
-        string FakeExtension { get; }
+        IList<string> FakeExtensions { get; }
 
         /// <summary>
         /// Returns an ImageBuilder instance to use for image processing.
