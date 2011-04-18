@@ -67,7 +67,7 @@ namespace ImageResizer.Caching {
             }
         }
 
-        protected HttpCacheability cacheControl = HttpCacheability.Public;
+        protected HttpCacheability cacheControl = HttpCacheability.Private;
 
         public HttpCacheability CacheControl {
             get { return cacheControl; }

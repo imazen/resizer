@@ -17,26 +17,28 @@ namespace ImageResizer.Caching {
         /// </summary>
         string ContentType { get; set; }
         /// <summary>
-        /// The cache setting
+        /// The cache setting. Defaults to private
         /// </summary>
         HttpCacheability CacheControl { get; set; }
         /// <summary>
-        /// The time at which the cached data should expire. 
+        /// The UTC time at which the cached data should expire. 
         /// Browsers generally don't re-request resources until the they have expired (unlike modififeddate).
         /// If MinValue, will be ignored.
         /// </summary>
         DateTime Expires { get; set; }
         /// <summary>
-        /// The modified date send with the response. Used by browsers with If-Modified-Since to check a cached value is still valid.
+        /// The UTC modified date send with the response. Used by browsers with If-Modified-Since to check a cached value is still valid.
         /// If = MinValue, will be ignored.
         /// </summary>
         DateTime LastModified { get; set; }
         /// <summary>
         /// When true: If a client requests a refresh, the response will *still* be served from the server cache.
+        /// Defaults to false
         /// </summary>
         bool ValidUntilExpires { get; set; }
         /// <summary>
         /// ASP.Net sometimes sends Vary: * which obliterates caching. Vary is to be avoided anyhow.
+        /// Defaults to true
         /// </summary>
         bool SuppressVaryHeader { get; set; }
 
@@ -57,7 +59,7 @@ namespace ImageResizer.Caching {
         List<CacheDependency> ServerCacheDependencies { get; set; }
 
         /// <summary>
-        /// A method to apply the values stored in IResponseHeaders to the specified HttpContext.
+        /// A delegate method to apply the values stored in IResponseHeaders to the specified HttpContext.
         /// </summary>
         ApplyResponseHeadersDelegate ApplyToResponse { get; set; }
         /// <summary>

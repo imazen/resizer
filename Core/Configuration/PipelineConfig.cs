@@ -129,9 +129,18 @@ namespace ImageResizer.Configuration {
             return false;
         }
 
-
-        public string FakeExtension {
-            get { return c.get("pipeline.fakeExtension",".ashx"); }
+        protected volatile IList<string> _fakeExtensions = null;
+        /// <summary>
+        /// Cached access to pipeline.fakeExtensions
+        /// </summary>
+        public IList<string> FakeExtensions {
+            get {
+                IList<string> temp = _fakeExtensions;
+                if (temp != null) return temp;
+                else temp = new List<string>(c.get("pipeline.fakeExtensions",".ashx").Split(new char[]{','}, StringSplitOptions.RemoveEmptyEntries));
+                _fakeExtensions = temp;
+                return temp;
+            }
         }
 
         public string ModifiedQueryStringKey {

@@ -1,82 +1,37 @@
-/**
- * Written by Nathanael Jones 
- * http://nathanaeljones.com
- * nathanael.jones@gmail.com
- * 
- * Although I typically release my components for free, I decided to charge a 
- * 'download fee' for this one to help support my other open-source projects. 
- * Don't worry, this component is still open-source, and the license permits 
- * source redistribution as part of a larger system. However, I'm asking that 
- * people who want to integrate this component purchase the download instead 
- * of ripping it out of another open-source project. My free to non-free LOC 
- * (lines of code) ratio is still over 40 to 1, and I plan on keeping it that 
- * way. I trust this will keep everybody happy.
- * 
- * By purchasing the download, you are permitted to 
- * 
- * 1) Modify and use the component in all of your projects. 
- * 
- * 2) Redistribute the source code as part of another project, provided 
- * the component is less than 5% of the project (in lines of code), 
- * and you keep this information attached.
- * 
- * 3) If you received the source code as part of another open source project, 
- * you cannot extract it (by itself) for use in another project without purchasing a download 
- * from http://nathanaeljones.com/. If nathanaeljones.com is no longer running, and a download
- * cannot be purchased, then you may extract the code.
- * 
- * Disclaimer of warranty and limitation of liability continued at http://nathanaeljones.com/11151_Image_Resizer_License
- **/
-
-//Clear the image cache before upgrading.. .not sure why it's needed, but images appear corrupted...
-
 using System;
-using System.Configuration;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using System.Drawing;
-using System.IO;
-using System.Web.Hosting;
-using System.Drawing.Imaging;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Collections.Specialized;
-using System.Text.RegularExpressions;
-using System.Security.Cryptography;
-using System.Text;
-using System.Security.Principal;
-using ImageResizer.Caching;
 using ImageResizer.Configuration;
-using ImageResizer.Encoding;
+using System.Web;
+using System.Collections.Specialized;
+using System.Security.Principal;
+using System.Web.Security;
+using System.Web.Hosting;
+using System.Diagnostics;
 using ImageResizer.Plugins;
+using ImageResizer.Encoding;
+using ImageResizer.Caching;
 using ImageResizer.Util;
-
-
+using System.Collections.Generic;
 namespace ImageResizer {
 
     /// <summary>
     /// Monitors incoming image requests. Image requests that request resizing are processed, cached, and served.
     /// </summary>
-    public class InterceptModule : System.Web.IHttpModule {
+    public class InterceptModule : IHttpModule {
 
         /// <summary>
         /// Called when the app is initialized
         /// </summary>
         /// <param name="context"></param>
-        void System.Web.IHttpModule.Init(System.Web.HttpApplication context) {
+        void IHttpModule.Init(System.Web.HttpApplication context) {
             //We wait until after URL auth happens for security. (although we authorize again since we are doing URL rewriting)
-            context.PostAuthorizeRequest += new EventHandler(CheckRequest_PostAuthorizeRequest);
+            context.PostAuthorizeRequest += CheckRequest_PostAuthorizeRequest;
 
             //This is where we set content-type and caching headers. content-type often don't match the
             //file extension, so we have to override them
-            context.PreSendRequestHeaders += new EventHandler(context_PreSendRequestHeaders);
+            context.PreSendRequestHeaders += context_PreSendRequestHeaders;
 
         }
-        void System.Web.IHttpModule.Dispose() { }
+        void IHttpModule.Dispose() { }
         /// <summary>
         /// Current configuration. Same as Config.Current.Pipeline
         /// </summary>
@@ -100,17 +55,21 @@ namespace ImageResizer {
 
             conf.FirePostAuthorizeRequest(this, app.Context);
 
-            //Copy FilePath so we can modify it
-            string filePath = app.Context.Request.FilePath; //Doesn't include pathInfo
+            //Copy FilePath so we can modify it. Add PathInfo back on so we can support directories with dots in them.
+            string filePath = app.Context.Request.FilePath + app.Context.Request.PathInfo;
 
             //Allows users to append .ashx to all their image URLs instead of doing wildcard mapping.
-            string altExtension = conf.FakeExtension; // Configuration.get("rewriting.fakeExtension", ".ashx");
+            IList<string> altExtensions = conf.FakeExtensions; //pipeline.fakeExtensions
 
 
-            //Remove extension from filePath, since otherwise IsAcceptedImageType() will fail.
-            if (!string.IsNullOrEmpty(altExtension) && filePath.EndsWith(altExtension, StringComparison.OrdinalIgnoreCase))
-                filePath = filePath.Substring(0, filePath.Length - altExtension.Length).TrimEnd('.');
-
+            //Remove extensions from filePath, since otherwise IsAcceptedImageType() will fail.
+            foreach (string s in altExtensions) {
+                if (filePath.EndsWith(s, StringComparison.OrdinalIgnoreCase)) {
+                    filePath = filePath.Substring(0, filePath.Length - s.Length).TrimEnd('.');
+                    break;
+                }
+            }
+            
 
             //Is this an image request? Checks the file extension for .jpg, .png, .tiff, etc.
             if (conf.IsAcceptedImageType(filePath)) {
@@ -118,7 +77,7 @@ namespace ImageResizer {
                 NameValueCollection q = new NameValueCollection(app.Context.Request.QueryString);
 
                 //Call events to do resize(w,h,f)/ parsing and any other custom syntax.
-                UrlEventArgs ue = new UrlEventArgs(filePath + app.Context.Request.PathInfo, q); //Includes pathinfo
+                UrlEventArgs ue = new UrlEventArgs(filePath, q);
                 conf.FireRewritingEvents(this, app.Context,ue);
 
                 //Pull data back out of event object, resolving app-relative paths
@@ -221,7 +180,7 @@ namespace ImageResizer {
                 else return DateTime.MinValue; //Won't be called, no modified date available.
             });
             //Add delegate for writing the data stream
-            e.ResizeImageToStream = new ResizeImageDelegate(delegate(Stream stream) {
+            e.ResizeImageToStream = new ResizeImageDelegate(delegate(System.IO.Stream stream) {
                 //This runs on a cache miss or cache invalid. This delegate is preventing from running in more
                 //than one thread at a time for the specified source file (current.Local)
 
@@ -291,7 +250,6 @@ namespace ImageResizer {
 
 
         }
-
 
     }
 }
