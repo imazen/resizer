@@ -4,18 +4,26 @@ using System.Text;
 using ImageResizer.Resizing;
 using System.Drawing;
 using ImageResizer.Configuration;
+using ImageResizer.Configuration.Issues;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
-    /// Implements app-wide size limits on image size
+    /// Implements app-wide size Limits on image size
     /// </summary>
-    public class SizeLimiting : BuilderExtension, IPlugin {
+    public class SizeLimiting : BuilderExtension, IPlugin, IIssueProvider {
         public SizeLimiting() {
         }
-        protected SizeLimits l = null;
+        private SizeLimits limits = null;
+        /// <summary>
+        /// The image and total size limits
+        /// </summary>
+        public SizeLimits Limits {
+            get { return limits; }
+            set { limits = value; }
+        }
         public IPlugin Install(Config c) {
             //Load SizeLimits
-
+            limits = new SizeLimits(c);
             c.Plugins.AllPlugins.Add(this);
             c.Plugins.ImageBuilderExtensions.Add(this);
             return this;
@@ -32,8 +40,8 @@ namespace ImageResizer.Plugins.Basic {
 
             SizeF box = s.layout.GetBoundingBox().Size;
 
-            double wFactor = box.Width / l.ImageSize.Width;
-            double hFactor = box.Height / l.ImageSize.Height;
+            double wFactor = box.Width / limits.ImageSize.Width;
+            double hFactor = box.Height / limits.ImageSize.Height;
 
             double scaleFactor = wFactor > hFactor ? wFactor : hFactor;
             if (scaleFactor > 1) {
@@ -44,7 +52,16 @@ namespace ImageResizer.Plugins.Basic {
             return RequestedAction.None;
         }
 
+        protected override RequestedAction PrepareDestinationBitmap(ImageState s) {
+            //Insure the total size is acceptable
+            limits.ValidateTotalSize(s.destSize);
+            return RequestedAction.None;
+        }
 
 
+        public IEnumerable<IIssue> GetIssues() {
+            if (limits != null) return limits.GetIssues();
+            else return null;
+        }
     }
 }
