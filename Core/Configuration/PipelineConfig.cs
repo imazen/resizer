@@ -87,6 +87,7 @@ namespace ImageResizer.Configuration {
         }
         /// <summary>
         /// Returns a unqiue copy of the image extensions supported by the pipeline. Performs a cached query to all registered IQuerystringPlugin instances.
+        /// Use IsAcceptedImageType for better performance.
         /// </summary>
         public ICollection<string> AcceptedImageExtensions {
             get {
@@ -95,6 +96,7 @@ namespace ImageResizer.Configuration {
         }
         /// <summary>
         /// Returns a unqiue copy of all querystring keys supported by the pipeline. Performs a cached query to all registered IQuerystringPlugin instances.
+        /// Use HasPipelineDirective for better performance.
         /// </summary>
         public ICollection<string> SupportedQuerystringKeys {
             get {
@@ -138,6 +140,9 @@ namespace ImageResizer.Configuration {
                 IList<string> temp = _fakeExtensions;
                 if (temp != null) return temp;
                 else temp = new List<string>(c.get("pipeline.fakeExtensions",".ashx").Split(new char[]{','}, StringSplitOptions.RemoveEmptyEntries));
+                for (int i = 0; i < temp.Count; i++) {
+                    if (!temp[i].StartsWith(".")) temp[i] = "." + temp[i];
+                }
                 _fakeExtensions = temp;
                 return temp;
             }
@@ -153,14 +158,7 @@ namespace ImageResizer.Configuration {
 
         public VppUsageOption VppUsage {
             get {
-                string value = c.get("pipeline.vppUsage", null);
-                if (value == null) return VppUsageOption.Fallback;
-                try {
-                    return (VppUsageOption)Enum.Parse(typeof(VppUsageOption), value, true);
-                } catch (ArgumentException ae) {
-                    c.configurationSectionIssues.AcceptIssue(new Issue("Failed to parse pipleine.vppUsage. Invalid value \"" + value + "\".", IssueSeverity.ConfigurationError));
-                    return VppUsageOption.Fallback;
-                }
+                return c.get<VppUsageOption>("pipeline.vppUsage", VppUsageOption.Fallback);
             }
         }
 
@@ -256,7 +254,18 @@ namespace ImageResizer.Configuration {
             if (PostAuthorizeImage != null) PostAuthorizeImage(sender, context, e);
         }
 
+        protected long processedCount = 0;
+        /// <summary>
+        /// The number of images processed by this pipeline.
+        /// </summary>
+        public long ProcessedCount {
+            get {
+                return processedCount;
+            }
+        }
+
         public void FirePreHandleImage(System.Web.IHttpModule sender, System.Web.HttpContext context, IResponseArgs e) {
+            System.Threading.Interlocked.Increment(ref processedCount);
             if (PreHandleImage != null) PreHandleImage(sender, context, e);
         }
 
