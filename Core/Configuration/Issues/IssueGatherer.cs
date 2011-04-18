@@ -4,7 +4,7 @@ using System.Text;
 using ImageResizer.Configuration.Issues;
 using ImageResizer.Plugins;
 
-namespace ImageResizer.Configuration {
+namespace ImageResizer.Configuration.Issues {
     public class IssueGatherer:IIssueProvider {
         Config c = null;
         /// <summary>
@@ -19,6 +19,7 @@ namespace ImageResizer.Configuration {
         public IEnumerable<IIssue> GetIssues() {
             List<IIssue> l = new List<IIssue>();
             l.AddRange(c.configurationSectionIssues.GetIssues());
+            l.AddRange(new ConfigChecker(c).GetIssues());
             l.AddRange(c.Plugins.GetIssues());
             IIssueProvider b = c.CurrentImageBuilder as IIssueProvider;
             if (b != null) l.AddRange(b.GetIssues());
