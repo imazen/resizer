@@ -32,13 +32,8 @@ namespace ImageResizer.Plugins.Basic {
                 totalSize = new Size(totalWidth, totalHeight);
 
 
-            string behavior = c.get("sizelimits.totalbehavior", TotalBehavior.ToString());
-            if (TotalSizeBehavior.ThrowException.ToString().Equals(behavior, StringComparison.OrdinalIgnoreCase))
-                totalBehavior = TotalSizeBehavior.ThrowException;
-            else if (TotalSizeBehavior.IgnoreLimits.ToString().Equals(behavior, StringComparison.OrdinalIgnoreCase))
-                totalBehavior = TotalSizeBehavior.IgnoreLimits;
-            else
-                AcceptIssue(new Issue("sizelimits.totalbehavior contains an unrecognized value, '" + behavior + "'. Reverting to default.", IssueSeverity.ConfigurationError));
+            totalBehavior =  c.get<TotalSizeBehavior>("sizelimits.totalbehavior", TotalSizeBehavior.ThrowException);
+           
         }
 
         public void ValidateTotalSize(Size total) {
