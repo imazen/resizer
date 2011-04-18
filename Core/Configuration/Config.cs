@@ -145,7 +145,9 @@ namespace ImageResizer.Configuration {
             int i;
             string s = cs.getAttr(selector, defaultValue.ToString());
             if (int.TryParse(s, out i)) return i;
-            else throw new ConfigurationException("Error in imageresizer configuration section: Invalid integer at " + selector + ":" + s);
+            else configurationSectionIssues.AcceptIssue(
+                new Issue("Invalid integer value in imageresizer configuration section, " + selector + ":" + s, IssueSeverity.ConfigurationError));
+            return defaultValue;
         }
 
         public bool get(string selector, bool defaultValue) {
@@ -159,7 +161,9 @@ namespace ImageResizer.Configuration {
                 "0".Equals(s, StringComparison.OrdinalIgnoreCase) ||
                 "no".Equals(s, StringComparison.OrdinalIgnoreCase) ||
                 "off".Equals(s, StringComparison.OrdinalIgnoreCase)) return false;
-            else throw new ConfigurationException("Error in imageresizer configuration section: Invalid boolean at " + selector + ":" + s);
+           else configurationSectionIssues.AcceptIssue(
+                new Issue("Invalid boolean value in imageresizer configuration section, " + selector + ":" + s, IssueSeverity.ConfigurationError));
+            return defaultValue;
         }
         /// <summary>
         /// Returns a deep copy of the specified node
