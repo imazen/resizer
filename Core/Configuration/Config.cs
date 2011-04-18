@@ -167,9 +167,13 @@ namespace ImageResizer.Configuration {
             return defaultValue;
         }
 
-        public T get<T>(string selector, T defaultValue) where T : Enum {    
+        public T get<T>(string selector, T defaultValue) where T : struct, IConvertible
+        {
+            if (!typeof(T).IsEnum) throw new ArgumentException("T must be an enumerated type");
+
             string value = get(selector, null);
             if (value == null) return defaultValue;
+            else value = value.Trim();
             try {
                 return (T)Enum.Parse(typeof(T), value, true);
             } catch (ArgumentException) {
