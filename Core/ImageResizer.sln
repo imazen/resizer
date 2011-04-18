@@ -56,6 +56,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.S3Read
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Core.Tests", "..\Tests\Core.Tests\ImageResizer.Core.Tests.csproj", "{1FE6E440-F9CB-412A-9D1D-E78850D0F0AC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibCassini35", "..\Tests\LibCassini35\LibCassini35.csproj", "{0D9F0FEA-45F7-4CE4-9868-6FB9BBE3DD4C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -171,6 +173,12 @@ Global
 		{1FE6E440-F9CB-412A-9D1D-E78850D0F0AC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1FE6E440-F9CB-412A-9D1D-E78850D0F0AC}.Trial Version|Any CPU.ActiveCfg = Release|Any CPU
 		{1FE6E440-F9CB-412A-9D1D-E78850D0F0AC}.Trial Version|Any CPU.Build.0 = Release|Any CPU
+		{0D9F0FEA-45F7-4CE4-9868-6FB9BBE3DD4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D9F0FEA-45F7-4CE4-9868-6FB9BBE3DD4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D9F0FEA-45F7-4CE4-9868-6FB9BBE3DD4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D9F0FEA-45F7-4CE4-9868-6FB9BBE3DD4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D9F0FEA-45F7-4CE4-9868-6FB9BBE3DD4C}.Trial Version|Any CPU.ActiveCfg = Release|Any CPU
+		{0D9F0FEA-45F7-4CE4-9868-6FB9BBE3DD4C}.Trial Version|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
