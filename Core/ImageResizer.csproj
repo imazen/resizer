@@ -77,6 +77,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\Issues\ConfigChecker.cs" />
     <Compile Include="Plugins\Basic\ClientCache.cs" />
     <Compile Include="Plugins\Basic\NoCacheHandler.cs" />
     <Compile Include="Caching\ResponseArgs.cs" />
@@ -87,7 +88,7 @@
     <Compile Include="Configuration\CacheSelectionEventArgs.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\ICacheSelectionEventArgs.cs" />
-    <Compile Include="Configuration\IssueGatherer.cs" />
+    <Compile Include="Configuration\Issues\IssueGatherer.cs" />
     <Compile Include="Configuration\Issues\IIssue.cs" />
     <Compile Include="Configuration\Issues\IIssueProvider.cs" />
     <Compile Include="Configuration\Issues\IIssueReceiver.cs" />
