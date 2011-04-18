@@ -333,5 +333,15 @@ namespace ImageResizer.Configuration {
             }
             
         }
+        /// <summary>
+        /// Returns true if at least one plugin of the specified type is registered.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public bool HasPluginOfType(Type type) {
+            IList<IPlugin> results = GetPluginsByType(type);
+            if (results == null || results.Count == 0) return false;
+            return true;
+        }
     }
 }
