@@ -23,7 +23,7 @@ namespace LibCassini {
     //
     // Internal class provides helpers for string formatting of HTTP responses
     //
-    static class Messages {
+    public static class Messages {
 
         const string _httpErrorFormat1 = 
 @"<html>

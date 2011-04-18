@@ -27,7 +27,7 @@ using Microsoft.Win32.SafeHandles;
 
 namespace LibCassini {
 	
-    class Request : SimpleWorkerRequest {
+    public class Request : SimpleWorkerRequest {
         static char[] badPathChars = new char[] { '%', '>', '<', ':', '\\' };
         static string[] defaultFileNames = new string[] { "default.aspx", "default.htm", "default.html" };
 

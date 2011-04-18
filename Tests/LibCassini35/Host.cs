@@ -25,7 +25,7 @@ using System.Security.Permissions;
 using System.Security.Principal;
 
 namespace LibCassini {
-    class Host : MarshalByRefObject, IRegisteredObject {
+   public class Host : MarshalByRefObject, IRegisteredObject {
         Server _server;
 
         int _port;

@@ -15,7 +15,7 @@ using System.Collections;
 using System.Text;
 
 namespace LibCassini {
-    class ByteParser {
+    public class ByteParser {
         byte[] _bytes;
         int _pos;
 
