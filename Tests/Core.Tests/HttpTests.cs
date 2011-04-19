@@ -14,15 +14,10 @@ namespace ImageResizer.Core.Tests {
     [TestFixture]
     public class HttpTests: HttpTestingFixture{
 
-        [Test]
-        public void TestOn() {
-            Debug.WriteLine(server.RootUrl);
-            Debug.WriteLine(server.PhysicalPath);
-           
-        }
+        
         [Test]
         public void TestRequest() {
-            Assert.AreEqual<HttpStatusCode>(HttpStatusCode.OK, this.Request("image.jpg").StatusCode);
+            Assert.AreEqual<HttpStatusCode>(HttpStatusCode.OK, this.Request("image.jpg?width=100").StatusCode);
         }
     }
 }

@@ -160,7 +160,7 @@ namespace LibCassini {
                 while (_host != null) {
                     Thread.Sleep(100);
                 }
-                Thread.Sleep(100);
+                Thread.Sleep(500);
             }
             catch {
             }

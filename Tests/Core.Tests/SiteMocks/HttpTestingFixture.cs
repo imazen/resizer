@@ -79,7 +79,7 @@ namespace ImageResizer.Core.Tests.SiteMocks {
         [Test()]
         public void TestExternal() {
             Debug.WriteLine("IsListening=" + server.IsListening.ToString());
-            Process.Start(server.RootUrl + "image.jpg");
+            //Process.Start(server.RootUrl + "image.jpg");
             //Thread.Sleep(10000);
         }
 
