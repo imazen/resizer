@@ -1,4 +1,5 @@
-﻿using System;
+﻿/* Copyright (c) 2011 Nathanael Jones. See license.txt */
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections.ObjectModel;
