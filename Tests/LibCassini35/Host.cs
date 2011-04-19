@@ -101,15 +101,19 @@ namespace LibCassini {
         }
 
         void IRegisteredObject.Stop(bool immediate) {
-            // Unhook the Host so Server will process the requests in the new appdomain.
-            if (_server != null) {
-                _server.HostStopped();
-            }
 
             // Make sure all the pending calls complete before this Object is unregistered.
             WaitForPendingCallsToFinish();
 
             HostingEnvironment.UnregisterObject(this);
+
+            // Unhook the Host so Server will process the requests in the new appdomain.
+            // Edit by Nathanael Jones, Apr. 19, 2001
+            // Moved this to the bottom of the method, otherwise the app domain might get killed before unregistration and calls complete.
+            if (_server != null) {
+                _server.HostStopped();
+            }
+
         }
 
         public string InstallPath { get { return _installPath; } }
