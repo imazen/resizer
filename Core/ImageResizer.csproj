@@ -40,33 +40,23 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\debug\</OutputPath>
+    <OutputPath>..\Dlls\debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>ImageResizer.XML</DocumentationFile>
+    <DocumentationFile>..\Dlls\debug\ImageResizer.XML</DocumentationFile>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>.\</OutputPath>
+    <OutputPath>..\Dlls\release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>ImageResizer.XML</DocumentationFile>
+    <DocumentationFile>..\Dlls\release\ImageResizer.XML</DocumentationFile>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Trial Version|AnyCPU' ">
-    <OutputPath>Trial Version\</OutputPath>
-    <DefineConstants>TRACE;TRIAL</DefineConstants>
-    <DocumentationFile>ImageResizer.XML</DocumentationFile>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
+    <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -109,7 +99,7 @@
     <Compile Include="Plugins\Basic\Diagnostic.cs" />
     <Compile Include="Plugins\Basic\DiagnosticPageHandler.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
-    <Compile Include="Configuration\Xml\ResizerConfigurationSection.cs" />
+    <Compile Include="Configuration\Xml\ResizerSection.cs" />
     <Compile Include="Caching\ICache.cs" />
     <Compile Include="Configuration\SafeList.cs" />
     <Compile Include="Plugins\Basic\DefaultEncoder.cs" />
