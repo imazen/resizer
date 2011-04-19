@@ -20,7 +20,7 @@ namespace ImageResizer.Tests {
         }
 
         public static IEnumerable<Config> GetConfigurations(){
-            return new Config[]{new Config(new ResizerConfigurationSection())}; //TODO - add a variety of configuration options in here.
+            return new Config[]{new Config(new ResizerSection())}; //TODO - add a variety of configuration options in here.
         }
 
         private Bitmap GetBitmap(int width, int height) {
@@ -64,7 +64,7 @@ namespace ImageResizer.Tests {
         [Test]
         [Row(200,200,50,50,"?width=50&height=50")]
         public void TestBitmapSize(int originalWidth, int originalHeight, int expectedWidth, int expectedHeight, string query) {
-            ResizerConfigurationSection config = new ResizerConfigurationSection();
+            ResizerSection config = new ResizerSection();
             Config c = new Config(config);
             using (Bitmap b = c.CurrentImageBuilder.Build(GetBitmap(originalWidth,originalHeight), new ResizeSettings(query))) {
                 Assert.AreEqual<Size>(b.Size,new Size(expectedWidth,expectedHeight));
