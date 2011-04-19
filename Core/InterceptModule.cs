@@ -1,3 +1,4 @@
+/* Copyright (c) 2011 Nathanael Jones. See license.txt */
 using System;
 using ImageResizer.Configuration;
 using System.Web;
