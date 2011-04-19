@@ -52,7 +52,7 @@ namespace ImageResizer.Tests {
         [System.Security.Permissions.ReflectionPermission(System.Security.Permissions.SecurityAction.Deny)]
 
         public void get_plugin_type(string name, Type type) {
-            PluginConfig c = new PluginConfig(new Config(new ResizerConfigurationSection()));
+            PluginConfig c = new PluginConfig(new Config(new ResizerSection()));
             Type t = c.get_plugin_type(name);
             Debug.WriteLine(new List<IIssue>(c.GetIssues())[0]);
             Assert.AreEqual<Type>(type, t);
@@ -66,7 +66,7 @@ namespace ImageResizer.Tests {
         [Row("<resizer><plugins><clear type='extensions' /></plugins></resizer>")]
         [System.Security.Permissions.ReflectionPermission(System.Security.Permissions.SecurityAction.Deny)]
         public void LoadPlugins(string xml) {
-            PluginConfig pc = new Config(new ResizerConfigurationSection(xml)).Plugins;
+            PluginConfig pc = new Config(new ResizerSection(xml)).Plugins;
             List<IIssue> oldIssues = new List<IIssue>(pc.GetIssues());
             pc.LoadPlugins();
             List<IIssue> issues = new List<IIssue>(pc.GetIssues());
@@ -88,7 +88,7 @@ namespace ImageResizer.Tests {
         [Row("<add name='SizeLimiting' />", typeof(BuilderExtension), 1)]
         [System.Security.Permissions.ReflectionPermission(System.Security.Permissions.SecurityAction.Deny)]
         public void GetPluginsByType(string startingXML, Type kind, int expectedCount) {
-            PluginConfig pc = new Config(new ResizerConfigurationSection("<resizer><plugins>" + startingXML + "</plugins></resizer>")).Plugins;
+            PluginConfig pc = new Config(new ResizerSection("<resizer><plugins>" + startingXML + "</plugins></resizer>")).Plugins;
             pc.RemoveAllPlugins();
             pc.LoadPlugins(); //Then load from xml
             Assert.AreEqual<int>(expectedCount, pc.GetPluginsByType(kind).Count);
