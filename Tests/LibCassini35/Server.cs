@@ -22,13 +22,15 @@ using System.Runtime.Remoting;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
+using System.Diagnostics;
 
 namespace LibCassini {
+    [System.Web.AspNetHostingPermission(System.Security.Permissions.SecurityAction.Demand,Level=AspNetHostingPermissionLevel.Unrestricted)]
     public class Server : MarshalByRefObject {
         int _port;
         string _virtualPath;
         string _physicalPath;
-        bool _shutdownInProgress;
+        bool _shutdownInProgress  =false;
         Socket _socket;
         Host _host;
 
@@ -79,6 +81,7 @@ namespace LibCassini {
         static Socket CreateSocketBindAndListen(AddressFamily family, IPAddress address, int port) {
             var socket = new Socket(family, SocketType.Stream, ProtocolType.Tcp);
             socket.Bind(new IPEndPoint(address, port));
+            Debug.WriteLine("Bound to " + address.ToString() + " port " + port);
             socket.Listen((int)SocketOptionName.MaxConnections);
             return socket;
         }
@@ -99,12 +102,15 @@ namespace LibCassini {
                         ThreadPool.QueueUserWorkItem(delegate {
                             if (!_shutdownInProgress) {
                                 var conn = new Connection(this, acceptedSocket);
-
+                                _isListening = true;
+                                Debug.WriteLine("Waiting for request..");
                                 // wait for at least some input
                                 if (conn.WaitForRequestBytes() == 0) {
                                     conn.WriteErrorAndClose(400);
+                                    _isListening = false;
                                     return;
                                 }
+                                _isListening = false;
 
                                 // find or create host
                                 Host host = GetHost();
@@ -112,7 +118,7 @@ namespace LibCassini {
                                     conn.WriteErrorAndClose(500);
                                     return;
                                 }
-
+                                Debug.WriteLine("Processing request..");
                                 // process request in worker app domain
                                 host.ProcessRequest(conn);
                             }
@@ -123,6 +129,13 @@ namespace LibCassini {
                     }
                 }
             });
+        }
+
+        private bool _isListening = false;
+        public bool IsListening {
+            get {
+                return _isListening;
+            }
         }
 
         public void Stop() {
@@ -147,6 +160,7 @@ namespace LibCassini {
                 while (_host != null) {
                     Thread.Sleep(100);
                 }
+                Thread.Sleep(100);
             }
             catch {
             }
@@ -176,9 +190,15 @@ namespace LibCassini {
                 lock (this) {
                     host = _host;
                     if (host == null) {
-                        host = (Host)CreateWorkerAppDomainWithHost(_virtualPath, _physicalPath, typeof(Host));
-                        host.Configure(this, _port, _virtualPath, _physicalPath);
-                        _host = host;
+                        try {
+                            host = (Host)CreateWorkerAppDomainWithHost(_virtualPath, _physicalPath, typeof(Host));
+                            host.Configure(this, _port, _virtualPath, _physicalPath);
+                            _host = host;
+                        } catch (System.Security.SecurityException sx) {
+                            //Edit by NDJ, Apr. 19 2011:
+                            //Unless we catch this exception, the server silently fails to respond instead of providing a status 500
+                            Debug.WriteLine("Failed to create hosting app domain: " + sx.Message + sx.StackTrace);
+                        }
                     }
                 }
             }
