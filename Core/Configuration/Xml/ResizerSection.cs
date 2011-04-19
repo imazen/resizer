@@ -14,14 +14,14 @@ namespace ImageResizer {
     /// <summary>
     /// Handles reading the &lt;resizer&gt; section from Web.Config
     /// </summary>
-    public class ResizerConfigurationSection : ConfigurationSection {
-        public ResizerConfigurationSection() {
+    public class ResizerSection : System.Configuration.ConfigurationSection {
+        public ResizerSection() {
         }
 
-        public ResizerConfigurationSection(Node root) {
+        public ResizerSection(Node root) {
             n = root;
         }
-        public ResizerConfigurationSection(string xml) {
+        public ResizerSection(string xml) {
 
             n = Node.FromXmlFragment(xml,sink);
         }
@@ -78,6 +78,11 @@ namespace ImageResizer {
             return true;
         }
 
+        protected override bool OnDeserializeUnrecognizedAttribute(string name, string value) {
+            n.Attrs[name] = value;
+            return true;
+        }
+
         protected override bool SerializeToXmlElement(XmlWriter writer, string elementName) {
             if (n.IsEmpty) return false;
             XmlElement e = null;
@@ -86,7 +91,7 @@ namespace ImageResizer {
             return true;
         }
 
-        protected IssueSink sink = new IssueSink("ResizerConfigurationSection");
+        protected IssueSink sink = new IssueSink("resizer configuration");
         public IssueSink IssueSink { get { return sink; } }
 
     }

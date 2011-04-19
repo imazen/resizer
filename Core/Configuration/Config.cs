@@ -33,7 +33,7 @@ namespace ImageResizer.Configuration {
         }
         #endregion
 
-        public Config(ResizerConfigurationSection config) {
+        public Config(ResizerSection config) {
 
             this.configuration = config;
 
@@ -114,20 +114,20 @@ namespace ImageResizer.Configuration {
         #endregion
 
 
-        private volatile ResizerConfigurationSection configuration;
+        private volatile ResizerSection configuration;
         private object configurationLock = new object();
         /// <summary>
         /// The ResizeConfigrationSection is not thread safe, and should not be modified
-        /// Dynamically loads the ConfigurationSection from web.config when accessed for the first time. 
+        /// Dynamically loads the ResizerSection from web.config when accessed for the first time. 
         /// If the resizer node doesn't exist, an empty configuration object is created with just the root resizer node.
         /// </summary>
-        protected ResizerConfigurationSection cs {
+        protected ResizerSection cs {
             get {
                 if (configuration == null) {
                     lock (configurationLock) {
                         if (configuration == null) {
-                            ResizerConfigurationSection section = System.Configuration.ConfigurationManager.GetSection("resizer") as ResizerConfigurationSection;
-                            configuration = section != null ? section : new ResizerConfigurationSection();
+                            ResizerSection section = System.Configuration.ConfigurationManager.GetSection("resizer") as ResizerSection;
+                            configuration = section != null ? section : new ResizerSection();
                         }
                     }
                 }
