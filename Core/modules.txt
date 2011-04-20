@@ -36,3 +36,4 @@ IVirtualBitmapFile
 IVirtualFileWithModifiedDate
 
 Cairo/AForge resizing backends in the future? AForge uses the Bitmap class, so that's probably a safe choice.
+TODO: Add default image plugin

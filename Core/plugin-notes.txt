@@ -1,0 +1,9 @@
+﻿Notes on building plugins
+
+Plugins should throw Systme.IO.FileNotFoundException if the resource is missing. This will allow proper handling of 404s.
+
+This means VirtualFile.Open()
+BuilderExtension.LoadImageFailed
+BuilderExtension.LoadImage()
+
+etc..
