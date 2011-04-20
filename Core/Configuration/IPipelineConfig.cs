@@ -78,5 +78,8 @@ namespace ImageResizer.Configuration {
 
         void FirePreHandleImage(IHttpModule sender, System.Web.HttpContext context, IResponseArgs e);
 
+
+        void FireImageMissing(IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs urlEventArgs);
+
     }
 }

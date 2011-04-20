@@ -15,7 +15,7 @@ using System.Collections.Generic;
 namespace ImageResizer {
 
     /// <summary>
-    /// Monitors incoming image requests. Image requests that request resizing are processed, cached, and served.
+    /// Monitors incoming image requests to determine if resizing (or other processing) is requested by their querystring
     /// </summary>
     public class InterceptModule : IHttpModule {
 
@@ -114,14 +114,23 @@ namespace ImageResizer {
                     //Create the virtual file instance only if (a) VppUsage=always, and it exists virtually, or (b) VppUsage=fallback, and it only exists virtually
                     VirtualFile vf = existsVirtually ? HostingEnvironment.VirtualPathProvider.GetFile(virtualPath) : null;
 
-                    //Only process files that exists
+                    //Only process files that exist
                     if (existsPhysically || existsVirtually)
                         ResizeRequest(app.Context, virtualPath, q, vf);
-
+                    else
+                        FileMissing(app.Context, virtualPath, q);
 
                 }
             }
 
+        }
+
+        protected void FileMissing(HttpContext httpContext, string virtualPath, NameValueCollection q) {
+            //Pass on the event. 
+            conf.FireImageMissing(this, httpContext, new UrlEventArgs( virtualPath, new NameValueCollection(q)));
+
+            //Remove the image from context items so we don't try to write response headers.
+            httpContext.Items[conf.ResponseArgsKey] = null;
         }
 
         /// <summary>
@@ -184,12 +193,17 @@ namespace ImageResizer {
             e.ResizeImageToStream = new ResizeImageDelegate(delegate(System.IO.Stream stream) {
                 //This runs on a cache miss or cache invalid. This delegate is preventing from running in more
                 //than one thread at a time for the specified source file (current.Local)
-
-                if (vf != null)
-                    conf.GetImageBuilder().Build(vf, stream, settings);
-                else
-                    conf.GetImageBuilder().Build(HostingEnvironment.MapPath(virtualPath), stream, settings);
-
+                try {
+                    if (vf != null)
+                        conf.GetImageBuilder().Build(vf, stream, settings);
+                    else
+                        conf.GetImageBuilder().Build(HostingEnvironment.MapPath(virtualPath), stream, settings);
+                //Catch not found exceptions
+                } catch (System.IO.FileNotFoundException notFound) {
+                    //This will be called later, if at all. 
+                    FileMissing(context, virtualPath, queryString);
+                    throw new HttpException(404, "The specified resource could not be located");
+                }
             });
             
             
@@ -207,25 +221,6 @@ namespace ImageResizer {
 
         }
 
-        private void PreProcess(HttpContext context, ResponseArgs e) {
-            context.Items[conf.ResponseArgsKey] = e; //store in context items
-
-
-            ////Determine the client caching settings (server time zone, not utc)
-            //string cacheSetting = conf.get("clientcache.minutes", null);
-            //if (!string.IsNullOrEmpty(cacheSetting)) {
-            //    double f;
-            //    if (double.TryParse(cacheSetting, out f) && f > 0)
-            //        e.ResponseHeaders.Expires = DateTime.Now.AddMinutes(f);
-            //} else {
-            //    e.ResponseHeaders.Expires = DateTime.Now.AddHours(24); //Default to 24 hours
-            //}
-
-            ////Set last modified date
-            //if (e.HasModifiedDate) e.ResponseHeaders.LastModified = e.GetModifiedDateUTC();
-
-            conf.FirePreHandleImage(this,context,e);
-        }
         /// <summary>
         /// We don't actually send the data - but we still want to control the headers on the data.
         /// PreSendRequestHeaders allows us to change the content-type and cache headers at excatly the last

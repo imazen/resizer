@@ -48,6 +48,9 @@ UrlRewritingHook PostRewrite;
 /// and modify the response accordingly.
 UrlRewritingHook PostAuthorizeImage;
 
+//Fired when an image is missing
+UrlRewritingHook ImageMissing;
+
 /// Fired immediately before the image request is sent off to the caching system for proccessing.
 /// Allows modification of response headers, caching arguments, and callbacks.
 PreHandleImageHook PreHandleImage;

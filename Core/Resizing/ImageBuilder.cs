@@ -120,6 +120,9 @@ namespace ImageResizer
                 try {
                     try {
                         b = new System.Drawing.Bitmap(path, useICM);
+                    //Pass FileNotFounds along
+                    } catch (FileNotFoundException notFound){
+                        throw notFound;
                     } catch (Exception e) {
                         b = LoadImageFailed(e, path, useICM);
                         if (b == null) throw e; //If none of the extensions loaded the image, throw the exception anyhow.

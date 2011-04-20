@@ -207,6 +207,13 @@ namespace ImageResizer.Configuration {
         /// </summary>
         public event UrlRewritingHook PostAuthorizeImage;
 
+
+        /// <summary>
+        /// Fired when the specified image doesn't exist. Only called for images that would normally be processed.
+        /// May be called during PostAuthorizeRequest or later - End the request completely with a redirect if you want alternate behavior.
+        /// </summary>
+        public event UrlRewritingHook ImageMissing;
+
         /// <summary>
         /// Fired immediately before the image request is sent off to the caching system for proccessing.
         /// Allows modification of response headers, caching arguments, and callbacks.
@@ -253,6 +260,10 @@ namespace ImageResizer.Configuration {
 
         public void FirePostAuthorizeImage(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
             if (PostAuthorizeImage != null) PostAuthorizeImage(sender, context, e);
+        }
+
+        public void FireImageMissing(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
+            if (ImageMissing != null) ImageMissing(sender, context, e);
         }
 
         protected long processedCount = 0;
