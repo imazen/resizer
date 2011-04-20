@@ -9,6 +9,7 @@ using System.Collections.Specialized;
 namespace ImageResizer.Caching {
     /// <summary>
     /// A callback method that will resize, encode, and write the data to the given stream.
+    /// Callback may throw FileNotFoundException when running on top of an optimistic VPP
     /// </summary>
     public delegate void ResizeImageDelegate(Stream s);
     /// <summary>
