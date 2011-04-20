@@ -1,0 +1,38 @@
+1) Copy the required DLLs to the /bin/ directory of your application.
+
+2) Modify web.config. Here is a sample configuration:
+
+
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <configSections>
+    <section name="resizer" type="ImageResizer.ResizerSection,ImageResizer" />
+  </configSections>
+
+
+  <resizer>
+    <!-- configure the resizer here -->
+    <pipeline fakeExtensions=".ashx" vppUsage="fallback" />
+    <plugins>
+       <!-- Add plugins here -->
+       <!-- <add name="PluginName" /> -->
+    </plugins>
+  </resizer>
+
+  
+  
+<system.web>
+  <httpModules>
+    <add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
+  </httpModules>
+
+  </system.web>
+  <system.webServer>
+    <validation validateIntegratedModeConfiguration="false"/>
+
+    <modules>
+      <add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
+    </modules>
+  </system.webServer>
+
+</configuration>

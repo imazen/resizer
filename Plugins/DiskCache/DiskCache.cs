@@ -129,6 +129,12 @@ namespace ImageResizer.Plugins.DiskCache
         protected void BeforeSettingChanged() {
             if (_started) throw new InvalidOperationException("DiskCache settings may not be adjusted after it is started.");
         }
+
+        /// <summary>
+        /// Creates a disk cache in the /imagecache folder
+        /// </summary>
+        public DiskCache(){}
+        
         /// <summary>
         /// Creates a DiskCache instance at the specified location. Must be installed as a plugin to be operational.
         /// </summary>

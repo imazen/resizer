@@ -1,1 +1,6 @@
-﻿<
+﻿<diskcache subfolders="integer number of subfolders. rounded to next power of 2"
+           enabled="true|false"
+		   autoClean="false|true: defaults to false"
+		   dir="cache folder name, absolute, relative, or app relative"
+		   hashModifiedDate="true|false: Defaults to true, which creates a new cached file when the modified date of a source file changes. False overwrites the old file. "
+		   />

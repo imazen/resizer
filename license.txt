@@ -1,47 +1,11 @@
-/**
- * Written by Nathanael Jones 
- * http://nathanaeljones.com
- * nathanael.jones@gmail.com
- * 
- * Although I typically release my components for free, I decided to charge a 
- * 'download fee' for this one to help support my other open-source projects. 
- * Don't worry, this component is still open-source, and the license permits 
- * source redistribution as part of a larger system. However, I'm asking that 
- * people who want to integrate this component purchase the download instead 
- * of ripping it out of another open-source project. My free to non-free LOC 
- * (lines of code) ratio is still over 40 to 1, and I plan on keeping it that 
- * way. I trust this will keep everybody happy.
- * 
- * By purchasing the download, you are permitted to 
- * 
- * 1) Modify and use the component in all of your projects. 
- * 
- * 2) Redistribute the source code as part of another project, provided 
- * the component is less than 5% of the project (in lines of code), 
- * and you keep this information attached.
- * 
- * 3) If you received the source code as part of another open source project, 
- * you cannot extract it (by itself) for use in another project without purchasing a download 
- * from http://nathanaeljones.com/. If nathanaeljones.com is no longer running, and a download
- * cannot be purchased, then you may extract the code.
- * 
+This software is divided into several parts, each of which may be licensed differently.
 
-Aaand… the stock software disclaimer, in highly annoying all caps
+1) The Core directory is licensed under an MIT-style license, see Core/License.txt for details.
+This includes all plugins in the ImageResizer.Plugins.Basic namespace
 
-Disclaimer of Warranty
 
-THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE
- STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM “AS IS” WITHOUT WARRANTY 
-OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
-MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE 
-OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
-Limitation of Liability
 
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR
- ANY OTHER PARTY WHO MODIFIES AND/OR CONVEYS THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR
- DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE 
-USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED 
-INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH
- ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+2) Without a purchase, all other software should be under the Resizer Trial license or a compatible license.
 
- **
+I.e, you may use the software for development and testing purposes, but not for production use without a purchased license.
+See imageresizingin.net/licenses/trial for more information
