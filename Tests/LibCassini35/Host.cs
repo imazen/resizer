@@ -25,6 +25,9 @@ using System.Security.Permissions;
 using System.Security.Principal;
 
 namespace LibCassini {
+
+   public delegate object QueryDelegate();
+
    public class Host : MarshalByRefObject, IRegisteredObject {
         Server _server;
 
@@ -45,6 +48,10 @@ namespace LibCassini {
 
         public Host() {
             HostingEnvironment.RegisterObject(this);
+        }
+
+        public object ExecuteDelegate(QueryDelegate d) {
+            return d();
         }
 
         public void Configure(Server server, int port, string virtualPath, string physicalPath) {

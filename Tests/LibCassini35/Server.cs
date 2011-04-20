@@ -180,7 +180,7 @@ namespace LibCassini {
             _host = null;
         }
 
-        Host GetHost() {
+        public Host GetHost() {
             if (_shutdownInProgress)
                 return null;
 
