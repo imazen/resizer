@@ -48,7 +48,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LitS3", "..\Plugins\Libs\Li
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.S3Cache", "..\Plugins\S3Cache\ImageResizer.Plugins.S3Cache.csproj", "{A5B06865-2E63-4293-ACD2-9436BFB85F1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Caption", "..\Plugins\Caption\ImageResizer.Plugins.Caption.csproj", "{DCFE9D91-E008-4DB0-9A53-3146B0551FC7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Basic.Caption", "..\Plugins\Caption\ImageResizer.Plugins.Basic.Caption.csproj", "{DCFE9D91-E008-4DB0-9A53-3146B0551FC7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.RequestLimiting", "..\Plugins\RequestLimiting\ImageResizer.Plugins.RequestLimiting.csproj", "{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}"
 EndProject

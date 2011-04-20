@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Resizing;
 
-namespace ImageResizer.Plugins.Caption {
+namespace ImageResizer.Plugins.Basic.Caption {
     public class Caption:BuilderExtension,IPlugin,IQuerystringPlugin {
         //Accepts 
         //caption=text
