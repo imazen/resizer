@@ -1,12 +1,4 @@
-﻿/**
- * Written by Nathanael Jones 
- * http://nathanaeljones.com
- * nathanael.jones@gmail.com
- * 
- * This file is for user extension and modification (although all the source is!)
- * No restrictions on distribution of this file.
- * 
- **/
+﻿/* Copyright (c) 2011 Nathanael Jones. See license.txt for your rights. */
 using System;
 using System.Collections.Generic;
 using System.Text;
