@@ -1,6 +1,6 @@
 ﻿The ImageResizer Core project (the /Core/ folder and its subdirectories) are licensed under the Resize Freedom license.
 
-This includes all plugins in the ImageResizer.Plugins.Basic namespace. (NoCache,DefaultEncoder,ClientCache,Caption,DropShadow,SizeLimiting)
+This includes all plugins in the ImageResizer.Plugins.Basic namespace. (NoCache,DefaultEncoder,ClientCache,Caption,DropShadow,SizeLimiting, etc.)
 
 
 Visit http://imageresizingin.net/license/freedom for the latest version of the license.

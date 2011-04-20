@@ -144,6 +144,7 @@ namespace ImageResizer.Configuration {
             if (hasDot) alternateNames.Add(name);
             //DefaultEncoder, NoCache, etc.
             alternateNames.Add("ImageResizer.Plugins.Basic." + name.TrimStart('.'));
+            alternateNames.Add("ImageResizer.Plugins.Pro." + name.TrimStart('.'));
             //AnimatedGifs
             if (!hasDot) alternateNames.Add("ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.') + "Plugin");
             //AnimatedGifsPlugin
