@@ -9,12 +9,12 @@ using ImageResizer.Util;
 using ImageResizer.Resizing;
 using System.Web.Hosting;
 
-namespace ImageResizer.Plugins.Watermark.Watermark
+namespace ImageResizer.Plugins.Watermark
 {
     /// <summary>
     /// Provides extensibility points for drawing watermarks and even modifying resizing/image settings
     /// </summary>
-    public class WatermarkSettings : BuilderExtension, IPlugin, IQuerystringPlugin
+    public class WatermarkPlugin : BuilderExtension, IPlugin, IQuerystringPlugin
     {
         public string watermarkDir = "~/watermarks";
         public SizeF watermarkSize = new SizeF(1, 1);
@@ -25,14 +25,9 @@ namespace ImageResizer.Plugins.Watermark.Watermark
         public Boolean hideIfTooSmall = false;
         public System.Drawing.ContentAlignment align = ContentAlignment.MiddleCenter;
  
-        string watermark = null;
-        /// <summary>
-        /// Creates a new WatermarkSettings class
-        /// </summary>
-        /// <param name="q"></param>
-        public WatermarkSettings(NameValueCollection q)
+
+        public WatermarkPlugin()
         {
-            watermark = q["watermark"];
         }
 
         /// <summary>
@@ -53,6 +48,7 @@ namespace ImageResizer.Plugins.Watermark.Watermark
 
 
         protected override RequestedAction RenderOverlays(ImageState s) {
+            string watermark = s.settings["watermark"]; //from the querystring
             Graphics g = s.destGraphics;
             RectangleF imageBox = PolygonMath.GetBoundingBox(s.layout["image"]);
 
@@ -133,15 +129,17 @@ namespace ImageResizer.Plugins.Watermark.Watermark
 
 
         public IPlugin Install(Configuration.Config c) {
-            throw new NotImplementedException();
+            c.Plugins.add_plugin(this);
+            return this;
         }
 
         public bool Uninstall(Configuration.Config c) {
-            throw new NotImplementedException();
+            c.Plugins.remove_plugin(this);
+            return true;
         }
 
         public IEnumerable<string> GetSupportedQuerystringKeys() {
-            throw new NotImplementedException();
+            return new string[] { "watermark" };
         }
     }
 }
