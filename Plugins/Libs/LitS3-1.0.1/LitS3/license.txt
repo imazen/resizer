@@ -1,0 +1,3 @@
+﻿Source: http://code.google.com/p/lits3/
+
+Licensed under the MIT License
