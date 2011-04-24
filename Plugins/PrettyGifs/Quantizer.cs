@@ -1,12 +1,19 @@
 /* 
-  THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF 
-  ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO 
-  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A 
-  PARTICULAR PURPOSE. 
-  
-    This is sample code and is freely distributable. 
- * Heavily modified by Nathanael Jones - I've left it under the same license
-*/
+ * Copyright (c) 2011 Nathanael Jones. See license.txt for your rights 
+ * 
+ * This code has been *heavily* modified from its original versions
+ * 
+ * Derived from: http://codebetter.com/brendantompkins/2007/06/14/gif-image-color-quantizer-now-with-safe-goodness/
+ * 
+ * Portions of this file are under the following license:
+ * 
+ * THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF 
+ * ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO 
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A 
+ * PARTICULAR PURPOSE. 
+ *
+ * This is sample code and is freely distributable. 
+ */
 
 using System;
 using System.Drawing;
