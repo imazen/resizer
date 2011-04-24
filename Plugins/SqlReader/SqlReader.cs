@@ -1,33 +1,4 @@
-﻿/**
- * Written by Nathanael Jones 
- * http://nathanaeljones.com
- * nathanael.jones@gmail.com
- * 
- * Although I typically release my components for free, I decided to charge a 
- * 'download fee' for this one to help support my other open-source projects. 
- * Don't worry, this component is still open-source, and the license permits 
- * source redistribution as part of a larger system. However, I'm asking that 
- * people who want to integrate this component purchase the download instead 
- * of ripping it out of another open-source project. My free to non-free LOC 
- * (lines of code) ratio is still over 40 to 1, and I plan on keeping it that 
- * way. I trust this will keep everybody happy.
- * 
- * By purchasing the download, you are permitted to 
- * 
- * 1) Modify and use the component in all of your projects. 
- * 
- * 2) Redistribute the source code as part of another project, provided 
- * the component is less than 5% of the project (in lines of code), 
- * and you keep this information attached.
- * 
- * 3) If you received the source code as part of another open source project, 
- * you cannot extract it (by itself) for use in another project without purchasing a download 
- * from http://nathanaeljones.com/. If nathanaeljones.com is no longer running, and a download
- * cannot be purchased, then you may extract the code.
- * 
- * Disclaimer of warranty and limitation of liability continued at http://nathanaeljones.com/11151_Image_Resizer_License
- **/
-
+﻿/* Copyright (c) 2011 Nathanael Jones. See license.txt for your rights. */
 using System;
 using System.Collections.Generic;
 using System.Web;
@@ -38,22 +9,33 @@ using System.IO;
 using System.Data.Sql;
 using System.Data.SqlClient;
 using System.Configuration;
-namespace fbs.ImageResizer.Plugins.SqlReader
+namespace ImageResizer.Plugins.SqlReader
 {
     /// <summary>
     /// Specialized VirtualPathProvider that allows accessing database images as if they are on disk.
     /// </summary>
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
-    public class SqlReader : VirtualPathProvider
+    public class SqlReaderPlugin : VirtualPathProvider, IPlugin
     {
 
         SqlReaderSettings s = null;
-        public SqlReader(SqlReaderSettings s)
+        public SqlReaderPlugin(SqlReaderSettings s)
             : base()
         {
             this.s = s;
         }
+
+        public IPlugin Install(Configuration.Config c) {
+            c.Plugins.add_plugin(this);
+            HostingEnvironment.RegisterVirtualPathProvider(this);
+            return this;
+        }
+
+        public bool Uninstall(Configuration.Config c) {
+            return false;
+        }
+
 
         /// <summary>
         /// Called before any database op. Fires the BeforeAccess event
@@ -259,15 +241,16 @@ namespace fbs.ImageResizer.Plugins.SqlReader
             else
                 return Previous.GetCacheDependency(virtualPath, virtualPathDependencies, utcStart);
         }
+
     }
 
 
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Minimal)]
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.Minimal)]
-    public class DatabaseFile : VirtualFile, fbs.ImageResizer.IVirtualFileWithModifiedDate
+    public class DatabaseFile : VirtualFile, ImageResizer.Plugins.IVirtualFileWithModifiedDate
     {
         private string id;
-        private SqlReader provider;
+        private SqlReaderPlugin provider;
 
         private Nullable<bool> _exists = null;
         private Nullable<DateTime> _fileModifiedDate = null;
@@ -283,7 +266,7 @@ namespace fbs.ImageResizer.Plugins.SqlReader
             }
         }
 
-        public DatabaseFile(string virtualPath, SqlReader provider)
+        public DatabaseFile(string virtualPath, SqlReaderPlugin provider)
             : base(virtualPath)
         {
             this.provider = provider;

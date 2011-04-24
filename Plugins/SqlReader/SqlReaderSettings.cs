@@ -1,8 +1,9 @@
-﻿using System;
+﻿/* Copyright (c) 2011 Nathanael Jones. See license.txt for your rights. */
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace fbs.ImageResizer.Plugins.SqlReader {
+namespace ImageResizer.Plugins.SqlReader {
 
     public delegate void AuthorizeEvent(String id);
 
