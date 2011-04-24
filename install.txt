@@ -15,7 +15,7 @@
     <pipeline fakeExtensions=".ashx" vppUsage="fallback" />
     <plugins>
        <!-- Add plugins here -->
-       <!-- <add name="PluginName" /> -->
+       <!-- <add name="DiskCache" /> -->
     </plugins>
   </resizer>
 

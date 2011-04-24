@@ -1,0 +1,12 @@
+# Which dlls to use
+
+ImageResizer.dll is always required. It includes all Basic plugins except Caption
+
+Each plugin has a identically named DLL that is obviously needed.
+
+The PsdReader plugin also requires PsdFile.dll
+The S3Reader plugin also requires LitS3.dll
+The AdvancedFilters plugin also requires FourCC.txt and all AForge* dlls
+
+It is suggested that you also copy the matching pdb files as well, as this will greatly assist debugging.
+
