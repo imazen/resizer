@@ -9,7 +9,7 @@
 <body>
     <form id="form1" runat="server">
     <div>
-    
+       <img src="red-leaf.jpg?width=200" runat="server" />
     </div>
     </form>
 </body>
