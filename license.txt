@@ -1,11 +1,14 @@
+
+See http://imageresizingin.net/licenses/ for the best explanation.
+
+
 This software is divided into several parts, each of which may be licensed differently.
 
-1) The Core directory is licensed under an MIT-style license, see Core/License.txt for details.
+* The Core directory (ImageResizer.dll) is licensed under an MIT-style license, see Core/License.txt for details.
 This includes all plugins in the ImageResizer.Plugins.Basic namespace
 
+* Most other plugins are provided under the Resizer Trial license. (http://imageresizingin.net/licenses/trial)
 
+The trial license permits use for development and testing purposes, but not for production use. 
 
-2) Without a purchase, all other software should be under the Resizer Trial license or a compatible license.
-
-I.e, you may use the software for development and testing purposes, but not for production use without a purchased license.
-See imageresizingin.net/licenses/trial for more information
+See http://imageresizingin.net/plugins for more information.
