@@ -1,0 +1,35 @@
+﻿This plugin requires 'manual' installation due to the number of configuration opetions that must be set.
+A configuration syntax may be established once the plugin has evolved more.
+
+This is how to install and configure the plugin:
+
+1) Copy the DLL to the bin folder, or include the source file in your project
+
+2) Use this code to configure and register the plugin with the pipeline
+
+ImageResizer.Plugins.Watermark.WatermarkPlugin w = new ImageResizer.Plugins.Watermark.WatermarkPlugin();
+w.align = System.Drawing.ContentAlignment.BottomLeft;
+w.hideIfTooSmall = true;
+w.keepAspectRatio = true;
+w.valuesPercentages = false;
+w.watermarkDir = "~/watermarks/"; //Where the watermark plugin looks for the image specifed in the querystring ?watermark=file.png
+w.bottomRightPadding = new System.Drawing.SizeF(20, 20);
+w.topLeftPadding = new System.Drawing.SizeF(20, 20);
+w.watermarkSize = new System.Drawing.SizeF(30, 30); //The desired size of the watermark, maximum dimensions (aspect ratio maintained if keepAspectRatio = true)
+//Install the plugin
+w.Install(ImageResizer.Configuration.Config.Current); 
+
+It is recommended that you execute the above code during Application_Start.
+
+This can be done in the Global.asax or Global.asax.cs file:
+
+void Application_Start(object sender, EventArgs e) 
+{
+	//Insert code here
+
+}
+	 
+
+
+
+	
