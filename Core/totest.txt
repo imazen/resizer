@@ -1,4 +1,4 @@
-﻿List of potential problem areas, best items to test.
+﻿List of complex areas, best items to test.
 
 
 ResponseHeaders.DefaultApplyToResponseMethod

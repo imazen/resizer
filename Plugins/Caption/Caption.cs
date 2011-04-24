@@ -5,7 +5,7 @@ using ImageResizer.Resizing;
 
 namespace ImageResizer.Plugins.Basic.Caption {
     public class Caption:BuilderExtension,IPlugin,IQuerystringPlugin {
-        //Accepts 
+        //Will accept 
         //caption=text
         //caption.align=left|right|center
         //caption.padding=all|left,top,right,bottom

@@ -11,7 +11,8 @@ namespace ImageResizer.Plugins.DiskCache {
     /// Provides locking based on a string key. 
     /// Locks are local to the LockProvider instance.
     /// The class handles disposing of unused locks. Generally used for 
-    /// coordinating writes to files (of which there can be millions). Only keeps key/lock pairs in memory which are in use.
+    /// coordinating writes to files (of which there can be millions). 
+    /// Only keeps key/lock pairs in memory which are in use.
     /// Thread-safe.
     /// </summary>
     public class LockProvider {
