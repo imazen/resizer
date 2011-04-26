@@ -18,7 +18,7 @@ namespace ImageResizer.ReleaseBuilder {
         /// </summary>
         public static string DevenvPath{
             get{
-                string toolsDir = Environment.GetEnvironmentVariable("VS100COMNTOOLS");
+                string toolsDir = Environment.GetEnvironmentVariable("VS100COMNTOOLS").TrimEnd('\\','/');
                 return Path.Combine(Path.Combine(Path.GetDirectoryName(toolsDir),"IDE"), "devenv.exe");
 
             }
@@ -28,7 +28,9 @@ namespace ImageResizer.ReleaseBuilder {
             var psi = new ProcessStartInfo(DevenvPath);
             psi.Arguments = '"' + solutionPath + "\" " + args;
             psi.WorkingDirectory = Path.GetDirectoryName(solutionPath);
-            //psi.RedirectStandardOutput
+            psi.UseShellExecute = false;
+            psi.RedirectStandardOutput = true;
+            psi.RedirectStandardError = true;
             var p = Process.Start(psi);
             p.WaitForExit();
         }
