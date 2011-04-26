@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using fbs.ImageResizer.BatchZipper;
+using ImageResizer.Plugins.BatchZipper;
 
 public partial class _Default : System.Web.UI.Page 
 {

@@ -8,8 +8,8 @@
     <ProjectGuid>{CDA9A53D-C190-4460-B5AF-F73132F56BFB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ImageResizer.Plugins.BatchResizeAndZip</RootNamespace>
-    <AssemblyName>ImageResizer.Plugins.BatchResizeAndZip</AssemblyName>
+    <RootNamespace>ImageResizer.Plugins.BatchZipper</RootNamespace>
+    <AssemblyName>ImageResizer.Plugins.BatchZipper</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

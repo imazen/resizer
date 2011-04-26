@@ -3,26 +3,27 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer", "..\..\Core\ImageResizer.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchResizeAndZip", "BatchResizeAndZip.csproj", "{CDA9A53D-C190-4460-B5AF-F73132F56BFB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.BatchZipper", "ImageResizer.Plugins.BatchZipper.csproj", "{CDA9A53D-C190-4460-B5AF-F73132F56BFB}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "BatchResizeAndZipSample", "..\..\Samples\BatchResizeAndZipSample\", "{D7EF9690-9216-4BB4-A527-B0DEAFC6B03A}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "BatchZipper", "..\..\Samples\BatchZipper\", "{3F201276-B74B-4FE0-85DC-BDD7CBDA4826}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv3.5"
-		Debug.AspNetCompiler.VirtualPath = "/BatchResizeAndZipSample"
-		Debug.AspNetCompiler.PhysicalPath = "..\..\Samples\BatchResizeAndZipSample\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\BatchResizeAndZipSample\"
+		ProjectReferences = "{CDA9A53D-C190-4460-B5AF-F73132F56BFB}|ImageResizer.Plugins.BatchZipper.dll;{FA5EF673-A6A4-498D-AA24-C025CC5267AF}|ImageResizer.dll;"
+		Debug.AspNetCompiler.VirtualPath = "/BatchZipper"
+		Debug.AspNetCompiler.PhysicalPath = "..\..\Samples\BatchZipper\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\BatchZipper\"
 		Debug.AspNetCompiler.Updateable = "true"
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/BatchResizeAndZipSample"
-		Release.AspNetCompiler.PhysicalPath = "..\..\Samples\BatchResizeAndZipSample\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\BatchResizeAndZipSample\"
+		Release.AspNetCompiler.VirtualPath = "/BatchZipper"
+		Release.AspNetCompiler.PhysicalPath = "..\..\Samples\BatchZipper\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\BatchZipper\"
 		Release.AspNetCompiler.Updateable = "true"
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "49518"
+		VWDPort = "49520"
 	EndProjectSection
 EndProject
 Global
@@ -44,12 +45,12 @@ Global
 		{CDA9A53D-C190-4460-B5AF-F73132F56BFB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CDA9A53D-C190-4460-B5AF-F73132F56BFB}.Trial Version|Any CPU.ActiveCfg = Release|Any CPU
 		{CDA9A53D-C190-4460-B5AF-F73132F56BFB}.Trial Version|Any CPU.Build.0 = Release|Any CPU
-		{D7EF9690-9216-4BB4-A527-B0DEAFC6B03A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D7EF9690-9216-4BB4-A527-B0DEAFC6B03A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D7EF9690-9216-4BB4-A527-B0DEAFC6B03A}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{D7EF9690-9216-4BB4-A527-B0DEAFC6B03A}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{D7EF9690-9216-4BB4-A527-B0DEAFC6B03A}.Trial Version|Any CPU.ActiveCfg = Debug|Any CPU
-		{D7EF9690-9216-4BB4-A527-B0DEAFC6B03A}.Trial Version|Any CPU.Build.0 = Debug|Any CPU
+		{3F201276-B74B-4FE0-85DC-BDD7CBDA4826}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F201276-B74B-4FE0-85DC-BDD7CBDA4826}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F201276-B74B-4FE0-85DC-BDD7CBDA4826}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F201276-B74B-4FE0-85DC-BDD7CBDA4826}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{3F201276-B74B-4FE0-85DC-BDD7CBDA4826}.Trial Version|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F201276-B74B-4FE0-85DC-BDD7CBDA4826}.Trial Version|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
