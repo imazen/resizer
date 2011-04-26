@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using ImageResizer.Caching;
 using ImageResizer.Configuration.Issues;
+using ImageResizer.Encoding;
 
 namespace ImageResizer.Configuration {
     public class PipelineConfig : IPipelineConfig, ICacheProvider{
@@ -105,6 +106,13 @@ namespace ImageResizer.Configuration {
             }
         }
 
+        protected string getExtension(string path) {
+            //Trim off the extension
+            int lastDot = path.LastIndexOfAny(new char[] { '.', '/', ' ', '\\', '?', '&', ':' });
+            if (lastDot > -1 && path[lastDot] == '.') return path.Substring(lastDot + 1);
+            else return null;
+        }
+
         /// <summary>
         /// The specified path must not include a querystring. Slashes, spaces, question marks, ampersands, and colons are not permitted in the extension.
         /// If it contains a multipart extension like .txt.zip, only "zip" will be recognized.
@@ -112,11 +120,7 @@ namespace ImageResizer.Configuration {
         /// <param name="path"></param>
         /// <returns></returns>
         public bool IsAcceptedImageType(string path) {
-            //Trim off the extension
-            int lastDot = path.LastIndexOfAny(new char[]{'.','/', ' ','\\','?','&',':'});
-            if (lastDot > -1 && path[lastDot] == '.') path = path.Substring(lastDot + 1);
-
-            return getCachedExtensions().ContainsKey(path);
+            return getCachedExtensions().ContainsKey(getExtension(path));
         }
         /// <summary>
         /// Returns true if any of the querystring keys match any of the directives supported by the pipeline (such as width, height, format, bgcolor, etc)
@@ -295,6 +299,25 @@ namespace ImageResizer.Configuration {
             CacheSelectionEventArgs e = new CacheSelectionEventArgs(context, args, defaultCache);
             if (SelectCachingSystem != null) SelectCachingSystem(this, e);
             return e.SelectedCache;
+        }
+
+        /// <summary>
+        /// Returns a very good guess of the final output format based on the specified settings and the original file name.
+        /// Returns the file extension without the leading dot.
+        /// </summary>
+        /// <param name="originalName"></param>
+        /// <param name="resizeSettings"></param>
+        /// <returns></returns>
+        public string GuessFinalExtension(string originalName, ResizeSettings resizeSettings) {
+            //First, try setting the 'format' to the originalName extension if there is no 'format' spec
+            ResizeSettings s = new ResizeSettings(resizeSettings);
+            s.SetDefaultImageFormat(getExtension(originalName));
+
+            IEncoder e =c.Plugins.EncoderProvider.GetEncoder(null, s);
+            //If that doesn't work, let the encoder use the default extension.
+            if (e == null) e = c.Plugins.EncoderProvider.GetEncoder(null, resizeSettings);
+
+            return e.Extension;
         }
     }
 }
