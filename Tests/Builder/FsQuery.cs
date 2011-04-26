@@ -17,11 +17,22 @@ namespace ImageResizer.ReleaseBuilder {
             exclusions.Add(new Pattern("/.git"));
             exclusions.Add(new Pattern("^/Releases"));
             exclusions.Add(new Pattern("^/Legacy"));
+            exclusions.Add(new Pattern("^/Tests/Builder"));
             exclusions.Add(new Pattern("/thumbs.db$"));
             exclusions.Add(new Pattern("/.DS_Store$"));
+            exclusions.Add(new Pattern(".suo$"));
+            exclusions.Add(new Pattern(".user$"));
         }
 
         public List<Pattern> exclusions = new List<Pattern>();
+
+
+        public List<string> files(params string[] p) {
+            return query(_files, exclusions, toPatterns(p));
+        }
+        public List<string> folders(params string[] p) {
+            return query(_folders, exclusions, toPatterns(p));
+        }
 
 
         public List<string> files(params Pattern[] p){
@@ -31,12 +42,23 @@ namespace ImageResizer.ReleaseBuilder {
             return query(_folders, exclusions, p);
         }
 
+        public Pattern[] toPatterns(string[] patterns) {
+            Pattern[] p = new Pattern[patterns.Length];
+            for (int i = 0; i < patterns.Length; i++)
+                p[i] = new Pattern(patterns[i]);
+            return p;
+        }
+
         protected List<String> query(string[] items, IEnumerable<Pattern> exclusions, IEnumerable<Pattern> queries) {
+            Console.WriteLine("Applying queries:");
+            foreach (Pattern p in queries) {
+                Console.WriteLine(p.ToString());
+            }
             List<string> results = new List<string>();
             foreach (string item in items) {
                 //Trim to basedir
                 if (!item.StartsWith(baseDir)) throw new Exception("Paths don't match: " + item + " , " + baseDir);
-                string s = item.Substring(baseDir.Length);
+                string s = item.Substring(baseDir.Length).TrimEnd('\\', '/');
 
                 bool excluded = false;
                 if (exclusions != null)
