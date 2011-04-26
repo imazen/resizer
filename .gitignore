@@ -2,6 +2,9 @@ bin/
 obj/
 Debug/
 imagecache/
+dlls/
+.DS_Store
+Thumbs.db
 *.suo
 *.user
 *.csproj.user
