@@ -7,6 +7,8 @@ Devenv SolutionName /build Debug
 Devenv SolutionName /build Release
 Devenv SolutionName /build Trial
 
+Ignore ^/Legacy, /.git, ^/Releases, /.DS_Store, /thumbs.db
+
 delete /Tests/binaries  *.pdb, *.xml, *.dll
 delete /tests/   /bin and /obj folders
 delete /samples/ * /bin/ *.pdb, *.xml, *.dll
@@ -15,7 +17,7 @@ delete /core/obj
 delete */.DS_Store
 delete Plugins */obj* and */bin
 
-list all files over 50kb, exclude Legacy Samples, .git/, .gitignore and Releases/, thumbs.db
+list all files over 50kb, 
 
 Builds
 
