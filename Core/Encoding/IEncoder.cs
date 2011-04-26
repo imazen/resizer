@@ -35,7 +35,7 @@ namespace ImageResizer.Encoding {
         string MimeType { get; }
 
         /// <summary>
-        /// Returns a file extension appropriate for the output format as currently configured.
+        /// Returns a file extension appropriate for the output format as currently configured, without a leading dot.
         /// </summary>
         string Extension { get; }
 
