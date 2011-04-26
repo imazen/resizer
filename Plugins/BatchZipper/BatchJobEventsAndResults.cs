@@ -7,7 +7,7 @@ using Ionic.Zip;
 using System.Text.RegularExpressions;
 using System.Collections.Specialized;
 
-namespace fbs.ImageResizer.BatchZipper
+namespace ImageResizer.Plugins.BatchZipper
 {
     public class ItemEventArgs : EventArgs
     {

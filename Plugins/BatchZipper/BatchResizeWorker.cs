@@ -10,7 +10,7 @@ using System.Diagnostics;
 using ImageResizer.Configuration;
 using ImageResizer;
 
-namespace fbs.ImageResizer.BatchZipper
+namespace ImageResizer.Plugins.BatchZipper
 {
 
     /// <summary>

@@ -8,7 +8,7 @@ using System.Collections.Specialized;
 using ImageResizer.Configuration;
 using ImageResizer;
 
-namespace fbs.ImageResizer.BatchZipper
+namespace ImageResizer.Plugins.BatchZipper
 {
     public delegate void ItemCallback(ItemEventArgs e);
 
