@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace ImageResizer.ReleaseBuilder {
     public class Pattern:Regex {
-        public Pattern(string pattern):base(pattern.Replace("/","\\\\").Replace(".","\\.").Replace("*","."), RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase | RegexOptions.Singleline) {
+        public Pattern(string pattern):base(pattern.Replace("/","\\\\").Replace(".","\\.").Replace("*",".*"), RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase | RegexOptions.Singleline) {
 
         }
 

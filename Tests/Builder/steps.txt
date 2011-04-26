@@ -1,11 +1,4 @@
-﻿Devenv Core/ImageResizer.sln /clean Debug
-Devenv Core/ImageResizer.sln /clean Release
-Devenv Core/ImageResizer.sln /clean Trial
-
-
-Devenv SolutionName /build Debug
-Devenv SolutionName /build Release
-Devenv SolutionName /build Trial
+﻿
 
 Ignore ^/Legacy, /.git, ^/Releases, /.DS_Store, /thumbs.db
 
