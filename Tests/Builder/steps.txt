@@ -1,0 +1,64 @@
+﻿Devenv Core/ImageResizer.sln /clean Debug
+Devenv Core/ImageResizer.sln /clean Release
+Devenv Core/ImageResizer.sln /clean Trial
+
+
+Devenv SolutionName /build Debug
+Devenv SolutionName /build Release
+Devenv SolutionName /build Trial
+
+delete /Tests/binaries  *.pdb, *.xml, *.dll
+delete /tests/   /bin and /obj folders
+delete /samples/ * /bin/ *.pdb, *.xml, *.dll
+delete /samples/ /imagecache
+delete /core/obj
+delete */.DS_Store
+delete Plugins */obj* and */bin
+
+list all files over 50kb, exclude Legacy Samples, .git/, .gitignore and Releases/, thumbs.db
+
+Builds
+
+
+'min' - /dlls/release/ImageResizer.* - /
+/*.txt
+
+'core' - 
+/dlls/release/ImageResizer.* -> /
+/dlls/debug/ImageResizer.* -> /
+/Core/
+/Samples/Images
+/Samples/Core/
+/*.txt
+
+
+'full'
+
+
+
+'bundle-1'
+/*.txt
+/Core/
+/Samples/Images/
+/Samples/Core/
+/Samples/DiskCache/
+/Samples/PrettyGifs/
+/dlls/debug/ImageResizer.*
+/dlls/debug/ImageResizer.Plugins.PrettyGifs.*
+/dlls/debug/ImageResizer.Plugins.DiskCache.*
+/dlls/release/ImageResizer.*
+/dlls/release/ImageResizer.Plugins.PrettyGifs.*
+/dlls/release/ImageResizer.Plugins.DiskCache.*
+/Plugins/PrettyGifs
+/Plugins/DiskCache
+/Plugins/Controls
+/Plugins/Caption
+
+
+
+
+
+
+
+
+
