@@ -31,6 +31,7 @@ namespace ImageResizer.ReleaseBuilder {
             psi.UseShellExecute = false;
             psi.RedirectStandardOutput = true;
             psi.RedirectStandardError = true;
+            Console.WriteLine("Executing " + psi.FileName + " " + psi.Arguments);
             var p = Process.Start(psi);
             p.WaitForExit();
         }

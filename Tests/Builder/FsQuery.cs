@@ -11,8 +11,8 @@ namespace ImageResizer.ReleaseBuilder {
         string baseDir = null;
         public FsQuery(string dir) {
             baseDir = dir.TrimEnd('\\','/');
-            _files = Directory.GetFiles(dir, "", SearchOption.AllDirectories);
-            _folders = Directory.GetDirectories(dir, "", SearchOption.AllDirectories);
+            _files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
+            _folders = Directory.GetDirectories(dir, "*", SearchOption.AllDirectories);
 
             exclusions.Add(new Pattern("/.git"));
             exclusions.Add(new Pattern("^/Releases"));
@@ -43,6 +43,7 @@ namespace ImageResizer.ReleaseBuilder {
                     foreach (Pattern e in exclusions)
                         if (e.IsMatch(s)) {
                             excluded = true;
+                           // Console.WriteLine("Excluded " + s);
                             break;
                         }
 
