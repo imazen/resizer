@@ -8,7 +8,7 @@ namespace ImageResizer.ReleaseBuilder {
         static void Main(string[] args) {
             Build b = new Build();
 
-            b.BuildAll();
+            b.RemoveUselessFiles();
         }
     }
 }
