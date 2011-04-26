@@ -25,7 +25,7 @@ namespace ImageResizer.ReleaseBuilder {
 
         public void RemoveUselessFiles() {
             var f = new Futile(Console.Out);
-            var q = new FsQuery(this.f.corePath);
+            var q = new FsQuery(this.f.rootPath);
 
             
             //delete /Tests/binaries  *.pdb, *.xml, *.dll

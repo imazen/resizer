@@ -17,6 +17,7 @@ namespace ImageResizer.ReleaseBuilder {
             foreach(string s in paths){
                 try {
                     File.Delete(s);
+                    err.WriteLine("Removed " + s);
                 } catch (Exception ex) {
                     err.WriteLine("Failed to delete " + s + " " + ex.ToString());
                 }
@@ -26,6 +27,7 @@ namespace ImageResizer.ReleaseBuilder {
             foreach (string s in paths) {
                 try {
                     Directory.Delete(s, true);
+                    err.WriteLine("Removed " + s);
                 } catch (Exception ex) {
                     err.WriteLine("Failed to delete " + s + " " + ex.ToString());
                 }
