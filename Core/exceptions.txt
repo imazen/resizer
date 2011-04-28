@@ -1,0 +1,21 @@
+﻿Most errors are recoverable, and are simply logged as issues. (Visit /resizer.debug to see the log). Duplicate issues are not logged.
+
+Some errors are not recoverable:
+
+InterceptModule (These errors 
+
+- ImageProcessingException (500)  - No caches configured
+- ImageProcessingException - no image encoders found
+- ImageProcessingException  - cache file locked, timeout occured.
+- ImageMissingException (404) - source file/resource missing (Can occur and different points, for example in watermarking, or in http-based VPP.
+- Intercept module converts FileNotFoundExceptions to 404 ImageMissingExceptions
+
+(ImageBuilder) Exceptions
+
+- FileNotFoundException - file not found
+- ArgumentException, ExternalException - Source file corrupted
+- ImageProcessingException - no image encoders found
+
+
+(SizeLimiting plugin)
+- SizeLimitException - the image exceeded configured total resolution limits.
