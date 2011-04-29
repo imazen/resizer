@@ -104,6 +104,15 @@ namespace ImageResizer
             bool useICM = true;
             if (settings != null && "true".Equals(settings["ignoreicc"], StringComparison.OrdinalIgnoreCase)) useICM = false;
 
+            //App-relative path
+            if (source is string) {
+                string path = source as string;
+                //Convert app-relative paths to VirtualFile instances
+                if (path.StartsWith("~", StringComparison.OrdinalIgnoreCase)) {
+                    source = HostingEnvironment.VirtualPathProvider.GetFile(PathUtils.ResolveAppRelative(path));
+                }
+            }
+
             //Bitmap
             if (source is Bitmap) return source as Bitmap;
             //Image
@@ -114,12 +123,11 @@ namespace ImageResizer
                 b.Tag = ((IVirtualBitmapFile)source).VirtualPath;
                 return b;
             }
-            
+
+
             //String, physical path
             if (source is string) {
                 string path = source as string;
-                //Convert app-relative paths
-                if (path.StartsWith("~", StringComparison.OrdinalIgnoreCase)) path = HostingEnvironment.MapPath(path);
                 try {
                     try {
                         b = new System.Drawing.Bitmap(path, useICM);
