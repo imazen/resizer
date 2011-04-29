@@ -122,6 +122,7 @@
     <Compile Include="Resizing\BuilderExtension.cs" />
     <Compile Include="Resizing\LayoutBuilder.cs" />
     <Compile Include="Plugins\Basic\SizeLimits.cs" />
+    <Compile Include="Util\PathUtils.cs" />
     <Compile Include="Util\PolygonMath.cs" />
     <Compile Include="Plugins\IVirtualFileWithModifiedDate.cs" />
     <Compile Include="Resizing\ResizeSettings.cs" />

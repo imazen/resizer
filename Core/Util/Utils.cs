@@ -13,59 +13,7 @@ using System.IO;
 namespace ImageResizer.Util {
     public class Utils {
 
-        public static string toQuerystring(NameValueCollection QueryString) {
-            StringBuilder path = new StringBuilder();
-            if (QueryString.Count > 0) {
-                path.Append('?');
-                foreach (string key in QueryString.Keys) {
-                    string value = QueryString[key];
-
-                    path.Append(HttpUtility.UrlEncode(key));
-                    path.Append('=');
-                    path.Append(HttpUtility.UrlEncode(value));
-                    path.Append('&');
-                }
-                if (path[path.Length - 1] == '&') path.Remove(path.Length - 1, 1);
-            }
-            return path.ToString();
-        }
-
-        /// <summary>
-        /// Like fromQuerystring, but permits the leading '?' to be omitted.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static NameValueCollection fromQuerystringFriendly(string path) {
-            if (path.IndexOf('?') < 0) path = '?' + path;
-            return fromQuerystring(path);
-        }
-        public static NameValueCollection fromQuerystring(string path) {
-            NameValueCollection c = new NameValueCollection();
-            int firstdelimiter = path.IndexOf('?');
-            if (firstdelimiter < 0) firstdelimiter = path.Length;
-
-            string querystring = "";
-            if (firstdelimiter < path.Length) querystring = path.Substring(firstdelimiter, path.Length - firstdelimiter);
-            if (querystring.Length > 0) {
-                string[] pairs = querystring.Split(new char[] { '?', '&' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (string s in pairs) {
-                    string[] namevalue = s.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (namevalue.Length == 2) {
-                        c[HttpUtility.UrlDecode(namevalue[0])] =
-                            HttpUtility.UrlDecode(namevalue[1]);
-                    } else {
-                        //No value, so we set a blank value
-                        //Setting a null value would be confusing, as that is how we determine
-                        //whether a certain paramater exists
-                        c[HttpUtility.UrlDecode(namevalue[0])] = "";
-                        
-                    }
-                }
-            }
-            return c;
-
-        }
-
+  
         public static Color parseColor(string value, Color defaultValue) {
             if (!string.IsNullOrEmpty(value)) {
                 //try hex first
