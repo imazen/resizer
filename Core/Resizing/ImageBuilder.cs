@@ -214,8 +214,11 @@ namespace ImageResizer
                 
                 //Write to Physical file
                 if (dest is string) {
-                    
-                    System.IO.FileStream fs = new FileStream((string)dest, FileMode.Create, FileAccess.Write);
+                    string destPath = dest as string;
+                    //Convert app-relative paths
+                    if (destPath.StartsWith("~", StringComparison.OrdinalIgnoreCase)) destPath = HostingEnvironment.MapPath(destPath);
+
+                    System.IO.FileStream fs = new FileStream(destPath, FileMode.Create, FileAccess.Write);
                     using (fs) {
                         buildToStream(b, fs, s);
                     }
@@ -241,7 +244,7 @@ namespace ImageResizer
         /// <param name="dest"></param>
         /// <param name="settings"></param>
         protected virtual void buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
-            IEncoder e = Config.Current.Plugins.GetEncoder(source, settings);
+            IEncoder e = Config.Current.Plugins.GetEncoder(settings,source);
             if (e == null) throw new ImageProcessingException("No image encoder was found for this request.");
             using (Bitmap b = buildToBitmap(source, settings,e.SupportsTransparency)) {//Determines output format, includes code for saving in a variety of formats.
                 //Save to stream

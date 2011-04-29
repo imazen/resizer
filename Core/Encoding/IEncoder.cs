@@ -10,13 +10,14 @@ namespace ImageResizer.Encoding {
     public interface IEncoder {
 
         /// <summary>
-        /// If the encoder can handle the requirements specified by 'settings', it should return an encoder instance.
+        /// If the encoder can handle the requirements specified by 'settings' and 'source', it should return an encoder instance.
         /// If not, it should return null.
         /// </summary>
-        /// <param name="originalImage">A source image used to provide hinting for palette generation and for determining the fallback image format. Leave it null if not available.</param>
-        /// <param name="settings">Output format settings, among others. </param>
+        /// <param name="settings">Request settings, like format, quality, colors, dither, etc.</param>
+        /// <param name="original">May be a Drawing.Image instance, a path, or null. To provide both, set Image.tag to the path. Helps the encoder detect the original format if the format was not specified.
+        /// May also be used for palette generation hinting by some encoders.</param>
         /// <returns></returns>
-        IEncoder CreateIfSuitable(Image originalImage, ResizeSettings settings);
+        IEncoder CreateIfSuitable(ResizeSettings settings, object original);
 
         /// <summary>
         /// Encodes the image to the specified stream 

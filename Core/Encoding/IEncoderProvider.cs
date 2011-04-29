@@ -5,6 +5,12 @@ using System.Text;
 
 namespace ImageResizer.Encoding {
     public interface IEncoderProvider {
-        IEncoder GetEncoder(System.Drawing.Image originalImage, ResizeSettings settings);
+        /// <summary>
+        /// Returns an encoder based on the provided settings and the source object
+        /// </summary>
+        /// <param name="settings">Request settings, like format, quality, colors, dither, etc.</param>
+        /// <param name="original">May be a Drawing.Image instance, a path, or null. To provide both, set Image.tag to the path. Helps the encoder detect the original format if the format was not specified.</param>
+        /// <returns></returns>
+        IEncoder GetEncoder(ResizeSettings settings, object original);
     }
 }
