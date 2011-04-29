@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{685863E0-64B5-4814-8974-249FADCE875F}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ComplexWebApplication</RootNamespace>
+    <AssemblyName>ComplexWebApplication</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <UseIISExpress>false</UseIISExpress>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Default.aspx" />
+    <Content Include="Dithering.aspx" />
+    <Content Include="Protected\rose-leaf.jpg" />
+    <Content Include="RegressionTests.aspx" />
+    <Content Include="watermarks\Sun_256.png" />
+    <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Default.aspx.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Dithering.aspx.cs">
+      <DependentUpon>Dithering.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Dithering.aspx.designer.cs">
+      <DependentUpon>Dithering.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="HandlerTest.ashx.cs">
+      <DependentUpon>HandlerTest.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegressionTests.aspx.cs">
+      <DependentUpon>RegressionTests.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="RegressionTests.aspx.designer.cs">
+      <DependentUpon>RegressionTests.aspx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="HandlerTest.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\ImageResizer.csproj">
+      <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
+      <Name>ImageResizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\AnimatedGifs\ImageResizer.Plugins.AnimatedGifs.csproj">
+      <Project>{D97EA32A-0845-4E00-9C4D-68C5B93A1869}</Project>
+      <Name>ImageResizer.Plugins.AnimatedGifs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\Caption\ImageResizer.Plugins.Basic.Caption.csproj">
+      <Project>{DCFE9D91-E008-4DB0-9A53-3146B0551FC7}</Project>
+      <Name>ImageResizer.Plugins.Basic.Caption</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\DiskCache\ImageResizer.Plugins.DiskCache.csproj">
+      <Project>{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}</Project>
+      <Name>ImageResizer.Plugins.DiskCache</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\PrettyGifs\ImageResizer.Plugins.PrettyGifs.csproj">
+      <Project>{BB8EEB97-6550-4780-97B2-B0F2FCD80970}</Project>
+      <Name>ImageResizer.Plugins.PrettyGifs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\PsdReader\ImageResizer.Plugins.PsdReader.csproj">
+      <Project>{BCF28DA2-AF29-4C09-B37D-059F40FC9B95}</Project>
+      <Name>ImageResizer.Plugins.PsdReader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\RequestLimiting\ImageResizer.Plugins.RequestLimiting.csproj">
+      <Project>{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}</Project>
+      <Name>ImageResizer.Plugins.RequestLimiting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\SimpleFilters\ImageResizer.Plugins.SimpleFilters.csproj">
+      <Project>{2A7D72F6-6DCB-4260-A921-6C7A6FC77812}</Project>
+      <Name>ImageResizer.Plugins.SimpleFilters</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\Watermark\ImageResizer.Plugins.Watermark.csproj">
+      <Project>{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}</Project>
+      <Name>ImageResizer.Plugins.Watermark</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Protected\Web.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>49704</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>
+          </IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
