@@ -86,7 +86,7 @@ namespace ImageResizer.Plugins.S3Reader
    
         private LitS3.S3Service service = null;
         /// <summary>
-        /// The S3Service object that specifies connection details such as authentication, encryption, etc.
+        /// Gets and sets the S3Service object that specifies connection details such as authentication, encryption, etc.
         /// </summary>
         public S3Service Service
         {
