@@ -5,6 +5,24 @@ using System.Text;
 
 namespace ImageResizer {
 
+    public enum ServerCacheMode {
+        /// <summary>
+        /// Request no caching of the resulting image.
+        /// </summary>
+        No,
+        /// <summary>
+        /// Request that the resulting image always be cached on the server, even if no modifications are made. 
+        /// </summary>
+        Always,
+        /// <summary>
+        /// Default caching behavior. Modified images are cached, unmodified images are not cached.
+        /// </summary>
+        Default
+
+    }
+
+
+
     public enum ScaleMode {
         /// <summary>
         /// The default. Only downsamples images - never enlarges. If an image is smaller than 'width' and 'height', the image coordinates are used instead.

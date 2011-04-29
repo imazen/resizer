@@ -8,6 +8,11 @@ using ImageResizer.Resizing;
 using ImageResizer.Util;
 
 namespace ImageResizer {
+    /// <summary>
+    /// Represents the settings which will be used by the pipeline to process the image. 
+    /// Extends NameValueCollection to provide friendly property names for commonly used settings.
+    /// </summary>
+    [Serializable]
     public class ResizeSettings : NameValueCollection {
         
         public ResizeSettings() : base() { }
@@ -67,6 +72,20 @@ namespace ImageResizer {
         public StretchMode Stretch                          { get {
             return Utils.parseStretch(this["stretch"]);      } set {
             this["stretch"] = Utils.writeStretch(value);    }}
+
+
+        /// <summary>
+        /// Server caching mode suggestion for the result
+        /// </summary>
+        public ServerCacheMode Cache {
+            get {
+                return Utils.parseEnum<ServerCacheMode>(this["cache"],ServerCacheMode.Default);
+            }
+            set {
+                this["cache"] = value.ToString();
+            }
+        }
+
 
         /// <summary>
         /// Crop settings. Defaults to None - letterboxing is used if both width and height are supplied, and stretch = proportionally.
