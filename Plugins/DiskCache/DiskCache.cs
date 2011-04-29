@@ -72,7 +72,7 @@ namespace ImageResizer.Plugins.DiskCache
 
         protected int cacheAccessTimeout = 15000;
         /// <summary>
-        /// How many milliseconds to wait for a cached item to be available. Values below 0 are set to 0.
+        /// How many milliseconds to wait for a cached item to be available. Values below 0 are set to 0. Defaults to 15 seconds.
         /// </summary>
         public int CacheAccessTimeout {
             get { return cacheAccessTimeout; }
@@ -231,6 +231,8 @@ namespace ImageResizer.Plugins.DiskCache
         }
 
         public bool CanProcess(HttpContext current, IResponseArgs e) {
+            //Disk caching will 'pass on' caching requests if 'cache=no'.
+            if (((ResizeSettings)e.RewrittenQuerystring).Cache == ServerCacheMode.No) return false;
             return Started;//Add support for nocache
         }
 
@@ -251,7 +253,7 @@ namespace ImageResizer.Plugins.DiskCache
 
             //Fail
             if (r.Result == CacheQueryResult.Failed) 
-                throw new ApplicationException("Failed to acquire a lock on file \"" + r.PhysicalPath + "\" within " + CacheAccessTimeout + "ms. Caching failed.");
+                throw new ImageResizer.Resizing.ImageProcessingException("Failed to acquire a lock on file \"" + r.PhysicalPath + "\" within " + CacheAccessTimeout + "ms. Caching failed.");
 
 
             context.Items["FinalCachedFile"] = r.PhysicalPath;
