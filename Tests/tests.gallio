@@ -4,16 +4,17 @@
     <files>
       <file>ImageResizer.Plugins.DiskCache.Tests\bin\Debug\ImageResizer.Plugins.DiskCache.Tests.dll</file>
       <file>..\Dlls\debug\ImageResizer.Core.Tests.dll</file>
+      <file>binaries\debug\ImageResizer.Core.Tests.dll</file>
     </files>
     <hintDirectories />
     <excludedFrameworkIds />
     <properties />
   </testPackage>
   <testFilters>
-    <testFilter filterName="AutoSave" filterExpr="Id: b2ee4efcf1c1338b" />
-    <testFilter filterName="LastRun" filterExpr="Id: b2ee4efcf1c1338b" />
+    <testFilter filterName="AutoSave" filterExpr="Namespace: ImageResizer.Tests" />
+    <testFilter filterName="LastRun" filterExpr="Namespace: ImageResizer.Tests" />
   </testFilters>
   <extensionSpecifications />
-  <reportDirectory>C:\Users\Administrator\AppData\Roaming\Gallio\Icarus\Reports</reportDirectory>
+  <reportDirectory>..\..\..\AppData\Roaming\Gallio\Icarus\Reports</reportDirectory>
   <reportNameFormat>test-report-{0}-{1}</reportNameFormat>
 </testProject>

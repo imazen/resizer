@@ -53,7 +53,7 @@ namespace ImageResizer.Tests {
 
         public void get_plugin_type(string name, Type type) {
             PluginConfig c = new PluginConfig(new Config(new ResizerSection()));
-            Type t = c.get_plugin_type(name);
+            Type t = c.FindPluginType(name);
             Debug.WriteLine(new List<IIssue>(c.GetIssues())[0]);
             Assert.AreEqual<Type>(type, t);
         }
@@ -82,16 +82,16 @@ namespace ImageResizer.Tests {
         }
 
         [Test]
-        [Row("<add name='defaultencoder' /><add name='nocache' />", typeof(IPlugin), 2)]
+        [Row("<add name='defaultencoder' /><add name='nocache' /><add name='nocache' />", typeof(IPlugin), 2)]
         [Row("<add name='defaultencoder' /><add name='nocache' />", typeof(IEncoder), 1)]
         [Row("<add name='defaultencoder' /><add name='nocache' />", typeof(ICache), 1)]
         [Row("<add name='SizeLimiting' />", typeof(BuilderExtension), 1)]
         [System.Security.Permissions.ReflectionPermission(System.Security.Permissions.SecurityAction.Deny)]
         public void GetPluginsByType(string startingXML, Type kind, int expectedCount) {
             PluginConfig pc = new Config(new ResizerSection("<resizer><plugins>" + startingXML + "</plugins></resizer>")).Plugins;
-            pc.RemoveAllPlugins();
+            pc.RemoveAll();
             pc.LoadPlugins(); //Then load from xml
-            Assert.AreEqual<int>(expectedCount, pc.GetPluginsByType(kind).Count);
+            Assert.AreEqual<int>(expectedCount, pc.GetPlugins(kind).Count);
         }
     }
 }
