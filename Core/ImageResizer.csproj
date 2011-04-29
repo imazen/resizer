@@ -70,7 +70,7 @@
   <ItemGroup>
     <Compile Include="Configuration\Issues\ConfigChecker.cs" />
     <Compile Include="Plugins\Basic\ClientCache.cs" />
-    <Compile Include="Plugins\Basic\Image404Redirect.cs" />
+    <Compile Include="Plugins\Basic\Image404.cs" />
     <Compile Include="Plugins\Basic\NoCacheHandler.cs" />
     <Compile Include="Caching\ResponseArgs.cs" />
     <Compile Include="Caching\ICacheProvider.cs" />

@@ -37,12 +37,27 @@ public class PathUtils {
     /// <returns></returns>
     public static string MergeOverwriteQueryString(string path, NameValueCollection newQuerystring) {
         NameValueCollection oldQuery = ParseQueryString(path);
-        //Overwrite
+        //Overwrite old with new
         foreach (string key in newQuerystring.AllKeys)
             oldQuery[key] = newQuerystring[key];
 
         return AddQueryString(RemoveQueryString(path), BuildQueryString(oldQuery));
     }
+    /// <summary>
+    /// Adds the querystring values in 'newQuerystring' to the querystring in Path, but does not overwrite values.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="newQuerystring"></param>
+    /// <returns></returns>
+    public static string MergeQueryString(string path, NameValueCollection newQuerystring) {
+        NameValueCollection oldQuery = ParseQueryString(path);
+        //Overwrite new with old
+        foreach (string key in oldQuery.AllKeys)
+           newQuerystring[key] =  oldQuery[key];
+
+        return AddQueryString(RemoveQueryString(path), BuildQueryString(newQuerystring));
+    }
+
 
     /// <summary>
     /// Returns a string querystring in the form "?key=value&amp;key=value".
