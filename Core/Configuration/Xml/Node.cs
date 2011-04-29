@@ -231,7 +231,7 @@ namespace ImageResizer.Configuration.Xml {
         public Node deepCopy() {
             Node n = new Node(this.name);
             //copy attrs
-            foreach (string key in this.Attrs.AllKeys) {
+            foreach (string key in this.Attrs.Keys) {
                 n[key] = this[key];
             }
             

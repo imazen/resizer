@@ -38,8 +38,8 @@ public class PathUtils {
     public static string MergeOverwriteQueryString(string path, NameValueCollection newQuerystring) {
         NameValueCollection oldQuery = ParseQueryString(path);
         //Overwrite old with new
-        foreach (string key in newQuerystring.AllKeys)
-            oldQuery[key] = newQuerystring[key];
+        foreach (string key in newQuerystring.Keys)
+            if (key != null) oldQuery[key] = newQuerystring[key];
 
         return AddQueryString(RemoveQueryString(path), BuildQueryString(oldQuery));
     }
@@ -70,6 +70,7 @@ public class PathUtils {
         if (QueryString.Count > 0) {
             path.Append('?');
             foreach (string key in QueryString.Keys) {
+                if (key == null) continue; //Skip null keys
                 string value = QueryString[key];
 
                 path.Append(HttpUtility.UrlEncode(key));

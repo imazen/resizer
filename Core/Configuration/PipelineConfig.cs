@@ -130,10 +130,11 @@ namespace ImageResizer.Configuration {
         /// <param name="q"></param>
         /// <returns></returns>
         public bool HasPipelineDirective(System.Collections.Specialized.NameValueCollection q) {
+            //Did you know that ASP.NET puts null keys into the QueryString?
             Dictionary<string, bool> dirs = getCachedDirectives();
             //The querystring always has fewer items than the cachedDirectives, so loop it instead.
             foreach (string key in q.Keys) {
-                if (dirs.ContainsKey(key)) return true; //Binary search, hashtable impl
+                if (key != null && dirs.ContainsKey(key)) return true; //Binary search, hashtable impl
             }
             return false;
         }

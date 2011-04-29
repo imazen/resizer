@@ -223,7 +223,7 @@ namespace ImageResizer.Plugins.Basic {
         /// <returns></returns>
         public static ImageFormat GetImageFormatFromExtension(string ext)
         {
-            if (ext == null) return null;
+            if (string.IsNullOrEmpty(ext)) return null;
             lock (_syncExts) {
                 ext = ext.Trim(' ', '.').ToLowerInvariant();
                 if (!imageExtensions.ContainsKey(ext)) return null;
