@@ -47,7 +47,8 @@ namespace ImageResizer.Util
         /// <summary>
         /// Modifies the specified array by applying the specified function to each element.
         /// </summary>
-        /// <param name="array"></param>
+        /// <param name="a"></param>
+        /// <param name="func">object delegate(object o){}</param>
         /// <returns></returns>
         public static void ForEach(Array a, ForEachFunction func)
         {
@@ -393,7 +394,7 @@ namespace ImageResizer.Util
         /// <returns></returns>
         public static PointF[,] GetCorners(PointF[] poly, float[] widths)
         {
-            if (poly.Length != widths.Length) throw new ArgumentException();
+            if (poly.Length != widths.Length) throw new ArgumentException("Arrays 'poly' and 'widths' must have the same number of elements");
 
             PointF[,] corners = new PointF[poly.Length, 4];
             int end = (poly.Length - 1); //the last index in the array

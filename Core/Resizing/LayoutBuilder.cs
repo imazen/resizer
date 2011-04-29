@@ -143,7 +143,6 @@ namespace ImageResizer.Resizing {
         /// <summary> 
         /// Normalizes all rings and invisible polygons so that the outermost ring's bounding box starts at the specified orign.
         /// </summary>
-        /// <param name="degrees"></param>
         /// <param name="origin"></param>
         /// <returns></returns>
         public void Normalize(PointF origin) {
