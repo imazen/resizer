@@ -15,7 +15,7 @@ namespace ImageResizer.Configuration.Issues {
             //If a plugin has a configuration section, but is not installed, log an issue.
             if (c.getNode("sizelimiting") != null) issues.Add(new Issue("Use <sizelimits>, not <sizelimiting> to configure the SizeLimiting plugin", IssueSeverity.ConfigurationError));
             if (c.getNode("sizelimits") != null && 
-                !c.Plugins.HasPluginOfType(typeof(SizeLimiting)))
+                !c.Plugins.Has<SizeLimiting>())
                 issues.Add(new Issue("You have specified configuration settings for the SizeLimiting plugin, but it is not installed. ",
                     "Use <add name=\"SizeLimiting\" /> inside <plugins> to install.", IssueSeverity.ConfigurationError));
 
