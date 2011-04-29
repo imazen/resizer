@@ -95,7 +95,7 @@ namespace PhotoshopFile.Text
 
             BinaryReverseReader r = this.DataReader;
 
-            string blendModeSignature = null;
+            //string blendModeSignature = null;
             uint version = r.ReadUInt32(); //two version specifications?!?
             switch (version)
             {
@@ -162,7 +162,7 @@ namespace PhotoshopFile.Text
 
             BinaryReverseReader r = this.DataReader;
 
-            string blendModeSignature = null;
+            //string blendModeSignature = null;
 
             uint version = r.ReadUInt32();
 
@@ -231,7 +231,7 @@ namespace PhotoshopFile.Text
 
             BinaryReverseReader r = this.DataReader;
 
-            string blendModeSignature = null;
+            //string blendModeSignature = null;
 
             int version = r.ReadInt32();
             switch (version)
