@@ -24,8 +24,8 @@ namespace ImageResizer.Configuration.Issues {
             l.AddRange(c.Plugins.GetIssues());
             IIssueProvider b = c.CurrentImageBuilder as IIssueProvider;
             if (b != null) l.AddRange(b.GetIssues());
-            foreach (IPlugin p in c.Plugins.GetPluginsByType(typeof(IIssueProvider))) {
-                l.AddRange(((IIssueProvider)p).GetIssues());
+            foreach (IIssueProvider p in c.Plugins.GetAll<IIssueProvider>()) {
+                l.AddRange(p.GetIssues());
             }
             return l;
         }

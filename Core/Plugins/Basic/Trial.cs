@@ -10,20 +10,20 @@ using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
-    /// Can be used by plugins to implement 'trial version' functionality
+    /// Can be used by plugins to implement 'trial version' functionality. Not currently used.
     /// </summary>
     public class Trial:BuilderExtension, IPlugin {
         public Trial() {
         }
         public static void InstallPermanent(Config c){
             //Re-install every request if it is removed
-            c.Pipeline.PreHandleImage += new PreHandleImageHook(Pipeline_PreHandleImage);
+            c.Pipeline.PreHandleImage += new PreHandleImageEventHandler(Pipeline_PreHandleImage);
             //Install it.
-            if (c.Plugins.GetPluginsByType(typeof(Trial)).Count == 0) new Trial().Install(c);
+            if (!c.Plugins.Has<Trial>()) new Trial().Install(c);
         }
 
         static void Pipeline_PreHandleImage(System.Web.IHttpModule sender, System.Web.HttpContext context, Caching.IResponseArgs e) {
-            if (Config.Current.Plugins.GetPluginsByType(typeof(Trial)).Count == 0) new Trial().Install(Config.Current);
+            if (!Config.Current.Plugins.Has<Trial>()) new Trial().Install(Config.Current);
         }
 
         public IPlugin Install(Config c) {
@@ -46,7 +46,7 @@ namespace ImageResizer.Plugins.Basic {
             Randomly
 
         }
-        private static volatile int requestCount = 0;
+        private static int requestCount = 0;
 
         protected override RequestedAction PreFlushChanges(ImageState s) {
             if (s.destGraphics == null) return RequestedAction.None;
