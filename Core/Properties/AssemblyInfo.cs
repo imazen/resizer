@@ -6,7 +6,7 @@ using System;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Image Resizing Module")]
+[assembly: AssemblyTitle("Image Resizing Library")]
 [assembly: AssemblyDescription("Allows server-side resizing, cropping, and manipulation of images")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Nathanael Jones")]
@@ -34,6 +34,6 @@ using System;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:/*
-[assembly: AssemblyVersion("3.0.0.*")]
-[assembly: AssemblyFileVersion("2.6.*.*")]
-[assembly: AssemblyInformationalVersion("v3a")]
+[assembly: AssemblyVersion("3.0.3.*")]
+[assembly: AssemblyFileVersion("3.0.3.*")]
+[assembly: AssemblyInformationalVersion("Resizer3-alpha-3")]
