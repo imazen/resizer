@@ -22,6 +22,13 @@ namespace ImageResizer.Plugins.Basic {
         AllHosts
 
     }
+    /// <summary>
+    /// Provides the incredibly helpful /resizer.debug page we all love.
+    /// 
+    /// Mimics the behavior of customErrors by default. Not available if CustomErrors=true or retail=true. Available only to localhost if customErrors=RemoteOnly.
+    /// Can be overriden by adding in the &lt;resizer&gt; section &lt;diagnostics enableFor="None|AllHosts|LocalHost" /&gt;
+    /// 
+    /// </summary>
     public class Diagnostic :IPlugin{
         Config c;
         public IPlugin Install(Configuration.Config c) {
@@ -33,7 +40,7 @@ namespace ImageResizer.Plugins.Basic {
 
         void Pipeline_PostAuthorizeRequestStart(System.Web.IHttpModule sender, System.Web.HttpContext context) {
             
-            if (context.Request.FilePath.EndsWith("/resizer.info", StringComparison.OrdinalIgnoreCase) &&
+            if (context.Request.FilePath.EndsWith("/resizer.debug", StringComparison.OrdinalIgnoreCase) &&
                 AllowResponse(context)) {
                 context.RemapHandler(new DiagnosticPageHandler(c));
             } 
@@ -55,7 +62,7 @@ namespace ImageResizer.Plugins.Basic {
 
             DiagnosticMode mode = c.get<DiagnosticMode>("diagnostics.enableFor", def);
             if (mode == DiagnosticMode.None) return false;
-            if (mode == DiagnosticMode.AllHosts) return false;
+            if (mode == DiagnosticMode.AllHosts) return true;
             return context.Request.IsLocal;
             
         }
