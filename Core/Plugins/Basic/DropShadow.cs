@@ -12,6 +12,21 @@ namespace ImageResizer.Plugins.Basic {
     /// </summary>
     public class DropShadow : BuilderExtension, IPlugin, IQuerystringPlugin {
 
+        public IPlugin Install(Configuration.Config c) {
+            c.Plugins.add_plugin(this);
+            return this;
+        }
+
+        public bool Uninstall(Configuration.Config c) {
+            c.Plugins.remove_plugin(this);
+            return true;
+        }
+
+        public IEnumerable<string> GetSupportedQuerystringKeys() {
+            return new string[] { "shadowColor", "shadowOffset", "shadowWidth" };
+        }
+
+
         protected override RequestedAction LayoutEffects(ImageState s) {
             if (base.LayoutEffects(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
@@ -59,18 +74,6 @@ namespace ImageResizer.Plugins.Basic {
         }
 
 
-        public IEnumerable<string> GetSupportedQuerystringKeys() {
-            return new string[] { "shadowColor", "shadowOffset", "shadowWidth" };
-        }
 
-        public IPlugin Install(Configuration.Config c) {
-            c.Plugins.add_plugin(this);
-            return this;
-        }
-
-        public bool Uninstall(Configuration.Config c) {
-            c.Plugins.remove_plugin(this);
-            return true;
-        }
     }
 }
