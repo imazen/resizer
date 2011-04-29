@@ -173,7 +173,7 @@ namespace ImageResizer {
             }
 
             ResizeSettings settings = new ResizeSettings(queryString);
-            IEncoder guessedEncoder = conf.GetImageBuilder().EncoderProvider.GetEncoder(null, settings);
+            IEncoder guessedEncoder = conf.GetImageBuilder().EncoderProvider.GetEncoder(settings, null);
 
             if (guessedEncoder == null) throw new ImageProcessingException("Image Resizer: No image encoder was found for the request.");
 
