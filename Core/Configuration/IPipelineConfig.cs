@@ -13,10 +13,11 @@ namespace ImageResizer.Configuration {
     }
 
 
-    public delegate void RequestHook(IHttpModule sender, HttpContext context);
-    public delegate void UrlRewritingHook(IHttpModule sender, HttpContext context, IUrlEventArgs e);
-    public delegate void PreHandleImageHook(IHttpModule sender, HttpContext context, IResponseArgs e);
-    public delegate void CacheSelectionDelegate(object sender, ICacheSelectionEventArgs e);
+    public delegate void RequestEventHandler(IHttpModule sender, HttpContext context);
+    public delegate void UrlRewritingEventHandler(IHttpModule sender, HttpContext context, IUrlEventArgs e);
+    public delegate void UrlEventHandler(IHttpModule sender, HttpContext context, IUrlEventArgs e);
+    public delegate void PreHandleImageEventHandler(IHttpModule sender, HttpContext context, IResponseArgs e);
+    public delegate void CacheSelectionHandler(object sender, ICacheSelectionEventArgs e);
 
 
     public interface IPipelineConfig {
@@ -49,11 +50,13 @@ namespace ImageResizer.Configuration {
         /// </summary>
         VppUsageOption VppUsage { get; }
 
+
         /// <summary>
-        /// A list of fake extensions to strip from incoming requests before verifying they are the correct type of request for the pipeline to process.
-        /// Should include leading periods;
+        /// Removes the first fake extension detected at the end of 'path' (like image.jpg.ashx -> image.jpg).
         /// </summary>
-        IList<string> FakeExtensions { get; }
+        /// <param name="path"></param>
+        /// <returns></returns>
+        string TrimFakeExtensions(string path);
 
         /// <summary>
         /// Returns an ImageBuilder instance to use for image processing.
