@@ -244,7 +244,7 @@ namespace ImageResizer.Plugins.Basic {
         }
 
         /// <summary>
-        /// Supports Png, Jpeg, Gif, Bmp, and Tiff.
+        /// Supports Png, Jpeg, Gif, Bmp, and Tiff. Throws a ArgumentOutOfRangeException if not png, jpeg, gif, bmp, or tiff
         /// </summary>
         /// <param name="format"></param>
         /// <returns></returns>

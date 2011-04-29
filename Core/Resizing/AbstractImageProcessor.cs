@@ -7,8 +7,8 @@ using System.IO;
 
 namespace ImageResizer.Resizing {
     /// <summary>
-    /// Not for external use. Inherit from ImageBuilderExtension
-    /// Dual-purpose base class for both ImageBuilder and ImageBuilderExtension
+    /// Not for external use. Inherit from BuilderExtension instead.
+    /// Dual-purpose base class for both ImageBuilder and BuilderExtension
     ///  Extensions can inherit and override certain methods.
     /// ImageBuilder inherits this method to utilize its extension invocation code. 
     /// Each method of AbstractImageProcessor loops through all extensions and executes the same method on each. Provides a sort of multiple-inheritance mechanisim.
@@ -62,6 +62,8 @@ namespace ImageResizer.Resizing {
         /// <summary>
         /// Extensions are executed until one extension returns a non-null value. 
         /// This is taken to mean that the error has been resolved.
+        /// Extensions should not throw an exception unless they wish to cause subsequent extensions to not execute.
+        /// If extensions throw an ArgumentException or ExternalException, it will be wrapped in an ImageCorruptedException instance.
         /// </summary>
         /// <param name="e"></param>
         /// <param name="s"></param>
