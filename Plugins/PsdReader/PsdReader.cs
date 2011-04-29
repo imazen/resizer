@@ -73,13 +73,14 @@ namespace PsdRenderer
             sw.Start();
 
             System.Drawing.Bitmap b = getBitmap(virtualPath);
+            if (b.Tag == null) b.Tag = virtualPath;
             //Memory stream for encoding the file
             MemoryStream ms = new MemoryStream();
             //Encode image to memory stream, then seek the stream to byte 0
             using (b)
             {
                 //Use whatever settings appear in the URL. TODO: may need to fix this, doesn't use path right.
-                IEncoder ios = Config.Current.Plugins.EncoderProvider.GetEncoder(b, new ResizeSettings(queryString));
+                IEncoder ios = Config.Current.Plugins.EncoderProvider.GetEncoder(new ResizeSettings(queryString),b);
                 ios.Write(b, ms);
                 ms.Seek(0, SeekOrigin.Begin); //Reset stream for reading
             }

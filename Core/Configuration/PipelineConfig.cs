@@ -331,25 +331,5 @@ namespace ImageResizer.Configuration {
             return e.SelectedCache;
         }
 
-        /// <summary>
-        /// Returns a very good guess of the final output format based on the specified settings and the original file name.
-        /// Returns the file extension without the leading dot.
-        /// </summary>
-        /// <param name="originalName"></param>
-        /// <param name="resizeSettings"></param>
-        /// <returns></returns>
-        public string GuessFinalExtension(string originalName, ResizeSettings resizeSettings) {
-            //First, try setting the 'format' to the originalName extension if there is no 'format' spec
-            ResizeSettings s = new ResizeSettings(resizeSettings);
-
-            string ext = getExtension(originalName);
-            if (!string.IsNullOrEmpty(ext)) s.SetDefaultImageFormat(ext);
-
-            IEncoder e =c.Plugins.EncoderProvider.GetEncoder(null, s);
-            //If that doesn't work, let the encoder use the default extension.
-            if (e == null) e = c.Plugins.EncoderProvider.GetEncoder(null, resizeSettings);
-
-            return e.Extension;
-        }
     }
 }

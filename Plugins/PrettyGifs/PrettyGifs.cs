@@ -15,10 +15,10 @@ namespace ImageResizer.Plugins.PrettyGifs {
         public PrettyGifs() { }
 
 
-        public PrettyGifs(Image original, ResizeSettings settings) {
+        public PrettyGifs(ResizeSettings settings, object original) {
             ResizeSettings q = settings;
             //Parse output format
-            OutputFormat = GetFormatIfSuitable(original, settings); 
+            OutputFormat = GetFormatIfSuitable(settings, original); 
             //Parse colors
             int colors = -1;
             if (!string.IsNullOrEmpty(q["colors"]))
@@ -72,14 +72,14 @@ namespace ImageResizer.Plugins.PrettyGifs {
         /// <param name="originalImage"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public IEncoder CreateIfSuitable(Image originalImage, ResizeSettings settings) {
-            ImageFormat f = GetFormatIfSuitable(originalImage, settings);
+        public IEncoder CreateIfSuitable( ResizeSettings settings, object original) {
+            ImageFormat f = GetFormatIfSuitable(settings, original);
 
-            if (f == ImageFormat.Gif || (f == ImageFormat.Png && settings["colors"] != null)) return new PrettyGifs(originalImage, settings);
+            if (f == ImageFormat.Gif || (f == ImageFormat.Png && settings["colors"] != null)) return new PrettyGifs(settings, original);
             return null;
         }
 
-        public ImageFormat GetFormatIfSuitable(Image original, ResizeSettings settings) {
+        public ImageFormat GetFormatIfSuitable(ResizeSettings settings, object original) {
             //What format was the image originally (used as a fallback).
             ImageFormat originalFormat = DefaultEncoder.GetOriginalFormat(original);
             if (!IsValidOutputFormat(originalFormat)) originalFormat = null;//No valid info available about the original format.

@@ -22,7 +22,7 @@ namespace ImageResizer.Plugins.Basic {
             this.Quality = jpegQuality;
         }
 
-        public DefaultEncoder(Image original, ResizeSettings settings) {
+        public DefaultEncoder(ResizeSettings settings, object original) {
             //What format was the image originally (used as a fallback).
             ImageFormat originalFormat = GetOriginalFormat(original);
             if (!IsValidOutputFormat(originalFormat)) originalFormat = ImageFormat.Jpeg;//No valid info available about the original format. Use Jpeg.
@@ -43,10 +43,10 @@ namespace ImageResizer.Plugins.Basic {
 
         }
         
-        public virtual IEncoder CreateIfSuitable(Image original, ResizeSettings settings) {
+        public virtual IEncoder CreateIfSuitable(ResizeSettings settings, object original) {
             ImageFormat requestedFormat = GetRequestedFormat(settings.Format, ImageFormat.Jpeg);
             if (requestedFormat == null || !IsValidOutputFormat(requestedFormat)) return null; //An unsupported format was explicitly specified.
-            return new DefaultEncoder(original, settings);
+            return new DefaultEncoder(settings, original);
         }
 
         private ImageFormat _outputFormat = ImageFormat.Jpeg;
@@ -135,24 +135,27 @@ namespace ImageResizer.Plugins.Basic {
 
         }
         /// <summary>
-        /// Attempts to determine the ImageFormat of the source image. First attempts to parse the path, if a string is present in original.Tag. 
+        /// Attempts to determine the ImageFormat of the source image. First attempts to parse the path, if a string is present in original.Tag. (or if 'original' is a string)
         /// Falls back to using original.RawFormat. Returns null if both 'original' is null.
         /// RawFormat has a bad reputation, so this may return unexpected values, like MemoryBitmap or something in some situations.
         /// </summary>
         /// <param name="img">The image we are encoding</param>
-        /// <param name="original">The source image that was loaded from a stream</param>
+        /// <param name="original">The source image that was loaded from a stream, or a string path</param>
         /// <returns></returns>
-        public static ImageFormat GetOriginalFormat(Image original) {
+        public static ImageFormat GetOriginalFormat(object original) {
             if (original == null) return null;
             //Try to parse the original file extension first.
-            string path = original.Tag as string;
+            string path = original as string;
+            
+            if (path == null && original is Image) path = ((Image)original).Tag as string;
             //We have a path? Parse it!
             if (path != null) {
                 ImageFormat f = DefaultEncoder.GetImageFormatFromPhysicalPath(path);
                 if (f != null) return f; //From the path
             }
             //Ok, I guess it there (a) wasn't a path, or (b), it didn't have a recognizeable extension
-            return original.RawFormat;
+            if (original is Image) return ((Image)original).RawFormat;
+            return null;
         }
 
         /// <summary>

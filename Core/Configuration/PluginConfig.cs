@@ -177,13 +177,14 @@ namespace ImageResizer.Configuration {
         /// Returns an instance of the first encoder that claims to be able to handle the specified settings.
         /// Returns null if no encoders are available.
         /// </summary>
-        /// <param name="originalImage"></param>
-        /// <param name="settings"></param>
+        /// <param name="settings">Request settings, like format, quality, colors, dither, etc.</param>
+        /// <param name="original">May be a Drawing.Image instance, a path, or null. To provide both, set Image.tag to the path. Helps the encoder detect the original format if the format was not specified.
+        /// May also be used for palette generation hinting by some encoders.</param>
         /// <returns></returns>
-        public IEncoder GetEncoder(System.Drawing.Image originalImage, ResizeSettings settings) {
+        public IEncoder GetEncoder(ResizeSettings settings, object original) {
             
             foreach (IEncoder e in this.ImageEncoders) {
-                IEncoder result = e.CreateIfSuitable(originalImage, settings);
+                IEncoder result = e.CreateIfSuitable(settings, original);
                 if (result != null) return result;
             }
             return null;

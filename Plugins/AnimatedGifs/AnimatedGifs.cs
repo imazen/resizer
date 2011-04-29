@@ -31,7 +31,7 @@ namespace ImageResizer.Plugins.AnimatedGifs
         /// <param name="dest"></param>
         /// <param name="settings"></param>
         protected override RequestedAction OnBuildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
-            IEncoder ios = Configuration.Config.Current.Plugins.EncoderProvider.GetEncoder(source, settings);
+            IEncoder ios = Configuration.Config.Current.Plugins.EncoderProvider.GetEncoder(settings, source);
             //Determines output format, includes code for saving in a variety of formats.
             if (ios.MimeType.Equals("image/gif", StringComparison.OrdinalIgnoreCase) && //If it's a GIF
                 settings["frame"] == null &&    //With no frame specifier
