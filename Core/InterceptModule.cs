@@ -179,7 +179,7 @@ namespace ImageResizer {
 
             //Build CacheEventArgs
             ResponseArgs e = new ResponseArgs();
-            e.RequestKey = virtualPath + Utils.toQuerystring(queryString);
+            e.RequestKey = virtualPath + PathUtils.BuildQueryString(queryString);
             e.RewrittenQuerystring = settings;
             e.ResponseHeaders.ContentType = guessedEncoder.MimeType;
             e.SuggestedExtension = guessedEncoder.Extension;

@@ -17,7 +17,7 @@ namespace ImageResizer {
         
         public ResizeSettings() : base() { }
         public ResizeSettings(NameValueCollection col) : base(col) { }
-        public ResizeSettings(string queryString) : base(Utils.fromQuerystringFriendly(queryString)) { }
+        public ResizeSettings(string queryString) : base(PathUtils.ParseQueryStringFriendly(queryString)) { }
 
 
         public int get(string name, int defaultValue){ return Utils.getInt(this,name,defaultValue);}
