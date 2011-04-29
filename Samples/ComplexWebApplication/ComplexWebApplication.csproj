@@ -41,8 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="BatchResizeAndZip.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="Dithering.aspx" />
+    <Content Include="Global.asax" />
     <Content Include="Protected\rose-leaf.jpg" />
     <Content Include="RegressionTests.aspx" />
     <Content Include="UploadSample.aspx" />
@@ -50,6 +52,13 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BatchResizeAndZip.aspx.cs">
+      <DependentUpon>BatchResizeAndZip.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="BatchResizeAndZip.aspx.designer.cs">
+      <DependentUpon>BatchResizeAndZip.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -63,6 +72,9 @@
     </Compile>
     <Compile Include="Dithering.aspx.designer.cs">
       <DependentUpon>Dithering.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="HandlerTest.ashx.cs">
       <DependentUpon>HandlerTest.ashx</DependentUpon>
@@ -94,6 +106,10 @@
     <ProjectReference Include="..\..\Plugins\AnimatedGifs\ImageResizer.Plugins.AnimatedGifs.csproj">
       <Project>{D97EA32A-0845-4E00-9C4D-68C5B93A1869}</Project>
       <Name>ImageResizer.Plugins.AnimatedGifs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\BatchZipper\ImageResizer.Plugins.BatchZipper.csproj">
+      <Project>{CDA9A53D-C190-4460-B5AF-F73132F56BFB}</Project>
+      <Name>ImageResizer.Plugins.BatchZipper</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Caption\ImageResizer.Plugins.Basic.Caption.csproj">
       <Project>{DCFE9D91-E008-4DB0-9A53-3146B0551FC7}</Project>
