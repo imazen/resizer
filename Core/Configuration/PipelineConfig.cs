@@ -120,7 +120,9 @@ namespace ImageResizer.Configuration {
         /// <param name="path"></param>
         /// <returns></returns>
         public bool IsAcceptedImageType(string path) {
-            return getCachedExtensions().ContainsKey(getExtension(path));
+            string ext = getExtension(path);
+            if (string.IsNullOrEmpty(ext)) return false;
+            return getCachedExtensions().ContainsKey(ext);
         }
         /// <summary>
         /// Returns true if any of the querystring keys match any of the directives supported by the pipeline (such as width, height, format, bgcolor, etc)
@@ -146,11 +148,25 @@ namespace ImageResizer.Configuration {
                 if (temp != null) return temp;
                 else temp = new List<string>(c.get("pipeline.fakeExtensions",".ashx").Split(new char[]{','}, StringSplitOptions.RemoveEmptyEntries));
                 for (int i = 0; i < temp.Count; i++) {
-                    if (!temp[i].StartsWith(".")) temp[i] = "." + temp[i];
+                    if (!temp[i].StartsWith(".", StringComparison.OrdinalIgnoreCase)) temp[i] = "." + temp[i];
                 }
                 _fakeExtensions = temp;
                 return temp;
             }
+        }
+        /// <summary>
+        /// Removes the first fake extensionm detected at the end of 'path'
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public string TrimFakeExtensions(string path) {
+            foreach (string s in FakeExtensions) {
+                if (path.EndsWith(s, StringComparison.OrdinalIgnoreCase)) {
+                    path = path.Substring(0, path.Length - s.Length).TrimEnd('.');
+                    break;
+                }
+            }
+            return path;
         }
 
         public string ModifiedQueryStringKey {
@@ -160,6 +176,13 @@ namespace ImageResizer.Configuration {
         public string ResponseArgsKey {
             get { return "resizer.cacheArgs"; }
         }
+        /// <summary>
+        /// Returns true if the current request is being handled by the pipeline (sent through the caching system, etc).
+        /// </summary>
+        public bool IsHandlingRequest {
+            get { return (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Items[ResponseArgsKey] != null); }
+        }
+        
 
         public VppUsageOption VppUsage {
             get {
@@ -179,12 +202,12 @@ namespace ImageResizer.Configuration {
         /// <summary>
         /// Fired once, on the first PostAuthorizeRequest event.
         /// </summary>
-        public event RequestHook OnFirstRequest;
+        public event RequestEventHandler OnFirstRequest;
         /// <summary>
         /// Fires during the PostAuthorizeRequest phase, prior to any module-specific logic.
         /// Executes for every request to the website. Use only as a last resort. Other events occur only for image requests, and thus have lower overhead.
         /// </summary>
-        public event RequestHook PostAuthorizeRequestStart;
+        public event RequestEventHandler PostAuthorizeRequestStart;
 
         /// <summary>
         /// Fired during PostAuthorizeRequest, after ResizeExtension has been removed.
@@ -193,38 +216,38 @@ namespace ImageResizer.Configuration {
         /// You can add additonal supported image extentions by registering a plugin that implementes IQuerystringPlugin, or you can add an 
         /// extra extension in the URL and remove it here. Example: .psd.jpg</para>
         /// </summary>
-        public event UrlRewritingHook Rewrite;
+        public event UrlRewritingEventHandler Rewrite;
         /// <summary>
         /// Fired during PostAuthorizeRequest, after Rewrite.
         /// Any changes made here (which conflict) will be overwritten by the the current querystring values. I.e, this is a good place to specify default settings.
         /// <para>Only fired on accepted image types. (see Rewrite)</para>
         /// </summary>
-        public event UrlRewritingHook RewriteDefaults;
+        public event UrlRewritingEventHandler RewriteDefaults;
         /// <summary>
         /// Fired after all other rewrite events.
         /// <para>Only fired on accepted image types. (see Rewrite)</para>
         /// </summary>
-        public event UrlRewritingHook PostRewrite;
+        public event UrlRewritingEventHandler PostRewrite;
         /// <summary>
         /// Fired after all rewriting should be finished, and the secondary UrlAuthorization has been completed. Plugins wanting to add additional authorization rules can implement them in a handler,
         /// and modify the response accordingly.
         /// </summary>
-        public event UrlRewritingHook PostAuthorizeImage;
+        public event UrlEventHandler PostAuthorizeImage;
 
 
         /// <summary>
         /// Fired when the specified image doesn't exist. Only called for images that would normally be processed.
         /// May be called during PostAuthorizeRequest or later - End the request completely with a redirect if you want alternate behavior.
         /// </summary>
-        public event UrlRewritingHook ImageMissing;
+        public event UrlEventHandler ImageMissing;
 
         /// <summary>
         /// Fired immediately before the image request is sent off to the caching system for proccessing.
         /// Allows modification of response headers, caching arguments, and callbacks.
         /// </summary>
-        public event PreHandleImageHook PreHandleImage;
+        public event PreHandleImageEventHandler PreHandleImage;
 
-        public event CacheSelectionDelegate SelectCachingSystem;
+        public event CacheSelectionHandler SelectCachingSystem;
 
         protected volatile bool firedFirstRequest = false;
         protected object firedFirstRequestSync = new object();
@@ -285,7 +308,14 @@ namespace ImageResizer.Configuration {
             if (PreHandleImage != null) PreHandleImage(sender, context, e);
         }
 
-
+        /// <summary>
+        /// Cache selection occurs as follows: (1) The first registered CachingSystem that returns  true from .CanProcess() is the default
+        /// (2) The SelectCachingSystem event is fired, allowing handlers to modify the selected cache. 
+        /// This method may return null. 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public ICache GetCachingSystem(System.Web.HttpContext context, IResponseArgs args) {
             ICache defaultCache = null;
             //Grab the first cache that claims it can process the request.
@@ -311,7 +341,9 @@ namespace ImageResizer.Configuration {
         public string GuessFinalExtension(string originalName, ResizeSettings resizeSettings) {
             //First, try setting the 'format' to the originalName extension if there is no 'format' spec
             ResizeSettings s = new ResizeSettings(resizeSettings);
-            s.SetDefaultImageFormat(getExtension(originalName));
+
+            string ext = getExtension(originalName);
+            if (!string.IsNullOrEmpty(ext)) s.SetDefaultImageFormat(ext);
 
             IEncoder e =c.Plugins.EncoderProvider.GetEncoder(null, s);
             //If that doesn't work, let the encoder use the default extension.
