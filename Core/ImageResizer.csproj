@@ -46,6 +46,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\dlls\debug\ImageResizer.XML</DocumentationFile>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -99,6 +100,7 @@
     <Compile Include="Plugins\Basic\Trial.cs" />
     <Compile Include="Plugins\Basic\Diagnostic.cs" />
     <Compile Include="Plugins\Basic\DiagnosticPageHandler.cs" />
+    <Compile Include="Plugins\IMultiInstancePlugin.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Configuration\Xml\ResizerSection.cs" />
     <Compile Include="Caching\ICache.cs" />
@@ -114,6 +116,7 @@
     <Compile Include="Resizing\ImageBuilder.cs" />
     <Compile Include="InterceptModule.cs" />
     <Compile Include="Caching\IResponseArgs.cs" />
+    <Compile Include="Resizing\ImageProcessingException.cs" />
     <Compile Include="Resizing\ImageState.cs" />
     <Compile Include="Plugins\IVirtualBitmapFile.cs" />
     <Compile Include="Resizing\BuilderExtension.cs" />
@@ -125,6 +128,7 @@
     <Compile Include="Util\UrlHasher.cs" />
     <Compile Include="Util\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Plugins\Basic\VirtualFolder.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -154,6 +158,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="exceptions.txt" />
     <Content Include="extending.txt" />
     <Content Include="license.txt" />
     <Content Include="plugins.txt" />
