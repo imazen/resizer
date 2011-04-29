@@ -86,7 +86,8 @@ namespace ImageResizer
             public Bitmap bitmap;
         }
         /// <summary>
-        /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag. The filename may be virtual, relative, UNC, windows, or unix. 
+        /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag. The Bitmap.tag may be virtual, relative, UNC, windows, or unix path. 
+        /// Accepts physical paths and application relative paths. (C:\... and ~/path) 
         /// </summary>
         /// <param name="source">May  be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream</param>
         /// <param name="settings">Will ignore ICC profile if ?ignoreicc=true.</param>
@@ -117,10 +118,12 @@ namespace ImageResizer
             //String, physical path
             if (source is string) {
                 string path = source as string;
+                //Convert app-relative paths
+                if (path.StartsWith("~", StringComparison.OrdinalIgnoreCase)) path = HostingEnvironment.MapPath(path);
                 try {
                     try {
                         b = new System.Drawing.Bitmap(path, useICM);
-                    //Pass FileNotFounds along
+                    //Pass FileNotFound Exceptions along
                     } catch (FileNotFoundException notFound){
                         throw notFound;
                     } catch (Exception e) {
@@ -129,14 +132,11 @@ namespace ImageResizer
                     }
                 } catch (ArgumentException ae) {
                     ae.Data.Add("path", path);
-                    ae.Data.Add("possiblereason",loadFailureReasons);
-                    throw ae;
-                } catch (ExternalException ee){
+                    throw new ImageCorruptedException(loadFailureReasons, ae);
+                } catch (ExternalException ee) {
                     ee.Data.Add("path", path);
-                    ee.Data.Add("possiblereason", loadFailureReasons);
-                    throw ee;
+                    throw new ImageCorruptedException(loadFailureReasons, ee);
                 }
-                if (b == null) throw new IOException("Could not read the specified image! Image invalid.");
                 b.Tag = path;
                 return b;
             }
@@ -166,14 +166,11 @@ namespace ImageResizer
                         }
                     } catch (ArgumentException ae) {
                         ae.Data.Add("path", path);
-                        ae.Data.Add("possiblereason", loadFailureReasons);
-                        throw ae;
+                        throw new ImageCorruptedException(loadFailureReasons, ae);
                     } catch (ExternalException ee) {
                         ee.Data.Add("path", path);
-                        ee.Data.Add("possiblereason", loadFailureReasons);
-                        throw ee;
+                        throw new ImageCorruptedException(loadFailureReasons, ee);
                     }
-                    if (b == null) throw new IOException("Could not read the specified image! Image invalid.");
                     b.Tag = path;
                     return b;
                 }
@@ -185,7 +182,7 @@ namespace ImageResizer
 
         /// <summary>
         /// Resizes and processes the specified source image and returns a bitmap of the result.
-        /// This method assumes that transparency will be supported in the final output format, and therefore does not apply a matte color. Use &bgcolor to specify a background color
+        /// This method assumes that transparency will be supported in the final output format, and therefore does not apply a matte color. Use &amp;bgcolor to specify a background color
         /// if you use this method with a non-transparent format such as Jpeg.
         /// </summary>
         /// <param name="source">May be an instance of string (a physical path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.</param>
@@ -245,6 +242,7 @@ namespace ImageResizer
         /// <param name="settings"></param>
         protected virtual void buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
             IEncoder e = Config.Current.Plugins.GetEncoder(source, settings);
+            if (e == null) throw new ImageProcessingException("No image encoder was found for this request.");
             using (Bitmap b = buildToBitmap(source, settings,e.SupportsTransparency)) {//Determines output format, includes code for saving in a variety of formats.
                 //Save to stream
                 e.Write(b, dest);
@@ -259,7 +257,7 @@ namespace ImageResizer
         /// <param name="settings"></param>
         /// <param name="transparencySupported">True if the output method will support transparency. If false, the image should be provided a matte color</param>
         /// <returns></returns>
-        protected virtual Bitmap buildToBitmap(Bitmap source, ResizeSettings settings, bool transparencySupported) {
+        protected override Bitmap buildToBitmap(Bitmap source, ResizeSettings settings, bool transparencySupported) {
             Bitmap b = base.buildToBitmap(source,settings,transparencySupported);
             if (b != null) return b; //Allow extensions to replace the method wholesale.
 
@@ -278,7 +276,7 @@ namespace ImageResizer
 
         /// <summary>
         /// Processes an ImageState instance. Used by Build, GetFinalSize, and TranslatePoint. 
-        /// Can be overriden by a plugin with the OnProcess methid
+        /// Can be overriden by a plugin with the OnProcess method
         /// </summary>
         /// <param name="s"></param>
         public virtual void Process(ImageState s){
