@@ -241,7 +241,7 @@ namespace ImageResizer.Plugins.BatchZipper
                 if (Config.Current.Pipeline.IsAcceptedImageType(originalName))
                 {
                     //Add the correct (possibly changed) file extension.
-                    i.TargetFilename += "." + Config.Current.Pipeline.GuessFinalExtension(originalName, new ResizeSettings(i.ResizeQuerystring));
+                    i.TargetFilename += "." + Config.Current.Plugins.EncoderProvider.GetEncoder(new ResizeSettings(i.ResizeQuerystring), originalName).Extension;
                 }
                 else
                 {
