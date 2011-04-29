@@ -6,11 +6,18 @@ using System.Drawing;
 using ImageResizer.Configuration;
 using ImageResizer.Configuration.Xml;
 using ImageResizer.Configuration.Issues;
+using ImageResizer.Resizing;
 
 namespace ImageResizer.Plugins.Basic {
+    /// <summary>
+    /// Enforces two kinds of maximum size constraints: a Total size limit, and an Image size limit. 
+    /// Image limits do not include padding, border, or effect widths, and automatically shrink the 'width/height/maxwidth/maxheight' values to fit within the limits.
+    /// Total limits are absolute and apply to the actual result dimensions, causing an exception if they are exceeded. 
+    /// Limits are checked during the layout phase,  prior to resource-intensive bitmap operations.
+    /// </summary>
     public class SizeLimits:IssueSink {
 
-        public class SizeLimitException : ApplicationException {
+        public class SizeLimitException : ImageProcessingException {
             public SizeLimitException(string message) : base(message) { }
         }
         public SizeLimits():base("SizeLimits") {
