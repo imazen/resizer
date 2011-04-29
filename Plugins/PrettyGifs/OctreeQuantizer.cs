@@ -83,7 +83,7 @@ namespace ImageResizer.Plugins.PrettyGifs
 		}
 
         private ColorPalette _lastPalette;
-        private const bool TransparencyAtZero = true; //Works much better than transparency at 255
+        private readonly bool TransparencyAtZero = true; //Works much better than transparency at 255
         protected bool _dither = false;
         /// <summary>
         /// Uses a Floyd-Steinberg dither
