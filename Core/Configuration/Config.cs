@@ -193,7 +193,7 @@ namespace ImageResizer.Configuration {
         /// <summary>
         /// Returns a deep copy of the specified node
         /// </summary>
-        /// <param name="n"></param>
+        /// <param name="selector"></param>
         public Node getNode(string selector) {
             return cs.getCopyOfNode(selector);
         }
@@ -201,7 +201,6 @@ namespace ImageResizer.Configuration {
         /// <summary>
         /// Returns a deep copy if the current state of the configuration tree (starting with the 'resizer' element as the root)
         /// </summary>
-        /// <param name="n"></param>
         public Node getConfigXml() {
             return cs.getCopyOfRootNode();
         }
