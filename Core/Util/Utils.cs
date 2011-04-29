@@ -8,6 +8,7 @@ using System.Globalization;
 using ImageResizer.Resizing;
 using System.Drawing.Drawing2D;
 using System.Web;
+using System.IO;
 
 namespace ImageResizer.Util {
     public class Utils {
@@ -57,7 +58,7 @@ namespace ImageResizer.Util {
                         //Setting a null value would be confusing, as that is how we determine
                         //whether a certain paramater exists
                         c[HttpUtility.UrlDecode(namevalue[0])] = "";
-                        //throw new Exception("The specified path \"" + path + "\" contains a query paramater pair \"" + s + "\" that does not parse!");
+                        
                     }
                 }
             }
@@ -117,6 +118,52 @@ namespace ImageResizer.Util {
                 double.TryParse(q[name], out temp);
             return temp;
         }
+
+        public static bool getBool(NameValueCollection q, string name, bool defaultValue) {
+            bool temp = defaultValue;
+            if (!string.IsNullOrEmpty(q[name])){
+                string s = q[name];
+                if ("true".Equals(s, StringComparison.OrdinalIgnoreCase) ||
+                     "1".Equals(s, StringComparison.OrdinalIgnoreCase) ||
+                     "yes".Equals(s, StringComparison.OrdinalIgnoreCase) ||
+                     "on".Equals(s, StringComparison.OrdinalIgnoreCase)) return true;
+                else if ("false".Equals(s, StringComparison.OrdinalIgnoreCase) ||
+                    "0".Equals(s, StringComparison.OrdinalIgnoreCase) ||
+                    "no".Equals(s, StringComparison.OrdinalIgnoreCase) ||
+                    "off".Equals(s, StringComparison.OrdinalIgnoreCase)) return false;
+            }
+            return temp;
+        }
+
+
+        public static T parseEnum<T>(string value, T defaultValue) where T : struct, IConvertible {
+            if (!typeof(T).IsEnum) throw new ArgumentException("T must be an enumerated type");
+
+            if (value == null) return defaultValue;
+            else value = value.Trim();
+            try {
+                return (T)Enum.Parse(typeof(T), value, true);
+            } catch (ArgumentException) {
+                return defaultValue;
+            }
+        }
+
+        /// <summary>
+        /// Copies all remaining data from 'source' to 'dest'
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="dest"></param>
+        public static void copyStream(Stream source, Stream dest) {
+            byte[] buffer = new byte[32768];//8Kb
+            while (true) {
+                int len = source.Read(buffer, 0, buffer.Length);
+                if (len <= 0) break;
+                dest.Write(buffer, 0, len);
+            }
+        }
+
+        
+
 
         /// <summary>
         /// Returns RotateNoneFlipNone if not a recognize value.
