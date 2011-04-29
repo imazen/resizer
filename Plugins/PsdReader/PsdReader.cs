@@ -19,11 +19,11 @@ using PhotoshopFile.Text;
 using ImageResizer.Plugins;
 using ImageResizer.Configuration;
 using ImageResizer.Encoding;
-namespace PsdRenderer
+namespace ImageResizer.Plugins.PsdReader
 {
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
-    public class PsdReader : VirtualPathProvider, IPlugin
+    public class PsdReaderPlugin : VirtualPathProvider, IPlugin
     {
         /// <summary>
         /// Registers the PsdReader plugin as a virtual path provider.
@@ -41,7 +41,7 @@ namespace PsdRenderer
 
 
 
-        public PsdReader() : base()
+        public PsdReaderPlugin() : base()
         {
         }
       
@@ -214,7 +214,7 @@ namespace PsdRenderer
     public class PsdReaderVirtualFile : VirtualFile, IVirtualFileWithModifiedDate, IVirtualBitmapFile
     {
   
-        private PsdReader provider;
+        private PsdReaderPlugin provider;
 
         private Nullable<bool> _exists = null;
         private Nullable<DateTime> _fileModifiedDate = null;
@@ -231,7 +231,7 @@ namespace PsdRenderer
             }
         }
 
-        public PsdReaderVirtualFile(string virtualPath, PsdReader provider)
+        public PsdReaderVirtualFile(string virtualPath, PsdReaderPlugin provider)
             : base(virtualPath)
         {
             this.provider = provider;
