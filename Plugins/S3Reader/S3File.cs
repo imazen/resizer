@@ -9,6 +9,8 @@ using System.Web.Hosting;
 using System.Web.Caching;
 using System.Security.Permissions;
 using LitS3;
+using ImageResizer.Configuration;
+using ImageResizer.Resizing;
 
 namespace ImageResizer.Plugins.S3Reader {
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Minimal)]
@@ -106,11 +108,11 @@ namespace ImageResizer.Plugins.S3Reader {
             try {
                 provider.Service.GetObject(bucket, key, ms);
             } catch (S3Exception se) {
-                if (se.ErrorCode == S3ErrorCode.NoSuchKey) throw new HttpException(404, "S3 File not found", se);
-                else if (se.ErrorCode == S3ErrorCode.AccessDenied) throw new HttpException(403, "Access Denied - file may not exist", se);
+               // if (HttpContext.Current != null && HttpContext.Current.Items[Config.Current.Pipeline.ResponseArgsKey]
+                if (se.ErrorCode == S3ErrorCode.NoSuchKey) throw new FileNotFoundException("Amazon S3 file not found",  se);
+                else if (se.ErrorCode == S3ErrorCode.AccessDenied) throw new FileNotFoundException("Amazon S3 access denied - file may not exist", se);
             }
             ms.Seek(0, SeekOrigin.Begin); //Reset to beginning
-            //TODO: handle file not found error, throw cachable exception
             return ms;
         }
 
