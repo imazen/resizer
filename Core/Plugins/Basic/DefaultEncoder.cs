@@ -339,7 +339,7 @@ namespace ImageResizer.Plugins.Basic {
             if (!target.CanSeek) {
                 //Write to an intermediate, seekable memory stream (PNG compression requires it)
                 using (MemoryStream ms = new MemoryStream(4096)) {
-                    SavePng(img,target); //Recursive call
+                    img.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
                     ms.WriteTo(target);
                 }
             } else {
