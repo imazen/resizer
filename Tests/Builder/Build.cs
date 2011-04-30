@@ -15,31 +15,35 @@ namespace ImageResizer.ReleaseBuilder {
             d = new Devenv(f.solutionPath);
         }
 
-        public void Run() {
-
-            //CleanAll();
-            //BuildAll();
-            RemoveUselessFiles();
-            PrepareForPackaging();
-            PackMin();
-            PackCore();
-            PackStandard();
-            PackFull();
+        public bool ask(string question) {
+            Console.WriteLine(question);
+            bool yes =  Console.ReadKey(false).KeyChar.ToString().ToLower().Equals("y");
+            Console.WriteLine();
+            return yes;
         }
 
+        public void Run() {
 
-        //Devenv Core/ImageResizer.sln /clean Debug
-        //Devenv Core/ImageResizer.sln /clean Release
-        //Devenv Core/ImageResizer.sln /clean Trial
+            CleanAll();
+            BuildAll();
+            RemoveUselessFiles();
+            PrepareForPackaging();
+            CheckPackagesExist();
+            PackMin();
+            PackFull();
+            PackCore();
+            PackStandard();
+        }
+
         public void CleanAll(){
+            if (!ask("Clean all?")) return;
             d.Run("/Clean Debug");
             d.Run("/Clean Release");
             d.Run("/Clean Trial");
         }
-        //Devenv SolutionName /build Debug
-        //Devenv SolutionName /build Release
-        //Devenv SolutionName /build Trial
+
         public void BuildAll() {
+            if (!ask("Build all?")) return;
             d.Run("/Build Debug");
             d.Run("/Build Release");
             d.Run("/Build Trial");
@@ -50,25 +54,19 @@ namespace ImageResizer.ReleaseBuilder {
             q = new FsQuery(this.f.rootPath);
 
             
-            //delete /Tests/binaries  *.pdb, *.xml, *.dll
-            //delete /samples/ * /bin/ *.pdb, *.xml, *.dll
-            f.DelFiles(q.files("^/Tests/binaries/*.(pdb|xml|dll|txt)$",
-                                "^/Samples/*/bin/*.(pdb|xml|dll)$"));
+            //delete /Tests/binaries  (*.pdb, *.xml, *.dll)
+            //delete all bin and obj folders under /Tests and /Plugins
+            //delete /Core/obj folder
+            //Deleate all bin,obj,imageacache,uploads, and results folders under /Samples
+            f.DelFiles(q.files("^/Tests/binaries/*.(pdb|xml|dll|txt)$"));
+            f.DelFolders(q.folders("^/(Tests|Plugins)/*/(bin|obj)$",
+                       "^/Samples/*/(bin|obj|imagecache|uploads|results)$",
+                       "^/Core/obj$"));
+
+
 
             //delete .xml and .pdb files for third-party libs
-
             f.DelFiles(q.files("^/dlls/*/(Aforge|LitS3|Ionic)*.(pdb|xml)$"));
-
-
-            //delete /tests/   /bin and /obj folders
-            //delete /samples/ /imagecache
-            //delete /core/obj
-            //delete Plugins */obj* and */bin
-            f.DelFolders(q.folders("^/Tests/*/(bin|obj)$",
-                                   "^/Samples/*/(bin|obj|imagecache)$",
-                                   "^/Plugins/*/(bin|obj)$",
-                                   "^/Core/obj$"));
-
 
             //delete Thumbs.db
             //delete */.DS_Store
@@ -78,8 +76,71 @@ namespace ImageResizer.ReleaseBuilder {
             q = new FsQuery(this.f.rootPath);
             
         }
+
+
+        public void PrepareForPackaging() {
+            if (q != null) q = new FsQuery(this.f.rootPath);
+            //Don't copy the DotNetZip xml file.
+            q.exclusions.Add(new Pattern("^/Plugins/Libs/DotNetZip*.xml$"));
+            q.exclusions.Add(new Pattern("^/Tests/Libs/LibDevCassini"));
+
+        }
+        public void PackMin() {
+            if (!ask("Create 'min' package?")) return;
+            // 'min' - /dlls/release/ImageResizer.* - /
+            // /*.txt
+            using (var p = new Package(getReleasePath("min"), this.f.rootPath)) {
+                p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/");
+                p.Add(q.files("^/[^/]+.txt$"));
+            }
+        }
+
+        public void PackFull() {
+            if (!ask("Create 'full' package?")) return;
+            // 'full'
+            using (var p = new Package(getReleasePath("full"), this.f.rootPath)) {
+                p.Add(q.files("^/(dlls|core|plugins|samples|tests)/"));
+                p.Add(q.files("^/[^/]+.txt$"));
+            }
+        }
+
+        public void PackCore() {
+            if (!ask("Create 'core' package?")) return;
+            // 'core' - 
+            // /dlls/release/ImageResizer.* -> /
+            // /dlls/debug/ImageResizer.* -> /
+            // /Core/
+            // /Samples/Images
+            // /Samples/Core/
+            // /*.txt
+            using (var p = new Package(getReleasePath("core"), this.f.rootPath)) {
+                p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/");
+                p.Add(q.files("^/Core/",
+                              "^/Samples/Images/",
+                              "^/Samples/BasicWebApplication/"));
+                p.Add(q.files("^/[^/]+.txt$"));
+            }
+        }
+
+
+
+        public void PackStandard() {
+            if (!ask("Create 'standard' package?")) return;
+            // 'standard'
+            
+            using (var p = new Package(getReleasePath("standard"), this.f.rootPath)) {
+                p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/");
+                p.Add(q.files("^/dlls/trial/"), "/TrialPlugins/");
+                p.Add(q.files("^/(core|samples)/"));
+                p.Add(q.files("^/[^/]+.txt$"));
+            }
+        }
+
+
+
+
         public string getReleasePath(string kind) {
-            return Path.Combine(Path.Combine(f.rootPath, "Releases"),  ver + "-" +  kind + "-" + DateTime.UtcNow.ToString("MMM-dd-yyyy") + ".zip");
+            return Path.Combine(Path.Combine(f.rootPath, "Releases"), ver + "-" + kind + "-" + DateTime.UtcNow.ToString("MMM-dd-yyyy") + ".zip");
         }
 
         public void CheckPackagesExist() {
@@ -100,57 +161,8 @@ namespace ImageResizer.ReleaseBuilder {
                     }
 
 
-                }  else Console.WriteLine("No files will be overwritten.");
+                } else Console.WriteLine("No files will be overwritten.");
 
-            }
-        }
-
-        public void PrepareForPackaging() {
-            if (q != null) q = new FsQuery(this.f.rootPath);
-        }
-        public void PackMin() {
-            // 'min' - /dlls/release/ImageResizer.* - /
-            // /*.txt
-            using (var p = new Package(getReleasePath("min"), this.f.rootPath)) {
-                p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/");
-                p.Add(q.files("^/[^/]+.txt$"));
-            }
-        }
-
-        public void PackCore() {
-            // 'core' - 
-            // /dlls/release/ImageResizer.* -> /
-            // /dlls/debug/ImageResizer.* -> /
-            // /Core/
-            // /Samples/Images
-            // /Samples/Core/
-            // /*.txt
-            using (var p = new Package(getReleasePath("core"), this.f.rootPath)) {
-                p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/");
-                p.Add(q.files("^/Core/",
-                              "^/Samples/Images/",
-                              "^/Samples/Core/"));
-                p.Add(q.files("^/[^/]+.txt$"));
-            }
-        }
-
-        public void PackFull() {
-            // 'full'
-            using (var p = new Package(getReleasePath("full"), this.f.rootPath)) {
-                p.Add(q.files("^/(dlls|core|plugins|samples|tests)/"));
-                p.Add(q.files("^/[^/]+.txt$"));
-            }
-        }
-
-        public void PackStandard() {
-            // 'standard'
-            
-            using (var p = new Package(getReleasePath("standard"), this.f.rootPath)) {
-                p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/");
-                p.Add(q.files("^/dlls/trial/"), "/TrialPlugins/");
-                p.Add(q.files("^/(core|samples)/"));
-                p.Add(q.files("^/dlls/"));
-                p.Add(q.files("^/[^/]+.txt$"));
             }
         }
     }
