@@ -99,7 +99,8 @@ namespace ImageResizer.ReleaseBuilder {
             if (!ask("Create 'full' package?")) return;
             // 'full'
             using (var p = new Package(getReleasePath("full"), this.f.rootPath)) {
-                p.Add(q.files("^/(dlls|core|plugins|samples|tests)/"));
+                p.Add(q.files("^/(core|plugins|samples|tests)/"));
+                p.Add(q.files("^/dlls/(release|trial)"));
                 p.Add(q.files("^/[^/]+.txt$"));
             }
         }
