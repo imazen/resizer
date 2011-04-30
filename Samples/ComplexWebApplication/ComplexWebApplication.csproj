@@ -45,6 +45,7 @@
     <Content Include="Default.aspx" />
     <Content Include="Dithering.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="GradientTest.aspx" />
     <Content Include="Protected\rose-leaf.jpg" />
     <Content Include="RegressionTests.aspx" />
     <Content Include="UploadSample.aspx" />
@@ -75,6 +76,13 @@
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="GradientTest.aspx.cs">
+      <DependentUpon>GradientTest.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GradientTest.aspx.designer.cs">
+      <DependentUpon>GradientTest.aspx</DependentUpon>
     </Compile>
     <Compile Include="HandlerTest.ashx.cs">
       <DependentUpon>HandlerTest.ashx</DependentUpon>

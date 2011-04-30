@@ -104,10 +104,10 @@ namespace ImageResizer {
                     bool existsPhysically = (conf.VppUsage != VppUsageOption.Always) && System.IO.File.Exists(HostingEnvironment.MapPath(virtualPath));
 
                     //Mutually exclusive with existsPhysically. 
-                    bool existsVirtually = (conf.VppUsage != VppUsageOption.Never && !existsPhysically) && HostingEnvironment.VirtualPathProvider.FileExists(virtualPath);
+                    bool existsVirtually = (conf.VppUsage != VppUsageOption.Never && !existsPhysically) && conf.FileExists(virtualPath, q);
                     
-                    //Create the virtual file instance only if (a) VppUsage=always, and it exists virtually, or (b) VppUsage=fallback, and it only exists virtually
-                    VirtualFile vf = existsVirtually ? HostingEnvironment.VirtualPathProvider.GetFile(virtualPath) : null;
+                    //object the virtual file instance only if (a) VppUsage=always, and it exists virtually, or (b) VppUsage=fallback, and it only exists virtually
+                    object vf = existsVirtually ? conf.GetFile(virtualPath,q) : null;
 
                     //Only process files that exist
                     if (existsPhysically || existsVirtually) {
@@ -157,7 +157,7 @@ namespace ImageResizer {
         /// </summary>
         /// <param name="context"></param>
         /// <param name="current"></param>
-        protected virtual void HandleRequest(HttpContext context, string virtualPath, NameValueCollection queryString, VirtualFile vf) {
+        protected virtual void HandleRequest(HttpContext context, string virtualPath, NameValueCollection queryString, object vf) {
             Stopwatch s = new Stopwatch();
             s.Start();
             context.Items[conf.ResponseArgsKey] = ""; //We are handling the requests
@@ -204,7 +204,7 @@ namespace ImageResizer {
                     if (cacheOnly) {
                         //Just duplicate the data
                         using (Stream source = (vf != null) ? 
-                                        vf.Open() : 
+                                        (vf is IVirtualFile ? ((IVirtualFile)vf).Open() : ((VirtualFile)vf).Open()): 
                                         File.Open(HostingEnvironment.MapPath(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read)) {
                             Utils.copyStream(source, stream);
                         }
