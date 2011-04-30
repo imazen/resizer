@@ -53,12 +53,11 @@ namespace ImageResizer.ReleaseBuilder {
             z.Save();
 
             Console.WriteLine("Archive created successfully: " + z.Name);
-            var bigFiles = (from e in z.Entries
-                            where e.CompressedSize > 100000
-                            select e).OrderByDescending<ZipEntry, long>(delegate(ZipEntry e) { return e.CompressedSize; });
+            Console.WriteLine((new FileInfo(z.Name).Length / 1024) + "k compressed.");
+            Console.WriteLine("Top 20 largest files (compressed)");
+            var bigFiles = z.Entries.OrderByDescending<ZipEntry, long>(delegate(ZipEntry e) { return e.CompressedSize; }).Take(20);
 
             foreach (ZipEntry entry in bigFiles) {
-          
                 Console.WriteLine((entry.CompressedSize / 1024) + "k " + entry.FileName);
             }
 
