@@ -7,7 +7,7 @@
     <title></title>
     <style type="text/css">
     body{
-    	background:url(gradient.png?width=8&height=8&angle=45);
+    	background:url(gradient.png?width=8&height=8&angle=45&color1=888&color2=white);
     }
     </style>
 </head>
