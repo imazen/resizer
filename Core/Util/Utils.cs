@@ -19,7 +19,14 @@ namespace ImageResizer.Util {
                 //try hex first
                 int val;
                 if (int.TryParse(value, System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out val)) {
-                    return System.Drawing.ColorTranslator.FromHtml("#" + value);
+                    int alpha = 255;
+                    if (value.Length % 2 == 0) {
+                        int regLength = value.Length - (value.Length / 4);
+                        alpha = int.Parse(value.Substring(regLength), System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture);
+                        if (regLength == 3) alpha *= 16;
+                        value = value.Substring(0, regLength);
+                    }
+                    return Color.FromArgb(alpha, System.Drawing.ColorTranslator.FromHtml("#" + value));
                 } else {
                     Color c = System.Drawing.ColorTranslator.FromHtml(value);
                     return (c.IsEmpty) ? defaultValue : c;

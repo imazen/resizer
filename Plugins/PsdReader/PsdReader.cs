@@ -213,7 +213,7 @@ namespace ImageResizer.Plugins.PsdReader
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.Minimal)]
     public class PsdReaderVirtualFile : VirtualFile, IVirtualFileWithModifiedDate, IVirtualBitmapFile
     {
-  
+
         private PsdReaderPlugin provider;
 
         private Nullable<bool> _exists = null;

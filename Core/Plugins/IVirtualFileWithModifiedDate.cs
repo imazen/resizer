@@ -5,9 +5,8 @@ using System.Text;
 
 namespace ImageResizer.Plugins
 {
-    public interface IVirtualFileWithModifiedDate
+    public interface IVirtualFileWithModifiedDate :IVirtualFile
     {
          DateTime ModifiedDateUTC { get; }
-         string VirtualPath { get; }
     }
 }

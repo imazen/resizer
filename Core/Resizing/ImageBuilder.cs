@@ -89,7 +89,7 @@ namespace ImageResizer
         /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag. The Bitmap.tag may be virtual, relative, UNC, windows, or unix path. 
         /// Accepts physical paths and application relative paths. (C:\... and ~/path) 
         /// </summary>
-        /// <param name="source">May  be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream</param>
+        /// <param name="source">May  be an instance of string, VirtualFile, IVirtualFile IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream</param>
         /// <param name="settings">Will ignore ICC profile if ?ignoreicc=true.</param>
         /// <returns></returns>
         public virtual Bitmap LoadImage(object source, ResizeSettings settings) {
@@ -151,7 +151,7 @@ namespace ImageResizer
             //VirtualFile
             //HttpPostedFile
             //Stream
-            if (source is VirtualFile || source is HttpPostedFile || source is Stream) {
+            if (source is VirtualFile || source is IVirtualFile || source is HttpPostedFile || source is Stream) {
                 Stream s = null;
                 string path = null;
                 if (source is Stream) s = (Stream)source;
@@ -162,6 +162,10 @@ namespace ImageResizer
                 if (source is VirtualFile) {
                     path = ((VirtualFile)source).VirtualPath;
                     s = ((VirtualFile)source).Open();
+                }
+                if (source is IVirtualFile) {
+                    path = ((IVirtualFile)source).VirtualPath;
+                    s = ((IVirtualFile)source).Open();
                 }
 
                 using (s) {

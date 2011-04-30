@@ -9,6 +9,7 @@ using System.Collections.Specialized;
 using ImageResizer.Caching;
 using ImageResizer.Configuration.Issues;
 using ImageResizer.Encoding;
+using System.Web.Hosting;
 
 namespace ImageResizer.Configuration {
     public class PipelineConfig : IPipelineConfig, ICacheProvider{
@@ -189,6 +190,32 @@ namespace ImageResizer.Configuration {
             get {
                 return c.get<VppUsageOption>("pipeline.vppUsage", VppUsageOption.Fallback);
             }
+        }
+
+        /// <summary>
+        /// Returns either an IVirtualFile instance or a VirtualFile instance.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        public object GetFile(string virtualPath, NameValueCollection queryString) {
+            foreach (IVirtualImageProvider p in c.Plugins.GetAll<IVirtualImageProvider>()) {
+                if (p.FileExists(virtualPath, queryString)) return p.GetFile(virtualPath, queryString);
+            }
+            return HostingEnvironment.VirtualPathProvider.GetFile(virtualPath);
+        }
+
+        /// <summary>
+        /// Returns true if (a) A registered IVirtualImageProvider says it exists, or (b) if the VirtualPathProvider chain says it exists.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        public bool FileExists(string virtualPath, NameValueCollection queryString) {
+            foreach (IVirtualImageProvider p in c.Plugins.GetAll<IVirtualImageProvider>()) {
+                if (p.FileExists(virtualPath, queryString)) return true;
+            }
+            return HostingEnvironment.VirtualPathProvider.FileExists(virtualPath);
         }
 
 

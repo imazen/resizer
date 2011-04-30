@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace ImageResizer.Plugins {
-    public interface IVirtualBitmapFile {
+    public interface IVirtualBitmapFile:IVirtualFile {
         System.Drawing.Bitmap GetBitmap();
         string VirtualPath { get; }
     }
