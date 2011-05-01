@@ -68,6 +68,7 @@ namespace ImageResizer.Plugins.Basic {
         }
 
         public bool Uninstall(Configuration.Config c) {
+            c.Plugins.remove_plugin(this);
             c.Pipeline.PostAuthorizeRequestStart -= Pipeline_PostAuthorizeRequestStart;
             return true;
         }
