@@ -8,6 +8,8 @@ using System.Web;
 using ImageResizer.Util;
 using ImageResizer.Resizing;
 using System.Web.Hosting;
+using ImageResizer.Configuration;
+using System.Web.Caching;
 
 namespace ImageResizer.Plugins.Watermark
 {
@@ -35,14 +37,17 @@ namespace ImageResizer.Plugins.Watermark
         /// </summary>
         /// <param name="localfile"></param>
         /// <returns></returns>
-        public Bitmap GetMemCachedBitmap(string localfile)
+        public Bitmap GetMemCachedBitmap(string virtualPath)
         {
-            string key = localfile.ToLowerInvariant();
+            string key = virtualPath.ToLowerInvariant();
             Bitmap b = HttpContext.Current.Cache[key] as Bitmap;
             if (b != null) return b;
 
-            b = ImageBuilder.Current.LoadImage(localfile,new ResizeSettings());
-            HttpContext.Current.Cache.Insert(key, b, new System.Web.Caching.CacheDependency(localfile));
+            b = ImageBuilder.Current.LoadImage(virtualPath, new ResizeSettings());
+            //Query VPPs for cache dependency. TODO: Add support for IVirtualImageProviders to customize cache dependencies.
+            CacheDependency cd = HostingEnvironment.VirtualPathProvider.GetCacheDependency(virtualPath, new string[] { }, DateTime.UtcNow);
+
+            HttpContext.Current.Cache.Insert(key, b,cd);
             return b;
         }
 
@@ -58,12 +63,14 @@ namespace ImageResizer.Plugins.Watermark
                 watermark.IndexOfAny(new char[] { '\\', '/' }) > -1)
                 throw new ArgumentException("Watermark value contained invalid file name characters: " + watermark);
 
-            //Combine the directory with the 
+            //Combine the directory with the base dir
             watermark = watermarkDir.TrimEnd('/') + '/' + watermark.TrimStart('/');
 
+            //Verify the file exists. If the watermark doesn't exist, skip watermarking.
+            if (!c.Pipeline.FileExists(watermark, s.settings)) return RequestedAction.None;
 
             //Load the file specified in the querystring,
-            Bitmap wb = GetMemCachedBitmap(HostingEnvironment.MapPath(watermark));
+            Bitmap wb = GetMemCachedBitmap(watermark);
 
             //If percentages, resolve to pixels
             if (valuesPercentages) {
@@ -127,9 +134,10 @@ namespace ImageResizer.Plugins.Watermark
             return RequestedAction.None;
         }
 
-
+        Config c;
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
+            this.c = c;
             return this;
         }
 
