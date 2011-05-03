@@ -49,6 +49,7 @@
     <Content Include="Protected\rose-leaf.jpg" />
     <Content Include="RegressionTests.aspx" />
     <Content Include="UploadSample.aspx" />
+    <Content Include="Watermarks.aspx" />
     <Content Include="watermarks\Sun_256.png" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -101,6 +102,13 @@
     </Compile>
     <Compile Include="UploadSample.aspx.designer.cs">
       <DependentUpon>UploadSample.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Watermarks.aspx.cs">
+      <DependentUpon>Watermarks.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Watermarks.aspx.designer.cs">
+      <DependentUpon>Watermarks.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
