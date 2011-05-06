@@ -4,9 +4,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Web;
 
+/// <summary>
+/// Contains interfaces for caching plugins, and implementations of IResponseArgs and IResponseHeadres.
+/// </summary>
 namespace ImageResizer.Caching {
     /// <summary>
-    /// Manages updating the cache and serving data from it.
+    /// Provides caching behavior
     /// </summary>
     public interface ICache {
         /// <summary>

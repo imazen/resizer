@@ -10,6 +10,9 @@ using ImageResizer.Plugins;
 using ImageResizer.Encoding;
 
 namespace ImageResizer.Plugins.Basic {
+    /// <summary>
+    /// Provides basic encoding functionality for Jpeg, png, and gif output. Allows adjustable Jpeg compression, but doesn't implement indexed PNG files or quantized GIF files.
+    /// </summary>
     public class DefaultEncoder :IEncoder, IQuerystringPlugin, IPlugin {
 
         public DefaultEncoder() {
@@ -367,7 +370,10 @@ namespace ImageResizer.Plugins.Basic {
 
 
      
-
+        /// <summary>
+        /// Returns the querystring keys used by DefaultEncoder (quality, format, and thumbnail)
+        /// </summary>
+        /// <returns></returns>
         public virtual IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "quality", "format", "thumbnail" };
         }

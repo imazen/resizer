@@ -9,7 +9,7 @@ namespace ImageResizer.Plugins.Basic {
     /// <summary>
     /// Default cache when DiskCache isn't installed. 
     /// Useful for debugging purposes but unsuited for production use, and will use large quanities of RAM. (Scales to fewer than 5 concurrent requests).
-    /// Serves content directly to the client.
+    /// Serves content directly to the client from memory.
     /// </summary>
     public class NoCache :ICache, IPlugin {
         /// <summary>

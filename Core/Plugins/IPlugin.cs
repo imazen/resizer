@@ -5,6 +5,9 @@ using System.Text;
 using ImageResizer.Configuration;
 
 namespace ImageResizer.Plugins {
+    /// <summary>
+    /// All plugins must implement this. Enables web.config addition and removal.
+    /// </summary>
     public interface IPlugin {
         /// <summary>
         /// Installs the plugin in the specified Config instance. The plugin must handle all the work of loading settings, registering the plugin etc.
