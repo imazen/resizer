@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Web;
 
-namespace ImageResizer.Resizing {
+namespace ImageResizer {
     /// <summary>
     /// Represents an non-recoverable exception that occured while processing the image. 
     /// Possible causes are: a corrupted source file, cache resource timeout (such as a locked file in imagecache),
@@ -39,11 +39,15 @@ namespace ImageResizer.Resizing {
         }
     }
 
-
+    /// <summary>
+    /// A source file was corrupted
+    /// </summary>
     public class ImageCorruptedException : ImageProcessingException {
         public ImageCorruptedException(string message, Exception innerException) : base(500, message, message, innerException) { }
     }
-
+    /// <summary>
+    /// One or more source files was missing
+    /// </summary>
     public class ImageMissingException : ImageProcessingException {
         public ImageMissingException(string message) : base(404, message) { }
 
