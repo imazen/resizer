@@ -7,6 +7,9 @@ using System.IO;
 using ImageResizer.Configuration;
 
 namespace ImageResizer.Encoding {
+    /// <summary>
+    /// An image encoder. Exposes methods for suitability checking, encoding, transparency compatibility checking, and mime-type/extension calculation.
+    /// </summary>
     public interface IEncoder {
 
         /// <summary>

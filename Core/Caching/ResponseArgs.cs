@@ -6,6 +6,9 @@ using System.IO;
 using System.Collections.Specialized;
 
 namespace ImageResizer.Caching {
+    /// <summary>
+    /// IResponseArgs implementation
+    /// </summary>
     public class ResponseArgs : IResponseArgs {
 
         public ResponseArgs() { }

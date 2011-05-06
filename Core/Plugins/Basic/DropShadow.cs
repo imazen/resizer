@@ -8,7 +8,7 @@ using System.Drawing;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
-    /// Adds drop shadow capabilities
+    /// Adds drop shadow capabilities (shadowColor, shadowOffset, and shadowWidth commands)
     /// </summary>
     public class DropShadow : BuilderExtension, IPlugin, IQuerystringPlugin {
 

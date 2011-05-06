@@ -14,6 +14,10 @@ using ImageResizer.Util;
 using System.Collections.Generic;
 using System.IO;
 using ImageResizer.Resizing;
+
+/// <summary>
+/// This namespace contains the most frequently used classes.
+/// </summary>
 namespace ImageResizer {
 
     /// <summary>

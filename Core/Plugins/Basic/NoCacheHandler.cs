@@ -6,6 +6,9 @@ using System.Web;
 using ImageResizer.Caching;
 
 namespace ImageResizer.Plugins.Basic {
+    /// <summary>
+    /// Implements IHttpHandler, serves content for the NoCache plugin
+    /// </summary>
     public class NoCacheHandler :IHttpHandler{
         private IResponseArgs e;
 

@@ -7,6 +7,9 @@ using ImageResizer.Plugins;
 using System.Web;
 
 namespace ImageResizer.Plugins.Basic {
+    /// <summary>
+    /// Determines when the diagnostics page can be viewed.
+    /// </summary>
     public enum DiagnosticMode {
         /// <summary>
         /// Diagnostics are disabled
