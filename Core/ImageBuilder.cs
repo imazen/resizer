@@ -100,15 +100,14 @@ namespace ImageResizer
             System.Drawing.Bitmap b = null;
 
             string loadFailureReasons = "File may be corrupted, empty, or may contain a PNG image with a single dimension greater than 65,535 pixels.";
-
-            bool useICM = true;
-            if (settings != null && "true".Equals(settings["ignoreicc"], StringComparison.OrdinalIgnoreCase)) useICM = false;
-
-            //App-relative path
+            string path = null;
+ 
+            //App-relative path - converted to virtual path
             if (source is string) {
-                string path = source as string;
+                path = source as string;
                 //Convert app-relative paths to VirtualFile instances
                 if (path.StartsWith("~", StringComparison.OrdinalIgnoreCase)) {
+                    //TODO: add support for virtual files
                     source = HostingEnvironment.VirtualPathProvider.GetFile(PathUtils.ResolveAppRelative(path));
                 }
             }
@@ -126,16 +125,41 @@ namespace ImageResizer
 
 
             //String, physical path
-            if (source is string) {
-                string path = source as string;
+            //VirtualFile
+            
+            
+            Stream s = null;
+            path = null;
+            //Stream
+            if (source is Stream) s = (Stream)source;
+            //HttpPostedFile
+            else if (source is HttpPostedFile) {
+                path = ((HttpPostedFile)source).FileName;
+                s = ((HttpPostedFile)source).InputStream;
+            //VirtualFile
+            } else if (source is VirtualFile) {
+                path = ((VirtualFile)source).VirtualPath;
+                s = ((VirtualFile)source).Open();
+            //IVirtualFile
+            } else if (source is IVirtualFile) {
+                path = ((IVirtualFile)source).VirtualPath;
+                s = ((IVirtualFile)source).Open();
+            //PhysicalPath
+            } else if (source is string) {
+                path = (string)source;
+                s = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            } else {
+                 throw new ArgumentException("Paramater source may only be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.", "source");
+            }
+            using (s) {
                 try {
                     try {
-                        b = new System.Drawing.Bitmap(path, useICM);
-                    //Pass FileNotFound Exceptions along
-                    } catch (FileNotFoundException notFound){
-                        throw notFound;
+                        b = this.DecodeStream(s, settings, path);
+                        if (b == null) b = DecodeStreamFailed(s, settings, path);
                     } catch (Exception e) {
-                        b = LoadImageFailed(e, path, useICM);
+                        //Start over
+                        if (s.CanSeek) s.Seek(0, SeekOrigin.Begin);
+                        b = DecodeStreamFailed(s, settings, path);
                         if (b == null) throw e; //If none of the extensions loaded the image, throw the exception anyhow.
                     }
                 } catch (ArgumentException ae) {
@@ -145,51 +169,26 @@ namespace ImageResizer
                     ee.Data.Add("path", path);
                     throw new ImageCorruptedException(loadFailureReasons, ee);
                 }
-                b.Tag = path;
-                return b;
             }
-            //VirtualFile
-            //HttpPostedFile
-            //Stream
-            if (source is VirtualFile || source is IVirtualFile || source is HttpPostedFile || source is Stream) {
-                Stream s = null;
-                string path = null;
-                if (source is Stream) s = (Stream)source;
-                else if (source is HttpPostedFile) {
-                    path = ((HttpPostedFile)source).FileName;
-                    s = ((HttpPostedFile)source).InputStream;
-                }
-                if (source is VirtualFile) {
-                    path = ((VirtualFile)source).VirtualPath;
-                    s = ((VirtualFile)source).Open();
-                }
-                if (source is IVirtualFile) {
-                    path = ((IVirtualFile)source).VirtualPath;
-                    s = ((IVirtualFile)source).Open();
-                }
-
-                using (s) {
-                    try {
-                        try {
-                            b = new System.Drawing.Bitmap(s, useICM);
-                        } catch (Exception e) {
-                            b = LoadImageFailed(e, s, useICM);
-                            if (b == null) throw e; //If none of the extensions loaded the image, throw the exception anyhow.
-                        }
-                    } catch (ArgumentException ae) {
-                        ae.Data.Add("path", path);
-                        throw new ImageCorruptedException(loadFailureReasons, ae);
-                    } catch (ExternalException ee) {
-                        ee.Data.Add("path", path);
-                        throw new ImageCorruptedException(loadFailureReasons, ee);
-                    }
-                    b.Tag = path;
-                    return b;
-                }
-            }
-            throw new ArgumentException("Paramater source may only be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.", "source");
+            if (b != null && b.Tag == null) b.Tag = path;
+            return b;            
         }
 
+        /// <summary>
+        /// Decodes the stream into a bitmap instance
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="settings"></param>
+        /// <param name="optionalPath"></param>
+        /// <returns></returns>
+        public virtual Bitmap DecodeStream(Stream s, ResizeSettings settings, string optionalPath) {
+            Bitmap b = base.DecodeStream(s, settings, optionalPath);
+            if (b != null) return b;
+            bool useICM = true;
+            if (settings != null && "true".Equals(settings["ignoreicc"], StringComparison.OrdinalIgnoreCase)) useICM = false;
+
+            return new Bitmap(s, useICM);
+        }
 
 
         /// <summary>
