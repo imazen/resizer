@@ -103,7 +103,7 @@
     <Compile Include="Plugins\Basic\DiagnosticPageHandler.cs" />
     <Compile Include="Plugins\IMultiInstancePlugin.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
-    <Compile Include="Configuration\Xml\ResizerSection.cs" />
+    <Compile Include="ResizerSection.cs" />
     <Compile Include="Caching\ICache.cs" />
     <Compile Include="Configuration\SafeList.cs" />
     <Compile Include="Plugins\Basic\DefaultEncoder.cs" />
@@ -115,11 +115,11 @@
     <Compile Include="Plugins\IVirtualImageProvider.cs" />
     <Compile Include="Resizing\AbstractImageProcessor.cs" />
     <Compile Include="Resizing\BoxPadding.cs" />
-    <Compile Include="Resizing\Enumerations.cs" />
-    <Compile Include="Resizing\ImageBuilder.cs" />
+    <Compile Include="Enumerations.cs" />
+    <Compile Include="ImageBuilder.cs" />
     <Compile Include="InterceptModule.cs" />
     <Compile Include="Caching\IResponseArgs.cs" />
-    <Compile Include="Resizing\ImageProcessingException.cs" />
+    <Compile Include="ImageProcessingException.cs" />
     <Compile Include="Resizing\ImageState.cs" />
     <Compile Include="Plugins\IVirtualBitmapFile.cs" />
     <Compile Include="Resizing\BuilderExtension.cs" />
@@ -129,7 +129,7 @@
     <Compile Include="Util\PathUtils.cs" />
     <Compile Include="Util\PolygonMath.cs" />
     <Compile Include="Plugins\IVirtualFileWithModifiedDate.cs" />
-    <Compile Include="Resizing\ResizeSettings.cs" />
+    <Compile Include="ResizeSettings.cs" />
     <Compile Include="Util\UrlHasher.cs" />
     <Compile Include="Util\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
