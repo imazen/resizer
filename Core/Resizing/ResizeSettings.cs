@@ -9,7 +9,7 @@ using ImageResizer.Util;
 
 namespace ImageResizer {
     /// <summary>
-    /// Represents the settings which will be used by the pipeline to process the image. 
+    /// Represents the settings which will be used to process the image. 
     /// Extends NameValueCollection to provide friendly property names for commonly used settings.
     /// </summary>
     [Serializable]
