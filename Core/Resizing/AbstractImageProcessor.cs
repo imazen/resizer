@@ -5,7 +5,24 @@ using System.Text;
 using System.Drawing;
 using System.IO;
 
+/// <summary>
+/// Contains classes for calculating and rendering images, as well as for building image processing plugins.
+/// </summary>
 namespace ImageResizer.Resizing {
+    /// <summary>
+    /// What to do about remaining handlers/methods for the specified section
+    /// </summary>
+    public enum RequestedAction {
+        /// <summary>
+        /// Does nothing
+        /// </summary>
+        None = 0,
+        /// <summary>
+        /// Requests that ImageBuilder cancels the default logic of the method, and stop executing plugin calls for the method immediately.
+        /// </summary>
+        Cancel,
+    }
+
     /// <summary>
     /// Not for external use. Inherit from BuilderExtension instead.
     /// Dual-purpose base class for both ImageBuilder and BuilderExtension
@@ -46,39 +63,37 @@ namespace ImageResizer.Resizing {
         /// <summary>
         /// Extensions are executed until one extension returns a non-null value. 
         /// This is taken to mean that the error has been resolved.
-        /// </summary>
-        /// <param name="e"></param>
-        /// <param name="path"></param>
-        /// <param name="useICM"></param>
-        protected virtual Bitmap LoadImageFailed(Exception e, string path, bool useICM) {
-            if (exts == null) return null;
-            foreach (AbstractImageProcessor p in exts) {
-                Bitmap b = p.LoadImageFailed(e, path, useICM);
-                if (b != null) return b;
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Extensions are executed until one extension returns a non-null value. 
-        /// This is taken to mean that the error has been resolved.
         /// Extensions should not throw an exception unless they wish to cause subsequent extensions to not execute.
         /// If extensions throw an ArgumentException or ExternalException, it will be wrapped in an ImageCorruptedException instance.
         /// </summary>
-        /// <param name="e"></param>
-        /// <param name="s"></param>
-        /// <param name="useICM"></param>
-        protected virtual Bitmap LoadImageFailed(Exception e, Stream s, bool useICM) {
+        public virtual Bitmap DecodeStreamFailed(Stream s, ResizeSettings settings, string optionalPath) {
             if (exts == null) return null;
             foreach (AbstractImageProcessor p in exts) {
-                Bitmap b = p.LoadImageFailed(e, s, useICM);
+                Bitmap b = p.DecodeStreamFailed(s,settings, optionalPath);
+                if (b != null) return b;
+            }
+            return null;
+        }
+        /// <summary>
+        /// Extend this to support alternate image source formats.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="settings"></param>
+        /// <param name="optionalPath"></param>
+        /// <returns></returns>
+        public virtual Bitmap DecodeStream(Stream s, ResizeSettings settings, string optionalPath) {
+            if (exts == null) return null;
+            foreach (AbstractImageProcessor p in exts) {
+                Bitmap b = p.DecodeStream(s,settings, optionalPath);
                 if (b != null) return b;
             }
             return null;
         }
 
+
+
         /// <summary>
-        /// Extend this to allow additional types of *destination* objects to be accepted by transforming them into either a bitmap or a stream.
+        /// Extend this to allow additional types of *destination* objects to be accepted by transforming them into either a bitmapholder or a stream.
         /// </summary>
         /// <param name="dest"></param>
         /// <param name="settings"></param>
