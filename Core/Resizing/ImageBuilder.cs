@@ -26,8 +26,8 @@ using ImageResizer.Plugins;
 namespace ImageResizer
 {
     /// <summary>
-    /// Provides methods for generating resizied images, and for reading and writing them to disk.
-    /// Use ImageManager.Create to get the default instance, or use ImageManager.Instance.Create() to control which extensions are used.
+    /// Provides methods for generating resized images, and for reading and writing them to disk.
+    /// Use ImageBuilder.Current to get the current instance (as configured in the application configuration), or use ImageBuilder.Current.Create() to control which extensions are used.
     /// </summary>
     public class ImageBuilder : AbstractImageProcessor, IQuerystringPlugin
     {

@@ -17,7 +17,7 @@ using ImageResizer.Resizing;
 namespace ImageResizer {
 
     /// <summary>
-    /// Monitors incoming image requests to determine if resizing (or other processing) is requested by their querystring
+    /// Monitors incoming image requests to determine if resizing (or other processing) is being requested.
     /// </summary>
     public class InterceptModule : IHttpModule {
 
