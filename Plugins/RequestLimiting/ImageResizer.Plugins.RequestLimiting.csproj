@@ -44,6 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
+      <Link>SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Limit.cs" />
     <Compile Include="RequestLimiting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

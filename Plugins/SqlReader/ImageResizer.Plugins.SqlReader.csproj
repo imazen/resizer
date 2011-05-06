@@ -37,6 +37,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
+      <Link>SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="SqlReaderSettings.cs" />
     <Compile Include="SqlReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

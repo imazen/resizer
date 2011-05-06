@@ -41,6 +41,9 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
+      <Link>SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="BatchJobEventsAndResults.cs" />
     <Compile Include="BatchJobSettings.cs" />
     <Compile Include="BatchResizeWorker.cs" />

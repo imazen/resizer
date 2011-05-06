@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
+      <Link>SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Index\CachedFileInfo.cs" />
     <Compile Include="Index\CachedFolder.cs" />
     <Compile Include="Index\CacheIndex.cs" />
