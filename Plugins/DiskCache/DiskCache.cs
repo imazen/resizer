@@ -253,7 +253,7 @@ namespace ImageResizer.Plugins.DiskCache
 
             //Fail
             if (r.Result == CacheQueryResult.Failed) 
-                throw new ImageResizer.Resizing.ImageProcessingException("Failed to acquire a lock on file \"" + r.PhysicalPath + "\" within " + CacheAccessTimeout + "ms. Caching failed.");
+                throw new ImageResizer.ImageProcessingException("Failed to acquire a lock on file \"" + r.PhysicalPath + "\" within " + CacheAccessTimeout + "ms. Caching failed.");
 
 
             context.Items["FinalCachedFile"] = r.PhysicalPath;
