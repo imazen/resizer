@@ -68,15 +68,3 @@ namespace ImageResizer {
     }
 
 }
-namespace ImageResizer.Resizing {
-    public enum RequestedAction {
-        /// <summary>
-        /// Does nothing
-        /// </summary>
-        None = 0,
-        /// <summary>
-        /// Requests that ImageBuilder cancels the default logic of the method, and stop executing plugin calls for the method immediately.
-        /// </summary>
-        Cancel,
-    }
-}
