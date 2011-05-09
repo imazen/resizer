@@ -175,6 +175,10 @@ namespace ImageResizer.Configuration {
             get { return "resizer.modifiedQueryString"; }
         }
 
+        public string ModifiedPathKey {
+            get { return "resizer.newPath"; }
+        }
+
         public string ResponseArgsKey {
             get { return "resizer.cacheArgs"; }
         }

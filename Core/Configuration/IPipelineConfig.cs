@@ -46,6 +46,10 @@ namespace ImageResizer.Configuration {
         string ResponseArgsKey { get; }
 
         /// <summary>
+        ///  The key in Context.Items to access a the path to use instead of Request.path
+        /// </summary>
+         string ModifiedPathKey { get; }
+        /// <summary>
         /// The behavior to use when accessing the file system.
         /// </summary>
         VppUsageOption VppUsage { get; }

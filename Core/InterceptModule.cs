@@ -65,10 +65,17 @@ namespace ImageResizer {
 
             conf.FirePostAuthorizeRequest(this, app.Context);
 
-            //Copy FilePath so we can modify it. Add PathInfo back on so we can support directories with dots in them.
-            //Trim fake extensions so IsAcceptedImageType will work properly
-            string filePath = conf.TrimFakeExtensions(app.Context.Request.FilePath + app.Context.Request.PathInfo);
+            
 
+            //Trim fake extensions so IsAcceptedImageType will work properly
+            //Support PathInfo - allow directories with dots in them without breaking pathinfo usage
+            //Allow handlers of the above event to change filePath so we can successfull test the extension
+            string originalPath = app.Context.Items[conf.ModifiedPathKey] != null ? app.Context.Items[conf.ModifiedPathKey] as string : (app.Context.Request.FilePath + app.Context.Request.PathInfo);
+
+
+            string filePath = conf.TrimFakeExtensions(originalPath);
+
+            
             //Is this an image request? Checks the file extension for .jpg, .png, .tiff, etc.
             if (conf.IsAcceptedImageType(filePath)) {
                 //Copy the querystring so we can mod it to death without messing up other stuff.
