@@ -45,6 +45,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComplexWebApplication", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.BatchZipper", "..\Plugins\BatchZipper\ImageResizer.Plugins.BatchZipper.csproj", "{CDA9A53D-C190-4460-B5AF-F73132F56BFB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.CloudFront", "..\Plugins\CloudFront\ImageResizer.Plugins.CloudFront.csproj", "{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -388,6 +390,21 @@ Global
 		{CDA9A53D-C190-4460-B5AF-F73132F56BFB}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{CDA9A53D-C190-4460-B5AF-F73132F56BFB}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{CDA9A53D-C190-4460-B5AF-F73132F56BFB}.Trial|x86.ActiveCfg = Release|Any CPU
+		{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}.Release|x86.ActiveCfg = Release|Any CPU
+		{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
