@@ -33,10 +33,10 @@ namespace ImageResizer.Plugins.Basic {
                 //Resolve the path to virtual or app-relative for
                 string path = resolve404Path(e.QueryString["404"]);
                 //Resolve to virtual path
-                path = PathUtils.ResolveAppRelative(path);
+                path = Util.PathUtils.ResolveAppRelative(path);
                 //Merge/overwrite with the current request querystring (current request settings take precedence)
                 e.QueryString.Remove("404"); //Remove the 404 ref
-                path = PathUtils.MergeQueryString(path, e.QueryString);
+                path = Util.PathUtils.MergeQueryString(path, e.QueryString);
                 //Redirect
                 context.Response.Redirect(path, true);
             }
