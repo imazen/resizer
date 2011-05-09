@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="BatchResizeAndZip.aspx" />
+    <Content Include="CloudFront.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="Dithering.aspx" />
     <Content Include="Global.asax" />
@@ -60,6 +61,13 @@
     </Compile>
     <Compile Include="BatchResizeAndZip.aspx.designer.cs">
       <DependentUpon>BatchResizeAndZip.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="CloudFront.aspx.cs">
+      <DependentUpon>CloudFront.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CloudFront.aspx.designer.cs">
+      <DependentUpon>CloudFront.aspx</DependentUpon>
     </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
