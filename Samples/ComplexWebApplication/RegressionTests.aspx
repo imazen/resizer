@@ -72,6 +72,12 @@
         <img id="Img21" style="border:1px solid black;" src="Protected/resize(50,50)/rose-leaf.jpg" runat="server" />
         <img id="Img22" style="border:1px solid black;" src="Protected/rose-leaf.jpg.cd?width=50" runat="server" />
         <p>There are three images referenced above... they should not appear.</p>
+
+
+        <h3> More rounding bugs. </h3>
+
+        There should not be a 1px white line inside the bottom border:
+        <img src="red-leaf.jpg?width=250&borderWidth=40&borderColor=green" />
     </div>
     
   
