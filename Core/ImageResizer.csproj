@@ -164,16 +164,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="exceptions.txt" />
-    <Content Include="extending.txt" />
     <Content Include="license.txt" />
     <Content Include="plugins.txt" />
     <Content Include="plugin-notes.txt" />
     <Content Include="totest.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="resizer.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="sample.config">
       <SubType>Designer</SubType>
     </None>
