@@ -9,6 +9,8 @@ using System;
 namespace ImageResizer.Plugins.PsdReader {
     public class PsdReader : ImageResizer.Resizing.BuilderExtension, IPlugin, IFileExtensionPlugin {
 
+        public PsdReader() { }
+
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             return this;
