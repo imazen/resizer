@@ -1,0 +1,4 @@
+﻿Known bugs:
+
+
+1) A rounding error causes the border to be 1px away from the image. GDI rounds differently than .NET, many issues here...
