@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="404Test.aspx" />
     <Content Include="BatchResizeAndZip.aspx" />
     <Content Include="CloudFront.aspx" />
     <Content Include="Default.aspx" />
@@ -55,6 +56,13 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="404Test.aspx.cs">
+      <DependentUpon>404Test.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="404Test.aspx.designer.cs">
+      <DependentUpon>404Test.aspx</DependentUpon>
+    </Compile>
     <Compile Include="BatchResizeAndZip.aspx.cs">
       <DependentUpon>BatchResizeAndZip.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
