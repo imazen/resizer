@@ -163,6 +163,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="bugs.txt" />
     <Content Include="exceptions.txt" />
     <Content Include="license.txt" />
     <Content Include="plugins.txt" />
