@@ -16,7 +16,15 @@ namespace ImageResizer {
     public class ResizeSettings : NameValueCollection {
         
         public ResizeSettings() : base() { }
+        /// <summary>
+        /// Copies the specified collection into a new ResizeSettings instance.
+        /// </summary>
+        /// <param name="col"></param>
         public ResizeSettings(NameValueCollection col) : base(col) { }
+        /// <summary>
+        /// Parses the specified querystring into name/value pairs. leading ? not required.
+        /// </summary>
+        /// <param name="queryString"></param>
         public ResizeSettings(string queryString) : base(PathUtils.ParseQueryStringFriendly(queryString)) { }
 
 
