@@ -50,6 +50,7 @@
     <Content Include="GradientTest.aspx" />
     <Content Include="Protected\rose-leaf.jpg" />
     <Content Include="RegressionTests.aspx" />
+    <Content Include="TestLimits.aspx" />
     <Content Include="UploadSample.aspx" />
     <Content Include="Watermarks.aspx" />
     <Content Include="watermarks\Sun_256.png" />
@@ -111,6 +112,13 @@
     </Compile>
     <Compile Include="RegressionTests.aspx.designer.cs">
       <DependentUpon>RegressionTests.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="TestLimits.aspx.cs">
+      <DependentUpon>TestLimits.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TestLimits.aspx.designer.cs">
+      <DependentUpon>TestLimits.aspx</DependentUpon>
     </Compile>
     <Compile Include="UploadSample.aspx.cs">
       <DependentUpon>UploadSample.aspx</DependentUpon>

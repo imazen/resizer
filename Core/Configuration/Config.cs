@@ -54,6 +54,7 @@ namespace ImageResizer.Configuration {
             new ImageResizer.Plugins.Basic.NoCache().Install(this);
             new ImageResizer.Plugins.Basic.ClientCache().Install(this);
             new ImageResizer.Plugins.Basic.Diagnostic().Install(this);
+            new ImageResizer.Plugins.Basic.SizeLimiting().Install(this);
 
             //Load plugins on the first request, unless they are already loaded.
             pipeline.OnFirstRequest += delegate(IHttpModule sender, HttpContext context) {

@@ -39,6 +39,8 @@ namespace ImageResizer.Plugins.Basic {
         protected override RequestedAction PostLayoutImage(ImageState s) {
             base.PostLayoutImage(s);
 
+            if (!limits.HasImageSize) return RequestedAction.None;//Skip this unless we have image size limits
+
             SizeF box = s.layout.GetBoundingBox().Size;
 
             double wFactor = box.Width / limits.ImageSize.Width;
