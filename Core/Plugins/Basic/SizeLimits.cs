@@ -27,10 +27,7 @@ namespace ImageResizer.Plugins.Basic {
 
             int imgWidth =  c.get("sizelimits.imageWidth", imageSize.Width);
             int imgHeight = c.get("sizelimits.imageHeight", imageSize.Height);
-            if (imgWidth < 1 || imgHeight < 1)
-                AcceptIssue(new Issue("sizelimits.imageHeight and sizelimits.imageWidth must both be greater than 0. Reverting to defaults.", IssueSeverity.ConfigurationError));
-            else
-                imageSize = new Size(imgWidth, imgHeight);
+            imageSize = new Size(imgWidth, imgHeight);
 
             int totalWidth = Math.Max(1, c.get("sizelimits.totalWidth", totalSize.Width));
             int totalHeight = Math.Max(1, c.get("sizelimits.totaleHeight", totalSize.Height));
@@ -78,14 +75,19 @@ namespace ImageResizer.Plugins.Basic {
             set {   totalBehavior = value; }
         }
 
-        protected Size imageSize = new Size(1680,1680);
+        /// <summary>
+        /// Returns true if ImageSize is specified.
+        /// </summary>
+        public bool HasImageSize { get { return ImageSize.Width > 0 && ImageSize.Height > 0; } }
+
+        protected Size imageSize = new Size(0,0);
         /// <summary>
         /// The maximum size an un-rotated image can be drawn when creating a resized image. 
         /// Rotation will increase the total size, as will any borders, paddings, margins, or
         /// effects. Not effective at preventing attacks, use totalSize.
         /// If larger values are specified in a querystring, they will automatically
         /// be scaled to fit within these dimensions.
-        /// Defaults to 1680x1680
+        /// Defaults to 0x0, which means no limits
         /// </summary>
         public Size ImageSize {
             get { return imageSize; }
