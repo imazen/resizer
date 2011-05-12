@@ -735,10 +735,7 @@ namespace ImageResizer
             //June 3: Ensure no dimension of targetSize or areaSize is less than 1px;
             areaSize.Width = Math.Max(1, areaSize.Width);
             areaSize.Height = Math.Max(1, areaSize.Height);
-            targetSize.Width = Math.Max(1, targetSize.Width);
-            targetSize.Height = Math.Max(1, targetSize.Height);
-            
-            
+  
             
             //Autocrop
             if (s.settings.CropMode == CropMode.Auto && s.settings.Stretch == StretchMode.Proportionally) {
@@ -749,6 +746,13 @@ namespace ImageResizer
                 //Restore targetSize to match areaSize //Warning - crop always forces scale=both.
                 targetSize = areaSize;
             }
+
+            //May 12: require max dimension and round values to minimize rounding differences later.
+            areaSize.Width = Math.Max(1, (float)Math.Round(areaSize.Width));
+            areaSize.Height = Math.Max(1, (float)Math.Round(areaSize.Height));
+            targetSize.Width = Math.Max(1, (float)Math.Round(targetSize.Width));
+            targetSize.Height = Math.Max(1, (float)Math.Round(targetSize.Height));
+            
 
             //Translate and scale all existing rings
             s.layout.Shift(new RectangleF(0, 0, s.originalSize.Width, s.originalSize.Height), new RectangleF(new Point(0, 0), targetSize));
