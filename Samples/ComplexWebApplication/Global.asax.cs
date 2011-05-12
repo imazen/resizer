@@ -11,6 +11,12 @@ namespace ComplexWebApplication {
         protected void Application_Start(object sender, EventArgs e) {
             // Code that runs on application startup
 
+           
+            //This is a URL rewrite rule. It sets the default value of '404' to '~/Sun_256.png' for all requests containing '/propertyimages/'
+            ImageResizer.Configuration.Config.Current.Pipeline.RewriteDefaults += delegate(IHttpModule m, HttpContext c, ImageResizer.Configuration.IUrlEventArgs args) {
+                if (args.VirtualPath.IndexOf("/propertyimages/", StringComparison.OrdinalIgnoreCase) > -1)
+                    args.QueryString["404"] = "~/Sun_256.png";
+            };
 
             //The watermark plugin has lots of options, and they're easier to configure in code.
             ImageResizer.Plugins.Watermark.WatermarkPlugin w = new ImageResizer.Plugins.Watermark.WatermarkPlugin();

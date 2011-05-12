@@ -11,6 +11,9 @@
     <div>
     There should be a photo of the sun.
     <img src="missing-file.jpg?404=/Sun_256.png" runat="server" />
+    <br />
+    This uses a a URL rewrite rule to affect an entire folder, eliminating need for individual specificaiton of the 404 command. Should also display a sun.
+    <img src="/propertyimages/missing.jpg" runat="server" />
     </div>
     </form>
 </body>
