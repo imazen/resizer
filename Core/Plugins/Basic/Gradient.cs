@@ -21,7 +21,7 @@ namespace ImageResizer.Plugins.Basic {
         }
 
         public IEnumerable<string> GetSupportedQuerystringKeys() {
-            return new string[] {"color1","color2" };
+            return new string[] {"color1","color2", "angle", "width", "height" };
         }
 
         public IPlugin Install(Configuration.Config c) {
