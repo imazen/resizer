@@ -100,12 +100,15 @@ namespace ImageResizer {
                     if (user == null)
                         user = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), new string[0]);
 
-                    //Run the rewritten path past the auth system again
-                    if (!UrlAuthorizationModule.CheckUrlAccessForPrincipal(virtualPath, user, "GET")) 
-                        throw new ImageProcessingException(403, "Access denied","Access denied");
+
+                    //Run the rewritten path past the auth system again, using the result as the default "AllowAccess" value
+                    IUrlAuthorizationEventArgs authEvent = new UrlAuthorizationEventArgs(virtualPath, new NameValueCollection(q),
+                        UrlAuthorizationModule.CheckUrlAccessForPrincipal(virtualPath, user, "GET"));
 
                     //Allow user code to deny access, but not modify the url or querystring.
-                    conf.FirePostAuthorizeImage(this, app.Context, new UrlEventArgs(virtualPath, new NameValueCollection(q)));
+                    conf.FireAuthorizeImage(this, app.Context, authEvent);
+
+                    if (!authEvent.AllowAccess) throw new ImageProcessingException(403, "Access denied", "Access denied");
 
                     //Store the modified querystring in request for use by VirtualPathProviders
                     app.Context.Items[conf.ModifiedQueryStringKey] = q; // app.Context.Items["modifiedQueryString"] = q;
