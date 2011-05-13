@@ -16,6 +16,7 @@ namespace ImageResizer.Configuration {
     public delegate void RequestEventHandler(IHttpModule sender, HttpContext context);
     public delegate void UrlRewritingEventHandler(IHttpModule sender, HttpContext context, IUrlEventArgs e);
     public delegate void UrlEventHandler(IHttpModule sender, HttpContext context, IUrlEventArgs e);
+    public delegate void UrlAuthorizationEventHandler(IHttpModule sender, HttpContext context, IUrlAuthorizationEventArgs e);
     public delegate void PreHandleImageEventHandler(IHttpModule sender, HttpContext context, IResponseArgs e);
     public delegate void CacheSelectionHandler(object sender, ICacheSelectionEventArgs e);
 
@@ -91,7 +92,7 @@ namespace ImageResizer.Configuration {
 
         void FireRewritingEvents(IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs ue);
 
-        void FirePostAuthorizeImage(IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs urlEventArgs);
+        void FireAuthorizeImage(IHttpModule sender, System.Web.HttpContext context, IUrlAuthorizationEventArgs urlEventArgs);
 
         void FirePreHandleImage(IHttpModule sender, System.Web.HttpContext context, IResponseArgs e);
 

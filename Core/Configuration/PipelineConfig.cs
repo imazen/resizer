@@ -261,10 +261,11 @@ namespace ImageResizer.Configuration {
         /// </summary>
         public event UrlRewritingEventHandler PostRewrite;
         /// <summary>
-        /// Fired after all rewriting should be finished, and the secondary UrlAuthorization has been completed. Plugins wanting to add additional authorization rules can implement them in a handler,
-        /// and modify the response accordingly.
+        /// Fired after all rewriting is finished.
+        /// e.AllowAccess defaults to the result of the UrlAuthorization module's verdict. It can be changed. 
+        /// Set e.AllowAccess to true to cause and 403 Access Dened result.
         /// </summary>
-        public event UrlEventHandler PostAuthorizeImage;
+        public event UrlAuthorizationEventHandler AuthorizeImage;
 
 
         /// <summary>
@@ -317,8 +318,8 @@ namespace ImageResizer.Configuration {
             if (PostRewrite != null) PostRewrite(sender,context, e);
         }
 
-        public void FirePostAuthorizeImage(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
-            if (PostAuthorizeImage != null) PostAuthorizeImage(sender, context, e);
+        public void FireAuthorizeImage(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlAuthorizationEventArgs e) {
+            if (AuthorizeImage != null) AuthorizeImage(sender, context, e);
         }
 
         public void FireImageMissing(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
