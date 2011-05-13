@@ -50,6 +50,7 @@
     <Content Include="GradientTest.aspx" />
     <Content Include="Protected\rose-leaf.jpg" />
     <Content Include="RegressionTests.aspx" />
+    <Content Include="SamplePluginTest.aspx" />
     <Content Include="TestLimits.aspx" />
     <Content Include="UploadSample.aspx" />
     <Content Include="Watermarks.aspx" />
@@ -113,6 +114,14 @@
     <Compile Include="RegressionTests.aspx.designer.cs">
       <DependentUpon>RegressionTests.aspx</DependentUpon>
     </Compile>
+    <Compile Include="SamplePlugin.cs" />
+    <Compile Include="SamplePluginTest.aspx.cs">
+      <DependentUpon>SamplePluginTest.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="SamplePluginTest.aspx.designer.cs">
+      <DependentUpon>SamplePluginTest.aspx</DependentUpon>
+    </Compile>
     <Compile Include="TestLimits.aspx.cs">
       <DependentUpon>TestLimits.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -142,6 +151,10 @@
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\AdvancedFilters\ImageResizer.Plugins.AdvancedFilters.csproj">
+      <Project>{961A7785-80E0-4AB9-A406-FD7E2A9FA9D9}</Project>
+      <Name>ImageResizer.Plugins.AdvancedFilters</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\AnimatedGifs\ImageResizer.Plugins.AnimatedGifs.csproj">
       <Project>{D97EA32A-0845-4E00-9C4D-68C5B93A1869}</Project>
