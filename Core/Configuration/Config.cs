@@ -11,6 +11,7 @@ using ImageResizer.Configuration;
 using ImageResizer.Configuration.Issues;
 using ImageResizer.Configuration.Xml;
 using System.Web;
+using ImageResizer.Collections;
 
 namespace ImageResizer.Configuration {
     public class Config {

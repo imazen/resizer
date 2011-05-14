@@ -12,9 +12,15 @@ using System.Reflection;
 using System.Diagnostics;
 using System.Collections;
 using System.Collections.Specialized;
+using ImageResizer.Collections;
 
 namespace ImageResizer.Configuration {
+    /// <summary>
+    /// Provides thread-safe access to plugin addition, removal, and querying methods
+    /// </summary>
     public class PluginConfig :IssueSink, IEncoderProvider {
+
+
 
         protected Config c;
         /// <summary>
@@ -132,6 +138,9 @@ namespace ImageResizer.Configuration {
             return Comparer<T>.Default.Compare(Get<T>(), default(T)) != 0;
         }
 
+
+
+
         protected SafeList<BuilderExtension> imageBuilderExtensions = null;
         /// <summary>
         /// Currently registered set of ImageBuilderExtensions. 
@@ -199,6 +208,7 @@ namespace ImageResizer.Configuration {
             foreach (IPlugin p in GetPlugins(t))
                 if (!p.Uninstall(c)) AcceptIssue(new Issue("Plugin " + t.FullName + " reported a failed uninstall attempt triggered by a <remove name=\"" + name + "\" />.", IssueSeverity.Error));
         }
+
         protected void add_plugin_by_name(string name, NameValueCollection args) {
             IPlugin p = CreatePluginByName(name, args);
             if (p == null) return; //failed
