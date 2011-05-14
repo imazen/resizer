@@ -46,6 +46,7 @@
     <Content Include="CloudFront.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="Dithering.aspx" />
+    <Content Include="FriendlyUrlsTest.aspx" />
     <Content Include="Global.asax" />
     <Content Include="GradientTest.aspx" />
     <Content Include="Protected\rose-leaf.jpg" />
@@ -92,6 +93,13 @@
     </Compile>
     <Compile Include="Dithering.aspx.designer.cs">
       <DependentUpon>Dithering.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="FriendlyUrlsTest.aspx.cs">
+      <DependentUpon>FriendlyUrlsTest.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="FriendlyUrlsTest.aspx.designer.cs">
+      <DependentUpon>FriendlyUrlsTest.aspx</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -171,6 +179,10 @@
     <ProjectReference Include="..\..\Plugins\DiskCache\ImageResizer.Plugins.DiskCache.csproj">
       <Project>{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}</Project>
       <Name>ImageResizer.Plugins.DiskCache</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\ImageResizer.Plugins.FriendlyUrls\ImageResizer.Plugins.FriendlyUrls.csproj">
+      <Project>{A931C3D7-FFCE-4BCF-933A-51A717904894}</Project>
+      <Name>ImageResizer.Plugins.FriendlyUrls</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\PrettyGifs\ImageResizer.Plugins.PrettyGifs.csproj">
       <Project>{BB8EEB97-6550-4780-97B2-B0F2FCD80970}</Project>
