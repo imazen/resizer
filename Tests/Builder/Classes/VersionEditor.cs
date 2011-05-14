@@ -15,7 +15,7 @@ namespace ImageResizer.ReleaseBuilder {
         }
 
         public Regex getRegex(string name){
-            return new Regex("(?<before>\\[assembly\\:\\s*" + Regex.Escape(name) + "\\s*\\(\\s*\"" + ")(?<value>[^\"]*)(?<after>" + "\"\\s*)\\s*\\])", RegexOptions.IgnoreCase);
+            return new Regex("(?<before>\\[assembly\\:\\s*" + Regex.Escape(name) + "\\s*\\(\\s*\"" + ")(?<value>[^\"]*)(?<after>" + "\"\\s*\\)\\s*\\])", RegexOptions.IgnoreCase);
         }
 
         public string get(string name) {
