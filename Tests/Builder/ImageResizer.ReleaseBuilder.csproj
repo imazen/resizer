@@ -68,6 +68,7 @@
     <Compile Include="Classes\Futile.cs" />
     <Compile Include="Classes\Interaction.cs" />
     <Compile Include="Classes\Package.cs" />
+    <Compile Include="Classes\PackageDescriptor.cs" />
     <Compile Include="Classes\Pattern.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

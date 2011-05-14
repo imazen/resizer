@@ -14,11 +14,49 @@ namespace ImageResizer.ReleaseBuilder {
             this.filename = filename;
         }
 
-        public string get(string name) {
-            Regex r = new Regex("\\[assembly\\:\\s*" + Regex.Escape(name) + "\\s*\\(\\s*\"" + "(?<value>[^\"]*)" + "\"\\s*)\\s*\\]", RegexOptions.IgnoreCase);
+        public Regex getRegex(string name){
+            return new Regex("(?<before>\\[assembly\\:\\s*" + Regex.Escape(name) + "\\s*\\(\\s*\"" + ")(?<value>[^\"]*)(?<after>" + "\"\\s*)\\s*\\])", RegexOptions.IgnoreCase);
+        }
 
-            (r.
-            [assembly: AssemblyVersion("
+        public string get(string name) {
+            Regex r = getRegex(name);
+            Match m = r.Match(contents);
+            if (m.Success) return m.Groups["value"].Value;
+            return null;
+        }
+        /// <summary>
+        /// Appends 'ending' to 'version' unless version already has 4 segments. 
+        /// </summary>
+        /// <param name="version"></param>
+        /// <param name="ending"></param>
+        /// <returns></returns>
+        public string join(string version, string ending) {
+            version = version.Trim('.');
+            if (version.Split('.').Length >= 4) return version; //Already has 4 sections
+
+            version = version + "." + ending.TrimStart('.');
+            return version;
+        }
+
+        /// <summary>
+        /// Replaces asterisks with the specified value
+        /// </summary>
+        /// <param name="version"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public string resolve(string version, int value) {
+            return version.Replace("*", value.ToString());
+        }
+
+        public bool set(string name, string value) {
+            Regex r = getRegex(name);
+            bool worked = false;
+
+            contents = r.Replace(contents, new MatchEvaluator(delegate(Match m){
+                worked = true;
+                return m.Groups["before"].Value + value + m.Groups["after"].Value;
+            }));
+            return worked;
         }
 
 
