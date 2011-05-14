@@ -100,10 +100,16 @@ namespace ImageResizer {
                     if (user == null)
                         user = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), new string[0]);
 
-
+                    //Do we have permission to call UrlAuthorizationModule.CheckUrlAccessForPrincipal?
+                    bool canCheckUrl = System.Security.SecurityManager.IsGranted(new System.Security.Permissions.SecurityPermission(System.Security.Permissions.PermissionState.Unrestricted));
+                    
+                    
                     //Run the rewritten path past the auth system again, using the result as the default "AllowAccess" value
-                    IUrlAuthorizationEventArgs authEvent = new UrlAuthorizationEventArgs(virtualPath, new NameValueCollection(q),
-                        UrlAuthorizationModule.CheckUrlAccessForPrincipal(virtualPath, user, "GET"));
+                    bool isAllowed = true;
+                    if (canCheckUrl) isAllowed = UrlAuthorizationModule.CheckUrlAccessForPrincipal(virtualPath, user, "GET");
+
+                    
+                    IUrlAuthorizationEventArgs authEvent = new UrlAuthorizationEventArgs(virtualPath, new NameValueCollection(q), isAllowed);
 
                     //Allow user code to deny access, but not modify the url or querystring.
                     conf.FireAuthorizeImage(this, app.Context, authEvent);
