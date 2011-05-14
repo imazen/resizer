@@ -6,7 +6,7 @@ using System.IO;
 
 namespace ImageResizer.ReleaseBuilder {
     /// <summary>
-    /// File utilities
+    /// File deletion utilities
     /// </summary>
     public class Futile {
         TextWriter err;

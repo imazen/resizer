@@ -5,23 +5,29 @@ using System.Text;
 using System.IO;
 
 namespace ImageResizer.ReleaseBuilder {
+    /// <summary>
+    /// Provides high-speed, cached, regex-capable filesystem query ability. 
+    /// </summary>
     public class FsQuery {
         string[] _files;
         string[] _folders;
         string baseDir = null;
-        public FsQuery(string dir) {
+
+        public FsQuery(string dir):this(dir,null) {
+
+        }
+
+        public FsQuery(string dir, IEnumerable<string> exclude) {
             baseDir = dir.TrimEnd('\\','/');
             _files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
             _folders = Directory.GetDirectories(dir, "*", SearchOption.AllDirectories);
 
-            exclusions.Add(new Pattern("/.git"));
-            exclusions.Add(new Pattern("^/Releases"));
-            exclusions.Add(new Pattern("^/Legacy"));
-            exclusions.Add(new Pattern("^/Tests/Builder"));
-            exclusions.Add(new Pattern("/thumbs.db$"));
-            exclusions.Add(new Pattern("/.DS_Store$"));
-            exclusions.Add(new Pattern(".suo$"));
-            exclusions.Add(new Pattern(".user$"));
+            if (exclude != null) AddExclusions(exclude);
+           
+        }
+
+        public void AddExclusions(IEnumerable<string> exclude) {
+            foreach (string s in exclude) exclusions.Add(new Pattern(s));
         }
 
         public List<Pattern> exclusions = new List<Pattern>();
