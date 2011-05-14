@@ -165,12 +165,19 @@ namespace ImageResizer.Plugins.DiskCache
         public IPlugin Install(Config c) {
             LoadSettings(c);
             Start();
+            c.Pipeline.AuthorizeImage += Pipeline_AuthorizeImage;
             c.Plugins.add_plugin(this);
             return this;
         }
 
+        void Pipeline_AuthorizeImage(IHttpModule sender, HttpContext context, IUrlAuthorizationEventArgs e) {
+            //Don't allow direct access to the cache.
+            if (e.VirtualPath.IndexOf(this.VirtualCacheDir, StringComparison.OrdinalIgnoreCase) >= 0) e.AllowAccess = false;
+        }
+
         public bool Uninstall(Config c) {
             c.Plugins.remove_plugin(this);
+            c.Pipeline.AuthorizeImage -= Pipeline_AuthorizeImage;
             return this.Stop();
         }
 
