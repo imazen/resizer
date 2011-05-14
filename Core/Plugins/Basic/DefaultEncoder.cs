@@ -257,7 +257,7 @@ namespace ImageResizer.Plugins.Basic {
         public static string GetContentTypeFromImageFormat(ImageFormat format)
         {
             if (format == ImageFormat.Png)
-                return "image/x-png";
+                return "image/png"; //Changed from image/x-png to image/png on May 14, 2011, per http://www.w3.org/Graphics/PNG/
             else if (format == ImageFormat.Jpeg)
                 return "image/jpeg";
             else if (format == ImageFormat.Gif)
