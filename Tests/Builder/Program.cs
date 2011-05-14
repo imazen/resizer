@@ -11,14 +11,8 @@ namespace ImageResizer.ReleaseBuilder {
             Console.WindowWidth = Console.LargestWindowWidth / 2;
             Console.SetBufferSize(Console.WindowWidth, 5000);
 
-            string lastValue = "Resizer3-alpha-3";
-            Console.WriteLine("Please enter the friendly archive base name (like Resizer3-alpha-3):");
-            Console.Write("(" + lastValue + ")");
-            string s = Console.ReadLine();
 
-            if (string.IsNullOrEmpty(s.Trim())) s = lastValue; //use default
-
-            Build b = new Build(s.Trim());
+            Build b = new Build();
             b.Run();
 
             Console.WriteLine("Press a key to exit");

@@ -13,7 +13,12 @@ namespace ImageResizer.ReleaseBuilder.Classes {
             Console.WriteLine();
             return yes;
         }
-
+        public string change(string message, string defaultValue) {
+            Console.Write(message + " (" + defaultValue + "):");
+            string response = Console.ReadLine();
+            if (string.IsNullOrEmpty(response.Trim())) return defaultValue;
+            else return response.Trim();
+        }
         public void nl() { Console.WriteLine(); }
         public void say(string text) { Console.WriteLine(text); }
 
