@@ -24,7 +24,7 @@ namespace ImageResizer.ReleaseBuilder {
         }
 
         public string getReleasePath(string packageBase, string ver,  string kind) {
-            return Path.Combine(Path.Combine(f.parentPath, "Releases"), packageBase.TrimEnd('-') + "-" + ver.Trim('-') + '-' + kind + "-" + DateTime.UtcNow.ToString("MMM-dd-yyyy") + ".zip");
+            return Path.Combine(Path.Combine(f.parentPath, "Releases"), packageBase + ver.Trim('-') + '-' + kind + "-" + DateTime.UtcNow.ToString("MMM-dd-yyyy") + ".zip");
         }
 
         List<PackageDescriptor> packages = new List<PackageDescriptor>();
@@ -68,6 +68,7 @@ namespace ImageResizer.ReleaseBuilder {
             }
 
             //2 - Set version numbers (with *, if missing)
+            string originalContents = v.Contents; //Save for checking changes.
             v.set("AssemblyFileVersion", v.join(fileVer, "*"));
             v.set("AssemblyVersion", v.join(assemblyVer, "*"));
             v.set("AssemblyInformationalVersion", infoVer);
@@ -76,7 +77,10 @@ namespace ImageResizer.ReleaseBuilder {
             string fileContents = v.Contents;
             
             //3 - Prompt to commit and tag
-            while (!ask("Version numbers written to file. Commit SharedAssemblyInfo.cs (and any other changes) to the repository, then return and hit 'y'.")) { }
+            bool versionsChanged = !fileContents.Equals(originalContents);
+            string question = versionsChanged ? "SharedAssemblyInfo.cs was modified. Commit it (and any other changes) to the repository, then hit 'y'."
+                : "Are all changes commited? Hit 'y' to continue.";
+            while (!ask(question)) { }
 
 
             //[assembly: Commit("git-commit-guid-here")]
@@ -115,7 +119,8 @@ namespace ImageResizer.ReleaseBuilder {
                     say("Deleted " + pd.Path);
                 }
                 pd.Builder(pd);
-
+                //Copy to a 'tozip' version for e-mailing
+                File.Copy(pd.Path, pd.Path.Replace(".zip", ".tozip"),true);
             }
 
             //10 - Upload all selected configurations
