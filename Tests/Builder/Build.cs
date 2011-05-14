@@ -3,24 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using ImageResizer.ReleaseBuilder.Classes;
 
 namespace ImageResizer.ReleaseBuilder {
-    public class Build {
-        SolutionFinder f = new SolutionFinder();
+    public class Build :Interaction {
+        FolderFinder f = new FolderFinder("Core" );
         Devenv d = null;
         FsQuery q = null;
         string ver;
+
         public Build(string version) {
             ver = version;
-            d = new Devenv(f.solutionPath);
+            d = new Devenv(Path.Combine(f.folderPath,"ImageResizer.sln"));
         }
 
-        public bool ask(string question) {
-            Console.WriteLine(question);
-            bool yes =  Console.ReadKey(false).KeyChar.ToString().ToLower().Equals("y");
-            Console.WriteLine();
-            return yes;
-        }
+ 
 
         public void Run() {
 
@@ -49,11 +46,12 @@ namespace ImageResizer.ReleaseBuilder {
             d.Run("/Build Trial");
         }
 
+
         public void RemoveUselessFiles() {
             var f = new Futile(Console.Out);
-            q = new FsQuery(this.f.rootPath);
+            q = new FsQuery(this.f.parentPath, new string[]{"/.git","^/Releases", "^/Tests/Builder"});
 
-            
+
             //delete /Tests/binaries  (*.pdb, *.xml, *.dll)
             //delete all bin and obj folders under /Tests and /Plugins
             //delete /Core/obj folder
@@ -70,16 +68,19 @@ namespace ImageResizer.ReleaseBuilder {
 
             //delete Thumbs.db
             //delete */.DS_Store
-            q.exclusions = null;
             f.DelFiles(q.files("/Thumbs.db$",
                                 "/.DS_Store$"));
-            q = new FsQuery(this.f.rootPath);
+            q = null;
             
         }
 
 
+        public string[] standardExclusions = new string[]{
+                "/.git","^/Releases","^/Legacy","^/Tests/Builder","/thumbs.db$","/.DS_Store$",".suo$",".user$"
+            };
+
         public void PrepareForPackaging() {
-            if (q != null) q = new FsQuery(this.f.rootPath);
+            if (q != null) q = new FsQuery(this.f.parentPath, standardExclusions);
             //Don't copy the DotNetZip xml file.
             q.exclusions.Add(new Pattern("^/Plugins/Libs/DotNetZip*.xml$"));
             q.exclusions.Add(new Pattern("^/Tests/Libs/LibDevCassini"));
@@ -89,7 +90,7 @@ namespace ImageResizer.ReleaseBuilder {
             if (!ask("Create 'min' package?")) return;
             // 'min' - /dlls/release/ImageResizer.* - /
             // /*.txt
-            using (var p = new Package(getReleasePath("min"), this.f.rootPath)) {
+            using (var p = new Package(getReleasePath("min"), this.f.parentPath)) {
                 p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/");
                 p.Add(q.files("^/[^/]+.txt$"));
             }
@@ -98,7 +99,7 @@ namespace ImageResizer.ReleaseBuilder {
         public void PackFull() {
             if (!ask("Create 'full' package?")) return;
             // 'full'
-            using (var p = new Package(getReleasePath("full"), this.f.rootPath)) {
+            using (var p = new Package(getReleasePath("full"), this.f.parentPath)) {
                 p.Add(q.files("^/(core|plugins|samples|tests)/"));
                 p.Add(q.files("^/dlls/(release|trial)"));
                 p.Add(q.files("^/[^/]+.txt$"));
@@ -114,7 +115,7 @@ namespace ImageResizer.ReleaseBuilder {
             // /Samples/Images
             // /Samples/Core/
             // /*.txt
-            using (var p = new Package(getReleasePath("core"), this.f.rootPath)) {
+            using (var p = new Package(getReleasePath("core"), this.f.parentPath)) {
                 p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/");
                 p.Add(q.files("^/Core/",
                               "^/Samples/Images/",
@@ -129,7 +130,7 @@ namespace ImageResizer.ReleaseBuilder {
             if (!ask("Create 'standard' package?")) return;
             // 'standard'
             
-            using (var p = new Package(getReleasePath("standard"), this.f.rootPath)) {
+            using (var p = new Package(getReleasePath("standard"), this.f.parentPath)) {
                 p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/");
                 p.Add(q.files("^/dlls/trial/"), "/TrialPlugins/");
                 p.Add(q.files("^/(core|samples)/"));
@@ -141,30 +142,15 @@ namespace ImageResizer.ReleaseBuilder {
 
 
         public string getReleasePath(string kind) {
-            return Path.Combine(Path.Combine(f.rootPath, "Releases"), ver + "-" + kind + "-" + DateTime.UtcNow.ToString("MMM-dd-yyyy") + ".zip");
+            return Path.Combine(Path.Combine(f.parentPath, "Releases"), ver + "-" + kind + "-" + DateTime.UtcNow.ToString("MMM-dd-yyyy") + ".zip");
         }
 
         public void CheckPackagesExist() {
             string[] paths = new string[] { getReleasePath("min"), getReleasePath("core"), getReleasePath("full"), getReleasePath("standard") };
-            List<string> exist = new List<string>();
-            foreach (string s in paths)
-                if (File.Exists(s)) exist.Add(s);
-
-            if (exist.Count > 0) {
-                Console.WriteLine("The following packages already exist. Overwrite them?");
-                foreach (string s in exist) Console.WriteLine(s);
-
-                if (Console.ReadKey(false).KeyChar.ToString().ToLower().Equals("y")) {
-                    foreach (string s in exist) {
-
-                        File.Delete(s);
-                        Console.WriteLine("Deleted " + s);
-                    }
+            
+            PromptDeleteBatch("The following packages already exist. Delete them so new ones can be created?", paths);
 
 
-                } else Console.WriteLine("No files will be overwritten.");
-
-            }
         }
     }
 }

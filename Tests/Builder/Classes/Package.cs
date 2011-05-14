@@ -11,7 +11,7 @@ namespace ImageResizer.ReleaseBuilder {
         ZipFile z = null;
         string basePath;
         /// <summary>
-        /// Creates a zip file a the specified location
+        /// Creates a zip file at the specified location, using the specified base path
         /// </summary>
         /// <param name="zipFile"></param>
         /// <param name="basePath"></param>

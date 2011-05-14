@@ -1,4 +1,36 @@
 ﻿
+I: Ask for version number
+II: Ask for information version number.
+III: Ask for package name
+IIII: For each package, specify options: choose 'c' (create and/or overwrite), 'u' (upload), 's' (skip), 'p' (make private)
+
+
+
+
+1 - Prompt to Clean
+1b - Run cleanup routine
+
+
+2 - Set version numbers (with *)
+3 - Prompt to commit and tag
+
+4 - Embed git commit value
+
+4b - change to hard version number
+6 - if (c) was specified for any package, build all.
+7 - Revert to * version number
+
+
+8 - run cleanup routine
+
+9 - Pacakge all selected configurations
+
+10 - Upload all selected configurations
+
+11 - wait
+
+
+
 
 Ignore ^/Legacy, /.git, ^/Releases, /.DS_Store, /thumbs.db
 

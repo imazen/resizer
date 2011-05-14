@@ -51,6 +51,9 @@
     <Reference Include="Ionic.Zip">
       <HintPath>..\..\Plugins\Libs\DotNetZipLib-v1.9\Ionic.Zip.dll</HintPath>
     </Reference>
+    <Reference Include="LitS3">
+      <HintPath>..\..\dlls\debug\LitS3.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -60,14 +63,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Build.cs" />
-    <Compile Include="Devenv.cs" />
-    <Compile Include="FsQuery.cs" />
-    <Compile Include="Futile.cs" />
-    <Compile Include="Package.cs" />
-    <Compile Include="Pattern.cs" />
+    <Compile Include="Classes\Devenv.cs" />
+    <Compile Include="Classes\FsQuery.cs" />
+    <Compile Include="Classes\Futile.cs" />
+    <Compile Include="Classes\Interaction.cs" />
+    <Compile Include="Classes\Package.cs" />
+    <Compile Include="Classes\Pattern.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SolutionFinder.cs" />
+    <Compile Include="Classes\FolderFinder.cs" />
+    <Compile Include="Classes\Uploader.cs" />
+    <Compile Include="Classes\VersionEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="steps.txt" />
