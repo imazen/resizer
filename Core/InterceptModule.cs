@@ -227,7 +227,7 @@ namespace ImageResizer {
                         if (vf != null)
                             conf.GetImageBuilder().Build(vf, stream, settings);
                         else
-                            conf.GetImageBuilder().Build(HostingEnvironment.MapPath(virtualPath), stream, settings);
+                            conf.GetImageBuilder().Build(HostingEnvironment.MapPath(virtualPath), stream, settings); //Use a physical path to bypass virtual file system
                     }
 
                     //Catch not found exceptions

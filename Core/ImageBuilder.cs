@@ -207,7 +207,7 @@ namespace ImageResizer
         /// <summary>
         /// Resizes and processes the specified source image and stores the encoded result in the specified destination. 
         /// </summary>
-        /// <param name="source">May be an instance of string (a physical path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.</param>
+        /// <param name="source">May be an instance of string (a physical path or app-relative virtual path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream. app-relative virtual paths will use the VirtualPathProvider system</param>
         /// <param name="dest">May be a physical path (string), or a Stream instance. Does not have to be seekable.</param>
         /// <param name="settings">Resizing and processing command to apply to the.</param>
         public virtual void Build(object source, object dest, ResizeSettings settings) {
