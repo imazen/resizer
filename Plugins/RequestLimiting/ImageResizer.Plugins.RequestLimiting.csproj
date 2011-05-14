@@ -54,6 +54,12 @@
   <ItemGroup>
     <Content Include="license.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\ImageResizer.csproj">
+      <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
+      <Name>ImageResizer</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
