@@ -72,6 +72,8 @@ namespace ImageResizer.ReleaseBuilder {
             v.set("AssemblyVersion", v.join(assemblyVer, "*"));
             v.set("AssemblyInformationalVersion", infoVer);
             v.Save();
+            //Save contents for reverting later
+            string fileContents = v.Contents;
             
             //3 - Prompt to commit and tag
             while (!ask("Version numbers written to file. Commit SharedAssemblyInfo.cs (and any other changes) to the repository, then return and hit 'y'.")) { }
@@ -94,9 +96,8 @@ namespace ImageResizer.ReleaseBuilder {
             
             if (buildOne) BuildAll();
 
-            //7 - Revert to * version number, reset commit value
-            v.set("AssemblyFileVersion", v.join(fileVer, "*"));
-            v.set("AssemblyVersion", v.join(assemblyVer, "*"));
+            //7 - Revert file to state at commit (remove 'full' version numbers and 'commit' value)
+            v.Contents = fileContents;
             v.Save();
 
 
@@ -179,7 +180,7 @@ namespace ImageResizer.ReleaseBuilder {
             };
 
         public void PrepareForPackaging() {
-            if (q != null) q = new FsQuery(this.f.parentPath, standardExclusions);
+            if (q == null) q = new FsQuery(this.f.parentPath, standardExclusions);
             //Don't copy the DotNetZip xml file.
             q.exclusions.Add(new Pattern("^/Plugins/Libs/DotNetZip*.xml$"));
             q.exclusions.Add(new Pattern("^/Tests/Libs/LibDevCassini"));

@@ -21,7 +21,7 @@ namespace ImageResizer.ReleaseBuilder {
             baseDir = dir.TrimEnd('\\','/');
             _files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
             _folders = Directory.GetDirectories(dir, "*", SearchOption.AllDirectories);
-
+            exclusions = new List<Pattern>();
             if (exclude != null) AddExclusions(exclude);
            
         }
@@ -30,7 +30,7 @@ namespace ImageResizer.ReleaseBuilder {
             foreach (string s in exclude) exclusions.Add(new Pattern(s));
         }
 
-        public List<Pattern> exclusions = new List<Pattern>();
+        public List<Pattern> exclusions = null;
 
 
         public List<string> files(params string[] p) {

@@ -9,6 +9,11 @@ namespace ImageResizer.ReleaseBuilder {
     public class VersionEditor {
         string filename;
         string contents = null;
+
+        public string Contents {
+            get { return contents; }
+            set { contents = value; }
+        }
         public VersionEditor(string filename) {
             contents = File.ReadAllText(filename, UTF8Encoding.UTF8);
             this.filename = filename;
@@ -20,7 +25,7 @@ namespace ImageResizer.ReleaseBuilder {
 
         public string get(string name) {
             Regex r = getRegex(name);
-            Match m = r.Match(contents);
+            Match m = r.Match(Contents);
             if (m.Success) return m.Groups["value"].Value;
             return null;
         }
@@ -52,7 +57,7 @@ namespace ImageResizer.ReleaseBuilder {
             Regex r = getRegex(name);
             bool worked = false;
 
-            contents = r.Replace(contents, new MatchEvaluator(delegate(Match m){
+            Contents = r.Replace(Contents, new MatchEvaluator(delegate(Match m){
                 worked = true;
                 return m.Groups["before"].Value + value + m.Groups["after"].Value;
             }));
@@ -61,7 +66,7 @@ namespace ImageResizer.ReleaseBuilder {
 
 
         public void Save() {
-            File.WriteAllText(filename, contents, UTF8Encoding.UTF8);
+            File.WriteAllText(filename, Contents, UTF8Encoding.UTF8);
         }
     }
 }
