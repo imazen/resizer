@@ -7,6 +7,7 @@ using ImageResizer.Configuration;
 using ImageResizer.Configuration.Issues;
 using System.Web.Hosting;
 using System.Reflection;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.Basic {
     public class DiagnosticPageHandler : IHttpHandler {
@@ -56,7 +57,24 @@ namespace ImageResizer.Plugins.Basic {
             sb.AppendLine("\nLoaded assemblies:\n");
             Assembly[] asms = AppDomain.CurrentDomain.GetAssemblies();
             foreach (Assembly a in asms) {
-                sb.AppendLine(a.FullName);
+                sb.Append(a.GetName().Name.PadRight(40,' '));
+
+
+
+                sb.Append(" Assembly: " + a.GetName().Version.ToString().PadRight(15));
+
+                object[] attrs;
+                
+                attrs = a.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
+                if (attrs != null && attrs.Length > 0) sb.Append(" File: " + ((AssemblyFileVersionAttribute)attrs[0]).Version.PadRight(15));
+
+                attrs = a.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
+                if (attrs != null && attrs.Length > 0) sb.Append(" Info: " + ((AssemblyInformationalVersionAttribute)attrs[0]).InformationalVersion);
+
+                attrs = a.GetCustomAttributes(typeof(CommitAttribute), false);
+                if (attrs != null && attrs.Length > 0) sb.Append("  Commit: " + ((CommitAttribute)attrs[0]).Value);
+
+                sb.AppendLine();
             }
             return sb.ToString();
 

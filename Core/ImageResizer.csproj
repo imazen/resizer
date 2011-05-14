@@ -129,6 +129,7 @@
     <Compile Include="Resizing\LayoutBuilder.cs" />
     <Compile Include="Plugins\Basic\SizeLimits.cs" />
     <Compile Include="SharedAssemblyInfo.cs" />
+    <Compile Include="Util\CommitAttribute.cs" />
     <Compile Include="Util\PathUtils.cs" />
     <Compile Include="Util\PolygonMath.cs" />
     <Compile Include="Plugins\IVirtualFileWithModifiedDate.cs" />
