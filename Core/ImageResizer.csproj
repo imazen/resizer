@@ -68,6 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\ReadOnlyDictionary.cs" />
     <Compile Include="Configuration\Issues\ConfigChecker.cs" />
     <Compile Include="Configuration\IUrlAuthorizationEventArgs.cs" />
     <Compile Include="Configuration\UrlAuthorizationEventArgs.cs" />
@@ -94,7 +95,7 @@
     <Compile Include="Configuration\PipelineConfig.cs" />
     <Compile Include="Configuration\IPipelineConfig.cs" />
     <Compile Include="Configuration\PluginConfig.cs" />
-    <Compile Include="Configuration\ReverseEnumerator.cs" />
+    <Compile Include="Collections\ReverseEnumerator.cs" />
     <Compile Include="Configuration\UrlEventArgs.cs" />
     <Compile Include="Configuration\Xml\Node.cs" />
     <Compile Include="Configuration\Xml\Selector.cs" />
@@ -107,7 +108,7 @@
     <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="ResizerSection.cs" />
     <Compile Include="Caching\ICache.cs" />
-    <Compile Include="Configuration\SafeList.cs" />
+    <Compile Include="Collections\SafeList.cs" />
     <Compile Include="Plugins\Basic\DefaultEncoder.cs" />
     <Compile Include="Encoding\IEncoderProvider.cs" />
     <Compile Include="Encoding\IEncoder.cs" />

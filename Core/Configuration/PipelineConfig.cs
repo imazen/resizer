@@ -10,6 +10,7 @@ using ImageResizer.Caching;
 using ImageResizer.Configuration.Issues;
 using ImageResizer.Encoding;
 using System.Web.Hosting;
+using ImageResizer.Collections;
 
 namespace ImageResizer.Configuration {
     public class PipelineConfig : IPipelineConfig, ICacheProvider{

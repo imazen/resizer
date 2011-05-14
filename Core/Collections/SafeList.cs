@@ -5,7 +5,7 @@ using System.Text;
 using System.Collections.ObjectModel;
 using System.Collections;
 
-namespace ImageResizer.Configuration {
+namespace ImageResizer.Collections {
 
     /// <summary>
     /// SafeList is mutable, but it uses immutable data structures to minimize the need for locking.

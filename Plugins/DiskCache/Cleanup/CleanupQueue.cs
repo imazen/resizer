@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Configuration;
+using ImageResizer.Collections;
 
 namespace ImageResizer.Plugins.DiskCache.Cleanup {
     public class CleanupQueue {
