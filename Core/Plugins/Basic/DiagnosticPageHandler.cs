@@ -43,6 +43,20 @@ namespace ImageResizer.Plugins.Basic {
             sb.AppendLine("\nConfiguration:\n");
             sb.AppendLine(c.getConfigXml().ToString());
 
+
+            sb.AppendLine("\nAccepted querystring keys:\n");
+            foreach (string s in c.Pipeline.SupportedQuerystringKeys) {
+                sb.Append(s + ", ");
+            }
+            sb.AppendLine();
+
+            sb.AppendLine("\nAccepted file extensions:\n");
+            foreach (string s in c.Pipeline.AcceptedImageExtensions) {
+                sb.Append(s + ", ");
+            }
+            sb.AppendLine();
+
+
             //Echo server assembly, iis version, OS version, and CLR version.
             sb.AppendLine("\nEnvironment information:\n");
             string iis = context.Request.ServerVariables["SERVER_SOFTWARE"];
