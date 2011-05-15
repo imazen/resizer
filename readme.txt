@@ -1,1 +1,1 @@
-The documentation is available online at http://imageresizingin.net/
+Visit http://imageresizing.net/ for documentation, licensing, and sampel code

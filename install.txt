@@ -1,7 +1,11 @@
-1) Copy the required DLLs to the /bin/ directory of your application.
+1. In Visual Studio, right click your project and choose "Add reference". 
 
-2) Modify web.config. Here is a sample configuration:
+Browse to the extracted folder, and choose `dlls\release\ImageResizer.dll`. 
 
+- Or just copy it into the 'bin' folder. Whichever you prefer.
+
+
+3. Modify or create the /Web.Config file for your site:
 
 <?xml version="1.0" encoding="utf-8" ?>
 <configuration>
@@ -9,30 +13,29 @@
     <section name="resizer" type="ImageResizer.ResizerSection,ImageResizer" />
   </configSections>
 
-
   <resizer>
-    <!-- configure the resizer here -->
-    <pipeline fakeExtensions=".ashx" vppUsage="fallback" />
+    <!-- Unless you (a) use Integrated mode, or (b) map all reqeusts to ASP.NET, 
+         you'll need to add .ashx to your image URLs: image.jpg.ashx?width=200&height=20 -->
+    <pipeline fakeExtensions=".ashx" />
+
     <plugins>
-       <!-- Add plugins here -->
-       <!-- <add name="DiskCache" /> -->
-    </plugins>
+      <!-- <add name="DiskCache" /> -->
+      <!-- <add name="PrettyGifs" /> -->
+    </plugins>  
   </resizer>
 
-  
-  
-<system.web>
-  <httpModules>
-    <add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
-  </httpModules>
-
+  <system.web>
+    <httpModules>
+      <!-- This is for IIS5, IIS6, and IIS7 Classic, and Cassini/VS Web Server-->
+      <add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
+    </httpModules>
   </system.web>
+
   <system.webServer>
     <validation validateIntegratedModeConfiguration="false"/>
-
     <modules>
+      <!-- This is for IIS7+ Integrated mode -->
       <add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
     </modules>
   </system.webServer>
-
 </configuration>
