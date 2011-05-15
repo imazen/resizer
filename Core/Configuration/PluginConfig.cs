@@ -138,8 +138,25 @@ namespace ImageResizer.Configuration {
             return Comparer<T>.Default.Compare(Get<T>(), default(T)) != 0;
         }
 
+        /// <summary>
+        /// Installs the specified plugin, returning the plugin instance. 
+        /// Convenience method, same as plugin.Install(Config.Current).
+        /// </summary>
+        /// <param name="plugin"></param>
+        /// <returns></returns>
+        public IPlugin Install(IPlugin plugin) {
+            return plugin.Install(this.c);
+        }
 
-
+        /// <summary>
+        /// Attempts uninstallation of the specified plugin, returning true if successful.
+        /// Convenience method, same as plugin.Uninstall(Config.Current).
+        /// </summary>
+        /// <param name="plugin"></param>
+        /// <returns></returns>
+        public bool Uninstall(IPlugin plugin) {
+            return plugin.Uninstall(this.c);
+        }
 
         protected SafeList<BuilderExtension> imageBuilderExtensions = null;
         /// <summary>
