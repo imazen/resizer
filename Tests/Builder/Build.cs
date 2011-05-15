@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using ImageResizer.ReleaseBuilder.Classes;
+using LitS3;
 
 namespace ImageResizer.ReleaseBuilder {
     public class Build :Interaction {
@@ -12,9 +13,17 @@ namespace ImageResizer.ReleaseBuilder {
         FsQuery q = null;
         VersionEditor v = null;
 
+        S3Service s3 = new S3Service();
+        string bucketName = "resizer-downloads";
+        string linkBase = "http://downloads.imageresizing.net/";
         public Build() {
             d = new Devenv(Path.Combine(f.folderPath,"ImageResizer.sln"));
             v = new VersionEditor(Path.Combine(f.folderPath, "SharedAssemblyInfo.cs"));
+            s3.AccessKeyID = "AKIAJ2TA3KZS5VPOBBTQ";
+            s3.SecretAccessKey = "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";
+            
+
+
 
             packages.Add(new PackageDescriptor("min", PackMin));
             packages.Add(new PackageDescriptor("full", PackFull));
@@ -59,7 +68,7 @@ namespace ImageResizer.ReleaseBuilder {
                 
             }
 
-
+             
             //1 - Prompt to Clean
             //1b - Run cleanup routine
             if (ask("Clean All?")) {
@@ -131,11 +140,17 @@ namespace ImageResizer.ReleaseBuilder {
                         say("Can't upload, file missing: " + pd.Path);
                         continue;
                     }
-                    //TODO - do upload here
-
+                    CannedAcl perm =  pd.Private ? CannedAcl.Private : CannedAcl.PublicRead;
+                    say("Uploading " + Path.GetFileName(pd.Path) + " to " + bucketName + " with CannedAcl:" + perm.ToString());
+                    //Upload
+                    s3.AddObject(pd.Path, bucketName, Path.GetFileName(pd.Path), "application/zip", perm);
+                    say("Finished uploading " + Path.GetFileName(pd.Path));
                 } 
-
             }
+
+            //11 - Generate template for release notes article
+
+            say("Everything is done.");
             
         }
 
