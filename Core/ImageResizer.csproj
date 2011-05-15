@@ -73,6 +73,7 @@
     <Compile Include="Configuration\IUrlAuthorizationEventArgs.cs" />
     <Compile Include="Configuration\UrlAuthorizationEventArgs.cs" />
     <Compile Include="Plugins\Basic\ClientCache.cs" />
+    <Compile Include="Plugins\Basic\DiagnosticDisabledHandler.cs" />
     <Compile Include="Plugins\Basic\Gradient.cs" />
     <Compile Include="Plugins\Basic\Image404.cs" />
     <Compile Include="Plugins\Basic\NoCacheHandler.cs" />

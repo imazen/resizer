@@ -44,9 +44,8 @@ namespace ImageResizer.Plugins.Basic {
         void Pipeline_PostAuthorizeRequestStart(System.Web.IHttpModule sender, System.Web.HttpContext context) {
             
             if ((context.Request.FilePath.EndsWith("/resizer.debug", StringComparison.OrdinalIgnoreCase) ||
-                context.Request.FilePath.EndsWith("/resizer.debug.ashx", StringComparison.OrdinalIgnoreCase)) &&
-                AllowResponse(context)) {
-                context.RemapHandler(new DiagnosticPageHandler(c));
+                context.Request.FilePath.EndsWith("/resizer.debug.ashx", StringComparison.OrdinalIgnoreCase))) {
+                    context.RemapHandler(AllowResponse(context) ? (IHttpHandler)new DiagnosticPageHandler(c) : (IHttpHandler)new DiagnosticDisabledHandler(c));
             } 
         }
 
