@@ -168,6 +168,17 @@ namespace ImageResizer.Util {
             else if (value == StretchMode.Fill) return "fill";
             throw new NotImplementedException("Unrecognized ScaleMode value: " + value.ToString());
         }
+        public static CropUnits parseCropUnits(string value) {
+            if ("percent".Equals(value, StringComparison.OrdinalIgnoreCase)) return CropUnits.Percentages;
+            if ("percents".Equals(value, StringComparison.OrdinalIgnoreCase)) return CropUnits.Percentages;
+            if ("percentages".Equals(value, StringComparison.OrdinalIgnoreCase)) return CropUnits.Percentages;
+            return CropUnits.Pixels;
+        }
+        public static string writeCropUnits(CropUnits value) {
+            if (value == CropUnits.Percentages) return "percentages";
+            else if (value == CropUnits.Pixels) return "pixels";
+            throw new NotImplementedException("Unrecognized CropUnits value: " + value.ToString());
+        }
 
         public static ScaleMode parseScale(string value) {
             if (value != null) {

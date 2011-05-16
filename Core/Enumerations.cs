@@ -67,4 +67,9 @@ namespace ImageResizer {
         Custom
     }
 
+    public enum CropUnits {
+        Pixels,
+        Percentages
+    }
+
 }

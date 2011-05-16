@@ -102,6 +102,19 @@ namespace ImageResizer {
             return Utils.parseCrop(this["crop"]).Key;           } set {
             this["crop"] = Utils.writeCrop(value, CropValues);  }}
 
+        /// <summary>
+        /// The units used in the crop rectangle
+        /// </summary>
+        public CropUnits CropUnits {
+            get {
+                return Utils.parseCropUnits(this["cropUnits"]);
+            }
+            set {
+                this["cropUnits"] = Utils.writeCropUnits(value);
+            }
+        }
+
+
         protected double[] CropValues {
             get {
                 //Return (0,0,0,0) when null.
@@ -194,6 +207,13 @@ namespace ImageResizer {
         public RectangleF getCustomCropSourceRect(SizeF imageSize) {
             double[] c = CropValues;
             double x1 = c[0], y1 = c[1], x2 = c[2], y2 = c[3];
+
+            if (CropUnits == ImageResizer.CropUnits.Percentages) {
+                x1 *= imageSize.Width;
+                x2 *= imageSize.Width;
+                y1 *= imageSize.Height;
+                y2 *= imageSize.Height;
+            }
 
             //allow negative offsets 
             if (x1 < 0) x1 += imageSize.Width;
