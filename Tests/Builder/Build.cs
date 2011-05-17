@@ -29,7 +29,7 @@ namespace ImageResizer.ReleaseBuilder {
             packages.Add(new PackageDescriptor("full", PackFull));
             packages.Add(new PackageDescriptor("core", PackCore));
             packages.Add(new PackageDescriptor("standard", PackStandard));
-
+            packages.Add(new PackageDescriptor("allbinaries", PackAllBinaries));
         }
 
         public string getReleasePath(string packageBase, string ver,  string kind) {
@@ -214,7 +214,12 @@ namespace ImageResizer.ReleaseBuilder {
                 p.Add(q.files("^/[^/]+.txt$"));
             }
         }
-
+        public void PackAllBinaries(PackageDescriptor desc) {
+            using (var p = new Package(desc.Path, this.f.parentPath)) {
+                p.Add(q.files("^/dlls/release/*.(dll|pdb)$"), "/");
+                p.Add(q.files("^/[^/]+.txt$"));
+            }
+        }
         public void PackFull(PackageDescriptor desc) {
             // 'full'
             using (var p = new Package(desc.Path, this.f.parentPath)) {
