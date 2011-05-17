@@ -13,7 +13,10 @@ using ImageResizer.Configuration.Xml;
 using System.Web;
 using ImageResizer.Collections;
 
+
 namespace ImageResizer.Configuration {
+
+   
     public class Config {
 
         #region Singleton code, .Current,
@@ -35,6 +38,9 @@ namespace ImageResizer.Configuration {
         }
         #endregion
 
+
+        public Config():this(new ResizerSection()){
+        }
         public Config(ResizerSection config) {
 
             this.configuration = config;
@@ -110,6 +116,15 @@ namespace ImageResizer.Configuration {
             }
         }
 
+        /// <summary>
+        /// Shortuct to CurrentImageBuilder.Build (Useful for COM clients)
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="dest"></param>
+        /// <param name="settings"></param>
+        public void BuildImage(object source, object dest, string settings) {
+            CurrentImageBuilder.Build(source, dest, new ResizeSettings(settings));
+        }
 
         protected void InvalidateImageBuilder() {
             lock (_imageBuilderSync) if (_imageBuilder != null) _imageBuilder = _imageBuilder.Create(plugins.ImageBuilderExtensions, plugins);
