@@ -1,0 +1,716 @@
+REGEDIT4
+
+[HKEY_CLASSES_ROOT\ImageResizer.Resizing.AbstractImageProcessor]
+@="ImageResizer.Resizing.AbstractImageProcessor"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Resizing.AbstractImageProcessor\CLSID]
+@="{7D8D5A14-7B15-3E6E-AC6B-A59D523B8119}"
+
+[HKEY_CLASSES_ROOT\CLSID\{7D8D5A14-7B15-3E6E-AC6B-A59D523B8119}]
+@="ImageResizer.Resizing.AbstractImageProcessor"
+
+[HKEY_CLASSES_ROOT\CLSID\{7D8D5A14-7B15-3E6E-AC6B-A59D523B8119}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Resizing.AbstractImageProcessor"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{7D8D5A14-7B15-3E6E-AC6B-A59D523B8119}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Resizing.AbstractImageProcessor"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{7D8D5A14-7B15-3E6E-AC6B-A59D523B8119}\ProgId]
+@="ImageResizer.Resizing.AbstractImageProcessor"
+
+[HKEY_CLASSES_ROOT\CLSID\{7D8D5A14-7B15-3E6E-AC6B-A59D523B8119}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.Resizing.BuilderExtension]
+@="ImageResizer.Resizing.BuilderExtension"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Resizing.BuilderExtension\CLSID]
+@="{19557D33-E09A-3FBE-8DAF-1DEA9DB2754E}"
+
+[HKEY_CLASSES_ROOT\CLSID\{19557D33-E09A-3FBE-8DAF-1DEA9DB2754E}]
+@="ImageResizer.Resizing.BuilderExtension"
+
+[HKEY_CLASSES_ROOT\CLSID\{19557D33-E09A-3FBE-8DAF-1DEA9DB2754E}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Resizing.BuilderExtension"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{19557D33-E09A-3FBE-8DAF-1DEA9DB2754E}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Resizing.BuilderExtension"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{19557D33-E09A-3FBE-8DAF-1DEA9DB2754E}\ProgId]
+@="ImageResizer.Resizing.BuilderExtension"
+
+[HKEY_CLASSES_ROOT\CLSID\{19557D33-E09A-3FBE-8DAF-1DEA9DB2754E}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.Trial]
+@="ImageResizer.Plugins.Basic.Trial"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.Trial\CLSID]
+@="{175D3A31-14B4-3081-943F-4009D23A385D}"
+
+[HKEY_CLASSES_ROOT\CLSID\{175D3A31-14B4-3081-943F-4009D23A385D}]
+@="ImageResizer.Plugins.Basic.Trial"
+
+[HKEY_CLASSES_ROOT\CLSID\{175D3A31-14B4-3081-943F-4009D23A385D}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Plugins.Basic.Trial"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{175D3A31-14B4-3081-943F-4009D23A385D}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Plugins.Basic.Trial"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{175D3A31-14B4-3081-943F-4009D23A385D}\ProgId]
+@="ImageResizer.Plugins.Basic.Trial"
+
+[HKEY_CLASSES_ROOT\CLSID\{175D3A31-14B4-3081-943F-4009D23A385D}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\Record\{669172C4-048C-32E7-9F69-BC24ED629978}\3.0.6.24009]
+"Class"="ImageResizer.Plugins.Basic.Trial+TrialWatermarkMode"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.NoCache]
+@="ImageResizer.Plugins.Basic.NoCache"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.NoCache\CLSID]
+@="{543407D7-E9F6-348B-8F31-FA92FC9C51DF}"
+
+[HKEY_CLASSES_ROOT\CLSID\{543407D7-E9F6-348B-8F31-FA92FC9C51DF}]
+@="ImageResizer.Plugins.Basic.NoCache"
+
+[HKEY_CLASSES_ROOT\CLSID\{543407D7-E9F6-348B-8F31-FA92FC9C51DF}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Plugins.Basic.NoCache"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{543407D7-E9F6-348B-8F31-FA92FC9C51DF}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Plugins.Basic.NoCache"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{543407D7-E9F6-348B-8F31-FA92FC9C51DF}\ProgId]
+@="ImageResizer.Plugins.Basic.NoCache"
+
+[HKEY_CLASSES_ROOT\CLSID\{543407D7-E9F6-348B-8F31-FA92FC9C51DF}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.Caching.ResponseArgs]
+@="ImageResizer.Caching.ResponseArgs"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Caching.ResponseArgs\CLSID]
+@="{24CD810B-179F-353A-8CDA-168E78A9AC5C}"
+
+[HKEY_CLASSES_ROOT\CLSID\{24CD810B-179F-353A-8CDA-168E78A9AC5C}]
+@="ImageResizer.Caching.ResponseArgs"
+
+[HKEY_CLASSES_ROOT\CLSID\{24CD810B-179F-353A-8CDA-168E78A9AC5C}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Caching.ResponseArgs"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{24CD810B-179F-353A-8CDA-168E78A9AC5C}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Caching.ResponseArgs"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{24CD810B-179F-353A-8CDA-168E78A9AC5C}\ProgId]
+@="ImageResizer.Caching.ResponseArgs"
+
+[HKEY_CLASSES_ROOT\CLSID\{24CD810B-179F-353A-8CDA-168E78A9AC5C}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.DefaultEncoder]
+@="ImageResizer.Plugins.Basic.DefaultEncoder"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.DefaultEncoder\CLSID]
+@="{9F69C5F5-CC59-377E-9072-AE9C2296EC9B}"
+
+[HKEY_CLASSES_ROOT\CLSID\{9F69C5F5-CC59-377E-9072-AE9C2296EC9B}]
+@="ImageResizer.Plugins.Basic.DefaultEncoder"
+
+[HKEY_CLASSES_ROOT\CLSID\{9F69C5F5-CC59-377E-9072-AE9C2296EC9B}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Plugins.Basic.DefaultEncoder"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{9F69C5F5-CC59-377E-9072-AE9C2296EC9B}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Plugins.Basic.DefaultEncoder"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{9F69C5F5-CC59-377E-9072-AE9C2296EC9B}\ProgId]
+@="ImageResizer.Plugins.Basic.DefaultEncoder"
+
+[HKEY_CLASSES_ROOT\CLSID\{9F69C5F5-CC59-377E-9072-AE9C2296EC9B}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.Gradient]
+@="ImageResizer.Plugins.Basic.Gradient"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.Gradient\CLSID]
+@="{848D6FB2-6F8E-3492-B928-A195D85C810B}"
+
+[HKEY_CLASSES_ROOT\CLSID\{848D6FB2-6F8E-3492-B928-A195D85C810B}]
+@="ImageResizer.Plugins.Basic.Gradient"
+
+[HKEY_CLASSES_ROOT\CLSID\{848D6FB2-6F8E-3492-B928-A195D85C810B}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Plugins.Basic.Gradient"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{848D6FB2-6F8E-3492-B928-A195D85C810B}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Plugins.Basic.Gradient"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{848D6FB2-6F8E-3492-B928-A195D85C810B}\ProgId]
+@="ImageResizer.Plugins.Basic.Gradient"
+
+[HKEY_CLASSES_ROOT\CLSID\{848D6FB2-6F8E-3492-B928-A195D85C810B}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.Resizing.LayoutBuilder]
+@="ImageResizer.Resizing.LayoutBuilder"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Resizing.LayoutBuilder\CLSID]
+@="{64290066-4FCF-3524-A540-FE331981D98C}"
+
+[HKEY_CLASSES_ROOT\CLSID\{64290066-4FCF-3524-A540-FE331981D98C}]
+@="ImageResizer.Resizing.LayoutBuilder"
+
+[HKEY_CLASSES_ROOT\CLSID\{64290066-4FCF-3524-A540-FE331981D98C}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Resizing.LayoutBuilder"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{64290066-4FCF-3524-A540-FE331981D98C}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Resizing.LayoutBuilder"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{64290066-4FCF-3524-A540-FE331981D98C}\ProgId]
+@="ImageResizer.Resizing.LayoutBuilder"
+
+[HKEY_CLASSES_ROOT\CLSID\{64290066-4FCF-3524-A540-FE331981D98C}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\Record\{D57BE4C5-7084-340F-BFEB-05303845852F}\3.0.6.24009]
+"Class"="ImageResizer.Resizing.LayoutBuilder+PointFlags"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\Record\{2F001888-47CC-37B1-B7AC-60F89F21724E}\3.0.6.24009]
+"Class"="ImageResizer.Resizing.LayoutBuilder+PointTranslationBehavior"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\Record\{B5E7FBB4-5089-39BE-B476-B113BC5A075B}\3.0.6.24009]
+"Class"="ImageResizer.Configuration.VppUsageOption"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\Record\{5481C0FB-0B0A-3BEA-8C4F-00E5712BB8A7}\3.0.6.24009]
+"Class"="ImageResizer.ServerCacheMode"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\Record\{B9F64BAF-3383-3668-9A90-E21F0E6F0E2C}\3.0.6.24009]
+"Class"="ImageResizer.ScaleMode"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\Record\{E9384DAF-901B-3F8B-9F8C-B87F02B50BBB}\3.0.6.24009]
+"Class"="ImageResizer.StretchMode"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\Record\{88766DB5-30FA-3754-96FC-196C26160F52}\3.0.6.24009]
+"Class"="ImageResizer.CropMode"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\Record\{2C7951EF-614D-32AA-B031-E32A4D4BA1CB}\3.0.6.24009]
+"Class"="ImageResizer.CropUnits"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.ClientCache]
+@="ImageResizer.Plugins.Basic.ClientCache"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.ClientCache\CLSID]
+@="{2F8709E9-4311-35BC-AA5B-62B8E19C5134}"
+
+[HKEY_CLASSES_ROOT\CLSID\{2F8709E9-4311-35BC-AA5B-62B8E19C5134}]
+@="ImageResizer.Plugins.Basic.ClientCache"
+
+[HKEY_CLASSES_ROOT\CLSID\{2F8709E9-4311-35BC-AA5B-62B8E19C5134}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Plugins.Basic.ClientCache"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{2F8709E9-4311-35BC-AA5B-62B8E19C5134}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Plugins.Basic.ClientCache"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{2F8709E9-4311-35BC-AA5B-62B8E19C5134}\ProgId]
+@="ImageResizer.Plugins.Basic.ClientCache"
+
+[HKEY_CLASSES_ROOT\CLSID\{2F8709E9-4311-35BC-AA5B-62B8E19C5134}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.InterceptModule]
+@="ImageResizer.InterceptModule"
+
+[HKEY_CLASSES_ROOT\ImageResizer.InterceptModule\CLSID]
+@="{E1B7FB17-D861-3827-AC5A-61CAEE377AF9}"
+
+[HKEY_CLASSES_ROOT\CLSID\{E1B7FB17-D861-3827-AC5A-61CAEE377AF9}]
+@="ImageResizer.InterceptModule"
+
+[HKEY_CLASSES_ROOT\CLSID\{E1B7FB17-D861-3827-AC5A-61CAEE377AF9}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.InterceptModule"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{E1B7FB17-D861-3827-AC5A-61CAEE377AF9}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.InterceptModule"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{E1B7FB17-D861-3827-AC5A-61CAEE377AF9}\ProgId]
+@="ImageResizer.InterceptModule"
+
+[HKEY_CLASSES_ROOT\CLSID\{E1B7FB17-D861-3827-AC5A-61CAEE377AF9}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\Record\{A634C487-FF3E-3E72-862B-0A36CF1DB803}\3.0.6.24009]
+"Class"="ImageResizer.Resizing.RequestedAction"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.SizeLimiting]
+@="ImageResizer.Plugins.Basic.SizeLimiting"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.SizeLimiting\CLSID]
+@="{614F7D13-05F6-3C31-8BB2-26CC31F046BC}"
+
+[HKEY_CLASSES_ROOT\CLSID\{614F7D13-05F6-3C31-8BB2-26CC31F046BC}]
+@="ImageResizer.Plugins.Basic.SizeLimiting"
+
+[HKEY_CLASSES_ROOT\CLSID\{614F7D13-05F6-3C31-8BB2-26CC31F046BC}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Plugins.Basic.SizeLimiting"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{614F7D13-05F6-3C31-8BB2-26CC31F046BC}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Plugins.Basic.SizeLimiting"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{614F7D13-05F6-3C31-8BB2-26CC31F046BC}\ProgId]
+@="ImageResizer.Plugins.Basic.SizeLimiting"
+
+[HKEY_CLASSES_ROOT\CLSID\{614F7D13-05F6-3C31-8BB2-26CC31F046BC}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.DropShadow]
+@="ImageResizer.Plugins.Basic.DropShadow"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.DropShadow\CLSID]
+@="{71C6540F-2609-33A4-9F5B-AEA3358E7CB8}"
+
+[HKEY_CLASSES_ROOT\CLSID\{71C6540F-2609-33A4-9F5B-AEA3358E7CB8}]
+@="ImageResizer.Plugins.Basic.DropShadow"
+
+[HKEY_CLASSES_ROOT\CLSID\{71C6540F-2609-33A4-9F5B-AEA3358E7CB8}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Plugins.Basic.DropShadow"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{71C6540F-2609-33A4-9F5B-AEA3358E7CB8}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Plugins.Basic.DropShadow"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{71C6540F-2609-33A4-9F5B-AEA3358E7CB8}\ProgId]
+@="ImageResizer.Plugins.Basic.DropShadow"
+
+[HKEY_CLASSES_ROOT\CLSID\{71C6540F-2609-33A4-9F5B-AEA3358E7CB8}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.Caching.ResponseHeaders]
+@="ImageResizer.Caching.ResponseHeaders"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Caching.ResponseHeaders\CLSID]
+@="{65F5ABBB-1CD0-3B9C-A2E7-4D2CE40AD9D7}"
+
+[HKEY_CLASSES_ROOT\CLSID\{65F5ABBB-1CD0-3B9C-A2E7-4D2CE40AD9D7}]
+@="ImageResizer.Caching.ResponseHeaders"
+
+[HKEY_CLASSES_ROOT\CLSID\{65F5ABBB-1CD0-3B9C-A2E7-4D2CE40AD9D7}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Caching.ResponseHeaders"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{65F5ABBB-1CD0-3B9C-A2E7-4D2CE40AD9D7}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Caching.ResponseHeaders"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{65F5ABBB-1CD0-3B9C-A2E7-4D2CE40AD9D7}\ProgId]
+@="ImageResizer.Caching.ResponseHeaders"
+
+[HKEY_CLASSES_ROOT\CLSID\{65F5ABBB-1CD0-3B9C-A2E7-4D2CE40AD9D7}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.Configuration.Config]
+@="ImageResizer.Configuration.Config"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Configuration.Config\CLSID]
+@="{BD3076EF-F22B-334C-880A-9301423C1607}"
+
+[HKEY_CLASSES_ROOT\CLSID\{BD3076EF-F22B-334C-880A-9301423C1607}]
+@="ImageResizer.Configuration.Config"
+
+[HKEY_CLASSES_ROOT\CLSID\{BD3076EF-F22B-334C-880A-9301423C1607}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Configuration.Config"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{BD3076EF-F22B-334C-880A-9301423C1607}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Configuration.Config"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{BD3076EF-F22B-334C-880A-9301423C1607}\ProgId]
+@="ImageResizer.Configuration.Config"
+
+[HKEY_CLASSES_ROOT\CLSID\{BD3076EF-F22B-334C-880A-9301423C1607}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.Util.PolygonMath]
+@="ImageResizer.Util.PolygonMath"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Util.PolygonMath\CLSID]
+@="{83284EBD-48BB-32E0-8395-5FFAF270C349}"
+
+[HKEY_CLASSES_ROOT\CLSID\{83284EBD-48BB-32E0-8395-5FFAF270C349}]
+@="ImageResizer.Util.PolygonMath"
+
+[HKEY_CLASSES_ROOT\CLSID\{83284EBD-48BB-32E0-8395-5FFAF270C349}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Util.PolygonMath"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{83284EBD-48BB-32E0-8395-5FFAF270C349}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Util.PolygonMath"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{83284EBD-48BB-32E0-8395-5FFAF270C349}\ProgId]
+@="ImageResizer.Util.PolygonMath"
+
+[HKEY_CLASSES_ROOT\CLSID\{83284EBD-48BB-32E0-8395-5FFAF270C349}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.Configuration.Issues.Issue]
+@="ImageResizer.Configuration.Issues.Issue"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Configuration.Issues.Issue\CLSID]
+@="{497E8F6B-7320-3E54-BED6-A124CE331D77}"
+
+[HKEY_CLASSES_ROOT\CLSID\{497E8F6B-7320-3E54-BED6-A124CE331D77}]
+@="ImageResizer.Configuration.Issues.Issue"
+
+[HKEY_CLASSES_ROOT\CLSID\{497E8F6B-7320-3E54-BED6-A124CE331D77}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Configuration.Issues.Issue"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{497E8F6B-7320-3E54-BED6-A124CE331D77}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Configuration.Issues.Issue"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{497E8F6B-7320-3E54-BED6-A124CE331D77}\ProgId]
+@="ImageResizer.Configuration.Issues.Issue"
+
+[HKEY_CLASSES_ROOT\CLSID\{497E8F6B-7320-3E54-BED6-A124CE331D77}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.SizeLimits]
+@="ImageResizer.Plugins.Basic.SizeLimits"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.SizeLimits\CLSID]
+@="{C014F559-771D-31D4-952D-E666469AEF39}"
+
+[HKEY_CLASSES_ROOT\CLSID\{C014F559-771D-31D4-952D-E666469AEF39}]
+@="ImageResizer.Plugins.Basic.SizeLimits"
+
+[HKEY_CLASSES_ROOT\CLSID\{C014F559-771D-31D4-952D-E666469AEF39}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Plugins.Basic.SizeLimits"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{C014F559-771D-31D4-952D-E666469AEF39}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Plugins.Basic.SizeLimits"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{C014F559-771D-31D4-952D-E666469AEF39}\ProgId]
+@="ImageResizer.Plugins.Basic.SizeLimits"
+
+[HKEY_CLASSES_ROOT\CLSID\{C014F559-771D-31D4-952D-E666469AEF39}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\Record\{E9A29AE2-846C-3327-B074-B48A9F2CB993}\3.0.6.24009]
+"Class"="ImageResizer.Plugins.Basic.SizeLimits+TotalSizeBehavior"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\Record\{42371CD3-B41E-3C4D-B48C-439A7A98D6BB}\3.0.6.24009]
+"Class"="ImageResizer.Configuration.Issues.IssueSeverity"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Util.Utils]
+@="ImageResizer.Util.Utils"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Util.Utils\CLSID]
+@="{5DD74671-1A7B-3E7E-B3F4-C941D093A404}"
+
+[HKEY_CLASSES_ROOT\CLSID\{5DD74671-1A7B-3E7E-B3F4-C941D093A404}]
+@="ImageResizer.Util.Utils"
+
+[HKEY_CLASSES_ROOT\CLSID\{5DD74671-1A7B-3E7E-B3F4-C941D093A404}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Util.Utils"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{5DD74671-1A7B-3E7E-B3F4-C941D093A404}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Util.Utils"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{5DD74671-1A7B-3E7E-B3F4-C941D093A404}\ProgId]
+@="ImageResizer.Util.Utils"
+
+[HKEY_CLASSES_ROOT\CLSID\{5DD74671-1A7B-3E7E-B3F4-C941D093A404}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.Util.PathUtils]
+@="ImageResizer.Util.PathUtils"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Util.PathUtils\CLSID]
+@="{99033C40-EBD1-319A-9FA0-D316F7D81738}"
+
+[HKEY_CLASSES_ROOT\CLSID\{99033C40-EBD1-319A-9FA0-D316F7D81738}]
+@="ImageResizer.Util.PathUtils"
+
+[HKEY_CLASSES_ROOT\CLSID\{99033C40-EBD1-319A-9FA0-D316F7D81738}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Util.PathUtils"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{99033C40-EBD1-319A-9FA0-D316F7D81738}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Util.PathUtils"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{99033C40-EBD1-319A-9FA0-D316F7D81738}\ProgId]
+@="ImageResizer.Util.PathUtils"
+
+[HKEY_CLASSES_ROOT\CLSID\{99033C40-EBD1-319A-9FA0-D316F7D81738}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.ResizerSection]
+@="ImageResizer.ResizerSection"
+
+[HKEY_CLASSES_ROOT\ImageResizer.ResizerSection\CLSID]
+@="{C4E464B1-F2CF-3A03-AADA-7B9498F1AA28}"
+
+[HKEY_CLASSES_ROOT\CLSID\{C4E464B1-F2CF-3A03-AADA-7B9498F1AA28}]
+@="ImageResizer.ResizerSection"
+
+[HKEY_CLASSES_ROOT\CLSID\{C4E464B1-F2CF-3A03-AADA-7B9498F1AA28}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.ResizerSection"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{C4E464B1-F2CF-3A03-AADA-7B9498F1AA28}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.ResizerSection"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{C4E464B1-F2CF-3A03-AADA-7B9498F1AA28}\ProgId]
+@="ImageResizer.ResizerSection"
+
+[HKEY_CLASSES_ROOT\CLSID\{C4E464B1-F2CF-3A03-AADA-7B9498F1AA28}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.Util.UrlHasher]
+@="ImageResizer.Util.UrlHasher"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Util.UrlHasher\CLSID]
+@="{0CD541F3-D78F-3C96-9CE6-AA2BFDFD0FEA}"
+
+[HKEY_CLASSES_ROOT\CLSID\{0CD541F3-D78F-3C96-9CE6-AA2BFDFD0FEA}]
+@="ImageResizer.Util.UrlHasher"
+
+[HKEY_CLASSES_ROOT\CLSID\{0CD541F3-D78F-3C96-9CE6-AA2BFDFD0FEA}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Util.UrlHasher"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{0CD541F3-D78F-3C96-9CE6-AA2BFDFD0FEA}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Util.UrlHasher"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{0CD541F3-D78F-3C96-9CE6-AA2BFDFD0FEA}\ProgId]
+@="ImageResizer.Util.UrlHasher"
+
+[HKEY_CLASSES_ROOT\CLSID\{0CD541F3-D78F-3C96-9CE6-AA2BFDFD0FEA}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.ResizeSettings]
+@="ImageResizer.ResizeSettings"
+
+[HKEY_CLASSES_ROOT\ImageResizer.ResizeSettings\CLSID]
+@="{1EB233C1-C83C-3327-9EB4-E30B73DF1AA6}"
+
+[HKEY_CLASSES_ROOT\CLSID\{1EB233C1-C83C-3327-9EB4-E30B73DF1AA6}]
+@="ImageResizer.ResizeSettings"
+
+[HKEY_CLASSES_ROOT\CLSID\{1EB233C1-C83C-3327-9EB4-E30B73DF1AA6}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.ResizeSettings"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{1EB233C1-C83C-3327-9EB4-E30B73DF1AA6}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.ResizeSettings"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{1EB233C1-C83C-3327-9EB4-E30B73DF1AA6}\ProgId]
+@="ImageResizer.ResizeSettings"
+
+[HKEY_CLASSES_ROOT\CLSID\{1EB233C1-C83C-3327-9EB4-E30B73DF1AA6}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\Record\{36F414E9-D00D-355B-8BF9-EE40820B5799}\3.0.6.24009]
+"Class"="ImageResizer.Plugins.Basic.DiagnosticMode"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.Diagnostic]
+@="ImageResizer.Plugins.Basic.Diagnostic"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.Diagnostic\CLSID]
+@="{395D063A-CBE3-3327-83B9-A43A29543890}"
+
+[HKEY_CLASSES_ROOT\CLSID\{395D063A-CBE3-3327-83B9-A43A29543890}]
+@="ImageResizer.Plugins.Basic.Diagnostic"
+
+[HKEY_CLASSES_ROOT\CLSID\{395D063A-CBE3-3327-83B9-A43A29543890}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Plugins.Basic.Diagnostic"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{395D063A-CBE3-3327-83B9-A43A29543890}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Plugins.Basic.Diagnostic"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{395D063A-CBE3-3327-83B9-A43A29543890}\ProgId]
+@="ImageResizer.Plugins.Basic.Diagnostic"
+
+[HKEY_CLASSES_ROOT\CLSID\{395D063A-CBE3-3327-83B9-A43A29543890}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.Image404]
+@="ImageResizer.Plugins.Basic.Image404"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Plugins.Basic.Image404\CLSID]
+@="{2F1C03BC-DCF5-3171-94C8-A3192DFFAE46}"
+
+[HKEY_CLASSES_ROOT\CLSID\{2F1C03BC-DCF5-3171-94C8-A3192DFFAE46}]
+@="ImageResizer.Plugins.Basic.Image404"
+
+[HKEY_CLASSES_ROOT\CLSID\{2F1C03BC-DCF5-3171-94C8-A3192DFFAE46}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Plugins.Basic.Image404"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{2F1C03BC-DCF5-3171-94C8-A3192DFFAE46}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Plugins.Basic.Image404"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{2F1C03BC-DCF5-3171-94C8-A3192DFFAE46}\ProgId]
+@="ImageResizer.Plugins.Basic.Image404"
+
+[HKEY_CLASSES_ROOT\CLSID\{2F1C03BC-DCF5-3171-94C8-A3192DFFAE46}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\ImageResizer.Util.CommitAttribute]
+@="ImageResizer.Util.CommitAttribute"
+
+[HKEY_CLASSES_ROOT\ImageResizer.Util.CommitAttribute\CLSID]
+@="{DEEDE303-3C96-3DD7-AF67-FA11194A4B61}"
+
+[HKEY_CLASSES_ROOT\CLSID\{DEEDE303-3C96-3DD7-AF67-FA11194A4B61}]
+@="ImageResizer.Util.CommitAttribute"
+
+[HKEY_CLASSES_ROOT\CLSID\{DEEDE303-3C96-3DD7-AF67-FA11194A4B61}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="ImageResizer.Util.CommitAttribute"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{DEEDE303-3C96-3DD7-AF67-FA11194A4B61}\InprocServer32\3.0.6.24009]
+"Class"="ImageResizer.Util.CommitAttribute"
+"Assembly"="ImageResizer, Version=3.0.6.24009, Culture=neutral, PublicKeyToken=null"
+"RuntimeVersion"="v2.0.50727"
+
+[HKEY_CLASSES_ROOT\CLSID\{DEEDE303-3C96-3DD7-AF67-FA11194A4B61}\ProgId]
+@="ImageResizer.Util.CommitAttribute"
+
+[HKEY_CLASSES_ROOT\CLSID\{DEEDE303-3C96-3DD7-AF67-FA11194A4B61}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
