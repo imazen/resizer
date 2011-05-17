@@ -228,6 +228,12 @@ namespace ImageResizer.Configuration {
         public void setConfigXml(Node n) {
             cs.replaceRootNode(n);
         }
-
+        /// <summary>
+        /// Replaces the configuration tree with the specified alternative
+        /// </summary>
+        /// <param name="xml"></param>
+        public void setConfigXmlText(String xml) {
+            cs.replaceRootNode(Node.FromXmlFragment(xml, cs.IssueSink));
+        }
     }
 }
