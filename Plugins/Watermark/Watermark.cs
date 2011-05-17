@@ -97,12 +97,24 @@ namespace ImageResizer.Plugins.Watermark
                 watermarkSize.Height + topLeftPadding.Height + bottomRightPadding.Height);
 
             //Don't draw the watermark if it is too small.
-            if (!PolygonMath.FitsInside(watermarkSize, imageBox.Size) && hideIfTooSmall) return RequestedAction.None;
+            if (!PolygonMath.FitsInside(watermarkBoundingBox, imageBox.Size)) {
+                if (hideIfTooSmall) return RequestedAction.None;
+                else {
+                    SizeF oldSize = watermarkBoundingBox;
+                    watermarkBoundingBox = PolygonMath.ScaleInside(watermarkBoundingBox, imageBox.Size);
+                    watermarkSize.Width -= (oldSize.Width - watermarkBoundingBox.Width);
+                    watermarkSize.Height -= (oldSize.Height - watermarkBoundingBox.Height);
+                }
+            }
+            //Floor all values again
+            watermarkSize = new SizeF((float)Math.Floor(watermarkSize.Width), (float)Math.Floor(watermarkSize.Height));
+            topLeftPadding = new SizeF((float)Math.Floor(topLeftPadding.Width), (float)Math.Floor(topLeftPadding.Height));
+            bottomRightPadding = new SizeF((float)Math.Floor(bottomRightPadding.Width), (float)Math.Floor(bottomRightPadding.Height));
 
 
 
-            float innerWidth = (float)Math.Floor(imageBox.Width - topLeftPadding.Width - bottomRightPadding.Width);
-            float innerHeight = (float)Math.Floor(imageBox.Height - topLeftPadding.Height - bottomRightPadding.Height);
+            float innerWidth = (float)Math.Floor(imageBox.Width - Math.Abs(topLeftPadding.Width) - Math.Abs(bottomRightPadding.Width));
+            float innerHeight = (float)Math.Floor(imageBox.Height - Math.Abs(topLeftPadding.Height) - Math.Abs(bottomRightPadding.Height));
 
             float x = 0;
             float y = 0;
