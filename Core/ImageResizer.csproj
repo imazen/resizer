@@ -58,6 +58,7 @@
     <DocumentationFile>..\dlls\release\ImageResizer.XML</DocumentationFile>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <RegisterForComInterop>false</RegisterForComInterop>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
