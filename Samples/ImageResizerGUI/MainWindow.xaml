@@ -33,8 +33,8 @@
                         <Button x:Name="btn_clearAll" Content="Clear All" Margin="5,3"/>
                     </StackPanel>
 
-                    <DataGrid x:Name="listView" Grid.Column="1" Grid.Row="1" Margin="0,0,10,0" 
-                             ItemsSource="{Binding}" AutoGenerateColumns="False" CanUserReorderColumns="False" IsSynchronizedWithCurrentItem="true">
+                    <DataGrid x:Name="listView" Grid.Column="1" Grid.Row="1" Margin="0,0,10,0"
+                             ItemsSource="{Binding}" AutoGenerateColumns="False" CanUserReorderColumns="False" IsSynchronizedWithCurrentItem="true" HorizontalGridLinesBrush="#FFC1C1C1" VerticalGridLinesBrush="#FFC1C1C1">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" IsReadOnly="True" />
                             <DataGridTextColumn Header="Folder" Binding="{Binding Folder}" IsReadOnly="True" />
@@ -75,13 +75,13 @@
                                         <ColumnDefinition Width="auto"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Max Height" Margin="5,0" VerticalAlignment="Center"/>
-                                    <TextBox Grid.Row="0" Grid.Column="1" x:Name="tbox_height" x:FieldModifier="public" Width="50" VerticalAlignment="Center" Text="768" Margin="0,2"/>
-                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="px" Margin="5,0" VerticalAlignment="Center"/>
-
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Max Width" Margin="5,0" VerticalAlignment="Center"/>
-                                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="tbox_width" x:FieldModifier="public" Width="50" VerticalAlignment="Center" Text="1024" Margin="0,2"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Max Height" Margin="5,0" VerticalAlignment="Center"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="tbox_height" x:FieldModifier="public" Width="50" VerticalAlignment="Center" Text="768" Margin="0,2"/>
                                     <TextBlock Grid.Row="1" Grid.Column="2" Text="px" Margin="5,0" VerticalAlignment="Center"/>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Max Width" Margin="5,0" VerticalAlignment="Center"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" x:Name="tbox_width" x:FieldModifier="public" Width="50" VerticalAlignment="Center" Text="1024" Margin="0,2"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="px" Margin="5,0" VerticalAlignment="Center"/>
                                 </Grid>
 
 
@@ -126,7 +126,10 @@
                 <TextBlock x:Name="tblock_errorMsg" Foreground="Red" Text="Error text" Margin="4" Padding="4" Visibility="Collapsed"/>
             </Grid>
             <Grid Grid.Row="3">
-                <Button x:Name="btn_resize" Content="Resize" HorizontalAlignment="Right" Width="200" Margin="10,5" Click="btn_resize_Click" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button x:Name="btn_showResults" Content="Show Results" Visibility="Collapsed" Width="200" Margin="10,5" Click="btn_showResults_Click" />
+                    <Button x:Name="btn_resize" Content="Resize"  Width="200" Margin="10,5" Click="btn_resize_Click" />
+                </StackPanel>
             </Grid>
         </Grid>
 
@@ -139,14 +142,21 @@
 
             <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="3" Margin="5" Padding="5" Background="White">
                 <DataGrid x:Name="dataGridResults" Grid.Column="1" Grid.Row="1" 
-                             ItemsSource="{Binding}" AutoGenerateColumns="False" CanUserReorderColumns="False">
+                             ItemsSource="{Binding}" AutoGenerateColumns="False" CanUserReorderColumns="False" HorizontalGridLinesBrush="#FFC1C1C1" VerticalGridLinesBrush="#FFC1C1C1">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Folder" Binding="{Binding Folder}" IsReadOnly="True" />
-                        <DataGridTemplateColumn Header="Status">
+                        <DataGridTemplateColumn Header="Progress">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <ProgressBar Value="{Binding Path=Status}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Status">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding StatusText}" Foreground="{Binding Color}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

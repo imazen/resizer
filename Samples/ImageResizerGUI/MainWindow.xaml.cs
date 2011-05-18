@@ -250,7 +250,6 @@ namespace ImageResizerGUI
                     break;
 
                 case SaveMode.CreateZipFile:
-                    var bInfo = new BatchInfo(saveZipPath);
                     if (File.Exists(saveZipPath))
                         File.Delete(saveZipPath);
                     ResizeBatchAndZip();
@@ -260,9 +259,15 @@ namespace ImageResizerGUI
 
         }
 
+        private void btn_showResults_Click(object sender, RoutedEventArgs e)
+        {
+            gridResults.Visibility = Visibility.Visible;
+        }
+
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             gridResults.Visibility = Visibility.Collapsed;
+            btn_showResults.Visibility = Visibility.Visible;
         }
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
@@ -333,6 +338,7 @@ namespace ImageResizerGUI
             var resultItems = new ObservableCollection<BatchInfo>();
             foreach (var item in listView.Items)
             {
+                ((BatchInfo)item).StatusText = "Waiting";
                 ((BatchInfo)item).Status = 0;
                 resultItems.Add(((BatchInfo)item));
             }
@@ -370,6 +376,7 @@ namespace ImageResizerGUI
             var resultItems = new ObservableCollection<BatchInfo>();
             foreach (var item in listView.Items)
             {
+                ((BatchInfo)item).StatusText = "Waiting";
                 ((BatchInfo)item).Status = 0;
                 resultItems.Add(((BatchInfo)item));
             }
@@ -418,11 +425,6 @@ namespace ImageResizerGUI
 
             if (saveMode == SaveMode.ExportResults)
             {
-                if (string.IsNullOrEmpty(saveFolderPath))
-                {
-                    System.Windows.MessageBox.Show("You must select a destination folder.");
-                    return false;
-                }
 
             }
 
@@ -519,6 +521,7 @@ namespace ImageResizerGUI
                         where ((BatchInfo)item).FullPath == itemDone
                         select item;
 
+            ((BatchInfo)query.First()).StatusText = "Done";
             ((BatchInfo)query.First()).Status = 100;
         }
 
@@ -528,6 +531,9 @@ namespace ImageResizerGUI
             pBar1.Visibility = Visibility.Hidden;
             btn_back.IsEnabled = true;
             btn_viewResults.IsEnabled = true;
+
+            if (!string.IsNullOrEmpty(saveFolderPath) && Directory.Exists(saveFolderPath))
+                System.Diagnostics.Process.Start(saveFolderPath);
         }
 
         private void BwResizeBatch_DoWork(object sender, DoWorkEventArgs e)
@@ -548,13 +554,21 @@ namespace ImageResizerGUI
                     foreach (var item in batchItems)
                     {
                         count++;
+                        try
+                        {
+                            if (saveMode == SaveMode.ModifyExisting)
+                                ImageBuilder.Current.Build(item.FullPath, item.FullPath, rs);
+                            else
+                                ImageBuilder.Current.Build(item.FullPath, saveFolderPath + "\\" + item.FileName, rs);
 
-                        if (saveMode == SaveMode.ModifyExisting)
-                            ImageBuilder.Current.Build(item.FullPath, item.FullPath, rs);
-                        else
-                            ImageBuilder.Current.Build(item.FullPath, saveFolderPath + item.FileName, rs);
-
-                        item.Status = 100;
+                            item.StatusText = "Done";
+                            item.Status = 100;
+                        }
+                        catch (Exception ex)
+                        {
+                            item.StatusText = "Error";
+                            item.Status = 50;
+                        }
 
                         bwResizeBatch.ReportProgress((count * 100) / batchItems.Count, item);
 
@@ -587,6 +601,7 @@ namespace ImageResizerGUI
                         where ((BatchInfo)item).FullPath == itemDone.FullPath
                         select item;
 
+            ((BatchInfo)query.First()).StatusText = "Done";
             ((BatchInfo)query.First()).Status = 100;
         }
 
@@ -596,9 +611,14 @@ namespace ImageResizerGUI
             pBar1.Visibility = Visibility.Hidden;
             btn_back.IsEnabled = true;
             btn_viewResults.IsEnabled = true;
+
+            if (!string.IsNullOrEmpty(saveFolderPath) && Directory.Exists(saveFolderPath))
+                System.Diagnostics.Process.Start(saveFolderPath);
         }
 
         #endregion
+
+
 
 
     }

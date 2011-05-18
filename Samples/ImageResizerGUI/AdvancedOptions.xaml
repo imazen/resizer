@@ -23,12 +23,12 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Grid.Row="0" Text="Max Height" VerticalAlignment="Center"/>
-                <TextBox x:Name="tbox_maxHeight" Grid.Column="2" Grid.Row="0" Margin="0,2"/>
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="Max Height" VerticalAlignment="Center"/>
+                <TextBox x:Name="tbox_maxHeight" Grid.Column="2" Grid.Row="1" Margin="0,2"/>
 
 
-                <TextBlock Grid.Column="0" Grid.Row="1" Text="Max Width" VerticalAlignment="Center"/>
-                <TextBox x:Name="tbox_maxWidth" Grid.Column="2" Grid.Row="1" Margin="0,2"/>
+                <TextBlock Grid.Column="0" Grid.Row="0" Text="Max Width" VerticalAlignment="Center"/>
+                <TextBox x:Name="tbox_maxWidth" Grid.Column="2" Grid.Row="0" Margin="0,2"/>
 
             </Grid>
 

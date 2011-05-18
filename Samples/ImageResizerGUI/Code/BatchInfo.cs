@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
+using System.Windows.Media;
 
 namespace ImageResizerGUI.Code
 {
@@ -13,6 +14,7 @@ namespace ImageResizerGUI.Code
         private string fileName;
         private string fullPath;
         private int status;
+        private string statusText;
 
         #endregion
 
@@ -24,6 +26,7 @@ namespace ImageResizerGUI.Code
             FileName = arr[arr.Length - 1];
             Folder = fullPath.Replace(FileName, "");
             Status = 0;
+            statusText = "Pending";
         }
 
         public BatchInfo(BatchInfo other)
@@ -52,6 +55,27 @@ namespace ImageResizerGUI.Code
             {
                 status = value;
                 NotifyPropertyChanged("Status");
+            }
+        }
+
+        public string StatusText
+        {
+            get { return statusText; }
+            set
+            {
+                statusText = value;
+                NotifyPropertyChanged("StatusText");
+                NotifyPropertyChanged("Color");
+            }
+        }
+
+        public Brush Color
+        {
+            get
+            {
+                if (StatusText == "Error")
+                    return new SolidColorBrush(Colors.Red);
+                return new SolidColorBrush(Colors.Black);
             }
         }
 
