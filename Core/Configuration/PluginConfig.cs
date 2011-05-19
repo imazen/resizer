@@ -190,6 +190,13 @@ namespace ImageResizer.Configuration {
         public SafeList<IFileExtensionPlugin> FileExtensionPlugins { get { return fileExtensionPlugins; } }
 
 
+        protected SafeList<IVirtualImageProvider> virtualProviderPlugins = null;
+        /// <summary>
+        /// Plugins which provide virtual files are registered here.
+        /// </summary>
+        public SafeList<IVirtualImageProvider> VirtualProviderPlugins { get { return virtualProviderPlugins; } }
+
+
         protected SafeList<IPlugin> allPlugins = null;
         /// <summary>
         /// All plugins should be registered here. Used for diagnostic purposes.
@@ -402,6 +409,7 @@ namespace ImageResizer.Configuration {
             if (plugin is ICache) CachingSystems.Remove(plugin as ICache);
             if (plugin is IEncoder) ImageEncoders.Remove(plugin as IEncoder);
             if (plugin is BuilderExtension) ImageBuilderExtensions.Remove(plugin as BuilderExtension);
+            if (plugin is IVirtualImageProvider) VirtualProviderPlugins.Remove(plugin as IVirtualImageProvider);
         }
 
         /// <summary>
@@ -425,6 +433,7 @@ namespace ImageResizer.Configuration {
             if (plugin is ICache) CachingSystems.AddFirst(plugin as ICache);
             if (plugin is IEncoder) ImageEncoders.AddFirst(plugin as IEncoder);
             if (plugin is BuilderExtension) ImageBuilderExtensions.Add(plugin as BuilderExtension);
+            if (plugin is IVirtualImageProvider) VirtualProviderPlugins.Add(plugin as IVirtualImageProvider);
         }
 
 
