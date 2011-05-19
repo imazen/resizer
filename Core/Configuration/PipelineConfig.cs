@@ -204,10 +204,10 @@ namespace ImageResizer.Configuration {
         /// <param name="queryString"></param>
         /// <returns></returns>
         public object GetFile(string virtualPath, NameValueCollection queryString) {
-            foreach (IVirtualImageProvider p in c.Plugins.GetAll<IVirtualImageProvider>()) {
+            foreach (IVirtualImageProvider p in c.Plugins.VirtualProviderPlugins) {
                 if (p.FileExists(virtualPath, queryString)) return p.GetFile(virtualPath, queryString);
             }
-            return HostingEnvironment.VirtualPathProvider.GetFile(virtualPath);
+            return HostingEnvironment.VirtualPathProvider != null ? HostingEnvironment.VirtualPathProvider.GetFile(virtualPath) : null;
         }
 
         /// <summary>
@@ -217,10 +217,10 @@ namespace ImageResizer.Configuration {
         /// <param name="queryString"></param>
         /// <returns></returns>
         public bool FileExists(string virtualPath, NameValueCollection queryString) {
-            foreach (IVirtualImageProvider p in c.Plugins.GetAll<IVirtualImageProvider>()) {
+            foreach (IVirtualImageProvider p in c.Plugins.VirtualProviderPlugins) {
                 if (p.FileExists(virtualPath, queryString)) return true;
             }
-            return HostingEnvironment.VirtualPathProvider.FileExists(virtualPath);
+            return HostingEnvironment.VirtualPathProvider != null ? HostingEnvironment.VirtualPathProvider.FileExists(virtualPath) : false;
         }
 
 
