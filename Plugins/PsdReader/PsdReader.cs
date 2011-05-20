@@ -46,10 +46,8 @@ namespace ImageResizer.Plugins.PsdReader {
         }
 
         private static void trace(string msg) {
-            if (HttpContext.Current == null)
-                System.Diagnostics.Debug.Write(msg);
-            else
-                HttpContext.Current.Trace.Write(msg);
+            Trace.Write(msg);
+
         }
 
         public override Bitmap DecodeStream(Stream s, ResizeSettings settings, string optionalPath) {
