@@ -186,7 +186,7 @@ namespace ImageResizer.Plugins.BatchZipper
         protected void  z_SaveProgress(object sender, SaveProgressEventArgs e)
         {
             if (e.EventType == ZipProgressEventType.Saving_Completed) savingCompletedEventArgs = e;
-            if (e.EventType == ZipProgressEventType.Saving_AfterWriteEntry) ItemCompleted(e);
+            if (e.EventType == ZipProgressEventType.Saving_AfterWriteEntry && e.CurrentEntry != null && e.CurrentEntry.IncludedInMostRecentSave) ItemCompleted(e);
         }
         protected void z_ZipError(object sender, ZipErrorEventArgs e)
         {
