@@ -119,7 +119,7 @@ namespace ImageResizer
             //IVirtualBitmapFile
             if (source is IVirtualBitmapFile) {
                 b = ((IVirtualBitmapFile)source).GetBitmap();
-                b.Tag = ((IVirtualBitmapFile)source).VirtualPath;
+                if (b.Tag == null) b.Tag = ((IVirtualBitmapFile)source).VirtualPath;
                 return b;
             }
 
@@ -187,7 +187,8 @@ namespace ImageResizer
             bool useICM = true;
             if (settings != null && "true".Equals(settings["ignoreicc"], StringComparison.OrdinalIgnoreCase)) useICM = false;
 
-            return new Bitmap(s, useICM);
+            //NDJ - May 24, 2011 - Copying stream into memory so it can be closed safely.
+            return new Bitmap(StreamUtils.CopyStream(s), useICM);
         }
 
 
