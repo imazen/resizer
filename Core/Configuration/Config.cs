@@ -63,11 +63,15 @@ namespace ImageResizer.Configuration {
             new ImageResizer.Plugins.Basic.Diagnostic().Install(this);
             new ImageResizer.Plugins.Basic.SizeLimiting().Install(this);
 
-            //Load plugins on the first request, unless they are already loaded.
-            pipeline.OnFirstRequest += delegate(IHttpModule sender, HttpContext context) {
-                Plugins.LoadPlugins();
-            };
-            
+            if (System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath == null) {
+                //Not running asp.net app here. Load them immediately.
+                plugins.LoadPlugins();
+            } else {            
+                //Load plugins on the first request, unless they are already loaded.
+                pipeline.OnFirstRequest += delegate(IHttpModule sender, HttpContext context) {
+                    Plugins.LoadPlugins();
+                };
+            }
 
         }
 
@@ -234,6 +238,21 @@ namespace ImageResizer.Configuration {
         /// <param name="xml"></param>
         public void setConfigXmlText(String xml) {
             cs.replaceRootNode(Node.FromXmlFragment(xml, cs.IssueSink));
+        }
+
+        /// <summary>
+        /// Writes a diagnostic page to the specified physical path
+        /// </summary>
+        /// <param name="path"></param>
+        public void WriteDiagnosticsTo(string path) {
+            System.IO.File.WriteAllText(path, GetDiagnosticsPage());
+        }
+        /// <summary>
+        /// Returns a string of the diagnostics page
+        /// </summary>
+        /// <returns></returns>
+        private string GetDiagnosticsPage() {
+            return new ImageResizer.Plugins.Basic.DiagnosticPageHandler(this).GenerateOutput(HttpContext.Current, this);
         }
     }
 }
