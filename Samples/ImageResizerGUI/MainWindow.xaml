@@ -1,7 +1,7 @@
 ﻿<Window x:Class="ImageResizerGUI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="600" Width="800">
+        Title="Image Resizer" Height="600" Width="800" Icon="/ImageResizerGUI;component/Images/image1.png">
     <Grid>
 
         <Grid>
@@ -34,7 +34,7 @@
                     </StackPanel>
 
                     <DataGrid x:Name="listView" Grid.Column="1" Grid.Row="1" Margin="0,0,10,0"
-                             ItemsSource="{Binding}" AutoGenerateColumns="False" CanUserReorderColumns="False" IsSynchronizedWithCurrentItem="true" HorizontalGridLinesBrush="#FFC1C1C1" VerticalGridLinesBrush="#FFC1C1C1">
+                             ItemsSource="{Binding}" AutoGenerateColumns="False" CanUserReorderColumns="False" IsSynchronizedWithCurrentItem="true" HorizontalGridLinesBrush="#FFC1C1C1" VerticalGridLinesBrush="#FFC1C1C1" AllowDrop="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" IsReadOnly="True" />
                             <DataGridTextColumn Header="Folder" Binding="{Binding Folder}" IsReadOnly="True" />
@@ -61,10 +61,11 @@
                         <Grid Grid.Row="1" Margin="0,10">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
                             </Grid.RowDefinitions>
 
                             <StackPanel Orientation="Horizontal">
-                                <Grid>
+                                <Grid> 
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="auto"/>
                                         <RowDefinition Height="auto"/>
@@ -75,11 +76,11 @@
                                         <ColumnDefinition Width="auto"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Max Height" Margin="5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Height" Margin="5,0" VerticalAlignment="Center"/>
                                     <TextBox Grid.Row="1" Grid.Column="1" x:Name="tbox_height" x:FieldModifier="public" Width="50" VerticalAlignment="Center" Text="768" Margin="0,2"/>
                                     <TextBlock Grid.Row="1" Grid.Column="2" Text="px" Margin="5,0" VerticalAlignment="Center"/>
 
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Max Width" Margin="5,0" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Width" Margin="5,0" VerticalAlignment="Center"/>
                                     <TextBox Grid.Row="0" Grid.Column="1" x:Name="tbox_width" x:FieldModifier="public" Width="50" VerticalAlignment="Center" Text="1024" Margin="0,2"/>
                                     <TextBlock Grid.Row="0" Grid.Column="2" Text="px" Margin="5,0" VerticalAlignment="Center"/>
                                 </Grid>
@@ -87,7 +88,7 @@
 
                                 <Button Content="Advanced Options" Margin="5,0" VerticalAlignment="Center" Click="Button_Click_2" />
                             </StackPanel>
-
+                           
                         </Grid>
                     </Grid>
 
