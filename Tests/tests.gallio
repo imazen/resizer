@@ -5,14 +5,15 @@
       <file>ImageResizer.Plugins.DiskCache.Tests\bin\Debug\ImageResizer.Plugins.DiskCache.Tests.dll</file>
       <file>..\Dlls\debug\ImageResizer.Core.Tests.dll</file>
       <file>binaries\debug\ImageResizer.Core.Tests.dll</file>
+      <file>binaries\debug\ImageResizer.Plugins.Watermark.Tests.dll</file>
     </files>
     <hintDirectories />
     <excludedFrameworkIds />
     <properties />
   </testPackage>
   <testFilters>
-    <testFilter filterName="AutoSave" filterExpr="Namespace: ImageResizer.Tests" />
-    <testFilter filterName="LastRun" filterExpr="Namespace: ImageResizer.Tests" />
+    <testFilter filterName="AutoSave" filterExpr="Id: 31b1671375ad4340" />
+    <testFilter filterName="LastRun" filterExpr="Id: 31b1671375ad4340" />
   </testFilters>
   <extensionSpecifications />
   <reportDirectory>..\..\..\AppData\Roaming\Gallio\Icarus\Reports</reportDirectory>
