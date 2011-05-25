@@ -209,6 +209,12 @@ namespace ImageResizer {
             double x1 = c[0], y1 = c[1], x2 = c[2], y2 = c[3];
 
             if (CropUnits == ImageResizer.CropUnits.Percentages) {
+                //Force all values to be between 0 and positive 1 inclusive.
+                x1 = Math.Max(Math.Min(1, x1), 0);
+                x2 = Math.Max(Math.Min(1, x2), 0);
+                y1 = Math.Max(Math.Min(1, y1), 0);
+                y2 = Math.Max(Math.Min(1, y2),0);
+                //Multiply by the width and height
                 x1 *= imageSize.Width;
                 x2 *= imageSize.Width;
                 y1 *= imageSize.Height;
