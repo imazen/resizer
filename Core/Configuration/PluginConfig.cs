@@ -35,6 +35,7 @@ namespace ImageResizer.Configuration {
             querystringPlugins = new SafeList<IQuerystringPlugin>();
             fileExtensionPlugins = new SafeList<IFileExtensionPlugin>();
             allPlugins = new SafeList<IPlugin>();
+            virtualProviderPlugins = new SafeList<IVirtualImageProvider>();
         }
 
         protected volatile bool _pluginsLoaded = false;
