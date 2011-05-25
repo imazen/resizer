@@ -1,6 +1,8 @@
 ﻿List of complex areas, best items to test.
 
 
+Verify all Build overloads handle streams appropriately.
+
 PathUtils
 
 ResponseHeaders.DefaultApplyToResponseMethod

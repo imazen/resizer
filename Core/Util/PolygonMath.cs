@@ -347,7 +347,7 @@ namespace ImageResizer.Util
         public static SizeF DownScaleInside(SizeF inner, SizeF bounding)
         {
             SizeF result = ScaleInside(inner, bounding);
-            if (result.Width > inner.Width) return inner;
+            if (result.Width > inner.Width || result.Height > inner.Height) return inner;
             else return result;
         }
         /// <summary>
