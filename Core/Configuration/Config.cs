@@ -23,7 +23,7 @@ namespace ImageResizer.Configuration {
         private static volatile Config _singleton = null;
         private static object _singletonLock = new object();
         /// <summary>
-        /// Gets the current config instance. 
+        /// Gets the current (app-wide) config instance. 
         /// </summary>
         /// <returns></returns>
         public static Config Current {
@@ -56,14 +56,15 @@ namespace ImageResizer.Configuration {
             //Relies on plugins, must init second
             pipeline = new PipelineConfig(this);
 
+            bool isAspNet = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath != null;
             //Load default plugins
             new ImageResizer.Plugins.Basic.DefaultEncoder().Install(this);
             new ImageResizer.Plugins.Basic.NoCache().Install(this);
             new ImageResizer.Plugins.Basic.ClientCache().Install(this);
             new ImageResizer.Plugins.Basic.Diagnostic().Install(this);
-            new ImageResizer.Plugins.Basic.SizeLimiting().Install(this);
+            if (isAspNet) new ImageResizer.Plugins.Basic.SizeLimiting().Install(this);
 
-            if (System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath == null) {
+            if (isAspNet) {
                 //Not running asp.net app here. Load them immediately.
                 plugins.LoadPlugins();
             } else {            
