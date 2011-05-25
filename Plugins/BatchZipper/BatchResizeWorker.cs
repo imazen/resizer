@@ -163,7 +163,7 @@ namespace ImageResizer.Plugins.BatchZipper
             using (System.IO.FileStream s = System.IO.File.OpenRead(i.PhysicalPath)) CopyStreamTo(s, stream);
         }
         /// <summary>
-        /// Copies an read stream to a write stream.
+        /// Copies a read stream to a write stream.
         /// </summary>
         /// <param name="src"></param>
         /// <param name="dest"></param>
