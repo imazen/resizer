@@ -65,6 +65,7 @@ namespace ImageResizer.Resizing {
         /// This is taken to mean that the error has been resolved.
         /// Extensions should not throw an exception unless they wish to cause subsequent extensions to not execute.
         /// If extensions throw an ArgumentException or ExternalException, it will be wrapped in an ImageCorruptedException instance.
+        /// If the Bitmap class is used for decoding, read gdi-bugs.txt and make sure you set b.Tag to new BitmapTag(optionalPath,stream);
         /// </summary>
         public virtual Bitmap DecodeStreamFailed(Stream s, ResizeSettings settings, string optionalPath) {
             if (exts == null) return null;
@@ -75,7 +76,8 @@ namespace ImageResizer.Resizing {
             return null;
         }
         /// <summary>
-        /// Extend this to support alternate image source formats.
+        /// Extend this to support alternate image source formats. 
+        /// If the Bitmap class is used for decoding, read gdi-bugs.txt and make sure you set b.Tag to new BitmapTag(optionalPath,stream);
         /// </summary>
         /// <param name="s"></param>
         /// <param name="settings"></param>
@@ -104,6 +106,8 @@ namespace ImageResizer.Resizing {
         /// Called for Build() calls that want the result encoded. (Not for Bitmap Build(source,settings) calls.
         /// Only override this method if you need to replace the behavior of image encoding and image processing together, such as adding support
         /// for resizing multi-page TIFF files or animated GIFs.
+        /// 
+        /// Does NOT dispose of 'source' or 'source's underlying stream.
         /// </summary>
         /// <param name="source"></param>
         /// <param name="dest"></param>
@@ -120,6 +124,7 @@ namespace ImageResizer.Resizing {
         /// Most calls funnel through here. Default behavior configures an ImageState instance and calls Process(imageState); 
         /// Shouldn't be overriden for any reason I can think of - use the appropriate virtual method under Process().
         /// If an extension returns a Bitmap instance, it will be used instead of the default behavior.
+        /// Does NOT dispose of 'source' or 'source's underlying stream.
         /// </summary>
         /// <param name="source"></param>
         /// <param name="settings"></param>

@@ -1,0 +1,16 @@
+﻿
+This document describes several GDI+ bugs and how we avoid them.
+
+
+
+
+Image and Bitmap classes - they keep an unmanaged reference to the underlying stream open for the life of the object. 
+If the managed reference is garbage collected, operations will fail.
+They do not dispose of the underlying stream when disposed. 
+
+http://support.microsoft.com/kb/814675
+
+
+Cloning the image would cause all frames and metadata to be lost.
+
+We clone the stream into a memory stream. 
