@@ -92,7 +92,16 @@ namespace ImageResizer.Resizing {
         /// Disposes sourceBitmap, destGraphics, destBitmap, and copyAttributes if they are non-null
         /// </summary>
         public void Dispose() {
-            try { if (sourceBitmap != null) sourceBitmap.Dispose(); } finally {
+            try {
+                //Close the source file stream if tagged for disposal.
+                if (sourceBitmap != null) {
+                    if (sourceBitmap.Tag != null && sourceBitmap.Tag is BitmapTag) {
+                        System.IO.Stream s = ((BitmapTag)sourceBitmap.Tag).Source;
+                        if (s != null) s.Dispose();
+                    }
+                    sourceBitmap.Dispose();
+                }
+            } finally {
                 try {
                     if (destGraphics != null) destGraphics.Dispose();
                 } finally {
