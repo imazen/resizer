@@ -86,13 +86,15 @@ namespace ImageResizer
             public Bitmap bitmap;
         }
         /// <summary>
-        /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag. The Bitmap.tag may be virtual, relative, UNC, windows, or unix path. 
-        /// Accepts physical paths and application relative paths. (C:\... and ~/path) 
+        /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag in a BitmapTag instance. The Bitmap.Tag.Path value may be a virtual, relative, UNC, windows, or unix path. 
+        /// Does not dispose 'source' if it is a Stream or Image instance - that's the responsibility of the calling code.
         /// </summary>
-        /// <param name="source">May  be an instance of string, VirtualFile, IVirtualFile IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream</param>
+        /// <param name="source">May  be an instance of string, VirtualFile, IVirtualFile IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.  If passed an Image instance, the image will be cloned, which will cause metadata, indexed state, and any additional frames to be lost. Accepts physical paths and application relative paths. (C:\... and ~/path) </param>
         /// <param name="settings">Will ignore ICC profile if ?ignoreicc=true.</param>
-        /// <returns></returns>
+        /// <returns>A Bitmap. The .Tag property will include a BitmapTag instance. If .Tag.Source is not null, remember to dispose it when you dispose the Bitmap.</returns>
         public virtual Bitmap LoadImage(object source, ResizeSettings settings) {
+
+            bool disposeStream =!(source is Stream);
 
             //Fire PreLoadImage(source,settings)
             this.PreLoadImage(ref source, settings);
@@ -107,7 +109,7 @@ namespace ImageResizer
                 path = source as string;
                 //Convert app-relative paths to VirtualFile instances
                 if (path.StartsWith("~", StringComparison.OrdinalIgnoreCase)) {
-                    //TODO: add support for virtual files
+                    //TODO: add support for Ivirtual files
                     source = HostingEnvironment.VirtualPathProvider.GetFile(PathUtils.ResolveAppRelative(path));
                 }
             }
@@ -115,17 +117,15 @@ namespace ImageResizer
             //Bitmap
             if (source is Bitmap) return source as Bitmap;
             //Image
-            if (source is System.Drawing.Image) return new Bitmap((System.Drawing.Image)source);
+            if (source is System.Drawing.Image) return new Bitmap((System.Drawing.Image)source); //Note, this clones just the raw bitmap data - doesn't copy attributes, bit depth, or anything.
             //IVirtualBitmapFile
             if (source is IVirtualBitmapFile) {
                 b = ((IVirtualBitmapFile)source).GetBitmap();
-                if (b.Tag == null) b.Tag = ((IVirtualBitmapFile)source).VirtualPath;
+                if (b.Tag == null) b.Tag = new BitmapTag(((IVirtualBitmapFile)source).VirtualPath);
                 return b;
             }
 
 
-            //String, physical path
-            //VirtualFile
             
             
             Stream s = null;
@@ -135,7 +135,7 @@ namespace ImageResizer
             //HttpPostedFile
             else if (source is HttpPostedFile) {
                 path = ((HttpPostedFile)source).FileName;
-                s = ((HttpPostedFile)source).InputStream;
+                s = ((HttpPostedFile)source).InputStream; //NDJ: I read the source - this stream can be disposed with no effect... It's isolated from the underlying file stream.
             //VirtualFile
             } else if (source is VirtualFile) {
                 path = ((VirtualFile)source).VirtualPath;
@@ -151,31 +151,48 @@ namespace ImageResizer
             } else {
                  throw new ArgumentException("Paramater source may only be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.", "source");
             }
-            using (s) {
+            try {
                 try {
-                    try {
-                        b = this.DecodeStream(s, settings, path);
-                        if (b == null) b = DecodeStreamFailed(s, settings, path);
-                    } catch (Exception e) {
-                        //Start over
-                        if (s.CanSeek) s.Seek(0, SeekOrigin.Begin);
-                        b = DecodeStreamFailed(s, settings, path);
-                        if (b == null) throw e; //If none of the extensions loaded the image, throw the exception anyhow.
-                    }
-                } catch (ArgumentException ae) {
-                    ae.Data.Add("path", path);
-                    throw new ImageCorruptedException(loadFailureReasons, ae);
-                } catch (ExternalException ee) {
-                    ee.Data.Add("path", path);
-                    throw new ImageCorruptedException(loadFailureReasons, ee);
+                    //First try DecodeStream
+                    b = this.DecodeStream(s, settings, path);
+                    //Let the fallbacks work. (Only happens when a plugin overrides DecodeStream and retuns null)
+                    if (b == null) throw new ImageCorruptedException("Failed to decode image. Plugin made DecodeStream return null.", null);
+                } catch (Exception e) {
+                    //Start over - on error.
+                    if (s.CanSeek && s.Position != 0)
+                        s.Seek(0, SeekOrigin.Begin);
+                    //If we can't seek back to the beginning of the stream, we can't hope to decode it.
+                    else if (!s.CanSeek)
+                        throw new ImageCorruptedException("Cannot attempt fallback decoding path on a non-seekable stream", e);
+
+                    b = DecodeStreamFailed(s, settings, path);
+                    if (b == null) throw e; //If none of the extensions loaded the image, throw the exception anyhow.
                 }
+            } catch (ArgumentException ae) {
+                ae.Data.Add("path", path);
+                throw new ImageCorruptedException(loadFailureReasons, ae);
+            } catch (ExternalException ee) {
+                ee.Data.Add("path", path);
+                throw new ImageCorruptedException(loadFailureReasons, ee);
+            } finally {
+                //Now, we can't dispose the stream if Bitmap is still using it. 
+                if (b.Tag != null && b.Tag is BitmapTag && ((BitmapTag)b.Tag).Source == s) {
+                    //And, it looks like Bitmap is still using it.
+                    s = null;
+                }
+                //Dispose the stream if we opened it. If someone passed it to us, they're responsible.
+                if (s != null && disposeStream) s.Dispose();
+
+                //Make sure the bitmap is tagged with its path. DecodeStream usually handles this, only relevant for extension decoders.
+                if (b != null && b.Tag == null && path != null) b.Tag = new BitmapTag(path);
+
             }
-            if (b != null && b.Tag == null) b.Tag = path;
             return b;            
         }
 
         /// <summary>
-        /// Decodes the stream into a bitmap instance
+        /// Decodes the stream into a bitmap instance. As of 3.0.7, now ensures the stream can safely be closed after the method returns.
+        /// May copy the stream. The copied stream will be in b.Tag.Source. Does not close or dispose any streams.
         /// </summary>
         /// <param name="s"></param>
         /// <param name="settings"></param>
@@ -183,42 +200,74 @@ namespace ImageResizer
         /// <returns></returns>
         public override Bitmap DecodeStream(Stream s, ResizeSettings settings, string optionalPath) {
             Bitmap b = base.DecodeStream(s, settings, optionalPath);
+            if (b != null && b.Tag == null) b.Tag = new BitmapTag(optionalPath); //Assume Bitmap wasn't used.
             if (b != null) return b;
+
             bool useICM = true;
             if (settings != null && "true".Equals(settings["ignoreicc"], StringComparison.OrdinalIgnoreCase)) useICM = false;
 
-            //NDJ - May 24, 2011 - Copying stream into memory so it can be closed safely.
-            return new Bitmap(StreamUtils.CopyStream(s), useICM);
+            //NDJ - May 24, 2011 - Copying stream into memory so the original can be closed safely.
+            MemoryStream ms = StreamUtils.CopyStream(s);
+            b = new Bitmap(ms, useICM); 
+            b.Tag = new BitmapTag(optionalPath, ms); //May 25, 2011: Storing a ref to the MemorySteam so it won't accidentally be garbage collected.
+            return b;
         }
 
 
         /// <summary>
         /// Resizes and processes the specified source image and returns a bitmap of the result.
+        /// Note! 
         /// This method assumes that transparency will be supported in the final output format, and therefore does not apply a matte color. Use &amp;bgcolor to specify a background color
         /// if you use this method with a non-transparent format such as Jpeg.
+        /// If passed a source Stream, Bitmap, or Image instance, it will be disposed after use. Use disposeSource=False to disable that behavior. 
         /// </summary>
         /// <param name="source">May be an instance of string (a physical path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.</param>
         /// <param name="settings">Resizing and processing command to apply to the.</param>
         public virtual Bitmap Build(object source, ResizeSettings settings) {
+            return Build(source, settings, true);
+        }
+        /// <summary>
+        /// Resizes and processes the specified source image and returns a bitmap of the result.
+        /// Note! 
+        /// This method assumes that transparency will be supported in the final output format, and therefore does not apply a matte color. Use &amp;bgcolor to specify a background color
+        /// if you use this method with a non-transparent format such as Jpeg.
+        /// 
+        /// If passed a source Stream, Bitmap, or Image instance, it will not be disposed unless disposeSource=true.
+        /// </summary>
+        /// <param name="source">May be an instance of string (a physical path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.</param>
+        /// <param name="settings">Resizing and processing command to apply to the.</param>
+       
+        public virtual Bitmap Build(object source, ResizeSettings settings, bool disposeSource) {
             BitmapHolder bh = new BitmapHolder();
             Build(source, bh, settings);
             return bh.bitmap;
         }
 
         /// <summary>
-        /// Resizes and processes the specified source image and stores the encoded result in the specified destination. 
+        /// Resizes and processes the specified source image and stores the encoded result in the specified destination.
+        /// If passed a source Stream, Bitmap, or Image instance, it will be disposed after use. Use disposeSource=False to disable that behavior. 
         /// </summary>
-        /// <param name="source">May be an instance of string (a physical path or app-relative virtual path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream. app-relative virtual paths will use the VirtualPathProvider system</param>
+        /// <param name="source">May be an instance of string (a physical path or app-relative virtual path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream. App-relative virtual paths will use the VirtualPathProvider system</param>
         /// <param name="dest">May be a physical path (string), or a Stream instance. Does not have to be seekable.</param>
-        /// <param name="settings">Resizing and processing command to apply to the.</param>
+        /// <param name="settings">Resizing and processing command to apply to the image.</param>
         public virtual void Build(object source, object dest, ResizeSettings settings) {
-            ResizeSettings s = new ResizeSettings(settings);
+            Build(source, dest, settings, true);
+        }
 
+        /// <summary>
+        /// Resizes and processes the specified source image and stores the encoded result in the specified destination. 
+        /// If passed a source Stream, Bitmap, or Image instance, it will not be disposed unless disposeSource=true.
+        /// </summary>
+        /// <param name="source">May be an instance of string (a physical path or app-relative virtual path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream. App-relative virtual paths will use the VirtualPathProvider system</param>
+        /// <param name="dest">May be a physical path (string), or a Stream instance. Does not have to be seekable.</param>
+        /// <param name="settings">Resizing and processing command to apply to the image.</param>
+        /// <param name="disposeSource">True to dispose 'source' after use. False to leave intact.</param>
+        public virtual void Build(object source, object dest, ResizeSettings settings, bool disposeSource) {
+            ResizeSettings s = new ResizeSettings(settings);
             Bitmap b = null; 
             try {
-                
                 //Load image
-                b = LoadImage(source,settings);
+                b = LoadImage(source, settings);
 
                 
                 //Fire PreAcquireStream(ref dest, settings)
@@ -240,17 +289,29 @@ namespace ImageResizer
                 //Write to BitmapHolder
                 } else if (dest is BitmapHolder) {
                     ((BitmapHolder)dest).bitmap = buildToBitmap(b, s, true);
-                    b = null; //So the b.Dispose doesn't happen
                 } else throw new ArgumentException("Paramater dest may only be a string, Stream, or BitmapHolder", "dest");
 
             } finally {
-                if (b != null) b.Dispose();
+                //Get the source bitmap's underlying stream (may differ from 'source')
+                Stream underlyingStream = null;
+                if (b != null && b.Tag != null && b.Tag is BitmapTag) underlyingStream = ((BitmapTag)b.Tag).Source;
+
+                //Close the source bitamp's underlying stream unless it is the same stream we were passed.
+                if (underlyingStream != source && underlyingStream != null) underlyingStream.Dispose();
+
+                //Dispose the bitmap unless we were passed it
+                if (b != source) b.Dispose();
+
+                //Follow the disposeSource boolean.
+                if (disposeSource && source is IDisposable) ((IDisposable)source).Dispose();
+
             }
 
         }
+
         /// <summary>
         /// Override this when you need to override the behavior of image encoding and/or Bitmap processing
-        /// Not for external use.
+        /// Not for external use. Does NOT dispose of 'source' or 'source's underlying stream.
         /// </summary>
         /// <param name="source"></param>
         /// <param name="dest"></param>
@@ -266,7 +327,7 @@ namespace ImageResizer
 
         /// <summary>
         /// Override this when you need to override the behavior of Bitmap processing. 
-        /// Not for external use.
+        /// Not for external use. Does NOT dispose of 'source' or 'source's underlying stream.
         /// </summary>
         /// <param name="source"></param>
         /// <param name="settings"></param>
@@ -285,6 +346,9 @@ namespace ImageResizer
                 //Save a reference to return
                 b = state.destBitmap;
                 state.destBitmap = null; //So it doesn't get disposed yet
+
+                //Don't dispose the source bitmap either, just the graphics object.
+                state.sourceBitmap = null;
             }
             return b;
         }
