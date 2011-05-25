@@ -16,6 +16,7 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -23,12 +24,21 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Grid.Row="1" Text="Max Height" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="Height" VerticalAlignment="Center"/>
                 <TextBox x:Name="tbox_maxHeight" Grid.Column="2" Grid.Row="1" Margin="0,2"/>
 
 
-                <TextBlock Grid.Column="0" Grid.Row="0" Text="Max Width" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="0" Grid.Row="0" Text="Width" VerticalAlignment="Center"/>
                 <TextBox x:Name="tbox_maxWidth" Grid.Column="2" Grid.Row="0" Margin="0,2"/>
+
+                <CheckBox Grid.Row="2" Grid.ColumnSpan="3" Margin="0,5" Content="Upscale images that already smaller"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="Resize Mode" VerticalAlignment="Center"/>
+                <ComboBox x:Name="cbox_resizeMode" Grid.Row="3" Margin="0,2" SelectedIndex="0" HorizontalAlignment="Stretch" Grid.Column="3">
+                    <ComboBoxItem Content="Shrink"/>
+                    <ComboBoxItem Content="Shrink and pad to ratio"/>
+                    <ComboBoxItem Content="Shrink and crop to ratio"/>
+                </ComboBox>
 
             </Grid>
 

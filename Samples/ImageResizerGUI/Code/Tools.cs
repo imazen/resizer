@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.Win32;
 
 namespace ImageResizerGUI.Code
 {
@@ -59,6 +60,70 @@ namespace ImageResizerGUI.Code
                 }
             }
             return result;
+        }
+    }
+
+    class ContexMenuTools
+    {
+        //Extension - Extension of the file (.zip, .txt etc.)
+        //MenuName - Name for the menu item (Play, Open etc.)
+        //MenuDescription - The actual text that will be shown
+        //MenuCommand - Path to executable
+
+        /// <summary>
+        /// A simple C# function to add context menu items in Explorer
+        /// </summary>
+        /// <param name="Extension">Extension of the file (.zip, .txt etc.)</param>
+        /// <param name="MenuName">Name for the menu item (Play, Open etc.)</param>
+        /// <param name="MenuDescription">The actual text that will be shown</param>
+        /// <param name="MenuCommand">Path to executable</param>
+        /// <returns></returns>
+        private bool AddContextMenuItem(string Extension, string MenuName, string MenuDescription, string MenuCommand)
+        {
+            bool ret = false;
+
+            RegistryKey rkey = Registry.ClassesRoot.OpenSubKey(Extension);
+
+            if (rkey != null)
+            {
+                string extstring = rkey.GetValue("").ToString();
+
+                rkey.Close();
+
+                if (extstring != null)
+                {
+                    if (extstring.Length > 0)
+                    {
+                        rkey = Registry.ClassesRoot.OpenSubKey(extstring, true);
+
+                        if (rkey != null)
+                        {
+                            string strkey = "shell\\" + MenuName + "\\command";
+
+                            RegistryKey subky = rkey.CreateSubKey(strkey);
+
+                            if (subky != null)
+                            {
+                                subky.SetValue("", MenuCommand);
+
+                                subky.Close();
+
+                                subky = rkey.OpenSubKey("shell\\" + MenuName, true);
+
+                                if (subky != null)
+                                {
+                                    subky.SetValue("", MenuDescription);
+
+                                    subky.Close();
+                                }
+                                ret = true;
+                            }
+                            rkey.Close();
+                        }
+                    }
+                }
+            }
+            return ret;
         }
     }
 }

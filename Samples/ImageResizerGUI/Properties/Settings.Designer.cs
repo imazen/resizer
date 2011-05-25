@@ -22,5 +22,29 @@ namespace ImageResizerGUI.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string saveFolderPath {
+            get {
+                return ((string)(this["saveFolderPath"]));
+            }
+            set {
+                this["saveFolderPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string openFolderPath {
+            get {
+                return ((string)(this["openFolderPath"]));
+            }
+            set {
+                this["openFolderPath"] = value;
+            }
+        }
     }
 }

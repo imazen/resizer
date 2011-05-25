@@ -16,13 +16,28 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\dlls\debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -31,27 +46,18 @@
     <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\dlls\release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>ImageResizerGUI.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ImageResizer, Version=3.0.3.41813, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>binaries\ImageResizer.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ImageResizer.Plugins.BatchZipper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>binaries\ImageResizer.Plugins.BatchZipper.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Ionic.Zip">
-      <HintPath>binaries\Ionic.Zip.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -70,6 +76,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Program.cs" />
+    <Compile Include="Settings.cs" />
     <Page Include="AdvancedOptions.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -124,6 +132,76 @@
     <Resource Include="Images\folder.png" />
     <Resource Include="Images\image.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\image1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\ImageResizer.csproj">
+      <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
+      <Name>ImageResizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\AnimatedGifs\ImageResizer.Plugins.AnimatedGifs.csproj">
+      <Project>{D97EA32A-0845-4E00-9C4D-68C5B93A1869}</Project>
+      <Name>ImageResizer.Plugins.AnimatedGifs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\BatchZipper\ImageResizer.Plugins.BatchZipper.csproj">
+      <Project>{CDA9A53D-C190-4460-B5AF-F73132F56BFB}</Project>
+      <Name>ImageResizer.Plugins.BatchZipper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\PrettyGifs\ImageResizer.Plugins.PrettyGifs.csproj">
+      <Project>{BB8EEB97-6550-4780-97B2-B0F2FCD80970}</Project>
+      <Name>ImageResizer.Plugins.PrettyGifs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\PsdReader\ImageResizer.Plugins.PsdReader.csproj">
+      <Project>{BCF28DA2-AF29-4C09-B37D-059F40FC9B95}</Project>
+      <Name>ImageResizer.Plugins.PsdReader</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\dlls\release\ImageResizer.dll">
+      <Link>Resources\ImageResizer.dll</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\dlls\release\ImageResizer.Plugins.AnimatedGifs.dll">
+      <Link>Resources\ImageResizer.Plugins.AnimatedGifs.dll</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\dlls\release\ImageResizer.Plugins.BatchZipper.dll">
+      <Link>Resources\ImageResizer.Plugins.BatchZipper.dll</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\dlls\release\ImageResizer.Plugins.PrettyGifs.dll">
+      <Link>Resources\ImageResizer.Plugins.PrettyGifs.dll</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\dlls\release\ImageResizer.Plugins.PsdReader.dll">
+      <Link>Resources\ImageResizer.Plugins.PsdReader.dll</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\dlls\release\Ionic.Zip.dll">
+      <Link>Resources\Ionic.Zip.dll</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\dlls\release\PsdFile.dll">
+      <Link>Resources\PsdFile.dll</Link>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -132,4 +210,11 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="AfterResolveReferences">
+    <ItemGroup>
+      <EmbeddedResource Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.Extension)' == '.dll'">
+        <LogicalName>%(ReferenceCopyLocalPaths.DestinationSubDirectory)%(ReferenceCopyLocalPaths.Filename)%(ReferenceCopyLocalPaths.Extension)</LogicalName>
+      </EmbeddedResource>
+    </ItemGroup>
+  </Target>
 </Project>

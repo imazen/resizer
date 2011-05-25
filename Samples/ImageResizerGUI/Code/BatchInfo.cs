@@ -55,6 +55,7 @@ namespace ImageResizerGUI.Code
             {
                 status = value;
                 NotifyPropertyChanged("Status");
+                NotifyPropertyChanged("Color");
             }
         }
 
@@ -65,7 +66,6 @@ namespace ImageResizerGUI.Code
             {
                 statusText = value;
                 NotifyPropertyChanged("StatusText");
-                NotifyPropertyChanged("Color");
             }
         }
 
@@ -73,7 +73,7 @@ namespace ImageResizerGUI.Code
         {
             get
             {
-                if (StatusText == "Error")
+                if (Status == 50)
                     return new SolidColorBrush(Colors.Red);
                 return new SolidColorBrush(Colors.Black);
             }
