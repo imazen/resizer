@@ -12,6 +12,7 @@ using ImageResizer.Util;
 namespace ImageResizer.Plugins.Basic {
     public class DiagnosticPageHandler : IHttpHandler {
         Config c;
+
         public DiagnosticPageHandler(Config c) {
             this.c = c;
         }
@@ -59,7 +60,7 @@ namespace ImageResizer.Plugins.Basic {
 
             //Echo server assembly, iis version, OS version, and CLR version.
             sb.AppendLine("\nEnvironment information:\n");
-            string iis = context.Request.ServerVariables["SERVER_SOFTWARE"];
+            string iis = context != null ? context.Request.ServerVariables["SERVER_SOFTWARE"] : "NOT ASP.NET";
             if (!string.IsNullOrEmpty(iis)) iis += " on ";
             sb.AppendLine("Running " + iis +
                 System.Environment.OSVersion.ToString() + " and CLR " +
