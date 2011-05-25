@@ -3,9 +3,29 @@ using System;
 using System.Text;
 using System.Collections.Specialized;
 using System.Web;
+using System.IO;
 
 namespace ImageResizer.Util {
     public class PathUtils {
+
+        /// <summary>
+        /// Returns HostingEnvironment.ApplicationVirtualPath or "/", if asp.net is not running
+        /// </summary>
+        public static string AppVirtualPath {
+            get {
+                return HostingEnvironment.ApplicationVirtualPath != null ? HostingEnvironment.ApplicationVirtualPath : "/";
+            }
+        }
+        /// <summary>
+        /// If not running in ASP.NET, returns the folder containing the DLL.
+        /// </summary>
+        public static string AppPhysicalPath {
+            get {
+                return HostingEnvironment.ApplicationPhysicalPath != null ? HostingEnvironment.ApplicationPhysicalPath : Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+            }
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -54,7 +74,7 @@ namespace ImageResizer.Util {
         public static string MergeQueryString(string path, NameValueCollection newQuerystring) {
             NameValueCollection oldQuery = ParseQueryString(path);
             //Overwrite new with old
-            foreach (string key in oldQuery.AllKeys)
+            foreach (string key in oldQuery.Keys)
                 newQuerystring[key] = oldQuery[key];
 
             return AddQueryString(RemoveQueryString(path), BuildQueryString(newQuerystring));
