@@ -128,11 +128,14 @@ namespace ImageResizer.Plugins.BatchZipper
             this.jobId = jobId;
             this.destinationFile = destinationFile;
             this.files = files;
+            this.conf = Config.Current;
         }
         //Input settings
         public Guid jobId;
         public IList<BatchResizeItem> files;
         public string destinationFile;
+
+        public Config conf = null;
 
         //Progress/failure callbacks
         /// <summary>
@@ -238,10 +241,10 @@ namespace ImageResizer.Plugins.BatchZipper
             {
                 string originalName = System.IO.Path.GetFileName(i.PhysicalPath);
                 //Can we resize it?
-                if (Config.Current.Pipeline.IsAcceptedImageType(originalName))
+                if (conf.Pipeline.IsAcceptedImageType(originalName))
                 {
                     //Add the correct (possibly changed) file extension.
-                    i.TargetFilename += "." + Config.Current.Plugins.EncoderProvider.GetEncoder(new ResizeSettings(i.ResizeQuerystring), originalName).Extension;
+                    i.TargetFilename += "." + conf.Plugins.EncoderProvider.GetEncoder(new ResizeSettings(i.ResizeQuerystring), originalName).Extension;
                 }
                 else
                 {

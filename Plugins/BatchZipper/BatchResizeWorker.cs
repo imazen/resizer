@@ -138,7 +138,7 @@ namespace ImageResizer.Plugins.BatchZipper
         public bool wouldResize(BatchResizeItem i)
         {
             //Can we resize it?
-            bool resize = Config.Current.Pipeline.IsAcceptedImageType(i.PhysicalPath);
+            bool resize = s.conf.Pipeline.IsAcceptedImageType(i.PhysicalPath);
             //Are we doing anything to it?
             if (String.IsNullOrEmpty(i.ResizeQuerystring)) resize = false;
             return resize;
@@ -153,7 +153,7 @@ namespace ImageResizer.Plugins.BatchZipper
             BatchResizeItem i = items[entryName];
             if (wouldResize(i))
             {
-                ImageBuilder.Current.Build(i.PhysicalPath, stream, new ResizeSettings(i.ResizeQuerystring));
+                s.conf.CurrentImageBuilder.Build(i.PhysicalPath, stream, new ResizeSettings(i.ResizeQuerystring));
                 return; //We're done!
                 
             }
