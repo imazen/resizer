@@ -52,6 +52,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -78,6 +79,10 @@
     <ProjectReference Include="..\..\Plugins\PsdReader\ImageResizer.Plugins.PsdReader.csproj">
       <Project>{BCF28DA2-AF29-4C09-B37D-059F40FC9B95}</Project>
       <Name>ImageResizer.Plugins.PsdReader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\Watermark\ImageResizer.Plugins.Watermark.csproj">
+      <Project>{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}</Project>
+      <Name>ImageResizer.Plugins.Watermark</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
