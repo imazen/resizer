@@ -8,6 +8,7 @@ using System.IO;
 using System.Collections.Specialized;
 using ImageResizer.Plugins;
 using ImageResizer.Encoding;
+using ImageResizer.Resizing;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
@@ -151,6 +152,9 @@ namespace ImageResizer.Plugins.Basic {
             string path = original as string;
             
             if (path == null && original is Image) path = ((Image)original).Tag as string;
+
+            if (path == null && original is Image && ((Image)original).Tag is BitmapTag) path = ((BitmapTag)((Image)original).Tag).Path;
+
             //We have a path? Parse it!
             if (path != null) {
                 ImageFormat f = DefaultEncoder.GetImageFormatFromPhysicalPath(path);
