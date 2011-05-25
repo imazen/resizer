@@ -10,7 +10,7 @@
     <form id="form1" runat="server">
     <div>
     <p>CloudFront removes all querystrings. The CloudFront plugin allows querystrings to bypass the querystring guillotine by using ';' instead of '?' and '&'. </p>
-    <img src="red-leaf.jpg;width=100;height=200
+    <img src="red-leaf.jpg;width=100;height=200" />
     </div>
     </form>
 </body>
