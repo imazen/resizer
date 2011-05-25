@@ -251,7 +251,7 @@ namespace ImageResizer.Configuration {
         /// Returns a string of the diagnostics page
         /// </summary>
         /// <returns></returns>
-        private string GetDiagnosticsPage() {
+        public string GetDiagnosticsPage() {
             return new ImageResizer.Plugins.Basic.DiagnosticPageHandler(this).GenerateOutput(HttpContext.Current, this);
         }
     }
