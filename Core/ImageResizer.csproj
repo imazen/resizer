@@ -173,6 +173,7 @@
   <ItemGroup>
     <Content Include="bugs.txt" />
     <Content Include="exceptions.txt" />
+    <Content Include="gdi-bugs.txt" />
     <Content Include="license.txt" />
     <Content Include="plugins.txt" />
     <Content Include="plugin-notes.txt" />
