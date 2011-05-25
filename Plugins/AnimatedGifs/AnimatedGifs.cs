@@ -9,13 +9,16 @@ using System.Collections.Specialized;
 using System.Drawing;
 using ImageResizer.Resizing;
 using ImageResizer.Encoding;
+using ImageResizer.Configuration;
 namespace ImageResizer.Plugins.AnimatedGifs
 {
     public class AnimatedGifs : AbstractImageProcessor, IPlugin
     {
+        Config c;
         public AnimatedGifs(){}
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
+            this.c = c;
             return this;
         }
 
@@ -31,7 +34,7 @@ namespace ImageResizer.Plugins.AnimatedGifs
         /// <param name="dest"></param>
         /// <param name="settings"></param>
         protected override RequestedAction OnBuildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
-            IEncoder ios = Configuration.Config.Current.Plugins.EncoderProvider.GetEncoder(settings, source);
+            IEncoder ios = c.Plugins.EncoderProvider.GetEncoder(settings, source);
             //Determines output format, includes code for saving in a variety of formats.
             if (ios.MimeType.Equals("image/gif", StringComparison.OrdinalIgnoreCase) && //If it's a GIF
                 settings["frame"] == null &&    //With no frame specifier
