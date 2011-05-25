@@ -15,19 +15,22 @@ namespace ImageResizer.Plugins.Basic {
     public class Trial:BuilderExtension, IPlugin {
         public Trial() {
         }
-        public static void InstallPermanent(Config c){
+        public static void InstallPermanent(){
             //Re-install every request if it is removed
-            c.Pipeline.PreHandleImage += new PreHandleImageEventHandler(Pipeline_PreHandleImage);
+            Config.Current.Pipeline.PreHandleImage -= new PreHandleImageEventHandler(Pipeline_PreHandleImage);
+            Config.Current.Pipeline.PreHandleImage += new PreHandleImageEventHandler(Pipeline_PreHandleImage);
             //Install it.
-            if (!c.Plugins.Has<Trial>()) new Trial().Install(c);
+            if (!Config.Current.Plugins.Has<Trial>()) new Trial().Install(Config.Current);
         }
 
         static void Pipeline_PreHandleImage(System.Web.IHttpModule sender, System.Web.HttpContext context, Caching.IResponseArgs e) {
             if (!Config.Current.Plugins.Has<Trial>()) new Trial().Install(Config.Current);
         }
 
+        Config c;
         public IPlugin Install(Config c) {
             c.Plugins.add_plugin(this);
+            this.c = c;
             return this;
         }
 
@@ -54,7 +57,7 @@ namespace ImageResizer.Plugins.Basic {
 
             Interlocked.Increment(ref requestCount); //Track request count
 
-            string mode = Config.Current.get("trial.watermarkMode","After500");
+            string mode = c.get("trial.watermarkMode","After500");
             TrialWatermarkMode m = TrialWatermarkMode.After500;
             if ("always".Equals(mode, StringComparison.OrdinalIgnoreCase)) m = TrialWatermarkMode.Always;
             if ("randomly".Equals(mode, StringComparison.OrdinalIgnoreCase)) m = TrialWatermarkMode.Randomly;
