@@ -181,7 +181,7 @@ namespace ImageResizer
         /// <param name="settings"></param>
         /// <param name="optionalPath"></param>
         /// <returns></returns>
-        public virtual Bitmap DecodeStream(Stream s, ResizeSettings settings, string optionalPath) {
+        public override Bitmap DecodeStream(Stream s, ResizeSettings settings, string optionalPath) {
             Bitmap b = base.DecodeStream(s, settings, optionalPath);
             if (b != null) return b;
             bool useICM = true;
@@ -256,7 +256,7 @@ namespace ImageResizer
         /// <param name="dest"></param>
         /// <param name="settings"></param>
         protected virtual void buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
-            IEncoder e = Config.Current.Plugins.GetEncoder(settings,source);
+            IEncoder e = this.EncoderProvider.GetEncoder(settings,source);
             if (e == null) throw new ImageProcessingException("No image encoder was found for this request.");
             using (Bitmap b = buildToBitmap(source, settings,e.SupportsTransparency)) {//Determines output format, includes code for saving in a variety of formats.
                 //Save to stream
