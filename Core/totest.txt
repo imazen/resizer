@@ -1,6 +1,8 @@
 ﻿List of complex areas, best items to test.
 
 
+PathUtils
+
 ResponseHeaders.DefaultApplyToResponseMethod
 
 Configuration.Issues.IssueSink
