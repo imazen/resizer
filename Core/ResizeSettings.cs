@@ -103,18 +103,9 @@ namespace ImageResizer {
             this["crop"] = Utils.writeCrop(value, CropValues);  }}
 
         /// <summary>
-        /// The units used in the crop rectangle
+        /// 4 values specify x1,y1,x2,y2 values for the crop rectangle.
+        /// Negative values are relative to the bottom right - on a 100x100 picture, (10,10,90,90) is equivalent to (10,10,-10,-10). And (0,0,0,0) is equivalent to (0,0,100,100).
         /// </summary>
-        public CropUnits CropUnits {
-            get {
-                return Utils.parseCropUnits(this["cropUnits"]);
-            }
-            set {
-                this["cropUnits"] = Utils.writeCropUnits(value);
-            }
-        }
-
-
         protected double[] CropValues {
             get {
                 //Return (0,0,0,0) when null.
@@ -123,7 +114,7 @@ namespace ImageResizer {
             }
             set {
                 //If values are valid, CropMode.Custom will automatically be selected
-                if (value != null && value.GetLength(0) == 4) {
+                if (value != null && (value.GetLength(0) == 4)) {
                     Utils.writeCrop(ImageResizer.CropMode.Custom, value);
                 } else {
                     //Throw an exception if an invalid value is assigned when CropMode.Custom is in use.
@@ -133,6 +124,7 @@ namespace ImageResizer {
                 }
             }
         }
+
         public PointF CropTopLeft {
             get {
                 return new PointF((float)CropValues[0], (float)CropValues[1]);
@@ -147,9 +139,10 @@ namespace ImageResizer {
                 return new PointF((float)CropValues[2], (float)CropValues[3]);
             }
             set {
-                CropValues = new double[] {CropValues[0], CropValues[1], value.X, value.Y };
+                CropValues = new double[] { CropValues[0], CropValues[1], value.X, value.Y };
             }
         }
+
 
         public Color BackgroundColor {
             get { return Utils.parseColor(this[ "bgcolor"], Color.Transparent); }
@@ -205,21 +198,35 @@ namespace ImageResizer {
         
 
         public RectangleF getCustomCropSourceRect(SizeF imageSize) {
+            RectangleF defValue = new RectangleF(new PointF(0, 0), imageSize);
             double[] c = CropValues;
-            double x1 = c[0], y1 = c[1], x2 = c[2], y2 = c[3];
 
-            if (CropUnits == ImageResizer.CropUnits.Percentages) {
-                //Force all values to be between 0 and positive 1 inclusive.
-                x1 = Math.Max(Math.Min(1, x1), 0);
-                x2 = Math.Max(Math.Min(1, x2), 0);
-                y1 = Math.Max(Math.Min(1, y1), 0);
-                y2 = Math.Max(Math.Min(1, y2),0);
-                //Multiply by the width and height
-                x1 *= imageSize.Width;
-                x2 *= imageSize.Width;
-                y1 *= imageSize.Height;
-                y2 *= imageSize.Height;
+            //Step 1, parse units.
+            KeyValuePair<CropUnits, double> xunits = Utils.parseCropUnits(this["cropxunits"]);
+            KeyValuePair<CropUnits, double> yunits = Utils.parseCropUnits(this["cropyunits"]);
+
+            //Step 2, Apply units to values, resolving against imageSize
+            for (int i = 0; i < c.Length; i++){
+                bool xvalue = i % 2 == 0;
+                if (xvalue && xunits.Key == CropUnits.Custom) c[i] *= (imageSize.Width / xunits.Value);
+                if (!xvalue && yunits.Key == CropUnits.Custom) c[i] *= (imageSize.Height / yunits.Value);
+
+                //Prohibit values larger than imageSize
+                if (xvalue && c[i] > imageSize.Width) c[i] = imageSize.Width;
+                if (!xvalue && c[i] > imageSize.Height) c[i] = imageSize.Height;
             }
+
+            //Step 3, expand width/height crop to 4-value crop (not currently used)
+            if (c.Length == 2) {
+                if (c[0] < 1 || c[1] < 1) return defValue; //We can't do anything with negative values here
+                //Center horizontally and vertically.
+                double x = (imageSize.Width - c[0]) /2;
+                double y= (imageSize.Height - c[1]) /2;
+
+                c = new double[] { x, y, x + c[0], y + c[1] };
+            }
+
+            double x1 = c[0], y1 = c[1], x2 = c[2], y2 = c[3];
 
             //allow negative offsets 
             if (x1 < 0) x1 += imageSize.Width;

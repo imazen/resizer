@@ -168,18 +168,17 @@ namespace ImageResizer.Util {
             else if (value == StretchMode.Fill) return "fill";
             throw new NotImplementedException("Unrecognized ScaleMode value: " + value.ToString());
         }
-        public static CropUnits parseCropUnits(string value) {
-            if ("pc".Equals(value, StringComparison.OrdinalIgnoreCase)) return CropUnits.Percentages;
-            if ("pct".Equals(value, StringComparison.OrdinalIgnoreCase)) return CropUnits.Percentages;
-            if ("percent".Equals(value, StringComparison.OrdinalIgnoreCase)) return CropUnits.Percentages;
-            if ("percents".Equals(value, StringComparison.OrdinalIgnoreCase)) return CropUnits.Percentages;
-            if ("percentages".Equals(value, StringComparison.OrdinalIgnoreCase)) return CropUnits.Percentages;
-            return CropUnits.Pixels;
+        public static KeyValuePair<CropUnits, double> parseCropUnits(string value) {
+            if (string.IsNullOrEmpty(value)) return new KeyValuePair<CropUnits, double>(CropUnits.SourcePixels, default(double));
+
+            double temp;
+            if (double.TryParse(value, out temp) && temp > 0) return new KeyValuePair<CropUnits, double>(CropUnits.Custom, temp);
+            else return new KeyValuePair<CropUnits, double>(CropUnits.SourcePixels, default(double));
         }
-        public static string writeCropUnits(CropUnits value) {
-            if (value == CropUnits.Percentages) return "percentages";
-            else if (value == CropUnits.Pixels) return "pixels";
-            throw new NotImplementedException("Unrecognized CropUnits value: " + value.ToString());
+        public static string writeCropUnits(KeyValuePair<CropUnits, double> value) {
+            if (value.Key == CropUnits.Custom) return value.Value.ToString();
+            else if (value.Key == CropUnits.SourcePixels) return "sourcepixels";
+            else throw new NotImplementedException("Unrecognized CropUnits value: " + value.ToString());
         }
 
         public static ScaleMode parseScale(string value) {
@@ -211,7 +210,7 @@ namespace ImageResizer.Util {
             if ("auto".Equals(value, StringComparison.OrdinalIgnoreCase)) return new KeyValuePair<CropMode, double[]>(CropMode.Auto, null);
 
             double[] coords = parseList(value, double.NaN);
-            if (coords.Length == 4) return new KeyValuePair<CropMode,double[]>(CropMode.Custom,coords);
+            if (coords.Length == 4) return new KeyValuePair<CropMode, double[]>(CropMode.Custom, coords);
 
             //Default to none if unrecognized
             return new KeyValuePair<CropMode, double[]>(CropMode.None, null);
