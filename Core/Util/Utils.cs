@@ -169,6 +169,8 @@ namespace ImageResizer.Util {
             throw new NotImplementedException("Unrecognized ScaleMode value: " + value.ToString());
         }
         public static CropUnits parseCropUnits(string value) {
+            if ("pc".Equals(value, StringComparison.OrdinalIgnoreCase)) return CropUnits.Percentages;
+            if ("pct".Equals(value, StringComparison.OrdinalIgnoreCase)) return CropUnits.Percentages;
             if ("percent".Equals(value, StringComparison.OrdinalIgnoreCase)) return CropUnits.Percentages;
             if ("percents".Equals(value, StringComparison.OrdinalIgnoreCase)) return CropUnits.Percentages;
             if ("percentages".Equals(value, StringComparison.OrdinalIgnoreCase)) return CropUnits.Percentages;
