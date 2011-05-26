@@ -2,7 +2,7 @@
 
 This includes all plugins in the ImageResizer.Plugins.Basic namespace. (NoCache,DefaultEncoder,ClientCache,Caption,DropShadow,SizeLimiting, etc.)
 
-Visit http://imageresizingin.net/license/freedom for the latest version of the license.
+Visit http://imageresizing.net/license/freedom for the latest version of the license.
 
 #Image Resizer Freedom license
 
