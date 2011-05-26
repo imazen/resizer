@@ -1,7 +1,7 @@
 ﻿List of complex areas, best items to test.
 
 
-Verify all Build overloads handle streams appropriately.
+Verify all Build overloads handle streams appropriately with unit tests. We don't want any regressions.
 
 PathUtils
 
