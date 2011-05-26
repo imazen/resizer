@@ -16,7 +16,7 @@ namespace ImageResizer.Core.Tests.SiteMocks {
             "</configSections>";
 
         public string resizerTop =
-            "<resizer xmlns='http://imageresizingin.net/resizer.xsd'  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='resizer.xsd'>\n\n";
+            "<resizer xmlns='http://imageresizing.net/resizer.xsd'  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='resizer.xsd'>\n\n";
 
         public string resizerContents = "";
 

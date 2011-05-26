@@ -3,16 +3,16 @@
 This software can be licensed under any of the following licenses.
 
 1) The free Resizer Trial license, which allows everyone usage for development and testing purposes. 
-See http://imageresizingin.net/licenses/trial
+See http://imageresizing.net/licenses/trial
 
 2) The paid Resizer Professional licence, which allows usage, modification and certain kinds of redistribution.
-See http://imageresizingin.net/licenses/pro
+See http://imageresizing.net/licenses/pro
 
 3) The paid Resizer Enterprise licence (for businesses), which allows usage, modification and certain kinds of redistribution.
-See http://imageresizingin.net/licenses/enterprise
+See http://imageresizing.net/licenses/enterprise
 
 4) The Resizer Pro Client license, which can be granted to you by a holder of the Resizer Pro/Enterprise license, as part of a software deliverable.
-See http://imageresizingin.net/licenses/proclient
+See http://imageresizing.net/licenses/proclient
 
 
 
