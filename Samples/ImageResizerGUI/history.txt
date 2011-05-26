@@ -1,0 +1,3 @@
+﻿This application (The WPF GUI) was implemented by CodeSowers, a member of vWorker.com. Development was funded by Nathanael Jones. 
+It is licensed under the Freedom license. 
+
