@@ -57,7 +57,9 @@
     <Content Include="UploadSample.aspx" />
     <Content Include="Watermarks.aspx" />
     <Content Include="watermarks\Sun_256.png" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="404Test.aspx.cs">
