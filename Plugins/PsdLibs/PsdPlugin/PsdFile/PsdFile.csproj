@@ -108,9 +108,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="FourCC.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="FourCC.txt" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="license.txt" />
