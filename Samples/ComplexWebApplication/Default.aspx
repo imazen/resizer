@@ -63,6 +63,14 @@
     <img id="Img7" src="tractor.jpg?crop=auto&width=300&height=150" runat="server" 
     title="Cropping out to 300x150 square using ?crop=auto&width=300&height=150"
     />
+    <p>Cropping can also be done against arbitrary scales, which is very useful for jQuery jCrop interfaces. 
+    Example to crop 10% off each edge: crop=(.1,.1,.9,.9)&cropxunits=1&cropyunits=1 
+    Example to crop an image relative to the 'final' coordinates, without knowing the original size. Ex. crop=(20,30,400,350)&cropxunits=500&cropxunits=390</p>
+    <img id="Img3" src="tractor.jpg?width=200" runat="server" 
+    title="original"
+    /> <img id="Img2" src="tractor.jpg?crop=(.1,.1,.9,.9)&cropxunits=1&cropyunits=1&width=200" runat="server" 
+    title="Cropping 10% off each edge using ?crop=(.1,.1,.9,.9)&cropxunits=1&cropyunits=1"
+    />
     <h2>Rotation</h2>
     <p>Rotation is easy - just specify the number of degrees. You may want to set bgcolor also.</p>
     <img id="Img8" src="red-leaf.jpg?rotate=30&maxwidth=100" runat="server" 
