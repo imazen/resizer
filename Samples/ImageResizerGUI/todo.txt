@@ -1,0 +1,8 @@
+﻿Extract background worker to class.
+Message boxes shouldn't ever be displayed when dragging or pasting files into the box.
+Destination path should be editable.
+ResizeMode should use an enumeration instead of magic numbers
+Region areas should be removed - they're counterproductive, and make it harder to read code. Generally, they're a sign that the class needs to be broken down into smaller pieces.
+
+Settings serializion path should be simpler and correct. Currently, the drop-down is not serialized or deserialized.
+
