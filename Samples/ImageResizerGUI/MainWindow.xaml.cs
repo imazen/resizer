@@ -51,8 +51,7 @@ namespace ImageResizerGUI
         {
             InitializeComponent();
 
-            Config.Current.Plugins.Get<IPlugin>().Uninstall(Config.Current);
-
+            
             // Install Plugins
             new AnimatedGifs().Install(Config.Current);
             new PrettyGifs().Install(Config.Current);
