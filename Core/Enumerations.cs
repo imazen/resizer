@@ -71,11 +71,20 @@ namespace ImageResizer {
         /// <summary>
         /// Indicates the crop units are pixels on the original image.
         /// </summary>
-        Pixels,
+        SourcePixels,
+        /// <summary>
+        /// Indicates a custom range is being specified for the values. Base 0.
+        /// </summary>
+        Custom
+
+
+       
         /// <summary>
         /// Indicates that the crop values are between 0 and 1 and indicate the percent of the original image surface to start and stop at.
         /// </summary>
-        Percentages
+        //WidthPercentage,
+        //HeightPercentage,
+
     }
 
 }
