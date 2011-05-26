@@ -49,6 +49,24 @@ namespace SampleProject {
         protected global::System.Web.UI.HtmlControls.HtmlImage Img7;
         
         /// <summary>
+        /// Img3 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlImage Img3;
+        
+        /// <summary>
+        /// Img2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlImage Img2;
+        
+        /// <summary>
         /// Img8 control.
         /// </summary>
         /// <remarks>
