@@ -29,6 +29,19 @@ namespace ImageResizerGUI
             // avoid non-numerical data
             tbox_maxHeight.PreviewTextInput += tbox_PreviewTextInput;
             tbox_maxWidth.PreviewTextInput += tbox_PreviewTextInput;
+            cbox_resizeMode.SelectionChanged += cbox_resizeMode_SelectionChanged;
+
+            Loaded += AdvancedOptions_Loaded;
+        }
+
+        void AdvancedOptions_Loaded(object sender, RoutedEventArgs e)
+        {
+            tbox_query.Text = QueryString;
+        }
+
+        void cbox_resizeMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            tbox_query.Text = QueryString;
         }
 
         void tbox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -61,6 +74,21 @@ namespace ImageResizerGUI
             this.Hide();
         }
 
-
+        public string QueryString
+        {
+            get
+            {
+                switch (cbox_resizeMode.SelectedIndex)
+                {
+                    case 0: //Shrink
+                        return "maxwidth=" + tbox_maxWidth.Text + "&maxheight=" + tbox_maxHeight.Text;
+                    case 1: //Shrink and pad to ratio
+                        return "width=" + tbox_maxWidth.Text + "&height=" + tbox_maxHeight.Text;
+                    case 2: //Shrink and crop to ratio
+                        return "width=" + tbox_maxWidth.Text + "&height=" + tbox_maxHeight.Text + "&crop=auto";
+                } 
+                return "error";
+            }
+        }
     }
 }
