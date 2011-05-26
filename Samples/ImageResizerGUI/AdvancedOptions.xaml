@@ -45,6 +45,7 @@
         </Border>
 
         <Grid Grid.Row="1" Margin="4">
+            <TextBlock x:Name="tbox_query" Text="query" Foreground="Brown" Margin="5"/>
             <Button Content="OK" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="100" Click="Button_Click_1" />
             <Button Content="Cancel" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="100" Click="Button_Click" />
         </Grid>

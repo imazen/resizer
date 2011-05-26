@@ -7,6 +7,7 @@ using System.Windows;
 using System.Linq;
 using System.Windows.Forms;
 using ImageResizer.Configuration;
+using ImageResizer.Plugins;
 using ImageResizerGUI.Code;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using ImageResizer;
@@ -50,10 +51,14 @@ namespace ImageResizerGUI
         {
             InitializeComponent();
 
+            Config.Current.Plugins.Get<IPlugin>().Uninstall(Config.Current);
+
             // Install Plugins
             new AnimatedGifs().Install(Config.Current);
             new PrettyGifs().Install(Config.Current);
             new PsdReader().Install(Config.Current);
+
+
 
             aOptions = new AdvancedOptions(this);
 
@@ -66,7 +71,7 @@ namespace ImageResizerGUI
             Closing += MainWindow_Closing;
             listView.Drop += listView_Drop;
             KeyDown += MainWindow_KeyDown;
-            
+
             comboBox_exportAction.SelectionChanged += comboBox_exportAction_SelectionChanged;
             comboBox_exportAction.SelectedIndex = 1;
             saveMode = SaveMode.ExportResults;
@@ -80,20 +85,21 @@ namespace ImageResizerGUI
             get
             {
                 var rs = new ResizeSettings();
+
                 int height = int.Parse(tbox_height.Text);
                 int width = int.Parse(tbox_width.Text);
 
                 switch (aOptions.cbox_resizeMode.SelectedIndex)
                 {
-                    case 0:
+                    case 0: //Shrink
                         rs.MaxHeight = height;
                         rs.MaxWidth = width;
                         break;
-                    case 1:
+                    case 1: //Shrink and pad to ratio
                         rs.Height = height;
                         rs.Width = width;
                         break;
-                    case 2:
+                    case 2: //Shrink and crop to ratio
                         rs.Height = height;
                         rs.Width = width;
                         rs.CropMode = CropMode.Auto;
@@ -133,15 +139,12 @@ namespace ImageResizerGUI
                 // Code to read the contents of the text file
                 if (File.Exists(fileLoc))
                 {
-                    listView.Items.Add(new BatchInfo(fileLoc));
+                    AddFileToBatch(fileLoc);
                 }
+
                 if (Directory.Exists(fileLoc))
                 {
-                    var files = FileTools.GetFilesRecursive(fileLoc);
-
-                    foreach (var fileName in files)
-                        if (!ImageInserted(fileName))
-                            listView.Items.Add(new BatchInfo(fileName));
+                    AddDirectoryToBatch(fileLoc);
                 }
             }
         }
@@ -354,7 +357,7 @@ namespace ImageResizerGUI
 
         void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            aOptions.SetData(UserResizeSettings.MaxHeight, UserResizeSettings.MaxWidth);
+            aOptions.SetData(int.Parse(tbox_height.Text), int.Parse(tbox_width.Text));
             aOptions.ShowDialog();
         }
 
@@ -516,7 +519,7 @@ namespace ImageResizerGUI
                 return false;
             }
 
-            var extensions = ImageResizer.ImageBuilder.Current.GetSupportedFileExtensions();
+            var extensions = ImageBuilder.Current.GetSupportedFileExtensions();
 
             foreach (var ext in extensions)
                 if (file.ToLower().EndsWith("." + ext.ToLower()))
@@ -527,6 +530,8 @@ namespace ImageResizerGUI
                         MessageBox.Show("The file: " + file + " is already inserted.", "Duplicated Items");
                     return true;
                 }
+
+            MessageBox.Show(file + " is not an image file.", "Supported Items");
 
             return false;
         }
