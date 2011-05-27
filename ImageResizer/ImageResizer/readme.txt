@@ -1,4 +1,13 @@
-﻿**
+﻿Version 2.X will not be supported after Jun 15, 2011. 
+
+Version 3 was released Apr. 24, and contains hundreds of bug fixes and improvements.
+
+E-mail support@imageresizing.net if you need help with the migration process. 
+
+A complete migration guide is available at http://imageresizing.net/docs/2to3/
+
+
+**
 Overview of source files
 **
 
@@ -29,6 +38,22 @@ EXIF data is removed - by design. EXIF data bloats the image file, and can somet
 **
 
 Changelog, by version
+
+Changes since v.2.6 (v2.8)
+
+Fixed serious limitation of ImageResizerMaxWidth/Height settings. **Important!**
+
+These settings only control the size of the photo portion of the image. They do not limit the dimensions of the resulting bitmap. 
+By using paddingWidth=100000, an attacker could perform a denial-of-service attack against the server to deprive it of RAM.
+New behavior: When the final dimensions of an image would exceed 2x the configured max width and height, 
+the request will be ignored with the following message: "The specified image will be more the 2x the permitted size. Request terminated."
+
+Fixed bug: Mime-type: image/x-png was being sent instead of image/png. **Causes Chrome to download images instead of displaying them.**
+Fixed bug in disk caching system: **Cached files modified by just one day or one hour don't get updated.**
+Fixed bug where **specifying both width and maxheight would cause width to be ignored.**
+Fixed bug: Two simultaneous ImageManager.getBestInstance() calls at app startup could return two different instances.
+Fixed bug causing Dictionary exception on the first request after the app was restarted. Only occurred if two simultaneous requests occurred. Only would happen once per app lifetime. 
+Fixed potential bug: **Extremely** rare Access Denied message occurring on one of 2 simultaneous requests for a newly added source image. No reported occurrences. 
 
 Changes since 2.1b (v2.6)  
 **************************************

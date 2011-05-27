@@ -3,6 +3,10 @@
  * http://nathanaeljones.com
  * nathanael.jones@gmail.com
  * 
+ * This is a discontinued version of the Image Resizer, and is being replaced by Version 3.
+ * Visit http://imageresizing.net/ to download version 3.
+ * Complete migration docs are available at: http://imageresizing.net/docs/2to3/
+ * 
  * Although I typically release my components for free, I decided to charge a 
  * 'download fee' for this one to help support my other open-source projects. 
  * Don't worry, this component is still open-source, and the license permits 
