@@ -83,6 +83,7 @@
     <Compile Include="ImageResizer\ImageManager.cs" />
     <Compile Include="ImageResizer\ImageSettings.cs" />
     <Compile Include="ImageResizer\InterceptModule.cs" />
+    <Compile Include="ImageResizer\LockProvider.cs" />
     <Compile Include="ImageResizer\OctreeQuantizer.cs" />
     <Compile Include="ImageResizer\PolygonMath.cs" />
     <Compile Include="ImageResizer\Quantizer.cs" />

@@ -84,68 +84,23 @@ namespace fbs.ImageResizer
             {
                 //Create or obtain a blank object for locking purposes. Store or retrieve using the filename as a key.
                 string key = cachedFilename.ToLower();
-
-                object fileLock = null;
-                lock (fileLocks) //We have to lock the dictionary, since otherwise two locks for the same file could be created and assigned at the same time. (i.e, between ContainsKey and the assignment)
-                {
-                    if (fileLocks.ContainsKey(key))
-                        fileLock = fileLocks[key];
-                    else
-                        fileLocks[key] = fileLock = new Object();//make new lock
-                }
-                //We should now have an exclusive lock for this filename.  We're only going to hold this thread open for fileLockTimeout ms - too many threads blocked kills performance.
-                //We don't use a standard lock{}, since that could block as long as the underlying I/O calls.
-                if (System.Threading.Monitor.TryEnter(fileLock,fileLockTimeout))
-                {
-                    try
-                    {
-                        if ((ignoreModifiedDate && IsCachedVersionValid(cachedFilename)) || !IsCachedVersionValid(getSourceModifiedDateUTC(), cachedFilename))
-                        {
-                            //Create subdirectory if needed.
-                            if (!Directory.Exists(Path.GetDirectoryName(cachedFilename)))
-                            {
-                                Directory.CreateDirectory(Path.GetDirectoryName(cachedFilename));
-                            }
-                            updateCallback();
-                            filesUpdatedSinceCleanup++;
-                            //Update the write time to match - this is how we know whether they are in sync.
-                            if (!ignoreModifiedDate) System.IO.File.SetLastWriteTimeUtc(cachedFilename,getSourceModifiedDateUTC());
+                return lockProvider.TryExecute(key, fileLockTimeout, delegate() {
+                    if ((ignoreModifiedDate && IsCachedVersionValid(cachedFilename)) || !IsCachedVersionValid(getSourceModifiedDateUTC(), cachedFilename)) {
+                        //Create subdirectory if needed.
+                        if (!Directory.Exists(Path.GetDirectoryName(cachedFilename))) {
+                            Directory.CreateDirectory(Path.GetDirectoryName(cachedFilename));
                         }
+                        updateCallback();
+                        filesUpdatedSinceCleanup++;
+                        //Update the write time to match - this is how we know whether they are in sync.
+                        if (!ignoreModifiedDate) System.IO.File.SetLastWriteTimeUtc(cachedFilename, getSourceModifiedDateUTC());
                     }
-                    finally
-                    {
-                        //release lock
-                        System.Threading.Monitor.Exit(fileLock);
-                    }
-                }
-                else
-                {
-                    //Only one resize operation on a source file occurs at a time.
-                    //fileLockTimeout was not enough to acquire a lock on the file
-                    return false;
-                }
-                //Attempt cleanup of lock objects. TryEnter() failes if there is anybody else holding the lock at that moment
-                if (System.Threading.Monitor.TryEnter(fileLocks))
-                {
-                    try
-                    {
-                        if (System.Threading.Monitor.TryEnter(fileLock)) //Try entering on the file-specific lock. 
-                        {
-                            try{ fileLocks.Remove(key);  } //It succeeds, so no-one else is locking on it - clean it up.
-                            finally { System.Threading.Monitor.Exit(fileLock); }
-                        }
-                    }
-                    finally { System.Threading.Monitor.Exit(fileLocks); }
-                }
-                //Ideally the only objects in fileLocks will be open operations now.
-                
+                });  
             }
             return true;
         }
-        /// <summary>
-        /// The only objects in this collection should be for open files. 
-        /// </summary>
-        private static Dictionary<String, Object> fileLocks = new Dictionary<string, object>();
+
+        private static LockProvider lockProvider = new LockProvider();
 
         private static void LogWarning(String message)
         {
