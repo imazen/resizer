@@ -35,7 +35,6 @@
 //Clear the image cache before upgrading.. .not sure why it's needed, but images appear corrupted...
 
 using System;
-using System.Data;
 using System.Configuration;
 using System.Web;
 using System.Web.Security;
