@@ -171,7 +171,7 @@ namespace fbs.ImageResizer
             {
                 string filePath = app.Context.Request.FilePath;
 
-                //Allows users to append .cd to all their image URLs instead of doing wildcard mapping.
+                //Allows users to append .ashx to all their image URLs instead of doing wildcard mapping.
                 string altExtension = ConfigurationManager.AppSettings["ResizeExtension"];
                 if (!string.IsNullOrEmpty(altExtension) && filePath.EndsWith(altExtension, StringComparison.OrdinalIgnoreCase))
                 {

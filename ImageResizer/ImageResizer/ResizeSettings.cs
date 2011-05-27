@@ -325,7 +325,7 @@ namespace fbs.ImageResizer
        
         /// </summary>
         /// <param name="imageSize">The dimensions of the source image</param>
-        /// <param name="q">The maximum (unrotated) bounds of the image.</param>
+        /// <param name="q">The maximum (unrotated, unpadded) bounds of the image.</param>
         /// <returns></returns>
         public  ImageSizingData CalculateSizingData(SizeF imageSize, SizeF finalSizeBounds)
         {
