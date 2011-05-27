@@ -366,7 +366,7 @@ namespace fbs.ImageResizer
         public static string GetContentTypeFromImageFormat(ImageFormat format)
         {
             if (format == ImageFormat.Png)
-                return "image/x-png";
+                return "image/png";
             else if (format == ImageFormat.Jpeg)
                 return "image/jpeg";
             else if (format == ImageFormat.Gif)
