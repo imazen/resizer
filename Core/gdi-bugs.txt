@@ -13,3 +13,6 @@ Cloning the image would cause all frames and metadata to be lost.
 We solve the issue by cloning the stream into a MemoryStream. We then place a reference to the MemoryStream inside the Bitmap.Tag.Source property, which keeps it alive for the duration of the Bitmap instance.
 
 All ImageResizer code first disposes Bitmap.Tag.Source, then the Bitmap itself.
+
+
+TODO: Investigate if this might be slowing things down at all: http://support.microsoft.com/kb/831419
