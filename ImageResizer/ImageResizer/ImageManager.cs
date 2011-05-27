@@ -451,6 +451,9 @@ namespace fbs.ImageResizer
             //Find the size
             SizeF box = PolygonMath.GetBoundingBox(all).Size;
 
+            //Verify the final size is not more than 2x the maximum permitted size, otherwise cancel the request.
+            if (box.Width > DiskCache.GetMaxWidth() * 2 || box.Height > DiskCache.GetMaxHeight() * 2) throw new HttpException(500, "The specified image will be more the 2x the permitted size. Request terminated.");
+
             //Create new bitmap using calculated size. 
             Bitmap b = new Bitmap((int)Math.Max(1, box.Width), (int)Math.Max(1, box.Height), PixelFormat.Format32bppArgb);
             
