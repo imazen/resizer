@@ -5,6 +5,3 @@ Version 3 was released Apr. 24, and contains hundreds of bug fixes and improveme
 E-mail support@imageresizing.net if you need help with the migration process. 
 
 A complete migration guide is available at http://imageresizing.net/docs/2to3/
-
-
-The V2 documentation can be found at http://nathanaeljones.com/products/asp-net-image-resizer-v2/

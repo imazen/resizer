@@ -6,6 +6,8 @@
  * This file is for user extension and modification (although all the source is!)
  * No restrictions on distribution of this file.
  * 
+ * This file will be replaced in V3 with events. See http://imageresizing.net/docs/2to3/ for details.
+ * 
  **/
 using System;
 using System.Collections.Generic;

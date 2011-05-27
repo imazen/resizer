@@ -1,12 +1,13 @@
-Upgrade notes are available online at
+Changelog is available at http://imageresizing.net/docs/v2/changelog
 
-http://nathanaeljones.com/products/asp-net-image-resizer/
+The upgrade notes for V2.6 to v2.8 are availabe at http://imageresizing.net/releases/2-8
 
+IMPORTANT NOTICE: 
 
+Version 2.X will not be supported after Jun 15, 2011. 
 
-It is recommended that you delete the /imagecache/ folder when changing versions. 
+Version 3 was released Apr. 24, and contains hundreds of bug fixes and improvements.
 
+E-mail support@imageresizing.net if you need help with the migration process. 
 
-
-Also, pay attention to required changes in your web.config settings.
-
+A complete migration guide is available at http://imageresizing.net/docs/2to3/

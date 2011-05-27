@@ -3,6 +3,7 @@
  * http://nathanaeljones.com
  * nathanael.jones@gmail.com
  * 
+ * This file is being discontinued in V3. 
  * 
  **/
 
