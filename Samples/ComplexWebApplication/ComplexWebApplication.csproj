@@ -44,11 +44,17 @@
     <Content Include="404Test.aspx" />
     <Content Include="BatchResizeAndZip.aspx" />
     <Content Include="CloudFront.aspx" />
+    <Content Include="CropExample.aspx" />
+    <Content Include="css\Jcrop.gif" />
+    <Content Include="css\jquery.Jcrop.css" />
     <Content Include="Default.aspx" />
     <Content Include="Dithering.aspx" />
     <Content Include="FriendlyUrlsTest.aspx" />
     <Content Include="Global.asax" />
     <Content Include="GradientTest.aspx" />
+    <Content Include="js\jquery.Jcrop.js" />
+    <Content Include="js\jquery.Jcrop.min.js" />
+    <Content Include="js\jquery.min.js" />
     <Content Include="Protected\rose-leaf.jpg" />
     <Content Include="RegressionTests.aspx" />
     <Content Include="ResizeInPlaceTest.aspx" />
@@ -82,6 +88,13 @@
     </Compile>
     <Compile Include="CloudFront.aspx.designer.cs">
       <DependentUpon>CloudFront.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="CropExample.aspx.cs">
+      <DependentUpon>CropExample.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CropExample.aspx.designer.cs">
+      <DependentUpon>CropExample.aspx</DependentUpon>
     </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
