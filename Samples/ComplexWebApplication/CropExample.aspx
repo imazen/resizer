@@ -51,7 +51,8 @@
             //Set the values explicitly.
             divPreview.css({
                 width: previewMaxWidth + 'px',
-                height: previewMaxHeight + 'px'
+                height: previewMaxHeight + 'px',
+                overflow:'hidden'
             });
 
             //Create another child div and style it to form a 'clipping rectangle' for the preview div.
@@ -86,8 +87,16 @@
                 innerPreview.css({
                     width: Math.ceil(innerWidth) + 'px',
                     height: Math.ceil(innerHeight) + 'px',
+                    marginTop: (previewMaxHeight - innerHeight) / 2 + 'px',
+                    marginLeft: (previewMaxWidth - innerWidth) / 2 + 'px',
                     overflow: 'hidden'
                 });
+                //Set the outer div's padding so it stays centered
+                divPreview.css({
+                    
+                });
+
+
 
                 //Calculate how much we are shrinking the image inside the preview window
                 var scalex = innerWidth / coords.w;
@@ -124,7 +133,8 @@
             }
            
             //Start up jCrop
-            image.Jcrop({
+            var jcrop_reference = $.Jcrop(image);
+            jcrop_reference.setOptions({
                 onChange: update,
                 onSelect: update,
                 aspectRatio: forcedRatio,
@@ -133,7 +143,20 @@
             });
 
             //Call the function to init the preview windows
-            update({x:0,y:0,x2:image.width(),y2:image.height(),w:image.width(),h:image.height()});
+            update({ x: 0, y: 0, x2: image.width(), y2: image.height(), w: image.width(), h: image.height() });
+
+            //Handle the 'lock ratio' checkbox change vent
+            container.find('.keepAspectRatio').change(function (e) {
+                //Update keepRatio value
+                keepRatio = this.checked;
+
+                //Update the forcedRatio value
+                forcedRatio = keepRatio ? originalRatio : null;
+
+                //Update the jcrop settings
+                jcrop_reference.setOptions({ aspectRatio: forcedRatio });
+                jcrop_reference.focus();
+            });
 
         }
 
@@ -153,7 +176,7 @@
 <body>
     <form id="form1" runat="server">
     <div>
-        <h1>Client-side preview, server-side final rendering</h1>
+        <h1>Combining jCrop with server-side resizing and cropping</h1>
         <div class="image-cropper">
             <table>
                 <tr>
@@ -164,10 +187,10 @@
                         <div style="margin:50px; width:200px; text-align:center">
                             <div class="preview" style="width:200px;height:200px">
                             </div>
-                            <input type="checkbox" class="keepAspectRatio" /> Keep aspect ratio
+                            <input type="checkbox" class="keepAspectRatio" /> Lock aspect ratio<br />
                             
-                            <label>Width: </label><input type="text" class="width" value="800" /><br />
-                            <label>Height: </label><input type="text" class="height" value="600" /><br />
+                            Max width:<input type="text" class="width" value="800" /><br />
+                            Max height:<input type="text" class="height" value="600" /><br />
                             <a class="result" href="#">View the result</a><br />
                             <input id='img1' type="hidden" class="result" value="" runat="server" />
                             <input type="submit" value="Send result to server" />
