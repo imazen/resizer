@@ -308,6 +308,9 @@ namespace ImageResizer.Plugins.DiskCache {
             CachedFolder f = getOrCreateFolder(relativePath, true);
             foreach (string s in physicalFiles) {
                 string local = s.Substring(s.LastIndexOf(System.IO.Path.DirectorySeparatorChar) + 1);
+                //Todo, add a callback that handles exclusion of files
+                if (local.EndsWith(".config", StringComparison.OrdinalIgnoreCase)) continue; 
+
                 //What did we have on file?
                 CachedFileInfo old = null;
                 lock (_sync) {
