@@ -9,6 +9,7 @@ using System.IO;
 using ImageResizer.Caching;
 using ImageResizer.Configuration;
 using System.Web.Hosting;
+using ImageResizer.Configuration.Issues;
 
 namespace ImageResizer.Plugins.DiskCache
 {
@@ -27,7 +28,7 @@ namespace ImageResizer.Plugins.DiskCache
     /// <summary>
     /// Provides methods for creating, maintaining, and securing the disk cache. 
     /// </summary>
-    public class DiskCache: ICache, IPlugin
+    public class DiskCache: ICache, IPlugin, IIssueProvider
     {
         private int subfolders = 32;
         /// <summary>
@@ -153,6 +154,7 @@ namespace ImageResizer.Plugins.DiskCache
             VirtualCacheDir = c.get("diskcache.dir", VirtualCacheDir);
             HashModifiedDate = c.get("diskcache.hashModifiedDate", HashModifiedDate);
             CacheAccessTimeout = c.get("diskcache.cacheAccessTimeout", CacheAccessTimeout);
+            CleanupStrategy.LoadFrom(c.getNode("cleanupStrategy"));
         }
 
 
@@ -274,6 +276,14 @@ namespace ImageResizer.Plugins.DiskCache
         }
 
 
-       
+
+
+        public IEnumerable<IIssue> GetIssues() {
+            List<IIssue> issues = new List<IIssue>(cleaner.GetIssues());
+            if (string.IsNullOrEmpty(VirtualCacheDir)) issues.Add(new Issue("DiskCache", "cacheDir is empty. Cannot operate", null, IssueSeverity.ConfigurationError));
+            if (!Started) issues.Add(new Issue("DiskCache", "DiskCache is not running. Verify cacheDir is a valid path and enabled=true.", null, IssueSeverity.ConfigurationError));
+            
+            return issues;
+        }
     }
 }

@@ -19,6 +19,24 @@ namespace ImageResizer.Plugins.DiskCache.Cleanup {
                 queue.AddLast(item);
             }
         }
+        /// <summary>
+        /// Queues the item if no other identical items exist in the queue. Returns true if the item was added.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public bool QueueIfUnique(CleanupWorkItem item) {
+            lock (_sync) {
+                bool unique = !queue.Contains(item);
+                if (unique) queue.AddLast(item);
+                return unique;
+            }
+        }
+
+        public bool Exists(CleanupWorkItem item) {
+            lock (_sync) {
+                return queue.Contains(item);
+            }
+        }
         public void Insert(CleanupWorkItem item) {
             lock (_sync) {
                 queue.AddFirst(item);
@@ -52,10 +70,14 @@ namespace ImageResizer.Plugins.DiskCache.Cleanup {
 
         public bool IsEmpty {
             get {
-                lock (_sync) return queue.Count > 0;
+                lock (_sync) return queue.Count <= 0;
             }
         }
-
+        public int Count {
+            get {
+                lock (_sync) return queue.Count;
+            }
+        }
         public void Clear() {
             lock (_sync) {
                 queue.Clear();

@@ -5,9 +5,11 @@ using System.Text;
 using System.Threading;
 using ImageResizer.Plugins.DiskCache.Cleanup;
 using System.IO;
+using ImageResizer.Configuration.Issues;
+using System.Diagnostics;
 
 namespace ImageResizer.Plugins.DiskCache {
-    public class CleanupWorker : IDisposable {
+    public class CleanupWorker : IssueSink, IDisposable {
 
         Thread t = null;
         EventWaitHandle _queueWait = new AutoResetEvent(false);
@@ -15,7 +17,7 @@ namespace ImageResizer.Plugins.DiskCache {
         CleanupStrategy cs = null;
         CleanupQueue queue = null;
         CustomDiskCache cache = null;
-        public CleanupWorker(CleanupStrategy cs, CleanupQueue queue, CustomDiskCache cache) {
+        public CleanupWorker(CleanupStrategy cs, CleanupQueue queue, CustomDiskCache cache):base("DiskCache-CleanupWorker") {
             this.cs = cs;
             this.queue = queue;
             this.cache = cache;
@@ -101,7 +103,13 @@ namespace ImageResizer.Plugins.DiskCache {
             while (DateTime.UtcNow.Subtract(startedAt) < length && !queue.IsEmpty) {
                 //Check for shutdown
                 if (shuttingDown) return true;
-                DoTask(queue.Pop());
+                //try {
+                    DoTask(queue.Pop());
+                //} catch (Exception e) {
+                //    if (Debugger.IsAttached) throw;
+                        
+                //    this.AcceptIssue(new Issue("Failed exeuting task", e.Message + e.StackTrace, IssueSeverity.Critical));
+                //}
             }
 
             lock (_timesLock) lastWorked = DateTime.UtcNow.Ticks;
@@ -120,8 +128,38 @@ namespace ImageResizer.Plugins.DiskCache {
 
 
         protected void DoTask(CleanupWorkItem item) {
-            string baseRelative = item.RelativePath + "/";
-            string basePhysical = item.PhysicalPath + System.IO.Path.DirectorySeparatorChar;
+            Debug.WriteLine("Executing task " + item.Task.ToString() + " " + item.RelativePath + " (" + queue.Count.ToString() + " task remaining)");
+
+            //When removing a file, item.RelativePath and item.PhysicalPath might never exist.
+            if (item.Task == CleanupWorkItem.Kind.RemoveFile) {
+                LazyTaskProvider provider = item.LazyProvider;
+                bool removedFile = false;
+                while (item != null && !removedFile) {
+                    if (provider != null) item = provider(); //Keep asking for the next candidate on failure
+                    if (item == null) return; //No more files to try!
+                    cache.Locks.TryExecute(item.RelativePath, 10, delegate() {
+                        //If the file is already gone, consider the mission a succes.
+                        if (!System.IO.File.Exists(item.PhysicalPath)) {
+                            cache.Index.setCachedFileInfo(item.RelativePath, null);
+                            removedFile = true;
+                            return;
+                        }
+                        //Cool, we got a lock on the file.
+                        //Remove it from the cache. Better a miss than an invalidation.
+                        cache.Index.setCachedFileInfo(item.RelativePath, null);
+                        try {
+                            System.IO.File.Delete(item.PhysicalPath);
+                        } catch (IOException e) { return; } //Faild to get a file lock.
+
+                        cache.Index.setCachedFileInfo(item.RelativePath, null); //In case it crossed paths.
+                        removedFile = true;
+                    });
+                }
+                return;
+            }
+
+            string baseRelative = item.RelativePath.Length > 0 ? (item.RelativePath + "/") : "";
+            string basePhysical = item.PhysicalPath.TrimEnd(System.IO.Path.DirectorySeparatorChar) + System.IO.Path.DirectorySeparatorChar;
             if (item.Task == CleanupWorkItem.Kind.CleanFolderRecursive) {
                 if (cache.Index.GetIsValid(item.RelativePath)) {
                     //Ok, it's valid.
@@ -184,9 +222,8 @@ namespace ImageResizer.Plugins.DiskCache {
 
                 //Do the local work.
                 if (!cache.Index.GetIsValid(item.RelativePath)) {
-                    cache.Index.populateSubfolders(item.RelativePath, item.PhysicalPath);
-                    cache.Index.populateFiles(item.RelativePath, item.PhysicalPath);
-
+                    Debug.WriteLine("Querying filesystem about " + item.PhysicalPath);
+                    cache.Index.populate(item.RelativePath, item.PhysicalPath);
                 }
 
 
@@ -199,29 +236,7 @@ namespace ImageResizer.Plugins.DiskCache {
 
 
 
-            } else if (item.Task == CleanupWorkItem.Kind.RemoveFile) {
-                LazyTaskProvider provider = item.LazyProvider;
-                bool removedFile = false;
-                while (item != null && !removedFile) {
-                    if (provider != null) item = provider(); //Keep asking for the next candidate on failure
-                    cache.Locks.TryExecute(item.RelativePath, 10, delegate() {
-                        //If the file is already gone, consider the mission a succes.
-                        if (!System.IO.File.Exists(item.PhysicalPath)) {
-                            cache.Index.setCachedFileInfo(item.RelativePath, null);
-                            removedFile = true;
-                            return;
-                        }
-                        //Cool, we got a lock on the file.
-                        //Remove it from the cache. Better a miss than an invalidation.
-                        cache.Index.setCachedFileInfo(item.RelativePath, null);
-                        try {
-                            System.IO.File.Delete(item.PhysicalPath);
-                        } catch (IOException e) { return; } //Faild to get a file lock.
-
-                        cache.Index.setCachedFileInfo(item.RelativePath, null); //In case it crossed paths.
-                        removedFile = true;
-                    });
-                }
+            
             }
         }
 

@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using ImageResizer.Plugins.DiskCache.Cleanup;
+using ImageResizer.Configuration.Issues;
 
 namespace ImageResizer.Plugins.DiskCache {
 
    
-    public class CleanupManager:IDisposable {
+    public class CleanupManager:IIssueProvider, IDisposable {
         protected CustomDiskCache cache = null;
         protected CleanupStrategy cs = null;
         protected CleanupQueue queue = null;
@@ -30,6 +31,7 @@ namespace ImageResizer.Plugins.DiskCache {
             cache.Index.FileDisappeared += delegate(string relativePath, string physicalPath) {
                 //Stop everything ASAP and start a brand new cleaning run.
                 queue.ReplaceWith(new CleanupWorkItem(CleanupWorkItem.Kind.CleanFolderRecursive, "", cache.PhysicalCachePath));
+                worker.MayHaveWork();
             };
 
             worker = new CleanupWorker(cs,queue,cache);
@@ -49,22 +51,33 @@ namespace ImageResizer.Plugins.DiskCache {
         /// </summary>
         /// <param name="relativePath"></param>
         public void AddedFile(string relativePath) {
-            //TODO: this is bad. Cache checking is expensive, and should be delayed a lot
+
+            //TODO: Maybe we shouldn't compare the numbers every time a file is added? 
+
             int slash = relativePath.LastIndexOf('/');
             string folder = slash > -1 ? relativePath.Substring(0, slash) : "";
             char c = System.IO.Path.DirectorySeparatorChar;
-            queue.Queue(new CleanupWorkItem(CleanupWorkItem.Kind.CleanFolderRecursive, folder, cache.PhysicalCachePath.TrimEnd(c) + c + folder.Replace('/',c).Replace('\\',c).Trim(c)));
-            worker.MayHaveWork();
+            string physicalFolder =  cache.PhysicalCachePath.TrimEnd(c) + c + folder.Replace('/',c).Replace('\\',c).Trim(c);
+
+            //Only queue the item if it doesn't already exist.
+            if (queue.QueueIfUnique(new CleanupWorkItem(CleanupWorkItem.Kind.CleanFolderRecursive, folder,physicalFolder)))
+                worker.MayHaveWork();
         }
 
         public void CleanAll() {
-            queue.Queue(new CleanupWorkItem(CleanupWorkItem.Kind.CleanFolderRecursive, "", cache.PhysicalCachePath));
-            worker.MayHaveWork();
+            //Only queue the item if it doesn't already exist.
+            if (queue.QueueIfUnique(new CleanupWorkItem(CleanupWorkItem.Kind.CleanFolderRecursive, "", cache.PhysicalCachePath)))
+                worker.MayHaveWork();
         }
         
 
         public void Dispose() {
             worker.Dispose();
+        }
+
+        public IEnumerable<IIssue> GetIssues() {
+            if (worker != null) return worker.GetIssues();
+            return new IIssue[] { };
         }
     }
    

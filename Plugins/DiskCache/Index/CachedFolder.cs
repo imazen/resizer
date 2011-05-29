@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 
 namespace ImageResizer.Plugins.DiskCache {
     public delegate void FileDisappearedHandler(string relativePath, string physicalPath);
@@ -19,6 +20,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <summary>
         /// Defaults to false. Set to true immediately after being refreshed from the filesystem.
         /// Set to false if a file disappears from the filesystem cache without the cache index being notified first.
+        /// Used by the cleanup system - not of importance to the cache write system.
         /// </summary>
         public bool IsValid {
             get { return isValid; }
@@ -52,6 +54,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="relativePath"></param>
         /// <returns></returns>
         public virtual CachedFileInfo getCachedFileInfo(string relativePath) {
+            relativePath = checkRelativePath(relativePath);
             lock (_sync) {
                 int slash = relativePath.IndexOf('/');
                 if (slash < 0) {
@@ -71,20 +74,28 @@ namespace ImageResizer.Plugins.DiskCache {
 
         /// <summary>
         /// Sets the CachedFileInfo object for the specified path, creating any needed folders along the way.
+        /// If 'null', the item will be removed.
         /// </summary>
         /// <param name="relativePath"></param>
         /// <param name="info"></param>
         public virtual void setCachedFileInfo(string relativePath, CachedFileInfo info) {
+            relativePath = checkRelativePath(relativePath);
             lock (_sync) {
                 int slash = relativePath.IndexOf('/');
                 if (slash < 0) {
-                    //Set the file
-                    files[relativePath] = info;
+                    //Set or remove the file
+                    if (info == null) 
+                        files.Remove(relativePath);
+                    else
+                        files[relativePath] = info;
                 } else {
                     //Try to access subfolder
                     string folder = relativePath.Substring(0, slash);
                     CachedFolder f;
                     if (!folders.TryGetValue(folder, out f)) f = null;
+
+
+                    if (info == null && f == null) return; //If the folder doesn't exist, the file definitely doesn't. Already accomplished.
                     //Create it if it doesn't exist
                     if (f == null) f = folders[folder] = new CachedFolder();
                     //Recurse if possible
@@ -100,6 +111,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="physicalPath"></param>
         /// <returns></returns>
         public virtual CachedFileInfo getFileInfo(string relativePath, string physicalPath) {
+            relativePath = checkRelativePath(relativePath);
             lock (_sync) {
                 CachedFileInfo f = getCachedFileInfo(relativePath);
                 //On cache miss or no file
@@ -120,6 +132,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="physicalPath"></param>
         /// <returns></returns>
         public virtual CachedFileInfo getFileInfoCertainExists(string relativePath, string physicalPath) {
+            relativePath = checkRelativePath(relativePath);
             bool fireEvent = false;
             CachedFileInfo f = null;
             lock (_sync) {
@@ -164,6 +177,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="relativePath"></param>
         /// <returns></returns>
         protected CachedFolder getFolder(string relativePath) {
+            relativePath = checkRelativePath(relativePath);
             if (string.IsNullOrEmpty(relativePath)) return this;
 
             int slash = relativePath.IndexOf('/');
@@ -176,7 +190,7 @@ namespace ImageResizer.Plugins.DiskCache {
             CachedFolder f;
             if (!folders.TryGetValue(folder, out f)) f = null;
             //Recurse if possible
-            if (f != null) return f;
+            if (f != null) return f.getFolder(relativePath);
             //Not found
             return null;
             
@@ -238,13 +252,26 @@ namespace ImageResizer.Plugins.DiskCache {
                 return f.files.Count;
             }
         }
-        
         /// <summary>
-        /// Updates  the 'folders' dictionary to match the folders that exist on disk
+        /// Refreshes file and folder listing for this folder (non-recursive). Sets IsValid=true afterwards.
+        /// 
         /// </summary>
         /// <param name="relativePath"></param>
         /// <param name="physicalPath"></param>
-        public void populateSubfolders(string relativePath, string physicalPath) {
+        public void populate(string relativePath, string physicalPath) {
+            //NDJ-added May 29,2011
+            //Nothing was setting IsValue=true before.
+            populateSubfolders(relativePath,physicalPath);
+            populateFiles(relativePath,physicalPath);
+            IsValid = true;
+        }
+        /// <summary>
+        /// Updates  the 'folders' dictionary to match the folders that exist on disk. ONLY UPDATES THE LOCAL FOLDER
+        /// </summary>
+        /// <param name="relativePath"></param>
+        /// <param name="physicalPath"></param>
+        protected void populateSubfolders(string relativePath, string physicalPath) {
+            relativePath = checkRelativePath(relativePath);
             string[] dirs = System.IO.Directory.GetDirectories(physicalPath);
             lock(_sync){
                 Dictionary<string,CachedFolder> newFolders = new Dictionary<string,CachedFolder>(folders.Count,folders.Comparer);
@@ -258,10 +285,12 @@ namespace ImageResizer.Plugins.DiskCache {
         }
         /// <summary>
         /// Updates the 'files' dictionary to match the files that exist on disk. Uses the accessedUtc values from the previous dictionary if they are newer.
+        /// 
         /// </summary>
         /// <param name="relativePath"></param>
         /// <param name="physicalPath"></param>
-        public void populateFiles(string relativePath, string physicalPath) {
+        protected void populateFiles(string relativePath, string physicalPath) {
+            relativePath = checkRelativePath(relativePath);
             string[] physicalFiles = System.IO.Directory.GetFiles(physicalPath);
             Dictionary<string, CachedFileInfo> newFiles = new Dictionary<string, CachedFileInfo>(files.Count, files.Comparer);
             foreach (string s in physicalFiles) {
@@ -305,6 +334,14 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <returns></returns>
         protected bool roughCompare(DateTime d1, DateTime d2) {
             return Math.Abs(d1.Ticks - d2.Ticks) < TimeSpan.TicksPerMillisecond * 5;
+        }
+
+        protected string checkRelativePath(string relativePath) {
+            if (relativePath == null) return relativePath;
+            if (relativePath.StartsWith("/") || relativePath.EndsWith("/")) {
+                Debug.WriteLine("Invalid relativePath value - should never have leading slash!");
+            }
+            return relativePath;
         }
     }
 
