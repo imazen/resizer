@@ -55,6 +55,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Waterm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication", "..\Samples\ConsoleApplication\ConsoleApplication.csproj", "{51E37FA2-4CD1-476D-8B29-BD51C5F02B78}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiskCacheWebTest", "..\Tests\DiskCacheWebTest\DiskCacheWebTest.csproj", "{109162D7-72F7-4C7D-BD71-EEAB424CC522}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -548,6 +550,21 @@ Global
 		{51E37FA2-4CD1-476D-8B29-BD51C5F02B78}.Trial|Mixed Platforms.Build.0 = Release|x86
 		{51E37FA2-4CD1-476D-8B29-BD51C5F02B78}.Trial|x86.ActiveCfg = Release|x86
 		{51E37FA2-4CD1-476D-8B29-BD51C5F02B78}.Trial|x86.Build.0 = Release|x86
+		{109162D7-72F7-4C7D-BD71-EEAB424CC522}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{109162D7-72F7-4C7D-BD71-EEAB424CC522}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{109162D7-72F7-4C7D-BD71-EEAB424CC522}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{109162D7-72F7-4C7D-BD71-EEAB424CC522}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{109162D7-72F7-4C7D-BD71-EEAB424CC522}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{109162D7-72F7-4C7D-BD71-EEAB424CC522}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{109162D7-72F7-4C7D-BD71-EEAB424CC522}.Release|Any CPU.Build.0 = Release|Any CPU
+		{109162D7-72F7-4C7D-BD71-EEAB424CC522}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{109162D7-72F7-4C7D-BD71-EEAB424CC522}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{109162D7-72F7-4C7D-BD71-EEAB424CC522}.Release|x86.ActiveCfg = Release|Any CPU
+		{109162D7-72F7-4C7D-BD71-EEAB424CC522}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{109162D7-72F7-4C7D-BD71-EEAB424CC522}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{109162D7-72F7-4C7D-BD71-EEAB424CC522}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{109162D7-72F7-4C7D-BD71-EEAB424CC522}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{109162D7-72F7-4C7D-BD71-EEAB424CC522}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
