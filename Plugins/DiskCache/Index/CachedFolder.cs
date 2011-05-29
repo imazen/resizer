@@ -27,13 +27,16 @@ namespace ImageResizer.Plugins.DiskCache {
             set { isValid = value; }
         }
 
-        
-      
+
+
 
         /// <summary>
         /// Fired when a file disappears from the cache folder without the cache index knowing about it.
         /// </summary>
         public event FileDisappearedHandler FileDisappeared;
+
+        protected StringComparer KeyComparer { get { return StringComparer.OrdinalIgnoreCase; } }
+ 
 
         protected Dictionary<string, CachedFolder> folders = new Dictionary<string, CachedFolder>(StringComparer.OrdinalIgnoreCase);
 
@@ -84,7 +87,7 @@ namespace ImageResizer.Plugins.DiskCache {
                 int slash = relativePath.IndexOf('/');
                 if (slash < 0) {
                     //Set or remove the file
-                    if (info == null) 
+                    if (info == null)
                         files.Remove(relativePath);
                     else
                         files[relativePath] = info;
@@ -177,6 +180,9 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="relativePath"></param>
         /// <returns></returns>
         protected CachedFolder getFolder(string relativePath) {
+            return getOrCreateFolder(relativePath, false);
+        }
+        protected CachedFolder getOrCreateFolder(string relativePath, bool createIfMissing) {
             relativePath = checkRelativePath(relativePath);
             if (string.IsNullOrEmpty(relativePath)) return this;
 
@@ -186,14 +192,17 @@ namespace ImageResizer.Plugins.DiskCache {
                 folder = relativePath.Substring(0, slash);
                 relativePath = relativePath.Substring(slash + 1);
             } else relativePath = "";
-            
+
             CachedFolder f;
-            if (!folders.TryGetValue(folder, out f)) f = null;
+            if (!folders.TryGetValue(folder, out f)) {
+                if (!createIfMissing) return null;
+                else f = folders[folder] = new CachedFolder();
+            }
             //Recurse if possible
             if (f != null) return f.getFolder(relativePath);
             //Not found
             return null;
-            
+
         }
 
         /// <summary>
@@ -230,8 +239,8 @@ namespace ImageResizer.Plugins.DiskCache {
                 if (f == null || f.files.Count < 1) return null;
                 //Copy pairs to an array.
                 KeyValuePair<string, CachedFileInfo>[] items = new KeyValuePair<string, CachedFileInfo>[f.files.Count];
-                int i =0;
-                foreach(KeyValuePair<string,CachedFileInfo> pair in f.files){
+                int i = 0;
+                foreach (KeyValuePair<string, CachedFileInfo> pair in f.files) {
                     items[i] = pair;
                     i++;
                 }
@@ -261,9 +270,9 @@ namespace ImageResizer.Plugins.DiskCache {
         public void populate(string relativePath, string physicalPath) {
             //NDJ-added May 29,2011
             //Nothing was setting IsValue=true before.
-            populateSubfolders(relativePath,physicalPath);
-            populateFiles(relativePath,physicalPath);
-            IsValid = true;
+            populateSubfolders(relativePath, physicalPath);
+            populateFiles(relativePath, physicalPath);
+            getOrCreateFolder(relativePath, true).IsValid = true;
         }
         /// <summary>
         /// Updates  the 'folders' dictionary to match the folders that exist on disk. ONLY UPDATES THE LOCAL FOLDER
@@ -273,37 +282,41 @@ namespace ImageResizer.Plugins.DiskCache {
         protected void populateSubfolders(string relativePath, string physicalPath) {
             relativePath = checkRelativePath(relativePath);
             string[] dirs = System.IO.Directory.GetDirectories(physicalPath);
-            lock(_sync){
-                Dictionary<string,CachedFolder> newFolders = new Dictionary<string,CachedFolder>(folders.Count,folders.Comparer);
+            lock (_sync) {
+                CachedFolder f = getOrCreateFolder(relativePath, true);
+                Dictionary<string, CachedFolder> newFolders = new Dictionary<string, CachedFolder>(dirs.Length, KeyComparer);
                 foreach (string s in dirs) {
                     string local = s.Substring(s.LastIndexOf(System.IO.Path.DirectorySeparatorChar) + 1);
-                    if (folders.ContainsKey(local)) newFolders[local] = folders[local];
-                    else newFolders[local] = new CachedFolder();
+                    if (f.folders.ContainsKey(local)) 
+                        newFolders[local] = f.folders[local]; //What if the value is null? does containskey work?
+                    else 
+                        newFolders[local] = new CachedFolder();
                 }
-                this.folders = newFolders;
+                f.folders = newFolders; //Question - why didn't the folders ge tlisted?
             }
         }
         /// <summary>
         /// Updates the 'files' dictionary to match the files that exist on disk. Uses the accessedUtc values from the previous dictionary if they are newer.
-        /// 
         /// </summary>
         /// <param name="relativePath"></param>
         /// <param name="physicalPath"></param>
         protected void populateFiles(string relativePath, string physicalPath) {
             relativePath = checkRelativePath(relativePath);
             string[] physicalFiles = System.IO.Directory.GetFiles(physicalPath);
-            Dictionary<string, CachedFileInfo> newFiles = new Dictionary<string, CachedFileInfo>(files.Count, files.Comparer);
+            Dictionary<string, CachedFileInfo> newFiles = new Dictionary<string, CachedFileInfo>(physicalFiles.Length, KeyComparer);
+
+            CachedFolder f = getOrCreateFolder(relativePath, true);
             foreach (string s in physicalFiles) {
                 string local = s.Substring(s.LastIndexOf(System.IO.Path.DirectorySeparatorChar) + 1);
                 //What did we have on file?
                 CachedFileInfo old = null;
                 lock (_sync) {
-                    if (!files.TryGetValue(relativePath, out old)) old = null;
+                    if (!f.files.TryGetValue(relativePath, out old)) old = null;
                 }
                 newFiles[local] = new CachedFileInfo(new FileInfo(s), old);
             }
             lock (_sync) {
-                files = newFiles;
+                f.files = newFiles;
             }
         }
 
