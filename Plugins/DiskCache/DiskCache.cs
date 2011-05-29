@@ -223,6 +223,9 @@ namespace ImageResizer.Plugins.DiskCache
                 if (AutoClean && cleanupStrategy == null) cleanupStrategy = new CleanupStrategy(); //Default settings if null
                 //Init the cleanup worker
                 if (AutoClean) cleaner = new CleanupManager(cache, cleanupStrategy);
+                //If we're running with subfolders, enqueue the cache root for cleanup (after the 5 minute delay)
+                //so we don't eternally 'skip' files in the root or in other unused subfolders (since only 'accessed' subfolders are ever cleaned ). 
+                cleaner.CleanAll();
 
                 //Started successfully
                 _started = true;
