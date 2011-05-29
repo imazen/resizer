@@ -160,15 +160,17 @@ namespace ImageResizer.Plugins.DiskCache {
 
             string baseRelative = item.RelativePath.Length > 0 ? (item.RelativePath + "/") : "";
             string basePhysical = item.PhysicalPath.TrimEnd(System.IO.Path.DirectorySeparatorChar) + System.IO.Path.DirectorySeparatorChar;
-            if (item.Task == CleanupWorkItem.Kind.CleanFolderRecursive) {
+            if (item.Task == CleanupWorkItem.Kind.CleanFolderRecursive || item.Task == CleanupWorkItem.Kind.CleanFolder) {
                 if (cache.Index.GetIsValid(item.RelativePath)) {
                     //Ok, it's valid.
                     //Queue the recursive work.
-                    IList<string> names = cache.Index.getSubfolders(item.RelativePath);
-                    List<CleanupWorkItem> childWorkItems = new List<CleanupWorkItem>(names.Count);
-                    foreach(string n in names)
-                        childWorkItems.Add(new CleanupWorkItem(CleanupWorkItem.Kind.CleanFolderRecursive,baseRelative + n,basePhysical + n));
-                    queue.InsertRange(childWorkItems);
+                    if (item.Task == CleanupWorkItem.Kind.CleanFolderRecursive) {
+                        IList<string> names = cache.Index.getSubfolders(item.RelativePath);
+                        List<CleanupWorkItem> childWorkItems = new List<CleanupWorkItem>(names.Count);
+                        foreach (string n in names)
+                            childWorkItems.Add(new CleanupWorkItem(CleanupWorkItem.Kind.CleanFolderRecursive, baseRelative + n, basePhysical + n));
+                        queue.InsertRange(childWorkItems);
+                    }
 
                     //Now do the local work
                     int files = cache.Index.getFileCount(item.RelativePath);
@@ -212,13 +214,15 @@ namespace ImageResizer.Plugins.DiskCache {
                     for (int i = 0; i < overMax; i++) queue.Insert(obsessive);
 
                 } else {
-                    //Put this item back where it was, but with a 'populaterecursive' right before it.
+                    //Put this item back where it was, but with a 'populate/populaterecursive' right before it.
+                    CleanupWorkItem.Kind popKind = item.Task == CleanupWorkItem.Kind.CleanFolderRecursive ? CleanupWorkItem.Kind.PopulateFolderRecursive : CleanupWorkItem.Kind.PopulateFolder;
                     queue.InsertRange(new CleanupWorkItem[]{
-                        new CleanupWorkItem(CleanupWorkItem.Kind.PopulateFolderRecursive,item.RelativePath,item.PhysicalPath),
+                        new CleanupWorkItem(popKind,item.RelativePath,item.PhysicalPath),
                         item});
                     return;
                 }
-            } else if (item.Task == CleanupWorkItem.Kind.PopulateFolderRecursive) {
+            } else if (item.Task == CleanupWorkItem.Kind.PopulateFolderRecursive ||
+                   item.Task == CleanupWorkItem.Kind.PopulateFolder) {
 
                 //Do the local work.
                 if (!cache.Index.GetIsValid(item.RelativePath)) {
@@ -226,17 +230,14 @@ namespace ImageResizer.Plugins.DiskCache {
                     cache.Index.populate(item.RelativePath, item.PhysicalPath);
                 }
 
-
-                //Queue the recursive work.
-                IList<string> names = cache.Index.getSubfolders(item.RelativePath);
-                List<CleanupWorkItem> childWorkItems = new List<CleanupWorkItem>(names.Count);
-                foreach (string n in names)
-                    childWorkItems.Add(new CleanupWorkItem(CleanupWorkItem.Kind.PopulateFolderRecursive, baseRelative + n, basePhysical + n));
-                queue.InsertRange(childWorkItems);
-
-
-
-            
+                if (item.Task == CleanupWorkItem.Kind.PopulateFolderRecursive) {
+                    //Queue the recursive work.
+                    IList<string> names = cache.Index.getSubfolders(item.RelativePath);
+                    List<CleanupWorkItem> childWorkItems = new List<CleanupWorkItem>(names.Count);
+                    foreach (string n in names)
+                        childWorkItems.Add(new CleanupWorkItem(CleanupWorkItem.Kind.PopulateFolderRecursive, baseRelative + n, basePhysical + n));
+                    queue.InsertRange(childWorkItems);
+                }
             }
         }
 
