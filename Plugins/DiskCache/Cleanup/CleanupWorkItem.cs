@@ -62,6 +62,8 @@ namespace ImageResizer.Plugins.DiskCache {
             /// Requires a valid folder.  
             /// </summary>
             CleanFolderRecursive,
+            CleanFolder,
+            PopulateFolder,
             /// <summary>
             /// Removes a single file. 
             /// </summary>
