@@ -2,12 +2,62 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ImageResizer.Configuration.Xml;
+using ImageResizer.Configuration.Issues;
+using System.Collections.Specialized;
+using System.Reflection;
 
 namespace ImageResizer.Plugins.DiskCache {
-    public class CleanupStrategy {
+    public class CleanupStrategy :IssueSink{
 
-        public CleanupStrategy() { }
+        public CleanupStrategy():base("DiskCache.CleanupStrategy") { }
+        public CleanupStrategy(Node n)
+            : base("DiskCache.CleanupStrategy") {
+            LoadFrom(n);
+        }
 
+        public void LoadFrom(Node n){
+            if (n == null) return;
+            LoadTimeSpan(n.Attrs, "StartupDelay");
+            LoadTimeSpan(n.Attrs, "MinDelay");
+            LoadTimeSpan(n.Attrs, "MaxDelay");
+            LoadTimeSpan(n.Attrs, "OptimalWorkSegmentLength");
+            LoadTimeSpan(n.Attrs, "AvoidRemovalIfUsedWithin");
+            LoadTimeSpan(n.Attrs, "AvoidRemovalIfCreatedWithin");
+            LoadTimeSpan(n.Attrs, "ProhibitRemovalIfUsedWithin");
+            LoadTimeSpan(n.Attrs, "ProhibitRemovalIfCreatedWithin");
+            LoadInt(n.Attrs, "TargetItemsPerFolder");
+            LoadInt(n.Attrs, "MaximumItemsPerFolder");
+        }
+
+        protected void LoadTimeSpan(NameValueCollection data, string key) {
+            string value = data[key];
+            if (string.IsNullOrEmpty(value)) return;
+
+            //Parse the timespan (format [ws][-]{ d | d.hh:mm[:ss[.ff]] | hh:mm[:ss[.ff]] }[ws])
+            TimeSpan tValue = TimeSpan.MinValue;
+            if (!TimeSpan.TryParse(value, out tValue)) tValue = TimeSpan.MinValue;
+
+            //Parse it as an integer number of seconds. Seconds is the default, unlike TimeSpan.TryParse which uses days.
+            int iValue = int.MinValue;
+            if (int.TryParse(value, out iValue)) tValue = new TimeSpan(0,0,iValue);
+
+            if (tValue == TimeSpan.MinValue) return; //We couldn't parse a value.
+
+            PropertyInfo pi = this.GetType().GetProperty(key);
+            pi.SetValue(this, tValue, null);
+        }
+
+        protected void LoadInt(NameValueCollection data, string key) {
+            string value = data[key];
+            if (string.IsNullOrEmpty(value)) return;
+
+            int iValue = int.MinValue;
+            if (!int.TryParse(value, out iValue)) return; //We couldn't parse a value.
+
+            PropertyInfo pi = this.GetType().GetProperty(key);
+            pi.SetValue(this, iValue, null);
+        }
 
 
         private TimeSpan startupDelay = new TimeSpan(0, 5, 0); //5 minutes
@@ -97,12 +147,14 @@ namespace ImageResizer.Plugins.DiskCache {
 
         public bool MeetsCleanupCriteria(CachedFileInfo i) {
             DateTime now = DateTime.UtcNow;
-            return (now.Subtract(i.AccessedUtc) > AvoidRemovalIfUsedWithin && now.Subtract(i.UpdatedUtc) > AvoidRemovalIfCreatedWithin);
+            return ((now.Subtract(i.AccessedUtc) > AvoidRemovalIfUsedWithin || AvoidRemovalIfUsedWithin <= new TimeSpan(0)) &&
+                (now.Subtract(i.UpdatedUtc) > AvoidRemovalIfCreatedWithin || AvoidRemovalIfCreatedWithin <= new TimeSpan(0)));
         }
 
         public bool MeetsOverMaxCriteria(CachedFileInfo i) {
             DateTime now = DateTime.UtcNow;
-            return (now.Subtract(i.AccessedUtc) > ProhibitRemovalIfUsedWithin && now.Subtract(i.UpdatedUtc) > ProhibitRemovalIfCreatedWithin);
+            return ((now.Subtract(i.AccessedUtc) > ProhibitRemovalIfUsedWithin || ProhibitRemovalIfUsedWithin <= new TimeSpan(0)) &&
+                (now.Subtract(i.UpdatedUtc) > ProhibitRemovalIfCreatedWithin || ProhibitRemovalIfCreatedWithin <= new TimeSpan(0)));
         }
     }
 }

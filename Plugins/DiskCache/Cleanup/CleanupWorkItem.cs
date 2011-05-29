@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Diagnostics;
 
 namespace ImageResizer.Plugins.DiskCache {
 
@@ -35,11 +36,21 @@ namespace ImageResizer.Plugins.DiskCache {
             this.task = task;
             this.relativePath = relativePath;
             this.physicalPath = physicalPath;
+            if (this.relativePath.StartsWith("/")) {
+                Debug.WriteLine("Invalid relativePath value - should never have leading slash!");
+            }
         }
 
         public CleanupWorkItem(Kind task, LazyTaskProvider callback) {
             this.task = task;
             this.lazyProvider = callback;
+        }
+
+        public override bool Equals(object obj) {
+            CleanupWorkItem other = obj as CleanupWorkItem;
+            if (other == null) return false;
+
+            return (other.Task == Task && other.RelativePath == RelativePath && other.PhysicalPath == PhysicalPath && other.LazyProvider == LazyProvider);
         }
 
         public enum Kind {
@@ -59,10 +70,7 @@ namespace ImageResizer.Plugins.DiskCache {
         }
 
         private Kind task = Kind.CleanFolderRecursive;
-        private Kind kind;
-        private string p;
-        private string p_2;
-        private CleanupWorkItem obsessive;
+
 
         public Kind Task {
             get { return task; }
