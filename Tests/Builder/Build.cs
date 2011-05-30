@@ -51,10 +51,12 @@ namespace ImageResizer.ReleaseBuilder {
             //c: Ask for information version number.  [assembly: AssemblyInformationalVersion("3-alpha-5")]
             string infoVer = change("InfoVersion", v.get("AssemblyInformationalVersion").TrimEnd('.', '*'));
 
+
             //d: For each package, specify options: choose 'c' (create and/or overwrite), 'u' (upload), 's' (skip), 'p' (make private). Should inform if the file already exists.
             nl();
             say("For each package, specify all operations to perform, then press enter.");
             say("'c' - Create package (overwrite if exists), 'u' (upload to S3), 's' (skip), 'p' (make private)");
+            bool isBuilding = false;
             foreach (PackageDescriptor desc in packages) {
                 desc.Path = getReleasePath(packageBase, infoVer, desc.Kind);
                 if (desc.Exists) say("\n" + Path.GetFileName(desc.Path) + " already exists");
@@ -65,76 +67,78 @@ namespace ImageResizer.ReleaseBuilder {
                     opts = Console.ReadLine().Trim();
                 }
                 desc.Options = opts;
-                
+                if (desc.Build) isBuilding = true;
             }
 
-             
-            //1 - Prompt to Clean
-            //1b - Run cleanup routine
-            if (ask("Clean All?")) {
-                CleanAll();
-                RemoveUselessFiles();
-            }
+            if (isBuilding) {
 
-            //2 - Set version numbers (with *, if missing)
-            string originalContents = v.Contents; //Save for checking changes.
-            v.set("AssemblyFileVersion", v.join(fileVer, "*"));
-            v.set("AssemblyVersion", v.join(assemblyVer, "*"));
-            v.set("AssemblyInformationalVersion", infoVer);
-            v.Save();
-            //Save contents for reverting later
-            string fileContents = v.Contents;
-            
-            //3 - Prompt to commit and tag
-            bool versionsChanged = !fileContents.Equals(originalContents);
-            string question = versionsChanged ? "SharedAssemblyInfo.cs was modified. Commit it (and any other changes) to the repository, then hit 'y'."
-                : "Are all changes commited? Hit 'y' to continue.";
-            while (!ask(question)) { }
-
-
-            //[assembly: Commit("git-commit-guid-here")]
-            //4 - Embed git commit value
-            v.set("Commit", "git-commit-todo");
-            v.Save();
-
-            //4b - change to hard version number for building
-            short revision = (short)(DateTime.UtcNow.TimeOfDay.Milliseconds % short.MaxValue); //the part under 32767. Can actually go up to, 65534, but what's the point.
-            v.set("AssemblyFileVersion", v.join(fileVer, revision.ToString()));
-            v.set("AssemblyVersion", v.join(assemblyVer, revision.ToString()));
-            v.Save();
-
-            //6 - if (c) was specified for any package, build all.
-            bool buildOne = false;
-            foreach(PackageDescriptor pd in packages) if (pd.Build) buildOne = true;
-            
-            if (buildOne) BuildAll();
-
-            //7 - Revert file to state at commit (remove 'full' version numbers and 'commit' value)
-            v.Contents = fileContents;
-            v.Save();
-
-
-            //8 - run cleanup routine
-            RemoveUselessFiles();
-
-            //Prepare searchers
-            PrepareForPackaging();
-
-            //9 - Pacakge all selected configurations
-            foreach (PackageDescriptor pd in packages) {
-                if (pd.Skip) continue;
-                if (pd.Exists && pd.Build) {
-                    File.Delete(pd.Path);
-                    say("Deleted " + pd.Path);
+                //1 - Prompt to Clean
+                //1b - Run cleanup routine
+                if (ask("Clean All?")) {
+                    CleanAll();
+                    RemoveUselessFiles();
                 }
-                pd.Builder(pd);
-                //Copy to a 'tozip' version for e-mailing
-                File.Copy(pd.Path, pd.Path.Replace(".zip", ".tozip"),true);
+
+                //2 - Set version numbers (with *, if missing)
+                string originalContents = v.Contents; //Save for checking changes.
+                v.set("AssemblyFileVersion", v.join(fileVer, "*"));
+                v.set("AssemblyVersion", v.join(assemblyVer, "*"));
+                v.set("AssemblyInformationalVersion", infoVer);
+                v.Save();
+                //Save contents for reverting later
+                string fileContents = v.Contents;
+
+                //3 - Prompt to commit and tag
+                bool versionsChanged = !fileContents.Equals(originalContents);
+                string question = versionsChanged ? "SharedAssemblyInfo.cs was modified. Commit it (and any other changes) to the repository, then hit 'y'."
+                    : "Are all changes commited? Hit 'y' to continue.";
+                while (!ask(question)) { }
+
+
+                //[assembly: Commit("git-commit-guid-here")]
+                //4 - Embed git commit value
+                v.set("Commit", "git-commit-todo");
+                v.Save();
+
+                //4b - change to hard version number for building
+                short revision = (short)(DateTime.UtcNow.TimeOfDay.Milliseconds % short.MaxValue); //the part under 32767. Can actually go up to, 65534, but what's the point.
+                v.set("AssemblyFileVersion", v.join(fileVer, revision.ToString()));
+                v.set("AssemblyVersion", v.join(assemblyVer, revision.ToString()));
+                v.Save();
+
+                //6 - if (c) was specified for any package, build all.
+                bool buildOne = false;
+                foreach (PackageDescriptor pd in packages) if (pd.Build) buildOne = true;
+
+                if (buildOne) BuildAll();
+
+                //7 - Revert file to state at commit (remove 'full' version numbers and 'commit' value)
+                v.Contents = fileContents;
+                v.Save();
+
+
+                //8 - run cleanup routine
+                RemoveUselessFiles();
+
+                //Prepare searchers
+                PrepareForPackaging();
+
+                //9 - Pacakge all selected configurations
+                foreach (PackageDescriptor pd in packages) {
+                    if (pd.Skip) continue;
+                    if (pd.Exists && pd.Build) {
+                        File.Delete(pd.Path);
+                        say("Deleted " + pd.Path);
+                    }
+                    pd.Builder(pd);
+                    //Copy to a 'tozip' version for e-mailing
+                    File.Copy(pd.Path, pd.Path.Replace(".zip", ".tozip"), true);
+                }
             }
 
             //10 - Upload all selected configurations
             foreach (PackageDescriptor pd in packages) {
-                if (pd.Skip) return;
+                if (pd.Skip) continue;
                 if (pd.Upload) {
                     if (!pd.Exists) {
                         say("Can't upload, file missing: " + pd.Path);
