@@ -186,10 +186,6 @@
     <br />
     
     
-    <h2>/resize(width,height,format)/ syntax</h2>
-    <p>For the URL-conscious, you can replace <strong>img/image.jpg?maxwidth=x&amp;maxheight=y</strong> with
-     <strong>img/resize(x,y)/image.jpg</strong>. A third argument, format, is also allowed.</p>
-  
     </div>
     </form>
 </body>
