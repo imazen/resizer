@@ -50,6 +50,9 @@ namespace ImageResizer.Plugins.DiskCache {
             this.task = task;
             this.lazyProvider = callback;
         }
+        public override int GetHashCode() {
+            return base.GetHashCode();
+        }
 
         public override bool Equals(object obj) {
             CleanupWorkItem other = obj as CleanupWorkItem;
@@ -67,12 +70,22 @@ namespace ImageResizer.Plugins.DiskCache {
             /// Requires a valid folder.  
             /// </summary>
             CleanFolderRecursive,
+            /// <summary>
+            /// Cleans the folder, enqueing RemoveFile tasks for everything that needs to be removed.
+            /// </summary>
             CleanFolder,
+            /// <summary>
+            /// Populates (non-recursive) the files and folders inside the specified directory.
+            /// </summary>
             PopulateFolder,
             /// <summary>
-            /// Removes a single file. 
+            /// Removes a single file, with the file and dir being determined at executing time via the LazyProvider delegate.
             /// </summary>
             RemoveFile,
+            /// <summary>
+            /// Calls File.SetLastAccessedTimeUtc() using the in-memory value, if present.
+            /// </summary>
+            FlushAccessedDate
 
         }
 

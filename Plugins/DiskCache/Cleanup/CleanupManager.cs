@@ -69,7 +69,16 @@ namespace ImageResizer.Plugins.DiskCache {
             if (queue.QueueIfUnique(new CleanupWorkItem(CleanupWorkItem.Kind.CleanFolderRecursive, "", cache.PhysicalCachePath)))
                 worker.MayHaveWork();
         }
-        
+
+        public void UsedFile(string relativePath, string physicalPath) {
+            //Bump the date in memory
+            cache.Index.bumpDateIfExists(relativePath);
+            //Make sure the 'flush' job for the file is in the queue somewhere, so the access date will get written to disk.
+            queue.QueueIfUnique(new CleanupWorkItem(CleanupWorkItem.Kind.FlushAccessedDate, relativePath, physicalPath));
+            //In case it's paused
+            worker.MayHaveWork();
+        }
+
 
         public void Dispose() {
             worker.Dispose();
@@ -79,6 +88,8 @@ namespace ImageResizer.Plugins.DiskCache {
             if (worker != null) return worker.GetIssues();
             return new IIssue[] { };
         }
+
+
     }
    
 }

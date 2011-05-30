@@ -106,6 +106,32 @@ namespace ImageResizer.Plugins.DiskCache {
                 }
             }
         }
+        /// <summary>
+        /// Tries to set the AccessedUtc of the specified file to the current date (just in memory, not on the filesystem).
+        /// </summary>
+        /// <param name="relativePath"></param>
+        /// <returns></returns>
+        public bool bumpDateIfExists(string relativePath) {
+            relativePath = checkRelativePath(relativePath);
+            lock (_sync) {
+                int slash = relativePath.IndexOf('/');
+                if (slash < 0) {
+                    //Update the accessed date.
+                    CachedFileInfo old;
+                    if (files.TryGetValue(relativePath,out old)) files[relativePath] = new CachedFileInfo(old, DateTime.UtcNow);
+                    return true; //We updated it!
+                } else {
+                    //Try to access subfolder
+                    string folder = relativePath.Substring(0, slash);
+                    CachedFolder f = null;
+                    if (!folders.TryGetValue(folder, out f)) return false;//If the folder doesn't exist, quit
+                    if (f == null) return false; //If the folder is null, quit!
+
+                    //Recurse if possible
+                    return f.bumpDateIfExists(relativePath.Substring(slash + 1));
+                }
+            }
+        }
 
         /// <summary>
         /// Gets a CachedFileInfo object for the file even if it isn't in the cache (falls back to the filesystem)
