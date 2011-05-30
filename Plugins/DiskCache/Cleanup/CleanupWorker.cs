@@ -130,95 +130,46 @@ namespace ImageResizer.Plugins.DiskCache {
         protected void DoTask(CleanupWorkItem item) {
             Debug.WriteLine("Executing task " + item.Task.ToString() + " " + item.RelativePath + " (" + queue.Count.ToString() + " task remaining)");
 
-            //When removing a file, item.RelativePath and item.PhysicalPath might never exist.
-            if (item.Task == CleanupWorkItem.Kind.RemoveFile) RemoveFile(item);
+            if (item.Task == CleanupWorkItem.Kind.RemoveFile)
 
-            string baseRelative = item.RelativePath.Length > 0 ? (item.RelativePath + "/") : "";
-            string basePhysical = item.PhysicalPath.TrimEnd(System.IO.Path.DirectorySeparatorChar) + System.IO.Path.DirectorySeparatorChar;
-            if (item.Task == CleanupWorkItem.Kind.CleanFolderRecursive || item.Task == CleanupWorkItem.Kind.CleanFolder) {
-                if (cache.Index.GetIsValid(item.RelativePath)) {
-                    //Ok, it's valid.
-                    //Queue the recursive work.
-                    if (item.Task == CleanupWorkItem.Kind.CleanFolderRecursive) {
-                        IList<string> names = cache.Index.getSubfolders(item.RelativePath);
-                        List<CleanupWorkItem> childWorkItems = new List<CleanupWorkItem>(names.Count);
-                        foreach (string n in names)
-                            childWorkItems.Add(new CleanupWorkItem(CleanupWorkItem.Kind.CleanFolderRecursive, baseRelative + n, basePhysical + n));
-                        queue.InsertRange(childWorkItems);
-                    }
+                RemoveFile(item);
+            else if (item.Task == CleanupWorkItem.Kind.CleanFolderRecursive || item.Task == CleanupWorkItem.Kind.CleanFolder) {
 
-                    //Now do the local work
-                    int files = cache.Index.getFileCount(item.RelativePath);
-
-                    //How much are we over?
-                    int overMax = Math.Max(0, files - cs.MaximumItemsPerFolder);
-                    int overOptimal = Math.Max(0, (files - overMax) - cs.TargetItemsPerFolder);
-
-                    if (overMax + overOptimal < 1) return; //nothing to do
-
-                    //Make a linked list, like a queue of files. 
-                    LinkedList<KeyValuePair<string, CachedFileInfo>> sortedList = new LinkedList<KeyValuePair<string, CachedFileInfo>>(
-                            cache.Index.getSortedSubfiles(item.RelativePath));
-
-                    //This callback will execute (overMax) number of times
-                    CleanupWorkItem obsessive = new CleanupWorkItem(CleanupWorkItem.Kind.RemoveFile, delegate() {
-                        //Pop the next item
-                        KeyValuePair<string, CachedFileInfo> file;
-                        while (sortedList.Count > 0) {
-                            file = sortedList.First.Value; sortedList.RemoveFirst();
-                            if (cs.MeetsOverMaxCriteria(file.Value)) {
-                                return new CleanupWorkItem(CleanupWorkItem.Kind.RemoveFile, baseRelative + file.Key, basePhysical + file.Key);
-                            }
-                        }
-                        return null; //No matching items left.
-                    });
-
-                    CleanupWorkItem relaxed = new CleanupWorkItem(CleanupWorkItem.Kind.RemoveFile, delegate() {
-                        //Pop the next item
-                        KeyValuePair<string, CachedFileInfo> file;
-                        while (sortedList.Count > 0) {
-                            file = sortedList.First.Value; sortedList.RemoveFirst();
-                            if (cs.MeetsCleanupCriteria(file.Value)) {
-                                return new CleanupWorkItem(CleanupWorkItem.Kind.RemoveFile, baseRelative + file.Key, basePhysical + file.Key);
-                            }
-                        }
-                        return null; //No matching items left.
-                    });
-                    //The 'obsessive' ones must be processed first, thus added last.
-                    for (int i = 0; i < overOptimal; i++) queue.Insert(relaxed);
-                    for (int i = 0; i < overMax; i++) queue.Insert(obsessive);
-
-                } else {
-                    //Put this item back where it was, but with a 'populate/populaterecursive' right before it.
-                    CleanupWorkItem.Kind popKind = item.Task == CleanupWorkItem.Kind.CleanFolderRecursive ? CleanupWorkItem.Kind.PopulateFolderRecursive : CleanupWorkItem.Kind.PopulateFolder;
-                    queue.InsertRange(new CleanupWorkItem[]{
-                        new CleanupWorkItem(popKind,item.RelativePath,item.PhysicalPath),
-                        item});
-                    return;
-                }
+                CleanFolder(item, item.Task == CleanupWorkItem.Kind.PopulateFolderRecursive);
             } else if (item.Task == CleanupWorkItem.Kind.PopulateFolderRecursive ||
-                   item.Task == CleanupWorkItem.Kind.PopulateFolder) {
+                       item.Task == CleanupWorkItem.Kind.PopulateFolder) {
 
-                //Do the local work.
-                if (!cache.Index.GetIsValid(item.RelativePath)) {
-                    Debug.WriteLine("Querying filesystem about " + item.PhysicalPath);
-                    cache.Index.populate(item.RelativePath, item.PhysicalPath);
-                }
+                PopulateFolder(item, item.Task == CleanupWorkItem.Kind.PopulateFolderRecursive);
+            }
+        }
 
-                if (item.Task == CleanupWorkItem.Kind.PopulateFolderRecursive) {
-                    //Queue the recursive work.
-                    IList<string> names = cache.Index.getSubfolders(item.RelativePath);
-                    List<CleanupWorkItem> childWorkItems = new List<CleanupWorkItem>(names.Count);
-                    foreach (string n in names)
-                        childWorkItems.Add(new CleanupWorkItem(CleanupWorkItem.Kind.PopulateFolderRecursive, baseRelative + n, basePhysical + n));
-                    queue.InsertRange(childWorkItems);
-                }
+        protected string addSlash(string s, bool physical) {
+            if (string.IsNullOrEmpty(s)) return s; //On empty or null, dont' add aslash.
+            if (physical) return s.TrimEnd(System.IO.Path.DirectorySeparatorChar) + System.IO.Path.DirectorySeparatorChar;
+            else return s.TrimEnd('/') + '/';
+        }
+
+        protected void PopulateFolder(CleanupWorkItem item, bool recursive) {
+            //Do the local work.
+            if (!cache.Index.GetIsValid(item.RelativePath)) {
+                Debug.WriteLine("Querying filesystem about " + item.PhysicalPath);
+                cache.Index.populate(item.RelativePath, item.PhysicalPath);
+            }
+
+            if (recursive) {
+                //Queue the recursive work.
+                IList<string> names = cache.Index.getSubfolders(item.RelativePath);
+                List<CleanupWorkItem> childWorkItems = new List<CleanupWorkItem>(names.Count);
+                foreach (string n in names)
+                    childWorkItems.Add(new CleanupWorkItem(CleanupWorkItem.Kind.PopulateFolderRecursive, addSlash(item.RelativePath,false) + n, addSlash(item.PhysicalPath,true) + n));
+                queue.InsertRange(childWorkItems);
             }
         }
 
         protected void RemoveFile(CleanupWorkItem item) {
             LazyTaskProvider provider = item.LazyProvider;
             bool removedFile = false;
+            //TODO: If a tryExecute fails, or an exception is thrown, the item should be re-queued instead of looping through all files.
             while (item != null && !removedFile) {
                 if (provider != null) item = provider(); //Keep asking for the next candidate on failure (the first item is blank)
                 if (item == null) return; //No more files to try!
@@ -246,6 +197,73 @@ namespace ImageResizer.Plugins.DiskCache {
                 });
             }
             return;
+        }
+
+
+        protected void CleanFolder(CleanupWorkItem item, bool recursvie) {
+            if (cache.Index.GetIsValid(item.RelativePath)) {
+                string baseRelative = addSlash(item.RelativePath, false);
+                string basePhysical = addSlash(item.PhysicalPath, true);
+
+                //Ok, it's valid.
+                //Queue the recursive work.
+                if (item.Task == CleanupWorkItem.Kind.CleanFolderRecursive) {
+                    IList<string> names = cache.Index.getSubfolders(item.RelativePath);
+                    List<CleanupWorkItem> childWorkItems = new List<CleanupWorkItem>(names.Count);
+                    foreach (string n in names)
+                        childWorkItems.Add(new CleanupWorkItem(CleanupWorkItem.Kind.CleanFolderRecursive, baseRelative + n, basePhysical + n));
+                    queue.InsertRange(childWorkItems);
+                }
+
+                //Now do the local work
+                int files = cache.Index.getFileCount(item.RelativePath);
+
+                //How much are we over?
+                int overMax = Math.Max(0, files - cs.MaximumItemsPerFolder);
+                int overOptimal = Math.Max(0, (files - overMax) - cs.TargetItemsPerFolder);
+
+                if (overMax + overOptimal < 1) return; //nothing to do
+
+                //Make a linked list, like a queue of files. 
+                LinkedList<KeyValuePair<string, CachedFileInfo>> sortedList = new LinkedList<KeyValuePair<string, CachedFileInfo>>(
+                        cache.Index.getSortedSubfiles(item.RelativePath));
+
+                //This callback will execute (overMax) number of times
+                CleanupWorkItem obsessive = new CleanupWorkItem(CleanupWorkItem.Kind.RemoveFile, delegate() {
+                    //Pop the next item
+                    KeyValuePair<string, CachedFileInfo> file;
+                    while (sortedList.Count > 0) {
+                        file = sortedList.First.Value; sortedList.RemoveFirst();
+                        if (cs.MeetsOverMaxCriteria(file.Value)) {
+                            return new CleanupWorkItem(CleanupWorkItem.Kind.RemoveFile, baseRelative + file.Key, basePhysical + file.Key);
+                        }
+                    }
+                    return null; //No matching items left.
+                });
+
+                CleanupWorkItem relaxed = new CleanupWorkItem(CleanupWorkItem.Kind.RemoveFile, delegate() {
+                    //Pop the next item
+                    KeyValuePair<string, CachedFileInfo> file;
+                    while (sortedList.Count > 0) {
+                        file = sortedList.First.Value; sortedList.RemoveFirst();
+                        if (cs.MeetsCleanupCriteria(file.Value)) {
+                            return new CleanupWorkItem(CleanupWorkItem.Kind.RemoveFile, baseRelative + file.Key, basePhysical + file.Key);
+                        }
+                    }
+                    return null; //No matching items left.
+                });
+                //The 'obsessive' ones must be processed first, thus added last.
+                for (int i = 0; i < overOptimal; i++) queue.Insert(relaxed);
+                for (int i = 0; i < overMax; i++) queue.Insert(obsessive);
+
+            } else {
+                //Put this item back where it was, but with a 'populate/populaterecursive' right before it.
+                CleanupWorkItem.Kind recursiveClean = recursvie ? CleanupWorkItem.Kind.PopulateFolderRecursive : CleanupWorkItem.Kind.PopulateFolder;
+                queue.InsertRange(new CleanupWorkItem[]{
+                        new CleanupWorkItem(recursiveClean,item.RelativePath,item.PhysicalPath),
+                        item});
+                return;
+            }
         }
 
     }
