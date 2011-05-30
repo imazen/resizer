@@ -23,9 +23,9 @@ using ImageResizer.Util;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:/*
-[assembly: AssemblyVersion("3.0.7.*")]
-[assembly: AssemblyFileVersion("3.0.7.*")]
-[assembly: AssemblyInformationalVersion("3-alpha-7")]
+[assembly: AssemblyVersion("3.0.8.*")]
+[assembly: AssemblyFileVersion("3.0.8.*")]
+[assembly: AssemblyInformationalVersion("3-alpha-8")]
 
 [assembly: Commit("git-commit-guid-here")]
 
