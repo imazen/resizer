@@ -73,7 +73,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="configuration.txt" />
+    <Content Include="LastAccessedUtc.txt" />
     <Content Include="license.txt" />
+    <Content Include="todo.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
