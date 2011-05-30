@@ -109,13 +109,13 @@ namespace ImageResizer.Plugins.DiskCache {
             while (DateTime.UtcNow.Subtract(startedAt) < length && !queue.IsEmpty) {
                 //Check for shutdown
                 if (shuttingDown) return true;
-                //try {
+                try {
                     DoTask(queue.Pop());
-                //} catch (Exception e) {
-                //    if (Debugger.IsAttached) throw;
+                } catch (Exception e) {
+                    if (Debugger.IsAttached) throw;
                         
-                //    this.AcceptIssue(new Issue("Failed exeuting task", e.Message + e.StackTrace, IssueSeverity.Critical));
-                //}
+                    this.AcceptIssue(new Issue("Failed exeuting task", e.Message + e.StackTrace, IssueSeverity.Critical));
+                }
             }
 
             lock (_timesLock) lastWorked = DateTime.UtcNow.Ticks;
