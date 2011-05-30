@@ -117,7 +117,8 @@ namespace ImageResizer
             //Bitmap
             if (source is Bitmap) return source as Bitmap;
             //Image
-            if (source is System.Drawing.Image) return new Bitmap((System.Drawing.Image)source); //Note, this clones just the raw bitmap data - doesn't copy attributes, bit depth, or anything.
+            if (source is System.Drawing.Image) 
+                return new Bitmap((System.Drawing.Image)source); //Note, this clones just the raw bitmap data - doesn't copy attributes, bit depth, or anything.
             //IVirtualBitmapFile
             if (source is IVirtualBitmapFile) {
                 b = ((IVirtualBitmapFile)source).GetBitmap();
@@ -239,7 +240,7 @@ namespace ImageResizer
        
         public virtual Bitmap Build(object source, ResizeSettings settings, bool disposeSource) {
             BitmapHolder bh = new BitmapHolder();
-            Build(source, bh, settings);
+            Build(source, bh, settings, disposeSource);
             return bh.bitmap;
         }
 
@@ -296,8 +297,8 @@ namespace ImageResizer
                 Stream underlyingStream = null;
                 if (b != null && b.Tag != null && b.Tag is BitmapTag) underlyingStream = ((BitmapTag)b.Tag).Source;
 
-                //Close the source bitamp's underlying stream unless it is the same stream we were passed.
-                if (underlyingStream != source && underlyingStream != null) underlyingStream.Dispose();
+                //Close the source bitamp's underlying stream unless it is the same stream (EDIT: or bitmap) we were passed.
+                if (b != source && underlyingStream != source && underlyingStream != null) underlyingStream.Dispose();
 
                 //Dispose the bitmap unless we were passed it
                 if (b != source) b.Dispose();
@@ -316,13 +317,16 @@ namespace ImageResizer
         /// <param name="source"></param>
         /// <param name="dest"></param>
         /// <param name="settings"></param>
-        protected virtual void buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
+        protected override RequestedAction buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
+            if (base.buildToStream(source, dest, settings) == RequestedAction.Cancel) return RequestedAction.None;
+
             IEncoder e = this.EncoderProvider.GetEncoder(settings,source);
             if (e == null) throw new ImageProcessingException("No image encoder was found for this request.");
             using (Bitmap b = buildToBitmap(source, settings,e.SupportsTransparency)) {//Determines output format, includes code for saving in a variety of formats.
                 //Save to stream
                 e.Write(b, dest);
             }
+            return RequestedAction.None;
         }
 
         /// <summary>

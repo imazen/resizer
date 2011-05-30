@@ -33,7 +33,7 @@ namespace ImageResizer.Plugins.AnimatedGifs
         }
         public void LoadGifPicture(MemoryStream stream)
         {
-           
+           //TODO: Eliminate double copying
             List<byte> dataList = new List<byte>(stream.ToArray()); //Copies the data *again* grr.
             
             if (!AnalyzeGifSignature(dataList))

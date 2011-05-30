@@ -12,7 +12,7 @@ using ImageResizer.Encoding;
 using ImageResizer.Configuration;
 namespace ImageResizer.Plugins.AnimatedGifs
 {
-    public class AnimatedGifs : AbstractImageProcessor, IPlugin
+    public class AnimatedGifs : BuilderExtension, IPlugin
     {
         Config c;
         public AnimatedGifs(){}
@@ -33,19 +33,19 @@ namespace ImageResizer.Plugins.AnimatedGifs
         /// <param name="source"></param>
         /// <param name="dest"></param>
         /// <param name="settings"></param>
-        protected override RequestedAction OnBuildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
+        protected override RequestedAction buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
             IEncoder ios = c.Plugins.EncoderProvider.GetEncoder(settings, source);
             //Determines output format, includes code for saving in a variety of formats.
             if (ios.MimeType.Equals("image/gif", StringComparison.OrdinalIgnoreCase) && //If it's a GIF
                 settings["frame"] == null &&    //With no frame specifier
                 source.FrameDimensionsList != null && source.FrameDimensionsList.Length > 0) { //With multiple frames
-                try {
+                //try {
                     if (source.GetFrameCount(FrameDimension.Time) > 1) {
                         WriteAnimatedGif(source,dest, ios, settings);
                         return RequestedAction.Cancel;
                     }
-                } catch (System.Runtime.InteropServices.ExternalException) {
-                }
+               // } catch (System.Runtime.InteropServices.ExternalException) {
+               // }
             }
             return RequestedAction.None;
         }
@@ -80,7 +80,7 @@ namespace ImageResizer.Plugins.AnimatedGifs
                     // http://radio.weblogs.com/0122832/2005/10/20.html
                     //src.MakeTransparent(); This call makes some GIFs replicate the first image on all frames.. i.e. SelectActiveFrame doesn't work.
                     
-                    using (Bitmap b = this.buildToBitmap(src,queryString,true)){
+                    using (Bitmap b = c.CurrentImageBuilder.Build(src,queryString,false)){
                         //Useful to check if animation is occuring - sometimes the problem isn't the output file, but the input frames are 
                         //all the same.
                         //for (var i = 0; i < b.Height; i++) b.SetPixel(frame * 10, i, Color.Green);
