@@ -173,14 +173,10 @@ namespace ImageResizer.ReleaseBuilder {
 
 
             //delete /Tests/binaries  (*.pdb, *.xml, *.dll)
-            //delete all bin and obj folders under /Tests and /Plugins
             //delete /Core/obj folder
-            //Deleate all bin,obj,imageacache,uploads, and results folders under /Samples
+            //Deleate all bin,obj,imageacache,uploads, and results folders under /Samples,  /Tests and /Plugins
             f.DelFiles(q.files("^/Tests/binaries/*.(pdb|xml|dll|txt)$"));
-
-
-            f.DelFiles(q.files("^/(Tests|Plugins)/*/(bin|obj)/*",
-                       "^/Samples/*/(bin|obj|imagecache|uploads|results)/*",
+            f.DelFiles(q.files("^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|results)/*",
                        "^/Core/obj/*"));
 
 
