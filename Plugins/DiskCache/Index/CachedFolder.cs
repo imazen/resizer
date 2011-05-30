@@ -313,6 +313,7 @@ namespace ImageResizer.Plugins.DiskCache {
                 Dictionary<string, CachedFolder> newFolders = new Dictionary<string, CachedFolder>(dirs.Length, KeyComparer);
                 foreach (string s in dirs) {
                     string local = s.Substring(s.LastIndexOf(System.IO.Path.DirectorySeparatorChar) + 1);
+                    if (local.StartsWith(".")) continue; //Skip folders that start with a period.
                     if (f.folders.ContainsKey(local)) 
                         newFolders[local] = f.folders[local]; //What if the value is null? does containskey work?
                     else 
@@ -336,7 +337,8 @@ namespace ImageResizer.Plugins.DiskCache {
                 string local = s.Substring(s.LastIndexOf(System.IO.Path.DirectorySeparatorChar) + 1);
                 
                 //Todo, add a callback that handles exclusion of files
-                if (local.EndsWith(".config", StringComparison.OrdinalIgnoreCase)) continue; 
+                if (local.EndsWith(".config", StringComparison.OrdinalIgnoreCase)) continue;
+                if (local.StartsWith(".")) continue; //Skip files that start with a period
 
                 //What did we have on file?
                 CachedFileInfo old = null;
