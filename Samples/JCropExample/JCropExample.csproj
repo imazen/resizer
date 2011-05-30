@@ -34,10 +34,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Advanced.aspx" />
     <Content Include="Basic.htm" />
     <Content Include="css\Jcrop.gif" />
     <Content Include="css\jquery.Jcrop.css" />
@@ -53,6 +57,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Advanced.aspx.cs">
+      <DependentUpon>Advanced.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Advanced.aspx.designer.cs">
+      <DependentUpon>Advanced.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
