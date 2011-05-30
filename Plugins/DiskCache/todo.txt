@@ -1,17 +1,43 @@
-﻿
-- are last accessed dates updated?
-- Does checking FileInfo update the last accessed date?
-- LastAccessedDates only have a 1 hour granularity. They may be updated to 'now' when GetFiles is called.
+﻿TODO: Add a scheduled "CleanAll", since items wil be more eligible for cleanup when there is no traffic.
+TODO: CachedFolder should offer some kind of inherited settings class that permits file exclusion from the listing
+TODO: CleanupStrategy.ShouldRemove should remove *all* files that can't be part of the cache. 
+TODO: Add diskcache physicalFolder property - when set, it should create a VirtualFolder instance if IIS doesn't already map the folder.
+TODO: Create a 'NamingStrategy' class that encapsulates the naming of the files and subfolders. Pluggable, so file hashes can be embedded.
 
 
-- How do we externalize file filtering?
-- How to we externalize removal of files that couldn't be part of the cache?
-- How to we embed both a 'version number' and a file hash without exceeding the file name limit.
+TODO: CachedFolder.populate() needs to log the following errors and handle them properly.
 
-- How do we handle NTFS errors? 
+##Directory.GetDirectories
 
-catch(UnauthorizedAccessException ex)
-   {
+DirectoryNotFoundException	
+The path encapsulated in the DirectoryInfo object is invalid, such as being on an unmapped drive.
+
+SecurityException	
+The caller does not have the required permission.
+
+UnauthorizedAccessException
+
+##Directory.GetFiles
+
+IOException	
+path is a file name.
+
+-or-
+
+A network error has occurred.
+
+UnauthorizedAccessException	
 
 
-Make it easy to host DiskCache outside the app folder using VirtualFolder.
+##FileInfo constructor
+
+SecurityException	
+The caller does not have the required permission.
+
+ArgumentException	
+The file name is empty, contains only white spaces, or contains invalid characters.
+
+UnauthorizedAccessException	
+
+
+
