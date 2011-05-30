@@ -156,5 +156,10 @@ namespace ImageResizer.Plugins.DiskCache {
             return ((now.Subtract(i.AccessedUtc) > ProhibitRemovalIfUsedWithin || ProhibitRemovalIfUsedWithin <= new TimeSpan(0)) &&
                 (now.Subtract(i.UpdatedUtc) > ProhibitRemovalIfCreatedWithin || ProhibitRemovalIfCreatedWithin <= new TimeSpan(0)));
         }
+
+        public bool ShouldRemove(string relativePath, CachedFileInfo info, bool isOverMax) {
+            if (isOverMax) return MeetsOverMaxCriteria(info);
+            else return MeetsCleanupCriteria(info);
+        }
     }
 }

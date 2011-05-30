@@ -1,0 +1,17 @@
+﻿
+- are last accessed dates updated?
+- Does checking FileInfo update the last accessed date?
+- LastAccessedDates only have a 1 hour granularity. They may be updated to 'now' when GetFiles is called.
+
+
+- How do we externalize file filtering?
+- How to we externalize removal of files that couldn't be part of the cache?
+- How to we embed both a 'version number' and a file hash without exceeding the file name limit.
+
+- How do we handle NTFS errors? 
+
+catch(UnauthorizedAccessException ex)
+   {
+
+
+Make it easy to host DiskCache outside the app folder using VirtualFolder.
