@@ -113,10 +113,10 @@ namespace ImageResizer.Resizing {
         /// <param name="dest"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        protected virtual RequestedAction OnBuildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
+        protected virtual RequestedAction buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
             if (exts != null) 
                 foreach (AbstractImageProcessor p in exts) 
-                    if (p.OnBuildToStream(source, dest, settings) == RequestedAction.Cancel) 
+                    if (p.buildToStream(source, dest, settings) == RequestedAction.Cancel) 
                         return RequestedAction.Cancel;
             return RequestedAction.None;
         }
