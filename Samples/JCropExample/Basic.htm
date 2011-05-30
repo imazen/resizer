@@ -4,43 +4,37 @@
     <title>Combining jCrop with server-side resizing and cropping</title>
     <script src="js/jquery.min.js" type="text/javascript"></script> 
 	<script src="js/jquery.Jcrop.js" type="text/javascript"></script> 
-	<link rel="stylesheet" href="css/jquery.Jcrop.css" type="text/css" /> 
+	<link href="css/jquery.Jcrop.css" type="text/css" rel="stylesheet" /> 
  
 	<script  type="text/javascript">
-	    $(function () {
+        $(function () { //On DOM ready
             //Using the 'each' pattern allows multiple cropping image/link pairs per page.
 	        $('.image-cropper').each(function(unusedIndex, container) {
 	            container = $(container); //We were passed a DOM reference, convert it to a jquery object
 
-	            //Find the image by class ("image")
+	            //Find the image inside 'container' by class ("image")
 	            var image = container.find("img.image");
 
 	            //Trim the querystring off the image URL.
-	            var path = image.attr('src');
-	            if (path.indexOf('?') > 0) path = path.substr(0, path.indexOf('?'));
+	            var path = image.attr('src'); if (path.indexOf('?') > 0) path = path.substr(0, path.indexOf('?'));
 
 	            //Define a function to execute when the cropping rectangle changes.
 	            var update = function (coords) {
 	                if (parseInt(coords.w) <= 0 || parseInt(coords.h) <= 0) return; //Require valid width and height
 
 	                //Build the URL based on the coordiantes. The resizing module will handle everything else.
-	                var url = path + '?crop=(' + coords.x + ',' + coords.y + ',' + coords.x2 + ',' + coords.y2 + ')&cropxunits=' + image.width() + '&cropyunits=' + image.height()
+	                var url = path + '?crop=(' + coords.x + ',' + coords.y + ',' + coords.x2 + ',' + coords.y2 + 
+                    ')&cropxunits=' + image.width() + '&cropyunits=' + image.height()
 
 	                //Now, update the link 'href' (you could update a hidden field just as easily)
 	                container.find('a.result').attr('href', url);
 	            }
 
-	            //Start up jCrop on the image
-	            image.Jcrop({
-	                onChange: update,
-	                onSelect: update,
-	                bgColor: 'black',
-	                bgOpacity: 0.6
-	            });
+	            //Start up jCrop on the image, specifying our function be called when the selection rectangle changes,
+                // and that a 60% black shadow should cover the cropped regions.
+	            image.Jcrop({ onChange: update, onSelect: update, bgColor: 'black', bgOpacity: 0.6 });
 	        });
-	    });
-
-	
+        });
 	</script>
 </head>
 <body>
@@ -48,12 +42,12 @@
         <h1>Combining jCrop with server-side resizing and cropping</h1>
         <div class="image-cropper">
             <img src="fountain-small.jpg?width=400" class="image" />    
-            <a class="result" href="#">View the result</a><br />        
+            <a class="result">View the result</a>        
         </div>
         <h2>Another image (see, we can have 2!)</h2>
         <div class="image-cropper">
             <img src="red-leaf.jpg?width=300" class="image" />    
-            <a class="result" href="#">View the result</a><br />        
+            <a class="result">View the result</a>        
         </div>
     </div>
 </body>
