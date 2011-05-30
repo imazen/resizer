@@ -167,36 +167,39 @@ namespace ImageResizer.Plugins.DiskCache {
         }
 
         protected void RemoveFile(CleanupWorkItem item) {
+            //File names are never embedded into the first item, they are provided on-demand by a LazyProvider
             LazyTaskProvider provider = item.LazyProvider;
+            item = provider();
+            if (item == null) return; //The provider is out of possible items
+            item.LazyProvider = provider; //So if this item fails, we can queue 'item' again and the next task run will get the next alternative.
+
             bool removedFile = false;
-            //TODO: If a tryExecute fails, or an exception is thrown, the item should be re-queued instead of looping through all files.
-            while (item != null && !removedFile) {
-                if (provider != null) item = provider(); //Keep asking for the next candidate on failure (the first item is blank)
-                if (item == null) return; //No more files to try!
-                cache.Locks.TryExecute(item.RelativePath, 10, delegate() {
 
-                    //If the file is already gone, consider the mission a succes.
-                    if (!System.IO.File.Exists(item.PhysicalPath)) {
-                        cache.Index.setCachedFileInfo(item.RelativePath, null);
-                        removedFile = true;
-                        return;
-                    }
-                    //Cool, we got a lock on the file.
-                    //Remove it from the cache. Better a miss than an invalidation.
+            cache.Locks.TryExecute(item.RelativePath, 10, delegate() {
+
+                //If the file is already gone, consider the mission a succes.
+                if (!System.IO.File.Exists(item.PhysicalPath)) {
                     cache.Index.setCachedFileInfo(item.RelativePath, null);
-                    try {
-                        System.IO.File.Delete(item.PhysicalPath);
-                    } catch (IOException) {
-                        return; //The file is in use, or has an open handle. - try the next file.
-                    } catch (UnauthorizedAccessException) {
-                        return; //Invalid NTFS permissions or readonly file.  - try the next file
-                    }
-
-                    cache.Index.setCachedFileInfo(item.RelativePath, null); //In case it crossed paths.
                     removedFile = true;
-                });
-            }
-            return;
+                    return;
+                }
+                //Cool, we got a lock on the file.
+                //Remove it from the cache. Better a miss than an invalidation.
+                cache.Index.setCachedFileInfo(item.RelativePath, null);
+                try {
+                    System.IO.File.Delete(item.PhysicalPath);
+                } catch (IOException) {
+                    return; //The file is in use, or has an open handle. - try the next file.
+                } catch (UnauthorizedAccessException) {
+                    return; //Invalid NTFS permissions or readonly file.  - try the next file
+                }
+
+                cache.Index.setCachedFileInfo(item.RelativePath, null); //In case it crossed paths.
+                removedFile = true;
+            });
+
+            //If we didn't remove a file, insert the task back in the queue for the next iteration.
+            if (!removedFile) queue.Insert(item);
         }
 
 

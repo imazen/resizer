@@ -21,7 +21,8 @@ namespace ImageResizer.Plugins.DiskCache {
         /// </summary>
         public LazyTaskProvider LazyProvider
         {
-          get { return lazyProvider; }
+            get { return lazyProvider; }
+            set { lazyProvider = value; }
         }
 
         public string RelativePath {

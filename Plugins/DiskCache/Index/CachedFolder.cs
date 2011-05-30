@@ -77,7 +77,7 @@ namespace ImageResizer.Plugins.DiskCache {
 
         /// <summary>
         /// Sets the CachedFileInfo object for the specified path, creating any needed folders along the way.
-        /// If 'null', the item will be removed.
+        /// If 'null', the item will be removed, and no missing folder will be created.
         /// </summary>
         /// <param name="relativePath"></param>
         /// <param name="info"></param>
