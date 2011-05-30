@@ -17,6 +17,12 @@ namespace ImageResizer.Plugins.DiskCache {
         CleanupStrategy cs = null;
         CleanupQueue queue = null;
         CustomDiskCache cache = null;
+        /// <summary>
+        /// Creates and starts a thread that consumes the queue, pausing until notified when 'queue' empties.
+        /// </summary>
+        /// <param name="cs"></param>
+        /// <param name="queue"></param>
+        /// <param name="cache"></param>
         public CleanupWorker(CleanupStrategy cs, CleanupQueue queue, CustomDiskCache cache):base("DiskCache-CleanupWorker") {
             this.cs = cs;
             this.queue = queue;
