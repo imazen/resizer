@@ -48,7 +48,9 @@ namespace ImageResizer.Plugins.DiskCache {
         }
         private  DateTime accessedUtc = DateTime.MinValue;
         /// <summary>
-        /// The last time the file was accessed.
+        /// The last time the file was accessed. Will not match NTFS date, this value is updated by DiskCache.
+        /// When first loaded from NTFS, it will be granular to about an hour, due to NTFS delayed write. Also, windows Vista and higher never write accessed dates. 
+        /// We update this value in memory, and flush it to disk lazily. 
         /// </summary>
         public DateTime AccessedUtc {
             get { return accessedUtc; }

@@ -1,0 +1,9 @@
+﻿Vista, Winodws 7, Server 2003, and Server 2008 do not update the last accessed date when a file is opened.
+http://technet.microsoft.com/en-us/library/cc758569(WS.10).aspx
+
+If the value is updated for any reason, it will only have a granularity of an hour to do delayed write cache for unimportant data.
+
+Thus, NTFS accessed data is only useful if we manually update it - and even then, it may have a 1 hour granularity.
+
+
+The solution DiskCache takes is to update an in-memory cache of the accessed date on each use, and queue a 'flush job' to the cleanup worker for updating the filesystem about it.

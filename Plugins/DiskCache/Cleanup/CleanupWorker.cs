@@ -137,16 +137,14 @@ namespace ImageResizer.Plugins.DiskCache {
             Debug.WriteLine("Executing task " + item.Task.ToString() + " " + item.RelativePath + " (" + queue.Count.ToString() + " task remaining)");
 
             if (item.Task == CleanupWorkItem.Kind.RemoveFile)
-
                 RemoveFile(item);
-            else if (item.Task == CleanupWorkItem.Kind.CleanFolderRecursive || item.Task == CleanupWorkItem.Kind.CleanFolder) {
-
+            else if (item.Task == CleanupWorkItem.Kind.CleanFolderRecursive || item.Task == CleanupWorkItem.Kind.CleanFolder) 
                 CleanFolder(item, item.Task == CleanupWorkItem.Kind.PopulateFolderRecursive);
-            } else if (item.Task == CleanupWorkItem.Kind.PopulateFolderRecursive ||
-                       item.Task == CleanupWorkItem.Kind.PopulateFolder) {
-
+            else if (item.Task == CleanupWorkItem.Kind.PopulateFolderRecursive || item.Task == CleanupWorkItem.Kind.PopulateFolder)
                 PopulateFolder(item, item.Task == CleanupWorkItem.Kind.PopulateFolderRecursive);
-            }
+            else if (item.Task == CleanupWorkItem.Kind.FlushAccessedDate) 
+                FlushAccessedDate(item);
+            
         }
 
         protected string addSlash(string s, bool physical) {
@@ -275,6 +273,17 @@ namespace ImageResizer.Plugins.DiskCache {
             for (int i = 0; i < overMax; i++) queue.Insert(obsessive);
 
 
+        }
+
+        public void FlushAccessedDate(CleanupWorkItem item) {
+            CachedFileInfo c = cache.Index.getCachedFileInfo(item.RelativePath);
+            if (c == null) return; //File was already deleted, nothing to do.
+            try{
+                File.SetLastAccessTimeUtc(item.PhysicalPath, c.AccessedUtc);
+                //In both of these exception cases, we don't care.
+            }catch (FileNotFoundException){
+            }catch (UnauthorizedAccessException){
+            }
         }
 
     }
