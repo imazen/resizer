@@ -181,7 +181,7 @@
             <table>
                 <tr>
                     <td>
-                        <img src="~/fountain-small.jpg?width=400" runat="server" class="image" />
+                        <img src="fountain-small.jpg?width=400" runat="server" class="image" />
                     </td>
                     <td>
                         <div style="margin:50px; width:200px; text-align:center">
@@ -203,7 +203,7 @@
         <h1>Client-side only</h1>
         <div class="image-cropper" style="width:300px; text-align:center">
             
-            <img src="~/fountain-small.jpg?width=300" runat="server" class="image" />
+            <img src="fountain-small.jpg?width=300" runat="server" class="image" />
             <div class="preview" style="margin-left:100px">
             </div>
             <a class="result" href="#">View result</a>
@@ -211,7 +211,7 @@
         <h1>Without a preview</h1>
         <div class="image-cropper" style="width:300px; text-align:center">
             
-            <img src="~/red-leaf.jpg?width=300" runat="server" class="image" />
+            <img src="red-leaf.jpg?width=300" runat="server" class="image" />
             <a class="result" href="#">View result</a>
         </div>
     </div>
