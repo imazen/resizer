@@ -6,7 +6,10 @@
     $(function () {
         for (var i = 1; i < 50; i++) {
             $("<img src='red-leaf.jpg?width=3&rand=" + (i * Math.random()) + "' />").appendTo($(".area"));
-            $('.status').text("Generated " + i + " new images");
+            $('.status').text("Generating " + i + " new images, reusing 50 old images");
+        }
+        for (var i = 1; i < 50; i++) {
+            $("<img src='red-leaf.jpg?width=3&nonrand=" + i + "' />").appendTo($(".area"));
         }
     });
 </script>
