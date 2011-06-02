@@ -307,7 +307,12 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="physicalPath"></param>
         protected void populateSubfolders(string relativePath, string physicalPath) {
             relativePath = checkRelativePath(relativePath);
-            string[] dirs = System.IO.Directory.GetDirectories(physicalPath);
+            string[] dirs = null;
+            try {
+                 dirs = System.IO.Directory.GetDirectories(physicalPath);
+            } catch (DirectoryNotFoundException) {
+                dirs = new string[]{}; //Pretend it's empty. We don't care, the next recursive will get rid of it.
+            }
             lock (_sync) {
                 CachedFolder f = getOrCreateFolder(relativePath, true);
                 Dictionary<string, CachedFolder> newFolders = new Dictionary<string, CachedFolder>(dirs.Length, KeyComparer);
@@ -329,7 +334,12 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="physicalPath"></param>
         protected void populateFiles(string relativePath, string physicalPath) {
             relativePath = checkRelativePath(relativePath);
-            string[] physicalFiles = System.IO.Directory.GetFiles(physicalPath);
+            string[] physicalFiles = null;
+            try {
+                physicalFiles = System.IO.Directory.GetFiles(physicalPath);
+            } catch (DirectoryNotFoundException) {
+                physicalFiles = new string[] { }; //Pretend it's empty. We don't care, the next recursive will get rid of it.
+            }
             Dictionary<string, CachedFileInfo> newFiles = new Dictionary<string, CachedFileInfo>(physicalFiles.Length, KeyComparer);
 
             CachedFolder f = getOrCreateFolder(relativePath, true);
