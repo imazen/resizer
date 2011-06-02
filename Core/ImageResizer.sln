@@ -53,7 +53,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Waterm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication", "..\Samples\ConsoleApplication\ConsoleApplication.csproj", "{51E37FA2-4CD1-476D-8B29-BD51C5F02B78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiskCacheWebTest", "..\Tests\DiskCacheWebTest\DiskCacheWebTest.csproj", "{109162D7-72F7-4C7D-BD71-EEAB424CC522}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.DiskCache.WebTest", "..\Tests\DiskCacheWebTest\ImageResizer.Plugins.DiskCache.WebTest.csproj", "{109162D7-72F7-4C7D-BD71-EEAB424CC522}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCropExample", "..\Samples\JCropExample\JCropExample.csproj", "{718E5759-A926-4F3B-A9B9-3AAA9FC5E9B4}"
 EndProject

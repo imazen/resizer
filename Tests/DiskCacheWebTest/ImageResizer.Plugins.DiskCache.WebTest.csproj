@@ -83,7 +83,6 @@
       <DependentUpon>Site.Master</DependentUpon>
     </Compile>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Content Include="Site.Master" />
   </ItemGroup>
