@@ -1,4 +1,7 @@
-﻿TODO: Add a scheduled "CleanAll", since items wil be more eligible for cleanup when there is no traffic.
+﻿TODO: Fix bug where notfound happens when the folder doesn't exist
+
+
+TODO: Add a scheduled "CleanAll", since items wil be more eligible for cleanup when there is no traffic.
 TODO: CachedFolder should offer some kind of inherited settings class that permits file exclusion from the listing
 TODO: CleanupStrategy.ShouldRemove should remove *all* files that can't be part of the cache. 
 TODO: Add diskcache physicalFolder property - when set, it should create a VirtualFolder instance if IIS doesn't already map the folder.

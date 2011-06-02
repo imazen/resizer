@@ -134,7 +134,7 @@ namespace ImageResizer {
                         try{
                             HandleRequest(app.Context, virtualPath, q, vf);
                             //Catch not found exceptions
-                        } catch (System.IO.FileNotFoundException notFound) {
+                        } catch (System.IO.FileNotFoundException notFound) { //Some VPPs are optimisitic , or could be a race condition
                             FileMissing(app.Context, virtualPath, q);
                             throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
                         }

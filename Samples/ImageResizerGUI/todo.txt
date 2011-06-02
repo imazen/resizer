@@ -7,7 +7,7 @@ App should not crash when settings file is missing.
 
 Message boxes shouldn't ever be displayed when dragging or pasting files into the box.
 Destination path should be editable.
-
+lowercase extensions should be used.
 
 # Code cleanup
 
@@ -19,3 +19,5 @@ Remove all uneeded dependencies.
 # Design
 
 Apply better typographic principles.
+
+
