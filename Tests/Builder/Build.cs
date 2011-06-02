@@ -27,9 +27,9 @@ namespace ImageResizer.ReleaseBuilder {
 
             packages.Add(new PackageDescriptor("min", PackMin));
             packages.Add(new PackageDescriptor("full", PackFull));
-            packages.Add(new PackageDescriptor("core", PackCore));
+            //packages.Add(new PackageDescriptor("core", PackCore));
             packages.Add(new PackageDescriptor("standard", PackStandard));
-            packages.Add(new PackageDescriptor("allbinaries", PackAllBinaries));
+            //packages.Add(new PackageDescriptor("allbinaries", PackAllBinaries));
         }
 
         public string getReleasePath(string packageBase, string ver,  string kind) {
