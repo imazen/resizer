@@ -19,6 +19,7 @@ namespace ComplexWebApplication {
             //Loop through each uploaded file
             foreach (string fileKey in HttpContext.Current.Request.Files.Keys) {
                 HttpPostedFile file = HttpContext.Current.Request.Files[fileKey];
+                if (file.ContentLength <= 0) continue; //Yep, it happens all the time
 
                 //Get the physical path for the uploads folder
                 string uploadFolder = MapPath("~/uploads");
