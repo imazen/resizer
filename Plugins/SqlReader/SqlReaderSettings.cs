@@ -85,8 +85,8 @@ namespace ImageResizer.Plugins.SqlReader {
         public System.Data.SqlDbType ImageIdType {
             get { return imageIdType; }
             set {
-                if (value != System.Data.SqlDbType.Int && value != System.Data.SqlDbType.TinyInt || value != System.Data.SqlDbType.SmallInt ||
-                value != System.Data.SqlDbType.BigInt || value != System.Data.SqlDbType.UniqueIdentifier)
+                if (value != System.Data.SqlDbType.Int && value != System.Data.SqlDbType.TinyInt && value != System.Data.SqlDbType.SmallInt &&
+                value != System.Data.SqlDbType.BigInt && value != System.Data.SqlDbType.UniqueIdentifier)
                     throw new ArgumentOutOfRangeException("Int, TinyInt, SmallInt, BigInt, and UniqueIdentifier are the only valid values for ImageIdType");
 
                 imageIdType = value; 
