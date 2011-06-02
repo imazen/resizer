@@ -20,3 +20,10 @@ InterceptModule (These errors
 
 (SizeLimiting plugin)
 - SizeLimitException - the image exceeded configured total resolution limits.
+
+(S3Reader)
+FileNotFoundException (recoverable with image404 plugin)
+
+(SqlReader)
+FileNotFoundException (recoverable with image404 plugin)
+Sql* errors, configuration problems
