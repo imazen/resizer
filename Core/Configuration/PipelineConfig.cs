@@ -11,6 +11,7 @@ using ImageResizer.Configuration.Issues;
 using ImageResizer.Encoding;
 using System.Web.Hosting;
 using ImageResizer.Collections;
+using System.Web;
 
 namespace ImageResizer.Configuration {
     public class PipelineConfig : IPipelineConfig, ICacheProvider{
@@ -178,6 +179,23 @@ namespace ImageResizer.Configuration {
 
         public string ModifiedPathKey {
             get { return "resizer.newPath"; }
+        }
+
+        /// <summary>
+        /// Returns the value of Context.Items["resizer.newPath"] if present. If not, returns FilePath + PathInfo.
+        /// Sets Context.Items["resizer.newPath"]. 
+        /// Only useful during the Pipeline.PostAuthorizeRequestStart event.
+        /// </summary>
+        public string PreRewritePath{
+            get{
+               if (HttpContext.Current == null) return null;
+               return HttpContext.Current.Items[ModifiedPathKey] != null ? HttpContext.Current.Items[ModifiedPathKey] as string : 
+                   (HttpContext.Current.Request.FilePath + HttpContext.Current.Request.PathInfo);
+
+            }
+            set {
+                HttpContext.Current.Items[ModifiedPathKey] = value;
+            }
         }
 
         public string ResponseArgsKey {
