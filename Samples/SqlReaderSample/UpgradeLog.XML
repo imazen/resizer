@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="DatabaseSampleCSharp">
+</Property><Property Name="Solution File" Value="D:\Documents and Settings\Nathanael\My Documents\resizer\DatabaseSampleCSharp\DatabaseSampleCSharp.sln">
+</Property><Property Name="Date" Value="Monday, October 04, 2010">
+</Property><Property Name="Time" Value="20:43:09 PM">
+</Property></Properties><Event ErrorLevel="0" Project="VPPTest" Source="..\VPPTest\VPPTest.csproj" Description="Project file successfully backed up as D:\Documents and Settings\Nathanael\My Documents\resizer\DatabaseSampleCSharp\Backup\VPPTest.csproj">
+</Event><Event ErrorLevel="0" Project="VPPTest" Source="..\VPPTest\VPPTest.csproj.user" Description="Project user file successfully backed up as D:\Documents and Settings\Nathanael\My Documents\resizer\DatabaseSampleCSharp\Backup\VPPTest.csproj.user">
+</Event><Event ErrorLevel="0" Project="VPPTest" Source="..\VPPTest\Properties\AssemblyInfo.cs" Description="File successfully backed up as D:\Documents and Settings\Nathanael\My Documents\resizer\DatabaseSampleCSharp\Backup\Properties\AssemblyInfo.cs">
+</Event><Event ErrorLevel="0" Project="VPPTest" Source="..\VPPTest\Web.config" Description="File successfully backed up as D:\Documents and Settings\Nathanael\My Documents\resizer\DatabaseSampleCSharp\Backup\Web.config">
+</Event><Event ErrorLevel="0" Project="VPPTest" Source="..\VPPTest\Global.asax" Description="File successfully backed up as D:\Documents and Settings\Nathanael\My Documents\resizer\DatabaseSampleCSharp\Backup\Global.asax">
+</Event><Event ErrorLevel="2" Project="VPPTest" Source="..\VPPTest\Protected\Web.config" Description="Failed to backup file as D:\Documents and Settings\Nathanael\My Documents\resizer\DatabaseSampleCSharp\Backup\Protected\Web.config">
+</Event><Event ErrorLevel="1" Project="VPPTest" Source="..\VPPTest\VPPTest.csproj" Description="Your project is targeting .NET Framework 2.0 or 3.0. If your project uses assemblies requiring a newer .NET Framework, your project will fail to build. You can change the .NET Framework version by clicking Properties on the project menu and then selecting a new version in the '.NET Framework' dropdown box. (In Visual Basic, this is located on the Compile tab by clicking the 'Advanced Compiler Options...' button.)">
+</Event><Event ErrorLevel="0" Project="VPPTest" Source="..\VPPTest\VPPTest.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="VPPTest" Source="..\VPPTest\VPPTest.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="VPPTest" Source="..\VPPTest\VPPTest.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event></UpgradeLog>
