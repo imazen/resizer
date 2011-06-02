@@ -10,6 +10,7 @@ using System.Drawing;
 using ImageResizer.Resizing;
 using ImageResizer.Encoding;
 using ImageResizer.Configuration;
+using ImageResizer.Plugins.Basic;
 namespace ImageResizer.Plugins.AnimatedGifs
 {
     public class AnimatedGifs : BuilderExtension, IPlugin
@@ -34,16 +35,15 @@ namespace ImageResizer.Plugins.AnimatedGifs
         /// <param name="dest"></param>
         /// <param name="settings"></param>
         protected override RequestedAction buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
-            IEncoder ios = c.Plugins.EncoderProvider.GetEncoder(settings, source);
             //Determines output format, includes code for saving in a variety of formats.
-            if (ios.MimeType.Equals("image/gif", StringComparison.OrdinalIgnoreCase) && //If it's a GIF
+            if (source.RawFormat.Guid.Equals(ImageFormat.Gif.Guid) && //If it's a GIF
                 settings["frame"] == null &&    //With no frame specifier
                 source.FrameDimensionsList != null && source.FrameDimensionsList.Length > 0) { //With multiple frames
                 //try {
-                    if (source.GetFrameCount(FrameDimension.Time) > 1) {
-                        WriteAnimatedGif(source,dest, ios, settings);
-                        return RequestedAction.Cancel;
-                    }
+                if (source.GetFrameCount(FrameDimension.Time) > 1) {
+                    WriteAnimatedGif(source,dest, c.Plugins.EncoderProvider.GetEncoder(settings, source), settings);
+                    return RequestedAction.Cancel;
+                }
                // } catch (System.Runtime.InteropServices.ExternalException) {
                // }
             }
