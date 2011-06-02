@@ -300,8 +300,8 @@ namespace ImageResizer
                 //Close the source bitamp's underlying stream unless it is the same stream (EDIT: or bitmap) we were passed.
                 if (b != source && underlyingStream != source && underlyingStream != null) underlyingStream.Dispose();
 
-                //Dispose the bitmap unless we were passed it
-                if (b != source) b.Dispose();
+                //Dispose the bitmap unless we were passed it. We check for 'null' in case an ImageCorruptedException occured. 
+                if (b != null && b != source) b.Dispose();
 
                 //Follow the disposeSource boolean.
                 if (disposeSource && source is IDisposable) ((IDisposable)source).Dispose();
