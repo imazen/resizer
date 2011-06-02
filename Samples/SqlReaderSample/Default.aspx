@@ -4,14 +4,30 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title></title>
+    <title>Display images from SQL</title>
 </head>
 <body>
     <form id="form1" runat="server">
     <div>
-     <a href="~/databaseimages/1.jpg" runat="server"><img src="~/databaseimages/1.jpg?width=200"  alt="click for original" runat="server" /></a>
-     <a id="A1" href="~/databaseimages/2.jpg" runat="server"><img id="Img1" src="~/databaseimages/2.jpg?width=200"  alt="click for original" runat="server" /></a>
-     <a id="A2" href="~/databaseimages/7.jpg" runat="server"><img id="Img2" src="~/databaseimages/7.jpg?width=200"  alt="click for original" runat="server" /></a>
+    <h1>These images are dynamically loaded from SQL and resized before being sent to the client.</h1>
+    <p><a href="~/Upload.aspx" runat="server">Click here to upload photos.</a></p>
+
+
+    <asp:SqlDataSource 
+            id="sql"
+          runat="server"
+          DataSourceMode="DataReader"
+          ConnectionString="<%$ ConnectionStrings:database%>"
+          SelectCommand="SELECT ImageID, FileName FROM Images" ></asp:SqlDataSource>
+
+    
+    <asp:Repeater DataSourceID="sql" runat="server">
+        <ItemTemplate>
+        <a href="<%# ResolveUrl("~/databaseimages/" +Eval( "ImageID"))%>">
+            <img src="<%# ResolveUrl("~/databaseimages/" + Eval( "ImageID") + "?width=100") %>" alt="<%# "Click for larger view. Original name: "  + Eval( "FileName")%>"/>
+            </a>
+        </ItemTemplate>
+    </asp:Repeater>
 
     </div>
     </form>
