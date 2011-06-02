@@ -153,13 +153,15 @@ namespace ImageResizer.Plugins.DiskCache {
 
         public bool MeetsCleanupCriteria(CachedFileInfo i) {
             DateTime now = DateTime.UtcNow;
-            return ((now.Subtract(i.AccessedUtc) > AvoidRemovalIfUsedWithin || AvoidRemovalIfUsedWithin <= new TimeSpan(0)) &&
+            //Only require the 'used' date to comply if it 1) doesn't match created date and 2) is above 0
+            return ((now.Subtract(i.AccessedUtc) > AvoidRemovalIfUsedWithin || AvoidRemovalIfUsedWithin <= new TimeSpan(0) || i.AccessedUtc == i.UpdatedUtc) &&
                 (now.Subtract(i.UpdatedUtc) > AvoidRemovalIfCreatedWithin || AvoidRemovalIfCreatedWithin <= new TimeSpan(0)));
         }
 
         public bool MeetsOverMaxCriteria(CachedFileInfo i) {
             DateTime now = DateTime.UtcNow;
-            return ((now.Subtract(i.AccessedUtc) > ProhibitRemovalIfUsedWithin || ProhibitRemovalIfUsedWithin <= new TimeSpan(0)) &&
+            //Only require the 'used' date to comply if it 1) doesn't match created date and 2) is above 0
+            return ((now.Subtract(i.AccessedUtc) > ProhibitRemovalIfUsedWithin || ProhibitRemovalIfUsedWithin <= new TimeSpan(0) || i.AccessedUtc == i.UpdatedUtc) &&
                 (now.Subtract(i.UpdatedUtc) > ProhibitRemovalIfCreatedWithin || ProhibitRemovalIfCreatedWithin <= new TimeSpan(0)));
         }
 
