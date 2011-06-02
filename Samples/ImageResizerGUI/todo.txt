@@ -1,7 +1,11 @@
 ﻿# Bugs
 
-Settings serializion path should be simpler and correct. Currently, the drop-down is not serialized or deserialized, and resets each app start. I'm not sure even the querystring is serialized properly
-App should not crash when settings file is missing.
+Settings serializion path should be simpler and correct. Currently, the drop-down is not serialized or deserialized, and resets each app start. 
+I'm not sure even the querystring is serialized properly
+
+App should not crash when settings file is missing. It should be created when missing, and probably stored in User profile\app data, not with the exe.
+
+Process stays running after it is closed.
 
 # Incorrect behavior
 
