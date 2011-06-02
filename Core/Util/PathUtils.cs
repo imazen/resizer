@@ -24,8 +24,54 @@ namespace ImageResizer.Util {
                 return HostingEnvironment.ApplicationPhysicalPath != null ? HostingEnvironment.ApplicationPhysicalPath : Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
             }
         }
+        /// <summary>
+        /// Sets the file extension of the specified path to the specified value, returning the result.
+        /// If an extension has multiple parts, it will replace all of them.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="newExtension"></param>
+        /// <returns></returns>
+        public static string SetExtension(string path, string newExtension) {
+            int query = path.IndexOf('?');
+            if (query < 0) query = path.Length;
+            //Finds the first character that could possibly be part of the extension (before the query)
+            int firstPossibleExtensionChar = path.LastIndexOfAny(new char[] { ' ', '/', '\\' }, query - 1) + 1;
+            int extensionStarts = path.IndexOf('.', firstPossibleExtensionChar, query - firstPossibleExtensionChar);
+            if (extensionStarts < 0) extensionStarts = query;
 
+            return path.Substring(0, extensionStarts) + "." + newExtension.TrimStart('.') + path.Substring(query);
 
+        }
+
+        /// <summary>
+        /// Adds the specified extension to path, returning the result. Multiple calls will result in "path.ext.ext.ext.ext".
+        /// maintains the querystring as-is.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="newExtension"></param>
+        /// <returns></returns>
+        public static string AddExtension(string path, string newExtension) {
+            int query = path.IndexOf('?');
+            if (query < 0) query = path.Length;
+            return path.Substring(0, query) + "." + newExtension.TrimStart('.') + path.Substring(query);
+        }
+        /// <summary>
+        /// Will return the full extension, like ".jpg.ashx", not just the last bit. 
+        /// Ignores the querystring part. Excludes extensions containing spaces or slashes.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string GetFullExtension(string path) {
+            int query = path.IndexOf('?');
+            if (query < 0) query = path.Length;
+            //Finds the first character that could possibly be part of the extension (before the query)
+            int firstPossibleExtensionChar = path.LastIndexOfAny(new char[] { ' ', '/', '\\' }, query -1) + 1;
+            int extensionStarts = path.IndexOf('.', firstPossibleExtensionChar, query - firstPossibleExtensionChar);
+            if (extensionStarts < 0) extensionStarts = query;
+
+            return path.Substring(extensionStarts, query - extensionStarts);
+
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -114,6 +160,8 @@ namespace ImageResizer.Util {
             int delimiter = path.IndexOf('?');
             return delimiter > -1 ? path.Substring(0, delimiter) : path;
         }
+
+       
 
         /// <summary>
         /// Like ParseQueryString, but permits the leading '?' to be omitted.
