@@ -1,19 +1,14 @@
-﻿TODO: Fix bug where notfound happens when the folder doesn't exist
+﻿
+TODO: add method for locating cached item based on the URL.
 
-
-TODO: Add a scheduled "CleanAll", since items wil be more eligible for cleanup when there is no traffic.
 TODO: CachedFolder should offer some kind of inherited settings class that permits file exclusion from the listing
 TODO: CleanupStrategy.ShouldRemove should remove *all* files that can't be part of the cache. 
+TODO: Add a scheduled "CleanAll", since items wil be more eligible for cleanup when there is no traffic. (debateable, 
 TODO: Add diskcache physicalFolder property - when set, it should create a VirtualFolder instance if IIS doesn't already map the folder.
 TODO: Create a 'NamingStrategy' class that encapsulates the naming of the files and subfolders. Pluggable, so file hashes can be embedded.
 
 
 TODO: CachedFolder.populate() needs to log the following errors and handle them properly.
-
-##Directory.GetDirectories
-
-DirectoryNotFoundException	
-The path encapsulated in the DirectoryInfo object is invalid, such as being on an unmapped drive.
 
 SecurityException	
 The caller does not have the required permission.
