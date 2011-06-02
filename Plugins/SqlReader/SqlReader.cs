@@ -61,7 +61,7 @@ namespace ImageResizer.Plugins.SqlReader
                 SqlDataReader sdr = sc.ExecuteReader();
                 using (sdr)
                 {
-                    if (!sdr.Read()) return null; //0 rows
+                    if (!sdr.Read()) throw new FileNotFoundException("Failed to find the specified image " + id + " in the database"); //0 rows
 
                     return sdr.GetSqlBytes(0).Stream; //No connection required for the stream, all cloned in memory.
                 }
@@ -275,7 +275,7 @@ namespace ImageResizer.Plugins.SqlReader
         }
 
         /// <summary>
-        /// Returns a stream to the database blob associated with the id
+        /// Returns a stream to the database blob associated with the id. Throws a FileNotFound exception if the row is missing. Allows Image404 to work properly.
         /// </summary>
         /// <returns></returns>
         public override Stream Open(){ return provider.getStream(id);}
