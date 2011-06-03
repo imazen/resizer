@@ -72,12 +72,8 @@ namespace ImageResizer.ReleaseBuilder {
 
             if (isBuilding) {
 
-                //1 - Prompt to Clean
-                //1b - Run cleanup routine
-                if (ask("Clean All?")) {
-                    CleanAll();
-                    RemoveUselessFiles();
-                }
+               //1 (moved to 8a)
+                bool cleanAll = ask("Clean All?");
 
                 //2 - Set version numbers (with *, if missing)
                 string originalContents = v.Contents; //Save for checking changes.
@@ -117,7 +113,12 @@ namespace ImageResizer.ReleaseBuilder {
                 v.Save();
 
 
-                //8 - run cleanup routine
+                //8a Clean projects if specified
+                if (cleanAll) {
+                    CleanAll();
+                }
+
+                //8b - run cleanup routine
                 RemoveUselessFiles();
 
                 //Prepare searchers
