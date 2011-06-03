@@ -284,7 +284,8 @@ namespace ImageResizer.Plugins.DiskCache
 
 
         public IEnumerable<IIssue> GetIssues() {
-            List<IIssue> issues = new List<IIssue>(cleaner.GetIssues());
+            List<IIssue> issues = new List<IIssue>();
+            if (cleaner != null) issues.AddRange(cleaner.GetIssues());
             if (string.IsNullOrEmpty(VirtualCacheDir)) issues.Add(new Issue("DiskCache", "cacheDir is empty. Cannot operate", null, IssueSeverity.ConfigurationError));
             if (!Started) issues.Add(new Issue("DiskCache", "DiskCache is not running. Verify cacheDir is a valid path and enabled=true.", null, IssueSeverity.ConfigurationError));
             
