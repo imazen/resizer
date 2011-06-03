@@ -33,7 +33,7 @@ namespace ImageResizer.ReleaseBuilder {
         }
 
         public string getReleasePath(string packageBase, string ver,  string kind) {
-            return Path.Combine(Path.Combine(f.parentPath, "Releases"), packageBase + ver.Trim('-') + '-' + kind + "-" + DateTime.UtcNow.ToString("MMM-dd-yyyy") + ".zip");
+            return Path.Combine(Path.Combine(f.parentPath, "Releases"), packageBase + ver.Trim('-') + '-' + kind + "-" + DateTime.UtcNow.ToString("MMM-d-yyyy") + ".zip");
         }
 
         List<PackageDescriptor> packages = new List<PackageDescriptor>();
