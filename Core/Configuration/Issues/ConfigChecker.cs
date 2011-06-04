@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Plugins.Basic;
+using System.Reflection;
 
 namespace ImageResizer.Configuration.Issues {
     public class ConfigChecker:IIssueProvider {
@@ -29,8 +30,29 @@ namespace ImageResizer.Configuration.Issues {
                       "Without this permission, it may be possible for users to bypass UrlAuthorization rules you have defined for your website, and access images that would otherwise be protected. If you do not use UrlAuthorization rules, this should not be a concern. " +
                     "You may also re-implement your security rules by handling the Config.Current.Pipeline.AuthorizeImage event.", IssueSeverity.Critical));
 
-                     
-                     
+            
+            string assembliesRunningHotfix = "";
+            Assembly[] asms = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (Assembly a in asms) {
+                //Only check DLLs with ImageResizer in their name
+                if (a.GetName().Name.IndexOf("ImageResizer",  StringComparison.OrdinalIgnoreCase) < 0) continue;
+                
+                object[] attrs;
+                
+                attrs = a.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
+                if (attrs != null && attrs.Length > 0) 
+                    if (((AssemblyInformationalVersionAttribute)attrs[0]).InformationalVersion.IndexOf("hotfix",StringComparison.OrdinalIgnoreCase) > -1)
+                        assembliesRunningHotfix += a.GetName().Name + ", ";
+            }
+            assembliesRunningHotfix = assembliesRunningHotfix.TrimEnd(',',' ');
+
+            if (!string.IsNullOrEmpty(assembliesRunningHotfix))
+                issues.Add(new Issue("You are running a hotfix version of the ImageResizer.",
+                    "You should upgrade to a released version with an equal or higher version number as soon as possible. " +
+                    "Hotfix and release DLLs with the same version number are not the same - the release DLL should be used instead." +
+                    "\nAssemblies marked as hotfix versions: " + assembliesRunningHotfix, IssueSeverity.Warning));
+                    
+   
             return issues;
         }
     }

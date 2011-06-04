@@ -12,6 +12,7 @@ namespace ImageResizer.ReleaseBuilder {
         Devenv d = null;
         FsQuery q = null;
         VersionEditor v = null;
+        GitManager g = null;
 
         S3Service s3 = new S3Service();
         string bucketName = "resizer-downloads";
@@ -19,6 +20,7 @@ namespace ImageResizer.ReleaseBuilder {
         public Build() {
             d = new Devenv(Path.Combine(f.folderPath,"ImageResizer.sln"));
             v = new VersionEditor(Path.Combine(f.folderPath, "SharedAssemblyInfo.cs"));
+            g = new GitManager(f.parentPath);
             s3.AccessKeyID = "AKIAJ2TA3KZS5VPOBBTQ";
             s3.SecretAccessKey = "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";
             
@@ -43,6 +45,9 @@ namespace ImageResizer.ReleaseBuilder {
             nl();
 
             string packageBase = v.get("PackageName"); //    // [assembly: PackageName("Resizer")]
+
+            //
+            bool isHotfix = ask("Is this a hotfix?");
 
             //a. Ask for file version number   [assembly: AssemblyFileVersion("3.0.5.*")]
             string fileVer = change("FileVersion", v.get("AssemblyFileVersion").TrimEnd('.', '*'));
@@ -72,7 +77,7 @@ namespace ImageResizer.ReleaseBuilder {
 
             if (isBuilding) {
 
-               //1 (moved to 8a)
+               //1 (moved execution to 8a)
                 bool cleanAll = ask("Clean All?");
 
                 //2 - Set version numbers (with *, if missing)
@@ -87,19 +92,21 @@ namespace ImageResizer.ReleaseBuilder {
                 //3 - Prompt to commit and tag
                 bool versionsChanged = !fileContents.Equals(originalContents);
                 string question = versionsChanged ? "SharedAssemblyInfo.cs was modified. Commit it (and any other changes) to the repository, then hit 'y'."
-                    : "Are all changes commited? Hit 'y' to continue.";
+                    : "Are all changes commited? Hit 'y' to continue. The SHA-1 of HEAD will be embedded in the DLLs.";
                 while (!ask(question)) { }
 
 
                 //[assembly: Commit("git-commit-guid-here")]
                 //4 - Embed git commit value
-                v.set("Commit", "git-commit-todo");
-                v.Save();
+                string gitCommit = g.CanExecute ? g.GetHeadHash() : "git-could-not-run-during-build";
+                v.set("Commit", gitCommit);
 
                 //4b - change to hard version number for building
                 short revision = (short)(DateTime.UtcNow.TimeOfDay.Milliseconds % short.MaxValue); //the part under 32767. Can actually go up to, 65534, but what's the point.
                 v.set("AssemblyFileVersion", v.join(fileVer, revision.ToString()));
                 v.set("AssemblyVersion", v.join(assemblyVer, revision.ToString()));
+                //Add hotfix suffix for hotfixes
+                v.set("AssemblyInformationalVersion", infoVer + (isHotfix ? ("-temp-hotfix-" + DateTime.Now.ToString("MMM-d-yyyy-htt")) : ""));
                 v.Save();
 
                 //6 - if (c) was specified for any package, build all.
