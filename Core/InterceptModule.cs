@@ -14,6 +14,7 @@ using ImageResizer.Util;
 using System.Collections.Generic;
 using System.IO;
 using ImageResizer.Resizing;
+using ImageResizer.Plugins.Basic;
 
 /// <summary>
 /// This namespace contains the most frequently used classes.
@@ -226,16 +227,25 @@ namespace ImageResizer {
                 if (guessedEncoder == null) throw new ImageProcessingException("Image Resizer: No image encoder was found for the request.");
             }
 
-            //Determine the fallback file extenson for the caching system to use
-            //if we aren't processing the image
-            string fallbackExtension = PathUtils.GetFullExtension(virtualPath);
-            if (!conf.IsAcceptedImageType(fallbackExtension)) fallbackExtension = "unknown";
-            
+            //Determine the file extenson for the caching system to use if we aren't processing the image
+            //Use the exsiting one if is an image extension. If not, use "unknown". 
+            // We don't want to suggest writing .exe or .aspx files to the cache! 
+            string fallbackExtension = PathUtils.GetFullExtension(virtualPath).TrimStart('.'); 
+            if (!conf.IsAcceptedImageType(virtualPath)) fallbackExtension = "unknown";
+
+            //Determine the mime-type if we aren't processing the image.
+            string fallbackContentType = "application/octet-stream";
+            //Support jpeg, png, gif, bmp, tiff mime-types. Otherwise use "application/octet-stream". 
+            //We can't set it to null - it will default to text/html
+            System.Drawing.Imaging.ImageFormat recognizedExtension = DefaultEncoder.GetImageFormatFromExtension(fallbackExtension);
+            if (recognizedExtension != null) fallbackContentType = DefaultEncoder.GetContentTypeFromImageFormat(recognizedExtension);
+
+
             //Build CacheEventArgs
             ResponseArgs e = new ResponseArgs();
             e.RequestKey = virtualPath + PathUtils.BuildQueryString(queryString);
             e.RewrittenQuerystring = settings;
-            e.ResponseHeaders.ContentType = isProcessing ? guessedEncoder.MimeType : null; //Let IIS guess the mime-type
+            e.ResponseHeaders.ContentType = isProcessing ? guessedEncoder.MimeType : fallbackContentType; 
             e.SuggestedExtension = isProcessing ? guessedEncoder.Extension : fallbackExtension;
             e.HasModifiedDate = hasModifiedDate;
             //Add delegate for retrieving the modified date of the source file. 
