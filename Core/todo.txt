@@ -1,0 +1,4 @@
+﻿Refactor Watermark plugin to use named configurations.
+Add debug=true querystring command to Diagnostics plugin.
+Add better usage examples.
+Add assembly-based trial version detection (#ifdef in SharedAssemblyInfo.cs)
