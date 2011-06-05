@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Data;
 
 namespace ImageResizer.Plugins.SqlReader {
 
@@ -13,6 +14,10 @@ namespace ImageResizer.Plugins.SqlReader {
     public class SqlReaderSettings {
 
         public SqlReaderSettings() {
+        }
+
+        public SqlReaderSettings(System.Collections.Specialized.NameValueCollection args) {
+            // TODO: Add support for inline configuration
         }
 
         /// <summary>
@@ -29,6 +34,15 @@ namespace ImageResizer.Plugins.SqlReader {
             if (BeforeAccess != null) FireBeforeAccess(id);
         }
 
+        private bool stripFileExtension = true;
+        /// <summary>
+        /// When true, the last file extension segment will be removed from the URL before the SQL Id is parsed. Only relevant when ImageIdType is a string type. Always true for other values.
+        /// </summary>
+        public bool StripFileExtension {
+            get { return stripFileExtension; }
+            set { stripFileExtension = value; }
+        }
+
         private string pathPrefix = "~/databaseimages/";
         /// <summary>
         /// Defines a virtual path where database images can be accessed. Defaults to "~/databaseimages"
@@ -38,10 +52,17 @@ namespace ImageResizer.Plugins.SqlReader {
             get { return pathPrefix; }
             set { pathPrefix = value; }
         }
+        /// <summary>
+        /// Returns PathPrefix, but with the "~" resolved - I.e, a full virtual path.
+        /// </summary>
+        public string VirtualPathPrefix {
+            get { return ImageResizer.Util.PathUtils.ResolveAppRelative(pathPrefix); }
+        }
 
         private string connectionString = null;
         /// <summary>
-        /// The database connection string. Defaults to null.
+        /// The database connection string. Defaults to null. You can specify an existing web.config connection string using
+        /// the "ConnectionStrings:namedKey" convention.
         /// </summary>
         public string ConnectionString {
             get { return connectionString; }
@@ -80,19 +101,33 @@ namespace ImageResizer.Plugins.SqlReader {
 
         private System.Data.SqlDbType imageIdType = System.Data.SqlDbType.Int;
         /// <summary>
-        /// Specifies the type of ID used for images. Int and GUID are the only valid values.
+        /// Specifies the type of ID used for images. Int, string, and GUID types are the only valid values.
+        /// Throws an ArgumentOutOfRange exception if set to an invalid value.
         /// </summary>
-        public System.Data.SqlDbType ImageIdType {
+        public SqlDbType ImageIdType {
             get { return imageIdType; }
             set {
-                if (value != System.Data.SqlDbType.Int && value != System.Data.SqlDbType.TinyInt && value != System.Data.SqlDbType.SmallInt &&
-                value != System.Data.SqlDbType.BigInt && value != System.Data.SqlDbType.UniqueIdentifier)
-                    throw new ArgumentOutOfRangeException("Int, TinyInt, SmallInt, BigInt, and UniqueIdentifier are the only valid values for ImageIdType");
+                if (!IsStringType(value) && !IsIntType(value) &&  value != System.Data.SqlDbType.UniqueIdentifier)
+                    throw new ArgumentOutOfRangeException("Int, TinyInt, SmallInt, BigInt, VarChar, NVarChar, NChar, Char, and UniqueIdentifier are the only valid values for ImageIdType");
 
                 imageIdType = value; 
             }
         }
 
+        /// <summary>
+        /// Returns true if the image ID is a string type
+        /// </summary>
+        public bool IsStringType(SqlDbType t) {
+                return t == System.Data.SqlDbType.VarChar || t == System.Data.SqlDbType.NVarChar ||
+                 t == System.Data.SqlDbType.NChar || t == System.Data.SqlDbType.Char;
+            
+        }
+
+        public bool IsIntType(SqlDbType t) {
+            return t == System.Data.SqlDbType.Int || t == System.Data.SqlDbType.TinyInt ||
+                    t == System.Data.SqlDbType.SmallInt || t == System.Data.SqlDbType.BigInt;
+            
+        }
 
     }
 }
