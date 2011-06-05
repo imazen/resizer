@@ -56,12 +56,15 @@ namespace ImageResizer.ReleaseBuilder {
             //c: Ask for information version number.  [assembly: AssemblyInformationalVersion("3-alpha-5")]
             string infoVer = change("InfoVersion", v.get("AssemblyInformationalVersion").TrimEnd('.', '*'));
 
+            string downloadServer = v.get("DownloadServer"); if (downloadServer == null) downloadServer = "http://downloads.imageresizing.net/";
+
 
             //d: For each package, specify options: choose 'c' (create and/or overwrite), 'u' (upload), 's' (skip), 'p' (make private). Should inform if the file already exists.
             nl();
             say("For each package, specify all operations to perform, then press enter.");
             say("'c' - Create package (overwrite if exists), 'u' (upload to S3), 's' (skip), 'p' (make private)");
             bool isBuilding = false;
+            StringBuilder downloadPaths = new StringBuilder();
             foreach (PackageDescriptor desc in packages) {
                 desc.Path = getReleasePath(packageBase, infoVer, desc.Kind);
                 if (desc.Exists) say("\n" + Path.GetFileName(desc.Path) + " already exists");
@@ -73,7 +76,18 @@ namespace ImageResizer.ReleaseBuilder {
                 }
                 desc.Options = opts;
                 if (desc.Build) isBuilding = true;
+                if (desc.Upload) {
+                    downloadPaths.AppendLine(downloadServer + Path.GetFileName(desc.Path));
+                }
             }
+
+            if (downloadPaths.Length > 0){
+                say("Once complete, your files will be available at");
+                say(downloadPaths.ToString());
+                if (ask("Copy these to the clipboard?"))
+                    System.Windows.Clipboard.SetText(downloadPaths.ToString());
+            }
+               
 
             if (isBuilding) {
 
