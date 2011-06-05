@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using ImageResizer.ReleaseBuilder.Classes;
 using LitS3;
+using System.Net;
 
 namespace ImageResizer.ReleaseBuilder {
     public class Build :Interaction {
@@ -168,8 +169,17 @@ namespace ImageResizer.ReleaseBuilder {
                     }
                     CannedAcl perm =  pd.Private ? CannedAcl.Private : CannedAcl.PublicRead;
                     say("Uploading " + Path.GetFileName(pd.Path) + " to " + bucketName + " with CannedAcl:" + perm.ToString());
-                    //Upload
-                    s3.AddObject(pd.Path, bucketName, Path.GetFileName(pd.Path), "application/zip", perm);
+                    bool retry = false;
+                    do {
+                        //Upload
+                        try {
+                            s3.AddObject(pd.Path, bucketName, Path.GetFileName(pd.Path), "application/zip", perm);
+                        } catch (WebException wex) {
+                            say("Upload failed: " + wex.Message);
+                            retry = ask("Retry upload?");
+                        }
+                    } while (retry);
+
                     say("Finished uploading " + Path.GetFileName(pd.Path));
                 } 
             }
