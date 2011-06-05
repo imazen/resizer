@@ -850,7 +850,7 @@ namespace ImageResizer
                 "width", "height",
                 "scale", "stretch", "crop", "page", "bgcolor",
                 "rotate", "flip", "sourceFlip", "borderWidth",
-                "borderColor", "paddingWidth", "paddingColor", "ignoreicc", "frame", "useresizingpipeline"};
+                "borderColor", "paddingWidth", "paddingColor", "ignoreicc", "frame", "useresizingpipeline", "cache", "process"};
     
         public virtual IEnumerable<string> GetSupportedQuerystringKeys() {
             return _supportedQuerystringKeys;
