@@ -21,6 +21,23 @@ namespace ImageResizer {
 
     }
 
+    public enum ProcessWhen {
+        /// <summary>
+        /// Request no processing of the image or file (generally used with cache=always).
+        /// The file contents will be used as-is.
+        /// </summary>
+        No,
+        /// <summary>
+        /// Require the file or image to be processed. Will cause non-image files to fail with an ImageCorruptedException.
+        /// </summary>
+        Always,
+        /// <summary>
+        /// Default. Only files with both a supported image extension and resizing settings specified in the querystring will be processed.
+        /// </summary>
+        Default
+    }
+
+
 
 
     public enum ScaleMode {
