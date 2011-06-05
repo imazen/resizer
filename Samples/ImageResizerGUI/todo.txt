@@ -11,7 +11,7 @@ Process stays running after it is closed.
 
 Message boxes shouldn't ever be displayed when dragging or pasting files into the box.
 Destination path should be editable.
-lowercase extensions should be used.
+lowercase filename extensions should be used.
 
 # Code cleanup
 
@@ -22,6 +22,6 @@ Remove all uneeded dependencies.
 
 # Design
 
-Apply better typographic principles.
+Apply good typographic principles, 
 
 
