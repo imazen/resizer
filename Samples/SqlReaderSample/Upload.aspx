@@ -9,8 +9,8 @@
 <body>
     <form id="form1" runat="server">
     <div>
-    <h2>Select an image to upload. </h2>
-    <p>They will be resized and cropped to 300x300 and encoded in Jpeg form before being inserted into the database. <a href="~/" runat="server">Click here to view all images</a>.</p>
+    <h2>Select images and files to upload. </h2>
+    <p>Images will be resized and cropped to 300x300 and encoded in Jpeg form before being inserted into the database. <a href="~/" runat="server">Click here to view all images</a>.</p>
     <asp:FileUpload runat="server" /> <br />
     <asp:FileUpload ID="FileUpload1" runat="server" /><br />
     <asp:FileUpload ID="FileUpload2" runat="server" /><br />
