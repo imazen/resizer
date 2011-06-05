@@ -9,6 +9,8 @@ using System.IO;
 using System.Data.Sql;
 using System.Data.SqlClient;
 using System.Configuration;
+using System.Collections.Specialized;
+using ImageResizer.Configuration.Issues;
 namespace ImageResizer.Plugins.SqlReader
 {
     /// <summary>
@@ -16,10 +18,13 @@ namespace ImageResizer.Plugins.SqlReader
     /// </summary>
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
-    public class SqlReaderPlugin : VirtualPathProvider, IPlugin
+    public class SqlReaderPlugin : VirtualPathProvider, IPlugin, IIssueProvider
     {
 
         SqlReaderSettings s = null;
+        public SqlReaderPlugin(NameValueCollection args) :base(){
+            this.s = new SqlReaderSettings(args);
+        }
         public SqlReaderPlugin(SqlReaderSettings s)
             : base()
         {
@@ -76,16 +81,31 @@ namespace ImageResizer.Plugins.SqlReader
         public SqlParameter getIdParameter(string id)
         {
             SqlParameter sp = new SqlParameter("id", s.ImageIdType, 4);
-            if (s.ImageIdType == System.Data.SqlDbType.Int || s.ImageIdType == System.Data.SqlDbType.TinyInt || s.ImageIdType == System.Data.SqlDbType.SmallInt ||
-                s.ImageIdType == System.Data.SqlDbType.BigInt)
-            {
+            if (IsIntKey)
                 sp.Value = long.Parse(id);
-            } else if (s.ImageIdType == System.Data.SqlDbType.UniqueIdentifier)
-            {
+            else if (s.ImageIdType == System.Data.SqlDbType.UniqueIdentifier)
                 sp.Value = new Guid(id);
-            }
+            else if (IsStringKey) 
+                     sp.Value = id;
+            
             return sp;
         }
+        /// <summary>
+        /// Returns true if the image ID is a string type
+        /// </summary>
+        public bool IsStringKey {
+            get {
+                return s.IsStringType(s.ImageIdType);
+            }
+        }
+
+        public bool IsIntKey {
+            get {
+                return s.IsIntType(s.ImageIdType);
+            }
+        }
+
+
         /// <summary>
         /// Executes _existsQuery, and returns true if the value is greater than 0
         /// </summary>
@@ -137,6 +157,16 @@ namespace ImageResizer.Plugins.SqlReader
         }
 
         public SqlConnection GetConnectionObj(){
+            string prefix = "ConnectionStrings:";
+            //ConnectionStrings:namedString convention
+            if (s.ConnectionString.Trim().StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) {
+                string key = s.ConnectionString.Trim().Substring(prefix.Length).Trim();
+                if (System.Configuration.ConfigurationManager.ConnectionStrings[key] != null)
+                    return new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings[key].ConnectionString);
+                else
+                    throw new ImageResizer.ImageProcessingException("SqlReader: Failed to locate the named connection string '" + key + "' in web.config");
+
+            }
             return new SqlConnection(s.ConnectionString);
         }
 
@@ -152,7 +182,7 @@ namespace ImageResizer.Plugins.SqlReader
         }
 
         /// <summary>
-        /// Supports int and GUID IDs. Override this to modify ID parsing if you can't do it with rewrite rules.
+        /// Supports int, string, and GUID IDs. Override this to modify ID parsing if you can't do it with rewrite rules.
         /// </summary>
         /// <param name="virtualPath"></param>
         /// <returns></returns>
@@ -164,14 +194,15 @@ namespace ImageResizer.Plugins.SqlReader
             string id = checkPath.Substring(s.PathPrefix.Length); //Strip prefix
             //Strip slashes at beginning 
             id = id.TrimStart(new char[] { '/', '\\' });
-            //Strip extension.
-            int length = id.LastIndexOf('.');
-            if (length > -1) id = id.Substring(0, length);
+            //Strip extension if not a string 
+            if (!IsStringKey || s.StripFileExtension) {
+                int length = id.LastIndexOf('.');
+                if (length > -1) id = id.Substring(0, length);
+            }
             //Can't be empty.
             if (id.Length < 1) return null;
             //Verify only valid characters present
-            if (s.ImageIdType == System.Data.SqlDbType.Int || s.ImageIdType == System.Data.SqlDbType.TinyInt || s.ImageIdType == System.Data.SqlDbType.SmallInt || 
-                s.ImageIdType == System.Data.SqlDbType.BigInt)
+            if (IsIntKey)
             {
                 long val =0;
                 if (!long.TryParse(id, out val)) return null; // not a valid integer
@@ -187,10 +218,10 @@ namespace ImageResizer.Plugins.SqlReader
                     return null; //Not a valid guid.
                 }
 
-            }
-            else
-            {
-                throw new Exception("Only Integer and GUID identifiers are suported by the DatabaseVirtualPathProvider class");
+            } else if (IsStringKey) {
+                return id;
+            }else {
+                throw new ImageProcessingException("Only Integer, String, and GUID identifiers are suported by SqlReader");
             }
  
             return id;
@@ -242,6 +273,22 @@ namespace ImageResizer.Plugins.SqlReader
                 return Previous.GetCacheDependency(virtualPath, virtualPathDependencies, utcStart);
         }
 
+
+        public IEnumerable<IIssue> GetIssues() {
+            List<IIssue> issues = new List<IIssue>();
+
+            //1) Verify named connection strings exist
+            string prefix = "ConnectionStrings:";
+            //ConnectionStrings:namedString convention
+            if (s.ConnectionString.Trim().StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) {
+                string key = s.ConnectionString.Trim().Substring(prefix.Length).Trim();
+                if (System.Configuration.ConfigurationManager.ConnectionStrings[key] == null)
+                    issues.Add(new Issue("SqlReader: Failed to locate the named connection string '" + key + "' in web.config", IssueSeverity.ConfigurationError));
+
+            }
+
+            return issues;
+        }
     }
 
 
