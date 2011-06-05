@@ -72,6 +72,18 @@ namespace ImageResizer.Util {
             return path.Substring(extensionStarts, query - extensionStarts);
 
         }
+
+        public static string GetExtension(string path) {
+            int query = path.IndexOf('?');
+            if (query < 0) query = path.Length;
+            //Finds the first character that could possibly be part of the extension (before the query)
+            int firstPossibleExtensionChar = path.LastIndexOfAny(new char[] { ' ', '/', '\\' }, query - 1) + 1;
+            int extensionStarts = path.LastIndexOf('.', query -1, query - firstPossibleExtensionChar );
+            if (extensionStarts < 0) extensionStarts = query;
+
+            return path.Substring(extensionStarts, query - extensionStarts);
+
+        }
         /// <summary>
         /// 
         /// </summary>
