@@ -101,7 +101,7 @@ namespace ImageResizer.Configuration {
         }
         /// <summary>
         /// Returns a unqiue copy of all querystring keys supported by the pipeline. Performs a cached query to all registered IQuerystringPlugin instances.
-        /// Use HasPipelineDirective for better performance.
+        /// Use HasPipelineDirective for better performance. (binary search)
         /// </summary>
         public ICollection<string> SupportedQuerystringKeys {
             get {
@@ -173,24 +173,19 @@ namespace ImageResizer.Configuration {
             return path;
         }
 
-        public string ModifiedQueryStringKey {
-            get { return "resizer.modifiedQueryString"; }
-        }
-
         public string ModifiedPathKey {
             get { return "resizer.newPath"; }
         }
-
         /// <summary>
         /// Returns the value of Context.Items["resizer.newPath"] if present. If not, returns FilePath + PathInfo.
         /// Sets Context.Items["resizer.newPath"]. 
         /// Only useful during the Pipeline.PostAuthorizeRequestStart event.
         /// </summary>
-        public string PreRewritePath{
-            get{
-               if (HttpContext.Current == null) return null;
-               return HttpContext.Current.Items[ModifiedPathKey] != null ? HttpContext.Current.Items[ModifiedPathKey] as string : 
-                   (HttpContext.Current.Request.FilePath + HttpContext.Current.Request.PathInfo);
+        public string PreRewritePath {
+            get {
+                if (HttpContext.Current == null) return null;
+                return HttpContext.Current.Items[ModifiedPathKey] != null ? HttpContext.Current.Items[ModifiedPathKey] as string :
+                    (HttpContext.Current.Request.FilePath + HttpContext.Current.Request.PathInfo);
 
             }
             set {
@@ -198,11 +193,51 @@ namespace ImageResizer.Configuration {
             }
         }
 
+        public string ModifiedQueryStringKey {
+            get { return "resizer.modifiedQueryString"; }
+        }
+
+        
+        /// <summary>
+        /// Returns the modified query string. If never set, returns a copy of Request.QueryString.
+        /// Returns the same instance if called multiple times. Copy it if you want to make changes without causing issues.
+        /// </summary>
+        public NameValueCollection ModifiedQueryString {
+            get {
+                if (HttpContext.Current == null) return null;
+                if (HttpContext.Current.Items[ModifiedQueryStringKey] == null)
+                    HttpContext.Current.Items[ModifiedQueryStringKey] = new NameValueCollection(HttpContext.Current.Request.QueryString);
+
+                return (NameValueCollection)HttpContext.Current.Items[ModifiedQueryStringKey];
+            }
+            set {
+                HttpContext.Current.Items[ModifiedQueryStringKey] = value;
+            }
+        }
+
+
+        public string SkipFileTypeCheckKey { get { return "resizer.skipFileTypeCheck"; } }
+        private bool skipFileTypeCheck = false;
+        /// <summary>
+        /// Get or sets whether the file extension check should be applied to the current request. Defaults to true.
+        /// If set to true, will only affect the current request, and will only cause the Resizer to evaluate the rewriting rules on the request.
+        /// Processing may still not occur if no querystring values are specified. Add 'cache=always' to force caching to occur.
+        /// </summary>
+        public bool SkipFileTypeCheck {
+            get { return HttpContext.Current.Items[SkipFileTypeCheckKey] != null && (bool)HttpContext.Current.Items[SkipFileTypeCheckKey]; }
+            set { HttpContext.Current.Items[SkipFileTypeCheckKey] = value; }
+        }
+
+
+
         public string ResponseArgsKey {
             get { return "resizer.cacheArgs"; }
         }
         /// <summary>
-        /// Returns true if the current request is being handled by the pipeline (sent through the caching system, etc).
+        /// Returns true if the current request is being processed and/or cached by the pipeline.
+        /// Will return false until *after* the FileExists method is called on the VirtualPathProviders, which is after the 
+        /// AuthorizeImage event fires. 
+        /// This will return a usable value if used from VirtualFile.Open(), or if used inside the PreHandleImage event or later.
         /// </summary>
         public bool IsHandlingRequest {
             get { return (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.Items[ResponseArgsKey] != null); }
@@ -382,6 +417,9 @@ namespace ImageResizer.Configuration {
             if (SelectCachingSystem != null) SelectCachingSystem(this, e);
             return e.SelectedCache;
         }
+
+
+
 
     }
 }
