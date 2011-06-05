@@ -94,6 +94,17 @@ namespace ImageResizer {
             }
         }
 
+        /// <summary>
+        /// Server caching mode suggestion for the result
+        /// </summary>
+        public ProcessWhen Process {
+            get {
+                return Utils.parseEnum<ProcessWhen>(this["process"], this["useresizingpipeline"] != null ? ProcessWhen.Always : ProcessWhen.Default);
+            }
+            set {
+                this["process"] = value.ToString(); this.Remove("useresizingpipeline");
+            }
+        }
 
         /// <summary>
         /// Crop settings. Defaults to None - letterboxing is used if both width and height are supplied, and stretch = proportionally.
