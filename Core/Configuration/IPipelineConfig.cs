@@ -55,6 +55,16 @@ namespace ImageResizer.Configuration {
         /// </summary>
         VppUsageOption VppUsage { get; }
 
+        string SkipFileTypeCheckKey { get; }
+        bool SkipFileTypeCheck { get; }
+
+        /// <summary>
+        /// Returns the value of Context.Items["resizer.newPath"] if present. If not, returns FilePath + PathInfo.
+        /// Sets Context.Items["resizer.newPath"]. 
+        /// Only useful during the Pipeline.PostAuthorizeRequestStart event.
+        /// </summary>
+        string PreRewritePath { get; }
+
 
         /// <summary>
         /// Removes the first fake extension detected at the end of 'path' (like image.jpg.ashx -> image.jpg).
@@ -99,5 +109,7 @@ namespace ImageResizer.Configuration {
 
         void FireImageMissing(IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs urlEventArgs);
 
+
+        NameValueCollection ModifiedQueryString { get; set; }
     }
 }
