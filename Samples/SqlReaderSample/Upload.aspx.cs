@@ -9,6 +9,8 @@ using System.IO;
 using ImageResizer.Encoding;
 using System.Data.SqlClient;
 using System.Configuration;
+using ImageResizer.Configuration;
+using ImageResizer.Util;
 
 namespace DatabaseSampleCSharp {
     public partial class Upload : System.Web.UI.Page {
@@ -21,14 +23,21 @@ namespace DatabaseSampleCSharp {
                 HttpPostedFile file = HttpContext.Current.Request.Files[fileKey];
                 if (file.ContentLength <= 0) continue; //Yes, 0-length files happen.
 
-                //The resizing settings can specify any of 30 commands.. See http://imageresizing.net for details.
-                ResizeSettings resizeCropSettings = new ResizeSettings("width=300&height=300&format=jpg&crop=auto");
+                if (Config.Current.Pipeline.IsAcceptedImageType(file.FileName)) {
+                    //The resizing settings can specify any of 30 commands.. See http://imageresizing.net for details.
+                    ResizeSettings resizeCropSettings = new ResizeSettings("width=300&height=300&format=jpg&crop=auto");
 
-                using (MemoryStream ms = new MemoryStream()) {
-                    //Resize the image
-                    ImageBuilder.Current.Build(file, ms, resizeCropSettings);
-                    //Upload the byte array to SQL
-                    lastUpload =StoreImage(ms.ToArray(), ImageBuilder.Current.EncoderProvider.GetEncoder(resizeCropSettings, file.FileName), file.FileName);
+                    using (MemoryStream ms = new MemoryStream()) {
+                        //Resize the image
+                        ImageBuilder.Current.Build(file, ms, resizeCropSettings);
+                        //Upload the byte array to SQL
+                        lastUpload = StoreFile(ms.ToArray(), ImageBuilder.Current.EncoderProvider.GetEncoder(resizeCropSettings, file.FileName).Extension, file.FileName);
+                    }
+                } else {
+                    using (MemoryStream ms = ImageResizer.Util.StreamUtils.CopyStream(file.InputStream)){
+                        //It's not an image - upload as-is.
+                        lastUpload = StoreFile(ms.ToArray(), PathUtils.GetExtension(file.FileName).TrimStart('.'), file.FileName);
+                    }
                 }
             }
 
@@ -36,7 +45,7 @@ namespace DatabaseSampleCSharp {
         }
 
 
-        public Guid StoreImage(byte[] data, IEncoder fileInfo, string fileName) {
+        public Guid StoreFile(byte[] data,string extension, string fileName) {
             SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["database"].ConnectionString);
             conn.Open();
             using (conn)
@@ -47,7 +56,7 @@ namespace DatabaseSampleCSharp {
                     "VALUES (@id, @filename, @extension, @contentlength, @content)", conn);
                 sc.Parameters.Add(new SqlParameter("id", id));
                 sc.Parameters.Add(new SqlParameter("filename", fileName));
-                sc.Parameters.Add(new SqlParameter("extension", fileInfo.Extension));
+                sc.Parameters.Add(new SqlParameter("extension", extension));
                 sc.Parameters.Add(new SqlParameter("contentlength", data.Length));
                 sc.Parameters.Add(new SqlParameter("content", data));
 
