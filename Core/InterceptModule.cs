@@ -67,19 +67,17 @@ namespace ImageResizer {
 
             
 
+            //Allow handlers of the above event to change filePath/pathinfo so we can successfull test the extension
+            string originalPath = conf.PreRewritePath;
+           
             //Trim fake extensions so IsAcceptedImageType will work properly
-            //Support PathInfo - allow directories with dots in them without breaking pathinfo usage
-            //Allow handlers of the above event to change filePath so we can successfull test the extension
-            string originalPath = app.Context.Items[conf.ModifiedPathKey] != null ? app.Context.Items[conf.ModifiedPathKey] as string : (app.Context.Request.FilePath + app.Context.Request.PathInfo);
-
-
             string filePath = conf.TrimFakeExtensions(originalPath);
 
             
             //Is this an image request? Checks the file extension for .jpg, .png, .tiff, etc.
-            if (conf.IsAcceptedImageType(filePath)) {
+            if (conf.SkipFileTypeCheck || conf.IsAcceptedImageType(filePath)) {
                 //Copy the querystring so we can mod it to death without messing up other stuff.
-                NameValueCollection q = new NameValueCollection(app.Context.Request.QueryString);
+                NameValueCollection q = conf.ModifiedQueryString;
 
                 //Call URL rewriting events
                 UrlEventArgs ue = new UrlEventArgs(filePath, q);
@@ -88,6 +86,9 @@ namespace ImageResizer {
                 //Pull data back out of event object, resolving app-relative paths
                 string virtualPath = fixPath(ue.VirtualPath);
                 q = ue.QueryString;
+
+                //Store the modified querystring in request for use by VirtualPathProviders
+                conf.ModifiedQueryString = q; // app.Context.Items["modifiedQueryString"] = q;
 
                 //See if resizing is wanted (i.e. one of the querystring commands is present).
                 //Called after processPath so processPath can add them if needed.
@@ -116,9 +117,7 @@ namespace ImageResizer {
 
                     if (!authEvent.AllowAccess) throw new ImageProcessingException(403, "Access denied", "Access denied");
 
-                    //Store the modified querystring in request for use by VirtualPathProviders
-                    app.Context.Items[conf.ModifiedQueryStringKey] = q; // app.Context.Items["modifiedQueryString"] = q;
-
+                    
                     
                     //Does the file exist?
                     bool existsPhysically = (conf.VppUsage != VppUsageOption.Always) && System.IO.File.Exists(HostingEnvironment.MapPath(virtualPath));
@@ -180,7 +179,34 @@ namespace ImageResizer {
         protected virtual void HandleRequest(HttpContext context, string virtualPath, NameValueCollection queryString, object vf) {
             Stopwatch s = new Stopwatch();
             s.Start();
+            
+
+            ResizeSettings settings = new ResizeSettings(queryString);
+
+            bool isCaching = settings.Cache == ServerCacheMode.Always;
+            bool isProcessing = settings.Process == ProcessWhen.Always;
+
+            //By default, we process it if is both (a) a recognized image extension, and (b) has a resizing directive (not just 'cache').
+            if (settings.Process == ProcessWhen.Default){
+                //Check for resize directive by removing ('non-resizing' items from the current querystring) 
+                NameValueCollection copy = new NameValueCollection(queryString);
+                copy.Remove("cache"); copy.Remove("process"); copy.Remove("useresizingpipeline");
+                //If the 'copy' still has directives, and it's an image request, then let's process it.
+                isProcessing = conf.IsAcceptedImageType(virtualPath) &&  conf.HasPipelineDirective(copy);
+            }
+
+            //By default, we only cache it if we're processing it. 
+            if (settings.Cache == ServerCacheMode.Default && isProcessing) 
+                isCaching = true;
+
+            //Resolve the 'cache' setting to 'no' unless we want it cache.
+            if (!isCaching) settings.Cache = ServerCacheMode.No;
+
+
+            //If we are neither processing nor caching, don't do anything more with the request
+            if (!isProcessing && !isCaching) return;
             context.Items[conf.ResponseArgsKey] = ""; //We are handling the requests
+
 
             //Find out if we have a modified date that we can work with
             bool hasModifiedDate = (vf == null) || vf is IVirtualFileWithModifiedDate;
@@ -192,17 +218,25 @@ namespace ImageResizer {
                 }
             }
 
-            ResizeSettings settings = new ResizeSettings(queryString);
-            IEncoder guessedEncoder = conf.GetImageBuilder().EncoderProvider.GetEncoder(settings, null);
 
-            if (guessedEncoder == null) throw new ImageProcessingException("Image Resizer: No image encoder was found for the request.");
+            IEncoder guessedEncoder = null;
+            //Only use an encoder to determine extension/mime-type when it's an image extension or when we've set process = always.
+            if (isProcessing) {
+                guessedEncoder = conf.GetImageBuilder().EncoderProvider.GetEncoder(settings, virtualPath);
+                if (guessedEncoder == null) throw new ImageProcessingException("Image Resizer: No image encoder was found for the request.");
+            }
 
+            //Determine the fallback file extenson for the caching system to use
+            //if we aren't processing the image
+            string fallbackExtension = PathUtils.GetFullExtension(virtualPath);
+            if (!conf.IsAcceptedImageType(fallbackExtension)) fallbackExtension = "unknown";
+            
             //Build CacheEventArgs
             ResponseArgs e = new ResponseArgs();
             e.RequestKey = virtualPath + PathUtils.BuildQueryString(queryString);
             e.RewrittenQuerystring = settings;
-            e.ResponseHeaders.ContentType = guessedEncoder.MimeType;
-            e.SuggestedExtension = guessedEncoder.Extension;
+            e.ResponseHeaders.ContentType = isProcessing ? guessedEncoder.MimeType : null; //Let IIS guess the mime-type
+            e.SuggestedExtension = isProcessing ? guessedEncoder.Extension : fallbackExtension;
             e.HasModifiedDate = hasModifiedDate;
             //Add delegate for retrieving the modified date of the source file. 
             e.GetModifiedDateUTC = new ModifiedDateDelegate(delegate() {
@@ -218,10 +252,7 @@ namespace ImageResizer {
                 //This runs on a cache miss or cache invalid. This delegate is preventing from running in more
                 //than one thread at a time for the specified cache key
                 try {
-                    //Is this just a 'cache-as-is' request (Used, for example, by VirtualPathProviders)?
-                    bool cacheOnly = (settings.Count == 1 && settings.Cache == ServerCacheMode.Always);
-
-                    if (cacheOnly) {
+                    if (!isProcessing) {
                         //Just duplicate the data
                         using (Stream source = (vf != null) ? 
                                         (vf is IVirtualFile ? ((IVirtualFile)vf).Open() : ((VirtualFile)vf).Open()): 
