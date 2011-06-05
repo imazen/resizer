@@ -18,13 +18,13 @@
           runat="server"
           DataSourceMode="DataReader"
           ConnectionString="<%$ ConnectionStrings:database%>"
-          SelectCommand="SELECT ImageID, FileName FROM Images" ></asp:SqlDataSource>
+          SelectCommand="SELECT ImageID, Extension, FileName FROM Images" ></asp:SqlDataSource>
 
     
     <asp:Repeater DataSourceID="sql" runat="server">
         <ItemTemplate>
-        <a href="<%# ResolveUrl("~/databaseimages/" +Eval( "ImageID"))%>">
-            <img src="<%# ResolveUrl("~/databaseimages/" + Eval( "ImageID") + "?width=100") %>" alt="<%# "Click for larger view. Original name: "  + Eval( "FileName")%>"/>
+        <a href="<%# ResolveUrl("~/databaseimages/" + Eval("ImageID") + "." + Eval("Extension"))%>">
+            <img src="<%# ResolveUrl("~/databaseimages/" + Eval("ImageID") + "." + Eval("Extension") + "?width=100") %>" alt="<%# "Click for larger view. Original name: "  + Eval( "FileName")%>"/>
             </a>
         </ItemTemplate>
     </asp:Repeater>
