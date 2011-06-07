@@ -41,6 +41,7 @@ namespace ImageResizer.ReleaseBuilder {
 
         List<PackageDescriptor> packages = new List<PackageDescriptor>();
 
+        [STAThread]
         public void Run() {
             say("Project root: " + f.parentPath);
             nl();
@@ -48,7 +49,9 @@ namespace ImageResizer.ReleaseBuilder {
             string packageBase = v.get("PackageName"); //    // [assembly: PackageName("Resizer")]
 
             //
-            bool isHotfix = ask("Is this a hotfix?");
+            bool isHotfix = ask("Is this a hotfix? Press Y to tag the assembiles and package as such.");
+
+            string packageHotfix = isHotfix ? ("-hotfix-" + DateTime.Now.ToString("htt").ToLower()) : "";
 
             //a. Ask for file version number   [assembly: AssemblyFileVersion("3.0.5.*")]
             string fileVer = change("FileVersion", v.get("AssemblyFileVersion").TrimEnd('.', '*'));
@@ -67,7 +70,7 @@ namespace ImageResizer.ReleaseBuilder {
             bool isBuilding = false;
             StringBuilder downloadPaths = new StringBuilder();
             foreach (PackageDescriptor desc in packages) {
-                desc.Path = getReleasePath(packageBase, infoVer, desc.Kind);
+                desc.Path = getReleasePath(packageBase, infoVer + packageHotfix, desc.Kind);
                 if (desc.Exists) say("\n" + Path.GetFileName(desc.Path) + " already exists");
                 string opts = "";
 
@@ -121,7 +124,7 @@ namespace ImageResizer.ReleaseBuilder {
                 v.set("AssemblyFileVersion", v.join(fileVer, revision.ToString()));
                 v.set("AssemblyVersion", v.join(assemblyVer, revision.ToString()));
                 //Add hotfix suffix for hotfixes
-                v.set("AssemblyInformationalVersion", infoVer + (isHotfix ? ("-temp-hotfix-" + DateTime.Now.ToString("MMM-d-yyyy-htt")) : ""));
+                v.set("AssemblyInformationalVersion", infoVer + (isHotfix ? ("-temp-hotfix-" + DateTime.Now.ToString("MMM-d-yyyy-htt").ToLower()) : ""));
                 v.Save();
 
                 //6 - if (c) was specified for any package, build all.
