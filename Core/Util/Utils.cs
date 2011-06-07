@@ -16,11 +16,12 @@ namespace ImageResizer.Util {
   
         public static Color parseColor(string value, Color defaultValue) {
             if (!string.IsNullOrEmpty(value)) {
+                value = value.TrimStart('#');
                 //try hex first
                 int val;
                 if (int.TryParse(value, System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out val)) {
                     int alpha = 255;
-                    if (value.Length % 2 == 0) {
+                    if (value.Length == 4 || value.Length == 8) {
                         int regLength = value.Length - (value.Length / 4);
                         alpha = int.Parse(value.Substring(regLength), System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture);
                         if (regLength == 3) alpha *= 16;
@@ -28,15 +29,24 @@ namespace ImageResizer.Util {
                     }
                     return Color.FromArgb(alpha, System.Drawing.ColorTranslator.FromHtml("#" + value));
                 } else {
-                    Color c = System.Drawing.ColorTranslator.FromHtml(value);
-                    return (c.IsEmpty) ? defaultValue : c;
+                    try {
+                        Color c = System.Drawing.ColorTranslator.FromHtml(value); //Throws an 'Exception' instance if invalid
+                        return (c.IsEmpty) ? defaultValue : c;
+                    } catch {
+                        return defaultValue;
+                    }
                 }
             }
             return defaultValue;
         }
 
         public static string writeColor(Color value) {
-            return System.Drawing.ColorTranslator.ToHtml(value).TrimStart('#');
+            string text =  System.Drawing.ColorTranslator.ToHtml(value);
+            if (text.StartsWith("#")) {
+                text = text.TrimStart('#');
+                if (value.A != 255) text += value.A.ToString("X2", null);
+            }
+            return text;
         }
         /// <summary>
         /// Parses lists in the form "3,4,5,2,5" and "(3,4,40,50)". If a number cannot be parsed (i.e, number 2 in "5,,2,3") defaultValue is used.
