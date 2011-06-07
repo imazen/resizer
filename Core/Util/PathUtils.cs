@@ -138,7 +138,6 @@ namespace ImageResizer.Util {
             return AddQueryString(RemoveQueryString(path), BuildQueryString(newQuerystring));
         }
 
-
         /// <summary>
         /// Returns a string querystring in the form "?key=value&amp;key=value".
         /// Keys and values are UrlEncoded as they should be.
@@ -146,6 +145,15 @@ namespace ImageResizer.Util {
         /// <param name="QueryString"></param>
         /// <returns></returns>
         public static string BuildQueryString(NameValueCollection QueryString) {
+            return BuildQueryString(QueryString, true);
+        }
+        /// <summary>
+        /// Returns a string querystring in the form "?key=value&amp;key=value".
+        /// Keys and values are UrlEncoded if urlEncode=true.
+        /// </summary>
+        /// <param name="QueryString"></param>
+        /// <returns></returns>
+        public static string BuildQueryString(NameValueCollection QueryString, bool urlEncode) {
             StringBuilder path = new StringBuilder();
             if (QueryString.Count > 0) {
                 path.Append('?');
@@ -153,15 +161,17 @@ namespace ImageResizer.Util {
                     if (key == null) continue; //Skip null keys
                     string value = QueryString[key];
 
-                    path.Append(HttpUtility.UrlEncode(key));
+                    path.Append(urlEncode ? HttpUtility.UrlEncode(key) : key);
                     path.Append('=');
-                    path.Append(HttpUtility.UrlEncode(value));
+                    path.Append(urlEncode ? HttpUtility.UrlEncode(value) : value);
                     path.Append('&');
                 }
                 if (path[path.Length - 1] == '&') path.Remove(path.Length - 1, 1);
             }
             return path.ToString();
         }
+
+        
 
         /// <summary>
         /// Removes the query string from the specifed path. If the path is only a querystring, an empty string is returned.
