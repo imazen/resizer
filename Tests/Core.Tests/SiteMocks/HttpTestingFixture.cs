@@ -16,7 +16,7 @@ using System.Web;
 [assembly: DegreeOfParallelism(20)]
 
 namespace ImageResizer.Core.Tests.SiteMocks {
-    [TestFixture]
+    
     [System.Web.AspNetHostingPermission(System.Security.Permissions.SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Unrestricted)]
     public class HttpTestingFixture {
 
