@@ -6,6 +6,7 @@ using Microsoft.Win32;
 
 namespace ImageResizer.ReleaseBuilder {
     class Program {
+        [STAThread]
         static void Main(string[] args) {
             Console.WindowHeight = Console.LargestWindowHeight / 2;
             Console.WindowWidth = Console.LargestWindowWidth / 2;
