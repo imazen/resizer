@@ -29,16 +29,16 @@ namespace ImageResizer
     /// Provides methods for generating resized images, and for reading and writing them to disk.
     /// Use ImageBuilder.Current to get the current instance (as configured in the application configuration), or use ImageBuilder.Current.Create() to control which extensions are used.
     /// </summary>
-    public class ImageBuilder : AbstractImageProcessor, IQuerystringPlugin
+    public class ImageBuilder : AbstractImageProcessor, IQuerystringPlugin, IFileExtensionPlugin
     {
         /// <summary>
         /// Handles the encoder selection and provision proccess.
         /// </summary>
-        protected IEncoderProvider encoderProvider = null;
+        protected IEncoderProvider _encoderProvider = null;
         /// <summary>
         /// Handles the encoder selection and provision proccess.
         /// </summary>
-        public IEncoderProvider EncoderProvider { get { return encoderProvider; } }
+        public IEncoderProvider EncoderProvider { get { return _encoderProvider; } }
 
         /// <summary>
         /// Returns a shared instance of ImageBuilder or a subclass, equivalent to  Config.Current.CurrentImageBuilder
@@ -49,15 +49,16 @@ namespace ImageResizer
         /// Creates a new ImageBuilder instance with no extensions.
         /// </summary>
         public ImageBuilder(IEncoderProvider encoderProvider): base() {
-                this.encoderProvider = encoderProvider;
+                this._encoderProvider = encoderProvider;
         }
 
         /// <summary>
         /// Create a new instance of ImageBuilder using the specified extensions and encoder provider. Extension methods will be fired in the order they exist in the collection.
         /// </summary>
         /// <param name="extensions"></param>
+        /// <param name="encoderProvider"></param>
         public ImageBuilder(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider):base(extensions){
-            this.encoderProvider = encoderProvider;
+            this._encoderProvider = encoderProvider;
         }
 
         
@@ -65,6 +66,7 @@ namespace ImageResizer
         /// Creates another instance of the class using the specified extensions. Subclasses should override this and point to their own constructor.
         /// </summary>
         /// <param name="extensions"></param>
+        /// <param name="writer"></param>
         /// <returns></returns>
         public virtual ImageBuilder Create(IEnumerable<BuilderExtension> extensions, IEncoderProvider writer) {
             return new ImageBuilder(extensions,writer);
@@ -74,7 +76,7 @@ namespace ImageResizer
         /// </summary>
         /// <returns></returns>
         public virtual ImageBuilder Copy(){
-            return new ImageBuilder(this.exts,this.encoderProvider);
+            return new ImageBuilder(this.exts,this._encoderProvider);
         }
 
 
@@ -85,6 +87,7 @@ namespace ImageResizer
             public BitmapHolder() { }
             public Bitmap bitmap;
         }
+
         /// <summary>
         /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag in a BitmapTag instance. The Bitmap.Tag.Path value may be a virtual, relative, UNC, windows, or unix path. 
         /// Does not dispose 'source' if it is a Stream or Image instance - that's the responsibility of the calling code.
@@ -237,6 +240,7 @@ namespace ImageResizer
         /// </summary>
         /// <param name="source">May be an instance of string (a physical path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.</param>
         /// <param name="settings">Resizing and processing command to apply to the.</param>
+        /// <param name="disposeSource">If false, 'source' will not be disposed. </param>
        
         public virtual Bitmap Build(object source, ResizeSettings settings, bool disposeSource) {
             BitmapHolder bh = new BitmapHolder();
@@ -482,6 +486,16 @@ namespace ImageResizer
             return RequestedAction.None;
         }
 
+        protected override RequestedAction LayoutMargin(ImageState s) {
+            if (base.LayoutMargin(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
+
+            //We need to add padding
+            if (!s.settings.Margin.IsEmpty) {
+                s.layout.AddRing("margin", s.settings.Margin);
+            }
+            return RequestedAction.None;
+        }
+
         protected override RequestedAction LayoutBorder(ImageState s) {
             if (base.LayoutBorder(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
@@ -694,10 +708,10 @@ namespace ImageResizer
 
 
 
-       /// <summary>
-       /// Populates copyRect, as well as Rings image and imageArea. Translates and scales any existing rings as if they existed on the original bitmap.
-       /// </summary>
-       /// <param name="s"></param>
+        /// <summary>
+        /// Populates copyRect, as well as Rings image and imageArea. Translates and scales any existing rings as if they existed on the original bitmap.
+        /// </summary>
+        /// <param name="s"></param>
         protected override RequestedAction LayoutImage(ImageState s) {
             if (base.LayoutImage(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
@@ -841,6 +855,10 @@ namespace ImageResizer
         private readonly string[] _supportedFileExtensions = new string[]
              {"bmp","gif","exif","png","tif","tiff","tff","jpg","jpeg", "jpe","jif","jfif","jfi"};
 
+        /// <summary>
+        /// Returns a list of the file extensions ImageBuilder can load by default. Plugins can implement IFileExtensionPlugin to add new ones.
+        /// </summary>
+        /// <returns></returns>
         public virtual IEnumerable<string> GetSupportedFileExtensions() {
             return _supportedFileExtensions;
         }
@@ -851,7 +869,11 @@ namespace ImageResizer
                 "scale", "stretch", "crop", "page", "bgcolor",
                 "rotate", "flip", "sourceFlip", "borderWidth",
                 "borderColor", "paddingWidth", "paddingColor", "ignoreicc", "frame", "useresizingpipeline", "cache", "process"};
-    
+
+        /// <summary>
+        /// Returns a list of the querystring commands ImageBuilder can parse by default. Plugins can implement IQuerystringPlugin to add new ones.
+        /// </summary>
+        /// <returns></returns>
         public virtual IEnumerable<string> GetSupportedQuerystringKeys() {
             return _supportedQuerystringKeys;
         }
