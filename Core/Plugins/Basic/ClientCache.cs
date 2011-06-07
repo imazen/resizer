@@ -52,7 +52,7 @@ namespace ImageResizer.Plugins.Basic {
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             c.Pipeline.PreHandleImage -= Pipeline_PreHandleImage;
-            return false;
+            return true;
         }
     }
 }
