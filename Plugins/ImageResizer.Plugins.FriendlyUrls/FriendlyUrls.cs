@@ -45,8 +45,8 @@ namespace ImageResizer.Plugins.FriendlyUrls {
             Match m = resizeFolder.Match(path);
             if (m.Success) {
                 //Parse capture groups
-                int maxwidth = -1; int.TryParse(m.Groups["maxwidth"].Value, out maxwidth);
-                int maxheight = -1; int.TryParse(m.Groups["maxheight"].Value, out maxheight);
+                int maxwidth = -1; if (!int.TryParse(m.Groups["maxwidth"].Value, out maxwidth)) maxwidth = -1;
+                int maxheight = -1; if (!int.TryParse(m.Groups["maxheight"].Value, out maxheight)) maxheight = -1;
                 string format = (m.Groups["format"].Captures.Count > 0) ? format = m.Groups["format"].Captures[0].Value : null;
 
                 //Remove first resize folder from URL

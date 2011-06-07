@@ -57,20 +57,20 @@ namespace ImageResizer.Util {
         public static int getInt(NameValueCollection q, string name, int defaultValue) {
             int temp = defaultValue;
             if (!string.IsNullOrEmpty(q[name]))
-                int.TryParse(q[name], out temp);
+                if (!int.TryParse(q[name], out temp)) return defaultValue;
             return temp;
         }
         public static float getFloat(NameValueCollection q, string name, float defaultValue) {
             float temp = defaultValue;
             if (!string.IsNullOrEmpty(q[name]))
-                float.TryParse(q[name], out temp);
+                if (!float.TryParse(q[name], out temp)) return defaultValue;
             return temp;
         }
 
         public static double getDouble(NameValueCollection q, string name, double defaultValue) {
             double temp = defaultValue;
             if (!string.IsNullOrEmpty(q[name]))
-                double.TryParse(q[name], out temp);
+                if (!double.TryParse(q[name], out temp)) return defaultValue;
             return temp;
         }
 
