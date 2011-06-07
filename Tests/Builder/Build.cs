@@ -241,7 +241,7 @@ namespace ImageResizer.ReleaseBuilder {
             //Don't copy the DotNetZip xml file.
             q.exclusions.Add(new Pattern("^/Plugins/Libs/DotNetZip*.xml$"));
             q.exclusions.Add(new Pattern("^/Tests/Libs/LibDevCassini"));
-
+            q.exclusions.Add(new Pattern("^/Samples/SqlReaderSampleVarChar"));
         }
         public void PackMin(PackageDescriptor desc) {
             // 'min' - /dlls/release/ImageResizer.* - /
