@@ -71,11 +71,15 @@ namespace ImageResizer.Tests {
 
         [Test]
         [Row(200,200,50,50,"?width=50&height=50")]
+        [Row(10, 10, 50, 50, "?paddingWidth=10&borderWidth=10&borderColor=green")]
+        [Row(10, 10, 50, 50, "?paddingWidth=10&borderWidth=10")]
+        [Row(10, 10, 70, 70, "?paddingWidth=10&margin=10&borderWidth=10&borderColor=green")]
+        [Row(10, 10, 70, 70, "?paddingWidth=10&margin=10&borderWidth=10")]
         public void TestBitmapSize(int originalWidth, int originalHeight, int expectedWidth, int expectedHeight, string query) {
             ResizerSection config = new ResizerSection();
             Config c = new Config(config);
             using (Bitmap b = c.CurrentImageBuilder.Build(GetBitmap(originalWidth,originalHeight), new ResizeSettings(query))) {
-                Assert.AreEqual<Size>(b.Size,new Size(expectedWidth,expectedHeight));
+                Assert.AreEqual<Size>(new Size(expectedWidth,expectedHeight),b.Size);
             }
         }
         /// <summary>

@@ -11,7 +11,7 @@ using System.Diagnostics;
 using System.Net;
 
 namespace ImageResizer.Core.Tests {
-    [TestFixture]
+   
     public class HttpTests: HttpTestingFixture{
 
         

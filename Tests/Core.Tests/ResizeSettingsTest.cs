@@ -28,5 +28,21 @@ namespace ImageResizer.Core.Tests {
             Assert.AreEqual<int>(-1, s.MaxWidth);
             Assert.AreEqual<int>(-1,s.MaxHeight);
         }
+
+        [Test]
+        [Row("red","red")]
+        [Row("#44550099", "44550099")]
+        [Row("666", "666666")]
+        [Row("6663", "66666630")]
+        [Row("green", "Green")]
+        [Row("fefefe", "fefefe")]
+        [Row("#fefefecc", "fefefecc")]
+        [Row("gggaeee", "transparent")]
+        public void TestBgColor(string from, string to) {
+            ResizeSettings s = new ResizeSettings("bgcolor=" + from);
+            s.BackgroundColor = s.BackgroundColor;
+            Assert.AreEqual(to, s["bgcolor"], StringComparison.OrdinalIgnoreCase);
+            
+        }
     }
 }

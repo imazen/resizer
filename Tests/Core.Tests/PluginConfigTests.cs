@@ -61,8 +61,8 @@ namespace ImageResizer.Tests {
 
         [Test]
         [Row("<resizer><plugins><clear type='all' /> <add name='defaultencoder' /><add name='nocache' /></plugins></resizer>")]
-        [Row("<resizer><plugins><add name='defaultencoder' /><remove name='defaultencoder' /><add name='nocache' /> <clear type='encoders' /></plugins></resizer>")]
-        [Row("<resizer><plugins><clear type='caches' /></plugins></resizer>")]
+        [Row("<resizer><plugins><remove name='defaultencoder' /><add name='defaultencoder' /><remove name='nocache' /><add name='nocache' /></plugins></resizer>")]
+        [Row("<resizer><plugins><clear type='caches' /><add name='nocache' /></plugins></resizer>")]
         [Row("<resizer><plugins><clear type='extensions' /></plugins></resizer>")]
         [System.Security.Permissions.ReflectionPermission(System.Security.Permissions.SecurityAction.Deny)]
         public void LoadPlugins(string xml) {
