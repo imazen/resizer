@@ -15,11 +15,15 @@ namespace ImageResizer.Core.Tests {
             s.CropBottomRight = new System.Drawing.PointF(50, 50);
             s.CropTopLeft = new System.Drawing.PointF(0, 0);
             Assert.AreEqual<string>( "?crop=(0,0,50,50)", s.ToString());
+            s.CropMode = CropMode.Auto;
+            Assert.AreEqual<string>("?crop=auto", s.ToString());
+            s.CropMode = CropMode.Custom;
+            Assert.AreEqual<string>("?crop=(0,0,0,0)", s.ToString());
         }
 
 
         [Test]
-        public void TestIntParsing() {
+        public void TestIntParsingOfInvalidSyntax() {
             ResizeSettings s = new ResizeSettings("maxwidth=100px&maxheight=50.6");
             Assert.AreEqual<int>(-1, s.MaxWidth);
             Assert.AreEqual<int>(-1,s.MaxHeight);

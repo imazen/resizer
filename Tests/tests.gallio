@@ -2,18 +2,15 @@
 <testProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.gallio.org/">
   <testPackage shadowCopy="false" debug="false">
     <files>
-      <file>ImageResizer.Plugins.DiskCache.Tests\bin\Debug\ImageResizer.Plugins.DiskCache.Tests.dll</file>
-      <file>..\Dlls\debug\ImageResizer.Core.Tests.dll</file>
       <file>binaries\debug\ImageResizer.Core.Tests.dll</file>
-      <file>binaries\debug\ImageResizer.Plugins.Watermark.Tests.dll</file>
     </files>
     <hintDirectories />
     <excludedFrameworkIds />
     <properties />
   </testPackage>
   <testFilters>
-    <testFilter filterName="AutoSave" filterExpr="Id: 31b1671375ad4340" />
-    <testFilter filterName="LastRun" filterExpr="Id: 31b1671375ad4340" />
+    <testFilter filterName="AutoSave" filterExpr="(Id: c88aed72114cf339 or (Id: dbf604e7f19231df or Id: f19a27b55143a7ec))" />
+    <testFilter filterName="LastRun" filterExpr="(Id: c88aed72114cf339 or (Id: dbf604e7f19231df or Id: f19a27b55143a7ec))" />
   </testFilters>
   <extensionSpecifications />
   <reportDirectory>..\..\..\AppData\Roaming\Gallio\Icarus\Reports</reportDirectory>
