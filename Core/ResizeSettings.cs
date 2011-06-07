@@ -15,6 +15,9 @@ namespace ImageResizer {
     [Serializable]
     public class ResizeSettings : NameValueCollection {
         
+        /// <summary>
+        /// Creates an empty settings collection. 
+        /// </summary>
         public ResizeSettings() : base() { }
         /// <summary>
         /// Copies the specified collection into a new ResizeSettings instance.
@@ -28,47 +31,83 @@ namespace ImageResizer {
         public ResizeSettings(string queryString) : base(PathUtils.ParseQueryStringFriendly(queryString)) { }
 
 
-        public int get(string name, int defaultValue){ return Utils.getInt(this,name,defaultValue);}
-        public void set(string name, int value) { this[name] = value.ToString();}
-        public double get(string name, double defaultValue) { return Utils.getDouble(this, name, defaultValue); }
-        public void set(string name, double value) { this[name] = value.ToString(); }
+        protected int get(string name, int defaultValue){ return Utils.getInt(this,name,defaultValue);}
+        protected void set(string name, int value) { this[name] = value.ToString(); }
 
+        protected double get(string name, double defaultValue) { return Utils.getDouble(this, name, defaultValue); }
+        protected void set(string name, double value) { this[name] = value.ToString(); }
 
+        /// <summary>
+        /// ["width"]: Sets the desired width of the image. (minus padding, borders, margins, effects, and rotation). 
+        /// The only instance the resulting image will be smaller is if the original source image is smaller. 
+        /// Set Scale=Both to upscale these images and ensure the output always matches 'width' and 'height'. 
+        /// If both width and height are specified, the image will be 'letterboxed' to match the desired aspect ratio. 
+        /// Use maxwidth/maxheight, crop=auto, or stretch=fill to avoid this behavior.
+        /// </summary>
         public int Width                        { get { 
             return get("width", -1);            } set {   
             set("width",value);                 } }
 
+        /// <summary>
+        /// ["height"]: Sets the desired height of the image.  (minus padding, borders, margins, effects, and rotation)
+        /// The only instance the resulting image will be smaller is if the original source image is smaller. 
+        /// Set Scale=Both to upscale these images and ensure the output always matches 'width' and 'height'. 
+        /// If both width and height are specified, the image will be 'letterboxed' to match the desired aspect ratio. 
+        /// Use maxwidth/maxheight, crop=auto, or stretch=fill to avoid this behavior.
+        /// </summary>
         public int Height                        { get { 
             return get("height", -1);            } set {   
             set("height",value);                 } }
 
+        /// <summary>
+        /// ["maxwidth"]: Sets the maximum desired width of the image.  (minus padding, borders, margins, effects, and rotation). 
+        /// The image may be smaller than this value to maintain aspect ratio when both maxwidth and maxheight are specified.
+        /// </summary>
         public int MaxWidth                        { get { 
             return get("maxwidth", -1);            } set {   
             set("maxwidth",value);                 } }
 
+        /// <summary>
+        /// ["maxheight"]: Sets the maximum desired height of the image.  (minus padding, borders, margins, effects, and rotation). 
+        /// The image may be smaller than this value to maintain aspect ratio when both maxwidth and maxheight are specified.
+        /// </summary>
         public int MaxHeight                        { get { 
             return get("maxheight", -1);            } set {   
             set("maxheight",value);                 } }
 
+        /// <summary>
+        /// Returns true if any of the specified keys are present in this NameValueCollection
+        /// </summary>
+        /// <param name="keys"></param>
+        /// <returns></returns>
         public bool WasOneSpecified(params string[] keys) {
             foreach (String s in keys) if (!string.IsNullOrEmpty(this[s])) return true;
             return false;
         }
-
+        /// <summary>
+        /// ["rotate"] The degress to rotate the image clockwise. -360 to 360.
+        /// </summary>
         public double Rotate                        { get { 
-            return get("rotate", 0);               } set {   
+            return get("rotate", 0.0d);               } set {   
             set("rotate",value);                    } }
 
+        /// <summary>
+        /// Allows you to flip the entire resulting image vertically, horizontally, or both.
+        /// </summary>
         public RotateFlipType Flip                      { get {
             return Utils.parseFlip(this["flip"]);       } set {
             this["flip"] = Utils.writeFlip(value);      }}
 
+        /// <summary>
+        /// ["sourceFlip"] Allows you to flip the source image vertically, horizontally, or both.
+        /// </summary>
         public RotateFlipType SourceFlip                    { get {
             return Utils.parseFlip(this["sourceFlip"]);     } set {
             this["sourceFlip"] = Utils.writeFlip(value);    }}
 
         /// <summary>
-        /// Whether to downscale, upscale, or allow both on images
+        /// ["scale"] Whether to downscale, upscale, upscale the canvas, or both upscale or downscale the image as needed. Defaults to
+        /// DownscaleOnly. 
         /// </summary>
         public ScaleMode Scale                              { get {
             return Utils.parseScale(this["scale"]);         } set {
@@ -83,7 +122,7 @@ namespace ImageResizer {
 
 
         /// <summary>
-        /// Server caching mode suggestion for the result
+        /// ["cache"]: Server caching mode suggestion for the result
         /// </summary>
         public ServerCacheMode Cache {
             get {
@@ -95,7 +134,7 @@ namespace ImageResizer {
         }
 
         /// <summary>
-        /// Server caching mode suggestion for the result
+        /// ["process"]: Server processing suggestion for the result. Allows you to 'disable' processing of the image (so you can use disk caching with non-image files). Allows you to 'force' processing of the image, for images without a querystring.
         /// </summary>
         public ProcessWhen Process {
             get {
@@ -107,7 +146,8 @@ namespace ImageResizer {
         }
 
         /// <summary>
-        /// Crop settings. Defaults to None - letterboxing is used if both width and height are supplied, and stretch = proportionally.
+        /// ["crop"]=none|auto Defaults to None - letterboxing is used if both width and height are supplied, and stretch = proportionally.
+        /// Set CropTopLeft and CropBottomRight when you need to specify a custom crop rectangle.
         /// </summary>
         public CropMode CropMode                                {get {
             return Utils.parseCrop(this["crop"]).Key;           } set {
@@ -135,6 +175,11 @@ namespace ImageResizer {
             }
         }
 
+        /// <summary>
+        /// ["crop"]=([x1],[y1],x2,y2). Sets x1 and y21, the top-right corner of the crop rectangle. If 0 or greater, the coordinate is relative to the top-left corner of the image.
+        /// If less than 0, the value is relative to the bottom-right corner. This allows for easy trimming: crop=(10,10,-10,-10).
+        /// Set ["cropxunits"] and ["cropyunits"] to the width/height of the rectangle your coordinates are relative to, if different from the original image size.
+        /// </summary>
         public PointF CropTopLeft {
             get {
                 return new PointF((float)CropValues[0], (float)CropValues[1]);
@@ -144,6 +189,11 @@ namespace ImageResizer {
             }
         }
 
+        /// <summary>
+        /// ["crop"]=(x1,y1,[x2],[y2]). Sets x2 and y2, the bottom-right corner of the crop rectangle. If 1 or greater, the coordinate is relative to the top-left corner of the image.
+        /// If 0 or less, the value is relative to the bottom-right corner. This allows for easy trimming: crop=(10,10,-10,-10).
+        /// Set ["cropxunits"] and ["cropyunits"] to the width/height of the rectangle your coordinates are relative to, if different from the original image size.
+        /// </summary>
         public PointF CropBottomRight {
             get {
                 return new PointF((float)CropValues[2], (float)CropValues[3]);
@@ -153,17 +203,24 @@ namespace ImageResizer {
             }
         }
 
-
+        /// <summary>
+        /// ["bgcolor"]: Named and hex values are supported. (rgb and rgba, both 3, 6, and 8 digits).
+        /// </summary>
         public Color BackgroundColor {
             get { return Utils.parseColor(this[ "bgcolor"], Color.Transparent); }
             set { this["bgcolor"] = Utils.writeColor(value); }
         }
 
-
+        /// <summary>
+        /// Gets/sets ["paddingColor"]. Named and hex values are supported. (rgb and rgba, both 3, 6, and 8 digits).
+        /// </summary>
         public Color PaddingColor {
             get { return Utils.parseColor(this["paddingColor"], Color.Transparent); }
             set { this["paddingColor"] = Utils.writeColor(value); }
         }
+        /// <summary>
+        /// ["paddingWidth"]: Gets/sets the width(s) of padding inside the image border.
+        /// </summary>
         public BoxPadding Padding {
             get {
                 return Utils.parsePadding(this["paddingWidth"]);
@@ -172,7 +229,9 @@ namespace ImageResizer {
                 this["paddingWidth"] = Utils.writePadding(value);
             }
         }
-
+        /// <summary>
+        /// ["margin"]: Gets/sets the width(s) of the margin outside the image border and effects.
+        /// </summary>
         public BoxPadding Margin {
             get {
                 return Utils.parsePadding(this["margin"]);
@@ -181,11 +240,16 @@ namespace ImageResizer {
                 this["margin"] = Utils.writePadding(value);
             }
         }
-
+        /// <summary>
+        /// Gets/sets ["borderColor"]. Named and hex values are supported. (rgb and rgba, both 3, 6, and 8 digits).
+        /// </summary>
         public Color BorderColor {
             get { return Utils.parseColor(this["borderColor"], Color.Transparent); }
             set { this["borderColor"] = Utils.writeColor(value); }
         }
+        /// <summary>
+        /// Friendly get/set accessor for the ["borderWidth"] value. Returns BoxPadding.Empty when unspecified.
+        /// </summary>
         public BoxPadding Border {
             get {
                 return Utils.parsePadding(this["borderWidth"]);
@@ -195,6 +259,13 @@ namespace ImageResizer {
             }
         }
 
+        /// <summary>
+        /// Like this["format"]. 
+        /// Gets or sets the output file format to use. "png", "jpg", and "gif" are valid values.
+        /// Returns null if unspecified. When format is not specified, the original format of the image is used (unless it is not a web safe format  - jpeg is the fallback in that scenario).
+        /// <remarks>Also checks the 'thumbnail' value for V2 compatibility. When set, 'thumnail' is removed and only 'format' is used.
+        /// </remarks>
+        /// </summary>
         public string Format {
             get {
                 if (!string.IsNullOrEmpty(this["format"])) return this["format"];
@@ -267,10 +338,18 @@ namespace ImageResizer {
             if (string.IsNullOrEmpty(this["thumbnail"]) && string.IsNullOrEmpty(this["format"])) this["format"] = format;
         }
 
+        /// <summary>
+        /// Returns a string containing all the settings in the class, in querystring form. Use ToStringEncoded() to get a URL-safe querystring. 
+        /// This method does not encode commas, spaces, etc.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString() {
             return PathUtils.BuildQueryString(this,false);
         }
-
+        /// <summary>
+        /// Returns a querystring with all the settings in this class. Querystring keys and values are URL encoded properly.
+        /// </summary>
+        /// <returns></returns>
         public  string ToStringEncoded() {
             return PathUtils.BuildQueryString(this);
         }
