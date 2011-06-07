@@ -62,7 +62,11 @@ namespace ImageResizer.Caching {
 
 
         protected IResponseHeaders responseHeaders = new ResponseHeaders();
-
+        /// <summary>
+        /// The content-type of the data, among other things. Set ResponseHeaders.ApplyDuringPreSendRequestHeaders to automatically
+        /// write caching headers based on ResponseHeaders values.
+        /// Caching systems that use redirects may use this data as hints when configuring caching on the remote server.
+        /// </summary>
         public IResponseHeaders ResponseHeaders {
             get { return responseHeaders; }
             set { responseHeaders = value; }
@@ -70,7 +74,9 @@ namespace ImageResizer.Caching {
 
 
         protected NameValueCollection rewrittenQuerystring;
-
+        /// <summary>
+        /// The rewritten querystring. Can be useful for caching systems that accept querystring arguments.
+        /// </summary>
         public NameValueCollection RewrittenQuerystring {
             get { return rewrittenQuerystring; }
             set { rewrittenQuerystring = value; }

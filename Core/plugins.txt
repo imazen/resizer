@@ -2,14 +2,12 @@ See http://imageresizing.net/plugins
 
 To-do list
 RemoteSiteReader - Loads images from a remote site over HTTP (not built)
-S3Cache - Caches resized images to S3 for scalability - but uses redirects. (not built)
-WatermarkOverlay - Add configurable
+Watermark - Add named configurations
 
 
 Backburner
 PrettyGifs - Add fastMode option that uses the original image palette to speed up processing times. (feature not yet added)
 PsdComposer - Re-compose PSD files on-the-fly. Rewrite text layers, hide/show layers. Minimal support for layer effects, only glow and solid fill at the moment.
-SqlCache - Caches resized images to SQL (not built)
 AzureReader - Loads images from Azure blob storage. (not built) (Only 1 request so far)
 AzureCache - Caches resized images to Azure's blob storage (not built)  (Only 1 request so far)
 

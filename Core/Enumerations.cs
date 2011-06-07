@@ -5,6 +5,9 @@ using System.Text;
 
 namespace ImageResizer {
 
+    /// <summary>
+    /// When to disk cache the image
+    /// </summary>
     public enum ServerCacheMode {
         /// <summary>
         /// Request no caching of the resulting image.
@@ -20,7 +23,9 @@ namespace ImageResizer {
         Default
 
     }
-
+    /// <summary>
+    /// When to process and re-encode the image. 
+    /// </summary>
     public enum ProcessWhen {
         /// <summary>
         /// Request no processing of the image or file (generally used with cache=always).
