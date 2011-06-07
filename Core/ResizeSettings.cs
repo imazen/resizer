@@ -125,12 +125,11 @@ namespace ImageResizer {
             }
             set {
                 //If values are valid, CropMode.Custom will automatically be selected
-                if (value != null && (value.GetLength(0) == 4)) {
-                    Utils.writeCrop(ImageResizer.CropMode.Custom, value);
+                if (value != null && (value.Length == 4)) {
+                    this["crop"] =  Utils.writeCrop(ImageResizer.CropMode.Custom, value);
                 } else {
                     //Throw an exception if an invalid value is assigned when CropMode.Custom is in use.
-                    if (CropMode == ImageResizer.CropMode.Custom)
-                        throw new ArgumentException("CropValues must be an array of 4 double values when CropMode.Custom is in use.");
+                    throw new ArgumentException("CropValues must be an array of 4 double values.");
                     //Otherwise, ignore it.
                 }
             }
@@ -266,6 +265,14 @@ namespace ImageResizer {
 
         public void SetDefaultImageFormat(string format) {
             if (string.IsNullOrEmpty(this["thumbnail"]) && string.IsNullOrEmpty(this["format"])) this["format"] = format;
+        }
+
+        public override string ToString() {
+            return PathUtils.BuildQueryString(this,false);
+        }
+
+        public  string ToStringEncoded() {
+            return PathUtils.BuildQueryString(this);
         }
     }
 }
