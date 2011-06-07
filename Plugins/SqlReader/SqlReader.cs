@@ -80,13 +80,14 @@ namespace ImageResizer.Plugins.SqlReader
         /// <returns></returns>
         public SqlParameter getIdParameter(string id)
         {
-            SqlParameter sp = new SqlParameter("id", s.ImageIdType, 4);
-            if (IsIntKey)
+            SqlParameter sp = new SqlParameter("id", s.ImageIdType);
+            if (IsIntKey) {
+                sp.Size = 4;
                 sp.Value = long.Parse(id);
-            else if (s.ImageIdType == System.Data.SqlDbType.UniqueIdentifier)
+            } else if (s.ImageIdType == System.Data.SqlDbType.UniqueIdentifier)
                 sp.Value = new Guid(id);
-            else if (IsStringKey) 
-                     sp.Value = id;
+            else if (IsStringKey)
+                sp.Value = id;
             
             return sp;
         }
