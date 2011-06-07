@@ -177,7 +177,7 @@ namespace ImageResizer
                 throw new ImageCorruptedException(loadFailureReasons, ee);
             } finally {
                 //Now, we can't dispose the stream if Bitmap is still using it. 
-                if (b.Tag != null && b.Tag is BitmapTag && ((BitmapTag)b.Tag).Source == s) {
+                if (b != null && b.Tag != null && b.Tag is BitmapTag && ((BitmapTag)b.Tag).Source == s) {
                     //And, it looks like Bitmap is still using it.
                     s = null;
                 }
