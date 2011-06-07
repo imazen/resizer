@@ -8,6 +8,8 @@ using MbUnit.Framework.ContractVerifiers;
 using ImageResizer.Configuration;
 using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Drawing.Imaging;
 
 namespace ImageResizer.Tests {
     [TestFixture]
@@ -31,6 +33,10 @@ namespace ImageResizer.Tests {
             }
             return b;
         }
+
+     
+
+
         [Test]
         [Row(50,50,"format=jpg&quality=100")]
         [Row(1,1,"format=jpg&quality=100")]
@@ -60,6 +66,8 @@ namespace ImageResizer.Tests {
                 }
             }
         }
+
+
 
         [Test]
         [Row(200,200,50,50,"?width=50&height=50")]
@@ -94,5 +102,73 @@ namespace ImageResizer.Tests {
             PointF result = c.CurrentImageBuilder.TranslatePoints(new PointF[] { new PointF(x,y) }, new Size(imgWidth,imgHeight), new ResizeSettings(query))[0];
             Assert.AreEqual<PointF>(new PointF(expectedX,expectedY), result );
         }
+
+
+        [Test]
+        public void TestSourceBitmapDisposed([Column(true, false)] bool dispose,
+                                            [Column(true, false)] bool useDestinationStream,
+                                            [Column(true, false)] bool useCorruptedSource,
+                                            [Column(true, false)] bool loadTwice,
+                                            [Column(true, false)] bool useSourceStream) {
+            if (useCorruptedSource) useSourceStream = true;//Required
+
+            object source = null;
+            if (!useSourceStream){ //Source is a bitmap here
+                source = GetBitmap(10,10);
+            }else if (useCorruptedSource){ //A corrupted stream
+                
+                byte[] randomBytes = new byte[256];
+                new Random().NextBytes(randomBytes);
+                source = new MemoryStream(randomBytes);
+                ((MemoryStream)source).Position = 0;
+                ((MemoryStream)source).SetLength(randomBytes.Length);
+            }else{ //A png stream
+                using(Bitmap b = GetBitmap(10,10)){
+                    MemoryStream ms = new MemoryStream();
+                    b.Save(ms,ImageFormat.Png);
+                    ms.Position = 0;
+                    source = ms;
+                }
+            }
+            
+            //The destination object, if it exists.
+            object dest = useDestinationStream ? new MemoryStream() : null;
+
+            
+            if (loadTwice){
+                bool corrupted = false;
+                try {
+                    source = c.CurrentImageBuilder.LoadImage(source, new ResizeSettings());
+                } catch (ImageCorruptedException) {
+                    corrupted = true;
+                    source = null;
+                }
+                Assert.AreEqual<bool>(useCorruptedSource,corrupted);
+            }
+
+            if (source == null) return;
+
+            bool wasCorrupted = false;
+            try{
+                if (dest != null)
+                    c.CurrentImageBuilder.Build(source, dest,new ResizeSettings(""), dispose);
+                else
+                    using (Bitmap b2 = c.CurrentImageBuilder.Build(source, new ResizeSettings(""), dispose)) { }
+            }catch(ImageCorruptedException){
+                wasCorrupted = true;
+            }
+            Assert.AreEqual<bool>(useCorruptedSource,wasCorrupted);
+
+            bool wasDisposed = false;
+            try {
+                if (source is Bitmap) ((Bitmap)source).Clone();
+                if (source is MemoryStream) wasDisposed = !((MemoryStream)source).CanRead;
+            }catch (ArgumentException){wasDisposed = true;}
+
+            Assert.AreEqual<bool>(dispose,wasDisposed);
+
+        }
+
+
     }
 }
