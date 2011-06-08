@@ -1,1 +1,1 @@
-Visit http://imageresizing.net/ for documentation, licensing, and sampel code
+Visit http://imageresizing.net/ for documentation, licensing, and sample code
