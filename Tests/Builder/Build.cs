@@ -200,8 +200,8 @@ namespace ImageResizer.ReleaseBuilder {
         }
 
         public void BuildAll() {
+            d.Run("/Build Release");//Have to run Release first, since ImageResizerGUI includes the DLLs.
             d.Run("/Build Debug");
-            d.Run("/Build Release");
             d.Run("/Build Trial");
         }
 
