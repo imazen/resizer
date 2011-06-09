@@ -80,8 +80,11 @@
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="MainWindows_BackgroundWorkers.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="SaveMode.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="UIData.cs" />
     <Page Include="AdvancedOptions.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

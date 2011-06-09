@@ -46,5 +46,28 @@ namespace ImageResizerGUI.Properties {
                 this["openFolderPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string saveZipPath {
+            get {
+                return ((string)(this["saveZipPath"]));
+            }
+            set {
+                this["saveZipPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::ImageResizer.ResizeSettings resizeSettings {
+            get {
+                return ((global::ImageResizer.ResizeSettings)(this["resizeSettings"]));
+            }
+            set {
+                this["resizeSettings"] = value;
+            }
+        }
     }
 }
