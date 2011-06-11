@@ -61,12 +61,37 @@ namespace ImageResizerGUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::ImageResizer.ResizeSettings resizeSettings {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string resizeMode {
             get {
-                return ((global::ImageResizer.ResizeSettings)(this["resizeSettings"]));
+                return ((string)(this["resizeMode"]));
             }
             set {
-                this["resizeSettings"] = value;
+                this["resizeMode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int height {
+            get {
+                return ((int)(this["height"]));
+            }
+            set {
+                this["height"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int width {
+            get {
+                return ((int)(this["width"]));
+            }
+            set {
+                this["width"] = value;
             }
         }
     }

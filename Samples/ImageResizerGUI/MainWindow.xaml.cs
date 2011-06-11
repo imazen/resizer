@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins;
@@ -16,6 +17,7 @@ using ImageResizer.Plugins.AnimatedGifs;
 using ImageResizer.Plugins.PrettyGifs;
 using ImageResizer.Plugins.PsdReader;
 using System.Collections.ObjectModel;
+using Control = System.Windows.Forms.Control;
 using DataFormats = System.Windows.DataFormats;
 using MessageBox = System.Windows.Forms.MessageBox;
 
@@ -41,9 +43,6 @@ namespace ImageResizerGUI
             new PrettyGifs().Install(Config.Current);
             new PsdReader().Install(Config.Current);
 
-            if (Properties.Settings.Default.resizeSettings == null)
-                Properties.Settings.Default.resizeSettings = new ResizeSettings() { MaxWidth = 1024, MaxHeight = 768 };
-
             aOptions = new AdvancedOptions(this);
 
             btn_BrowseButton.Click += btn_BrowseButton_Click;
@@ -55,10 +54,38 @@ namespace ImageResizerGUI
             Closing += MainWindow_Closing;
             listView.Drop += listView_Drop;
             KeyDown += MainWindow_KeyDown;
-
             comboBox_exportAction.SelectionChanged += comboBox_exportAction_SelectionChanged;
             comboBox_exportAction.SelectedIndex = 1;
             saveMode = SaveMode.ExportResults;
+
+            LoadSettings();
+        }
+
+        /// <summary>
+        /// Load initial data from last used settings
+        /// </summary>
+        void LoadSettings()
+        {
+            // if settings are not saved, create default settings
+            if (string.IsNullOrEmpty(Properties.Settings.Default.resizeMode))
+                Properties.Settings.Default.resizeMode = "Shrink";
+
+            if (Properties.Settings.Default.width == 0)
+                Properties.Settings.Default.width = 1024;
+
+            if (Properties.Settings.Default.height == 0)
+                Properties.Settings.Default.height = 768;
+
+            // set settings to the GUI
+            tbox_width.Text = Properties.Settings.Default.width.ToString();
+            tbox_height.Text = Properties.Settings.Default.height.ToString();
+
+            var resizeMode = from ComboBoxItem item in aOptions.cbox_resizeMode.Items
+                             where item.Content.ToString() == Properties.Settings.Default.resizeMode
+                             select item;
+
+
+            aOptions.cbox_resizeMode.SelectedItem = resizeMode.First();
         }
 
         /// <summary>
@@ -73,17 +100,19 @@ namespace ImageResizerGUI
                 int height = int.Parse(tbox_height.Text);
                 int width = int.Parse(tbox_width.Text);
 
-                switch (aOptions.cbox_resizeMode.SelectedIndex)
+                switch ((ResizeMode)((ComboBoxItem)aOptions.cbox_resizeMode.SelectedItem).Tag)
                 {
-                    case 0: //Shrink
+                    case ImageResizerGUI.ResizeMode.Shrink:
                         rs.MaxHeight = height;
                         rs.MaxWidth = width;
                         break;
-                    case 1: //Shrink and pad to ratio
+
+                    case ImageResizerGUI.ResizeMode.ShrinkAndPadToRatio:
                         rs.Height = height;
                         rs.Width = width;
                         break;
-                    case 2: //Shrink and crop to ratio
+
+                    case ImageResizerGUI.ResizeMode.ShrinkAndCropToRatio:
                         rs.Height = height;
                         rs.Width = width;
                         rs.CropMode = CropMode.Auto;
@@ -93,16 +122,6 @@ namespace ImageResizerGUI
                 return rs;
             }
         }
-
-        public ResizeSettings UserSettings
-        {
-            get
-            {
-                return Properties.Settings.Default.resizeSettings;
-            }
-        }
-
-        #region Events
 
         void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
@@ -165,6 +184,8 @@ namespace ImageResizerGUI
             try
             {
                 Convert.ToInt32(e.Text);
+                Properties.Settings.Default.height = int.Parse(tbox_height.Text);
+                Properties.Settings.Default.width = int.Parse(tbox_width.Text);
             }
             catch
             {
@@ -372,9 +393,6 @@ namespace ImageResizerGUI
             System.Diagnostics.Process.Start(path);
         }
 
-        #endregion
-
-        #region methods
 
         void ResizeBatch()
         {
@@ -497,18 +515,24 @@ namespace ImageResizerGUI
             return true;
         }
 
-        void AddFilesToBatch(IEnumerable<string> files)
+        string AddFilesToBatch(IEnumerable<string> files)
         {
+            var error = "";
+
             foreach (var item in files)
-                AddFileToBatch(item);
+                error += AddFileToBatch(item) + "; ";
+
+            return error;
         }
 
-        bool AddFileToBatch(string file)
+        string AddFileToBatch(string file)
         {
+            var error = "";
+
             if (!File.Exists(file))
             {
-                MessageBox.Show("The file: " + file + " doesn't exist.");
-                return false;
+                error += "The file: " + file + " doesn't exist.";
+                return error;
             }
 
             var extensions = ImageBuilder.Current.GetSupportedFileExtensions();
@@ -517,15 +541,14 @@ namespace ImageResizerGUI
                 if (file.ToLower().EndsWith("." + ext.ToLower()))
                 {
                     if (!ImageInserted(file))
+                    {
                         listView.Items.Add(new BatchInfo(file));
-                    else
-                        MessageBox.Show("The file: " + file + " is already inserted.", "Duplicated Items");
-                    return true;
+                        return "";
+                    }
+                    return "The file: " + file + " is already inserted.";
                 }
 
-            MessageBox.Show(file + " is not an image file.", "Supported Items");
-
-            return false;
+            return file + " is not an image file.";
         }
 
         void AddDirectoryToBatch(string directory)
@@ -535,30 +558,5 @@ namespace ImageResizerGUI
             foreach (var fileName in files)
                 AddFileToBatch(fileName);
         }
-
-        #endregion
-
-        #region BatchZip events
-
-        void s_ItemEvent(ItemEventArgs e)
-        {
-            if (bwResizeBatchAndZip.CancellationPending)
-            {
-                e.Cancel = true;
-                tbStatus.Dispatcher.BeginInvoke(new Action(() => tbStatus.Text = "Status: Cancelled by user"));
-                return;
-            }
-
-            bwResizeBatchAndZip.ReportProgress((e.Stats.SuccessfulItems * 100) / e.Stats.RequestedItems, e.Result);
-        }
-
-        void s_JobEvent(JobEventArgs e)
-        {
-        }
-
-        #endregion
-
-
-
     }
 }

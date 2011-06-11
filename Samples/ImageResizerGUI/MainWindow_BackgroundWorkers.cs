@@ -20,6 +20,22 @@ namespace ImageResizerGUI
 
         private BackgroundWorker bwResizeBatchAndZip;
 
+        void s_ItemEvent(ItemEventArgs e)
+        {
+            if (bwResizeBatchAndZip.CancellationPending)
+            {
+                e.Cancel = true;
+                tbStatus.Dispatcher.BeginInvoke(new Action(() => tbStatus.Text = "Status: Cancelled by user"));
+                return;
+            }
+
+            bwResizeBatchAndZip.ReportProgress((e.Stats.SuccessfulItems * 100) / e.Stats.RequestedItems, e.Result);
+        }
+
+        void s_JobEvent(JobEventArgs e)
+        {
+        }
+
         void bwResizeBatchAndZip_DoWork(object sender, DoWorkEventArgs e)
         {
             try

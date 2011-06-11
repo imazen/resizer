@@ -5,10 +5,10 @@ using System.Text;
 
 namespace ImageResizerGUI
 {
-    /// <summary>
-    /// Contains the user settings
-    /// </summary>
-    public class UIData
+    public enum ResizeMode
     {
+        Shrink,
+        ShrinkAndPadToRatio,
+        ShrinkAndCropToRatio
     }
 }
