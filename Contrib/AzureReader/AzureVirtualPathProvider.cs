@@ -16,14 +16,14 @@ namespace ImageResizer.Plugins.AzureReader {
         private CloudBlobClient _cloudBlobClient = null;
 
         /// <summary>
-        /// Requests starting with this path will be handled by this virtual path provider. Can be in app-relative form: "~/azure/". Will be translated to domain-relative form.
+        /// Requests starting with this path will be handled by this virtual path provider.
+        /// Can be in app-relative form: "~/azure/". Will be translated to domain-relative form.
         /// </summary>
         public string VirtualFilesystemPrefix {
             get {
                 return _virtualFilesystemPrefix;
             }
             set {
-
                 _virtualFilesystemPrefix = value != null ? PathUtils.ResolveAppRelative(value) : value;
             }
         }
@@ -104,32 +104,6 @@ namespace ImageResizer.Plugins.AzureReader {
             else {
                 return Previous.GetFile(virtualPath);
             }
-        }
-
-        public string GetBlobURI(string virtualPath) {
-            if (IsPathVirtual(virtualPath)) {
-                // Strip prefix from virtual path; keep container and blob
-                string relativeBlobURL = virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim('/', '\\');
-
-                // Get a reference to the blob
-                CloudBlob cloudBlob = CloudBlobClient.GetBlobReference(relativeBlobURL);
-
-                try {
-                    cloudBlob.FetchAttributes();
-                    return cloudBlob.Uri.ToString();
-                }
-                catch (StorageClientException e) {
-                    if (e.ErrorCode == StorageErrorCode.ResourceNotFound) {
-                        return "";
-                    }
-                    else {
-                        throw;
-                    }
-                }
-            }
-            else {
-                return "";
-            }
-        }
+        }        
     }
 }
