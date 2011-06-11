@@ -281,7 +281,7 @@ namespace ImageResizer.Plugins.SqlReader
             //1) Verify named connection strings exist
             string prefix = "ConnectionStrings:";
             //ConnectionStrings:namedString convention
-            if (s.ConnectionString.Trim().StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) {
+            if (s != null && s.ConnectionString != null && s.ConnectionString.Trim().StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) {
                 string key = s.ConnectionString.Trim().Substring(prefix.Length).Trim();
                 if (System.Configuration.ConfigurationManager.ConnectionStrings[key] == null)
                     issues.Add(new Issue("SqlReader: Failed to locate the named connection string '" + key + "' in web.config", IssueSeverity.ConfigurationError));
