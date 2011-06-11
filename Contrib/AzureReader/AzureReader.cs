@@ -10,10 +10,12 @@ namespace ImageResizer.Plugins.AzureReader {
 
         AzureVirtualPathProvider vpp = null;
         string blobStorageConnection;
+        string blobStorageEndpoint;
         string vPath;
 
         public AzureReader(NameValueCollection args) {
             blobStorageConnection = args["connectionstring"];
+            blobStorageEndpoint = args["blobstorageendpoint"];
             vPath = args["prefix"];
         }
 
@@ -23,6 +25,12 @@ namespace ImageResizer.Plugins.AzureReader {
 
             if (string.IsNullOrEmpty(blobStorageConnection))
                 throw new InvalidOperationException("This plugin needs a connection string for the Azure blob storage.");
+
+            if (string.IsNullOrEmpty(blobStorageEndpoint))
+                throw new InvalidOperationException("This plugin needs a blob end point; the default will be [http|https]://myaccount.blob.core.windows.net.");
+
+            if (!blobStorageEndpoint.EndsWith("/"))
+                blobStorageEndpoint += "/";
 
             if (string.IsNullOrEmpty(vPath))
                 vPath = "~/azure/";
@@ -47,11 +55,12 @@ namespace ImageResizer.Plugins.AzureReader {
 
             // Check if prefix is within virtual file system and if there is no querystring
             if (e.VirtualPath.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) && e.QueryString.Count == 0) {
-                string url = vpp.GetBlobURI(e.VirtualPath);
 
-                if (!string.IsNullOrWhiteSpace(url)) {
-                    context.Response.Redirect(url);
-                }
+                // Strip prefix from virtual path; keep container and blob
+                string relativeBlobURL = prefix.Substring(prefix.Length).Trim('/', '\\');
+
+                // Redirect to blob
+                context.Response.Redirect(blobStorageEndpoint + relativeBlobURL);
             }
         }
 

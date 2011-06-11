@@ -3,8 +3,6 @@ using System.IO;
 using System.Web.Hosting;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.StorageClient;
-using System.Web;
-using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.AzureReader {
 
@@ -27,8 +25,9 @@ namespace ImageResizer.Plugins.AzureReader {
 
             // Synchronously download
             try {
+                // Perhaps this would be a future optimization?
+                // return cloudBlob.OpenRead();
 
-                //Perhaps this would be a future optimization? return cloudBlob.OpenRead();
                 cloudBlob.DownloadToStream(ms);
             }
             catch (StorageClientException e) {
