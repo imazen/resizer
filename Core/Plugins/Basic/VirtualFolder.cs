@@ -16,7 +16,7 @@ namespace ImageResizer.Plugins.Basic {
     /// </summary>
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
-    public class VirtualFolder : VirtualPathProvider, IPlugin {
+    public class VirtualFolder : VirtualPathProvider, IPlugin , IMultiInstancePlugin{
 
         public VirtualFolder(string virtualPath, string physicalPath)
             : base() {
