@@ -80,7 +80,10 @@
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="MainWindow_BackgroundWorkers.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Code\ResizeMode.cs" />
+    <Compile Include="Code\SaveMode.cs" />
     <Compile Include="Settings.cs" />
     <Page Include="AdvancedOptions.xaml">
       <SubType>Designer</SubType>
