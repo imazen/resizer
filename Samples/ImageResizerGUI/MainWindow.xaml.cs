@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins;
@@ -16,48 +17,31 @@ using ImageResizer.Plugins.AnimatedGifs;
 using ImageResizer.Plugins.PrettyGifs;
 using ImageResizer.Plugins.PsdReader;
 using System.Collections.ObjectModel;
+using Control = System.Windows.Forms.Control;
 using DataFormats = System.Windows.DataFormats;
 using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace ImageResizerGUI
 {
-    public enum SaveMode
-    {
-        ModifyExisting, ExportResults, CreateZipFile
-    }
-
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        #region fields
-
-        private string saveZipPath;
-
-        private BackgroundWorker bwResizeBatch;
-
-        private BackgroundWorker bwResizeBatchAndZip;
-
         AdvancedOptions aOptions;
 
         private SaveMode saveMode;
 
         private List<string> failedItems;
 
-        #endregion
-
         public MainWindow()
         {
             InitializeComponent();
 
-            
             // Install Plugins
             new AnimatedGifs().Install(Config.Current);
             new PrettyGifs().Install(Config.Current);
             new PsdReader().Install(Config.Current);
-
-
 
             aOptions = new AdvancedOptions(this);
 
@@ -70,10 +54,38 @@ namespace ImageResizerGUI
             Closing += MainWindow_Closing;
             listView.Drop += listView_Drop;
             KeyDown += MainWindow_KeyDown;
-
             comboBox_exportAction.SelectionChanged += comboBox_exportAction_SelectionChanged;
             comboBox_exportAction.SelectedIndex = 1;
             saveMode = SaveMode.ExportResults;
+
+            LoadSettings();
+        }
+
+        /// <summary>
+        /// Load initial data from last used settings
+        /// </summary>
+        void LoadSettings()
+        {
+            // if settings are not saved, create default settings
+            if (string.IsNullOrEmpty(Properties.Settings.Default.resizeMode))
+                Properties.Settings.Default.resizeMode = "Shrink";
+
+            if (Properties.Settings.Default.width == 0)
+                Properties.Settings.Default.width = 1024;
+
+            if (Properties.Settings.Default.height == 0)
+                Properties.Settings.Default.height = 768;
+
+            // set settings to the GUI
+            tbox_width.Text = Properties.Settings.Default.width.ToString();
+            tbox_height.Text = Properties.Settings.Default.height.ToString();
+
+            var resizeMode = from ComboBoxItem item in aOptions.cbox_resizeMode.Items
+                             where item.Content.ToString() == Properties.Settings.Default.resizeMode
+                             select item;
+
+
+            aOptions.cbox_resizeMode.SelectedItem = resizeMode.First();
         }
 
         /// <summary>
@@ -88,17 +100,19 @@ namespace ImageResizerGUI
                 int height = int.Parse(tbox_height.Text);
                 int width = int.Parse(tbox_width.Text);
 
-                switch (aOptions.cbox_resizeMode.SelectedIndex)
+                switch ((ResizeMode)((ComboBoxItem)aOptions.cbox_resizeMode.SelectedItem).Tag)
                 {
-                    case 0: //Shrink
+                    case ImageResizerGUI.ResizeMode.Shrink:
                         rs.MaxHeight = height;
                         rs.MaxWidth = width;
                         break;
-                    case 1: //Shrink and pad to ratio
+
+                    case ImageResizerGUI.ResizeMode.ShrinkAndPadToRatio:
                         rs.Height = height;
                         rs.Width = width;
                         break;
-                    case 2: //Shrink and crop to ratio
+
+                    case ImageResizerGUI.ResizeMode.ShrinkAndCropToRatio:
                         rs.Height = height;
                         rs.Width = width;
                         rs.CropMode = CropMode.Auto;
@@ -108,8 +122,6 @@ namespace ImageResizerGUI
                 return rs;
             }
         }
-
-        #region Events
 
         void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
@@ -172,6 +184,8 @@ namespace ImageResizerGUI
             try
             {
                 Convert.ToInt32(e.Text);
+                Properties.Settings.Default.height = int.Parse(tbox_height.Text);
+                Properties.Settings.Default.width = int.Parse(tbox_width.Text);
             }
             catch
             {
@@ -207,7 +221,7 @@ namespace ImageResizerGUI
                     if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
                         BatchInfo saveFile = new BatchInfo(dialog.FileName);
-                        saveZipPath = tbox_savePath.Text = dialog.FileName;
+                        Properties.Settings.Default.saveZipPath = tbox_savePath.Text = dialog.FileName;
                         Properties.Settings.Default.saveFolderPath = saveFile.Folder;
                     }
 
@@ -234,7 +248,7 @@ namespace ImageResizerGUI
                     btn_BrowseButton.Content = "Save as";
                     saveMode = SaveMode.CreateZipFile;
                     grid_exportResults.Visibility = Visibility.Visible;
-                    tbox_savePath.Text = saveZipPath;
+                    tbox_savePath.Text = Properties.Settings.Default.saveZipPath;
                     break;
             }
         }
@@ -318,8 +332,8 @@ namespace ImageResizerGUI
                     break;
 
                 case SaveMode.CreateZipFile:
-                    if (File.Exists(saveZipPath))
-                        File.Delete(saveZipPath);
+                    if (File.Exists(Properties.Settings.Default.saveZipPath))
+                        File.Delete(Properties.Settings.Default.saveZipPath);
                     ResizeBatchAndZip();
                     break;
             }
@@ -379,9 +393,6 @@ namespace ImageResizerGUI
             System.Diagnostics.Process.Start(path);
         }
 
-        #endregion
-
-        #region methods
 
         void ResizeBatch()
         {
@@ -483,18 +494,18 @@ namespace ImageResizerGUI
 
             if (saveMode == SaveMode.CreateZipFile)
             {
-                if (string.IsNullOrEmpty(saveZipPath))
+                if (string.IsNullOrEmpty(Properties.Settings.Default.saveZipPath))
                 {
                     System.Windows.MessageBox.Show("You must select a destination ZIP file.");
                     return false;
                 }
-                var bInfo = new BatchInfo(saveZipPath);
+                var bInfo = new BatchInfo(Properties.Settings.Default.saveZipPath);
                 if (!Directory.Exists(bInfo.Folder))
                 {
                     System.Windows.MessageBox.Show("You must select a correct Directory. \"" + bInfo.Folder);
                     return false;
                 }
-                if (File.Exists(saveZipPath))
+                if (File.Exists(Properties.Settings.Default.saveZipPath))
                 {
                     if (System.Windows.MessageBox.Show("The ZIP file already exists. \"" + bInfo.Folder + ". Do you want to replace this file?", "Replace Files", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
                         return false;
@@ -504,18 +515,24 @@ namespace ImageResizerGUI
             return true;
         }
 
-        void AddFilesToBatch(IEnumerable<string> files)
+        string AddFilesToBatch(IEnumerable<string> files)
         {
+            var error = "";
+
             foreach (var item in files)
-                AddFileToBatch(item);
+                error += AddFileToBatch(item) + "; ";
+
+            return error;
         }
 
-        bool AddFileToBatch(string file)
+        string AddFileToBatch(string file)
         {
+            var error = "";
+
             if (!File.Exists(file))
             {
-                MessageBox.Show("The file: " + file + " doesn't exist.");
-                return false;
+                error += "The file: " + file + " doesn't exist.";
+                return error;
             }
 
             var extensions = ImageBuilder.Current.GetSupportedFileExtensions();
@@ -524,15 +541,14 @@ namespace ImageResizerGUI
                 if (file.ToLower().EndsWith("." + ext.ToLower()))
                 {
                     if (!ImageInserted(file))
+                    {
                         listView.Items.Add(new BatchInfo(file));
-                    else
-                        MessageBox.Show("The file: " + file + " is already inserted.", "Duplicated Items");
-                    return true;
+                        return "";
+                    }
+                    return "The file: " + file + " is already inserted.";
                 }
 
-            MessageBox.Show(file + " is not an image file.", "Supported Items");
-
-            return false;
+            return file + " is not an image file.";
         }
 
         void AddDirectoryToBatch(string directory)
@@ -542,211 +558,5 @@ namespace ImageResizerGUI
             foreach (var fileName in files)
                 AddFileToBatch(fileName);
         }
-
-        #endregion
-
-        #region BatchZip events
-
-        void s_ItemEvent(ItemEventArgs e)
-        {
-            if (bwResizeBatchAndZip.CancellationPending)
-            {
-                e.Cancel = true;
-                tbStatus.Dispatcher.BeginInvoke(new Action(() => tbStatus.Text = "Status: Cancelled by user"));
-                return;
-            }
-
-            bwResizeBatchAndZip.ReportProgress((e.Stats.SuccessfulItems * 100) / e.Stats.RequestedItems, e.Result);
-        }
-
-        void s_JobEvent(JobEventArgs e)
-        {
-        }
-
-        #endregion
-
-        #region BackgroundWorker Events
-
-        void bwResizeBatchAndZip_DoWork(object sender, DoWorkEventArgs e)
-        {
-            try
-            {
-                failedItems = new List<string>();
-
-                Dictionary<string, object> UserInputs = e.Argument as Dictionary<string, object>;
-
-                if (UserInputs != null)
-                {
-                    int maxHeight = (int)UserInputs["MaxHeight"];
-                    int maxWidth = (int)UserInputs["MaxWidth"];
-                    var batchItems = (List<BatchInfo>)UserInputs["batchItems"];
-
-                    Guid job = Guid.NewGuid();
-                    BatchResizeSettings s = new BatchResizeSettings(saveZipPath, job, new List<BatchResizeItem>());
-
-                    foreach (var batchItem in batchItems)
-                    {
-                        s.files.Add(new BatchResizeItem(batchItem.FullPath, null, "?maxwidth=" + maxWidth + "&maxheight=" + maxHeight));
-                    }
-
-                    s.JobEvent += s_JobEvent;
-                    s.ItemEvent += s_ItemEvent;
-
-                    //Executes on a thread pool thread
-                    new BatchResizeWorker(s).Work();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-                tbStatus.Dispatcher.BeginInvoke(new Action(() => tbStatus.Text = "Status: Error in the current operation"));
-            }
-
-
-        }
-
-        void bwResizeBatchAndZip_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            pBar1.Visibility = Visibility.Visible;
-            pBar1.Value = e.ProgressPercentage;
-
-            var itemDone = ((ItemResult)e.UserState);
-
-            if (failedItems.Contains(itemDone.Item.PhysicalPath))
-                return;
-
-            var query = from object item in dataGridResults.Items
-                        where ((BatchInfo)item).FullPath == itemDone.Item.PhysicalPath
-                        select item;
-
-            //if (itemDone.ItemError == null)
-            if (itemDone.Successful)
-            {
-                ((BatchInfo)query.First()).Status = 100;
-                ((BatchInfo)query.First()).StatusText = "Done";
-
-            }
-            else
-            {
-                ((BatchInfo)query.First()).Status = 50;
-                ((BatchInfo)query.First()).StatusText = "Error: " + itemDone.ItemError.Message;
-
-                failedItems.Add(itemDone.Item.PhysicalPath);
-            }
-
-
-
-        }
-
-        void bwResizeBatchAndZip_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            btnCancel.Visibility =
-            pBar1.Visibility = Visibility.Hidden;
-            btn_back.IsEnabled = true;
-            btn_viewResults.IsEnabled = true;
-
-            if (failedItems.Count == 0 && !string.IsNullOrEmpty(Properties.Settings.Default.saveFolderPath) && Directory.Exists(Properties.Settings.Default.saveFolderPath))
-                System.Diagnostics.Process.Start(Properties.Settings.Default.saveFolderPath);
-        }
-
-        private void BwResizeBatch_DoWork(object sender, DoWorkEventArgs e)
-        {
-            try
-            {
-                failedItems = new List<string>();
-
-                Dictionary<string, object> UserInputs = e.Argument as Dictionary<string, object>;
-
-                if (UserInputs != null)
-                {
-                    int maxHeight = (int)UserInputs["MaxHeight"];
-                    int maxWidth = (int)UserInputs["MaxWidth"];
-                    ResizeSettings rs = new ResizeSettings { MaxHeight = maxHeight, MaxWidth = maxWidth };
-
-                    var batchItems = (List<BatchInfo>)UserInputs["batchItems"];
-
-                    int count = 0;
-                    foreach (var item in batchItems)
-                    {
-                        count++;
-                        try
-                        {
-                            if (saveMode == SaveMode.ModifyExisting)
-                                ImageBuilder.Current.Build(item.FullPath, item.FullPath, rs);
-                            else
-                                ImageBuilder.Current.Build(item.FullPath, Properties.Settings.Default.saveFolderPath + "\\" + item.FileName, rs);
-
-                            item.StatusText = "Done";
-                            item.Status = 100;
-                        }
-                        catch (Exception ex)
-                        {
-                            if (ex is ImageMissingException)
-                            {
-                                item.StatusText = "Error: Image missing.";
-                                item.Status = 50;
-                            }
-                            else if (ex is ImageCorruptedException)
-                            {
-                                item.StatusText = "Error: Image corrupted";
-                                item.Status = 50;
-                            }
-                            else
-                            {
-                                item.StatusText = "Error: " + ex.Message;
-                                item.Status = 50;
-                            }
-
-                            failedItems.Add(item.FullPath);
-                        }
-
-                        bwResizeBatch.ReportProgress((count * 100) / batchItems.Count, item);
-
-                        if (bwResizeBatch.CancellationPending)
-                        {
-                            e.Cancel = true;
-                            tbStatus.Dispatcher.BeginInvoke(new Action(() => tbStatus.Text = "Status: Cancelled by user"));
-                            return;
-                        }
-                    }
-
-                    e.Result = batchItems; // Pass the results to the completed events to process them accordingly.
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-                tbStatus.Dispatcher.BeginInvoke(new Action(() => tbStatus.Text = "Status: Error in the current operation"));
-            }
-        }
-
-        private void BwResizeBatch_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            pBar1.Visibility = Visibility.Visible;
-            pBar1.Value = e.ProgressPercentage;
-
-            var itemDone = ((BatchInfo)e.UserState);
-
-            var query = from object item in dataGridResults.Items
-                        where ((BatchInfo)item).FullPath == itemDone.FullPath
-                        select item;
-
-            ((BatchInfo)query.First()).StatusText = itemDone.StatusText;
-            ((BatchInfo)query.First()).Status = itemDone.Status;
-        }
-
-        private void BwResizeBatch_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            btnCancel.Visibility =
-            pBar1.Visibility = Visibility.Hidden;
-            btn_back.IsEnabled = true;
-            btn_viewResults.IsEnabled = true;
-
-            if (failedItems.Count == 0 && !string.IsNullOrEmpty(Properties.Settings.Default.saveFolderPath) && Directory.Exists(Properties.Settings.Default.saveFolderPath))
-                System.Diagnostics.Process.Start(Properties.Settings.Default.saveFolderPath);
-        }
-
-        #endregion
-
     }
 }

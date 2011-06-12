@@ -35,9 +35,6 @@
 
                 <TextBlock Grid.Column="0" Grid.Row="3" Text="Resize Mode" VerticalAlignment="Center"/>
                 <ComboBox x:Name="cbox_resizeMode" Grid.Row="3" Margin="0,2" SelectedIndex="0" HorizontalAlignment="Stretch" Grid.Column="3">
-                    <ComboBoxItem Content="Shrink"/>
-                    <ComboBoxItem Content="Shrink and pad to ratio"/>
-                    <ComboBoxItem Content="Shrink and crop to ratio"/>
                 </ComboBox>
 
             </Grid>
@@ -46,8 +43,8 @@
 
         <Grid Grid.Row="1" Margin="4">
             <TextBlock x:Name="tbox_query" Text="query" Foreground="Brown" Margin="5"/>
-            <Button Content="OK" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="100" Click="Button_Click_1" />
-            <Button Content="Cancel" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="100" Click="Button_Click" />
+            <Button x:Name="btn_ok" Content="OK" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="100"/>
+            <Button x:Name="btn_cancel" Content="Cancel" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="100" />
         </Grid>
     </Grid>
 </Window>
