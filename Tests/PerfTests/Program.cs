@@ -4,10 +4,9 @@ using System.Text;
 using System.Drawing;
 using System.Diagnostics;
 using System.Drawing.Imaging;
-using fbs;
 using System.Collections.Specialized;
-using fbs.ImageResizer;
 using System.IO;
+using ImageResizer;
 
 namespace PerfTests
 {
@@ -23,10 +22,10 @@ namespace PerfTests
 
             Console.WriteLine("True testing requires running a stress testing tool like MACT."); 
 
-            using (Bitmap b1 = new Bitmap("../../grass.jpg")){
+            using (Bitmap b1 = new Bitmap("../../../../Samples/Images/grass.jpg")){
                 TestWith(b1);
             }
-            using (Bitmap b2 = new Bitmap("../../grass-large.jpg"))
+            using (Bitmap b2 = new Bitmap("../../../../Samples/Images/quality-original.jpg"))
             {
                 TestWith(b2);
             }
@@ -61,9 +60,7 @@ namespace PerfTests
 
         static void TestQuery(string query, Bitmap b, int times)
         {
-            NameValueCollection queryString =  System.Web.HttpUtility.ParseQueryString(query);
-            ImageOutputSettings ios = new ImageOutputSettings(ImageFormat.Jpeg, queryString);
-
+            
             MemoryStream ms = new MemoryStream(1000000); //1MB memory stream, to allow us to test the speed of the image compression.
 
             Console.WriteLine("Running " + query + " " + times + " times");
@@ -75,7 +72,7 @@ namespace PerfTests
             {
                 resizing.Start();
                 //Resize the image.
-                using (Bitmap result = fbs.ImageResizer.ImageManager.getBestInstance().BuildImage(b, ImageFormat.Jpeg, queryString))
+                using (Bitmap result = ImageResizer.ImageBuilder.Current.Build(b,new ResizeSettings(query),false))
                 {
                     resizing.Stop();
                     saving.Start();
@@ -83,7 +80,7 @@ namespace PerfTests
                     ms.Seek(0, SeekOrigin.Begin);
                     ms.SetLength(0);
                     //Compress the image
-                    ios.SaveImage(ms, result);
+                    ImageResizer.ImageBuilder.Current.EncoderProvider.GetEncoder(new ResizeSettings(query),b).Write(result,ms);
                     saving.Stop();
                 }
                 
