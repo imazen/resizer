@@ -101,28 +101,28 @@ namespace ImageResizer.ReleaseBuilder {
             IList<NPackageDescriptor> npackages =NPackageDescriptor.GetPackagesIn(Path.Combine(f.parentPath,"nuget"));
 
             bool isMakingNugetPackage = false;
-            if (!isHotfix) {
-                say("For each nuget package, specify all operations to perform, then press enter. ");
-                say("(c (create and overwrite), u (upload to nuget.org)");
-                foreach(NPackageDescriptor desc in npackages){
-                    desc.Version = nugetVer;
-                    desc.OutputDirectory = Path.Combine(Path.Combine(f.parentPath, "Releases", "nuget-packages"));
-                    string opts = "";
+           
+            say("For each nuget package, specify all operations to perform, then press enter. ");
+            say("(c (create and overwrite), u (upload to nuget.org)");
+            foreach(NPackageDescriptor desc in npackages){
+                desc.Version = nugetVer;
+                desc.OutputDirectory = Path.Combine(Path.Combine(f.parentPath, "Releases", "nuget-packages"));
+                string opts = "";
 
-                    ConsoleColor original = Console.ForegroundColor;
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    if (desc.PackageExists) say(Path.GetFileName(desc.PackagePath) + " exists");
-                    if (desc.SymbolPackageExists) say(Path.GetFileName(desc.SymbolPackagePath) + " exists");
-                    Console.ForegroundColor = original;
+                ConsoleColor original = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.Red;
+                if (desc.PackageExists) say(Path.GetFileName(desc.PackagePath) + " exists");
+                if (desc.SymbolPackageExists) say(Path.GetFileName(desc.SymbolPackagePath) + " exists");
+                Console.ForegroundColor = original;
 
-                    Console.Write(desc.BaseName + " (" + opts + "):");
-                    opts = Console.ReadLine().Trim();
+                Console.Write(desc.BaseName + " (" + opts + "):");
+                opts = Console.ReadLine().Trim();
                 
-                    desc.Options = opts;
-                    if (desc.Build) isMakingNugetPackage = true;
+                desc.Options = opts;
+                if (desc.Build) isMakingNugetPackage = true;
                     
-                }
             }
+            
             if (!isBuilding && isMakingNugetPackage) {
                 isBuilding = ask("You're creating 1 or more NuGet packages. Rebuild software?");
             }
@@ -137,6 +137,8 @@ namespace ImageResizer.ReleaseBuilder {
                 v.set("AssemblyFileVersion", v.join(fileVer, "*"));
                 v.set("AssemblyVersion", v.join(assemblyVer, "*"));
                 v.set("AssemblyInformationalVersion", infoVer);
+                v.set("NugetVersion", nugetVer);
+                v.set("Commit", "git-commit-guid-here");
                 v.Save();
                 //Save contents for reverting later
                 string fileContents = v.Contents;
