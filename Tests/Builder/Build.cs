@@ -100,6 +100,7 @@ namespace ImageResizer.ReleaseBuilder {
             //Get all the .nuspec packages on in the /nuget directory.
             IList<NPackageDescriptor> npackages =NPackageDescriptor.GetPackagesIn(Path.Combine(f.parentPath,"nuget"));
 
+            bool isMakingNugetPackage = false;
             if (!isHotfix) {
                 say("For each nuget package, specify all operations to perform, then press enter. ");
                 say("(c (create and overwrite), u (upload to nuget.org)");
@@ -108,17 +109,23 @@ namespace ImageResizer.ReleaseBuilder {
                     desc.OutputDirectory = Path.Combine(Path.Combine(f.parentPath, "Releases", "nuget-packages"));
                     string opts = "";
 
-                    if (desc.PackageExists) say("\n" + Path.GetFileName(desc.PackagePath) + " already exists");
-                    if (desc.SymbolPackageExists) say("\n" + Path.GetFileName(desc.SymbolPackagePath) + " already exists");
+                    ConsoleColor original = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    if (desc.PackageExists) say(Path.GetFileName(desc.PackagePath) + " exists");
+                    if (desc.SymbolPackageExists) say(Path.GetFileName(desc.SymbolPackagePath) + " exists");
+                    Console.ForegroundColor = original;
 
                     Console.Write(desc.BaseName + " (" + opts + "):");
                     opts = Console.ReadLine().Trim();
                 
                     desc.Options = opts;
+                    if (desc.Build) isMakingNugetPackage = true;
                     
                 }
             }
-
+            if (!isBuilding && isMakingNugetPackage) {
+                isBuilding = ask("You're creating 1 or more NuGet packages. Rebuild software?");
+            }
 
             if (isBuilding) {
 
@@ -156,18 +163,18 @@ namespace ImageResizer.ReleaseBuilder {
                 v.set("AssemblyInformationalVersion", infoVer + (isHotfix ? ("-temp-hotfix-" + DateTime.Now.ToString("MMM-d-yyyy-htt").ToLower()) : ""));
                 v.Save();
 
+
+                //8a Clean projects if specified
+                if (cleanAll) {
+                    CleanAll();
+                }
+
                 //6 - if (c) was specified for any package, build all.
                 BuildAll();
 
                 //7 - Revert file to state at commit (remove 'full' version numbers and 'commit' value)
                 v.Contents = fileContents;
                 v.Save();
-
-
-                //8a Clean projects if specified
-                if (cleanAll) {
-                    CleanAll();
-                }
 
                 //8b - run cleanup routine
                 RemoveUselessFiles();
