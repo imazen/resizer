@@ -32,8 +32,9 @@ namespace ImageResizer.ReleaseBuilder.Classes {
         }
 
         public void Push(NPackageDescriptor desc) {
-            if (desc.SpecPath != null) Console.Write(exec("push \"" + desc.PackagePath + "\""));
-            if (desc.SymbolSpecPath != null) Console.Write(exec("push \"" + desc.SymbolPackagePath + "\""));
+            if (desc.SpecPath != null) exec("push \"" + desc.PackagePath + "\"");
+            //We don't push the symbols, those are pushed automatically.
+            //if (desc.SymbolSpecPath != null)exec("push \"" + desc.SymbolPackagePath + "\"");
         }
 
         public void pack(NPackageDescriptor desc, string spec, string version) {
@@ -42,13 +43,13 @@ namespace ImageResizer.ReleaseBuilder.Classes {
             File.WriteAllText(spec, newText, Encoding.UTF8); //Set version value
             string arguments = "pack " + Path.GetFileName(spec) + " -Version " + version;
             arguments += " -OutputDirectory " + desc.OutputDirectory;
-            Console.Write(exec(arguments));
+            exec(arguments);
             File.WriteAllText(spec, oldText, Encoding.UTF8); //restore file
         }
 
-        public string exec(string command) {
+        public void exec(string command) {
             var psi = new ProcessStartInfo(nugetExe);
-            psi.Arguments = ' ' + command;
+            psi.Arguments = ' ' + command.TrimStart(' ');
             psi.WorkingDirectory = nugetDir;
             psi.UseShellExecute = false;
             psi.RedirectStandardOutput = true;
@@ -58,7 +59,11 @@ namespace ImageResizer.ReleaseBuilder.Classes {
             var p = Process.Start(psi);
 
             p.WaitForExit();
-            return p.StandardOutput.ReadToEnd() + p.StandardError.ReadToEnd();
+            ConsoleColor original = Console.ForegroundColor;
+            Console.WriteLine(p.StandardOutput.ReadToEnd());
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write(p.StandardError.ReadToEnd());
+            Console.ForegroundColor = original;
         }
     }
 }
