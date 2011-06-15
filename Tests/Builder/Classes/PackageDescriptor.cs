@@ -50,7 +50,7 @@ namespace ImageResizer.ReleaseBuilder.Classes {
         }
 
 
-        public bool Build { get { return options.IndexOf("c", StringComparison.OrdinalIgnoreCase) > -1; } }
+        public bool Build { get { return options.IndexOf("c", StringComparison.OrdinalIgnoreCase) > -1 || options.IndexOf("b", StringComparison.OrdinalIgnoreCase) > -1; } }
         public bool Upload { get { return options.IndexOf("u", StringComparison.OrdinalIgnoreCase) > -1; } }
         public bool Skip { get { return options.IndexOf("s", StringComparison.OrdinalIgnoreCase) > -1; } }
         public bool Private { get { return options.IndexOf("p", StringComparison.OrdinalIgnoreCase) > -1; } }

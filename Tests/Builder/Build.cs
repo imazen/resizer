@@ -14,6 +14,7 @@ namespace ImageResizer.ReleaseBuilder {
         FsQuery q = null;
         VersionEditor v = null;
         GitManager g = null;
+        NugetManager nuget = null;
 
         S3Service s3 = new S3Service();
         string bucketName = "resizer-downloads";
@@ -22,6 +23,7 @@ namespace ImageResizer.ReleaseBuilder {
             d = new Devenv(Path.Combine(f.folderPath,"ImageResizer.sln"));
             v = new VersionEditor(Path.Combine(f.folderPath, "SharedAssemblyInfo.cs"));
             g = new GitManager(f.parentPath);
+            nuget = new NugetManager(Path.Combine(f.parentPath, "nuget"));
             s3.AccessKeyID = "AKIAJ2TA3KZS5VPOBBTQ";
             s3.SecretAccessKey = "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";
             
@@ -45,27 +47,31 @@ namespace ImageResizer.ReleaseBuilder {
         public void Run() {
             say("Project root: " + f.parentPath);
             nl();
-
+            //The base name for creating zip packags.
             string packageBase = v.get("PackageName"); //    // [assembly: PackageName("Resizer")]
 
-            //
-            bool isHotfix = ask("Is this a hotfix? Press Y to tag the assembiles and package as such.");
-
+            //a. Ask about hotfix - for hotfixes, we embed warnings and stuff so they don't get used in production.
+            bool isHotfix = ask("Is this a hotfix? Press Y to tag the assembiles and packages as such.");
+            //Build the hotfix name
             string packageHotfix = isHotfix ? ("-hotfix-" + DateTime.Now.ToString("htt").ToLower()) : "";
 
-            //a. Ask for file version number   [assembly: AssemblyFileVersion("3.0.5.*")]
+            //b. Ask for file version number   [assembly: AssemblyFileVersion("3.0.5.*")]
             string fileVer = change("FileVersion", v.get("AssemblyFileVersion").TrimEnd('.', '*'));
-            //b. Ask for assembly version number  AssemblyVersion("3.0.5.*")]
+            //c. Ask for assembly version number. AssemblyVersion("3.0.5.*")]
             string assemblyVer = change("AssemblyVersion", v.get("AssemblyVersion").TrimEnd('.', '*'));
-            //c: Ask for information version number.  [assembly: AssemblyInformationalVersion("3-alpha-5")]
+            //d: Ask for information version number. (used in zip package names) [assembly: AssemblyInformationalVersion("3-alpha-5")]
             string infoVer = change("InfoVersion", v.get("AssemblyInformationalVersion").TrimEnd('.', '*'));
+            //e. Ask for Nuget package version number. New builds need to have a 4th number specified.
+            string nugetVer = change("NugetVersion", v.get("NugetVersion").TrimEnd('.', '*'));
 
+            //Get the download server from SharedAssemblyInfo.cs if specified
             string downloadServer = v.get("DownloadServer"); if (downloadServer == null) downloadServer = "http://downloads.imageresizing.net/";
 
 
-            //d: For each package, specify options: choose 'c' (create and/or overwrite), 'u' (upload), 's' (skip), 'p' (make private). Should inform if the file already exists.
+            //f. For each package, specify options: choose 'c' (create and/or overwrite), 'u' (upload), 'p' (make private). 
+            //Should inform if the file already exists.
             nl();
-            say("For each package, specify all operations to perform, then press enter.");
+            say("For each zip package, specify all operations to perform, then press enter.");
             say("'c' - Create package (overwrite if exists), 'u' (upload to S3), 's' (skip), 'p' (make private)");
             bool isBuilding = false;
             StringBuilder downloadPaths = new StringBuilder();
@@ -74,10 +80,9 @@ namespace ImageResizer.ReleaseBuilder {
                 if (desc.Exists) say("\n" + Path.GetFileName(desc.Path) + " already exists");
                 string opts = "";
 
-                while(string.IsNullOrEmpty(opts)){
-                    Console.Write(desc.Kind + " (" + opts + "):");
-                    opts = Console.ReadLine().Trim();
-                }
+                Console.Write(desc.Kind + " (" + opts + "):");
+                opts = Console.ReadLine().Trim();
+                
                 desc.Options = opts;
                 if (desc.Build) isBuilding = true;
                 if (desc.Upload) {
@@ -91,11 +96,33 @@ namespace ImageResizer.ReleaseBuilder {
                 if (ask("Copy these to the clipboard?"))
                     System.Windows.Clipboard.SetText(downloadPaths.ToString());
             }
-               
+
+            //Get all the .nuspec packages on in the /nuget directory.
+            IList<NPackageDescriptor> npackages =NPackageDescriptor.GetPackagesIn(Path.Combine(f.parentPath,"nuget"));
+
+            if (!isHotfix) {
+                say("For each nuget package, specify all operations to perform, then press enter. ");
+                say("(c (create and overwrite), u (upload to nuget.org)");
+                foreach(NPackageDescriptor desc in npackages){
+                    desc.Version = nugetVer;
+                    desc.OutputDirectory = Path.Combine(Path.Combine(f.parentPath, "Releases", "nuget-packages"));
+                    string opts = "";
+
+                    if (desc.PackageExists) say("\n" + Path.GetFileName(desc.PackagePath) + " already exists");
+                    if (desc.SymbolPackageExists) say("\n" + Path.GetFileName(desc.SymbolPackagePath) + " already exists");
+
+                    Console.Write(desc.BaseName + " (" + opts + "):");
+                    opts = Console.ReadLine().Trim();
+                
+                    desc.Options = opts;
+                    
+                }
+            }
+
 
             if (isBuilding) {
 
-               //1 (moved execution to 8a)
+                //1 (moved execution to 8a)
                 bool cleanAll = ask("Clean All?");
 
                 //2 - Set version numbers (with *, if missing)
@@ -121,17 +148,16 @@ namespace ImageResizer.ReleaseBuilder {
 
                 //4b - change to hard version number for building
                 short revision = (short)(DateTime.UtcNow.TimeOfDay.Milliseconds % short.MaxValue); //the part under 32767. Can actually go up to, 65534, but what's the point.
-                v.set("AssemblyFileVersion", v.join(fileVer, revision.ToString()));
-                v.set("AssemblyVersion", v.join(assemblyVer, revision.ToString()));
+
+                string exactVersion = v.join(fileVer, revision.ToString());
+                v.set("AssemblyFileVersion", exactVersion);
+                v.set("AssemblyVersion", exactVersion);
                 //Add hotfix suffix for hotfixes
                 v.set("AssemblyInformationalVersion", infoVer + (isHotfix ? ("-temp-hotfix-" + DateTime.Now.ToString("MMM-d-yyyy-htt").ToLower()) : ""));
                 v.Save();
 
                 //6 - if (c) was specified for any package, build all.
-                bool buildOne = false;
-                foreach (PackageDescriptor pd in packages) if (pd.Build) buildOne = true;
-
-                if (buildOne) BuildAll();
+                BuildAll();
 
                 //7 - Revert file to state at commit (remove 'full' version numbers and 'commit' value)
                 v.Contents = fileContents;
@@ -149,9 +175,9 @@ namespace ImageResizer.ReleaseBuilder {
                 //Prepare searchers
                 PrepareForPackaging();
 
-                //9 - Pacakge all selected configurations
+                //9 - Pacakge all selected zip configurations
                 foreach (PackageDescriptor pd in packages) {
-                    if (pd.Skip) continue;
+                    if (pd.Skip || !pd.Build) continue;
                     if (pd.Exists && pd.Build) {
                         File.Delete(pd.Path);
                         say("Deleted " + pd.Path);
@@ -160,9 +186,20 @@ namespace ImageResizer.ReleaseBuilder {
                     //Copy to a 'tozip' version for e-mailing
                     File.Copy(pd.Path, pd.Path.Replace(".zip", ".tozip"), true);
                 }
+
+
+            } 
+
+
+            //10 - Pacakge all nuget configurations
+            foreach (NPackageDescriptor pd in npackages) {
+                if (pd.Skip) continue;
+                
+                if (pd.Build) nuget.Pack(pd);
+
             }
 
-            //10 - Upload all selected configurations
+            //11 - Upload all selected zip configurations
             foreach (PackageDescriptor pd in packages) {
                 if (pd.Skip) continue;
                 if (pd.Upload) {
@@ -187,7 +224,17 @@ namespace ImageResizer.ReleaseBuilder {
                 } 
             }
 
-            //11 - Generate template for release notes article
+
+            //2 - Upload all nuget configurations
+            foreach (NPackageDescriptor pd in npackages) {
+                if (pd.Skip || !pd.Upload) continue;
+                nuget.Push(pd);
+
+            }
+
+
+
+            //12 - Generate template for release notes article
 
             say("Everything is done.");
             

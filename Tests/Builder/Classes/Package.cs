@@ -11,7 +11,7 @@ namespace ImageResizer.ReleaseBuilder {
         ZipFile z = null;
         string basePath;
         /// <summary>
-        /// Creates a zip file at the specified location, using the specified base path
+        /// Creates a zip file at the specified location, using the specified base _specPath
         /// </summary>
         /// <param name="zipFile"></param>
         /// <param name="basePath"></param>
@@ -34,7 +34,7 @@ namespace ImageResizer.ReleaseBuilder {
                 if (dir == null){
                     string relPath = Path.GetDirectoryName(s);
                     if (relPath.StartsWith(basePath)) dir = relPath.Substring(basePath.Length).TrimStart('\\','/');
-                    else throw new Exception("Path outside baseDir: " + relPath + " , " + basePath);
+                    else throw new Exception("SpecPath outside baseDir: " + relPath + " , " + basePath);
                 }
                 dir = dir ?? "";
                 if (dir != lastDir) Console.WriteLine("\nIn folder \"" + dir + "\":");
