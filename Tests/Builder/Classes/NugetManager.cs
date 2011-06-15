@@ -60,6 +60,7 @@ namespace ImageResizer.ReleaseBuilder.Classes {
 
             p.WaitForExit();
             ConsoleColor original = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(p.StandardOutput.ReadToEnd());
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Write(p.StandardError.ReadToEnd());
