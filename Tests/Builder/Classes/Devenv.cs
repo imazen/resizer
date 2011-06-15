@@ -24,7 +24,7 @@ namespace ImageResizer.ReleaseBuilder {
             }
         }
 
-        public void Run(string args){
+        public int Run(string args){
             var psi = new ProcessStartInfo(DevenvPath);
             psi.Arguments = '"' + solutionPath + "\" " + args;
             psi.WorkingDirectory = Path.GetDirectoryName(solutionPath);
@@ -34,6 +34,12 @@ namespace ImageResizer.ReleaseBuilder {
             Console.WriteLine("Executing " + psi.FileName + " " + psi.Arguments);
             var p = Process.Start(psi);
             p.WaitForExit();
+            ConsoleColor original = Console.ForegroundColor;
+            Console.WriteLine(p.StandardOutput.ReadToEnd());
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write(p.StandardError.ReadToEnd());
+            Console.ForegroundColor = original;
+            return p.ExitCode;
         }
 
  //       System.Diagnostics.ProcessStartInfo psi =
