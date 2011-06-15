@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.PrettyGifs</id>
+		<version>$version$</version>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="..\dlls\trial\ImageResizer.Plugins.PrettyGifs.dll" target="lib" />
+		<file src="..\dlls\trial\ImageResizer.Plugins.PrettyGifs.pdb" target="lib" />
+		<file src="..\dlls\trial\ImageResizer.Plugins.PrettyGifs.xml" target="lib" />
+		<file src="..\Plugins\PrettyGifs\**\*.cs" target="src" />
+	</files>
+</package>
