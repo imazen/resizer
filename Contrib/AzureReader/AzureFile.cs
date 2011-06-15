@@ -1,4 +1,5 @@
-﻿using System;
+﻿/* Copyright (c) 2011 Wouter A. Alberts and Nathanael D. Jones. See license.txt for your rights. */
+using System;
 using System.IO;
 using System.Web.Hosting;
 using Microsoft.WindowsAzure;
@@ -15,24 +16,23 @@ namespace ImageResizer.Plugins.AzureReader {
         }
 
         public override System.IO.Stream Open() {
-            // Strip prefix from virtual path; keep container and blob
-            string relativeBlobURL = VirtualPath.Substring(parent.VirtualFilesystemPrefix.Length).Trim('/', '\\');
+            // Prefix already stripped from virtual path
 
             // Get a reference to the blob
-            CloudBlob cloudBlob = parent.CloudBlobClient.GetBlobReference(relativeBlobURL);
+            CloudBlob cloudBlob = parent.CloudBlobClient.GetBlobReference(VirtualPath);
 
             MemoryStream ms = new MemoryStream(4096); // 4kb is a good starting point.
 
             // Synchronously download
             try {
-                // Perhaps this would be a future optimization?
-                // return cloudBlob.OpenRead();
-
                 cloudBlob.DownloadToStream(ms);
             }
             catch (StorageClientException e) {
                 if (e.ErrorCode == StorageErrorCode.ResourceNotFound) {
                     throw new FileNotFoundException("Azure blob file not found", e);
+                }
+                else if (e.ErrorCode == StorageErrorCode.ContainerNotFound) {
+                    throw new FileNotFoundException("Azure blob container not found", e);
                 }
                 else {
                     throw;

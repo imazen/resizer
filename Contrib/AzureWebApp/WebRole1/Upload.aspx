@@ -6,12 +6,12 @@
 <body>
 <form id="form1" runat="server">
 <div>
-    Please select a picture to upload or go to the <a href="gallery.aspx">gallery</a> directly.<br />
+    Please select a picture to upload.<br />
     <asp:FileUpload ID="fuPicture" runat="server" /> <asp:RequiredFieldValidator ID="rvfUpload" ErrorMessage="Picture required" ControlToValidate="fuPicture" runat="server" />
     <br /><br />
     <asp:Button ID="btnSubmit" Text="Upload" runat="server" onclick="btnSubmit_Click" />
     <br /><br />
-    <asp:Label ID="lblMessage" runat="server"></asp:Label>
+    <asp:Literal ID="litImages" runat="server" />
 </div>
 </form>
 </body>

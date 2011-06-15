@@ -1,4 +1,5 @@
-﻿using System;
+﻿/* Copyright (c) 2011 Wouter A. Alberts and Nathanael D. Jones. See license.txt for your rights. */
+using System;
 using System.Security.Permissions;
 using System.Web;
 using System.Web.Hosting;
@@ -56,8 +57,9 @@ namespace ImageResizer.Plugins.AzureReader {
 
         public override bool FileExists(string virtualPath) {
             if (IsPathVirtual(virtualPath)) {
+
                 // Strip prefix from virtual path; keep container and blob
-                string relativeBlobURL = virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim('/', '\\');
+                string relativeBlobURL = virtualPath.Substring(VirtualFilesystemPrefix.Length - 1).Trim('/', '\\');
                 
                 // Get a reference to the blob
                 CloudBlob cloudBlob = CloudBlobClient.GetBlobReference(relativeBlobURL);
@@ -83,7 +85,7 @@ namespace ImageResizer.Plugins.AzureReader {
         public override VirtualFile GetFile(string virtualPath) {
             if (IsPathVirtual(virtualPath)) {
                 // Strip prefix from virtual path; keep container and blob
-                string relativeBlobURL = virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim('/', '\\');
+                string relativeBlobURL = virtualPath.Substring(VirtualFilesystemPrefix.Length - 1).Trim('/', '\\');
 
                 // Get a reference to the blob
                 CloudBlob cloudBlob = CloudBlobClient.GetBlobReference(relativeBlobURL);
