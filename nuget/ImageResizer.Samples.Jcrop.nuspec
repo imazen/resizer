@@ -1,0 +1,28 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Samples.Jcrop</id>
+		<title>ImageResizer.Samples.Jcrop</title>
+		<version>$version$</version>
+		<authors>Nathanael Jones</authors>
+		<owners>Nathanael Jones</owners>
+		<licenseUrl>http://imageresizing.net/licenses/freedom</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>http://imageresizing.net/images/pictures.png</iconUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>Cropping and resizing made simple with this easy, packaged demo. Install into any Web Application. Visit http://imageresizing.net for details, documenation, and support.</description>
+		<tags>Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing </tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		  <dependency id="ImageResizer.WebConfig"/>
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="..\Samples\JCropExample\css\*.*" target="content\css" />
+		<file src="..\Samples\JCropExample\js\*.*" target="content\js" />
+		<file src="..\Samples\JCropExample\Basic.htm" target="content" />
+		<file src="..\Samples\Images\red-leaf.jpg" target="content" />
+		<file src="..\Samples\Images\fountain-small.jpg" target="content" />
+		<file src="..\Samples\JCropExample\Advanced.*" target="content" />
+	</files>
+</package>
