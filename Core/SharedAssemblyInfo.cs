@@ -31,5 +31,5 @@ using ImageResizer.Util;
 
 // These commented out settings are for the build script to access
 // [assembly: PackageName("Resizer")]
-// [assembly: NugetVersion("3.0.10")]
+// [assembly: NugetVersion("3.0.10.1")]
 // [assembly: DownloadServer("http://downloads.imageresizing.net/")]
