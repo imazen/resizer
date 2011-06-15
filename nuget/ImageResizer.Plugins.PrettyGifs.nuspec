@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.PrettyGifs</id>
+		<title>ImageResizer.Plugins.PrettyGifs - High-quality GIF and 8-bit PNG encoding plugin</title>
+		<version>$version$</version>
+		<authors>Nathanael Jones</authors>
+		<owners>Nathanael Jones</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>http://imageresizing.net/images/pictures.png</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>Replaces .NET's default GIF and 8-bit PNG encoding with high-quality Octree Quantization and multi-pass dithering support. 
+
+Visit http://imageresizing.net for details, documenation, and free support. 
+E-mail support@imageresizing.net if you encounter any problems with the software. 
+The documentation for this plugin resides at http://imageresizing.net/plugins/prettygifs</description>
+		<tags>Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing disk caching</tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="..\dlls\trial\ImageResizer.Plugins.PrettyGifs.dll" target="lib" />
+		<file src="..\dlls\trial\ImageResizer.Plugins.PrettyGifs.xml" target="lib" />
+		<file src="..\Plugins\PrettyGifs\Web.config.transform" target="content" />
+	</files>
+</package>
