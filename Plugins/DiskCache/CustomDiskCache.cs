@@ -71,14 +71,14 @@ namespace ImageResizer.Plugins.DiskCache {
             CacheResult result = new CacheResult(CacheQueryResult.Hit, physicalPath,relativePath);
             
             //On the first check, verify the file exists using System.IO directly (the last 'true' parameter)
-            if (((!hasModifiedDate || hashModifiedDate) && Index.existsCertain(relativePath, physicalPath)) || !Index.modifiedDateMatchesCertainExists(sourceModifiedUtc, relativePath, physicalPath)) {
+            if (((!hasModifiedDate || hashModifiedDate) && !Index.existsCertain(relativePath, physicalPath)) || !Index.modifiedDateMatchesCertainExists(sourceModifiedUtc, relativePath, physicalPath)) {
                 
                 //Lock execution using relativePath as the sync basis. Ignore casing differences.
                 if (!Locks.TryExecute(relativePath.ToUpperInvariant(), timeoutMs,
                     delegate() {
 
                         //On the second check, use cached data for speed. The cached data should be updated if another thread updated a file.
-                        if (((!hasModifiedDate || hashModifiedDate) && Index.exists(relativePath, physicalPath)) || !Index.modifiedDateMatches(sourceModifiedUtc, relativePath, physicalPath)) {
+                        if (((!hasModifiedDate || hashModifiedDate) && !Index.exists(relativePath, physicalPath)) || !Index.modifiedDateMatches(sourceModifiedUtc, relativePath, physicalPath)) {
 
                             //Create subdirectory if needed.
                             if (!Directory.Exists(Path.GetDirectoryName(physicalPath))) Directory.CreateDirectory(Path.GetDirectoryName(physicalPath));
