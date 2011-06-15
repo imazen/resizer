@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
 		<id>ImageResizer.Plugins.DiskCache</id>
@@ -22,6 +22,6 @@
 		<file src="..\dlls\trial\ImageResizer.Plugins.DiskCache.dll" target="lib" />
 		<file src="..\dlls\trial\ImageResizer.Plugins.DiskCache.pdb" target="lib" />
 		<file src="..\dlls\trial\ImageResizer.Plugins.DiskCache.xml" target="lib" />
-		<file src="..\Plugins\DiskCache\**.cs" target="src" />
+		<file src="..\Plugins\DiskCache\**\*.cs" target="src" />
 	</files>
 </package>
