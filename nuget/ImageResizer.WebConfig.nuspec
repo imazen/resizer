@@ -19,7 +19,7 @@
 	</dependencies>
   </metadata>
   	<files>
-		<file src="Web.config.transform" target="content" />
+		<file src="..\Core\Web.config.transform" target="content" />
 	</files>
 
 </package>
