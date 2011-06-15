@@ -1,4 +1,5 @@
-﻿using System;
+﻿/* Copyright (c) 2011 Wouter A. Alberts and Nathanael D. Jones. See license.txt for your rights. */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.WindowsAzure;

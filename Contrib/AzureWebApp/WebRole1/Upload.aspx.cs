@@ -1,6 +1,8 @@
-﻿using System;
+﻿/* Copyright (c) 2011 Wouter A. Alberts and Nathanael D. Jones. See license.txt for your rights. */
+using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.StorageClient;
 
@@ -23,7 +25,7 @@ namespace AzureWebImages {
                     bool isImage = extensions.Any(x => x.Equals(Path.GetExtension(fuPicture.FileName.ToLower()), StringComparison.OrdinalIgnoreCase));
 
                     if (isImage) {
-                        // Store the uploaded file as Blob on the Cloud storage
+                        // Store the uploaded file as Blob in the Cloud storage
 
                         // Get the reference of the container in which the blobs are stored
                         CloudBlobContainer cloudBlobContainer = cloudBlobClient.GetContainerReference("imageresizer");
@@ -36,8 +38,13 @@ namespace AzureWebImages {
                         blob.Properties.ContentType = fuPicture.PostedFile.ContentType;
                         blob.UploadFromStream(fuPicture.FileContent);
 
-                        // Display url
-                        lblMessage.Text = blob.Uri.ToString();
+                        // Display images; use relative paths so the module will capture the urls
+                        StringBuilder sb = new StringBuilder(2000);
+                        sb.Append("<img src=\"azure/imageresizer/" + filename + "?width=75\" border=\"0\"><br /><br />");
+                        sb.Append("<img src=\"/azure/imageresizer/" + filename + "?width=150&height=150&crop=auto\" border=\"0\"><br /><br />");
+                        sb.Append("<img src=\"/azure/imageresizer/" + filename + "\" border=\"0\">");
+
+                        litImages.Text = sb.ToString();
                     }
                 }
             }
