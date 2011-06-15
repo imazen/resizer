@@ -1,0 +1,25 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>ImageResizer</id>
+	<title>ImageResizer</title>
+    <version>$version$</version>
+    <authors>Nathanael Jones</authors>
+    <owners>Nathanael Jones</owners>
+    <licenseUrl>http://imageresizing.net/licenses/freedom</licenseUrl>
+    <projectUrl>http://imageresizing.net</projectUrl>
+    <iconUrl>http://imageresizing.net/images/pictures.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+	<summary>Lightweight HttpModule (and/or) API for server-side image processing.</summary>
+    <description>Finally a Nuget package! Resize, crop, rotate, and modify images with a simple REST API. Or, do the same with a single line of managed code. Visit http://imageresizing.net for details, documenation, and support.</description>
+    <tags>Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing </tags>
+
+	
+  	<files>
+		<file src="..\dlls\debug\ImageResizer.dll" target="lib" />
+		<file src="..\dlls\debug\ImageResizer.pdb" target="lib" />
+		<file src="..\dlls\debug\ImageResizer.xml" target="lib" />
+		<file src="..\Core\**\*.cs" target="src" />
+	</files>
+	
+</package>

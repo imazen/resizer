@@ -18,7 +18,7 @@ namespace ImageResizer.ReleaseBuilder {
         }
 
         /// <summary>
-        /// Physical path to the folder that was searched for.
+        /// Physical _specPath to the folder that was searched for.
         /// </summary>
         public string folderPath;
         /// <summary>

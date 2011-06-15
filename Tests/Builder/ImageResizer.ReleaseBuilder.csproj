@@ -70,6 +70,8 @@
     <Compile Include="Classes\Futile.cs" />
     <Compile Include="Classes\GitManager.cs" />
     <Compile Include="Classes\Interaction.cs" />
+    <Compile Include="Classes\NPackageDescriptor.cs" />
+    <Compile Include="Classes\NugetManager.cs" />
     <Compile Include="Classes\Package.cs" />
     <Compile Include="Classes\PackageDescriptor.cs" />
     <Compile Include="Classes\Pattern.cs" />
