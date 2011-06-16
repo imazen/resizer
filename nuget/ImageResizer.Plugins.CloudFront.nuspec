@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.CloudFront</id>
+		<title>ImageResizer.Plugins.CloudFront - Allows Amazon CloudFront to cache processed images</title>
+		<version>$version$</version>
+		<authors>Nathanael Jones</authors>
+		<owners>Nathanael Jones</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>
+Amazon CloudFront can now cache images processed by the ImageResizer. Adds support for semi-colon based syntax so CloudFront doesn't strip the querystring and break everything.
+
+Example usage: http://cf.server.com/image.jpg;width=100;height=100
+
+Go to resizer.uservoice.com to vote for new features, like automatic redirection, control adapters and html filters to simplify using CloudFront!
+
+Visit http://imageresizing.net for details, documenation, and free support. 
+E-mail support@imageresizing.net if you encounter any problems with the software. 
+The documentation for this plugin resides at http://imageresizing.net/plugins/cloudfront</description>
+		<tags>Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing disk caching gif png octree quanitization animated gifs dithering</tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="..\dlls\trial\ImageResizer.Plugins.CloudFront.dll" target="lib" />
+		<file src="..\dlls\trial\ImageResizer.Plugins.CloudFront.xml" target="lib" />
+		<file src="..\Plugins\CloudFront\Web.config.transform" target="content" />
+	</files>
+</package>
