@@ -44,6 +44,42 @@ namespace ImageResizer.Util {
         }
 
         /// <summary>
+        /// Removes the extension from the filename.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="newExtension"></param>
+        /// <returns></returns>
+        public static string RemoveFullExtension(string path) {
+            int query = path.IndexOf('?');
+            if (query < 0) query = path.Length;
+            //Finds the first character that could possibly be part of the extension (before the query)
+            int firstPossibleExtensionChar = path.LastIndexOfAny(new char[] { ' ', '/', '\\' }, query - 1) + 1;
+            int extensionStarts = path.IndexOf('.', firstPossibleExtensionChar, query - firstPossibleExtensionChar);
+            if (extensionStarts < 0) extensionStarts = query;
+
+            return path.Substring(0, extensionStarts) + path.Substring(query);
+
+        }
+
+        /// <summary>
+        /// Removes the extension from the filename.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="newExtension"></param>
+        /// <returns></returns>
+        public static string RemoveExtension(string path) {
+            int query = path.IndexOf('?');
+            if (query < 0) query = path.Length;
+            //Finds the first character that could possibly be part of the extension (before the query)
+            int firstPossibleExtensionChar = path.LastIndexOfAny(new char[] { ' ', '/', '\\' }, query - 1) + 1;
+            int extensionStarts = path.LastIndexOf('.', query - 1, query - firstPossibleExtensionChar);
+            if (extensionStarts < 0) extensionStarts = query;
+
+            return path.Substring(0, extensionStarts) + path.Substring(query);
+
+        }
+
+        /// <summary>
         /// Adds the specified extension to path, returning the result. Multiple calls will result in "path.ext.ext.ext.ext".
         /// maintains the querystring as-is.
         /// </summary>
