@@ -8,7 +8,7 @@
 		<owners>Nathanael Jones</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
-		<iconUrl>http://imageresizing.net/images/pictures.png</iconUrl>
+		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 <description>Adds disk caching to the ImageResizer core. Fast, multithreaded, and self-managing. 
 Drastically increases scalability and performance. Writing processed images to disk permits images to be served as static files by IIS, eliminating the typical RAM and CPU overhead assocatied with real-time image processing.

@@ -8,7 +8,7 @@
 		<owners>Nathanael Jones</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
-		<iconUrl>http://imageresizing.net/images/pictures.png</iconUrl>
+		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 <description>Replaces .NET's default GIF and 8-bit PNG encoding with high-quality Octree Quantization and multi-pass dithering support. 
 
