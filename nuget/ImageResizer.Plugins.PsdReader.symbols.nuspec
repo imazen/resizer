@@ -15,7 +15,7 @@
 		<file src="..\dlls\trial\ImageResizer.Plugins.PsdReader.xml" target="lib" />
 		<file src="..\dlls\trial\PsdFile.dll" target="lib" />
 		<file src="..\dlls\trial\PsdFile.pdb" target="lib" />
-		<file src="..\Plugins\PsdReader\**\*.cs" target="src" />
-		<file src="..\Plugins\PsdLibs\PsdPlugin\PsdFile\**\*.cs" target="src" />
+		<file src="..\Plugins\PsdReader\**\*.cs" target="src\PsdReader" />
+		<file src="..\Plugins\PsdLibs\PsdPlugin\PsdFile\**\*.cs" target="src\PsdFile" />
 	</files>
 </package>
