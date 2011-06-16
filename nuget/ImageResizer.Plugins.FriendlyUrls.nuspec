@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.FriendlyUrls</id>
+		<title>ImageResizer.Plugins.FriendlyUrls - /resize(w,h)/image.jpg syntax</title>
+		<version>$version$</version>
+		<authors>Nathanael Jones</authors>
+		<owners>Nathanael Jones</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>http://imageresizing.net/images/pictures.png</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>Allows images to be resized by specifying a fake folder instead of using the querystring.
+For example, `image.jpg?maxwidth=100&maxheight=100` would become `/resize(100,100)/image.jpg`. 
+
+Visit http://imageresizing.net for details, documenation, and free support. 
+E-mail support@imageresizing.net if you encounter any problems with the software. 
+The documentation for this plugin resides at http://imageresizing.net/plugins/friendlyurls</description>
+		<tags>Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing disk caching gif png octree quanitization animated gifs dithering</tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="..\dlls\trial\ImageResizer.Plugins.FriendlyUrls.dll" target="lib" />
+		<file src="..\dlls\trial\ImageResizer.Plugins.FriendlyUrls.xml" target="lib" />
+		<file src="..\Plugins\FriendlyUrls\Web.config.transform" target="content" />
+	</files>
+</package>
