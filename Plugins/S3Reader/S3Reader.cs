@@ -13,6 +13,8 @@ namespace ImageResizer.Plugins.S3Reader {
 
         string buckets, vpath;
         bool includeModifiedDate = false;
+        bool checkForModifiedFiles = false;
+
         public S3Reader(NameValueCollection args ) {
             s3config = new S3Service();
             s3config.UseSsl = false;
@@ -40,7 +42,7 @@ namespace ImageResizer.Plugins.S3Reader {
             if (string.IsNullOrEmpty(vpath)) vpath = "~/s3/";
 
             string[] bucketArray = null;
-            if (!string.IsNullOrEmpty(buckets)) buckets.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if (!string.IsNullOrEmpty(buckets)) bucketArray = buckets.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             else c.configurationSectionIssues.AcceptIssue(new Issue("S3Reader", "S3Reader cannot function without a list of permitted bucket names.",
                 "Please specify a comma-delimited list of buckets in the <add name='S3Reader' buckets='bucketa,bucketb' /> element.",
                  IssueSeverity.ConfigurationError));
@@ -51,8 +53,10 @@ namespace ImageResizer.Plugins.S3Reader {
                 ev.AssertBucketMatches(bucketArray);
             }, !includeModifiedDate);
 
+            vpp.FastMode = !checkForModifiedFiles;
 
             vpp.Service = s3config;
+
             vpp.VirtualFilesystemPrefix = vpath;
            // vpp.MetadataAbsoluteExpiration
 
