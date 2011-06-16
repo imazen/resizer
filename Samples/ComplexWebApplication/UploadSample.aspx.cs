@@ -21,10 +21,8 @@ namespace ComplexWebApplication {
                 HttpPostedFile file = HttpContext.Current.Request.Files[fileKey];
                 if (file.ContentLength <= 0) continue; //Skip unused file controls.
 
-                //Get the physical path for the uploads folder
+                //Get the physical path for the uploads folder and make sure it exists
                 string uploadFolder = MapPath("~/uploads");
-
-                //Create the upload folder if it is missing
                 if (!Directory.Exists(uploadFolder)) Directory.CreateDirectory(uploadFolder);
 
                 //The resizing settings can specify any of 30 commands.. See http://imageresizing.net for details.
@@ -33,9 +31,8 @@ namespace ComplexWebApplication {
                 //Generate a filename (GUIDs are safest).
                 string fileName = Path.Combine(uploadFolder, System.Guid.NewGuid().ToString());
 
-                //Let the image builder add the correct extension based on the output file type (which may differ from the original file type).
+                //Let the image builder add the correct extension based on the output file type (which may differ).
                 fileName = ImageBuilder.Current.Build(file, fileName, resizeCropSettings, false, true);
-
             }
 
             //Here's an example of getting a byte array for sending to SQL
