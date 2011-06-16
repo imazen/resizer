@@ -97,7 +97,7 @@ namespace ImageResizer
         /// <returns>A Bitmap. The .Tag property will include a BitmapTag instance. If .Tag.Source is not null, remember to dispose it when you dispose the Bitmap.</returns>
         public virtual Bitmap LoadImage(object source, ResizeSettings settings) {
 
-            bool disposeStream =!(source is Stream);
+            bool disposeStream = !(source is Stream || source is HttpPostedFile);
 
             //Fire PreLoadImage(source,settings)
             this.PreLoadImage(ref source, settings);
@@ -153,8 +153,11 @@ namespace ImageResizer
                 path = (string)source;
                 s = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
             } else {
-                 throw new ArgumentException("Paramater source may only be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.", "source");
+                throw new ArgumentException("Paramater source may only be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.", "source");
             }
+            //Save the original stream position if it's an HttpPostedFile
+            long originalPosition = (source is HttpPostedFile) ? s.Position : - 1;
+
             try {
                 try {
                     //First try DecodeStream
@@ -185,7 +188,10 @@ namespace ImageResizer
                     s = null;
                 }
                 //Dispose the stream if we opened it. If someone passed it to us, they're responsible.
-                if (s != null && disposeStream) s.Dispose();
+                if (s != null && disposeStream) { s.Dispose(); s = null; }
+
+                //Restore the stream position if we were given an HttpPostedFile instance
+                if (originalPosition > -1 && s != null && s.CanSeek) s.Position = originalPosition;
 
                 //Make sure the bitmap is tagged with its path. DecodeStream usually handles this, only relevant for extension decoders.
                 if (b != null && b.Tag == null && path != null) b.Tag = new BitmapTag(path);
@@ -259,6 +265,7 @@ namespace ImageResizer
             Build(source, dest, settings, true);
         }
 
+
         /// <summary>
         /// Resizes and processes the specified source image and stores the encoded result in the specified destination. 
         /// If passed a source Stream, Bitmap, or Image instance, it will not be disposed unless disposeSource=true.
@@ -268,6 +275,20 @@ namespace ImageResizer
         /// <param name="settings">Resizing and processing command to apply to the image.</param>
         /// <param name="disposeSource">True to dispose 'source' after use. False to leave intact.</param>
         public virtual void Build(object source, object dest, ResizeSettings settings, bool disposeSource) {
+            Build(source, dest, settings, disposeSource, false);
+        }
+
+        /// <summary>
+        /// Resizes and processes the specified source image and stores the encoded result in the specified destination. 
+        /// If passed a source Stream, Bitmap, or Image instance, it will not be disposed unless disposeSource=true.
+        /// If passed a path destination, the physical path of the written file will be returned.
+        /// </summary>
+        /// <param name="source">May be an instance of string (a physical path or app-relative virtual path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream. App-relative virtual paths will use the VirtualPathProvider system</param>
+        /// <param name="dest">May be a physical path (string), or a Stream instance. Does not have to be seekable.</param>
+        /// <param name="settings">Resizing and processing command to apply to the image.</param>
+        /// <param name="disposeSource">True to dispose 'source' after use. False to leave intact.</param>
+        /// <param name="addFileExtension">If true, will add the correct file extension to 'dest' if it is a string. </param>
+        public virtual string Build(object source, object dest, ResizeSettings settings, bool disposeSource, bool addFileExtension) {
             ResizeSettings s = new ResizeSettings(settings);
             Bitmap b = null; 
             try {
@@ -284,10 +305,17 @@ namespace ImageResizer
                     //Convert app-relative paths
                     if (destPath.StartsWith("~", StringComparison.OrdinalIgnoreCase)) destPath = HostingEnvironment.MapPath(destPath);
 
+                    //Add the file extension if specified.
+                    if (addFileExtension) {
+                        IEncoder e = this.EncoderProvider.GetEncoder(settings, b);
+                        if (e != null) destPath += "." + e.Extension;
+                    }
+
                     System.IO.FileStream fs = new FileStream(destPath, FileMode.Create, FileAccess.Write);
                     using (fs) {
                         buildToStream(b, fs, s);
                     }
+                    return destPath;
                 //Write to Unknown stream
                 } else if (dest is Stream) {
                     buildToStream(b, (Stream)dest, s);
@@ -311,7 +339,7 @@ namespace ImageResizer
                 if (disposeSource && source is IDisposable) ((IDisposable)source).Dispose();
 
             }
-
+            return null;
         }
 
         /// <summary>
