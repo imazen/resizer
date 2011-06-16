@@ -22,7 +22,6 @@ The documentation for this plugin resides at http://imageresizing.net/plugins/ad
 		</dependencies>
 	</metadata>
   	<files>
-  	<files>
 		<file src="..\dlls\trial\ImageResizer.Plugins.AdvancedFilters.dll" target="lib" />
 		<file src="..\dlls\trial\ImageResizer.Plugins.AdvancedFilters.xml" target="lib" />
 		<file src="..\dlls\trial\AForge.dll" target="lib" />

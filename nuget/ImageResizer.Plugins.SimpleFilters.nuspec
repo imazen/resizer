@@ -24,7 +24,6 @@ The documentation for this plugin resides at http://imageresizing.net/plugins/si
 		</dependencies>
 	</metadata>
   	<files>
-  	<files>
 		<file src="..\dlls\trial\ImageResizer.Plugins.SimpleFilters.dll" target="lib" />
 		<file src="..\dlls\trial\ImageResizer.Plugins.SimpleFilters.xml" target="lib" />
 		<file src="..\Plugins\SimpleFilters\Web.config.transform" target="content" />
