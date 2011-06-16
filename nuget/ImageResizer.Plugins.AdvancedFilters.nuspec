@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
 		<id>ImageResizer.Plugins.AdvancedFilters</id>
@@ -10,8 +10,8 @@
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
-<description>Apply gaussian blur and sharpening via the URL. Gaussian blur with adjustable radius: &blur=radius. 
-Gaussian sharpen with adjustable radius: &sharpen=radius
+<description>Apply gaussian blur and sharpening via the URL. Gaussian blur with adjustable radius: &amp;blur=radius. 
+Gaussian sharpen with adjustable radius: &amp;sharpen=radius
 
 Visit http://imageresizing.net for details, documenation, and free support. 
 E-mail support@imageresizing.net if you encounter any problems with the software. 

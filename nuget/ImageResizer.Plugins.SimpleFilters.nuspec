@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
 		<id>ImageResizer.Plugins.SimpleFilters</id>
@@ -11,10 +11,10 @@
 		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 <description>Apply grayscale, sepia, alpha, or brightness filters via the URL.
-* &filter=grayscale
-* &filter=sepia
-* &filter=brightness(factor)
-* &filter=alpha(factor) 
+* &amp;filter=grayscale
+* &amp;filter=sepia
+* &amp;filter=brightness(factor)
+* &amp;filter=alpha(factor) 
 Visit http://imageresizing.net for details, documenation, and free support. 
 E-mail support@imageresizing.net if you encounter any problems with the software. 
 The documentation for this plugin resides at http://imageresizing.net/plugins/simplefilters</description>
