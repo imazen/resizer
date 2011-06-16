@@ -18,10 +18,6 @@ namespace ImageResizer.Plugins.SimpleFilters {
             return true;
         }
 
-        public IEnumerable<string> GetSupportedFileExtensions() {
-            return null;
-        }
-
         public IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "filter" };
         }
