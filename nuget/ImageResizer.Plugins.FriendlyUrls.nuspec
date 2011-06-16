@@ -8,7 +8,7 @@
 		<owners>Nathanael Jones</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
-		<iconUrl>http://imageresizing.net/images/pictures.png</iconUrl>
+		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 <description>Allows images to be resized by specifying a fake folder instead of using the querystring.
 For example, `image.jpg?maxwidth=100&maxheight=100` would become `/resize(100,100)/image.jpg`. 
