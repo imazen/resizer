@@ -294,8 +294,9 @@ namespace ImageResizer.ReleaseBuilder {
 
         public void PrepareForPackaging() {
             if (q == null) q = new FsQuery(this.f.parentPath, standardExclusions);
-            //Don't copy the DotNetZip xml file.
+            //Don't copy the DotNetZip or Aforge xml file.
             q.exclusions.Add(new Pattern("^/Plugins/Libs/DotNetZip*.xml$"));
+            q.exclusions.Add(new Pattern("^/Plugins/Libs/Aforge*.xml$"));
             q.exclusions.Add(new Pattern("^/Tests/Libs/LibDevCassini"));
             q.exclusions.Add(new Pattern("^/Samples/SqlReaderSampleVarChar"));
         }
