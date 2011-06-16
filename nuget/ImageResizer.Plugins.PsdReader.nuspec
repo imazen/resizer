@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
 		<id>ImageResizer.Plugins.PsdReader</id>
@@ -21,8 +21,7 @@ The documentation for this plugin resides at http://imageresizing.net/plugins/ps
 		</dependencies>
 	</metadata>
   	<files>
-  	<files>
-		<file src="..\dlls\trial\ImageResizer.Plugins.PsdReader.dll" target="lib" />
+ 		<file src="..\dlls\trial\ImageResizer.Plugins.PsdReader.dll" target="lib" />
 		<file src="..\dlls\trial\ImageResizer.Plugins.PsdReader.xml" target="lib" />
 		<file src="..\dlls\trial\PsdFile.dll" target="lib" />
 		<file src="..\Plugins\PsdReader\Web.config.transform" target="content" />
