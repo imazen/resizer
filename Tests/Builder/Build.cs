@@ -317,6 +317,7 @@ namespace ImageResizer.ReleaseBuilder {
             // 'full'
             using (var p = new Package(desc.Path, this.f.parentPath)) {
                 p.Add(q.files("^/(core|plugins|samples|tests)/"));
+                p.Add(q.files("^/contrib/azure"));
                 p.Add(q.files("^/dlls/(release|trial)"));
                 p.Add(q.files("^/[^/]+.txt$"));
             }
