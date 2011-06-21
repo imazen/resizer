@@ -114,7 +114,7 @@ namespace ImageResizer.Plugins.AnimatedGifs
             finally
             {
                if (memoryStream != null) memoryStream.Dispose();
-               if (writer != null) writer.Close();
+               //if (writer != null) writer.Close
             }
         }
         /// <summary>
