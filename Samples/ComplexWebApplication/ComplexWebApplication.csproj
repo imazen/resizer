@@ -44,6 +44,7 @@
     <Content Include="404Test.aspx" />
     <Content Include="BatchResizeAndZip.aspx" />
     <Content Include="CloudFront.aspx" />
+    <Content Include="ContentAwareResizing.htm" />
     <Content Include="CropExample.aspx" />
     <Content Include="css\Jcrop.gif" />
     <Content Include="css\jquery.Jcrop.css" />
@@ -203,6 +204,10 @@
       <Project>{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}</Project>
       <Name>ImageResizer.Plugins.DiskCache</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\FriendlyUrls\ImageResizer.Plugins.FriendlyUrls.csproj">
+      <Project>{A931C3D7-FFCE-4BCF-933A-51A717904894}</Project>
+      <Name>ImageResizer.Plugins.FriendlyUrls</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\PrettyGifs\ImageResizer.Plugins.PrettyGifs.csproj">
       <Project>{BB8EEB97-6550-4780-97B2-B0F2FCD80970}</Project>
       <Name>ImageResizer.Plugins.PrettyGifs</Name>
@@ -214,6 +219,10 @@
     <ProjectReference Include="..\..\Plugins\RequestLimiting\ImageResizer.Plugins.RequestLimiting.csproj">
       <Project>{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}</Project>
       <Name>ImageResizer.Plugins.RequestLimiting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\SeamCarving\ImageResizer.Plugins.SeamCarving.csproj">
+      <Project>{7AEFB877-A720-4929-880C-1090A71C83EB}</Project>
+      <Name>ImageResizer.Plugins.SeamCarving</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\SimpleFilters\ImageResizer.Plugins.SimpleFilters.csproj">
       <Project>{2A7D72F6-6DCB-4260-A921-6C7A6FC77812}</Project>
