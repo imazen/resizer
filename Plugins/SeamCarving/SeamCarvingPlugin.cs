@@ -29,7 +29,7 @@ namespace ImageResizer.Plugins.SeamCarving {
             if (s.destGraphics == null) return RequestedAction.None;
 
             FilterType ftype = Utils.parseEnum<FilterType>(s.settings["carve"], FilterType.None);
-            if ("true".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase)) ftype = FilterType.V1;
+            if ("true".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase)) ftype = FilterType.Prewitt;
 
             if (ftype == FilterType.None) return RequestedAction.None; //Only override rendering when carving is requested.
 
@@ -102,11 +102,19 @@ namespace ImageResizer.Plugins.SeamCarving {
         }
 
         public IPlugin Install(Configuration.Config c) {
+            c.Pipeline.RewriteDefaults -= Pipeline_RewriteDefaults;
+            c.Pipeline.RewriteDefaults += Pipeline_RewriteDefaults;
             c.Plugins.add_plugin(this);
             return this;
         }
 
+        void Pipeline_RewriteDefaults(System.Web.IHttpModule sender, System.Web.HttpContext context, Configuration.IUrlEventArgs e) {
+            if (!string.IsNullOrEmpty(e.QueryString["carve"])) e.QueryString["stretch"] = "fill";
+        }
+
         public bool Uninstall(Configuration.Config c) {
+            c.Pipeline.RewriteDefaults -= Pipeline_RewriteDefaults;
+    
             c.Plugins.remove_plugin(this);
             return true;
         }
