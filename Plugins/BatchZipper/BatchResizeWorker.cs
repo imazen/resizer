@@ -9,6 +9,8 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using ImageResizer.Configuration;
 using ImageResizer;
+using System.IO;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.BatchZipper
 {
@@ -153,7 +155,12 @@ namespace ImageResizer.Plugins.BatchZipper
             BatchResizeItem i = items[entryName];
             if (wouldResize(i))
             {
-                s.conf.CurrentImageBuilder.Build(i.PhysicalPath, stream, new ResizeSettings(i.ResizeQuerystring));
+                //Buffer in a memory stream to avoid stepping on CrcCalculatorStream's broken toes
+                using (MemoryStream ms = new MemoryStream()) {
+                    s.conf.CurrentImageBuilder.Build(i.PhysicalPath, ms, new ResizeSettings(i.ResizeQuerystring));
+                    ms.Position = 0;
+                    StreamUtils.CopyTo(ms, stream);
+                }
                 return; //We're done!
                 
             }
