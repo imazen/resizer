@@ -126,6 +126,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
+    <EmbeddedResource Include="..\..\dlls\release\Ionic.Zip.Reduced.dll">
+      <Link>Resources\Ionic.Zip.Reduced.dll</Link>
+    </EmbeddedResource>
     <Content Include="history.txt" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -135,10 +138,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controls\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\folder.png" />
-    <Resource Include="Images\image.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\image1.png" />
@@ -202,9 +201,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="..\..\dlls\release\ImageResizer.Plugins.PsdReader.dll">
       <Link>Resources\ImageResizer.Plugins.PsdReader.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\dlls\release\Ionic.Zip.dll">
-      <Link>Resources\Ionic.Zip.dll</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="..\..\dlls\release\PsdFile.dll">
       <Link>Resources\PsdFile.dll</Link>

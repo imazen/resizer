@@ -1,0 +1,7 @@
+The Ionic.Zip.Reduced.dll files has been modified - CrcCalculatorStream.CanSeek no longer lies. 
+
+http://dotnetzip.codeplex.com/workitem/13709
+
+However, it still can't set position, which seems to break jpeg encoding. 
+
+So, we buffer in a memory stream instead.
