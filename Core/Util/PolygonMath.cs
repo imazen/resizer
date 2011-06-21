@@ -271,6 +271,18 @@ namespace ImageResizer.Util
         }
 
         /// <summary>
+        /// Determines the width and height of the paralellogram.
+        /// </summary>
+        /// <param name="quad"></param>
+        /// <returns></returns>
+        public static SizeF getParallelogramSize(PointF[] p) {
+            double width = Math.Sqrt(Math.Pow(p[0].X - p[1].X,2) + Math.Pow(p[0].Y - p[1].Y,2));
+            double height = Math.Sqrt(Math.Pow(p[1].X - p[2].X,2) + Math.Pow(p[1].Y - p[2].Y,2));
+            return new SizeF((float)width, (float)height);
+        }
+
+
+        /// <summary>
         /// Grabs a single-dimension array from a 2 dimensional array, using the specified primary index.
         /// </summary>
         /// <param name="array"></param>
@@ -338,6 +350,24 @@ namespace ImageResizer.Util
             }
         }
 
+        /// <summary>
+        /// Scales 'outer' to be equal or larger than 'innerBounds' while maintaining aspect ratio. Upscales and downscales.
+        /// </summary>
+        /// <param name="bounding"></param>
+        /// <param name="fitInside"></param>
+        /// <returns></returns>
+        public static SizeF ScaleOutside(SizeF innerBounds, SizeF outer) {
+            double innerRatio = innerBounds.Width / innerBounds.Height;
+            double outerRatio = outer.Width / outer.Height;
+
+            if (outerRatio > innerRatio) {
+                //Width is wider - so bound by height.
+                return new SizeF((float)(outerRatio * innerBounds.Height), (float)(innerBounds.Height));
+            } else {
+                //Height is higher, or aspect ratios are identical.
+                return new SizeF((float)(innerBounds.Width), (float)(innerBounds.Width / outerRatio));
+            }
+        }
         /// <summary>
         /// Scales 'inner' to fit inside 'bounding' while maintaining aspect ratio. Only downscales.
         /// </summary>
