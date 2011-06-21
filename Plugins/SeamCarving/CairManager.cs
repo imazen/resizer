@@ -6,6 +6,8 @@ using System.Reflection;
 using ImageResizer.Util;
 using System.Drawing;
 using System.Diagnostics;
+using System.Web;
+using System.Web.Hosting;
 
 namespace ImageResizer.Plugins.SeamCarving {
     public class CairManager {
@@ -18,9 +20,12 @@ namespace ImageResizer.Plugins.SeamCarving {
             if (cairPath != null) return cairPath;
             lock(cairLock){
                 if (cairPath != null) return cairPath;
-                //Copy to temporary file 
+                
+                //In ASP.NET, use ~/App_Data/cair, otherwise use a temp folder.
+                string cairDir = HttpContext.Current == null ? Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()) : HostingEnvironment.MapPath("~/App_Data/cair/");
+                if (!Directory.Exists(cairDir)) Directory.CreateDirectory(cairDir);
 
-                string dllPath = Path.Combine(Path.GetTempPath(), "pthreadVSE2.dll");
+                string dllPath = Path.Combine(cairDir, "pthreadVSE2.dll");
 
                 using (Stream input = Assembly.GetExecutingAssembly().GetManifestResourceStream("ImageResizer.Plugins.SeamCarving.pthreadVSE2.dll"))
                 using (Stream output = File.Create(dllPath))
@@ -28,7 +33,7 @@ namespace ImageResizer.Plugins.SeamCarving {
                     StreamUtils.CopyTo(input, output);
                 }
 
-                string tempPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".exe");
+                string tempPath = Path.Combine(cairDir, "cair.exe");
 
                 using (Stream input = Assembly.GetExecutingAssembly().GetManifestResourceStream("ImageResizer.Plugins.SeamCarving.CAIR.exe"))
                 using (Stream output = File.Create(tempPath)) {
@@ -54,7 +59,7 @@ namespace ImageResizer.Plugins.SeamCarving {
             args += " -I \"" + sourcePath + "\"";
             args += " -O \"" + destPath + "\"";
             args += " -T 1";
-            args += " -C " + type.ToString();
+            args += " -C " + ((int)type).ToString();
 			args += " -X " + size.Width;
 			args += " -Y " + size.Height;
 
