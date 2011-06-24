@@ -7,46 +7,61 @@ using System.Windows.Media;
 
 namespace ImageResizerGUI.Code
 {
+    /// <summary>
+    /// BatchInfo objects stores informations about the images to resize.
+    /// </summary>
     public class BatchInfo : INotifyPropertyChanged
     {
-        #region Fields
-
         private string fileName;
         private string fullPath;
         private int status;
         private string statusText;
+        private string folder;
 
-        #endregion
-
+        /// <summary>
+        /// Create a BatchItem from a path.
+        /// </summary>
+        /// <param name="fullPath"></param>
         public BatchInfo(string fullPath)
         {
-            FullPath = fullPath;
+            this.fullPath = fullPath;
 
             var arr = fullPath.Split('\\');
-            FileName = arr[arr.Length - 1];
-            Folder = fullPath.Replace(FileName, "");
+            fileName = arr[arr.Length - 1];
+            folder = fullPath.Replace(FileName, "");
             Status = 0;
             statusText = "Pending";
         }
 
+        /// <summary>
+        /// Duplicate (Clone) a BatchInfo.
+        /// </summary>
+        /// <param name="other"></param>
         public BatchInfo(BatchInfo other)
             : this(other.FullPath)
         {
         }
 
+        /// <summary>
+        /// Gets the file name .
+        /// </summary>
         public string FileName
         {
             get { return fileName; }
-            set { fileName = value; }
         }
 
+        /// <summary>
+        /// Gets the full path
+        /// </summary>
         public string FullPath
         {
             get { return fullPath; }
-            set { fullPath = value; }
         }
 
-        public string Folder { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Folder { get { return folder; } }
 
         public int Status
         {

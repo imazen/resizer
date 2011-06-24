@@ -114,7 +114,7 @@
                                 <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox x:Name="tbox_savePath" IsReadOnly="True" Margin="0,5"/>
+                            <TextBox x:Name="tbox_savePath" Margin="0,5"/>
                             <Button x:Name="btn_BrowseButton" Grid.Column="1" Content="Browse" Margin="10,5" Width="90"/>
                         </Grid>
 

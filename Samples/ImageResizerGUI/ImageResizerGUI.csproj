@@ -55,6 +55,10 @@
     <StartupObject>ImageResizerGUI.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ionic.Zip, Version=1.9.1.5, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\dlls\release\Ionic.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -80,6 +84,7 @@
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Code\BatchBackgroundWorking.cs" />
     <Compile Include="MainWindow_BackgroundWorkers.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Code\ResizeMode.cs" />
@@ -133,13 +138,7 @@
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Controls\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\folder.png" />
-    <Resource Include="Images\image.png" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Images\image1.png" />
   </ItemGroup>
