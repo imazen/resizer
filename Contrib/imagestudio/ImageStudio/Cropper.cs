@@ -8,7 +8,6 @@ using System.Web.UI.WebControls;
 using System.IO;
 using System.Reflection;
 
-using ImageStudio.Library;
 
 namespace ImageStudio
 {
@@ -183,7 +182,6 @@ namespace ImageStudio
         }
         #endregion
 
-        #region //Protected Controls
         protected Button btnSave = new Button();
         protected Button btnCancel = new Button();
 
@@ -193,9 +191,8 @@ namespace ImageStudio
         protected HiddenField hdnFieldHeight = new HiddenField();
 
         protected Image imgEditor = new Image();
-        #endregion
+       
 
-        #region //Methods
         /// <summary>
         /// Starts the cropping.
         /// </summary>
@@ -271,7 +268,7 @@ namespace ImageStudio
                 Hide(null, null);
             }
         }
-        #endregion
+       
 
         #region //Control Events
         /// <summary>
