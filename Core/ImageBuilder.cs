@@ -97,7 +97,7 @@ namespace ImageResizer
         /// <returns>A Bitmap. The .Tag property will include a BitmapTag instance. If .Tag.Source is not null, remember to dispose it when you dispose the Bitmap.</returns>
         public virtual Bitmap LoadImage(object source, ResizeSettings settings) {
 
-            bool disposeStream = !(source is Stream || source is HttpPostedFile);
+            bool disposeStream = !(source is Stream);
 
             //Fire PreLoadImage(source,settings)
             this.PreLoadImage(ref source, settings);
@@ -136,12 +136,8 @@ namespace ImageResizer
             path = null;
             //Stream
             if (source is Stream) s = (Stream)source;
-            //HttpPostedFile
-            else if (source is HttpPostedFile) {
-                path = ((HttpPostedFile)source).FileName;
-                s = ((HttpPostedFile)source).InputStream; //NDJ: I read the source - this stream can be disposed with no effect... It's isolated from the underlying file stream.
             //VirtualFile
-            } else if (source is VirtualFile) {
+             else if (source is VirtualFile) {
                 path = ((VirtualFile)source).VirtualPath;
                 s = ((VirtualFile)source).Open();
             //IVirtualFile
@@ -153,7 +149,18 @@ namespace ImageResizer
                 path = (string)source;
                 s = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
             } else {
-                throw new ArgumentException("Paramater source may only be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.", "source");
+                //For HttpPostedFile and HttpPostedFileBase - we must use reflection to support .NET 3.5 without losing 2.0 compat.
+                PropertyInfo pname = source.GetType().GetProperty("FileName",typeof(string));
+                PropertyInfo pstream = source.GetType().GetProperty("InputStream");
+
+                if (pname != null && pstream != null) {
+                    path = pname.GetValue(source, null) as string;
+                    s = pstream.GetValue(source, null) as Stream;
+                    disposeStream = false; //We never want to dispose the HttpPostedFile or HttpPostedFileBase streams...
+                }
+                
+                if (s == null) 
+                    throw new ArgumentException("Paramater source may only be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, HttpPostedFileBase, Bitmap, Image, or Stream.", "source");
             }
             //Save the original stream position if it's an HttpPostedFile
             long originalPosition = (source is HttpPostedFile) ? s.Position : - 1;
