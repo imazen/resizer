@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace ImageResizerGUI
+﻿namespace ImageResizerGUI
 {
     /// <summary>
     /// Enumerate the saving modes for the UI.
