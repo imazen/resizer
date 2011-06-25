@@ -55,10 +55,6 @@
     <StartupObject>ImageResizerGUI.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ionic.Zip, Version=1.9.1.5, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\release\Ionic.Zip.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -131,6 +127,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
+    <EmbeddedResource Include="..\..\dlls\release\Ionic.Zip.Reduced.dll">
+      <Link>Resources\Ionic.Zip.Reduced.dll</Link>
+    </EmbeddedResource>
     <Content Include="history.txt" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -201,9 +200,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="..\..\dlls\release\ImageResizer.Plugins.PsdReader.dll">
       <Link>Resources\ImageResizer.Plugins.PsdReader.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\dlls\release\Ionic.Zip.dll">
-      <Link>Resources\Ionic.Zip.dll</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="..\..\dlls\release\PsdFile.dll">
       <Link>Resources\PsdFile.dll</Link>

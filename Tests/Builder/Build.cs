@@ -269,7 +269,7 @@ namespace ImageResizer.ReleaseBuilder {
 
             //delete /Tests/binaries  (*.pdb, *.xml, *.dll)
             //delete /Core/obj folder
-            //Deleate all bin,obj,imageacache,uploads, and results folders under /Samples,  /Tests and /Plugins
+            //Deleate all bin,obj,imageacache,uploads, and results folders under /Samples, /Tests, and /Plugins
             f.DelFiles(q.files("^/Tests/binaries/*.(pdb|xml|dll|txt)$"));
             f.DelFiles(q.files("^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|results)/*",
                        "^/Core/obj/*"));
@@ -294,10 +294,12 @@ namespace ImageResizer.ReleaseBuilder {
 
         public void PrepareForPackaging() {
             if (q == null) q = new FsQuery(this.f.parentPath, standardExclusions);
-            //Don't copy the DotNetZip xml file.
+            //Don't copy the DotNetZip or Aforge xml file.
             q.exclusions.Add(new Pattern("^/Plugins/Libs/DotNetZip*.xml$"));
+            q.exclusions.Add(new Pattern("^/Plugins/Libs/Aforge*.xml$"));
             q.exclusions.Add(new Pattern("^/Tests/Libs/LibDevCassini"));
             q.exclusions.Add(new Pattern("^/Samples/SqlReaderSampleVarChar"));
+            q.exclusions.Add(new Pattern("^/Contrib/*/(bin|obj|imagecache|uploads|results)/*"));
         }
         public void PackMin(PackageDescriptor desc) {
             // 'min' - /dlls/release/ImageResizer.* - /
@@ -317,6 +319,7 @@ namespace ImageResizer.ReleaseBuilder {
             // 'full'
             using (var p = new Package(desc.Path, this.f.parentPath)) {
                 p.Add(q.files("^/(core|plugins|samples|tests)/"));
+                p.Add(q.files("^/contrib/azure"));
                 p.Add(q.files("^/dlls/(release|trial)"));
                 p.Add(q.files("^/[^/]+.txt$"));
             }

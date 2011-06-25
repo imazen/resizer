@@ -13,7 +13,12 @@
         <asp:FileUpload ID="fileUpload" runat="server" />
         
         <asp:Button ID="btnUpload" runat="server" Text="Upload, crop and resize!" />
+        
+        <asp:Button ID="btnUploadAndGenerate" runat="server" 
+            Text="Upload, crop, and resize 3 versions!" 
+            onclick="btnUploadAndGenerate_Click" />
     
+
     </div>
     </form>
 </body>

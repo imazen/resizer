@@ -1,0 +1,835 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AForge</name>
+    </assembly>
+    <members>
+        <member name="T:AForge.IntPoint">
+            <summary>
+            Structure for representing a pair of coordinates of integer type.
+            </summary>
+            
+            <remarks><para>The structure is used to store a pair of integer coordinates.</para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // assigning coordinates in the constructor
+            IntPoint p1 = new IntPoint( 10, 20 );
+            // creating a point and assigning coordinates later
+            IntPoint p2;
+            p2.X = 30;
+            p2.Y = 40;
+            // calculating distance between two points
+            double distance = p1.DistanceTo( p2 );
+            </code>
+            </remarks>
+            
+        </member>
+        <member name="F:AForge.IntPoint.X">
+            <summary> 
+            X coordinate.
+            </summary> 
+            
+        </member>
+        <member name="F:AForge.IntPoint.Y">
+            <summary> 
+            Y coordinate.
+            </summary> 
+            
+        </member>
+        <member name="M:AForge.IntPoint.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.IntPoint"/> structure.
+            </summary>
+            
+            <param name="x">X axis coordinate.</param>
+            <param name="y">Y axis coordinate.</param>
+            
+        </member>
+        <member name="M:AForge.IntPoint.DistanceTo(AForge.IntPoint)">
+            <summary>
+            Calculate Euclidean distance between two points.
+            </summary>
+            
+            <param name="anotherPoint">Point to calculate distance to.</param>
+            
+            <returns>Returns Euclidean distance between this point and
+            <paramref name="anotherPoint"/> points.</returns>
+            
+        </member>
+        <member name="M:AForge.IntPoint.op_Addition(AForge.IntPoint,AForge.IntPoint)">
+            <summary>
+            Addition operator - adds values of two points.
+            </summary>
+            
+            <param name="p1">First point for addition.</param>
+            <param name="p2">Second point for addition.</param>
+            
+            <returns>Returns new point which coordinates equal to sum of corresponding
+            coordinates of specified points.</returns>
+            
+        </member>
+        <member name="M:AForge.IntPoint.op_Subtraction(AForge.IntPoint,AForge.IntPoint)">
+             <summary>
+             Subtraction operator - subtracts values of two points.
+             </summary>
+             
+             <param name="p1">Point to subtract from.</param>
+             <param name="p2">Point to subtract.</param>
+             
+             <returns>Returns new point which coordinates equal to difference of corresponding
+             coordinates of specified points.</returns>
+            
+        </member>
+        <member name="M:AForge.IntPoint.op_Addition(AForge.IntPoint,System.Int32)">
+            <summary>
+            Addition operator - adds scalar to the specified point.
+            </summary>
+            
+            <param name="p">Point to increase coordinates of.</param>
+            <param name="valueToAdd">Value to add to coordinates of the specified point.</param>
+            
+            <returns>Returns new point which coordinates equal to coordinates of
+            the specified point increased by specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.IntPoint.op_Subtraction(AForge.IntPoint,System.Int32)">
+            <summary>
+            Subtraction operator - subtracts scalar from the specified point.
+            </summary>
+            
+            <param name="p">Point to decrease coordinates of.</param>
+            <param name="valueToSubtract">Value to subtract from coordinates of the specified point.</param>
+            
+            <returns>Returns new point which coordinates equal to coordinates of
+            the specified point decreased by specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.IntPoint.op_Multiply(AForge.IntPoint,System.Int32)">
+             <summary>
+             Multiplication operator - multiplies coordinates of the specified point by scalar value.
+             </summary>
+             
+             <param name="p">Point to multiply coordinates of.</param>
+             <param name="factor">Multiplication factor.</param>
+             
+             <returns>Returns new point which coordinates equal to coordinates of
+             the specified point multiplied by specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.IntPoint.op_Division(AForge.IntPoint,System.Int32)">
+            <summary>
+            Division operator - divides coordinates of the specified point by scalar value.
+            </summary>
+            
+            <param name="p">Point to divide coordinates of.</param>
+            <param name="factor">Division factor.</param>
+            
+            <returns>Returns new point which coordinates equal to coordinates of
+            the specified point divided by specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.IntPoint.op_Equality(AForge.IntPoint,AForge.IntPoint)">
+             <summary>
+             Equality operator - checks if two points have equal coordinates.
+             </summary>
+             
+             <param name="p1">First point to check.</param>
+             <param name="p2">Second point to check.</param>
+             
+             <returns>Returns <see langword="true"/> if coordinates of specified
+             points are equal.</returns>
+            
+        </member>
+        <member name="M:AForge.IntPoint.op_Inequality(AForge.IntPoint,AForge.IntPoint)">
+             <summary>
+             Inequality operator - checks if two points have different coordinates.
+             </summary>
+             
+             <param name="p1">First point to check.</param>
+             <param name="p2">Second point to check.</param>
+             
+             <returns>Returns <see langword="true"/> if coordinates of specified
+             points are not equal.</returns>
+            
+        </member>
+        <member name="M:AForge.IntPoint.Equals(System.Object)">
+            <summary>
+            Check if this instance of <see cref="T:AForge.IntPoint"/> equal to the specified one.
+            </summary>
+            
+            <param name="obj">Another point to check equalty to.</param>
+            
+            <returns>Return <see langword="true"/> if objects are equal.</returns>
+            
+        </member>
+        <member name="M:AForge.IntPoint.GetHashCode">
+            <summary>
+            Get hash code for this instance.
+            </summary>
+            
+            <returns>Returns the hash code for this instance.</returns>
+            
+        </member>
+        <member name="M:AForge.IntPoint.op_Implicit(AForge.IntPoint)~AForge.DoublePoint">
+            <summary>
+            Implicit conversion to <see cref="T:AForge.DoublePoint"/>.
+            </summary>
+            
+            <param name="p">Integer point to convert to double precision point.</param>
+            
+            <returns>Returns new double precision point which coordinates are implicitly converted
+            to doubles from coordinates of the specified integer point.</returns>
+            
+        </member>
+        <member name="M:AForge.IntPoint.ToString">
+             <summary>
+             Get string representation of the class.
+             </summary>
+             
+             <returns>Returns string, which contains values of the point in readable form.</returns>
+            
+        </member>
+        <member name="M:AForge.IntPoint.EuclideanNorm">
+            <summary>
+            Calculate Euclidean norm of the vector comprised of the point's 
+            coordinates - distance from (0, 0) in other words.
+            </summary>
+            
+            <returns>Returns point's distance from (0, 0) point.</returns>
+            
+        </member>
+        <member name="T:AForge.PolishExpression">
+            <summary>
+            Evaluator of expressions written in reverse polish notation.
+            </summary>
+            
+            <remarks><para>The class evaluates expressions writen in reverse postfix polish notation.</para>
+            
+            <para>The list of supported functuins is:</para>
+            <list type="bullet">
+            <item><b>Arithmetic functions</b>: +, -, *, /;</item>
+            <item><b>sin</b> - sine;</item>
+            <item><b>cos</b> - cosine;</item>
+            <item><b>ln</b> - natural logarithm;</item>
+            <item><b>exp</b> - exponent;</item>
+            <item><b>sqrt</b> - square root.</item>
+            </list>
+            
+            <para>Arguments for these functions could be as usual constants, written as numbers, as variables,
+            writen as $&lt;var_number&gt; (<b>$2</b>, for example). The variable number is zero based index
+            of variables array.</para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // expression written in polish notation
+            string expression = "2 $0 / 3 $1 * +";
+            // variables for the expression
+            double[] vars = new double[] { 3, 4 };
+            // expression evaluation
+            double result = PolishExpression.Evaluate( expression, vars );
+            </code>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.PolishExpression.Evaluate(System.String,System.Double[])">
+             <summary>
+             Evaluates specified expression.
+             </summary>
+            
+             <param name="expression">Expression written in postfix polish notation.</param>
+             <param name="variables">Variables for the expression.</param>
+             
+             <returns>Evaluated value of the expression.</returns>
+             
+             <exception cref="T:System.ArgumentException">Unsupported function is used in the expression.</exception>
+             <exception cref="T:System.ArgumentException">Incorrect postfix polish expression.</exception>
+            
+        </member>
+        <member name="T:AForge.DoubleRange">
+            <summary>
+            Represents a double range with minimum and maximum values.
+            </summary>
+            
+            <remarks>
+            <para>The class represents a double range with inclusive limits -
+            both minimum and maximum values of the range are included into it.
+            Mathematical notation of such range is <b>[min, max]</b>.</para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // create [0.25, 1.5] range
+            DoubleRange range1 = new DoubleRange( 0.25, 1.5 );
+            // create [1.00, 2.25] range
+            DoubleRange range2 = new DoubleRange( 1.00, 2.25 );
+            // check if values is inside of the first range
+            if ( range1.IsInside( 0.75 ) )
+            {
+                // ...
+            }
+            // check if the second range is inside of the first range
+            if ( range1.IsInside( range2 ) )
+            {
+                // ...
+            }
+            // check if two ranges overlap
+            if ( range1.IsOverlapping( range2 ) )
+            {
+                // ...
+            }
+            </code>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.DoubleRange.#ctor(System.Double,System.Double)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.DoubleRange"/> class.
+            </summary>
+            
+            <param name="min">Minimum value of the range.</param>
+            <param name="max">Maximum value of the range.</param>
+            
+        </member>
+        <member name="M:AForge.DoubleRange.IsInside(System.Double)">
+            <summary>
+            Check if the specified value is inside of the range.
+            </summary>
+            
+            <param name="x">Value to check.</param>
+            
+            <returns><b>True</b> if the specified value is inside of the range or
+            <b>false</b> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.DoubleRange.IsInside(AForge.DoubleRange)">
+            <summary>
+            Check if the specified range is inside of the range.
+            </summary>
+            
+            <param name="range">Range to check.</param>
+            
+            <returns><b>True</b> if the specified range is inside of the range or
+            <b>false</b> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.DoubleRange.IsOverlapping(AForge.DoubleRange)">
+            <summary>
+            Check if the specified range overlaps with the range.
+            </summary>
+            
+            <param name="range">Range to check for overlapping.</param>
+            
+            <returns><b>True</b> if the specified range overlaps with the range or
+            <b>false</b> otherwise.</returns>
+            
+        </member>
+        <member name="P:AForge.DoubleRange.Min">
+            <summary>
+            Minimum value of the range.
+            </summary>
+            
+            <remarks><para>The property represents minimum value (left side limit) or the range -
+            [<b>min</b>, max].</para></remarks>
+            
+        </member>
+        <member name="P:AForge.DoubleRange.Max">
+            <summary>
+            Maximum value of the range.
+            </summary>
+            
+            <remarks><para>The property represents maximum value (right side limit) or the range -
+            [min, <b>max</b>].</para></remarks>
+            
+        </member>
+        <member name="P:AForge.DoubleRange.Length">
+            <summary>
+            Length of the range (deffirence between maximum and minimum values).
+            </summary>
+        </member>
+        <member name="T:AForge.IntRange">
+            <summary>
+            Represents an integer range with minimum and maximum values.
+            </summary>
+            
+            <remarks>
+            <para>The class represents an integer range with inclusive limits -
+            both minimum and maximum values of the range are included into it.
+            Mathematical notation of such range is <b>[min, max]</b>.</para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // create [1, 10] range
+            IntRange range1 = new IntRange( 1, 10 );
+            // create [5, 15] range
+            IntRange range2 = new IntRange( 5, 15 );
+            // check if values is inside of the first range
+            if ( range1.IsInside( 7 ) )
+            {
+                // ...
+            }
+            // check if the second range is inside of the first range
+            if ( range1.IsInside( range2 ) )
+            {
+                // ...
+            }
+            // check if two ranges overlap
+            if ( range1.IsOverlapping( range2 ) )
+            {
+                // ...
+            }
+            </code>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.IntRange.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.IntRange"/> class.
+            </summary>
+            
+            <param name="min">Minimum value of the range.</param>
+            <param name="max">Maximum value of the range.</param>
+            
+        </member>
+        <member name="M:AForge.IntRange.IsInside(System.Int32)">
+            <summary>
+            Check if the specified value is inside of the range.
+            </summary>
+            
+            <param name="x">Value to check.</param>
+            
+            <returns><b>True</b> if the specified value is inside of the range or
+            <b>false</b> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.IntRange.IsInside(AForge.IntRange)">
+            <summary>
+            Check if the specified range is inside of the range.
+            </summary>
+            
+            <param name="range">Range to check.</param>
+            
+            <returns><b>True</b> if the specified range is inside of the range or
+            <b>false</b> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.IntRange.IsOverlapping(AForge.IntRange)">
+            <summary>
+            Check if the specified range overlaps with the range.
+            </summary>
+            
+            <param name="range">Range to check for overlapping.</param>
+            
+            <returns><b>True</b> if the specified range overlaps with the range or
+            <b>false</b> otherwise.</returns>
+            
+        </member>
+        <member name="P:AForge.IntRange.Min">
+            <summary>
+            Minimum value of the range.
+            </summary>
+            
+            <remarks><para>The property represents minimum value (left side limit) or the range -
+            [<b>min</b>, max].</para></remarks>
+            
+        </member>
+        <member name="P:AForge.IntRange.Max">
+            <summary>
+            Maximum value of the range.
+            </summary>
+            
+            <remarks><para>The property represents maximum value (right side limit) or the range -
+            [min, <b>max</b>].</para></remarks>
+            
+        </member>
+        <member name="P:AForge.IntRange.Length">
+            <summary>
+            Length of the range (deffirence between maximum and minimum values).
+            </summary>
+        </member>
+        <member name="T:AForge.Parallel">
+             <summary>
+             The class provides support for parallel computations, paralleling loop's iterations.
+             </summary>
+             
+             <remarks><para>The class allows to parallel loop's iteration computing them in separate threads,
+             what allows their simultaneous execution on multiple CPUs/cores.
+             </para></remarks>
+            
+        </member>
+        <member name="M:AForge.Parallel.For(System.Int32,System.Int32,AForge.Parallel.ForLoopBody)">
+            <summary>
+            Executes a for-loop in which iterations may run in parallel. 
+            </summary>
+            
+            <param name="start">Loop's start index.</param>
+            <param name="stop">Loop's stop index.</param>
+            <param name="loopBody">Loop's body.</param>
+            
+            <remarks><para>The method is used to parallel for-loop running its iterations in
+            different threads. The <b>start</b> and <b>stop</b> parameters define loop's
+            starting and ending loop's indexes. The number of iterations is equal to <b>stop - start</b>.
+            </para>
+            
+            <para>Sample usage:</para>
+            <code>
+            Parallel.For( 0, 20, delegate( int i )
+            // which is equivalent to
+            // for ( int i = 0; i &lt; 20; i++ )
+            {
+                System.Diagnostics.Debug.WriteLine( "Iteration: " + i );
+                // ...
+            } );
+            </code>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Parallel.ThreadsCount">
+            <summary>
+            Number of threads used for parallel computations.
+            </summary>
+            
+            <remarks><para>The property sets how many worker threads are created for paralleling
+            loops' computations.</para>
+            
+            <para>By default the property is set to number of CPU's in the system
+            (see <see cref="P:System.Environment.ProcessorCount"/>).</para>
+            </remarks>
+            
+        </member>
+        <member name="T:AForge.Parallel.ForLoopBody">
+            <summary>
+            Delegate defining for-loop's body.
+            </summary>
+            
+            <param name="index">Loop's index.</param>
+            
+        </member>
+        <member name="T:AForge.SystemTools">
+            <summary>
+            Set of systems tools.
+            </summary>
+            
+            <remarks><para>The class is a container of different system tools, which are used
+            across the framework. Some of these tools are platform specific, so their
+            implementation is different on different platform, like .NET and Mono.</para>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.SystemTools.CopyUnmanagedMemory(System.IntPtr,System.IntPtr,System.Int32)">
+             <summary>
+             Copy block of unmanaged memory.
+             </summary>
+             
+             <param name="dst">Destination pointer.</param>
+             <param name="src">Source pointer.</param>
+             <param name="count">Memory block's length to copy.</param>
+             
+             <returns>Return's value of <paramref name="dst"/> - pointer to destination.</returns>
+             
+             <remarks><para>This function is required because of the fact that .NET does
+             not provide any way to copy unmanaged blocks, but provides only methods to
+             copy from unmanaged memory to managed memory and vise versa.</para></remarks>
+            
+        </member>
+        <member name="M:AForge.SystemTools.CopyUnmanagedMemory(System.Byte*,System.Byte*,System.Int32)">
+            <summary>
+            Copy block of unmanaged memory.
+            </summary>
+            
+            <param name="dst">Destination pointer.</param>
+            <param name="src">Source pointer.</param>
+            <param name="count">Memory block's length to copy.</param>
+            
+            <returns>Return's value of <paramref name="dst"/> - pointer to destination.</returns>
+            
+            <remarks><para>This function is required because of the fact that .NET does
+            not provide any way to copy unmanaged blocks, but provides only methods to
+            copy from unmanaged memory to managed memory and vise versa.</para></remarks>
+            
+        </member>
+        <member name="M:AForge.SystemTools.SetUnmanagedMemory(System.IntPtr,System.Int32,System.Int32)">
+            <summary>
+            Fill memory region with specified value.
+            </summary>
+            
+            <param name="dst">Destination pointer.</param>
+            <param name="filler">Filler byte's value.</param>
+            <param name="count">Memory block's length to fill.</param>
+            
+            <returns>Return's value of <paramref name="dst"/> - pointer to destination.</returns>
+            
+        </member>
+        <member name="M:AForge.SystemTools.SetUnmanagedMemory(System.Byte*,System.Int32,System.Int32)">
+            <summary>
+            Fill memory region with specified value.
+            </summary>
+            
+            <param name="dst">Destination pointer.</param>
+            <param name="filler">Filler byte's value.</param>
+            <param name="count">Memory block's length to fill.</param>
+            
+            <returns>Return's value of <paramref name="dst"/> - pointer to destination.</returns>
+            
+        </member>
+        <member name="T:AForge.ConnectionFailedException">
+            <summary>
+            Connection failed exception.
+            </summary>
+            
+            <remarks><para>The exception is thrown in the case if connection to device
+            has failed.</para>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.ConnectionFailedException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.ConnectionFailedException"/> class.
+            </summary>
+            
+            <param name="message">Exception's message.</param>
+            
+        </member>
+        <member name="T:AForge.ConnectionLostException">
+            <summary>
+            Connection lost exception.
+            </summary>
+            
+            <remarks><para>The exception is thrown in the case if connection to device
+            is lost. When the exception is caught, user may need to reconnect to the device.</para>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.ConnectionLostException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.ConnectionLostException"/> class.
+            </summary>
+            
+            <param name="message">Exception's message.</param>
+            
+        </member>
+        <member name="T:AForge.NotConnectedException">
+            <summary>
+            Not connected exception.
+            </summary>
+            
+            <remarks><para>The exception is thrown in the case if connection to device
+            is not established, but user requests for its services.</para>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.NotConnectedException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.NotConnectedException"/> class.
+            </summary>
+            
+            <param name="message">Exception's message.</param>
+            
+        </member>
+        <member name="T:AForge.DoublePoint">
+            <summary>
+            Structure for representing a pair of coordinates of double type.
+            </summary>
+            
+            <remarks><para>The structure is used to store a pair of floating point
+            coordinates with double precision.</para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // assigning coordinates in the constructor
+            DoublePoint p1 = new DoublePoint( 10, 20 );
+            // creating a point and assigning coordinates later
+            DoublePoint p2;
+            p2.X = 30;
+            p2.Y = 40;
+            // calculating distance between two points
+            double distance = p1.DistanceTo( p2 );
+            </code>
+            </remarks>
+            
+        </member>
+        <member name="F:AForge.DoublePoint.X">
+            <summary> 
+            X coordinate.
+            </summary> 
+            
+        </member>
+        <member name="F:AForge.DoublePoint.Y">
+            <summary> 
+            Y coordinate.
+            </summary> 
+            
+        </member>
+        <member name="M:AForge.DoublePoint.#ctor(System.Double,System.Double)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.DoublePoint"/> structure.
+            </summary>
+            
+            <param name="x">X axis coordinate.</param>
+            <param name="y">Y axis coordinate.</param>
+            
+        </member>
+        <member name="M:AForge.DoublePoint.DistanceTo(AForge.DoublePoint)">
+            <summary>
+            Calculate Euclidean distance between two points.
+            </summary>
+            
+            <param name="anotherPoint">Point to calculate distance to.</param>
+            
+            <returns>Returns Euclidean distance between this point and
+            <paramref name="anotherPoint"/> points.</returns>
+            
+        </member>
+        <member name="M:AForge.DoublePoint.op_Addition(AForge.DoublePoint,AForge.DoublePoint)">
+            <summary>
+            Addition operator - adds values of two points.
+            </summary>
+            
+            <param name="p1">First point for addition.</param>
+            <param name="p2">Second point for addition.</param>
+            
+            <returns>Returns new point which coordinates equal to sum of corresponding
+            coordinates of specified points.</returns>
+            
+        </member>
+        <member name="M:AForge.DoublePoint.op_Subtraction(AForge.DoublePoint,AForge.DoublePoint)">
+             <summary>
+             Subtraction operator - subtracts values of two points.
+             </summary>
+             
+             <param name="p1">Point to subtract from.</param>
+             <param name="p2">Point to subtract.</param>
+             
+             <returns>Returns new point which coordinates equal to difference of corresponding
+             coordinates of specified points.</returns>
+            
+        </member>
+        <member name="M:AForge.DoublePoint.op_Addition(AForge.DoublePoint,System.Double)">
+            <summary>
+            Addition operator - adds scalar to the specified point.
+            </summary>
+            
+            <param name="p">Point to increase coordinates of.</param>
+            <param name="valueToAdd">Value to add to coordinates of the specified point.</param>
+            
+            <returns>Returns new point which coordinates equal to coordinates of
+            the specified point increased by specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.DoublePoint.op_Subtraction(AForge.DoublePoint,System.Double)">
+            <summary>
+            Subtraction operator - subtracts scalar from the specified point.
+            </summary>
+            
+            <param name="p">Point to decrease coordinates of.</param>
+            <param name="valueToSubtract">Value to subtract from coordinates of the specified point.</param>
+            
+            <returns>Returns new point which coordinates equal to coordinates of
+            the specified point decreased by specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.DoublePoint.op_Multiply(AForge.DoublePoint,System.Double)">
+             <summary>
+             Multiplication operator - multiplies coordinates of the specified point by scalar value.
+             </summary>
+             
+             <param name="p">Point to multiply coordinates of.</param>
+             <param name="factor">Multiplication factor.</param>
+             
+             <returns>Returns new point which coordinates equal to coordinates of
+             the specified point multiplied by specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.DoublePoint.op_Division(AForge.DoublePoint,System.Double)">
+            <summary>
+            Division operator - divides coordinates of the specified point by scalar value.
+            </summary>
+            
+            <param name="p">Point to divide coordinates of.</param>
+            <param name="factor">Division factor.</param>
+            
+            <returns>Returns new point which coordinates equal to coordinates of
+            the specified point divided by specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.DoublePoint.op_Equality(AForge.DoublePoint,AForge.DoublePoint)">
+             <summary>
+             Equality operator - checks if two points have equal coordinates.
+             </summary>
+             
+             <param name="p1">First point to check.</param>
+             <param name="p2">Second point to check.</param>
+             
+             <returns>Returns <see langword="true"/> if coordinates of specified
+             points are equal.</returns>
+            
+        </member>
+        <member name="M:AForge.DoublePoint.op_Inequality(AForge.DoublePoint,AForge.DoublePoint)">
+             <summary>
+             Inequality operator - checks if two points have different coordinates.
+             </summary>
+             
+             <param name="p1">First point to check.</param>
+             <param name="p2">Second point to check.</param>
+             
+             <returns>Returns <see langword="true"/> if coordinates of specified
+             points are not equal.</returns>
+            
+        </member>
+        <member name="M:AForge.DoublePoint.Equals(System.Object)">
+            <summary>
+            Check if this instance of <see cref="T:AForge.DoublePoint"/> equal to the specified one.
+            </summary>
+            
+            <param name="obj">Another point to check equalty to.</param>
+            
+            <returns>Return <see langword="true"/> if objects are equal.</returns>
+            
+        </member>
+        <member name="M:AForge.DoublePoint.GetHashCode">
+            <summary>
+            Get hash code for this instance.
+            </summary>
+            
+            <returns>Returns the hash code for this instance.</returns>
+            
+        </member>
+        <member name="M:AForge.DoublePoint.op_Explicit(AForge.DoublePoint)~AForge.IntPoint">
+            <summary>
+            Explicit conversion to <see cref="T:AForge.IntPoint"/>.
+            </summary>
+            
+            <param name="p">Double precision point to convert to integer point.</param>
+            
+            <returns>Returns new integer point which coordinates are explicitly converted
+            to integers from coordinates of the specified double precision point by
+            casting double values to integers value.</returns>
+            
+        </member>
+        <member name="M:AForge.DoublePoint.Round">
+            <summary>
+            Rounds the double precision point.
+            </summary>
+            
+            <returns>Returns new integer point, which coordinates equal to whole numbers
+            nearest to the corresponding coordinates of the double precision point.</returns>
+            
+        </member>
+        <member name="M:AForge.DoublePoint.ToString">
+             <summary>
+             Get string representation of the class.
+             </summary>
+             
+             <returns>Returns string, which contains values of the point in readable form.</returns>
+            
+        </member>
+        <member name="M:AForge.DoublePoint.EuclideanNorm">
+            <summary>
+            Calculate Euclidean norm of the vector comprised of the point's 
+            coordinates - distance from (0, 0) in other words.
+            </summary>
+            
+            <returns>Returns point's distance from (0, 0) point.</returns>
+            
+        </member>
+    </members>
+</doc>
