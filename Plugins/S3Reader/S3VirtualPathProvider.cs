@@ -96,7 +96,8 @@ namespace ImageResizer.Plugins.S3Reader
 
         private bool _fastMode = true;
         /// <summary>
-        /// If true, existence of bucket and key is assumed as long as prefix is present. Also, no modified date information is provided, so the cache never gets updated. Requires 1 request instead of 2 to download the image.
+        /// If true, existence of bucket and key is assumed as long as prefix is present.
+        /// Defaults to true. Also, no modified date information is provided, so the cache never gets updated. Requires 1 request instead of 2 to download the image.
         /// </summary>
         public bool FastMode { get { return _fastMode; } set { _fastMode = value; } }
         /// <summary>

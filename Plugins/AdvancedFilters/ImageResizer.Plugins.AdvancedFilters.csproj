@@ -29,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\Dlls\release\ImageResizer.Plugins.AdvancedFilters.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Trial|AnyCPU' ">
     <OutputPath>..\..\dlls\trial\</OutputPath>
@@ -39,16 +40,20 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <DocumentationFile>..\..\dlls\trial\ImageResizer.Plugins.AdvancedFilters.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AForge">
-      <HintPath>C:\Users\Administrator\Downloads\AForge.NET Framework-2.1.5\Release\AForge.dll</HintPath>
+    <Reference Include="AForge, Version=2.1.5.0, Culture=neutral, PublicKeyToken=c1db6ff4eaa06aeb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\AForge\AForge.dll</HintPath>
     </Reference>
-    <Reference Include="AForge.Imaging">
-      <HintPath>C:\Users\Administrator\Downloads\AForge.NET Framework-2.1.5\Release\AForge.Imaging.dll</HintPath>
+    <Reference Include="AForge.Imaging, Version=2.1.5.0, Culture=neutral, PublicKeyToken=ba8ddea9676ca48b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\AForge\AForge.Imaging.dll</HintPath>
     </Reference>
-    <Reference Include="AForge.Imaging.Formats">
-      <HintPath>C:\Users\Administrator\Downloads\AForge.NET Framework-2.1.5\Release\AForge.Imaging.Formats.dll</HintPath>
+    <Reference Include="AForge.Imaging.Formats, Version=2.1.1.0, Culture=neutral, PublicKeyToken=8065ed5a639199a0, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\AForge\AForge.Imaging.Formats.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
