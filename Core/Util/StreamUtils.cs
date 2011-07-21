@@ -7,7 +7,7 @@ namespace ImageResizer.Util {
     public class StreamUtils {
 
         public static MemoryStream CopyStream(Stream s) {
-            MemoryStream ms = new MemoryStream((int)s.Length + 8);
+            MemoryStream ms = new MemoryStream(s.CanSeek ? ((int)s.Length + 8) : 4096);
             CopyTo(s, ms);
             ms.Position = 0;
             return ms;
