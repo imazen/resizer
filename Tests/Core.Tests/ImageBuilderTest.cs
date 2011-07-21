@@ -10,6 +10,7 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Drawing.Imaging;
+using System.Net;
 
 namespace ImageResizer.Tests {
     [TestFixture]
@@ -107,6 +108,29 @@ namespace ImageResizer.Tests {
             Assert.AreEqual<PointF>(new PointF(expectedX,expectedY), result );
         }
 
+        [Test]
+        public void TestWithWebResponseStream() {
+            WebRequest request = WebRequest.Create("http://www.google.com/intl/en_com/images/srpr/logo2w.png");
+            WebResponse response = request.GetResponse();
+
+            using(Stream input = response.GetResponseStream())
+            using(MemoryStream output = new MemoryStream())
+            {
+
+            ResizeSettings rs = new ResizeSettings();
+
+            rs.Height = 100;
+
+            rs.Stretch = StretchMode.Fill;
+
+            rs.Scale = ScaleMode.Both;
+
+            //ImageBuilder.Current.Build(@"C:\Temp\Images\clock.gif", output, rs);
+
+            ImageBuilder.Current.Build(input, output, rs); 
+            }
+
+        }
 
         [Test]
         public void TestSourceBitmapDisposed([Column(true, false)] bool dispose,
