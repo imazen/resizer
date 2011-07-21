@@ -70,7 +70,7 @@ namespace ImageResizer.Plugins.Basic {
         /// <param name="f"></param>
         /// <returns></returns>
         public bool IsValidOutputFormat(ImageFormat f) {
-            return (f == ImageFormat.Gif || f == ImageFormat.Png || f == ImageFormat.Jpeg);
+            return (ImageFormat.Gif.Equals(f) || ImageFormat.Png.Equals(f) || ImageFormat.Jpeg.Equals(f));
         }
 
 
@@ -89,9 +89,9 @@ namespace ImageResizer.Plugins.Basic {
         /// <param name="image"></param>
         /// <param name="s"></param>
         public void Write(Image image, System.IO.Stream s) {
-            if (OutputFormat == ImageFormat.Jpeg) SaveJpeg(image, s, this.Quality);
-            else if (OutputFormat == ImageFormat.Png) SavePng(image, s);
-            else if (OutputFormat == ImageFormat.Gif) SaveGif(image, s);
+            if (ImageFormat.Jpeg.Equals(OutputFormat)) SaveJpeg(image, s, this.Quality);
+            else if (ImageFormat.Png.Equals(OutputFormat)) SavePng(image, s);
+            else if (ImageFormat.Gif.Equals(OutputFormat)) SaveGif(image, s);
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace ImageResizer.Plugins.Basic {
         /// </summary>
         public bool SupportsTransparency {
             get {
-                return (OutputFormat == ImageFormat.Gif || OutputFormat == ImageFormat.Png); //Does Gif transparency work?
+                return ImageFormat.Png.Equals(OutputFormat) || ImageFormat.Gif.Equals(OutputFormat); //Does Gif transparency work?
             }
         }
 
@@ -260,15 +260,17 @@ namespace ImageResizer.Plugins.Basic {
         /// <returns></returns>
         public static string GetContentTypeFromImageFormat(ImageFormat format)
         {
-            if (format == ImageFormat.Png)
+            if (format == null) throw new ArgumentNullException();
+
+            if (ImageFormat.Png.Equals(format))
                 return "image/png"; //Changed from image/x-png to image/png on May 14, 2011, per http://www.w3.org/Graphics/PNG/
-            else if (format == ImageFormat.Jpeg)
+            else if (ImageFormat.Jpeg.Equals(format))
                 return "image/jpeg";
-            else if (format == ImageFormat.Gif)
+            else if (ImageFormat.Gif.Equals(format))
                 return "image/gif";
-            else if (format == ImageFormat.Bmp)
+            else if (ImageFormat.Bmp.Equals(format))
                 return "image/x-ms-bmp";
-            else if (format == ImageFormat.Tiff)
+            else if (ImageFormat.Tiff.Equals(format))
                 return "image/tiff";
             else
             {

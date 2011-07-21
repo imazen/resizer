@@ -5,6 +5,14 @@ Add assembly-based trial version detection (#ifdef in SharedAssemblyInfo.cs)
 Make diagnostics page work with ASP.NET MVC.
 
 
+Add another image resizing pitfall....
+
+ImageFormat.Gif.Equals(f)
+true
+ImageFormat.Gif == f
+false
+
+
 Add rounded corners plugin:
 /// <summary>
         /// Rounds the corner of the image default cornering of the image precentage is 50%
