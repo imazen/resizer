@@ -74,8 +74,8 @@ namespace ImageResizer.Plugins.PrettyGifs {
         /// <returns></returns>
         public IEncoder CreateIfSuitable( ResizeSettings settings, object original) {
             ImageFormat f = GetFormatIfSuitable(settings, original);
-
-            if (f == ImageFormat.Gif || (f == ImageFormat.Png && settings["colors"] != null)) return new PrettyGifs(settings, original);
+            
+            if (ImageFormat.Gif.Equals(f) || (ImageFormat.Png.Equals(f) && settings["colors"] != null)) return new PrettyGifs(settings, original);
             return null;
         }
 
@@ -100,13 +100,13 @@ namespace ImageResizer.Plugins.PrettyGifs {
             bool useMax = (Colors < 0);
             byte colors = (byte)Math.Min(Math.Max(this.Colors, 1), 255);
 
-            if (OutputFormat == ImageFormat.Png) {
+            if (ImageFormat.Png.Equals(OutputFormat)) {
 
                 if (useMax)
                     DefaultEncoder.SavePng(i, s);
                 else
                     SaveIndexed(ImageFormat.Png, i, s, colors, Dither || FourPassDither, FourPassDither, DitherPercent);
-            } else if (OutputFormat == ImageFormat.Gif) {
+            } else if (ImageFormat.Gif.Equals(OutputFormat)) {
 
                 if (useMax)
                     SaveIndexed(ImageFormat.Gif, i, s, 255, Dither || FourPassDither, FourPassDither, DitherPercent);
@@ -143,7 +143,7 @@ namespace ImageResizer.Plugins.PrettyGifs {
             using (Bitmap quantized = quantizer.Quantize(img)) {
                 //If we are encoding in PNG, and writing to a non-seekable stream,
                 //we have to buffer it all in memory or we'll get an exception
-                if (!target.CanSeek && format == ImageFormat.Png) {
+                if (!target.CanSeek && ImageFormat.Png.Equals(format)) {
                     using (MemoryStream ms = new MemoryStream(4096)) {
                         quantized.Save(ms,format); //Recursive call
                         ms.WriteTo(target);
@@ -170,7 +170,7 @@ namespace ImageResizer.Plugins.PrettyGifs {
         /// <param name="f"></param>
         /// <returns></returns>
         public bool IsValidOutputFormat(ImageFormat f) {
-            return (f == ImageFormat.Gif || f == ImageFormat.Png);
+            return (ImageFormat.Gif.Equals(f) || ImageFormat.Png.Equals(f));
         }
 
 
