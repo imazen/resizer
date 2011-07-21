@@ -59,6 +59,7 @@
     <Compile Include="SiteMocks\WebConfigBuilder.cs" />
     <Compile Include="TestPolygonMath.cs" />
     <Compile Include="TestSiteBuilder.cs" />
+    <Compile Include="XmlTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
