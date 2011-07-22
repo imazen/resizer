@@ -27,6 +27,7 @@ namespace ImageResizer.Util {
         /// <summary>
         /// Sets the file extension of the specified path to the specified value, returning the result.
         /// If an extension has multiple parts, it will replace all of them.
+        /// Leading dots will be stripped from 'newExtension' and re-addd as required.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="newExtension"></param>
@@ -108,7 +109,12 @@ namespace ImageResizer.Util {
             return path.Substring(extensionStarts, query - extensionStarts);
 
         }
-
+        /// <summary>
+        /// Ignores the querystring. Grabs the last segment of the filename extension. Returns an empty string if there is no extension, or if the extension contains a space.
+        /// Includes the leading '.'
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static string GetExtension(string path) {
             int query = path.IndexOf('?');
             if (query < 0) query = path.Length;
@@ -264,5 +270,39 @@ namespace ImageResizer.Util {
 
         }
 
+
+        /// <summary>
+        /// Converts aribtrary bytes to a URL-safe version of base64 (no = padding, with - instead of + and _ instead of /)
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string ToBase64U(byte[] data) {
+            return Convert.ToBase64String(data).Replace("=", String.Empty).Replace('+', '-').Replace('/', '_');
+        }
+        /// <summary>
+        /// Converts a URL-safe version of base64 to a byte array.  (no = padding, with - instead of + and _ instead of /)
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static byte[] FromBase64UToButes(string data) {
+            data = data.PadRight(data.Length + ((4 - data.Length % 4) % 4), '='); //if there is 1 leftover octet, add ==, if 2, add =. 3 octects = 4 chars. 
+            return Convert.FromBase64String(data.Replace('-', '+').Replace('_', '/'));
+        }
+        /// <summary>
+        /// Converts aribtrary strings to a URL-safe version of base64 (no = padding, with - instead of + and _ instead of /)
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string ToBase64U(string data) {
+            return ToBase64U(UTF8Encoding.UTF8.GetBytes(data));
+        }
+        /// <summary>
+        /// Converts a URL-safe version of base64 to a string. 64U is (no = padding, with - instead of + and _ instead of /)
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string FromBase64UToString(string data) {
+            return UTF8Encoding.UTF8.GetString(FromBase64UToButes(data));
+        }
     }
 }
