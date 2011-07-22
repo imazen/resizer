@@ -7,6 +7,7 @@ using System.Web.SessionState;
 using ImageResizer;
 using System.Drawing;
 using ImageResizer.Configuration;
+using ImageResizer.Plugins.RemoteReader;
 
 namespace ComplexWebApplication {
     public class Global : System.Web.HttpApplication {
@@ -47,13 +48,15 @@ namespace ComplexWebApplication {
                     }
                 }
             };
+
+            RemoteReaderPlugin.Current.AllowRemoteRequest += delegate(object sender2, RemoteRequestEventArgs args) {
+                //Allow all images from this trusted domain
+                if (args.RemoteUrl.StartsWith("http://images.imageresizing.net", StringComparison.OrdinalIgnoreCase)) args.DenyRequest = false;
+            };
+        }
+
+
         
-        }
-
-
-        protected void Session_Start(object sender, EventArgs e) {
-
-        }
 
         protected void Application_BeginRequest(object sender, EventArgs e) {
 

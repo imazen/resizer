@@ -58,6 +58,7 @@
     <Content Include="js\jquery.min.js" />
     <Content Include="Protected\rose-leaf.jpg" />
     <Content Include="RegressionTests.aspx" />
+    <Content Include="RemoteSiteTest.aspx" />
     <Content Include="ResizeInPlaceTest.aspx" />
     <Content Include="SamplePluginTest.aspx" />
     <Content Include="TestLimits.aspx" />
@@ -89,6 +90,13 @@
     </Compile>
     <Compile Include="CloudFront.aspx.designer.cs">
       <DependentUpon>CloudFront.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="RemoteSiteTest.aspx.cs">
+      <DependentUpon>RemoteSiteTest.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="RemoteSiteTest.aspx.designer.cs">
+      <DependentUpon>RemoteSiteTest.aspx</DependentUpon>
     </Compile>
     <Compile Include="TestAnimatedGif.ashx.cs">
       <DependentUpon>TestAnimatedGif.ashx</DependentUpon>
@@ -218,6 +226,10 @@
     <ProjectReference Include="..\..\Plugins\PsdReader\ImageResizer.Plugins.PsdReader.csproj">
       <Project>{BCF28DA2-AF29-4C09-B37D-059F40FC9B95}</Project>
       <Name>ImageResizer.Plugins.PsdReader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\RemoteReader\ImageResizer.Plugins.RemoteReader.csproj">
+      <Project>{0E6BE1A7-C754-4E33-A8AC-75A8549FC68B}</Project>
+      <Name>ImageResizer.Plugins.RemoteReader</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\RequestLimiting\ImageResizer.Plugins.RequestLimiting.csproj">
       <Project>{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}</Project>
