@@ -1,0 +1,18 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.RemoteReader</id>
+		<version>$version$</version>
+		<authors>Nathanael Jones</authors>
+		<description>Description</description>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="..\dlls\trial\ImageResizer.Plugins.RemoteReader.dll" target="lib" />
+		<file src="..\dlls\trial\ImageResizer.Plugins.RemoteReader.pdb" target="lib" />
+		<file src="..\dlls\trial\ImageResizer.Plugins.RemoteReader.xml" target="lib" />
+		<file src="..\Plugins\RemoteReader\**\*.cs" target="src" />
+	</files>
+</package>
