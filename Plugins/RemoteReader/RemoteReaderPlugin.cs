@@ -68,11 +68,14 @@ public static string HmacKey
 
 
         /// <summary>
-        /// Returns the currently registered RemoteReaderPlugin, or 'null'.
+        /// Returns the currently registered RemoteReaderPlugin, or adds a new RemoteReaderPlugin automatically if one is not registered.
+        /// 
         /// </summary>
         public static RemoteReaderPlugin Current {
             get {
-                return Config.Current.Plugins.Get<RemoteReaderPlugin>();
+                RemoteReaderPlugin p = Config.Current.Plugins.Get<RemoteReaderPlugin>();
+                if (p != null) return p;
+                return (RemoteReaderPlugin)new RemoteReaderPlugin().Install(Config.Current);
             }
         }
 
@@ -88,14 +91,20 @@ public static string HmacKey
             return remotePrefix + ".jpg.ashx" + PathUtils.BuildQueryString(settings);
         }
 
+         public string CreateSignedUrl(string remoteUrl, string settings) {
+             return CreateSignedUrl(remoteUrl, new ResizeSettings(settings));
+         }
         public string SignData(string data) {
 
             string key = c.get("remoteReader.signingKey", String.Empty);
             if (string.IsNullOrEmpty(key)) throw new ImageResizer.ImageProcessingException("You are required to set a passphrase for securing remote URLs. <resizer><remotereader signingKey=\"put a long and randam passphrase here\" /> </resizer>");
 
             HMACSHA256 hmac = new HMACSHA256(UTF8Encoding.UTF8.GetBytes(key));
-            byte[] hash = hmac.ComputeHash(UTF8Encoding.UTF8.GetBytes(data));
-            return PathUtils.ToBase64U(hash);
+            byte[] hash = hmac.ComputeHash(UTF8Encoding.UTF8.GetBytes(data)); 
+            //32-byte hash is a bit overkill. Truncation doesn't weaking the integrity of the algorithm.
+            byte[] shorterHash = new byte[8];
+            Array.Copy(hash,shorterHash,8);
+            return PathUtils.ToBase64U(shorterHash);
         }
 
         public RemoteRequestEventArgs ParseRequest(string virtualPath, NameValueCollection query) {
@@ -115,7 +124,7 @@ public static string HmacKey
                 args.RemoteUrl = PathUtils.FromBase64UToString(data);
                 args.SignedRequest = true;
             } else
-                args.RemoteUrl = "http" + virtualPath.Substring(remotePrefix.Length).TrimStart('/', '\\');
+                args.RemoteUrl = "http://" + virtualPath.Substring(remotePrefix.Length).TrimStart('/', '\\');
   
             if (!Uri.IsWellFormedUriString(args.RemoteUrl, UriKind.Absolute))
                 throw new ImageProcessingException("Invalid request! The specified Uri is invalid: " + args.RemoteUrl);
