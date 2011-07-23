@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace ImageResizerGUI
 {
@@ -36,6 +37,12 @@ namespace ImageResizerGUI
 
         void btn_cancel_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                SetData(int.Parse(parent.tbox_height.Text), int.Parse(parent.tbox_width.Text));
+            }
+            catch (Exception) { }
+
             Hide();
         }
 
@@ -65,11 +72,15 @@ namespace ImageResizerGUI
         {
             try
             {
-                Convert.ToInt32(e.Text);
+                Convert.ToInt32(((TextBox)sender).Text + e.Text);
+                ((TextBox)sender).Background = new SolidColorBrush(Colors.White);
             }
             catch
             {
                 e.Handled = true;
+                ((TextBox)sender).Text = 1.ToString();
+                ((TextBox)sender).Background = new SolidColorBrush(Colors.Pink);
+                ((TextBox)sender).SelectAll();
             }
         }
 
