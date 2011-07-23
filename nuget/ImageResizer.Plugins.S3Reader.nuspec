@@ -1,0 +1,27 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.S3Reader</id>
+		<title>ImageResizer.Plugins.S3Reader - Serve (and resize) images (and documents) from Amazon S3</title>
+		<version>$version$</version>
+		<authors>Nathanael Jones</authors>
+		<owners>Nathanael Jones</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>
+Visit http://imageresizing.net for details, documenation, and free support. 
+E-mail support@imageresizing.net if you encounter any problems with the software. 
+The documentation for this plugin resides at http://imageresizing.net/plugins/s3reader</description>
+		<tags>Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing disk caching gif png octree quanitization animated gifs dithering psd photoshop psdreader</tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		  <dependency id="LitS3"/>
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="..\dlls\trial\ImageResizer.Plugins.S3Reader.dll" target="lib" />
+		<file src="..\dlls\trial\ImageResizer.Plugins.S3Reader.xml" target="lib" />
+	</files>
+</package>
