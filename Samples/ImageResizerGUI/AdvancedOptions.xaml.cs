@@ -44,9 +44,8 @@ namespace ImageResizerGUI
             parent.tbox_height.Text = tbox_maxHeight.Text;
             parent.tbox_width.Text = tbox_maxWidth.Text;
 
-            Properties.Settings.Default.resizeMode = ((ComboBoxItem)cbox_resizeMode.SelectedItem).Content.ToString();
-            Properties.Settings.Default.height = int.Parse(parent.tbox_height.Text);
-            Properties.Settings.Default.width = int.Parse(parent.tbox_width.Text);
+            Properties.Settings.Default.querystring = QueryString;
+            Properties.Settings.Default.Save();
 
             Hide();
         }
@@ -58,7 +57,7 @@ namespace ImageResizerGUI
 
         void cbox_resizeMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-           
+
             tbox_query.Text = QueryString;
         }
 
@@ -89,10 +88,10 @@ namespace ImageResizerGUI
                     case ImageResizerGUI.ResizeMode.Shrink:
                         return "maxwidth=" + tbox_maxWidth.Text + "&maxheight=" + tbox_maxHeight.Text;
 
-                    case ImageResizerGUI.ResizeMode.ShrinkAndCropToRatio:
+                    case ImageResizerGUI.ResizeMode.ShrinkAndPadToRatio:
                         return "width=" + tbox_maxWidth.Text + "&height=" + tbox_maxHeight.Text;
 
-                    case ImageResizerGUI.ResizeMode.ShrinkAndPadToRatio:
+                    case ImageResizerGUI.ResizeMode.ShrinkAndCropToRatio:
                         return "width=" + tbox_maxWidth.Text + "&height=" + tbox_maxHeight.Text + "&crop=auto";
                 }
                 return "error";

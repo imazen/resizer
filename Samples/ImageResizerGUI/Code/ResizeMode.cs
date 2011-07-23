@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace ImageResizerGUI
+﻿namespace ImageResizerGUI
 {
+    /// <summary>
+    /// Enumerate the Resize modes.
+    /// </summary>
     public enum ResizeMode
     {
         Shrink,
