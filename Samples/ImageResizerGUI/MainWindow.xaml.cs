@@ -77,65 +77,6 @@ namespace ImageResizerGUI
             tbox_width.TextChanged += tbox_TextChanged;
         }
 
-        void tbox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            try
-            {
-                int.Parse(tbox_height.Text);
-                int.Parse(tbox_width.Text);
-            }
-            catch (Exception)
-            {
-                e.Handled = true;
-                ((TextBox)sender).Text = 1.ToString();
-                ((TextBox)sender).Background = new SolidColorBrush(Colors.Pink);
-                ((TextBox)sender).SelectAll();
-            }
-            if (AfterSettingChangedOnMainWindows != null)
-                AfterSettingChangedOnMainWindows();
-        }
-
-        void MainWindow_AfterSettingChangedOnMainWindows()
-        {
-            try
-            {
-                int.Parse(tbox_height.Text);
-                int.Parse(tbox_width.Text);
-
-                if (tbox_height.Text != aOptions.tbox_maxHeight.Text || tbox_width.Text != aOptions.tbox_maxWidth.Text)
-                    aOptions.SetData(int.Parse(tbox_height.Text), int.Parse(tbox_width.Text));
-
-                Properties.Settings.Default.querystring = aOptions.QueryString;
-                Properties.Settings.Default.Save();
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        void tbox_savePath_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
-            if (saveMode == SaveMode.ExportResults)
-            {
-                if (Directory.Exists(tbox_savePath.Text))
-                {
-                    tbox_savePath.Background = new SolidColorBrush(Colors.White);
-                    Properties.Settings.Default.saveFolderPath = tbox_savePath.Text;
-                    Properties.Settings.Default.Save();
-                }
-
-                else
-                    tbox_savePath.Background = new SolidColorBrush(Colors.Pink);
-
-            }
-
-            if (saveMode == SaveMode.CreateZipFile)
-            {
-                Properties.Settings.Default.saveZipPath = tbox_savePath.Text;
-                Properties.Settings.Default.Save();
-            }
-        }
 
         /// <summary>
         /// Load initial data from last used settings
@@ -196,6 +137,66 @@ namespace ImageResizerGUI
                 }
 
                 return rs;
+            }
+        }
+
+        void tbox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                int.Parse(tbox_height.Text);
+                int.Parse(tbox_width.Text);
+            }
+            catch (Exception)
+            {
+                e.Handled = true;
+                ((TextBox)sender).Text = 1.ToString();
+                ((TextBox)sender).Background = new SolidColorBrush(Colors.Pink);
+                ((TextBox)sender).SelectAll();
+            }
+            if (AfterSettingChangedOnMainWindows != null)
+                AfterSettingChangedOnMainWindows();
+        }
+
+        void MainWindow_AfterSettingChangedOnMainWindows()
+        {
+            try
+            {
+                int.Parse(tbox_height.Text);
+                int.Parse(tbox_width.Text);
+
+                if (tbox_height.Text != aOptions.tbox_maxHeight.Text || tbox_width.Text != aOptions.tbox_maxWidth.Text)
+                    aOptions.SetData(int.Parse(tbox_height.Text), int.Parse(tbox_width.Text));
+
+                Properties.Settings.Default.querystring = aOptions.QueryString;
+                Properties.Settings.Default.Save();
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        void tbox_savePath_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+            if (saveMode == SaveMode.ExportResults)
+            {
+                if (Directory.Exists(tbox_savePath.Text))
+                {
+                    tbox_savePath.Background = new SolidColorBrush(Colors.White);
+                    Properties.Settings.Default.saveFolderPath = tbox_savePath.Text;
+                    Properties.Settings.Default.Save();
+                }
+
+                else
+                    tbox_savePath.Background = new SolidColorBrush(Colors.Pink);
+
+            }
+
+            if (saveMode == SaveMode.CreateZipFile)
+            {
+                Properties.Settings.Default.saveZipPath = tbox_savePath.Text;
+                Properties.Settings.Default.Save();
             }
         }
 

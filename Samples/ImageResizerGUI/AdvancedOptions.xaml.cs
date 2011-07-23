@@ -27,12 +27,28 @@ namespace ImageResizerGUI
             tbox_maxHeight.PreviewTextInput += tbox_PreviewTextInput;
             tbox_maxWidth.PreviewTextInput += tbox_PreviewTextInput;
 
+            tbox_maxHeight.TextChanged += tbox_TextChanged;
+            tbox_maxWidth.TextChanged += tbox_TextChanged;
+
             cbox_resizeMode.SelectionChanged += cbox_resizeMode_SelectionChanged;
 
             btn_ok.Click += btn_ok_Click;
             btn_cancel.Click += btn_cancel_Click;
 
             Loaded += AdvancedOptions_Loaded;
+
+            cbUpscale.Checked += cbUpscale_Checked;
+            cbUpscale.Unchecked += cbUpscale_Unchecked;
+        }
+
+        void cbUpscale_Unchecked(object sender, RoutedEventArgs e)
+        {
+            tbox_query.Text = QueryString;
+        }
+
+        void cbUpscale_Checked(object sender, RoutedEventArgs e)
+        {
+            tbox_query.Text = QueryString;
         }
 
         void btn_cancel_Click(object sender, RoutedEventArgs e)
@@ -84,6 +100,22 @@ namespace ImageResizerGUI
             }
         }
 
+        void tbox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                int.Parse(((TextBox)sender).Text);
+                ((TextBox)sender).Background = new SolidColorBrush(Colors.White);
+            }
+            catch (Exception)
+            {
+                ((TextBox)sender).Text = 1.ToString();
+                ((TextBox)sender).Background = new SolidColorBrush(Colors.Pink);
+                ((TextBox)sender).SelectAll();
+            }
+
+        }
+
         public void SetData(int height, int width)
         {
             tbox_maxHeight.Text = height.ToString();
@@ -97,16 +129,17 @@ namespace ImageResizerGUI
                 switch ((ResizeMode)((ComboBoxItem)cbox_resizeMode.SelectedItem).Tag)
                 {
                     case ImageResizerGUI.ResizeMode.Shrink:
-                        return "maxwidth=" + tbox_maxWidth.Text + "&maxheight=" + tbox_maxHeight.Text;
+                        return "maxwidth=" + tbox_maxWidth.Text + "&maxheight=" + tbox_maxHeight.Text + ((cbUpscale.IsChecked == true) ? "&scale=both" : "");
 
                     case ImageResizerGUI.ResizeMode.ShrinkAndPadToRatio:
-                        return "width=" + tbox_maxWidth.Text + "&height=" + tbox_maxHeight.Text;
+                        return "width=" + tbox_maxWidth.Text + "&height=" + tbox_maxHeight.Text + ((cbUpscale.IsChecked == true) ? "&scale=both" : "");
 
                     case ImageResizerGUI.ResizeMode.ShrinkAndCropToRatio:
-                        return "width=" + tbox_maxWidth.Text + "&height=" + tbox_maxHeight.Text + "&crop=auto";
+                        return "width=" + tbox_maxWidth.Text + "&height=" + tbox_maxHeight.Text + "&crop=auto" + ((cbUpscale.IsChecked == true) ? "&scale=both" : "");
                 }
                 return "error";
             }
         }
+
     }
 }
