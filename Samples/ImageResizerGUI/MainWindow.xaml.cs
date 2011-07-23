@@ -6,6 +6,7 @@ using System.Windows;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using System.Windows.Media;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins.BatchZipper;
 using ImageResizerGUI.Code;
@@ -17,6 +18,7 @@ using ImageResizer.Plugins.PsdReader;
 using System.Collections.ObjectModel;
 using Control = System.Windows.Forms.Control;
 using DataFormats = System.Windows.DataFormats;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace ImageResizerGUI
 {
@@ -25,6 +27,9 @@ namespace ImageResizerGUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        delegate void AfterSettingChangedOnMainWindowsEventHandler();
+        event AfterSettingChangedOnMainWindowsEventHandler AfterSettingChangedOnMainWindows;
+
         AdvancedOptions aOptions;
 
         private SaveMode saveMode;
@@ -34,6 +39,8 @@ namespace ImageResizerGUI
         private bool cancelled;
 
         private int count;
+
+        private string lastUsedPath;
 
         public MainWindow()
         {
@@ -64,6 +71,46 @@ namespace ImageResizerGUI
             LoadSettings();
 
             aOptions.SetData(int.Parse(tbox_height.Text), int.Parse(tbox_width.Text));
+
+            AfterSettingChangedOnMainWindows += MainWindow_AfterSettingChangedOnMainWindows;
+            tbox_height.TextChanged += tbox_TextChanged;
+            tbox_width.TextChanged += tbox_TextChanged;
+        }
+
+        void tbox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                int.Parse(tbox_height.Text);
+                int.Parse(tbox_width.Text);
+            }
+            catch (Exception)
+            {
+                e.Handled = true;
+                ((TextBox)sender).Text = 1.ToString();
+                ((TextBox)sender).Background = new SolidColorBrush(Colors.Pink);
+                ((TextBox)sender).SelectAll();
+            }
+            if (AfterSettingChangedOnMainWindows != null)
+                AfterSettingChangedOnMainWindows();
+        }
+
+        void MainWindow_AfterSettingChangedOnMainWindows()
+        {
+            try
+            {
+                int.Parse(tbox_height.Text);
+                int.Parse(tbox_width.Text);
+
+                if (tbox_height.Text != aOptions.tbox_maxHeight.Text || tbox_width.Text != aOptions.tbox_maxWidth.Text)
+                    aOptions.SetData(int.Parse(tbox_height.Text), int.Parse(tbox_width.Text));
+
+                Properties.Settings.Default.querystring = aOptions.QueryString;
+                Properties.Settings.Default.Save();
+            }
+            catch (Exception)
+            {
+            }
         }
 
         void tbox_savePath_TextChanged(object sender, TextChangedEventArgs e)
@@ -71,6 +118,15 @@ namespace ImageResizerGUI
 
             if (saveMode == SaveMode.ExportResults)
             {
+                if (Directory.Exists(tbox_savePath.Text))
+                {
+                    tbox_savePath.Background = new SolidColorBrush(Colors.White);
+                    Properties.Settings.Default.saveFolderPath = tbox_savePath.Text;
+                    Properties.Settings.Default.Save();
+                }
+
+                else
+                    tbox_savePath.Background = new SolidColorBrush(Colors.Pink);
 
             }
 
@@ -182,8 +238,6 @@ namespace ImageResizerGUI
 
         void MainWindow_Closing(object sender, CancelEventArgs e)
         {
-            Properties.Settings.Default.Save();
-
             if (!btn_viewResults.IsEnabled)
             {
                 if (System.Windows.MessageBox.Show("Do you want to interrupt the current work?", "Program Close", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
@@ -194,21 +248,23 @@ namespace ImageResizerGUI
                 else
                     e.Cancel = true;
             }
-
+            aOptions.Close();
         }
 
         void tbox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
             try
             {
-                Convert.ToInt32(e.Text);
-                aOptions.SetData(int.Parse(tbox_height.Text), int.Parse(tbox_width.Text));
-                Properties.Settings.Default.querystring = aOptions.QueryString;
-                Properties.Settings.Default.Save();
+                Convert.ToInt32(((TextBox)sender).Text + e.Text);
+
+                ((TextBox)sender).Background = new SolidColorBrush(Colors.White);
             }
             catch
             {
                 e.Handled = true;
+                ((TextBox)sender).Text = 1.ToString();
+                ((TextBox)sender).Background = new SolidColorBrush(Colors.Pink);
+                ((TextBox)sender).SelectAll();
             }
 
         }
@@ -347,6 +403,7 @@ namespace ImageResizerGUI
             {
                 case SaveMode.ModifyExisting:
                 case SaveMode.ExportResults:
+                    lastUsedPath = Properties.Settings.Default.saveFolderPath;
                     ResizeBatch();
                     break;
 
@@ -405,8 +462,12 @@ namespace ImageResizerGUI
 
         void btn_viewResults_Click(object sender, RoutedEventArgs e)
         {
-            string path = (string.IsNullOrEmpty(Properties.Settings.Default.saveFolderPath)) ? @"c:\" : Properties.Settings.Default.saveFolderPath;
-            System.Diagnostics.Process.Start(path);
+            if (!string.IsNullOrEmpty(lastUsedPath) && Directory.Exists(lastUsedPath))
+            {
+                //string path = (string.IsNullOrEmpty(Properties.Settings.Default.saveFolderPath)) ? @"c:\" : Properties.Settings.Default.saveFolderPath;
+                System.Diagnostics.Process.Start(lastUsedPath);
+            }
+
         }
 
         void batchBackgroundWorking_RunWorkerCompletedEvent(object sender, RunWorkerCompletedEventArgs e)
@@ -575,9 +636,9 @@ namespace ImageResizerGUI
 
             if (saveMode == SaveMode.ExportResults)
             {
-                if (!Directory.Exists(Properties.Settings.Default.saveFolderPath))
+                if (!Directory.Exists(Properties.Settings.Default.saveFolderPath) || !(Directory.Exists(tbox_savePath.Text)))
                 {
-                    System.Windows.MessageBox.Show("The selected folder does not exist. Select a correct folder.");
+                    System.Windows.MessageBox.Show("The selected folder does not exists. Select a correct folder.");
                     return false;
                 }
             }
@@ -599,6 +660,7 @@ namespace ImageResizerGUI
             }
             return true;
         }
+
 
         string AddFilesToBatch(IEnumerable<string> files)
         {
