@@ -113,7 +113,7 @@ namespace ImageResizerGUI
                 ((TextBox)sender).Background = new SolidColorBrush(Colors.Pink);
                 ((TextBox)sender).SelectAll();
             }
-
+            tbox_query.Text = QueryString;
         }
 
         public void SetData(int height, int width)

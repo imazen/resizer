@@ -75,7 +75,10 @@ namespace ImageResizerGUI
             AfterSettingChangedOnMainWindows += MainWindow_AfterSettingChangedOnMainWindows;
             tbox_height.TextChanged += tbox_TextChanged;
             tbox_width.TextChanged += tbox_TextChanged;
-        }
+
+            if(tbox_savePath.Text == "")
+                tbox_savePath.Background=new SolidColorBrush(Colors.Pink);
+            }
 
 
         /// <summary>
@@ -103,6 +106,12 @@ namespace ImageResizerGUI
                 aOptions.cbox_resizeMode.SelectedIndex = 2;
             else
                 aOptions.cbox_resizeMode.SelectedIndex = 1;
+
+            if (Properties.Settings.Default.querystring.Contains("scale=both"))
+                aOptions.cbUpscale.IsChecked = true;
+
+            if (!string.IsNullOrEmpty(Properties.Settings.Default.saveFolderPath))
+                tbox_savePath.Text = Properties.Settings.Default.saveFolderPath;
         }
 
         /// <summary>
@@ -195,8 +204,16 @@ namespace ImageResizerGUI
 
             if (saveMode == SaveMode.CreateZipFile)
             {
-                Properties.Settings.Default.saveZipPath = tbox_savePath.Text;
-                Properties.Settings.Default.Save();
+                BatchInfo saveFile = new BatchInfo(tbox_savePath.Text);
+
+                if (Directory.Exists(saveFile.Folder) && tbox_savePath.Text.ToLower().EndsWith(".zip"))
+                {
+                    tbox_savePath.Background = new SolidColorBrush(Colors.White);
+                    Properties.Settings.Default.saveZipPath = tbox_savePath.Text;
+                    Properties.Settings.Default.Save();
+                }
+                else
+                    tbox_savePath.Background = new SolidColorBrush(Colors.Pink);
             }
         }
 
@@ -478,7 +495,7 @@ namespace ImageResizerGUI
             btn_back.IsEnabled = true;
             btn_viewResults.IsEnabled = true;
 
-            if (!string.IsNullOrEmpty(Properties.Settings.Default.saveFolderPath) && Directory.Exists(Properties.Settings.Default.saveFolderPath))
+            if (!string.IsNullOrEmpty(Properties.Settings.Default.saveFolderPath) && Directory.Exists(Properties.Settings.Default.saveFolderPath) && saveMode!= SaveMode.ModifyExisting)
                 System.Diagnostics.Process.Start(Properties.Settings.Default.saveFolderPath);
         }
 
@@ -637,15 +654,24 @@ namespace ImageResizerGUI
 
             if (saveMode == SaveMode.ExportResults)
             {
-                if (!Directory.Exists(Properties.Settings.Default.saveFolderPath) || !(Directory.Exists(tbox_savePath.Text)))
+                if (!Directory.Exists(Properties.Settings.Default.saveFolderPath) || !Directory.Exists(tbox_savePath.Text))
                 {
-                    System.Windows.MessageBox.Show("The selected folder does not exists. Select a correct folder.");
+                    System.Windows.MessageBox.Show("The selected folder does not exist. Select a correct folder.");
                     return false;
                 }
             }
 
             if (saveMode == SaveMode.CreateZipFile)
             {
+                var saveFile = new BatchInfo(tbox_savePath.Text);
+
+                if (!(Directory.Exists(saveFile.Folder) && tbox_savePath.Text.ToLower().EndsWith(".zip")))
+                {
+                    System.Windows.MessageBox.Show("You must select a valid destination ZIP file.");
+                    return false;
+                }
+
+
                 if (string.IsNullOrEmpty(Properties.Settings.Default.saveZipPath))
                 {
                     System.Windows.MessageBox.Show("You must select a destination ZIP file.");
