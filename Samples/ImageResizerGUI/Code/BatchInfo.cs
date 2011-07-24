@@ -28,7 +28,10 @@ namespace ImageResizerGUI.Code
 
             var arr = fullPath.Split('\\');
             fileName = arr[arr.Length - 1];
-            folder = fullPath.Replace(FileName, "");
+            if (fileName != "")
+                folder = fullPath.Replace(FileName, "");
+            else
+                folder = fullPath;
             Status = 0;
             statusText = "Pending";
         }
