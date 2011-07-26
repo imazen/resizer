@@ -19,6 +19,8 @@ using System.Collections.ObjectModel;
 using Control = System.Windows.Forms.Control;
 using DataFormats = System.Windows.DataFormats;
 using TextBox = System.Windows.Controls.TextBox;
+using System.Windows.Threading;
+using System.Security.Permissions;
 
 namespace ImageResizerGUI
 {
@@ -35,6 +37,8 @@ namespace ImageResizerGUI
         private SaveMode saveMode;
 
         private BatchBackgroundWorking batchBackgroundWorking;
+
+        private ZipBackgroundWorking zipBackgroundWorking;
 
         private bool cancelled;
 
@@ -76,9 +80,9 @@ namespace ImageResizerGUI
             tbox_height.TextChanged += tbox_TextChanged;
             tbox_width.TextChanged += tbox_TextChanged;
 
-            if(tbox_savePath.Text == "")
-                tbox_savePath.Background=new SolidColorBrush(Colors.Pink);
-            }
+            if (tbox_savePath.Text == "")
+                tbox_savePath.Background = new SolidColorBrush(Colors.Pink);
+        }
 
 
         /// <summary>
@@ -262,6 +266,9 @@ namespace ImageResizerGUI
                 {
                     if (batchBackgroundWorking != null)
                         batchBackgroundWorking.StopWork();
+
+                    if (zipBackgroundWorking != null)
+                        zipBackgroundWorking.StopWork();
                 }
                 else
                     e.Cancel = true;
@@ -488,90 +495,9 @@ namespace ImageResizerGUI
 
         }
 
-        void batchBackgroundWorking_RunWorkerCompletedEvent(object sender, RunWorkerCompletedEventArgs e)
-        {
-            btnCancel.Visibility =
-            pBar1.Visibility = Visibility.Hidden;
-            btn_back.IsEnabled = true;
-            btn_viewResults.IsEnabled = true;
-
-            if (!string.IsNullOrEmpty(Properties.Settings.Default.saveFolderPath) && Directory.Exists(Properties.Settings.Default.saveFolderPath) && saveMode!= SaveMode.ModifyExisting)
-                System.Diagnostics.Process.Start(Properties.Settings.Default.saveFolderPath);
-        }
-
-        void batchBackgroundWorking_ProgressChangedEvent(object sender, ProgressChangedEventArgs e)
-        {
-            pBar1.Visibility = Visibility.Visible;
-            pBar1.Value = e.ProgressPercentage;
-
-            var itemDone = ((BatchInfo)e.UserState);
-
-            var query = from object item in dataGridResults.Items
-                        where ((BatchInfo)item).FullPath == itemDone.FullPath
-                        select item;
-
-            ((BatchInfo)query.First()).StatusText = itemDone.StatusText;
-            ((BatchInfo)query.First()).Status = itemDone.Status;
-        }
-
-        void batchBackgroundWorking_DoWorkEvent(object sender, DoWorkEventArgs e)
-        {
-            // Prepare all controls for image processing...
-            btnCancel.Dispatcher.BeginInvoke(new Action(() => btnCancel.Visibility = Visibility.Visible));
-            pBar1.Dispatcher.BeginInvoke(new Action(() => pBar1.Visibility = Visibility.Visible));
-            btn_back.Dispatcher.BeginInvoke(new Action(() => btn_back.IsEnabled = false));
-            btn_viewResults.Dispatcher.BeginInvoke(new Action(() => btn_viewResults.IsEnabled = false));
-        }
-
-        void s_ItemEvent(ItemEventArgs e)
-        {
-            count++;
-
-            pBar1.Visibility = Visibility.Visible;
-            pBar1.Value = (count * 100) / listView.Items.Count;
-
-            var itemDone = e.Result;
-
-            var query = from object item in dataGridResults.Items
-                        where ((BatchInfo)item).FullPath == itemDone.Item.PhysicalPath
-                        select item;
-
-            if (itemDone.Successful)
-            {
-                ((BatchInfo)query.First()).Status = 100;
-                ((BatchInfo)query.First()).StatusText = "Done";
-
-            }
-            else
-            {
-                ((BatchInfo)query.First()).Status = 50;
-                ((BatchInfo)query.First()).StatusText = "Error: " + itemDone.ItemError.Message;
-
-            }
-            if (cancelled)
-            {
-                e.Cancel = true;
-                tbStatus.Dispatcher.BeginInvoke(new Action(() => tbStatus.Text = "Status: Cancelled by user"));
-                return;
-            }
-        }
-
-        void s_JobEvent(JobEventArgs e)
-        {
-            btnCancel.Visibility = pBar1.Visibility = Visibility.Hidden;
-            btn_back.IsEnabled = true;
-            btn_viewResults.IsEnabled = true;
-
-            if (!string.IsNullOrEmpty(Properties.Settings.Default.saveFolderPath) && Directory.Exists(Properties.Settings.Default.saveFolderPath))
-                System.Diagnostics.Process.Start(Properties.Settings.Default.saveFolderPath);
-        }
-
-
 
         void ResizeBatch()
         {
-
-
             var resultItems = new ObservableCollection<BatchInfo>();
             var items = new List<BatchInfo>();
 
@@ -597,31 +523,27 @@ namespace ImageResizerGUI
 
         void ResizeBatchAndZip()
         {
-            cancelled = false;
             var resultItems = new ObservableCollection<BatchInfo>();
+            var items = new List<BatchInfo>();
+
             foreach (var item in listView.Items)
             {
+                ((BatchInfo)item).StatusText = "Waiting";
+                ((BatchInfo)item).Status = 0;
                 resultItems.Add(((BatchInfo)item));
+                items.Add(((BatchInfo)item));
             }
+
             dataGridResults.ItemsSource = resultItems;
 
-            Guid job = Guid.NewGuid();
+            zipBackgroundWorking = new ZipBackgroundWorking(aOptions.QueryString, items, saveMode);
 
-            BatchResizeSettings s = new BatchResizeSettings(Properties.Settings.Default.saveZipPath, job, new List<BatchResizeItem>());
+            zipBackgroundWorking.DoWorkEvent += zipBackgroundWorking_DoWorkEvent;
+            zipBackgroundWorking.ProgressChangedEvent += zipBackgroundWorking_ProgressChangedEvent;
+            zipBackgroundWorking.RunWorkerCompletedEvent += zipBackgroundWorking_RunWorkerCompletedEvent;
 
-            foreach (var item in listView.Items)
-                s.files.Add(new BatchResizeItem(((BatchInfo)item).FullPath, null, aOptions.QueryString));
+            zipBackgroundWorking.InitWork();
 
-            btnCancel.Visibility = pBar1.Visibility = Visibility.Visible;
-            btn_back.IsEnabled = false;
-            btn_viewResults.IsEnabled = false;
-
-            s.ItemEvent += s_ItemEvent;
-            s.JobEvent += s_JobEvent;
-
-            count = 0;
-
-            new BatchResizeWorker(s).Work();
         }
 
 
