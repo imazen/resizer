@@ -81,6 +81,7 @@
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Code\BatchBackgroundWorking.cs" />
+    <Compile Include="Code\ZipBackgroundWorking.cs" />
     <Compile Include="MainWindow_BackgroundWorkers.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Code\ResizeMode.cs" />
