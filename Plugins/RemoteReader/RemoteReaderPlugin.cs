@@ -8,23 +8,22 @@ using ImageResizer.Util;
 using System.Security.Cryptography;
 using ImageResizer.Configuration.Issues;
 using System.IO;
+using ImageResizer.Resizing;
 
 namespace ImageResizer.Plugins.RemoteReader {
 
-    public class RemoteReaderPlugin:IPlugin, IVirtualImageProvider, IIssueProvider {
+    public class RemoteReaderPlugin : BuilderExtension, IPlugin, IVirtualImageProvider, IIssueProvider {
 
         private static string base64UrlKey = "urlb64";
 
-        public static string Base64UrlKey
-        {
-          get { return RemoteReaderPlugin.base64UrlKey; }
+        public static string Base64UrlKey {
+            get { return RemoteReaderPlugin.base64UrlKey; }
         }
         private static string hmacKey = "hmac";
 
-public static string HmacKey
-{
-  get { return RemoteReaderPlugin.hmacKey; }
-}
+        public static string HmacKey {
+            get { return RemoteReaderPlugin.hmacKey; }
+        }
 
         protected string remotePrefix = "~/remote";
         Config c;
@@ -48,11 +47,31 @@ public static string HmacKey
             return true;
         }
 
+        /// <summary>
+        /// Allows .Build and .LoadImage to resize remote URLs
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="settings"></param>
+        protected override void PreLoadImage(ref object source,ref string path, ref bool disposeSource, ref  ResizeSettings settings) {
+            //Turn remote URLs into URI instances
+            if (source is string && (((string)source).StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                                    ((string)source).StartsWith("https://", StringComparison.OrdinalIgnoreCase))){
+                if (Uri.IsWellFormedUriString((string)source, UriKind.Absolute))
+                    source = new Uri((string)source);
+
+            }
+            //Turn URI instances into streams
+            if (source is Uri) {
+                path = ((Uri)source).ToString();
+                source = GetUriStream((Uri)source);
+            }
+        }
+
 
         void Pipeline_RewriteDefaults(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
             //Set the XXX of /remote.XXX to the real extension used by the remote file.
             //Allows the output extension and mime-type default to be determined correctly
-            if (IsRemotePath(e.VirtualPath) && 
+            if (IsRemotePath(e.VirtualPath) &&
                     !string.IsNullOrEmpty(e.QueryString[Base64UrlKey])) {
                 string ext = PathUtils.GetExtension(PathUtils.FromBase64UToString(e.QueryString[Base64UrlKey]));
                 e.VirtualPath = PathUtils.SetExtension(e.VirtualPath, ext);
@@ -91,19 +110,19 @@ public static string HmacKey
             return remotePrefix + ".jpg.ashx" + PathUtils.BuildQueryString(settings);
         }
 
-         public string CreateSignedUrl(string remoteUrl, string settings) {
-             return CreateSignedUrl(remoteUrl, new ResizeSettings(settings));
-         }
+        public string CreateSignedUrl(string remoteUrl, string settings) {
+            return CreateSignedUrl(remoteUrl, new ResizeSettings(settings));
+        }
         public string SignData(string data) {
 
             string key = c.get("remoteReader.signingKey", String.Empty);
             if (string.IsNullOrEmpty(key)) throw new ImageResizer.ImageProcessingException("You are required to set a passphrase for securing remote URLs. <resizer><remotereader signingKey=\"put a long and randam passphrase here\" /> </resizer>");
 
             HMACSHA256 hmac = new HMACSHA256(UTF8Encoding.UTF8.GetBytes(key));
-            byte[] hash = hmac.ComputeHash(UTF8Encoding.UTF8.GetBytes(data)); 
+            byte[] hash = hmac.ComputeHash(UTF8Encoding.UTF8.GetBytes(data));
             //32-byte hash is a bit overkill. Truncation doesn't weaking the integrity of the algorithm.
             byte[] shorterHash = new byte[8];
-            Array.Copy(hash,shorterHash,8);
+            Array.Copy(hash, shorterHash, 8);
             return PathUtils.ToBase64U(shorterHash);
         }
 
@@ -119,13 +138,13 @@ public static string HmacKey
                 string hmac = query[HmacKey];
                 query.Remove(Base64UrlKey);
                 query.Remove(HmacKey);
-                if (!SignData(data).Equals(hmac)) 
+                if (!SignData(data).Equals(hmac))
                     throw new ImageProcessingException("Invalid request! This request was not properly signed, or has been tampered with since transmission.");
                 args.RemoteUrl = PathUtils.FromBase64UToString(data);
                 args.SignedRequest = true;
             } else
                 args.RemoteUrl = "http://" + virtualPath.Substring(remotePrefix.Length).TrimStart('/', '\\');
-  
+
             if (!Uri.IsWellFormedUriString(args.RemoteUrl, UriKind.Absolute))
                 throw new ImageProcessingException("Invalid request! The specified Uri is invalid: " + args.RemoteUrl);
             return args;
@@ -153,7 +172,7 @@ public static string HmacKey
 
             if (request.DenyRequest) throw new ImageProcessingException(403, "The specified remote URL is not permitted.");
 
-            return new RemoteSiteFile(virtualPath,request,this);
+            return new RemoteSiteFile(virtualPath, request, this);
         }
 
         public IEnumerable<IIssue> GetIssues() {
@@ -163,6 +182,23 @@ public static string HmacKey
                 issues.Add(new Issue("You are required to set a passphrase for securing remote URLs. Example: <resizer><remotereader signingKey=\"put a long and randam passphrase here\" /> </resizer>"));
             return issues;
 
+        }
+
+
+        public Stream GetUriStream(Uri uri) {
+
+            HttpWebResponse response = null;
+            try {
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+                request.Timeout = 15000; //Default to 15 seconds. Browser timeout is usually 30.
+
+                //This is IDisposable, but only disposes the stream we are returning. So we can't dispose it, and don't need to
+                response = request.GetResponse() as HttpWebResponse;
+                return response.GetResponseStream();
+            } catch {
+                if (response != null) response.Close();
+                throw;
+            }
         }
     }
 
@@ -183,19 +219,7 @@ public static string HmacKey
         }
 
         public System.IO.Stream Open() {
-            HttpWebResponse response = null;
-            try {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(new Uri(this.request.RemoteUrl));
-                request.Timeout = 15000; //Default to 15 seconds. Browser timeout is usually 30.
-
-                //This is IDisposable, but only disposes the stream we are returning. So we can't dispose it, and don't need to
-                response = request.GetResponse() as HttpWebResponse;
-                return response.GetResponseStream();
-            } catch {
-                if (response != null) response.Close();
-                throw;
-            }
-
+            return parent.GetUriStream(new Uri(this.request.RemoteUrl));
         }
     }
 }
