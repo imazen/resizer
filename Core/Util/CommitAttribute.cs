@@ -18,4 +18,20 @@ namespace ImageResizer.Util {
         
     }
 
+
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public class BuildTypeAttribute : Attribute {
+
+        string type;
+        public BuildTypeAttribute() { type = string.Empty; }
+        public BuildTypeAttribute(string txt) { type = txt; }
+
+        public string Value { get { return type; } }
+        public override string ToString() {
+            return type;
+        }
+
+    }
+
+
 }

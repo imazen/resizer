@@ -8,7 +8,12 @@ using ImageResizer.Util;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
+#if TRIAL
+[assebly: BuildType("trial")]
+[assembly: AssemblyProduct("Image Resizer Plugin - Trial Version")]
+#else
 [assembly: AssemblyProduct("Image Resizer")]
+#endif
 
 [assembly: AssemblyCompany("Nathanael Jones")]
 [assembly: AssemblyCopyright("Copyright © 2011 Nathanael Jones")]
@@ -28,6 +33,8 @@ using ImageResizer.Util;
 [assembly: AssemblyInformationalVersion("3-alpha-11")]
 
 [assembly: Commit("git-commit-guid-here")]
+
+
 
 // These commented out settings are for the build script to access
 // [assembly: PackageName("Resizer")]
