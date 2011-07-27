@@ -133,8 +133,6 @@ namespace ImageResizer.Plugins.PrettyGifs {
 
 
             //http://codebetter.com/blogs/brendan.tompkins/archive/2007/06/14/gif-image-color-quantizer-now-with-safe-goodness.aspx
-            //TODO: add Octree and Grayscale quantizer
-            //TODO: Preserve transparency
 
             OctreeQuantizer quantizer = new OctreeQuantizer(colors, GetBitsNeededForColorDepth(colors));
             quantizer.Dither = dither;
