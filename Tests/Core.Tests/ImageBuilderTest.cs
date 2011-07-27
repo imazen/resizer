@@ -68,6 +68,22 @@ namespace ImageResizer.Tests {
             }
         }
 
+        [Test]
+        [Row(50, 50, "format=jpg&quality=100")]
+        [Row(1, 1, "format=jpg&quality=100")]
+        [Row(50, 50, "format=jpg&quality=-300")]
+        [Row(50, 50, "format=png")]
+        [Row(50, 50, "format=gif")]
+        public void LoadImageBytes(int width, int height, string encodeQuery) {
+            using (MemoryStream ms = new MemoryStream(8000)) {
+                c.CurrentImageBuilder.Build(GetBitmap(width, height), ms, new ResizeSettings(encodeQuery));
+                //Now we test the loading
+                using (Bitmap b = c.CurrentImageBuilder.LoadImage(ms.ToArray(), new ResizeSettings())) {
+                    Assert.AreEqual<Size>(new Size(width, height), b.Size);
+                }
+            }
+        }
+
 
 
         [Test]
