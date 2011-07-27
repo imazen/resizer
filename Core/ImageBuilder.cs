@@ -98,14 +98,14 @@ namespace ImageResizer
         public virtual Bitmap LoadImage(object source, ResizeSettings settings) {
 
             bool disposeStream = !(source is Stream);
+            string path = null;
 
             //Fire PreLoadImage(source,settings)
-            this.PreLoadImage(ref source, settings);
+            this.PreLoadImage(ref source, ref path, ref disposeStream,  ref settings);
 
             System.Drawing.Bitmap b = null;
-
             string loadFailureReasons = "File may be corrupted, empty, or may contain a PNG image with a single dimension greater than 65,535 pixels.";
-            string path = null;
+            
  
             //App-relative path - converted to virtual path
             if (source is string) {
@@ -148,6 +148,8 @@ namespace ImageResizer
             } else if (source is string) {
                 path = (string)source;
                 s = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            } else if (source is byte[]){
+                s = new MemoryStream((byte[])source, false);
             } else {
                 //For HttpPostedFile and HttpPostedFileBase - we must use reflection to support .NET 3.5 without losing 2.0 compat.
                 PropertyInfo pname = source.GetType().GetProperty("FileName",typeof(string));

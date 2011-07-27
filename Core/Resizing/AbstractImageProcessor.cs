@@ -56,8 +56,8 @@ namespace ImageResizer.Resizing {
         /// </summary>
         /// <param name="source"></param>
         /// <param name="settings"></param>
-        protected virtual void PreLoadImage(ref object source, ResizeSettings settings) {
-            if (exts != null) foreach (AbstractImageProcessor p in exts) p.PreLoadImage(ref source, settings);
+        protected virtual void PreLoadImage(ref object source, ref string path, ref bool disposeSource, ref ResizeSettings settings) {
+            if (exts != null) foreach (AbstractImageProcessor p in exts) p.PreLoadImage(ref source, ref path, ref disposeSource, ref settings);
         }
 
         /// <summary>
