@@ -11,7 +11,8 @@
 		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<summary>Lightweight HttpModule (and/or) API for server-side image processing.</summary>
-		<description>Finally a Nuget package! Resize, crop, rotate, and modify images with a simple REST API. Or, do the same with a single line of managed code. Visit http://imageresizing.net for details, documenation, and support.</description>
+		<description>Lightweight HttpModule and API for server-side image resizing and processing. Works with .NET 2, 3 and 4. Use ether the URL API (image.jpg?width=100&height=100) or the Managed API (ImageBuilder.Current.Build(source,dest,settings)).
+		Supports resizing, cropping, rotating, flipping, watermarking, converting images via the REST API. |||| Go to http://imageresizing.net for details, documenation, and support.</description>
 		<tags>Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing </tags>
 	</metadata>
   	<files>
