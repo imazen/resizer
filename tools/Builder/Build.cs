@@ -256,6 +256,9 @@ namespace ImageResizer.ReleaseBuilder {
             d.Run("/Clean Debug");
             d.Run("/Clean Release");
             d.Run("/Clean Trial");
+            System.IO.Directory.Delete(Path.Combine(f.parentPath, "dlls\\trial"), true);
+            System.IO.Directory.Delete(Path.Combine(f.parentPath, "dlls\\release"), true);
+            System.IO.Directory.Delete(Path.Combine(f.parentPath, "dlls\\debug"), true);
         }
 
         public void BuildAll() {
@@ -292,7 +295,7 @@ namespace ImageResizer.ReleaseBuilder {
 
 
         public string[] standardExclusions = new string[]{
-                "/.git","^/Releases","^/Legacy","^/Tests/Builder","/thumbs.db$","/.DS_Store$",".suo$",".user$"
+                "/.git","^/Releases","^/Legacy","^/Tools/Builder","/thumbs.db$","/.DS_Store$",".suo$",".user$"
             };
 
         public void PrepareForPackaging() {
@@ -303,6 +306,7 @@ namespace ImageResizer.ReleaseBuilder {
             q.exclusions.Add(new Pattern("^/Tests/Libs/LibDevCassini"));
             q.exclusions.Add(new Pattern("^/Samples/SqlReaderSampleVarChar"));
             q.exclusions.Add(new Pattern("^/Contrib/*/(bin|obj|imagecache|uploads|results)/*"));
+            q.exclusions.Add(new Pattern(".config.transform$"));
         }
         public void PackMin(PackageDescriptor desc) {
             // 'min' - /dlls/release/ImageResizer.* - /
@@ -325,8 +329,13 @@ namespace ImageResizer.ReleaseBuilder {
                 p.Add(q.files("^/contrib/azure"));
                 p.Add(q.files("^/dlls/(release|trial)"));
                 p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/"); //Make a copy in the root
-                p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb)$"), "/Samples/BasicIISSite/bin/"); 
+                
                 p.Add(q.files("^/[^/]+.txt$"));
+                p.Add(q.files("^/Web.config$"));
+
+                //Make a empty sample app for IIS
+                p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb)$"), "/Samples/BasicIISSite/bin/"); 
+                p.Add(q.files("^/Web.config$"),"/Samples/BasicIISSite/");
             }
         }
         public void PackStandard(PackageDescriptor desc) {
