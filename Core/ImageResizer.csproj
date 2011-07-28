@@ -176,7 +176,6 @@
     <Content Include="exceptions.txt" />
     <Content Include="gdi-bugs.txt" />
     <Content Include="license.txt" />
-    <Content Include="plugins.txt" />
     <Content Include="plugin-notes.txt" />
     <Content Include="todo.txt" />
     <Content Include="totest.txt" />
