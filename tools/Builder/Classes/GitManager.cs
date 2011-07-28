@@ -38,6 +38,11 @@ namespace ImageResizer.ReleaseBuilder.Classes {
             return exec("log -1 --pretty=format:%h");
         }
 
+        public string Tag(string name) {
+            return exec("tag " + name);
+        }
+
+
         public string exec(string command) {
             var psi = new ProcessStartInfo(gitExe);
             psi.Arguments = ' ' + command;
