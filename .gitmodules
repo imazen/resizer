@@ -1,0 +1,3 @@
+[submodule "tools/docu"]
+	path = tools/docu
+	url = https://github.com/jagregory/docu.git
