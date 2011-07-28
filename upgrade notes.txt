@@ -1,4 +1,0 @@
-Please visit http://imageresizing.net/download for upgrade notes and the changelog.
-
-Remember to clear your imagecache directory if you are using the DiskCache plugin.
-
