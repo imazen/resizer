@@ -1,6 +1,6 @@
 1. In Visual Studio, right click your project and choose "Add reference". 
 
-Browse to the extracted folder, and choose `dlls\release\ImageResizer.dll`. 
+Browse to the extracted folder, and choose `ImageResizer.dll`. 
 
 - Or just copy it into the 'bin' folder. Whichever you prefer.
 

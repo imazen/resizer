@@ -1,9 +1,7 @@
 ﻿Refactor Watermark plugin to use named configurations.
 Add debug=true querystring command to Diagnostics plugin.
 Add better usage examples.
-Add assembly-based trial version detection (#ifdef in SharedAssemblyInfo.cs)
-Make diagnostics page work with ASP.NET MVC.
-
+Diagnostics page should list trial versions of files
 
 Add another image resizing pitfall....
 
@@ -11,6 +9,9 @@ ImageFormat.Gif.Equals(f)
 true
 ImageFormat.Gif == f
 false
+
+PrettyGifs - Add fastMode option that uses the original image palette to speed up processing times. (feature not yet added)
+PsdComposer - Re-compose PSD files on-the-fly. Rewrite text layers, hide/show layers. Minimal support for layer effects, only glow and solid fill at the moment.
 
 
 Add rounded corners plugin:

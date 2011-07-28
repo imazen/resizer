@@ -1,4 +1,4 @@
-﻿Most errors are recoverable, and are simply logged as issues. (Visit /resizer.debug to see the log). Duplicate issues are not logged.
+﻿Most errors are recoverable, and are simply logged as issues. (Visit /resizer.debug.ashx to see the log). Duplicate issues are not logged.
 
 Some errors are not recoverable:
 
