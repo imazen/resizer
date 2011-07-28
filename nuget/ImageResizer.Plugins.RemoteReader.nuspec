@@ -18,7 +18,7 @@ There are 3 layers of security to prevent abuse.
 2. A whitelist approach is taken to sites. By default, no sites are allowed. You must handle the RemoteReaderPlugin.Current.AllowRemoteRequest event to permit sites (or portions of sites) to be relayed.
 4. The  plugin requires that all remote images be decoded and re-encoded. Files are never returned as-is. This ensures that the files are valid images, and prevents XSS attacks.
 
-Please note, you must configure the <remotereader signingKey="to a long and secure pass phrase" /> and set <remotereader allowAllSignedRequests="true" /> if all code calling RemoteReaderPlugin.Current.CreateSignedUrl(remoteUrl,settings) is trusted.
+Please note, you must configure the &lt;remotereader signingKey="to a long and secure pass phrase" /> and set &lt;remotereader allowAllSignedRequests="true" /> if all code calling RemoteReaderPlugin.Current.CreateSignedUrl(remoteUrl,settings) is trusted.
 Visit http://imageresizing.net for details, documenation, and free support. 
 E-mail support@imageresizing.net if you encounter any problems with the software. 
 The documentation for this plugin resides at http://imageresizing.net/plugins/remotereader</description>
