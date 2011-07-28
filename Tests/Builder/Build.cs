@@ -101,26 +101,29 @@ namespace ImageResizer.ReleaseBuilder {
             IList<NPackageDescriptor> npackages =NPackageDescriptor.GetPackagesIn(Path.Combine(f.parentPath,"nuget"));
 
             bool isMakingNugetPackage = false;
-           
-            say("For each nuget package, specify all operations to perform, then press enter. ");
-            say("(c (create and overwrite), u (upload to nuget.org)");
-            foreach(NPackageDescriptor desc in npackages){
-                desc.Version = nugetVer;
-                desc.OutputDirectory = Path.Combine(Path.Combine(f.parentPath, "Releases", "nuget-packages"));
-                string opts = "";
 
-                ConsoleColor original = Console.ForegroundColor;
-                Console.ForegroundColor = ConsoleColor.Red;
-                if (desc.PackageExists) say(Path.GetFileName(desc.PackagePath) + " exists");
-                if (desc.SymbolPackageExists) say(Path.GetFileName(desc.SymbolPackagePath) + " exists");
-                Console.ForegroundColor = original;
+            if (ask("Create or upload any NuGet packages?")) {
 
-                Console.Write(desc.BaseName + " (" + opts + "):");
-                opts = Console.ReadLine().Trim();
-                
-                desc.Options = opts;
-                if (desc.Build) isMakingNugetPackage = true;
-                    
+                say("For each nuget package, specify all operations to perform, then press enter. ");
+                say("(c (create and overwrite), u (upload to nuget.org)");
+                foreach (NPackageDescriptor desc in npackages) {
+                    desc.Version = nugetVer;
+                    desc.OutputDirectory = Path.Combine(Path.Combine(f.parentPath, "Releases", "nuget-packages"));
+                    string opts = "";
+
+                    ConsoleColor original = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    if (desc.PackageExists) say(Path.GetFileName(desc.PackagePath) + " exists");
+                    if (desc.SymbolPackageExists) say(Path.GetFileName(desc.SymbolPackagePath) + " exists");
+                    Console.ForegroundColor = original;
+
+                    Console.Write(desc.BaseName + " (" + opts + "):");
+                    opts = Console.ReadLine().Trim();
+
+                    desc.Options = opts;
+                    if (desc.Build) isMakingNugetPackage = true;
+
+                }
             }
             
             if (!isBuilding && isMakingNugetPackage) {
@@ -321,9 +324,25 @@ namespace ImageResizer.ReleaseBuilder {
                 p.Add(q.files("^/(core|plugins|samples|tests)/"));
                 p.Add(q.files("^/contrib/azure"));
                 p.Add(q.files("^/dlls/(release|trial)"));
+                p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/"); //Make a copy in the root
+                p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb)$"), "/Samples/BasicIISSite/bin/"); 
                 p.Add(q.files("^/[^/]+.txt$"));
             }
         }
+        public void PackStandard(PackageDescriptor desc) {
+            // 'standard'
+            List<Pattern> old = q.exclusions;
+            q.exclusions = new List<Pattern>(old);
+            
+            using (var p = new Package(desc.Path, this.f.parentPath)) {
+                p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/");
+                p.Add(q.files("^/dlls/trial/"), "/dlls/trial");
+                p.Add(q.files("^/(core|samples)/"));
+                p.Add(q.files("^/[^/]+.txt$"));
+            }
+            q.exclusions = old;
+        }
+
 
         public void PackCore(PackageDescriptor desc) {
             // 'core' - 
@@ -344,16 +363,7 @@ namespace ImageResizer.ReleaseBuilder {
 
 
 
-        public void PackStandard(PackageDescriptor desc) {
-            // 'standard'
-            
-            using (var p = new Package(desc.Path, this.f.parentPath)) {
-                p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/");
-                p.Add(q.files("^/dlls/trial/"), "/TrialPlugins/");
-                p.Add(q.files("^/(core|samples)/"));
-                p.Add(q.files("^/[^/]+.txt$"));
-            }
-        }
+
 
 
 
