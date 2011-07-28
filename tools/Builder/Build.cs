@@ -357,7 +357,7 @@ namespace ImageResizer.ReleaseBuilder {
             // 'standard'
             List<Pattern> old = q.exclusions;
             q.exclusions = new List<Pattern>(old);
-            
+            q.exclusions.Add(new Pattern("^/Core/[^/]+.sln")); //Don't include the regular solution files, they won't load properly.
             using (var p = new Package(desc.Path, this.f.parentPath)) {
                 p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/");
                 p.Add(q.files("^/dlls/(release|debug)/"));
