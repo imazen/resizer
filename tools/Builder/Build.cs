@@ -316,6 +316,8 @@ namespace ImageResizer.ReleaseBuilder {
             using (var p = new Package(desc.Path, this.f.parentPath)) {
                 p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/");
                 p.Add(q.files("^/[^/]+.txt$"));
+                p.Add(q.files("^/Core/license.txt$"), "");
+                p.Add(q.files("^/Web.config$"));
             }
         }
         public void PackAllBinaries(PackageDescriptor desc) {
@@ -329,7 +331,7 @@ namespace ImageResizer.ReleaseBuilder {
             using (var p = new Package(desc.Path, this.f.parentPath)) {
                 p.Add(q.files("^/(core|plugins|samples|tests)/"));
                 p.Add(q.files("^/contrib/azure"));
-                p.Add(q.files("^/dlls/(release|trial)"));
+                p.Add(q.files("^/dlls/release"));
                 p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/"); //Make a copy in the root
                 
                 p.Add(q.files("^/[^/]+.txt$"));
@@ -347,9 +349,10 @@ namespace ImageResizer.ReleaseBuilder {
             
             using (var p = new Package(desc.Path, this.f.parentPath)) {
                 p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/");
-                p.Add(q.files("^/dlls/trial/"), "/dlls/trial");
+                p.Add(q.files("^/dlls/trial/"));
                 p.Add(q.files("^/(core|samples)/"));
                 p.Add(q.files("^/[^/]+.txt$"));
+                p.Add(q.files("^/Web.config$"));
             }
             q.exclusions = old;
         }
