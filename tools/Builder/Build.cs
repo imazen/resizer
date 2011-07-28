@@ -315,7 +315,7 @@ namespace ImageResizer.ReleaseBuilder {
             // /*.txt
             using (var p = new Package(desc.Path, this.f.parentPath)) {
                 p.Add(q.files("^/dlls/release/ImageResizer.(dll|pdb|xml)$"), "/");
-                p.Add(q.files("^/[^/]+.txt$"));
+                p.Add(q.files("^/readme.txt$"));
                 p.Add(q.files("^/Core/license.txt$"), "");
                 p.Add(q.files("^/Web.config$"));
             }
