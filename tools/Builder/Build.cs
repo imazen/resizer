@@ -253,12 +253,14 @@ namespace ImageResizer.ReleaseBuilder {
         }
 
         public void CleanAll(){
+            try { System.IO.Directory.Delete(Path.Combine(f.parentPath, "dlls\\trial"), true); } catch { }
+            try { System.IO.Directory.Delete(Path.Combine(f.parentPath, "dlls\\release"), true); } catch { }
+            try { System.IO.Directory.Delete(Path.Combine(f.parentPath, "dlls\\debug"), true); } catch { }
+
             d.Run("/Clean Debug");
             d.Run("/Clean Release");
             d.Run("/Clean Trial");
-            System.IO.Directory.Delete(Path.Combine(f.parentPath, "dlls\\trial"), true);
-            System.IO.Directory.Delete(Path.Combine(f.parentPath, "dlls\\release"), true);
-            System.IO.Directory.Delete(Path.Combine(f.parentPath, "dlls\\debug"), true);
+
         }
 
         public void BuildAll() {
