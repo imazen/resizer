@@ -146,11 +146,24 @@ namespace ImageResizer.ReleaseBuilder {
                 //Save contents for reverting later
                 string fileContents = v.Contents;
 
+                
+                //Generate hard revision number for building (so all dlls use the same number)
+                short revision = (short)(DateTime.UtcNow.TimeOfDay.Milliseconds % short.MaxValue); //the part under 32767. Can actually go up to, 65534, but what's the point.
+                string exactVersion = v.join(fileVer, revision.ToString());
+                string fullInfoVer = infoVer + (isHotfix ? ("-temp-hotfix-" + DateTime.Now.ToString("MMM-d-yyyy-htt").ToLower()) : "");
+                string tag = "resizer" + v.join(infoVer, revision.ToString()) + (isHotfix ? "-hotfix": "");
+
+
                 //3 - Prompt to commit and tag
                 bool versionsChanged = !fileContents.Equals(originalContents);
                 string question = versionsChanged ? "SharedAssemblyInfo.cs was modified. Commit it (and any other changes) to the repository, then hit 'y'."
                     : "Are all changes commited? Hit 'y' to continue. The SHA-1 of HEAD will be embedded in the DLLs.";
                 while (!ask(question)) { }
+
+                if (ask("Tag HEAD with '" + tag + "'?"))
+                    g.Tag(tag);
+
+
 
 
                 //[assembly: Commit("git-commit-guid-here")]
@@ -159,13 +172,11 @@ namespace ImageResizer.ReleaseBuilder {
                 v.set("Commit", gitCommit);
 
                 //4b - change to hard version number for building
-                short revision = (short)(DateTime.UtcNow.TimeOfDay.Milliseconds % short.MaxValue); //the part under 32767. Can actually go up to, 65534, but what's the point.
-
-                string exactVersion = v.join(fileVer, revision.ToString());
+                
                 v.set("AssemblyFileVersion", exactVersion);
                 v.set("AssemblyVersion", exactVersion);
                 //Add hotfix suffix for hotfixes
-                v.set("AssemblyInformationalVersion", infoVer + (isHotfix ? ("-temp-hotfix-" + DateTime.Now.ToString("MMM-d-yyyy-htt").ToLower()) : ""));
+                v.set("AssemblyInformationalVersion", fullInfoVer);
                 v.Save();
 
 
