@@ -39,8 +39,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CrazyFastPlugin.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\ImageResizer.csproj">
+      <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
+      <Name>ImageResizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\ImageResizer.Plugins.CrazyFast\ImageResizer.Plugins.CrazyFast.csproj">
+      <Project>{0204D765-34D2-4A09-B283-B0FC92ECF6AE}</Project>
+      <Name>ImageResizer.Plugins.CrazyFast</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
