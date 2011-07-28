@@ -130,8 +130,8 @@ namespace ImageResizer
             }
 
 
-            
-            
+
+            bool restoreStreamPosition = false;
             Stream s = null;
             path = null;
             //Stream
@@ -158,14 +158,15 @@ namespace ImageResizer
                 if (pname != null && pstream != null) {
                     path = pname.GetValue(source, null) as string;
                     s = pstream.GetValue(source, null) as Stream;
-                    disposeStream = false; //We never want to dispose the HttpPostedFile or HttpPostedFileBase streams...
+                    disposeStream = false; //We never want to dispose the HttpPostedFile or HttpPostedFileBase streams..
+                    restoreStreamPosition = true;
                 }
                 
                 if (s == null) 
                     throw new ArgumentException("Paramater source may only be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, HttpPostedFileBase, Bitmap, Image, or Stream.", "source");
             }
             //Save the original stream position if it's an HttpPostedFile
-            long originalPosition = (source is HttpPostedFile) ? s.Position : - 1;
+            long originalPosition = (restoreStreamPosition) ? s.Position : - 1;
 
             try {
                 try {
