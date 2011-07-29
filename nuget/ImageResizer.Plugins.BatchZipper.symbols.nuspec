@@ -1,0 +1,20 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.BatchZipper</id>
+		<version>$version$</version>
+		<authors>Nathanael Jones</authors>
+		<description>Description</description>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		  <dependency id="DotNetZip"/>
+
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="..\dlls\trial\ImageResizer.Plugins.BatchZipper.dll" target="lib" />
+		<file src="..\dlls\trial\ImageResizer.Plugins.BatchZipper.pdb" target="lib" />
+		<file src="..\dlls\trial\ImageResizer.Plugins.BatchZipper.xml" target="lib" />
+		<file src="..\Plugins\BatchZipper\**\*.cs" target="src" />
+	</files>
+</package>

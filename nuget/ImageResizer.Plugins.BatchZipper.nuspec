@@ -1,0 +1,28 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.BatchZipper</id>
+		<title>ImageResizer.Plugins.BatchZipper - Resize and zip multiple images asynchronously</title>
+		<version>$version$</version>
+		<authors>Nathanael Jones</authors>
+		<owners>Nathanael Jones</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>API for Resizing and combining multiple images (and files) into a .zip folder asynchronously (or synchronously, if needed).
+Alpha, not yet documented.
+Visit http://imageresizing.net for details, documenation, and free support. 
+E-mail support@imageresizing.net if you encounter any problems with the software. 
+</description>
+		<tags>Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing disk caching gif png octree quanitization animated gifs dithering</tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		  <dependency id="DotNetZip"/>
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="..\dlls\trial\ImageResizer.Plugins.BatchZipper.dll" target="lib" />
+		<file src="..\dlls\trial\ImageResizer.Plugins.BatchZipper.xml" target="lib" />
+	</files>
+</package>
