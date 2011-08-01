@@ -28,7 +28,9 @@ namespace ImageResizer.Plugins.RemoteReader {
         protected string remotePrefix = "~/remote";
         Config c;
         public RemoteReaderPlugin() {
-            remotePrefix = Util.PathUtils.ResolveAppRelative(remotePrefix);
+            try {
+                remotePrefix = Util.PathUtils.ResolveAppRelative(remotePrefix);
+            } catch { }
         }
 
         public IPlugin Install(Configuration.Config c) {
@@ -113,10 +115,21 @@ namespace ImageResizer.Plugins.RemoteReader {
         public string CreateSignedUrl(string remoteUrl, string settings) {
             return CreateSignedUrl(remoteUrl, new ResizeSettings(settings));
         }
+
+        public string CreateSignedUrlWithKey(string remoteUrl, string settings, string key) {
+            NameValueCollection s = new ResizeSettings(settings);
+            s[Base64UrlKey] = PathUtils.ToBase64U(remoteUrl);
+            s[HmacKey] = SignDataWithKey(s[Base64UrlKey],key);
+            return remotePrefix + ".jpg.ashx" + PathUtils.BuildQueryString(s);
+        }
+
         public string SignData(string data) {
 
             string key = c.get("remoteReader.signingKey", String.Empty);
             if (string.IsNullOrEmpty(key)) throw new ImageResizer.ImageProcessingException("You are required to set a passphrase for securing remote URLs. <resizer><remotereader signingKey=\"put a long and randam passphrase here\" /> </resizer>");
+            return SignDataWithKey(data, key);
+        }
+        public string SignDataWithKey(string data, string key) {
 
             HMACSHA256 hmac = new HMACSHA256(UTF8Encoding.UTF8.GetBytes(key));
             byte[] hash = hmac.ComputeHash(UTF8Encoding.UTF8.GetBytes(data));
