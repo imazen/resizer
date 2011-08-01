@@ -89,12 +89,14 @@ namespace ImageResizer.Plugins.AnimatedGifs
         public static byte[] CreateLoopBlock()
         { return CreateLoopBlock(0); }
         /// <summary>
-        /// Creates a Loop block for the specified number of repeats. Written after the last frame's image data
+        /// Creates a Loop block for the specified number of repeats. Written after the last frame's image data. 
+        /// Do NOT call this if numberOfRepeatings=1. IE and FF &lt; 3 (incorrectly) loop infinitely when loops=1. Simply omit the extension in that case.
         /// </summary>
         /// <param name="numberOfRepeatings"></param>
         /// <returns></returns>
         public static byte[] CreateLoopBlock(int numberOfRepeatings)
         {
+            //http://www.let.rug.nl/kleiweg/gif/netscape.html
             /*30D:   21 FF 0B                Application Extension
             310:   4E 45 54
                    53 43 41

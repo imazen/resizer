@@ -94,9 +94,9 @@ namespace ImageResizer.Plugins.AnimatedGifs
                     {
                         //Only one screen descriptor per file. Steal from the first image
                         writer.Write(gif.m_ScreenDescriptor.ToArray());
-                        //How many times to loop the image (unless it is 1)
+                        //How many times to loop the image (unless it is 1) IE and FF3 loop endlessley if loop=1
                         if (loops != 1) 
-                            writer.Write(GifCreator.CreateLoopBlock(loops)); //Changed to fit wikipedia structure 
+                            writer.Write(GifCreator.CreateLoopBlock(loops));
                     }
                     //Restore frame delay
                     int delay = 0;
