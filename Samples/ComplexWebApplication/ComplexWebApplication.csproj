@@ -231,10 +231,6 @@
       <Project>{0E6BE1A7-C754-4E33-A8AC-75A8549FC68B}</Project>
       <Name>ImageResizer.Plugins.RemoteReader</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\RequestLimiting\ImageResizer.Plugins.RequestLimiting.csproj">
-      <Project>{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}</Project>
-      <Name>ImageResizer.Plugins.RequestLimiting</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\SeamCarving\ImageResizer.Plugins.SeamCarving.csproj">
       <Project>{7AEFB877-A720-4929-880C-1090A71C83EB}</Project>
       <Name>ImageResizer.Plugins.SeamCarving</Name>
