@@ -13,4 +13,5 @@ echo Path: %dllpath%
 pause
 %SystemRoot%\Microsoft.NET\Framework\v2.0.50727\regasm.exe %dllpath%.dll /codebase
 %SystemRoot%\Microsoft.NET\Framework\v2.0.50727\regasm.exe %dllpath%.Plugins.PrettyGifs.dll /codebase
+%SystemRoot%\Microsoft.NET\Framework\v2.0.50727\regasm.exe %dllpath%.Plugins.RemoteReader.dll /codebase
 pause 
