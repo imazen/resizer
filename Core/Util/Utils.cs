@@ -102,7 +102,7 @@ namespace ImageResizer.Util {
 
 
         public static T parseEnum<T>(string value, T defaultValue) where T : struct, IConvertible {
-            if (!typeof(T).IsEnum) throw new ArgumentException("T must be an enumerated type");
+            //if (!typeof(T).IsEnum) throw new ArgumentException("T must be an enumerated type");
 
             if (value == null) return defaultValue;
             else value = value.Trim();
@@ -112,6 +112,7 @@ namespace ImageResizer.Util {
                 return defaultValue;
             }
         }
+
 
         /// <summary>
         /// Copies all remaining data from 'source' to 'dest'
