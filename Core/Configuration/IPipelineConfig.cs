@@ -47,6 +47,11 @@ namespace ImageResizer.Configuration {
         string ResponseArgsKey { get; }
 
         /// <summary>
+        /// The key in Context.Items to set if we want to cancel MVC routing for the request
+        /// </summary>
+        string StopRoutingKey { get; }
+
+        /// <summary>
         ///  The key in Context.Items to access a the path to use instead of Request.path
         /// </summary>
          string ModifiedPathKey { get; }
