@@ -45,7 +45,11 @@ namespace ImageResizer.Plugins.Basic {
             
             if ((context.Request.FilePath.EndsWith("/resizer.debug", StringComparison.OrdinalIgnoreCase) ||
                 context.Request.FilePath.EndsWith("/resizer.debug.ashx", StringComparison.OrdinalIgnoreCase))) {
-                    context.RemapHandler(AllowResponse(context) ? (IHttpHandler)new DiagnosticPageHandler(c) : (IHttpHandler)new DiagnosticDisabledHandler(c));
+
+                //Communicate to the MVC plugin this request should not be affected by the UrlRoutingModule.
+                context.Items[c.Pipeline.StopRoutingKey] = true;
+                //Provide the request handler
+                context.RemapHandler(AllowResponse(context) ? (IHttpHandler)new DiagnosticPageHandler(c) : (IHttpHandler)new DiagnosticDisabledHandler(c));
             } 
         }
 

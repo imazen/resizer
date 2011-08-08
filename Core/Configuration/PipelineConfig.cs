@@ -176,6 +176,10 @@ namespace ImageResizer.Configuration {
         public string ModifiedPathKey {
             get { return "resizer.newPath"; }
         }
+
+        public string StopRoutingKey {
+            get { return "resizer.stopRouting"; }
+        }
         /// <summary>
         /// Returns the value of Context.Items["resizer.newPath"] if present. If not, returns FilePath + PathInfo.
         /// Sets Context.Items["resizer.newPath"]. 

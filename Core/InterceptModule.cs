@@ -208,6 +208,8 @@ namespace ImageResizer {
             if (!isProcessing && !isCaching) return;
             context.Items[conf.ResponseArgsKey] = ""; //We are handling the requests
 
+            //Communicate to the MVC plugin this request should not be affected by the UrlRoutingModule.
+            context.Items[conf.StopRoutingKey] = true;
 
             //Find out if we have a modified date that we can work with
             bool hasModifiedDate = (vf == null) || vf is IVirtualFileWithModifiedDate;
