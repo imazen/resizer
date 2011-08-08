@@ -1,0 +1,62 @@
+﻿The ImageResizer Core project (the /Core/ folder and its subdirectories) are licensed under the Resize Freedom license.
+
+This includes all plugins in the ImageResizer.Plugins.Basic namespace. (NoCache,DefaultEncoder,ClientCache,Caption,DropShadow,SizeLimiting, etc.)
+
+Visit http://imageresizing.net/license/freedom for the latest version of the license.
+
+#Image Resizer Freedom license
+
+##License summary:
+
+No restrictions, except you can't use my own code to compete with my own products.
+
+Permitted actions
+ * Usage
+ * Modification
+ * Redistribution
+ * Sub-licensing (but the original license must be included with the source and binaries)
+ * Hosting providers may install as a shared library (in the GAC) on their servers.
+
+An exact copy of the [MIT license](http://www.opensource.org/licenses/mit-license.php), but with one extra condition (in bold).
+
+If you purchased a [Professional](/licenses/pro) or [Enterprise](/licenses/enterprise) license, read those instead. If you comply with them, you're automatically complying with this license.
+
+##License Terms
+
+Copyright (c) 2011 Nathanael Jones
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+1. The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software. 
+
+2. **Sale, public distribution, marketing, and publishing of derivative works 
+are not permitted if those works directly and primarily compete with previously published product
+offerings of the author (Nathanael Jones).**
+
+**To comply with this clause, compare the purpose of your derived product 
+to the purpose of each of the products listed on <http://imageresizing.net/>.
+If the purpose or marketing of the products are similar, then you should contact 
+nathanael.jones@gmail.com for written clarification and permission (provided free of charge).**
+
+**An example prohibited action would be selling a derived version of the ImageResizer which included a disk caching plugin (since that behavior is provided by an pre-existing plugin).
+If you are the 'first to market', however, you do not have to worry about retroactively being in violation of the license.**
+
+**This no-backstabbing clause is included to insure continued maintenance and improvement of the software.**
+
+**This clause does not apply if the author is deceased, or if said products are no longer offered or maintained (reverting to the standard MIT license).**
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
