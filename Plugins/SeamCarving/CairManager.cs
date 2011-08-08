@@ -8,10 +8,33 @@ using System.Drawing;
 using System.Diagnostics;
 using System.Web;
 using System.Web.Hosting;
+using System.Threading;
 
 namespace ImageResizer.Plugins.SeamCarving {
     public class CairManager {
         public CairManager() {
+        }
+
+        private int _maxConcurrentExecutions = 0;
+        /// <summary>
+        /// The maximum number of CAIR.exe instances to allow at the same time. After this limit is reached, 
+        /// requests will wait until requests will MaxConcurrentWaitingThreads is reached, at which point 
+        /// requests will be denied so the thread pool doesn't become exhausted.
+        /// Set this value to at least CPU cores * 2, as the proccess is also I/O bound. Set to 0 for no limit (default).
+        /// </summary>
+        public int MaxConcurrentExecutions {
+            get { return _maxConcurrentExecutions; }
+            set { _maxConcurrentExecutions = value; }
+        }
+
+        private int _maxConcurrentWaitingThreads = 0;
+        /// <summary>
+        /// The maximum number of waiting threads (for a CAIR.exe instance) to permit before denying requests. Set to 0 (default) to permit an endless number of threads to wait (although request timeout will still be effect).
+        /// Set this value to at least 30 
+        /// </summary>
+        public int MaxConcurrentWaitingThreads {
+            get { return _maxConcurrentWaitingThreads; }
+            set { _maxConcurrentWaitingThreads = value; }
         }
 
         protected string cairPath = null;
@@ -49,33 +72,76 @@ namespace ImageResizer.Plugins.SeamCarving {
             cairPath = null;
             GetCair();
         }
+        /// <summary>
+        /// Number of executing CAIR.exe processes
+        /// </summary>
+        private int _concurrentExecutions = 0;
+        /// <summary>
+        /// Number of threads waiting for a CAIR.exe process.
+        /// </summary>
+        private int _concurrentWaitingThreads = 0;
+        /// <summary>
+        /// Used for efficient thread waiting
+        /// </summary>
+        private AutoResetEvent turnstile = new AutoResetEvent(true);
 
-        public bool CairyIt(string sourcePath, string destPath, Size size, SeamCarving.SeamCarvingPlugin.FilterType type, int msToWait){
+        public bool CairyIt(string sourcePath, string destPath, Size size, SeamCarving.SeamCarvingPlugin.FilterType type, int msToWait) {
 
-            //Make sure CAIR.exe still exists. If not, recreate it
-            if (!File.Exists(GetCair())) CairMissing();
+            //If we have too many threads waiting to run CAIR, just kill the request.
+            if (_maxConcurrentWaitingThreads > 0 &&
+                _concurrentWaitingThreads > _maxConcurrentWaitingThreads)
+                throw new ImageProcessingException("Content-aware image processing failed - too many threads waiting. Try again later.");
 
-            string args = "";
-            args += " -I \"" + sourcePath + "\"";
-            args += " -O \"" + destPath + "\"";
-            args += " -T 1";
-            args += " -C " + ((int)type).ToString();
-			args += " -X " + size.Width;
-			args += " -Y " + size.Height;
+            //If there are any threads waiting in line, or if the permitted number of CAIR.exe instances has been reached, get in line
+            if (_concurrentWaitingThreads > 0 || (_maxConcurrentExecutions > 0 &&
+                    _concurrentExecutions > _maxConcurrentExecutions)) {
+                try {
+                    Interlocked.Increment(ref _concurrentWaitingThreads);
+                    //Wait for a free slot
+                    while (_maxConcurrentExecutions > 0 &&
+                        _concurrentExecutions > _maxConcurrentExecutions) {
+                        turnstile.WaitOne(1000);
+                    }
+                } finally {
+                    Interlocked.Decrement(ref _concurrentWaitingThreads);
+                }
+            }
+            //Ok, there should be a free slot now.
+            try {
+                //Register, we have our own process slot now.
+                Interlocked.Increment(ref _concurrentExecutions);
 
-            ProcessStartInfo info = new ProcessStartInfo(GetCair(), args);
-            info.UseShellExecute = false;
-            info.RedirectStandardError = true;
-            info.RedirectStandardOutput= true;
-            info.CreateNoWindow = true;
-            
-            using (Process p = Process.Start(info)) {
-                bool result = p.WaitForExit(msToWait);
-                if (!result) p.Kill();
-                string messages = p.StandardError.ReadToEnd() + p.StandardOutput.ReadToEnd();
-                if (p.ExitCode != 0)
-                    throw new ImageProcessingException("Content-aware image processing failed: " + messages);
-                return result;
+                //Make sure CAIR.exe exists. If not, recreate it
+                if (!File.Exists(GetCair())) CairMissing();
+
+                string args = "";
+                args += " -I \"" + sourcePath + "\"";
+                args += " -O \"" + destPath + "\"";
+                args += " -T 1";
+                args += " -C " + ((int)type).ToString();
+                args += " -X " + size.Width;
+                args += " -Y " + size.Height;
+
+                ProcessStartInfo info = new ProcessStartInfo(GetCair(), args);
+                info.UseShellExecute = false;
+                info.RedirectStandardError = true;
+                info.RedirectStandardOutput = true;
+                info.CreateNoWindow = true;
+
+                using (Process p = Process.Start(info)) {
+                    bool result = p.WaitForExit(msToWait);
+                    if (!result) {
+                        p.Kill(); //Kill the process if it times out.
+                        throw new ImageProcessingException("Content-aware image processing failed due to timeout.");
+                    }
+                    string messages = p.StandardError.ReadToEnd() + p.StandardOutput.ReadToEnd();
+                    if (p.ExitCode != 0)
+                        throw new ImageProcessingException("Content-aware image processing failed: " + messages);
+                    return result;
+                }
+            } finally {
+                Interlocked.Decrement(ref _concurrentExecutions);
+                turnstile.Set();
             }
 
         }
