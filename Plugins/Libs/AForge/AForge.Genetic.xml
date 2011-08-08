@@ -566,7 +566,7 @@
             selection method</see> is used to reduce the population.</para></remarks>
             
             <exception cref="T:System.ArgumentException">Too small population's size was specified. The
-            exception is thrown in the case if <paramref name="size"/> is smaller than 2.</exception>
+            exception is thrown in the case if <paramref name="newPopulationSize"/> is smaller than 2.</exception>
             
         </member>
         <member name="M:AForge.Genetic.Population.Resize(System.Int32,AForge.Genetic.ISelectionMethod)">
@@ -584,7 +584,7 @@
              reduce the population.</para></remarks>
              
              <exception cref="T:System.ArgumentException">Too small population's size was specified. The
-             exception is thrown in the case if <paramref name="size"/> is smaller than 2.</exception>
+             exception is thrown in the case if <paramref name="newPopulationSize"/> is smaller than 2.</exception>
             
         </member>
         <member name="P:AForge.Genetic.Population.CrossoverRate">
@@ -1715,7 +1715,7 @@
              public class UserFunction : OptimizationFunction1D
              {
             	    public UserFunction( ) :
-                     base( new DoubleRange( 0, 255 ) ) { }
+                     base( new Range( 0, 255 ) ) { }
             
              	public override double OptimizationFunction( double x )
             		{
@@ -1739,7 +1739,7 @@
              </remarks>
             
         </member>
-        <member name="M:AForge.Genetic.OptimizationFunction1D.#ctor(AForge.DoubleRange)">
+        <member name="M:AForge.Genetic.OptimizationFunction1D.#ctor(AForge.Range)">
              <summary>
              Initializes a new instance of the <see cref="T:AForge.Genetic.OptimizationFunction1D"/> class.
              </summary>
@@ -1845,7 +1845,7 @@
              public class UserFunction : OptimizationFunction2D
              {
             		public UserFunction( ) :
-            			base( new DoubleRange( -4, 4 ), new DoubleRange( -4, 4 ) ) { }
+            			base( new Range( -4, 4 ), new Range( -4, 4 ) ) { }
             
              	public override double OptimizationFunction( double x, double y )
             		{
@@ -1864,7 +1864,7 @@
              </remarks>
             
         </member>
-        <member name="M:AForge.Genetic.OptimizationFunction2D.#ctor(AForge.DoubleRange,AForge.DoubleRange)">
+        <member name="M:AForge.Genetic.OptimizationFunction2D.#ctor(AForge.Range,AForge.Range)">
              <summary>
              Initializes a new instance of the <see cref="T:AForge.Genetic.OptimizationFunction2D"/> class.
              </summary>

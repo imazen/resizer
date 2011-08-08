@@ -504,6 +504,21 @@
             <remarks>Password required to access video source.</remarks>
             
         </member>
+        <member name="P:AForge.Video.MJPEGStream.Proxy">
+            <summary>
+            Gets or sets proxy information for the request.
+            </summary>
+            
+            <remarks><para>The local computer or application config file may specify that a default
+            proxy to be used. If the Proxy property is specified, then the proxy settings from the Proxy
+            property overridea the local computer or application config file and the instance will use
+            the proxy settings specified. If no proxy is specified in a config file
+            and the Proxy property is unspecified, the request uses the proxy settings
+            inherited from Internet Explorer on the local computer. If there are no proxy settings
+            in Internet Explorer, the request is sent directly to the server.
+            </para></remarks>
+            
+        </member>
         <member name="P:AForge.Video.MJPEGStream.HttpUserAgent">
             <summary>
             User agent to specify in HTTP request header.
@@ -556,6 +571,23 @@
             <remarks>Current state of video source object - running or not.</remarks>
             
         </member>
+        <member name="T:AForge.Video.VideoException">
+            <summary>
+            Video related exception.
+            </summary>
+            
+            <remarks><para>The exception is thrown in the case of some video related issues, like
+            failure of initializing codec, compression, etc.</para></remarks>
+            
+        </member>
+        <member name="M:AForge.Video.VideoException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Video.VideoException"/> class.
+            </summary>
+            
+            <param name="message">Exception's message.</param>
+            
+        </member>
         <member name="T:AForge.Video.NewFrameEventHandler">
             <summary>
             Delegate for new frame event handler.
@@ -600,6 +632,17 @@
         <member name="F:AForge.Video.ReasonToFinishPlaying.StoppedByUser">
             <summary>
             Video playing has finished because it was stopped by user.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.ReasonToFinishPlaying.DeviceLost">
+            <summary>
+            Video playing has finished because the device was lost (unplugged).
+            </summary>
+        </member>
+        <member name="F:AForge.Video.ReasonToFinishPlaying.VideoSourceError">
+            <summary>
+            Video playing has finished because of some error happened the video source (camera, stream, file, etc.).
+            A error reporting event usually is fired to provide error information.
             </summary>
         </member>
         <member name="T:AForge.Video.NewFrameEventArgs">
@@ -830,6 +873,21 @@
             </summary>
             
             <remarks>Password required to access video source.</remarks>
+            
+        </member>
+        <member name="P:AForge.Video.JPEGStream.Proxy">
+            <summary>
+            Gets or sets proxy information for the request.
+            </summary>
+            
+            <remarks><para>The local computer or application config file may specify that a default
+            proxy to be used. If the Proxy property is specified, then the proxy settings from the Proxy
+            property overridea the local computer or application config file and the instance will use
+            the proxy settings specified. If no proxy is specified in a config file
+            and the Proxy property is unspecified, the request uses the proxy settings
+            inherited from Internet Explorer on the local computer. If there are no proxy settings
+            in Internet Explorer, the request is sent directly to the server.
+            </para></remarks>
             
         </member>
         <member name="P:AForge.Video.JPEGStream.FramesReceived">

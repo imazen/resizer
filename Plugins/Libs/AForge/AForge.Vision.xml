@@ -612,7 +612,7 @@
             <param name="videoFrame">Video frame to process (detect motion in).</param>
             
             <returns>Returns amount of motion, which is provided <see cref="P:AForge.Vision.Motion.IMotionDetector.MotionLevel"/>
-            property of the <see cref="P:AForge.Vision.Motion.MotionDetector.MotionDetectionAlgorthm">motion detection algorithm in use</see>.</returns>
+            property of the <see cref="P:AForge.Vision.Motion.MotionDetector.MotionDetectionAlgorithm">motion detection algorithm in use</see>.</returns>
             
             <remarks><para>See <see cref="M:AForge.Vision.Motion.MotionDetector.ProcessFrame(AForge.Imaging.UnmanagedImage)"/> for additional details.</para>
             </remarks>
@@ -626,7 +626,7 @@
              <param name="videoFrame">Video frame to process (detect motion in).</param>
              
              <returns>Returns amount of motion, which is provided <see cref="P:AForge.Vision.Motion.IMotionDetector.MotionLevel"/>
-             property of the <see cref="P:AForge.Vision.Motion.MotionDetector.MotionDetectionAlgorthm">motion detection algorithm in use</see>.</returns>
+             property of the <see cref="P:AForge.Vision.Motion.MotionDetector.MotionDetectionAlgorithm">motion detection algorithm in use</see>.</returns>
              
              <remarks><para>See <see cref="M:AForge.Vision.Motion.MotionDetector.ProcessFrame(AForge.Imaging.UnmanagedImage)"/> for additional details.</para>
              </remarks>
@@ -640,7 +640,7 @@
             <param name="videoFrame">Video frame to process (detect motion in).</param>
             
             <returns>Returns amount of motion, which is provided <see cref="P:AForge.Vision.Motion.IMotionDetector.MotionLevel"/>
-            property of the <see cref="P:AForge.Vision.Motion.MotionDetector.MotionDetectionAlgorthm">motion detection algorithm in use</see>.</returns>
+            property of the <see cref="P:AForge.Vision.Motion.MotionDetector.MotionDetectionAlgorithm">motion detection algorithm in use</see>.</returns>
             
             <remarks><para>The method first of all applies motion detection algorithm to the specified video
             frame to calculate <see cref="P:AForge.Vision.Motion.IMotionDetector.MotionLevel">motion level</see> and
@@ -668,7 +668,7 @@
             </remarks>
             
         </member>
-        <member name="P:AForge.Vision.Motion.MotionDetector.MotionDetectionAlgorthm">
+        <member name="P:AForge.Vision.Motion.MotionDetector.MotionDetectionAlgorithm">
              <summary>
              Motion detection algorithm to apply to each video frame.
              </summary>

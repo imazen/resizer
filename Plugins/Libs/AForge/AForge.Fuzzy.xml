@@ -95,11 +95,11 @@
             FuzzySet fsCool = new FuzzySet( "Cool", function1 );
             
             // getting membership
-            double m1 = fsCool.GetMembership( 15 );
+            float m1 = fsCool.GetMembership( 15 );
             
             // computing the membership of "NOT Cool"
             NotOperator NOT = new NotOperator( );
-            double result = NOT.Evaluate( m1 );
+            float result = NOT.Evaluate( m1 );
                          
             // show result
             Console.WriteLine( result );
@@ -118,7 +118,7 @@
             </para></remarks>
             
         </member>
-        <member name="M:AForge.Fuzzy.IUnaryOperator.Evaluate(System.Double)">
+        <member name="M:AForge.Fuzzy.IUnaryOperator.Evaluate(System.Single)">
             <summary>
             Calculates the numerical result of a Unary operation applied to one
             fuzzy membership value.
@@ -129,7 +129,7 @@
             <returns>The numerical result of the operation applied to <paramref name="membership"/></returns>.
             
         </member>
-        <member name="M:AForge.Fuzzy.NotOperator.Evaluate(System.Double)">
+        <member name="M:AForge.Fuzzy.NotOperator.Evaluate(System.Single)">
             <summary>
             Calculates the numerical result of the NOT operation applied to
             a fuzzy membership value.
@@ -157,12 +157,12 @@
             FuzzySet fsNear = new FuzzySet( "Near", function2 );
             
             // getting memberships
-            double m1 = fsCool.GetMembership( 15 );
-            double m2 = fsNear.GetMembership( 35 );
+            float m1 = fsCool.GetMembership( 15 );
+            float m2 = fsNear.GetMembership( 35 );
             
             // computing the membership of "Cool OR Near"
             MaximumCoNorm OR = new MaximumCoNorm( );
-            double result = OR.Evaluate( m1, m2 );
+            float result = OR.Evaluate( m1, m2 );
                          
             // show result
             Console.WriteLine( result );
@@ -181,7 +181,7 @@
             </para></remarks>
             
         </member>
-        <member name="M:AForge.Fuzzy.ICoNorm.Evaluate(System.Double,System.Double)">
+        <member name="M:AForge.Fuzzy.ICoNorm.Evaluate(System.Single,System.Single)">
             <summary>
             Calculates the numerical result of a CoNorm (OR) operation applied to
             two fuzzy membership values.
@@ -194,7 +194,7 @@
             and <paramref name="membershipB"/>.</returns>
             
         </member>
-        <member name="M:AForge.Fuzzy.MaximumCoNorm.Evaluate(System.Double,System.Double)">
+        <member name="M:AForge.Fuzzy.MaximumCoNorm.Evaluate(System.Single,System.Single)">
             <summary>
             Calculates the numerical result of the OR operation applied to
             two fuzzy membership values.
@@ -241,7 +241,7 @@
             </para></remarks>
             
         </member>
-        <member name="M:AForge.Fuzzy.IMembershipFunction.GetMembership(System.Double)">
+        <member name="M:AForge.Fuzzy.IMembershipFunction.GetMembership(System.Single)">
             <summary>
             Calculate membership of a given value to the fuzzy set.
             </summary>
@@ -266,7 +266,7 @@
             The unique point where the membership value is 1.
             </summary>
         </member>
-        <member name="M:AForge.Fuzzy.SingletonFunction.#ctor(System.Double)">
+        <member name="M:AForge.Fuzzy.SingletonFunction.#ctor(System.Single)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Fuzzy.SingletonFunction"/> class. 
             </summary>
@@ -274,7 +274,7 @@
             <param name="support">Support is the only value of x where the membership function is 1.</param>
             
         </member>
-        <member name="M:AForge.Fuzzy.SingletonFunction.GetMembership(System.Double)">
+        <member name="M:AForge.Fuzzy.SingletonFunction.GetMembership(System.Single)">
             <summary>
             Calculate membership of a given value to the singleton function.
             </summary>
@@ -374,7 +374,7 @@
             // getting outputs
             try
             {
-                double newAngle = IS.Evaluate( "Angle" );
+                float newAngle = IS.Evaluate( "Angle" );
             }
             catch ( Exception )
             {
@@ -420,7 +420,7 @@
             <returns>The new <see cref="T:AForge.Fuzzy.Rule"/> reference. </returns>
             
         </member>
-        <member name="M:AForge.Fuzzy.InferenceSystem.SetInput(System.String,System.Double)">
+        <member name="M:AForge.Fuzzy.InferenceSystem.SetInput(System.String,System.Single)">
             <summary>
             Sets a numerical input for one of the linguistic variables of the <see cref="T:AForge.Fuzzy.Database"/>. 
             </summary>
@@ -553,12 +553,12 @@
             FuzzySet fsNear = new FuzzySet( "Near", function2 );
             
             // getting memberships
-            double m1 = fsCool.GetMembership( 15 );
-            double m2 = fsNear.GetMembership( 35 );
+            float m1 = fsCool.GetMembership( 15 );
+            float m2 = fsNear.GetMembership( 35 );
             
             // computing the membership of "Cool AND Near"
             ProductNorm AND = new ProductNorm( );
-            double result = AND.Evaluate( m1, m2 );
+            float result = AND.Evaluate( m1, m2 );
                          
             // show result
             Console.WriteLine( result );
@@ -577,7 +577,7 @@
             </para></remarks>
             
         </member>
-        <member name="M:AForge.Fuzzy.INorm.Evaluate(System.Double,System.Double)">
+        <member name="M:AForge.Fuzzy.INorm.Evaluate(System.Single,System.Single)">
             <summary>
             Calculates the numerical result of a Norm (AND) operation applied to
             two fuzzy membership values.
@@ -590,7 +590,7 @@
             and <paramref name="membershipB"/>.</returns>
             
         </member>
-        <member name="M:AForge.Fuzzy.ProductNorm.Evaluate(System.Double,System.Double)">
+        <member name="M:AForge.Fuzzy.ProductNorm.Evaluate(System.Single,System.Single)">
             <summary>
             Calculates the numerical result of the AND operation applied to
             two fuzzy membership values using the product rule.
@@ -632,7 +632,7 @@
             be instantiated with a sequence of points representing the edges of each one of the lines composing the 
             piecewise function.</para>
             
-            <para><note>The x-axis points must be ordered (crescent), so the <see cref="M:AForge.Fuzzy.PiecewiseLinearFunction.GetMembership(System.Double)"/> function will use each X value 
+            <para><note>The x-axis points must be ordered (crescent), so the <see cref="M:AForge.Fuzzy.PiecewiseLinearFunction.GetMembership(System.Single)"/> function will use each X value 
             as an ending point for one line and starting point of the next.</note></para>
             
             <para>While trapezoidal and half trapezoidal are classic functions used in fuzzy functions, this class supports any function
@@ -641,15 +641,15 @@
             <para>Sample usage:</para>
             <code>
             // creating an array of points representing a typical trapezoidal function /-\
-            DoublePoint [] points = new DoublePoint[4];
+            Point [] points = new Point[4];
             // point where membership starts to rise
-            points[0] = new DoublePoint( 10, 0 );
+            points[0] = new Point( 10, 0 );
             // maximum membership (1) reached at the second point 
-            points[1] = new DoublePoint( 20, 1 );
+            points[1] = new Point( 20, 1 );
             // membership starts to fall at the third point 
-            points[2] = new DoublePoint( 30, 1 );
+            points[2] = new Point( 30, 1 );
             // membership gets to zero at the last point 
-            points[3] = new DoublePoint( 40, 0 );
+            points[3] = new Point( 40, 0 );
             // creating the instance
             PiecewiseLinearFunction membershipFunction = new PiecewiseLinearFunction( points );
             // getting membership for several points
@@ -673,7 +673,7 @@
             points vector after the instantiation.</para></remarks>
             
         </member>
-        <member name="M:AForge.Fuzzy.PiecewiseLinearFunction.#ctor(AForge.DoublePoint[])">
+        <member name="M:AForge.Fuzzy.PiecewiseLinearFunction.#ctor(AForge.Point[])">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Fuzzy.PiecewiseLinearFunction"/> class.
             </summary>
@@ -687,7 +687,7 @@
             <exception cref="T:System.ArgumentException">Y value of points must be in the range of [0, 1].</exception>
             
         </member>
-        <member name="M:AForge.Fuzzy.PiecewiseLinearFunction.GetMembership(System.Double)">
+        <member name="M:AForge.Fuzzy.PiecewiseLinearFunction.GetMembership(System.Single)">
              <summary>
              Calculate membership of a given value to the piecewise function.
              </summary>
@@ -724,7 +724,7 @@
             trapezoid.</param>
             
         </member>
-        <member name="M:AForge.Fuzzy.TrapezoidalFunction.#ctor(System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
+        <member name="M:AForge.Fuzzy.TrapezoidalFunction.#ctor(System.Single,System.Single,System.Single,System.Single,System.Single,System.Single)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Fuzzy.TrapezoidalFunction"/> class.
             
@@ -739,7 +739,7 @@
             <param name="min">The minimum value that the membership will reach, [0, 1].</param>
             
         </member>
-        <member name="M:AForge.Fuzzy.TrapezoidalFunction.#ctor(System.Double,System.Double,System.Double,System.Double)">
+        <member name="M:AForge.Fuzzy.TrapezoidalFunction.#ctor(System.Single,System.Single,System.Single,System.Single)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Fuzzy.TrapezoidalFunction"/> class.
             
@@ -756,7 +756,7 @@
             </remarks>
             
         </member>
-        <member name="M:AForge.Fuzzy.TrapezoidalFunction.#ctor(System.Double,System.Double,System.Double,System.Double,System.Double)">
+        <member name="M:AForge.Fuzzy.TrapezoidalFunction.#ctor(System.Single,System.Single,System.Single,System.Single,System.Single)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Fuzzy.TrapezoidalFunction"/> class.
             
@@ -770,7 +770,7 @@
             <param name="min">The minimum value that the membership will reach, [0, 1].</param>
             
         </member>
-        <member name="M:AForge.Fuzzy.TrapezoidalFunction.#ctor(System.Double,System.Double,System.Double)">
+        <member name="M:AForge.Fuzzy.TrapezoidalFunction.#ctor(System.Single,System.Single,System.Single)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Fuzzy.TrapezoidalFunction"/> class.
             
@@ -786,7 +786,7 @@
             </remarks>
             
         </member>
-        <member name="M:AForge.Fuzzy.TrapezoidalFunction.#ctor(System.Double,System.Double,System.Double,System.Double,AForge.Fuzzy.TrapezoidalFunction.EdgeType)">
+        <member name="M:AForge.Fuzzy.TrapezoidalFunction.#ctor(System.Single,System.Single,System.Single,System.Single,AForge.Fuzzy.TrapezoidalFunction.EdgeType)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Fuzzy.TrapezoidalFunction"/> class.
             
@@ -802,7 +802,7 @@
             <param name="edge">Trapezoid's <see cref="T:AForge.Fuzzy.TrapezoidalFunction.EdgeType"/>.</param>
             
         </member>
-        <member name="M:AForge.Fuzzy.TrapezoidalFunction.#ctor(System.Double,System.Double,AForge.Fuzzy.TrapezoidalFunction.EdgeType)">
+        <member name="M:AForge.Fuzzy.TrapezoidalFunction.#ctor(System.Single,System.Single,AForge.Fuzzy.TrapezoidalFunction.EdgeType)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Fuzzy.TrapezoidalFunction"/> class.
             
@@ -921,12 +921,12 @@
             
              // showing the shape of the linguistic variable - the shape of its labels memberships from start to end
              Console.WriteLine( "Cold; Cool; Warm; Hot" );
-             for ( double x = 0; x &lt; 80; x += 0.2 )
+             for ( float x = 0; x &lt; 80; x += 0.2 )
              {
-                 double y1 = lvTemperature.GetLabelMembership( "Cold", x );
-                 double y2 = lvTemperature.GetLabelMembership( "Cool", x );
-                 double y3 = lvTemperature.GetLabelMembership( "Warm", x );
-                 double y4 = lvTemperature.GetLabelMembership( "Hot" , x );
+                 float y1 = lvTemperature.GetLabelMembership( "Cold", x );
+                 float y2 = lvTemperature.GetLabelMembership( "Cool", x );
+                 float y3 = lvTemperature.GetLabelMembership( "Warm", x );
+                 float y4 = lvTemperature.GetLabelMembership( "Hot" , x );
             
                  Console.WriteLine( String.Format( "{0:N}; {1:N}; {2:N}; {3:N}", y1, y2, y3, y4 ) );
              }
@@ -934,7 +934,7 @@
              </remarks>
              
         </member>
-        <member name="M:AForge.Fuzzy.LinguisticVariable.#ctor(System.String,System.Double,System.Double)">
+        <member name="M:AForge.Fuzzy.LinguisticVariable.#ctor(System.String,System.Single,System.Single)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Fuzzy.LinguisticVariable"/> class.
             </summary>
@@ -982,7 +982,7 @@
             <exception cref="T:System.Collections.Generic.KeyNotFoundException">The label indicated was not found in the linguistic variable.</exception>
             
         </member>
-        <member name="M:AForge.Fuzzy.LinguisticVariable.GetLabelMembership(System.String,System.Double)">
+        <member name="M:AForge.Fuzzy.LinguisticVariable.GetLabelMembership(System.String,System.Single)">
             <summary>
             Calculate the membership of a given value to a given label. Used to evaluate linguistics clauses like 
             "X IS A", where X is a value and A is a linguistic label.
@@ -1105,7 +1105,7 @@
              // testing the firing strength
              lvSteel.NumericInput = 12;
              lvStove.NumericInput = 35;
-             double result = r1.EvaluateFiringStrength( );
+             float result = r1.EvaluateFiringStrength( );
              Console.WriteLine( result.ToString( ) );
              </code>    
              </remarks>
@@ -1252,7 +1252,7 @@
             <param name="function">Membership function that will define the shape of the fuzzy set. </param>
             
         </member>
-        <member name="M:AForge.Fuzzy.FuzzySet.GetMembership(System.Double)">
+        <member name="M:AForge.Fuzzy.FuzzySet.GetMembership(System.Single)">
             <summary>
             Calculate membership of a given value to the fuzzy set.
             </summary>
@@ -1368,7 +1368,7 @@
             <param name="outputVar">A <see cref="T:AForge.Fuzzy.LinguisticVariable"/> representing a Fuzzy Inference System's output.</param>
             
         </member>
-        <member name="M:AForge.Fuzzy.FuzzyOutput.AddOutput(System.String,System.Double)">
+        <member name="M:AForge.Fuzzy.FuzzyOutput.AddOutput(System.String,System.Single)">
             <summary>
             Adds an output to the Fuzzy Output. 
             </summary>
@@ -1403,7 +1403,7 @@
             a fuzzy output.
             </summary>
         </member>
-        <member name="M:AForge.Fuzzy.FuzzyOutput.OutputConstraint.#ctor(System.String,System.Double)">
+        <member name="M:AForge.Fuzzy.FuzzyOutput.OutputConstraint.#ctor(System.String,System.Single)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Fuzzy.FuzzyOutput.OutputConstraint"/> class.
             </summary>
@@ -1465,7 +1465,7 @@
              Clause fuzzyClause = new Clause( lvTemperature, fsHot );
              // setting the numerical input of the variable to evaluate the Clause
              lvTemperature.NumericInput = 35;
-             double result = fuzzyClause.Evaluate( );
+             float result = fuzzyClause.Evaluate( );
              Console.WriteLine ( result.ToString( ) );
              </code>    
              </remarks>
@@ -1526,12 +1526,12 @@
             FuzzySet fsNear = new FuzzySet( "Near", function2 );
             
             // getting memberships
-            double m1 = fsCool.GetMembership( 15 );
-            double m2 = fsNear.GetMembership( 35 );
+            float m1 = fsCool.GetMembership( 15 );
+            float m2 = fsNear.GetMembership( 35 );
             
             // computing the membership of "Cool AND Near"
             MinimumNorm AND = new MinimumNorm( );
-            double result = AND.Evaluate( m1, m2 );
+            float result = AND.Evaluate( m1, m2 );
                          
             // show result
             Console.WriteLine( result );
@@ -1541,7 +1541,7 @@
             <seealso cref="T:AForge.Fuzzy.ProductNorm"/>
             
         </member>
-        <member name="M:AForge.Fuzzy.MinimumNorm.Evaluate(System.Double,System.Double)">
+        <member name="M:AForge.Fuzzy.MinimumNorm.Evaluate(System.Single,System.Single)">
             <summary>
             Calculates the numerical result of the AND operation applied to
             two fuzzy membership values using the minimum rule.

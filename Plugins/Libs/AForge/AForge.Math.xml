@@ -401,6 +401,35 @@
             </remarks>
             
         </member>
+        <member name="M:AForge.Math.Statistics.Mode(System.Int32[])">
+             <summary>
+             Calculate mode value.
+             </summary>
+             
+             <param name="values">Histogram array.</param>
+             
+             <returns>Returns mode value of the histogram array.</returns>
+             
+             <remarks>
+             <para>The input array is treated as histogram, i.e. its
+             indexes are treated as values of stochastic function, but
+             array values are treated as "probabilities" (total amount of
+             hits).</para>
+             
+             <para><note>Returns the minimum mode value if the specified histogram is multimodal.</note></para>
+            
+             <para>Sample usage:</para>
+             <code>
+             // create array
+             int[] values = new int[] { 1, 1, 2, 3, 6, 8, 11, 12, 7, 3 };
+             // calculate mode value
+             int mode = Statistics.Mode( values );
+             // output it (7)
+             System.Diagnostics.Debug.WriteLine( "mode = " + mode );
+             </code>
+             </remarks>
+             
+        </member>
         <member name="T:AForge.Math.Random.GaussianGenerator">
             <summary>
             Gaussian random numbers generator.
@@ -417,7 +446,7 @@
             // create instance of random generator
             IRandomNumberGenerator generator = new GaussianGenerator( 5.0, 1.5 );
             // generate random number
-            double randomNumber = generator.Next( );
+            float randomNumber = generator.Next( );
             </code>
             </remarks>
             
@@ -460,7 +489,7 @@
             </summary>
             
         </member>
-        <member name="M:AForge.Math.Random.GaussianGenerator.#ctor(System.Double,System.Double)">
+        <member name="M:AForge.Math.Random.GaussianGenerator.#ctor(System.Single,System.Single)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Math.Random.GaussianGenerator"/> class.
             </summary>
@@ -469,7 +498,7 @@
             <param name="stdDev">Standard deviation value.</param>
             
         </member>
-        <member name="M:AForge.Math.Random.GaussianGenerator.#ctor(System.Double,System.Double,System.Int32)">
+        <member name="M:AForge.Math.Random.GaussianGenerator.#ctor(System.Single,System.Single,System.Int32)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Math.Random.GaussianGenerator"/> class.
             </summary>
@@ -530,18 +559,18 @@
             <para>Sample usage:</para>
             <code>
             // create a segment
-            LineSegment segment = new LineSegment( new DoublePoint( 0, 0 ), new DoublePoint( 3, 4 ) );
+            LineSegment segment = new LineSegment( new Point( 0, 0 ), new Point( 3, 4 ) );
             // get segment's length
-            double length = segment.Length;
+            float length = segment.Length;
             
             // get intersection point with a line
-            DoublePoint? intersection = segment.GetIntersectionWith(
-                new Line( new DoublePoint( -3, 8 ), new DoublePoint( 0, 4 ) ) );
+            Point? intersection = segment.GetIntersectionWith(
+                new Line( new Point( -3, 8 ), new Point( 0, 4 ) ) );
             </code>
             </remarks>
             
         </member>
-        <member name="M:AForge.Math.Geometry.LineSegment.#ctor(AForge.DoublePoint,AForge.DoublePoint)">
+        <member name="M:AForge.Math.Geometry.LineSegment.#ctor(AForge.Point,AForge.Point)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Math.Geometry.LineSegment"/> class.
             </summary>
@@ -563,7 +592,7 @@
             <returns>Returns a <see cref="T:AForge.Math.Geometry.Line"/> that contains this <paramref name="segment"/>.</returns>
             
         </member>
-        <member name="M:AForge.Math.Geometry.LineSegment.DistanceToPoint(AForge.DoublePoint)">
+        <member name="M:AForge.Math.Geometry.LineSegment.DistanceToPoint(AForge.Point)">
             <summary>
             Calculate Euclidean distance between a point and a finite line segment.
             </summary>
@@ -571,7 +600,7 @@
             <param name="point">The point to calculate the distance to.</param>
             
             <returns>Returns the Euclidean distance between this line segment and the specified point. Unlike
-            <see cref="M:AForge.Math.Geometry.Line.DistanceToPoint(AForge.DoublePoint)"/>, this returns the distance from the finite segment. (0,0) is 5 units
+            <see cref="M:AForge.Math.Geometry.Line.DistanceToPoint(AForge.Point)"/>, this returns the distance from the finite segment. (0,0) is 5 units
             from the segment (0,5)-(0,8), but is 0 units from the line through those points.</returns>
             
         </member>
@@ -609,6 +638,56 @@
             
             <exception cref="T:System.InvalidOperationException">Thrown if this segment is a portion of
             <paramref name="other"/> line.</exception>
+            
+        </member>
+        <member name="M:AForge.Math.Geometry.LineSegment.op_Equality(AForge.Math.Geometry.LineSegment,AForge.Math.Geometry.LineSegment)">
+             <summary>
+             Equality operator - checks if two line segments have equal parameters.
+             </summary>
+             
+             <param name="line1">First line segment to check.</param>
+             <param name="line2">Second line segment to check.</param>
+             
+             <returns>Returns <see langword="true"/> if parameters of specified
+             line segments are equal.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Geometry.LineSegment.op_Inequality(AForge.Math.Geometry.LineSegment,AForge.Math.Geometry.LineSegment)">
+             <summary>
+             Inequality operator - checks if two lines have different parameters.
+             </summary>
+             
+             <param name="line1">First line segment to check.</param>
+             <param name="line2">Second line segment to check.</param>
+             
+             <returns>Returns <see langword="true"/> if parameters of specified
+             line segments are not equal.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Geometry.LineSegment.Equals(System.Object)">
+            <summary>
+            Check if this instance of <see cref="T:AForge.Math.Geometry.LineSegment"/> equals to the specified one.
+            </summary>
+            
+            <param name="obj">Another line segment to check equalty to.</param>
+            
+            <returns>Return <see langword="true"/> if objects are equal.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Geometry.LineSegment.GetHashCode">
+            <summary>
+            Get hash code for this instance.
+            </summary>
+            
+            <returns>Returns the hash code for this instance.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Geometry.LineSegment.ToString">
+             <summary>
+             Get string representation of the class.
+             </summary>
+             
+             <returns>Returns string, which contains values of the like in readable form.</returns>
             
         </member>
         <member name="P:AForge.Math.Geometry.LineSegment.Start">
@@ -819,16 +898,16 @@
             
             <para>Generally, the equation of the line is y = <see cref="P:AForge.Math.Geometry.Line.Slope"/> * x + 
             <see cref="P:AForge.Math.Geometry.Line.Intercept"/>. However, when <see cref="P:AForge.Math.Geometry.Line.Slope"/> is an Infinity,
-            <paramref name="Intercept"/> would normally be meaningless, and it would be
+            <see name="Intercept"/> would normally be meaningless, and it would be
             impossible to distinguish the line x = 5 from the line x = -5. Therefore,
-            if <see cref="P:AForge.Math.Geometry.Line.Slope"/> is <see cref="F:System.Double.PositiveInfinity"/> or
-            <see cref="F:System.Double.NegativeInfinity"/>, the line's equation is instead 
+            if <see cref="P:AForge.Math.Geometry.Line.Slope"/> is <see cref="F:System.Single.PositiveInfinity"/> or
+            <see cref="F:System.Single.NegativeInfinity"/>, the line's equation is instead 
             x = <see cref="P:AForge.Math.Geometry.Line.Intercept"/>.</para>
             
             <para>Sample usage:</para>
             <code>
             // create a line
-            Line line = Line.FromPoints( new DoublePoint( 0, 0 ), new DoublePoint( 3, 4 ) );
+            Line line = Line.FromPoints( new Point( 0, 0 ), new Point( 3, 4 ) );
             // check if it is vertical or horizontal
             if ( line.IsVertical || line.IsHorizontal )
             {
@@ -836,13 +915,13 @@
             }
             
             // get intersection point with another line
-            DoublePoint intersection = line.GetIntersectionWith(
-                Line.FromPoints( new DoublePoint( 3, 0 ), new DoublePoint( 0, 4 ) ) );
+            Point intersection = line.GetIntersectionWith(
+                Line.FromPoints( new Point( 3, 0 ), new Point( 0, 4 ) ) );
             </code>
             </remarks>
             
         </member>
-        <member name="M:AForge.Math.Geometry.Line.FromPoints(AForge.DoublePoint,AForge.DoublePoint)">
+        <member name="M:AForge.Math.Geometry.Line.FromPoints(AForge.Point,AForge.Point)">
             <summary>
             Creates a <see cref="T:AForge.Math.Geometry.Line"/>  that goes through the two specified points.
             </summary>
@@ -856,7 +935,7 @@
             <exception cref="T:System.ArgumentException">Thrown if the two points are the same.</exception>
             
         </member>
-        <member name="M:AForge.Math.Geometry.Line.FromSlopeIntercept(System.Double,System.Double)">
+        <member name="M:AForge.Math.Geometry.Line.FromSlopeIntercept(System.Single,System.Single)">
             <summary>
             Creates a <see cref="T:AForge.Math.Geometry.Line"/> with the specified slope and intercept.
             </summary>
@@ -870,11 +949,11 @@
             <remarks><para>The construction here follows the same rules as for the rest of this class.
             Most lines are expressed as y = slope * x + intercept. Vertical lines, however, are 
             x = intercept. This is indicated by <see cref="P:AForge.Math.Geometry.Line.IsVertical"/> being true or by 
-            <see cref="P:AForge.Math.Geometry.Line.Slope"/> returning <see cref="F:System.Double.PositiveInfinity"/> or 
-            <see cref="F:System.Double.NegativeInfinity"/>.</para></remarks>
+            <see cref="P:AForge.Math.Geometry.Line.Slope"/> returning <see cref="F:System.Single.PositiveInfinity"/> or 
+            <see cref="F:System.Single.NegativeInfinity"/>.</para></remarks>
             
         </member>
-        <member name="M:AForge.Math.Geometry.Line.FromRTheta(System.Double,System.Double)">
+        <member name="M:AForge.Math.Geometry.Line.FromRTheta(System.Single,System.Single)">
             <summary>
             Constructs a <see cref="T:AForge.Math.Geometry.Line"/> from a radius and an angle (in degrees).
             </summary>
@@ -895,7 +974,7 @@
             <exception cref="T:System.ArgumentOutOfRangeException">Thrown if radius is negative.</exception>
             
         </member>
-        <member name="M:AForge.Math.Geometry.Line.FromPointTheta(AForge.DoublePoint,System.Double)">
+        <member name="M:AForge.Math.Geometry.Line.FromPointTheta(AForge.Point,System.Single)">
             <summary>
             Constructs a <see cref="T:AForge.Math.Geometry.Line"/> from a point and an angle (in degrees).
             </summary>
@@ -954,7 +1033,7 @@
             of this line.</exception>
             
         </member>
-        <member name="M:AForge.Math.Geometry.Line.DistanceToPoint(AForge.DoublePoint)">
+        <member name="M:AForge.Math.Geometry.Line.DistanceToPoint(AForge.Point)">
             <summary>
             Calculate Euclidean distance between a point and a line.
             </summary>
@@ -962,8 +1041,58 @@
             <param name="point">The point to calculate distance to.</param>
             
             <returns>Returns the Euclidean distance between this line and the specified point. Unlike
-            <see cref="M:AForge.Math.Geometry.LineSegment.DistanceToPoint(AForge.DoublePoint)"/>, this returns the distance from the infinite line. (0,0) is 0 units
+            <see cref="M:AForge.Math.Geometry.LineSegment.DistanceToPoint(AForge.Point)"/>, this returns the distance from the infinite line. (0,0) is 0 units
             from the line defined by (0,5) and (0,8), but is 5 units from the segment with those endpoints.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Geometry.Line.op_Equality(AForge.Math.Geometry.Line,AForge.Math.Geometry.Line)">
+             <summary>
+             Equality operator - checks if two lines have equal parameters.
+             </summary>
+             
+             <param name="line1">First line to check.</param>
+             <param name="line2">Second line to check.</param>
+             
+             <returns>Returns <see langword="true"/> if parameters of specified
+             lines are equal.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Geometry.Line.op_Inequality(AForge.Math.Geometry.Line,AForge.Math.Geometry.Line)">
+             <summary>
+             Inequality operator - checks if two lines have different parameters.
+             </summary>
+             
+             <param name="line1">First line to check.</param>
+             <param name="line2">Second line to check.</param>
+             
+             <returns>Returns <see langword="true"/> if parameters of specified
+             lines are not equal.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Geometry.Line.Equals(System.Object)">
+            <summary>
+            Check if this instance of <see cref="T:AForge.Math.Geometry.Line"/> equals to the specified one.
+            </summary>
+            
+            <param name="obj">Another line to check equalty to.</param>
+            
+            <returns>Return <see langword="true"/> if objects are equal.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Geometry.Line.GetHashCode">
+            <summary>
+            Get hash code for this instance.
+            </summary>
+            
+            <returns>Returns the hash code for this instance.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Geometry.Line.ToString">
+             <summary>
+             Get string representation of the class.
+             </summary>
+             
+             <returns>Returns string, which contains values of the like in readable form.</returns>
             
         </member>
         <member name="P:AForge.Math.Geometry.Line.IsVertical">
@@ -1029,7 +1158,7 @@
             </summary>
             
         </member>
-        <member name="M:AForge.Math.Geometry.GeometryTools.GetAngleBetweenVectors(AForge.IntPoint,AForge.IntPoint,AForge.IntPoint)">
+        <member name="M:AForge.Math.Geometry.GeometryTools.GetAngleBetweenVectors(AForge.Point,AForge.Point,AForge.Point)">
             <summary>
             Calculate angle between to vectors measured in [0, 180] degrees range.
             </summary>
@@ -1041,7 +1170,7 @@
             <returns>Returns angle between specified vectors measured in degrees.</returns>
             
         </member>
-        <member name="M:AForge.Math.Geometry.GeometryTools.GetAngleBetweenLines(AForge.IntPoint,AForge.IntPoint,AForge.IntPoint,AForge.IntPoint)">
+        <member name="M:AForge.Math.Geometry.GeometryTools.GetAngleBetweenLines(AForge.Point,AForge.Point,AForge.Point,AForge.Point)">
             <summary>
             Calculate minimum angle between two lines measured in [0, 90] degrees range.
             </summary>
@@ -1122,7 +1251,7 @@
             </summary>
             
         </member>
-        <member name="M:AForge.Math.Geometry.ClosePointsMergingOptimizer.#ctor(System.Double)">
+        <member name="M:AForge.Math.Geometry.ClosePointsMergingOptimizer.#ctor(System.Single)">
              <summary>
              Initializes a new instance of the <see cref="T:AForge.Math.Geometry.ClosePointsMergingOptimizer"/> class.
              </summary>
@@ -1169,7 +1298,7 @@
             // create instance of random generator
             IRandomNumberGenerator generator = new StandardGenerator( );
             // generate random number
-            double randomNumber = generator.Next( );
+            float randomNumber = generator.Next( );
             </code>
             </remarks>
             
@@ -1218,6 +1347,170 @@
              Variance value of the generator.
              </summary>
             
+        </member>
+        <member name="T:AForge.Math.Geometry.CoplanarPosit">
+             <summary>
+             3D pose estimation algorithm (coplanar case).
+             </summary>
+            
+             <remarks><para>The class implements an algorithm for 3D object's pose estimation from it's
+             2D coordinates obtained by perspective projection, when the object is described coplanar points.
+             The idea of the implemented math and algorithm is described in "Iterative Pose Estimation using
+             Coplanar Feature Points" paper written by Oberkampf, Daniel DeMenthon and Larry Davis
+             (the implementation of the algorithm is very close translation of the pseudo code given by the
+             paper, so should be easy to follow).</para>
+             
+             <para><note>At this point the implementation works only with models described by 4 points, which is
+             the minimum number of points enough for 3D pose estimation.</note></para>
+             
+             <para><note>The 4 model's point are supposed to be coplanar, i.e. supposed to reside all within
+             same planer. See <see cref="T:AForge.Math.Geometry.Posit"/> for none coplanar case.</note></para>
+             
+             <para>Read <a href="http://www.aforgenet.com/articles/posit/">3D Pose Estimation</a> article for
+             additional information and samples.</para>
+             
+             <para>Sample usage:</para>
+             <code>
+             // points of real object - model
+             Vector3[] copositObject = new Vector3[4]
+             { 
+                 new Vector3( -56.5f, 0,  56.5f ),
+                 new Vector3(  56.5f, 0,  56.5f ),
+                 new Vector3(  56.5f, 0, -56.5f ),
+                 new Vector3( -56.5f, 0, -56.5f ),
+             };
+             // focal length of camera used to capture the object
+             float focalLength = 640; // depends on your camera or projection system
+             // initialize CoPOSIT object
+             CoplanarPosit coposit = new CoplanarPosit( copositObject, focalLength );
+             
+             // 2D points of te object - projection
+             AForge.Point[] projectedPoints = new AForge.Point[4]
+             {
+                 new AForge.Point( -77,  48 ),
+                 new AForge.Point(  44,  66 ),
+                 new AForge.Point(  75, -36 ),
+                 new AForge.Point( -61, -58 ),
+             };
+             // estimate pose
+             Matrix3x3 rotationMatrix;
+             Vector3 translationVector;
+             coposit.EstimatePose( projectedPoints,
+                 out rotationMatrix, out translationVector );
+             </code>
+             </remarks>
+             
+             <seealso cref="T:AForge.Math.Geometry.Posit"/>
+            
+        </member>
+        <member name="M:AForge.Math.Geometry.CoplanarPosit.#ctor(AForge.Math.Vector3[],System.Single)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Math.Geometry.Posit"/> class.
+            </summary>
+            
+            <param name="model">Array of vectors containing coordinates of four real model's point.</param>
+            <param name="focalLength">Focal length of the camera used to capture the model.</param>
+            
+            <exception cref="T:System.ArgumentException">The model must have 4 points.</exception>
+            
+        </member>
+        <member name="M:AForge.Math.Geometry.CoplanarPosit.EstimatePose(AForge.Point[],AForge.Math.Matrix3x3@,AForge.Math.Vector3@)">
+            <summary>
+            Estimate pose of a model from it's projected 2D coordinates.
+            </summary>
+            
+            <param name="points">4 2D points of the <see cref="P:AForge.Math.Geometry.CoplanarPosit.Model">model's</see> projection.</param>
+            <param name="rotation">Gets best estimation of object's rotation.</param>
+            <param name="translation">Gets best estimation of object's translation.</param>
+            
+            <exception cref="T:System.ArgumentException">4 points must be be given for pose estimation.</exception>
+            
+            <remarks><para>Because of the Coplanar POSIT algorithm's nature, it provides two pose estimations,
+            which are valid from the algorithm's math point of view. For each pose an error is calculated,
+            which specifies how good estimation fits to the specified real 2D coordinated. The method
+            provides the best estimation through its output parameters <paramref name="rotation"/> and
+            <paramref name="translation"/>. This may be enough for many of the pose estimation application.
+            For those, who require checking the alternate pose estimation, it can be obtained using
+            <see cref="P:AForge.Math.Geometry.CoplanarPosit.AlternateEstimatedRotation"/> and <see cref="P:AForge.Math.Geometry.CoplanarPosit.AlternateEstimatedTranslation"/> properties.
+            The calculated error is provided for both estimations through <see cref="P:AForge.Math.Geometry.CoplanarPosit.BestEstimationError"/> and
+            <see cref="P:AForge.Math.Geometry.CoplanarPosit.AlternateEstimationError"/> properties.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Geometry.CoplanarPosit.BestEstimatedRotation">
+            <summary>
+            Best estimated pose recently found.
+            </summary>
+            
+            <remarks><para>The property keeps best estimated pose found by the latest call to <see cref="M:AForge.Math.Geometry.CoplanarPosit.EstimatePose(AForge.Point[],AForge.Math.Matrix3x3@,AForge.Math.Vector3@)"/>.
+            The same estimated pose is provided by that method also and can be accessed through this property
+            for convenience.</para>
+            
+            <para>See also <see cref="P:AForge.Math.Geometry.CoplanarPosit.BestEstimatedTranslation"/> and <see cref="P:AForge.Math.Geometry.CoplanarPosit.BestEstimationError"/>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Geometry.CoplanarPosit.BestEstimatedTranslation">
+            <summary>
+            Best estimated translation recently found.
+            </summary>
+            
+            <remarks><para>The property keeps best estimated translation found by the latest call to <see cref="M:AForge.Math.Geometry.CoplanarPosit.EstimatePose(AForge.Point[],AForge.Math.Matrix3x3@,AForge.Math.Vector3@)"/>.
+            The same estimated translation is provided by that method also and can be accessed through this property
+            for convenience.</para>
+            
+            <para>See also <see cref="P:AForge.Math.Geometry.CoplanarPosit.BestEstimatedRotation"/> and <see cref="P:AForge.Math.Geometry.CoplanarPosit.BestEstimationError"/>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Geometry.CoplanarPosit.BestEstimationError">
+            <summary>
+            Error of the best pose estimation.
+            </summary>
+            
+            <remarks><para>The property keeps error of the best pose estimation, which is calculated as average
+            error between real angles of the specified quadrilateral and angles of the quadrilateral which
+            is a projection of the best pose estimation. The error is measured degrees in (angle).</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Geometry.CoplanarPosit.AlternateEstimatedRotation">
+            <summary>
+            Alternate estimated pose recently found.
+            </summary>
+            
+            <remarks><para>The property keeps alternate estimated pose found by the latest call to <see cref="M:AForge.Math.Geometry.CoplanarPosit.EstimatePose(AForge.Point[],AForge.Math.Matrix3x3@,AForge.Math.Vector3@)"/>.</para>
+            
+            <para>See also <see cref="P:AForge.Math.Geometry.CoplanarPosit.AlternateEstimatedTranslation"/> and <see cref="P:AForge.Math.Geometry.CoplanarPosit.AlternateEstimationError"/>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Geometry.CoplanarPosit.AlternateEstimatedTranslation">
+            <summary>
+            Alternated estimated translation recently found.
+            </summary>
+            
+            <remarks><para>The property keeps alternate estimated translation found by the latest call to <see cref="M:AForge.Math.Geometry.CoplanarPosit.EstimatePose(AForge.Point[],AForge.Math.Matrix3x3@,AForge.Math.Vector3@)"/>.</para>
+            
+            <para>See also <see cref="P:AForge.Math.Geometry.CoplanarPosit.AlternateEstimatedRotation"/> and <see cref="P:AForge.Math.Geometry.CoplanarPosit.AlternateEstimationError"/>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Geometry.CoplanarPosit.AlternateEstimationError">
+            <summary>
+            Error of the alternate pose estimation.
+            </summary>
+            
+            <remarks><para>The property keeps error of the alternate pose estimation, which is calculated as average
+            error between real angles of the specified quadrilateral and angles of the quadrilateral which
+            is a projection of the alternate pose estimation. The error is measured in degrees (angle).</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Geometry.CoplanarPosit.Model">
+            <summary>
+            Coordinates of the model points which pose should be estimated.
+            </summary>
         </member>
         <member name="T:AForge.Math.Metrics.PearsonCorrelation">
             <summary>
@@ -1303,7 +1596,7 @@
              shape. If the mean distance is equal to or less than maximum allowed distance,
              then a shape is recognized. The maximum allowed distance is calculated as:
              <code lang="none">
-             maxDitance = max( minAcceptableDistortion, relativeDistortionLimit * ( width + height ) / 2 )
+             maxDistance = max( minAcceptableDistortion, relativeDistortionLimit * ( width + height ) / 2 )
              </code>
              , where <b>width</b> and <b>height</b> is the size of bounding rectangle for the
              specified points.
@@ -1324,11 +1617,11 @@
              System.Random rand = new System.Random( );
             
              // generate sample circles
-             double radius = 100;
+             float radius = 100;
             
              for ( int i = 0; i &lt; 360; i += 10 )
              {
-                 double angle = (double) i / 180 * System.Math.PI;
+                 float angle = (float) ( (float) i / 180 * System.Math.PI );
              
                  // add point to ideal circle
                  idealCicle.Add( new IntPoint(
@@ -1336,7 +1629,7 @@
                      (int) ( radius * System.Math.Sin( angle ) ) ) );
              
                  // add a bit distortion for distorred cirlce
-                 double distorredRadius = radius + rand.Next( 7 ) - 3;
+                 float distorredRadius = radius + rand.Next( 7 ) - 3;
              
                  distorredCircle.Add( new IntPoint(
                      (int) ( distorredRadius * System.Math.Cos( angle ) ),
@@ -1384,7 +1677,7 @@
             shape is less than 8.</note></para></remarks>
             
         </member>
-        <member name="M:AForge.Math.Geometry.SimpleShapeChecker.IsCircle(System.Collections.Generic.List{AForge.IntPoint},AForge.DoublePoint@,System.Double@)">
+        <member name="M:AForge.Math.Geometry.SimpleShapeChecker.IsCircle(System.Collections.Generic.List{AForge.IntPoint},AForge.Point@,System.Single@)">
             <summary>
             Check if the specified set of points form a circle shape.
             </summary>
@@ -1703,7 +1996,7 @@
             </summary>
             
         </member>
-        <member name="M:AForge.Math.Geometry.LineStraighteningOptimizer.#ctor(System.Double)">
+        <member name="M:AForge.Math.Geometry.LineStraighteningOptimizer.#ctor(System.Single)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Math.Geometry.LineStraighteningOptimizer"/> class.
             </summary>
@@ -1762,7 +2055,7 @@
             </summary>
             
         </member>
-        <member name="M:AForge.Math.Geometry.FlatAnglesOptimizer.#ctor(System.Double)">
+        <member name="M:AForge.Math.Geometry.FlatAnglesOptimizer.#ctor(System.Single)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Math.Geometry.FlatAnglesOptimizer"/> class.
             </summary>
@@ -1808,14 +2101,14 @@
             <para>Sample usage:</para>
             <code>
             // create instance of random generator
-            IRandomNumberGenerator generator = new UniformGenerator( new DoubleRange( 50, 100 ) );
+            IRandomNumberGenerator generator = new UniformGenerator( new Range( 50, 100 ) );
             // generate random number
-            double randomNumber = generator.Next( );
+            float randomNumber = generator.Next( );
             </code>
             </remarks>
             
         </member>
-        <member name="M:AForge.Math.Random.UniformGenerator.#ctor(AForge.DoubleRange)">
+        <member name="M:AForge.Math.Random.UniformGenerator.#ctor(AForge.Range)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Math.Random.UniformGenerator"/> class.
             </summary>
@@ -1825,7 +2118,7 @@
             <remarks>Initializes random numbers generator with zero seed.</remarks>
             
         </member>
-        <member name="M:AForge.Math.Random.UniformGenerator.#ctor(AForge.DoubleRange,System.Int32)">
+        <member name="M:AForge.Math.Random.UniformGenerator.#ctor(AForge.Range,System.Int32)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Math.Random.UniformGenerator"/> class.
             </summary>
@@ -1912,6 +2205,411 @@
             array have different length).</exception>
             
         </member>
+        <member name="T:AForge.Math.Vector4">
+            <summary>
+            4D Vector structure with X, Y, Z and W coordinates.
+            </summary>
+            
+            <remarks><para>The structure incapsulates X, Y, Z and W coordinates of a 4D vector and
+            provides some operations with it.</para></remarks>
+            
+        </member>
+        <member name="F:AForge.Math.Vector4.X">
+            <summary>
+            X coordinate of the vector.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Vector4.Y">
+            <summary>
+            Y coordinate of the vector.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Vector4.Z">
+            <summary>
+            Z coordinate of the vector.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Vector4.W">
+            <summary>
+            W coordinate of the vector.
+            </summary>
+        </member>
+        <member name="M:AForge.Math.Vector4.#ctor(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Math.Vector4"/> structure.
+            </summary>
+            
+            <param name="x">X coordinate of the vector.</param>
+            <param name="y">Y coordinate of the vector.</param>
+            <param name="z">Z coordinate of the vector.</param>
+            <param name="w">W coordinate of the vector.</param>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.#ctor(System.Single)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Math.Vector4"/> structure.
+            </summary>
+            
+            <param name="value">Value, which is set to all 4 coordinates of the vector.</param>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.ToString">
+            <summary>
+            Returns a string representation of this object.
+            </summary>
+            
+            <returns>A string representation of this object.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.ToArray">
+            <summary>
+            Returns array representation of the vector.
+            </summary>
+            
+            <returns>Array with 4 values containing X/Y/Z/W coordinates.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.op_Addition(AForge.Math.Vector4,AForge.Math.Vector4)">
+             <summary>
+             Adds corresponding coordinates of two vectors.
+             </summary>
+             
+             <param name="vector1">The vector to add to.</param>
+             <param name="vector2">The vector to add to the first vector.</param>
+             
+             <returns>Returns a vector which coordinates are equal to sum of corresponding
+             coordinates of the two specified vectors.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.Add(AForge.Math.Vector4,AForge.Math.Vector4)">
+             <summary>
+             Adds corresponding coordinates of two vectors.
+             </summary>
+             
+             <param name="vector1">The vector to add to.</param>
+             <param name="vector2">The vector to add to the first vector.</param>
+             
+             <returns>Returns a vector which coordinates are equal to sum of corresponding
+             coordinates of the two specified vectors.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.op_Addition(AForge.Math.Vector4,System.Single)">
+            <summary>
+            Adds a value to all coordinates of the specified vector.
+            </summary>
+            
+            <param name="vector">Vector to add the specified value to.</param>
+            <param name="value">Value to add to all coordinates of the vector.</param>
+            
+            <returns>Returns new vector with all coordinates increased by the specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.Add(AForge.Math.Vector4,System.Single)">
+            <summary>
+            Adds a value to all coordinates of the specified vector.
+            </summary>
+            
+            <param name="vector">Vector to add the specified value to.</param>
+            <param name="value">Value to add to all coordinates of the vector.</param>
+            
+            <returns>Returns new vector with all coordinates increased by the specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.op_Subtraction(AForge.Math.Vector4,AForge.Math.Vector4)">
+             <summary>
+             Subtracts corresponding coordinates of two vectors.
+             </summary>
+             
+             <param name="vector1">The vector to subtract from.</param>
+             <param name="vector2">The vector to subtract from the first vector.</param>
+             
+             <returns>Returns a vector which coordinates are equal to difference of corresponding
+             coordinates of the two specified vectors.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.Subtract(AForge.Math.Vector4,AForge.Math.Vector4)">
+             <summary>
+             Subtracts corresponding coordinates of two vectors.
+             </summary>
+             
+             <param name="vector1">The vector to subtract from.</param>
+             <param name="vector2">The vector to subtract from the first vector.</param>
+             
+             <returns>Returns a vector which coordinates are equal to difference of corresponding
+             coordinates of the two specified vectors.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.op_Subtraction(AForge.Math.Vector4,System.Single)">
+            <summary>
+            Subtracts a value from all coordinates of the specified vector.
+            </summary>
+            
+            <param name="vector">Vector to subtract the specified value from.</param>
+            <param name="value">Value to subtract from all coordinates of the vector.</param>
+            
+            <returns>Returns new vector with all coordinates decreased by the specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.Subtract(AForge.Math.Vector4,System.Single)">
+            <summary>
+            Subtracts a value from all coordinates of the specified vector.
+            </summary>
+            
+            <param name="vector">Vector to subtract the specified value from.</param>
+            <param name="value">Value to subtract from all coordinates of the vector.</param>
+            
+            <returns>Returns new vector with all coordinates decreased by the specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.op_Multiply(AForge.Math.Vector4,AForge.Math.Vector4)">
+             <summary>
+             Multiplies corresponding coordinates of two vectors.
+             </summary>
+             
+             <param name="vector1">The first vector to multiply.</param>
+             <param name="vector2">The second vector to multiply.</param>
+             
+             <returns>Returns a vector which coordinates are equal to multiplication of corresponding
+             coordinates of the two specified vectors.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.Multiply(AForge.Math.Vector4,AForge.Math.Vector4)">
+             <summary>
+             Multiplies corresponding coordinates of two vectors.
+             </summary>
+             
+             <param name="vector1">The first vector to multiply.</param>
+             <param name="vector2">The second vector to multiply.</param>
+             
+             <returns>Returns a vector which coordinates are equal to multiplication of corresponding
+             coordinates of the two specified vectors.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.op_Multiply(AForge.Math.Vector4,System.Single)">
+             <summary>
+             Multiplies coordinates of the specified vector by the specified factor.
+             </summary>
+             
+             <param name="vector">Vector to multiply coordinates of.</param>
+             <param name="factor">Factor to multiple coordinates of the specified vector by.</param>
+             
+             <returns>Returns new vector with all coordinates multiplied by the specified factor.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.Multiply(AForge.Math.Vector4,System.Single)">
+             <summary>
+             Multiplies coordinates of the specified vector by the specified factor.
+             </summary>
+             
+             <param name="vector">Vector to multiply coordinates of.</param>
+             <param name="factor">Factor to multiple coordinates of the specified vector by.</param>
+             
+             <returns>Returns new vector with all coordinates multiplied by the specified factor.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.op_Division(AForge.Math.Vector4,AForge.Math.Vector4)">
+             <summary>
+             Divides corresponding coordinates of two vectors.
+             </summary>
+             
+             <param name="vector1">The first vector to divide.</param>
+             <param name="vector2">The second vector to devide.</param>
+             
+             <returns>Returns a vector which coordinates are equal to coordinates of the first vector divided by
+             corresponding coordinates of the second vector.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.Divide(AForge.Math.Vector4,AForge.Math.Vector4)">
+             <summary>
+             Divides corresponding coordinates of two vectors.
+             </summary>
+             
+             <param name="vector1">The first vector to divide.</param>
+             <param name="vector2">The second vector to devide.</param>
+             
+             <returns>Returns a vector which coordinates are equal to coordinates of the first vector divided by
+             corresponding coordinates of the second vector.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.op_Division(AForge.Math.Vector4,System.Single)">
+             <summary>
+             Divides coordinates of the specified vector by the specified factor.
+             </summary>
+             
+             <param name="vector">Vector to divide coordinates of.</param>
+             <param name="factor">Factor to divide coordinates of the specified vector by.</param>
+             
+             <returns>Returns new vector with all coordinates divided by the specified factor.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.Divide(AForge.Math.Vector4,System.Single)">
+             <summary>
+             Divides coordinates of the specified vector by the specified factor.
+             </summary>
+             
+             <param name="vector">Vector to divide coordinates of.</param>
+             <param name="factor">Factor to divide coordinates of the specified vector by.</param>
+             
+             <returns>Returns new vector with all coordinates divided by the specified factor.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.op_Equality(AForge.Math.Vector4,AForge.Math.Vector4)">
+            <summary>
+            Tests whether two specified vectors are equal.
+            </summary>
+            
+            <param name="vector1">The left-hand vector.</param>
+            <param name="vector2">The right-hand vector.</param>
+            
+            <returns>Returns <see langword="true"/> if the two vectors are equal or <see langword="false"/> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.op_Inequality(AForge.Math.Vector4,AForge.Math.Vector4)">
+            <summary>
+            Tests whether two specified vectors are not equal.
+            </summary>
+            
+            <param name="vector1">The left-hand vector.</param>
+            <param name="vector2">The right-hand vector.</param>
+            
+            <returns>Returns <see langword="true"/> if the two vectors are not equal or <see langword="false"/> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.Equals(AForge.Math.Vector4)">
+            <summary>
+            Tests whether the vector equals to the specified one.
+            </summary>
+            
+            <param name="vector">The vector to test equality with.</param>
+            
+            <returns>Returns <see langword="true"/> if the two vectors are equal or <see langword="false"/> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.Equals(System.Object)">
+            <summary>
+            Tests whether the vector equals to the specified object.
+            </summary>
+            
+            <param name="obj">The object to test equality with.</param>
+            
+            <returns>Returns <see langword="true"/> if the vector equals to the specified object or <see langword="false"/> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.GetHashCode">
+            <summary>
+            Returns the hashcode for this instance.
+            </summary>
+            
+            <returns>A 32-bit signed integer hash code.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.Normalize">
+             <summary>
+             Normalizes the vector by dividing it’s all coordinates with the vector's norm.
+             </summary>
+             
+             <returns>Returns the value of vectors’ norm before normalization.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.Inverse">
+             <summary>
+             Inverse the vector.
+             </summary>
+             
+             <returns>Returns a vector with all coordinates equal to 1.0 divided by the value of corresponding coordinate
+             in this vector (or equal to 0.0 if this vector has corresponding coordinate also set to 0.0).</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.Abs">
+            <summary>
+            Calculate absolute values of the vector.
+            </summary>
+            
+            <returns>Returns a vector with all coordinates equal to absolute values of this vector's coordinates.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.Dot(AForge.Math.Vector4,AForge.Math.Vector4)">
+            <summary>
+            Calculates dot product of two vectors.
+            </summary>
+            
+            <param name="vector1">First vector to use for dot product calculation.</param>
+            <param name="vector2">Second vector to use for dot product calculation.</param>
+            
+            <returns>Returns dot product of the two specified vectors.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector4.ToVector3">
+            <summary>
+            Converts the vector to a 3D vector.
+            </summary>
+            
+            <returns>Returns 3D vector which has X/Y/Z coordinates equal to X/Y/Z coordinates
+            of this vector divided by <see cref="F:AForge.Math.Vector4.W"/>.</returns>
+            
+        </member>
+        <member name="P:AForge.Math.Vector4.Max">
+             <summary>
+             Returns maximum value of the vector.
+             </summary>
+            
+             <remarks><para>Returns maximum value of all 4 vector's coordinates.</para></remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Vector4.Min">
+             <summary>
+             Returns minimum value of the vector.
+             </summary>
+            
+             <remarks><para>Returns minimum value of all 4 vector's coordinates.</para></remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Vector4.MaxIndex">
+             <summary>
+             Returns index of the coordinate with maximum value.
+             </summary>
+            
+             <remarks><para>Returns index of the coordinate, which has the maximum value - 0 for X,
+             1 for Y, 2 for Z or 3 for W.</para>
+             
+             <para><note>If there are multiple coordinates which have the same maximum value, the
+             property returns smallest index.</note></para>
+             </remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Vector4.MinIndex">
+             <summary>
+             Returns index of the coordinate with minimum value.
+             </summary>
+            
+             <remarks><para>Returns index of the coordinate, which has the minimum value - 0 for X,
+             1 for Y, 2 for Z or 3 for W.</para>
+             
+             <para><note>If there are multiple coordinates which have the same minimum value, the
+             property returns smallest index.</note></para>
+             </remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Vector4.Norm">
+            <summary>
+            Returns vector's norm.
+            </summary>
+            
+            <remarks><para>Returns Euclidean norm of the vector, which is a
+            square root of the sum: X<sup>2</sup>+Y<sup>2</sup>+Z<sup>2</sup>+W<sup>2</sup>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Vector4.Square">
+            <summary>
+            Returns square of the vector's norm.
+            </summary>
+            
+            <remarks><para>Return X<sup>2</sup>+Y<sup>2</sup>+Z<sup>2</sup>+W<sup>2</sup>, which is
+            a square of <see cref="P:AForge.Math.Vector4.Norm">vector's norm</see> or a <see cref="M:AForge.Math.Vector4.Dot(AForge.Math.Vector4,AForge.Math.Vector4)">dot product</see> of this vector
+            with itself.</para></remarks>
+            
+        </member>
         <member name="T:AForge.Math.Random.UniformOneGenerator">
             <summary>
             Uniform random numbers generator in the range of [0, 1).
@@ -1930,7 +2628,7 @@
             // create instance of random generator
             IRandomNumberGenerator generator = new UniformOneGenerator( );
             // generate random number
-            double randomNumber = generator.Next( );
+            float randomNumber = generator.Next( );
             </code>
             </remarks>
             
@@ -1998,12 +2696,12 @@
             // create instance of random generator
             IRandomNumberGenerator generator = new ExponentialGenerator( 5 );
             // generate random number
-            double randomNumber = generator.Next( );
+            float randomNumber = generator.Next( );
             </code>
             </remarks>
             
         </member>
-        <member name="M:AForge.Math.Random.ExponentialGenerator.#ctor(System.Double)">
+        <member name="M:AForge.Math.Random.ExponentialGenerator.#ctor(System.Single)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Math.Random.ExponentialGenerator"/> class.
             </summary>
@@ -2013,7 +2711,7 @@
             <exception cref="T:System.ArgumentException">Rate value should be greater than zero.</exception>
             
         </member>
-        <member name="M:AForge.Math.Random.ExponentialGenerator.#ctor(System.Double,System.Int32)">
+        <member name="M:AForge.Math.Random.ExponentialGenerator.#ctor(System.Single,System.Int32)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Math.Random.ExponentialGenerator"/> class.
             </summary>
@@ -2062,6 +2760,404 @@
              Variance value of the generator.
              </summary>
             
+        </member>
+        <member name="T:AForge.Math.Matrix4x4">
+            <summary>
+            A structure representing 4x4 matrix.
+            </summary>
+            
+            <remarks><para>The structure incapsulates elements of a 4x4 matrix and
+            provides some operations with it.</para></remarks>
+            
+        </member>
+        <member name="F:AForge.Math.Matrix4x4.V00">
+            <summary>
+            Row 0 column 0 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix4x4.V01">
+            <summary>
+            Row 0 column 1 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix4x4.V02">
+            <summary>
+            Row 0 column 2 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix4x4.V03">
+            <summary>
+            Row 0 column 3 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix4x4.V10">
+            <summary>
+            Row 1 column 0 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix4x4.V11">
+            <summary>
+            Row 1 column 1 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix4x4.V12">
+            <summary>
+            Row 1 column 2 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix4x4.V13">
+            <summary>
+            Row 1 column 3 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix4x4.V20">
+            <summary>
+            Row 2 column 0 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix4x4.V21">
+            <summary>
+            Row 2 column 1 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix4x4.V22">
+            <summary>
+            Row 2 column 2 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix4x4.V23">
+            <summary>
+            Row 2 column 3 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix4x4.V30">
+            <summary>
+            Row 3 column 0 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix4x4.V31">
+            <summary>
+            Row 3 column 1 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix4x4.V32">
+            <summary>
+            Row 3 column 2 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix4x4.V33">
+            <summary>
+            Row 3 column 3 element of the matrix.
+            </summary>
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.ToArray">
+            <summary>
+            Returns array representation of the matrix.
+            </summary>
+            
+            <returns>Returns array which contains all elements of the matrix in the row-major order.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.CreateRotationY(System.Single)">
+            <summary>
+            Creates rotation matrix around Y axis.
+            </summary>
+            
+            <param name="radians">Rotation angle around Y axis in radians.</param>
+            
+            <returns>Returns rotation matrix to rotate an object around Y axis.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.CreateRotationX(System.Single)">
+            <summary>
+            Creates rotation matrix around X axis.
+            </summary>
+            
+            <param name="radians">Rotation angle around X axis in radians.</param>
+            
+            <returns>Returns rotation matrix to rotate an object around X axis.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.CreateRotationZ(System.Single)">
+            <summary>
+            Creates rotation matrix around Z axis.
+            </summary>
+            
+            <param name="radians">Rotation angle around Z axis in radians.</param>
+            
+            <returns>Returns rotation matrix to rotate an object around Z axis.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.CreateFromYawPitchRoll(System.Single,System.Single,System.Single)">
+            <summary>
+            Creates rotation matrix to rotate an object around X, Y and Z axes.
+            </summary>
+            
+            <param name="yaw">Rotation angle around Y axis in radians.</param>
+            <param name="pitch">Rotation angle around X axis in radians.</param>
+            <param name="roll">Rotation angle around Z axis in radians.</param>
+            
+            <returns>Returns rotation matrix to rotate an object around all 3 axes.</returns>
+            
+            <remarks>
+            <para><note>The routine assumes roll-pitch-yaw rotation order, when creating rotation
+            matrix, i.e. an object is first rotated around Z axis, then around X axis and finally around
+            Y axis.</note></para>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.ExtractYawPitchRoll(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Extract rotation angles from the rotation matrix.
+            </summary>
+            
+            <param name="yaw">Extracted rotation angle around Y axis in radians.</param>
+            <param name="pitch">Extracted rotation angle around X axis in radians.</param>
+            <param name="roll">Extracted rotation angle around Z axis in radians.</param>
+            
+            <remarks><para><note>The routine assumes roll-pitch-yaw rotation order when extracting rotation angle.
+            Using extracted angles with the <see cref="M:AForge.Math.Matrix4x4.CreateFromYawPitchRoll(System.Single,System.Single,System.Single)"/> should provide same rotation matrix.
+            </note></para>
+            
+            <para><note>The method assumes the provided matrix represent valid rotation matrix.</note></para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // assume we have a rotation matrix created like this
+            float yaw   = 10.0f / 180 * Math.PI;
+            float pitch = 30.0f / 180 * Math.PI;
+            float roll  = 45.0f / 180 * Math.PI;
+            
+            Matrix4x4 rotationMatrix = Matrix3x3.CreateFromYawPitchRoll( yaw, pitch, roll );
+            // ...
+            
+            // now somewhere in the code you may want to get rotation
+            // angles back from a matrix assuming same rotation order
+            float extractedYaw;
+            float extractedPitch;
+            float extractedRoll;
+            
+            rotation.ExtractYawPitchRoll( out extractedYaw, out extractedPitch, out extractedRoll );
+            </code>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.CreateFromRotation(AForge.Math.Matrix3x3)">
+            <summary>
+            Creates 4x4 tranformation matrix from 3x3 rotation matrix.
+            </summary>
+            
+            <param name="rotationMatrix">Source 3x3 rotation matrix.</param>
+            
+            <returns>Returns 4x4 rotation matrix.</returns>
+            
+            <remarks><para>The source 3x3 rotation matrix is copied into the top left corner of the result 4x4 matrix,
+            i.e. it represents 0th, 1st and 2nd row/column. The <see cref="F:AForge.Math.Matrix4x4.V33"/> element is set to 1 and the rest
+            elements of 3rd row and 3rd column are set to zeros.</para></remarks>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.CreateTranslation(AForge.Math.Vector3)">
+            <summary>
+            Creates translation matrix for the specified movement amount.
+            </summary>
+            
+            <param name="position">Vector which set direction and amount of movement.</param>
+            
+            <returns>Returns translation matrix.</returns>
+            
+            <remarks><para>The specified vector is copied to the 3rd column of the result matrix.
+            All diagonal elements are set to 1. The rest of matrix is initialized with zeros.</para></remarks>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.CreateLookAt(AForge.Math.Vector3,AForge.Math.Vector3)">
+            <summary>
+            Creates a view matrix for the specified camera position and target point.
+            </summary>
+            
+            <param name="cameraPosition">Position of camera.</param>
+            <param name="cameraTarget">Target point towards which camera is pointing.</param>
+            
+            <returns>Returns a view matrix.</returns>
+            
+            <remarks><para>Camera's "up" vector is supposed to be (0, 1, 0).</para></remarks>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.CreatePerspective(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Creates a perspective projection matrix.
+            </summary>
+            
+            <param name="width">Width of the view volume at the near view plane.</param>
+            <param name="height">Height of the view volume at the near view plane.</param>
+            <param name="nearPlaneDistance">Distance to the near view plane.</param>
+            <param name="farPlaneDistance">Distance to the far view plane.</param>
+            
+            <returns>Return a perspective projection matrix.</returns>
+            
+            <exception cref="T:System.ArgumentOutOfRangeException">Both near and far view planes' distances must be greater than zero.</exception>
+            <exception cref="T:System.ArgumentException">Near plane must be closer than the far plane.</exception>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.CreateFromRows(AForge.Math.Vector4,AForge.Math.Vector4,AForge.Math.Vector4,AForge.Math.Vector4)">
+            <summary>
+            Creates a matrix from 4 rows specified as vectors.
+            </summary>
+            
+            <param name="row0">First row of the matrix to create.</param>
+            <param name="row1">Second row of the matrix to create.</param>
+            <param name="row2">Third row of the matrix to create.</param>
+            <param name="row3">Fourth row of the matrix to create.</param>
+            
+            <returns>Returns a matrix from specified rows.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.CreateFromColumns(AForge.Math.Vector4,AForge.Math.Vector4,AForge.Math.Vector4,AForge.Math.Vector4)">
+            <summary>
+            Creates a matrix from 4 columns specified as vectors.
+            </summary>
+            
+            <param name="column0">First column of the matrix to create.</param>
+            <param name="column1">Second column of the matrix to create.</param>
+            <param name="column2">Third column of the matrix to create.</param>
+            <param name="column3">Fourth column of the matrix to create.</param>
+            
+            <returns>Returns a matrix from specified columns.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.CreateDiagonal(AForge.Math.Vector4)">
+            <summary>
+            Creates a diagonal matrix using the specified vector as diagonal elements.
+            </summary>
+            
+            <param name="vector">Vector to use for diagonal elements of the matrix.</param>
+            
+            <returns>Returns a diagonal matrix.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.GetRow(System.Int32)">
+            <summary>
+            Get row of the matrix.
+            </summary>
+            
+            <param name="index">Row index to get, [0, 3].</param>
+            
+            <returns>Returns specified row of the matrix as a vector.</returns>
+            
+            <exception cref="T:System.ArgumentException">Invalid row index was specified.</exception>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.GetColumn(System.Int32)">
+            <summary>
+            Get column of the matrix.
+            </summary>
+            
+            <param name="index">Column index to get, [0, 3].</param>
+            
+            <returns>Returns specified column of the matrix as a vector.</returns>
+            
+            <exception cref="T:System.ArgumentException">Invalid column index was specified.</exception>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.op_Multiply(AForge.Math.Matrix4x4,AForge.Math.Matrix4x4)">
+            <summary>
+            Multiplies two specified matrices.
+            </summary>
+            
+            <param name="matrix1">Matrix to multiply.</param>
+            <param name="matrix2">Matrix to multiply by.</param>
+            
+            <returns>Return new matrix, which the result of multiplication of the two specified matrices.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.Multiply(AForge.Math.Matrix4x4,AForge.Math.Matrix4x4)">
+            <summary>
+            Multiplies two specified matrices.
+            </summary>
+            
+            <param name="matrix1">Matrix to multiply.</param>
+            <param name="matrix2">Matrix to multiply by.</param>
+            
+            <returns>Return new matrix, which the result of multiplication of the two specified matrices.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.op_Multiply(AForge.Math.Matrix4x4,AForge.Math.Vector4)">
+             <summary>
+             Multiplies specified matrix by the specified vector.
+             </summary>
+             
+             <param name="matrix">Matrix to multiply by vector.</param>
+             <param name="vector">Vector to multiply matrix by.</param>
+             
+             <returns>Returns new vector which is the result of multiplication of the specified matrix
+             by the specified vector.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.Multiply(AForge.Math.Matrix4x4,AForge.Math.Vector4)">
+             <summary>
+             Multiplies specified matrix by the specified vector.
+             </summary>
+             
+             <param name="matrix">Matrix to multiply by vector.</param>
+             <param name="vector">Vector to multiply matrix by.</param>
+             
+             <returns>Returns new vector which is the result of multiplication of the specified matrix
+             by the specified vector.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.op_Equality(AForge.Math.Matrix4x4,AForge.Math.Matrix4x4)">
+            <summary>
+            Tests whether two specified matrices are equal.
+            </summary>
+            
+            <param name="matrix1">The left-hand matrix.</param>
+            <param name="matrix2">The right-hand matrix.</param>
+            
+            <returns>Returns <see langword="true"/> if the two matrices are equal or <see langword="false"/> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.op_Inequality(AForge.Math.Matrix4x4,AForge.Math.Matrix4x4)">
+            <summary>
+            Tests whether two specified matrices are not equal.
+            </summary>
+            
+            <param name="matrix1">The left-hand matrix.</param>
+            <param name="matrix2">The right-hand matrix.</param>
+            
+            <returns>Returns <see langword="true"/> if the two matrices are not equal or <see langword="false"/> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.Equals(AForge.Math.Matrix4x4)">
+            <summary>
+            Tests whether the matrix equals to the specified one.
+            </summary>
+            
+            <param name="matrix">The matrix to test equality with.</param>
+            
+            <returns>Returns <see langword="true"/> if the two matrices are equal or <see langword="false"/> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.Equals(System.Object)">
+            <summary>
+            Tests whether the matrix equals to the specified object.
+            </summary>
+            
+            <param name="obj">The object to test equality with.</param>
+            
+            <returns>Returns <see langword="true"/> if the matrix equals to the specified object or <see langword="false"/> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.GetHashCode">
+            <summary>
+            Returns the hashcode for this instance.
+            </summary>
+            
+            <returns>A 32-bit signed integer hash code.</returns>
+            
+        </member>
+        <member name="P:AForge.Math.Matrix4x4.Identity">
+            <summary>
+            Provides an identity matrix with all diagonal elements set to 1.
+            </summary>
         </member>
         <member name="T:AForge.Math.Geometry.ShapeType">
             <summary>
@@ -2204,7 +3300,7 @@
         </member>
         <member name="M:AForge.Math.Geometry.PointsCloud.GetFurthestPoint(System.Collections.Generic.IEnumerable{AForge.IntPoint},AForge.IntPoint)">
             <summary>
-            Find furhtest point from the specified point.
+            Find furthest point from the specified point.
             </summary>
             
             <param name="cloud">Collection of points to search furthest point in.</param>
@@ -2215,7 +3311,7 @@
         </member>
         <member name="M:AForge.Math.Geometry.PointsCloud.GetFurthestPointsFromLine(System.Collections.Generic.IEnumerable{AForge.IntPoint},AForge.IntPoint,AForge.IntPoint,AForge.IntPoint@,AForge.IntPoint@)">
             <summary>
-            Find two furhtest points from the specified line.
+            Find two furthest points from the specified line.
             </summary>
             
             <param name="cloud">Collection of points to search furthest points in.</param>
@@ -2225,14 +3321,14 @@
             <param name="furthestPoint2">Second found furthest point (which is on the
             opposite side from the line compared to the <paramref name="furthestPoint1"/>);</param>
             
-            <remarks><para>The method finds two furhtest points from the specified line,
+            <remarks><para>The method finds two furthest points from the specified line,
             where one point is on one side from the line and the second point is on
             another side from the line.</para></remarks>
             
         </member>
-        <member name="M:AForge.Math.Geometry.PointsCloud.GetFurthestPointsFromLine(System.Collections.Generic.IEnumerable{AForge.IntPoint},AForge.IntPoint,AForge.IntPoint,AForge.IntPoint@,System.Double@,AForge.IntPoint@,System.Double@)">
+        <member name="M:AForge.Math.Geometry.PointsCloud.GetFurthestPointsFromLine(System.Collections.Generic.IEnumerable{AForge.IntPoint},AForge.IntPoint,AForge.IntPoint,AForge.IntPoint@,System.Single@,AForge.IntPoint@,System.Single@)">
              <summary>
-             Find two furhtest points from the specified line.
+             Find two furthest points from the specified line.
              </summary>
              
              <param name="cloud">Collection of points to search furthest points in.</param>
@@ -2244,14 +3340,14 @@
              opposite side from the line compared to the <paramref name="furthestPoint1"/>);</param>
              <param name="distance2">Distance between the second found point and the given line.</param>
              
-             <remarks><para>The method finds two furhtest points from the specified line,
+             <remarks><para>The method finds two furthest points from the specified line,
              where one point is on one side from the line and the second point is on
              another side from the line.</para></remarks>
             
         </member>
         <member name="M:AForge.Math.Geometry.PointsCloud.GetFurthestPointFromLine(System.Collections.Generic.IEnumerable{AForge.IntPoint},AForge.IntPoint,AForge.IntPoint)">
              <summary>
-             Find the furhtest point from the specified line.
+             Find the furthest point from the specified line.
              </summary>
              
              <param name="cloud">Collection of points to search furthest point in.</param>
@@ -2267,21 +3363,21 @@
              regardless of side from the line.</para></remarks>
             
         </member>
-        <member name="M:AForge.Math.Geometry.PointsCloud.GetFurthestPointFromLine(System.Collections.Generic.IEnumerable{AForge.IntPoint},AForge.IntPoint,AForge.IntPoint,System.Double@)">
+        <member name="M:AForge.Math.Geometry.PointsCloud.GetFurthestPointFromLine(System.Collections.Generic.IEnumerable{AForge.IntPoint},AForge.IntPoint,AForge.IntPoint,System.Single@)">
              <summary>
-             Find the furhtest point from the specified line.
+             Find the furthest point from the specified line.
              </summary>
              
              <param name="cloud">Collection of points to search furthest points in.</param>
              <param name="linePoint1">First point forming the line.</param>
              <param name="linePoint2">Second point forming the line.</param>
-             <param name="distance">Distance between the furhtest found point and the given line.</param>
+             <param name="distance">Distance between the furthest found point and the given line.</param>
              
              <returns>Returns a point, which is the furthest away from the
              specified line.</returns>
              
              <remarks><para>The method finds the furthest point from the specified line.
-             Unlike the <see cref="M:AForge.Math.Geometry.PointsCloud.GetFurthestPointsFromLine(System.Collections.Generic.IEnumerable{AForge.IntPoint},AForge.IntPoint,AForge.IntPoint,AForge.IntPoint@,System.Double@,AForge.IntPoint@,System.Double@)"/>
+             Unlike the <see cref="M:AForge.Math.Geometry.PointsCloud.GetFurthestPointsFromLine(System.Collections.Generic.IEnumerable{AForge.IntPoint},AForge.IntPoint,AForge.IntPoint,AForge.IntPoint@,System.Single@,AForge.IntPoint@,System.Single@)"/>
              method, this method find only one point, which is the furthest away from the line
              regardless of side from the line.</para></remarks>
             
@@ -2349,6 +3445,419 @@
             </remarks>
             
         </member>
+        <member name="T:AForge.Math.Vector3">
+            <summary>
+            3D Vector structure with X, Y and Z coordinates.
+            </summary>
+            
+            <remarks><para>The structure incapsulates X, Y and Z coordinates of a 3D vector and
+            provides some operations with it.</para></remarks>
+            
+        </member>
+        <member name="F:AForge.Math.Vector3.X">
+            <summary>
+            X coordinate of the vector.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Vector3.Y">
+            <summary>
+            Y coordinate of the vector.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Vector3.Z">
+            <summary>
+            Z coordinate of the vector.
+            </summary>
+        </member>
+        <member name="M:AForge.Math.Vector3.#ctor(System.Single,System.Single,System.Single)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Math.Vector3"/> structure.
+            </summary>
+            
+            <param name="x">X coordinate of the vector.</param>
+            <param name="y">Y coordinate of the vector.</param>
+            <param name="z">Z coordinate of the vector.</param>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.#ctor(System.Single)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Math.Vector3"/> structure.
+            </summary>
+            
+            <param name="value">Value, which is set to all 3 coordinates of the vector.</param>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.ToString">
+            <summary>
+            Returns a string representation of this object.
+            </summary>
+            
+            <returns>A string representation of this object.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.ToArray">
+            <summary>
+            Returns array representation of the vector.
+            </summary>
+            
+            <returns>Array with 3 values containing X/Y/Z coordinates.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.op_Addition(AForge.Math.Vector3,AForge.Math.Vector3)">
+             <summary>
+             Adds corresponding coordinates of two vectors.
+             </summary>
+             
+             <param name="vector1">The vector to add to.</param>
+             <param name="vector2">The vector to add to the first vector.</param>
+             
+             <returns>Returns a vector which coordinates are equal to sum of corresponding
+             coordinates of the two specified vectors.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.Add(AForge.Math.Vector3,AForge.Math.Vector3)">
+             <summary>
+             Adds corresponding coordinates of two vectors.
+             </summary>
+             
+             <param name="vector1">The vector to add to.</param>
+             <param name="vector2">The vector to add to the first vector.</param>
+             
+             <returns>Returns a vector which coordinates are equal to sum of corresponding
+             coordinates of the two specified vectors.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.op_Addition(AForge.Math.Vector3,System.Single)">
+            <summary>
+            Adds a value to all coordinates of the specified vector.
+            </summary>
+            
+            <param name="vector">Vector to add the specified value to.</param>
+            <param name="value">Value to add to all coordinates of the vector.</param>
+            
+            <returns>Returns new vector with all coordinates increased by the specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.Add(AForge.Math.Vector3,System.Single)">
+            <summary>
+            Adds a value to all coordinates of the specified vector.
+            </summary>
+            
+            <param name="vector">Vector to add the specified value to.</param>
+            <param name="value">Value to add to all coordinates of the vector.</param>
+            
+            <returns>Returns new vector with all coordinates increased by the specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.op_Subtraction(AForge.Math.Vector3,AForge.Math.Vector3)">
+             <summary>
+             Subtracts corresponding coordinates of two vectors.
+             </summary>
+             
+             <param name="vector1">The vector to subtract from.</param>
+             <param name="vector2">The vector to subtract from the first vector.</param>
+             
+             <returns>Returns a vector which coordinates are equal to difference of corresponding
+             coordinates of the two specified vectors.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.Subtract(AForge.Math.Vector3,AForge.Math.Vector3)">
+             <summary>
+             Subtracts corresponding coordinates of two vectors.
+             </summary>
+             
+             <param name="vector1">The vector to subtract from.</param>
+             <param name="vector2">The vector to subtract from the first vector.</param>
+             
+             <returns>Returns a vector which coordinates are equal to difference of corresponding
+             coordinates of the two specified vectors.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.op_Subtraction(AForge.Math.Vector3,System.Single)">
+            <summary>
+            Subtracts a value from all coordinates of the specified vector.
+            </summary>
+            
+            <param name="vector">Vector to subtract the specified value from.</param>
+            <param name="value">Value to subtract from all coordinates of the vector.</param>
+            
+            <returns>Returns new vector with all coordinates decreased by the specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.Subtract(AForge.Math.Vector3,System.Single)">
+            <summary>
+            Subtracts a value from all coordinates of the specified vector.
+            </summary>
+            
+            <param name="vector">Vector to subtract the specified value from.</param>
+            <param name="value">Value to subtract from all coordinates of the vector.</param>
+            
+            <returns>Returns new vector with all coordinates decreased by the specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.op_Multiply(AForge.Math.Vector3,AForge.Math.Vector3)">
+             <summary>
+             Multiplies corresponding coordinates of two vectors.
+             </summary>
+             
+             <param name="vector1">The first vector to multiply.</param>
+             <param name="vector2">The second vector to multiply.</param>
+             
+             <returns>Returns a vector which coordinates are equal to multiplication of corresponding
+             coordinates of the two specified vectors.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.Multiply(AForge.Math.Vector3,AForge.Math.Vector3)">
+             <summary>
+             Multiplies corresponding coordinates of two vectors.
+             </summary>
+             
+             <param name="vector1">The first vector to multiply.</param>
+             <param name="vector2">The second vector to multiply.</param>
+             
+             <returns>Returns a vector which coordinates are equal to multiplication of corresponding
+             coordinates of the two specified vectors.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.op_Multiply(AForge.Math.Vector3,System.Single)">
+             <summary>
+             Multiplies coordinates of the specified vector by the specified factor.
+             </summary>
+             
+             <param name="vector">Vector to multiply coordinates of.</param>
+             <param name="factor">Factor to multiple coordinates of the specified vector by.</param>
+             
+             <returns>Returns new vector with all coordinates multiplied by the specified factor.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.Multiply(AForge.Math.Vector3,System.Single)">
+             <summary>
+             Multiplies coordinates of the specified vector by the specified factor.
+             </summary>
+             
+             <param name="vector">Vector to multiply coordinates of.</param>
+             <param name="factor">Factor to multiple coordinates of the specified vector by.</param>
+             
+             <returns>Returns new vector with all coordinates multiplied by the specified factor.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.op_Division(AForge.Math.Vector3,AForge.Math.Vector3)">
+             <summary>
+             Divides corresponding coordinates of two vectors.
+             </summary>
+             
+             <param name="vector1">The first vector to divide.</param>
+             <param name="vector2">The second vector to devide.</param>
+             
+             <returns>Returns a vector which coordinates are equal to coordinates of the first vector divided by
+             corresponding coordinates of the second vector.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.Divide(AForge.Math.Vector3,AForge.Math.Vector3)">
+             <summary>
+             Divides corresponding coordinates of two vectors.
+             </summary>
+             
+             <param name="vector1">The first vector to divide.</param>
+             <param name="vector2">The second vector to devide.</param>
+             
+             <returns>Returns a vector which coordinates are equal to coordinates of the first vector divided by
+             corresponding coordinates of the second vector.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.op_Division(AForge.Math.Vector3,System.Single)">
+             <summary>
+             Divides coordinates of the specified vector by the specified factor.
+             </summary>
+             
+             <param name="vector">Vector to divide coordinates of.</param>
+             <param name="factor">Factor to divide coordinates of the specified vector by.</param>
+             
+             <returns>Returns new vector with all coordinates divided by the specified factor.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.Divide(AForge.Math.Vector3,System.Single)">
+             <summary>
+             Divides coordinates of the specified vector by the specified factor.
+             </summary>
+             
+             <param name="vector">Vector to divide coordinates of.</param>
+             <param name="factor">Factor to divide coordinates of the specified vector by.</param>
+             
+             <returns>Returns new vector with all coordinates divided by the specified factor.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.op_Equality(AForge.Math.Vector3,AForge.Math.Vector3)">
+            <summary>
+            Tests whether two specified vectors are equal.
+            </summary>
+            
+            <param name="vector1">The left-hand vector.</param>
+            <param name="vector2">The right-hand vector.</param>
+            
+            <returns>Returns <see langword="true"/> if the two vectors are equal or <see langword="false"/> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.op_Inequality(AForge.Math.Vector3,AForge.Math.Vector3)">
+            <summary>
+            Tests whether two specified vectors are not equal.
+            </summary>
+            
+            <param name="vector1">The left-hand vector.</param>
+            <param name="vector2">The right-hand vector.</param>
+            
+            <returns>Returns <see langword="true"/> if the two vectors are not equal or <see langword="false"/> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.Equals(AForge.Math.Vector3)">
+            <summary>
+            Tests whether the vector equals to the specified one.
+            </summary>
+            
+            <param name="vector">The vector to test equality with.</param>
+            
+            <returns>Returns <see langword="true"/> if the two vectors are equal or <see langword="false"/> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.Equals(System.Object)">
+            <summary>
+            Tests whether the vector equals to the specified object.
+            </summary>
+            
+            <param name="obj">The object to test equality with.</param>
+            
+            <returns>Returns <see langword="true"/> if the vector equals to the specified object or <see langword="false"/> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.GetHashCode">
+            <summary>
+            Returns the hashcode for this instance.
+            </summary>
+            
+            <returns>A 32-bit signed integer hash code.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.Normalize">
+             <summary>
+             Normalizes the vector by dividing it’s all coordinates with the vector's norm.
+             </summary>
+             
+             <returns>Returns the value of vectors’ norm before normalization.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.Inverse">
+             <summary>
+             Inverse the vector.
+             </summary>
+             
+             <returns>Returns a vector with all coordinates equal to 1.0 divided by the value of corresponding coordinate
+             in this vector (or equal to 0.0 if this vector has corresponding coordinate also set to 0.0).</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.Abs">
+            <summary>
+            Calculate absolute values of the vector.
+            </summary>
+            
+            <returns>Returns a vector with all coordinates equal to absolute values of this vector's coordinates.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.Cross(AForge.Math.Vector3,AForge.Math.Vector3)">
+            <summary>
+            Calculates cross product of two vectors.
+            </summary>
+            
+            <param name="vector1">First vector to use for cross product calculation.</param>
+            <param name="vector2">Second vector to use for cross product calculation.</param>
+            
+            <returns>Returns cross product of the two specified vectors.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.Dot(AForge.Math.Vector3,AForge.Math.Vector3)">
+            <summary>
+            Calculates dot product of two vectors.
+            </summary>
+            
+            <param name="vector1">First vector to use for dot product calculation.</param>
+            <param name="vector2">Second vector to use for dot product calculation.</param>
+            
+            <returns>Returns dot product of the two specified vectors.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Vector3.ToVector4">
+            <summary>
+            Converts the vector to a 4D vector.
+            </summary>
+            
+            <returns>Returns 4D vector which is an extension of the 3D vector.</returns>
+            
+            <remarks><para>The method returns a 4D vector which has X, Y and Z coordinates equal to the
+            coordinates of this 3D vector and <see cref="F:AForge.Math.Vector4.W">W</see> coordinate set to 1.0.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Vector3.Max">
+             <summary>
+             Returns maximum value of the vector.
+             </summary>
+            
+             <remarks><para>Returns maximum value of all 3 vector's coordinates.</para></remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Vector3.Min">
+             <summary>
+             Returns minimum value of the vector.
+             </summary>
+            
+             <remarks><para>Returns minimum value of all 3 vector's coordinates.</para></remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Vector3.MaxIndex">
+             <summary>
+             Returns index of the coordinate with maximum value.
+             </summary>
+            
+             <remarks><para>Returns index of the coordinate, which has the maximum value - 0 for X,
+             1 for Y or 2 for Z.</para>
+             
+             <para><note>If there are multiple coordinates which have the same maximum value, the
+             property returns smallest index.</note></para>
+             </remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Vector3.MinIndex">
+             <summary>
+             Returns index of the coordinate with minimum value.
+             </summary>
+            
+             <remarks><para>Returns index of the coordinate, which has the minimum value - 0 for X,
+             1 for Y or 2 for Z.</para>
+             
+             <para><note>If there are multiple coordinates which have the same minimum value, the
+             property returns smallest index.</note></para>
+             </remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Vector3.Norm">
+            <summary>
+            Returns vector's norm.
+            </summary>
+            
+            <remarks><para>Returns Euclidean norm of the vector, which is a
+            square root of the sum: X<sup>2</sup>+Y<sup>2</sup>+Z<sup>2</sup>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Vector3.Square">
+            <summary>
+            Returns square of the vector's norm.
+            </summary>
+            
+            <remarks><para>Return X<sup>2</sup>+Y<sup>2</sup>+Z<sup>2</sup>, which is
+            a square of <see cref="P:AForge.Math.Vector3.Norm">vector's norm</see> or a <see cref="M:AForge.Math.Vector3.Dot(AForge.Math.Vector3,AForge.Math.Vector3)">dot product</see> of this vector
+            with itself.</para></remarks>
+            
+        </member>
         <member name="T:AForge.Math.Metrics.CosineSimilarity">
             <summary>
             Cosine similarity metric. 
@@ -2384,6 +3893,90 @@
             array have different length).</exception>
             
         </member>
+        <member name="T:AForge.Math.Geometry.Posit">
+            <summary>
+            3D pose estimation algorithm.
+            </summary>
+            
+            <remarks><para>The class implements an algorithm for 3D object's pose estimation from it's
+            2D coordinates obtained by perspective projection, when the object is described none coplanar points.
+            The idea of the implemented math and algorithm is described in "Model-Based Object Pose in 25
+            Lines of Code" paper written by Daniel F. DeMenthon and Larry S. Davis (the implementation of
+            the algorithm is almost 1 to 1 translation of the pseudo code given by the paper, so should
+            be easy to follow).</para>
+            
+            <para><note>At this point the implementation works only with models described by 4 points, which is
+            the minimum number of points enough for 3D pose estimation.</note></para>
+            
+            <para><note>The 4 model's point <b>must not be coplanar</b>, i.e. must not reside all within
+            same planer. See <see cref="T:AForge.Math.Geometry.CoplanarPosit"/> for coplanar case.</note></para>
+            
+            <para>Read <a href="http://www.aforgenet.com/articles/posit/">3D Pose Estimation</a> article for
+            additional information and samples.</para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // points of real object - model
+            Vector3[] positObject = new Vector3[4]
+            { 
+                new Vector3(  28,  28, -28 ),
+                new Vector3( -28,  28, -28 ),
+                new Vector3(  28, -28, -28 ),
+                new Vector3(  28,  28,  28 ),
+            };
+            // focal length of camera used to capture the object
+            float focalLength = 640; // depends on your camera or projection system
+            // initialize POSIT object
+            Posit posit = new Posit( positObject, focalLength );
+            
+            // 2D points of te object - projection
+            AForge.Point[] projectedPoints = new AForge.Point[4]
+            {
+                new AForge.Point(   -4,   29 ),
+                new AForge.Point( -180,   86 ),
+                new AForge.Point(   -5, -102 ),
+                new AForge.Point(   76,  137 ),
+            };
+            // estimate pose
+            Matrix3x3 rotationMatrix;
+            Vector3 translationVector;
+            posit.EstimatePose( projectedPoints,
+                out rotationMatrix, out translationVector );
+            </code>
+            </remarks>
+            
+            <seealso cref="T:AForge.Math.Geometry.CoplanarPosit"/>
+            
+        </member>
+        <member name="M:AForge.Math.Geometry.Posit.#ctor(AForge.Math.Vector3[],System.Single)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Math.Geometry.Posit"/> class.
+            </summary>
+            
+            <param name="model">Array of vectors containing coordinates of four real model's point (points
+            must not be on the same plane).</param>
+            <param name="focalLength">Focal length of the camera used to capture the model.</param>
+            
+            <exception cref="T:System.ArgumentException">The model must have 4 points.</exception>
+            
+        </member>
+        <member name="M:AForge.Math.Geometry.Posit.EstimatePose(AForge.Point[],AForge.Math.Matrix3x3@,AForge.Math.Vector3@)">
+            <summary>
+            Estimate pose of a model from it's projected 2D coordinates.
+            </summary>
+            
+            <param name="points">4 2D points of the <see cref="P:AForge.Math.Geometry.Posit.Model">model's</see> projection.</param>
+            <param name="rotation">Gets object's rotation.</param>
+            <param name="translation">Gets object's translation.</param>
+            
+            <exception cref="T:System.ArgumentException">4 points must be be given for pose estimation.</exception>
+            
+        </member>
+        <member name="P:AForge.Math.Geometry.Posit.Model">
+            <summary>
+            Coordinates of the model points which pose should be estimated.
+            </summary>
+        </member>
         <member name="T:AForge.Math.ContinuousHistogram">
             <summary>
             Histogram for continuous random values.
@@ -2409,14 +4002,14 @@
             <code>
             // create histogram
             ContinuousHistogram histogram = new ContinuousHistogram(
-                new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new DoubleRange( 0.0, 1.0 ) );
+                new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new Range( 0.0f, 1.0f ) );
             // get mean and standard deviation values
             System.Diagnostics.Debug.WriteLine( "mean = " + histogram.Mean + ", std.dev = " + histogram.StdDev );
             </code>
             </remarks>
             
         </member>
-        <member name="M:AForge.Math.ContinuousHistogram.#ctor(System.Int32[],AForge.DoubleRange)">
+        <member name="M:AForge.Math.ContinuousHistogram.#ctor(System.Int32[],AForge.Range)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Math.ContinuousHistogram"/> class.
             </summary>
@@ -2431,7 +4024,7 @@
             </remarks>
             
         </member>
-        <member name="M:AForge.Math.ContinuousHistogram.GetRange(System.Double)">
+        <member name="M:AForge.Math.ContinuousHistogram.GetRange(System.Single)">
             <summary>
             Get range around median containing specified percentage of values.
             </summary>
@@ -2447,9 +4040,9 @@
             <code>
             // create histogram
             ContinuousHistogram histogram = new ContinuousHistogram(
-                new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new DoubleRange( 0.0, 1.0 ) );
+                new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new Range( 0.0f, 1.0f ) );
             // get 50% range
-            DoubleRange range = histogram.GetRange( 0.5 );
+            Range range = histogram.GetRange( 0.5f );
             // show the range ([0.25, 0.75])
             System.Diagnostics.Debug.WriteLine( "50% range = [" + range.Min + ", " + range.Max + "]" );
             </code>
@@ -2490,7 +4083,7 @@
             <code>
             // create histogram
             ContinuousHistogram histogram = new ContinuousHistogram(
-                new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new DoubleRange( 0.0, 1.0 ) );
+                new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new Range( 0.0f, 1.0f ) );
             // get mean value (= 0.505 )
             System.Diagnostics.Debug.WriteLine( "mean = " + histogram.Mean.ToString( "F3" ) );
             </code>
@@ -2508,7 +4101,7 @@
             <code>
             // create histogram
             ContinuousHistogram histogram = new ContinuousHistogram(
-                new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new DoubleRange( 0.0, 1.0 ) );
+                new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new Range( 0.0f, 1.0f ) );
             // get std.dev. value (= 0.215)
             System.Diagnostics.Debug.WriteLine( "std.dev. = " + histogram.StdDev.ToString( "F3" ) );
             </code>
@@ -2526,7 +4119,7 @@
             <code>
             // create histogram
             ContinuousHistogram histogram = new ContinuousHistogram(
-                new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new DoubleRange( 0.0, 1.0 ) );
+                new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new Range( 0.0f, 1.0f ) );
             // get median value (= 0.500)
             System.Diagnostics.Debug.WriteLine( "median = " + histogram.Median.ToString( "F3" ) );
             </code>
@@ -2545,7 +4138,7 @@
             <code>
             // create histogram
             ContinuousHistogram histogram = new ContinuousHistogram(
-                new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new DoubleRange( 0.0, 1.0 ) );
+                new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new Range( 0.0f, 1.0f ) );
             // get min value (= 0.250)
             System.Diagnostics.Debug.WriteLine( "min = " + histogram.Min.ToString( "F3" ) );
             </code>
@@ -2563,12 +4156,487 @@
             <code>
             // create histogram
             ContinuousHistogram histogram = new ContinuousHistogram(
-                new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new DoubleRange( 0.0, 1.0 ) );
+                new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new Range( 0.0f, 1.0f ) );
             // get max value (= 0.875)
             System.Diagnostics.Debug.WriteLine( "max = " + histogram.Max.ToString( "F3" ) );
             </code>
             </remarks>
             
+        </member>
+        <member name="T:AForge.Math.Matrix3x3">
+            <summary>
+            A structure representing 3x3 matrix.
+            </summary>
+            
+            <remarks><para>The structure incapsulates elements of a 3x3 matrix and
+            provides some operations with it.</para></remarks>
+            
+        </member>
+        <member name="F:AForge.Math.Matrix3x3.V00">
+            <summary>
+            Row 0 column 0 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix3x3.V01">
+            <summary>
+            Row 0 column 1 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix3x3.V02">
+            <summary>
+            Row 0 column 2 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix3x3.V10">
+            <summary>
+            Row 1 column 0 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix3x3.V11">
+            <summary>
+            Row 1 column 1 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix3x3.V12">
+            <summary>
+            Row 1 column 2 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix3x3.V20">
+            <summary>
+            Row 2 column 0 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix3x3.V21">
+            <summary>
+            Row 2 column 1 element of the matrix.
+            </summary>
+        </member>
+        <member name="F:AForge.Math.Matrix3x3.V22">
+            <summary>
+            Row 2 column 2 element of the matrix.
+            </summary>
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.ToArray">
+            <summary>
+            Returns array representation of the matrix.
+            </summary>
+            
+            <returns>Returns array which contains all elements of the matrix in the row-major order.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.CreateRotationY(System.Single)">
+            <summary>
+            Creates rotation matrix around Y axis.
+            </summary>
+            
+            <param name="radians">Rotation angle around Y axis in radians.</param>
+            
+            <returns>Returns rotation matrix to rotate an object around Y axis.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.CreateRotationX(System.Single)">
+            <summary>
+            Creates rotation matrix around X axis.
+            </summary>
+            
+            <param name="radians">Rotation angle around X axis in radians.</param>
+            
+            <returns>Returns rotation matrix to rotate an object around X axis.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.CreateRotationZ(System.Single)">
+            <summary>
+            Creates rotation matrix around Z axis.
+            </summary>
+            
+            <param name="radians">Rotation angle around Z axis in radians.</param>
+            
+            <returns>Returns rotation matrix to rotate an object around Z axis.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.CreateFromYawPitchRoll(System.Single,System.Single,System.Single)">
+            <summary>
+            Creates rotation matrix to rotate an object around X, Y and Z axes.
+            </summary>
+            
+            <param name="yaw">Rotation angle around Y axis in radians.</param>
+            <param name="pitch">Rotation angle around X axis in radians.</param>
+            <param name="roll">Rotation angle around Z axis in radians.</param>
+            
+            <returns>Returns rotation matrix to rotate an object around all 3 axes.</returns>
+            
+            <remarks>
+            <para><note>The routine assumes roll-pitch-yaw rotation order, when creating rotation
+            matrix, i.e. an object is first rotated around Z axis, then around X axis and finally around
+            Y axis.</note></para>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.ExtractYawPitchRoll(System.Single@,System.Single@,System.Single@)">
+            <summary>
+            Extract rotation angles from the rotation matrix.
+            </summary>
+            
+            <param name="yaw">Extracted rotation angle around Y axis in radians.</param>
+            <param name="pitch">Extracted rotation angle around X axis in radians.</param>
+            <param name="roll">Extracted rotation angle around Z axis in radians.</param>
+            
+            <remarks><para><note>The routine assumes roll-pitch-yaw rotation order when extracting rotation angle.
+            Using extracted angles with the <see cref="M:AForge.Math.Matrix3x3.CreateFromYawPitchRoll(System.Single,System.Single,System.Single)"/> should provide same rotation matrix.
+            </note></para>
+            
+            <para><note>The method assumes the provided matrix represent valid rotation matrix.</note></para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // assume we have a rotation matrix created like this
+            float yaw   = 10.0f / 180 * Math.PI;
+            float pitch = 30.0f / 180 * Math.PI;
+            float roll  = 45.0f / 180 * Math.PI;
+            
+            Matrix3x3 rotationMatrix = Matrix3x3.CreateFromYawPitchRoll( yaw, pitch, roll );
+            // ...
+            
+            // now somewhere in the code you may want to get rotation
+            // angles back from a matrix assuming same rotation order
+            float extractedYaw;
+            float extractedPitch;
+            float extractedRoll;
+            
+            rotation.ExtractYawPitchRoll( out extractedYaw, out extractedPitch, out extractedRoll );
+            </code>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.CreateFromRows(AForge.Math.Vector3,AForge.Math.Vector3,AForge.Math.Vector3)">
+            <summary>
+            Creates a matrix from 3 rows specified as vectors.
+            </summary>
+            
+            <param name="row0">First row of the matrix to create.</param>
+            <param name="row1">Second row of the matrix to create.</param>
+            <param name="row2">Third row of the matrix to create.</param>
+            
+            <returns>Returns a matrix from specified rows.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.CreateFromColumns(AForge.Math.Vector3,AForge.Math.Vector3,AForge.Math.Vector3)">
+            <summary>
+            Creates a matrix from 3 columns specified as vectors.
+            </summary>
+            
+            <param name="column0">First column of the matrix to create.</param>
+            <param name="column1">Second column of the matrix to create.</param>
+            <param name="column2">Third column of the matrix to create.</param>
+            
+            <returns>Returns a matrix from specified columns.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.CreateDiagonal(AForge.Math.Vector3)">
+            <summary>
+            Creates a diagonal matrix using the specified vector as diagonal elements.
+            </summary>
+            
+            <param name="vector">Vector to use for diagonal elements of the matrix.</param>
+            
+            <returns>Returns a diagonal matrix.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.GetRow(System.Int32)">
+            <summary>
+            Get row of the matrix.
+            </summary>
+            
+            <param name="index">Row index to get, [0, 2].</param>
+            
+            <returns>Returns specified row of the matrix as a vector.</returns>
+            
+            <exception cref="T:System.ArgumentException">Invalid row index was specified.</exception>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.GetColumn(System.Int32)">
+            <summary>
+            Get column of the matrix.
+            </summary>
+            
+            <param name="index">Column index to get, [0, 2].</param>
+            
+            <returns>Returns specified column of the matrix as a vector.</returns>
+            
+            <exception cref="T:System.ArgumentException">Invalid column index was specified.</exception>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.op_Multiply(AForge.Math.Matrix3x3,AForge.Math.Matrix3x3)">
+            <summary>
+            Multiplies two specified matrices.
+            </summary>
+            
+            <param name="matrix1">Matrix to multiply.</param>
+            <param name="matrix2">Matrix to multiply by.</param>
+            
+            <returns>Return new matrix, which the result of multiplication of the two specified matrices.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.Multiply(AForge.Math.Matrix3x3,AForge.Math.Matrix3x3)">
+            <summary>
+            Multiplies two specified matrices.
+            </summary>
+            
+            <param name="matrix1">Matrix to multiply.</param>
+            <param name="matrix2">Matrix to multiply by.</param>
+            
+            <returns>Return new matrix, which the result of multiplication of the two specified matrices.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.op_Addition(AForge.Math.Matrix3x3,AForge.Math.Matrix3x3)">
+             <summary>
+             Adds corresponding components of two matrices.
+             </summary>
+             
+             <param name="matrix1">The matrix to add to.</param>
+             <param name="matrix2">The matrix to add to the first matrix.</param>
+             
+             <returns>Returns a matrix which components are equal to sum of corresponding
+             components of the two specified matrices.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.Add(AForge.Math.Matrix3x3,AForge.Math.Matrix3x3)">
+             <summary>
+             Adds corresponding components of two matrices.
+             </summary>
+             
+             <param name="matrix1">The matrix to add to.</param>
+             <param name="matrix2">The matrix to add to the first matrix.</param>
+             
+             <returns>Returns a matrix which components are equal to sum of corresponding
+             components of the two specified matrices.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.op_Subtraction(AForge.Math.Matrix3x3,AForge.Math.Matrix3x3)">
+             <summary>
+             Subtracts corresponding components of two matrices.
+             </summary>
+             
+             <param name="matrix1">The matrix to subtract from.</param>
+             <param name="matrix2">The matrix to subtract from the first matrix.</param>
+             
+             <returns>Returns a matrix which components are equal to difference of corresponding
+             components of the two specified matrices.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.Subtract(AForge.Math.Matrix3x3,AForge.Math.Matrix3x3)">
+             <summary>
+             Subtracts corresponding components of two matrices.
+             </summary>
+             
+             <param name="matrix1">The matrix to subtract from.</param>
+             <param name="matrix2">The matrix to subtract from the first matrix.</param>
+             
+             <returns>Returns a matrix which components are equal to difference of corresponding
+             components of the two specified matrices.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.op_Multiply(AForge.Math.Matrix3x3,AForge.Math.Vector3)">
+             <summary>
+             Multiplies specified matrix by the specified vector.
+             </summary>
+             
+             <param name="matrix">Matrix to multiply by vector.</param>
+             <param name="vector">Vector to multiply matrix by.</param>
+             
+             <returns>Returns new vector which is the result of multiplication of the specified matrix
+             by the specified vector.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.Multiply(AForge.Math.Matrix3x3,AForge.Math.Vector3)">
+             <summary>
+             Multiplies specified matrix by the specified vector.
+             </summary>
+             
+             <param name="matrix">Matrix to multiply by vector.</param>
+             <param name="vector">Vector to multiply matrix by.</param>
+             
+             <returns>Returns new vector which is the result of multiplication of the specified matrix
+             by the specified vector.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.op_Multiply(AForge.Math.Matrix3x3,System.Single)">
+            <summary>
+            Multiplies matrix by the specified factor.
+            </summary>
+            
+            <param name="matrix">Matrix to multiply.</param>
+            <param name="factor">Factor to multiple the specified matrix by.</param>
+            
+            <returns>Returns new matrix with all components equal to corresponding components of the
+            specified matrix multiples by the specified factor.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.Multiply(AForge.Math.Matrix3x3,System.Single)">
+            <summary>
+            Multiplies matrix by the specified factor.
+            </summary>
+            
+            <param name="matrix">Matrix to multiply.</param>
+            <param name="factor">Factor to multiple the specified matrix by.</param>
+            
+            <returns>Returns new matrix with all components equal to corresponding components of the
+            specified matrix multiples by the specified factor.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.op_Addition(AForge.Math.Matrix3x3,System.Single)">
+            <summary>
+            Adds specified value to all components of the specified matrix.
+            </summary>
+            
+            <param name="matrix">Matrix to add value to.</param>
+            <param name="value">Value to add to all components of the specified matrix.</param>
+            
+            <returns>Returns new matrix with all components equal to corresponding components of the
+            specified matrix increased by the specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.Add(AForge.Math.Matrix3x3,System.Single)">
+            <summary>
+            Adds specified value to all components of the specified matrix.
+            </summary>
+            
+            <param name="matrix">Matrix to add value to.</param>
+            <param name="value">Value to add to all components of the specified matrix.</param>
+            
+            <returns>Returns new matrix with all components equal to corresponding components of the
+            specified matrix increased by the specified value.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.op_Equality(AForge.Math.Matrix3x3,AForge.Math.Matrix3x3)">
+            <summary>
+            Tests whether two specified matrices are equal.
+            </summary>
+            
+            <param name="matrix1">The left-hand matrix.</param>
+            <param name="matrix2">The right-hand matrix.</param>
+            
+            <returns>Returns <see langword="true"/> if the two matrices are equal or <see langword="false"/> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.op_Inequality(AForge.Math.Matrix3x3,AForge.Math.Matrix3x3)">
+            <summary>
+            Tests whether two specified matrices are not equal.
+            </summary>
+            
+            <param name="matrix1">The left-hand matrix.</param>
+            <param name="matrix2">The right-hand matrix.</param>
+            
+            <returns>Returns <see langword="true"/> if the two matrices are not equal or <see langword="false"/> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.Equals(AForge.Math.Matrix3x3)">
+            <summary>
+            Tests whether the matrix equals to the specified one.
+            </summary>
+            
+            <param name="matrix">The matrix to test equality with.</param>
+            
+            <returns>Returns <see langword="true"/> if the two matrices are equal or <see langword="false"/> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.Equals(System.Object)">
+            <summary>
+            Tests whether the matrix equals to the specified object.
+            </summary>
+            
+            <param name="obj">The object to test equality with.</param>
+            
+            <returns>Returns <see langword="true"/> if the matrix equals to the specified object or <see langword="false"/> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.GetHashCode">
+            <summary>
+            Returns the hashcode for this instance.
+            </summary>
+            
+            <returns>A 32-bit signed integer hash code.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.Transpose">
+            <summary>
+            Transpose the matrix, A<sup>T</sup>.
+            </summary>
+            
+            <returns>Return a matrix which equals to transposition of this matrix.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.MultiplySelfByTranspose">
+             <summary>
+             Multiply the matrix by its transposition, A*A<sup>T</sup>.
+             </summary>
+             
+             <returns>Returns a matrix which is the result of multiplying this matrix by its transposition.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.MultiplyTransposeBySelf">
+             <summary>
+             Multiply transposition of this matrix by itself, A<sup>T</sup>*A.
+             </summary>
+             
+             <returns>Returns a matrix which is the result of multiplying this matrix's transposition by itself.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.Adjugate">
+            <summary>
+            Calculate adjugate of the matrix, adj(A).
+            </summary>
+            
+            <returns>Returns adjugate of the matrix.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.Inverse">
+            <summary>
+            Calculate inverse of the matrix, A<sup>-1</sup>.
+            </summary>
+            
+            <returns>Returns inverse of the matrix.</returns>
+            
+            <exception cref="T:System.ArgumentException">Cannot calculate inverse of the matrix since it is singular.</exception>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.PseudoInverse">
+            <summary>
+            Calculate pseudo inverse of the matrix, A<sup>+</sup>.
+            </summary>
+            
+            <returns>Returns pseudo inverse of the matrix.</returns>
+            
+            <remarks><para>The pseudo inverse of the matrix is calculate through its <see cref="M:AForge.Math.Matrix3x3.SVD(AForge.Math.Matrix3x3@,AForge.Math.Vector3@,AForge.Math.Matrix3x3@)"/>
+            as V*E<sup>+</sup>*U<sup>T</sup>.</para></remarks>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix3x3.SVD(AForge.Math.Matrix3x3@,AForge.Math.Vector3@,AForge.Math.Matrix3x3@)">
+            <summary>
+            Calculate Singular Value Decomposition (SVD) of the matrix, such as A=U*E*V<sup>T</sup>.
+            </summary>
+            
+            <param name="u">Output parameter which gets 3x3 U matrix.</param>
+            <param name="e">Output parameter which gets diagonal elements of the E matrix.</param>
+            <param name="v">Output parameter which gets 3x3 V matrix.</param>
+            
+            <remarks><para>Having components U, E and V the source matrix can be reproduced using below code:
+            <code>
+            Matrix3x3 source = u * Matrix3x3.Diagonal( e ) * v.Transpose( );
+            </code>
+            </para></remarks>
+            
+        </member>
+        <member name="P:AForge.Math.Matrix3x3.Identity">
+            <summary>
+            Provides an identity matrix with all diagonal elements set to 1.
+            </summary>
+        </member>
+        <member name="P:AForge.Math.Matrix3x3.Determinant">
+            <summary>
+            Calculates determinant of the matrix.
+            </summary>
         </member>
         <member name="T:AForge.Math.PerlinNoise">
             <summary>

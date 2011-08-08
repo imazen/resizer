@@ -278,6 +278,90 @@
             <returns>Return's <b>HRESULT</b> error code.</returns>
             
         </member>
+        <member name="T:AForge.Video.DirectShow.Internals.IAMVideoControl">
+            <summary>
+            The interface controls certain video capture operations such as enumerating available
+            frame rates and image orientation.
+            </summary>
+            
+        </member>
+        <member name="M:AForge.Video.DirectShow.Internals.IAMVideoControl.GetCaps(AForge.Video.DirectShow.Internals.IPin,AForge.Video.DirectShow.Internals.VideoControlFlags@)">
+            <summary>
+            Retrieves the capabilities of the underlying hardware.
+            </summary>
+            
+            <param name="pin">Pin to query capabilities from.</param>
+            <param name="flags">Get capabilities of the specified pin.</param>
+            
+            <returns>Return's <b>HRESULT</b> error code.</returns>
+            
+        </member>
+        <member name="M:AForge.Video.DirectShow.Internals.IAMVideoControl.SetMode(AForge.Video.DirectShow.Internals.IPin,AForge.Video.DirectShow.Internals.VideoControlFlags)">
+            <summary>
+            Sets the video control mode of operation.
+            </summary>
+            
+            <param name="pin">The pin to set the video control mode on.</param>
+            <param name="mode">Value specifying a combination of the flags to set the video control mode.</param>
+            
+            <returns>Return's <b>HRESULT</b> error code.</returns>
+            
+        </member>
+        <member name="M:AForge.Video.DirectShow.Internals.IAMVideoControl.GetMode(AForge.Video.DirectShow.Internals.IPin,AForge.Video.DirectShow.Internals.VideoControlFlags@)">
+            <summary>
+            Retrieves the video control mode of operation.
+            </summary>
+            
+            <param name="pin">The pin to retrieve the video control mode from.</param>
+            <param name="mode">Gets combination of flags, which specify the video control mode.</param>
+            
+            <returns>Return's <b>HRESULT</b> error code.</returns>
+            
+        </member>
+        <member name="M:AForge.Video.DirectShow.Internals.IAMVideoControl.GetCurrentActualFrameRate(AForge.Video.DirectShow.Internals.IPin,System.Int64@)">
+            <summary>
+            The method retrieves the actual frame rate, expressed as a frame duration in 100-nanosecond units.
+            USB (Universal Serial Bus) and IEEE 1394 cameras may provide lower frame rates than requested
+            because of bandwidth availability. This is only available during video streaming.
+            </summary>
+            
+            <param name="pin">The pin to retrieve the frame rate from.</param>
+            <param name="actualFrameRate">Gets frame rate in frame duration in 100-nanosecond units.</param>
+            
+            <returns>Return's <b>HRESULT</b> error code.</returns>
+            
+        </member>
+        <member name="M:AForge.Video.DirectShow.Internals.IAMVideoControl.GetMaxAvailableFrameRate(AForge.Video.DirectShow.Internals.IPin,System.Int32,System.Drawing.Size,System.Int64@)">
+            <summary>
+            Retrieves the maximum frame rate currently available based on bus bandwidth usage for connections
+            such as USB and IEEE 1394 camera devices where the maximum frame rate can be limited by bandwidth
+            availability.
+            </summary>
+            
+            <param name="pin">The pin to retrieve the maximum frame rate from.</param>
+            <param name="index">Index of the format to query for maximum frame rate. This index corresponds
+            to the order in which formats are enumerated by <see cref="M:AForge.Video.DirectShow.Internals.IAMStreamConfig.GetStreamCaps(System.Int32,AForge.Video.DirectShow.Internals.AMMediaType@,AForge.Video.DirectShow.Internals.VideoStreamConfigCaps)"/>.</param>
+            <param name="dimensions">Frame image size (width and height) in pixels.</param>
+            <param name="maxAvailableFrameRate">Gets maximum available frame rate. The frame rate is expressed as frame duration in 100-nanosecond units.</param>
+            
+            <returns>Return's <b>HRESULT</b> error code.</returns>
+            
+        </member>
+        <member name="M:AForge.Video.DirectShow.Internals.IAMVideoControl.GetFrameRateList(AForge.Video.DirectShow.Internals.IPin,System.Int32,System.Drawing.Size,System.Int32@,System.IntPtr@)">
+            <summary>
+            Retrieves a list of available frame rates.
+            </summary>
+            
+            <param name="pin">The pin to retrieve the maximum frame rate from.</param>
+            <param name="index">Index of the format to query for maximum frame rate. This index corresponds
+            to the order in which formats are enumerated by <see cref="M:AForge.Video.DirectShow.Internals.IAMStreamConfig.GetStreamCaps(System.Int32,AForge.Video.DirectShow.Internals.AMMediaType@,AForge.Video.DirectShow.Internals.VideoStreamConfigCaps)"/>.</param>
+            <param name="dimensions">Frame image size (width and height) in pixels.</param>
+            <param name="listSize">Number of elements in the list of frame rates.</param>
+            <param name="frameRate">Array of frame rates in 100-nanosecond units.</param>
+            
+            <returns>Return's <b>HRESULT</b> error code.</returns>
+            
+        </member>
         <member name="T:AForge.Video.DirectShow.FilterCategory">
             <summary>
             DirectShow filter categories.
@@ -338,9 +422,9 @@
             Frame size supported by video device.
             </summary>
         </member>
-        <member name="F:AForge.Video.DirectShow.VideoCapabilities.MaxFrameRate">
+        <member name="F:AForge.Video.DirectShow.VideoCapabilities.FrameRate">
             <summary>
-            Maximum frame rate supported by video device for corresponding <see cref="F:AForge.Video.DirectShow.VideoCapabilities.FrameSize">frame size</see>.
+            Frame rate supported by video device for corresponding <see cref="F:AForge.Video.DirectShow.VideoCapabilities.FrameSize">frame size</see>.
             </summary>
         </member>
         <member name="T:AForge.Video.DirectShow.Internals.PinDirection">
@@ -1228,8 +1312,11 @@
             Video source for local video capture device (for example USB webcam).
             </summary>
             
-            <remarks><para>The video source captures video data from local video capture device.
-            DirectShow is used for capturing.</para>
+            <remarks><para>This video source class captures video data from local video capture device,
+            like USB web camera (or internal), frame grabber, capture board - anything which
+            supports <b>DirectShow</b> interface. For devices which has a shutter button or
+            support external software triggering, the class also allows to do snapshots. Both
+            video size and snapshot size can be configured.</para>
             
             <para>Sample usage:</para>
             <code>
@@ -1242,7 +1329,7 @@
             // start the video source
             videoSource.Start( );
             // ...
-            // signal to stop
+            // signal to stop when you no longer need capturing
             videoSource.SignalToStop( );
             // ...
             
@@ -1336,6 +1423,20 @@
             <exception cref="T:System.NotSupportedException">The video source does not support configuration property page.</exception>
             
         </member>
+        <member name="M:AForge.Video.DirectShow.VideoCaptureDevice.SimulateTrigger">
+            <summary>
+            Simulates an external trigger.
+            </summary>
+            
+            <remarks><para>The method simulates external trigger for video cameras, which support
+            providing still image snapshots. The effect is equivalent as pressing camera's shutter
+            button - a snapshot will be provided through <see cref="E:AForge.Video.DirectShow.VideoCaptureDevice.SnapshotFrame"/> event.</para>
+            
+            <para><note>The <see cref="P:AForge.Video.DirectShow.VideoCaptureDevice.ProvideSnapshots"/> property must be set to <see langword="true"/>
+            to enable receiving snapshots.</note></para>
+            </remarks>
+            
+        </member>
         <member name="M:AForge.Video.DirectShow.VideoCaptureDevice.WorkerThread">
             <summary>
             Worker thread.
@@ -1344,10 +1445,38 @@
         </member>
         <member name="M:AForge.Video.DirectShow.VideoCaptureDevice.OnNewFrame(System.Drawing.Bitmap)">
             <summary>
-            Notifies client about new frame.
+            Notifies clients about new frame.
             </summary>
             
             <param name="image">New frame's image.</param>
+            
+        </member>
+        <member name="M:AForge.Video.DirectShow.VideoCaptureDevice.OnSnapshotFrame(System.Drawing.Bitmap)">
+            <summary>
+            Notifies clients about new snapshot frame.
+            </summary>
+            
+            <param name="image">New snapshot's image.</param>
+            
+        </member>
+        <member name="P:AForge.Video.DirectShow.VideoCaptureDevice.ProvideSnapshots">
+             <summary>
+             Specifies if snapshots should be provided or not.
+             </summary>
+             
+             <remarks><para>Some USB cameras/devices may have a shutter button, which may result into snapshot if it
+             is pressed. So the property specifies if the video source will try providing snapshots or not - it will
+             check if the camera supports providing still image snapshots. If camera supports snapshots and the property
+             is set to <see langword="true"/>, then snapshots will be provided through <see cref="E:AForge.Video.DirectShow.VideoCaptureDevice.SnapshotFrame"/>
+             event.</para>
+             
+             <para>Check supported sizes of snapshots using <see cref="P:AForge.Video.DirectShow.VideoCaptureDevice.SnapshotCapabilities"/> property and set the
+             desired size using <see cref="P:AForge.Video.DirectShow.VideoCaptureDevice.DesiredSnapshotSize"/> property.</para>
+             
+             <para><note>The property must be set before running the video source to take effect.</note></para>
+             
+             <para>Default value of the property is set to <see langword="false"/>.</para>
+             </remarks>
             
         </member>
         <member name="E:AForge.Video.DirectShow.VideoCaptureDevice.NewFrame">
@@ -1361,6 +1490,24 @@
             making a copy (cloning) of the passed video frame, because the video source disposes its
             own original copy after notifying of clients.</note></para>
             </remarks>
+            
+        </member>
+        <member name="E:AForge.Video.DirectShow.VideoCaptureDevice.SnapshotFrame">
+            <summary>
+            Snapshot frame event.
+            </summary>
+            
+            <remarks><para>Notifies clients about new available snapshot frame - the one which comes when
+            camera's snapshot/shutter button is pressed.</para>
+            
+            <para>See documentation to <see cref="P:AForge.Video.DirectShow.VideoCaptureDevice.ProvideSnapshots"/> for additional information.</para>
+            
+            <para><note>Since video source may have multiple clients, each client is responsible for
+            making a copy (cloning) of the passed snapshot frame, because the video source disposes its
+            own original copy after notifying of clients.</note></para>
+            </remarks>
+            
+            <seealso cref="P:AForge.Video.DirectShow.VideoCaptureDevice.ProvideSnapshots"/>
             
         </member>
         <member name="E:AForge.Video.DirectShow.VideoCaptureDevice.VideoSourceError">
@@ -1419,20 +1566,42 @@
         </member>
         <member name="P:AForge.Video.DirectShow.VideoCaptureDevice.DesiredFrameSize">
             <summary>
-            Desired size of captured frames.
+            Desired size of captured video frames.
             </summary>
             
-            <remarks><para>The property sets desired frame size. However capture
-            device may not always provide frame with configured size due to the fact
+            <remarks><para>The property sets desired video frame size. However capture
+            device may not always provide video frames of configured size due to the fact
             that the size is not supported by it.</para>
             
             <para>If the property is set to size (0, 0), then capture device uses its own
-            default frame size configuration.</para>
+            default video frame size configuration.</para>
             
             <para>Default value of the property is set to (0, 0).</para>
             
             <para><note>The property should be configured before video source is started
             to take effect.</note></para></remarks>
+            
+        </member>
+        <member name="P:AForge.Video.DirectShow.VideoCaptureDevice.DesiredSnapshotSize">
+            <summary>
+            Desired size of captured snapshot frames.
+            </summary>
+            
+            <remarks><para>The property sets desired snapshot size. However capture
+            device may not always provide snapshots of configured size due to the fact
+            that the size is not supported by it.</para>
+            
+            <para>If the property is set to size (0, 0), then capture device uses its own
+            default snapshot size configuration.</para>
+            
+            <para>See documentation to <see cref="P:AForge.Video.DirectShow.VideoCaptureDevice.ProvideSnapshots"/> for additional information.</para>
+            
+            <para>Default value of the property is set to (0, 0).</para>
+            
+            <para><note>The property should be configured before video source is started
+            to take effect.</note></para></remarks>
+            
+            <seealso cref="P:AForge.Video.DirectShow.VideoCaptureDevice.ProvideSnapshots"/>
             
         </member>
         <member name="P:AForge.Video.DirectShow.VideoCaptureDevice.DesiredFrameRate">
@@ -1455,15 +1624,35 @@
         </member>
         <member name="P:AForge.Video.DirectShow.VideoCaptureDevice.VideoCapabilities">
             <summary>
-            Capabilities of the video device.
+            Video capabilities of the device.
             </summary>
             
-            <remarks><para>The property provides list of video device's capabilities.</para>
+            <remarks><para>The property provides list of device's video capabilities.</para>
             
             <para><note>Do not call this property immediately after <see cref="M:AForge.Video.DirectShow.VideoCaptureDevice.Start"/> method, since
             device may not start yet and provide its information. It is better to call the property
             before starting device or a bit after (but not immediately after).</note></para>
             </remarks>
+            
+        </member>
+        <member name="P:AForge.Video.DirectShow.VideoCaptureDevice.SnapshotCapabilities">
+            <summary>
+            Snapshot capabilities of the device.
+            </summary>
+            
+            <remarks><para>The property provides list of device's snapshot capabilities.</para>
+            
+            <para>If the array has zero length, then it means that this device does not support making
+            snapshots.</para>
+            
+            <para>See documentation to <see cref="P:AForge.Video.DirectShow.VideoCaptureDevice.ProvideSnapshots"/> for additional information.</para>
+            
+            <para><note>Do not call this property immediately after <see cref="M:AForge.Video.DirectShow.VideoCaptureDevice.Start"/> method, since
+            device may not start yet and provide its information. It is better to call the property
+            before starting device or a bit after (but not immediately after).</note></para>
+            </remarks>
+            
+            <seealso cref="P:AForge.Video.DirectShow.VideoCaptureDevice.ProvideSnapshots"/>
             
         </member>
         <member name="P:AForge.Video.DirectShow.VideoCaptureDevice.SourceObject">
@@ -2374,7 +2563,7 @@
             <returns>Returns <b>S_OK</b> on success.</returns>
             
         </member>
-        <member name="M:AForge.Video.DirectShow.Internals.Win32.memcpy(System.Int32,System.Int32,System.Int32)">
+        <member name="M:AForge.Video.DirectShow.Internals.Win32.memcpy(System.Byte*,System.Byte*,System.Int32)">
             <summary>
             Copy a block of memory.
             </summary>
@@ -2668,6 +2857,14 @@
             <remarks>Equals to PIN_CATEGORY_CAPTURE.</remarks>
             
         </member>
+        <member name="F:AForge.Video.DirectShow.Internals.PinCategory.StillImage">
+            <summary>
+            Still image pin.
+            </summary>
+            
+            <remarks>Equals to PIN_CATEGORY_STILL.</remarks>
+            
+        </member>
         <member name="T:AForge.Video.DirectShow.Internals.IReferenceClock">
              <summary>
              The IReferenceClock interface provides the reference time for the filter graph.
@@ -2865,7 +3062,7 @@
             <returns>Return's <b>HRESULT</b> error code.</returns>
             
         </member>
-        <member name="M:AForge.Video.DirectShow.Internals.IMediaEventEx.GetEvent(AForge.Video.DirectShow.Internals.DsEvCode@,System.Int32@,System.Int32@,System.Int32)">
+        <member name="M:AForge.Video.DirectShow.Internals.IMediaEventEx.GetEvent(AForge.Video.DirectShow.Internals.DsEvCode@,System.IntPtr@,System.IntPtr@,System.Int32)">
             <summary>
             Retrieves the next event notification from the event queue.
             </summary>
@@ -2908,7 +3105,7 @@
             <returns>Return's <b>HRESULT</b> error code.</returns>
             
         </member>
-        <member name="M:AForge.Video.DirectShow.Internals.IMediaEventEx.FreeEventParams(AForge.Video.DirectShow.Internals.DsEvCode,System.Int32,System.Int32)">
+        <member name="M:AForge.Video.DirectShow.Internals.IMediaEventEx.FreeEventParams(AForge.Video.DirectShow.Internals.DsEvCode,System.IntPtr,System.IntPtr)">
             <summary>
             Frees resources associated with the parameters of an event.
             </summary>
@@ -2958,6 +3155,7 @@
             
             <remarks><para>The video source provides access to video files. DirectShow is used to access video
             files.</para>
+            
             <para>Sample usage:</para>
             <code>
             // create video source

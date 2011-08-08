@@ -67,13 +67,16 @@
             <summary>
             Dispose the object.
             </summary>
+            
+            <param name="disposing">Specifies if disposing was invoked by user's code.</param>
+            
         </member>
         <member name="E:AForge.Controls.ColorSlider.ValuesChanged">
             <summary>
-            An event, to notify about changes of <see cref="P:AForge.Controls.ColorSlider.Min"/> or <see cref="P:AForge.Controls.ColorSlider.Max"/> property.
+            An event, to notify about changes of <see cref="P:AForge.Controls.ColorSlider.Min"/> or <see cref="P:AForge.Controls.ColorSlider.Max"/> properties.
             </summary>
             
-            <remarks><para>The event if fired after changes of <see cref="P:AForge.Controls.ColorSlider.Min"/> or <see cref="P:AForge.Controls.ColorSlider.Max"/> property,
+            <remarks><para>The event is fired after changes of <see cref="P:AForge.Controls.ColorSlider.Min"/> or <see cref="P:AForge.Controls.ColorSlider.Max"/> property,
             which is caused by user dragging the corresponding control’s arrow (slider).</para>
             </remarks>
             
@@ -789,6 +792,106 @@
         <member name="F:AForge.Controls.Joystick.Buttons.Button16">
             <summary>
             16th button.
+            </summary>
+        </member>
+        <member name="T:AForge.Controls.HuePicker">
+            <summary>
+            Hue picker control.
+            </summary>
+            
+            <remarks><para>The control allows selecting hue value (or range) from HSL color space. Hue values
+            are integer values in the [0, 359] range.</para>
+            
+            <para>If control's type is set to <see cref="F:AForge.Controls.HuePicker.HuePickerType.Value"/>, then it allows selecting single
+            hue value and looks like this:<br/>
+            <img src="img/controls/hue_picker1.png" width="220" height="220"/>
+            </para>
+            
+            <para>If control's type is set to <see cref="F:AForge.Controls.HuePicker.HuePickerType.Range"/>, then it allows selecting range
+            of hue values and looks like this:<br/>
+            <img src="img/controls/hue_picker2.png" width="220" height="220"/>
+            </para>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.Controls.HuePicker.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Controls.HuePicker"/> class.
+            </summary>
+            
+        </member>
+        <member name="M:AForge.Controls.HuePicker.Dispose(System.Boolean)">
+            <summary>
+            Dispose the object.
+            </summary>
+            
+            <param name="disposing">Specifies if disposing was invoked by user's code.</param>
+            
+        </member>
+        <member name="M:AForge.Controls.HuePicker.OnPaint(System.Windows.Forms.PaintEventArgs)">
+            <summary>
+            Paint the controls.
+            </summary>
+            
+            <param name="pe">Paint event arguments.</param>
+            
+        </member>
+        <member name="E:AForge.Controls.HuePicker.ValuesChanged">
+            <summary>
+            An event, to notify about changes of <see cref="P:AForge.Controls.HuePicker.Min"/> or <see cref="P:AForge.Controls.HuePicker.Max"/> properties.
+            </summary>
+            
+            <remarks><para>The event is fired after changes of its <see cref="P:AForge.Controls.HuePicker.Value"/>, <see cref="P:AForge.Controls.HuePicker.Min"/> or
+            <see cref="P:AForge.Controls.HuePicker.Max"/> properties, which is caused by user dragging the corresponding hue picker's bullets.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Controls.HuePicker.Value">
+            <summary>
+            Selected value of the hue picker control in <see cref="F:AForge.Controls.HuePicker.HuePickerType.Value"/> mode.
+            </summary>
+        </member>
+        <member name="P:AForge.Controls.HuePicker.Min">
+            <summary>
+            Minimum selected value of the hue picker control in <see cref="F:AForge.Controls.HuePicker.HuePickerType.Range"/> mode.
+            </summary>
+        </member>
+        <member name="P:AForge.Controls.HuePicker.Max">
+            <summary>
+            Maximum selected value of the hue picker control in <see cref="F:AForge.Controls.HuePicker.HuePickerType.Range"/> mode.
+            </summary>
+        </member>
+        <member name="P:AForge.Controls.HuePicker.Type">
+            <summary>
+            Current type of the hue picker control.
+            </summary>
+            
+            <remarks><para>See <see cref="T:AForge.Controls.HuePicker.HuePickerType"/> enumeration for description of the available types.</para></remarks>
+            
+        </member>
+        <member name="T:AForge.Controls.HuePicker.HuePickerType">
+            <summary>
+            Enumeration of hue picker types.
+            </summary>
+            
+            <remarks>
+            <para>The <see cref="F:AForge.Controls.HuePicker.HuePickerType.Value"/> type provides single bullet to drag, which allows
+            selecting single hue value. The value is accessible through <see cref="F:AForge.Controls.HuePicker.HuePickerType.Value"/> property.</para>
+            
+            <para>The <see cref="F:AForge.Controls.HuePicker.HuePickerType.Range"/> type provides two bullets to drag, which correspond
+            to minimum and maximum values of the hue range. These values are accessible through
+            <see cref="P:AForge.Controls.HuePicker.Min"/> and <see cref="P:AForge.Controls.HuePicker.Max"/> properties.</para>
+            </remarks>
+            
+        </member>
+        <member name="F:AForge.Controls.HuePicker.HuePickerType.Value">
+            <summary>
+            Selecting single hue value.
+            </summary>
+        </member>
+        <member name="F:AForge.Controls.HuePicker.HuePickerType.Range">
+            <summary>
+            Selecting hue values range.
             </summary>
         </member>
         <member name="T:AForge.Controls.ManipulatorControl">

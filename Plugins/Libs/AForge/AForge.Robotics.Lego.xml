@@ -1095,6 +1095,18 @@
             <returns>Returns <b>true</b> if device is alive or <b>false</b> otherwise.</returns>
             
         </member>
+        <member name="M:AForge.Robotics.Lego.NXTBrick.PlayTone(System.Int16,System.Int16,System.Boolean)">
+            <summary>
+            Play tone of specified frequency.
+            </summary>
+            
+            <param name="frequency">Tone frequency in Hz.</param>
+            <param name="duration">Tone duration in milliseconds.</param>
+            <param name="waitReply">Wait reply from NXT (safer option) or not (faster option).</param>
+            
+            <returns>Returns <b>true</b> if device is alive or <b>false</b> otherwise.</returns>
+            
+        </member>
         <member name="M:AForge.Robotics.Lego.NXTBrick.GetVersion(System.String@,System.String@)">
              <summary>
              Get firmware version of NXT brick.
@@ -1139,15 +1151,30 @@
             <returns>Returns <b>true</b> if command was executed successfully or <b>false</b> otherwise.</returns>
             
         </member>
-        <member name="M:AForge.Robotics.Lego.NXTBrick.ResetMotorPosition(AForge.Robotics.Lego.NXTBrick.Motor)">
-            <summary>
-            Reset motor's position.
-            </summary>
+        <member name="M:AForge.Robotics.Lego.NXTBrick.ResetMotorPosition(AForge.Robotics.Lego.NXTBrick.Motor,System.Boolean)">
+             <summary>
+             Reset motor's position.
+             </summary>
+             
+             <param name="motor">Motor to reset.</param>
+             <param name="relative">Specifies if relative (to last movement) or absolute motor's
+             position should reset.</param>
             
-            <param name="motor">Motor to reset.</param>
+             <returns>Returns <b>true</b> if command was executed successfully or <b>false</b> otherwise.</returns>
+             
+        </member>
+        <member name="M:AForge.Robotics.Lego.NXTBrick.ResetMotorPosition(AForge.Robotics.Lego.NXTBrick.Motor,System.Boolean,System.Boolean)">
+             <summary>
+             Reset motor's position.
+             </summary>
+             
+             <param name="motor">Motor to reset.</param>
+             <param name="relative">Specifies if relative (to last movement) or absolute motor's
+             position should reset.</param>
+             <param name="waitReply">Wait reply from NXT (safer option) or not (faster option).</param>
             
-            <returns>Returns <b>true</b> if command was executed successfully or <b>false</b> otherwise.</returns>
-            
+             <returns>Returns <b>true</b> if command was executed successfully or <b>false</b> otherwise.</returns>
+             
         </member>
         <member name="M:AForge.Robotics.Lego.NXTBrick.SetMotorState(AForge.Robotics.Lego.NXTBrick.Motor,AForge.Robotics.Lego.NXTBrick.MotorState)">
             <summary>
@@ -1156,6 +1183,18 @@
             
             <param name="motor">Motor to set state for.</param>
             <param name="state">Motor's state to set.</param>
+            
+            <returns>Returns <b>true</b> if command was executed successfully or <b>false</b> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Robotics.Lego.NXTBrick.SetMotorState(AForge.Robotics.Lego.NXTBrick.Motor,AForge.Robotics.Lego.NXTBrick.MotorState,System.Boolean)">
+            <summary>
+            Set motor state.
+            </summary>
+            
+            <param name="motor">Motor to set state for.</param>
+            <param name="state">Motor's state to set.</param>
+            <param name="waitReply">Wait reply from NXT (safer option) or not (faster option).</param>
             
             <returns>Returns <b>true</b> if command was executed successfully or <b>false</b> otherwise.</returns>
             
@@ -1183,6 +1222,19 @@
             <returns>Returns <b>true</b> if command was executed successfully or <b>false</b> otherwise.</returns>
             
         </member>
+        <member name="M:AForge.Robotics.Lego.NXTBrick.SetSensorMode(AForge.Robotics.Lego.NXTBrick.Sensor,AForge.Robotics.Lego.NXTBrick.SensorType,AForge.Robotics.Lego.NXTBrick.SensorMode,System.Boolean)">
+            <summary>
+            Set sensor's type and mode.
+            </summary>
+            
+            <param name="sensor">Sensor to set type of.</param>
+            <param name="type">Sensor's type.</param>
+            <param name="mode">Sensor's mode.</param>
+            <param name="waitReply">Wait reply from NXT (safer option) or not (faster option).</param>
+            
+            <returns>Returns <b>true</b> if command was executed successfully or <b>false</b> otherwise.</returns>
+            
+        </member>
         <member name="M:AForge.Robotics.Lego.NXTBrick.GetSensorValue(AForge.Robotics.Lego.NXTBrick.Sensor,AForge.Robotics.Lego.NXTBrick.SensorValues@)">
             <summary>
             Get sensor's values.
@@ -1200,6 +1252,17 @@
             </summary>
             
             <param name="sensor">Sensor to clear value of.</param>
+            
+            <returns>Returns <b>true</b> if command was executed successfully or <b>false</b> otherwise.</returns>
+            
+        </member>
+        <member name="M:AForge.Robotics.Lego.NXTBrick.ClearSensor(AForge.Robotics.Lego.NXTBrick.Sensor,System.Boolean)">
+            <summary>
+            Clear sensor's scaled value. 
+            </summary>
+            
+            <param name="sensor">Sensor to clear value of.</param>
+            <param name="waitReply">Wait reply from NXT (safer option) or not (faster option).</param>
             
             <returns>Returns <b>true</b> if command was executed successfully or <b>false</b> otherwise.</returns>
             
@@ -1224,6 +1287,22 @@
             <param name="data">Data to send to the I2C device.</param>
             <param name="expectedBytes">Number of bytes expected from device on reply, [0..16].
             Can be set to zero if I2C command does not suppose any reply.</param>
+            
+            <returns>Returns <b>true</b> if command was executed successfully or <b>false</b> otherwise.</returns>
+            
+            <exception cref="T:System.ArgumentException">Data length must be in the [1..16] range.</exception>
+            
+        </member>
+        <member name="M:AForge.Robotics.Lego.NXTBrick.LsWrite(AForge.Robotics.Lego.NXTBrick.Sensor,System.Byte[],System.Int32,System.Boolean)">
+            <summary>
+            Write to Low Speed bus.
+            </summary>
+            
+            <param name="sensor">Sensor to write to.</param>
+            <param name="data">Data to send to the I2C device.</param>
+            <param name="expectedBytes">Number of bytes expected from device on reply, [0..16].
+            Can be set to zero if I2C command does not suppose any reply.</param>
+            <param name="waitReply">Wait reply from NXT (safer option) or not (faster option).</param>
             
             <returns>Returns <b>true</b> if command was executed successfully or <b>false</b> otherwise.</returns>
             
@@ -1262,7 +1341,7 @@
             for details.</para>
             
             <para><note>Before using this method it is required to use
-            <see cref="M:AForge.Robotics.Lego.NXTBrick.SetSensorMode(AForge.Robotics.Lego.NXTBrick.Sensor,AForge.Robotics.Lego.NXTBrick.SensorType,AForge.Robotics.Lego.NXTBrick.SensorMode)"/> method to set sensor's type to
+            <see cref="M:AForge.Robotics.Lego.NXTBrick.SetSensorMode(AForge.Robotics.Lego.NXTBrick.Sensor,AForge.Robotics.Lego.NXTBrick.SensorType,AForge.Robotics.Lego.NXTBrick.SensorMode,System.Boolean)"/> method to set sensor's type to
             <see cref="F:AForge.Robotics.Lego.NXTBrick.SensorType.Lowspeed9V"/> mode. It should be done
             once after NXT brick is powered on. If sensor's type is not set properly,
             the method will generate an exception. Also after setting sensor's
@@ -1287,12 +1366,148 @@
             <exception cref="T:System.ArgumentException">Reply buffer size is smaller than the reply data size.</exception>
             <exception cref="T:System.ApplicationException">Reply does not correspond to command (second byte of reply should
             be equal to second byte of command).</exception>
-            <exception cref="T:System.ApplicationException">Error occured on NXT brick side.</exception>
+            <exception cref="T:System.ApplicationException">Error occurred on NXT brick side.</exception>
             
+        </member>
+        <member name="M:AForge.Robotics.Lego.NXTBrick.ReadHiTechnicColorSensor(AForge.Robotics.Lego.NXTBrick.Sensor,System.Int32@,System.Int32@,System.Int32@,System.Int32@)">
+            <summary>
+            Read data from HiTechnic color sensor (also color sensor v2).
+            </summary>
+            
+            <param name="sensor">Sensor to read from.</param>
+            <param name="colorNumber"><a href="http://www.hitechnic.com/contents/media/Color%20Number.jpg">Found color number.</a></param>
+            <param name="redValue">Found red value.</param>
+            <param name="greenValue">Found green value.</param>
+            <param name="blueValue">Found blue value.</param>
+            
+            <returns>Returns <b>true</b> if the command was sent successfully and reply was
+            received, otherwise <b>false</b>.</returns>
+            
+            <remarks><para>The method retrieves the color valuse of a <a href="http://www.hitechnic.com/products/">HiTechnic color sensor</a>
+            by communicating with I2C device (writing to and reading from low speed bus).
+            The method first sends { 0x02, 0x42 } command to the specified device using
+            <see cref="M:AForge.Robotics.Lego.NXTBrick.LsWrite(AForge.Robotics.Lego.NXTBrick.Sensor,System.Byte[],System.Int32)"/> method. Then it waits until there is something available
+            to read using <see cref="M:AForge.Robotics.Lego.NXTBrick.LsGetStatus(AForge.Robotics.Lego.NXTBrick.Sensor,System.Int32@)"/> method. Finally it reads sensor's value
+            using <see cref="M:AForge.Robotics.Lego.NXTBrick.LsRead(AForge.Robotics.Lego.NXTBrick.Sensor,System.Byte[],System.Int32@)"/> device. See
+            <a href="http://hsrc.static.net/Research/NXT%20I2C%20Communication/">this page</a>
+            for details.</para>
+            
+            <para><note>Before using this method it is required to use
+            <see cref="M:AForge.Robotics.Lego.NXTBrick.SetSensorMode(AForge.Robotics.Lego.NXTBrick.Sensor,AForge.Robotics.Lego.NXTBrick.SensorType,AForge.Robotics.Lego.NXTBrick.SensorMode,System.Boolean)"/> method to set sensor's type to
+            <see cref="F:AForge.Robotics.Lego.NXTBrick.SensorType.Lowspeed"/> mode. It should be done
+            once after NXT brick is powered on. If sensor's type is not set properly,
+            the method will generate an exception. Also after setting sensor's
+            type application may need to wait a bit to give device some time
+            to initialize.</note></para>
+            
+            <para><note>NXT Firmware version 1.24 must be loaded in the NXT for the HiTechnic color sensor to operate correctly.
+            You can check the firmware version using the <see cref="M:AForge.Robotics.Lego.NXTBrick.GetVersion(System.String@,System.String@)"/> method.</note></para>
+            
+            <para><note>The color sensor V2 must be configured to match the mains electricity frequency for your
+            country. Details on how to configure the Color Sensor V2 can be found at
+            <a href="http://www.hitechnic.com/colorsensor"></a></note></para>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.Robotics.Lego.NXTBrick.ReadHiTechnicCompassSensor(AForge.Robotics.Lego.NXTBrick.Sensor,System.Int32@)">
+            <summary>
+            Read data from HiTechnic compass sensor.
+            </summary>
+            
+            <param name="sensor">Sensor to read from.</param>
+            <param name="angle">The magnetic heading, [0, 359] degrees.</param>
+            
+            <returns>Returns <b>true</b> if the command was sent successfully and reply was
+            received, otherwise <b>false</b>.</returns>
+            
+            <remarks><para>The method retrieves the angle of a <a href="http://www.hitechnic.com/products/">
+            HiTechnic compass sensor</a> by
+            communicating with I2C device (writing to and reading from low speed bus).
+            The method first sends { 0x02, 0x42 } command to the specified device using
+            <see cref="M:AForge.Robotics.Lego.NXTBrick.LsWrite(AForge.Robotics.Lego.NXTBrick.Sensor,System.Byte[],System.Int32)"/> method. Then it waits until there is something available
+            to read using <see cref="M:AForge.Robotics.Lego.NXTBrick.LsGetStatus(AForge.Robotics.Lego.NXTBrick.Sensor,System.Int32@)"/> method. Finally it reads sensor's value
+            using <see cref="M:AForge.Robotics.Lego.NXTBrick.LsRead(AForge.Robotics.Lego.NXTBrick.Sensor,System.Byte[],System.Int32@)"/> device. See
+            <a href="http://hsrc.static.net/Research/NXT%20I2C%20Communication/">this page</a>
+            for details.</para>
+            
+            <para><note>Before using this method it is required to use
+            <see cref="M:AForge.Robotics.Lego.NXTBrick.SetSensorMode(AForge.Robotics.Lego.NXTBrick.Sensor,AForge.Robotics.Lego.NXTBrick.SensorType,AForge.Robotics.Lego.NXTBrick.SensorMode,System.Boolean)"/> method to set sensor's type to
+            <see cref="F:AForge.Robotics.Lego.NXTBrick.SensorType.Lowspeed"/> mode. It should be done
+            once after NXT brick is powered on. If sensor's type is not set properly,
+            the method will generate an exception. Also after setting sensor's
+            type application may need to wait a bit to give device some time
+            to initialize.</note></para>
+            
+            <para><note>The HiTechnic compass sensor will only operate correctly in a horizontal plane so you must keep the compass
+            level for it to read correctly. This is very important so remember this when you build it into your robot.
+            It is highly desirable to mount the compass at least 6 inches (15cm) away from the motors and 4 inches (10cm) away from the NXT brick
+            itself. Try to make sure it is firmly mounted, if it bounces around, the readings may bounce around too.
+            </note></para>
+            
+            <para><note>NXT Firmware version 1.03 must be loaded in the NXT for the compass to operate correctly. You can check the firmware version
+            using the <see cref="M:AForge.Robotics.Lego.NXTBrick.GetVersion(System.String@,System.String@)"/> method.</note></para>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.Robotics.Lego.NXTBrick.ReadHiTechnicAccelerationTiltSensor(AForge.Robotics.Lego.NXTBrick.Sensor,System.Int32@,System.Int32@,System.Int32@)">
+             <summary>
+             Read data from HiTechnic acceleration/tilt sensor. The HiTechnic accelerometer/tilt sensor measures acceleration in 
+             three axes. It measures also tilt along each axis. Using the sensor, you can measure the acceleration of your robot in the range
+             of -2g to 2g.
+             </summary>
+             
+             <param name="sensor">Sensor to read from.</param>
+             <param name="xAceeleration">Acceleration in X direction, with a scaling of approximately 200 counts per g.</param>
+             <param name="yAceeleration">Acceleration in Y direction, with a scaling of approximately 200 counts per g.</param>
+             <param name="zAceeleration">Acceleration in Z direction, with a scaling of approximately 200 counts per g.</param>
+             
+             <returns>Returns <b>true</b> if the command was sent successfully and reply was
+             received, otherwise <b>false</b>.</returns>
+             
+             <remarks><para>The method retrieves the acceleration in three directions of a
+             <a href="http://www.hitechnic.com/products/"> HiTechnic acceleration/tilt sensor</a> by
+             communicating with I2C device (writing to and reading from low speed bus).
+             The method first sends { 0x02, 0x42 } command to the specified device using
+             <see cref="M:AForge.Robotics.Lego.NXTBrick.LsWrite(AForge.Robotics.Lego.NXTBrick.Sensor,System.Byte[],System.Int32)"/> method. Then it waits until there is something available
+             to read using <see cref="M:AForge.Robotics.Lego.NXTBrick.LsGetStatus(AForge.Robotics.Lego.NXTBrick.Sensor,System.Int32@)"/> method. Finally it reads sensor's value
+             using <see cref="M:AForge.Robotics.Lego.NXTBrick.LsRead(AForge.Robotics.Lego.NXTBrick.Sensor,System.Byte[],System.Int32@)"/> device. See
+             <a href="http://hsrc.static.net/Research/NXT%20I2C%20Communication/">this page</a>
+             for details.</para>
+             
+             <para><note>Before using this method it is required to use
+             <see cref="M:AForge.Robotics.Lego.NXTBrick.SetSensorMode(AForge.Robotics.Lego.NXTBrick.Sensor,AForge.Robotics.Lego.NXTBrick.SensorType,AForge.Robotics.Lego.NXTBrick.SensorMode,System.Boolean)"/> method to set sensor's type to
+             <see cref="F:AForge.Robotics.Lego.NXTBrick.SensorType.Lowspeed"/> mode. It should be done
+             once after NXT brick is powered onq If sensor's type is not set properly,
+             the method will generate an exception. Also after setting sensor's
+             type application may need to wait a bit to give device some time
+             to initialize.</note></para>
+             
+             <para>The acceleration sensor can also be used to measure tilt in three axes This is possible because gravity is perceived
+             as acceleration. When the sensor is stationary and in the normal horizontal position, the x and y axis will be near 
+             zero, because they are horizontal, while the z axis will be near 200, which represents g. If you tilt the sensor then 
+             gravity will also be detected on the other axis and the value for the z axis will go down. Since gravity is distributed
+             among the three component vectors, the tilt of the sensor can be determined.</para>
+            
+             <para><note>NXT Firmware version 1.05 or later must be loaded in the NXT for the acceleration/tilt sensor and other digital I2C
+             sensors to operate correctly. You can check the firmware version using the <see cref="M:AForge.Robotics.Lego.NXTBrick.GetVersion(System.String@,System.String@)"/> method.</note></para>
+             </remarks>
+             
         </member>
         <member name="P:AForge.Robotics.Lego.NXTBrick.IsConnected">
             <summary>
             Check if connection to NXT brick is established.
+            </summary>
+            
+        </member>
+        <member name="E:AForge.Robotics.Lego.NXTBrick.MessageSent">
+            <summary>
+            The event is raised every time a command is sent successfully.
+            </summary>
+            
+        </member>
+        <member name="E:AForge.Robotics.Lego.NXTBrick.MessageRead">
+            <summary>
+            The event is raised every time a command is read successfully.
             </summary>
             
         </member>
@@ -1334,57 +1549,92 @@
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.Switch">
             <summary>
-            Switch (touch) sensor.
+            NXT or Legacy touch sensor.
             </summary>
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.Temperature">
             <summary>
-            Temperature sensor.
+            Legacy temperature sensor.
             </summary>
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.Reflection">
             <summary>
-            Reflection sensor.
+            Legacy light sensor.
             </summary>
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.Angle">
             <summary>
-            Angle sensor.
+            Legacy rotation sensor.
             </summary>
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.LightActive">
             <summary>
-            Light activity sensor.
+            NXT light sensor with floodlight enabled.
             </summary>
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.LightInactive">
             <summary>
-            Light inactivity sensor.
+            NXT light sensor with floodlight disabled.
             </summary>
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.SoundDB">
             <summary>
-            Sound sensor (in dB).
+            NXT sound sensor (dB scaling).
             </summary>
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.SoundDBA">
             <summary>
-            Sound sensor (in dBA).
+            NXT sound sensor (dBA scaling).
             </summary>
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.Custom">
             <summary>
-            Custom sensor.
+            Unused
             </summary>
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.Lowspeed">
             <summary>
-            Low speed sensor.
+            I2C digital sensor.
             </summary>
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.Lowspeed9V">
             <summary>
-            Low speed sensor (9V).
+            I2C digital sensor (9V power).
+            </summary>
+        </member>
+        <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.Highspeed">
+            <summary>
+            Unused.
+            </summary>
+        </member>
+        <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.ColorFull">
+            <summary>
+            NXT 2.0 color sensor in color detector mode.
+            </summary>
+        </member>
+        <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.ColorRed">
+            <summary>
+            NXT 2.0 color sensor in light sensor mode with red light on.
+            </summary>
+        </member>
+        <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.ColorGreen">
+            <summary>
+            NXT 2.0 color sensor in light sensor mode with green light on.
+            </summary>
+        </member>
+        <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.ColorBlue">
+            <summary>
+            NXT 2.0 color sensor in light sensor mode with blue light on.
+            </summary>
+        </member>
+        <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.ColorNone">
+            <summary>
+            NXT 2.0 color sensor in light sensor mode without light.
+            </summary>
+        </member>
+        <member name="F:AForge.Robotics.Lego.NXTBrick.SensorType.ColorExit">
+            <summary>
+            NXT 2.0 color sensor internal state (no functionality known yet).
             </summary>
         </member>
         <member name="T:AForge.Robotics.Lego.NXTBrick.SensorMode">
@@ -1400,82 +1650,85 @@
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorMode.Boolean">
             <summary>
-            Boolean mode.
+            Boolean mode. Report scaled value as 1 (TRUE) or 0 (FALSE). The firmware uses
+            inverse Boolean logic to match the physical characteristics of NXT sensors. Readings
+            are FALSE if raw value exceeds 55% of total range; reading are TRUE if raw value
+            is less than 45% of total range.
             </summary>
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorMode.TransitionCounter">
             <summary>
-            Number of boolean transitions.
+            Report scaled value as number of transition between TRUE and FALSE.
             </summary>
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorMode.PeriodicCounter">
             <summary>
-            Periodic counter (number of boolean transitions divided by two).
+            Report scaled value as number of transitions from FALSE to TRUE, then back to FALSE.
             </summary>
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorMode.PCTFullScale">
             <summary>
-            ??? (lack of documentation from Lego).
+            Report scaled value as percentage of full scale reading for configured sensor type.
             </summary>
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorMode.Celsius">
             <summary>
-            Celsius mode.
+            Scale terperature reading to degrees Celsius.
             </summary>
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorMode.Fahrenheit">
             <summary>
-            Fahrenheit mode.
+            Scale terperature reading to degrees Fahrenheit.
             </summary>
         </member>
         <member name="F:AForge.Robotics.Lego.NXTBrick.SensorMode.AngleSteps">
             <summary>
-            Angle steps mode.
+            Report scaled value as count of ticks on RCX-style rotation sensor.
             </summary>
         </member>
         <member name="T:AForge.Robotics.Lego.NXTBrick.SensorValues">
             <summary>
-            Structure, which describes sensor's values received from NXT brick's sensor port.
+            Class describing sensor's values received from NXT brick's sensor port.
             </summary>
             
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.SensorValues.IsValid">
+        <member name="P:AForge.Robotics.Lego.NXTBrick.SensorValues.IsValid">
             <summary>
             Specifies if data value should be treated as valid data.
             </summary>
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.SensorValues.IsCalibrated">
+        <member name="P:AForge.Robotics.Lego.NXTBrick.SensorValues.IsCalibrated">
             <summary>
-            Specifies if calibration file was found and used for <see cref="F:AForge.Robotics.Lego.NXTBrick.SensorValues.Calibrated"/>
+            Specifies if calibration file was found and used for <see cref="P:AForge.Robotics.Lego.NXTBrick.SensorValues.Calibrated"/>
             field calculation.
             </summary>
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.SensorValues.SensorType">
+        <member name="P:AForge.Robotics.Lego.NXTBrick.SensorValues.SensorType">
             <summary>
             Sensor type.
             </summary>
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.SensorValues.SensorMode">
+        <member name="P:AForge.Robotics.Lego.NXTBrick.SensorValues.SensorMode">
             <summary>
             Sensor mode.
             </summary>
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.SensorValues.Raw">
+        <member name="P:AForge.Robotics.Lego.NXTBrick.SensorValues.Raw">
             <summary>
             Raw A/D value (device dependent).
             </summary>
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.SensorValues.Normalized">
+        <member name="P:AForge.Robotics.Lego.NXTBrick.SensorValues.Normalized">
             <summary>
             Normalized A/D value (sensor type dependent), [0, 1023].
             </summary>
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.SensorValues.Scaled">
+        <member name="P:AForge.Robotics.Lego.NXTBrick.SensorValues.Scaled">
             <summary>
             Scaled value (sensor mode dependent).
             </summary>
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.SensorValues.Calibrated">
+        <member name="P:AForge.Robotics.Lego.NXTBrick.SensorValues.Calibrated">
             <summary>
             Value scaled according to calibration.
             </summary>
@@ -1589,43 +1842,61 @@
         </member>
         <member name="T:AForge.Robotics.Lego.NXTBrick.MotorState">
             <summary>
-            Structure, which describes motor's state.
+            Class describing motor's state.
             </summary>
             
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.MotorState.Power">
+        <member name="M:AForge.Robotics.Lego.NXTBrick.MotorState.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Robotics.Lego.NXTBrick.MotorState"/> class.
+            </summary>
+        </member>
+        <member name="M:AForge.Robotics.Lego.NXTBrick.MotorState.#ctor(System.Int32,System.Int32,AForge.Robotics.Lego.NXTBrick.MotorMode,AForge.Robotics.Lego.NXTBrick.MotorRegulationMode,AForge.Robotics.Lego.NXTBrick.MotorRunState,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Robotics.Lego.NXTBrick.MotorState"/> class.
+            </summary>
+            
+            <param name="power">Power, [-100, 100].</param>
+            <param name="turnRatio">Turn ratio, [-100, 100].</param>
+            <param name="mode">Mode (bit field).</param>
+            <param name="regulation">Regulation mode.</param>
+            <param name="runState">Run state.</param>
+            <param name="tachoLimit">The value determines motor's run limit.</param>
+            
+        </member>
+        <member name="P:AForge.Robotics.Lego.NXTBrick.MotorState.Power">
             <summary>
             Power, [-100, 100].
             </summary>
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.MotorState.TurnRatio">
+        <member name="P:AForge.Robotics.Lego.NXTBrick.MotorState.TurnRatio">
             <summary>
             Turn ratio, [-100, 100].
             </summary>
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.MotorState.Mode">
+        <member name="P:AForge.Robotics.Lego.NXTBrick.MotorState.Mode">
             <summary>
             Mode (bit field).
             </summary>
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.MotorState.Regulation">
+        <member name="P:AForge.Robotics.Lego.NXTBrick.MotorState.Regulation">
             <summary>
             Regulation mode.
             </summary>
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.MotorState.RunState">
+        <member name="P:AForge.Robotics.Lego.NXTBrick.MotorState.RunState">
             <summary>
             Run state.
             </summary>
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.MotorState.TachoLimit">
+        <member name="P:AForge.Robotics.Lego.NXTBrick.MotorState.TachoLimit">
             <summary>
             Tacho limit (0 - run forever).
             </summary>
             
             <remarks>The value determines motor's run limit.</remarks>
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.MotorState.TachoCount">
+        <member name="P:AForge.Robotics.Lego.NXTBrick.MotorState.TachoCount">
             <summary>
             Number of counts since last reset of motor counter.
             </summary>
@@ -1633,7 +1904,7 @@
             <remarks><note>The value is ignored when motor's state is set. The value is
             provided when motor's state is retrieved.</note></remarks>
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.MotorState.BlockTachoCount">
+        <member name="P:AForge.Robotics.Lego.NXTBrick.MotorState.BlockTachoCount">
             <summary>
             Current position relative to last programmed movement.
             </summary>
@@ -1641,7 +1912,7 @@
             <remarks><note>The value is ignored when motor's state is set. The value is
             provided when motor's state is retrieved.</note></remarks>
         </member>
-        <member name="F:AForge.Robotics.Lego.NXTBrick.MotorState.RotationCount">
+        <member name="P:AForge.Robotics.Lego.NXTBrick.MotorState.RotationCount">
             <summary>
             Current position relative to last reset of motor's rotation sensor.
             </summary>

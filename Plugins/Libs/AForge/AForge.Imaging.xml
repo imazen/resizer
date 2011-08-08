@@ -110,7 +110,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks> 
             
         </member>
@@ -139,7 +139,7 @@
             <returns>Returns filter's result obtained by applying the filter to
             the source image.</returns>
             
-            <remarks>The method keeps the source image unchanged and returns the
+            <remarks>The method keeps the source image unchanged and returns
             the result of image processing filter as new image.</remarks> 
             
         </member>
@@ -219,7 +219,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks>
              
              <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image.</exception>
@@ -252,7 +252,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks>
              
              <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image.</exception>
@@ -365,8 +365,8 @@
              
              <para><note>Rotation is performed in counterclockwise direction.</note></para>
              
-             <para>The filter accepts 8 bpp grayscale images and 24 bpp
-             color images for processing.</para>
+             <para>The filter accepts 8/16 bpp grayscale images and 24/48 bpp color image
+             for processing.</para>
             
              <para>Sample usage:</para>
              <code>
@@ -669,7 +669,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks>
              
              <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image.</exception>
@@ -702,7 +702,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks>
              
              <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image.</exception>
@@ -916,7 +916,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks>
              
              <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image.</exception>
@@ -949,7 +949,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks>
              
              <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image.</exception>
@@ -1245,7 +1245,8 @@
             Base class for error diffusion dithering.
             </summary>
             
-            <remarks><para>The class is the base class for binarization algorithms based on error diffusion.</para>
+            <remarks><para>The class is the base class for binarization algorithms based on
+            <a href="http://en.wikipedia.org/wiki/Error_diffusion">error diffusion</a>.</para>
             
             <para>Binarization with error diffusion in its idea is similar to binarization based on thresholding
             of pixels' cumulative value (see <see cref="T:AForge.Imaging.Filters.ThresholdWithCarry"/>). Each pixel is binarized based not only
@@ -1521,7 +1522,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks> 
             
         </member>
@@ -1550,7 +1551,7 @@
             <returns>Returns filter's result obtained by applying the filter to
             the source image.</returns>
             
-            <remarks>The method keeps the source image unchanged and returns the
+            <remarks>The method keeps the source image unchanged and returns
             the result of image processing filter as new image.</remarks>
             
         </member>
@@ -1697,7 +1698,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks>
              
              <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image.</exception>
@@ -1730,7 +1731,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks>
              
              <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image.</exception>
@@ -2086,7 +2087,8 @@
             Base class for error diffusion color dithering.
             </summary>
             
-            <remarks><para>The class is the base class for color dithering algorithms based on error diffusion.</para>
+            <remarks><para>The class is the base class for color dithering algorithms based on
+            <a href="http://en.wikipedia.org/wiki/Error_diffusion">error diffusion</a>.</para>
             
             <para>Color dithering with error diffusion is based on the idea that each pixel from the specified source
             image is substituted with a best matching color (or better say with color's index) from the specified color
@@ -2208,7 +2210,7 @@
             <para><note>The property provides a trade off. On one hand it may speedup color dithering routine, but on another
             hand it increases memory usage. Also cache usage may not be efficient for very small target color tables.</note></para>
             
-            <para>Default value is set to <see langword="true"/>.</para>
+            <para>Default value is set to <see langword="false"/>.</para>
             </remarks>
             
         </member>
@@ -2304,8 +2306,8 @@
             </summary>
             
             <remarks><para>The image processing routine represents color dithering algorithm, which is based on
-            error diffusion dithering with Floyd-Steinberg coefficients. Error is diffused
-            on 4 neighbor pixels with the next coefficients:</para>
+            error diffusion dithering with <a href="http://en.wikipedia.org/wiki/Floyd%E2%80%93Steinberg_dithering">Floyd-Steinberg</a>
+            coefficients. Error is diffused on 4 neighbor pixels with the next coefficients:</para>
             
             <code lang="none">
                 | * | 7 |
@@ -2635,7 +2637,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks>
              
              <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image.</exception>
@@ -2668,7 +2670,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks>
              
              <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image.</exception>
@@ -3739,7 +3741,7 @@
             <para>Sample usage:</para>
             <code>
             // create filter
-            SaturationCorrection filter = new SaturationCorrection( -0.5 );
+            SaturationCorrection filter = new SaturationCorrection( -0.5f );
             // apply the filter
             filter.ApplyInPlace( image );
             </code>
@@ -3757,7 +3759,7 @@
             </summary>
             
         </member>
-        <member name="M:AForge.Imaging.Filters.SaturationCorrection.#ctor(System.Double)">
+        <member name="M:AForge.Imaging.Filters.SaturationCorrection.#ctor(System.Single)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.SaturationCorrection"/> class.
             </summary>
@@ -3823,7 +3825,7 @@
             </summary>
             
         </member>
-        <member name="M:AForge.Imaging.Filters.BrightnessCorrection.#ctor(System.Double)">
+        <member name="M:AForge.Imaging.Filters.BrightnessCorrection.#ctor(System.Single)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.BrightnessCorrection"/> class.
             </summary>
@@ -4399,14 +4401,39 @@
             <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
             
         </member>
-        <member name="M:AForge.Imaging.ImageStatistics.#ctor(System.Drawing.Imaging.BitmapData)">
+        <member name="M:AForge.Imaging.ImageStatistics.#ctor(System.Drawing.Bitmap,System.Drawing.Bitmap)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Imaging.ImageStatistics"/> class.
             </summary>
             
-            <param name="imageData">Image data to gather statistics about.</param>
+            <param name="image">Image to gather statistics about.</param>
+            <param name="mask">Mask image which specifies areas to collect statistics for.</param>
+            
+            <remarks><para>The mask image must be a grayscale/binary (8bpp) image of the same size as the
+            specified source image, where black pixels (value 0) correspond to areas which should be excluded
+            from processing. So statistics is calculated only for pixels, which are none black in the mask image.
+            </para></remarks>
             
             <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
+            <exception cref="T:System.ArgumentException">Mask image must be 8 bpp grayscale image.</exception>
+            <exception cref="T:System.ArgumentException">Mask must have the same size as the source image to get statistics for.</exception>
+            
+        </member>
+        <member name="M:AForge.Imaging.ImageStatistics.#ctor(System.Drawing.Bitmap,System.Byte[0:,0:])">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.ImageStatistics"/> class.
+            </summary>
+            
+            <param name="image">Image to gather statistics about.</param>
+            <param name="mask">Mask array which specifies areas to collect statistics for.</param>
+            
+            <remarks><para>The mask array must be of the same size as the specified source image, where 0 values
+            correspond to areas which should be excluded from processing. So statistics is calculated only for pixels,
+            which have none zero corresponding value in the mask.
+            </para></remarks>
+            
+            <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
+            <exception cref="T:System.ArgumentException">Mask must have the same size as the source image to get statistics for.</exception>
             
         </member>
         <member name="M:AForge.Imaging.ImageStatistics.#ctor(AForge.Imaging.UnmanagedImage)">
@@ -4419,12 +4446,39 @@
             <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
             
         </member>
-        <member name="M:AForge.Imaging.ImageStatistics.ProcessImage(AForge.Imaging.UnmanagedImage)">
+        <member name="M:AForge.Imaging.ImageStatistics.#ctor(AForge.Imaging.UnmanagedImage,AForge.Imaging.UnmanagedImage)">
             <summary>
-            Gather statistics about specified image.
+            Initializes a new instance of the <see cref="T:AForge.Imaging.ImageStatistics"/> class.
             </summary>
             
-            <param name="image">Unmanaged image to process.</param>
+            <param name="image">Image to gather statistics about.</param>
+            <param name="mask">Mask image which specifies areas to collect statistics for.</param>
+            
+            <remarks><para>The mask image must be a grayscale/binary (8bpp) image of the same size as the
+            specified source image, where black pixels (value 0) correspond to areas which should be excluded
+            from processing. So statistics is calculated only for pixels, which are none black in the mask image.
+            </para></remarks>
+            
+            <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
+            <exception cref="T:System.ArgumentException">Mask image must be 8 bpp grayscale image.</exception>
+            <exception cref="T:System.ArgumentException">Mask must have the same size as the source image to get statistics for.</exception>
+            
+        </member>
+        <member name="M:AForge.Imaging.ImageStatistics.#ctor(AForge.Imaging.UnmanagedImage,System.Byte[0:,0:])">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.ImageStatistics"/> class.
+            </summary>
+            
+            <param name="image">Image to gather statistics about.</param>
+            <param name="mask">Mask array which specifies areas to collect statistics for.</param>
+            
+            <remarks><para>The mask array must be of the same size as the specified source image, where 0 values
+            correspond to areas which should be excluded from processing. So statistics is calculated only for pixels,
+            which have none zero corresponding value in the mask.
+            </para></remarks>
+            
+            <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
+            <exception cref="T:System.ArgumentException">Mask must have the same size as the source image to get statistics for.</exception>
             
         </member>
         <member name="P:AForge.Imaging.ImageStatistics.Red">
@@ -5029,7 +5083,7 @@
             </summary>
             
             <remarks><para>Top-hat morphological operator <see cref="T:AForge.Imaging.Filters.Subtract">subtracts</see>
-            result of <see cref="T:AForge.Imaging.Filters.Opening">morphological opening</see> on the the input image
+            result of <see cref="T:AForge.Imaging.Filters.Opening">morphological opening</see> on the input image
             from the input image itself.</para>
             
              <para>Applied to binary image, the filter allows to get all those object (their parts)
@@ -5666,7 +5720,24 @@
             <returns>Returns managed copy of the unmanaged image.</returns>
             
             <remarks><para>The method creates a managed copy of the unmanaged image with the
-            same size and pixel format.</para></remarks>
+            same size and pixel format (it calls <see cref="M:AForge.Imaging.UnmanagedImage.ToManagedImage(System.Boolean)"/> specifying
+            <see langword="true"/> for the <b>makeCopy</b> parameter).</para></remarks>
+            
+        </member>
+        <member name="M:AForge.Imaging.UnmanagedImage.ToManagedImage(System.Boolean)">
+            <summary>
+            Create managed image from the unmanaged.
+            </summary>
+            
+            <param name="makeCopy">Make a copy of the unmanaged image or not.</param>
+            
+            <returns>Returns managed copy of the unmanaged image.</returns>
+            
+            <remarks><para>If the <paramref name="makeCopy"/> is set to <see langword="true"/>, then the method
+            creates a managed copy of the unmanaged image, so the managed image stays valid even when the unmanaged
+            image gets disposed. However, setting this parameter to <see langword="false"/> creates a managed image which is
+            just a wrapper around the unmanaged image. So if unmanaged image is disposed, the
+            managed image becomes no longer valid and accessing it will generate an exception.</para></remarks>
             
         </member>
         <member name="M:AForge.Imaging.UnmanagedImage.FromManagedImage(System.Drawing.Bitmap)">
@@ -5726,6 +5797,61 @@
             
             <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image. Use Collect16bppPixelValues() method for
             images with 16 bpp channels.</exception>
+            
+        </member>
+        <member name="M:AForge.Imaging.UnmanagedImage.CollectActivePixels">
+            <summary>
+            Collect coordinates of none black pixels in the image.
+            </summary>
+            
+            <returns>Returns list of points, which have other than black color.</returns>
+            
+        </member>
+        <member name="M:AForge.Imaging.UnmanagedImage.CollectActivePixels(System.Drawing.Rectangle)">
+             <summary>
+             Collect coordinates of none black pixels within specified rectangle of the image.
+             </summary>
+             
+             <param name="rect">Image's rectangle to process.</param>
+             
+             <returns>Returns list of points, which have other than black color.</returns>
+            
+        </member>
+        <member name="M:AForge.Imaging.UnmanagedImage.SetPixels(System.Collections.Generic.List{AForge.IntPoint},System.Drawing.Color)">
+             <summary>
+             Set pixels with the specified coordinates to the specified color.
+             </summary>
+             
+             <param name="coordinates">List of points to set color for.</param>
+             <param name="color">Color to set for the specified points.</param>
+             
+             <remarks><para><note>For images having 16 bpp per color plane, the method extends the specified color
+             value to 16 bit by multiplying it by 256.</note></para></remarks>
+            
+        </member>
+        <member name="M:AForge.Imaging.UnmanagedImage.SetPixel(AForge.IntPoint,System.Drawing.Color)">
+             <summary>
+             Set pixel with the specified coordinates to the specified color.
+             </summary>
+             
+             <param name="point">Point's coordiates to set color for.</param>
+             <param name="color">Color to set for the pixel.</param>
+             
+             <remarks><para><note>For images having 16 bpp per color plane, the method extends the specified color
+             value to 16 bit by multiplying it by 256.</note></para></remarks>
+            
+        </member>
+        <member name="M:AForge.Imaging.UnmanagedImage.SetPixel(System.Int32,System.Int32,System.Drawing.Color)">
+            <summary>
+            Set pixel with the specified coordinates to the specified color.
+            </summary>
+            
+            <param name="x">X coordinate of the pixel to set.</param>
+            <param name="y">Y coordinate of the pixel to set.</param>
+            <param name="color">Color to set for the pixel.</param>
+            
+            <remarks><para><note>For images having 16 bpp per color plane, the method extends the specified color
+            value to 16 bit by multiplying it by 256.</note></para></remarks>
             
         </member>
         <member name="M:AForge.Imaging.UnmanagedImage.Collect16bppPixelValues(System.Collections.Generic.List{AForge.IntPoint})">
@@ -6711,8 +6837,8 @@
             // create filter
             HSLLinear filter = new HSLLinear( );
             // configure the filter
-            filter.InLuminance   = new DoubleRange( 0, 0.85 );
-            filter.OutSaturation = new DoubleRange( 0.25, 1 );
+            filter.InLuminance   = new Range( 0, 0.85f );
+            filter.OutSaturation = new Range( 0.25f, 1 );
             // apply the filter
             filter.ApplyInPlace( image );
             </code>
@@ -6796,7 +6922,7 @@
              <para>Sample usage:</para>
              <code>
              // create filter
-             ContrastCorrection filter = new ContrastCorrection( 2.0 );
+             ContrastCorrection filter = new ContrastCorrection( 2.0f );
              // apply the filter
              filter.ApplyInPlace( image );
              </code>
@@ -6815,7 +6941,7 @@
             </summary>
             
         </member>
-        <member name="M:AForge.Imaging.Filters.ContrastCorrection.#ctor(System.Double)">
+        <member name="M:AForge.Imaging.Filters.ContrastCorrection.#ctor(System.Single)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.ContrastCorrection"/> class.
             </summary>
@@ -6912,7 +7038,7 @@
              <para>Sample usage:</para>
              <code>
              // create filter
-             Posterization filter = new Posterization( );
+             SimplePosterization filter = new SimplePosterization( );
              // process image
              filter.ApplyInPlace( sourceImage );
              </code>
@@ -7061,7 +7187,7 @@
             // process colors (taken from image for example)
             for ( int i = 0; i &lt; pixelsToProcess; i++ )
             {
-                quantizer.AddColor( /* pixel coloer */ );
+                quantizer.AddColor( /* pixel color */ );
             }
             // get palette reduced to 16 colors
             Color[] palette = quantizer.GetPalette( 16 );
@@ -8676,8 +8802,8 @@
             HSLFiltering filter = new HSLFiltering( );
             // set color ranges to keep
             filter.Hue = new IntRange( 335, 0 );
-            filter.Saturation = new DoubleRange( 0.6, 1 );
-            filter.Luminance = new DoubleRange( 0.1, 1 );
+            filter.Saturation = new Range( 0.6, 1 );
+            filter.Luminance = new Range( 0.1, 1 );
             // apply the filter
             filter.ApplyInPlace( image );
             </code>
@@ -8712,7 +8838,7 @@
             Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.HSLFiltering"/> class.
             </summary>
         </member>
-        <member name="M:AForge.Imaging.Filters.HSLFiltering.#ctor(AForge.IntRange,AForge.DoubleRange,AForge.DoubleRange)">
+        <member name="M:AForge.Imaging.Filters.HSLFiltering.#ctor(AForge.IntRange,AForge.Range,AForge.Range)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.HSLFiltering"/> class.
             </summary>
@@ -9769,6 +9895,8 @@
             <remarks><para>Processes the image and builds objects map, which is used later to extracts blobs.</para></remarks>
             
             <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image.</exception>
+            <exception cref="T:AForge.Imaging.InvalidImagePropertiesException">Thrown by some inherited classes if some image property other
+            than the pixel format is not supported. See that class's documentation or the exception message for details.</exception>
             
         </member>
         <member name="M:AForge.Imaging.BlobCounterBase.GetObjectsRectangles">
@@ -10059,7 +10187,7 @@
             </summary>
             
             <remarks><para>In uncoupled filtering mode, objects are filtered out in the case if
-            their width is smaller than <see cref="P:AForge.Imaging.BlobCounterBase.MinWidth"/> or height is smaller than 
+            their width is smaller than <see cref="P:AForge.Imaging.BlobCounterBase.MinWidth"/> <b>or</b> height is smaller than 
             <see cref="P:AForge.Imaging.BlobCounterBase.MinHeight"/>. But in coupled filtering mode, objects are filtered out in
             the case if their width is smaller than <see cref="P:AForge.Imaging.BlobCounterBase.MinWidth"/> <b>and</b> height is
             smaller than <see cref="P:AForge.Imaging.BlobCounterBase.MinHeight"/>. In both modes the idea with filtering by objects'
@@ -10131,7 +10259,7 @@
             </summary>
             
             <remarks><para>The property specifies custom blobs' filtering routine to use. It has
-            effect only in the case if see cref="FilterBlobs"/&gt; property is set to <see langword="true"/>.</para>
+            effect only in the case if <see cref="P:AForge.Imaging.BlobCounterBase.FilterBlobs"/> property is set to <see langword="true"/>.</para>
             
             <para><note>When custom blobs' filtering routine is set, it has priority over default filtering done
             with <see cref="P:AForge.Imaging.BlobCounterBase.MinWidth"/>, <see cref="P:AForge.Imaging.BlobCounterBase.MinHeight"/>, <see cref="P:AForge.Imaging.BlobCounterBase.MaxWidth"/> and <see cref="P:AForge.Imaging.BlobCounterBase.MaxHeight"/>.</note></para>
@@ -10240,14 +10368,39 @@
             <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
             
         </member>
-        <member name="M:AForge.Imaging.ImageStatisticsHSL.#ctor(System.Drawing.Imaging.BitmapData)">
+        <member name="M:AForge.Imaging.ImageStatisticsHSL.#ctor(System.Drawing.Bitmap,System.Drawing.Bitmap)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Imaging.ImageStatisticsHSL"/> class.
             </summary>
             
-            <param name="imageData">Image data to gather statistics about.</param>
+            <param name="image">Image to gather statistics about.</param>
+            <param name="mask">Mask image which specifies areas to collect statistics for.</param>
+            
+            <remarks><para>The mask image must be a grayscale/binary (8bpp) image of the same size as the
+            specified source image, where black pixels (value 0) correspond to areas which should be excluded
+            from processing. So statistics is calculated only for pixels, which are none black in the mask image.
+            </para></remarks>
             
             <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
+            <exception cref="T:System.ArgumentException">Mask image must be 8 bpp grayscale image.</exception>
+            <exception cref="T:System.ArgumentException">Mask must have the same size as the source image to get statistics for.</exception>
+            
+        </member>
+        <member name="M:AForge.Imaging.ImageStatisticsHSL.#ctor(System.Drawing.Bitmap,System.Byte[0:,0:])">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.ImageStatisticsHSL"/> class.
+            </summary>
+            
+            <param name="image">Image to gather statistics about.</param>
+            <param name="mask">Mask array which specifies areas to collect statistics for.</param>
+            
+            <remarks><para>The mask array must be of the same size as the specified source image, where 0 values
+            correspond to areas which should be excluded from processing. So statistics is calculated only for pixels,
+            which have none zero corresponding value in the mask.
+            </para></remarks>
+            
+            <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
+            <exception cref="T:System.ArgumentException">Mask must have the same size as the source image to get statistics for.</exception>
             
         </member>
         <member name="M:AForge.Imaging.ImageStatisticsHSL.#ctor(AForge.Imaging.UnmanagedImage)">
@@ -10260,12 +10413,39 @@
             <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
             
         </member>
-        <member name="M:AForge.Imaging.ImageStatisticsHSL.ProcessImage(AForge.Imaging.UnmanagedImage)">
+        <member name="M:AForge.Imaging.ImageStatisticsHSL.#ctor(AForge.Imaging.UnmanagedImage,AForge.Imaging.UnmanagedImage)">
             <summary>
-            Gather statistics about specified image.
+            Initializes a new instance of the <see cref="T:AForge.Imaging.ImageStatisticsHSL"/> class.
             </summary>
             
-            <param name="image">Unmanaged image to process.</param>
+            <param name="image">Image to gather statistics about.</param>
+            <param name="mask">Mask image which specifies areas to collect statistics for.</param>
+            
+            <remarks><para>The mask image must be a grayscale/binary (8bpp) image of the same size as the
+            specified source image, where black pixels (value 0) correspond to areas which should be excluded
+            from processing. So statistics is calculated only for pixels, which are none black in the mask image.
+            </para></remarks>
+            
+            <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
+            <exception cref="T:System.ArgumentException">Mask image must be 8 bpp grayscale image.</exception>
+            <exception cref="T:System.ArgumentException">Mask must have the same size as the source image to get statistics for.</exception>
+            
+        </member>
+        <member name="M:AForge.Imaging.ImageStatisticsHSL.#ctor(AForge.Imaging.UnmanagedImage,System.Byte[0:,0:])">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.ImageStatisticsHSL"/> class.
+            </summary>
+            
+            <param name="image">Image to gather statistics about.</param>
+            <param name="mask">Mask array which specifies areas to collect statistics for.</param>
+            
+            <remarks><para>The mask array must be of the same size as the specified source image, where 0 values
+            correspond to areas which should be excluded from processing. So statistics is calculated only for pixels,
+            which have none zero corresponding value in the mask.
+            </para></remarks>
+            
+            <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
+            <exception cref="T:System.ArgumentException">Mask must have the same size as the source image to get statistics for.</exception>
             
         </member>
         <member name="P:AForge.Imaging.ImageStatisticsHSL.Saturation">
@@ -10403,6 +10583,9 @@
             <remarks>
             <para>The filter moves canvas to the specified area filling unused empty areas with specified color.</para>
             
+            <para>The filter accepts 8/16 bpp grayscale images and 24/32/48/64 bpp color image
+            for processing.</para>
+            
             <para>Sample usage:</para>
             <code>
             // create filter
@@ -10478,7 +10661,7 @@
             
             <remarks><para>The color is used to fill empty areas in color images.</para>
             
-            <para>Default value is set to white - RGB(255, 255, 255).</para></remarks>
+            <para>Default value is set to white - ARGB(255, 255, 255, 255).</para></remarks>
             
         </member>
         <member name="P:AForge.Imaging.Filters.CanvasMove.FillColorGray">
@@ -11369,8 +11552,8 @@
             </summary>
             
             <remarks><para>The filter represents binarization filter, which is based on
-            error diffusion dithering with Floyd-Steinberg coefficients. Error is diffused
-            on 4 neighbor pixels with next coefficients:</para>
+            error diffusion dithering with <a href="http://en.wikipedia.org/wiki/Floyd%E2%80%93Steinberg_dithering">Floyd-Steinberg</a>
+            coefficients. Error is diffused on 4 neighbor pixels with next coefficients:</para>
             
             <code lang="none">
                 | * | 7 |
@@ -11613,8 +11796,8 @@
             // create filter
             YCbCrLinear filter = new YCbCrLinear( );
             // configure the filter
-            filter.InCb = new DoubleRange( -0.276, 0.163 );
-            filter.InCr = new DoubleRange( -0.202, 0.500 );
+            filter.InCb = new Range( -0.276f, 0.163f );
+            filter.InCr = new Range( -0.202f, 0.500f );
             // apply the filter
             filter.ApplyInPlace( image );
             </code>
@@ -12704,7 +12887,9 @@
             
             <remarks><para>The invalid image properties exception is thrown in the case when
             user provides an image with certain properties, which are treated as invalid by
-            particular image processing routine.</para>
+            particular image processing routine. Another case when this exception is
+            thrown is the case when user tries to access some properties of an image (or
+            of a recently processed image by some routine), which are not valid for that image.</para>
             </remarks>
             
         </member>
@@ -12895,6 +13080,11 @@
             Blue component.
             </summary>
         </member>
+        <member name="F:AForge.Imaging.RGB.Alpha">
+            <summary>
+            Alpha component.
+            </summary>
+        </member>
         <member name="M:AForge.Imaging.RGB.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Imaging.RGB"/> class.
@@ -12908,6 +13098,17 @@
             <param name="red">Red component.</param>
             <param name="green">Green component.</param>
             <param name="blue">Blue component.</param>
+            
+        </member>
+        <member name="M:AForge.Imaging.RGB.#ctor(System.Byte,System.Byte,System.Byte,System.Byte)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.RGB"/> class.
+            </summary>
+            
+            <param name="red">Red component.</param>
+            <param name="green">Green component.</param>
+            <param name="blue">Blue component.</param>
+            <param name="alpha">Alpha component.</param>
             
         </member>
         <member name="M:AForge.Imaging.RGB.#ctor(System.Drawing.Color)">
@@ -12960,7 +13161,7 @@
             Initializes a new instance of the <see cref="T:AForge.Imaging.HSL"/> class.
             </summary>
         </member>
-        <member name="M:AForge.Imaging.HSL.#ctor(System.Int32,System.Double,System.Double)">
+        <member name="M:AForge.Imaging.HSL.#ctor(System.Int32,System.Single,System.Single)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Imaging.HSL"/> class.
             </summary>
@@ -13052,7 +13253,7 @@
             Initializes a new instance of the <see cref="T:AForge.Imaging.YCbCr"/> class.
             </summary>
         </member>
-        <member name="M:AForge.Imaging.YCbCr.#ctor(System.Double,System.Double,System.Double)">
+        <member name="M:AForge.Imaging.YCbCr.#ctor(System.Single,System.Single,System.Single)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Imaging.YCbCr"/> class.
             </summary>
@@ -13096,6 +13297,139 @@
             </summary>
             
             <returns>Returns <see cref="T:AForge.Imaging.RGB"/> instance, which represents converted color value.</returns>
+            
+        </member>
+        <member name="T:AForge.Imaging.ColorReduction.OrderedColorDithering">
+            <summary>
+            Color dithering with a thresold matrix (ordered dithering).
+            </summary>
+            
+            <remarks><para>The class implements ordered color dithering as described on
+            <a href="http://en.wikipedia.org/wiki/Ordered_dithering">Wikipedia</a>.
+            The algorithm achieves dithering by applying a <see cref="P:AForge.Imaging.ColorReduction.OrderedColorDithering.ThresholdMatrix">threshold map</see> on
+            the pixels displayed, causing some of the pixels to be rendered at a different color, depending on
+            how far in between the color is of available <see cref="P:AForge.Imaging.ColorReduction.OrderedColorDithering.ColorTable">color entries</see>.</para>
+            
+            <para>The image processing routine accepts 24/32 bpp color images for processing. As a result this routine
+            produces 4 bpp or 8 bpp indexed image, which depends on size of the specified
+            <see cref="P:AForge.Imaging.ColorReduction.OrderedColorDithering.ColorTable">color table</see> - 4 bpp result for
+            color tables with 16 colors or less; 8 bpp result for larger color tables.</para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // create color image quantization routine
+            ColorImageQuantizer ciq = new ColorImageQuantizer( new MedianCutQuantizer( ) );
+            // create 256 colors table
+            Color[] colorTable = ciq.CalculatePalette( image, 256 );
+            // create dithering routine
+            OrderedColorDithering dithering = new OrderedColorDithering( );
+            dithering.ColorTable = colorTable;
+            // apply the dithering routine
+            Bitmap newImage = dithering.Apply( image );
+            </code>
+            
+            <para><b>Initial image:</b></para>
+            <img src="img/imaging/sample1.jpg" width="480" height="361"/>
+            <para><b>Result image:</b></para>
+            <img src="img/imaging/ordered_color_dithering.png" width="480" height="361"/>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.Imaging.ColorReduction.OrderedColorDithering.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.ColorReduction.OrderedColorDithering"/> class.
+            </summary>
+            
+        </member>
+        <member name="M:AForge.Imaging.ColorReduction.OrderedColorDithering.#ctor(System.Byte[0:,0:])">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.ColorReduction.OrderedColorDithering"/> class.
+            </summary>
+            
+            <param name="matrix">Threshold matrix (see <see cref="P:AForge.Imaging.ColorReduction.OrderedColorDithering.ThresholdMatrix"/> property).</param>
+            
+        </member>
+        <member name="M:AForge.Imaging.ColorReduction.OrderedColorDithering.Apply(System.Drawing.Bitmap)">
+            <summary>
+            Perform color dithering for the specified image.
+            </summary>
+            
+            <param name="sourceImage">Source image to do color dithering for.</param>
+            
+            <returns>Returns color dithered image. See <see cref="P:AForge.Imaging.ColorReduction.OrderedColorDithering.ColorTable"/> for information about format of
+            the result image.</returns>
+            
+            <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image. It must 24 or 32 bpp color image.</exception>
+            
+        </member>
+        <member name="M:AForge.Imaging.ColorReduction.OrderedColorDithering.Apply(AForge.Imaging.UnmanagedImage)">
+            <summary>
+            Perform color dithering for the specified image.
+            </summary>
+            
+            <param name="sourceImage">Source image to do color dithering for.</param>
+            
+            <returns>Returns color dithered image. See <see cref="P:AForge.Imaging.ColorReduction.OrderedColorDithering.ColorTable"/> for information about format of
+            the result image.</returns>
+            
+            <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image. It must 24 or 32 bpp color image.</exception>
+            
+        </member>
+        <member name="P:AForge.Imaging.ColorReduction.OrderedColorDithering.ThresholdMatrix">
+            <summary>
+            Threshold matrix - values to add source image's values.
+            </summary>
+            
+            <remarks><para>The property keeps a threshold matrix, which is applied to values of a source image
+            to dither. By adding these values to the source image the algorithm produces the effect when pixels
+            of the same color in source image may have different color in the result image (which depends on pixel's
+            position). This threshold map is also known as an index matrix or Bayer matrix.</para>
+            
+            <para>By default the property is inialized with the below matrix:
+            <code lang="none">
+             2   18    6   22
+            26   10   30   14
+             8   24    4   20
+            32   16   28   12
+            </code>
+            </para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.ColorReduction.OrderedColorDithering.ColorTable">
+            <summary>
+            Color table to use for image dithering. Must contain 2-256 colors.
+            </summary>
+            
+            <remarks><para>Color table size determines format of the resulting image produced by this
+            image processing routine. If color table contains 16 color or less, then result image will have
+            4 bpp indexed pixel format. If color table contains more than 16 colors, then result image will
+            have 8 bpp indexed pixel format.</para>
+            
+            <para>By default the property is initialized with default 16 colors, which are:
+            Black, Dark Blue, Dark Green, Dark Cyan, Dark Red, Dark Magenta, Dark Khaki, Light Gray,
+            Gray, Blue, Green, Cyan, Red, Magenta, Yellow and White.</para>
+            </remarks>
+            
+            <exception cref="T:System.ArgumentException">Color table length must be in the [2, 256] range.</exception>
+            
+        </member>
+        <member name="P:AForge.Imaging.ColorReduction.OrderedColorDithering.UseCaching">
+            <summary>
+            Use color caching during color dithering or not.
+            </summary>
+            
+            <remarks><para>The property  specifies if internal cache of already processed colors should be used or not.
+            For each pixel in the original image the color dithering routine does search in target color palette to find
+            the best matching color. To avoid doing the search again and again for already processed colors, the class may
+            use internal dictionary which maps colors of original image to indexes in target color palette.
+            </para>
+            
+            <para><note>The property provides a trade off. On one hand it may speedup color dithering routine, but on another
+            hand it increases memory usage. Also cache usage may not be efficient for very small target color tables.</note></para>
+            
+            <para>Default value is set to <see langword="false"/>.</para>
+            </remarks>
             
         </member>
         <member name="T:AForge.Imaging.BlockMatch">
@@ -14053,7 +14387,9 @@
             as background, but pixels with higher values are treated as objects' pixels.</note></para>
             
             <para>For blobs' searching the class supports 8 bpp indexed grayscale images and
-            24/32 bpp color images. 
+            24/32 bpp color images that are at least two pixels wide. Images that are one
+            pixel wide can be processed if they are rotated first, or they can be processed
+            with <see cref="T:AForge.Imaging.RecursiveBlobCounter"/>.
             See documentation about <see cref="T:AForge.Imaging.BlobCounterBase"/> for information about which
             pixel formats are supported for extraction of blobs.</para>
             
@@ -14119,6 +14455,8 @@
             <remarks>The method supports 8 bpp indexed grayscale images and 24/32 bpp color images.</remarks>
             
             <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image.</exception>
+            <exception cref="T:AForge.Imaging.InvalidImagePropertiesException">Cannot process images that are one pixel wide. Rotate the image
+            or use <see cref="T:AForge.Imaging.RecursiveBlobCounter"/>.</exception>
             
         </member>
         <member name="P:AForge.Imaging.BlobCounter.BackgroundThreshold">
@@ -14175,14 +14513,39 @@
             <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
             
         </member>
-        <member name="M:AForge.Imaging.ImageStatisticsYCbCr.#ctor(System.Drawing.Imaging.BitmapData)">
+        <member name="M:AForge.Imaging.ImageStatisticsYCbCr.#ctor(System.Drawing.Bitmap,System.Drawing.Bitmap)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Imaging.ImageStatisticsYCbCr"/> class.
             </summary>
             
-            <param name="imageData">Image data to gather statistics about.</param>
+            <param name="image">Image to gather statistics about.</param>
+            <param name="mask">Mask image which specifies areas to collect statistics for.</param>
+            
+            <remarks><para>The mask image must be a grayscale/binary (8bpp) image of the same size as the
+            specified source image, where black pixels (value 0) correspond to areas which should be excluded
+            from processing. So statistics is calculated only for pixels, which are none black in the mask image.
+            </para></remarks>
             
             <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
+            <exception cref="T:System.ArgumentException">Mask image must be 8 bpp grayscale image.</exception>
+            <exception cref="T:System.ArgumentException">Mask must have the same size as the source image to get statistics for.</exception>
+            
+        </member>
+        <member name="M:AForge.Imaging.ImageStatisticsYCbCr.#ctor(System.Drawing.Bitmap,System.Byte[0:,0:])">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.ImageStatisticsYCbCr"/> class.
+            </summary>
+            
+            <param name="image">Image to gather statistics about.</param>
+            <param name="mask">Mask array which specifies areas to collect statistics for.</param>
+            
+            <remarks><para>The mask array must be of the same size as the specified source image, where 0 values
+            correspond to areas which should be excluded from processing. So statistics is calculated only for pixels,
+            which have none zero corresponding value in the mask.
+            </para></remarks>
+            
+            <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
+            <exception cref="T:System.ArgumentException">Mask must have the same size as the source image to get statistics for.</exception>
             
         </member>
         <member name="M:AForge.Imaging.ImageStatisticsYCbCr.#ctor(AForge.Imaging.UnmanagedImage)">
@@ -14195,12 +14558,39 @@
             <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
             
         </member>
-        <member name="M:AForge.Imaging.ImageStatisticsYCbCr.ProcessImage(AForge.Imaging.UnmanagedImage)">
+        <member name="M:AForge.Imaging.ImageStatisticsYCbCr.#ctor(AForge.Imaging.UnmanagedImage,AForge.Imaging.UnmanagedImage)">
             <summary>
-            Gather statistics about specified image.
+            Initializes a new instance of the <see cref="T:AForge.Imaging.ImageStatisticsYCbCr"/> class.
             </summary>
             
-            <param name="image">Unmanaged image to process.</param>
+            <param name="image">Image to gather statistics about.</param>
+            <param name="mask">Mask image which specifies areas to collect statistics for.</param>
+            
+            <remarks><para>The mask image must be a grayscale/binary (8bpp) image of the same size as the
+            specified source image, where black pixels (value 0) correspond to areas which should be excluded
+            from processing. So statistics is calculated only for pixels, which are none black in the mask image.
+            </para></remarks>
+            
+            <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
+            <exception cref="T:System.ArgumentException">Mask image must be 8 bpp grayscale image.</exception>
+            <exception cref="T:System.ArgumentException">Mask must have the same size as the source image to get statistics for.</exception>
+            
+        </member>
+        <member name="M:AForge.Imaging.ImageStatisticsYCbCr.#ctor(AForge.Imaging.UnmanagedImage,System.Byte[0:,0:])">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.ImageStatisticsYCbCr"/> class.
+            </summary>
+            
+            <param name="image">Image to gather statistics about.</param>
+            <param name="mask">Mask array which specifies areas to collect statistics for.</param>
+            
+            <remarks><para>The mask array must be of the same size as the specified source image, where 0 values
+            correspond to areas which should be excluded from processing. So statistics is calculated only for pixels,
+            which have none zero corresponding value in the mask.
+            </para></remarks>
+            
+            <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Source pixel format is not supported.</exception>
+            <exception cref="T:System.ArgumentException">Mask must have the same size as the source image to get statistics for.</exception>
             
         </member>
         <member name="P:AForge.Imaging.ImageStatisticsYCbCr.Y">
@@ -14280,8 +14670,8 @@
             // create filter
             YCbCrFiltering filter = new YCbCrFiltering( );
             // set color ranges to keep
-            filter.Cb = new DoubleRange( -0.2, 0 );
-            filter.Cr = new DoubleRange( 0.26, 0.5 );
+            filter.Cb = new Range( -0.2f, 0.0f );
+            filter.Cr = new Range( 0.26f, 0.5f );
             // apply the filter
             filter.ApplyInPlace( image );
             </code>
@@ -14301,7 +14691,7 @@
             Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.YCbCrFiltering"/> class.
             </summary>
         </member>
-        <member name="M:AForge.Imaging.Filters.YCbCrFiltering.#ctor(AForge.DoubleRange,AForge.DoubleRange,AForge.DoubleRange)">
+        <member name="M:AForge.Imaging.Filters.YCbCrFiltering.#ctor(AForge.Range,AForge.Range,AForge.Range)">
             <summary>
             Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.YCbCrFiltering"/> class.
             </summary>
@@ -14457,7 +14847,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks>
              
              <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image.</exception>
@@ -14488,7 +14878,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks>
              
              <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image.</exception>
@@ -14730,7 +15120,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks>
              
              <exception cref="T:System.ApplicationException">No filters were added into the filters' sequence.</exception>
@@ -14763,7 +15153,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks>
              
              <exception cref="T:System.ApplicationException">No filters were added into the filters' sequence.</exception>
@@ -14873,6 +15263,321 @@
             </summary>
             
             <remarks>Default value is set to <b>10</b>.</remarks>
+            
+        </member>
+        <member name="T:AForge.Imaging.Filters.TransformToPolar">
+            <summary>
+            Transform rectangle image into circle (to polar coordinates).
+            </summary>
+            
+            <remarks><para>The image processing routine does transformation of the source image into
+            circle (polar transformation). The produced effect is similar to GIMP's "Polar Coordinates"
+            distortion filter (or its equivalent in Photoshop).
+            </para>
+            
+            <para>The filter accepts 8 bpp grayscale and 24/32 bpp color images for processing.</para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // create filter
+            TransformToPolar filter = new TransformToPolar( );
+            filter.OffsetAngle = 0;
+            filter.CirlceDepth = 1;
+            filter.UseOriginalImageSize = false;
+            filter.NewSize = new Size( 200, 200 );
+            // apply the filter
+            Bitmap newImage = filter.Apply( image );
+            </code>
+            
+            <para><b>Initial image:</b></para>
+            <img src="img/imaging/sample21.png" width="320" height="160"/>
+            <para><b>Result image:</b></para>
+            <img src="img/imaging/polar.png" width="200" height="200"/>
+            </remarks>
+            
+            <seealso cref="T:AForge.Imaging.Filters.TransformFromPolar"/>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.TransformToPolar.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.TransformToPolar"/> class.
+            </summary>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.TransformToPolar.CalculateNewImageSize(AForge.Imaging.UnmanagedImage)">
+            <summary>
+            Calculates new image size.
+            </summary>
+            
+            <param name="sourceData">Source image data.</param>
+            
+            <returns>New image size - size of the destination image.</returns>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.TransformToPolar.ProcessFilter(AForge.Imaging.UnmanagedImage,AForge.Imaging.UnmanagedImage)">
+            <summary>
+            Process the filter on the specified image.
+            </summary>
+            
+            <param name="sourceData">Source image data.</param>
+            <param name="destinationData">Destination image data.</param>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.TransformToPolar.CirlceDepth">
+            <summary>
+            Circularity coefficient of the mapping, [0, 1].
+            </summary>
+            
+            <remarks><para>The property specifies circularity coefficient of the mapping to be done.
+            If the coefficient is set to 1, then the mapping will produce ideal circle. If the coefficient
+            is set to 0, then the mapping will occupy entire area of the destination image (circle will
+            be extended into direction of edges). Changing the property from 0 to 1 user may balance
+            circularity of the produced output.
+            </para>
+            
+            <para>Default value is set to <b>1</b>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.TransformToPolar.OffsetAngle">
+            <summary>
+            Offset angle used to shift mapping, [-360, 360] degrees.
+            </summary>
+            
+            <remarks><para>The property specifies offset angle, which can be used to shift
+            mapping in counter clockwise direction. For example, if user sets this property to 30, then
+            start of polar mapping is shifted by 30 degrees in counter clockwise direction.</para>
+            
+            <para>Default value is set to <b>0</b>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.TransformToPolar.MapBackwards">
+             <summary>
+             Specifies direction of mapping.
+             </summary>
+            
+             <remarks><para>The property specifies direction of mapping source image's X axis. If the
+             property is set to <see langword="false"/>, the image is mapped in clockwise direction;
+             otherwise in counter clockwise direction.</para>
+             
+             <para>Default value is set to <see langword="false"/>.</para>
+             </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.TransformToPolar.MapFromTop">
+            <summary>
+            Specifies if top of the source image should go to center or edge of the result image.
+            </summary>
+            
+            <remarks><para>The property specifies position of the source image's top line in the destination
+            image. If the property is set to <see langword="true"/>, then it goes to the center of the result image;
+            otherwise it goes to the edge.</para>
+            
+            <para>Default value is set to <see langword="true"/>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.TransformToPolar.FillColor">
+            <summary>
+            Fill color to use for unprocessed areas.
+            </summary>
+            
+            <remarks><para>The property specifies fill color, which is used to fill unprocessed areas.
+            In the case if <see cref="P:AForge.Imaging.Filters.TransformToPolar.CirlceDepth"/> is greater than 0, then there will be some areas on
+            the image's edge, which are not filled by the produced "circular" image, but are filled by
+            the specified color.
+            </para>
+            
+            <para>Default value is set to <see cref="P:System.Drawing.Color.White"/>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.TransformToPolar.NewSize">
+            <summary>
+            Size of destination image.
+            </summary>
+            
+            <remarks><para>The property specifies size of result image produced by this image
+            processing routine in the case if <see cref="P:AForge.Imaging.Filters.TransformToPolar.UseOriginalImageSize"/> property
+            is set to <see langword="false"/>.</para>
+            
+            <para><note>Both width and height must be in the [1, 10000] range.</note></para>
+            
+            <para>Default value is set to <b>200 x 200</b>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.TransformToPolar.UseOriginalImageSize">
+            <summary>
+            Use source image size for destination or not.
+            </summary>
+            
+            <remarks><para>The property specifies if the image processing routine should create destination
+            image of the same size as original image or of the size specified by <see cref="P:AForge.Imaging.Filters.TransformToPolar.NewSize"/>
+            property.</para>
+            
+            <para>Default value is set to <see langword="true"/>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.TransformToPolar.FormatTranslations">
+            <summary>
+            Format translations dictionary.
+            </summary>
+            
+            <remarks><para>See <see cref="P:AForge.Imaging.Filters.IFilterInformation.FormatTranslations"/>
+            documentation for additional information.</para></remarks>
+            
+        </member>
+        <member name="T:AForge.Imaging.Filters.TransformFromPolar">
+            <summary>
+            Transform polar image into rectangle.
+            </summary>
+            
+            <remarks>The image processing routine is oposite transformation to the one done by <see cref="T:AForge.Imaging.Filters.TransformToPolar"/>
+            routine, i.e. transformation from polar image into rectangle. The produced effect is similar to GIMP's
+            "Polar Coordinates" distortion filter (or its equivalent in Photoshop).
+            
+            <para>The filter accepts 8 bpp grayscale and 24/32 bpp color images for processing.</para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // create filter
+            TransformFromPolar filter = new TransformFromPolar( );
+            filter.OffsetAngle = 0;
+            filter.CirlceDepth = 1;
+            filter.UseOriginalImageSize = false;
+            filter.NewSize = new Size( 360, 120 );
+            // apply the filter
+            Bitmap newImage = filter.Apply( image );
+            </code>
+            
+            <para><b>Initial image:</b></para>
+            <img src="img/imaging/sample22.png" width="240" height="240"/>
+            <para><b>Result image:</b></para>
+            <img src="img/imaging/from_polar.png" width="360" height="120"/>
+            </remarks>
+            
+            <seealso cref="T:AForge.Imaging.Filters.TransformToPolar"/>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.TransformFromPolar.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.TransformFromPolar"/> class.
+            </summary>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.TransformFromPolar.CalculateNewImageSize(AForge.Imaging.UnmanagedImage)">
+            <summary>
+            Calculates new image size.
+            </summary>
+            
+            <param name="sourceData">Source image data.</param>
+            
+            <returns>New image size - size of the destination image.</returns>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.TransformFromPolar.ProcessFilter(AForge.Imaging.UnmanagedImage,AForge.Imaging.UnmanagedImage)">
+            <summary>
+            Process the filter on the specified image.
+            </summary>
+            
+            <param name="sourceData">Source image data.</param>
+            <param name="destinationData">Destination image data.</param>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.TransformFromPolar.CirlceDepth">
+            <summary>
+            Circularity coefficient of the mapping, [0, 1].
+            </summary>
+            
+            <remarks><para>The property specifies circularity coefficient of the mapping to be done.
+            If the coefficient is set to 1, then destination image will be produced by mapping
+            ideal circle from the source image, which is placed in source image's centre and its
+            radius equals to the minimum distance from centre to the image’s edge. If the coefficient
+            is set to 0, then the mapping will use entire area of the source image (circle will
+            be extended into direction of edges). Changing the property from 0 to 1 user may balance
+            circularity of the produced output.</para>
+            
+            <para>Default value is set to <b>1</b>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.TransformFromPolar.OffsetAngle">
+            <summary>
+            Offset angle used to shift mapping, [-360, 360] degrees.
+            </summary>
+            
+            <remarks><para>The property specifies offset angle, which can be used to shift
+            mapping in clockwise direction. For example, if user sets this property to 30, then
+            start of polar mapping is shifted by 30 degrees in clockwise direction.</para>
+            
+            <para>Default value is set to <b>0</b>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.TransformFromPolar.MapBackwards">
+             <summary>
+             Specifies direction of mapping.
+             </summary>
+            
+             <remarks><para>The property specifies direction of mapping source image. If the
+             property is set to <see langword="false"/>, the image is mapped in clockwise direction;
+             otherwise in counter clockwise direction.</para>
+             
+             <para>Default value is set to <see langword="false"/>.</para>
+             </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.TransformFromPolar.MapFromTop">
+            <summary>
+            Specifies if centre of the source image should to top or bottom of the result image.
+            </summary>
+            
+            <remarks><para>The property specifies position of the source image's centre in the destination image.
+            If the property is set to <see langword="true"/>, then it goes to the top of the result image;
+            otherwise it goes to the bottom.</para>
+            
+            <para>Default value is set to <see langword="true"/>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.TransformFromPolar.NewSize">
+            <summary>
+            Size of destination image.
+            </summary>
+            
+            <remarks><para>The property specifies size of result image produced by this image
+            processing routine in the case if <see cref="P:AForge.Imaging.Filters.TransformFromPolar.UseOriginalImageSize"/> property
+            is set to <see langword="false"/>.</para>
+            
+            <para><note>Both width and height must be in the [1, 10000] range.</note></para>
+            
+            <para>Default value is set to <b>200 x 200</b>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.TransformFromPolar.UseOriginalImageSize">
+            <summary>
+            Use source image size for destination or not.
+            </summary>
+            
+            <remarks><para>The property specifies if the image processing routine should create destination
+            image of the same size as original image or of the size specified by <see cref="P:AForge.Imaging.Filters.TransformFromPolar.NewSize"/>
+            property.</para>
+            
+            <para>Default value is set to <see langword="true"/>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.TransformFromPolar.FormatTranslations">
+            <summary>
+            Format translations dictionary.
+            </summary>
+            
+            <remarks><para>See <see cref="P:AForge.Imaging.Filters.IFilterInformation.FormatTranslations"/>
+            documentation for additional information.</para></remarks>
             
         </member>
         <member name="T:AForge.Imaging.Filters.RotateBicubic">
@@ -15018,7 +15723,7 @@
             <para>Sample usage:</para>
             <code>
             // create random generator
-            IRandomNumberGenerator generator = new UniformGenerator( new DoubleRange( -50, 50 ) );
+            IRandomNumberGenerator generator = new UniformGenerator( new Range( -50, 50 ) );
             // create filter
             AdditiveNoise filter = new AdditiveNoise( generator );
             // apply the filter
@@ -15134,7 +15839,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks>
              
              <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image.</exception>
@@ -15165,7 +15870,7 @@
              <returns>Returns filter's result obtained by applying the filter to
              the source image.</returns>
              
-             <remarks>The method keeps the source image unchanged and returns the
+             <remarks>The method keeps the source image unchanged and returns
              the result of image processing filter as new image.</remarks>
              
              <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Unsupported pixel format of the source image.</exception>
@@ -16064,7 +16769,7 @@
             
             <remarks><para>Contrast stretching (or as it is often called normalization) is a simple image enhancement
             technique that attempts to improve the contrast in an image by 'stretching' the range of intensity values
-            it contains to span a desired range of values, e.g. the the full range of pixel values that the image type
+            it contains to span a desired range of values, e.g. the full range of pixel values that the image type
             concerned allows. It differs from the more sophisticated <see cref="T:AForge.Imaging.Filters.HistogramEqualization">histogram equalization</see>
             in that it can only apply a linear scaling function to the image pixel values.</para>
             
@@ -16239,6 +16944,96 @@
              </summary>
              
              <remarks>Default value is set to <see langword="true"/>.</remarks>
+            
+        </member>
+        <member name="T:AForge.Imaging.Filters.BayerFilter">
+            <summary>
+            Bayer fileter image processing routine.
+            </summary>
+            
+            <remarks><para>The class implements <a href="http://en.wikipedia.org/wiki/Bayer_filter">Bayer filter</a>
+            routine, which creates color image out of grayscale image produced by image sensor built with
+            Bayer color matrix.</para>
+            
+            <para>The filter accepts 8 bpp grayscale images and produces
+            24 bpp RGB image.</para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // create filter
+            BayerFilter filter = new BayerFilter( );
+            // apply the filter
+            Bitmap rgbImage = filter.Apply( image );
+            </code>
+            
+            <para><b>Source image:</b></para>
+            <img src="img/imaging/sample23.png" width="640" height="480" />
+            <para><b>Result image:</b></para>
+            <img src="img/imaging/bayer_filter.jpg" width="640" height="480" />
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.BayerFilter.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.BayerFilter"/> class.
+            </summary>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.BayerFilter.ProcessFilter(AForge.Imaging.UnmanagedImage,AForge.Imaging.UnmanagedImage)">
+            <summary>
+            Process the filter on the specified image.
+            </summary>
+            
+            <param name="sourceData">Source image data.</param>
+            <param name="destinationData">Destination image data.</param>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.BayerFilter.PerformDemosaicing">
+            <summary>
+            Specifies if demosaicing must be done or not.
+            </summary>
+            
+            <remarks><para>The property specifies if color demosaicing must be done or not.
+            If the property is set to <see langword="false"/>, then pixels of the result color image
+            are colored according to the <see cref="P:AForge.Imaging.Filters.BayerFilter.BayerPattern">Bayer pattern</see> used, i.e. every pixel
+            of the source grayscale image is copied to corresponding color plane of the result image.
+            If the property is set to <see langword="true"/>, then pixels of the result image
+            are set to color, which is obtained by averaging color components from the 3x3 window - pixel
+            itself plus 8 surrounding neighbors.</para>
+            
+            <para>Default value is set to <see langword="true"/>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.BayerFilter.BayerPattern">
+            <summary>
+            Specifies Bayer pattern used for decoding color image.
+            </summary>
+            
+            <remarks><para>The property specifies 2x2 array of RGB color indexes, which set the
+            Bayer patter used for decoding color image.</para>
+            
+            <para>By default the property is set to:
+            <code>
+            new int[2, 2] { { RGB.G, RGB.B }, { RGB.R, RGB.G } }
+            </code>,
+            which corresponds to
+            <code lang="none">
+            G B
+            R G
+            </code>
+            pattern.
+            </para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.BayerFilter.FormatTranslations">
+            <summary>
+            Format translations dictionary.
+            </summary>
+            
+            <remarks><para>See <see cref="P:AForge.Imaging.Filters.IFilterInformation.FormatTranslations"/>
+            documentation for additional information.</para></remarks>
             
         </member>
         <member name="T:AForge.Imaging.Filters.MoveTowards">
@@ -16506,7 +17301,7 @@
              // get 16 color palette for a given image
              Color[] colorTable = ciq.CalculatePalette( image, 16 );
              
-             // ... or just reduce color in the specified image
+             // ... or just reduce colors in the specified image
              Bitmap newImage = ciq.ReduceColors( image, 16 );
              </code>
              
@@ -16647,7 +17442,7 @@
             <para><note>The property provides a trade off. On one hand it may speedup color reduction routine, but on another
             hand it increases memory usage. Also cache usage may not be efficient for very small target color tables.</note></para>
             
-            <para>Default value is set to <see langword="true"/>.</para>
+            <para>Default value is set to <see langword="false"/>.</para>
             </remarks>
             
         </member>

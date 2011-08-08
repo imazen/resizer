@@ -1,0 +1,635 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AForge.Video.Ximea</name>
+    </assembly>
+    <members>
+        <member name="T:AForge.Video.Ximea.CameraParameter">
+            <summary>
+            Set of available configuration options for XIMEA cameras.
+            </summary>
+            
+            <remarks><para><note>The list of configuration options may not be complete. See XIMEA API
+            for the complete up to date list of possible configuration options.</note></para></remarks>
+            
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.DeviceName">
+            <summary>
+            Get camera model name. Type string.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.DeviceSerialNumber">
+            <summary>
+            Get device serial number in decimal format. Type string, integer, float
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.DeviceType">
+            <summary>
+            Returns device type (1394, USB2.0, CURRERA…..). Type string.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.Exposure">
+            <summary>
+            Set/Get exposure time in microseconds. Type integer.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.ExposureMax">
+            <summary>
+            Get longest possible exposure to be set on camera in microseconds. Type integer.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.ExposureMin">
+            <summary>
+            Get shortest possible exposure to be set on camera in microseconds. Type integer. 
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.Gain">
+            <summary>
+            Set/Get camera gain in dB. Type float. 
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.GainMax">
+            <summary>
+            Get highest possible camera gain in dB. Type float.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.GainMin">
+            <summary>
+            Get lowest possible camera gain in dB. Type float.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.Width">
+            <summary>
+            Set/Get width of the image provided by the camera (in pixels). Type integer.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.WidthMax">
+            <summary>
+            Get maximal image width provided by the camera (in pixels). Type integer.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.WidthMin">
+            <summary>
+            Get minimum image width provided by the camera (in pixels). Type integer.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.Height">
+            <summary>
+            Set/Get height of the image provided by the camera (in pixels). Type integer.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.HeightMax">
+            <summary>
+            Get maximal image height provided by the camera (in pixels). Type integer.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.HeightMin">
+            <summary>
+            Get minimum image height provided by the camera (in pixels). Type integer.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.Downsampling">
+            <summary>
+            Set/Get image resolution by binning or skipping. Type integer. 
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.DownsamplingMax">
+            <summary>
+            Get highest value for binning or skipping. Type integer.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.DownsamplingMin">
+            <summary>
+            Get lowest value for binning or skipping. Type integer.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.Framerate">
+            <summary>
+            Get frames per second. Type float. 
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.FramerateMax">
+            <summary>
+            Get highest possible framerate for current camera settings. Type float.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.FramerateMin">
+            <summary>
+            Get lowest framerate for current camera settings. Type float.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.OffsetX">
+            <summary>
+            Set/Get horizontal offset from the origin to the area of interest (in pixels). Type integer. 
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.OffsetXMax">
+            <summary>
+            Get maximum horizontal offset from the origin to the area of interest (in pixels). Type integer. 
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.OffsetXMin">
+            <summary>
+            Get minimum horizontal offset from the origin to the area of interest (in pixels). Type integer. 
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.OffsetY">
+            <summary>
+            Set/Get vertical offset from the origin to the area of interest (in pixels). Type integer.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.OffsetYMax">
+            <summary>
+            Get maximum vertical offset from the origin to the area of interest (in pixels). Type integer.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.OffsetYMin">
+            <summary>
+            Get minimal vertical offset from the origin to the area of interest (in pixels). Type integer.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.WhiteBalanceBlue">
+            <summary>
+            Set/Get white balance blue coefficient. Type float.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.WhiteBalanceREd">
+            <summary>
+            Set/Get white balance red coefficient. Type float.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.WhiteBalanceGreen">
+            <summary>
+            Set/Get white balance green coefficient. Type float.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.Ximea.CameraParameter.Sharpness">
+            <summary>
+            Set/Get sharpness strenght. Type float. 
+            </summary>
+        </member>
+        <member name="T:AForge.Video.Ximea.XimeaCamera">
+            <summary>
+            The class provides access to XIMEA cameras.
+            </summary>
+            
+            <remarks><para>The class allows to perform image acquisition from <a href="http://www.ximea.com/">XIMEA</a> cameras.
+            It wraps XIMEA'a xiAPI, which means that users of this class will also require <b>m3api.dll</b> and a correct
+            TM file for the camera model connected to the system (both are provided with XIMEA API software package).</para>
+            
+            <para>Sample usage:</para>
+            <code>
+            XimeaCamera camera = new XimeaCamera( );
+            
+            // open camera and start data acquisition
+            camera.Open( 0 );
+            camera.StartAcquisition( );
+            
+            // set exposure time to 10 milliseconds
+            camera.SetParam( CameraParameter.Exposure, 10 * 1000 );
+            
+            // get image from the camera
+            Bitmap bitmap = camera.GetImage( );
+            // process the image
+            // ...
+            
+            // dispose the image when it is no longer needed
+            bitmap.Dispose( );
+            
+            // stop data acquisition and close the camera
+            camera.StopAcquisition( );
+            camera.Close( );
+            </code>
+            </remarks>
+            
+            <seealso cref="T:AForge.Video.Ximea.XimeaVideoSource"/>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaCamera.Open(System.Int32)">
+             <summary>
+             Open XIMEA camera.
+             </summary>
+             
+             <param name="deviceID">Camera ID to open.</param>
+             
+             <remarks><para>Opens the specified XIMEA camera preparing it for starting video acquisition
+             which is done using <see cref="M:AForge.Video.Ximea.XimeaCamera.StartAcquisition"/> method. The <see cref="P:AForge.Video.Ximea.XimeaCamera.IsDeviceOpen"/>
+             property can be used at any time to find if a camera was opened or not.</para></remarks>
+             
+             <exception cref="T:AForge.Video.VideoException">An error occurred while communicating with a camera. See error
+             message for additional information.</exception>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaCamera.Close">
+             <summary>
+             Close opened camera (if any) and release allocated resources.
+             </summary>
+             
+             <remarks><para><note>The method also calls <see cref="M:AForge.Video.Ximea.XimeaCamera.StopAcquisition"/> method if it was not
+             done by user.</note></para></remarks>
+             
+             <exception cref="T:AForge.Video.VideoException">An error occurred while communicating with a camera. See error
+             message for additional information.</exception>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaCamera.StartAcquisition">
+            <summary>
+            Begin camera's work cycle and start data acquisition from it.
+            </summary>
+            
+            <remarks><para>The <see cref="P:AForge.Video.Ximea.XimeaCamera.IsAcquisitionStarted"/> property can be used at any time to find if the
+            acquisition was started or not.</para></remarks>
+            
+            <exception cref="T:AForge.Video.VideoException">An error occurred while communicating with a camera. See error
+            message for additional information.</exception>
+            <exception cref="T:AForge.NotConnectedException">No camera was opened, so can not access its methods.</exception>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaCamera.StopAcquisition">
+            <summary>
+            End camera's work cycle and stops data acquisition.
+            </summary>
+            
+            <exception cref="T:AForge.Video.VideoException">An error occurred while communicating with a camera. See error
+            message for additional information.</exception>
+            <exception cref="T:AForge.NotConnectedException">No camera was opened, so can not access its methods.</exception>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaCamera.SetParam(System.String,System.Int32)">
+             <summary>
+             Set camera's parameter.
+             </summary>
+             
+             <param name="parameterName">Parameter name.</param>
+             <param name="value">Integer parameter value.</param>
+             
+             <remarks><para>The method allows to control different camera's parameters, like exposure time, gain value, etc.
+             See <see cref="T:AForge.Video.Ximea.CameraParameter"/> class for the list of some possible configuration parameters. See
+             XIMEA documentation for the complete list of supported parameters.
+             </para></remarks>
+             
+             <exception cref="T:AForge.Video.VideoException">An error occurred while communicating with a camera. See error
+             message for additional information.</exception>
+             <exception cref="T:AForge.NotConnectedException">No camera was opened, so can not access its methods.</exception>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaCamera.SetParam(System.String,System.Single)">
+             <summary>
+             Set camera's parameter.
+             </summary>
+             
+             <param name="parameterName">Parameter name.</param>
+             <param name="value">Float parameter value.</param>
+             
+             <remarks><para>The method allows to control different camera's parameters, like exposure time, gain value, etc.
+             See <see cref="T:AForge.Video.Ximea.CameraParameter"/> class for the list of some possible configuration parameters. See
+             XIMEA documentation for the complete list of supported parameters.
+             </para></remarks>
+             
+             <exception cref="T:AForge.Video.VideoException">An error occurred while communicating with a camera. See error
+             message for additional information.</exception>
+             <exception cref="T:AForge.NotConnectedException">No camera was opened, so can not access its methods.</exception>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaCamera.GetParamInt(System.String)">
+             <summary>
+             Get camera's parameter as integer value.
+             </summary>
+             
+             <param name="parameterName">Parameter name to get from camera.</param>
+             
+             <returns>Returns integer value of the requested parameter.</returns>
+             
+             <remarks><para>See <see cref="T:AForge.Video.Ximea.CameraParameter"/> class for the list of some possible configuration parameters. See
+             XIMEA documentation for the complete list of supported parameters.</para></remarks>
+             
+             <exception cref="T:AForge.Video.VideoException">An error occurred while communicating with a camera. See error
+             message for additional information.</exception>
+             <exception cref="T:AForge.NotConnectedException">No camera was opened, so can not access its methods.</exception>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaCamera.GetParamFloat(System.String)">
+             <summary>
+             Get camera's parameter as float value.
+             </summary>
+             
+             <param name="parameterName">Parameter name to get from camera.</param>
+             
+             <returns>Returns float value of the requested parameter.</returns>
+             
+             <remarks><para>See <see cref="T:AForge.Video.Ximea.CameraParameter"/> class for the list of some possible configuration parameters. See
+             XIMEA documentation for the complete list of supported parameters.</para></remarks>
+             
+             <exception cref="T:AForge.Video.VideoException">An error occurred while communicating with a camera. See error
+             message for additional information.</exception>
+             <exception cref="T:AForge.NotConnectedException">No camera was opened, so can not access its methods.</exception>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaCamera.GetParamString(System.String)">
+             <summary>
+             Get camera's parameter as string value.
+             </summary>
+             
+             <param name="parameterName">Parameter name to get from camera.</param>
+             
+             <returns>Returns string value of the requested parameter.</returns>
+             
+             <remarks><para>See <see cref="T:AForge.Video.Ximea.CameraParameter"/> class for the list of some possible configuration parameters. See
+             XIMEA documentation for the complete list of supported parameters.</para></remarks>
+             
+             <exception cref="T:AForge.Video.VideoException">An error occurred while communicating with a camera. See error
+             message for additional information.</exception>
+             <exception cref="T:AForge.NotConnectedException">No camera was opened, so can not access its methods.</exception>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaCamera.GetImage">
+             <summary>
+             Get image from the opened XIMEA camera.
+             </summary>
+             
+             <returns>Returns image retrieved from the camera.</returns>
+             
+             <remarks><para>The method calls <see cref="M:AForge.Video.Ximea.XimeaCamera.GetImage(System.Int32)"/> method specifying 5000 as the timeout
+             value.</para></remarks>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaCamera.GetImage(System.Int32)">
+             <summary>
+             Get image from the opened XIMEA camera.
+             </summary>
+             
+             <param name="timeout">Maximum time to wait in milliseconds till image becomes available.</param>
+             
+             <returns>Returns image retrieved from the camera.</returns>
+             
+             <remarks><para>The method calls <see cref="M:AForge.Video.Ximea.XimeaCamera.GetImage(System.Int32,System.Boolean)"/> method specifying <see langword="true"/>
+             the <b>makeCopy</b> parameter.</para></remarks>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaCamera.GetImage(System.Int32,System.Boolean)">
+             <summary>
+             Get image from the opened XIMEA camera.
+             </summary>
+             
+             <param name="timeout">Maximum time to wait in milliseconds till image becomes available.</param>
+             <param name="makeCopy">Make a copy of the camera's image or not.</param>
+             
+             <returns>Returns image retrieved from the camera.</returns>
+             
+             <remarks><para>If the <paramref name="makeCopy"/> is set to <see langword="true"/>, then the method
+             creates a managed copy of the camera's image, so the managed image stays valid even when the camera
+             is closed. However, setting this parameter to <see langword="false"/> creates a managed image which is
+             just a wrapper around camera's unmanaged image. So if camera is closed and its resources are freed, the
+             managed image becomes no longer valid and accessing it will generate an exception.</para></remarks>
+             
+             <exception cref="T:AForge.Video.VideoException">An error occurred while communicating with a camera. See error
+             message for additional information.</exception>
+             <exception cref="T:AForge.NotConnectedException">No camera was opened, so can not access its methods.</exception>
+             <exception cref="T:System.TimeoutException">Time out value reached - no image is available within specified time value.</exception>
+            
+        </member>
+        <member name="P:AForge.Video.Ximea.XimeaCamera.CamerasCount">
+            <summary>
+            Get number of XIMEA camera connected to the system.
+            </summary>
+        </member>
+        <member name="P:AForge.Video.Ximea.XimeaCamera.IsAcquisitionStarted">
+            <summary>
+            Specifies if camera's data acquisition is currently active for the opened camera (if any).
+            </summary>
+        </member>
+        <member name="P:AForge.Video.Ximea.XimeaCamera.IsDeviceOpen">
+            <summary>
+            Specifies if a camera is currently opened by the instance of the class.
+            </summary>
+        </member>
+        <member name="P:AForge.Video.Ximea.XimeaCamera.DeviceID">
+            <summary>
+            ID of the the recently opened XIMEA camera.
+            </summary>
+        </member>
+        <member name="T:AForge.Video.Ximea.XimeaVideoSource">
+            <summary>
+            The class provides continues access to XIMEA cameras.
+            </summary>
+            
+            <remarks><para>The video source class is aimed to provide continues access to XIMEA camera, when
+            images are continuosly acquired from camera and provided throw the <see cref="E:AForge.Video.Ximea.XimeaVideoSource.NewFrame"/> event.
+            It just creates a background thread and gets new images from <see cref="T:AForge.Video.Ximea.XimeaCamera">XIMEA camera</see>
+            keeping the <see cref="P:AForge.Video.Ximea.XimeaVideoSource.FrameInterval">specified time interval</see> between image acquisition.
+            Essentially it is a wrapper class around <see cref="T:AForge.Video.Ximea.XimeaCamera"/> providing <see cref="T:AForge.Video.IVideoSource"/> interface.</para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // create video source for the XIMEA camera with ID 0
+            XimeaVideoSource videoSource = new XimeaVideoSource( 0 );
+            // set event handlers
+            videoSource.NewFrame += new NewFrameEventHandler( video_NewFrame );
+            // start the video source
+            videoSource.Start( );
+            
+            // set exposure time to 10 milliseconds
+            videoSource.SetParam( CameraParameter.Exposure, 10 * 1000 );
+            
+            // ...
+            
+            // New frame event handler, which is invoked on each new available video frame
+            private void video_NewFrame( object sender, NewFrameEventArgs eventArgs )
+            {
+                // get new frame
+                Bitmap bitmap = eventArgs.Frame;
+                // process the frame
+            }
+            </code>
+            </remarks>
+            
+            <seealso cref="T:AForge.Video.Ximea.XimeaCamera"/>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaVideoSource.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Video.Ximea.XimeaVideoSource"/> class.
+            </summary>
+            
+            <param name="deviceID">XIMEA camera ID (index) to connect to.</param>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaVideoSource.Start">
+            <summary>
+            Start video source.
+            </summary>
+            
+            <remarks>Starts video source and returns execution to caller. Video camera will be started
+            and will provide new video frames through the <see cref="E:AForge.Video.Ximea.XimeaVideoSource.NewFrame"/> event.</remarks>
+            
+            <exception cref="T:System.ArgumentException">There is no XIMEA camera with specified ID connected to the system.</exception>
+            <exception cref="T:AForge.Video.VideoException">An error occurred while communicating with a camera. See error
+            message for additional information.</exception>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaVideoSource.SignalToStop">
+            <summary>
+            Signal video source to stop its work.
+            </summary>
+            
+            <remarks><para></para></remarks>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaVideoSource.WaitForStop">
+            <summary>
+            Wait for video source has stopped.
+            </summary>
+            
+            <remarks><para></para></remarks>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaVideoSource.Stop">
+            <summary>
+            Stop video source.
+            </summary>
+            
+            <remarks><para>The method stops the video source, so it no longer provides new video frames
+            and does not consume any resources.</para>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaVideoSource.SetParam(System.String,System.Int32)">
+             <summary>
+             Set camera's parameter.
+             </summary>
+             
+             <param name="parameterName">Parameter name.</param>
+             <param name="value">Integer parameter value.</param>
+             
+             <remarks><para><note>The call is redirected to <see cref="M:AForge.Video.Ximea.XimeaCamera.SetParam(System.String,System.Int32)"/>.</note></para></remarks>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaVideoSource.SetParam(System.String,System.Single)">
+             <summary>
+             Set camera's parameter.
+             </summary>
+             
+             <param name="parameterName">Parameter name.</param>
+             <param name="value">Float parameter value.</param>
+             
+             <remarks><para><note>The call is redirected to <see cref="M:AForge.Video.Ximea.XimeaCamera.GetParamFloat(System.String)"/>.</note></para></remarks>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaVideoSource.GetParamInt(System.String)">
+             <summary>
+             Get camera's parameter as integer value.
+             </summary>
+             
+             <param name="parameterName">Parameter name to get from camera.</param>
+             
+             <returns>Returns integer value of the requested parameter.</returns>
+             
+             <remarks><para><note>The call is redirected to <see cref="M:AForge.Video.Ximea.XimeaCamera.GetParamFloat(System.String)"/>.</note></para></remarks>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaVideoSource.GetParamFloat(System.String)">
+             <summary>
+             Get camera's parameter as float value.
+             </summary>
+             
+             <param name="parameterName">Parameter name to get from camera.</param>
+             
+             <returns>Returns float value of the requested parameter.</returns>
+             
+             <remarks><para><note>The call is redirected to <see cref="M:AForge.Video.Ximea.XimeaCamera.GetParamFloat(System.String)"/>.</note></para></remarks>
+            
+        </member>
+        <member name="M:AForge.Video.Ximea.XimeaVideoSource.GetParamString(System.String)">
+             <summary>
+             Get camera's parameter as string value.
+             </summary>
+             
+             <param name="parameterName">Parameter name to get from camera.</param>
+             
+             <returns>Returns string value of the requested parameter.</returns>
+             
+             <remarks><para><note>The call is redirected to <see cref="M:AForge.Video.Ximea.XimeaCamera.GetParamString(System.String)"/>.</note></para></remarks>
+            
+        </member>
+        <member name="E:AForge.Video.Ximea.XimeaVideoSource.NewFrame">
+            <summary>
+            New frame event.
+            </summary>
+            
+            <remarks><para>Notifies clients about new available frames from the video source.</para>
+            
+            <para><note>Since video source may have multiple clients, each client is responsible for
+            making a copy (cloning) of the passed video frame, because the video source disposes its
+            own original copy after notifying of clients.</note></para>
+            </remarks>
+            
+        </member>
+        <member name="E:AForge.Video.Ximea.XimeaVideoSource.VideoSourceError">
+             <summary>
+             Video source error event.
+             </summary>
+             
+             <remarks>This event is used to notify clients about any type of errors occurred in
+             video source object, for example internal exceptions.</remarks>
+            
+        </member>
+        <member name="E:AForge.Video.Ximea.XimeaVideoSource.PlayingFinished">
+            <summary>
+            Video playing finished event.
+            </summary>
+            
+            <remarks><para>This event is used to notify clients that the video playing has finished.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Video.Ximea.XimeaVideoSource.Source">
+            <summary>
+            A string identifying the video source.
+            </summary>
+            
+        </member>
+        <member name="P:AForge.Video.Ximea.XimeaVideoSource.IsRunning">
+            <summary>
+            State of the video source.
+            </summary>
+            
+            <remarks>Current state of video source object - running or not.</remarks>
+            
+        </member>
+        <member name="P:AForge.Video.Ximea.XimeaVideoSource.BytesReceived">
+            <summary>
+            Received bytes count.
+            </summary>
+            
+            <remarks>Number of bytes the video source provided from the moment of the last
+            access to the property.
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Video.Ximea.XimeaVideoSource.FramesReceived">
+            <summary>
+            Received frames count.
+            </summary>
+            
+            <remarks>Number of frames the video source provided from the moment of the last
+            access to the property.
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Video.Ximea.XimeaVideoSource.FrameInterval">
+            <summary>
+            Time interval between frames.
+            </summary>
+            
+            <remarks><para>The property sets the interval in milliseconds between getting new frames from the camera.
+            If the property is set to 100, then the desired frame rate should be about 10 frames per second.</para>
+            
+            <para><note>Setting this property to 0 leads to no delay between video frames - frames
+            are read as fast as possible.</note></para>
+            
+            <para>Default value is set to <b>200</b>.</para>
+            </remarks>
+            
+        </member>
+    </members>
+</doc>

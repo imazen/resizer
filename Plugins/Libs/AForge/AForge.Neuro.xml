@@ -402,7 +402,7 @@
             <para>Sample usage (clustering RGB colors):</para>
             <code>
             // set range for randomization neurons' weights
-            Neuron.RandRange = new DoubleRange( 0, 255 );
+            Neuron.RandRange = new Range( 0, 255 );
             // create network
             DistanceNetwork	network = new DistanceNetwork(
                     3, // thress inputs in the network
@@ -1572,11 +1572,11 @@
              <item>Mutation rate - 0.25;</item>
              <item>Rate of injection of random chromosomes during selection - 0.20;</item>
              <item>Random numbers generator for initializing new chromosome -
-             <c>UniformGenerator( new DoubleRange( -1, 1 ) )</c>;</item>
+             <c>UniformGenerator( new Range( -1, 1 ) )</c>;</item>
              <item>Random numbers generator used during mutation for genes' multiplication -
              <c>ExponentialGenerator( 1 )</c>;</item>
              <item>Random numbers generator used during mutation for adding random value to genes -
-             <c>UniformGenerator( new DoubleRange( -0.5, 0.5 ) )</c>.</item>
+             <c>UniformGenerator( new Range( -0.5f, 0.5f ) )</c>.</item>
              </list></para>
              
              <para>In order to have full control over the above default parameters, it is possible to

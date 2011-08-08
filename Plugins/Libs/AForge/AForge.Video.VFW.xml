@@ -85,8 +85,10 @@
             <remarks><para>The method opens (creates) a video files, configure video codec and prepares
             the stream for saving video frames with a help of <see cref="M:AForge.Video.VFW.AVIWriter.AddFrame(System.Drawing.Bitmap)"/> method.</para></remarks>
             
-            <exception cref="T:System.ApplicationException">Failure of opening video files (the exception message
-            specifies the issues).</exception>
+            <exception cref="T:System.IO.IOException">Failed opening the specified file.</exception>
+            <exception cref="T:AForge.Video.VideoException">A error occurred while creating new video file. See exception message.</exception>
+            <exception cref="T:System.OutOfMemoryException">Insufficient memory for internal buffer.</exception>
+            <exception cref="T:System.ArgumentException">Video file resolution must be a multiple of two.</exception>
             
         </member>
         <member name="M:AForge.Video.VFW.AVIWriter.Close">
@@ -106,8 +108,9 @@
             of the frame should be the same as it was specified in <see cref="M:AForge.Video.VFW.AVIWriter.Open(System.String,System.Int32,System.Int32)"/> method
             (see <see cref="P:AForge.Video.VFW.AVIWriter.Width"/> and <see cref="P:AForge.Video.VFW.AVIWriter.Height"/> properties).</para></remarks>
             
-            <exception cref="T:System.ApplicationException">Failure of opening video files (the exception message
-            specifies the issues).</exception>
+            <exception cref="T:System.IO.IOException">Thrown if no video file was open.</exception>
+            <exception cref="T:System.ArgumentException">Bitmap size must be of the same as video size, which was specified on opening video file.</exception>
+            <exception cref="T:AForge.Video.VideoException">A error occurred while writing new video frame. See exception message.</exception>
             
         </member>
         <member name="P:AForge.Video.VFW.AVIWriter.Width">
@@ -235,19 +238,20 @@
             
         </member>
         <member name="M:AForge.Video.VFW.AVIReader.Open(System.String)">
-            <summary>
-            Open AVI file.
-            </summary>
+             <summary>
+             Open AVI file.
+             </summary>
+             
+             <param name="fileName">AVI file name to open.</param>
+             
+             <remarks><para>The method opens a video file and prepares the stream and decoder for
+             reading video frames with the help of <see cref="M:AForge.Video.VFW.AVIReader.GetNextFrame"/> method.</para>
+             </remarks>
+             
+             <exception cref="T:System.IO.IOException">Failed opening the specified file.</exception>
+             <exception cref="T:AForge.Video.VideoException">A error occurred while opening the video file. See exception message.</exception>
             
-            <param name="fileName">AVI file name to open.</param>
-            
-            <remarks><para>The method opens a video file and prepares the stream and decoder for
-            reading video frames with the help of <see cref="M:AForge.Video.VFW.AVIReader.GetNextFrame"/> method.</para>
-            </remarks>
-            
-            <exception cref="T:System.ApplicationException">Failure of opening video files (the exception message
-            specifies the issues).</exception>
-            
+             
         </member>
         <member name="M:AForge.Video.VFW.AVIReader.Close">
             <summary>
@@ -265,8 +269,8 @@
             <remarks><para>The method reads and returns the next video frame in the opened video stream
             at the position, which is set in <see cref="P:AForge.Video.VFW.AVIReader.Position"/> property.</para></remarks>
             
-            <exception cref="T:System.ApplicationException">Failure of opening video files (the exception message
-            specifies the issues).</exception>
+            <exception cref="T:System.IO.IOException">Thrown if no video file was open.</exception>
+            <exception cref="T:AForge.Video.VideoException">A error occurred while reading next video frame. See exception message.</exception>
             
         </member>
         <member name="P:AForge.Video.VFW.AVIReader.Width">
@@ -377,6 +381,8 @@
             object creates background thread and notifies about new frames with the
             help of <see cref="E:AForge.Video.VFW.AVIFileVideoSource.NewFrame"/> event.</remarks>
             
+            <exception cref="T:System.ArgumentException">Video source is not specified.</exception>
+            
         </member>
         <member name="M:AForge.Video.VFW.AVIFileVideoSource.SignalToStop">
             <summary>
@@ -464,7 +470,7 @@
             <para><note>Setting this property to 0 leads to no delay between video frames - frames
             are read as fast as possible.</note></para>
             
-            <para>Default value is set to <b>0</b>0.</para>
+            <para>Default value is set to <b>0</b>.</para>
             </remarks>
             
         </member>
@@ -506,7 +512,7 @@
             Received bytes count.
             </summary>
             
-            <remarks>The property is not supported by the class. It always equals to 0.</remarks>
+            <remarks>The property is not supported by this class. It always equals to 0.</remarks>
             
         </member>
         <member name="P:AForge.Video.VFW.AVIFileVideoSource.IsRunning">
