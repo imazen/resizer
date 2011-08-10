@@ -35,14 +35,15 @@ namespace ImageResizer.Configuration.Issues {
             Assembly[] asms = AppDomain.CurrentDomain.GetAssemblies();
             foreach (Assembly a in asms) {
                 //Only check DLLs with ImageResizer in their name
-                if (a.GetName().Name.IndexOf("ImageResizer",  StringComparison.OrdinalIgnoreCase) < 0) continue;
+				AssemblyName assemblyName = new AssemblyName(a.FullName);
+                if (assemblyName.Name.IndexOf("ImageResizer",  StringComparison.OrdinalIgnoreCase) < 0) continue;
                 
                 object[] attrs;
                 
                 attrs = a.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
                 if (attrs != null && attrs.Length > 0) 
                     if (((AssemblyInformationalVersionAttribute)attrs[0]).InformationalVersion.IndexOf("hotfix",StringComparison.OrdinalIgnoreCase) > -1)
-                        assembliesRunningHotfix += a.GetName().Name + ", ";
+                        assembliesRunningHotfix += assemblyName.Name + ", ";
             }
             assembliesRunningHotfix = assembliesRunningHotfix.TrimEnd(',',' ');
 
