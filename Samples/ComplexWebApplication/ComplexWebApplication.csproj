@@ -68,6 +68,7 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="WhitespaceTrimmerTest.aspx" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="404Test.aspx.cs">
@@ -186,6 +187,13 @@
     <Compile Include="Watermarks.aspx.designer.cs">
       <DependentUpon>Watermarks.aspx</DependentUpon>
     </Compile>
+    <Compile Include="WhitespaceTrimmerTest.aspx.cs">
+      <DependentUpon>WhitespaceTrimmerTest.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="WhitespaceTrimmerTest.aspx.designer.cs">
+      <DependentUpon>WhitespaceTrimmerTest.aspx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="HandlerTest.ashx" />
@@ -242,6 +250,14 @@
     <ProjectReference Include="..\..\Plugins\Watermark\ImageResizer.Plugins.Watermark.csproj">
       <Project>{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}</Project>
       <Name>ImageResizer.Plugins.Watermark</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\WhitespaceTrimmer\ImageResizer.Plugins.WhitespaceTrimmer.csproj">
+      <Project>{167B88AF-E3EE-4005-A266-F4D712B3BC62}</Project>
+      <Name>ImageResizer.Plugins.WhitespaceTrimmer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BasicWebApplication\BasicWebApplication.csproj">
+      <Project>{7FA1116A-0D5C-4A48-93A8-56C091EA202F}</Project>
+      <Name>BasicWebApplication</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
