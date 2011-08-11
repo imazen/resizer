@@ -1,3 +1,5 @@
 ﻿Known bugs:
 
 None. Yay! I'm keeping them all fixed!
+
+SimpleFilters Brightness - buggy on overexposure

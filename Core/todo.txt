@@ -1,4 +1,26 @@
-﻿Refactor Watermark plugin to use named configurations.
+﻿In V3.1:
+
+
+* Add support for autocropping and cropping separately
+* Simplify URL sytax with a 'resizing mode' instead of disparate features
+mode=default
+mode=crop
+mode=pad 
+mode=carve
+mode=stretch
+* Add support for an anchor point when autocropping and autopadding
+anchor=center, topleft, energyaverage (for padding and cropping)
+* Add support for resizing entire image (including effects) within the coordinates instead of just the image. Standard rotation will cause extra padding here..
+* bounds=all|image
+
+
+scale=upscaleonly|downscaleonly|both|upscalecanvas
+
+
+
+
+
+Refactor Watermark plugin to use named configurations.
 Add debug=true querystring command to Diagnostics plugin.
 Add better usage examples.
 Diagnostics page should list trial versions of files
