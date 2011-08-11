@@ -7,6 +7,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.IO;
 using System.Reflection;
+using ImageResizer;
 
 
 namespace ImageStudio
@@ -39,144 +40,109 @@ namespace ImageStudio
         #endregion
 
         #region - Public Properties -
-        public int croppingWidthMax
-        {
-            get
-            {
+        public int croppingWidthMax {
+            get {
                 return _croppingWidthMax;
             }
-            set
-            {
+            set {
                 _croppingWidthMax = value;
             }
         }
 
-        public int croppingHeightMax
-        {
-            get
-            {
+        public int croppingHeightMax {
+            get {
                 return _croppingHeightMax;
             }
-            set
-            {
+            set {
                 _croppingHeightMax = value;
             }
         }
 
-        public int croppingWidthMin
-        {
-            get
-            {
+        public int croppingWidthMin {
+            get {
                 return _croppingWidthMin;
             }
-            set
-            {
+            set {
                 _croppingWidthMin = value;
             }
         }
 
-        public int croppingHeightMin
-        {
-            get
-            {
+        public int croppingHeightMin {
+            get {
                 return _croppingHeightMin;
             }
-            set
-            {
+            set {
                 _croppingHeightMin = value;
             }
         }
 
-        public string croppingAspectRatio
-        {
-            get
-            {
+        public string croppingAspectRatio {
+            get {
                 return _croppingAspectRatio;
             }
-            set
-            {
+            set {
                 _croppingAspectRatio = value;
             }
         }
 
-        public FileUpload fileUpload
-        {
-            get
-            {
+        public FileUpload fileUpload {
+            get {
                 return _fileUpload;
             }
-            set
-            {
+            set {
                 _fileUpload = value;
             }
         }
 
-        public string imageUrlPath
-        {
-            get
-            {
+        public string imageUrlPath {
+            get {
                 return _imageUrlPath;
             }
-            set
-            {
+            set {
                 _imageUrlPath = value;
             }
         }
 
-        public string filePath
-        {
-            get
-            {
+        public string filePath {
+            get {
                 return (string)ViewState[KEY_FILENAME];
             }
 
-            set
-            {
+            set {
                 ViewState[KEY_FILENAME] = value;
             }
         }
 
-        public string fileExtension
-        {
-            get
-            {
+        public string fileExtension {
+            get {
                 FileInfo fileInfo = new FileInfo(filePath);
                 return fileInfo.Extension;
             }
         }
 
-        public string fileContentType
-        {
-            get
-            {
+        public string fileContentType {
+            get {
                 return (string)ViewState[KEY_CONTENTTYPE];
             }
-            set
-            {
+            set {
                 ViewState[KEY_CONTENTTYPE] = value;
             }
         }
 
-        public string JqueryExtension
-        {
-            get
-            {
+        public string JqueryExtension {
+            get {
                 return _jqueryExtension;
             }
-            set
-            {
+            set {
                 _jqueryExtension = value;
             }
         }
 
-        public string OnClientCropperImageLoad
-        {
-            get
-            {
+        public string OnClientCropperImageLoad {
+            get {
                 return _onClientCropperImageLoad;
             }
-            set
-            {
+            set {
                 _onClientCropperImageLoad = value;
             }
         }
@@ -198,48 +164,29 @@ namespace ImageStudio
         /// </summary>
         public void StartCropping()
         {
-            if (fileUpload != null)
+            if (fileUpload != null && fileUpload.PostedFile != null)
             {
-                fileUpload.SaveAs(filePath);
 
-                fileContentType = fileUpload.PostedFile.ContentType;
 
-                //get file resolution
-                int widthRaw, heightRaw;
-                ImageManipulation.GetResolution(filePath, out widthRaw, out heightRaw);
+                using (System.Drawing.Bitmap image = ImageBuilder.Current.LoadImage(fileUpload.PostedFile, new ResizeSettings())) {
 
-                if (!(heightRaw < _croppingHeightMin || widthRaw < _croppingWidthMin))
-                {
+                    fileContentType = fileUpload.PostedFile.ContentType;
 
-                    if (heightRaw > croppingHeightMax || widthRaw > croppingWidthMax)
-                    {
-                        if (heightRaw > croppingHeightMax)
-                        {
-                            ImageManipulation.ResizeWithRatio(filePath, croppingHeightMax, 0);
+                    //get file resolution
+                    
+                    if (!(image.Height < _croppingHeightMin || image.Width < _croppingWidthMin)) {
 
-                            //if just resized, get new dimension and see if we need to resize further.
-                            ImageManipulation.GetResolution(filePath, out widthRaw, out heightRaw);
+                        ResizeSettings settings = new ResizeSettings();
+                        settings.MaxWidth = croppingWidthMax;
+                        settings.MaxHeight = croppingHeightMax;
+                        ImageBuilder.Current.Build(image, filePath, settings);
+                        imgEditor.ImageUrl = imageUrlPath;
+                        ControlShow();
+                    } else {
+                        ControlHide();
+                        if (ErrorProcessingImage != null) {
+                            ErrorProcessingImage(new Exception(String.Format("Image size should be at least {0}x{1}", _croppingWidthMin, _croppingHeightMin)), null);
                         }
-
-                        if (widthRaw > croppingWidthMax)
-                        {
-                            ImageManipulation.ResizeWithRatio(filePath, 0, croppingWidthMax);
-                        }
-                    }
-                    else
-                    {
-                        //resize file even if it is fine, to avoid corrypted files
-                        ImageManipulation.Resize(filePath, heightRaw, widthRaw);
-                    }
-                    imgEditor.ImageUrl = imageUrlPath;
-                    ControlShow();
-                }
-                else
-                {
-                    ControlHide();
-                    if (ErrorProcessingImage != null)
-                    {
-                        ErrorProcessingImage(new Exception(String.Format("Image size should be at least {0}x{1}", _croppingWidthMin, _croppingHeightMin)), null);
                     }
                 }
             }
@@ -334,13 +281,14 @@ namespace ImageStudio
                 int width = int.Parse(hdnFieldWidth.Value);
                 int height = int.Parse(hdnFieldHeight.Value);
 
-                if (ImageManipulation.Crop(filePath, x, y, width, height))
-                {
-                    if (SuccesfullyProcessedImage != null)
-                    {
-                        SuccesfullyProcessedImage(sender, e);
-                    }
-                }
+                ResizeSettings settings = new ResizeSettings();
+                settings.CropTopLeft = new System.Drawing.PointF(x, y);
+                settings.CropBottomRight = new System.Drawing.PointF(width, height);
+
+                ImageBuilder.Current.Build(filePath, filePath, settings);
+                
+                if (SuccesfullyProcessedImage != null) SuccesfullyProcessedImage(sender, e);
+
             }
             catch (Exception ex)
             {
