@@ -9,7 +9,7 @@ using ImageResizer.Util;
 using AForge.Imaging;
 
 namespace ImageResizer.Plugins.WhitespaceTrimmer {
-    public class WhitespaceTrimmerPlugin:BuilderExtension, IPlugin {
+    public class WhitespaceTrimmerPlugin:BuilderExtension, IPlugin, IQuerystringPlugin {
 
         public WhitespaceTrimmerPlugin() {
         }
@@ -68,6 +68,10 @@ namespace ImageResizer.Plugins.WhitespaceTrimmer {
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
+        }
+
+        public IEnumerable<string> GetSupportedQuerystringKeys() {
+            return new string[] { "trim.percentpadding", "trim.threshold" };
         }
     }
 }
