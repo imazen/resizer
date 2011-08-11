@@ -307,7 +307,7 @@ namespace ImageResizer.ReleaseBuilder {
 
 
         public string[] standardExclusions = new string[]{
-                "/.git","^/Releases","^/Legacy","^/Tools/Builder","^/Tests/Hidden","/thumbs.db$","/.DS_Store$",".suo$",".user$"
+                "/.git","^/Releases","^/Legacy","^/Tools/Builder","^/Samples/Images/*/*","^/Tests/Hidden","/thumbs.db$","/.DS_Store$",".suo$",".user$"
             };
 
         public void PrepareForPackaging() {
