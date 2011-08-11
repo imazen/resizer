@@ -24,6 +24,11 @@ namespace ImageResizer.Plugins.SeamCarving {
             Laplacian = 4
         }
 
+        protected override RequestedAction OnProcess(ImageState s) {
+            if ("true".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(s.settings["stretch"])) s.settings["stretch"] = "fill";
+            return RequestedAction.None;
+        }
+
         protected override RequestedAction RenderImage(ImageState s) {
             //Skip this when we are doing simulations
             if (s.destGraphics == null) return RequestedAction.None;
@@ -102,19 +107,13 @@ namespace ImageResizer.Plugins.SeamCarving {
         }
 
         public IPlugin Install(Configuration.Config c) {
-            c.Pipeline.RewriteDefaults -= Pipeline_RewriteDefaults;
-            c.Pipeline.RewriteDefaults += Pipeline_RewriteDefaults;
             c.Plugins.add_plugin(this);
             return this;
         }
 
-        void Pipeline_RewriteDefaults(System.Web.IHttpModule sender, System.Web.HttpContext context, Configuration.IUrlEventArgs e) {
-            if (!string.IsNullOrEmpty(e.QueryString["carve"])) e.QueryString["stretch"] = "fill";
-        }
+
 
         public bool Uninstall(Configuration.Config c) {
-            c.Pipeline.RewriteDefaults -= Pipeline_RewriteDefaults;
-    
             c.Plugins.remove_plugin(this);
             return true;
         }
