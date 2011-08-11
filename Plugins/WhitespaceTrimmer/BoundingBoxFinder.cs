@@ -19,39 +19,53 @@ namespace ImageResizer.Plugins.WhitespaceTrimmer {
         /// <returns></returns>
         public Rectangle FindBoxSobel(Bitmap image, Rectangle lookInside, byte threshold) {
 
-            //We do this mess of try/finally so we never have more than 1 copy in memory at a time.
-            UnmanagedImage croppedCopy = null; 
-            UnmanagedImage grayscaleCopy = null; 
 
-            Rectangle imageSize = new Rectangle(0, 0, image.Width, image.Height);
+            bool disposeImage = false;
             try {
-                try {
-                    // lock source bitmap data
-                    BitmapData data = image.LockBits(imageSize, ImageLockMode.ReadWrite, image.PixelFormat);
-                    try {
-
-                        //Crop original image if needed.
-                        if (lookInside.Equals(imageSize))
-                            grayscaleCopy = Grayscale.CommonAlgorithms.Y.Apply(new UnmanagedImage(data));
-                        else
-                            croppedCopy = new Crop(PolygonMath.ToRectangle(lookInside)).Apply(new UnmanagedImage(data));
-                    } finally {
-                        image.UnlockBits(data);
-                    }
-                    //Convert to 8bpp grayscale
-                    if (grayscaleCopy == null) grayscaleCopy = Grayscale.CommonAlgorithms.Y.Apply(croppedCopy);
-                } finally {
-                    if (croppedCopy != null) croppedCopy.Dispose(); ;
+                if (image.PixelFormat == PixelFormat.Format1bppIndexed ||
+                    image.PixelFormat == PixelFormat.Format4bppIndexed ||
+                    image.PixelFormat == PixelFormat.Format8bppIndexed ||
+                    image.PixelFormat == PixelFormat.Indexed) {
+                        image = AForge.Imaging.Image.Clone(image, PixelFormat.Format24bppRgb);
+                        disposeImage = true;
                 }
-                //Apply sobel operator to grayscale image
-                new SobelEdgeDetector().ApplyInPlace(grayscaleCopy);
-                //Threshold into black and white.
-                new Threshold(threshold).ApplyInPlace(grayscaleCopy);
-                //Trim only exact black pixels
-                Rectangle result = FindBoxExact(grayscaleCopy, Color.Black);
-                return new Rectangle(lookInside.X + result.X, lookInside.Y + result.Y, result.Width, result.Height);
+                
+                //We do this mess of try/finally so we never have more than 1 copy in memory at a time.
+                UnmanagedImage croppedCopy = null;
+                UnmanagedImage grayscaleCopy = null;
+                
+                Rectangle imageSize = new Rectangle(0, 0, image.Width, image.Height);
+                try {
+                    try {
+                        // lock source bitmap data
+                        BitmapData data = image.LockBits(imageSize, ImageLockMode.ReadWrite, image.PixelFormat);
+                        try {
+
+                            //Crop original image if needed.
+                            if (lookInside.Equals(imageSize))
+                                grayscaleCopy = Grayscale.CommonAlgorithms.Y.Apply(new UnmanagedImage(data));
+                            else
+                                croppedCopy = new Crop(PolygonMath.ToRectangle(lookInside)).Apply(new UnmanagedImage(data));
+                        } finally {
+                            image.UnlockBits(data);
+                        }
+                        //Convert to 8bpp grayscale
+                        if (grayscaleCopy == null) grayscaleCopy = Grayscale.CommonAlgorithms.Y.Apply(croppedCopy);
+                    } finally {
+                        if (croppedCopy != null) croppedCopy.Dispose(); ;
+                    }
+                    //Apply sobel operator to grayscale image
+                    new SobelEdgeDetector().ApplyInPlace(grayscaleCopy);
+                    //Threshold into black and white.
+                    new Threshold(threshold).ApplyInPlace(grayscaleCopy);
+                    //Trim only exact black pixels
+                    Rectangle result = FindBoxExact(grayscaleCopy, Color.Black);
+                    return new Rectangle(lookInside.X + result.X, lookInside.Y + result.Y, result.Width, result.Height);
+                } finally {
+                    if (grayscaleCopy != null) grayscaleCopy.Dispose();
+                }
             } finally {
-                if (grayscaleCopy != null) grayscaleCopy.Dispose();
+                if (disposeImage) image.Dispose();
             }
 
         }
