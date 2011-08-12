@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace ImageResizer.ReleaseBuilder {
+namespace BuildTools {
     public class VersionEditor {
         string filename;
         string contents = null;

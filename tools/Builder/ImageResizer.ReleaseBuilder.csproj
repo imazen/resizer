@@ -52,8 +52,8 @@
     <Reference Include="Ionic.Zip">
       <HintPath>..\..\Plugins\Libs\DotNetZipLib-v1.9\Ionic.Zip.dll</HintPath>
     </Reference>
-    <Reference Include="LitS3">
-      <HintPath>..\..\dlls\debug\LitS3.dll</HintPath>
+    <Reference Include="LitS3, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\LitS3.1.0.1\lib\LitS3.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
@@ -65,20 +65,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Build.cs" />
-    <Compile Include="Classes\Devenv.cs" />
-    <Compile Include="Classes\FsQuery.cs" />
-    <Compile Include="Classes\Futile.cs" />
-    <Compile Include="Classes\GitManager.cs" />
-    <Compile Include="Classes\Interaction.cs" />
-    <Compile Include="Classes\NPackageDescriptor.cs" />
-    <Compile Include="Classes\NugetManager.cs" />
-    <Compile Include="Classes\Package.cs" />
-    <Compile Include="Classes\PackageDescriptor.cs" />
-    <Compile Include="Classes\Pattern.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Classes\FolderFinder.cs" />
-    <Compile Include="Classes\VersionEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="steps.txt" />
@@ -102,6 +90,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BuildTools\BuildTools.csproj">
+      <Project>{F32CED6D-C516-46A6-BC00-369842F98B5A}</Project>
+      <Name>BuildTools</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

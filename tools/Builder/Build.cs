@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using ImageResizer.ReleaseBuilder.Classes;
+using BuildTools;
 using LitS3;
 using System.Net;
 
@@ -44,6 +44,8 @@ namespace ImageResizer.ReleaseBuilder {
 
         [STAThread]
         public void Run() {
+            MakeConsoleNicer();
+
             say("Project root: " + f.ParentPath);
             nl();
             //The base name for creating zip packags.

@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 
-namespace ImageResizer.ReleaseBuilder.Classes {
+namespace BuildTools {
     public class NugetManager {
 
         public NugetManager(string nugetFolder) {
