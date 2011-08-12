@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 
-namespace ImageResizer.ReleaseBuilder {
+namespace BuildTools {
     /// <summary>
     /// a wrapper class for executing commands against a visual studio solution
     /// </summary>

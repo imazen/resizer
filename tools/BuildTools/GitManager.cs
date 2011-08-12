@@ -5,7 +5,7 @@ using System.Text;
 using System.Diagnostics;
 using System.IO;
 
-namespace ImageResizer.ReleaseBuilder.Classes {
+namespace BuildTools {
     public class GitManager {
 
         string gitExe = null;

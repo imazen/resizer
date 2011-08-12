@@ -5,7 +5,7 @@ using System.Text;
 using Ionic.Zip;
 using System.IO;
 
-namespace ImageResizer.ReleaseBuilder {
+namespace BuildTools {
     public class Package:IDisposable {
 
         ZipFile z = null;

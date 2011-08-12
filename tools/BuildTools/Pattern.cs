@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace ImageResizer.ReleaseBuilder {
+namespace BuildTools {
     /// <summary>
     /// Simplified regex creation. Escapes dots, expands "*", and conversts forward slashes to escaped backslashes. Compiled, case-insensitive, culture-invariant.
     /// </summary>

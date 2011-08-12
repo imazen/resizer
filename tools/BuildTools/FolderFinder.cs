@@ -5,7 +5,7 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 
-namespace ImageResizer.ReleaseBuilder {
+namespace BuildTools {
     public class FolderFinder {
         /// <summary>
         /// Attempts to locate the specified folder by traversing up (Towards C:\) the directory tree from two locations (the original Builder exe location, and the current working directory).

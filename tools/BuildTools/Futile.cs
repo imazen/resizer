@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace ImageResizer.ReleaseBuilder {
+namespace BuildTools {
     /// <summary>
     /// File deletion utilities
     /// </summary>
