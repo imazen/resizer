@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>936da99f-1f68-4c8c-8754-5698ff1597a2</ProjectGuid>
+    <ProjectGuid>{F32CED6D-C516-46A6-BC00-369842F98B5A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BuildTools</RootNamespace>
@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\Builder\packages\DotNetZip.1.9\lib\Ionic.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,8 +43,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Devenv.cs" />
+    <Compile Include="FolderFinder.cs" />
+    <Compile Include="FsQuery.cs" />
+    <Compile Include="Futile.cs" />
+    <Compile Include="GitManager.cs" />
+    <Compile Include="Interaction.cs" />
+    <Compile Include="NPackageDescriptor.cs" />
+    <Compile Include="NugetManager.cs" />
+    <Compile Include="Package.cs" />
+    <Compile Include="PackageDescriptor.cs" />
+    <Compile Include="Pattern.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VersionEditor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
