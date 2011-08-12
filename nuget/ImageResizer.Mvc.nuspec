@@ -1,0 +1,25 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Mvc</id>
+		<title>ImageResizer.Mvc - MVC-friendly utilities</title>
+		<version>$version$</version>
+		<authors>Nathanael Jones</authors>
+		<owners>Nathanael Jones</owners>
+		<licenseUrl>http://imageresizing.net/licenses/freedom</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<summary>Provides MVC-friendly helper methods and the MvcRoutingShim plugin for the ImageResizer Core library.</summary>
+
+		<description>Provides MVC-friendly helper methods and the MvcRoutingShim plugin for the ImageResizer Core library. |||| Go to http://imageresizing.net for details, documenation, and support.</description>
+		<tags>Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing </tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="..\dlls\release\ImageResizer.Mvc.dll" target="lib" />
+		<file src="..\dlls\release\ImageResizer.Mvc.xml" target="lib" />
+	</files>
+</package>

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Mvc</id>
+		<version>$version$</version>
+		<authors>Nathanael Jones</authors>
+		<description>Description</description>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="..\dlls\debug\ImageResizer.Mvc.dll" target="lib" />
+		<file src="..\dlls\debug\ImageResizer.Mvc.pdb" target="lib" />
+		<file src="..\dlls\debug\ImageResizer.Mvc.xml" target="lib" />
+		<file src="..\Core.Mvc\**\*.cs" target="src" />
+	</files>
+</package>
