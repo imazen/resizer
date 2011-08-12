@@ -73,6 +73,7 @@
     <Compile Include="Configuration\Issues\ConfigChecker.cs" />
     <Compile Include="Configuration\IUrlAuthorizationEventArgs.cs" />
     <Compile Include="Configuration\UrlAuthorizationEventArgs.cs" />
+    <Compile Include="Plugins\Basic\FolderResizeSyntaxPlugin.cs" />
     <Compile Include="Plugins\Basic\ImageHandlerSyntaxPlugin.cs">
       <SubType>Code</SubType>
     </Compile>
