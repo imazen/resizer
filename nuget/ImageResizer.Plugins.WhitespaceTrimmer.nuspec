@@ -1,0 +1,30 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.WhitespaceTrimmer</id>
+		<title>ImageResizer.Plugins.WhitespaceTrimmer - Automatically crop whitespace off your images</title>
+		<version>$version$</version>
+		<authors>Nathanael Jones</authors>
+		<owners>Nathanael Jones</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>Automatically trims off whitespace from product images, leaving only a specified margin around the object. Uses sobel energy analysis and adjustable thresholding for great accuracy. 
+URL commands: &trim.threshold=80, &trim.percentpadding=1
+
+Visit http://imageresizing.net for details, documenation, and free support. 
+E-mail support@imageresizing.net if you encounter any problems with the software. 
+The documentation for this plugin resides at http://imageresizing.net/plugins/advancedfilters</description>
+		<tags>Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing disk caching gif png octree quanitization animated gifs dithering psd photoshop psdreader</tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		  <dependency id="AForge.Imaging"/>
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="..\dlls\trial\ImageResizer.Plugins.WhitespaceTrimmer.dll" target="lib" />
+		<file src="..\dlls\trial\ImageResizer.Plugins.WhitespaceTrimmer.xml" target="lib" />
+		<file src="..\Plugins\WhitespaceTrimmer\Web.config.transform" target="content" />
+	</files>
+</package>
