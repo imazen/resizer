@@ -20,10 +20,10 @@ namespace ImageResizer.ReleaseBuilder {
         string bucketName = "resizer-downloads";
         string linkBase = "http://downloads.imageresizing.net/";
         public Build() {
-            d = new Devenv(Path.Combine(f.folderPath,"ImageResizer.sln"));
-            v = new VersionEditor(Path.Combine(f.folderPath, "SharedAssemblyInfo.cs"));
-            g = new GitManager(f.parentPath);
-            nuget = new NugetManager(Path.Combine(f.parentPath, "nuget"));
+            d = new Devenv(Path.Combine(f.FolderPath,"ImageResizer.sln"));
+            v = new VersionEditor(Path.Combine(f.FolderPath, "SharedAssemblyInfo.cs"));
+            g = new GitManager(f.ParentPath);
+            nuget = new NugetManager(Path.Combine(f.ParentPath, "nuget"));
             s3.AccessKeyID = "***REMOVED***";
             s3.SecretAccessKey = "***REMOVED***";
             
@@ -37,14 +37,14 @@ namespace ImageResizer.ReleaseBuilder {
         }
 
         public string getReleasePath(string packageBase, string ver,  string kind) {
-            return Path.Combine(Path.Combine(f.parentPath, "Releases"), packageBase + ver.Trim('-') + '-' + kind + "-" + DateTime.UtcNow.ToString("MMM-d-yyyy") + ".zip");
+            return Path.Combine(Path.Combine(f.ParentPath, "Releases"), packageBase + ver.Trim('-') + '-' + kind + "-" + DateTime.UtcNow.ToString("MMM-d-yyyy") + ".zip");
         }
 
         List<PackageDescriptor> packages = new List<PackageDescriptor>();
 
         [STAThread]
         public void Run() {
-            say("Project root: " + f.parentPath);
+            say("Project root: " + f.ParentPath);
             nl();
             //The base name for creating zip packags.
             string packageBase = v.get("PackageName"); //    // [assembly: PackageName("Resizer")]
@@ -97,7 +97,7 @@ namespace ImageResizer.ReleaseBuilder {
             }
 
             //Get all the .nuspec packages on in the /nuget directory.
-            IList<NPackageDescriptor> npackages =NPackageDescriptor.GetPackagesIn(Path.Combine(f.parentPath,"nuget"));
+            IList<NPackageDescriptor> npackages =NPackageDescriptor.GetPackagesIn(Path.Combine(f.ParentPath,"nuget"));
 
             bool isMakingNugetPackage = false;
 
@@ -106,8 +106,9 @@ namespace ImageResizer.ReleaseBuilder {
                 say("For each nuget package, specify all operations to perform, then press enter. ");
                 say("(c (create and overwrite), u (upload to nuget.org)");
                 foreach (NPackageDescriptor desc in npackages) {
+
                     desc.Version = nugetVer;
-                    desc.OutputDirectory = Path.Combine(Path.Combine(f.parentPath, "Releases", "nuget-packages"));
+                    desc.OutputDirectory = Path.Combine(Path.Combine(f.ParentPath, "Releases", "nuget-packages"));
                     string opts = "";
 
                     ConsoleColor original = Console.ForegroundColor;
@@ -263,9 +264,9 @@ namespace ImageResizer.ReleaseBuilder {
         }
 
         public void CleanAll(){
-            try { System.IO.Directory.Delete(Path.Combine(f.parentPath, "dlls\\trial"), true); } catch { }
-            try { System.IO.Directory.Delete(Path.Combine(f.parentPath, "dlls\\release"), true); } catch { }
-            try { System.IO.Directory.Delete(Path.Combine(f.parentPath, "dlls\\debug"), true); } catch { }
+            try { System.IO.Directory.Delete(Path.Combine(f.ParentPath, "dlls\\trial"), true); } catch { }
+            try { System.IO.Directory.Delete(Path.Combine(f.ParentPath, "dlls\\release"), true); } catch { }
+            try { System.IO.Directory.Delete(Path.Combine(f.ParentPath, "dlls\\debug"), true); } catch { }
 
             d.Run("/Clean Debug");
             d.Run("/Clean Release");
@@ -282,7 +283,7 @@ namespace ImageResizer.ReleaseBuilder {
 
         public void RemoveUselessFiles() {
             var f = new Futile(Console.Out);
-            q = new FsQuery(this.f.parentPath, new string[]{"/.git","^/Releases", "^/Tests/Builder"});
+            q = new FsQuery(this.f.ParentPath, new string[]{"/.git","^/Releases", "^/Tests/Builder"});
 
 
             //delete /Tests/binaries  (*.pdb, *.xml, *.dll)
@@ -311,7 +312,7 @@ namespace ImageResizer.ReleaseBuilder {
             };
 
         public void PrepareForPackaging() {
-            if (q == null) q = new FsQuery(this.f.parentPath, standardExclusions);
+            if (q == null) q = new FsQuery(this.f.ParentPath, standardExclusions);
             //Don't copy the DotNetZip or Aforge xml file.
             q.exclusions.Add(new Pattern("^/Plugins/Libs/DotNetZip*.xml$"));
             q.exclusions.Add(new Pattern("^/Plugins/Libs/Aforge*.xml$"));
@@ -323,7 +324,7 @@ namespace ImageResizer.ReleaseBuilder {
         public void PackMin(PackageDescriptor desc) {
             // 'min' - /dlls/release/ImageResizer.* - /
             // /*.txt
-            using (var p = new Package(desc.Path, this.f.parentPath)) {
+            using (var p = new Package(desc.Path, this.f.ParentPath)) {
                 p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"), "/");
                 p.Add(q.files("^/readme.txt$"));
                 p.Add(q.files("^/Core/license.txt$"), "");
@@ -331,14 +332,14 @@ namespace ImageResizer.ReleaseBuilder {
             }
         }
         public void PackAllBinaries(PackageDescriptor desc) {
-            using (var p = new Package(desc.Path, this.f.parentPath)) {
+            using (var p = new Package(desc.Path, this.f.ParentPath)) {
                 p.Add(q.files("^/dlls/release/*.(dll|pdb)$"), "/");
                 p.Add(q.files("^/[^/]+.txt$"));
             }
         }
         public void PackFull(PackageDescriptor desc) {
             // 'full'
-            using (var p = new Package(desc.Path, this.f.parentPath)) {
+            using (var p = new Package(desc.Path, this.f.ParentPath)) {
                 p.Add(q.files("^/(core|core.mvc|plugins|samples|tests)/"));
                 p.Add(q.files("^/contrib/azure"));
                 p.Add(q.files("^/dlls/(release|debug)"));
@@ -357,7 +358,7 @@ namespace ImageResizer.ReleaseBuilder {
             List<Pattern> old = q.exclusions;
             q.exclusions = new List<Pattern>(old);
             q.exclusions.Add(new Pattern("^/Core/[^/]+.sln")); //Don't include the regular solution files, they won't load properly.
-            using (var p = new Package(desc.Path, this.f.parentPath)) {
+            using (var p = new Package(desc.Path, this.f.ParentPath)) {
                 p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"), "/");
                 p.Add(q.files("^/dlls/(release|debug)/"));
                 p.Add(q.files("^/(core|samples)/"));

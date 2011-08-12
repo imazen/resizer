@@ -6,9 +6,16 @@ using System.IO;
 using System.Diagnostics;
 
 namespace ImageResizer.ReleaseBuilder {
+    /// <summary>
+    /// a wrapper class for executing commands against a visual studio solution
+    /// </summary>
     public class Devenv {
 
         protected string solutionPath = null;
+        /// <summary>
+        /// Creates a wrapper class for executing commands against a visual studio solution using devenv.exe (VS 2010
+        /// </summary>
+        /// <param name="solutionPath"></param>
         public Devenv(string solutionPath){
             this.solutionPath = solutionPath;
         }
@@ -23,7 +30,12 @@ namespace ImageResizer.ReleaseBuilder {
 
             }
         }
-
+        /// <summary>
+        /// Executes the specified arguments against the solution specified in the class constructor, using VS2010's devenv.exe interface.
+        /// Outputs stdout and stderr to the Console, with stderr in red text.
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public int Run(string args){
             var psi = new ProcessStartInfo(DevenvPath);
             psi.Arguments = '"' + solutionPath + "\" " + args;
@@ -42,21 +54,6 @@ namespace ImageResizer.ReleaseBuilder {
             return p.ExitCode;
         }
 
- //       System.Diagnostics.ProcessStartInfo psi =
- //  new System.Diagnostics.ProcessStartInfo(@"C:\listfiles.bat");
- //psi.RedirectStandardOutput = true;
- //psi.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
- //psi.UseShellExecute = false;
- //System.Diagnostics.Process listFiles;
- //listFiles = System.Diagnostics.Process.Start(psi);
- //System.IO.StreamReader myOutput = listFiles.StandardOutput;
- //listFiles.WaitForExit(2000);
- //if (listFiles.HasExited)
- // {
- // string output = myOutput.ReadToEnd();
- // this.processResults.Text = output;
-
- //       VS100COMNTOOLS
 
     }
 }

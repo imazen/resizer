@@ -8,8 +8,9 @@ using System.IO;
 namespace ImageResizer.ReleaseBuilder {
     public class FolderFinder {
         /// <summary>
-        /// Attempts to locate the specified folder by traversing up the directory tree from two locations (the original Builder exe location, and the current working directory).
-        /// Checks siblings at each level.
+        /// Attempts to locate the specified folder by traversing up (Towards C:\) the directory tree from two locations (the original Builder exe location, and the current working directory).
+        /// Checks siblings at each level, looking for the folder. 
+        /// 
         /// </summary>
         /// <param name="folderName"></param>
         /// <param name="solutionName"></param>
@@ -20,14 +21,20 @@ namespace ImageResizer.ReleaseBuilder {
         /// <summary>
         /// Physical _specPath to the folder that was searched for.
         /// </summary>
-        public string folderPath;
+        public string FolderPath;
         /// <summary>
         /// Parent folder of 'folderPath'
         /// </summary>
-        public string parentPath;
+        public string ParentPath;
 
 
-
+        /// <summary>
+        /// Starts in the 'startPath' directory, searches for any child directories matching 'query', and continues up to C until it finds a match.
+        /// Returns null if there are no matches.
+        /// </summary>
+        /// <param name="startPath"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public string FindFolder(string startPath, string query) {
             DirectoryInfo di = new DirectoryInfo(startPath);
             while (di != null) {
@@ -47,13 +54,11 @@ namespace ImageResizer.ReleaseBuilder {
             //Working directory
             string workingFolder = Directory.GetCurrentDirectory();
 
-            folderPath = FindFolder(workingFolder, folderName);
-            if (folderPath == null) folderPath = FindFolder(originalFolder, folderName);
-            if (folderPath != null) {
-                parentPath = Path.GetDirectoryName(folderPath);
+            FolderPath = FindFolder(workingFolder, folderName);
+            if (FolderPath == null) FolderPath = FindFolder(originalFolder, folderName);
+            if (FolderPath != null) {
+                ParentPath = Path.GetDirectoryName(FolderPath);
             }
-
-
         }
 
 
