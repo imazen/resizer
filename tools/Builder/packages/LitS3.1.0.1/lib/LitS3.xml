@@ -1,0 +1,1384 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>LitS3</name>
+    </assembly>
+    <members>
+        <member name="T:LitS3.CannedAcl">
+            <summary>
+            Access Control Lists that are predefined by Amazon and supported when adding objects.
+            </summary>
+        </member>
+        <member name="F:LitS3.CannedAcl.Private">
+            <summary>
+            Owner gets FULL_CONTROL. No one else has access rights (default).
+            </summary>
+        </member>
+        <member name="F:LitS3.CannedAcl.PublicRead">
+            <summary>
+            Owner gets FULL_CONTROL and the anonymous principal is granted READ access. 
+            If this policy is used on an object, it can be read from a browser with no authentication.
+            </summary>
+        </member>
+        <member name="F:LitS3.CannedAcl.PublicReadWrite">
+            <summary>
+            Owner gets FULL_CONTROL, the anonymous principal is granted READ and WRITE access. This is 
+            a useful policy to apply to a bucket, if you intend for any anonymous user to PUT 
+            objects into the bucket.
+            </summary>
+        </member>
+        <member name="F:LitS3.CannedAcl.AuthenticatedRead">
+            <summary>
+            Owner gets FULL_CONTROL, and any principal authenticated as a registered 
+            Amazon S3 user is granted READ access.
+            </summary>
+        </member>
+        <member name="T:LitS3.AddObjectRequest">
+            <summary>
+            Uploads an object to S3.
+            </summary>
+        </member>
+        <member name="T:LitS3.S3Request`1">
+            <summary>
+            Common base class for all concrete S3Requests, pairs each one tightly with its S3Response
+            counterpart.
+            </summary>
+        </member>
+        <member name="T:LitS3.S3Request">
+            <summary>
+            The base class for all S3 requests.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Request.Service">
+            <summary>
+            Gets the service this request will operate against.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Request.HaveResponse">
+            <summary>
+            Gets a value that indicates whether a response has been received from S3.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Request.KeepAlive">
+            <summary>
+            Gets or sets a value that indicates whether to make a persistent connection to S3.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Request.Proxy">
+            <summary>
+            Gets or sets proxy information for this request.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Request.ReadWriteTimeout">
+            <summary>
+            Gets or sets a time-out in milliseconds when writing to or reading from a stream.
+            The default value is 5 minutes.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Request.ServicePoint">
+            <summary>
+            Gets the service point to use for this request. See remarks on this property if you
+            plan on using Expect100Continue.
+            </summary>
+            <remarks>
+            In specific circumstances, the S3 request will hang indefinitely if Expect100Continue is 
+            set to true and S3 immediately responds with a HTTP 5xx server error after the request is 
+            issued and before any data is written to the stream. The downside to leaving this property 
+            at false is that you'll waste bandwidth and time if S3 knows the PUT is going to fail at 
+            the very start of the request.
+            </remarks>
+        </member>
+        <member name="M:LitS3.S3Request`1.GetResponse">
+            <summary>
+            Gets the S3 REST response synchronously.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Request`1.BeginGetResponse(System.AsyncCallback,System.Object)">
+            <summary>
+            Begins an asynchronous request to S3.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Request`1.EndGetResponse(System.IAsyncResult)">
+            <summary>
+            Ends an asynchronous call to BeginGetResponse().
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Request`1.Abort">
+            <summary>
+            Cancels an asynchronous request to S3.
+            </summary>
+        </member>
+        <member name="M:LitS3.AddObjectRequest.GetRequestStream">
+            <summary>
+            Submits the request to the server and retrieves a Stream for writing object data to.
+            </summary>
+        </member>
+        <member name="M:LitS3.AddObjectRequest.PerformWithRequestStream(System.Action{System.IO.Stream})">
+            <summary>
+            Submits the request to the server and performs the given action with the request
+            stream which should be filled with the object's data. The GetResponse() method
+            will automatically be called after the action is executed.
+            </summary>
+        </member>
+        <member name="M:LitS3.AddObjectRequest.BeginGetRequestStream(System.AsyncCallback,System.Object)">
+            <summary>
+            Begins an asynchronous request for a Stream object to use to write object data.
+            </summary>
+        </member>
+        <member name="M:LitS3.AddObjectRequest.EndGetRequestStream(System.IAsyncResult)">
+            <summary>
+            Ends an asynchronous call to BeginGetRequestStream(). 
+            </summary>
+        </member>
+        <member name="P:LitS3.AddObjectRequest.CannedAcl">
+            <summary>
+            Gets or sets the "canned" access control to apply to this object. The default is
+            Private. More complex permission sets than the CannedAcl values are allowed, but
+            you must use SetObjectAclRequest (not currently implemented).
+            </summary>
+        </member>
+        <member name="P:LitS3.AddObjectRequest.Expires">
+            <summary>
+            Gets or sets the optional expiration date of the object. If specified, it will be 
+            stored by S3 and returned as a standard Expires header when the object is retrieved.
+            </summary>
+        </member>
+        <member name="P:LitS3.AddObjectRequest.Metadata">
+            <summary>
+            Gets a collection where you can store name/value metadata pairs to be stored along
+            with this object. Since we are using the REST API, the names and values are limited
+            to ASCII encoding. Additionally, Amazon imposes a 2k limit on the total HTTP header
+            size which includes metadata. Note that LitS3 manages adding the special "x-amz-meta"
+            prefix for you.
+            </summary>
+        </member>
+        <member name="P:LitS3.AddObjectRequest.CacheControl">
+            <summary>
+            Gets or sets the cache control for this request as the raw HTTP header you would like
+            S3 to return along with your object when requested. An example value for this might
+            be "max-age=3600, must-revalidate".
+            </summary>
+        </member>
+        <member name="P:LitS3.AddObjectRequest.ContentType">
+            <summary>
+            Gets or sets the MIME type of this object. It will be stored by S3 and returned as a
+            standard Content-Type header when the object is retrieved.
+            </summary>
+        </member>
+        <member name="P:LitS3.AddObjectRequest.ContentLength">
+            <summary>
+            Gets or sets the size of the object you are adding. Setting this property is required.
+            </summary>
+        </member>
+        <member name="P:LitS3.AddObjectRequest.ContentMD5">
+            <summary>
+            Gets or sets the base64 encoded 128-bit MD5 digest of the message (without the headers)
+            according to RFC 1864.
+            </summary>
+        </member>
+        <member name="P:LitS3.AddObjectRequest.ContentDisposition">
+            <summary>
+            Gets or sets presentational information for the object. It will be stored by S3 and
+            returned as a standard Content-Disposition header when the object is retrieved.
+            </summary>
+            <remarks>
+            One use of this header is to cause a browser to download this resource as a file attachment
+            instead of displaying it inline. For that behavior, use a string like:
+            "Content-disposition: attachment; filename=mytextfile.txt"
+            </remarks>
+        </member>
+        <member name="P:LitS3.AddObjectRequest.ContentEncoding">
+            <summary>
+            Gets or sets the specified encoding of the object data. It will be stored by S3 
+            and returned as a standard Content-Encoding header when the object is retrieved.
+            </summary>
+        </member>
+        <member name="T:LitS3.AddObjectResponse">
+            <summary>
+            Represents the response returned by S3 after adding an object with AddObjectRequest.
+            </summary>
+        </member>
+        <member name="T:LitS3.S3Response">
+            <summary>
+            Provides a base class which encapsulates an Amazon REST WebResponse and sets up an
+            appropriate XmlReader for the kinds of XML data Amazon sends back.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Response.Close">
+            <summary>
+            Closes our response stream. You must call this method when you are finished with
+            this response.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Response.Reader">
+            <summary>
+            Gets an XmlReader for parsing Amazon XML responses, creating one if necessary and
+            calling MoveToContent().
+            </summary>
+        </member>
+        <member name="P:LitS3.AddObjectResponse.ETag">
+            <summary>
+            Gets the added object's ETag as calculated by S3. You can compare this to an ETag you
+            calculate locally to verify that S3 received the file correctly.
+            </summary>
+        </member>
+        <member name="T:LitS3.Bucket">
+            <summary>
+            Represents a bucket hosted by Amazon S3 that contains objects.
+            </summary>
+        </member>
+        <member name="P:LitS3.Bucket.Name">
+            <summary>
+            The name of this bucket.
+            </summary>
+        </member>
+        <member name="P:LitS3.Bucket.CreationDate">
+            <summary>
+            The creation time of this bucket, as determined by S3.
+            </summary>
+        </member>
+        <member name="T:LitS3.BucketAccess">
+            <summary>
+            Indicates the accessibility of a bucket.
+            </summary>
+        </member>
+        <member name="F:LitS3.BucketAccess.Accessible">
+            <summary> The bucket is owned and accessible by you. </summary>
+        </member>
+        <member name="F:LitS3.BucketAccess.NotAccessible">
+            <summary> The bucket is owned by someone else. </summary>
+        </member>
+        <member name="F:LitS3.BucketAccess.NoSuchBucket">
+            <summary> The bucket does not exist. </summary>
+        </member>
+        <member name="T:LitS3.MetadataDirective">
+            <summary>
+            For COPY operations, indicates whether the metadata is copied from the source object or replaced
+            with metadata provided in the request. If copied, it remains unchanged. Otherwise, all original
+            metadata is replaced by the metadata you specify.
+            </summary>
+        </member>
+        <member name="F:LitS3.MetadataDirective.Automatic">
+            <summary> Check the contents of the Metadata property. If empty, Copy, else Replace. </summary>
+        </member>
+        <member name="F:LitS3.MetadataDirective.Copy">
+            <summary> Copy the metadata from the source object. This is the default. </summary>
+        </member>
+        <member name="F:LitS3.MetadataDirective.Replace">
+            <summary> Replace the metadata with the metadata specified in the COPY operation. </summary>
+        </member>
+        <member name="T:LitS3.CopyObjectRequest">
+            <summary>
+            Copies an existing object in S3. Even if you successfully get a CopyObjectResponse
+            without an exception, you should inspect it to see if any errors occurred while copying.
+            </summary>
+        </member>
+        <member name="P:LitS3.CopyObjectRequest.CannedAcl">
+            <summary>
+            Gets or sets the "canned" access control to apply to this object. The default is
+            Private. More complex permission sets than the CannedAcl values are allowed, but
+            you must use SetObjectAclRequest (not currently implemented).
+            </summary>
+        </member>
+        <member name="P:LitS3.CopyObjectRequest.CopyIfMatchETag">
+            <summary>
+            Gets or sets the ETag value that will be used to conditionally execute the COPY
+            operation on S3. If the ETag value set here does not match the ETag of the source
+            object, S3 will return a "412 Precondition Failed" error.
+            </summary>
+        </member>
+        <member name="P:LitS3.CopyObjectRequest.CopyIfNoneMatchETag">
+            <summary>
+            Gets or sets the ETag value that will be used to conditionally execute the COPY
+            operation on S3. If the ETag value set here matches the ETag of the source object,
+            S3 will return a "412 Precondition Failed" error.
+            </summary>
+        </member>
+        <member name="P:LitS3.CopyObjectRequest.CopyIfUnmodifiedSince">
+            <summary>
+            Gets or sets the date value that will be used to conditionally execute the COPY
+            operation on S3. If the date value set here matches the "Last-Modified" data of
+            the source object, S3 will return a "412 Precondition Failed" error.
+            </summary>
+        </member>
+        <member name="P:LitS3.CopyObjectRequest.CopyIfModifiedSince">
+            <summary>
+            Gets or sets the date value that will be used to conditionally execute the COPY
+            operation on S3. If the date value set here does not match the "Last-Modified" data
+            of the source object, S3 will return a "412 Precondition Failed" error.
+            </summary>
+        </member>
+        <member name="P:LitS3.CopyObjectRequest.Metadata">
+            <summary>
+            Gets a collection where you can store name/value metadata pairs to be stored along
+            with this object. Since we are using the REST API, the names and values are limited
+            to ASCII encoding. Additionally, Amazon imposes a 2k limit on the total HTTP header
+            size which includes metadata. Note that LitS3 manages adding the special "x-amz-meta"
+            prefix for you.
+            </summary>
+        </member>
+        <member name="P:LitS3.CopyObjectRequest.MetadataDirective">
+            <summary>
+            Gets or sets the metadata directive for the current COPY operation. The metadata
+            directive tells S3 whether to copy the metadata from the source object (default) or
+            replace the metadata of the new object with the provided metadata.
+            </summary>
+        </member>
+        <member name="P:LitS3.CopyObjectResponse.LastModified">
+            <summary>
+            Gets the last time this object was modified, as calculated internally and stored by S3.
+            </summary>
+        </member>
+        <member name="P:LitS3.CopyObjectResponse.ETag">
+            <summary>
+            Gets the ETag of this object as calculated internally and stored by S3.
+            </summary>
+        </member>
+        <member name="P:LitS3.CopyObjectResponse.Error">
+            <summary>
+            Gets the error that occurred during the copy operation, if any.
+            </summary>
+        </member>
+        <member name="T:LitS3.CreateBucketRequest">
+            <summary>
+            Creates a new bucket hosted by S3.
+            </summary>
+        </member>
+        <member name="M:LitS3.CreateBucketRequest.#ctor(LitS3.S3Service,System.String,System.Boolean)">
+            <param name="createInEurope">
+            True if you want to request that Amazon create this bucket in the Europe location. Otherwise,
+            false to let Amazon decide.
+            </param>
+        </member>
+        <member name="T:LitS3.CreateBucketResponse">
+            <summary>
+            Represents an S3 response for a created bucket.
+            </summary>
+        </member>
+        <member name="P:LitS3.CreateBucketResponse.Location">
+            <summary>
+            The location of the created bucket, as returned by Amazon in the Location header.
+            </summary>
+        </member>
+        <member name="T:LitS3.DeleteBucketRequest">
+            <summary>
+            Deletes a bucket from S3. The bucket must be empty.
+            </summary>
+        </member>
+        <member name="T:LitS3.DeleteBucketResponse">
+            <summary>
+            Represents an S3 response for a deleted bucket.
+            </summary>
+        </member>
+        <member name="T:LitS3.DeleteObjectRequest">
+            <summary>
+            Deletes an object in an S3 bucket.
+            </summary>
+        </member>
+        <member name="T:LitS3.DeleteObjectResponse">
+            <summary>
+            Represents the response for deleting an S3 object.
+            </summary>
+        </member>
+        <member name="T:LitS3.GetAllBucketsRequest">
+            <summary>
+            Gets all buckets owned by you.
+            </summary>
+        </member>
+        <member name="T:LitS3.GetAllBucketsResponse">
+            <summary>
+            Contains the S3 response with all your owned buckets.
+            </summary>
+        </member>
+        <member name="P:LitS3.GetAllBucketsResponse.Buckets">
+            <summary>
+            Provides a forward-only reader for efficiently enumerating through the response
+            list of Buckets.
+            </summary>
+        </member>
+        <member name="T:LitS3.GetBucketLocationRequest">
+            <summary>
+            Queries S3 for the hosted location of a bucket.
+            </summary>
+        </member>
+        <member name="T:LitS3.GetBucketLocationResponse">
+            <summary>
+            The S3 response for the hosted location of a bucket.
+            </summary>
+        </member>
+        <member name="P:LitS3.GetBucketLocationResponse.IsEurope">
+            <summary>
+            Gets true if the bucket was created in the Europe location.
+            </summary>
+        </member>
+        <member name="T:LitS3.GetObjectRequest">
+            <summary>
+            Gets an S3 object, partial object, or just object metadata.
+            </summary>
+        </member>
+        <member name="M:LitS3.GetObjectRequest.AddRange(System.Int32)">
+            <summary>
+            Requests a partial object. You can only add one range request.
+            </summary>
+            <param name="range">
+            Example: Assume an object with a size of 1000 bytes.
+            AddRange(300) will return all bytes from byte 300 (bytes 300-999), that is: 700 bytes in total.
+            AddRange(-300) will return the last 300 bytes (bytes 700-999), that is: 300 bytes in total.
+            </param>
+        </member>
+        <member name="M:LitS3.GetObjectRequest.AddRange(System.Int32,System.Int32)">
+            <summary>
+            Requests a partial object. You can only add one range request.
+            </summary>
+            <param name="from">
+            Example: Assume an object with a size of 1000 bytes.
+            AddRange(0,499) will return the first 500 bytes (byte offsets 0-499, inclusive).
+            AddRange(500,999) will return The second 500 bytes (byte offsets 500-999, inclusive).
+            </param>
+        </member>
+        <member name="P:LitS3.GetObjectRequest.IfModifiedSince">
+            <summary>
+            Gets or sets: Return the object only if it has been modified since the 
+            specified time, otherwise return a 304 (not modified).
+            </summary>
+        </member>
+        <member name="P:LitS3.GetObjectRequest.IfUnmodifiedSince">
+            <summary>
+            Gets or sets: Return the object only if it has not been modified since 
+            the specified time, otherwise return a 412 (precondition failed).
+            </summary>
+        </member>
+        <member name="P:LitS3.GetObjectRequest.IfMatch">
+            <summary>
+            Gets or sets: Return the object only if its entity tag (ETag) is the same as the 
+            one specified, otherwise return a 412 (precondition failed).
+            </summary>
+        </member>
+        <member name="T:LitS3.GetObjectResponse">
+            <summary>
+            Represents the S3 response containing the queried object's metadata and/or data.
+            </summary>
+        </member>
+        <member name="M:LitS3.GetObjectResponse.GetResponseStream">
+            <summary>
+            Gets a stream containing the object data (if included).
+            </summary>
+        </member>
+        <member name="P:LitS3.GetObjectResponse.MissingMetadataHeaders">
+            <summary>
+            Gets the number of metadata entries that were not returned due to the limitations of
+            the REST API.
+            </summary>
+        </member>
+        <member name="P:LitS3.GetObjectResponse.Metadata">
+            <summary>
+            Gets a collection of name/value metadata pairs associated with this object.
+            Note that LitS3 manages removing the special "x-amz-meta" header prefix for you.
+            </summary>
+        </member>
+        <member name="P:LitS3.GetObjectResponse.LastModified">
+            <summary>
+            Gets the last time this object was modified, as calculated internally and stored by S3.
+            </summary>
+        </member>
+        <member name="P:LitS3.GetObjectResponse.ETag">
+            <summary>
+            Gets the ETag of this object as calculated internally and stored by S3.
+            </summary>
+        </member>
+        <member name="P:LitS3.GetObjectResponse.ContentType">
+            <summary>
+            Gets the MIME type of the object. This is set to the same value specified when
+            adding the object. The default content type is binary/octet-stream.
+            </summary>
+        </member>
+        <member name="P:LitS3.GetObjectResponse.ContentDisposition">
+            <summary>
+            Gets the optioanl disposition header, if one was specified when adding the object.
+            The exception is BitTorrent files which have a non-empty default disposition.
+            </summary>
+        </member>
+        <member name="P:LitS3.GetObjectResponse.ContentLength">
+            <summary>
+            Gets the size of the response data stream.
+            </summary>
+        </member>
+        <member name="P:LitS3.GetObjectResponse.ContentRange">
+            <summary>
+            Gets the HTTP header describing the range of bytes returned in the event that 
+            a partial object was requested using AddObject.AddRange().
+            </summary>
+        </member>
+        <member name="T:LitS3.Identity">
+            <summary>
+            Represents an Amazon S3 user.
+            </summary>
+        </member>
+        <member name="T:LitS3.ListEntry">
+            <summary>
+            The base class for items returned by a ListObjectsRequest. The only two concrete subclasses
+            are ObjectEntry and CommonPrefix.
+            </summary>
+        </member>
+        <member name="P:LitS3.ListEntry.Name">
+            <summary>
+            Gets the name of this entry, which is the portion of the key or common prefix after the
+            search prefix.
+            </summary>
+        </member>
+        <member name="T:LitS3.ObjectEntry">
+            <summary>
+            Represents an S3 Object.
+            </summary>
+        </member>
+        <member name="P:LitS3.ObjectEntry.Key">
+            <summary>
+            Gets the unique S3 Object key.
+            </summary>
+        </member>
+        <member name="P:LitS3.ObjectEntry.LastModified">
+            <summary>
+            Gets the last modified date of this object, as determined by S3.
+            </summary>
+        </member>
+        <member name="P:LitS3.ObjectEntry.ETag">
+            <summary>
+            Gets the ETag of this object, as computed by S3.
+            </summary>
+        </member>
+        <member name="P:LitS3.ObjectEntry.Size">
+            <summary>
+            Get the size of this object.
+            </summary>
+        </member>
+        <member name="P:LitS3.ObjectEntry.Owner">
+            <summary>
+            Gets the owner of this object.
+            </summary>
+        </member>
+        <member name="T:LitS3.CommonPrefix">
+            <summary>
+            Represents a common prefix rolled up by a ListObjectsRequest. In a filesystem-like
+            interpretation of Amazon S3 using a delimiter of "/", you might consider this a "directory".
+            </summary>
+        </member>
+        <member name="P:LitS3.CommonPrefix.Prefix">
+            <summary>
+            Gets the prefix common to one or more items found by the ListObjectsRequest.
+            </summary>
+        </member>
+        <member name="T:LitS3.ListObjectsArgs">
+            <summary>
+            A structure passed to ListObjectRequest which describes the range of items to search for.
+            </summary>
+        </member>
+        <member name="P:LitS3.ListObjectsArgs.Prefix">
+            <summary>
+            Limits the response to keys which begin with the indicated prefix.
+            You can use prefixes to separate a bucket into different sets of keys 
+            in a way similar to how a file system uses folders.
+            </summary>
+        </member>
+        <member name="P:LitS3.ListObjectsArgs.Marker">
+            <summary>
+            Indicates where in the bucket to begin listing. The list will only include keys 
+            that occur lexicographically after marker. This is convenient for pagination: To get 
+            the next page of results use the last key of the current page as the marker.
+            </summary>
+        </member>
+        <member name="P:LitS3.ListObjectsArgs.Delimiter">
+            <summary>
+            Causes keys that contain the same string between the prefix and the first occurrence 
+            of the delimiter to be rolled up into a single result element in the CommonPrefixes 
+            collection. These rolled-up keys are not returned elsewhere in the response.
+            </summary>
+        </member>
+        <member name="P:LitS3.ListObjectsArgs.MaxKeys">
+            <summary>
+            The maximum number of keys you'd like to see in the response body. The server might
+            return fewer than this many keys, but will not return more.
+            </summary>
+        </member>
+        <member name="T:LitS3.ListObjectsRequest">
+            <summary>
+            An S3 request which searches for items in a bucket.
+            </summary>
+        </member>
+        <member name="T:LitS3.ListObjectsResponse">
+            <summary>
+            An S3 response describing the requested contents of a bucket.
+            </summary>
+        </member>
+        <member name="P:LitS3.ListObjectsResponse.BucketName">
+            <summary>
+            Gets the bucket queried in the original request.
+            </summary>
+        </member>
+        <member name="P:LitS3.ListObjectsResponse.Prefix">
+            <summary>
+            Gets the prefix specified in the original request.
+            </summary>
+        </member>
+        <member name="P:LitS3.ListObjectsResponse.Marker">
+            <summary>
+            Gets the marker specified in the original request.
+            </summary>
+        </member>
+        <member name="P:LitS3.ListObjectsResponse.MaxKeys">
+            <summary>
+            Gets the maximum number of keys specified in the original request.
+            </summary>
+        </member>
+        <member name="P:LitS3.ListObjectsResponse.Delimiter">
+            <summary>
+            Gets the delimiter specified in the original request.
+            </summary>
+        </member>
+        <member name="P:LitS3.ListObjectsResponse.IsTruncated">
+            <summary>
+            Gets whether the list of itmes was truncated by the server because too many matched
+            or the number of items found was greater than the maximum keys specified in the request.
+            </summary>
+        </member>
+        <member name="P:LitS3.ListObjectsResponse.NextMarker">
+            <summary>
+            Gets a marker you can use in a second ListObjectRequest to get the next range of items.
+            This will be non-null only if IsTruncated is true and Delimiter is not null.
+            </summary>
+        </member>
+        <member name="P:LitS3.ListObjectsResponse.Entries">
+            <summary>
+            Provides a forward-only reader for efficiently enumerating through the response
+            list of objects and common prefixes.
+            </summary>
+        </member>
+        <member name="T:LitS3.S3ProgressEventArgs">
+            <summary>
+            Provides progress data for S3 object transfer operations.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3ProgressEventArgs.BucketName">
+            <summary>
+            Gets the bucket of the object being transferred.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3ProgressEventArgs.Key">
+            <summary>
+            Gets the key of the object being transferred.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3ProgressEventArgs.BytesTransferred">
+            <summary>
+            Gets the number of bytes transferred. 
+            </summary>
+        </member>
+        <member name="P:LitS3.S3ProgressEventArgs.BytesTotal">
+            <summary>
+            Gets the total number of bytes in the transfer operation.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Authorizer.AuthorizeRequest(System.Net.HttpWebRequest,System.String)">
+            <summary>
+            Signs the given HttpWebRequest using the HTTP Authorization header with a value
+            generated using the contents of the request plus our SecretAccessKey.
+            </summary>
+            <remarks>
+            See http://docs.amazonwebservices.com/AmazonS3/2006-03-01/RESTAuthentication.html
+            </remarks>
+        </member>
+        <member name="M:LitS3.S3Authorizer.Compare(System.String,System.String)">
+            <summary>
+            Implements string comparison for the purpose of sorting amazon request headers
+            lexographically. The default string.Compare() is "interesting", in that it
+            attempts to sort words according to current locale settings. What we want is
+            the old-school sorting based on the numeric value of each char, which is
+            what CompareOrdinal does.
+            </summary>
+        </member>
+        <member name="T:LitS3.DateTimeEpochExtension">
+            <summary>
+            Assists in converting DateTime objects into the seconds-since-epoch required by some
+            parts of S3.
+            </summary>
+        </member>
+        <member name="T:LitS3.S3ErrorCode">
+            <summary>
+            Represents the possible error codes that can be returned by S3.
+            </summary>
+            <remarks>
+            The list of codes was parsed from here:
+            http://docs.amazonwebservices.com/AmazonS3/2006-03-01/ErrorCodeList.html
+            </remarks>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.Unknown">
+            <summary>
+            Represents a code unknown to this class.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.AccessDenied">
+            <summary>
+            Access Denied
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.AccountProblem">
+            <summary>
+            There is a problem with your AWS account that prevents the operation from completing
+            successfully. Please contact customer service at webservices@amazon.com.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.AmbiguousGrantByEmailAddress">
+            <summary>
+            The e-mail address you provided is associated with more than one account.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.BadDigest">
+            <summary>
+            The Content-MD5 you specified did not match what we received.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.BucketAlreadyExists">
+            <summary>
+            The requested bucket name is not available. The bucket namespace is shared by all users of
+            the system. Please select a different name and try again.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.BucketAlreadyOwnedByYou">
+            <summary>
+            Your previous request to create the named bucket succeeded and you already own it.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.BucketNotEmpty">
+            <summary>
+            The bucket you tried to delete is not empty.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.CredentialsNotSupported">
+            <summary>
+            This request does not support credentials.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.CrossLocationLoggingProhibited">
+            <summary>
+            Cross location logging not allowed. Buckets in one geographic location cannot log
+            information to a bucket in another location.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.EntityTooSmall">
+            <summary>
+            Your proposed upload is smaller than the minimum allowed object size.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.EntityTooLarge">
+            <summary>
+            Your proposed upload exceeds the maximum allowed object size.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.ExpiredToken">
+            <summary>
+            The provided token has expired.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.IncompleteBody">
+            <summary>
+            You did not provide the number of bytes specified by the Content-Length HTTP header
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.IncorrectNumberOfFilesInPostRequest">
+            <summary>
+            POST requires exactly one file upload per request.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InlineDataTooLarge">
+            <summary>
+            Inline data exceeds the maximum allowed size.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InternalError">
+            <summary>
+            We encountered an internal error. Please try again.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InvalidAccessKeyId">
+            <summary>
+            The AWS Access Key Id you provided does not exist in our records.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InvalidAddressingHeader">
+            <summary>
+            You must specify the Anonymous role.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InvalidArgument">
+            <summary>
+            Invalid Argument
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InvalidBucketName">
+            <summary>
+            The specified bucket is not valid.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InvalidDigest">
+            <summary>
+            The Content-MD5 you specified was an invalid.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InvalidLocationConstraint">
+            <summary>
+            The specified location constraint is not valid.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InvalidPayer">
+            <summary>
+            All access to this object has been disabled.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InvalidPolicyDocument">
+            <summary>
+            The content of the form does not meet the conditions specified in the policy document.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InvalidRange">
+            <summary>
+            The requested range cannot be satisfied.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InvalidSecurity">
+            <summary>
+            The provided security credentials are not valid.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InvalidSOAPRequest">
+            <summary>
+            The SOAP request body is invalid.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InvalidStorageClass">
+            <summary>
+            The storage class you specified is not valid.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InvalidTargetBucketForLogging">
+            <summary>
+            The target bucket for logging does not exist, is not owned by you, or does not have the
+            appropriate grants for the log-delivery group.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InvalidToken">
+            <summary>
+            The provided token is malformed or otherwise invalid.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.InvalidURI">
+            <summary>
+            Couldn't parse the specified URI.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.KeyTooLong">
+            <summary>
+            Your key is too long.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.MalformedACLError">
+            <summary>
+            The XML you provided was not well-formed or did not validate against our published schema.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.MalformedXML">
+            <summary>
+            The XML you provided was not well-formed or did not validate against our published schema.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.MaxMessageLengthExceeded">
+            <summary>
+            Your request was too big.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.MaxPostPreDataLengthExceededError">
+            <summary>
+            Your POST request fields preceding the upload file were too large.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.MetadataTooLarge">
+            <summary>
+            Your metadata headers exceed the maximum allowed metadata size.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.MethodNotAllowed">
+            <summary>
+            The specified method is not allowed against this resource.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.MissingAttachment">
+            <summary>
+            A SOAP attachment was expected, but none were found.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.MissingContentLength">
+            <summary>
+            You must provide the Content-Length HTTP header.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.MissingSecurityElement">
+            <summary>
+            The SOAP 1.1 request is missing a security element.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.MissingSecurityHeader">
+            <summary>
+            Your request was missing a required header.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.NoLoggingStatusForKey">
+            <summary>
+            There is no such thing as a logging status sub-resource for a key.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.NoSuchBucket">
+            <summary>
+            The specified bucket does not exist.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.NoSuchKey">
+            <summary>
+            The specified key does not exist.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.NotImplemented">
+            <summary>
+            A header you provided implies functionality that is not implemented.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.NotSignedUp">
+            <summary>
+            Your account is not signed up for the Amazon S3 service. You must sign up before you can
+            use Amazon S3. You can sign up at the following URL: http://aws.amazon.com/s3
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.OperationAborted">
+            <summary>
+            A conflicting conditional operation is currently in progress against this resource.
+            Please try again.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.PermanentRedirect">
+            <summary>
+            The bucket you are attempting to access must be addressed using the specified endpoint.
+            Please send all future requests to this endpoint.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.PreconditionFailed">
+            <summary>
+            At least one of the pre-conditions you specified did not hold.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.Redirect">
+            <summary>
+            Temporary redirect.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.RequestIsNotMultiPartContent">
+            <summary>
+            Bucket POST must be of the enclosure-type multipart/form-data.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.RequestTimeout">
+            <summary>
+            Your socket connection to the server was not read from or written to within the 
+            timeout period.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.RequestTimeTooSkewed">
+            <summary>
+            The difference between the request time and the server's time is too large.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.RequestTorrentOfBucketError">
+            <summary>
+            Requesting the torrent file of a bucket is not permitted.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.SignatureDoesNotMatch">
+            <summary>
+            The request signature we calculated does not match the signature you provided.
+            Check your AWS Secret Access Key and signing method. For more information, see
+            Authenticating REST Requests and Authenticating SOAP Requests for details.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.SlowDown">
+            <summary>
+            Please reduce your request rate.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.TemporaryRedirect">
+            <summary>
+            You are being redirected to the bucket while DNS updates.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.TokenRefreshRequired">
+            <summary>
+            The provided token must be refreshed.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.TooManyBuckets">
+            <summary>
+            You have attempted to create more buckets than allowed.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.UnexpectedContent">
+            <summary>
+            This request does not support content.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.UnresolvableGrantByEmailAddress">
+            <summary>
+            The e-mail address you provided does not match any account on record.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3ErrorCode.UserKeyMustBeSpecified">
+            <summary>
+            The bucket POST must contain the specified field name. If it is specified, please check
+            the order of the fields.
+            </summary>
+        </member>
+        <member name="F:LitS3.S3Headers.MissingMetadata">
+            <summary>
+            This is set to the number of metadata entries not returned in x-amz-meta headers.
+            This can happen if you create metadata using an API like SOAP that supports more
+            flexible metadata than the REST API. For example, using SOAP, you can create metadata
+            whose values are not legal HTTP headers.
+            </summary>
+        </member>
+        <member name="T:LitS3.S3Exception">
+            <summary>
+            The exception that is thrown when the S3 server returns a specially formatted error object
+            that we can parse.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Exception.ErrorCode">
+            <summary>
+            Gets the error code returned by S3.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Exception.BucketName">
+            <summary>
+            Gets the bucket name this error pertains to, if applicable.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Exception.RequestID">
+            <summary>
+            Gets the ID of the request associated with the error.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Exception.HostID">
+            <summary>
+            Gets the ID of the host that returned the error.
+            </summary>
+        </member>
+        <member name="T:LitS3.S3RequestArgs">
+            <summary>
+            Describes an event involving an S3Request.
+            </summary>
+        </member>
+        <member name="T:LitS3.S3Service">
+            <summary>
+            Describes how to connect to a particular S3 server.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.#ctor">
+            <summary>
+            Creates a new S3Service with the default values.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.GetAllBuckets">
+            <summary>
+            Lists all buckets owned by you.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.ForEachBucket(System.Action{LitS3.Bucket})">
+            <summary>
+            Performs the given action on each of your buckets without loading the list of
+            buckets completely into memory.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.CreateBucket(System.String)">
+            <summary>
+            Creates a bucket in the default storage location automatically determined by Amazon.
+            </summary>
+            <param name="bucketName">The name of the bucket, which will be checked against
+            the BucketNameChecking.Strict requirements.</param>
+        </member>
+        <member name="M:LitS3.S3Service.CreateBucketInEurope(System.String)">
+            <summary>
+            Creates a bucket in the Amazon Europe storage location.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.QueryBucket(System.String)">
+            <summary>
+            Queries S3 about the existance and ownership of the given bucket name.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.ObjectExists(System.String,System.String)">
+            <summary>
+            Returns true if the given object exists in the given bucket.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.IsBucketInEurope(System.String)">
+            <summary>
+            Queries S3 to determine whether the given bucket resides in the Europe location.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.ListObjects(System.String,System.String)">
+            <summary>
+            Queries a bucket for a listing of objects it contains. Only objects with keys
+            beginning with the given prefix will be returned. The DefaultDelimiter will
+            be used. If you expect a large number of objects to be returned, consider using
+            ListAllObjects().
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.ListAllObjects(System.String)">
+            <summary>
+            Queries a bucket for a listing of all objects it contains. The DefaultDelimiter will
+            be used.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.ListAllObjects(System.String,System.String)">
+            <summary>
+            Queries a bucket for a listing of objects it contains. Only objects with keys
+            beginning with the given prefix will be returned. The DefaultDelimiter will
+            be used.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.ListAllObjects(System.String,System.String,System.String)">
+            <summary>
+            Queries a bucket for a listing of objects it contains. Only objects with keys
+            beginning with the given prefix will be returned.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.ForEachObject(System.String,System.Action{LitS3.ListEntry})">
+            <summary>
+            Queries a bucket for a listing of objects it contains and performs the given
+            action on each object. The DefaultDelimiter will be used.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.ForEachObject(System.String,System.String,System.Action{LitS3.ListEntry})">
+            <summary>
+            Queries a bucket for a listing of objects it contains and performs the given
+            action on each object. Only objects with keys beginning with the given prefix 
+            will be returned. The DefaultDelimiter will be used.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.DeleteBucket(System.String)">
+            <summary>
+            Deletes the bucket with the given name.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.DeleteObject(System.String,System.String)">
+            <summary>
+            Deletes the object in the specified bucket with the specified key.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.GetUrl(System.String,System.String)">
+            <summary>
+            This constructs a Uri suitable for accessing the given object in the given bucket.
+            It is not authorized, so it will only work for objects with anonymous read access.
+            This method itself does not communicate with S3 and will return immediately.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.GetAuthorizedUrl(System.String,System.String,System.DateTime)">
+            <summary>
+            Creates a pre-authorized URI valid for performing a GET on the given S3 object
+            in the given bucket. This is useful for constructing a URL to hand over to a 3rd party
+            (such as a web browser). The Uri will automatically expire after the time given.
+            This method itself does not communicate with S3 and will return immediately.
+            </summary>
+            <remarks>
+            You might expect this method to return a System.Uri instead of a string. It turns out
+            there is a tricky issue with constructing Uri objects from these pre-authenticated
+            url strings: The Uri.ToString() method will convert a properly-encoded "+" character back
+            into a raw "+", which is interpreted by Amazon S3 as a space (standard URI conventions).
+            So the signature will be misread if you were to take the Uri.ToString() and feed
+            it to a browser. So instead, we'll give you a properly escaped URL string which 
+            will always work in a browser. If you want to, say, use it in a WebRequest instead, 
+            it turns out that WebRequest will leave it escaped properly and everything will work.
+            </remarks>
+        </member>
+        <member name="M:LitS3.S3Service.AddObject(System.String,System.String,System.Int64,System.String,LitS3.CannedAcl,System.Action{System.IO.Stream})">
+            <summary>
+            Adds an object to S3 by acquiring the upload stream then allowing the given
+            function to handle writing data into it.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.AddObject(System.String,System.String,System.Int64,System.Action{System.IO.Stream})">
+            <summary>
+            Adds an object to S3 by acquiring the upload stream then allowing the given
+            function to handle writing data into it.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.AddObject(System.IO.Stream,System.Int64,System.String,System.String,System.String,LitS3.CannedAcl)">
+            <summary>
+            Adds an object to S3 by reading the specified amount of data from the given stream.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.AddObject(System.IO.Stream,System.Int64,System.String,System.String)">
+            <summary>
+            Adds an object to S3 by reading the specified amount of data from the given stream.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.AddObject(System.IO.Stream,System.String,System.String,System.String,LitS3.CannedAcl)">
+            <summary>
+            Adds an object to S3 by reading all the data in the given stream. The stream must support
+            the Length property.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.AddObject(System.IO.Stream,System.String,System.String)">
+            <summary>
+            Adds an object to S3 by reading all the data in the given stream. The stream must support
+            the Length property.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.AddObject(System.String,System.String,System.String,System.String,LitS3.CannedAcl)">
+            <summary>
+            Uploads the contents of an existing local file to S3.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.AddObject(System.String,System.String,System.String)">
+            <summary>
+            Uploads the contents of an existing local file to S3.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.AddObjectString(System.String,System.String,System.String,System.String,LitS3.CannedAcl)">
+            <summary>
+            Uploads the contents of a string to S3. This method is only appropriate for
+            small objects and testing. The UTF-8 encoding will be used.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.AddObjectString(System.String,System.String,System.String)">
+            <summary>
+            Uploads the contents of a string to S3. This method is only appropriate for
+            small objects and testing. The UTF-8 encoding will be used.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.CopyObject(System.String,System.String,System.String,System.String,LitS3.CannedAcl)">
+            <summary>
+            Copies an object from one bucket to another with the given canned ACL.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.CopyObject(System.String,System.String,System.String,System.String)">
+            <summary>
+            Copies an object from one bucket to another.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.CopyObject(System.String,System.String,System.String,LitS3.CannedAcl)">
+            <summary>
+            Copies an object within a bucket and assigns the given canned ACL.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.CopyObject(System.String,System.String,System.String)">
+            <summary>
+            Copies an object within a bucket.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.GetObjectStream(System.String,System.String,System.Int64@,System.String@)">
+            <summary>
+            Gets a data stream for an existing object in S3. It is your responsibility to close
+            the Stream when you are finished.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.GetObjectStream(System.String,System.String)">
+            <summary>
+            Gets a data stream for an existing object in S3. It is your responsibility to close
+            the Stream when you are finished.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.GetObject(System.String,System.String,System.IO.Stream,System.Int64@,System.String@)">
+            <summary>
+            Gets an existing object in S3 and copies its data to the given Stream.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.GetObject(System.String,System.String,System.IO.Stream)">
+            <summary>
+            Gets an existing object in S3 and copies its data to the given Stream.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.GetObject(System.String,System.String,System.String,System.String@)">
+            <summary>
+            Downloads an existing object in S3 to the given local file path.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.GetObject(System.String,System.String,System.String)">
+            <summary>
+            Downloads an existing object in S3 to the given local file path.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.GetObjectString(System.String,System.String,System.String@)">
+            <summary>
+            Downloads an existing object in S3 and loads the entire contents into a string.
+            This is only appropriate for very small objects and for testing.
+            </summary>
+        </member>
+        <member name="M:LitS3.S3Service.GetObjectString(System.String,System.String)">
+            <summary>
+            Downloads an existing object in S3 and loads the entire contents into a string.
+            This is only appropriate for very small objects and for testing.
+            </summary>
+        </member>
+        <member name="E:LitS3.S3Service.AddObjectProgress">
+            <summary>
+            Reports progress for any operation that adds an object to a bucket.
+            </summary>
+        </member>
+        <member name="E:LitS3.S3Service.GetObjectProgress">
+            <summary>
+            Reports progress for any operation that gets an object from a bucket.
+            </summary>
+        </member>
+        <member name="E:LitS3.S3Service.BeforeAuthorize">
+            <summary>
+            Fired before an S3Request operating against this service is authorized and sent
+            out to the S3 server. This is a good opportunity to modify every S3Request 
+            created internally by this class, for instance, to set the Proxy server or ServicePoint.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Service.Host">
+            <summary>
+            Gets or sets the hostname of the s3 server, usually "s3.amazonaws.com" unless you
+            are using a 3rd party S3 implementation.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Service.UseSsl">
+            <summary>
+            Gets or sets whether to connect to the server using SSL. The default is true.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Service.UseSubdomains">
+            <summary>
+            Gets or sets whether to prepend the bucket name as a subdomain when accessing a bucket.
+            This is Amazon's preferred method, however the property defaults to false for greater
+            compatibility with existing buckets.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Service.CustomPort">
+            <summary>
+            Gets or sets a custom port to use to connect to the S3 server. The default is zero, which
+            will let this class auto-select the port based on the UseSsl property.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Service.AccessKeyID">
+            <summary>
+            Gets or sets the Amazon Access Key ID to use for authentication purposes.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Service.SecretAccessKey">
+            <summary>
+            Gets or sets the Amazon Secret Access Key to use for authentication purposes.
+            </summary>
+        </member>
+        <member name="P:LitS3.S3Service.DefaultDelimiter">
+            <summary>
+            Gets or sets the default delimiter to use when calling ListObjects(). The default is
+            a forward-slash "/".
+            </summary>
+        </member>
+    </members>
+</doc>
