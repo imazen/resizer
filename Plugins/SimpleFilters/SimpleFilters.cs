@@ -92,13 +92,12 @@ namespace ImageResizer.Plugins.SimpleFilters {
                                   new float[]{0,0,0,0,1}});
         }
         public static ColorMatrix GetBrightnessTransform(float factor) {
-            //http://www.codeproject.com/KB/GDI-plus/CsTranspTutorial2.aspx
             return new ColorMatrix(new float[][]{
-                                  new float[]{factor,0,0,0,0},
-                                  new float[]{0,factor,0,0,0},
-                                  new float[]{0,0,factor,0,0},
+                                  new float[]{1,0,0,0,0},
+                                  new float[]{0,1,0,0,0},
+                                  new float[]{0,0,1,0,0},
                                   new float[]{0,0,0,1,0},
-                                  new float[]{0,0,0,0,1}});
+                                  new float[]{factor,factor,factor,0,1}});
 
         }
 
