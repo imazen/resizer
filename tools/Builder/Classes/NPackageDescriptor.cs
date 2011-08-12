@@ -59,7 +59,9 @@ namespace ImageResizer.ReleaseBuilder.Classes {
             }
         }
         private string _baseName;
-
+        /// <summary>
+        /// The package name
+        /// </summary>
         public string BaseName {
             get { return _baseName; }
             set { _baseName = value; }
