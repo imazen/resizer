@@ -1,0 +1,19 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.WhitespaceTrimmer</id>
+		<version>$version$</version>
+		<authors>Nathanael Jones</authors>
+		<description>Description</description>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		  <dependency id="AForge.Imaging"/>
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="..\dlls\trial\ImageResizer.Plugins.WhitespaceTrimmer.dll" target="lib" />
+		<file src="..\dlls\trial\ImageResizer.Plugins.WhitespaceTrimmer.pdb" target="lib" />
+		<file src="..\dlls\trial\ImageResizer.Plugins.WhitespaceTrimmer.xml" target="lib" />
+		<file src="..\Plugins\WhitespaceTrimmer\**\*.cs" target="src" />
+	</files>
+</package>
