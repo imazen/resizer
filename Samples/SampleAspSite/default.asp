@@ -1,12 +1,26 @@
 <html>
 <body>
 
-<%
-set r = CreateObject("ImageResizer.Plugins.RemoteReader.RemoteReaderPlugin")
-set url = r.CreateSignedUrlWithKey  ("http://www.build.com/imagebase/resized/330x320/minkaaireimages/f518-bn_w_light-.jpg","width=200&height=100", "uy8=89849k87i_uh-dwjgngwty")
+<h1>ASP can resize images!</h1>
 
-response.write("<img src=""" & url & """ />")
+<p>It's easy to use the URL syntax in ASP - it's no different than in html.</p>
+
+&lt;img src="red-leaf.jpg.ashx?width=100" /&gt;
+
+<img src="red-leaf.jpg.ashx?width=100" >
+
+<h2>You can also resize to disk, using the COM API
+
+
+<pre>
+set c = CreateObject("ImageResizer.Configuration.Config");
+c.BuildImage("..\Images\red-leaf.jpg","test-image.jpg","width=100");
+</pre>
+<%
+set c = CreateObject("ImageResizer.Configuration.Config");
+c.BuildImage("..\Images\red-leaf.jpg","test-image.jpg","width=100");
 %>
+<img src="test-image.jpg" />
 
 </body>
 </html>
