@@ -1,0 +1,15 @@
+﻿1) Locate the ProgramFiles\\ImageResizingNet\\v3 folder.
+2) List the Dlls alongside this .exe file, plus non-duplicates in ..\release if the parent folder is named 'trial'.
+
+
+3) Check the registry to see what is installed
+
+3 buttons
+
+Install (available only if nothing is installed)
+
+
+
+
+Uninstall Old (present if there are any .dll or .pdb files in the ImageResizingNet\v3 folder)
+Install New
