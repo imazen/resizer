@@ -12,6 +12,7 @@ using ImageResizer.Configuration.Issues;
 using ImageResizer.Configuration.Xml;
 using System.Web;
 using ImageResizer.Collections;
+using System.IO;
 
 
 namespace ImageResizer.Configuration {
@@ -122,12 +123,22 @@ namespace ImageResizer.Configuration {
         }
 
         /// <summary>
-        /// Shortuct to CurrentImageBuilder.Build (Useful for COM clients)
+        /// Shortuct to CurrentImageBuilder.Build (Useful for COM clients). Also creates a destination folder if needed, unlike the normal .Build() call.
+        /// 
         /// </summary>
         /// <param name="source"></param>
         /// <param name="dest"></param>
         /// <param name="settings"></param>
         public void BuildImage(object source, object dest, string settings) {
+            if (dest is string) {
+                string d = dest as string;
+                //If it's not a virtual path, make sure the directory exists.
+                if (!string.IsNullOrEmpty(d) && !d.StartsWith("~") && !(d.Contains("/")) && d.Contains("\\")) {
+                    d = Path.GetDirectoryName(d);
+                    if (!Directory.Exists(d)) Directory.CreateDirectory(d);
+                }
+
+            }
             CurrentImageBuilder.Build(source, dest, new ResizeSettings(settings));
         }
 
