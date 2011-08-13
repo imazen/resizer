@@ -1,6 +1,6 @@
-JScript, VBScript and COM clients can access the ImageResizer.dll if it is registered.
+JScript, VBScript and COM clients can access the ImageResizer.dll (and plugins!) if they are registered.
 
-1) Run registerdll.bat on the server
+1) Run dlls/release/COMInstaller.exe and click "Install".
 
 2) Create an instance of ImageResizer.Configuration.Config using new ActiveXObject() or CreateObject()
 
