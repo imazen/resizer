@@ -293,7 +293,7 @@ namespace ImageResizer.ReleaseBuilder {
             //Deleate all bin,obj,imageacache,uploads, and results folders under /Samples, /Tests, and /Plugins
             f.DelFiles(q.files("^/Tests/binaries/*.(pdb|xml|dll|txt)$"));
             f.DelFiles(q.files("^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|results)/*",
-                       "^/Core/obj/*"));
+                       "^/Core/obj/*","^/Core.Mvc/obj/*"));
 
 
 
@@ -310,7 +310,7 @@ namespace ImageResizer.ReleaseBuilder {
 
 
         public string[] standardExclusions = new string[]{
-                "/.git","^/Releases","^/Legacy","^/Tools/Builder","^/Samples/Images/*/*","^/Tests/Hidden","/thumbs.db$","/.DS_Store$",".suo$",".user$"
+                "/.git","^/Releases","/Hidden/","^/Legacy","^/Tools/(Builder|BuildTools|docu)","^/Samples/Images/*/*","/thumbs.db$","/.DS_Store$",".suo$",".user$"
             };
 
         public void PrepareForPackaging() {
@@ -342,8 +342,8 @@ namespace ImageResizer.ReleaseBuilder {
         public void PackFull(PackageDescriptor desc) {
             // 'full'
             using (var p = new Package(desc.Path, this.f.ParentPath)) {
-                p.Add(q.files("^/(core|core.mvc|plugins|samples|tests)/"));
-                p.Add(q.files("^/contrib/azure"));
+                p.Add(q.files("^/(core|contrib|core.mvc|plugins|samples|tests)/"));
+                p.Add(q.files("^/tools/COMInstaller"));
                 p.Add(q.files("^/dlls/(release|debug)"));
                 p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"), "/"); //Make a copy in the root
                 
@@ -351,7 +351,8 @@ namespace ImageResizer.ReleaseBuilder {
                 p.Add(q.files("^/Web.config$"));
 
                 //Make a empty sample app for IIS
-                p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb)$"), "/Samples/BasicIISSite/bin/"); 
+                p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb)$"), "/Samples/BasicIISSite/bin/");
+                p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb)$"), "/Samples/SampleAspSite/bin/"); 
                 p.Add(q.files("^/Web.config$"),"/Samples/BasicIISSite/");
             }
         }
