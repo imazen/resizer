@@ -3,14 +3,17 @@
   <testPackage shadowCopy="false" debug="false">
     <files>
       <file>binaries\debug\ImageResizer.Core.Tests.dll</file>
+      <file>binaries\debug\ImageResizer.AllPlugins.Tests.dll</file>
     </files>
-    <hintDirectories />
+    <hintDirectories>
+      <hintDirectory>..\dlls\debug</hintDirectory>
+    </hintDirectories>
     <excludedFrameworkIds />
     <properties />
   </testPackage>
   <testFilters>
-    <testFilter filterName="AutoSave" filterExpr="(Id: c88aed72114cf339 or (Id: dbf604e7f19231df or Id: f19a27b55143a7ec))" />
-    <testFilter filterName="LastRun" filterExpr="(Id: c88aed72114cf339 or (Id: dbf604e7f19231df or Id: f19a27b55143a7ec))" />
+    <testFilter filterName="AutoSave" filterExpr="" />
+    <testFilter filterName="LastRun" filterExpr="" />
   </testFilters>
   <extensionSpecifications />
   <reportDirectory>..\..\..\AppData\Roaming\Gallio\Icarus\Reports</reportDirectory>

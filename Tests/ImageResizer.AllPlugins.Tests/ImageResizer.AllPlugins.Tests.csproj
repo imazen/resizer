@@ -22,7 +22,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\binaries\debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -30,7 +30,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\binaries\release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -56,6 +56,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestAll.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestWatermark.cs" />
   </ItemGroup>
@@ -119,6 +120,10 @@
     <ProjectReference Include="..\..\Plugins\Watermark\ImageResizer.Plugins.Watermark.csproj">
       <Project>{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}</Project>
       <Name>ImageResizer.Plugins.Watermark</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\WhitespaceTrimmer\ImageResizer.Plugins.WhitespaceTrimmer.csproj">
+      <Project>{167B88AF-E3EE-4005-A266-F4D712B3BC62}</Project>
+      <Name>ImageResizer.Plugins.WhitespaceTrimmer</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

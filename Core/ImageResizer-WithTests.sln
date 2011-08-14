@@ -65,6 +65,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.HttpTests", ".
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Mvc", "..\Core.Mvc\ImageResizer.Mvc.csproj", "{4181B9C4-1EAF-4070-8571-2EE25475547E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.WhitespaceTrimmer", "..\Plugins\WhitespaceTrimmer\ImageResizer.Plugins.WhitespaceTrimmer.csproj", "{167B88AF-E3EE-4005-A266-F4D712B3BC62}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -627,6 +629,21 @@ Global
 		{4181B9C4-1EAF-4070-8571-2EE25475547E}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{4181B9C4-1EAF-4070-8571-2EE25475547E}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{4181B9C4-1EAF-4070-8571-2EE25475547E}.Trial|x86.ActiveCfg = Release|Any CPU
+		{167B88AF-E3EE-4005-A266-F4D712B3BC62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{167B88AF-E3EE-4005-A266-F4D712B3BC62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{167B88AF-E3EE-4005-A266-F4D712B3BC62}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{167B88AF-E3EE-4005-A266-F4D712B3BC62}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{167B88AF-E3EE-4005-A266-F4D712B3BC62}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{167B88AF-E3EE-4005-A266-F4D712B3BC62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{167B88AF-E3EE-4005-A266-F4D712B3BC62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{167B88AF-E3EE-4005-A266-F4D712B3BC62}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{167B88AF-E3EE-4005-A266-F4D712B3BC62}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{167B88AF-E3EE-4005-A266-F4D712B3BC62}.Release|x86.ActiveCfg = Release|Any CPU
+		{167B88AF-E3EE-4005-A266-F4D712B3BC62}.Trial|Any CPU.ActiveCfg = Trial|Any CPU
+		{167B88AF-E3EE-4005-A266-F4D712B3BC62}.Trial|Any CPU.Build.0 = Trial|Any CPU
+		{167B88AF-E3EE-4005-A266-F4D712B3BC62}.Trial|Mixed Platforms.ActiveCfg = Trial|Any CPU
+		{167B88AF-E3EE-4005-A266-F4D712B3BC62}.Trial|Mixed Platforms.Build.0 = Trial|Any CPU
+		{167B88AF-E3EE-4005-A266-F4D712B3BC62}.Trial|x86.ActiveCfg = Trial|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
