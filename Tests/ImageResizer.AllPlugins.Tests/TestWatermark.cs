@@ -9,7 +9,7 @@ using ImageResizer.Plugins.Basic;
 
 namespace ImageResizer.Plugins.Watermark.Tests {
     [TestFixture]
-    public class TestParallel {
+    public class TestWatermark {
         [Test]
         public void Test() {
             //
