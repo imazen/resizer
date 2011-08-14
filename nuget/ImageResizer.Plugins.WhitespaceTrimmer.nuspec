@@ -11,7 +11,7 @@
 		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 <description>Automatically trims off whitespace from product images, leaving only a specified margin around the object. Uses sobel energy analysis and adjustable thresholding for great accuracy. 
-URL commands: &trim.threshold=80, &trim.percentpadding=1
+URL commands: &amp;trim.threshold=80, &amp;trim.percentpadding=1
 
 Visit http://imageresizing.net for details, documenation, and free support. 
 E-mail support@imageresizing.net if you encounter any problems with the software. 
