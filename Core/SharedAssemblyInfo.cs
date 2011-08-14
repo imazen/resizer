@@ -9,7 +9,7 @@ using ImageResizer.Util;
 // associated with an assembly.
 
 #if TRIAL
-[assebly: BuildType("trial")]
+[assembly: BuildType("trial")]
 [assembly: AssemblyProduct("Image Resizer Plugin - Trial Version")]
 #else
 [assembly: AssemblyProduct("Image Resizer")]
