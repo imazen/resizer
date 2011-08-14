@@ -35,7 +35,11 @@ namespace ImageResizer.Plugins.Basic {
         /// <param name="context"></param>
         /// <param name="e"></param>
         public void Process(System.Web.HttpContext context, IResponseArgs e) {
-            context.RemapHandler(new NoCacheHandler(e));
+            try {
+                context.RemapHandler(new NoCacheHandler(e));
+            } catch (MissingMethodException) { //For pre-.net 2.0SP2 support
+                context.Handler = new NoCacheHandler(e);
+            }
         }
 
 

@@ -49,7 +49,12 @@ namespace ImageResizer.Plugins.Basic {
                 //Communicate to the MVC plugin this request should not be affected by the UrlRoutingModule.
                 context.Items[c.Pipeline.StopRoutingKey] = true;
                 //Provide the request handler
-                context.RemapHandler(AllowResponse(context) ? (IHttpHandler)new DiagnosticPageHandler(c) : (IHttpHandler)new DiagnosticDisabledHandler(c));
+                IHttpHandler handler =AllowResponse(context) ? (IHttpHandler)new DiagnosticPageHandler(c) : (IHttpHandler)new DiagnosticDisabledHandler(c);
+                try {
+                    context.RemapHandler(handler);
+                } catch (MissingMethodException) { //For pre-.net 2.0SP2 support
+                    context.Handler = handler; 
+                }
             } 
         }
 
