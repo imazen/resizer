@@ -61,7 +61,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Remote
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.SeamCarving", "..\Plugins\SeamCarving\ImageResizer.Plugins.SeamCarving.csproj", "{7AEFB877-A720-4929-880C-1090A71C83EB}"
 EndProject
-Project("{00000000-0000-0000-0000-000000000000}") = "ImageResizer.HttpTests", "..\Tests\ImageResizer.HttpTests\ImageResizer.HttpTests.csproj", "{6F830EA6-ACA6-456C-AA68-6D9ACCCC6647}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.AllPlugins.Tests", "..\Tests\ImageResizer.AllPlugins.Tests\ImageResizer.AllPlugins.Tests.csproj", "{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.HttpTests", "..\Tests\ImageResizer.HttpTests\ImageResizer.HttpTests.csproj", "{6F830EA6-ACA6-456C-AA68-6D9ACCCC6647}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -598,6 +600,21 @@ Global
 		{7AEFB877-A720-4929-880C-1090A71C83EB}.Trial|Mixed Platforms.ActiveCfg = Trial|Any CPU
 		{7AEFB877-A720-4929-880C-1090A71C83EB}.Trial|Mixed Platforms.Build.0 = Trial|Any CPU
 		{7AEFB877-A720-4929-880C-1090A71C83EB}.Trial|x86.ActiveCfg = Trial|Any CPU
+		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Release|x86.ActiveCfg = Release|Any CPU
+		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Trial|x86.ActiveCfg = Release|Any CPU
 		{6F830EA6-ACA6-456C-AA68-6D9ACCCC6647}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6F830EA6-ACA6-456C-AA68-6D9ACCCC6647}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F830EA6-ACA6-456C-AA68-6D9ACCCC6647}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
