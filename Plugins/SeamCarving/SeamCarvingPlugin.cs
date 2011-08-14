@@ -90,6 +90,7 @@ namespace ImageResizer.Plugins.SeamCarving {
 
 
                 using (Bitmap carved = new Bitmap(outputTempFile)) {
+                    carved.MakeTransparent();
                     s.copyAttibutes.SetWrapMode(WrapMode.TileFlipXY);
                     s.destGraphics.DrawImage(carved, PolygonMath.getParallelogram(s.layout["image"]), new RectangleF(0, 0, carved.Width, carved.Height), GraphicsUnit.Pixel, s.copyAttibutes);
                 }
