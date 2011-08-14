@@ -4,9 +4,10 @@ ImageResizer.dll is always required. It includes all Basic plugins except Captio
 
 Each plugin has a identically named DLL that is obviously needed.
 
-The PsdReader plugin also requires PsdFile.dll and FOurCC.txt
+The PsdReader plugin also requires PsdFile.dll
 The S3Reader plugin also requires LitS3.dll
-The AdvancedFilters plugin requires all AForge* dlls
+The AdvancedFilters and WhitespaceTrimmer plugins require all AForge dlls
+The BatchTrimmer plugin requires Ionic.Zip.Reduced.dll
 
 It is suggested that you also copy the matching pdb files as well, as this will greatly assist debugging.
 
