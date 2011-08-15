@@ -678,7 +678,7 @@ namespace ImageResizer
             //Draw border
             if (s.settings.Border.IsEmpty) return RequestedAction.None;
 
-            if (s.settings.Border.All == -1) throw new NotImplementedException("Separate border widths have not yet been implemented");
+            if (s.settings.Border.All == double.NaN) throw new NotImplementedException("Separate border widths have not yet been implemented");
 
             Pen p = new Pen(s.settings.BorderColor, (float)s.settings.Border.All);
             p.Alignment = System.Drawing.Drawing2D.PenAlignment.Center; //PenAlignment.Center is the only supported mode.
