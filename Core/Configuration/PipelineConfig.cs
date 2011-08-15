@@ -227,7 +227,6 @@ namespace ImageResizer.Configuration {
 
 
         public string SkipFileTypeCheckKey { get { return "resizer.skipFileTypeCheck"; } }
-        private bool skipFileTypeCheck = false;
         /// <summary>
         /// Get or sets whether the file extension check should be applied to the current request. Defaults to true.
         /// If set to true, will only affect the current request, and will only cause the Resizer to evaluate the rewriting rules on the request.
