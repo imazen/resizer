@@ -4,14 +4,14 @@
 		<id>ImageResizer.Samples.Jcrop</id>
 		<title>ImageResizer.Samples.Jcrop</title>
 		<version>$version$</version>
-		<authors>Nathanael Jones</authors>
-		<owners>Nathanael Jones</owners>
+		<authors>$author$</authors>
+		<owners>$author$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/freedom</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
-		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
+		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>Cropping and resizing made simple with this easy, packaged demo. Install into any Web Application. Visit http://imageresizing.net for details, documenation, and support.</description>
-		<tags>Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing </tags>
+		<tags>$tags$</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		  <dependency id="ImageResizer.WebConfig"/>

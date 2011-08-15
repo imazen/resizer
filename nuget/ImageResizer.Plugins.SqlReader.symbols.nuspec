@@ -3,16 +3,16 @@
 	<metadata>
 		<id>ImageResizer.Plugins.SqlReader</id>
 		<version>$version$</version>
-		<authors>Nathanael Jones</authors>
+		<authors>$author$</authors>
 		<description>Description</description>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="..\dlls\trial\ImageResizer.Plugins.SqlReader.dll" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.SqlReader.pdb" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.SqlReader.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.SqlReader.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.SqlReader.pdb" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.SqlReader.xml" target="lib" />
 		<file src="..\Plugins\SqlReader\**\*.cs" target="src" />
 	</files>
 </package>

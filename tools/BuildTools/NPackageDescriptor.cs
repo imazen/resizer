@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Collections.Specialized;
 
 namespace BuildTools {
     public class NPackageDescriptor {
 
         public NPackageDescriptor() {
+            VariableSubstitutions = new NameValueCollection();
         }
 
         private string _specPath;
@@ -24,6 +26,9 @@ namespace BuildTools {
             get { return version; }
             set { version = value; }
         }
+
+
+        public NameValueCollection VariableSubstitutions { get; set; }
 
         private string _symbolSpecPath;
 

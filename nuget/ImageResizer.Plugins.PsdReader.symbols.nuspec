@@ -3,18 +3,18 @@
 	<metadata>
 		<id>ImageResizer.Plugins.PsdReader</id>
 		<version>$version$</version>
-		<authors>Nathanael Jones</authors>
+		<authors>$author$</authors>
 		<description>Description</description>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="..\dlls\trial\ImageResizer.Plugins.PsdReader.dll" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.PsdReader.pdb" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.PsdReader.xml" target="lib" />
-		<file src="..\dlls\trial\PsdFile.dll" target="lib" />
-		<file src="..\dlls\trial\PsdFile.pdb" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdReader.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdReader.pdb" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdReader.xml" target="lib" />
+		<file src="$pluginsdlldir$\PsdFile.dll" target="lib" />
+		<file src="$pluginsdlldir$\PsdFile.pdb" target="lib" />
 		<file src="..\Plugins\PsdReader\**\*.cs" target="src\PsdReader" />
 		<file src="..\Plugins\PsdLibs\PsdPlugin\PsdFile\**\*.cs" target="src\PsdFile" />
 	</files>

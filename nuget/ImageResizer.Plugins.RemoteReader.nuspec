@@ -4,11 +4,11 @@
 		<id>ImageResizer.Plugins.RemoteReader</id>
 		<title>ImageResizer.Plugins.RemoteReader - Resize and process images located on other servers or websites</title>
 		<version>$version$</version>
-		<authors>Nathanael Jones</authors>
-		<owners>Nathanael Jones</owners>
+		<authors>$author$</authors>
+		<owners>$author$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
-		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
+		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 <description>The RemoteReader plugin allows the ImageResizer to resize and display images that are located at arbitrary URLs. Kind of like a resizing relay.
 
@@ -22,14 +22,14 @@ Please note, you must configure the &lt;remotereader signingKey="to a long and s
 Visit http://imageresizing.net for details, documenation, and free support. 
 E-mail support@imageresizing.net if you encounter any problems with the software. 
 The documentation for this plugin resides at http://imageresizing.net/plugins/remotereader</description>
-		<tags>Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing disk caching gif png octree quanitization animated gifs dithering psd photoshop psdreader</tags>
+		<tags>$tags$</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="..\dlls\trial\ImageResizer.Plugins.RemoteReader.dll" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.RemoteReader.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.RemoteReader.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.RemoteReader.xml" target="lib" />
 		<file src="..\Plugins\RemoteReader\Web.config.transform" target="content" />
 	</files>
 </package>

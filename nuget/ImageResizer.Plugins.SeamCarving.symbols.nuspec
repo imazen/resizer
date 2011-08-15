@@ -3,16 +3,16 @@
 	<metadata>
 		<id>ImageResizer.Plugins.SeamCarving</id>
 		<version>$version$</version>
-		<authors>Nathanael Jones</authors>
+		<authors>$author$</authors>
 		<description>Description</description>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="..\dlls\trial\ImageResizer.Plugins.SeamCarving.dll" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.SeamCarving.pdb" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.SeamCarving.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.SeamCarving.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.SeamCarving.pdb" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.SeamCarving.xml" target="lib" />
 		<file src="..\Plugins\SeamCarving\**\*.cs" target="src" />
 	</files>
 </package>

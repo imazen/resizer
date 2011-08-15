@@ -4,11 +4,11 @@
 		<id>ImageResizer.Plugins.DiskCache</id>
 		<title>ImageResizer.Plugins.DiskCache</title>
 		<version>$version$</version>
-		<authors>Nathanael Jones</authors>
-		<owners>Nathanael Jones</owners>
+		<authors>$author$</authors>
+		<owners>$author$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
-		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
+		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 <description>Adds disk caching to the ImageResizer core. Fast, multithreaded, and self-managing. 
 Drastically increases scalability and performance. Writing processed images to disk permits images to be served as static files by IIS, eliminating the typical RAM and CPU overhead assocatied with real-time image processing.
@@ -16,14 +16,14 @@ Drastically increases scalability and performance. Writing processed images to d
 Visit http://imageresizing.net for details, documenation, and free support. 
 E-mail support@imageresizing.net if you encounter any problems with the software. 
 The documentation for this plugin resides at http://imageresizing.net/plugins/diskcache</description>
-		<tags>Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing disk caching</tags>
+		<tags>$tags$</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="..\dlls\trial\ImageResizer.Plugins.DiskCache.dll" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.DiskCache.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.DiskCache.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.DiskCache.xml" target="lib" />
 		<file src="..\Plugins\DiskCache\Web.config.transform" target="content" />
 	</files>
 </package>

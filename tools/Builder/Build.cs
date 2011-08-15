@@ -6,6 +6,7 @@ using System.IO;
 using BuildTools;
 using LitS3;
 using System.Net;
+using System.Collections.Specialized;
 
 namespace ImageResizer.ReleaseBuilder {
     public class Build :Interaction {
@@ -27,7 +28,7 @@ namespace ImageResizer.ReleaseBuilder {
             s3.AccessKeyID = "***REMOVED***";
             s3.SecretAccessKey = "***REMOVED***";
             
-
+            //TODO: nuget and s3 API key need to go.
 
 
             packages.Add(new PackageDescriptor("min", PackMin));
@@ -38,6 +39,16 @@ namespace ImageResizer.ReleaseBuilder {
 
         public string getReleasePath(string packageBase, string ver,  string kind) {
             return Path.Combine(Path.Combine(f.ParentPath, "Releases"), packageBase + ver.Trim('-') + '-' + kind + "-" + DateTime.UtcNow.ToString("MMM-d-yyyy") + ".zip");
+        }
+
+        public NameValueCollection GetNugetVariables() {
+            var nvc = new NameValueCollection();
+            nvc["author"] = "Nathanael Jones";
+            nvc["pluginsdlldir"] = @"..\dlls\trial";
+            nvc["coredlldir"] = @"..\dlls\release";
+            nvc["iconurl"] = "http://imageresizing.net/images/logos/ImageIconPSD100.png";
+            nvc["tags"] = "Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing disk caching gif png octree quanitization animated gifs dithering";
+            return nvc;
         }
 
         List<PackageDescriptor> packages = new List<PackageDescriptor>();
@@ -109,7 +120,10 @@ namespace ImageResizer.ReleaseBuilder {
                 say("(c (create and overwrite), u (upload to nuget.org)");
                 foreach (NPackageDescriptor desc in npackages) {
 
+                    desc.VariableSubstitutions = GetNugetVariables();
+                    desc.VariableSubstitutions["version"] = nugetVer;
                     desc.Version = nugetVer;
+
                     desc.OutputDirectory = Path.Combine(Path.Combine(f.ParentPath, "Releases", "nuget-packages"));
                     string opts = "";
 
