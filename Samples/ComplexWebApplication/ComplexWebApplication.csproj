@@ -109,73 +109,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="404Test.aspx" />
-    <Content Include="BatchResizeAndZip.aspx" />
-    <Content Include="CloudFront.aspx" />
-    <Content Include="ContentAwareResizing.htm" />
-    <Content Include="CropExample.aspx" />
-    <Content Include="css\Jcrop.gif" />
-    <Content Include="css\jquery.Jcrop.css" />
+    <Content Include="css\demo.css" />
+    <Content Include="css\state.gif" />
+    <Content Include="Misc\BatchResizeAndZip.aspx" />
     <Content Include="Default.aspx" />
-    <Content Include="Dithering.aspx" />
-    <Content Include="FriendlyUrlsTest.aspx" />
     <Content Include="Global.asax" />
-    <Content Include="GradientTest.aspx" />
-    <Content Include="js\jquery.Jcrop.js" />
-    <Content Include="js\jquery.Jcrop.min.js" />
     <Content Include="js\jquery.min.js" />
-    <Content Include="Protected\rose-leaf.jpg" />
-    <Content Include="RegressionTests.aspx" />
-    <Content Include="RemoteSiteTest.aspx" />
-    <Content Include="ResizeInPlaceTest.aspx" />
-    <Content Include="SamplePluginTest.aspx" />
-    <Content Include="TestLimits.aspx" />
+    <Content Include="Plugins.htm" />
+    <Content Include="Misc\Protected\rose-leaf.jpg" />
+    <Content Include="Misc\RegressionTests.aspx" />
     <Content Include="UploadSample.aspx" />
-    <Content Include="Watermarks.aspx" />
-    <Content Include="watermarks\Sun_256.png" />
+    <Content Include="watermarks\Sun_64.png" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="WhitespaceTrimmerTest.aspx" />
+    <Content Include="Misc\WhitespaceTrimmerTest.aspx" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="404Test.aspx.cs">
-      <DependentUpon>404Test.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="404Test.aspx.designer.cs">
-      <DependentUpon>404Test.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="BatchResizeAndZip.aspx.cs">
+    <Compile Include="Misc\BatchResizeAndZip.aspx.cs">
       <DependentUpon>BatchResizeAndZip.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="BatchResizeAndZip.aspx.designer.cs">
+    <Compile Include="Misc\BatchResizeAndZip.aspx.designer.cs">
       <DependentUpon>BatchResizeAndZip.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="CloudFront.aspx.cs">
-      <DependentUpon>CloudFront.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="CloudFront.aspx.designer.cs">
-      <DependentUpon>CloudFront.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="RemoteSiteTest.aspx.cs">
-      <DependentUpon>RemoteSiteTest.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="RemoteSiteTest.aspx.designer.cs">
-      <DependentUpon>RemoteSiteTest.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="TestAnimatedGif.ashx.cs">
-      <DependentUpon>TestAnimatedGif.ashx</DependentUpon>
-    </Compile>
-    <Compile Include="CropExample.aspx.cs">
-      <DependentUpon>CropExample.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="CropExample.aspx.designer.cs">
-      <DependentUpon>CropExample.aspx</DependentUpon>
     </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
@@ -184,63 +140,21 @@
     <Compile Include="Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Dithering.aspx.cs">
-      <DependentUpon>Dithering.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Dithering.aspx.designer.cs">
-      <DependentUpon>Dithering.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="FriendlyUrlsTest.aspx.cs">
-      <DependentUpon>FriendlyUrlsTest.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="FriendlyUrlsTest.aspx.designer.cs">
-      <DependentUpon>FriendlyUrlsTest.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="GradientTest.aspx.cs">
-      <DependentUpon>GradientTest.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="GradientTest.aspx.designer.cs">
-      <DependentUpon>GradientTest.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="HandlerTest.ashx.cs">
+    <Compile Include="Misc\HandlerTest.ashx.cs">
       <DependentUpon>HandlerTest.ashx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RegressionTests.aspx.cs">
+    <Compile Include="Misc\RegressionTests.aspx.cs">
       <DependentUpon>RegressionTests.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="RegressionTests.aspx.designer.cs">
+    <Compile Include="Misc\RegressionTests.aspx.designer.cs">
       <DependentUpon>RegressionTests.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="ResizeInPlaceTest.aspx.cs">
-      <DependentUpon>ResizeInPlaceTest.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="ResizeInPlaceTest.aspx.designer.cs">
-      <DependentUpon>ResizeInPlaceTest.aspx</DependentUpon>
     </Compile>
     <Compile Include="SamplePlugin.cs" />
-    <Compile Include="SamplePluginTest.aspx.cs">
-      <DependentUpon>SamplePluginTest.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="SamplePluginTest.aspx.designer.cs">
-      <DependentUpon>SamplePluginTest.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="TestLimits.aspx.cs">
-      <DependentUpon>TestLimits.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="TestLimits.aspx.designer.cs">
-      <DependentUpon>TestLimits.aspx</DependentUpon>
-    </Compile>
     <Compile Include="UploadSample.aspx.cs">
       <DependentUpon>UploadSample.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -248,29 +162,19 @@
     <Compile Include="UploadSample.aspx.designer.cs">
       <DependentUpon>UploadSample.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Watermarks.aspx.cs">
-      <DependentUpon>Watermarks.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Watermarks.aspx.designer.cs">
-      <DependentUpon>Watermarks.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="WhitespaceTrimmerTest.aspx.cs">
+    <Compile Include="Misc\WhitespaceTrimmerTest.aspx.cs">
       <DependentUpon>WhitespaceTrimmerTest.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WhitespaceTrimmerTest.aspx.designer.cs">
+    <Compile Include="Misc\WhitespaceTrimmerTest.aspx.designer.cs">
       <DependentUpon>WhitespaceTrimmerTest.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="HandlerTest.ashx" />
+    <Content Include="Misc\HandlerTest.ashx" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Protected\Web.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="TestAnimatedGif.ashx" />
+    <Content Include="Misc\Protected\Web.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

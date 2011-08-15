@@ -9,7 +9,11 @@
 <body>
     <form id="form1" runat="server">
     <div>
-    
+        <div>
+    <a id="A1" href="Default.aspx" runat="server"> Core examples </a> &nbsp;&nbsp;
+    <a id="A2"  href="Plugins.htm" runat="server"> Plugin Tests </a> &nbsp;&nbsp;
+    <a id="A3"  href="Misc/RegressionTests.aspx" runat="server"> Regression Tests </a> &nbsp;&nbsp;
+    <a id="A4" href="UploadSample.aspx" runat="server"> Upload example </a> </div>
         <asp:FileUpload ID="fileUpload" runat="server" />
         
         <asp:Button ID="btnUpload" runat="server" Text="Upload, crop and resize!" />

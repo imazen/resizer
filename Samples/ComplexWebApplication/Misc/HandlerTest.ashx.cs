@@ -23,7 +23,7 @@ namespace SampleProject
              * Disk cache resizing results
              * Should be implemented as an HttpModule, not an IHttpHandler, and let the static file handler serve the resulting image from disk.
              * Implementing a HTTP handler that supports range requests, 401, 200, etc, is very complicated.
-             * Read "Image Resizing Pitfalls" on nathanaeljones.com for more reasons why a handler is not scalable as a solution (such as memory saturation)
+             * Read "Image Resizing Pitfalls" on nathanaeljones.com for more reasons why a handler is not a good solution (such as memory saturation)
              */
             ResizeSettings settings =  new ResizeSettings("?maxwidth=80&maxheight=80&format=png");
 
