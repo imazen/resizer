@@ -1,4 +1,6 @@
-﻿In V3.1:
+﻿See if we should use .Handler instead of .RemapHanlder(), since the latter is only present in .net 2.0 SP something.
+
+In V3.1:
 
 
 * Add support for autocropping and cropping separately

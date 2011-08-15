@@ -3,6 +3,9 @@
 
 Verify all Build overloads handle streams appropriately with unit tests. We don't want any regressions.
 
+InterceptModule in VppUsageMode.Fallback will serve a physical gradient.png file instead of the virtual gradient.png file. 
+ImageBuilder.Current.Build() will do the opposite...
+
 PathUtils
 
 ResponseHeaders.DefaultApplyToResponseMethod
