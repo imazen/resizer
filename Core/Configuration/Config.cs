@@ -96,7 +96,9 @@ namespace ImageResizer.Configuration {
         }
 
         #region ImageBuilder singleton code .CurrentImageBuilder .UpgradeImageBuilder .InvalidateImageBuilder
+        [CLSCompliant(false)]
         protected volatile ImageBuilder _imageBuilder = null;
+        [CLSCompliant(false)]
         protected volatile object _imageBuilderSync = new object();
         /// <summary>
         /// Allows subclasses to be used instead of ImageBuilder. Replacements must override the Create method and call their own constructor instead.
