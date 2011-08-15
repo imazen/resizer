@@ -149,6 +149,15 @@ namespace ImageResizer.Tests {
         }
 
         [Test]
+        public void ResizeInPlace() {
+            GetBitmap(100, 100).Save("test-image.png", ImageFormat.Png);
+            ImageBuilder.Current.Build("test-image.png", "test-image.png", new ResizeSettings("width=20"));
+            File.Delete("test-image.png");
+
+
+        }
+
+        [Test]
         public void TestSourceBitmapDisposed([Column(true, false)] bool dispose,
                                             [Column(true, false)] bool useDestinationStream,
                                             [Column(true, false)] bool useCorruptedSource,
