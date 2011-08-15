@@ -366,7 +366,8 @@ namespace ImageResizer.ReleaseBuilder {
 
                 //Make a empty sample app for IIS
                 p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb)$"), "/Samples/BasicIISSite/bin/");
-                p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb)$"), "/Samples/SampleAspSite/bin/"); 
+                p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb)$"), "/Samples/SampleAspSite/bin/");
+                p.Add(q.files("^/dlls/release/ImageResizer.Plugins.RemoteReader.(dll|pdb)$"), "/Samples/SampleAspSite/bin/"); 
                 p.Add(q.files("^/Web.config$"),"/Samples/BasicIISSite/");
             }
         }
