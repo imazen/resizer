@@ -34,10 +34,10 @@
     <DocumentationFile>..\..\dlls\release\ImageResizer.Plugins.WhitespaceTrimmer.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Trial|AnyCPU'">
-    <OutputPath>bin\Trial\</OutputPath>
+    <OutputPath>..\..\dlls\trial\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>..\..\dlls\release\ImageResizer.Plugins.WhitespaceTrimmer.XML</DocumentationFile>
+    <DocumentationFile>..\..\dlls\trial\ImageResizer.Plugins.WhitespaceTrimmer.XML</DocumentationFile>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
