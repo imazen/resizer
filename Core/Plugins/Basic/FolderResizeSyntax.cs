@@ -5,9 +5,9 @@ using System.Text.RegularExpressions;
 using System.Collections.Specialized;
 
 namespace ImageResizer.Plugins.Basic {
-    public class FolderResizeSyntaxPlugin : IPlugin {
+    public class FolderResizeSyntax : IPlugin {
 
-        public FolderResizeSyntaxPlugin() {
+        public FolderResizeSyntax() {
         }
 
         public IPlugin Install(Configuration.Config c) {
