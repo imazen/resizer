@@ -4,19 +4,19 @@
 		<id>ImageResizer</id>
 		<title>ImageResizer</title>
 		<version>$version$</version>
-		<authors>Nathanael Jones</authors>
-		<owners>Nathanael Jones</owners>
+		<authors>$author$</authors>
+		<owners>$author$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/freedom</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
-		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
+		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<summary>Lightweight HttpModule (and/or) API for server-side image processing.</summary>
 		<description>Lightweight HttpModule and API for server-side image resizing and processing. Works with .NET 2, 3 and 4. Use ether the URL API (image.jpg?width=100&amp;height=100) or the Managed API (ImageBuilder.Current.Build(source,dest,settings)).
 		Supports resizing, cropping, rotating, flipping, watermarking, converting images via the REST API. |||| Go to http://imageresizing.net for details, documenation, and support.</description>
-		<tags>Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing </tags>
+		<tags>$tags$</tags>
 	</metadata>
   	<files>
-		<file src="..\dlls\release\ImageResizer.dll" target="lib" />
-		<file src="..\dlls\release\ImageResizer.xml" target="lib" />
+		<file src="$coredlldir$\ImageResizer.dll" target="lib" />
+		<file src="$coredlldir$\ImageResizer.xml" target="lib" />
 	</files>
 </package>

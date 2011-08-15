@@ -3,7 +3,7 @@
 	<metadata>
 		<id>ImageResizer.Mvc</id>
 		<version>$version$</version>
-		<authors>Nathanael Jones</authors>
+		<authors>$author$</authors>
 		<description>Description</description>
 		<dependencies>
 		  <dependency id="ImageResizer"/>

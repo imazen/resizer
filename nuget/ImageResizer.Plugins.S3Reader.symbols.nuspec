@@ -3,7 +3,7 @@
 	<metadata>
 		<id>ImageResizer.Plugins.S3Reader</id>
 		<version>$version$</version>
-		<authors>Nathanael Jones</authors>
+		<authors>$author$</authors>
 		<description>Description</description>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
@@ -11,9 +11,9 @@
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="..\dlls\trial\ImageResizer.Plugins.S3Reader.dll" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.S3Reader.pdb" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.S3Reader.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.S3Reader.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.S3Reader.pdb" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.S3Reader.xml" target="lib" />
 		<file src="..\Plugins\S3Reader\**\*.cs" target="src" />
 	</files>
 </package>

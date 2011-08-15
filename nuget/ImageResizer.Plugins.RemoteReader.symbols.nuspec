@@ -3,16 +3,16 @@
 	<metadata>
 		<id>ImageResizer.Plugins.RemoteReader</id>
 		<version>$version$</version>
-		<authors>Nathanael Jones</authors>
+		<authors>$author$</authors>
 		<description>Description</description>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="..\dlls\trial\ImageResizer.Plugins.RemoteReader.dll" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.RemoteReader.pdb" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.RemoteReader.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.RemoteReader.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.RemoteReader.pdb" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.RemoteReader.xml" target="lib" />
 		<file src="..\Plugins\RemoteReader\**\*.cs" target="src" />
 	</files>
 </package>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using System.Collections.Specialized;
 
 namespace BuildTools {
     public class NugetManager {
@@ -22,12 +23,12 @@ namespace BuildTools {
             //11 - Pack and upload nuget packages
             //Pack symbols first, then rename them.
             if (desc.SymbolSpecPath != null) {
-                pack(desc, desc.SymbolSpecPath, desc.Version);
+                pack(desc, desc.SymbolSpecPath, desc.VariableSubstitutions);
                 //nuget.exe has a bug - the symbol package is build using the Name.nupkg instead of Name.symbols.nupkg format.
                 //So we copy it, then overwrite it with the main package.
                 if (File.Exists(desc.PackagePath)) File.Copy(desc.PackagePath, desc.SymbolPackagePath, true);
             }
-            if (desc.SpecPath != null) pack(desc,desc.SpecPath, desc.Version);
+            if (desc.SpecPath != null) pack(desc,desc.SpecPath, desc.VariableSubstitutions);
            
         }
 
@@ -37,14 +38,20 @@ namespace BuildTools {
             //if (desc.SymbolSpecPath != null)exec("push \"" + desc.SymbolPackagePath + "\"");
         }
 
-        public void pack(NPackageDescriptor desc, string spec, string version) {
+        public void pack(NPackageDescriptor desc, string spec, NameValueCollection variables) {
             string oldText = File.ReadAllText(spec);
-            string newText = oldText.Replace("$version$", version);
+            string newText = oldText;
+            foreach (string key in variables.Keys) {
+                newText = newText.Replace("$" + key + "$", variables[key]);
+            }
+            DateTime lastMod = File.GetLastWriteTimeUtc(spec);//Grab modified date
             File.WriteAllText(spec, newText, Encoding.UTF8); //Set version value
-            string arguments = "pack " + Path.GetFileName(spec) + " -Version " + version;
+            
+            string arguments = "pack " + Path.GetFileName(spec) + " -Version " + desc.Version;
             arguments += " -OutputDirectory " + desc.OutputDirectory;
             exec(arguments);
             File.WriteAllText(spec, oldText, Encoding.UTF8); //restore file
+            File.SetLastWriteTimeUtc(spec, lastMod);//Restore modified date
         }
 
         public void exec(string command) {

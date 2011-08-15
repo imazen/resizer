@@ -3,7 +3,7 @@
 	<metadata>
 		<id>ImageResizer.Plugins.BatchZipper</id>
 		<version>$version$</version>
-		<authors>Nathanael Jones</authors>
+		<authors>$author$</authors>
 		<description>Description</description>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
@@ -12,9 +12,9 @@
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="..\dlls\trial\ImageResizer.Plugins.BatchZipper.dll" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.BatchZipper.pdb" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.BatchZipper.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.BatchZipper.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.BatchZipper.pdb" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.BatchZipper.xml" target="lib" />
 		<file src="..\Plugins\BatchZipper\**\*.cs" target="src" />
 	</files>
 </package>

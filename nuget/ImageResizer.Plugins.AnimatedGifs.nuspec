@@ -4,25 +4,25 @@
 		<id>ImageResizer.Plugins.AnimatedGifs</id>
 		<title>ImageResizer.Plugins.AnimatedGifs - Resize and process animated GIFs</title>
 		<version>$version$</version>
-		<authors>Nathanael Jones</authors>
-		<owners>Nathanael Jones</owners>
+		<authors>$author$</authors>
+		<owners>$author$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
-		<iconUrl>http://imageresizing.net/images/logos/ImageIconPSD100.png</iconUrl>
+		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 <description>Replaces the .NET GIF encoding for animated gifs so that the animation can be preserved through the resizing and processing of all the frames.
 
 Visit http://imageresizing.net for details, documenation, and free support. 
 E-mail support@imageresizing.net if you encounter any problems with the software. 
 The documentation for this plugin resides at http://imageresizing.net/plugins/animatedgifs</description>
-		<tags>Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing disk caching gif png octree quanitization animated gifs dithering</tags>
+		<tags>$tags$</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="..\dlls\trial\ImageResizer.Plugins.AnimatedGifs.dll" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.AnimatedGifs.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.AnimatedGifs.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.AnimatedGifs.xml" target="lib" />
 		<file src="..\Plugins\AnimatedGifs\Web.config.transform" target="content" />
 	</files>
 </package>

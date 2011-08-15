@@ -3,7 +3,7 @@
 	<metadata>
 		<id>ImageResizer.Plugins.WhitespaceTrimmer</id>
 		<version>$version$</version>
-		<authors>Nathanael Jones</authors>
+		<authors>$author$</authors>
 		<description>Description</description>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
@@ -11,9 +11,9 @@
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="..\dlls\trial\ImageResizer.Plugins.WhitespaceTrimmer.dll" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.WhitespaceTrimmer.pdb" target="lib" />
-		<file src="..\dlls\trial\ImageResizer.Plugins.WhitespaceTrimmer.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.WhitespaceTrimmer.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.WhitespaceTrimmer.pdb" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.WhitespaceTrimmer.xml" target="lib" />
 		<file src="..\Plugins\WhitespaceTrimmer\**\*.cs" target="src" />
 	</files>
 </package>
