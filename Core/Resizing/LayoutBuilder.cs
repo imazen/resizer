@@ -92,6 +92,10 @@ namespace ImageResizer.Resizing {
             return ps;
         }
 
+        public bool ContainsRing(string name) {
+            return ring.ContainsKey(name);
+        }
+
         /// <summary>
         /// Inflates the last ring using the specified padding options. Returns the resulting ring object
         /// </summary>
