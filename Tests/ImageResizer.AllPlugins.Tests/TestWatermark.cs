@@ -29,10 +29,9 @@ namespace ImageResizer.Plugins.Watermark.Tests {
             //Install the plugin
             w.Install(c);
 
-            new VirtualFolder("~/","..\\..\\..\\Samples\\Images").Install(c);
+            string imgdir = "..\\..\\..\\Samples\\Images\\";
 
-
-            c.CurrentImageBuilder.Build("~/red-leaf.jpg", "~/results/red-leaf-watermarked.jpg", new ResizeSettings("watermark=Sun_256.png&width=400"));
+            c.CurrentImageBuilder.Build(imgdir + "red-leaf.jpg", "red-leaf-watermarked.jpg", new ResizeSettings("watermark=Sun_256.png&width=400"));
 
         }
     }

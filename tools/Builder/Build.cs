@@ -291,7 +291,6 @@ namespace ImageResizer.ReleaseBuilder {
             //delete /Tests/binaries  (*.pdb, *.xml, *.dll)
             //delete /Core/obj folder
             //Deleate all bin,obj,imageacache,uploads, and results folders under /Samples, /Tests, and /Plugins
-            f.DelFiles(q.files("^/Tests/binaries/*.(pdb|xml|dll|txt)$"));
             f.DelFiles(q.files("^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|results)/*",
                        "^/Core/obj/*","^/Core.Mvc/obj/*"));
 
@@ -319,6 +318,7 @@ namespace ImageResizer.ReleaseBuilder {
             q.exclusions.Add(new Pattern("^/Plugins/Libs/DotNetZip*.xml$"));
             q.exclusions.Add(new Pattern("^/Plugins/Libs/Aforge*.xml$"));
             q.exclusions.Add(new Pattern("^/Tests/Libs/LibDevCassini"));
+            q.exclusions.Add(new Pattern("^/Tests/binaries"));
             q.exclusions.Add(new Pattern("^/Samples/SqlReaderSampleVarChar"));
             q.exclusions.Add(new Pattern("^/Contrib/*/(bin|obj|imagecache|uploads|results)/*"));
             q.exclusions.Add(new Pattern(".config.transform$"));
