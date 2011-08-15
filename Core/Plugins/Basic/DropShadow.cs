@@ -55,6 +55,8 @@ namespace ImageResizer.Plugins.Basic {
             if (base.RenderEffects(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
 
+            if (s.destGraphics == null) return RequestedAction.None;
+
             //parse shadow
             Color shadowColor = Utils.parseColor(s.settings["shadowColor"], Color.Transparent);
             int shadowWidth = Utils.getInt(s.settings, "shadowWidth", -1);
