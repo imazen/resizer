@@ -27,7 +27,11 @@ namespace ImageResizer {
             n = Node.FromXmlFragment(xml,sink);
         }
         protected object nSync = new object();
+
+		[CLSCompliant(false)]
         protected volatile Node n = new Node("resizer");
+
+		[CLSCompliant(false)]
         protected volatile XmlDocument xmlDoc = new XmlDocument();
 
 
