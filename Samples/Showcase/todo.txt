@@ -1,1 +1,0 @@
-﻿This project will eventually be a showcase app to demonstrate all the features of the image resizer.
