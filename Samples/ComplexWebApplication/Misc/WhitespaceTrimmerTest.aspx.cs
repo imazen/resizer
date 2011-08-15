@@ -11,7 +11,9 @@ using System.Web.Hosting;
 namespace ComplexWebApplication {
     public partial class WhitespaceTrimmerTest : System.Web.UI.Page {
         protected void Page_Load(object sender, EventArgs e) {
+            
             string dir = Path.Combine(Path.Combine(Path.GetDirectoryName(HostingEnvironment.ApplicationPhysicalPath.TrimEnd('/','\\')),  "Images"), "private");
+            if (!Directory.Exists(dir)) return;
             string[] files = Directory.GetFiles(dir,"*.jpg");
             StringBuilder sb = new StringBuilder();
             foreach (string s in files) {

@@ -7,10 +7,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ComplexWebApplication {
+namespace SampleProject {
     
     
-    public partial class UploadSample {
+    public partial class RegressionTests {
         
         /// <summary>
         /// form1 control.
@@ -58,30 +58,12 @@ namespace ComplexWebApplication {
         protected global::System.Web.UI.HtmlControls.HtmlAnchor A4;
         
         /// <summary>
-        /// fileUpload control.
+        /// Img1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.FileUpload fileUpload;
-        
-        /// <summary>
-        /// btnUpload control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnUpload;
-        
-        /// <summary>
-        /// btnUploadAndGenerate control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnUploadAndGenerate;
+        protected global::System.Web.UI.HtmlControls.HtmlImage Img1;
     }
 }

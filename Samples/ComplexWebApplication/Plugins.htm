@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+    <div>
+    <a href="Default.aspx" runat="server"> Core examples </a> &nbsp;&nbsp;
+    <a  href="Plugins.htm" runat="server"> Plugin Tests </a> &nbsp;&nbsp;
+    <a  href="Misc/RegressionTests.aspx" runat="server"> Regression Tests </a> &nbsp;&nbsp;
+    <a href="UploadSample.aspx" runat="server"> Upload example </a> </div>
+<h3>Image404 Plugin Test</h3>
+    <div>
+    There should be a photo of the sun.
+    <img src="missing-file.jpg?404=/Sun_256.png" runat="server" />
+    <br />
+    This uses a a URL rewrite rule to affect an entire folder, eliminating need for individual specificaiton of the 404 command. Should also display a sun.
+    <img src="/propertyimages/missing.jpg" runat="server" />
+    </div>
+    <h3>CloudFront test</h3>
+        <div>
+    <p>CloudFront removes all querystrings. The CloudFront plugin allows querystrings to bypass the querystring guillotine by using ';' instead of '?' and '&'. </p>
+    <img src="red-leaf.jpg;width=100;height=200" />
+
+    <h2>PrettyGifs dithering support</h2>
+        <h3>Without dither</h3>
+    <img src="red-leaf.jpg?format=gif" runat="server" />
+    <h3>With dither (Floyd-Steinberg  30%)</h3>
+    <img src="red-leaf.jpg?format=gif&dither=true" runat="server" />
+    <h3>With 4-pass dither (Floyd-Steinberg  30%)</h3>
+    <img src="red-leaf.jpg?format=gif&dither=4pass" runat="server" />
+    
+    <h3>Without dither</h3>
+    <img src="red-leaf.jpg?format=gif" runat="server" />
+    <h3>20% dither</h3>
+    <img src="red-leaf.jpg?format=gif&dither=20" runat="server" />
+    <h3>50% dither</h3>
+    <img src="red-leaf.jpg?format=gif&dither=50" runat="server" />
+    <h3>75% dither</h3>
+    <img src="red-leaf.jpg?format=gif&dither=75" runat="server" />
+
+    <h2>FolderResizeSyntax plugin</h2>   
+    <h3>Should be a 40px jpeg</h3>
+       <img src="~/resize(40,40)/red-leaf.jpg" runat="server" />
+       <h3>Should be a 40px gif</h3>
+       <img src="~/resize(40,40,gif)/red-leaf.jpg" runat="server" />
+
+    <h2>Gradient plugin test (css and img)</h2>
+    <div style="background:url(gradient.png?width=8&height=8&angle=45&color1=888&color2=white);">
+    <img src="gradient.png?width=500&height=300&angle=90&color1=green&color2=ffffff33" />
+    </div>
+    <h3>SamplePlugin test</h3>
+    This should display "Success!"
+    <img src="gradient.png?color1=white&color2=gray&angle=90&width=200&height=200&sample=Success!" />
+    <h2>SizeLimiting plugin tests</h2>
+    The following request should result in an 800x600 or smaller photo: <a href="quality-original.jpg?width=1000">click here</a>.
+    <br />The following request should throw an error: <a href="quality-original.jpg?width=1000&paddingWidth=5000">click here</a>.
+    <h2>Watermark plugin test</h2>
+     <h3>This should have a watermark of a sun</h3>
+    <img src="quality-original.jpg?width=400&watermark=Sun_64.png" />
+    <h3>This should not, since the watermark file doesn't exist</h3>
+    <img src="quality-original.jpg?width=400&watermark=Sun_64-missing.png" />
+    </div>
+    </div>
+</body>
+</html>
