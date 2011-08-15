@@ -41,9 +41,9 @@
 
     <h2>FolderResizeSyntax plugin</h2>   
     <h3>Should be a 40px jpeg</h3>
-       <img src="~/resize(40,40)/red-leaf.jpg" runat="server" />
+       <img src="resize(40,40)/red-leaf.jpg" runat="server" />
        <h3>Should be a 40px gif</h3>
-       <img src="~/resize(40,40,gif)/red-leaf.jpg" runat="server" />
+       <img src="resize(40,40,gif)/red-leaf.jpg" runat="server" />
 
     <h2>Gradient plugin test (css and img)</h2>
     <div style="background:url(gradient.png?width=8&height=8&angle=45&color1=888&color2=white);">
@@ -60,7 +60,22 @@
     <img src="quality-original.jpg?width=400&watermark=Sun_64.png" />
     <h3>This should not, since the watermark file doesn't exist</h3>
     <img src="quality-original.jpg?width=400&watermark=Sun_64-missing.png" />
+
+    <h2>ImageHandlerSyntax plugin</h2>
+    <h3>WebImageResizer compatibility</h3>
+
+    <img src="ImageHandler.ashx?src=fountain-small.jpg&width=100&height=100&format=jpg&rotate=45" />
+
+        <h3>"Image Handler for ASP.NET 2.0" compatibility</h3>
+    <img src="imghandler.ashx?h=100&w=100&img=fountain-small.jpg " />
+   
+     <h3>BBImageHandler compatibility</h3>
+    <img src="bbimagehandler.ashx?File=fountain-small.jpg&width=150&ResizeMode=FitSquare&BackColor=F58719&border=10" />
+
+     <h3>BetterImageProcessor compatibility</h3>
+    <img src="fountain-small.jpg?w=100&h=100" />
+
     </div>
-    </div>
+    
 </body>
 </html>
