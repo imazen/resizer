@@ -9,7 +9,7 @@ using ImageResizer.Util;
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
     /// Allows gradients to be dynamically generated like so:
-    /// /gradient.png?color1=white&color2=black&angle=40&width=20&height=100
+	/// /gradient.png?color1=white&amp;color2=black&amp;angle=40&amp;width=20&amp;height=100
     /// </summary>
     public class Gradient: IPlugin, IQuerystringPlugin, IVirtualImageProvider {
         public bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {

@@ -48,7 +48,6 @@ namespace ImageResizer.Util {
         /// Removes the extension from the filename.
         /// </summary>
         /// <param name="path"></param>
-        /// <param name="newExtension"></param>
         /// <returns></returns>
         public static string RemoveFullExtension(string path) {
             int query = path.IndexOf('?');
@@ -66,7 +65,6 @@ namespace ImageResizer.Util {
         /// Removes the extension from the filename.
         /// </summary>
         /// <param name="path"></param>
-        /// <param name="newExtension"></param>
         /// <returns></returns>
         public static string RemoveExtension(string path) {
             int query = path.IndexOf('?');
@@ -194,6 +192,7 @@ namespace ImageResizer.Util {
         /// Keys and values are UrlEncoded if urlEncode=true.
         /// </summary>
         /// <param name="QueryString"></param>
+		/// <param name="urlEncode"></param>
         /// <returns></returns>
         public static string BuildQueryString(NameValueCollection QueryString, bool urlEncode) {
             StringBuilder path = new StringBuilder();
@@ -238,7 +237,7 @@ namespace ImageResizer.Util {
         }
         /// <summary>
         /// Parses the querystring from the given path into a NameValueCollection. 
-        /// accepts "file?key=value" and "?key=value&key2=value2" formats. (no path is required)
+        /// accepts "file?key=value" and "?key=value&amp;key2=value2" formats. (no path is required)
         /// UrlDecodes keys and values.
         /// </summary>
         /// <param name="path"></param>
