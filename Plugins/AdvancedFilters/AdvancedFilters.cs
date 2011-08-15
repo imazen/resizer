@@ -22,6 +22,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
         }
         protected override RequestedAction PostRenderImage(ImageState s) {
 
+            if (s.destBitmap == null) return RequestedAction.None;
             string str = null;
             int i = 0;
             
