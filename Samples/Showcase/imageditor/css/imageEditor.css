@@ -1,0 +1,51 @@
+.image-editor-container {background:#f8f8ee;}
+
+/* Component containers
+----------------------------------*/
+.ui-widget-content { border: 1px solid #d9d6c4; background: #eceadf }
+
+/* Interaction states
+----------------------------------*/
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default { border: 1px solid #cbc7bd; background: #f8f7f6 ; font-weight: bold; color: #654b24; }
+.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited { color: #654b24; text-decoration: none; }
+.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus { border: 1px solid #cbc7bd; background: #cec9b0; font-weight: bold; color: #ffffff; }
+.ui-state-hover a, .ui-state-hover a:hover { color: #ffffff; text-decoration: none; }
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active { border: 1px solid #d9d6c4; background: #eceadf; font-weight: bold; color: #140f06; }
+.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited { color: #140f06; text-decoration: none; }
+.ui-widget :active { outline: none; }
+
+/* Icons
+----------------------------------*/
+
+/* icon */
+.ui-icon-gripsmall-diagonal-se { width: 16px; height: 16px; background-image: url(images/corner.png)}
+
+/* Overlays */
+.ui-resizable { position: relative;}
+.ui-resizable-handle { position: absolute;font-size: 0.1px;z-index: 99999; display: block;}
+.ui-resizable-disabled .ui-resizable-handle, .ui-resizable-autohide .ui-resizable-handle { display: none; }
+.ui-resizable-n { cursor: n-resize; height: 10px; width: 100%; top: -5px; left: 0; }
+.ui-resizable-s { cursor: s-resize; height: 10px; width: 100%; bottom: -5px; left: 0; }
+.ui-resizable-e { cursor: e-resize; width: 10px; right: -5px; top: 0; height: 100%; }
+.ui-resizable-w { cursor: w-resize; width: 10px; left: -5px; top: 0; height: 100%; }
+.ui-resizable-se { cursor: se-resize; width: 16px; height: 16px; right: 1px; bottom: 1px; }
+.ui-resizable-sw { cursor: sw-resize; width: 15px; height: 15px; left: -5px; bottom: -5px; }
+.ui-resizable-nw { cursor: nw-resize; width: 15px; height: 15px; left: -5px; top: -5px; }
+.ui-resizable-ne { cursor: ne-resize; width: 15px; height: 15px; right: -5px; top: -5px;}
+
+/* Slider
+----------------------------------*/
+.ui-slider { position: relative; text-align: left; }
+.ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 1.2em; height: 1.2em; cursor: default; }
+
+.ui-slider-horizontal { height: .8em; }
+.ui-slider-horizontal .ui-slider-handle { top: -.3em; margin-left: -.6em; }
+.ui-slider-horizontal .ui-slider-range { top: 0; height: 100%; }
+.ui-slider-horizontal .ui-slider-range-min { left:0; }
+.ui-slider-horizontal .ui-slider-range-max { right:0; }
+
+.ui-slider-vertical { width: .8em; height: 100px; }
+.ui-slider-vertical .ui-slider-handle { left: -.3em; margin-left: 0; margin-bottom: -.6em; }
+.ui-slider-vertical .ui-slider-range { left: 0; width: 100%; }
+.ui-slider-vertical .ui-slider-range-min { bottom: 0; }
+.ui-slider-vertical .ui-slider-range-max { top: 0; }
