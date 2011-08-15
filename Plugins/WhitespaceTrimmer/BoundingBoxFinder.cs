@@ -22,10 +22,9 @@ namespace ImageResizer.Plugins.WhitespaceTrimmer {
 
             bool disposeImage = false;
             try {
-                if (image.PixelFormat == PixelFormat.Format1bppIndexed ||
-                    image.PixelFormat == PixelFormat.Format4bppIndexed ||
-                    image.PixelFormat == PixelFormat.Format8bppIndexed ||
-                    image.PixelFormat == PixelFormat.Indexed) {
+                if (image.PixelFormat != PixelFormat.Format24bppRgb && 
+                    image.PixelFormat != PixelFormat.Format32bppArgb && 
+                    image.PixelFormat != PixelFormat.Format32bppRgb) {
                         image = AForge.Imaging.Image.Clone(image, PixelFormat.Format24bppRgb);
                         disposeImage = true;
                 }
