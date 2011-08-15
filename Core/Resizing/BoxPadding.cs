@@ -71,14 +71,14 @@ namespace ImageResizer.Resizing {
         }
 
         /// <summary>
-        /// Returns -1 unless all edges are the same width, in which case that width is returned
+        /// Returns double.NaN unless all edges are the same width, in which case that width is returned
         /// </summary>
         public double All { get { return this.all; } }
 
         protected double all {
             get {
                 if (top == left && left == bottom && bottom == right) return top;
-                else return -1;
+                else return double.NaN;
             }
             set {
                 top = left = bottom = right = value;

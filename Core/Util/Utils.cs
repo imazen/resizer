@@ -263,7 +263,7 @@ namespace ImageResizer.Util {
 
 
         public static string writePadding(BoxPadding p) {
-            if (p.All != -1) return p.All.ToString(); //Easy
+            if (p.All != double.NaN) return p.All.ToString(); //Easy
 
             return "(" + p.Left + "," + p.Top + "," + p.Right + "," + p.Bottom + ")";
 
