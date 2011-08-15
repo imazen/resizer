@@ -43,19 +43,6 @@ namespace DatabaseSampleCSharp
                 Config.Current.Pipeline.ModifiedQueryString["cache"] = ServerCacheMode.Always.ToString();
             };
 
-            Config.Current.Pipeline.Rewrite += delegate(IHttpModule sender2, HttpContext context, IUrlEventArgs ea) {
-                //This is where we have to modify ea.VirtualPath to remove the 'filename' that's not part of the ID.
-
-                //Without a file extension, though, the image resizer doesn't know if the file is an image that can be resized or not.
-                //It also doesn't know the original file type, so it will revert to jpeg format if any processing occurs 
-                //(although, without setting a file extension, we'd have to set  ea.QueryString["process"] = "Always" for that to occur).
-
-                //So, we need to leave ea.VirtualPath in the form [id].[originalextension]
-
-
-
-            };
-   
         }
 
 
