@@ -42,7 +42,7 @@ namespace ImageResizer.Plugins.Basic {
         /// Places settings into the referenced querystring
         /// </summary>
         /// <param name="path"></param>
-        /// <param name="query">The collection to place parsed values into</param>
+        /// <param name="q">The collection to place parsed values into</param>
         /// <returns></returns>
         protected string parseResizeFolderSyntax(string path, NameValueCollection q) {
             Match m = resizeFolder.Match(path);

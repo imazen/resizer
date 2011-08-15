@@ -30,6 +30,7 @@ namespace ImageResizer.Util
         /// </summary>
         /// <param name="a"></param>
         /// <returns></returns>
+        [CLSCompliant(false)]
         public static PointF[,] RoundPoints(PointF[,] a)
         {
             
