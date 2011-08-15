@@ -87,11 +87,14 @@ namespace ImageResizer.Configuration {
         /// <summary>
         /// Returns a ICacheProvider instance that provides caching system selection and creation.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="virtualPathAndQuerystring"></param>
         /// <returns></returns>
         ICacheProvider GetCacheProvider();
 
+		/// <summary>
+		/// </summary>
+		/// <param name="virtualPath"></param>
+		/// <param name="queryString"></param>
+		/// <returns></returns>
         object GetFile(string virtualPath, NameValueCollection queryString);
 
         /// <summary>

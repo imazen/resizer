@@ -38,7 +38,9 @@ namespace ImageResizer.Configuration {
             virtualProviderPlugins = new SafeList<IVirtualImageProvider>();
         }
 
+		[CLSCompliant(false)]
         protected volatile bool _pluginsLoaded = false;
+
         protected object _loadPluginsSync = new object();
         /// <summary>
         /// Processes the &lt;plugins&gt; section if they are not already loaded. Thread safe.

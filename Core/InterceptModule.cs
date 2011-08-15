@@ -16,9 +16,7 @@ using System.IO;
 using ImageResizer.Resizing;
 using ImageResizer.Plugins.Basic;
 
-/// <summary>
-/// This namespace contains the most frequently used classes.
-/// </summary>
+// This namespace contains the most frequently used classes.
 namespace ImageResizer {
 
     /// <summary>
@@ -176,7 +174,9 @@ namespace ImageResizer {
         /// Called during PostAuthorizeRequest
         /// </summary>
         /// <param name="context"></param>
-        /// <param name="current"></param>
+        /// <param name="virtualPath"></param>
+		/// <param name="queryString"></param>
+		/// <param name="vf"></param>
         protected virtual void HandleRequest(HttpContext context, string virtualPath, NameValueCollection queryString, object vf) {
             Stopwatch s = new Stopwatch();
             s.Start();

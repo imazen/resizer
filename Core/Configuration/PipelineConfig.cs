@@ -32,7 +32,11 @@ namespace ImageResizer.Configuration {
 
 
         protected object _cachedUrlDataSync = new object();
+
+		[CLSCompliant(false)]
         protected volatile Dictionary<string, bool> _cachedDirectives = null;
+
+		[CLSCompliant(false)]
         protected volatile Dictionary<string, bool> _cachedExtensions = null;
 
         /// <summary>
@@ -142,7 +146,9 @@ namespace ImageResizer.Configuration {
             return false;
         }
 
+		[CLSCompliant(false)]
         protected volatile IList<string> _fakeExtensions = null;
+
         /// <summary>
         /// Cached access to pipeline.fakeExtensions
         /// </summary>
@@ -340,7 +346,9 @@ namespace ImageResizer.Configuration {
 
         public event CacheSelectionHandler SelectCachingSystem;
 
+		[CLSCompliant(false)]
         protected volatile bool firedFirstRequest = false;
+
         protected object firedFirstRequestSync = new object();
 
         public void FirePostAuthorizeRequest(System.Web.IHttpModule sender, System.Web.HttpContext httpContext) {

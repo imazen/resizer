@@ -22,7 +22,9 @@ namespace ImageResizer.Collections {
 
         public delegate IEnumerable<T> ListEditor(IList<T> items);
 
+		[CLSCompliant(false)]
         protected volatile ReadOnlyCollection<T> items;
+
         protected object writeLock = new object();
 
 
