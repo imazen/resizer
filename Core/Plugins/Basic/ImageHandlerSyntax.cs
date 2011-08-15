@@ -9,7 +9,7 @@ namespace ImageResizer.Plugins.Basic {
     /// <summary>
     /// Adds URL syntax support for http://webimageresizer.codeplex.com/, http://imagehandler.codeplex.com/, http://bbimagehandler.codeplex.com/, and http://bip.codeplex.com/
     /// </summary>
-    public class ImageHandlerSyntaxPlugin:IPlugin {
+    public class ImageHandlerSyntax:IPlugin {
 
         Config c; 
 
