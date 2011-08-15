@@ -100,13 +100,13 @@ namespace ImageResizer {
         Custom
 
 
-       
+/*       
         /// <summary>
         /// Indicates that the crop values are between 0 and 1 and indicate the percent of the original image surface to start and stop at.
         /// </summary>
         //WidthPercentage,
         //HeightPercentage,
-
+*/
     }
 
 }

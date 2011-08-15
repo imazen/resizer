@@ -25,6 +25,7 @@ namespace ImageResizer.Encoding {
         /// <summary>
         /// Encodes the image to the specified stream 
         /// </summary>
+		/// <param name="i"></param>
         /// <param name="s"></param>
         void Write(Image i, Stream s);
 

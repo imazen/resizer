@@ -9,12 +9,12 @@ using System.Text.RegularExpressions;
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
     /// Redirects image 404 errors to a querystring-specified server-local location, while maintaining querystring values so layout isn't disrupted.
-    /// For example, missingimage.jpg?404=image.jpg&width=200
+	/// For example, missingimage.jpg?404=image.jpg&amp;width=200
     /// with the default setting &lt;image404 baseDir="~/" /&gt; will redirect to ~/image.jpg?width=200.
     /// You may also configure 'variables', which is the reccomended approach.
     /// Ex. &lt;image404 propertyImageDefault="~/images/nophoto.png" /&gt; and use them like so: missingimage.jpg?404=propertImageDefault?width=200 -> ~/images/nophoto.png?width=200.
     /// Querystring values in the variable value take precedence. For example, 
-    /// Ex. &lt;image404 propertyImageDefault="~/images/nophoto.png?format=png" /&gt; and missingimage.jpg?format=jpg&404=propertImageDefault?width=200 -> ~/images/nophoto.png?format=png&width=200.
+	/// Ex. &lt;image404 propertyImageDefault="~/images/nophoto.png?format=png" /&gt; and missingimage.jpg?format=jpg&amp;404=propertImageDefault?width=200 -> ~/images/nophoto.png?format=png&amp;width=200.
     /// </summary>
     public class Image404:IQuerystringPlugin,IPlugin {
 

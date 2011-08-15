@@ -125,7 +125,7 @@ namespace ImageResizer.Plugins.Basic {
         /// If an unsupported format is specified, it is returned.
         /// If *no* format is specified, returns defaultValue.
         /// </summary>
-        /// <param name="settings"></param>
+		/// <param name="format"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
         public static ImageFormat GetRequestedFormat(string format, ImageFormat defaultValue) {
@@ -143,7 +143,6 @@ namespace ImageResizer.Plugins.Basic {
         /// Falls back to using original.RawFormat. Returns null if both 'original' is null.
         /// RawFormat has a bad reputation, so this may return unexpected values, like MemoryBitmap or something in some situations.
         /// </summary>
-        /// <param name="img">The image we are encoding</param>
         /// <param name="original">The source image that was loaded from a stream, or a string path</param>
         /// <returns></returns>
         public static ImageFormat GetOriginalFormat(object original) {
@@ -179,7 +178,7 @@ namespace ImageResizer.Plugins.Basic {
         /// Returns an string instance from the specfied ImageFormat. First matching entry in imageExtensions is used.
         /// Returns null if not recognized.
         /// </summary>
-        /// <param name="ext"></param>
+		/// <param name="format"></param>
         /// <returns></returns>
         public static string GetExtensionFromImageFormat(ImageFormat format)
         {

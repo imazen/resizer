@@ -4,12 +4,10 @@ using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Configuration;
 
-///<summary>
-///All plugins in this namespace are licensed under the Freedom license
-///</summary>
+// All plugins in this namespace are licensed under the Freedom license
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
-    /// Provides default client-caching behavior. Sends Last-Modified header if present, and Expires header if &ltclientcache minutes="value" /> is configured.
+    /// Provides default client-caching behavior. Sends Last-Modified header if present, and Expires header if &lt;clientcache minutes="value" /&gt; is configured.
     /// Also defaults Cache-control to Public for anonymous requests (and private for authenticated requests)
     /// </summary>
     public class ClientCache:IPlugin{
