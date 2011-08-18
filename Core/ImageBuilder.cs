@@ -623,7 +623,7 @@ namespace ImageResizer
 
             if (background == Color.Transparent)
                 //Only set the bgcolor if the image isn't taking the whole area.
-                if (!s.supportsTransparency && !PolygonMath.GetBoundingBox(s.layout["image"]).Equals(s.layout.GetBoundingBox()))
+                if (!s.supportsTransparency)// && (!PolygonMath.GetBoundingBox(s.layout["image"]).Equals(s.layout.GetBoundingBox()))
                     background = Color.White;
             
             //Fill background
