@@ -35,11 +35,10 @@ namespace ImageResizer.Plugins.Basic {
         /// <param name="context"></param>
         /// <param name="e"></param>
         public void Process(System.Web.HttpContext context, IResponseArgs e) {
-            try {
-                context.RemapHandler(new NoCacheHandler(e));
-            } catch (MissingMethodException) { //For pre-.net 2.0SP2 support
-                context.Handler = new NoCacheHandler(e);
-            }
+            context.RemapHandler(new NoCacheHandler(e));
+            // The following line of code does nothing. I don't think there is any way to make this work before .NET 2.0 SP2
+            //context.Handler = new NoCacheHandler(e); 
+
         }
 
 
