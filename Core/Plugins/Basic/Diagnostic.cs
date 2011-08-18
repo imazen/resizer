@@ -50,11 +50,10 @@ namespace ImageResizer.Plugins.Basic {
                 context.Items[c.Pipeline.StopRoutingKey] = true;
                 //Provide the request handler
                 IHttpHandler handler =AllowResponse(context) ? (IHttpHandler)new DiagnosticPageHandler(c) : (IHttpHandler)new DiagnosticDisabledHandler(c);
-                try {
-                    context.RemapHandler(handler);
-                } catch (MissingMethodException) { //For pre-.net 2.0SP2 support
-                    context.Handler = handler; 
-                }
+                context.RemapHandler(handler); 
+                // The following line of code does nothing. I don't think there is any way to make this work before .NET 2.0 SP2
+                //context.Handler = handler; 
+
             } 
         }
 
