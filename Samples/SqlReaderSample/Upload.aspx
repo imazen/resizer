@@ -15,8 +15,9 @@
     <asp:FileUpload ID="FileUpload1" runat="server" /><br />
     <asp:FileUpload ID="FileUpload2" runat="server" /><br />
     <asp:FileUpload ID="FileUpload3" runat="server" /><br />
-    <asp:Button Text="Upload" runat="server" />
-    
+    <asp:Button Text="Upload" runat="server" onclick="Unnamed2_Click" />
+     <asp:Button ID="btnUploadAsIs" Text="Upload As-Is" runat="server" 
+            onclick="btnUploadAsIs_Click" />
 
     </div>
     </form>
