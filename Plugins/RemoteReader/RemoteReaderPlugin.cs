@@ -138,8 +138,16 @@ namespace ImageResizer.Plugins.RemoteReader {
             Array.Copy(hash, shorterHash, 8);
             return PathUtils.ToBase64U(shorterHash);
         }
-
+        /// <summary>
+        /// Parses the specified path and querystring. Verifies the hmac signature for querystring specified paths, parses the
+        /// human-friendly syntax for that syntax. Verifies the URL is properly formed. Returns an object containing the remote URL,
+        /// querystring remainder, and a flag stating whether the request was signed or not. Incorrectly signed requests immediately throw an exception.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public RemoteRequestEventArgs ParseRequest(string virtualPath, NameValueCollection query) {
+            query = new NameValueCollection(query);
             if (!IsRemotePath(virtualPath)) return null;
 
             RemoteRequestEventArgs args = new RemoteRequestEventArgs();
