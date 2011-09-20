@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library", "Library\Library.csproj", "{6598A7CD-8F27-4D3F-A675-5AE63113A7C3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceFileMerger", "SourceFileMerger\SourceFileMerger.csproj", "{2AD35641-C1EA-492C-B081-F4AA5AAE8FA1}"
