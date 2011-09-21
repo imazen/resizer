@@ -31,7 +31,7 @@ namespace ImageResizer.Plugins.Basic {
 		public string GenerateOutput(HttpContext context, Config c) {
 			List<IIssue> issues = new List<IIssue>(c.AllIssues.GetIssues());
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine("Image resizier diagnostic sheet\t\t" + DateTime.UtcNow.ToString() + "\n");
+			sb.AppendLine("Image resizer diagnostic sheet\t\t" + DateTime.UtcNow.ToString() + "\n");
 			sb.AppendLine(issues.Count + " Issues detected:\n");
 			foreach (IIssue i in issues)
 				sb.AppendLine(i.Source + "(" + i.Severity.ToString() + "):\t" + i.Summary  +
