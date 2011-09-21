@@ -9,6 +9,9 @@ using System.Diagnostics;
 using ImageResizer.Plugins.FreeImageBuilder;
 using ImageResizer.Util;
 using System.IO;
+using ImageResizer.Plugins.FreeImageDecoder;
+using System.Drawing;
+using ImageResizer.Plugins.FreeImageEncoder;
 
 namespace ConsoleApplication {
     class Program {
@@ -35,6 +38,9 @@ namespace ConsoleApplication {
             string s = c.GetDiagnosticsPage();
             c.BuildImage(imageDir + "quality-original.jpg", "grass.gif", "rotate=3&width=600&format=gif&colors=128&watermark=Sun_256.png");
 
+            CompareFreeImageEncoderToDefault();
+            CompareFreeImageDecoderToDefault();
+
             CompareFreeImageToDefault();
             Console.ReadKey();
         }
@@ -46,9 +52,7 @@ namespace ConsoleApplication {
             Config c = new Config();
             new FreeImageBuilderPlugin().Install(c);
 
-
-
-
+            Console.WriteLine();
             Console.WriteLine("Running in-memory test");
             Console.WriteLine("Testing default pipeline");
             BenchmarkInMemory(c, jpeg, new ResizeSettings("maxwidth=200&maxheight=200"));
@@ -63,6 +67,45 @@ namespace ConsoleApplication {
 
        }
 
+
+
+        public static void CompareFreeImageDecoderToDefault() {
+            string[] images = new string[] { imageDir + "quality-original.jpg", imageDir + "sample.tif", imageDir + "\\private\\98613_17.tif" };
+
+            Config c = new Config();
+            new FreeImageDecoderPlugin().Install(c);
+
+            Console.WriteLine();
+            foreach(string s in images){
+                Console.WriteLine("Comparing FreeImage and standard decoders for " + s);
+                Console.WriteLine("Testing default pipeline");
+                BenchmarkDecoderInMemory(c, s, new ResizeSettings());
+                Console.WriteLine("Testing FreeImage pipeline");
+                BenchmarkDecoderInMemory(c, s, new ResizeSettings());
+            }
+            Console.WriteLine();
+        }
+
+        public static void CompareFreeImageEncoderToDefault() {
+            string[] images = new string[] { imageDir + "quality-original.jpg", imageDir + "sample.tif", imageDir + "\\private\\98613_17.tif" };
+
+            Config c = new Config();
+            new FreeImageEncoderPlugin().Install(c);
+
+            ResizeSettings settings = new ResizeSettings("format=jpg");
+            Console.WriteLine();
+            foreach (string s in images) {
+                Console.WriteLine("Comparing FreeImage and standard encoders for " + s);
+                Console.WriteLine("Testing default pipeline");
+                BenchmarkEncoderInMemory(c, c.CurrentImageBuilder.LoadImage(s, settings), settings);
+                Console.WriteLine("Testing FreeImage pipeline");
+                BenchmarkEncoderInMemory(c, c.CurrentImageBuilder.LoadImage(s, settings), settings);
+            }
+            Console.WriteLine();
+        }
+
+
+
         /// <summary>
         /// This is inherently flawed - the unpredictability and inconsistency of disk and NTFS performance makes these results difficult to read.
         /// </summary>
@@ -72,6 +115,7 @@ namespace ConsoleApplication {
             s.Start();
             c.CurrentImageBuilder.Build(source, dest, settings);
             s.Stop();
+            Console.WriteLine();
             Console.WriteLine("First iteration: " + s.ElapsedMilliseconds.ToString() + "ms");
             s.Reset();
             s.Start();
@@ -80,6 +124,7 @@ namespace ConsoleApplication {
             }
             s.Stop();
             Console.WriteLine("Avg. of next " + loops + " iterations: " + (s.ElapsedMilliseconds / loops).ToString() + "ms");
+            Console.WriteLine();
         }
 
 
@@ -94,12 +139,56 @@ namespace ConsoleApplication {
             s.Start();
             c.CurrentImageBuilder.Build(ms, settings,false).Dispose();
             s.Stop();
+            Console.WriteLine();
             Console.WriteLine("First iteration: " + s.ElapsedMilliseconds.ToString() + "ms");
             s.Reset();
             s.Start();
             for (int i = 0; i < loops; i++) {
                 ms.Seek(0, SeekOrigin.Begin);
                 c.CurrentImageBuilder.Build(ms, settings,false).Dispose();
+            }
+            s.Stop();
+            Console.WriteLine("Avg. of next " + loops + " iterations: " + (s.ElapsedMilliseconds / loops).ToString() + "ms");
+            Console.WriteLine();
+        }
+
+        public static void BenchmarkDecoderInMemory(Config c, string source, ResizeSettings settings) {
+            MemoryStream ms;
+            using (FileStream fs = new FileStream(source, FileMode.Open, FileAccess.Read)) {
+                ms = StreamUtils.CopyStream(fs);
+            }
+
+            int loops = 20;
+            Stopwatch s = new Stopwatch();
+            s.Start();
+            c.CurrentImageBuilder.LoadImage(ms,settings).Dispose();
+            s.Stop();
+            Console.WriteLine("First iteration: " + s.ElapsedMilliseconds.ToString() + "ms");
+            s.Reset();
+            s.Start();
+            for (int i = 0; i < loops; i++) {
+                ms.Seek(0, SeekOrigin.Begin);
+                c.CurrentImageBuilder.LoadImage(ms, settings).Dispose();
+            }
+            s.Stop();
+            Console.WriteLine("Avg. of next " + loops + " iterations: " + (s.ElapsedMilliseconds / loops).ToString() + "ms");
+        }
+
+        public static void BenchmarkEncoderInMemory(Config c, Image img, ResizeSettings settings) {
+            MemoryStream ms = new MemoryStream();
+
+            int loops = 20;
+            Stopwatch s = new Stopwatch();
+            s.Start();
+            c.CurrentImageBuilder.EncoderProvider.GetEncoder(settings, img).Write(img, ms);
+            s.Stop();
+            Console.WriteLine("First iteration: " + s.ElapsedMilliseconds.ToString() + "ms");
+            s.Reset();
+            s.Start();
+            for (int i = 0; i < loops; i++) {
+                ms.Seek(0, SeekOrigin.Begin);
+                ms.SetLength(0);
+                c.CurrentImageBuilder.EncoderProvider.GetEncoder(settings, img).Write(img, ms);
             }
             s.Stop();
             Console.WriteLine("Avg. of next " + loops + " iterations: " + (s.ElapsedMilliseconds / loops).ToString() + "ms");
