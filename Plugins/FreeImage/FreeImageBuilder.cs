@@ -101,7 +101,7 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
                 RectangleF imageDest = PolygonMath.GetBoundingBox(state.layout["image"]);
 
                 //Rescale
-                final = FreeImage.Rescale(original,(int)imageDest.Width,(int)imageDest.Height,FREE_IMAGE_FILTER.FILTER_BILINEAR);
+                final = FreeImage.Rescale(original,(int)imageDest.Width,(int)imageDest.Height,FREE_IMAGE_FILTER.FILTER_BOX);
                 FreeImage.UnloadEx(ref original);
                 if (final.IsNull) return false;
 
