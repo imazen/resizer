@@ -12,7 +12,7 @@ namespace ImageResizer.Util {
 
         /// <summary>
         /// Builds a key for the cached version, using the hashcode of the normalized URL.
-        /// if subfolders > 0, dirSeparator will be used to separate the subfolder and the key. 
+        /// if subfolders > 1, dirSeparator will be used to separate the subfolder and the key. 
         /// No extension is appended.
         /// I.e, a13514\124211ab132592 or 12412ababc12141
         /// </summary>
@@ -27,7 +27,7 @@ namespace ImageResizer.Util {
 
             //If configured, place files in subfolders.
             string subfolder = "";
-            if (subfolders > 0) {
+            if (subfolders > 1) {
                 subfolder = getSubfolder(hash, subfolders) + dirSeparator;
             }
             
