@@ -62,7 +62,7 @@ namespace Sample01
 			// format or the loading process will fail. An additional flag (the default value is
 			// 'DEFAULT') can be set to enable special loading options.
 			dib = FreeImage.Load(FREE_IMAGE_FORMAT.FIF_JPEG, fileName, FREE_IMAGE_LOAD_FLAGS.JPEG_ACCURATE);
-
+            
 			// Check if the handle is null which means the bitmap could not be loaded.
 			if (dib.IsNull)
 			{
