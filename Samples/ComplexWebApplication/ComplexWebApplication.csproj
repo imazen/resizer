@@ -176,6 +176,12 @@
   <ItemGroup>
     <Content Include="Misc\Protected\Web.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Plugins\FreeImage\ImageResizer.Plugins.FreeImage.csproj">
+      <Project>{8E863AFE-B4CF-46AA-8382-0C3547C0EDE9}</Project>
+      <Name>ImageResizer.Plugins.FreeImage</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
   <ProjectExtensions>
