@@ -15,3 +15,5 @@ Add support for high-quality upscaling and downscaling with FreeImageBuilder.
 
 
 Make FreeImage.dll automatically get copied with (or inside) FreeImageNet.dll
+
+http://stackoverflow.com/questions/2864673/specify-the-search-path-for-dllimport-in-net
