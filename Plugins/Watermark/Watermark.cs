@@ -83,6 +83,12 @@ namespace ImageResizer.Plugins.Watermark
             //Verify the file exists if we're in ASP.NET. If the watermark doesn't exist, skip watermarking.
             if (!c.Pipeline.FileExists(watermark, s.settings) && slash == '/') return RequestedAction.None;
 
+
+            SizeF watermarkSize = this.watermarkSize;
+            SizeF topLeftPadding = this.topLeftPadding;
+            SizeF bottomRightPadding = this.bottomRightPadding;
+
+
             //Load the file specified in the querystring,
             Bitmap wb = GetMemCachedBitmap(watermark);
             lock(wb){
