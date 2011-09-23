@@ -8,6 +8,7 @@ using ImageResizer.Configuration.Issues;
 using System.Web.Hosting;
 using System.Reflection;
 using ImageResizer.Util;
+using System.ComponentModel;
 
 namespace ImageResizer.Plugins.Basic {
     public class DiagnosticPageHandler : IHttpHandler {
@@ -102,7 +103,12 @@ namespace ImageResizer.Plugins.Basic {
 		}
 
 		private static string mainModuleFileName() {
-			return System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+            try {
+                return System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+            } catch (Win32Exception) {
+                return " (cannot be determined, access denied)";
+            }
+
 		}
 
 		private static bool hasFullTrust() {
