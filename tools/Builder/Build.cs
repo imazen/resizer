@@ -323,7 +323,7 @@ namespace ImageResizer.ReleaseBuilder {
 
 
         public string[] standardExclusions = new string[]{
-                "/.git","^/Releases","/Hidden/","^/Legacy","^/Tools/(Builder|BuildTools|docu)","^/Samples/Images/*/*","/thumbs.db$","/.DS_Store$",".suo$",".user$"
+                "/.git","^/Releases","/Hidden/","^/Legacy","^/Tools/(Builder|BuildTools|docu)","^/Samples/Images/*/*","/Thumbs.db$","/.DS_Store$",".suo$",".user$"
             };
 
         public void PrepareForPackaging() {
@@ -336,6 +336,10 @@ namespace ImageResizer.ReleaseBuilder {
             q.exclusions.Add(new Pattern("^/Samples/SqlReaderSampleVarChar"));
             q.exclusions.Add(new Pattern("^/Contrib/*/(bin|obj|imagecache|uploads|results)/*"));
             q.exclusions.Add(new Pattern(".config.transform$"));
+            q.exclusions.Add(new Pattern("^/Plugins/Libs/FreeImage/(Examples|Dist|Wrapper/Delphi|Wrapper/VB6|Wrapper/FreeImagePlus|Wrapper/FreeImage.NET/cs/Samples)"));
+            q.exclusions.Add(new Pattern("^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|results)/"));
+            q.exclusions.Add(new Pattern("^/Core(.Mvc)?/obj/"));
+            q.exclusions.Add(new Pattern("^/dlls/*/(Aforge|LitS3|Ionic)*.(pdb|xml)$"));
         }
         public void PackMin(PackageDescriptor desc) {
             // 'min' - /dlls/release/ImageResizer.* - /
