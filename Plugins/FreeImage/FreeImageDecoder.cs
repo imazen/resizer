@@ -4,6 +4,8 @@ using System.Text;
 using ImageResizer.Resizing;
 using ImageResizer.Configuration.Issues;
 using FreeImageAPI;
+using System.Drawing;
+using System.IO;
 
 namespace ImageResizer.Plugins.FreeImageDecoder {
     public class FreeImageDecoderPlugin : BuilderExtension, IPlugin, IFileExtensionPlugin, IIssueProvider {
@@ -40,8 +42,21 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
         }
 
         public override System.Drawing.Bitmap DecodeStream(System.IO.Stream s, ResizeSettings settings, string optionalPath) {
-            if (!FreeImageAPI.FreeImage.IsAvailable()) return null;
+            if (!"true".Equals(settings["freeimage"], StringComparison.OrdinalIgnoreCase)) return null;
 
+            return Decode(s,  settings,);
+        }
+
+        public override System.Drawing.Bitmap DecodeStreamFailed(System.IO.Stream s, ResizeSettings settings, string optionalPath) {
+            try {
+                return Decode(s,settings);
+            } catch {
+                return null;
+            }
+        }
+
+        public Bitmap Decode(Stream s, ResizeSettings settings) {
+            if (!FreeImageAPI.FreeImage.IsAvailable()) return null;
 
             FIBITMAP original = FreeImage.LoadFromStream(s, FREE_IMAGE_LOAD_FLAGS.JPEG_FAST);
             if (original.IsNull) return null;
