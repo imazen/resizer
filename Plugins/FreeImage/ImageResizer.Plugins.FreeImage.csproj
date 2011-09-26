@@ -25,7 +25,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\dlls\release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -36,6 +36,9 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
+      <Link>SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="FreeImageDecoder.cs" />
     <Compile Include="FreeImageBuilder.cs" />
     <Compile Include="FreeImageEncoder.cs" />
@@ -46,9 +49,9 @@
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Libs\FreeImage\Wrapper\FreeImage.NET\cs\Library\FreeImage.Net.csproj">
+    <ProjectReference Include="..\Libs\FreeImage\Wrapper\FreeImage.NET\cs\Library\WrapperFreeImage.NET.csproj">
       <Project>{6598A7CD-8F27-4D3F-A675-5AE63113A7C3}</Project>
-      <Name>FreeImage.Net</Name>
+      <Name>WrapperFreeImage.NET</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
