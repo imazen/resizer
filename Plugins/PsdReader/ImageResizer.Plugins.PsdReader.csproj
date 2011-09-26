@@ -63,7 +63,7 @@
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PsdLibs\PsdPlugin\PsdFile\PsdFile.csproj">
+    <ProjectReference Include="..\Libs\PsdPlugin\PsdFile\PsdFile.csproj">
       <Project>{DB6A1DE3-FAEB-451B-8EDB-D557B149BC8A}</Project>
       <Name>PsdFile</Name>
     </ProjectReference>
