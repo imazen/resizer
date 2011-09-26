@@ -44,7 +44,7 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
         public override System.Drawing.Bitmap DecodeStream(System.IO.Stream s, ResizeSettings settings, string optionalPath) {
             if (!"true".Equals(settings["freeimage"], StringComparison.OrdinalIgnoreCase)) return null;
 
-            return Decode(s,  settings,);
+            return Decode(s,  settings);
         }
 
         public override System.Drawing.Bitmap DecodeStreamFailed(System.IO.Stream s, ResizeSettings settings, string optionalPath) {

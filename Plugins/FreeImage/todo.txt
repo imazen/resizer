@@ -7,7 +7,7 @@ libjpeg-turbo may be faster than GDI: https://sourceforge.net/projects/freeimage
 
 
 
-Make FreeImageDecoder a fallback. Make JPEG_FAST switchable - test with large CR2 files. Add ignoreicc support
+ Make JPEG_FAST switchable - test with large CR2 files. Add ignoreicc support
 
 Make FreeImageEncoder properly parse quality, colors, etc.
 
