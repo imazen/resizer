@@ -31,6 +31,7 @@ namespace ImageResizer
     /// </summary>
     public class ImageBuilder : AbstractImageProcessor, IQuerystringPlugin, IFileExtensionPlugin
     {
+        protected ImageBuilder() { }
         /// <summary>
         /// Handles the encoder selection and provision proccess.
         /// </summary>

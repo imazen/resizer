@@ -1,0 +1,19 @@
+﻿Embed the DLL into the managed DLL. (Will need separate versions).
+
+http://stackoverflow.com/questions/666799/embedding-unmanaged-dll-into-a-managed-c-dll
+
+
+libjpeg-turbo may be faster than GDI: https://sourceforge.net/projects/freeimage/forums/forum/36111/topic/3827036
+
+
+
+ Make JPEG_FAST switchable - test with large CR2 files. Add ignoreicc support
+
+Make FreeImageEncoder properly parse quality, colors, etc.
+
+Add support for high-quality upscaling and downscaling with FreeImageBuilder.
+
+
+Make FreeImage.dll automatically get copied with (or inside) FreeImageNet.dll
+
+http://stackoverflow.com/questions/2864673/specify-the-search-path-for-dllimport-in-net
