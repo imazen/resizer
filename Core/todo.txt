@@ -1,4 +1,6 @@
-﻿See if we should use .Handler instead of .RemapHanlder(), since the latter is only present in .net 2.0 SP something.
+﻿
+
+
 
 In V3.1:
 
@@ -25,7 +27,6 @@ scale=upscaleonly|downscaleonly|both|upscalecanvas
 Refactor Watermark plugin to use named configurations.
 Add debug=true querystring command to Diagnostics plugin.
 Add better usage examples.
-Diagnostics page should list trial versions of files
 
 Add another image resizing pitfall....
 
