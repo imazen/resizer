@@ -84,6 +84,8 @@ namespace ImageResizer.Plugins.DiskCache {
                             if (!Directory.Exists(Path.GetDirectoryName(physicalPath))) Directory.CreateDirectory(Path.GetDirectoryName(physicalPath));
 
                             //Open stream 
+                            //TODO: Catch IOException, and if it is a file lock, (and hashmodified is true), then it's another process writing to the file, and we can serve the file afterwards
+                            //... If we can wait for a read handle for a specified timeout.
                             System.IO.FileStream fs = new FileStream(physicalPath, FileMode.Create, FileAccess.Write);
                             using (fs) {
                                 //Run callback to write the cached data
@@ -108,6 +110,33 @@ namespace ImageResizer.Plugins.DiskCache {
             //Fire event
             if (CacheResultReturned != null) CacheResultReturned(this, result);
             return result;
+        }
+
+
+        //private string _fileName;
+
+        //private int _numberOfTries;
+
+        //private int _timeIntervalBetweenTries;
+
+        //private FileStream GetStream(FileAccess fileAccess) {
+        //    var tries = 0;
+        //    while (true) {
+        //        try {
+        //            return File.Open(_fileName, FileMode.Open, fileAccess, Fileshare.None);
+        //        } catch (IOException e) {
+        //            if (!IsFileLocked(e))
+        //                throw;
+        //            if (++tries > _numberOfTries)
+        //                throw new MyCustomException("The file is locked too long: " + e.Message, e);
+        //            Thread.Sleep(_timeIntervalBetweenTries);
+        //        }
+        //    }
+        //}
+
+        private static bool IsFileLocked(IOException exception) {
+            int errorCode = System.Runtime.InteropServices.Marshal.GetHRForException(exception) & ((1 << 16) - 1);
+            return errorCode == 32 || errorCode == 33;
         }
 
 
