@@ -10,6 +10,7 @@ using ImageResizer.Caching;
 using ImageResizer.Configuration;
 using System.Web.Hosting;
 using ImageResizer.Configuration.Issues;
+using ImageResizer.Configuration.Logging;
 
 namespace ImageResizer.Plugins.DiskCache
 {
@@ -28,7 +29,7 @@ namespace ImageResizer.Plugins.DiskCache
     /// <summary>
     /// Provides methods for creating, maintaining, and securing the disk cache. 
     /// </summary>
-    public class DiskCache: ICache, IPlugin, IIssueProvider
+    public class DiskCache: ICache, IPlugin, IIssueProvider, ILoggerProvider
     {
         private int subfolders = 32;
         /// <summary>
@@ -157,7 +158,8 @@ namespace ImageResizer.Plugins.DiskCache
             CleanupStrategy.LoadFrom(c.getNode("cleanupStrategy"));
         }
 
-
+        protected ILogger log = null;
+        public ILogger Logger { get { return log; } }
         /// <summary>
         /// Loads the settings from 'c', starts the cache, and registers the plugin.
         /// Will throw an invalidoperationexception if already started.
@@ -165,6 +167,14 @@ namespace ImageResizer.Plugins.DiskCache
         /// <param name="c"></param>
         /// <returns></returns>
         public IPlugin Install(Config c) {
+            if (c.get("diskcache.logging", false)) {
+                if (c.Plugins.LogManager != null) 
+                    log = c.Plugins.LogManager.GetLogger("ImageResizer.Plugins.DiskCache");
+                else 
+                    c.Plugins.LoggingAvailable += delegate(ILogManager mgr) {
+                        if (log != null) log = c.Plugins.LogManager.GetLogger("ImageResizer.Plugins.DiskCache");
+                    };
+            }
             LoadSettings(c);
             Start();
             c.Pipeline.AuthorizeImage += Pipeline_AuthorizeImage;
@@ -216,17 +226,18 @@ namespace ImageResizer.Plugins.DiskCache
                 if (!IsConfigurationValid()) return false;
 
                 //Init the writer.
-                writer = new WebConfigWriter(PhysicalCacheDir);
+                writer = new WebConfigWriter(this,PhysicalCacheDir);
                 //Init the inner cache
-                cache = new CustomDiskCache(PhysicalCacheDir, Subfolders, HashModifiedDate);
+                cache = new CustomDiskCache(this, PhysicalCacheDir, Subfolders, HashModifiedDate);
                 //Init the cleanup strategy
                 if (AutoClean && cleanupStrategy == null) cleanupStrategy = new CleanupStrategy(); //Default settings if null
                 //Init the cleanup worker
-                if (AutoClean) cleaner = new CleanupManager(cache, cleanupStrategy);
+                if (AutoClean) cleaner = new CleanupManager(this, cache, cleanupStrategy);
                 //If we're running with subfolders, enqueue the cache root for cleanup (after the 5 minute delay)
                 //so we don't eternally 'skip' files in the root or in other unused subfolders (since only 'accessed' subfolders are ever cleaned ). 
                 if (cleaner != null) cleaner.CleanAll();
 
+                if (log != null) log.Info("DiskCache started successfully.");
                 //Started successfully
                 _started = true;
                 return true;

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using ImageResizer.Plugins.DiskCache.Cleanup;
 using ImageResizer.Configuration.Issues;
+using ImageResizer.Configuration.Logging;
 
 namespace ImageResizer.Plugins.DiskCache {
 
@@ -14,11 +15,12 @@ namespace ImageResizer.Plugins.DiskCache {
         protected CleanupStrategy cs = null;
         protected CleanupQueue queue = null;
         protected CleanupWorker worker = null;
-        
 
-        public CleanupManager(CustomDiskCache cache, CleanupStrategy cs) {
+        protected ILoggerProvider lp = null;
+        public CleanupManager(ILoggerProvider lp, CustomDiskCache cache, CleanupStrategy cs) {
             this.cache = cache;
             this.cs = cs;
+            this.lp = lp;
             queue = new CleanupQueue();
             //Called each request
             cache.CacheResultReturned += delegate(CustomDiskCache sender, CacheResult r) {
@@ -29,12 +31,13 @@ namespace ImageResizer.Plugins.DiskCache {
             };
             //Called when the filesystem changes unexpectedly.
             cache.Index.FileDisappeared += delegate(string relativePath, string physicalPath) {
+                if (lp.Logger != null) lp.Logger.Warn("File disappeared from the cache unexpectedly - reindexing entire cache. File name: {0}", relativePath);
                 //Stop everything ASAP and start a brand new cleaning run.
                 queue.ReplaceWith(new CleanupWorkItem(CleanupWorkItem.Kind.CleanFolderRecursive, "", cache.PhysicalCachePath));
                 worker.MayHaveWork();
             };
 
-            worker = new CleanupWorker(cs,queue,cache);
+            worker = new CleanupWorker(lp, cs,queue,cache);
         }
         
 
@@ -65,6 +68,7 @@ namespace ImageResizer.Plugins.DiskCache {
         }
 
         public void CleanAll() {
+            if (lp.Logger != null) lp.Logger.Debug("Queuing CleanAll() task");
             //Only queue the item if it doesn't already exist.
             if (queue.QueueIfUnique(new CleanupWorkItem(CleanupWorkItem.Kind.CleanFolderRecursive, "", cache.PhysicalCachePath)))
                 worker.MayHaveWork();
