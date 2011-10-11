@@ -73,6 +73,7 @@
     <Compile Include="Configuration\Issues\ConfigChecker.cs" />
     <Compile Include="Configuration\IUrlAuthorizationEventArgs.cs" />
     <Compile Include="Configuration\Logging\ILogger.cs" />
+    <Compile Include="Configuration\Logging\ILoggerProvider.cs" />
     <Compile Include="Configuration\Logging\ILogManager.cs" />
     <Compile Include="Configuration\UrlAuthorizationEventArgs.cs" />
     <Compile Include="Plugins\Basic\FolderResizeSyntax.cs" />

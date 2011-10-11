@@ -18,36 +18,42 @@ namespace ImageResizer.Configuration.Logging {
         /// </summary>
         /// <param name="message">A <see langword="string" /> to be written.</param>
         void Trace(string message);
+        void Trace(string message, params object[] args);
 
         /// <summary>
         /// Writes the diagnostic message at the Debug level.
         /// </summary>
         /// <param name="message">A <see langword="string" /> to be written.</param>
         void Debug(string message);
+        void Debug(string message, params object[] args);
 
         /// <summary>
         /// Writes the diagnostic message at the Info level.
         /// </summary>
         /// <param name="message">A <see langword="string" /> to be written.</param>
         void Info(string message);
+        void Info(string message, params object[] args);
 
         /// <summary>
         /// Writes the diagnostic message at the Warn level.
         /// </summary>
         /// <param name="message">A <see langword="string" /> to be written.</param>
         void Warn(string message);
+        void Warn(string message, params object[] args);
 
         /// <summary>
         /// Writes the diagnostic message at the Error level.
         /// </summary>
         /// <param name="message">A <see langword="string" /> to be written.</param>
         void Error(string message);
+        void Error(string message, params object[] args);
 
         /// <summary>
         /// Writes the diagnostic message at the Fatal level.
         /// </summary>
         /// <param name="message">A <see langword="string" /> to be written.</param>
         void Fatal(string message);
+        void Fatal(string message, params object[] args);
 
         /// <summary>
         /// Checks if the specified log level is enabled.
