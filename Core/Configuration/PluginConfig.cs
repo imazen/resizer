@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Collections;
 using System.Collections.Specialized;
 using ImageResizer.Collections;
+using ImageResizer.Configuration.Logging;
 
 namespace ImageResizer.Configuration {
     /// <summary>
@@ -209,6 +210,16 @@ namespace ImageResizer.Configuration {
 
         public IEncoderProvider EncoderProvider { get { return this; } }
 
+        protected ILogManager _logManager = null;
+        /// <summary>
+        /// Returns the most recently registered Logging plugin, or null.
+        /// </summary>
+        public ILogManager LogManager { get { return _logManager; } set { _logManager = value; if (LoggingAvailable != null && value != null) LoggingAvailable(value); } }
+
+
+        public delegate void LoggingAvaialbleEvent(ILogManager logger);
+        public LoggingAvaialbleEvent LoggingAvailable;
+
         /// <summary>
         /// Returns an instance of the first encoder that claims to be able to handle the specified settings.
         /// Returns null if no encoders are available.
@@ -365,8 +376,8 @@ namespace ImageResizer.Configuration {
             //TODO - perhaps manually select the constructor ? 
             //ConstructorInfo ci = null;
 
-            
 
+            bool hasConstructor = true;
             if (args != null && t.GetConstructor(new Type[] { typeof(NameValueCollection) }) == null) {
                 args = null; //The plugin doesn't accept arguments
                 this.AcceptIssue(new Issue("Plugins", "The plugin " + t.ToString() + " doesn't support constructor arguments.",
@@ -377,22 +388,26 @@ namespace ImageResizer.Configuration {
                 if (acceptsArgs)
                     this.AcceptIssue(new Issue("Plugins", "The plugin " + t.ToString() + " requires arguments in the <add> element. Refer to the plugin documentation for details.",
                     null, IssueSeverity.ConfigurationError));
-                else
+                else {
                     this.AcceptIssue(new Issue("Plugins", "The plugin " + t.ToString() + " does not have a constuctor   Constructor() or Constructor(NameValueCollection args)."
                     , "To be compatible with the <plugins> section, a plugin must implement IPlugin and define one or more of the above constructors publicly.",
                      IssueSeverity.Critical));
+                    hasConstructor = false;
+                }
+            } 
+            if (hasConstructor || Debugger.IsAttached){
+
+                object plugin = null;
+                if (args == null)
+                    plugin = Activator.CreateInstance(t, false);
+                else
+                    plugin = Activator.CreateInstance(t, args);
+
+                if (!(plugin is IPlugin))
+                    this.AcceptIssue(new Issue("Plugins", "Specified plugin doesn't implement IPlugin as required: " + t.ToString(), null, IssueSeverity.ConfigurationError));
+                return plugin as IPlugin;
             }
-
-            object plugin = null;
-            if (args == null)
-                plugin = Activator.CreateInstance(t, false);
-            else
-                plugin = Activator.CreateInstance(t, args);
-
-            if (!(plugin is IPlugin))
-                this.AcceptIssue(new Issue("Plugins", "Specified plugin doesn't implement IPlugin as required: " + t.ToString(), null, IssueSeverity.ConfigurationError));
-
-            return plugin as IPlugin;
+            return null;
         }
 
 
@@ -413,6 +428,7 @@ namespace ImageResizer.Configuration {
             if (plugin is IEncoder) ImageEncoders.Remove(plugin as IEncoder);
             if (plugin is BuilderExtension) ImageBuilderExtensions.Remove(plugin as BuilderExtension);
             if (plugin is IVirtualImageProvider) VirtualProviderPlugins.Remove(plugin as IVirtualImageProvider);
+            if (plugin is ILogManager && LogManager == plugin) LogManager = null;
         }
 
         /// <summary>
@@ -437,6 +453,7 @@ namespace ImageResizer.Configuration {
             if (plugin is IEncoder) ImageEncoders.AddFirst(plugin as IEncoder);
             if (plugin is BuilderExtension) ImageBuilderExtensions.Add(plugin as BuilderExtension);
             if (plugin is IVirtualImageProvider) VirtualProviderPlugins.Add(plugin as IVirtualImageProvider);
+            if (plugin is ILogManager) LogManager = plugin as ILogManager;
         }
 
 
