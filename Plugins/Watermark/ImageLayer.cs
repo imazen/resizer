@@ -54,15 +54,15 @@ namespace ImageResizer.Plugins.Watermark {
         /// </summary>
         /// <param name="localfile"></param>
         /// <returns></returns>
-        public Bitmap GetMemCachedBitmap(string virtualPath) {
+        public Bitmap GetMemCachedBitmap(string virtualPath, ResizeSettings query) {
             //If not ASP.NET, don't cache.
-            if (HttpContext.Current == null) return c.CurrentImageBuilder.LoadImage(virtualPath, new ResizeSettings());
+            if (HttpContext.Current == null) return c.CurrentImageBuilder.LoadImage(virtualPath, query);
 
-            string key = virtualPath.ToLowerInvariant();
+            string key = virtualPath.ToLowerInvariant() + query.ToString();
             Bitmap b = HttpContext.Current.Cache[key] as Bitmap;
             if (b != null) return b;
 
-            b = c.CurrentImageBuilder.LoadImage(virtualPath, new ResizeSettings());
+            b = c.CurrentImageBuilder.LoadImage(virtualPath, query);
             //Query VPPs for cache dependency. TODO: Add support for IVirtualImageProviders to customize cache dependencies.
             CacheDependency cd = null;
             if (HostingEnvironment.VirtualPathProvider != null) cd = HostingEnvironment.VirtualPathProvider.GetCacheDependency(virtualPath, new string[] { }, DateTime.UtcNow);
@@ -71,12 +71,6 @@ namespace ImageResizer.Plugins.Watermark {
             return b;
         }
 
-
-        public Bitmap GetBitmap() {
-            return GetMemCachedBitmap(Path);
-        }
-
-
         public override void RenderTo(Resizing.ImageState s) {
             if (string.IsNullOrEmpty(Path)) return;
 
@@ -84,17 +78,24 @@ namespace ImageResizer.Plugins.Watermark {
             s.destGraphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
             s.destGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
 
-            Bitmap img = GetBitmap();
-            lock (img){ //Only one reader from the cached bitmap at a time.
-                //Calculate the location for the bitmap
-                RectangleF imgBounds = this.CalculateLayerCoordinates(s, delegate(double maxwidth, double maxheight) {
-                    ResizeSettings opts = new ResizeSettings(ImageQuery);
-                    if (!double.IsNaN(maxwidth)) opts.MaxWidth = (int)maxwidth;
-                    if (!double.IsNaN(maxheight)) opts.MaxHeight = (int)maxheight;
+            //If the image is a virtual gradient, allow delayed loading so the estimated width/height values can be used to create it the proper size. 
+            //Otherwise, load immediately.
+            Bitmap img = null;
+            if (!(c.Pipeline.GetFile(Path,ImageQuery) is ImageResizer.Plugins.Basic.Gradient.GradientVirtualFile))
+                img = GetMemCachedBitmap(Path, ImageQuery);
+           
+            //Calculate the location for the bitmap
+            RectangleF imgBounds = this.CalculateLayerCoordinates(s, delegate(double maxwidth, double maxheight) {
+                ResizeSettings opts = new ResizeSettings(ImageQuery);
+                if (!double.IsNaN(maxwidth)) opts.MaxWidth = (int)maxwidth;
+                if (!double.IsNaN(maxheight)) opts.MaxHeight = (int)maxheight;
 
-                    return ImageBuilder.Current.GetFinalSize(img.Size, opts);
-                }, true);
+                if (img == null) img = GetMemCachedBitmap(Path, opts); //Delayed creation allows the maxwidth/maxheight to be used in gradient plugin
 
+                return ImageBuilder.Current.GetFinalSize(img.Size, opts);
+            }, true);
+
+            lock (img) { //Only one reader from the cached bitmap at a time.
                 //Skip rendering unless we have room to work with.
                 if (imgBounds.Width <2 || imgBounds.Height < 2) return;
 

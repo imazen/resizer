@@ -50,8 +50,8 @@ namespace ImageResizer.Plugins.Basic {
             public System.Drawing.Bitmap GetBitmap() {
                 Bitmap b = null;
                 try {
-                    int w = query.Width > 0 ? query.Width : 8;
-                    int h = query.Height > 0 ? query.Height : 8;
+                    int w = query.Width > 0 ? query.Width : (query.MaxWidth > 0 ? query.MaxWidth : 8);
+                    int h = query.Height > 0 ? query.Height : (query.MaxHeight > 0 ? query.MaxHeight : 8);
                     float angle = Util.Utils.getFloat(query,"angle",0);
                     Color c1 = Utils.parseColor(query["color1"],Color.White);
                     Color c2 = Utils.parseColor(query["color2"],Color.Black);

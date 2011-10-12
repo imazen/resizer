@@ -94,10 +94,6 @@
     <Reference Include="ImageResizer.Plugins.SqlReader">
       <HintPath>..\..\dlls\release\ImageResizer.Plugins.SqlReader.dll</HintPath>
     </Reference>
-    <Reference Include="ImageResizer.Plugins.Watermark, Version=3.0.12.31525, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\release\ImageResizer.Plugins.Watermark.dll</HintPath>
-    </Reference>
     <Reference Include="ImageResizer.Plugins.WhitespaceTrimmer, Version=3.0.12.31525, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\dlls\release\ImageResizer.Plugins.WhitespaceTrimmer.dll</HintPath>
@@ -180,6 +176,10 @@
     <ProjectReference Include="..\..\Plugins\FreeImage\ImageResizer.Plugins.FreeImage.csproj">
       <Project>{8E863AFE-B4CF-46AA-8382-0C3547C0EDE9}</Project>
       <Name>ImageResizer.Plugins.FreeImage</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\Watermark\ImageResizer.Plugins.Watermark.csproj">
+      <Project>{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}</Project>
+      <Name>ImageResizer.Plugins.Watermark</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
