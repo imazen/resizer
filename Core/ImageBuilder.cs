@@ -622,10 +622,22 @@ namespace ImageResizer
             //If the image doesn't support transparency, we need to fill the background color now.
             Color background = s.settings.BackgroundColor;
 
-            if (background == Color.Transparent)
+            if (background == Color.Transparent) {
                 //Only set the bgcolor if the image isn't taking the whole area.
-                if (!s.supportsTransparency)// && (!PolygonMath.GetBoundingBox(s.layout["image"]).Equals(s.layout.GetBoundingBox()))
-                    background = Color.White;
+                if (!s.supportsTransparency) {
+                    //If the source format doesn't support transparency either, we should be able to safely leave the bg transparent, hopefully preventing the ghostly outline.
+                    //Update: nope, doesn't seem to help. Must be the edge blending by the hq bicubic.
+                    //if (s.sourceBitmap != null && (s.sourceBitmap.PixelFormat == PixelFormat.Format24bppRgb ||
+                   //     s.sourceBitmap.PixelFormat == PixelFormat.Format32bppRgb || 
+                   //     s.sourceBitmap.PixelFormat == PixelFormat.Format48bppRgb) &&
+                   //     PolygonMath.GetBoundingBox(s.layout["image"]).Equals(s.layout.GetBoundingBox())) {
+                        //Do nothing, the image is transparent by default
+                    //} else {
+                        background = Color.White;
+                    //}
+                }
+            }
+
             
             //Fill background
             if (background != Color.Transparent) //This causes increased aliasing at the edges - i.e., a faint white border that is even more pronounced than usual.
@@ -865,7 +877,7 @@ namespace ImageResizer
                 //Determine the size of the area we are copying
                 SizeF sourceSize = PolygonMath.ScaleInside(areaSize, s.originalSize);
                 //Center the portion we are copying within the original bitmap
-                s.copyRect = new RectangleF((s.originalSize.Width - sourceSize.Width) / 2, (s.originalSize.Height - sourceSize.Height) / 2, sourceSize.Width, sourceSize.Height);
+                s.copyRect = PolygonMath.AlignWith(new RectangleF(0,0,sourceSize.Width,sourceSize.Height),new RectangleF(0,0,s.originalSize.Width,s.originalSize.Height),s.settings.Anchor);
                 //Restore targetSize to match areaSize //Warning - crop always forces scale=both.
                 targetSize = areaSize;
             }
@@ -885,7 +897,7 @@ namespace ImageResizer
             s.layout.AddRing("imageArea",PolygonMath.ToPoly(new RectangleF(new PointF(0, 0), areaSize)));
 
             //Center imageArea around 'image'
-            s.layout["imageArea"] = PolygonMath.CenterInside(s.layout["imageArea"], s.layout["image"]);
+            s.layout["imageArea"] = PolygonMath.AlignWith(s.layout["imageArea"], s.layout["image"], s.settings.Anchor);
 
             return RequestedAction.None;
         }

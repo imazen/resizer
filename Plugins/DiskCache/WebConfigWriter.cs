@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ImageResizer.Configuration.Logging;
 
 namespace ImageResizer.Plugins.DiskCache {
     /// <summary>
@@ -12,14 +13,15 @@ namespace ImageResizer.Plugins.DiskCache {
     /// </summary>
     public class WebConfigWriter {
 
-        public WebConfigWriter(string physicalDirPath)
-            : this(physicalDirPath, null) {
+        public WebConfigWriter(ILoggerProvider lp, string physicalDirPath)
+            : this(lp,physicalDirPath, null) {
         }
-        public WebConfigWriter(string physicalDirPath, string alternateWebConfigContents) {
+        public WebConfigWriter(ILoggerProvider lp, string physicalDirPath, string alternateWebConfigContents) {
             this.physicalDirPath = physicalDirPath;
+            this.lp = lp;
             if (alternateWebConfigContents != null) this.webConfigContents = alternateWebConfigContents;
         }
-
+        protected ILoggerProvider lp = null;
         protected string physicalDirPath = null;
 
         /// <summary>
@@ -83,6 +85,7 @@ namespace ImageResizer.Plugins.DiskCache {
         protected void _checkWebConfig() {
             try {
                 string webConfigPath = physicalDirPath.TrimEnd('/', '\\') + System.IO.Path.DirectorySeparatorChar + "Web.config";
+                if (lp.Logger != null) lp.Logger.Debug("Verifying Web.config exists in cache directory.");
                 if (System.IO.File.Exists(webConfigPath)) return; //Already exists, quit
 
 
@@ -90,6 +93,7 @@ namespace ImageResizer.Plugins.DiskCache {
                 if (!System.IO.Directory.Exists(physicalDirPath))
                     System.IO.Directory.CreateDirectory(physicalDirPath);
 
+                if (lp.Logger != null) lp.Logger.Info("Creating missing Web.config in cache directory.");
                 //Create the Web.config file
                 System.IO.File.WriteAllText(webConfigPath, getNewWebConfigContents(),UTF8Encoding.UTF8);
 

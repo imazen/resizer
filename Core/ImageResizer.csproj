@@ -72,6 +72,9 @@
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
     <Compile Include="Configuration\Issues\ConfigChecker.cs" />
     <Compile Include="Configuration\IUrlAuthorizationEventArgs.cs" />
+    <Compile Include="Configuration\Logging\ILogger.cs" />
+    <Compile Include="Configuration\Logging\ILoggerProvider.cs" />
+    <Compile Include="Configuration\Logging\ILogManager.cs" />
     <Compile Include="Configuration\UrlAuthorizationEventArgs.cs" />
     <Compile Include="Plugins\Basic\FolderResizeSyntax.cs" />
     <Compile Include="Plugins\Basic\ImageHandlerSyntax.cs">
@@ -106,12 +109,14 @@
     <Compile Include="Configuration\Xml\Node.cs" />
     <Compile Include="Configuration\Xml\Selector.cs" />
     <Compile Include="Plugins\Basic\DropShadow.cs" />
+    <Compile Include="Plugins\Basic\SpeedOrQuality.cs" />
     <Compile Include="Plugins\IFileExtensionPlugin.cs" />
     <Compile Include="Plugins\Basic\Trial.cs" />
     <Compile Include="Plugins\Basic\Diagnostic.cs" />
     <Compile Include="Plugins\Basic\DiagnosticPageHandler.cs" />
     <Compile Include="Plugins\IMultiInstancePlugin.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
+    <Compile Include="Plugins\VirtualFileWrapper.cs" />
     <Compile Include="ResizerSection.cs" />
     <Compile Include="Caching\ICache.cs" />
     <Compile Include="Collections\SafeList.cs" />
