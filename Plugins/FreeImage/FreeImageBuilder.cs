@@ -19,7 +19,8 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
          /// <summary>
         /// Creates a new FreeImageBuilder instance with no extensions.
         /// </summary>
-        public FreeImageBuilderPlugin(IEncoderProvider encoderProvider): base(encoderProvider) {
+        public FreeImageBuilderPlugin(IEncoderProvider encoderProvider, IVirtualImageProvider virtualFileProvider)
+            : base(encoderProvider,virtualFileProvider) {
         }
 
         /// <summary>
@@ -27,8 +28,8 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
         /// </summary>
         /// <param name="extensions"></param>
         /// <param name="encoderProvider"></param>
-        public FreeImageBuilderPlugin(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider)
-            : base(extensions, encoderProvider) {
+        public FreeImageBuilderPlugin(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider, IVirtualImageProvider virtualFileProvider)
+            : base(extensions, encoderProvider,virtualFileProvider) {
         }
 
         
@@ -38,19 +39,19 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
         /// <param name="extensions"></param>
         /// <param name="writer"></param>
         /// <returns></returns>
-        public override ImageBuilder Create(IEnumerable<BuilderExtension> extensions, IEncoderProvider writer) {
-            return new FreeImageBuilderPlugin(extensions, writer);
+        public override ImageBuilder Create(IEnumerable<BuilderExtension> extensions, IEncoderProvider writer, IVirtualImageProvider virtualFileProvider) {
+            return new FreeImageBuilderPlugin(extensions, writer,virtualFileProvider);
         }
         /// <summary>
         /// Copies the instance along with extensions. Subclasses must override this.
         /// </summary>
         /// <returns></returns>
         public override ImageBuilder Copy() {
-            return new FreeImageBuilderPlugin(this.exts, this._encoderProvider);
+            return new FreeImageBuilderPlugin(this.exts, this.EncoderProvider, this.VirtualFileProvider);
         }
 
         public IPlugin Install(Configuration.Config c) {
-            c.UpgradeImageBuilder(new FreeImageBuilderPlugin(c.CurrentImageBuilder.EncoderProvider));
+            c.UpgradeImageBuilder(new FreeImageBuilderPlugin(c.CurrentImageBuilder.EncoderProvider,VirtualFileProvider));
             c.Plugins.add_plugin(this);
             return this;
         }
