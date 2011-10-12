@@ -16,6 +16,6 @@
 		<file src="$pluginsdlldir$\PsdFile.dll" target="lib" />
 		<file src="$pluginsdlldir$\PsdFile.pdb" target="lib" />
 		<file src="..\Plugins\PsdReader\**\*.cs" target="src\PsdReader" />
-		<file src="..\Plugins\PsdLibs\PsdPlugin\PsdFile\**\*.cs" target="src\PsdFile" />
+		<file src="..\Plugins\Libs\PsdPlugin\PsdFile\**\*.cs" target="src\PsdFile" />
 	</files>
 </package>
