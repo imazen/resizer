@@ -922,7 +922,7 @@ namespace ImageResizer
                 "rotate", "flip", "sourceFlip", "borderWidth",
                 "borderColor", "paddingWidth", "paddingColor",
                 "ignoreicc", "frame", "useresizingpipeline", 
-                "cache", "process", "margin"};
+                "cache", "process", "margin", "anchor"};
 
         /// <summary>
         /// Returns a list of the querystring commands ImageBuilder can parse by default. Plugins can implement IQuerystringPlugin to add new ones.
