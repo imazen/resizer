@@ -374,6 +374,8 @@ namespace ImageResizer.Util
                 return new SizeF((float)(innerBounds.Width), (float)(innerBounds.Width / outerRatio));
             }
         }
+
+        
         /// <summary>
         /// Scales 'inner' to fit inside 'bounding' while maintaining aspect ratio. Only downscales.
         /// </summary>
@@ -537,6 +539,19 @@ namespace ImageResizer.Util
             return MovePoly(NormalizePoly(inner), new PointF((outBox.Width - inBox.Width) / 2 + outBox.X,
                                                     (outBox.Height - inBox.Height) / 2 + outBox.Y));
         }
+
+
+        /// <summary>
+        /// Creates a rectangle of size 'size' with a center matching that of bounds.
+        /// </summary>
+        /// <param name="sizeF"></param>
+        /// <param name="imgBounds"></param>
+        /// <returns></returns>
+        public static RectangleF CenterInside(SizeF size, RectangleF bounds) {
+            return new RectangleF(bounds.Width / 2 + bounds.X - (size.Width / 2), bounds.Height / 2 + bounds.Y - (size.Height / 2), size.Width, size.Height);
+        }
+
+
         /// <summary>
         /// Rounds a floating-point rectangle to an integer rectangle using System.Round
         /// </summary>
@@ -552,5 +567,40 @@ namespace ImageResizer.Util
         }
 
 
+        /// <summary>
+        /// Aligns the specified rectangle object with its reference ('container') rectangle using the specified alignment. The container can be smaller than 'obj'.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="container"></param>
+        /// <param name="align"></param>
+        /// <returns></returns>
+        public static RectangleF AlignWith(RectangleF obj, RectangleF container, ContentAlignment align) {
+            if (align == ContentAlignment.BottomLeft || align == ContentAlignment.MiddleLeft || align == ContentAlignment.TopLeft)
+                obj.X = container.X;
+            if (align == ContentAlignment.BottomCenter || align == ContentAlignment.MiddleCenter || align == ContentAlignment.TopCenter)
+                obj.X = container.X + (container.Width - obj.Width) / 2;
+            if (align == ContentAlignment.BottomRight || align == ContentAlignment.MiddleRight || align == ContentAlignment.TopRight)
+                obj.X = container.X + (container.Width - obj.Width);
+            if (align == ContentAlignment.TopLeft || align == ContentAlignment.TopCenter || align == ContentAlignment.TopRight)
+                obj.Y = container.Y;
+            if (align == ContentAlignment.MiddleLeft || align == ContentAlignment.MiddleCenter || align == ContentAlignment.MiddleRight)
+                obj.Y = container.Y + (container.Height - obj.Height) / 2;
+            if (align == ContentAlignment.BottomLeft || align == ContentAlignment.BottomCenter || align == ContentAlignment.BottomRight)
+                obj.Y = container.Y + (container.Height - obj.Height);
+
+            return obj;
+        }
+        /// <summary>
+        /// Aligns the specified polygon with its container (reference) polygon using the specified alignment. The container can be smaller than 'obj'.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="container"></param>
+        /// <param name="align"></param>
+        /// <returns></returns>
+        public static PointF[] AlignWith(PointF[] obj, PointF[] container, ContentAlignment align) {
+            RectangleF origBounds = PolygonMath.GetBoundingBox(obj);
+            RectangleF newBounds = AlignWith(PolygonMath.GetBoundingBox(obj), PolygonMath.GetBoundingBox(container), align);
+            return PolygonMath.MovePoly(obj, new PointF(newBounds.X - origBounds.X, newBounds.Y - origBounds.Y));
+        }
     }
 }
