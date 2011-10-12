@@ -17,7 +17,7 @@ namespace ImageResizer.Plugins.Logging {
                 LoadConfigFromFile(args["configFile"]); //TODO: resolve app-relative paths.
         }
         public IPlugin Install(Configuration.Config c) {
-            c.Plugins.add_plugin(this); //TODO: assign this instance as the default log manager.
+            c.Plugins.add_plugin(this);
             return this;
         }
 

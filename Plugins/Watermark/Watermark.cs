@@ -25,7 +25,9 @@ namespace ImageResizer.Plugins.Watermark
 
         ImageLayer _otherImages = null;
         /// <summary>
-        /// These settings are applied to watermarks which are not preset in Web.config. To set the folder that watermark images are looked for in, set OtherImages.ImagePath. 
+        /// When a &amp;watermark command does not specify a named preset, it is assumed to be a file name. 
+        /// Set OtherImages.Path to the search folder. All watermark images (except for presets) must be in the root of the search folder. 
+        /// The remainder of the settings affect how each watermrak will be positioned and displayed.
         /// </summary>
         public ImageLayer OtherImages {
             get { return _otherImages; }
