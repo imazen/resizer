@@ -7,6 +7,7 @@ using ImageResizer.Plugins.DiskCache.Cleanup;
 using System.IO;
 using ImageResizer.Configuration.Issues;
 using System.Diagnostics;
+using ImageResizer.Configuration.Logging;
 
 namespace ImageResizer.Plugins.DiskCache {
     public class CleanupWorker : IssueSink, IDisposable {
@@ -17,16 +18,18 @@ namespace ImageResizer.Plugins.DiskCache {
         CleanupStrategy cs = null;
         CleanupQueue queue = null;
         CustomDiskCache cache = null;
+        ILoggerProvider lp = null;
         /// <summary>
         /// Creates and starts a thread that consumes the queue, pausing until notified when 'queue' empties.
         /// </summary>
         /// <param name="cs"></param>
         /// <param name="queue"></param>
         /// <param name="cache"></param>
-        public CleanupWorker(CleanupStrategy cs, CleanupQueue queue, CustomDiskCache cache):base("DiskCache-CleanupWorker") {
+        public CleanupWorker(ILoggerProvider lp, CleanupStrategy cs, CleanupQueue queue, CustomDiskCache cache):base("DiskCache-CleanupWorker") {
             this.cs = cs;
             this.queue = queue;
             this.cache = cache;
+            this.lp = lp;
             t = new Thread(main);
             t.IsBackground = true;
             t.Start();
@@ -113,7 +116,7 @@ namespace ImageResizer.Plugins.DiskCache {
                     DoTask(queue.Pop());
                 } catch (Exception e) {
                     if (Debugger.IsAttached) throw;
-                        
+                    if (lp.Logger != null) lp.Logger.Error("Failed exeuting task {0}", e.Message + e.StackTrace);
                     this.AcceptIssue(new Issue("Failed exeuting task", e.Message + e.StackTrace, IssueSeverity.Critical));
                 }
             }
@@ -134,7 +137,10 @@ namespace ImageResizer.Plugins.DiskCache {
 
 
         protected void DoTask(CleanupWorkItem item) {
-            Debug.WriteLine("Executing task " + item.Task.ToString() + " " + item.RelativePath + " (" + queue.Count.ToString() + " task remaining)");
+
+
+            Stopwatch sw = null;
+            if (lp.Logger != null) { sw = new Stopwatch(); sw.Start(); }
 
             if (item.Task == CleanupWorkItem.Kind.RemoveFile)
                 RemoveFile(item);
@@ -144,6 +150,10 @@ namespace ImageResizer.Plugins.DiskCache {
                 PopulateFolder(item, item.Task == CleanupWorkItem.Kind.PopulateFolderRecursive);
             else if (item.Task == CleanupWorkItem.Kind.FlushAccessedDate) 
                 FlushAccessedDate(item);
+
+            if (lp.Logger != null) sw.Stop();
+            if (lp.Logger != null) lp.Logger.Trace("({2}ms): Executing task {0} {1} ({3} tasks remaining)", item.Task.ToString(), item.RelativePath, sw.ElapsedMilliseconds, queue.Count.ToString());
+
             
         }
 
@@ -156,8 +166,14 @@ namespace ImageResizer.Plugins.DiskCache {
         protected void PopulateFolder(CleanupWorkItem item, bool recursive) {
             //Do the local work.
             if (!cache.Index.GetIsValid(item.RelativePath)) {
-                Debug.WriteLine("Querying filesystem about " + item.PhysicalPath);
-                cache.Index.populate(item.RelativePath, item.PhysicalPath);
+                if (lp.Logger != null) {
+                    Stopwatch sw = new Stopwatch();
+                    sw.Start();
+                    cache.Index.populate(item.RelativePath, item.PhysicalPath);
+                    sw.Stop();
+                    lp.Logger.Trace("({0}ms): Querying filesystem about {1}", sw.ElapsedMilliseconds, item.RelativePath);
+                } else 
+                    cache.Index.populate(item.RelativePath, item.PhysicalPath);
             }
 
             if (recursive) {

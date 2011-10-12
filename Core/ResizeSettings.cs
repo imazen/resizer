@@ -91,6 +91,16 @@ namespace ImageResizer {
             return get("rotate", 0.0d);               } set {   
             set("rotate",value);                    } }
 
+
+        /// <summary>
+        /// How to anchor the image when cropping or adding whitespace to meet sizing requirements.
+        /// </summary>
+        public ContentAlignment Anchor                   { get {
+            return Utils.parseEnum<ContentAlignment>(this["anchor"],ContentAlignment.MiddleCenter);       } set {
+            this["anchor"] = value.ToString();      }}
+
+
+
         /// <summary>
         /// Allows you to flip the entire resulting image vertically, horizontally, or both.
         /// </summary>
@@ -114,7 +124,7 @@ namespace ImageResizer {
             this["scale"] = Utils.writeScale(value);        }}
 
         /// <summary>
-        /// Whether to preserve aspect ratio or stretch.
+        /// Whether to preserve aspect ratio or stretch to fill the bounds.
         /// </summary>
         public StretchMode Stretch                          { get {
             return Utils.parseStretch(this["stretch"]);      } set {

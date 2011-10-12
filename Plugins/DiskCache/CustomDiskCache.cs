@@ -5,6 +5,8 @@ using System.Text;
 using ImageResizer.Caching;
 using ImageResizer.Util;
 using System.IO;
+using ImageResizer.Configuration.Logging;
+using System.Diagnostics;
 
 namespace ImageResizer.Plugins.DiskCache {
     public delegate void CacheResultHandler(CustomDiskCache sender, CacheResult r);
@@ -21,7 +23,9 @@ namespace ImageResizer.Plugins.DiskCache {
         }
         protected int subfolders;
         protected bool hashModifiedDate;
-        public CustomDiskCache(string physicalCachePath, int subfolders, bool hashModifiedDate) {
+        protected ILoggerProvider lp;
+        public CustomDiskCache(ILoggerProvider lp, string physicalCachePath, int subfolders, bool hashModifiedDate) {
+            this.lp = lp;
             this.physicalCachePath = physicalCachePath;
             this.subfolders = subfolders;
             this.hashModifiedDate = hashModifiedDate;
@@ -53,6 +57,10 @@ namespace ImageResizer.Plugins.DiskCache {
 
 
         public CacheResult GetCachedFile(string keyBasis, string extension, ResizeImageDelegate writeCallback, DateTime sourceModifiedUtc, int timeoutMs) {
+            Stopwatch sw = null;
+            if (lp.Logger != null) { sw = new Stopwatch(); sw.Start(); }
+
+
             bool hasModifiedDate = !sourceModifiedUtc.Equals(DateTime.MinValue);
 
 
@@ -81,7 +89,10 @@ namespace ImageResizer.Plugins.DiskCache {
                         if (((!hasModifiedDate || hashModifiedDate) && !Index.exists(relativePath, physicalPath)) || !Index.modifiedDateMatches(sourceModifiedUtc, relativePath, physicalPath)) {
 
                             //Create subdirectory if needed.
-                            if (!Directory.Exists(Path.GetDirectoryName(physicalPath))) Directory.CreateDirectory(Path.GetDirectoryName(physicalPath));
+                            if (!Directory.Exists(Path.GetDirectoryName(physicalPath))) {
+                                Directory.CreateDirectory(Path.GetDirectoryName(physicalPath));
+                                if (lp.Logger != null) lp.Logger.Debug("Creating missing parent directory {0}",Path.GetDirectoryName(physicalPath));
+                            }
 
                             //Open stream 
                             //TODO: Catch IOException, and if it is a file lock, (and hashmodified is true), then it's another process writing to the file, and we can serve the file afterwards
@@ -106,6 +117,10 @@ namespace ImageResizer.Plugins.DiskCache {
                     result.Result = CacheQueryResult.Failed;
                 }
                 
+            }
+            if (lp.Logger != null) {
+                sw.Stop();
+                lp.Logger.Trace("({0}ms): {1} for {2}", sw.ElapsedMilliseconds, result.Result.ToString(), result.RelativePath); 
             }
             //Fire event
             if (CacheResultReturned != null) CacheResultReturned(this, result);

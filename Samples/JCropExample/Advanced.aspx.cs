@@ -11,7 +11,8 @@ namespace JCropExample {
             //Here we just do a redirect, but we could store the URL in SQL just as easily, saving the crop settings for future pages.
             if (Page.IsPostBack && !string.IsNullOrEmpty(img1.Value)) Response.Redirect(ResolveUrl(img1.Value));
             //We could even write the cropped image to disk, if we wanted
-            //ImageBuilder.Current.Build(ResolveUrl(ImageResizer.Util.PathUtils.RemoveQueryString(img1.Value)), "~/savedimages/cropped.jpg", new ResizeSettings(img1.Value));
+            //if (Page.IsPostBack && !string.IsNullOrEmpty(img1.Value))  
+            //    ImageBuilder.Current.Build("~/" + ImageResizer.Util.PathUtils.RemoveQueryString(img1.Value), "~/cropped.jpg", new ResizeSettings(img1.Value));
         }
     }
 }

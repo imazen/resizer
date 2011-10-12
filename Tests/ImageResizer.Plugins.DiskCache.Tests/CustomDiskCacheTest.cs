@@ -5,18 +5,19 @@ using Gallio.Framework;
 using MbUnit.Framework;
 using MbUnit.Framework.ContractVerifiers;
 using System.IO;
+using ImageResizer.Configuration.Logging;
 
 namespace ImageResizer.Plugins.DiskCache.Tests {
     [TestFixture]
     [Row(0,50,false)]
     [Row(0,50,true)]
     //[Row(8000,100,true)]
-    public class CustomDiskCacheTest {
+    public class CustomDiskCacheTest :ILoggerProvider{
 
         public CustomDiskCacheTest(int subfolders, int totalFiles, bool hashModifiedDate) {
             char c = System.IO.Path.DirectorySeparatorChar;
             string folder = System.IO.Path.GetTempPath().TrimEnd(c) + c + System.IO.Path.GetRandomFileName();
-            cache = new CustomDiskCache(folder,subfolders,hashModifiedDate);
+            cache = new CustomDiskCache(this, folder,subfolders,hashModifiedDate);
             this.quantity = totalFiles;
 
             for (int i = 0; i < quantity;i++){
@@ -60,6 +61,10 @@ namespace ImageResizer.Plugins.DiskCache.Tests {
         [Test(Order=3)]
         public void TestClear() {
             System.IO.Directory.Delete(cache.PhysicalCachePath, true);
+        }
+
+        public ILogger Logger {
+            get { return null; }
         }
     }
 }
