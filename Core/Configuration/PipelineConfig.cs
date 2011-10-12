@@ -265,11 +265,11 @@ namespace ImageResizer.Configuration {
         /// <param name="virtualPath"></param>
         /// <param name="queryString"></param>
         /// <returns></returns>
-        public object GetFile(string virtualPath, NameValueCollection queryString) {
+        public IVirtualFile GetFile(string virtualPath, NameValueCollection queryString) {
             foreach (IVirtualImageProvider p in c.Plugins.VirtualProviderPlugins) {
                 if (p.FileExists(virtualPath, queryString)) return p.GetFile(virtualPath, queryString);
             }
-            return HostingEnvironment.VirtualPathProvider != null ? HostingEnvironment.VirtualPathProvider.GetFile(virtualPath) : null;
+            return HostingEnvironment.VirtualPathProvider != null && HostingEnvironment.VirtualPathProvider.FileExists(virtualPath)  ? new VirtualFileWrapper(HostingEnvironment.VirtualPathProvider.GetFile(virtualPath)) : null;
         }
 
         /// <summary>
