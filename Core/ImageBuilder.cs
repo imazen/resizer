@@ -1,15 +1,8 @@
 /* Copyright (c) 2011 Nathanael Jones. See license.txt */
 using System;
 using System.Configuration;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
 using System.Drawing;
 using System.IO;
-using System.Web.Hosting;
 using System.Drawing.Imaging;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,6 +15,7 @@ using ImageResizer.Encoding;
 using ImageResizer.Util;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins;
+using System.Web.Hosting;
 
 namespace ImageResizer
 {
@@ -41,6 +35,16 @@ namespace ImageResizer
         /// </summary>
         public IEncoderProvider EncoderProvider { get { return _encoderProvider; } }
 
+
+        private IVirtualImageProvider _virtualFileProvider;
+
+        /// <summary>
+        /// Provides a resolution service for app-relative URLs. 
+        /// </summary>
+        public IVirtualImageProvider VirtualFileProvider {
+            get { return _virtualFileProvider; }
+        }
+
         /// <summary>
         /// Returns a shared instance of ImageBuilder or a subclass, equivalent to  Config.Current.CurrentImageBuilder
         /// </summary>
@@ -49,8 +53,10 @@ namespace ImageResizer
         /// <summary>
         /// Creates a new ImageBuilder instance with no extensions.
         /// </summary>
-        public ImageBuilder(IEncoderProvider encoderProvider): base() {
-                this._encoderProvider = encoderProvider;
+        public ImageBuilder(IEncoderProvider encoderProvider, IVirtualImageProvider virtualFileProvider)
+            : base() {
+            this._encoderProvider = encoderProvider;
+            this._virtualFileProvider = virtualFileProvider;
         }
 
         /// <summary>
@@ -58,8 +64,10 @@ namespace ImageResizer
         /// </summary>
         /// <param name="extensions"></param>
         /// <param name="encoderProvider"></param>
-        public ImageBuilder(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider):base(extensions){
+        public ImageBuilder(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider, IVirtualImageProvider virtualFileProvider)
+            : base(extensions) {
             this._encoderProvider = encoderProvider;
+            this._virtualFileProvider = virtualFileProvider;
         }
 
         
@@ -68,16 +76,17 @@ namespace ImageResizer
         /// </summary>
         /// <param name="extensions"></param>
         /// <param name="writer"></param>
+        /// <param name="virtualFileProvider"></param>
         /// <returns></returns>
-        public virtual ImageBuilder Create(IEnumerable<BuilderExtension> extensions, IEncoderProvider writer) {
-            return new ImageBuilder(extensions,writer);
+        public virtual ImageBuilder Create(IEnumerable<BuilderExtension> extensions, IEncoderProvider writer, IVirtualImageProvider virtualFileProvider) {
+            return new ImageBuilder(extensions,writer,virtualFileProvider);
         }
         /// <summary>
         /// Copies the instance along with extensions. Subclasses must override this.
         /// </summary>
         /// <returns></returns>
         public virtual ImageBuilder Copy(){
-            return new ImageBuilder(this.exts,this._encoderProvider);
+            return new ImageBuilder(this.exts,this._encoderProvider, this._virtualFileProvider);
         }
 
 
@@ -113,8 +122,7 @@ namespace ImageResizer
                 path = source as string;
                 //Convert app-relative paths to VirtualFile instances
                 if (path.StartsWith("~", StringComparison.OrdinalIgnoreCase)) {
-                    //TODO: add support for Ivirtual files
-                    source = HostingEnvironment.VirtualPathProvider.GetFile(PathUtils.ResolveAppRelative(path));
+                    source = this.VirtualFileProvider.GetFile(PathUtils.ResolveAppRelative(path), settings); 
                 }
             }
 

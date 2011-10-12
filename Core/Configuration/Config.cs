@@ -105,7 +105,7 @@ namespace ImageResizer.Configuration {
         /// </summary>
         /// <param name="replacement"></param>
         public void UpgradeImageBuilder(ImageBuilder replacement) {
-            lock (_imageBuilderSync) _imageBuilder = replacement.Create(plugins.ImageBuilderExtensions, plugins);
+            lock (_imageBuilderSync) _imageBuilder = replacement.Create(plugins.ImageBuilderExtensions, plugins,pipeline);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace ImageResizer.Configuration {
                 if (_imageBuilder == null)
                     lock (_imageBuilderSync)
                         if (_imageBuilder == null)
-                            _imageBuilder = new ImageBuilder(plugins.ImageBuilderExtensions,plugins);
+                            _imageBuilder = new ImageBuilder(plugins.ImageBuilderExtensions,plugins,pipeline);
 
                 return _imageBuilder;
             }
@@ -145,7 +145,7 @@ namespace ImageResizer.Configuration {
         }
 
         protected void InvalidateImageBuilder() {
-            lock (_imageBuilderSync) if (_imageBuilder != null) _imageBuilder = _imageBuilder.Create(plugins.ImageBuilderExtensions, plugins);
+            lock (_imageBuilderSync) if (_imageBuilder != null) _imageBuilder = _imageBuilder.Create(plugins.ImageBuilderExtensions, plugins,pipeline);
         }
         #endregion
 
