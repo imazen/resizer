@@ -6,6 +6,7 @@ using ImageResizer.Caching;
 using ImageResizer.Configuration;
 using System.Collections.Specialized;
 using System.Web;
+using ImageResizer.Plugins;
 
 namespace ImageResizer.Configuration {
     public enum VppUsageOption {
@@ -21,7 +22,7 @@ namespace ImageResizer.Configuration {
     public delegate void CacheSelectionHandler(object sender, ICacheSelectionEventArgs e);
 
 
-    public interface IPipelineConfig {
+    public interface IPipelineConfig:IVirtualImageProvider {
         /// <summary>
         /// True if the specified extension is one that the pipeline can handle
         /// </summary>
@@ -91,11 +92,12 @@ namespace ImageResizer.Configuration {
         ICacheProvider GetCacheProvider();
 
 		/// <summary>
+        /// Returns an IVirtualFile instance if the specified file exists.
 		/// </summary>
 		/// <param name="virtualPath"></param>
 		/// <param name="queryString"></param>
 		/// <returns></returns>
-        object GetFile(string virtualPath, NameValueCollection queryString);
+        IVirtualFile GetFile(string virtualPath, NameValueCollection queryString);
 
         /// <summary>
         /// Returns true if (a) A registered IVirtualImageProvider says it exists, or (b) if the VirtualPathProvider chain says it exists.

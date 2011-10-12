@@ -118,17 +118,14 @@ namespace ImageResizer {
 
                     
                     
-                    //Does the file exist?
+                    //Does the file exist physically? (false if VppUsage=always or file is missing)
                     bool existsPhysically = (conf.VppUsage != VppUsageOption.Always) && System.IO.File.Exists(HostingEnvironment.MapPath(virtualPath));
 
-                    //Mutually exclusive with existsPhysically. 
-                    bool existsVirtually = (conf.VppUsage != VppUsageOption.Never && !existsPhysically) && conf.FileExists(virtualPath, q);
-                    
-                    //object the virtual file instance only if (a) VppUsage=always, and it exists virtually, or (b) VppUsage=fallback, and it only exists virtually
-                    object vf = existsVirtually ? conf.GetFile(virtualPath,q) : null;
+                    //If not present physically (and VppUsage!=never), try to get the virtual file. Null indicates a missing file
+                    IVirtualFile vf = (conf.VppUsage != VppUsageOption.Never && !existsPhysically) ? conf.GetFile(virtualPath, q) : null;
 
                     //Only process files that exist
-                    if (existsPhysically || existsVirtually) {
+                    if (existsPhysically || vf != null) {
                         try{
                             HandleRequest(app.Context, virtualPath, q, vf);
                             //Catch not found exceptions
@@ -177,7 +174,7 @@ namespace ImageResizer {
         /// <param name="virtualPath"></param>
 		/// <param name="queryString"></param>
 		/// <param name="vf"></param>
-        protected virtual void HandleRequest(HttpContext context, string virtualPath, NameValueCollection queryString, object vf) {
+        protected virtual void HandleRequest(HttpContext context, string virtualPath, NameValueCollection queryString, IVirtualFile vf) {
             Stopwatch s = new Stopwatch();
             s.Start();
             
@@ -266,8 +263,7 @@ namespace ImageResizer {
                 try {
                     if (!isProcessing) {
                         //Just duplicate the data
-                        using (Stream source = (vf != null) ? 
-                                        (vf is IVirtualFile ? ((IVirtualFile)vf).Open() : ((VirtualFile)vf).Open()): 
+                        using (Stream source = (vf != null) ? vf.Open(): 
                                         File.Open(HostingEnvironment.MapPath(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read)) {
                             Utils.copyStream(source, stream);
                         }
