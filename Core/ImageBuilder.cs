@@ -877,7 +877,7 @@ namespace ImageResizer
                 //Determine the size of the area we are copying
                 SizeF sourceSize = PolygonMath.ScaleInside(areaSize, s.originalSize);
                 //Center the portion we are copying within the original bitmap
-                s.copyRect = new RectangleF((s.originalSize.Width - sourceSize.Width) / 2, (s.originalSize.Height - sourceSize.Height) / 2, sourceSize.Width, sourceSize.Height);
+                s.copyRect = PolygonMath.AlignWith(new RectangleF(0,0,sourceSize.Width,sourceSize.Height),new RectangleF(0,0,s.originalSize.Width,s.originalSize.Height),s.settings.Anchor);
                 //Restore targetSize to match areaSize //Warning - crop always forces scale=both.
                 targetSize = areaSize;
             }
@@ -897,7 +897,7 @@ namespace ImageResizer
             s.layout.AddRing("imageArea",PolygonMath.ToPoly(new RectangleF(new PointF(0, 0), areaSize)));
 
             //Center imageArea around 'image'
-            s.layout["imageArea"] = PolygonMath.CenterInside(s.layout["imageArea"], s.layout["image"]);
+            s.layout["imageArea"] = PolygonMath.AlignWith(s.layout["imageArea"], s.layout["image"], s.settings.Anchor);
 
             return RequestedAction.None;
         }
