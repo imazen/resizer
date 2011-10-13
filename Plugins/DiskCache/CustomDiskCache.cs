@@ -7,6 +7,7 @@ using ImageResizer.Util;
 using System.IO;
 using ImageResizer.Configuration.Logging;
 using System.Diagnostics;
+using System.Threading;
 
 namespace ImageResizer.Plugins.DiskCache {
     public delegate void CacheResultHandler(CustomDiskCache sender, CacheResult r);
@@ -85,7 +86,7 @@ namespace ImageResizer.Plugins.DiskCache {
                 if (!Locks.TryExecute(relativePath.ToUpperInvariant(), timeoutMs,
                     delegate() {
 
-                        //On the second check, use cached data for speed. The cached data should be updated if another thread updated a file.
+                        //On the second check, use cached data for speed. The cached data should be updated if another thread updated a file (but not if another process did).
                         if (((!hasModifiedDate || hashModifiedDate) && !Index.exists(relativePath, physicalPath)) || !Index.modifiedDateMatches(sourceModifiedUtc, relativePath, physicalPath)) {
 
                             //Create subdirectory if needed.
@@ -95,22 +96,55 @@ namespace ImageResizer.Plugins.DiskCache {
                             }
 
                             //Open stream 
-                            //TODO: Catch IOException, and if it is a file lock, (and hashmodified is true), then it's another process writing to the file, and we can serve the file afterwards
+                            //Catch IOException, and if it is a file lock,
+                            // - (and hashmodified is true), then it's another process writing to the file, and we can serve the file afterwards
+                            // - (and hashmodified is false), then it could either be an IIS read lock or another process writing to the file. Correct behavior is to kill the request here, as we can't guarantee accurate image data.
+                            // I.e, hashmodified=true is the only supported setting for multi-process environments.
+                            //TODO: Catch UnathorizedAccessException and log issue about file permissions.
                             //... If we can wait for a read handle for a specified timeout.
-                            System.IO.FileStream fs = new FileStream(physicalPath, FileMode.Create, FileAccess.Write);
-                            using (fs) {
-                                //Run callback to write the cached data
-                                writeCallback(fs);
+                            try {
+                                System.IO.FileStream fs = new FileStream(physicalPath, FileMode.Create, FileAccess.Write, FileShare.None);
+                                
+                                using (fs) {
+                                    //Run callback to write the cached data
+                                    writeCallback(fs);
+                                }
+
+                                DateTime createdUtc = DateTime.UtcNow;
+                                //Update the write time to match - this is how we know whether they are in sync.
+                                if (hasModifiedDate) System.IO.File.SetLastWriteTimeUtc(physicalPath, sourceModifiedUtc);
+                                //Set the created date, so we know the last time we updated the cache.s
+                                System.IO.File.SetCreationTimeUtc(physicalPath, createdUtc);
+                                //Update index
+                                Index.setCachedFileInfo(relativePath, new CachedFileInfo(sourceModifiedUtc, createdUtc, createdUtc));
+                                //This was a cache miss
+                                result.Result = CacheQueryResult.Miss;
+                            } catch (IOException ex) {
+                                
+                                if (hashModifiedDate && hasModifiedDate && IsFileLocked(ex)) {
+                                    //Somehow in between verifying the file didn't exist and trying to create it, the file was created and locked by someone else.
+                                    //When hashModifiedDate==true, we don't care what the file contains, we just want it to exist. If the file is available for 
+                                    //reading within timeoutMs, let's recursively call this method so that we can consider it a hit. 
+                                    Stopwatch waitForFile = new Stopwatch();
+                                    bool opened = false;
+                                    while (!opened && waitForFile.ElapsedMilliseconds < timeoutMs)
+                                    {
+                                        waitForFile.Start();
+                                        try{
+                                            using (FileStream temp = new FileStream(physicalPath, FileMode.Open,  FileAccess.Read, FileShare.ReadWrite))
+                                                opened = true;
+                                        } catch(IOException iex){
+                                            if (IsFileLocked(iex))
+                                                Thread.Sleep((int)Math.Min(30, Math.Round((float)timeoutMs / 3.0))); 
+                                            else throw iex;
+                                        }
+                                        waitForFile.Stop();
+                                    }
+                                    if (!opened) throw; //By not throwing an exception, it is considered a hit by the rest of the code.
+
+                                }else throw;
                             }
-                            DateTime createdUtc = DateTime.UtcNow;
-                            //Update the write time to match - this is how we know whether they are in sync.
-                            if (hasModifiedDate) System.IO.File.SetLastWriteTimeUtc(physicalPath, sourceModifiedUtc);
-                            //Set the created date, so we know the last time we updated the cache.s
-                            System.IO.File.SetCreationTimeUtc(physicalPath, createdUtc);
-                            //Update index
-                            Index.setCachedFileInfo(relativePath, new CachedFileInfo(sourceModifiedUtc, createdUtc, createdUtc));
-                            //This was a cache miss
-                            result.Result = CacheQueryResult.Miss;
+
                         }
                     })) {
                     //On failure
@@ -127,27 +161,6 @@ namespace ImageResizer.Plugins.DiskCache {
             return result;
         }
 
-
-        //private string _fileName;
-
-        //private int _numberOfTries;
-
-        //private int _timeIntervalBetweenTries;
-
-        //private FileStream GetStream(FileAccess fileAccess) {
-        //    var tries = 0;
-        //    while (true) {
-        //        try {
-        //            return File.Open(_fileName, FileMode.Open, fileAccess, Fileshare.None);
-        //        } catch (IOException e) {
-        //            if (!IsFileLocked(e))
-        //                throw;
-        //            if (++tries > _numberOfTries)
-        //                throw new MyCustomException("The file is locked too long: " + e.Message, e);
-        //            Thread.Sleep(_timeIntervalBetweenTries);
-        //        }
-        //    }
-        //}
 
         private static bool IsFileLocked(IOException exception) {
             int errorCode = System.Runtime.InteropServices.Marshal.GetHRForException(exception) & ((1 << 16) - 1);
