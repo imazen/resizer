@@ -57,45 +57,95 @@ namespace ImageResizer.Plugins.DiskCache {
         /// Thread runs this method.
         /// </summary>
         protected void main() {
-            //Sleep for the duration requested
+            //TODO: Verify that GetHashCode() is the same between .net 2 and 4. 
+            string mutexKey = "ir.cachedir:" + cache.PhysicalCachePath.ToLowerInvariant().GetHashCode().ToString("x");
+
+            //Sleep for the duration requested before trying anything. 
             _quitWait.WaitOne(cs.StartupDelay);
-            //Start the work loop
-            while(true){
-                //Check for shutdown
-                if (shuttingDown) return;
 
-                //Is it time to do some work?
-                bool noWorkInTooLong = false;
-                lock (_timesLock) noWorkInTooLong = (DateTime.UtcNow.Subtract(new DateTime(lastWorked)) > cs.MaxDelay);
-                bool notBusy = false;
-                lock (_timesLock) notBusy = (DateTime.UtcNow.Subtract(new DateTime(lastBusy)) > cs.MinDelay);
-                //doSomeWork keeps being true in absence of incoming requests
-
-                bool didWork = (noWorkInTooLong || notBusy) && DoWorkFor(cs.OptimalWorkSegmentLength);
-                
-                //Check for shutdown
-                if (shuttingDown) return;
-
-                //Nothing to do, queue is empty.
-                if (!didWork && queue.IsEmpty) 
-                    //Wait perpetually until notified of more queue items.
-                    _queueWait.WaitOne();
-                else if (didWork && notBusy) 
-                    //Don't flood the system even when it's not busy. 50% usage here.
-                    _quitWait.WaitOne(cs.OptimalWorkSegmentLength); 
-                else if (didWork && !notBusy) {
-                    //Estimate how long before we can run more code.
-                    long busyTicks = 0;
-                    lock (_timesLock) busyTicks = (cs.MinDelay - DateTime.UtcNow.Subtract(new DateTime(lastBusy))).Ticks;
-                    long maxTicks = 0;
-                    lock (_timesLock) maxTicks = (cs.MaxDelay - DateTime.UtcNow.Subtract(new DateTime(lastWorked))).Ticks;
-                    //Use the longer value and add a second to avoid rounding and timing errors.
-                    _quitWait.WaitOne(new TimeSpan(Math.Max(busyTicks,maxTicks)) + new TimeSpan(0,0,1) ); 
+            Mutex cleanupLock = null;
+            bool hasLock = false;
+            try {
+                //Try to create and lock the mutex, or else open and lock it.
+                try{
+                    cleanupLock = new Mutex(true, mutexKey, out hasLock);
+                }catch(UnauthorizedAccessException){
+                    hasLock = false;
                 }
-                //Check for shutdown
-                if (shuttingDown) return;
+         
+                //Start the work loop
+                while (true) {
+                    //Check for shutdown
+                    if (shuttingDown) return;
+
+                    //Try to acquire a reference to the lock if we didn't have access last time.
+                    if (cleanupLock == null) {
+                        //In this case, another process (running as another user account) has opened the lock. Eventually it may be garbage collected.
+                        try {
+                            cleanupLock = new Mutex(true, mutexKey, out hasLock);
+                        } catch (UnauthorizedAccessException) {
+                            hasLock = false;
+                        }
+                    }
+
+                    if (!hasLock) {
+                        //1. Complain
+                        this.AcceptIssue(new Issue("This CleanupWorker is not operating - another processes' CleanupWorker is handling maintenance for the directory " + cache.PhysicalCachePath, IssueSeverity.Warning));
+
+                        //If we have a reference, wait for it
+                        if (cleanupLock != null) hasLock = cleanupLock.WaitOne(30000); //Wait until the other process calls ReleaseMutex(), or for 30 seconds, whichever is shorter.
+                        else Thread.Sleep(10000); //Otherwise just sleep 10s and check again.
+
+                        if (hasLock) {
+                            //2. Stop complaining (sort of)
+                            this.AcceptIssue(new Issue("This CleanupWorker is  now operating, as the other process has reliqueshed control.", IssueSeverity.Warning));
+                       
+                        }
+                    }
+                    if (!hasLock) {
+                        //Still no luck, someone else is managing things...
+                        //Clear out the todo-list
+                        queue.Clear();
+                        //Get back to doing nothing.
+                        continue;
+                    }
+                    
+
+                    //Is it time to do some work?
+                    bool noWorkInTooLong = false;
+                    lock (_timesLock) noWorkInTooLong = (DateTime.UtcNow.Subtract(new DateTime(lastWorked)) > cs.MaxDelay);
+                    bool notBusy = false;
+                    lock (_timesLock) notBusy = (DateTime.UtcNow.Subtract(new DateTime(lastBusy)) > cs.MinDelay);
+                    //doSomeWork keeps being true in absence of incoming requests
+
+                    bool didWork = (noWorkInTooLong || notBusy) && DoWorkFor(cs.OptimalWorkSegmentLength);
+
+                    //Check for shutdown
+                    if (shuttingDown) return;
+
+                    
+                    //Nothing to do, queue is empty.
+                    if (!didWork && queue.IsEmpty)
+                        //Wait perpetually until notified of more queue items.
+                        _queueWait.WaitOne();
+                    else if (didWork && notBusy)
+                        //Don't flood the system even when it's not busy. 50% usage here.
+                        _quitWait.WaitOne(cs.OptimalWorkSegmentLength);
+                    else if (didWork && !notBusy) {
+                        //Estimate how long before we can run more code.
+                        long busyTicks = 0;
+                        lock (_timesLock) busyTicks = (cs.MinDelay - DateTime.UtcNow.Subtract(new DateTime(lastBusy))).Ticks;
+                        long maxTicks = 0;
+                        lock (_timesLock) maxTicks = (cs.MaxDelay - DateTime.UtcNow.Subtract(new DateTime(lastWorked))).Ticks;
+                        //Use the longer value and add a second to avoid rounding and timing errors.
+                        _quitWait.WaitOne(new TimeSpan(Math.Max(busyTicks, maxTicks)) + new TimeSpan(0, 0, 1));
+                    }
+                    //Check for shutdown
+                    if (shuttingDown) return;
+                }
+            } finally {
+                if (hasLock) cleanupLock.ReleaseMutex();
             }
-            
         }
 
         /// <summary>
