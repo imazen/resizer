@@ -120,8 +120,8 @@ namespace ImageResizer.Plugins.DiskCache {
                                 //This was a cache miss
                                 result.Result = CacheQueryResult.Miss;
                             } catch (IOException ex) {
-                                
-                                if (hashModifiedDate && hasModifiedDate && IsFileLocked(ex)) {
+
+                                if ((!hasModifiedDate || hashModifiedDate) && IsFileLocked(ex)) {
                                     //Somehow in between verifying the file didn't exist and trying to create it, the file was created and locked by someone else.
                                     //When hashModifiedDate==true, we don't care what the file contains, we just want it to exist. If the file is available for 
                                     //reading within timeoutMs, let's recursively call this method so that we can consider it a hit. 
