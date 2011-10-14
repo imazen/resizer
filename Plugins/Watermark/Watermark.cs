@@ -83,8 +83,8 @@ namespace ImageResizer.Plugins.Watermark
                     List<Layer> layers = new List<Layer>();
                     if (c.Children != null) {
                         foreach (Node layer in c.Children) {
-                            if (c.Name.Equals("image", StringComparison.OrdinalIgnoreCase)) layers.Add(new ImageLayer(c.Attrs, this.c));
-                            if (c.Name.Equals("text", StringComparison.OrdinalIgnoreCase)) layers.Add(new TextLayer(c.Attrs));
+                            if (layer.Name.Equals("image", StringComparison.OrdinalIgnoreCase)) layers.Add(new ImageLayer(layer.Attrs, this.c));
+                            if (layer.Name.Equals("text", StringComparison.OrdinalIgnoreCase)) layers.Add(new TextLayer(layer.Attrs));
                         }
                     }
                     dict.Add(name, layers);
@@ -113,14 +113,21 @@ namespace ImageResizer.Plugins.Watermark
             Graphics g = s.destGraphics;
             if (string.IsNullOrEmpty(watermark) || g == null) return RequestedAction.None;
 
-            if (NamedWatermarks.ContainsKey(watermark)) {
-                IEnumerable<Layer> layers = NamedWatermarks[watermark];
-                foreach (Layer l in layers) {
-                    if (l.DrawAs == only) {
-                        l.RenderTo(s);
+            string[] parts = watermark.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            bool foundPart = false;
+
+            foreach (string w in parts) {
+                if (NamedWatermarks.ContainsKey(w)) {
+                    IEnumerable<Layer> layers = NamedWatermarks[w];
+                    foreach (Layer l in layers) {
+                        if (l.DrawAs == only) {
+                            l.RenderTo(s);
+                        }
                     }
+                    foundPart = true;
                 }
-            } else if (only == Layer.LayerPlacement.Overlay) {
+            }
+            if ( !foundPart && only == Layer.LayerPlacement.Overlay) {
                 //Parse named watermark files
                 
                 if (watermark.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) > -1 ||
