@@ -4,6 +4,7 @@ using System.Text;
 using System.Collections.Specialized;
 using System.Drawing;
 using ImageResizer.Util;
+using System.Text.RegularExpressions;
 
 namespace ImageResizer.Plugins.Watermark {
     public class TextLayer:Layer {
@@ -58,14 +59,26 @@ namespace ImageResizer.Plugins.Watermark {
 
         public override void RenderTo(Resizing.ImageState s) {
             if (string.IsNullOrEmpty(Text)) return;
+
+            string finalText = Text;
+
+            if (finalText.IndexOf('#') > -1) {
+                Regex r = new Regex("\\#\\{([^}]+)\\}");
+                finalText = r.Replace(finalText, delegate(Match m){
+                    string val =  s.settings[m.Groups[1].Value];
+                    if (val == null) return "";
+                    else return val;
+                });
+            }
+
              RectangleF bounds = this.CalculateLayerCoordinates(s, delegate(double maxwidth, double maxheight) {
                  using (Font f= GetFont()){
-                    return PolygonMath.RoundPoints(s.destGraphics.MeasureString(Text,f,new PointF(),GetFormat()));
+                     return PolygonMath.RoundPoints(s.destGraphics.MeasureString(finalText, f, new PointF(), GetFormat()));
                  }
              }, true);
             using(Font f = GetFont()){
                 using (Brush b = GetBrush()) {
-                    s.destGraphics.DrawString(Text, f, b, bounds.Location, GetFormat());
+                    s.destGraphics.DrawString(finalText, f, b, bounds.Location, GetFormat());
                 }
             }
         }
