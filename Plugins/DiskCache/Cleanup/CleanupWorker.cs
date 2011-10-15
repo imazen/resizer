@@ -52,6 +52,10 @@ namespace ImageResizer.Plugins.DiskCache {
         }
         protected long lastWorked = DateTime.MinValue.Ticks;
 
+        /// <summary>
+        /// When true, indicates that another process is managing cleanup operations - this thread is idle, waiting for the other process to end before it can pick up work.
+        /// </summary>
+        protected bool otherProcessManagingCleanup = false;
         protected readonly object _timesLock = new object();
         /// <summary>
         /// Thread runs this method.
@@ -65,6 +69,7 @@ namespace ImageResizer.Plugins.DiskCache {
 
             Mutex cleanupLock = null;
             bool hasLock = false;
+           
             try {
                 //Try to create and lock the mutex, or else open and lock it.
                 try{
@@ -88,20 +93,17 @@ namespace ImageResizer.Plugins.DiskCache {
                         }
                     }
 
+                    otherProcessManagingCleanup = !hasLock;
                     if (!hasLock) {
-                        //1. Complain
-                        this.AcceptIssue(new Issue("This CleanupWorker is not operating - another processes' CleanupWorker is handling maintenance for the directory " + cache.PhysicalCachePath, IssueSeverity.Warning));
-
                         //If we have a reference, wait for it
-                        if (cleanupLock != null) hasLock = cleanupLock.WaitOne(30000); //Wait until the other process calls ReleaseMutex(), or for 30 seconds, whichever is shorter.
-                        else Thread.Sleep(10000); //Otherwise just sleep 10s and check again.
-
-                        if (hasLock) {
-                            //2. Stop complaining (sort of)
-                            this.AcceptIssue(new Issue("This CleanupWorker is  now operating, as the other process has reliqueshed control.", IssueSeverity.Warning));
-                       
+                        if (cleanupLock != null) {
+                            //Wait until the other process calls ReleaseMutex(), or for 30 seconds, whichever is shorter.
+                            hasLock = cleanupLock.WaitOne(30000);
                         }
+                        else Thread.Sleep(10000); //Otherwise just sleep 10s and check again, waiting for the mutex to be garbage collected so we can recreate it.
+
                     }
+                    otherProcessManagingCleanup = !hasLock;
                     if (!hasLock) {
                         //Still no luck, someone else is managing things...
                         //Clear out the todo-list
@@ -145,9 +147,16 @@ namespace ImageResizer.Plugins.DiskCache {
                 }
             } finally {
                 if (hasLock) cleanupLock.ReleaseMutex();
+                otherProcessManagingCleanup = false;
             }
         }
 
+        public override IEnumerable<IIssue> GetIssues() {
+            List<IIssue> issues = new List<IIssue>(base.GetIssues());
+            issues.Add(new Issue("An external process indicates it is managing cleanup of the disk cache. " + 
+                "This process is not currently managing disk cache cleanup.", IssueSeverity.Warning));
+            return issues;
+        }
         /// <summary>
         /// Processes items from the queue for roughly the specified amount of time.
         /// Returns false if the queue was empty.
