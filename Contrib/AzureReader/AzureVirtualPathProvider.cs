@@ -13,7 +13,7 @@ namespace ImageResizer.Plugins.AzureReader {
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
     class AzureVirtualPathProvider : VirtualPathProvider {
 
-        private string _virtualFilesystemPrefix = "~/azure/";
+        private string _virtualFilesystemPrefix = PathUtils.ResolveAppRelative("~/azure/");
         private CloudBlobClient _cloudBlobClient = null;
 
         /// <summary>
@@ -25,9 +25,21 @@ namespace ImageResizer.Plugins.AzureReader {
                 return _virtualFilesystemPrefix;
             }
             set {
+                //Default to app-relative
+                if (!value.StartsWith("/") && !value.StartsWith("~")) value = "~/" + value;
+                if (!value.EndsWith("/")) value += "/";
+                
                 _virtualFilesystemPrefix = value != null ? PathUtils.ResolveAppRelative(value) : value;
             }
         }
+
+        private bool _lazyExistenceCheck = false;
+
+        public bool LazyExistenceCheck {
+            get { return _lazyExistenceCheck; }
+            set { _lazyExistenceCheck = value; }
+        }
+
 
         public CloudBlobClient CloudBlobClient {
             get {
@@ -52,14 +64,15 @@ namespace ImageResizer.Plugins.AzureReader {
         /// True if the virtual path is within the virtual file sytem; otherwise, false.
         /// </returns>
         public bool IsPathVirtual(string virtualPath) {
-            return (virtualPath.StartsWith(VirtualFilesystemPrefix, StringComparison.InvariantCultureIgnoreCase));
+            return (virtualPath.StartsWith(VirtualFilesystemPrefix, StringComparison.OrdinalIgnoreCase));
         }
 
         public override bool FileExists(string virtualPath) {
             if (IsPathVirtual(virtualPath)) {
+                if (LazyExistenceCheck) return true;
 
                 // Strip prefix from virtual path; keep container and blob
-                string relativeBlobURL = virtualPath.Substring(VirtualFilesystemPrefix.Length - 1).Trim('/', '\\');
+                string relativeBlobURL = virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim('/', '\\');
                 
                 // Get a reference to the blob
                 CloudBlob cloudBlob = CloudBlobClient.GetBlobReference(relativeBlobURL);
@@ -85,13 +98,15 @@ namespace ImageResizer.Plugins.AzureReader {
         public override VirtualFile GetFile(string virtualPath) {
             if (IsPathVirtual(virtualPath)) {
                 // Strip prefix from virtual path; keep container and blob
-                string relativeBlobURL = virtualPath.Substring(VirtualFilesystemPrefix.Length - 1).Trim('/', '\\');
+                string relativeBlobURL = virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim('/', '\\');
 
-                // Get a reference to the blob
-                CloudBlob cloudBlob = CloudBlobClient.GetBlobReference(relativeBlobURL);
-
+                
                 try {
-                    cloudBlob.FetchAttributes();
+                    if (!LazyExistenceCheck) {
+                        // Get a reference to the blob
+                        CloudBlob cloudBlob = CloudBlobClient.GetBlobReference(relativeBlobURL);
+                        cloudBlob.FetchAttributes();
+                    }
                     return new AzureFile(relativeBlobURL, this);
                 }
                 catch (StorageClientException e) {
