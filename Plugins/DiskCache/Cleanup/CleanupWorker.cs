@@ -55,12 +55,28 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <summary>
         /// When true, indicates that another process is managing cleanup operations - this thread is idle, waiting for the other process to end before it can pick up work.
         /// </summary>
+        public bool ExteralProcessCleaning { get { return this.otherProcessManagingCleanup; } }
+        /// <summary>
+        /// When true, indicates that another process is managing cleanup operations - this thread is idle, waiting for the other process to end before it can pick up work.
+        /// </summary>
         protected bool otherProcessManagingCleanup = false;
         protected readonly object _timesLock = new object();
         /// <summary>
         /// Thread runs this method.
         /// </summary>
         protected void main() {
+            try {
+                mainInner();
+            } catch (Exception ex) {
+                if (Debugger.IsAttached) throw;
+                if (lp.Logger != null) lp.Logger.Error("Contact support! A critical (and unexpected) exception occured in the disk cache cleanup worker thread. This needs to be investigated. {0}", ex.Message + ex.StackTrace);
+                this.AcceptIssue(new Issue("Contact support! A critical (and unexpected) exception occured in the disk cache cleanup worker thread. This needs to be investigated. ", ex.Message + ex.StackTrace, IssueSeverity.Critical));
+            }
+        }
+        /// <summary>
+        /// Processes work items from the queue, using at most 50%
+        /// </summary>
+        protected void mainInner(){
             //TODO: Verify that GetHashCode() is the same between .net 2 and 4. 
             string mutexKey = "ir.cachedir:" + cache.PhysicalCachePath.ToLowerInvariant().GetHashCode().ToString("x");
 
@@ -114,13 +130,23 @@ namespace ImageResizer.Plugins.DiskCache {
                     
 
                     //Is it time to do some work?
-                    bool noWorkInTooLong = false;
+                    bool noWorkInTooLong = false; //Has it been too long since we did something?
                     lock (_timesLock) noWorkInTooLong = (DateTime.UtcNow.Subtract(new DateTime(lastWorked)) > cs.MaxDelay);
-                    bool notBusy = false;
+
+                    bool notBusy = false; //Is the server busy recently?
                     lock (_timesLock) notBusy = (DateTime.UtcNow.Subtract(new DateTime(lastBusy)) > cs.MinDelay);
                     //doSomeWork keeps being true in absence of incoming requests
 
-                    bool didWork = (noWorkInTooLong || notBusy) && DoWorkFor(cs.OptimalWorkSegmentLength);
+                    //If the server isn't busy, or if it's been to long, do some work and time it.
+                    bool didWork = false;
+                    Stopwatch workedForTime = null;
+                    if (noWorkInTooLong || notBusy) {
+                        workedForTime = new Stopwatch();
+                        workedForTime.Start();
+                        DoWorkFor(cs.OptimalWorkSegmentLength);
+                        didWork = true;
+                        workedForTime.Stop();
+                    }
 
                     //Check for shutdown
                     if (shuttingDown) return;
@@ -131,8 +157,9 @@ namespace ImageResizer.Plugins.DiskCache {
                         //Wait perpetually until notified of more queue items.
                         _queueWait.WaitOne();
                     else if (didWork && notBusy)
-                        //Don't flood the system even when it's not busy. 50% usage here.
-                        _quitWait.WaitOne(cs.OptimalWorkSegmentLength);
+                        //Don't flood the system even when it's not busy. 50% usage here. Wait for the length of time worked or the optimal work time, whichever is longer.
+                        //A directory listing can take 30 seconds sometimes and kill the cpu.
+                        _quitWait.WaitOne(new TimeSpan((long)Math.Max(cs.OptimalWorkSegmentLength.TotalMilliseconds, workedForTime.ElapsedMilliseconds)));
                     else if (didWork && !notBusy) {
                         //Estimate how long before we can run more code.
                         long busyTicks = 0;
@@ -155,6 +182,7 @@ namespace ImageResizer.Plugins.DiskCache {
             List<IIssue> issues = new List<IIssue>(base.GetIssues());
             issues.Add(new Issue("An external process indicates it is managing cleanup of the disk cache. " + 
                 "This process is not currently managing disk cache cleanup.", IssueSeverity.Warning));
+            
             return issues;
         }
         /// <summary>
