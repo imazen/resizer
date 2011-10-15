@@ -65,6 +65,7 @@ namespace ImageResizer.Plugins.DiskCache
         private CleanupStrategy cleanupStrategy = new CleanupStrategy();
         /// <summary>
         /// Only relevant when AutoClean=true. Settings about how background cache cleanup are performed.
+        /// It is best not to modify these settings. There are very complicated and non-obvious factors involved in their choice.
         /// </summary>
         public CleanupStrategy CleanupStrategy {
             get { return cleanupStrategy; }
@@ -75,6 +76,7 @@ namespace ImageResizer.Plugins.DiskCache
         protected int cacheAccessTimeout = 15000;
         /// <summary>
         /// How many milliseconds to wait for a cached item to be available. Values below 0 are set to 0. Defaults to 15 seconds.
+        /// Actual time spent waiting may be 2 or 3x this value, if multiple layers of synchronization require a wait.
         /// </summary>
         public int CacheAccessTimeout {
             get { return cacheAccessTimeout; }
@@ -84,7 +86,9 @@ namespace ImageResizer.Plugins.DiskCache
         private bool hashModifiedDate = true;
         /// <summary>
         /// If true, when a source file is changed, a new file will be created instead of overwriting the old cached file.
-        /// This helps prevent file lock contention on high-traffic servers. Defaults to true. 
+        /// This helps prevent file lock contention on high-traffic servers. Defaults to true.  
+        /// Do NOT set this to false in a Web Garden or if you have overlapped recycle enabled, as you may risk having occasional failed requests due
+        /// to write contention by separate proccesses.
         /// Changes the hash function, so you should delete the cache folder whenever this setting is modified.
         /// </summary>
         public bool HashModifiedDate {
@@ -299,7 +303,13 @@ namespace ImageResizer.Plugins.DiskCache
             if (cleaner != null) issues.AddRange(cleaner.GetIssues());
             if (string.IsNullOrEmpty(VirtualCacheDir)) issues.Add(new Issue("DiskCache", "cacheDir is empty. Cannot operate", null, IssueSeverity.ConfigurationError));
             if (!Started) issues.Add(new Issue("DiskCache", "DiskCache is not running. Verify cacheDir is a valid path and enabled=true.", null, IssueSeverity.ConfigurationError));
-            
+
+            //Warn user about setting hashModifiedDate=false in a web garden.
+            if (this.cleaner != null && cleaner.ExteralProcessCleaning && !this.HashModifiedDate)
+                issues.Add(new Issue("DiskCache", "You should set hashModifiedDate=\"true\" on the <diskcache /> element in Web.config.",
+                    "Setting false for this value in a Web Garden scenario can cause failed requests. (DiskCache detects one or more other process on this machine working on the same cache directory).", IssueSeverity.Critical));
+
+
             return issues;
         }
     }
