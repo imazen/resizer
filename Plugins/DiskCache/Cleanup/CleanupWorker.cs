@@ -41,7 +41,15 @@ namespace ImageResizer.Plugins.DiskCache {
             _queueWait.Set();
         }
 
+        /// <summary>
+        /// The last time a cache folder exceeded both the optimum and maximum limits for file count. 
+        /// If recent, indicates a misconfiguration; the subfolders="" count needs to be increased.
+        /// </summary>
+        protected long lastFoundItemsOverMax = DateTime.MinValue.Ticks;
 
+        /// <summary>
+        /// The last time a cache query came through
+        /// </summary>
         protected long lastBusy = DateTime.MinValue.Ticks;
         /// <summary>
         /// Tells the worker to avoid work for a little bit.
@@ -181,8 +189,14 @@ namespace ImageResizer.Plugins.DiskCache {
         public override IEnumerable<IIssue> GetIssues() {
             List<IIssue> issues = new List<IIssue>(base.GetIssues());
             issues.Add(new Issue("An external process indicates it is managing cleanup of the disk cache. " + 
-                "This process is not currently managing disk cache cleanup.", IssueSeverity.Warning));
-            
+                "This process is not currently managing disk cache cleanup. If configured as a web garden, keep in mind that the negligible performance gains are likely to be outweighed by the loss of cache optimization quality.", IssueSeverity.Warning));
+            lock (_timesLock) {
+                if (this.lastFoundItemsOverMax > (DateTime.UtcNow.Subtract(new TimeSpan(0, 5, 0)).Ticks))
+                    issues.Add(new Issue("Your cache configuration may not be optimal. If this message persists, you should increase the 'subfolders' value in the <diskcache /> element in Web.config",
+                        "In the last 5 minutes, a cache folder exceeded both the optimum and maximum limits for file count. This usually indicates that your 'subfolders' setting is too low, and that cached images are being deleted shortly after their creation. \n" +
+                        "To estimate the appropriate subfolders value, multiply the total number of images on the site times the average number of size variations, and divide by 400. I.e, 6,400 images with 2 variants would be 32. If in doubt, set the value higher, but ensure there is disk space available.", IssueSeverity.Error));
+
+            }
             return issues;
         }
         /// <summary>
@@ -342,6 +356,8 @@ namespace ImageResizer.Plugins.DiskCache {
             int overOptimal = Math.Max(0, (files - overMax) - cs.TargetItemsPerFolder);
 
             if (overMax + overOptimal < 1) return; //nothing to do
+
+            if (overMax > 0) lock (_timesLock) lastFoundItemsOverMax = DateTime.UtcNow.Ticks;
 
             //Make a linked list, like a queue of files. 
             LinkedList<KeyValuePair<string, CachedFileInfo>> sortedList = new LinkedList<KeyValuePair<string, CachedFileInfo>>(
