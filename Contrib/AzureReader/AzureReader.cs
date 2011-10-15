@@ -13,11 +13,13 @@ namespace ImageResizer.Plugins.AzureReader {
         string blobStorageConnection;
         string blobStorageEndpoint;
         string vPath;
+        bool lazyExistenceCheck = false;
 
         public AzureReader(NameValueCollection args) {
             blobStorageConnection = args["connectionstring"];
             blobStorageEndpoint = args["blobstorageendpoint"];
             vPath = args["prefix"];
+            lazyExistenceCheck = Utils.getBool(args, "lazyExistenceCheck", lazyExistenceCheck);
         }
 
         public IPlugin Install(Configuration.Config c) {
@@ -38,6 +40,7 @@ namespace ImageResizer.Plugins.AzureReader {
 
             vpp = new AzureVirtualPathProvider(blobStorageConnection);
             vpp.VirtualFilesystemPrefix = vPath;
+            vpp.LazyExistenceCheck = lazyExistenceCheck;
 
             // Registers the virtual path provider
             HostingEnvironment.RegisterVirtualPathProvider(vpp);
@@ -50,9 +53,6 @@ namespace ImageResizer.Plugins.AzureReader {
             return this;
         }
 
-        void Pipeline_RewriteDefaults(IHttpModule sender, HttpContext context, Configuration.IUrlEventArgs e) {
-
-        }
         /// <summary>
         /// In case there is no querystring attached to the file (thus no operations on the fly) we can
         /// redirect directly to the blob. This let us make advantage of the CDN (if configured).
@@ -61,13 +61,13 @@ namespace ImageResizer.Plugins.AzureReader {
         /// <param name="context"></param>
         /// <param name="e"></param>
         void Pipeline_PostRewrite(IHttpModule sender, HttpContext context, Configuration.IUrlEventArgs e) {
-            string prefix = PathUtils.ResolveAppRelative(e.VirtualPath);
+            string prefix = vpp.VirtualFilesystemPrefix;
 
             // Check if prefix is within virtual file system and if there is no querystring
             if (e.VirtualPath.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) && e.QueryString.Count == 0) {
 
                 // Strip prefix from virtual path; keep container and blob
-                string relativeBlobURL = prefix.Substring(vPath.Length -1).Trim('/', '\\');
+                string relativeBlobURL = e.VirtualPath.Substring(vPath.Length -1).Trim('/', '\\');
 
                 // Redirect to blob
                 context.Response.Redirect(blobStorageEndpoint + relativeBlobURL);
