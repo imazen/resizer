@@ -10,6 +10,7 @@ using ImageResizer.Configuration;
 using ImageResizer.Util;
 using ImageResizer.Caching;
 using ImageResizer;
+using System.Data.SqlClient;
 
 namespace DatabaseSampleCSharp
 {
@@ -18,32 +19,37 @@ namespace DatabaseSampleCSharp
         
         protected void Application_Start(object sender, EventArgs e)
         {
-            //Configure Sql Backend
-            SqlReaderSettings s = new SqlReaderSettings();
-            s.ConnectionString = ConfigurationManager.ConnectionStrings["database"].ConnectionString;
-            s.PathPrefix = "~/databaseimages";
-            s.StripFileExtension = true; 
-            s.ImageIdType = System.Data.SqlDbType.UniqueIdentifier;
-            s.ImageBlobQuery = "SELECT Content FROM Images WHERE ImageID=@id";
-            s.ModifiedDateQuery = "Select ModifiedDate, CreatedDate From Images WHERE ImageID=@id";
-            s.ImageExistsQuery = "Select COUNT(ImageID) From Images WHERE ImageID=@id";
+            //If you don't want to configure the plugin from XML, you can also do it from code
+            ////Configure Sql Backend
+            //SqlReaderSettings s = new SqlReaderSettings();
+            //s.ConnectionString = ConfigurationManager.ConnectionStrings["database"].ConnectionString;
+            //s.PathPrefix = "~/databaseimages";
+            //s.StripFileExtension = true; 
+            //s.ImageIdType = System.Data.SqlDbType.UniqueIdentifier;
+            //s.ImageBlobQuery = "SELECT Content FROM Images WHERE ImageID=@id";
+            //s.ModifiedDateQuery = "Select ModifiedDate, CreatedDate From Images WHERE ImageID=@id";
+            //s.ImageExistsQuery = "Select COUNT(ImageID) From Images WHERE ImageID=@id";
+            //s.CacheUnmodifiedFiles = true;
+            //s.RequireImageExtension = false;
 
-            //Add plugin
-            new SqlReaderPlugin(s).Install(Config.Current);
+            ////Add plugin
+            //new SqlReaderPlugin(s).Install(Config.Current);
 
-            //This is optional, but allows us to resize database images without putting ".jpg" after the ID in the path.
-            Config.Current.Pipeline.PostAuthorizeRequestStart += delegate(IHttpModule sender2, HttpContext context) {
-                string path = Config.Current.Pipeline.PreRewritePath;
-                //Only work with database images
-                if (!path.StartsWith(s.VirtualPathPrefix, StringComparison.OrdinalIgnoreCase)) return;
+            //This is example code for protecting authorization 
+            Config.Current.Plugins.LoadPlugins();
+            Config.Current.Plugins.Get<SqlReaderPlugin>().Settings.BeforeAccess += delegate(string id) {
+                bool allowed = true;
+                //INSERT HERE: execute query or whatever to check authorization to view this files
+                //  SqlParameter pId = Config.Current.Plugins.Get<SqlReaderPlugin>().CreateIdParameter(id);
+                // 
+                if (HttpContext.Current.Request.QueryString["denyme"] != null) allowed = false;
+                //END pretend code
 
-                Config.Current.Pipeline.SkipFileTypeCheck = true; //Skip the file extension check. FakeExtensions will still be stripped.
-                //Non-images will be served as-is
-                //Cache all file types, whether they are processed or not.
-                Config.Current.Pipeline.ModifiedQueryString["cache"] = ServerCacheMode.Always.ToString();
+                if (!allowed) throw new HttpException(403, "Access denied to this resource.");
             };
 
         }
+
 
 
        
