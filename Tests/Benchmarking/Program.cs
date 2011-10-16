@@ -15,7 +15,7 @@ using ImageResizer.Plugins.FreeImageEncoder;
 using ImageResizer.Plugins.Basic;
 using ImageResizer.Plugins.Watermark;
 
-namespace ConsoleApplication {
+namespace Bench {
     class Program {
 
         public static string imageDir = "..\\..\\Samples\\Images\\";// "..\\..\\..\\..\\Samples\\Images\\";
