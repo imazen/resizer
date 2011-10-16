@@ -883,7 +883,7 @@ namespace ImageResizer
             //Autocrop
             if (s.settings.CropMode == CropMode.Auto && s.settings.Stretch == StretchMode.Proportionally) {
                 //Determine the size of the area we are copying
-                SizeF sourceSize = PolygonMath.ScaleInside(areaSize, s.originalSize);
+                SizeF sourceSize = PolygonMath.ScaleInside(areaSize, s.originalSize); //TODO, shouldn't these be rounded to ints?
                 //Center the portion we are copying within the original bitmap
                 s.copyRect = PolygonMath.AlignWith(new RectangleF(0,0,sourceSize.Width,sourceSize.Height),new RectangleF(0,0,s.originalSize.Width,s.originalSize.Height),s.settings.Anchor);
                 //Restore targetSize to match areaSize //Warning - crop always forces scale=both.
