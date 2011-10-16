@@ -50,7 +50,15 @@ namespace ImageResizer.Plugins.Basic {
                 Rectangle midsize = PolygonMath.ToRectangle(PolygonMath.GetBoundingBox(s.layout["image"]));
               
                 using (Image thumb = s.sourceBitmap.GetThumbnailImage(midsize.Width, midsize.Height, delegate() { return false; }, IntPtr.Zero)) {
-                    s.destGraphics.DrawImage(thumb, PolygonMath.getParallelogram(s.layout["image"]), s.copyRect, GraphicsUnit.Pixel, s.copyAttibutes);
+                    double xfactor = (double)thumb.Width / (double)s.sourceBitmap.Width;
+                    double yfactor = (double)thumb.Height / (double)s.sourceBitmap.Height;
+                    RectangleF copyPart = new RectangleF((float)(s.copyRect.Left * xfactor), 
+                                                        (float)(s.copyRect.Top * yfactor), 
+                                                        (float)(s.copyRect.Width * xfactor), 
+                                                        (float)(s.copyRect.Height * yfactor));
+                    if (Math.Floor(copyPart.Height) == thumb.Height || Math.Ceiling(copyPart.Height) == thumb.Height) copyPart.Height = thumb.Height;
+                    if (Math.Floor(copyPart.Width) == thumb.Width || Math.Ceiling(copyPart.Width) == thumb.Width) copyPart.Width = thumb.Width;
+                    s.destGraphics.DrawImage(thumb, PolygonMath.getParallelogram(s.layout["image"]), copyPart, GraphicsUnit.Pixel, s.copyAttibutes);
                 }
             }
 
