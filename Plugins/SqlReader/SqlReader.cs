@@ -33,6 +33,25 @@ namespace ImageResizer.Plugins.SqlReader
 
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
+            
+            if (!s.RequireImageExtension || s.CacheUnmodifiedFiles || s.UntrustedData) {
+                c.Pipeline.PostAuthorizeRequestStart += delegate(IHttpModule sender2, HttpContext context) {
+                    string path = c.Pipeline.PreRewritePath;
+                    //Only work with database images
+                    if (!path.StartsWith(s.VirtualPathPrefix, StringComparison.OrdinalIgnoreCase)) return;
+
+                    //This allows us to resize database images without putting ".jpg" after the ID in the path.
+                    if (!s.RequireImageExtension) c.Pipeline.SkipFileTypeCheck = true; //Skip the file extension check. FakeExtensions will still be stripped.
+
+                    //Non-images will be served as-is
+                    //Cache all file types, whether they are processed or not.
+                    if (s.CacheUnmodifiedFiles) c.Pipeline.ModifiedQueryString["cache"] = ServerCacheMode.Always.ToString();
+
+                    //If the data is untrusted, always re-encode each file.
+                    if (s.UntrustedData) c.Pipeline.ModifiedQueryString["process"] = ImageResizer.ProcessWhen.Always.ToString();
+
+                };
+            }
             HostingEnvironment.RegisterVirtualPathProvider(this);
             return this;
         }
@@ -158,6 +177,12 @@ namespace ImageResizer.Plugins.SqlReader
         }
 
         public SqlConnection GetConnectionObj(){
+
+            //First, try the connection string as a connection string key.
+            if (System.Configuration.ConfigurationManager.ConnectionStrings[s.ConnectionString] != null)
+                return new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings[s.ConnectionString].ConnectionString);
+
+            //Second, try the .NET syntax
             string prefix = "ConnectionStrings:";
             //ConnectionStrings:namedString convention
             if (s.ConnectionString.Trim().StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) {
@@ -168,6 +193,7 @@ namespace ImageResizer.Plugins.SqlReader
                     throw new ImageResizer.ImageProcessingException("SqlReader: Failed to locate the named connection string '" + key + "' in web.config");
 
             }
+            //Third, try it as an actual connection string
             return new SqlConnection(s.ConnectionString);
         }
 
@@ -284,10 +310,13 @@ namespace ImageResizer.Plugins.SqlReader
             if (s != null && s.ConnectionString != null && s.ConnectionString.Trim().StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) {
                 string key = s.ConnectionString.Trim().Substring(prefix.Length).Trim();
                 if (System.Configuration.ConfigurationManager.ConnectionStrings[key] == null)
-                    issues.Add(new Issue("SqlReader: Failed to locate the named connection string '" + key + "' in web.config", IssueSeverity.ConfigurationError));
+                    issues.Add(new Issue("SqlReader", "Failed to locate the named connection string '" + key + "' in web.config","", IssueSeverity.ConfigurationError));
 
             }
 
+
+            if (!s.PathPrefix.StartsWith("~/") || !s.PathPrefix.EndsWith("/"))
+                issues.Add(new Issue("SqlReader", "The 'prefix' value must be in app-relative form (starting with ~/), and ending with '/'. I.e, in the form ~/sql/ or ~/databaseimages/", "", IssueSeverity.Error));
             return issues;
         }
     }

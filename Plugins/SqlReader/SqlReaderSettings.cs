@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Data;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.SqlReader {
 
@@ -17,7 +18,18 @@ namespace ImageResizer.Plugins.SqlReader {
         }
 
         public SqlReaderSettings(System.Collections.Specialized.NameValueCollection args) {
-            // TODO: Add support for inline configuration
+            if (!string.IsNullOrEmpty(args["prefix"])) this.PathPrefix = args["prefix"];
+            if (!string.IsNullOrEmpty(args["connectionString"])) this.ConnectionString = args["connectionString"];
+            if (!string.IsNullOrEmpty(args["idType"])) this.ImageIdType = Util.Utils.parseEnum<SqlDbType>(args["idType"],this.ImageIdType);
+            if (!string.IsNullOrEmpty(args["blobQuery"])) this.ImageBlobQuery = args["blobQuery"];
+            if (!string.IsNullOrEmpty(args["existsQuery"])) this.ImageExistsQuery = args["existsQuery"];
+            if (!string.IsNullOrEmpty(args["modifiedQuery"])) this.ModifiedDateQuery  = args["modifiedQuery"];
+            
+            StripFileExtension = !Utils.getBool(args, "extensionPartOfId", false);
+            RequireImageExtension = Utils.getBool(args, "requireImageExtension", RequireImageExtension);
+            UntrustedData = Utils.getBool(args, "untrustedData", UntrustedData);
+            CacheUnmodifiedFiles = Utils.getBool(args, "cacheUnmodifiedFiles", CacheUnmodifiedFiles);
+            
         }
 
         /// <summary>
@@ -37,15 +49,48 @@ namespace ImageResizer.Plugins.SqlReader {
         private bool stripFileExtension = true;
         /// <summary>
         /// When true, the last file extension segment will be removed from the URL before the SQL Id is parsed. Only relevant when ImageIdType is a string type. Always true for other values.
+        /// Configured by setting 'extensionPartOfId' to the opposite value.
         /// </summary>
         public bool StripFileExtension {
             get { return stripFileExtension; }
             set { stripFileExtension = value; }
         }
 
+        private bool _requireImageExtension = true;
+        /// <summary>
+        /// (default true) When false, this plugin will serve requests that don't end in an image extension. 
+        /// You should still use image extensions, otherwise we don't know what content type to send with the response, and browsers will choke. 
+        /// It's  also the cleanest way to tell the image resizer what kind of file type you'd like back when you request resizing.
+        /// This setting is designed to support non-image file serving from the DB.
+        /// </summary>
+        public bool RequireImageExtension {
+            get { return _requireImageExtension; }
+            set { _requireImageExtension = value; }
+        }
+
+        private bool _untrustedData = false;
+        /// <summary>
+        /// (default: false) When true, all requests will be re-encoded before being served to the client. Invalid or malicious images will fail with an error if they cannot be read as images.
+        /// This should prevent malicious files from being served to the client.
+        /// </summary>
+        public bool UntrustedData {
+            get { return _untrustedData; }
+            set { _untrustedData = value; }
+        }
+
+        private bool _cacheUnmodifiedFiles = false;
+        /// <summary>
+        /// (default false). When true, files and unmodified images (i.e, no querystring) will be cached to disk (if they are requested that way) instead of only caching requests for resized images.
+        /// DiskCache plugin must be installed for this to have any effect.
+        /// </summary>
+        public bool CacheUnmodifiedFiles {
+            get { return _cacheUnmodifiedFiles; }
+            set { _cacheUnmodifiedFiles = value; }
+        }
+
         private string pathPrefix = "~/databaseimages/";
         /// <summary>
-        /// Defines a virtual path where database images can be accessed. Defaults to "~/databaseimages"
+        /// Defines a virtual path where database images can be accessed. Defaults to "~/databaseimages/"
         /// Ex image URL: localhost/databaseimages/4953.jpg
         /// </summary>
         public string PathPrefix {
@@ -115,14 +160,18 @@ namespace ImageResizer.Plugins.SqlReader {
         }
 
         /// <summary>
-        /// Returns true if the image ID is a string type
+        /// Returns true if the specified type is a kind of strings
         /// </summary>
         public bool IsStringType(SqlDbType t) {
                 return t == System.Data.SqlDbType.VarChar || t == System.Data.SqlDbType.NVarChar ||
                  t == System.Data.SqlDbType.NChar || t == System.Data.SqlDbType.Char;
             
         }
-
+        /// <summary>
+        /// Returns true if the specified type is a kind of integer
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public bool IsIntType(SqlDbType t) {
             return t == System.Data.SqlDbType.Int || t == System.Data.SqlDbType.TinyInt ||
                     t == System.Data.SqlDbType.SmallInt || t == System.Data.SqlDbType.BigInt;
