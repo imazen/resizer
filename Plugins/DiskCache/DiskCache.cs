@@ -266,6 +266,22 @@ namespace ImageResizer.Plugins.DiskCache
 
         public void Process(HttpContext context, IResponseArgs e) {
 
+            CacheResult r = Process(e);
+            context.Items["FinalCachedFile"] = r.PhysicalPath;
+
+
+            //Calculate the virtual path
+            string virtualPath = VirtualCacheDir.TrimEnd('/') + '/' + r.RelativePath.Replace('\\', '/').TrimStart('/');
+            
+            //Rewrite to cached, resized image.
+            context.RewritePath(virtualPath, false);
+        }
+
+        public string ProcessToVirtualPath(IResponseArgs e) {
+            CacheResult r = Process(e);
+            return VirtualCacheDir.TrimEnd('/') + '/' + r.RelativePath.Replace('\\', '/').TrimStart('/');
+        }
+        public CacheResult Process(IResponseArgs e) {
             //Query for the modified date of the source file. If the source file changes on us during the write,
             //we (may) end up saving the newer version in the cache properly, but with an older modified date.
             //This will not cause any actual problems from a behavioral standpoint - the next request for the 
@@ -279,20 +295,13 @@ namespace ImageResizer.Plugins.DiskCache
             CacheResult r = cache.GetCachedFile(e.RequestKey, e.SuggestedExtension, e.ResizeImageToStream, modDate, CacheAccessTimeout);
 
             //Fail
-            if (r.Result == CacheQueryResult.Failed) 
+            if (r.Result == CacheQueryResult.Failed)
                 throw new ImageResizer.ImageProcessingException("Failed to acquire a lock on file \"" + r.PhysicalPath + "\" within " + CacheAccessTimeout + "ms. Caching failed.");
 
             if (r.Result == CacheQueryResult.Hit && cleaner != null)
                 cleaner.UsedFile(r.RelativePath, r.PhysicalPath);
 
-            context.Items["FinalCachedFile"] = r.PhysicalPath;
-
-
-            //Calculate the virtual path
-            string virtualPath = VirtualCacheDir.TrimEnd('/') + '/' + r.RelativePath.Replace('\\', '/').TrimStart('/');
-
-            //Rewrite to cached, resized image.
-            context.RewritePath(virtualPath, false);
+            return r;
         }
 
 
