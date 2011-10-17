@@ -43,7 +43,7 @@ namespace ImageResizer.Plugins.SqlReader {
         /// </summary>
         /// <param name="id"></param>
         public void FireBeforeAccess(string id) {
-            if (BeforeAccess != null) FireBeforeAccess(id);
+            if (BeforeAccess != null) BeforeAccess(id);
         }
 
         private bool stripFileExtension = true;
