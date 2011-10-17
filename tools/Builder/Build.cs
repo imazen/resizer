@@ -253,8 +253,8 @@ namespace ImageResizer.ReleaseBuilder {
                         //Upload
                         try {
                             s3.AddObject(pd.Path, bucketName, Path.GetFileName(pd.Path), "application/zip", perm);
-                        } catch (WebException wex) {
-                            say("Upload failed: " + wex.Message);
+                        } catch (Exception ex) {
+                            say("Upload failed: " + ex.Message);
                             retry = ask("Retry upload?");
                         }
                     } while (retry);
