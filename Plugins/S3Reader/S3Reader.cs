@@ -7,19 +7,21 @@ using System.Web.Hosting;
 using System.Collections.Specialized;
 using LitS3;
 using ImageResizer.Configuration.Issues;
+using System.Security;
 
 namespace ImageResizer.Plugins.S3Reader {
     public class S3Reader : IPlugin {
 
         string buckets, vpath;
         bool includeModifiedDate = false;
-
+        bool asVpp = false;
         public S3Reader(NameValueCollection args ) {
             s3config = new S3Service();
  
             buckets = args["buckets"];
             vpath = args["prefix"];
 
+            asVpp = Util.Utils.getBool(args, "vpp", true);
             s3config.UseSsl = Util.Utils.getBool(args, "useSsl", false);
 
             if (!string.IsNullOrEmpty(args["accessKeyId"])) s3config.AccessKeyID = args["accessKeyId"];
@@ -68,8 +70,20 @@ namespace ImageResizer.Plugins.S3Reader {
             vpp.VirtualFilesystemPrefix = vpath;
            // vpp.MetadataAbsoluteExpiration
 
-            //Registers the virtual path provider.
-            HostingEnvironment.RegisterVirtualPathProvider(vpp);
+            if (asVpp) {
+                try {
+                    //Registers the virtual path provider.
+                    HostingEnvironment.RegisterVirtualPathProvider(vpp);
+                } catch (SecurityException sx) {
+                    asVpp = false;
+                    c.configurationSectionIssues.AcceptIssue(new Issue("S3Reader", "S3Reader could not be installed as a VirtualPathProvider due to missing AspNetHostingPermission."
+                    ,"It was installed as an IVirtualImageProvider instead, which means that only image URLs will be accessible, and only if they contain a querystring.\n" +
+                    "Set vpp=false to tell S3Reader to register as an IVirtualImageProvider instead. <add name='S3Reader' vpp=false />", IssueSeverity.Error));
+                }
+            }
+            if (!asVpp) {
+                c.Plugins.VirtualProviderPlugins.Add(vpp);
+            }
 
             //Register a url default. All incoming urls that point to this reader will automatically have 'cache=auto' unless another cache value has been specified.
             c.Pipeline.RewriteDefaults += new Configuration.UrlRewritingEventHandler(Pipeline_RewriteDefaults);
@@ -85,7 +99,16 @@ namespace ImageResizer.Plugins.S3Reader {
             if (vpp.IsPathVirtual(e.VirtualPath)) e.QueryString["cache"] = ServerCacheMode.Always.ToString();
         }
 
+        /// <summary>
+        /// This plugin can only be removed if it was installed as an IVirtualImageProvider (vpp="false")
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Uninstall(Configuration.Config c) {
+            if (!asVpp) {
+                c.Plugins.VirtualProviderPlugins.Remove(vpp);
+                return true;
+            }else
             return false;
         }
 
