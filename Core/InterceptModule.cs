@@ -83,7 +83,7 @@ namespace ImageResizer {
                 conf.FireRewritingEvents(this, app.Context,ue);
 
                 //Pull data back out of event object, resolving app-relative paths
-                string virtualPath = fixPath(ue.VirtualPath);
+                string virtualPath = PathUtils.ResolveAppRelativeAssumeAppRelative(ue.VirtualPath);
                 q = ue.QueryString;
 
                 //Store the modified querystring in request for use by VirtualPathProviders
@@ -149,19 +149,7 @@ namespace ImageResizer {
             httpContext.Items[conf.ResponseArgsKey] = null;
         }
 
-        /// <summary>
-        /// Turns relative paths into domain-relative paths.
-        /// Turns app-relative paths into domain relative paths.
-        /// </summary>
-        /// <param name="virtualPath"></param>
-        /// <returns></returns>
-        protected String fixPath(string virtualPath) {
-
-            if (virtualPath.StartsWith("~")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/" + virtualPath.TrimStart('/');
-            if (!virtualPath.StartsWith("/")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/" + virtualPath;
-            return virtualPath;
-        }
-
+  
 
 
 
