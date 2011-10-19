@@ -18,7 +18,7 @@ namespace ImageResizer.Plugins.S3Reader
     /// </summary>
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
-    public class S3VirtualPathProvider : VirtualPathProvider
+    public class S3VirtualPathProvider : VirtualPathProvider, IVirtualImageProvider
     {
 
         public delegate void RewriteBucketAndKeyPath(S3VirtualPathProvider sender, S3PathEventArgs e);
@@ -197,6 +197,14 @@ namespace ImageResizer.Plugins.S3Reader
 
 
 
+
+        public bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
+            return this.FileExists(virtualPath);
+        }
+
+        public IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
+            return (IVirtualFile)GetFile(virtualPath);
+        }
     }
 
 
