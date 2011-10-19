@@ -26,6 +26,7 @@ namespace ImageResizer.Plugins.SqlReader {
             if (!string.IsNullOrEmpty(args["modifiedQuery"])) this.ModifiedDateQuery  = args["modifiedQuery"];
             
             StripFileExtension = !Utils.getBool(args, "extensionPartOfId", false);
+            RegisterAsVirtualPathProvider = Utils.getBool(args, "vpp", true);
             RequireImageExtension = Utils.getBool(args, "requireImageExtension", RequireImageExtension);
             UntrustedData = Utils.getBool(args, "untrustedData", UntrustedData);
             CacheUnmodifiedFiles = Utils.getBool(args, "cacheUnmodifiedFiles", CacheUnmodifiedFiles);
@@ -56,6 +57,16 @@ namespace ImageResizer.Plugins.SqlReader {
             set { stripFileExtension = value; }
         }
 
+        private bool _registerAsVirtualPathProvider = true;
+        /// <summary>
+        /// When true, the SqlReader will be registered as a VirtualPathProvider with ASP.NET, which will
+        /// make this plugin's virtual files accessible from all code which depends on the VirtualPathProvider system. 
+        /// </summary>
+        public bool RegisterAsVirtualPathProvider {
+            get { return _registerAsVirtualPathProvider; }
+            set { _registerAsVirtualPathProvider = value; }
+        }
+         
         private bool _requireImageExtension = true;
         /// <summary>
         /// (default true) When false, this plugin will serve requests that don't end in an image extension. 

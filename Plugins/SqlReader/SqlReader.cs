@@ -11,6 +11,7 @@ using System.Data.SqlClient;
 using System.Configuration;
 using System.Collections.Specialized;
 using ImageResizer.Configuration.Issues;
+using System.Security;
 namespace ImageResizer.Plugins.SqlReader
 {
     /// <summary>
@@ -18,7 +19,7 @@ namespace ImageResizer.Plugins.SqlReader
     /// </summary>
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
-    public class SqlReaderPlugin : VirtualPathProvider, IPlugin, IIssueProvider
+    public class SqlReaderPlugin : VirtualPathProvider, IPlugin, IIssueProvider, IVirtualImageProvider 
     {
 
         SqlReaderSettings s = null;
@@ -35,6 +36,16 @@ namespace ImageResizer.Plugins.SqlReader
         /// </summary>
         public SqlReaderSettings Settings { get { return s; } }
 
+
+        private bool _failedToRegisterVpp = false;
+        /// <summary>
+        /// True if the provider attempted to register itself as a VirtualPathProvider and failed due to limited security clearance.
+        /// False if it did not attempt, or if it succeeded.
+        /// </summary>
+        public bool FailedToRegisterVpp {
+            get { return _failedToRegisterVpp; }
+        }
+
         /// <summary>
         /// Installes the plugin into the specified configuration. Once installed, it cannot be uninstalled.
         /// </summary>
@@ -43,27 +54,41 @@ namespace ImageResizer.Plugins.SqlReader
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             
-            if (!s.RequireImageExtension || s.CacheUnmodifiedFiles || s.UntrustedData) {
-                c.Pipeline.PostAuthorizeRequestStart += delegate(IHttpModule sender2, HttpContext context) {
-                    string path = c.Pipeline.PreRewritePath;
+            c.Pipeline.PostAuthorizeRequestStart += delegate(IHttpModule sender2, HttpContext context) {
                     //Only work with database images
-                    if (!path.StartsWith(s.VirtualPathPrefix, StringComparison.OrdinalIgnoreCase)) return;
-
                     //This allows us to resize database images without putting ".jpg" after the ID in the path.
-                    if (!s.RequireImageExtension) c.Pipeline.SkipFileTypeCheck = true; //Skip the file extension check. FakeExtensions will still be stripped.
+                    if (!s.RequireImageExtension && c.Pipeline.PreRewritePath.StartsWith(s.VirtualPathPrefix, StringComparison.OrdinalIgnoreCase))
+                        c.Pipeline.SkipFileTypeCheck = true; //Skip the file extension check. FakeExtensions will still be stripped.
+            };
+            
 
-                    //Non-images will be served as-is
-                    //Cache all file types, whether they are processed or not.
-                    if (s.CacheUnmodifiedFiles) c.Pipeline.ModifiedQueryString["cache"] = ServerCacheMode.Always.ToString();
+            c.Pipeline.RewriteDefaults += delegate(IHttpModule sender, HttpContext context, Configuration.IUrlEventArgs e) {
+                //Only work with database images
+                //Non-images will be served as-is
+                //Cache all file types, whether they are processed or not.
+                if (s.CacheUnmodifiedFiles && e.VirtualPath.StartsWith(s.VirtualPathPrefix, StringComparison.OrdinalIgnoreCase))
+                    e.QueryString["cache"] = ServerCacheMode.Always.ToString();
 
-                    //If the data is untrusted, always re-encode each file.
-                    if (s.UntrustedData) c.Pipeline.ModifiedQueryString["process"] = ImageResizer.ProcessWhen.Always.ToString();
 
-                };
+            };
+            c.Pipeline.PostRewrite += delegate(IHttpModule sender, HttpContext context, Configuration.IUrlEventArgs e) {
+                //Only work with database images
+                //If the data is untrusted, always re-encode each file.
+                if (s.UntrustedData && e.VirtualPath.StartsWith(s.VirtualPathPrefix, StringComparison.OrdinalIgnoreCase))
+                    e.QueryString["process"] = ImageResizer.ProcessWhen.Always.ToString();
+
+            };
+            if (s.RegisterAsVirtualPathProvider) {
+                try {
+                    HostingEnvironment.RegisterVirtualPathProvider(this);
+                } catch (SecurityException) {
+                    this._failedToRegisterVpp = true;
+                }
             }
-            HostingEnvironment.RegisterVirtualPathProvider(this);
+
             return this;
         }
+
         /// <summary>
         /// This plugin cannot be uninstalled as ASP.NET does not provide a 'undo' function for RegisterVirtualPathProvider
         /// </summary>
@@ -212,6 +237,7 @@ namespace ImageResizer.Plugins.SqlReader
                     throw new ImageResizer.ImageProcessingException("SqlReader: Failed to locate the named connection string '" + key + "' in web.config");
 
             }
+
             //Third, try it as an actual connection string
             return new SqlConnection(s.ConnectionString);
         }
@@ -323,6 +349,26 @@ namespace ImageResizer.Plugins.SqlReader
                 return Previous.GetFile(virtualPath);
         }
         /// <summary>
+        /// Returns true if the specified virtual file should be provided by this reader and it exists. False if this provider cannot/should not provide it, or it doesn't exist.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        public bool FileExists(string virtualPath, NameValueCollection queryString) {
+            return IsPathVirtual(virtualPath) &&  RowExists(ParseIdFromVirtualPath(virtualPath));
+        }
+
+        /// <summary>
+        /// Returns an IVirtualFile instance if the file exists in this provider.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        public IVirtualFile GetFile(string virtualPath, NameValueCollection queryString) {
+            return IsPathVirtual(virtualPath) ? new DatabaseFile(virtualPath, this) : null;
+        }
+
+        /// <summary>
         /// VPP method, not for external use
         /// </summary>
         /// <param name="virtualPath"></param>
@@ -357,11 +403,17 @@ namespace ImageResizer.Plugins.SqlReader
 
             }
 
+            if (FailedToRegisterVpp)
+                issues.Add(new Issue("SqlReader", "Failed to register as VirtualPathProvider.",
+                    "Only the image resizer will be able to access files located in SQL - other systems will not be able to.", IssueSeverity.Error));
+            
 
             if (!s.PathPrefix.StartsWith("~/") || !s.PathPrefix.EndsWith("/"))
                 issues.Add(new Issue("SqlReader", "The 'prefix' value must be in app-relative form (starting with ~/), and ending with '/'. I.e, in the form ~/sql/ or ~/databaseimages/", "", IssueSeverity.Error));
             return issues;
         }
+
+
     }
 
     /// <summary>
@@ -370,7 +422,7 @@ namespace ImageResizer.Plugins.SqlReader
     /// </summary>
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Minimal)]
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.Minimal)]
-    public class DatabaseFile : VirtualFile, ImageResizer.Plugins.IVirtualFileWithModifiedDate
+    public class DatabaseFile : VirtualFile, ImageResizer.Plugins.IVirtualFileWithModifiedDate, IVirtualFile
     {
         private string id;
         private SqlReaderPlugin provider;
