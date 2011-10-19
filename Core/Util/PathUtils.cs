@@ -135,6 +135,20 @@ namespace ImageResizer.Util {
             return virtualPath;
         }
 
+        /// <summary>
+        /// Turns relative paths into domain-relative paths.
+        /// Turns app-relative paths into domain relative paths.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
+        public static string ResolveAppRelativeAssumeAppRelative(string virtualPath) {
+
+            if (virtualPath.StartsWith("~")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/" + virtualPath.TrimStart('/');
+            if (!virtualPath.StartsWith("/")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/" + virtualPath;
+            return virtualPath;
+        }
+
+
 
         /// <summary>
         /// Joins the path and querystring. If the path already contains a querystring, they are 'append joined' with the correct character.
