@@ -199,11 +199,11 @@ namespace ImageResizer.Plugins.S3Reader
 
 
         public bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
-            return this.FileExists(virtualPath);
+            return IsPathVirtual(virtualPath) && new S3File(virtualPath, this).Exists;
         }
 
         public IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
-            return (IVirtualFile)GetFile(virtualPath);
+            return (IsPathVirtual(virtualPath)) ? new S3File(virtualPath, this) : null;
         }
     }
 
