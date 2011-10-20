@@ -69,10 +69,11 @@ namespace ImageResizer.Plugins.SqlReader {
          
         private bool _requireImageExtension = true;
         /// <summary>
-        /// (default true) When false, this plugin will serve requests that don't end in an image extension. 
+        /// (default true) When false, all URLs inside the PathPrefix folder will be assumed to be images, and will be handled by this plugin.
         /// You should still use image extensions, otherwise we don't know what content type to send with the response, and browsers will choke. 
         /// It's  also the cleanest way to tell the image resizer what kind of file type you'd like back when you request resizing.
         /// This setting is designed to support non-image file serving from the DB.
+        /// It will also cause conflicts if PathPrefix overlaps with a folder name used for something else.
         /// </summary>
         public bool RequireImageExtension {
             get { return _requireImageExtension; }
