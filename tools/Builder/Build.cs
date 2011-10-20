@@ -34,7 +34,7 @@ namespace ImageResizer.ReleaseBuilder {
             packages.Add(new PackageDescriptor("min", PackMin));
             packages.Add(new PackageDescriptor("full", PackFull));
             packages.Add(new PackageDescriptor("standard", PackStandard));
-            //packages.Add(new PackageDescriptor("allbinaries", PackAllBinaries));
+            packages.Add(new PackageDescriptor("allbinaries", PackAllBinaries));
         }
 
         public string getReleasePath(string packageBase, string ver,  string kind) {
@@ -62,19 +62,33 @@ namespace ImageResizer.ReleaseBuilder {
             //The base name for creating zip packags.
             string packageBase = v.get("PackageName"); //    // [assembly: PackageName("Resizer")]
 
-            //a. Ask about hotfix - for hotfixes, we embed warnings and stuff so they don't get used in production.
+
+            //List the file version number   [assembly: AssemblyFileVersion("3.0.5.*")]
+            string fileVer = list("FileVersion", v.get("AssemblyFileVersion").TrimEnd('.', '*'));
+            //List the assembly version number. AssemblyVersion("3.0.5.*")]
+            string assemblyVer = list("AssemblyVersion", v.get("AssemblyVersion").TrimEnd('.', '*'));
+            //List the information version number. (used in zip package names) [assembly: AssemblyInformationalVersion("3-alpha-5")]
+            string infoVer = list("InfoVersion", v.get("AssemblyInformationalVersion").TrimEnd('.', '*'));
+            //List the Nuget package version number. New builds need to have a 4th number specified.
+            string nugetVer = list("NugetVersion", v.get("NugetVersion").TrimEnd('.', '*'));
+
+            //a. Ask if version numbers need to be modified
+            if (ask("Change version numbers?")) {
+                //b. Ask for file version number   [assembly: AssemblyFileVersion("3.0.5.*")]
+                fileVer = change("FileVersion", v.get("AssemblyFileVersion").TrimEnd('.', '*'));
+                //c. Ask for assembly version number. AssemblyVersion("3.0.5.*")]
+                assemblyVer = change("AssemblyVersion", v.get("AssemblyVersion").TrimEnd('.', '*'));
+                //d: Ask for information version number. (used in zip package names) [assembly: AssemblyInformationalVersion("3-alpha-5")]
+                infoVer = change("InfoVersion", v.get("AssemblyInformationalVersion").TrimEnd('.', '*'));
+                //e. Ask for Nuget package version number. New builds need to have a 4th number specified.
+                nugetVer = change("NugetVersion", v.get("NugetVersion").TrimEnd('.', '*'));
+            }
+
+            //b. Ask about hotfix - for hotfixes, we embed warnings and stuff so they don't get used in production.
             bool isHotfix = ask("Is this a hotfix? Press Y to tag the assembiles and packages as such.");
             //Build the hotfix name
             string packageHotfix = isHotfix ? ("-hotfix-" + DateTime.Now.ToString("htt").ToLower()) : "";
 
-            //b. Ask for file version number   [assembly: AssemblyFileVersion("3.0.5.*")]
-            string fileVer = change("FileVersion", v.get("AssemblyFileVersion").TrimEnd('.', '*'));
-            //c. Ask for assembly version number. AssemblyVersion("3.0.5.*")]
-            string assemblyVer = change("AssemblyVersion", v.get("AssemblyVersion").TrimEnd('.', '*'));
-            //d: Ask for information version number. (used in zip package names) [assembly: AssemblyInformationalVersion("3-alpha-5")]
-            string infoVer = change("InfoVersion", v.get("AssemblyInformationalVersion").TrimEnd('.', '*'));
-            //e. Ask for Nuget package version number. New builds need to have a 4th number specified.
-            string nugetVer = change("NugetVersion", v.get("NugetVersion").TrimEnd('.', '*'));
 
             //Get the download server from SharedAssemblyInfo.cs if specified
             string downloadServer = v.get("DownloadServer"); if (downloadServer == null) downloadServer = "http://downloads.imageresizing.net/";
