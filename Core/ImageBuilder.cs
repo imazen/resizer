@@ -216,6 +216,7 @@ namespace ImageResizer
                 if (b != null && b.Tag == null && path != null) b.Tag = new BitmapTag(path);
 
             }
+            PostDecodeStream(ref b,settings);
             return b;            
         }
 
