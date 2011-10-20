@@ -23,7 +23,7 @@ namespace ImageResizer.Plugins.Watermark
         public WatermarkPlugin() {
         }
 
-        ImageLayer _otherImages = null;
+        ImageLayer _otherImages = new ImageLayer(null);
         /// <summary>
         /// When a &amp;watermark command does not specify a named preset, it is assumed to be a file name. 
         /// Set OtherImages.Path to the search folder. All watermark images (except for presets) must be in the root of the search folder. 
@@ -44,6 +44,7 @@ namespace ImageResizer.Plugins.Watermark
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             this.c = c;
+            this.OtherImages.ConfigInstance = c;
             _namedWatermarks = ParseWatermarks(c.getConfigXml().queryFirst("watermarks"), ref _otherImages);
             return this;
         }
@@ -145,8 +146,8 @@ namespace ImageResizer.Plugins.Watermark
                     layer.Path = layer.Path.TrimEnd(slash) + slash + watermark.TrimStart(slash);
 
 
-                    //Verify the file exists if we're in ASP.NET. If the watermark doesn't exist, skip watermarking.
-                    if (!c.Pipeline.FileExists(watermark, layer.ImageQuery) && slash == '/') return RequestedAction.None;
+                    //If it's a forward-slash, and we're in asp.net,  verify the file exists
+                    if (slash == '/' && HttpContext.Current != null && !c.Pipeline.FileExists(watermark, layer.ImageQuery)) return RequestedAction.None;
                     layer.RenderTo(s);
 
 
