@@ -94,6 +94,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Logging", "..\Plugins\Logging\ImageResizer.Plugins.Logging.csproj", "{10E04BAD-889B-4C01-BA0B-FAC7EF63B859}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarking", "..\Tests\Benchmarking\Benchmarking.csproj", "{7D496099-EE56-4875-9A96-7036698F5D26}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF} = {FA5EF673-A6A4-498D-AA24-C025CC5267AF}
+		{6598A7CD-8F27-4D3F-A675-5AE63113A7C3} = {6598A7CD-8F27-4D3F-A675-5AE63113A7C3}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S3ReaderSample", "..\Samples\S3ReaderSample\S3ReaderSample.csproj", "{8A750B3B-CFDE-43E8-A7EA-35DC84178088}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -820,6 +826,7 @@ Global
 		{7D496099-EE56-4875-9A96-7036698F5D26}.Debug|x86.ActiveCfg = Debug|x86
 		{7D496099-EE56-4875-9A96-7036698F5D26}.Debug|x86.Build.0 = Debug|x86
 		{7D496099-EE56-4875-9A96-7036698F5D26}.Release|Any CPU.ActiveCfg = Release|x86
+		{7D496099-EE56-4875-9A96-7036698F5D26}.Release|Any CPU.Build.0 = Release|x86
 		{7D496099-EE56-4875-9A96-7036698F5D26}.Release|Mixed Platforms.ActiveCfg = Release|x86
 		{7D496099-EE56-4875-9A96-7036698F5D26}.Release|Mixed Platforms.Build.0 = Release|x86
 		{7D496099-EE56-4875-9A96-7036698F5D26}.Release|x64.ActiveCfg = Release|x86
@@ -831,6 +838,24 @@ Global
 		{7D496099-EE56-4875-9A96-7036698F5D26}.Trial|x64.ActiveCfg = Release|x86
 		{7D496099-EE56-4875-9A96-7036698F5D26}.Trial|x86.ActiveCfg = Release|x86
 		{7D496099-EE56-4875-9A96-7036698F5D26}.Trial|x86.Build.0 = Release|x86
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Release|x64.ActiveCfg = Release|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Release|x86.ActiveCfg = Release|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Trial|x64.ActiveCfg = Release|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
