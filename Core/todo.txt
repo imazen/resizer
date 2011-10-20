@@ -1,8 +1,4 @@
-﻿
-
-
-
-In V3.1:
+﻿In V3.1:
 
 
 * Add support for autocropping and cropping separately
@@ -21,10 +17,10 @@ anchor=center, topleft, energyaverage (for padding and cropping)
 scale=upscaleonly|downscaleonly|both|upscalecanvas
 
 
+Refactor code to avoid Response.Redirect() (ThreadAbortException), save a few ms.
 
 
 
-Refactor Watermark plugin to use named configurations.
 Add debug=true querystring command to Diagnostics plugin.
 Add better usage examples.
 
