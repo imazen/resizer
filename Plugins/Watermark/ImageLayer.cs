@@ -18,7 +18,8 @@ namespace ImageResizer.Plugins.Watermark {
                 if (!string.IsNullOrEmpty(attrs["imageQuery"])) ImageQuery = new ResizeSettings(attrs["imageQuery"]);
         }
 
-        public ImageLayer() {
+        public ImageLayer(Config c) {
+            this.c = c;
         }
         protected string _path = null;
         /// <summary>
@@ -30,7 +31,9 @@ namespace ImageResizer.Plugins.Watermark {
         }
 
         protected ResizeSettings _imageQuery = new ResizeSettings();
-        protected Config c;
+        protected Config c = null;
+
+        public Config ConfigInstance { get { return c; } set { c = value; } }
         /// <summary>
         /// Settings to apply to the watermark before overlaying it on the image. 
         /// </summary>
@@ -45,7 +48,7 @@ namespace ImageResizer.Plugins.Watermark {
             other.ImageQuery = new ResizeSettings(ImageQuery);
         }
         public ImageLayer Copy() {
-            ImageLayer l = new ImageLayer();
+            ImageLayer l = new ImageLayer(this.c);
             this.CopyTo(l);
             return l;
         }
@@ -81,7 +84,7 @@ namespace ImageResizer.Plugins.Watermark {
             //If the image is a virtual gradient, allow delayed loading so the estimated width/height values can be used to create it the proper size. 
             //Otherwise, load immediately.
             Bitmap img = null;
-            if (!(c.Pipeline.GetFile(Path,ImageQuery) is ImageResizer.Plugins.Basic.Gradient.GradientVirtualFile))
+            if (c.Pipeline.GetFile(Path,ImageQuery) == null || !(c.Pipeline.GetFile(Path,ImageQuery) is ImageResizer.Plugins.Basic.Gradient.GradientVirtualFile))
                 img = GetMemCachedBitmap(Path, ImageQuery);
            
             //Calculate the location for the bitmap
