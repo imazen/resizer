@@ -40,25 +40,31 @@ namespace ImageResizer.Plugins.CloudFront {
         }
 
         bool TransformCloudFrontUrl(System.Web.HttpContext context) {
-            if (context.Request.Path.LastIndexOf('=') < 0) return false; //Must have an = sign or there is no query
+            if (c.Pipeline.PreRewritePath.LastIndexOf('=') < 0) return false; //Must have an = sign or there is no query
 
             //With an equal sign in the path, we can look for the sign.
-            Match m = r.Match(context.Request.Path);
+            Match m = r.Match(c.Pipeline.PreRewritePath);
             if (!m.Success) return false; //Must match regex
 
             string path = m.Groups["path"].Captures[0].Value;
             if (!c.Pipeline.IsAcceptedImageType(path)) return false; //Must be valid image type
+            c.Pipeline.PreRewritePath = path; //Fix the path.
 
+            //Parse the fake query, merge it with the real one, and we are done.
             string query = m.Groups["query"].Captures[0].Value;
-
             NameValueCollection q = Util.PathUtils.ParseQueryStringFriendly(query.Replace(";", "&"));
-            context.Items[c.Pipeline.ModifiedPathKey] = path; //Fix the path.
 
-            context.Items[c.Pipeline.ModifiedPathKey + ".query"] = q; //Save the querystring for later
+            //Merge the querystring with everything found in PathInfo. THe querystring wins on conflicts
+            foreach (string key in c.Pipeline.ModifiedQueryString.Keys)
+                q[key] = c.Pipeline.ModifiedQueryString[key];
+
+            c.Pipeline.ModifiedQueryString = q;
+
             return true;
         }
 
         void Pipeline_RewriteDefaults(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
+            ///Handle redirectThrough behavior
             if (redirectThrough != null && context.Items[c.Pipeline.ModifiedPathKey + ".notcloudfronturl"] != null) {
                 //It wasn't a cloudfront URL - which means the request didn't come from CloudFront, it came directly from the browser. Perform a redirect, rewriting the querystring appropriately
 
@@ -73,16 +79,6 @@ namespace ImageResizer.Plugins.CloudFront {
                     context.Response.End();
                 }
             }
-
-            //Ok, the rest only happens if it is a cloudfront URL. 
-
-            if (context.Items[c.Pipeline.ModifiedPathKey + ".query"] == null) return;
-
-            NameValueCollection q = context.Items[c.Pipeline.ModifiedPathKey + ".query"] as NameValueCollection;
-
-            //Merge overwrite the querystring with everything found in PathInfo. This is the defaults event, so it will still get overwritten by an additional 'real' querystring.
-            foreach (string key in q.Keys)
-                e.QueryString[key] = q[key];
 
         }
 
