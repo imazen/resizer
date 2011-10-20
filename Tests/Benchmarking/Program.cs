@@ -14,6 +14,7 @@ using System.Drawing;
 using ImageResizer.Plugins.FreeImageEncoder;
 using ImageResizer.Plugins.Basic;
 using ImageResizer.Plugins.Watermark;
+using ImageResizer.Encoding;
 
 namespace Bench {
     class Program {
@@ -24,18 +25,22 @@ namespace Bench {
             new PrettyGifs().Install(c);
             WatermarkPlugin w = (WatermarkPlugin)new WatermarkPlugin().Install(c);
             w.OtherImages.Path = imageDir;
-           
 
+            Console.WindowWidth = 200;
+            
 
+            //TODO: make watermark system work outside of the web folder.
             string s = c.GetDiagnosticsPage();
             c.BuildImage(imageDir + "quality-original.jpg", "grass.gif", "rotate=3&width=600&format=gif&colors=128&watermark=Sun_256.png");
 
-            EvaluateSpeedPlugin();
-
-            CompareFreeImageEncoderToDefault();
             CompareFreeImageDecoderToDefault();
 
+            CompareFreeImageEncoderToDefault();
+           
+
             CompareFreeImageToDefault();
+
+            EvaluateSpeedPlugin();
             Console.ReadKey();
         }
 
@@ -78,31 +83,60 @@ namespace Bench {
         }
 
         public static void CompareFreeImageToDefault(){
-            string jpeg = imageDir + "quality-original.jpg";
+            string[] images = new string[] { imageDir + "quality-original.jpg", imageDir + "fountain-small.jpg", imageDir + "sample.tif", imageDir + "\\private\\98613_17.tif" };
+
             string dest = "dest.jpg";
 
             Config c = new Config();
-            new FreeImageBuilderPlugin().Install(c);
+            Config f = new Config();
+            new FreeImageBuilderPlugin().Install(f);
+
+            Config h = new Config();
+            new FreeImageDecoderPlugin().Install(h);
+            new FreeImageEncoderPlugin().Install(h);
 
             Console.WriteLine();
-            Console.WriteLine("Running in-memory test");
-            Console.WriteLine("Testing default pipeline");
-            BenchmarkInMemory(c, jpeg, new ResizeSettings("maxwidth=200&maxheight=200"));
-            Console.WriteLine("Testing FreeImage pipeline");
-            BenchmarkInMemory(c, jpeg, new ResizeSettings("maxwidth=200&maxheight=200&freeimage=true"));
 
-            Console.WriteLine("Running filesystem test");
-            Console.WriteLine("Testing default pipeline");
-            BenchmarkFileToFile(c, jpeg, dest, new ResizeSettings("maxwidth=200&maxheight=200"));
-            Console.WriteLine("Testing FreeImage pipeline");
-            BenchmarkFileToFile(c, jpeg, dest, new ResizeSettings("maxwidth=200&maxheight=200&freeimage=true"));
+            Dictionary<string, Config> pipelines = new Dictionary<string, Config>();
+            pipelines.Add("Default", c);
+            pipelines.Add("FreeImageBuilder", f);
+            pipelines.Add("Hybrid", h);
+            
+            ResizeSettings[] queryies = new ResizeSettings[]{new ResizeSettings("maxwidth=200&maxheight=200&freeimage=true"),new ResizeSettings("freeimage=true")};
+
+            foreach (string file in images) {
+                foreach(ResizeSettings s in queryies){
+                    Console.WriteLine();
+                    Console.WriteLine("Running in-memory test with " + file + s.ToString());
+                    foreach (string pipe in pipelines.Keys) {
+                        Console.Write(pipe.PadRight(25) + ": ");
+                        BenchmarkInMemory(pipelines[pipe],file, s);
+                    }
+                }
+            }
+
+            foreach (string file in images) {
+                foreach (ResizeSettings s in queryies) {
+                    Console.WriteLine();
+                    Console.WriteLine("Running filesystem (flawed) test with " + file + s.ToString());
+                    foreach (string pipe in pipelines.Keys) {
+                        Console.Write(pipe.PadRight(25) + ": ");
+                        BenchmarkFileToFile(pipelines[pipe], file,dest, s);
+                    }
+                }
+            }
+
 
        }
 
 
 
         public static void CompareFreeImageDecoderToDefault() {
-            string[] images = new string[] { imageDir + "quality-original.jpg", imageDir + "sample.tif", imageDir + "\\private\\98613_17.tif" };
+            string[] images = new string[] { imageDir + "quality-original.jpg", imageDir + "fountain-small.jpg", 
+                imageDir + "\\extra\\cherry-blossoms.jpg",
+                imageDir + "\\extra\\mountain.jpg",
+                 imageDir + "\\extra\\dewdrops.jpg", imageDir + "sample.tif", imageDir + "\\private\\98613_17.tif" };
+
 
             Config c = new Config();
             new FreeImageDecoderPlugin().Install(c);
@@ -110,28 +144,34 @@ namespace Bench {
             Console.WriteLine();
             foreach(string s in images){
                 Console.WriteLine("Comparing FreeImage and standard decoders for " + s);
-                Console.WriteLine("Testing default pipeline");
+                Console.Write("Default: ".PadRight(25));
                 BenchmarkDecoderInMemory(c, s, new ResizeSettings());
-                Console.WriteLine("Testing FreeImage pipeline");
-                BenchmarkDecoderInMemory(c, s, new ResizeSettings());
+                Console.Write("FreeImage: ".PadRight(25));
+                BenchmarkDecoderInMemory(c, s, new ResizeSettings("freeimage=true"));
             }
             Console.WriteLine();
         }
 
         public static void CompareFreeImageEncoderToDefault() {
-            string[] images = new string[] { imageDir + "quality-original.jpg", imageDir + "sample.tif", imageDir + "\\private\\98613_17.tif" };
+            string[] images = new string[] { imageDir + "quality-original.jpg", imageDir + "fountain-small.jpg", 
+                imageDir + "\\extra\\cherry-blossoms.jpg",
+                imageDir + "\\extra\\mountain.jpg",
+                 imageDir + "\\extra\\dewdrops.jpg", imageDir + "sample.tif", imageDir + "\\private\\98613_17.tif" };
+
 
             Config c = new Config();
-            new FreeImageEncoderPlugin().Install(c);
+            Config f = new Config();
+            new FreeImageEncoderPlugin().Install(f);
 
-            ResizeSettings settings = new ResizeSettings("format=jpg");
+            ResizeSettings settings = new ResizeSettings("format=jpg&freeimage=true");
+
             Console.WriteLine();
             foreach (string s in images) {
                 Console.WriteLine("Comparing FreeImage and standard encoders for " + s);
-                Console.WriteLine("Testing default pipeline");
+                Console.Write("Default: ".PadRight(25));
                 BenchmarkEncoderInMemory(c, c.CurrentImageBuilder.LoadImage(s, settings), settings);
-                Console.WriteLine("Testing FreeImage pipeline");
-                BenchmarkEncoderInMemory(c, c.CurrentImageBuilder.LoadImage(s, settings), settings);
+                Console.Write("FreeImage: ".PadRight(25));
+                BenchmarkEncoderInMemory(f, f.CurrentImageBuilder.LoadImage(s, settings), settings);
             }
             Console.WriteLine();
         }
@@ -147,15 +187,14 @@ namespace Bench {
             s.Start();
             c.CurrentImageBuilder.Build(source, dest, settings);
             s.Stop();
-            Console.WriteLine();
-            Console.WriteLine("First iteration: " + s.ElapsedMilliseconds.ToString() + "ms");
+            Console.Write("First: " + s.ElapsedMilliseconds.ToString() + "ms");
             s.Reset();
             s.Start();
             for (int i = 0; i < loops; i++) {
                 c.CurrentImageBuilder.Build(source, dest, settings);
             }
             s.Stop();
-            Console.WriteLine("Avg. of next " + loops + " iterations: " + (s.ElapsedMilliseconds / loops).ToString() + "ms");
+            Console.Write(" Avg(" + loops + "):" + (s.ElapsedMilliseconds / loops).ToString() + "ms");
             Console.WriteLine();
         }
 
@@ -177,8 +216,7 @@ namespace Bench {
             dest.Seek(0, SeekOrigin.Begin);
             dest.SetLength(0);
             s.Stop();
-            if (outputResults) Console.WriteLine();
-            if (outputResults) Console.WriteLine("First iteration: " + s.ElapsedMilliseconds.ToString() + "ms");
+            if (outputResults) Console.Write("First:" + s.ElapsedMilliseconds.ToString() + "ms");
             s.Reset();
             s.Start();
             for (int i = 0; i < loops; i++) {
@@ -189,7 +227,7 @@ namespace Bench {
                     c.CurrentImageBuilder.Build(src, dest, settings, false);
             }
             s.Stop();
-            if (outputResults) Console.WriteLine("Avg. of next " + loops + " iterations: " + (s.ElapsedMilliseconds / loops).ToString() + "ms");
+            if (outputResults) Console.Write(" Avg(" + loops + "):" + (s.ElapsedMilliseconds / loops).ToString() + "ms");
             if (outputResults) Console.WriteLine();
             return (s.ElapsedMilliseconds / loops);
         }
@@ -205,7 +243,7 @@ namespace Bench {
             s.Start();
             c.CurrentImageBuilder.LoadImage(ms,settings).Dispose();
             s.Stop();
-            Console.WriteLine("First iteration: " + s.ElapsedMilliseconds.ToString() + "ms");
+            Console.Write("First: " + s.ElapsedMilliseconds.ToString() + "ms");
             s.Reset();
             s.Start();
             for (int i = 0; i < loops; i++) {
@@ -213,7 +251,7 @@ namespace Bench {
                 c.CurrentImageBuilder.LoadImage(ms, settings).Dispose();
             }
             s.Stop();
-            Console.WriteLine("Avg. of next " + loops + " iterations: " + (s.ElapsedMilliseconds / loops).ToString() + "ms");
+            Console.WriteLine(" Avg(" + loops + "): " + (s.ElapsedMilliseconds / loops).ToString() + "ms");
         }
 
         public static void BenchmarkEncoderInMemory(Config c, Image img, ResizeSettings settings) {
@@ -224,16 +262,18 @@ namespace Bench {
             s.Start();
             c.CurrentImageBuilder.EncoderProvider.GetEncoder(settings, img).Write(img, ms);
             s.Stop();
-            Console.WriteLine("First iteration: " + s.ElapsedMilliseconds.ToString() + "ms");
+            Console.Write("First: " + s.ElapsedMilliseconds.ToString() + "ms");
             s.Reset();
             s.Start();
             for (int i = 0; i < loops; i++) {
                 ms.Seek(0, SeekOrigin.Begin);
                 ms.SetLength(0);
-                c.CurrentImageBuilder.EncoderProvider.GetEncoder(settings, img).Write(img, ms);
+                IEncoder ie = c.CurrentImageBuilder.EncoderProvider.GetEncoder(settings, img);
+                Debug.Assert(settings["freeimage"] == null || ie is FreeImageEncoderPlugin);
+                ie.Write(img, ms);
             }
             s.Stop();
-            Console.WriteLine("Avg. of next " + loops + " iterations: " + (s.ElapsedMilliseconds / loops).ToString() + "ms");
+            Console.WriteLine("Avg(" + loops + "): " + (s.ElapsedMilliseconds / loops).ToString() + "ms");
         }
     }
 }
