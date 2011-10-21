@@ -164,7 +164,7 @@ namespace ImageResizer.Util {
         }
 
         /// <summary>
-        /// Overwrites exisisting querystring values in 'path' with the values in 'newQuerystring'
+        /// Overwrites exisisting querystring values in 'path' with the values in 'newQuerystring'. Doesn't support ; querystrings
         /// </summary>
         /// <param name="path"></param>
         /// <param name="newQuerystring"></param>
@@ -178,7 +178,7 @@ namespace ImageResizer.Util {
             return AddQueryString(RemoveQueryString(path), BuildQueryString(oldQuery));
         }
         /// <summary>
-        /// Adds the querystring values in 'newQuerystring' to the querystring in Path, but does not overwrite values.
+        /// Adds the querystring values in 'newQuerystring' to the querystring in Path, but does not overwrite values. Doesn't support ; querystrings
         /// </summary>
         /// <param name="path"></param>
         /// <param name="newQuerystring"></param>
@@ -249,6 +249,17 @@ namespace ImageResizer.Util {
             if (path.IndexOf('?') < 0) path = '?' + path;
             return ParseQueryString(path);
         }
+
+        /// <summary>
+        /// Like ParseQueryString, but permits the leading '?' to be omitted, and semicolons can be substituted for '&'
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static NameValueCollection ParseQueryStringFriendlyAllowSemicolons(string path) {
+            if (path.IndexOf('?') < 0 && path.IndexOf(';') < 0) path = '?' + path;
+            return ParseQueryString(path.Replace(';','?'));
+        }
+
         /// <summary>
         /// Parses the querystring from the given path into a NameValueCollection. 
         /// accepts "file?key=value" and "?key=value&amp;key2=value2" formats. (no path is required)
