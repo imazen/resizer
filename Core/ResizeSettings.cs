@@ -28,7 +28,7 @@ namespace ImageResizer {
         /// Parses the specified querystring into name/value pairs. leading ? not required.
         /// </summary>
         /// <param name="queryString"></param>
-        public ResizeSettings(string queryString) : base(PathUtils.ParseQueryStringFriendly(queryString)) { }
+        public ResizeSettings(string queryString) : base(PathUtils.ParseQueryStringFriendlyAllowSemicolons(queryString)) { }
 
 
         protected int get(string name, int defaultValue){ return Utils.getInt(this,name,defaultValue);}
