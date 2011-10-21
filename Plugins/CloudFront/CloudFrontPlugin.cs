@@ -52,7 +52,7 @@ namespace ImageResizer.Plugins.CloudFront {
 
             //Parse the fake query, merge it with the real one, and we are done.
             string query = m.Groups["query"].Captures[0].Value;
-            NameValueCollection q = Util.PathUtils.ParseQueryStringFriendly(query.Replace(";", "&"));
+            NameValueCollection q = Util.PathUtils.ParseQueryStringFriendlyAllowSemicolons(query);
 
             //Merge the querystring with everything found in PathInfo. THe querystring wins on conflicts
             foreach (string key in c.Pipeline.ModifiedQueryString.Keys)
