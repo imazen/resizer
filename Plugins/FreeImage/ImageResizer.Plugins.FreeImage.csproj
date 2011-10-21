@@ -42,6 +42,7 @@
     <Compile Include="FreeImageDecoder.cs" />
     <Compile Include="FreeImageBuilder.cs" />
     <Compile Include="FreeImageEncoder.cs" />
+    <Compile Include="FreeImageResizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +56,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\Libs\FreeImage\Dist\FreeImage.dll">
+      <Link>FreeImage.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="todo.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
