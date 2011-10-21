@@ -71,7 +71,7 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
         protected virtual bool BuildUnmanaged(object source, object dest, ResizeSettings settings) {
             if (!FreeImageAPI.FreeImage.IsAvailable()) return false;
 
-            if (!"true".Equals(settings["freeimage"])) return false;
+            if (!"freeimage".Equals(settings["builder"])) return false;
 
             // Load the example bitmap.
             FIBITMAP original = FIBITMAP.Zero;
@@ -101,10 +101,14 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
 
                 RectangleF imageDest = PolygonMath.GetBoundingBox(state.layout["image"]);
 
-                //Rescale
-                final = FreeImage.Rescale(original,(int)imageDest.Width,(int)imageDest.Height,FREE_IMAGE_FILTER.FILTER_BOX);
-                FreeImage.UnloadEx(ref original);
-                if (final.IsNull) return false;
+                if (imageDest.Width != orig.Width || imageDest.Height != orig.Height) {
+                    //Rescale
+                    final = FreeImage.Rescale(original, (int)imageDest.Width, (int)imageDest.Height, FREE_IMAGE_FILTER.FILTER_BOX);
+                    FreeImage.UnloadEx(ref original);
+                    if (final.IsNull) return false;
+                } else {
+                    final = original;
+                }
 
                 RGBQUAD bgcolor = default(RGBQUAD);
                 bgcolor.Color = settings.BackgroundColor;
