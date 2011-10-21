@@ -101,11 +101,11 @@ namespace Bench {
             pipelines.Add("Default", c);
             pipelines.Add("FreeImageBuilder", f);
             pipelines.Add("Hybrid", h);
-            
-            ResizeSettings[] queryies = new ResizeSettings[]{new ResizeSettings("maxwidth=200&maxheight=200&freeimage=true"),new ResizeSettings("freeimage=true")};
+
+            ResizeSettings[] queries = new ResizeSettings[] { new ResizeSettings("maxwidth=200&maxheight=200&decoder=freeimage&builder=freeimage"), new ResizeSettings("&decoder=freeimage&builder=freeimage") };
 
             foreach (string file in images) {
-                foreach(ResizeSettings s in queryies){
+                foreach (ResizeSettings s in queries) {
                     Console.WriteLine();
                     Console.WriteLine("Running in-memory test with " + file + s.ToString());
                     foreach (string pipe in pipelines.Keys) {
@@ -116,7 +116,7 @@ namespace Bench {
             }
 
             foreach (string file in images) {
-                foreach (ResizeSettings s in queryies) {
+                foreach (ResizeSettings s in queries) {
                     Console.WriteLine();
                     Console.WriteLine("Running filesystem (flawed) test with " + file + s.ToString());
                     foreach (string pipe in pipelines.Keys) {
@@ -147,7 +147,7 @@ namespace Bench {
                 Console.Write("Default: ".PadRight(25));
                 BenchmarkDecoderInMemory(c, s, new ResizeSettings());
                 Console.Write("FreeImage: ".PadRight(25));
-                BenchmarkDecoderInMemory(c, s, new ResizeSettings("freeimage=true"));
+                BenchmarkDecoderInMemory(c, s, new ResizeSettings("&decoder=freeimage"));
             }
             Console.WriteLine();
         }
@@ -160,18 +160,25 @@ namespace Bench {
 
 
             Config c = new Config();
+            Config p = new Config();
+            new PrettyGifs().Install(p);
             Config f = new Config();
             new FreeImageEncoderPlugin().Install(f);
 
-            ResizeSettings settings = new ResizeSettings("format=jpg&freeimage=true");
+            ResizeSettings[] queries = new ResizeSettings[] { new ResizeSettings("format=jpg"), new ResizeSettings("format=png"), new ResizeSettings("format=gif") };
+
 
             Console.WriteLine();
             foreach (string s in images) {
-                Console.WriteLine("Comparing FreeImage and standard encoders for " + s);
-                Console.Write("Default: ".PadRight(25));
-                BenchmarkEncoderInMemory(c, c.CurrentImageBuilder.LoadImage(s, settings), settings);
-                Console.Write("FreeImage: ".PadRight(25));
-                BenchmarkEncoderInMemory(f, f.CurrentImageBuilder.LoadImage(s, settings), settings);
+                foreach (ResizeSettings query in queries) {
+                    Console.WriteLine("Comparing FreeImage and standard encoders for " + s + query.ToString());
+                    Console.Write("Default: ".PadRight(25));
+                    BenchmarkEncoderInMemory(c, c.CurrentImageBuilder.LoadImage(s, query), query);
+                    Console.Write("PrettyGifs: ".PadRight(25));
+                    BenchmarkEncoderInMemory(p, p.CurrentImageBuilder.LoadImage(s, query), query);
+                    Console.Write("FreeImage: ".PadRight(25));
+                    BenchmarkEncoderInMemory(f, f.CurrentImageBuilder.LoadImage(s, query), query);
+                }
             }
             Console.WriteLine();
         }
@@ -269,7 +276,6 @@ namespace Bench {
                 ms.Seek(0, SeekOrigin.Begin);
                 ms.SetLength(0);
                 IEncoder ie = c.CurrentImageBuilder.EncoderProvider.GetEncoder(settings, img);
-                Debug.Assert(settings["freeimage"] == null || ie is FreeImageEncoderPlugin);
                 ie.Write(img, ms);
             }
             s.Stop();
