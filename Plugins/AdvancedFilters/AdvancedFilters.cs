@@ -164,7 +164,9 @@ namespace ImageResizer.Plugins.AdvancedFilters {
         }
 
         public IEnumerable<string> GetSupportedQuerystringKeys() {
-            return new string[] { "blur", "sharpen" };
+            return new string[] { "blur", "sharpen" , "a.blur", "a.sharpen", "a.oilpainting", "a.removenoise", 
+                                "a.sobel", "a.threshold", "a.canny", "a.sepia", "a.equalize", "a.posterize", 
+                                "a.contrast", "a.brightness", "a.saturation","a.truncate"};
         }
     }
 }
