@@ -196,11 +196,11 @@ namespace ImageResizer.Util {
             if (value != null) {
                 if (value.Equals("both", StringComparison.OrdinalIgnoreCase))
                     return ScaleMode.Both;
-                else if (value.Equals("upscaleonly", StringComparison.OrdinalIgnoreCase))
+                else if (value.Equals("upscaleonly", StringComparison.OrdinalIgnoreCase) || value.Equals("up", StringComparison.OrdinalIgnoreCase))
                     return ScaleMode.UpscaleOnly;
-                else if (value.Equals("downscaleonly", StringComparison.OrdinalIgnoreCase))
+                else if (value.Equals("downscaleonly", StringComparison.OrdinalIgnoreCase) || value.Equals("down", StringComparison.OrdinalIgnoreCase))
                     return ScaleMode.DownscaleOnly;
-                else if (value.Equals("upscalecanvas", StringComparison.OrdinalIgnoreCase))
+                else if (value.Equals("upscalecanvas", StringComparison.OrdinalIgnoreCase) || value.Equals("canvas", StringComparison.OrdinalIgnoreCase))
                     return ScaleMode.UpscaleCanvas;
             }
             //default
