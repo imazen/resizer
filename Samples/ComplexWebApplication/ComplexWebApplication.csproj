@@ -106,7 +106,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="css\demo.css" />
+    <Content Include="css\hover.css" />
     <Content Include="css\state.gif" />
+    <Content Include="Filters.htm" />
+    <Content Include="js\hover.js" />
+    <Content Include="js\Markdown.Converter.js" />
+    <Content Include="js\querystring.js" />
     <Content Include="Misc\BatchResizeAndZip.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />

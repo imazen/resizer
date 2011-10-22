@@ -1,0 +1,212 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Testing Simple and Advanced filters</title>
+    <link rel="Stylesheet" href="css/hover.css" />
+</head>
+<body>
+<div>
+<a href="Default.aspx" runat="server"> Core examples </a> &nbsp;&nbsp;
+<a  href="Plugins.htm" runat="server"> Plugin Tests </a> &nbsp;&nbsp;
+<a  href="Misc/RegressionTests.aspx" runat="server"> Regression Tests </a> &nbsp;&nbsp;
+<a href="UploadSample.aspx" runat="server"> Upload example </a> </div>
+<div id="content">
+
+## SimpleFilters tests
+
+![Invert](red-leaf.jpg?width=100&s.invert=true)
+
+### Grayscale modes
+![NTSC/Y grayscale standard](red-leaf.jpg?width=100&s.grayscale=y)
+![R-Y Grayscale standard](red-leaf.jpg?width=100&s.grayscale=ry)
+![BT709 (htdv) Grayscale standard](red-leaf.jpg?width=100&s.grayscale=bt709)
+![Flat (50/50/50) Grayscale](red-leaf.jpg?width=100&s.grayscale=flat)
+![Saturation=-1](red-leaf.jpg?width=100&s.saturation=-1)
+
+### Sepia
+
+![](red-leaf.jpg?width=100&s.sepia=true)
+![](red-leaf.jpg?width=100&s.sepia=true&s.grayscale=true)
+![](red-leaf.jpg?width=100&s.sepia=true&s.contrast=0.5)
+
+![](red-leaf.jpg?width=100&a.sepia=true)
+![](red-leaf.jpg?width=100&a.sepia=true&a.saturation=-1)
+![](red-leaf.jpg?width=100&s.sepia=true&a.contrast=0.5)
+
+
+### Saturation
+
+![](red-leaf.jpg?width=100&s.saturation=-5)
+![](red-leaf.jpg?width=100&s.saturation=-1)
+![](red-leaf.jpg?width=100&s.saturation=-0.9)
+![](red-leaf.jpg?width=100&s.saturation=-0.5)
+![](red-leaf.jpg?width=100&s.saturation=-0.2)
+![](red-leaf.jpg?width=100&s.saturation=0)
+![](red-leaf.jpg?width=100&s.saturation=0.2)
+![](red-leaf.jpg?width=100&s.saturation=0.5)
+![](red-leaf.jpg?width=100&s.saturation=0.9)
+![](red-leaf.jpg?width=100&s.saturation=1)
+![](red-leaf.jpg?width=100&s.saturation=5)
+![](red-leaf.jpg?width=100&s.saturation=10)
+
+![](red-leaf.jpg?width=100&a.saturation=-5)
+![](red-leaf.jpg?width=100&a.saturation=-1)
+![](red-leaf.jpg?width=100&a.saturation=-0.9)
+![](red-leaf.jpg?width=100&a.saturation=-0.5)
+![](red-leaf.jpg?width=100&a.saturation=-0.2)
+![](red-leaf.jpg?width=100&a.saturation=0)
+![](red-leaf.jpg?width=100&a.saturation=0.2)
+![](red-leaf.jpg?width=100&a.saturation=0.5)
+![](red-leaf.jpg?width=100&a.saturation=0.9)
+![](red-leaf.jpg?width=100&a.saturation=1)
+![](red-leaf.jpg?width=100&a.saturation=5)
+![](red-leaf.jpg?width=100&a.saturation=10)
+
+
+![](red-leaf.jpg?width=100&a.saturation=-5&a.truncate=true)
+![](red-leaf.jpg?width=100&a.saturation=-1&a.truncate=true)
+![](red-leaf.jpg?width=100&a.saturation=-0.9&a.truncate=true)
+![](red-leaf.jpg?width=100&a.saturation=-0.5&a.truncate=true)
+![](red-leaf.jpg?width=100&a.saturation=-0.2&a.truncate=true)
+![](red-leaf.jpg?width=100&a.saturation=0&a.truncate=true)
+![](red-leaf.jpg?width=100&a.saturation=0.2&a.truncate=true)
+![](red-leaf.jpg?width=100&a.saturation=0.5&a.truncate=true)
+![](red-leaf.jpg?width=100&a.saturation=0.9&a.truncate=true)
+![](red-leaf.jpg?width=100&a.saturation=1&a.truncate=true)
+![](red-leaf.jpg?width=100&a.saturation=5&a.truncate=true)
+![](red-leaf.jpg?width=100&a.saturation=10&a.truncate=true)
+
+
+### Contrast
+
+![](red-leaf.jpg?width=100&s.contrast=-5)
+![](red-leaf.jpg?width=100&s.contrast=-1)
+![](red-leaf.jpg?width=100&s.contrast=-0.9)
+![](red-leaf.jpg?width=100&s.contrast=-0.5)
+![](red-leaf.jpg?width=100&s.contrast=-0.2)
+![](red-leaf.jpg?width=100&s.contrast=0)
+![](red-leaf.jpg?width=100&s.contrast=0.2)
+![](red-leaf.jpg?width=100&s.contrast=0.5)
+![](red-leaf.jpg?width=100&s.contrast=0.9)
+![](red-leaf.jpg?width=100&s.contrast=1)
+![](red-leaf.jpg?width=100&s.contrast=5)
+![](red-leaf.jpg?width=100&s.contrast=10)
+
+![](red-leaf.jpg?width=100&a.contrast=-5)
+![](red-leaf.jpg?width=100&a.contrast=-1)
+![](red-leaf.jpg?width=100&a.contrast=-0.9)
+![](red-leaf.jpg?width=100&a.contrast=-0.5)
+![](red-leaf.jpg?width=100&a.contrast=-0.2)
+![](red-leaf.jpg?width=100&a.contrast=0)
+![](red-leaf.jpg?width=100&a.contrast=0.2)
+![](red-leaf.jpg?width=100&a.contrast=0.5)
+![](red-leaf.jpg?width=100&a.contrast=0.9)
+![](red-leaf.jpg?width=100&a.contrast=1)
+![](red-leaf.jpg?width=100&a.contrast=5)
+![](red-leaf.jpg?width=100&a.contrast=10)
+
+
+![](red-leaf.jpg?width=100&a.contrast=-5&a.truncate=true)
+![](red-leaf.jpg?width=100&a.contrast=-1&a.truncate=true)
+![](red-leaf.jpg?width=100&a.contrast=-0.9&a.truncate=true)
+![](red-leaf.jpg?width=100&a.contrast=-0.5&a.truncate=true)
+![](red-leaf.jpg?width=100&a.contrast=-0.2&a.truncate=true)
+![](red-leaf.jpg?width=100&a.contrast=0&a.truncate=true)
+![](red-leaf.jpg?width=100&a.contrast=0.2&a.truncate=true)
+![](red-leaf.jpg?width=100&a.contrast=0.5&a.truncate=true)
+![](red-leaf.jpg?width=100&a.contrast=0.9&a.truncate=true)
+![](red-leaf.jpg?width=100&a.contrast=1&a.truncate=true)
+![](red-leaf.jpg?width=100&a.contrast=5&a.truncate=true)
+![](red-leaf.jpg?width=100&a.contrast=10&a.truncate=true)
+
+
+### Brightness
+
+
+![](red-leaf.jpg?width=100&s.brightness=-1)
+![](red-leaf.jpg?width=100&s.brightness=-0.7)
+![](red-leaf.jpg?width=100&s.brightness=-0.5)
+![](red-leaf.jpg?width=100&s.brightness=-0.2)
+![](red-leaf.jpg?width=100&s.brightness=0)
+![](red-leaf.jpg?width=100&s.brightness=0.2)
+![](red-leaf.jpg?width=100&s.brightness=0.5)
+![](red-leaf.jpg?width=100&s.brightness=0.7)
+![](red-leaf.jpg?width=100&s.brightness=1)
+
+
+![](red-leaf.jpg?width=100&a.brightness=-1)
+![](red-leaf.jpg?width=100&a.brightness=-0.7)
+![](red-leaf.jpg?width=100&a.brightness=-0.5)
+![](red-leaf.jpg?width=100&a.brightness=-0.2)
+![](red-leaf.jpg?width=100&a.brightness=0)
+![](red-leaf.jpg?width=100&a.brightness=0.2)
+![](red-leaf.jpg?width=100&a.brightness=0.5)
+![](red-leaf.jpg?width=100&a.brightness=0.7)
+![](red-leaf.jpg?width=100&a.brightness=1)
+
+
+![](red-leaf.jpg?width=100&a.brightness=-1&a.truncate=true)
+![](red-leaf.jpg?width=100&a.brightness=-0.7&a.truncate=true)
+![](red-leaf.jpg?width=100&a.brightness=-0.5&a.truncate=true)
+![](red-leaf.jpg?width=100&a.brightness=-0.2&a.truncate=true)
+![](red-leaf.jpg?width=100&a.brightness=0&a.truncate=true)
+![](red-leaf.jpg?width=100&a.brightness=0.2&a.truncate=true)
+![](red-leaf.jpg?width=100&a.brightness=0.5&a.truncate=true)
+![](red-leaf.jpg?width=100&a.brightness=0.7&a.truncate=true)
+![](red-leaf.jpg?width=100&a.brightness=1&a.truncate=true)
+### Mixing 
+
+
+![](red-leaf.jpg?width=100&s.brightness=-1&s.contrast=.7&s.saturation=0.5)
+![](red-leaf.jpg?width=100&s.brightness=-0.7&s.contrast=.7&s.saturation=0.5)
+![](red-leaf.jpg?width=100&s.brightness=-0.5&s.contrast=.7&s.saturation=0.5)
+![](red-leaf.jpg?width=100&s.brightness=-0.2&s.contrast=.7&s.saturation=0.5)
+![](red-leaf.jpg?width=100&s.brightness=0&s.contrast=.7&s.saturation=0.5)
+![](red-leaf.jpg?width=100&s.brightness=0.2&s.contrast=.7&s.saturation=0.5)
+![](red-leaf.jpg?width=100&s.brightness=0.5&s.contrast=.7&s.saturation=0.5)
+![](red-leaf.jpg?width=100&s.brightness=0.7&s.contrast=.7&s.saturation=0.5)
+![](red-leaf.jpg?width=100&s.brightness=1&s.contrast=.7&s.saturation=0.5)
+
+![](red-leaf.jpg?width=100&a.brightness=-1&a.contrast=.7&a.saturation=0.5)
+![](red-leaf.jpg?width=100&a.brightness=-0.7&a.contrast=.7&a.saturation=0.5)
+![](red-leaf.jpg?width=100&a.brightness=-0.5&a.contrast=.7&a.saturation=0.5)
+![](red-leaf.jpg?width=100&a.brightness=-0.2&a.contrast=.7&a.saturation=0.5)
+![](red-leaf.jpg?width=100&a.brightness=0&a.contrast=.7&a.saturation=0.5)
+![](red-leaf.jpg?width=100&a.brightness=0.2&a.contrast=.7&a.saturation=0.5)
+![](red-leaf.jpg?width=100&a.brightness=0.5&a.contrast=.7&a.saturation=0.5)
+![](red-leaf.jpg?width=100&a.brightness=0.7&a.contrast=.7&a.saturation=0.5)
+![](red-leaf.jpg?width=100&a.brightness=1&a.contrast=.7&a.saturation=0.5)
+
+
+
+### Alpha adjustment
+
+
+![](red-leaf.jpg?width=100&s.alpha=0.1)
+![](red-leaf.jpg?width=100&s.alpha=0.5)
+![](red-leaf.jpg?width=100&s.alpha=0.9)
+
+
+
+</div>
+<div style="padding-bottom:300px" >. </div>
+
+
+    <script type="text/javascript" src="js/jquery.min.js"  ></script>
+    <script type="text/javascript" src="js/Markdown.Converter.js"  ></script>
+    <script type="text/javascript">
+        var converter = new Markdown.Converter();
+        var div = document.getElementById("content");
+        div.innerHTML = converter.makeHtml(div.innerHTML);
+
+        $(function () {
+            $("img").each(function (i, e) {
+                var newUrl = $(e).attr("src").replace("100","300");
+
+                $(e).wrap($("<a />").attr("href", newUrl).attr("title", $(e).attr("alt") + " (" + $(e).attr("src") + ")").attr("class", "preview"));
+            });
+        });
+    </script>
+    <script type="text/javascript" src="js/hover.js"  ></script>
+</body>
+</html>
