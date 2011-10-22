@@ -17,7 +17,7 @@ namespace ImageResizer.Plugins.Watermark {
     /// </summary>
     public class LegacyWatermarkFeatures : BuilderExtension {
         [Obsolete("Use .OtherImages.Path instead")]
-        public string watermarkDir = "~/watermarks";
+        public string watermarkDir = null;
         [Obsolete("Use. OtherImages.Width/Height or a named preset instead")]
         public SizeF watermarkSize = new SizeF(1, 1);
         [Obsolete("Use .OtherImages instead - it permits percentage and pixel values to be mixed.")]
@@ -65,7 +65,7 @@ namespace ImageResizer.Plugins.Watermark {
             Graphics g = s.destGraphics;
             if (string.IsNullOrEmpty(watermark) || g == null) return false;
 
-
+            if (watermarkDir == null) return false;
 
 
 
