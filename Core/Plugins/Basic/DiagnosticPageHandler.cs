@@ -9,6 +9,7 @@ using System.Web.Hosting;
 using System.Reflection;
 using ImageResizer.Util;
 using System.ComponentModel;
+using ImageResizer.Configuration.Xml;
 
 namespace ImageResizer.Plugins.Basic {
     public class DiagnosticPageHandler : IHttpHandler {
@@ -43,7 +44,11 @@ namespace ImageResizer.Plugins.Basic {
 				sb.AppendLine(p.ToString());
 
 			sb.AppendLine("\nConfiguration:\n");
-			sb.AppendLine(c.getConfigXml().ToString());
+            //Start out the signing key. TODO: star out db passwords.
+            string config = c.getConfigXml().ToString();
+            string pwd = c.get("remoteReader.signingKey", String.Empty);
+            if (!string.IsNullOrEmpty(pwd)) config.Replace(pwd,"*********");
+			sb.AppendLine(config);
 
 
 			sb.AppendLine("\nAccepted querystring keys:\n");
