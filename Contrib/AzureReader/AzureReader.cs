@@ -4,10 +4,13 @@ using System.Collections.Specialized;
 using System.Web;
 using System.Web.Hosting;
 using ImageResizer.Util;
+using System.Collections.Generic;
+using ImageResizer.Configuration.Issues;
+using System.Security;
 
 namespace ImageResizer.Plugins.AzureReader {
 
-    public class AzureReader : IPlugin {
+    public class AzureReader : IPlugin, IIssueProvider {
 
         AzureVirtualPathProvider vpp = null;
         string blobStorageConnection;
@@ -18,9 +21,31 @@ namespace ImageResizer.Plugins.AzureReader {
         public AzureReader(NameValueCollection args) {
             blobStorageConnection = args["connectionstring"];
             blobStorageEndpoint = args["blobstorageendpoint"];
+            if (string.IsNullOrEmpty(blobStorageEndpoint)) blobStorageEndpoint = args["endpoint"];
             vPath = args["prefix"];
             lazyExistenceCheck = Utils.getBool(args, "lazyExistenceCheck", lazyExistenceCheck);
+            _registerAsVirtualPathProvider = Utils.getBool(args, "vpp", _registerAsVirtualPathProvider);
         }
+
+
+        private bool _failedToRegisterVpp = false;
+        /// <summary>
+        /// True if the provider attempted to register itself as a VirtualPathProvider and failed due to limited security clearance.
+        /// False if it did not attempt, or if it succeeded.
+        /// </summary>
+        public bool FailedToRegisterVpp {
+            get { return _failedToRegisterVpp; }
+        }
+
+        private bool _registerAsVirtualPathProvider = true;
+        /// <summary>
+        /// True to register the plugin as  VPP, false to register it as a VIP. VIPs are only visible to the ImageResizer pipeline - i.e, only processed images are visible. 
+        /// </summary>
+        public bool RegisterAsVirtualPathProvider {
+            get { return _registerAsVirtualPathProvider; }
+            set { _registerAsVirtualPathProvider = value; }
+        }
+
 
         public IPlugin Install(Configuration.Config c) {
             if (vpp != null)
@@ -42,11 +67,17 @@ namespace ImageResizer.Plugins.AzureReader {
             vpp.VirtualFilesystemPrefix = vPath;
             vpp.LazyExistenceCheck = lazyExistenceCheck;
 
-            // Registers the virtual path provider
-            HostingEnvironment.RegisterVirtualPathProvider(vpp);
+            if (RegisterAsVirtualPathProvider) {
+                try {
+                    HostingEnvironment.RegisterVirtualPathProvider(vpp);
+                } catch (SecurityException) {
+                    this._failedToRegisterVpp = true;
+                    c.Plugins.VirtualProviderPlugins.Add(vpp); //Fall back to VIP instead.
+                }
+            }
 
             // Register rewrite
-            c.Pipeline.PostRewrite += new Configuration.UrlRewritingEventHandler(Pipeline_PostRewrite);
+            c.Pipeline.PostRewrite += Pipeline_PostRewrite;
 
             c.Plugins.add_plugin(this);
 
@@ -55,7 +86,7 @@ namespace ImageResizer.Plugins.AzureReader {
 
         /// <summary>
         /// In case there is no querystring attached to the file (thus no operations on the fly) we can
-        /// redirect directly to the blob. This let us make advantage of the CDN (if configured).
+        /// redirect directly to the blob. This let us take advantage of the CDN (if configured).
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="context"></param>
@@ -75,7 +106,31 @@ namespace ImageResizer.Plugins.AzureReader {
         }
 
         public bool Uninstall(Configuration.Config c) {
+            //We can uninstall if it wasn't installed as a VPP
+            if (!RegisterAsVirtualPathProvider || FailedToRegisterVpp) {
+                c.Plugins.VirtualProviderPlugins.Remove(vpp);
+                c.Pipeline.PostRewrite -= Pipeline_PostRewrite;
+                c.Plugins.remove_plugin(this);
+                return true;
+            }
             return false;
         }
+
+        /// <summary>
+        /// Provides the diagnostics system with a list of configuration issues
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<IIssue> GetIssues() {
+            List<IIssue> issues = new List<IIssue>();
+
+            if (FailedToRegisterVpp)
+                issues.Add(new Issue("AzureReader", "Failed to register as VirtualPathProvider.",
+                    "Only the image resizer will be able to access files located in Azure Blob Storage - other systems will not be able to.", IssueSeverity.Error));
+
+
+            return issues;
+        }
+
+
     }
 }
