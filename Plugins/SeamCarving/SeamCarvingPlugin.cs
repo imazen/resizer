@@ -25,7 +25,7 @@ namespace ImageResizer.Plugins.SeamCarving {
         }
 
         protected override RequestedAction OnProcess(ImageState s) {
-            if ("true".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(s.settings["stretch"])) s.settings["stretch"] = "fill";
+            //if ("true".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(s.settings["stretch"])) s.settings["stretch"] = "fill";
             return RequestedAction.None;
         }
 
