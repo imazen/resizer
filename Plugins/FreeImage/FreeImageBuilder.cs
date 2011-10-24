@@ -10,6 +10,8 @@ using ImageResizer.Util;
 using System.Drawing.Imaging;
 using ImageResizer.Plugins.Basic;
 using System.IO;
+using ImageResizer.Plugins.FreeImageEncoder;
+using ImageResizer.Plugins.FreeImageScaling;
 
 namespace ImageResizer.Plugins.FreeImageBuilder {
     public class FreeImageBuilderPlugin :ImageBuilder, IPlugin, IIssueProvider {
@@ -103,7 +105,8 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
 
                 if (imageDest.Width != orig.Width || imageDest.Height != orig.Height) {
                     //Rescale
-                    final = FreeImage.Rescale(original, (int)imageDest.Width, (int)imageDest.Height, FREE_IMAGE_FILTER.FILTER_BOX);
+                    bool temp;
+                    final = FreeImage.Rescale(original, (int)imageDest.Width, (int)imageDest.Height, FreeImageScalingPlugin.ParseResizeAlgorithm(settings["fi.scale"], FREE_IMAGE_FILTER.FILTER_BOX, out temp));
                     FreeImage.UnloadEx(ref original);
                     if (final.IsNull) return false;
                 } else {
@@ -131,10 +134,13 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
                 }
 
                 // Try to save the bitmap
-                if (dest is string){
-                    if (!FreeImage.Save(destFormat, final, (string)dest, FREE_IMAGE_SAVE_FLAGS.DEFAULT)) return false;
-                }else if (dest is Stream){
-                     if (!FreeImage.SaveToStream(final,(Stream)dest,destFormat)) return false;
+                if (dest is string || dest is Stream){
+                    FreeImageEncoderPlugin e = new FreeImageEncoderPlugin(settings, source);
+                    if (dest is string){
+                        if (!FreeImage.Save(e.Format, final, (string)dest, e.EncodingOptions)) return false;
+                    } else if (dest is Stream) {
+                        if (!FreeImage.SaveToStream(final, (Stream)dest, e.Format,e.EncodingOptions)) return false;
+                    }
                 } else if (dest is BitmapHolder){
                     ((BitmapHolder)dest).bitmap = FreeImage.GetBitmap(final);
                 }
