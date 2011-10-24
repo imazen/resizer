@@ -90,8 +90,9 @@ namespace ImageResizer.Plugins.Watermark {
             //Calculate the location for the bitmap
             RectangleF imgBounds = this.CalculateLayerCoordinates(s, delegate(double maxwidth, double maxheight) {
                 ResizeSettings opts = new ResizeSettings(ImageQuery);
-                if (!double.IsNaN(maxwidth)) opts.MaxWidth = (int)maxwidth;
-                if (!double.IsNaN(maxheight)) opts.MaxHeight = (int)maxheight;
+                if (Fill && string.IsNullOrEmpty(opts["scale"])) opts.Scale = ScaleMode.Both;
+                if (!double.IsNaN(maxwidth)) opts.MaxWidth = (int)Math.Floor(maxwidth);
+                if (!double.IsNaN(maxheight)) opts.MaxHeight = (int)Math.Floor(maxheight);
 
                 if (img == null) img = GetMemCachedBitmap(Path, opts); //Delayed creation allows the maxwidth/maxheight to be used in gradient plugin
 
@@ -103,8 +104,9 @@ namespace ImageResizer.Plugins.Watermark {
                 if (imgBounds.Width <2 || imgBounds.Height < 2) return;
 
 
-                if (ImageQuery.Keys.Count > 0) {
+                if (ImageQuery.Keys.Count > 0 || Fill) {
                     ResizeSettings settings = new ResizeSettings(ImageQuery);
+                    if (Fill && string.IsNullOrEmpty(settings["scale"])) settings.Scale = ScaleMode.Both;
 
                     settings.MaxWidth = (int)Math.Floor(imgBounds.Width);
                     settings.MaxHeight = (int)Math.Floor(imgBounds.Height);
