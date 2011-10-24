@@ -48,8 +48,7 @@ namespace BuildTools {
         /// <param name="value"></param>
         /// <returns></returns>
         public string list(string name, string value) {
-            Console.Write(name + "=" + value);
-            string response = Console.ReadLine();
+            Console.WriteLine(name.PadRight(25,'.') + " " + value);
             return value;
         }
         /// <summary>
