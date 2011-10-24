@@ -7,14 +7,17 @@ using Microsoft.WindowsAzure.StorageClient;
 
 namespace ImageResizer.Plugins.AzureReader {
 
-    class AzureFile : VirtualFile {
+    public class AzureFile : VirtualFile, IVirtualFile {
 
         protected readonly AzureVirtualPathProvider parent;
 
         public AzureFile(string blobName, AzureVirtualPathProvider parentProvider) : base(blobName) {
             parent = parentProvider;
         }
-
+        /// <summary>
+        /// Attempts to download the blob into a MemoryStream instance and return it. Throws a FileNotFoundException if the blob doesn't exist.
+        /// </summary>
+        /// <returns></returns>
         public override System.IO.Stream Open() {
             // Prefix already stripped from virtual path
 

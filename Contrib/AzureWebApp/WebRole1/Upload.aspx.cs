@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.StorageClient;
+using ImageResizer.Util;
 
 namespace AzureWebImages {
     public partial class Upload : System.Web.UI.Page {
@@ -20,7 +21,6 @@ namespace AzureWebImages {
         protected void btnSubmit_Click(object sender, EventArgs e) {
             if (Page.IsValid) {
                 if (fuPicture.HasFile == true && fuPicture.FileBytes.Length > 0) {
-
                     string[] extensions = { ".jpg", ".jpeg", ".gif", ".bmp", ".png" };
                     bool isImage = extensions.Any(x => x.Equals(Path.GetExtension(fuPicture.FileName.ToLower()), StringComparison.OrdinalIgnoreCase));
 
@@ -31,7 +31,7 @@ namespace AzureWebImages {
                         CloudBlobContainer cloudBlobContainer = cloudBlobClient.GetContainerReference("imageresizer");
 
                         // Set the name of the uploaded document to a unique name
-                        string filename = Guid.NewGuid().ToString() + ".jpg";
+                        string filename = Guid.NewGuid().ToString() + PathUtils.GetExtension(fuPicture.FileName.ToLower());
 
                         // Get the blob reference and set its metadata properties
                         CloudBlockBlob blob = cloudBlobContainer.GetBlockBlobReference(filename);
