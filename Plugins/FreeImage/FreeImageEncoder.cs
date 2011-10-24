@@ -11,7 +11,18 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
     public class FreeImageEncoderPlugin : IPlugin, IEncoder {
 
         FREE_IMAGE_FORMAT format = FREE_IMAGE_FORMAT.FIF_JPEG;
+
+
+        public FREE_IMAGE_FORMAT Format {
+            get { return format; }
+            set { format = value; }
+        }
         FREE_IMAGE_SAVE_FLAGS encodingOptions = FREE_IMAGE_SAVE_FLAGS.DEFAULT;
+
+        public FREE_IMAGE_SAVE_FLAGS EncodingOptions {
+            get { return encodingOptions; }
+            set { encodingOptions = value; }
+        }
    
 
         public FreeImageEncoderPlugin(ResizeSettings settings, object original) {
@@ -90,7 +101,7 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
             if (!(i is Bitmap)) throw new ArgumentException("FreeImageEncoder only works with bitmaps");
             FIBITMAP bit = FreeImage.CreateFromBitmap(i as Bitmap);
             if (bit.IsNull) throw new ImageProcessingException("FreeImageEncoder failed to convert System.Drawing.Bitmap to FIBITMAP");
-            if (format == FREE_IMAGE_FORMAT.FIF_GIF || ( format == FREE_IMAGE_FORMAT.FIF_PNG && colors != -1)){
+            if (Format == FREE_IMAGE_FORMAT.FIF_GIF || ( Format == FREE_IMAGE_FORMAT.FIF_PNG && colors != -1)){
                 FreeImage.SetTransparent(bit, true);
                 FIBITMAP old = bit;
                 //TODO - ColorQuantizeEx returns null no matter what we do.. Is it because the image is 32-bit?
@@ -98,19 +109,19 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
                 if (bit.IsNull) bit = old;
                 else if (bit != old) FreeImage.UnloadEx(ref old);
             }
-            FreeImage.SaveToStream(ref bit, s, format, encodingOptions, true);
+            FreeImage.SaveToStream(ref bit, s, Format, EncodingOptions, true);
         }
 
         public bool SupportsTransparency {
-            get { return format != FREE_IMAGE_FORMAT.FIF_JPEG; }
+            get { return Format != FREE_IMAGE_FORMAT.FIF_JPEG; }
         }
 
         public string MimeType {
-            get { return FreeImage.GetFIFMimeType(format); }
+            get { return FreeImage.GetFIFMimeType(Format); }
         }
 
         public string Extension {
-            get { return FreeImage.GetPrimaryExtensionFromFIF(format); }
+            get { return FreeImage.GetPrimaryExtensionFromFIF(Format); }
         }
     }
 }
