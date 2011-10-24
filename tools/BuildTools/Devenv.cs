@@ -36,7 +36,8 @@ namespace BuildTools {
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        public int Run(string args){
+        public int Run(string args, string solutionPath = null){
+            if (solutionPath == null) solutionPath = this.solutionPath;
             var psi = new ProcessStartInfo(DevenvPath);
             psi.Arguments = '"' + solutionPath + "\" " + args;
             psi.WorkingDirectory = Path.GetDirectoryName(solutionPath);
