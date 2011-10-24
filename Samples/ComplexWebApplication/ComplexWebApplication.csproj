@@ -120,6 +120,7 @@
     <Content Include="Misc\Protected\rose-leaf.jpg" />
     <Content Include="Misc\RegressionTests.aspx" />
     <Content Include="UploadSample.aspx" />
+    <Content Include="Watermarks.htm" />
     <Content Include="watermarks\Sun_64.png" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>

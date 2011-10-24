@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Testing Watermark plugin</title>
+    <link rel="Stylesheet" href="css/hover.css" />
+</head>
+<body>
+<div>
+<a href="Default.aspx" runat="server"> Core examples </a> &nbsp;&nbsp;
+<a  href="Plugins.htm" runat="server"> Plugin Tests </a> &nbsp;&nbsp;
+<a  href="Misc/RegressionTests.aspx" runat="server"> Regression Tests </a> &nbsp;&nbsp;
+<a href="UploadSample.aspx" runat="server"> Upload example </a> </div>
+<div id="content">
+
+## Text stretching tests
+
+![Invert](red-leaf.jpg?width=300&watermark=filltext&text=Hi)
+![Invert](red-leaf.jpg?width=300&watermark=filltext&text=An+intentionally+long+phrase)
+
+
+### Alpha adjustment
+
+
+![](red-leaf.jpg?width=100&s.alpha=0.1)
+![](red-leaf.jpg?width=100&s.alpha=0.5)
+![](red-leaf.jpg?width=100&s.alpha=0.9)
+
+
+
+</div>
+<div style="padding-bottom:300px" >. </div>
+
+
+    <script type="text/javascript" src="js/jquery.min.js"  ></script>
+    <script type="text/javascript" src="js/Markdown.Converter.js"  ></script>
+    <script type="text/javascript">
+        var converter = new Markdown.Converter();
+        var div = document.getElementById("content");
+        div.innerHTML = converter.makeHtml(div.innerHTML);
+
+        $(function () {
+            $("img").each(function (i, e) {
+                var newUrl = $(e).attr("src").replace("100", "300");
+
+                $(e).wrap($("<a />").attr("href", newUrl).attr("title", $(e).attr("alt") + " (" + $(e).attr("src") + ")").attr("class", "preview"));
+            });
+        });
+    </script>
+    <script type="text/javascript" src="js/hover.js"  ></script>
+</body>
+</html>
