@@ -206,10 +206,10 @@ namespace ImageResizer.Plugins.Watermark {
                 path.AddString(text, f.FontFamily, (int)f.Style, (float)(f.SizeInPoints / 72 * g.DpiY), point, fmt);
 
                 Color c = GlowColor;
-                if (c.A = == 0)
+                if (GlowWidth > 0 && c.A == 255) c = Color.FromArgb(Math.Max(64, Math.Min(24, 255 / GlowWidth)), c);
                 //Draw glow
                 for (int i = 1; i <= GlowWidth; ++i) {
-                    using (Pen pen = new Pen(GlowColor, i + OutlineWidth)) {
+                    using (Pen pen = new Pen(c, i + OutlineWidth)) {
                         pen.LineJoin = LineJoin.Round;
                         g.DrawPath(pen, path);
                     }
