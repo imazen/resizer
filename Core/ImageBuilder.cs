@@ -735,6 +735,12 @@ namespace ImageResizer
             if (s.settings.Flip != RotateFlipType.RotateNoneFlipNone)
                 s.destBitmap.RotateFlip(s.settings.Flip);
 
+            //Set DPI value
+            if (!string.IsNullOrEmpty(s.settings["dpi"])){
+                int dpi = Util.Utils.getInt(s.settings,"dpi",96);
+                s.destBitmap.SetResolution(dpi, dpi);
+            }
+            
             s.finalSize = s.destBitmap.Size;
             return RequestedAction.None;
         }
@@ -783,18 +789,35 @@ namespace ImageResizer
                 if (s.copyRect.Size.IsEmpty) throw new Exception("You must specify a custom crop rectange if crop=custom");
             }
 
+            FitMode fit = s.settings.Mode;
+            //Determine fit mode to use if both vertical and horizontal limits are used.
+            if (fit == FitMode.None){
+                if (s.settings.Width != -1 || s.settings.Height != -1){
+
+                    if (s.settings.Stretch == StretchMode.Fill) fit = FitMode.Stretch;
+                    else if ("auto".Equals(s.settings["crop"], StringComparison.OrdinalIgnoreCase)) fit = FitMode.Crop;
+                    else if (!string.IsNullOrEmpty(s.settings["carve"]) 
+                        && !"false".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase)
+                        && !"none".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase)) fit = FitMode.Carve;
+                    else fit = FitMode.Pad;
+                }else{
+                    fit = FitMode.Max;
+                }
+
+            }
+            
+
+
+
             //Aspect ratio of the image
             double imageRatio = s.copySize.Width / s.copySize.Height;
 
-            //Was any dimension specified?
-            bool dimensionSpecified = s.settings.Width != -1 || s.settings.Height != -1 || s.settings.MaxHeight != -1 || s.settings.MaxWidth != -1;
-
             //The target size for the image 
             SizeF targetSize = new SizeF(-1, -1);
+            //Target area for the image
             SizeF areaSize = new SizeF(-1, -1);
-            if (!dimensionSpecified) {
-                areaSize = targetSize = s.copySize; //No dimension - use original size if possible - within web.config bounds.
-            } else {
+            //If any dimensions are specified, calculate. Otherwise, use original image dimensions
+            if (s.settings.Width != -1 || s.settings.Height != -1 || s.settings.MaxHeight != -1 || s.settings.MaxWidth != -1) {
                 //A dimension was specified. 
                 //We first calculate the largest size the image can be under the width/height/maxwidth/maxheight restrictions.
                 //- pretending stretch=fill and scale=both
@@ -805,52 +828,37 @@ namespace ImageResizer
                 double maxwidth = s.settings.MaxWidth;
                 double maxheight = s.settings.MaxHeight;
 
+                //Handle cases of width/maxheight and height/maxwidth as in legacy versions. 
+                if (width != -1 && maxheight != -1) maxheight = Math.Min(maxheight, (width /imageRatio));
+                if (height != -1 && maxwidth != -1) maxwidth = Math.Min(maxwidth, (height * imageRatio));
+
                 //Eliminate cases where both a value and a max value are specified: use the smaller value for the width/height 
-                if (maxwidth > 0 && width > 0) {
-                    width = Math.Min(maxwidth, width);
-                    maxwidth = -1;
-                }
-                if (maxheight > 0 && height > 0) {
-                    height = Math.Min(maxheight, height);
-                    maxheight = -1;
-                }
-                //Do sizing logic
+                if (maxwidth > 0 && width > 0) {   width = Math.Min(maxwidth, width);    maxwidth = -1;  }
+                if (maxheight > 0 && height > 0) { height = Math.Min(maxheight, height); maxheight = -1; }
 
-                if (width > 0 || height > 0) //In this case, either (or both) width and height were specified 
-                {
-                    //If only one is specified, calculate the other from 
-                    if (width > 0) {
-                        if (height < 0) height = (width / imageRatio);
-                        if (maxheight > 0 && height > maxheight) height = maxheight; //Crop to maxheight value
+                //Move max values to width/height. FitMode should already reflect the mode we are using, and we've already resolved mixed modes above.
+                width = Math.Max(width, maxwidth);
+                height = Math.Max(height, maxheight);
 
-                    } else if (height > 0) {
-                        if (width < 0) width = (height * imageRatio);
-                        if (maxheight > 0 && height > maxheight) height = maxheight; //Crop to maxheight value
-                    }
-                    //Store result
-                    targetSize = new SizeF((float)width, (float)height);
-                } else //In this case, only maxwidth and/or maxheight were specified.
-                {
-                    //Calculate the missing max bounds (if one *is* missing), using aspect ratio of the image
-                    if (maxheight > 0 && maxwidth <= 0)
-                        maxwidth = maxheight * imageRatio;
-                    else if (maxwidth > 0 && maxheight <= 0)
-                        maxheight = maxwidth / imageRatio;
+                //Calculate missing value (a missing value is handled the same everywhere). 
+                if (width > 0 && height <= 0) height = width/ imageRatio;
+                else if (height > 0 && width <= 0) width = height * imageRatio;
 
-                    //Scale image coords to fit.
-                    targetSize = PolygonMath.ScaleInside(s.copySize, new SizeF((float)maxwidth, (float)maxheight));
+                //FitMode.Max
+                if (fit == FitMode.Max)
+                    areaSize = targetSize = PolygonMath.ScaleInside(s.copySize, new SizeF((float)width, (float)height));
+                else
+                    areaSize = targetSize = new SizeF((float)width, (float)height);
 
-                }
+                //We now have targetSize. targetSize will only be a different aspect ratio from the image if both 'width' and 'height' are specified.
 
-                //We now have targetSize. targetSize will only be a different aspect ratio if both 'width' and 'height' are specified.
 
-                //This will be the area size also
-                areaSize = targetSize;
-
-                //Now do scale=proportionally check. Set targetSize=imageSize and make it fit within areaSize using ScaleInside.
-                if (s.settings.Stretch == StretchMode.Proportionally) {
+                //Now do stretch=proportionally check. Set targetSize=imageSize and make it fit within areaSize using ScaleInside.
+                if (fit == FitMode.Pad) { //FitMode.Carve, Stretch, Crop, don't use padding. FitMode.Max never needed it.
                     targetSize = PolygonMath.ScaleInside(s.copySize, areaSize);
                 }
+                
+                
 
                 //Now do upscale/downscale checks. If they take effect, set targetSize to imageSize
                 if (s.settings.Scale == ScaleMode.DownscaleOnly) {
@@ -874,22 +882,25 @@ namespace ImageResizer
 
                 }
 
+                //June 3: Ensure no dimension of targetSize or areaSize is less than 1px;
+                areaSize.Width = Math.Max(1, areaSize.Width);
+                areaSize.Height = Math.Max(1, areaSize.Height);
+
+
+                //Autocrop (always forces scale=both)
+                if (fit == FitMode.Crop) {
+                    //Determine the size of the area we are copying
+                    Size sourceSize = PolygonMath.RoundPoints(PolygonMath.ScaleInside(areaSize, s.originalSize)); //TODO, shouldn't these be rounded to ints?
+                    //Center the portion we are copying within the original bitmap
+                    s.copyRect = PolygonMath.AlignWith(new RectangleF(0, 0, sourceSize.Width, sourceSize.Height), new RectangleF(0, 0, s.originalSize.Width, s.originalSize.Height), s.settings.Anchor);
+                    //Restore targetSize to match areaSize //Warning - crop always forces scale=both.
+                    targetSize = areaSize;
+                }
+            } else {
+                areaSize = targetSize = s.copySize; //No dimensions - use original size if possible - within web.config bounds.
             }
 
-            //June 3: Ensure no dimension of targetSize or areaSize is less than 1px;
-            areaSize.Width = Math.Max(1, areaSize.Width);
-            areaSize.Height = Math.Max(1, areaSize.Height);
-  
-            
-            //Autocrop
-            if (s.settings.CropMode == CropMode.Auto && s.settings.Stretch == StretchMode.Proportionally) {
-                //Determine the size of the area we are copying
-                SizeF sourceSize = PolygonMath.ScaleInside(areaSize, s.originalSize); //TODO, shouldn't these be rounded to ints?
-                //Center the portion we are copying within the original bitmap
-                s.copyRect = PolygonMath.AlignWith(new RectangleF(0,0,sourceSize.Width,sourceSize.Height),new RectangleF(0,0,s.originalSize.Width,s.originalSize.Height),s.settings.Anchor);
-                //Restore targetSize to match areaSize //Warning - crop always forces scale=both.
-                targetSize = areaSize;
-            }
+
 
             //May 12: require max dimension and round values to minimize rounding differences later.
             areaSize.Width = Math.Max(1, (float)Math.Round(areaSize.Width));
@@ -931,7 +942,7 @@ namespace ImageResizer
                 "rotate", "flip", "sourceFlip", "borderWidth",
                 "borderColor", "paddingWidth", "paddingColor",
                 "ignoreicc", "frame", "useresizingpipeline", 
-                "cache", "process", "margin", "anchor"};
+                "cache", "process", "margin", "anchor","dpi","mode"};
 
         /// <summary>
         /// Returns a list of the querystring commands ImageBuilder can parse by default. Plugins can implement IQuerystringPlugin to add new ones.

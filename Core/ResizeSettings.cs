@@ -76,6 +76,13 @@ namespace ImageResizer {
             set("maxheight",value);                 } }
 
         /// <summary>
+        /// ["mode"]: Sets the fit mode for the image. max, min, pad, crop, carve, stretch
+        /// </summary>
+        public FitMode Mode{                        get {
+            return Utils.parseEnum<FitMode>(this["mode"], FitMode.Pad);       } set {
+            this["mode"] = value.ToString();      }}
+
+        /// <summary>
         /// Returns true if any of the specified keys are present in this NameValueCollection
         /// </summary>
         /// <param name="keys"></param>
@@ -102,14 +109,14 @@ namespace ImageResizer {
 
 
         /// <summary>
-        /// Allows you to flip the entire resulting image vertically, horizontally, or both.
+        /// Allows you to flip the entire resulting image vertically, horizontally, or both. Rotation is not supported.
         /// </summary>
         public RotateFlipType Flip                      { get {
             return Utils.parseFlip(this["flip"]);       } set {
             this["flip"] = Utils.writeFlip(value);      }}
 
         /// <summary>
-        /// ["sourceFlip"] Allows you to flip the source image vertically, horizontally, or both.
+        /// ["sourceFlip"] Allows you to flip the source image vertically, horizontally, or both. Rotation is not supported.
         /// </summary>
         public RotateFlipType SourceFlip                    { get {
             return Utils.parseFlip(this["sourceFlip"]);     } set {
@@ -117,15 +124,16 @@ namespace ImageResizer {
 
         /// <summary>
         /// ["scale"] Whether to downscale, upscale, upscale the canvas, or both upscale or downscale the image as needed. Defaults to
-        /// DownscaleOnly. 
+        /// DownscaleOnly when maxwidth/maxheight is used, and Both when width/height are used.
         /// </summary>
         public ScaleMode Scale                              { get {
             return Utils.parseScale(this["scale"]);         } set {
             this["scale"] = Utils.writeScale(value);        }}
 
         /// <summary>
-        /// Whether to preserve aspect ratio or stretch to fill the bounds.
+        /// [Depreciated] (Replaced by mode=stretch) Whether to preserve aspect ratio or stretch to fill the bounds.
         /// </summary>
+        [Obsolete("Replaced by Mode=Stretch")]
         public StretchMode Stretch                          { get {
             return Utils.parseStretch(this["stretch"]);      } set {
             this["stretch"] = Utils.writeStretch(value);    }}
@@ -159,6 +167,7 @@ namespace ImageResizer {
         /// ["crop"]=none|auto Defaults to None - letterboxing is used if both width and height are supplied, and stretch = proportionally.
         /// Set CropTopLeft and CropBottomRight when you need to specify a custom crop rectangle.
         /// </summary>
+        [Obsolete("Replaced by Mode=Crop. Use CropTopLeft and CropTopRight instead for setting a custom crop mode.")]
         public CropMode CropMode                                {get {
             return Utils.parseCrop(this["crop"]).Key;           } set {
             this["crop"] = Utils.writeCrop(value, CropValues);  }}
@@ -343,7 +352,10 @@ namespace ImageResizer {
             return new RectangleF((float)x1, (float)y1, (float)(x2 - x1), (float)(y2 - y1));
         }
         
-
+        /// <summary>
+        /// If 'thumbnail' and 'format' are not specified, sets 'format' to the specified value.
+        /// </summary>
+        /// <param name="format"></param>
         public void SetDefaultImageFormat(string format) {
             if (string.IsNullOrEmpty(this["thumbnail"]) && string.IsNullOrEmpty(this["format"])) this["format"] = format;
         }

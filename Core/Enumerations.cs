@@ -47,7 +47,7 @@ namespace ImageResizer {
 
     public enum ScaleMode {
         /// <summary>
-        /// The default. Only downsamples images - never enlarges. If an image is smaller than 'width' and 'height', the image coordinates are used instead.
+        /// The default when using Maxwidth/maxheight or mode=max. Only downsamples images - never enlarges. If an image is smaller than 'width' and 'height', the image coordinates are used instead.
         /// </summary>
         DownscaleOnly,
         /// <summary>
@@ -55,7 +55,7 @@ namespace ImageResizer {
         /// </summary>
         UpscaleOnly,
         /// <summary>
-        /// Upscales and downscales images according to 'width' and 'height', within web.config restrictions.
+        /// The default when using width/height and mode != max. Upscales and downscales images according to 'width' and 'height', within web.config restrictions.
         /// </summary>
         Both,
         /// <summary>
@@ -64,15 +64,50 @@ namespace ImageResizer {
         UpscaleCanvas
     }
 
+    /// <summary>
+    /// [Depreciated (Use FitMode)]
+    /// </summary>
     public enum StretchMode {
         /// <summary>
-        /// Maintains aspect ratio. Default.
+        /// [Depreciated (Use FitMode)] Maintains aspect ratio. Default.
         /// </summary>
         Proportionally,
         /// <summary>
-        /// Skews image to fit the new aspect ratio defined by 'width' and 'height'
+        /// [Depreciated (Use FitMode)] Skews image to fit the new aspect ratio defined by 'width' and 'height'
         /// </summary>
         Fill
+    }
+    /// <summary>
+    /// How do deal with aspect ratio changes. ]
+    /// </summary>
+    public enum FitMode {
+        /// <summary>
+        /// Fit mode will be determined by other settings, such as &amp;carve=true, &amp;stretch=fill, and &amp;crop=auto. If none are specified and width/height are specified , &amp;mode=pad will be used. If maxwidth/maxheight are used, &amp;mode=max will be used.
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// Width and height are considered maximum values. The resulting image may be smaller to maintain its aspect ratio. The image may also be smaller if the source image is smaller
+        /// </summary>
+        Max,
+       
+        /// Width and height are considered exact values - padding is used if there is an aspect ratio difference. Use &anchor to override the MiddleCenter default.
+        /// </summary>
+        Pad,
+        /// <summary>
+        /// Width and height are considered exact values - cropping is used if there is an aspect ratio difference. Use &anchor to override the MiddleCenter default.
+        /// </summary>
+        Crop,
+        /// <summary>
+        /// Width and height are considered exact values - seam carving is used if there is an aspect ratio difference. Requires the SeamCarving plugin to be installed, otherwise behaves like 'pad'.
+        /// </summary>
+        Carve,
+        /// <summary>
+        /// Width and height are considered exact values - if there is an aspect ratio difference, the image is stretched.
+        /// </summary>
+        Stretch,
+       
+
     }
     public enum CropMode {
         /// <summary>
@@ -80,7 +115,7 @@ namespace ImageResizer {
         /// </summary>
         None,
         /// <summary>
-        /// Minimally crops to preserve aspect ratio if stretch=proportionally.
+        /// [Depreciated] Use Mode=Crop. Minimally crops to preserve aspect ratio if stretch=proportionally.
         /// </summary>
         Auto,
         /// <summary>
@@ -100,13 +135,6 @@ namespace ImageResizer {
         Custom
 
 
-/*       
-        /// <summary>
-        /// Indicates that the crop values are between 0 and 1 and indicate the percent of the original image surface to start and stop at.
-        /// </summary>
-        //WidthPercentage,
-        //HeightPercentage,
-*/
     }
 
 }
