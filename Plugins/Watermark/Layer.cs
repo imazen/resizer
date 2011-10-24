@@ -22,6 +22,7 @@ namespace ImageResizer.Plugins.Watermark {
             if (!string.IsNullOrEmpty(settings["relativeTo"])) RelativeTo = settings["relativeTo"];
             DrawAs = Utils.parseEnum<LayerPlacement>(settings["drawAs"], DrawAs);
             Align = Utils.parseEnum<ContentAlignment>(settings["align"], Align);
+            Fill = Utils.getBool(settings, "fill", false);
         }
 
         public virtual void CopyTo(Layer other) {
@@ -129,6 +130,19 @@ namespace ImageResizer.Plugins.Watermark {
             set { _align = value; }
         }
 
+
+        private bool _fill = false;
+        /// <summary>
+        /// (defaults false). When true, the image or text will attempt to fill 1 of the layer's bounds, even if upscaling is required. 
+        /// When Width is not specified, and both left and right are not specififed, this causes the image to fill the container width (if possible).
+        /// When Height is not specified, and both top and bottom are not specififed, this causes the image to fill the container height (if possible).
+        /// This causes &scale=both to be used on images unless another setting is specified in imageQuery.
+        /// </summary>
+        public bool Fill {
+            get { return _fill; }
+            set { _fill = value; }
+        }
+
         public enum LayerPlacement { Overlay, Background }
 
         private LayerPlacement _drawAs = LayerPlacement.Overlay;
@@ -192,7 +206,7 @@ namespace ImageResizer.Plugins.Watermark {
 
   
             //Execute the callback to get the actual size. Update the width and height values if the actual size is smaller. 
-            SizeF normalSize = actualSizeCalculator(width, height);
+            SizeF normalSize = actualSizeCalculator((double.IsNaN(width) && Fill) ? cont.Width : width, (double.IsNaN(height) && Fill) ? cont.Height : height);
             if (double.IsNaN(width) || width > normalSize.Width) width = normalSize.Width;
             if (double.IsNaN(height) || height > normalSize.Height) height = normalSize.Height;
 
