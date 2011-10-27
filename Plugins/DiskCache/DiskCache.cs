@@ -11,6 +11,7 @@ using ImageResizer.Configuration;
 using System.Web.Hosting;
 using ImageResizer.Configuration.Issues;
 using ImageResizer.Configuration.Logging;
+using ImageResizer.Plugins.Basic;
 
 namespace ImageResizer.Plugins.DiskCache
 {
@@ -96,6 +97,26 @@ namespace ImageResizer.Plugins.DiskCache
             set { BeforeSettingChanged(); hashModifiedDate = value; }
         }
 
+        private bool _asyncWrites = false;
+        /// <summary>
+        /// If true, writes to the disk cache will be performed outside the request thread, allowing responses to return to the client quicker. 
+        /// </summary>
+        public bool AsyncWrites {
+            get { return _asyncWrites; }
+            set { BeforeSettingChanged(); _asyncWrites = value; }
+        }
+
+
+        private int _asyncBufferSize = 1024 * 1024 * 10;
+        /// <summary>
+        /// If more than this amount of memory (in bytes) is currently allocated by queued writes, the request will be processed synchronously instead of asynchronously.
+        /// </summary>
+        public int AsyncBufferSize {
+            get { return _asyncBufferSize; }
+            set { BeforeSettingChanged(); _asyncBufferSize = value; }
+        }
+
+
         protected string virtualDir =  HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/imagecache";
         /// <summary>
         /// Sets the location of the cache directory. 
@@ -159,6 +180,8 @@ namespace ImageResizer.Plugins.DiskCache
             VirtualCacheDir = c.get("diskcache.dir", VirtualCacheDir);
             HashModifiedDate = c.get("diskcache.hashModifiedDate", HashModifiedDate);
             CacheAccessTimeout = c.get("diskcache.cacheAccessTimeout", CacheAccessTimeout);
+            AsyncBufferSize = c.get("diskcache.asyncBufferSize", AsyncBufferSize);
+            AsyncWrites = c.get("diskcache.asyncWrites", AsyncWrites);
             CleanupStrategy.LoadFrom(c.getNode("cleanupStrategy"));
         }
 
@@ -232,7 +255,7 @@ namespace ImageResizer.Plugins.DiskCache
                 //Init the writer.
                 writer = new WebConfigWriter(this,PhysicalCacheDir);
                 //Init the inner cache
-                cache = new CustomDiskCache(this, PhysicalCacheDir, Subfolders, HashModifiedDate);
+                cache = new CustomDiskCache(this, PhysicalCacheDir, Subfolders, HashModifiedDate,AsyncBufferSize);
                 //Init the cleanup strategy
                 if (AutoClean && cleanupStrategy == null) cleanupStrategy = new CleanupStrategy(); //Default settings if null
                 //Init the cleanup worker
@@ -269,18 +292,22 @@ namespace ImageResizer.Plugins.DiskCache
             CacheResult r = Process(e);
             context.Items["FinalCachedFile"] = r.PhysicalPath;
 
+            if (r.Data == null) {
 
-            //Calculate the virtual path
-            string virtualPath = VirtualCacheDir.TrimEnd('/') + '/' + r.RelativePath.Replace('\\', '/').TrimStart('/');
-            
-            //Rewrite to cached, resized image.
-            context.RewritePath(virtualPath, false);
+                //Calculate the virtual path
+                string virtualPath = VirtualCacheDir.TrimEnd('/') + '/' + r.RelativePath.Replace('\\', '/').TrimStart('/');
+
+                //Rewrite to cached, resized image.
+                context.RewritePath(virtualPath, false);
+            } else {
+                //Remap the response args writer to use the existing stream.
+                ((ResponseArgs)e).ResizeImageToStream = delegate(Stream s) {
+                    ((MemoryStream)r.Data).WriteTo(s);
+                };
+                context.RemapHandler(new NoCacheHandler(e));
+            }
         }
 
-        public string ProcessToVirtualPath(IResponseArgs e) {
-            CacheResult r = Process(e);
-            return VirtualCacheDir.TrimEnd('/') + '/' + r.RelativePath.Replace('\\', '/').TrimStart('/');
-        }
         public CacheResult Process(IResponseArgs e) {
             //Query for the modified date of the source file. If the source file changes on us during the write,
             //we (may) end up saving the newer version in the cache properly, but with an older modified date.
@@ -292,7 +319,7 @@ namespace ImageResizer.Plugins.DiskCache
             writer.CheckWebConfigEvery5();
 
             //Cache the data to disk and return a path.
-            CacheResult r = cache.GetCachedFile(e.RequestKey, e.SuggestedExtension, e.ResizeImageToStream, modDate, CacheAccessTimeout);
+            CacheResult r = cache.GetCachedFile(e.RequestKey, e.SuggestedExtension, e.ResizeImageToStream, modDate, CacheAccessTimeout,AsyncWrites);
 
             //Fail
             if (r.Result == CacheQueryResult.Failed)
@@ -317,7 +344,10 @@ namespace ImageResizer.Plugins.DiskCache
             if (this.cleaner != null && cleaner.ExteralProcessCleaning && !this.HashModifiedDate)
                 issues.Add(new Issue("DiskCache", "You should set hashModifiedDate=\"true\" on the <diskcache /> element in Web.config.",
                     "Setting false for this value in a Web Garden scenario can cause failed requests. (DiskCache detects one or more other process on this machine working on the same cache directory).", IssueSeverity.Critical));
-
+            if (this.AsyncBufferSize < 1024 * 1024 * 2)
+                issues.Add(new Issue("DiskCache", "The asyncBufferSize should not be set below 2 megabytes (2097152). Found in the <diskcache /> element in Web.config.",
+                    "A buffer that is too small will cause requests to be processed synchronously. Remember to set the value to at least 4x the maximum size of an output image.", IssueSeverity.ConfigurationError));
+        
 
             return issues;
         }
