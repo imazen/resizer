@@ -179,7 +179,7 @@ namespace ImageResizer.Plugins.DiskCache {
                                     } else {
                                         swio.Stop();
                                         if (lp.Logger != null)
-                                            lp.Logger.Trace("({0}ms): Async write finished {1}ms after enqueue for {2}", swio.ElapsedMilliseconds, DateTime.UtcNow.Subtract(w.JobCreatedAt).TotalMilliseconds, result.RelativePath);
+                                            lp.Logger.Trace("{0}ms: Async write started {1}ms after enqueue for {2}", swio.ElapsedMilliseconds.ToString().PadLeft(4), DateTime.UtcNow.Subtract(w.JobCreatedAt).Subtract(swio.Elapsed).TotalMilliseconds, result.RelativePath);
                                     }
 
                                 } catch (Exception ex) {
@@ -215,7 +215,7 @@ namespace ImageResizer.Plugins.DiskCache {
             }
             if (lp.Logger != null) {
                 sw.Stop();
-                lp.Logger.Trace("({0}ms): {3}{1} for {2}", sw.ElapsedMilliseconds, result.Result.ToString(), result.RelativePath, async ? (asyncFailed ? "Fallback to sync  " : "async ") : "");
+                lp.Logger.Trace("{0}ms: {3}{1} for {2}", sw.ElapsedMilliseconds.ToString().PadLeft(4), result.Result.ToString(), result.RelativePath, async ? (asyncFailed ? "Fallback to sync  " : "Async ") : "");
             }
             //Fire event
             if (CacheResultReturned != null) CacheResultReturned(this, result);
