@@ -58,6 +58,9 @@ namespace ImageResizer.Plugins.DiskCache {
             lock(_timesLock) lastBusy = DateTime.UtcNow.Ticks;
             
         }
+        /// <summary>
+        /// The last time we did work (or attempted to do work, failing if the queue was empty)
+        /// </summary>
         protected long lastWorked = DateTime.MinValue.Ticks;
 
         /// <summary>
@@ -119,13 +122,9 @@ namespace ImageResizer.Plugins.DiskCache {
 
                     otherProcessManagingCleanup = !hasLock;
                     if (!hasLock) {
-                        //If we have a reference, wait for it
-                        if (cleanupLock != null) {
-                            //Wait until the other process calls ReleaseMutex(), or for 30 seconds, whichever is shorter.
-                            hasLock = cleanupLock.WaitOne(30000);
-                        }
+                        //If we have a reference, Wait until the other process calls ReleaseMutex(), or for 30 seconds, whichever is shorter.
+                        if (cleanupLock != null) hasLock = cleanupLock.WaitOne(30000);
                         else Thread.Sleep(10000); //Otherwise just sleep 10s and check again, waiting for the mutex to be garbage collected so we can recreate it.
-
                     }
                     otherProcessManagingCleanup = !hasLock;
                     if (!hasLock) {
@@ -145,14 +144,13 @@ namespace ImageResizer.Plugins.DiskCache {
                     lock (_timesLock) notBusy = (DateTime.UtcNow.Subtract(new DateTime(lastBusy)) > cs.MinDelay);
                     //doSomeWork keeps being true in absence of incoming requests
 
-                    //If the server isn't busy, or if it's been to long, do some work and time it.
-                    bool didWork = false;
+                    //If the server isn't busy, or if this worker has been lazy to long long, do some work and time it.
                     Stopwatch workedForTime = null;
                     if (noWorkInTooLong || notBusy) {
                         workedForTime = new Stopwatch();
                         workedForTime.Start();
                         DoWorkFor(cs.OptimalWorkSegmentLength);
-                        didWork = true;
+                        lock (_timesLock) lastWorked = DateTime.UtcNow.Ticks; 
                         workedForTime.Stop();
                     }
 
@@ -161,14 +159,15 @@ namespace ImageResizer.Plugins.DiskCache {
 
                     
                     //Nothing to do, queue is empty.
-                    if (!didWork && queue.IsEmpty)
+                    if (queue.IsEmpty)
                         //Wait perpetually until notified of more queue items.
                         _queueWait.WaitOne();
-                    else if (didWork && notBusy)
+                    else if (notBusy)
                         //Don't flood the system even when it's not busy. 50% usage here. Wait for the length of time worked or the optimal work time, whichever is longer.
                         //A directory listing can take 30 seconds sometimes and kill the cpu.
-                        _quitWait.WaitOne(new TimeSpan((long)Math.Max(cs.OptimalWorkSegmentLength.TotalMilliseconds, workedForTime.ElapsedMilliseconds)));
-                    else if (didWork && !notBusy) {
+                        _quitWait.WaitOne((int)Math.Max(cs.OptimalWorkSegmentLength.TotalMilliseconds, workedForTime.ElapsedMilliseconds));
+
+                    else {
                         //Estimate how long before we can run more code.
                         long busyTicks = 0;
                         lock (_timesLock) busyTicks = (cs.MinDelay - DateTime.UtcNow.Subtract(new DateTime(lastBusy))).Ticks;
@@ -176,7 +175,8 @@ namespace ImageResizer.Plugins.DiskCache {
                         lock (_timesLock) maxTicks = (cs.MaxDelay - DateTime.UtcNow.Subtract(new DateTime(lastWorked))).Ticks;
                         //Use the longer value and add a second to avoid rounding and timing errors.
                         _quitWait.WaitOne(new TimeSpan(Math.Max(busyTicks, maxTicks)) + new TimeSpan(0, 0, 1));
-                    }
+                    } 
+
                     //Check for shutdown
                     if (shuttingDown) return;
                 }
@@ -221,8 +221,6 @@ namespace ImageResizer.Plugins.DiskCache {
                     this.AcceptIssue(new Issue("Failed exeuting task", e.Message + e.StackTrace, IssueSeverity.Critical));
                 }
             }
-
-            lock (_timesLock) lastWorked = DateTime.UtcNow.Ticks;
             return true;
         }
         protected volatile bool shuttingDown = false;
@@ -253,7 +251,7 @@ namespace ImageResizer.Plugins.DiskCache {
                 FlushAccessedDate(item);
 
             if (lp.Logger != null) sw.Stop();
-            if (lp.Logger != null) lp.Logger.Trace("({2}ms): Executing task {0} {1} ({3} tasks remaining)", item.Task.ToString(), item.RelativePath, sw.ElapsedMilliseconds, queue.Count.ToString());
+            if (lp.Logger != null) lp.Logger.Trace("{2}ms: Executing task {0} {1} ({3} tasks remaining)", item.Task.ToString(), item.RelativePath, sw.ElapsedMilliseconds.ToString().PadLeft(4), queue.Count.ToString());
 
             
         }
@@ -272,7 +270,7 @@ namespace ImageResizer.Plugins.DiskCache {
                     sw.Start();
                     cache.Index.populate(item.RelativePath, item.PhysicalPath);
                     sw.Stop();
-                    lp.Logger.Trace("({0}ms): Querying filesystem about {1}", sw.ElapsedMilliseconds, item.RelativePath);
+                    lp.Logger.Trace("{0}ms: Querying filesystem about {1}", sw.ElapsedMilliseconds.ToString().PadLeft(4), item.RelativePath);
                 } else 
                     cache.Index.populate(item.RelativePath, item.PhysicalPath);
             }
