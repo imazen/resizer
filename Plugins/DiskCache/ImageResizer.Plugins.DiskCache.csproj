@@ -53,6 +53,8 @@
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Async\AsyncWriteCollection.cs" />
+    <Compile Include="Async\AsyncWrite.cs" />
     <Compile Include="Index\CachedFileInfo.cs" />
     <Compile Include="Index\CachedFolder.cs" />
     <Compile Include="Index\CacheIndex.cs" />
@@ -80,6 +82,7 @@
     <Content Include="license.txt" />
     <Content Include="todo.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

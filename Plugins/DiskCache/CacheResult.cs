@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 namespace ImageResizer.Plugins.DiskCache {
     public enum CacheQueryResult {
@@ -10,7 +11,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// </summary>
         Failed,
         /// <summary>
-        /// The item wasn't cached, but was successfully added to the cache
+        /// The item wasn't cached, but was successfully added to the cache (or queued, in which case you should read .Data instead of .PhysicalPath)
         /// </summary>
         Miss,
         /// <summary>
@@ -24,14 +25,30 @@ namespace ImageResizer.Plugins.DiskCache {
             this.physicalPath = physicalPath;
             this.relativePath = relativePath;
         }
+        public CacheResult(CacheQueryResult result, Stream data, string relativePath) {
+            this.result = result;
+            this.data = data;
+            this.relativePath = relativePath;
+        }
 
-        private string physicalPath;
+        private string physicalPath= null;
         /// <summary>
-        /// The physical path to the cached item
+        /// The physical path to the cached item. Verify .Data is null before trying to read from this file.
         /// </summary>
         public string PhysicalPath {
             get { return physicalPath; }
         }
+
+        private Stream data = null;
+        /// <summary>
+        /// Provides a read-only stream to the data. Usually a MemoryStream instance, but you should dispose it once you are done. 
+        /// If this value is not null, it indicates that the file has not yet been written to disk, and you should read it from this stream instead.
+        /// </summary>
+        public Stream Data {
+            get { return data; }
+            set { data = value; }
+        }
+       
 
         private string relativePath;
         /// <summary>
