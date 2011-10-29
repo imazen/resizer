@@ -67,6 +67,20 @@ namespace ImageResizer {
             return get("maxwidth", -1);            } set {   
             set("maxwidth",value);                 } }
 
+
+        /// <summary>
+        /// ["quality"]: The jpeg encoding quality to use. (10..100). 90 is the default and best value, you should leave it.
+        /// </summary>
+        public int Quality {
+            get {
+                return get("quality", 90);
+            }
+            set {
+                set("quality", value);
+            }
+        }
+
+
         /// <summary>
         /// ["maxheight"]: Sets the maximum desired height of the image.  (minus padding, borders, margins, effects, and rotation). 
         /// The image may be smaller than this value to maintain aspect ratio when both maxwidth and maxheight are specified.
@@ -79,7 +93,7 @@ namespace ImageResizer {
         /// ["mode"]: Sets the fit mode for the image. max, min, pad, crop, carve, stretch
         /// </summary>
         public FitMode Mode{                        get {
-            return Utils.parseEnum<FitMode>(this["mode"], FitMode.Pad);       } set {
+            return Utils.parseEnum<FitMode>(this["mode"], FitMode.None);       } set {
             this["mode"] = value.ToString();      }}
 
         /// <summary>
@@ -116,11 +130,13 @@ namespace ImageResizer {
             this["flip"] = Utils.writeFlip(value);      }}
 
         /// <summary>
-        /// ["sourceFlip"] Allows you to flip the source image vertically, horizontally, or both. Rotation is not supported.
+        /// ["sFlip"] Allows you to flip the source image vertically, horizontally, or both. Rotation is not supported.
         /// </summary>
         public RotateFlipType SourceFlip                    { get {
-            return Utils.parseFlip(this["sourceFlip"]);     } set {
-            this["sourceFlip"] = Utils.writeFlip(value);    }}
+                return Utils.parseFlip(string.IsNullOrEmpty(this["sFlip"]) ? this["sourceFlip"] : this["sFlip"]);
+            }
+            set {
+            this["sFlip"] = Utils.writeFlip(value);    }}
 
         /// <summary>
         /// ["scale"] Whether to downscale, upscale, upscale the canvas, or both upscale or downscale the image as needed. Defaults to
