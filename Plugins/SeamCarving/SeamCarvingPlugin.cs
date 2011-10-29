@@ -24,6 +24,22 @@ namespace ImageResizer.Plugins.SeamCarving {
             Laplacian = 4
         }
 
+        public enum OutputType {
+            CAIR=  0,
+            Grayscale =  1,
+            Edge=  2,
+            VerticalEnergy =  3,
+            HorizontalEnergy =  4,
+            Removal= 5,
+            CAIR_HD=  6
+
+        }
+        public enum EnergyType {
+            Backward = 0,
+            Forward = 1
+        }
+              
+
         protected override RequestedAction OnProcess(ImageState s) {
             //if ("true".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(s.settings["stretch"])) s.settings["stretch"] = "fill";
             return RequestedAction.None;
@@ -82,7 +98,13 @@ namespace ImageResizer.Plugins.SeamCarving {
                     }
 
                     Size intTargetSize = new Size((int)targetSize.Width, (int)targetSize.Height);
-                    cair.CairyIt(tempFile, outputTempFile, intTargetSize, ftype, 5000);
+                    CairJob job = new CairJob();
+                    job.SourcePath = tempFile;
+                    job.DestPath = outputTempFile;
+                    job.Size = intTargetSize;
+                    job.Filter = ftype;
+                    job.Timeout = 5000;
+                    cair.CairyIt(job);
 
                 } finally {
                     File.Delete(tempFile);
