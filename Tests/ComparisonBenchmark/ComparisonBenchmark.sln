@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer", "..\..\Core\ImageResizer.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.FreeImage", "..\..\Plugins\FreeImage\ImageResizer.Plugins.FreeImage.csproj", "{8E863AFE-B4CF-46AA-8382-0C3547C0EDE9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComparisonBenchmark", "ComparisonBenchmark.csproj", "{1B70E968-BFB6-48DD-A5D4-B613FB2852EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Wic", "..\..\Plugins\Wic\ImageResizer.Plugins.Wic.csproj", "{4A55B40D-1E0D-4D1F-8D96-25F624847E53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PrettyGifs", "..\..\Plugins\PrettyGifs\ImageResizer.Plugins.PrettyGifs.csproj", "{BB8EEB97-6550-4780-97B2-B0F2FCD80970}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Trial|Any CPU = Trial|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{8E863AFE-B4CF-46AA-8382-0C3547C0EDE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E863AFE-B4CF-46AA-8382-0C3547C0EDE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E863AFE-B4CF-46AA-8382-0C3547C0EDE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E863AFE-B4CF-46AA-8382-0C3547C0EDE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E863AFE-B4CF-46AA-8382-0C3547C0EDE9}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{8E863AFE-B4CF-46AA-8382-0C3547C0EDE9}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{1B70E968-BFB6-48DD-A5D4-B613FB2852EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B70E968-BFB6-48DD-A5D4-B613FB2852EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B70E968-BFB6-48DD-A5D4-B613FB2852EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B70E968-BFB6-48DD-A5D4-B613FB2852EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B70E968-BFB6-48DD-A5D4-B613FB2852EE}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{1B70E968-BFB6-48DD-A5D4-B613FB2852EE}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{BB8EEB97-6550-4780-97B2-B0F2FCD80970}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB8EEB97-6550-4780-97B2-B0F2FCD80970}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB8EEB97-6550-4780-97B2-B0F2FCD80970}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB8EEB97-6550-4780-97B2-B0F2FCD80970}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB8EEB97-6550-4780-97B2-B0F2FCD80970}.Trial|Any CPU.ActiveCfg = Trial|Any CPU
+		{BB8EEB97-6550-4780-97B2-B0F2FCD80970}.Trial|Any CPU.Build.0 = Trial|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
