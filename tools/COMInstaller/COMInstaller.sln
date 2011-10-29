@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "COMInstaller", "COMInstaller.csproj", "{25D6354D-840A-471F-A78E-4515A28A82B1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Installer", "..\Installer\Installer.csproj", "{6FDF24DC-C4B9-45C3-81BE-EF1ED63880DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -13,6 +15,10 @@ Global
 		{25D6354D-840A-471F-A78E-4515A28A82B1}.Debug|x86.Build.0 = Debug|x86
 		{25D6354D-840A-471F-A78E-4515A28A82B1}.Release|x86.ActiveCfg = Release|x86
 		{25D6354D-840A-471F-A78E-4515A28A82B1}.Release|x86.Build.0 = Release|x86
+		{6FDF24DC-C4B9-45C3-81BE-EF1ED63880DD}.Debug|x86.ActiveCfg = Debug|x86
+		{6FDF24DC-C4B9-45C3-81BE-EF1ED63880DD}.Debug|x86.Build.0 = Debug|x86
+		{6FDF24DC-C4B9-45C3-81BE-EF1ED63880DD}.Release|x86.ActiveCfg = Release|x86
+		{6FDF24DC-C4B9-45C3-81BE-EF1ED63880DD}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
