@@ -256,7 +256,7 @@ namespace ImageResizer.Util {
         /// <param name="path"></param>
         /// <returns></returns>
         public static NameValueCollection ParseQueryStringFriendlyAllowSemicolons(string path) {
-            if (path.IndexOf('?') < 0 && path.IndexOf(';') < 0) path = '?' + path;
+            if (path.IndexOf('?') < 0 && path.IndexOf(';') != 0) path = '?' + path;
             return ParseQueryString(path.Replace(';','?'));
         }
 
