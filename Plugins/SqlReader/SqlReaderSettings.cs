@@ -59,8 +59,8 @@ namespace ImageResizer.Plugins.SqlReader {
 
         private bool _registerAsVirtualPathProvider = true;
         /// <summary>
-        /// When true, the SqlReader will be registered as a VirtualPathProvider with ASP.NET, which will
-        /// make this plugin's virtual files accessible from all code which depends on the VirtualPathProvider system. 
+        /// (default: true) When true, the SqlReader will be registered as a VirtualPathProvider with ASP.NET, which will
+        /// make this plugin's virtual files accessible from all code which depends on the VirtualPathProvider system. If trust levels don't allow that, it falls back to IVirtualImageProvider mode, which allows the image resizer to access the files, but not other systems, so you'll need to enable cacheUnmodifiedFiles if you want to access files without resizing them.
         /// </summary>
         public bool RegisterAsVirtualPathProvider {
             get { return _registerAsVirtualPathProvider; }
