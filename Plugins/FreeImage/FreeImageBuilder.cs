@@ -64,21 +64,22 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
 
 
         public override string Build(object source, object dest, ResizeSettings settings, bool disposeSource, bool addFileExtension) {
-            if ((source is String || source is Stream) && (dest is String || dest is Stream || dest is BitmapHolder) && !addFileExtension) {
+            if ((source is String || source is Stream || source is byte[]) && (dest is String || dest is Stream || dest is BitmapHolder) && !addFileExtension) {
                 if (BuildUnmanaged(source, dest, settings)) return dest as string;
             }
             return base.Build(source, dest, settings, disposeSource, addFileExtension);
         }
 
         protected virtual bool BuildUnmanaged(object source, object dest, ResizeSettings settings) {
+            if (!"freeimage".Equals(settings["builder"])) return false;
+
             if (!FreeImageAPI.FreeImage.IsAvailable()) return false;
 
-            if (!"freeimage".Equals(settings["builder"])) return false;
 
             // Load the example bitmap.
             FIBITMAP original = FIBITMAP.Zero;
             FIBITMAP final = FIBITMAP.Zero;
-
+            if (source is byte[]) source = new MemoryStream((byte[])source); 
             if (source is String)
                 original = FreeImage.LoadEx((String)source); //Supports all kinds of input formats.
             else if (source is Stream)
