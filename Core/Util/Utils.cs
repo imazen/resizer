@@ -132,7 +132,7 @@ namespace ImageResizer.Util {
 
 
         /// <summary>
-        /// Returns RotateNoneFlipNone if not a recognize value.
+        /// Returns RotateNoneFlipNone if not a recognized value.
         /// </summary>
         /// <param name="sFlip"></param>
         /// <returns></returns>
@@ -158,7 +158,51 @@ namespace ImageResizer.Util {
         }
 
         /// <summary>
-        /// Throws an exception if the specified value is unsupported. Rotation values are not supported, and should be specified with the Rotate command.
+        /// Returns 0 if not a recognized value. Rounds the value to 0, 90, 180, or 270
+        /// </summary>
+        /// <param name="sFlip"></param>
+        /// <returns></returns>
+        public static double parseRotate(string s) {
+
+            if (!string.IsNullOrEmpty(s)) {
+                double temp;
+                if (!double.TryParse(s, out temp)) return 0;
+                
+                return normalizeTo90Intervals(temp);
+            }
+            return 0;
+        }
+
+        public static double normalizeTo90Intervals(double d){
+            d = d % 360;
+            if (d < 0) d += 360;
+
+            if (d >= 315 && d < 360) return 0;
+            if (d >= 0 && d < 45) return 0;
+            if (d >=45 && d < 135) return 90;
+            if (d >= 135 && d < 225) return 180;
+            if (d >= 225 && d < 315) return 270;
+
+            throw new Exception("Impossible");
+        }
+
+        public static RotateFlipType combineFlipAndRotate(RotateFlipType flip, double angle) {
+            angle = normalizeTo90Intervals(angle);
+            if (flip == 0) return (RotateFlipType)(int)(angle / 90);
+            else if (flip == (RotateFlipType)4) return (RotateFlipType)(int)(4 + (angle / 90));
+            else if (flip == (RotateFlipType)6) {
+                if (angle == 0) return (RotateFlipType)6;
+                if (angle == 90) return (RotateFlipType)7;
+                if (angle == 180) return (RotateFlipType)5;
+                if (angle == 270) return (RotateFlipType)6;
+            }
+
+            throw new ArgumentException("Valid flip values are RotateNoneFlipNone, RotateNoneFlipX, RotateNoneFlipY, and RotateNoneFlipXY. Rotation must be specified with Rotate or srcRotate instead. Received: " + flip.ToString());
+        }
+
+
+        /// <summary>
+        /// Throws an exception if the specified value is unsupported. Rotation values are not supported, and should be specified with the Rotate or srcRotate command.
         /// </summary>
         /// <returns></returns>
         public static string writeFlip(RotateFlipType flip) {
@@ -167,7 +211,7 @@ namespace ImageResizer.Util {
             if (flip == RotateFlipType.RotateNoneFlipY) return "y";
             if (flip == RotateFlipType.RotateNoneFlipXY) return "xy";
 
-            throw new ArgumentException("Valid flip values are RotateNoneFlipNone, RotateNoneFlipX, RotateNoneFlipY, and RotateNoneFlipXY. Rotation must be specified with Rotate instead. Received: " + flip.ToString());
+            throw new ArgumentException("Valid flip values are RotateNoneFlipNone, RotateNoneFlipX, RotateNoneFlipY, and RotateNoneFlipXY. Rotation must be specified with Rotate or srcRotate instead. Received: " + flip.ToString());
         }
 
         public static StretchMode parseStretch(string value) {
