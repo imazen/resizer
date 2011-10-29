@@ -101,6 +101,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarking", "..\Tests\Be
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S3ReaderSample", "..\Samples\S3ReaderSample\S3ReaderSample.csproj", "{8A750B3B-CFDE-43E8-A7EA-35DC84178088}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Wic", "..\Plugins\Wic\ImageResizer.Plugins.Wic.csproj", "{4A55B40D-1E0D-4D1F-8D96-25F624847E53}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -856,6 +858,24 @@ Global
 		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Trial|x64.ActiveCfg = Release|Any CPU
 		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Trial|x86.ActiveCfg = Release|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Release|x64.ActiveCfg = Release|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Release|x86.ActiveCfg = Release|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Trial|x64.ActiveCfg = Release|Any CPU
+		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
