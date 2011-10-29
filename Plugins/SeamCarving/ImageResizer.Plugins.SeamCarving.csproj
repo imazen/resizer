@@ -52,6 +52,29 @@
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="CairJob.cs" />
+    <Compile Include="SevenZipReduced\Common\CRC.cs" />
+    <Compile Include="SevenZipReduced\Common\InBuffer.cs" />
+    <Compile Include="SevenZipReduced\Common\OutBuffer.cs" />
+    <Compile Include="SevenZipReduced\Compress\LZMA\LzmaBase.cs" />
+    <Compile Include="SevenZipReduced\Compress\LZMA\LzmaDecoder.cs" />
+    <Compile Include="SevenZipReduced\Compress\LZMA\LzmaEncoder.cs" />
+    <Compile Include="SevenZipReduced\Compress\LZ\IMatchFinder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SevenZipReduced\Compress\LZ\LzBinTree.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SevenZipReduced\Compress\LZ\LzInWindow.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SevenZipReduced\Compress\LZ\LzOutWindow.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SevenZipReduced\Compress\RangeCoder\RangeCoder.cs" />
+    <Compile Include="SevenZipReduced\Compress\RangeCoder\RangeCoderBit.cs" />
+    <Compile Include="SevenZipReduced\Compress\RangeCoder\RangeCoderBitTree.cs" />
+    <Compile Include="SevenZipReduced\ICoder.cs" />
     <Compile Include="CairManager.cs" />
     <Compile Include="SeamCarvingPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

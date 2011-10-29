@@ -85,7 +85,7 @@ namespace ImageResizer.Plugins.SeamCarving {
         /// </summary>
         private AutoResetEvent turnstile = new AutoResetEvent(true);
 
-        public bool CairyIt(string sourcePath, string destPath, Size size, SeamCarving.SeamCarvingPlugin.FilterType type, int msToWait) {
+        public bool CairyIt(CairJob job) {
 
             //If we have too many threads waiting to run CAIR, just kill the request.
             if (_maxConcurrentWaitingThreads > 0 &&
@@ -114,13 +114,56 @@ namespace ImageResizer.Plugins.SeamCarving {
                 //Make sure CAIR.exe exists. If not, recreate it
                 if (!File.Exists(GetCair())) CairMissing();
 
+                /*CAIR CLI Usage: cair -I <input_file>
+                    Other options:
+                      -O <output_file>
+                          Default: Dependent on operation
+                      -W <weight_file>
+                          Bitmap with: Black- no weight
+                                       Green- Protect weight
+                                       Red- Remove weight
+                          Default: Weights are all zero
+                      -S <weight_scale>
+                          Default: 100,000
+                      -X <goal_x>
+                          Default: Source image width
+                      -Y <goal_y>
+                          Default: Source image height
+                      -R <expected_result>
+                          CAIR: 0
+                          Grayscale: 1
+                          Edge: 2
+                          Vertical Energy: 3
+                          Horizontal Energy: 4
+                          Removal: 5
+                          CAIR_HD: 6
+                          Default: CAIR
+                      -C <convoluton_type>
+                          Prewitt: 0
+                          V1: 1
+                          V_SQUARE: 2
+                          Sobel: 3
+                          Laplacian: 4
+                          Default: Prewitt
+
+                      -E <energy_type>
+                          Backward: 0
+                          Forward: 1
+                          Default: Backward
+                      -T <thread_count>
+                          Default : CAIR_NUM_THREADS (4)
+                    http://sourceforge.net/projects/c-a-i-r/*/
+
                 string args = "";
-                args += " -I \"" + sourcePath + "\"";
-                args += " -O \"" + destPath + "\"";
-                args += " -T 1";
-                args += " -C " + ((int)type).ToString();
-                args += " -X " + size.Width;
-                args += " -Y " + size.Height;
+                args += " -I \"" + job.SourcePath + "\"";
+                args += " -O \"" + job.DestPath + "\"";
+                if (job.WeightPath != null) args += " -W \"" + job.WeightPath + "\"";
+                args += " -T " + job.Threads;
+                args += " -R " + ((int)job.Output).ToString();
+                args += " -C " + ((int)job.Filter).ToString();
+                args += " -E " + ((int)job.Energy).ToString();
+                args += " -X " + job.Size.Width;
+                args += " -Y " + job.Size.Height;
 
                 ProcessStartInfo info = new ProcessStartInfo(GetCair(), args);
                 info.UseShellExecute = false;
@@ -129,7 +172,7 @@ namespace ImageResizer.Plugins.SeamCarving {
                 info.CreateNoWindow = true;
 
                 using (Process p = Process.Start(info)) {
-                    bool result = p.WaitForExit(msToWait);
+                    bool result = p.WaitForExit(job.Timeout);
                     if (!result) {
                         p.Kill(); //Kill the process if it times out.
                         throw new ImageProcessingException("Content-aware image processing failed due to timeout.");
