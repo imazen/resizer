@@ -40,7 +40,8 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
             if (string.IsNullOrEmpty(settings["quality"]) || !int.TryParse(settings["quality"], out quality)) quality = 90;
             if (format == FREE_IMAGE_FORMAT.FIF_JPEG) {
                 if (quality >= 100) encodingOptions |= FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYSUPERB;
-                else if (quality >= 75) encodingOptions |= FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYGOOD;
+                else if (quality >= 75) 
+                    encodingOptions |= FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYGOOD;
                 else if (quality >= 50) encodingOptions |= FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYNORMAL;
                 else if (quality >= 25) encodingOptions |= FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYAVERAGE;
                 else encodingOptions |= FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYBAD;
@@ -80,10 +81,11 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
         }
 
         public IEncoder CreateIfSuitable(ResizeSettings settings, object original) {
-            if (!FreeImage.IsAvailable()) return null;
+            
             ImageFormat requestedFormat = DefaultEncoder.GetRequestedFormat(settings.Format, ImageFormat.Jpeg);
             if (requestedFormat == null || !IsValidOutputFormat(requestedFormat)) return null; //An unsupported format was explicitly specified.
             if (!"freeimage".Equals(settings["encoder"], StringComparison.OrdinalIgnoreCase)) return null;
+            if (!FreeImage.IsAvailable()) return null;
             return new FreeImageEncoderPlugin(settings, original);
         }
 
