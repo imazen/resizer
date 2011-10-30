@@ -98,6 +98,53 @@ namespace ImageResizer
             public Bitmap bitmap;
         }
 
+        protected Stream GetStreamFromSource(ref object source, ref string path, ref bool disposeStream, ref bool restoreStreamPosition, ref ResizeSettings settings){
+            
+            //App-relative path - converted to virtual path
+            if (source is string) {
+                path = source as string;
+                //Convert app-relative paths to VirtualFile instances
+                if (path.StartsWith("~", StringComparison.OrdinalIgnoreCase)) {
+                    source = this.VirtualFileProvider.GetFile(PathUtils.ResolveAppRelative(path), settings);
+                }
+            }
+
+            Stream s = null;
+            path = null;
+            //Stream
+            if (source is Stream) s = (Stream)source;
+            //VirtualFile
+             else if (source is VirtualFile) {
+                path = ((VirtualFile)source).VirtualPath;
+                s = ((VirtualFile)source).Open();
+            //IVirtualFile
+            } else if (source is IVirtualFile) {
+                path = ((IVirtualFile)source).VirtualPath;
+                s = ((IVirtualFile)source).Open();
+            //PhysicalPath
+            } else if (source is string) {
+                path = (string)source;
+                s = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            } else if (source is byte[]){
+                s = new MemoryStream((byte[])source, 0, ((byte[])source).Length,false,true);
+            } else {
+                //For HttpPostedFile and HttpPostedFileBase - we must use reflection to support .NET 3.5 without losing 2.0 compat.
+                PropertyInfo pname = source.GetType().GetProperty("FileName",typeof(string));
+                PropertyInfo pstream = source.GetType().GetProperty("InputStream");
+
+                if (pname != null && pstream != null) {
+                    path = pname.GetValue(source, null) as string;
+                    s = pstream.GetValue(source, null) as Stream;
+                    disposeStream = false; //We never want to dispose the HttpPostedFile or HttpPostedFileBase streams..
+                    restoreStreamPosition = true;
+                }
+                
+                if (s == null) 
+                    throw new ArgumentException("Paramater source may only be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, HttpPostedFileBase, Bitmap, Image, or Stream.", "source");
+            }
+            return s;
+        }
+
         /// <summary>
         /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag in a BitmapTag instance. The Bitmap.Tag.Path value may be a virtual, relative, UNC, windows, or unix path. 
         /// Does not dispose 'source' if it is a Stream or Image instance - that's the responsibility of the calling code.
@@ -116,16 +163,6 @@ namespace ImageResizer
             System.Drawing.Bitmap b = null;
             string loadFailureReasons = "File may be corrupted, empty, or may contain a PNG image with a single dimension greater than 65,535 pixels.";
             
- 
-            //App-relative path - converted to virtual path
-            if (source is string) {
-                path = source as string;
-                //Convert app-relative paths to VirtualFile instances
-                if (path.StartsWith("~", StringComparison.OrdinalIgnoreCase)) {
-                    source = this.VirtualFileProvider.GetFile(PathUtils.ResolveAppRelative(path), settings); 
-                }
-            }
-
             //Bitmap
             if (source is Bitmap) return source as Bitmap;
             //Image
@@ -138,42 +175,10 @@ namespace ImageResizer
                 return b;
             }
 
-
-
             bool restoreStreamPosition = false;
-            Stream s = null;
-            path = null;
-            //Stream
-            if (source is Stream) s = (Stream)source;
-            //VirtualFile
-             else if (source is VirtualFile) {
-                path = ((VirtualFile)source).VirtualPath;
-                s = ((VirtualFile)source).Open();
-            //IVirtualFile
-            } else if (source is IVirtualFile) {
-                path = ((IVirtualFile)source).VirtualPath;
-                s = ((IVirtualFile)source).Open();
-            //PhysicalPath
-            } else if (source is string) {
-                path = (string)source;
-                s = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-            } else if (source is byte[]){
-                s = new MemoryStream((byte[])source, false);
-            } else {
-                //For HttpPostedFile and HttpPostedFileBase - we must use reflection to support .NET 3.5 without losing 2.0 compat.
-                PropertyInfo pname = source.GetType().GetProperty("FileName",typeof(string));
-                PropertyInfo pstream = source.GetType().GetProperty("InputStream");
+            Stream s = GetStreamFromSource(ref source, ref path, ref disposeStream, ref restoreStreamPosition, ref settings);
 
-                if (pname != null && pstream != null) {
-                    path = pname.GetValue(source, null) as string;
-                    s = pstream.GetValue(source, null) as Stream;
-                    disposeStream = false; //We never want to dispose the HttpPostedFile or HttpPostedFileBase streams..
-                    restoreStreamPosition = true;
-                }
-                
-                if (s == null) 
-                    throw new ArgumentException("Paramater source may only be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, HttpPostedFileBase, Bitmap, Image, or Stream.", "source");
-            }
+
             //Save the original stream position if it's an HttpPostedFile
             long originalPosition = (restoreStreamPosition) ? s.Position : - 1;
 
@@ -516,8 +521,10 @@ namespace ImageResizer
 
             //Flipping has to be done on the original - it can't be done as part of the DrawImage or later, after the borders are drawn.
 
-            if (s.sourceBitmap != null && s.settings.SourceFlip != RotateFlipType.RotateNoneFlipNone) {
-                s.sourceBitmap.RotateFlip(s.settings.SourceFlip);
+            if (s.sourceBitmap != null && (s.settings.SourceFlip != RotateFlipType.RotateNoneFlipNone || !string.IsNullOrEmpty(s.settings["sRotate"]))) {
+                double angle = Utils.parseRotate(s.settings["sRotate"]);
+
+                s.sourceBitmap.RotateFlip(Utils.combineFlipAndRotate(s.settings.SourceFlip,angle));
                 s.originalSize = s.sourceBitmap.Size;
             }
             return RequestedAction.None;
@@ -636,14 +643,15 @@ namespace ImageResizer
                 if (!s.supportsTransparency) {
                     //If the source format doesn't support transparency either, we should be able to safely leave the bg transparent, hopefully preventing the ghostly outline.
                     //Update: nope, doesn't seem to help. Must be the edge blending by the hq bicubic.
-                    //if (s.sourceBitmap != null && (s.sourceBitmap.PixelFormat == PixelFormat.Format24bppRgb ||
-                   //     s.sourceBitmap.PixelFormat == PixelFormat.Format32bppRgb || 
-                   //     s.sourceBitmap.PixelFormat == PixelFormat.Format48bppRgb) &&
-                   //     PolygonMath.GetBoundingBox(s.layout["image"]).Equals(s.layout.GetBoundingBox())) {
+                    if (s.sourceBitmap != null && (s.sourceBitmap.PixelFormat == PixelFormat.Format24bppRgb ||
+                        s.sourceBitmap.PixelFormat == PixelFormat.Format32bppRgb || 
+                        s.sourceBitmap.PixelFormat == PixelFormat.Format48bppRgb) &&
+                        PolygonMath.ArraysEqual(s.layout["image"], s.layout.LastRing.points)) {
                         //Do nothing, the image is transparent by default
-                    //} else {
+                            int j = 0;
+                    } else {
                         background = Color.White;
-                    //}
+                    }
                 }
             }
 
@@ -939,7 +947,7 @@ namespace ImageResizer
                     "format", "thumbnail", "maxwidth", "maxheight",
                 "width", "height",
                 "scale", "stretch", "crop", "page", "bgcolor",
-                "rotate", "flip", "sourceFlip", "borderWidth",
+                "rotate", "flip", "sourceFlip", "sFlip", "sRotate", "borderWidth",
                 "borderColor", "paddingWidth", "paddingColor",
                 "ignoreicc", "frame", "useresizingpipeline", 
                 "cache", "process", "margin", "anchor","dpi","mode"};
