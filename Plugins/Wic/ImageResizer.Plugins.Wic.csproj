@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConversionUtils.cs" />
+    <Compile Include="WicBitmapPadder.cs" />
     <Compile Include="WicBuilder.cs" />
     <Compile Include="InteropServices\ComTypes\WinCodec.cs" />
     <Compile Include="InteropServices\ComTypes\WinCodecSdk.cs" />
@@ -45,6 +46,7 @@
     <Compile Include="InteropServices\PropVariant.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WicDecoder.cs" />
+    <Compile Include="WicEncoder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">

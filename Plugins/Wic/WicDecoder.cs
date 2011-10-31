@@ -9,6 +9,7 @@ using System.IO;
 using ImageResizer.Util;
 using Microsoft.Test.Tools.WicCop.InteropServices.ComTypes;
 using ImageResizer.Plugins.Wic;
+using System.Runtime.InteropServices;
 
 namespace ImageResizer.Plugins.WicDecoder {
     public class WicDecoderPlugin : BuilderExtension, IPlugin, IFileExtensionPlugin, IIssueProvider {
@@ -67,11 +68,18 @@ namespace ImageResizer.Plugins.WicDecoder {
             var decoder = factory.CreateDecoderFromStream(streamWrapper, null,
                                                           WICDecodeOptions.WICDecodeMetadataCacheOnLoad);
 
-
-            //TODO: add support for &frame= and &page=0
-            frame = decoder.GetFrame(0);
-
-            return ConversionUtils.FromWic(frame);
+            try {
+                //TODO: add support for &frame= and &page=0
+                frame = decoder.GetFrame(0);
+                try {
+                    return ConversionUtils.FromWic(frame);
+                } finally {
+                    Marshal.FinalReleaseComObject(frame);
+                }
+            } finally {
+                Marshal.FinalReleaseComObject(decoder);
+                Marshal.FinalReleaseComObject(factory);
+            }
         }
 
         public IEnumerable<IIssue> GetIssues() {
