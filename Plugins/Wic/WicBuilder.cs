@@ -11,6 +11,7 @@ using Microsoft.Test.Tools.WicCop.InteropServices.ComTypes;
 using System.Drawing;
 using WicResize.InteropServices;
 using ImageResizer.Configuration;
+using ImageResizer.Plugins.Wic;
 
 namespace ImageResizer.Plugins.WicBuilder {
     public class WicBuilderPlugin : ImageBuilder, IPlugin, IIssueProvider {
@@ -115,6 +116,12 @@ namespace ImageResizer.Plugins.WicBuilder {
                 if (managedEncoder.MimeType.Equals("image/jpeg")) guidEncoder = Consts.GUID_ContainerFormatJpeg;
                 if (managedEncoder.MimeType.Equals("image/png")) guidEncoder = Consts.GUID_ContainerFormatPng;
                 if (managedEncoder.MimeType.Equals("image/gif")) guidEncoder = Consts.GUID_ContainerFormatGif;
+
+                WICBitmapInterpolationMode interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeFant;
+                if ("nearest".Equals(settings["w.filter"], StringComparison.OrdinalIgnoreCase)) interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeNearestNeighbor;
+                if ("bicubic".Equals(settings["w.filter"], StringComparison.OrdinalIgnoreCase)) interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeCubic;
+                if ("linear".Equals(settings["w.filter"], StringComparison.OrdinalIgnoreCase)) interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeLinear;
+
                 var encoder = factory.CreateEncoder(guidEncoder, null);
 
                 //Configure it, prepare output stream
@@ -137,13 +144,15 @@ namespace ImageResizer.Plugins.WicBuilder {
                 frame.GetSize(out origWidth,out origHeight);
                 Size orig = new Size((int)origWidth,(int)origHeight);
 
+                Guid pixelFormat;
+                frame.GetPixelFormat(out pixelFormat);
                 //Calculate the new size of the image and the canvas.
                 ImageState state = new ImageState(settings, orig, true);
                 Layout(state);
 
                 bool supportsTransparency = true;
 
-                RectangleF imageDest = PolygonMath.GetBoundingBox(state.layout["image"]);
+                Rectangle imageDest = PolygonMath.ToRectangle(PolygonMath.GetBoundingBox(state.layout["image"]));
 
                 //Set destination frame size
                 outputFrame.SetSize((uint)state.destSize.Width, (uint)state.destSize.Height);
@@ -151,31 +160,52 @@ namespace ImageResizer.Plugins.WicBuilder {
                 IWICBitmapSource imageData = frame; 
                 //Are we cropping? then daisy-chain a clipper
                 if (state.copyRect.Left != 0 || state.copyRect.Top != 0 || state.copyRect.Width != state.originalSize.Width || state.copyRect.Height != state.originalSize.Height) {
-                    var clipper = factory.CreateBitmapClipper();
-                    clipper.Initialize(imageData, new WICRect { X = (int)state.copyRect.X, Y = (int)state.copyRect.Y, Width = (int)state.copyRect.Width, Height = (int)state.copyRect.Height });
-                    imageData = clipper;
-                }
 
-                //Are we scaling? Then daisy-chain a scaler
-                if (imageDest.Width != state.originalSize.Width || imageDest.Height != state.originalSize.Height) {
-                    WICBitmapInterpolationMode interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeFant;
-                    if ("nearest".Equals(settings["w.filter"], StringComparison.OrdinalIgnoreCase)) interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeNearestNeighbor;
-                    if ("bicubic".Equals(settings["w.filter"], StringComparison.OrdinalIgnoreCase)) interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeCubic;
-                    if ("linear".Equals(settings["w.filter"], StringComparison.OrdinalIgnoreCase)) interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeLinear;
+                    //Cropping is absurdly slow... 4x slower than resizing!
+                    //Cropping after resizing (unintuitively) is faster.
+                    if (imageDest.Width != state.originalSize.Width || imageDest.Height != state.originalSize.Height) {
+                        double sx = (double)imageDest.Width / (double)state.copyRect.Width;
+                        double sy = (double)imageDest.Height / (double)state.copyRect.Height;
+                        uint uncroppedDestWidth = (uint)Math.Round(sx * state.originalSize.Width);
+                        uint uncroppedDestHeight = (uint)Math.Round(sy * state.originalSize.Height);
+                        
+                        var scaler = factory.CreateBitmapScaler();
+                        scaler.Initialize(imageData, uncroppedDestWidth, uncroppedDestHeight, interpolationMode);
+  
+                        //TODO: cropping is not consistent with GDI.
+                        var clipper = factory.CreateBitmapClipper();
+                        clipper.Initialize(scaler, new WICRect { 
+                            X = (int)Math.Floor((double)state.copyRect.X * sx),
+                            Y = (int)Math.Floor((double)state.copyRect.Y * sy), 
+                            Width = imageDest.Width, 
+                            Height = imageDest.Height
+                        });
+                        imageData = clipper;
+
+                    } else {
+                        var clipper = factory.CreateBitmapClipper();
+                        clipper.Initialize(imageData, new WICRect { X = (int)state.copyRect.X, Y = (int)state.copyRect.Y, Width = (int)state.copyRect.Width, Height = (int)state.copyRect.Height });
+                        imageData = clipper;
+                    }
+                    //If we're scaling but not cropping.
+                }else if (imageDest.Width != state.originalSize.Width || imageDest.Height != state.originalSize.Height) {
                     var scaler = factory.CreateBitmapScaler();
                     scaler.Initialize(imageData, (uint)imageDest.Width, (uint)imageDest.Height, interpolationMode);
                     imageData = scaler;
                 }
 
+                
+
                 //Are we padding? Then we have to do an intermediate write.
                 if (state.destSize.Width != imageDest.Width || state.destSize.Height != imageDest.Height){
-                    //IWICBitmap canvas = factory.CreateBitmap((uint)state.destSize.Width, (uint)state.destSize.Height, Consts.GUID_WICPixelFormat32bppRGBA, WICBitmapCreateCacheOption.WICBitmapCacheOnLoad);
-                    //TODO: Write unsafe code to draw padding, etc.
+                    byte[] bgcolor = new byte[ConversionUtils.BytesPerPixel(pixelFormat)];
+                    for (int i = 0; i < bgcolor.Length; i++) bgcolor[i] = 255; //White
+
+                    var padder = new WicBitmapPadder(imageData, imageDest.X, imageDest.Y, state.destSize.Width - (imageDest.X + imageDest.Width), state.destSize.Height - (imageDest.Y + imageDest.Height), bgcolor, null);
+                    imageData = padder;
                 }
-                //TODO: no support for background color or padding
-               
                 // Write the data to the output frame
-                outputFrame.WriteSource(imageData, new WICRect { X = 0, Y = 0, Width = (int)imageDest.Width, Height = (int)imageDest.Height });
+                outputFrame.WriteSource(imageData,null);
                 outputFrame.Commit();
                 encoder.Commit();
 
