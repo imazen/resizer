@@ -9,6 +9,8 @@ using System.Drawing;
 
 namespace ImageResizer.Plugins.FreeImageScaling {
     public class FreeImageScalingPlugin : BuilderExtension, IPlugin, IQuerystringPlugin {
+        public FreeImageScalingPlugin() {
+        }
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             return this;

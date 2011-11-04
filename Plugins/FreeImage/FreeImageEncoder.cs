@@ -23,7 +23,8 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
             get { return encodingOptions; }
             set { encodingOptions = value; }
         }
-   
+        public FreeImageEncoderPlugin() {
+        }
 
         public FreeImageEncoderPlugin(ResizeSettings settings, object original) {
             ImageFormat originalFormat = DefaultEncoder.GetOriginalFormat(original);
