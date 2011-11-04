@@ -10,7 +10,8 @@ using System.Diagnostics;
 
 namespace ImageResizer.Plugins.FreeImageDecoder {
     public class FreeImageDecoderPlugin : BuilderExtension, IPlugin, IFileExtensionPlugin, IIssueProvider {
-
+        public FreeImageDecoderPlugin() {
+        }
         private static IEnumerable<string> supportedExts = null;
         public IPlugin Install(Configuration.Config c) {
             if (supportedExts == null && FreeImage.IsAvailable()) {
