@@ -40,6 +40,12 @@ namespace ImageResizer.Plugins.Basic {
                 c.Pipeline.ModifiedQueryString.Remove("src");
 
                 //Grayscale and zoom not supported yet
+                if (string.IsNullOrEmpty(c.Pipeline.ModifiedQueryString["s.grayscale"]) &&
+                    !string.IsNullOrEmpty(c.Pipeline.ModifiedQueryString["greyscale"])) c.Pipeline.ModifiedQueryString["s.grayscale"] = "true";
+
+                if (string.IsNullOrEmpty(c.Pipeline.ModifiedQueryString["s.invert"]) &&
+                    !string.IsNullOrEmpty(c.Pipeline.ModifiedQueryString["invert"])) c.Pipeline.ModifiedQueryString["s.invert"] = "true";
+
 
                 //Mimic aspect-ratio destruction
                 if (string.IsNullOrEmpty(c.Pipeline.ModifiedQueryString["stretch"]))
@@ -109,7 +115,7 @@ namespace ImageResizer.Plugins.Basic {
                     c.Pipeline.ModifiedQueryString.Remove("w");
                     c.Pipeline.ModifiedQueryString.Remove("h");
                     //Note - the module will not lose aspect ratio even though BIP does. Although implemented for other syntaxes, 
-                    // this syntax (w/h) may eventually be adopted by the image resizer, so we don't want issues down the roat.
+                    // this syntax (w/h) may eventually be adopted by the image resizer, so we don't want issues down the road.
                 }
                 
 
