@@ -195,6 +195,11 @@ namespace ImageResizer.Util {
                 if (angle == 90) return (RotateFlipType)7;
                 if (angle == 180) return (RotateFlipType)5;
                 if (angle == 270) return (RotateFlipType)6;
+            } else if (flip == (RotateFlipType)2) {
+                if (angle == 0) return (RotateFlipType)2;
+                if (angle == 90) return (RotateFlipType)3;
+                if (angle == 180) return (RotateFlipType)0;
+                if (angle == 270) return (RotateFlipType)1;
             }
 
             throw new ArgumentException("Valid flip values are RotateNoneFlipNone, RotateNoneFlipX, RotateNoneFlipY, and RotateNoneFlipXY. Rotation must be specified with Rotate or srcRotate instead. Received: " + flip.ToString());
