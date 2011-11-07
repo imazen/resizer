@@ -61,10 +61,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\dlls\release\ImageResizer.Plugins.DiskCache.dll</HintPath>
     </Reference>
-    <Reference Include="ImageResizer.Plugins.FriendlyUrls, Version=3.0.12.31526, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\release\ImageResizer.Plugins.FriendlyUrls.dll</HintPath>
-    </Reference>
     <Reference Include="ImageResizer.Plugins.PrettyGifs, Version=3.0.12.31526, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\dlls\release\ImageResizer.Plugins.PrettyGifs.dll</HintPath>
@@ -105,11 +101,39 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="griddata.js" />
+    <Content Include="css\ui-darkness\images\ui-bg_flat_30_cccccc_40x100.png" />
+    <Content Include="css\ui-darkness\images\ui-bg_flat_50_5c5c5c_40x100.png" />
+    <Content Include="css\ui-darkness\images\ui-bg_glass_20_555555_1x400.png" />
+    <Content Include="css\ui-darkness\images\ui-bg_glass_40_0078a3_1x400.png" />
+    <Content Include="css\ui-darkness\images\ui-bg_glass_40_ffc73d_1x400.png" />
+    <Content Include="css\ui-darkness\images\ui-bg_gloss-wave_25_333333_500x100.png" />
+    <Content Include="css\ui-darkness\images\ui-bg_highlight-soft_80_eeeeee_1x100.png" />
+    <Content Include="css\ui-darkness\images\ui-bg_inset-soft_25_000000_1x100.png" />
+    <Content Include="css\ui-darkness\images\ui-bg_inset-soft_30_f58400_1x100.png" />
+    <Content Include="css\ui-darkness\images\ui-icons_222222_256x240.png" />
+    <Content Include="css\ui-darkness\images\ui-icons_4b8e0b_256x240.png" />
+    <Content Include="css\ui-darkness\images\ui-icons_a83300_256x240.png" />
+    <Content Include="css\ui-darkness\images\ui-icons_cccccc_256x240.png" />
+    <Content Include="css\ui-darkness\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="css\ui-darkness\jquery-ui-1.8.16.custom.css" />
+    <Content Include="filters.js" />
     <Content Include="css\demo.css" />
     <Content Include="css\hover.css" />
     <Content Include="css\state.gif" />
     <Content Include="Filters.htm" />
+    <Content Include="grid.css" />
+    <Content Include="Grid.htm" />
+    <Content Include="grid.js" />
     <Content Include="js\hover.js" />
+    <Content Include="js\jquery-1.6.2.min.js" />
+    <Content Include="js\jquery-ui-1.8.16.custom.min.js" />
+    <Content Include="js\jquery.ba-bbq.js" />
+    <Content Include="js\jquery.ba-bbq.min.js" />
+    <Content Include="js\jquery.ba-urlinternal.js" />
+    <Content Include="js\jquery.ba-urlinternal.min.js" />
+    <Content Include="js\jquery.collapse.js" />
+    <Content Include="js\jquery.cookie.js" />
     <Content Include="js\Markdown.Converter.js" />
     <Content Include="js\querystring.js" />
     <Content Include="Misc\BatchResizeAndZip.aspx" />
@@ -190,6 +214,10 @@
     <ProjectReference Include="..\..\Plugins\Watermark\ImageResizer.Plugins.Watermark.csproj">
       <Project>{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}</Project>
       <Name>ImageResizer.Plugins.Watermark</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\Wic\ImageResizer.Plugins.Wic.csproj">
+      <Project>{4A55B40D-1E0D-4D1F-8D96-25F624847E53}</Project>
+      <Name>ImageResizer.Plugins.Wic</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
