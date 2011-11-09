@@ -12,6 +12,7 @@ namespace ImageResizer.ReleaseBuilder {
     public class Build :Interaction {
         FolderFinder f = new FolderFinder("Core" );
         Devenv d = null;
+        Devenv extras = null;
         FsQuery q = null;
         VersionEditor v = null;
         GitManager g = null;
@@ -22,6 +23,7 @@ namespace ImageResizer.ReleaseBuilder {
         string linkBase = "http://downloads.imageresizing.net/";
         public Build() {
             d = new Devenv(Path.Combine(f.FolderPath,"ImageResizer.sln"));
+            extras = new Devenv(Path.Combine(f.FolderPath, "Other-Plugins-With-External-Dependencies.sln"));
             v = new VersionEditor(Path.Combine(f.FolderPath, "SharedAssemblyInfo.cs"));
             g = new GitManager(f.ParentPath);
             nuget = new NugetManager(Path.Combine(f.ParentPath, "nuget"));
@@ -37,8 +39,8 @@ namespace ImageResizer.ReleaseBuilder {
             packages.Add(new PackageDescriptor("allbinaries", PackAllBinaries));
         }
 
-        public string getReleasePath(string packageBase, string ver,  string kind) {
-            return Path.Combine(Path.Combine(f.ParentPath, "Releases"), packageBase + ver.Trim('-') + '-' + kind + "-" + DateTime.UtcNow.ToString("MMM-d-yyyy") + ".zip");
+        public string getReleasePath(string packageBase, string ver,  string kind, string hotfix) {
+            return Path.Combine(Path.Combine(f.ParentPath, "Releases"), packageBase + ver.Trim('-') + '-' + kind + "-" + hotfix.Trim('-') +  "-" + DateTime.UtcNow.ToString("MMM-d-yyyy") + ".zip");
         }
 
         public NameValueCollection GetNugetVariables() {
@@ -47,7 +49,18 @@ namespace ImageResizer.ReleaseBuilder {
             nvc["pluginsdlldir"] = @"..\dlls\trial";
             nvc["coredlldir"] = @"..\dlls\release";
             nvc["iconurl"] = "http://imageresizing.net/images/logos/ImageIconPSD100.png";
-            nvc["tags"] = "Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing disk caching gif png octree quanitization animated gifs dithering";
+            nvc["tags"] = "ImageResizer ImageResizing.Net Resize Resizer Resizing Crop Cropper Cropping automatic jCrop " +
+            "asp:Image Photo Image Rotate Flip Drawing System.Drawing WIC WPF disk caching jpeg jpg gif png ASP.NET MVC IIS " +
+            "transparency octree quanitization animated gifs dithering " +
+            "Gaussian blur sharpen sharpening radius contrast saturation hue brightness histogram sepia grayscale invert color " +
+            "pixel shader plugins noise removal exif rotation autorotate azure azurereader worker blob blobstore zip batch compress cache-control expires " +
+            "amazon cloudfront s3 quality jpeg format drop shadow 404 handling url rewriting gradient freeimage " +
+            "CatmullRom Lanczos3 bspline box bicubic bilinear CRW CR2 NEF RAF DNG MOS KDC DCR " +
+            "404 redirect actionresult routing logging nlog psd remote url download webclient virtual path provider virtualpathprovider CAIR seam carving " +
+            "content aware image resizing alpha channel grayscale y ry ntsc bt709 flat size limit sizelimiting getthumbnailimage bitmap SQL database query blob " +
+            "watermark virtual folder text overlay image watermark automatic whitespace trimming product images thumbnails " + 
+            "padding pad margin borders background color bgcolor InterpolationMode Fant";
+
             return nvc;
         }
 
@@ -102,7 +115,7 @@ namespace ImageResizer.ReleaseBuilder {
             bool isBuilding = false;
             StringBuilder downloadPaths = new StringBuilder();
             foreach (PackageDescriptor desc in packages) {
-                desc.Path = getReleasePath(packageBase, infoVer + packageHotfix, desc.Kind);
+                desc.Path = getReleasePath(packageBase, infoVer, desc.Kind, packageHotfix);
                 if (desc.Exists) say("\n" + Path.GetFileName(desc.Path) + " already exists");
                 string opts = "";
 
@@ -136,6 +149,7 @@ namespace ImageResizer.ReleaseBuilder {
 
                     desc.VariableSubstitutions = GetNugetVariables();
                     desc.VariableSubstitutions["version"] = nugetVer;
+
                     desc.Version = nugetVer;
 
                     desc.OutputDirectory = Path.Combine(Path.Combine(f.ParentPath, "Releases", "nuget-packages"));
@@ -216,11 +230,13 @@ namespace ImageResizer.ReleaseBuilder {
                 }
 
                 //6 - if (c) was specified for any package, build all.
-                BuildAll();
+                bool success = BuildAll();
 
                 //7 - Revert file to state at commit (remove 'full' version numbers and 'commit' value)
                 v.Contents = fileContents;
                 v.Save();
+
+                if (!success) return; //If the build didn't go ok, pause and exit
 
                 //8b - run cleanup routine
                 RemoveUselessFiles();
@@ -301,13 +317,24 @@ namespace ImageResizer.ReleaseBuilder {
             d.Run("/Clean Debug");
             d.Run("/Clean Release");
             d.Run("/Clean Trial");
+            extras.Run("/Clean Debug");
+            extras.Run("/Clean Release");
+            extras.Run("/Clean Trial");
 
         }
 
-        public void BuildAll() {
-            d.Run("/Build Release");//Have to run Release first, since ImageResizerGUI includes the DLLs.
-            d.Run("/Build Debug");
+        public bool BuildAll() {
+            int result = d.Run("/Build Release") + //Have to run Release first, since ImageResizerGUI includes the DLLs.
+            d.Run("/Build Debug") +
             d.Run("/Build Trial");
+            int extrasResult =
+            extras.Run("/Build Release") +
+            extras.Run("/Build Debug") +
+            extras.Run("/Build Trial");
+
+            if (result > 0 && !ask("There were build errors. Continue?")) return false;
+            else if (extrasResult > 0 && !ask("There were build errors for Plugins With External Dependencies. Continue?")) return false;
+            return true;
         }
 
 
@@ -337,7 +364,8 @@ namespace ImageResizer.ReleaseBuilder {
 
 
         public string[] standardExclusions = new string[]{
-                "/.git","^/Releases","/Hidden/","^/Legacy","^/Tools/(Builder|BuildTools|docu)","^/Samples/Images/*/*","/Thumbs.db$","/.DS_Store$",".suo$",".user$"
+                "/.git","^/Releases","/Hidden/","^/Legacy","^/Tools/(Builder|BuildTools|docu)",
+				"^/Samples/Images/*/*","/Thumbs.db$","/.DS_Store$",".suo$",".user$", "/._","/~$"
             };
 
         public void PrepareForPackaging() {
