@@ -5,6 +5,8 @@ using System.Collections.Specialized;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using ImageResizer.Util;
+using System.IO;
+using System.Drawing.Imaging;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
@@ -44,7 +46,12 @@ namespace ImageResizer.Plugins.Basic {
             protected ResizeSettings query;
 
             public System.IO.Stream Open() {
-                throw new NotImplementedException();
+                MemoryStream ms = new MemoryStream();
+                using (Bitmap b = GetBitmap()) {
+                    b.Save(ms, ImageFormat.Png);
+                }
+                ms.Seek(0, SeekOrigin.Begin);
+                return ms;
             }
 
             public System.Drawing.Bitmap GetBitmap() {
