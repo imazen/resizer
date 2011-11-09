@@ -88,6 +88,10 @@
     <Content Include="Site.Master" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Core.Mvc\ImageResizer.Mvc.csproj">
+      <Project>{4181B9C4-1EAF-4070-8571-2EE25475547E}</Project>
+      <Name>ImageResizer.Mvc</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
