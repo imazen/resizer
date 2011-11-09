@@ -78,6 +78,7 @@
     <Compile Include="Configuration\UrlAuthorizationEventArgs.cs" />
     <Compile Include="ImageBuilder.Job.cs" />
     <Compile Include="Plugins\Basic\AutoRotate.cs" />
+    <Compile Include="Plugins\Basic\DefaultSettings.cs" />
     <Compile Include="Plugins\Basic\FolderResizeSyntax.cs" />
     <Compile Include="Plugins\Basic\ImageHandlerSyntax.cs">
       <SubType>Code</SubType>
