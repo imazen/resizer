@@ -31,7 +31,31 @@ namespace ImageResizer.Plugins.Basic {
         }
 
 		public string GenerateOutput(HttpContext context, Config c) {
+            //Get loaded assemblies for later use
+			Assembly[] asms = AppDomain.CurrentDomain.GetAssemblies();
+
+
 			List<IIssue> issues = new List<IIssue>(c.AllIssues.GetIssues());
+            
+            //Verify we are using MvcRoutingShim if System.Web.Routing is loaded.
+            bool routingLoaded = false;
+			foreach (Assembly a in asms) {
+                if (new AssemblyName(a.FullName).Name.StartsWith("System.Web.Routing", StringComparison.OrdinalIgnoreCase)) {
+                    routingLoaded = true; break;
+                }
+            }
+            bool usingRoutingShim = false;
+            foreach (IPlugin p in c.Plugins.AllPlugins){
+                if (p.GetType().Name.EndsWith("MvcRoutingShimPlugin", StringComparison.OrdinalIgnoreCase)) {
+                    usingRoutingShim = true; break;
+                }
+            }
+
+            if (routingLoaded && !usingRoutingShim) issues.Add(new Issue(
+                "The MvcRoutingShim plugin must be installed if you are using MVC or System.Web.Routing",
+                "System.Web.Routing is loaded. You must install the MvcRoutingShim plugin. Add ImageResizer.Mvc.dll to your project, and add '<add name=\"MvcRoutingPlugin\" />' to the <plugins> section of web.config.", IssueSeverity.Critical));
+
+
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine("Image resizer diagnostic sheet\t\t" + DateTime.UtcNow.ToString() + "\n");
 			sb.AppendLine(issues.Count + " Issues detected:\n");
@@ -86,17 +110,18 @@ namespace ImageResizer.Plugins.Basic {
             Dictionary<string, bool> usedAssemblies = new Dictionary<string,bool>(StringComparer.OrdinalIgnoreCase);
             foreach (IPlugin p in c.Plugins.AllPlugins) 
                 usedAssemblies[p.GetType().Assembly.FullName] = true;
+
             
-			Assembly[] asms = AppDomain.CurrentDomain.GetAssemblies();
 			foreach (Assembly a in asms) {
                 StringBuilder asb = new StringBuilder();
 
 				AssemblyName assemblyName = new AssemblyName(a.FullName);
+                
 				asb.Append(assemblyName.Name.PadRight(40, ' '));
 
 				asb.Append(" Assembly: " + assemblyName.Version.ToString().PadRight(15));
 
-
+               
                 object[] attrs;
                 
 				attrs = a.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
@@ -110,7 +135,7 @@ namespace ImageResizer.Plugins.Basic {
 
 				asb.AppendLine();
 
-
+                
                 if (assemblyName.Name.StartsWith("ImageResizer.Plugins", StringComparison.OrdinalIgnoreCase) && !usedAssemblies.ContainsKey(a.FullName)) {
                     unusedPlugins.Append(asb.ToString());
                 }
