@@ -47,6 +47,11 @@ namespace ImageResizer.Caching {
 
             //Valid until expires (I.e, ignore refresh requests)
             context.Response.Cache.SetValidUntilExpires(headers.ValidUntilExpires);
+
+            //Vary by the querystring
+            //context.Response.Cache.VaryByParams["*"] = true;
+
+
             //Omit the Vary: * 
             context.Response.Cache.SetOmitVaryStar(headers.SuppressVaryHeader);
             //Add dependencies to the server cache
@@ -54,7 +59,7 @@ namespace ImageResizer.Caching {
                 context.Response.AddCacheDependency(d);
 
             //Set Cache-Control: header
-            context.Response.Cache.SetCacheability(headers.CacheControl);
+            context.Response.Cache.SetCacheability(headers.CacheControl); 
             
             //Apply new headers
             foreach (string key in headers.Headers)
