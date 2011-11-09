@@ -1,8 +1,0 @@
-﻿            WebRequest request = WebRequest.Create("http://images.imageresizing.net/2_computers.gif");
-            WebResponse response = request.GetResponse();
-
-            using(Stream input = response.GetResponseStream())
-            {
-                context.Response.ContentType = "image/gif";
-                ImageBuilder.Current.Build(input, context.Response.OutputStream, new ResizeSettings("?width=50")); 
-            }
