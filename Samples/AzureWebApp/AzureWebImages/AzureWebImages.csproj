@@ -59,7 +59,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
-    <Content Include="Images\rose-leaf.jpg" />
     <Content Include="Upload.aspx" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -85,9 +84,7 @@
     </Compile>
     <Compile Include="Webrole.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\ImageResizer.csproj">
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
