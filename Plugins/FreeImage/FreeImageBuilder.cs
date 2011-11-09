@@ -12,96 +12,118 @@ using ImageResizer.Plugins.Basic;
 using System.IO;
 using ImageResizer.Plugins.FreeImageEncoder;
 using ImageResizer.Plugins.FreeImageScaling;
+using ImageResizer.Configuration;
+using System.Web.Hosting;
 
 namespace ImageResizer.Plugins.FreeImageBuilder {
-    public class FreeImageBuilderPlugin :ImageBuilder, IPlugin, IIssueProvider {
+    public class FreeImageBuilderPlugin :BuilderExtension, IPlugin, IIssueProvider {
 
         public FreeImageBuilderPlugin(){
         }
-         /// <summary>
-        /// Creates a new FreeImageBuilder instance with no extensions.
-        /// </summary>
-        public FreeImageBuilderPlugin(IEncoderProvider encoderProvider, IVirtualImageProvider virtualFileProvider)
-            : base(encoderProvider,virtualFileProvider) {
-        }
 
-        /// <summary>
-        /// Create a new instance of FreeImageBuilder using the specified extensions and encoder provider. Extension methods will be fired in the order they exist in the collection.
-        /// </summary>
-        /// <param name="extensions"></param>
-        /// <param name="encoderProvider"></param>
-        public FreeImageBuilderPlugin(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider, IVirtualImageProvider virtualFileProvider)
-            : base(extensions, encoderProvider,virtualFileProvider) {
-        }
-
-        
-        /// <summary>
-        /// Creates another instance of the class using the specified extensions. Subclasses should override this and point to their own constructor.
-        /// </summary>
-        /// <param name="extensions"></param>
-        /// <param name="writer"></param>
-        /// <returns></returns>
-        public override ImageBuilder Create(IEnumerable<BuilderExtension> extensions, IEncoderProvider writer, IVirtualImageProvider virtualFileProvider) {
-            return new FreeImageBuilderPlugin(extensions, writer,virtualFileProvider);
-        }
-        /// <summary>
-        /// Copies the instance along with extensions. Subclasses must override this.
-        /// </summary>
-        /// <returns></returns>
-        public override ImageBuilder Copy() {
-            return new FreeImageBuilderPlugin(this.exts, this.EncoderProvider, this.VirtualFileProvider);
-        }
-
+        Config c;
         public IPlugin Install(Configuration.Config c) {
-            c.UpgradeImageBuilder(new FreeImageBuilderPlugin(c.CurrentImageBuilder.EncoderProvider,VirtualFileProvider));
             c.Plugins.add_plugin(this);
+            this.c = c;
             return this;
         }
 
         public bool Uninstall(Configuration.Config c) {
-            return false; // We can't uninstall this.
+            c.Plugins.remove_plugin(this);
+            return true;
+            
         }
 
+        /// <summary>
+        /// Adds alternate pipeline based on FreeImage. Invoked by &builder=freeimage. 
+        /// This method doesn't handle job.DisposeSource or job.DesposeDest or settings filtering, that's handled by ImageBuilder.
+        /// All the bitmap processing is handled by buildFiBitmap, this method handles all the I/O
+        /// </summary>
+        /// <param name="job"></param>
+        /// <returns></returns>
+        protected override RequestedAction BuildJob(ImageBuilder.Job job) {
+            if (!"freeimage".Equals(job.Settings["builder"])) return RequestedAction.None;
+            if (!FreeImageAPI.FreeImage.IsAvailable()) return RequestedAction.None;
 
-        public override string Build(object source, object dest, ResizeSettings settings, bool disposeSource, bool addFileExtension) {
-            if ((source is String || source is Stream || source is byte[]) && (dest is String || dest is Stream || dest is BitmapHolder) && !addFileExtension) {
-                if (BuildUnmanaged(source, dest, settings)) return dest as string;
-            }
-            return base.Build(source, dest, settings, disposeSource, addFileExtension);
-        }
-
-        protected virtual bool BuildUnmanaged(object source, object dest, ResizeSettings settings) {
-            if (!"freeimage".Equals(settings["builder"])) return false;
-
-            if (!FreeImageAPI.FreeImage.IsAvailable()) return false;
-
-
-            // Load the example bitmap.
-            FIBITMAP original = FIBITMAP.Zero;
-            FIBITMAP final = FIBITMAP.Zero;
-            if (source is byte[]) source = new MemoryStream((byte[])source); 
-            if (source is String)
-                original = FreeImage.LoadEx((String)source); //Supports all kinds of input formats.
-            else if (source is Stream)
-                original = FreeImage.LoadFromStream((Stream)source);
-            if (original.IsNull) return false;
+            // Variables
+            Stream s = null;
+            bool disposeStream = !(job.Source is Stream);
+            long originalPosition = 0;
+            bool restoreStreamPosition = false;
             try{
-                //What is our destination format
-                IEncoder managedEncoder = EncoderProvider.GetEncoder(settings, source); //Use the existing pipeline to parse the querystring
-                FREE_IMAGE_FORMAT destFormat = FreeImage.GetFIFFromMime(managedEncoder.MimeType); //Use the resulting mime-type to determine the output format.
-                //This prevents us from supporting output formats that don't already have registered encoders. Good, right?
-                
-                
+                //Get a Stream instance for the job
+                string path;
+                s = c.CurrentImageBuilder.GetStreamFromSource(job.Source, job.Settings, ref disposeStream, out path, out restoreStreamPosition);
+                if (s == null) return  RequestedAction.None;
+                if (job.ResetSourceStream) restoreStreamPosition = true;
+                job.SourcePathData = path;
+            
+                //Save the original stream positione
+                originalPosition = (restoreStreamPosition) ? s.Position : - 1;
 
+                FIBITMAP b = FIBITMAP.Zero;
+                try {
+                    //What is our destination format
+                    IEncoder managedEncoder = c.Plugins.GetEncoder(job.Settings, job.SourcePathData); //Use the existing pipeline to parse the querystring
+                    //FREE_IMAGE_FORMAT destFormat = FreeImage.GetFIFFromMime(managedEncoder.MimeType); //Use the resulting mime-type to determine the output format.
+                    //This prevents us from supporting output formats that don't already have registered encoders. Good, right?
+
+                    bool supportsTransparency = managedEncoder.SupportsTransparency;
+                    //Do all the bitmap stuff in another method
+                    b = buildFiBitmap(s, job, supportsTransparency);
+                    if (b.IsNull) return RequestedAction.None;
+
+                    // Try to save the bitmap
+                    if (job.Dest is string || job.Dest is Stream) {
+                        FreeImageEncoderPlugin e = new FreeImageEncoderPlugin(job.Settings, path);
+                        if (job.Dest is string) {
+                            string destPath = job.Dest as string;
+                            //Convert app-relative paths
+                            if (destPath.StartsWith("~", StringComparison.OrdinalIgnoreCase)) destPath = HostingEnvironment.MapPath(destPath);
+
+                            //Add the file extension if specified.
+                            if (job.AddFileExtension) {
+                                if (e != null) destPath += "." + e.Extension; //NOTE: These may differ from the normal default extensions
+                            }
+                            job.FinalPath = destPath;
+                            if (!FreeImage.Save(e.Format, b, destPath, e.EncodingOptions)) return RequestedAction.None;
+                        } else if (job.Dest is Stream) {
+                            if (!FreeImage.SaveToStream(b, (Stream)job.Dest, e.Format, e.EncodingOptions)) return RequestedAction.None;
+                        }
+                    } else if (job.Dest == typeof(Bitmap)) {
+                        job.Result = FreeImage.GetBitmap(b);
+                    } else return RequestedAction.None;
+                } finally {
+                    //Ensure we unload the resulting bitmap
+                   if (!b.IsNull) FreeImage.UnloadEx(ref b);
+                }
+                return RequestedAction.Cancel;
+            }finally{
+                if (s != null && restoreStreamPosition && s.CanSeek) s.Seek(originalPosition, SeekOrigin.Begin);
+                if (disposeStream) s.Dispose();
+            }
+
+        }
+        /// <summary>
+        /// Builds an FIBitmap from the stream and job.Settings 
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="job"></param>
+        /// <returns></returns>
+        protected FIBITMAP buildFiBitmap(Stream s, ImageBuilder.Job job, bool supportsTransparency){
+
+            ResizeSettings settings = job.Settings;
+            FIBITMAP original = FreeImage.LoadFromStream((Stream)s);
+            if (original.IsNull) return FIBITMAP.Zero;
+            FIBITMAP final = FIBITMAP.Zero;
+            
+            try{
                 //Find the image size
                 Size orig = new Size( (int)FreeImage.GetWidth(original),  (int)FreeImage.GetHeight(original));
 
                 //Calculate the new size of the image and the canvas.
                 ImageState state = new ImageState(settings, orig, true);
                 Layout(state);
-
-                bool supportsTransparency = true;
-
                 RectangleF imageDest = PolygonMath.GetBoundingBox(state.layout["image"]);
 
                 if (imageDest.Width != orig.Width || imageDest.Height != orig.Height) {
@@ -109,7 +131,7 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
                     bool temp;
                     final = FreeImage.Rescale(original, (int)imageDest.Width, (int)imageDest.Height, FreeImageScalingPlugin.ParseResizeAlgorithm(settings["fi.scale"], FREE_IMAGE_FILTER.FILTER_BOX, out temp));
                     FreeImage.UnloadEx(ref original);
-                    if (final.IsNull) return false;
+                    if (final.IsNull) return FIBITMAP.Zero;
                 } else {
                     final = original;
                 }
@@ -131,27 +153,15 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
                                 FREE_IMAGE_COLOR_OPTIONS.FICO_RGBA);
  
                     FreeImage.UnloadEx(ref original);
-                    if (final.IsNull) return false;
+                    if (final.IsNull) return FIBITMAP.Zero;
                 }
 
-                // Try to save the bitmap
-                if (dest is string || dest is Stream){
-                    FreeImageEncoderPlugin e = new FreeImageEncoderPlugin(settings, source);
-                    if (dest is string){
-                        if (!FreeImage.Save(e.Format, final, (string)dest, e.EncodingOptions)) return false;
-                    } else if (dest is Stream) {
-                        if (!FreeImage.SaveToStream(final, (Stream)dest, e.Format,e.EncodingOptions)) return false;
-                    }
-                } else if (dest is BitmapHolder){
-                    ((BitmapHolder)dest).bitmap = FreeImage.GetBitmap(final);
-                }
-
+                return final;
             
             }finally{
-                if (!original.IsNull) FreeImage.UnloadEx(ref original);
-                if (!original.IsNull) FreeImage.UnloadEx(ref final);
+                //Ensure we unload the source bitmap (unless it's also the final one)
+                if (original != final && !original.IsNull) FreeImage.UnloadEx(ref original);
             }
-            return true;
         }
 
 

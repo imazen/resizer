@@ -66,10 +66,6 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
         }
         int colors = -1;
 
-        public FreeImageEncoderPlugin() {
-           
-        }
-
 
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
