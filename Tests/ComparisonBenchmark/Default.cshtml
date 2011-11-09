@@ -1,8 +1,9 @@
 ﻿@using System.Drawing;
-@using App_code
 @using ImageResizer;
 @using Microsoft.Test.Tools.WicCop.InteropServices.ComTypes;
 @using System.Diagnostics;
+@using System.Drawing.Drawing2D;
+@using Benchmark
 
 <!doctype html>
 <html><head><title>Image resizing benchmark</title>
@@ -16,9 +17,17 @@
                 <tr>
                     <td>Size</td>
                     <td>Quality</td>
-                     @{ var systems = new string[] { "ImageResizer","ImageResizer"};}
+                     @{ var systems = new string[] { "ImageResizer", "GDI", "GDI(defaults=bertrand)", "GDI(defaults=bertrand;blend=SourceOver)","GDI(defaults=bertrand;filter=HighQualityBicubic)" ,
+                            "GDI(defaults=bertrand;filter=HighQualityBicubic;blend=SourceOver)"};
+                       }
                             
-                            //"ImageResizer(builder=freeimage;fi.filter=catmullrom)", "ImageResizer(builder=wic;w.filter=fant)",
+                            /* 
+                        InterpolationMode interpolationMode = ImageResizer.Util.Utils.parseEnum<InterpolationMode>(s["filter"], InterpolationMode.HighQualityBicubic); ;
+                        SmoothingMode smoothingMode = ImageResizer.Util.Utils.parseEnum<SmoothingMode>(s["smoothing"], SmoothingMode.HighQuality);
+                        PixelOffsetMode pixelMode = ImageResizer.Util.Utils.parseEnum<PixelOffsetMode>(s["pixel"], PixelOffsetMode.HighQuality);
+                        CompositingQuality compositingQuality = ImageResizer.Util.Utils.parseEnum<CompositingQuality>(s["compose"], CompositingQuality.HighQuality);
+                        CompositingMode compositingMode = ImageResizer.Util.Utils.parseEnum<CompositingMode>(s["blend"], CompositingMode.SourceOver);*/
+                            //"ImageResizer(builder=freeimage;fi.filter=catmullrom)",
                               //                      "ImageResizer(builder=wic;w.filter=nearest)", "ImageResizer(speed=4)", "WIC", "WPF", "GDI" };}
                      @foreach (string sys in systems) {
                         @: <td>@(sys) time</td>
@@ -33,8 +42,8 @@
 @{
     
     var files = Directory.GetFiles(Server.MapPath("~/images"), "*.jpg");
-    var qualities = new int[] { 100 };
-    qualities = new int[] { 10, 25, 50, 75, 80, 85, 90, 95, 100 }; //To get a better distribution without increasing benchmark run time.
+    var qualities = new int[] { 90 };
+    //qualities = new int[] { 10, 25, 50, 75, 80, 85, 90, 95, 100 }; //To get a better distribution without increasing benchmark run time.
     
     foreach (var thumbnailSize in new int[]{150,600}){
     
@@ -61,8 +70,8 @@
                 if (system.StartsWith("ImageResizer", StringComparison.OrdinalIgnoreCase)){
                     string settings = system.Length > 12 ? system.Substring(12).Trim('(', ')') : "";
                     var s = new ResizeSettings(settings);
-                    s.MaxWidth = thumbnailSize;
-                    s.MaxHeight = thumbnailSize;
+                    s.Width = thumbnailSize;
+                    s.Height = thumbnailSize;
                     s.Format = "jpg";
                     s.Quality = quality;
                     
@@ -108,7 +117,7 @@
                         var bitFrame = Utils.WpfResize(photo, width, height);
                         resized = Utils.ToByteArrayWpf(bitFrame, quality);
                     }
-                 }else if (system.Equals("GDI", StringComparison.OrdinalIgnoreCase)){
+                 }else if (system.StartsWith("GDI", StringComparison.OrdinalIgnoreCase)){
                       using (var photoStream = new MemoryStream(photoBytes)){
                         var photo = new Bitmap(photoStream,true);
                         int width, height;
@@ -120,7 +129,37 @@
                             width = photo.Width * thumbnailSize / photo.Height;
                             height = thumbnailSize;
                         }
-                        using (var bitmap = Utils.GdiResize(photo, width, height)) {
+
+                        string settings = system.Length > 3 ? system.Substring(3).Trim('(', ')') : "";
+                        var s = new ResizeSettings(settings);
+
+                          
+                          
+                        InterpolationMode interpolationMode =  InterpolationMode.HighQualityBicubic; ;
+                        SmoothingMode smoothingMode = SmoothingMode.HighQuality;
+                        PixelOffsetMode pixelMode = PixelOffsetMode.HighQuality;
+                        CompositingQuality compositingQuality = CompositingQuality.HighQuality;
+                        CompositingMode compositingMode = CompositingMode.SourceOver;
+                          
+                          
+                         if ("bertrand".Equals(s["defaults"], StringComparison.OrdinalIgnoreCase)){
+                              interpolationMode = InterpolationMode.Bicubic;
+                              pixelMode = PixelOffsetMode.Default;
+                              compositingMode = CompositingMode.SourceCopy;
+                              compositingQuality = CompositingQuality.Default;
+                              smoothingMode = SmoothingMode.Default;
+                          }
+                          
+                          
+                        interpolationMode = ImageResizer.Util.Utils.parseEnum<InterpolationMode>(s["filter"], interpolationMode); 
+                        smoothingMode = ImageResizer.Util.Utils.parseEnum<SmoothingMode>(s["smoothing"], smoothingMode);
+                        pixelMode = ImageResizer.Util.Utils.parseEnum<PixelOffsetMode>(s["pixel"], pixelMode);
+                        compositingQuality = ImageResizer.Util.Utils.parseEnum<CompositingQuality>(s["compose"], compositingQuality);
+                       compositingMode = ImageResizer.Util.Utils.parseEnum<CompositingMode>(s["blend"], compositingMode);
+                          
+
+
+                         using (var bitmap = Utils.GdiResize(photo, width, height,interpolationMode,smoothingMode,pixelMode,compositingQuality,compositingMode)) {
                             resized = Utils.ToByteArrayGdi(bitmap, quality);
                         }
                       }
@@ -130,9 +169,11 @@
                 size[system] += resized.Length;
 
                 // Write out the thumbnail, to validate it actually works
-                var dir =  Server.MapPath("~/" + system);
+                var dir =  Server.MapPath("~/Results/" + system);
                 if (!Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
                 File.WriteAllBytes(dir + System.IO.Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(file) +"_" + thumbnailSize + "_" + quality + ".jpg", resized);
+                GC.Collect();
+                System.Threading.Thread.Sleep(50);
             }
             
             
