@@ -23,18 +23,24 @@ namespace ImageResizer
     /// Provides methods for generating resized images, and for reading and writing them to disk.
     /// Use ImageBuilder.Current to get the current instance (as configured in the application configuration), or use ImageBuilder.Current.Create() to control which extensions are used.
     /// </summary>
-    public class ImageBuilder : AbstractImageProcessor, IQuerystringPlugin, IFileExtensionPlugin
+    public partial class ImageBuilder : AbstractImageProcessor, IQuerystringPlugin, IFileExtensionPlugin
     {
-        protected ImageBuilder() { }
         /// <summary>
-        /// Handles the encoder selection and provision proccess.
+        /// Shouldn't be used except to make a factory instance.
         /// </summary>
+        protected ImageBuilder() { }
         protected IEncoderProvider _encoderProvider = null;
         /// <summary>
         /// Handles the encoder selection and provision proccess.
         /// </summary>
         public IEncoderProvider EncoderProvider { get { return _encoderProvider; } }
 
+
+        protected ISettingsModifier _settingsModifier = null;
+        /// <summary>
+        /// May be null. A class to modify or normalize ResizeSettings instances before they are used.
+        /// </summary>
+        public ISettingsModifier SettingsModifier { get { return _settingsModifier; } }
 
         private IVirtualImageProvider _virtualFileProvider;
 
@@ -50,27 +56,19 @@ namespace ImageResizer
         /// </summary>
         /// <returns></returns>
         public static ImageBuilder Current {get{ return Config.Current.CurrentImageBuilder; }}
-        /// <summary>
-        /// Creates a new ImageBuilder instance with no extensions.
-        /// </summary>
-        public ImageBuilder(IEncoderProvider encoderProvider, IVirtualImageProvider virtualFileProvider)
-            : base() {
-            this._encoderProvider = encoderProvider;
-            this._virtualFileProvider = virtualFileProvider;
-        }
 
         /// <summary>
-        /// Create a new instance of ImageBuilder using the specified extensions and encoder provider. Extension methods will be fired in the order they exist in the collection.
+        /// Create a new instance of ImageBuilder using the specified extensions, encoder provider, file provider, and settings filter. Extension methods will be fired in the order they exist in the collection.
         /// </summary>
         /// <param name="extensions"></param>
         /// <param name="encoderProvider"></param>
-        public ImageBuilder(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider, IVirtualImageProvider virtualFileProvider)
+        public ImageBuilder(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider, IVirtualImageProvider virtualFileProvider, ISettingsModifier settingsModifier)
             : base(extensions) {
             this._encoderProvider = encoderProvider;
             this._virtualFileProvider = virtualFileProvider;
+            this._settingsModifier = settingsModifier;
         }
 
-        
         /// <summary>
         /// Creates another instance of the class using the specified extensions. Subclasses should override this and point to their own constructor.
         /// </summary>
@@ -78,72 +76,18 @@ namespace ImageResizer
         /// <param name="writer"></param>
         /// <param name="virtualFileProvider"></param>
         /// <returns></returns>
-        public virtual ImageBuilder Create(IEnumerable<BuilderExtension> extensions, IEncoderProvider writer, IVirtualImageProvider virtualFileProvider) {
-            return new ImageBuilder(extensions,writer,virtualFileProvider);
+        public virtual ImageBuilder Create(IEnumerable<BuilderExtension> extensions, IEncoderProvider writer, IVirtualImageProvider virtualFileProvider, ISettingsModifier settingsModifier) {
+            return new ImageBuilder(extensions,writer,virtualFileProvider,settingsModifier);
         }
         /// <summary>
         /// Copies the instance along with extensions. Subclasses must override this.
         /// </summary>
         /// <returns></returns>
         public virtual ImageBuilder Copy(){
-            return new ImageBuilder(this.exts,this._encoderProvider, this._virtualFileProvider);
+            return new ImageBuilder(this.exts,this._encoderProvider, this._virtualFileProvider,this._settingsModifier);
         }
 
 
-        /// <summary>
-        /// Allows Bitmap Build(object) to wrap void Build(object,object) easily.
-        /// </summary>
-        protected class BitmapHolder {
-            public BitmapHolder() { }
-            public Bitmap bitmap;
-        }
-
-        protected Stream GetStreamFromSource(ref object source, ref string path, ref bool disposeStream, ref bool restoreStreamPosition, ref ResizeSettings settings){
-            
-            //App-relative path - converted to virtual path
-            if (source is string) {
-                path = source as string;
-                //Convert app-relative paths to VirtualFile instances
-                if (path.StartsWith("~", StringComparison.OrdinalIgnoreCase)) {
-                    source = this.VirtualFileProvider.GetFile(PathUtils.ResolveAppRelative(path), settings);
-                }
-            }
-
-            Stream s = null;
-            path = null;
-            //Stream
-            if (source is Stream) s = (Stream)source;
-            //VirtualFile
-             else if (source is VirtualFile) {
-                path = ((VirtualFile)source).VirtualPath;
-                s = ((VirtualFile)source).Open();
-            //IVirtualFile
-            } else if (source is IVirtualFile) {
-                path = ((IVirtualFile)source).VirtualPath;
-                s = ((IVirtualFile)source).Open();
-            //PhysicalPath
-            } else if (source is string) {
-                path = (string)source;
-                s = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-            } else if (source is byte[]){
-                s = new MemoryStream((byte[])source, 0, ((byte[])source).Length,false,true);
-            } else {
-                //For HttpPostedFile and HttpPostedFileBase - we must use reflection to support .NET 3.5 without losing 2.0 compat.
-                PropertyInfo pname = source.GetType().GetProperty("FileName",typeof(string));
-                PropertyInfo pstream = source.GetType().GetProperty("InputStream");
-
-                if (pname != null && pstream != null) {
-                    path = pname.GetValue(source, null) as string;
-                    s = pstream.GetValue(source, null) as Stream;
-                    disposeStream = false; //We never want to dispose the HttpPostedFile or HttpPostedFileBase streams..
-                    restoreStreamPosition = true;
-                }
-                
-                if (s == null) 
-                    throw new ArgumentException("Paramater source may only be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, HttpPostedFileBase, Bitmap, Image, or Stream.", "source");
-            }
-            return s;
-        }
 
         /// <summary>
         /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag in a BitmapTag instance. The Bitmap.Tag.Path value may be a virtual, relative, UNC, windows, or unix path. 
@@ -153,6 +97,17 @@ namespace ImageResizer
         /// <param name="settings">Will ignore ICC profile if ?ignoreicc=true.</param>
         /// <returns>A Bitmap. The .Tag property will include a BitmapTag instance. If .Tag.Source is not null, remember to dispose it when you dispose the Bitmap.</returns>
         public virtual Bitmap LoadImage(object source, ResizeSettings settings) {
+            return LoadImage(source, settings, false);
+        }
+        /// <summary>
+        /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag in a BitmapTag instance. The Bitmap.Tag.Path value may be a virtual, relative, UNC, windows, or unix path. 
+        /// Does not dispose 'source' if it is a Stream or Image instance - that's the responsibility of the calling code.
+        /// </summary>
+        /// <param name="source">May  be an instance of string, VirtualFile, IVirtualFile IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.  If passed an Image instance, the image will be cloned, which will cause metadata, indexed state, and any additional frames to be lost. Accepts physical paths and application relative paths. (C:\... and ~/path) </param>
+        /// <param name="settings">Will ignore ICC profile if ?ignoreicc=true.</param>
+        /// <param name="restoreStreamPos">If true, the position of the source stream will be restored after being read</param>
+        /// <returns>A Bitmap. The .Tag property will include a BitmapTag instance. If .Tag.Source is not null, remember to dispose it when you dispose the Bitmap.</returns>
+        public virtual Bitmap LoadImage(object source, ResizeSettings settings, bool restoreStreamPos){
 
             bool disposeStream = !(source is Stream);
             string path = null;
@@ -176,8 +131,10 @@ namespace ImageResizer
             }
 
             bool restoreStreamPosition = false;
-            Stream s = GetStreamFromSource(ref source, ref path, ref disposeStream, ref restoreStreamPosition, ref settings);
+            Stream s = GetStreamFromSource(source, settings, ref disposeStream, out path, out restoreStreamPosition);
+            if (s == null) throw new ArgumentException("Source may only be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, HttpPostedFileBase, Bitmap, Image, or Stream.", "source");
 
+            if (restoreStreamPos) restoreStreamPosition = true;
 
             //Save the original stream position if it's an HttpPostedFile
             long originalPosition = (restoreStreamPosition) ? s.Position : - 1;
@@ -226,7 +183,7 @@ namespace ImageResizer
         }
 
         /// <summary>
-        /// Decodes the stream into a bitmap instance. As of 3.0.7, now ensures the stream can safely be closed after the method returns.
+        /// Decodes the stream into a System.Drawing.Bitmap instance. As of 3.0.7, now ensures the stream can safely be closed after the method returns.
         /// May copy the stream. The copied stream will be in b.Tag.Source. Does not close or dispose any streams.
         /// </summary>
         /// <param name="s"></param>
@@ -247,8 +204,72 @@ namespace ImageResizer
             b.Tag = new BitmapTag(optionalPath, ms); //May 25, 2011: Storing a ref to the MemorySteam so it won't accidentally be garbage collected.
             return b;
         }
+        /// <summary>
+        /// For plugin use only. 
+        /// Returns a stream instance from the specified source object and settings object. 
+        /// To exend this method, override GetStream.
+        /// </summary>
+        /// <param name="source">The physical or app-relative path, or a VirtualFile, IVirtualFile, Stream, HttpPostedFile, or HttpPostedFileBase instance.</param>
+        /// <param name="settings">Querystring settings to pass to the VirtualFileProvider</param>
+        /// <param name="disposeStream">You should externally initialize this to true, unless the user-provided 'source' is a Stream instance. Will be set to false for HttpPostedFile and HttpPostedFileBase instances, so they can be reused. </param>
+        /// <param name="path">The physical or virtual path associated with the stream (if present). Otherwise null</param>
+        /// <param name="restoreStreamPosition">True if you should save and restore the seek position of the stream. True for HttpPostedFile and HttpPostedFileBase instances. </param>
+        /// <returns></returns>
+        public Stream GetStreamFromSource(object source, ResizeSettings settings, ref bool disposeStream, out string path, out bool restoreStreamPosition) {
+            //Allow plugins to extend this
+            bool disposeS = disposeStream;
+            Stream s = base.GetStream(source, settings, ref disposeS, out path, out restoreStreamPosition);
+            if (s != null) {
+                disposeStream = disposeS;
+                return s;
+            }
+
+            //App-relative path - converted to virtual path
+            if (source is string) {
+                path = source as string;
+                //Convert app-relative paths to VirtualFile instances
+                if (path.StartsWith("~", StringComparison.OrdinalIgnoreCase)) {
+                    source = this.VirtualFileProvider.GetFile(PathUtils.ResolveAppRelative(path), settings);
+                }
+            }
+
+            path = null;
+            restoreStreamPosition = false;
+            //Stream
+            if (source is Stream) s = (Stream)source;
+            //VirtualFile
+            else if (source is VirtualFile) {
+                path = ((VirtualFile)source).VirtualPath;
+                s = ((VirtualFile)source).Open();
+                //IVirtualFile
+            } else if (source is IVirtualFile) {
+                path = ((IVirtualFile)source).VirtualPath;
+                s = ((IVirtualFile)source).Open();
+                //PhysicalPath
+            } else if (source is string) {
+                path = (string)source;
+                s = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            } else if (source is byte[]) {
+                s = new MemoryStream((byte[])source, 0, ((byte[])source).Length, false, true);
+            } else {
+                //For HttpPostedFile and HttpPostedFileBase - we must use reflection to support .NET 3.5 without losing 2.0 compat.
+                PropertyInfo pname = source.GetType().GetProperty("FileName", typeof(string));
+                PropertyInfo pstream = source.GetType().GetProperty("InputStream");
+
+                if (pname != null && pstream != null) {
+                    path = pname.GetValue(source, null) as string;
+                    s = pstream.GetValue(source, null) as Stream;
+                    disposeStream = false; //We never want to dispose the HttpPostedFile or HttpPostedFileBase streams..
+                    restoreStreamPosition = true;
+                }
+
+                if (s == null) return null;
+            }
+            return s;
+        }
 
 
+        #region Wrapper overloads
         /// <summary>
         /// Resizes and processes the specified source image and returns a bitmap of the result.
         /// Note! 
@@ -274,9 +295,9 @@ namespace ImageResizer
         /// <param name="disposeSource">If false, 'source' will not be disposed. </param>
        
         public virtual Bitmap Build(object source, ResizeSettings settings, bool disposeSource) {
-            BitmapHolder bh = new BitmapHolder();
-            Build(source, bh, settings, disposeSource);
-            return bh.bitmap;
+            Job j = new Job(source, typeof(Bitmap), settings, disposeSource, false);
+            Build(j);
+            return j.Result as Bitmap;
         }
 
         /// <summary>
@@ -314,25 +335,58 @@ namespace ImageResizer
         /// <param name="disposeSource">True to dispose 'source' after use. False to leave intact.</param>
         /// <param name="addFileExtension">If true, will add the correct file extension to 'dest' if it is a string. </param>
         public virtual string Build(object source, object dest, ResizeSettings settings, bool disposeSource, bool addFileExtension) {
-            ResizeSettings s = new ResizeSettings(settings);
-            Bitmap b = null; 
-            try {
-                //Load image
-                b = LoadImage(source, settings);
+            return Build(new Job(source, dest, settings, disposeSource, addFileExtension)).FinalPath;
+        }
+        #endregion
 
-                
-                //Fire PreAcquireStream(ref dest, settings)
-                this.PreAcquireStream(ref dest, settings);
-                
-                //Write to Physical file
-                if (dest is string) {
+        public virtual Job Build(Job job) {
+            //Clone and filter settings FIRST, before calling plugins.
+            ResizeSettings s = job.Settings == null ? new ResizeSettings() : new ResizeSettings(job.Settings);
+            if (SettingsModifier != null) s = SettingsModifier.Modify(s);
+            job.Settings = s;
+
+            try {
+                //Allow everything else to be overriden
+                if (BuildJob(job) != RequestedAction.Cancel) throw new ImageProcessingException("Nobody did the job");
+                return job;
+            } finally {
+                //Follow the dispose requests
+                if (job.DisposeSourceStream && job.Source is IDisposable && job.Source != null) ((IDisposable)job.Source).Dispose();
+                if (job.DisposeDestinationStream && job.Dest is IDisposable && job.Dest != null) ((IDisposable)job.Dest).Dispose();
+            }
+        }
+
+        protected override RequestedAction BuildJob(ImageBuilder.Job job) {
+            if (base.BuildJob(job) == RequestedAction.Cancel) return RequestedAction.Cancel;
+
+            Bitmap b = null;
+            try {
+                ResizeSettings s = job.Settings;
+
+                //Load image
+                b = LoadImage(job.Source, s, job.ResetSourceStream);
+
+                //Save source path info
+                job.SourcePathData = (b != null && b.Tag != null && b.Tag is BitmapTag) ? ((BitmapTag)b.Tag).Path : null;
+
+
+                //Fire PreAcquireStream(ref dest, settings) to modify 'dest'
+                object dest = job.Dest;
+                this.PreAcquireStream(ref dest, s);
+                job.Dest = dest;
+
+                if (dest == typeof(Bitmap)) {
+                    job.Result = buildToBitmap(b, s, true);
+
+                    //Write to Physical file
+                } else if (dest is string) {
                     string destPath = dest as string;
                     //Convert app-relative paths
                     if (destPath.StartsWith("~", StringComparison.OrdinalIgnoreCase)) destPath = HostingEnvironment.MapPath(destPath);
 
                     //Add the file extension if specified.
-                    if (addFileExtension) {
-                        IEncoder e = this.EncoderProvider.GetEncoder(settings, b);
+                    if (job.AddFileExtension) {
+                        IEncoder e = this.EncoderProvider.GetEncoder(s, b);
                         if (e != null) destPath += "." + e.Extension;
                     }
 
@@ -340,31 +394,33 @@ namespace ImageResizer
                     using (fs) {
                         buildToStream(b, fs, s);
                     }
-                    return destPath;
-                //Write to Unknown stream
+                    job.FinalPath = destPath;
+                    //Write to Unknown stream
                 } else if (dest is Stream) {
                     buildToStream(b, (Stream)dest, s);
-                //Write to BitmapHolder
-                } else if (dest is BitmapHolder) {
-                    ((BitmapHolder)dest).bitmap = buildToBitmap(b, s, true);
-                } else throw new ArgumentException("Paramater dest may only be a string, Stream, or BitmapHolder", "dest");
+                } else throw new ArgumentException("Destination may be a string or Stream.", "Dest");
 
             } finally {
                 //Get the source bitmap's underlying stream (may differ from 'source')
                 Stream underlyingStream = null;
                 if (b != null && b.Tag != null && b.Tag is BitmapTag) underlyingStream = ((BitmapTag)b.Tag).Source;
 
+                //Look for underlying GCHandle under the source bitmap
+                GCHandle underlyingHandle = default(GCHandle);
+                bool hasHandle = false;
+                if (b != null & b.Tag != null && b.Tag is GCHandle) { underlyingHandle = (GCHandle)b.Tag; hasHandle = true; }
+
                 //Close the source bitamp's underlying stream unless it is the same stream (EDIT: or bitmap) we were passed.
-                if (b != source && underlyingStream != source && underlyingStream != null) underlyingStream.Dispose();
+                if (b != job.Source && underlyingStream != job.Source && underlyingStream != null) underlyingStream.Dispose();
 
                 //Dispose the bitmap unless we were passed it. We check for 'null' in case an ImageCorruptedException occured. 
-                if (b != null && b != source) b.Dispose();
+                if (b != null && b != job.Source) b.Dispose();
 
-                //Follow the disposeSource boolean.
-                if (disposeSource && source is IDisposable) ((IDisposable)source).Dispose();
-
+                //Free the pinned byte[] underlying the Bitmap class.
+                if (b != job.Source && hasHandle) underlyingHandle.Free();
             }
-            return null;
+
+            return RequestedAction.Cancel;
         }
 
         /// <summary>
@@ -435,7 +491,7 @@ namespace ImageResizer
         /// <param name="s"></param>
         protected override RequestedAction Layout(ImageState s) {
             if (base.Layout(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
-            FlipExistingPoints(s);
+            FlipExistingPoints(s); //Not implemented
             LayoutImage(s);
             PostLayoutImage(s);
             LayoutPadding(s);
@@ -647,7 +703,7 @@ namespace ImageResizer
                         s.sourceBitmap.PixelFormat == PixelFormat.Format32bppRgb || 
                         s.sourceBitmap.PixelFormat == PixelFormat.Format48bppRgb) &&
                         PolygonMath.ArraysEqual(s.layout["image"], s.layout.LastRing.points)) {
-                        //Do nothing, the image is transparent by default
+                        //Do nothing, there is no visible 
                             int j = 0;
                     } else {
                         background = Color.White;
@@ -946,7 +1002,7 @@ namespace ImageResizer
         private readonly string[] _supportedQuerystringKeys = new string[]{
                     "format", "thumbnail", "maxwidth", "maxheight",
                 "width", "height",
-                "scale", "stretch", "crop", "page", "bgcolor",
+                "scale", "stretch", "crop", "cropxunits", "cropyunits", "page", "bgcolor",
                 "rotate", "flip", "sourceFlip", "sFlip", "sRotate", "borderWidth",
                 "borderColor", "paddingWidth", "paddingColor",
                 "ignoreicc", "frame", "useresizingpipeline", 
