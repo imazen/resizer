@@ -12,6 +12,11 @@ using ImageResizer.Plugins.Wic;
 using System.Runtime.InteropServices;
 
 namespace ImageResizer.Plugins.WicDecoder {
+    /// <summary>
+    /// Note: This decoder produces Bitmaps that require special disposal instructions.
+    /// While ImageBuilder handles this, your code may not. It's best not to directly call LoadImage with &decoder=wic. 
+    /// This decoder returns Bitmap instances with .Tag set to a GCHandle instance. You must call ((GCHandle)b.Tag).Free() after disposing the Bitmap.
+    /// </summary>
     public class WicDecoderPlugin : BuilderExtension, IPlugin, IFileExtensionPlugin, IIssueProvider {
 
         public IPlugin Install(Configuration.Config c) {
@@ -69,16 +74,30 @@ namespace ImageResizer.Plugins.WicDecoder {
                                                           WICDecodeOptions.WICDecodeMetadataCacheOnLoad);
 
             try {
-                //TODO: add support for &frame= and &page=0
-                frame = decoder.GetFrame(0);
+
+                //Figure out which frame to work with
+                int frameIndex = 0;
+                if (!string.IsNullOrEmpty(settings["page"]) && !int.TryParse(settings["page"], out frameIndex))
+                    if (!string.IsNullOrEmpty(settings["frame"]) && !int.TryParse(settings["frame"], out frameIndex))
+                        frameIndex = 0;
+
+                //So users can use 1-based numbers
+                frameIndex--;
+
+                if (frameIndex > 0) {
+                    int frameCount = (int)decoder.GetFrameCount(); //Don't let the user go past the end.
+                    if (frameIndex >= frameCount) frameIndex = frameCount - 1;
+                }
+
+                frame = decoder.GetFrame((uint)Math.Max(0, frameIndex));
                 try {
                     return ConversionUtils.FromWic(frame);
                 } finally {
-                    Marshal.FinalReleaseComObject(frame);
+                    Marshal.ReleaseComObject(frame);
                 }
             } finally {
-                Marshal.FinalReleaseComObject(decoder);
-                Marshal.FinalReleaseComObject(factory);
+                Marshal.ReleaseComObject(decoder);
+                Marshal.ReleaseComObject(factory);
             }
         }
 
