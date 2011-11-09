@@ -76,6 +76,7 @@
     <Compile Include="Configuration\Logging\ILoggerProvider.cs" />
     <Compile Include="Configuration\Logging\ILogManager.cs" />
     <Compile Include="Configuration\UrlAuthorizationEventArgs.cs" />
+    <Compile Include="ImageBuilder.Job.cs" />
     <Compile Include="Plugins\Basic\AutoRotate.cs" />
     <Compile Include="Plugins\Basic\FolderResizeSyntax.cs" />
     <Compile Include="Plugins\Basic\ImageHandlerSyntax.cs">
@@ -118,6 +119,7 @@
     <Compile Include="Plugins\Basic\DiagnosticPageHandler.cs" />
     <Compile Include="Plugins\IMultiInstancePlugin.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
+    <Compile Include="Plugins\ISettingsModifier.cs" />
     <Compile Include="Plugins\VirtualFileWrapper.cs" />
     <Compile Include="ResizerSection.cs" />
     <Compile Include="Caching\ICache.cs" />

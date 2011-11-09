@@ -50,8 +50,7 @@ namespace ImageResizer.Resizing {
         protected volatile IEnumerable<BuilderExtension> exts;
 
         /// <summary>
-        /// Extend this to allow additional types of source objects to be accepted by transforming them into accepted types, such as Image, Bitmap,
-        /// Stream, or a physical path
+        /// Extend this to allow additional types of source objects to be accepted by transforming them into Bitmap instances.
         /// </summary>
         /// <param name="source"></param>
 		/// <param name="path"></param>
@@ -60,6 +59,31 @@ namespace ImageResizer.Resizing {
         protected virtual void PreLoadImage(ref object source, ref string path, ref bool disposeSource, ref ResizeSettings settings) {
             if (exts != null) foreach (AbstractImageProcessor p in exts) p.PreLoadImage(ref source, ref path, ref disposeSource, ref settings);
         }
+
+        /// <summary>
+        /// Extend this to allow  additional types of source objects to be accepted by transforming them into Stream instances. First plugin to return a Stream wins.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="settings"></param>
+        /// <param name="disposeStream"></param>
+        /// <param name="path"></param>
+        /// <param name="restoreStreamPosition"></param>
+        /// <returns></returns>
+        protected virtual Stream GetStream(object source, ResizeSettings settings, ref bool disposeStream, out string path, out bool restoreStreamPosition) {
+            path = null; //Init so the compiler doesn't complain
+            restoreStreamPosition = false;
+
+            if (exts != null) foreach (AbstractImageProcessor p in exts) {
+                bool disposeS = disposeStream; //Copy the referenced boolean. Only allow plugins who return a stream to change its value
+                Stream s = p.GetStream(source, settings, ref disposeS, out path, out restoreStreamPosition);
+                if (s != null) {
+                    disposeStream = disposeS;
+                    return s;
+                }
+            }
+            return null;
+        }
+
 
         /// <summary>
         /// Extensions are executed until one extension returns a non-null value. 
@@ -106,14 +130,32 @@ namespace ImageResizer.Resizing {
 
 
 
+
         /// <summary>
-        /// Extend this to allow additional types of *destination* objects to be accepted by transforming them into either a bitmapholder or a stream.
+        /// Extend this to allow additional types of *destination* objects to be accepted by transforming them into a stream.
         /// </summary>
         /// <param name="dest"></param>
         /// <param name="settings"></param>
         protected virtual void PreAcquireStream(ref object dest, ResizeSettings settings) {
             if (exts != null) foreach (AbstractImageProcessor p in exts) p.PreAcquireStream(ref dest, settings);
         }
+
+        /// <summary>
+        /// The method to override if you want to replace the entire pipeline.
+        /// All Build() calls call this method first. 
+        /// Does nothing in ImageBuilder
+        /// </summary>
+        /// <param name="job"></param>
+        /// <returns></returns>
+        protected virtual RequestedAction BuildJob(ImageResizer.ImageBuilder.Job job) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.BuildJob(job) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
+        }
+
+
         /// <summary>
         /// Called for Build() calls that want the result encoded. (Not for Bitmap Build(source,settings) calls.
         /// Only override this method if you need to replace the behavior of image encoding and image processing together, such as adding support

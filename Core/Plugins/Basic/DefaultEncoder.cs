@@ -76,7 +76,7 @@ namespace ImageResizer.Plugins.Basic {
 
         private int quality = 90;
         /// <summary>
-        /// The Jpeg compression quality. 90 is the best setting. Not relevant in Png or Gif compression
+        /// 0..100 value. The Jpeg compression quality. 90 is the best setting. Not relevant in Png or Gif compression
         /// </summary>
         public int Quality {
             get { return quality; }
