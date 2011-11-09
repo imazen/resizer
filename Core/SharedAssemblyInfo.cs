@@ -28,9 +28,9 @@ using ImageResizer.Util;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:/*
-[assembly: AssemblyVersion("3.0.14.*")]
-[assembly: AssemblyFileVersion("3.0.14.*")]
-[assembly: AssemblyInformationalVersion("3-0-14")]
+[assembly: AssemblyVersion("3.1.0.*")]
+[assembly: AssemblyFileVersion("3.1.0.*")]
+[assembly: AssemblyInformationalVersion("3-1-alpha-1")]
 
 [assembly: Commit("git-commit-guid-here")]
 
@@ -38,5 +38,5 @@ using ImageResizer.Util;
 
 // These commented out settings are for the build script to access
 // [assembly: PackageName("Resizer")]
-// [assembly: NugetVersion("3.0.14")]
+// [assembly: NugetVersion("3.1.0")]
 // [assembly: DownloadServer("http://downloads.imageresizing.net/")]
