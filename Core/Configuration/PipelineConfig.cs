@@ -14,7 +14,7 @@ using ImageResizer.Collections;
 using System.Web;
 
 namespace ImageResizer.Configuration {
-    public class PipelineConfig : IPipelineConfig, ICacheProvider{
+    public class PipelineConfig : IPipelineConfig, ICacheProvider, ISettingsModifier{
         protected Config c;
         public PipelineConfig(Config c) {
             this.c = c;
@@ -432,5 +432,11 @@ namespace ImageResizer.Configuration {
 
 
 
+
+        public ResizeSettings Modify(ResizeSettings settings) {
+            foreach (ISettingsModifier m in c.Plugins.SettingsModifierPlugins)
+                settings = m.Modify(settings);
+            return settings;
+        }
     }
 }
