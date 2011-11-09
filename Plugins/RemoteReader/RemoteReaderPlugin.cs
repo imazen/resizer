@@ -54,20 +54,28 @@ namespace ImageResizer.Plugins.RemoteReader {
         /// </summary>
         /// <param name="source"></param>
         /// <param name="settings"></param>
-        protected override void PreLoadImage(ref object source,ref string path, ref bool disposeSource, ref  ResizeSettings settings) {
+        /// <param name="disposeStream"></param>
+        /// <param name="path"></param>
+        /// <param name="restoreStreamPosition"></param>
+        /// <returns></returns>
+        protected override Stream GetStream(object source, ResizeSettings settings, ref bool disposeStream, out string path, out bool restoreStreamPosition) {
             //Turn remote URLs into URI instances
             if (source is string && (((string)source).StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-                                    ((string)source).StartsWith("https://", StringComparison.OrdinalIgnoreCase))){
+                                    ((string)source).StartsWith("https://", StringComparison.OrdinalIgnoreCase))) {
                 if (Uri.IsWellFormedUriString((string)source, UriKind.Absolute))
                     source = new Uri((string)source);
 
             }
+            restoreStreamPosition = false;
+            path = null;
             //Turn URI instances into streams
             if (source is Uri) {
                 path = ((Uri)source).ToString();
-                source = GetUriStream((Uri)source);
+                return GetUriStream((Uri)source);
             }
+            return null;
         }
+
 
 
         void Pipeline_RewriteDefaults(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
@@ -164,11 +172,18 @@ namespace ImageResizer.Plugins.RemoteReader {
                 args.RemoteUrl = PathUtils.FromBase64UToString(data);
                 args.SignedRequest = true;
             } else
-                args.RemoteUrl = "http://" + virtualPath.Substring(remotePrefix.Length).TrimStart('/', '\\');
+                args.RemoteUrl = "http://" + ReplaceInLeadingSegment(virtualPath.Substring(remotePrefix.Length).TrimStart('/', '\\'),"_",".");
 
             if (!Uri.IsWellFormedUriString(args.RemoteUrl, UriKind.Absolute))
                 throw new ImageProcessingException("Invalid request! The specified Uri is invalid: " + args.RemoteUrl);
             return args;
+        }
+
+        private string ReplaceInLeadingSegment(string path, string from, string to) {
+            int firstslash = path.IndexOf('/',1);
+            if (firstslash < 0) firstslash = path.Length; //If no forward slashes, edit whole string.
+
+            return path.Substring(0, firstslash).Replace(from, to) + path.Substring(firstslash);
         }
 
 
