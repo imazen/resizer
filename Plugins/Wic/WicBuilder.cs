@@ -12,133 +12,146 @@ using System.Drawing;
 using WicResize.InteropServices;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins.Wic;
+using System.Web.Hosting;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
+using ImageResizer.Plugins.WicEncoder;
 
 namespace ImageResizer.Plugins.WicBuilder {
-    public class WicBuilderPlugin : ImageBuilder, IPlugin, IIssueProvider {
+    public class WicBuilderPlugin : BuilderExtension, IPlugin, IIssueProvider, IFileExtensionPlugin {
 
         public WicBuilderPlugin() {
         }
-        /// <summary>
-        /// Creates a new FreeImageBuilder instance with no extensions.
-        /// </summary>
-        public WicBuilderPlugin(IEncoderProvider encoderProvider, IVirtualImageProvider virtualFileProvider)
-            : base(encoderProvider, virtualFileProvider) {
-        }
 
-        /// <summary>
-        /// Create a new instance of FreeImageBuilder using the specified extensions and encoder provider. Extension methods will be fired in the order they exist in the collection.
-        /// </summary>
-        /// <param name="extensions"></param>
-        /// <param name="encoderProvider"></param>
-        public WicBuilderPlugin(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider, IVirtualImageProvider virtualFileProvider)
-            : base(extensions, encoderProvider, virtualFileProvider) {
-        }
-
-
-        /// <summary>
-        /// Creates another instance of the class using the specified extensions. Subclasses should override this and point to their own constructor.
-        /// </summary>
-        /// <param name="extensions"></param>
-        /// <param name="writer"></param>
-        /// <returns></returns>
-        public override ImageBuilder Create(IEnumerable<BuilderExtension> extensions, IEncoderProvider writer, IVirtualImageProvider virtualFileProvider) {
-            return new WicBuilderPlugin(extensions, writer, virtualFileProvider);
-        }
-        /// <summary>
-        /// Copies the instance along with extensions. Subclasses must override this.
-        /// </summary>
-        /// <returns></returns>
-        public override ImageBuilder Copy() {
-            return new WicBuilderPlugin(this.exts, this.EncoderProvider, this.VirtualFileProvider);
-        }
-
+        Config c;
         public IPlugin Install(Configuration.Config c) {
-            c.UpgradeImageBuilder(new WicBuilderPlugin(c.CurrentImageBuilder.EncoderProvider, VirtualFileProvider));
             c.Plugins.add_plugin(this);
+            this.c = c;
             return this;
         }
 
         public bool Uninstall(Configuration.Config c) {
-            return false; // We can't uninstall this.
+            c.Plugins.remove_plugin(this);
+            return true;
         }
 
 
-        public override string Build(object source, object dest, ResizeSettings settings, bool disposeSource, bool addFileExtension) {
-            if (!(source is Image) && (dest is String || dest is Stream) && !addFileExtension) {
-                if (BuildWic(source, dest, settings, disposeSource)) return dest as string;
-            }
-            return base.Build(source, dest, settings, disposeSource, addFileExtension);
-        }
+        /// <summary>
+        /// Adds alternate pipeline based on WIC. Invoked by &builder=wic. 
+        /// This method doesn't handle job.DisposeSource or job.DesposeDest or settings filtering, that's handled by ImageBuilder.
+        /// Handles all the work for turning 'source' into a byte[]/long pair.
+        /// </summary>
+        /// <param name="job"></param>
+        /// <returns></returns>
+        protected override RequestedAction BuildJob(ImageBuilder.Job job) {
+            if (!"wic".Equals(job.Settings["builder"])) return RequestedAction.None;
 
-        protected virtual bool BuildWic(object source, object dest, ResizeSettings settings, bool disposeSource) {
-            if (!"wic".Equals(settings["builder"])) return false;
-
-            string path = null;
-            bool disposeSourceDuringLoad = !(source is Stream);
-            bool restoreStreamPosition = false;
-
-            //Convert the source object to a stream
-            Stream s = this.GetStreamFromSource(ref source, ref path, ref disposeSourceDuringLoad, ref restoreStreamPosition, ref settings);
-            //Make it a memory stream
-            if (!(s is MemoryStream)) {
-                s = StreamUtils.CopyStream((Stream)s);
-            }
-            if (disposeSourceDuringLoad && source is IDisposable) ((IDisposable)source).Dispose();
-
-            //Get the underlying byte array
+            //Convert the source stream to a byte[] array and length.
             byte[] data = null;
             long lData = 0;
+
+
+            //This step gets a Stream instance, copies it to a MemoryStream, then accesses the underlying buffer to get the byte[] and length we need.
+            Stream s = null;
+            bool disposeStream = !(job.Source is Stream);
+            long originalPosition = 0;
+            bool restoreStreamPosition = false;
             try {
-                data = ((MemoryStream)s).GetBuffer();
-                lData = s.Length;
-            } catch (UnauthorizedAccessException) {
-                data = ((MemoryStream)s).ToArray();
-                lData = data.Length;
+                //Get a Stream instance for the job
+                string path;
+                s = c.CurrentImageBuilder.GetStreamFromSource(job.Source, job.Settings, ref disposeStream, out path, out restoreStreamPosition);
+                if (s == null) return RequestedAction.None; //We don't support the source object!
+                if (job.ResetSourceStream) restoreStreamPosition = true;
+                job.SourcePathData = path;
+
+                //Save the original stream positione
+                originalPosition = (restoreStreamPosition) ? s.Position : -1;
+
+                //Clone to a memory stream
+                MemoryStream ms = (s is MemoryStream) ? (MemoryStream)s : StreamUtils.CopyStream(s);
+
+                //Get the underlying byte array
+                try {
+                    data = ms.GetBuffer();
+                    lData = ms.Length;
+                    //Or copy it to a new byte array if that fails..
+                } catch (UnauthorizedAccessException) {
+                    data = ms.ToArray();
+                    lData = data.Length;
+                } finally {
+                    if (ms != s) ms.Dispose(); //Even though it does nothing, maybe in the future it will
+                }
+
+
+            } finally {
+                if (s != null && restoreStreamPosition && s.CanSeek) s.Seek(originalPosition, SeekOrigin.Begin);
+                if (disposeStream) s.Dispose();
             }
 
-            
-            var factory = (IWICComponentFactory)new WICImagingFactory();
+            //Ok, now we have our byte[] and length. 
 
-            //Decode the image with WIC
-            IWICBitmapFrameDecode frame;
-            var streamWrapper = factory.CreateStream();
-            streamWrapper.InitializeFromMemory(data, (uint)lData);
-            var decoder = factory.CreateDecoderFromStream(streamWrapper, null,
-                                                          WICDecodeOptions.WICDecodeMetadataCacheOnLoad);
-            frame = decoder.GetFrame(0); //TODO add support for page and frame
+            //Let's find out if transparency is supported.
+            IEncoder managedEncoder = c.Plugins.GetEncoder(job.Settings, job.SourcePathData);
 
+            bool supportsTransparency = managedEncoder.SupportsTransparency;
+
+            return BuildJobWic(data, lData, job, supportsTransparency);
+        }
+
+        /// <summary>
+        /// Decodes the image in byte[] data, performs the image proccessing, and encodes it to job.Dest
+        /// </summary>
+        /// <param name="data">The buffer containing the encoded image file</param>
+        /// <param name="lData">The number of bytes to read</param>
+        /// <param name="job"></param>
+        /// <param name="supportsTransparency"></param>
+        /// <returns></returns>
+        protected virtual RequestedAction BuildJobWic(byte[] data, long lData, ImageBuilder.Job job, bool supportsTransparency) {
+
+            ResizeSettings settings = job.Settings; ResizeSettings q = settings;
+            string path = job.SourcePathData;
+
+            //A list of COM objects to destroy
+            List<object> com = new List<object>();
             try {
-                //What is our destination format
-                IEncoder managedEncoder = EncoderProvider.GetEncoder(settings, path); //Use the existing pipeline to parse the querystring 
+                //Create the factory
+                IWICComponentFactory factory  = (IWICComponentFactory)new WICImagingFactory();
+                com.Add(factory);
 
-                //Load the WIC the container encoder
-                Guid guidEncoder = Consts.GUID_ContainerFormatJpeg;
-                if (managedEncoder.MimeType.Equals("image/jpeg")) guidEncoder = Consts.GUID_ContainerFormatJpeg;
-                if (managedEncoder.MimeType.Equals("image/png")) guidEncoder = Consts.GUID_ContainerFormatPng;
-                if (managedEncoder.MimeType.Equals("image/gif")) guidEncoder = Consts.GUID_ContainerFormatGif;
+                //Wrap the byte[] with a IWICStream instance
+                var streamWrapper = factory.CreateStream();
+                streamWrapper.InitializeFromMemory(data, (uint)lData);
+                com.Add(streamWrapper);
+
+                var decoder = factory.CreateDecoderFromStream(streamWrapper, null,
+                                                              WICDecodeOptions.WICDecodeMetadataCacheOnLoad);
+                com.Add(decoder);
+
+                //Figure out which frame to work with
+                int frameIndex = 0;
+                if (!string.IsNullOrEmpty(q["page"]) && !int.TryParse(q["page"], out frameIndex))
+                    if (!string.IsNullOrEmpty(q["frame"]) && !int.TryParse(q["frame"], out frameIndex))
+                        frameIndex = 0;
+
+                //So users can use 1-based numbers
+                frameIndex--;
+
+                if (frameIndex > 0) {
+                    int frameCount = (int)decoder.GetFrameCount(); //Don't let the user go past the end.
+                    if (frameIndex >= frameCount) frameIndex = frameCount - 1;
+                }
+
+                IWICBitmapFrameDecode frame = decoder.GetFrame((uint)Math.Max(0,frameIndex));
+                com.Add(frame);
+
+                
 
                 WICBitmapInterpolationMode interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeFant;
                 if ("nearest".Equals(settings["w.filter"], StringComparison.OrdinalIgnoreCase)) interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeNearestNeighbor;
                 if ("bicubic".Equals(settings["w.filter"], StringComparison.OrdinalIgnoreCase)) interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeCubic;
                 if ("linear".Equals(settings["w.filter"], StringComparison.OrdinalIgnoreCase)) interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeLinear;
-
-                var encoder = factory.CreateEncoder(guidEncoder, null);
-
-                //Configure it, prepare output stream
-                var outputStream = new MemoryIStream();
-                encoder.Initialize(outputStream, WICBitmapEncoderCacheOption.WICBitmapEncoderNoCache);
-                // Prepare output frame
-                IWICBitmapFrameEncode outputFrame;
-                var arg = new IPropertyBag2[1];
-                encoder.CreateNewFrame(out outputFrame, arg);
-                var propBag = arg[0];
-                var propertyBagOption = new PROPBAG2[1];
-                propertyBagOption[0].pstrName = "ImageQuality";
-                propBag.Write(1, propertyBagOption, new object[] { ((float)settings.Quality) / 100 });
-                outputFrame.Initialize(propBag);
-
-
-
+                if ("nearestneighbor".Equals(settings["w.filter"], StringComparison.OrdinalIgnoreCase)) interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeLinear;
+                
                 //Find the original image size
                 uint origWidth, origHeight;
                 frame.GetSize(out origWidth,out origHeight);
@@ -150,13 +163,10 @@ namespace ImageResizer.Plugins.WicBuilder {
                 ImageState state = new ImageState(settings, orig, true);
                 Layout(state);
 
-                bool supportsTransparency = true;
 
                 Rectangle imageDest = PolygonMath.ToRectangle(PolygonMath.GetBoundingBox(state.layout["image"]));
 
-                //Set destination frame size
-                outputFrame.SetSize((uint)state.destSize.Width, (uint)state.destSize.Height);
-
+              
                 IWICBitmapSource imageData = frame; 
                 //Are we cropping? then daisy-chain a clipper
                 if (state.copyRect.Left != 0 || state.copyRect.Top != 0 || state.copyRect.Width != state.originalSize.Width || state.copyRect.Height != state.originalSize.Height) {
@@ -171,7 +181,8 @@ namespace ImageResizer.Plugins.WicBuilder {
                         
                         var scaler = factory.CreateBitmapScaler();
                         scaler.Initialize(imageData, uncroppedDestWidth, uncroppedDestHeight, interpolationMode);
-  
+                        com.Add(scaler);
+
                         //TODO: cropping is not consistent with GDI.
                         var clipper = factory.CreateBitmapClipper();
                         clipper.Initialize(scaler, new WICRect { 
@@ -180,17 +191,20 @@ namespace ImageResizer.Plugins.WicBuilder {
                             Width = imageDest.Width, 
                             Height = imageDest.Height
                         });
+                        com.Add(clipper);
                         imageData = clipper;
 
                     } else {
                         var clipper = factory.CreateBitmapClipper();
                         clipper.Initialize(imageData, new WICRect { X = (int)state.copyRect.X, Y = (int)state.copyRect.Y, Width = (int)state.copyRect.Width, Height = (int)state.copyRect.Height });
+                        com.Add(clipper);
                         imageData = clipper;
                     }
                     //If we're scaling but not cropping.
                 }else if (imageDest.Width != state.originalSize.Width || imageDest.Height != state.originalSize.Height) {
                     var scaler = factory.CreateBitmapScaler();
                     scaler.Initialize(imageData, (uint)imageDest.Width, (uint)imageDest.Height, interpolationMode);
+                    com.Add(scaler);
                     imageData = scaler;
                 }
 
@@ -204,36 +218,60 @@ namespace ImageResizer.Plugins.WicBuilder {
                     var padder = new WicBitmapPadder(imageData, imageDest.X, imageDest.Y, state.destSize.Width - (imageDest.X + imageDest.Width), state.destSize.Height - (imageDest.Y + imageDest.Height), bgcolor, null);
                     imageData = padder;
                 }
-                // Write the data to the output frame
-                outputFrame.WriteSource(imageData,null);
-                outputFrame.Commit();
-                encoder.Commit();
 
-
-                // Try to save the bitmap
-                if (dest is string || dest is Stream) {
-                    if (dest is string) {
-                        using (FileStream fs = new FileStream((string)dest, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None)){
-                            outputStream.WriteTo(fs);
-                        }
-                    } else if (dest is Stream) {
-                        outputStream.WriteTo((Stream)dest);
-                    }
-                } 
-                
-
-
+                //Now encode imageData and be done with it...
+                return Encode(factory, imageData, imageDest.Size, job);
             } finally {
-                //Nothing to do really...
+                //Manually cleanup all the com reference counts, aggressively
+                while (com.Count > 0) {
+                    Marshal.ReleaseComObject(com[com.Count - 1]); //In reverse order, so no item is ever deleted out from under another.
+                    com.RemoveAt(com.Count - 1);
+                }
             }
-            return true;
+        }
+
+        protected virtual RequestedAction Encode(IWICComponentFactory factory, IWICBitmapSource data, Size imageSize, ImageBuilder.Job job) {
+            WicEncoderPlugin encoder = new WicEncoderPlugin(job.Settings, job.SourcePathData); 
+ 
+            //Create the IStream/MemoryStream
+            var outputStream = new MemoryIStream();
+
+
+            encoder.EncodeToStream(factory, data, imageSize, outputStream);
+
+            object dest = job.Dest;
+            // Try to save the bitmap
+            if (dest is string) {
+                string destPath = job.Dest as string;
+                //Convert app-relative paths
+                if (destPath.StartsWith("~", StringComparison.OrdinalIgnoreCase)) destPath = HostingEnvironment.MapPath(destPath);
+
+                //Add the file extension if specified.
+                if (job.AddFileExtension) destPath += "." + encoder.Extension; 
+
+                job.FinalPath = destPath;
+                using (FileStream fs = new FileStream((string)dest, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None)) {
+                    outputStream.WriteTo(fs);
+                }
+            } else if (dest is Stream) {
+                outputStream.WriteTo((Stream)dest);
+            } else return RequestedAction.None;
+
+            return RequestedAction.Cancel;
         }
 
 
         public IEnumerable<IIssue> GetIssues() {
             List<IIssue> issues = new List<IIssue>();
-            if (Environment.OSVersion.Version.Major < 6) issues.Add(new Issue("WIC should only be used Windows 7, Server 2008, or higher.", IssueSeverity.Critical));
+            if (Environment.OSVersion.Version.Major < 6) issues.Add(new Issue("WIC should only be used Windows 7, Server 2008, or higher to prevent stability issues.", IssueSeverity.Critical));
             return issues;
+        }
+
+        public IEnumerable<string> GetSupportedFileExtensions() {
+            return new string[]{"hdp","jxr","wdp"};//Plus the ones already listed by ImageBuilder
+            //We can enumerate available codecs through factory.CreateComponentEnumerator and factory.CreateComponentInfo...
+            //But those codecs only give us Author, CLSID, FriendlyName, SpecVersion, VendorGUID, and Version. No list of supported file extensions.
+            //So maybe it's best to make that user-specified?
         }
     }
 }

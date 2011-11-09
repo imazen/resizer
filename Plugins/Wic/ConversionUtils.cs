@@ -11,6 +11,33 @@ using System.Drawing.Imaging;
 namespace ImageResizer.Plugins.Wic {
     public class ConversionUtils {
 
+        private static HashSet<Guid> alphaFormats = new HashSet<Guid>(new Guid[]{
+            Consts.GUID_WICPixelFormat112bpp6ChannelsAlpha, Consts.GUID_WICPixelFormat128bpp7ChannelsAlpha,
+            Consts.GUID_WICPixelFormat128bppPRGBAFloat, Consts.GUID_WICPixelFormat128bppRGBAFixedPoint,
+            Consts.GUID_WICPixelFormat128bppRGBAFloat, Consts.GUID_WICPixelFormat144bpp8ChannelsAlpha,
+            Consts.GUID_WICPixelFormat32bpp3ChannelsAlpha, Consts.GUID_WICPixelFormat40bpp4ChannelsAlpha,
+            Consts.GUID_WICPixelFormat56bpp6ChannelsAlpha, Consts.GUID_WICPixelFormat64bpp3ChannelsAlpha,
+            Consts.GUID_WICPixelFormat16bppBGRA5551,  Consts.GUID_WICPixelFormat32bppBGRA, 
+            Consts.GUID_WICPixelFormat32bppPBGRA, Consts.GUID_WICPixelFormat32bppPRGBA, 
+            Consts.GUID_WICPixelFormat32bppRGBA, Consts.GUID_WICPixelFormat32bppRGBA1010102, 
+            Consts.GUID_WICPixelFormat32bppRGBA1010102XR, Consts.GUID_WICPixelFormat40bpp4ChannelsAlpha,
+            Consts.GUID_WICPixelFormat40bppCMYKAlpha, Consts.GUID_WICPixelFormat48bpp5ChannelsAlpha,
+            Consts.GUID_WICPixelFormat56bpp6ChannelsAlpha, Consts.GUID_WICPixelFormat64bpp3ChannelsAlpha,
+            Consts.GUID_WICPixelFormat64bpp7ChannelsAlpha, Consts.GUID_WICPixelFormat64bppBGRA,
+            Consts.GUID_WICPixelFormat64bppBGRAFixedPoint, Consts.GUID_WICPixelFormat64bppPBGRA,
+            Consts.GUID_WICPixelFormat64bppPRGBA, Consts.GUID_WICPixelFormat64bppRGBA,
+            Consts.GUID_WICPixelFormat64bppRGBAFixedPoint, Consts.GUID_WICPixelFormat64bppRGBAHalf,
+            Consts.GUID_WICPixelFormat72bpp8ChannelsAlpha, Consts.GUID_WICPixelFormat80bpp4ChannelsAlpha,
+            Consts.GUID_WICPixelFormat80bppCMYKAlpha, Consts.GUID_WICPixelFormat8bppAlpha,
+            Consts.GUID_WICPixelFormat96bpp5ChannelsAlpha, Consts.GUID_WICPixelFormat8bppIndexed,
+            Consts.GUID_WICPixelFormat4bppIndexed, Consts.GUID_WICPixelFormat1bppIndexed,
+            Consts.GUID_WICPixelFormat2bppIndexed
+
+        });
+        public static bool HasAlphaAbility(Guid format) {
+            return alphaFormats.Contains(format);
+
+        }
 
         private static object _lockBppDict = new object();
         private static Dictionary<Guid,int> _bppDict = null;
