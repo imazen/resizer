@@ -35,7 +35,7 @@ QueryString.stringify = function (obj, sep, eq, name) {
         return name ? encodeURIComponent(name) + eq : '';
     }
 
-    if (isBool(obj)) obj = +obj;
+    if (isBool(obj)) obj = obj ? "true" : "false";
     if (isNumber(obj) || isString(obj)) {
         return encodeURIComponent(name) + eq + encodeURIComponent(obj);
     }

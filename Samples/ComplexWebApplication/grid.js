@@ -91,7 +91,7 @@ var updateGrid = function () {
     if (grid.yaxis.length > 0){
         var topRow = $("<tr />").append("<td />");
         for (var i =0; i < grid.yaxis.length; i++)
-            $("<th class='yfield' />").text(grid.commands[grid.yaxis[i]].key).appendTo(topRow);
+            $("<th class='yfield' />").text(grid.commands[grid.yaxis[i]].n).appendTo(topRow);
         for (var i = 0; i < Math.max(1,xItems.length); i++)
             topRow.append("<td />");
         topRow.appendTo(t);
@@ -175,21 +175,36 @@ $(function () {
         });*/
 
         $("<span class='field'></span>").text(item.n + " (" + item.key + "):").appendTo(d);
-        var select = $("<select></select>").appendTo(d); //.attr("size", item.values.length)
-        for (var i = 0; i < item.values.length; i++) {
-            $("<option></option>").attr("value", item.values[i]).text(item.values[i]).appendTo(select);
+
+        if (item.values.length == 2 && (item.values[0] === true || item.values[0] === false)
+        && (item.values[1] === true || item.values[1] === false)){
+            
+            var check = $("<input type='checkbox' />");
+            check.prop("checked", grid.global[item.key] !== undefined ? grid.global[item.key] : item.values[0]);
+            check.change(function(){
+                grid.global[item.key] = check.prop("checked");
+                updateGrid();
+                saveState();
+            });
+            check.appendTo(d);
+        }else{
+
+            var select = $("<select></select>").appendTo(d); //.attr("size", item.values.length)
+            for (var i = 0; i < item.values.length; i++) {
+                $("<option></option>").attr("value", item.values[i]).text(item.values[i]).appendTo(select);
+            }
+            if (grid.global[item.key] !== undefined)
+                select.val(grid.global[item.key])
+            else{
+                select.val(item.values[0]);
+                grid.global[item.key] = item.values[0];
+            }
+            select.change(function () {
+                grid.global[item.key] = select.val();
+                updateGrid();
+                saveState();
+            });
         }
-        if (grid.global[item.key] !== undefined)
-            select.val(grid.global[item.key])
-        else{
-            select.val(item.values[0]);
-            grid.global[item.key] = item.values[0];
-        }
-        select.change(function () {
-            grid.global[item.key] = select.val();
-            updateGrid();
-            saveState();
-        });
         var li = $("<li></li>").attr('title',ix).append(d);
         li.draggable({
             revert: "invalid",
@@ -267,30 +282,30 @@ $(function () {
 
     var restoreState = function(state){
         //Restore controls
-        grid.global = state.global !== undefined ? state.global : {};
+        grid.global = state.g !== undefined ? state.g : {};
         grid.globalcontrols = [];
         grid.xaxis = [];
         grid.yaxis = [];
         $("ul.controls").empty();
-        if (state.globalcontrols !== undefined) 
-            for (var i =0; i < state.globalcontrols.length; i++)
-                buildControl(state.globalcontrols[i]).appendTo($("ul.controls"));
+        if (state.gc !== undefined) 
+            for (var i =0; i < state.gc.length; i++)
+                buildControl(state.gc[i]).appendTo($("ul.controls"));
         
         //Restore axis
         $("ul.axisitems").empty();
-        if (state.xaxis !== undefined)
-            for(var i =0; i < state.xaxis.length; i++)
-                buildAxisItem(state.xaxis[i],grid,"xaxis").appendTo($("ul.x"));
-        if (state.yaxis !== undefined)
-            for(var i =0; i < state.yaxis.length; i++)
-                buildAxisItem(state.yaxis[i],grid,"yaxis").appendTo($("ul.y"));
+        if (state.x !== undefined)
+            for(var i =0; i < state.x.length; i++)
+                buildAxisItem(state.x[i],grid,"xaxis").appendTo($("ul.x"));
+        if (state.y !== undefined)
+            for(var i =0; i < state.y.length; i++)
+                buildAxisItem(state.y[i],grid,"yaxis").appendTo($("ul.y"));
         
         updateGrid();
 
     };
 
     var saveState = function(){
-        jQuery.bbq.pushState({globalcontrols: grid.globalcontrols,global:grid.global,xaxis:grid.xaxis,yaxis:grid.yaxis},2);
+        jQuery.bbq.pushState({gc: grid.globalcontrols,g:grid.global,x:grid.xaxis,y:grid.yaxis},2);
     };
     $(window).bind( 'hashchange', function(e) {
         restoreState(e.getState(true));
