@@ -35,7 +35,7 @@
     <ServiceConfiguration Include="ServiceConfiguration.cscfg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WebRole1\AzureWebImages.csproj">
+    <ProjectReference Include="..\AzureWebImages\AzureWebImages.csproj">
       <Name>AzureWebImages</Name>
       <Project>{26785f6a-8146-4697-8d94-6f4509512665}</Project>
       <Private>True</Private>
