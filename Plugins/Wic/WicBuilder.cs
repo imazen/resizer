@@ -212,7 +212,8 @@ namespace ImageResizer.Plugins.WicBuilder {
 
                 //Are we padding? Then we have to do an intermediate write.
                 if (state.destSize.Width != imageDest.Width || state.destSize.Height != imageDest.Height){
-                    byte[] bgcolor = new byte[ConversionUtils.BytesPerPixel(pixelFormat)];
+                    byte[] bgcolor = ConversionUtils.ConvertColor(job.Settings.BackgroundColor, pixelFormat);
+
                     for (int i = 0; i < bgcolor.Length; i++) bgcolor[i] = 255; //White
 
                     var padder = new WicBitmapPadder(imageData, imageDest.X, imageDest.Y, state.destSize.Width - (imageDest.X + imageDest.Width), state.destSize.Height - (imageDest.Y + imageDest.Height), bgcolor, null);
