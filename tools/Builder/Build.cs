@@ -59,7 +59,7 @@ namespace ImageResizer.ReleaseBuilder {
             "404 redirect actionresult routing logging nlog psd remote url download webclient virtual path provider virtualpathprovider CAIR seam carving " +
             "content aware image resizing alpha channel grayscale y ry ntsc bt709 flat size limit sizelimiting getthumbnailimage bitmap SQL database query blob " +
             "watermark virtual folder text overlay image watermark automatic whitespace trimming product images thumbnails " + 
-            "padding pad margin borders background color bgcolor InterpolationMode Fant";
+            "padding pad margin borders background color bgcolor InterpolationMode Fant wic IWICBitmap IWICBitmapSource";
 
             return nvc;
         }
@@ -332,8 +332,8 @@ namespace ImageResizer.ReleaseBuilder {
             extras.Run("/Build Debug") +
             extras.Run("/Build Trial");
 
-            if (result > 0 && !ask("There were build errors. Continue?")) return false;
-            else if (extrasResult > 0 && !ask("There were build errors for Plugins With External Dependencies. Continue?")) return false;
+            if (result > 0 && !ask("There may have been build errors. Continue?")) return false;
+            else if (extrasResult > 0 && !ask("There may have been build errors for Plugins With External Dependencies. Continue?")) return false;
             return true;
         }
 
@@ -375,6 +375,7 @@ namespace ImageResizer.ReleaseBuilder {
             q.exclusions.Add(new Pattern("^/Plugins/Libs/Aforge*.xml$"));
             q.exclusions.Add(new Pattern("^/Tests/Libs/LibDevCassini"));
             q.exclusions.Add(new Pattern("^/Tests/binaries"));
+            q.exclusions.Add(new Pattern("^/Tests/ComparisonBenchmark/Images"));
             q.exclusions.Add(new Pattern("^/Samples/SqlReaderSampleVarChar"));
             q.exclusions.Add(new Pattern("^/Contrib/*/(bin|obj|imagecache|uploads|results)/*"));
             q.exclusions.Add(new Pattern(".config.transform$"));
