@@ -177,7 +177,7 @@ namespace ImageResizer.Plugins.WicEncoder {
                     var qualityOption = new PROPBAG2[1];
                     qualityOption[0].pstrName = "ImageQuality";
                     
-                    propBag.Write(1, qualityOption, new object[] { ((float)Math.Max(100,Math.Min(0,Quality))) / 100 });
+                    propBag.Write(1, qualityOption, new object[] { ((float)Math.Max(0,Math.Min(100,Quality))) / 100 });
 
                     WICJpegYCrCbSubsamplingOption subsampling = WICJpegYCrCbSubsamplingOption.WICJpegYCrCbSubsamplingDefault;
                     //411 NOT SUPPPORTED BY WIC - only by freeimage
@@ -187,8 +187,9 @@ namespace ImageResizer.Plugins.WicEncoder {
 
                     if (subsampling != WICJpegYCrCbSubsamplingOption.WICJpegYCrCbSubsamplingDefault) {
                         var samplingOption = new PROPBAG2[1];
-                        qualityOption[0].pstrName = "JpegYCrCbSubsampling";
-                        propBag.Write(1, samplingOption, new object[] { subsampling });
+                        samplingOption[0].pstrName = "JpegYCrCbSubsampling";
+                        samplingOption[0].vt = VarEnum.VT_UI1;
+                        propBag.Write(1, samplingOption, new object[] { (byte)subsampling });
                     }
                 }
                 //PNG interlace
@@ -197,8 +198,6 @@ namespace ImageResizer.Plugins.WicEncoder {
                 //Apply the property bag
                 outputFrame.Initialize(propBag);
 
-                //Set destination frame size
-                outputFrame.SetSize((uint)imageSize.Width, (uint)imageSize.Height);
 
                 //Convert the bitmap to the correct pixel format for encoding.
 
@@ -248,7 +247,7 @@ namespace ImageResizer.Plugins.WicEncoder {
 
                         var palette = factory.CreatePalette();
                         com.Add(palette);
-                        palette.InitializeFromBitmap(data, (uint)colors - 1, true);
+                        palette.InitializeFromBitmap(data, (uint)colors, true);
 
                         /*dither, pIPalette, alphaThresholdPercent, and paletteTranslate are used to mitigate color loss when 
                          * converting to a reduced bit-depth format. For conversions that do not need these settings, the 
@@ -261,7 +260,12 @@ namespace ImageResizer.Plugins.WicEncoder {
                     }
                 }
 
+                //Get size
+                uint fw, fh;
+                data.GetSize(out fw, out fh);
 
+                //Set destination frame size
+                outputFrame.SetSize(fw,fh);
 
                 // Write the data to the output frame
                 outputFrame.WriteSource(data, null);
