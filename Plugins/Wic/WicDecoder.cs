@@ -19,6 +19,9 @@ namespace ImageResizer.Plugins.WicDecoder {
     /// </summary>
     public class WicDecoderPlugin : BuilderExtension, IPlugin, IFileExtensionPlugin, IIssueProvider {
 
+        public WicDecoderPlugin() {
+        }
+
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             return this;
