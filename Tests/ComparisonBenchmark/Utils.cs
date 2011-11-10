@@ -7,21 +7,30 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Test.Tools.WicCop.InteropServices.ComTypes;
 using WicResize.InteropServices;
+using System.Runtime.InteropServices;
 
 namespace Benchmark {
     public class Utils {
 
-        public static IWICBitmapFrameDecode ReadWicBitmapFrame(IWICComponentFactory factory, byte[] photoBytes) {
-            var inputStream = factory.CreateStream();
-            inputStream.InitializeFromMemory(photoBytes, (uint) photoBytes.Length);
-            var decoder = factory.CreateDecoderFromStream(inputStream, null,
-                                                          WICDecodeOptions.WICDecodeMetadataCacheOnLoad);
-            return decoder.GetFrame(0);
-   
-        }
 
-        public static byte[] WicResize(IWICComponentFactory factory, IWICBitmapFrameDecode frame, uint width,
-                                       uint height, int quality) {
+        public static byte[] WicResize(IWICComponentFactory factory, byte[] photoBytes, int width, int height, int quality) {
+            IWICBitmapDecoder decoder = null ;
+            var inputStream = factory.CreateStream();
+            try {
+                
+                inputStream.InitializeFromMemory(photoBytes, (uint)photoBytes.Length);
+                decoder = factory.CreateDecoderFromStream(inputStream, null,
+                                                              WICDecodeOptions.WICDecodeMetadataCacheOnLoad);
+                return WicResize(factory, decoder.GetFrame(0), width, height, quality);
+            } finally {
+                Marshal.ReleaseComObject(decoder);
+                Marshal.ReleaseComObject(inputStream);
+            }
+        }
+        
+
+        public static byte[] WicResize(IWICComponentFactory factory, IWICBitmapFrameDecode frame, int width,
+                                       int height, int quality) {
             // Prepare output stream to cache file
             var outputStream = new MemoryIStream();
             // Prepare PNG encoder
@@ -39,16 +48,32 @@ namespace Benchmark {
             double dpiX, dpiY;
             frame.GetResolution(out dpiX, out dpiY);
             outputFrame.SetResolution(dpiX, dpiY);
-            outputFrame.SetSize(width, height);
+
+            uint ow, oh, w, h;
+            frame.GetSize(out ow, out oh);
+            if (ow > oh ) {
+                w = (uint)width;
+                h = (uint)((double)height * (double)oh / (double)ow);
+            } else {
+                w = (uint)((double)height * (double)ow / (double)oh);
+                h = (uint)height;
+            }
+
+
+            outputFrame.SetSize(w, h);
             // Prepare scaler
             var scaler = factory.CreateBitmapScaler();
-            scaler.Initialize(frame, width, height, WICBitmapInterpolationMode.WICBitmapInterpolationModeFant);
+            scaler.Initialize(frame, w, h, WICBitmapInterpolationMode.WICBitmapInterpolationModeFant);
             // Write the scaled source to the output frame
             outputFrame.WriteSource(scaler, new WICRect {X = 0, Y = 0, Width = (int) width, Height = (int) height});
             outputFrame.Commit();
             encoder.Commit();
             var outputArray = outputStream.ToArray();
             outputStream.Close();
+            Marshal.ReleaseComObject(outputFrame);
+            Marshal.ReleaseComObject(scaler);
+            Marshal.ReleaseComObject(propBag);
+            Marshal.ReleaseComObject(encoder);
             return outputArray;
         }
 
