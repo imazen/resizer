@@ -23,7 +23,8 @@ namespace WicResize.InteropServices {
         }
 
         void IStream.Seek(long dlibMove, int dwOrigin, IntPtr plibNewPosition) {
-            Marshal.WriteInt64(plibNewPosition, Seek(dlibMove, dwOrigin == 0 ? SeekOrigin.Begin : dwOrigin == 1 ? SeekOrigin.Current : SeekOrigin.End));
+            long pos = Seek(dlibMove, dwOrigin == 0 ? SeekOrigin.Begin : dwOrigin == 1 ? SeekOrigin.Current : SeekOrigin.End);
+            if (plibNewPosition != IntPtr.Zero) Marshal.WriteInt64(plibNewPosition, pos);
         }
 
         void IStream.SetSize(long libNewSize) {
