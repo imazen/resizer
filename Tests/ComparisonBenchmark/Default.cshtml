@@ -17,18 +17,9 @@
                 <tr>
                     <td>Size</td>
                     <td>Quality</td>
-                     @{ var systems = new string[] { "ImageResizer", "GDI", "GDI(defaults=bertrand)", "GDI(defaults=bertrand;blend=SourceOver)","GDI(defaults=bertrand;filter=HighQualityBicubic)" ,
-                            "GDI(defaults=bertrand;filter=HighQualityBicubic;blend=SourceOver)"};
+                     @{ var systems = new string[] { "ImageResizer","ImageResizer(speed=4)", "ImageResizer(builder=wic)", "ImageResizer(builder=wic;w.filter=nearest)", "ImageResizer(builder=wic;w.filter=bicubic)", "GDI", "GDI(defaults=bertrand)", "WIC", "WPF" };
                        }
                             
-                            /* 
-                        InterpolationMode interpolationMode = ImageResizer.Util.Utils.parseEnum<InterpolationMode>(s["filter"], InterpolationMode.HighQualityBicubic); ;
-                        SmoothingMode smoothingMode = ImageResizer.Util.Utils.parseEnum<SmoothingMode>(s["smoothing"], SmoothingMode.HighQuality);
-                        PixelOffsetMode pixelMode = ImageResizer.Util.Utils.parseEnum<PixelOffsetMode>(s["pixel"], PixelOffsetMode.HighQuality);
-                        CompositingQuality compositingQuality = ImageResizer.Util.Utils.parseEnum<CompositingQuality>(s["compose"], CompositingQuality.HighQuality);
-                        CompositingMode compositingMode = ImageResizer.Util.Utils.parseEnum<CompositingMode>(s["blend"], CompositingMode.SourceOver);*/
-                            //"ImageResizer(builder=freeimage;fi.filter=catmullrom)",
-                              //                      "ImageResizer(builder=wic;w.filter=nearest)", "ImageResizer(speed=4)", "WIC", "WPF", "GDI" };}
                      @foreach (string sys in systems) {
                         @: <td>@(sys) time</td>
                      }
@@ -42,9 +33,10 @@
 @{
     
     var files = Directory.GetFiles(Server.MapPath("~/images"), "*.jpg");
-    var qualities = new int[] { 90 };
-    //qualities = new int[] { 10, 25, 50, 75, 80, 85, 90, 95, 100 }; //To get a better distribution without increasing benchmark run time.
-    
+    var qualities = new int[] { 100 };
+    var writeFiles = false;
+    qualities = new int[] { 10, 25, 50, 75, 80, 85, 90, 95, 100 }; //To get a better distribution without increasing benchmark run time.
+    var buildCount = files.Length;
     foreach (var thumbnailSize in new int[]{150,600}){
     
     foreach(var quality in qualities) {
@@ -52,16 +44,22 @@
         var timers = new Dictionary<string, Stopwatch>();
         var size = new Dictionary<string, int>();
         
-        //Loop through each system.
-        foreach(string system in systems){
-            //Init timers and size values
-            timers[system] = new Stopwatch();
-            size[system] = 0;
-            //Loop through files to develop an average
-            foreach (var file in files) {
-                var filename = System.IO.Path.GetFileName(file);
-                if (filename.StartsWith(".") || filename.StartsWith("_")) { continue; }//Skip temp files
-                var photoBytes = File.ReadAllBytes(file);
+        //Loop through files to develop an average
+        foreach (var file in files) {
+            var filename = System.IO.Path.GetFileName(file);
+            if (filename.StartsWith(".") || filename.StartsWith("_")) { continue; }//Skip temp files
+            var photoBytes = File.ReadAllBytes(file);
+
+            
+            //Loop through each system. We do systems for each file to prevent one system from messing with another too badly.
+            foreach(string system in systems){
+                //Init timers and size values
+                if (!timers.ContainsKey(system)){ 
+                    timers[system] = new Stopwatch();
+                    size[system] = 0;
+                }
+            
+                
                 byte[] resized = null;
                 
                 timers[system].Start();
@@ -70,18 +68,10 @@
                 if (system.StartsWith("ImageResizer", StringComparison.OrdinalIgnoreCase)){
                     string settings = system.Length > 12 ? system.Substring(12).Trim('(', ')') : "";
                     var s = new ResizeSettings(settings);
-                    s.Width = thumbnailSize;
-                    s.Height = thumbnailSize;
+                    s.MaxWidth = thumbnailSize;
+                    s.MaxHeight = thumbnailSize;
                     s.Format = "jpg";
                     s.Quality = quality;
-                    
-                    //This is a hack to allow two separate pipeline upgrades to both be tested. 
-                    ImageResizer.Configuration.Config c = ImageResizer.Configuration.Config.Current;
-                    if ("freeimage".Equals(s["builder"], StringComparison.OrdinalIgnoreCase)){
-                        c.UpgradeImageBuilder(new ImageResizer.Plugins.FreeImageBuilder.FreeImageBuilderPlugin(c.CurrentImageBuilder.EncoderProvider, c.Pipeline));
-                    } else if ("wic".Equals(s["builder"], StringComparison.OrdinalIgnoreCase)) {
-                        c.UpgradeImageBuilder(new ImageResizer.Plugins.WicBuilder.WicBuilderPlugin(c.CurrentImageBuilder.EncoderProvider, c.Pipeline));
-                    }
                     
                     
                     using (var outStream = new MemoryStream()){
@@ -91,17 +81,9 @@
                  //WIC
                 }else if (system.Equals("WIC", StringComparison.OrdinalIgnoreCase)){
                     var factory = (IWICComponentFactory)new WICImagingFactory();
-                    var frame = Utils.ReadWicBitmapFrame(factory, photoBytes);
-                    uint width, height, thumbWidth, thumbHeight;
-                    frame.GetSize(out width, out height);
-                    if (width > height) {
-                        thumbWidth = (uint)thumbnailSize;
-                        thumbHeight = (uint)((double)height * (double)thumbnailSize / (double)width);
-                    } else {
-                        thumbWidth = (uint)((double)width * (double)thumbnailSize / (double)height);
-                        thumbHeight = (uint)thumbnailSize;
-                    }
-                    resized = Utils.WicResize(factory, frame, thumbWidth, thumbHeight, quality);
+                    
+                    resized = Utils.WicResize(factory, photoBytes, thumbnailSize, thumbnailSize, quality);
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(factory);
                 }else if (system.Equals("WPF", StringComparison.OrdinalIgnoreCase)){
                     using (var photoStream = new MemoryStream(photoBytes)) {
                         var photo = Utils.ReadWpfBitmapFrame(photoStream);
@@ -168,10 +150,13 @@
                 timers[system].Stop();
                 size[system] += resized.Length;
 
-                // Write out the thumbnail, to validate it actually works
-                var dir =  Server.MapPath("~/Results/" + system);
-                if (!Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
-                File.WriteAllBytes(dir + System.IO.Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(file) +"_" + thumbnailSize + "_" + quality + ".jpg", resized);
+                
+                if (writeFiles){
+                    // Write out the thumbnail, to validate it actually works
+                    var dir = Server.MapPath("~/Results/" + system);
+                    if (!Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
+                    File.WriteAllBytes(dir + System.IO.Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(file) +"_" + thumbnailSize + "_" + quality + ".jpg", resized);
+                }
                 GC.Collect();
                 System.Threading.Thread.Sleep(50);
             }
@@ -184,7 +169,7 @@
         <td>@thumbnailSize</td>
             <td>@quality</td>
                      @foreach (string sys in systems) {
-                        @: <td>@(timers[sys].Elapsed.ToString())</td>
+                        @: <td>@(Math.Round(timers[sys].Elapsed.TotalMilliseconds / (float)buildCount).ToString())</td>
                      }
                      @foreach (string sys in systems) {
                          @: <td>@(size[sys] /1024)</td>
