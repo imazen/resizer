@@ -694,22 +694,16 @@ namespace ImageResizer
             //If the image doesn't support transparency, we need to fill the background color now.
             Color background = s.settings.BackgroundColor;
 
-            if (background == Color.Transparent) {
-                //Only set the bgcolor if the image isn't taking the whole area.
-                if (!s.supportsTransparency) {
-                    //If the source format doesn't support transparency either, we should be able to safely leave the bg transparent, hopefully preventing the ghostly outline.
-                    //Update: nope, doesn't seem to help. Must be the edge blending by the hq bicubic.
-                    if (s.sourceBitmap != null && (s.sourceBitmap.PixelFormat == PixelFormat.Format24bppRgb ||
+            //Find out if we can safely know that nothing will be showing from behind the image (no margin, padding, etc, and source format doesn't have alpha channel).
+            bool nothingToShow = (s.sourceBitmap != null && (s.sourceBitmap.PixelFormat == PixelFormat.Format24bppRgb ||
                         s.sourceBitmap.PixelFormat == PixelFormat.Format32bppRgb || 
                         s.sourceBitmap.PixelFormat == PixelFormat.Format48bppRgb) &&
-                        PolygonMath.ArraysEqual(s.layout["image"], s.layout.LastRing.points)) {
-                        //Do nothing, there is no visible 
-                            int j = 0;
-                    } else {
-                        background = Color.White;
-                    }
-                }
-            }
+                        PolygonMath.ArraysEqual(s.layout["image"], s.layout.LastRing.points));
+
+            //Set the background to white if the background will be showing and the destination format doesn't support transparency.
+            if (background == Color.Transparent && !s.supportsTransparency & !nothingToShow) 
+                background = Color.White;
+
 
             
             //Fill background
