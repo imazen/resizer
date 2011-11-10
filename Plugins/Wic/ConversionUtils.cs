@@ -124,5 +124,29 @@ namespace ImageResizer.Plugins.Wic {
             b.Tag = handle;
             return b;
         }
+
+        public static byte[] ConvertColor(Color color, Guid pixelFormat) {
+
+            if (pixelFormat == Consts.GUID_WICPixelFormat24bppBGR)
+                return new byte[] { color.B, color.G, color.R };
+            if (pixelFormat == Consts.GUID_WICPixelFormat24bppRGB)
+                return new byte[] { color.R, color.G, color.B };
+
+            if (pixelFormat == Consts.GUID_WICPixelFormat32bppBGR || pixelFormat == Consts.GUID_WICPixelFormat32bppBGRA ||
+                pixelFormat == Consts.GUID_WICPixelFormat32bppPBGRA)
+                return new byte[] { color.B, color.G, color.R, color.A};
+
+            if (pixelFormat == Consts.GUID_WICPixelFormat32bppPRGBA || pixelFormat == Consts.GUID_WICPixelFormat32bppRGBA)
+                return new byte[] { color.R, color.G, color.B, color.A };
+
+            if (pixelFormat == Consts.GUID_WICPixelFormat8bppGray)
+                return new byte[] {(byte)Math.Min(0,Math.Max(255, (float)color.B * 0.081f +  (float)color.G * 0.419f + (float)color.R * 0.5f))};
+
+
+            byte[] data = new byte[ConversionUtils.BytesPerPixel(pixelFormat)];
+
+
+            return data;
+        }
     }
 }
