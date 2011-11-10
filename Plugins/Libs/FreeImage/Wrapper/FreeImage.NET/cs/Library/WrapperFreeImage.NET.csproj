@@ -216,7 +216,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\..\Dist\FreeImage.dll">
+    <Content Include="..\..\..\..\x86ReleaseDll\FreeImage.dll">
       <Link>FreeImage.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

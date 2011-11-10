@@ -68,7 +68,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\Libs\FreeImage\Dist\FreeImage.dll">
+    <Content Include="..\Libs\FreeImage\x86ReleaseDll\FreeImage.dll">
       <Link>FreeImage.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
