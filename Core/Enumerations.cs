@@ -47,7 +47,7 @@ namespace ImageResizer {
 
     public enum ScaleMode {
         /// <summary>
-        /// The default when using Maxwidth/maxheight or mode=max. Only downsamples images - never enlarges. If an image is smaller than 'width' and 'height', the image coordinates are used instead.
+        /// The default. Only downsamples images - never enlarges. If an image is smaller than 'width' and 'height', the image coordinates are used instead.
         /// </summary>
         DownscaleOnly,
         /// <summary>
@@ -55,7 +55,7 @@ namespace ImageResizer {
         /// </summary>
         UpscaleOnly,
         /// <summary>
-        /// The default when using width/height and mode != max. Upscales and downscales images according to 'width' and 'height', within web.config restrictions.
+        /// Upscales and downscales images according to 'width' and 'height', within web.config restrictions.
         /// </summary>
         Both,
         /// <summary>
