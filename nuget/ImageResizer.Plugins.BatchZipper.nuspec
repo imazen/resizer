@@ -11,14 +11,14 @@
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 <description>API for Resizing and combining multiple images (and files) into a .zip folder asynchronously (or synchronously, if needed).
-Alpha, not yet documented.
 Visit http://imageresizing.net for details, documenation, and free support. 
 E-mail support@imageresizing.net if you encounter any problems with the software. 
+See http://imageresizing.net/plugins/batchzipper for documentation
 </description>
 		<tags>$tags$</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
-		  <dependency id="DotNetZip"/>
+		  <dependency id="DotNetZip.Reduced"/>
 		</dependencies>
 	</metadata>
   	<files>
