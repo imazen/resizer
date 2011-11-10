@@ -379,7 +379,7 @@ namespace ImageResizer.ReleaseBuilder {
             q.exclusions.Add(new Pattern("^/Samples/SqlReaderSampleVarChar"));
             q.exclusions.Add(new Pattern("^/Contrib/*/(bin|obj|imagecache|uploads|results)/*"));
             q.exclusions.Add(new Pattern(".config.transform$"));
-            q.exclusions.Add(new Pattern("^/Plugins/Libs/FreeImage/[^DW][^ir]*/")); //Exclude everything except Dist and Wrapper folders
+            q.exclusions.Add(new Pattern("^/Plugins/Libs/FreeImage/Examples/")); //Exclude examples folder
             q.exclusions.Add(new Pattern("^/Plugins/Libs/FreeImage/Wrapper/(Delphi|VB6|FreeImagePlus)")); //Exclude everything except the FreeImage.NET folder
             q.exclusions.Add(new Pattern("^/Plugins/Libs/FreeImage/Wrapper/FreeImage.NET/cs/[^L]*/")); //Exclude everything except the library folder
             q.exclusions.Add(new Pattern("^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|hidden|results)/"));
