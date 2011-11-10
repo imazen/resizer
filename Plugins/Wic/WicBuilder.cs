@@ -161,7 +161,7 @@ namespace ImageResizer.Plugins.WicBuilder {
                 frame.GetPixelFormat(out pixelFormat);
                 //Calculate the new size of the image and the canvas.
                 ImageState state = new ImageState(settings, orig, true);
-                Layout(state);
+                c.CurrentImageBuilder.Process(state);
 
 
                 Rectangle imageDest = PolygonMath.ToRectangle(PolygonMath.GetBoundingBox(state.layout["image"]));
