@@ -146,6 +146,8 @@ namespace ImageResizer
                     //Let the fallbacks work. (Only happens when a plugin overrides DecodeStream and retuns null)
                     if (b == null) throw new ImageCorruptedException("Failed to decode image. Plugin made DecodeStream return null.", null);
                 } catch (Exception e) {
+                    //if (Debugger.IsAttached) throw e;
+                    Debug.Write("Falling back to DecodeStreamFailed: " + e.Message + "\n" + e.StackTrace); 
                     //Start over - on error.
                     if (s.CanSeek && s.Position != 0)
                         s.Seek(0, SeekOrigin.Begin);
@@ -405,19 +407,11 @@ namespace ImageResizer
                 Stream underlyingStream = null;
                 if (b != null && b.Tag != null && b.Tag is BitmapTag) underlyingStream = ((BitmapTag)b.Tag).Source;
 
-                //Look for underlying GCHandle under the source bitmap
-                GCHandle underlyingHandle = default(GCHandle);
-                bool hasHandle = false;
-                if (b != null & b.Tag != null && b.Tag is GCHandle) { underlyingHandle = (GCHandle)b.Tag; hasHandle = true; }
-
                 //Close the source bitamp's underlying stream unless it is the same stream (EDIT: or bitmap) we were passed.
                 if (b != job.Source && underlyingStream != job.Source && underlyingStream != null) underlyingStream.Dispose();
 
                 //Dispose the bitmap unless we were passed it. We check for 'null' in case an ImageCorruptedException occured. 
                 if (b != null && b != job.Source) b.Dispose();
-
-                //Free the pinned byte[] underlying the Bitmap class.
-                if (b != job.Source && hasHandle) underlyingHandle.Free();
             }
 
             return RequestedAction.Cancel;
