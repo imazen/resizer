@@ -95,10 +95,6 @@
       <Project>{BB8EEB97-6550-4780-97B2-B0F2FCD80970}</Project>
       <Name>ImageResizer.Plugins.PrettyGifs</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\PsdReader\ImageResizer.Plugins.PsdReader.csproj">
-      <Project>{BCF28DA2-AF29-4C09-B37D-059F40FC9B95}</Project>
-      <Name>ImageResizer.Plugins.PsdReader</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\RemoteReader\ImageResizer.Plugins.RemoteReader.csproj">
       <Project>{0E6BE1A7-C754-4E33-A8AC-75A8549FC68B}</Project>
       <Name>ImageResizer.Plugins.RemoteReader</Name>
