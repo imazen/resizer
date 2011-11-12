@@ -88,10 +88,7 @@ namespace ImageResizer.Plugins.WicEncoder {
         private static bool IsValidOutputFormat(ImageFormat f) {
             return (ImageFormat.Gif.Equals(f) || ImageFormat.Png.Equals(f) || ImageFormat.Jpeg.Equals(f));
         }
-        [DllImport("gdi32.dll")]
-        public static extern bool DeleteObject(IntPtr hObject);
-
-        
+      
 
         public void Write(System.Drawing.Image i, System.IO.Stream s) {
             //A list of COM objects to destroy
@@ -104,17 +101,8 @@ namespace ImageResizer.Plugins.WicEncoder {
                 Stopwatch conversion = new Stopwatch();
                 conversion.Start();
 
-                //Copy GDI Bitmap pixel data into managed array
-                Bitmap bit = i as Bitmap;
-                BitmapData bd = bit.LockBits(new Rectangle(0, 0, bit.Width, bit.Height), ImageLockMode.ReadOnly, bit.PixelFormat);
-                int size = bd.Stride * bd.Height;
-                byte[] data = new byte[size];
-                Marshal.Copy(bd.Scan0, data, 0, size);
-                bit.UnlockBits(bd);
+                IWICBitmap b = ConversionUtils.ToWic(factory,i as Bitmap);
 
-                //Create WIC bitmap from that
-                IWICBitmap b = factory.CreateBitmapFromMemory((uint)bit.Width, (uint)bit.Height, ConversionUtils.FromPixelFormat(bit.PixelFormat), (uint)bd.Stride, (uint)size, data);
-                com.Add(b);
                 conversion.Stop();
 
                 Stopwatch encoding = new Stopwatch();
