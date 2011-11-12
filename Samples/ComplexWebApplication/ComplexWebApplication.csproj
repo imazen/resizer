@@ -140,6 +140,7 @@
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
     <Content Include="js\jquery.min.js" />
+    <Content Include="Misc\UrlAuthorizationTests.aspx" />
     <Content Include="Plugins.htm" />
     <Content Include="Misc\Protected\rose-leaf.jpg" />
     <Content Include="Misc\RegressionTests.aspx" />
@@ -173,13 +174,6 @@
       <DependentUpon>HandlerTest.ashx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Misc\RegressionTests.aspx.cs">
-      <DependentUpon>RegressionTests.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Misc\RegressionTests.aspx.designer.cs">
-      <DependentUpon>RegressionTests.aspx</DependentUpon>
-    </Compile>
     <Compile Include="SamplePlugin.cs" />
     <Compile Include="UploadSample.aspx.cs">
       <DependentUpon>UploadSample.aspx</DependentUpon>
