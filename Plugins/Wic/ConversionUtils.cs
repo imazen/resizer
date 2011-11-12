@@ -7,6 +7,7 @@ using Microsoft.Test.Tools.WicCop.InteropServices.ComTypes;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Drawing.Imaging;
+using Microsoft.Win32.SafeHandles;
 
 namespace ImageResizer.Plugins.Wic {
     public class ConversionUtils {
@@ -78,16 +79,30 @@ namespace ImageResizer.Plugins.Wic {
             if (wicFormat == Consts.GUID_WICPixelFormat32bppBGR) return System.Drawing.Imaging.PixelFormat.Format32bppRgb;
             if (wicFormat == Consts.GUID_WICPixelFormat32bppPBGRA) return System.Drawing.Imaging.PixelFormat.Format32bppPArgb;
             if (wicFormat == Consts.GUID_WICPixelFormat8bppIndexed) return System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
-            throw new NotSupportedException();
+            if (wicFormat == Consts.GUID_WICPixelFormat4bppIndexed) return PixelFormat.Format4bppIndexed;
+            if (wicFormat == Consts.GUID_WICPixelFormat48bppRGB) return PixelFormat.Format48bppRgb;
+            if (wicFormat == Consts.GUID_WICPixelFormat1bppIndexed) return PixelFormat.Format1bppIndexed;
+            if (wicFormat == Consts.GUID_WICPixelFormat64bppBGRA) return PixelFormat.Format64bppArgb;
+            return PixelFormat.Undefined;
         }
         public static Guid FromPixelFormat(PixelFormat f) {
+            if (f == PixelFormat.Alpha) return Consts.GUID_WICPixelFormat8bppAlpha;
+            if (f == PixelFormat.Canonical) return Consts.GUID_WICPixelFormat32bppBGRA;
+            if (f == PixelFormat.Format16bppArgb1555) return Consts.GUID_WICPixelFormat16bppBGRA5551;
+            if (f == PixelFormat.Format16bppGrayScale) return Consts.GUID_WICPixelFormat16bppGray;
+            if (f == PixelFormat.Format16bppRgb555) return Consts.GUID_WICPixelFormat16bppBGR555;
+            if (f == PixelFormat.Format16bppRgb565) return Consts.GUID_WICPixelFormat16bppBGR565;
+            if (f == PixelFormat.Format1bppIndexed) return Consts.GUID_WICPixelFormat1bppIndexed;
             if (f == PixelFormat.Format24bppRgb) return Consts.GUID_WICPixelFormat24bppBGR;
             if (f == PixelFormat.Format32bppRgb) return Consts.GUID_WICPixelFormat32bppBGR;
             if (f == PixelFormat.Format32bppArgb) return Consts.GUID_WICPixelFormat32bppBGRA;
             if (f == PixelFormat.Format32bppPArgb) return Consts.GUID_WICPixelFormat32bppPBGRA;
+            if (f == PixelFormat.Format48bppRgb) return Consts.GUID_WICPixelFormat48bppBGR;
+            if (f == PixelFormat.Format4bppIndexed) return Consts.GUID_WICPixelFormat4bppIndexed;
+            if (f == PixelFormat.Format64bppArgb) return Consts.GUID_WICPixelFormat64bppBGRA;
+            if (f == PixelFormat.Format64bppPArgb) return Consts.GUID_WICPixelFormat64bppPBGRA;
             if (f == PixelFormat.Format8bppIndexed) return Consts.GUID_WICPixelFormat8bppIndexed;
-
-            throw new NotSupportedException();
+            return Guid.Empty;
         }
 
         public static uint GetStride(IWICBitmapSource source) {
@@ -101,29 +116,68 @@ namespace ImageResizer.Plugins.Wic {
             return stride;
         }
 
-        public static Bitmap FromWic(IWICBitmapSource source) {
-            return null;
-            //var factory = (IWICComponentFactory)new WICImagingFactory();
-            //var converter = factory.CreateFormatConverter();
-            //TODO: handle conversion. converter.Initialize(b, GUID_WICPixelFormat24bppBGR, WICBitmapDitherType.
+        [DllImport("WindowsCodecs.dll", EntryPoint = "IWICImagingFactory_CreateBitmapFromMemory_Proxy")]
+        internal static extern int CreateBitmapFromMemory(IWICComponentFactory factory, uint width, uint height, ref Guid pixelFormatGuid, uint stride, uint cbBufferSize, IntPtr pvPixels, out IWICBitmap ppIBitmap);
 
-            uint w, h;
-            source.GetSize(out w, out h);
-            Guid format;
-            source.GetPixelFormat(out format);
 
-            uint stride = GetStride(source);
-
-            //Allocate managed memory to decode the image into. 
-            uint bufferSize = stride * h;
-            byte[] buffer = new byte[bufferSize];
-            //Decode and store the data
-            source.CopyPixels(new WICRect { X = 0, Y = 0, Width = (int)w, Height = (int)h }, stride, bufferSize, buffer);
-            GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-            Bitmap b = new Bitmap((int)w, (int)h, (int)stride, GetPixelFormat(format), handle.AddrOfPinnedObject());
-            b.Tag = handle;
-            return b;
+        public static IWICBitmap ToWic(IWICComponentFactory factory, Bitmap bit) {
+            Guid pixelFormat = ConversionUtils.FromPixelFormat(bit.PixelFormat);
+            if (pixelFormat == Guid.Empty) throw new NotSupportedException("PixelFormat " + bit.PixelFormat.ToString() + " not supported.");
+            BitmapData bd = bit.LockBits(new Rectangle(0, 0, bit.Width, bit.Height), ImageLockMode.ReadOnly, bit.PixelFormat);
+            IWICBitmap b = null;
+            try {
+                    //Create WIC bitmap directly from unmanaged memory
+                long result = CreateBitmapFromMemory(factory, (uint)bit.Width, (uint)bit.Height, ref pixelFormat, (uint)bd.Stride, (uint)(bd.Stride * bd.Height), bd.Scan0, out b);
+                //b = factory.CreateBitmapFromMemory((uint)bit.Width, (uint)bit.Height, ConversionUtils.FromPixelFormat(bit.PixelFormat), (uint)bd.Stride, (uint)(bd.Stride * bd.Height), bd.Scan0);
+                if (result == 0x80070057) throw new ArgumentException();
+                if (result < 0) throw new Exception("HRESULT " + result);
+                return b;
+            } finally {
+                bit.UnlockBits(bd);
+            }
         }
+
+    [DllImport("WindowsCodecs.dll", EntryPoint = "IWICBitmapSource_CopyPixels_Proxy")]
+    internal static extern int CopyPixels(IWICBitmapSource bitmap, IntPtr rect, uint cbStride, uint cbBufferSize, IntPtr pvPixels);
+
+    public static Bitmap FromWic(IWICBitmapSource source) {
+            
+        Guid format; //Get the WIC pixel format
+        source.GetPixelFormat(out format);
+        //Get the matching GDI format
+        PixelFormat gdiFormat = ConversionUtils.GetPixelFormat(format);
+
+        //If it's not GDI-supported format, convert it to one.
+        IWICComponentFactory factory = null;
+        IWICFormatConverter converter = null;
+        try {
+            if (gdiFormat == PixelFormat.Undefined) {
+                factory = (IWICComponentFactory)new WICImagingFactory();
+                converter = factory.CreateFormatConverter();
+                converter.Initialize(source, Consts.GUID_WICPixelFormat32bppBGRA, WICBitmapDitherType.WICBitmapDitherTypeNone, null, 0.9f, WICBitmapPaletteType.WICBitmapPaletteTypeCustom);
+                gdiFormat = PixelFormat.Format32bppArgb;
+            }
+            IWICBitmapSource data = converter != null ? converter : source;
+
+            //Get the dimensions of the WIC bitmap
+            uint w, h;
+            data.GetSize(out w, out h);
+
+            Bitmap b = new Bitmap((int)w, (int)h, gdiFormat);
+            BitmapData bd = b.LockBits(new Rectangle(0, 0, (int)w, (int)h), ImageLockMode.WriteOnly, b.PixelFormat);
+            try {
+                long result = CopyPixels(data, IntPtr.Zero, (uint)bd.Stride, (uint)(bd.Stride * bd.Height), bd.Scan0);
+                if (result == 0x80070057) throw new ArgumentException();
+                if (result < 0) throw new Exception("HRESULT " + result);
+                return b;
+            } finally {
+                b.UnlockBits(bd);
+            }
+        } finally {
+            if (converter != null) Marshal.ReleaseComObject(converter);
+            if (source != null) Marshal.ReleaseComObject(factory);
+        }
+    }
 
         public static byte[] ConvertColor(Color color, Guid pixelFormat) {
 
