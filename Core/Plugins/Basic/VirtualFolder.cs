@@ -9,13 +9,14 @@ using ImageResizer.Configuration;
 using System.IO;
 using System.Web.Caching;
 using System.Collections.Specialized;
+using System.Security;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
     /// Functions exactly like an IIS virtual folder, but doesn't require IIS configuration.
     /// </summary>
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
-    [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
+    [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.Medium)]
     public class VirtualFolder : VirtualPathProvider, IPlugin , IMultiInstancePlugin{
 
         public VirtualFolder(string virtualPath, string physicalPath)
@@ -70,14 +71,37 @@ namespace ImageResizer.Plugins.Basic {
 
 
         protected string normalizeVirtualPath(string path) {
-            if (path.StartsWith("~")) path = HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/' + path.Substring(1).TrimStart('/');
+            if (!path.StartsWith("/")) path = HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/' + path.Substring(1).TrimStart('/');
             return path;
         }
 
         protected string resolvePhysicalPath(string path) {
             
             if (!Path.IsPathRooted(path)) path = Path.Combine(HostingEnvironment.ApplicationPhysicalPath, path);
-            return Path.GetFullPath(path);
+            try {
+                return Path.GetFullPath(path);
+            } catch (SecurityException) { //TODO: provide alterante implementation that is medium-trust friendly, or maybe just throw the error that we don't have permissions to call File.Open anyway? 
+                return collapsePath(path);
+            }
+        }
+
+        protected string collapsePath(string path){
+            string oldPath = path;
+            do{
+                oldPath = path;
+                path = collapseOneLevel(oldPath);
+            }while(oldPath != path);
+            return path;
+        }
+
+        protected string collapseOneLevel(string path) {
+            int up = path.IndexOf(Path.DirectorySeparatorChar + ".." + Path.DirectorySeparatorChar);
+            if (up < 0) return path;
+            int prevSlash = path.LastIndexOf(Path.DirectorySeparatorChar, up - 1);
+            if (prevSlash > -1) {
+                return path.Substring(0, prevSlash) + path.Substring(up + 3);
+            }
+            return path;
         }
 
         public string virtualToPhysical(string virtualPath) {
