@@ -123,7 +123,7 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
 
                 //Calculate the new size of the image and the canvas.
                 ImageState state = new ImageState(settings, orig, true);
-                Layout(state);
+                c.CurrentImageBuilder.Process(state);
                 RectangleF imageDest = PolygonMath.GetBoundingBox(state.layout["image"]);
 
                 if (imageDest.Width != orig.Width || imageDest.Height != orig.Height) {
