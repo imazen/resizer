@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="RegressionTests.aspx.cs" Inherits="SampleProject.RegressionTests" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true"  %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -48,7 +48,8 @@
          <h3>There should be a 50% opaque white 1px border on this image. Anything more is a bug</h3>
         
          <div style="background-color:Black; padding:30px">
-<img runat="server" src="red-leaf.jpg?width=300" />
+<img runat="server" src="red-leaf.jpg?width=300" /><img id="Img2" runat="server" src="red-leaf.jpg?width=300&builder=wic" />
+<img id="Img3" runat="server" src="red-leaf.jpg?width=300&builder=freeimage" />
 </div>
 
 <h3>No clipping should occur (original, followed by resized)</h3>
@@ -73,15 +74,7 @@
         <h3>IIS Configuration-free mode (.jpg.ashx)</h3>
         <img src="rose-leaf.jpg.ashx?width=400" runat="server" />
         
-        <h3>Security test</h3>
-        <img style="border:1px solid black;" src="resize(50,50)/Protected/rose-leaf.jpg" runat="server" />
-        <img style="border:1px solid black;" src="Protected/resize(50,50)/rose-leaf.jpg" runat="server" />
-        <img style="border:1px solid black;" src="Protected/rose-leaf.jpg.cd?width=50" runat="server" />
-                <img style="border:1px solid black;" src="resize(50,50)/Protected/rose-leaf2.jpg" runat="server" />
-        <img  style="border:1px solid black;" src="Protected2/resize(50,50)/rose-leaf.jpg" runat="server" />
-        <img style="border:1px solid black;" src="Protected2/rose-leaf.jpg.cd?width=50" runat="server" />
-        <p>There are six images referenced above... 0 should appear.</p>
-
+  
 
         <h3> More rounding bugs. </h3>
 
