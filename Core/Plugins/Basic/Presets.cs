@@ -29,7 +29,7 @@ namespace ImageResizer.Plugins.Basic {
             if (OnlyAllowPresets) {
                 string preset = e.QueryString["preset"];
                 e.QueryString.Clear();
-                e.QueryString["preset"] = preset;
+                e.QueryString["preset"] = preset.ToLowerInvariant();
             }
             ApplyPreset(e, settings);
         }
