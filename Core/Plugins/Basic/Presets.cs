@@ -6,9 +6,11 @@ using ImageResizer.Configuration;
 using ImageResizer.Configuration.Issues;
 
 namespace ImageResizer.Plugins.Basic {
-    public class Presets:IPlugin,IQuerystringPlugin {
+    public class Presets:IPlugin,IQuerystringPlugin, IIssueProvider {
 
+        Config c;
         public IPlugin Install(Configuration.Config c) {
+            this.c = c;
             c.Plugins.add_plugin(this);
             ParseXml(c.getConfigXml().queryFirst("presets"),c);
             c.Pipeline.RewriteDefaults += Pipeline_RewriteDefaults;
@@ -24,6 +26,11 @@ namespace ImageResizer.Plugins.Basic {
             ApplyPreset(e, defaults);
         }
         void Pipeline_Rewrite(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
+            if (OnlyAllowPresets) {
+                string preset = e.QueryString["preset"];
+                e.QueryString.Clear();
+                e.QueryString["preset"] = preset;
+            }
             ApplyPreset(e, settings);
         }
 
@@ -49,9 +56,20 @@ namespace ImageResizer.Plugins.Basic {
             return true;
         }
 
+        private bool _onlyAllowPresets = false;
+        /// <summary>
+        /// If true, the plugin will block all commands except those specified in a preset, and the &amp;preset command itself
+        /// </summary>
+        public bool OnlyAllowPresets
+        {
+          get { return _onlyAllowPresets; }
+          set { _onlyAllowPresets = value; }
+        }
 
         protected void ParseXml(Node n, Config conf) {
-            if (n == null || n.Children == null) return;
+            if (n == null ) return;
+            OnlyAllowPresets = Util.Utils.getBool(n.Attrs, "onlyAllowPresets", OnlyAllowPresets);
+            if (n.Children == null) return;
             foreach (Node c in n.Children) {
                 string name = c.Attrs["name"];
                 if (c.Name.Equals("preset", StringComparison.OrdinalIgnoreCase)) {
@@ -72,6 +90,17 @@ namespace ImageResizer.Plugins.Basic {
 
         public IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "preset" };
+        }
+
+        public IEnumerable<IIssue> GetIssues() {
+            if (OnlyAllowPresets && c.Plugins.Has<FolderResizeSyntax>()) {
+                return new IIssue[]{new Issue("Presets","The FolderResizeSyntax allows clients to circumvent the 'onlyAllowPresets' setting by pulling values from the path into the querystring.",
+                    "You should remove the FolderResizeSyntax to ensure 'onlyAllowPresets' can be enforced.", IssueSeverity.Critical)};
+            } else if (OnlyAllowPresets) {
+                return new IIssue[]{new Issue("Presets","Standard resizing commands are currently disabled; only presets are enabled.",
+                    "To fix, set <presets onlyAllowPresets=\"false\"> (it is currently set to true).", IssueSeverity.Warning)};
+            }
+            return new IIssue[] { };
         }
     }
 }
