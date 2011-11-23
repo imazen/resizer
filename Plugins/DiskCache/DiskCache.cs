@@ -12,6 +12,9 @@ using System.Web.Hosting;
 using ImageResizer.Configuration.Issues;
 using ImageResizer.Configuration.Logging;
 using ImageResizer.Plugins.Basic;
+using System.Security.Permissions;
+using System.Security;
+using System.Threading;
 
 namespace ImageResizer.Plugins.DiskCache
 {
@@ -131,14 +134,9 @@ namespace ImageResizer.Plugins.DiskCache
             }
             set {
                 BeforeSettingChanged();
-                virtualDir =  string.IsNullOrEmpty(value) ? null : value;
-                if (virtualDir != null){
-                    //Default to application-relative path if no leading slash is present. 
-                    //Resolve the tilde if present.
-                    if (virtualDir.StartsWith("~")) virtualDir = HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + virtualDir.Substring(1);
-                    else if (!virtualDir.StartsWith("/")) virtualDir =  HostingEnvironment.ApplicationVirtualPath.TrimEnd('/')  + "/" + virtualDir;
-                }
-                
+                //Default to application-relative path if no leading slash is present. 
+                //Resolve the tilde if present.
+                virtualDir =  string.IsNullOrEmpty(value) ? null : PathUtils.ResolveAppRelativeAssumeAppRelative(value);
             }
         }
         /// <summary>
@@ -150,6 +148,7 @@ namespace ImageResizer.Plugins.DiskCache
                 return null;
             }
         }
+
         /// <summary>
         /// Throws an exception if the class is already modified
         /// </summary>
@@ -222,14 +221,20 @@ namespace ImageResizer.Plugins.DiskCache
 
 
         /// <summary>
-        /// Returns true if the configured settings are valid.
+        /// Returns true if the configured settings are valid and .NET (not NTFS) permissions will work.
         /// </summary>
         /// <returns></returns>
         public bool IsConfigurationValid(){
-            return !string.IsNullOrEmpty(VirtualCacheDir) && this.Enabled;
+            return !string.IsNullOrEmpty(VirtualCacheDir) && this.Enabled && HasFileIOPermission();
         }
-
-
+        /// <summary>
+        /// Returns true if .NET permissions allow writing to the cache directory. Does not check NTFS permissions. 
+        /// </summary>
+        /// <returns></returns>
+        protected bool HasFileIOPermission() {
+            FileIOPermission writePermission = new FileIOPermission(FileIOPermissionAccess.AllAccess,new string[]{PhysicalCacheDir, Path.Combine(PhysicalCacheDir,"web.config")});
+            return SecurityManager.IsGranted(writePermission);
+        }
 
         
         protected CustomDiskCache cache = null;
@@ -331,14 +336,39 @@ namespace ImageResizer.Plugins.DiskCache
             return r;
         }
 
+        protected bool HasNTFSPermission(){
+            try {
+                if (!Directory.Exists(PhysicalCacheDir)) Directory.CreateDirectory(PhysicalCacheDir);
+                string testFile = Path.Combine(this.PhysicalCacheDir, "TestFile.txt");
+                File.WriteAllText(testFile, "You may delete this file - it is written and deleted just to verify permissions are configured correctly");
+                File.Delete(testFile);
+                return true;
+            } catch (Exception e){
+                return false;
+            }
+        }
 
-
+        protected string GetExecutingUser() {
+            try {
+                return Thread.CurrentPrincipal.Identity.Name;
+            } catch {
+                return "[Unknown - please check App Pool configuration]";
+            }
+        }
 
         public IEnumerable<IIssue> GetIssues() {
             List<IIssue> issues = new List<IIssue>();
             if (cleaner != null) issues.AddRange(cleaner.GetIssues());
-            if (string.IsNullOrEmpty(VirtualCacheDir)) issues.Add(new Issue("DiskCache", "cacheDir is empty. Cannot operate", null, IssueSeverity.ConfigurationError));
-            if (!Started) issues.Add(new Issue("DiskCache", "DiskCache is not running. Verify cacheDir is a valid path and enabled=true.", null, IssueSeverity.ConfigurationError));
+
+            if (!HasFileIOPermission()) 
+                issues.Add(new Issue("DiskCache", "Failed to start: Write access to the cache directory is prohibited by your .NET trust level configuration.", 
+                "Please configure your .NET trust level to permit writing to the cache directory. Most medium trust configurations allow this, but yours does not.", IssueSeverity.ConfigurationError));
+            
+            if (!HasNTFSPermission()) 
+                issues.Add(new Issue("DiskCache", "Not working: Your NTFS Security permissions are preventing the application from writing to the disk cache",
+    "Please give user " + GetExecutingUser() + " read and write access to directory \"" + PhysicalCacheDir + "\" to correct the problem. You can access NTFS security settings by right-clicking the aformentioned folder and choosing Properties, then Security.", IssueSeverity.ConfigurationError));
+
+            if (!Started && !Enabled) issues.Add(new Issue("DiskCache", "DiskCache is disabled in Web.config. Set enabled=true on the <diskcache /> element to fix.", null, IssueSeverity.ConfigurationError));
 
             //Warn user about setting hashModifiedDate=false in a web garden.
             if (this.cleaner != null && cleaner.ExteralProcessCleaning && !this.HashModifiedDate)
