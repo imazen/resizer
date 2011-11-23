@@ -70,7 +70,7 @@ namespace ImageResizer.Plugins.WicDecoder {
             var factory = (IWICComponentFactory)new WICImagingFactory();
 
             //Decode the image with WIC
-            IWICBitmapFrameDecode frame;
+            IWICBitmapSource frame;
             var streamWrapper = factory.CreateStream();
             streamWrapper.InitializeFromMemory(data, (uint)lData);
             var decoder = factory.CreateDecoderFromStream(streamWrapper, null,
@@ -91,8 +91,14 @@ namespace ImageResizer.Plugins.WicDecoder {
                     int frameCount = (int)decoder.GetFrameCount(); //Don't let the user go past the end.
                     if (frameIndex >= frameCount) frameIndex = frameCount - 1;
                 }
+                frameIndex = Math.Max(0, frameIndex);
 
-                frame = decoder.GetFrame((uint)Math.Max(0, frameIndex));
+                if ("true".Equals(settings["usepreview"]))
+                    frame = decoder.GetPreview();
+                else if ("true".Equals(settings["usethumb"]))
+                    frame = decoder.GetThumbnail();
+                else 
+                    frame = decoder.GetFrame((uint)frameIndex);
                 try {
                     return ConversionUtils.FromWic(frame);
                 } finally {
