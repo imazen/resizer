@@ -128,7 +128,7 @@ namespace ImageResizer.Plugins.Watermark {
 
         public Font GetFont() {
             FontFamily ff = string.IsNullOrEmpty(Font) ? FontFamily.GenericSansSerif : new FontFamily(Font);
-
+            
             return new Font(ff, FontSize, FontStyle.Bold, GraphicsUnit.Pixel);
 
         }
@@ -159,8 +159,9 @@ namespace ImageResizer.Plugins.Watermark {
             SizeF naturalSize = SizeF.Empty;
             SizeF unrotatedSize = SizeF.Empty;
              RectangleF bounds = this.CalculateLayerCoordinates(s, delegate(double maxwidth, double maxheight) {
-                 using (Font f= GetFont()){
-                    naturalSize = s.destGraphics.MeasureString(finalText, f, new PointF(), GetFormat());
+                 using (Font f= GetFont())
+                 using (StringFormat sf = GetFormat()){
+                    naturalSize = s.destGraphics.MeasureString(finalText, f, new PointF(), sf);
                      SizeF size = naturalSize;
 
                      unrotatedSize = Fill ? PolygonMath.ScaleInside(size, new SizeF((float)maxwidth, (float)maxheight)) : size;
@@ -169,9 +170,9 @@ namespace ImageResizer.Plugins.Watermark {
                      if (Fill) {
                          size = PolygonMath.ScaleInside(size, new SizeF((float)maxwidth, (float)maxheight));
                      }
-
-                     return PolygonMath.RoundPoints(size);
                      f.FontFamily.Dispose();
+                     return PolygonMath.RoundPoints(size);
+                     
                  }
              }, true);
              using (Font f = GetFont()) {
@@ -186,8 +187,9 @@ namespace ImageResizer.Plugins.Watermark {
                  if (Angle != 0) s.destGraphics.RotateTransform((float)Angle);
                  s.destGraphics.ScaleTransform(unrotatedSize.Width / naturalSize.Width, unrotatedSize.Height / naturalSize.Height);
                  s.destGraphics.TranslateTransform(bounds.X, bounds.Y, MatrixOrder.Append);
-
-                 DrawString(s.destGraphics, finalText, f, new Point(0, 0), GetFormat());
+                 using (StringFormat sf = GetFormat()) {
+                     DrawString(s.destGraphics, finalText, f, new Point(0, 0), sf);
+                 }
                  s.destGraphics.ResetTransform();
 
                  f.FontFamily.Dispose();
@@ -197,7 +199,7 @@ namespace ImageResizer.Plugins.Watermark {
         public void DrawString(Graphics g, string text, Font f, Point point, StringFormat fmt) {
             if (GlowWidth == 0 && OutlineWidth == 0) {
                 using (Brush b = GetBrush()) {
-                    g.DrawString(text, f, b, new PointF(0, 0), GetFormat());
+                    g.DrawString(text, f, b, new PointF(0, 0), fmt);
                 }
                 return;
             }
