@@ -20,6 +20,19 @@ namespace ImageResizer.Util {
 
 
     [AttributeUsage(AttributeTargets.Assembly)]
+    public class BundleAttribute : Attribute {
+
+        string type;
+        public BundleAttribute() { type = string.Empty; }
+        public BundleAttribute(string txt) { type = txt; }
+
+        public string Value { get { return type; } }
+        public override string ToString() {
+            return type;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Assembly)]
     public class BuildTypeAttribute : Attribute {
 
         string type;
