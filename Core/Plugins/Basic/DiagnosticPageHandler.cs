@@ -63,6 +63,30 @@ namespace ImageResizer.Plugins.Basic {
 				sb.AppendLine(i.Source + "(" + i.Severity.ToString() + "):\t" + i.Summary  +
 					("\n" + i.Details).Replace("\n","\n\t\t\t") + "\n");
 
+            //What bundles are used?
+            Dictionary<string, bool> bundlesUsed = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            foreach (IPlugin p in c.Plugins.AllPlugins) {
+                object[] attrs = p.GetType().Assembly.GetCustomAttributes(typeof(Util.BundleAttribute), true);
+                if (attrs.Length > 0 && attrs[0] is BundleAttribute) {
+                    bundlesUsed[((BundleAttribute)attrs[0]).Value] = true;
+                }
+            }
+
+            Dictionary<string, string> friendlyNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            friendlyNames.Add("R3Bundle1", "Performance Bundle");
+            friendlyNames.Add("R3Bundle2", "Design Bundle");
+            friendlyNames.Add("R3Bundle3", "Cloud Bundle");
+            friendlyNames.Add("R3Bundle4", "Extras Bundle");
+
+            if (bundlesUsed.Count == 0) 
+                sb.AppendLine("\nYou are not using any paid bundles.");
+            else {
+                sb.Append("\nYou are using paid bundles: ");
+                foreach (string s in bundlesUsed.Keys) sb.Append((friendlyNames.ContainsKey(s) ? friendlyNames[s] : s) + ", ");
+                sb.Remove(sb.Length - 2, 2);
+                sb.AppendLine();
+            }
+
 			sb.AppendLine("\nRegistered plugins:\n");
 			foreach (IPlugin p in c.Plugins.AllPlugins)
 				sb.AppendLine(p.ToString());
