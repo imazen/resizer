@@ -94,11 +94,11 @@ namespace PhotoshopFile.Text
 
                 //TODO: get alignment data
             }else if (tt != null){
-                throw new Exception("Old style tySh font syntax not implemented. Use a new version of Photoshop");
+                throw new Exception("Old style tySh font syntax not implemented, found on layer " + l.Name + ". Use a newer version of Photoshop");
             }else if (foundTxt2){
-                throw new Exception("Txt2 text layer info not supported. Where did you find this file? What version of photoshop?");
+                throw new Exception("Txt2 text layer info not supported, found on layer " + l.Name + ". Where did you find this file? What version of photoshop?");
             }else{
-                throw new Exception("No text layer information found!");
+                throw new Exception("No text layer information found on " + l.Name + "!");
             }
 
             if (outerGlow != null){
