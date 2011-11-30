@@ -9,13 +9,15 @@ using System.Data.Sql;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Diagnostics;
-using fbs.ImageResizer;
 using fbs;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Drawing.Imaging;
 using PhotoshopFile;
 using PhotoshopFile.Text;
+using ImageResizer.Plugins;
+using ImageResizer.Encoding;
+using ImageResizer.Configuration;
 namespace PsdRenderer
 {
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
@@ -23,11 +25,16 @@ namespace PsdRenderer
     public class PsdProvider : VirtualPathProvider
     {
 
-
+        
         public PsdProvider()
             : base()
+        { }
+
+        public static bool isStrictMode()
         {
+            return !"false".Equals(ConfigurationManager.AppSettings["PsdStrictMode"], StringComparison.OrdinalIgnoreCase); 
         }
+
         /// <summary>
         /// Returns the renderer object selected in the querystring
         /// </summary>
@@ -60,6 +67,9 @@ namespace PsdRenderer
 
             return delegate(int index, string name, bool visibleNow)
             {
+                //Exclude Layer Group layers, 		Name	"</Layer group>"	string
+                if ("</Layer group>".Equals(name, StringComparison.InvariantCultureIgnoreCase)) return false;
+                if (name.IndexOf('<') > -1) return false;
                 Nullable<bool> show = (searcher.getVisibility(name));
                 if (show == null) return visibleNow;
                 else return show.Value;
@@ -110,22 +120,37 @@ namespace PsdRenderer
                 //See if this layer is supposed to be re-colored.
                 Nullable<Color> color = searcher.getColor(l.Name);
 
+                if (b == null && l.Rect.X == 0 && l.Rect.Y == 0 && l.Rect.Width == 0 && l.Rect.Height == 0)
+                {
+                    return; //This layer has no size, it is probably a layer group.
+                }
 
                 //See if we need to re-draw this text layer
                 Nullable<bool> redraw = searcher.getRedraw(l.Name);
                 if (redraw != null && redraw == true)
                 {
-                    //Re-draw the text directly, ignoring the bitmap
-                    new TextLayerRenderer(l).Render(g, color, searcher.getReplacementText(l.Name));
+                    //Verify it has text layer information:
+                    bool hasText = false;
+                    foreach (PhotoshopFile.Layer.AdjustmentLayerInfo lInfo in  l.AdjustmentInfo)
+                        if (lInfo.Key.Equals("TySh")){ hasText=true; break;}
+
+
+                    if (hasText) {
+                        //Re-draw the text directly, ignoring the bitmap
+                        new TextLayerRenderer(l).Render(g, color, searcher.getReplacementText(l.Name));
+                        return;
+                    }
                 }
-                else
-                {
+                
+                    
+                    if (b == null && !isStrictMode()) return; //Skip drawing layers that have no bitmap data.
+                    if (b == null) throw new Exception("No bitmap data found for layer " + l.Name);
                     //Draw the existing bitmap
                     //Blend color into bitmap
                     if (color != null) ColorBitmap(b, color.Value);
                     //Draw image
                     g.DrawImage(b, l.Rect);
-                }
+                
             };
         }
 
@@ -133,8 +158,8 @@ namespace PsdRenderer
         {
             get
             {
-                if (HttpContext.Current.Items["modifiedQueryString"] != null) 
-                    return (NameValueCollection)HttpContext.Current.Items["modifiedQueryString"];
+                if (HttpContext.Current.Items[Config.Current.Pipeline.ModifiedQueryStringKey] != null)
+                    return (NameValueCollection)HttpContext.Current.Items[Config.Current.Pipeline.ModifiedQueryStringKey];
                 else 
                     return HttpContext.Current.Request.QueryString;
             }
@@ -163,8 +188,8 @@ namespace PsdRenderer
             using (b)
             {
                 //Use whatever settings appear in the URL 
-                ImageOutputSettings ios = new ImageOutputSettings(ImageOutputSettings.GetImageFormatFromExtension(System.IO.Path.GetExtension(virtualPath)),queryString);
-                ios.SaveImage(ms, b);
+                IEncoder encoder = ImageResizer.ImageBuilder.Current.EncoderProvider.GetEncoder(new ImageResizer.ResizeSettings(queryString), virtualPath);
+                encoder.Write(b, ms);
                 ms.Seek(0, SeekOrigin.Begin); //Reset stream for reading
             }
 

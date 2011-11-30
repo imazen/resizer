@@ -2,7 +2,6 @@
 using System.IO;
 using System.Drawing;
 using System.Collections.Generic;
-using fbs.ImageResizer;
 namespace PsdRenderer
 {
     public delegate bool ShowLayerDelegate(int index, string Name, bool visibleNow);

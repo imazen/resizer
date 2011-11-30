@@ -146,7 +146,13 @@ namespace PsdRenderer
         {
             layerVisibility[layer] = false;
         }
-        
+        public void Redraw(string layer) {
+            layerRedraw[layer] = true;
+        }
+
+        public void SetText(string layer, string text) {
+            this.layerText[layer] = text;
+        }
 
 
         private string Base64UrlEncode(string s)
@@ -221,6 +227,8 @@ namespace PsdRenderer
             layer = layer.ToLowerInvariant();
             foreach (string s in wildcards)
             {
+                if (s.Equals("*")) return s; //Only used by unit tests
+
                 string trimmed = s.ToLowerInvariant().Trim('*');
                 //Contains query
                 if (s.StartsWith("*") && s.EndsWith("*"))
