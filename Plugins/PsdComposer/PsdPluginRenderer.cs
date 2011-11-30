@@ -4,7 +4,6 @@ using System.Web;
 using System.IO;
 using PhotoshopFile;
 using System.Drawing;
-using fbs.ImageResizer;
 using fbs;
 
 
@@ -16,8 +15,10 @@ namespace PsdRenderer
         {
             PsdFile file = new PsdFile();
             file.Load(s);
-            //Load background layer
-            Bitmap b = ImageDecoder.DecodeImage(file.Layers[0]); //Layers collection doesn't include the composed layer
+            //Start with a transparent bitmap (not all PSD files have background layers)
+            Bitmap b = new Bitmap(file.Columns, file.Rows);
+                
+            //ImageDecoder.DecodeImage(file.Layers[0]); //Layers collection doesn't include the composed layer
             
             Graphics g = Graphics.FromImage(b);
             using (g){
@@ -27,7 +28,7 @@ namespace PsdRenderer
                 g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
                 g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
 
-                for (int i = 1; i < file.Layers.Count; i++)
+                for (int i = 0; i < file.Layers.Count; i++)
                 {
                     if (showLayerCallback(i,file.Layers[i].Name,file.Layers[i].Visible)){
                         using (Bitmap frame = ImageDecoder.DecodeImage(file.Layers[i])){
