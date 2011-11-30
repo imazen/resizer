@@ -215,7 +215,7 @@ namespace ImageResizer.Plugins.DiskCache {
             }
             if (lp.Logger != null) {
                 sw.Stop();
-                lp.Logger.Trace("{0}ms: {3}{1} for {2}", sw.ElapsedMilliseconds.ToString().PadLeft(4), result.Result.ToString(), result.RelativePath, async ? (asyncFailed ? "Fallback to sync  " : "Async ") : "");
+                lp.Logger.Trace("{0}ms: {3}{1} for {2}, Key: {4}", sw.ElapsedMilliseconds.ToString().PadLeft(4), result.Result.ToString(), result.RelativePath, async ? (asyncFailed ? "Fallback to sync  " : "Async ") : "", keyBasis);
             }
             //Fire event
             if (CacheResultReturned != null) CacheResultReturned(this, result);
