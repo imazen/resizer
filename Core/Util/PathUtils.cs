@@ -143,7 +143,7 @@ namespace ImageResizer.Util {
         /// <returns></returns>
         public static string ResolveAppRelativeAssumeAppRelative(string virtualPath) {
 
-            if (virtualPath.StartsWith("~")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/" + virtualPath.TrimStart('/');
+            if (virtualPath.StartsWith("~")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/" + virtualPath.TrimStart('~', '/');
             if (!virtualPath.StartsWith("/")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/" + virtualPath;
             return virtualPath;
         }
