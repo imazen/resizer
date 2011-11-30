@@ -1,5 +1,4 @@
-﻿/* Copyright (c) 2011 Nathanael Jones. See license.txt for your rights */
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -155,7 +154,7 @@ namespace PhotoshopFile.Text
                 }
             }
             //Integer or double. Ends at whitespace, newline, ], or >
-            if (Char.IsDigit(c) || c == '.'){
+            if (Char.IsDigit(c) || c=='-' || c == '.'){
                 StringBuilder sb = new StringBuilder(40);
                 sb.Append(c);
                 while (r.CanReadByte()){
@@ -171,7 +170,7 @@ namespace PhotoshopFile.Text
                             return new Token(TokenType.Integer,int.Parse(s));
                         }
                         
-                    }else if (Char.IsDigit(c) || c == '.'){
+                    }else if (Char.IsDigit(c) || c=='-' || c == '.'){
                         //A valid char, append it.
                         sb.Append(r.ReadChar());
                     }else{
