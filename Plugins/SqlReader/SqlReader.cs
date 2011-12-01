@@ -17,8 +17,6 @@ namespace ImageResizer.Plugins.SqlReader
     /// <summary>
     /// Specialized VirtualPathProvider that allows accessing database images as if they are on disk.
     /// </summary>
-    [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
-    [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
     public class SqlReaderPlugin : VirtualPathProvider, IPlugin, IIssueProvider, IVirtualImageProvider 
     {
 
@@ -267,10 +265,10 @@ namespace ImageResizer.Plugins.SqlReader
         /// <returns></returns>
         public virtual string ParseIdFromVirtualPath(string virtualPath)
         {
-            String checkPath = VirtualPathUtility.ToAppRelative(virtualPath);
+            String checkPath = ImageResizer.Util.PathUtils.ResolveAppRelative(virtualPath);
             //Check for prefix
-            if (!checkPath.StartsWith(s.PathPrefix, StringComparison.InvariantCultureIgnoreCase)) return null;
-            string id = checkPath.Substring(s.PathPrefix.Length); //Strip prefix
+            if (!checkPath.StartsWith(s.VirtualPathPrefix, StringComparison.OrdinalIgnoreCase)) return null;
+            string id = checkPath.Substring(s.VirtualPathPrefix.Length); //Strip prefix
             //Strip slashes at beginning 
             id = id.TrimStart(new char[] { '/', '\\' });
             //Strip extension if not a string 
@@ -408,8 +406,6 @@ namespace ImageResizer.Plugins.SqlReader
                     "Only the image resizer will be able to access files located in SQL - other systems will not be able to.", IssueSeverity.Error));
             
 
-            if (!s.PathPrefix.StartsWith("~/") || !s.PathPrefix.EndsWith("/"))
-                issues.Add(new Issue("SqlReader", "The 'prefix' value must be in app-relative form (starting with ~/), and ending with '/'. I.e, in the form ~/sql/ or ~/databaseimages/", "", IssueSeverity.Error));
             return issues;
         }
 
@@ -420,8 +416,6 @@ namespace ImageResizer.Plugins.SqlReader
     /// Represents a blob stored in the database. Provides methods for verifying existence, opening a stream, and checking the modified date.
     /// Modified date and existence values are cached after the first query.
     /// </summary>
-    [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Minimal)]
-    [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.Minimal)]
     public class DatabaseFile : VirtualFile, ImageResizer.Plugins.IVirtualFileWithModifiedDate, IVirtualFile
     {
         private string id;

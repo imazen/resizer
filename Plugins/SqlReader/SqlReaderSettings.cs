@@ -107,13 +107,15 @@ namespace ImageResizer.Plugins.SqlReader {
         /// </summary>
         public string PathPrefix {
             get { return pathPrefix; }
-            set { pathPrefix = value; }
+            set { pathPrefix = value; virtualPathPrefix = PathUtils.ResolveAppRelativeAssumeAppRelative(pathPrefix); }
         }
+
+        private string virtualPathPrefix = PathUtils.ResolveAppRelativeAssumeAppRelative("~/databaseimages/");
         /// <summary>
-        /// Returns PathPrefix, but with the "~" resolved - I.e, a full virtual path.
+        /// Returns PathPrefix, but with the "~" resolved - I.e, a full virtual path. If the string doesn't start with / or ~, the application path is prepended as if it started with ~/
         /// </summary>
         public string VirtualPathPrefix {
-            get { return ImageResizer.Util.PathUtils.ResolveAppRelative(pathPrefix); }
+            get { return virtualPathPrefix; }
         }
 
         private string connectionString = null;
