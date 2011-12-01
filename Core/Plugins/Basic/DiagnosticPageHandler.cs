@@ -176,7 +176,7 @@ namespace ImageResizer.Plugins.Basic {
                 sb.AppendLine("The FreeImage plugin has the following dependencies: FreeImage.dll and FreeImageNET.dll\n" +
                     "The Logging plugin depends on: NLog.dll\n" +
                     "The AdvancedFilters and WhitespaceTrimmer plugins depend on: AForge.dll, AForge.Math.dll, AForge.Imaging.dll, and AForge.Imaging.Formats.dll\n" +
-                    "The PsdReader plugin depends on: PsdFile.dll\n" +
+                    "The PsdReader and PsdComposer plugins depend on: PsdFile.dll\n" +
                     "The S3Reader plugin depends on: LitS3.dll\n" +
                     "The BatchZipper plugin depends on: Ionic.Zip.Reduced.dll\n");
             }
