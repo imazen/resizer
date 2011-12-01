@@ -13,8 +13,7 @@ using ImageResizer.Configuration;
 using ImageResizer.Resizing;
 
 namespace ImageResizer.Plugins.S3Reader {
-    [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Minimal)]
-    [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.Minimal)]
+
     public class S3File : VirtualFile, IVirtualFile, IVirtualFileWithModifiedDate {
         private string bucket;
         private string key;
@@ -80,7 +79,7 @@ namespace ImageResizer.Plugins.S3Reader {
             /////////// Parse path into bucket and key
 
             //Strip prefix
-            String path = VirtualPathUtility.ToAppRelative(VirtualPath).Substring(provider.VirtualFilesystemPrefix.Length);
+            String path = VirtualPath.Substring(provider.VirtualFilesystemPrefix.Length);
 
             //strip leading slashes
             path = path.TrimStart(new char[] { '/', '\\' });

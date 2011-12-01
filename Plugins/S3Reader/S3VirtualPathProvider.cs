@@ -10,14 +10,13 @@ using System.Data.Sql;
 using System.Data.SqlClient;
 using System.Configuration;
 using LitS3;
+using ImageResizer.Util;
 namespace ImageResizer.Plugins.S3Reader
 {
     
     /// <summary>
     /// Allows clients to request objects located on another amazon S3 server through this server. Allows URL rewriting.
     /// </summary>
-    [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
-    [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
     public class S3VirtualPathProvider : VirtualPathProvider, IVirtualImageProvider
     {
 
@@ -42,12 +41,12 @@ namespace ImageResizer.Plugins.S3Reader
 
         private string _virtualFilesystemPrefix = "~/s3/";
         /// <summary>
-        /// Requests starting with this path will be handled by this virtual path provider. Must be in app-relative form: "~/s3/"
+        /// Requests starting with this path will be handled by this virtual path provider. Should be in app-relative form: "~/s3/". Will be converted to root-relative form upon assigment. Trailing slash required, auto-added.
         /// </summary>
         public string VirtualFilesystemPrefix
         {
             get { return _virtualFilesystemPrefix; }
-            set { _virtualFilesystemPrefix = value; }
+            set { if (!value.EndsWith("/")) value += "/";  _virtualFilesystemPrefix = PathUtils.ResolveAppRelativeAssumeAppRelative(value); }
         }
         private TimeSpan _metadataAbsoluteExpiration = TimeSpan.MaxValue;
         /// <summary>
@@ -151,7 +150,7 @@ namespace ImageResizer.Plugins.S3Reader
         /// </returns>
         public bool IsPathVirtual(string virtualPath)
         {
-            return (VirtualPathUtility.ToAppRelative(virtualPath).StartsWith(VirtualFilesystemPrefix, StringComparison.InvariantCultureIgnoreCase));
+            return virtualPath.StartsWith(VirtualFilesystemPrefix, StringComparison.OrdinalIgnoreCase);
         }
 
         public override bool FileExists(string virtualPath)
