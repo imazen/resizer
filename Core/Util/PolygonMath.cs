@@ -602,5 +602,15 @@ namespace ImageResizer.Util
             RectangleF newBounds = AlignWith(PolygonMath.GetBoundingBox(obj), PolygonMath.GetBoundingBox(container), align);
             return PolygonMath.MovePoly(obj, new PointF(newBounds.X - origBounds.X, newBounds.Y - origBounds.Y));
         }
+
+        /// <summary>
+        /// Returns a point equidistant beweteen A and B
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static PointF Average(PointF a, PointF b) {
+            return new PointF((a.X + b.X) / 2, (a.Y + b.Y) / 2);
+        }
     }
 }
