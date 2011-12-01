@@ -5,12 +5,12 @@ using System.Text;
 using System.Drawing;
 using System.Collections.Specialized;
 
-namespace PsdRenderer
+namespace ImageResizer.Plugins.PsdComposer
 {
     /// <summary>
     /// Layer names are case-insensitive. Asterisks can be used as wildcards to specify suffixes, prefixs, and search terms.
     /// </summary>
-    public class PsdCommandBuilder
+    public class PsdCommandBuilder 
     {
         public Dictionary<string, Color> layerColors = new Dictionary<string, Color>(StringComparer.CurrentCultureIgnoreCase);
         public Dictionary<string, bool> layerVisibility = new Dictionary<string, bool>(StringComparer.CurrentCultureIgnoreCase);
@@ -162,6 +162,10 @@ namespace PsdRenderer
         private string Base64UrlDecode(string s)
         {
             return new System.Text.UTF8Encoding().GetString(Convert.FromBase64String(s.Replace('-', '+').Replace('_', '/')));
+        }
+
+        public static IEnumerable<string> GetSupportedQuerystringKeys() {
+            return new string[] { "layerColors", "layerVisibility", "layerRedraw", "layerText", "renderer" };
         }
     }
 

@@ -4,20 +4,20 @@ using System.Web;
 using System.IO;
 using PhotoshopFile;
 using System.Drawing;
-using fbs;
 
 
-namespace PsdRenderer
+namespace ImageResizer.Plugins.PsdComposer
 {
     public class PsdPluginRenderer: IPsdRenderer
     {
-        public Bitmap Render(Stream s, out IList<IPsdLayer> layers, ShowLayerDelegate showLayerCallback, ComposeLayerDelegate composeLayer)
+        public Bitmap Render(Stream s, out IList<IPsdLayer> layers, out Size size,ShowLayerDelegate showLayerCallback, ComposeLayerDelegate composeLayer)
         {
             PsdFile file = new PsdFile();
             file.Load(s);
             //Start with a transparent bitmap (not all PSD files have background layers)
+            size = new Size(file.Columns, file.Rows);
             Bitmap b = new Bitmap(file.Columns, file.Rows);
-                
+
             //ImageDecoder.DecodeImage(file.Layers[0]); //Layers collection doesn't include the composed layer
             
             Graphics g = Graphics.FromImage(b);
@@ -46,6 +46,12 @@ namespace PsdRenderer
         {
             PsdFile file = new PsdFile();
             file.Load(s);
+            return getLayers(file);
+        }
+        public IList<IPsdLayer> GetLayersAndSize(Stream s, out Size size) {
+            PsdFile file = new PsdFile();
+            file.Load(s);
+            size = new Size(file.Columns,file.Rows);
             return getLayers(file);
         }
         private IList<IPsdLayer> getLayers(PsdFile file)

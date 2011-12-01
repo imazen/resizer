@@ -6,6 +6,9 @@ using Aurigma.GraphicsMill.Codecs;
 
 namespace PsdRenderer
 {
+    /// <summary>
+    /// An Aurigma.GraphicsMill-based renderer. GraphicsMill was far too limited to do what we needed, so this got scrapped.
+    /// </summary>
     public class GraphicsMillRenderer: IPsdRenderer
     {
         /// <summary>
