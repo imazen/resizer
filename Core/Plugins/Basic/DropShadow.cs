@@ -64,10 +64,11 @@ namespace ImageResizer.Plugins.Basic {
             //Skip on transparent or 0-width shadow
             if (shadowColor == Color.Transparent || shadowWidth <= 0) return RequestedAction.None;
 
-            //Offsets may show inside the shadow - so we have to fix that
-            s.destGraphics.FillPolygon(new SolidBrush(shadowColor),
-                PolygonMath.InflatePoly(s.layout["shadowInner"], 1)); //Inflate 1 for FillPolgyon rounding errors.
-
+            using (Brush b = new SolidBrush(shadowColor)) {
+                //Offsets may show inside the shadow - so we have to fix that
+                s.destGraphics.FillPolygon(b,
+                    PolygonMath.InflatePoly(s.layout["shadowInner"], 1)); //Inflate 1 for FillPolgyon rounding errors.
+            }
             //Then we can draw the outer gradient
             Utils.DrawOuterGradient(s.destGraphics, s.layout["shadowInner"],
                              shadowColor, Color.Transparent, shadowWidth);
