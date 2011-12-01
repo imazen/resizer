@@ -25,11 +25,9 @@ namespace ImageResizer.Plugins.AzureReader {
                 return _virtualFilesystemPrefix;
             }
             set {
-                //Default to app-relative
-                if (!value.StartsWith("/") && !value.StartsWith("~")) value = "~/" + value;
                 if (!value.EndsWith("/")) value += "/";
+                _virtualFilesystemPrefix = value != null ? PathUtils.ResolveAppRelativeAssumeAppRelative(value) : value;
                 
-                _virtualFilesystemPrefix = value != null ? PathUtils.ResolveAppRelative(value) : value;
             }
         }
 
