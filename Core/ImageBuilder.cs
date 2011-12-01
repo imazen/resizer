@@ -837,9 +837,11 @@ namespace ImageResizer
             //Use the crop size if present.
             s.copyRect = new RectangleF(new PointF(0,0),s.originalSize);
             if (s.settings.CropMode == CropMode.Custom) {
-                s.copyRect = s.settings.getCustomCropSourceRect(s.originalSize);
+                s.copyRect = PolygonMath.ToRectangle(s.settings.getCustomCropSourceRect(s.originalSize)); //Round the custom crop rectangle coordinates
                 if (s.copyRect.Size.IsEmpty) throw new Exception("You must specify a custom crop rectange if crop=custom");
             }
+            //Save the manual crop size.
+            SizeF manualCropSize = s.copySize;
 
             FitMode fit = s.settings.Mode;
             //Determine fit mode to use if both vertical and horizontal limits are used.
@@ -863,6 +865,9 @@ namespace ImageResizer
 
             //Aspect ratio of the image
             double imageRatio = s.copySize.Width / s.copySize.Height;
+
+            //Zoom factor
+            double zoom = Utils.getDouble(s.settings, "zoom", 1);
 
             //The target size for the image 
             SizeF targetSize = new SizeF(-1, -1);
@@ -896,62 +901,60 @@ namespace ImageResizer
                 if (width > 0 && height <= 0) height = width/ imageRatio;
                 else if (height > 0 && width <= 0) width = height * imageRatio;
 
+                //We now have width & height, our target size. It will only be a different aspect ratio from the image if both 'width' and 'height' are specified.
+
                 //FitMode.Max
-                if (fit == FitMode.Max)
-                    areaSize = targetSize = PolygonMath.ScaleInside(s.copySize, new SizeF((float)width, (float)height));
-                else
+                if (fit == FitMode.Max) {
+                    areaSize = targetSize = PolygonMath.ScaleInside(manualCropSize, new SizeF((float)width, (float)height));
+                //FitMode.Pad
+                } else if (fit == FitMode.Pad) {
+                    areaSize = new SizeF((float)width, (float)height);
+                    targetSize = PolygonMath.ScaleInside(manualCropSize, areaSize);
+                //FitMode.crop
+                } else if (fit == FitMode.Crop) {
+                    //We autocrop - so both target and area match the requested size
                     areaSize = targetSize = new SizeF((float)width, (float)height);
-
-                //We now have targetSize. targetSize will only be a different aspect ratio from the image if both 'width' and 'height' are specified.
-
-
-                //Now do stretch=proportionally check. Set targetSize=imageSize and make it fit within areaSize using ScaleInside.
-                if (fit == FitMode.Pad) { //FitMode.Carve, Stretch, Crop, don't use padding. FitMode.Max never needed it.
-                    targetSize = PolygonMath.ScaleInside(s.copySize, areaSize);
-                }
-                
-                
-
-                //Now do upscale/downscale checks. If they take effect, set targetSize to imageSize
-                if (s.settings.Scale == ScaleMode.DownscaleOnly) {
-                    if (PolygonMath.FitsInside(s.copySize, targetSize)) {
-                        //The image is smaller or equal to its target polygon. Use original image coordinates instead.
-                        areaSize = targetSize = s.copySize;
-                    }
-                } else if (s.settings.Scale == ScaleMode.UpscaleOnly) {
-                    if (!PolygonMath.FitsInside(s.copySize, targetSize)) {
-                        //The image is larger than its target. Use original image coordintes instead
-                        areaSize = targetSize = s.copySize;
-
-                    }
-                } else if (s.settings.Scale == ScaleMode.UpscaleCanvas) {
-                    //Same as downscaleonly, except areaSize isn't changed.
-                    if (PolygonMath.FitsInside(s.copySize, targetSize)) {
-                        //The image is smaller or equal to its target polygon. Use original image coordinates instead.
-
-                        targetSize = s.copySize;
-                    }
-
-                }
-
-                //June 3: Ensure no dimension of targetSize or areaSize is less than 1px;
-                areaSize.Width = Math.Max(1, areaSize.Width);
-                areaSize.Height = Math.Max(1, areaSize.Height);
-
-
-                //Autocrop (always forces scale=both)
-                if (fit == FitMode.Crop) {
                     //Determine the size of the area we are copying
-                    Size sourceSize = PolygonMath.RoundPoints(PolygonMath.ScaleInside(areaSize, s.originalSize)); //TODO, shouldn't these be rounded to ints?
-                    //Center the portion we are copying within the original bitmap
-                    s.copyRect = PolygonMath.AlignWith(new RectangleF(0, 0, sourceSize.Width, sourceSize.Height), new RectangleF(0, 0, s.originalSize.Width, s.originalSize.Height), s.settings.Anchor);
-                    //Restore targetSize to match areaSize //Warning - crop always forces scale=both.
-                    targetSize = areaSize;
+                    Size sourceSize = PolygonMath.RoundPoints(PolygonMath.ScaleInside(areaSize, manualCropSize)); 
+                    //Center the portion we are copying within the manualCropSize
+                    s.copyRect = PolygonMath.ToRectangle(PolygonMath.AlignWith(new RectangleF(0, 0, sourceSize.Width, sourceSize.Height), s.copyRect, s.settings.Anchor));
+
+                } else { //Stretch and carve both act like stretching, so do that:
+                    areaSize = targetSize = new SizeF((float)width, (float)height);
                 }
-            } else {
-                areaSize = targetSize = s.copySize; //No dimensions - use original size if possible - within web.config bounds.
+
+
+            }else{
+                //No dimensions specified, no fit mode needed. Use manual crop dimensions
+                areaSize = targetSize = manualCropSize; 
             }
 
+            //Multiply both areaSize and targetSize by zoom. 
+            areaSize.Width *= (float)zoom;
+            areaSize.Height *= (float)zoom;
+            targetSize.Width *= (float)zoom;
+            targetSize.Height *= (float)zoom;
+                
+            //Now do upscale/downscale checks. If they take effect, set targetSize to imageSize
+            if (s.settings.Scale == ScaleMode.DownscaleOnly) {
+                if (PolygonMath.FitsInside(manualCropSize, targetSize)) {
+                    //The image is smaller or equal to its target polygon. Use original image coordinates instead.
+                    areaSize = targetSize = manualCropSize;
+                }
+            } else if (s.settings.Scale == ScaleMode.UpscaleOnly) {
+                if (!PolygonMath.FitsInside(manualCropSize, targetSize)) {
+                    //The image is larger than its target. Use original image coordintes instead
+                    areaSize = targetSize = manualCropSize;
+
+                }
+            } else if (s.settings.Scale == ScaleMode.UpscaleCanvas) {
+                //Same as downscaleonly, except areaSize isn't changed.
+                if (PolygonMath.FitsInside(manualCropSize, targetSize)) {
+                    //The image is smaller or equal to its target polygon. Use original image coordinates instead.
+
+                    targetSize = manualCropSize;
+                }
+            }
 
 
             //May 12: require max dimension and round values to minimize rounding differences later.
