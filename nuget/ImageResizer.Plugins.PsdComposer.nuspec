@@ -1,0 +1,29 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.PsdComposer</id>
+		<title>ImageResizer.Plugins.PsdComposer - Edit and dynamically render PSD files</title>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<owners>$author$</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>$iconurl$</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>Hide or show layers, change text layer contents, apply layer effects, change layer fill colors, and dynamically render PSD files to jpeg, png, or gif format. Resize or crop with the ImageResizer - plugin compatible with all commands and plugins.
+ 
+Visit http://imageresizing.net for details, documenation, and free support. 
+E-mail support@imageresizing.net if you encounter any problems with the software. 
+The documentation for this plugin resides at http://imageresizing.net/plugins/psdcomposer</description>
+		<tags>$tags$</tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		</dependencies>
+	</metadata>
+  	<files>
+ 		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdComposer.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdComposer.xml" target="lib" />
+		<file src="$pluginsdlldir$\PsdFile.dll" target="lib" />
+		<file src="..\Plugins\PsdComposer\Web.config.transform" target="content" />
+	</files>
+</package>
