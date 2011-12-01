@@ -84,6 +84,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Loggin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Wic", "..\Plugins\Wic\ImageResizer.Plugins.Wic.csproj", "{4A55B40D-1E0D-4D1F-8D96-25F624847E53}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PsdComposer", "..\Plugins\PsdComposer\ImageResizer.Plugins.PsdComposer.csproj", "{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -694,6 +696,24 @@ Global
 		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Trial|x64.ActiveCfg = Release|Any CPU
 		{4A55B40D-1E0D-4D1F-8D96-25F624847E53}.Trial|x86.ActiveCfg = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Release|x64.ActiveCfg = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Release|x86.ActiveCfg = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Trial|Any CPU.ActiveCfg = Trial|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Trial|Any CPU.Build.0 = Trial|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Trial|Mixed Platforms.ActiveCfg = Trial|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Trial|Mixed Platforms.Build.0 = Trial|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Trial|x64.ActiveCfg = Trial|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Trial|x86.ActiveCfg = Trial|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
