@@ -38,6 +38,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComplexWebApplication", "..\Samples\ComplexWebApplication\ComplexWebApplication.csproj", "{685863E0-64B5-4814-8974-249FADCE875F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D97EA32A-0845-4E00-9C4D-68C5B93A1869} = {D97EA32A-0845-4E00-9C4D-68C5B93A1869}
+		{CDA9A53D-C190-4460-B5AF-F73132F56BFB} = {CDA9A53D-C190-4460-B5AF-F73132F56BFB}
 		{FA5EF673-A6A4-498D-AA24-C025CC5267AF} = {FA5EF673-A6A4-498D-AA24-C025CC5267AF}
 		{7AEFB877-A720-4929-880C-1090A71C83EB} = {7AEFB877-A720-4929-880C-1090A71C83EB}
 		{A3B6F984-D500-40F1-B836-C02B46FCF14D} = {A3B6F984-D500-40F1-B836-C02B46FCF14D}
@@ -121,6 +122,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Wic", "..\Plugins\Wic\ImageResizer.Plugins.Wic.csproj", "{4A55B40D-1E0D-4D1F-8D96-25F624847E53}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediumTrustTest", "..\Tests\MediumTrustTest\MediumTrustTest.csproj", "{D64CC1D0-E239-4D6B-8223-9C6E6A729951}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PsdComposer", "..\Plugins\PsdComposer\ImageResizer.Plugins.PsdComposer.csproj", "{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -915,6 +918,24 @@ Global
 		{D64CC1D0-E239-4D6B-8223-9C6E6A729951}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{D64CC1D0-E239-4D6B-8223-9C6E6A729951}.Trial|x64.ActiveCfg = Release|Any CPU
 		{D64CC1D0-E239-4D6B-8223-9C6E6A729951}.Trial|x86.ActiveCfg = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Release|x64.ActiveCfg = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Release|x86.ActiveCfg = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Trial|Any CPU.ActiveCfg = Trial|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Trial|Any CPU.Build.0 = Trial|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Trial|x64.ActiveCfg = Release|Any CPU
+		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

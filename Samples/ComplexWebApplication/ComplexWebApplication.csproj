@@ -73,9 +73,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\dlls\release\ImageResizer.Plugins.RemoteReader.dll</HintPath>
     </Reference>
-    <Reference Include="ImageResizer.Plugins.RequestLimiting">
-      <HintPath>..\..\dlls\release\ImageResizer.Plugins.RequestLimiting.dll</HintPath>
-    </Reference>
     <Reference Include="ImageResizer.Plugins.S3Reader">
       <HintPath>..\..\dlls\release\ImageResizer.Plugins.S3Reader.dll</HintPath>
     </Reference>
