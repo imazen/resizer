@@ -16,8 +16,6 @@ namespace ImageResizer.Plugins.Basic {
     /// <summary>
     /// Functions exactly like an IIS virtual folder, but doesn't require IIS configuration.
     /// </summary>
-    [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
-    [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.Medium)]
     public class VirtualFolder : VirtualPathProvider, IVirtualImageProvider, IPlugin , IMultiInstancePlugin, IIssueProvider{
 
         public VirtualFolder(string virtualPath, string physicalPath)
@@ -267,8 +265,6 @@ namespace ImageResizer.Plugins.Basic {
 
         }
 
-        [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Minimal)]
-        [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.Minimal)]
         public class VirtualFolderProviderVirtualFile : VirtualFile, IVirtualFileWithModifiedDate, IVirtualFile {
 
             private VirtualFolder provider;
