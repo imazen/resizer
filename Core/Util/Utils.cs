@@ -312,7 +312,7 @@ namespace ImageResizer.Util {
 
 
         public static string writePadding(BoxPadding p) {
-            if (p.All != double.NaN) return p.All.ToString(); //Easy
+            if (!double.IsNaN(p.All)) return p.All.ToString(); //Easy
 
             return "(" + p.Left + "," + p.Top + "," + p.Right + "," + p.Bottom + ")";
 
@@ -335,17 +335,18 @@ namespace ImageResizer.Util {
             //Paint corners
             for (int i = 0; i <= corners.GetUpperBound(0); i++) {
                 PointF[] pts = PolygonMath.GetSubArray(corners, i);
-                Brush b = PolygonMath.GenerateRadialBrush(inner, outer, pts[0], width + 1);
-
-                g.FillPolygon(b, pts);
+                using (Brush b = PolygonMath.GenerateRadialBrush(inner, outer, pts[0], width + 1)) {
+                    g.FillPolygon(b, pts);
+                }
             }
             //Paint sides
             for (int i = 0; i <= sides.GetUpperBound(0); i++) {
                 PointF[] pts = PolygonMath.GetSubArray(sides, i);
-                LinearGradientBrush b = new LinearGradientBrush(pts[3], pts[0], inner, outer);
-                b.SetSigmaBellShape(1);
-                b.WrapMode = WrapMode.TileFlipXY;
-                g.FillPolygon(b, pts);
+                using (LinearGradientBrush b = new LinearGradientBrush(pts[3], pts[0], inner, outer)) {
+                    b.SetSigmaBellShape(1);
+                    b.WrapMode = WrapMode.TileFlipXY;
+                    g.FillPolygon(b, pts);
+                }
             }
         }
 
