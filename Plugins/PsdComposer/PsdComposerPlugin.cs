@@ -19,8 +19,6 @@ using ImageResizer.Encoding;
 using ImageResizer.Configuration;
 namespace ImageResizer.Plugins.PsdComposer
 {
-    [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
-    [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
     public class PsdComposerPlugin : VirtualPathProvider, IPlugin, IVirtualImageProvider, IQuerystringPlugin, IFileExtensionPlugin
     {
 
@@ -442,8 +440,6 @@ namespace ImageResizer.Plugins.PsdComposer
     }
 
 
-    [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Minimal)]
-    [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.Minimal)]
     public class PsdVirtualFile : VirtualFile,IVirtualFile, IVirtualFileWithModifiedDate, IVirtualBitmapFile
     {
   

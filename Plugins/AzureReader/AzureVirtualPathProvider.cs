@@ -9,9 +9,7 @@ using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.AzureReader {
 
-    [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
-    [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
-    public class AzureVirtualPathProvider : VirtualPathProvider, IVirtualImageProvider {
+     public class AzureVirtualPathProvider : VirtualPathProvider, IVirtualImageProvider {
 
         private string _virtualFilesystemPrefix = PathUtils.ResolveAppRelative("~/azure/");
         private CloudBlobClient _cloudBlobClient = null;
