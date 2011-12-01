@@ -328,8 +328,10 @@ namespace ImageResizer.Util {
         /// <param name="width"></param>
         public static void DrawOuterGradient(Graphics g, PointF[] poly, Color inner, Color outer, float width) {
 
-            PointF[,] corners = PolygonMath.RoundPoints(PolygonMath.GetCorners(poly, width));
-            PointF[,] sides = PolygonMath.RoundPoints(PolygonMath.GetSides(poly, width));
+            //PointF[,] corners = PolygonMath.RoundPoints(PolygonMath.GetCorners(poly, width));
+            //PointF[,] sides = PolygonMath.RoundPoints(PolygonMath.GetSides(poly, width));
+            PointF[,] corners = PolygonMath.GetCorners(poly, width);
+            PointF[,] sides = PolygonMath.GetSides(poly, width);
             //Overlapping these causes darker areas... Dont use InflatePoly
 
             //Paint corners
