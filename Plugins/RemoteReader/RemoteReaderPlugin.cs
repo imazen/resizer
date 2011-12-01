@@ -29,7 +29,8 @@ namespace ImageResizer.Plugins.RemoteReader {
         Config c;
         public RemoteReaderPlugin() {
             try {
-                remotePrefix = Util.PathUtils.ResolveAppRelative(remotePrefix);
+                remotePrefix = Util.PathUtils.ResolveAppRelativeAssumeAppRelative(remotePrefix);
+                //Remote prefix must never end in a slash - remote.jpg syntax...
             } catch { }
         }
 
@@ -188,7 +189,9 @@ namespace ImageResizer.Plugins.RemoteReader {
 
 
         public bool IsRemotePath(string virtualPath) {
-            return (virtualPath.StartsWith(remotePrefix, StringComparison.OrdinalIgnoreCase));
+            return (virtualPath.Length > remotePrefix.Length && 
+                virtualPath.StartsWith(remotePrefix, StringComparison.OrdinalIgnoreCase)
+                && (virtualPath[remotePrefix.Length] == '.' || virtualPath[remotePrefix.Length] == '/'));
         }
 
         public bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
