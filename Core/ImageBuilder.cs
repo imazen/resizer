@@ -760,7 +760,7 @@ namespace ImageResizer
                     int last = i == 0 ? corners.GetUpperBound(0) : i -1;
 
                     PointF start = PolygonMath.Average(corners[last, 3], corners[last, 0]);
-                    PointF end = PolygonMath.Average(corners[i, 2], corners[i, 3]);
+                    PointF end = PolygonMath.Average(corners[i, 0], corners[i, 1]);
 
                     using (Pen p = new Pen(s.settings.BorderColor, widths[i < 1 ? 3 : i -1] * -1)) {
                         p.Alignment = System.Drawing.Drawing2D.PenAlignment.Center; //PenAlignment.Center is the only supported mode.
