@@ -720,7 +720,7 @@ namespace ImageResizer
             if (paddingColor.Equals(Color.Transparent)) paddingColor = s.settings.BackgroundColor;
             //Draw padding around image if needed.
             if (!paddingColor.Equals(s.settings.BackgroundColor) && paddingColor != Color.Transparent)
-                s.destGraphics.FillPolygon(new SolidBrush(paddingColor), s.layout["padding"]);
+                using (Brush b = new SolidBrush(paddingColor)) s.destGraphics.FillPolygon(b, s.layout["padding"]);
 
             return RequestedAction.None;
         }
@@ -752,12 +752,30 @@ namespace ImageResizer
             //Draw border
             if (s.settings.Border.IsEmpty) return RequestedAction.None;
 
-            if (s.settings.Border.All == double.NaN) throw new NotImplementedException("Separate border widths have not yet been implemented");
+            if (double.IsNaN(s.settings.Border.All)) {
+                float[] widths = new float[] { (float)s.settings.Border.Top * -1, (float)s.settings.Border.Right * -1, (float)s.settings.Border.Bottom * -1, (float)s.settings.Border.Left * -1 };
+                PointF[,] corners = PolygonMath.GetCorners(s.layout["border"],widths);
 
-            Pen p = new Pen(s.settings.BorderColor, (float)s.settings.Border.All);
-            p.Alignment = System.Drawing.Drawing2D.PenAlignment.Center; //PenAlignment.Center is the only supported mode.
-            p.LineJoin = System.Drawing.Drawing2D.LineJoin.Miter;
-            s.destGraphics.DrawPolygon(p, PolygonMath.InflatePoly(s.layout["border"], (float)(s.settings.Border.All / -2.0))); //I hope GDI rounds the same way as .NET.. Otherwise there may be an off-by-one error..
+                for (int i = 0; i <= corners.GetUpperBound(0); i++) {
+                    int last = i == 0 ? corners.GetUpperBound(0) : i -1;
+
+                    PointF start = PolygonMath.Average(corners[last, 3], corners[last, 0]);
+                    PointF end = PolygonMath.Average(corners[i, 2], corners[i, 3]);
+
+                    using (Pen p = new Pen(s.settings.BorderColor, widths[i < 1 ? 3 : i -1] * -1)) {
+                        p.Alignment = System.Drawing.Drawing2D.PenAlignment.Center; //PenAlignment.Center is the only supported mode.
+                        p.LineJoin = System.Drawing.Drawing2D.LineJoin.Miter;
+                        s.destGraphics.DrawLine(p, start, end);
+                    }
+
+                }
+            } else {
+                using (Pen p = new Pen(s.settings.BorderColor, (float)s.settings.Border.All)) {
+                    p.Alignment = System.Drawing.Drawing2D.PenAlignment.Center; //PenAlignment.Center is the only supported mode.
+                    p.LineJoin = System.Drawing.Drawing2D.LineJoin.Miter;
+                    s.destGraphics.DrawPolygon(p, PolygonMath.InflatePoly(s.layout["border"], (float)(s.settings.Border.All / -2.0))); //I hope GDI rounds the same way as .NET.. Otherwise there may be an off-by-one error..
+                }
+            }
 
             return RequestedAction.None;
         }
