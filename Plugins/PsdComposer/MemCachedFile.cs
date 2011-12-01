@@ -6,7 +6,7 @@ using System.IO;
 using System.Web.Caching;
 using System.Diagnostics;
 
-namespace PsdRenderer
+namespace ImageResizer.Plugins.PsdComposer
 {
     /// <summary>
     /// Caches a file in memory using the asp.net Cache object, while exposing methods for adding subkeys that invalidate along with the file if the source file is changed.
@@ -24,7 +24,7 @@ namespace PsdRenderer
         /// </summary>
         /// <param name="subkey"></param>
         /// <returns></returns>
-        public object getSubkey(string subkey)
+        public object GetSubkey(string subkey)
         {
             lock (subkey_syncobj)
             {
@@ -32,7 +32,7 @@ namespace PsdRenderer
                 return subkeys[subkey];
             }
         }
-        public void setSubkey(string subkey, object item)
+        public void SetSubkey(string subkey, object item)
         {
             lock (subkey_syncobj)
             {

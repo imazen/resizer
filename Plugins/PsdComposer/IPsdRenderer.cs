@@ -2,17 +2,18 @@
 using System.IO;
 using System.Drawing;
 using System.Collections.Generic;
-namespace PsdRenderer
+namespace ImageResizer.Plugins.PsdComposer
 {
     public delegate bool ShowLayerDelegate(int index, string Name, bool visibleNow);
     public delegate void ComposeLayerDelegate(Graphics g,Bitmap bitmap,  object layer);
     public interface IPsdRenderer
     {
+        Bitmap Render(Stream s, out IList<IPsdLayer> layers, out Size size, ShowLayerDelegate showLayerCallback, ComposeLayerDelegate modifyLayer);
 
+        IList<IPsdLayer> GetLayers(Stream s);
 
-        Bitmap Render(Stream s, out IList<IPsdLayer> layers, ShowLayerDelegate showLayerCallback, ComposeLayerDelegate modifyLayer);
+        IList<IPsdLayer> GetLayersAndSize(Stream s, out Size size);
 
-         IList<IPsdLayer> GetLayers(Stream s);
     }
 
     public interface IPsdLayer

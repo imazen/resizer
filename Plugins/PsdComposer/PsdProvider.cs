@@ -9,7 +9,6 @@ using System.Data.Sql;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Diagnostics;
-using fbs;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -18,49 +17,243 @@ using PhotoshopFile.Text;
 using ImageResizer.Plugins;
 using ImageResizer.Encoding;
 using ImageResizer.Configuration;
-namespace PsdRenderer
+namespace ImageResizer.Plugins.PsdComposer
 {
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
-    public class PsdProvider : VirtualPathProvider
+    public class PsdComposerPlugin : VirtualPathProvider, IPlugin, IVirtualImageProvider, IQuerystringPlugin, IFileExtensionPlugin
     {
 
-        
-        public PsdProvider()
-            : base()
-        { }
 
-        public static bool isStrictMode()
+        public PsdComposerPlugin(): base()  { }
+
+        internal Config c;
+        public IPlugin Install(Config c) {
+            this.c = c;
+            this.c.Plugins.add_plugin(this);
+            return this;
+        }
+
+        public bool Uninstall(Config c) {
+            c.Plugins.remove_plugin(this);
+            return true;
+        }
+
+        /// <summary>
+        /// Returns true if the specified file and querystring indicate a PSD composition request
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        public bool FileExists(string virtualPath, NameValueCollection queryString) {
+            return IsPathPSDToCompose(virtualPath,queryString) && System.IO.File.Exists(GetPhysicalPath(virtualPath));
+        }
+        
+        /// <summary>
+        /// Returns a virtual file instance for the specified specified file and querystring, if they indicate a PSD composition request. 
+        /// Otherwise, null is returned.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        public IVirtualFile GetFile(string virtualPath, NameValueCollection queryString) {
+            if (IsPathPSDToCompose(virtualPath,queryString) && System.IO.File.Exists(GetPhysicalPath(virtualPath)))
+                return new PsdVirtualFile(virtualPath, this);
+            else
+                return null;
+        }
+
+
+        public IEnumerable<string> GetSupportedQuerystringKeys() {
+            return PsdCommandBuilder.GetSupportedQuerystringKeys();
+        }
+
+        public IEnumerable<string> GetSupportedFileExtensions() {
+            return new string[] { "psd" };
+        }
+
+
+        protected bool isStrictMode()
         {
-            return !"false".Equals(ConfigurationManager.AppSettings["PsdStrictMode"], StringComparison.OrdinalIgnoreCase); 
+            return c.get("psdcomposer.strictMode", true);
         }
 
         /// <summary>
         /// Returns the renderer object selected in the querystring
         /// </summary>
         /// <returns></returns>
-        public static IPsdRenderer GetSelectedRenderer(NameValueCollection queryString)
+        protected IPsdRenderer GetSelectedRenderer(NameValueCollection queryString)
         {
             //Renderer object
             IPsdRenderer renderer = null;
-            ////The querystring-specified renderer name
-            //string sRenderer = null;
-            //if (queryString["renderer"] != null) sRenderer = queryString["renderer"].ToLowerInvariant();
-            ////Build the correct renderer
-            //if (("graphicsmill").Equals(sRenderer))
-            //    renderer = new GraphicsMillRenderer();
-            //else
-            //There is only ONE renderer now
+            //There is only ONE renderer now - The Agurigma one was horrible
             renderer = new PsdPluginRenderer();
             return renderer;
         }
+
+ 
+        /// <summary>
+        /// Returns a stream to the composed file, encoded in the format requested by the querystring or fake extension
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public Stream ComposeStream(string virtualPath, NameValueCollection queryString) {
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            System.Drawing.Bitmap b = ComposeBitmap(virtualPath, queryString);
+            //Memory stream for encoding the file
+            MemoryStream ms = new MemoryStream();
+            //Encode image to memory stream, then seek the stream to byte 0
+            using (b) {
+                //Use whatever settings appear in the URL 
+                IEncoder encoder = c.Plugins.GetEncoder(new ImageResizer.ResizeSettings(queryString), virtualPath);
+                encoder.Write(b, ms);
+                ms.Seek(0, SeekOrigin.Begin); //Reset stream for reading
+            }
+
+            sw.Stop();
+            trace("Total time, including encoding: " + sw.ElapsedMilliseconds.ToString() + "ms");
+
+            return ms;
+        }
+ 
+        /// <summary>
+        /// Returns a Bitmap instance of the composed result
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public System.Drawing.Bitmap ComposeBitmap(string virtualPath, NameValueCollection queryString) {
+            //Renderer object
+            IPsdRenderer renderer = GetSelectedRenderer(queryString);
+
+            //Bitmap we will render to
+            System.Drawing.Bitmap b = null;
+
+            MemCachedFile file = MemCachedFile.GetCachedFile(GetPhysicalPath(virtualPath));
+            using (Stream s = file.GetStream()) {
+                //Time just the parsing/rendering
+                Stopwatch swRender = new Stopwatch();
+                swRender.Start();
+
+                IList<IPsdLayer> layers = null;
+                Size size = Size.Empty;
+                //Use the selected renderer to parse the file and compose the layers, using this delegate callback to determine which layers to show.
+                b = renderer.Render(s, out layers, out size, BuildLayerCallback(queryString), BuildModifyLayerCallback(queryString));
+
+                //Save layers & size for later use
+                file.SetSubkey("layers_" + renderer.ToString(), layers);
+                file.SetSubkey("size_" + renderer.ToString(), size);
+
+
+                //How fast?
+                swRender.Stop();
+                trace("Using encoder " + renderer.ToString() + ", rendering stream to a composed Bitmap instance took " + swRender.ElapsedMilliseconds.ToString() + "ms");
+            }
+            return b;
+        }
+
+        /// <summary>
+        /// Returns the size of the PSD 
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        public Size GetPsdDimensions(string virtualPath, NameValueCollection queryString) {
+            return GetFileMetadata(virtualPath, queryString).Key;
+        }
+
+        /// <summary>
+        /// Returns a collection of all the layers for the specified file (memcached)
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        public IList<IPsdLayer> GetAllLayers(string virtualPath, NameValueCollection queryString) {
+            return GetFileMetadata(virtualPath, queryString).Value;
+        }
+        /// <summary>
+        /// Returns a collection of all the layers for the specified file and the size of the file (memcached)
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        protected KeyValuePair<Size,IList<IPsdLayer>> GetFileMetadata(string virtualPath, NameValueCollection queryString) {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            //Renderer object
+            IPsdRenderer renderer = GetSelectedRenderer(queryString);
+            //File
+            MemCachedFile file = MemCachedFile.GetCachedFile(GetPhysicalPath(virtualPath));
+            //key
+            string layersKey = "layers_" + renderer.ToString();
+            string sizeKey = "size_" + renderer.ToString();
+
+            //Try getting from the cache first
+            IList<IPsdLayer> layers = file.GetSubkey(layersKey) as IList<IPsdLayer>;
+            Size size = file.GetSubkey(sizeKey) is Size ? (Size)file.GetSubkey(sizeKey) : Size.Empty;
+            if (layers == null) {
+                //Time just the parsing
+                Stopwatch swRender = new Stopwatch();
+                swRender.Start();
+
+                layers = renderer.GetLayersAndSize(file.GetStream(), out size);
+
+                //Save to cache for later
+                file.SetSubkey(layersKey, layers);
+                file.SetSubkey(sizeKey, size);
+                //How fast?
+                swRender.Stop();
+                trace("Using decoder " + renderer.ToString() + ",parsing file and enumerating layers took " + swRender.ElapsedMilliseconds.ToString() + "ms");
+            }
+
+
+            sw.Stop();
+            trace("Total time for enumerating, including file reading: " + sw.ElapsedMilliseconds.ToString() + "ms");
+            return new KeyValuePair<Size,IList<IPsdLayer>>(size,layers);
+        }
+
+        /// <summary>
+        /// Returns a collection of all visible text layers for the file (memcached). Useful for building image maps
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        public IList<IPsdLayer> GetVisibleTextLayers(string virtualPath, NameValueCollection queryString) {
+
+            //Get all layers
+            IList<IPsdLayer> layers = GetAllLayers(virtualPath, queryString);
+
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            //Now, time to filter layers to those that would be showing on the image right now.
+            IList<IPsdLayer> filtered = new List<IPsdLayer>();
+
+            //Generate a callback just like the one used in the renderer for filtering
+            ShowLayerDelegate callback = BuildLayerCallback(queryString);
+
+            for (int i = 0; i < layers.Count; i++) {
+                if (layers[i].IsTextLayer && callback(layers[i].Index, layers[i].Name, layers[i].Visible)) {
+                    filtered.Add(layers[i]);
+                }
+            }
+
+            sw.Stop();
+            trace("Time for filtering layers: " + sw.ElapsedMilliseconds.ToString() + "ms");
+            return filtered;
+
+        }
+
 
         /// <summary>
         /// Creates a callback that can be used to filter layer visibility.
         /// </summary>
         /// <param name="queryString"></param>
         /// <returns></returns>
-        private static ShowLayerDelegate BuildLayerCallback(NameValueCollection queryString)
+        private ShowLayerDelegate BuildLayerCallback(NameValueCollection queryString)
         {
             //Which layers do we show?
             PsdCommandSearcher searcher = new PsdCommandSearcher(new PsdCommandBuilder(queryString));
@@ -80,7 +273,7 @@ namespace PsdRenderer
         /// </summary>
         /// <param name="b"></param>
         /// <param name="c"></param>
-        private static void ColorBitmap(Bitmap b, Color c)
+        private void ColorBitmap(Bitmap b, Color c)
         {
             double weightedR = c.R * c.A;
             double weightedG = c.G * c.A;
@@ -110,7 +303,7 @@ namespace PsdRenderer
             b.UnlockBits(bd);
         }
 
-        private static ComposeLayerDelegate BuildModifyLayerCallback(NameValueCollection queryString)
+        private ComposeLayerDelegate BuildModifyLayerCallback(NameValueCollection queryString)
         {
             PsdCommandSearcher searcher = new PsdCommandSearcher(new PsdCommandBuilder(queryString));
 
@@ -154,89 +347,6 @@ namespace PsdRenderer
             };
         }
 
-        public NameValueCollection QueryString
-        {
-            get
-            {
-                if (HttpContext.Current.Items[Config.Current.Pipeline.ModifiedQueryStringKey] != null)
-                    return (NameValueCollection)HttpContext.Current.Items[Config.Current.Pipeline.ModifiedQueryStringKey];
-                else 
-                    return HttpContext.Current.Request.QueryString;
-            }
-        }
-
-
-        public Stream getStream(string virtualPath)
-        {
-            return getStream(virtualPath, QueryString);
-        }
-        /// <summary>
-        /// Returns a stream to the 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public static Stream getStream(string virtualPath, NameValueCollection queryString)
-        {
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            System.Drawing.Bitmap b = getBitmap(virtualPath, queryString);
-            //Memory stream for encoding the file
-            MemoryStream ms = new MemoryStream();
-            //Encode image to memory stream, then seek the stream to byte 0
-            using (b)
-            {
-                //Use whatever settings appear in the URL 
-                IEncoder encoder = ImageResizer.ImageBuilder.Current.EncoderProvider.GetEncoder(new ImageResizer.ResizeSettings(queryString), virtualPath);
-                encoder.Write(b, ms);
-                ms.Seek(0, SeekOrigin.Begin); //Reset stream for reading
-            }
-
-            sw.Stop();
-            trace("Total time, including encoding: " + sw.ElapsedMilliseconds.ToString() + "ms");
-
-            return ms;
-        }
-        public System.Drawing.Bitmap getBitmap(string virtualPath){
-            return getBitmap(virtualPath,QueryString);
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public static System.Drawing.Bitmap getBitmap(string virtualPath, NameValueCollection queryString)
-        {
-            //Renderer object
-            IPsdRenderer renderer = GetSelectedRenderer(queryString);
-
-            //Bitmap we will render to
-            System.Drawing.Bitmap b = null;
-
-            MemCachedFile file = MemCachedFile.GetCachedFile(getPhysicalPath(virtualPath));
-            using (Stream s = file.GetStream())
-            {
-                //Time just the parsing/rendering
-                Stopwatch swRender = new Stopwatch();
-                swRender.Start();
-
-                IList<IPsdLayer> layers = null;
-                //Use the selected renderer to parse the file and compose the layers, using this delegate callback to determine which layers to show.
-                b = renderer.Render(s, out layers, BuildLayerCallback(queryString), BuildModifyLayerCallback(queryString));
-
-                //Save layers for later use
-                file.setSubkey("layers_" + renderer.ToString(), layers);
-
-
-                //How fast?
-                swRender.Stop();
-                trace("Using encoder " + renderer.ToString() + ", rendering stream to a composed Bitmap instance took " + swRender.ElapsedMilliseconds.ToString() + "ms");
-            }
-            return b;
-        }
-
- 
 
         private static void trace(string msg)
         {
@@ -246,100 +356,35 @@ namespace PsdRenderer
                 HttpContext.Current.Trace.Write(msg);
         }
 
-        public static Size getPsdSize(string virtualPath, NameValueCollection queryString)
+
+   
+        /// <summary>
+        /// True if the file is a .psd.jpeg, .psd.png, etc file.
+        /// </returns>
+        protected bool IsPathPSDToCompose(string virtualPath,  NameValueCollection queryString = null)
         {
-            return getAllLayers(virtualPath, queryString)[0].Rect.Size;
-        }
+            string fileName = System.IO.Path.GetFileName(virtualPath); //Exclude the folders, just looking at the filename here.
+            int psd = fileName.IndexOf(".psd",StringComparison.OrdinalIgnoreCase);
+            if (psd > -1){
+                //We always take the .psd. syntax
+                if (fileName.IndexOf(".psd.",StringComparison.OrdinalIgnoreCase) > -1) return true;
 
-        public static IList<IPsdLayer> getAllLayers(string virtualPath, NameValueCollection queryString)
-        {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            //Renderer object
-            IPsdRenderer renderer = GetSelectedRenderer(queryString);
-            //File
-            MemCachedFile file = MemCachedFile.GetCachedFile(getPhysicalPath(virtualPath));
-            //key
-            string dataKey = "layers_" + renderer.ToString();
-
-            //Try getting from the cache first
-            IList<IPsdLayer> layers = file.getSubkey(dataKey) as IList<IPsdLayer>;
-            if (layers == null)
-            {
-                //Time just the parsing
-                Stopwatch swRender = new Stopwatch();
-                swRender.Start();
-
-                layers = renderer.GetLayers(file.GetStream());
-                //Save to cache for later
-                file.setSubkey(dataKey, layers);
-
-                //How fast?
-                swRender.Stop();
-                trace("Using decoder " + renderer.ToString() + ",parsing file and enumerating layers took " + swRender.ElapsedMilliseconds.ToString() + "ms");
-            }
-
-
-            sw.Stop();
-            trace("Total time for enumerating, including file reading: " + sw.ElapsedMilliseconds.ToString() + "ms");
-            return layers;
-        }
-        public static IList<IPsdLayer> getVisibleTextLayers(string virtualPath, NameValueCollection queryString)
-        {
-            
-            //Get all layers
-            IList<IPsdLayer> layers = getAllLayers(virtualPath, queryString);
-
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            //Now, time to filter layers to those that would be showing on the image right now.
-            IList<IPsdLayer> filtered = new List<IPsdLayer>();
-            
-            //Generate a callback just like the one used in the renderer for filtering
-            ShowLayerDelegate callback = BuildLayerCallback(queryString);
-
-            for (int i = 0; i < layers.Count; i++){
-                if (layers[i].IsTextLayer && callback(layers[i].Index, layers[i].Name, layers[i].Visible))
-                {
-                    filtered.Add(layers[i]);
+                if (queryString == null) queryString = c.Pipeline.ModifiedQueryString;
+                //But we only grab the .psd syntax if we detect our commands
+                foreach(string s in PsdCommandBuilder.GetSupportedQuerystringKeys()){
+                    if (!string.IsNullOrEmpty(queryString[s])) return true;
                 }
             }
-            
-            sw.Stop();
-            trace("Time for filtering layers: " + sw.ElapsedMilliseconds.ToString() + "ms");
-            return filtered;
-
+            return false;
         }
-
         /// <summary>
-        /// Returns DateTime.MinValue if there are no rows, or no values on the row.
-        /// Executes _modifiedDateQuery, then returns the first non-null datetime value on the first row.
+        /// Strips the .psd.jpg to .psd, converts to physical path
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="virtualPath"></param>
         /// <returns></returns>
-        public DateTime getDateModifiedUtc(string virtualPath){
-            return System.IO.File.GetLastWriteTimeUtc(getPhysicalPath(virtualPath));
-        }
-
-
-        /// <summary>
-        ///   Determines whether a specified virtual path is within
-        ///   the virtual file system.
-        /// </summary>
-        /// <param name="virtualPath">An absolute virtual path.</param>
-        /// <returns>
-        ///   true if the virtual path is within the 
-        ///   virtual file sytem; otherwise, false.
-        /// </returns>
-        bool IsPathVirtual(string virtualPath)
+        internal static string GetPhysicalPath(string virtualPath)
         {
-            return (System.IO.Path.GetFileName(virtualPath).ToLowerInvariant().Contains(".psd."));
-        }
-
-        static string  getPhysicalPath(string virtualPath)
-        {
+            //Trim everything after .psd
             int ix = virtualPath.ToLowerInvariant().LastIndexOf(".psd");
             string str = virtualPath.Substring(0, ix + 4);
             if (HttpContext.Current != null)
@@ -352,30 +397,38 @@ namespace PsdRenderer
             }
         }
 
-
+        /// <summary>
+        /// For internal VPP use only.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
         public override bool FileExists(string virtualPath)
         {
-            if (IsPathVirtual(virtualPath))
-            {
-                return System.IO.File.Exists(getPhysicalPath(virtualPath));
-            }
+            if (IsPathPSDToCompose(virtualPath))
+                return System.IO.File.Exists(GetPhysicalPath(virtualPath));
             else
                 return Previous.FileExists(virtualPath);
         }
-
-        bool PSDExists(string virtualPath)
-        {
-            return IsPathVirtual(virtualPath) && System.IO.File.Exists(getPhysicalPath(virtualPath));
-        }
-
+        /// <summary>
+        /// For internal VPP use only
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
         public override VirtualFile GetFile(string virtualPath)
         {
-            if (PSDExists(virtualPath))
+            if (IsPathPSDToCompose(virtualPath) && System.IO.File.Exists(GetPhysicalPath(virtualPath)))
                 return new PsdVirtualFile(virtualPath, this);
             else
                 return Previous.GetFile(virtualPath);
         }
 
+        /// <summary>
+        /// For internal VPP use only
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="virtualPathDependencies"></param>
+        /// <param name="utcStart"></param>
+        /// <returns></returns>
         public override CacheDependency GetCacheDependency(
           string virtualPath,
           System.Collections.IEnumerable virtualPathDependencies,
@@ -384,15 +437,17 @@ namespace PsdRenderer
             //Maybe the database is also involved? 
             return Previous.GetCacheDependency(virtualPath, virtualPathDependencies, utcStart);
         }
+
+  
     }
 
 
     [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Minimal)]
     [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.Minimal)]
-    public class PsdVirtualFile : VirtualFile, IVirtualFileWithModifiedDate, IVirtualBitmapFile
+    public class PsdVirtualFile : VirtualFile,IVirtualFile, IVirtualFileWithModifiedDate, IVirtualBitmapFile
     {
   
-        private PsdProvider provider;
+        private PsdComposerPlugin provider;
 
         private Nullable<bool> _exists = null;
         private Nullable<DateTime> _fileModifiedDate = null;
@@ -408,7 +463,7 @@ namespace PsdRenderer
             }
         }
 
-        public PsdVirtualFile(string virtualPath, PsdProvider provider)
+        public PsdVirtualFile(string virtualPath, PsdComposerPlugin provider)
             : base(virtualPath)
         {
             this.provider = provider;
@@ -418,19 +473,19 @@ namespace PsdRenderer
         /// Returns a stream of the encoded file bitmap using the current request querystring.
         /// </summary>
         /// <returns></returns>
-        public override Stream Open(){ return provider.getStream(this.VirtualPath);}
+        public override Stream Open() { return provider.ComposeStream(this.VirtualPath, provider.c.Pipeline.ModifiedQueryString); }
         /// <summary>
         /// Returns a composed bitmap of the file using request querystring paramaters.
         /// </summary>
         /// <returns></returns>
-        public System.Drawing.Bitmap GetBitmap() { return provider.getBitmap(this.VirtualPath); }
+        public System.Drawing.Bitmap GetBitmap() { return provider.ComposeBitmap(this.VirtualPath, provider.c.Pipeline.ModifiedQueryString); }
 
         /// <summary>
         /// Returns the last modified date of the row. Cached for performance.
         /// </summary>
         public DateTime ModifiedDateUTC{
             get{
-                if (_fileModifiedDate == null) _fileModifiedDate = provider.getDateModifiedUtc(this.VirtualPath);
+                if (_fileModifiedDate == null) _fileModifiedDate = System.IO.File.GetLastWriteTimeUtc(PsdComposerPlugin.GetPhysicalPath(this.VirtualPath));
                 return _fileModifiedDate.Value;
             }
         }
