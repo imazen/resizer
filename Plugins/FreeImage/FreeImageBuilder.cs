@@ -41,7 +41,7 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
         /// </summary>
         /// <param name="job"></param>
         /// <returns></returns>
-        protected override RequestedAction BuildJob(ImageBuilder.Job job) {
+        protected override RequestedAction BuildJob(ImageJob job) {
             if (!"freeimage".Equals(job.Settings["builder"])) return RequestedAction.None;
             if (!FreeImageAPI.FreeImage.IsAvailable()) return RequestedAction.None;
 
@@ -110,7 +110,7 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
         /// <param name="s"></param>
         /// <param name="job"></param>
         /// <returns></returns>
-        protected FIBITMAP buildFiBitmap(Stream s, ImageBuilder.Job job, bool supportsTransparency){
+        protected FIBITMAP buildFiBitmap(Stream s, ImageJob job, bool supportsTransparency){
 
             ResizeSettings settings = job.Settings;
             FIBITMAP original = FreeImage.LoadFromStream((Stream)s);
