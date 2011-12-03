@@ -76,7 +76,7 @@
     <Compile Include="Configuration\Logging\ILoggerProvider.cs" />
     <Compile Include="Configuration\Logging\ILogManager.cs" />
     <Compile Include="Configuration\UrlAuthorizationEventArgs.cs" />
-    <Compile Include="ImageBuilder.Job.cs" />
+    <Compile Include="ImageJob.cs" />
     <Compile Include="Plugins\Basic\AutoRotate.cs" />
     <Compile Include="Plugins\Basic\DefaultSettings.cs" />
     <Compile Include="Plugins\Basic\FolderResizeSyntax.cs" />

@@ -43,7 +43,7 @@ namespace ImageResizer.Plugins.WicBuilder {
         /// </summary>
         /// <param name="job"></param>
         /// <returns></returns>
-        protected override RequestedAction BuildJob(ImageBuilder.Job job) {
+        protected override RequestedAction BuildJob(ImageJob job) {
             if (!"wic".Equals(job.Settings["builder"])) return RequestedAction.None;
 
             //Convert the source stream to a byte[] array and length.
@@ -106,7 +106,7 @@ namespace ImageResizer.Plugins.WicBuilder {
         /// <param name="job"></param>
         /// <param name="supportsTransparency"></param>
         /// <returns></returns>
-        protected virtual RequestedAction BuildJobWic(byte[] data, long lData, ImageBuilder.Job job, bool supportsTransparency) {
+        protected virtual RequestedAction BuildJobWic(byte[] data, long lData, ImageJob job, bool supportsTransparency) {
 
             ResizeSettings settings = job.Settings; ResizeSettings q = settings;
             string path = job.SourcePathData;
@@ -231,7 +231,7 @@ namespace ImageResizer.Plugins.WicBuilder {
             }
         }
 
-        protected virtual RequestedAction Encode(IWICComponentFactory factory, IWICBitmapSource data, Size imageSize, ImageBuilder.Job job) {
+        protected virtual RequestedAction Encode(IWICComponentFactory factory, IWICBitmapSource data, Size imageSize, ImageJob job) {
             WicEncoderPlugin encoder = new WicEncoderPlugin(job.Settings, job.SourcePathData); 
  
             //Create the IStream/MemoryStream

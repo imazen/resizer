@@ -147,7 +147,7 @@ namespace ImageResizer.Resizing {
         /// </summary>
         /// <param name="job"></param>
         /// <returns></returns>
-        protected virtual RequestedAction BuildJob(ImageResizer.ImageBuilder.Job job) {
+        protected virtual RequestedAction BuildJob(ImageResizer.ImageJob job) {
             if (exts != null)
                 foreach (AbstractImageProcessor p in exts)
                     if (p.BuildJob(job) == RequestedAction.Cancel)

@@ -297,7 +297,7 @@ namespace ImageResizer
         /// <param name="disposeSource">If false, 'source' will not be disposed. </param>
        
         public virtual Bitmap Build(object source, ResizeSettings settings, bool disposeSource) {
-            Job j = new Job(source, typeof(Bitmap), settings, disposeSource, false);
+            ImageJob j = new ImageJob(source, typeof(Bitmap), settings, disposeSource, false);
             Build(j);
             return j.Result as Bitmap;
         }
@@ -337,11 +337,11 @@ namespace ImageResizer
         /// <param name="disposeSource">True to dispose 'source' after use. False to leave intact.</param>
         /// <param name="addFileExtension">If true, will add the correct file extension to 'dest' if it is a string. </param>
         public virtual string Build(object source, object dest, ResizeSettings settings, bool disposeSource, bool addFileExtension) {
-            return Build(new Job(source, dest, settings, disposeSource, addFileExtension)).FinalPath;
+            return Build(new ImageJob(source, dest, settings, disposeSource, addFileExtension)).FinalPath;
         }
         #endregion
 
-        public virtual Job Build(Job job) {
+        public virtual ImageJob Build(ImageJob job) {
             //Clone and filter settings FIRST, before calling plugins.
             ResizeSettings s = job.Settings == null ? new ResizeSettings() : new ResizeSettings(job.Settings);
             if (SettingsModifier != null) s = SettingsModifier.Modify(s);
@@ -358,7 +358,7 @@ namespace ImageResizer
             }
         }
 
-        protected override RequestedAction BuildJob(ImageBuilder.Job job) {
+        protected override RequestedAction BuildJob(ImageJob job) {
             if (base.BuildJob(job) == RequestedAction.Cancel) return RequestedAction.Cancel;
 
             Bitmap b = null;
