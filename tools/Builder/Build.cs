@@ -241,19 +241,29 @@ namespace ImageResizer.ReleaseBuilder {
                 //8b - run cleanup routine
                 RemoveUselessFiles();
 
-                //Prepare searchers
+                //Prepare searchersq
                 PrepareForPackaging();
 
-                //9 - Pacakge all selected zip configurations
-                foreach (PackageDescriptor pd in packages) {
-                    if (pd.Skip || !pd.Build) continue;
-                    if (pd.Exists && pd.Build) {
-                        File.Delete(pd.Path);
-                        say("Deleted " + pd.Path);
+                //Allows use to temporarily edit all the sample project files
+                using (RestorePoint rp = new RestorePoint(q.files(new Pattern("^/Samples/*/*.(cs|vb)proj$")))) {
+
+                    //Replace all project references temporarily
+                    foreach (string pf in q.files(new Pattern("^/Samples/*/*.(cs|vb)proj$"))) {
+                        new ProjectFileEditor(pf).ReplaceAllProjectReferencesWithDllReferences("..\\..\\dlls\\release");
                     }
-                    pd.Builder(pd);
-                    //Copy to a 'tozip' version for e-mailing
-                    File.Copy(pd.Path, pd.Path.Replace(".zip", ".tozip"), true);
+
+
+                    //9 - Pacakge all selected zip configurations
+                    foreach (PackageDescriptor pd in packages) {
+                        if (pd.Skip || !pd.Build) continue;
+                        if (pd.Exists && pd.Build) {
+                            File.Delete(pd.Path);
+                            say("Deleted " + pd.Path);
+                        }
+                        pd.Builder(pd);
+                        //Copy to a 'tozip' version for e-mailing
+                        //File.Copy(pd.Path, pd.Path.Replace(".zip", ".tozip"), true);
+                    }
                 }
 
 

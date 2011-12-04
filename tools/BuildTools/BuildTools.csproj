@@ -54,7 +54,9 @@
     <Compile Include="Package.cs" />
     <Compile Include="PackageDescriptor.cs" />
     <Compile Include="Pattern.cs" />
+    <Compile Include="ProjectFileEditor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RestorePoint.cs" />
     <Compile Include="VersionEditor.cs" />
   </ItemGroup>
   <ItemGroup>
