@@ -23,7 +23,9 @@ namespace BuildTools {
             XDocument d = XDocument.Load(Path);
             
             bool didsomething = false;
-            foreach (XElement e in d.Descendants("{http://schemas.microsoft.com/developer/msbuild/2003}ProjectReference")) {
+            //if (d.Descendants("{http://schemas.microsoft.com/developer/msbuild/2003}ProjectReference").Count() < 1) return;
+
+            foreach (XElement e in d.Descendants("{http://schemas.microsoft.com/developer/msbuild/2003}ProjectReference").ToList()) {
                 string name = e.Descendants("{http://schemas.microsoft.com/developer/msbuild/2003}Name").First().Value;
 
                 
