@@ -335,11 +335,11 @@ namespace ImageResizer.ReleaseBuilder {
 
         public bool BuildAll() {
             int result = d.Run("/Build Release") + //Have to run Release first, since ImageResizerGUI includes the DLLs.
-            d.Run("/Build Debug") +
+            //d.Run("/Build Debug") +
             d.Run("/Build Trial");
             int extrasResult =
             extras.Run("/Build Release") +
-            extras.Run("/Build Debug") +
+            //extras.Run("/Build Debug") +
             extras.Run("/Build Trial");
 
             if (result > 0 && !ask("There may have been build errors. Continue?")) return false;
