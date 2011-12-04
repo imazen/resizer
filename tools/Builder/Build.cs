@@ -69,6 +69,15 @@ namespace ImageResizer.ReleaseBuilder {
         [STAThread]
         public void Run() {
             MakeConsoleNicer();
+            //PrepareForPackaging();
+            //using (RestorePoint rp = new RestorePoint(q.files(new Pattern("^/Samples/*/*.(cs|vb)proj$")))) {
+
+            //    //Replace all project references temporarily
+            //    foreach (string pf in q.files(new Pattern("^/Samples/[^/]+/*.(cs|vb)proj$"))) {
+            //        new ProjectFileEditor(pf).ReplaceAllProjectReferencesWithDllReferences("..\\..\\dlls\\release");
+            //    }
+
+            //}
 
             say("Project root: " + f.ParentPath);
             nl();
@@ -248,7 +257,7 @@ namespace ImageResizer.ReleaseBuilder {
                 using (RestorePoint rp = new RestorePoint(q.files(new Pattern("^/Samples/*/*.(cs|vb)proj$")))) {
 
                     //Replace all project references temporarily
-                    foreach (string pf in q.files(new Pattern("^/Samples/*/*.(cs|vb)proj$"))) {
+                    foreach (string pf in q.files(new Pattern("^/Samples/[^/]+/*.(cs|vb)proj$"))) {
                         new ProjectFileEditor(pf).ReplaceAllProjectReferencesWithDllReferences("..\\..\\dlls\\release");
                     }
 
