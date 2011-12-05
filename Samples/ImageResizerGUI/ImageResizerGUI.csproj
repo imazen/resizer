@@ -65,26 +65,6 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ImageResizer, Version=3.0.12.639, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\release\ImageResizer.dll</HintPath>
-    </Reference>
-    <Reference Include="ImageResizer.Plugins.AnimatedGifs, Version=3.0.12.639, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\release\ImageResizer.Plugins.AnimatedGifs.dll</HintPath>
-    </Reference>
-    <Reference Include="ImageResizer.Plugins.BatchZipper, Version=3.0.12.639, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\release\ImageResizer.Plugins.BatchZipper.dll</HintPath>
-    </Reference>
-    <Reference Include="ImageResizer.Plugins.PrettyGifs, Version=3.0.12.639, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\release\ImageResizer.Plugins.PrettyGifs.dll</HintPath>
-    </Reference>
-    <Reference Include="ImageResizer.Plugins.PsdReader, Version=3.0.12.639, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dlls\release\ImageResizer.Plugins.PsdReader.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -168,7 +148,28 @@
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\ImageResizer.csproj">
+      <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
+      <Name>ImageResizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\AnimatedGifs\ImageResizer.Plugins.AnimatedGifs.csproj">
+      <Project>{D97EA32A-0845-4E00-9C4D-68C5B93A1869}</Project>
+      <Name>ImageResizer.Plugins.AnimatedGifs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\BatchZipper\ImageResizer.Plugins.BatchZipper.csproj">
+      <Project>{CDA9A53D-C190-4460-B5AF-F73132F56BFB}</Project>
+      <Name>ImageResizer.Plugins.BatchZipper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\PrettyGifs\ImageResizer.Plugins.PrettyGifs.csproj">
+      <Project>{BB8EEB97-6550-4780-97B2-B0F2FCD80970}</Project>
+      <Name>ImageResizer.Plugins.PrettyGifs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\PsdReader\ImageResizer.Plugins.PsdReader.csproj">
+      <Project>{BCF28DA2-AF29-4C09-B37D-059F40FC9B95}</Project>
+      <Name>ImageResizer.Plugins.PsdReader</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\image1.png" />
   </ItemGroup>
