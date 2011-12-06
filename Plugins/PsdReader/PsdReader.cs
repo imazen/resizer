@@ -60,10 +60,9 @@ namespace ImageResizer.Plugins.PsdReader {
         public override Bitmap DecodeStreamFailed(Stream s, ResizeSettings settings, string optionalPath) {
             //Catch Photoshop files not ending in .psd
             try {
-                Bitmap b = Decode(s);
-                return b;
+                return Decode(s);
             } catch {
-                if (s.CanSeek) s.Seek(0, SeekOrigin.Begin);
+
                 return null;
             }
         }

@@ -51,8 +51,9 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
 
         public override System.Drawing.Bitmap DecodeStreamFailed(System.IO.Stream s, ResizeSettings settings, string optionalPath) {
             try {
-                return Decode(s,settings);
-            } catch {
+                 return Decode(s,settings);
+                 
+            } catch (Exception exts){
                 return null;
             }
         }
