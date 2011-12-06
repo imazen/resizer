@@ -34,6 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.WebPages" />
     <Reference Include="System.Web.Helpers" />
@@ -58,12 +59,51 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\PhotosController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Photo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\plupload\js\i18n\cs.js" />
+    <Content Include="Content\plupload\js\i18n\da.js" />
+    <Content Include="Content\plupload\js\i18n\de.js" />
+    <Content Include="Content\plupload\js\i18n\es.js" />
+    <Content Include="Content\plupload\js\i18n\fi.js" />
+    <Content Include="Content\plupload\js\i18n\fr.js" />
+    <Content Include="Content\plupload\js\i18n\it.js" />
+    <Content Include="Content\plupload\js\i18n\ja.js" />
+    <Content Include="Content\plupload\js\i18n\lv.js" />
+    <Content Include="Content\plupload\js\i18n\nl.js" />
+    <Content Include="Content\plupload\js\i18n\pt-br.js" />
+    <Content Include="Content\plupload\js\i18n\ru.js" />
+    <Content Include="Content\plupload\js\i18n\sv.js" />
+    <Content Include="Content\plupload\js\jquery.plupload.queue\css\jquery.plupload.queue.css" />
+    <Content Include="Content\plupload\js\jquery.plupload.queue\img\backgrounds.gif" />
+    <Content Include="Content\plupload\js\jquery.plupload.queue\img\buttons-disabled.png" />
+    <Content Include="Content\plupload\js\jquery.plupload.queue\img\buttons.png" />
+    <Content Include="Content\plupload\js\jquery.plupload.queue\img\delete.gif" />
+    <Content Include="Content\plupload\js\jquery.plupload.queue\img\done.gif" />
+    <Content Include="Content\plupload\js\jquery.plupload.queue\img\error.gif" />
+    <Content Include="Content\plupload\js\jquery.plupload.queue\img\throbber.gif" />
+    <Content Include="Content\plupload\js\jquery.plupload.queue\img\transp50.png" />
+    <Content Include="Content\plupload\js\jquery.plupload.queue\jquery.plupload.queue.js" />
+    <Content Include="Content\plupload\js\jquery.ui.plupload\css\jquery.ui.plupload.css" />
+    <Content Include="Content\plupload\js\jquery.ui.plupload\img\plupload-bw.png" />
+    <Content Include="Content\plupload\js\jquery.ui.plupload\img\plupload.png" />
+    <Content Include="Content\plupload\js\jquery.ui.plupload\jquery.ui.plupload.js" />
+    <Content Include="Content\plupload\js\plupload.browserplus.js" />
+    <Content Include="Content\plupload\js\plupload.flash.js" />
+    <Content Include="Content\plupload\js\plupload.flash.swf" />
+    <Content Include="Content\plupload\js\plupload.full.js" />
+    <Content Include="Content\plupload\js\plupload.gears.js" />
+    <Content Include="Content\plupload\js\plupload.html4.js" />
+    <Content Include="Content\plupload\js\plupload.html5.js" />
+    <Content Include="Content\plupload\js\plupload.js" />
+    <Content Include="Content\plupload\js\plupload.silverlight.js" />
+    <Content Include="Content\plupload\js\plupload.silverlight.xap" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Content\themes\base\jquery-ui.css" />
@@ -111,8 +151,7 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="Models\" />
+    <Content Include="Views\Photos\Upload.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core.Mvc\ImageResizer.Mvc.csproj">
@@ -123,6 +162,9 @@
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Photos\Index.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
