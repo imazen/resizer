@@ -369,6 +369,7 @@ namespace ImageResizer.ReleaseBuilder {
                        "^/Core/obj/*","^/Core.Mvc/obj/*"));
 
 
+            f.DelFiles(q.files("^/Samples/MvcSample/App_Data/*"));
 
             //delete .xml and .pdb files for third-party libs
             f.DelFiles(q.files("^/dlls/*/(Aforge|LitS3|Ionic)*.(pdb|xml)$"));
@@ -384,7 +385,9 @@ namespace ImageResizer.ReleaseBuilder {
 
         public string[] standardExclusions = new string[]{
                 "/.git","^/Releases","/Hidden/","^/Legacy","^/Tools/(Builder|BuildTools|docu)",
-				"^/Samples/Images/*/*","/Thumbs.db$","/.DS_Store$",".suo$",".user$", "/._","/~$"
+				"^/Samples/Images/*/*","/Thumbs.db$","/.DS_Store$",".suo$",".user$", "/._","/~$", 
+                "^/Samples/MvcSample/App_Data/"
+
             };
 
         public void PrepareForPackaging() {
