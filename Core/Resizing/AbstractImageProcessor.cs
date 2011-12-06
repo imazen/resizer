@@ -95,6 +95,9 @@ namespace ImageResizer.Resizing {
         public virtual Bitmap DecodeStreamFailed(Stream s, ResizeSettings settings, string optionalPath) {
             if (exts == null) return null;
             foreach (AbstractImageProcessor p in exts) {
+                if (s.CanSeek && s.Position != 0)
+                    s.Seek(0, SeekOrigin.Begin);
+
                 Bitmap b = p.DecodeStreamFailed(s,settings, optionalPath);
                 if (b != null) return b;
             }
