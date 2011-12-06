@@ -5,6 +5,8 @@ using System.Text;
 namespace ImageResizer {
 
     public class ImageJob {
+        public ImageJob() {
+        }
         public ImageJob(string sourcePath, string destPath, ResizeSettings settings) {
             this.Source = sourcePath;
             this.Dest = destPath;
