@@ -25,6 +25,13 @@ namespace ImageResizer {
             this.AddFileExtension = addFileExtension;
         }
 
+        /// <summary>
+        /// Shorthand method for ImageBuilder.Current.Build(this)
+        /// </summary>
+        /// <returns></returns>
+        public ImageJob Build() {
+            return ImageBuilder.Current.Build(this);
+        }
         private object _source = null;
         /// <summary>
         /// The source image's physical path, app-relative virtual path, or a Stream, byte array, Bitmap, VirtualFile, IVirtualFile, HttpPostedFile, or HttpPostedFileBase instance.
