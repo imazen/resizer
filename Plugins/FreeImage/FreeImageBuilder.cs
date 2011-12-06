@@ -45,6 +45,12 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
             if (!"freeimage".Equals(job.Settings["builder"])) return RequestedAction.None;
             if (!FreeImageAPI.FreeImage.IsAvailable()) return RequestedAction.None;
 
+            //StringBuilder log = new StringBuilder();
+
+            //FreeImageAPI.FreeImageEngine.Message += (delegate(FREE_IMAGE_FORMAT fmt, string msg) {
+            //    log.AppendLine(msg);
+            //});
+
             // Variables
             Stream s = null;
             bool disposeStream = !(job.Source is Stream);
