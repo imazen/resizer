@@ -148,11 +148,8 @@ namespace ImageResizer
                 } catch (Exception e) {
                     //if (Debugger.IsAttached) throw e;
                     Debug.Write("Falling back to DecodeStreamFailed: " + e.Message + "\n" + e.StackTrace); 
-                    //Start over - on error.
-                    if (s.CanSeek && s.Position != 0)
-                        s.Seek(0, SeekOrigin.Begin);
-                    //If we can't seek back to the beginning of the stream, we can't hope to decode it.
-                    else if (!s.CanSeek)
+                    
+                    if (!s.CanSeek)
                         throw new ImageCorruptedException("Cannot attempt fallback decoding path on a non-seekable stream", e);
 
                     b = DecodeStreamFailed(s, settings, path);
