@@ -45,7 +45,7 @@
          <img src="sample.tif?page=2&width=200" runat="server" />
          <img src="sample.tif?page=3&width=200" runat="server" />
          
-         <h3>There should be a 50% opaque white 1px border on this image. Anything more is a bug</h3>
+         <h3>There should not be any kind of border on these images.</h3>
         
          <div style="background-color:Black; padding:30px">
 <img runat="server" src="red-leaf.jpg?width=300" /><img id="Img2" runat="server" src="red-leaf.jpg?width=300&builder=wic" />
