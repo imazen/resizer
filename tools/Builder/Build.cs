@@ -239,7 +239,7 @@ namespace ImageResizer.ReleaseBuilder {
                 }
 
                 //6 - if (c) was specified for any package, build all.
-                bool success = BuildAll();
+                bool success = BuildAll(true); //isMakingNugetPackage);
 
                 //7 - Revert file to state at commit (remove 'full' version numbers and 'commit' value)
                 v.Contents = fileContents;
@@ -342,14 +342,15 @@ namespace ImageResizer.ReleaseBuilder {
 
         }
 
-        public bool BuildAll() {
+        public bool BuildAll(bool buildDebug) {
             int result = d.Run("/Build Release") + //Have to run Release first, since ImageResizerGUI includes the DLLs.
-            //d.Run("/Build Debug") +
             d.Run("/Build Trial");
+            if (buildDebug) result += d.Run("/Build Debug");
+
             int extrasResult =
             extras.Run("/Build Release") +
-            //extras.Run("/Build Debug") +
             extras.Run("/Build Trial");
+            if (buildDebug) extrasResult += d.Run("/Build Debug");
 
             if (result > 0 && !ask("There may have been build errors. Continue?")) return false;
             else if (extrasResult > 0 && !ask("There may have been build errors for Plugins With External Dependencies. Continue?")) return false;
@@ -385,7 +386,7 @@ namespace ImageResizer.ReleaseBuilder {
 
         public string[] standardExclusions = new string[]{
                 "/.git","^/Releases","/Hidden/","^/Legacy","^/Tools/(Builder|BuildTools|docu)",
-				"^/Samples/Images/*/*","/Thumbs.db$","/.DS_Store$",".suo$",".user$", "/._","/~$", 
+				"^/Samples/Images/(extra|private)/","/Thumbs.db$","/.DS_Store$",".suo$",".user$", "/._","/~$", 
                 "^/Samples/MvcSample/App_Data/"
 
             };
@@ -430,7 +431,7 @@ namespace ImageResizer.ReleaseBuilder {
             using (var p = new Package(desc.Path, this.f.ParentPath)) {
                 p.Add(q.files("^/(core|contrib|core.mvc|plugins|samples|tests)/"));
                 p.Add(q.files("^/tools/COMInstaller"));
-                p.Add(q.files("^/dlls/(release|debug)"));
+                p.Add(q.files("^/dlls/(debug|release)"));
                 p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"), "/"); //Make a copy in the root
                 
                 p.Add(q.files("^/[^/]+.txt$"));
@@ -450,7 +451,7 @@ namespace ImageResizer.ReleaseBuilder {
             q.exclusions.Add(new Pattern("^/Core/[^/]+.sln")); //Don't include the regular solution files, they won't load properly.
             using (var p = new Package(desc.Path, this.f.ParentPath)) {
                 p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"), "/");
-                p.Add(q.files("^/dlls/(release|debug)/"));
+                p.Add(q.files("^/dlls/(debug|release)/"));
                 p.Add(q.files("^/(core|samples)/"));
                 p.Add(q.files("^/[^/]+.txt$"));
                 p.Add(q.files("^/Web.config$"));
