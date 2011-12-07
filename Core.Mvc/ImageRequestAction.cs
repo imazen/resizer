@@ -24,7 +24,7 @@ namespace ImageResizer.Mvc {
     /// It does not support the CloudFront, Image404, or ImageHandlerSyntax plugins.  RemoteReader, SqlReader, S3Reader, , Image404, ClientCache, 
     /// It doesn't even work yet.
     /// </summary>
-    private class ImageRequestAction: ActionResult {
+    internal class ImageRequestAction: ActionResult {
 
         public ImageRequestAction(string virtualPath, NameValueCollection query, IPipelineConfig conf = null) {
             this.conf = (conf == null) ? Config.Current.Pipeline : conf;
