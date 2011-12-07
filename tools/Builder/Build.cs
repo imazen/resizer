@@ -40,7 +40,7 @@ namespace ImageResizer.ReleaseBuilder {
         }
 
         public string getReleasePath(string packageBase, string ver,  string kind, string hotfix) {
-            return Path.Combine(Path.Combine(f.ParentPath, "Releases"), packageBase + ver.Trim('-') + '-' + kind + "-" + hotfix.Trim('-') +  "-" + DateTime.UtcNow.ToString("MMM-d-yyyy") + ".zip");
+            return Path.Combine(Path.Combine(f.ParentPath, "Releases"), packageBase + ver.Trim('-') + '-' + kind + "-" + (string.IsNullOrWhiteSpace(hotfix) ? "" : (hotfix.Trim('-') +  "-")) + DateTime.UtcNow.ToString("MMM-d-yyyy") + ".zip");
         }
 
         public NameValueCollection GetNugetVariables() {
