@@ -22,9 +22,9 @@ namespace ImageResizer.Mvc {
     /// This action result is NOT a replacement for the InterceptModule and MvcRoutingShim. It cannot hope to achieve the same performance, compatibility, or flexibility.
     /// It does not support all the plugins, nor all the Pipeline events. 
     /// It does not support the CloudFront, Image404, or ImageHandlerSyntax plugins.  RemoteReader, SqlReader, S3Reader, , Image404, ClientCache, 
-    /// 
+    /// It doesn't even work yet.
     /// </summary>
-    public class ImageRequestAction: ActionResult {
+    private class ImageRequestAction: ActionResult {
 
         public ImageRequestAction(string virtualPath, NameValueCollection query, IPipelineConfig conf = null) {
             this.conf = (conf == null) ? Config.Current.Pipeline : conf;
