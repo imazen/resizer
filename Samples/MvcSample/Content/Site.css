@@ -66,3 +66,8 @@ textarea
 {
     display: none;
 }
+
+ul.images li{
+	list-style-type:none;
+	display:inline;
+}

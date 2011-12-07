@@ -42,6 +42,10 @@ public class Photo {
     public Guid Id { get; set; }
     [DataMember]
     public string FilePath { get; set; }
+
+    [DataMember]
+    public string Caption { get; set; }
+
     [DataMember]
     public string OriginalName { get; set; }
     [IgnoreDataMember]
@@ -49,6 +53,9 @@ public class Photo {
     [DataMember]
     public String Querystring { get { return PathUtils.BuildQueryString(Query, true); } set{ Query = PathUtils.ParseQueryStringFriendlyAllowSemicolons(value);}}
 
+    public string UrlWith(string settings) {
+        return PathUtils.MergeOverwriteQueryString("/photos/" + FilePath + Querystring, PathUtils.ParseQueryStringFriendlyAllowSemicolons(settings));
+    }
 
     public void Delete() {
         Photo.Remove(Id);
@@ -168,7 +175,6 @@ public class Photo {
                 return new List<Photo>();
             }
         }
-
     }
 
     private static void SaveData(List<Photo> data) {

@@ -125,6 +125,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediumTrustTest", "..\Tests
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PsdComposer", "..\Plugins\PsdComposer\ImageResizer.Plugins.PsdComposer.csproj", "{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcSample", "..\Samples\MvcSample\MvcSample.csproj", "{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -936,6 +938,24 @@ Global
 		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Trial|x64.ActiveCfg = Release|Any CPU
 		{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}.Trial|x86.ActiveCfg = Release|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Release|x64.ActiveCfg = Release|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Release|x86.ActiveCfg = Release|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Trial|x64.ActiveCfg = Release|Any CPU
+		{4344B544-0BAA-4517-AEC6-1BDE2FDDFD90}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
