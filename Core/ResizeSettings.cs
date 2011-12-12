@@ -44,9 +44,11 @@ namespace ImageResizer {
         /// If both width and height are specified, the image will be 'letterboxed' to match the desired aspect ratio. 
         /// Use maxwidth/maxheight, crop=auto, or stretch=fill to avoid this behavior.
         /// </summary>
-        public int Width                        { get { 
-            return get("width", -1);            } set {   
-            set("width",value);                 } }
+        public int Width                        { get {
+                return get("width", get("w", -1)); }set {
+                set("width", value); this.Remove("w");
+            }
+        }
 
         /// <summary>
         /// ["height"]: Sets the desired height of the image.  (minus padding, borders, margins, effects, and rotation)
@@ -56,8 +58,10 @@ namespace ImageResizer {
         /// Use maxwidth/maxheight, crop=auto, or stretch=fill to avoid this behavior.
         /// </summary>
         public int Height                        { get { 
-            return get("height", -1);            } set {   
-            set("height",value);                 } }
+            return get("height", get("h",-1));            } set {
+                set("height", value); this.Remove("height");
+            }
+        }
 
         /// <summary>
         /// ["maxwidth"]: Sets the maximum desired width of the image.  (minus padding, borders, margins, effects, and rotation). 

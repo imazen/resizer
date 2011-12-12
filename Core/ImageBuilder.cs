@@ -1007,7 +1007,7 @@ namespace ImageResizer
        
         private readonly string[] _supportedQuerystringKeys = new string[]{
                     "format", "thumbnail", "maxwidth", "maxheight",
-                "width", "height",
+                "width", "height","w","h",
                 "scale", "stretch", "crop", "cropxunits", "cropyunits", "page", "bgcolor",
                 "rotate", "flip", "sourceFlip", "sFlip", "sRotate", "borderWidth",
                 "borderColor", "paddingWidth", "paddingColor",
