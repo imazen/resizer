@@ -48,8 +48,8 @@ namespace ImageResizer.Plugins.Basic {
 
 
                 //Mimic aspect-ratio destruction
-                if (string.IsNullOrEmpty(c.Pipeline.ModifiedQueryString["stretch"]))
-                    c.Pipeline.ModifiedQueryString["stretch"] = "fill";
+                if (string.IsNullOrEmpty(c.Pipeline.ModifiedQueryString["stretch"]) && string.IsNullOrEmpty(c.Pipeline.ModifiedQueryString["mode"]))
+                    c.Pipeline.ModifiedQueryString["mode"] = "stretch";
 
             }else if (c.Pipeline.PreRewritePath.Equals(prefix + "imghandler.ashx", StringComparison.OrdinalIgnoreCase) && 
                 !string.IsNullOrEmpty(context.Request.QueryString["img"])) {
