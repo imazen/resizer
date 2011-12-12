@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 namespace ImageResizer {
 
@@ -10,6 +11,12 @@ namespace ImageResizer {
         public ImageJob(string sourcePath, string destPath, ResizeSettings settings) {
             this.Source = sourcePath;
             this.Dest = destPath;
+            this.Settings = settings;
+        }
+
+        public ImageJob(Stream sourceStream, Stream destStream, ResizeSettings settings) {
+            this.Source = sourceStream;
+            this.Dest = destStream;
             this.Settings = settings;
         }
 
