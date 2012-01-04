@@ -56,6 +56,29 @@ namespace ImageResizer.Plugins.Basic {
                 "System.Web.Routing is loaded. You must install the MvcRoutingShim plugin. Add ImageResizer.Mvc.dll to your project, and add '<add name=\"MvcRoutingPlugin\" />' to the <plugins> section of web.config.", IssueSeverity.Critical));
 
 
+            //Verify we're using the same general version of all ImageResizer assemblies.
+            Dictionary<string, List<string>> versions = new Dictionary<string, List<string>>();
+            foreach (Assembly a in asms) {
+                AssemblyName an = new AssemblyName(a.FullName);
+                if (an.Name.StartsWith("ImageResizer", StringComparison.OrdinalIgnoreCase)) {
+                    string key = an.Version.Major + "." + an.Version.Minor + "." + an.Version.Build;
+                    if (!versions.ContainsKey(key)) versions[key] = new List<string>();
+                    versions[key].Add(an.Name);
+                }
+            }
+            if (versions.Keys.Count > 1) {
+                string groups = "";
+                foreach(string v in versions.Keys){
+                    groups += "\n" + v + " assemblies: ";
+                    foreach(string a in versions[v])
+                        groups += a + ", ";
+                    groups = groups.TrimEnd(' ', ',');
+                }
+                issues.Add(new Issue("Potentially incompatible ImageResizer assemblies were detected.",
+                    "Please make sure all ImageResizer assemblies are from the same version. Compatibility issues are possible if you mix plugins from different releases." + groups, IssueSeverity.Warning));
+
+            }
+
 			StringBuilder sb = new StringBuilder();
 			sb.AppendLine("Image resizer diagnostic sheet\t\t" + DateTime.UtcNow.ToString() + "\n");
 			sb.AppendLine(issues.Count + " Issues detected:\n");
