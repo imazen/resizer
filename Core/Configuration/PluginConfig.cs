@@ -352,15 +352,20 @@ namespace ImageResizer.Configuration {
                     qualifiedNames.Add(className + assemblyName);
             }
 
-
-            //Now, try them all.
-            foreach (string s in qualifiedNames) {
-                if (t != null) return t;
-                Debug.WriteLine("Trying " + s);
-                t = Type.GetType(s, false, true);
-                if (t != null) Debug.WriteLine("Success!");
+            try {
+                //Now, try them all.
+                foreach (string s in qualifiedNames) {
+                    if (t != null) return t;
+                    Debug.WriteLine("Trying " + s);
+                    t = Type.GetType(s, false, true);
+                    if (t != null) Debug.WriteLine("Success!");
+                }
+            } catch (System.Security.SecurityException sx) {
+                this.AcceptIssue(new Issue("Failed to load plugin \"" + searchName + "\" due to ASP.NET trust configuration. ",
+                                "You may need to increase the trust level for this plugin to get loaded properly. Error details: \n" +
+                                sx.Message + "\n" + sx.StackTrace, IssueSeverity.Error));
+                return null;
             }
-
 
             //Ok, time to log problem.
             if (t == null) {
