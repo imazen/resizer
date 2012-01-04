@@ -7,7 +7,9 @@ using System.Collections.Specialized;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
-    /// Adds URL syntax support for http://webimageresizer.codeplex.com/, http://imagehandler.codeplex.com/, http://bbimagehandler.codeplex.com/, and http://bip.codeplex.com/
+    /// Adds URL syntax support for http://webimageresizer.codeplex.com/, 
+    /// http://imagehandler.codeplex.com/, http://bbimagehandler.codeplex.com/, http://dynamicimageprocess.codeplex.com/, 
+    /// and http://bip.codeplex.com/
     /// </summary>
     public class ImageHandlerSyntax:IPlugin {
 
@@ -108,7 +110,7 @@ namespace ImageResizer.Plugins.Basic {
                     q.Remove("border");
                 }
             } else if (c.Pipeline.IsAcceptedImageType(c.Pipeline.PreRewritePath) || c.Pipeline.SkipFileTypeCheck){
-                //BetterImageProcessor uses a Handler registered to all Jpeg images. Just the image URL plus ?w= and/or ?h=
+                //BetterImageProcessor and DynamicImageProcessor uses a Handler registered to all Jpeg images. Just the image URL plus ?w= and/or ?h=
                 if (!string.IsNullOrEmpty(context.Request.QueryString["w"]) || !string.IsNullOrEmpty(context.Request.QueryString["h"])) {
                     c.Pipeline.ModifiedQueryString["width"] = c.Pipeline.ModifiedQueryString["w"];
                     c.Pipeline.ModifiedQueryString["height"] = c.Pipeline.ModifiedQueryString["h"];
