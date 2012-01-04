@@ -315,7 +315,11 @@ namespace ImageResizer {
                 this["thumbnail"] = null;
             }
         }
-        
+
+
+        public double CropXUnits { get { return Utils.parseCropUnits(this["cropxunits"]).Value; } set { this["cropxunits"] = value == default(double) ? "sourcepixels" : value.ToString(); } }
+        public double CropYUnits { get { return Utils.parseCropUnits(this["cropyunits"]).Value; } set { this["cropyunits"] = value == default(double) ? "sourcepixels" : value.ToString(); } }
+
 
         public RectangleF getCustomCropSourceRect(SizeF imageSize) {
             RectangleF defValue = new RectangleF(new PointF(0, 0), imageSize);
