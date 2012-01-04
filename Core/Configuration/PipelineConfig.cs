@@ -12,6 +12,8 @@ using ImageResizer.Encoding;
 using System.Web.Hosting;
 using ImageResizer.Collections;
 using System.Web;
+using System.Security.Permissions;
+using System.Runtime.InteropServices;
 
 namespace ImageResizer.Configuration {
     public class PipelineConfig : IPipelineConfig, ICacheProvider, ISettingsModifier{
@@ -365,19 +367,26 @@ namespace ImageResizer.Configuration {
                    
         }
 
+
         public void FireRewritingEvents(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
+
+            //TODO: this approach is non-intuitive....
+
             //Fire first event (results will stay in e)
             if (Rewrite != null) Rewrite(sender,context, e);
 
             //Copy querystring for use in 'defaults' even
-            NameValueCollection copy = new NameValueCollection(e.QueryString); //Copy so we can later overwrite q with the original values.
+            NameValueCollection copy = new NameValueCollection(e.QueryString); //Copy so we can later overwrite q with the rewrite values.
 
             //Fire defaults event.
             if (RewriteDefaults != null) RewriteDefaults(sender, context, e);
 
             //Overwrite with querystring values again - this is what makes applyDefaults applyDefaults, vs. being applyOverrides.
-            foreach (string k in copy)
-                e.QueryString[k] = copy[k];
+            foreach (string k in copy) {
+                if (copy[k] != null) { //Don't allow null values to override defaults. Empty values can, however.
+                    e.QueryString[k] = copy[k];
+                }
+            }
             
             //Fire final event
             if (PostRewrite != null) PostRewrite(sender,context, e);
