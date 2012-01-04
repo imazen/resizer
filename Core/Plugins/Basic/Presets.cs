@@ -4,10 +4,22 @@ using System.Text;
 using ImageResizer.Configuration.Xml;
 using ImageResizer.Configuration;
 using ImageResizer.Configuration.Issues;
+using System.Collections.Specialized;
 
 namespace ImageResizer.Plugins.Basic {
-    public class Presets:IPlugin,IQuerystringPlugin, IIssueProvider {
+    public class Presets:IPlugin,IQuerystringPlugin, IIssueProvider, ISettingsModifier {
 
+        public Presets() {
+        }
+
+        public Presets(Dictionary<string, ResizeSettings> defaults, Dictionary<string, ResizeSettings> settings, bool onlyAllowPresets) {
+            this.OnlyAllowPresets = onlyAllowPresets;
+            if (defaults.Comparer == StringComparer.OrdinalIgnoreCase) this.defaults = defaults;
+            else this.defaults = new Dictionary<string, ResizeSettings>(defaults, StringComparer.OrdinalIgnoreCase);
+
+            if (settings.Comparer == StringComparer.OrdinalIgnoreCase) this.settings = settings;
+            else this.settings = new Dictionary<string, ResizeSettings>(settings, StringComparer.OrdinalIgnoreCase);
+        }
         Config c;
         public IPlugin Install(Configuration.Config c) {
             this.c = c;
@@ -15,6 +27,7 @@ namespace ImageResizer.Plugins.Basic {
             ParseXml(c.getConfigXml().queryFirst("presets"),c);
             c.Pipeline.RewriteDefaults += Pipeline_RewriteDefaults;
             c.Pipeline.Rewrite += Pipeline_Rewrite;
+            c.Pipeline.PostRewrite += Pipeline_PostRewrite;
             return this;
         }
 
@@ -27,11 +40,29 @@ namespace ImageResizer.Plugins.Basic {
         }
         void Pipeline_Rewrite(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
             if (OnlyAllowPresets) {
-                string preset = e.QueryString["preset"];
-                e.QueryString.Clear();
-                e.QueryString["preset"] = preset.ToLowerInvariant();
+                e.QueryString = FilterQuerystring(e.QueryString, false);
             }
             ApplyPreset(e, settings);
+            
+        }
+        void Pipeline_PostRewrite(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
+            if (e.QueryString["preset"] != null) e.QueryString.Remove("preset"); //Remove presets so they aren't processed again during ModifySettings
+        }
+
+        /// <summary>
+        /// Returns an new NameValueCollection instance that only includes the "preset" and ("hmac" and "urlb64", if specified) querystring pairs from the specified instance. 
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static NameValueCollection FilterQuerystring(NameValueCollection s, bool keepHmacAndUrl64) {
+            NameValueCollection q = new NameValueCollection();
+            string preset = s["preset"];
+            string hmac = s["hmac"];
+            string urlb64 = s["urlb64"];
+            if (preset != null) q["preset"] = preset.ToLowerInvariant();
+            if (keepHmacAndUrl64 && hmac != null) q["hmac"] = hmac;
+            if (keepHmacAndUrl64&& urlb64 != null) q["urlb64"] = urlb64;
+            return q;
         }
 
         void ApplyPreset(IUrlEventArgs e, Dictionary<string, ResizeSettings> dict) {
@@ -47,18 +78,45 @@ namespace ImageResizer.Plugins.Basic {
             }
         }
 
+        public ResizeSettings Modify(ResizeSettings s) {
+            if (!string.IsNullOrEmpty(s["preset"])) {
+                string[] presets = s["preset"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string p in presets) {
+                    //Apply defaults
+                    if (defaults.ContainsKey(p)) {
+                        ResizeSettings dq = defaults[p];
+                        foreach (string key in dq.Keys) {
+                            if (s[key] == null) s[key] = dq[key]; //Overwrite null and missing values on defaults.
+                        }
+                    }
+                    //Apply overrides
+                    if (settings.ContainsKey(p)) {
+                        ResizeSettings sq = settings[p];
+                        foreach (string key in sq.Keys) {
+                            s[key] = sq[key]; //Overwrite null and missing values on defaults.
+                        }
+                    }
+                }
+                s.Remove("preset");
+            }
+            return s;
+        }
+
+
 
 
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             c.Pipeline.RewriteDefaults -= Pipeline_RewriteDefaults;
             c.Pipeline.Rewrite -= Pipeline_Rewrite;
+            c.Pipeline.PostRewrite -= Pipeline_PostRewrite;
             return true;
         }
 
         private bool _onlyAllowPresets = false;
         /// <summary>
-        /// If true, the plugin will block all commands except those specified in a preset, and the &amp;preset command itself
+        /// If true, the plugin will block all commands except those specified in a preset, and the &amp;preset command itself. 
+        /// Only applies to InterceptModule (the URL API). Does not apply to ImageBuilder.Build calls. To replicate the behavior, simply prevent any querystring keys except 'preset' from being passed to ImageBuilder.Build.
         /// </summary>
         public bool OnlyAllowPresets
         {
@@ -102,5 +160,7 @@ namespace ImageResizer.Plugins.Basic {
             }
             return new IIssue[] { };
         }
+
+
     }
 }
