@@ -612,5 +612,18 @@ namespace ImageResizer.Util
         public static PointF Average(PointF a, PointF b) {
             return new PointF((a.X + b.X) / 2, (a.Y + b.Y) / 2);
         }
+        /// <summary>
+        /// Verifies that the specified 4 points are not rotated - that each point shares either the x or y coordinate with the previous point
+        /// </summary>
+        /// <param name="pointF"></param>
+        /// <returns></returns>
+        public static bool IsUnrotated(PointF[] a) {
+            PointF lastPoint = a[a.GetUpperBound(0)];
+            foreach (PointF p in a) {
+                if (p.X != lastPoint.X && p.Y != lastPoint.Y) return false;
+                lastPoint = p;
+            }
+            return true;
+        }
     }
 }

@@ -235,8 +235,16 @@ namespace ImageResizer
             path = null;
             restoreStreamPosition = false;
             //Stream
-            if (source is Stream) s = (Stream)source;
-            //VirtualFile
+            if (source is Stream) {
+                s = (Stream)source;
+                
+                try{
+                    if (s.Length <= s.Position && s.Position > 0)
+                        throw new ImageProcessingException("Stream already ended. You must call s.Seek(0, SeekOrigin.Begin); before re-using a stream, or use ImageJob with ResetSourceStream=true the first time the stream is read.");
+                }catch (NotSupportedException){
+                }
+            }
+                //VirtualFile
             else if (source is VirtualFile) {
                 path = ((VirtualFile)source).VirtualPath;
                 s = ((VirtualFile)source).Open();
@@ -689,7 +697,8 @@ namespace ImageResizer
             bool nothingToShow = (s.sourceBitmap != null && (s.sourceBitmap.PixelFormat == PixelFormat.Format24bppRgb ||
                         s.sourceBitmap.PixelFormat == PixelFormat.Format32bppRgb || 
                         s.sourceBitmap.PixelFormat == PixelFormat.Format48bppRgb) &&
-                        PolygonMath.ArraysEqual(s.layout["image"], s.layout.LastRing.points));
+                        PolygonMath.ArraysEqual(s.layout["image"], s.layout.LastRing.points) &&
+                        PolygonMath.IsUnrotated(s.layout["image"]));
 
             //Set the background to white if the background will be showing and the destination format doesn't support transparency.
             if (background == Color.Transparent && !s.supportsTransparency & !nothingToShow) 
