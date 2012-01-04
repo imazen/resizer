@@ -17,12 +17,14 @@ namespace ImageResizer.Plugins.S3Reader {
         bool asVpp = false;
         public S3Reader(NameValueCollection args ) {
             s3config = new S3Service();
- 
+
             buckets = args["buckets"];
             vpath = args["prefix"];
 
             asVpp = Util.Utils.getBool(args, "vpp", true);
             s3config.UseSsl = Util.Utils.getBool(args, "useSsl", false);
+            s3config.UseSubdomains = Util.Utils.getBool(args, "useSubdomains", s3config.UseSubdomains);
+
 
             if (!string.IsNullOrEmpty(args["accessKeyId"])) s3config.AccessKeyID = args["accessKeyId"];
             if (!string.IsNullOrEmpty(args["secretAccessKey"])) s3config.SecretAccessKey = args["secretAccessKey"];
@@ -57,6 +59,9 @@ namespace ImageResizer.Plugins.S3Reader {
             else c.configurationSectionIssues.AcceptIssue(new Issue("S3Reader", "S3Reader cannot function without a list of permitted bucket names.",
                 "Please specify a comma-delimited list of buckets in the <add name='S3Reader' buckets='bucketa,bucketb' /> element.",
                  IssueSeverity.ConfigurationError));
+
+            for (int i = 0; i < bucketArray.Length; i++)
+                bucketArray[i] = bucketArray[i].Trim();
 
 
             vpp = new S3VirtualPathProvider(delegate(S3VirtualPathProvider s, S3PathEventArgs ev) {
