@@ -108,8 +108,10 @@ namespace ImageResizer.Plugins.S3Reader {
                 provider.Service.GetObject(bucket, key, ms);
             } catch (S3Exception se) {
                // if (HttpContext.Current != null && HttpContext.Current.Items[Config.Current.Pipeline.ResponseArgsKey]
-                if (se.ErrorCode == S3ErrorCode.NoSuchKey) throw new FileNotFoundException("Amazon S3 file not found",  se);
+                if (se.ErrorCode == S3ErrorCode.NoSuchKey) throw new FileNotFoundException("Amazon S3 file not found", se);
                 else if (se.ErrorCode == S3ErrorCode.AccessDenied) throw new FileNotFoundException("Amazon S3 access denied - file may not exist", se);
+                else throw se;
+                    //LitS3.S3ErrorCode.PermanentRedirect
             }
             ms.Seek(0, SeekOrigin.Begin); //Reset to beginning
             return ms;
