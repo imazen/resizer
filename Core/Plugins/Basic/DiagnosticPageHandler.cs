@@ -119,7 +119,7 @@ namespace ImageResizer.Plugins.Basic {
 			sb.AppendLine("Running " + iis +
 				System.Environment.OSVersion.ToString() + " and CLR " +
 				System.Environment.Version.ToString());
-
+            sb.AppendLine("Trust level: " + GetCurrentTrustLevel().ToString());
 
 			if (hasFullTrust()) {
 				sb.AppendLine("Executing assembly: " + mainModuleFileName());
@@ -183,6 +183,30 @@ namespace ImageResizer.Plugins.Basic {
 			return sb.ToString();
 
 		}
+        /// <summary>
+        /// Returns the ASP.NET trust level
+        /// </summary>
+        /// <returns></returns>
+        AspNetHostingPermissionLevel GetCurrentTrustLevel() {
+            foreach (AspNetHostingPermissionLevel trustLevel in
+                    new AspNetHostingPermissionLevel[] {
+            AspNetHostingPermissionLevel.Unrestricted,
+            AspNetHostingPermissionLevel.High,
+            AspNetHostingPermissionLevel.Medium,
+            AspNetHostingPermissionLevel.Low,
+            AspNetHostingPermissionLevel.Minimal 
+        }) {
+                try {
+                    new AspNetHostingPermission(trustLevel).Demand();
+                } catch (System.Security.SecurityException) {
+                    continue;
+                }
+
+                return trustLevel;
+            }
+
+            return AspNetHostingPermissionLevel.None;
+        }
 
 		private static string mainModuleFileName() {
             try {
