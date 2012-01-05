@@ -30,6 +30,20 @@ namespace ImageResizer {
         /// <param name="queryString"></param>
         public ResizeSettings(string queryString) : base(PathUtils.ParseQueryStringFriendlyAllowSemicolons(queryString)) { }
 
+        /// <summary>
+        /// Creates a new resize settings object with the specified resizing settings
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="mode"></param>
+        /// <param name="imageFormat">The desired image format, like 'jpg', 'gif', or 'png'. Leave null if you want to preserve the original format.</param>
+        public ResizeSettings(int width, int height, FitMode mode, string imageFormat) {
+            this.Width = width;
+            this.Height = height;
+            this.Mode = mode;
+            if (imageFormat != null) this.Format = imageFormat;
+        }
+
 
         protected int get(string name, int defaultValue){ return Utils.getInt(this,name,defaultValue);}
         protected void set(string name, int value) { this[name] = value.ToString(); }
@@ -312,7 +326,7 @@ namespace ImageResizer {
             }
             set {
                 this["format"] = value;
-                this["thumbnail"] = null;
+                if (this["thumbnail"] != null) Remove("thumbnail"); 
             }
         }
 
