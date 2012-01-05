@@ -21,18 +21,11 @@ namespace ComplexWebApplication {
                 HttpPostedFile file = HttpContext.Current.Request.Files[fileKey];
                 if (file.ContentLength <= 0) continue; //Skip unused file controls.
 
-                //Get the physical path for the uploads folder and make sure it exists
-                string uploadFolder = MapPath("~/uploads");
-                if (!Directory.Exists(uploadFolder)) Directory.CreateDirectory(uploadFolder);
-
                 //The resizing settings can specify any of 30 commands.. See http://imageresizing.net for details.
-                ResizeSettings resizeCropSettings = new ResizeSettings("width=200&height=200&format=jpg&crop=auto");
-
-                //Generate a filename (GUIDs are safest).
-                string fileName = Path.Combine(uploadFolder, System.Guid.NewGuid().ToString());
-
-                //Let the image builder add the correct extension based on the output file type (which may differ).
-                fileName = ImageBuilder.Current.Build(file, fileName, resizeCropSettings, false, true);
+                //Destination paths can have variables like <guid> and <ext>
+                ImageJob i = new ImageJob(file, "~/uploads/<guid>.<ext>", new ResizeSettings("width=200&height=200&format=jpg&crop=auto"));
+                i.CreateParentDirectory = true; //Auto-create the uploads directory.
+                i.Build();
             }
 
             //Here's an example of getting a byte array for sending to SQL
@@ -65,17 +58,12 @@ namespace ComplexWebApplication {
                 HttpPostedFile file = HttpContext.Current.Request.Files[fileKey];
                 if (file.ContentLength <= 0) continue; //Skip unused file controls.
 
-                //Get the physical path for the uploads folder and make sure it exists
-                string uploadFolder = MapPath("~/uploads");
-                if (!Directory.Exists(uploadFolder)) Directory.CreateDirectory(uploadFolder);
-
                 //Generate each version
                 foreach (string suffix in versions.Keys) {
-                    //Generate a filename (GUIDs are best).
-                    string fileName = Path.Combine(uploadFolder, System.Guid.NewGuid().ToString() + suffix);
 
-                    //Let the image builder add the correct extension based on the output file type
-                    fileName = ImageBuilder.Current.Build(file, fileName, new ResizeSettings(versions[suffix]), false, true);
+                    ImageJob i = new ImageJob(file, "~/uploads/<guid>" + suffix + ".<ext>", new ResizeSettings(versions[suffix]));
+                    i.CreateParentDirectory = true; //Auto-create the uploads directory.
+                    i.Build();
                 }
 
             }
@@ -88,16 +76,13 @@ namespace ComplexWebApplication {
             versions.Add("_medium", "maxwidth=400&maxheight=400format=jpg"); //Fit inside 400x400 area, jpeg
             versions.Add("_large", "maxwidth=1900&maxheight=1900&format=jpg"); //Fit inside 1900x1200 area
 
-
-            string basePath = ImageResizer.Util.PathUtils.RemoveExtension(original);
-
             //To store the list of generated paths
             List<string> generatedFiles = new List<string>();
 
             //Generate each version
             foreach (string suffix in versions.Keys)
                 //Let the image builder add the correct extension based on the output file type
-                generatedFiles.Add(ImageBuilder.Current.Build(original, basePath + suffix, new ResizeSettings(versions[suffix]), false, true));
+                generatedFiles.Add(new ImageJob(original, "<path>" + suffix + ".<ext>", new ResizeSettings(versions[suffix])).Build().FinalPath);
 
             return generatedFiles;   
         }

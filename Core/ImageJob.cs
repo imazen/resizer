@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using ImageResizer.Util;
 
 namespace ImageResizer {
 
@@ -30,7 +31,7 @@ namespace ImageResizer {
             this.Source = source;
             this.Dest = dest;
             this.Settings = settings;
-            this.DisposeSourceStream = disposeSource;
+            this.DisposeSourceObject = disposeSource;
             this.AddFileExtension = addFileExtension;
         }
 
@@ -78,13 +79,13 @@ namespace ImageResizer {
             set { _settings = value; }
         }
 
-        private bool _disposeSourceStream = true;
+        private bool _disposeSourceObject = true;
         /// <summary>
-        /// If true, and if 'source' is a Stream instance, it will be disposed after it has been read. Defaults to true.
+        /// If true, and if 'source' is a IDisposable instead like Bitmap or Stream instance, it will be disposed after it has been used. Defaults to true.
         /// </summary>
-        public bool DisposeSourceStream {
-            get { return _disposeSourceStream; }
-            set { _disposeSourceStream = value; }
+        public bool DisposeSourceObject {
+            get { return _disposeSourceObject; }
+            set { _disposeSourceObject = value; }
         }
 
         private bool _resetSourceStream = false;
@@ -134,6 +135,79 @@ namespace ImageResizer {
             get { return _addFileExtension; }
             set { _addFileExtension = value; }
         }
+
+        private bool _allowDestinationPathVariables = true;
+        /// <summary>
+        /// If true (the default), destination paths can include variables that are expanded during the image build process. 
+        /// Ex. Dest = "~/folder/&lt>guid>.&lt;ext>" will expand to "C:\WWW\App\folder\1ddadaadaddaa75da75ad34ad33da3a.jpg". 
+        /// </summary>
+        public bool AllowDestinationPathVariables {
+            get { return _allowDestinationPathVariables; }
+            set { _allowDestinationPathVariables = value; }
+        }
+
+        private bool _createParentDirectory = false;
+        /// <summary>
+        /// Defaults to false. When true, the parent directory of the destination filename will be created if it doesn't already exist.
+        /// </summary>
+        public bool CreateParentDirectory {
+            get { return _createParentDirectory; }
+            set { _createParentDirectory = value; }
+        }
+        /// <summary>
+        /// Internal use only.
+        /// Resolves the specified (potenetially templated) path into a physical path. 
+        /// Applies the AddFileExtension setting using the 'ext' variable.
+        /// Supplies the guid, settings.*, filename, path, and originalExt variables. 
+        /// The resolver method should supply 'ext', 'width', and 'height' (all of which refer to the final image).
+        /// If AllowDestinationPathVariables=False, only AddFileExtenson will be processed.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="resolver"></param>
+        /// <param name="originalWidth">Leave 0 if unavailable</param>
+        /// <param name="originalHeight">Leave 0 if unavailable</param>
+        /// <param name="builder">Leave null if unavailable</param>
+        /// <returns></returns>
+        public string ResolveTemplatedPath(string path, ImageResizer.Util.PathUtils.VariableResolverCallback resolver) {
+            if (!AllowDestinationPathVariables) {
+                //Only add the extension if requested when variables are turned off.
+                return PathUtils.MapPathIfAppRelative(path + (AddFileExtension ? ("." + resolver("ext")) : ""));
+            }
+            if (this.AddFileExtension) path = path + ".<ext>";
+            path = PathUtils.ResolveVariablesInPath(path, delegate(string p) {
+                //Let the 'resolver' passed to this method take precedence - we provide default values.
+                string result = resolver(p);
+                if (result != null) return result;
+                //GUID in lowercase hexadecimal with no hyphens
+                if ("guid".Equals(p, StringComparison.OrdinalIgnoreCase)) 
+                    return Guid.NewGuid().ToString("N"); 
+                //Access to the settings collection
+                string settingsPrefix = "settings.";
+                if (p.StartsWith(settingsPrefix, StringComparison.OrdinalIgnoreCase)) {
+                    string subName = p.Substring(settingsPrefix.Length);
+                    return Settings[subName];
+                }
+                if ("filename".Equals(p,StringComparison.OrdinalIgnoreCase)){
+                    if (SourcePathData == null) throw new ImageProcessingException("You cannot use the <filename> variable in a job that does not have a source filename, such as with a Stream or Bitmap instance");
+                    return Path.GetFileNameWithoutExtension(SourcePathData);
+                }
+
+                if ("path".Equals(p, StringComparison.OrdinalIgnoreCase)) {
+                    if (SourcePathData == null) throw new ImageProcessingException("You cannot use the <path> variable in a job that does not have a source filename, such as with a Stream or Bitmap instance");
+                    return PathUtils.RemoveExtension(SourcePathData); //Just remove the last segment
+                }
+                if ("originalext".Equals(p, StringComparison.OrdinalIgnoreCase)) {
+                    if (SourcePathData == null) throw new ImageProcessingException("You cannot use the <originalext> variable in a job that does not have a source filename, such as with a Stream or Bitmap instance");
+                    return PathUtils.GetExtension(SourcePathData); //Just remove the last segment
+                }
+                
+
+                return null;
+            });
+            return PathUtils.MapPathIfAppRelative(path);
+        }
+
+
     }
 
 }

@@ -83,16 +83,20 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
                     if (job.Dest is string || job.Dest is Stream) {
                         FreeImageEncoderPlugin e = new FreeImageEncoderPlugin(job.Settings, path);
                         if (job.Dest is string) {
-                            string destPath = job.Dest as string;
-                            //Convert app-relative paths
-                            if (destPath.StartsWith("~", StringComparison.OrdinalIgnoreCase)) destPath = HostingEnvironment.MapPath(destPath);
-
-                            //Add the file extension if specified.
-                            if (job.AddFileExtension) {
-                                if (e != null) destPath += "." + e.Extension; //NOTE: These may differ from the normal default extensions
+                            //Make physical and resolve variable references all at the same time.
+                            job.FinalPath = job.ResolveTemplatedPath(job.Dest as string,
+                                delegate(string var) {
+                                    if ("width".Equals(var, StringComparison.OrdinalIgnoreCase)) return FreeImage.GetWidth(b).ToString();
+                                    if ("height".Equals(var, StringComparison.OrdinalIgnoreCase)) return FreeImage.GetHeight(b).ToString();
+                                    if ("ext".Equals(var, StringComparison.OrdinalIgnoreCase)) return e.Extension;
+                                    return null;
+                                });
+                            //If requested, auto-create the parent directory(ies)
+                            if (job.CreateParentDirectory) {
+                                string dirName = Path.GetDirectoryName(job.FinalPath);
+                                if (!Directory.Exists(dirName)) Directory.CreateDirectory(dirName);
                             }
-                            job.FinalPath = destPath;
-                            if (!FreeImage.Save(e.Format, b, destPath, e.EncodingOptions)) return RequestedAction.None;
+                            if (!FreeImage.Save(e.Format, b, job.FinalPath, e.EncodingOptions)) return RequestedAction.None;
                         } else if (job.Dest is Stream) {
                             if (!FreeImage.SaveToStream(b, (Stream)job.Dest, e.Format, e.EncodingOptions)) return RequestedAction.None;
                         }
