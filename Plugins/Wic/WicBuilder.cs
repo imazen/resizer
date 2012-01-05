@@ -243,15 +243,21 @@ namespace ImageResizer.Plugins.WicBuilder {
             object dest = job.Dest;
             // Try to save the bitmap
             if (dest is string) {
-                string destPath = job.Dest as string;
-                //Convert app-relative paths
-                if (destPath.StartsWith("~", StringComparison.OrdinalIgnoreCase)) destPath = HostingEnvironment.MapPath(destPath);
+                //Make physical and resolve variable references all at the same time.
+                job.FinalPath = job.ResolveTemplatedPath(job.Dest as string,
+                    delegate(string var) {
+                        if ("ext".Equals(var, StringComparison.OrdinalIgnoreCase)) return encoder.Extension;
+                        if ("width".Equals(var, StringComparison.OrdinalIgnoreCase)) return imageSize.Width.ToString();
+                        if ("height".Equals(var, StringComparison.OrdinalIgnoreCase)) return imageSize.Height.ToString();
+                        return null;
+                    });
+                //If requested, auto-create the parent directory(ies)
+                if (job.CreateParentDirectory) {
+                    string dirName = Path.GetDirectoryName(job.FinalPath);
+                    if (!Directory.Exists(dirName)) Directory.CreateDirectory(dirName);
+                }
 
-                //Add the file extension if specified.
-                if (job.AddFileExtension) destPath += "." + encoder.Extension; 
-
-                job.FinalPath = destPath;
-                using (FileStream fs = new FileStream((string)dest, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None)) {
+                using (FileStream fs = new FileStream(job.FinalPath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None)) {
                     outputStream.WriteTo(fs);
                 }
             } else if (dest is Stream) {

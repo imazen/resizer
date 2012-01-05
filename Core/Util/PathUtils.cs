@@ -4,6 +4,7 @@ using System.Text;
 using System.Collections.Specialized;
 using System.Web;
 using System.IO;
+using System.Collections.Generic;
 
 namespace ImageResizer.Util {
     public class PathUtils {
@@ -45,7 +46,7 @@ namespace ImageResizer.Util {
         }
 
         /// <summary>
-        /// Removes the extension from the filename.
+        /// Removes all extension segments from the filename or URL, leaving the querystring intact. I.e, image.jpg.bmp.tiff?hi would be image?hi
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -62,7 +63,8 @@ namespace ImageResizer.Util {
         }
 
         /// <summary>
-        /// Removes the extension from the filename.
+        /// Removes the extension from the filename or URL, leaving the querystring intact, where the extension is only the last extension segment.
+        /// I.e, image.jpg.bmp.tiff?hi would be image.jpg.bmp?hi after this call.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -328,5 +330,49 @@ namespace ImageResizer.Util {
         public static string FromBase64UToString(string data) {
             return UTF8Encoding.UTF8.GetString(FromBase64UToButes(data));
         }
+        /// <summary>
+        /// Returns the physcial mapped path for the specified virtual path if it starts with ~, otherwise retuns the original path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string MapPathIfAppRelative(string path) {
+            return (path.StartsWith("~", StringComparison.OrdinalIgnoreCase)) ? HostingEnvironment.MapPath(path) : path;
+        }
+
+
+        /// <summary>
+        /// Replaces variables in paths with their values. Ex. ~/uploads/thumbs/&lt;guid>.&lt;ext>.
+        /// Standard variables are &lt;ext> (the default extension for the final file type), &lt;guid>, a randomly generated GUID, 
+        /// &lt;filename>, the original filename without it's extension, &lt;path>, the original path and filename without extension, 
+        /// &lt;settings.width>, (any specified settings value except preset), &lt;width> (final width), and &lt;height> (final height).
+        /// 
+        /// </summary>
+        /// <param name="pathWithVars"></param>
+        /// <param name="variables"></param>
+        /// <returns></returns>
+        public static string ResolveVariablesInPath(string pathWithVars, VariableResolverCallback resolver) {
+            string p = pathWithVars;
+            while (p.IndexOf('<') > -1) {
+                int start = p.IndexOf('<');
+                int stop = p.IndexOf('>',start);
+                int bugcheck = p.IndexOf('<',start + 1);
+                if (stop < 0 || (bugcheck > -1 && bugcheck < stop) || stop == start + 1) 
+                    throw new ImageProcessingException("Destination paths can only contain < and > in matched pairs to designate variables. Path \"" + pathWithVars + "\" has invalid syntax");
+                string varName = p.Substring(start + 1,stop - start -1).ToLowerInvariant();
+
+                string result = resolver(varName);
+                if (result == null)
+                    throw new ImageProcessingException("Invalid variable name \"" + varName + "\" in templated path \"" + pathWithVars + "\". The variable name may be mispelled, or the variable may not be available with the pipeline you are using.");
+                p = p.Substring(0,start) + result + p.Substring(stop + 1);
+            }
+            if (p.IndexOf('>') > -1) throw new ImageProcessingException("Orphaned '>' in template path \"" + pathWithVars + "\".");
+            return p;
+        }
+        /// <summary>
+        /// A method that resolves variable names to values for the ResolveVariablesInPath method
+        /// </summary>
+        /// <param name="variableName"></param>
+        /// <returns></returns>
+        public delegate string VariableResolverCallback(string variableName);
     }
 }

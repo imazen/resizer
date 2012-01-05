@@ -358,7 +358,7 @@ namespace ImageResizer
                 return job;
             } finally {
                 //Follow the dispose requests
-                if (job.DisposeSourceStream && job.Source is IDisposable && job.Source != null) ((IDisposable)job.Source).Dispose();
+                if (job.DisposeSourceObject && job.Source is IDisposable && job.Source != null) ((IDisposable)job.Source).Dispose();
                 if (job.DisposeDestinationStream && job.Dest is IDisposable && job.Dest != null) ((IDisposable)job.Dest).Dispose();
             }
         }
@@ -387,21 +387,28 @@ namespace ImageResizer
 
                     //Write to Physical file
                 } else if (dest is string) {
-                    string destPath = dest as string;
-                    //Convert app-relative paths
-                    if (destPath.StartsWith("~", StringComparison.OrdinalIgnoreCase)) destPath = HostingEnvironment.MapPath(destPath);
-
-                    //Add the file extension if specified.
-                    if (job.AddFileExtension) {
-                        IEncoder e = this.EncoderProvider.GetEncoder(s, b);
-                        if (e != null) destPath += "." + e.Extension;
+                    //Make physical and resolve variable references all at the same time.
+                    job.FinalPath = job.ResolveTemplatedPath(dest as string,
+                        delegate(string var) {
+                            if ("ext".Equals(var, StringComparison.OrdinalIgnoreCase)) {
+                                IEncoder e = this.EncoderProvider.GetEncoder(s, b);
+                                if (e != null) return e.Extension;
+                            }
+                            if ("width".Equals(var, StringComparison.OrdinalIgnoreCase))
+                                return GetFinalSize(new System.Drawing.Size(b.Width, b.Height), new ResizeSettings(job.Settings)).Width.ToString();
+                            if ("height".Equals(var, StringComparison.OrdinalIgnoreCase))
+                                return GetFinalSize(new System.Drawing.Size(b.Width, b.Height), new ResizeSettings(job.Settings)).Height.ToString();
+                            return null;
+                        });
+                    //If requested, auto-create the parent directory(ies)
+                    if (job.CreateParentDirectory) {
+                        string dirName = Path.GetDirectoryName(job.FinalPath);
+                        if (!Directory.Exists(dirName)) Directory.CreateDirectory(dirName);
                     }
-
-                    System.IO.FileStream fs = new FileStream(destPath, FileMode.Create, FileAccess.Write);
+                    System.IO.FileStream fs = new FileStream(job.FinalPath, FileMode.Create, FileAccess.Write);
                     using (fs) {
                         buildToStream(b, fs, s);
                     }
-                    job.FinalPath = destPath;
                     //Write to Unknown stream
                 } else if (dest is Stream) {
                     buildToStream(b, (Stream)dest, s);
