@@ -341,6 +341,44 @@ namespace ImageResizer.Util {
 
 
         /// <summary>
+        /// Generates a resized image url for the specified physical or virtual path. 
+        /// Not CloudFront compatible. Does not support remote URLs, use RemoteReader for that.
+        /// If you're running in IIS classic, add ".ashx" to the 'path' parameter. 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public static string GenerateImageUrl(string path, NameValueCollection query) {
+            return ResolveAppRelative(GuessVirtualPath(path)) + BuildQueryString(query); 
+        }
+
+        /// <summary>
+        /// Attempts to guess the virtual path from physical path. Will be thrwarted if the path is mapped as a virtual folder inside the application.
+        /// If the path is a non-physical path, it will be returned as is.
+        /// Returns null if the physical path isn't a subfolder of the application's physical path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string GuessVirtualPath(string path) {
+            //If there's no windows slashes, it's probably virtual.
+            if (path.IndexOf('\\') < 0)
+                return path;
+            
+            string appPath = HostingEnvironment.ApplicationPhysicalPath;
+            //Otherwise, try to get the full path so we can compare it.
+            if (!Path.IsPathRooted(path)) path = Path.Combine(appPath, path);
+            path = Path.GetFullPath(path);
+            //If it's a match, strip it and convert it to a virtual path.
+            if (path.StartsWith(appPath, StringComparison.OrdinalIgnoreCase)) {
+                //Convert to app-relative path missing the ~/
+                path = path.Remove(0, appPath.Length).TrimStart(new char[] { '/', '\\', '~' }).Replace('\\', '/');
+                return PathUtils.ResolveAppRelativeAssumeAppRelative(path);
+                
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Replaces variables in paths with their values. Ex. ~/uploads/thumbs/&lt;guid>.&lt;ext>.
         /// Standard variables are &lt;ext> (the default extension for the final file type), &lt;guid>, a randomly generated GUID, 
         /// &lt;filename>, the original filename without it's extension, &lt;path>, the original path and filename without extension, 
