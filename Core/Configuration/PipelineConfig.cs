@@ -447,5 +447,19 @@ namespace ImageResizer.Configuration {
                 settings = m.Modify(settings);
             return settings;
         }
+
+
+        private bool _moduleInstalled = false;
+        /// <summary>
+        /// True once the InterceptModule has been installed and is intercepting requests.
+        /// </summary>
+        public bool ModuleInstalled {
+            get {
+                return _moduleInstalled;
+            }
+            set {
+                _moduleInstalled = value;
+            }
+        }
     }
 }

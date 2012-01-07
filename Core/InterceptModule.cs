@@ -39,6 +39,9 @@ namespace ImageResizer {
             context.PreSendRequestHeaders -= context_PreSendRequestHeaders;
             context.PreSendRequestHeaders += context_PreSendRequestHeaders;
 
+            //Say it's installed.
+            conf.ModuleInstalled = true;
+
         }
         void IHttpModule.Dispose() { }
         /// <summary>

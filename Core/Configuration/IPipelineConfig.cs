@@ -62,7 +62,17 @@ namespace ImageResizer.Configuration {
         VppUsageOption VppUsage { get; }
 
         string SkipFileTypeCheckKey { get; }
+        /// <summary>
+        /// Get or sets whether the file extension check should be applied to the current request. Defaults to true.
+        /// If set to true, will only affect the current request, and will only cause the Resizer to evaluate the rewriting rules on the request.
+        /// Processing may still not occur if no querystring values are specified. Add 'cache=always' to force caching to occur.
+        /// </summary>
         bool SkipFileTypeCheck { get; }
+
+        /// <summary>
+        /// True once the InterceptModule has been installed. 
+        /// </summary>
+        bool ModuleInstalled { get; set; }
 
         /// <summary>
         /// Returns the value of Context.Items["resizer.newPath"] if present. If not, returns FilePath + PathInfo.
