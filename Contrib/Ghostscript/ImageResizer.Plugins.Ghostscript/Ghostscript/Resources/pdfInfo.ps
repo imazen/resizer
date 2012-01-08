@@ -1,0 +1,134 @@
+%!PS
+
+% Copyright (c) 2012 Jason Morse
+%
+% Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files 
+% (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, 
+% merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is 
+% furnished to do so, subject to the following conditions:
+% 
+% The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+% 
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
+% OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
+% LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+% CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+% NOTES:
+% - Flush often, particularly before and after each document field (e.g. Title) so that we can compensate for UNICODE vs ANSI characters.
+
+% Ensure extra info is not printed 
+/QUIET true def
+
+% Write opening PDF element
+(<pdf>\n) print flush
+
+% Write PDF filename
+File dup (r) file runpdfbegin
+(<fileName>) print flush
+=print flush
+(</fileName>\n) print 
+
+% Write Info dictionary, if it exists
+Trailer /Info knownoget {
+  % - Title
+  dup /Title knownoget { 
+    (<title>) print flush 
+    =print flush 
+    (</title>\n) print
+  } if
+  % - Author
+  dup /Author knownoget { 
+    (<author>) print flush
+    =print flush
+    (</author>\n) print 
+  } if
+  % - Subject
+  dup /Subject knownoget { 
+    (<subject>) print flush
+    =print flush
+    (</subject>\n) print 
+  } if
+  % - Keywords
+  dup /Keywords knownoget { 
+    (<keywords>) print flush 
+    =print flush
+    (</keywords>\n) print 
+  } if
+   % - Creator
+  dup /Creator knownoget { 
+    (<creator>) print flush
+    =print flush
+    (</creator>\n) print 
+  } if
+  % - Producer
+  dup /Producer knownoget { 
+    (<producer>) print flush
+    =print flush
+    (</producer>\n) print 
+  } if
+  % - CreationDate
+  dup /CreationDate knownoget { 
+    (<creationDate>) print flush
+    =print flush
+    (</creationDate>\n) print 
+  } if
+  % - ModDate
+  dup /ModDate knownoget { 
+    (<modifiedDate>) print flush
+    =print flush
+    (</modifiedDate>\n) print 
+  } if
+} if  
+
+% Write overall PDF page count
+/PDFPageCount pdfpagecount def
+(<pageCount>) print flush
+PDFPageCount =print flush
+(</pageCount>\n) print
+
+% Write page info, including media sizes, for each page
+(<pages>\n) print
+  1 1 PDFPageCount {
+    % - Page number
+    dup (<page number=") print =print (") print
+    pdfgetpage dup
+    % - Rotate
+    dup /Rotate pget {
+      ( rotate=") print =print (") print
+    } if
+    % - Transparency
+    pageusestransparency {
+      ( transparency="true") print
+    } if
+    (>\n) print flush
+
+    % - MediaBox
+    /MediaBox pget {
+      aload pop   % NOTE: Elements are reversed when popping from stack 
+      (<mediaBox) print 
+      ( height=") print =print (") print
+      ( width=") print =print (") print
+      ( top=") print =print (") print
+      ( left=") print =print (") print
+      (/>\n) print flush
+    } if
+
+    % CropBox
+    dup /CropBox pget {
+      aload pop   % NOTE: Elements are reversed when popping from stack 
+      (<cropBox) print 
+      ( height=") print =print (") print
+      ( width=") print =print (") print
+      ( top=") print =print (") print
+      ( left=") print =print (") print
+      (/>\n) print flush
+    } if
+    (</page>\n) print flush
+  } for
+  (</pages>\n) print flush
+
+% Write closing PDF element
+(</pdf>\n) print flush
+
+ clear quit
