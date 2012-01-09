@@ -1,7 +1,8 @@
 ﻿using System.IO;
 using System.Xml.Serialization;
-using ImageResizer.Plugins.Pdf.Ghostscript;
+using ImageResizer.Plugins.PdfRenderer;
 using MbUnit.Framework;
+using ImageResizer.Plugins.PdfRenderer.Ghostscript;
 
 namespace ImageResizer.Plugins.Pdf.Tests.Ghostscript
 {
