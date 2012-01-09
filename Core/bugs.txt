@@ -1,3 +1,3 @@
 ﻿Known bugs:
 
-None. Yay! I'm keeping them all fixed!
+Specifying &format=png&format=png (duplicate entries) causes a "No image encoder was found" message.
