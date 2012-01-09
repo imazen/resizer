@@ -6,12 +6,14 @@ using System.Linq;
 using System.Reflection;
 using ImageResizer.Configuration.Issues;
 using MbUnit.Framework;
+using ImageResizer.Plugins.PdfRenderer;
+using ImageResizer.Plugins.PdfRenderer.Ghostscript;
 
 namespace ImageResizer.Plugins.Pdf.Tests
 {
-    public class PdfDecoderTests
+    public class PdfRendererTests
     {
-        private PdfDecoder _decoder;
+        private PdfRendererPlugin _decoder;
 
         /// <summary>
         ///   Name of embedded PDF test document. 
@@ -40,7 +42,7 @@ namespace ImageResizer.Plugins.Pdf.Tests
         [FixtureSetUp]
         public void FixtureSetUp()
         {
-            _decoder = new PdfDecoder();
+            _decoder = new PdfRendererPlugin();
 
             IIssue[] issues = _decoder.GetIssues().ToArray();
             if(issues.Length > 0)

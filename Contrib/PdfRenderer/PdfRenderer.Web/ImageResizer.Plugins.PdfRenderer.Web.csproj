@@ -61,7 +61,7 @@
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ImageResizer.Plugins.Ghostscript\ImageResizer.Plugins.Pdf.csproj">
+    <ProjectReference Include="..\PdfRenderer\ImageResizer.Plugins.PdfRenderer.csproj">
       <Project>{7C8A13F7-5C00-4074-B16E-45D0E231B70D}</Project>
       <Name>ImageResizer.Plugins.Pdf</Name>
     </ProjectReference>

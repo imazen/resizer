@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Pdf", "ImageResizer.Plugins.Ghostscript\ImageResizer.Plugins.Pdf.csproj", "{7C8A13F7-5C00-4074-B16E-45D0E231B70D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PdfRenderer", "PdfRenderer\ImageResizer.Plugins.PdfRenderer.csproj", "{7C8A13F7-5C00-4074-B16E-45D0E231B70D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer", "..\..\Core\ImageResizer.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Pdf.Web", "ImageResizer.Plugins.Ghostscript.Web\ImageResizer.Plugins.Pdf.Web.csproj", "{5BE28545-F104-4765-8E1B-4129246E200E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PdfRenderer.Web", "PdfRenderer.Web\ImageResizer.Plugins.PdfRenderer.Web.csproj", "{5BE28545-F104-4765-8E1B-4129246E200E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Pdf.Tests", "ImageResizer.Plugins.Ghostscript.Tests\ImageResizer.Plugins.Pdf.Tests.csproj", "{00D9FEC9-F33A-4C7C-AECF-76C08E7D8D9C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PdfRenderer.Tests", "PdfRenderer.Tests\ImageResizer.Plugins.PdfRenderer.Tests.csproj", "{00D9FEC9-F33A-4C7C-AECF-76C08E7D8D9C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
