@@ -20,7 +20,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace ImageResizer.Plugins.Pdf.Ghostscript
+namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
 {
     /// <summary>
     ///   Provides a managed interface to Ghostscript API.

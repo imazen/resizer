@@ -14,7 +14,7 @@
 
 using System.Collections.Specialized;
 
-namespace ImageResizer.Plugins.Pdf.Ghostscript
+namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
 {
     public static class NameValueCollectionExtensions
     {

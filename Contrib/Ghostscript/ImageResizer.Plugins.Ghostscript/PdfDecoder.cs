@@ -22,20 +22,20 @@ using System.Reflection;
 using System.Xml.Serialization;
 using ImageResizer.Configuration;
 using ImageResizer.Configuration.Issues;
-using ImageResizer.Plugins.Pdf.Ghostscript;
+using ImageResizer.Plugins.PdfRenderer.Ghostscript;
 using ImageResizer.Resizing;
 using ImageResizer.Util;
 using System.Collections.Specialized;
 
-namespace ImageResizer.Plugins.Pdf
+namespace ImageResizer.Plugins.PdfRenderer
 {
     /// <summary>
     ///   Ghostscript image resizer decoder capable of rendering postscript-based files to bitmaps.
     /// </summary>
-    public class PdfDecoder : BuilderExtension, IPlugin, IFileExtensionPlugin, IIssueProvider, IQuerystringPlugin
+    public class PdfRendererPlugin : BuilderExtension, IPlugin, IFileExtensionPlugin, IIssueProvider, IQuerystringPlugin
     {
 
-        public PdfDecoder() {
+        public PdfRendererPlugin() {
         }
 
         #region Fields
