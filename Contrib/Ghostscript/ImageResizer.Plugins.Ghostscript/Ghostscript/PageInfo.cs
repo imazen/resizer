@@ -14,7 +14,7 @@
 
 using System.Xml.Serialization;
 
-namespace ImageResizer.Plugins.Pdf.Ghostscript
+namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
 {
     public class PageInfo
     {

@@ -1,4 +1,4 @@
-namespace ImageResizer.Plugins.Pdf.Ghostscript
+namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
 {
     /// <summary>
     ///   Ghostscript argument names

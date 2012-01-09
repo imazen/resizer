@@ -15,7 +15,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace ImageResizer.Plugins.Pdf.Ghostscript
+namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
 {
     [Serializable]
     public class GhostscriptException : Exception
