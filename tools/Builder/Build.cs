@@ -409,6 +409,7 @@ namespace ImageResizer.ReleaseBuilder {
             q.exclusions.Add(new Pattern("^/Core(.Mvc)?/obj/"));
             q.exclusions.Add(new Pattern("^/dlls/*/(Aforge|LitS3|Ionic)*.(pdb|xml)$"));
             q.exclusions.Add(new Pattern("^/dlls/*/FreeImage.dll$")); //Exclude FreeImage.dll from the dlls folder - no need for multiple copies of it.
+            q.exclusions.Add(new Pattern("/gsdll(32|64).dll$")); //Exclude ghostscript dlls, they're huge.
         }
         public void PackMin(PackageDescriptor desc) {
             // 'min' - /dlls/release/ImageResizer.* - /
