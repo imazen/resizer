@@ -25,6 +25,7 @@ using ImageResizer.Configuration.Issues;
 using ImageResizer.Plugins.Pdf.Ghostscript;
 using ImageResizer.Resizing;
 using ImageResizer.Util;
+using System.Collections.Specialized;
 
 namespace ImageResizer.Plugins.Pdf
 {
@@ -33,6 +34,10 @@ namespace ImageResizer.Plugins.Pdf
     /// </summary>
     public class PdfDecoder : BuilderExtension, IPlugin, IFileExtensionPlugin, IIssueProvider, IQuerystringPlugin
     {
+
+        public PdfDecoder() {
+        }
+
         #region Fields
 
         private static readonly string[] _queryStringKeys = new[]
@@ -50,7 +55,18 @@ namespace ImageResizer.Plugins.Pdf
                                                                     ".pdf"
                                                                 };
         private static readonly XmlSerializer _pdfInfoSerializer = new XmlSerializer(typeof(PdfInfo));
-        private static string _pdfInfoPath = GetPathInfoResource();
+        private static string _pdfInfoPath = null;
+        /// <summary>
+        ///
+        /// </summary>
+        private static string PdfInfoPath {
+            get {
+                if (_pdfInfoPath == null)  _pdfInfoPath = GetPathInfoResource();
+                return _pdfInfoPath;
+            }
+        }
+
+
 
         private readonly GhostscriptEngine _engine = new GhostscriptEngine();
         private readonly int[] _validAlphaBitValues = new[] { 1, 2, 4 };
@@ -72,12 +88,8 @@ namespace ImageResizer.Plugins.Pdf
         public int MaxHeight
         {
             get { return _maxHeight; }
-            set
-            {
-                if(value <= 0)
-                {
-                    throw new ArgumentOutOfRangeException("value", "Maximum height must be greater than zero.");
-                }
+            set {
+                if(value <= 0)throw new ArgumentOutOfRangeException("value", "Maximum height must be greater than zero.");
                 _maxHeight = value;
             }
         }
@@ -91,12 +103,8 @@ namespace ImageResizer.Plugins.Pdf
         public int MaxWidth
         {
             get { return _maxWidth; }
-            set
-            {
-                if(value <= 0)
-                {
-                    throw new ArgumentOutOfRangeException("value", "Maximum width must be greater than zero.");
-                }
+            set {
+                if(value <= 0) throw new ArgumentOutOfRangeException("value", "Maximum width must be greater than zero.");
                 _maxWidth = value;
             }
         }
@@ -112,10 +120,7 @@ namespace ImageResizer.Plugins.Pdf
             get { return _defaultHeight; }
             set
             {
-                if(value <= 0)
-                {
-                    throw new ArgumentOutOfRangeException("value", "Default height must be greater than zero.");
-                }
+                if(value <= 0) throw new ArgumentOutOfRangeException("value", "Default height must be greater than zero.");
                 _defaultHeight = value;
             }
         }
@@ -131,10 +136,7 @@ namespace ImageResizer.Plugins.Pdf
             get { return _defaultWidth; }
             set
             {
-                if(value <= 0)
-                {
-                    throw new ArgumentOutOfRangeException("value", "Default width must be greater than zero.");
-                }
+                if(value <= 0) throw new ArgumentOutOfRangeException("value", "Default width must be greater than zero.");
                 _defaultWidth = value;
             }
         }
@@ -146,9 +148,18 @@ namespace ImageResizer.Plugins.Pdf
         {
             if(string.IsNullOrEmpty(optionalPath))
             {
-                return null;
-            }
-            if(!_supportedExtensions.Contains(Path.GetExtension(optionalPath), StringComparer.OrdinalIgnoreCase))
+                if (s.CanSeek) {
+                    //Check the header instead if no filename is present.
+                    byte[] header = new byte[4];
+                    s.Read(header, 0, 4);
+                    bool isPdf = (header[0] == '%' && header[1] == 'P' && header[2] == 'D' && header[3] == 'F');
+                    s.Seek(-4, SeekOrigin.Current); //Restore position.
+
+                    if (!isPdf) return null;
+                } else {
+                    return null; //It's not seekable, we can't check the header. 
+                }
+            } else if(!_supportedExtensions.Contains(Path.GetExtension(optionalPath), StringComparer.OrdinalIgnoreCase))
             {
                 // Not a supported format
                 return null;
@@ -196,6 +207,9 @@ namespace ImageResizer.Plugins.Pdf
                 // Get the output size of the generated bitmap by applying the resize settings and media box.
                 Size outputSize = GetOutputSize(settings, pageInfo.MediaBox);
 
+
+                
+
                 // Create default Ghostscript settings and apply the resize settings.
                 GhostscriptSettings ghostscriptSettings = new GhostscriptSettings
                                                           {
@@ -207,7 +221,7 @@ namespace ImageResizer.Plugins.Pdf
                                                               {GhostscriptArgument.MaxBitmap, 24000000},
                                                               {GhostscriptArgument.RenderingThreads, 4},
                                                               {GhostscriptArgument.GridFitTT, 0},
-                                                              {GhostscriptArgument.AlignToPixels, 0},
+                                                              {GhostscriptArgument.AlignToPixels, 0}, //Subpixel rendering depends on output device... perhaps testing would help determine if 1 would be better?
                                                               {GhostscriptArgument.FirstPage, pageNumber},
                                                               {GhostscriptArgument.LastPage, pageNumber},
                                                               GhostscriptArgument.Printed,
@@ -226,7 +240,6 @@ namespace ImageResizer.Plugins.Pdf
                     // Add output file and input file. The input file must be the very last argument.
                     ghostscriptSettings.Add(GhostscriptArgument.OutputFile, tempOutputPathInfo.FullName);
                     ghostscriptSettings.Add(tempInputPathInfo.FullName);
-
                     _engine.Execute(ghostscriptSettings);
 
                     // NOTE: Do not dispose of memory stream because it is used as the backing source for the loaded bitmap.
@@ -238,13 +251,13 @@ namespace ImageResizer.Plugins.Pdf
 
                     // Per ImagerResizer plugin example source code:
                     // NOTE: If the Bitmap class is used for decoding, read gdi-bugs.txt and make sure you set b.Tag to new BitmapTag(optionalPath,stream);
-                    BitmapTag bitmapTag = new BitmapTag(null, memoryStream);
+                    BitmapTag bitmapTag = new BitmapTag("ghostscript.png", memoryStream);
                     return new Bitmap(memoryStream) { Tag = bitmapTag };
                 }
                 catch(GhostscriptException)
                 {
                     // Conversion failed
-                    return null;
+                    return null; //or maybe we should show details? If it's a valid PDF?
                 }
                 finally
                 {
@@ -277,7 +290,7 @@ namespace ImageResizer.Plugins.Pdf
 
         public IEnumerable<IIssue> GetIssues()
         {
-            if(!GhostscriptEngine.IsAvailable())
+            if(!GhostscriptEngine.IsAvailable()) //Cached inside Ghostscript engine. 
             {
                 string message = "Ghostscript native library for this platform not found: " + GhostscriptEngine.NativeFileName;
                 Issue issue = new Issue(message, IssueSeverity.Error);
@@ -306,43 +319,43 @@ namespace ImageResizer.Plugins.Pdf
             //        Whitespace will be added if the aspect ratio is different.
             // This plugin renders to a size within the requested size and then expects remaining plugins in the 
             // pipeline to perform and additional processing such as adding whitespace, etc.
-            int width = Math.Max(settings.Width, settings.MaxWidth);
-            int height = Math.Max(settings.Height, settings.MaxHeight);
+            // It can safely treat width/height as maxwidth/maxheight.
 
-            // If neither width nor height as specified use default values
-            if(width <= 0 && height <= 0)
-            {
+            double imageRatio = boundingBox.Width / boundingBox.Height;
+            double width = settings.Width;
+            double height = settings.Height;
+            double maxwidth = settings.MaxWidth;
+            double maxheight = settings.MaxHeight;
+
+            //Handle cases of width/maxheight and height/maxwidth as in legacy versions. 
+            if (width != -1 && maxheight != -1) maxheight = Math.Min(maxheight, (width / imageRatio));
+            if (height != -1 && maxwidth != -1) maxwidth = Math.Min(maxwidth, (height * imageRatio));
+
+            //Eliminate cases where both a value and a max value are specified: use the smaller value for the width/height 
+            if (maxwidth > 0 && width > 0) { width = Math.Min(maxwidth, width); maxwidth = -1; }
+            if (maxheight > 0 && height > 0) { height = Math.Min(maxheight, height); maxheight = -1; }
+
+            //Move values to width/height
+            if (width <= 0) width = maxwidth;
+            if (height <= 0) height = maxheight;
+
+            //Calculate missing value(s) 
+            if (width > 0 && height <= 0) height = width / imageRatio;
+            else if (height > 0 && width <= 0) width = height * imageRatio;
+            else if(width <= 0 && height <= 0) { // If neither width nor height as specified use default values
                 width = DefaultWidth;
                 height = DefaultHeight;
             }
 
             // Limit maximum output size
-            if(width > 0)
-            {
-                width = Math.Min(width, MaxWidth);
-            }
-            if(height > 0)
-            {
-                height = Math.Min(height, MaxHeight);
-            }
+            width = Math.Min(width, this.MaxWidth);
+            height = Math.Min(height, this.MaxHeight);
 
+            
             // Determine the scaling values, and use the smallest to ensure we fit in the bounding box without changing 
             // the aspect ratio otherwise we will crop.
-            double widthScaling = width / boundingBox.Width;
-            double heightScaling = height / boundingBox.Height;
-            if(heightScaling > 0 && (widthScaling <= 0 || heightScaling < widthScaling))
-            {
-                // Scale by height
-                width = (int)Math.Round(boundingBox.Width * heightScaling);
-                height = (int)Math.Round(boundingBox.Height * heightScaling);
-            }
-            else
-            {
-                // Scale by width
-                width = (int)Math.Round(boundingBox.Width * widthScaling);
-                height = (int)Math.Round(boundingBox.Height * widthScaling);
-            }
-            return new Size(width, height);
+            //Use a scaled version of boundingBox inside our maximum width and height constraints.
+            return PolygonMath.RoundPoints(PolygonMath.ScaleInside(new SizeF((float)boundingBox.Width, (float)boundingBox.Height), new SizeF((float)width, (float)height)));
         }
 
         private PdfInfo GetPdfInfo(string path)
@@ -353,7 +366,7 @@ namespace ImageResizer.Plugins.Pdf
                                                GhostscriptArgument.NoDisplay,
                                                GhostscriptArgument.Quiet,
                                                {GhostscriptArgument.File, path},
-                                               _pdfInfoPath
+                                               PdfInfoPath
                                            };
             output = _engine.Execute(settings);
 
@@ -404,6 +417,10 @@ namespace ImageResizer.Plugins.Pdf
                 textAlphaBits = _validAlphaBitValues.Last();
             }
             ghostscriptSettings.Add(GhostscriptArgument.TextAlphaBits, textAlphaBits);
+
+            ghostscriptSettings[GhostscriptArgument.GridFitTT] = (Utils.getBool(settings,"gridfit",false) ? 2 : 0).ToString();
+            ghostscriptSettings[GhostscriptArgument.AlignToPixels] =(Utils.getBool(settings,"subpixels",false) ? 1 : 0).ToString();
+            if (Utils.getBool(settings,"printed",true) == false) ghostscriptSettings.Remove(GhostscriptArgument.Printed);
         }
     }
 }
