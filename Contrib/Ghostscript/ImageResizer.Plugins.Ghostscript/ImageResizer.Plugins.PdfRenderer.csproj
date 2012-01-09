@@ -8,8 +8,8 @@
     <ProjectGuid>{7C8A13F7-5C00-4074-B16E-45D0E231B70D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ImageResizer.Plugins.Pdf</RootNamespace>
-    <AssemblyName>ImageResizer.Plugins.Pdf</AssemblyName>
+    <RootNamespace>ImageResizer.Plugins.PdfRenderer</RootNamespace>
+    <AssemblyName>ImageResizer.Plugins.PdfRenderer</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -71,6 +71,7 @@
     <Content Include="gsdll64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="license.txt" />
     <Content Include="readme.txt" />
   </ItemGroup>
   <ItemGroup>
