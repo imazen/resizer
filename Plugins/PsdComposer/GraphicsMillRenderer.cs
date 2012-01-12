@@ -4,7 +4,7 @@ using System.Web;
 using System.IO;
 using Aurigma.GraphicsMill.Codecs;
 
-namespace PsdRenderer
+namespace ImageResizer.Plugins.PsdComposer
 {
     /// <summary>
     /// An Aurigma.GraphicsMill-based renderer. GraphicsMill was far too limited to do what we needed, so this got scrapped.
