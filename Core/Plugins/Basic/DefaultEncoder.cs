@@ -331,10 +331,12 @@ namespace ImageResizer.Plugins.Basic {
             if (quality < 0) quality = 90; //90 is a very good default to stick with.
             if (quality > 100) quality = 100;
             //Prepare paramater for encoder
-            EncoderParameters p = new EncoderParameters(1);
-            p.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, (long)quality);
-            //save
-            b.Save(target, GetImageCodeInfo("image/jpeg"), p);
+            using (EncoderParameters p = new EncoderParameters(1)) {
+
+                p.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, (long)quality);
+                //save
+                b.Save(target, GetImageCodeInfo("image/jpeg"), p);
+            }
         }
         
          /// <summary>
