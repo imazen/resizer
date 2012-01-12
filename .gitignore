@@ -6,6 +6,7 @@ dlls/
 samples/*/bin
 samples/SimpleWebApplication/bin
 samples/ComplexWebApplication/bin
+/docs/*/
 Tests/*/Results
 .DS_Store
 Thumbs.db
