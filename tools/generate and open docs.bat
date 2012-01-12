@@ -1,7 +1,7 @@
 cd ..
 cd docs
 
-..\Tools\docu\src\Docu.Console\bin\Debug\docu.exe ..\dlls\release\ImageResizer.dll
+..\Tools\docu\src\Docu.Console\bin\Debug\docu.exe ..\dlls\release\ImageResizer.dll --output=docu
 
-output\index.htm
+docu\index.htm
 pause
