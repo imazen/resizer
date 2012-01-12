@@ -7,7 +7,7 @@ using ImageResizer.Configuration.Issues;
 using System.Drawing;
 using System.IO;
 using ImageResizer.Util;
-using Microsoft.Test.Tools.WicCop.InteropServices.ComTypes;
+using ImageResizer.Plugins.Wic.InteropServices.ComTypes;
 using ImageResizer.Plugins.Wic;
 using System.Runtime.InteropServices;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
-using Microsoft.Test.Tools.WicCop.InteropServices.ComTypes;
+using ImageResizer.Plugins.Wic.InteropServices.ComTypes;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Drawing.Imaging;
