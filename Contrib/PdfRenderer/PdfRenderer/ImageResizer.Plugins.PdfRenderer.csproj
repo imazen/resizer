@@ -54,7 +54,7 @@
     <Compile Include="Ghostscript\BoundingBox.cs" />
     <Compile Include="Ghostscript\GhostscriptArgument.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="PdfDecoder.cs" />
+    <Compile Include="PdfRenderer.cs" />
     <Compile Include="Ghostscript\GhostscriptEngine.cs" />
     <Compile Include="Ghostscript\GhostscriptException.cs" />
     <Compile Include="Ghostscript\GhostscriptSettings.cs" />
