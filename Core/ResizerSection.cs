@@ -18,10 +18,17 @@ namespace ImageResizer {
     public class ResizerSection : System.Configuration.ConfigurationSection {
         public ResizerSection() {
         }
-
+        /// <summary>
+        /// Create a ResizerSection instance that wraps the specified node. The node should be a &lt;resizer&gt; element.
+        /// </summary>
+        /// <param name="root"></param>
         public ResizerSection(Node root) {
             n = root;
         }
+        /// <summary>
+        /// Parse the specified XML into a Node. The text should include 1 root element, &lt;resizer&gt;
+        /// </summary>
+        /// <param name="xml"></param>
         public ResizerSection(string xml) {
 
             n = Node.FromXmlFragment(xml,sink);
