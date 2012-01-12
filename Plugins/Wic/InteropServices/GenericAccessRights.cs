@@ -10,7 +10,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.Test.Tools.WicCop.InteropServices
+namespace ImageResizer.Plugins.Wic.InteropServices
 {
     public static partial class NativeMethods
     {

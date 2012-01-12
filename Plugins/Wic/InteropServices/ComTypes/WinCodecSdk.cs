@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
-namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
+namespace ImageResizer.Plugins.Wic.InteropServices.ComTypes
 {
     public enum WICMetadataCreationOptions : uint
     {

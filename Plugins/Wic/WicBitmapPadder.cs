@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Test.Tools.WicCop.InteropServices.ComTypes;
+using ImageResizer.Plugins.Wic.InteropServices.ComTypes;
 using System.Runtime;
 using System.Runtime.InteropServices;
 

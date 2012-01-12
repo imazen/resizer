@@ -15,7 +15,7 @@ using System.Text;
 using EXCEPINFO = System.Runtime.InteropServices.ComTypes.EXCEPINFO;
 using STATSTG = System.Runtime.InteropServices.ComTypes.STATSTG;
 
-namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
+namespace ImageResizer.Plugins.Wic.InteropServices.ComTypes
 {
     public enum WinCodecError
     {

@@ -11,7 +11,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
+namespace ImageResizer.Plugins.Wic.InteropServices.ComTypes
 {
     [StructLayout(LayoutKind.Explicit, Size = 16)]
     internal sealed class UnmanagedPropVariant

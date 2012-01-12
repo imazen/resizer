@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.InteropServices;
 
-namespace WicResize.InteropServices {
+namespace ImageResizer.Plugins.Wic.InteropServices {
     public class MemoryIStream : MemoryStream, IStream {
         public MemoryIStream() { }
         public MemoryIStream(byte[] buffer) : base(buffer) { }
