@@ -1,3 +1,5 @@
 ﻿Known bugs:
 
-Specifying &format=png&format=png (duplicate entries) causes a "No image encoder was found" message.
+Specifying &format=png&format=png (duplicate entries) causes a "No image encoder was found" message, 
+since NameValueCollection makes the value "png,png", for which there aren't, actually, any encoders.
+

@@ -1,4 +1,6 @@
-﻿This plugin uses the Ghostscript library, which is licensed under the GPL v3.
+﻿# PdfRenderer licensing
+
+This plugin (PdfRenderer) uses the Ghostscript library, which is licensed under the GPL v3.
 
 http://www.gnu.org/copyleft/gpl.html
 
@@ -28,7 +30,6 @@ GhostScript executables instead of the DLL. It may have reduced performance,
 but would not require the plugin to be GPL licensed.
 
 If you are interested in funding development of a GPL-free version, please contact support@imageresizing.net.
-
 
 To sum up: Compiled versions which use Ghostscript are under the GPL v3. Source is under MIT or GPL v3, your pick. 
 
