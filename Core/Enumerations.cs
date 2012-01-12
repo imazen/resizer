@@ -44,7 +44,9 @@ namespace ImageResizer {
 
 
 
-
+    /// <summary>
+    /// Controls whether the image is allowed to upscale, downscale, both, or if only the canvas gets to be upscaled.
+    /// </summary>
     public enum ScaleMode {
         /// <summary>
         /// The default. Only downsamples images - never enlarges. If an image is smaller than 'width' and 'height', the image coordinates are used instead.
@@ -65,7 +67,7 @@ namespace ImageResizer {
     }
 
     /// <summary>
-    /// [Depreciated (Use FitMode)]
+    /// [Depreciated (Use FitMode.Stretch)] Previously used to force an image to be 'stretched' to match a different aspect ratio.
     /// </summary>
     public enum StretchMode {
         /// <summary>
@@ -78,7 +80,7 @@ namespace ImageResizer {
         Fill
     }
     /// <summary>
-    /// How do deal with aspect ratio changes. ]
+    /// How do deal with aspect ratio differences between the requested size and the original image's size.
     /// </summary>
     public enum FitMode {
         /// <summary>

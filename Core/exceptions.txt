@@ -2,7 +2,7 @@
 
 Some errors are not recoverable:
 
-InterceptModule (These errors 
+InterceptModule 
 
 - ImageProcessingException (500)  - No caches configured
 - ImageProcessingException - no image encoders found
@@ -23,6 +23,7 @@ InterceptModule (These errors
 
 (S3Reader)
 FileNotFoundException (recoverable with image404 plugin)
+
 
 (SqlReader)
 FileNotFoundException (recoverable with image404 plugin)
