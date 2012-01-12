@@ -110,7 +110,7 @@ namespace ImageResizer.Plugins.Basic {
         /// <param name="request"></param>
         /// <returns></returns>
         public static bool NeedsPngFix(HttpContext context) {
-            return true;
+
             if (context == null || context.Request == null || string.IsNullOrEmpty(context.Request.UserAgent)) return false;
             if (context.Items["isIE6orlower"] == null) {
                 bool needsFix = ie456.IsMatch(context.Request.UserAgent);
