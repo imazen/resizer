@@ -67,15 +67,15 @@ namespace ImageResizer {
     }
 
     /// <summary>
-    /// [Depreciated (Use FitMode.Stretch)] Previously used to force an image to be 'stretched' to match a different aspect ratio.
+    /// [Deprecated (Use FitMode.Stretch)] Previously used to force an image to be 'stretched' to match a different aspect ratio.
     /// </summary>
     public enum StretchMode {
         /// <summary>
-        /// [Depreciated (Use FitMode)] Maintains aspect ratio. Default.
+        /// [Deprecated (Use FitMode)] Maintains aspect ratio. Default.
         /// </summary>
         Proportionally,
         /// <summary>
-        /// [Depreciated (Use FitMode)] Skews image to fit the new aspect ratio defined by 'width' and 'height'
+        /// [Deprecated (Use FitMode)] Skews image to fit the new aspect ratio defined by 'width' and 'height'
         /// </summary>
         Fill
     }
@@ -117,7 +117,7 @@ namespace ImageResizer {
         /// </summary>
         None,
         /// <summary>
-        /// [Depreciated] Use Mode=Crop. Minimally crops to preserve aspect ratio if stretch=proportionally.
+        /// [Deprecated] Use Mode=Crop. Minimally crops to preserve aspect ratio if stretch=proportionally.
         /// </summary>
         Auto,
         /// <summary>

@@ -319,7 +319,7 @@ namespace ImageResizer.Configuration {
                 alternateNames.Add("ImageResizer.Plugins." + name.Substring(0, name.Length - 6).Trim('.') + "." + name.Trim('.'));
             //Basic.DefaultEncoder
             alternateNames.Add("ImageResizer.Plugins." + name.TrimStart('.'));
-            //For the depreciated convention of naming the plugin namespace and class the same.
+            //For the deprecated convention of naming the plugin namespace and class the same.
             if (!hasDot) alternateNames.Add("ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.'));
             //Plugins.Basic.DefaultEncoder
             alternateNames.Add("ImageResizer." + name.TrimStart('.'));
