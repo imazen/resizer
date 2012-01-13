@@ -165,7 +165,7 @@ namespace ImageResizer {
             this["scale"] = Utils.writeScale(value);        }}
 
         /// <summary>
-        /// [Depreciated] (Replaced by mode=stretch) Whether to preserve aspect ratio or stretch to fill the bounds.
+        /// [Deprecated] (Replaced by mode=stretch) Whether to preserve aspect ratio or stretch to fill the bounds.
         /// </summary>
         [Obsolete("Replaced by Mode=Stretch")]
         public StretchMode Stretch                          { get {
