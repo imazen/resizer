@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.AzureR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer", "ImageResizer.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PdfRenderer", "..\Contrib\PdfRenderer\PdfRenderer\ImageResizer.Plugins.PdfRenderer.csproj", "{7C8A13F7-5C00-4074-B16E-45D0E231B70D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,12 @@ Global
 		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Trial|Any CPU.ActiveCfg = Release|Any CPU
 		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Trial|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
