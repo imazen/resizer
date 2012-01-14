@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Web;
 using System.IO;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace ImageResizer.Util {
     public class PathUtils {
@@ -396,9 +397,19 @@ namespace ImageResizer.Util {
                 int bugcheck = p.IndexOf('<',start + 1);
                 if (stop < 0 || (bugcheck > -1 && bugcheck < stop) || stop == start + 1) 
                     throw new ImageProcessingException("Destination paths can only contain < and > in matched pairs to designate variables. Path \"" + pathWithVars + "\" has invalid syntax");
-                string varName = p.Substring(start + 1,stop - start -1).ToLowerInvariant();
-
+                string varName = p.Substring(start + 1,stop - start -1);
+                string filter = null;
+                //Split off the filter if present.
+                int filterIx = varName.IndexOf(':');
+                if (filterIx > 0) {
+                    filter = varName.Substring(filterIx + 1);
+                    varName = varName.Substring(0, filterIx);
+                }
+                varName = varName.ToLowerInvariant();
                 string result = resolver(varName);
+                if (!string.IsNullOrEmpty(filter)) {
+                    result = RemoveNonMatchingChars(result, filter);
+                }
                 if (result == null)
                     throw new ImageProcessingException("Invalid variable name \"" + varName + "\" in templated path \"" + pathWithVars + "\". The variable name may be mispelled, or the variable may not be available with the pipeline you are using.");
                 p = p.Substring(0,start) + result + p.Substring(stop + 1);
@@ -406,6 +417,24 @@ namespace ImageResizer.Util {
             if (p.IndexOf('>') > -1) throw new ImageProcessingException("Orphaned '>' in template path \"" + pathWithVars + "\".");
             return p;
         }
+        /// <summary>
+        /// Allows a string to be filtered using the specified whitelisting expression (regex style). 
+        /// 
+        /// I.e, "hi YOU 3", "a-z3" will produce "hi3". 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="chars"></param>
+        /// <returns></returns>
+        public static string RemoveNonMatchingChars(string text, string chars) {
+            StringBuilder sb = new StringBuilder();
+            Regex r = new Regex("[" + Regex.Escape(chars) + "]", RegexOptions.Compiled);
+            for (int i = 0; i < text.Length; i++) {
+                string chr = text.Substring(i,1);
+                if (r.IsMatch(chr)) sb.Append(chr);
+            }
+            return sb.ToString();
+        }
+
         /// <summary>
         /// A method that resolves variable names to values for the ResolveVariablesInPath method
         /// </summary>

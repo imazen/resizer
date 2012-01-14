@@ -23,7 +23,7 @@ namespace ComplexWebApplication {
 
                 //The resizing settings can specify any of 30 commands.. See http://imageresizing.net for details.
                 //Destination paths can have variables like <guid> and <ext>
-                ImageJob i = new ImageJob(file, "~/uploads/<guid>.<ext>", new ResizeSettings("width=200&height=200&format=jpg&crop=auto"));
+                ImageJob i = new ImageJob(file, "~/uploads/<guid>_<filename:A-Za-z0-9>.<ext>", new ResizeSettings("width=200&height=200&format=jpg&crop=auto"));
                 i.CreateParentDirectory = true; //Auto-create the uploads directory.
                 i.Build();
             }
