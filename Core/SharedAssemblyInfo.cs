@@ -30,7 +30,7 @@ using ImageResizer.Util;
 // by using the '*' as shown below:/*
 [assembly: AssemblyVersion("3.1.3.*")]
 [assembly: AssemblyFileVersion("3.1.3.*")]
-[assembly: AssemblyInformationalVersion("3-1-alpha-3")]
+[assembly: AssemblyInformationalVersion("3-1-3")]
 
 [assembly: Commit("git-commit-guid-here")]
 
