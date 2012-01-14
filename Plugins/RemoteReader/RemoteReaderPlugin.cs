@@ -92,7 +92,7 @@ namespace ImageResizer.Plugins.RemoteReader {
         void Pipeline_PostRewrite(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
             if (IsRemotePath(e.VirtualPath)) {
                 //Force images to be processed - don't allow them to only cache it.
-                e.QueryString["process"] = ProcessWhen.Always.ToString();
+                e.QueryString["process"] = ProcessWhen.Always.ToString().ToLowerInvariant();
             }
         }
 
@@ -223,7 +223,14 @@ namespace ImageResizer.Plugins.RemoteReader {
 
         }
 
-
+        /// <summary>
+        /// Returns a stream of the HTTP response to the specified URL with a 15 second timeout. 
+        /// Throws a FileNotFoundException instead of a WebException for 404 errors.
+        /// Can throw a variety of exceptions: ProtocolViolationException, WebException,  FileNotFoundException,
+        /// SecurityException, NotSupportedException?, and InvalidOperationException?.
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <returns></returns>
         public Stream GetUriStream(Uri uri) {
 
             HttpWebResponse response = null;
@@ -234,10 +241,15 @@ namespace ImageResizer.Plugins.RemoteReader {
                 //This is IDisposable, but only disposes the stream we are returning. So we can't dispose it, and don't need to
                 response = request.GetResponse() as HttpWebResponse;
                 return response.GetResponseStream();
-            } catch {
+            } catch (WebException e) {
+                var resp = e.Response as HttpWebResponse;
+                if (e.Status == WebExceptionStatus.ProtocolError && resp != null && resp.StatusCode == HttpStatusCode.NotFound) {
+                    throw new FileNotFoundException("404 error: \"" + uri.ToString() + "\" not found.", e);
+                }
+                //if (resp != null)resp.Close();
                 if (response != null) response.Close();
-                throw;
-            }
+                throw e;
+            } 
         }
     }
 
