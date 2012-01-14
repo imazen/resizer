@@ -330,9 +330,18 @@ namespace ImageResizer {
             }
         }
 
-
-        public double CropXUnits { get { return Utils.parseCropUnits(this["cropxunits"]).Value; } set { this["cropxunits"] = value == default(double) ? "sourcepixels" : value.ToString(); } }
-        public double CropYUnits { get { return Utils.parseCropUnits(this["cropyunits"]).Value; } set { this["cropyunits"] = value == default(double) ? "sourcepixels" : value.ToString(); } }
+        /// <summary>
+        /// The width which the X and X2 crop values should be applied. For example, a value of '100' makes X and X2 percentages of the original image width.
+        /// This can be set to any non-negative value. Very useful for performing cropping when the original image size is unknown.
+        /// 0 indicates that the crop values are relative to the original size of the image.
+        /// </summary>
+        public double CropXUnits { get { return Utils.parseCropUnits(this["cropxunits"]).Value; } set { this["cropxunits"] = value <= 0 ? "sourcepixels" : value.ToString(); } }
+        /// <summary>
+        /// The width which the Y and Y2 crop values should be applied. For example, a value of '100' makes Y and Y2 percentages of the original image height.
+        /// This can be set to any non-negative  value. Very useful for performing cropping when the original image size is unknown.
+        /// 0 indicates that the crop values are relative to the original size of the image.
+        /// </summary>        
+        public double CropYUnits { get { return Utils.parseCropUnits(this["cropyunits"]).Value; } set { this["cropyunits"] = value <= 0 ? "sourcepixels" : value.ToString(); } }
 
 
         public RectangleF getCustomCropSourceRect(SizeF imageSize) {
