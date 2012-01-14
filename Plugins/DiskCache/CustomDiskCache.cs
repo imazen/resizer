@@ -52,7 +52,7 @@ namespace ImageResizer.Plugins.DiskCache {
 
         protected LockProvider queueLocks = new LockProvider();
         /// <summary>
-        /// Provides string-based locking for image resizing (not writing, just processing). Prevents duplication of efforts in async mode, where 'Locks' is not being used.
+        /// Provides string-based locking for image resizing (not writing, just processing). Prevents duplication of efforts in asynchronous mode, where 'Locks' is not being used.
         /// </summary>
         public LockProvider QueueLocks {
             get { return queueLocks; }
@@ -95,7 +95,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <summary>
         /// May return either a physical file name or a MemoryStream with the data. 
         /// Faster than GetCachedFile, as writes are (usually) asynchronous. If the write queue is full, the write is forced to be synchronous again.
-        /// Identical to GetCachedFile() when async=false
+        /// Identical to GetCachedFile() when asynchronous=false
         /// </summary>
         /// <param name="keyBasis"></param>
         /// <param name="extension"></param>
@@ -103,7 +103,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="sourceModifiedUtc"></param>
         /// <param name="timeoutMs"></param>
         /// <returns></returns>
-        public CacheResult GetCachedFile(string keyBasis, string extension, ResizeImageDelegate writeCallback, DateTime sourceModifiedUtc, int timeoutMs, bool async) {
+        public CacheResult GetCachedFile(string keyBasis, string extension, ResizeImageDelegate writeCallback, DateTime sourceModifiedUtc, int timeoutMs, bool asynchronous) {
             Stopwatch sw = null;
             if (lp.Logger != null) { sw = new Stopwatch(); sw.Start(); }
 
@@ -128,7 +128,7 @@ namespace ImageResizer.Plugins.DiskCache {
             bool asyncFailed = false;
 
              //On the first check, verify the file exists using System.IO directly (the last 'true' parameter).
-            if (!async) {
+            if (!asynchronous) {
                 //On the first check, verify the file exists using System.IO directly (the last 'true' parameter)
                 //May throw an IOException if the file cannot be opened, and is locked by an external processes for longer than timeoutMs. 
                 //This method may take longer than timeoutMs under absolute worst conditions. 
@@ -137,7 +137,7 @@ namespace ImageResizer.Plugins.DiskCache {
                     result.Result = CacheQueryResult.Failed;
                 }
             }else if (((!hasModifiedDate || hashModifiedDate) && !Index.existsCertain(relativePath, physicalPath)) || !Index.modifiedDateMatchesCertainExists(sourceModifiedUtc, relativePath, physicalPath)) {
-
+                
                 //Looks like a miss. Let's enter a lock for the creation of the file. This is a different locking system than for writing to the file - far less contention, as it doesn't include the 
                 //This prevents two identical requests from duplicating efforts. Different requests don't lock.
 
@@ -215,7 +215,7 @@ namespace ImageResizer.Plugins.DiskCache {
             }
             if (lp.Logger != null) {
                 sw.Stop();
-                lp.Logger.Trace("{0}ms: {3}{1} for {2}, Key: {4}", sw.ElapsedMilliseconds.ToString().PadLeft(4), result.Result.ToString(), result.RelativePath, async ? (asyncFailed ? "Fallback to sync  " : "Async ") : "", keyBasis);
+                lp.Logger.Trace("{0}ms: {3}{1} for {2}, Key: {4}", sw.ElapsedMilliseconds.ToString().PadLeft(4), result.Result.ToString(), result.RelativePath, asynchronous ? (asyncFailed ? "Fallback to sync  " : "Async ") : "", keyBasis);
             }
             //Fire event
             if (CacheResultReturned != null) CacheResultReturned(this, result);
