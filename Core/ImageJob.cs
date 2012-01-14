@@ -191,7 +191,10 @@ namespace ImageResizer {
                     if (SourcePathData == null) throw new ImageProcessingException("You cannot use the <filename> variable in a job that does not have a source filename, such as with a Stream or Bitmap instance");
                     return Path.GetFileNameWithoutExtension(SourcePathData);
                 }
-
+                if ("dir".Equals(p, StringComparison.OrdinalIgnoreCase)) {
+                    if (SourcePathData == null) throw new ImageProcessingException("You cannot use the <dir> variable in a job that does not have a source filename, such as with a Stream or Bitmap instance");
+                    return Path.GetDirectoryName(SourcePathData); //Just remove the last segment
+                }
                 if ("path".Equals(p, StringComparison.OrdinalIgnoreCase)) {
                     if (SourcePathData == null) throw new ImageProcessingException("You cannot use the <path> variable in a job that does not have a source filename, such as with a Stream or Bitmap instance");
                     return PathUtils.RemoveExtension(SourcePathData); //Just remove the last segment
