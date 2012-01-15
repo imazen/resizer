@@ -155,6 +155,15 @@ namespace ImageResizer {
             set { _createParentDirectory = value; }
         }
         /// <summary>
+        /// Sets CreateParentDirectory to true. Provided for easy chaining so you can do one-liners.
+        /// new ImageJob(source,dest,settings).CreateDir().Build()
+        /// </summary>
+        /// <returns></returns>
+        public ImageJob CreateDir() {
+            CreateParentDirectory = true;
+            return this;
+        }
+        /// <summary>
         /// Internal use only.
         /// Resolves the specified (potenetially templated) path into a physical path. 
         /// Applies the AddFileExtension setting using the 'ext' variable.
