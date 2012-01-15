@@ -108,6 +108,7 @@ namespace ImageResizer
         /// <param name="restoreStreamPos">If true, the position of the source stream will be restored after being read</param>
         /// <returns>A Bitmap. The .Tag property will include a BitmapTag instance. If .Tag.Source is not null, remember to dispose it when you dispose the Bitmap.</returns>
         public virtual Bitmap LoadImage(object source, ResizeSettings settings, bool restoreStreamPos){
+            if (source == null) throw new ArgumentNullException("source", "The source argument cannot be null; how do you load an image from a null value?");
 
             bool disposeStream = !(source is Stream);
             string path = null;
@@ -215,6 +216,9 @@ namespace ImageResizer
         /// <param name="restoreStreamPosition">True if you should save and restore the seek position of the stream. True for HttpPostedFile and HttpPostedFileBase instances. </param>
         /// <returns></returns>
         public Stream GetStreamFromSource(object source, ResizeSettings settings, ref bool disposeStream, out string path, out bool restoreStreamPosition) {
+            if (source == null) throw new ArgumentNullException("source", "The source argument cannot be null; how do you load an image from a null value?");
+            if (settings == null) settings = new ResizeSettings();
+
             //Allow plugins to extend this
             bool disposeS = disposeStream;
             Stream s = base.GetStream(source, settings, ref disposeS, out path, out restoreStreamPosition);
@@ -229,6 +233,7 @@ namespace ImageResizer
                 //Convert app-relative paths to VirtualFile instances
                 if (path.StartsWith("~", StringComparison.OrdinalIgnoreCase)) {
                     source = this.VirtualFileProvider.GetFile(PathUtils.ResolveAppRelative(path), settings);
+                    if (source == null) throw new FileNotFoundException("The specified virtual file could not be found.", PathUtils.ResolveAppRelative(path));
                 }
             }
 
@@ -237,12 +242,6 @@ namespace ImageResizer
             //Stream
             if (source is Stream) {
                 s = (Stream)source;
-                
-                try{
-                    if (s.Length <= s.Position && s.Position > 0)
-                        throw new ImageProcessingException("Stream already ended. You must call s.Seek(0, SeekOrigin.Begin); before re-using a stream, or use ImageJob with ResetSourceStream=true the first time the stream is read.");
-                }catch (NotSupportedException){
-                }
             }
                 //VirtualFile
             else if (source is VirtualFile) {
@@ -272,6 +271,19 @@ namespace ImageResizer
 
                 if (s == null) return null;
             }
+
+
+            try {
+
+                if (s != null && s.Length <= s.Position && s.Position > 0)
+                    throw new ImageProcessingException("The source stream is at the end (have you already read it?). You must call stream.Seek(0, SeekOrigin.Begin); before re-using a stream, or use ImageJob with ResetSourceStream=true the first time the stream is read.");
+
+                if (s != null && s.Length == 0)
+                    throw new ImageProcessingException("Source stream is empty; it has a length of 0. No bytes, no data. We can't work with this.");
+
+            } catch (NotSupportedException) {
+            }
+
             return s;
         }
 
@@ -347,6 +359,8 @@ namespace ImageResizer
         #endregion
 
         public virtual ImageJob Build(ImageJob job) {
+            if (job == null) throw new ArgumentNullException("job", "ImageJob parameter null. Cannot Build a null ImageJob instance");
+
             //Clone and filter settings FIRST, before calling plugins.
             ResizeSettings s = job.Settings == null ? new ResizeSettings() : new ResizeSettings(job.Settings);
             if (SettingsModifier != null) s = SettingsModifier.Modify(s);
