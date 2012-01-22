@@ -60,7 +60,7 @@ namespace ImageResizer.Plugins.Basic {
                 string ext = c.Pipeline.FakeExtensions.Count > 0 ? c.Pipeline.FakeExtensions[0] : "[the fakeExtensions attribute of the <pipeline> element in web.config is empty. Remove, or set to .ashx]";
 
                 if (server.IndexOf("IIS/7", 0, StringComparison.OrdinalIgnoreCase) > -1) {
-                    issues.Add(new Issue("Pipeline", "This app is running in Classic mode instead of Integrataed mode. This causes reduced performance and requires a special URL syntax."
+                    issues.Add(new Issue("Pipeline", "This app is running in Classic mode instead of Integrataed mode. This causes reduced performance and requires a special URL syntax." + 
 						"In classic mode, you will need to append the " + ext + " extension to any images you wish to process.\n" +
                         "Alternatively, switch the mode to Integrated in the application's App Pool.", IssueSeverity.Warning));
                 }
