@@ -65,6 +65,7 @@
     <Content Include="grid.css" />
     <Content Include="Grid.htm" />
     <Content Include="grid.js" />
+    <Content Include="Hybrid.aspx" />
     <Content Include="js\hover.js" />
     <Content Include="js\jquery-1.6.2.min.js" />
     <Content Include="js\jquery-ui-1.8.16.custom.min.js" />
@@ -93,6 +94,13 @@
     <Content Include="Misc\WhitespaceTrimmerTest.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Hybrid.aspx.cs">
+      <DependentUpon>Hybrid.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Hybrid.aspx.designer.cs">
+      <DependentUpon>Hybrid.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Misc\BatchResizeAndZip.aspx.cs">
       <DependentUpon>BatchResizeAndZip.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -137,6 +145,10 @@
     <Content Include="Misc\Protected\Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Contrib\PdfRenderer\PdfRenderer\ImageResizer.Plugins.PdfRenderer.csproj">
+      <Project>{7C8A13F7-5C00-4074-B16E-45D0E231B70D}</Project>
+      <Name>ImageResizer.Plugins.PdfRenderer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Core.Mvc\ImageResizer.Mvc.csproj">
       <Project>{4181B9C4-1EAF-4070-8571-2EE25475547E}</Project>
       <Name>ImageResizer.Mvc</Name>
@@ -168,6 +180,10 @@
     <ProjectReference Include="..\..\Plugins\FreeImage\ImageResizer.Plugins.FreeImage.csproj">
       <Project>{8E863AFE-B4CF-46AA-8382-0C3547C0EDE9}</Project>
       <Name>ImageResizer.Plugins.FreeImage</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\ImageResizer.Plugins.HybridEncoder\ImageResizer.Plugins.HybridEncoder.csproj">
+      <Project>{955A9A1F-5CF5-483B-8F0A-151423772BCF}</Project>
+      <Name>ImageResizer.Plugins.HybridEncoder</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Libs\FreeImage\Wrapper\FreeImage.NET\cs\Library\WrapperFreeImage.NET.csproj">
       <Project>{6598A7CD-8F27-4D3F-A675-5AE63113A7C3}</Project>

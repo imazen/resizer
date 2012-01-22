@@ -1,0 +1,4 @@
+﻿Make a sobel version of the image after processing is complete.
+
+For jpegs, set all pixels over the threshold to the background color.
+For pngs, set all pixels under the threshold to 0000.

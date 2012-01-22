@@ -129,6 +129,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcSample", "..\Samples\Mvc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PdfRenderer", "..\Contrib\PdfRenderer\PdfRenderer\ImageResizer.Plugins.PdfRenderer.csproj", "{7C8A13F7-5C00-4074-B16E-45D0E231B70D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.HybridEncoder", "..\Plugins\ImageResizer.Plugins.HybridEncoder\ImageResizer.Plugins.HybridEncoder.csproj", "{955A9A1F-5CF5-483B-8F0A-151423772BCF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -976,6 +978,24 @@ Global
 		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Trial|x64.ActiveCfg = Release|Any CPU
 		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Trial|x86.ActiveCfg = Release|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Release|x64.ActiveCfg = Release|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Release|x86.ActiveCfg = Release|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Trial|x64.ActiveCfg = Release|Any CPU
+		{955A9A1F-5CF5-483B-8F0A-151423772BCF}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
