@@ -73,7 +73,7 @@ namespace ImageResizer {
         /// </summary>
         public int Height                        { get { 
             return get("height", get("h",-1));            } set {
-                set("height", value); this.Remove("height");
+                set("height", value); this.Remove("h");
             }
         }
 
