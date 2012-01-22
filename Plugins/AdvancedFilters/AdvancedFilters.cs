@@ -6,6 +6,7 @@ using ImageResizer;
 using ImageResizer.Resizing;
 using AForge.Imaging.Filters;
 using AForge;
+using ImageResizer.Util;
 namespace ImageResizer.Plugins.AdvancedFilters {
     public class AdvancedFilters:BuilderExtension, IPlugin, IQuerystringPlugin {
         public AdvancedFilters() {
@@ -71,6 +72,22 @@ namespace ImageResizer.Plugins.AdvancedFilters {
 
 
             }
+
+            double blt = Utils.getDouble(s.settings, "a.blt", -1);
+            if (blt > -1) {
+                using (s.destBitmap) {
+                    s.destBitmap = Grayscale.CommonAlgorithms.Y.Apply(s.destBitmap);
+
+                }
+
+                BradleyLocalThresholding blr = new BradleyLocalThresholding();
+                blr.WindowSize = 7;
+                blr.PixelBrightnessDifferenceLimit = (float)blt;
+                blr.ApplyInPlace(s.destBitmap);
+            }
+
+            
+
 
             //true/false - duplicate with SimpleFilters?
             if ("true".Equals(s.settings["a.sepia"], StringComparison.OrdinalIgnoreCase))
