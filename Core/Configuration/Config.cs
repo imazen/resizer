@@ -65,7 +65,7 @@ namespace ImageResizer.Configuration {
             new ImageResizer.Plugins.Basic.Diagnostic().Install(this);
             if (isAspNet) new ImageResizer.Plugins.Basic.SizeLimiting().Install(this);
 
-            if (isAspNet) {
+            if (!isAspNet) {
                 //Not running asp.net app here. Load them immediately.
                 plugins.LoadPlugins();
             } else {            
