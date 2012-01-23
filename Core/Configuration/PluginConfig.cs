@@ -14,6 +14,7 @@ using System.Collections;
 using System.Collections.Specialized;
 using ImageResizer.Collections;
 using ImageResizer.Configuration.Logging;
+using System.Web.Compilation;
 
 namespace ImageResizer.Configuration {
     /// <summary>
@@ -334,7 +335,7 @@ namespace ImageResizer.Configuration {
             //3) Next, add all assemblies that have "ImageResizer" in their name 
             List<string> otherAssemblies = new List<string>();
             //Add ImageResizer-related assemblies first
-            foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies()) {
+            foreach (Assembly a in BuildManager.GetReferencedAssemblies()) {// AppDomain.CurrentDomain.GetAssemblies()
                 string aname = a.FullName;
                 if (aname.IndexOf("ImageResizer", StringComparison.OrdinalIgnoreCase) > -1) assemblies.Add(", " + aname);
                 else
