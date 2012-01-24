@@ -63,7 +63,9 @@ namespace PhotoshopFile.Text
 
         public override string ToString()
         {
-            return "(" + type.ToString() + "):" + value.ToString();
+            if (value is int) return "(" + type.ToString() + "):" + ((int)value).ToString(NumberFormatInfo.InvariantInfo);
+            if (value is double) return "(" + type.ToString() + "):" + ((double)value).ToString(NumberFormatInfo.InvariantInfo);
+            else return "(" + type.ToString() + "):" + value.ToString();
         }
 
         /// <summary>
@@ -171,7 +173,7 @@ namespace PhotoshopFile.Text
                         if (s.Contains('.')){
                             return new Token(TokenType.Double,double.Parse(s, floatingPointStyle,NumberFormatInfo.InvariantInfo));
                         }else{ 
-                            return new Token(TokenType.Integer,int.Parse(s,NumberStyles.Integer,NumberFormatInfo.InvariantInfo,));
+                            return new Token(TokenType.Integer,int.Parse(s,NumberStyles.Integer,NumberFormatInfo.InvariantInfo));
                         }
                         
                     }else if (Char.IsDigit(c) || c=='-' || c == '.'){
@@ -185,7 +187,7 @@ namespace PhotoshopFile.Text
             }
             //Boolean (true|false) parsing
             if (c == 't' || c == 'T' || c == 'f' || c == 'F'){
-                string s = c +  r.ReadChar().ToString() +  r.ReadChar().ToString() + r.ReadChar().ToString();
+                string s = c.ToString() + r.ReadChar().ToString() + r.ReadChar().ToString() + r.ReadChar().ToString();
                 char pc = (char)r.PeekChar();
                 if (s.Equals("true", StringComparison.OrdinalIgnoreCase)){
                     return new Token(TokenType.Boolean,true);

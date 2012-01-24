@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Globalization;
 
 namespace PhotoshopFile
 {
@@ -31,7 +32,7 @@ namespace PhotoshopFile
                 {
                     sbChars.Append(".");
                 }
-                sbAll.Append(num3.ToString("X").PadLeft(2, '0') + " ");
+                sbAll.Append(num3.ToString("X",NumberFormatInfo.InvariantInfo).PadLeft(2, '0') + " ");
                 pos++;
                 if ((pos % 8) == 0)
                 {
@@ -56,7 +57,7 @@ namespace PhotoshopFile
         {
             sbAll.Append("  ");
             sbAll.Append(sbChars);
-            sbAll.Append("\r\n" + pos.ToString("X").PadLeft(4, '0') + ":");
+            sbAll.Append("\r\n" + pos.ToString("X", NumberFormatInfo.InvariantInfo).PadLeft(4, '0') + ":");
         }
     }
 
