@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.DiskCache.Async {
     public class AsyncWriteCollection {
@@ -80,7 +81,7 @@ namespace ImageResizer.Plugins.DiskCache.Async {
         public delegate void WriterDelegate(AsyncWrite w);
 
         public string HashTogether(string relativePath, DateTime modifiedUtc) {
-            return relativePath.ToUpperInvariant() + "_" + modifiedUtc.Ticks.ToString();
+            return relativePath.ToUpperInvariant() + "_" + modifiedUtc.Ticks.ToString(NumberFormatInfo.InvariantInfo);
         }
 
 

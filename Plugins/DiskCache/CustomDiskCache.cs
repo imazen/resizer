@@ -9,6 +9,7 @@ using ImageResizer.Configuration.Logging;
 using System.Diagnostics;
 using System.Threading;
 using ImageResizer.Plugins.DiskCache.Async;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.DiskCache {
     public delegate void CacheResultHandler(CustomDiskCache sender, CacheResult r);
@@ -113,7 +114,7 @@ namespace ImageResizer.Plugins.DiskCache {
 
             //Hash the modified date if needed.
             if (hashModifiedDate && hasModifiedDate)
-                keyBasis += "|" + sourceModifiedUtc.Ticks.ToString();
+                keyBasis += "|" + sourceModifiedUtc.Ticks.ToString(NumberFormatInfo.InvariantInfo);
 
             //Relative to the cache directory. Not relative to the app or domain root
             string relativePath = new UrlHasher().hash(keyBasis, subfolders, "/") + '.' + extension;
@@ -215,7 +216,7 @@ namespace ImageResizer.Plugins.DiskCache {
             }
             if (lp.Logger != null) {
                 sw.Stop();
-                lp.Logger.Trace("{0}ms: {3}{1} for {2}, Key: {4}", sw.ElapsedMilliseconds.ToString().PadLeft(4), result.Result.ToString(), result.RelativePath, asynchronous ? (asyncFailed ? "Fallback to sync  " : "Async ") : "", keyBasis);
+                lp.Logger.Trace("{0}ms: {3}{1} for {2}, Key: {4}", sw.ElapsedMilliseconds.ToString(NumberFormatInfo.InvariantInfo).PadLeft(4), result.Result.ToString(), result.RelativePath, asynchronous ? (asyncFailed ? "Fallback to sync  " : "Async ") : "", keyBasis);
             }
             //Fire event
             if (CacheResultReturned != null) CacheResultReturned(this, result);

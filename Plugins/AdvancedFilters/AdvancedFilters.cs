@@ -6,6 +6,8 @@ using ImageResizer;
 using ImageResizer.Resizing;
 using AForge.Imaging.Filters;
 using AForge;
+using System.Globalization;
+using ImageResizer.Util;
 namespace ImageResizer.Plugins.AdvancedFilters {
     public class AdvancedFilters:BuilderExtension, IPlugin, IQuerystringPlugin {
         public AdvancedFilters() {
@@ -29,21 +31,21 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             
             str = s.settings["blur"]; //radius
             if (string.IsNullOrEmpty(str)) str= s.settings["a.blur"];
-            if (!string.IsNullOrEmpty(str) && int.TryParse(str, out i))
+            if (!string.IsNullOrEmpty(str) && int.TryParse(str,NumberStyles.Integer,NumberFormatInfo.InvariantInfo, out i))
                 new GaussianBlur(1.4, i).ApplyInPlace(s.destBitmap);
             
             str = s.settings["sharpen"]; //radius
             if (string.IsNullOrEmpty(str)) str= s.settings["a.sharpen"];
-            if (!string.IsNullOrEmpty(str) && int.TryParse(str, out i))
+            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
                 new GaussianSharpen(1.4, i).ApplyInPlace(s.destBitmap);
 
             str = s.settings["a.oilpainting"]; //radius
-            if (!string.IsNullOrEmpty(str) && int.TryParse(str, out i))
+            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
                 new OilPainting(i).ApplyInPlace(s.destBitmap);
 
             str = s.settings["a.removenoise"]; //radius
             if ("true".Equals(str, StringComparison.OrdinalIgnoreCase)) str = "3";
-            if (!string.IsNullOrEmpty(str) && int.TryParse(str, out i))
+            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
                 new ConservativeSmoothing(i).ApplyInPlace(s.destBitmap); 
 
             //Sobel only supports 8bpp grayscale images.
@@ -56,7 +58,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
                 new SobelEdgeDetector().ApplyInPlace(s.destBitmap);
 
                 str = s.settings["a.threshold"]; //radius
-                if (!string.IsNullOrEmpty(str) && int.TryParse(str, out i))
+                if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
                  new Threshold(i).ApplyInPlace(s.destBitmap);
     
             }
@@ -82,7 +84,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
 
 
             str = s.settings["a.posterize"]; //number of colors to merge
-            if (!string.IsNullOrEmpty(str) && int.TryParse(str, out i)){
+            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i)) {
                 SimplePosterization sp = new SimplePosterization();
                 if (i < 1) i = 1; 
                 if (i > 255) i = 255;
@@ -106,9 +108,9 @@ namespace ImageResizer.Plugins.AdvancedFilters {
 
             if (!string.IsNullOrEmpty(str) || !string.IsNullOrEmpty(strB) || !string.IsNullOrEmpty(strS)) {
                 float contrast, brightness, saturation;
-                if (string.IsNullOrEmpty(str) || !float.TryParse(str, out contrast)) contrast = 0;
-                if (string.IsNullOrEmpty(strB) || !float.TryParse(strB, out brightness)) brightness = 0;
-                if (string.IsNullOrEmpty(strS) || !float.TryParse(strS, out saturation)) saturation = 0;
+                if (string.IsNullOrEmpty(str) || !float.TryParse(str, Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo, out contrast)) contrast = 0;
+                if (string.IsNullOrEmpty(strB) || !float.TryParse(strB, Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo, out brightness)) brightness = 0;
+                if (string.IsNullOrEmpty(strS) || !float.TryParse(strS, Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo, out saturation)) saturation = 0;
 
                 HSLLinear adjust = new HSLLinear();
                 AdjustContrastBrightnessSaturation(adjust, contrast, brightness, saturation, "true".Equals(s.settings["a.truncate"]));

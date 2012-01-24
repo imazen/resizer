@@ -6,6 +6,7 @@ using ImageResizer.Configuration.Xml;
 using ImageResizer.Configuration.Issues;
 using System.Collections.Specialized;
 using System.Reflection;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.DiskCache {
     public class CleanupStrategy :IssueSink{
@@ -36,11 +37,12 @@ namespace ImageResizer.Plugins.DiskCache {
 
             //Parse the timespan (format [ws][-]{ d | d.hh:mm[:ss[.ff]] | hh:mm[:ss[.ff]] }[ws])
             TimeSpan tValue = TimeSpan.MinValue;
+            //Culture invariant by default
             if (!TimeSpan.TryParse(value, out tValue)) tValue = TimeSpan.MinValue;
 
             //Parse it as an integer number of seconds. Seconds is the default, unlike TimeSpan.TryParse which uses days.
             int iValue = int.MinValue;
-            if (int.TryParse(value, out iValue)) tValue = new TimeSpan(0,0,iValue);
+            if (int.TryParse(value, NumberStyles.Integer,NumberFormatInfo.InvariantInfo, out iValue)) tValue = new TimeSpan(0,0,iValue);
 
             if (tValue == TimeSpan.MinValue) return; //We couldn't parse a value.
 
@@ -53,7 +55,7 @@ namespace ImageResizer.Plugins.DiskCache {
             if (string.IsNullOrEmpty(value)) return;
 
             int iValue = int.MinValue;
-            if (!int.TryParse(value, out iValue)) return; //We couldn't parse a value.
+            if (!int.TryParse(value, NumberStyles.Integer,NumberFormatInfo.InvariantInfo,out iValue)) return; //We couldn't parse a value.
 
             PropertyInfo pi = this.GetType().GetProperty(key);
             pi.SetValue(this, iValue, null);
