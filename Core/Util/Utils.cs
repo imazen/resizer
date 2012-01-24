@@ -19,11 +19,11 @@ namespace ImageResizer.Util {
                 value = value.TrimStart('#');
                 //try hex first
                 int val;
-                if (int.TryParse(value, System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out val)) {
+                if (int.TryParse(value, System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out val)) {
                     int alpha = 255;
                     if (value.Length == 4 || value.Length == 8) {
                         int regLength = value.Length - (value.Length / 4);
-                        alpha = int.Parse(value.Substring(regLength), System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture);
+                        alpha = int.Parse(value.Substring(regLength), System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture);
                         if (regLength == 3) alpha *= 16;
                         value = value.Substring(0, regLength);
                     }
@@ -44,7 +44,7 @@ namespace ImageResizer.Util {
             string text =  System.Drawing.ColorTranslator.ToHtml(value);
             if (text.StartsWith("#")) {
                 text = text.TrimStart('#');
-                if (value.A != 255) text += value.A.ToString("X2", null);
+                if (value.A != 255) text += value.A.ToString("X2", NumberFormatInfo.InvariantInfo);
             }
             return text;
         }
@@ -59,28 +59,31 @@ namespace ImageResizer.Util {
             string[] parts = text.Split(new char[] { ',' }, StringSplitOptions.None);
             double[] vals = new double[parts.Length];
             for (int i = 0; i < parts.Length; i++) {
-                if (!double.TryParse(parts[i], out vals[i]))
+                if (!double.TryParse(parts[i], floatingPointStyle, NumberFormatInfo.InvariantInfo, out vals[i]))
                     vals[i] = defaultValue;
             }
             return vals;
         }
+        public const NumberStyles floatingPointStyle = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite | 
+            NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands | NumberStyles.AllowExponent;
+
         public static int getInt(NameValueCollection q, string name, int defaultValue) {
             int temp = defaultValue;
             if (!string.IsNullOrEmpty(q[name]))
-                if (!int.TryParse(q[name], out temp)) return defaultValue;
+                if (!int.TryParse(q[name], NumberStyles.Integer,NumberFormatInfo.InvariantInfo, out temp)) return defaultValue;
             return temp;
         }
         public static float getFloat(NameValueCollection q, string name, float defaultValue) {
             float temp = defaultValue;
             if (!string.IsNullOrEmpty(q[name]))
-                if (!float.TryParse(q[name], out temp)) return defaultValue;
-            return temp;
+                if (!float.TryParse(q[name], floatingPointStyle, NumberFormatInfo.InvariantInfo, out temp)) return defaultValue;
+            return temp; 
         }
 
         public static double getDouble(NameValueCollection q, string name, double defaultValue) {
             double temp = defaultValue;
             if (!string.IsNullOrEmpty(q[name]))
-                if (!double.TryParse(q[name], out temp)) return defaultValue;
+                if (!double.TryParse(q[name], floatingPointStyle, NumberFormatInfo.InvariantInfo, out temp)) return defaultValue;
             return temp;
         }
 
@@ -166,7 +169,7 @@ namespace ImageResizer.Util {
 
             if (!string.IsNullOrEmpty(s)) {
                 double temp;
-                if (!double.TryParse(s, out temp)) return 0;
+                if (!double.TryParse(s,floatingPointStyle, NumberFormatInfo.InvariantInfo, out temp)) return 0;
                 
                 return normalizeTo90Intervals(temp);
             }
@@ -232,7 +235,7 @@ namespace ImageResizer.Util {
             if (string.IsNullOrEmpty(value)) return new KeyValuePair<CropUnits, double>(CropUnits.SourcePixels, default(double));
 
             double temp;
-            if (double.TryParse(value, out temp) && temp > 0) return new KeyValuePair<CropUnits, double>(CropUnits.Custom, temp);
+            if (double.TryParse(value,floatingPointStyle, NumberFormatInfo.InvariantInfo, out temp) && temp > 0) return new KeyValuePair<CropUnits, double>(CropUnits.Custom, temp);
             else return new KeyValuePair<CropUnits, double>(CropUnits.SourcePixels, default(double));
         }
         public static string writeCropUnits(KeyValuePair<CropUnits, double> value) {
@@ -282,7 +285,7 @@ namespace ImageResizer.Util {
             if (mode == CropMode.Custom) {
                 string c = "(";
                 foreach (double d in coords)
-                    c += d.ToString() + ",";
+                    c += d.ToString(NumberFormatInfo.InvariantInfo) + ",";
                 return c.TrimEnd(',') + ")";
             }
             throw new NotImplementedException("Unrecognized CropMode value: " + mode.ToString());
@@ -312,9 +315,10 @@ namespace ImageResizer.Util {
 
 
         public static string writePadding(BoxPadding p) {
-            if (!double.IsNaN(p.All)) return p.All.ToString(); //Easy
+            if (!double.IsNaN(p.All)) return p.All.ToString(NumberFormatInfo.InvariantInfo); //Easy
 
-            return "(" + p.Left + "," + p.Top + "," + p.Right + "," + p.Bottom + ")";
+            return "(" + p.Left.ToString(NumberFormatInfo.InvariantInfo) + "," + p.Top.ToString(NumberFormatInfo.InvariantInfo) + "," +
+                p.Right.ToString(NumberFormatInfo.InvariantInfo) + "," + p.Bottom.ToString(NumberFormatInfo.InvariantInfo) + ")";
 
         }
 

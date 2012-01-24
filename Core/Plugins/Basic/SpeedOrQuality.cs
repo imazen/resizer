@@ -5,6 +5,7 @@ using ImageResizer.Resizing;
 using System.Drawing.Drawing2D;
 using ImageResizer.Util;
 using System.Drawing;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.Basic {
     public class SpeedOrQuality:BuilderExtension, IPlugin {
@@ -27,7 +28,7 @@ namespace ImageResizer.Plugins.Basic {
 
             //Find out what the speed setting is.
             int speed = 0;
-            if (string.IsNullOrEmpty(s.settings["speed"]) || !int.TryParse(s.settings["speed"], out speed)) speed = 0;
+            if (string.IsNullOrEmpty(s.settings["speed"]) || !int.TryParse(s.settings["speed"], NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out speed)) speed = 0;
 
             if (speed < 1) return RequestedAction.None;
 

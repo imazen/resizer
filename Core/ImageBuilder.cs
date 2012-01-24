@@ -16,6 +16,7 @@ using ImageResizer.Util;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins;
 using System.Web.Hosting;
+using System.Globalization;
 
 namespace ImageResizer
 {
@@ -409,9 +410,9 @@ namespace ImageResizer
                                 if (e != null) return e.Extension;
                             }
                             if ("width".Equals(var, StringComparison.OrdinalIgnoreCase))
-                                return GetFinalSize(new System.Drawing.Size(b.Width, b.Height), new ResizeSettings(job.Settings)).Width.ToString();
+                                return GetFinalSize(new System.Drawing.Size(b.Width, b.Height), new ResizeSettings(job.Settings)).Width.ToString(NumberFormatInfo.InvariantInfo);
                             if ("height".Equals(var, StringComparison.OrdinalIgnoreCase))
-                                return GetFinalSize(new System.Drawing.Size(b.Width, b.Height), new ResizeSettings(job.Settings)).Height.ToString();
+                                return GetFinalSize(new System.Drawing.Size(b.Width, b.Height), new ResizeSettings(job.Settings)).Height.ToString(NumberFormatInfo.InvariantInfo);
                             return null;
                         });
                     //If requested, auto-create the parent directory(ies)
@@ -572,11 +573,11 @@ namespace ImageResizer
             ResizeSettings q = s.settings;
 
             int page = 0;
-            if (!string.IsNullOrEmpty(q["page"]) && !int.TryParse(q["page"], out page))
+            if (!string.IsNullOrEmpty(q["page"]) && !int.TryParse(q["page"], NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out page))
                 page = 0;
 
             int frame = 0;
-            if (!string.IsNullOrEmpty(q["frame"]) && !int.TryParse(q["frame"], out frame))
+            if (!string.IsNullOrEmpty(q["frame"]) && !int.TryParse(q["frame"], NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out frame))
                 frame = 0;
 
             //So users can use 1-based numbers
