@@ -10,6 +10,7 @@ using ImageResizer.Util;
 using ImageResizer.Plugins.Wic.InteropServices.ComTypes;
 using ImageResizer.Plugins.Wic;
 using System.Runtime.InteropServices;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.WicDecoder {
     /// <summary>
@@ -80,8 +81,8 @@ namespace ImageResizer.Plugins.WicDecoder {
 
                 //Figure out which frame to work with
                 int frameIndex = 0;
-                if (!string.IsNullOrEmpty(settings["page"]) && !int.TryParse(settings["page"], out frameIndex))
-                    if (!string.IsNullOrEmpty(settings["frame"]) && !int.TryParse(settings["frame"], out frameIndex))
+                if (!string.IsNullOrEmpty(settings["page"]) && !int.TryParse(settings["page"], NumberStyles.Number, NumberFormatInfo.InvariantInfo, out frameIndex))
+                    if (!string.IsNullOrEmpty(settings["frame"]) && !int.TryParse(settings["frame"], NumberStyles.Number, NumberFormatInfo.InvariantInfo, out frameIndex))
                         frameIndex = 0;
 
                 //So users can use 1-based numbers

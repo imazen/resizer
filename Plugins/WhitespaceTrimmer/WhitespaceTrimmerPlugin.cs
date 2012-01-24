@@ -7,6 +7,7 @@ using AForge.Imaging.Filters;
 using System.Drawing.Imaging;
 using ImageResizer.Util;
 using AForge.Imaging;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.WhitespaceTrimmer {
     public class WhitespaceTrimmerPlugin:BuilderExtension, IPlugin, IQuerystringPlugin {
@@ -22,13 +23,13 @@ namespace ImageResizer.Plugins.WhitespaceTrimmer {
             string str = null;
             str = s.settings["trim.percentpadding"]; //percentpadding. Percentage is 0-100, multiplied by the average of the width and height.
             double percentpadding = 0;
-            if (!string.IsNullOrEmpty(str) && double.TryParse(str, out percentpadding))
+            if (!string.IsNullOrEmpty(str) && double.TryParse(str,Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo,out percentpadding))
                 percentpadding /= 100;
 
 
             int threshold = 0;
             str = s.settings["trim.threshold"]; //threshold
-            if (!string.IsNullOrEmpty(str) && int.TryParse(str, out threshold)) {
+            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out threshold)) {
                 if (threshold < 0) threshold = 0; if (threshold > 255) threshold = 255;
 
                 

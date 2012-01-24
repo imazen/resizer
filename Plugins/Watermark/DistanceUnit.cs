@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ImageResizer.Util;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.Watermark {
     public class DistanceUnit {
@@ -30,7 +32,7 @@ namespace ImageResizer.Plugins.Watermark {
                 value = value.Substring(0, value.Length - 3); type = Units.Percentage;
             }
 
-            if (!double.TryParse(value, out val)) return null;
+            if (!double.TryParse(value, Utils.floatingPointStyle,NumberFormatInfo.InvariantInfo, out val)) return null;
             return new DistanceUnit(val, type);
         }
 
@@ -48,8 +50,8 @@ namespace ImageResizer.Plugins.Watermark {
         public double Value { get { return _value; } set { _value = value; } }
 
         public override string ToString() {
-            if (Type == Units.Pixels) return Value.ToString() + "px";
-            else return Value.ToString() + "percent";
+            if (Type == Units.Pixels) return Value.ToString(NumberFormatInfo.InvariantInfo) + "px";
+            else return Value.ToString(NumberFormatInfo.InvariantInfo) + "percent";
 
         }
     }

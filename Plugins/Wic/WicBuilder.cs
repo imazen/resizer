@@ -16,6 +16,7 @@ using System.Web.Hosting;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using ImageResizer.Plugins.WicEncoder;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.WicBuilder {
     public class WicBuilderPlugin : BuilderExtension, IPlugin, IIssueProvider, IFileExtensionPlugin {
@@ -129,8 +130,8 @@ namespace ImageResizer.Plugins.WicBuilder {
 
                 //Figure out which frame to work with
                 int frameIndex = 0;
-                if (!string.IsNullOrEmpty(q["page"]) && !int.TryParse(q["page"], out frameIndex))
-                    if (!string.IsNullOrEmpty(q["frame"]) && !int.TryParse(q["frame"], out frameIndex))
+                if (!string.IsNullOrEmpty(q["page"]) && !int.TryParse(q["page"], NumberStyles.Number, NumberFormatInfo.InvariantInfo, out frameIndex))
+                    if (!string.IsNullOrEmpty(q["frame"]) && !int.TryParse(q["frame"], NumberStyles.Number, NumberFormatInfo.InvariantInfo, out frameIndex))
                         frameIndex = 0;
 
                 //So users can use 1-based numbers
