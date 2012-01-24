@@ -290,6 +290,7 @@ namespace ImageResizer.Plugins.PrettyGifs
                     AnalyzeImage(intermediateData, width, height);
                     output.Palette = GetPalette(output.Palette);
                     QuantizeImage(intermediateData, null, output, width, height, bounds);
+                    return output;
                 } finally {
                     // Ensure that the bits are unlocked
                     copy.UnlockBits(sourceData);
