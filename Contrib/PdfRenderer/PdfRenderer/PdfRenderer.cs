@@ -26,6 +26,7 @@ using ImageResizer.Plugins.PdfRenderer.Ghostscript;
 using ImageResizer.Resizing;
 using ImageResizer.Util;
 using System.Collections.Specialized;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.PdfRenderer
 {
@@ -420,8 +421,8 @@ namespace ImageResizer.Plugins.PdfRenderer
             }
             ghostscriptSettings.Add(GhostscriptArgument.TextAlphaBits, textAlphaBits);
 
-            ghostscriptSettings[GhostscriptArgument.GridFitTT] = (Utils.getBool(settings,"gridfit",false) ? 2 : 0).ToString();
-            ghostscriptSettings[GhostscriptArgument.AlignToPixels] =(Utils.getBool(settings,"subpixels",false) ? 1 : 0).ToString();
+            ghostscriptSettings[GhostscriptArgument.GridFitTT] = (Utils.getBool(settings, "gridfit", false) ? 2 : 0).ToString(NumberFormatInfo.InvariantInfo);
+            ghostscriptSettings[GhostscriptArgument.AlignToPixels] = (Utils.getBool(settings, "subpixels", false) ? 1 : 0).ToString(NumberFormatInfo.InvariantInfo);
             if (Utils.getBool(settings,"printed",true) == false) ghostscriptSettings.Remove(GhostscriptArgument.Printed);
         }
     }

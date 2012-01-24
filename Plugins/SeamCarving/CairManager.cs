@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Web;
 using System.Web.Hosting;
 using System.Threading;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.SeamCarving {
     public class CairManager {
@@ -159,9 +160,9 @@ namespace ImageResizer.Plugins.SeamCarving {
                 args += " -O \"" + job.DestPath + "\"";
                 if (job.WeightPath != null) args += " -W \"" + job.WeightPath + "\"";
                 args += " -T " + job.Threads;
-                args += " -R " + ((int)job.Output).ToString();
-                args += " -C " + ((int)job.Filter).ToString();
-                args += " -E " + ((int)job.Energy).ToString();
+                args += " -R " + ((int)job.Output).ToString(NumberFormatInfo.InvariantInfo);
+                args += " -C " + ((int)job.Filter).ToString(NumberFormatInfo.InvariantInfo);
+                args += " -E " + ((int)job.Energy).ToString(NumberFormatInfo.InvariantInfo);
                 args += " -X " + job.Size.Width;
                 args += " -Y " + job.Size.Height;
 
