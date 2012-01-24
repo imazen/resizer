@@ -17,11 +17,11 @@ using PhotoshopFile.Text;
 using ImageResizer.Plugins;
 using ImageResizer.Encoding;
 using ImageResizer.Configuration;
+using System.Globalization;
 namespace ImageResizer.Plugins.PsdComposer
 {
-    public class PsdComposerPlugin : VirtualPathProvider, IPlugin, IVirtualImageProvider, IQuerystringPlugin, IFileExtensionPlugin
+    public class PsdComposerPlugin : IPlugin, IVirtualImageProvider, IQuerystringPlugin, IFileExtensionPlugin
     {
-
 
         public PsdComposerPlugin(): base()  { }
 
@@ -44,7 +44,7 @@ namespace ImageResizer.Plugins.PsdComposer
         /// <param name="queryString"></param>
         /// <returns></returns>
         public bool FileExists(string virtualPath, NameValueCollection queryString) {
-            return IsPathPSDToCompose(virtualPath,queryString) && System.IO.File.Exists(GetPhysicalPath(virtualPath));
+            return IsPathPSDToCompose(virtualPath,queryString) && c.Pipeline.FileExists(StripFakeExtension(virtualPath),new NameValueCollection());
         }
         
         /// <summary>
@@ -55,8 +55,8 @@ namespace ImageResizer.Plugins.PsdComposer
         /// <param name="queryString"></param>
         /// <returns></returns>
         public IVirtualFile GetFile(string virtualPath, NameValueCollection queryString) {
-            if (IsPathPSDToCompose(virtualPath,queryString) && System.IO.File.Exists(GetPhysicalPath(virtualPath)))
-                return new PsdVirtualFile(virtualPath, this);
+            if (IsPathPSDToCompose(virtualPath, queryString) && c.Pipeline.FileExists(StripFakeExtension(virtualPath), new NameValueCollection()))
+                return new PsdVirtualFile(virtualPath, queryString, this);
             else
                 return null;
         }
@@ -82,11 +82,7 @@ namespace ImageResizer.Plugins.PsdComposer
         /// <returns></returns>
         protected IPsdRenderer GetSelectedRenderer(NameValueCollection queryString)
         {
-            //Renderer object
-            IPsdRenderer renderer = null;
-            //There is only ONE renderer now - The Agurigma one was horrible
-            renderer = new PsdPluginRenderer();
-            return renderer;
+            return new PsdPluginRenderer(); //There is only ONE renderer now - The Agurigma one was horrible
         }
 
  
@@ -100,6 +96,7 @@ namespace ImageResizer.Plugins.PsdComposer
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
+        
             System.Drawing.Bitmap b = ComposeBitmap(virtualPath, queryString);
             //Memory stream for encoding the file
             MemoryStream ms = new MemoryStream();
@@ -110,6 +107,7 @@ namespace ImageResizer.Plugins.PsdComposer
                 encoder.Write(b, ms);
                 ms.Seek(0, SeekOrigin.Begin); //Reset stream for reading
             }
+
 
             sw.Stop();
             trace("Total time, including encoding: " + sw.ElapsedMilliseconds.ToString() + "ms");
@@ -129,7 +127,7 @@ namespace ImageResizer.Plugins.PsdComposer
             //Bitmap we will render to
             System.Drawing.Bitmap b = null;
 
-            MemCachedFile file = MemCachedFile.GetCachedFile(GetPhysicalPath(virtualPath));
+            MemCachedFile file = MemCachedFile.GetCachedVirtualFile(StripFakeExtension(virtualPath),c.Pipeline, new NameValueCollection());
             using (Stream s = file.GetStream()) {
                 //Time just the parsing/rendering
                 Stopwatch swRender = new Stopwatch();
@@ -144,11 +142,12 @@ namespace ImageResizer.Plugins.PsdComposer
                 file.SetSubkey("layers_" + renderer.ToString(), layers);
                 file.SetSubkey("size_" + renderer.ToString(), size);
 
-
                 //How fast?
                 swRender.Stop();
                 trace("Using encoder " + renderer.ToString() + ", rendering stream to a composed Bitmap instance took " + swRender.ElapsedMilliseconds.ToString() + "ms");
             }
+
+
             return b;
         }
 
@@ -181,10 +180,11 @@ namespace ImageResizer.Plugins.PsdComposer
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
+
             //Renderer object
             IPsdRenderer renderer = GetSelectedRenderer(queryString);
             //File
-            MemCachedFile file = MemCachedFile.GetCachedFile(GetPhysicalPath(virtualPath));
+            MemCachedFile file = MemCachedFile.GetCachedVirtualFile(StripFakeExtension(virtualPath), c.Pipeline, new NameValueCollection());
             //key
             string layersKey = "layers_" + renderer.ToString();
             string sizeKey = "size_" + renderer.ToString();
@@ -209,7 +209,7 @@ namespace ImageResizer.Plugins.PsdComposer
 
 
             sw.Stop();
-            trace("Total time for enumerating, including file reading: " + sw.ElapsedMilliseconds.ToString() + "ms");
+            trace("Total time for enumerating, including file reading: " + sw.ElapsedMilliseconds.ToString(NumberFormatInfo.InvariantInfo) + "ms");
             return new KeyValuePair<Size,IList<IPsdLayer>>(size,layers);
         }
 
@@ -259,7 +259,7 @@ namespace ImageResizer.Plugins.PsdComposer
             return delegate(int index, string name, bool visibleNow)
             {
                 //Exclude Layer Group layers, 		Name	"</Layer group>"	string
-                if ("</Layer group>".Equals(name, StringComparison.InvariantCultureIgnoreCase)) return false;
+                if ("</Layer group>".Equals(name, StringComparison.OrdinalIgnoreCase)) return false;
                 if (name.IndexOf('<') > -1) return false;
                 Nullable<bool> show = (searcher.getVisibility(name));
                 if (show == null) return visibleNow;
@@ -323,7 +323,7 @@ namespace ImageResizer.Plugins.PsdComposer
                     //Verify it has text layer information:
                     bool hasText = false;
                     foreach (PhotoshopFile.Layer.AdjustmentLayerInfo lInfo in  l.AdjustmentInfo)
-                        if (lInfo.Key.Equals("TySh")){ hasText=true; break;}
+                        if (lInfo.Key.Equals("TySh", StringComparison.Ordinal)){ hasText=true; break;}
 
 
                     if (hasText) {
@@ -375,78 +375,39 @@ namespace ImageResizer.Plugins.PsdComposer
             }
             return false;
         }
+
+
         /// <summary>
-        /// Strips the .psd.jpg to .psd, converts to physical path
+        /// Strips the .psd.jpg to .psd, converts to physical physicalPath
         /// </summary>
         /// <param name="virtualPath"></param>
         /// <returns></returns>
-        internal static string GetPhysicalPath(string virtualPath)
-        {
+        internal static string StripFakeExtension(string virtualPath) {
             //Trim everything after .psd
             int ix = virtualPath.ToLowerInvariant().LastIndexOf(".psd");
-            string str = virtualPath.Substring(0, ix + 4);
-            if (HttpContext.Current != null)
-            {
-                return HttpContext.Current.Request.MapPath(str);
-            }
-            else
-            {
-                return str.TrimStart('~','/').Replace('/','\\');
-            }
+            if (ix < 0) return virtualPath;
+            return  virtualPath.Substring(0, ix + 4);
         }
 
-        /// <summary>
-        /// For internal VPP use only.
-        /// </summary>
-        /// <param name="virtualPath"></param>
-        /// <returns></returns>
-        public override bool FileExists(string virtualPath)
-        {
-            if (IsPathPSDToCompose(virtualPath))
-                return System.IO.File.Exists(GetPhysicalPath(virtualPath));
-            else
-                return Previous.FileExists(virtualPath);
-        }
-        /// <summary>
-        /// For internal VPP use only
-        /// </summary>
-        /// <param name="virtualPath"></param>
-        /// <returns></returns>
-        public override VirtualFile GetFile(string virtualPath)
-        {
-            if (IsPathPSDToCompose(virtualPath) && System.IO.File.Exists(GetPhysicalPath(virtualPath)))
-                return new PsdVirtualFile(virtualPath, this);
-            else
-                return Previous.GetFile(virtualPath);
-        }
 
-        /// <summary>
-        /// For internal VPP use only
-        /// </summary>
-        /// <param name="virtualPath"></param>
-        /// <param name="virtualPathDependencies"></param>
-        /// <param name="utcStart"></param>
-        /// <returns></returns>
-        public override CacheDependency GetCacheDependency(
-          string virtualPath,
-          System.Collections.IEnumerable virtualPathDependencies,
-          DateTime utcStart)
-        {
-            //Maybe the database is also involved? 
-            return Previous.GetCacheDependency(virtualPath, virtualPathDependencies, utcStart);
+        internal static NameValueCollection QueryStringMinusTriggers(NameValueCollection qs) {
+            var nvc = new NameValueCollection(qs);
+            foreach (string s in PsdCommandBuilder.GetSupportedQuerystringKeys())
+                nvc.Remove(s);
+            return nvc;
         }
 
   
     }
 
 
-    public class PsdVirtualFile : VirtualFile,IVirtualFile, IVirtualFileWithModifiedDate, IVirtualBitmapFile
+    public class PsdVirtualFile : IVirtualFile, IVirtualBitmapFile
     {
   
         private PsdComposerPlugin provider;
 
         private Nullable<bool> _exists = null;
-        private Nullable<DateTime> _fileModifiedDate = null;
+        //private Nullable<DateTime> _fileModifiedDate = null;
 
         /// <summary>
         /// Returns true if the row exists. 
@@ -454,37 +415,41 @@ namespace ImageResizer.Plugins.PsdComposer
         public bool Exists
         {
             get {
-                if (_exists == null) _exists = provider.FileExists(this.VirtualPath);
+                if (_exists == null) _exists = provider.FileExists(this.VirtualPath, this.Query);
                 return _exists.Value;
             }
         }
 
-        public PsdVirtualFile(string virtualPath, PsdComposerPlugin provider)
-            : base(virtualPath)
+        public PsdVirtualFile(string virtualPath, NameValueCollection query, PsdComposerPlugin provider)
         {
             this.provider = provider;
+            this._virtualPath = virtualPath;
+            this._query = query;
+
+        }
+
+        private string _virtualPath = null;
+
+        public string VirtualPath {
+            get { return _virtualPath; }
+        }
+        private NameValueCollection _query;
+
+        public NameValueCollection Query {
+            get { return _query; }
+            set { _query = value; }
         }
 
         /// <summary>
         /// Returns a stream of the encoded file bitmap using the current request querystring.
         /// </summary>
         /// <returns></returns>
-        public override Stream Open() { return provider.ComposeStream(this.VirtualPath, provider.c.Pipeline.ModifiedQueryString); }
+        public  Stream Open() { return provider.ComposeStream(this.VirtualPath, this.Query); }
         /// <summary>
         /// Returns a composed bitmap of the file using request querystring paramaters.
         /// </summary>
         /// <returns></returns>
-        public System.Drawing.Bitmap GetBitmap() { return provider.ComposeBitmap(this.VirtualPath, provider.c.Pipeline.ModifiedQueryString); }
+        public System.Drawing.Bitmap GetBitmap() { return provider.ComposeBitmap(this.VirtualPath, this.Query); }
 
-        /// <summary>
-        /// Returns the last modified date of the row. Cached for performance.
-        /// </summary>
-        public DateTime ModifiedDateUTC{
-            get{
-                if (_fileModifiedDate == null) _fileModifiedDate = System.IO.File.GetLastWriteTimeUtc(PsdComposerPlugin.GetPhysicalPath(this.VirtualPath));
-                return _fileModifiedDate.Value;
-            }
-        }
-      
     }
 }

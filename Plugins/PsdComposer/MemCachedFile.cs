@@ -99,7 +99,9 @@ namespace ImageResizer.Plugins.PsdComposer
                 }
                 else
                 {
-                    file = provider != null ? new MemCachedFile(provider.GetFile(path, queryString)) : new MemCachedFile(path);
+                    IVirtualFile vfile = provider != null ? provider.GetFile(path, queryString) : null;
+                    if (vfile == null) throw new FileNotFoundException("The specified virtual file could not be found: \"" + path + "\" Associated querystring: \"" + PathUtils.BuildQueryString(queryString) + "\".");
+                    file = vfile != null ? new MemCachedFile(vfile) : new MemCachedFile(path);
                     if (provider == null)
                         HttpContext.Current.Cache.Insert(key, file, new CacheDependency(path));
                     else
