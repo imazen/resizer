@@ -17,6 +17,13 @@ namespace PhotoshopFile.Text
             l = layer;
         }
 
+        private bool _ignoreMissingFonts = true;
+
+        public bool IgnoreMissingFonts {
+            get { return _ignoreMissingFonts; }
+            set { _ignoreMissingFonts = value; }
+        }
+
         public void Render(Graphics g, Nullable<Color> overlayColor, string replacementText)
         {
 
@@ -132,7 +139,14 @@ namespace PhotoshopFile.Text
                     //Remove from fontName
                     fontName = new Regex("\\-(Bold|Italic|BoldItalic)$", RegexOptions.IgnoreCase | RegexOptions.IgnoreCase).Replace(fontName, "");
                     //Find font family
-                    fontFamily = new FontFamily(fontName);
+                    try {
+                        fontFamily = new FontFamily(fontName);
+                    } catch (ArgumentException ae) {
+                        if (IgnoreMissingFonts) {
+                            fontFamily = FontFamily.GenericSansSerif;
+                        } else throw ae;
+
+                    }
                     if (fauxBold) style |= FontStyle.Bold;
                     if (fauxItalic) style |= FontStyle.Italic;
                     if (underline) style |= FontStyle.Underline;
