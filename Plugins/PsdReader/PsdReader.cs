@@ -6,6 +6,7 @@ using PhotoshopFile;
 using System.Web;
 using System.IO;
 using System;
+using System.Globalization;
 namespace ImageResizer.Plugins.PsdReader {
     public class PsdReader : ImageResizer.Resizing.BuilderExtension, IPlugin, IFileExtensionPlugin {
 
@@ -40,7 +41,7 @@ namespace ImageResizer.Plugins.PsdReader {
 
             //How fast?
             swRender.Stop();
-            trace("Parsing and rendering PSD to a Bitmap instance took " + swRender.ElapsedMilliseconds.ToString() + "ms");
+            trace("Parsing and rendering PSD to a Bitmap instance took " + swRender.ElapsedMilliseconds.ToString(NumberFormatInfo.InvariantInfo) + "ms");
 
             return b;
         }
