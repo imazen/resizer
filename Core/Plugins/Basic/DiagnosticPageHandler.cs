@@ -105,6 +105,27 @@ namespace ImageResizer.Plugins.Basic {
                     bundlesUsed[((BundleAttribute)attrs[0]).Value] = true;
                 }
             }
+            //Support multiple bundle ownership
+            List<string> keys = new List<string>(bundlesUsed.Keys);
+            foreach (string s in keys) {
+                if (s.IndexOf(',') > -1) {
+                    bool found = false;
+                    string[] bundles = s.Split(',');
+                    foreach (string b in bundles) {
+                        if (bundlesUsed.ContainsKey(b.Trim())) {
+                            bundlesUsed[b.Trim()] = true;
+                            bundlesUsed.Remove(s);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        //Ok, so none of those bundles are used elsewhere. Use the first bundle listed.
+                        bundlesUsed[bundles[0].Trim()] = true;
+                        bundlesUsed.Remove(s);
+                    }
+                }
+            }
 
             Dictionary<string, string> friendlyNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             friendlyNames.Add("R3Bundle1", "Performance Bundle");
