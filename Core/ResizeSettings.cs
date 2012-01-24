@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using System.Drawing;
 using ImageResizer.Resizing;
 using ImageResizer.Util;
+using System.Globalization;
 
 namespace ImageResizer {
     /// <summary>
@@ -46,10 +47,10 @@ namespace ImageResizer {
 
 
         protected int get(string name, int defaultValue){ return Utils.getInt(this,name,defaultValue);}
-        protected void set(string name, int value) { this[name] = value.ToString(); }
+        protected void set(string name, int value) { this[name] = value.ToString(NumberFormatInfo.InvariantInfo); }
 
         protected double get(string name, double defaultValue) { return Utils.getDouble(this, name, defaultValue); }
-        protected void set(string name, double value) { this[name] = value.ToString(); }
+        protected void set(string name, double value) { this[name] = value.ToString(NumberFormatInfo.InvariantInfo); }
 
         /// <summary>
         /// ["width"]: Sets the desired width of the image. (minus padding, borders, margins, effects, and rotation). 
@@ -335,13 +336,13 @@ namespace ImageResizer {
         /// This can be set to any non-negative value. Very useful for performing cropping when the original image size is unknown.
         /// 0 indicates that the crop values are relative to the original size of the image.
         /// </summary>
-        public double CropXUnits { get { return Utils.parseCropUnits(this["cropxunits"]).Value; } set { this["cropxunits"] = value <= 0 ? "sourcepixels" : value.ToString(); } }
+        public double CropXUnits { get { return Utils.parseCropUnits(this["cropxunits"]).Value; } set { this["cropxunits"] = value <= 0 ? "sourcepixels" : value.ToString(NumberFormatInfo.InvariantInfo); } }
         /// <summary>
         /// The width which the Y and Y2 crop values should be applied. For example, a value of '100' makes Y and Y2 percentages of the original image height.
         /// This can be set to any non-negative  value. Very useful for performing cropping when the original image size is unknown.
         /// 0 indicates that the crop values are relative to the original size of the image.
         /// </summary>        
-        public double CropYUnits { get { return Utils.parseCropUnits(this["cropyunits"]).Value; } set { this["cropyunits"] = value <= 0 ? "sourcepixels" : value.ToString(); } }
+        public double CropYUnits { get { return Utils.parseCropUnits(this["cropyunits"]).Value; } set { this["cropyunits"] = value <= 0 ? "sourcepixels" : value.ToString(NumberFormatInfo.InvariantInfo); } }
 
 
         public RectangleF getCustomCropSourceRect(SizeF imageSize) {

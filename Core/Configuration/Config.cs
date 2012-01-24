@@ -13,6 +13,7 @@ using ImageResizer.Configuration.Xml;
 using System.Web;
 using ImageResizer.Collections;
 using System.IO;
+using System.Globalization;
 
 
 namespace ImageResizer.Configuration {
@@ -181,15 +182,15 @@ namespace ImageResizer.Configuration {
         }
         public int get(string selector, int defaultValue) {
             int i;
-            string s = cs.getAttr(selector, defaultValue.ToString());
-            if (int.TryParse(s, out i)) return i;
+            string s = cs.getAttr(selector, defaultValue.ToString(NumberFormatInfo.InvariantInfo));
+            if (int.TryParse(s, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i)) return i;
             else configurationSectionIssues.AcceptIssue(
                 new Issue("Invalid integer value in imageresizer configuration section, " + selector + ":" + s, IssueSeverity.ConfigurationError));
             return defaultValue;
         }
 
         public bool get(string selector, bool defaultValue) {
-            string s = cs.getAttr(selector, defaultValue.ToString());
+            string s = cs.getAttr(selector, defaultValue.ToString(NumberFormatInfo.InvariantInfo));
 
             if ("true".Equals(s, StringComparison.OrdinalIgnoreCase) ||
                 "1".Equals(s, StringComparison.OrdinalIgnoreCase) ||

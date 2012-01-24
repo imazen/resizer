@@ -188,8 +188,8 @@ namespace ImageResizer {
                 string result = resolver(p);
                 if (result != null) return result;
                 //GUID in lowercase hexadecimal with no hyphens
-                if ("guid".Equals(p, StringComparison.OrdinalIgnoreCase)) 
-                    return Guid.NewGuid().ToString("N"); 
+                if ("guid".Equals(p, StringComparison.OrdinalIgnoreCase))
+                    return Guid.NewGuid().ToString("N", NumberFormatInfo.InvariantInfo); 
                 //Access to the settings collection
                 string settingsPrefix = "settings.";
                 if (p.StartsWith(settingsPrefix, StringComparison.OrdinalIgnoreCase)) {

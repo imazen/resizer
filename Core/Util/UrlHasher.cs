@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 using System.Security.Cryptography;
+using System.Globalization;
 
 namespace ImageResizer.Util {
     public class UrlHasher {
@@ -59,7 +60,7 @@ namespace ImageResizer.Util {
         protected string Base16Encode(byte[] bytes) {
             StringBuilder sb = new StringBuilder(bytes.Length * 2);
             foreach (byte b in bytes)
-                sb.Append(b.ToString("x").PadLeft(2, '0'));
+                sb.Append(b.ToString("x", NumberFormatInfo.InvariantInfo).PadLeft(2, '0'));
             return sb.ToString();
         }
     }

@@ -9,6 +9,7 @@ using System.Collections.Specialized;
 using ImageResizer.Plugins;
 using ImageResizer.Encoding;
 using ImageResizer.Resizing;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
@@ -42,7 +43,7 @@ namespace ImageResizer.Plugins.Basic {
             //parse quality;
             int quality = 90;
             if (!string.IsNullOrEmpty(settings["quality"]))
-                if (int.TryParse(settings["quality"], out quality))
+                if (int.TryParse(settings["quality"], NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out quality))
                     this.Quality = quality;
 
         }
