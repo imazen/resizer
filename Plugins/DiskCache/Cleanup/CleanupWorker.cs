@@ -8,6 +8,7 @@ using System.IO;
 using ImageResizer.Configuration.Issues;
 using System.Diagnostics;
 using ImageResizer.Configuration.Logging;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.DiskCache {
     public class CleanupWorker : IssueSink, IDisposable {
@@ -89,7 +90,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// </summary>
         protected void mainInner(){
             //TODO: Verify that GetHashCode() is the same between .net 2 and 4. 
-            string mutexKey = "ir.cachedir:" + cache.PhysicalCachePath.ToLowerInvariant().GetHashCode().ToString("x");
+            string mutexKey = "ir.cachedir:" + cache.PhysicalCachePath.ToLowerInvariant().GetHashCode().ToString("x", NumberFormatInfo.InvariantInfo);
 
             //Sleep for the duration requested before trying anything. 
             _quitWait.WaitOne(cs.StartupDelay);
@@ -251,7 +252,7 @@ namespace ImageResizer.Plugins.DiskCache {
                 FlushAccessedDate(item);
 
             if (lp.Logger != null) sw.Stop();
-            if (lp.Logger != null) lp.Logger.Trace("{2}ms: Executing task {0} {1} ({3} tasks remaining)", item.Task.ToString(), item.RelativePath, sw.ElapsedMilliseconds.ToString().PadLeft(4), queue.Count.ToString());
+            if (lp.Logger != null) lp.Logger.Trace("{2}ms: Executing task {0} {1} ({3} tasks remaining)", item.Task.ToString(), item.RelativePath, sw.ElapsedMilliseconds.ToString(NumberFormatInfo.InvariantInfo).PadLeft(4), queue.Count.ToString(NumberFormatInfo.InvariantInfo));
 
             
         }
@@ -270,7 +271,7 @@ namespace ImageResizer.Plugins.DiskCache {
                     sw.Start();
                     cache.Index.populate(item.RelativePath, item.PhysicalPath);
                     sw.Stop();
-                    lp.Logger.Trace("{0}ms: Querying filesystem about {1}", sw.ElapsedMilliseconds.ToString().PadLeft(4), item.RelativePath);
+                    lp.Logger.Trace("{0}ms: Querying filesystem about {1}", sw.ElapsedMilliseconds.ToString(NumberFormatInfo.InvariantInfo).PadLeft(4), item.RelativePath);
                 } else 
                     cache.Index.populate(item.RelativePath, item.PhysicalPath);
             }
