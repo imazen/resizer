@@ -6,6 +6,7 @@ using ImageResizer.Resizing;
 using System.Drawing.Imaging;
 using System.Drawing;
 using ImageResizer.Util;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.SimpleFilters {
     public class SimpleFilters : BuilderExtension, IPlugin, IQuerystringPlugin {
@@ -65,10 +66,10 @@ namespace ImageResizer.Plugins.SimpleFilters {
             string saturation = s.settings["s.saturation"];
 
             double temp = 0;
-            if (!string.IsNullOrEmpty(alpha) && double.TryParse(alpha, out temp)) filters.Add(Alpha((float)temp));
-            if (!string.IsNullOrEmpty(brightness) && double.TryParse(brightness, out temp)) filters.Add(Brightness((float)temp));
-            if (!string.IsNullOrEmpty(contrast) && double.TryParse(contrast, out temp)) filters.Add(Contrast((float)temp));
-            if (!string.IsNullOrEmpty(saturation) && double.TryParse(saturation, out temp)) filters.Add(Saturation((float)temp));
+            if (!string.IsNullOrEmpty(alpha) && double.TryParse(alpha, Utils.floatingPointStyle,NumberFormatInfo.InvariantInfo,out temp)) filters.Add(Alpha((float)temp));
+            if (!string.IsNullOrEmpty(brightness) && double.TryParse(brightness, Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo, out temp)) filters.Add(Brightness((float)temp));
+            if (!string.IsNullOrEmpty(contrast) && double.TryParse(contrast, Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo, out temp)) filters.Add(Contrast((float)temp));
+            if (!string.IsNullOrEmpty(saturation) && double.TryParse(saturation, Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo, out temp)) filters.Add(Saturation((float)temp));
 
 
             if (filters.Count == 0) return RequestedAction.None;

@@ -6,6 +6,7 @@ using FreeImageAPI;
 using System.Drawing;
 using ImageResizer.Plugins.Basic;
 using System.Drawing.Imaging;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.FreeImageEncoder {
     public class FreeImageEncoderPlugin : IPlugin, IEncoder {
@@ -38,7 +39,7 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
 
             //Parse JPEG settings.
             int quality = 90;
-            if (string.IsNullOrEmpty(settings["quality"]) || !int.TryParse(settings["quality"], out quality)) quality = 90;
+            if (string.IsNullOrEmpty(settings["quality"]) || !int.TryParse(settings["quality"], NumberStyles.Number, NumberFormatInfo.InvariantInfo, out quality)) quality = 90;
             if (format == FREE_IMAGE_FORMAT.FIF_JPEG) {
                 if (quality >= 100) encodingOptions |= FREE_IMAGE_SAVE_FLAGS.JPEG_QUALITYSUPERB;
                 else if (quality >= 75) 
@@ -55,7 +56,7 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
                 if ("422".Equals(settings["subsampling"])) encodingOptions |= FREE_IMAGE_SAVE_FLAGS.JPEG_SUBSAMPLING_422;
                 if ("444".Equals(settings["subsampling"])) encodingOptions |= FREE_IMAGE_SAVE_FLAGS.JPEG_SUBSAMPLING_444;
             }
-            if (string.IsNullOrEmpty(settings["colors"]) || !int.TryParse(settings["colors"], out colors)) colors = -1;
+            if (string.IsNullOrEmpty(settings["colors"]) || !int.TryParse(settings["colors"], NumberStyles.Number, NumberFormatInfo.InvariantInfo, out colors)) colors = -1;
 
 
             if (format == FREE_IMAGE_FORMAT.FIF_GIF) {

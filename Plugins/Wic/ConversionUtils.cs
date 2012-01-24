@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Drawing.Imaging;
 using Microsoft.Win32.SafeHandles;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.Wic {
     public class ConversionUtils {
@@ -65,7 +66,7 @@ namespace ImageResizer.Plugins.Wic {
                     }
                     if (string.IsNullOrEmpty(bpp)) continue;
                     int ibpp;
-                    if (int.TryParse(bpp, out ibpp)) d[key] = ibpp;
+                    if (int.TryParse(bpp, NumberStyles.Number, NumberFormatInfo.InvariantInfo, out ibpp)) d[key] = ibpp;
                 }
                 _bppDict = d;
             }

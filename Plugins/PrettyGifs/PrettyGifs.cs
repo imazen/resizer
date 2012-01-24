@@ -12,6 +12,7 @@ using ImageResizer.Plugins.Basic;
 using System.Security.Permissions;
 using System.Security;
 using ImageResizer.Util;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.PrettyGifs {
     public class PrettyGifs :IEncoder, IPlugin, IQuerystringPlugin {
@@ -28,7 +29,7 @@ namespace ImageResizer.Plugins.PrettyGifs {
             //Parse colors
             int colors = -1;
             if (!string.IsNullOrEmpty(q["colors"]))
-                if (int.TryParse(q["colors"], out colors))
+                if (int.TryParse(q["colors"], NumberStyles.Integer,NumberFormatInfo.InvariantInfo, out colors))
                     this.Colors = colors;
             //Parse dither settings
             if (!string.IsNullOrEmpty(q["dither"])) {
@@ -38,7 +39,7 @@ namespace ImageResizer.Plugins.PrettyGifs {
                     this.FourPassDither = true;
                 else {
                     int dither;
-                    if (int.TryParse(q["dither"], out dither)) {
+                    if (int.TryParse(q["dither"], NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out dither)) {
                         DitherPercent = dither;
                         Dither = true;
                     }
