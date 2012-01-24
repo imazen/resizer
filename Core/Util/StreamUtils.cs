@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 
 namespace ImageResizer.Util {
     public class StreamUtils {
@@ -46,6 +47,41 @@ namespace ImageResizer.Util {
             } else
                 CopyTo(src,(Stream)dest);
         }
+        /// <summary>
+        /// Copies the remaining portion of the specified stream to a byte array of exact size.
+        /// </summary>
+        /// <param name="src"></param>
+        /// <returns></returns>
+        public static byte[] CopyToBytes(Stream src) {
+            byte[] bytes;
+            if (src is MemoryStream) {
+                MemoryStream ms = src as MemoryStream;
+                try{
+                    byte[] buffer = ms.GetBuffer();
+                    long count =src.Length - src.Position;
+                    bytes = new byte[src.Length - src.Position];
+                    Array.Copy(buffer, src.Position, bytes, 0, count);
+                    return bytes;
+                }catch(UnauthorizedAccessException)
+                {}
+            }
+            // Read the source file into a byte array.
+            int numBytesToRead = (int)(src.Length - src.Position);
+            bytes = new byte[numBytesToRead];
+            int numBytesRead = 0;
+            while (numBytesToRead > 0) {
+                // Read may return anything from 0 to numBytesToRead.
+                int n = src.Read(bytes, numBytesRead, numBytesToRead);
 
+                // Break when the end of the file is reached.
+                if (n == 0)
+                    break;
+
+                numBytesRead += n;
+                numBytesToRead -= n;
+            }
+            Debug.Assert(numBytesRead == bytes.Length);
+            return bytes;
+        }
     }
 }
