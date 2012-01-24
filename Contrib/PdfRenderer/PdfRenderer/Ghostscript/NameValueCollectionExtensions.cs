@@ -13,6 +13,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Specialized;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
 {
@@ -25,7 +26,7 @@ namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
                 if(!string.IsNullOrEmpty(collection[name]))
                 {
                     int value;
-                    if(int.TryParse(collection[name], out value))
+                    if(int.TryParse(collection[name],NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out value))
                     {
                         return value;
                     }
