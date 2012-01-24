@@ -5,6 +5,9 @@ using System.Web;
 using System.IO;
 using System.Web.Caching;
 using System.Diagnostics;
+using ImageResizer.Configuration;
+using System.Collections.Specialized;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.PsdComposer
 {
@@ -49,6 +52,14 @@ namespace ImageResizer.Plugins.PsdComposer
         {
             return new MemoryStream(data,false);
         }
+        MemCachedFile( IVirtualFile file ) {
+            if (file == null) throw new FileNotFoundException();
+            this.path = file.VirtualPath;
+
+            using (Stream s = file.Open()) {
+                this.data = StreamUtils.CopyToBytes(s);
+            }
+        }
         /// <summary>
         /// Reads the file into memory 
         /// </summary>
@@ -60,26 +71,9 @@ namespace ImageResizer.Plugins.PsdComposer
             sw.Start();
 
             this.path = physicalPath;
-            using (System.IO.FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+            using (System.IO.FileStream fs = new FileStream(physicalPath, FileMode.Open, FileAccess.Read))
             {
-                // Read the source file into a byte array.
-                byte[] bytes = new byte[fs.Length];
-                int numBytesToRead = (int)fs.Length;
-                int numBytesRead = 0;
-                while (numBytesToRead > 0)
-                {
-                    // Read may return anything from 0 to numBytesToRead.
-                    int n = fs.Read(bytes, numBytesRead, numBytesToRead);
-
-                    // Break when the end of the file is reached.
-                    if (n == 0)
-                        break;
-
-                    numBytesRead += n;
-                    numBytesToRead -= n;
-                }
-                Debug.Assert(numBytesRead == bytes.Length);
-                this.data = bytes;
+                this.data = StreamUtils.CopyToBytes(fs);
             }
 
             sw.Stop();
@@ -93,8 +87,9 @@ namespace ImageResizer.Plugins.PsdComposer
         /// </summary>
         private static Dictionary<string, MemCachedFile> _fallbackCache = new Dictionary<string, MemCachedFile>();
 
-        public static MemCachedFile GetCachedFile(string physicalPath){
-            string key = getCacheKey(physicalPath);
+        
+        public static MemCachedFile GetCachedVirtualFile(string path, IVirtualImageProvider provider, NameValueCollection queryString){
+            string key = provider != null ? getVirtualCacheKey(path,queryString) : getCacheKey(path);
             MemCachedFile file = null;
             if (HttpContext.Current != null)
             {
@@ -104,8 +99,11 @@ namespace ImageResizer.Plugins.PsdComposer
                 }
                 else
                 {
-                    file = new MemCachedFile(physicalPath);
-                    HttpContext.Current.Cache.Insert(key, file, new CacheDependency(physicalPath));
+                    file = provider != null ? new MemCachedFile(provider.GetFile(path, queryString)) : new MemCachedFile(path);
+                    if (provider == null)
+                        HttpContext.Current.Cache.Insert(key, file, new CacheDependency(path));
+                    else
+                        HttpContext.Current.Cache.Insert(key, file);
                 }
             }
             else
@@ -115,7 +113,7 @@ namespace ImageResizer.Plugins.PsdComposer
                     if (_fallbackCache.ContainsKey(key)) file = _fallbackCache[key];
                     else
                     {
-                        file = new MemCachedFile(physicalPath);
+                        file = provider != null ? new MemCachedFile(provider.GetFile(path, queryString)) : new MemCachedFile(path);
                         _fallbackCache[key] = file;
                     }
                 }
@@ -125,6 +123,9 @@ namespace ImageResizer.Plugins.PsdComposer
         private static string getCacheKey(string physicalPath)
         {
             return "MemCachedFile:" + physicalPath.ToLowerInvariant();
+        }
+        private static string getVirtualCacheKey(string virtualPath, NameValueCollection query) {
+            return "MemCachedVirtualFile:" + virtualPath.ToLowerInvariant() + PathUtils.BuildQueryString(query);
         }
     }
 }
