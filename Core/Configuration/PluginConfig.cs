@@ -281,6 +281,34 @@ namespace ImageResizer.Configuration {
             }
         }
 
+        /// <summary>
+        /// This is called to get a sorted list of plugins based on their likelyhood of having the plugin.
+        /// </summary>
+        /// <param name="assemblyName"></param>
+        /// <param name="pluginName"></param>
+        /// <returns></returns>
+        protected List<string> GetOptimizedAssemblyList(string assemblyName, string pluginName) {
+            List<string> assemblies = new List<string>();
+            //1) If an assembly was specified, search it first
+            if (assemblyName != null) assemblies.Add(assemblyName);
+            //2) Follow by searching the Core, the currently executing assembly
+            assemblies.Add(""); // Defaults to current assembly
+
+            //3) Next, add all assemblies that have "ImageResizer" in their name 
+
+
+            List<string> otherAssemblies = new List<string>();
+            //Add ImageResizer-related assemblies first
+            foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies()) {// AppDomain.CurrentDomain.GetAssemblies()
+                string aname = a.FullName;
+                if (aname.IndexOf("ImageResizer", StringComparison.OrdinalIgnoreCase) > -1) assemblies.Add(", " + aname);
+                else
+                    otherAssemblies.Add(", " + aname);
+            }
+            //4) Last, add all remaining assemblies
+            assemblies.AddRange(otherAssemblies);
+            return assemblies;
+        }
 
         /// <summary>
         /// Searches all loaded assemblies for the specified type, applying rules and prefixes to resolve the namespace and assembly.
@@ -327,23 +355,8 @@ namespace ImageResizer.Configuration {
             //PluginWithNoNamespace
             if (!hasDot) alternateNames.Add(name);
 
-            List<string> assemblies = new List<string>();
-            //1) If an assembly was specified, search it first
-            if (assembly != null) assemblies.Add(assembly);
-            //2) Follow by searching the Core, the currently executing assembly
-            assemblies.Add(""); // Defaults to current assembly
-            //3) Next, add all assemblies that have "ImageResizer" in their name 
-            List<string> otherAssemblies = new List<string>();
-            //Add ImageResizer-related assemblies first
-            foreach (Assembly a in BuildManager.GetReferencedAssemblies()) {// AppDomain.CurrentDomain.GetAssemblies()
-                string aname = a.FullName;
-                if (aname.IndexOf("ImageResizer", StringComparison.OrdinalIgnoreCase) > -1) assemblies.Add(", " + aname);
-                else
-                    otherAssemblies.Add(", " + aname);
-            }
-            //4) Last, add all remaining assemblies
-            assemblies.AddRange(otherAssemblies);
-
+            //Get a list of assemblies, sorted by likelyhood of a match
+            List<string> assemblies = GetOptimizedAssemblyList(assembly,name);
             //Now multiply 
             List<string> qualifiedNames = new List<string>(assemblies.Count * alternateNames.Count);
 
