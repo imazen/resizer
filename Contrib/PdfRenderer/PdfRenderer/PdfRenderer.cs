@@ -205,7 +205,9 @@ namespace ImageResizer.Plugins.PdfRenderer
                 }
 
                 // Get the output size of the generated bitmap by applying the resize settings and media box.
-                Size outputSize = GetOutputSize(settings, pageInfo.MediaBox);
+                Size outputSize = (pageInfo.Rotate == -90 || pageInfo.Rotate == 90) ? 
+                    GetOutputSize(settings, pageInfo.MediaBox.Height,pageInfo.MediaBox.Width) 
+                    : GetOutputSize(settings, pageInfo.MediaBox.Width, pageInfo.MediaBox.Height) ;
 
 
                 
@@ -309,7 +311,7 @@ namespace ImageResizer.Plugins.PdfRenderer
             return _queryStringKeys;
         }
 
-        private Size GetOutputSize(ResizeSettings settings, BoundingBox boundingBox)
+        private Size GetOutputSize(ResizeSettings settings, double boundingWidth, double boundingHeight)
         {
             // Output size is determined by resize settings, if available.
             //  maxwidth, maxheight 
@@ -321,7 +323,7 @@ namespace ImageResizer.Plugins.PdfRenderer
             // pipeline to perform and additional processing such as adding whitespace, etc.
             // It can safely treat width/height as maxwidth/maxheight.
 
-            double imageRatio = boundingBox.Width / boundingBox.Height;
+            double imageRatio = boundingWidth / boundingHeight;
             double width = settings.Width;
             double height = settings.Height;
             double maxwidth = settings.MaxWidth;
@@ -355,7 +357,7 @@ namespace ImageResizer.Plugins.PdfRenderer
             // Determine the scaling values, and use the smallest to ensure we fit in the bounding box without changing 
             // the aspect ratio otherwise we will crop.
             //Use a scaled version of boundingBox inside our maximum width and height constraints.
-            return PolygonMath.RoundPoints(PolygonMath.ScaleInside(new SizeF((float)boundingBox.Width, (float)boundingBox.Height), new SizeF((float)width, (float)height)));
+            return PolygonMath.RoundPoints(PolygonMath.ScaleInside(new SizeF((float)boundingWidth, (float)boundingHeight), new SizeF((float)width, (float)height)));
         }
 
         private PdfInfo GetPdfInfo(string path)
