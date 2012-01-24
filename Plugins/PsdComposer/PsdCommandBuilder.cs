@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Collections.Specialized;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.PsdComposer
 {
@@ -12,10 +13,10 @@ namespace ImageResizer.Plugins.PsdComposer
     /// </summary>
     public class PsdCommandBuilder 
     {
-        public Dictionary<string, Color> layerColors = new Dictionary<string, Color>(StringComparer.CurrentCultureIgnoreCase);
-        public Dictionary<string, bool> layerVisibility = new Dictionary<string, bool>(StringComparer.CurrentCultureIgnoreCase);
-        public Dictionary<string, bool> layerRedraw = new Dictionary<string, bool>(StringComparer.CurrentCultureIgnoreCase);
-        public Dictionary<string, string> layerText = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+        public Dictionary<string, Color> layerColors = new Dictionary<string, Color>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, bool> layerVisibility = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, bool> layerRedraw = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, string> layerText = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         /// <summary>
         /// Set the renderer. graphicsmill and psdplugin are the currently supported values
         /// </summary>
@@ -52,7 +53,7 @@ namespace ImageResizer.Plugins.PsdComposer
             
             for (int i = 0; i < parts.Length - 1; i += 2)
             {
-                dict.Add(Base64UrlDecode(parts[i]), System.Drawing.Color.FromArgb(int.Parse(parts[i + 1], System.Globalization.NumberStyles.HexNumber)));
+                dict.Add(Base64UrlDecode(parts[i]), System.Drawing.Color.FromArgb(int.Parse(parts[i + 1], System.Globalization.NumberStyles.HexNumber,NumberFormatInfo.InvariantInfo)));
             }
             return dict;
         }
@@ -63,7 +64,7 @@ namespace ImageResizer.Plugins.PsdComposer
             {
                 sb.Append(Base64UrlEncode(p.Key));
                 sb.Append("|");
-                sb.Append(p.Value.ToArgb().ToString("x"));
+                sb.Append(p.Value.ToArgb().ToString("x", NumberFormatInfo.InvariantInfo));
                 sb.Append("|");
             }
             return sb.ToString();
@@ -71,7 +72,8 @@ namespace ImageResizer.Plugins.PsdComposer
         public Dictionary<string, string> parseStringDict(string str)
         {
             if (string.IsNullOrEmpty(str)) return new Dictionary<string, string>();
-            string[] parts = str.Trim('|').Split('|');
+            if (str.EndsWith("|")) str = str.Substring(0, str.Length - 1);
+            string[] parts = str.Split(new char[]{'|'},StringSplitOptions.None);
 
             if (parts.Length % 2 != 0) throw new ArgumentException("Invalid string! Must have an even number of parts.");
             Dictionary<string, string> dict = new Dictionary<string, string>();
@@ -89,7 +91,7 @@ namespace ImageResizer.Plugins.PsdComposer
             {
                 sb.Append(Base64UrlEncode(p.Key));
                 sb.Append("|");
-                sb.Append(Base64UrlEncode(p.Value));
+                sb.Append(Base64UrlEncode(p.Value != null ? p.Value : ""));
                 sb.Append("|");
             }
             return sb.ToString();
@@ -157,10 +159,12 @@ namespace ImageResizer.Plugins.PsdComposer
 
         private string Base64UrlEncode(string s)
         {
+            if (string.IsNullOrEmpty(s)) return s;
             return Convert.ToBase64String(new System.Text.UTF8Encoding().GetBytes(s)).Replace('+', '-').Replace('/', '_');
         }
         private string Base64UrlDecode(string s)
         {
+            if (string.IsNullOrEmpty(s)) return s;
             return new System.Text.UTF8Encoding().GetString(Convert.FromBase64String(s.Replace('-', '+').Replace('_', '/')));
         }
 
@@ -228,22 +232,21 @@ namespace ImageResizer.Plugins.PsdComposer
 
         public string getFirstMatchingWildcard(string layer, string[] wildcards)
         {
-            layer = layer.ToLowerInvariant();
             foreach (string s in wildcards)
             {
                 if (s.Equals("*")) return s; //Only used by unit tests
 
-                string trimmed = s.ToLowerInvariant().Trim('*');
+                string trimmed = s.Trim('*');
                 //Contains query
                 if (s.StartsWith("*") && s.EndsWith("*"))
                 {
-                    if (layer.Contains(trimmed)) return s;
+                    if (layer.IndexOf(trimmed,StringComparison.OrdinalIgnoreCase) > -1) return s;
                 }else if (s.StartsWith("*")){
-                    if (layer.EndsWith(trimmed)) return s;
+                    if (layer.EndsWith(trimmed, StringComparison.OrdinalIgnoreCase)) return s;
                 }
                 else if (s.EndsWith("*"))
                 {
-                    if (layer.StartsWith(trimmed)) return s;
+                    if (layer.StartsWith(trimmed, StringComparison.OrdinalIgnoreCase)) return s;
                 }
             }
             return null;
