@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Drawing;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace PhotoshopFile.Text
 {
@@ -60,7 +61,7 @@ namespace PhotoshopFile.Text
             m = arrayNotation.Match(selector);
             if (m != null && m.Success)
             {
-                int index = int.Parse(m.Groups["index"].Value);
+                int index = int.Parse(m.Groups["index"].Value,NumberStyles.Integer,NumberFormatInfo.InvariantInfo);
                 return query(((List<object>)tree)[index], selector.Substring(m.Length));
             }
 

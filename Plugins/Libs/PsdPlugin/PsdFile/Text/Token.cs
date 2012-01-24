@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Globalization;
 
 namespace PhotoshopFile.Text
 {
@@ -110,6 +111,9 @@ namespace PhotoshopFile.Text
             throw new TdTaParseException("Hit end of stream without finding closing parenthesis!");
         }
 
+        public const NumberStyles floatingPointStyle = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite |
+            NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands | NumberStyles.AllowExponent;
+
         /// <summary>
         /// Parses tdta contents into tokens. Throws a generic exception if unrecognized tokens are encountered
         /// </summary>
@@ -165,9 +169,9 @@ namespace PhotoshopFile.Text
                         string s = sb.ToString();
                         //If it has a decimal, it's a double
                         if (s.Contains('.')){
-                            return new Token(TokenType.Double,double.Parse(s));
+                            return new Token(TokenType.Double,double.Parse(s, floatingPointStyle,NumberFormatInfo.InvariantInfo));
                         }else{ 
-                            return new Token(TokenType.Integer,int.Parse(s));
+                            return new Token(TokenType.Integer,int.Parse(s,NumberStyles.Integer,NumberFormatInfo.InvariantInfo,));
                         }
                         
                     }else if (Char.IsDigit(c) || c=='-' || c == '.'){
