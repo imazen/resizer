@@ -6,6 +6,7 @@ using System.Drawing;
 using ImageResizer.Util;
 using System.Text.RegularExpressions;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 
 namespace ImageResizer.Plugins.Watermark {
     public class TextLayer:Layer {
@@ -24,6 +25,15 @@ namespace ImageResizer.Plugins.Watermark {
                 Style = Utils.parseEnum<FontStyle>(attrs["style"], this.Style);
                 OutlineWidth = Utils.getInt(attrs, "outlineWidth", OutlineWidth);
                 GlowWidth = Utils.getInt(attrs, "glowWidth", GlowWidth);
+                Rendering = Utils.parseEnum<TextRenderingHint>(attrs["rendering"], this.Rendering);
+        }
+
+
+        private TextRenderingHint _rendering = TextRenderingHint.AntiAliasGridFit;
+
+        public TextRenderingHint Rendering {
+            get { return _rendering; }
+            set { _rendering = value; }
         }
 
         private string _text = "";
@@ -129,7 +139,7 @@ namespace ImageResizer.Plugins.Watermark {
         public Font GetFont() {
             FontFamily ff = string.IsNullOrEmpty(Font) ? FontFamily.GenericSansSerif : new FontFamily(Font);
             
-            return new Font(ff, FontSize, FontStyle.Bold, GraphicsUnit.Pixel);
+            return new Font(ff, FontSize, Style, GraphicsUnit.Pixel);
 
         }
         public StringFormat GetFormat() {
@@ -178,10 +188,11 @@ namespace ImageResizer.Plugins.Watermark {
              using (Font f = GetFont()) {
 
                  s.destGraphics.SmoothingMode = SmoothingMode.HighQuality;
-                 s.destGraphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+                 s.destGraphics.TextRenderingHint = Rendering; // Utils.parseEnum<TextRenderingHint>(s.settings["watermark.rendering"], this.Rendering); ;
                  s.destGraphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
                  s.destGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-
+                 s.destGraphics.CompositingMode = CompositingMode.SourceOver;
+                 s.destGraphics.CompositingQuality = CompositingQuality.HighQuality;
 
                  s.destGraphics.ResetTransform();
                  if (Angle != 0) s.destGraphics.RotateTransform((float)Angle);
