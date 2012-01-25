@@ -65,7 +65,7 @@
     </ProjectReference>
     <ProjectReference Include="..\PdfRenderer\ImageResizer.Plugins.PdfRenderer.csproj">
       <Project>{7C8A13F7-5C00-4074-B16E-45D0E231B70D}</Project>
-      <Name>ImageResizer.Plugins.Pdf</Name>
+      <Name>ImageResizer.Plugins.PdfRenderer</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -330,6 +330,12 @@ namespace ImageResizer.Plugins.PdfRenderer
             double maxwidth = settings.MaxWidth;
             double maxheight = settings.MaxHeight;
 
+            //Allow overrides with pdfwidth and pdfheight when we *want* to rescale afterwards.
+            int pw = Utils.getInt(settings, "pdfwidth", -1);
+            int ph = Utils.getInt(settings, "pdfheight", -1);
+            if (pw > 0) { width = pw; maxwidth = -1;}
+            if (ph > 0) { height = ph; maxheight = -1; }
+
             //Handle cases of width/maxheight and height/maxwidth as in legacy versions. 
             if (width != -1 && maxheight != -1) maxheight = Math.Min(maxheight, (width / imageRatio));
             if (height != -1 && maxwidth != -1) maxwidth = Math.Min(maxwidth, (height * imageRatio));
