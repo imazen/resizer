@@ -765,6 +765,11 @@ namespace ImageResizer
             //Skip this when we are doing simulations
             if (s.destGraphics == null) return RequestedAction.None;
 
+            if (!string.IsNullOrEmpty(s.settings["filter"])) {
+
+                s.destGraphics.InterpolationMode = Utils.parseEnum<System.Drawing.Drawing2D.InterpolationMode>(s.settings["filter"], s.destGraphics.InterpolationMode);
+            }
+
             s.copyAttibutes.SetWrapMode(WrapMode.TileFlipXY);
             s.destGraphics.DrawImage(s.sourceBitmap, PolygonMath.getParallelogram(s.layout["image"]), s.copyRect, GraphicsUnit.Pixel, s.copyAttibutes);
 
@@ -888,6 +893,7 @@ namespace ImageResizer
             }
             //Save the manual crop size.
             SizeF manualCropSize = s.copySize;
+            RectangleF manualCropRect = s.copyRect;
 
             FitMode fit = s.settings.Mode;
             //Determine fit mode to use if both vertical and horizontal limits are used.
@@ -986,12 +992,13 @@ namespace ImageResizer
                 if (PolygonMath.FitsInside(manualCropSize, targetSize)) {
                     //The image is smaller or equal to its target polygon. Use original image coordinates instead.
                     areaSize = targetSize = manualCropSize;
+                    s.copyRect = manualCropRect;
                 }
             } else if (s.settings.Scale == ScaleMode.UpscaleOnly) {
                 if (!PolygonMath.FitsInside(manualCropSize, targetSize)) {
                     //The image is larger than its target. Use original image coordintes instead
                     areaSize = targetSize = manualCropSize;
-
+                    s.copyRect = manualCropRect;
                 }
             } else if (s.settings.Scale == ScaleMode.UpscaleCanvas) {
                 //Same as downscaleonly, except areaSize isn't changed.
@@ -999,6 +1006,7 @@ namespace ImageResizer
                     //The image is smaller or equal to its target polygon. Use original image coordinates instead.
 
                     targetSize = manualCropSize;
+                    s.copyRect = manualCropRect;
                 }
             }
 
