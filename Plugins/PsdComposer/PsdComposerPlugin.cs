@@ -328,7 +328,9 @@ namespace ImageResizer.Plugins.PsdComposer
 
                     if (hasText) {
                         //Re-draw the text directly, ignoring the bitmap
-                        new TextLayerRenderer(l).Render(g, color, searcher.getReplacementText(l.Name));
+                        var tlr = new TextLayerRenderer(l);
+                        tlr.IgnoreMissingFonts = !isStrictMode();
+                        tlr.Render(g, color, searcher.getReplacementText(l.Name));
                         return;
                     }
                 }
