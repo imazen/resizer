@@ -147,7 +147,7 @@ namespace ImageResizer.Plugins.Watermark
 
 
                     //If it's a forward-slash, and we're in asp.net,  verify the file exists
-                    if (slash == '/' && HttpContext.Current != null && !c.Pipeline.FileExists(watermark, layer.ImageQuery)) return RequestedAction.None;
+                    if (slash == '/' && HttpContext.Current != null && !c.Pipeline.FileExists(layer.Path, layer.ImageQuery)) return RequestedAction.None;
                     layer.RenderTo(s);
 
 
