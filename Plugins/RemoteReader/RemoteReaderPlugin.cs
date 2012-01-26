@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using ImageResizer.Configuration.Issues;
 using System.IO;
 using ImageResizer.Resizing;
+using System.Web;
 
 namespace ImageResizer.Plugins.RemoteReader {
 
@@ -25,6 +26,15 @@ namespace ImageResizer.Plugins.RemoteReader {
             get { return RemoteReaderPlugin.hmacKey; }
         }
 
+        private int _allowedRedirects = 5;
+        /// <summary>
+        /// How many redirects to follow before throwing an exception. Defaults to 5.
+        /// </summary>
+        public int AllowedRedirects {
+            get { return _allowedRedirects; }
+            set { _allowedRedirects = value; }
+        }
+
         protected string remotePrefix = "~/remote";
         Config c;
         public RemoteReaderPlugin() {
@@ -39,6 +49,8 @@ namespace ImageResizer.Plugins.RemoteReader {
             c.Plugins.add_plugin(this);
             c.Pipeline.RewriteDefaults += Pipeline_RewriteDefaults;
             c.Pipeline.PostRewrite += Pipeline_PostRewrite;
+            AllowedRedirects = c.get("remoteReader.allowedRedirects",AllowedRedirects);
+
             return this;
         }
 
@@ -231,20 +243,34 @@ namespace ImageResizer.Plugins.RemoteReader {
         /// </summary>
         /// <param name="uri"></param>
         /// <returns></returns>
-        public Stream GetUriStream(Uri uri) {
+        public Stream GetUriStream(Uri uri, int maxRedirects = -1) {
+            if (maxRedirects == -1) maxRedirects = AllowedRedirects;
 
             HttpWebResponse response = null;
             try {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
                 request.Timeout = 15000; //Default to 15 seconds. Browser timeout is usually 30.
-
+                
                 //This is IDisposable, but only disposes the stream we are returning. So we can't dispose it, and don't need to
                 response = request.GetResponse() as HttpWebResponse;
                 return response.GetResponseStream();
             } catch (WebException e) {
                 var resp = e.Response as HttpWebResponse;
-                if (e.Status == WebExceptionStatus.ProtocolError && resp != null && resp.StatusCode == HttpStatusCode.NotFound) {
-                    throw new FileNotFoundException("404 error: \"" + uri.ToString() + "\" not found.", e);
+
+                if (e.Status == WebExceptionStatus.ProtocolError && resp != null) {
+                    if (resp.StatusCode == HttpStatusCode.NotFound) throw new FileNotFoundException("404 error: \"" + uri.ToString() + "\" not found.", e);
+
+                    if (resp.StatusCode == HttpStatusCode.Forbidden) throw new HttpException(403, "403 Not Authorized (from remote server) for : \"" + uri.ToString() + "\".", e);
+                    if (resp.StatusCode == HttpStatusCode.Moved ||
+                        resp.StatusCode == HttpStatusCode.Redirect) {
+                            if (maxRedirects < 1) throw new HttpException(500, "Too many redirects, stopped while looking for \"" + uri.ToString() + "\".");
+                            string loc = resp.GetResponseHeader("Location");
+                            if (!string.IsNullOrEmpty(loc) && Uri.IsWellFormedUriString(loc, UriKind.RelativeOrAbsolute)) {
+                                Uri newLoc = Uri.IsWellFormedUriString(loc, UriKind.Absolute) ? new Uri(loc) : new Uri(uri, new Uri(loc));
+                                response.Close(); response = null; 
+                                return GetUriStream(newLoc, maxRedirects - 1);
+                            }
+                    }
                 }
                 //if (resp != null)resp.Close();
                 if (response != null) response.Close();
