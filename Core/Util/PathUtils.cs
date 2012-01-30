@@ -42,7 +42,7 @@ namespace ImageResizer.Util {
             int extensionStarts = path.IndexOf('.', firstPossibleExtensionChar, query - firstPossibleExtensionChar);
             if (extensionStarts < 0) extensionStarts = query;
 
-            return path.Substring(0, extensionStarts) + "." + newExtension.TrimStart('.') + path.Substring(query);
+            return path.Substring(0, extensionStarts) + (!string.IsNullOrEmpty(newExtension) ? "." + newExtension.TrimStart('.') : "") + path.Substring(query);
 
         }
 
