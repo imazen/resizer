@@ -93,8 +93,10 @@ namespace ImageResizer.Plugins.DiskCache {
         }
 
         public IEnumerable<IIssue> GetIssues() {
-            if (worker != null) return worker.GetIssues();
-            return new IIssue[] { };
+            List<IIssue> issues = new List<IIssue>();
+            if (worker != null) issues.AddRange(worker.GetIssues());
+            if (cs != null) issues.AddRange(cs.GetIssues());
+            return issues;
         }
 
 
