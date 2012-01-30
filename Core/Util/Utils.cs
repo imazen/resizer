@@ -196,8 +196,8 @@ namespace ImageResizer.Util {
             else if (flip == (RotateFlipType)6) {
                 if (angle == 0) return (RotateFlipType)6;
                 if (angle == 90) return (RotateFlipType)7;
-                if (angle == 180) return (RotateFlipType)5;
-                if (angle == 270) return (RotateFlipType)6;
+                if (angle == 180) return (RotateFlipType)4;
+                if (angle == 270) return (RotateFlipType)5;
             } else if (flip == (RotateFlipType)2) {
                 if (angle == 0) return (RotateFlipType)2;
                 if (angle == 90) return (RotateFlipType)3;
