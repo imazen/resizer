@@ -47,6 +47,7 @@ namespace ImageResizer.Plugins.RemoteReader {
         public IPlugin Install(Configuration.Config c) {
             this.c = c;
             c.Plugins.add_plugin(this);
+            c.Pipeline.PostAuthorizeRequestStart += Pipeline_PostAuthorizeRequestStart;
             c.Pipeline.RewriteDefaults += Pipeline_RewriteDefaults;
             c.Pipeline.PostRewrite += Pipeline_PostRewrite;
             AllowedRedirects = c.get("remoteReader.allowedRedirects",AllowedRedirects);
@@ -54,10 +55,15 @@ namespace ImageResizer.Plugins.RemoteReader {
             return this;
         }
 
+        void Pipeline_PostAuthorizeRequestStart(IHttpModule sender, HttpContext context) {
+            if (IsRemotePath(c.Pipeline.PreRewritePath)) c.Pipeline.SkipFileTypeCheck = true;
+        }
+
 
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             c.Pipeline.RewriteDefaults -= Pipeline_RewriteDefaults;
+            c.Pipeline.PostAuthorizeRequestStart -= Pipeline_PostAuthorizeRequestStart;
             c.Pipeline.PostRewrite -= Pipeline_PostRewrite;
             return true;
         }
