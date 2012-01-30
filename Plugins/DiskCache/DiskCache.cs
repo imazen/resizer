@@ -377,7 +377,24 @@ namespace ImageResizer.Plugins.DiskCache
             if (this.AsyncBufferSize < 1024 * 1024 * 2)
                 issues.Add(new Issue("DiskCache", "The asyncBufferSize should not be set below 2 megabytes (2097152). Found in the <diskcache /> element in Web.config.",
                     "A buffer that is too small will cause requests to be processed synchronously. Remember to set the value to at least 4x the maximum size of an output image.", IssueSeverity.ConfigurationError));
-        
+
+            string physicalCache = PhysicalCacheDir;
+            if (!string.IsNullOrEmpty(physicalCache)) {
+                bool isNetwork = false;
+                if (physicalCache.StartsWith("\\\\")) 
+                    isNetwork = true;
+                else{
+                    try {
+                        DriveInfo dri = new DriveInfo(Path.GetPathRoot(physicalCache));
+                        if (dri.DriveType == DriveType.Network) isNetwork = true;
+                    } catch { }
+                }
+                if (isNetwork)
+                    issues.Add(new Issue("DiskCache", "It appears that the cache directory is located on a network drive.",
+                        "Both IIS and ASP.NET have trouble hosting websites with large numbers of folders over a network drive, such as a SAN. The cache will create " +
+                        Subfolders.ToString() + " subfolders. If the total number of network-hosted folders exceeds 100, you should contact support@imageresizing.net and consult the documentation for details on configuring IIS and ASP.NET for this situation.", IssueSeverity.Warning));
+                    
+            }
 
             return issues;
         }
