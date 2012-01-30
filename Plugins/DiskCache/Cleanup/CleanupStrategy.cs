@@ -11,55 +11,78 @@ using System.Globalization;
 namespace ImageResizer.Plugins.DiskCache {
     public class CleanupStrategy :IssueSink{
 
-        public CleanupStrategy():base("DiskCache.CleanupStrategy") { }
+        public CleanupStrategy() : base("DiskCache.CleanupStrategy") { SaveDefaults(); }
         public CleanupStrategy(Node n)
             : base("DiskCache.CleanupStrategy") {
+                SaveDefaults();
             LoadFrom(n);
         }
 
+        private string[] properties = new string[] {
+            "StartupDelay", "MinDelay", "MaxDelay", "OptimalWorkSegmentLength", "AvoidRemovalIfUsedWithin", "AvoidRemovalIfCreatedWithin"
+            , "ProhibitRemovalIfUsedWithin", "ProhibitRemovalIfCreatedWithin", "TargetItemsPerFolder", "MaximumItemsPerFolder"};
+        /// <summary>
+        /// Loads settings from the specified node. Attribute names and property names must match.
+        /// </summary>
+        /// <param name="n"></param>
         public void LoadFrom(Node n){
             if (n == null) return;
-            LoadTimeSpan(n.Attrs, "StartupDelay");
-            LoadTimeSpan(n.Attrs, "MinDelay");
-            LoadTimeSpan(n.Attrs, "MaxDelay");
-            LoadTimeSpan(n.Attrs, "OptimalWorkSegmentLength");
-            LoadTimeSpan(n.Attrs, "AvoidRemovalIfUsedWithin");
-            LoadTimeSpan(n.Attrs, "AvoidRemovalIfCreatedWithin");
-            LoadTimeSpan(n.Attrs, "ProhibitRemovalIfUsedWithin");
-            LoadTimeSpan(n.Attrs, "ProhibitRemovalIfCreatedWithin");
-            LoadInt(n.Attrs, "TargetItemsPerFolder");
-            LoadInt(n.Attrs, "MaximumItemsPerFolder");
+            foreach (string s in properties)
+                LoadProperty(n.Attrs, s);
         }
 
-        protected void LoadTimeSpan(NameValueCollection data, string key) {
+        private Dictionary<string,object> defaults = new Dictionary<string,object>(StringComparer.OrdinalIgnoreCase);
+        /// <summary>
+        /// Saves the current settings to the dictionary of default settings.
+        /// </summary>
+        private void SaveDefaults(){
+            Type t = this.GetType();
+            foreach(string s in properties){
+                PropertyInfo pi = t.GetProperty(s);
+                defaults[s] = pi.GetValue(this,null);
+            }
+        }
+        /// <summary>
+        /// Restores the default property valies
+        /// </summary>
+        private void RestoreDefaults() {
+            Type t = this.GetType();
+            foreach(string s in properties){
+                PropertyInfo pi = t.GetProperty(s);
+                pi.SetValue(this,defaults[s],null);
+            }
+        }
+
+        protected void LoadProperty(NameValueCollection data, string key) {
             string value = data[key];
             if (string.IsNullOrEmpty(value)) return;
 
-            //Parse the timespan (format [ws][-]{ d | d.hh:mm[:ss[.ff]] | hh:mm[:ss[.ff]] }[ws])
-            TimeSpan tValue = TimeSpan.MinValue;
-            //Culture invariant by default
-            if (!TimeSpan.TryParse(value, out tValue)) tValue = TimeSpan.MinValue;
-
-            //Parse it as an integer number of seconds. Seconds is the default, unlike TimeSpan.TryParse which uses days.
-            int iValue = int.MinValue;
-            if (int.TryParse(value, NumberStyles.Integer,NumberFormatInfo.InvariantInfo, out iValue)) tValue = new TimeSpan(0,0,iValue);
-
-            if (tValue == TimeSpan.MinValue) return; //We couldn't parse a value.
 
             PropertyInfo pi = this.GetType().GetProperty(key);
-            pi.SetValue(this, tValue, null);
+
+            if (pi.PropertyType.Equals(typeof(int))) {
+                //It's an integer property
+                int iValue = int.MinValue;
+                if (!int.TryParse(value, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out iValue)) return; //We couldn't parse a value.
+
+                pi.SetValue(this, iValue, null);
+            } else {
+                //It's a time span property
+                //Parse the timespan (format [ws][-]{ d | d.hh:mm[:ss[.ff]] | hh:mm[:ss[.ff]] }[ws])
+                TimeSpan tValue = TimeSpan.MinValue;
+                //Culture invariant by default
+                if (!TimeSpan.TryParse(value, out tValue)) tValue = TimeSpan.MinValue;
+
+                //Parse it as an integer number of seconds. Seconds is the default, unlike TimeSpan.TryParse which uses days.
+                int iValue = int.MinValue;
+                if (int.TryParse(value, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out iValue)) tValue = new TimeSpan(0, 0, iValue);
+
+                if (tValue == TimeSpan.MinValue) return; //We couldn't parse a value.
+
+                pi.SetValue(this, tValue, null);
+            }
         }
 
-        protected void LoadInt(NameValueCollection data, string key) {
-            string value = data[key];
-            if (string.IsNullOrEmpty(value)) return;
-
-            int iValue = int.MinValue;
-            if (!int.TryParse(value, NumberStyles.Integer,NumberFormatInfo.InvariantInfo,out iValue)) return; //We couldn't parse a value.
-
-            PropertyInfo pi = this.GetType().GetProperty(key);
-            pi.SetValue(this, iValue, null);
-        }
 
 
         private TimeSpan startupDelay = new TimeSpan(0, 5, 0); //5 minutes
@@ -71,7 +94,6 @@ namespace ImageResizer.Plugins.DiskCache {
             set { startupDelay = value; }
         }
 
-
         private TimeSpan minDelay = new TimeSpan(0, 0, 20); //20 seconds
         /// <summary>
         /// The minimum amount of time to wait after the most recent BeLazy to begin working again.
@@ -80,7 +102,6 @@ namespace ImageResizer.Plugins.DiskCache {
             get { return minDelay; }
             set { minDelay = value; }
         }
-
         private TimeSpan maxDelay = new TimeSpan(0, 5, 0); //5 minutes
         /// <summary>
         /// The maximum amount of time to wait between work segements
@@ -170,6 +191,24 @@ namespace ImageResizer.Plugins.DiskCache {
         public bool ShouldRemove(string relativePath, CachedFileInfo info, bool isOverMax) {
             if (isOverMax) return MeetsOverMaxCriteria(info);
             else return MeetsCleanupCriteria(info);
+        }
+
+
+        public override IEnumerable<IIssue> GetIssues() {
+            List<IIssue> issues = new List<IIssue>(base.GetIssues());
+            Type t = this.GetType();
+            StringBuilder sb = new StringBuilder();
+            foreach(string s in defaults.Keys){
+                PropertyInfo pi = t.GetProperty(s);
+                object v = pi.GetValue(this,null);
+                if (!v.Equals(defaults[s]))
+                    sb.AppendLine(s + " has been changed to " + v.ToString() + " instead of the suggested value, " + defaults[s].ToString());
+            }
+            if (sb.Length > 0)
+                issues.Add(new Issue( "The cleanup strategy settings have been changed. This is not advised, and may have ill effects. " +
+                "\nThe default settings for the cleanup strategy were carefully chosen, and should not be changed except at the suggestion of the author.\n" + sb.ToString(), IssueSeverity.Warning));
+
+            return issues;
         }
     }
 }
