@@ -18,16 +18,18 @@ namespace PsdComposerSample {
             var request = Request;
 
             // generate png image link 
-            const string path = "~/example.psd";
+            const string path = "~/text.psd";
             var query = new NameValueCollection { { "format", "png" } };
            
             var psdcmd = new PsdCommandBuilder(query);
             psdcmd.renderer = "psdplugin";
 
             foreach (string s in request.QueryString) {
-                psdcmd.SetText(s, request.QueryString[s]);
+                if (!"redraw".Equals(request.QueryString[s], StringComparison.OrdinalIgnoreCase))
+                    psdcmd.SetText(s, request.QueryString[s]);
                 psdcmd.Redraw(s);
                 psdcmd.Show(s);
+
             }
 
             Encoding c = Encoding.Default;
