@@ -520,7 +520,7 @@ namespace ImageResizer.Configuration {
 
             //Verify there is something other than NoCache registered
             if (c.Plugins.CachingSystems.First is ImageResizer.Plugins.Basic.NoCache)
-                issues.Add(new Issue("NoCache is only for development usage, and cannot scale to production use.", "Add DiskCache or S3Cache for production use", IssueSeverity.Warning));
+                issues.Add(new Issue("NoCache is only for development usage, and cannot scale to production use.", "Add DiskCache or CloudFront for production use", IssueSeverity.Warning));
 
             //Verify NoCache is registered
             if (!c.Plugins.Has<ImageResizer.Plugins.Basic.NoCache>())
