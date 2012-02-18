@@ -190,9 +190,10 @@ namespace ImageResizer.Plugins.RemoteReader {
                     throw new ImageProcessingException("Invalid request! This request was not properly signed, or has been tampered with since transmission.");
                 args.RemoteUrl = PathUtils.FromBase64UToString(data);
                 args.SignedRequest = true;
-            } else
-                args.RemoteUrl = "http://" + ReplaceInLeadingSegment(virtualPath.Substring(remotePrefix.Length).TrimStart('/', '\\'),"_",".");
-
+            } else {
+                args.RemoteUrl = "http://" + ReplaceInLeadingSegment(virtualPath.Substring(remotePrefix.Length).TrimStart('/', '\\'), "_", ".");
+                args.RemoteUrl = Uri.EscapeUriString(args.RemoteUrl);
+            }
             if (!Uri.IsWellFormedUriString(args.RemoteUrl, UriKind.Absolute))
                 throw new ImageProcessingException("Invalid request! The specified Uri is invalid: " + args.RemoteUrl);
             return args;
