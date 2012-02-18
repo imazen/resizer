@@ -137,7 +137,7 @@ namespace ImageResizer.Plugins.DiskCache {
                     //On failure
                     result.Result = CacheQueryResult.Failed;
                 }
-            }else if (((!hasModifiedDate || hashModifiedDate) && !Index.existsCertain(relativePath, physicalPath)) || !Index.modifiedDateMatchesCertainExists(sourceModifiedUtc, relativePath, physicalPath)) {
+            }else if ((!hasModifiedDate || hashModifiedDate) ? !Index.existsCertain(relativePath, physicalPath) : !Index.modifiedDateMatchesCertainExists(sourceModifiedUtc, relativePath, physicalPath)) {
                 
                 //Looks like a miss. Let's enter a lock for the creation of the file. This is a different locking system than for writing to the file - far less contention, as it doesn't include the 
                 //This prevents two identical requests from duplicating efforts. Different requests don't lock.
@@ -155,7 +155,7 @@ namespace ImageResizer.Plugins.DiskCache {
 
                         //On the second check, use cached data for speed. The cached data should be updated if another thread updated a file (but not if another process did).
                         if (t == null &&
-                            (((!hasModifiedDate || hashModifiedDate) && !Index.exists(relativePath, physicalPath)) || !Index.modifiedDateMatches(sourceModifiedUtc, relativePath, physicalPath))) {
+                            ((!hasModifiedDate || hashModifiedDate) ? !Index.exists(relativePath, physicalPath) : !Index.modifiedDateMatches(sourceModifiedUtc, relativePath, physicalPath))) {
 
                                 result.Result = CacheQueryResult.Miss;
                             //Still a miss, we even rechecked the filesystem. Write to memory.
@@ -242,7 +242,7 @@ namespace ImageResizer.Plugins.DiskCache {
 
             bool miss = true;
             if (recheckFS) {
-                miss = (((!hasModifiedDate || hashModifiedDate) && !Index.existsCertain(relativePath, physicalPath)) || !Index.modifiedDateMatchesCertainExists(sourceModifiedUtc, relativePath, physicalPath));
+                miss = (!hasModifiedDate || hashModifiedDate) ? !Index.existsCertain(relativePath, physicalPath) : !Index.modifiedDateMatchesCertainExists(sourceModifiedUtc, relativePath, physicalPath);
                 if (!miss) return true;
             }
                
@@ -252,7 +252,7 @@ namespace ImageResizer.Plugins.DiskCache {
                 delegate() {
 
                     //On the second check, use cached data for speed. The cached data should be updated if another thread updated a file (but not if another process did).
-                    if (((!hasModifiedDate || hashModifiedDate) && !Index.exists(relativePath, physicalPath)) || !Index.modifiedDateMatches(sourceModifiedUtc, relativePath, physicalPath)) {
+                    if ((!hasModifiedDate || hashModifiedDate) ? !Index.exists(relativePath, physicalPath) : !Index.modifiedDateMatches(sourceModifiedUtc, relativePath, physicalPath)) {
 
                         //Create subdirectory if needed.
                         if (!Directory.Exists(Path.GetDirectoryName(physicalPath))) {
