@@ -229,7 +229,30 @@ namespace ImageResizer.Util {
             return path.ToString();
         }
 
-        
+        /// <summary>
+        /// Returns a string querystring in the form ";key=value;key=value".
+        /// Keys and values are UrlEncoded if urlEncode=true.
+        /// </summary>
+        /// <param name="QueryString"></param>
+        /// <param name="urlEncode"></param>
+        /// <returns></returns>
+        public static string BuildSemicolonQueryString(NameValueCollection QueryString, bool urlEncode) {
+            StringBuilder path = new StringBuilder();
+            if (QueryString.Count > 0) {
+                path.Append(';');
+                foreach (string key in QueryString.Keys) {
+                    if (key == null) continue; //Skip null keys
+                    string value = QueryString[key];
+
+                    path.Append(urlEncode ? HttpUtility.UrlEncode(key) : key);
+                    path.Append('=');
+                    path.Append(urlEncode ? HttpUtility.UrlEncode(value) : value);
+                    path.Append(';');
+                }
+                if (path[path.Length - 1] == ';') path.Remove(path.Length - 1, 1);
+            }
+            return path.ToString();
+        }
 
         /// <summary>
         /// Removes the query string from the specifed path. If the path is only a querystring, an empty string is returned.

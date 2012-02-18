@@ -5,6 +5,7 @@ using ImageResizer.Configuration;
 using System.Text.RegularExpressions;
 using System.Collections.Specialized;
 using System.Web;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.CloudFront {
     /// <summary>
@@ -68,10 +69,7 @@ namespace ImageResizer.Plugins.CloudFront {
             if (redirectThrough != null && context.Items[c.Pipeline.ModifiedPathKey + ".notcloudfronturl"] != null) {
                 //It wasn't a cloudfront URL - which means the request didn't come from CloudFront, it came directly from the browser. Perform a redirect, rewriting the querystring appropriately
 
-                string finalPath = redirectThrough + e.VirtualPath + ";";
-                foreach (string s in e.QueryString.Keys) {
-                    finalPath += HttpUtility.UrlEncode(s) + "=" + HttpUtility.UrlEncode(e.QueryString[s]);
-                }
+                string finalPath = redirectThrough + e.VirtualPath + PathUtils.BuildSemicolonQueryString(e.QueryString,true);
 
                 context.Response.Redirect(finalPath, !redirectPermanent);
                 if (redirectPermanent) {
