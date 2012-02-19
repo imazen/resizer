@@ -89,7 +89,7 @@ namespace PhotoshopFile.Text
                 underline = TdTaParser.getBool(d,"Underline");
                 strikethrough = TdTaParser.getBool(d,"Strikethrough");
                 int styleRunAlignment = (int)TdTaParser.query(d,"StyleRunAlignment");//No idea what this maps to.
-
+                //string info = tto.TxtDescriptor.getString();
                 outlineWidth =  (double)TdTaParser.query(d,"OutlineWidth");
 
                 fillColor = TdTaParser.getColor(d,"FillColor");
@@ -132,12 +132,16 @@ namespace PhotoshopFile.Text
                 StringFormat strformat = null;
                 try{
                     FontStyle style = FontStyle.Regular;
+                    //Remove MT
+                    if (fontName.EndsWith("MT")) fontName = fontName.Substring(0, fontName.Length - 2);
                     //Remove -Bold, -Italic, -BoldItalic
                     if (fontName.EndsWith("-Bold", StringComparison.OrdinalIgnoreCase)) style |= FontStyle.Bold;
                     if (fontName.EndsWith("-Italic", StringComparison.OrdinalIgnoreCase)) style |= FontStyle.Italic;
                     if (fontName.EndsWith("-BoldItalic", StringComparison.OrdinalIgnoreCase)) style |= FontStyle.Bold | FontStyle.Italic;
                     //Remove from fontName
                     fontName = new Regex("\\-(Bold|Italic|BoldItalic)$", RegexOptions.IgnoreCase | RegexOptions.IgnoreCase).Replace(fontName, "");
+                    //Remove PS
+                    if (fontName.EndsWith("PS")) fontName = fontName.Substring(0, fontName.Length - 2);
                     //Find font family
                     try {
                         fontFamily = new FontFamily(fontName);
@@ -158,7 +162,7 @@ namespace PhotoshopFile.Text
                     strformat.FormatFlags = StringFormatFlags.NoWrap | StringFormatFlags.NoClip;
                     if (!horizontal) strformat.FormatFlags |= StringFormatFlags.DirectionVertical;
                     strformat.Trimming = StringTrimming.None;
-
+                    
                     path.AddString(text, fontFamily,
                         (int)style, (float)(fontSize),rect, strformat);
                 }finally{
