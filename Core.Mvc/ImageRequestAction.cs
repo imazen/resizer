@@ -95,7 +95,10 @@ namespace ImageResizer.Mvc {
                 //Do we have permission to call UrlAuthorizationModule.CheckUrlAccessForPrincipal?
                 bool canCheckUrl = System.Security.SecurityManager.IsGranted(new System.Security.Permissions.SecurityPermission(System.Security.Permissions.PermissionState.Unrestricted));
                 //Run the rewritten path past the auth system again, using the result as the default "AllowAccess" value
-                if (canCheckUrl) isAllowed = UrlAuthorizationModule.CheckUrlAccessForPrincipal(virtualPath, user, "GET");
+                if (canCheckUrl) try {
+                            isAllowed = UrlAuthorizationModule.CheckUrlAccessForPrincipal(virtualPath, user, "GET");
+                        } catch (NotImplementedException) { } //For MONO support
+
             }
                  
             //Allow user code to deny access, but not modify the url or querystring.

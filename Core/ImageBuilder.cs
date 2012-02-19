@@ -15,7 +15,6 @@ using ImageResizer.Encoding;
 using ImageResizer.Util;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins;
-using System.Web.Hosting;
 using System.Globalization;
 
 namespace ImageResizer
@@ -245,9 +244,9 @@ namespace ImageResizer
                 s = (Stream)source;
             }
                 //VirtualFile
-            else if (source is VirtualFile) {
-                path = ((VirtualFile)source).VirtualPath;
-                s = ((VirtualFile)source).Open();
+            else if (source is System.Web.Hosting.VirtualFile) {
+                path = ((System.Web.Hosting.VirtualFile)source).VirtualPath;
+                s = ((System.Web.Hosting.VirtualFile)source).Open();
                 //IVirtualFile
             } else if (source is IVirtualFile) {
                 path = ((IVirtualFile)source).VirtualPath;
