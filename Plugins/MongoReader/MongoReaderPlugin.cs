@@ -15,6 +15,11 @@ namespace ImageResizer.Plugins.MongoReader {
         MongoDatabase db;
         MongoGridFSSettings gridSettings;
         MongoGridFS grid;
+        /// <summary>
+        /// A reference to the GridFS instance used to retrieve files.
+        /// </summary>
+        public MongoGridFS GridFS { get { return grid; } }
+
         public MongoReaderPlugin(string prefix, MongoDatabase db, MongoGridFSSettings gridSettings) {
             this.db = db;
             this.gridSettings = gridSettings;
