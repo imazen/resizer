@@ -423,5 +423,38 @@ namespace ImageResizer {
         public  string ToStringEncoded() {
             return PathUtils.BuildQueryString(this);
         }
+
+        /// <summary>
+        /// This method will 'normalize' command aliases to the primary key name and resolve duplicates. 
+        /// w->width, h->height, sourceFlip->sFlip, thumbnail->format
+        /// </summary>
+        public void Normalize() {
+            Normalize("width", "w");
+            Normalize("height", "h");
+            Normalize("sFlip", "sourceFlip");
+            Normalize("format", "thumbnail");
+        }
+        /// <summary>
+        /// Normalizes a command that has two possible names. 
+        /// If either of the commands has a null or empty value, those keys are removed. 
+        /// If both the the primary and secondary are present, the secondary is removed. 
+        /// Otherwise, the secondary is renamed to the primary name.
+        /// </summary>
+        /// <param name="primary"></param>
+        /// <param name="secondary"></param>
+        protected void Normalize(string primary, string secondary) {
+            //Get rid of null and empty values.
+            if (string.IsNullOrEmpty(this[primary])) this.Remove(primary);
+            if (string.IsNullOrEmpty(this[secondary])) this.Remove(secondary);
+            //Our job is done if no secondary value exists.
+            if (this[secondary] == null) return;
+            else{
+                //Otherwise, we have to resolve it
+                //No primary value? copy the secondary one. Otherwise leave it be
+                if (this[primary] == null) this[primary] = this[secondary];
+                //In either case, we now have a duplicate to remove
+                this.Remove(secondary);
+            }
+        }
     }
 }
