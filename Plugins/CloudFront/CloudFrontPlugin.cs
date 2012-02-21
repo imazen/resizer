@@ -13,11 +13,9 @@ namespace ImageResizer.Plugins.CloudFront {
     /// Since IIS can't stand '&' symbols in the path, you have to replace both '?' and '&' with ';'
     /// Later I hope to include control adapters to automate the process.
     /// </summary>
-    public class CloudFrontPlugin:IPlugin {
+    public class CloudFrontPlugin : IPlugin {
 
-        public CloudFrontPlugin(){}
-
-        Regex r = new Regex("^(?<path>[^=]+\\.[a-zA-Z0-9]+)[/;](?<query>.+)$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.RightToLeft);
+        public CloudFrontPlugin() { }
 
         Config c;
 
@@ -34,25 +32,31 @@ namespace ImageResizer.Plugins.CloudFront {
         }
 
         void Pipeline_PostAuthorizeRequestStart(System.Web.IHttpModule sender, System.Web.HttpContext context) {
-            if (!TransformCloudFrontUrl(context) && redirectThrough != null) {
-                //It wasn't a cloudfront URL. 
-                context.Items[c.Pipeline.ModifiedPathKey + ".notcloudfronturl"] = true;
+            if (redirectThrough != null && c.Pipeline.ModifiedQueryString.Count > 0) {
+                //It wasn't a cloudfront URL - it had a normal querystring
+                context.Items[c.Pipeline.ModifiedPathKey + ".hadquery"] = true;
             }
+            //Transform semicolon querystrings into the normal collection
+            TransformCloudFrontUrl(context);
         }
 
         bool TransformCloudFrontUrl(System.Web.HttpContext context) {
-            if (c.Pipeline.PreRewritePath.LastIndexOf('=') < 0) return false; //Must have an = sign or there is no query
+            string s = c.Pipeline.PreRewritePath;
+            int semi = s.IndexOf(';');
+            if (semi < 0) return false; //No querystring here.
+            int question = s.IndexOf('?');
+            if (question > -1) throw new ImageProcessingException("ASP.NET failed to parse querystring, question mark remains in path segment: " + s);
 
-            //With an equal sign in the path, we can look for the sign.
-            Match m = r.Match(c.Pipeline.PreRewritePath);
-            if (!m.Success) return false; //Must match regex
 
-            string path = m.Groups["path"].Captures[0].Value;
-            if (!c.Pipeline.IsAcceptedImageType(path)) return false; //Must be valid image type
+
+            string path = s.Substring(0, semi);
+
+            //Why do we care what image type it is? That gets checked later
+            //if (!c.Pipeline.IsAcceptedImageType(path)) return false; //Must be valid image type
             c.Pipeline.PreRewritePath = path; //Fix the path.
 
             //Parse the fake query, merge it with the real one, and we are done.
-            string query = m.Groups["query"].Captures[0].Value;
+            string query = s.Substring(semi);
             NameValueCollection q = Util.PathUtils.ParseQueryStringFriendlyAllowSemicolons(query);
 
             //Merge the querystring with everything found in PathInfo. THe querystring wins on conflicts
@@ -66,11 +70,11 @@ namespace ImageResizer.Plugins.CloudFront {
 
         void Pipeline_RewriteDefaults(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
             ///Handle redirectThrough behavior
-            if (redirectThrough != null && context.Items[c.Pipeline.ModifiedPathKey + ".notcloudfronturl"] != null) {
-                //It wasn't a cloudfront URL - which means the request didn't come from CloudFront, it came directly from the browser. Perform a redirect, rewriting the querystring appropriately
+            if (redirectThrough != null && context.Items[c.Pipeline.ModifiedPathKey + ".hadquery"] != null) {
+                //It had a querystring originally - which means the request didn't come from CloudFront, it came directly from the browser. Perform a redirect, rewriting the querystring appropriately
+                string finalPath = redirectThrough + e.VirtualPath + PathUtils.BuildSemicolonQueryString(e.QueryString, true);
 
-                string finalPath = redirectThrough + e.VirtualPath + PathUtils.BuildSemicolonQueryString(e.QueryString,true);
-
+                //Redirect according to setting
                 context.Response.Redirect(finalPath, !redirectPermanent);
                 if (redirectPermanent) {
                     context.Response.StatusCode = 301;
