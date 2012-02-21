@@ -190,7 +190,7 @@ namespace ImageResizer.Util {
             NameValueCollection oldQuery = ParseQueryString(path);
             //Overwrite new with old
             foreach (string key in oldQuery.Keys)
-                newQuerystring[key] = oldQuery[key];
+                if (key != null) newQuerystring[key] = oldQuery[key];
 
             return AddQueryString(RemoveQueryString(path), BuildQueryString(newQuerystring));
         }
