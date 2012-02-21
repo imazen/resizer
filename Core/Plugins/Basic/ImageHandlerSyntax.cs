@@ -109,19 +109,21 @@ namespace ImageResizer.Plugins.Basic {
                     q["borderWidth"] = q["border"];
                     q.Remove("border");
                 }
-            } else if (c.Pipeline.IsAcceptedImageType(c.Pipeline.PreRewritePath) || c.Pipeline.SkipFileTypeCheck){
-                //BetterImageProcessor and DynamicImageProcessor uses a Handler registered to all Jpeg images. Just the image URL plus ?w= and/or ?h=
-                if (!string.IsNullOrEmpty(context.Request.QueryString["w"]) || !string.IsNullOrEmpty(context.Request.QueryString["h"])) {
-                    c.Pipeline.ModifiedQueryString["width"] = c.Pipeline.ModifiedQueryString["w"];
-                    c.Pipeline.ModifiedQueryString["height"] = c.Pipeline.ModifiedQueryString["h"];
-                    c.Pipeline.ModifiedQueryString.Remove("w");
-                    c.Pipeline.ModifiedQueryString.Remove("h");
-                    //Note - the module will not lose aspect ratio even though BIP does. Although implemented for other syntaxes, 
-                    // this syntax (w/h) may eventually be adopted by the image resizer, so we don't want issues down the road.
-                }
+            } 
+            //Feb. 20 - removed this, as the w/h syntax has already been adopted by the image resizer, and this code was breaking URLs when both w and height or h and width were used togehter.
+            //else if (c.Pipeline.IsAcceptedImageType(c.Pipeline.PreRewritePath) || c.Pipeline.SkipFileTypeCheck){
+            //    //BetterImageProcessor and DynamicImageProcessor uses a Handler registered to all Jpeg images. Just the image URL plus ?w= and/or ?h=
+            //    if (!string.IsNullOrEmpty(context.Request.QueryString["w"]) || !string.IsNullOrEmpty(context.Request.QueryString["h"])) {
+            //        c.Pipeline.ModifiedQueryString["width"] = c.Pipeline.ModifiedQueryString["w"];
+            //        c.Pipeline.ModifiedQueryString["height"] = c.Pipeline.ModifiedQueryString["h"];
+            //        c.Pipeline.ModifiedQueryString.Remove("w");
+            //        c.Pipeline.ModifiedQueryString.Remove("h");
+            //        //Note - the module will not lose aspect ratio even though BIP does. Although implemented for other syntaxes, 
+            //        // this syntax (w/h) may eventually be adopted by the image resizer, so we don't want issues down the road.
+            //    }
                 
 
-            }
+            //}
         }
 
        
