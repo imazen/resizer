@@ -45,10 +45,14 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MongoDB.Bson">
+      <HintPath>..\Libs\mongocsharpdriver.1.3.1\MongoDB.Bson.dll</HintPath>
+    </Reference>
     <Reference Include="MongoDB.Driver">
       <HintPath>..\Libs\mongocsharpdriver.1.3.1\MongoDB.Driver.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">

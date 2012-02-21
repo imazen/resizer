@@ -6,6 +6,9 @@ using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using ImageResizer.Util;
 using System.Collections.Specialized;
+using MongoDB.Driver.Builders;
+using MongoDB.Bson;
+using System.IO;
 
 namespace ImageResizer.Plugins.MongoReader {
     public class MongoReaderPlugin:IPlugin, IVirtualImageProvider {
@@ -76,6 +79,17 @@ namespace ImageResizer.Plugins.MongoReader {
             protected ResizeSettings query;
 
             public System.IO.Stream Open() {
+                //First try to get it by id, next by filename
+                ObjectId id;
+                if (filename.StartsWith("id/", StringComparison.OrdinalIgnoreCase) ) {
+                    //Strip the extension and id/ prefix
+                    string sid = PathUtils.RemoveFullExtension(filename.Substring(3));
+                    if (ObjectId.TryParse(sid, out id)) {
+                        var file = parent.grid.FindOne(Query.EQ("_id", id));
+                        if (file == null) throw new FileNotFoundException("Failed to locate blob " + sid + " on GridFS.");
+                        return file.OpenRead();
+                    }
+                } 
                 return parent.grid.OpenRead(filename);
             }
 
