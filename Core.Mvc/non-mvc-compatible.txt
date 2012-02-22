@@ -1,0 +1,12 @@
+These plugins won't be supported by the ImageRequestAction class
+
+Use MvcRoutingShim instead
+
+ImageHandlerSyntax
+FolderResizeSytnax
+Diagnostics
+Presets
+Image404
+ClientCache
+DiskCache
+CloudFront
