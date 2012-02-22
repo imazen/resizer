@@ -267,12 +267,20 @@ namespace ImageResizer.Plugins.DiskCache {
                         // I.e, hashmodified=true is the only supported setting for multi-process environments.
                         //TODO: Catch UnathorizedAccessException and log issue about file permissions.
                         //... If we can wait for a read handle for a specified timeout.
+                        
                         try {
+                            
                             System.IO.FileStream fs = new FileStream(physicalPath, FileMode.Create, FileAccess.Write, FileShare.None);
-
-                            using (fs) {
-                                //Run callback to write the cached data
-                                writeCallback(fs); //Can throw any number of exceptions.
+                            bool finished = false;
+                            try {
+                                using (fs) {
+                                    //Run callback to write the cached data
+                                    writeCallback(fs); //Can throw any number of exceptions.
+                                    finished = true;
+                                }
+                            } finally {
+                                //Don't leave half-written files around.
+                                if (!finished) try { if (File.Exists(physicalPath)) File.Delete(physicalPath);} catch { }
                             }
 
                             DateTime createdUtc = DateTime.UtcNow;
