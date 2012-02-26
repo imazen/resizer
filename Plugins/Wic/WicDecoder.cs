@@ -101,7 +101,9 @@ namespace ImageResizer.Plugins.WicDecoder {
                 else 
                     frame = decoder.GetFrame((uint)frameIndex);
                 try {
-                    return ConversionUtils.FromWic(frame);
+                    Bitmap b = ConversionUtils.FromWic(frame);
+                    GC.KeepAlive(data);
+                    return b;
                 } finally {
                     Marshal.ReleaseComObject(frame);
                 }

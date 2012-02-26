@@ -96,7 +96,9 @@ namespace ImageResizer.Plugins.WicBuilder {
 
             bool supportsTransparency = managedEncoder.SupportsTransparency;
 
-            return BuildJobWic(data, lData, job, supportsTransparency);
+            RequestedAction result = BuildJobWic(data, lData, job, supportsTransparency);
+            GC.KeepAlive(data);
+            return result;
         }
 
         /// <summary>
