@@ -76,6 +76,7 @@
     <Content Include="js\jquery.cookie.js" />
     <Content Include="js\Markdown.Converter.js" />
     <Content Include="js\querystring.js" />
+    <Content Include="ListImages.aspx" />
     <Content Include="Misc\BatchResizeAndZip.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
@@ -84,6 +85,7 @@
     <Content Include="Plugins.htm" />
     <Content Include="Misc\Protected\rose-leaf.jpg" />
     <Content Include="Misc\RegressionTests.aspx" />
+    <Content Include="Studio.aspx" />
     <Content Include="UploadSample.aspx" />
     <Content Include="Watermarks.htm" />
     <Content Include="watermarks\Sun_64.png" />
@@ -93,6 +95,13 @@
     <Content Include="Misc\WhitespaceTrimmerTest.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ListImages.aspx.cs">
+      <DependentUpon>ListImages.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ListImages.aspx.designer.cs">
+      <DependentUpon>ListImages.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Misc\BatchResizeAndZip.aspx.cs">
       <DependentUpon>BatchResizeAndZip.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -115,6 +124,13 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SamplePlugin.cs" />
+    <Compile Include="Studio.aspx.cs">
+      <DependentUpon>Studio.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Studio.aspx.designer.cs">
+      <DependentUpon>Studio.aspx</DependentUpon>
+    </Compile>
     <Compile Include="UploadSample.aspx.cs">
       <DependentUpon>UploadSample.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -188,6 +204,10 @@
     <ProjectReference Include="..\..\Plugins\PsdReader\ImageResizer.Plugins.PsdReader.csproj">
       <Project>{BCF28DA2-AF29-4C09-B37D-059F40FC9B95}</Project>
       <Name>ImageResizer.Plugins.PsdReader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\RedEye\ImageResizer.Plugins.RedEye.csproj">
+      <Project>{054D5D5D-1041-4F03-B5E4-BFF0441586FA}</Project>
+      <Name>ImageResizer.Plugins.RedEye</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\RemoteReader\ImageResizer.Plugins.RemoteReader.csproj">
       <Project>{0E6BE1A7-C754-4E33-A8AC-75A8549FC68B}</Project>
