@@ -117,8 +117,9 @@ namespace ImageResizer.Configuration {
         /// <returns></returns>
         public IList<T> GetAll<T>() {
             List<T> results = new List<T>();
+            Type t = typeof(T);
             foreach (IPlugin p in AllPlugins)
-                if (typeof(T).IsAssignableFrom(p.GetType())) //Like instance of. Can be a subclass
+                if (t.IsAssignableFrom(p.GetType())) //Like instance of. Can be a subclass
                     results.Add((T)p);
             return results;
         }
@@ -128,11 +129,33 @@ namespace ImageResizer.Configuration {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T Get<T>() {
+        public T Get<T>()  {
+            Type t = typeof(T);
             foreach (IPlugin p in AllPlugins)
-                if (typeof(T).IsAssignableFrom(p.GetType())) //Like instance of. Can be a subclass
+                if (t.IsAssignableFrom(p.GetType())) //Like instance of. Can be a subclass
                     return (T)p;
             return default(T);
+        }
+
+
+        public T GetOrInstall<T>() where T : IPlugin {
+            Type t = typeof(T);
+            ConstructorInfo ci = t.GetConstructor(System.Type.EmptyTypes);
+            if (ci == null) {
+                throw new ArgumentException("The specified plugin lacks a default constructor. Create an instance and pass it to GetOrInstall as a fallback instance.");
+            } else {
+               return GetOrInstall<T>((T)Activator.CreateInstance(t, false));
+            }
+        }
+
+        public T GetOrInstall<T>(T newInstance) where T : IPlugin {
+            T instance = Get<T>();
+            if (instance != null) return instance;
+
+            //Our instance may not get installed if there is a duplicate already
+            newInstance.Install(this.c);
+
+            return Get<T>();
         }
 
         /// <summary>
@@ -398,6 +421,10 @@ namespace ImageResizer.Configuration {
             Type t = FindPluginType(name);
 
             if (t == null) return null;
+            return CreatePluginByType(t, args);
+        }
+
+        protected IPlugin CreatePluginByType(Type t, NameValueCollection args) {
 
             //TODO - perhaps manually select the constructor ? 
             //ConstructorInfo ci = null;
