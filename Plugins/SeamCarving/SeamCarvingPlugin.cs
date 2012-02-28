@@ -51,6 +51,7 @@ namespace ImageResizer.Plugins.SeamCarving {
 
             FilterType ftype = Utils.parseEnum<FilterType>(s.settings["carve"], FilterType.None);
             if ("true".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase)) ftype = FilterType.Prewitt;
+            if (string.IsNullOrEmpty(s.settings["carve"]) && s.settings.Mode == FitMode.Carve) ftype = FilterType.Prewitt;
 
             if (ftype == FilterType.None) return RequestedAction.None; //Only override rendering when carving is requested.
 
