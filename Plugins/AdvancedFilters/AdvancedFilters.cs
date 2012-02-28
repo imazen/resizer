@@ -31,21 +31,21 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             
             str = s.settings["blur"]; //radius
             if (string.IsNullOrEmpty(str)) str= s.settings["a.blur"];
-            if (!string.IsNullOrEmpty(str) && int.TryParse(str,NumberStyles.Integer,NumberFormatInfo.InvariantInfo, out i))
+            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
                 new GaussianBlur(1.4, i).ApplyInPlace(s.destBitmap);
             
             str = s.settings["sharpen"]; //radius
             if (string.IsNullOrEmpty(str)) str= s.settings["a.sharpen"];
-            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
+            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
                 new GaussianSharpen(1.4, i).ApplyInPlace(s.destBitmap);
 
             str = s.settings["a.oilpainting"]; //radius
-            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
+            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
                 new OilPainting(i).ApplyInPlace(s.destBitmap);
 
             str = s.settings["a.removenoise"]; //radius
             if ("true".Equals(str, StringComparison.OrdinalIgnoreCase)) str = "3";
-            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
+            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
                 new ConservativeSmoothing(i).ApplyInPlace(s.destBitmap); 
 
             //Sobel only supports 8bpp grayscale images.
@@ -58,7 +58,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
                 new SobelEdgeDetector().ApplyInPlace(s.destBitmap);
 
                 str = s.settings["a.threshold"]; //radius
-                if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
+                if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
                  new Threshold(i).ApplyInPlace(s.destBitmap);
     
             }
@@ -84,7 +84,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
 
 
             str = s.settings["a.posterize"]; //number of colors to merge
-            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i)) {
+            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0) {
                 SimplePosterization sp = new SimplePosterization();
                 if (i < 1) i = 1; 
                 if (i > 255) i = 255;
