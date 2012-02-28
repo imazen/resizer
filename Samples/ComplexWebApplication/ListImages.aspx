@@ -26,7 +26,7 @@
             if (evt.which == 1) {
                 var radius = Math.sqrt(Math.pow(evt.offsetX - this.downx,2) + Math.pow(evt.offsetY - this.downy,2));
 
-                var segment = this.downx + "," + this.downy + "," + radius + ",";
+                var segment = this.downx + "," + this.downy + "," + ((radius < 2 ) ? -1 : radius) + ",";
 
                 var key = "&r.eyes=";
                 var qs = $(this).attr("src");
