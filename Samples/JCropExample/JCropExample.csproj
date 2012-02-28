@@ -50,6 +50,7 @@
     <Content Include="css\jquery.Jcrop.css" />
     <Content Include="js\jquery.Jcrop.js" />
     <Content Include="js\jquery.Jcrop.min.js" />
+    <Content Include="js\jquery.jcrop.preview.js" />
     <Content Include="js\jquery.min.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
