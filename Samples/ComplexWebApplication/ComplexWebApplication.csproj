@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="css\Jcrop.gif" />
+    <Content Include="css\jquery.Jcrop.css" />
     <Content Include="griddata.js" />
     <Content Include="css\ui-darkness\images\ui-bg_flat_30_cccccc_40x100.png" />
     <Content Include="css\ui-darkness\images\ui-bg_flat_50_5c5c5c_40x100.png" />
@@ -74,8 +76,13 @@
     <Content Include="js\jquery.ba-urlinternal.min.js" />
     <Content Include="js\jquery.collapse.js" />
     <Content Include="js\jquery.cookie.js" />
+    <Content Include="js\jquery.imagestudio.js" />
+    <Content Include="js\jquery.Jcrop.js" />
+    <Content Include="js\jquery.Jcrop.min.js" />
+    <Content Include="js\jquery.jcrop.preview.js" />
     <Content Include="js\Markdown.Converter.js" />
     <Content Include="js\querystring.js" />
+    <Content Include="js\studio.js" />
     <Content Include="ListImages.aspx" />
     <Content Include="Misc\BatchResizeAndZip.aspx" />
     <Content Include="Default.aspx" />
@@ -86,6 +93,7 @@
     <Content Include="Misc\Protected\rose-leaf.jpg" />
     <Content Include="Misc\RegressionTests.aspx" />
     <Content Include="Studio.aspx" />
+    <Content Include="studio.txt" />
     <Content Include="UploadSample.aspx" />
     <Content Include="Watermarks.htm" />
     <Content Include="watermarks\Sun_64.png" />
@@ -95,6 +103,7 @@
     <Content Include="Misc\WhitespaceTrimmerTest.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="css\reset.css" />
     <Compile Include="ListImages.aspx.cs">
       <DependentUpon>ListImages.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

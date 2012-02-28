@@ -1,0 +1,64 @@
+﻿#Rotate & Flip
+
+Rotate Left
+Rotate Right
+
+Flip Horizontal
+Flip Vertical
+
+* Rotation and flip will need to translate crop, red-eye, and object removal coordinates.
+
+Flip/rotate could happen in CSS until the new image loads: http://stackoverflow.com/questions/1309055/cross-browser-way-to-flip-html-image-via-javascript-css
+And use jQueryRotate to help the user follow (potenetially)
+
+# Crop
+
+To crop, select an aspect ratio below
+
+Custom
+4:3
+6:9
+2:3
+
+
+[Reset] [Apply]
+Apply
+
+# Adjust image
+
+[Auto-correct]
+
+### Sliders
+[Brightness]
+[Contrast]
+[Saturation]
+
+Noise Removal
+
+
+
+    <h3>Remove objects</h3>
+    <div></div>
+    <h3>Red Eye Repair</h3>
+    <div>
+    </div>
+    <h3>Effects & Filters</h3>
+    <div>
+     sepia, b&w, negative, posterize, sharpen, blur, oil painting
+
+     </div>
+
+     </div>
+
+
+#Other things
+
+* Drop Shadow
+* Glow
+* Border
+* Margin
+* Padding
+* Encoding
+* Background color
+* Select page or frame
+* catmullrom or lanczos resizing filter
