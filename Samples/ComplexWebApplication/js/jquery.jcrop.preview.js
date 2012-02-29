@@ -90,6 +90,12 @@
             $(this).data('updateFunc')(coords);
         });
     };
+    $.fn.JcropPreviewUpdateFn = function () {
+        var t = $(this);
+        return function (coords) {
+            t.data('updateFunc')(coords);
+        };
+    };
 
 })(jQuery);  
 
