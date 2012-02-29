@@ -1,64 +1,28 @@
-﻿#Rotate & Flip
+﻿# List of bugs and edge cases to fix
 
-Rotate Left
-Rotate Right
+Rotation and flip will need to translate crop, red-eye, and object removal coordinates if present.
 
-Flip Horizontal
-Flip Vertical
+Filters that use a radius (like sharpen, blur, painting, and posterize) need to use source-relative numbers or percentages of the width/height so resized versions don't appear vastly different.
 
-* Rotation and flip will need to translate crop, red-eye, and object removal coordinates.
-
-Flip/rotate could happen in CSS until the new image loads: http://stackoverflow.com/questions/1309055/cross-browser-way-to-flip-html-image-via-javascript-css
-And use jQueryRotate to help the user follow (potenetially)
-
-# Crop
-
-To crop, select an aspect ratio below
-
-Custom
-4:3
-6:9
-2:3
-
-
-[Reset] [Apply]
-Apply
-
-# Adjust image
-
-[Auto-correct]
-
-### Sliders
-[Brightness]
-[Contrast]
-[Saturation]
-
-Noise Removal
-
-
-
-    <h3>Remove objects</h3>
-    <div></div>
-    <h3>Red Eye Repair</h3>
-    <div>
-    </div>
-    <h3>Effects & Filters</h3>
-    <div>
-     sepia, b&w, negative, posterize, sharpen, blur, oil painting
-
-     </div>
-
-     </div>
-
-
-#Other things
+# Some effects should be disabled during crop, red-eye, and object removal:  
 
 * Drop Shadow
 * Glow
 * Border
 * Margin
 * Padding
+
+
+# Stuff that could eventually be added 
+
 * Encoding
 * Background color
-* Select page or frame
+* Select page or frame (we'd need a meta API to find the ranges). 
 * catmullrom or lanczos resizing filter
+
+
+
+
+
+Flip/rotate could happen in CSS until the new image loads: http://stackoverflow.com/questions/1309055/cross-browser-way-to-flip-html-image-via-javascript-css
+And use jQueryRotate to help the user follow (potenetially)
