@@ -78,7 +78,6 @@
     <Content Include="js\jquery.cookie.js" />
     <Content Include="js\jquery.imagestudio.js" />
     <Content Include="js\jquery.Jcrop.js" />
-    <Content Include="js\jquery.Jcrop.min.js" />
     <Content Include="js\jquery.jcrop.preview.js" />
     <Content Include="js\Markdown.Converter.js" />
     <Content Include="js\querystring.js" />
