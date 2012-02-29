@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
+    <Compile Include="Collections\EventCountingDictionary.cs" />
     <Compile Include="Configuration\Issues\ConfigChecker.cs" />
     <Compile Include="Configuration\IUrlAuthorizationEventArgs.cs" />
     <Compile Include="Configuration\Logging\ILogger.cs" />
@@ -114,7 +115,9 @@
     <Compile Include="Configuration\Xml\Selector.cs" />
     <Compile Include="Plugins\Basic\DropShadow.cs" />
     <Compile Include="Plugins\Basic\Presets.cs" />
+    <Compile Include="Plugins\Basic\SourceMemCache.cs" />
     <Compile Include="Plugins\Basic\SpeedOrQuality.cs" />
+    <Compile Include="Plugins\IVirtualFileCache.cs" />
     <Compile Include="Plugins\IFileExtensionPlugin.cs" />
     <Compile Include="Plugins\Basic\Trial.cs" />
     <Compile Include="Plugins\Basic\Diagnostic.cs" />
