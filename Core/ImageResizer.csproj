@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\ConstrainedCache.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
     <Compile Include="Collections\EventCountingDictionary.cs" />
     <Compile Include="Configuration\Issues\ConfigChecker.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="Plugins\Basic\Presets.cs" />
     <Compile Include="Plugins\Basic\SourceMemCache.cs" />
     <Compile Include="Plugins\Basic\SpeedOrQuality.cs" />
+    <Compile Include="Plugins\IVirtualFileSourceCacheKey.cs" />
     <Compile Include="Plugins\IVirtualFileCache.cs" />
     <Compile Include="Plugins\IFileExtensionPlugin.cs" />
     <Compile Include="Plugins\Basic\Trial.cs" />

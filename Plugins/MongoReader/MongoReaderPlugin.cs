@@ -65,7 +65,7 @@ namespace ImageResizer.Plugins.MongoReader {
         }
 
 
-        public class MongoVirtualFile : IVirtualFile {
+        public class MongoVirtualFile : IVirtualFile, IVirtualFileSourceCacheKey {
 
             public MongoVirtualFile(MongoReaderPlugin parent, string virtualPath, NameValueCollection query) {
                 if (!virtualPath.StartsWith(parent.VirtualFilesystemPrefix, StringComparison.OrdinalIgnoreCase)) throw new ApplicationException("The specified virtual file must exist within the prefix: " + parent.VirtualFilesystemPrefix);
@@ -98,6 +98,10 @@ namespace ImageResizer.Plugins.MongoReader {
                 return parent.grid.OpenRead(filename);
             }
 
+
+            public string GetCacheKey(bool includeModifiedDate) {
+                return VirtualPath;
+            }
         }
     }
 }

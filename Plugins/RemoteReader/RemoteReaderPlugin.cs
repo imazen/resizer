@@ -286,7 +286,7 @@ namespace ImageResizer.Plugins.RemoteReader {
         }
     }
 
-    public class RemoteSiteFile : IVirtualFile {
+    public class RemoteSiteFile : IVirtualFile, IVirtualFileSourceCacheKey {
 
         protected string virtualPath;
         protected RemoteReaderPlugin parent;
@@ -304,6 +304,10 @@ namespace ImageResizer.Plugins.RemoteReader {
 
         public System.IO.Stream Open() {
             return parent.GetUriStream(new Uri(this.request.RemoteUrl));
+        }
+
+        public string GetCacheKey(bool includeModifiedDate) {
+            return this.request.RemoteUrl;
         }
     }
 }

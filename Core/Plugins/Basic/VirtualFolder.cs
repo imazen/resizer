@@ -11,6 +11,7 @@ using System.Web.Caching;
 using System.Collections.Specialized;
 using System.Security;
 using ImageResizer.Configuration.Issues;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
@@ -274,7 +275,7 @@ namespace ImageResizer.Plugins.Basic {
 
         }
 
-        public class VirtualFolderProviderVirtualFile : VirtualFile, IVirtualFileWithModifiedDate, IVirtualFile {
+        public class VirtualFolderProviderVirtualFile : VirtualFile, IVirtualFileWithModifiedDate, IVirtualFile, IVirtualFileSourceCacheKey{
 
             private VirtualFolder provider;
 
@@ -302,6 +303,9 @@ namespace ImageResizer.Plugins.Basic {
                 }
             }
 
+            public string GetCacheKey(bool includeModifiedDate) {
+                return VirtualPath + (includeModifiedDate ? ("_" + ModifiedDateUTC.Ticks.ToString()) : "");
+            }
         }
 
         public IEnumerable<IIssue> GetIssues() {
@@ -313,6 +317,7 @@ namespace ImageResizer.Plugins.Basic {
 
             return issues;
         }
+
 
     }
 

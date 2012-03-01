@@ -464,5 +464,14 @@ namespace ImageResizer.Util {
         /// <param name="variableName"></param>
         /// <returns></returns>
         public delegate string VariableResolverCallback(string variableName);
+
+   
+        public static NameValueCollection FilterQueryString(ResizeSettings query, params string[] keepKeys) {
+            NameValueCollection c = new NameValueCollection();
+            foreach (string s in keepKeys) 
+                if (query[s] != null) c[s] = query[s];
+            
+            return c;
+        }
     }
 }

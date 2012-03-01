@@ -37,7 +37,7 @@ namespace ImageResizer.Plugins.Basic {
         }
 
 
-        public class GradientVirtualFile : IVirtualFile, IVirtualBitmapFile {
+        public class GradientVirtualFile : IVirtualFile, IVirtualBitmapFile, IVirtualFileSourceCacheKey {
             public GradientVirtualFile(NameValueCollection query) { this.query = new ResizeSettings(query); }
             public string VirtualPath {
                 get { return "gradient.png"; }
@@ -73,6 +73,10 @@ namespace ImageResizer.Plugins.Basic {
                     throw;
                 }
                 return b;
+            }
+
+            public string GetCacheKey(bool includeModifiedDate) {
+                return VirtualPath + PathUtils.BuildQueryString(PathUtils.FilterQueryString(query, "width", "height", "w", "h", "maxwidth", "maxheight", "angle", "color1", "color2"));
             }
         }
     }
