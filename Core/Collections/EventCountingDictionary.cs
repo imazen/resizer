@@ -12,7 +12,7 @@ namespace ImageResizer.Collections {
             Threading = ThreadingPrecision.Fast;
             CounterGranularity = 8;
             MaxBytesUsed = 0;
-            CleanupInterval = new TimeSpan(0, 0, 20); //Once per 20 seconds
+            MinimumCleanupInterval = new TimeSpan(0, 0, 20); //Once per 20 seconds
         }
 
         public enum ThreadingPrecision {
@@ -33,19 +33,19 @@ namespace ImageResizer.Collections {
         public int CounterGranularity{get;set;}
 
         /// <summary>
-        /// Specifies a hard limit on the number of bytes used for tracking purposes. Causes the smallest-valued items to get discarded first. Doesn't count key size. Set to 0 to disable (default)
+        /// Specifies a hard limit on the number of bytes used for tracking purposes. Causes the smallest-valued items to get discarded first. Doesn't count key size unless SetCustomSize is called on the items. Set to 0 to disable (default)
         /// </summary>
-        public int MaxBytesUsed {get;set;}
+        public long MaxBytesUsed {get;set;}
 
         /// <summary>
-        /// Specifies how often to eliminate 0-valued items from the dictionary. Defaults to 20 seconds.
+        /// Specifies how often to eliminate 0-valued items from the dictionary. Defaults to 20 seconds. Only potentially triggered by .Increment() or PingCleanup() calls.
         /// </summary>
-        public TimeSpan CleanupInterval{get;set;}
+        public TimeSpan MinimumCleanupInterval{get;set;}
 
         /// <summary>
         /// The estimated size (in bytes) of a counter (excluding the key). Based on CounterGranularity
         /// </summary>
-        public int EstimatedCounterSize { get { return CounterGranularity * 4 + 128; } }
+        public int EstimatedCounterSize { get { return CounterGranularity * 4 + 132; } }
     }
 
     /// <summary>
@@ -54,6 +54,11 @@ namespace ImageResizer.Collections {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class EventCountingDictionary<T> {
+
+        public delegate void EventKeyRemoved(EventCountingDictionary<T> sender, T key, int value);
+
+        public event EventKeyRemoved CounterRemoved;
+
         public EventCountingDictionary(IEqualityComparer<T> keyComparer, TimeSpan trackingDuration, EventCountingStrategy strategy) {
             this._trackingDuration = trackingDuration;
             this.granularity = strategy.CounterGranularity;
@@ -63,10 +68,10 @@ namespace ImageResizer.Collections {
             countersToKeys = new Dictionary<EventCounter, T>();
             //Est size per item
             itemSize = strategy.EstimatedCounterSize;
-            //Max number of items
-            maxItems = strategy.MaxBytesUsed / itemSize;
+            //Max bytes
+            byteCeiling = strategy.MaxBytesUsed;
 
-            cleanupInterval = strategy.CleanupInterval.Ticks;
+            cleanupInterval = strategy.MinimumCleanupInterval.Ticks;
         }
 
         private TimeSpan _trackingDuration;
@@ -78,9 +83,16 @@ namespace ImageResizer.Collections {
         }
         private int granularity = 0;
         private int itemSize = 0;
-        private int maxItems = 0;
+        private long byteCeiling = 0;
         private long cleanupInterval = 0;
         private EventCountingStrategy.ThreadingPrecision precision;
+
+        private long bytesUsed = 0;
+
+        /// <summary>
+        /// The estimated number of bytes used for tracking, plus the sum of the CustomSize values. Key space not included unless the caller always includes key size in CustomSize parameter.
+        /// </summary>
+        public long ReportedBytesUsed { get { return bytesUsed; } }
 
         /// <summary>
         /// For incrementing and finding counters based on keys
@@ -130,8 +142,11 @@ namespace ImageResizer.Collections {
         /// </summary>
         /// <param name="skipOnContention">Always set this to true</param>
         private bool Cleanup(CleanupMode mode) {
-            if (mode == CleanupMode.MakeRoom && maxItems < 1) return true; //We don't perform minimal cleanups unless a ceiling is specified.
-            
+            if (mode == CleanupMode.MakeRoom && byteCeiling < 1) return true; //We don't perform minimal cleanups unless a ceiling is specified.
+
+            //We have to track removed items so we can fire events later.
+            List<KeyValuePair<T, int>> removed = CounterRemoved != null ? new List<KeyValuePair<T, int>>() : null;
+
             //We have to weak lock method-level, because otherwise a background thread could be cleaning when GetOrAdd is called, and we could have a deadlock
             //With syncLock locked in GetOrAdd, waiting on cleanupLock, and Cleanup locked on cleanupLock, waiting on GetOrAdd.
             //If we didn't have any method-level lock, we'd waste resources with simultaneous cleanup runs.
@@ -145,7 +160,7 @@ namespace ImageResizer.Collections {
                     //In fast mode, only lock for the copy and delete. We can sort outside after taking a snapshot. 
                     //We wont remove newly added ones, but thats ok. 
                     lock (syncLock) {
-                        if (mode == CleanupMode.MakeRoom && keysToCounters.Count < maxItems) return true; //Nothing to do, there is stil room
+                        if (mode == CleanupMode.MakeRoom && bytesUsed < byteCeiling) return true; //Nothing to do, there is stil room
                         counters = new EventCounter[countersToKeys.Count];
                         countersToKeys.Keys.CopyTo(counters, 0); //Clone 
                     }
@@ -162,12 +177,12 @@ namespace ImageResizer.Collections {
                     }
                     //Go back into lock
                     lock (syncLock) {
-                        int removedItems = 0;
-                        int goal = maxItems / 10; //10% is our goal if we are removing minimally.
+                        long removedBytes = 0;
+                        long goal = byteCeiling / 10; //10% is our goal if we are removing minimally.
                         //Remove items
                         for (int i = 0; i < counters.Length; i++) {
                             EventCounter c = counters[i];
-                            if (mode == CleanupMode.MakeRoom && removedItems >= goal) return true; //Done, we hit our goal!
+                            if (mode == CleanupMode.MakeRoom && removedBytes >= goal) return true; //Done, we hit our goal!
                             if (mode == CleanupMode.Maintenance && c.sortValue > 0) return true; //Done, We hit the end of the zeros
                             if (mode == CleanupMode.Maintenance && c.GetValue() > 0) continue; //Skip counters that incremeted while we were working.
                             //Look up key
@@ -177,7 +192,12 @@ namespace ImageResizer.Collections {
                             //Remove counter
                             countersToKeys.Remove(c);
                             keysToCounters.Remove(key);
-                            removedItems++;
+                            //Increment our local byte removal counter
+                            removedBytes += c.CustomSize + itemSize; 
+                            //Decrement global counter
+                            bytesUsed = bytesUsed - c.CustomSize - itemSize;
+                            //store removed keys
+                            if (removed != null) removed.Add(new KeyValuePair<T, int>(key, c.GetValue()));
                         }
                     }
                 } finally {
@@ -185,33 +205,52 @@ namespace ImageResizer.Collections {
                 }
             } finally {
                 Monitor.Exit(cleanupLock);
+
+                //Fire CounterRemoved event (may still be in syncLock)!
+                if (removed != null && this.CounterRemoved != null) {
+                    foreach (KeyValuePair<T, int> p in removed) {
+                        CounterRemoved(this, p.Key, p.Value);
+                    }
+                }
             }
+
+
             return true;
         }
 
-        private EventCounter GetOrAdd(T key) {
+        private EventCounter GetOrAdd(T key, long customSize) {
             EventCounter c;
             lock (syncLock) {
                 keysToCounters.TryGetValue(key, out c);
                 if (c == null){
-                    if (maxItems > 0 && keysToCounters.Count >= maxItems) Cleanup(CleanupMode.MakeRoom);
+                    if (customSize < 0) customSize = 0;
+                    //Increment global counter first, so cleanup routine makes enough room
+                    bytesUsed += itemSize + customSize;
+
+                    if (byteCeiling > 0 && bytesUsed >= byteCeiling) Cleanup(CleanupMode.MakeRoom);
                     c = new EventCounter(granularity,(int)_trackingDuration.Ticks / granularity);
+                    c.CustomSize = customSize;
                     keysToCounters.Add(key,c);
                     countersToKeys.Add(c,key);
+
+                } else if (customSize >= 0 && c.CustomSize != customSize) {
+                    bytesUsed += customSize - c.CustomSize;
                 }
             }
             return c;
         }
         /// <summary>
-        /// Increment the counter for the given item
+        /// Increment the counter for the given item. Pings cleanup as well.
         /// </summary>
         /// <param name="key"></param>
-        public void Increment(T key) {
-            EventCounter c = GetOrAdd(key);
+        /// <param name="customSize"> Sets the custom size offset for the specified key (used for cleanup purposes). If -1, existing value will remain unchanged. </param>
+        public void Increment(T key, long customSize) {
+            EventCounter c = GetOrAdd(key, customSize);
             if (precision == EventCountingStrategy.ThreadingPrecision.Fast)
                 c.Increment();
             else
                 c.IncrementExact();
+            PingCleanup();
         }
         /// <summary>
         /// Calculate the counter value for the given item
@@ -240,6 +279,10 @@ namespace ImageResizer.Collections {
         private int arraySize;
         private int ticksPer;
         private long started;
+        /// <summary>
+        /// User-defined size of related item (key and/or a related cache object). Defaults to 0;
+        /// </summary>
+        public long CustomSize { get; set; }
 
         public EventCounter(TimeSpan trackingDuration, TimeSpan trackingPrecision)
             : this((int)(trackingDuration.Ticks / trackingPrecision.Ticks), (int)trackingPrecision.Ticks) {
@@ -250,6 +293,7 @@ namespace ImageResizer.Collections {
             this.arraySize = arraySize;
             ticksPer = ticksPerElement;
             started = DateTime.Now.Ticks;
+            CustomSize = 0;
         }
 
         public void Increment(long ticks) {

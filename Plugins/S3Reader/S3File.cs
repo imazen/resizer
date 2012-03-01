@@ -14,7 +14,7 @@ using ImageResizer.Resizing;
 
 namespace ImageResizer.Plugins.S3Reader {
 
-    public class S3File : VirtualFile, IVirtualFile, IVirtualFileWithModifiedDate {
+    public class S3File : VirtualFile, IVirtualFile, IVirtualFileWithModifiedDate, IVirtualFileSourceCacheKey {
         private string bucket;
         private string key;
         private S3VirtualPathProvider provider;
@@ -125,6 +125,10 @@ namespace ImageResizer.Plugins.S3Reader {
             }
         }
 
+
+        public string GetCacheKey(bool includeModifiedDate) {
+            return VirtualPath + (includeModifiedDate ? ("_" + ModifiedDateUTC.Ticks.ToString()) : "");
+        }
     }
 }
 
