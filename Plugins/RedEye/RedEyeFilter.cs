@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Collections.Generic;
 using AForge.Imaging.Filters;
 using AForge.Imaging;
 using System.Drawing;

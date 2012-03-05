@@ -45,6 +45,10 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSearcher.cs" />
+    <Compile Include="EyeKernels.cs" />
+    <Compile Include="GridSearch.cs" />
+    <Compile Include="ISearcher.cs" />
     <Compile Include="RedEyeFilter.cs" />
     <Compile Include="RedEyePlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -54,6 +58,9 @@
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="alogorithm.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
