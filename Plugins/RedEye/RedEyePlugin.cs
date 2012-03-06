@@ -115,11 +115,14 @@ namespace ImageResizer.Plugins.RedEye {
                     UnmanagedImage ui = new UnmanagedImage(data);
 
                     for (i = 0; i < eyes.Length -2; i += 3) {
-                        if (eyes[i + 2] > 0) {
-                            CorrectRedEye(ui, (int)eyes[i], (int)eyes[i + 1], (int)eyes[i + 2]);
+                        AdaptiveCircleFill.MarkEye(ui, new System.Drawing.Point((int)eyes[i], (int)eyes[i + 1]), (int)Math.Ceiling(0.02 * Math.Max(ui.Width, ui.Height)), 24);
+                            
+                        /*if (eyes[i + 2] > 0) {
+                            AdaptiveCircleFill.MarkEye(ui, new System.Drawing.Point((int)eyes[i], (int)eyes[i + 1]),(int)Math.Ceiling(0.025 * Math.Max(ui.Width,ui.Height)),24);
+                            //CorrectRedEye(ui, (int)eyes[i], (int)eyes[i + 1], (int)eyes[i + 2]);
                         }else{
                             SemiAutoCorrectRedEye(ui, (int)eyes[i], (int)eyes[i + 1]);
-                        }
+                        }*/
                     }
 
                 } finally {
