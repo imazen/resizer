@@ -45,10 +45,12 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdaptiveCircleFill.cs" />
     <Compile Include="CSearcher.cs" />
     <Compile Include="EyeKernels.cs" />
     <Compile Include="GridSearch.cs" />
     <Compile Include="ISearcher.cs" />
+    <Compile Include="ManualSearcher.cs" />
     <Compile Include="RedEyeFilter.cs" />
     <Compile Include="RedEyePlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -61,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="alogorithm.txt" />
+    <Content Include="manual-algorithm.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
