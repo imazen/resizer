@@ -5,6 +5,7 @@ using AForge.Imaging;
 using System.Drawing;
 using AForge.Imaging.Filters;
 using System.Runtime.InteropServices;
+using System.Drawing.Imaging;
 
 namespace ImageResizer.Plugins.RedEye {
 
@@ -59,9 +60,10 @@ namespace ImageResizer.Plugins.RedEye {
                 var fill = new AdaptiveCircleFill(red, startAt, start, maxEyeRadius * 2);
                 fill.FirstPass();
                 fill.SecondPass();
-                fill.MarkFilledPixels(image, subset.X, subset.Y, new byte[] { 0, 255, 0, 0 });
+                fill.CorrectRedEye(image, subset.X, subset.Y);
+                //fill.MarkFilledPixels(image, subset.X, subset.Y, new byte[] { 0, 255, 0, 0 });
 
-                fill.SetPixel(image, startAt.X + subset.X, startAt.Y + subset.Y, new byte[] { 255, 255, 0, 0 });
+                //fill.SetPixel(image, startAt.X + subset.X, startAt.Y + subset.Y, new byte[] { 255, 255, 0, 0 });
             }finally{
                 if (red != null) red.Dispose();
             }
@@ -340,5 +342,65 @@ namespace ImageResizer.Plugins.RedEye {
 
 
         }
+
+        public UnmanagedImage GetBlurredMask() {
+            using (UnmanagedImage ui = UnmanagedImage.Create(filledArray.GetLength(1),filledArray.GetLength(0), PixelFormat.Format8bppIndexed)) {
+                MarkFilledPixels(ui, 0, 0, new byte[] { 255 });
+                return new GaussianBlur(1.25,5).Apply(ui);
+            }
+        }
+
+        /// <summary>
+        /// Using the fill array calculated in passes 1 and 2, apply red-eye correction to the specified image. 
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="ox"></param>
+        /// <param name="oy"></param>
+        public unsafe void CorrectRedEye(UnmanagedImage image, int ox, int oy) {
+            int pixelSize = System.Drawing.Image.GetPixelFormatSize(image.PixelFormat) / 8;
+            if (pixelSize > 4) throw new Exception("Invalid pixel depth");
+            UnmanagedImage mask = GetBlurredMask(); ;
+            try {
+                long scan0 = (long)image.ImageData;
+                long stride = image.Stride;
+                // do the job
+                byte* src;
+                //Establish bounds
+                int top = oy;
+                int bottom = oy + mask.Height;
+                int left = ox;
+                int right = ox + mask.Width;
+
+                byte* fade;
+                float fadeVal;
+                float gray;
+
+                //Scan region
+                for (int y = top; y < bottom; y++) {
+                    src = (byte*)(scan0 + y * stride + (left * pixelSize));
+                    for (int x = left; x < right; x++, src += pixelSize) {
+                        if (src[RGB.R] == 0) continue; //Because 0 will crash the formula
+
+                        //Get ptr to mask pixel
+                        fade = (byte*)((long)mask.ImageData + (y - top) * mask.Stride + x - left);
+                        if (*fade == 0) continue; 
+
+                        fadeVal = (float)*fade / 255.0F;
+                        //Calculate monochrome alternative
+                        gray = (byte)((float)src[RGB.G] * 0.5f + (float)src[RGB.B] * 0.5f);
+
+                        //Apply monochrome alternative using mask
+                        src[RGB.R] = (byte)((fadeVal * gray) + (1.0 - fadeVal) * src[RGB.R]);
+                        src[RGB.G] = (byte)((fadeVal * gray) + (1.0 - fadeVal) * src[RGB.G]);
+                        src[RGB.B] = (byte)((fadeVal * gray) + (1.0 - fadeVal) * src[RGB.B]);
+                        
+                    }
+                }
+            } finally {
+                if (mask != null) mask.Dispose();
+            }
+        }
+
+
     }
 }
