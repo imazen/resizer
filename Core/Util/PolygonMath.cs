@@ -625,5 +625,20 @@ namespace ImageResizer.Util
             }
             return true;
         }
+        /// <summary>
+        /// Returns the length of the shortest line segment in the given polygon.
+        /// </summary>
+        /// <param name="pointF"></param>
+        /// <returns></returns>
+        public static double GetShortestPair(PointF[] poly) {
+            PointF last = poly[poly.Length - 1];
+            double max = 0;
+            foreach (PointF p in poly) {
+                double dist = Math.Sqrt((p.X - last.X) * (p.X - last.X) + (p.Y - last.Y) * (p.Y - last.Y));
+                if (dist > max) max = dist;
+                last = p;
+            }
+            return max;
+        }
     }
 }
