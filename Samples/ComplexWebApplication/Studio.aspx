@@ -10,23 +10,29 @@
 	<link rel="stylesheet" href="css/jquery.Jcrop.css" type="text/css" /> 
  
 </head>
-<body>
+<body bgcolor="black">
     <form id="form1" runat="server">
-    <div id="studio">
-    <table><tr><td style="vertical-align:top">
-    <div class="controls ui-helper-reset">
-     </div>
-     </td><td style="text-align:center; vertical-align:middle">
-     <img class="img" runat="server" src="~/private/redeye/Red-Eye_08.jpg?width=400" style="margin:auto;" />
-     </td></tr></table>
-<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
-<script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
-<script type="text/javascript" src="js/querystring.js"></script>
-<script src="js/jquery.Jcrop.js" type="text/javascript"></script> 
-<script src="js/jquery.jcrop.preview.js" type="text/javascript"></script> 
-<script type="text/javascript" src="js/studio.js"></script>
+    <div class="studio1" />
+    <input type="text" runat="server" id="caption" />
 
-    </div>
+
+    <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
+
+    <script src="js/jquery.Jcrop.js" type="text/javascript"></script> 
+    <script src="js/jquery.jcrop.preview.js" type="text/javascript"></script> 
+    <script type="text/javascript" src="js/ImageResizing.js"></script>
+    <script type="text/javascript" src="js/jquery.imagestudio.js"></script>
+    <script type="text/javascript">
+    //<!--
+
+        $(function () {
+            $('div.studio1').ImageStudio({ url: '/private/redeye/Red-Eye_08.jpg?width=400' });
+        });
+
+    //-->
+    </script>
+    
     </form>
 </body>
 </html>
