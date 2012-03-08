@@ -8,6 +8,7 @@ using AForge.Imaging.Filters;
 using AForge;
 using System.Globalization;
 using ImageResizer.Util;
+using System.Drawing;
 namespace ImageResizer.Plugins.AdvancedFilters {
     public class AdvancedFilters:BuilderExtension, IPlugin, IQuerystringPlugin {
         public AdvancedFilters() {
@@ -22,31 +23,78 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             c.Plugins.remove_plugin(this);
             return true;
         }
-        protected override RequestedAction PostRenderImage(ImageState s) {
 
+        /// <summary>
+        /// Calculates a radius based on the provided value, using min(width/height) as the normalizing factor. Querystring values are interpreted as 1/1000ths of the normalizing factor.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="key"></param>
+        /// <param name="key2"></param>
+        /// <returns></returns>
+        protected int GetRadius(ImageState s, string key, string key2, double units) {
+            string str = s.settings[key];
+            if (string.IsNullOrEmpty(str) && key2 != null) str = s.settings[key2];
+            if (string.IsNullOrEmpty(str)) return -1;
+            double d;
+            if (double.TryParse(str, Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo, out d) && d > 0) {
+                double factor = Util.PolygonMath.GetShortestPair(s.layout["image"]) / units;
+
+                return (int)Math.Round(factor * d);
+            }
+            return -1;
+
+        }
+        protected override RequestedAction PostRenderImage(ImageState s) {
             if (s.destBitmap == null) return RequestedAction.None;
+
+            //TODO: if the image is unrotated, use a rectangle to limit the effect to the desired area
+
             string str = null;
             int i = 0;
-            
-            
-            str = s.settings["blur"]; //radius
-            if (string.IsNullOrEmpty(str)) str= s.settings["a.blur"];
-            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
-                new GaussianBlur(1.4, i).ApplyInPlace(s.destBitmap);
-            
-            str = s.settings["sharpen"]; //radius
-            if (string.IsNullOrEmpty(str)) str= s.settings["a.sharpen"];
-            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
-                new GaussianSharpen(1.4, i).ApplyInPlace(s.destBitmap);
 
-            str = s.settings["a.oilpainting"]; //radius
-            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
-                new OilPainting(i).ApplyInPlace(s.destBitmap);
+            //If radiusunits is specified, use that code path.
+            double units = -1;
+            str = s.settings["a.radiusunits"];
+            if (!string.IsNullOrEmpty(str) && double.TryParse(str, Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo, out units) && units > 0) {
 
-            str = s.settings["a.removenoise"]; //radius
-            if ("true".Equals(str, StringComparison.OrdinalIgnoreCase)) str = "3";
-            if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
-                new ConservativeSmoothing(i).ApplyInPlace(s.destBitmap); 
+                i = GetRadius(s, "blur", "a.blur", units);
+                if (i > 0) new GaussianBlur(1.4, i).ApplyInPlace(s.destBitmap);
+
+                i = GetRadius(s, "sharpen", "a.sharpen", units);
+                if (i > 0) new GaussianSharpen(1.4, i).ApplyInPlace(s.destBitmap);
+
+                i = GetRadius(s, "a.oilpainting", null, units);
+                if (i > 0) new OilPainting(i).ApplyInPlace(s.destBitmap);
+
+                if ("true".Equals(s.settings["a.removenoise"], StringComparison.OrdinalIgnoreCase)) {
+                    new ConservativeSmoothing(3).ApplyInPlace(s.destBitmap);
+                } else {
+                    i = GetRadius(s, "a.removenoise", null, units);
+                    if (i > 0) new ConservativeSmoothing(i).ApplyInPlace(s.destBitmap);
+                }
+
+
+            } else {
+
+                str = s.settings["blur"]; //radius
+                if (string.IsNullOrEmpty(str)) str = s.settings["a.blur"];
+                if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
+                    new GaussianBlur(1.4, i).ApplyInPlace(s.destBitmap);
+
+                str = s.settings["sharpen"]; //radius
+                if (string.IsNullOrEmpty(str)) str = s.settings["a.sharpen"];
+                if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
+                    new GaussianSharpen(1.4, i).ApplyInPlace(s.destBitmap);
+
+                str = s.settings["a.oilpainting"]; //radius
+                if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
+                    new OilPainting(i).ApplyInPlace(s.destBitmap);
+
+                str = s.settings["a.removenoise"]; //radius
+                if ("true".Equals(str, StringComparison.OrdinalIgnoreCase)) str = "3";
+                if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
+                    new ConservativeSmoothing(i).ApplyInPlace(s.destBitmap);
+            }
 
             //Sobel only supports 8bpp grayscale images.
             //true/false
