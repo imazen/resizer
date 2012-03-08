@@ -1,4 +1,31 @@
-﻿# List of bugs and edge cases to fix
+﻿## Settings
+
+height: the height to set the container. 
+width: the width to set the container.
+
+panes: ['rotateflip','crop','adjust', 'redeye','objectremoval','effects'] //A list of panes to display
+
+strings: {
+paneRotateFlip: "Rotate & Flip"
+
+
+
+API
+
+call $('div').ImageStudio('api') to get the object.
+
+
+## Division of responsibility:
+
+It is the responsibility of the caller to ensure that jQuery, jQuery UI, ImageResizing.js, ImageStudio.js, jQuery UI CSS, and JCrop CSS are are all loaded. Dynamic loading is not yet implemented.
+
+
+
+## Feature idea
+
+Zoom tool - load a high-res version and display it, following the cursor, using css like the preview window.
+
+# List of bugs and edge cases to fix
 
 Rotation and flip will need to translate crop, red-eye, and object removal coordinates if present.
 
