@@ -71,25 +71,33 @@
 
     $.fn.ImageStudio = function (options) {
 
-        function processOptions(options){
-            var defs = $.extend({},defaults);
+        var processOptions = function(options){
+            var defs = $.extend(true,{},defaults);
             if (options.url.indexOf('?') < 0 && options.url.indexOf(';') > -1) defs.finalWithSemicolons = true;
             defs.editWithSemicolons = defs.finalWithSemicolons;
-           return $.extend(true,{},defaults, options);
+            if (options.labels) defs.labels = $.extend(true,defs.labels,options.labels);
+            if (options.icons) defs.icons = $.extend(true,defs.icons,options.icons);
+           return $.extend(defs, options);
         }
 
-        return this.each(function () {
-            div = $(this);
+        var result = this;
+
+        this.each(function () {
+            var div = $(this);
             
             if (div.data('ImageStudio')) {
                 // The API can be requested this way (undocumented)
-                if (options === 'api') return $(this).data('ImageStudio');
+                if (options == 'api') {
+                    result = div.data('ImageStudio');
+                    return;
+                }
                 // Otherwise, we just reset the options...
-                else $(this).data('ImageStudio').setOptions(processOptions(options));
+                else div.data('ImageStudio').setOptions(processOptions(options));
             }else {
-                $(this).data('ImageStudio',init($(this),processOptions(options)));
+                div.data('ImageStudio',init(div,processOptions(options)));
             }
         });
+        return result;
     };
 
     function init(div, opts){
@@ -437,7 +445,7 @@ var addCropPane = function (opts) {
     }
 
 
-    var stopCrop = function (save) {
+    var stopCrop = function (save, norestore) {
         cropping = false;
         if (save) {
             setUrl(opts, previousUrl, true);
@@ -447,7 +455,7 @@ var addCropPane = function (opts) {
                 obj['cropxunits'] = img.width();
                 obj['cropyunits'] = img.height();
             });
-        } else {
+        } else if (!norestore) {
             setUrl(opts, previousUrl);
         }
         jcrop_reference.destroy();
@@ -495,7 +503,7 @@ var addCropPane = function (opts) {
     }).appendTo(c).hide();
     var preview = $("<div style='width:200px;height:200px;margin-left:-15px'></div>").appendTo(c).hide();
     var btnReset = button(opts,'reset', function (obj) {
-        stopCrop(false);
+        stopCrop(false, true);
         obj.remove("crop","cropxunits","cropyunits");
     }).appendTo(c);
 
