@@ -14,6 +14,13 @@ namespace ImageResizer.Plugins.RedEye {
     /// </summary>
     public class AdaptiveCircleFill {
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="red">A grayscale image filtered using a redness algorithm</param>
+        /// <param name="startAt">The maximum brightness point, the place to start filling</param>
+        /// <param name="origin">The origin of the search, usually the click</param>
+        /// <param name="maxRadius">The maximum distance from 'startAt' to consider filling</param>
         public AdaptiveCircleFill(UnmanagedImage red, System.Drawing.Point startAt, PointF origin, float maxRadius) {
             this.red = red; 
             this.StartAt = startAt;

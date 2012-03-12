@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\dlls\debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -26,10 +26,11 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\dlls\release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AForge">
@@ -41,15 +42,21 @@
     <Reference Include="AForge.Imaging.Formats">
       <HintPath>..\Libs\AForge\AForge.Imaging.Formats.dll</HintPath>
     </Reference>
+    <Reference Include="OpenCvSharp">
+      <HintPath>..\Libs\OpenCV\x86\OpenCvSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
+      <Link>SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="AdaptiveCircleFill.cs" />
     <Compile Include="CSearcher.cs" />
     <Compile Include="EyeKernels.cs" />
+    <Compile Include="FaceDetection.cs" />
     <Compile Include="GridSearch.cs" />
-    <Compile Include="ISearcher.cs" />
     <Compile Include="ManualSearcher.cs" />
     <Compile Include="RedEyeFilter.cs" />
     <Compile Include="RedEyePlugin.cs" />

@@ -6,7 +6,7 @@ using AForge.Imaging;
 using AForge.Imaging.Filters;
 
 namespace ImageResizer.Plugins.RedEye {
-    public class CSearcher :ISearcher {
+    public class CSearcher  {
 
 
         public RectangleF LocateEye(Bitmap img, Rectangle bounds, PointF estimatedPosition, float positionalWeight) {

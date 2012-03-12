@@ -57,7 +57,7 @@ namespace ImageResizer {
         /// The only instance the resulting image will be smaller is if the original source image is smaller. 
         /// Set Scale=Both to upscale these images and ensure the output always matches 'width' and 'height'. 
         /// If both width and height are specified, the image will be 'letterboxed' to match the desired aspect ratio. 
-        /// Use maxwidth/maxheight, crop=auto, or stretch=fill to avoid this behavior.
+        /// Change the Mode property to adjust this behavior.
         /// </summary>
         public int Width                        { get {
                 return get("width", get("w", -1)); }set {
@@ -70,7 +70,7 @@ namespace ImageResizer {
         /// The only instance the resulting image will be smaller is if the original source image is smaller. 
         /// Set Scale=Both to upscale these images and ensure the output always matches 'width' and 'height'. 
         /// If both width and height are specified, the image will be 'letterboxed' to match the desired aspect ratio. 
-        /// Use maxwidth/maxheight, crop=auto, or stretch=fill to avoid this behavior.
+        /// Change the Mode property to adjust this behavior.
         /// </summary>
         public int Height                        { get { 
             return get("height", get("h",-1));            } set {

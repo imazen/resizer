@@ -9,14 +9,17 @@ using AForge;
 using AForge.Imaging;
 using System.Drawing.Imaging;
 using System.Drawing;
+using ImageResizer.Configuration;
 
 namespace ImageResizer.Plugins.RedEye {
     public class RedEyePlugin:BuilderExtension, IPlugin, IQuerystringPlugin {
         public RedEyePlugin() {
         }
 
+        Config c;
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
+            this.c = c;
             return this;
         }
 
@@ -131,6 +134,25 @@ namespace ImageResizer.Plugins.RedEye {
                 }
             }
 
+             if ("true".Equals(s.settings["r.autoeyes"], StringComparison.OrdinalIgnoreCase)) {
+                 List<RectangleF> eyes = new FaceDetection(@"C:\Users\Administrator\Documents\resizer\Plugins\Libs\OpenCV").DetectEyes(s.sourceBitmap);
+                 List<PointF> points = new List<PointF>();
+                 foreach(RectangleF r in eyes) { points.Add(r.Location); points.Add(new PointF(r.Right,r.Bottom));}
+                 PointF[] newPoints = c.CurrentImageBuilder.TranslatePoints(points.ToArray(),s.originalSize,new ResizeSettings(s.settings));
+                 using (Graphics g = Graphics.FromImage(s.destBitmap)){
+                     for(i =0; i < newPoints.Length -1; i+=2){
+                         float x1 = newPoints[i].X;
+                         float y1 = newPoints[i].Y;
+                         float x2 = newPoints[i + 1].X;
+                         float y2 = newPoints[i + 1].Y;
+                         float t; 
+                         if (x1 > x2){ t = x2; x2  =x1; x1 = t;}
+                         if (y1 > y2){ t = y1; y1 = y2; y2 = t;} 
+
+                         g.DrawRectangle(Pens.Green,new Rectangle((int)x1,(int)y1,(int)(x2-x1),(int)(y2-y1)));
+                     }
+                 }
+             }
 
             str = s.settings["r.filter"]; //radius
             if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i)) {
