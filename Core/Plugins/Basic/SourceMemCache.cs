@@ -4,9 +4,15 @@ using System.Text;
 using System.IO;
 using ImageResizer.Collections;
 using ImageResizer.Util;
+using System.Collections.Specialized;
 
 namespace ImageResizer.Plugins.Basic {
     public class SourceMemCache: IPlugin, IVirtualFileCache {
+
+        /// <summary>
+        /// Defaults to 10MB limit, and samples usage over the last 10 minutes when deciding what to remove. Stuff not used in the last 10 minutes gets discarded even if the limit hasn't been reached.
+        /// </summary>
+        public SourceMemCache() : this(1024 * 1024 * 1024, new TimeSpan(0, 10, 0)) { }
 
         public SourceMemCache(long maxBytes, TimeSpan usageWindow) {
             //Cleanup at most once per minute, unless hitting the limits. 

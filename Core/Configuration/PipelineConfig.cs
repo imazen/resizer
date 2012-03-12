@@ -268,10 +268,20 @@ namespace ImageResizer.Configuration {
         /// <param name="queryString"></param>
         /// <returns></returns>
         public IVirtualFile GetFile(string virtualPath, NameValueCollection queryString) {
+            IVirtualFile f = null;
             foreach (IVirtualImageProvider p in c.Plugins.VirtualProviderPlugins) {
-                if (p.FileExists(virtualPath, queryString)) return p.GetFile(virtualPath, queryString);
+                if (p.FileExists(virtualPath, queryString)) { f = p.GetFile(virtualPath, queryString); break; }
             }
-            return HostingEnvironment.VirtualPathProvider != null && HostingEnvironment.VirtualPathProvider.FileExists(virtualPath)  ? new VirtualFileWrapper(HostingEnvironment.VirtualPathProvider.GetFile(virtualPath)) : null;
+            if (f == null &&  HostingEnvironment.VirtualPathProvider != null && HostingEnvironment.VirtualPathProvider.FileExists(virtualPath)) f =  new VirtualFileWrapper(HostingEnvironment.VirtualPathProvider.GetFile(virtualPath));
+            if (f == null) return null;
+
+            //Now we have a reference to the real virtual file, let's see if it is source-cached.
+            IVirtualFile cached = null;
+            foreach (IVirtualFileCache p in c.Plugins.GetAll<IVirtualFileCache>()) {
+                cached = p.GetFileIfCached(virtualPath,queryString,f);
+                if (cached != null) return cached;
+            }
+            return f;
         }
 
         /// <summary>
