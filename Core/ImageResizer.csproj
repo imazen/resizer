@@ -79,6 +79,7 @@
     <Compile Include="Configuration\Logging\ILogManager.cs" />
     <Compile Include="Configuration\UrlAuthorizationEventArgs.cs" />
     <Compile Include="ImageJob.cs" />
+    <Compile Include="Instructions.cs" />
     <Compile Include="Plugins\Basic\AutoRotate.cs" />
     <Compile Include="Plugins\Basic\DefaultSettings.cs" />
     <Compile Include="Plugins\Basic\FolderResizeSyntax.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="Plugins\Basic\DiagnosticDisabledHandler.cs" />
     <Compile Include="Plugins\Basic\Gradient.cs" />
     <Compile Include="Plugins\Basic\Image404.cs" />
+    <Compile Include="Plugins\Basic\ImageInfoAPI.cs" />
     <Compile Include="Plugins\Basic\NoCacheHandler.cs" />
     <Compile Include="Caching\ResponseArgs.cs" />
     <Compile Include="Caching\ICacheProvider.cs" />
