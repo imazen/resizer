@@ -9,6 +9,7 @@
     var defaults = {
         url: null, //The image URL to load for editing. 
         width: null, //To set the width of the area
+        accordionWidth: 230,
         height: 530, //To constrain the height of the area.
         panes: ['rotateflip', 'crop', 'adjust', 'redeye', 'carve', 'effects'], //A list of panes to display, in order. 
         editingServer: null, //If set, an alternate server will be used during editing. For example, using a cloud front distribution during editing is counter productive
@@ -21,6 +22,7 @@
                        'cache','process', 'shadowwidth', 'shadowcolor', 'shadowoffset'], 
         onchange: null, //The callback to fire whenever an edit occurs.
         cropratios: [[0, "Custom"], ["current", "Current"], [4 / 3, "4:3"], [16 / 9, "16:9 (Widescreen)"], [3 / 2, "3:2"]],
+        cropPreview: {width:'200px',height:'200px','margin-left':'-15px'},
         icons: { 
             rotateleft: 'arrowreturnthick-1-w',
             rotateright: 'arrowreturnthick-1-e',
@@ -109,7 +111,7 @@
         var tr = $('<tr></tr>').appendTo($('<table></table').appendTo(div));
 
         //Add accordion
-        var a = $("<div></div>").addClass("controls").width(230).appendTo($('<td></td>').appendTo(tr));
+        var a = $("<div></div>").addClass("controls").width(opts.accordionWidth).appendTo($('<td></td>').appendTo(tr));
         //Add image
         var img = $('<img />').addClass("studioimage").appendTo($('<td></td>').css('vertical-align','middle').css('text-align','center').css('padding-left','20px').appendTo(tr));
         opts.img = img; //Save a reference to the image object in options
@@ -380,7 +382,7 @@ var addCropPane = function (opts) {
      closure.opts = opts;
 
     var startCrop = function (uncroppedWidth, uncroppedHeight, uncroppedUrl) {
-    console.log ("starting to crop " + uncroppedUrl);
+        //console.log ("starting to crop " + uncroppedUrl);
         var cl = closure;
         cl.cropping = true;
 
@@ -407,12 +409,12 @@ var addCropPane = function (opts) {
             coords = cropObj.stretchTo(uncroppedWidth,uncroppedHeight).toCoordsArray();
         }
 
-        preview.JcropPreview({ jcropImg: cl.img });
+        if (cl.opts.cropPreview) preview.JcropPreview({ jcropImg: cl.img });
         preview.hide();
 
         var update = function (coords) {
-            preview.JcropPreviewUpdate(coords);
-            preview.show();
+            if (cl.opts.cropPreview) preview.JcropPreviewUpdate(coords);
+            if (cl.opts.cropPreview) preview.show();
         };
 
         //Start up jCrop
@@ -425,7 +427,7 @@ var addCropPane = function (opts) {
         }, function () {
             cl.jcrop_reference = this;
 
-            preview.JcropPreviewUpdate({ x: 0, y: 0, x2: uncroppedWidth, y2: uncroppedHeight, width: uncroppedWidth, height: uncroppedHeight });
+            if (cl.opts.cropPreview) preview.JcropPreviewUpdate({ x: 0, y: 0, x2: uncroppedWidth, y2: uncroppedHeight, width: uncroppedWidth, height: uncroppedHeight });
             if (coords != null) this.setSelect(coords);
 
             btnReset.hide();
@@ -474,7 +476,7 @@ var addCropPane = function (opts) {
         var q = new ImageResizing.ResizeSettings(cl.opts.editQuery);
         q.remove("crop","cropxunits","cropyunits");
         var uncroppedUrl = cl.opts.editPath + q.toQueryString(cl.opts.editWithSemicolons);
-        console.log("Loading uncropped image: " + uncroppedUrl);
+        //console.log("Loading uncropped image: " + uncroppedUrl);
         var image = new Image();
         image.onload = function () { startCrop(image.width, image.height, uncroppedUrl); };
         image.src = uncroppedUrl;
@@ -501,7 +503,8 @@ var addCropPane = function (opts) {
     var btnDone = button(opts, 'crop_done', null, function () {
         stopCrop(true);
     }).appendTo(c).hide();
-    var preview = $("<div style='width:200px;height:200px;margin-left:-15px'></div>").appendTo(c).hide();
+    var preview = $("<div></div>").addClass('cropPreview').appendTo(c).hide();
+    if (opts.cropPreview) preview.css(opts.cropPreview);
     var btnReset = button(opts,'reset', function (obj) {
         stopCrop(false, true);
         obj.remove("crop","cropxunits","cropyunits");

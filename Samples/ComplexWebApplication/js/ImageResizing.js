@@ -273,8 +273,8 @@ ir.Utils.flipRotateRect = function (x1, y1, x2, y2, width, height, oldAngle, new
     }
 
     var ret = { x1: x1, y1: y1, x2: x2, y2: y2, xunits: width, yunits: height };
-    console.log("Moving from " + oldAngle + " to " + newAngle + ", " + oldFlipH + " to " + newFlipH + " and " + oldFlipV + " to " + newFlipV);
-    console.log(ret); 
+    //console.log("Moving from " + oldAngle + " to " + newAngle + ", " + oldFlipH + " to " + newFlipH + " and " + oldFlipV + " to " + newFlipV);
+    //console.log(ret); 
     return ret;
 };
 
