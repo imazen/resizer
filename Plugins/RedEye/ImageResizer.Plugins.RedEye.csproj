@@ -44,8 +44,9 @@
     <Reference Include="AForge.Imaging.Formats">
       <HintPath>..\Libs\AForge\AForge.Imaging.Formats.dll</HintPath>
     </Reference>
-    <Reference Include="OpenCvSharp">
-      <HintPath>..\Libs\OpenCV\x86\OpenCvSharp.dll</HintPath>
+    <Reference Include="OpenCvSharp, Version=2.0.4431.20114, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\OpenCV\3.2.1\OpenCvSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
