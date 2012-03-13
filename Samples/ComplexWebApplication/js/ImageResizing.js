@@ -253,6 +253,20 @@ ir.Utils.flipRotatePoint = function (x, y, oldWidth, oldHeight, oldAngle, newAng
 
     return { x: x, y: y };
 }
+//Returns an array of 4 values, x1, y2, x2, y2, of a rectangle of the given aspect ratio centered in the given width/height
+ir.Utils.getRectOfRatio = function (ratio, maxwidth, maxheight) {
+    var w; var h;
+    if (maxwidth / maxheight > ratio) {
+        w = ratio * maxheight;
+        h = w / ratio;
+    } else {
+        h = maxwidth / ratio;
+        w = h * ratio;
+    }
+    var x = (maxwidth - w) / 2;
+    var y = (maxheight - h) / 2;
+    return [x, y, x + w, y + h];
+};
 
 ir.Utils.flipRotateRect = function (x1, y1, x2, y2, width, height, oldAngle, newAngle, oldFlipH, newFlipH, oldFlipV, newFlipV) {
     var p1 = ir.Utils.flipRotatePoint(x1, y1, width, height, oldAngle, newAngle, oldFlipH, newFlipH, oldFlipV, newFlipV);
