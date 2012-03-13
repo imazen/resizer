@@ -115,8 +115,10 @@
         var a = $("<div></div>").addClass("controls").width(opts.accordionWidth).appendTo(atd);
         
         //Add image
-        var img = $('<img />').addClass("studioimage").appendTo($('<td></td>').addClass("imageCell").css('vertical-align','middle').css('text-align','center').css('padding-left','10px').css('padding-right','10px').appendTo(tr));
+        var idiv = $('<div></div>').css('text-align','center').appendTo($('<td></td>').addClass("imageCell").css('vertical-align','middle').css('text-align','center').css('padding-left','10px').css('padding-right','10px').appendTo(tr));
+        var img = $('<img />').addClass("studioimage").appendTo(idiv);
         opts.img = img; //Save a reference to the image object in options
+        opts.imgDiv = idiv;
         opts.accordion = a;
         var updateOptions = function(){
             if (opts.width) { div.width(opts.width);}
@@ -429,6 +431,8 @@ var addCropPane = function (opts) {
             bgOpacity: 0.6
         }, function () {
             cl.jcrop_reference = this;
+            cl.opts.jcrop_reference = this;
+            cl.opts.imgDiv.css('padding-left',(cl.opts.imgDiv.width() - cl.img.width()) /2 + 1);
 
             if (cl.opts.cropPreview) preview.JcropPreviewUpdate({ x: 0, y: 0, x2: uncroppedWidth, y2: uncroppedHeight, width: uncroppedWidth, height: uncroppedHeight });
             if (coords != null) this.setSelect(coords);
@@ -460,7 +464,9 @@ var addCropPane = function (opts) {
             setUrl(cl.opts, cl.previousUrl);
         }
         cl.jcrop_reference.destroy();
+        delete cl.opts.jcrop_reference;
         cl.img.attr('style', ''); //Needed to fix all the junk JCrop added.
+        cl.opts.imgDiv.css('padding-left',0); //undo horizontal align fix
         btnCancel.hide();
         btnDone.hide();
         label.hide();
@@ -488,7 +494,8 @@ var addCropPane = function (opts) {
     var label = h3(opts,'aspectratio',c).hide();
     var ratio = $("<select></select>");
     var getRatio = function () {
-        return ratio.val() == "current" ? img.width() / img.height() : (ratio.val() == 0 ? null : ratio.val())
+        var cl = closure;
+        return ratio.val() == "current" ? cl.img.width() / cl.img.height() : (ratio.val() == 0 ? null : ratio.val())
     }
     var ratios = opts.cropratios;
     for (var i = 0; i < ratios.length; i++)
@@ -496,16 +503,28 @@ var addCropPane = function (opts) {
     ratio.appendTo(c).val(0).hide();
     ratio.change(function () {
         var cl = closure;
-        cl.jcrop_reference.setOptions({ aspectRatio: getRatio() });
+        var r = getRatio();
+        var coords = cl.jcrop_reference.tellSelect();
+        cl.jcrop_reference.setOptions({ aspectRatio: r });
+        var areAllEmpty = function(obj, keys){
+            for(var k in keys)
+                if (!isNaN(obj[keys[k]]) && obj[keys[k]] != 0) return false;
+            return true;
+        };
+        if (areAllEmpty(coords,['x','y','x2','y2'])){
+            if (r != 0 && r != cl.img.width() / cl.img.height()){
+             cl.jcrop_reference.setSelect(ImageResizing.Utils.getRectOfRatio(r,cl.img.width(),cl.img.height()));
+            }else cl.jcrop_reference.release();
+        }
         cl.jcrop_reference.focus();
     });
-
+    var grouper = $('<div></div>').addClass('crop-active-buttons').appendTo(c);
     var btnCancel = button(opts,'crop_cancel', null, function () {
         stopCrop(false);
-    }).appendTo(c).hide();
+    }).appendTo(grouper).hide();
     var btnDone = button(opts, 'crop_done', null, function () {
         stopCrop(true);
-    }).appendTo(c).hide();
+    }).appendTo(grouper).hide();
     var preview = $("<div></div>").addClass('cropPreview').appendTo(c).hide();
     if (opts.cropPreview) preview.css(opts.cropPreview);
     var btnReset = button(opts,'reset', function (obj) {
