@@ -85,7 +85,8 @@ rs.prototype.toggle = function (key, defaultValue, deleteIf) {
     if ((/flip\.[xy]$/i).test(key)) {
         var lastchar = key.charAt(key.length - 1);
         key = key.substring(0, key.length - 2);
-        var val = ir.Utils.toggleFlip(this[key], lastchar == 'x', lastchar == 'y');
+        if (key.charAt(0) == 's') this.rotateFlipCrop(0, lastchar == 'x', lastchar == 'y'); //Must call before changing flip value. Have to undo x flip, then reapply x or y flip.
+        var val = ir.Utils.toggleFlip(this[key], lastchar == 'x', lastchar == 'y'); 
         if (val == "00") delete this[key];
         else this[key] = val;
         return;
@@ -100,12 +101,85 @@ rs.prototype.increment = function (key, offset, cycleLimit, defaultValue) {
     defaultValue = defaultValue ? defaultValue : 0;
     var val = (this[key] === undefined | this[key] === null) ? defaultValue : parseFloat(this[key]);
     val = (val + offset) % cycleLimit;
+    if (key == "srotate") this.rotateFlipCrop(offset, false,false);
     this[key] = val;
+    
 };
 
 rs.prototype.getBool = function (key) {
     return ir.Utils.toBool(this[key]);
 };
+
+rs.prototype.getCrop = function () {
+    return new ir.CropRectangle().pullFrom(this);
+};
+
+rs.prototype.setCrop = function (cropObj) {
+    new ir.CropRectangle(cropObj).pushTo(this);
+};
+
+rs.prototype.resetSourceRotateFlip = function () {
+    var oldFlip = ir.Utils.parseFlip(this.sflip);
+    this.rotateFlipCrop(this.srotate ? -parseFloat(this.srotate) : 0, oldFlip.x, oldFlip.y);
+    delete this.srotate;
+    delete this.sflip;
+};
+
+rs.prototype.rotateFlipCrop = function (rot, fx, fy) {
+    var c = this.getCrop();
+    //Only rotate if all items are present.
+    if (!c.allPresent()) return;
+    var oldFlip = ir.Utils.parseFlip(this.sflip);
+    var oldAngle = parseFloat(this.srotate ? this.srotate : "0");
+    var r = ir.Utils.flipRotateRect(c.x1, c.y1, c.x2, c.y2, c.xunits, c.yunits, oldAngle, oldAngle + rot,oldFlip.x, oldFlip.x ^ fx,oldFlip.y, oldFlip.y ^ fy);
+    this.setCrop(r);
+};
+
+
+ir.CropRectangle = function (obj) {
+    if (obj) {
+        for (var i in obj) if (i && obj.hasOwnProperty(i) && obj[i] !== undefined && obj[i] !== null) {
+            this[i] = obj[i];
+        }
+    }
+};
+ir.CropRectangle.prototype.pullFrom = function (query) {
+    if (query.cropxunits) this.xunits = query.cropxunits;
+    if (query.cropyunits) this.yunits = query.cropyunits;
+    if (query.crop) {
+        var vals = query.crop.split(',');
+        var keys = ['x1', 'y1', 'x2', 'y2'];
+        if (vals.length < keys.length) return o;
+        for (var i = 0; i < keys.length; i++) {
+            this[keys[i]] = parseFloat(vals[i]);
+        }
+    }
+    return this;
+};
+ir.CropRectangle.prototype.pushTo = function (query) {
+    if (this.xunits) query.cropxunits = this.xunits;
+    if (this.yunits) query.cropyunits = this.yunits;
+    query.crop = this.x1 + "," + this.y1 + "," + this.x2 + "," + this.y2;
+};
+
+ir.CropRectangle.prototype.allPresent = function () {
+    return this.x1 != null && this.y1 != null && this.x2 != null && this.y2 != null && this.xunits != null && this.yunits != null;
+};
+
+ir.CropRectangle.prototype.stretchTo = function (width, height) {
+    var n = new ir.CropRectangle( { xunits: width, yunits: height, x1: this.x1, y1: this.y1, x2: this.x2, y2: this.y2 });
+    var xfactor = width / this.xunits;
+    var yfactor = height / this.yunits;
+    n.x1 *= xfactor;
+    n.x2 *= xfactor;
+    n.y1 *= yfactor;
+    n.y2 *= yfactor;
+    return n;
+};
+ir.CropRectangle.prototype.toCoordsArray = function () {
+    return [this.x1, this.y1, this.x2, this.y2];
+};
+
 ir.Utils = {};
 
 ir.Utils.parseUrl = function (url) {
@@ -154,31 +228,35 @@ ir.Utils.toBool = function (val, defaultValue) {
 }
 
 //Rotates the specified point around (0,0), (oldWidth,0), or (0,oldHeight) depending on the angle. 
-//Used to translate crop coordinates. 
-ir.Utils.flipRotatePoint = function (x, y, oldWidth, oldHeight, degreeOf90, flipH, flipV) {
-    degreeOf90 = (degreeOf90 % 360 + 360) % 360;
-    if ((degreeOf90 % 90) != 0) throw "Specified angle is not a multiple of 90";
-    degreeOf90 /= 90;
+//Used to translate crop coordinates.
+ir.Utils.flipRotatePoint = function (x, y, oldWidth, oldHeight, oldAngle, newAngle, oldFlipH, newFlipH, oldFlipV, newFlipV) {
+    var normal = function (angle) {
+        if ((angle % 90) != 0) throw "Specified angle is not a multiple of 90";
+        return (((angle + 360 + 360) % 360) / 90);
+    };
+    oldAngle = normal(oldAngle);
+    newAngle = normal(newAngle);
+    
+    //First, undo all flipping, then rotation
+    if (oldFlipH ^ (oldAngle == 2)) x = oldWidth - x;
+    if (oldFlipV ^ (oldAngle == 2))  y = oldHeight - y; 
+    var t;
+    if (oldAngle == 1) { t = x; x = y; y = oldWidth - t; t = oldHeight; oldHeight = oldWidth; oldWidth = t; }
+    if (oldAngle == 3) { t = y; y = x; x = oldHeight - t; t = oldHeight; oldHeight = oldWidth; oldWidth = t; }
 
-    if (degreeOf90 == 1) {
-        var oldY = y;
-        y = x;
-        x = oldWidth - oldY;
-    }
+    //Reapply rotation, then flipping.
+    if (newAngle == 3) { t = x; x = y; y = oldWidth - t; t = oldHeight; oldHeight = oldWidth; oldWidth = t; }
+    if (newAngle == 1) { t = y; y = x; x = oldHeight - t; t = oldHeight; oldHeight = oldWidth; oldWidth = t; }
 
-    if (degreeOf90 == 3) {
-        var oldX = x;
-        x = y;
-        y = oldWidth - oldX;
-    }
-    if (flipV ^ degreeOf90 == 2) y = oldHeight - y;
-    if (flipX) x = oldWidth - x;
+    if (newFlipH ^ (newAngle == 2)) x = oldWidth - x;
+    if (newFlipV ^ (newAngle == 2)) y = oldHeight - y;
+
     return { x: x, y: y };
 }
 
-ir.Utils.flipRotateRect = function (x1, y1, x2, y2, width, height, degreeOf90, flipH, flipV) {
-    var p1 = ir.Utils.flipRotatePoint(x1, y1, width, height, degreeOf90, flipH, flipV);
-    var p2 = ir.Utils.flipRotatePoint(x2, y2, width, height, degreeOf90, flipH, flipV);
+ir.Utils.flipRotateRect = function (x1, y1, x2, y2, width, height, oldAngle, newAngle, oldFlipH, newFlipH, oldFlipV, newFlipV) {
+    var p1 = ir.Utils.flipRotatePoint(x1, y1, width, height, oldAngle, newAngle, oldFlipH, newFlipH, oldFlipV, newFlipV);
+    var p2 = ir.Utils.flipRotatePoint(x2, y2, width, height, oldAngle, newAngle, oldFlipH, newFlipH, oldFlipV, newFlipV);
     x1 = p1.x;
     x2 = p2.x;
     y1 = p1.y;
@@ -189,7 +267,15 @@ ir.Utils.flipRotateRect = function (x1, y1, x2, y2, width, height, degreeOf90, f
     if (y2 < y1) { t = y1; y1 = y2; y2 = t; }
     if (x2 < x1) { t = x1; x1 = x2; x2 = t; }
 
-    return { x1: x1, y1: y1, x2: x2, y2: y2 };
+    //Flip units when needed
+    if ((((((newAngle - oldAngle) + 360 + 360) % 360) / 90) % 2) == 1) {
+        t = width; width = height; height = t;
+    }
+
+    var ret = { x1: x1, y1: y1, x2: x2, y2: y2, xunits: width, yunits: height };
+    console.log("Moving from " + oldAngle + " to " + newAngle + ", " + oldFlipH + " to " + newFlipH + " and " + oldFlipV + " to " + newFlipV);
+    console.log(ret); 
+    return ret;
 };
 
 (function () {
