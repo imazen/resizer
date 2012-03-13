@@ -12,6 +12,9 @@ namespace ImageResizer.Caching {
     /// Callback may throw FileNotFoundException when running on top of an optimistic VPP
     /// </summary>
     public delegate void ResizeImageDelegate(Stream s);
+
+    public delegate Stream GetSourceImageDelegate();
+
     /// <summary>
     /// A callback method to return the last modified date of the source file if available, or DateTime.MinValue if not available.
     /// </summary>
