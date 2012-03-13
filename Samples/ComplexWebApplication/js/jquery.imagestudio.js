@@ -108,18 +108,21 @@
         div.removeClass("imagestudio"); div.addClass("imagestudio");
 
         //UGH! a table. But the alternative is nasty cross-browser.
-        var tr = $('<tr></tr>').appendTo($('<table></table').appendTo(div));
+        var tr = $('<tr></tr>').appendTo($('<table></table>').css('width','100%').appendTo(div));
 
         //Add accordion
-        var a = $("<div></div>").addClass("controls").width(opts.accordionWidth).appendTo($('<td></td>').appendTo(tr));
+        var atd = $('<td></td>').appendTo(tr);
+        var a = $("<div></div>").addClass("controls").width(opts.accordionWidth).appendTo(atd);
+        
         //Add image
-        var img = $('<img />').addClass("studioimage").appendTo($('<td></td>').css('vertical-align','middle').css('text-align','center').css('padding-left','20px').appendTo(tr));
+        var img = $('<img />').addClass("studioimage").appendTo($('<td></td>').addClass("imageCell").css('vertical-align','middle').css('text-align','center').css('padding-left','10px').css('padding-right','10px').appendTo(tr));
         opts.img = img; //Save a reference to the image object in options
         opts.accordion = a;
         var updateOptions = function(){
-            if (opts.width) div.width(opts.width);
+            if (opts.width) { div.width(opts.width);}
             if (opts.height) div.height(opts.height);
             if (opts.height) a.height(opts.height);
+            if (opts.accordionWidth)  { a.width(opts.accordionWidth); atd.width(opts.accordionWidth);}
             opts.original = ImageResizing.Utils.parseUrl(opts.url);
             opts.editPath = opts.original.path; 
             if (opts.editingServer) opts.editPath = ImageResizing.Utils.changeServer(opts.editPath,opts.editingServer);
@@ -128,7 +131,7 @@
             opts.filteredQuery = new ImageResizing.ResizeSettings(opts.originalQuery);
             opts.suspendedItems = opts.filteredQuery.remove(opts.suspendKeys);
             var withConstraints = new ImageResizing.ResizeSettings(opts.filteredQuery); 
-            withConstraints.maxwidth = div.width() - 250;
+            withConstraints.maxwidth = div.width() - opts.accordionWidth - 30;
             withConstraints.maxheight = opts.height;
             
             opts.editQuery = withConstraints;
