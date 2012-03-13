@@ -92,6 +92,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PsdCom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.MongoReader", "..\Plugins\MongoReader\ImageResizer.Plugins.MongoReader.csproj", "{C8D43F4E-103E-4CD7-B0D9-E97D9F708003}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.RedEye", "..\Plugins\RedEye\ImageResizer.Plugins.RedEye.csproj", "{054D5D5D-1041-4F03-B5E4-BFF0441586FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -737,6 +739,24 @@ Global
 		{C8D43F4E-103E-4CD7-B0D9-E97D9F708003}.Trial|Mixed Platforms.Build.0 = Trial|Any CPU
 		{C8D43F4E-103E-4CD7-B0D9-E97D9F708003}.Trial|x64.ActiveCfg = Trial|Any CPU
 		{C8D43F4E-103E-4CD7-B0D9-E97D9F708003}.Trial|x86.ActiveCfg = Trial|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Release|x64.ActiveCfg = Release|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Release|x86.ActiveCfg = Release|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Trial|x64.ActiveCfg = Release|Any CPU
+		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
