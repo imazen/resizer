@@ -181,6 +181,7 @@ var edit = function (opts, callback) {
     opts.img.attr('src', opts.editUrl);
     opts.img.triggerHandler('query', [opts.editQuery]);
     if (opts.onchange != null) opts.onchange(opts.api);
+    console.log(opts.editQuery);
 };
 var setUrl = function(opts, url, silent){
     opts.editQuery = new ImageResizing.ResizeSettings(url) ;
@@ -256,7 +257,7 @@ var addRotateFlipPane = function (opts) {
     button(opts, 'rotateright',  function (obj) { obj.increment("srotate", 90, 360);}).appendTo(c);
     button(opts, 'flipvertical', function (obj) {obj.toggle("sflip.y");}).appendTo(c);
     button(opts, 'fliphorizontal', function (obj) { obj.toggle("sflip.x");}).appendTo(c);
-    button(opts, 'reset', function (obj) { obj.remove("srotate","sflip"); }).appendTo(c);
+    button(opts, 'reset', function (obj) { obj.resetSourceRotateFlip() }).appendTo(c);
 
 
 //    var lRot = $("<h3></h3>").appendTo(c).hide();
@@ -369,14 +370,19 @@ var addCarvePane = function (opts) {
 //Adds a pane for cropping
 var addCropPane = function (opts) {
      var c = $('<div></div>');
-     var img = opts.img;
 
-    var cropping = false;
-    var jcrop_reference
-    var previousUrl = null;
+     var closure = {};
+
+     closure.img = opts.img;
+     closure.cropping = false;
+     closure.jcrop_reference = null;
+     closure.previousUrl = null;
+     closure.opts = opts;
 
     var startCrop = function (uncroppedWidth, uncroppedHeight, uncroppedUrl) {
-        cropping = true;
+    console.log ("starting to crop " + uncroppedUrl);
+        var cl = closure;
+        cl.cropping = true;
 
         btnCrop.hide();
         //Prevent the accordion from changing, but don't gray out this panel
@@ -387,30 +393,21 @@ var addCropPane = function (opts) {
 
 
         //Get the original crop values and URL
-        var obj = opts.editQuery;
-        previousUrl = opts.editUrl;
+        var obj = cl.opts.editQuery;
+        cl.previousUrl = opts.editUrl;
 
         //Switched to uncropped image
-        img.attr('src', uncroppedUrl);
-        img.data('obj', null);
-
+        cl.img.attr('src', uncroppedUrl);
+        
         //Start jcrop
-
-
         //Use existing coords if present
         var coords = null;
-        if (obj["crop"] && obj["cropxunits"] && obj["cropyunits"]) {
-            coords = obj["crop"].split(',');
-            for (var i = 0; i < coords.length; i++) coords[i] = parseInt(coords[i]);
-            var xfactor = uncroppedWidth / obj["cropxunits"];
-            var yfactor = uncroppedHeight / obj["cropyunits"];
-            coords[0] *= xfactor;
-            coords[2] *= xfactor;
-            coords[1] *= yfactor;
-            coords[3] *= yfactor;
+        var cropObj = obj.getCrop();
+        if (cropObj && cropObj.allPresent()) {
+            coords = cropObj.stretchTo(uncroppedWidth,uncroppedHeight).toCoordsArray();
         }
 
-        preview.JcropPreview({ jcropImg: img });
+        preview.JcropPreview({ jcropImg: cl.img });
         preview.hide();
 
         var update = function (coords) {
@@ -419,14 +416,14 @@ var addCropPane = function (opts) {
         };
 
         //Start up jCrop
-        img.Jcrop({
+        cl.img.Jcrop({
             onChange: update,
             onSelect: update,
             aspectRatio: getRatio(),
             bgColor: 'black',
             bgOpacity: 0.6
         }, function () {
-            jcrop_reference = this;
+            cl.jcrop_reference = this;
 
             preview.JcropPreviewUpdate({ x: 0, y: 0, x2: uncroppedWidth, y2: uncroppedHeight, width: uncroppedWidth, height: uncroppedHeight });
             if (coords != null) this.setSelect(coords);
@@ -446,20 +443,19 @@ var addCropPane = function (opts) {
 
 
     var stopCrop = function (save, norestore) {
-        cropping = false;
+        var cl = closure;
+        cl.cropping = false;
         if (save) {
-            setUrl(opts, previousUrl, true);
-            var coords = jcrop_reference.tellSelect();
-            edit(opts, function (obj) {
-                obj['crop'] = coords.x + ',' + coords.y + ',' + coords.x2 + ',' + coords.y2;
-                obj['cropxunits'] = img.width();
-                obj['cropyunits'] = img.height();
+            setUrl(cl.opts, cl.previousUrl, true);
+            var coords = cl.jcrop_reference.tellSelect();
+            edit(cl.opts, function (obj) {
+                obj.setCrop({x1:coords.x, y1:coords.y, x2:coords.x2, y2:coords.y2, xunits:cl.img.width(),yunits:cl.img.height()});
             });
         } else if (!norestore) {
-            setUrl(opts, previousUrl);
+            setUrl(cl.opts, cl.previousUrl);
         }
-        jcrop_reference.destroy();
-        img.attr('style', ''); //Needed to fix all the junk JCrop added.
+        cl.jcrop_reference.destroy();
+        cl.img.attr('style', ''); //Needed to fix all the junk JCrop added.
         btnCancel.hide();
         btnDone.hide();
         label.hide();
@@ -469,13 +465,16 @@ var addCropPane = function (opts) {
         btnCrop.show();
         btnReset.show();
         
-        opts.accordion.accordion("enable");
+        cl.opts.accordion.accordion("enable");
     }
 
     var btnCrop = button(opts,'crop_crop',null, function () {
-        var q = new ImageResizing.ResizeSettings(opts.dataQuery);
+        var cl = closure;
+        console.log(cl);
+        var q = new ImageResizing.ResizeSettings(cl.opts.editQuery);
         q.remove("crop","cropxunits","cropyunits");
-        var uncroppedUrl = opts.editPath + q.toQueryString(opts.editWithSemicolons);
+        var uncroppedUrl = cl.opts.editPath + q.toQueryString(cl.opts.editWithSemicolons);
+        console.log("Loading uncropped image: " + uncroppedUrl);
         var image = new Image();
         image.onload = function () { startCrop(image.width, image.height, uncroppedUrl); };
         image.src = uncroppedUrl;
@@ -491,14 +490,15 @@ var addCropPane = function (opts) {
         $('<option value="' + ratios[i][0].toString() + '">' + ratios[i][1] + '</option>').appendTo(ratio);
     ratio.appendTo(c).val(0).hide();
     ratio.change(function () {
-        jcrop_reference.setOptions({ aspectRatio: getRatio() });
-        jcrop_reference.focus();
+        var cl = closure;
+        cl.jcrop_reference.setOptions({ aspectRatio: getRatio() });
+        cl.jcrop_reference.focus();
     });
 
-    var btnCancel = button(opts,'crop_cancel', null, function (obj) {
+    var btnCancel = button(opts,'crop_cancel', null, function () {
         stopCrop(false);
     }).appendTo(c).hide();
-    var btnDone = button(opts, 'crop_done', null, function (obj) {
+    var btnDone = button(opts, 'crop_done', null, function () {
         stopCrop(true);
     }).appendTo(c).hide();
     var preview = $("<div style='width:200px;height:200px;margin-left:-15px'></div>").appendTo(c).hide();
@@ -512,7 +512,7 @@ var addCropPane = function (opts) {
     //Update button label and 'undo' visib
     btnCrop.button("option", "label", opts.editQuery.crop ? opts.labels.crop_modify : opts.labels.crop_crop);
     btnReset.button({ disabled: !opts.editQuery.crop });
-    img.bind('query', function (e, obj) {
+    closure.img.bind('query', function (e, obj) {
         btnCrop.button("option", "label", obj["crop"] ? opts.labels.crop_modify : opts.labels.crop_crop);
         btnReset.button({ disabled: !obj["crop"] });
     });
