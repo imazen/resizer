@@ -24,6 +24,9 @@ namespace ImageResizer.Caching {
           set { getModifiedDateUTC = value; }
         }
 
+
+        public GetSourceImageDelegate GetSourceImage {get;set;}
+
         protected ResizeImageDelegate resizeImageToStream;
         /// <summary>
         /// A callback method that will resize and encode the image into a stream.

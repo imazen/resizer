@@ -249,6 +249,11 @@ namespace ImageResizer {
                 else return DateTime.MinValue; //Won't be called, no modified date available.
             });
 
+            //A delegate for accessing the source file
+            e.GetSourceImage = new GetSourceImageDelegate(delegate() {
+                return (vf != null) ? vf.Open() : File.Open(HostingEnvironment.MapPath(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read);
+            });
+
             //Add delegate for writing the data stream
             e.ResizeImageToStream = new ResizeImageDelegate(delegate(System.IO.Stream stream) {
                 //This runs on a cache miss or cache invalid. This delegate is preventing from running in more
