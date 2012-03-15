@@ -10,23 +10,25 @@ namespace ImageResizer.Caching {
     public class ResponseHeaders :IResponseHeaders {
 
         public ResponseHeaders() {
+            DefaultHeaders = new NameValueCollection();
+            Headers = new NameValueCollection();
+            ApplyDuringPreSendRequestHeaders = true;
+            CacheControl = HttpCacheability.Private;
+            SuppressVaryHeader = true;
+            ValidUntilExpires = false;
+            LastModified = DateTime.MinValue;
+            Expires = DateTime.MinValue;
+            ContentType = null;
+            ServerCacheDependencies = new List<CacheDependency>();
             this.ApplyToResponse = new ApplyResponseHeadersDelegate(ResponseHeaders.DefaultApplyToResponseMethod);
         }
 
-        protected Boolean applyDuringPreSendRequestHeaders = true;
-       
-        public Boolean ApplyDuringPreSendRequestHeaders {
-            get { return applyDuringPreSendRequestHeaders; }
-            set { applyDuringPreSendRequestHeaders = value; }
-        }
-        protected string contentType = null;
+        public Boolean ApplyDuringPreSendRequestHeaders { get; set; }
+        
         /// <summary>
         /// The mime-type of the encoded image. Defaults to null
         /// </summary>
-        public string ContentType {
-            get { return contentType; }
-            set { contentType = value; }
-        }
+        public string ContentType { get; set; }
 
 
 
@@ -66,73 +68,23 @@ namespace ImageResizer.Caching {
                 context.Response.Headers[key] = headers.Headers[key];
         }
 
-        protected ApplyResponseHeadersDelegate applyToResponse = null;
-        public ApplyResponseHeadersDelegate ApplyToResponse {
-            get {
-                return applyToResponse;
-            }
-            set {
-                applyToResponse = value;
-            }
-        }
+        public ApplyResponseHeadersDelegate ApplyToResponse { get; set; }
 
-        protected HttpCacheability cacheControl = HttpCacheability.Private;
+        public HttpCacheability CacheControl { get; set; }
 
-        public HttpCacheability CacheControl {
-            get { return cacheControl; }
-            set { cacheControl = value; }
-        }
+        public DateTime Expires { get; set; }
 
-        protected DateTime expires = DateTime.MinValue;
+        public DateTime LastModified {get;set;}
 
-        public DateTime Expires {
-            get { return expires; }
-            set { expires = value; }
-        }
+        public bool ValidUntilExpires {get;set;}
 
-        protected DateTime lastModified = DateTime.MinValue;
+        public bool SuppressVaryHeader { get; set; }
 
-        public DateTime LastModified {
-            get { return lastModified; }
-            set { lastModified = value; }
-        }
+        public NameValueCollection DefaultHeaders { get; set; }
 
-        protected bool validUntilExpires = false;
+        public NameValueCollection Headers { get; set; }
 
-        public bool ValidUntilExpires {
-            get { return validUntilExpires; }
-            set { validUntilExpires = value; }
-        }
-
-        protected bool suppressVaryHeader = true;
-
-        public bool SuppressVaryHeader {
-            get { return suppressVaryHeader; }
-            set { suppressVaryHeader = value; }
-        }
-
-
-        protected NameValueCollection defaultHeaders = new NameValueCollection();
-
-        public NameValueCollection DefaultHeaders {
-            get { return defaultHeaders; }
-            set { defaultHeaders = value; }
-        }
-
-
-        protected NameValueCollection headers = new NameValueCollection();
-
-        public NameValueCollection Headers {
-            get { return headers; }
-            set { headers = value; }
-        }
-
-        private List<CacheDependency> dependencies = new List<CacheDependency>();
-
-        public List<CacheDependency> ServerCacheDependencies {
-            get { return dependencies; }
-            set { dependencies = value; }
-        }
+        public List<CacheDependency> ServerCacheDependencies { get; set; }
 
 
     }

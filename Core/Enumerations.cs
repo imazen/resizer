@@ -93,11 +93,11 @@ namespace ImageResizer {
         /// </summary>
         Max,
        
-        /// Width and height are considered exact values - padding is used if there is an aspect ratio difference. Use &anchor to override the MiddleCenter default.
+        /// Width and height are considered exact values - padding is used if there is an aspect ratio difference. Use &amp;anchor to override the MiddleCenter default.
         /// </summary>
         Pad,
         /// <summary>
-        /// Width and height are considered exact values - cropping is used if there is an aspect ratio difference. Use &anchor to override the MiddleCenter default.
+        /// Width and height are considered exact values - cropping is used if there is an aspect ratio difference. Use &amp;anchor to override the MiddleCenter default.
         /// </summary>
         Crop,
         /// <summary>

@@ -544,8 +544,6 @@ namespace ImageResizer.Util
         /// <summary>
         /// Creates a rectangle of size 'size' with a center matching that of bounds.
         /// </summary>
-        /// <param name="sizeF"></param>
-        /// <param name="imgBounds"></param>
         /// <returns></returns>
         public static RectangleF CenterInside(SizeF size, RectangleF bounds) {
             return new RectangleF(bounds.Width / 2 + bounds.X - (size.Width / 2), bounds.Height / 2 + bounds.Y - (size.Height / 2), size.Width, size.Height);
@@ -615,7 +613,6 @@ namespace ImageResizer.Util
         /// <summary>
         /// Verifies that the specified 4 points are not rotated - that each point shares either the x or y coordinate with the previous point
         /// </summary>
-        /// <param name="pointF"></param>
         /// <returns></returns>
         public static bool IsUnrotated(PointF[] a) {
             PointF lastPoint = a[a.GetUpperBound(0)];
@@ -628,7 +625,6 @@ namespace ImageResizer.Util
         /// <summary>
         /// Returns the length of the shortest line segment in the given polygon.
         /// </summary>
-        /// <param name="pointF"></param>
         /// <returns></returns>
         public static double GetShortestPair(PointF[] poly) {
             PointF last = poly[poly.Length - 1];
