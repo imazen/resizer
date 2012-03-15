@@ -124,8 +124,6 @@ namespace ImageResizer.Resizing {
         /// <summary>
         /// Extend this to modify the Bitmap instance after it has been decoded by DecodeStream or DecodeStreamFailed
         /// </summary>
-        /// <param name="dest"></param>
-        /// <param name="settings"></param>
         protected virtual RequestedAction PostDecodeStream(ref Bitmap img, ResizeSettings settings) {
             if (exts != null) foreach (AbstractImageProcessor p in exts) if (p.PostDecodeStream(ref img, settings) == RequestedAction.Cancel) return RequestedAction.Cancel;
             return RequestedAction.None;

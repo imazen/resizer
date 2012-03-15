@@ -277,7 +277,7 @@ namespace ImageResizer.Util {
         }
 
         /// <summary>
-        /// Like ParseQueryString, but permits the leading '?' to be omitted, and semicolons can be substituted for '&'
+        /// Like ParseQueryString, but permits the leading '?' to be omitted, and semicolons can be substituted for '&amp;'
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -410,7 +410,7 @@ namespace ImageResizer.Util {
         /// 
         /// </summary>
         /// <param name="pathWithVars"></param>
-        /// <param name="variables"></param>
+        /// <param name="resolver"></param>
         /// <returns></returns>
         public static string ResolveVariablesInPath(string pathWithVars, VariableResolverCallback resolver) {
             string p = pathWithVars;

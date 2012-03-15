@@ -163,7 +163,6 @@ namespace ImageResizer.Util {
         /// <summary>
         /// Returns 0 if not a recognized value. Rounds the value to 0, 90, 180, or 270
         /// </summary>
-        /// <param name="sFlip"></param>
         /// <returns></returns>
         public static double parseRotate(string s) {
 
