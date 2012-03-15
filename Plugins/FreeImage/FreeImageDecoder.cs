@@ -53,7 +53,7 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
             try {
                  return Decode(s,settings);
                  
-            } catch (Exception exts){
+            } catch (Exception){
                 return null;
             }
         }

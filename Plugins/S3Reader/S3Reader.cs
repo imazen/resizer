@@ -79,7 +79,7 @@ namespace ImageResizer.Plugins.S3Reader {
                 try {
                     //Registers the virtual path provider.
                     HostingEnvironment.RegisterVirtualPathProvider(vpp);
-                } catch (SecurityException sx) {
+                } catch (SecurityException) {
                     asVpp = false;
                     c.configurationSectionIssues.AcceptIssue(new Issue("S3Reader", "S3Reader could not be installed as a VirtualPathProvider due to missing AspNetHostingPermission."
                     ,"It was installed as an IVirtualImageProvider instead, which means that only image URLs will be accessible, and only if they contain a querystring.\n" +

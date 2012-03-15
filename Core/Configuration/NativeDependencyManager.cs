@@ -104,7 +104,7 @@ namespace ImageResizer.Configuration.Plugins {
                         }
                     }
 
-                    var d = new Dependency() { Exists = existingLength > 0, Name = name, Url = url, DestPath = destPath, ExistingLength = existingLength, ExpectedLength = fileBytes, Client = new WebClient() };
+                    var d = new Dependency() { Exists = existingLength > 0, Name = name, Url = url, DestPath = destPath, ExistingLength = existingLength, ExpectedLength = fileBytes, Client = new WebClient(), RequestingAssembly =assemblyName };
                     q.Enqueue(d);
                 }
 
