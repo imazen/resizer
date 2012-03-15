@@ -79,7 +79,7 @@ namespace ImageResizer.Plugins.RedEye {
             /// Initializes a new instance of the <see cref="ExtractNormalizedRGBChannel"/> class.
             /// </summary>
             /// 
-            /// <param name="channel">Normalized RGB channel to extract.</param>
+            /// <param name="alg">The algorithm to use for filtering the image.</param>
             /// 
             public RedEyeFilter(short alg)
                 : this() {

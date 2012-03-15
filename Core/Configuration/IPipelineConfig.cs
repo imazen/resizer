@@ -107,7 +107,7 @@ namespace ImageResizer.Configuration {
 		/// <param name="virtualPath"></param>
 		/// <param name="queryString"></param>
 		/// <returns></returns>
-        IVirtualFile GetFile(string virtualPath, NameValueCollection queryString);
+        new IVirtualFile GetFile(string virtualPath, NameValueCollection queryString);
 
         /// <summary>
         /// Returns true if (a) A registered IVirtualImageProvider says it exists, or (b) if the VirtualPathProvider chain says it exists.
@@ -115,7 +115,7 @@ namespace ImageResizer.Configuration {
         /// <param name="virtualPath"></param>
         /// <param name="queryString"></param>
         /// <returns></returns>
-        bool FileExists(string virtualPath, NameValueCollection queryString);
+        new bool FileExists(string virtualPath, NameValueCollection queryString);
 
 
         void FirePostAuthorizeRequest(IHttpModule sender, System.Web.HttpContext httpContext);

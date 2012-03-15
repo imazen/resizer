@@ -121,6 +121,7 @@ namespace ImageResizer.Plugins.Watermark {
         private int _fontSize = 48;
         /// <summary>
         /// The size of the font in pixels
+        /// </summary>  
         public int FontSize {
             get { return _fontSize; }
             set { _fontSize = value; }

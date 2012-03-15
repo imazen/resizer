@@ -384,13 +384,18 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <summary>
         /// Returns true if both dates are equal to the nearest 200th of a second.
         /// </summary>
-        /// <param name="modifiedOn"></param>
-        /// <param name="dateTime"></param>
+        /// <param name="d1"></param>
+        /// <param name="d2"></param>
         /// <returns></returns>
         protected bool roughCompare(DateTime d1, DateTime d2) {
             return Math.Abs(d1.Ticks - d2.Ticks) < TimeSpan.TicksPerMillisecond * 5;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="relativePath"></param>
+        /// <returns></returns>
         protected string checkRelativePath(string relativePath) {
             if (relativePath == null) return relativePath;
             if (relativePath.StartsWith("/") || relativePath.EndsWith("/")) {

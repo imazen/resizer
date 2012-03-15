@@ -42,7 +42,7 @@ namespace ImageResizer.Plugins.RedEye {
         /// </summary>
         /// <param name="image"></param>
         /// <param name="start"></param>
-        /// <param name="maxRadius">Should be 2-3 percent of max(width/height)</param>
+        /// <param name="maxEyeRadius">Should be 2-3 percent of max(width/height)</param>
         /// <param name="maxPointSearchDistance">In source pixels, the max distance from 'start' from which to look for the starting point. Good default: roughly 24 display pixels.</param>
         public static void MarkEye(UnmanagedImage image, Point start, int maxEyeRadius, float maxPointSearchDistance = 0) {
             int maxRadius = maxEyeRadius * 2 + (int)Math.Ceiling(maxPointSearchDistance);

@@ -107,7 +107,7 @@ namespace ImageResizer.Plugins.Basic {
         /// <summary>
         /// Returns true if the user agent string specifies MSIE versions 1 through 6 for Windows. Cached in context.Items after first call.
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
         public static bool NeedsPngFix(HttpContext context) {
 

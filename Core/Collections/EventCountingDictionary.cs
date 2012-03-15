@@ -140,7 +140,7 @@ namespace ImageResizer.Collections {
         /// <summary>
         /// Performs cleanup on the dictionaries in either MakeRoom or Maintenance mode. Returns true if the goal was achieved, false if the cleanup was canceled because another cleanup was executing conurrently.
         /// </summary>
-        /// <param name="skipOnContention">Always set this to true</param>
+        /// <param name="mode"></param>
         private bool Cleanup(CleanupMode mode) {
             if (mode == CleanupMode.MakeRoom && byteCeiling < 1) return true; //We don't perform minimal cleanups unless a ceiling is specified.
 
