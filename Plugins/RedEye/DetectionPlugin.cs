@@ -60,7 +60,7 @@ namespace ImageResizer.Plugins.RedEye {
             ex.ContentType = "application/json; charset=utf-8";
             StringWriter sw = new StringWriter();
             new Newtonsoft.Json.JsonSerializer().Serialize(sw, d);
-            ex.Data = UTF8Encoding.UTF8.GetBytes(sw.ToString().ToCharArray());
+            ex.ResponseData = UTF8Encoding.UTF8.GetBytes(sw.ToString().ToCharArray());
             ex.StatusCode = 200;
 
             throw ex;
@@ -84,7 +84,7 @@ namespace ImageResizer.Plugins.RedEye {
                 try {
                     old(s);
                 } catch (ResizingCanceledException rce) {
-                    s.Write(rce.Data, 0, rce.Data.Length);
+                    s.Write(rce.ResponseData, 0, rce.ResponseData.Length);
                 }
             });
         }
