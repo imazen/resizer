@@ -19,6 +19,21 @@ namespace ImageResizer.Util {
     }
 
 
+    
+
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public class NativeDependenciesAttribute : Attribute {
+
+        string type;
+        public NativeDependenciesAttribute() { type = string.Empty; }
+        public NativeDependenciesAttribute(string txt) { type = txt; }
+
+        public string Value { get { return type; } }
+        public override string ToString() {
+            return type;
+        }
+    }
+
     [AttributeUsage(AttributeTargets.Assembly)]
     public class BundleAttribute : Attribute {
 
