@@ -348,7 +348,7 @@ ir.Utils.flipRotateRect = function (x1, y1, x2, y2, width, height, oldAngle, new
         var s = [];
         var begin = name ? name + '[' : '';
         var end = name ? ']' : '';
-        for (var i in obj) if (obj.hasOwnProperty(i)) {
+        for (var i in obj) if (_.has(obj,i)) {
             var n = begin + i + end;
             s.push(QueryString.stringify(obj[i], sep, eq, n));
         }
@@ -361,10 +361,7 @@ ir.Utils.flipRotateRect = function (x1, y1, x2, y2, width, height, oldAngle, new
     };
 
     QueryString.parseQuery = QueryString.parse = function (qs, sep, eq) {
-        return qs
-            .split(sep || "&")
-            .map(pieceParser(eq || "="))
-            .reduce(mergeParams);
+        return _.reduce(_.map(qs.split(sep || "&"),pieceParser(eq || "=")),mergeParams);
     };
 
     // Parse a key=val string.
@@ -431,7 +428,7 @@ ir.Utils.flipRotateRect = function (x1, y1, x2, y2, width, height, oldAngle, new
     // Merge two *objects* together. If this is called, we've already ruled
     // out the simple cases, and need to do the for-in business.
     function mergeObjects(params, addition) {
-        for (var i in addition) if (i && addition.hasOwnProperty(i)) {
+        for (var i in addition) if (i && _.has(addition,i)) {
             params[i] = mergeParams(params[i], addition[i]);
         }
         return params;

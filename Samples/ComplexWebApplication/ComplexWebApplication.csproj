@@ -83,7 +83,7 @@
     <Content Include="js\jquery.jcrop.preview.js" />
     <Content Include="js\Markdown.Converter.js" />
     <Content Include="js\querystring.js" />
-    <Content Include="js\studio.js" />
+    <Content Include="js\underscore-min.js" />
     <Content Include="ListImages.aspx" />
     <Content Include="Misc\BatchResizeAndZip.aspx" />
     <Content Include="Default.aspx" />
