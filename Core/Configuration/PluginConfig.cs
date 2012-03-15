@@ -15,6 +15,7 @@ using System.Collections.Specialized;
 using ImageResizer.Collections;
 using ImageResizer.Configuration.Logging;
 using System.Web.Compilation;
+using ImageResizer.Configuration.Plugins;
 
 namespace ImageResizer.Configuration {
     /// <summary>
@@ -24,6 +25,7 @@ namespace ImageResizer.Configuration {
 
 
 
+        protected NativeDependencyManager ndeps = new NativeDependencyManager();
         protected Config c;
         /// <summary>
         /// Creates a new plugin config section, attached to the specified parent
@@ -428,6 +430,14 @@ namespace ImageResizer.Configuration {
 
             //TODO - perhaps manually select the constructor ? 
             //ConstructorInfo ci = null;
+            bool downloadDependencies = false;
+            if (args != null && args["downloadNativeDependencies"] != null) {
+                downloadDependencies = "true".Equals(args["downloadNativeDependencies"], StringComparison.OrdinalIgnoreCase);
+                if (args.Count == 2) args = null; //Don't require plugins to have an argument-supporting constructor just for downloadNativeDependencies
+                //'name' is included in args, remember.
+                ndeps.EnsureLoaded(t.Assembly);
+            }
+
 
 
             bool hasConstructor = true;
