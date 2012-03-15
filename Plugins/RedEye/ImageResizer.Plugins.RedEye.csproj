@@ -41,8 +41,8 @@
     <Reference Include="AForge.Imaging">
       <HintPath>..\Libs\AForge\AForge.Imaging.dll</HintPath>
     </Reference>
-    <Reference Include="AForge.Imaging.Formats">
-      <HintPath>..\Libs\AForge\AForge.Imaging.Formats.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Libs\Json.NET-40r8\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp, Version=2.0.4431.20114, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -50,13 +50,16 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AdaptiveCircleFill.cs" />
+    <Compile Include="AutoThresholdCorrection.cs" />
     <Compile Include="CSearcher.cs" />
+    <Compile Include="DetectionPlugin.cs" />
     <Compile Include="EyeKernels.cs" />
     <Compile Include="FaceDetection.cs" />
     <Compile Include="GridSearch.cs" />
@@ -74,6 +77,7 @@
   <ItemGroup>
     <Content Include="alogorithm.txt" />
     <Content Include="manual-algorithm.txt" />
+    <EmbeddedResource Include="Native.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
