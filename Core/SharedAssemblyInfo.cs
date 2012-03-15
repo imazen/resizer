@@ -16,7 +16,7 @@ using ImageResizer.Util;
 #endif
 
 [assembly: AssemblyCompany("Nathanael Jones")]
-[assembly: AssemblyCopyright("Copyright © 2011 Nathanael Jones")]
+[assembly: AssemblyCopyright("Copyright © 2012 Nathanael Jones")]
 
 
 // Version information for an assembly consists of the following four values:
