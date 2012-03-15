@@ -92,7 +92,7 @@ namespace ImageResizer {
         /// Width and height are considered maximum values. The resulting image may be smaller to maintain its aspect ratio. The image may also be smaller if the source image is smaller
         /// </summary>
         Max,
-       
+        /// <summary>
         /// Width and height are considered exact values - padding is used if there is an aspect ratio difference. Use &amp;anchor to override the MiddleCenter default.
         /// </summary>
         Pad,

@@ -55,7 +55,8 @@ namespace ImageResizer.Plugins.Watermark {
         /// <summary>
         /// Loads a bitmap, cached using asp.net's cache
         /// </summary>
-        /// <param name="localfile"></param>
+        /// <param name="query"></param>
+        /// <param name="virtualPath"></param>
         /// <returns></returns>
         public Bitmap GetMemCachedBitmap(string virtualPath, ResizeSettings query) {
             //If not ASP.NET, don't cache.

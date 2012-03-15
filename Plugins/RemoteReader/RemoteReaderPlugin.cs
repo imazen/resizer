@@ -128,7 +128,7 @@ namespace ImageResizer.Plugins.RemoteReader {
         }
 
         /// <summary>
-        /// Generates a signed domain-relative URL in the form "/app/remote.jpg.ashx?width=200&urlb64=aHnSh3haSh...&hmac=913f3KJGK3hj"
+        /// Generates a signed domain-relative URL in the form "/app/remote.jpg.ashx?width=200&amp;urlb64=aHnSh3haSh...&amp;hmac=913f3KJGK3hj"
         /// </summary>
         /// <param name="remoteUrl"></param>
         /// <param name="settings"></param>
@@ -249,6 +249,7 @@ namespace ImageResizer.Plugins.RemoteReader {
         /// SecurityException, NotSupportedException?, and InvalidOperationException?.
         /// </summary>
         /// <param name="uri"></param>
+        /// <param name="maxRedirects"></param>
         /// <returns></returns>
         public Stream GetUriStream(Uri uri, int maxRedirects = -1) {
             if (maxRedirects == -1) maxRedirects = AllowedRedirects;

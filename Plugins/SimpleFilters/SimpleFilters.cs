@@ -221,7 +221,7 @@ Q = 0.212 * R - 0.523 * G + 0.311 * B
         /// <param name="saturation"></param>
         /// <returns></returns>
         static float[][] Saturation(float saturation) {
-        http://www.bobpowell.net/imagesaturation.htm
+            //http://www.bobpowell.net/imagesaturation.htm
 
             saturation = Math.Max(0, saturation + 1); //Stop at -1
 

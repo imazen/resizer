@@ -135,17 +135,19 @@ namespace ImageResizerGUI
                     case ImageResizerGUI.ResizeMode.Shrink:
                         rs.MaxHeight = height;
                         rs.MaxWidth = width;
+                        rs.Mode = FitMode.Max;
                         break;
 
                     case ImageResizerGUI.ResizeMode.ShrinkAndPadToRatio:
                         rs.Height = height;
                         rs.Width = width;
+                        rs.Mode = FitMode.Pad;
                         break;
 
                     case ImageResizerGUI.ResizeMode.ShrinkAndCropToRatio:
                         rs.Height = height;
                         rs.Width = width;
-                        rs.CropMode = CropMode.Auto;
+                        rs.Mode = FitMode.Crop;
                         break;
                 }
 

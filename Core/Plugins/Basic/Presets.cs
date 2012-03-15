@@ -53,6 +53,7 @@ namespace ImageResizer.Plugins.Basic {
         /// Returns an new NameValueCollection instance that only includes the "preset" and ("hmac" and "urlb64", if specified) querystring pairs from the specified instance. 
         /// </summary>
         /// <param name="s"></param>
+        /// <param name="keepHmacAndUrl64"></param>
         /// <returns></returns>
         public static NameValueCollection FilterQuerystring(NameValueCollection s, bool keepHmacAndUrl64) {
             NameValueCollection q = new NameValueCollection();

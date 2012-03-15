@@ -360,7 +360,7 @@ namespace ImageResizer.Plugins.PsdComposer
    
         /// <summary>
         /// True if the file is a .psd.jpeg, .psd.png, etc file.
-        /// </returns>
+        /// </summary>
         protected bool IsPathPSDToCompose(string virtualPath,  NameValueCollection queryString = null)
         {
             string fileName = System.IO.Path.GetFileName(virtualPath); //Exclude the folders, just looking at the filename here.

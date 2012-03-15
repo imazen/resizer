@@ -140,7 +140,7 @@ namespace ImageResizer {
         private bool _allowDestinationPathVariables = true;
         /// <summary>
         /// If true (the default), destination paths can include variables that are expanded during the image build process. 
-        /// Ex. Dest = "~/folder/&lt>guid>.&lt;ext>" will expand to "C:\WWW\App\folder\1ddadaadaddaa75da75ad34ad33da3a.jpg". 
+        /// Ex. Dest = "~/folder/&lt;guid>.&lt;ext>" will expand to "C:\WWW\App\folder\1ddadaadaddaa75da75ad34ad33da3a.jpg". 
         /// </summary>
         public bool AllowDestinationPathVariables {
             get { return _allowDestinationPathVariables; }
@@ -174,9 +174,6 @@ namespace ImageResizer {
         /// </summary>
         /// <param name="path"></param>
         /// <param name="resolver"></param>
-        /// <param name="originalWidth">Leave 0 if unavailable</param>
-        /// <param name="originalHeight">Leave 0 if unavailable</param>
-        /// <param name="builder">Leave null if unavailable</param>
         /// <returns></returns>
         public string ResolveTemplatedPath(string path, ImageResizer.Util.PathUtils.VariableResolverCallback resolver) {
             if (!AllowDestinationPathVariables) {

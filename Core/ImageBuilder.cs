@@ -62,6 +62,8 @@ namespace ImageResizer
         /// </summary>
         /// <param name="extensions"></param>
         /// <param name="encoderProvider"></param>
+        /// <param name="settingsModifier"></param>
+        /// <param name="virtualFileProvider"></param>
         public ImageBuilder(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider, IVirtualImageProvider virtualFileProvider, ISettingsModifier settingsModifier)
             : base(extensions) {
             this._encoderProvider = encoderProvider;
@@ -75,6 +77,7 @@ namespace ImageResizer
         /// <param name="extensions"></param>
         /// <param name="writer"></param>
         /// <param name="virtualFileProvider"></param>
+        /// <param name="settingsModifier"></param>
         /// <returns></returns>
         public virtual ImageBuilder Create(IEnumerable<BuilderExtension> extensions, IEncoderProvider writer, IVirtualImageProvider virtualFileProvider, ISettingsModifier settingsModifier) {
             return new ImageBuilder(extensions,writer,virtualFileProvider,settingsModifier);
@@ -886,7 +889,7 @@ namespace ImageResizer
 
             //Use the crop size if present.
             s.copyRect = new RectangleF(new PointF(0,0),s.originalSize);
-            if (s.settings.CropMode == CropMode.Custom) {
+            if (Utils.parseCrop(s.settings["crop"]).Key == CropMode.Custom) {
                 s.copyRect = PolygonMath.ToRectangle(s.settings.getCustomCropSourceRect(s.originalSize)); //Round the custom crop rectangle coordinates
                 if (s.copyRect.Size.IsEmpty) throw new Exception("You must specify a custom crop rectange if crop=custom");
             }
@@ -899,7 +902,7 @@ namespace ImageResizer
             if (fit == FitMode.None){
                 if (s.settings.Width != -1 || s.settings.Height != -1){
 
-                    if (s.settings.Stretch == StretchMode.Fill) fit = FitMode.Stretch;
+                    if (Utils.parseStretch(s.settings["stretch"]) == StretchMode.Fill) fit = FitMode.Stretch;
                     else if ("auto".Equals(s.settings["crop"], StringComparison.OrdinalIgnoreCase)) fit = FitMode.Crop;
                     else if (!string.IsNullOrEmpty(s.settings["carve"]) 
                         && !"false".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase)

@@ -26,7 +26,7 @@ namespace ImageResizer {
 
 
 
-
+        /*
         ///Width
         ///Height
         ///Mode
@@ -46,5 +46,6 @@ namespace ImageResizer {
         ///Page
         ///FallbackUrl 
         ///
+         */
     }
 }
