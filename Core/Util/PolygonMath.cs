@@ -636,5 +636,15 @@ namespace ImageResizer.Util
             }
             return max;
         }
+
+        /// <summary>
+        /// Returns the distance between two points
+        /// </summary>
+        /// <param name="pointF"></param>
+        /// <param name="pointF_2"></param>
+        /// <returns></returns>
+        public static double Dist(PointF a, PointF b) {
+            return Math.Sqrt((b.X - a.X) * (b.X - a.X) + (b.Y - a.Y) * (b.Y - a.Y));
+        }
     }
 }
