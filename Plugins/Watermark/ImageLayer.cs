@@ -96,8 +96,9 @@ namespace ImageResizer.Plugins.Watermark {
                 if (!double.IsNaN(maxheight)) opts.MaxHeight = (int)Math.Floor(maxheight);
 
                 if (img == null) img = GetMemCachedBitmap(Path, opts); //Delayed creation allows the maxwidth/maxheight to be used in gradient plugin
-
-                return ImageBuilder.Current.GetFinalSize(img.Size, opts);
+                lock (img) {
+                    return ImageBuilder.Current.GetFinalSize(img.Size, opts);
+                }
             }, true);
 
             lock (img) { //Only one reader from the cached bitmap at a time.
