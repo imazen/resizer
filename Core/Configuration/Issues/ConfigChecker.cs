@@ -6,6 +6,7 @@ using ImageResizer.Plugins.Basic;
 using System.Reflection;
 using System.Security.Principal;
 using System.Web.Security;
+using System.Web.Hosting;
 
 namespace ImageResizer.Configuration.Issues {
     public class ConfigChecker:IIssueProvider {
@@ -30,7 +31,7 @@ namespace ImageResizer.Configuration.Issues {
             if (canCheckUrls) {
                 try {
                     IPrincipal user = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), new string[0]);
-                    UrlAuthorizationModule.CheckUrlAccessForPrincipal("/", user, "GET");
+                    UrlAuthorizationModule.CheckUrlAccessForPrincipal(HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/', user, "GET");
                 } catch (NotImplementedException) {
                     issues.Add(new Issue("UrlAuthorizationModule.CheckUrlAccessForPrincipal is not supported on this runtime (are you running Mono?)",
                          "It may be possible for users to bypass UrlAuthorization rules you have defined for your website, and access images that would otherwise be protected. If you do not use UrlAuthorization rules, this should not be a concern. " +
