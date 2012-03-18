@@ -19,18 +19,26 @@ namespace ImageResizer.Plugins.CustomOverlay {
     public class CustomOverlayPlugin:BuilderExtension, IPlugin, IMultiInstancePlugin {
         IOverlayProvider provider;
 
+        /// <summary>
+        /// If true, an exception will not be thrown when the file for an overlay cannot be found.
+        /// </summary>
+        public bool IgnoreMissingFiles { get; set; }
+
         public CustomOverlayPlugin(NameValueCollection args) {
             string providerName = args["provider"];
             Type providerType = typeof(CachedOverlayProvider);
 
             if (!string.IsNullOrEmpty(providerName)){
                 providerType = Type.GetType(providerName, false, true);
-                if (providerType == null) throw new ConfigurationException("CustomOverlay: The specified provider '" + providerName + "' cannot be found. Ensure you are using the fully qualified type name, including assembly: MyNamespace.SampleProvider,MyAssembly");
+                if (providerType == null) throw new ConfigurationErrorsException("CustomOverlay: The specified provider '" + providerName + "' cannot be found. Ensure you are using the fully qualified type name, including assembly: MyNamespace.SampleProvider,MyAssembly");
             }
             this.provider = Activator.CreateInstance(providerType, args) as IOverlayProvider;
-            if (this.provider == null) throw new ConfigurationException("CustomOverlay: The specified provider '" + providerName + "' was found, but does not implement IOverlayProvider.");
+            if (this.provider == null) throw new ConfigurationErrorsException("CustomOverlay: The specified provider '" + providerName + "' was found, but does not implement IOverlayProvider.");
             //Use a unique key so we don't confuse other instances
             CustomOverlaysKey += new Random().Next().ToString();
+
+
+            IgnoreMissingFiles = Utils.getBool(args, "ignoreMissingFiles", false);
 
         }
 
@@ -103,7 +111,7 @@ namespace ImageResizer.Plugins.CustomOverlay {
                         g.Flush(System.Drawing.Drawing2D.FlushIntention.Sync);
                     }
                 } catch (FileNotFoundException fe) {
-                    throw new ImageMissingException("The overlay image " + o.OverlayPath + " could not be found.");
+                    if (!IgnoreMissingFiles) throw new ImageMissingException("The overlay image " + o.OverlayPath + " could not be found.");
                 }
             }
 
