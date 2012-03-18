@@ -6,11 +6,11 @@ using System.Collections.Specialized;
 namespace ImageResizer.Plugins.CustomOverlay {
     public interface IOverlayProvider {
         /// <summary>
-        /// Provides an Overlay object for the specified request parameters
+        /// Provides a collection of Overlay objects for the specified request parameters
         /// </summary>
         /// <param name="virtualPath"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        Overlay GetOverlayInfo(string virtualPath, NameValueCollection query);
+        IEnumerable<Overlay> GetOverlays(string virtualPath, NameValueCollection query);
     }
 }

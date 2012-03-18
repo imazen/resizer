@@ -4,19 +4,27 @@ using System.Text;
 using System.Drawing;
 
 namespace ImageResizer.Plugins.CustomOverlay {
-    public enum CoordinateSpace {
-        UncroppedImage
-    }
+    /// <summary>
+    /// Specifies a image to overlay, the overlay paralellogram, the alignemnt, and (optionally) a pair of weird scaling factors. 
+    /// </summary>
     public class Overlay {
         /// <summary>
-        /// A 4-point array that describes a parallelogram within which to draw the overlay image
+        /// A 4-point array that describes a parallelogram within which to draw the overlay image. Specified in the native coordinate space of the original image (not the overlay).
         /// </summary>
         public PointF[] Poly { get; set; }
 
         /// <summary>
-        /// The maximum width and height of the overlay. (width = dist(x1,y1,x2,y2), height = dest(x2,y2,x3,y3))
+        /// Defines the width of the parallelogram in the coordinate space of the overlay image. 
+        /// If greater than zero, will be used to determine the (maximum) percentage of the width of the poly that the overlay should occupy. 
+        /// Ie, MaxWidth = PolyWidth * (OverlayWidth / PolyWidthInLogoPixels)
         /// </summary>
-        public SizeF MaxOverlaySize { get; set; }
+        public float PolyWidthInLogoPixels { get; set; }
+
+        /// <summary>
+        /// Defines the height of the parallelogram in the coordinate space of the overlay image. If greater than zero, will be used to determine the (maximum) percentage of the height of the poly that the overlay should occupy.
+        /// Ie, MaxHeight = PolyHeight * (OverlayHeight / PolyHeightInLogoPixels)
+        /// </summary>
+        public float PolyHeightInLogoPixels { get; set; }
 
         /// <summary>
         /// A virtual path to the overlay image. 
@@ -29,21 +37,17 @@ namespace ImageResizer.Plugins.CustomOverlay {
         public ContentAlignment Align { get; set; }
 
         /// <summary>
-        /// What coordinate space the points in parallelogram and distance in MaxOverlaySize are relative to
-        /// </summary>
-        public CoordinateSpace PointSpace { get; set; }
-
-        /// <summary>
         /// Hashes all contained data in the effort to keep DiskCache from preventing an update
         /// I'm not positive about this implementation - it probably shouldn't be used for lookup, but it should be good enough for the disk cache
         /// </summary>
         /// <returns></returns>
         public int GetDataHashCode() {
             int hash = 0xbac2d3;
-            hash ^= (int)(MaxOverlaySize.Width * 10);
-            hash ^= (int)(MaxOverlaySize.Height * 10.5);
+            hash ^= (int)(PolyWidthInLogoPixels * 10) << 5;
+            hash ^= (int)(PolyHeightInLogoPixels * 10) << 5;
+
             if (OverlayPath != null) hash ^= OverlayPath.GetHashCode();
-            hash ^= (int)Align ^ (int)PointSpace << 5;
+            hash ^= (int)Align;
 
             int poly = 0;
 
