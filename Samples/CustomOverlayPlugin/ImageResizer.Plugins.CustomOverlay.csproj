@@ -32,6 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
@@ -41,10 +42,13 @@
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="CachedOverlayProvider.cs" />
     <Compile Include="CustomOverlayPlugin.cs" />
     <Compile Include="IOverlayProvider.cs" />
+    <Compile Include="LayoutEngine.cs" />
     <Compile Include="Overlay.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuerystringOverlayProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
