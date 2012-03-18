@@ -35,6 +35,8 @@ namespace ImageResizer.Plugins.CustomOverlay {
                 p.X = (float)(p.X * xScale); //Scale
                 p.Y = (float)(p.Y * yScale);
                 p = PolygonMath.RotateVector(p, angle, dest[0]); //Rotate
+                p.X += dest[0].X;
+                p.Y += dest[1].Y;
                 moved[i] = p;
             }
             return moved;
