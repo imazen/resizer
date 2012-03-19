@@ -115,7 +115,7 @@ namespace ImageResizer.Plugins.CustomOverlay {
                     //Build overlay path
                     Overlay o = new Overlay();
                     StringBuilder p = new StringBuilder();
-                    p.AppendFormat("{4}/{2}/{0}_{1}_{2}_{3}.png", r.GetString(0), r.GetString(1), r.GetBoolean(2) ? "dark" : "light", r.GetString(3), this.OverlayBasePath.TrimEnd('/'));
+                    p.AppendFormat("{4}/{0}_{1}_{2}_{3}.png", r.GetString(0), r.GetString(1), r.GetBoolean(2) ? "dark" : "light", r.GetString(3), this.OverlayBasePath.TrimEnd('/'));
                     p.Replace(" ", "");
                     o.OverlayPath = p.ToString();
 
@@ -136,7 +136,7 @@ namespace ImageResizer.Plugins.CustomOverlay {
                     }
 
                     //Swap points 3 and 4 to make it clockwise.
-                    var temp = o.Poly[3];
+                    var temp = o.Poly[2];
                     o.Poly[2] = o.Poly[3];
                     o.Poly[3] = temp;
                     
