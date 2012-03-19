@@ -33,7 +33,9 @@ namespace ImageResizer.Plugins.Basic {
             //If not, let's cache it.
             if ("true".Equals(queryString["memcache"], StringComparison.OrdinalIgnoreCase)) {
                 //Optimization idea - use LockProvider to prevent duplicate requests. Would mean merging with DiskCache :(
-                c = new CachedVirtualFile(original.VirtualPath, StreamUtils.CopyToBytes(original.Open())); //Very long-running call
+                using (Stream data = original.Open()) {//Very long-running call
+                    c = new CachedVirtualFile(original.VirtualPath, StreamUtils.CopyToBytes(data)); 
+                }
                 cache.Set(key, c); //Save to cache (may trigger cleanup)
                 return c;
             }
