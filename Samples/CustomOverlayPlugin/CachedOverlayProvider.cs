@@ -12,7 +12,7 @@ namespace ImageResizer.Plugins.CustomOverlay {
     /// Understands &amp;designid=504&amp;mastid=8540&amp;colorid=9633 syntax. Caches database lookups so that repeat requests are fast. Only supports 1 overlay per image. 
     /// Does
     /// </summary>
-    public class CachedOverlayProvider:IOverlayProvider {
+    public class CachedOverlayProvider:IOverlayProvider, IQuerystringPlugin {
         /// <summary>
         /// If true, null values (missing rows) will be cached. 
         /// This makes requests for non-existent designs fast, but also means it could take 1 second (or whatever the sqlcachedependency polling value is) for them to appear after they are created.
@@ -45,6 +45,9 @@ namespace ImageResizer.Plugins.CustomOverlay {
  
         }
 
+        public IEnumerable<string> GetSupportedQuerystringKeys() {
+            return new string[] { "designid", "mastid", "colorid" };
+        }
 
         public CachedOverlayProvider(string connectionStringName, string sqlDependencyName, string overlayBasePath) {
             this.ConnectionStringName = connectionStringName;
@@ -287,5 +290,7 @@ namespace ImageResizer.Plugins.CustomOverlay {
             Unknown
         }
 
+
+        
     }
 }

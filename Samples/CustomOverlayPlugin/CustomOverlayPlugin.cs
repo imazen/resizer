@@ -17,7 +17,7 @@ namespace ImageResizer.Plugins.CustomOverlay {
     /// This plugin applies image overlays onto a base image using data provided by the specified IOverlayProvider. 
     /// It requires a base image path and therefore cannot work except within the HttpModule.
     /// </summary>
-    public class CustomOverlayPlugin:BuilderExtension, IPlugin, IMultiInstancePlugin {
+    public class CustomOverlayPlugin:BuilderExtension, IPlugin, IMultiInstancePlugin, IQuerystringPlugin {
         IOverlayProvider provider;
 
         /// <summary>
@@ -130,6 +130,10 @@ namespace ImageResizer.Plugins.CustomOverlay {
             c.Pipeline.Rewrite -= Pipeline_Rewrite;
             c.Plugins.remove_plugin(this);
             return true;
+        }
+
+        public IEnumerable<string> GetSupportedQuerystringKeys() {
+            return provider.GetSupportedQuerystringKeys();
         }
     }
 }
