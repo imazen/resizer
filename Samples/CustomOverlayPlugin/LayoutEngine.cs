@@ -18,7 +18,7 @@ namespace ImageResizer.Plugins.CustomOverlay {
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        protected PointF[] TranslatePoints(PointF[] points, ImageState s) {
+        public PointF[] TranslatePoints(PointF[] points, ImageState s) {
             PointF[] moved = new PointF[points.Length];
             PointF[] dest = s.layout["image"];
             double newWidth = PolygonMath.Dist(dest[0], dest[1]);
@@ -52,18 +52,24 @@ namespace ImageResizer.Plugins.CustomOverlay {
             double w = cw;
             double h = ch;
 
-            //If specified, what percentage of the space do we use?
-            if (o.PolyWidthInLogoPixels > 0) 
-                w = w * (double)nativeSize.Width / o.PolyWidthInLogoPixels;
+            double aspect = (double)nativeSize.Height / (double)nativeSize.Width;
 
-            if (o.PolyHeightInLogoPixels > 0)
+            //If specified, what percentage of the space do we use?
+            if (o.PolyWidthInLogoPixels > 0) {
+                w = w * (double)nativeSize.Width / o.PolyWidthInLogoPixels;
+                h = w * aspect;
+            }
+
+            if (o.PolyHeightInLogoPixels > 0) {
                 h = h * (double)nativeSize.Height / o.PolyHeightInLogoPixels;
+                w = h / aspect;
+            }
             
             //Shrink to keep aspect ratio
-            if (w / h > (double)nativeSize.Width / (double)nativeSize.Height) {
-                w = h * (double)nativeSize.Width / (double)nativeSize.Height;
+            if (w / h > 1 / aspect) {
+                w = h / aspect;
             } else {
-                h = w * (double)nativeSize.Height / (double)nativeSize.Width;
+                h = w * aspect;
             }
             //Let's define our width/height offsets
             double ox = 0; double oy = 0; ;
