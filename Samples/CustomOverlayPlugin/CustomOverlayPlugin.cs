@@ -10,6 +10,7 @@ using System.Drawing.Imaging;
 using ImageResizer.Util;
 using System.Collections.Specialized;
 using System.Configuration;
+using System.Drawing.Drawing2D;
 
 namespace ImageResizer.Plugins.CustomOverlay {
     /// <summary>
@@ -23,6 +24,9 @@ namespace ImageResizer.Plugins.CustomOverlay {
         /// If true, an exception will not be thrown when the file for an overlay cannot be found.
         /// </summary>
         public bool IgnoreMissingFiles { get; set; }
+
+        public SmoothingMode Smoothing { get; set; }
+        public CompositingQuality Compositing { get; set; }
 
         public CustomOverlayPlugin(NameValueCollection args) {
             string providerName = args["provider"];
@@ -40,6 +44,8 @@ namespace ImageResizer.Plugins.CustomOverlay {
 
             IgnoreMissingFiles = Utils.getBool(args, "ignoreMissingFiles", false);
 
+            Smoothing = Utils.parseEnum<SmoothingMode>(args["smoothing"], SmoothingMode.HighQuality);
+            Compositing = Utils.parseEnum<CompositingQuality>(args["compositing"], CompositingQuality.HighQuality);
         }
 
         public CustomOverlayPlugin(IOverlayProvider provider) {
@@ -92,11 +98,11 @@ namespace ImageResizer.Plugins.CustomOverlay {
 
 
             Graphics g = s.destGraphics;
-            s.destGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            s.destGraphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
-            s.destGraphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
-            s.destGraphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-            s.destGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+            g.SmoothingMode = this.Smoothing;
+            g.CompositingMode = CompositingMode.SourceOver;
+            g.CompositingQuality = this.Compositing;
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
             foreach (Overlay o in overlays) {
                 if (string.IsNullOrEmpty(o.OverlayPath)) continue;//Skip overlays without a path
@@ -108,6 +114,8 @@ namespace ImageResizer.Plugins.CustomOverlay {
                         ia.SetWrapMode(System.Drawing.Drawing2D.WrapMode.TileFlipXY);
 
                         g.DrawImage(b, PolygonMath.getParallelogram(new LayoutEngine().GetOverlayParalellogram(o, b.Size, s)), new Rectangle(0, 0, b.Width, b.Height), GraphicsUnit.Pixel, ia);
+                        //Draw the poly if requested.
+                        if (Utils.getBool(s.settings,"customoverlay.showpoly",false)) g.DrawPolygon(Pens.Green, new LayoutEngine().TranslatePoints(o.Poly, s));
                         g.Flush(System.Drawing.Drawing2D.FlushIntention.Sync);
                     }
                 } catch (FileNotFoundException fe) {
@@ -117,7 +125,6 @@ namespace ImageResizer.Plugins.CustomOverlay {
 
             return RequestedAction.None;
         }
-
 
         public bool Uninstall(Config c) {
             c.Pipeline.Rewrite -= Pipeline_Rewrite;
