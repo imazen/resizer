@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Database.aspx" />
+    <Content Include="Default.htm" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

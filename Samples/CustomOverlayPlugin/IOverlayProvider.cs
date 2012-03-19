@@ -4,7 +4,7 @@ using System.Text;
 using System.Collections.Specialized;
 
 namespace ImageResizer.Plugins.CustomOverlay {
-    public interface IOverlayProvider {
+    public interface IOverlayProvider:IQuerystringPlugin {
         /// <summary>
         /// Provides a collection of Overlay objects for the specified request parameters
         /// </summary>
