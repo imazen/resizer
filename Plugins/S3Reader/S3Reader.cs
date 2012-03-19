@@ -10,7 +10,7 @@ using ImageResizer.Configuration.Issues;
 using System.Security;
 
 namespace ImageResizer.Plugins.S3Reader {
-    public class S3Reader : IPlugin {
+    public class S3Reader : IPlugin, IMultiInstancePlugin {
 
         string buckets, vpath;
         bool includeModifiedDate = false;

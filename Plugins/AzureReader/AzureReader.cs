@@ -10,7 +10,7 @@ using System.Security;
 
 namespace ImageResizer.Plugins.AzureReader {
 
-    public class AzureReader : IPlugin, IIssueProvider {
+    public class AzureReader : IPlugin, IIssueProvider, IMultiInstancePlugin {
 
         AzureVirtualPathProvider vpp = null;
         string blobStorageConnection;

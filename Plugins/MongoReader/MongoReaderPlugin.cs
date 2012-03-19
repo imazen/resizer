@@ -11,7 +11,7 @@ using MongoDB.Bson;
 using System.IO;
 
 namespace ImageResizer.Plugins.MongoReader {
-    public class MongoReaderPlugin:IPlugin, IVirtualImageProvider {
+    public class MongoReaderPlugin:IPlugin, IVirtualImageProvider, IMultiInstancePlugin {
         MongoDatabase db;
         MongoGridFSSettings gridSettings;
         MongoGridFS grid;

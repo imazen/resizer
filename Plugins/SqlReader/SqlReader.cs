@@ -17,7 +17,7 @@ namespace ImageResizer.Plugins.SqlReader
     /// <summary>
     /// Specialized VirtualPathProvider that allows accessing database images as if they are on disk.
     /// </summary>
-    public class SqlReaderPlugin : VirtualPathProvider, IPlugin, IIssueProvider, IVirtualImageProvider 
+    public class SqlReaderPlugin : VirtualPathProvider, IPlugin, IIssueProvider, IVirtualImageProvider, IMultiInstancePlugin
     {
 
         SqlReaderSettings s = null;
