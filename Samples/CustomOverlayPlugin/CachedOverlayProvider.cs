@@ -139,6 +139,8 @@ namespace ImageResizer.Plugins.CustomOverlay {
                     var temp = o.Poly[2];
                     o.Poly[2] = o.Poly[3];
                     o.Poly[3] = temp;
+
+                    o.RespectOnlyMatchingBound = true;
                     
                     return o;
                 }

@@ -56,13 +56,13 @@ namespace ImageResizer.Plugins.CustomOverlay {
 
             //If specified, what percentage of the space do we use?
             if (o.PolyWidthInLogoPixels > 0) {
-                w = w * (double)nativeSize.Width / o.PolyWidthInLogoPixels;
-                h = w * aspect;
+                w = cw * (double)nativeSize.Width / o.PolyWidthInLogoPixels;
+                if (o.RespectOnlyMatchingBound) h = w * aspect;
             }
 
             if (o.PolyHeightInLogoPixels > 0) {
-                h = h * (double)nativeSize.Height / o.PolyHeightInLogoPixels;
-                w = h / aspect;
+                h = ch * (double)nativeSize.Height / o.PolyHeightInLogoPixels;
+                if (o.RespectOnlyMatchingBound && o.PolyWidthInLogoPixels <= 0) w = h / aspect;
             }
             
             //Shrink to keep aspect ratio

@@ -8,6 +8,9 @@ namespace ImageResizer.Plugins.CustomOverlay {
     /// Specifies a image to overlay, the overlay paralellogram, the alignemnt, and (optionally) a pair of weird scaling factors. 
     /// </summary>
     public class Overlay {
+        public Overlay() {
+            RespectOnlyMatchingBound = true;
+        }
         /// <summary>
         /// A 4-point array that describes a parallelogram within which to draw the overlay image. Specified in the native coordinate space of the original image (not the overlay).
         /// </summary>
@@ -27,6 +30,11 @@ namespace ImageResizer.Plugins.CustomOverlay {
         public float PolyHeightInLogoPixels { get; set; }
 
         /// <summary>
+        /// If true (default), and if PolyWidthInLogoPixels is set, only the polygon's width will be respected. If true, and PolyHeightInLogoPixels is set, only the polygon's height will be respected.
+        /// </summary>
+        public bool RespectOnlyMatchingBound { get; set; }
+
+        /// <summary>
         /// A virtual path to the overlay image. 
         /// </summary>
         public string OverlayPath { get; set; }
@@ -42,7 +50,7 @@ namespace ImageResizer.Plugins.CustomOverlay {
         /// </summary>
         /// <returns></returns>
         public int GetDataHashCode() {
-            int hash = 0xbac2d3;
+            int hash = RespectOnlyMatchingBound ? 0xbac2d3 : 0xbbac486;
             hash ^= (int)(PolyWidthInLogoPixels * 10) << 5;
             hash ^= (int)(PolyHeightInLogoPixels * 10) << 5;
 
