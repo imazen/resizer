@@ -68,10 +68,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\Libs\FreeImage\x86ReleaseDll\FreeImage.dll">
-      <Link>FreeImage.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <EmbeddedResource Include="Native.xml" />
     <Content Include="todo.txt" />
   </ItemGroup>
