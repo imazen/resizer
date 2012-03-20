@@ -89,7 +89,7 @@ namespace ImageResizer.Plugins.RedEye {
             });
         }
 
-        public IEnumerable<string> GetSupportedQuerystringKeys() {
+        public virtual IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "r.detecteyes"};
         }
     }
