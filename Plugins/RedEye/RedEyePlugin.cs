@@ -118,7 +118,7 @@ namespace ImageResizer.Plugins.RedEye {
             return RequestedAction.None;
         }
 
-        public IEnumerable<string> GetSupportedQuerystringKeys() {
+        public override IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "r.detecteyes","r.conv","r.econv","r.sn","r.canny","r.threshold","r.sobel","r.filter","r.eyes","r.autoeyes"};
         }
     }
