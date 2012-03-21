@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<files>
+  <file url="http://dyn.imageresizing.net/ghostscript/9.04/gsdll32.dll" name="gsdll32.dll" bitness="32" fileBytes="14,639,104" />
+  <file url="http://dyn.imageresizing.net/ghostscript/9.04/gsdll64.dll" name="gsdll64.dll"  bitness="64" fileBytes="16,230,912" />
+</files>

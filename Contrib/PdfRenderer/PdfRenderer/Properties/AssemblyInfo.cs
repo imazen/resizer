@@ -9,6 +9,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Ghostscript-based plugin for PDF support.")]
 
 
+
+//Inform NativeDependencyManager where to find the download manifest
+[assembly: NativeDependencies("Native.xml")]
+
 #if DEBUG
 [assembly: AssemblyConfiguration("DEBUG")]
 #else
