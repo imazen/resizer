@@ -547,9 +547,20 @@ namespace ImageResizer.Resizing {
             return RequestedAction.None;
         }
 
+        /// <summary>
+        /// Process.5(Render).9: Plugins have a chance to pre-process the source image before it gets rendered, and save it to s.preRenderBitmap
+        /// </summary>
+        /// <param name="s"></param>
+        protected virtual RequestedAction PreRenderImage(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PreRenderImage(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
+        }
 
         /// <summary>
-        /// Process.5(Render).9: The image is copied to the destination parallelogram specified by ring 'image'. 
+        /// Process.5(Render).10: The image is copied to the destination parallelogram specified by ring 'image'. 
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction RenderImage(ImageState s) {
@@ -560,7 +571,7 @@ namespace ImageResizer.Resizing {
             return RequestedAction.None;
         }
         /// <summary>
-        /// Process.5(Render).10: After the image is drawn
+        /// Process.5(Render).11: After the image is drawn
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction PostRenderImage(ImageState s) {
@@ -571,7 +582,7 @@ namespace ImageResizer.Resizing {
             return RequestedAction.None;
         }
         /// <summary>
-        /// Process.5(Render).11: The border is rendered
+        /// Process.5(Render).12: The border is rendered
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction RenderBorder(ImageState s) {
@@ -582,7 +593,7 @@ namespace ImageResizer.Resizing {
             return RequestedAction.None;
         }
         /// <summary>
-        /// Process.5(Render).12: After the border is drawn
+        /// Process.5(Render).13: After the border is drawn
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction PostRenderBorder(ImageState s) {
@@ -594,7 +605,7 @@ namespace ImageResizer.Resizing {
         }
 
         /// <summary>
-        /// Process.5(Render).13: Any last-minute changes before watermarking or overlays are applied
+        /// Process.5(Render).14: Any last-minute changes before watermarking or overlays are applied
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction PreRenderOverlays(ImageState s) {
@@ -606,7 +617,7 @@ namespace ImageResizer.Resizing {
         }
 
         /// <summary>
-        /// Process.5(Render).14: Watermarks can be rendered here. All image processing should be done
+        /// Process.5(Render).15: Watermarks can be rendered here. All image processing should be done
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction RenderOverlays(ImageState s) {
@@ -617,7 +628,7 @@ namespace ImageResizer.Resizing {
             return RequestedAction.None;
         }
         /// <summary>
-        /// Process.5(Render).15: Called before changes are flushed and the graphics object is destroyed.
+        /// Process.5(Render).16: Called before changes are flushed and the graphics object is destroyed.
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction PreFlushChanges(ImageState s) {
@@ -629,7 +640,7 @@ namespace ImageResizer.Resizing {
         }
 
         /// <summary>
-        /// Process.5(Render).16: Changes are flushed to the bitmap here and the graphics object is destroyed.
+        /// Process.5(Render).17: Changes are flushed to the bitmap here and the graphics object is destroyed.
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction FlushChanges(ImageState s) {
@@ -641,7 +652,7 @@ namespace ImageResizer.Resizing {
         }
 
         /// <summary>
-        /// Process.5(Render).17: Changes have been flushed to the bitmap, but the final bitmap has not been flipped yet.
+        /// Process.5(Render).18: Changes have been flushed to the bitmap, but the final bitmap has not been flipped yet.
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction PostFlushChanges(ImageState s) {

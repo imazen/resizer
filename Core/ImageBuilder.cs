@@ -401,7 +401,7 @@ namespace ImageResizer
 
                 if (dest == typeof(Bitmap)) {
                     job.Result = buildToBitmap(b, s, true);
-
+                    
                     //Write to Physical file
                 } else if (dest is string) {
                     //Make physical and resolve variable references all at the same time.
@@ -548,6 +548,7 @@ namespace ImageResizer
             PostRenderPadding(s);
             CreateImageAttribues(s);
             PostCreateImageAttributes(s);
+            PreRenderImage(s);
             RenderImage(s);
             PostRenderImage(s);
             RenderBorder(s);
@@ -722,7 +723,7 @@ namespace ImageResizer
                         s.sourceBitmap.PixelFormat == PixelFormat.Format32bppRgb || 
                         s.sourceBitmap.PixelFormat == PixelFormat.Format48bppRgb) &&
                         PolygonMath.ArraysEqual(s.layout["image"], s.layout.LastRing.points) &&
-                        PolygonMath.IsUnrotated(s.layout["image"]));
+                        PolygonMath.IsUnrotated(s.layout["image"]) && string.IsNullOrEmpty(s.settings["roundcorners"]));
 
             //Set the background to white if the background will be showing and the destination format doesn't support transparency.
             if (background == Color.Transparent && !s.supportsTransparency & !nothingToShow) 
@@ -751,7 +752,7 @@ namespace ImageResizer
             //Draw padding around image if needed.
             if (!paddingColor.Equals(s.settings.BackgroundColor) && paddingColor != Color.Transparent)
                 using (Brush b = new SolidBrush(paddingColor)) s.destGraphics.FillPolygon(b, s.layout["padding"]);
-
+          
             return RequestedAction.None;
         }
 
@@ -768,13 +769,17 @@ namespace ImageResizer
             if (s.destGraphics == null) return RequestedAction.None;
 
             if (!string.IsNullOrEmpty(s.settings["filter"])) {
-
                 s.destGraphics.InterpolationMode = Utils.parseEnum<System.Drawing.Drawing2D.InterpolationMode>(s.settings["filter"], s.destGraphics.InterpolationMode);
             }
 
             s.copyAttibutes.SetWrapMode(WrapMode.TileFlipXY);
-            s.destGraphics.DrawImage(s.sourceBitmap, PolygonMath.getParallelogram(s.layout["image"]), s.copyRect, GraphicsUnit.Pixel, s.copyAttibutes);
-
+            if (s.preRenderBitmap != null) {
+                using (Bitmap b = s.preRenderBitmap) { //Dispose the intermediate bitmap aggressively
+                    s.destGraphics.DrawImage(s.preRenderBitmap, PolygonMath.getParallelogram(s.layout["image"]), new RectangleF(0, 0, s.preRenderBitmap.Width, s.preRenderBitmap.Height), GraphicsUnit.Pixel, s.copyAttibutes);
+                }
+            } else {
+                s.destGraphics.DrawImage(s.sourceBitmap, PolygonMath.getParallelogram(s.layout["image"]), s.copyRect, GraphicsUnit.Pixel, s.copyAttibutes);
+            }
             return RequestedAction.None;
         }
 

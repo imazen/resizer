@@ -26,6 +26,9 @@ namespace ImageResizer.Plugins.Basic {
             //Skip this when we are doing simulations
             if (s.destGraphics == null) return RequestedAction.None;
 
+            //If there's pre-rendering involved this optimization is utterly pointless.
+            if (s.preRenderBitmap != null) return RequestedAction.None;
+
             //Find out what the speed setting is.
             int speed = 0;
             if (string.IsNullOrEmpty(s.settings["speed"]) || !int.TryParse(s.settings["speed"], NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out speed)) speed = 0;
@@ -45,8 +48,8 @@ namespace ImageResizer.Plugins.Basic {
             s.copyAttibutes.SetWrapMode(WrapMode.TileFlipXY);
 
             if (speed < 3) {
-                
                 s.destGraphics.DrawImage(s.sourceBitmap, PolygonMath.getParallelogram(s.layout["image"]), s.copyRect, GraphicsUnit.Pixel, s.copyAttibutes);
+                
             } else if (speed < 4) {
                 Rectangle midsize = PolygonMath.ToRectangle(PolygonMath.GetBoundingBox(s.layout["image"]));
 
