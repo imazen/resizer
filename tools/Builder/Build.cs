@@ -430,7 +430,7 @@ namespace ImageResizer.ReleaseBuilder {
         public void PackFull(PackageDescriptor desc) {
             // 'full'
             using (var p = new Package(desc.Path, this.f.ParentPath)) {
-                p.Add(q.files("^/(core|contrib|core.mvc|plugins|samples|tests)/"));
+                p.Add(q.files("^/(core|contrib|core.mvc|plugins|samples|tests|studiojs)/"));
                 p.Add(q.files("^/tools/COMInstaller"));
                 p.Add(q.files("^/dlls/(debug|release)"));
                 p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"), "/"); //Make a copy in the root
@@ -453,7 +453,7 @@ namespace ImageResizer.ReleaseBuilder {
             using (var p = new Package(desc.Path, this.f.ParentPath)) {
                 p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"), "/");
                 p.Add(q.files("^/dlls/(debug|release)/"));
-                p.Add(q.files("^/(core|samples)/"));
+                p.Add(q.files("^/(core|samples|studiojs)/"));
                 p.Add(q.files("^/[^/]+.txt$"));
                 p.Add(q.files("^/Web.config$"));
             }
