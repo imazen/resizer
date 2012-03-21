@@ -61,7 +61,7 @@ namespace ImageResizer.Plugins.Basic {
                 string ext = c.Pipeline.FakeExtensions.Count > 0 ? c.Pipeline.FakeExtensions[0] : "[the fakeExtensions attribute of the <pipeline> element in web.config is empty. Remove, or set to .ashx]";
 
                 if (server.IndexOf("IIS/7", 0, StringComparison.OrdinalIgnoreCase) > -1) {
-                    issues.Add(new Issue("Pipeline", "This app is running in Classic mode instead of Integrataed mode. This causes reduced performance and requires a special URL syntax." + 
+                    issues.Add(new Issue("Pipeline", "This app is running in Classic mode instead of Integrated mode. This causes reduced performance and requires a special URL syntax." + 
 						"In classic mode, you will need to append the " + ext + " extension to any images you wish to process.\n" +
                         "Alternatively, switch the mode to Integrated in the application's App Pool.", IssueSeverity.Warning));
                 }
@@ -227,13 +227,15 @@ namespace ImageResizer.Plugins.Basic {
                     "You should remove them (and especially their dependencies (unless used elsewhere)) from the /bin folder to improve application load times:\n");
                 sb.Append(unusedPlugins.ToString());
 
-                sb.AppendLine("\nReference list of plugin dependencies - so you know what additional dlls to remove when removing a plugin. (may not be up-to-date):\n");
+                sb.AppendLine("\nReference list of plugin dependencies - so you know what additional dlls to remove when removing a plugin. (may not be up-to-date, see plugin docs):\n");
                 sb.AppendLine("The FreeImage plugin has the following dependencies: FreeImage.dll and FreeImageNET.dll\n" +
                     "The Logging plugin depends on: NLog.dll\n" +
-                    "The AdvancedFilters and WhitespaceTrimmer plugins depend on: AForge.dll, AForge.Math.dll, AForge.Imaging.dll, and AForge.Imaging.Formats.dll\n" +
+                    "The AdvancedFilters, RedEye, and WhitespaceTrimmer plugins depend on: AForge.dll, AForge.Math.dll, and AForge.Imaging.dll\n" +
                     "The PsdReader and PsdComposer plugins depend on: PsdFile.dll\n" +
                     "The S3Reader plugin depends on: LitS3.dll\n" +
-                    "The BatchZipper plugin depends on: Ionic.Zip.Reduced.dll\n");
+                    "The BatchZipper plugin depends on: Ionic.Zip.Reduced.dll\n" + 
+                    "The PdfRenderer plugin depends on gsdll32.dll or gdsll32.dll\n" + 
+                    "The RedEye plugin depends on several dozen files... see the plugin docs.\n");
             }
 			return sb.ToString();
 
