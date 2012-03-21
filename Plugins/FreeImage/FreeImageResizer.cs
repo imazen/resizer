@@ -40,7 +40,7 @@ namespace ImageResizer.Plugins.FreeImageScaling {
             return filter;
         }
 
-        protected override RequestedAction RenderImage(ImageState s) {
+        protected override RequestedAction PreRenderImage(ImageState s) {
             //Skip this when we are doing simulations
             if (s.destGraphics == null) return RequestedAction.None;
 
@@ -68,16 +68,24 @@ namespace ImageResizer.Plugins.FreeImageScaling {
             FIBITMAP src = FIBITMAP.Zero;
             FIBITMAP midway = FIBITMAP.Zero;
             try {
-                //Convert, scale, then convert back.
-                src = FreeImage.CreateFromBitmap(s.sourceBitmap);
+                //Crop if needed, Convert, scale, then convert back.
+                if (s.preRenderBitmap != null || (s.copyRect.Width == s.originalSize.Width && s.copyRect.Height == s.originalSize.Height && s.copyRect.X == 0 && s.copyRect.Y == 0)){
+                    src = FreeImage.CreateFromBitmap(s.preRenderBitmap != null ? s.preRenderBitmap : s.sourceBitmap);
+                }else{
+
+                    using (Bitmap c = s.sourceBitmap.Clone(s.copyRect, System.Drawing.Imaging.PixelFormat.Format32bppArgb)) {
+                        src = FreeImage.CreateFromBitmap(c);
+                    }
+                }
                 midway = FreeImage.Rescale(src, tempWidth, tempHeight, filter);
                 FreeImage.UnloadEx(ref src);
-                using (Bitmap resized = FreeImage.GetBitmap(midway)) {
-                    FreeImage.UnloadEx(ref midway);
-                    resized.MakeTransparent();
-                    s.copyAttibutes.SetWrapMode(WrapMode.TileFlipXY);
-                    s.destGraphics.DrawImage(resized, PolygonMath.getParallelogram(s.layout["image"]), new RectangleF(0, 0, resized.Width, resized.Height), GraphicsUnit.Pixel, s.copyAttibutes);
-                }
+                //Clear the old pre-rendered image if needed
+                if (s.preRenderBitmap != null) s.preRenderBitmap.Dispose();
+                //Reassign the pre-rendered image
+                s.preRenderBitmap = FreeImage.GetBitmap(midway);
+                FreeImage.UnloadEx(ref midway);
+                s.preRenderBitmap.MakeTransparent();
+
             } finally {
                 if (!src.IsNull) FreeImage.UnloadEx(ref src);
                 if (!midway.IsNull) FreeImage.UnloadEx(ref midway);
