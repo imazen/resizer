@@ -41,6 +41,51 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\StudioJS\ImageResizing.js">
+      <Link>js\ImageResizing.js</Link>
+    </Content>
+    <Content Include="..\..\StudioJS\jquery-1.7.1.min.js">
+      <Link>js\jquery-1.7.1.min.js</Link>
+    </Content>
+    <Content Include="..\..\StudioJS\jquery-ui-1.8.16.custom.min.js">
+      <Link>js\jquery-ui-1.8.16.custom.min.js</Link>
+    </Content>
+    <Content Include="..\..\StudioJS\jquery.ba-bbq.js">
+      <Link>js\jquery.ba-bbq.js</Link>
+    </Content>
+    <Content Include="..\..\StudioJS\jquery.ba-bbq.min.js">
+      <Link>js\jquery.ba-bbq.min.js</Link>
+    </Content>
+    <Content Include="..\..\StudioJS\jquery.ba-urlinternal.js">
+      <Link>js\jquery.ba-urlinternal.js</Link>
+    </Content>
+    <Content Include="..\..\StudioJS\jquery.ba-urlinternal.min.js">
+      <Link>js\jquery.ba-urlinternal.min.js</Link>
+    </Content>
+    <Content Include="..\..\StudioJS\jquery.collapse.js">
+      <Link>js\jquery.collapse.js</Link>
+    </Content>
+    <Content Include="..\..\StudioJS\jquery.cookie.js">
+      <Link>js\jquery.cookie.js</Link>
+    </Content>
+    <Content Include="..\..\StudioJS\jquery.imagestudio.js">
+      <Link>js\jquery.imagestudio.js</Link>
+    </Content>
+    <Content Include="..\..\StudioJS\jquery.Jcrop.js">
+      <Link>js\jquery.Jcrop.js</Link>
+    </Content>
+    <Content Include="..\..\StudioJS\jquery.jcrop.preview.js">
+      <Link>js\jquery.jcrop.preview.js</Link>
+    </Content>
+    <Content Include="..\..\StudioJS\Markdown.Converter.js">
+      <Link>js\Markdown.Converter.js</Link>
+    </Content>
+    <Content Include="..\..\StudioJS\querystring.js">
+      <Link>js\querystring.js</Link>
+    </Content>
+    <Content Include="..\..\StudioJS\underscore-min.js">
+      <Link>js\underscore-min.js</Link>
+    </Content>
     <Content Include="css\Jcrop.gif" />
     <Content Include="css\jquery.Jcrop.css" />
     <Content Include="griddata.js" />
@@ -68,27 +113,10 @@
     <Content Include="Grid.htm" />
     <Content Include="grid.js" />
     <Content Include="js\hover.js" />
-    <Content Include="js\ImageResizing.js" />
-    <Content Include="js\jquery-1.6.2.min.js" />
-    <Content Include="js\jquery-1.7.1.min.js" />
-    <Content Include="js\jquery-ui-1.8.16.custom.min.js" />
-    <Content Include="js\jquery.ba-bbq.js" />
-    <Content Include="js\jquery.ba-bbq.min.js" />
-    <Content Include="js\jquery.ba-urlinternal.js" />
-    <Content Include="js\jquery.ba-urlinternal.min.js" />
-    <Content Include="js\jquery.collapse.js" />
-    <Content Include="js\jquery.cookie.js" />
-    <Content Include="js\jquery.imagestudio.js" />
-    <Content Include="js\jquery.Jcrop.js" />
-    <Content Include="js\jquery.jcrop.preview.js" />
-    <Content Include="js\Markdown.Converter.js" />
-    <Content Include="js\querystring.js" />
-    <Content Include="js\underscore-min.js" />
     <Content Include="ListImages.aspx" />
     <Content Include="Misc\BatchResizeAndZip.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
-    <Content Include="js\jquery.min.js" />
     <Content Include="Misc\UrlAuthorizationTests.aspx" />
     <Content Include="Plugins.htm" />
     <Content Include="Misc\Protected\rose-leaf.jpg" />
