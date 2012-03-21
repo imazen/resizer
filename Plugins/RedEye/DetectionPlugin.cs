@@ -43,13 +43,17 @@ namespace ImageResizer.Plugins.RedEye {
         }
 
         protected override RequestedAction Render(ImageState s) {
-            if (!Utils.getBool(s.settings, "r.detecteyes", false)) return RequestedAction.None;
+            bool detecteyes = Utils.getBool(s.settings, "r.detecteyes", false);
+            bool getlayout = Utils.getBool(s.settings, "r.getlayout", false);
+            if (!detecteyes && !getlayout) return RequestedAction.None;
 
 
             var ex = new ResizingCanceledException("Resizing was canceled as JSON data was requested instead");
 
             RedEyeData d = new RedEyeData();
-            d.features = new FaceDetection().DetectFeatures(s.sourceBitmap);
+            //Only detect eyes if it was requested.
+            if (detecteyes) d.features = new FaceDetection().DetectFeatures(s.sourceBitmap);
+
             d.xunits = s.originalSize.Width;
             d.yunits = s.originalSize.Height;
             RectangleF dest = PolygonMath.GetBoundingBox(s.layout["image"]);
@@ -73,8 +77,9 @@ namespace ImageResizer.Plugins.RedEye {
         /// <param name="context"></param>
         /// <param name="e"></param>
         void Pipeline_PreHandleImage(System.Web.IHttpModule sender, System.Web.HttpContext context, Caching.IResponseArgs e) {
-            if (!Utils.getBool(e.RewrittenQuerystring, "r.detecteyes", false)) return;
-
+            bool detecteyes = Utils.getBool(e.RewrittenQuerystring, "r.detecteyes", false);
+            bool getlayout = Utils.getBool(e.RewrittenQuerystring, "r.getlayout", false);
+            if (!detecteyes && !getlayout) return;
 
             ResponseArgs ra = e as ResponseArgs;
             e.ResponseHeaders.ContentType = "application/json; charset=utf-8";
