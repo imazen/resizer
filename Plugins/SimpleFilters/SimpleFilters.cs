@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using System.Drawing;
 using ImageResizer.Util;
 using System.Globalization;
+using System.Drawing.Drawing2D;
 
 namespace ImageResizer.Plugins.SimpleFilters {
     public class SimpleFilters : BuilderExtension, IPlugin, IQuerystringPlugin {
@@ -24,6 +25,70 @@ namespace ImageResizer.Plugins.SimpleFilters {
             return new string[] { "filter", "s.grayscale", "s.sepia", "s.alpha", "s.brightness", "s.contrast", "s.saturation", "s.invert" };
         }
 
+        /// <summary>
+        /// Supporting rounded corners.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        protected override RequestedAction PreRenderImage(ImageState s) {
+            string svals = s.settings["roundcorners"];
+            if (string.IsNullOrEmpty(svals)) return  RequestedAction.None;
+
+            double[] vals = Utils.parseList(svals,0);
+
+            if (vals.Length == 1){
+                vals = new double[]{vals[0],vals[0],vals[0],vals[0]};
+            }
+            if (vals.Length != 4) return RequestedAction.None;
+
+            bool hasValue = false;
+            foreach (double d in vals) if (d > 0) hasValue = true;
+            if (!hasValue) return RequestedAction.None;
+            
+            Bitmap cropped = null;
+            try{
+                //Make sure cropping is applied, and use existing prerendered bitmap if present.
+                if (s.preRenderBitmap != null) cropped = s.preRenderBitmap;
+                else if (s.copyRect.X != 0 || s.copyRect.Y != 0 || s.copyRect.Width != s.originalSize.Width || s.copyRect.Height != s.originalSize.Height){
+                    cropped = s.sourceBitmap.Clone(s.copyRect, PixelFormat.Format32bppArgb);
+                }else{
+                    cropped = s.sourceBitmap;
+                }
+                s.preRenderBitmap = new Bitmap(cropped.Width,cropped.Height, PixelFormat.Format32bppArgb);
+
+                int[] radius = new int[4];
+                //Radius percentages are 0-100, a percentage of the average of the width and height.
+                for (int i = 0; i < vals.Length; i++) radius[i] = (int)Math.Round(Math.Max(0,Math.Min(99.999,vals[i])) * ((double)Math.Min(s.preRenderBitmap.Width,s.preRenderBitmap.Height) / 100));
+
+
+                s.preRenderBitmap.MakeTransparent();
+                using (Graphics g = Graphics.FromImage(s.preRenderBitmap)) {
+                    g.SmoothingMode = SmoothingMode.AntiAlias;
+                    g.CompositingMode = CompositingMode.SourceOver;
+                    g.CompositingQuality = CompositingQuality.HighQuality;
+                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                    using (TextureBrush tb = new TextureBrush(cropped))
+                    using (GraphicsPath gp = new GraphicsPath(FillMode.Winding)) {
+                        Rectangle bounds = new Rectangle(0, 0, s.preRenderBitmap.Width, s.preRenderBitmap.Height);
+                        int[] angles = new int[]{180,270,0,90};
+                        int[] xs = new int[]{bounds.X,bounds.Right - radius[1], bounds.Right - radius[2], bounds.X};
+                        int[] ys = new int[]{bounds.Y,bounds.Y,bounds.Bottom - radius[2], bounds.Bottom - radius[3]};
+                        for (int i =0; i < 4; i++){
+                            if (radius[i] > 0){
+                                gp.AddArc(xs[i],ys[i],radius[i],radius[i],angles[i],90);
+                            }else{
+                                gp.AddLine(xs[i],ys[i],xs[i],ys[i]);
+                            }
+                        }
+                        g.FillPath(tb, gp);
+
+                    }
+                }
+            }finally{
+                if (cropped != null & cropped != s.sourceBitmap) cropped.Dispose();
+            }
+            return RequestedAction.None;
+        }
 
         protected override RequestedAction PostCreateImageAttributes(ImageState s) {
             if (s.copyAttibutes == null) return RequestedAction.None;
