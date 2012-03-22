@@ -113,7 +113,6 @@
     <Content Include="Grid.htm" />
     <Content Include="grid.js" />
     <Content Include="js\hover.js" />
-    <Content Include="ListImages.aspx" />
     <Content Include="Misc\BatchResizeAndZip.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
@@ -133,13 +132,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="css\reset.css" />
-    <Compile Include="ListImages.aspx.cs">
-      <DependentUpon>ListImages.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="ListImages.aspx.designer.cs">
-      <DependentUpon>ListImages.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Misc\BatchResizeAndZip.aspx.cs">
       <DependentUpon>BatchResizeAndZip.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
