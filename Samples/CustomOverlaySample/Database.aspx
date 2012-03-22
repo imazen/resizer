@@ -53,11 +53,15 @@ src="Images/ProductSource/2184_74_z.jpg?width=375&height=375&mastid=7549&colorid
 <!--Center Chest - L - logo should be 101px/218px max = 46% of width of 
 source coordinates; yours is too small -->
 </div>
-
+<div>
 <img 
 src="Images/ProductSource/2184_74_z.jpg?width=375&height=375&mastid=7549&colorid=2218&designid=3280&trim.threshold=50" />
 
 <img src="Images/FinalOutput/image006.jpeg" />
+</div>
+<p>And last, a problem with w3wp?</p>
+
+<img src="Images/ProductSource/3311_43_z.jpg.ashx?orgid=2096&mastid=7577&colorid=1445&designid=1&logousageid=3&trim.threshold=50&width=375" />
 
     </div>
     </form>

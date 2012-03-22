@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Web;
 using System.Web.Caching;
 using System.Drawing;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.CustomOverlay {
     /// <summary>
@@ -41,12 +42,18 @@ namespace ImageResizer.Plugins.CustomOverlay {
         /// </summary>
         public string OverlayBasePath { get; set; }
 
+         
+        /// <summary>
+        /// If true, caching of database results will be enabled.
+        /// </summary>
+        public bool CacheDb { get; set; }
+
         public CachedOverlayProvider(NameValueCollection args):this(args["connectionStringName"],args["sqlDependencyName"],args["overlayBasePath"]) {
- 
+            CacheDb = Utils.getBool(args, "cachedb", true);
         }
 
         public IEnumerable<string> GetSupportedQuerystringKeys() {
-            return new string[] { "designid", "mastid", "colorid" };
+            return new string[] { "designid", "mastid", "colorid","orgid","logousageid" };
         }
 
         public CachedOverlayProvider(string connectionStringName, string sqlDependencyName, string overlayBasePath) {
@@ -57,26 +64,43 @@ namespace ImageResizer.Plugins.CustomOverlay {
 
             WatchTables = new string[] { "LogoDesignMap", "LogoDesign", "LogoUsage", "Organization", "LogoImage2", "Color" };
 
-            SqlQuery = @"SELECT
-                            Organization.NickName, 
-                            LogoDesign.Description,
-                            Color.IsDarkColor,
-                            LogoUsage.Description,
-                            X1, Y1, X2, Y2, X3, Y3, X4, Y4
+//            SqlQuery = @"SELECT
+//                            Organization.NickName, 
+//                            LogoDesign.Description,
+//                            Color.IsDarkColor,
+//                            LogoUsage.Description,
+            //                            X1, Y1, X2, Y2, X4, Y4, X3, Y3, 
+//
+//                            FROM LogoDesignMap 
+//                            INNER JOIN LogoDesign 
+//		                            ON (LogoDesignMap.LogoDesignID = LogoDesign.LogoDesignID)
+//                            INNER JOIN LogoUsage
+//		                            ON (LogoDesignMap.LogoUsageID = LogoUsage.LogoUsageID)
+//                            INNER JOIN Organization 
+//		                            ON (LogoDesignMap.OrgID = Organization.OrgID)
+//                            INNER JOIN LogoImage2
+//		                            ON (LogoImage2.LogoPosition = LogoUsage.Description AND
+//		                            LogoImage2.MastID = @masterid AND LogoImage2.ColorID = @colorid)
+//                            INNER JOIN Color
+//		                            ON (Color.ColorID = @colorid)
+//                            WHERE LogoDesignMap.ID = @designmapid AND LogoImage2.IsLegacy = 0";
 
-                            FROM LogoDesignMap 
-                            INNER JOIN LogoDesign 
-		                            ON (LogoDesignMap.LogoDesignID = LogoDesign.LogoDesignID)
-                            INNER JOIN LogoUsage
-		                            ON (LogoDesignMap.LogoUsageID = LogoUsage.LogoUsageID)
-                            INNER JOIN Organization 
-		                            ON (LogoDesignMap.OrgID = Organization.OrgID)
-                            INNER JOIN LogoImage2
-		                            ON (LogoImage2.LogoPosition = LogoUsage.Description AND
-		                            LogoImage2.MastID = @masterid AND LogoImage2.ColorID = @colorid)
-                            INNER JOIN Color
-		                            ON (Color.ColorID = @colorid)
-                            WHERE LogoDesignMap.ID = @designmapid AND LogoImage2.IsLegacy = 0";
+            SqlQuery = @"SELECT
+	                        NickName, 
+	                        DesignDesc,
+	                        Color.IsDarkColor,
+	                        UsageDesc,
+	                        X1, Y1, X2, Y2, X4, Y4, X3, Y3, 
+	                        LogoAlignment
+
+	                        FROM LogoDesignView 
+	                        INNER JOIN LogoImage2
+			                        ON (LogoDesignView.LogoUsageId = LogoImage2.LogoUsageID AND LogoDesignView.MastId = LogoImage2.MastID AND
+			                        LogoImage2.MastID = @masterid AND LogoImage2.ColorID = @colorid)
+	                        INNER JOIN Color
+			                        ON (Color.ColorID = @colorid)
+	                        WHERE LogoDesignID = @designid AND LogoDesignView.OrgID=@orgid and LogoImage2.LogoUsageID=@logousageid AND LogoImage2.IsLegacy = 0 ";
+
             
 
             cachedDataKey = this.GetType().ToString() + new Random().Next().ToString(); //establish a unique cache key for the ASP.NET cache
@@ -87,15 +111,19 @@ namespace ImageResizer.Plugins.CustomOverlay {
             return new SqlConnection(s.ConnectionString);
         }
 
-        private Overlay GetOverlayFromDb(int designMapId, int masterId, int colorId) {
+        //private Overlay GetOverlayFromDb(int designMapId, int masterId, int colorId) {
+        private Overlay GetOverlayFromDb(int designId, int masterId, int colorId, int orgId, int logoUsageId)
+        {
 
 
             using (var conn = GetConnection()) {
                 conn.Open();
                 var c = new SqlCommand(SqlQuery, conn);
-                c.Parameters.AddWithValue("designmapid", designMapId);
+                c.Parameters.AddWithValue("designid", designId);
                 c.Parameters.AddWithValue("masterid", masterId);
                 c.Parameters.AddWithValue("colorid", colorId);
+                c.Parameters.AddWithValue("orgid", orgId);
+                c.Parameters.AddWithValue("logousageid", logoUsageId);
 
                 using (var r = c.ExecuteReader(System.Data.CommandBehavior.SingleRow)) {
                     if (!r.HasRows) return null; //No results?
@@ -118,15 +146,19 @@ namespace ImageResizer.Plugins.CustomOverlay {
                     //Build overlay path
                     Overlay o = new Overlay();
                     StringBuilder p = new StringBuilder();
-                    p.AppendFormat("{4}/{0}_{1}_{2}_{3}.png", r.GetString(0), r.GetString(1), r.GetBoolean(2) ? "dark" : "light", r.GetString(3), this.OverlayBasePath.TrimEnd('/'));
+                    //p.AppendFormat("{4}/{0}_{1}_{2}_{3}.png", r.GetString(0), r.GetString(1), r.GetBoolean(2) ? "dark" : "light", r.GetString(3), this.OverlayBasePath.TrimEnd('/'));
+                    p.AppendFormat("{4}/{0}/LogoImages/{0}_{1}_{2}_{3}.png", r.GetString(0), r.GetString(1), r.GetBoolean(2) ? "dark" : "light", r.GetString(3), this.OverlayBasePath.TrimEnd('/'));
                     p.Replace(" ", "");
                     o.OverlayPath = p.ToString();
 
-                    //Parse logo position and use it to fill in alignment and magic values
+                    //Parse logo position and use it to fill in magic values
                     string logoPosition = r.GetString(3).Replace(" ", "");
                     LogoPosition type = (LogoPosition)Enum.Parse(typeof(LogoPosition), logoPosition, true);
-                    this.ApplyLogoAlignment(o, type);
                     this.ApplyLogoPositionMagicValues(o, type);
+
+
+                    o.Align = (ContentAlignment)r.GetInt32(12);     //LogoAlignment
+                    
 
 
 
@@ -138,13 +170,6 @@ namespace ImageResizer.Plugins.CustomOverlay {
                         o.Poly[i] = new PointF(x, y);
                     }
 
-                    //Swap points 3 and 4 to make it clockwise.
-                    var temp = o.Poly[2];
-                    o.Poly[2] = o.Poly[3];
-                    o.Poly[3] = temp;
-
-                    o.RespectOnlyMatchingBound = true;
-                    
                     return o;
                 }
             }
@@ -165,42 +190,46 @@ namespace ImageResizer.Plugins.CustomOverlay {
             string sDesign = query["designid"];
             string sMaster = query["mastid"];
             string sColor = query["colorid"];
-            if (string.IsNullOrEmpty(sDesign) || string.IsNullOrEmpty(sMaster) || string.IsNullOrEmpty(sColor)) return null; //Don't process this image, it's not ours
+            string sOrgId = query["orgid"];
+            string sLogoUsageId = query["logousageid"];
+            if (string.IsNullOrEmpty(sDesign) || string.IsNullOrEmpty(sMaster) || string.IsNullOrEmpty(sColor) || string.IsNullOrEmpty(sOrgId) || string.IsNullOrEmpty(sLogoUsageId)) return null; //Don't process this image, it's not ours
 
-            int designMapId = 0;
+            int designId = 0;
             int masterId = 0;
             int colorId = 0;
+            int orgId = 0;
+            int logoUsageId = 0;
 
-            if (!int.TryParse(sDesign, out designMapId) || !(int.TryParse(sMaster, out masterId)) || !int.TryParse(sColor, out colorId)) return null; //Invalid numbers, fail silently.
+            if (!int.TryParse(sDesign, out designId) || !(int.TryParse(sMaster, out masterId)) || !int.TryParse(sColor, out colorId) || !int.TryParse(sOrgId, out orgId) || !int.TryParse(sLogoUsageId, out logoUsageId)) return null; //Invalid numbers, fail silently.
 
-            string cacheKey = sDesign + "_" + sMaster + "_" + sColor;
+            string cacheKey = sDesign + "_" + sMaster + "_" + sColor + "_" + sOrgId + "_" + sLogoUsageId;
             var cachedData = HttpRuntime.Cache[cachedDataKey] as Dictionary<string,Overlay>;
-
-            //If the value is alreaady cached, use it.
-            if (cachedData != null) lock (cachedDataSync) {
+            //Load from cache if present
+            if (CacheDb && cachedData != null) lock (cachedDataSync) {
                     Overlay temp;
                     if (cachedData.TryGetValue(cacheKey, out temp) && (temp != null || CacheNullValues)) {
                         return temp == null ? null :  new Overlay[] { temp };
                     }
                 }
 
+
             //Cache mis. Let's do our SQL
-            Overlay o = GetOverlayFromDb(designMapId, masterId, colorId);
+            Overlay o = GetOverlayFromDb(designId, masterId, colorId, orgId, logoUsageId);
             if (!CacheNullValues && o == null) return null; //Item doesn't exist
 
-
-            //Save in cache
-            lock (cachedDataSync) {
-                //Perform lookup again, don't want to overwrite it
-                var cachedData2 = HttpRuntime.Cache[cachedDataKey] as Dictionary<string, Overlay>;
-                //Ensure the dictionary exists
-                if (cachedData2 == null) {
-                    cachedData2 = new Dictionary<string, Overlay>();
-                    HttpRuntime.Cache.Add(cachedDataKey, cachedData2, GetDependencies(), Cache.NoAbsoluteExpiration, Cache.NoSlidingExpiration, CacheItemPriority.Normal, null);
+            if (CacheDb) {
+                //Save in cache
+                lock (cachedDataSync) {
+                    //Perform lookup again, don't want to overwrite it
+                    var cachedData2 = HttpRuntime.Cache[cachedDataKey] as Dictionary<string, Overlay>;
+                    //Ensure the dictionary exists
+                    if (cachedData2 == null) {
+                        cachedData2 = new Dictionary<string, Overlay>();
+                        HttpRuntime.Cache.Add(cachedDataKey, cachedData2, GetDependencies(), Cache.NoAbsoluteExpiration, Cache.NoSlidingExpiration, CacheItemPriority.Normal, null);
+                    }
+                    cachedData2[cacheKey] = o;
                 }
-                cachedData2[cacheKey] = o;
             }
-
             return (o == null) ? null : new Overlay[]{o};
         }
 
@@ -217,29 +246,6 @@ namespace ImageResizer.Plugins.CustomOverlay {
         }
 
 
-        /// <summary>
-        /// Applies the alignment based on the logo position
-        /// </summary>
-        /// <param name="o"></param>
-        /// <param name="lp"></param>
-        public void ApplyLogoAlignment(Overlay o, LogoPosition lp) {
-            switch (lp) {
-                case LogoPosition.CenterChest:
-                case LogoPosition.FullChest:
-                case LogoPosition.General:
-                case LogoPosition.LeftThigh:
-                    o.Align = System.Drawing.ContentAlignment.TopCenter;
-                    break;
-                case LogoPosition.LeftChest:
-                case LogoPosition.VerticalLeg:
-                case LogoPosition.LeftSleeve:
-                    o.Align = System.Drawing.ContentAlignment.TopRight;
-                    break;
-                default:
-                    o.Align = System.Drawing.ContentAlignment.TopLeft;
-                    break;
-            }
-        }
         /// <summary>
         /// Applies the scaling values based on the logo position
         /// </summary>
@@ -280,13 +286,18 @@ namespace ImageResizer.Plugins.CustomOverlay {
         }
 
         public enum LogoPosition {
-            FullChest,
-            CenterChest,
-            LeftChest,
-            LeftThigh,
-            VerticalLeg,
-            LeftSleeve,
-            General,
+            FullChest, //1
+            CenterChest, //3
+            LeftChest, //2
+            LeftThigh, //6
+            VerticalLeg, //12
+            LeftSleeve, //4
+            General, //11
+            RightSleeve, //5
+            Butt, //7
+            CenterChestOnBack,  //14
+            FullChestOnBack,    //15
+            NeckOnBack, //16
             Unknown
         }
 
