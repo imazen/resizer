@@ -46,6 +46,7 @@ namespace ImageResizer.Plugins.CustomOverlay {
 
             Smoothing = Utils.parseEnum<SmoothingMode>(args["smoothing"], SmoothingMode.HighQuality);
             Compositing = Utils.parseEnum<CompositingQuality>(args["compositing"], CompositingQuality.HighQuality);
+           
         }
 
         public CustomOverlayPlugin(IOverlayProvider provider) {
@@ -116,7 +117,6 @@ namespace ImageResizer.Plugins.CustomOverlay {
                         g.DrawImage(b, PolygonMath.getParallelogram(new LayoutEngine().GetOverlayParalellogram(o, b.Size, s)), new Rectangle(0, 0, b.Width, b.Height), GraphicsUnit.Pixel, ia);
                         //Draw the poly if requested.
                         if (Utils.getBool(s.settings,"customoverlay.showpoly",false)) g.DrawPolygon(Pens.Green, new LayoutEngine().TranslatePoints(o.Poly, s));
-                        g.Flush(System.Drawing.Drawing2D.FlushIntention.Sync);
                     }
                 } catch (FileNotFoundException fe) {
                     if (!IgnoreMissingFiles) throw new ImageMissingException("The overlay image " + o.OverlayPath + " could not be found.");
