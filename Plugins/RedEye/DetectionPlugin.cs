@@ -33,12 +33,14 @@ namespace ImageResizer.Plugins.RedEye {
         }
 
         class RedEyeData {
-            public int xunits;
-            public int yunits;
             public float dx;
             public float dy;
             public float dw;
             public float dh;
+            public float cropx;
+            public float cropy;
+            public float cropw;
+            public float croph;
             public List<ObjRect> features;
         }
 
@@ -54,8 +56,10 @@ namespace ImageResizer.Plugins.RedEye {
             //Only detect eyes if it was requested.
             if (detecteyes) d.features = new FaceDetection().DetectFeatures(s.sourceBitmap);
 
-            d.xunits = s.originalSize.Width;
-            d.yunits = s.originalSize.Height;
+            d.cropx = s.copyRect.X;
+            d.cropy = s.copyRect.Y;
+            d.cropw = s.copyRect.Width;
+            d.croph = s.copyRect.Height;
             RectangleF dest = PolygonMath.GetBoundingBox(s.layout["image"]);
             d.dx = dest.X;
             d.dy = dest.Y;
@@ -64,7 +68,9 @@ namespace ImageResizer.Plugins.RedEye {
             ex.ContentType = "application/json; charset=utf-8";
             StringWriter sw = new StringWriter();
             new Newtonsoft.Json.JsonSerializer().Serialize(sw, d);
-            ex.ResponseData = UTF8Encoding.UTF8.GetBytes(sw.ToString().ToCharArray());
+            string prefix = string.IsNullOrEmpty(s.settings["callback"]) ? "" : s.settings["callback"] + "(";
+            string suffix = string.IsNullOrEmpty(prefix)  ? "" : ");";
+            ex.ResponseData = UTF8Encoding.UTF8.GetBytes(prefix + sw.ToString() + suffix);
             ex.StatusCode = 200;
 
             throw ex;

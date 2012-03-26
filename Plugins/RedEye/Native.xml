@@ -5,7 +5,7 @@
   <file url="http://dyn.imageresizing.net/opencv/2.3.1/cascades/haarcascade_mcs_eyepair_small.xml" name="haarcascade_mcs_eyepair_small.xml"  fileBytes="422,790" />
   <file url="http://dyn.imageresizing.net/opencv/2.3.1/cascades/haarcascade_mcs_lefteye.xml" name="haarcascade_mcs_lefteye.xml"  fileBytes="801,512" />
   <file url="http://dyn.imageresizing.net/opencv/2.3.1/cascades/haarcascade_mcs_righteye.xml" name="haarcascade_mcs_righteye.xml"  fileBytes="1,425,365" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/cascades/haarcascade_eye.xml" name="haarcascade_frontalface_default.xml"  fileBytes="506,314" />
+  <file url="http://dyn.imageresizing.net/opencv/2.3.1/cascades/haarcascade_eye.xml" name="haarcascade_eye.xml"  fileBytes="506,314" />
   
   
   <file url="http://dyn.imageresizing.net/opencv/2.3.1/x86/opencv_legacy231.dll" name="opencv_legacy231.dll" bitness="32" fileBytes="762880" />
