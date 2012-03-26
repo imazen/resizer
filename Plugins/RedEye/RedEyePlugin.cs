@@ -33,8 +33,18 @@ namespace ImageResizer.Plugins.RedEye {
                 try {
                     UnmanagedImage ui = new UnmanagedImage(data);
 
-                    for (i = 0; i < eyes.Length -2; i += 3) {
-                        AdaptiveCircleFill.MarkEye(ui, new System.Drawing.Point((int)eyes[i], (int)eyes[i + 1]), (int)Math.Ceiling(0.02 * Math.Max(ui.Width, ui.Height)), 24);
+                    for (i = 0; i < eyes.Length / 5; i ++) {
+                        var x = eyes[i * 5];
+                        var y = eyes[i * 5 + 1];
+                        var w = eyes[i * 5 + 2];
+                        var h = eyes[i * 5 + 3];
+                        var a = eyes[i * 5 + 4];
+                        var cx = x + w / 2;
+                        var cy = y + h / 2;
+                        var radius = Math.Sqrt(w * w + h * h) /2;
+
+
+                        AdaptiveCircleFill.MarkEye(ui, new System.Drawing.Point((int)cx, (int)cy),(int)Math.Ceiling(radius),(float)(a > 6 ? radius /2 : radius ));
                             
                         /*if (eyes[i + 2] > 0) {
                             AdaptiveCircleFill.MarkEye(ui, new System.Drawing.Point((int)eyes[i], (int)eyes[i + 1]),(int)Math.Ceiling(0.025 * Math.Max(ui.Width,ui.Height)),24);

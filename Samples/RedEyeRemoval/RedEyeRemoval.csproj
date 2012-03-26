@@ -43,49 +43,25 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\StudioJS\ImageResizing.js">
-      <Link>js\ImageResizing.js</Link>
+      <Link>ImageResizing.js</Link>
     </Content>
     <Content Include="..\..\StudioJS\jquery-1.7.1.min.js">
-      <Link>js\jquery-1.7.1.min.js</Link>
+      <Link>jquery-1.7.1.min.js</Link>
     </Content>
     <Content Include="..\..\StudioJS\jquery-ui-1.8.16.custom.min.js">
-      <Link>js\jquery-ui-1.8.16.custom.min.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery.ba-bbq.js">
-      <Link>js\jquery.ba-bbq.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery.ba-bbq.min.js">
-      <Link>js\jquery.ba-bbq.min.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery.ba-urlinternal.js">
-      <Link>js\jquery.ba-urlinternal.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery.ba-urlinternal.min.js">
-      <Link>js\jquery.ba-urlinternal.min.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery.collapse.js">
-      <Link>js\jquery.collapse.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery.cookie.js">
-      <Link>js\jquery.cookie.js</Link>
+      <Link>jquery-ui-1.8.16.custom.min.js</Link>
     </Content>
     <Content Include="..\..\StudioJS\jquery.imagestudio.js">
-      <Link>js\jquery.imagestudio.js</Link>
+      <Link>jquery.imagestudio.js</Link>
     </Content>
     <Content Include="..\..\StudioJS\jquery.Jcrop.js">
-      <Link>js\jquery.Jcrop.js</Link>
+      <Link>jquery.Jcrop.js</Link>
     </Content>
     <Content Include="..\..\StudioJS\jquery.jcrop.preview.js">
-      <Link>js\jquery.jcrop.preview.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\Markdown.Converter.js">
-      <Link>js\Markdown.Converter.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\querystring.js">
-      <Link>js\querystring.js</Link>
+      <Link>jquery.jcrop.preview.js</Link>
     </Content>
     <Content Include="..\..\StudioJS\underscore-min.js">
-      <Link>js\underscore-min.js</Link>
+      <Link>underscore-min.js</Link>
     </Content>
     <Content Include="ListImages.aspx" />
     <Content Include="Studio.aspx" />
