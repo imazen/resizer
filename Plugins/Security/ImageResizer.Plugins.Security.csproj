@@ -8,8 +8,8 @@
     <ProjectGuid>{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ImageResizer.Plugins.RequestLimiting</RootNamespace>
-    <AssemblyName>ImageResizer.Plugins.RequestLimiting</AssemblyName>
+    <RootNamespace>ImageResizer.Plugins.Security</RootNamespace>
+    <AssemblyName>ImageResizer.Plugins.Security</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
