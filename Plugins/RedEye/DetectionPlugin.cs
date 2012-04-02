@@ -37,13 +37,17 @@ namespace ImageResizer.Plugins.RedEye {
             public float dy;
             public float dw;
             public float dh;
+            public float ow;
+            public float oh;
             public float cropx;
             public float cropy;
             public float cropw;
             public float croph;
             public List<ObjRect> features;
+            public string message;
         }
 
+        
         protected override RequestedAction Render(ImageState s) {
             bool detecteyes = Utils.getBool(s.settings, "r.detecteyes", false);
             bool getlayout = Utils.getBool(s.settings, "r.getlayout", false);
@@ -53,9 +57,16 @@ namespace ImageResizer.Plugins.RedEye {
             var ex = new ResizingCanceledException("Resizing was canceled as JSON data was requested instead");
 
             RedEyeData d = new RedEyeData();
-            //Only detect eyes if it was requested.
-            if (detecteyes) d.features = new FaceDetection().DetectFeatures(s.sourceBitmap);
-
+            try {
+                //Only detect eyes if it was requested.
+                if (detecteyes) d.features = new FaceDetection().DetectFeatures(s.sourceBitmap);
+            } catch(TypeInitializationException e){
+                throw e;
+            } catch (Exception e) {
+                d.message = e.Message;
+            }
+            d.ow = s.originalSize.Width;
+            d.oh = s.originalSize.Height;
             d.cropx = s.copyRect.X;
             d.cropy = s.copyRect.Y;
             d.cropw = s.copyRect.Width;

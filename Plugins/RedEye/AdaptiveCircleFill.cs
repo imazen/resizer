@@ -48,13 +48,16 @@ namespace ImageResizer.Plugins.RedEye {
             int maxRadius = maxEyeRadius * 2 + (int)Math.Ceiling(maxPointSearchDistance);
             //Find subset
             Rectangle subset = new Rectangle(start.X - maxRadius,start.Y - maxRadius,maxRadius * 2, maxRadius * 2);
-            if (subset.X < 0) subset.X = 0;
-            if (subset.Y < 0) subset.Y = 0;
+            if (subset.X < 0) { subset.Width += subset.X; subset.X = 0; }
+            if (subset.Y < 0) { subset.Height += subset.Y; subset.Y = 0; }
             if (subset.Right >= image.Width) subset.Width -= (subset.Right - image.Width + 1);
             if (subset.Bottom >= image.Height) subset.Height -= (subset.Bottom - image.Height + 1);
 
             start.X -= subset.X;
             start.Y -= subset.Y;
+
+            //Skip processing if we're slightly out of bounds
+            if (subset.X < 0 || subset.Y < 0 || subset.Width < 0 || subset.Height < 0 || subset.Right >= image.Width || subset.Bottom >= image.Height) return;
 
             UnmanagedImage red = null;
             try{
