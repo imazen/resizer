@@ -51,8 +51,8 @@
             /><br />
     Enter multiple querystrings to compare multiple versions of the images<br />
     <asp:TextBox ID="col1" Text="width=400;scale=both" runat="server" Width="400" /><br />
-    <asp:TextBox ID="col2" Text="width=400;scale=both;r.filter=2;" runat="server"  Width="400"/><br />
-    <asp:TextBox ID="col3" Text="width=400;scale=both;r.filter=2;r.conv=1" runat="server"  Width="400"/><br />
+    <asp:TextBox ID="col2" Text="width=400;scale=both;r.autoeyes=true;cache=no;" runat="server"  Width="400"/><br />
+    <asp:TextBox ID="col3" Text="width=400;scale=both;r.filter=2;" runat="server"  Width="400"/><br />
     <asp:TextBox ID="col4" Text="" runat="server"  Width="400"/><br />
     <asp:TextBox ID="col5" Text="" runat="server"  Width="400"/><br />
     <asp:TextBox ID="col6" Text="" runat="server"  Width="400"/><br />

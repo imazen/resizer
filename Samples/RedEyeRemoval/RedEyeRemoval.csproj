@@ -45,12 +45,6 @@
     <Content Include="..\..\StudioJS\ImageResizing.js">
       <Link>ImageResizing.js</Link>
     </Content>
-    <Content Include="..\..\StudioJS\jquery-1.7.1.min.js">
-      <Link>jquery-1.7.1.min.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery-ui-1.8.16.custom.min.js">
-      <Link>jquery-ui-1.8.16.custom.min.js</Link>
-    </Content>
     <Content Include="..\..\StudioJS\jquery.imagestudio.js">
       <Link>jquery.imagestudio.js</Link>
     </Content>
@@ -59,9 +53,6 @@
     </Content>
     <Content Include="..\..\StudioJS\jquery.jcrop.preview.js">
       <Link>jquery.jcrop.preview.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\underscore-min.js">
-      <Link>underscore-min.js</Link>
     </Content>
     <Content Include="ListImages.aspx" />
     <Content Include="Studio.aspx" />
@@ -95,9 +86,21 @@
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\AdvancedFilters\ImageResizer.Plugins.AdvancedFilters.csproj">
+      <Project>{961A7785-80E0-4AB9-A406-FD7E2A9FA9D9}</Project>
+      <Name>ImageResizer.Plugins.AdvancedFilters</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\DiskCache\ImageResizer.Plugins.DiskCache.csproj">
+      <Project>{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}</Project>
+      <Name>ImageResizer.Plugins.DiskCache</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\RedEye\ImageResizer.Plugins.RedEye.csproj">
       <Project>{054D5D5D-1041-4F03-B5E4-BFF0441586FA}</Project>
       <Name>ImageResizer.Plugins.RedEye</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\SimpleFilters\ImageResizer.Plugins.SimpleFilters.csproj">
+      <Project>{2A7D72F6-6DCB-4260-A921-6C7A6FC77812}</Project>
+      <Name>ImageResizer.Plugins.SimpleFilters</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
