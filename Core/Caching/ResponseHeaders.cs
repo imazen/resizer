@@ -45,7 +45,11 @@ namespace ImageResizer.Caching {
             //Sets the Last-Modifed: header
             //The check against the current time is because  files served from another server may have a modified date in the future, if the clocks are not synchronized.
             //ASP.NET incorrectly blocks an future modified date from being sent, with an ArgumentOutOfRangeException
-            if (headers.LastModified != DateTime.MinValue && headers.LastModified < DateTime.UtcNow) context.Response.Cache.SetLastModified(headers.LastModified);
+            DateTime utc = headers.LastModified.ToUniversalTime();
+
+            if (utc != DateTime.MinValue && utc < DateTime.UtcNow) {
+                context.Response.Cache.SetLastModified(utc);
+            }
 
             //Valid until expires (I.e, ignore refresh requests)
             context.Response.Cache.SetValidUntilExpires(headers.ValidUntilExpires);
