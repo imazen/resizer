@@ -206,7 +206,9 @@ namespace ImageResizer.Plugins.SqlReader
                     {
                         if (!sdr.IsDBNull(i) && sdr.GetValue(i) is DateTime)
                         {
-                            return (DateTime)sdr.GetValue(i); //Return the first non-null datetime instance in the row. Regardless of value.
+                            DateTime val = (DateTime)sdr.GetValue(i);
+                            if (val.Kind == DateTimeKind.Unspecified) val = DateTime.SpecifyKind(val, DateTimeKind.Utc);
+                            return val; //Return the first non-null datetime instance in the row. Regardless of value.
                         }
                     }
                 }
