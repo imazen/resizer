@@ -16,24 +16,23 @@ namespace ImageResizer.Plugins.RedEye {
         public RedEyePlugin() {
         }
 
- 
-        protected override RequestedAction PostRenderImage(ImageState s) {
 
-            if (s.destBitmap == null) return RequestedAction.None;
-            string str = null;
-            int i = 0;
+        protected override RequestedAction Render(ImageState s) {
+            if (base.Render(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
+
+            if (s.sourceBitmap == null) return RequestedAction.None;
 
             if (!string.IsNullOrEmpty(s.settings["r.eyes"])) {
                 double[] eyes = Utils.parseList(s.settings["r.eyes"], 0);
                 // lock source bitmap data
-                BitmapData data = s.destBitmap.LockBits(
-                    new Rectangle(0, 0, s.destBitmap.Width, s.destBitmap.Height),
-                    ImageLockMode.ReadWrite, s.destBitmap.PixelFormat);
+                BitmapData data = s.sourceBitmap.LockBits(
+                    new Rectangle(0, 0, s.sourceBitmap.Width, s.sourceBitmap.Height),
+                    ImageLockMode.ReadWrite, s.sourceBitmap.PixelFormat);
 
                 try {
                     UnmanagedImage ui = new UnmanagedImage(data);
 
-                    for (i = 0; i < eyes.Length / 5; i ++) {
+                    for (var i = 0; i < eyes.Length / 5; i++) {
                         var x = eyes[i * 5];
                         var y = eyes[i * 5 + 1];
                         var w = eyes[i * 5 + 2];
@@ -41,11 +40,11 @@ namespace ImageResizer.Plugins.RedEye {
                         var a = eyes[i * 5 + 4];
                         var cx = x + w / 2;
                         var cy = y + h / 2;
-                        var radius = Math.Sqrt(w * w + h * h) /2;
+                        var radius = Math.Sqrt(w * w + h * h) / 2;
 
 
-                        AdaptiveCircleFill.MarkEye(ui, new System.Drawing.Point((int)cx, (int)cy),(int)Math.Ceiling(radius),(float)(a > 6 ? radius /2 : radius ));
-                            
+                        AdaptiveCircleFill.MarkEye(ui, new System.Drawing.Point((int)cx, (int)cy), (int)Math.Ceiling(radius), (float)(a > 6 ? radius / 4 : radius));
+
                         /*if (eyes[i + 2] > 0) {
                             AdaptiveCircleFill.MarkEye(ui, new System.Drawing.Point((int)eyes[i], (int)eyes[i + 1]),(int)Math.Ceiling(0.025 * Math.Max(ui.Width,ui.Height)),24);
                             //CorrectRedEye(ui, (int)eyes[i], (int)eyes[i + 1], (int)eyes[i + 2]);
@@ -56,9 +55,21 @@ namespace ImageResizer.Plugins.RedEye {
 
                 } finally {
                     // unlock image
-                    s.destBitmap.UnlockBits(data);
+                    s.sourceBitmap.UnlockBits(data);
                 }
             }
+            return RequestedAction.None;
+
+        }
+
+ 
+        protected override RequestedAction PostRenderImage(ImageState s) {
+
+            if (s.destBitmap == null) return RequestedAction.None;
+            string str = null;
+            int i = 0;
+
+
 
              if ("true".Equals(s.settings["r.autoeyes"], StringComparison.OrdinalIgnoreCase)) {
                  List<ObjRect> eyes = new FaceDetection(@"C:\Users\Administrator\Documents\resizer\Plugins\Libs\OpenCV").DetectFeatures(s.sourceBitmap);
