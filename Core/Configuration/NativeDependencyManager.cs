@@ -17,7 +17,12 @@ namespace ImageResizer.Configuration.Plugins {
     public class NativeDependencyManager:Issues.IssueSink {
 
         public NativeDependencyManager():base("NativeDependencyManager") {
-            TargetFolder = Path.GetDirectoryName(this.GetType().Assembly.Location);
+            var a = this.GetType().Assembly;
+            //Use CodeBase if it is physical; this means we don't re-download each time we recycle. 
+            //If it's a URL, we fall back to Location, which is often the shadow-copied version.
+            TargetFolder = a.CodeBase.StartsWith("file:///", StringComparison.OrdinalIgnoreCase) ? a.CodeBase : a.Location;
+            //Convert UNC paths 
+            TargetFolder = Path.GetDirectoryName(TargetFolder.Replace("file:///", "").Replace("/", "\\"));
         }
 
         private string TargetFolder = null;

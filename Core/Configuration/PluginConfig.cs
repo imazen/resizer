@@ -569,6 +569,7 @@ namespace ImageResizer.Configuration {
             if (c.Plugins.ImageEncoders.First == null)
                 issues.Add(new Issue("No encoders are registered! Without an image encoder, the pipeline cannot function.", IssueSeverity.Error));
 
+            issues.AddRange(ndeps.GetIssues());
 
             return issues;
         }
