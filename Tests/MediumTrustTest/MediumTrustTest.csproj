@@ -75,10 +75,6 @@
       <Project>{D97EA32A-0845-4E00-9C4D-68C5B93A1869}</Project>
       <Name>ImageResizer.Plugins.AnimatedGifs</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\BatchZipper\ImageResizer.Plugins.BatchZipper.csproj">
-      <Project>{CDA9A53D-C190-4460-B5AF-F73132F56BFB}</Project>
-      <Name>ImageResizer.Plugins.BatchZipper</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\CloudFront\ImageResizer.Plugins.CloudFront.csproj">
       <Project>{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}</Project>
       <Name>ImageResizer.Plugins.CloudFront</Name>
