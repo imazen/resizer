@@ -79,10 +79,6 @@
       <Project>{BC40DDCE-96BB-41AF-9D3C-6CF4861E3408}</Project>
       <Name>ImageResizer.Plugins.PsdComposer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\PsdReader\ImageResizer.Plugins.PsdReader.csproj">
-      <Project>{BCF28DA2-AF29-4C09-B37D-059F40FC9B95}</Project>
-      <Name>ImageResizer.Plugins.PsdReader</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
