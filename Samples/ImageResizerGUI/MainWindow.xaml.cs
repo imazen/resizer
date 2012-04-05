@@ -14,7 +14,6 @@ using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using ImageResizer;
 using ImageResizer.Plugins.AnimatedGifs;
 using ImageResizer.Plugins.PrettyGifs;
-using ImageResizer.Plugins.PsdReader;
 using System.Collections.ObjectModel;
 using Control = System.Windows.Forms.Control;
 using DataFormats = System.Windows.DataFormats;
@@ -53,8 +52,7 @@ namespace ImageResizerGUI
             // Install Plugins
             new AnimatedGifs().Install(Config.Current);
             new PrettyGifs().Install(Config.Current);
-            new PsdReader().Install(Config.Current);
-
+            
             aOptions = new AdvancedOptions(this);
 
 
