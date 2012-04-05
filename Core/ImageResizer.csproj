@@ -72,6 +72,9 @@
     <Compile Include="Collections\ConstrainedCache.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
     <Compile Include="Collections\EventCountingDictionary.cs" />
+    <Compile Include="Configuration\Cryptography\AppDataKeyProvider.cs" />
+    <Compile Include="Configuration\Cryptography\IKeyProvider.cs" />
+    <Compile Include="Configuration\Cryptography\VolatileKeyProvider.cs" />
     <Compile Include="Configuration\Issues\ConfigChecker.cs" />
     <Compile Include="Configuration\IUrlAuthorizationEventArgs.cs" />
     <Compile Include="Configuration\Logging\ILogger.cs" />
