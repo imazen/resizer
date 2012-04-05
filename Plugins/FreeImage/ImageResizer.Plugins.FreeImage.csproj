@@ -8,7 +8,7 @@
     <ProjectGuid>{8E863AFE-B4CF-46AA-8382-0C3547C0EDE9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ImageResizer.Plugins.FreeImageBundle</RootNamespace>
+    <RootNamespace>ImageResizer.Plugins.FreeImage</RootNamespace>
     <AssemblyName>ImageResizer.Plugins.FreeImage</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
