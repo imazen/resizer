@@ -1,0 +1,7 @@
+﻿This DLL will probably eventually be home to 
+
+1) Encrypted - Encrypted URLs
+2) Signed - Signed URLs
+3) RequestLimting - Limit request counts
+4) ThroughputLimiting
+
