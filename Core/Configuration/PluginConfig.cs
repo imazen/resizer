@@ -365,18 +365,18 @@ namespace ImageResizer.Configuration {
             if (hasDot) alternateNames.Add(name);
             //DefaultEncoder, NoCache, etc.
             alternateNames.Add("ImageResizer.Plugins.Basic." + name.TrimStart('.'));
-            alternateNames.Add("ImageResizer.Plugins.Pro." + name.TrimStart('.'));
+            //Apr4-2012 - Deleted, never used: alternateNames.Add("ImageResizer.Plugins.Pro." + name.TrimStart('.'));
             //AnimatedGifs
             if (!hasDot) alternateNames.Add("ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.') + "Plugin");
             //AnimatedGifsPlugin
             if (!hasDot && name.EndsWith("Plugin"))
                 alternateNames.Add("ImageResizer.Plugins." + name.Substring(0, name.Length - 6).Trim('.') + "." + name.Trim('.'));
-            //Basic.DefaultEncoder
-            alternateNames.Add("ImageResizer.Plugins." + name.TrimStart('.'));
+            //Apr4-2012 - Deleted, never used: //Basic.DefaultEncoder
+            //Apr4-2012 - Deleted, never used: alternateNames.Add("ImageResizer.Plugins." + name.TrimStart('.'));
             //For the deprecated convention of naming the plugin namespace and class the same.
             if (!hasDot) alternateNames.Add("ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.'));
-            //Plugins.Basic.DefaultEncoder
-            alternateNames.Add("ImageResizer." + name.TrimStart('.'));
+            //Apr4-2012 - Deleted, never used: //Plugins.Basic.DefaultEncoder
+            //Apr4-2012 - Deleted, never used: alternateNames.Add("ImageResizer." + name.TrimStart('.'));
             //PluginWithNoNamespace
             if (!hasDot) alternateNames.Add(name);
 
@@ -394,14 +394,16 @@ namespace ImageResizer.Configuration {
             try {
                 //Now, try them all.
                 foreach (string s in qualifiedNames) {
-                    if (t != null) return t;
                     Debug.WriteLine("Trying " + s);
                     t = Type.GetType(s, false, true);
-                    if (t != null) Debug.WriteLine("Success!");
+                    if (t != null) {
+                        Debug.WriteLine("Success!");
+                        return t;
+                    }
                 }
             } catch (System.Security.SecurityException sx) {
                 this.AcceptIssue(new Issue("Failed to load plugin \"" + searchName + "\" due to ASP.NET trust configuration. ",
-                                "You may need to increase the trust level for this plugin to get loaded properly. Error details: \n" +
+                                "You may need to increase the trust level for this plugin to load properly. Error details: \n" +
                                 sx.Message + "\n" + sx.StackTrace, IssueSeverity.Error));
                 return null;
             }
