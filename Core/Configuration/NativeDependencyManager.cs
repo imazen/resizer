@@ -34,6 +34,8 @@ namespace ImageResizer.Configuration.Plugins {
 
         public void EnsureLoaded(Assembly a) {
             if (assembliesProcessed.Contains(a.FullName)) return;
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             try {
                 object[] attrs = a.GetCustomAttributes(typeof(Util.NativeDependenciesAttribute), true);
                 if (attrs.Length == 0) return;
@@ -49,7 +51,7 @@ namespace ImageResizer.Configuration.Plugins {
                     x.Load(s);
 
                     var n = new Node(x.DocumentElement, this);
-                    EnsureLoaded(n, shortName);
+                    EnsureLoaded(n, shortName,sw);
                 }
                 
 
@@ -69,7 +71,7 @@ namespace ImageResizer.Configuration.Plugins {
             public string RequestingAssembly;
         }
 
-        public void EnsureLoaded(Node manifest, string assemblyName) {
+        public void EnsureLoaded(Node manifest, string assemblyName, Stopwatch sw = null) {
             string platform = IntPtr.Size == 8 ? "64" : "32";
             
             Queue<Dependency> q = new Queue<Dependency>();
@@ -113,12 +115,14 @@ namespace ImageResizer.Configuration.Plugins {
                     q.Enqueue(d);
                 }
 
-                ServicePointManager.DefaultConnectionLimit = 1000; //Allow more than 2 simultaneous http requests.
+                sw.Stop();
+                if (sw.ElapsedMilliseconds > 100 && q.Count < 1) this.AcceptIssue(new Issues.Issue("Verifying native dependencies for " + assemblyName + " took " + sw.ElapsedMilliseconds + "ms.", Issues.IssueSeverity.Warning));
 
+                ServicePointManager.DefaultConnectionLimit = 1000; //Allow more than 2 simultaneous http requests.
                 StringBuilder message = new StringBuilder();
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
                 if (q.Count > 0) {
+                    Stopwatch dsw = new Stopwatch();
+                    dsw.Start();
                     using (var cd = new Countdown(q.Count)) {
                         foreach (var current in q.ToArray()) {
                             var d = current;
@@ -129,13 +133,11 @@ namespace ImageResizer.Configuration.Plugins {
                         }
                         cd.Wait();
                     }
+                    dsw.Stop();
+                    this.AcceptIssue(new Issues.Issue("Some native dependencies for " + assemblyName + " were missing, but were downloaded successfully. This delayed startup time by " + (sw.ElapsedMilliseconds + dsw.ElapsedMilliseconds).ToString() + "ms.", message.ToString(), Issues.IssueSeverity.Warning));
+
                 }
-                sw.Stop();
-                this.AcceptIssue(new Issues.Issue("Some native dependencies were missing, but were downloaded successfully. This delayed startup time by " + sw.ElapsedMilliseconds.ToString() + "ms.",message.ToString(), Issues.IssueSeverity.Warning));
-
-
-
-
+                
             } finally {
                 foreach (Dependency d in q.ToArray()) {
                     d.Client.Dispose();
