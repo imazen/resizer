@@ -272,8 +272,8 @@ namespace ImageResizer.Util {
         /// <param name="path"></param>
         /// <returns></returns>
         public static NameValueCollection ParseQueryStringFriendly(string path) {
-            if (path.IndexOf('?') < 0) path = '?' + path;
-            return ParseQueryString(path);
+            if (path.IndexOf('?') < 0 && path.IndexOf('=') >= 0) path = '?' + path;
+            return ParseQueryString(path,false);
         }
 
         /// <summary>
@@ -282,8 +282,8 @@ namespace ImageResizer.Util {
         /// <param name="path"></param>
         /// <returns></returns>
         public static NameValueCollection ParseQueryStringFriendlyAllowSemicolons(string path) {
-            if (path.IndexOf('?') < 0 && path.IndexOf(';') != 0) path = '?' + path;
-            return ParseQueryString(path.Replace(';','?'));
+            if (path.IndexOf('?') < 0 && path.IndexOf(';') < 0 && path.IndexOf('=') >= 0) path = '?' + path;
+            return ParseQueryString(path,true);
         }
 
         /// <summary>
@@ -294,28 +294,68 @@ namespace ImageResizer.Util {
         /// <param name="path"></param>
         /// <returns></returns>
         public static NameValueCollection ParseQueryString(string path) {
+            return ParseQueryString(path, false);
+        }
+
+        /// <summary>
+        /// Parses the querystring from the given path into a NameValueCollection. 
+        /// accepts "file?key=value" and "?key=value&amp;key2=value2" formats. (no path is required)
+        /// UrlDecodes keys and values. Does not enforce correct syntax, I.E. '?key=value?key2=value2' is allowed. However, '&key=value?key2=value' will only get key2 parsed. 
+        /// When allowSemicolons is true, semicolon paths like ';key=value;key2=value2' are allowed, as are hybrid paths: ';key=value?key2=value2&amp;key3=value3'.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="allowSemicolons"></param>
+        /// <returns></returns>
+        public static NameValueCollection ParseQueryString(string path, bool allowSemicolons) {
+            string s;
+            return ParseQueryString(path, allowSemicolons, out s);
+        }
+
+                    /// <summary>
+        /// Parses the querystring from the given path into a NameValueCollection. 
+        /// accepts "file?key=value" and "?key=value&amp;key2=value2" formats. (no path is required)
+        /// UrlDecodes keys and values. Does not enforce correct syntax, I.E. '?key=value?key2=value2' is allowed. However, '&key=value?key2=value' will only get key2 parsed. 
+        /// When allowSemicolons is true, semicolon paths like ';key=value;key2=value2' are allowed, as are hybrid paths: ';key=value?key2=value2&amp;key3=value3'.
+        /// 
+        /// Does NOT parse fragments correctly.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="allowSemicolons"></param>
+        /// <param name="beforeQuery">Returns the portion of the 'path' before the querystring. May include the scheme, server, port, path and path info, depending upon what 'path' contained.</param>
+        /// <returns></returns>
+        public static NameValueCollection ParseQueryString(string path, bool allowSemicolons, out string beforeQuery) {
             NameValueCollection c = new NameValueCollection();
             int firstdelimiter = path.IndexOf('?');
-            if (firstdelimiter < 0) return c;//Nothing to parse.
+            if (allowSemicolons) {
+                //Use the index if whichever is first, and preset
+                int firstsemicolon = path.IndexOf(';');
+                if (firstdelimiter < 0 || (firstsemicolon >= 0 && firstsemicolon < firstdelimiter)) firstdelimiter = firstsemicolon;
+            }
+            if (firstdelimiter < 0 || firstdelimiter >= path.Length) {
+                //No query string detected
+                beforeQuery = path;
+                return c;
+            } else {
+                beforeQuery = path.Substring(0, firstdelimiter);
+            }
 
-            string querystring = "";
-            if (firstdelimiter < path.Length) querystring = path.Substring(firstdelimiter, path.Length - firstdelimiter);
-            if (querystring.Length > 0) {
-                string[] pairs = querystring.Split(new char[] { '?', '&' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (string s in pairs) {
-                    string[] namevalue = s.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (namevalue.Length == 2) {
-                        c[HttpUtility.UrlDecode(namevalue[0])] =
-                            HttpUtility.UrlDecode(namevalue[1]);
-                    } else {
-                        //No value, so we set a blank value
-                        //Setting a null value would be confusing, as that is how we determine
-                        //whether a certain paramater exists
-                        c[HttpUtility.UrlDecode(namevalue[0])] = "";
+            string querystring = path.Substring(firstdelimiter, path.Length - firstdelimiter);
 
-                    }
+            string[] pairs = querystring.Split(allowSemicolons ? new char[] { '?', '&' } : new char[] { '?', '&', ';' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string s in pairs) {
+                string[] namevalue = s.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+                if (namevalue.Length == 2) {
+                    c[HttpUtility.UrlDecode(namevalue[0])] =
+                        HttpUtility.UrlDecode(namevalue[1]);
+                } else {
+                    //No value, so we set a blank value
+                    //Setting a null value would be confusing, as that is how we determine
+                    //whether a certain paramater exists
+                    c[HttpUtility.UrlDecode(namevalue[0])] = "";
+
                 }
             }
+
             return c;
 
         }
@@ -334,7 +374,7 @@ namespace ImageResizer.Util {
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static byte[] FromBase64UToButes(string data) {
+        public static byte[] FromBase64UToBytes(string data) {
             data = data.PadRight(data.Length + ((4 - data.Length % 4) % 4), '='); //if there is 1 leftover octet, add ==, if 2, add =. 3 octects = 4 chars. 
             return Convert.FromBase64String(data.Replace('-', '+').Replace('_', '/'));
         }
@@ -352,7 +392,7 @@ namespace ImageResizer.Util {
         /// <param name="data"></param>
         /// <returns></returns>
         public static string FromBase64UToString(string data) {
-            return UTF8Encoding.UTF8.GetString(FromBase64UToButes(data));
+            return UTF8Encoding.UTF8.GetString(FromBase64UToBytes(data));
         }
         /// <summary>
         /// Returns the physcial mapped path for the specified virtual path if it starts with ~, otherwise retuns the original path.
