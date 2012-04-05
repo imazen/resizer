@@ -1,0 +1,25 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace ImageResizer.Configuration.Cryptography {
+    public class VolatileKeyProvider: IKeyProvider {
+
+        private object syncLock = new object{};
+
+        private Dictionary<string, byte[]> keys = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
+
+
+        public byte[] GetKey(string name, int sizeInBytes) {
+            lock (syncLock) {
+                byte[] val;
+                if (!keys.TryGetValue(name, out val)){
+                    val = new byte[sizeInBytes];
+                    new System.Security.Cryptography.RNGCryptoServiceProvider().GetBytes(val);
+                    keys[name] = val;
+                }
+                return val;
+            }
+        }
+    }
+}
