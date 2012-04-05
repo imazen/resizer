@@ -6,7 +6,7 @@ using ImageResizer.Util;
 
 namespace ImageResizer {
     /// <summary>
-    /// A name/value collection of image processsing instructions. Replaces ResizeSettings.
+    /// A name/value collection of image processsing instructions. Replaces ResizeSettings, avoiding any dependencies on System.Drawing
     /// </summary>
     public class Instructions: NameValueCollection {
         /// <summary>

@@ -5,7 +5,7 @@ using System.IO;
 
 namespace ImageResizer.Plugins {
     /// <summary>
-    /// A virtual file. Implementing this allows usage of your VirtualProvider without registering it with ASP.NET
+    /// A virtual file to support IVirtualImageProvider
     /// </summary>
     public interface IVirtualFile {
         /// <summary>

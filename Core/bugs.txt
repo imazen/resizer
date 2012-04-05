@@ -3,3 +3,8 @@
 Specifying &format=png&format=png (duplicate entries) causes a "No image encoder was found" message, 
 since NameValueCollection makes the value "png,png", for which there aren't, actually, any encoders.
 
+Fix &a.oilpainting=1&a.sobel=true&a.threshold=255&a.contrast=-1
+
+Suspected but not confirmed bugs:
+
+Investigate how negative border, padding, margin, and shadow widths are handled.
