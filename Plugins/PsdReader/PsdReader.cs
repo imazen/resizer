@@ -52,8 +52,11 @@ namespace ImageResizer.Plugins.PsdReader {
         }
 
         public override Bitmap DecodeStream(Stream s, ResizeSettings settings, string optionalPath) {
+            bool requested = "psdreader".Equals(settings["decoder"], StringComparison.OrdinalIgnoreCase);
+            if (!string.IsNullOrEmpty(settings["decoder"]) && !requested) return null; //Don't take it away from the requested decoder
+
             //If a .psd is coming in, try first, before Bitmap tries to parse it.
-            if (optionalPath != null && optionalPath.EndsWith(".psd", StringComparison.OrdinalIgnoreCase)) {
+            if (requested || (optionalPath != null && optionalPath.EndsWith(".psd", StringComparison.OrdinalIgnoreCase))) {
                 return Decode(s);
             }
             return null;
