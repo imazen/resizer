@@ -22,7 +22,7 @@ namespace ImageResizer.Plugins.SimpleFilters {
         }
 
         public IEnumerable<string> GetSupportedQuerystringKeys() {
-            return new string[] { "filter", "s.grayscale", "s.sepia", "s.alpha", "s.brightness", "s.contrast", "s.saturation", "s.invert" };
+            return new string[] { "filter", "s.grayscale", "s.sepia", "s.alpha", "s.brightness", "s.contrast", "s.saturation", "s.invert","s.roundcorners" };
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace ImageResizer.Plugins.SimpleFilters {
         /// <param name="s"></param>
         /// <returns></returns>
         protected override RequestedAction PreRenderImage(ImageState s) {
-            string svals = s.settings["roundcorners"];
+            string svals = s.settings["s.roundcorners"];
             if (string.IsNullOrEmpty(svals)) return  RequestedAction.None;
 
             double[] vals = Utils.parseList(svals,0);
@@ -57,7 +57,7 @@ namespace ImageResizer.Plugins.SimpleFilters {
                 s.preRenderBitmap = new Bitmap(cropped.Width,cropped.Height, PixelFormat.Format32bppArgb);
 
                 int[] radius = new int[4];
-                //Radius percentages are 0-100, a percentage of the average of the width and height.
+                //Radius percentages are 0-100, a percentage of the smaller of the width and height.
                 for (int i = 0; i < vals.Length; i++) radius[i] = (int)Math.Round(Math.Max(0,Math.Min(99.999,vals[i])) * ((double)Math.Min(s.preRenderBitmap.Width,s.preRenderBitmap.Height) / 100));
 
 
