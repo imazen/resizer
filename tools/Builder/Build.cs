@@ -350,7 +350,7 @@ namespace ImageResizer.ReleaseBuilder {
             int extrasResult =
             extras.Run("/Build Release") +
             extras.Run("/Build Trial");
-            if (buildDebug) extrasResult += d.Run("/Build Debug");
+            if (buildDebug) extrasResult += extras.Run("/Build Debug");
 
             if (result > 0 && !ask("There may have been build errors. Continue?")) return false;
             else if (extrasResult > 0 && !ask("There may have been build errors for Plugins With External Dependencies. Continue?")) return false;
