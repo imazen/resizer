@@ -55,7 +55,7 @@ namespace ImageResizer.Plugins.SqlReader
             c.Pipeline.PostAuthorizeRequestStart += delegate(IHttpModule sender2, HttpContext context) {
                     //Only work with database images
                     //This allows us to resize database images without putting ".jpg" after the ID in the path.
-                    if (!s.RequireImageExtension && c.Pipeline.PreRewritePath.StartsWith(s.VirtualPathPrefix, StringComparison.OrdinalIgnoreCase))
+                    if ((!s.RequireImageExtension || s.UntrustedData) && c.Pipeline.PreRewritePath.StartsWith(s.VirtualPathPrefix, StringComparison.OrdinalIgnoreCase))
                         c.Pipeline.SkipFileTypeCheck = true; //Skip the file extension check. FakeExtensions will still be stripped.
             };
             
