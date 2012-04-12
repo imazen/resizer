@@ -5,6 +5,7 @@ using System.IO;
 using ImageResizer.Collections;
 using ImageResizer.Util;
 using System.Collections.Specialized;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.Basic {
     public class SourceMemCache: IPlugin, IVirtualFileCache {
@@ -34,7 +35,7 @@ namespace ImageResizer.Plugins.Basic {
             if ("true".Equals(queryString["memcache"], StringComparison.OrdinalIgnoreCase)) {
                 //Optimization idea - use LockProvider to prevent duplicate requests. Would mean merging with DiskCache :(
                 using (Stream data = original.Open()) {//Very long-running call
-                    c = new CachedVirtualFile(original.VirtualPath, StreamUtils.CopyToBytes(data)); 
+                    c = new CachedVirtualFile(original.VirtualPath,  data.CopyToBytes(true)); 
                 }
                 cache.Set(key, c); //Save to cache (may trigger cleanup)
                 return c;

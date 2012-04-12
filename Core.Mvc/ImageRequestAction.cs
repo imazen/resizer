@@ -16,6 +16,7 @@ using ImageResizer.Plugins.Basic;
 using ImageResizer.Caching;
 using System.IO;
 using ImageResizer.Encoding;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Mvc {
     /// <summary>
@@ -226,7 +227,7 @@ namespace ImageResizer.Mvc {
                         //Just duplicate the data
                         using (Stream source = (vf != null) ? vf.Open(): 
                                         File.Open(HostingEnvironment.MapPath(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read)) {
-                            Utils.copyStream(source, stream);
+                                            source.CopyToStream(stream);
                         }
                     } else {
                         //Process the image

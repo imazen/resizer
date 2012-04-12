@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using ImageResizer.Resizing;
 using ImageResizer.Plugins.Basic;
+using ImageResizer.ExtensionMethods;
 
 // This namespace contains the most frequently used classes.
 namespace ImageResizer {
@@ -263,7 +264,7 @@ namespace ImageResizer {
                         //Just duplicate the data
                         using (Stream source = (vf != null) ? vf.Open(): 
                                         File.Open(HostingEnvironment.MapPath(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read)) {
-                            Utils.copyStream(source, stream);
+                                            source.CopyToStream(stream); //4KiB buffer
                         }
                     } else {
                         //Process the image
