@@ -6,6 +6,7 @@ using System.Diagnostics;
 using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Util {
+    [Obsolete("Use ImageResizer.ExtensionMethods.StreamExtensions instead")]
     public class StreamUtils {
 
         public static MemoryStream CopyStream(Stream s) {

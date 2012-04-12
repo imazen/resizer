@@ -9,6 +9,7 @@ using ImageResizer.Resizing;
 using System.Drawing.Drawing2D;
 using System.Web;
 using System.IO;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Util {
     public class Utils {
@@ -73,6 +74,7 @@ namespace ImageResizer.Util {
                 if (!int.TryParse(q[name], NumberStyles.Integer,NumberFormatInfo.InvariantInfo, out temp)) return defaultValue;
             return temp;
         }
+
         public static float getFloat(NameValueCollection q, string name, float defaultValue) {
             float temp = defaultValue;
             if (!string.IsNullOrEmpty(q[name]))
@@ -86,7 +88,6 @@ namespace ImageResizer.Util {
                 if (!double.TryParse(q[name], floatingPointStyle, NumberFormatInfo.InvariantInfo, out temp)) return defaultValue;
             return temp;
         }
-
         public static bool getBool(NameValueCollection q, string name, bool defaultValue) {
             bool temp = defaultValue;
             if (!string.IsNullOrEmpty(q[name])){
@@ -117,18 +118,15 @@ namespace ImageResizer.Util {
         }
 
 
+
         /// <summary>
         /// Copies all remaining data from 'source' to 'dest'
         /// </summary>
         /// <param name="source"></param>
         /// <param name="dest"></param>
+        [Obsolete("Use ImageResizer.ExtensionMethods instead.")]
         public static void copyStream(Stream source, Stream dest) {
-            byte[] buffer = new byte[32768];//8Kb
-            while (true) {
-                int len = source.Read(buffer, 0, buffer.Length);
-                if (len <= 0) break;
-                dest.Write(buffer, 0, len);
-            }
+            source.CopyToStream(dest, false, 0x8000); 
         }
 
         
@@ -184,7 +182,7 @@ namespace ImageResizer.Util {
             if (d >=45 && d < 135) return 90;
             if (d >= 135 && d < 225) return 180;
             if (d >= 225 && d < 315) return 270;
-
+            
             throw new Exception("Impossible");
         }
 
