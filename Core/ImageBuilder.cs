@@ -723,7 +723,9 @@ namespace ImageResizer
                         s.sourceBitmap.PixelFormat == PixelFormat.Format32bppRgb || 
                         s.sourceBitmap.PixelFormat == PixelFormat.Format48bppRgb) &&
                         PolygonMath.ArraysEqual(s.layout["image"], s.layout.LastRing.points) &&
-                        PolygonMath.IsUnrotated(s.layout["image"]) && string.IsNullOrEmpty(s.settings["roundcorners"]));
+                        PolygonMath.IsUnrotated(s.layout["image"]) && string.IsNullOrEmpty(s.settings["s.alpha"])
+                            && string.IsNullOrEmpty(s.settings["s.roundcorners"])
+                            && string.IsNullOrEmpty(s.settings["filter"]));
 
             //Set the background to white if the background will be showing and the destination format doesn't support transparency.
             if (background == Color.Transparent && !s.supportsTransparency & !nothingToShow) 
