@@ -4,9 +4,10 @@ using System.Text;
 using System.Web;
 using System.Text.RegularExpressions;
 using System.Collections.Specialized;
-using ImageResizer.Util;
+using ImageResizer.ExtensionMethods;
 using ImageResizer.Configuration;
 using ImageResizer.Encoding;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
@@ -19,8 +20,8 @@ namespace ImageResizer.Plugins.Basic {
         public IEPngFix() {
         }
         public IEPngFix(NameValueCollection settings) {
-            CatchAll = Util.Utils.getBool(settings, "catchAll", CatchAll);
-            Redirect = Util.Utils.getBool(settings, "redirect", Redirect);
+            CatchAll = settings.Get<bool>( "catchAll", CatchAll);
+            Redirect = settings.Get<bool>("redirect", Redirect);
         }
 
 
@@ -70,7 +71,7 @@ namespace ImageResizer.Plugins.Basic {
         }
 
         void Pipeline_PostRewrite(IHttpModule sender, HttpContext context, Configuration.IUrlEventArgs e) {
-            if (Utils.getBool(e.QueryString,"iefix",false) && NeedsPngFix(context) && DestFormatPng(e)){
+            if (e.QueryString.Get<bool>("iefix",false) && NeedsPngFix(context) && DestFormatPng(e)){
                 if (Redirect) {
                     //Get the original request URL, and change the 'format' setting to 'gif'. 
                     NameValueCollection newValues = new NameValueCollection();

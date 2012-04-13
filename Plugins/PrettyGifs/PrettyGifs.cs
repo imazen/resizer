@@ -13,6 +13,7 @@ using System.Security.Permissions;
 using System.Security;
 using ImageResizer.Util;
 using System.Globalization;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.PrettyGifs {
     public class PrettyGifs :IEncoder, IPlugin, IQuerystringPlugin {
@@ -47,7 +48,7 @@ namespace ImageResizer.Plugins.PrettyGifs {
 
             }
             
-            PreservePalette = Util.Utils.getBool(q, "preservePalette", PreservePalette);
+            PreservePalette = q.Get<bool>("preservePalette", PreservePalette);
             if (PreservePalette && original is Image && ((Image)original).Palette.Entries.Length > 0) {
                 originalPalette = ((Image)original).Palette;
             }
@@ -178,7 +179,7 @@ namespace ImageResizer.Plugins.PrettyGifs {
 
             OctreeQuantizer quantizer = new OctreeQuantizer(colors, GetBitsNeededForColorDepth(colors));
 
-            if (Utils.getBool(query,"fulltrust",HasFullTrust)) {
+            if (query.Get<bool>("fulltrust",HasFullTrust)) {
                 quantizer.Dither = dither;
                 quantizer.FourPass = fourPass;
                 quantizer.DitherPercent = (float)ditherPercent / 100;
@@ -187,8 +188,8 @@ namespace ImageResizer.Plugins.PrettyGifs {
                 quantizer.OmitFinalStage = true;
                 quantizer.ResizeForFirstPass = true;
 
-                quantizer.FirstPassPixelCount = (long)Math.Pow(Utils.getInt(query, "pixelCount", (int)Math.Sqrt(quantizer.FirstPassPixelCount)),2);
-                quantizer.FirstPassPixelThreshold = (long)Math.Pow(Utils.getInt(query, "pixelThreshold", (int)Math.Sqrt(quantizer.FirstPassPixelThreshold)), 2);
+                quantizer.FirstPassPixelCount = (long)Math.Pow(query.Get<int>( "pixelCount", (int)Math.Sqrt(quantizer.FirstPassPixelCount)),2);
+                quantizer.FirstPassPixelThreshold = (long)Math.Pow(query.Get<int>( "pixelThreshold", (int)Math.Sqrt(quantizer.FirstPassPixelThreshold)), 2);
                 
             }
             using (Bitmap quantized = quantizer.Quantize(img)) {

@@ -7,6 +7,7 @@ using System.Drawing.Drawing2D;
 using ImageResizer.Util;
 using System.IO;
 using System.Drawing.Imaging;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
@@ -59,9 +60,9 @@ namespace ImageResizer.Plugins.Basic {
                 try {
                     int w = query.Width > 0 ? query.Width : (query.MaxWidth > 0 ? query.MaxWidth : 8);
                     int h = query.Height > 0 ? query.Height : (query.MaxHeight > 0 ? query.MaxHeight : 8);
-                    float angle = Util.Utils.getFloat(query,"angle",0);
-                    Color c1 = Utils.parseColor(query["color1"],Color.White);
-                    Color c2 = Utils.parseColor(query["color2"],Color.Black);
+                    float angle = query.Get<float>("angle", 0);
+                    Color c1 = ParseUtils.ParseColor(query["color1"], Color.White);
+                    Color c2 = ParseUtils.ParseColor(query["color2"], Color.Black);
                     b = new Bitmap(w, h);
 
                     using (Graphics g = Graphics.FromImage(b)) 

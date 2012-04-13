@@ -10,6 +10,7 @@ using AForge.Imaging;
 using System.Drawing.Imaging;
 using System.Drawing;
 using ImageResizer.Configuration;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.RedEye {
     public class RedEyePlugin:DetectionPlugin {
@@ -23,7 +24,7 @@ namespace ImageResizer.Plugins.RedEye {
             if (s.sourceBitmap == null) return RequestedAction.None;
 
             if (!string.IsNullOrEmpty(s.settings["r.eyes"])) {
-                double[] eyes = Utils.parseList(s.settings["r.eyes"], 0);
+                double[] eyes = s.settings.GetList<double>("r.eyes", 0);
                 // lock source bitmap data
                 BitmapData data = s.sourceBitmap.LockBits(
                     new Rectangle(0, 0, s.sourceBitmap.Width, s.sourceBitmap.Height),

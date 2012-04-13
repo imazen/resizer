@@ -27,6 +27,7 @@ using ImageResizer.Resizing;
 using ImageResizer.Util;
 using System.Collections.Specialized;
 using System.Globalization;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.PdfRenderer
 {
@@ -68,7 +69,7 @@ namespace ImageResizer.Plugins.PdfRenderer
         }
 
 
-
+        //TODO: needs to be static, it's process-wide
         private readonly GhostscriptEngine _engine = new GhostscriptEngine();
         private readonly int[] _validAlphaBitValues = new[] { 1, 2, 4 };
         private int _defaultHeight = 600;
@@ -331,8 +332,8 @@ namespace ImageResizer.Plugins.PdfRenderer
             double maxheight = settings.MaxHeight;
 
             //Allow overrides with pdfwidth and pdfheight when we *want* to rescale afterwards.
-            int pw = Utils.getInt(settings, "pdfwidth", -1);
-            int ph = Utils.getInt(settings, "pdfheight", -1);
+            int pw = settings.Get<int>("pdfwidth", -1).Value;
+            int ph = settings.Get<int>("pdfheight", -1).Value;
             if (pw > 0) { width = pw; maxwidth = -1;}
             if (ph > 0) { height = ph; maxheight = -1; }
 
@@ -427,9 +428,9 @@ namespace ImageResizer.Plugins.PdfRenderer
             }
             ghostscriptSettings.Add(GhostscriptArgument.TextAlphaBits, textAlphaBits);
 
-            ghostscriptSettings[GhostscriptArgument.GridFitTT] = (Utils.getBool(settings, "gridfit", false) ? 2 : 0).ToString(NumberFormatInfo.InvariantInfo);
-            ghostscriptSettings[GhostscriptArgument.AlignToPixels] = (Utils.getBool(settings, "subpixels", false) ? 1 : 0).ToString(NumberFormatInfo.InvariantInfo);
-            if (Utils.getBool(settings,"printed",true) == false) ghostscriptSettings.Remove(GhostscriptArgument.Printed);
+            ghostscriptSettings[GhostscriptArgument.GridFitTT] = (settings.Get<bool>("gridfit") == true ? 2 : 0).ToString(NumberFormatInfo.InvariantInfo);
+            ghostscriptSettings[GhostscriptArgument.AlignToPixels] = (settings.Get<bool>("subpixels") == true ? 1 : 0).ToString(NumberFormatInfo.InvariantInfo);
+            if (settings.Get<bool>("printed",true) == false) ghostscriptSettings.Remove(GhostscriptArgument.Printed);
         }
     }
 }

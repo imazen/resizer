@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data;
 using ImageResizer.Util;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.SqlReader {
 
@@ -20,16 +21,16 @@ namespace ImageResizer.Plugins.SqlReader {
         public SqlReaderSettings(System.Collections.Specialized.NameValueCollection args) {
             if (!string.IsNullOrEmpty(args["prefix"])) this.PathPrefix = args["prefix"];
             if (!string.IsNullOrEmpty(args["connectionString"])) this.ConnectionString = args["connectionString"];
-            if (!string.IsNullOrEmpty(args["idType"])) this.ImageIdType = Util.Utils.parseEnum<SqlDbType>(args["idType"],this.ImageIdType);
+            this.ImageIdType = args.Get<SqlDbType>("idType",this.ImageIdType);
             if (!string.IsNullOrEmpty(args["blobQuery"])) this.ImageBlobQuery = args["blobQuery"];
             if (!string.IsNullOrEmpty(args["existsQuery"])) this.ImageExistsQuery = args["existsQuery"];
             if (!string.IsNullOrEmpty(args["modifiedQuery"])) this.ModifiedDateQuery  = args["modifiedQuery"];
             
-            StripFileExtension = !Utils.getBool(args, "extensionPartOfId", false);
-            RegisterAsVirtualPathProvider = Utils.getBool(args, "vpp", true);
-            RequireImageExtension = Utils.getBool(args, "requireImageExtension", RequireImageExtension);
-            UntrustedData = Utils.getBool(args, "untrustedData", UntrustedData);
-            CacheUnmodifiedFiles = Utils.getBool(args, "cacheUnmodifiedFiles", CacheUnmodifiedFiles);
+            StripFileExtension = !args.Get<bool>("extensionPartOfId", false);
+            RegisterAsVirtualPathProvider = args.Get<bool>("vpp", true);
+            RequireImageExtension = args.Get<bool>("requireImageExtension", RequireImageExtension);
+            UntrustedData = args.Get<bool>("untrustedData", UntrustedData);
+            CacheUnmodifiedFiles = args.Get<bool>("cacheUnmodifiedFiles", CacheUnmodifiedFiles);
             
         }
 

@@ -8,6 +8,7 @@ using System.Drawing;
 using ImageResizer.Util;
 using System.Globalization;
 using System.Drawing.Drawing2D;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.SimpleFilters {
     public class SimpleFilters : BuilderExtension, IPlugin, IQuerystringPlugin {
@@ -31,16 +32,11 @@ namespace ImageResizer.Plugins.SimpleFilters {
         /// <param name="s"></param>
         /// <returns></returns>
         protected override RequestedAction PreRenderImage(ImageState s) {
-            string svals = s.settings["s.roundcorners"];
-            if (string.IsNullOrEmpty(svals)) return  RequestedAction.None;
+            double[] vals = s.settings.GetList<double>("s.roundcorners",0,1,4);
+            if (vals == null) return RequestedAction.None;
 
-            double[] vals = Utils.parseList(svals,0);
-
-            if (vals.Length == 1){
-                vals = new double[]{vals[0],vals[0],vals[0],vals[0]};
-            }
-            if (vals.Length != 4) return RequestedAction.None;
-
+            if (vals.Length == 1)  vals = new double[]{vals[0],vals[0],vals[0],vals[0]};
+            
             bool hasValue = false;
             foreach (double d in vals) if (d > 0) hasValue = true;
             if (!hasValue) return RequestedAction.None;
@@ -105,7 +101,7 @@ namespace ImageResizer.Plugins.SimpleFilters {
                 if (valuesStart > -1) {
                     valStr = filter.Substring(valuesStart);
                     filter = filter.Substring(0, valuesStart);
-                    values = Util.Utils.parseList(valStr, 0);
+                    values = ParseUtils.ParseList<double>(valStr, 0,0,1);
                 }
 
                 if ("grayscale".Equals(filter, StringComparison.OrdinalIgnoreCase)) filters.Add(GrayscaleFlat());
@@ -131,10 +127,10 @@ namespace ImageResizer.Plugins.SimpleFilters {
             string saturation = s.settings["s.saturation"];
 
             double temp = 0;
-            if (!string.IsNullOrEmpty(alpha) && double.TryParse(alpha, Utils.floatingPointStyle,NumberFormatInfo.InvariantInfo,out temp)) filters.Add(Alpha((float)temp));
-            if (!string.IsNullOrEmpty(brightness) && double.TryParse(brightness, Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo, out temp)) filters.Add(Brightness((float)temp));
-            if (!string.IsNullOrEmpty(contrast) && double.TryParse(contrast, Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo, out temp)) filters.Add(Contrast((float)temp));
-            if (!string.IsNullOrEmpty(saturation) && double.TryParse(saturation, Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo, out temp)) filters.Add(Saturation((float)temp));
+            if (!string.IsNullOrEmpty(alpha) && double.TryParse(alpha, ParseUtils.FloatingPointStyle, NumberFormatInfo.InvariantInfo, out temp)) filters.Add(Alpha((float)temp));
+            if (!string.IsNullOrEmpty(brightness) && double.TryParse(brightness, ParseUtils.FloatingPointStyle, NumberFormatInfo.InvariantInfo, out temp)) filters.Add(Brightness((float)temp));
+            if (!string.IsNullOrEmpty(contrast) && double.TryParse(contrast, ParseUtils.FloatingPointStyle, NumberFormatInfo.InvariantInfo, out temp)) filters.Add(Contrast((float)temp));
+            if (!string.IsNullOrEmpty(saturation) && double.TryParse(saturation, ParseUtils.FloatingPointStyle, NumberFormatInfo.InvariantInfo, out temp)) filters.Add(Saturation((float)temp));
 
 
             if (filters.Count == 0) return RequestedAction.None;

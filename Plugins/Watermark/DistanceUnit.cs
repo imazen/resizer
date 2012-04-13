@@ -32,7 +32,7 @@ namespace ImageResizer.Plugins.Watermark {
                 value = value.Substring(0, value.Length - 3); type = Units.Percentage;
             }
 
-            if (!double.TryParse(value, Utils.floatingPointStyle,NumberFormatInfo.InvariantInfo, out val)) return null;
+            if (!double.TryParse(value, ParseUtils.FloatingPointStyle, NumberFormatInfo.InvariantInfo, out val)) return null;
             return new DistanceUnit(val, type);
         }
 

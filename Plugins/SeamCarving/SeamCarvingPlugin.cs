@@ -7,6 +7,7 @@ using ImageResizer.Util;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.SeamCarving {
     public class SeamCarvingPlugin : BuilderExtension, IQuerystringPlugin, IPlugin {
@@ -44,7 +45,7 @@ namespace ImageResizer.Plugins.SeamCarving {
             //Skip this when we are doing simulations
             if (s.destGraphics == null) return RequestedAction.None;
 
-            FilterType ftype = Utils.parseEnum<FilterType>(s.settings["carve"], FilterType.None);
+            FilterType ftype = s.settings.Get<FilterType>("carve", FilterType.None);
             if ("true".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase)) ftype = FilterType.Prewitt;
             if (string.IsNullOrEmpty(s.settings["carve"]) && s.settings.Mode == FitMode.Carve) ftype = FilterType.Prewitt;
 
