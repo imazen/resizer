@@ -26,7 +26,7 @@ namespace ImageResizer.ExtensionMethods {
         /// <param name="entireStream">True to copy entire stream if seeakable, false to only copy remaining data</param>
         /// <returns></returns>
         public static MemoryStream CopyToMemoryStream(this Stream s, bool entireStream) {
-            return CopyToMemoryStream(s, entireStream,0x4000);
+            return CopyToMemoryStream(s, entireStream,0x1000);
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace ImageResizer.ExtensionMethods {
         /// <param name="entireStream">True to copy entire stream if seeakable, false to only copy remaining data</param>
         /// <returns></returns>
         public static byte[] CopyToBytes(this Stream s, bool entireStream) {
-            return CopyToBytes(s, entireStream, 0x4000);
+            return CopyToBytes(s, entireStream, 0x1000);
         }
         /// <summary>
         /// Copies the remaining data from the this stream into the given stream.
@@ -75,7 +75,7 @@ namespace ImageResizer.ExtensionMethods {
         /// <param name="other">The stream to write to</param>
         /// <param name="entireStream">True to copy entire stream if seeakable, false to only copy remaining data</param>
         public static void CopyToStream(this Stream s, Stream other, bool entireStream) {
-            CopyToStream(s, other, entireStream, 0x4000);
+            CopyToStream(s, other, entireStream, 0x1000);
         }
 
 
