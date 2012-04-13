@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
-using System.Diagnostics;
 using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Util {

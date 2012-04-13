@@ -13,41 +13,14 @@ using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Util {
     public class Utils {
-
+        
   
         public static Color parseColor(string value, Color defaultValue) {
-            if (!string.IsNullOrEmpty(value)) {
-                value = value.TrimStart('#');
-                //try hex first
-                int val;
-                if (int.TryParse(value, System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out val)) {
-                    int alpha = 255;
-                    if (value.Length == 4 || value.Length == 8) {
-                        int regLength = value.Length - (value.Length / 4);
-                        alpha = int.Parse(value.Substring(regLength), System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture);
-                        if (regLength == 3) alpha *= 16;
-                        value = value.Substring(0, regLength);
-                    }
-                    return Color.FromArgb(alpha, System.Drawing.ColorTranslator.FromHtml("#" + value));
-                } else {
-                    try {
-                        Color c = System.Drawing.ColorTranslator.FromHtml(value); //Throws an 'Exception' instance if invalid
-                        return (c.IsEmpty) ? defaultValue : c;
-                    } catch {
-                        return defaultValue;
-                    }
-                }
-            }
-            return defaultValue;
+            return ParseUtils.ParseColor(value, defaultValue);
         }
 
         public static string writeColor(Color value) {
-            string text =  System.Drawing.ColorTranslator.ToHtml(value);
-            if (text.StartsWith("#")) {
-                text = text.TrimStart('#');
-                if (value.A != 255) text += value.A.ToString("X2", NumberFormatInfo.InvariantInfo);
-            }
-            return text;
+            return ParseUtils.SerializeColor(value);
         }
         /// <summary>
         /// Parses lists in the form "3,4,5,2,5" and "(3,4,40,50)". If a number cannot be parsed (i.e, number 2 in "5,,2,3") defaultValue is used.
@@ -126,7 +99,7 @@ namespace ImageResizer.Util {
         /// <param name="dest"></param>
         [Obsolete("Use ImageResizer.ExtensionMethods instead.")]
         public static void copyStream(Stream source, Stream dest) {
-            source.CopyToStream(dest, false, 0x8000); 
+            source.CopyToStream(dest, false, 0x1000); 
         }
 
         
@@ -138,24 +111,7 @@ namespace ImageResizer.Util {
         /// <param name="sFlip"></param>
         /// <returns></returns>
         public static RotateFlipType parseFlip(string sFlip) {
-
-            if (!string.IsNullOrEmpty(sFlip)) {
-                if ("none".Equals(sFlip, StringComparison.OrdinalIgnoreCase))
-                    return RotateFlipType.RotateNoneFlipNone;
-                else if (sFlip.Equals("h", StringComparison.OrdinalIgnoreCase))
-                    return RotateFlipType.RotateNoneFlipX;
-                else if (sFlip.Equals("x", StringComparison.OrdinalIgnoreCase))
-                    return RotateFlipType.RotateNoneFlipX;
-                else if (sFlip.Equals("v", StringComparison.OrdinalIgnoreCase))
-                    return RotateFlipType.RotateNoneFlipY;
-                else if (sFlip.Equals("y", StringComparison.OrdinalIgnoreCase))
-                    return RotateFlipType.RotateNoneFlipY;
-                else if (sFlip.Equals("both", StringComparison.OrdinalIgnoreCase))
-                    return RotateFlipType.RotateNoneFlipXY;
-                else if (sFlip.Equals("xy", StringComparison.OrdinalIgnoreCase))
-                    return RotateFlipType.RotateNoneFlipXY;
-            }
-            return RotateFlipType.RotateNoneFlipNone;
+            return (RotateFlipType)ParseUtils.ParsePrimitive<FlipMode>(sFlip, FlipMode.None);
         }
 
         /// <summary>
@@ -174,35 +130,11 @@ namespace ImageResizer.Util {
         }
 
         public static double normalizeTo90Intervals(double d){
-            d = d % 360;
-            if (d < 0) d += 360;
-
-            if (d >= 315 && d < 360) return 0;
-            if (d >= 0 && d < 45) return 0;
-            if (d >=45 && d < 135) return 90;
-            if (d >= 135 && d < 225) return 180;
-            if (d >= 225 && d < 315) return 270;
-            
-            throw new Exception("Impossible");
+            return PolygonMath.NormalizeTo90Intervals(d);
         }
 
         public static RotateFlipType combineFlipAndRotate(RotateFlipType flip, double angle) {
-            angle = normalizeTo90Intervals(angle);
-            if (flip == 0) return (RotateFlipType)(int)(angle / 90);
-            else if (flip == (RotateFlipType)4) return (RotateFlipType)(int)(4 + (angle / 90));
-            else if (flip == (RotateFlipType)6) {
-                if (angle == 0) return (RotateFlipType)6;
-                if (angle == 90) return (RotateFlipType)7;
-                if (angle == 180) return (RotateFlipType)4;
-                if (angle == 270) return (RotateFlipType)5;
-            } else if (flip == (RotateFlipType)2) {
-                if (angle == 0) return (RotateFlipType)2;
-                if (angle == 90) return (RotateFlipType)3;
-                if (angle == 180) return (RotateFlipType)0;
-                if (angle == 270) return (RotateFlipType)1;
-            }
-
-            throw new ArgumentException("Valid flip values are RotateNoneFlipNone, RotateNoneFlipX, RotateNoneFlipY, and RotateNoneFlipXY. Rotation must be specified with Rotate or srcRotate instead. Received: " + flip.ToString());
+            return PolygonMath.CombineFlipAndRotate(flip, angle);
         }
 
 
@@ -242,18 +174,7 @@ namespace ImageResizer.Util {
         }
 
         public static ScaleMode parseScale(string value) {
-            if (value != null) {
-                if (value.Equals("both", StringComparison.OrdinalIgnoreCase))
-                    return ScaleMode.Both;
-                else if (value.Equals("upscaleonly", StringComparison.OrdinalIgnoreCase) || value.Equals("up", StringComparison.OrdinalIgnoreCase))
-                    return ScaleMode.UpscaleOnly;
-                else if (value.Equals("downscaleonly", StringComparison.OrdinalIgnoreCase) || value.Equals("down", StringComparison.OrdinalIgnoreCase))
-                    return ScaleMode.DownscaleOnly;
-                else if (value.Equals("upscalecanvas", StringComparison.OrdinalIgnoreCase) || value.Equals("canvas", StringComparison.OrdinalIgnoreCase))
-                    return ScaleMode.UpscaleCanvas;
-            }
-            //default
-            return ScaleMode.DownscaleOnly;
+            return ParseUtils.ParsePrimitive<ScaleMode>(value, ScaleMode.DownscaleOnly);
         }
         public static string writeScale(ScaleMode value) {
             if (value == ScaleMode.Both) return "both";
@@ -327,30 +248,9 @@ namespace ImageResizer.Util {
         /// <param name="inner"></param>
         /// <param name="outer"></param>
         /// <param name="width"></param>
+        [Obsolete("This method will be removed in V3.3. Use DropShadow.DrawOuterGradient instead")]
         public static void DrawOuterGradient(Graphics g, PointF[] poly, Color inner, Color outer, float width) {
-
-            //PointF[,] corners = PolygonMath.RoundPoints(PolygonMath.GetCorners(poly, width));
-            //PointF[,] sides = PolygonMath.RoundPoints(PolygonMath.GetSides(poly, width));
-            PointF[,] corners = PolygonMath.GetCorners(poly, width);
-            PointF[,] sides = PolygonMath.GetSides(poly, width);
-            //Overlapping these causes darker areas... Dont use InflatePoly
-
-            //Paint corners
-            for (int i = 0; i <= corners.GetUpperBound(0); i++) {
-                PointF[] pts = PolygonMath.GetSubArray(corners, i);
-                using (Brush b = PolygonMath.GenerateRadialBrush(inner, outer, pts[0], width + 1)) {
-                    g.FillPolygon(b, pts);
-                }
-            }
-            //Paint sides
-            for (int i = 0; i <= sides.GetUpperBound(0); i++) {
-                PointF[] pts = PolygonMath.GetSubArray(sides, i);
-                using (LinearGradientBrush b = new LinearGradientBrush(pts[3], pts[0], inner, outer)) {
-                    b.SetSigmaBellShape(1);
-                    b.WrapMode = WrapMode.TileFlipXY;
-                    g.FillPolygon(b, pts);
-                }
-            }
+            ImageResizer.Plugins.Basic.DropShadow.DrawOuterGradient(g, poly, inner, outer, width);
         }
 
 
