@@ -603,9 +603,9 @@ namespace ImageResizer
             //Flipping has to be done on the original - it can't be done as part of the DrawImage or later, after the borders are drawn.
 
             if (s.sourceBitmap != null && (s.settings.SourceFlip != RotateFlipType.RotateNoneFlipNone || !string.IsNullOrEmpty(s.settings["sRotate"]))) {
-                double angle = Utils.parseRotate(s.settings["sRotate"]);
+                double angle = s.settings.Get<double>("sRotate",0);
 
-                s.sourceBitmap.RotateFlip(Utils.combineFlipAndRotate(s.settings.SourceFlip,angle));
+                s.sourceBitmap.RotateFlip(PolygonMath.CombineFlipAndRotate(s.settings.SourceFlip,angle));
                 s.originalSize = s.sourceBitmap.Size;
             }
             return RequestedAction.None;
@@ -772,7 +772,7 @@ namespace ImageResizer
             if (s.destGraphics == null) return RequestedAction.None;
 
             if (!string.IsNullOrEmpty(s.settings["filter"])) {
-                s.destGraphics.InterpolationMode = Utils.parseEnum<System.Drawing.Drawing2D.InterpolationMode>(s.settings["filter"], s.destGraphics.InterpolationMode);
+                s.destGraphics.InterpolationMode = s.settings.Get<InterpolationMode>("filter", s.destGraphics.InterpolationMode);
             }
 
             s.copyAttibutes.SetWrapMode(WrapMode.TileFlipXY);
@@ -850,7 +850,7 @@ namespace ImageResizer
 
             //Set DPI value
             if (!string.IsNullOrEmpty(s.settings["dpi"])){
-                int dpi = Util.Utils.getInt(s.settings,"dpi",96);
+                int dpi = s.settings.Get<int>("dpi",96);
                 s.destBitmap.SetResolution(dpi, dpi);
             }
             
@@ -897,7 +897,7 @@ namespace ImageResizer
 
             //Use the crop size if present.
             s.copyRect = new RectangleF(new PointF(0,0),s.originalSize);
-            if (Utils.parseCrop(s.settings["crop"]).Key == CropMode.Custom) {
+            if (s.settings.GetList<double>("crop", 0, 4) != null) {
                 s.copyRect = PolygonMath.ToRectangle(s.settings.getCustomCropSourceRect(s.originalSize)); //Round the custom crop rectangle coordinates
                 if (s.copyRect.Size.IsEmpty) throw new Exception("You must specify a custom crop rectange if crop=custom");
             }
@@ -910,7 +910,7 @@ namespace ImageResizer
             if (fit == FitMode.None){
                 if (s.settings.Width != -1 || s.settings.Height != -1){
 
-                    if (Utils.parseStretch(s.settings["stretch"]) == StretchMode.Fill) fit = FitMode.Stretch;
+                    if ("fill".Equals(s.settings["stretch"], StringComparison.OrdinalIgnoreCase)) fit = FitMode.Stretch;
                     else if ("auto".Equals(s.settings["crop"], StringComparison.OrdinalIgnoreCase)) fit = FitMode.Crop;
                     else if (!string.IsNullOrEmpty(s.settings["carve"]) 
                         && !"false".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase)
@@ -929,7 +929,7 @@ namespace ImageResizer
             double imageRatio = s.copySize.Width / s.copySize.Height;
 
             //Zoom factor
-            double zoom = Utils.getDouble(s.settings, "zoom", 1);
+            double zoom = s.settings.Get<double>("zoom", 1);
 
             //The target size for the image 
             SizeF targetSize = new SizeF(-1, -1);
