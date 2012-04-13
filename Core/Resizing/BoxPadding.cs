@@ -2,12 +2,24 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Globalization;
+using ImageResizer.Util;
 
 namespace ImageResizer.Resizing {
     /// <summary>
     /// Represents the widths of edges of a box.
     /// </summary>
     public class BoxPadding {
+
+        public static BoxPadding Parse(string text, BoxPadding fallbackValue) {
+            double[] coords = ParseUtils.ParseList<double>(text, 0, 1, 4);
+            if (coords == null) return fallbackValue; //Failed to parse, or was empty
+
+            if (coords.Length == 1) return new BoxPadding(coords[0]);
+            if (coords.Length == 4) return new BoxPadding(coords[0], coords[1], coords[2], coords[3]);
+
+            return fallbackValue; 
+        }
         
         /// <summary>
         /// Create a box with all edges the same width.
@@ -99,5 +111,13 @@ namespace ImageResizer.Resizing {
         public float[] GetEdgeOffsets() {
             return new float[4] { (float)top, (float)right, (float)bottom, (float)left };
         }
+
+        public override string ToString() {
+            if (!double.IsNaN(All)) return All.ToString(NumberFormatInfo.InvariantInfo); //Easy
+
+            return "(" + Left.ToString(NumberFormatInfo.InvariantInfo) + "," + Top.ToString(NumberFormatInfo.InvariantInfo) + "," +
+                Right.ToString(NumberFormatInfo.InvariantInfo) + "," + Bottom.ToString(NumberFormatInfo.InvariantInfo) + ")";
+        }
+        
     }
 }
