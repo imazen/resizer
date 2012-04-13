@@ -7,6 +7,7 @@ using System.Drawing;
 using ImageResizer.Resizing;
 using ImageResizer.Util;
 using System.Globalization;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer {
     /// <summary>
@@ -46,11 +47,11 @@ namespace ImageResizer {
         }
 
 
-        protected int get(string name, int defaultValue){ return Utils.getInt(this,name,defaultValue);}
-        protected void set(string name, int value) { this[name] = value.ToString(NumberFormatInfo.InvariantInfo); }
+        protected int get(string name, int defaultValue){ return this.Get<int>(name,defaultValue);}
+        protected void set(string name, int value) { this.Set<int>(name, value); }
 
-        protected double get(string name, double defaultValue) { return Utils.getDouble(this, name, defaultValue); }
-        protected void set(string name, double value) { this[name] = value.ToString(NumberFormatInfo.InvariantInfo); }
+        protected double get(string name, double defaultValue) { return this.Get<double>(name, defaultValue); }
+        protected void set(string name, double value) { this.Set<double>(name, value); }
 
         /// <summary>
         /// ["width"]: Sets the desired width of the image. (minus padding, borders, margins, effects, and rotation). 
@@ -111,9 +112,14 @@ namespace ImageResizer {
         /// <summary>
         /// ["mode"]: Sets the fit mode for the image. max, min, pad, crop, carve, stretch
         /// </summary>
-        public FitMode Mode{                        get {
-            return Utils.parseEnum<FitMode>(this["mode"], FitMode.None);       } set {
-            this["mode"] = value.ToString();      }}
+        public FitMode Mode {
+            get {
+                return this.Get<FitMode>("mode", FitMode.None);
+            }
+            set {
+                this.Set<FitMode>("mode", value);
+            }
+        }
 
         /// <summary>
         /// Returns true if any of the specified keys are present in this NameValueCollection
@@ -121,8 +127,7 @@ namespace ImageResizer {
         /// <param name="keys"></param>
         /// <returns></returns>
         public bool WasOneSpecified(params string[] keys) {
-            foreach (String s in keys) if (!string.IsNullOrEmpty(this[s])) return true;
-            return false;
+            return this.IsOneSpecified(keys);
         }
         /// <summary>
         /// ["rotate"] The degress to rotate the image clockwise. -360 to 360.
@@ -136,8 +141,8 @@ namespace ImageResizer {
         /// How to anchor the image when cropping or adding whitespace to meet sizing requirements.
         /// </summary>
         public ContentAlignment Anchor                   { get {
-            return Utils.parseEnum<ContentAlignment>(this["anchor"],ContentAlignment.MiddleCenter);       } set {
-            this["anchor"] = value.ToString();      }}
+            return this.Get<ContentAlignment>("anchor",ContentAlignment.MiddleCenter);       } set {
+            this.Set<ContentAlignment>("anchor",value);      }}
 
 
 
@@ -145,33 +150,41 @@ namespace ImageResizer {
         /// Allows you to flip the entire resulting image vertically, horizontally, or both. Rotation is not supported.
         /// </summary>
         public RotateFlipType Flip                      { get {
-            return Utils.parseFlip(this["flip"]);       } set {
-            this["flip"] = Utils.writeFlip(value);      }}
+                return (RotateFlipType)this.Get<FlipMode>("flip", FlipMode.None);
+            }
+            set {
+            this.Set<FlipMode>("flip",(FlipMode)value);      }}
 
         /// <summary>
         /// ["sFlip"] Allows you to flip the source image vertically, horizontally, or both. Rotation is not supported.
         /// </summary>
         public RotateFlipType SourceFlip                    { get {
-                return Utils.parseFlip(string.IsNullOrEmpty(this["sFlip"]) ? this["sourceFlip"] : this["sFlip"]);
+            return (RotateFlipType)this.Get<FlipMode>("sFlip", this.Get<FlipMode>("sourceFlip", FlipMode.None));
             }
             set {
-            this["sFlip"] = Utils.writeFlip(value);    }}
+                this.Set<FlipMode>("sflip", (FlipMode)value);
+            }
+        }
 
         /// <summary>
         /// ["scale"] Whether to downscale, upscale, upscale the canvas, or both upscale or downscale the image as needed. Defaults to
-        /// DownscaleOnly when maxwidth/maxheight is used, and Both when width/height are used.
+        /// DownscaleOnly. See the DefaultSettings plugin to adjust the default.
         /// </summary>
         public ScaleMode Scale                              { get {
-            return Utils.parseScale(this["scale"]);         } set {
-            this["scale"] = Utils.writeScale(value);        }}
+                return this.Get<ScaleMode>("scale", ScaleMode.DownscaleOnly);
+            }
+            set {
+                this.Set<ScaleMode>("scale", value);        }}
 
         /// <summary>
         /// [Deprecated] (Replaced by mode=stretch) Whether to preserve aspect ratio or stretch to fill the bounds.
         /// </summary>
         [Obsolete("Replaced by Mode=Stretch")]
         public StretchMode Stretch                          { get {
-            return Utils.parseStretch(this["stretch"]);      } set {
-            this["stretch"] = Utils.writeStretch(value);    }}
+            return this.Get<StretchMode>("stretch", StretchMode.Proportionally);
+            }
+            set {
+                this.Set<StretchMode>("stretch", value);   }}
 
 
         /// <summary>
@@ -179,7 +192,7 @@ namespace ImageResizer {
         /// </summary>
         public ServerCacheMode Cache {
             get {
-                return Utils.parseEnum<ServerCacheMode>(this["cache"],ServerCacheMode.Default);
+                return this.Get<ServerCacheMode>("cache",ServerCacheMode.Default);
             }
             set {
                 this["cache"] = value.ToString();
@@ -191,7 +204,7 @@ namespace ImageResizer {
         /// </summary>
         public ProcessWhen Process {
             get {
-                return Utils.parseEnum<ProcessWhen>(this["process"], this["useresizingpipeline"] != null ? ProcessWhen.Always : ProcessWhen.Default);
+                return this.Get<ProcessWhen>(this["process"], this["useresizingpipeline"] != null ? ProcessWhen.Always : ProcessWhen.Default);
             }
             set {
                 this["process"] = value.ToString(); this.Remove("useresizingpipeline");
@@ -204,8 +217,14 @@ namespace ImageResizer {
         /// </summary>
         [Obsolete("Replaced by Mode=Crop. Use CropTopLeft and CropTopRight instead for setting a custom crop mode.")]
         public CropMode CropMode                                {get {
-            return Utils.parseCrop(this["crop"]).Key;           } set {
-            this["crop"] = Utils.writeCrop(value, CropValues);  }}
+            if ("auto".Equals(this["crop"], StringComparison.OrdinalIgnoreCase)) return ImageResizer.CropMode.Auto;
+            if (this.GetList<double>("crop", 0, 4) != null) return ImageResizer.CropMode.Custom;
+            return ImageResizer.CropMode.None;
+       } set {
+                if (value == ImageResizer.CropMode.None) this.Remove("crop");
+                else if (value == ImageResizer.CropMode.Auto) this["crop"] = "auto";
+            }
+        }
 
         /// <summary>
         /// 4 values specify x1,y1,x2,y2 values for the crop rectangle.
@@ -214,18 +233,11 @@ namespace ImageResizer {
         protected double[] CropValues {
             get {
                 //Return (0,0,0,0) when null.
-                double[] vals = Utils.parseCrop(this["crop"]).Value;
+                double[] vals = this.GetList<double>("crop", 0, 4);
                 return vals != null ? vals : new double[] { 0, 0, 0, 0 };
             }
             set {
-                //If values are valid, CropMode.Custom will automatically be selected
-                if (value != null && (value.Length == 4)) {
-                    this["crop"] =  Utils.writeCrop(ImageResizer.CropMode.Custom, value);
-                } else {
-                    //Throw an exception if an invalid value is assigned when CropMode.Custom is in use.
-                    throw new ArgumentException("CropValues must be an array of 4 double values.");
-                    //Otherwise, ignore it.
-                }
+                this.SetList<double>("crop", value, true, 4);
             }
         }
 
@@ -261,26 +273,26 @@ namespace ImageResizer {
         /// ["bgcolor"]: Named and hex values are supported. (rgb and rgba, both 3, 6, and 8 digits).
         /// </summary>
         public Color BackgroundColor {
-            get { return Utils.parseColor(this[ "bgcolor"], Color.Transparent); }
-            set { this["bgcolor"] = Utils.writeColor(value); }
+            get { return ParseUtils.ParseColor(this["bgcolor"], Color.Transparent); }
+            set { this["bgcolor"] = Util.ParseUtils.SerializeColor(value); }
         }
 
         /// <summary>
         /// Gets/sets ["paddingColor"]. Named and hex values are supported. (rgb and rgba, both 3, 6, and 8 digits).
         /// </summary>
         public Color PaddingColor {
-            get { return Utils.parseColor(this["paddingColor"], Color.Transparent); }
-            set { this["paddingColor"] = Utils.writeColor(value); }
+            get { return ParseUtils.ParseColor(this["paddingColor"], Color.Transparent); }
+            set { this["paddingColor"] = Util.ParseUtils.SerializeColor(value); }
         }
         /// <summary>
         /// ["paddingWidth"]: Gets/sets the width(s) of padding inside the image border.
         /// </summary>
         public BoxPadding Padding {
             get {
-                return Utils.parsePadding(this["paddingWidth"]);
+                return BoxPadding.Parse(this["paddingWidth"], BoxPadding.Empty);
             }
             set {
-                this["paddingWidth"] = Utils.writePadding(value);
+                this.Set<BoxPadding>("paddingWidth",value);
             }
         }
         /// <summary>
@@ -288,28 +300,28 @@ namespace ImageResizer {
         /// </summary>
         public BoxPadding Margin {
             get {
-                return Utils.parsePadding(this["margin"]);
+                return BoxPadding.Parse(this["margin"], BoxPadding.Empty);
             }
             set {
-                this["margin"] = Utils.writePadding(value);
+                this.Set<BoxPadding>("margin", value);
             }
         }
         /// <summary>
         /// Gets/sets ["borderColor"]. Named and hex values are supported. (rgb and rgba, both 3, 6, and 8 digits).
         /// </summary>
         public Color BorderColor {
-            get { return Utils.parseColor(this["borderColor"], Color.Transparent); }
-            set { this["borderColor"] = Utils.writeColor(value); }
+            get { return ParseUtils.ParseColor(this["borderColor"], Color.Transparent); }
+            set { this["borderColor"] = Util.ParseUtils.SerializeColor(value); }
         }
         /// <summary>
         /// Friendly get/set accessor for the ["borderWidth"] value. Returns BoxPadding.Empty when unspecified.
         /// </summary>
         public BoxPadding Border {
             get {
-                return Utils.parsePadding(this["borderWidth"]);
+                return BoxPadding.Parse(this["borderWidth"], BoxPadding.Empty);
             }
             set {
-                this["borderWidth"] = Utils.writePadding(value);
+                this.Set<BoxPadding>("borderWidth", value);
             }
         }
 
@@ -336,68 +348,20 @@ namespace ImageResizer {
         /// This can be set to any non-negative value. Very useful for performing cropping when the original image size is unknown.
         /// 0 indicates that the crop values are relative to the original size of the image.
         /// </summary>
-        public double CropXUnits { get { return Utils.parseCropUnits(this["cropxunits"]).Value; } set { this["cropxunits"] = value <= 0 ? "sourcepixels" : value.ToString(NumberFormatInfo.InvariantInfo); } }
+        public double CropXUnits { get { return this.Get<double>("cropxunits",0); } set { this.Set<double>("cropxunits", value <= 0 ? null : (double?)value); } }
         /// <summary>
         /// The width which the Y and Y2 crop values should be applied. For example, a value of '100' makes Y and Y2 percentages of the original image height.
         /// This can be set to any non-negative  value. Very useful for performing cropping when the original image size is unknown.
         /// 0 indicates that the crop values are relative to the original size of the image.
         /// </summary>        
-        public double CropYUnits { get { return Utils.parseCropUnits(this["cropyunits"]).Value; } set { this["cropyunits"] = value <= 0 ? "sourcepixels" : value.ToString(NumberFormatInfo.InvariantInfo); } }
+        public double CropYUnits { get { return this.Get<double>("cropyunits", 0); } set { this.Set<double>("cropyunits", value <= 0 ? null : (double?)value); } }
 
 
         public RectangleF getCustomCropSourceRect(SizeF imageSize) {
-            RectangleF defValue = new RectangleF(new PointF(0, 0), imageSize);
-            double[] c = CropValues;
+            double xunits = this.Get<double>("cropxunits",0);
+            double yunits = this.Get<double>("cropyunits",0);
 
-            //Step 1, parse units.
-            KeyValuePair<CropUnits, double> xunits = Utils.parseCropUnits(this["cropxunits"]);
-            KeyValuePair<CropUnits, double> yunits = Utils.parseCropUnits(this["cropyunits"]);
-
-            //Step 2, Apply units to values, resolving against imageSize
-            for (int i = 0; i < c.Length; i++){
-                bool xvalue = i % 2 == 0;
-                if (xvalue && xunits.Key == CropUnits.Custom) c[i] *= (imageSize.Width / xunits.Value);
-                if (!xvalue && yunits.Key == CropUnits.Custom) c[i] *= (imageSize.Height / yunits.Value);
-
-                //Prohibit values larger than imageSize
-                if (xvalue && c[i] > imageSize.Width) c[i] = imageSize.Width;
-                if (!xvalue && c[i] > imageSize.Height) c[i] = imageSize.Height;
-            }
-
-            //Step 3, expand width/height crop to 4-value crop (not currently used)
-            if (c.Length == 2) {
-                if (c[0] < 1 || c[1] < 1) return defValue; //We can't do anything with negative values here
-                //Center horizontally and vertically.
-                double x = (imageSize.Width - c[0]) /2;
-                double y= (imageSize.Height - c[1]) /2;
-
-                c = new double[] { x, y, x + c[0], y + c[1] };
-            }
-
-            double x1 = c[0], y1 = c[1], x2 = c[2], y2 = c[3];
-
-            //allow negative offsets 
-            if (x1 < 0) x1 += imageSize.Width;
-            if (y1 < 0) y1 += imageSize.Height;
-            if (x2 <= 0) x2 += imageSize.Width;
-            if (y2 <= 0) y2 += imageSize.Height;
-
-
-            //Require box stay in bounds.
-            if (x1 < 0) x1 = 0; if (x2 < 0) x2 = 0;
-            if (y1 < 0) y1 = 0; if (y2 < 0) y2 = 0;
-            if (x1 > imageSize.Width) x1 = imageSize.Width;
-            if (x2 > imageSize.Width) x2 = imageSize.Width;
-            if (y1 > imageSize.Height) y1 = imageSize.Height;
-            if (y2 > imageSize.Height) y2 = imageSize.Height;
-
-            //Require positive width and height.
-            if (x2 <= x1 || y2 <= y1) {
-                //Use original dimensions - can't recover from negative width or height in cropping rectangle
-                return new RectangleF(new PointF(0, 0), imageSize);
-            }
-
-            return new RectangleF((float)x1, (float)y1, (float)(x2 - x1), (float)(y2 - y1));
+            return PolygonMath.GetCroppingRectangle(CropValues, xunits, yunits, imageSize);
         }
         
         /// <summary>
@@ -429,32 +393,10 @@ namespace ImageResizer {
         /// w->width, h->height, sourceFlip->sFlip, thumbnail->format
         /// </summary>
         public void Normalize() {
-            Normalize("width", "w");
-            Normalize("height", "h");
-            Normalize("sFlip", "sourceFlip");
-            Normalize("format", "thumbnail");
-        }
-        /// <summary>
-        /// Normalizes a command that has two possible names. 
-        /// If either of the commands has a null or empty value, those keys are removed. 
-        /// If both the the primary and secondary are present, the secondary is removed. 
-        /// Otherwise, the secondary is renamed to the primary name.
-        /// </summary>
-        /// <param name="primary"></param>
-        /// <param name="secondary"></param>
-        protected void Normalize(string primary, string secondary) {
-            //Get rid of null and empty values.
-            if (string.IsNullOrEmpty(this[primary])) this.Remove(primary);
-            if (string.IsNullOrEmpty(this[secondary])) this.Remove(secondary);
-            //Our job is done if no secondary value exists.
-            if (this[secondary] == null) return;
-            else{
-                //Otherwise, we have to resolve it
-                //No primary value? copy the secondary one. Otherwise leave it be
-                if (this[primary] == null) this[primary] = this[secondary];
-                //In either case, we now have a duplicate to remove
-                this.Remove(secondary);
-            }
+            this.Normalize("width", "w")
+                .Normalize("height", "h")
+                .Normalize("sFlip", "sourceFlip")
+                .Normalize("format", "thumbnail");
         }
     }
 }
