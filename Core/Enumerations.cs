@@ -97,7 +97,7 @@ namespace ImageResizer {
     /// <summary>
     /// [Deprecated (Use FitMode.Stretch)] Previously used to force an image to be 'stretched' to match a different aspect ratio.
     /// </summary>
-    [Obsolete("Use Mode=FitMode.Stretch instead")]
+    [Obsolete("Use Mode=FitMode.Stretch instead. Will be removed in V3.5 or V4.")]
     public enum StretchMode {
         /// <summary>
         /// [Deprecated (Use FitMode)] Maintains aspect ratio. Default.
@@ -140,7 +140,8 @@ namespace ImageResizer {
        
 
     }
-    [Obsolete("Obsolete. Use Mode=Crop to specify automatic cropping. Set CropTopLeft and CropTopRight to specify custom coordinates.")]
+
+    [Obsolete("Obsolete. Use Mode=Crop to specify automatic cropping. Set CropTopLeft and CropTopRight to specify custom coordinates. Will be removed in V3.5 or V4.")]
     public enum CropMode {
         /// <summary>
         /// Default. No cropping - uses letterboxing if strecth=proportionally and both width and height are specified.
@@ -157,6 +158,7 @@ namespace ImageResizer {
         Custom
     }
 
+    [Obsolete("Obsolete. Specify 0 for a crop unit to indicate source pixel coordinates.  Will be removed in V3.5 or V4.")]
     public enum CropUnits {
         /// <summary>
         /// Indicates the crop units are pixels on the original image.
