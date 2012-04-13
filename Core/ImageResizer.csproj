@@ -166,6 +166,7 @@
     <Compile Include="SharedAssemblyInfo.cs" />
     <Compile Include="UrlOptions.cs" />
     <Compile Include="Util\CommitAttribute.cs" />
+    <Compile Include="Util\ParseUtils.cs" />
     <Compile Include="Util\PathUtils.cs" />
     <Compile Include="Util\PolygonMath.cs" />
     <Compile Include="Plugins\IVirtualFileWithModifiedDate.cs" />
