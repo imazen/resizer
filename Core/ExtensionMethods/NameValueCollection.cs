@@ -85,6 +85,11 @@ namespace ImageResizer.ExtensionMethods {
 
         }
 
+        public static NameValueCollection Set<T>(this NameValueCollection q, string name, T val) where T : class {
+            if (val == null) q.Remove(name);
+            else q[name] = val.ToString();
+            return q;
+        }
 
         /// <summary>
         /// Provides culture-invariant serialization of value types, in lower case for querystring readability. Setting a key to null removes it.
