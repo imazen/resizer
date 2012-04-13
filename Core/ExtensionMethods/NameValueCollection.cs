@@ -32,7 +32,9 @@ namespace ImageResizer.ExtensionMethods {
             return ParsePrimitive<T>(q[name], defaultValue).Value;
         }
 
-        public static T? ParsePrimitive<T>(string value, T? defaultValue) where T:struct,IConvertible{
+
+
+        public static T? ParsePrimitive<T>(string value, T? defaultValue) where T : struct,IConvertible {
             if (value == null) return defaultValue;
             value = value.Trim(); //Trim whitespace
             if (value.Length == 0) return defaultValue;
@@ -42,7 +44,7 @@ namespace ImageResizer.ExtensionMethods {
             if (t == typeof(byte)) {
                 byte temp = 0;
                 if (byte.TryParse(value, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out temp)) return temp as T?;
-            }else if (t == typeof(int)) {
+            } else if (t == typeof(int)) {
                 int temp = 0;
                 if (int.TryParse(value, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out temp)) return temp as T?;
             } else if (t == typeof(double)) {
@@ -61,8 +63,8 @@ namespace ImageResizer.ExtensionMethods {
                     "0".Equals(s, StringComparison.OrdinalIgnoreCase) ||
                     "no".Equals(s, StringComparison.OrdinalIgnoreCase) ||
                     "off".Equals(s, StringComparison.OrdinalIgnoreCase)) return false as T?;
-            } else if (t.IsEnum){
-                return EnumExtensions.Parse<T>( value); //Support EnumString values
+            } else if (t.IsEnum) {
+                return EnumExtensions.Parse<T>(value); //Support EnumString values
             } else {
                 return value as T?; //Just try casting
             }
@@ -80,8 +82,9 @@ namespace ImageResizer.ExtensionMethods {
             } else {
                 return Convert.ToString(value, NumberFormatInfo.InvariantInfo).ToLowerInvariant();
             }
- 
+
         }
+
 
         /// <summary>
         /// Provides culture-invariant serialization of value types, in lower case for querystring readability. Setting a key to null removes it.
@@ -92,13 +95,24 @@ namespace ImageResizer.ExtensionMethods {
         /// <param name="val"></param>
         /// <returns></returns>
         public static NameValueCollection Set<T>(this NameValueCollection q, string name, T? val) where T : struct, IConvertible {
-            if (val == null) q.Remove(name); 
+            if (val == null) q.Remove(name);
             else q[name] = SerializePrimitive<T>(val);
             return q;
         }
 
-        public static T[] GetList<T>(this NameValueCollection q, string name, T defaultValue, params int[] allowedSizes) where T : struct, IConvertible {
-            string text = q[name];
+        public static T[] GetList<T>(this NameValueCollection q, string name, T? fallbackValue, params int[] allowedSizes) where T : struct, IConvertible {
+            return ParseList<T>(q[name], fallbackValue, allowedSizes);
+        }
+
+        /// <summary>
+        /// Parses a comma-delimited list of primitive values. If there are unparsable items in the list, they will be replaced with 'fallbackValue'. If fallbackValue is null, the function will return null
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="text"></param>
+        /// <param name="fallbackValue"></param>
+        /// <param name="allowedSizes"></param>
+        /// <returns></returns>
+        public static T[] ParseList<T>(string text, T? fallbackValue, params int[] allowedSizes) where T : struct, IConvertible {
             if (text == null) return null;
             text = text.Trim(' ', '(', ')', ','); //Trim parenthesis, commas, and spaces
             if (text.Length == 0) return null;
@@ -113,10 +127,13 @@ namespace ImageResizer.ExtensionMethods {
             //Parse the array
             T[] vals = new T[parts.Length];
             for (int i = 0; i < parts.Length; i++) {
-                vals[i] = ParsePrimitive<T>(q[name], defaultValue).Value;
+                var v = ParsePrimitive<T>(parts[i], fallbackValue);
+                if (v == null) return null;
+                vals[i] = v.Value;
             }
             return vals;
         }
+
 
         private static string JoinPrimitives<T>(T[] array, char delimiter) where T : struct, IConvertible {
             var sb = new StringBuilder();
@@ -130,7 +147,7 @@ namespace ImageResizer.ExtensionMethods {
         public static NameValueCollection SetList<T>(this NameValueCollection q, string name, T[] values, bool throwExceptions, params int[] allowedSizes) where T : struct, IConvertible {
             if (values == null) { q.Remove(name); return q; }
             //Verify the array is of an accepted size
-            bool foundCount = false;
+            bool foundCount = allowedSizes.Length == 0;
             foreach (int c in allowedSizes) if (c == values.Length) foundCount = true;
             if (!foundCount) {
                 if (throwExceptions) throw new ArgumentOutOfRangeException("values", "The specified array is not a valid length. Valid lengths are " + JoinPrimitives<int>(allowedSizes, ','));
