@@ -28,6 +28,10 @@ namespace ImageResizer.ExtensionMethods {
             return ParsePrimitive<T>(q[name],defaultValue);
         }
 
+        public static T Get<T>(this NameValueCollection q, string name, T defaultValue) where T : struct, IConvertible {
+            return ParsePrimitive<T>(q[name], defaultValue).Value;
+        }
+
         public static T? ParsePrimitive<T>(string value, T? defaultValue) where T:struct,IConvertible{
             if (value == null) return defaultValue;
             value = value.Trim(); //Trim whitespace
@@ -101,8 +105,8 @@ namespace ImageResizer.ExtensionMethods {
 
             string[] parts = text.Split(new char[] { ',' }, StringSplitOptions.None);
 
-            //Verify the array is of an accepted size
-            bool foundCount = false;
+            //Verify the array is of an accepted size if any are specified
+            bool foundCount = allowedSizes.Length == 0;
             foreach (int c in allowedSizes) if (c == parts.Length) foundCount = true;
             if (!foundCount) return null;
 
