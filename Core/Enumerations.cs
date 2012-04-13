@@ -2,23 +2,50 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer {
+
+    /// <summary>
+    /// Output image formats
+    /// </summary>
+    public enum OutputFormat {
+        /// <summary>
+        /// Jpeg - the best format for photographs and thumbnails
+        /// </summary>
+        [EnumString("jpg",true)]
+        [EnumString("jpe")]
+        [EnumString("jif")]
+        [EnumString("jfif")]
+        [EnumString("jfi")]
+        [EnumString("exif")]
+        Jpeg = 8,
+        /// <summary>
+        /// The best format for transparent images and vector graphics
+        /// </summary>
+        Png = 16,
+        /// <summary>
+        /// A really poor choice for pretty much everything except animation
+        /// </summary>
+        Gif = 32
+    }
+           
+
 
     /// <summary>
     /// When to disk cache the image
     /// </summary>
     public enum ServerCacheMode {
         /// <summary>
-        /// Request no caching of the resulting image.
+        /// Request no disk caching of the resulting image.
         /// </summary>
         No,
         /// <summary>
-        /// Request that the resulting image always be cached on the server, even if no modifications are made. 
+        /// Request that the resulting image always be disk cached on the server, even if no modifications are made. 
         /// </summary>
         Always,
         /// <summary>
-        /// Default caching behavior. Modified images are cached, unmodified images are not cached.
+        /// Default caching behavior. Modified images are disk cached, unmodified images are not.
         /// </summary>
         Default
 
@@ -51,10 +78,12 @@ namespace ImageResizer {
         /// <summary>
         /// The default. Only downsamples images - never enlarges. If an image is smaller than 'width' and 'height', the image coordinates are used instead.
         /// </summary>
+        [EnumString("down")]
         DownscaleOnly,
         /// <summary>
         /// Only upscales (zooms) images - never downsamples except to meet web.config restrictions. If an image is larger than 'width' and 'height', the image coordinates are used instead.
         /// </summary>
+        [EnumString("up")]
         UpscaleOnly,
         /// <summary>
         /// Upscales and downscales images according to 'width' and 'height', within web.config restrictions.
@@ -63,12 +92,14 @@ namespace ImageResizer {
         /// <summary>
         /// When the image is smaller than the requested size, padding is added instead of stretching the image
         /// </summary>
+        [EnumString("canvas")]
         UpscaleCanvas
     }
 
     /// <summary>
     /// [Deprecated (Use FitMode.Stretch)] Previously used to force an image to be 'stretched' to match a different aspect ratio.
     /// </summary>
+    [Obsolete("Use Mode=FitMode.Stretch instead")]
     public enum StretchMode {
         /// <summary>
         /// [Deprecated (Use FitMode)] Maintains aspect ratio. Default.
@@ -138,5 +169,133 @@ namespace ImageResizer {
 
 
     }
+    /// <summary>
+    /// Horizontal and vertical flipping. Convertible to System.Drawing.RotateFlipType by casting.
+    /// </summary>
+    public enum FlipMode{
+        /// <summary>
+        /// No flipping
+        /// </summary>
+        None = 0,
+        /// <summary>
+        /// Flip horizontally
+        /// </summary>
+        [EnumString("h")]
+        X = 4,
+        /// <summary>
+        /// Flip vertically (identical to 180 degree rotation)
+        /// </summary>
+        [EnumString("v")]
+        Y = 6,
+        /// <summary>
+        /// Flip horizontally and vertically
+        /// </summary>
+        [EnumString("both")]
+        XY = 2
+    }
 
+
+    /// <summary>
+    /// Anchor location. Convertible to System.Drawing.ContentAlignment by casting.
+    /// </summary>
+    [Flags]
+    public enum AnchorLocation {
+        // Summary:
+        //     Content is vertically aligned at the top, and horizontally aligned on the
+        //     left.
+        TopLeft = 1,
+        //
+        // Summary:
+        //     Content is vertically aligned at the top, and horizontally aligned at the
+        //     center.
+        TopCenter = 2,
+        //
+        // Summary:
+        //     Content is vertically aligned at the top, and horizontally aligned on the
+        //     right.
+        TopRight = 4,
+        //
+        // Summary:
+        //     Content is vertically aligned in the middle, and horizontally aligned on
+        //     the left.
+        MiddleLeft = 16,
+        //
+        // Summary:
+        //     Content is vertically aligned in the middle, and horizontally aligned at
+        //     the center.
+        MiddleCenter = 32,
+        //
+        // Summary:
+        //     Content is vertically aligned in the middle, and horizontally aligned on
+        //     the right.
+        MiddleRight = 64,
+        //
+        // Summary:
+        //     Content is vertically aligned at the bottom, and horizontally aligned on
+        //     the left.
+        BottomLeft = 256,
+        //
+        // Summary:
+        //     Content is vertically aligned at the bottom, and horizontally aligned at
+        //     the center.
+        BottomCenter = 512,
+        //
+        // Summary:
+        //     Content is vertically aligned at the bottom, and horizontally aligned on
+        //     the right.
+        BottomRight = 1024,
+    }
+
+    /// <summary>
+    /// Modes of converting the image to Grayscale. GrayscaleMode.Y usually produces the best resuts
+    /// </summary>
+    public enum GrayscaleMode {
+        [EnumString("false")]
+        None = 0,
+        /// <summary>
+        /// The reccomended value. Y and NTSC are identical.
+        /// </summary>
+        [EnumString("true")]
+        Y = 1,
+        
+        NTSC = 1,
+        RY = 2,
+        BT709= 3,
+        Flat = 4
+    }
+    /// <summary>
+    /// The Jpeg subsampling mode to use. Requires FreeImageEncoder, FreeImageBuilder, WicEncoder, or WicBuilder.
+    /// </summary>
+    public enum JpegSubsamplingMode {
+        /// <summary>
+        /// The encoder's default subsampling method will be used.
+        /// </summary>
+        Default = 0,
+        /// <summary>
+        /// 411 Subsampling - Only supported by FreeImageBuilder and FreeImageEncoder. Poor quality.
+        /// </summary>
+        [EnumString("411",true)]
+        Y4Cb1Cr1 = 4,
+        /// <summary>
+        /// 420 Subsampling - Commonly used in H262 and H264. Low quality compared to 422 and 444. 
+        /// </summary>
+        [EnumString("420",true)]
+        Y4Cb2Cr0 = 8,
+        /// <summary>
+        /// 422 Subsampling - Great balance of quality and file size, commonly used in high-end video formats.
+        /// </summary>
+        [EnumString("422",true)]
+        Y4Cb2Cr2 = 16,
+        /// <summary>
+        /// 444 subsampling - Highest quality, largest file size.
+        /// </summary>
+        [EnumString("444",true)]
+        HighestQuality =32,
+        /// <summary>
+        /// 444 subsampling - Highest quality, largest file size.
+        /// </summary>
+        [EnumString("444",true)]
+        Y4Cb4Cr4 = 32
+    }
+    
 }
