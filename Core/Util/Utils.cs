@@ -12,6 +12,7 @@ using System.IO;
 using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Util {
+    [Obsolete("All methods of this class have been deprecated. Use ParseUtils or ImageResizer.ExtensionMethods instead.  Will be removed in V3.5 or V4.")]
     public class Utils {
         
   
