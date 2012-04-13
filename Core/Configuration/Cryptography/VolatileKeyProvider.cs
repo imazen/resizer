@@ -11,6 +11,7 @@ namespace ImageResizer.Configuration.Cryptography {
 
 
         public byte[] GetKey(string name, int sizeInBytes) {
+            name += "_" + sizeInBytes;
             lock (syncLock) {
                 byte[] val;
                 if (!keys.TryGetValue(name, out val)){
