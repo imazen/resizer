@@ -7,6 +7,9 @@ using System.Drawing.Drawing2D;
 
 namespace ImageResizer.Util
 {
+    /// <summary>
+    /// Defines a collection of utility functions for manipulating polygons.
+    /// </summary>
     public class PolygonMath
     {
         /// <summary>
@@ -646,5 +649,122 @@ namespace ImageResizer.Util
         public static double Dist(PointF a, PointF b) {
             return Math.Sqrt((b.X - a.X) * (b.X - a.X) + (b.Y - a.Y) * (b.Y - a.Y));
         }
+
+        /// <summary>
+        /// Normalizes the given angle to a positive multiple of 90 degrees between 0 and 270.
+        /// </summary>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        public static double NormalizeTo90Intervals(double d) {
+            d = d % 360;
+            if (d < 0) d += 360;
+
+            if (d >= 315 && d < 360) return 0;
+            if (d >= 0 && d < 45) return 0;
+            if (d >= 45 && d < 135) return 90;
+            if (d >= 135 && d < 225) return 180;
+            if (d >= 225 && d < 315) return 270;
+
+            throw new Exception("Impossible");
+        }
+
+        public static RotateFlipType CombineFlipAndRotate(RotateFlipType flip, double angle) {
+            if (flip != (RotateFlipType)FlipMode.None && 
+                flip != (RotateFlipType)FlipMode.X && 
+                flip != (RotateFlipType)FlipMode.Y && 
+                flip != (RotateFlipType)FlipMode.XY)
+                throw new ArgumentException("Valid flip values are RotateNoneFlipNone, RotateNoneFlipX, RotateNoneFlipY, and RotateNoneFlipXY. Rotation must be specified with Rotate or srcRotate instead. Received: " + flip.ToString());
+            return CombineFlipAndRotate((FlipMode)flip, angle);
+        }
+
+        /// <summary>
+        /// Combines the given flipping info and rotation angle into a RotateFlipType value. Rotation angle will snap to nearest 90-degree multiple
+        /// </summary>
+        /// <param name="flip"></param>
+        /// <param name="angle"></param>
+        /// <returns></returns>
+        public static RotateFlipType CombineFlipAndRotate(FlipMode flip, double angle) {
+            angle = NormalizeTo90Intervals(angle);
+            if (flip == FlipMode.None) {
+                return (RotateFlipType)(int)(angle / 90);
+            } else if (flip == FlipMode.X) {
+                return (RotateFlipType)(int)(4 + (angle / 90));
+            } else if (flip == FlipMode.Y) {
+                if (angle == 0) return (RotateFlipType)6;
+                if (angle == 90) return (RotateFlipType)7;
+                if (angle == 180) return (RotateFlipType)4;
+                if (angle == 270) return (RotateFlipType)5;
+            } else if (flip == FlipMode.XY) {
+                if (angle == 0) return (RotateFlipType)2;
+                if (angle == 90) return (RotateFlipType)3;
+                if (angle == 180) return (RotateFlipType)0;
+                if (angle == 270) return (RotateFlipType)1;
+            } else {
+                throw new ArgumentException("Invalid FlipMode value " + flip.ToString());
+            }
+            throw new ArgumentException("Invalid angle value " + angle.ToString());
+        }
+
+
+        /// <summary>
+        /// Used for converting custom crop rectangle coordinates into a valid cropping rectangle. Positive values are relative to 0,0, negative values relative to width, height.
+        /// X2 and Y2 values of 0 become width and height respectively. 
+        /// </summary>
+        /// <param name="cropValues">An array of 4 elements defining x1, y1, x2, and y2 of the cropping rectangle</param>
+        /// <param name="xunits">The width x1 and x2 are relative to</param>
+        /// <param name="yunits">The height y1 and y2 are relative to</param>
+        /// <param name="imageSize">The size of the uncropped image</param>
+        /// <returns></returns>
+        public static RectangleF GetCroppingRectangle(double[] cropValues, double xunits, double yunits, SizeF imageSize) {
+            RectangleF defValue = new RectangleF(new PointF(0, 0), imageSize);
+            double[] c = cropValues;
+
+            //Step 2, Apply units to values, resolving against imageSize
+            for (int i = 0; i < c.Length; i++) {
+                bool xvalue = i % 2 == 0;
+                if (xvalue && xunits != 0) c[i] *= (imageSize.Width / xunits);
+                if (!xvalue && xunits != 0) c[i] *= (imageSize.Height / yunits);
+
+                //Prohibit values larger than imageSize
+                if (xvalue && c[i] > imageSize.Width) c[i] = imageSize.Width;
+                if (!xvalue && c[i] > imageSize.Height) c[i] = imageSize.Height;
+            }
+
+            //Step 3, expand width/height crop to 4-value crop (not currently used)
+            if (c.Length == 2) {
+                if (c[0] < 1 || c[1] < 1) return defValue; //We can't do anything with negative values here
+                //Center horizontally and vertically.
+                double x = (imageSize.Width - c[0]) / 2;
+                double y = (imageSize.Height - c[1]) / 2;
+
+                c = new double[] { x, y, x + c[0], y + c[1] };
+            }
+
+            double x1 = c[0], y1 = c[1], x2 = c[2], y2 = c[3];
+
+            //allow negative offsets 
+            if (x1 < 0) x1 += imageSize.Width;
+            if (y1 < 0) y1 += imageSize.Height;
+            if (x2 <= 0) x2 += imageSize.Width;
+            if (y2 <= 0) y2 += imageSize.Height;
+
+
+            //Require box stay in bounds.
+            if (x1 < 0) x1 = 0; if (x2 < 0) x2 = 0;
+            if (y1 < 0) y1 = 0; if (y2 < 0) y2 = 0;
+            if (x1 > imageSize.Width) x1 = imageSize.Width;
+            if (x2 > imageSize.Width) x2 = imageSize.Width;
+            if (y1 > imageSize.Height) y1 = imageSize.Height;
+            if (y2 > imageSize.Height) y2 = imageSize.Height;
+
+            //Require positive width and height.
+            if (x2 <= x1 || y2 <= y1) {
+                //Use original dimensions - can't recover from negative width or height in cropping rectangle
+                return new RectangleF(new PointF(0, 0), imageSize);
+            }
+
+            return new RectangleF((float)x1, (float)y1, (float)(x2 - x1), (float)(y2 - y1));
+        }
+        
     }
 }
