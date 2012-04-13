@@ -1,7 +1,5 @@
 ﻿/* Copyright (c) 2011 Nathanael Jones. See license.txt */
 using System;
-using System.Collections.Generic;
-using System.Text;
 using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer {
@@ -51,7 +49,7 @@ namespace ImageResizer {
 
     }
     /// <summary>
-    /// When to process and re-encode the image. 
+    /// When to process and re-encode the file. 
     /// </summary>
     public enum ProcessWhen {
         /// <summary>
@@ -111,7 +109,7 @@ namespace ImageResizer {
         Fill
     }
     /// <summary>
-    /// How do deal with aspect ratio differences between the requested size and the original image's size.
+    /// How to resolve aspect ratio differences between the requested size and the original image's size.
     /// </summary>
     public enum FitMode {
         /// <summary>
@@ -142,6 +140,7 @@ namespace ImageResizer {
        
 
     }
+    [Obsolete("Obsolete. Use Mode=Crop to specify automatic cropping. Set CropTopLeft and CropTopRight to specify custom coordinates.")]
     public enum CropMode {
         /// <summary>
         /// Default. No cropping - uses letterboxing if strecth=proportionally and both width and height are specified.
@@ -150,6 +149,7 @@ namespace ImageResizer {
         /// <summary>
         /// [Deprecated] Use Mode=Crop. Minimally crops to preserve aspect ratio if stretch=proportionally.
         /// </summary>
+        [Obsolete("Use Mode=Crop instead.")]
         Auto,
         /// <summary>
         /// Crops using the custom crop rectangle. Letterboxes if stretch=proportionally and both widht and height are specified.
@@ -200,49 +200,49 @@ namespace ImageResizer {
     /// </summary>
     [Flags]
     public enum AnchorLocation {
-        // Summary:
-        //     Content is vertically aligned at the top, and horizontally aligned on the
-        //     left.
+        /// <summary>
+        /// Content is vertically aligned at the top, and horizontally aligned on the left.
+        /// </summary>
         TopLeft = 1,
-        //
-        // Summary:
-        //     Content is vertically aligned at the top, and horizontally aligned at the
-        //     center.
+
+        /// <summary>
+        /// Content is vertically aligned at the top, and horizontally aligned at the center.
+        /// </summary>
         TopCenter = 2,
-        //
-        // Summary:
-        //     Content is vertically aligned at the top, and horizontally aligned on the
-        //     right.
+
+        /// <summary>
+        /// Content is vertically aligned at the top, and horizontally aligned on the right.
+        /// </summary>
         TopRight = 4,
-        //
-        // Summary:
-        //     Content is vertically aligned in the middle, and horizontally aligned on
-        //     the left.
+        
+        /// <summary>
+        /// Content is vertically aligned in the middle, and horizontally aligned onthe left.
+        /// </summary>
         MiddleLeft = 16,
-        //
-        // Summary:
-        //     Content is vertically aligned in the middle, and horizontally aligned at
-        //     the center.
+        
+        /// <summary>
+        /// Content is vertically aligned in the middle, and horizontally aligned at the center.
+        /// </summary>
         MiddleCenter = 32,
-        //
-        // Summary:
-        //     Content is vertically aligned in the middle, and horizontally aligned on
-        //     the right.
+
+        /// <summary>
+        /// Content is vertically aligned in the middle, and horizontally aligned on  the right.
+        /// </summary>
         MiddleRight = 64,
-        //
-        // Summary:
-        //     Content is vertically aligned at the bottom, and horizontally aligned on
-        //     the left.
+
+        /// <summary>
+        /// Content is vertically aligned at the bottom, and horizontally aligned on the left.
+        /// </summary>
         BottomLeft = 256,
-        //
-        // Summary:
-        //     Content is vertically aligned at the bottom, and horizontally aligned at
-        //     the center.
+        
+        /// <summary>
+        /// Content is vertically aligned at the bottom, and horizontally aligned at  the center.
+        /// </summary>
         BottomCenter = 512,
-        //
-        // Summary:
-        //     Content is vertically aligned at the bottom, and horizontally aligned on
-        //     the right.
+
+        /// <summary>
+        /// Content is vertically aligned at the bottom, and horizontally aligned on the right.
+        /// </summary>
         BottomRight = 1024,
     }
 
@@ -261,6 +261,10 @@ namespace ImageResizer {
         NTSC = 1,
         RY = 2,
         BT709= 3,
+
+        /// <summary>
+        /// Red, green, and blue are averaged to get the grayscale image. Usually produces poor results compared to other algorithms.
+        /// </summary>
         Flat = 4
     }
     /// <summary>
