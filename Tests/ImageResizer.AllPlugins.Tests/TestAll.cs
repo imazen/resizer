@@ -81,7 +81,7 @@ namespace ImageResizer.AllPlugins.Tests {
             data.Add("ignoreicc", new string[] { "true", "false" });
             data.Add("angle", new string[] { "0", "361", "15", "180" });
             data.Add("rotate", new string[] { "0", "90", "270", "400", "15", "45" });
-            string[] colors =  new string[] {"", "black", "white", Util.Utils.writeColor(Color.FromArgb(25, Color.Green)), Util.Utils.writeColor(Color.Transparent) };
+            string[] colors = new string[] { "", "black", "white", Util.ParseUtils.SerializeColor(Color.FromArgb(25, Color.Green)), Util.ParseUtils.SerializeColor(Color.Transparent) };
             data.Add("color1", colors);
             data.Add("color2", colors);
             data.Add("page",new string[]{"-10","1","5"});

@@ -49,8 +49,8 @@ namespace ImageResizer.Plugins.RedEye {
 
         
         protected override RequestedAction Render(ImageState s) {
-            bool detecteyes = Utils.getBool(s.settings, "r.detecteyes", false);
-            bool getlayout = Utils.getBool(s.settings, "r.getlayout", false);
+            bool detecteyes = s.settings.Get<bool>( "r.detecteyes", false);
+            bool getlayout = s.settings.Get<bool>( "r.getlayout", false);
             if (!detecteyes && !getlayout) return RequestedAction.None;
 
 
@@ -94,8 +94,8 @@ namespace ImageResizer.Plugins.RedEye {
         /// <param name="context"></param>
         /// <param name="e"></param>
         void Pipeline_PreHandleImage(System.Web.IHttpModule sender, System.Web.HttpContext context, Caching.IResponseArgs e) {
-            bool detecteyes = Utils.getBool(e.RewrittenQuerystring, "r.detecteyes", false);
-            bool getlayout = Utils.getBool(e.RewrittenQuerystring, "r.getlayout", false);
+            bool detecteyes = e.RewrittenQuerystring.Get<bool>( "r.detecteyes", false);
+            bool getlayout = e.RewrittenQuerystring.Get<bool>( "r.getlayout", false);
             if (!detecteyes && !getlayout) return;
 
             ResponseArgs ra = e as ResponseArgs;

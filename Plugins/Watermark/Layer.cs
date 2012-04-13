@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using ImageResizer.Resizing;
 using System.Drawing;
 using ImageResizer.Util;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.Watermark {
     public class Layer {
@@ -20,9 +21,9 @@ namespace ImageResizer.Plugins.Watermark {
             Width = DistanceUnit.TryParse(settings["width"]);
             Height = DistanceUnit.TryParse(settings["height"]);
             if (!string.IsNullOrEmpty(settings["relativeTo"])) RelativeTo = settings["relativeTo"];
-            DrawAs = Utils.parseEnum<LayerPlacement>(settings["drawAs"], DrawAs);
-            Align = Utils.parseEnum<ContentAlignment>(settings["align"], Align);
-            Fill = Utils.getBool(settings, "fill", false);
+            DrawAs = settings.Get<LayerPlacement>("drawAs", DrawAs);
+            Align = settings.Get<ContentAlignment>("align", Align);
+            Fill = settings.Get<bool>("fill", false);
         }
 
         public virtual void CopyTo(Layer other) {

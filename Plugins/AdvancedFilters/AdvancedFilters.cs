@@ -9,6 +9,8 @@ using AForge;
 using System.Globalization;
 using ImageResizer.Util;
 using System.Drawing;
+using ImageResizer.ExtensionMethods;
+
 namespace ImageResizer.Plugins.AdvancedFilters {
     public class AdvancedFilters:BuilderExtension, IPlugin, IQuerystringPlugin {
         public AdvancedFilters() {
@@ -36,7 +38,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             if (string.IsNullOrEmpty(str) && key2 != null) str = s.settings[key2];
             if (string.IsNullOrEmpty(str)) return -1;
             double d;
-            if (double.TryParse(str, Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo, out d) && d > 0) {
+            if (double.TryParse(str, ParseUtils.FloatingPointStyle, NumberFormatInfo.InvariantInfo, out d) && d > 0) {
                 double factor = Util.PolygonMath.GetShortestPair(s.layout["image"]) / units;
 
                 return (int)Math.Round(factor * d);
@@ -53,9 +55,9 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             int i = 0;
 
             //If radiusunits is specified, use that code path.
-            double units = -1;
-            str = s.settings["a.radiusunits"];
-            if (!string.IsNullOrEmpty(str) && double.TryParse(str, Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo, out units) && units > 0) {
+            double units = s.settings.Get<double>("a.radiusunits",-1);
+           
+            if ( units > 0) {
 
                 i = GetRadius(s, "blur", "a.blur", units);
                 if (i > 0) new GaussianBlur(1.4, i).ApplyInPlace(s.destBitmap);
@@ -149,17 +151,11 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             //}
             
 
-            str = s.settings["a.contrast"];
-            string strB = s.settings["a.brightness"];
-            string strS = s.settings["a.saturation"];
-            
+            float contrast = s.settings.Get<float>("a.contrast", 0);
+            float brightness = s.settings.Get<float>("a.brightness", 0);
+            float saturation = s.settings.Get<float>("a.saturation", 0);
 
-            if (!string.IsNullOrEmpty(str) || !string.IsNullOrEmpty(strB) || !string.IsNullOrEmpty(strS)) {
-                float contrast, brightness, saturation;
-                if (string.IsNullOrEmpty(str) || !float.TryParse(str, Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo, out contrast)) contrast = 0;
-                if (string.IsNullOrEmpty(strB) || !float.TryParse(strB, Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo, out brightness)) brightness = 0;
-                if (string.IsNullOrEmpty(strS) || !float.TryParse(strS, Utils.floatingPointStyle, NumberFormatInfo.InvariantInfo, out saturation)) saturation = 0;
-
+            if (contrast != 0 || brightness != 0 || saturation != 0){
                 HSLLinear adjust = new HSLLinear();
                 AdjustContrastBrightnessSaturation(adjust, contrast, brightness, saturation, "true".Equals(s.settings["a.truncate"]));
                 adjust.ApplyInPlace(s.destBitmap);

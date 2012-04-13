@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Drawing;
 using System.Windows;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.WpfBuilder
 {
@@ -147,7 +148,7 @@ namespace ImageResizer.Plugins.WpfBuilder
                     WpfEncoderPlugin wpfEncoder = new WpfEncoderPlugin(settings, job.SourcePathData);
 
 
-                    RenderTargetBitmap final = new RenderTargetBitmap(imageState.finalSize.Width, imageState.finalSize.Height, Util.Utils.getInt(settings, "dpi", 96), Util.Utils.getInt(settings, "dpi", 96), PixelFormats.Default);
+                    RenderTargetBitmap final = new RenderTargetBitmap(imageState.finalSize.Width, imageState.finalSize.Height, settings.Get<int>("dpi", 96), settings.Get<int>("dpi", 96), PixelFormats.Default);
                     DrawingVisual dv = new DrawingVisual();
 
                     using (DrawingContext dc = dv.RenderOpen())

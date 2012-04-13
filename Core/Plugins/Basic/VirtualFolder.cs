@@ -12,6 +12,7 @@ using System.Collections.Specialized;
 using System.Security;
 using ImageResizer.Configuration.Issues;
 using ImageResizer.Util;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
@@ -35,7 +36,7 @@ namespace ImageResizer.Plugins.Basic {
             : base() {
             this.VirtualPath = args["virtualPath"];
             this.PhysicalPath = args["physicalPath"];
-            this.RegisterAsVpp = Util.Utils.getBool(args, "vpp", this.RegisterAsVpp);
+            this.RegisterAsVpp = args.Get<bool>( "vpp", this.RegisterAsVpp);
         }
 
 

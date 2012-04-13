@@ -5,6 +5,7 @@ using ImageResizer.Configuration.Xml;
 using ImageResizer.Configuration;
 using ImageResizer.Configuration.Issues;
 using System.Collections.Specialized;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.Basic {
     public class Presets:IPlugin,IQuerystringPlugin, IIssueProvider, ISettingsModifier {
@@ -127,7 +128,7 @@ namespace ImageResizer.Plugins.Basic {
 
         protected void ParseXml(Node n, Config conf) {
             if (n == null ) return;
-            OnlyAllowPresets = Util.Utils.getBool(n.Attrs, "onlyAllowPresets", OnlyAllowPresets);
+            OnlyAllowPresets = n.Attrs.Get<bool>( "onlyAllowPresets", OnlyAllowPresets);
             if (n.Children == null) return;
             foreach (Node c in n.Children) {
                 string name = c.Attrs["name"];

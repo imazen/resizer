@@ -7,6 +7,7 @@ using ImageResizer.Util;
 using System.Text.RegularExpressions;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.Watermark {
     public class TextLayer:Layer {
@@ -15,17 +16,17 @@ namespace ImageResizer.Plugins.Watermark {
         public TextLayer(NameValueCollection attrs)
             : base(attrs) {
                 Text = attrs["text"];
-                Vertical = "true".Equals(attrs["vertical"], StringComparison.OrdinalIgnoreCase);
-                TextColor = Utils.parseColor(attrs["color"], TextColor);
-                OutlineColor = Utils.parseColor(attrs["outlineColor"], OutlineColor);
-                GlowColor = Utils.parseColor(attrs["glowColor"], GlowColor);
+                Vertical = attrs.Get<bool>("vertical",false);
+                TextColor = ParseUtils.ParseColor(attrs["color"], TextColor);
+                OutlineColor = ParseUtils.ParseColor(attrs["outlineColor"], OutlineColor);
+                GlowColor = ParseUtils.ParseColor(attrs["glowColor"], GlowColor);
                 Font = attrs["font"];
-                Angle = Utils.getDouble(attrs, "angle", Angle);
-                FontSize = Utils.getInt(attrs, "fontSize", FontSize);
-                Style = Utils.parseEnum<FontStyle>(attrs["style"], this.Style);
-                OutlineWidth = Utils.getInt(attrs, "outlineWidth", OutlineWidth);
-                GlowWidth = Utils.getInt(attrs, "glowWidth", GlowWidth);
-                Rendering = Utils.parseEnum<TextRenderingHint>(attrs["rendering"], this.Rendering);
+                Angle = attrs.Get<double>("angle", Angle);
+                FontSize = attrs.Get<int>("fontSize", FontSize);
+                Style = attrs.Get<FontStyle>("style", this.Style);
+                OutlineWidth = attrs.Get<int>("outlineWidth", OutlineWidth);
+                GlowWidth = attrs.Get<int>("glowWidth", GlowWidth);
+                Rendering = attrs.Get<TextRenderingHint>("rendering", this.Rendering);
         }
 
 
