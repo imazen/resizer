@@ -292,7 +292,7 @@ namespace ImageResizer {
                 return BoxPadding.Parse(this["paddingWidth"], BoxPadding.Empty);
             }
             set {
-                this.Set<BoxPadding>("paddingWidth",value);
+                this.SetAsString<BoxPadding>("paddingWidth", value);
             }
         }
         /// <summary>
@@ -303,7 +303,7 @@ namespace ImageResizer {
                 return BoxPadding.Parse(this["margin"], BoxPadding.Empty);
             }
             set {
-                this.Set<BoxPadding>("margin", value);
+                this.SetAsString<BoxPadding>("margin", value);
             }
         }
         /// <summary>
@@ -321,7 +321,7 @@ namespace ImageResizer {
                 return BoxPadding.Parse(this["borderWidth"], BoxPadding.Empty);
             }
             set {
-                this.Set<BoxPadding>("borderWidth", value);
+                this.SetAsString<BoxPadding>("borderWidth", value);
             }
         }
 
