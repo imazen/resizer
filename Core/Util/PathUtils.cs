@@ -6,6 +6,7 @@ using System.Web;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Util {
     public class PathUtils {
@@ -26,19 +27,24 @@ namespace ImageResizer.Util {
                 return HostingEnvironment.ApplicationPhysicalPath != null ? HostingEnvironment.ApplicationPhysicalPath : Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
             }
         }
+
+        private static readonly char[] QueryOrFragment = new char[] { '?', '#' };
+        private static readonly char[] SpaceOrSlash = new char[] { ' ', '/', '\\' };
         /// <summary>
+        /// Should be called SetFullExtension.
         /// Sets the file extension of the specified path to the specified value, returning the result.
         /// If an extension has multiple parts, it will replace all of them.
         /// Leading dots will be stripped from 'newExtension' and re-addd as required.
+        /// The querystring and fragment is maintained as-is. Semicolon syntax not supported.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="newExtension"></param>
         /// <returns></returns>
         public static string SetExtension(string path, string newExtension) {
-            int query = path.IndexOf('?');
+            int query = path.IndexOfAny(QueryOrFragment);
             if (query < 0) query = path.Length;
             //Finds the first character that could possibly be part of the extension (before the query)
-            int firstPossibleExtensionChar = path.LastIndexOfAny(new char[] { ' ', '/', '\\' }, query - 1) + 1;
+            int firstPossibleExtensionChar = path.LastIndexOfAny(SpaceOrSlash, query - 1) + 1;
             int extensionStarts = path.IndexOf('.', firstPossibleExtensionChar, query - firstPossibleExtensionChar);
             if (extensionStarts < 0) extensionStarts = query;
 
@@ -48,14 +54,15 @@ namespace ImageResizer.Util {
 
         /// <summary>
         /// Removes all extension segments from the filename or URL, leaving the querystring intact. I.e, image.jpg.bmp.tiff?hi would be image?hi
+        /// The querystring and fragment is maintained as-is. Semicolon syntax not supported.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
         public static string RemoveFullExtension(string path) {
-            int query = path.IndexOf('?');
+            int query = path.IndexOfAny(QueryOrFragment);
             if (query < 0) query = path.Length;
             //Finds the first character that could possibly be part of the extension (before the query)
-            int firstPossibleExtensionChar = path.LastIndexOfAny(new char[] { ' ', '/', '\\' }, query - 1) + 1;
+            int firstPossibleExtensionChar = path.LastIndexOfAny(SpaceOrSlash, query - 1) + 1;
             int extensionStarts = path.IndexOf('.', firstPossibleExtensionChar, query - firstPossibleExtensionChar);
             if (extensionStarts < 0) extensionStarts = query;
 
@@ -66,14 +73,15 @@ namespace ImageResizer.Util {
         /// <summary>
         /// Removes the extension from the filename or URL, leaving the querystring intact, where the extension is only the last extension segment.
         /// I.e, image.jpg.bmp.tiff?hi would be image.jpg.bmp?hi after this call.
+        /// The querystring and fragment is maintained as-is. Semicolon syntax not supported.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
         public static string RemoveExtension(string path) {
-            int query = path.IndexOf('?');
+            int query = path.IndexOfAny(QueryOrFragment);
             if (query < 0) query = path.Length;
             //Finds the first character that could possibly be part of the extension (before the query)
-            int firstPossibleExtensionChar = path.LastIndexOfAny(new char[] { ' ', '/', '\\' }, query - 1) + 1;
+            int firstPossibleExtensionChar = path.LastIndexOfAny(SpaceOrSlash, query - 1) + 1;
             int extensionStarts = path.LastIndexOf('.', query - 1, query - firstPossibleExtensionChar);
             if (extensionStarts < 0) extensionStarts = query;
 
@@ -83,27 +91,28 @@ namespace ImageResizer.Util {
 
         /// <summary>
         /// Adds the specified extension to path, returning the result. Multiple calls will result in "path.ext.ext.ext.ext".
-        /// maintains the querystring as-is.
+        /// The querystring and fragment is maintained as-is. Semicolon syntax not supported.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="newExtension"></param>
         /// <returns></returns>
         public static string AddExtension(string path, string newExtension) {
-            int query = path.IndexOf('?');
+            int query = path.IndexOfAny(QueryOrFragment);
             if (query < 0) query = path.Length;
             return path.Substring(0, query) + "." + newExtension.TrimStart('.') + path.Substring(query);
         }
         /// <summary>
         /// Will return the full extension, like ".jpg.ashx", not just the last bit. 
-        /// Ignores the querystring part. Excludes extensions containing spaces or slashes.
+        ///  Excludes extensions containing spaces or slashes.
+        ///  The querystring and fragment is ignored. Semicolon syntax not supported.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
         public static string GetFullExtension(string path) {
-            int query = path.IndexOf('?');
+            int query = path.IndexOfAny(QueryOrFragment);
             if (query < 0) query = path.Length;
             //Finds the first character that could possibly be part of the extension (before the query)
-            int firstPossibleExtensionChar = path.LastIndexOfAny(new char[] { ' ', '/', '\\' }, query -1) + 1;
+            int firstPossibleExtensionChar = path.LastIndexOfAny(SpaceOrSlash, query - 1) + 1;
             int extensionStarts = path.IndexOf('.', firstPossibleExtensionChar, query - firstPossibleExtensionChar);
             if (extensionStarts < 0) extensionStarts = query;
 
@@ -111,16 +120,17 @@ namespace ImageResizer.Util {
 
         }
         /// <summary>
-        /// Ignores the querystring. Grabs the last segment of the filename extension. Returns an empty string if there is no extension, or if the extension contains a space.
+        /// Grabs the last segment of the filename extension. Returns an empty string if there is no extension, or if the extension contains a space.
         /// Includes the leading '.'
+        /// The querystring and fragment is ignored. Semicolon syntax not supported.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
         public static string GetExtension(string path) {
-            int query = path.IndexOf('?');
+            int query = path.IndexOfAny(QueryOrFragment);
             if (query < 0) query = path.Length;
             //Finds the first character that could possibly be part of the extension (before the query)
-            int firstPossibleExtensionChar = path.LastIndexOfAny(new char[] { ' ', '/', '\\' }, query - 1) + 1;
+            int firstPossibleExtensionChar = path.LastIndexOfAny(SpaceOrSlash, query - 1) + 1;
             int extensionStarts = path.LastIndexOf('.', query -1, query - firstPossibleExtensionChar );
             if (extensionStarts < 0) extensionStarts = query;
 
@@ -128,7 +138,7 @@ namespace ImageResizer.Util {
 
         }
         /// <summary>
-        /// 
+        /// Resolves app-relative paths to virtual paths. Does nothing with virtual or relative paths.
         /// </summary>
         /// <param name="virtualPath"></param>
         /// <returns></returns>
@@ -154,20 +164,50 @@ namespace ImageResizer.Util {
 
 
         /// <summary>
-        /// Joins the path and querystring. If the path already contains a querystring, they are 'append joined' with the correct character.
+        /// Joins the path and querystring. If the path already contains a querystring, they are 'append joined' with the correct character. Fragment is maintained as-is. 
+        /// Does not support the semicolon syntax. 
         /// </summary>
         /// <param name="virtualPath"></param>
         /// <param name="querystring"></param>
         /// <returns></returns>
         public static string AddQueryString(string virtualPath, string querystring) {
+            //Separate the fragment if it's present, and restore it later
+            int fragment = virtualPath.IndexOf('#');
+            string suffix = "";
+            if (fragment < 0) fragment = virtualPath.Length;
+            else {
+                suffix = virtualPath.Substring(fragment);
+                virtualPath = virtualPath.Substring(0, fragment);
+            }
+
             if (virtualPath.IndexOf('?') > -1) virtualPath = virtualPath.TrimEnd('&') + '&';
             else virtualPath += '?';
 
-            return virtualPath + querystring.TrimStart('&', '?');
+            return virtualPath + querystring.TrimStart('&', '?') + suffix;
         }
 
         /// <summary>
-        /// Overwrites exisisting querystring values in 'path' with the values in 'newQuerystring'. Doesn't support ; querystrings
+        /// Removes the query string from the specifed path. If the path is only a querystring, an empty string is returned. Does not support the semicolon syntax.  Fragment is maintained as-is.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string RemoveQueryString(string path) {
+            //Separate the fragment if it's present, and restore it later
+            int fragment = path.IndexOf('#');
+            string suffix = "";
+            if (fragment < 0) fragment = path.Length;
+            else {
+                suffix = path.Substring(fragment);
+                path = path.Substring(0, fragment);
+            }
+
+            int delimiter = path.IndexOf('?');
+            return delimiter > -1 ? path.Substring(0, delimiter) + suffix : path;
+        }
+
+
+        /// <summary>
+        /// Overwrites exisisting querystring values in 'path' with the values in 'newQuerystring'. Does not support the semicolon syntax. 
         /// </summary>
         /// <param name="path"></param>
         /// <param name="newQuerystring"></param>
@@ -181,7 +221,7 @@ namespace ImageResizer.Util {
             return AddQueryString(RemoveQueryString(path), BuildQueryString(oldQuery));
         }
         /// <summary>
-        /// Adds the querystring values in 'newQuerystring' to the querystring in Path, but does not overwrite values. Doesn't support ; querystrings
+        /// Adds the querystring values in 'newQuerystring' to the querystring in Path, but does not overwrite values. Does not support the semicolon syntax. 
         /// </summary>
         /// <param name="path"></param>
         /// <param name="newQuerystring"></param>
@@ -212,22 +252,9 @@ namespace ImageResizer.Util {
 		/// <param name="urlEncode"></param>
         /// <returns></returns>
         public static string BuildQueryString(NameValueCollection QueryString, bool urlEncode) {
-            StringBuilder path = new StringBuilder();
-            if (QueryString.Count > 0) {
-                path.Append('?');
-                foreach (string key in QueryString.Keys) {
-                    if (key == null) continue; //Skip null keys
-                    string value = QueryString[key];
-
-                    path.Append(urlEncode ? HttpUtility.UrlEncode(key) : key);
-                    path.Append('=');
-                    path.Append(urlEncode ? HttpUtility.UrlEncode(value) : value);
-                    path.Append('&');
-                }
-                if (path[path.Length - 1] == '&') path.Remove(path.Length - 1, 1);
-            }
-            return path.ToString();
+            return BuildQueryString(QueryString, urlEncode, true, '?', '&', '=');
         }
+
 
         /// <summary>
         /// Returns a string querystring in the form ";key=value;key=value".
@@ -237,37 +264,43 @@ namespace ImageResizer.Util {
         /// <param name="urlEncode"></param>
         /// <returns></returns>
         public static string BuildSemicolonQueryString(NameValueCollection QueryString, bool urlEncode) {
-            StringBuilder path = new StringBuilder();
-            if (QueryString.Count > 0) {
-                path.Append(';');
-                foreach (string key in QueryString.Keys) {
-                    if (key == null) continue; //Skip null keys
-                    string value = QueryString[key];
+            return BuildQueryString(QueryString, urlEncode, true, ';', ';', '=');
+        }
+        /// <summary>
+        /// Build a customized querystring from a NameValueCollection
+        /// </summary>
+        /// <param name="QueryString"></param>
+        /// <param name="urlEncode">True to URL encode all values</param>
+        /// <param name="skipNullValues">If true, null-valued keys will be skipped</param>
+        /// <param name="firstSeparator">Usually ? or ; </param>
+        /// <param name="laterSeparators">Usually &amp; or ;</param>
+        /// <param name="equals">Always =</param>
+        /// <returns></returns>
+        public static string BuildQueryString(NameValueCollection QueryString, bool urlEncode, bool skipNullValues = true, char firstSeparator = '?', char laterSeparators = '&', char equals = '=') {
+            if (QueryString.Count < 1) return ""; //No keys? return empty string.
 
-                    path.Append(urlEncode ? HttpUtility.UrlEncode(key) : key);
-                    path.Append('=');
-                    path.Append(urlEncode ? HttpUtility.UrlEncode(value) : value);
-                    path.Append(';');
-                }
-                if (path[path.Length - 1] == ';') path.Remove(path.Length - 1, 1);
+            StringBuilder path = new StringBuilder();
+            path.Append(firstSeparator);
+            foreach (string key in QueryString.Keys) {
+                if (key == null) continue; //Skip null keys
+                string value = QueryString[key];
+                if (skipNullValues && value == null) continue; //Optionally skip null values
+                path.Append(urlEncode ? HttpUtility.UrlEncode(key) : key);
+                path.Append(equals);
+                path.Append(urlEncode ? HttpUtility.UrlEncode(value) : value);
+                path.Append(laterSeparators);
             }
+            if (path[path.Length - 1] == laterSeparators) path.Remove(path.Length - 1, 1);
+
             return path.ToString();
         }
 
-        /// <summary>
-        /// Removes the query string from the specifed path. If the path is only a querystring, an empty string is returned.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static string RemoveQueryString(string path) {
-            int delimiter = path.IndexOf('?');
-            return delimiter > -1 ? path.Substring(0, delimiter) : path;
-        }
+
 
        
 
         /// <summary>
-        /// Like ParseQueryString, but permits the leading '?' to be omitted.
+        /// Like ParseQueryString, but permits the leading '?' to be omitted. Does not support the semicolon syntax.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -282,7 +315,17 @@ namespace ImageResizer.Util {
         /// <param name="path"></param>
         /// <returns></returns>
         public static NameValueCollection ParseQueryStringFriendlyAllowSemicolons(string path) {
-            if (path.IndexOf('?') < 0 && path.IndexOf(';') < 0 && path.IndexOf('=') >= 0) path = '?' + path;
+            //Delete the fragment before we start
+            int fragment = path.IndexOf('#');
+            if (fragment > -1) path = path.Substring(0, fragment);
+
+            int eq = path.IndexOf('=');
+            int quest = path.IndexOf('?');
+            int semi = path.IndexOf(';');
+            if (eq >= 0 && //We have equals, which indicates a query
+                quest < 0 && //But no question mark!
+                (eq < semi || semi < 0)) //An no semicolon, or else a semicolon *after* the first equals.
+                path = '?' + path;
             return ParseQueryString(path,true);
         }
 
@@ -307,11 +350,11 @@ namespace ImageResizer.Util {
         /// <param name="allowSemicolons"></param>
         /// <returns></returns>
         public static NameValueCollection ParseQueryString(string path, bool allowSemicolons) {
-            string s;
-            return ParseQueryString(path, allowSemicolons, out s);
+            string s, f;
+            return ParseQueryString(path, allowSemicolons, out s,out f);
         }
 
-                    /// <summary>
+        /// <summary>
         /// Parses the querystring from the given path into a NameValueCollection. 
         /// accepts "file?key=value" and "?key=value&amp;key2=value2" formats. (no path is required)
         /// UrlDecodes keys and values. Does not enforce correct syntax, I.E. '?key=value?key2=value2' is allowed. However, '&key=value?key2=value' will only get key2 parsed. 
@@ -323,8 +366,16 @@ namespace ImageResizer.Util {
         /// <param name="allowSemicolons"></param>
         /// <param name="beforeQuery">Returns the portion of the 'path' before the querystring. May include the scheme, server, port, path and path info, depending upon what 'path' contained.</param>
         /// <returns></returns>
-        public static NameValueCollection ParseQueryString(string path, bool allowSemicolons, out string beforeQuery) {
-            NameValueCollection c = new NameValueCollection();
+        public static NameValueCollection ParseQueryString(string path, bool allowSemicolons, out string beforeQuery, out string fragment) {
+            //Separate the fragment if it's present, and restore it later
+            int frag = path.IndexOf('#');
+            if (frag < 0) fragment = "";
+            else {
+                fragment = path.Substring(frag);
+                path = path.Substring(0, frag);
+            }
+
+
             int firstdelimiter = path.IndexOf('?');
             if (allowSemicolons) {
                 //Use the index if whichever is first, and preset
@@ -334,32 +385,44 @@ namespace ImageResizer.Util {
             if (firstdelimiter < 0 || firstdelimiter >= path.Length) {
                 //No query string detected
                 beforeQuery = path;
-                return c;
+                return new NameValueCollection();
             } else {
                 beforeQuery = path.Substring(0, firstdelimiter);
             }
 
-            string querystring = path.Substring(firstdelimiter, path.Length - firstdelimiter);
-
-            string[] pairs = querystring.Split(allowSemicolons ? new char[] { '?', '&' } : new char[] { '?', '&', ';' }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (string s in pairs) {
-                string[] namevalue = s.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
-                if (namevalue.Length == 2) {
-                    c[HttpUtility.UrlDecode(namevalue[0])] =
-                        HttpUtility.UrlDecode(namevalue[1]);
-                } else {
-                    //No value, so we set a blank value
-                    //Setting a null value would be confusing, as that is how we determine
-                    //whether a certain paramater exists
-                    c[HttpUtility.UrlDecode(namevalue[0])] = "";
-
-                }
-            }
-
-            return c;
-
+            return ParseQueryOnly(path.Substring(firstdelimiter, path.Length - firstdelimiter),allowSemicolons);
         }
 
+        /// <summary>
+        /// Parses a querystring into a name/value collection. The given string cannot include path or fragment information - it must be *just* the querystring.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="allowSemicolons"></param>
+        /// <param name="urlDecode"></param>
+        /// <returns></returns>
+        public static NameValueCollection ParseQueryOnly(string query, bool allowSemicolons = true, bool urlDecode = true) {
+            string[] pairs = query.Split(allowSemicolons ? new char[] { '?', '&' } : new char[] { '?', '&', ';' }, StringSplitOptions.RemoveEmptyEntries);
+            NameValueCollection c = new NameValueCollection();
+            foreach (string s in pairs) {
+                string[] namevalue = s.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+                if (namevalue.Length > 2) {
+                    //Handle &key=value=value and &key===value=value -> key : "value=value"
+                    string value = s.Substring(s.IndexOf('=')).TrimStart('=');
+                    c[urlDecode ? HttpUtility.UrlDecode(namevalue[0]) : namevalue[0]] =
+                        urlDecode ? HttpUtility.UrlDecode(value) : value;
+                } else if (namevalue.Length == 2) {
+                    //Handle key=value (normal)
+                    c[urlDecode ? HttpUtility.UrlDecode(namevalue[0]) : namevalue[0]] =
+                        urlDecode ? HttpUtility.UrlDecode(namevalue[1]) : namevalue[1];
+                } else if (namevalue.Length == 1){
+                    //Hanlde &key=&key2= or &key&key2 -> key: "", key2: ""
+                    //Setting a null value would be confusing, as that is how we determine
+                    //whether a certain paramater exists
+                    c[urlDecode ? HttpUtility.UrlDecode(namevalue[0]) : namevalue[0]] = "";
+                }
+            }
+            return c;
+        }
 
         /// <summary>
         /// Converts aribtrary bytes to a URL-safe version of base64 (no = padding, with - instead of + and _ instead of /)
@@ -505,13 +568,14 @@ namespace ImageResizer.Util {
         /// <returns></returns>
         public delegate string VariableResolverCallback(string variableName);
 
-   
+        /// <summary>
+        /// Returns a new collection containing only the specified keys from the old one
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="keepKeys"></param>
+        /// <returns></returns>
         public static NameValueCollection FilterQueryString(ResizeSettings query, params string[] keepKeys) {
-            NameValueCollection c = new NameValueCollection();
-            foreach (string s in keepKeys) 
-                if (query[s] != null) c[s] = query[s];
-            
-            return c;
+            return query.Keep(keepKeys);
         }
     }
 }
