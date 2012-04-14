@@ -24,7 +24,7 @@ If you purchased a [Professional](/licenses/pro) or [Enterprise](/licenses/enter
 
 ##License Terms
 
-Copyright (c) 2011 Nathanael Jones
+Copyright (c) 2011-2012 Nathanael Jones
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
