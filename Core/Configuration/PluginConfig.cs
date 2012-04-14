@@ -26,6 +26,7 @@ namespace ImageResizer.Configuration {
 
 
         protected NativeDependencyManager ndeps = new NativeDependencyManager();
+
         protected Config c;
         /// <summary>
         /// Creates a new plugin config section, attached to the specified parent
@@ -88,7 +89,7 @@ namespace ImageResizer.Configuration {
             }
         }
         /// <summary>
-        /// Returns the subset of AllPlugins which implement the specified type or interface
+        /// Returns the subset of installed plugins which implement the specified type or interface
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -97,6 +98,19 @@ namespace ImageResizer.Configuration {
             foreach (IPlugin p in AllPlugins)
                 if (type.IsAssignableFrom(p.GetType())) //Like instance of. Can be a subclass
                     results.Add(p); 
+            return results;
+        }
+        /// <summary>
+        /// Returns all registered instances of the specified plugins
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public IList<T> GetAll<T>() {
+            List<T> results = new List<T>();
+            Type t = typeof(T);
+            foreach (IPlugin p in AllPlugins)
+                if (t.IsAssignableFrom(p.GetType())) //Like instance of. Can be a subclass
+                    results.Add((T)p);
             return results;
         }
 
@@ -113,18 +127,14 @@ namespace ImageResizer.Configuration {
         }
 
         /// <summary>
-        /// Returns all registered instances of the specified plugins
+        /// Returns true if 1 or more instances of the type are registered.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public IList<T> GetAll<T>() {
-            List<T> results = new List<T>();
-            Type t = typeof(T);
-            foreach (IPlugin p in AllPlugins)
-                if (t.IsAssignableFrom(p.GetType())) //Like instance of. Can be a subclass
-                    results.Add((T)p);
-            return results;
+        public bool Has<T>() {
+            return Comparer<T>.Default.Compare(Get<T>(), default(T)) != 0;
         }
+
 
         /// <summary>
         /// Returns the first registerd instance of the specified plugin. For IMultiInstancePlugins, use GetAll()
@@ -139,17 +149,26 @@ namespace ImageResizer.Configuration {
             return default(T);
         }
 
+        /// <summary>
+        /// Returns the first registered instance of the specified plugin, or creates a new instance if the plugin isn't installed. 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetOrInstall<T>() where T : IPlugin, new() {
+            T instance = Get<T>();
+            if (instance != null) return instance;
 
-        public T GetOrInstall<T>() where T : IPlugin {
-            Type t = typeof(T);
-            ConstructorInfo ci = t.GetConstructor(System.Type.EmptyTypes);
-            if (ci == null) {
-                throw new ArgumentException("The specified plugin lacks a default constructor. Create an instance and pass it to GetOrInstall as a fallback instance.");
-            } else {
-               return GetOrInstall<T>((T)Activator.CreateInstance(t, false));
-            }
+            new T().Install(this.c);
+
+            return Get<T>();
         }
 
+        /// <summary>
+        /// Returns the first registered instance of the specified plugin, or installs the given instance instead, then re-tries the query
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="newInstance"></param>
+        /// <returns></returns>
         public T GetOrInstall<T>(T newInstance) where T : IPlugin {
             T instance = Get<T>();
             if (instance != null) return instance;
@@ -160,14 +179,6 @@ namespace ImageResizer.Configuration {
             return Get<T>();
         }
 
-        /// <summary>
-        /// Returns true if 1 or more instances of the type are registered.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public bool Has<T>() {
-            return Comparer<T>.Default.Compare(Get<T>(), default(T)) != 0;
-        }
 
         /// <summary>
         /// Installs the specified plugin, returning the plugin instance. 
