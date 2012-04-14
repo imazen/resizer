@@ -87,7 +87,7 @@ namespace ImageResizer.Plugins.Encrypted {
             if (!virtualPathAndQuery.StartsWith("~/")) throw new ArgumentException();
 
 
-            return VirtualPrefix.TrimEnd('/') + '/' + Encrypt(virtualPathAndQuery.Substring(1).TrimStart('/'));
+            return VirtualPrefix.TrimEnd('/') + '/' + Encrypt(virtualPathAndQuery.Substring(1).TrimStart('/')) + ".ashx";
 
         }
 
@@ -107,6 +107,8 @@ namespace ImageResizer.Plugins.Encrypted {
 
             if (parts.Length != 2) return; //There must be exactly two parts
 
+            parts[1] = PathUtils.RemoveFullExtension(parts[1]); //Remove the .ashx or .jpg.ashx or whatever it is.
+
             byte[] iv = PathUtils.FromBase64UToBytes(parts[0]);
             if (iv.Length != 16) return; //16-byte IV required
             byte[] data = PathUtils.FromBase64UToBytes(parts[1]);
@@ -114,9 +116,9 @@ namespace ImageResizer.Plugins.Encrypted {
             string result = UTF8Encoding.UTF8.GetString(Enc.Decrypt(data, iv));
 
             string path;
-
+            string fragment;
             //We do not merge the old and new query strings. We do not accept plaintext additions to an encrypted URL
-            c.Pipeline.ModifiedQueryString = PathUtils.ParseQueryString(result, true, out path);
+            c.Pipeline.ModifiedQueryString = PathUtils.ParseQueryString(result, true, out path, out fragment);
             c.Pipeline.PreRewritePath = path;
             sw.Stop();
         }
