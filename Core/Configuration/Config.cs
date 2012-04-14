@@ -50,6 +50,9 @@ namespace ImageResizer.Configuration {
             //Init plugins module
             plugins = new PluginConfig(this);
 
+            //Init urlBuilder module
+            urlBuilder = new UrlBuilder(this);
+
             //Whenever the extensions change, the image builder instance has to be replaced.
             plugins.ImageBuilderExtensions.Changed += delegate(SafeList<BuilderExtension> s) {
                 InvalidateImageBuilder();
@@ -78,6 +81,13 @@ namespace ImageResizer.Configuration {
 
         }
 
+        protected UrlBuilder urlBuilder = null;
+        /// <summary>
+        /// Generate URLs using the current configuration
+        /// </summary>
+        public UrlBuilder UrlBuilder {
+            get { return urlBuilder; }
+        }
         
 
         protected PluginConfig plugins = null;

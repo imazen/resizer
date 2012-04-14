@@ -129,6 +129,8 @@
     <Compile Include="Plugins\Basic\Presets.cs" />
     <Compile Include="Plugins\Basic\SourceMemCache.cs" />
     <Compile Include="Plugins\Basic\SpeedOrQuality.cs" />
+    <Compile Include="Plugins\IUrlPostFilter.cs" />
+    <Compile Include="Plugins\IUrlPreFilter.cs" />
     <Compile Include="Plugins\IVirtualFileSourceCacheKey.cs" />
     <Compile Include="Plugins\IVirtualFileCache.cs" />
     <Compile Include="Plugins\IFileExtensionPlugin.cs" />
@@ -165,6 +167,7 @@
     <Content Include="Resizing\UnitR.cs.txt" />
     <Compile Include="Resizing\ResizingCanceledException.cs" />
     <Compile Include="SharedAssemblyInfo.cs" />
+    <Compile Include="UrlBuilder.cs" />
     <Compile Include="UrlOptions.cs" />
     <Compile Include="Util\AssemblyAttributes.cs" />
     <Compile Include="Util\ParseUtils.cs" />
