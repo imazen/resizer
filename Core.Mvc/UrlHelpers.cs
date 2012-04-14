@@ -1,36 +1,36 @@
 ﻿using System;
 using System.Web.Mvc;
 using System.Collections.Specialized;
+using ImageResizer.Configuration;
+using ImageResizer.Util;
 
 
 namespace ImageResizer{
 
     public static class ImageResizerUrlHelpers {
 
-        //Sources - MongoDB, S3Reader, SqlReader, Gradient, RemoteReader
-        // RemoteReader - URL
-        // S3Reader - relative path
-        // SqlReader - Object and Image Extension
-        // Gradient - 2 colors, angle, and width
-        // MongoDB - relative path OR string id, + Image extension
-
-
-        public static string Image(this UrlHelper helper, string imageFileName) {
-            return Image(helper, imageFileName, null);
+        /// <summary>
+        /// Requires the Gradient plugin be installed
+        /// </summary>
+        /// <param name="helper"></param>
+        /// <param name="imageFileName"></param>
+        /// <param name="commands"></param>
+        /// <param name="urlOptions"></param>
+        /// <returns></returns>
+        public static string Gradient(this UrlHelper helper, string color1, string color2, double angle, Instructions commands, UrlOptions urlOptions = null) {
+            commands["color1"] = color1;
+            commands["color2"] = color2;
+            commands["angle"] = ParseUtils.SerializePrimitive<double>(angle);
+            return Image(helper, "gradient.png", commands, urlOptions);
         }
 
-        public static string Image(this UrlHelper helper, string imageFileName, NameValueCollection resizeCommands) {
-            // 'imageBasePath' should be replaced with centralized logic from ImageResizer
-            // In my case I was using the S3 Reader plugin so this is hard-coded (for the time being)
-            const string imageBasePath = "/s3/bucketname/";
-            
+        public static string Image(this UrlHelper helper, string imageFileName, Instructions commands, UrlOptions urlOptions = null) {
+            return Config.Current.UrlBuilder.Default(imageFileName, commands, urlOptions);
+        }
 
-            if (string.IsNullOrEmpty(imageFileName))
-                throw new ArgumentNullException("imageFileName");
 
-            var parameters = (resizeCommands != null) ? "?" + resizeCommands : string.Empty;
-
-            return imageBasePath + imageFileName + parameters;
+        public static string Image(this UrlHelper helper,string config, string imageFileName, Instructions commands, UrlOptions urlOptions = null) {
+            return Config.Current.UrlBuilder.Url(config, imageFileName, commands, urlOptions);
         }
     }
 }

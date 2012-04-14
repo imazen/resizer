@@ -50,6 +50,7 @@
     <Compile Include="MvcRoutingShimPlugin.cs" />
     <Compile Include="StopRoutingRoute.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="UrlHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="license.txt" />

@@ -9,13 +9,47 @@ using ImageResizer.Util;
 namespace ImageResizer {
     public class UrlBuilder {
 
+        private Dictionary<string, UrlOptions> configs;
+        private object syncLock = new object();
+
         private Config c;
         public UrlBuilder(Config c) {
             this.c = c;
+            this.configs = ParseFrom(c);
         }
+
+        private Dictionary<string, UrlOptions> ParseFrom(Config c) {
+        }
+
+        public UrlBuilder(IDictionary<string, UrlOptions> configurations) {
+            this.configs = new Dictionary<string, UrlOptions>(configurations, StringComparer.OrdinalIgnoreCase);
+        }
+
         public static UrlBuilder Current { get { return Config.Current.UrlBuilder; } }
 
-        public string Url(string path, Instructions commands, UrlOptions urlOptions) {
+        /// <summary>
+        /// Generates a url using the default url options for the current site
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="commands"></param>
+        /// <param name="urlOptions"></param>
+        /// <returns></returns>
+        public string Default(string path, Instructions commands = null, UrlOptions urlOptions = null) {
+            return Url(null, path, commands, urlOptions);
+        }
+        /// <summary>
+        /// Generates a url using a named set of url options 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="path"></param>
+        /// <param name="commands"></param>
+        /// <param name="urlOptions"></param>
+        /// <returns></returns>
+        public string Url(string config, string path, Instructions commands = null, UrlOptions urlOptions = null) {
+            //Allow null url options and commands
+            if (urlOptions == null) urlOptions = new UrlOptions();
+            if (commands == null) commands = new Instructions(); 
+
             var pre = (List<IUrlPreFilter>)c.Plugins.GetAll<IUrlPreFilter>();
             pre.Sort(delegate(IUrlPreFilter a, IUrlPreFilter b){
                 return a.PreFilterOrderHint.CompareTo(b.PreFilterOrderHint); 
