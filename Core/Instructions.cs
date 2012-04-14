@@ -13,6 +13,27 @@ namespace ImageResizer {
     /// </summary>
     public class Instructions: NameValueCollection {
 
+
+        /*
+         * A list of commands not implemented by this class, along with justifications
+         * 
+         * maxwidth/maxheight - These will eventually be deprecated in favor of width=x;height=y;mode=max. 
+         * Offering multiple variables for width and height leads to unexpected results, confusion, and consistency issues.
+         * 
+         * color1,color2, angle - Justification - Commands are specific to one infrequently used plugin: Gradient
+         * speed - The SpeedOrQuality plugin doesn't have a great reason for existence, and is still alpha
+         * a.oilpainting, a.sobel,  a.threshold, a.canny, a.equalize, a.posterize - Commands have neither been finalized nor confirmed.
+         * fi.scale - Specific to two very infrequently used plugins: FreeImageBuilder and FreeImageResizer
+         * preservePalette - Specific to the PrettyGifs plugin, and not well tested. *TODO*
+         * progressive - Specific to the FreeImage pipeline - not supported by GDI, WIC, or WPF
+         * shadow* - I'm hoping to retire/replace the DropShadow plugin sometime. I think it is very infrequently used.
+         * memcache - This feature is pre-alpha
+         * dpi - This feature is only useful if the user downloads the image before printing it. Lots of confusion around DPI, need to find a way to make it obvious. Perhaps naming it PrintDPI?
+         * 
+         * 
+         */
+
+
         public static explicit operator string(Instructions s) {
             return PathUtils.BuildQueryString(s, true);
         }
@@ -248,10 +269,10 @@ namespace ImageResizer {
         /// </summary>
         public BoxEdges Padding {
             get {
-                return BoxEdges.Parse(this["paddingWidth"], BoxEdges.Empty);
+                return BoxEdges.Parse(this["paddingWidth"],null);
             }
             set {
-                this.Set<BoxEdges>("paddingWidth", value);
+                this.SetAsString<BoxEdges>("paddingWidth", value);
             }
         }
         /// <summary>
@@ -259,42 +280,23 @@ namespace ImageResizer {
         /// </summary>
         public BoxEdges Margin {
             get {
-                return BoxEdges.Parse(this["margin"], BoxEdges.Empty);
+                return BoxEdges.Parse(this["margin"],null);
             }
             set {
-                this.Set<BoxEdges>("margin", value);
+                this.SetAsString<BoxEdges>("margin", value);
             }
         }
         /// <summary>
-        /// Friendly get/set accessor for the ["borderWidth"] value. Returns BoxEdges.Empty when unspecified.
+        /// Friendly get/set accessor for the ["borderWidth"] value. Returns null when unspecified.
         /// </summary>
         public BoxEdges Border {
             get {
-                return BoxEdges.Parse(this["borderWidth"], BoxEdges.Empty);
+                return BoxEdges.Parse(this["borderWidth"], null);
             }
             set {
-                this.Set<BoxEdges>("borderWidth", value);
+                this.SetAsString<BoxEdges>("borderWidth", value);
             }
         }
 
-        /*
-         * color1,color2, angle
-         * speed
-         * a.oilpainting
-         * a.sobel
-         * a.threshold
-         * a.canny
-         * a.equalize
-         * a.posterize
-         * fi.scale
-         * preservePalette
-         * progressive
-         * shadow*
-         * memcache
-        
-         //Removed: maxwidth, maxheight, 
-            //Not used: dpi
-         
-         */
     }
 }

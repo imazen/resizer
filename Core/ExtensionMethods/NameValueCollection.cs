@@ -85,7 +85,7 @@ namespace ImageResizer.ExtensionMethods {
 
         }
 
-        public static NameValueCollection Set<T>(this NameValueCollection q, string name, T val) where T : class {
+        public static NameValueCollection SetAsString<T>(this NameValueCollection q, string name, T val) where T : class {
             if (val == null) q.Remove(name);
             else q[name] = val.ToString();
             return q;
@@ -199,6 +199,20 @@ namespace ImageResizer.ExtensionMethods {
                 q.Remove(secondary);
             }
             return q;
+        }
+
+        /// <summary>
+        /// Creates and returns a new NameValueCollection instance that contains only the specified keys from the current collection.
+        /// </summary>
+        /// <param name="q"></param>
+        /// <param name="keysToKeep"></param>
+        /// <returns></returns>
+        public static NameValueCollection Keep(this NameValueCollection q, params string[] keysToKeep) {
+            NameValueCollection c = new NameValueCollection();
+            foreach (string s in keysToKeep)
+                if (q[s] != null) c[s] = q[s];
+
+            return c;
         }
     }
 }
