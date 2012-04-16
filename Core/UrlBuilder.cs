@@ -19,6 +19,8 @@ namespace ImageResizer {
         }
 
         private Dictionary<string, UrlOptions> ParseFrom(Config c) {
+            var d = new Dictionary<string, UrlOptions>(StringComparer.OrdinalIgnoreCase);
+            return d;
         }
 
         public UrlBuilder(IDictionary<string, UrlOptions> configurations) {
@@ -59,7 +61,7 @@ namespace ImageResizer {
             foreach (var f in pre) f.PreFilterUrl(ref path, ref q, ref urlOptions);
 
             //Join query to path
-            if (urlOptions.Semicolons)
+            if (urlOptions.Semicolons == true) //TODO should fill in based on CloudFront plugin
                 path += PathUtils.BuildSemicolonQueryString(q, true);
             else
                 path += PathUtils.BuildQueryString(q, true);

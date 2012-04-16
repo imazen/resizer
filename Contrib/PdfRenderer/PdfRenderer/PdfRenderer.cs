@@ -258,11 +258,11 @@ namespace ImageResizer.Plugins.PdfRenderer
                     BitmapTag bitmapTag = new BitmapTag("ghostscript.png", memoryStream);
                     return new Bitmap(memoryStream) { Tag = bitmapTag };
                 }
-                catch(GhostscriptException)
-                {
-                    // Conversion failed
-                    return null; //or maybe we should show details? If it's a valid PDF?
-                }
+                //catch(GhostscriptException)
+                //{
+                //    // Conversion failed
+                //    return null; //or maybe we should show details? If it's a valid PDF?
+                //}
                 finally
                 {
                     tempOutputPathInfo.Delete();
@@ -332,8 +332,8 @@ namespace ImageResizer.Plugins.PdfRenderer
             double maxheight = settings.MaxHeight;
 
             //Allow overrides with pdfwidth and pdfheight when we *want* to rescale afterwards.
-            int pw = settings.Get<int>("pdfwidth", -1).Value;
-            int ph = settings.Get<int>("pdfheight", -1).Value;
+            int pw = settings.Get<int>("pdfwidth", -1);
+            int ph = settings.Get<int>("pdfheight", -1);
             if (pw > 0) { width = pw; maxwidth = -1;}
             if (ph > 0) { height = ph; maxheight = -1; }
 

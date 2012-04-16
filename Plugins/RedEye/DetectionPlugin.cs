@@ -12,6 +12,7 @@ using System.Drawing;
 using ImageResizer.Configuration;
 using System.IO;
 using ImageResizer.Caching;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.RedEye {
     public class DetectionPlugin : BuilderExtension, IPlugin, IQuerystringPlugin {
