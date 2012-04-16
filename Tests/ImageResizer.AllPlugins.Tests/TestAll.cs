@@ -8,7 +8,6 @@ using ImageResizer.Configuration;
 using ImageResizer.Plugins.Basic;
 using ImageResizer.Plugins.Watermark;
 using ImageResizer.Plugins.PrettyGifs;
-using ImageResizer.Plugins.PsdReader;
 using ImageResizer.Plugins.AnimatedGifs;
 using ImageResizer.Plugins.AdvancedFilters;
 using ImageResizer.Plugins.RemoteReader;
@@ -39,7 +38,6 @@ namespace ImageResizer.AllPlugins.Tests {
 
             new Gradient().Install(c);
             new PrettyGifs().Install(c);
-            new PsdReader().Install(c);
             new AnimatedGifs().Install(c);
             new AdvancedFilters().Install(c);
             RemoteReaderPlugin rrp = new RemoteReaderPlugin(); rrp.Install(c);
