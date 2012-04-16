@@ -8,6 +8,9 @@ using System.Collections.Specialized;
 using LitS3;
 using ImageResizer.Configuration.Issues;
 using System.Security;
+using ImageResizer.Util;
+using System.Web;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.S3Reader {
     public class S3Reader : IPlugin, IMultiInstancePlugin {
@@ -21,9 +24,9 @@ namespace ImageResizer.Plugins.S3Reader {
             buckets = args["buckets"];
             vpath = args["prefix"];
 
-            asVpp = Util.Utils.getBool(args, "vpp", true);
-            s3config.UseSsl = Util.Utils.getBool(args, "useSsl", false);
-            s3config.UseSubdomains = Util.Utils.getBool(args, "useSubdomains", s3config.UseSubdomains);
+            asVpp = args.Get<bool>( "vpp", true);
+            s3config.UseSsl = args.Get<bool>( "useSsl", false);
+            s3config.UseSubdomains = args.Get<bool>( "useSubdomains", s3config.UseSubdomains);
 
 
             if (!string.IsNullOrEmpty(args["accessKeyId"])) s3config.AccessKeyID = args["accessKeyId"];
@@ -32,9 +35,13 @@ namespace ImageResizer.Plugins.S3Reader {
             
 
 
-            includeModifiedDate = Util.Utils.getBool(args, "includeModifiedDate", includeModifiedDate);
+            includeModifiedDate = args.Get<bool>( "includeModifiedDate", includeModifiedDate);
 
-            includeModifiedDate = Util.Utils.getBool(args, "checkForModifiedFiles", includeModifiedDate);
+            includeModifiedDate = args.Get<bool>( "checkForModifiedFiles", includeModifiedDate);
+
+            RequireImageExtension = args.Get<bool>( "requireImageExtension", RequireImageExtension);
+            UntrustedData = args.Get<bool>( "untrustedData", UntrustedData);
+            CacheUnmodifiedFiles = args.Get<bool>( "cacheUnmodifiedFiles", CacheUnmodifiedFiles);
             
         }
         private S3Service s3config = null;
@@ -46,6 +53,42 @@ namespace ImageResizer.Plugins.S3Reader {
             get { return s3config; }
             set { s3config = value; }
         }
+
+
+        private bool _requireImageExtension = true;
+        /// <summary>
+        /// (default true) When false, all URLs inside the PathPrefix folder will be assumed to be images, and will be handled by this plugin.
+        /// You should still use image extensions, otherwise we don't know what content type to send with the response, and browsers will choke. 
+        /// It's  also the cleanest way to tell the image resizer what kind of file type you'd like back when you request resizing.
+        /// This setting is designed to support non-image file serving from the DB.
+        /// It will also cause conflicts if PathPrefix overlaps with a folder name used for something else.
+        /// </summary>
+        public bool RequireImageExtension {
+            get { return _requireImageExtension; }
+            set { _requireImageExtension = value; }
+        }
+
+        private bool _untrustedData = false;
+        /// <summary>
+        /// (default: false) When true, all requests will be re-encoded before being served to the client. Invalid or malicious images will fail with an error if they cannot be read as images.
+        /// This should prevent malicious files from being served to the client.
+        /// </summary>
+        public bool UntrustedData {
+            get { return _untrustedData; }
+            set { _untrustedData = value; }
+        }
+
+        private bool _cacheUnmodifiedFiles = true;
+        /// <summary>
+        /// (default true). When true, files and unmodified images (i.e, no querystring) will be cached to disk (if they are requested that way) instead of only caching requests for resized images.
+        /// DiskCache plugin must be installed for this to have any effect.
+        /// </summary>
+        public bool CacheUnmodifiedFiles {
+            get { return _cacheUnmodifiedFiles; }
+            set { _cacheUnmodifiedFiles = value; }
+        }
+
+
         S3VirtualPathProvider vpp = null;
 
         public IPlugin Install(Configuration.Config c) {
@@ -75,6 +118,32 @@ namespace ImageResizer.Plugins.S3Reader {
             vpp.VirtualFilesystemPrefix = vpath;
            // vpp.MetadataAbsoluteExpiration
 
+
+            c.Pipeline.PostAuthorizeRequestStart += delegate(IHttpModule sender2, HttpContext context) {
+                //Only work with database images
+                //This allows us to resize database images without putting ".jpg" after the ID in the path.
+                if (!RequireImageExtension && vpp.IsPathVirtual(c.Pipeline.PreRewritePath))
+                    c.Pipeline.SkipFileTypeCheck = true; //Skip the file extension check. FakeExtensions will still be stripped.
+            };
+
+
+            c.Pipeline.RewriteDefaults += delegate(IHttpModule sender, HttpContext context, Configuration.IUrlEventArgs e) {
+                //Only work with database images
+                //Non-images will be served as-is
+                //Cache all file types, whether they are processed or not.
+                if (CacheUnmodifiedFiles && vpp.IsPathVirtual(e.VirtualPath))
+                    e.QueryString["cache"] = ServerCacheMode.Always.ToString();
+
+
+            };
+            c.Pipeline.PostRewrite += delegate(IHttpModule sender, HttpContext context, Configuration.IUrlEventArgs e) {
+                //Only work with database images
+                //If the data is untrusted, always re-encode each file.
+                if (UntrustedData && vpp.IsPathVirtual(e.VirtualPath))
+                    e.QueryString["process"] = ImageResizer.ProcessWhen.Always.ToString();
+
+            };
+            
             if (asVpp) {
                 try {
                     //Registers the virtual path provider.
@@ -90,19 +159,13 @@ namespace ImageResizer.Plugins.S3Reader {
                 c.Plugins.VirtualProviderPlugins.Add(vpp);
             }
 
-            //Register a url default. All incoming urls that point to this reader will automatically have 'cache=auto' unless another cache value has been specified.
-            c.Pipeline.RewriteDefaults += new Configuration.UrlRewritingEventHandler(Pipeline_RewriteDefaults);
-
+            //
             c.Plugins.add_plugin(this);
             
             return this;
 
         }
 
-        void Pipeline_RewriteDefaults(System.Web.IHttpModule sender, System.Web.HttpContext context, Configuration.IUrlEventArgs e) {
-            //Always request caching for this VPP. Will not override existing values.
-            if (vpp.IsPathVirtual(e.VirtualPath)) e.QueryString["cache"] = ServerCacheMode.Always.ToString();
-        }
 
         /// <summary>
         /// This plugin can only be removed if it was installed as an IVirtualImageProvider (vpp="false")
