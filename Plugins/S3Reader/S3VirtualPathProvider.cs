@@ -6,8 +6,6 @@ using System.Web.Hosting;
 using System.Security.Permissions;
 using System.Web.Caching;
 using System.IO;
-using System.Data.Sql;
-using System.Data.SqlClient;
 using System.Configuration;
 using LitS3;
 using ImageResizer.Util;
