@@ -10,6 +10,9 @@ using ImageResizer.Configuration.Issues;
 using System.IO;
 using ImageResizer.Resizing;
 using System.Web;
+using ImageResizer.Configuration.Xml;
+using ImageResizer.ExtensionMethods;
+using System.Text.RegularExpressions;
 
 namespace ImageResizer.Plugins.RemoteReader {
 
@@ -121,9 +124,7 @@ namespace ImageResizer.Plugins.RemoteReader {
         /// </summary>
         public static RemoteReaderPlugin Current {
             get {
-                RemoteReaderPlugin p = Config.Current.Plugins.Get<RemoteReaderPlugin>();
-                if (p != null) return p;
-                return (RemoteReaderPlugin)new RemoteReaderPlugin().Install(Config.Current);
+                return Config.Current.Plugins.GetOrInstall<RemoteReaderPlugin>();
             }
         }
 
@@ -217,7 +218,44 @@ namespace ImageResizer.Plugins.RemoteReader {
             return IsRemotePath(virtualPath);
         }
 
+        /// <summary>
+        /// Allows you to perform programmatic white or blacklisting of remote URLs
+        /// </summary>
         public event RemoteRequest AllowRemoteRequest;
+
+        private bool IsWhitelisted(RemoteRequestEventArgs request) {
+            var rr = c.getNode("remotereader");
+            var domain = new Uri(request.RemoteUrl).Host;
+
+
+            foreach (Node n in rr.childrenByName("allow")) {
+                bool onlyWhenSigned = n.Attrs.Get<bool>("onlyWhenSigned", false);
+                if (onlyWhenSigned && !request.SignedRequest) continue;
+
+                bool hostMatches = false, regexMatches = false;
+                string host = n.Attrs.Get("domain");
+                if (!string.IsNullOrEmpty(host)) {
+                    if (host.StartsWith("*.", StringComparison.OrdinalIgnoreCase))
+                        hostMatches = domain.EndsWith(host.Substring(1), StringComparison.OrdinalIgnoreCase);
+                    else
+                        hostMatches = domain.Equals(host, StringComparison.OrdinalIgnoreCase);
+
+                    if (!hostMatches) continue;//If any filter doesn't match, skip rule
+                }
+
+                string regex = n.Attrs.Get("regex");
+                if (!string.IsNullOrEmpty(regex)) {
+                    var r = new Regex("^" + regex + "$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+                    regexMatches = r.IsMatch(request.RemoteUrl);
+                    if (!regexMatches) continue;//If any filter doesn't match, skip rule
+                }
+                //If all specified filters match, allow the request. 
+                //This *is* supposed to be || not &&, because we already deal with non-matching filters via 'continue'.
+                if (hostMatches || regexMatches) return true;
+
+            }
+            return false;
+        }
 
         public IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
             RemoteRequestEventArgs request = ParseRequest(virtualPath, queryString);
@@ -225,6 +263,9 @@ namespace ImageResizer.Plugins.RemoteReader {
 
             if (request.SignedRequest && c.get("remotereader.allowAllSignedRequests", false)) request.DenyRequest = false;
 
+            //Check the whitelist
+            if (request.DenyRequest && IsWhitelisted(request)) request.DenyRequest = false;
+     
             //Fire event
             if (AllowRemoteRequest != null) AllowRemoteRequest(this, request);
 
