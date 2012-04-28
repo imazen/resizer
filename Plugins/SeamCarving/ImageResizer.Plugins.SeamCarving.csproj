@@ -53,6 +53,8 @@
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="CairJob.cs" />
+    <Compile Include="CarveDataPlotter.cs" />
+    <Compile Include="LzwDecoder.cs" />
     <Compile Include="SevenZipReduced\Common\CRC.cs" />
     <Compile Include="SevenZipReduced\Common\InBuffer.cs" />
     <Compile Include="SevenZipReduced\Common\OutBuffer.cs" />
