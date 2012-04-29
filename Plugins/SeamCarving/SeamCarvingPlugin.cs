@@ -99,7 +99,7 @@ namespace ImageResizer.Plugins.SeamCarving {
             if (string.IsNullOrEmpty(s.settings["carve"]) && s.settings.Mode == FitMode.Carve) ftype = FilterType.Prewitt;
 
             //If we have carve data
-            CarveDataPlotter carveData = s.Data[CarveData] as CarveDataPlotter;
+            CarveDataPlotter carveData = s.Data.ContainsKey(CarveData) ? (s.Data[CarveData] as CarveDataPlotter) : null;
             if (carveData != null && ftype == FilterType.None) ftype = FilterType.Prewitt;
 
             RectangleF copyRect = s.copyRect;
