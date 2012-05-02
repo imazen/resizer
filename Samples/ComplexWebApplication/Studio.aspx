@@ -16,13 +16,14 @@
     <input type="text" runat="server" id="caption" />
 
 
-    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
-    <script type="text/javascript" src="js/underscore-min.js"></script>
-    <script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="js/libs/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/libs/underscore-min.js"></script>
+    <script type="text/javascript" src="js/libs/jquery-ui-1.8.16.custom.min.js"></script>
 
     <script src="js/jquery.Jcrop.js" type="text/javascript"></script> 
     <script src="js/jquery.jcrop.preview.js" type="text/javascript"></script> 
     <script type="text/javascript" src="js/ImageResizing.js"></script>
+    <script type="text/javascript" src="js/jquery.overdraw.js"></script>
     <script type="text/javascript" src="js/jquery.imagestudio.js"></script>
     <script type="text/javascript">
     //<!--
