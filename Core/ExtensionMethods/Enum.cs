@@ -135,10 +135,10 @@ namespace ImageResizer.ExtensionMethods {
                 long temp;
                 if ((char.IsDigit(p[0]) || p[0] == '-' || p[0] == '+') && 
                     long.TryParse(p, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out temp)) {
-                    num &= temp;
+                    num |= temp;
                     parsedSomething = true;
                 }else if (d.TryGetValue(value, out part)){
-                    num = num & Convert.ToInt64(part);
+                    num = num | Convert.ToInt64(part);
                     parsedSomething = true;
                 } else return null; //If we fail to parse any non-empty bit, return null
 
