@@ -44,30 +44,6 @@
     <Content Include="..\..\StudioJS\ImageResizing.js">
       <Link>js\ImageResizing.js</Link>
     </Content>
-    <Content Include="..\..\StudioJS\jquery-1.7.1.min.js">
-      <Link>js\jquery-1.7.1.min.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery-ui-1.8.16.custom.min.js">
-      <Link>js\jquery-ui-1.8.16.custom.min.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery.ba-bbq.js">
-      <Link>js\jquery.ba-bbq.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery.ba-bbq.min.js">
-      <Link>js\jquery.ba-bbq.min.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery.ba-urlinternal.js">
-      <Link>js\jquery.ba-urlinternal.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery.ba-urlinternal.min.js">
-      <Link>js\jquery.ba-urlinternal.min.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery.collapse.js">
-      <Link>js\jquery.collapse.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery.cookie.js">
-      <Link>js\jquery.cookie.js</Link>
-    </Content>
     <Content Include="..\..\StudioJS\jquery.imagestudio.js">
       <Link>js\jquery.imagestudio.js</Link>
     </Content>
@@ -77,14 +53,8 @@
     <Content Include="..\..\StudioJS\jquery.jcrop.preview.js">
       <Link>js\jquery.jcrop.preview.js</Link>
     </Content>
-    <Content Include="..\..\StudioJS\Markdown.Converter.js">
-      <Link>js\Markdown.Converter.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\querystring.js">
-      <Link>js\querystring.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\underscore-min.js">
-      <Link>js\underscore-min.js</Link>
+    <Content Include="..\..\StudioJS\jquery.overdraw.js">
+      <Link>js\jquery.overdraw.js</Link>
     </Content>
     <Content Include="css\Jcrop.gif" />
     <Content Include="css\jquery.Jcrop.css" />
@@ -183,6 +153,10 @@
     <Content Include="Misc\Protected\Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Contrib\PdfRenderer\PdfRenderer\ImageResizer.Plugins.PdfRenderer.csproj">
+      <Project>{7C8A13F7-5C00-4074-B16E-45D0E231B70D}</Project>
+      <Name>ImageResizer.Plugins.PdfRenderer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Core.Mvc\ImageResizer.Mvc.csproj">
       <Project>{4181B9C4-1EAF-4070-8571-2EE25475547E}</Project>
       <Name>ImageResizer.Mvc</Name>
