@@ -329,7 +329,7 @@ namespace ImageResizer.Plugins.SqlReader
         {
             if (IsPathVirtual(virtualPath))
             {
-                return RowExists(ParseIdFromVirtualPath(virtualPath));
+                return !s.CheckForModifiedFiles || RowExists(ParseIdFromVirtualPath(virtualPath));
             }
             else
                 return Previous.FileExists(virtualPath);
@@ -355,7 +355,7 @@ namespace ImageResizer.Plugins.SqlReader
         /// <param name="queryString"></param>
         /// <returns></returns>
         public bool FileExists(string virtualPath, NameValueCollection queryString) {
-            return IsPathVirtual(virtualPath) &&  RowExists(ParseIdFromVirtualPath(virtualPath));
+            return IsPathVirtual(virtualPath) && (!s.CheckForModifiedFiles || RowExists(ParseIdFromVirtualPath(virtualPath)));
         }
 
         /// <summary>
@@ -432,6 +432,7 @@ namespace ImageResizer.Plugins.SqlReader
         public bool Exists
         {
             get {
+                if (_exists == null && !provider.Settings.CheckForModifiedFiles) return true;
                 if (_exists == null) _exists =  provider.RowExists(id);
                 return _exists.Value;
             }
@@ -456,6 +457,7 @@ namespace ImageResizer.Plugins.SqlReader
         /// </summary>
         public DateTime ModifiedDateUTC{
             get{
+                if (_fileModifiedDate == null && !provider.Settings.CheckForModifiedFiles) return DateTime.MinValue;
                 if (_fileModifiedDate == null) _fileModifiedDate = provider.GetDateModifiedUtc(id);
                 return _fileModifiedDate.Value;
             }
