@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Globalization;
 
-namespace ImageResizer.Util {
+namespace ImageResizer.Plugins.DiskCache {
     [Obsolete("This class has been moved to the DiskCache plugin, as it is only used there. ")]
     public class UrlHasher {
         public UrlHasher() {
