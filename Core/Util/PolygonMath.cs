@@ -8,7 +8,7 @@ using System.Drawing.Drawing2D;
 namespace ImageResizer.Util
 {
     /// <summary>
-    /// Defines a collection of utility functions for manipulating polygons.
+    /// Defines a collection of utility functions for manipulating polygons. These functions may be (re)moved in future releases; be prepared. 
     /// </summary>
     public class PolygonMath
     {
