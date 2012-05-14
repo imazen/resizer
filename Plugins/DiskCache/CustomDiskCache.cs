@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Caching;
-using ImageResizer.Util;
 using System.IO;
 using ImageResizer.Configuration.Logging;
 using System.Diagnostics;
