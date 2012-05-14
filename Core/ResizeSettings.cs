@@ -13,6 +13,7 @@ namespace ImageResizer {
     /// <summary>
     /// Represents the settings which will be used to process the image. 
     /// Extends NameValueCollection to provide friendly property names for commonly used settings.
+    /// Replaced by the Instructions class. Will be removed in V4.0
     /// </summary>
     [Serializable]
     public class ResizeSettings : NameValueCollection {
