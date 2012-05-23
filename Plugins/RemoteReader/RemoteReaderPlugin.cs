@@ -106,7 +106,7 @@ namespace ImageResizer.Plugins.RemoteReader {
             if (IsRemotePath(e.VirtualPath) &&
                     !string.IsNullOrEmpty(e.QueryString[Base64UrlKey])) {
                 string ext = PathUtils.GetExtension(PathUtils.FromBase64UToString(e.QueryString[Base64UrlKey]));
-                e.VirtualPath = PathUtils.SetExtension(e.VirtualPath, ext);
+                if (!string.IsNullOrEmpty(ext)) e.VirtualPath = PathUtils.SetExtension(e.VirtualPath, ext);
             }
         }
 
