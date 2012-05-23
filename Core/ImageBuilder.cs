@@ -947,13 +947,14 @@ namespace ImageResizer
                 double maxwidth = s.settings.MaxWidth;
                 double maxheight = s.settings.MaxHeight;
 
-                //Handle cases of width/maxheight and height/maxwidth as in legacy versions. 
-                if (width != -1 && maxheight != -1) maxheight = Math.Min(maxheight, (width /imageRatio));
-                if (height != -1 && maxwidth != -1) maxwidth = Math.Min(maxwidth, (height * imageRatio));
-
                 //Eliminate cases where both a value and a max value are specified: use the smaller value for the width/height 
                 if (maxwidth > 0 && width > 0) {   width = Math.Min(maxwidth, width);    maxwidth = -1;  }
                 if (maxheight > 0 && height > 0) { height = Math.Min(maxheight, height); maxheight = -1; }
+
+                //Handle cases of width/maxheight and height/maxwidth as in legacy versions. 
+                if (width != -1 && maxheight != -1) maxheight = Math.Min(maxheight, (width / imageRatio));
+                if (height != -1 && maxwidth != -1) maxwidth = Math.Min(maxwidth, (height * imageRatio));
+
 
                 //Move max values to width/height. FitMode should already reflect the mode we are using, and we've already resolved mixed modes above.
                 width = Math.Max(width, maxwidth);
