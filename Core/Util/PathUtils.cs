@@ -7,8 +7,13 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using ImageResizer.ExtensionMethods;
+using System.Globalization;
+using System.Reflection;
 
 namespace ImageResizer.Util {
+    /// <summary>
+    /// A set of utility methods for manipulating virtual paths
+    /// </summary>
     public class PathUtils {
 
         /// <summary>
@@ -401,7 +406,7 @@ namespace ImageResizer.Util {
         /// <param name="urlDecode"></param>
         /// <returns></returns>
         public static NameValueCollection ParseQueryOnly(string query, bool allowSemicolons = true, bool urlDecode = true) {
-            string[] pairs = query.Split(allowSemicolons ? new char[] { '?', '&' } : new char[] { '?', '&', ';' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] pairs = query.Split(allowSemicolons ? new char[] { '?', '&', ';' } : new char[] { '?', '&' }, StringSplitOptions.RemoveEmptyEntries);
             NameValueCollection c = new NameValueCollection();
             foreach (string s in pairs) {
                 string[] namevalue = s.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
@@ -504,6 +509,7 @@ namespace ImageResizer.Util {
             }
             return null;
         }
+
 
         /// <summary>
         /// Replaces variables in paths with their values. Ex. ~/uploads/thumbs/&lt;guid>.&lt;ext>.
