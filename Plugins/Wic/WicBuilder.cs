@@ -17,6 +17,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using ImageResizer.Plugins.WicEncoder;
 using System.Globalization;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.WicBuilder {
     public class WicBuilderPlugin : BuilderExtension, IPlugin, IIssueProvider, IFileExtensionPlugin {
@@ -68,22 +69,7 @@ namespace ImageResizer.Plugins.WicBuilder {
                 //Save the original stream positione
                 originalPosition = (restoreStreamPosition) ? s.Position : -1;
 
-                //Clone to a memory stream
-                MemoryStream ms = (s is MemoryStream) ? (MemoryStream)s : StreamUtils.CopyStream(s);
-
-                //Get the underlying byte array
-                try {
-                    data = ms.GetBuffer();
-                    lData = ms.Length;
-                    //Or copy it to a new byte array if that fails..
-                } catch (UnauthorizedAccessException) {
-                    data = ms.ToArray();
-                    lData = data.Length;
-                } finally {
-                    if (ms != s) ms.Dispose(); //Even though it does nothing, maybe in the future it will
-                }
-
-
+                data = s.CopyOrReturnBuffer(out lData,false, 0x1000);
             } finally {
                 if (s != null && restoreStreamPosition && s.CanSeek) s.Seek(originalPosition, SeekOrigin.Begin);
                 if (disposeStream) s.Dispose();

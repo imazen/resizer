@@ -11,6 +11,7 @@ using ImageResizer.Plugins.Wic.InteropServices.ComTypes;
 using ImageResizer.Plugins.Wic;
 using System.Runtime.InteropServices;
 using System.Globalization;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.WicDecoder {
     /// <summary>
@@ -50,22 +51,9 @@ namespace ImageResizer.Plugins.WicDecoder {
         }
 
         public Bitmap Decode(Stream s, ResizeSettings settings) {
-
-            //Make it a memory stream
-            if (!(s is MemoryStream)) {
-                s = StreamUtils.CopyStream((Stream)s);
-            }
-
             //Get the underlying byte array
-            byte[] data = null;
             long lData = 0;
-            try {
-                data = ((MemoryStream)s).GetBuffer();
-                lData = s.Length;
-            } catch (UnauthorizedAccessException) {
-                data = ((MemoryStream)s).ToArray();
-                lData = data.Length;
-            }
+            byte[] data = s.CopyOrReturnBuffer(out lData,false, 0x1000);
 
 
             var factory = (IWICComponentFactory)new WICImagingFactory();
