@@ -41,11 +41,15 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Web" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Cryptography\AppDataKeyProvider.cs" />
+    <Compile Include="Cryptography\IKeyProvider.cs" />
+    <Compile Include="Cryptography\VolatileKeyProvider.cs" />
     <Compile Include="Encrypted.cs" />
     <Compile Include="Limit.cs" />
     <Compile Include="RequestLimiting.cs" />
