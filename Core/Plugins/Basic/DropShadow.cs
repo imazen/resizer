@@ -5,6 +5,8 @@ using System.Text;
 using ImageResizer.Resizing;
 using ImageResizer.Util;
 using System.Drawing;
+using ImageResizer.ExtensionMethods;
+using System.Drawing.Drawing2D;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
@@ -28,19 +30,16 @@ namespace ImageResizer.Plugins.Basic {
 
 
         protected override RequestedAction LayoutEffects(ImageState s) {
-            if (base.LayoutEffects(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
+            float shadowWidth = s.settings.Get<float>("shadowWidth", 0);
+            if (shadowWidth != 0) {
 
-            //Clone last ring, then offset it.
-            if (s.settings["shadowWidth"] != null) {
-                float shadowWidth = Utils.getFloat(s.settings, "shadowWidth", 0);
+                var offset = s.settings.GetList<float>("shadowOffset", 0, 2);
+                PointF shadowOffset =  offset == null ? new PointF(0,0) : new PointF(offset[0], offset[1]);
 
-
-                PointF shadowOffset = Utils.parsePointF(s.settings["shadowOffset"], new PointF(0, 0));
-
-                //For drawing purposes later
+                //Clone last ring, then offset it - provides the inner bounds of the shadow later
                 s.layout.AddInvisiblePolygon("shadowInner", PolygonMath.MovePoly(s.layout.LastRing.points, shadowOffset));
 
-                //For layout purposes
+                //Determine the outer bound of the shadow
                 s.layout.AddRing("shadow", PolygonMath.InflatePoly(s.layout.LastRing.points, new float[]{
                     Math.Max(0, shadowWidth - shadowOffset.Y),
                     Math.Max(0, shadowWidth + shadowOffset.X),
@@ -58,18 +57,19 @@ namespace ImageResizer.Plugins.Basic {
             if (s.destGraphics == null) return RequestedAction.None;
 
             //parse shadow
-            Color shadowColor = Utils.parseColor(s.settings["shadowColor"], Color.Transparent);
-            int shadowWidth = Utils.getInt(s.settings, "shadowWidth", -1);
+            Color shadowColor = ParseUtils.ParseColor(s.settings["shadowColor"], Color.Transparent);
+            int shadowWidth = s.settings.Get<int>( "shadowWidth", -1);
 
             //Skip on transparent or 0-width shadow
             if (shadowColor == Color.Transparent || shadowWidth <= 0) return RequestedAction.None;
 
-            //Offsets may show inside the shadow - so we have to fix that
-            s.destGraphics.FillPolygon(new SolidBrush(shadowColor),
-                PolygonMath.InflatePoly(s.layout["shadowInner"], 1)); //Inflate 1 for FillPolgyon rounding errors.
-
+            using (Brush b = new SolidBrush(shadowColor)) {
+                //Offsets may show inside the shadow - so we have to fix that
+                s.destGraphics.FillPolygon(b,
+                    PolygonMath.InflatePoly(s.layout["shadowInner"], 1)); //Inflate 1 for FillPolgyon rounding errors.
+            }
             //Then we can draw the outer gradient
-            Utils.DrawOuterGradient(s.destGraphics, s.layout["shadowInner"],
+            DrawOuterGradient(s.destGraphics, s.layout["shadowInner"],
                              shadowColor, Color.Transparent, shadowWidth);
 
             return RequestedAction.None;
@@ -77,5 +77,36 @@ namespace ImageResizer.Plugins.Basic {
 
 
 
+        /// <summary>
+        /// Draws a gradient around the specified polygon. Fades from 'inner' to 'outer' over a distance of 'width' pixels. 
+        /// </summary>
+        /// <param name="g"></param>
+        /// <param name="poly"></param>
+        /// <param name="inner"></param>
+        /// <param name="outer"></param>
+        /// <param name="width"></param>
+        public static void DrawOuterGradient(Graphics g, PointF[] poly, Color inner, Color outer, float width) {
+
+            PointF[,] corners = PolygonMath.GetCorners(poly, width);
+            PointF[,] sides = PolygonMath.GetSides(poly, width);
+            //Overlapping these causes darker areas... Dont use InflatePoly
+
+            //Paint corners
+            for (int i = 0; i <= corners.GetUpperBound(0); i++) {
+                PointF[] pts = PolygonMath.GetSubArray(corners, i);
+                using (Brush b = PolygonMath.GenerateRadialBrush(inner, outer, pts[0], width + 1)) {
+                    g.FillPolygon(b, pts);
+                }
+            }
+            //Paint sides
+            for (int i = 0; i <= sides.GetUpperBound(0); i++) {
+                PointF[] pts = PolygonMath.GetSubArray(sides, i);
+                using (LinearGradientBrush b = new LinearGradientBrush(pts[3], pts[0], inner, outer)) {
+                    b.SetSigmaBellShape(1);
+                    b.WrapMode = WrapMode.TileFlipXY;
+                    g.FillPolygon(b, pts);
+                }
+            }
+        }
     }
 }

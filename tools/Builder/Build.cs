@@ -12,6 +12,7 @@ namespace ImageResizer.ReleaseBuilder {
     public class Build :Interaction {
         FolderFinder f = new FolderFinder("Core" );
         Devenv d = null;
+        Devenv extras = null;
         FsQuery q = null;
         VersionEditor v = null;
         GitManager g = null;
@@ -22,6 +23,7 @@ namespace ImageResizer.ReleaseBuilder {
         string linkBase = "http://downloads.imageresizing.net/";
         public Build() {
             d = new Devenv(Path.Combine(f.FolderPath,"ImageResizer.sln"));
+            extras = new Devenv(Path.Combine(f.FolderPath, "Other-Plugins-With-External-Dependencies.sln"));
             v = new VersionEditor(Path.Combine(f.FolderPath, "SharedAssemblyInfo.cs"));
             g = new GitManager(f.ParentPath);
             nuget = new NugetManager(Path.Combine(f.ParentPath, "nuget"));
@@ -34,11 +36,11 @@ namespace ImageResizer.ReleaseBuilder {
             packages.Add(new PackageDescriptor("min", PackMin));
             packages.Add(new PackageDescriptor("full", PackFull));
             packages.Add(new PackageDescriptor("standard", PackStandard));
-            //packages.Add(new PackageDescriptor("allbinaries", PackAllBinaries));
+            packages.Add(new PackageDescriptor("allbinaries", PackAllBinaries));
         }
 
-        public string getReleasePath(string packageBase, string ver,  string kind) {
-            return Path.Combine(Path.Combine(f.ParentPath, "Releases"), packageBase + ver.Trim('-') + '-' + kind + "-" + DateTime.UtcNow.ToString("MMM-d-yyyy") + ".zip");
+        public string getReleasePath(string packageBase, string ver,  string kind, string hotfix) {
+            return Path.Combine(Path.Combine(f.ParentPath, "Releases"), packageBase + ver.Trim('-') + '-' + kind + "-" + (string.IsNullOrWhiteSpace(hotfix) ? "" : (hotfix.Trim('-') +  "-")) + DateTime.UtcNow.ToString("MMM-d-yyyy") + ".zip");
         }
 
         public NameValueCollection GetNugetVariables() {
@@ -47,7 +49,18 @@ namespace ImageResizer.ReleaseBuilder {
             nvc["pluginsdlldir"] = @"..\dlls\trial";
             nvc["coredlldir"] = @"..\dlls\release";
             nvc["iconurl"] = "http://imageresizing.net/images/logos/ImageIconPSD100.png";
-            nvc["tags"] = "Cropping Resizer ImageResizer ImageResizing.net Resizing Photo Image Crop jCrop Rotate Image Drawing disk caching gif png octree quanitization animated gifs dithering";
+            nvc["tags"] = "ImageResizer ImageResizing.Net Resize Resizer Resizing Crop Cropper Cropping automatic jCrop " +
+            "asp:Image Photo Image Rotate Flip Drawing System.Drawing WIC WPF disk caching jpeg jpg gif png ASP.NET MVC IIS " +
+            "transparency octree quanitization animated gifs dithering " +
+            "Gaussian blur sharpen sharpening radius contrast saturation hue brightness histogram sepia grayscale invert color " +
+            "pixel shader plugins noise removal exif rotation autorotate azure azurereader worker blob blobstore zip batch compress cache-control expires " +
+            "amazon cloudfront s3 quality jpeg format drop shadow 404 handling url rewriting gradient freeimage " +
+            "CatmullRom Lanczos3 bspline box bicubic bilinear CRW CR2 NEF RAF DNG MOS KDC DCR " +
+            "404 redirect actionresult routing logging nlog psd remote url download webclient virtual path provider virtualpathprovider CAIR seam carving " +
+            "content aware image resizing alpha channel grayscale y ry ntsc bt709 flat size limit sizelimiting getthumbnailimage bitmap SQL database query blob " +
+            "watermark virtual folder text overlay image watermark automatic whitespace trimming product images thumbnails " + 
+            "padding pad margin borders background color bgcolor InterpolationMode Fant wic IWICBitmap IWICBitmapSource";
+
             return nvc;
         }
 
@@ -56,25 +69,48 @@ namespace ImageResizer.ReleaseBuilder {
         [STAThread]
         public void Run() {
             MakeConsoleNicer();
+            //PrepareForPackaging();
+            //using (RestorePoint rp = new RestorePoint(q.files(new Pattern("^/Samples/*/*.(cs|vb)proj$")))) {
+
+            //    //Replace all project references temporarily
+            //    foreach (string pf in q.files(new Pattern("^/Samples/[^/]+/*.(cs|vb)proj$"))) {
+            //        new ProjectFileEditor(pf).ReplaceAllProjectReferencesWithDllReferences("..\\..\\dlls\\release");
+            //    }
+
+            //}
 
             say("Project root: " + f.ParentPath);
             nl();
             //The base name for creating zip packags.
             string packageBase = v.get("PackageName"); //    // [assembly: PackageName("Resizer")]
 
-            //a. Ask about hotfix - for hotfixes, we embed warnings and stuff so they don't get used in production.
+
+            //List the file version number   [assembly: AssemblyFileVersion("3.0.5.*")]
+            string fileVer = list("FileVersion", v.get("AssemblyFileVersion").TrimEnd('.', '*'));
+            //List the assembly version number. AssemblyVersion("3.0.5.*")]
+            string assemblyVer = list("AssemblyVersion", v.get("AssemblyVersion").TrimEnd('.', '*'));
+            //List the information version number. (used in zip package names) [assembly: AssemblyInformationalVersion("3-alpha-5")]
+            string infoVer = list("InfoVersion", v.get("AssemblyInformationalVersion").TrimEnd('.', '*'));
+            //List the Nuget package version number. New builds need to have a 4th number specified.
+            string nugetVer = list("NugetVersion", v.get("NugetVersion").TrimEnd('.', '*'));
+
+            //a. Ask if version numbers need to be modified
+            if (ask("Change version numbers?")) {
+                //b. Ask for file version number   [assembly: AssemblyFileVersion("3.0.5.*")]
+                fileVer = change("FileVersion", v.get("AssemblyFileVersion").TrimEnd('.', '*'));
+                //c. Ask for assembly version number. AssemblyVersion("3.0.5.*")]
+                assemblyVer = change("AssemblyVersion", v.get("AssemblyVersion").TrimEnd('.', '*'));
+                //d: Ask for information version number. (used in zip package names) [assembly: AssemblyInformationalVersion("3-alpha-5")]
+                infoVer = change("InfoVersion", v.get("AssemblyInformationalVersion").TrimEnd('.', '*'));
+                //e. Ask for Nuget package version number. New builds need to have a 4th number specified.
+                nugetVer = change("NugetVersion", v.get("NugetVersion").TrimEnd('.', '*'));
+            }
+
+            //b. Ask about hotfix - for hotfixes, we embed warnings and stuff so they don't get used in production.
             bool isHotfix = ask("Is this a hotfix? Press Y to tag the assembiles and packages as such.");
             //Build the hotfix name
             string packageHotfix = isHotfix ? ("-hotfix-" + DateTime.Now.ToString("htt").ToLower()) : "";
 
-            //b. Ask for file version number   [assembly: AssemblyFileVersion("3.0.5.*")]
-            string fileVer = change("FileVersion", v.get("AssemblyFileVersion").TrimEnd('.', '*'));
-            //c. Ask for assembly version number. AssemblyVersion("3.0.5.*")]
-            string assemblyVer = change("AssemblyVersion", v.get("AssemblyVersion").TrimEnd('.', '*'));
-            //d: Ask for information version number. (used in zip package names) [assembly: AssemblyInformationalVersion("3-alpha-5")]
-            string infoVer = change("InfoVersion", v.get("AssemblyInformationalVersion").TrimEnd('.', '*'));
-            //e. Ask for Nuget package version number. New builds need to have a 4th number specified.
-            string nugetVer = change("NugetVersion", v.get("NugetVersion").TrimEnd('.', '*'));
 
             //Get the download server from SharedAssemblyInfo.cs if specified
             string downloadServer = v.get("DownloadServer"); if (downloadServer == null) downloadServer = "http://downloads.imageresizing.net/";
@@ -88,7 +124,7 @@ namespace ImageResizer.ReleaseBuilder {
             bool isBuilding = false;
             StringBuilder downloadPaths = new StringBuilder();
             foreach (PackageDescriptor desc in packages) {
-                desc.Path = getReleasePath(packageBase, infoVer + packageHotfix, desc.Kind);
+                desc.Path = getReleasePath(packageBase, infoVer, desc.Kind, packageHotfix);
                 if (desc.Exists) say("\n" + Path.GetFileName(desc.Path) + " already exists");
                 string opts = "";
 
@@ -122,6 +158,7 @@ namespace ImageResizer.ReleaseBuilder {
 
                     desc.VariableSubstitutions = GetNugetVariables();
                     desc.VariableSubstitutions["version"] = nugetVer;
+
                     desc.Version = nugetVer;
 
                     desc.OutputDirectory = Path.Combine(Path.Combine(f.ParentPath, "Releases", "nuget-packages"));
@@ -202,28 +239,40 @@ namespace ImageResizer.ReleaseBuilder {
                 }
 
                 //6 - if (c) was specified for any package, build all.
-                BuildAll();
+                bool success = BuildAll(true); //isMakingNugetPackage);
 
                 //7 - Revert file to state at commit (remove 'full' version numbers and 'commit' value)
                 v.Contents = fileContents;
                 v.Save();
 
+                if (!success) return; //If the build didn't go ok, pause and exit
+
                 //8b - run cleanup routine
                 RemoveUselessFiles();
 
-                //Prepare searchers
+                //Prepare searchersq
                 PrepareForPackaging();
 
-                //9 - Pacakge all selected zip configurations
-                foreach (PackageDescriptor pd in packages) {
-                    if (pd.Skip || !pd.Build) continue;
-                    if (pd.Exists && pd.Build) {
-                        File.Delete(pd.Path);
-                        say("Deleted " + pd.Path);
+                //Allows use to temporarily edit all the sample project files
+                using (RestorePoint rp = new RestorePoint(q.files(new Pattern("^/Samples/*/*.(cs|vb)proj$")))) {
+
+                    //Replace all project references temporarily
+                    foreach (string pf in q.files(new Pattern("^/Samples/[^/]+/*.(cs|vb)proj$"))) {
+                        new ProjectFileEditor(pf).ReplaceAllProjectReferencesWithDllReferences("..\\..\\dlls\\release");
                     }
-                    pd.Builder(pd);
-                    //Copy to a 'tozip' version for e-mailing
-                    File.Copy(pd.Path, pd.Path.Replace(".zip", ".tozip"), true);
+
+
+                    //9 - Pacakge all selected zip configurations
+                    foreach (PackageDescriptor pd in packages) {
+                        if (pd.Skip || !pd.Build) continue;
+                        if (pd.Exists && pd.Build) {
+                            File.Delete(pd.Path);
+                            say("Deleted " + pd.Path);
+                        }
+                        pd.Builder(pd);
+                        //Copy to a 'tozip' version for e-mailing
+                        //File.Copy(pd.Path, pd.Path.Replace(".zip", ".tozip"), true);
+                    }
                 }
 
 
@@ -253,8 +302,8 @@ namespace ImageResizer.ReleaseBuilder {
                         //Upload
                         try {
                             s3.AddObject(pd.Path, bucketName, Path.GetFileName(pd.Path), "application/zip", perm);
-                        } catch (WebException wex) {
-                            say("Upload failed: " + wex.Message);
+                        } catch (Exception ex) {
+                            say("Upload failed: " + ex.Message);
                             retry = ask("Retry upload?");
                         }
                     } while (retry);
@@ -287,13 +336,25 @@ namespace ImageResizer.ReleaseBuilder {
             d.Run("/Clean Debug");
             d.Run("/Clean Release");
             d.Run("/Clean Trial");
+            extras.Run("/Clean Debug");
+            extras.Run("/Clean Release");
+            extras.Run("/Clean Trial");
 
         }
 
-        public void BuildAll() {
-            d.Run("/Build Release");//Have to run Release first, since ImageResizerGUI includes the DLLs.
-            d.Run("/Build Debug");
+        public bool BuildAll(bool buildDebug) {
+            int result = d.Run("/Build Release") + //Have to run Release first, since ImageResizerGUI includes the DLLs.
             d.Run("/Build Trial");
+            if (buildDebug) result += d.Run("/Build Debug");
+
+            int extrasResult =
+            extras.Run("/Build Release") +
+            extras.Run("/Build Trial");
+            if (buildDebug) extrasResult += extras.Run("/Build Debug");
+
+            if (result > 0 && !ask("There may have been build errors. Continue?")) return false;
+            else if (extrasResult > 0 && !ask("There may have been build errors for Plugins With External Dependencies. Continue?")) return false;
+            return true;
         }
 
 
@@ -309,6 +370,7 @@ namespace ImageResizer.ReleaseBuilder {
                        "^/Core/obj/*","^/Core.Mvc/obj/*"));
 
 
+            f.DelFiles(q.files("^/Samples/MvcSample/App_Data/*"));
 
             //delete .xml and .pdb files for third-party libs
             f.DelFiles(q.files("^/dlls/*/(Aforge|LitS3|Ionic)*.(pdb|xml)$"));
@@ -323,7 +385,10 @@ namespace ImageResizer.ReleaseBuilder {
 
 
         public string[] standardExclusions = new string[]{
-                "/.git","^/Releases","/Hidden/","^/Legacy","^/Tools/(Builder|BuildTools|docu)","^/Samples/Images/*/*","/Thumbs.db$","/.DS_Store$",".suo$",".user$"
+                "/.git","^/Releases","/Hidden/","^/Legacy","^/Tools/(Builder|BuildTools|docu)",
+				"^/Samples/Images/(extra|private)/","/Thumbs.db$","/.DS_Store$",".suo$",".user$", "/._","/~$", 
+                "^/Samples/MvcSample/App_Data/"
+
             };
 
         public void PrepareForPackaging() {
@@ -333,16 +398,18 @@ namespace ImageResizer.ReleaseBuilder {
             q.exclusions.Add(new Pattern("^/Plugins/Libs/Aforge*.xml$"));
             q.exclusions.Add(new Pattern("^/Tests/Libs/LibDevCassini"));
             q.exclusions.Add(new Pattern("^/Tests/binaries"));
+            q.exclusions.Add(new Pattern("^/Tests/ComparisonBenchmark/Images"));
             q.exclusions.Add(new Pattern("^/Samples/SqlReaderSampleVarChar"));
             q.exclusions.Add(new Pattern("^/Contrib/*/(bin|obj|imagecache|uploads|results)/*"));
             q.exclusions.Add(new Pattern(".config.transform$"));
-            q.exclusions.Add(new Pattern("^/Plugins/Libs/FreeImage/[^DW][^ir]*/")); //Exclude everything except Dist and Wrapper folders
+            q.exclusions.Add(new Pattern("^/Plugins/Libs/FreeImage/Examples/")); //Exclude examples folder
             q.exclusions.Add(new Pattern("^/Plugins/Libs/FreeImage/Wrapper/(Delphi|VB6|FreeImagePlus)")); //Exclude everything except the FreeImage.NET folder
             q.exclusions.Add(new Pattern("^/Plugins/Libs/FreeImage/Wrapper/FreeImage.NET/cs/[^L]*/")); //Exclude everything except the library folder
-            q.exclusions.Add(new Pattern("^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|results)/"));
+            q.exclusions.Add(new Pattern("^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|hidden|results)/"));
             q.exclusions.Add(new Pattern("^/Core(.Mvc)?/obj/"));
             q.exclusions.Add(new Pattern("^/dlls/*/(Aforge|LitS3|Ionic)*.(pdb|xml)$"));
             q.exclusions.Add(new Pattern("^/dlls/*/FreeImage.dll$")); //Exclude FreeImage.dll from the dlls folder - no need for multiple copies of it.
+            q.exclusions.Add(new Pattern("/gsdll(32|64).dll$")); //Exclude ghostscript dlls, they're huge.
         }
         public void PackMin(PackageDescriptor desc) {
             // 'min' - /dlls/release/ImageResizer.* - /
@@ -363,9 +430,9 @@ namespace ImageResizer.ReleaseBuilder {
         public void PackFull(PackageDescriptor desc) {
             // 'full'
             using (var p = new Package(desc.Path, this.f.ParentPath)) {
-                p.Add(q.files("^/(core|contrib|core.mvc|plugins|samples|tests)/"));
+                p.Add(q.files("^/(core|contrib|core.mvc|plugins|samples|tests|studiojs)/"));
                 p.Add(q.files("^/tools/COMInstaller"));
-                p.Add(q.files("^/dlls/(release|debug)"));
+                p.Add(q.files("^/dlls/(debug|release)"));
                 p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"), "/"); //Make a copy in the root
                 
                 p.Add(q.files("^/[^/]+.txt$"));
@@ -385,8 +452,8 @@ namespace ImageResizer.ReleaseBuilder {
             q.exclusions.Add(new Pattern("^/Core/[^/]+.sln")); //Don't include the regular solution files, they won't load properly.
             using (var p = new Package(desc.Path, this.f.ParentPath)) {
                 p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"), "/");
-                p.Add(q.files("^/dlls/(release|debug)/"));
-                p.Add(q.files("^/(core|samples)/"));
+                p.Add(q.files("^/dlls/(debug|release)/"));
+                p.Add(q.files("^/(core|samples|studiojs)/"));
                 p.Add(q.files("^/[^/]+.txt$"));
                 p.Add(q.files("^/Web.config$"));
             }

@@ -7,7 +7,9 @@ using System.Collections.Specialized;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
-    /// Adds URL syntax support for http://webimageresizer.codeplex.com/, http://imagehandler.codeplex.com/, http://bbimagehandler.codeplex.com/, and http://bip.codeplex.com/
+    /// Adds URL syntax support for http://webimageresizer.codeplex.com/, 
+    /// http://imagehandler.codeplex.com/, http://bbimagehandler.codeplex.com/, http://dynamicimageprocess.codeplex.com/, 
+    /// and http://bip.codeplex.com/
     /// </summary>
     public class ImageHandlerSyntax:IPlugin {
 
@@ -40,10 +42,16 @@ namespace ImageResizer.Plugins.Basic {
                 c.Pipeline.ModifiedQueryString.Remove("src");
 
                 //Grayscale and zoom not supported yet
+                if (string.IsNullOrEmpty(c.Pipeline.ModifiedQueryString["s.grayscale"]) &&
+                    !string.IsNullOrEmpty(c.Pipeline.ModifiedQueryString["greyscale"])) c.Pipeline.ModifiedQueryString["s.grayscale"] = "true";
+
+                if (string.IsNullOrEmpty(c.Pipeline.ModifiedQueryString["s.invert"]) &&
+                    !string.IsNullOrEmpty(c.Pipeline.ModifiedQueryString["invert"])) c.Pipeline.ModifiedQueryString["s.invert"] = "true";
+
 
                 //Mimic aspect-ratio destruction
-                if (string.IsNullOrEmpty(c.Pipeline.ModifiedQueryString["stretch"]))
-                    c.Pipeline.ModifiedQueryString["stretch"] = "fill";
+                if (string.IsNullOrEmpty(c.Pipeline.ModifiedQueryString["stretch"]) && string.IsNullOrEmpty(c.Pipeline.ModifiedQueryString["mode"]))
+                    c.Pipeline.ModifiedQueryString["mode"] = "stretch";
 
             }else if (c.Pipeline.PreRewritePath.Equals(prefix + "imghandler.ashx", StringComparison.OrdinalIgnoreCase) && 
                 !string.IsNullOrEmpty(context.Request.QueryString["img"])) {
@@ -101,19 +109,21 @@ namespace ImageResizer.Plugins.Basic {
                     q["borderWidth"] = q["border"];
                     q.Remove("border");
                 }
-            } else if (c.Pipeline.IsAcceptedImageType(c.Pipeline.PreRewritePath) || c.Pipeline.SkipFileTypeCheck){
-                //BetterImageProcessor uses a Handler registered to all Jpeg images. Just the image URL plus ?w= and/or ?h=
-                if (!string.IsNullOrEmpty(context.Request.QueryString["w"]) || !string.IsNullOrEmpty(context.Request.QueryString["h"])) {
-                    c.Pipeline.ModifiedQueryString["width"] = c.Pipeline.ModifiedQueryString["w"];
-                    c.Pipeline.ModifiedQueryString["height"] = c.Pipeline.ModifiedQueryString["h"];
-                    c.Pipeline.ModifiedQueryString.Remove("w");
-                    c.Pipeline.ModifiedQueryString.Remove("h");
-                    //Note - the module will not lose aspect ratio even though BIP does. Although implemented for other syntaxes, 
-                    // this syntax (w/h) may eventually be adopted by the image resizer, so we don't want issues down the roat.
-                }
+            } 
+            //Feb. 20 - removed this, as the w/h syntax has already been adopted by the image resizer, and this code was breaking URLs when both w and height or h and width were used togehter.
+            //else if (c.Pipeline.IsAcceptedImageType(c.Pipeline.PreRewritePath) || c.Pipeline.SkipFileTypeCheck){
+            //    //BetterImageProcessor and DynamicImageProcessor uses a Handler registered to all Jpeg images. Just the image URL plus ?w= and/or ?h=
+            //    if (!string.IsNullOrEmpty(context.Request.QueryString["w"]) || !string.IsNullOrEmpty(context.Request.QueryString["h"])) {
+            //        c.Pipeline.ModifiedQueryString["width"] = c.Pipeline.ModifiedQueryString["w"];
+            //        c.Pipeline.ModifiedQueryString["height"] = c.Pipeline.ModifiedQueryString["h"];
+            //        c.Pipeline.ModifiedQueryString.Remove("w");
+            //        c.Pipeline.ModifiedQueryString.Remove("h");
+            //        //Note - the module will not lose aspect ratio even though BIP does. Although implemented for other syntaxes, 
+            //        // this syntax (w/h) may eventually be adopted by the image resizer, so we don't want issues down the road.
+            //    }
                 
 
-            }
+            //}
         }
 
        

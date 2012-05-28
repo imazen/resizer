@@ -64,6 +64,11 @@ namespace ImageResizer.Resizing {
         /// The source bitmap.  If null, skip drawing commands, but continue layout logic.
         /// </summary>
         public Bitmap sourceBitmap;
+
+        /// <summary>
+        /// An optional intermediate bitmap, created by plugins who need to process the source bitmap it gets rendered to destBitmap. If defined, it should be used instead of sourceBitmap during RenderImage(), and disposed immediately after use.
+        /// </summary>
+        public Bitmap preRenderBitmap;
         /// <summary>
         /// The destination bitmap.  If null, skip drawing commands, but continue layout logic.
         /// </summary>
@@ -108,7 +113,11 @@ namespace ImageResizer.Resizing {
                     try {
                         if (destBitmap != null) destBitmap.Dispose();
                     } finally {
-                        if (copyAttibutes != null) copyAttibutes.Dispose();
+                        try {
+                            if (copyAttibutes != null) copyAttibutes.Dispose();
+                        } finally {
+                            if (preRenderBitmap != null) preRenderBitmap.Dispose();
+                        }
                     }
                 }
 

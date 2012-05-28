@@ -9,6 +9,10 @@ using System.Security.Cryptography;
 using ImageResizer.Configuration.Issues;
 using System.IO;
 using ImageResizer.Resizing;
+using System.Web;
+using ImageResizer.Configuration.Xml;
+using ImageResizer.ExtensionMethods;
+using System.Text.RegularExpressions;
 
 namespace ImageResizer.Plugins.RemoteReader {
 
@@ -25,26 +29,44 @@ namespace ImageResizer.Plugins.RemoteReader {
             get { return RemoteReaderPlugin.hmacKey; }
         }
 
+        private int _allowedRedirects = 5;
+        /// <summary>
+        /// How many redirects to follow before throwing an exception. Defaults to 5.
+        /// </summary>
+        public int AllowedRedirects {
+            get { return _allowedRedirects; }
+            set { _allowedRedirects = value; }
+        }
+
         protected string remotePrefix = "~/remote";
         Config c;
         public RemoteReaderPlugin() {
             try {
-                remotePrefix = Util.PathUtils.ResolveAppRelative(remotePrefix);
+                remotePrefix = Util.PathUtils.ResolveAppRelativeAssumeAppRelative(remotePrefix);
+                //Remote prefix must never end in a slash - remote.jpg syntax...
             } catch { }
         }
 
         public IPlugin Install(Configuration.Config c) {
             this.c = c;
             c.Plugins.add_plugin(this);
+            c.Pipeline.PostAuthorizeRequestStart += Pipeline_PostAuthorizeRequestStart;
             c.Pipeline.RewriteDefaults += Pipeline_RewriteDefaults;
             c.Pipeline.PostRewrite += Pipeline_PostRewrite;
+            AllowedRedirects = c.get("remoteReader.allowedRedirects",AllowedRedirects);
+
             return this;
+        }
+
+        void Pipeline_PostAuthorizeRequestStart(IHttpModule sender, HttpContext context) {
+            if (IsRemotePath(c.Pipeline.PreRewritePath)) c.Pipeline.SkipFileTypeCheck = true;
         }
 
 
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             c.Pipeline.RewriteDefaults -= Pipeline_RewriteDefaults;
+            c.Pipeline.PostAuthorizeRequestStart -= Pipeline_PostAuthorizeRequestStart;
             c.Pipeline.PostRewrite -= Pipeline_PostRewrite;
             return true;
         }
@@ -54,20 +76,28 @@ namespace ImageResizer.Plugins.RemoteReader {
         /// </summary>
         /// <param name="source"></param>
         /// <param name="settings"></param>
-        protected override void PreLoadImage(ref object source,ref string path, ref bool disposeSource, ref  ResizeSettings settings) {
+        /// <param name="disposeStream"></param>
+        /// <param name="path"></param>
+        /// <param name="restoreStreamPosition"></param>
+        /// <returns></returns>
+        protected override Stream GetStream(object source, ResizeSettings settings, ref bool disposeStream, out string path, out bool restoreStreamPosition) {
             //Turn remote URLs into URI instances
             if (source is string && (((string)source).StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-                                    ((string)source).StartsWith("https://", StringComparison.OrdinalIgnoreCase))){
+                                    ((string)source).StartsWith("https://", StringComparison.OrdinalIgnoreCase))) {
                 if (Uri.IsWellFormedUriString((string)source, UriKind.Absolute))
                     source = new Uri((string)source);
 
             }
+            restoreStreamPosition = false;
+            path = null;
             //Turn URI instances into streams
             if (source is Uri) {
                 path = ((Uri)source).ToString();
-                source = GetUriStream((Uri)source);
+                return GetUriStream((Uri)source);
             }
+            return null;
         }
+
 
 
         void Pipeline_RewriteDefaults(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
@@ -76,14 +106,14 @@ namespace ImageResizer.Plugins.RemoteReader {
             if (IsRemotePath(e.VirtualPath) &&
                     !string.IsNullOrEmpty(e.QueryString[Base64UrlKey])) {
                 string ext = PathUtils.GetExtension(PathUtils.FromBase64UToString(e.QueryString[Base64UrlKey]));
-                e.VirtualPath = PathUtils.SetExtension(e.VirtualPath, ext);
+                if (!string.IsNullOrEmpty(ext)) e.VirtualPath = PathUtils.SetExtension(e.VirtualPath, ext);
             }
         }
 
         void Pipeline_PostRewrite(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
             if (IsRemotePath(e.VirtualPath)) {
                 //Force images to be processed - don't allow them to only cache it.
-                e.QueryString["process"] = ProcessWhen.Always.ToString();
+                e.QueryString["process"] = ProcessWhen.Always.ToString().ToLowerInvariant();
             }
         }
 
@@ -94,14 +124,12 @@ namespace ImageResizer.Plugins.RemoteReader {
         /// </summary>
         public static RemoteReaderPlugin Current {
             get {
-                RemoteReaderPlugin p = Config.Current.Plugins.Get<RemoteReaderPlugin>();
-                if (p != null) return p;
-                return (RemoteReaderPlugin)new RemoteReaderPlugin().Install(Config.Current);
+                return Config.Current.Plugins.GetOrInstall<RemoteReaderPlugin>();
             }
         }
 
         /// <summary>
-        /// Generates a signed domain-relative URL in the form "/app/remote.jpg.ashx?width=200&urlb64=aHnSh3haSh...&hmac=913f3KJGK3hj"
+        /// Generates a signed domain-relative URL in the form "/app/remote.jpg.ashx?width=200&amp;urlb64=aHnSh3haSh...&amp;hmac=913f3KJGK3hj"
         /// </summary>
         /// <param name="remoteUrl"></param>
         /// <param name="settings"></param>
@@ -163,24 +191,71 @@ namespace ImageResizer.Plugins.RemoteReader {
                     throw new ImageProcessingException("Invalid request! This request was not properly signed, or has been tampered with since transmission.");
                 args.RemoteUrl = PathUtils.FromBase64UToString(data);
                 args.SignedRequest = true;
-            } else
-                args.RemoteUrl = "http://" + virtualPath.Substring(remotePrefix.Length).TrimStart('/', '\\');
-
+            } else {
+                args.RemoteUrl = "http://" + ReplaceInLeadingSegment(virtualPath.Substring(remotePrefix.Length).TrimStart('/', '\\'), "_", ".");
+                args.RemoteUrl = Uri.EscapeUriString(args.RemoteUrl);
+            }
             if (!Uri.IsWellFormedUriString(args.RemoteUrl, UriKind.Absolute))
                 throw new ImageProcessingException("Invalid request! The specified Uri is invalid: " + args.RemoteUrl);
             return args;
         }
 
+        private string ReplaceInLeadingSegment(string path, string from, string to) {
+            int firstslash = path.IndexOf('/',1);
+            if (firstslash < 0) firstslash = path.Length; //If no forward slashes, edit whole string.
+
+            return path.Substring(0, firstslash).Replace(from, to) + path.Substring(firstslash);
+        }
+
 
         public bool IsRemotePath(string virtualPath) {
-            return (virtualPath.StartsWith(remotePrefix, StringComparison.OrdinalIgnoreCase));
+            return (virtualPath.Length > remotePrefix.Length && 
+                virtualPath.StartsWith(remotePrefix, StringComparison.OrdinalIgnoreCase)
+                && (virtualPath[remotePrefix.Length] == '.' || virtualPath[remotePrefix.Length] == '/'));
         }
 
         public bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
             return IsRemotePath(virtualPath);
         }
 
+        /// <summary>
+        /// Allows you to perform programmatic white or blacklisting of remote URLs
+        /// </summary>
         public event RemoteRequest AllowRemoteRequest;
+
+        private bool IsWhitelisted(RemoteRequestEventArgs request) {
+            var rr = c.getNode("remotereader");
+            var domain = new Uri(request.RemoteUrl).Host;
+
+
+            foreach (Node n in rr.childrenByName("allow")) {
+                bool onlyWhenSigned = n.Attrs.Get<bool>("onlyWhenSigned", false);
+                if (onlyWhenSigned && !request.SignedRequest) continue;
+
+                bool hostMatches = false, regexMatches = false;
+                string host = n.Attrs.Get("domain");
+                if (!string.IsNullOrEmpty(host)) {
+                    if (host.StartsWith("*.", StringComparison.OrdinalIgnoreCase))
+                        hostMatches = domain.EndsWith(host.Substring(1), StringComparison.OrdinalIgnoreCase);
+                    else
+                        hostMatches = domain.Equals(host, StringComparison.OrdinalIgnoreCase);
+
+                    if (!hostMatches) continue;//If any filter doesn't match, skip rule
+                }
+
+                string regex = n.Attrs.Get("regex");
+                if (!string.IsNullOrEmpty(regex)) {
+                    var r = new Regex("^" + regex + "$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+                    regexMatches = r.IsMatch(request.RemoteUrl);
+                    if (!regexMatches) continue;//If any filter doesn't match, skip rule
+                }
+                //If all specified filters match, allow the request. 
+                //This *is* supposed to be || not &&, because we already deal with non-matching filters via 'continue'.
+                if (hostMatches || regexMatches) return true;
+
+            }
+            return false;
+        }
 
         public IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
             RemoteRequestEventArgs request = ParseRequest(virtualPath, queryString);
@@ -188,6 +263,9 @@ namespace ImageResizer.Plugins.RemoteReader {
 
             if (request.SignedRequest && c.get("remotereader.allowAllSignedRequests", false)) request.DenyRequest = false;
 
+            //Check the whitelist
+            if (request.DenyRequest && IsWhitelisted(request)) request.DenyRequest = false;
+     
             //Fire event
             if (AllowRemoteRequest != null) AllowRemoteRequest(this, request);
 
@@ -205,25 +283,52 @@ namespace ImageResizer.Plugins.RemoteReader {
 
         }
 
-
-        public Stream GetUriStream(Uri uri) {
+        /// <summary>
+        /// Returns a stream of the HTTP response to the specified URL with a 15 second timeout. 
+        /// Throws a FileNotFoundException instead of a WebException for 404 errors.
+        /// Can throw a variety of exceptions: ProtocolViolationException, WebException,  FileNotFoundException,
+        /// SecurityException, NotSupportedException?, and InvalidOperationException?.
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="maxRedirects"></param>
+        /// <returns></returns>
+        public Stream GetUriStream(Uri uri, int maxRedirects = -1) {
+            if (maxRedirects == -1) maxRedirects = AllowedRedirects;
 
             HttpWebResponse response = null;
             try {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
                 request.Timeout = 15000; //Default to 15 seconds. Browser timeout is usually 30.
-
+                
                 //This is IDisposable, but only disposes the stream we are returning. So we can't dispose it, and don't need to
                 response = request.GetResponse() as HttpWebResponse;
                 return response.GetResponseStream();
-            } catch {
+            } catch (WebException e) {
+                var resp = e.Response as HttpWebResponse;
+
+                if (e.Status == WebExceptionStatus.ProtocolError && resp != null) {
+                    if (resp.StatusCode == HttpStatusCode.NotFound) throw new FileNotFoundException("404 error: \"" + uri.ToString() + "\" not found.", e);
+
+                    if (resp.StatusCode == HttpStatusCode.Forbidden) throw new HttpException(403, "403 Not Authorized (from remote server) for : \"" + uri.ToString() + "\".", e);
+                    if (resp.StatusCode == HttpStatusCode.Moved ||
+                        resp.StatusCode == HttpStatusCode.Redirect) {
+                            if (maxRedirects < 1) throw new HttpException(500, "Too many redirects, stopped while looking for \"" + uri.ToString() + "\".");
+                            string loc = resp.GetResponseHeader("Location");
+                            if (!string.IsNullOrEmpty(loc) && Uri.IsWellFormedUriString(loc, UriKind.RelativeOrAbsolute)) {
+                                Uri newLoc = Uri.IsWellFormedUriString(loc, UriKind.Absolute) ? new Uri(loc) : new Uri(uri, new Uri(loc));
+                                response.Close(); response = null; 
+                                return GetUriStream(newLoc, maxRedirects - 1);
+                            }
+                    }
+                }
+                //if (resp != null)resp.Close();
                 if (response != null) response.Close();
-                throw;
-            }
+                throw e;
+            } 
         }
     }
 
-    public class RemoteSiteFile : IVirtualFile {
+    public class RemoteSiteFile : IVirtualFile, IVirtualFileSourceCacheKey {
 
         protected string virtualPath;
         protected RemoteReaderPlugin parent;
@@ -241,6 +346,10 @@ namespace ImageResizer.Plugins.RemoteReader {
 
         public System.IO.Stream Open() {
             return parent.GetUriStream(new Uri(this.request.RemoteUrl));
+        }
+
+        public string GetCacheKey(bool includeModifiedDate) {
+            return this.request.RemoteUrl;
         }
     }
 }

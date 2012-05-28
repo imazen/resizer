@@ -9,28 +9,55 @@ using ImageResizer.Configuration;
 using System.IO;
 using System.Web.Caching;
 using System.Collections.Specialized;
+using System.Security;
+using ImageResizer.Configuration.Issues;
+using ImageResizer.Util;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
     /// Functions exactly like an IIS virtual folder, but doesn't require IIS configuration.
     /// </summary>
-    [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
-    [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
-    public class VirtualFolder : VirtualPathProvider, IPlugin , IMultiInstancePlugin{
+    public class VirtualFolder : VirtualPathProvider, IVirtualImageProvider, IPlugin , IMultiInstancePlugin, IIssueProvider{
 
         public VirtualFolder(string virtualPath, string physicalPath)
             : base() {
             this.VirtualPath = virtualPath;
             this.PhysicalPath = physicalPath;
         }
+        public VirtualFolder(string virtualPath, string physicalPath, bool registerAsVpp)
+            : base() {
+            this.VirtualPath = virtualPath;
+            this.PhysicalPath = physicalPath;
+            this.RegisterAsVpp = registerAsVpp;
+        }
 
         public VirtualFolder(NameValueCollection args)
             : base() {
             this.VirtualPath = args["virtualPath"];
             this.PhysicalPath = args["physicalPath"];
+            this.RegisterAsVpp = args.Get<bool>( "vpp", this.RegisterAsVpp);
         }
 
 
+
+        private bool _failedToRegisterVpp = false;
+        /// <summary>
+        /// True if the provider attempted to register itself as a VirtualPathProvider and failed due to limited security clearance.
+        /// False if it did not attempt (say, due to missing IOPermission) , or if it succeeded.
+        /// </summary>
+        public bool FailedToRegisterVpp {
+            get { return _failedToRegisterVpp; }
+        }
+
+        private bool registerAsVpp = true;
+        /// <summary>
+        /// If true, the plugin will attempt to register itself as an application-wide VirtualPathProvider instead of a image resizer-specific IVirtualImageProvider.
+        /// </summary>
+        public bool RegisterAsVpp {
+            get { return registerAsVpp; }
+            set { registerAsVpp = value; }
+        }
 
         private string virtualPath = null;
         /// <summary>
@@ -51,83 +78,187 @@ namespace ImageResizer.Plugins.Basic {
         }
 
 
+        private bool registeredVpp = false;
         /// <summary>
         /// Registers the VirtualFolder plugin as a virtual path provider.
         /// </summary>
         /// <returns></returns>
         public IPlugin Install(Config c) {
-            HostingEnvironment.RegisterVirtualPathProvider(this);
+            if (!NoIOPermission && RegisterAsVpp) {
+                try {
+                    HostingEnvironment.RegisterVirtualPathProvider(this);
+                    registeredVpp = true;
+                } catch (SecurityException) {
+                    this._failedToRegisterVpp =true;
+                }
+            }
             c.Plugins.add_plugin(this);
             return this;
         }
         public bool Uninstall(Config c) {
             c.Plugins.remove_plugin(this);
-            return false;//Cannot truly remove a VPP
+            return !registeredVpp;//Cannot truly remove a VPP
+        }
+
+        private bool noIOPermission = false;
+        /// <summary>
+        /// True if the plugin has detected it doesn't have sufficient IOPermission to operate.
+        /// </summary>
+        public bool NoIOPermission {
+            get { return noIOPermission; }
         }
 
 
-
-
-
         protected string normalizeVirtualPath(string path) {
-            if (path.StartsWith("~")) path = HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/' + path.Substring(1).TrimStart('/');
+            if (!path.StartsWith("/")) path = HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/' + path.Substring(1).TrimStart('/');
             return path;
         }
 
         protected string resolvePhysicalPath(string path) {
             
             if (!Path.IsPathRooted(path)) path = Path.Combine(HostingEnvironment.ApplicationPhysicalPath, path);
-            return Path.GetFullPath(path);
+            if (NoIOPermission) return collapsePath(path);
+
+            try {
+                return Path.GetFullPath(path);
+            } catch (SecurityException) {
+                noIOPermission = true;
+                return collapsePath(path);
+            }
         }
 
-        public string virtualToPhysical(string virtualPath) {
+        protected string collapsePath(string path) {
+            string oldPath = path;
+            do {
+                oldPath = path;
+                path = collapseOneLevel(oldPath);
+            } while (oldPath != path);
+            return path;
+        }
+
+        protected string collapseOneLevel(string path) {
+            int up = path.Length - 1;
+            do {
+                up = path.LastIndexOf(System.IO.Path.DirectorySeparatorChar + ".." + System.IO.Path.DirectorySeparatorChar, up);
+                if (up < 0) return path;
+                int prevSlash = path.LastIndexOf(System.IO.Path.DirectorySeparatorChar, up - 1);
+                if (prevSlash < 0) return path;
+                string segment = path.Substring(prevSlash + 1, up - prevSlash - 1);
+                if (segment.Equals("..", StringComparison.OrdinalIgnoreCase)) {
+                    //We can't combine \..\..\, just keep looking closer to the beginning of the string. We already adjusted 'up'
+                } else if (segment.Equals(".", StringComparison.OrdinalIgnoreCase)) {
+                    return path.Substring(0, prevSlash) + path.Substring(up); //Just remove \.\ sections
+                } else {
+                    return path.Substring(0, prevSlash) + path.Substring(up + 3); //If it's not \.\ or \..\, remove both it and the following \..\
+                }
+            } while (up > 0);
+            return path;
+        }
+        /// <summary>
+        /// Converts a virtual path in this folder to a physical path. Returns null if the virtual path is outside the folder.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
+        public string VirtualToPhysical(string virtualPath) {
             virtualPath = normalizeVirtualPath(virtualPath);
             if (virtualPath.StartsWith(this.VirtualPath, StringComparison.OrdinalIgnoreCase)) {
                 return Path.Combine(PhysicalPath, virtualPath.Substring(this.VirtualPath.Length).TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
             }
             return null;
         }
-
-        public bool isVirtualPath(string virtualPath) {
+        /// <summary>
+        /// Returns true if the specified path is inside this virtual folder
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
+        public bool IsVirtualPath(string virtualPath) {
             virtualPath = normalizeVirtualPath(virtualPath);
             return virtualPath.StartsWith(this.VirtualPath, StringComparison.OrdinalIgnoreCase);
         }
-        public bool isOnlyVirtualPath(string virtualPath) {
+        private bool isOnlyVirtualPath(string virtualPath) {
+            if (NoIOPermission) return false; //Don't act as a VPP if we don't have permission to operate.
             if (Previous.FileExists(virtualPath)) return false;
-            return isVirtualPath(virtualPath);
+            return IsVirtualPath(virtualPath);
         }
 
 
 
-        public Stream getStream(string virtualPath) {
+        internal protected Stream getStream(string virtualPath) {
             if (isOnlyVirtualPath(virtualPath))
-                return File.Open(virtualToPhysical(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read);
+                return File.Open(VirtualToPhysical(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read);
             return null;
         }
-
-        public DateTime getDateModifiedUtc(string virtualPath) {
-            string physicalPath = virtualToPhysical(virtualPath);
+        /// <summary>
+        /// Returns the LastWriteTimeUtc value for the specified virtual file in this folder, or DateTime.MinValue if missing.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
+        public DateTime GetDateModifiedUtc(string virtualPath) {
+            string physicalPath = VirtualToPhysical(virtualPath);
             if (System.IO.File.Exists(physicalPath))
                 return System.IO.File.GetLastWriteTimeUtc(physicalPath);
             else return DateTime.MinValue;
         }
 
+        /// <summary>
+        /// Returns true if the file exists in this virtual folder, and would not be masking an existing file.
+        /// Returns false if NoIOPermission is true.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        public bool FileExists(string virtualPath, NameValueCollection queryString) {
+            if (NoIOPermission) return false; //Because File.Exists is always false when IOPermission is missing, anyhow.
+            if (!IsVirtualPath(virtualPath)) return false; //It's not even in our area.
+            if (File.Exists(VirtualToPhysical(virtualPath))){
+                //Ok, we could serve it, but existing files take precedence.
+                //Return false if we would be masking an existing file.
+                return !File.Exists(HostingEnvironment.MapPath(normalizeVirtualPath(virtualPath)));
+            }
+            return false;
+        }
+        /// <summary>
+        /// Unless the path is not within the virtual folder, or IO permissions are missing, will return an IVirtualFile instance for the path. 
+        /// The file may or may not exist.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        public IVirtualFile GetFile(string virtualPath, NameValueCollection queryString) {
+            if (NoIOPermission) return null;
+            if (!IsVirtualPath(virtualPath)) return null; //It's not even in our area.
+            return new VirtualFolderProviderVirtualFile(virtualPath, this);
+        }
 
-
+        /// <summary>
+        /// For internal use only by the .NET VPP system.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
         public override bool FileExists(string virtualPath) {
             if (isOnlyVirtualPath(virtualPath))
-                return File.Exists(virtualToPhysical(virtualPath));
+                return File.Exists(VirtualToPhysical(virtualPath));
             else
                 return Previous.FileExists(virtualPath);
         }
-
+        /// <summary>
+        /// For internal use only by the .NET VPP system.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
         public override VirtualFile GetFile(string virtualPath) {
             if (isOnlyVirtualPath(virtualPath))
                 return new VirtualFolderProviderVirtualFile(virtualPath, this);
             else
                 return Previous.GetFile(virtualPath);
         }
-
+        /// <summary>
+        /// For internal use only by the .NET VPP system.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="virtualPathDependencies"></param>
+        /// <param name="utcStart"></param>
+        /// <returns></returns>
         public override CacheDependency GetCacheDependency(
           string virtualPath,
           System.Collections.IEnumerable virtualPathDependencies,
@@ -141,13 +272,11 @@ namespace ImageResizer.Plugins.Basic {
             }
 
 
-             return new CacheDependency(new string[] { virtualToPhysical(virtualPath) }, deps.ToArray(), utcStart);
+             return new CacheDependency(new string[] { VirtualToPhysical(virtualPath) }, deps.ToArray(), utcStart);
 
         }
 
-        [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Minimal)]
-        [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.Minimal)]
-        public class VirtualFolderProviderVirtualFile : VirtualFile, IVirtualFileWithModifiedDate {
+        public class VirtualFolderProviderVirtualFile : VirtualFile, IVirtualFileWithModifiedDate, IVirtualFile, IVirtualFileSourceCacheKey{
 
             private VirtualFolder provider;
 
@@ -170,12 +299,27 @@ namespace ImageResizer.Plugins.Basic {
 
             public DateTime ModifiedDateUTC {
                 get {
-                    if (_fileModifiedDate == null) _fileModifiedDate = provider.getDateModifiedUtc(this.VirtualPath);
+                    if (_fileModifiedDate == null) _fileModifiedDate = provider.GetDateModifiedUtc(this.VirtualPath);
                     return _fileModifiedDate.Value;
                 }
             }
 
+            public string GetCacheKey(bool includeModifiedDate) {
+                return VirtualPath + (includeModifiedDate ? ("_" + ModifiedDateUTC.Ticks.ToString()) : "");
+            }
         }
+
+        public IEnumerable<IIssue> GetIssues() {
+            List<IIssue> issues = new List<IIssue>();
+
+            if (NoIOPermission) issues.Add(new Issue("The VirtualFolder plugin cannot serve files from \"" +  PhysicalPath + "\" until you increase the trust level or modify the trust configuration to permit read access to the directory.", IssueSeverity.Error));
+            if (FailedToRegisterVpp) issues.Add(new Issue("The VirtualFolder plugin failed to register itself as an app-wide VirtualPathProvider. It will only work for images proccessed by the image resizer.", IssueSeverity.Error));
+
+
+            return issues;
+        }
+
+
     }
 
 }

@@ -7,6 +7,8 @@ using AForge.Imaging.Filters;
 using System.Drawing.Imaging;
 using ImageResizer.Util;
 using AForge.Imaging;
+using System.Globalization;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.WhitespaceTrimmer {
     public class WhitespaceTrimmerPlugin:BuilderExtension, IPlugin, IQuerystringPlugin {
@@ -19,19 +21,12 @@ namespace ImageResizer.Plugins.WhitespaceTrimmer {
         protected override RequestedAction LayoutImage(ImageState s) {
             if (s.sourceBitmap == null) return RequestedAction.None;
 
-            string str = null;
-            str = s.settings["trim.percentpadding"]; //percentpadding. Percentage is 0-100, multiplied by the average of the width and height.
-            double percentpadding = 0;
-            if (!string.IsNullOrEmpty(str) && double.TryParse(str, out percentpadding))
-                percentpadding /= 100;
-
-
-            int threshold = 0;
-            str = s.settings["trim.threshold"]; //threshold
-            if (!string.IsNullOrEmpty(str) && int.TryParse(str, out threshold)) {
+            //percentpadding. Percentage is 0-100, multiplied by the average of the width and height.
+            double percentpadding = s.settings.Get<double>("trim.percentpadding", 0) / 100;
+            
+            int? threshold = s.settings.Get<int>("trim.threshold");
+            if (threshold != null) {
                 if (threshold < 0) threshold = 0; if (threshold > 255) threshold = 255;
-
-                
                 
                 Rectangle box = new BoundingBoxFinder().FindBoxSobel(s.sourceBitmap, new Rectangle(0, 0, s.sourceBitmap.Width, s.sourceBitmap.Height), (byte)threshold);
                 //Add padding

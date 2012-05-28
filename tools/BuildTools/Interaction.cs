@@ -40,6 +40,17 @@ namespace BuildTools {
             if (string.IsNullOrEmpty(response.Trim())) return defaultValue;
             else return response.Trim();
         }
+
+        /// <summary>
+        /// Prints a key/value pair and returns the value
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public string list(string name, string value) {
+            Console.WriteLine(name.PadRight(25,'.') + " " + value);
+            return value;
+        }
         /// <summary>
         /// Writes a newline.
         /// </summary>

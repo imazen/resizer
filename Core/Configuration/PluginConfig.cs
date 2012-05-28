@@ -14,6 +14,8 @@ using System.Collections;
 using System.Collections.Specialized;
 using ImageResizer.Collections;
 using ImageResizer.Configuration.Logging;
+using System.Web.Compilation;
+using ImageResizer.Configuration.Plugins;
 
 namespace ImageResizer.Configuration {
     /// <summary>
@@ -22,6 +24,8 @@ namespace ImageResizer.Configuration {
     public class PluginConfig :IssueSink, IEncoderProvider {
 
 
+
+        protected NativeDependencyManager ndeps = new NativeDependencyManager();
 
         protected Config c;
         /// <summary>
@@ -37,6 +41,7 @@ namespace ImageResizer.Configuration {
             fileExtensionPlugins = new SafeList<IFileExtensionPlugin>();
             allPlugins = new SafeList<IPlugin>();
             virtualProviderPlugins = new SafeList<IVirtualImageProvider>();
+            settingsModifierPlugins = new SafeList<ISettingsModifier>();
         }
 
 		[CLSCompliant(false)]
@@ -84,7 +89,7 @@ namespace ImageResizer.Configuration {
             }
         }
         /// <summary>
-        /// Returns the subset of AllPlugins which implement the specified type or interface
+        /// Returns the subset of installed plugins which implement the specified type or interface
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -93,6 +98,19 @@ namespace ImageResizer.Configuration {
             foreach (IPlugin p in AllPlugins)
                 if (type.IsAssignableFrom(p.GetType())) //Like instance of. Can be a subclass
                     results.Add(p); 
+            return results;
+        }
+        /// <summary>
+        /// Returns all registered instances of the specified plugins
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public IList<T> GetAll<T>() {
+            List<T> results = new List<T>();
+            Type t = typeof(T);
+            foreach (IPlugin p in AllPlugins)
+                if (t.IsAssignableFrom(p.GetType())) //Like instance of. Can be a subclass
+                    results.Add((T)p);
             return results;
         }
 
@@ -109,31 +127,6 @@ namespace ImageResizer.Configuration {
         }
 
         /// <summary>
-        /// Returns all registered instances of the specified plugins
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public IList<T> GetAll<T>() {
-            List<T> results = new List<T>();
-            foreach (IPlugin p in AllPlugins)
-                if (typeof(T).IsAssignableFrom(p.GetType())) //Like instance of. Can be a subclass
-                    results.Add((T)p);
-            return results;
-        }
-
-        /// <summary>
-        /// Returns the first registerd instance of the specified plugin. For IMultiInstancePlugins, use GetAll()
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public T Get<T>() {
-            foreach (IPlugin p in AllPlugins)
-                if (typeof(T).IsAssignableFrom(p.GetType())) //Like instance of. Can be a subclass
-                    return (T)p;
-            return default(T);
-        }
-
-        /// <summary>
         /// Returns true if 1 or more instances of the type are registered.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -141,6 +134,51 @@ namespace ImageResizer.Configuration {
         public bool Has<T>() {
             return Comparer<T>.Default.Compare(Get<T>(), default(T)) != 0;
         }
+
+
+        /// <summary>
+        /// Returns the first registerd instance of the specified plugin. For IMultiInstancePlugins, use GetAll()
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T Get<T>()  {
+            Type t = typeof(T);
+            foreach (IPlugin p in AllPlugins)
+                if (t.IsAssignableFrom(p.GetType())) //Like instance of. Can be a subclass
+                    return (T)p;
+            return default(T);
+        }
+
+        /// <summary>
+        /// Returns the first registered instance of the specified plugin, or creates a new instance if the plugin isn't installed. 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetOrInstall<T>() where T : IPlugin, new() {
+            T instance = Get<T>();
+            if (instance != null) return instance;
+
+            new T().Install(this.c);
+
+            return Get<T>();
+        }
+
+        /// <summary>
+        /// Returns the first registered instance of the specified plugin, or installs the given instance instead, then re-tries the query
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="newInstance"></param>
+        /// <returns></returns>
+        public T GetOrInstall<T>(T newInstance) where T : IPlugin {
+            T instance = Get<T>();
+            if (instance != null) return instance;
+
+            //Our instance may not get installed if there is a duplicate already
+            newInstance.Install(this.c);
+
+            return Get<T>();
+        }
+
 
         /// <summary>
         /// Installs the specified plugin, returning the plugin instance. 
@@ -199,6 +237,12 @@ namespace ImageResizer.Configuration {
         /// Plugins which provide virtual files are registered here.
         /// </summary>
         public SafeList<IVirtualImageProvider> VirtualProviderPlugins { get { return virtualProviderPlugins; } }
+
+        protected SafeList<ISettingsModifier> settingsModifierPlugins = null;
+        /// <summary>
+        /// Plugins which modify image processing settings.
+        /// </summary>
+        public SafeList<ISettingsModifier> SettingsModifierPlugins { get { return settingsModifierPlugins; } }
 
 
         protected SafeList<IPlugin> allPlugins = null;
@@ -273,6 +317,34 @@ namespace ImageResizer.Configuration {
             }
         }
 
+        /// <summary>
+        /// This is called to get a sorted list of plugins based on their likelyhood of having the plugin.
+        /// </summary>
+        /// <param name="assemblyName"></param>
+        /// <param name="pluginName"></param>
+        /// <returns></returns>
+        protected List<string> GetOptimizedAssemblyList(string assemblyName, string pluginName) {
+            List<string> assemblies = new List<string>();
+            //1) If an assembly was specified, search it first
+            if (assemblyName != null) assemblies.Add(assemblyName);
+            //2) Follow by searching the Core, the currently executing assembly
+            assemblies.Add(""); // Defaults to current assembly
+
+            //3) Next, add all assemblies that have "ImageResizer" in their name 
+
+
+            List<string> otherAssemblies = new List<string>();
+            //Add ImageResizer-related assemblies first
+            foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies()) {// AppDomain.CurrentDomain.GetAssemblies()
+                string aname = a.FullName;
+                if (aname.IndexOf("ImageResizer", StringComparison.OrdinalIgnoreCase) > -1) assemblies.Add(", " + aname);
+                else
+                    otherAssemblies.Add(", " + aname);
+            }
+            //4) Last, add all remaining assemblies
+            assemblies.AddRange(otherAssemblies);
+            return assemblies;
+        }
 
         /// <summary>
         /// Searches all loaded assemblies for the specified type, applying rules and prefixes to resolve the namespace and assembly.
@@ -304,38 +376,23 @@ namespace ImageResizer.Configuration {
             if (hasDot) alternateNames.Add(name);
             //DefaultEncoder, NoCache, etc.
             alternateNames.Add("ImageResizer.Plugins.Basic." + name.TrimStart('.'));
-            alternateNames.Add("ImageResizer.Plugins.Pro." + name.TrimStart('.'));
+            //Apr4-2012 - Deleted, never used: alternateNames.Add("ImageResizer.Plugins.Pro." + name.TrimStart('.'));
             //AnimatedGifs
             if (!hasDot) alternateNames.Add("ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.') + "Plugin");
             //AnimatedGifsPlugin
             if (!hasDot && name.EndsWith("Plugin"))
                 alternateNames.Add("ImageResizer.Plugins." + name.Substring(0, name.Length - 6).Trim('.') + "." + name.Trim('.'));
-            //Basic.DefaultEncoder
-            alternateNames.Add("ImageResizer.Plugins." + name.TrimStart('.'));
-            //For the depreciated convention of naming the plugin namespace and class the same.
+            //Apr4-2012 - Deleted, never used: //Basic.DefaultEncoder
+            //Apr4-2012 - Deleted, never used: alternateNames.Add("ImageResizer.Plugins." + name.TrimStart('.'));
+            //For the deprecated convention of naming the plugin namespace and class the same.
             if (!hasDot) alternateNames.Add("ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.'));
-            //Plugins.Basic.DefaultEncoder
-            alternateNames.Add("ImageResizer." + name.TrimStart('.'));
+            //Apr4-2012 - Deleted, never used: //Plugins.Basic.DefaultEncoder
+            //Apr4-2012 - Deleted, never used: alternateNames.Add("ImageResizer." + name.TrimStart('.'));
             //PluginWithNoNamespace
             if (!hasDot) alternateNames.Add(name);
 
-            List<string> assemblies = new List<string>();
-            //1) If an assembly was specified, search it first
-            if (assembly != null) assemblies.Add(assembly);
-            //2) Follow by searching the Core, the currently executing assembly
-            assemblies.Add(""); // Defaults to current assembly
-            //3) Next, add all assemblies that have "ImageResizer" in their name 
-            List<string> otherAssemblies = new List<string>();
-            //Add ImageResizer-related assemblies first
-            foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies()) {
-                string aname = a.FullName;
-                if (aname.IndexOf("ImageResizer", StringComparison.OrdinalIgnoreCase) > -1) assemblies.Add(", " + aname);
-                else
-                    otherAssemblies.Add(", " + aname);
-            }
-            //4) Last, add all remaining assemblies
-            assemblies.AddRange(otherAssemblies);
-
+            //Get a list of assemblies, sorted by likelyhood of a match
+            List<string> assemblies = GetOptimizedAssemblyList(assembly,name);
             //Now multiply 
             List<string> qualifiedNames = new List<string>(assemblies.Count * alternateNames.Count);
 
@@ -345,15 +402,22 @@ namespace ImageResizer.Configuration {
                     qualifiedNames.Add(className + assemblyName);
             }
 
-
-            //Now, try them all.
-            foreach (string s in qualifiedNames) {
-                if (t != null) return t;
-                Debug.WriteLine("Trying " + s);
-                t = Type.GetType(s, false, true);
-                if (t != null) Debug.WriteLine("Success!");
+            try {
+                //Now, try them all.
+                foreach (string s in qualifiedNames) {
+                    Debug.WriteLine("Trying " + s);
+                    t = Type.GetType(s, false, true);
+                    if (t != null) {
+                        Debug.WriteLine("Success!");
+                        return t;
+                    }
+                }
+            } catch (System.Security.SecurityException sx) {
+                this.AcceptIssue(new Issue("Failed to load plugin \"" + searchName + "\" due to ASP.NET trust configuration. ",
+                                "You may need to increase the trust level for this plugin to load properly. Error details: \n" +
+                                sx.Message + "\n" + sx.StackTrace, IssueSeverity.Error));
+                return null;
             }
-
 
             //Ok, time to log problem.
             if (t == null) {
@@ -372,9 +436,21 @@ namespace ImageResizer.Configuration {
             Type t = FindPluginType(name);
 
             if (t == null) return null;
+            return CreatePluginByType(t, args);
+        }
+
+        protected IPlugin CreatePluginByType(Type t, NameValueCollection args) {
 
             //TODO - perhaps manually select the constructor ? 
             //ConstructorInfo ci = null;
+            bool downloadDependencies = false;
+            if (args != null && args["downloadNativeDependencies"] != null) {
+                downloadDependencies = "true".Equals(args["downloadNativeDependencies"], StringComparison.OrdinalIgnoreCase);
+                if (args.Count == 2) args = null; //Don't require plugins to have an argument-supporting constructor just for downloadNativeDependencies
+                //'name' is included in args, remember.
+                ndeps.EnsureLoaded(t.Assembly);
+            }
+
 
 
             bool hasConstructor = true;
@@ -428,6 +504,7 @@ namespace ImageResizer.Configuration {
             if (plugin is IEncoder) ImageEncoders.Remove(plugin as IEncoder);
             if (plugin is BuilderExtension) ImageBuilderExtensions.Remove(plugin as BuilderExtension);
             if (plugin is IVirtualImageProvider) VirtualProviderPlugins.Remove(plugin as IVirtualImageProvider);
+            if (plugin is ISettingsModifier) SettingsModifierPlugins.Remove(plugin as ISettingsModifier);
             if (plugin is ILogManager && LogManager == plugin) LogManager = null;
         }
 
@@ -453,6 +530,7 @@ namespace ImageResizer.Configuration {
             if (plugin is IEncoder) ImageEncoders.AddFirst(plugin as IEncoder);
             if (plugin is BuilderExtension) ImageBuilderExtensions.Add(plugin as BuilderExtension);
             if (plugin is IVirtualImageProvider) VirtualProviderPlugins.Add(plugin as IVirtualImageProvider);
+            if (plugin is ISettingsModifier) SettingsModifierPlugins.Add(plugin as ISettingsModifier);
             if (plugin is ILogManager) LogManager = plugin as ILogManager;
         }
 
@@ -492,7 +570,7 @@ namespace ImageResizer.Configuration {
 
             //Verify there is something other than NoCache registered
             if (c.Plugins.CachingSystems.First is ImageResizer.Plugins.Basic.NoCache)
-                issues.Add(new Issue("NoCache is only for development usage, and cannot scale to production use.", "Add DiskCache or S3Cache for production use", IssueSeverity.Warning));
+                issues.Add(new Issue("NoCache is only for development usage, and cannot scale to production use.", "Add DiskCache or CloudFront for production use", IssueSeverity.Warning));
 
             //Verify NoCache is registered
             if (!c.Plugins.Has<ImageResizer.Plugins.Basic.NoCache>())
@@ -504,6 +582,7 @@ namespace ImageResizer.Configuration {
             if (c.Plugins.ImageEncoders.First == null)
                 issues.Add(new Issue("No encoders are registered! Without an image encoder, the pipeline cannot function.", IssueSeverity.Error));
 
+            issues.AddRange(ndeps.GetIssues());
 
             return issues;
         }

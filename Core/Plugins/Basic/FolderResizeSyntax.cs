@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections.Specialized;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.Basic {
     public class FolderResizeSyntax : IPlugin {
@@ -48,16 +49,16 @@ namespace ImageResizer.Plugins.Basic {
             Match m = resizeFolder.Match(path);
             if (m.Success) {
                 //Parse capture groups
-                int maxwidth = -1; if (!int.TryParse(m.Groups["maxwidth"].Value, out maxwidth)) maxwidth = -1;
-                int maxheight = -1; if (!int.TryParse(m.Groups["maxheight"].Value, out maxheight)) maxheight = -1;
+                int maxwidth = -1; if (!int.TryParse(m.Groups["maxwidth"].Value, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out maxwidth)) maxwidth = -1;
+                int maxheight = -1; if (!int.TryParse(m.Groups["maxheight"].Value, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out maxheight)) maxheight = -1;
                 string format = (m.Groups["format"].Captures.Count > 0) ? format = m.Groups["format"].Captures[0].Value : null;
 
                 //Remove first resize folder from URL
                 path = resizeFolder.Replace(path, "", 1);
 
                 //Add values to querystring
-                if (maxwidth > 0) q["maxwidth"] = maxwidth.ToString();
-                if (maxheight > 0) q["maxheight"] = maxheight.ToString();
+                if (maxwidth > 0) q["maxwidth"] = maxwidth.ToString(NumberFormatInfo.InvariantInfo);
+                if (maxheight > 0) q["maxheight"] = maxheight.ToString(NumberFormatInfo.InvariantInfo);
                 if (format != null) q["format"] = format;
 
                 //Call recursive - this handles multiple /resize(w,h)/resize(w,h)/ occurrences

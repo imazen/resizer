@@ -12,9 +12,11 @@ using ImageResizer.Encoding;
 using System.Web.Hosting;
 using ImageResizer.Collections;
 using System.Web;
+using System.Security.Permissions;
+using System.Runtime.InteropServices;
 
 namespace ImageResizer.Configuration {
-    public class PipelineConfig : IPipelineConfig, ICacheProvider{
+    public class PipelineConfig : IPipelineConfig, ICacheProvider, ISettingsModifier{
         protected Config c;
         public PipelineConfig(Config c) {
             this.c = c;
@@ -266,10 +268,20 @@ namespace ImageResizer.Configuration {
         /// <param name="queryString"></param>
         /// <returns></returns>
         public IVirtualFile GetFile(string virtualPath, NameValueCollection queryString) {
+            IVirtualFile f = null;
             foreach (IVirtualImageProvider p in c.Plugins.VirtualProviderPlugins) {
-                if (p.FileExists(virtualPath, queryString)) return p.GetFile(virtualPath, queryString);
+                if (p.FileExists(virtualPath, queryString)) { f = p.GetFile(virtualPath, queryString); break; }
             }
-            return HostingEnvironment.VirtualPathProvider != null && HostingEnvironment.VirtualPathProvider.FileExists(virtualPath)  ? new VirtualFileWrapper(HostingEnvironment.VirtualPathProvider.GetFile(virtualPath)) : null;
+            if (f == null &&  HostingEnvironment.VirtualPathProvider != null && HostingEnvironment.VirtualPathProvider.FileExists(virtualPath)) f =  new VirtualFileWrapper(HostingEnvironment.VirtualPathProvider.GetFile(virtualPath));
+            if (f == null) return null;
+
+            //Now we have a reference to the real virtual file, let's see if it is source-cached.
+            IVirtualFile cached = null;
+            foreach (IVirtualFileCache p in c.Plugins.GetAll<IVirtualFileCache>()) {
+                cached = p.GetFileIfCached(virtualPath,queryString,f);
+                if (cached != null) return cached;
+            }
+            return f;
         }
 
         /// <summary>
@@ -365,19 +377,26 @@ namespace ImageResizer.Configuration {
                    
         }
 
+
         public void FireRewritingEvents(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
+
+            //TODO: this approach is non-intuitive....
+
             //Fire first event (results will stay in e)
             if (Rewrite != null) Rewrite(sender,context, e);
 
             //Copy querystring for use in 'defaults' even
-            NameValueCollection copy = new NameValueCollection(e.QueryString); //Copy so we can later overwrite q with the original values.
+            NameValueCollection copy = new NameValueCollection(e.QueryString); //Copy so we can later overwrite q with the rewrite values.
 
             //Fire defaults event.
             if (RewriteDefaults != null) RewriteDefaults(sender, context, e);
 
             //Overwrite with querystring values again - this is what makes applyDefaults applyDefaults, vs. being applyOverrides.
-            foreach (string k in copy)
-                e.QueryString[k] = copy[k];
+            foreach (string k in copy) {
+                if (copy[k] != null) { //Don't allow null values to override defaults. Empty values can, however.
+                    e.QueryString[k] = copy[k];
+                }
+            }
             
             //Fire final event
             if (PostRewrite != null) PostRewrite(sender,context, e);
@@ -432,5 +451,25 @@ namespace ImageResizer.Configuration {
 
 
 
+
+        public ResizeSettings Modify(ResizeSettings settings) {
+            foreach (ISettingsModifier m in c.Plugins.SettingsModifierPlugins)
+                settings = m.Modify(settings);
+            return settings;
+        }
+
+
+        private bool _moduleInstalled = false;
+        /// <summary>
+        /// True once the InterceptModule has been installed and is intercepting requests.
+        /// </summary>
+        public bool ModuleInstalled {
+            get {
+                return _moduleInstalled;
+            }
+            set {
+                _moduleInstalled = value;
+            }
+        }
     }
 }

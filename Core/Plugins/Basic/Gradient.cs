@@ -5,6 +5,9 @@ using System.Collections.Specialized;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using ImageResizer.Util;
+using System.IO;
+using System.Drawing.Imaging;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
@@ -35,7 +38,7 @@ namespace ImageResizer.Plugins.Basic {
         }
 
 
-        public class GradientVirtualFile : IVirtualFile, IVirtualBitmapFile {
+        public class GradientVirtualFile : IVirtualFile, IVirtualBitmapFile, IVirtualFileSourceCacheKey {
             public GradientVirtualFile(NameValueCollection query) { this.query = new ResizeSettings(query); }
             public string VirtualPath {
                 get { return "gradient.png"; }
@@ -44,17 +47,22 @@ namespace ImageResizer.Plugins.Basic {
             protected ResizeSettings query;
 
             public System.IO.Stream Open() {
-                throw new NotImplementedException();
+                MemoryStream ms = new MemoryStream();
+                using (Bitmap b = GetBitmap()) {
+                    b.Save(ms, ImageFormat.Png);
+                }
+                ms.Seek(0, SeekOrigin.Begin);
+                return ms;
             }
 
             public System.Drawing.Bitmap GetBitmap() {
                 Bitmap b = null;
                 try {
-                    int w = query.Width > 0 ? query.Width : 8;
-                    int h = query.Height > 0 ? query.Height : 8;
-                    float angle = Util.Utils.getFloat(query,"angle",0);
-                    Color c1 = Utils.parseColor(query["color1"],Color.White);
-                    Color c2 = Utils.parseColor(query["color2"],Color.Black);
+                    int w = query.Width > 0 ? query.Width : (query.MaxWidth > 0 ? query.MaxWidth : 8);
+                    int h = query.Height > 0 ? query.Height : (query.MaxHeight > 0 ? query.MaxHeight : 8);
+                    float angle = query.Get<float>("angle", 0);
+                    Color c1 = ParseUtils.ParseColor(query["color1"], Color.White);
+                    Color c2 = ParseUtils.ParseColor(query["color2"], Color.Black);
                     b = new Bitmap(w, h);
 
                     using (Graphics g = Graphics.FromImage(b)) 
@@ -66,6 +74,10 @@ namespace ImageResizer.Plugins.Basic {
                     throw;
                 }
                 return b;
+            }
+
+            public string GetCacheKey(bool includeModifiedDate) {
+                return VirtualPath + PathUtils.BuildQueryString(query.Keep("width", "height", "w", "h", "maxwidth", "maxheight", "angle", "color1", "color2"));
             }
         }
     }

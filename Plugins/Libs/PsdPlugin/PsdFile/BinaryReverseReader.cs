@@ -41,8 +41,9 @@ namespace PhotoshopFile
   public class BinaryReverseReader : BinaryReader
   {
     public BinaryReverseReader(Stream a_stream)
-      : base(a_stream, Encoding.Default)
+          : base(a_stream, Encoding.GetEncoding("ISO-8859-1"))
     {
+      
     }
 
     public override short ReadInt16()

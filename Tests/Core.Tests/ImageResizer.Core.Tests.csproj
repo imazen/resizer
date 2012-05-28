@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="ImageBuilderTest.cs" />
     <Compile Include="PluginConfigTests.cs" />
+    <Compile Include="PresetPluginTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResizeSettingsTest.cs" />
     <Compile Include="TestPolygonMath.cs" />

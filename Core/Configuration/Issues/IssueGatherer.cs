@@ -18,14 +18,23 @@ namespace ImageResizer.Configuration.Issues {
 
 
         public IEnumerable<IIssue> GetIssues() {
-            List<IIssue> l = new List<IIssue>();
-            l.AddRange(c.configurationSectionIssues.GetIssues());
-            l.AddRange(new ConfigChecker(c).GetIssues());
-            l.AddRange(c.Plugins.GetIssues());
+            //Build a list of issue providers
+            List<IIssueProvider> providers = new List<IIssueProvider>(new IIssueProvider[]{
+                c.configurationSectionIssues,
+                new ConfigChecker(c),
+                c.Plugins});
             IIssueProvider b = c.CurrentImageBuilder as IIssueProvider;
-            if (b != null) l.AddRange(b.GetIssues());
-            foreach (IIssueProvider p in c.Plugins.GetAll<IIssueProvider>()) {
-                l.AddRange(p.GetIssues());
+            if (b != null) providers.Add(b);
+            providers.AddRange(c.Plugins.GetAll<IIssueProvider>());
+
+            //Build a list of issues
+            List<IIssue> l = new List<IIssue>();
+            foreach (IIssueProvider p in providers) {
+                try {
+                    l.AddRange(p.GetIssues());
+                } catch (Exception e) {
+                    l.Add(new Issue(p.GetType().Name, "Error checking for issues: " + e.ToString(), e.StackTrace, IssueSeverity.Error));
+                }
             }
             return l;
         }

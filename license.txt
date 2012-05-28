@@ -1,13 +1,23 @@
-See http://imageresizing.net/licenses/ for the best explanation.
+Please visit the web page at
+http://imageresizing.net/licenses/
+
+The core and 18 plugins are free and open-source, under a modified MIT license called the Freedom license. 
+See http://imageresizing.net/licenses/freedom
+
+The following DLLs are under the Freedom license:
+
+* ImageResizer.dll
+* ImageResizer.Mvc.dll 
+* ImageResizer.Plugins.Logging.dll 
 
 
-This software is divided into several parts, each of which may be licensed differently.
+Development of this project is funded by people purchasing Pro and Enterprise licenses
+to the 4 paid plugin bundles. Both Pro and Enterprise licenses are as MIT-like as possible, 
+allowing redistribution, modification, and sub-licensing.
 
-* The Core directory (and ImageResizer.dll) is licensed under an MIT-like license, see Core/License.txt for details.
-This includes all plugins in the ImageResizer.Plugins.Basic namespace
+The free trial license permits use of the paid plugins for development and testing purposes, but not for production use. 
+http://imageresizing.net/licenses/trial
 
-* Most other plugins are provided under the Resizer Trial license. (http://imageresizing.net/licenses/trial)
-
-The trial license permits use for development and testing purposes, but not for production use. 
+Once you begin using them on a production server, you will need a Pro or Enterprise-wide license.
 
 See http://imageresizing.net/plugins for information on buying licuenses.

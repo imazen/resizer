@@ -1,0 +1,44 @@
+﻿# Redness algorithm
+
+This algorithm seems the most effective, on average. Other algorithms fare better on certain images, but not on average. Assumes 8-bit RGB values.
+
+	Psuedo: `V = R == 0 ? : 0 : Min(255,Max(0, (R - Max(G,B)) * 255 / R))`
+	C#: `byte V =  R == 0 ? (byte)0 : (byte)Math.Min(255,Math.Max(0,((float)(R - Math.Max(G, B)) * 255.0F / (float)R)));`
+
+# Search algorithms
+
+Search algorithms need to function in two scenarios. 
+
+1. When provided a facial rectangle by face/eye detection. A likely eye position point and weight may also be proviuded.
+2. When provided a pixel by the user in manual mode. Search rect must be guessed. Eyes wider than 5% of image are extremely rare, so a radius of 3% of width would be a good max. 
+
+Resolution independence is very important. The easiest solution is to provide a web service that provides the crop rectangle in both source coordinates and final coordinates. Thus red-eye and object data could be specified in source coordinates.
+
+## Grid search
+
+1. Divide the search area into a grid that is a power of 2. For a single eye, a 32x16 grid should be sufficient. 
+
+2. Use RMS to calculate redness for each square. 
+
+3. Use RMS to create 4 sets of 16x8 grids, 16 sets of 8x4 grids, and 64 sets of 4x2 grids from the 16x16 grid.
+
+4. Find the 2 highest values from each of the 85 grids, and use the ratio of the max vs. the second highest to select the grid that contains the red eye within a single rectangle, 
+then use the midpoint of that rectangle and a radius of the max(width,height) to create the working area in which to process pixels. 
+Using the selected area and the second-most selected area, it should be possible to compute appropriate thresholds for red-eye removal.
+
+#### Weaknesses
+
+1. No likelyhood index for eye size, RMS favors large skin regions over small eyes. 
+2. Local contrast isn't calculated, so skin patches with high redness value get captured a lot.
+
+
+### Convolution search
+
+1. Define set of kernels
+2. Clone search area and convert to 8-bit
+3. Apply kernels at various sizes, perhaps use the sizes together. 
+4. Pick one. 
+5. Make tiny size/placement adjustments to optimize within a 25% variance of size. 
+
+opencv\build\(x64|x86)\vc10\bin
+

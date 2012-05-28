@@ -16,7 +16,7 @@ using ImageResizer.Util;
 #endif
 
 [assembly: AssemblyCompany("Nathanael Jones")]
-[assembly: AssemblyCopyright("Copyright © 2011 Nathanael Jones")]
+[assembly: AssemblyCopyright("Copyright © 2012 Nathanael Jones")]
 
 
 // Version information for an assembly consists of the following four values:
@@ -28,9 +28,9 @@ using ImageResizer.Util;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:/*
-[assembly: AssemblyVersion("3.0.13.*")]
-[assembly: AssemblyFileVersion("3.0.13.*")]
-[assembly: AssemblyInformationalVersion("3-0-13")]
+[assembly: AssemblyVersion("3.2.0.*")]
+[assembly: AssemblyFileVersion("3.2.0.*")]
+[assembly: AssemblyInformationalVersion("3-2-0")]
 
 [assembly: Commit("git-commit-guid-here")]
 
@@ -38,5 +38,5 @@ using ImageResizer.Util;
 
 // These commented out settings are for the build script to access
 // [assembly: PackageName("Resizer")]
-// [assembly: NugetVersion("3.0.13")]
+// [assembly: NugetVersion("3.2.0")]
 // [assembly: DownloadServer("http://downloads.imageresizing.net/")]

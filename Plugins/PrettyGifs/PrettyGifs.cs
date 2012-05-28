@@ -9,20 +9,28 @@ using ImageResizer;
 using ImageResizer.Plugins;
 using System.IO;
 using ImageResizer.Plugins.Basic;
+using System.Security.Permissions;
+using System.Security;
+using ImageResizer.Util;
+using System.Globalization;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.PrettyGifs {
     public class PrettyGifs :IEncoder, IPlugin, IQuerystringPlugin {
         public PrettyGifs() { }
 
+        private ResizeSettings query;
 
         public PrettyGifs(ResizeSettings settings, object original) {
+
+            this.query = new ResizeSettings(settings);
             ResizeSettings q = settings;
             //Parse output format
             OutputFormat = GetFormatIfSuitable(settings, original); 
             //Parse colors
             int colors = -1;
             if (!string.IsNullOrEmpty(q["colors"]))
-                if (int.TryParse(q["colors"], out colors))
+                if (int.TryParse(q["colors"], NumberStyles.Integer,NumberFormatInfo.InvariantInfo, out colors))
                     this.Colors = colors;
             //Parse dither settings
             if (!string.IsNullOrEmpty(q["dither"])) {
@@ -32,13 +40,32 @@ namespace ImageResizer.Plugins.PrettyGifs {
                     this.FourPassDither = true;
                 else {
                     int dither;
-                    if (int.TryParse(q["dither"], out dither)) {
+                    if (int.TryParse(q["dither"], NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out dither)) {
                         DitherPercent = dither;
                         Dither = true;
                     }
                 }
 
             }
+            
+            PreservePalette = q.Get<bool>("preservePalette", PreservePalette);
+            if (PreservePalette && original is Image && ((Image)original).Palette.Entries.Length > 0) {
+                originalPalette = ((Image)original).Palette;
+            }
+        }
+
+
+
+
+        private ColorPalette originalPalette = null;
+
+        private bool _preservePalette = false;
+        /// <summary>
+        /// If true, the original palette will be used if it exists. May cause serious color problems if new content has been added to the image.
+        /// </summary>
+        public bool PreservePalette {
+            get { return _preservePalette; }
+            set { _preservePalette = value; }
         }
 
         /// <summary>
@@ -54,9 +81,9 @@ namespace ImageResizer.Plugins.PrettyGifs {
         public bool FourPassDither = false;
         public int DitherPercent = 30;
 
-        private ImageFormat _outputFormat = ImageFormat.Jpeg;
+        private ImageFormat _outputFormat = ImageFormat.Gif;
         /// <summary>
-        /// If you set this to anything other than Gif, Png, or Jpeg, it will throw an exception. Defaults to Jpeg
+        /// If you set this to anything other than Gif or Png, it will throw an exception. Defaults to GIF.
         /// </summary>
         public ImageFormat OutputFormat {
             get { return _outputFormat; }
@@ -73,6 +100,8 @@ namespace ImageResizer.Plugins.PrettyGifs {
         /// <param name="settings"></param>
         /// <returns></returns>
         public IEncoder CreateIfSuitable( ResizeSettings settings, object original) {
+            //Opt out if the user is requesting a different one.
+            if (!string.IsNullOrEmpty(settings["encoder"]) && !"prettygifs".Equals(settings["encoder"], StringComparison.OrdinalIgnoreCase)) return null;
             ImageFormat f = GetFormatIfSuitable(settings, original);
             
             if (ImageFormat.Gif.Equals(f) || (ImageFormat.Png.Equals(f) && settings["colors"] != null)) return new PrettyGifs(settings, original);
@@ -115,6 +144,8 @@ namespace ImageResizer.Plugins.PrettyGifs {
             }
         }
 
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -126,18 +157,41 @@ namespace ImageResizer.Plugins.PrettyGifs {
         /// <param name="fourPass"></param>
         /// <param name="ditherPercent"></param>
         /// <param name="useGdiQuantization"></param>
-        public static void SaveIndexed(System.Drawing.Imaging.ImageFormat format, Image img, Stream target, byte colors, bool dither, bool fourPass, int ditherPercent) {
-            //NeoQuant may be the best, but it's too slow
-            //http://pngnq.sourceforge.net/index.html 
-            //http://members.ozemail.com.au/~dekker/NEUQUANT.HTML
+        public void SaveIndexed(System.Drawing.Imaging.ImageFormat format, Image img, Stream target, byte colors, bool dither, bool fourPass, int ditherPercent) {
+      
 
-
-            //http://codebetter.com/blogs/brendan.tompkins/archive/2007/06/14/gif-image-color-quantizer-now-with-safe-goodness.aspx
+            if (PreservePalette && originalPalette != null) {
+                img.Palette = originalPalette;
+                //If we are encoding in PNG, and writing to a non-seekable stream,
+                //we have to buffer it all in memory or we'll get an exception
+                if (!target.CanSeek && ImageFormat.Png.Equals(format)) {
+                    using (MemoryStream ms = new MemoryStream(4096)) {
+                        img.Save(ms,format); //Recursive call
+                        ms.WriteTo(target);
+                    }
+                } else {
+                    //Everything else
+                    img.Save(target, format);
+                }
+                return;
+            }
+            
 
             OctreeQuantizer quantizer = new OctreeQuantizer(colors, GetBitsNeededForColorDepth(colors));
-            quantizer.Dither = dither;
-            quantizer.fourPass = fourPass;
-            quantizer.DitherPercent = (float)ditherPercent / 100;
+
+            if (query.Get<bool>("fulltrust",HasFullTrust)) {
+                quantizer.Dither = dither;
+                quantizer.FourPass = fourPass;
+                quantizer.DitherPercent = (float)ditherPercent / 100;
+            } else {
+                quantizer.FullTrust = false;
+                quantizer.OmitFinalStage = true;
+                quantizer.ResizeForFirstPass = true;
+
+                quantizer.FirstPassPixelCount = (long)Math.Pow(query.Get<int>( "pixelCount", (int)Math.Sqrt(quantizer.FirstPassPixelCount)),2);
+                quantizer.FirstPassPixelThreshold = (long)Math.Pow(query.Get<int>( "pixelThreshold", (int)Math.Sqrt(quantizer.FirstPassPixelThreshold)), 2);
+                
+            }
             using (Bitmap quantized = quantizer.Quantize(img)) {
                 //If we are encoding in PNG, and writing to a non-seekable stream,
                 //we have to buffer it all in memory or we'll get an exception
@@ -151,7 +205,32 @@ namespace ImageResizer.Plugins.PrettyGifs {
                     quantized.Save(target, format);
                 }
             }
+
+
         }
+
+        private static bool _hasFullTrust = false;
+        private static bool _hasFullTrustSet = false;
+        /// <summary>
+        /// Returns true if the assembly can call unmanged code (i.e, has full trust)
+        /// </summary>
+        public static bool HasFullTrust {
+            get {
+                if (_hasFullTrustSet) return _hasFullTrust;
+                
+                try {
+                    new SecurityPermission(SecurityPermissionFlag.UnmanagedCode).Demand();
+                    _hasFullTrust = true;
+                } catch (SecurityException) {
+                    _hasFullTrust = false;
+                }
+                _hasFullTrustSet = true;
+                return _hasFullTrust;
+            }
+        }
+
+
+
         /// <summary>
         /// Returns how many bits are required to store the specified number of colors. Performs a Log2() on the value.
         /// </summary>

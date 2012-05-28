@@ -37,7 +37,7 @@ namespace ImageResizer.Plugins.S3Reader {
             bool found = false;
             string b = Bucket;
             //Look for exact match
-            foreach (string s in buckets) if (s.Equals(b)) { found = true; break; }
+            foreach (string s in buckets) if (s.Equals(b,StringComparison.InvariantCulture)) { found = true; break; }
             //If no exact matches, but a case-insensitive match exists, tell the user
             if (!found) foreach (string s in buckets) if (s.Equals(b, StringComparison.InvariantCultureIgnoreCase)) { ThrowInvalidCaseException(); }
             //Throw exception if needed

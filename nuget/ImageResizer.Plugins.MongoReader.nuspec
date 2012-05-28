@@ -1,0 +1,27 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.MongoReader</id>
+		<title>ImageResizer.Plugins.MongoReader - Serve (and resize) images from MongDB GridFS</title>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<owners>$author$</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>$iconurl$</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>
+Visit http://imageresizing.net for details, documenation, and free support. 
+E-mail support@imageresizing.net if you encounter any problems with the software. 
+The documentation for this plugin resides at http://imageresizing.net/plugins/mongoreader</description>
+		<tags>$tags$</tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		  <dependency id="mongocsharpdriver"/>
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.MongoReader.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.MongoReader.xml" target="lib" />
+	</files>
+</package>

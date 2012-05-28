@@ -17,6 +17,13 @@ namespace PhotoshopFile.Text
             l = layer;
         }
 
+        private bool _ignoreMissingFonts = true;
+
+        public bool IgnoreMissingFonts {
+            get { return _ignoreMissingFonts; }
+            set { _ignoreMissingFonts = value; }
+        }
+
         public void Render(Graphics g, Nullable<Color> overlayColor, string replacementText)
         {
 
@@ -82,7 +89,7 @@ namespace PhotoshopFile.Text
                 underline = TdTaParser.getBool(d,"Underline");
                 strikethrough = TdTaParser.getBool(d,"Strikethrough");
                 int styleRunAlignment = (int)TdTaParser.query(d,"StyleRunAlignment");//No idea what this maps to.
-
+                //string info = tto.TxtDescriptor.getString();
                 outlineWidth =  (double)TdTaParser.query(d,"OutlineWidth");
 
                 fillColor = TdTaParser.getColor(d,"FillColor");
@@ -94,11 +101,11 @@ namespace PhotoshopFile.Text
 
                 //TODO: get alignment data
             }else if (tt != null){
-                throw new Exception("Old style tySh font syntax not implemented. Use a new version of Photoshop");
+                throw new Exception("Old style tySh font syntax not implemented, found on layer " + l.Name + ". Use a newer version of Photoshop");
             }else if (foundTxt2){
-                throw new Exception("Txt2 text layer info not supported. Where did you find this file? What version of photoshop?");
+                throw new Exception("Txt2 text layer info not supported, found on layer " + l.Name + ". Where did you find this file? What version of photoshop?");
             }else{
-                throw new Exception("No text layer information found!");
+                throw new Exception("No text layer information found on " + l.Name + "!");
             }
 
             if (outerGlow != null){
@@ -125,14 +132,25 @@ namespace PhotoshopFile.Text
                 StringFormat strformat = null;
                 try{
                     FontStyle style = FontStyle.Regular;
+                    //Remove MT
+                    if (fontName.EndsWith("MT")) fontName = fontName.Substring(0, fontName.Length - 2);
                     //Remove -Bold, -Italic, -BoldItalic
                     if (fontName.EndsWith("-Bold", StringComparison.OrdinalIgnoreCase)) style |= FontStyle.Bold;
                     if (fontName.EndsWith("-Italic", StringComparison.OrdinalIgnoreCase)) style |= FontStyle.Italic;
                     if (fontName.EndsWith("-BoldItalic", StringComparison.OrdinalIgnoreCase)) style |= FontStyle.Bold | FontStyle.Italic;
                     //Remove from fontName
                     fontName = new Regex("\\-(Bold|Italic|BoldItalic)$", RegexOptions.IgnoreCase | RegexOptions.IgnoreCase).Replace(fontName, "");
+                    //Remove PS
+                    if (fontName.EndsWith("PS")) fontName = fontName.Substring(0, fontName.Length - 2);
                     //Find font family
-                    fontFamily = new FontFamily(fontName);
+                    try {
+                        fontFamily = new FontFamily(fontName);
+                    } catch (ArgumentException ae) {
+                        if (IgnoreMissingFonts) {
+                            fontFamily = FontFamily.GenericSansSerif;
+                        } else throw ae;
+
+                    }
                     if (fauxBold) style |= FontStyle.Bold;
                     if (fauxItalic) style |= FontStyle.Italic;
                     if (underline) style |= FontStyle.Underline;
@@ -144,7 +162,7 @@ namespace PhotoshopFile.Text
                     strformat.FormatFlags = StringFormatFlags.NoWrap | StringFormatFlags.NoClip;
                     if (!horizontal) strformat.FormatFlags |= StringFormatFlags.DirectionVertical;
                     strformat.Trimming = StringTrimming.None;
-
+                    
                     path.AddString(text, fontFamily,
                         (int)style, (float)(fontSize),rect, strformat);
                 }finally{

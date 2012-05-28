@@ -1,0 +1,184 @@
+﻿@using System.Drawing;
+@using ImageResizer;
+@using Microsoft.Test.Tools.WicCop.InteropServices.ComTypes;
+@using System.Diagnostics;
+@using System.Drawing.Drawing2D;
+@using Benchmark
+
+<!doctype html>
+<html><head><title>Image resizing benchmark</title>
+
+<style type="text/css">table td {padding:10px;}</style>
+</head>
+    <body>
+        <h1>Image resizing benchmark</h1>
+        <table>
+            <thead>
+                <tr>
+                    <td>Size</td>
+                    <td>Quality</td>
+                     @{ var systems = new string[] { "ImageResizer","ImageResizer(speed=4)", "ImageResizer(builder=wic)", "ImageResizer(builder=wic;w.filter=nearest)", "ImageResizer(builder=wic;w.filter=bicubic)", "GDI", "GDI(defaults=bertrand)", "WIC", "WPF" };
+                       }
+                            
+                     @foreach (string sys in systems) {
+                        @: <td>@(sys) time</td>
+                     }
+                     @foreach (string sys in systems) {
+                         @: <td>@(sys) size</td>
+                     }
+                </tr>
+            </thead>
+            <tbody>  
+               
+@{
+    
+    var files = Directory.GetFiles(Server.MapPath("~/images"), "*.jpg");
+    var qualities = new int[] { 100 };
+    var writeFiles = false;
+    qualities = new int[] { 10, 25, 50, 75, 80, 85, 90, 95, 100 }; //To get a better distribution without increasing benchmark run time.
+    var buildCount = files.Length;
+    foreach (var thumbnailSize in new int[]{150,600}){
+    
+    foreach(var quality in qualities) {
+        // Set up our time and size aggregation variables
+        var timers = new Dictionary<string, Stopwatch>();
+        var size = new Dictionary<string, int>();
+        
+        //Loop through files to develop an average
+        foreach (var file in files) {
+            var filename = System.IO.Path.GetFileName(file);
+            if (filename.StartsWith(".") || filename.StartsWith("_")) { continue; }//Skip temp files
+            var photoBytes = File.ReadAllBytes(file);
+
+            
+            //Loop through each system. We do systems for each file to prevent one system from messing with another too badly.
+            foreach(string system in systems){
+                //Init timers and size values
+                if (!timers.ContainsKey(system)){ 
+                    timers[system] = new Stopwatch();
+                    size[system] = 0;
+                }
+            
+                
+                byte[] resized = null;
+                
+                timers[system].Start();
+                
+                //ImageResizer
+                if (system.StartsWith("ImageResizer", StringComparison.OrdinalIgnoreCase)){
+                    string settings = system.Length > 12 ? system.Substring(12).Trim('(', ')') : "";
+                    var s = new ResizeSettings(settings);
+                    s.MaxWidth = thumbnailSize;
+                    s.MaxHeight = thumbnailSize;
+                    s.Format = "jpg";
+                    s.Quality = quality;
+                    
+                    
+                    using (var outStream = new MemoryStream()){
+                        ImageBuilder.Current.Build(photoBytes, outStream, s);
+                        resized = outStream.ToArray();
+                    }
+                 //WIC
+                }else if (system.Equals("WIC", StringComparison.OrdinalIgnoreCase)){
+                    var factory = (IWICComponentFactory)new WICImagingFactory();
+                    
+                    resized = Utils.WicResize(factory, photoBytes, thumbnailSize, thumbnailSize, quality);
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(factory);
+                }else if (system.Equals("WPF", StringComparison.OrdinalIgnoreCase)){
+                    using (var photoStream = new MemoryStream(photoBytes)) {
+                        var photo = Utils.ReadWpfBitmapFrame(photoStream);
+                        int width, height;
+                        if (photo.Width > photo.Height) {
+                            width = thumbnailSize;
+                            height = (int)(photo.Height * thumbnailSize / photo.Width);
+                        }
+                        else {
+                            width = (int)(photo.Width * thumbnailSize / photo.Height);
+                            height = thumbnailSize;
+                        }
+                        var bitFrame = Utils.WpfResize(photo, width, height);
+                        resized = Utils.ToByteArrayWpf(bitFrame, quality);
+                    }
+                 }else if (system.StartsWith("GDI", StringComparison.OrdinalIgnoreCase)){
+                      using (var photoStream = new MemoryStream(photoBytes)){
+                        var photo = new Bitmap(photoStream,true);
+                        int width, height;
+                        if (photo.Width > photo.Height) {
+                            width = thumbnailSize;
+                            height = photo.Height * thumbnailSize / photo.Width;
+                        }
+                        else {
+                            width = photo.Width * thumbnailSize / photo.Height;
+                            height = thumbnailSize;
+                        }
+
+                        string settings = system.Length > 3 ? system.Substring(3).Trim('(', ')') : "";
+                        var s = new ResizeSettings(settings);
+
+                          
+                          
+                        InterpolationMode interpolationMode =  InterpolationMode.HighQualityBicubic; ;
+                        SmoothingMode smoothingMode = SmoothingMode.HighQuality;
+                        PixelOffsetMode pixelMode = PixelOffsetMode.HighQuality;
+                        CompositingQuality compositingQuality = CompositingQuality.HighQuality;
+                        CompositingMode compositingMode = CompositingMode.SourceOver;
+                          
+                          
+                         if ("bertrand".Equals(s["defaults"], StringComparison.OrdinalIgnoreCase)){
+                              interpolationMode = InterpolationMode.Bicubic;
+                              pixelMode = PixelOffsetMode.Default;
+                              compositingMode = CompositingMode.SourceCopy;
+                              compositingQuality = CompositingQuality.Default;
+                              smoothingMode = SmoothingMode.Default;
+                          }
+                          
+                          
+                        interpolationMode = ImageResizer.Util.Utils.parseEnum<InterpolationMode>(s["filter"], interpolationMode); 
+                        smoothingMode = ImageResizer.Util.Utils.parseEnum<SmoothingMode>(s["smoothing"], smoothingMode);
+                        pixelMode = ImageResizer.Util.Utils.parseEnum<PixelOffsetMode>(s["pixel"], pixelMode);
+                        compositingQuality = ImageResizer.Util.Utils.parseEnum<CompositingQuality>(s["compose"], compositingQuality);
+                       compositingMode = ImageResizer.Util.Utils.parseEnum<CompositingMode>(s["blend"], compositingMode);
+                          
+
+
+                         using (var bitmap = Utils.GdiResize(photo, width, height,interpolationMode,smoothingMode,pixelMode,compositingQuality,compositingMode)) {
+                            resized = Utils.ToByteArrayGdi(bitmap, quality);
+                        }
+                      }
+                 }
+                    
+                timers[system].Stop();
+                size[system] += resized.Length;
+
+                
+                if (writeFiles){
+                    // Write out the thumbnail, to validate it actually works
+                    var dir = Server.MapPath("~/Results/" + system);
+                    if (!Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
+                    File.WriteAllBytes(dir + System.IO.Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(file) +"_" + thumbnailSize + "_" + quality + ".jpg", resized);
+                }
+                GC.Collect();
+                System.Threading.Thread.Sleep(50);
+            }
+            
+            
+        }
+    
+
+        <tr>
+        <td>@thumbnailSize</td>
+            <td>@quality</td>
+                     @foreach (string sys in systems) {
+                        @: <td>@(Math.Round(timers[sys].Elapsed.TotalMilliseconds / (float)buildCount).ToString())</td>
+                     }
+                     @foreach (string sys in systems) {
+                         @: <td>@(size[sys] /1024)</td>
+                     }
+        </tr>
+    }
+    }
+    }
+            </tbody>
+        </table>
+    </body>
+</html>

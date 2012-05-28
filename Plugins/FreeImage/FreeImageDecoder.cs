@@ -6,10 +6,12 @@ using ImageResizer.Configuration.Issues;
 using FreeImageAPI;
 using System.Drawing;
 using System.IO;
+using System.Diagnostics;
 
 namespace ImageResizer.Plugins.FreeImageDecoder {
     public class FreeImageDecoderPlugin : BuilderExtension, IPlugin, IFileExtensionPlugin, IIssueProvider {
-
+        public FreeImageDecoderPlugin() {
+        }
         private static IEnumerable<string> supportedExts = null;
         public IPlugin Install(Configuration.Config c) {
             if (supportedExts == null && FreeImage.IsAvailable()) {
@@ -42,15 +44,16 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
         }
 
         public override System.Drawing.Bitmap DecodeStream(System.IO.Stream s, ResizeSettings settings, string optionalPath) {
-            if (!"true".Equals(settings["freeimage"], StringComparison.OrdinalIgnoreCase)) return null;
+            if (!"freeimage".Equals(settings["decoder"], StringComparison.OrdinalIgnoreCase)) return null;
 
             return Decode(s,  settings);
         }
 
         public override System.Drawing.Bitmap DecodeStreamFailed(System.IO.Stream s, ResizeSettings settings, string optionalPath) {
             try {
-                return Decode(s,settings);
-            } catch {
+                 return Decode(s,settings);
+                 
+            } catch (Exception){
                 return null;
             }
         }
@@ -58,11 +61,18 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
         public Bitmap Decode(Stream s, ResizeSettings settings) {
             if (!FreeImageAPI.FreeImage.IsAvailable()) return null;
 
-            FIBITMAP original = FreeImage.LoadFromStream(s, FREE_IMAGE_LOAD_FLAGS.JPEG_FAST);
+            FREE_IMAGE_LOAD_FLAGS flags = FREE_IMAGE_LOAD_FLAGS.DEFAULT;
+            bool autorotate = ("true".Equals(settings["autorotate"], StringComparison.OrdinalIgnoreCase));
+            if (autorotate) flags |= FREE_IMAGE_LOAD_FLAGS.JPEG_EXIFROTATE;
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            FIBITMAP original = FreeImage.LoadFromStream(s, flags);
+            sw.Stop();
             if (original.IsNull) return null;
             try {
-                return FreeImage.GetBitmap(original);
-
+                Bitmap b =  FreeImage.GetBitmap(original);
+                if (autorotate) try { b.RemovePropertyItem(0x0112); } catch { }
+                return b;
             } finally {
                 if (!original.IsNull) FreeImage.UnloadEx(ref original);
             }

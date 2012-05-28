@@ -1,0 +1,23 @@
+﻿# Manual algorithm
+
+After extensive analysis, it appears that using the same algorithm for both red-eye detection systems would be counterproductive.
+
+
+### Accuracy of click
+
+1. It can be resonably expected that users will click within 25 display pixels of the eye.  
+2. By searching that radius from the click for the reddest pixel, while applying a distance curve factor to prefer close matches, it should be possible to reliably grab a red pixel. 
+To eliminate stray pixels (such as red dots on the eyelid), the search area (25 display pixels) radius should be 
+resampled to a low-resolution area (say 15x15) (prior to red eval) so only major blobs are counted. 
+The search is repeated using the scale factor as a radius and the max point as the origin to get an real pixel.
+
+### Adaptive flood fill thresholding
+
+The max pixel provides an upper bound for our intensity expectactions. 
+
+A maxium search radius is provided by 0.05 * max(width/height)
+
+Search should occur simultaneously in all directions. Local thresholding sensitivity is determined by two variables. (a) distance from click, and (b) distance from current weighted center of fill.
+
+Once complete, the final weighted center can be used to re-analyze red area
+

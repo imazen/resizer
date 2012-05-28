@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.AzureReader", "..\Plugins\AzureReader\ImageResizer.Plugins.AzureReader.csproj", "{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer", "ImageResizer.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PdfRenderer", "..\Contrib\PdfRenderer\PdfRenderer\ImageResizer.Plugins.PdfRenderer.csproj", "{7C8A13F7-5C00-4074-B16E-45D0E231B70D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Trial|Any CPU = Trial|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Trial|Any CPU.ActiveCfg = Trial|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Trial|Any CPU.Build.0 = Trial|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Trial|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

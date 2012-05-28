@@ -50,8 +50,7 @@ namespace ImageResizer.Resizing {
         protected volatile IEnumerable<BuilderExtension> exts;
 
         /// <summary>
-        /// Extend this to allow additional types of source objects to be accepted by transforming them into accepted types, such as Image, Bitmap,
-        /// Stream, or a physical path
+        /// Extend this to allow additional types of source objects to be accepted by transforming them into Bitmap instances.
         /// </summary>
         /// <param name="source"></param>
 		/// <param name="path"></param>
@@ -60,6 +59,31 @@ namespace ImageResizer.Resizing {
         protected virtual void PreLoadImage(ref object source, ref string path, ref bool disposeSource, ref ResizeSettings settings) {
             if (exts != null) foreach (AbstractImageProcessor p in exts) p.PreLoadImage(ref source, ref path, ref disposeSource, ref settings);
         }
+
+        /// <summary>
+        /// Extend this to allow  additional types of source objects to be accepted by transforming them into Stream instances. First plugin to return a Stream wins.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="settings"></param>
+        /// <param name="disposeStream"></param>
+        /// <param name="path"></param>
+        /// <param name="restoreStreamPosition"></param>
+        /// <returns></returns>
+        protected virtual Stream GetStream(object source, ResizeSettings settings, ref bool disposeStream, out string path, out bool restoreStreamPosition) {
+            path = null; //Init so the compiler doesn't complain
+            restoreStreamPosition = false;
+
+            if (exts != null) foreach (AbstractImageProcessor p in exts) {
+                bool disposeS = disposeStream; //Copy the referenced boolean. Only allow plugins who return a stream to change its value
+                Stream s = p.GetStream(source, settings, ref disposeS, out path, out restoreStreamPosition);
+                if (s != null) {
+                    disposeStream = disposeS;
+                    return s;
+                }
+            }
+            return null;
+        }
+
 
         /// <summary>
         /// Extensions are executed until one extension returns a non-null value. 
@@ -71,6 +95,9 @@ namespace ImageResizer.Resizing {
         public virtual Bitmap DecodeStreamFailed(Stream s, ResizeSettings settings, string optionalPath) {
             if (exts == null) return null;
             foreach (AbstractImageProcessor p in exts) {
+                if (s.CanSeek && s.Position != 0)
+                    s.Seek(0, SeekOrigin.Begin);
+
                 Bitmap b = p.DecodeStreamFailed(s,settings, optionalPath);
                 if (b != null) return b;
             }
@@ -94,15 +121,42 @@ namespace ImageResizer.Resizing {
         }
 
 
+        /// <summary>
+        /// Extend this to modify the Bitmap instance after it has been decoded by DecodeStream or DecodeStreamFailed
+        /// </summary>
+        protected virtual RequestedAction PostDecodeStream(ref Bitmap img, ResizeSettings settings) {
+            if (exts != null) foreach (AbstractImageProcessor p in exts) if (p.PostDecodeStream(ref img, settings) == RequestedAction.Cancel) return RequestedAction.Cancel;
+            return RequestedAction.None;
+        }
+
+
+
 
         /// <summary>
-        /// Extend this to allow additional types of *destination* objects to be accepted by transforming them into either a bitmapholder or a stream.
+        /// Extend this to allow additional types of *destination* objects to be accepted by transforming them into a stream.
         /// </summary>
         /// <param name="dest"></param>
         /// <param name="settings"></param>
         protected virtual void PreAcquireStream(ref object dest, ResizeSettings settings) {
             if (exts != null) foreach (AbstractImageProcessor p in exts) p.PreAcquireStream(ref dest, settings);
         }
+
+        /// <summary>
+        /// The method to override if you want to replace the entire pipeline.
+        /// All Build() calls call this method first. 
+        /// Does nothing in ImageBuilder
+        /// </summary>
+        /// <param name="job"></param>
+        /// <returns></returns>
+        protected virtual RequestedAction BuildJob(ImageResizer.ImageJob job) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.BuildJob(job) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
+        }
+
+
         /// <summary>
         /// Called for Build() calls that want the result encoded. (Not for Bitmap Build(source,settings) calls.
         /// Only override this method if you need to replace the behavior of image encoding and image processing together, such as adding support
@@ -493,9 +547,20 @@ namespace ImageResizer.Resizing {
             return RequestedAction.None;
         }
 
+        /// <summary>
+        /// Process.5(Render).9: Plugins have a chance to pre-process the source image before it gets rendered, and save it to s.preRenderBitmap
+        /// </summary>
+        /// <param name="s"></param>
+        protected virtual RequestedAction PreRenderImage(ImageState s) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.PreRenderImage(s) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
+        }
 
         /// <summary>
-        /// Process.5(Render).9: The image is copied to the destination parallelogram specified by ring 'image'. 
+        /// Process.5(Render).10: The image is copied to the destination parallelogram specified by ring 'image'. 
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction RenderImage(ImageState s) {
@@ -506,7 +571,7 @@ namespace ImageResizer.Resizing {
             return RequestedAction.None;
         }
         /// <summary>
-        /// Process.5(Render).10: After the image is drawn
+        /// Process.5(Render).11: After the image is drawn
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction PostRenderImage(ImageState s) {
@@ -517,7 +582,7 @@ namespace ImageResizer.Resizing {
             return RequestedAction.None;
         }
         /// <summary>
-        /// Process.5(Render).11: The border is rendered
+        /// Process.5(Render).12: The border is rendered
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction RenderBorder(ImageState s) {
@@ -528,7 +593,7 @@ namespace ImageResizer.Resizing {
             return RequestedAction.None;
         }
         /// <summary>
-        /// Process.5(Render).12: After the border is drawn
+        /// Process.5(Render).13: After the border is drawn
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction PostRenderBorder(ImageState s) {
@@ -540,7 +605,7 @@ namespace ImageResizer.Resizing {
         }
 
         /// <summary>
-        /// Process.5(Render).13: Any last-minute changes before watermarking or overlays are applied
+        /// Process.5(Render).14: Any last-minute changes before watermarking or overlays are applied
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction PreRenderOverlays(ImageState s) {
@@ -552,7 +617,7 @@ namespace ImageResizer.Resizing {
         }
 
         /// <summary>
-        /// Process.5(Render).14: Watermarks can be rendered here. All image processing should be done
+        /// Process.5(Render).15: Watermarks can be rendered here. All image processing should be done
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction RenderOverlays(ImageState s) {
@@ -563,7 +628,7 @@ namespace ImageResizer.Resizing {
             return RequestedAction.None;
         }
         /// <summary>
-        /// Process.5(Render).15: Called before changes are flushed and the graphics object is destroyed.
+        /// Process.5(Render).16: Called before changes are flushed and the graphics object is destroyed.
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction PreFlushChanges(ImageState s) {
@@ -575,7 +640,7 @@ namespace ImageResizer.Resizing {
         }
 
         /// <summary>
-        /// Process.5(Render).16: Changes are flushed to the bitmap here and the graphics object is destroyed.
+        /// Process.5(Render).17: Changes are flushed to the bitmap here and the graphics object is destroyed.
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction FlushChanges(ImageState s) {
@@ -587,7 +652,7 @@ namespace ImageResizer.Resizing {
         }
 
         /// <summary>
-        /// Process.5(Render).17: Changes have been flushed to the bitmap, but the final bitmap has not been flipped yet.
+        /// Process.5(Render).18: Changes have been flushed to the bitmap, but the final bitmap has not been flipped yet.
         /// </summary>
         /// <param name="s"></param>
         protected virtual RequestedAction PostFlushChanges(ImageState s) {

@@ -11,14 +11,13 @@ using System.Data.SqlClient;
 using System.Configuration;
 using System.Collections.Specialized;
 using ImageResizer.Configuration.Issues;
+using System.Security;
 namespace ImageResizer.Plugins.SqlReader
 {
     /// <summary>
     /// Specialized VirtualPathProvider that allows accessing database images as if they are on disk.
     /// </summary>
-    [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Medium)]
-    [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.High)]
-    public class SqlReaderPlugin : VirtualPathProvider, IPlugin, IIssueProvider
+    public class SqlReaderPlugin : VirtualPathProvider, IPlugin, IIssueProvider, IVirtualImageProvider, IMultiInstancePlugin
     {
 
         SqlReaderSettings s = null;
@@ -30,13 +29,69 @@ namespace ImageResizer.Plugins.SqlReader
         {
             this.s = s;
         }
+        /// <summary>
+        /// Provides all the configuration options for the plugin.
+        /// </summary>
+        public SqlReaderSettings Settings { get { return s; } }
 
+
+        private bool _failedToRegisterVpp = false;
+        /// <summary>
+        /// True if the provider attempted to register itself as a VirtualPathProvider and failed due to limited security clearance.
+        /// False if it did not attempt, or if it succeeded.
+        /// </summary>
+        public bool FailedToRegisterVpp {
+            get { return _failedToRegisterVpp; }
+        }
+
+        /// <summary>
+        /// Installes the plugin into the specified configuration. Once installed, it cannot be uninstalled.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
-            HostingEnvironment.RegisterVirtualPathProvider(this);
+            
+            c.Pipeline.PostAuthorizeRequestStart += delegate(IHttpModule sender2, HttpContext context) {
+                    //Only work with database images
+                    //This allows us to resize database images without putting ".jpg" after the ID in the path.
+                    if ((!s.RequireImageExtension || s.UntrustedData) && c.Pipeline.PreRewritePath.StartsWith(s.VirtualPathPrefix, StringComparison.OrdinalIgnoreCase))
+                        c.Pipeline.SkipFileTypeCheck = true; //Skip the file extension check. FakeExtensions will still be stripped.
+            };
+            
+
+            c.Pipeline.RewriteDefaults += delegate(IHttpModule sender, HttpContext context, Configuration.IUrlEventArgs e) {
+                //Only work with database images
+                //Non-images will be served as-is
+                //Cache all file types, whether they are processed or not.
+                if (s.CacheUnmodifiedFiles && e.VirtualPath.StartsWith(s.VirtualPathPrefix, StringComparison.OrdinalIgnoreCase))
+                    e.QueryString["cache"] = ServerCacheMode.Always.ToString();
+
+
+            };
+            c.Pipeline.PostRewrite += delegate(IHttpModule sender, HttpContext context, Configuration.IUrlEventArgs e) {
+                //Only work with database images
+                //If the data is untrusted, always re-encode each file.
+                if (s.UntrustedData && e.VirtualPath.StartsWith(s.VirtualPathPrefix, StringComparison.OrdinalIgnoreCase))
+                    e.QueryString["process"] = ImageResizer.ProcessWhen.Always.ToString();
+
+            };
+            if (s.RegisterAsVirtualPathProvider) {
+                try {
+                    HostingEnvironment.RegisterVirtualPathProvider(this);
+                } catch (SecurityException) {
+                    this._failedToRegisterVpp = true;
+                }
+            }
+
             return this;
         }
 
+        /// <summary>
+        /// This plugin cannot be uninstalled as ASP.NET does not provide a 'undo' function for RegisterVirtualPathProvider
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Uninstall(Configuration.Config c) {
             return false;
         }
@@ -46,7 +101,7 @@ namespace ImageResizer.Plugins.SqlReader
         /// Called before any database op. Fires the BeforeAccess event
         /// </summary>
         /// <param name="id"></param>
-        public virtual void authorize(string id){
+        public virtual void FireAuthorizeEvent(string id){
             s.FireBeforeAccess(id);
         }
         /// <summary>
@@ -54,15 +109,15 @@ namespace ImageResizer.Plugins.SqlReader
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Stream getStream(string id)
+        public Stream GetStream(string id)
         {
-            authorize(id);
+            FireAuthorizeEvent(id);
             SqlConnection conn = GetConnectionObj();
             conn.Open();
             using (conn)
             {
                 SqlCommand sc = new SqlCommand(s.ImageBlobQuery, conn);
-                sc.Parameters.Add(getIdParameter(id));
+                sc.Parameters.Add(CreateIdParameter(id));
                 SqlDataReader sdr = sc.ExecuteReader();
                 using (sdr)
                 {
@@ -78,7 +133,7 @@ namespace ImageResizer.Plugins.SqlReader
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public SqlParameter getIdParameter(string id)
+        public SqlParameter CreateIdParameter(string id)
         {
             SqlParameter sp = new SqlParameter("id", s.ImageIdType);
             if (IsIntKey) {
@@ -92,14 +147,16 @@ namespace ImageResizer.Plugins.SqlReader
             return sp;
         }
         /// <summary>
-        /// Returns true if the image ID is a string type
+        /// Returns true if Settings.ImageIdType is a string type
         /// </summary>
         public bool IsStringKey {
             get {
                 return s.IsStringType(s.ImageIdType);
             }
         }
-
+        /// <summary>
+        /// Returns true if Settings.ImageIdType  is an integer type
+        /// </summary>
         public bool IsIntKey {
             get {
                 return s.IsIntType(s.ImageIdType);
@@ -108,18 +165,18 @@ namespace ImageResizer.Plugins.SqlReader
 
 
         /// <summary>
-        /// Executes _existsQuery, and returns true if the value is greater than 0
+        /// Executes existsQuery, and returns true if the value is greater than 0
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public bool rowExists(string id){
-            authorize(id);
+        public bool RowExists(string id){
+            FireAuthorizeEvent(id);
             SqlConnection conn = GetConnectionObj();
             conn.Open();
             using (conn)
             {
                 SqlCommand sc = new SqlCommand(s.ImageExistsQuery, conn);
-                sc.Parameters.Add(getIdParameter(id));
+                sc.Parameters.Add(CreateIdParameter(id));
                 int count = (int)sc.ExecuteScalar();
                 if (count > 0) return true;
             }
@@ -132,14 +189,14 @@ namespace ImageResizer.Plugins.SqlReader
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public DateTime getDateModifiedUtc(string id){
-            authorize(id);
+        public DateTime GetDateModifiedUtc(string id){
+            FireAuthorizeEvent(id);
             SqlConnection conn = GetConnectionObj();
             conn.Open();
             using (conn)
             {
                 SqlCommand sc = new SqlCommand(s.ModifiedDateQuery, conn);
-                sc.Parameters.Add(getIdParameter(id));
+                sc.Parameters.Add(CreateIdParameter(id));
                 SqlDataReader sdr = sc.ExecuteReader();
                 using (sdr)
                 {
@@ -149,7 +206,9 @@ namespace ImageResizer.Plugins.SqlReader
                     {
                         if (!sdr.IsDBNull(i) && sdr.GetValue(i) is DateTime)
                         {
-                            return (DateTime)sdr.GetValue(i); //Return the first non-null datetime instance in the row. Regardless of value.
+                            DateTime val = (DateTime)sdr.GetValue(i);
+                            if (val.Kind == DateTimeKind.Unspecified) val = DateTime.SpecifyKind(val, DateTimeKind.Utc);
+                            return val; //Return the first non-null datetime instance in the row. Regardless of value.
                         }
                     }
                 }
@@ -157,7 +216,17 @@ namespace ImageResizer.Plugins.SqlReader
             return DateTime.MinValue;
         }
 
+        /// <summary>
+        /// Creates and returns a SqlConnection object for the database based on the configuration.
+        /// </summary>
+        /// <returns></returns>
         public SqlConnection GetConnectionObj(){
+
+            //First, try the connection string as a connection string key.
+            if (System.Configuration.ConfigurationManager.ConnectionStrings[s.ConnectionString] != null)
+                return new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings[s.ConnectionString].ConnectionString);
+
+            //Second, try the .NET syntax
             string prefix = "ConnectionStrings:";
             //ConnectionStrings:namedString convention
             if (s.ConnectionString.Trim().StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) {
@@ -168,18 +237,27 @@ namespace ImageResizer.Plugins.SqlReader
                     throw new ImageResizer.ImageProcessingException("SqlReader: Failed to locate the named connection string '" + key + "' in web.config");
 
             }
+
+            //Third, try it as an actual connection string
             return new SqlConnection(s.ConnectionString);
         }
 
+        /// <summary>
+        /// Returns a SqlCommand cache dependency using the modifiedQuery.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public SqlCommand GetCacheDependencyQuery(string id){
             SqlCommand sc = new SqlCommand(s.ModifiedDateQuery, GetConnectionObj());
-            sc.Parameters.Add(getIdParameter(id));
+            sc.Parameters.Add(CreateIdParameter(id));
             return sc;
         }
 
+        /// <summary>
+        /// No initialization needed for this VPP
+        /// </summary>
         protected override void Initialize()
         {
-
         }
 
         /// <summary>
@@ -187,12 +265,12 @@ namespace ImageResizer.Plugins.SqlReader
         /// </summary>
         /// <param name="virtualPath"></param>
         /// <returns></returns>
-        public virtual string getIdFromPath(string virtualPath)
+        public virtual string ParseIdFromVirtualPath(string virtualPath)
         {
-            String checkPath = VirtualPathUtility.ToAppRelative(virtualPath);
+            String checkPath = ImageResizer.Util.PathUtils.ResolveAppRelative(virtualPath);
             //Check for prefix
-            if (!checkPath.StartsWith(s.PathPrefix, StringComparison.InvariantCultureIgnoreCase)) return null;
-            string id = checkPath.Substring(s.PathPrefix.Length); //Strip prefix
+            if (!checkPath.StartsWith(s.VirtualPathPrefix, StringComparison.OrdinalIgnoreCase)) return null;
+            string id = checkPath.Substring(s.VirtualPathPrefix.Length); //Strip prefix
             //Strip slashes at beginning 
             id = id.TrimStart(new char[] { '/', '\\' });
             //Strip extension if not a string 
@@ -240,20 +318,28 @@ namespace ImageResizer.Plugins.SqlReader
         /// </returns>
         private bool IsPathVirtual(string virtualPath)
         {
-            return getIdFromPath(virtualPath) != null;
+            return ParseIdFromVirtualPath(virtualPath) != null;
         }
-
+        /// <summary>
+        /// VPP method - not for external use
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
         public override bool FileExists(string virtualPath)
         {
             if (IsPathVirtual(virtualPath))
             {
-                return rowExists(getIdFromPath(virtualPath));
+                return !s.CheckForModifiedFiles || RowExists(ParseIdFromVirtualPath(virtualPath));
             }
             else
                 return Previous.FileExists(virtualPath);
         }
 
-
+        /// <summary>
+        /// VPP method, not for external use
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
         public override VirtualFile GetFile(string virtualPath)
         {
             if (IsPathVirtual(virtualPath))
@@ -262,19 +348,48 @@ namespace ImageResizer.Plugins.SqlReader
             else
                 return Previous.GetFile(virtualPath);
         }
+        /// <summary>
+        /// Returns true if the specified virtual file should be provided by this reader and it exists. False if this provider cannot/should not provide it, or it doesn't exist.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        public bool FileExists(string virtualPath, NameValueCollection queryString) {
+            return IsPathVirtual(virtualPath) && (!s.CheckForModifiedFiles || RowExists(ParseIdFromVirtualPath(virtualPath)));
+        }
 
+        /// <summary>
+        /// Returns an IVirtualFile instance if the file exists in this provider.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        public IVirtualFile GetFile(string virtualPath, NameValueCollection queryString) {
+            return IsPathVirtual(virtualPath) ? new DatabaseFile(virtualPath, this) : null;
+        }
+
+        /// <summary>
+        /// VPP method, not for external use
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="virtualPathDependencies"></param>
+        /// <param name="utcStart"></param>
+        /// <returns></returns>
         public override CacheDependency GetCacheDependency(
           string virtualPath,
           System.Collections.IEnumerable virtualPathDependencies,
           DateTime utcStart)
         {
             if (IsPathVirtual(virtualPath))
-                return new SqlCacheDependency(GetCacheDependencyQuery(getIdFromPath(virtualPath)));
+                return new SqlCacheDependency(GetCacheDependencyQuery(ParseIdFromVirtualPath(virtualPath)));
             else
                 return Previous.GetCacheDependency(virtualPath, virtualPathDependencies, utcStart);
         }
 
-
+        /// <summary>
+        /// Provides the diagnostics system with a list of configuration issues
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<IIssue> GetIssues() {
             List<IIssue> issues = new List<IIssue>();
 
@@ -284,18 +399,26 @@ namespace ImageResizer.Plugins.SqlReader
             if (s != null && s.ConnectionString != null && s.ConnectionString.Trim().StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) {
                 string key = s.ConnectionString.Trim().Substring(prefix.Length).Trim();
                 if (System.Configuration.ConfigurationManager.ConnectionStrings[key] == null)
-                    issues.Add(new Issue("SqlReader: Failed to locate the named connection string '" + key + "' in web.config", IssueSeverity.ConfigurationError));
+                    issues.Add(new Issue("SqlReader", "Failed to locate the named connection string '" + key + "' in web.config","", IssueSeverity.ConfigurationError));
 
             }
 
+            if (FailedToRegisterVpp)
+                issues.Add(new Issue("SqlReader", "Failed to register as VirtualPathProvider.",
+                    "Only the image resizer will be able to access files located in SQL - other systems will not be able to.", IssueSeverity.Error));
+            
+
             return issues;
         }
+
+
     }
 
-
-    [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Minimal)]
-    [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.Minimal)]
-    public class DatabaseFile : VirtualFile, ImageResizer.Plugins.IVirtualFileWithModifiedDate
+    /// <summary>
+    /// Represents a blob stored in the database. Provides methods for verifying existence, opening a stream, and checking the modified date.
+    /// Modified date and existence values are cached after the first query.
+    /// </summary>
+    public class DatabaseFile : VirtualFile, ImageResizer.Plugins.IVirtualFileWithModifiedDate, IVirtualFile
     {
         private string id;
         private SqlReaderPlugin provider;
@@ -309,7 +432,8 @@ namespace ImageResizer.Plugins.SqlReader
         public bool Exists
         {
             get {
-                if (_exists == null) _exists =  provider.rowExists(id);
+                if (_exists == null && !provider.Settings.CheckForModifiedFiles) return true;
+                if (_exists == null) _exists =  provider.RowExists(id);
                 return _exists.Value;
             }
         }
@@ -318,7 +442,7 @@ namespace ImageResizer.Plugins.SqlReader
             : base(virtualPath)
         {
             this.provider = provider;
-            this.id = provider.getIdFromPath(virtualPath);
+            this.id = provider.ParseIdFromVirtualPath(virtualPath);
 
         }
 
@@ -326,14 +450,15 @@ namespace ImageResizer.Plugins.SqlReader
         /// Returns a stream to the database blob associated with the id. Throws a FileNotFound exception if the row is missing. Allows Image404 to work properly.
         /// </summary>
         /// <returns></returns>
-        public override Stream Open(){ return provider.getStream(id);}
+        public override Stream Open(){ return provider.GetStream(id);}
 
         /// <summary>
         /// Returns the last modified date of the row. Cached for performance.
         /// </summary>
         public DateTime ModifiedDateUTC{
             get{
-                if (_fileModifiedDate == null) _fileModifiedDate = provider.getDateModifiedUtc(id);
+                if (_fileModifiedDate == null && !provider.Settings.CheckForModifiedFiles) return DateTime.MinValue;
+                if (_fileModifiedDate == null) _fileModifiedDate = provider.GetDateModifiedUtc(id);
                 return _fileModifiedDate.Value;
             }
         }

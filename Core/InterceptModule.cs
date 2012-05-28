@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using ImageResizer.Resizing;
 using ImageResizer.Plugins.Basic;
+using ImageResizer.ExtensionMethods;
 
 // This namespace contains the most frequently used classes.
 namespace ImageResizer {
@@ -38,6 +39,9 @@ namespace ImageResizer {
             //file extension, so we have to override them
             context.PreSendRequestHeaders -= context_PreSendRequestHeaders;
             context.PreSendRequestHeaders += context_PreSendRequestHeaders;
+
+            //Say it's installed.
+            conf.ModuleInstalled = true;
 
         }
         void IHttpModule.Dispose() { }
@@ -83,7 +87,7 @@ namespace ImageResizer {
                 conf.FireRewritingEvents(this, app.Context,ue);
 
                 //Pull data back out of event object, resolving app-relative paths
-                string virtualPath = fixPath(ue.VirtualPath);
+                string virtualPath = PathUtils.ResolveAppRelativeAssumeAppRelative(ue.VirtualPath);
                 q = ue.QueryString;
 
                 //Store the modified querystring in request for use by VirtualPathProviders
@@ -106,7 +110,9 @@ namespace ImageResizer {
                     
                     //Run the rewritten path past the auth system again, using the result as the default "AllowAccess" value
                     bool isAllowed = true;
-                    if (canCheckUrl) isAllowed = UrlAuthorizationModule.CheckUrlAccessForPrincipal(virtualPath, user, "GET");
+                    if (canCheckUrl) try {
+                            isAllowed = UrlAuthorizationModule.CheckUrlAccessForPrincipal(virtualPath, user, "GET");
+                        } catch (NotImplementedException) { } //For MONO support
 
                     
                     IUrlAuthorizationEventArgs authEvent = new UrlAuthorizationEventArgs(virtualPath, new NameValueCollection(q), isAllowed);
@@ -149,19 +155,7 @@ namespace ImageResizer {
             httpContext.Items[conf.ResponseArgsKey] = null;
         }
 
-        /// <summary>
-        /// Turns relative paths into domain-relative paths.
-        /// Turns app-relative paths into domain relative paths.
-        /// </summary>
-        /// <param name="virtualPath"></param>
-        /// <returns></returns>
-        protected String fixPath(string virtualPath) {
-
-            if (virtualPath.StartsWith("~")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/" + virtualPath.TrimStart('/');
-            if (!virtualPath.StartsWith("/")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/" + virtualPath;
-            return virtualPath;
-        }
-
+  
 
 
 
@@ -256,6 +250,11 @@ namespace ImageResizer {
                 else return DateTime.MinValue; //Won't be called, no modified date available.
             });
 
+            //A delegate for accessing the source file
+            e.GetSourceImage = new GetSourceImageDelegate(delegate() {
+                return (vf != null) ? vf.Open() : File.Open(HostingEnvironment.MapPath(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read);
+            });
+
             //Add delegate for writing the data stream
             e.ResizeImageToStream = new ResizeImageDelegate(delegate(System.IO.Stream stream) {
                 //This runs on a cache miss or cache invalid. This delegate is preventing from running in more
@@ -265,7 +264,7 @@ namespace ImageResizer {
                         //Just duplicate the data
                         using (Stream source = (vf != null) ? vf.Open(): 
                                         File.Open(HostingEnvironment.MapPath(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read)) {
-                            Utils.copyStream(source, stream);
+                                            source.CopyToStream(stream); //4KiB buffer
                         }
                     } else {
                         //Process the image

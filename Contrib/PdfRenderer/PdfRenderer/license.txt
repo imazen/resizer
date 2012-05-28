@@ -1,0 +1,57 @@
+﻿# PdfRenderer licensing
+
+
+## The long winded explanation
+
+This plugin (PdfRenderer) uses the Ghostscript library, which is licensed [under the GPL v3](http://www.gnu.org/copyleft/gpl.html).
+
+Therefore, this plugin (PdfRenderer) is also made available under the GPL v3, 
+as the current version links dynamically to the Ghostscript library. 
+
+While the GPL v3 does not allow us to license the binaries under the MIT license 
+(since they are derivative works when used with the ghostscript dlls), 
+we can license the source under the MIT license. 
+
+This allows any future user to take the source code and modify it to either 
+
+ * (a) not use ghostscript, or 
+ * (b) use ghostscript via an external executable, and therefore lift the GPL v3 requirement.
+
+Be aware that (unlike any of the other plugins), this places restrictions on the binaries of any code 
+that uses the PdfRenderer plugin; because it too becomes under the GPL, 
+in addition to any other license it is under.
+
+If you are not distributing binaries of your code which uses the PdfRenderer plugin, 
+or are only using them on your web server, it is unlikely you need to be concerned about this.
+
+However, **if you are including this plugin as part of a product or deliverable, 
+you should make sure you understand the implications**.
+
+One way to fix this licensing problem would be to have a version which uses the 
+GhostScript executables instead of the DLL. It may have reduced performance, 
+but would not require the plugin to be GPL licensed.
+
+If you are interested in funding development of a GPL-free version, please contact support@imageresizing.net.
+
+**To sum up: Compiled versions which use Ghostscript are under the GPL v3. Source is under MIT or GPL v3, your pick**. 
+
+### GPL v3 License
+
+[It's long, click here](http://www.gnu.org/copyleft/gpl.html).
+
+## MIT License (only on source code)
+
+Copyright (c) 2012 Jason Morse and Nathanael Jones
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
+associated documentation files (the "Software"), to deal in the Software without restriction, including
+ without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+ copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
+LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

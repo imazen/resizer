@@ -1,0 +1,21 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.PsdComposer</id>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<description>Description</description>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdComposer.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdComposer.pdb" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdComposer.xml" target="lib" />
+		<file src="$pluginsdlldir$\PsdFile.dll" target="lib" />
+		<file src="$pluginsdlldir$\PsdFile.pdb" target="lib" />
+		<file src="..\Plugins\PsdComposer\**\*.cs" target="src\PsdComposer" />
+		<file src="..\Plugins\Libs\PsdPlugin\PsdFile\**\*.cs" target="src\PsdFile" />
+	</files>
+</package>

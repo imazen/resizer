@@ -9,6 +9,7 @@ using System.Collections.Specialized;
 using ImageResizer.Plugins;
 using ImageResizer.Encoding;
 using ImageResizer.Resizing;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
@@ -42,7 +43,7 @@ namespace ImageResizer.Plugins.Basic {
             //parse quality;
             int quality = 90;
             if (!string.IsNullOrEmpty(settings["quality"]))
-                if (int.TryParse(settings["quality"], out quality))
+                if (int.TryParse(settings["quality"], NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out quality))
                     this.Quality = quality;
 
         }
@@ -76,7 +77,7 @@ namespace ImageResizer.Plugins.Basic {
 
         private int quality = 90;
         /// <summary>
-        /// The Jpeg compression quality. 90 is the best setting. Not relevant in Png or Gif compression
+        /// 0..100 value. The Jpeg compression quality. 90 is the best setting. Not relevant in Png or Gif compression
         /// </summary>
         public int Quality {
             get { return quality; }
@@ -331,10 +332,12 @@ namespace ImageResizer.Plugins.Basic {
             if (quality < 0) quality = 90; //90 is a very good default to stick with.
             if (quality > 100) quality = 100;
             //Prepare paramater for encoder
-            EncoderParameters p = new EncoderParameters(1);
-            p.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, (long)quality);
-            //save
-            b.Save(target, GetImageCodeInfo("image/jpeg"), p);
+            using (EncoderParameters p = new EncoderParameters(1)) {
+
+                p.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, (long)quality);
+                //save
+                b.Save(target, GetImageCodeInfo("image/jpeg"), p);
+            }
         }
         
          /// <summary>
