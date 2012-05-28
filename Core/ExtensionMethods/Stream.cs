@@ -145,6 +145,7 @@ namespace ImageResizer.ExtensionMethods {
                     return bytes;
                 } catch (UnauthorizedAccessException) //If we can't slice it, then we read it like a normal stream
                 { }
+                if (entireStream || src.Position == 0) return ms.ToArray(); //Uses InternalBlockCopy, quite fast...
             }
 
             if (src.CanSeek) {
@@ -172,8 +173,39 @@ namespace ImageResizer.ExtensionMethods {
                 //No seeking, so we have to buffer to an intermediate memory stream
                 var ms = new MemoryStream();
                 CopyToStream(src, ms, entireStream, chunkSize);
-                ms.Seek(0, SeekOrigin.Begin);
-                return CopyToBytes(ms, entireStream, chunkSize);
+                return CopyToBytes(ms, true, chunkSize);
+            }
+        }
+
+
+        /// <summary>
+        /// Attempts to return a byte[] array containing the remaining portion of the stream.
+        /// Unlike CopyToBytes(), does not return a byte[] array of exact length, and may re-use the actual Stream's byte array, making it unsafe to write to in the future.
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="length"></param>
+        /// <param name="chunkSize"></param>
+        /// <returns></returns>
+        public static byte[] CopyOrReturnBuffer(this Stream src, out long length, bool entireStream, int chunkSize) {
+            if (src is MemoryStream) {
+                if (entireStream || src.Position == 0) {
+                    length = src.Length;
+                    //Slice from 
+                    MemoryStream ms = src as MemoryStream;
+                    try {
+                        return ms.GetBuffer();
+                    } catch (UnauthorizedAccessException) //If we can't slice it, then we read it like a normal stream
+                    {
+                        return ms.ToArray();
+                    }
+                } else {
+                    byte[] buf = src.CopyToBytes(entireStream, chunkSize);
+                    length = buf.Length;
+                    return buf;
+                }
+            }else{
+                MemoryStream ms = CopyToMemoryStream(src, entireStream, chunkSize);
+                return CopyOrReturnBuffer(ms, out length, true, chunkSize);
             }
         }
     }
