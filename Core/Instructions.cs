@@ -34,12 +34,28 @@ namespace ImageResizer {
          */
 
 
-        public static explicit operator string(Instructions s) {
-            return PathUtils.BuildQueryString(s, true);
+        //public static explicit operator string(Instructions s) {
+        //    return PathUtils.BuildQueryString(s, true);
+        //}
+
+        //public static explicit operator Instructions(string s) {
+        //    return new Instructions(PathUtils.ParseQueryStringFriendlyAllowSemicolons(s));
+        //}
+
+        /// <summary>
+        /// Returns a human-friendly representation of the instruction set. Not suitable for URL usage; use ToQueryString() for that.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString() {
+            return PathUtils.BuildSemicolonQueryString(this, false);
         }
 
-        public static explicit operator Instructions(string s) {
-            return new Instructions(PathUtils.ParseQueryStringFriendlyAllowSemicolons(s));
+        /// <summary>
+        /// Returns a URL-safe querystring containing the instruction set
+        /// </summary>
+        /// <returns></returns>
+        public string ToQueryString() {
+            return PathUtils.BuildQueryString(this, true);
         }
 
         /// <summary>
@@ -58,40 +74,60 @@ namespace ImageResizer {
         public Instructions(string queryString) : base(PathUtils.ParseQueryStringFriendlyAllowSemicolons(queryString)) { }
 
 
-
+        /// <summary>
+        /// The width in pixels to constrain the image to. See 'Mode' and 'Scale' for constraint logic.
+        /// </summary>
         public int? Width { get { return this.Get<int>("width", this.Get<int>("w")); } set { this.Set<int>("width", value); this.Remove("w"); } }
+        /// <summary>
+        /// The height in pixels to constrain the image to. See 'Mode' and 'Scale' for constraint logic.
+        /// </summary>
         public int? Height { get { return this.Get<int>("height", this.Get<int>("h")); } set { this.Set<int>("height", value); this.Remove("h"); } }
 
-
+        /// <summary>
+        /// The fit mode to use when both Width and Height are specified. Defaults to Pad.
+        /// </summary>
         public FitMode? Mode { get { return this.Get<FitMode>("mode"); } set { this.Set<FitMode>("mode", value); } }
 
+        /// <summary>
+        /// The alignment to use when cropping or padding the image automatically. Defaults to MiddleCenter.
+        /// </summary>
         public AnchorLocation? Anchor { get { return this.Get<AnchorLocation>("anchor"); } set { this.Set<AnchorLocation>("anchor", value); } }
 
         /// <summary>
-        /// Maps to 'sflip' and 'sourceFlip'.
+        /// Flip instruction to perform immediately after loading source image. Maps to 'sflip' and 'sourceFlip'. 
         /// </summary>
         public FlipMode? SourceFlip { get { return this.Get<FlipMode>("sflip", this.Get<FlipMode>("sourceFlip")); } set { this.Set<FlipMode>("sflip", value); this.Remove("sourceFlip"); } }
-
+        /// <summary>
+        /// Flip instruction to perform after rendering is complete
+        /// </summary>
         public FlipMode? FinalFlip { get { return this.Get<FlipMode>("flip"); } set { this.Set<FlipMode>("flip", value); } }
 
+        /// <summary>
+        /// Control how upscaling is performed. Defaults to DownscaleOnly. 
+        /// </summary>
         public ScaleMode? Scale { get { return this.Get<ScaleMode>("scale"); } set { this.Set<ScaleMode>("scale", value); } }
 
         /// <summary>
-        /// Controls disk caching. 
+        /// Allows disk caching to be forced or prevented.
         /// </summary>
         public ServerCacheMode? Cache { get { return this.Get<ServerCacheMode>("cache"); } set { this.Set<ServerCacheMode>("cache", value); } }
 
+        /// <summary>
+        /// Allows processing to be forced or prevented.
+        /// </summary>
         public ProcessWhen? Process { get { return this.Get<ProcessWhen>("process", this["useresizingpipeline"] != null ? new Nullable<ProcessWhen>(ProcessWhen.Always) : null); } set { this.Set<ProcessWhen>("process", value); this.Remove("useresizingpipeline"); } }
 
-
-
-        
-        
+        /// <summary>
+        /// The frame of the animated GIF to display. 1-based
+        /// </summary>
         public int? Frame { get { return this.Get<int>("frame"); } set { this.Set<int>("frame", value); } }
+        /// <summary>
+        /// The page of the TIFF file to display. 1-based
+        /// </summary>
         public int? Page { get { return this.Get<int>("page"); } set { this.Set<int>("page", value); } }
 
         /// <summary>
-        /// Maps to 'quality' setting. 
+        /// Determines Jpeg encoding quality. Maps to 'quality' setting. 
         /// </summary>
         public int? JpegQuality { get { return this.Get<int>("quality"); } set { this.Set<int>("quality", value); } }
         /// <summary>
@@ -108,9 +144,18 @@ namespace ImageResizer {
         /// </summary>
         public byte? PaletteSize { get { return this.Get<byte>("colors"); } set { this.Set<byte>("colors", value); } }
 
+        /// <summary>
+        /// A multiplier to apply to all sizing settings (still obeys Scale=down, though). Useful when you need to apply a page-wide scaling factor, such as for mobile devices.
+        /// </summary>
         public double? Zoom { get { return this.Get<double>("zoom"); } set { this.Set<double>("zoom", value); } }
 
+        /// <summary>
+        /// Defines the horizontal width of the crop rectangle's coordinate space. For example, setting this to 100 makes the crop X1 and X2 values percentages of the image width.
+        /// </summary>
         public double? CropXUnits { get { return this.Get<double>("cropxunits"); } set { this.Set<double>("cropxunits", value); } }
+        /// <summary>
+        /// Defines the vertical height of the crop rectangle's coordinate space. For example, setting this to 100 makes the crop Y1 and Y1 values percentages of the image height.
+        /// </summary>
         public double? CropYUnits { get { return this.Get<double>("cropyunits"); } set { this.Set<double>("cropyunits", value); } }
 
         /// <summary>
@@ -128,14 +173,17 @@ namespace ImageResizer {
         /// </summary>
         public double? SourceRotate { get { return this.Get<double>("srotate"); } set { this.Set<double>("srotate", value); } }
         /// <summary>
-        /// Maps to 'rotate'. Rotates the image during rendering. Arbitrary angles supported. 
+        /// Maps to 'rotate'. Rotates the image during rendering. Arbitrary angles are supported. 
         /// </summary>
         public double? Rotate { get { return this.Get<double>("rotate"); } set { this.Set<double>("rotate", value); } }
 
+        /// <summary>
+        /// Use 'OutputFormat' unless you need a custom value. Determines the format and encoding of the output image.
+        /// </summary>
         public string Format { get { return string.IsNullOrEmpty(this["format"]) ? this["thumbnail"] : this["format"]; } set { this["format"] = value; this.Remove("thumbnail"); } }
 
         /// <summary>
-        /// Maps to 'format'. Returns null if the format is unspecified or if it isn't defined in the enumeration.
+        /// Selects the image encoding format. Maps to 'format'. Returns null if the format is unspecified or if it isn't defined in the enumeration.  
         /// </summary>
         public OutputFormat? OutputFormat { get { return this.Get<OutputFormat>("format", this.Get<OutputFormat>("thumbnail")); } set { this.Set<OutputFormat>("format", value); this.Remove("thumbnail"); } }
 
@@ -150,11 +198,17 @@ namespace ImageResizer {
         /// </summary>
         public string FallbackImage { get { return this["404"]; } set { this["404"] = value; } }
  
-
+        /// <summary>
+        /// The color of margin and padding regions. Defaults to Transparent, or White (when jpeg is the selected output color). 
+        /// </summary>
         public string BackgroundColor { get { return this["bgcolor"]; } set { this["bgcolor"] = value; } }
-
+        /// <summary>
+        /// Defaults to 'bgcolor'. Allows a separate color to be used for padding areas vs. margins.
+        /// </summary>
         public string PaddingColor { get { return this["paddingcolor"]; } set { this["paddingcolor"] = value; } }
-
+        /// <summary>
+        /// The color to draw the border with, if a border width is specified.
+        /// </summary>
         public string BorderColor { get { return this["bordercolor"]; } set { this["bordercolor"] = value; } }
 
         /// <summary>
