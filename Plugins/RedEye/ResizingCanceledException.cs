@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ImageResizer.Resizing {
+namespace ImageResizer.Plugins.RedEye {
     public class ResizingCanceledException:Exception {
         public byte[] ResponseData { get; set; }
         public string ContentType { get; set; }
