@@ -84,7 +84,7 @@ namespace ImageResizer.Configuration.Xml {
         /// <param name="elementName"></param>
         /// <returns></returns>
         public IList<Node> childrenByName(string elementName) {
-            if (children == null || children.Count == 0) return null;
+            //if (children == null || children.Count == 0) return null;
             List<Node> results = null;
             foreach(Node n in children){
                 if (n.Name.Equals(elementName, StringComparison.OrdinalIgnoreCase)) {
