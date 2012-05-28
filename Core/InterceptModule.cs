@@ -262,10 +262,9 @@ namespace ImageResizer {
                 try {
                     if (!isProcessing) {
                         //Just duplicate the data
-                        using (Stream source = (vf != null) ? vf.Open(): 
-                                        File.Open(HostingEnvironment.MapPath(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read)) {
-                                            source.CopyToStream(stream); //4KiB buffer
-                        }
+                        using (Stream source = e.GetSourceImage())
+                            source.CopyToStream(stream); //4KiB buffer
+                        
                     } else {
                         //Process the image
                         if (vf != null)
