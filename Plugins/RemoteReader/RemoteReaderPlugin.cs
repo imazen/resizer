@@ -226,7 +226,7 @@ namespace ImageResizer.Plugins.RemoteReader {
         private bool IsWhitelisted(RemoteRequestEventArgs request) {
             var rr = c.getNode("remotereader");
             var domain = new Uri(request.RemoteUrl).Host;
-
+            if (rr == null || string.IsNullOrEmpty(domain)) return false;
 
             foreach (Node n in rr.childrenByName("allow")) {
                 bool onlyWhenSigned = n.Attrs.Get<bool>("onlyWhenSigned", false);
