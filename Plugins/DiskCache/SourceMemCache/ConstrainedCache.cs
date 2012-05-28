@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ImageResizer.Collections {
-    public class ConstrainedCache<K,V> {
+namespace ImageResizer.Plugins.SourceMemCache {
+    internal class ConstrainedCache<K,V> {
 
         public delegate long SizeCalculationDelegate(K key, V value);
         public ConstrainedCache(IEqualityComparer<K> keyComparer, SizeCalculationDelegate calculator, long maxBytes, TimeSpan usageWindow, TimeSpan minCleanupInterval) {
