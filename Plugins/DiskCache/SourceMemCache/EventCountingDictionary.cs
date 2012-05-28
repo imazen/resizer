@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
-namespace ImageResizer.Collections {
+namespace ImageResizer.Plugins.SourceMemCache {
     /// <summary>
     /// Specifies counter granularity, memory limits, cleanup intervals, and threading optimization level.
     /// </summary>
-    public class EventCountingStrategy{
+    internal class EventCountingStrategy{
         public EventCountingStrategy() {
             Threading = ThreadingPrecision.Fast;
             CounterGranularity = 8;
@@ -53,7 +53,7 @@ namespace ImageResizer.Collections {
     /// Can enforce size limits and cleanup empty counters on an inverval.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class EventCountingDictionary<T> {
+    internal class EventCountingDictionary<T> {
 
         public delegate void EventKeyRemoved(EventCountingDictionary<T> sender, T key, int value);
 
@@ -274,7 +274,7 @@ namespace ImageResizer.Collections {
     /// <summary>
     /// Maintains a rotating data structure to track events over a moving time period.
     /// </summary>
-    public class EventCounter {
+    internal class EventCounter {
         private int[] data;
         private int arraySize;
         private int ticksPer;

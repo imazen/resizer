@@ -7,15 +7,15 @@ using ImageResizer.Util;
 using System.Collections.Specialized;
 using ImageResizer.ExtensionMethods;
 
-namespace ImageResizer.Plugins.Basic {
-    public class SourceMemCache: IPlugin, IVirtualFileCache {
+namespace ImageResizer.Plugins.SourceMemCache {
+    public class SourceMemCachePlugin: IPlugin, IVirtualFileCache {
 
         /// <summary>
         /// Defaults to 10MB limit, and samples usage over the last 10 minutes when deciding what to remove. Stuff not used in the last 10 minutes gets discarded even if the limit hasn't been reached.
         /// </summary>
-        public SourceMemCache() : this(1024 * 1024 * 1024, new TimeSpan(0, 10, 0)) { }
+        public SourceMemCachePlugin() : this(1024 * 1024 * 1024, new TimeSpan(0, 10, 0)) { }
 
-        public SourceMemCache(long maxBytes, TimeSpan usageWindow) {
+        public SourceMemCachePlugin(long maxBytes, TimeSpan usageWindow) {
             //Cleanup at most once per minute, unless hitting the limits. 
             cache = new ConstrainedCache<string, CachedVirtualFile>(StringComparer.OrdinalIgnoreCase, delegate(string key, CachedVirtualFile file) {
                 return key.Length * 4 + file.BytesOccupied;
