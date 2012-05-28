@@ -6,7 +6,7 @@
     <version>$version$</version>
     <authors>$author$</authors>
     <owners>$author$</owners>
-    <licenseUrl>http://imageresizing.net/licenses/freedom</licenseUrl>
+    <licenseUrl>http://imageresizing.net/licenses/</licenseUrl>
     <projectUrl>http://imageresizing.net</projectUrl>
     <iconUrl>$iconurl$</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -19,7 +19,8 @@
 	</dependencies>
   </metadata>
   	<files>
-		<file src="..\Core\Web.config.transform" target="content" />
+		<file src="..\Core\nuget\Web.config.transform" target="content" />
+		<file src="..\Core\nuget\readme.txt" target="" />
 	</files>
 
 </package>
