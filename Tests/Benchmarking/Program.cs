@@ -15,6 +15,7 @@ using ImageResizer.Plugins.FreeImageEncoder;
 using ImageResizer.Plugins.Basic;
 using ImageResizer.Plugins.Watermark;
 using ImageResizer.Encoding;
+using ImageResizer.ExtensionMethods;
 
 namespace Bench {
     class Program {
@@ -211,7 +212,7 @@ namespace Bench {
         public static long BenchmarkInMemory(Config c, string source,  ResizeSettings settings, bool outputResults, bool excludeDecoding = false, bool excludeEncoding = true, int loops = 20) {
             MemoryStream ms;
             using (FileStream fs = new FileStream(source, FileMode.Open, FileAccess.Read)){
-                ms =StreamUtils.CopyStream(fs);
+                ms = fs.CopyToMemoryStream();
             }
             MemoryStream dest = new MemoryStream(4096);
             ms.Seek(0, SeekOrigin.Begin);
@@ -242,7 +243,7 @@ namespace Bench {
         public static void BenchmarkDecoderInMemory(Config c, string source, ResizeSettings settings) {
             MemoryStream ms;
             using (FileStream fs = new FileStream(source, FileMode.Open, FileAccess.Read)) {
-                ms = StreamUtils.CopyStream(fs);
+                ms = fs.CopyToMemoryStream();
             }
 
             int loops = 20;

@@ -11,6 +11,7 @@ using System.Data.SqlClient;
 using System.Configuration;
 using ImageResizer.Configuration;
 using ImageResizer.Util;
+using ImageResizer.ExtensionMethods;
 
 namespace DatabaseSampleCSharp {
     public partial class Upload : System.Web.UI.Page {
@@ -68,10 +69,9 @@ namespace DatabaseSampleCSharp {
                         lastUpload = StoreFile(ms.ToArray(), ImageBuilder.Current.EncoderProvider.GetEncoder(resizeCropSettings, file.FileName).Extension, file.FileName);
                     }
                 } else {
-                    using (MemoryStream ms = ImageResizer.Util.StreamUtils.CopyStream(file.InputStream)) {
-                        //It's not an image - upload as-is.
-                        lastUpload = StoreFile(ms.ToArray(), PathUtils.GetExtension(file.FileName).TrimStart('.'), file.FileName);
-                    }
+                    //It's not an image - upload as-is.
+                    lastUpload = StoreFile(file.InputStream.CopyToBytes(), PathUtils.GetExtension(file.FileName).TrimStart('.'), file.FileName);
+
                 }
             }
 

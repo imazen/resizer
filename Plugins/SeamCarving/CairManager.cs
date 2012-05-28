@@ -10,6 +10,7 @@ using System.Web;
 using System.Web.Hosting;
 using System.Threading;
 using System.Globalization;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.SeamCarving {
     public class CairManager {
@@ -54,14 +55,14 @@ namespace ImageResizer.Plugins.SeamCarving {
                 using (Stream input = Assembly.GetExecutingAssembly().GetManifestResourceStream("ImageResizer.Plugins.SeamCarving.pthreadVSE2.dll"))
                 using (Stream output = File.Create(dllPath))
                 {
-                    StreamUtils.CopyTo(input, output);
+                    input.CopyToStream(output);
                 }
 
                 string tempPath = Path.Combine(cairDir, "cair.exe");
 
                 using (Stream input = Assembly.GetExecutingAssembly().GetManifestResourceStream("ImageResizer.Plugins.SeamCarving.CAIR.exe"))
                 using (Stream output = File.Create(tempPath)) {
-                    StreamUtils.CopyTo(input, output);
+                    input.CopyToStream(output);
                 }
                 //Save the path.
                 cairPath = tempPath;
