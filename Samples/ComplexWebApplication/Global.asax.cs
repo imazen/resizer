@@ -32,10 +32,6 @@ namespace ComplexWebApplication {
                 }
             };
 
-            RemoteReaderPlugin.Current.AllowRemoteRequest += delegate(object sender2, RemoteRequestEventArgs args) {
-                //Allow all images from this trusted domain
-                if (args.RemoteUrl.StartsWith("http://images.imageresizing.net", StringComparison.OrdinalIgnoreCase)) args.DenyRequest = false;
-            };
         }
 
 

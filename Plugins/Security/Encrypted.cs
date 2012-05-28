@@ -9,7 +9,6 @@ using System.IO;
 using System.Web.Security;
 using ImageResizer.Configuration.Issues;
 using ImageResizer.Plugins.Security;
-using ImageResizer.Configuration.Cryptography;
 using System.Diagnostics;
 using ImageResizer.Plugins.Security.Cryptography;
 
