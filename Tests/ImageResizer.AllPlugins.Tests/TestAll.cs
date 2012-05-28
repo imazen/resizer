@@ -8,7 +8,6 @@ using ImageResizer.Configuration;
 using ImageResizer.Plugins.Basic;
 using ImageResizer.Plugins.Watermark;
 using ImageResizer.Plugins.PrettyGifs;
-using ImageResizer.Plugins.PsdReader;
 using ImageResizer.Plugins.AnimatedGifs;
 using ImageResizer.Plugins.AdvancedFilters;
 using ImageResizer.Plugins.RemoteReader;
@@ -39,7 +38,6 @@ namespace ImageResizer.AllPlugins.Tests {
 
             new Gradient().Install(c);
             new PrettyGifs().Install(c);
-            new PsdReader().Install(c);
             new AnimatedGifs().Install(c);
             new AdvancedFilters().Install(c);
             RemoteReaderPlugin rrp = new RemoteReaderPlugin(); rrp.Install(c);
@@ -81,7 +79,7 @@ namespace ImageResizer.AllPlugins.Tests {
             data.Add("ignoreicc", new string[] { "true", "false" });
             data.Add("angle", new string[] { "0", "361", "15", "180" });
             data.Add("rotate", new string[] { "0", "90", "270", "400", "15", "45" });
-            string[] colors =  new string[] {"", "black", "white", Util.Utils.writeColor(Color.FromArgb(25, Color.Green)), Util.Utils.writeColor(Color.Transparent) };
+            string[] colors = new string[] { "", "black", "white", Util.ParseUtils.SerializeColor(Color.FromArgb(25, Color.Green)), Util.ParseUtils.SerializeColor(Color.Transparent) };
             data.Add("color1", colors);
             data.Add("color2", colors);
             data.Add("page",new string[]{"-10","1","5"});

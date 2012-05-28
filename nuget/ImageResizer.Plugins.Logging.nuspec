@@ -1,0 +1,31 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.Logging</id>
+		<title>ImageResizer.Plugins.Logging - Get NLog-based logging for your image requests</title>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<owners>$author$</owners>
+		<licenseUrl>http://imageresizing.net/licenses/freedom</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>$iconurl$</iconUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+<description>
+Get NLog-based logging support for your image requests. 
+
+Go to resizer.uservoice.com to vote for new features.
+Visit http://imageresizing.net for details, documenation, and free support. 
+E-mail support@imageresizing.net if you encounter any problems with the software. 
+The documentation for this plugin resides at http://imageresizing.net/plugins/logging</description>
+		<tags>$tags$</tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		  <dependency id="NLog" />
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="$coredlldir$\ImageResizer.Plugins.Logging.dll" target="lib" />
+		<file src="$coredlldir$\ImageResizer.Plugins.Logging.xml" target="lib" />
+		<file src="..\Plugins\Logging\Web.config.transform" target="content" />
+	</files>
+</package>

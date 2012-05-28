@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("The core HttpModule - Allows server-side resizing, cropping, and manipulation of images")]
 
 
-[assembly: CLSCompliant(true)]
+[assembly: CLSCompliant(false)]
 
 [assembly: ComVisible(true)]
 

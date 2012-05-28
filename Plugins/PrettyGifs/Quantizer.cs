@@ -21,28 +21,113 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
 namespace ImageResizer.Plugins.PrettyGifs
+
+  
 {
     /// <summary>
-    /// Summary description for Class1.
+    /// Abstract Quantizer class - handles the messy, algorithm-independent details of quantization. 
+    /// Subclasses must implement InitialQuantizePixel, GetPallete(), and QuantizePixel. Not thread-safe!
     /// </summary>
     public abstract class Quantizer
     {
 
+        private bool _fixedPalette = false;
+        /// <summary>
+        /// (Readonly) If true, the algorithm can do everything in QuantizePixel, and InitialQuantizePixel will not be called. Implies ResizeForFirstPass=False and FourPass=false=
+        /// </summary>
+        public bool FixedPalette {
+            get { return _fixedPalette; }
+        }
+
+
+        private int _pixelSize;
+        /// <summary>
+        /// The number of bytes in a ARGB structure. Should be 4
+        /// </summary>
+        public int PixelSize {
+            get { return _pixelSize; }
+        }
+
+        private bool _fullTrust = true;
+        /// <summary>
+        /// If true, pointer arithmetic will be used instead of GetPixel. GetPixel is much slower. If false, OmitFinalStage will be assumed true, as only palette generation is possible in low trust.
+        /// Defaults to true.
+        /// </summary>
+        public bool FullTrust {
+            get { return _fullTrust; }
+            set { _fullTrust = value; }
+        }
+
+
+        private bool _resizeForFirstPass = false;
+        /// <summary>
+        /// If true, the first pass (InitialQuantizePixel) will be performed on a size-limited version of the original image to control performance. Ignored if FixedPalette=True
+        /// </summary>
+        public bool ResizeForFirstPass {
+            get { return _resizeForFirstPass; }
+            set { _resizeForFirstPass = value; }
+        }
+
+        private long _firstPassPixelCount = 256 * 256;
+        /// <summary>
+        /// The approximate number of pixels to use when making a scaled copy of the image for the first pass. Only used when ResizeForFirstPass=True and FirstPassPixelThreshold is exceeded.
+        /// </summary>
+        public long FirstPassPixelCount {
+            get { return _firstPassPixelCount; }
+            set { _firstPassPixelCount = value; }
+        }
+
+        private long _firstPassPixelThreshold = 512 * 512;
+        /// <summary>
+        /// The maximum number of pixels the original image may contain before a scaled copy is made for the first pass. 
+        /// Only relevant when ResizeForFirstPass=True
+        /// </summary>
+        public long FirstPassPixelThreshold {
+            get { return _firstPassPixelThreshold; }
+            set { _firstPassPixelThreshold = value; }
+        }
+
+
+        private bool _fourPass = false;
+
+        /// <summary>
+        /// If true, image is re-paletted after quantization - forces 2 clones of the original image to be created. FixedPalette and OmitFinalStage should be false if this is used.
+        /// </summary>
+        public bool FourPass {
+            get { return _fourPass; }
+            set { _fourPass = value; }
+        }
+
+
+        private bool _omitFinalStage = false;
+        /// <summary>
+        /// If true, a 32-bit image with an 8-bit palette will be returned instead of an 8-bit image, which GDI can save using median-cut quantization. Much faster than our final quantization pass, although it can't do transparency.
+        /// Assumed true if FullTrust is false.
+        /// </summary>
+        public bool OmitFinalStage {
+            get { return _omitFinalStage; }
+            set { _omitFinalStage = value; }
+        }
+
+
         /// <summary>
         /// Construct the quantizer
         /// </summary>
-        /// <param name="singlePass">If true, the quantization only needs to loop through the source pixels once</param>
+        /// <param name="fixedPalette">If true, the quantization only needs to loop through the source pixels once - InitialQuantiize</param>
         /// <remarks>
         /// If you construct this class with a true value for singlePass, then the code will, when quantizing your image,
         /// only call the 'QuantizeImage' function. If two passes are required, the code will call 'InitialQuantizeImage'
         /// and then 'QuantizeImage'.
         /// </remarks>
-        public Quantizer(bool singlePass)
+        public Quantizer(bool fixedPalette)
         {
-            _singlePass = singlePass;
+            _fixedPalette = fixedPalette;
             _pixelSize = Marshal.SizeOf(typeof (Color32));
         }
 
+        /// <summary>
+        /// Resets the quantizer so it can process a new image. 
+        /// </summary>
         public virtual void Reset()
         {
             this.secondPassIntermediate = null;
@@ -50,114 +135,192 @@ namespace ImageResizer.Plugins.PrettyGifs
             this.secondPassY = 0;
           
         }
-        /// <summary>
-        /// If true, image is re-paletted after quantization, and dithering occurs on a separate frame from the source.
-        /// </summary>
-        public bool fourPass = false;
+
+        protected virtual void ValidatePropertyValues() {
+            if (!FullTrust && !OmitFinalStage) throw new Exception("If FullTrust=False, OmitFinalStage must be set to true. The final stage requires full trust.");
+            if (!FullTrust && FourPass) throw new Exception("If FullTrust=False, FourPass must be false also. Four-pass quantization requires full trust.");
+
+
+        }
+
         /// <summary>
         /// Quantize an image and return the resulting output bitmap
         /// </summary>
         /// <param name="source">The image to quantize</param>
         /// <returns>A quantized version of the image</returns>
-        public Bitmap Quantize(Image source)
-        {
-            // Get the size of the source image
-            int height = source.Height;
-            int width = source.Width;
-
-            // And construct a rectangle from these dimensions
-            Rectangle bounds = new Rectangle(0, 0, width, height);
-
-            // First off take a 32bpp copy of the image
-            Bitmap copy = new Bitmap(width, height, PixelFormat.Format32bppArgb);
-
-            // And construct an 8bpp version
-            Bitmap output = new Bitmap(width, height, PixelFormat.Format8bppIndexed);
-
-            // Now lock the bitmap into memory
-            using (Graphics g = Graphics.FromImage(copy))
-            {
-                g.PageUnit = GraphicsUnit.Pixel;
-
-                // Draw the source image onto the copy bitmap,
-                // which will effect a widening as appropriate.
-                g.DrawImage(source, bounds);
-
-            }
-
+        public Bitmap Quantize(Image src) {
+            //We just set up the Bitmap copies and handle their disposal - the real work happens in 
+            // QuantizeFullTrust and QuantizeLowTrust
+            Bitmap firstPass = null;
+            Bitmap copy = null;
             Bitmap copy2 = null;
-            if (fourPass)
-            {
-                copy2 = new Bitmap(width, height, PixelFormat.Format32bppArgb);
-                using (Graphics g = Graphics.FromImage(copy2))
-                {
-                    g.PageUnit = GraphicsUnit.Pixel;
-                    g.DrawImage(source, bounds);
+            Bitmap tempOutput = null;
+            Bitmap result = null;
+            try {
+                // First off take a 32bpp copy of 'source' if it's not a 32bpp Bitmap instance.
+                copy = src as Bitmap;
+                if (FourPass || copy == null || !src.PixelFormat.Equals(PixelFormat.Format32bppArgb)) {
+                    copy = new Bitmap(src.Width, src.Height, PixelFormat.Format32bppArgb);
+
+                    // Now lock the bitmap into memory
+                    using (Graphics g = Graphics.FromImage(copy)) {
+                        g.PageUnit = GraphicsUnit.Pixel;
+
+                        // Draw the source image onto the copy bitmap,
+                        // which will effect a widening as appropriate.
+                        g.DrawImage(src, new Point(0, 0));
+
+                    }
+                }
+
+                firstPass = copy;
+                //If we should make a resized version for the first pass, let's do it.
+                if (!FixedPalette && ResizeForFirstPass && FirstPassPixelThreshold < copy.Width * copy.Height) {
+                    double factor = FirstPassPixelCount / ((double)copy.Width * (double)copy.Height);
+                    firstPass = new Bitmap((int)Math.Floor((double)copy.Width * factor), (int)Math.Floor((double)copy.Height * factor), PixelFormat.Format32bppArgb);
+                    using (Graphics g = Graphics.FromImage(firstPass)) {
+                        //Use the low-quality settings - we want the original colors of the image, nearest neighbor is better than bicubic spline here.
+                        g.PageUnit = GraphicsUnit.Pixel;
+                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                        g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
+                        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
+                        g.DrawImage(copy, 0, 0, firstPass.Width, firstPass.Height);
+                    }
+                }
+                copy2 = null;
+                if (FourPass) {
+                    copy2 = new Bitmap(src.Width, src.Height, PixelFormat.Format32bppArgb);
+                    using (Graphics g = Graphics.FromImage(copy2)) {
+                        g.PageUnit = GraphicsUnit.Pixel;
+                        g.DrawImage(src, new Point(0, 0));
+                    }
+                }
+                // And make an 8-bit output image
+                tempOutput = new Bitmap(OmitFinalStage ? 2 : src.Width, OmitFinalStage ? 2 : src.Height, PixelFormat.Format8bppIndexed);
+
+                //Full trust and low trust are implemented differently. 
+                if (FullTrust) {
+                    result = QuantizeFullTrust(firstPass, copy, copy2, tempOutput);
+                } else {
+                    result = QuantizeLowTrust(firstPass, copy, copy2, tempOutput);
+                }
+                return result;
+            } finally {
+                if (firstPass != null && firstPass != copy && firstPass != src && firstPass != result) firstPass.Dispose();
+                if (copy != null && copy != src && copy != result) copy.Dispose();
+                if (copy2 != null && copy2 != src && copy2 != result) copy2.Dispose();
+                if (tempOutput != null && tempOutput != src && tempOutput != result) tempOutput.Dispose();
+            }
+
+        }
+        
+
+
+        protected Bitmap QuantizeFullTrust(Bitmap firstPass, Bitmap copy, Bitmap copy2, Bitmap output) {
+            Rectangle bounds = new Rectangle(0, 0, copy.Width, copy.Height);
+            int width = copy.Width;
+            int height = copy.Height;
+
+            //On a fixed palette, AnalyzeImage is never called.
+            if (FixedPalette) {
+                if (OmitFinalStage) {
+                    copy.Palette = GetPalette(output.Palette); //We have to reuse the palette structure since we can't make new ones.
+                    return copy;
+                } else {
+                    output.Palette = GetPalette(output.Palette);
+                    //Lock and quantize
+                    BitmapData copyData = null;
+                    try {
+                        copyData = copy.LockBits(bounds, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+                        QuantizeImage(copyData, null, output, width, height, bounds);
+                        return output;
+                    } finally {
+                        copy.UnlockBits(copyData);
+                    }
                 }
             }
 
-
-
-            // Define a pointer to the bitmap data
-            BitmapData sourceData = null;
-            BitmapData intermediateData = null;
-            try
-            {
-                // Get the source image bits and lock into memory
-                sourceData = copy.LockBits(bounds, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-
-
-
-                // Call the FirstPass function if not a single pass algorithm.
-                // For something like an octree quantizer, this will run through
-                // all image pixels, build a data structure, and create a palette.
-                if (!_singlePass)
-                    FirstPass(sourceData, width, height);
-
-                // Then set the color palette on the output bitmap. I'm passing in the current palette 
-                // as there's no way to construct a new, empty palette.
-                output.Palette = GetPalette(output.Palette);
-
-                if (!fourPass)
-                {
-                    // Then call the second pass which actually does the conversion
-                    SecondPass(sourceData, null, output, width, height, bounds);
+            //This is our standard quantize, calling AnalyzeImage and QuantizeImage once each
+            if (!FourPass) {
+                BitmapData firstPassData = null;
+                try { 
+                    firstPassData = firstPass.LockBits(new Rectangle(0, 0, firstPass.Width, firstPass.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+                    //Analyze image and build data structures so we can generate a palette
+                    AnalyzeImage(firstPassData, firstPass.Width, firstPass.Height);
+                    // Then set the color palette on the output bitmap, using the existing one since no ctor exists.
+                    output.Palette = GetPalette(output.Palette);
+                    if (OmitFinalStage) {
+                        copy.Palette = output.Palette;
+                        return copy;
+                    } else if (firstPass == copy) {
+                        //In case we didn't resize for the first pass, reuse data
+                        QuantizeImage(firstPassData, null, output, width, height, bounds);
+                        return output;
+                    } else {
+                        BitmapData copyData = null;
+                        try {
+                            copyData = copy.LockBits(bounds, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+                            QuantizeImage(copyData, null, output, width, height, bounds);
+                            return output;
+                        } finally {
+                            copy.UnlockBits(copyData);
+                        }
+                    }
+                } finally {
+                    firstPass.UnlockBits(firstPassData);
                 }
-                else
-                {
+            }
+
+            //With a 4-pass algorithm, we 
+            if (FourPass) {
+                // Define a pointer to the bitmap data
+                BitmapData sourceData = null;
+                BitmapData intermediateData = null;
+                try {
+                    // Get the source image bits and lock into memory
+                    sourceData = copy.LockBits(bounds, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
                     intermediateData = copy2.LockBits(bounds, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
-                    SecondPass(sourceData, intermediateData, output, width, height, bounds);
-
-                    //NDJ- trying quad pass for better results (adjusts for dithering)
-                    FirstPass(intermediateData, width, height);
+                    //Analyze and generate an intermediate palette
+                    AnalyzeImage(sourceData, width, height);
                     output.Palette = GetPalette(output.Palette);
-                    SecondPass(intermediateData, null,output, width, height, bounds);
-
+                    //Run first pass
+                    QuantizeImage(sourceData, intermediateData, output, width, height, bounds);
+                    //TODO: document
+                    AnalyzeImage(intermediateData, width, height);
+                    output.Palette = GetPalette(output.Palette);
+                    QuantizeImage(intermediateData, null, output, width, height, bounds);
+                    return output;
+                } finally {
+                    // Ensure that the bits are unlocked
+                    copy.UnlockBits(sourceData);
+                    if (intermediateData != null) copy2.UnlockBits(intermediateData);
                 }
-                /*
-                Reset();
-                
-                */
             }
-            finally
-            {
-                // Ensure that the bits are unlocked
-                copy.UnlockBits(sourceData);
-                if (intermediateData != null) copy2.UnlockBits(intermediateData);
-            }
-
-            // Last but not least, return the output bitmap
-            return output;
+            return null;
         }
+        protected Bitmap QuantizeLowTrust(Bitmap firstPass, Bitmap copy, Bitmap copy2, Bitmap output) {
+            Rectangle bounds = new Rectangle(0, 0, copy.Width, copy.Height);
+            int width = copy.Width;
+            int height = copy.Height;
 
+            //On a fixed palette, AnalyzeImage is never called.
+            if (!FixedPalette) {
+                //Analyze image and build data structures so we can generate a palette
+                AnalyzeImageLowTrust(firstPass, firstPass.Width, firstPass.Height);
+            }
+
+            copy.Palette = GetPalette(output.Palette); //We have to reuse the palette structure since we can't make new ones.
+            return copy;
+
+        }
         /// <summary>
         /// Execute the first pass through the pixels in the image
         /// </summary>
         /// <param name="sourceData">The source data</param>
         /// <param name="width">The width in pixels of the image</param>
         /// <param name="height">The height in pixels of the image</param>
-        protected  virtual void FirstPass(BitmapData sourceData, int width, int height)
+        protected  virtual void AnalyzeImage(BitmapData sourceData, int width, int height)
         {
             // Define the source data pointers. The source row is a byte to
             // keep addition of the stride value easier (as this is in bytes)              
@@ -173,16 +336,26 @@ namespace ImageResizer.Plugins.PrettyGifs
                 for (int col = 0; col < width; col++)
                 {            
                     InitialQuantizePixel(new Color32(pSourcePixel)); 
-                    pSourcePixel = (IntPtr)((Int32)pSourcePixel + _pixelSize);
+                    pSourcePixel = (IntPtr)((long)pSourcePixel + PixelSize); //Increment afterwards
                 }	// Now I have the pixel, call the FirstPassQuantize function...
 
                 // Add the stride to the source row
                 pSourceRow = (IntPtr)((long)pSourceRow + sourceData.Stride);
             }
         }
+        protected virtual void AnalyzeImageLowTrust(Bitmap b, int width, int height) {
+            // Loop through each row
+            for (int row = 0; row < height; row++) {
+                // And loop through each column
+                for (int col = 0; col < width; col++) {
+                    InitialQuantizePixel(new Color32(b.GetPixel(col, row)));
+                }
+            }
+        }
 
         //For dithering - 5-18-09 ndj
         private BitmapData secondPassIntermediate;
+        //private Bitmap secondPassIntermediateBitmap;
         private int secondPassX;
         private int secondPassY;
 
@@ -195,7 +368,7 @@ namespace ImageResizer.Plugins.PrettyGifs
         /// <param name="width">The width in pixels of the image</param>
         /// <param name="height">The height in pixels of the image</param>
         /// <param name="bounds">The bounding rectangle</param>
-        protected virtual void SecondPass(BitmapData sourceData, BitmapData intermediate, Bitmap output, int width, int height, Rectangle bounds)
+        protected virtual void QuantizeImage(BitmapData sourceData, BitmapData intermediate, Bitmap output, int width, int height, Rectangle bounds)
         {
             secondPassIntermediate = (intermediate != null) ? intermediate : sourceData;// Not thread safe.... But nothing here is anyways...//For dithering - 5-18-09 ndj
             BitmapData outputData = null;
@@ -254,7 +427,7 @@ namespace ImageResizer.Plugins.PrettyGifs
                         // And set the pixel in the output
                         if (intermediate == null) Marshal.WriteByte(pDestinationPixel, pixelValue);
 
-                        pSourcePixel = (IntPtr)((long)pSourcePixel + _pixelSize);
+                        pSourcePixel = (IntPtr)((long)pSourcePixel + PixelSize);
                         if (intermediate == null) pDestinationPixel = (IntPtr)((long)pDestinationPixel + 1);
 
                     }
@@ -273,10 +446,18 @@ namespace ImageResizer.Plugins.PrettyGifs
                 secondPassIntermediate = null;
             }
         }
-       
-        //Can only be called from QuantizePixel... Expects sourceData to be locked.
-        //This is how dithering is done... 
-        //5-18-09 ndj
+
+        /// <summary>
+        /// Can only be called from QuantizePixel...
+        ///This is how dithering is done... 
+        ///5-18-09 ndj
+        /// </summary>
+        /// <param name="offsetX"></param>
+        /// <param name="offsetY"></param>
+        /// <param name="deltaR"></param>
+        /// <param name="deltaG"></param>
+        /// <param name="deltaB"></param>
+        /// <param name="deltaA"></param>
         protected void AdjustNeighborSource(int offsetX, int offsetY, int deltaR, int deltaG, int deltaB, int deltaA)
         {
             if (secondPassIntermediate == null) return;
@@ -284,7 +465,7 @@ namespace ImageResizer.Plugins.PrettyGifs
             int y = secondPassY + offsetY;
             if (x < 0 || x >= secondPassIntermediate.Width) return; //do nothing;
             if (y < 0 || y >= secondPassIntermediate.Height) return; //do nothing
-            IntPtr p = (IntPtr)((long)secondPassIntermediate.Scan0 + ((long)y * (long)secondPassIntermediate.Stride) + (_pixelSize * x));
+            IntPtr p = (IntPtr)((long)secondPassIntermediate.Scan0 + ((long)y * (long)secondPassIntermediate.Stride) + (PixelSize * x));
             //Read the original color
             Color32 c = new Color32(p);
 
@@ -297,12 +478,28 @@ namespace ImageResizer.Plugins.PrettyGifs
   
         }
         //Truncates an int to a byte. 5-18-09 ndj
-        protected byte ToByte(int i)
-        {
+        protected byte ToByte(int i) {
             if (i < 0) return 0;
             if (i > 255) return 255;
             return (byte)i;
         }
+        //protected void AdjustNeighborSourceLowTrust(int offsetX, int offsetY, int deltaR, int deltaG, int deltaB, int deltaA) {
+        //    if (secondPassIntermediateBitmap == null) return;
+        //    int x = secondPassX + offsetX;
+        //    int y = secondPassY + offsetY;
+        //    if (x < 0 || x >= secondPassIntermediateBitmap.Width) return; //do nothing;
+        //    if (y < 0 || y >= secondPassIntermediateBitmap.Height) return; //do nothing
+        //    Color c = secondPassIntermediateBitmap.GetPixel(x, y);
+
+        //    secondPassIntermediateBitmap.SetPixel(x, y, Color.FromArgb(ClampToByte(c.A + deltaA),
+        //        ClampToByte(c.R + deltaR), ClampToByte(c.G + deltaG), ClampToByte(c.B + deltaB)));
+
+        //}
+        //protected int ClampToByte(int i) {
+        //    if (i < 0) return 0;
+        //    if (i > 255) return 255;
+        //    return i;
+        //}
         
 
         /// <summary>
@@ -331,11 +528,7 @@ namespace ImageResizer.Plugins.PrettyGifs
         /// <returns>The new color palette</returns>
         protected abstract ColorPalette GetPalette(ColorPalette original);
 
-        /// <summary>
-        /// Flag used to indicate whether a single pass or two passes are needed for quantization.
-        /// </summary>
-        private bool _singlePass;
-        private int _pixelSize;
+
 
      
 
@@ -350,7 +543,13 @@ namespace ImageResizer.Plugins.PrettyGifs
         [StructLayout(LayoutKind.Explicit)]
         public struct Color32
         {
-
+            public Color32(Color c){
+                this.ARGB = c.ToArgb();
+                Blue = c.B;
+                Green = c.G;
+                Red = c.R;
+                Alpha = c.A;
+            }
             public Color32(IntPtr pSourcePixel)
             {
               this = (Color32) Marshal.PtrToStructure(pSourcePixel, typeof(Color32));

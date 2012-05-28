@@ -1,0 +1,29 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.AzureReader</id>
+		<title>ImageResizer.Plugins.AzureReader - Process images from the Azure blobstore</title>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<owners>$author$</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>$iconurl$</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>
+You can now process images from the Azure Blobstore. 
+
+Go to resizer.uservoice.com to vote for new azure-related features.
+Visit http://imageresizing.net for details, documenation, and free support. 
+E-mail support@imageresizing.net if you encounter any problems with the software. 
+The documentation for this plugin resides at http://imageresizing.net/plugins/azurereader</description>
+		<tags>$tags$</tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.AzureReader.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.AzureReader.xml" target="lib" />
+	</files>
+</package>

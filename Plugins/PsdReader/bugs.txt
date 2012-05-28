@@ -1,0 +1,1 @@
+﻿1. Transparency support varies - need to establish test scenario and see if improvement is possible. FreeImageDecoder supports PSD files better. 

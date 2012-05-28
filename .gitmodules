@@ -1,3 +1,6 @@
 [submodule "tools/docu"]
 	path = tools/docu
 	url = https://github.com/jagregory/docu.git
+[submodule "StudioJS"]
+	path = StudioJS
+	url = git@github.com:nathanaeljones/studiojs.git

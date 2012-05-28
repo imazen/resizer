@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PdfRenderer", "PdfRenderer\ImageResizer.Plugins.PdfRenderer.csproj", "{7C8A13F7-5C00-4074-B16E-45D0E231B70D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer", "..\..\Core\ImageResizer.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PdfRenderer.Web", "PdfRenderer.Web\ImageResizer.Plugins.PdfRenderer.Web.csproj", "{5BE28545-F104-4765-8E1B-4129246E200E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PdfRenderer.Tests", "PdfRenderer.Tests\ImageResizer.Plugins.PdfRenderer.Tests.csproj", "{00D9FEC9-F33A-4C7C-AECF-76C08E7D8D9C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BE28545-F104-4765-8E1B-4129246E200E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BE28545-F104-4765-8E1B-4129246E200E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BE28545-F104-4765-8E1B-4129246E200E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BE28545-F104-4765-8E1B-4129246E200E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00D9FEC9-F33A-4C7C-AECF-76C08E7D8D9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00D9FEC9-F33A-4C7C-AECF-76C08E7D8D9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00D9FEC9-F33A-4C7C-AECF-76C08E7D8D9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00D9FEC9-F33A-4C7C-AECF-76C08E7D8D9C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

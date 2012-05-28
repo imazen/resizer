@@ -7,7 +7,7 @@
 		<description>Description</description>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
-		  <dependency id="DotNetZip"/>
+		  <dependency id="DotNetZip.Reduced"/>
 
 		</dependencies>
 	</metadata>

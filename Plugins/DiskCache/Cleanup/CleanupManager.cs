@@ -39,9 +39,13 @@ namespace ImageResizer.Plugins.DiskCache {
 
             worker = new CleanupWorker(lp, cs,queue,cache);
         }
-        
 
-        
+
+
+        /// <summary>
+        /// When true, indicates that another process is managing cleanup operations - this thread is idle, waiting for the other process to end before it can pick up work.
+        /// </summary>
+        public bool ExteralProcessCleaning { get {   return worker != null ? worker.ExteralProcessCleaning : false; } }
 
         /// <summary>
         /// Notifies the CleanupManager that a request is in process. Helps CleanupManager optimize background work so it doesn't interfere with request processing.
@@ -89,8 +93,10 @@ namespace ImageResizer.Plugins.DiskCache {
         }
 
         public IEnumerable<IIssue> GetIssues() {
-            if (worker != null) return worker.GetIssues();
-            return new IIssue[] { };
+            List<IIssue> issues = new List<IIssue>();
+            if (worker != null) issues.AddRange(worker.GetIssues());
+            if (cs != null) issues.AddRange(cs.GetIssues());
+            return issues;
         }
 
 

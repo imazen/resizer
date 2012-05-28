@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ImageResizer.Plugins {
     /// <summary>
-    /// For virtual files who want to provide their data in Bitmap form (like a PSD reader or gradient generator)
+    /// For virtual files who want to provide their data in Bitmap form (like a PSD reader or gradient generator). Plugins should never assume this interface will be used, .Open() must also be implemented.
     /// </summary>
     public interface IVirtualBitmapFile:IVirtualFile {
         /// <summary>

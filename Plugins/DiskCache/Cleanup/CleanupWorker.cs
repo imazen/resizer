@@ -8,6 +8,7 @@ using System.IO;
 using ImageResizer.Configuration.Issues;
 using System.Diagnostics;
 using ImageResizer.Configuration.Logging;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.DiskCache {
     public class CleanupWorker : IssueSink, IDisposable {
@@ -41,7 +42,15 @@ namespace ImageResizer.Plugins.DiskCache {
             _queueWait.Set();
         }
 
+        /// <summary>
+        /// The last time a cache folder exceeded both the optimum and maximum limits for file count. 
+        /// If recent, indicates a misconfiguration; the subfolders="" count needs to be increased.
+        /// </summary>
+        protected long lastFoundItemsOverMax = DateTime.MinValue.Ticks;
 
+        /// <summary>
+        /// The last time a cache query came through
+        /// </summary>
         protected long lastBusy = DateTime.MinValue.Ticks;
         /// <summary>
         /// Tells the worker to avoid work for a little bit.
@@ -50,54 +59,147 @@ namespace ImageResizer.Plugins.DiskCache {
             lock(_timesLock) lastBusy = DateTime.UtcNow.Ticks;
             
         }
+        /// <summary>
+        /// The last time we did work (or attempted to do work, failing if the queue was empty)
+        /// </summary>
         protected long lastWorked = DateTime.MinValue.Ticks;
 
+        /// <summary>
+        /// When true, indicates that another process is managing cleanup operations - this thread is idle, waiting for the other process to end before it can pick up work.
+        /// </summary>
+        public bool ExteralProcessCleaning { get { return this.otherProcessManagingCleanup; } }
+        /// <summary>
+        /// When true, indicates that another process is managing cleanup operations - this thread is idle, waiting for the other process to end before it can pick up work.
+        /// </summary>
+        protected bool otherProcessManagingCleanup = false;
         protected readonly object _timesLock = new object();
         /// <summary>
         /// Thread runs this method.
         /// </summary>
         protected void main() {
-            //Sleep for the duration requested
-            _quitWait.WaitOne(cs.StartupDelay);
-            //Start the work loop
-            while(true){
-                //Check for shutdown
-                if (shuttingDown) return;
-
-                //Is it time to do some work?
-                bool noWorkInTooLong = false;
-                lock (_timesLock) noWorkInTooLong = (DateTime.UtcNow.Subtract(new DateTime(lastWorked)) > cs.MaxDelay);
-                bool notBusy = false;
-                lock (_timesLock) notBusy = (DateTime.UtcNow.Subtract(new DateTime(lastBusy)) > cs.MinDelay);
-                //doSomeWork keeps being true in absence of incoming requests
-
-                bool didWork = (noWorkInTooLong || notBusy) && DoWorkFor(cs.OptimalWorkSegmentLength);
-                
-                //Check for shutdown
-                if (shuttingDown) return;
-
-                //Nothing to do, queue is empty.
-                if (!didWork && queue.IsEmpty) 
-                    //Wait perpetually until notified of more queue items.
-                    _queueWait.WaitOne();
-                else if (didWork && notBusy) 
-                    //Don't flood the system even when it's not busy. 50% usage here.
-                    _quitWait.WaitOne(cs.OptimalWorkSegmentLength); 
-                else if (didWork && !notBusy) {
-                    //Estimate how long before we can run more code.
-                    long busyTicks = 0;
-                    lock (_timesLock) busyTicks = (cs.MinDelay - DateTime.UtcNow.Subtract(new DateTime(lastBusy))).Ticks;
-                    long maxTicks = 0;
-                    lock (_timesLock) maxTicks = (cs.MaxDelay - DateTime.UtcNow.Subtract(new DateTime(lastWorked))).Ticks;
-                    //Use the longer value and add a second to avoid rounding and timing errors.
-                    _quitWait.WaitOne(new TimeSpan(Math.Max(busyTicks,maxTicks)) + new TimeSpan(0,0,1) ); 
-                }
-                //Check for shutdown
-                if (shuttingDown) return;
+            try {
+                mainInner();
+            } catch (Exception ex) {
+                if (Debugger.IsAttached) throw;
+                if (lp.Logger != null) lp.Logger.Error("Contact support! A critical (and unexpected) exception occured in the disk cache cleanup worker thread. This needs to be investigated. {0}", ex.Message + ex.StackTrace);
+                this.AcceptIssue(new Issue("Contact support! A critical (and unexpected) exception occured in the disk cache cleanup worker thread. This needs to be investigated. ", ex.Message + ex.StackTrace, IssueSeverity.Critical));
             }
-            
+        }
+        /// <summary>
+        /// Processes work items from the queue, using at most 50%
+        /// </summary>
+        protected void mainInner(){
+            //TODO: Verify that GetHashCode() is the same between .net 2 and 4. 
+            string mutexKey = "ir.cachedir:" + cache.PhysicalCachePath.ToLowerInvariant().GetHashCode().ToString("x", NumberFormatInfo.InvariantInfo);
+
+            //Sleep for the duration requested before trying anything. 
+            _quitWait.WaitOne(cs.StartupDelay);
+
+            Mutex cleanupLock = null;
+            bool hasLock = false;
+           
+            try {
+                //Try to create and lock the mutex, or else open and lock it.
+                try{
+                    cleanupLock = new Mutex(true, mutexKey, out hasLock);
+                }catch(UnauthorizedAccessException){
+                    hasLock = false;
+                }
+         
+                //Start the work loop
+                while (true) {
+                    //Check for shutdown
+                    if (shuttingDown) return;
+
+                    //Try to acquire a reference to the lock if we didn't have access last time.
+                    if (cleanupLock == null) {
+                        //In this case, another process (running as another user account) has opened the lock. Eventually it may be garbage collected.
+                        try {
+                            cleanupLock = new Mutex(true, mutexKey, out hasLock);
+                        } catch (UnauthorizedAccessException) {
+                            hasLock = false;
+                        }
+                    }
+
+                    otherProcessManagingCleanup = !hasLock;
+                    if (!hasLock) {
+                        //If we have a reference, Wait until the other process calls ReleaseMutex(), or for 30 seconds, whichever is shorter.
+                        if (cleanupLock != null) hasLock = cleanupLock.WaitOne(30000);
+                        else Thread.Sleep(10000); //Otherwise just sleep 10s and check again, waiting for the mutex to be garbage collected so we can recreate it.
+                    }
+                    otherProcessManagingCleanup = !hasLock;
+                    if (!hasLock) {
+                        //Still no luck, someone else is managing things...
+                        //Clear out the todo-list
+                        queue.Clear();
+                        //Get back to doing nothing.
+                        continue;
+                    }
+                    
+
+                    //Is it time to do some work?
+                    bool noWorkInTooLong = false; //Has it been too long since we did something?
+                    lock (_timesLock) noWorkInTooLong = (DateTime.UtcNow.Subtract(new DateTime(lastWorked)) > cs.MaxDelay);
+
+                    bool notBusy = false; //Is the server busy recently?
+                    lock (_timesLock) notBusy = (DateTime.UtcNow.Subtract(new DateTime(lastBusy)) > cs.MinDelay);
+                    //doSomeWork keeps being true in absence of incoming requests
+
+                    //If the server isn't busy, or if this worker has been lazy to long long, do some work and time it.
+                    Stopwatch workedForTime = null;
+                    if (noWorkInTooLong || notBusy) {
+                        workedForTime = new Stopwatch();
+                        workedForTime.Start();
+                        DoWorkFor(cs.OptimalWorkSegmentLength);
+                        lock (_timesLock) lastWorked = DateTime.UtcNow.Ticks; 
+                        workedForTime.Stop();
+                    }
+
+                    //Check for shutdown
+                    if (shuttingDown) return;
+
+                    
+                    //Nothing to do, queue is empty.
+                    if (queue.IsEmpty)
+                        //Wait perpetually until notified of more queue items.
+                        _queueWait.WaitOne();
+                    else if (notBusy)
+                        //Don't flood the system even when it's not busy. 50% usage here. Wait for the length of time worked or the optimal work time, whichever is longer.
+                        //A directory listing can take 30 seconds sometimes and kill the cpu.
+                        _quitWait.WaitOne((int)Math.Max(cs.OptimalWorkSegmentLength.TotalMilliseconds, workedForTime.ElapsedMilliseconds));
+
+                    else {
+                        //Estimate how long before we can run more code.
+                        long busyTicks = 0;
+                        lock (_timesLock) busyTicks = (cs.MinDelay - DateTime.UtcNow.Subtract(new DateTime(lastBusy))).Ticks;
+                        long maxTicks = 0;
+                        lock (_timesLock) maxTicks = (cs.MaxDelay - DateTime.UtcNow.Subtract(new DateTime(lastWorked))).Ticks;
+                        //Use the longer value and add a second to avoid rounding and timing errors.
+                        _quitWait.WaitOne(new TimeSpan(Math.Max(busyTicks, maxTicks)) + new TimeSpan(0, 0, 1));
+                    } 
+
+                    //Check for shutdown
+                    if (shuttingDown) return;
+                }
+            } finally {
+                if (hasLock) cleanupLock.ReleaseMutex();
+                otherProcessManagingCleanup = false;
+            }
         }
 
+        public override IEnumerable<IIssue> GetIssues() {
+            List<IIssue> issues = new List<IIssue>(base.GetIssues());
+            issues.Add(new Issue("An external process indicates it is managing cleanup of the disk cache. " + 
+                "This process is not currently managing disk cache cleanup. If configured as a web garden, keep in mind that the negligible performance gains are likely to be outweighed by the loss of cache optimization quality.", IssueSeverity.Warning));
+            lock (_timesLock) {
+                if (this.lastFoundItemsOverMax > (DateTime.UtcNow.Subtract(new TimeSpan(0, 5, 0)).Ticks))
+                    issues.Add(new Issue("Your cache configuration may not be optimal. If this message persists, you should increase the 'subfolders' value in the <diskcache /> element in Web.config",
+                        "In the last 5 minutes, a cache folder exceeded both the optimum and maximum limits for file count. This usually indicates that your 'subfolders' setting is too low, and that cached images are being deleted shortly after their creation. \n" +
+                        "To estimate the appropriate subfolders value, multiply the total number of images on the site times the average number of size variations, and divide by 400. I.e, 6,400 images with 2 variants would be 32. If in doubt, set the value higher, but ensure there is disk space available.", IssueSeverity.Error));
+
+            }
+            return issues;
+        }
         /// <summary>
         /// Processes items from the queue for roughly the specified amount of time.
         /// Returns false if the queue was empty.
@@ -120,8 +222,6 @@ namespace ImageResizer.Plugins.DiskCache {
                     this.AcceptIssue(new Issue("Failed exeuting task", e.Message + e.StackTrace, IssueSeverity.Critical));
                 }
             }
-
-            lock (_timesLock) lastWorked = DateTime.UtcNow.Ticks;
             return true;
         }
         protected volatile bool shuttingDown = false;
@@ -152,7 +252,7 @@ namespace ImageResizer.Plugins.DiskCache {
                 FlushAccessedDate(item);
 
             if (lp.Logger != null) sw.Stop();
-            if (lp.Logger != null) lp.Logger.Trace("({2}ms): Executing task {0} {1} ({3} tasks remaining)", item.Task.ToString(), item.RelativePath, sw.ElapsedMilliseconds, queue.Count.ToString());
+            if (lp.Logger != null) lp.Logger.Trace("{2}ms: Executing task {0} {1} ({3} tasks remaining)", item.Task.ToString(), item.RelativePath, sw.ElapsedMilliseconds.ToString(NumberFormatInfo.InvariantInfo).PadLeft(4), queue.Count.ToString(NumberFormatInfo.InvariantInfo));
 
             
         }
@@ -171,7 +271,7 @@ namespace ImageResizer.Plugins.DiskCache {
                     sw.Start();
                     cache.Index.populate(item.RelativePath, item.PhysicalPath);
                     sw.Stop();
-                    lp.Logger.Trace("({0}ms): Querying filesystem about {1}", sw.ElapsedMilliseconds, item.RelativePath);
+                    lp.Logger.Trace("{0}ms: Querying filesystem about {1}", sw.ElapsedMilliseconds.ToString(NumberFormatInfo.InvariantInfo).PadLeft(4), item.RelativePath);
                 } else 
                     cache.Index.populate(item.RelativePath, item.PhysicalPath);
             }
@@ -255,6 +355,8 @@ namespace ImageResizer.Plugins.DiskCache {
             int overOptimal = Math.Max(0, (files - overMax) - cs.TargetItemsPerFolder);
 
             if (overMax + overOptimal < 1) return; //nothing to do
+
+            if (overMax > 0) lock (_timesLock) lastFoundItemsOverMax = DateTime.UtcNow.Ticks;
 
             //Make a linked list, like a queue of files. 
             LinkedList<KeyValuePair<string, CachedFileInfo>> sortedList = new LinkedList<KeyValuePair<string, CachedFileInfo>>(

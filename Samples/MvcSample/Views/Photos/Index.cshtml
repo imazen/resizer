@@ -1,0 +1,12 @@
+﻿@{
+    ViewBag.Title = "All Photos";
+}
+<h2>All photos</h2>
+
+<a href="/photos/upload">Upload photos</a>
+
+<ul class="images">
+@foreach (Photo p in Photo.GetAll()) {
+    @: <li><img src='@p.UrlWith("maxwidth=100;maxheight=100")' alt='@p.OriginalName'/></li>
+}
+</ul>

@@ -49,7 +49,7 @@ namespace ImageResizer.Plugins.Basic {
 
 
         public bool FitsInsideTotalSize(Size s) {
-            return (s.Width < totalSize.Width && s.Height < totalSize.Height);
+            return (s.Width <= totalSize.Width && s.Height <= totalSize.Height);
         }
 
         public enum TotalSizeBehavior {

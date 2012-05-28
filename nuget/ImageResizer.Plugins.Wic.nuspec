@@ -1,0 +1,32 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.Wic</id>
+		<title>ImageResizer.Plugins.Wic - Alternate Windows Imaging Components pipeline</title>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<owners>$author$</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>$iconurl$</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>
+While WIC requires full trust, it can be 2-4x faster than GDI for simple resizing operations with only a slight quality loss. 
+
+You can switch between the GDI, WIC, and FreeImage pipelines from the URL! Get the best of each without sacrificing anything.
+
+Go to resizer.uservoice.com to vote for new features!
+
+Visit http://imageresizing.net for details, documenation, and free support. 
+E-mail support@imageresizing.net if you encounter any problems with the software. 
+The documentation for this plugin resides at http://imageresizing.net/plugins/wic</description>
+		<tags>$tags$</tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.Wic.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.Wic.xml" target="lib" />
+	</files>
+</package>

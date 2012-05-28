@@ -1154,8 +1154,9 @@ $.Jcrop = function(obj,opt)
 		getWidgetSize: function() { return [ boundx, boundy ]; },
 
 		release: Selection.release,
-		destroy: destroy
-
+		destroy: destroy,
+        
+            getOptions: function () { return options; }
 	};
 
 	$origimg.data('Jcrop',api);

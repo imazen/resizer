@@ -69,14 +69,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BoxEdges.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
+    <Compile Include="Configuration\Cryptography\AppDataKeyProvider.cs" />
+    <Compile Include="Configuration\Cryptography\IKeyProvider.cs" />
+    <Compile Include="Configuration\Cryptography\VolatileKeyProvider.cs" />
     <Compile Include="Configuration\Issues\ConfigChecker.cs" />
     <Compile Include="Configuration\IUrlAuthorizationEventArgs.cs" />
     <Compile Include="Configuration\Logging\ILogger.cs" />
     <Compile Include="Configuration\Logging\ILoggerProvider.cs" />
     <Compile Include="Configuration\Logging\ILogManager.cs" />
+    <Compile Include="Configuration\NativeDependencyManager.cs" />
     <Compile Include="Configuration\UrlAuthorizationEventArgs.cs" />
+    <Compile Include="ExtensionMethods\Enum.cs" />
+    <Compile Include="ExtensionMethods\ExtensionAttribute.cs" />
+    <Compile Include="ExtensionMethods\NameValueCollection.cs" />
+    <Compile Include="ExtensionMethods\Stream.cs" />
+    <Compile Include="ImageJob.cs" />
+    <Compile Include="Instructions.cs" />
+    <Compile Include="Plugins\Basic\AutoRotate.cs" />
+    <Compile Include="Plugins\Basic\DefaultSettings.cs" />
     <Compile Include="Plugins\Basic\FolderResizeSyntax.cs" />
+    <Compile Include="Plugins\Basic\IEPngFix.cs" />
     <Compile Include="Plugins\Basic\ImageHandlerSyntax.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -84,6 +98,7 @@
     <Compile Include="Plugins\Basic\DiagnosticDisabledHandler.cs" />
     <Compile Include="Plugins\Basic\Gradient.cs" />
     <Compile Include="Plugins\Basic\Image404.cs" />
+    <Compile Include="Plugins\Basic\ImageInfoAPI.cs" />
     <Compile Include="Plugins\Basic\NoCacheHandler.cs" />
     <Compile Include="Caching\ResponseArgs.cs" />
     <Compile Include="Caching\ICacheProvider.cs" />
@@ -109,15 +124,22 @@
     <Compile Include="Configuration\Xml\Node.cs" />
     <Compile Include="Configuration\Xml\Selector.cs" />
     <Compile Include="Plugins\Basic\DropShadow.cs" />
+    <Compile Include="Plugins\Basic\Presets.cs" />
     <Compile Include="Plugins\Basic\SpeedOrQuality.cs" />
+    <Compile Include="Plugins\ICurrentConfigProvider.cs" />
+    <Compile Include="Plugins\IUrlPostFilter.cs" />
+    <Compile Include="Plugins\IUrlPreFilter.cs" />
+    <Compile Include="Plugins\IVirtualFileSourceCacheKey.cs" />
+    <Compile Include="Plugins\IVirtualFileCache.cs" />
     <Compile Include="Plugins\IFileExtensionPlugin.cs" />
     <Compile Include="Plugins\Basic\Trial.cs" />
     <Compile Include="Plugins\Basic\Diagnostic.cs" />
     <Compile Include="Plugins\Basic\DiagnosticPageHandler.cs" />
     <Compile Include="Plugins\IMultiInstancePlugin.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
+    <Compile Include="Plugins\ISettingsModifier.cs" />
     <Compile Include="Plugins\VirtualFileWrapper.cs" />
-    <Compile Include="ResizerSection.cs" />
+    <Compile Include="Configuration\ImageResizer.ResizerSection.cs" />
     <Compile Include="Caching\ICache.cs" />
     <Compile Include="Collections\SafeList.cs" />
     <Compile Include="Plugins\Basic\DefaultEncoder.cs" />
@@ -141,8 +163,12 @@
     <Compile Include="Plugins\Basic\SizeLimits.cs" />
     <Compile Include="Resizing\BitmapTag.cs" />
     <Content Include="Resizing\UnitR.cs.txt" />
+    <Compile Include="Resizing\ResizingCanceledException.cs" />
     <Compile Include="SharedAssemblyInfo.cs" />
-    <Compile Include="Util\CommitAttribute.cs" />
+    <Compile Include="UrlBuilder.cs" />
+    <Compile Include="UrlOptions.cs" />
+    <Compile Include="Util\AssemblyAttributes.cs" />
+    <Compile Include="Util\ParseUtils.cs" />
     <Compile Include="Util\PathUtils.cs" />
     <Compile Include="Util\PolygonMath.cs" />
     <Compile Include="Plugins\IVirtualFileWithModifiedDate.cs" />
@@ -189,7 +215,6 @@
     <Content Include="todo.txt" />
     <Content Include="totest.txt" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

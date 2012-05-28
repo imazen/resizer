@@ -13,9 +13,8 @@ using ImageResizer.Configuration;
 using ImageResizer.Resizing;
 
 namespace ImageResizer.Plugins.S3Reader {
-    [AspNetHostingPermission(SecurityAction.Demand, Level = AspNetHostingPermissionLevel.Minimal)]
-    [AspNetHostingPermission(SecurityAction.InheritanceDemand, Level = AspNetHostingPermissionLevel.Minimal)]
-    public class S3File : VirtualFile, IVirtualFileWithModifiedDate {
+
+    public class S3File : VirtualFile, IVirtualFile, IVirtualFileWithModifiedDate, IVirtualFileSourceCacheKey {
         private string bucket;
         private string key;
         private S3VirtualPathProvider provider;
@@ -80,7 +79,7 @@ namespace ImageResizer.Plugins.S3Reader {
             /////////// Parse path into bucket and key
 
             //Strip prefix
-            String path = VirtualPathUtility.ToAppRelative(VirtualPath).Substring(provider.VirtualFilesystemPrefix.Length);
+            String path = VirtualPath.Substring(provider.VirtualFilesystemPrefix.Length);
 
             //strip leading slashes
             path = path.TrimStart(new char[] { '/', '\\' });
@@ -109,8 +108,10 @@ namespace ImageResizer.Plugins.S3Reader {
                 provider.Service.GetObject(bucket, key, ms);
             } catch (S3Exception se) {
                // if (HttpContext.Current != null && HttpContext.Current.Items[Config.Current.Pipeline.ResponseArgsKey]
-                if (se.ErrorCode == S3ErrorCode.NoSuchKey) throw new FileNotFoundException("Amazon S3 file not found",  se);
+                if (se.ErrorCode == S3ErrorCode.NoSuchKey) throw new FileNotFoundException("Amazon S3 file not found", se);
                 else if (se.ErrorCode == S3ErrorCode.AccessDenied) throw new FileNotFoundException("Amazon S3 access denied - file may not exist", se);
+                else throw se;
+                    //LitS3.S3ErrorCode.PermanentRedirect
             }
             ms.Seek(0, SeekOrigin.Begin); //Reset to beginning
             return ms;
@@ -124,6 +125,10 @@ namespace ImageResizer.Plugins.S3Reader {
             }
         }
 
+
+        public string GetCacheKey(bool includeModifiedDate) {
+            return VirtualPath + (includeModifiedDate ? ("_" + ModifiedDateUTC.Ticks.ToString()) : "");
+        }
     }
 }
 

@@ -1,15 +1,8 @@
 /* Copyright (c) 2011 Nathanael Jones. See license.txt */
 using System;
 using System.Configuration;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
 using System.Drawing;
 using System.IO;
-using System.Web.Hosting;
 using System.Drawing.Imaging;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,6 +15,8 @@ using ImageResizer.Encoding;
 using ImageResizer.Util;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins;
+using System.Globalization;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer
 {
@@ -29,65 +24,74 @@ namespace ImageResizer
     /// Provides methods for generating resized images, and for reading and writing them to disk.
     /// Use ImageBuilder.Current to get the current instance (as configured in the application configuration), or use ImageBuilder.Current.Create() to control which extensions are used.
     /// </summary>
-    public class ImageBuilder : AbstractImageProcessor, IQuerystringPlugin, IFileExtensionPlugin
+    public partial class ImageBuilder : AbstractImageProcessor, IQuerystringPlugin, IFileExtensionPlugin
     {
-        protected ImageBuilder() { }
         /// <summary>
-        /// Handles the encoder selection and provision proccess.
+        /// Shouldn't be used except to make a factory instance.
         /// </summary>
+        protected ImageBuilder() { }
         protected IEncoderProvider _encoderProvider = null;
         /// <summary>
         /// Handles the encoder selection and provision proccess.
         /// </summary>
         public IEncoderProvider EncoderProvider { get { return _encoderProvider; } }
 
+
+        protected ISettingsModifier _settingsModifier = null;
+        /// <summary>
+        /// May be null. A class to modify or normalize ResizeSettings instances before they are used.
+        /// </summary>
+        public ISettingsModifier SettingsModifier { get { return _settingsModifier; } }
+
+        private IVirtualImageProvider _virtualFileProvider;
+
+        /// <summary>
+        /// Provides a resolution service for app-relative URLs. 
+        /// </summary>
+        public IVirtualImageProvider VirtualFileProvider {
+            get { return _virtualFileProvider; }
+        }
+
         /// <summary>
         /// Returns a shared instance of ImageBuilder or a subclass, equivalent to  Config.Current.CurrentImageBuilder
         /// </summary>
         /// <returns></returns>
         public static ImageBuilder Current {get{ return Config.Current.CurrentImageBuilder; }}
-        /// <summary>
-        /// Creates a new ImageBuilder instance with no extensions.
-        /// </summary>
-        public ImageBuilder(IEncoderProvider encoderProvider): base() {
-                this._encoderProvider = encoderProvider;
-        }
 
         /// <summary>
-        /// Create a new instance of ImageBuilder using the specified extensions and encoder provider. Extension methods will be fired in the order they exist in the collection.
+        /// Create a new instance of ImageBuilder using the specified extensions, encoder provider, file provider, and settings filter. Extension methods will be fired in the order they exist in the collection.
         /// </summary>
         /// <param name="extensions"></param>
         /// <param name="encoderProvider"></param>
-        public ImageBuilder(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider):base(extensions){
+        /// <param name="settingsModifier"></param>
+        /// <param name="virtualFileProvider"></param>
+        public ImageBuilder(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider, IVirtualImageProvider virtualFileProvider, ISettingsModifier settingsModifier)
+            : base(extensions) {
             this._encoderProvider = encoderProvider;
+            this._virtualFileProvider = virtualFileProvider;
+            this._settingsModifier = settingsModifier;
         }
 
-        
         /// <summary>
         /// Creates another instance of the class using the specified extensions. Subclasses should override this and point to their own constructor.
         /// </summary>
         /// <param name="extensions"></param>
         /// <param name="writer"></param>
+        /// <param name="virtualFileProvider"></param>
+        /// <param name="settingsModifier"></param>
         /// <returns></returns>
-        public virtual ImageBuilder Create(IEnumerable<BuilderExtension> extensions, IEncoderProvider writer) {
-            return new ImageBuilder(extensions,writer);
+        public virtual ImageBuilder Create(IEnumerable<BuilderExtension> extensions, IEncoderProvider writer, IVirtualImageProvider virtualFileProvider, ISettingsModifier settingsModifier) {
+            return new ImageBuilder(extensions,writer,virtualFileProvider,settingsModifier);
         }
         /// <summary>
         /// Copies the instance along with extensions. Subclasses must override this.
         /// </summary>
         /// <returns></returns>
         public virtual ImageBuilder Copy(){
-            return new ImageBuilder(this.exts,this._encoderProvider);
+            return new ImageBuilder(this.exts,this._encoderProvider, this._virtualFileProvider,this._settingsModifier);
         }
 
 
-        /// <summary>
-        /// Allows Bitmap Build(object) to wrap void Build(object,object) easily.
-        /// </summary>
-        protected class BitmapHolder {
-            public BitmapHolder() { }
-            public Bitmap bitmap;
-        }
 
         /// <summary>
         /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag in a BitmapTag instance. The Bitmap.Tag.Path value may be a virtual, relative, UNC, windows, or unix path. 
@@ -97,6 +101,18 @@ namespace ImageResizer
         /// <param name="settings">Will ignore ICC profile if ?ignoreicc=true.</param>
         /// <returns>A Bitmap. The .Tag property will include a BitmapTag instance. If .Tag.Source is not null, remember to dispose it when you dispose the Bitmap.</returns>
         public virtual Bitmap LoadImage(object source, ResizeSettings settings) {
+            return LoadImage(source, settings, false);
+        }
+        /// <summary>
+        /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag in a BitmapTag instance. The Bitmap.Tag.Path value may be a virtual, relative, UNC, windows, or unix path. 
+        /// Does not dispose 'source' if it is a Stream or Image instance - that's the responsibility of the calling code.
+        /// </summary>
+        /// <param name="source">May  be an instance of string, VirtualFile, IVirtualFile IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.  If passed an Image instance, the image will be cloned, which will cause metadata, indexed state, and any additional frames to be lost. Accepts physical paths and application relative paths. (C:\... and ~/path) </param>
+        /// <param name="settings">Will ignore ICC profile if ?ignoreicc=true.</param>
+        /// <param name="restoreStreamPos">If true, the position of the source stream will be restored after being read</param>
+        /// <returns>A Bitmap. The .Tag property will include a BitmapTag instance. If .Tag.Source is not null, remember to dispose it when you dispose the Bitmap.</returns>
+        public virtual Bitmap LoadImage(object source, ResizeSettings settings, bool restoreStreamPos){
+            if (source == null) throw new ArgumentNullException("source", "The source argument cannot be null; how do you load an image from a null value?");
 
             bool disposeStream = !(source is Stream);
             string path = null;
@@ -107,17 +123,6 @@ namespace ImageResizer
             System.Drawing.Bitmap b = null;
             string loadFailureReasons = "File may be corrupted, empty, or may contain a PNG image with a single dimension greater than 65,535 pixels.";
             
- 
-            //App-relative path - converted to virtual path
-            if (source is string) {
-                path = source as string;
-                //Convert app-relative paths to VirtualFile instances
-                if (path.StartsWith("~", StringComparison.OrdinalIgnoreCase)) {
-                    //TODO: add support for Ivirtual files
-                    source = HostingEnvironment.VirtualPathProvider.GetFile(PathUtils.ResolveAppRelative(path));
-                }
-            }
-
             //Bitmap
             if (source is Bitmap) return source as Bitmap;
             //Image
@@ -130,42 +135,12 @@ namespace ImageResizer
                 return b;
             }
 
-
-
             bool restoreStreamPosition = false;
-            Stream s = null;
-            path = null;
-            //Stream
-            if (source is Stream) s = (Stream)source;
-            //VirtualFile
-             else if (source is VirtualFile) {
-                path = ((VirtualFile)source).VirtualPath;
-                s = ((VirtualFile)source).Open();
-            //IVirtualFile
-            } else if (source is IVirtualFile) {
-                path = ((IVirtualFile)source).VirtualPath;
-                s = ((IVirtualFile)source).Open();
-            //PhysicalPath
-            } else if (source is string) {
-                path = (string)source;
-                s = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-            } else if (source is byte[]){
-                s = new MemoryStream((byte[])source, false);
-            } else {
-                //For HttpPostedFile and HttpPostedFileBase - we must use reflection to support .NET 3.5 without losing 2.0 compat.
-                PropertyInfo pname = source.GetType().GetProperty("FileName",typeof(string));
-                PropertyInfo pstream = source.GetType().GetProperty("InputStream");
+            Stream s = GetStreamFromSource(source, settings, ref disposeStream, out path, out restoreStreamPosition);
+            if (s == null) throw new ArgumentException("Source may only be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, HttpPostedFileBase, Bitmap, Image, or Stream.", "source");
 
-                if (pname != null && pstream != null) {
-                    path = pname.GetValue(source, null) as string;
-                    s = pstream.GetValue(source, null) as Stream;
-                    disposeStream = false; //We never want to dispose the HttpPostedFile or HttpPostedFileBase streams..
-                    restoreStreamPosition = true;
-                }
-                
-                if (s == null) 
-                    throw new ArgumentException("Paramater source may only be an instance of string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, HttpPostedFileBase, Bitmap, Image, or Stream.", "source");
-            }
+            if (restoreStreamPos) restoreStreamPosition = true;
+
             //Save the original stream position if it's an HttpPostedFile
             long originalPosition = (restoreStreamPosition) ? s.Position : - 1;
 
@@ -176,11 +151,10 @@ namespace ImageResizer
                     //Let the fallbacks work. (Only happens when a plugin overrides DecodeStream and retuns null)
                     if (b == null) throw new ImageCorruptedException("Failed to decode image. Plugin made DecodeStream return null.", null);
                 } catch (Exception e) {
-                    //Start over - on error.
-                    if (s.CanSeek && s.Position != 0)
-                        s.Seek(0, SeekOrigin.Begin);
-                    //If we can't seek back to the beginning of the stream, we can't hope to decode it.
-                    else if (!s.CanSeek)
+                    //if (Debugger.IsAttached) throw e;
+                    Debug.Write("Falling back to DecodeStreamFailed: " + e.Message + "\n" + e.StackTrace); 
+                    
+                    if (!s.CanSeek)
                         throw new ImageCorruptedException("Cannot attempt fallback decoding path on a non-seekable stream", e);
 
                     b = DecodeStreamFailed(s, settings, path);
@@ -208,11 +182,12 @@ namespace ImageResizer
                 if (b != null && b.Tag == null && path != null) b.Tag = new BitmapTag(path);
 
             }
+            PostDecodeStream(ref b,settings);
             return b;            
         }
 
         /// <summary>
-        /// Decodes the stream into a bitmap instance. As of 3.0.7, now ensures the stream can safely be closed after the method returns.
+        /// Decodes the stream into a System.Drawing.Bitmap instance. As of 3.0.7, now ensures the stream can safely be closed after the method returns.
         /// May copy the stream. The copied stream will be in b.Tag.Source. Does not close or dispose any streams.
         /// </summary>
         /// <param name="s"></param>
@@ -228,13 +203,96 @@ namespace ImageResizer
             if (settings != null && "true".Equals(settings["ignoreicc"], StringComparison.OrdinalIgnoreCase)) useICM = false;
 
             //NDJ - May 24, 2011 - Copying stream into memory so the original can be closed safely.
-            MemoryStream ms = StreamUtils.CopyStream(s);
+            MemoryStream ms = s.CopyToMemoryStream(); 
             b = new Bitmap(ms, useICM); 
             b.Tag = new BitmapTag(optionalPath, ms); //May 25, 2011: Storing a ref to the MemorySteam so it won't accidentally be garbage collected.
             return b;
         }
+        /// <summary>
+        /// For plugin use only. 
+        /// Returns a stream instance from the specified source object and settings object. 
+        /// To exend this method, override GetStream.
+        /// </summary>
+        /// <param name="source">The physical or app-relative path, or a VirtualFile, IVirtualFile, Stream, HttpPostedFile, or HttpPostedFileBase instance.</param>
+        /// <param name="settings">Querystring settings to pass to the VirtualFileProvider</param>
+        /// <param name="disposeStream">You should externally initialize this to true, unless the user-provided 'source' is a Stream instance. Will be set to false for HttpPostedFile and HttpPostedFileBase instances, so they can be reused. </param>
+        /// <param name="path">The physical or virtual path associated with the stream (if present). Otherwise null</param>
+        /// <param name="restoreStreamPosition">True if you should save and restore the seek position of the stream. True for HttpPostedFile and HttpPostedFileBase instances. </param>
+        /// <returns></returns>
+        public Stream GetStreamFromSource(object source, ResizeSettings settings, ref bool disposeStream, out string path, out bool restoreStreamPosition) {
+            if (source == null) throw new ArgumentNullException("source", "The source argument cannot be null; how do you load an image from a null value?");
+            if (settings == null) settings = new ResizeSettings();
+
+            //Allow plugins to extend this
+            bool disposeS = disposeStream;
+            Stream s = base.GetStream(source, settings, ref disposeS, out path, out restoreStreamPosition);
+            if (s != null) {
+                disposeStream = disposeS;
+                return s;
+            }
+
+            //App-relative path - converted to virtual path
+            if (source is string) {
+                path = source as string;
+                //Convert app-relative paths to VirtualFile instances
+                if (path.StartsWith("~", StringComparison.OrdinalIgnoreCase)) {
+                    source = this.VirtualFileProvider.GetFile(PathUtils.ResolveAppRelative(path), settings);
+                    if (source == null) throw new FileNotFoundException("The specified virtual file could not be found.", PathUtils.ResolveAppRelative(path));
+                }
+            }
+
+            path = null;
+            restoreStreamPosition = false;
+            //Stream
+            if (source is Stream) {
+                s = (Stream)source;
+            }
+                //VirtualFile
+            else if (source is System.Web.Hosting.VirtualFile) {
+                path = ((System.Web.Hosting.VirtualFile)source).VirtualPath;
+                s = ((System.Web.Hosting.VirtualFile)source).Open();
+                //IVirtualFile
+            } else if (source is IVirtualFile) {
+                path = ((IVirtualFile)source).VirtualPath;
+                s = ((IVirtualFile)source).Open();
+                //PhysicalPath
+            } else if (source is string) {
+                path = (string)source;
+                s = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            } else if (source is byte[]) {
+                s = new MemoryStream((byte[])source, 0, ((byte[])source).Length, false, true);
+            } else {
+                //For HttpPostedFile and HttpPostedFileBase - we must use reflection to support .NET 3.5 without losing 2.0 compat.
+                PropertyInfo pname = source.GetType().GetProperty("FileName", typeof(string));
+                PropertyInfo pstream = source.GetType().GetProperty("InputStream");
+
+                if (pname != null && pstream != null) {
+                    path = pname.GetValue(source, null) as string;
+                    s = pstream.GetValue(source, null) as Stream;
+                    disposeStream = false; //We never want to dispose the HttpPostedFile or HttpPostedFileBase streams..
+                    restoreStreamPosition = true;
+                }
+
+                if (s == null) return null;
+            }
 
 
+            try {
+
+                if (s != null && s.Length <= s.Position && s.Position > 0)
+                    throw new ImageProcessingException("The source stream is at the end (have you already read it?). You must call stream.Seek(0, SeekOrigin.Begin); before re-using a stream, or use ImageJob with ResetSourceStream=true the first time the stream is read.");
+
+                if (s != null && s.Length == 0)
+                    throw new ImageProcessingException("Source stream is empty; it has a length of 0. No bytes, no data. We can't work with this.");
+
+            } catch (NotSupportedException) {
+            }
+
+            return s;
+        }
+
+
+        #region Wrapper overloads
         /// <summary>
         /// Resizes and processes the specified source image and returns a bitmap of the result.
         /// Note! 
@@ -260,9 +318,9 @@ namespace ImageResizer
         /// <param name="disposeSource">If false, 'source' will not be disposed. </param>
        
         public virtual Bitmap Build(object source, ResizeSettings settings, bool disposeSource) {
-            BitmapHolder bh = new BitmapHolder();
-            Build(source, bh, settings, disposeSource);
-            return bh.bitmap;
+            ImageJob j = new ImageJob(source, typeof(Bitmap), settings, disposeSource, false);
+            Build(j);
+            return j.Result as Bitmap;
         }
 
         /// <summary>
@@ -300,40 +358,79 @@ namespace ImageResizer
         /// <param name="disposeSource">True to dispose 'source' after use. False to leave intact.</param>
         /// <param name="addFileExtension">If true, will add the correct file extension to 'dest' if it is a string. </param>
         public virtual string Build(object source, object dest, ResizeSettings settings, bool disposeSource, bool addFileExtension) {
-            ResizeSettings s = new ResizeSettings(settings);
-            Bitmap b = null; 
+            return Build(new ImageJob(source, dest, settings, disposeSource, addFileExtension)).FinalPath;
+        }
+        #endregion
+
+        public virtual ImageJob Build(ImageJob job) {
+            if (job == null) throw new ArgumentNullException("job", "ImageJob parameter null. Cannot Build a null ImageJob instance");
+
+            //Clone and filter settings FIRST, before calling plugins.
+            ResizeSettings s = job.Settings == null ? new ResizeSettings() : new ResizeSettings(job.Settings);
+            if (SettingsModifier != null) s = SettingsModifier.Modify(s);
+            job.Settings = s;
+
             try {
+                //Allow everything else to be overriden
+                if (BuildJob(job) != RequestedAction.Cancel) throw new ImageProcessingException("Nobody did the job");
+                return job;
+            } finally {
+                //Follow the dispose requests
+                if (job.DisposeSourceObject && job.Source is IDisposable && job.Source != null) ((IDisposable)job.Source).Dispose();
+                if (job.DisposeDestinationStream && job.Dest is IDisposable && job.Dest != null) ((IDisposable)job.Dest).Dispose();
+            }
+        }
+
+        protected override RequestedAction BuildJob(ImageJob job) {
+            if (base.BuildJob(job) == RequestedAction.Cancel) return RequestedAction.Cancel;
+
+            Bitmap b = null;
+            try {
+                ResizeSettings s = job.Settings;
+
                 //Load image
-                b = LoadImage(source, settings);
+                b = LoadImage(job.Source, s, job.ResetSourceStream);
 
-                
-                //Fire PreAcquireStream(ref dest, settings)
-                this.PreAcquireStream(ref dest, settings);
-                
-                //Write to Physical file
-                if (dest is string) {
-                    string destPath = dest as string;
-                    //Convert app-relative paths
-                    if (destPath.StartsWith("~", StringComparison.OrdinalIgnoreCase)) destPath = HostingEnvironment.MapPath(destPath);
+                //Save source path info
+                job.SourcePathData = (b != null && b.Tag != null && b.Tag is BitmapTag) ? ((BitmapTag)b.Tag).Path : null;
 
-                    //Add the file extension if specified.
-                    if (addFileExtension) {
-                        IEncoder e = this.EncoderProvider.GetEncoder(settings, b);
-                        if (e != null) destPath += "." + e.Extension;
+
+                //Fire PreAcquireStream(ref dest, settings) to modify 'dest'
+                object dest = job.Dest;
+                this.PreAcquireStream(ref dest, s);
+                job.Dest = dest;
+
+                if (dest == typeof(Bitmap)) {
+                    job.Result = buildToBitmap(b, s, true);
+                    
+                    //Write to Physical file
+                } else if (dest is string) {
+                    //Make physical and resolve variable references all at the same time.
+                    job.FinalPath = job.ResolveTemplatedPath(dest as string,
+                        delegate(string var) {
+                            if ("ext".Equals(var, StringComparison.OrdinalIgnoreCase)) {
+                                IEncoder e = this.EncoderProvider.GetEncoder(s, b);
+                                if (e != null) return e.Extension;
+                            }
+                            if ("width".Equals(var, StringComparison.OrdinalIgnoreCase))
+                                return GetFinalSize(new System.Drawing.Size(b.Width, b.Height), new ResizeSettings(job.Settings)).Width.ToString(NumberFormatInfo.InvariantInfo);
+                            if ("height".Equals(var, StringComparison.OrdinalIgnoreCase))
+                                return GetFinalSize(new System.Drawing.Size(b.Width, b.Height), new ResizeSettings(job.Settings)).Height.ToString(NumberFormatInfo.InvariantInfo);
+                            return null;
+                        });
+                    //If requested, auto-create the parent directory(ies)
+                    if (job.CreateParentDirectory) {
+                        string dirName = Path.GetDirectoryName(job.FinalPath);
+                        if (!Directory.Exists(dirName)) Directory.CreateDirectory(dirName);
                     }
-
-                    System.IO.FileStream fs = new FileStream(destPath, FileMode.Create, FileAccess.Write);
+                    System.IO.FileStream fs = new FileStream(job.FinalPath, FileMode.Create, FileAccess.Write);
                     using (fs) {
                         buildToStream(b, fs, s);
                     }
-                    return destPath;
-                //Write to Unknown stream
+                    //Write to Unknown stream
                 } else if (dest is Stream) {
                     buildToStream(b, (Stream)dest, s);
-                //Write to BitmapHolder
-                } else if (dest is BitmapHolder) {
-                    ((BitmapHolder)dest).bitmap = buildToBitmap(b, s, true);
-                } else throw new ArgumentException("Paramater dest may only be a string, Stream, or BitmapHolder", "dest");
+                } else throw new ArgumentException("Destination may be a string or Stream.", "Dest");
 
             } finally {
                 //Get the source bitmap's underlying stream (may differ from 'source')
@@ -341,16 +438,13 @@ namespace ImageResizer
                 if (b != null && b.Tag != null && b.Tag is BitmapTag) underlyingStream = ((BitmapTag)b.Tag).Source;
 
                 //Close the source bitamp's underlying stream unless it is the same stream (EDIT: or bitmap) we were passed.
-                if (b != source && underlyingStream != source && underlyingStream != null) underlyingStream.Dispose();
+                if (b != job.Source && underlyingStream != job.Source && underlyingStream != null) underlyingStream.Dispose();
 
                 //Dispose the bitmap unless we were passed it. We check for 'null' in case an ImageCorruptedException occured. 
-                if (b != null && b != source) b.Dispose();
-
-                //Follow the disposeSource boolean.
-                if (disposeSource && source is IDisposable) ((IDisposable)source).Dispose();
-
+                if (b != null && b != job.Source) b.Dispose();
             }
-            return null;
+
+            return RequestedAction.Cancel;
         }
 
         /// <summary>
@@ -421,7 +515,7 @@ namespace ImageResizer
         /// <param name="s"></param>
         protected override RequestedAction Layout(ImageState s) {
             if (base.Layout(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
-            FlipExistingPoints(s);
+            FlipExistingPoints(s); //Not implemented
             LayoutImage(s);
             PostLayoutImage(s);
             LayoutPadding(s);
@@ -455,6 +549,7 @@ namespace ImageResizer
             PostRenderPadding(s);
             CreateImageAttribues(s);
             PostCreateImageAttributes(s);
+            PreRenderImage(s);
             RenderImage(s);
             PostRenderImage(s);
             RenderBorder(s);
@@ -482,11 +577,11 @@ namespace ImageResizer
             ResizeSettings q = s.settings;
 
             int page = 0;
-            if (!string.IsNullOrEmpty(q["page"]) && !int.TryParse(q["page"], out page))
+            if (!string.IsNullOrEmpty(q["page"]) && !int.TryParse(q["page"], NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out page))
                 page = 0;
 
             int frame = 0;
-            if (!string.IsNullOrEmpty(q["frame"]) && !int.TryParse(q["frame"], out frame))
+            if (!string.IsNullOrEmpty(q["frame"]) && !int.TryParse(q["frame"], NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out frame))
                 frame = 0;
 
             //So users can use 1-based numbers
@@ -507,8 +602,10 @@ namespace ImageResizer
 
             //Flipping has to be done on the original - it can't be done as part of the DrawImage or later, after the borders are drawn.
 
-            if (s.sourceBitmap != null && s.settings.SourceFlip != RotateFlipType.RotateNoneFlipNone) {
-                s.sourceBitmap.RotateFlip(s.settings.SourceFlip);
+            if (s.sourceBitmap != null && (s.settings.SourceFlip != RotateFlipType.RotateNoneFlipNone || !string.IsNullOrEmpty(s.settings["sRotate"]))) {
+                double angle = s.settings.Get<double>("sRotate",0);
+
+                s.sourceBitmap.RotateFlip(PolygonMath.CombineFlipAndRotate(s.settings.SourceFlip,angle));
                 s.originalSize = s.sourceBitmap.Size;
             }
             return RequestedAction.None;
@@ -622,21 +719,19 @@ namespace ImageResizer
             //If the image doesn't support transparency, we need to fill the background color now.
             Color background = s.settings.BackgroundColor;
 
-            if (background == Color.Transparent) {
-                //Only set the bgcolor if the image isn't taking the whole area.
-                if (!s.supportsTransparency) {
-                    //If the source format doesn't support transparency either, we should be able to safely leave the bg transparent, hopefully preventing the ghostly outline.
-                    //Update: nope, doesn't seem to help. Must be the edge blending by the hq bicubic.
-                    //if (s.sourceBitmap != null && (s.sourceBitmap.PixelFormat == PixelFormat.Format24bppRgb ||
-                   //     s.sourceBitmap.PixelFormat == PixelFormat.Format32bppRgb || 
-                   //     s.sourceBitmap.PixelFormat == PixelFormat.Format48bppRgb) &&
-                   //     PolygonMath.GetBoundingBox(s.layout["image"]).Equals(s.layout.GetBoundingBox())) {
-                        //Do nothing, the image is transparent by default
-                    //} else {
-                        background = Color.White;
-                    //}
-                }
-            }
+            //Find out if we can safely know that nothing will be showing from behind the image (no margin, padding, etc, and source format doesn't have alpha channel).
+            bool nothingToShow = (s.sourceBitmap != null && (s.sourceBitmap.PixelFormat == PixelFormat.Format24bppRgb ||
+                        s.sourceBitmap.PixelFormat == PixelFormat.Format32bppRgb || 
+                        s.sourceBitmap.PixelFormat == PixelFormat.Format48bppRgb) &&
+                        PolygonMath.ArraysEqual(s.layout["image"], s.layout.LastRing.points) &&
+                        PolygonMath.IsUnrotated(s.layout["image"]) && string.IsNullOrEmpty(s.settings["s.alpha"])
+                            && string.IsNullOrEmpty(s.settings["s.roundcorners"])
+                            && string.IsNullOrEmpty(s.settings["filter"]));
+
+            //Set the background to white if the background will be showing and the destination format doesn't support transparency.
+            if (background == Color.Transparent && !s.supportsTransparency & !nothingToShow) 
+                background = Color.White;
+
 
             
             //Fill background
@@ -659,8 +754,8 @@ namespace ImageResizer
             if (paddingColor.Equals(Color.Transparent)) paddingColor = s.settings.BackgroundColor;
             //Draw padding around image if needed.
             if (!paddingColor.Equals(s.settings.BackgroundColor) && paddingColor != Color.Transparent)
-                s.destGraphics.FillPolygon(new SolidBrush(paddingColor), s.layout["padding"]);
-
+                using (Brush b = new SolidBrush(paddingColor)) s.destGraphics.FillPolygon(b, s.layout["padding"]);
+          
             return RequestedAction.None;
         }
 
@@ -676,9 +771,18 @@ namespace ImageResizer
             //Skip this when we are doing simulations
             if (s.destGraphics == null) return RequestedAction.None;
 
-            s.copyAttibutes.SetWrapMode(WrapMode.TileFlipXY);
-            s.destGraphics.DrawImage(s.sourceBitmap, PolygonMath.getParallelogram(s.layout["image"]), s.copyRect, GraphicsUnit.Pixel, s.copyAttibutes);
+            if (!string.IsNullOrEmpty(s.settings["filter"])) {
+                s.destGraphics.InterpolationMode = s.settings.Get<InterpolationMode>("filter", s.destGraphics.InterpolationMode);
+            }
 
+            s.copyAttibutes.SetWrapMode(WrapMode.TileFlipXY);
+            if (s.preRenderBitmap != null) {
+                using (Bitmap b = s.preRenderBitmap) { //Dispose the intermediate bitmap aggressively
+                    s.destGraphics.DrawImage(s.preRenderBitmap, PolygonMath.getParallelogram(s.layout["image"]), new RectangleF(0, 0, s.preRenderBitmap.Width, s.preRenderBitmap.Height), GraphicsUnit.Pixel, s.copyAttibutes);
+                }
+            } else {
+                s.destGraphics.DrawImage(s.sourceBitmap, PolygonMath.getParallelogram(s.layout["image"]), s.copyRect, GraphicsUnit.Pixel, s.copyAttibutes);
+            }
             return RequestedAction.None;
         }
 
@@ -691,12 +795,30 @@ namespace ImageResizer
             //Draw border
             if (s.settings.Border.IsEmpty) return RequestedAction.None;
 
-            if (s.settings.Border.All == double.NaN) throw new NotImplementedException("Separate border widths have not yet been implemented");
+            if (double.IsNaN(s.settings.Border.All)) {
+                float[] widths = new float[] { (float)s.settings.Border.Top * -1, (float)s.settings.Border.Right * -1, (float)s.settings.Border.Bottom * -1, (float)s.settings.Border.Left * -1 };
+                PointF[,] corners = PolygonMath.GetCorners(s.layout["border"],widths);
 
-            Pen p = new Pen(s.settings.BorderColor, (float)s.settings.Border.All);
-            p.Alignment = System.Drawing.Drawing2D.PenAlignment.Center; //PenAlignment.Center is the only supported mode.
-            p.LineJoin = System.Drawing.Drawing2D.LineJoin.Miter;
-            s.destGraphics.DrawPolygon(p, PolygonMath.InflatePoly(s.layout["border"], (float)(s.settings.Border.All / -2.0))); //I hope GDI rounds the same way as .NET.. Otherwise there may be an off-by-one error..
+                for (int i = 0; i <= corners.GetUpperBound(0); i++) {
+                    int last = i == 0 ? corners.GetUpperBound(0) : i -1;
+
+                    PointF start = PolygonMath.Average(corners[last, 3], corners[last, 0]);
+                    PointF end = PolygonMath.Average(corners[i, 0], corners[i, 1]);
+
+                    using (Pen p = new Pen(s.settings.BorderColor, widths[i < 1 ? 3 : i -1] * -1)) {
+                        p.Alignment = System.Drawing.Drawing2D.PenAlignment.Center; //PenAlignment.Center is the only supported mode.
+                        p.LineJoin = System.Drawing.Drawing2D.LineJoin.Miter;
+                        s.destGraphics.DrawLine(p, start, end);
+                    }
+
+                }
+            } else {
+                using (Pen p = new Pen(s.settings.BorderColor, (float)s.settings.Border.All)) {
+                    p.Alignment = System.Drawing.Drawing2D.PenAlignment.Center; //PenAlignment.Center is the only supported mode.
+                    p.LineJoin = System.Drawing.Drawing2D.LineJoin.Miter;
+                    s.destGraphics.DrawPolygon(p, PolygonMath.InflatePoly(s.layout["border"], (float)(s.settings.Border.All / -2.0))); //I hope GDI rounds the same way as .NET.. Otherwise there may be an off-by-one error..
+                }
+            }
 
             return RequestedAction.None;
         }
@@ -726,6 +848,12 @@ namespace ImageResizer
             if (s.settings.Flip != RotateFlipType.RotateNoneFlipNone)
                 s.destBitmap.RotateFlip(s.settings.Flip);
 
+            //Set DPI value
+            if (!string.IsNullOrEmpty(s.settings["dpi"])){
+                int dpi = s.settings.Get<int>("dpi",96);
+                s.destBitmap.SetResolution(dpi, dpi);
+            }
+            
             s.finalSize = s.destBitmap.Size;
             return RequestedAction.None;
         }
@@ -769,23 +897,46 @@ namespace ImageResizer
 
             //Use the crop size if present.
             s.copyRect = new RectangleF(new PointF(0,0),s.originalSize);
-            if (s.settings.CropMode == CropMode.Custom) {
-                s.copyRect = s.settings.getCustomCropSourceRect(s.originalSize);
+            if (s.settings.GetList<double>("crop", 0, 4) != null) {
+                s.copyRect = PolygonMath.ToRectangle(s.settings.getCustomCropSourceRect(s.originalSize)); //Round the custom crop rectangle coordinates
                 if (s.copyRect.Size.IsEmpty) throw new Exception("You must specify a custom crop rectange if crop=custom");
             }
+            //Save the manual crop size.
+            SizeF manualCropSize = s.copySize;
+            RectangleF manualCropRect = s.copyRect;
+
+            FitMode fit = s.settings.Mode;
+            //Determine fit mode to use if both vertical and horizontal limits are used.
+            if (fit == FitMode.None){
+                if (s.settings.Width != -1 || s.settings.Height != -1){
+
+                    if ("fill".Equals(s.settings["stretch"], StringComparison.OrdinalIgnoreCase)) fit = FitMode.Stretch;
+                    else if ("auto".Equals(s.settings["crop"], StringComparison.OrdinalIgnoreCase)) fit = FitMode.Crop;
+                    else if (!string.IsNullOrEmpty(s.settings["carve"]) 
+                        && !"false".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase)
+                        && !"none".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase)) fit = FitMode.Carve;
+                    else fit = FitMode.Pad;
+                }else{
+                    fit = FitMode.Max;
+                }
+
+            }
+            
+
+
 
             //Aspect ratio of the image
             double imageRatio = s.copySize.Width / s.copySize.Height;
 
-            //Was any dimension specified?
-            bool dimensionSpecified = s.settings.Width != -1 || s.settings.Height != -1 || s.settings.MaxHeight != -1 || s.settings.MaxWidth != -1;
+            //Zoom factor
+            double zoom = s.settings.Get<double>("zoom", 1);
 
             //The target size for the image 
             SizeF targetSize = new SizeF(-1, -1);
+            //Target area for the image
             SizeF areaSize = new SizeF(-1, -1);
-            if (!dimensionSpecified) {
-                areaSize = targetSize = s.copySize; //No dimension - use original size if possible - within web.config bounds.
-            } else {
+            //If any dimensions are specified, calculate. Otherwise, use original image dimensions
+            if (s.settings.Width != -1 || s.settings.Height != -1 || s.settings.MaxHeight != -1 || s.settings.MaxWidth != -1) {
                 //A dimension was specified. 
                 //We first calculate the largest size the image can be under the width/height/maxwidth/maxheight restrictions.
                 //- pretending stretch=fill and scale=both
@@ -797,90 +948,79 @@ namespace ImageResizer
                 double maxheight = s.settings.MaxHeight;
 
                 //Eliminate cases where both a value and a max value are specified: use the smaller value for the width/height 
-                if (maxwidth > 0 && width > 0) {
-                    width = Math.Min(maxwidth, width);
-                    maxwidth = -1;
-                }
-                if (maxheight > 0 && height > 0) {
-                    height = Math.Min(maxheight, height);
-                    maxheight = -1;
-                }
-                //Do sizing logic
+                if (maxwidth > 0 && width > 0) {   width = Math.Min(maxwidth, width);    maxwidth = -1;  }
+                if (maxheight > 0 && height > 0) { height = Math.Min(maxheight, height); maxheight = -1; }
 
-                if (width > 0 || height > 0) //In this case, either (or both) width and height were specified 
-                {
-                    //If only one is specified, calculate the other from 
-                    if (width > 0) {
-                        if (height < 0) height = (width / imageRatio);
-                        if (maxheight > 0 && height > maxheight) height = maxheight; //Crop to maxheight value
+                //Handle cases of width/maxheight and height/maxwidth as in legacy versions. 
+                if (width != -1 && maxheight != -1) maxheight = Math.Min(maxheight, (width / imageRatio));
+                if (height != -1 && maxwidth != -1) maxwidth = Math.Min(maxwidth, (height * imageRatio));
 
-                    } else if (height > 0) {
-                        if (width < 0) width = (height * imageRatio);
-                        if (maxheight > 0 && height > maxheight) height = maxheight; //Crop to maxheight value
-                    }
-                    //Store result
-                    targetSize = new SizeF((float)width, (float)height);
-                } else //In this case, only maxwidth and/or maxheight were specified.
-                {
-                    //Calculate the missing max bounds (if one *is* missing), using aspect ratio of the image
-                    if (maxheight > 0 && maxwidth <= 0)
-                        maxwidth = maxheight * imageRatio;
-                    else if (maxwidth > 0 && maxheight <= 0)
-                        maxheight = maxwidth / imageRatio;
 
-                    //Scale image coords to fit.
-                    targetSize = PolygonMath.ScaleInside(s.copySize, new SizeF((float)maxwidth, (float)maxheight));
+                //Move max values to width/height. FitMode should already reflect the mode we are using, and we've already resolved mixed modes above.
+                width = Math.Max(width, maxwidth);
+                height = Math.Max(height, maxheight);
 
-                }
+                //Calculate missing value (a missing value is handled the same everywhere). 
+                if (width > 0 && height <= 0) height = width/ imageRatio;
+                else if (height > 0 && width <= 0) width = height * imageRatio;
 
-                //We now have targetSize. targetSize will only be a different aspect ratio if both 'width' and 'height' are specified.
+                //We now have width & height, our target size. It will only be a different aspect ratio from the image if both 'width' and 'height' are specified.
 
-                //This will be the area size also
-                areaSize = targetSize;
+                //FitMode.Max
+                if (fit == FitMode.Max) {
+                    areaSize = targetSize = PolygonMath.ScaleInside(manualCropSize, new SizeF((float)width, (float)height));
+                //FitMode.Pad
+                } else if (fit == FitMode.Pad) {
+                    areaSize = new SizeF((float)width, (float)height);
+                    targetSize = PolygonMath.ScaleInside(manualCropSize, areaSize);
+                //FitMode.crop
+                } else if (fit == FitMode.Crop) {
+                    //We autocrop - so both target and area match the requested size
+                    areaSize = targetSize = new SizeF((float)width, (float)height);
+                    //Determine the size of the area we are copying
+                    Size sourceSize = PolygonMath.RoundPoints(PolygonMath.ScaleInside(areaSize, manualCropSize)); 
+                    //Center the portion we are copying within the manualCropSize
+                    s.copyRect = PolygonMath.ToRectangle(PolygonMath.AlignWith(new RectangleF(0, 0, sourceSize.Width, sourceSize.Height), s.copyRect, s.settings.Anchor));
 
-                //Now do scale=proportionally check. Set targetSize=imageSize and make it fit within areaSize using ScaleInside.
-                if (s.settings.Stretch == StretchMode.Proportionally) {
-                    targetSize = PolygonMath.ScaleInside(s.copySize, areaSize);
+                } else { //Stretch and carve both act like stretching, so do that:
+                    areaSize = targetSize = new SizeF((float)width, (float)height);
                 }
 
-                //Now do upscale/downscale checks. If they take effect, set targetSize to imageSize
-                if (s.settings.Scale == ScaleMode.DownscaleOnly) {
-                    if (PolygonMath.FitsInside(s.copySize, targetSize)) {
-                        //The image is smaller or equal to its target polygon. Use original image coordinates instead.
-                        areaSize = targetSize = s.copySize;
-                    }
-                } else if (s.settings.Scale == ScaleMode.UpscaleOnly) {
-                    if (!PolygonMath.FitsInside(s.copySize, targetSize)) {
-                        //The image is larger than its target. Use original image coordintes instead
-                        areaSize = targetSize = s.copySize;
 
-                    }
-                } else if (s.settings.Scale == ScaleMode.UpscaleCanvas) {
-                    //Same as downscaleonly, except areaSize isn't changed.
-                    if (PolygonMath.FitsInside(s.copySize, targetSize)) {
-                        //The image is smaller or equal to its target polygon. Use original image coordinates instead.
-
-                        targetSize = s.copySize;
-                    }
-
-                }
-
+            }else{
+                //No dimensions specified, no fit mode needed. Use manual crop dimensions
+                areaSize = targetSize = manualCropSize; 
             }
 
-            //June 3: Ensure no dimension of targetSize or areaSize is less than 1px;
-            areaSize.Width = Math.Max(1, areaSize.Width);
-            areaSize.Height = Math.Max(1, areaSize.Height);
-  
-            
-            //Autocrop
-            if (s.settings.CropMode == CropMode.Auto && s.settings.Stretch == StretchMode.Proportionally) {
-                //Determine the size of the area we are copying
-                SizeF sourceSize = PolygonMath.ScaleInside(areaSize, s.originalSize);
-                //Center the portion we are copying within the original bitmap
-                s.copyRect = PolygonMath.AlignWith(new RectangleF(0,0,sourceSize.Width,sourceSize.Height),new RectangleF(0,0,s.originalSize.Width,s.originalSize.Height),s.settings.Anchor);
-                //Restore targetSize to match areaSize //Warning - crop always forces scale=both.
-                targetSize = areaSize;
+            //Multiply both areaSize and targetSize by zoom. 
+            areaSize.Width *= (float)zoom;
+            areaSize.Height *= (float)zoom;
+            targetSize.Width *= (float)zoom;
+            targetSize.Height *= (float)zoom;
+                
+            //Now do upscale/downscale checks. If they take effect, set targetSize to imageSize
+            if (s.settings.Scale == ScaleMode.DownscaleOnly) {
+                if (PolygonMath.FitsInside(manualCropSize, targetSize)) {
+                    //The image is smaller or equal to its target polygon. Use original image coordinates instead.
+                    areaSize = targetSize = manualCropSize;
+                    s.copyRect = manualCropRect;
+                }
+            } else if (s.settings.Scale == ScaleMode.UpscaleOnly) {
+                if (!PolygonMath.FitsInside(manualCropSize, targetSize)) {
+                    //The image is larger than its target. Use original image coordintes instead
+                    areaSize = targetSize = manualCropSize;
+                    s.copyRect = manualCropRect;
+                }
+            } else if (s.settings.Scale == ScaleMode.UpscaleCanvas) {
+                //Same as downscaleonly, except areaSize isn't changed.
+                if (PolygonMath.FitsInside(manualCropSize, targetSize)) {
+                    //The image is smaller or equal to its target polygon. Use original image coordinates instead.
+
+                    targetSize = manualCropSize;
+                    s.copyRect = manualCropRect;
+                }
             }
+
 
             //May 12: require max dimension and round values to minimize rounding differences later.
             areaSize.Width = Math.Max(1, (float)Math.Round(areaSize.Width));
@@ -917,12 +1057,12 @@ namespace ImageResizer
        
         private readonly string[] _supportedQuerystringKeys = new string[]{
                     "format", "thumbnail", "maxwidth", "maxheight",
-                "width", "height",
-                "scale", "stretch", "crop", "page", "bgcolor",
-                "rotate", "flip", "sourceFlip", "borderWidth",
+                "width", "height","w","h",
+                "scale", "stretch", "crop", "cropxunits", "cropyunits", "page", "bgcolor",
+                "rotate", "flip", "sourceFlip", "sFlip", "sRotate", "borderWidth",
                 "borderColor", "paddingWidth", "paddingColor",
                 "ignoreicc", "frame", "useresizingpipeline", 
-                "cache", "process", "margin"};
+                "cache", "process", "margin", "anchor","dpi","mode", "zoom"};
 
         /// <summary>
         /// Returns a list of the querystring commands ImageBuilder can parse by default. Plugins can implement IQuerystringPlugin to add new ones.

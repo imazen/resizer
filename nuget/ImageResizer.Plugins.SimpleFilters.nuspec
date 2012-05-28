@@ -11,10 +11,14 @@
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 <description>Apply grayscale, sepia, alpha, or brightness filters via the URL.
-* &amp;filter=grayscale
-* &amp;filter=sepia
-* &amp;filter=brightness(factor)
-* &amp;filter=alpha(factor) 
+* &amp;s.grayscale=true|y|ry|ntsc|bt709|flat  (true, ntsc, and y produce identical results)
+* &amp;s.sepia=true
+* &amp;s.alpha= 0..1
+* &amp;s.brightness=-1..1
+* &amp;s.contrast=-1..1
+* &amp;s.saturation=-1..1
+* &amp;s.invert=true
+
 Visit http://imageresizing.net for details, documenation, and free support. 
 E-mail support@imageresizing.net if you encounter any problems with the software. 
 The documentation for this plugin resides at http://imageresizing.net/plugins/simplefilters</description>

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.PdfRenderer</id>
+		<title>ImageResizer.Plugins.PdfRenderer - Read PDF files like images</title>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<owners>$author$</owners>
+		<licenseUrl>http://imageresizing.net/licenses/pdfrenderer</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>$iconurl$</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>Dynamically render PDF files (page-by-page) to any size, then (optionally) process them as if they were images.  GPL!
+Visit http://imageresizing.net for details, documenation, and free support. 
+E-mail support@imageresizing.net if you encounter any problems with the software. 
+The documentation for this plugin resides at http://imageresizing.net/plugins/pdfrenderer</description>
+		<tags>$tags$</tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		</dependencies>
+	</metadata>
+  	<files>
+ 		<file src="$coredlldir$\ImageResizer.Plugins.PdfRenderer.dll" target="lib" />
+		<file src="$coredlldir$\ImageResizer.Plugins.PdfRenderer.xml" target="lib" />
+	</files>
+</package>

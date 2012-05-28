@@ -36,7 +36,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Mvc, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.Routing" />
     <Reference Include="System.Web" />
   </ItemGroup>
@@ -44,9 +46,11 @@
     <Compile Include="..\Core\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="ImageRequestAction.cs" />
     <Compile Include="MvcRoutingShimPlugin.cs" />
     <Compile Include="StopRoutingRoute.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="UrlHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="license.txt" />

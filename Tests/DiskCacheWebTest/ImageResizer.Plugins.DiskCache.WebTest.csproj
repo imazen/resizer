@@ -13,7 +13,7 @@
     <RootNamespace>DiskCacheWebTest</RootNamespace>
     <AssemblyName>DiskCacheWebTest</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -88,6 +88,10 @@
     <Content Include="Site.Master" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Core.Mvc\ImageResizer.Mvc.csproj">
+      <Project>{4181B9C4-1EAF-4070-8571-2EE25475547E}</Project>
+      <Name>ImageResizer.Mvc</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
@@ -100,6 +104,10 @@
       <Project>{10E04BAD-889B-4C01-BA0B-FAC7EF63B859}</Project>
       <Name>ImageResizer.Plugins.Logging</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\PrettyGifs\ImageResizer.Plugins.PrettyGifs.csproj">
+      <Project>{BB8EEB97-6550-4780-97B2-B0F2FCD80970}</Project>
+      <Name>ImageResizer.Plugins.PrettyGifs</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
@@ -111,7 +119,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>49756</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:49756/</IISUrl>
+          <IISUrl>http://localhost/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

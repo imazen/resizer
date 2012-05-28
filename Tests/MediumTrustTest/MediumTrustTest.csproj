@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D64CC1D0-E239-4D6B-8223-9C6E6A729951}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MediumTrustTest</RootNamespace>
+    <AssemblyName>MediumTrustTest</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <UseIISExpress>false</UseIISExpress>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Web.config" />
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core.Mvc\ImageResizer.Mvc.csproj">
+      <Project>{4181B9C4-1EAF-4070-8571-2EE25475547E}</Project>
+      <Name>ImageResizer.Mvc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Core\ImageResizer.csproj">
+      <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
+      <Name>ImageResizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\AnimatedGifs\ImageResizer.Plugins.AnimatedGifs.csproj">
+      <Project>{D97EA32A-0845-4E00-9C4D-68C5B93A1869}</Project>
+      <Name>ImageResizer.Plugins.AnimatedGifs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\CloudFront\ImageResizer.Plugins.CloudFront.csproj">
+      <Project>{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}</Project>
+      <Name>ImageResizer.Plugins.CloudFront</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\DiskCache\ImageResizer.Plugins.DiskCache.csproj">
+      <Project>{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}</Project>
+      <Name>ImageResizer.Plugins.DiskCache</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\Logging\ImageResizer.Plugins.Logging.csproj">
+      <Project>{10E04BAD-889B-4C01-BA0B-FAC7EF63B859}</Project>
+      <Name>ImageResizer.Plugins.Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\PrettyGifs\ImageResizer.Plugins.PrettyGifs.csproj">
+      <Project>{BB8EEB97-6550-4780-97B2-B0F2FCD80970}</Project>
+      <Name>ImageResizer.Plugins.PrettyGifs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\RemoteReader\ImageResizer.Plugins.RemoteReader.csproj">
+      <Project>{0E6BE1A7-C754-4E33-A8AC-75A8549FC68B}</Project>
+      <Name>ImageResizer.Plugins.RemoteReader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\S3Reader\ImageResizer.Plugins.S3Reader.csproj">
+      <Project>{A3B6F984-D500-40F1-B836-C02B46FCF14D}</Project>
+      <Name>ImageResizer.Plugins.S3Reader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\SeamCarving\ImageResizer.Plugins.SeamCarving.csproj">
+      <Project>{7AEFB877-A720-4929-880C-1090A71C83EB}</Project>
+      <Name>ImageResizer.Plugins.SeamCarving</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\SimpleFilters\ImageResizer.Plugins.SimpleFilters.csproj">
+      <Project>{2A7D72F6-6DCB-4260-A921-6C7A6FC77812}</Project>
+      <Name>ImageResizer.Plugins.SimpleFilters</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\SqlReader\ImageResizer.Plugins.SqlReader.csproj">
+      <Project>{2AB0FC98-8AD5-4D2A-BF06-0EA4DCF8764D}</Project>
+      <Name>ImageResizer.Plugins.SqlReader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\Watermark\ImageResizer.Plugins.Watermark.csproj">
+      <Project>{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}</Project>
+      <Name>ImageResizer.Plugins.Watermark</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\Wic\ImageResizer.Plugins.Wic.csproj">
+      <Project>{4A55B40D-1E0D-4D1F-8D96-25F624847E53}</Project>
+      <Name>ImageResizer.Plugins.Wic</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>60071</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>
+          </IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,75 @@
+﻿body{
+	font-family:Segoe UI, Arial, sans-serif; font-size: 1.1em;
+}
+
+div.command{
+	font-size:11px;
+}
+
+ul{list-style-type:none;padding:0;margin:0;}
+
+div.commands{
+}
+div.commands li{
+	display:inline-block;
+	margin:5px;
+}
+
+div.controlsArea{
+	margin-bottom:6px;
+	margin-top:6px;
+	padding:2px;
+	font-size:11px;
+	min-height:25px;
+}
+ul.controls li, div.control{
+	display:inline;
+}
+ul.controls li{ margin:5px;}
+
+span.field{
+	cursor:pointer;
+}
+div.axisDiv{
+	margin-bottom:6px;
+}
+
+div.gridWrapper{}
+
+ul.axisitems{
+	
+	padding:5px;
+	min-height:20px;
+}
+
+h3{
+	font-size:12px;	
+	display:block;
+	margin:0;
+	padding:0;
+}
+ul.axisitems li{ display:inline}
+
+
+.drop-area{
+	border: 1px solid #ffaf0f; background: #f58400 url(css/ui-darkness/images/ui-bg_inset-soft_30_f58400_1x100.png) 50% 50% repeat-x;
+}
+
+.xfield, .yfield{
+	font-size:8pt;
+}
+
+div.trash{
+	padding:2px;
+	padding-left:5px;
+	color:White;
+	font-size:9pt;
+}
+div.drop-trash .trash{
+
+}
+
+.gridContent{
+	font-size:10pt;
+	font-weight:normal;
+}

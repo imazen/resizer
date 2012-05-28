@@ -17,8 +17,8 @@ set c = CreateObject("ImageResizer.Configuration.Config");
 c.BuildImage("..\Images\red-leaf.jpg","test-image.jpg","width=100");
 </pre>
 <%
-set c = CreateObject("ImageResizer.Configuration.Config");
-c.BuildImage("..\Images\red-leaf.jpg","test-image.jpg","width=100");
+set c = CreateObject("ImageResizer.Configuration.Config")
+c.BuildImage("..\Images\red-leaf.jpg","test-image.jpg","width=100")
 %>
 <img src="test-image.jpg" />
 

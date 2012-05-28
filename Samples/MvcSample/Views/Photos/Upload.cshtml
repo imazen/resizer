@@ -1,0 +1,59 @@
+﻿@{
+    ViewBag.Title = "Upload";
+}
+
+<!-- Load Queue widget CSS and jQuery -->
+<style type="text/css">@@import url(/Content/plupload/js/jquery.plupload.queue/css/jquery.plupload.queue.css);</style>
+
+<!-- Third party script for BrowserPlus runtime (Google Gears included in Gears runtime now) -->
+<script type="text/javascript" src="http://bp.yahooapis.com/2.4.21/browserplus-min.js"></script>
+
+<!-- Load plupload and all it's runtimes and finally the jQuery queue widget -->
+<script type="text/javascript" src="/Content/plupload/js/plupload.full.js"></script>
+<script type="text/javascript" src="/Content/plupload/js/jquery.plupload.queue/jquery.plupload.queue.js"></script>
+
+<script type="text/javascript">
+    // Convert divs to queue widgets when the DOM is ready
+    $(function () {
+        $("#uploader").pluploadQueue({
+            // General settings
+            runtimes: 'html5,gears,flash,silverlight,browserplus',
+            url: '/photos/uploadfiles',
+            max_file_size: '10mb',
+            chunk_size: '1mb',
+            unique_names: true,
+            // Flash settings
+            flash_swf_url: '/Content/plupload/js/plupload.flash.swf',
+
+            // Silverlight settings
+            silverlight_xap_url: '/Content/plupload/js/plupload.silverlight.xap',
+            multiple_queues:true
+        });
+
+        // Client side form validation
+        $('form').submit(function (e) {
+            var uploader = $('#uploader').pluploadQueue();
+
+            // Files in queue upload them first
+            if (uploader.files.length > 0) {
+                // When all files are uploaded submit form
+                uploader.bind('StateChanged', function () {
+                    if (uploader.files.length === (uploader.total.uploaded + uploader.total.failed)) {
+                        $('form')[0].submit();
+                    }
+                });
+
+                uploader.start();
+            } else {
+                alert('You must queue at least one file.');
+            }
+
+            return false;
+        });
+    });
+</script>
+
+<div id="uploader">
+		<p>You browser doesn't have Flash, Silverlight, Gears, BrowserPlus or HTML5 support.</p>
+	</div>
+

@@ -5,6 +5,7 @@ using ImageResizer.Configuration;
 using System.Text.RegularExpressions;
 using System.Collections.Specialized;
 using System.Web;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.CloudFront {
     /// <summary>
@@ -12,11 +13,9 @@ namespace ImageResizer.Plugins.CloudFront {
     /// Since IIS can't stand '&' symbols in the path, you have to replace both '?' and '&' with ';'
     /// Later I hope to include control adapters to automate the process.
     /// </summary>
-    public class CloudFrontPlugin:IPlugin {
+    public class CloudFrontPlugin : IPlugin {
 
-        public CloudFrontPlugin(){}
-
-        Regex r = new Regex("^(?<path>[^=]+\\.[a-zA-Z0-9]+)[/;](?<query>.+)$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.RightToLeft);
+        public CloudFrontPlugin() { }
 
         Config c;
 
@@ -33,56 +32,55 @@ namespace ImageResizer.Plugins.CloudFront {
         }
 
         void Pipeline_PostAuthorizeRequestStart(System.Web.IHttpModule sender, System.Web.HttpContext context) {
-            if (!TransformCloudFrontUrl(context) && redirectThrough != null) {
-                //It wasn't a cloudfront URL. 
-                context.Items[c.Pipeline.ModifiedPathKey + ".notcloudfronturl"] = true;
+            if (redirectThrough != null && c.Pipeline.ModifiedQueryString.Count > 0) {
+                //It wasn't a cloudfront URL - it had a normal querystring
+                context.Items[c.Pipeline.ModifiedPathKey + ".hadquery"] = true;
             }
+            //Transform semicolon querystrings into the normal collection
+            TransformCloudFrontUrl(context);
         }
 
         bool TransformCloudFrontUrl(System.Web.HttpContext context) {
-            if (context.Request.Path.LastIndexOf('=') < 0) return false; //Must have an = sign or there is no query
+            string s = c.Pipeline.PreRewritePath;
+            int semi = s.IndexOf(';');
+            if (semi < 0) return false; //No querystring here.
+            int question = s.IndexOf('?');
+            if (question > -1) throw new ImageProcessingException("ASP.NET failed to parse querystring, question mark remains in path segment: " + s);
 
-            //With an equal sign in the path, we can look for the sign.
-            Match m = r.Match(context.Request.Path);
-            if (!m.Success) return false; //Must match regex
 
-            string path = m.Groups["path"].Captures[0].Value;
-            if (!c.Pipeline.IsAcceptedImageType(path)) return false; //Must be valid image type
 
-            string query = m.Groups["query"].Captures[0].Value;
+            string path = s.Substring(0, semi);
 
-            NameValueCollection q = Util.PathUtils.ParseQueryStringFriendly(query.Replace(";", "&"));
-            context.Items[c.Pipeline.ModifiedPathKey] = path; //Fix the path.
+            //Why do we care what image type it is? That gets checked later
+            //if (!c.Pipeline.IsAcceptedImageType(path)) return false; //Must be valid image type
+            c.Pipeline.PreRewritePath = path; //Fix the path.
 
-            context.Items[c.Pipeline.ModifiedPathKey + ".query"] = q; //Save the querystring for later
+            //Parse the fake query, merge it with the real one, and we are done.
+            string query = s.Substring(semi);
+            NameValueCollection q = Util.PathUtils.ParseQueryStringFriendlyAllowSemicolons(query);
+
+            //Merge the querystring with everything found in PathInfo. THe querystring wins on conflicts
+            foreach (string key in c.Pipeline.ModifiedQueryString.Keys)
+                q[key] = c.Pipeline.ModifiedQueryString[key];
+
+            c.Pipeline.ModifiedQueryString = q;
+
             return true;
         }
 
         void Pipeline_RewriteDefaults(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
-            if (redirectThrough != null && context.Items[c.Pipeline.ModifiedPathKey + ".notcloudfronturl"] != null) {
-                //It wasn't a cloudfront URL - which means the request didn't come from CloudFront, it came directly from the browser. Perform a redirect, rewriting the querystring appropriately
+            ///Handle redirectThrough behavior
+            if (redirectThrough != null && context.Items[c.Pipeline.ModifiedPathKey + ".hadquery"] != null) {
+                //It had a querystring originally - which means the request didn't come from CloudFront, it came directly from the browser. Perform a redirect, rewriting the querystring appropriately
+                string finalPath = redirectThrough + e.VirtualPath + PathUtils.BuildSemicolonQueryString(e.QueryString, true);
 
-                string finalPath = redirectThrough + e.VirtualPath + ";";
-                foreach (string s in e.QueryString.Keys) {
-                    finalPath += HttpUtility.UrlEncode(s) + "=" + HttpUtility.UrlEncode(e.QueryString[s]);
-                }
-
+                //Redirect according to setting
                 context.Response.Redirect(finalPath, !redirectPermanent);
                 if (redirectPermanent) {
                     context.Response.StatusCode = 301;
                     context.Response.End();
                 }
             }
-
-            //Ok, the rest only happens if it is a cloudfront URL. 
-
-            if (context.Items[c.Pipeline.ModifiedPathKey + ".query"] == null) return;
-
-            NameValueCollection q = context.Items[c.Pipeline.ModifiedPathKey + ".query"] as NameValueCollection;
-
-            //Merge overwrite the querystring with everything found in PathInfo. This is the defaults event, so it will still get overwritten by an additional 'real' querystring.
-            foreach (string key in q.Keys)
-                e.QueryString[key] = q[key];
 
         }
 

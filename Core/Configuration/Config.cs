@@ -13,6 +13,7 @@ using ImageResizer.Configuration.Xml;
 using System.Web;
 using ImageResizer.Collections;
 using System.IO;
+using System.Globalization;
 
 
 namespace ImageResizer.Configuration {
@@ -49,6 +50,9 @@ namespace ImageResizer.Configuration {
             //Init plugins module
             plugins = new PluginConfig(this);
 
+            //Init urlBuilder module
+            urlBuilder = new UrlBuilder(this);
+
             //Whenever the extensions change, the image builder instance has to be replaced.
             plugins.ImageBuilderExtensions.Changed += delegate(SafeList<BuilderExtension> s) {
                 InvalidateImageBuilder();
@@ -65,7 +69,7 @@ namespace ImageResizer.Configuration {
             new ImageResizer.Plugins.Basic.Diagnostic().Install(this);
             if (isAspNet) new ImageResizer.Plugins.Basic.SizeLimiting().Install(this);
 
-            if (isAspNet) {
+            if (!isAspNet) {
                 //Not running asp.net app here. Load them immediately.
                 plugins.LoadPlugins();
             } else {            
@@ -77,6 +81,13 @@ namespace ImageResizer.Configuration {
 
         }
 
+        protected UrlBuilder urlBuilder = null;
+        /// <summary>
+        /// Generate URLs using the current configuration
+        /// </summary>
+        public UrlBuilder UrlBuilder {
+            get { return urlBuilder; }
+        }
         
 
         protected PluginConfig plugins = null;
@@ -105,7 +116,7 @@ namespace ImageResizer.Configuration {
         /// </summary>
         /// <param name="replacement"></param>
         public void UpgradeImageBuilder(ImageBuilder replacement) {
-            lock (_imageBuilderSync) _imageBuilder = replacement.Create(plugins.ImageBuilderExtensions, plugins);
+            lock (_imageBuilderSync) _imageBuilder = replacement.Create(plugins.ImageBuilderExtensions, plugins,pipeline, pipeline);
         }
 
         /// <summary>
@@ -118,7 +129,7 @@ namespace ImageResizer.Configuration {
                 if (_imageBuilder == null)
                     lock (_imageBuilderSync)
                         if (_imageBuilder == null)
-                            _imageBuilder = new ImageBuilder(plugins.ImageBuilderExtensions,plugins);
+                            _imageBuilder = new ImageBuilder(plugins.ImageBuilderExtensions,plugins,pipeline, pipeline);
 
                 return _imageBuilder;
             }
@@ -145,7 +156,7 @@ namespace ImageResizer.Configuration {
         }
 
         protected void InvalidateImageBuilder() {
-            lock (_imageBuilderSync) if (_imageBuilder != null) _imageBuilder = _imageBuilder.Create(plugins.ImageBuilderExtensions, plugins);
+            lock (_imageBuilderSync) if (_imageBuilder != null) _imageBuilder = _imageBuilder.Create(plugins.ImageBuilderExtensions, plugins,pipeline,pipeline);
         }
         #endregion
 
@@ -181,15 +192,15 @@ namespace ImageResizer.Configuration {
         }
         public int get(string selector, int defaultValue) {
             int i;
-            string s = cs.getAttr(selector, defaultValue.ToString());
-            if (int.TryParse(s, out i)) return i;
+            string s = cs.getAttr(selector, defaultValue.ToString(NumberFormatInfo.InvariantInfo));
+            if (int.TryParse(s, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i)) return i;
             else configurationSectionIssues.AcceptIssue(
                 new Issue("Invalid integer value in imageresizer configuration section, " + selector + ":" + s, IssueSeverity.ConfigurationError));
             return defaultValue;
         }
 
         public bool get(string selector, bool defaultValue) {
-            string s = cs.getAttr(selector, defaultValue.ToString());
+            string s = cs.getAttr(selector, defaultValue.ToString(NumberFormatInfo.InvariantInfo));
 
             if ("true".Equals(s, StringComparison.OrdinalIgnoreCase) ||
                 "1".Equals(s, StringComparison.OrdinalIgnoreCase) ||

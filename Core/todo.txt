@@ -1,30 +1,13 @@
-﻿
+﻿In V3.3:
 
-
-
-In V3.1:
-
-
-* Add support for autocropping and cropping separately
-* Simplify URL sytax with a 'resizing mode' instead of disparate features
-mode=default
-mode=crop
-mode=pad 
-mode=carve
-mode=stretch
-* Add support for an anchor point when autocropping and autopadding
-anchor=center, topleft, energyaverage (for padding and cropping)
 * Add support for resizing entire image (including effects) within the coordinates instead of just the image. Standard rotation will cause extra padding here..
 * bounds=all|image
+* Add support for duplicated querystring names, either by throwing an exception, or by coalescing duplicate values silently.
 
-
-scale=upscaleonly|downscaleonly|both|upscalecanvas
-
-
+Refactor code to avoid Response.Redirect() (ThreadAbortException), save a few ms.
 
 
 
-Refactor Watermark plugin to use named configurations.
 Add debug=true querystring command to Diagnostics plugin.
 Add better usage examples.
 
@@ -34,10 +17,6 @@ ImageFormat.Gif.Equals(f)
 true
 ImageFormat.Gif == f
 false
-
-PrettyGifs - Add fastMode option that uses the original image palette to speed up processing times. (feature not yet added)
-PsdComposer - Re-compose PSD files on-the-fly. Rewrite text layers, hide/show layers. Minimal support for layer effects, only glow and solid fill at the moment.
-
 
 Add rounded corners plugin:
 /// <summary>

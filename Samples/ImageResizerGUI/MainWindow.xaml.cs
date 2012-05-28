@@ -14,7 +14,6 @@ using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using ImageResizer;
 using ImageResizer.Plugins.AnimatedGifs;
 using ImageResizer.Plugins.PrettyGifs;
-using ImageResizer.Plugins.PsdReader;
 using System.Collections.ObjectModel;
 using Control = System.Windows.Forms.Control;
 using DataFormats = System.Windows.DataFormats;
@@ -53,8 +52,7 @@ namespace ImageResizerGUI
             // Install Plugins
             new AnimatedGifs().Install(Config.Current);
             new PrettyGifs().Install(Config.Current);
-            new PsdReader().Install(Config.Current);
-
+            
             aOptions = new AdvancedOptions(this);
 
 
@@ -135,17 +133,19 @@ namespace ImageResizerGUI
                     case ImageResizerGUI.ResizeMode.Shrink:
                         rs.MaxHeight = height;
                         rs.MaxWidth = width;
+                        rs.Mode = FitMode.Max;
                         break;
 
                     case ImageResizerGUI.ResizeMode.ShrinkAndPadToRatio:
                         rs.Height = height;
                         rs.Width = width;
+                        rs.Mode = FitMode.Pad;
                         break;
 
                     case ImageResizerGUI.ResizeMode.ShrinkAndCropToRatio:
                         rs.Height = height;
                         rs.Width = width;
-                        rs.CropMode = CropMode.Auto;
+                        rs.Mode = FitMode.Crop;
                         break;
                 }
 

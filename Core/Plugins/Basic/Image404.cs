@@ -5,6 +5,8 @@ using ImageResizer.Resizing;
 using System.Web.Hosting;
 using ImageResizer.Configuration;
 using System.Text.RegularExpressions;
+using System.Collections.Specialized;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
@@ -34,9 +36,19 @@ namespace ImageResizer.Plugins.Basic {
                 string path = resolve404Path(e.QueryString["404"]);
                 //Resolve to virtual path
                 path = Util.PathUtils.ResolveAppRelative(path);
-                //Merge/overwrite with the current request querystring (current request settings take precedence)
-                e.QueryString.Remove("404"); //Remove the 404 ref
-                path = Util.PathUtils.MergeQueryString(path, e.QueryString);
+
+                //Merge commands from the 404 querystring with ones from the original image. 
+                ResizeSettings imageQuery = new ResizeSettings(e.QueryString);
+                imageQuery.Normalize();
+                imageQuery.Remove("404"); //Remove the 404 ref
+
+                ResizeSettings i404Query = new ResizeSettings(Util.PathUtils.ParseQueryString(path));
+                i404Query.Normalize();
+                //Overwrite new with old
+                foreach (string key in i404Query.Keys)
+                    if (key != null) imageQuery[key] = i404Query[key];
+
+                path = PathUtils.AddQueryString(PathUtils.RemoveQueryString(path), PathUtils.BuildQueryString(imageQuery));
                 //Redirect
                 context.Response.Redirect(path, true);
             }

@@ -1,9 +1,9 @@
-﻿/* Copyright (c) 2011 Nathanael Jones. See license.txt for your rights */
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Globalization;
 
 namespace PhotoshopFile.Text
 {
@@ -63,7 +63,9 @@ namespace PhotoshopFile.Text
 
         public override string ToString()
         {
-            return "(" + type.ToString() + "):" + value.ToString();
+            if (value is int) return "(" + type.ToString() + "):" + ((int)value).ToString(NumberFormatInfo.InvariantInfo);
+            if (value is double) return "(" + type.ToString() + "):" + ((double)value).ToString(NumberFormatInfo.InvariantInfo);
+            else return "(" + type.ToString() + "):" + value.ToString();
         }
 
         /// <summary>
@@ -111,6 +113,9 @@ namespace PhotoshopFile.Text
             throw new TdTaParseException("Hit end of stream without finding closing parenthesis!");
         }
 
+        public const NumberStyles floatingPointStyle = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite |
+            NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands | NumberStyles.AllowExponent;
+
         /// <summary>
         /// Parses tdta contents into tokens. Throws a generic exception if unrecognized tokens are encountered
         /// </summary>
@@ -155,7 +160,7 @@ namespace PhotoshopFile.Text
                 }
             }
             //Integer or double. Ends at whitespace, newline, ], or >
-            if (Char.IsDigit(c) || c == '.'){
+            if (Char.IsDigit(c) || c=='-' || c == '.'){
                 StringBuilder sb = new StringBuilder(40);
                 sb.Append(c);
                 while (r.CanReadByte()){
@@ -166,12 +171,12 @@ namespace PhotoshopFile.Text
                         string s = sb.ToString();
                         //If it has a decimal, it's a double
                         if (s.Contains('.')){
-                            return new Token(TokenType.Double,double.Parse(s));
+                            return new Token(TokenType.Double,double.Parse(s, floatingPointStyle,NumberFormatInfo.InvariantInfo));
                         }else{ 
-                            return new Token(TokenType.Integer,int.Parse(s));
+                            return new Token(TokenType.Integer,int.Parse(s,NumberStyles.Integer,NumberFormatInfo.InvariantInfo));
                         }
                         
-                    }else if (Char.IsDigit(c) || c == '.'){
+                    }else if (Char.IsDigit(c) || c=='-' || c == '.'){
                         //A valid char, append it.
                         sb.Append(r.ReadChar());
                     }else{
@@ -182,7 +187,7 @@ namespace PhotoshopFile.Text
             }
             //Boolean (true|false) parsing
             if (c == 't' || c == 'T' || c == 'f' || c == 'F'){
-                string s = c +  r.ReadChar().ToString() +  r.ReadChar().ToString() + r.ReadChar().ToString();
+                string s = c.ToString() + r.ReadChar().ToString() + r.ReadChar().ToString() + r.ReadChar().ToString();
                 char pc = (char)r.PeekChar();
                 if (s.Equals("true", StringComparison.OrdinalIgnoreCase)){
                     return new Token(TokenType.Boolean,true);
