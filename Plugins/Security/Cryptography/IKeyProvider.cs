@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ImageResizer.Configuration.Cryptography {
-    public interface IKeyProvider {
+namespace ImageResizer.Plugins.Security.Cryptography {
+    internal interface IKeyProvider {
         /// <summary>
         /// Locates or creates a cryptographic key of the given byte size and the given name. Implementations may store keys in RAM or on disk. 
         /// calling ("a", 8) and ("a",16) will generate and store two different keys. I.e, the size is part of the lookup key.

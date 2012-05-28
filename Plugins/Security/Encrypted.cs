@@ -11,6 +11,7 @@ using ImageResizer.Configuration.Issues;
 using ImageResizer.Plugins.Security;
 using ImageResizer.Configuration.Cryptography;
 using System.Diagnostics;
+using ImageResizer.Plugins.Security.Cryptography;
 
 namespace ImageResizer.Plugins.Encrypted {
     public class EncryptedPlugin:IssueSink, IPlugin, IMultiInstancePlugin {
