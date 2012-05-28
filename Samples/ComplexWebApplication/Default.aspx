@@ -32,15 +32,15 @@
     or <em>maxheight</em>. The difference is when you specify both.</p>
     <p>Specifying both width and height will force the image to those exact dimensions, unless the 
     image is already smaller (see scale). This is done by adding whitespace to the image. To center and crop instead, use
-    <strong>&amp;crop=auto</strong>. To lose aspect ratio and fill the specified rectangle, use <strong>&amp;stretch=fill</strong>.</p>
+    <strong>&amp;mode=crop</strong>. To lose aspect ratio and fill the specified rectangle, use <strong>&amp;mode=stretch</strong>.</p>
     <img style="border:1px solid gray;" src="grass.jpg?width=200&height=200" runat="server"
      title="Shown with a border so you can see the added whitespace. ?width=200&height=200"/>
      <img src="grass.jpg?width=200&height=200&bgcolor=black" runat="server"
       title="With ?width=200&height=200&bgcolor=black"/>
-    <img  src="red-leaf.jpg?width=100&height=200&stretch=fill" runat="server" 
-    title="Distorted to 100x200. ?width=100&height=200&stretch=fill"/>
-    <img src="red-leaf.jpg?width=100&height=200&crop=auto" runat="server" 
-    title="Cropped to 100x200. ?width=100&height=200&crop=auto"/>
+    <img  src="red-leaf.jpg?width=100&height=200&mode=stretch" runat="server" 
+    title="Distorted to 100x200. ?width=100&height=200&mode=stretch"/>
+    <img src="red-leaf.jpg?width=100&height=200&mode=crop" runat="server" 
+    title="Cropped to 100x200. ?width=100&height=200&mode=crop"/>
     
     <h2>Scaling</h2>
     <p>By default, images are not upscaled. If an image is already smaller than width/height/maxwidth/maxheight, it is not resized.
@@ -69,7 +69,7 @@
     <img src="tractor.jpg?crop=(60,200,250,400)" runat="server" 
     title="Cropping out a 200x200 square using ?crop=(60,200,250,400)"
     />
-    <img src="tractor.jpg?crop=auto&width=300&height=150" runat="server" 
+    <img src="tractor.jpg?mode=crop&width=300&height=150" runat="server" 
     title="Cropping out to 300x150 square using ?crop=auto&width=300&height=150"
     />
     <p>Cropping can also be done against arbitrary scales, which is very useful for jQuery jCrop interfaces. 
@@ -110,7 +110,7 @@
     <h2>Source flipping</h2>
     <p>Since normal flipping applies after rotation and cropping occur, it can be 
     difficult to work with if you are just wanting the source image flipped before the other
-    adjustments are applied. To flip the source prior to work, use <strong>&amp;sourceFlip=h|v|both</strong>.</p>
+    adjustments are applied. To flip the source prior to work, use <strong>&amp;sFlip=h|v|both</strong>.</p>
     <p>Note how the same crop coordinates return different sections of the image. This is because the source image is flipped before *anything* happens.</p>
     <img src="tractor.jpg?maxwidth=100" runat="server" 
     title="Using ?maxwidth=100"
@@ -118,8 +118,8 @@
     <img src="tractor.jpg?crop=(0,0,100,100)" runat="server" 
     title="Using ?crop=(0,0,100,100)"
     />
-    <img src="tractor.jpg?flip=both&crop=(0,0,100,100)" runat="server" 
-    title="Using ?flip=both&crop=(0,0,100,100)"
+    <img src="tractor.jpg?sflip=both&crop=(0,0,100,100)" runat="server" 
+    title="Using ?sflip=both&crop=(0,0,100,100)"
     />
     <h2>Stretching</h2>
     <p>To stretch an image to width and height, use <strong>&amp;stretch=fill</strong>. </p>
