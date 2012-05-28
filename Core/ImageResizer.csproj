@@ -71,9 +71,6 @@
   <ItemGroup>
     <Compile Include="BoxEdges.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
-    <Compile Include="Configuration\Cryptography\AppDataKeyProvider.cs" />
-    <Compile Include="Configuration\Cryptography\IKeyProvider.cs" />
-    <Compile Include="Configuration\Cryptography\VolatileKeyProvider.cs" />
     <Compile Include="Configuration\Issues\ConfigChecker.cs" />
     <Compile Include="Configuration\IUrlAuthorizationEventArgs.cs" />
     <Compile Include="Configuration\Logging\ILogger.cs" />
@@ -126,9 +123,6 @@
     <Compile Include="Plugins\Basic\DropShadow.cs" />
     <Compile Include="Plugins\Basic\Presets.cs" />
     <Compile Include="Plugins\Basic\SpeedOrQuality.cs" />
-    <Compile Include="Plugins\ICurrentConfigProvider.cs" />
-    <Compile Include="Plugins\IUrlPostFilter.cs" />
-    <Compile Include="Plugins\IUrlPreFilter.cs" />
     <Compile Include="Plugins\IVirtualFileSourceCacheKey.cs" />
     <Compile Include="Plugins\IVirtualFileCache.cs" />
     <Compile Include="Plugins\IFileExtensionPlugin.cs" />
@@ -163,10 +157,7 @@
     <Compile Include="Plugins\Basic\SizeLimits.cs" />
     <Compile Include="Resizing\BitmapTag.cs" />
     <Content Include="Resizing\UnitR.cs.txt" />
-    <Compile Include="Resizing\ResizingCanceledException.cs" />
     <Compile Include="SharedAssemblyInfo.cs" />
-    <Compile Include="UrlBuilder.cs" />
-    <Compile Include="UrlOptions.cs" />
     <Compile Include="Util\AssemblyAttributes.cs" />
     <Compile Include="Util\ParseUtils.cs" />
     <Compile Include="Util\PathUtils.cs" />
