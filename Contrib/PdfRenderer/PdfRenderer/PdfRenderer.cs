@@ -181,7 +181,7 @@ namespace ImageResizer.Plugins.PdfRenderer
             {
                 using(FileStream tempInputStream = tempInputPathInfo.Create())
                 {
-                    StreamUtils.CopyTo(s, tempInputStream);
+                    s.CopyToStream(tempInputStream);
                 }
 
                 // Get information about the PDF such as page count and media boxes
@@ -250,7 +250,7 @@ namespace ImageResizer.Plugins.PdfRenderer
                     MemoryStream memoryStream = new MemoryStream((int)tempOutputPathInfo.Length);
                     using(FileStream fileStream = tempOutputPathInfo.Open(FileMode.Open))
                     {
-                        StreamUtils.CopyTo(fileStream, memoryStream);
+                        fileStream.CopyToStream(memoryStream);
                     }
 
                     // Per ImagerResizer plugin example source code:
