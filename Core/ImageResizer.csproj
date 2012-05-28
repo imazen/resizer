@@ -70,9 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BoxEdges.cs" />
-    <Compile Include="Collections\ConstrainedCache.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
-    <Compile Include="Collections\EventCountingDictionary.cs" />
     <Compile Include="Configuration\Cryptography\AppDataKeyProvider.cs" />
     <Compile Include="Configuration\Cryptography\IKeyProvider.cs" />
     <Compile Include="Configuration\Cryptography\VolatileKeyProvider.cs" />
@@ -127,7 +125,6 @@
     <Compile Include="Configuration\Xml\Selector.cs" />
     <Compile Include="Plugins\Basic\DropShadow.cs" />
     <Compile Include="Plugins\Basic\Presets.cs" />
-    <Compile Include="Plugins\Basic\SourceMemCache.cs" />
     <Compile Include="Plugins\Basic\SpeedOrQuality.cs" />
     <Compile Include="Plugins\ICurrentConfigProvider.cs" />
     <Compile Include="Plugins\IUrlPostFilter.cs" />
