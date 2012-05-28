@@ -6,8 +6,8 @@ using System.IO;
 using System.Xml;
 using ImageResizer.Util;
 
-namespace ImageResizer.Configuration.Cryptography {
-    public class AppDataKeyProvider:IKeyProvider {
+namespace ImageResizer.Plugins.Security.Cryptography {
+    internal class AppDataKeyProvider:IKeyProvider {
 
         private string _keyFilePath;
         /// <summary>

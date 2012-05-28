@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ImageResizer.Configuration.Cryptography {
-    public class VolatileKeyProvider: IKeyProvider {
+namespace ImageResizer.Plugins.Security.Cryptography {
+    internal class VolatileKeyProvider: IKeyProvider {
 
         private object syncLock = new object{};
 
