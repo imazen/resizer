@@ -146,6 +146,7 @@ namespace ImageResizer.Configuration.Plugins {
         }
         private void DownloadFile(Dependency d, StringBuilder message) {
             try {
+                if (File.Exists(d.DestPath)) File.Delete(d.DestPath);
                 d.Client.DownloadFile(d.Url, d.DestPath);
                 lock (message) {
                     if (d.Exists) message.AppendLine(d.Name + " reported size of " + d.ExistingLength + " instead of expected " + d.ExpectedLength + " Re-downloaded from " + d.Url);
