@@ -55,48 +55,25 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             int i = 0;
 
             //If radiusunits is specified, use that code path.
-            double units = s.settings.Get<double>("a.radiusunits",-1);
+            double units = s.settings.Get<double>("a.radiusunits",1000);
            
-            if ( units > 0) {
+            i = GetRadius(s, "blur", "a.blur", units);
+            if (i > 0) new GaussianBlur(1.4, i).ApplyInPlace(s.destBitmap);
 
-                i = GetRadius(s, "blur", "a.blur", units);
-                if (i > 0) new GaussianBlur(1.4, i).ApplyInPlace(s.destBitmap);
+            i = GetRadius(s, "sharpen", "a.sharpen", units);
+            if (i > 0) new GaussianSharpen(1.4, i).ApplyInPlace(s.destBitmap);
 
-                i = GetRadius(s, "sharpen", "a.sharpen", units);
-                if (i > 0) new GaussianSharpen(1.4, i).ApplyInPlace(s.destBitmap);
+            i = GetRadius(s, "a.oilpainting", null, units);
+            if (i > 0) new OilPainting(i).ApplyInPlace(s.destBitmap);
 
-                i = GetRadius(s, "a.oilpainting", null, units);
-                if (i > 0) new OilPainting(i).ApplyInPlace(s.destBitmap);
-
-                if ("true".Equals(s.settings["a.removenoise"], StringComparison.OrdinalIgnoreCase)) {
-                    new ConservativeSmoothing(3).ApplyInPlace(s.destBitmap);
-                } else {
-                    i = GetRadius(s, "a.removenoise", null, units);
-                    if (i > 0) new ConservativeSmoothing(i).ApplyInPlace(s.destBitmap);
-                }
-
-
+            if ("true".Equals(s.settings["a.removenoise"], StringComparison.OrdinalIgnoreCase)) {
+                new ConservativeSmoothing(3).ApplyInPlace(s.destBitmap);
             } else {
-
-                str = s.settings["blur"]; //radius
-                if (string.IsNullOrEmpty(str)) str = s.settings["a.blur"];
-                if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
-                    new GaussianBlur(1.4, i).ApplyInPlace(s.destBitmap);
-
-                str = s.settings["sharpen"]; //radius
-                if (string.IsNullOrEmpty(str)) str = s.settings["a.sharpen"];
-                if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
-                    new GaussianSharpen(1.4, i).ApplyInPlace(s.destBitmap);
-
-                str = s.settings["a.oilpainting"]; //radius
-                if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
-                    new OilPainting(i).ApplyInPlace(s.destBitmap);
-
-                str = s.settings["a.removenoise"]; //radius
-                if ("true".Equals(str, StringComparison.OrdinalIgnoreCase)) str = "3";
-                if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0)
-                    new ConservativeSmoothing(i).ApplyInPlace(s.destBitmap);
+                i = GetRadius(s, "a.removenoise", null, units);
+                if (i > 0) new ConservativeSmoothing(i).ApplyInPlace(s.destBitmap);
             }
+
+
 
             //Sobel only supports 8bpp grayscale images.
             //true/false
