@@ -997,6 +997,98 @@
             Length of the range (deffirence between maximum and minimum values).
             </summary>
         </member>
+        <member name="T:AForge.ThreadSafeRandom">
+            <summary>
+            Thread safe version of the <see cref="T:System.Random"/> class.
+            </summary>
+            
+            <remarks><para>The class inherits the <see cref="T:System.Random"/> and overrides
+            its random numbers generation methods providing thread safety by guarding call
+            to the base class with a lock. See documentation to <see cref="T:System.Random"/> for
+            additional information about the base class.</para></remarks>
+            
+        </member>
+        <member name="M:AForge.ThreadSafeRandom.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.ThreadSafeRandom"/> class.
+            </summary>
+            
+            <remarks>See <see cref="M:System.Random.Next"/> for more information.</remarks>
+            
+        </member>
+        <member name="M:AForge.ThreadSafeRandom.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.ThreadSafeRandom"/> class.
+            </summary>
+            
+            <remarks>A number used to calculate a starting value for the pseudo-random number sequence.
+            If a negative number is specified, the absolute value of the number is used.</remarks>
+            
+            
+            <remarks>See <see cref="M:System.Random.Next"/> for more information.</remarks>
+            
+        </member>
+        <member name="M:AForge.ThreadSafeRandom.Next">
+            <summary>
+            Returns a nonnegative random number.
+            </summary>
+            
+            <returns>Returns a 32-bit signed integer greater than or equal to zero and less than
+            <see cref="F:System.Int32.MaxValue"/>.</returns>
+            
+            <remarks>See <see cref="M:System.Random.Next"/> for more information.</remarks>
+            
+        </member>
+        <member name="M:AForge.ThreadSafeRandom.Next(System.Int32)">
+            <summary>
+            Returns a nonnegative random number less than the specified maximum.
+            </summary>
+            
+            <param name="maxValue">The exclusive upper bound of the random number to be generated.
+            <paramref name="maxValue"/> must be greater than or equal to zero.</param>
+            
+            <returns>Returns a 32-bit signed integer greater than or equal to zero, and less than <paramref name="maxValue"/>;
+            that is, the range of return values ordinarily includes zero but not <paramref name="maxValue"/>.</returns>
+            
+            <remarks>See <see cref="M:System.Random.Next(System.Int32)"/> for more information.</remarks>
+            
+        </member>
+        <member name="M:AForge.ThreadSafeRandom.Next(System.Int32,System.Int32)">
+             <summary>
+             Returns a random number within a specified range.
+             </summary>
+             
+             <param name="minValue">The inclusive lower bound of the random number returned.</param>
+             <param name="maxValue">The exclusive upper bound of the random number returned.
+             <paramref name="maxValue"/> must be greater than or equal to <paramref name="minValue"/>.</param>
+             
+             <returns>Returns a 32-bit signed integer greater than or equal to <paramref name="minValue"/> and less
+             than <paramref name="maxValue"/>; that is, the range of return values includes
+             <paramref name="minValue"/> but not <paramref name="maxValue"/>.</returns>
+             
+             <remarks>See <see cref="M:System.Random.Next(System.Int32,System.Int32)"/> for more information.</remarks>
+            
+        </member>
+        <member name="M:AForge.ThreadSafeRandom.NextBytes(System.Byte[])">
+             <summary>
+             Fills the elements of a specified array of bytes with random numbers.
+             </summary>
+             
+             <param name="buffer">An array of bytes to contain random numbers.</param>
+             
+             <remarks>See <see cref="M:System.Random.NextBytes(System.Byte[])"/> for more information.</remarks>
+            
+        </member>
+        <member name="M:AForge.ThreadSafeRandom.NextDouble">
+             <summary>
+             Returns a random number between 0.0 and 1.0.
+             </summary>
+             
+             <returns>Returns a double-precision floating point number greater than or equal to 0.0, and less than 1.0.</returns>
+             
+             <remarks>See <see cref="M:System.Random.NextDouble"/> for more information.</remarks>
+            
+        </member>
         <member name="T:AForge.Range">
              <summary>
              Represents a range with minimum and maximum values, which are single precision numbers (floats).
