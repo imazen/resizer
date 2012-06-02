@@ -105,6 +105,9 @@
              <remarks><para>Processes provided motion frame and highlights motion areas
              on the original video frame with <see cref="P:AForge.Vision.Motion.MotionAreaHighlighting.HighlightColor">specified color</see>.</para>
              </remarks>
+             
+             <exception cref="T:AForge.Imaging.InvalidImagePropertiesException">Motion frame is not 8 bpp image, but it must be so.</exception>
+             <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Video frame must be 8 bpp grayscale image or 24/32 bpp color image.</exception>
             
         </member>
         <member name="M:AForge.Vision.Motion.MotionAreaHighlighting.Reset">
@@ -294,6 +297,9 @@
             original video frame.
             </para></remarks>
             
+            <exception cref="T:AForge.Imaging.InvalidImagePropertiesException">Motion frame is not 8 bpp image, but it must be so.</exception>
+            <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Video frame must be 8 bpp grayscale image or 24/32 bpp color image.</exception>
+            
         </member>
         <member name="M:AForge.Vision.Motion.BlobCountingObjectsProcessing.Reset">
              <summary>
@@ -465,6 +471,9 @@
              for each grid's cell. In the case if <see cref="P:AForge.Vision.Motion.GridMotionAreaProcessing.HighlightMotionGrid"/> property is
              set to <see langword="true"/>, the cell with motion level above threshold are
              highlighted.</para></remarks>
+            
+             <exception cref="T:AForge.Imaging.InvalidImagePropertiesException">Motion frame is not 8 bpp image, but it must be so.</exception>
+             <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Video frame must be 8 bpp grayscale image or 24/32 bpp color image.</exception>
             
         </member>
         <member name="M:AForge.Vision.Motion.GridMotionAreaProcessing.Reset">
@@ -897,6 +906,9 @@
              <remarks><para>Processes provided motion frame and highlights borders of motion areas
              on the original video frame with <see cref="P:AForge.Vision.Motion.MotionBorderHighlighting.HighlightColor">specified color</see>.</para>
              </remarks>
+            
+             <exception cref="T:AForge.Imaging.InvalidImagePropertiesException">Motion frame is not 8 bpp image, but it must be so.</exception>
+             <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Video frame must be 8 bpp grayscale image or 24/32 bpp color image.</exception>
             
         </member>
         <member name="M:AForge.Vision.Motion.MotionBorderHighlighting.Reset">

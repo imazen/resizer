@@ -266,10 +266,11 @@
             Layer's inputs count.
             </summary>
         </member>
-        <member name="P:AForge.Neuro.Layer.NeuronsCount">
+        <member name="P:AForge.Neuro.Layer.Neurons">
             <summary>
-            Layer's neurons count.
+            Layer's neurons.
             </summary>
+            
         </member>
         <member name="P:AForge.Neuro.Layer.Output">
             <summary>
@@ -282,16 +283,6 @@
             <para><note>The property is not initialized (equals to <see langword="null"/>) until
             <see cref="M:AForge.Neuro.Layer.Compute(System.Double[])"/> method is called.</note></para>
             </remarks>
-            
-        </member>
-        <member name="P:AForge.Neuro.Layer.Item(System.Int32)">
-            <summary>
-            Layer's neurons accessor.
-            </summary>
-            
-            <param name="index">Neuron index.</param>
-            
-            <remarks>Allows to access layer's neurons.</remarks>
             
         </member>
         <member name="T:AForge.Neuro.BipolarSigmoidFunction">
@@ -935,9 +926,9 @@
             Network's inputs count.
             </summary>
         </member>
-        <member name="P:AForge.Neuro.Network.LayersCount">
+        <member name="P:AForge.Neuro.Network.Layers">
             <summary>
-            Network's layers count.
+            Network's layers.
             </summary>
         </member>
         <member name="P:AForge.Neuro.Network.Output">
@@ -951,16 +942,6 @@
             <para><note>The property is not initialized (equals to <see langword="null"/>) until
             <see cref="M:AForge.Neuro.Network.Compute(System.Double[])"/> method is called.</note></para>
             </remarks>
-            
-        </member>
-        <member name="P:AForge.Neuro.Network.Item(System.Int32)">
-            <summary>
-            Network's layers accessor.
-            </summary>
-            
-            <param name="index">Layer index.</param>
-            
-            <remarks>Allows to access network's layer.</remarks>
             
         </member>
         <member name="T:AForge.Neuro.DistanceNetwork">
@@ -994,16 +975,6 @@
             
             <remarks>The method returns index of the neuron, which weights have
             the minimum distance from network's input.</remarks>
-            
-        </member>
-        <member name="P:AForge.Neuro.DistanceNetwork.Item(System.Int32)">
-            <summary>
-            Network's layers accessor.
-            </summary>
-            
-            <param name="index">Layer index.</param>
-            
-            <remarks>Allows to access network's layer.</remarks>
             
         </member>
         <member name="T:AForge.Neuro.Learning.EvolutionaryFitness">
@@ -1283,15 +1254,10 @@
             <remarks>The calculation way of neuron's output value is determined by inherited class.</remarks>
             
         </member>
-        <member name="P:AForge.Neuro.Neuron.Item(System.Int32)">
+        <member name="P:AForge.Neuro.Neuron.Weights">
             <summary>
-            Neuron's weights accessor.
+            Neuron's weights.
             </summary>
-            
-            <param name="index">Weight index.</param>
-            
-            <remarks>Allows to access neuron's weights.</remarks>
-            
         </member>
         <member name="T:AForge.Neuro.ActivationLayer">
              <summary>
@@ -1324,16 +1290,6 @@
             
             <remarks><para>The methods sets new activation function for each neuron by setting
             their <see cref="P:AForge.Neuro.ActivationNeuron.ActivationFunction"/> property.</para></remarks>
-            
-        </member>
-        <member name="P:AForge.Neuro.ActivationLayer.Item(System.Int32)">
-            <summary>
-            Layer's neurons accessor.
-            </summary>
-            
-            <param name="index">Neuron index.</param>
-            
-            <remarks>Allows to access layer's neurons.</remarks>
             
         </member>
         <member name="T:AForge.Neuro.ActivationNeuron">
@@ -1471,16 +1427,6 @@
             
             <remarks><para>The method sets new activation function for all neurons by calling
             <see cref="M:AForge.Neuro.ActivationLayer.SetActivationFunction(AForge.Neuro.IActivationFunction)"/> method for each layer of the network.</para></remarks>
-            
-        </member>
-        <member name="P:AForge.Neuro.ActivationNetwork.Item(System.Int32)">
-            <summary>
-            Network's layers accessor.
-            </summary>
-            
-            <param name="index">Layer index.</param>
-            
-            <remarks>Allows to access network's layer.</remarks>
             
         </member>
         <member name="T:AForge.Neuro.Learning.EvolutionaryLearning">
@@ -1640,14 +1586,130 @@
             method) after it is created.</remarks>
             
         </member>
-        <member name="P:AForge.Neuro.DistanceLayer.Item(System.Int32)">
+        <member name="T:AForge.Neuro.Learning.ResilientBackpropagationLearning">
             <summary>
-            Layer's neurons accessor.
+            Resilient Backpropagation learning algorithm.
             </summary>
             
-            <param name="index">Neuron index.</param>
+            <remarks><para>This class implements the resilient backpropagation (RProp)
+            learning algorithm. The RProp learning algorithm is one of the fastest learning
+            algorithms for feed-forward learning networks which use only first-order
+            information.</para>
             
-            <remarks>Allows to access layer's neurons.</remarks>
+            <para>Sample usage (training network to calculate XOR function):</para>
+            <code>
+            // initialize input and output values
+            double[][] input = new double[4][] {
+                new double[] {0, 0}, new double[] {0, 1},
+                new double[] {1, 0}, new double[] {1, 1}
+            };
+            double[][] output = new double[4][] {
+                new double[] {0}, new double[] {1},
+                new double[] {1}, new double[] {0}
+            };
+            // create neural network
+            ActivationNetwork   network = new ActivationNetwork(
+                SigmoidFunction( 2 ),
+                2, // two inputs in the network
+                2, // two neurons in the first layer
+                1 ); // one neuron in the second layer
+            // create teacher
+            ResilientBackpropagationLearning teacher = new ResilientBackpropagationLearning( network );
+            // loop
+            while ( !needToStop )
+            {
+                // run epoch of learning procedure
+                double error = teacher.RunEpoch( input, output );
+                // check error value to see if we need to stop
+                // ...
+            }
+            </code>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.Neuro.Learning.ResilientBackpropagationLearning.#ctor(AForge.Neuro.ActivationNetwork)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Neuro.Learning.ResilientBackpropagationLearning"/> class.
+            </summary>
+            
+            <param name="network">Network to teach.</param>
+            
+        </member>
+        <member name="M:AForge.Neuro.Learning.ResilientBackpropagationLearning.Run(System.Double[],System.Double[])">
+             <summary>
+             Runs learning iteration.
+             </summary>
+             
+             <param name="input">Input vector.</param>
+             <param name="output">Desired output vector.</param>
+             
+             <returns>Returns squared error (difference between current network's output and
+             desired output) divided by 2.</returns>
+             
+             <remarks><para>Runs one learning iteration and updates neuron's
+             weights.</para></remarks>
+            
+        </member>
+        <member name="M:AForge.Neuro.Learning.ResilientBackpropagationLearning.RunEpoch(System.Double[][],System.Double[][])">
+            <summary>
+            Runs learning epoch.
+            </summary>
+            
+            <param name="input">Array of input vectors.</param>
+            <param name="output">Array of output vectors.</param>
+            
+            <returns>Returns summary learning error for the epoch. See <see cref="M:AForge.Neuro.Learning.ResilientBackpropagationLearning.Run(System.Double[],System.Double[])"/>
+            method for details about learning error calculation.</returns>
+            
+            <remarks><para>The method runs one learning epoch, by calling <see cref="M:AForge.Neuro.Learning.ResilientBackpropagationLearning.Run(System.Double[],System.Double[])"/> method
+            for each vector provided in the <paramref name="input"/> array.</para></remarks>
+            
+        </member>
+        <member name="M:AForge.Neuro.Learning.ResilientBackpropagationLearning.ResetGradient">
+            <summary>
+            Resets current weight and threshold derivatives.
+            </summary>
+            
+        </member>
+        <member name="M:AForge.Neuro.Learning.ResilientBackpropagationLearning.ResetUpdates(System.Double)">
+            <summary>
+            Resets the current update steps using the given learning rate.
+            </summary>
+            
+        </member>
+        <member name="M:AForge.Neuro.Learning.ResilientBackpropagationLearning.UpdateNetwork">
+            <summary>
+            Update network's weights.
+            </summary>
+            
+        </member>
+        <member name="M:AForge.Neuro.Learning.ResilientBackpropagationLearning.CalculateError(System.Double[])">
+            <summary>
+            Calculates error values for all neurons of the network.
+            </summary>
+            
+            <param name="desiredOutput">Desired output vector.</param>
+            
+            <returns>Returns summary squared error of the last layer divided by 2.</returns>
+            
+        </member>
+        <member name="M:AForge.Neuro.Learning.ResilientBackpropagationLearning.CalculateGradient(System.Double[])">
+            <summary>
+            Calculate weights updates
+            </summary>
+            
+            <param name="input">Network's input vector.</param>
+            
+        </member>
+        <member name="P:AForge.Neuro.Learning.ResilientBackpropagationLearning.LearningRate">
+             <summary>
+             Learning rate.
+             </summary>
+             
+             <remarks><para>The value determines speed of learning.</para>
+             
+             <para>Default value equals to <b>0.0125</b>.</para>
+             </remarks>
             
         </member>
         <member name="T:AForge.Neuro.DistanceNeuron">

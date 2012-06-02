@@ -4,6 +4,22 @@
         <name>AForge.Video.DirectShow</name>
     </assembly>
     <members>
+        <member name="T:AForge.Video.DirectShow.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:AForge.Video.DirectShow.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:AForge.Video.DirectShow.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
         <member name="T:AForge.Video.DirectShow.Internals.IPin">
             <summary>
             This interface is exposed by all input and output pins of DirectShow filters.
@@ -425,6 +441,142 @@
         <member name="F:AForge.Video.DirectShow.VideoCapabilities.FrameRate">
             <summary>
             Frame rate supported by video device for corresponding <see cref="F:AForge.Video.DirectShow.VideoCapabilities.FrameSize">frame size</see>.
+            </summary>
+        </member>
+        <member name="T:AForge.Video.DirectShow.PhysicalConnectorType">
+            <summary>
+            Specifies the physical type of pin (audio or video).
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.Default">
+            <summary>
+            Default value of connection type. Physically it does not exist, but just either to specify that
+            connection type should not be changed (input) or was not determined (output).
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.VideoTuner">
+            <summary>
+            Specifies a tuner pin for video.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.VideoComposite">
+            <summary>
+            Specifies a composite pin for video.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.VideoSVideo">
+            <summary>
+            Specifies an S-Video (Y/C video) pin.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.VideoRGB">
+            <summary>
+            Specifies an RGB pin for video.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.VideoYRYBY">
+            <summary>
+            Specifies a YRYBY (Y, R–Y, B–Y) pin for video.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.VideoSerialDigital">
+            <summary>
+            Specifies a serial digital pin for video.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.VideoParallelDigital">
+            <summary>
+            Specifies a parallel digital pin for video.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.VideoSCSI">
+            <summary>
+            Specifies a SCSI (Small Computer System Interface) pin for video.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.VideoAUX">
+            <summary>
+            Specifies an AUX (auxiliary) pin for video.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.Video1394">
+            <summary>
+            Specifies an IEEE 1394 pin for video.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.VideoUSB">
+            <summary>
+            Specifies a USB (Universal Serial Bus) pin for video.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.VideoDecoder">
+            <summary>
+            Specifies a video decoder pin.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.VideoEncoder">
+            <summary>
+            Specifies a video encoder pin.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.VideoSCART">
+            <summary>
+            Specifies a SCART (Peritel) pin for video.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.VideoBlack">
+            <summary>
+            Not used.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.AudioTuner">
+            <summary>
+            Specifies a tuner pin for audio.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.AudioLine">
+            <summary>
+            Specifies a line pin for audio.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.AudioMic">
+            <summary>
+            Specifies a microphone pin.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.AudioAESDigital">
+            <summary>
+            Specifies an AES/EBU (Audio Engineering Society/European Broadcast Union) digital pin for audio.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.AudioSPDIFDigital">
+            <summary>
+            Specifies an S/PDIF (Sony/Philips Digital Interface Format) digital pin for audio.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.AudioSCSI">
+            <summary>
+            Specifies a SCSI pin for audio.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.AudioAUX">
+            <summary>
+            Specifies an AUX pin for audio.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.Audio1394">
+            <summary>
+            Specifies an IEEE 1394 pin for audio.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.AudioUSB">
+            <summary>
+            Specifies a USB pin for audio.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.PhysicalConnectorType.AudioDecoder">
+            <summary>
+            Specifies an audio decoder pin.
             </summary>
         </member>
         <member name="T:AForge.Video.DirectShow.Internals.PinDirection">
@@ -1110,6 +1262,114 @@
             <returns>Return's <b>HRESULT</b> error code.</returns>
             
         </member>
+        <member name="T:AForge.Video.DirectShow.VideoCaptureDeviceForm">
+            <summary>
+            Local video device selection form.
+            </summary>
+            
+            <remarks><para>The form provides a standard way of selecting local video
+            device (USB web camera, capture board, etc. - anything supporting DirectShow
+            interface), which can be reused across applications. It allows selecting video
+            device, video size and snapshots size (if device supports snapshots and
+            <see cref="P:AForge.Video.DirectShow.VideoCaptureDeviceForm.ConfigureSnapshots">user needs them</see>).</para>
+            
+            <para><img src="img/video/VideoCaptureDeviceForm.png" width="478" height="205"/></para>
+            </remarks>
+            
+        </member>
+        <member name="F:AForge.Video.DirectShow.VideoCaptureDeviceForm.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:AForge.Video.DirectShow.VideoCaptureDeviceForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:AForge.Video.DirectShow.VideoCaptureDeviceForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="M:AForge.Video.DirectShow.VideoCaptureDeviceForm.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Video.DirectShow.VideoCaptureDeviceForm"/> class.
+            </summary>
+            
+        </member>
+        <member name="P:AForge.Video.DirectShow.VideoCaptureDeviceForm.ConfigureSnapshots">
+            <summary>
+            Specifies if snapshot configuration should be done or not.
+            </summary>
+            
+            <remarks><para>The property specifies if the dialog form should
+            allow configuration of snapshot sizes (if selected video source supports
+            snapshots). If the property is set to <see langword="true"/>, then
+            the form will provide additional combo box enumerating supported
+            snapshot sizes. Otherwise the combo boxes will be hidden.
+            </para>
+            
+            <para>If the property is set to <see langword="true"/> and selected
+            device supports snapshots, then <see cref="P:AForge.Video.DirectShow.VideoCaptureDevice.ProvideSnapshots"/>
+            property of the <see cref="P:AForge.Video.DirectShow.VideoCaptureDeviceForm.VideoDevice">configured device</see> is set to
+            <see langword="true"/>.</para>
+            
+            <para>Default value of the property is set to <see langword="false"/>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Video.DirectShow.VideoCaptureDeviceForm.VideoDevice">
+            <summary>
+            Provides configured video device.
+            </summary>
+            
+            <remarks><para>The property provides configured video device if user confirmed
+            the dialog using "OK" button. If user canceled the dialog, the property is
+            set to <see langword="null"/>.</para></remarks>
+            
+        </member>
+        <member name="P:AForge.Video.DirectShow.VideoCaptureDeviceForm.VideoDeviceMoniker">
+            <summary>
+            Moniker string of the selected video device.
+            </summary>
+            
+            <remarks><para>The property allows to get moniker string of the selected device
+            on form completion or set video device which should be selected by default on
+            form loading.</para></remarks>
+            
+        </member>
+        <member name="P:AForge.Video.DirectShow.VideoCaptureDeviceForm.CaptureSize">
+            <summary>
+            Video frame size of the selected device.
+            </summary>
+            
+            <remarks><para>The property allows to get video size of the selected device
+            on form completion or set the size to be selected by default on form loading.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Video.DirectShow.VideoCaptureDeviceForm.SnapshotSize">
+            <summary>
+            Snapshot frame size of the selected device.
+            </summary>
+            
+            <remarks><para>The property allows to get snapshot size of the selected device
+            on form completion or set the size to be selected by default on form loading
+            (if <see cref="P:AForge.Video.DirectShow.VideoCaptureDeviceForm.ConfigureSnapshots"/> property is set <see langword="true"/>).</para>
+            </remarks>
+        </member>
+        <member name="P:AForge.Video.DirectShow.VideoCaptureDeviceForm.VideoInput">
+            <summary>
+            Video input to use with video capture card.
+            </summary>
+            
+            <remarks><para>The property allows to get video input of the selected device
+            on form completion or set it to be selected by default on form loading.</para></remarks>
+            
+        </member>
         <member name="T:AForge.Video.DirectShow.Internals.Tools">
             <summary>
             Some miscellaneous functions.
@@ -1423,6 +1683,43 @@
             <exception cref="T:System.NotSupportedException">The video source does not support configuration property page.</exception>
             
         </member>
+        <member name="M:AForge.Video.DirectShow.VideoCaptureDevice.DisplayCrossbarPropertyPage(System.IntPtr)">
+            <summary>
+            Display property page of video crossbar (Analog Video Crossbar filter).
+            </summary>
+            
+            <param name="parentWindow">Handle of parent window.</param>
+            
+            <remarks><para>The Analog Video Crossbar filter is modeled after a general switching matrix,
+            with n inputs and m outputs. For example, a video card might have two external connectors:
+            a coaxial connector for TV, and an S-video input. These would be represented as input pins on
+            the filter. The displayed property page allows to configure the crossbar by selecting input
+            of a video card to use.</para>
+            
+            <para><note>This method can be invoked only when video source is running (<see cref="P:AForge.Video.DirectShow.VideoCaptureDevice.IsRunning"/> is
+            <see langword="true"/>). Otherwise it generates exception.</note></para>
+            
+            <para>Use <see cref="M:AForge.Video.DirectShow.VideoCaptureDevice.CheckIfCrossbarAvailable"/> method to check if running video source provides
+            crossbar configuration.</para>
+            </remarks>
+            
+            <exception cref="T:System.ApplicationException">The video source must be running in order to display crossbar property page.</exception>
+            <exception cref="T:System.NotSupportedException">Crossbar configuration is not supported by currently running video source.</exception>
+            
+        </member>
+        <member name="M:AForge.Video.DirectShow.VideoCaptureDevice.CheckIfCrossbarAvailable">
+             <summary>
+             Check if running video source provides crossbar for configuration.
+             </summary>
+             
+             <returns>Returns <see langword="true"/> if crossbar configuration is available or
+             <see langword="false"/> otherwise.</returns>
+             
+             <remarks><para>The method reports if the video source provides crossbar configuration
+             using <see cref="M:AForge.Video.DirectShow.VideoCaptureDevice.DisplayCrossbarPropertyPage(System.IntPtr)"/>.</para>
+             </remarks>
+            
+        </member>
         <member name="M:AForge.Video.DirectShow.VideoCaptureDevice.SimulateTrigger">
             <summary>
             Simulates an external trigger.
@@ -1457,6 +1754,46 @@
             </summary>
             
             <param name="image">New snapshot's image.</param>
+            
+        </member>
+        <member name="P:AForge.Video.DirectShow.VideoCaptureDevice.CrossbarVideoInput">
+            <summary>
+            Current video input of capture card.
+            </summary>
+            
+            <remarks><para>The property specifies video input to use for video devices like capture cards
+            (those which provide crossbar configuration). List of available video inputs can be obtained
+            from <see cref="P:AForge.Video.DirectShow.VideoCaptureDevice.AvailableCrossbarVideoInputs"/> property.</para>
+            
+            <para>To check if the video device supports crossbar configuration, the <see cref="M:AForge.Video.DirectShow.VideoCaptureDevice.CheckIfCrossbarAvailable"/>
+            method can be used.</para>
+            
+            <para><note>This property can be set as before running video device, as while running it.</note></para>
+            
+            <para>By default this property is set to <see cref="P:AForge.Video.DirectShow.VideoInput.Default"/>, which means video input
+            will not be set when running video device, but currently configured will be used. After video device
+            is started this property will be updated anyway to tell current video input.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Video.DirectShow.VideoCaptureDevice.AvailableCrossbarVideoInputs">
+            <summary>
+            Available inputs of the video capture card.
+            </summary>
+            
+            <remarks><para>The property provides list of video inputs for devices like video capture cards.
+            Such devices usually provide several video inputs, which can be selected using crossbar.
+            If video device represented by the object of this class supports crossbar, then this property
+            will list all video inputs. However if it is a regular USB camera, for example, which does not
+            provide crossbar configuration, the property will provide zero length array.</para>
+            
+            <para>Video input to be used can be selected using <see cref="P:AForge.Video.DirectShow.VideoCaptureDevice.CrossbarVideoInput"/>. See also
+            <see cref="M:AForge.Video.DirectShow.VideoCaptureDevice.DisplayCrossbarPropertyPage(System.IntPtr)"/> method, which provides crossbar configuration dialog.</para>
+            
+            <para><note>It is recomended not to call this property immediately after <see cref="M:AForge.Video.DirectShow.VideoCaptureDevice.Start"/> method, since
+            device may not start yet and provide its information. It is better to call the property
+            before starting device or a bit after (but not immediately after).</note></para>
+            </remarks>
             
         </member>
         <member name="P:AForge.Video.DirectShow.VideoCaptureDevice.ProvideSnapshots">
@@ -1629,7 +1966,7 @@
             
             <remarks><para>The property provides list of device's video capabilities.</para>
             
-            <para><note>Do not call this property immediately after <see cref="M:AForge.Video.DirectShow.VideoCaptureDevice.Start"/> method, since
+            <para><note>It is recomended not to call this property immediately after <see cref="M:AForge.Video.DirectShow.VideoCaptureDevice.Start"/> method, since
             device may not start yet and provide its information. It is better to call the property
             before starting device or a bit after (but not immediately after).</note></para>
             </remarks>
@@ -1647,7 +1984,7 @@
             
             <para>See documentation to <see cref="P:AForge.Video.DirectShow.VideoCaptureDevice.ProvideSnapshots"/> for additional information.</para>
             
-            <para><note>Do not call this property immediately after <see cref="M:AForge.Video.DirectShow.VideoCaptureDevice.Start"/> method, since
+            <para><note>It is recomended not to call this property immediately after <see cref="M:AForge.Video.DirectShow.VideoCaptureDevice.Start"/> method, since
             device may not start yet and provide its information. It is better to call the property
             before starting device or a bit after (but not immediately after).</note></para>
             </remarks>
@@ -2595,6 +2932,31 @@
             <returns>Returns <b>S_OK</b> on success.</returns>
             
         </member>
+        <member name="T:AForge.Video.DirectShow.VideoInput">
+            <summary>
+            Video input of a capture board.
+            </summary>
+            
+            <remarks><para>The class is used to describe video input of devices like video capture boards,
+            which usually provide several inputs.</para>
+            </remarks>
+            
+        </member>
+        <member name="F:AForge.Video.DirectShow.VideoInput.Index">
+            <summary>
+            Index of the video input.
+            </summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.VideoInput.Type">
+            <summary>
+            Type of the video input.
+            </summary>
+        </member>
+        <member name="P:AForge.Video.DirectShow.VideoInput.Default">
+            <summary>
+            Default video input. Used to specify that it should not be changed.
+            </summary>
+        </member>
         <member name="T:AForge.Video.DirectShow.FilterInfo">
             <summary>
             DirectShow filter information.
@@ -2865,6 +3227,12 @@
             <remarks>Equals to PIN_CATEGORY_STILL.</remarks>
             
         </member>
+        <member name="F:AForge.Video.DirectShow.Internals.FindDirection.UpstreamOnly">
+            <summary>Equals to LOOK_UPSTREAM_ONLY.</summary>
+        </member>
+        <member name="F:AForge.Video.DirectShow.Internals.FindDirection.DownstreamOnly">
+            <summary>Equals to LOOK_DOWNSTREAM_ONLY.</summary>
+        </member>
         <member name="T:AForge.Video.DirectShow.Internals.IReferenceClock">
              <summary>
              The IReferenceClock interface provides the reference time for the filter graph.
@@ -2916,6 +3284,68 @@
             </summary>
             
             <param name="dwAdviseCookie">Identifier of the request to remove. Use the value returned by IReferenceClock::AdviseTime  or IReferenceClock::AdvisePeriodic  in the pdwAdviseToken parameter.</param>
+            
+            <returns>Return's <b>HRESULT</b> error code.</returns>
+            
+        </member>
+        <member name="T:AForge.Video.DirectShow.Internals.IAMCrossbar">
+            <summary>
+            The IAMCrossbar interface routes signals from an analog or digital source to a video capture filter.
+            </summary>
+        </member>
+        <member name="M:AForge.Video.DirectShow.Internals.IAMCrossbar.get_PinCounts(System.Int32@,System.Int32@)">
+            <summary>
+            Retrieves the number of input and output pins on the crossbar filter.
+            </summary>
+            
+            <param name="outputPinCount">Variable that receives the number of output pins.</param>
+            <param name="inputPinCount">Variable that receives the number of input pins.</param>
+            
+            <returns>Return's <b>HRESULT</b> error code.</returns>
+            
+        </member>
+        <member name="M:AForge.Video.DirectShow.Internals.IAMCrossbar.CanRoute(System.Int32,System.Int32)">
+            <summary>
+            Queries whether a specified input pin can be routed to a specified output pin.
+            </summary>
+            
+            <param name="outputPinIndex">Specifies the index of the output pin.</param>
+            <param name="inputPinIndex">Specifies the index of input pin.</param>
+            
+            <returns>Return's <b>HRESULT</b> error code.</returns>
+            
+        </member>
+        <member name="M:AForge.Video.DirectShow.Internals.IAMCrossbar.Route(System.Int32,System.Int32)">
+            <summary>
+            Routes an input pin to an output pin.
+            </summary>
+            
+            <param name="outputPinIndex">Specifies the index of the output pin.</param>
+            <param name="inputPinIndex">Specifies the index of the input pin.</param>
+            
+            <returns>Return's <b>HRESULT</b> error code.</returns>
+            
+        </member>
+        <member name="M:AForge.Video.DirectShow.Internals.IAMCrossbar.get_IsRoutedTo(System.Int32,System.Int32@)">
+            <summary>
+            Retrieves the input pin that is currently routed to the specified output pin.
+            </summary>
+            
+            <param name="outputPinIndex">Specifies the index of the output pin.</param>
+            <param name="inputPinIndex">Variable that receives the index of the input pin, or -1 if no input pin is routed to this output pin.</param>
+            
+            <returns>Return's <b>HRESULT</b> error code.</returns>
+            
+        </member>
+        <member name="M:AForge.Video.DirectShow.Internals.IAMCrossbar.get_CrossbarPinInfo(System.Boolean,System.Int32,System.Int32@,AForge.Video.DirectShow.PhysicalConnectorType@)">
+            <summary>
+            Retrieves information about a specified pin.
+            </summary>
+            
+            <param name="isInputPin">Specifies the direction of the pin. Use one of the following values.</param>
+            <param name="pinIndex">Specifies the index of the pin.</param>
+            <param name="pinIndexRelated">Variable that receives the index of the related pin, or –1 if no pin is related to this pin.</param>
+            <param name="physicalType">Variable that receives a member of the PhysicalConnectorType enumeration, indicating the pin's physical type.</param>
             
             <returns>Return's <b>HRESULT</b> error code.</returns>
             

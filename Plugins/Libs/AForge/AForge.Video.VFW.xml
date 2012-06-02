@@ -512,7 +512,9 @@
             Received bytes count.
             </summary>
             
-            <remarks>The property is not supported by this class. It always equals to 0.</remarks>
+            <remarks>Number of bytes the video source provided from the moment of the last
+            access to the property.
+            </remarks>
             
         </member>
         <member name="P:AForge.Video.VFW.AVIFileVideoSource.IsRunning">
@@ -843,7 +845,7 @@
             </summary>
             
         </member>
-        <member name="F:AForge.Video.VFW.Win32.AVISTREAMINFO.сapabilities">
+        <member name="F:AForge.Video.VFW.Win32.AVISTREAMINFO.Capabilities">
             <summary>
             Capability flags; currently unused.
             </summary>

@@ -571,6 +571,20 @@
             <remarks>Current state of video source object - running or not.</remarks>
             
         </member>
+        <member name="P:AForge.Video.MJPEGStream.ForceBasicAuthentication">
+            <summary>
+            Force using of basic authentication when connecting to the video source.
+            </summary>
+            
+            <remarks><para>For some IP cameras (TrendNET IP cameras, for example) using standard .NET's authentication via credentials
+            does not seem to be working (seems like camera does not request for authentication, but expects corresponding headers to be
+            present on connection request). So this property allows to force basic authentication by adding required HTTP headers when
+            request is sent.</para>
+            
+            <para>Default value is set to <see langword="false"/>.</para>
+            </remarks>
+            
+        </member>
         <member name="T:AForge.Video.VideoException">
             <summary>
             Video related exception.
@@ -926,6 +940,20 @@
             </summary>
             
             <remarks>Current state of video source object - running or not.</remarks>
+            
+        </member>
+        <member name="P:AForge.Video.JPEGStream.ForceBasicAuthentication">
+            <summary>
+            Force using of basic authentication when connecting to the video source.
+            </summary>
+            
+            <remarks><para>For some IP cameras (TrendNET IP cameras, for example) using standard .NET's authentication via credentials
+            does not seem to be working (seems like camera does not request for authentication, but expects corresponding headers to be
+            present on connection request). So this property allows to force basic authentication by adding required HTTP headers when
+            request is sent.</para>
+            
+            <para>Default value is set to <see langword="false"/>.</para>
+            </remarks>
             
         </member>
         <member name="T:AForge.Video.ByteArrayUtils">

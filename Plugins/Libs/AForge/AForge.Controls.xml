@@ -296,7 +296,7 @@
             Get clone of current video frame displayed by the control.
             </summary>
             
-            <returns>Returns clone of the video frame, which is currently displayed
+            <returns>Returns copy of the video frame, which is currently displayed
             by the control - the last video frame received from video source. If the
             control did not receive any video frames yet, then the method returns
             <see langword="null"/>.</returns>
@@ -380,6 +380,15 @@
             If user needs to keep the image, it should be cloned, since the original image will be disposed
             by the control when it is required.</note></para>
             </remarks>
+            
+        </member>
+        <member name="E:AForge.Controls.VideoSourcePlayer.PlayingFinished">
+            <summary>
+            Playing finished event.
+            </summary>
+            
+            <remarks><para>The event is fired when/if video playing finishes. The reason of video
+            stopping is provided as an argument to the event handler.</para></remarks>
             
         </member>
         <member name="T:AForge.Controls.VideoSourcePlayer.NewFrameHandler">
@@ -1292,11 +1301,13 @@
             // fill data series
             for ( int i = 0; i &lt; 10; i++ )
             {
-                testValues[i, 0] = i;
-                testValues[i, 1] = Math.Sin( i / 18.0 * Math.PI );
+                testValues[i, 0] = i; // X values
+                testValues[i, 1] = Math.Sin( i / 18.0 * Math.PI ); // Y values
             }
             // add new data series to the chart
             chart.AddDataSeries( "Test", Color.DarkGreen, Chart.SeriesType.ConnectedDots, 3 );
+            // set X range to display
+            chart.RangeX = new AForge.Range( 0, 9 );
             // update the chart
             chart.UpdateDataSeries( "Test", testValues );
             </code>

@@ -1153,6 +1153,82 @@
             <remarks>Default value is set to <b>2.2</b>.</remarks>
             
         </member>
+        <member name="T:AForge.Imaging.Filters.BrightnessCorrection">
+            <summary>
+            Brightness adjusting in RGB color space.
+            </summary>
+            
+            <remarks><para>The filter operates in <b>RGB</b> color space and adjusts
+            pixels' brightness by increasing every pixel's RGB values by the specified
+            <see cref="P:AForge.Imaging.Filters.BrightnessCorrection.AdjustValue">adjust value</see>. The filter is based on <see cref="T:AForge.Imaging.Filters.LevelsLinear"/>
+            filter and simply sets all input ranges to (0, 255-<see cref="P:AForge.Imaging.Filters.BrightnessCorrection.AdjustValue"/>) and
+            all output range to (<see cref="P:AForge.Imaging.Filters.BrightnessCorrection.AdjustValue"/>, 255) in the case if the adjust value is positive.
+            If the adjust value is negative, then all input ranges are set to
+            (-<see cref="P:AForge.Imaging.Filters.BrightnessCorrection.AdjustValue"/>, 255 ) and all output ranges are set to
+            ( 0, 255+<see cref="P:AForge.Imaging.Filters.BrightnessCorrection.AdjustValue"/>).</para>
+            
+            <para>See <see cref="T:AForge.Imaging.Filters.LevelsLinear"/> documentation for more information about the base filter.</para>
+            
+            <para>The filter accepts 8 bpp grayscale and 24/32 bpp color images for processing.</para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // create filter
+            BrightnessCorrection filter = new BrightnessCorrection( -50 );
+            // apply the filter
+            filter.ApplyInPlace( image );
+            </code>
+            
+            <para><b>Initial image:</b></para>
+            <img src="img/imaging/sample1.jpg" width="480" height="361"/>
+            <para><b>Result image:</b></para>
+            <img src="img/imaging/brightness_correction.jpg" width="480" height="361"/>
+            </remarks>
+            
+            <seealso cref="T:AForge.Imaging.Filters.LevelsLinear"/>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.BrightnessCorrection.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.BrightnessCorrection"/> class.
+            </summary>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.BrightnessCorrection.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.BrightnessCorrection"/> class.
+            </summary>
+            
+            <param name="adjustValue">Brightness <see cref="P:AForge.Imaging.Filters.BrightnessCorrection.AdjustValue">adjust value</see>.</param>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.BrightnessCorrection.ProcessFilter(AForge.Imaging.UnmanagedImage,System.Drawing.Rectangle)">
+             <summary>
+             Process the filter on the specified image.
+             </summary>
+             
+             <param name="image">Source image data.</param>
+             <param name="rect">Image rectangle for processing by the filter.</param>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.BrightnessCorrection.AdjustValue">
+             <summary>
+             Brightness adjust value, [-255, 255].
+             </summary>
+             
+             <remarks>Default value is set to <b>10</b>, which corresponds to increasing
+             RGB values of each pixel by 10.</remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.BrightnessCorrection.FormatTranslations">
+             <summary>
+             Format translations dictionary.
+             </summary>
+             
+             <remarks><para>See <see cref="P:AForge.Imaging.Filters.IFilterInformation.FormatTranslations"/>
+             documentation for additional information.</para></remarks>
+            
+        </member>
         <member name="T:AForge.Imaging.Filters.StuckiDithering">
              <summary>
              Dithering using Stucki error diffusion.
@@ -3790,72 +3866,6 @@
             Format translations dictionary.
             </summary>
         </member>
-        <member name="T:AForge.Imaging.Filters.BrightnessCorrection">
-            <summary>
-            Brightness adjusting in HSL color space.
-            </summary>
-            
-            <remarks><para>The filter operates in <b>HSL</b> color space and adjusts
-            pixels' brightness value using luminance value of HSL color space, increasing it
-            or decreasing by specified percentage. The filters is based on <see cref="T:AForge.Imaging.Filters.HSLLinear"/>
-            filter, passing work to it after recalculating brightness
-            <see cref="P:AForge.Imaging.Filters.BrightnessCorrection.AdjustValue">adjust value</see> to input/output ranges of the
-            <see cref="T:AForge.Imaging.Filters.HSLLinear"/> filter.</para>
-            
-            <para>The filter accepts 24 and 32 bpp color images for processing.</para>
-            
-            <para>Sample usage:</para>
-            <code>
-            // create filter
-            BrightnessCorrection filter = new BrightnessCorrection( -0.15 );
-            // apply the filter
-            filter.ApplyInPlace( image );
-            </code>
-            
-            <para><b>Initial image:</b></para>
-            <img src="img/imaging/sample1.jpg" width="480" height="361"/>
-            <para><b>Result image:</b></para>
-            <img src="img/imaging/brightness_correction.jpg" width="480" height="361"/>
-            </remarks>
-            
-        </member>
-        <member name="M:AForge.Imaging.Filters.BrightnessCorrection.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.BrightnessCorrection"/> class.
-            </summary>
-            
-        </member>
-        <member name="M:AForge.Imaging.Filters.BrightnessCorrection.#ctor(System.Single)">
-            <summary>
-            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.BrightnessCorrection"/> class.
-            </summary>
-            
-            <param name="adjustValue">Brightness adjust value.</param>
-            
-        </member>
-        <member name="M:AForge.Imaging.Filters.BrightnessCorrection.ProcessFilter(AForge.Imaging.UnmanagedImage,System.Drawing.Rectangle)">
-             <summary>
-             Process the filter on the specified image.
-             </summary>
-             
-             <param name="image">Source image data.</param>
-             <param name="rect">Image rectangle for processing by the filter.</param>
-            
-        </member>
-        <member name="P:AForge.Imaging.Filters.BrightnessCorrection.AdjustValue">
-             <summary>
-             Brightness adjust value, [-1, 1].
-             </summary>
-             
-             <remarks>Default value is set to <b>0.1</b>, which corresponds to increasing
-             brightness by 10%.</remarks>
-            
-        </member>
-        <member name="P:AForge.Imaging.Filters.BrightnessCorrection.FormatTranslations">
-            <summary>
-            Format translations dictionary.
-            </summary>
-        </member>
         <member name="T:AForge.Imaging.Filters.Convolution">
             <summary>
             Convolution filter.
@@ -3872,8 +3882,8 @@
             different results, like blur image, sharpen it, find edges, etc.</para>
             
             <para>The filter accepts 8 and 16 bpp grayscale images and 24, 32, 48 and 64 bpp
-            color images for processing. Note: for 32 bpp and 64 bpp images, the alpha channel is
-            not processed anyhow with the specified kernel; its values are just copied as is. </para>
+            color images for processing. Note: depending on the value of <see cref="P:AForge.Imaging.Filters.Convolution.ProcessAlpha"/>
+            property, the alpha channel is either copied as is or processed with the kernel.</para>
             
             <para>Sample usage:</para>
             <code>
@@ -4002,6 +4012,20 @@
             (elements, which are not outside image).</para>
             
             <para>Default value is set to <see langword="true"/>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.Convolution.ProcessAlpha">
+            <summary>
+            Specifies if alpha channel must be processed or just copied.
+            </summary>
+            
+            <remarks><para>The property specifies the way how alpha channel is handled for 32 bpp
+            and 64 bpp images. If the property is set to <see langword="false"/>, then alpha
+            channel's values are just copied as is. If the property is set to <see langword="true"/>
+            then alpha channel is convolved using the specified kernel same way as RGB channels.</para>
+            
+            <para>Default value is set to <see langword="false"/>.</para>
             </remarks>
             
         </member>
@@ -4237,6 +4261,40 @@
             <remarks><para>Both specified points are included into the calculation rectangle.</para></remarks>
             
         </member>
+        <member name="M:AForge.Imaging.IntegralImage.GetHaarXWavelet(System.Int32,System.Int32,System.Int32)">
+             <summary>
+             Calculate horizontal (X) haar wavelet at the specified point.
+             </summary>
+             
+             <param name="x">X coordinate of the point to calculate wavelet at.</param>
+             <param name="y">Y coordinate of the point to calculate wavelet at.</param>
+             <param name="radius">Wavelet size to calculate.</param>
+             
+             <returns>Returns value of the horizontal wavelet at the specified point.</returns>
+            
+             <remarks><para>The method calculates horizontal wavelet, which is a difference
+             of two horizontally adjacent boxes' sums, i.e. <b>A-B</b>. A is the sum of rectangle with coordinates
+             (x, y-radius, x+radius-1, y+radius-1). B is the sum of rectangle with coordinates
+             (x-radius, y-radius, x-1, y+radiys-1).</para></remarks>
+            
+        </member>
+        <member name="M:AForge.Imaging.IntegralImage.GetHaarYWavelet(System.Int32,System.Int32,System.Int32)">
+             <summary>
+             Calculate vertical (Y) haar wavelet at the specified point.
+             </summary>
+             
+             <param name="x">X coordinate of the point to calculate wavelet at.</param>
+             <param name="y">Y coordinate of the point to calculate wavelet at.</param>
+             <param name="radius">Wavelet size to calculate.</param>
+             
+             <returns>Returns value of the vertical wavelet at the specified point.</returns>
+            
+             <remarks><para>The method calculates vertical wavelet, which is a difference
+             of two vertical adjacent boxes' sums, i.e. <b>A-B</b>. A is the sum of rectangle with coordinates
+             (x-radius, y, x+radius-1, y+radius-1). B is the sum of rectangle with coordinates
+             (x-radius, y-radius, x+radius-1, y-1).</para></remarks>
+            
+        </member>
         <member name="M:AForge.Imaging.IntegralImage.GetRectangleSumUnsafe(System.Int32,System.Int32,System.Int32,System.Int32)">
             <summary>
             Calculate sum of pixels in the specified rectangle without checking it's coordinates.
@@ -4350,6 +4408,16 @@
             </remarks>
             
         </member>
+        <member name="P:AForge.Imaging.IntegralImage.Width">
+            <summary>
+            Width of the source image the integral image was constructed for.
+            </summary>
+        </member>
+        <member name="P:AForge.Imaging.IntegralImage.Height">
+            <summary>
+            Height of the source image the integral image was constructed for.
+            </summary>
+        </member>
         <member name="P:AForge.Imaging.IntegralImage.InternalData">
             <summary>
             Provides access to internal array keeping integral image data.
@@ -4358,8 +4426,9 @@
             <remarks>
             <para><note>The array should be accessed by [y, x] indexing.</note></para>
             
-            <para><note>The array's size is [height+1, width+1]. The first row and column are filled with
-            zeros, what is done for more efficient calculation of rectangles' sums.</note></para>
+            <para><note>The array's size is [<see cref="P:AForge.Imaging.IntegralImage.Height"/>+1, <see cref="P:AForge.Imaging.IntegralImage.Width"/>+1]. The first
+            row and column are filled with zeros, what is done for more efficient calculation of
+            rectangles' sums.</note></para>
             </remarks>
             
         </member>
@@ -5218,6 +5287,10 @@
             <para>With the above kernel the convolution filter is just calculates each pixel's value
             in result image as average of 9 corresponding pixels in the source image.</para>
             
+            <para><note>By default this filter sets <see cref="P:AForge.Imaging.Filters.Convolution.ProcessAlpha"/> property to
+            <see langword="true"/>, so the alpha channel of 32 bpp and 64 bpp images is blurred as well.
+            </note></para>
+            
             <para>Sample usage:</para>
             <code>
             // create filter
@@ -5739,6 +5812,11 @@
             just a wrapper around the unmanaged image. So if unmanaged image is disposed, the
             managed image becomes no longer valid and accessing it will generate an exception.</para></remarks>
             
+            <exception cref="T:AForge.Imaging.InvalidImagePropertiesException">The unmanaged image has some invalid properties, which results
+            in failure of converting it to managed image. This may happen if user used the
+            <see cref="M:AForge.Imaging.UnmanagedImage.#ctor(System.IntPtr,System.Int32,System.Int32,System.Int32,System.Drawing.Imaging.PixelFormat)"/> constructor specifying some
+            invalid parameters.</exception>
+            
         </member>
         <member name="M:AForge.Imaging.UnmanagedImage.FromManagedImage(System.Drawing.Bitmap)">
             <summary>
@@ -5837,8 +5915,7 @@
              <param name="point">Point's coordiates to set color for.</param>
              <param name="color">Color to set for the pixel.</param>
              
-             <remarks><para><note>For images having 16 bpp per color plane, the method extends the specified color
-             value to 16 bit by multiplying it by 256.</note></para></remarks>
+             <remarks><para>See <see cref="M:AForge.Imaging.UnmanagedImage.SetPixel(System.Int32,System.Int32,System.Drawing.Color)"/> for more information.</para></remarks>
             
         </member>
         <member name="M:AForge.Imaging.UnmanagedImage.SetPixel(System.Int32,System.Int32,System.Drawing.Color)">
@@ -5851,7 +5928,66 @@
             <param name="color">Color to set for the pixel.</param>
             
             <remarks><para><note>For images having 16 bpp per color plane, the method extends the specified color
-            value to 16 bit by multiplying it by 256.</note></para></remarks>
+            value to 16 bit by multiplying it by 256.</note></para>
+            
+            <para>For grayscale images this method will calculate intensity value based on the below formula:
+            <code lang="none">
+            0.2125 * Red + 0.7154 * Green + 0.0721 * Blue
+            </code>
+            </para>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.Imaging.UnmanagedImage.SetPixel(System.Int32,System.Int32,System.Byte)">
+             <summary>
+             Set pixel with the specified coordinates to the specified value.
+             </summary>
+            
+             <param name="x">X coordinate of the pixel to set.</param>
+             <param name="y">Y coordinate of the pixel to set.</param>
+             <param name="value">Pixel value to set.</param>
+             
+             <remarks><para>The method sets all color components of the pixel to the specified value.
+             If it is a grayscale image, then pixel's intensity is set to the specified value.
+             If it is a color image, then pixel's R/G/B components are set to the same specified value
+             (if an image has alpha channel, then it is set to maximum value - 255 or 65535).</para>
+             
+             <para><note>For images having 16 bpp per color plane, the method extends the specified color
+             value to 16 bit by multiplying it by 256.</note></para>
+             </remarks>
+             
+        </member>
+        <member name="M:AForge.Imaging.UnmanagedImage.GetPixel(AForge.IntPoint)">
+             <summary>
+             Get color of the pixel with the specified coordinates.
+             </summary>
+             
+             <param name="point">Point's coordiates to get color of.</param>
+             
+             <returns>Return pixel's color at the specified coordinates.</returns>
+             
+             <remarks><para>See <see cref="M:AForge.Imaging.UnmanagedImage.GetPixel(System.Int32,System.Int32)"/> for more information.</para></remarks>
+            
+        </member>
+        <member name="M:AForge.Imaging.UnmanagedImage.GetPixel(System.Int32,System.Int32)">
+            <summary>
+            Get color of the pixel with the specified coordinates.
+            </summary>
+            
+            <param name="x">X coordinate of the pixel to get.</param>
+            <param name="y">Y coordinate of the pixel to get.</param>
+            
+            <returns>Return pixel's color at the specified coordinates.</returns>
+            
+            <remarks>
+            <para><note>In the case if the image has 8 bpp grayscale format, the method will return a color with
+            all R/G/B components set to same value, which is grayscale intensity.</note></para>
+            
+            <para><note>The method supports only 8 bpp grayscale images and 24/32 bpp color images so far.</note></para>
+            </remarks>
+            
+            <exception cref="T:System.ArgumentOutOfRangeException">The specified pixel coordinate is out of image's bounds.</exception>
+            <exception cref="T:AForge.Imaging.UnsupportedImageFormatException">Pixel format of this image is not supported by the method.</exception>
             
         </member>
         <member name="M:AForge.Imaging.UnmanagedImage.Collect16bppPixelValues(System.Collections.Generic.List{AForge.IntPoint})">
@@ -6905,76 +7041,6 @@
             Format translations dictionary.
             </summary>
         </member>
-        <member name="T:AForge.Imaging.Filters.ContrastCorrection">
-             <summary>
-             Contrast adjusting in HSL color space.
-             </summary>
-             
-             <remarks><para>The filter operates in <b>HSL</b> color space and adjusts
-             pixels contrast value using luminance value of HSL color space, increasing it
-             or decreasing by specified factor. The filters is based on <see cref="T:AForge.Imaging.Filters.HSLLinear"/>
-             filter, passing work to it after recalculating contrast
-             <see cref="P:AForge.Imaging.Filters.ContrastCorrection.Factor">factor</see> to input/output ranges of the
-             <see cref="T:AForge.Imaging.Filters.HSLLinear"/> filter.</para>
-             
-             <para>The filter accepts 24 and 32 bpp color images for processing.</para>
-             
-             <para>Sample usage:</para>
-             <code>
-             // create filter
-             ContrastCorrection filter = new ContrastCorrection( 2.0f );
-             // apply the filter
-             filter.ApplyInPlace( image );
-             </code>
-             
-             <para><b>Initial image:</b></para>
-             <img src="img/imaging/sample1.jpg" width="480" height="361"/>
-             <para><b>Result image:</b></para>
-             <img src="img/imaging/contrast_correction.jpg" width="480" height="361"/>
-             </remarks>
-            
-             
-        </member>
-        <member name="M:AForge.Imaging.Filters.ContrastCorrection.#ctor">
-            <summary>
-            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.ContrastCorrection"/> class.
-            </summary>
-            
-        </member>
-        <member name="M:AForge.Imaging.Filters.ContrastCorrection.#ctor(System.Single)">
-            <summary>
-            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.ContrastCorrection"/> class.
-            </summary>
-            
-            <param name="factor">Contrast adjusting factor.</param>
-            
-        </member>
-        <member name="M:AForge.Imaging.Filters.ContrastCorrection.ProcessFilter(AForge.Imaging.UnmanagedImage,System.Drawing.Rectangle)">
-             <summary>
-             Process the filter on the specified image.
-             </summary>
-             
-             <param name="image">Source image data.</param>
-             <param name="rect">Image rectangle for processing by the filter.</param>
-            
-        </member>
-        <member name="P:AForge.Imaging.Filters.ContrastCorrection.Factor">
-            <summary>
-            Contrast adjusting factor.
-            </summary>
-            
-            <remarks><para>Factor which is used to adjust contrast. Factor values greater than
-            1 increase contrast making light areas lighter and dark areas darker. Factor values
-            less than 1 decrease contrast - decreasing variety of contrast.</para>
-            
-            <para>Default value is set to <b>1.25</b>.</para></remarks>
-            
-        </member>
-        <member name="P:AForge.Imaging.Filters.ContrastCorrection.FormatTranslations">
-            <summary>
-            Format translations dictionary.
-            </summary>
-        </member>
         <member name="T:AForge.Imaging.Filters.Blur">
              <summary>
              Blur filter.
@@ -6993,6 +7059,10 @@
              
              <para>For the list of supported pixel formats, see the documentation to <see cref="T:AForge.Imaging.Filters.Convolution"/>
              filter.</para>
+             
+             <para><note>By default this filter sets <see cref="P:AForge.Imaging.Filters.Convolution.ProcessAlpha"/> property to
+             <see langword="true"/>, so the alpha channel of 32 bpp and 64 bpp images is blurred as well.
+             </note></para>
              
              <para>Sample usage:</para>
              <code>
@@ -8802,8 +8872,8 @@
             HSLFiltering filter = new HSLFiltering( );
             // set color ranges to keep
             filter.Hue = new IntRange( 335, 0 );
-            filter.Saturation = new Range( 0.6, 1 );
-            filter.Luminance = new Range( 0.1, 1 );
+            filter.Saturation = new Range( 0.6f, 1 );
+            filter.Luminance = new Range( 0.1f, 1 );
             // apply the filter
             filter.ApplyInPlace( image );
             </code>
@@ -8944,6 +9014,10 @@
              
              <para>For the list of supported pixel formats, see the documentation to <see cref="T:AForge.Imaging.Filters.Convolution"/>
              filter.</para>
+             
+             <para><note>By default this filter sets <see cref="P:AForge.Imaging.Filters.Convolution.ProcessAlpha"/> property to
+             <see langword="true"/>, so the alpha channel of 32 bpp and 64 bpp images is blurred as well.
+             </note></para>
              
              <para>Sample usage:</para>
              <code>
@@ -11252,6 +11326,159 @@
             </summary>
             
         </member>
+        <member name="T:AForge.Imaging.Filters.MaskedFilter">
+            <summary>
+            Apply filter according to the specified mask.
+            </summary>
+            
+            <remarks><para>The image processing routine applies the specified <see cref="P:AForge.Imaging.Filters.MaskedFilter.BaseFilter"/> to
+            a source image according to the specified mask - if a pixel/value in the specified mask image/array
+            is set to 0, then the original pixel's value is kept; otherwise the pixel is filtered using the
+            specified base filter.</para>
+            
+            <para>Mask can be specified as <see cref="P:AForge.Imaging.Filters.MaskedFilter.MaskImage">.NET's managed Bitmap</see>, as
+            <see cref="P:AForge.Imaging.Filters.MaskedFilter.UnmanagedMaskImage">UnmanagedImage</see> or as <see cref="P:AForge.Imaging.Filters.MaskedFilter.Mask">byte array</see>.
+            In the case if mask is specified as image, it must be 8 bpp grayscale image. In all case
+            mask size must be the same as size of the image to process.</para>
+            
+            <para><note>Pixel formats accepted by this filter are specified by the <see cref="P:AForge.Imaging.Filters.MaskedFilter.BaseFilter"/>.</note></para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // create the filter
+            MaskedFilter maskedFilter = new MaskedFilter( new Sepia( ), maskImage );
+            // apply the filter
+            maskedFilter.ApplyInPlace( image );
+            </code>
+            
+            <para><b>Initial image:</b></para>
+            <img src="img/imaging/sample1.jpg" width="480" height="361"/>
+            <para><b>Mask image:</b></para>
+            <img src="img/imaging/mask.png" width="480" height="361"/>
+            <para><b>Result image:</b></para>
+            <img src="img/imaging/masked_image.jpg" width="480" height="361"/>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.MaskedFilter.#ctor(AForge.Imaging.Filters.IFilter,System.Drawing.Bitmap)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.MaskedFilter"/> class.
+            </summary>
+            
+            <param name="baseFiler"><see cref="P:AForge.Imaging.Filters.MaskedFilter.BaseFilter">Base filter</see> to apply to the specified source image.</param>
+            <param name="maskImage"><see cref="P:AForge.Imaging.Filters.MaskedFilter.MaskImage">Mask image</see> to use.</param>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.MaskedFilter.#ctor(AForge.Imaging.Filters.IFilter,AForge.Imaging.UnmanagedImage)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.MaskedFilter"/> class.
+            </summary>
+            
+            <param name="baseFiler"><see cref="P:AForge.Imaging.Filters.MaskedFilter.BaseFilter">Base filter</see> to apply to the specified source image.</param>
+            <param name="unmanagedMaskImage"><see cref="P:AForge.Imaging.Filters.MaskedFilter.UnmanagedMaskImage">Unmanaged mask image</see> to use.</param>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.MaskedFilter.#ctor(AForge.Imaging.Filters.IFilter,System.Byte[0:,0:])">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.MaskedFilter"/> class.
+            </summary>
+            
+            <param name="baseFiler"><see cref="P:AForge.Imaging.Filters.MaskedFilter.BaseFilter">Base filter</see> to apply to the specified source image.</param>
+            <param name="mask"><see cref="P:AForge.Imaging.Filters.MaskedFilter.Mask"/> to use.</param>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.MaskedFilter.ProcessFilter(AForge.Imaging.UnmanagedImage,System.Drawing.Rectangle)">
+             <summary>
+             Process the filter on the specified image.
+             </summary>
+             
+             <param name="image">Source image data.</param>
+             <param name="rect">Image rectangle for processing by the filter.</param>
+             
+             <exception cref="T:System.NullReferenceException">None of the possible mask properties were set. Need to provide mask before applying the filter.</exception>
+             <exception cref="T:System.ArgumentException">Invalid size of provided mask. Its size must be the same as the size of the image to mask.</exception>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.MaskedFilter.BaseFilter">
+             <summary>
+             Base filter to apply to the source image.
+             </summary>
+            
+             <remarks><para>The property specifies base filter which is applied to the specified source
+             image (to all pixels which have corresponding none 0 value in mask image/array).</para>
+             
+             <para><note>The base filter must implement <see cref="T:AForge.Imaging.Filters.IFilterInformation"/> interface.</note></para>
+             
+             <para><note>The base filter must never change image's pixel format. For example, if source
+             image's pixel format is 24 bpp color image, then it must stay the same after the base
+             filter is applied.</note></para>
+             
+             <para><note>The base filter must never change size of the source image.</note></para>
+             </remarks>
+             
+             <exception cref="T:System.NullReferenceException">Base filter can not be set to null.</exception>
+             <exception cref="T:System.ArgumentException">The specified base filter must implement IFilterInformation interface.</exception>
+             <exception cref="T:System.ArgumentException">The specified filter must never change pixel format.</exception>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.MaskedFilter.MaskImage">
+            <summary>
+            Mask image to apply.
+            </summary>
+            
+            <remarks><para>The property specifies mask image to use. The image must be grayscale
+            (8 bpp format) and have the same size as the source image to process.</para>
+            
+            <para>When the property is set, both <see cref="P:AForge.Imaging.Filters.MaskedFilter.UnmanagedMaskImage"/> and
+            <see cref="P:AForge.Imaging.Filters.MaskedFilter.Mask"/> properties are set to <see langword="null"/>.</para>
+            </remarks>
+            
+            <exception cref="T:System.ArgumentException">The mask image must be 8 bpp grayscale image.</exception>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.MaskedFilter.UnmanagedMaskImage">
+            <summary>
+            Unmanaged mask image to apply.
+            </summary>
+            
+            <remarks><para>The property specifies unmanaged mask image to use. The image must be grayscale
+            (8 bpp format) and have the same size as the source image to process.</para>
+            
+            <para>When the property is set, both <see cref="P:AForge.Imaging.Filters.MaskedFilter.MaskImage"/> and
+            <see cref="P:AForge.Imaging.Filters.MaskedFilter.Mask"/> properties are set to <see langword="null"/>.</para>
+            </remarks>
+            
+            <exception cref="T:System.ArgumentException">The mask image must be 8 bpp grayscale image.</exception>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.MaskedFilter.Mask">
+            <summary>
+            Mask to apply.
+            </summary>
+            
+            <remarks><para>The property specifies mask array to use. Size of the array must
+            be the same size as the size of the source image to process - its 0<sup>th</sup> dimension
+            must be equal to image's height and its 1<sup>st</sup> dimension must be equal to width. For
+            example, for 640x480 image, the mask array must be defined as:
+            <code>
+            byte[,] mask = new byte[480, 640];
+            </code>
+            </para></remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.MaskedFilter.FormatTranslations">
+            <summary>
+            Format translations dictionary.
+            </summary>
+            
+            <remarks><para>See <see cref="P:AForge.Imaging.Filters.IFilterInformation.FormatTranslations"/>
+            documentation for additional information.</para>
+            
+            <para><note>The property returns format translation table from the
+            <see cref="P:AForge.Imaging.Filters.MaskedFilter.BaseFilter"/>.</note></para>
+            </remarks>
+            
+        </member>
         <member name="T:AForge.Imaging.Filters.Jitter">
             <summary>
             Jitter filter.
@@ -13492,6 +13719,18 @@
             or <see cref="M:AForge.Imaging.BlobCounterBase.ExtractBlobsImage(AForge.Imaging.UnmanagedImage,AForge.Imaging.Blob,System.Boolean)"/> method.</para></remarks>
             
         </member>
+        <member name="M:AForge.Imaging.Blob.#ctor(AForge.Imaging.Blob)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Blob"/> class.
+            </summary>
+            
+            <param name="source">Source blob to copy.</param>
+            
+            <remarks><para>This copy constructor leaves <see cref="P:AForge.Imaging.Blob.Image"/> property not initialized. The blob's
+            image may be extracted later using <see cref="M:AForge.Imaging.BlobCounterBase.ExtractBlobsImage(System.Drawing.Bitmap,AForge.Imaging.Blob,System.Boolean)"/>
+            or <see cref="M:AForge.Imaging.BlobCounterBase.ExtractBlobsImage(AForge.Imaging.UnmanagedImage,AForge.Imaging.Blob,System.Boolean)"/> method.</para></remarks>
+            
+        </member>
         <member name="P:AForge.Imaging.Blob.Image">
              <summary>
              Blob's image.
@@ -14159,6 +14398,86 @@
             documentation for additional information.</para></remarks>
             
         </member>
+        <member name="T:AForge.Imaging.Filters.HorizontalRunLengthSmoothing">
+             <summary>
+             Horizontal run length smoothing algorithm.
+             </summary>
+             
+             <remarks><para>The class implements horizontal run length smoothing algorithm, which
+             is described in: <b>K.Y. Wong, R.G. Casey and F.M. Wahl, "Document analysis system,"
+             IBM J. Res. Devel., Vol. 26, NO. 6,111). 647-656, 1982.</b></para>
+             
+             <para>Unlike the original description of this algorithm, this implementation must be applied
+             to inverted binary images containing document, i.e. white text on black background. So this
+             implementation fills horizontal black gaps between white pixels.</para>
+             
+             <para><note>This algorithm is usually used together with <see cref="T:AForge.Imaging.Filters.VerticalRunLengthSmoothing"/>,
+             <see cref="T:AForge.Imaging.Filters.Intersect"/> and then further analysis of white blobs.</note></para>
+             
+             <para>The filter accepts 8 bpp grayscale images, which are supposed to be binary inverted documents.</para>
+             
+             <para>Sample usage:</para>
+             <code>
+             // create filter
+             HorizontalRunLengthSmoothing hrls = new HorizontalRunLengthSmoothing( 32 );
+             // apply the filter
+             hrls.ApplyInPlace( image );
+             </code>
+            
+             <para><b>Source image:</b></para>
+             <img src="img/imaging/sample24.png" width="480" height="320"/>
+             <para><b>Result image:</b></para>
+             <img src="img/imaging/hrls.png" width="480" height="320"/>
+             </remarks>
+             
+             <seealso cref="T:AForge.Imaging.Filters.VerticalRunLengthSmoothing"/>
+             
+        </member>
+        <member name="M:AForge.Imaging.Filters.HorizontalRunLengthSmoothing.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.HorizontalRunLengthSmoothing"/> class.
+            </summary>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.HorizontalRunLengthSmoothing.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.HorizontalRunLengthSmoothing"/> class.
+            </summary>
+            
+            <param name="maxGapSize">Maximum gap size to fill (see <see cref="P:AForge.Imaging.Filters.HorizontalRunLengthSmoothing.MaxGapSize"/>).</param>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.HorizontalRunLengthSmoothing.ProcessFilter(AForge.Imaging.UnmanagedImage,System.Drawing.Rectangle)">
+             <summary>
+             Process the filter on the specified image.
+             </summary>
+             
+             <param name="image">Source image data.</param>
+             <param name="rect">Image rectangle for processing by the filter.</param>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.HorizontalRunLengthSmoothing.MaxGapSize">
+             <summary>
+             Maximum gap size to fill (in pixels).
+             </summary>
+             
+             <remarks><para>The property specifies maximum horizontal gap between white pixels to fill.
+             If number of black pixels between some white pixels is bigger than this value, then those
+             black pixels are left as is; otherwise the gap is filled with white pixels.
+             </para>
+             
+             <para>Default value is set to <b>10</b>. Minimum value is 1. Maximum value is 1000.</para></remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.HorizontalRunLengthSmoothing.FormatTranslations">
+            <summary>
+            Format translations dictionary.
+            </summary>
+            
+            <remarks><para>See <see cref="P:AForge.Imaging.Filters.IFilterInformation.FormatTranslations"/>
+            documentation for additional information.</para></remarks>
+            
+        </member>
         <member name="T:AForge.Imaging.Filters.ExtractBiggestBlob">
             <summary>
             Extract the biggest blob from image.
@@ -14781,6 +15100,159 @@
             <para>Default value is set to <see langword="true"/>.</para></remarks>
             
         </member>
+        <member name="T:AForge.Imaging.Filters.BilateralSmoothing">
+             <summary>
+             Bilateral filter implementation - edge preserving smoothing and noise reduction that uses chromatic and spatial factors.
+             </summary>
+             
+             <remarks>
+             <para>Bilateral filter conducts "selective" Gaussian smoothing of areas of same color (domains) which removes noise and contrast artifacts
+             while preserving sharp edges.</para>
+             
+             <para>Two major parameters <see cref="P:AForge.Imaging.Filters.BilateralSmoothing.SpatialFactor"/> and <see cref="P:AForge.Imaging.Filters.BilateralSmoothing.ColorFactor"/> define the result of the filter. 
+             By changing these parameters you may achieve either only noise reduction with little change to the
+             image or get nice looking effect to the entire image.</para>
+            
+             <para>Although the filter can use parallel processing large <see cref="P:AForge.Imaging.Filters.BilateralSmoothing.KernelSize"/> values
+             (greater than 25) on high resolution images may decrease speed of processing. Also on high
+             resolution images small <see cref="P:AForge.Imaging.Filters.BilateralSmoothing.KernelSize"/> values (less than 9) may not provide noticeable
+             results.</para>
+             
+             <para>More details on the algorithm can be found by following this
+             <a href="http://saplin.blogspot.com/2012/01/bilateral-image-filter-edge-preserving.html">link</a>.</para>
+             
+             <para>The filter accepts 8 bpp grayscale images and 24/32 bpp color images for processing.</para>
+             
+             <para>Sample usage:</para>
+             <code>
+             // create filter
+             BilateralSmoothing filter = new BilateralSmoothing( );
+             filter.KernelSize    = 7;
+             filter.SpatialFactor = 10;
+             filter.ColorFactor   = 60;
+             filter.ColorPower    = 0.5;
+             // apply the filter
+             filter.ApplyInPlace( image );
+             </code>
+             
+             <para><b>Initial image:</b></para>
+             <img src="img/imaging/sample13.png" width="480" height="361"/>
+             <para><b>Result image:</b></para>
+             <img src="img/imaging/bilateral.jpg" width="480" height="361"/>
+             </remarks>
+             
+        </member>
+        <member name="M:AForge.Imaging.Filters.BilateralSmoothing.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.BilateralSmoothing"/> class.
+            </summary>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.BilateralSmoothing.ProcessFilter(AForge.Imaging.UnmanagedImage,AForge.Imaging.UnmanagedImage,System.Drawing.Rectangle)">
+            <summary>
+            Process the filter on the specified image.
+            </summary>
+            
+            <param name="source">Source image data.</param>
+            <param name="destination">Destination image data.</param>
+            <param name="rect">Image rectangle for processing by the filter.</param>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.BilateralSmoothing.LimitKernelSize">
+            <summary>
+            Specifies if exception must be thrown in the case a large
+            <see cref="P:AForge.Imaging.Filters.BilateralSmoothing.KernelSize">kernel size</see> is used which may lead
+            to significant performance issues.
+            </summary>
+            
+            <remarks>
+            <para>Default value is set to <see langword="true"/>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.BilateralSmoothing.EnableParallelProcessing">
+            <summary>
+            Enable or not parallel processing on multi-core CPUs.
+            </summary>
+            
+            <remarks><para>If the property is set to <see langword="true"/>, then this image processing
+            routine will run in parallel on the systems with multiple core/CPUs. The <see cref="M:AForge.Parallel.For(System.Int32,System.Int32,AForge.Parallel.ForLoopBody)"/>
+            is used to make it parallel.</para>
+            
+            <para>Default value is set to <see langword="false"/>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.BilateralSmoothing.KernelSize">
+            <summary>
+            Size of a square for limiting surrounding pixels that take part in calculations, [3, 255].
+            </summary>
+            
+            <remarks><para>The greater the value the more is the general power of the filter. Small values
+            (less than 9) on high resolution images (3000 pixels wide) do not give significant results.
+            Large values increase the number of calculations and degrade performance.</para>
+            
+            <para><note>The value of this property must be an odd integer in the [3, 255] range if
+            <see cref="P:AForge.Imaging.Filters.BilateralSmoothing.LimitKernelSize"/> is set to <see langword="false"/> or in the [3, 25] range
+            otherwise.</note></para>
+            
+            <para>Default value is set to <b>9</b>.</para>
+            </remarks>
+            
+            <exception cref="T:System.ArgumentOutOfRangeException">The specified value is out of range (see
+            eception message for details).</exception>
+            <exception cref="T:System.ArgumentException">The value of this must be an odd integer.</exception>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.BilateralSmoothing.SpatialFactor">
+            <summary>
+            Determines smoothing power within a color domain (neighbor pixels of similar color).
+            </summary>
+            
+            <remarks>
+            <para>Default value is set to <b>10</b>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.BilateralSmoothing.SpatialPower">
+            <summary>
+            Exponent power, used in Spatial function calculation.
+            </summary>
+            
+            <remarks>
+            <para>Default value is set to <b>2</b>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.BilateralSmoothing.ColorFactor">
+            <summary>
+            Determines the variance of color for a color domain .
+            </summary>
+            
+            <remarks>
+            <para>Default value is set to <b>50</b>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.BilateralSmoothing.ColorPower">
+            <summary>
+            Exponent power, used in Color function calculation.
+            </summary>
+            
+            <remarks>
+            <para>Default value is set to <b>2</b>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.BilateralSmoothing.FormatTranslations">
+             <summary>
+             Format translations dictionary.
+             </summary>
+             
+             <remarks><para>See <see cref="P:AForge.Imaging.Filters.IFilterInformation.FormatTranslations"/>
+             documentation for additional information.</para></remarks>
+            
+        </member>
         <member name="T:AForge.Imaging.Filters.Opening">
              <summary>
              Opening operator from Mathematical Morphology.
@@ -15185,6 +15657,86 @@
             <param name="index">Index of filter to get.</param>
             
             <returns>Returns filter at specified index.</returns>
+            
+        </member>
+        <member name="T:AForge.Imaging.Filters.ContrastCorrection">
+             <summary>
+             Contrast adjusting in RGB color space.
+             </summary>
+             
+             <remarks><para>The filter operates in <b>RGB</b> color space and adjusts
+             pixels' contrast value by increasing RGB values of bright pixel and decreasing
+             RGB values of dark pixels (or vise versa if contrast needs to be decreased).
+             The filter is based on <see cref="T:AForge.Imaging.Filters.LevelsLinear"/>
+             filter and simply sets all input ranges to (<see cref="P:AForge.Imaging.Filters.ContrastCorrection.Factor"/>, 255-<see cref="P:AForge.Imaging.Filters.ContrastCorrection.Factor"/>) and
+             all output range to (0, 255) in the case if the factor value is positive.
+             If the factor value is negative, then all input ranges are set to
+             (0, 255 ) and all output ranges are set to
+             (-<see cref="P:AForge.Imaging.Filters.ContrastCorrection.Factor"/>, 255_<see cref="P:AForge.Imaging.Filters.ContrastCorrection.Factor"/>).</para>
+             
+             <para>See <see cref="T:AForge.Imaging.Filters.LevelsLinear"/> documentation forr more information about the base filter.</para>
+             
+             <para>The filter accepts 8 bpp grayscale and 24/32 bpp color images for processing.</para>
+            
+             <para>Sample usage:</para>
+             <code>
+             // create filter
+             ContrastCorrection filter = new ContrastCorrection( 15 );
+             // apply the filter
+             filter.ApplyInPlace( image );
+             </code>
+             
+             <para><b>Initial image:</b></para>
+             <img src="img/imaging/sample1.jpg" width="480" height="361"/>
+             <para><b>Result image:</b></para>
+             <img src="img/imaging/contrast_correction.jpg" width="480" height="361"/>
+             </remarks>
+            
+             <seealso cref="T:AForge.Imaging.Filters.LevelsLinear"/>
+             
+        </member>
+        <member name="M:AForge.Imaging.Filters.ContrastCorrection.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.ContrastCorrection"/> class.
+            </summary>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.ContrastCorrection.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.ContrastCorrection"/> class.
+            </summary>
+            
+            <param name="factor">Contrast <see cref="P:AForge.Imaging.Filters.ContrastCorrection.Factor">adjusting factor</see>.</param>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.ContrastCorrection.ProcessFilter(AForge.Imaging.UnmanagedImage,System.Drawing.Rectangle)">
+             <summary>
+             Process the filter on the specified image.
+             </summary>
+             
+             <param name="image">Source image data.</param>
+             <param name="rect">Image rectangle for processing by the filter.</param>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.ContrastCorrection.Factor">
+            <summary>
+            Contrast adjusting factor, [-127, 127].
+            </summary>
+            
+            <remarks><para>Factor which is used to adjust contrast. Factor values greater than
+            0 increase contrast making light areas lighter and dark areas darker. Factor values
+            less than 0 decrease contrast - decreasing variety of contrast.</para>
+            
+            <para>Default value is set to <b>10</b>.</para></remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.ContrastCorrection.FormatTranslations">
+             <summary>
+             Format translations dictionary.
+             </summary>
+             
+             <remarks><para>See <see cref="P:AForge.Imaging.Filters.IFilterInformation.FormatTranslations"/>
+             documentation for additional information.</para></remarks>
             
         </member>
         <member name="T:AForge.Imaging.Textures.MarbleTexture">
@@ -15648,6 +16200,86 @@
             Format translations dictionary.
             </summary>
         </member>
+        <member name="T:AForge.Imaging.Filters.VerticalRunLengthSmoothing">
+            <summary>
+            Vertical run length smoothing algorithm.
+            </summary>
+            
+            <remarks><para>The class implements vertical run length smoothing algorithm, which
+            is described in: <b>K.Y. Wong, R.G. Casey and F.M. Wahl, "Document analysis system,"
+            IBM J. Res. Devel., Vol. 26, NO. 6,111). 647-656, 1982.</b></para>
+            
+            <para>Unlike the original description of this algorithm, this implementation must be applied
+            to inverted binary images containing document, i.e. white text on black background. So this
+            implementation fills vertical black gaps between white pixels.</para>
+            
+            <para><note>This algorithm is usually used together with <see cref="T:AForge.Imaging.Filters.HorizontalRunLengthSmoothing"/>,
+            <see cref="T:AForge.Imaging.Filters.Intersect"/> and then further analysis of white blobs.</note></para>
+            
+            <para>The filter accepts 8 bpp grayscale images, which are supposed to be binary inverted documents.</para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // create filter
+            VerticalRunLengthSmoothing vrls = new VerticalRunLengthSmoothing( 32 );
+            // apply the filter
+            vrls.ApplyInPlace( image );
+            </code>
+            
+            <para><b>Source image:</b></para>
+            <img src="img/imaging/sample24.png" width="480" height="320"/>
+            <para><b>Result image:</b></para>
+            <img src="img/imaging/vrls.png" width="480" height="320"/>
+            </remarks>
+            
+            <see cref="T:AForge.Imaging.Filters.HorizontalRunLengthSmoothing"/>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.VerticalRunLengthSmoothing.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.VerticalRunLengthSmoothing"/> class.
+            </summary>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.VerticalRunLengthSmoothing.#ctor(System.Int32)">
+             <summary>
+             Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.VerticalRunLengthSmoothing"/> class.
+             </summary>
+             
+             <param name="maxGapSize">Maximum gap size to fill (see <see cref="P:AForge.Imaging.Filters.VerticalRunLengthSmoothing.MaxGapSize"/>).</param>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.VerticalRunLengthSmoothing.ProcessFilter(AForge.Imaging.UnmanagedImage,System.Drawing.Rectangle)">
+             <summary>
+             Process the filter on the specified image.
+             </summary>
+             
+             <param name="image">Source image data.</param>
+             <param name="rect">Image rectangle for processing by the filter.</param>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.VerticalRunLengthSmoothing.MaxGapSize">
+             <summary>
+             Maximum gap size to fill (in pixels).
+             </summary>
+             
+             <remarks><para>The property specifies maximum vertical gap between white pixels to fill.
+             If number of black pixels between some white pixels is bigger than this value, then those
+             black pixels are left as is; otherwise the gap is filled with white pixels.
+             </para>
+             
+             <para>Default value is set to <b>10</b>. Minimum value is 1. Maximum value is 1000.</para></remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.VerticalRunLengthSmoothing.FormatTranslations">
+            <summary>
+            Format translations dictionary.
+            </summary>
+            
+            <remarks><para>See <see cref="P:AForge.Imaging.Filters.IFilterInformation.FormatTranslations"/>
+            documentation for additional information.</para></remarks>
+            
+        </member>
         <member name="T:AForge.Imaging.Filters.SaltAndPepperNoise">
             <summary>
             Salt and pepper noise.
@@ -16037,6 +16669,89 @@
             </summary>
             
             <remarks><para>Default value is set to <b>0</b>.</para></remarks>
+            
+        </member>
+        <member name="T:AForge.Imaging.Filters.BayerPattern">
+            <summary>
+            Set of Bayer patterns supported by <see cref="T:AForge.Imaging.Filters.BayerFilterOptimized"/>.
+            </summary>
+        </member>
+        <member name="F:AForge.Imaging.Filters.BayerPattern.GRBG">
+            <summary>
+            Pattern:<br /><br />
+            G R<br />
+            B G
+            </summary>
+        </member>
+        <member name="F:AForge.Imaging.Filters.BayerPattern.BGGR">
+            <summary>
+            Pattern:<br /><br />
+            B G<br />
+            G R
+            </summary>
+        </member>
+        <member name="T:AForge.Imaging.Filters.BayerFilterOptimized">
+            <summary>
+            Optimized Bayer fileter image processing routine.
+            </summary>
+            
+            <remarks><para>The class implements <a href="http://en.wikipedia.org/wiki/Bayer_filter">Bayer filter</a>
+            routine, which creates color image out of grayscale image produced by image sensor built with
+            Bayer color matrix.</para>
+            
+            <para>This class does all the same as <see cref="T:AForge.Imaging.Filters.BayerFilter"/> class. However this version is
+            optimized for some well known patterns defined in <see cref="T:AForge.Imaging.Filters.BayerPattern"/> enumeration.
+            Also this class processes images with even width and height only. Image size must be at least 2x2 pixels.
+            </para>
+            
+            <para>The filter accepts 8 bpp grayscale images and produces 24 bpp RGB image.</para>
+            
+            <para>Sample usage:</para>
+            <code>
+            // create filter
+            BayerFilter filter = new BayerFilter( );
+            // apply the filter
+            Bitmap rgbImage = filter.Apply( image );
+            </code>
+            </remarks>
+            
+            <seealso cref="T:AForge.Imaging.Filters.BayerFilter"/>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.BayerFilterOptimized.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.BayerFilterOptimized"/> class.
+            </summary>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.BayerFilterOptimized.ProcessFilter(AForge.Imaging.UnmanagedImage,AForge.Imaging.UnmanagedImage)">
+            <summary>
+            Process the filter on the specified image.
+            </summary>
+            
+            <param name="sourceData">Source image data.</param>
+            <param name="destinationData">Destination image data.</param>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.BayerFilterOptimized.Pattern">
+            <summary>
+            Bayer pattern of source images to decode.
+            </summary>
+            
+            <remarks><para>The property specifies Bayer pattern of source images to be
+            decoded into color images.</para>
+            
+            <para>Default value is set to <see cref="F:AForge.Imaging.Filters.BayerPattern.GRBG"/>.</para>
+            </remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.BayerFilterOptimized.FormatTranslations">
+            <summary>
+            Format translations dictionary.
+            </summary>
+            
+            <remarks><para>See <see cref="P:AForge.Imaging.Filters.IFilterInformation.FormatTranslations"/>
+            documentation for additional information.</para></remarks>
             
         </member>
         <member name="T:AForge.Imaging.Filters.ColorRemapping">
@@ -16948,15 +17663,19 @@
         </member>
         <member name="T:AForge.Imaging.Filters.BayerFilter">
             <summary>
-            Bayer fileter image processing routine.
+            Generic Bayer fileter image processing routine.
             </summary>
             
             <remarks><para>The class implements <a href="http://en.wikipedia.org/wiki/Bayer_filter">Bayer filter</a>
             routine, which creates color image out of grayscale image produced by image sensor built with
             Bayer color matrix.</para>
             
-            <para>The filter accepts 8 bpp grayscale images and produces
-            24 bpp RGB image.</para>
+            <para>This Bayer filter implementation is made generic by allowing user to specify used
+            <see cref="P:AForge.Imaging.Filters.BayerFilter.BayerPattern">Bayer pattern</see>. This makes it slower. For optimized version
+            of the Bayer filter see <see cref="T:AForge.Imaging.Filters.BayerFilterOptimized"/> class, which implements Bayer filter
+            specifically optimized for some well known patterns.</para>
+            
+            <para>The filter accepts 8 bpp grayscale images and produces 24 bpp RGB image.</para>
             
             <para>Sample usage:</para>
             <code>
@@ -16967,10 +17686,12 @@
             </code>
             
             <para><b>Source image:</b></para>
-            <img src="img/imaging/sample23.png" width="640" height="480" />
+            <img src="img/imaging/sample23.png" width="640" height="480"/>
             <para><b>Result image:</b></para>
-            <img src="img/imaging/bayer_filter.jpg" width="640" height="480" />
+            <img src="img/imaging/bayer_filter.jpg" width="640" height="480"/>
             </remarks>
+            
+            <see cref="T:AForge.Imaging.Filters.BayerFilterOptimized"/>
             
         </member>
         <member name="M:AForge.Imaging.Filters.BayerFilter.#ctor">
@@ -17015,12 +17736,12 @@
             
             <para>By default the property is set to:
             <code>
-            new int[2, 2] { { RGB.G, RGB.B }, { RGB.R, RGB.G } }
+            new int[2, 2] { { RGB.G, RGB.R }, { RGB.B, RGB.G } }
             </code>,
             which corresponds to
             <code lang="none">
-            G B
-            R G
+            G R
+            B G
             </code>
             pattern.
             </para>
@@ -17148,8 +17869,12 @@
             <remarks><para>The class allows to do drawing of some primitives directly on
             locked image data or unmanaged image.</para>
             
-            <para>All methods of this class support drawing only on color 24/32 bpp images and
-            on grayscale 8 bpp indexed images.</para>
+            <para><note>All methods of this class support drawing only on color 24/32 bpp images and
+            on grayscale 8 bpp indexed images.</note></para>
+            
+            <para><note>When it comes to alpha blending for 24/32 bpp images, all calculations are done
+            as described on <a href="http://en.wikipedia.org/wiki/Alpha_compositing#Description">Wikipeadia</a>
+            (see "over" operator).</note></para>
             </remarks>
             
         </member>
@@ -17541,6 +18266,114 @@
             
             <remarks>The property is used to set both <see cref="P:AForge.Imaging.Filters.Pixellate.PixelWidth"/> and
             <see cref="P:AForge.Imaging.Filters.Pixellate.PixelHeight"/> simultaneously.</remarks>
+            
+        </member>
+        <member name="T:AForge.Imaging.Filters.ApplyMask">
+            <summary>
+            Apply mask to the specified image.
+            </summary>
+            
+            <remarks><para>The filter applies mask to the specified image - keeps all pixels
+            in the image if corresponding pixels/values of the mask are not equal to 0. For all
+            0 pixels/values in mask, corresponding pixels in the source image are set to 0.</para>
+            
+            <para>Mask can be specified as <see cref="P:AForge.Imaging.Filters.ApplyMask.MaskImage">.NET's managed Bitmap</see>, as
+            <see cref="P:AForge.Imaging.Filters.ApplyMask.UnmanagedMaskImage">UnmanagedImage</see> or as <see cref="P:AForge.Imaging.Filters.ApplyMask.Mask">byte array</see>.
+            In the case if mask is specified as image, it must be 8 bpp grayscale image. In all case
+            mask size must be the same as size of the image to process.</para>
+            
+            <para>The filter accepts 8/16 bpp grayscale and 24/32/48/64 bpp color images for processing.</para>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.ApplyMask.#ctor(System.Drawing.Bitmap)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.ApplyMask"/> class.
+            </summary>
+            
+            <param name="maskImage"><see cref="P:AForge.Imaging.Filters.ApplyMask.MaskImage">Mask image</see> to use.</param>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.ApplyMask.#ctor(AForge.Imaging.UnmanagedImage)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.ApplyMask"/> class.
+            </summary>
+            
+            <param name="unmanagedMaskImage"><see cref="P:AForge.Imaging.Filters.ApplyMask.UnmanagedMaskImage">Unmanaged mask image</see> to use.</param>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.ApplyMask.#ctor(System.Byte[0:,0:])">
+            <summary>
+            Initializes a new instance of the <see cref="T:AForge.Imaging.Filters.ApplyMask"/> class.
+            </summary>
+            
+            <param name="mask"><see cref="P:AForge.Imaging.Filters.ApplyMask.Mask"/> to use.</param>
+            
+        </member>
+        <member name="M:AForge.Imaging.Filters.ApplyMask.ProcessFilter(AForge.Imaging.UnmanagedImage,System.Drawing.Rectangle)">
+             <summary>
+             Process the filter on the specified image.
+             </summary>
+             
+             <param name="image">Source image data.</param>
+             <param name="rect">Image rectangle for processing by the filter.</param>
+             
+             <exception cref="T:System.NullReferenceException">None of the possible mask properties were set. Need to provide mask before applying the filter.</exception>
+             <exception cref="T:System.ArgumentException">Invalid size of provided mask. Its size must be the same as the size of the image to mask.</exception>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.ApplyMask.MaskImage">
+            <summary>
+            Mask image to apply.
+            </summary>
+            
+            <remarks><para>The property specifies mask image to use. The image must be grayscale
+            (8 bpp format) and have the same size as the source image to process.</para>
+            
+            <para>When the property is set, both <see cref="P:AForge.Imaging.Filters.ApplyMask.UnmanagedMaskImage"/> and
+            <see cref="P:AForge.Imaging.Filters.ApplyMask.Mask"/> properties are set to <see langword="null"/>.</para>
+            </remarks>
+            
+            <exception cref="T:System.ArgumentException">The mask image must be 8 bpp grayscale image.</exception>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.ApplyMask.UnmanagedMaskImage">
+            <summary>
+            Unmanaged mask image to apply.
+            </summary>
+            
+            <remarks><para>The property specifies unmanaged mask image to use. The image must be grayscale
+            (8 bpp format) and have the same size as the source image to process.</para>
+            
+            <para>When the property is set, both <see cref="P:AForge.Imaging.Filters.ApplyMask.MaskImage"/> and
+            <see cref="P:AForge.Imaging.Filters.ApplyMask.Mask"/> properties are set to <see langword="null"/>.</para>
+            </remarks>
+            
+            <exception cref="T:System.ArgumentException">The mask image must be 8 bpp grayscale image.</exception>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.ApplyMask.Mask">
+            <summary>
+            Mask to apply.
+            </summary>
+            
+            <remarks><para>The property specifies mask array to use. Size of the array must
+            be the same size as the size of the source image to process - its 0<sup>th</sup> dimension
+            must be equal to image's height and its 1<sup>st</sup> dimension must be equal to width. For
+            example, for 640x480 image, the mask array must be defined as:
+            <code>
+            byte[,] mask = new byte[480, 640];
+            </code>
+            </para></remarks>
+            
+        </member>
+        <member name="P:AForge.Imaging.Filters.ApplyMask.FormatTranslations">
+            <summary>
+            Format translations dictionary.
+            </summary>
+            
+            <remarks><para>See <see cref="P:AForge.Imaging.Filters.IFilterInformation.FormatTranslations"/>
+            documentation for additional information.</para></remarks>
             
         </member>
         <member name="T:AForge.Imaging.Filters.CannyEdgeDetector">

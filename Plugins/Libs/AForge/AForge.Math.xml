@@ -73,23 +73,23 @@
             
         </member>
         <member name="T:AForge.Math.Histogram">
-            <summary>
-            Histogram for discrete random values.
-            </summary>
-            
-            <remarks><para>The class wraps histogram for discrete stochastic function, which is represented
-            by integer array, where indexes of the array are treated as values of the stochastic function,
-            but array values are treated as "probabilities" (total amount of hits).
-            </para>
-            
-            <para>Sample usage:</para>
-            <code>
-            // create histogram
-            Histogram histogram = new Histogram( new int[10] { 0, 0, 1, 3, 6, 8, 11, 0, 0, 0 } );
-            // get mean and standard deviation values
-            System.Diagnostics.Debug.WriteLine( "mean = " + histogram.Mean + ", std.dev = " + histogram.StdDev );
-            </code>
-            </remarks>
+             <summary>
+             Histogram for discrete random values.
+             </summary>
+             
+             <remarks><para>The class wraps histogram for discrete stochastic function, which is represented
+             by integer array, where indexes of the array are treated as values of the stochastic function,
+             but array values are treated as "probabilities" (total amount of hits).
+             </para>
+             
+             <para>Sample usage:</para>
+             <code>
+             // create histogram
+             Histogram histogram = new Histogram( new int[10] { 0, 0, 1, 3, 6, 8, 11, 0, 0, 0 } );
+             // get mean and standard deviation values
+             Console.WriteLine( "mean = " + histogram.Mean + ", std.dev = " + histogram.StdDev );
+             </code>
+             </remarks>
             
         </member>
         <member name="M:AForge.Math.Histogram.#ctor(System.Int32[])">
@@ -123,7 +123,7 @@
             // get 50% range
             IntRange range = histogram.GetRange( 0.5 );
             // show the range ([4, 6])
-            System.Diagnostics.Debug.WriteLine( "50% range = [" + range.Min + ", " + range.Max + "]" );
+            Console.WriteLine( "50% range = [" + range.Min + ", " + range.Max + "]" );
             </code>
             </remarks>
             
@@ -162,7 +162,7 @@
             // create histogram
             Histogram histogram = new Histogram( new int[10] { 0, 0, 1, 3, 6, 8, 11, 0, 0, 0 } );
             // get mean value (= 4.862)
-            System.Diagnostics.Debug.WriteLine( "mean = " + histogram.Mean.ToString( "F3" ) );
+            Console.WriteLine( "mean = " + histogram.Mean.ToString( "F3" ) );
             </code>
             </remarks>
             
@@ -179,7 +179,7 @@
             // create histogram
             Histogram histogram = new Histogram( new int[10] { 0, 0, 1, 3, 6, 8, 11, 0, 0, 0 } );
             // get std.dev. value (= 1.136)
-            System.Diagnostics.Debug.WriteLine( "std.dev. = " + histogram.StdDev.ToString( "F3" ) );
+            Console.WriteLine( "std.dev. = " + histogram.StdDev.ToString( "F3" ) );
             </code>
             </remarks>
             
@@ -196,7 +196,7 @@
             // create histogram
             Histogram histogram = new Histogram( new int[10] { 0, 0, 1, 3, 6, 8, 11, 0, 0, 0 } );
             // get median value (= 5)
-            System.Diagnostics.Debug.WriteLine( "median = " + histogram.Median );
+            Console.WriteLine( "median = " + histogram.Median );
             </code>
             </remarks>
             
@@ -214,7 +214,7 @@
             // create histogram
             Histogram histogram = new Histogram( new int[10] { 0, 0, 1, 3, 6, 8, 11, 0, 0, 0 } );
             // get min value (= 2)
-            System.Diagnostics.Debug.WriteLine( "min = " + histogram.Min );
+            Console.WriteLine( "min = " + histogram.Min );
             </code>
             </remarks>
             
@@ -232,10 +232,28 @@
             // create histogram
             Histogram histogram = new Histogram( new int[10] { 0, 0, 1, 3, 6, 8, 11, 0, 0, 0 } );
             // get max value (= 6)
-            System.Diagnostics.Debug.WriteLine( "max = " + histogram.Max );
+            Console.WriteLine( "max = " + histogram.Max );
             </code>
             </remarks>
             
+        </member>
+        <member name="P:AForge.Math.Histogram.TotalCount">
+             <summary>
+             Total count of values.
+             </summary>
+             
+             <remarks><para>The property represents total count of values contributed to the histogram, which is
+             essentially sum of the <see cref="P:AForge.Math.Histogram.Values"/> array.</para>
+            
+             <para>Sample usage:</para>
+             <code>
+             // create histogram
+             Histogram histogram = new Histogram( new int[10] { 0, 0, 1, 3, 6, 8, 11, 0, 0, 0 } );
+             // get total value (= 29)
+             Console.WriteLine( "total = " + histogram.TotalCount );
+             </code>
+             </remarks>
+             
         </member>
         <member name="T:AForge.Math.Statistics">
             <summary>
@@ -267,7 +285,7 @@
             // calculate mean value
             double mean = Statistics.Mean( histogram );
             // output it (5.759)
-            System.Diagnostics.Debug.WriteLine( "mean = " + mean.ToString( "F3" ) );
+            Console.WriteLine( "mean = " + mean.ToString( "F3" ) );
             </code>
             </remarks>
             
@@ -293,8 +311,29 @@
             // calculate standard deviation value
             double stdDev = Statistics.StdDev( histogram );
             // output it (1.999)
-            System.Diagnostics.Debug.WriteLine( "std.dev. = " + stdDev.ToString( "F3" ) );
+            Console.WriteLine( "std.dev. = " + stdDev.ToString( "F3" ) );
             </code>
+            </remarks>
+            
+        </member>
+        <member name="M:AForge.Math.Statistics.StdDev(System.Int32[],System.Double)">
+            <summary>
+            Calculate standard deviation.
+            </summary>
+            
+            <param name="values">Histogram array.</param>
+            <param name="mean">Mean value of the histogram.</param>
+            
+            <returns>Returns value of standard deviation.</returns>
+            
+            <remarks><para>The input array is treated as histogram, i.e. its
+            indexes are treated as values of stochastic function, but
+            array values are treated as "probabilities" (total amount of
+            hits).</para>
+            
+            <para>The method is an equevalent to the <see cref="M:AForge.Math.Statistics.StdDev(System.Int32[])"/> method,
+            but it relieas on the passed mean value, which is previously calculated
+            using <see cref="M:AForge.Math.Statistics.Mean(System.Int32[])"/> method.</para>
             </remarks>
             
         </member>
@@ -324,7 +363,7 @@
             // calculate median value
             int median = Statistics.Median( histogram );
             // output it (6)
-            System.Diagnostics.Debug.WriteLine( "median = " + median );
+            Console.WriteLine( "median = " + median );
             </code>
             </remarks>
             
@@ -356,7 +395,7 @@
             // get 75% range around median
             IntRange range = Statistics.GetRange( histogram, 0.75 );
             // output it ([4, 8])
-            System.Diagnostics.Debug.WriteLine( "range = [" + range.Min + ", " + range.Max + "]" );
+            Console.WriteLine( "range = [" + range.Min + ", " + range.Max + "]" );
             </code>
             </remarks>
             
@@ -382,21 +421,21 @@
             // calculate entropy
             double entropy1 = Statistics.Entropy( histogram1 );
             // output it (1.000)
-            System.Diagnostics.Debug.WriteLine( "entropy1 = " + entropy1.ToString( "F3" ) );
+            Console.WriteLine( "entropy1 = " + entropy1.ToString( "F3" ) );
             
             // create histogram array with 4 values of equal probabilities
             int[] histogram2 = new int[4] { 1, 1, 1, 1 };
             // calculate entropy
             double entropy2 = Statistics.Entropy( histogram2 );
             // output it (2.000)
-            System.Diagnostics.Debug.WriteLine( "entropy2 = " + entropy2.ToString( "F3" ) );
+            Console.WriteLine( "entropy2 = " + entropy2.ToString( "F3" ) );
             
             // create histogram array with 4 values of different probabilities
             int[] histogram3 = new int[4] { 1, 2, 3, 4 };
             // calculate entropy
             double entropy3 = Statistics.Entropy( histogram3 );
             // output it (1.846)
-            System.Diagnostics.Debug.WriteLine( "entropy3 = " + entropy3.ToString( "F3" ) );
+            Console.WriteLine( "entropy3 = " + entropy3.ToString( "F3" ) );
             </code>
             </remarks>
             
@@ -425,7 +464,7 @@
              // calculate mode value
              int mode = Statistics.Mode( values );
              // output it (7)
-             System.Diagnostics.Debug.WriteLine( "mode = " + mode );
+             Console.WriteLine( "mode = " + mode );
              </code>
              </remarks>
              
@@ -1409,7 +1448,7 @@
             </summary>
             
             <param name="model">Array of vectors containing coordinates of four real model's point.</param>
-            <param name="focalLength">Focal length of the camera used to capture the model.</param>
+            <param name="focalLength">Effective focal length of the camera used to capture the model.</param>
             
             <exception cref="T:System.ArgumentException">The model must have 4 points.</exception>
             
@@ -1510,6 +1549,11 @@
         <member name="P:AForge.Math.Geometry.CoplanarPosit.Model">
             <summary>
             Coordinates of the model points which pose should be estimated.
+            </summary>
+        </member>
+        <member name="P:AForge.Math.Geometry.CoplanarPosit.FocalLength">
+            <summary>
+            Effective focal length of the camera used to capture the model.
             </summary>
         </member>
         <member name="T:AForge.Math.Metrics.PearsonCorrelation">
@@ -3080,6 +3124,54 @@
             <returns>Return new matrix, which the result of multiplication of the two specified matrices.</returns>
             
         </member>
+        <member name="M:AForge.Math.Matrix4x4.op_Addition(AForge.Math.Matrix4x4,AForge.Math.Matrix4x4)">
+             <summary>
+             Adds corresponding components of two matrices.
+             </summary>
+             
+             <param name="matrix1">The matrix to add to.</param>
+             <param name="matrix2">The matrix to add to the first matrix.</param>
+             
+             <returns>Returns a matrix which components are equal to sum of corresponding
+             components of the two specified matrices.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.Add(AForge.Math.Matrix4x4,AForge.Math.Matrix4x4)">
+             <summary>
+             Adds corresponding components of two matrices.
+             </summary>
+             
+             <param name="matrix1">The matrix to add to.</param>
+             <param name="matrix2">The matrix to add to the first matrix.</param>
+             
+             <returns>Returns a matrix which components are equal to sum of corresponding
+             components of the two specified matrices.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.op_Subtraction(AForge.Math.Matrix4x4,AForge.Math.Matrix4x4)">
+             <summary>
+             Subtracts corresponding components of two matrices.
+             </summary>
+             
+             <param name="matrix1">The matrix to subtract from.</param>
+             <param name="matrix2">The matrix to subtract from the first matrix.</param>
+             
+             <returns>Returns a matrix which components are equal to difference of corresponding
+             components of the two specified matrices.</returns>
+            
+        </member>
+        <member name="M:AForge.Math.Matrix4x4.Subtract(AForge.Math.Matrix4x4,AForge.Math.Matrix4x4)">
+             <summary>
+             Subtracts corresponding components of two matrices.
+             </summary>
+             
+             <param name="matrix1">The matrix to subtract from.</param>
+             <param name="matrix2">The matrix to subtract from the first matrix.</param>
+             
+             <returns>Returns a matrix which components are equal to difference of corresponding
+             components of the two specified matrices.</returns>
+            
+        </member>
         <member name="M:AForge.Math.Matrix4x4.op_Multiply(AForge.Math.Matrix4x4,AForge.Math.Vector4)">
              <summary>
              Multiplies specified matrix by the specified vector.
@@ -3955,7 +4047,7 @@
             
             <param name="model">Array of vectors containing coordinates of four real model's point (points
             must not be on the same plane).</param>
-            <param name="focalLength">Focal length of the camera used to capture the model.</param>
+            <param name="focalLength">Effective focal length of the camera used to capture the model.</param>
             
             <exception cref="T:System.ArgumentException">The model must have 4 points.</exception>
             
@@ -3975,6 +4067,11 @@
         <member name="P:AForge.Math.Geometry.Posit.Model">
             <summary>
             Coordinates of the model points which pose should be estimated.
+            </summary>
+        </member>
+        <member name="P:AForge.Math.Geometry.Posit.FocalLength">
+            <summary>
+            Effective focal length of the camera used to capture the model.
             </summary>
         </member>
         <member name="T:AForge.Math.ContinuousHistogram">
@@ -4004,7 +4101,7 @@
             ContinuousHistogram histogram = new ContinuousHistogram(
                 new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new Range( 0.0f, 1.0f ) );
             // get mean and standard deviation values
-            System.Diagnostics.Debug.WriteLine( "mean = " + histogram.Mean + ", std.dev = " + histogram.StdDev );
+            Console.WriteLine( "mean = " + histogram.Mean + ", std.dev = " + histogram.StdDev );
             </code>
             </remarks>
             
@@ -4044,7 +4141,7 @@
             // get 50% range
             Range range = histogram.GetRange( 0.5f );
             // show the range ([0.25, 0.75])
-            System.Diagnostics.Debug.WriteLine( "50% range = [" + range.Min + ", " + range.Max + "]" );
+            Console.WriteLine( "50% range = [" + range.Min + ", " + range.Max + "]" );
             </code>
             </remarks>
             
@@ -4085,7 +4182,7 @@
             ContinuousHistogram histogram = new ContinuousHistogram(
                 new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new Range( 0.0f, 1.0f ) );
             // get mean value (= 0.505 )
-            System.Diagnostics.Debug.WriteLine( "mean = " + histogram.Mean.ToString( "F3" ) );
+            Console.WriteLine( "mean = " + histogram.Mean.ToString( "F3" ) );
             </code>
             </remarks>
             
@@ -4103,7 +4200,7 @@
             ContinuousHistogram histogram = new ContinuousHistogram(
                 new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new Range( 0.0f, 1.0f ) );
             // get std.dev. value (= 0.215)
-            System.Diagnostics.Debug.WriteLine( "std.dev. = " + histogram.StdDev.ToString( "F3" ) );
+            Console.WriteLine( "std.dev. = " + histogram.StdDev.ToString( "F3" ) );
             </code>
             </remarks>
             
@@ -4121,7 +4218,7 @@
             ContinuousHistogram histogram = new ContinuousHistogram(
                 new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new Range( 0.0f, 1.0f ) );
             // get median value (= 0.500)
-            System.Diagnostics.Debug.WriteLine( "median = " + histogram.Median.ToString( "F3" ) );
+            Console.WriteLine( "median = " + histogram.Median.ToString( "F3" ) );
             </code>
             </remarks>
             
@@ -4140,7 +4237,7 @@
             ContinuousHistogram histogram = new ContinuousHistogram(
                 new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new Range( 0.0f, 1.0f ) );
             // get min value (= 0.250)
-            System.Diagnostics.Debug.WriteLine( "min = " + histogram.Min.ToString( "F3" ) );
+            Console.WriteLine( "min = " + histogram.Min.ToString( "F3" ) );
             </code>
             </remarks>
         </member>
@@ -4158,7 +4255,7 @@
             ContinuousHistogram histogram = new ContinuousHistogram(
                 new int[] { 0, 0, 8, 4, 2, 4, 7, 1, 0 }, new Range( 0.0f, 1.0f ) );
             // get max value (= 0.875)
-            System.Diagnostics.Debug.WriteLine( "max = " + histogram.Max.ToString( "F3" ) );
+            Console.WriteLine( "max = " + histogram.Max.ToString( "F3" ) );
             </code>
             </remarks>
             
