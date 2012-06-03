@@ -64,9 +64,11 @@ namespace ImageResizer.ExtensionMethods {
                     "no".Equals(s, StringComparison.OrdinalIgnoreCase) ||
                     "off".Equals(s, StringComparison.OrdinalIgnoreCase)) return false as T?;
             } else if (t.IsEnum) {
-                return EnumExtensions.Parse<T>(value); //Support EnumString values
+                T? val = EnumExtensions.Parse<T>(value); //Support EnumString values
+                if (val.HasValue) return val;
             } else {
-                return value as T?; //Just try casting
+                T? val =  value as T?; //Just try casting
+                if (val.HasValue) return val;
             }
 
             return defaultValue;
