@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using AForge.Imaging;
 using ImageResizer.Util;
 using AForge.Imaging.Filters;
+using System.Diagnostics;
 
 namespace ImageResizer.Plugins.WhitespaceTrimmer {
     public class BoundingBoxFinder {
@@ -32,7 +33,7 @@ namespace ImageResizer.Plugins.WhitespaceTrimmer {
                 if (!lookInside.Equals(new Rectangle(0, 0, image.Width, image.Height))) {
                     Bitmap oldImage = image;
                     try {
-                        image = new Crop(PolygonMath.ToRectangle(lookInside)).Apply(image);
+                        image = new Crop(lookInside).Apply(image);
                     } finally {
                         if (oldImage != originalImage) oldImage.Dispose(); //Dispose the cloned 
                     }
@@ -49,7 +50,12 @@ namespace ImageResizer.Plugins.WhitespaceTrimmer {
             }
 
         }
-
+        /// <summary>
+        /// Requires 24 bit or 32 bit (A) RGB image. 
+        /// </summary>
+        /// <param name="rgb"></param>
+        /// <param name="threshold"></param>
+        /// <returns></returns>
         public Rectangle FindBoxSobel(Bitmap rgb, byte threshold) {
             using (Bitmap gray = Grayscale.CommonAlgorithms.Y.Apply(rgb)) {
 
@@ -61,30 +67,25 @@ namespace ImageResizer.Plugins.WhitespaceTrimmer {
                 // lock source bitmap data
                 BitmapData data = gray.LockBits(new Rectangle(0, 0, gray.Width, gray.Height), ImageLockMode.ReadOnly, gray.PixelFormat);
                 try {
-                    return FindBoxExact(data, Color.Black);
+                    return FindBoxExactGrayscale(data, 0);
                 } finally {
                     gray.UnlockBits(data);
                 }
             }
         }
         /// <summary>
-        /// Returns a bounding box that only excludes the specified color.
+        /// Returns a bounding box that only excludes the specified color. 
+        /// Only works on 8-bit images.
         /// </summary>
         /// <param name="sourceData"></param>
-        /// <param name="colorToRemove"></param>
+        /// <param name="colorToRemove">The palette index to remove.</param>
         /// <returns></returns>
-        public Rectangle FindBoxExact(BitmapData sourceData, Color colorToRemove) {
-            
+        public Rectangle FindBoxExactGrayscale(BitmapData sourceData, byte indexToRemove) {
+            if (sourceData.PixelFormat != PixelFormat.Format8bppIndexed) throw new ArgumentOutOfRangeException("FindBoxExact only operates on 8-bit grayscale images");
             // get source image size
             int width = sourceData.Width;
             int height = sourceData.Height;
-            int offset = sourceData.Stride -
-                ((sourceData.PixelFormat == PixelFormat.Format8bppIndexed) ? width : width * 3);
-
-            // color to remove
-            byte r = colorToRemove.R;
-            byte g = colorToRemove.G;
-            byte b = colorToRemove.B;
+            int offset = sourceData.Stride - width;
 
             int minX = width;
             int minY = height;
@@ -95,42 +96,20 @@ namespace ImageResizer.Plugins.WhitespaceTrimmer {
             unsafe {
                 byte* src = (byte*)sourceData.Scan0;
 
-                if (sourceData.PixelFormat == PixelFormat.Format8bppIndexed) {
-                    // grayscale
-                    for (int y = 0; y < height; y++) {
-                        for (int x = 0; x < width; x++, src++) {
-                            if (*src != g) {
-                                if (x < minX)
-                                    minX = x;
-                                if (x > maxX)
-                                    maxX = x;
-                                if (y < minY)
-                                    minY = y;
-                                if (y > maxY)
-                                    maxY = y;
-                            }
+                for (int y = 0; y < height; y++) {
+                    if (y > 0) src += offset; //Don't adjust for offset until after first row
+                    for (int x = 0; x < width; x++) {
+                        if (x > 0 || y > 0) src++; //Don't increment until after the first pixel.
+                        if (*src != indexToRemove) {
+                            if (x < minX)
+                                minX = x;
+                            if (x > maxX)
+                                maxX = x;
+                            if (y < minY)
+                                minY = y;
+                            if (y > maxY)
+                                maxY = y;
                         }
-                        src += offset;
-                    }
-                } else {
-                    // RGB
-                    for (int y = 0; y < height; y++) {
-                        for (int x = 0; x < width; x++, src += 3) {
-                            if (
-                                (src[RGB.R] != r) ||
-                                (src[RGB.G] != g) ||
-                                (src[RGB.B] != b)) {
-                                if (x < minX)
-                                    minX = x;
-                                if (x > maxX)
-                                    maxX = x;
-                                if (y < minY)
-                                    minY = y;
-                                if (y > maxY)
-                                    maxY = y;
-                            }
-                        }
-                        src += offset;
                     }
                 }
             }
