@@ -771,8 +771,8 @@ namespace ImageResizer
             //Skip this when we are doing simulations
             if (s.destGraphics == null) return RequestedAction.None;
 
-            if (!string.IsNullOrEmpty(s.settings["filter"])) {
-                s.destGraphics.InterpolationMode = s.settings.Get<InterpolationMode>("filter", s.destGraphics.InterpolationMode);
+            if (!string.IsNullOrEmpty(s.settings["gdi.filter"])) {
+                s.destGraphics.InterpolationMode = s.settings.Get<InterpolationMode>("gdi.filter", s.destGraphics.InterpolationMode);
             }
 
             s.copyAttibutes.SetWrapMode(WrapMode.TileFlipXY);
