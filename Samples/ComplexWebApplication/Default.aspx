@@ -130,13 +130,13 @@
     <p>You can add padding around the image with <strong>&amp;paddingWidth=px</strong> and 
     <strong>&amp;paddingColor=color|hex</strong>. paddingColor defaults to bgcolor, which defaults to white.
     This setting can be.... useful.</p>
-    <img src="grass.jpg?maxwidth=200&paddingColor=black&paddingwidth=20" runat="server"
-      title="With ?maxwidth=200&paddingColor=black&paddingwidth=20"/>
+    <img src="grass.jpg?width=200&paddingColor=black&paddingwidth=20" runat="server"
+      title="With ?width=200&paddingColor=black&paddingwidth=20"/>
     <h2>Borders</h2>
     <p>You can add a border around the image with <strong>&amp;borderWidth=px</strong>, 
     <strong>&amp;borderColor=color|hex</strong>.</p>
-    <img src="grass.jpg?maxwidth=200&paddingColor=white&paddingwidth=20&borderWidth=8&borderColor=808080" runat="server"
-      title="With ?maxwidth=200&borderWidth=8&borderColor=808080&paddingwidth=20"/>
+    <img src="grass.jpg?width=200&paddingColor=white&paddingwidth=20&borderWidth=8&borderColor=808080" runat="server"
+      title="With ?width=200&borderWidth=8&borderColor=808080&paddingwidth=20"/>
     
     
     
@@ -144,46 +144,46 @@
     <p>GIF, JPG, and PNG output is supported. BMP and TIFF input fils are additionally supported, and every format can be converted to any other format with <strong>&amp;format=jpg|png|gif</strong></p>
     <h2>Jpeg compression levels 0-100 (&amp;quality=0-100)</h2>
     <p>The sizes of these images range from 855B to 12KB. The largest size jump is from 90 to 100 (5KB to 12KB). I think 90 is a good balance, and is therefore the default.</p>
-     <img src="tulip-leaf.jpg?quality=0&maxwidth=100" runat="server" />
-    <img src="tulip-leaf.jpg?quality=10&maxwidth=100" runat="server" />
-    <img src="tulip-leaf.jpg?quality=20&maxwidth=100" runat="server" />
-    <img src="tulip-leaf.jpg?quality=30&maxwidth=100" runat="server" />
-    <img src="tulip-leaf.jpg?quality=40&maxwidth=100" runat="server" />
-    <img src="tulip-leaf.jpg?quality=50&maxwidth=100" runat="server" />
-    <img src="tulip-leaf.jpg?quality=60&maxwidth=100" runat="server" />
-    <img src="tulip-leaf.jpg?quality=70&maxwidth=100" runat="server" />
-    <img src="tulip-leaf.jpg?quality=80&maxwidth=100" runat="server" />
-    <img src="tulip-leaf.jpg?quality=90&maxwidth=100" runat="server" />
-    <img src="tulip-leaf.jpg?quality=100&maxwidth=100" runat="server" />
+     <img src="tulip-leaf.jpg?quality=0&width=100" runat="server" />
+    <img src="tulip-leaf.jpg?quality=10&width=100" runat="server" />
+    <img src="tulip-leaf.jpg?quality=20&width=100" runat="server" />
+    <img src="tulip-leaf.jpg?quality=30&width=100" runat="server" />
+    <img src="tulip-leaf.jpg?quality=40&width=100" runat="server" />
+    <img src="tulip-leaf.jpg?quality=50&width=100" runat="server" />
+    <img src="tulip-leaf.jpg?quality=60&width=100" runat="server" />
+    <img src="tulip-leaf.jpg?quality=70&width=100" runat="server" />
+    <img src="tulip-leaf.jpg?quality=80&width=100" runat="server" />
+    <img src="tulip-leaf.jpg?quality=90&width=100" runat="server" />
+    <img src="tulip-leaf.jpg?quality=100&width=100" runat="server" />
     <h2>Quantization (8-bit PNG and GIFs)</h2>
     <p>The default GDI quantization is terrible, and produces lousy GIFs. Using the Octree quantizer, you can 
     control the number of colors (and therefore the size and quality) of an image using <strong>&amp;colors=2-255</strong></p>
     <h3>GIFs, in 4,8,16,32,64,128, and 256 colors</h3>
-    <img src="tractor.jpg?&maxwidth=100&format=gif&colors=4" runat="server" />
-    <img src="tractor.jpg?&maxwidth=100&format=gif&colors=8" runat="server" />
-    <img src="tractor.jpg?&maxwidth=100&format=gif&colors=16" runat="server" />
-    <img src="tractor.jpg?&maxwidth=100&format=gif&colors=32" runat="server" />
-    <img src="tractor.jpg?&maxwidth=100&format=gif&colors=64" runat="server" />
-    <img src="tractor.jpg?&maxwidth=100&format=gif&colors=128" runat="server" />
-    <img src="tractor.jpg?&maxwidth=100&format=gif&colors=256" runat="server" />
+    <img src="tractor.jpg?&width=100&format=gif&colors=4" runat="server" />
+    <img src="tractor.jpg?&width=100&format=gif&colors=8" runat="server" />
+    <img src="tractor.jpg?&width=100&format=gif&colors=16" runat="server" />
+    <img src="tractor.jpg?&width=100&format=gif&colors=32" runat="server" />
+    <img src="tractor.jpg?&width=100&format=gif&colors=64" runat="server" />
+    <img src="tractor.jpg?&width=100&format=gif&colors=128" runat="server" />
+    <img src="tractor.jpg?&width=100&format=gif&colors=256" runat="server" />
     <h3>PNGs, in 4,8,16,32,64,128, 256, and 16 million colors</h3>
-        <img src="tractor.jpg?&maxwidth=100&format=png&colors=4" runat="server" />
-    <img src="tractor.jpg?&maxwidth=100&format=png&colors=8" runat="server" />
-    <img src="tractor.jpg?&maxwidth=100&format=png&colors=16" runat="server" />
-    <img src="tractor.jpg?&maxwidth=100&format=png&colors=32" runat="server" />
-    <img src="tractor.jpg?&maxwidth=100&format=png&colors=64" runat="server" />
-    <img src="tractor.jpg?&maxwidth=100&format=png&colors=128" runat="server" />
-    <img src="tractor.jpg?&maxwidth=100&format=png&colors=256" runat="server" />
-    <img src="tractor.jpg?&maxwidth=100&format=png" runat="server" />
+        <img src="tractor.jpg?&width=100&format=png&colors=4" runat="server" />
+    <img src="tractor.jpg?&width=100&format=png&colors=8" runat="server" />
+    <img src="tractor.jpg?&width=100&format=png&colors=16" runat="server" />
+    <img src="tractor.jpg?&width=100&format=png&colors=32" runat="server" />
+    <img src="tractor.jpg?&width=100&format=png&colors=64" runat="server" />
+    <img src="tractor.jpg?&width=100&format=png&colors=128" runat="server" />
+    <img src="tractor.jpg?&width=100&format=png&colors=256" runat="server" />
+    <img src="tractor.jpg?&width=100&format=png" runat="server" />
     <h2>Transparent GIFs and PNGs</h2>
     <h3>Transparency is maintained when resizing PNGs</h3>
     <img src="sun_256.png" runat="server" />
-    <img src="sun_256.png?maxwidth=100" runat="server" />
+    <img src="sun_256.png?width=100" runat="server" />
     <img style="background-color:black" src="sun_256.png?&maxwidth=200" runat="server" />
     <h3>Matte backgrounds can be applied with bgcolor. </h3>
-    <img src="moon_256.png?maxwidth=100&bgcolor=red" runat="server" />
-    <img src="moon_256.png?maxwidth=100&bgcolor=blue" runat="server" />
-    <img src="moon_256.png?maxwidth=100&bgcolor=green" runat="server" />
+    <img src="moon_256.png?width=100&bgcolor=red" runat="server" />
+    <img src="moon_256.png?width=100&bgcolor=blue" runat="server" />
+    <img src="moon_256.png?width=100&bgcolor=green" runat="server" />
     <h3>Transparent PNGs can be converted to transparent GIFs</h3>
     <p>It's ugly, but GIFs only get 1 bit for transparency.</p>
     <img src="saturn_256.png?format=gif" runat="server" />
