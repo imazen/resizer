@@ -20,64 +20,68 @@
 % Ensure extra info is not printed 
 /QUIET true def
 
+/encode { 
+  { (<value>) print =print (</value>) print } forall
+} def
+
 % Write opening PDF element
 (<pdf>\n) print flush
 
 % Write PDF filename
 File dup (r) file runpdfbegin
-(<fileName>) print flush
-=print flush
-(</fileName>\n) print 
+(<fileNameData>) print flush
+encode
+(</fileNameData>\n) print 
 
 % Write Info dictionary, if it exists
 Trailer /Info knownoget {
   % - Title
   dup /Title knownoget { 
-    (<title>) print flush 
-    =print flush 
-    (</title>\n) print
+    (<titleData>) print flush 
+	encode
+    (</titleData>\n) print
   } if
   % - Author
   dup /Author knownoget { 
-    (<author>) print flush
-    =print flush
-    (</author>\n) print 
+    (<authorData>) print flush
+    encode
+    (</authorData>\n) print 
   } if
   % - Subject
   dup /Subject knownoget { 
-    (<subject>) print flush
-    =print flush
-    (</subject>\n) print 
+    (<subjectData>) print flush
+    encode
+    (</subjectData>\n) print 
   } if
   % - Keywords
   dup /Keywords knownoget { 
-    (<keywords>) print flush 
-    =print flush
-    (</keywords>\n) print 
+    (<keywordsData>) print flush 
+    encode
+    (</keywordsData>\n) print 
   } if
    % - Creator
   dup /Creator knownoget { 
-    (<creator>) print flush
-    =print flush
-    (</creator>\n) print 
+    (<creatorData>) print flush
+    encode
+    (</creatorData>\n) print 
   } if
   % - Producer
   dup /Producer knownoget { 
-    (<producer>) print flush
-    =print flush
-    (</producer>\n) print 
+    (<producerData>) print flush
+    encode
+    (</producerData>\n) print 
   } if
   % - CreationDate
   dup /CreationDate knownoget { 
-    (<creationDate>) print flush
-    =print flush
-    (</creationDate>\n) print 
+    (<creationDateData>) print flush
+    encode
+    (</creationDateData>\n) print 
   } if
   % - ModDate
   dup /ModDate knownoget { 
-    (<modifiedDate>) print flush
-    =print flush
-    (</modifiedDate>\n) print 
+    (<modifiedDateData>) print flush
+    encode
+    (</modifiedDateData>\n) print 
   } if
 } if  
 
