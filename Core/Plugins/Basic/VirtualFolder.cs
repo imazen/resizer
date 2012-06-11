@@ -110,7 +110,7 @@ namespace ImageResizer.Plugins.Basic {
 
 
         protected string normalizeVirtualPath(string path) {
-            if (!path.StartsWith("/")) path = HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/' + path.Substring(1).TrimStart('/');
+            if (!path.StartsWith("/")) path = HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/' + (path.StartsWith("~") ? path.Substring(1) : path).TrimStart('/');
             return path;
         }
 
@@ -177,8 +177,10 @@ namespace ImageResizer.Plugins.Basic {
         }
         private bool isOnlyVirtualPath(string virtualPath) {
             if (NoIOPermission) return false; //Don't act as a VPP if we don't have permission to operate.
-            if (Previous.FileExists(virtualPath)) return false;
-            return IsVirtualPath(virtualPath);
+            if (!IsVirtualPath(virtualPath)) return false;
+            if (File.Exists(VirtualToPhysical(virtualPath))) return false;
+            if (registeredVpp && Previous.FileExists(virtualPath)) return false;
+            return true;
         }
 
 
