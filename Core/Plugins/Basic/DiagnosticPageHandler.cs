@@ -54,7 +54,7 @@ namespace ImageResizer.Plugins.Basic {
 
             if (routingLoaded && !usingRoutingShim) issues.Add(new Issue(
                 "The MvcRoutingShim plugin must be installed if you are using MVC or System.Web.Routing",
-                "System.Web.Routing is loaded. You must install the MvcRoutingShim plugin. Add ImageResizer.Mvc.dll to your project, and add '<add name=\"MvcRoutingPlugin\" />' to the <plugins> section of web.config.", IssueSeverity.Critical));
+                "System.Web.Routing is loaded. You must install the MvcRoutingShim plugin. Add ImageResizer.Mvc.dll to your project, and add '<add name=\"MvcRoutingShim\" />' to the <plugins> section of web.config.", IssueSeverity.Critical));
 
             if (!HttpRuntime.UsingIntegratedPipeline && context != null && context.Request != null) {
                 string server = context.Request.ServerVariables["SERVER_SOFTWARE"];
