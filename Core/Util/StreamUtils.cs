@@ -7,7 +7,7 @@ namespace ImageResizer.Util {
     public class StreamUtils {
 
         public static MemoryStream CopyStream(Stream s) {
-            return s.CopyToMemoryStream();
+            return StreamExtensions.CopyToMemoryStream(s);
         }
 
 
@@ -17,7 +17,7 @@ namespace ImageResizer.Util {
         /// <param name="src"></param>
         /// <param name="dest"></param>
         public static void CopyTo(Stream src, Stream dest) {
-            src.CopyToStream(dest);
+            StreamExtensions.CopyToStream(src, dest);
         }
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace ImageResizer.Util {
         /// <param name="src"></param>
         /// <returns></returns>
         public static byte[] CopyToBytes(Stream src) {
-            return src.CopyToBytes();
+            return StreamExtensions.CopyToBytes(src);
         }
     }
 }

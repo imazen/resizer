@@ -128,7 +128,7 @@ namespace ImageResizer.Plugins.Basic {
 
         protected void ParseXml(Node n, Config conf) {
             if (n == null ) return;
-            OnlyAllowPresets = n.Attrs.Get<bool>( "onlyAllowPresets", OnlyAllowPresets);
+            OnlyAllowPresets = NameValueCollectionExtensions.Get(n.Attrs, "onlyAllowPresets", OnlyAllowPresets);
             if (n.Children == null) return;
             foreach (Node c in n.Children) {
                 string name = c.Attrs["name"];

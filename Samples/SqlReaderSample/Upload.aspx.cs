@@ -70,7 +70,7 @@ namespace DatabaseSampleCSharp {
                     }
                 } else {
                     //It's not an image - upload as-is.
-                    lastUpload = StoreFile(file.InputStream.CopyToBytes(), PathUtils.GetExtension(file.FileName).TrimStart('.'), file.FileName);
+                    lastUpload = StoreFile(StreamExtensions.CopyToBytes(file.InputStream), PathUtils.GetExtension(file.FileName).TrimStart('.'), file.FileName);
 
                 }
             }

@@ -69,7 +69,7 @@ namespace ImageResizer.Plugins.WicBuilder {
                 //Save the original stream positione
                 originalPosition = (restoreStreamPosition) ? s.Position : -1;
 
-                data = s.CopyOrReturnBuffer(out lData,false, 0x1000);
+                data = StreamExtensions.CopyOrReturnBuffer(s, out lData,false, 0x1000);
             } finally {
                 if (s != null && restoreStreamPosition && s.CanSeek) s.Seek(originalPosition, SeekOrigin.Begin);
                 if (disposeStream) s.Dispose();

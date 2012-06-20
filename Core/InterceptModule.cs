@@ -263,7 +263,7 @@ namespace ImageResizer {
                     if (!isProcessing) {
                         //Just duplicate the data
                         using (Stream source = e.GetSourceImage())
-                            source.CopyToStream(stream); //4KiB buffer
+                            StreamExtensions.CopyToStream(source, stream); //4KiB buffer
                         
                     } else {
                         //Process the image

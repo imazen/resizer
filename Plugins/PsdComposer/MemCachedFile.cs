@@ -58,7 +58,7 @@ namespace ImageResizer.Plugins.PsdComposer
             this.path = file.VirtualPath;
 
             using (Stream s = file.Open()) {
-                this.data = s.CopyToBytes();
+                this.data = StreamExtensions.CopyToBytes(s);
             }
         }
         /// <summary>
@@ -74,7 +74,7 @@ namespace ImageResizer.Plugins.PsdComposer
             this.path = physicalPath;
             using (System.IO.FileStream fs = new FileStream(physicalPath, FileMode.Open, FileAccess.Read))
             {
-                this.data = fs.CopyToBytes();
+                this.data = StreamExtensions.CopyToBytes(fs);
             }
 
             sw.Stop();

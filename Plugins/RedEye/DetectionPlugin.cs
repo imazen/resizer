@@ -95,8 +95,8 @@ namespace ImageResizer.Plugins.RedEye {
         /// <param name="context"></param>
         /// <param name="e"></param>
         void Pipeline_PreHandleImage(System.Web.IHttpModule sender, System.Web.HttpContext context, Caching.IResponseArgs e) {
-            bool detecteyes = e.RewrittenQuerystring.Get<bool>( "r.detecteyes", false);
-            bool getlayout = e.RewrittenQuerystring.Get<bool>( "r.getlayout", false);
+            bool detecteyes = NameValueCollectionExtensions.Get(e.RewrittenQuerystring, "r.detecteyes", false);
+            bool getlayout = NameValueCollectionExtensions.Get(e.RewrittenQuerystring, "r.getlayout", false);
             if (!detecteyes && !getlayout) return;
 
             ResponseArgs ra = e as ResponseArgs;

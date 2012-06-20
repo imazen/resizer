@@ -80,7 +80,7 @@ namespace ImageResizer.Plugins.Security {
                 using (var decrypt = rm.CreateDecryptor(GetKey(), iv))
                 using (var ms = new MemoryStream(data, 0, data.Length, false, true))
                 using (var s = new CryptoStream(ms, decrypt, CryptoStreamMode.Read)) {
-                    return s.CopyToBytes();
+                    return StreamExtensions.CopyToBytes(s);
 
                 }
             } finally {
@@ -108,7 +108,7 @@ namespace ImageResizer.Plugins.Security {
                         s.Flush();
                         s.FlushFinalBlock();
                         ms.Seek(0, SeekOrigin.Begin);
-                        return ms.CopyToBytes();
+                        return StreamExtensions.CopyToBytes(ms);
                     }
                 }
             } finally {
