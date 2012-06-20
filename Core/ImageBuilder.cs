@@ -897,7 +897,7 @@ namespace ImageResizer
 
             //Use the crop size if present.
             s.copyRect = new RectangleF(new PointF(0,0),s.originalSize);
-            if (s.settings.GetList<double>("crop", 0, 4) != null) {
+            if (NameValueCollectionExtensions.GetList<double>(s.settings, "crop", 0, 4) != null) {
                 s.copyRect = PolygonMath.ToRectangle(s.settings.getCustomCropSourceRect(s.originalSize)); //Round the custom crop rectangle coordinates
                 if (s.copyRect.Size.IsEmpty) throw new Exception("You must specify a custom crop rectange if crop=custom");
             }

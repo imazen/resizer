@@ -163,7 +163,7 @@ namespace ImageResizer {
         /// <summary>
         /// An X1,Y1,X2,Y2 array of coordinates. Unless CropXUnits and CropYUnits are specified, these are in the coordinate space of the original image.
         /// </summary>
-        public double[] CropRectange {get { return this.GetList<double>("crop",0,4);}set{this.SetList<double>("crop",value,true,4);}}
+        public double[] CropRectange {get { return NameValueCollectionExtensions.GetList<double>(this, "crop",0,4);}set{NameValueCollectionExtensions.SetList(this, "crop",value,true,4);}}
 
         /// <summary>
         /// Automatically rotates images based on gravity sensor data embedded in Exif. Requires the AutoRotate plugin
@@ -315,7 +315,7 @@ namespace ImageResizer {
         /// Gets or sets a 1 or 4-element array defining cornder radii. If the array is 1 element, it applies to all corners. If it is 4 elements, each corner gets an individual radius. Values are percentages of the image width or height, whichever is smaller.
         /// Requires the SimpleFilters plugin.
         /// </summary>
-        public double[] RoundCorners { get { return this.GetList<double>("s.roundcorners", 0, 4, 1); } set { this.SetList<double>("s.roundcorners", value, true, 4, 1); } }
+        public double[] RoundCorners { get { return NameValueCollectionExtensions.GetList<double>(this, "s.roundcorners", 0, 4, 1); } set { NameValueCollectionExtensions.SetList(this, "s.roundcorners", value, true, 4, 1); } }
 
 
 
