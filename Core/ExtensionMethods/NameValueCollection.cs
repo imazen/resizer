@@ -12,7 +12,13 @@ namespace ImageResizer.ExtensionMethods {
         private static NumberStyles floatingPointStyle = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite | 
             NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands | NumberStyles.AllowExponent;
 
-
+        /// <summary>
+        /// Provides culture-invariant parsing of int, double, float, bool, and enum values.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static T? Get<T>(NameValueCollection t, string name) where T : struct, IConvertible {
             return Get<T>(t, name, null);
         }
@@ -27,13 +33,26 @@ namespace ImageResizer.ExtensionMethods {
         public static T? Get<T>(NameValueCollection q, string name, T? defaultValue) where T:struct, IConvertible{
             return ParsePrimitive<T>(q[name],defaultValue);
         }
-
+        /// <summary>
+        /// Provides culture-invariant parsing of int, double, float, bool, and enum values.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="q"></param>
+        /// <param name="name"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public static T Get<T>(NameValueCollection q, string name, T defaultValue) where T : struct, IConvertible {
             return ParsePrimitive<T>(q[name], defaultValue).Value;
         }
 
 
-
+        /// <summary>
+        /// Provides culture-invariant parsing of int, double, float, bool, and enum values.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public static T? ParsePrimitive<T>(string value, T? defaultValue) where T : struct,IConvertible {
             if (value == null) return defaultValue;
             value = value.Trim(); //Trim whitespace
@@ -87,6 +106,14 @@ namespace ImageResizer.ExtensionMethods {
 
         }
 
+        /// <summary>
+        /// Serializes the given value by calling .ToString(). If the value is null, the key is removed.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="q"></param>
+        /// <param name="name"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
         public static NameValueCollection SetAsString<T>(NameValueCollection q, string name, T val) where T : class {
             if (val == null) q.Remove(name);
             else q[name] = val.ToString();
@@ -132,8 +159,8 @@ namespace ImageResizer.ExtensionMethods {
             if (!foundCount) return null;
 
             //Parse the array
-            T[] vals = new T[parts.Length];
-            for (int i = 0; i < parts.Length; i++) {
+            var vals = new T[parts.Length];
+            for (var i = 0; i < parts.Length; i++) {
                 var v = ParsePrimitive<T>(parts[i], fallbackValue);
                 if (v == null) return null;
                 vals[i] = v.Value;
