@@ -13,5 +13,5 @@ Thumbs.db
 *.suo
 *.user
 *.csproj.user
-
-/Core/_ReSharper.ImageResizer
+*/_ReSharper
+_ReSharper*
