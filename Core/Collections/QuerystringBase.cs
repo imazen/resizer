@@ -70,32 +70,6 @@ namespace ImageResizer.Collections {
         }
 
 
-        /// <summary>
-        /// Returns true if any of the specified keys contain a value
-        /// </summary>
-        /// <param name="q"></param>
-        /// <param name="keys"></param>
-        /// <returns></returns>
-        public  bool IsOneSpecified( params string[] keys)
-        {
-            return NameValueCollectionExtensions.IsOneSpecified(this, keys);
-        }
-
-
-
-        /// <summary>
-        /// Normalizes a command that has two possible names. 
-        /// If either of the commands has a null or empty value, those keys are removed. 
-        /// If both the the primary and secondary are present, the secondary is removed. 
-        /// Otherwise, the secondary is renamed to the primary name.
-        /// </summary>
-        /// <param name="primary"></param>
-        /// <param name="secondary"></param>
-        public TK Normalize(string primary, string secondary)
-        {
-            return (TK) NameValueCollectionExtensions.Normalize(this, primary, secondary);
-        }
-
 
     }
 }

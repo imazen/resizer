@@ -129,7 +129,7 @@ namespace ImageResizer {
         /// <param name="keys"></param>
         /// <returns></returns>
         public bool WasOneSpecified(params string[] keys) {
-            return this.IsOneSpecified(keys);
+            return NameValueCollectionExtensions.IsOneSpecified(this, keys);
         }
         /// <summary>
         /// ["rotate"] The degress to rotate the image clockwise. -360 to 360.
@@ -400,5 +400,20 @@ namespace ImageResizer {
                 .Normalize("sFlip", "sourceFlip")
                 .Normalize("format", "thumbnail");
         }
+
+
+
+        /// <summary>
+        /// Normalizes a command that has two possible names. 
+        /// If either of the commands has a null or empty value, those keys are removed. 
+        /// If both the the primary and secondary are present, the secondary is removed. 
+        /// Otherwise, the secondary is renamed to the primary name.
+        /// </summary>
+        /// <param name="primary"></param>
+        /// <param name="secondary"></param>
+        public ResizeSettings Normalize(string primary, string secondary) {
+            return (ResizeSettings)NameValueCollectionExtensions.Normalize(this, primary, secondary);
+        }
+
     }
 }
