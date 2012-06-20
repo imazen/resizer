@@ -35,7 +35,7 @@ namespace ImageResizer.Plugins.SourceMemCache {
             if ("mem".Equals(queryString["scache"], StringComparison.OrdinalIgnoreCase)) {
                 //Optimization idea - use LockProvider to prevent duplicate requests. Would mean merging with DiskCache :(
                 using (Stream data = original.Open()) {//Very long-running call
-                    c = new CachedVirtualFile(original.VirtualPath,  data.CopyToBytes(true)); 
+                    c = new CachedVirtualFile(original.VirtualPath,  StreamExtensions.CopyToBytes(data, true)); 
                 }
                 cache.Set(key, c); //Save to cache (may trigger cleanup)
                 return c;

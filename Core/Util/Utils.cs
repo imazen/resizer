@@ -100,7 +100,7 @@ namespace ImageResizer.Util {
         /// <param name="dest"></param>
         [Obsolete("Use ImageResizer.ExtensionMethods instead.")]
         public static void copyStream(Stream source, Stream dest) {
-            source.CopyToStream(dest, false, 0x1000); 
+            StreamExtensions.CopyToStream(source, dest, false, 0x1000); 
         }
 
         

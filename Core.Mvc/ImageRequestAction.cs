@@ -227,7 +227,7 @@ namespace ImageResizer.Mvc {
                         //Just duplicate the data
                         using (Stream source = (vf != null) ? vf.Open(): 
                                         File.Open(HostingEnvironment.MapPath(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read)) {
-                                            source.CopyToStream(stream);
+                                            StreamExtensions.CopyToStream(source, stream);
                         }
                     } else {
                         //Process the image

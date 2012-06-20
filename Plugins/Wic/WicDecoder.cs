@@ -53,7 +53,7 @@ namespace ImageResizer.Plugins.WicDecoder {
         public Bitmap Decode(Stream s, ResizeSettings settings) {
             //Get the underlying byte array
             long lData = 0;
-            byte[] data = s.CopyOrReturnBuffer(out lData,false, 0x1000);
+            byte[] data = StreamExtensions.CopyOrReturnBuffer(s, out lData,false, 0x1000);
 
 
             var factory = (IWICComponentFactory)new WICImagingFactory();

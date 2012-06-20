@@ -99,7 +99,7 @@ namespace ImageResizer.Plugins.WpfBuilder
             job.SourcePathData = path;
 
             // Instanzio uno stream locale per le operazioni WPF
-            using (MemoryStream localStream = (s is MemoryStream) ? (MemoryStream)s : s.CopyToMemoryStream()) 
+            using (MemoryStream localStream = (s is MemoryStream) ? (MemoryStream)s : StreamExtensions.CopyToMemoryStream(s)) 
             {
                 if (s != null && restoreStreamPosition && s.CanSeek) 
                     s.Seek(originalPosition, SeekOrigin.Begin);
@@ -112,7 +112,7 @@ namespace ImageResizer.Plugins.WpfBuilder
                 bool supportsTransparency = managedEncoder.SupportsTransparency;
 
                 // Recupero le dimensioni originali
-                var frame = BitmapFrame.Create(localStream.CopyToMemoryStream());
+                var frame = BitmapFrame.Create(StreamExtensions.CopyToMemoryStream(localStream));
                 System.Windows.Size originalSize = new System.Windows.Size(frame.PixelWidth, frame.PixelHeight);
 
                 // Resetto lo stream locale alla posizione iniziale, dopo aver letto i metadata

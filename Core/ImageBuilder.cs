@@ -203,7 +203,7 @@ namespace ImageResizer
             if (settings != null && "true".Equals(settings["ignoreicc"], StringComparison.OrdinalIgnoreCase)) useICM = false;
 
             //NDJ - May 24, 2011 - Copying stream into memory so the original can be closed safely.
-            MemoryStream ms = s.CopyToMemoryStream(); 
+            MemoryStream ms = StreamExtensions.CopyToMemoryStream(s); 
             b = new Bitmap(ms, useICM); 
             b.Tag = new BitmapTag(optionalPath, ms); //May 25, 2011: Storing a ref to the MemorySteam so it won't accidentally be garbage collected.
             return b;

@@ -80,7 +80,6 @@
     <Compile Include="Configuration\NativeDependencyManager.cs" />
     <Compile Include="Configuration\UrlAuthorizationEventArgs.cs" />
     <Compile Include="ExtensionMethods\Enum.cs" />
-    <Compile Include="ExtensionMethods\ExtensionAttribute.cs" />
     <Compile Include="ExtensionMethods\NameValueCollection.cs" />
     <Compile Include="ExtensionMethods\Stream.cs" />
     <Compile Include="ImageJob.cs" />

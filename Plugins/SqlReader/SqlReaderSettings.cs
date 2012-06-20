@@ -21,17 +21,17 @@ namespace ImageResizer.Plugins.SqlReader {
         public SqlReaderSettings(System.Collections.Specialized.NameValueCollection args) {
             if (!string.IsNullOrEmpty(args["prefix"])) this.PathPrefix = args["prefix"];
             if (!string.IsNullOrEmpty(args["connectionString"])) this.ConnectionString = args["connectionString"];
-            this.ImageIdType = args.Get<SqlDbType>("idType",this.ImageIdType);
+            this.ImageIdType = NameValueCollectionExtensions.Get(args, "idType",this.ImageIdType);
             if (!string.IsNullOrEmpty(args["blobQuery"])) this.ImageBlobQuery = args["blobQuery"];
             if (!string.IsNullOrEmpty(args["existsQuery"])) this.ImageExistsQuery = args["existsQuery"];
             if (!string.IsNullOrEmpty(args["modifiedQuery"])) this.ModifiedDateQuery  = args["modifiedQuery"];
             
-            StripFileExtension = !args.Get<bool>("extensionPartOfId", false);
-            RegisterAsVirtualPathProvider = args.Get<bool>("vpp", true);
-            RequireImageExtension = args.Get<bool>("requireImageExtension", RequireImageExtension);
-            UntrustedData = args.Get<bool>("untrustedData", UntrustedData);
-            CacheUnmodifiedFiles = args.Get<bool>("cacheUnmodifiedFiles", CacheUnmodifiedFiles);
-            CheckForModifiedFiles = args.Get<bool>("checkForModifiedFiles", true);
+            StripFileExtension = !NameValueCollectionExtensions.Get(args, "extensionPartOfId", false);
+            RegisterAsVirtualPathProvider = NameValueCollectionExtensions.Get(args, "vpp", true);
+            RequireImageExtension = NameValueCollectionExtensions.Get(args, "requireImageExtension", RequireImageExtension);
+            UntrustedData = NameValueCollectionExtensions.Get(args, "untrustedData", UntrustedData);
+            CacheUnmodifiedFiles = NameValueCollectionExtensions.Get(args, "cacheUnmodifiedFiles", CacheUnmodifiedFiles);
+            CheckForModifiedFiles = NameValueCollectionExtensions.Get(args, "checkForModifiedFiles", true);
         }
 
         /// <summary>
