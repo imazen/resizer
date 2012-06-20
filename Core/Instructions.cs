@@ -5,13 +5,15 @@ using System.Collections.Specialized;
 using ImageResizer.Util;
 using System.Globalization;
 using ImageResizer.ExtensionMethods;
+using ImageResizer.Collections;
 
 namespace ImageResizer {
     /// <summary>
     /// A name/value collection of image processsing instructions. The successor to ResizeSettings.
     /// Just because a key doesn't have a property wrapper doesn't mean you can't use it. i["key"] = value; isnt' that scary.
     /// </summary>
-    public class Instructions: NameValueCollection {
+    public class Instructions: QuerystringBase<Instructions> {
+
 
 
         /*

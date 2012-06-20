@@ -8,6 +8,7 @@ using ImageResizer.Resizing;
 using ImageResizer.Util;
 using System.Globalization;
 using ImageResizer.ExtensionMethods;
+using ImageResizer.Collections;
 
 namespace ImageResizer {
     /// <summary>
@@ -16,7 +17,7 @@ namespace ImageResizer {
     /// Replaced by the Instructions class. Will be removed in V4.0
     /// </summary>
     [Serializable]
-    public class ResizeSettings : NameValueCollection {
+    public class ResizeSettings : QuerystringBase<ResizeSettings> {
         
         /// <summary>
         /// Creates an empty settings collection. 
