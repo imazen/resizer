@@ -189,7 +189,8 @@ namespace ImageResizer.Plugins.DiskCache {
 
         public override IEnumerable<IIssue> GetIssues() {
             List<IIssue> issues = new List<IIssue>(base.GetIssues());
-            issues.Add(new Issue("An external process indicates it is managing cleanup of the disk cache. " + 
+            if (ExteralProcessCleaning) 
+                issues.Add(new Issue("An external process indicates it is managing cleanup of the disk cache. " + 
                 "This process is not currently managing disk cache cleanup. If configured as a web garden, keep in mind that the negligible performance gains are likely to be outweighed by the loss of cache optimization quality.", IssueSeverity.Warning));
             lock (_timesLock) {
                 if (this.lastFoundItemsOverMax > (DateTime.UtcNow.Subtract(new TimeSpan(0, 5, 0)).Ticks))
