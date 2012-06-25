@@ -178,7 +178,7 @@ namespace ImageResizer.Plugins.Basic {
         private bool isOnlyVirtualPath(string virtualPath) {
             if (NoIOPermission) return false; //Don't act as a VPP if we don't have permission to operate.
             if (!IsVirtualPath(virtualPath)) return false;
-            if (File.Exists(VirtualToPhysical(virtualPath))) return false;
+            if (!File.Exists(VirtualToPhysical(virtualPath))) return false;
             if (registeredVpp && Previous.FileExists(virtualPath)) return false;
             return true;
         }
