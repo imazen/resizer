@@ -596,6 +596,7 @@ namespace ImageResizer
                 //Select the right page/frame if specified
                 if (page > 0) src.SelectActiveFrame(FrameDimension.Page, page);
                 if (frame > 0) src.SelectActiveFrame(FrameDimension.Time, frame);
+                s.originalSize = s.sourceBitmap.Size;
             } catch (ExternalException) { } //When somebody tries &frame or &page on a single-frame image
             
 
