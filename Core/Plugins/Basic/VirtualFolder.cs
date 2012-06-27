@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Web;
 using System.Security.Permissions;
@@ -21,9 +22,7 @@ namespace ImageResizer.Plugins.Basic {
     public class VirtualFolder : VirtualPathProvider, IVirtualImageProvider, IPlugin , IMultiInstancePlugin, IIssueProvider{
 
         public VirtualFolder(string virtualPath, string physicalPath)
-            : base() {
-            this.VirtualPath = virtualPath;
-            this.PhysicalPath = physicalPath;
+            : this(virtualPath,physicalPath,true) {
         }
         public VirtualFolder(string virtualPath, string physicalPath, bool registerAsVpp)
             : base() {
@@ -50,14 +49,10 @@ namespace ImageResizer.Plugins.Basic {
             get { return _failedToRegisterVpp; }
         }
 
-        private bool registerAsVpp = true;
         /// <summary>
         /// If true, the plugin will attempt to register itself as an application-wide VirtualPathProvider instead of a image resizer-specific IVirtualImageProvider.
         /// </summary>
-        public bool RegisterAsVpp {
-            get { return registerAsVpp; }
-            set { registerAsVpp = value; }
-        }
+        public bool RegisterAsVpp { get; set; }
 
         private string virtualPath = null;
         /// <summary>
@@ -108,12 +103,20 @@ namespace ImageResizer.Plugins.Basic {
             get { return noIOPermission; }
         }
 
-
+        /// <summary>
+        /// Converts relative and app-relative paths to domain-relative virtual paths.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         protected string normalizeVirtualPath(string path) {
             if (!path.StartsWith("/")) path = HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/' + (path.StartsWith("~") ? path.Substring(1) : path).TrimStart('/');
             return path;
         }
-
+        /// <summary>
+        /// Attempts to convert a phyiscal path into a collapsed rooted physical path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         protected string resolvePhysicalPath(string path) {
             
             if (!Path.IsPathRooted(path)) path = Path.Combine(HostingEnvironment.ApplicationPhysicalPath, path);
@@ -126,7 +129,11 @@ namespace ImageResizer.Plugins.Basic {
                 return collapsePath(path);
             }
         }
-
+        /// <summary>
+        /// Collapses any .. segments
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         protected string collapsePath(string path) {
             string oldPath = path;
             do {
@@ -154,12 +161,17 @@ namespace ImageResizer.Plugins.Basic {
             } while (up > 0);
             return path;
         }
+
+        public string VirtualToPhysical(string virtualPath)
+        {
+            return LocalMapPath(virtualPath);
+        }
         /// <summary>
-        /// Converts a virtual path in this folder to a physical path. Returns null if the virtual path is outside the folder.
+        /// Converts any virtual path in this folder to a physical path. Returns null if the virtual path is outside the folder.
         /// </summary>
         /// <param name="virtualPath"></param>
         /// <returns></returns>
-        public string VirtualToPhysical(string virtualPath) {
+        public string LocalMapPath(string virtualPath) {
             virtualPath = normalizeVirtualPath(virtualPath);
             if (virtualPath.StartsWith(this.VirtualPath, StringComparison.OrdinalIgnoreCase)) {
                 return Path.Combine(PhysicalPath, virtualPath.Substring(this.VirtualPath.Length).TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
@@ -175,10 +187,17 @@ namespace ImageResizer.Plugins.Basic {
             virtualPath = normalizeVirtualPath(virtualPath);
             return virtualPath.StartsWith(this.VirtualPath, StringComparison.OrdinalIgnoreCase);
         }
+        /// <summary>
+        /// Returns true if (a) we have IOPermission, (b) the path is under our prefix, (c) the 
+        /// expected physical file does not exist (because we shouldn't interfere in that case), and
+        /// (d) the other VPPs don't believe the file exists.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
         private bool isOnlyVirtualPath(string virtualPath) {
             if (NoIOPermission) return false; //Don't act as a VPP if we don't have permission to operate.
             if (!IsVirtualPath(virtualPath)) return false;
-            if (File.Exists(VirtualToPhysical(virtualPath))) return false;
+            if (File.Exists(HostingEnvironment.MapPath(normalizeVirtualPath(virtualPath)))) return false;
             if (registeredVpp && Previous.FileExists(virtualPath)) return false;
             return true;
         }
@@ -186,9 +205,8 @@ namespace ImageResizer.Plugins.Basic {
 
 
         internal protected Stream getStream(string virtualPath) {
-            if (isOnlyVirtualPath(virtualPath))
-                return File.Open(VirtualToPhysical(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read);
-            return null;
+            if (NoIOPermission || !IsVirtualPath(virtualPath)) return null;
+            return File.Open(LocalMapPath(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read);
         }
         /// <summary>
         /// Returns the LastWriteTimeUtc value for the specified virtual file in this folder, or DateTime.MinValue if missing.
@@ -196,7 +214,7 @@ namespace ImageResizer.Plugins.Basic {
         /// <param name="virtualPath"></param>
         /// <returns></returns>
         public DateTime GetDateModifiedUtc(string virtualPath) {
-            string physicalPath = VirtualToPhysical(virtualPath);
+            string physicalPath = LocalMapPath(virtualPath);
             if (System.IO.File.Exists(physicalPath))
                 return System.IO.File.GetLastWriteTimeUtc(physicalPath);
             else return DateTime.MinValue;
@@ -212,7 +230,7 @@ namespace ImageResizer.Plugins.Basic {
         public bool FileExists(string virtualPath, NameValueCollection queryString) {
             if (NoIOPermission) return false; //Because File.Exists is always false when IOPermission is missing, anyhow.
             if (!IsVirtualPath(virtualPath)) return false; //It's not even in our area.
-            if (File.Exists(VirtualToPhysical(virtualPath))){
+            if (File.Exists(LocalMapPath(virtualPath))){
                 //Ok, we could serve it, but existing files take precedence.
                 //Return false if we would be masking an existing file.
                 return !File.Exists(HostingEnvironment.MapPath(normalizeVirtualPath(virtualPath)));
@@ -239,7 +257,7 @@ namespace ImageResizer.Plugins.Basic {
         /// <returns></returns>
         public override bool FileExists(string virtualPath) {
             if (isOnlyVirtualPath(virtualPath))
-                return File.Exists(VirtualToPhysical(virtualPath));
+                return File.Exists(LocalMapPath(virtualPath));
             else
                 return Previous.FileExists(virtualPath);
         }
@@ -274,7 +292,7 @@ namespace ImageResizer.Plugins.Basic {
             }
 
 
-             return new CacheDependency(new string[] { VirtualToPhysical(virtualPath) }, deps.ToArray(), utcStart);
+             return new CacheDependency(new string[] { LocalMapPath(virtualPath) }, deps.ToArray(), utcStart);
 
         }
 
@@ -307,7 +325,7 @@ namespace ImageResizer.Plugins.Basic {
             }
 
             public string GetCacheKey(bool includeModifiedDate) {
-                return VirtualPath + (includeModifiedDate ? ("_" + ModifiedDateUTC.Ticks.ToString()) : "");
+                return VirtualPath + (includeModifiedDate ? ("_" + ModifiedDateUTC.Ticks.ToString(CultureInfo.InvariantCulture)) : "");
             }
         }
 
