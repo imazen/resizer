@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Collections;
 using System.Reflection;
+using ImageResizer.Configuration.Issues;
 using ImageResizer.Configuration.Xml;
 using System.IO;
 using System.Globalization;
 using System.Net;
 using System.Diagnostics;
 using System.Threading;
+using System.Security;
 
 namespace ImageResizer.Configuration.Plugins {
     /// <summary>
@@ -17,13 +19,23 @@ namespace ImageResizer.Configuration.Plugins {
     public class NativeDependencyManager:Issues.IssueSink {
 
         public NativeDependencyManager():base("NativeDependencyManager") {
-            var a = this.GetType().Assembly;
-            //Use CodeBase if it is physical; this means we don't re-download each time we recycle. 
-            //If it's a URL, we fall back to Location, which is often the shadow-copied version.
-            TargetFolder = a.CodeBase.StartsWith("file:///", StringComparison.OrdinalIgnoreCase) ? a.CodeBase : a.Location;
-            //Convert UNC paths 
-            TargetFolder = Path.GetDirectoryName(TargetFolder.Replace("file:///", "").Replace("/", "\\"));
+            try
+            {
+                var a = this.GetType().Assembly;
+                //Use CodeBase if it is physical; this means we don't re-download each time we recycle. 
+                //If it's a URL, we fall back to Location, which is often the shadow-copied version.
+                TargetFolder = a.CodeBase.StartsWith("file:///", StringComparison.OrdinalIgnoreCase)
+                                   ? a.CodeBase
+                                   : a.Location;
+                //Convert UNC paths 
+                TargetFolder = Path.GetDirectoryName(TargetFolder.Replace("file:///", "").Replace("/", "\\"));
+            }catch(SecurityException)
+            {
+                TargetFolder = null;
+               
+            }
         }
+
 
         private string TargetFolder = null;
 
@@ -33,6 +45,7 @@ namespace ImageResizer.Configuration.Plugins {
 
 
         public void EnsureLoaded(Assembly a) {
+           
             if (assembliesProcessed.Contains(a.FullName)) return;
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -72,6 +85,13 @@ namespace ImageResizer.Configuration.Plugins {
         }
 
         public void EnsureLoaded(Node manifest, string assemblyName, Stopwatch sw = null) {
+            if (TargetFolder == null)
+            {
+                this.AcceptIssue(
+                    new Issue("Applicaiton does not have IOPermission; Native dependencies for " + assemblyName +
+                              " will not be downloaded if missing"));
+                return;
+            }
             string platform = IntPtr.Size == 8 ? "64" : "32";
             
             Queue<Dependency> q = new Queue<Dependency>();
