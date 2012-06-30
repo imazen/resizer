@@ -29,7 +29,7 @@
     //<!--
 
         $(function () {
-            $('div.studio1').ImageStudio({ url: '/private/redeye/Red-Eye_08.jpg?width=400' });
+            $('div.studio1').ImageStudio({ url: '/red-eye-wikipedia.jpg?width=400' });
         });
 
     //-->
