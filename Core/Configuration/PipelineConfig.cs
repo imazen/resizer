@@ -365,15 +365,18 @@ namespace ImageResizer.Configuration {
 		[CLSCompliant(false)]
         protected volatile bool firedFirstRequest = false;
 
+        protected volatile bool firstRequestFinished = false;
+
         protected object firedFirstRequestSync = new object();
 
         public void FirePostAuthorizeRequest(System.Web.IHttpModule sender, System.Web.HttpContext httpContext) {
             //The one-time event
-            if (!firedFirstRequest) {
+            if (!firstRequestFinished) {
                 lock (firedFirstRequestSync) {
                     if (!firedFirstRequest) {
                         firedFirstRequest = true;
                         if (OnFirstRequest != null) OnFirstRequest(sender, httpContext);
+                        firstRequestFinished = true;
                     }
                 }
             }

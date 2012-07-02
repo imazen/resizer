@@ -103,7 +103,7 @@ namespace ImageResizer.Plugins.WicDecoder {
 
         public IEnumerable<IIssue> GetIssues() {
             List<IIssue> issues = new List<IIssue>();
-            if (Environment.OSVersion.Version.Major < 6) issues.Add(new Issue("WIC should only be used Windows 7, Server 2008, or higher.", IssueSeverity.Critical));
+            if (Environment.OSVersion.Version.Major < 6) issues.Add(new Issue("WIC should only be used on Windows 7, Server 2008, or higher.", IssueSeverity.Critical));
             return issues;
         }
     }
