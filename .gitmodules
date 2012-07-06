@@ -4,3 +4,6 @@
 [submodule "StudioJS"]
 	path = StudioJS
 	url = git@github.com:nathanaeljones/studiojs.git
+[submodule "Tools/lightresize"]
+	path = Tools/lightresize
+	url = https://github.com/imazen/lightresize.git
