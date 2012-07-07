@@ -61,7 +61,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             if (i > 0) new GaussianBlur(1.4, i).ApplyInPlace(s.destBitmap);
 
             i = GetRadius(s, "sharpen", "a.sharpen", units);
-            if (i > 0) new GaussianSharpen(1.4, i).ApplyInPlace(s.destBitmap);
+            if (i > 0) new GaussianSharpen(1.4, Math.Min(11,i)).ApplyInPlace(s.destBitmap);
 
             i = GetRadius(s, "a.oilpainting", null, units);
             if (i > 0) new OilPainting(i).ApplyInPlace(s.destBitmap);
