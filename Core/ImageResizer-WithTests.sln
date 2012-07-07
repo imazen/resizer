@@ -107,6 +107,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Wpf", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LitS3", "..\Plugins\Libs\LitS3-1.0.1\LitS3\LitS3.csproj", "{C564E026-D515-4E8B-ADED-36087E89443E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imazen.LightResize", "..\Tools\lightresize\Imazen.LightResize.csproj", "{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -953,6 +955,24 @@ Global
 		{C564E026-D515-4E8B-ADED-36087E89443E}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{C564E026-D515-4E8B-ADED-36087E89443E}.Trial|x64.ActiveCfg = Release|Any CPU
 		{C564E026-D515-4E8B-ADED-36087E89443E}.Trial|x86.ActiveCfg = Release|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Release|x64.ActiveCfg = Release|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Release|x86.ActiveCfg = Release|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Trial|x64.ActiveCfg = Release|Any CPU
+		{C13AE8F5-392C-40DB-9FA8-AC7337A5C229}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
