@@ -5,39 +5,19 @@ using OpenCvSharp;
 using System.Drawing;
 using System.Diagnostics;
 using System.IO;
-
-namespace System.Runtime.CompilerServices {
-    [AttributeUsage(AttributeTargets.Method)]
-    internal sealed class ExtensionAttribute : Attribute {
-        public ExtensionAttribute() { }
-    }
-}
+using ImageResizer.Plugins.Faces;
 
 
 namespace ImageResizer.Plugins.RedEye {
 
-    public static class OpenCvExtensions{
-        public static RectangleF ToRectangleF(this CvRect rect) {
-            return new RectangleF(rect.X, rect.Y, rect.Width, rect.Height);
-        }
-        public static CvAvgComp[] ToArrayAndDispose(this CvSeq<CvAvgComp> seq) {
-            CvAvgComp[] arr = seq.ToArray();
-            seq.Dispose();
-            return arr;
-        }
 
-        public static CvRect Offset(this CvRect rect, CvPoint offset ) {
-            return new CvRect(rect.X + offset.X, rect.Y +offset.Y, rect.Width, rect.Height);
-        }
-    }
-    public enum FeatureType{
+    public enum FeatureType {
         Eye,
         EyePair,
         Face
     }
 
-
-    public class ObjRect {
+    public class ObjRect : IFeature {
         public ObjRect(RectangleF rect, FeatureType type) {
             this.X = rect.X;
             this.Y = rect.Y;
@@ -54,104 +34,16 @@ namespace ImageResizer.Plugins.RedEye {
         public FeatureType Feature { get; set; }
     }
 
-    public class FaceDetection:IDisposable{
-
-        public FaceDetection(string xmlFolder = null) {
-            if (xmlFolder != null) searchFolders.Insert(0,xmlFolder);
-            searchFolders.Add(System.IO.Path.GetDirectoryName(new Uri(this.GetType().Assembly.CodeBase).LocalPath));
-            searchFolders.Add(System.IO.Path.GetDirectoryName(this.GetType().Assembly.Location));
-        
-            searchFolders.Add(@"C:\Users\Administrator\Documents\resizer\Plugins\Libs\OpenCV");
-        }
-
-        private List<string> searchFolders = new List<string>() { };
-
-        private  Dictionary<string, string> fileNames = new Dictionary<string,string>(){ 
-            {"FaceCascade",@"haarcascade_frontalface_default.xml"}, 
-            {"LeftEyeCascade" , @"haarcascade_mcs_lefteye.xml"},
-            {"RightEyeCascade" , @"haarcascade_mcs_righteye.xml"},
-            {"EyePair45" , @"haarcascade_mcs_eyepair_big.xml"},
-            {"EyePair22" , @"haarcascade_mcs_eyepair_small.xml"},
-            {"Eye" , @"haarcascade_eye.xml"},
-        };
-
-        private Dictionary<string, string> Files = null;
-        private Dictionary<string, CvHaarClassifierCascade> Cascades = null;
-        private void LoadFiles() {
-            if (Files != null) return;
-
-            var f = new Dictionary<string, string>();
-            Cascades = new Dictionary<string, CvHaarClassifierCascade>();
-            foreach (string key in fileNames.Keys) {
-                string resolvedPath = null;
-                foreach (string basePath in searchFolders) {
-                    string full = basePath.TrimEnd('\\') + '\\' + fileNames[key];
-                    if (File.Exists(full)) {
-                        resolvedPath = Path.GetFullPath(full);
-                        Cascades[key] = Cv.Load<CvHaarClassifierCascade>(resolvedPath);
-                        break;
-                    }
-                }
-                if (resolvedPath == null) throw new FileNotFoundException("Failed to find " + fileNames[key] + " in any of the search directories. Verify the XML files have been copied to the same folder as ImageResizer.Plugins.RedEye.dll.");
-                f[key] = resolvedPath;
-            }
-
-            Files = f;
-        }
+    public class FaceDetection : FeatureDetectionBase<ObjRect> {
 
 
-        public List<ObjRect> DetectFeatures(Bitmap b) {
-            LoadFiles();
-            List<ObjRect> eyes;
-            //Type Intializer Exception occurs if you reuse an appdomain. Always restart the server.
-            using (IplImage orig = OpenCvSharp.BitmapConverter.ToIplImage(b))
-            using (IplImage gray = new IplImage(orig.Size, BitDepth.U8, 1)) {
-
-                //Make grayscale version
-                Cv.CvtColor(orig, gray, ColorConversion.BgrToGray);
-
-                int w = orig.Width; int h = orig.Height;
-                double ratio = (double)w / (double)h;
-                double scale = 1;
-                if (ratio > 1) scale = (double)w / 1000;
-                if (ratio <= 1) scale = (double)h / 1000;
-                scale = Math.Min(1, 1 / scale);
-
-
-                using (IplImage small = new IplImage(new CvSize(Cv.Round(w * scale), Cv.Round(h * scale)), BitDepth.U8, 1)) {
-                    //Resize to smaller version
-                    Cv.Resize(gray, small, Interpolation.Area);
-                    //Equalize histogram
-                    Cv.EqualizeHist(gray, gray);
-
-                    using (CvMemStorage storage = new CvMemStorage()) {
-                        storage.Clear();
-                        eyes = DetectFeatures(small, storage);
-                    }
-                }
-                //Scale all rectangles by factor to restore to original resolution
-                for (int i = 0; i < eyes.Count; i++) {
-                    ObjRect e = eyes[i];
-                    e.Y = (float)Math.Min(h, e.Y / scale);
-                    e.X = (float)Math.Min(w, e.X / scale);
-                    e.Y2 = (float)Math.Min(h, e.Y2 / scale);
-                    e.X2 = (float)Math.Min(w, e.X2 / scale);
-                    
-                }
-            }
-            return eyes;
-        }
-
-        private int CompareByNeighbors(CvAvgComp a, CvAvgComp b) {
-            return a.Neighbors.CompareTo(b.Neighbors);
-        }
         /// <summary>
         /// Detects features on a grayscale image.
         /// </summary>
         /// <param name="img"></param>
         /// <param name="storage"></param>
         /// <returns></returns>
-        private List<ObjRect> DetectFeatures(IplImage img, CvMemStorage storage) {
+        protected override List<ObjRect> DetectFeatures(IplImage img, CvMemStorage storage) {
             List<ObjRect> eyes = new List<ObjRect>();
 
             //Detect faces
@@ -164,9 +56,10 @@ namespace ImageResizer.Plugins.RedEye {
 
             //If there are no faces, look for large eye pairs
             if (faces.Length == 0) {
-                CvAvgComp[] pairs = Cv.HaarDetectObjects(img, Cascades["EyePair45"], storage, 1.0850, 2,0,new CvSize(img.Width / 4,img.Width / 20)).ToArrayAndDispose();
+                CvAvgComp[] pairs = Cv.HaarDetectObjects(img, Cascades["EyePair45"], storage, 1.0850, 2, 0, new CvSize(img.Width / 4, img.Width / 20)).ToArrayAndDispose();
                 if (pairs.Length > 0) {
-                    //Array.Sort<CvAvgComp>(pairs, CompareByNeighbors); //TODO: verify sorting is happening in the right order
+                    //TODO!!! Uncomment and test now that CompareByNeighbors sorts correctly
+                    //Array.Sort<CvAvgComp>(pairs, CompareByNeighbors); 
                     //Take the 1st most likely that actually contains eyes. We don't want to evaluate multiple eye pairs when there are no faces.
                     //If there are pairs, evalutate them all. Finding eyes within multiple pairs is unlikely
                     foreach (CvAvgComp pair in pairs) {
@@ -196,7 +89,7 @@ namespace ImageResizer.Plugins.RedEye {
             img.SetROI(r);
 
             //Look for pairs there
-            CvAvgComp[] pairs = Cv.HaarDetectObjects(img, Cascades["EyePair22"], storage, 1.0850, 2, 0, new CvSize(r.Width < 50 ? 11 : 22,r.Width < 50 ? 3 : 5)).ToArrayAndDispose();
+            CvAvgComp[] pairs = Cv.HaarDetectObjects(img, Cascades["EyePair22"], storage, 1.0850, 2, 0, new CvSize(r.Width < 50 ? 11 : 22, r.Width < 50 ? 3 : 5)).ToArrayAndDispose();
             //Array.Sort<CvAvgComp>(pairs, CompareByNeighbors);
 
             //Look for individual eyes if no pairs were found
@@ -207,10 +100,10 @@ namespace ImageResizer.Plugins.RedEye {
                 r.Y += aFifth;
                 r.Height -= aFifth;
 
-                eyes.AddRange(DetectEyesInRegion(img, storage,r));
+                eyes.AddRange(DetectEyesInRegion(img, storage, r));
             }
             //If there are pairs, evalutate them all. Finding eyes within multiple pairs is unlikely
-            for(var i = 0; i < pairs.Length; i++) {
+            for (var i = 0; i < pairs.Length; i++) {
                 CvAvgComp pair = pairs[i]; //Adjust for ROI
                 pair.Rect.X += r.X;
                 pair.Rect.Y += r.Y;
@@ -249,13 +142,13 @@ namespace ImageResizer.Plugins.RedEye {
             //Split the region into two overlapping rectangles
             CvRect leftEye = region;
             leftEye.Width = (int)(leftEye.Width * 0.6);
-            
+
             CvRect rightEye = region;
             rightEye.Width = (int)(rightEye.Width * 0.6);
             rightEye.X += (int)(region.Width * 0.4);
 
             //If the eye pair or face is small enough, use 3 instead of 5
-            int minEyeLength = region.Width < 80 ? 3 : 5; 
+            int minEyeLength = region.Width < 80 ? 3 : 5;
             CvSize minEyeSize = new CvSize(minEyeLength, minEyeLength);
 
             List<object[]> vars = new List<object[]>();
@@ -294,7 +187,7 @@ namespace ImageResizer.Plugins.RedEye {
                         minEyeSize = new CvSize(leyes[0].Rect.Width / 4, leyes[0].Rect.Width / 4);
                         foundLeft = true;
                     }
-                    
+
                 }
 
                 if (!foundRight) {
@@ -317,13 +210,6 @@ namespace ImageResizer.Plugins.RedEye {
         }
 
 
-        public void Dispose() {
-            foreach (string s in Cascades.Keys) {
-                if (Cascades[s] != null) {
-                    Cascades[s].Dispose();
-                    Cascades[s] = null;
-                }
-            }
-        }
+
     }
 }

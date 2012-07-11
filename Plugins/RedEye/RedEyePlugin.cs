@@ -73,7 +73,7 @@ namespace ImageResizer.Plugins.RedEye {
 
 
              if ("true".Equals(s.settings["r.autoeyes"], StringComparison.OrdinalIgnoreCase)) {
-                 List<ObjRect> eyes = new FaceDetection(@"C:\Users\Administrator\Documents\resizer\Plugins\Libs\OpenCV").DetectFeatures(s.sourceBitmap);
+                 List<ObjRect> eyes = new FaceDetection().DetectFeatures(s.sourceBitmap);
                  List<PointF> points = new List<PointF>();
                  foreach(ObjRect r in eyes) { points.Add(new PointF(r.X,r.Y)); points.Add(new PointF(r.X2,r.Y2));}
                  PointF[] newPoints = c.CurrentImageBuilder.TranslatePoints(points.ToArray(),s.originalSize,new ResizeSettings(s.settings));
