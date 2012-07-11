@@ -181,6 +181,10 @@
       <Project>{8E863AFE-B4CF-46AA-8382-0C3547C0EDE9}</Project>
       <Name>ImageResizer.Plugins.FreeImage</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\ImageResizer.Plugins.Faces\ImageResizer.Plugins.Faces.csproj">
+      <Project>{144686D8-7820-4BEE-9325-60C4E998C2B0}</Project>
+      <Name>ImageResizer.Plugins.Faces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Libs\FreeImage\Wrapper\FreeImage.NET\cs\Library\WrapperFreeImage.NET.csproj">
       <Project>{6598A7CD-8F27-4D3F-A675-5AE63113A7C3}</Project>
       <Name>WrapperFreeImage.NET</Name>
