@@ -75,7 +75,7 @@
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ImageResizer.Plugins.Faces\ImageResizer.Plugins.Faces.csproj">
+    <ProjectReference Include="..\Faces\ImageResizer.Plugins.Faces.csproj">
       <Project>{144686D8-7820-4BEE-9325-60C4E998C2B0}</Project>
       <Name>ImageResizer.Plugins.Faces</Name>
     </ProjectReference>
