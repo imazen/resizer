@@ -6,6 +6,11 @@ using FreeImageAPI;
 using System.Drawing.Drawing2D;
 using ImageResizer.Util;
 using System.Drawing;
+using ImageResizer.Plugins.FreeImageResizer;
+using ImageResizer.Plugins.FreeImageScaling;
+
+namespace ImageResizer.Plugins.FreeImageResizer { public class FreeImageResizerPlugin : FreeImageScalingPlugin { public FreeImageResizerPlugin() { } } }
+
 
 namespace ImageResizer.Plugins.FreeImageScaling {
     public class FreeImageScalingPlugin : BuilderExtension, IPlugin, IQuerystringPlugin {
