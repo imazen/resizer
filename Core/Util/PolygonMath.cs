@@ -231,6 +231,25 @@ namespace ImageResizer.Util
             return new RectangleF(left, top, right - left, bottom - top);
         }
         /// <summary>
+        /// Returns a bounding box for the specified set of points. Odd points are Y values, even points are X values
+        /// </summary>
+        /// <param name="points"></param>
+        /// <returns></returns>
+        public static RectangleF GetBoundingBox(double[] flattenedPoints)  {
+            double? minx = null, maxx = null, miny = null, maxy = null;
+            for (var i = 0; i < flattenedPoints.Length; i++) {
+                var v = flattenedPoints[i];
+                if (i % 2 == 0) {
+                    if (minx == null || v < minx.Value) minx = v;
+                    if (maxx == null || v > maxx.Value) maxx = v;
+                } else {
+                    if (miny == null || v < miny.Value) miny = v;
+                    if (maxy == null || v > maxy.Value) maxy = v;
+                }
+            }
+            return new RectangleF((float)minx, (float)miny, (float)(maxx - minx), (float)(maxy - miny));
+        }
+        /// <summary>
         /// Returns a modified version of the array, with each element being offset by the specified amount.
         /// </summary>
 		/// <param name="points"></param>
@@ -366,6 +385,7 @@ namespace ImageResizer.Util
 		/// <param name="outer"></param>
         /// <returns></returns>
         public static SizeF ScaleOutside(SizeF innerBounds, SizeF outer) {
+            
             double innerRatio = innerBounds.Width / innerBounds.Height;
             double outerRatio = outer.Width / outer.Height;
 
@@ -765,6 +785,45 @@ namespace ImageResizer.Util
 
             return new RectangleF((float)x1, (float)y1, (float)(x2 - x1), (float)(y2 - y1));
         }
-        
+
+        /// <summary>
+        /// Returns 'box' clipped to be within 'bounds'
+        /// </summary>
+        /// <param name="box"></param>
+        /// <param name="bounds"></param>
+        /// <returns></returns>
+        public static RectangleF ClipRectangle(RectangleF box, RectangleF bounds) {
+            var topleft = new PointF(Math.Min(bounds.Right, Math.Max(box.X,bounds.X)),
+                                Math.Min(bounds.Bottom, Math.Max(box.Y,bounds.Y)));
+            var bottomright = new PointF(Math.Min(bounds.Right, Math.Max(box.Right,bounds.X)),
+                                Math.Min(bounds.Bottom, Math.Max(box.Bottom,bounds.Y)));
+
+            return new RectangleF(topleft,new SizeF(bottomright.X - topleft.X, bottomright.Y - topleft.Y));
+        }
+
+        /// <summary>
+        /// Expands the given rectangle to be the given size while keeping it centered.
+        /// </summary>
+        /// <param name="box"></param>
+        /// <param name="copySize"></param>
+        /// <returns></returns>
+        public static RectangleF ExpandTo(RectangleF box, SizeF copySize) {
+            var dx = copySize.Width - box.Width;
+            var dy = copySize.Height - box.Height;
+            return new RectangleF(box.X - (dx / 2), box.Y - (dy / 2), copySize.Width, copySize.Height);
+        }
+
+        /// <summary>
+        /// Expands the given rectangle using the specified scale multipliers, leaving it centered
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="ExpandX"></param>
+        /// <param name="ExpandY"></param>
+        /// <returns></returns>
+        public static RectangleF ScaleRect(RectangleF rect, double ExpandX, double ExpandY) {
+            var dx = (float)(rect.Width * ExpandX);
+            var dy = (float)(rect.Height * ExpandY);
+            return new RectangleF(rect.X - (dx / 2), rect.Y - (dy / 2), rect.Width + dx, rect.Height + dy);
+        }
     }
 }
