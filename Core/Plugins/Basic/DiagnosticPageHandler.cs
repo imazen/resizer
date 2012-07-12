@@ -58,12 +58,19 @@ namespace ImageResizer.Plugins.Basic {
 
             if (!HttpRuntime.UsingIntegratedPipeline && context != null && context.Request != null) {
                 string server = context.Request.ServerVariables["SERVER_SOFTWARE"];
-                string ext = c.Pipeline.FakeExtensions.Count > 0 ? c.Pipeline.FakeExtensions[0] : "[the fakeExtensions attribute of the <pipeline> element in web.config is empty. Remove, or set to .ashx]";
+                if (server.IndexOf("IIS", 0, StringComparison.OrdinalIgnoreCase) > -1) {
 
-                if (server.IndexOf("IIS/7", 0, StringComparison.OrdinalIgnoreCase) > -1) {
-                    issues.Add(new Issue("Pipeline", "This app is running in Classic mode instead of Integrated mode. This causes reduced performance and requires a special URL syntax." + 
-						"In classic mode, you will need to append the " + ext + " extension to any images you wish to process.\n" +
-                        "Alternatively, switch the mode to Integrated in the application's App Pool.", IssueSeverity.Warning));
+                    string ext = c.Pipeline.FakeExtensions.Count > 0 ? c.Pipeline.FakeExtensions[0] : "[the fakeExtensions attribute of the <pipeline> element in web.config is empty. Remove, or set to .ashx]";
+
+                    if (server.IndexOf("IIS/7", 0, StringComparison.OrdinalIgnoreCase) > -1 ||
+                        server.IndexOf("IIS/8", 0, StringComparison.OrdinalIgnoreCase) > -1) {
+                        issues.Add(new Issue("Pipeline", "This app is running in Classic mode instead of Integrated mode. This causes reduced performance and requires a special URL syntax." +
+                            "In classic mode, you will need to append the " + ext + " extension to any images you wish to process.\n" +
+                            "Alternatively, switch the mode to Integrated in the application's App Pool.", IssueSeverity.Warning));
+                    } else {
+                        issues.Add(new Issue("Server", server + " does not support Integrated mode or does not have it enabled.",
+                            "You must append the " + ext + " extension to any image requests you wish to process.\n", IssueSeverity.Warning));
+                    }
                 }
             }
 
