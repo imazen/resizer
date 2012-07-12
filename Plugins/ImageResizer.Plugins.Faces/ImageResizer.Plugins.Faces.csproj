@@ -48,7 +48,7 @@
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="DetectionPlugin.cs" />
+    <Compile Include="CropAround.cs" />
     <Compile Include="FaceDetection.cs" />
     <Compile Include="FeatureDetectionBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

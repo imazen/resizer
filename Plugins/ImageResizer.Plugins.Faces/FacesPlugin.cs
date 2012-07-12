@@ -11,6 +11,7 @@ using ImageResizer.ExtensionMethods;
 using ImageResizer.Caching;
 using System.IO;
 using System.Collections.Specialized;
+using ImageResizer.Plugins.CropAround;
 
 namespace ImageResizer.Plugins.Faces {
     public class FacesPlugin:BuilderExtension,IPlugin,IQuerystringPlugin {
@@ -19,8 +20,11 @@ namespace ImageResizer.Plugins.Faces {
 
 
         protected Config c;
+        //protected CropAroundPlugin ca;
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
+            //ca = new CropAroundPlugin();
+            //c.Plugins.add_plugin(ca);
             this.c = c;
             c.Pipeline.PreHandleImage += Pipeline_PreHandleImage;
             return this;
@@ -28,37 +32,65 @@ namespace ImageResizer.Plugins.Faces {
 
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
+            //ca.Uninstall(c);
             c.Pipeline.PreHandleImage -= Pipeline_PreHandleImage;
             return true;
         }
 
-       
- 
+        protected override RequestedAction PostPrepareSourceBitmap(ImageState s) {
+            if (s.sourceBitmap == null) return RequestedAction.None;
+
+            bool focusFaces = ("faces".Equals(s.settings["c.focus"], StringComparison.OrdinalIgnoreCase));
+            bool showFaces = "true".Equals(s.settings["f.show"], StringComparison.OrdinalIgnoreCase);
+
+            List<Face> faces = null;
+
+            //Perform face detection for either (or both) situations
+            if (showFaces || focusFaces) {
+                //Store faces
+                s.Data["faces"] = faces =ConfigureDetection(s.settings).DetectFeatures(s.sourceBitmap);
+                //Store points
+                List<PointF> points = new List<PointF>();
+                foreach (Face r in faces) { points.Add(new PointF(r.X, r.Y)); points.Add(new PointF(r.X2, r.Y2)); }
+                s.layout.AddInvisiblePolygon("faces", points.ToArray());
+            }
+
+            //Capture and rewrite requests with &c.focus=faces
+            if (focusFaces) {
+                //Write the face points as focus values
+                List<double> focusPoints = new List<double>();
+                foreach (Face r in faces) { focusPoints.Add(r.X); focusPoints.Add(r.Y); focusPoints.Add(r.X2); focusPoints.Add(r.Y2); }
+                NameValueCollectionExtensions.SetList<double>(s.settings, "c.focus", focusPoints.ToArray(), false);
+            }
+            return RequestedAction.None;
+        }
+
+
         protected override RequestedAction PostRenderImage(ImageState s) {
 
-            if (s.destBitmap == null) return RequestedAction.None;
-            string str = null;
-            int i = 0;
 
-             if ("true".Equals(s.settings["f.show"], StringComparison.OrdinalIgnoreCase)) {
-                 List<Face> eyes = new FaceDetection() { MinFaces = 1, MaxFaces = 1 }.DetectFeatures(s.sourceBitmap);
-                 List<PointF> points = new List<PointF>();
-                 foreach(Face r in eyes) { points.Add(new PointF(r.X,r.Y)); points.Add(new PointF(r.X2,r.Y2));}
-                 PointF[] newPoints = c.CurrentImageBuilder.TranslatePoints(points.ToArray(),s.originalSize,new ResizeSettings(s.settings));
-                 using (Graphics g = Graphics.FromImage(s.destBitmap)){
-                     for(i =0; i < newPoints.Length -1; i+=2){
-                         float x1 = newPoints[i].X;
-                         float y1 = newPoints[i].Y;
-                         float x2 = newPoints[i + 1].X;
-                         float y2 = newPoints[i + 1].Y;
-                         float t; 
-                         if (x1 > x2){ t = x2; x2  =x1; x1 = t;}
-                         if (y1 > y2){ t = y1; y1 = y2; y2 = t;} 
-                         
-                         g.DrawRectangle(Pens.Green,new Rectangle((int)x1,(int)y1,(int)(x2-x1),(int)(y2-y1)));
-                     }
-                 }
-             }
+            if (!"true".Equals(s.settings["f.show"], StringComparison.OrdinalIgnoreCase) ||
+                !s.layout.ContainsRing("faces") ||
+                s.destBitmap == null) return RequestedAction.None;
+
+
+            var newPoints = s.layout["faces"];
+
+            using (Graphics g = Graphics.FromImage(s.destBitmap)) {
+
+                for (var i = 0; i < newPoints.Length - 1; i += 2) {
+                    float x1 = newPoints[i].X;
+                    float y1 = newPoints[i].Y;
+                    float x2 = newPoints[i + 1].X;
+                    float y2 = newPoints[i + 1].Y;
+                    float t;
+                    if (x1 > x2) { t = x2; x2 = x1; x1 = t; }
+                    if (y1 > y2) { t = y1; y1 = y2; y2 = t; }
+
+                    g.DrawRectangle(Pens.Green, new Rectangle((int)x1, (int)y1, (int)(x2 - x1), (int)(y2 - y1)));
+                }
+            }
+
 
             return RequestedAction.None;
         }
@@ -80,8 +112,8 @@ namespace ImageResizer.Plugins.Faces {
 
 
         protected override RequestedAction Render(ImageState s) {
-            bool detect = NameValueCollectionExtensions.Get(e.RewrittenQuerystring, "f.detect", false);
-            bool getlayout = NameValueCollectionExtensions.Get(e.RewrittenQuerystring, "f.getlayout", false);
+            bool detect = NameValueCollectionExtensions.Get(s.settings, "f.detect", false);
+            bool getlayout = NameValueCollectionExtensions.Get(s.settings, "f.getlayout", false);
             if (!detect && !getlayout) return RequestedAction.None;
 
 
@@ -151,7 +183,7 @@ namespace ImageResizer.Plugins.Faces {
             if (count == null) {
                 f.MinFaces = 1;
                 f.MaxFaces = 1;
-            }else if (count.Length > 0{
+            }else if (count.Length > 0){
                 f.MinFaces = f.MaxFaces = count[0];
                 if (count.Length > 1) f.MaxFaces = count[1];
             }
@@ -166,11 +198,21 @@ namespace ImageResizer.Plugins.Faces {
             //Parse min size percent
             f.MinSizePercent = NameValueCollectionExtensions.Get<float>(s,"f.minsize",f.MinSizePercent);
 
+            //Parse expandsion rules
+            double[] expand = NameValueCollectionExtensions.GetList<double>(s, "f.expand", null, 1, 2);
+
+            //Exapnd bounding box by requested percentage
+            if (expand != null) {
+                f.ExpandX = expand[0];
+                f.ExpandY = expand.Length > 1 ? expand[1] : expand[0];
+            }
+            
+
             return f;
         }
 
-        public override IEnumerable<string> GetSupportedQuerystringKeys() {
-            return new string[] { "f.show", "f.detect","f.faces", "f.threshold", "f.minsize"};
+        public  IEnumerable<string> GetSupportedQuerystringKeys() {
+            return new string[] { "f.show", "f.detect","f.faces", "f.threshold", "f.minsize", "f.expand"};
         }
     }
 }
