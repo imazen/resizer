@@ -8,6 +8,7 @@ using ImageResizer.ExtensionMethods;
 using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.CropAround {
+
     public class CropAroundPlugin:BuilderExtension, IPlugin,IQuerystringPlugin  {
      
         public IPlugin Install(Configuration.Config c) {
@@ -21,7 +22,7 @@ namespace ImageResizer.Plugins.CropAround {
         }
 
         public IEnumerable<string> GetSupportedQuerystringKeys() {
-            return new string[] { "c.focus", "c.zoom" };
+            return new string[] { "c.focus", "c.zoom", "c.finalmode" };
         }
 
         protected override RequestedAction LayoutImage(ImageState s) {
@@ -61,10 +62,14 @@ namespace ImageResizer.Plugins.CropAround {
             var padding = PolygonMath.ScaleInside(box.Size, targetSize);
             padding = new SizeF(targetSize.Width - padding.Width, targetSize.Height - padding.Height);
 
-            //Crop off 1 or 2 pixels without worrying too much
-            if (padding.Width + padding.Height < 3) s.settings.Mode = FitMode.Crop;
-                //Otherwise pad the result
-            else s.settings.Mode = FitMode.Pad;
+
+            //So, if we haven't met the aspect ratio yet, what mode will we pass on?
+            var finalmode = NameValueCollectionExtensions.Get<FitMode>(s.settings, "c.finalmode", FitMode.Pad);
+
+            //Crop off 1 or 2 pixels instead of padding without worrying too much
+            if (finalmode == FitMode.Pad && padding.Width + padding.Height < 3) finalmode = FitMode.Crop;
+
+            s.settings.Mode = finalmode;
 
             return RequestedAction.None;
         }
