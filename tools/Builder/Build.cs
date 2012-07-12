@@ -393,23 +393,34 @@ namespace ImageResizer.ReleaseBuilder {
 
         public void PrepareForPackaging() {
             if (q == null) q = new FsQuery(this.f.ParentPath, standardExclusions);
-            //Don't copy the DotNetZip or Aforge xml file.
-            q.exclusions.Add(new Pattern("^/Plugins/Libs/DotNetZip*.xml$"));
-            q.exclusions.Add(new Pattern("^/Plugins/Libs/Aforge*.xml$"));
-            q.exclusions.Add(new Pattern("^/Tests/Libs/LibDevCassini"));
+            //Don't copy XML or PDB files for the following libs:
+            q.exclusions.Add(new Pattern("/(Newtonsoft.Json|DotNetZip|Aforge|LitS3|Ionic|NLog|MongoDB)*.(xml|pdb)$"));
+            //Don't copy XML for these (but do keep pdb)
+            q.exclusions.Add(new Pattern("/(AWSSDK|OpenCvSharp|FreeImageNet|Microsoft.)*.xml$"));
+            //Exclude dependencies handled by NDP
+            q.exclusions.Add(new Pattern("/(FreeImage|gsdll32|gsdll64).dll$")); 
+            
+            //Exclude infrequently used but easily buildable stuff
+            q.exclusions.Add(new Pattern("/ImageResizerGUI.exe$"));
+            
+            //Exclude resharper junk
+            q.exclusions.Add(new Pattern("_ReSharper"));
+
+            //Exclude temorary files
+            q.exclusions.Add(new Pattern("^/Contrib/*/(bin|obj|imagecache|uploads|results)/*"));
+            q.exclusions.Add(new Pattern("^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|hidden|results)/"));
+            q.exclusions.Add(new Pattern("^/Core(.Mvc)?/obj/"));
             q.exclusions.Add(new Pattern("^/Tests/binaries"));
+
+            //Exclude stuff that is not used or generally useful
+            q.exclusions.Add(new Pattern("^/Tests/LibDevCassini"));
             q.exclusions.Add(new Pattern("^/Tests/ComparisonBenchmark/Images"));
             q.exclusions.Add(new Pattern("^/Samples/SqlReaderSampleVarChar"));
-            q.exclusions.Add(new Pattern("^/Contrib/*/(bin|obj|imagecache|uploads|results)/*"));
             q.exclusions.Add(new Pattern(".config.transform$"));
             q.exclusions.Add(new Pattern("^/Plugins/Libs/FreeImage/Examples/")); //Exclude examples folder
             q.exclusions.Add(new Pattern("^/Plugins/Libs/FreeImage/Wrapper/(Delphi|VB6|FreeImagePlus)")); //Exclude everything except the FreeImage.NET folder
             q.exclusions.Add(new Pattern("^/Plugins/Libs/FreeImage/Wrapper/FreeImage.NET/cs/[^L]*/")); //Exclude everything except the library folder
-            q.exclusions.Add(new Pattern("^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|hidden|results)/"));
-            q.exclusions.Add(new Pattern("^/Core(.Mvc)?/obj/"));
-            q.exclusions.Add(new Pattern("^/dlls/*/(Aforge|LitS3|Ionic)*.(pdb|xml)$"));
-            q.exclusions.Add(new Pattern("^/dlls/*/FreeImage.dll$")); //Exclude FreeImage.dll from the dlls folder - no need for multiple copies of it.
-            q.exclusions.Add(new Pattern("/gsdll(32|64).dll$")); //Exclude ghostscript dlls, they're huge.
+            
         }
         public void PackMin(PackageDescriptor desc) {
             // 'min' - /dlls/release/ImageResizer.* - /
