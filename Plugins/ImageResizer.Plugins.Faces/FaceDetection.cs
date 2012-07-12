@@ -5,6 +5,7 @@ using OpenCvSharp;
 using System.Drawing;
 using System.Diagnostics;
 using System.IO;
+using ImageResizer.Util;
 
 
 namespace ImageResizer.Plugins.Faces {
@@ -33,6 +34,8 @@ namespace ImageResizer.Plugins.Faces {
             ConfidenceLevelThreshold = 2;
             MinConfidenceLevel = 1;
 
+            ExpandX = 0;
+            ExpandY = 0;
             fileNames = new Dictionary<string, string>(){ 
             {"FaceCascade",@"haarcascade_frontalface_default.xml"} };
         }
@@ -61,6 +64,17 @@ namespace ImageResizer.Plugins.Faces {
         /// The minimum number of agreeing matches required for a face rectangle to be evaluated
         /// </summary>
         public int MinConfidenceLevel { get; set; }
+
+        /// <summary>
+        /// The percentage by which to expand each face rectangle horizontally after detection. To expand 5% each side, set to 0.1
+        /// </summary>
+        public double ExpandX { get; set; }
+
+        /// <summary>
+        /// The percentage by which to expand each face rectangle vertically after detection. To expand 20% on the top and bottom, set to 0.4
+        /// </summary>
+        public double ExpandY { get; set; }
+        
        
         /// <summary>
         /// Detects features on a grayscale image.
@@ -84,7 +98,7 @@ namespace ImageResizer.Plugins.Faces {
 
             //Convert into feature objects list
             List<Face> features = new List<Face>(faces.Length);
-            foreach (CvAvgComp face in faces) features.Add(new Face(face.Rect.ToRectangleF(), face.Neighbors));
+            foreach (CvAvgComp face in faces) features.Add(new Face(PolygonMath.ScaleRect(face.Rect.ToRectangleF(),ExpandX,ExpandY), face.Neighbors));
             
             //Unless we're below MinFaces, filter out the low confidence matches.
             while (features.Count > MinFaces && features[features.Count - 1].Accuracy < ConfidenceLevelThreshold) features.RemoveAt(features.Count - 1);
