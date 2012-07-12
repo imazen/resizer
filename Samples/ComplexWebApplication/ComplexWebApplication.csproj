@@ -181,7 +181,7 @@
       <Project>{8E863AFE-B4CF-46AA-8382-0C3547C0EDE9}</Project>
       <Name>ImageResizer.Plugins.FreeImage</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\ImageResizer.Plugins.Faces\ImageResizer.Plugins.Faces.csproj">
+    <ProjectReference Include="..\..\Plugins\Faces\ImageResizer.Plugins.Faces.csproj">
       <Project>{144686D8-7820-4BEE-9325-60C4E998C2B0}</Project>
       <Name>ImageResizer.Plugins.Faces</Name>
     </ProjectReference>
