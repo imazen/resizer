@@ -438,10 +438,13 @@ namespace ImageResizer
                 if (b != null && b.Tag != null && b.Tag is BitmapTag) underlyingStream = ((BitmapTag)b.Tag).Source;
 
                 //Close the source bitamp's underlying stream unless it is the same stream (EDIT: or bitmap) we were passed.
-                if (b != job.Source && underlyingStream != job.Source && underlyingStream != null) underlyingStream.Dispose();
+                var closeUnderlyingStream = (b != job.Source && underlyingStream != job.Source && underlyingStream != null);
 
                 //Dispose the bitmap unless we were passed it. We check for 'null' in case an ImageCorruptedException occured. 
                 if (b != null && b != job.Source) b.Dispose();
+
+                //Dispose the underlying stream after disposing the bitmap
+                if (closeUnderlyingStream) underlyingStream.Dispose();
             }
 
             return RequestedAction.Cancel;
@@ -896,11 +899,13 @@ namespace ImageResizer
         protected override RequestedAction LayoutImage(ImageState s) {
             if (base.LayoutImage(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
-            //Use the crop size if present.
-            s.copyRect = new RectangleF(new PointF(0,0),s.originalSize);
-            if (NameValueCollectionExtensions.GetList<double>(s.settings, "crop", 0, 4) != null) {
-                s.copyRect = PolygonMath.ToRectangle(s.settings.getCustomCropSourceRect(s.originalSize)); //Round the custom crop rectangle coordinates
-                if (s.copyRect.Size.IsEmpty) throw new Exception("You must specify a custom crop rectange if crop=custom");
+            if (s.copyRect.IsEmpty) {
+                //Use the crop size if present.
+                s.copyRect = new RectangleF(new PointF(0, 0), s.originalSize);
+                if (NameValueCollectionExtensions.GetList<double>(s.settings, "crop", 0, 4) != null) {
+                    s.copyRect = PolygonMath.ToRectangle(s.settings.getCustomCropSourceRect(s.originalSize)); //Round the custom crop rectangle coordinates
+                    if (s.copyRect.Size.IsEmpty) throw new Exception("You must specify a custom crop rectange if crop=custom");
+                }
             }
             //Save the manual crop size.
             SizeF manualCropSize = s.copySize;
@@ -1031,7 +1036,7 @@ namespace ImageResizer
             
 
             //Translate and scale all existing rings
-            s.layout.Shift(new RectangleF(0, 0, s.originalSize.Width, s.originalSize.Height), new RectangleF(new Point(0, 0), targetSize));
+            s.layout.Shift(s.copyRect, new RectangleF(new Point(0, 0), targetSize));
 
             s.layout.AddRing("image", PolygonMath.ToPoly(new RectangleF(new PointF(0, 0), targetSize)));
 

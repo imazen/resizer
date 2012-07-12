@@ -105,6 +105,12 @@ namespace ImageResizer.Resizing {
         public PointSet AddRing(string name, BoxPadding padding) {
             return AddRing(name, PolygonMath.InflatePoly(LastRing.points, padding.GetEdgeOffsets()));
         }
+        /// <summary>
+        /// Add points this way to see where they will occur on the destination image
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="points"></param>
+        /// <returns></returns>
         public PointSet AddInvisiblePolygon(string name, PointF[] points) {
             PointSet ps = new PointSet(points);
             ps.flags = PointFlags.Invisible;
