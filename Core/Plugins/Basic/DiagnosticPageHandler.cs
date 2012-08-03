@@ -11,6 +11,7 @@ using ImageResizer.Util;
 using System.ComponentModel;
 using ImageResizer.Configuration.Xml;
 using System.Globalization;
+using System.Security;
 
 namespace ImageResizer.Plugins.Basic {
     public class DiagnosticPageHandler : IHttpHandler {
@@ -183,11 +184,13 @@ namespace ImageResizer.Plugins.Basic {
 				System.Environment.Version.ToString());
             sb.AppendLine("Trust level: " + GetCurrentTrustLevel().ToString());
 
-
-            string wow64 = System.Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432");
-            string arch = System.Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
-            sb.AppendLine("OS bitness: " + arch + (string.IsNullOrEmpty(wow64) ? "" : " !! Warning, running as 32-bit on a 64-bit OS(" + wow64 + "). This will limit ram usage !!"));
-
+            try{
+                string wow64 = System.Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432");
+                string arch = System.Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
+                sb.AppendLine("OS bitness: " + arch + (string.IsNullOrEmpty(wow64) ? "" : " !! Warning, running as 32-bit on a 64-bit OS(" + wow64 + "). This will limit ram usage !!"));
+            }catch(SecurityException){
+                sb.AppendLine("Failed to detect operating system bitness - security restrictions prevent reading environment variables");
+            }
 
             // PROCESSOR_ARCHITECTURE	x86	AMD64	x86
             // PROCESSOR_ARCHITEW6432	undefined	undefined	AMD64
