@@ -7,10 +7,11 @@ using ImageResizer.Util;
 using System.Collections.Generic;
 using ImageResizer.Configuration.Issues;
 using System.Security;
+using ImageResizer.Configuration.Xml;
 
 namespace ImageResizer.Plugins.AzureReader {
 
-    public class AzureReader : IPlugin, IIssueProvider, IMultiInstancePlugin {
+    public class AzureReader : IPlugin, IIssueProvider, IMultiInstancePlugin, IRedactDiagnostics {
 
         AzureVirtualPathProvider vpp = null;
         string blobStorageConnection;
@@ -82,6 +83,13 @@ namespace ImageResizer.Plugins.AzureReader {
             c.Plugins.add_plugin(this);
 
             return this;
+        }
+
+        public Configuration.Xml.Node RedactFrom(Node resizer) {
+            foreach (Node n in resizer.queryUncached("plugins.add")) {
+                if (n.Attrs["connectionString"] != null) n.Attrs.Set("connectionString", "[redacted]");
+            }
+            return resizer;
         }
 
         /// <summary>
