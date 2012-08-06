@@ -9,6 +9,7 @@ using System.Collections.Specialized;
 using MongoDB.Driver.Builders;
 using MongoDB.Bson;
 using System.IO;
+using ImageResizer.Configuration.Xml;
 
 namespace ImageResizer.Plugins.MongoReader {
     public class MongoReaderPlugin:IPlugin, IVirtualImageProvider, IMultiInstancePlugin, IRedactDiagnostics {
