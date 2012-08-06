@@ -109,6 +109,10 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             if ("true".Equals(s.settings["a.equalize"], StringComparison.OrdinalIgnoreCase))
                 new HistogramEqualization().ApplyInPlace(s.destBitmap);
 
+            if ("true".Equals(s.settings["a.balancewhite"], StringComparison.OrdinalIgnoreCase))
+                new AutoWhiteBalance().ApplyInPlace(s.destBitmap);
+
+
 
             str = s.settings["a.posterize"]; //number of colors to merge
             if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0) {
@@ -189,7 +193,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
         public IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "blur", "sharpen" , "a.blur", "a.sharpen", "a.oilpainting", "a.removenoise", 
                                 "a.sobel", "a.threshold", "a.canny", "a.sepia", "a.equalize", "a.posterize", 
-                                "a.contrast", "a.brightness", "a.saturation","a.truncate"};
+                                "a.contrast", "a.brightness", "a.saturation","a.truncate","a.balancewhite"};
         }
     }
 }
