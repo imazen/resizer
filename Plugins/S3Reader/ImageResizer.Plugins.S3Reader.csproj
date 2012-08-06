@@ -42,6 +42,10 @@
     <DocumentationFile>..\..\dlls\trial\ImageResizer.Plugins.S3Reader.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AWSSDK, Version=1.4.6.3, Culture=neutral, PublicKeyToken=cd2d24cd2bace800, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\AWS\AWSSDK.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Web" />
   </ItemGroup>
@@ -59,10 +63,6 @@
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Libs\LitS3-1.0.1\LitS3\LitS3.csproj">
-      <Project>{C564E026-D515-4E8B-ADED-36087E89443E}</Project>
-      <Name>LitS3</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

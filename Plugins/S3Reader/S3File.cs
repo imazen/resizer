@@ -8,9 +8,11 @@ using System.Web;
 using System.Web.Hosting;
 using System.Web.Caching;
 using System.Security.Permissions;
-using LitS3;
 using ImageResizer.Configuration;
 using ImageResizer.Resizing;
+using Amazon.S3.Model;
+using ImageResizer.ExtensionMethods;
+using Amazon.S3;
 
 namespace ImageResizer.Plugins.S3Reader {
 
@@ -38,10 +40,11 @@ namespace ImageResizer.Plugins.S3Reader {
                 _fileModifiedDate = null;
             } else {
                 //Looks like we have to execute a head request
-                var request = new GetObjectRequest(provider.Service, bucket, key, true);
+                var request = new GetObjectMetadataRequest(){ BucketName = bucket, Key = key};
+
                 try {
-                    using (GetObjectResponse response = request.GetResponse()) {
-                        //Exists.
+                    using (GetObjectMetadataResponse response = provider.S3Client.GetObjectMetadata(request)) {
+                        //Exists
                         _exists = true;
                         _fileModifiedDate = response.LastModified;
                     }
@@ -102,19 +105,21 @@ namespace ImageResizer.Plugins.S3Reader {
 
 
         public override Stream Open() {
-            MemoryStream ms = new MemoryStream(4096); //4kb is a good starting point.
-            //Synchronously download
+            //Synchronously download to memory stream
             try {
-                provider.Service.GetObject(bucket, key, ms);
-            } catch (S3Exception se) {
+                var req = new Amazon.S3.Model.GetObjectRequest() { BucketName = bucket, Key = key };
+
+                using (var s = provider.S3Client.GetObject(req)){
+                    return StreamExtensions.CopyToMemoryStream(s.ResponseStream);
+                }
+            } catch (AmazonS3Exception se) {
                // if (HttpContext.Current != null && HttpContext.Current.Items[Config.Current.Pipeline.ResponseArgsKey]
-                if (se.ErrorCode == S3ErrorCode.NoSuchKey) throw new FileNotFoundException("Amazon S3 file not found", se);
-                else if (se.ErrorCode == S3ErrorCode.AccessDenied) throw new FileNotFoundException("Amazon S3 access denied - file may not exist", se);
-                else throw se;
+                if ("NoSuchKey".Equals(se.ErrorCode, StringComparison.OrdinalIgnoreCase)) throw new FileNotFoundException("Amazon S3 file not found", se);
+                else if ("AccessDenied".Equals(se.ErrorCode, StringComparison.OrdinalIgnoreCase)) throw new FileNotFoundException("Amazon S3 access denied - file may not exist", se);
+                else throw;
                     //LitS3.S3ErrorCode.PermanentRedirect
             }
-            ms.Seek(0, SeekOrigin.Begin); //Reset to beginning
-            return ms;
+            return null;
         }
 
         public DateTime ModifiedDateUTC {

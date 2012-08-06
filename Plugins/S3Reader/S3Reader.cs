@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Web.Hosting;
 using System.Collections.Specialized;
-using LitS3;
 using ImageResizer.Configuration.Issues;
 using System.Security;
 using ImageResizer.Util;
 using System.Web;
 using ImageResizer.ExtensionMethods;
+using Amazon.S3;
 
 namespace ImageResizer.Plugins.S3Reader {
     public class S3Reader : IPlugin, IMultiInstancePlugin {
@@ -19,18 +19,21 @@ namespace ImageResizer.Plugins.S3Reader {
         bool includeModifiedDate = false;
         bool asVpp = false;
         public S3Reader(NameValueCollection args ) {
-            s3config = new S3Service();
+
+            var S3Config = new AmazonS3Config();
 
             buckets = args["buckets"];
             vpath = args["prefix"];
 
             asVpp = NameValueCollectionExtensions.Get(args, "vpp", true);
-            s3config.UseSsl = NameValueCollectionExtensions.Get(args, "useSsl", false);
-            s3config.UseSubdomains = NameValueCollectionExtensions.Get(args, "useSubdomains", s3config.UseSubdomains);
 
+            S3Config.CommunicationProtocol = NameValueCollectionExtensions.Get(args, "useSsl", false) ? Amazon.S3.Model.Protocol.HTTPS : Amazon.S3.Model.Protocol.HTTP;
+            S3Config.UseSecureStringForAwsSecretKey = false;
 
-            if (!string.IsNullOrEmpty(args["accessKeyId"])) s3config.AccessKeyID = args["accessKeyId"];
-            if (!string.IsNullOrEmpty(args["secretAccessKey"])) s3config.SecretAccessKey = args["secretAccessKey"];
+            S3Client = new AmazonS3Client(S3Config);
+            if (!string.IsNullOrEmpty(args["accessKeyId"]) && !string.IsNullOrEmpty(args["secretAccessKey"])){
+                S3Client = new AmazonS3Client(args["accessKeyId"],args["secretAccessKey"],S3Config);
+            }
 
             
 
@@ -44,15 +47,12 @@ namespace ImageResizer.Plugins.S3Reader {
             CacheUnmodifiedFiles = NameValueCollectionExtensions.Get(args, "cacheUnmodifiedFiles", CacheUnmodifiedFiles);
             
         }
-        private S3Service s3config = null;
-
+    
         /// <summary>
-        /// Configure S3 authentication and encryption details
+        /// Configure AWS access keys
         /// </summary>
-        public S3Service S3config {
-            get { return s3config; }
-            set { s3config = value; }
-        }
+        public AmazonS3Client S3Client { get; set; }
+
 
 
         private bool _requireImageExtension = true;
@@ -113,7 +113,7 @@ namespace ImageResizer.Plugins.S3Reader {
             }, !includeModifiedDate);
 
             
-            vpp.Service = s3config;
+            vpp.S3Client = S3Client;
 
             vpp.VirtualFilesystemPrefix = vpath;
            // vpp.MetadataAbsoluteExpiration

@@ -7,8 +7,8 @@ using System.Security.Permissions;
 using System.Web.Caching;
 using System.IO;
 using System.Configuration;
-using LitS3;
 using ImageResizer.Util;
+using Amazon.S3;
 namespace ImageResizer.Plugins.S3Reader
 {
     
@@ -81,14 +81,14 @@ namespace ImageResizer.Plugins.S3Reader
         }
 
    
-        private LitS3.S3Service service = null;
+        private AmazonS3Client s3Client = null;
         /// <summary>
-        /// Gets and sets the S3Service object that specifies connection details such as authentication, encryption, etc.
+        /// Gets and sets the AmazonS3Client object that specifies connection details such as authentication, encryption, etc.
         /// </summary>
-        public S3Service Service
+        public AmazonS3Client S3Client
         {
-            get { return service; }
-            set { service = value; }
+            get { return s3Client; }
+            set { s3Client = value; }
         }
 
         private bool _fastMode = true;
@@ -100,16 +100,16 @@ namespace ImageResizer.Plugins.S3Reader
         /// <summary>
         /// Create and configure a virtual path provider. 
         /// </summary>
-        /// <param name="service">Provide the authentication and ecryption settings. For public buckets, no settings are required. UseSSL should be false for best performance. </param>
+        /// <param name="s3client">Provide the authentication and ecryption settings. For public buckets, no settings are required. Use AmazonS3Config.CommunicationProtocol=HTTP for best performance. </param>
         /// <param name="virtualFilesystemPrefix">The virtual folder to allow client access of s3 from.</param>
         /// <param name="absoluteMetadataExpiration"></param>
         /// <param name="slidingMetadataExpiration"></param>
         /// <param name="bucketFilterCallback">You should validate that the requested bucket is your own. If you only want one bucket, just prefix your bucket to the path.</param>
         /// <param name="fastMode">If true, existence of bucket and key is assumed as long as prefix is present. Also, no modified date information is provided to the image resizer, so the cache never gets updated. Requires 1 request instead of 2 to download the image.</param>
-        public S3VirtualPathProvider(S3Service service, String virtualFilesystemPrefix, TimeSpan absoluteMetadataExpiration, TimeSpan slidingMetadataExpiration, RewriteBucketAndKeyPath bucketFilterCallback, Boolean fastMode)
+        public S3VirtualPathProvider(AmazonS3Client s3client, String virtualFilesystemPrefix, TimeSpan absoluteMetadataExpiration, TimeSpan slidingMetadataExpiration, RewriteBucketAndKeyPath bucketFilterCallback, Boolean fastMode)
             : base()
         {
-            this.service = service;
+            this.s3Client = s3client;
             this.VirtualFilesystemPrefix = virtualFilesystemPrefix;
             this.MetadataAbsoluteExpiration = absoluteMetadataExpiration;
             this.MetadataSlidingExpiration = slidingMetadataExpiration;
@@ -118,7 +118,7 @@ namespace ImageResizer.Plugins.S3Reader
         }
 
         /// <summary>
-        /// Default settings: UseSSL=false, VirtualFileSystemPrefix = "~/s3", SlidingExpiration = 1h, AbsoluteExpiration = maxvalue
+        /// Default settings: CommunicationProtocol=HTTP, VirtualFileSystemPrefix = "~/s3", SlidingExpiration = 1h, AbsoluteExpiration = maxvalue
         /// No bucket filtering is performed, so any amazon-hosted bucket can be accessed through this provider unless you add a bucket filter.
         /// </summary>
         /// <param name="bucketFilterCallback">You should validate that the requested bucket is your own. If you only want one bucket, just prefix your bucket to the path.</param>
@@ -126,8 +126,7 @@ namespace ImageResizer.Plugins.S3Reader
         public S3VirtualPathProvider(RewriteBucketAndKeyPath bucketFilterCallback, Boolean fastMode)
             : base()
         {
-            this.service = new S3Service();
-            this.service.UseSsl = false;
+            this.s3Client = new AmazonS3Client(new AmazonS3Config() { UseSecureStringForAwsSecretKey = false, CommunicationProtocol = Amazon.S3.Model.Protocol.HTTP });
             this.PreS3RequestFilter += bucketFilterCallback;
             this.FastMode = fastMode;
         }
