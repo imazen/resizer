@@ -17,7 +17,7 @@ The documentation for this plugin resides at http://imageresizing.net/plugins/s3
 		<tags>$tags$</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
-		  <dependency id="LitS3"/>
+		  <dependency id="AWSSDK"/>
 		</dependencies>
 	</metadata>
   	<files>

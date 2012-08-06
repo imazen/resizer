@@ -7,7 +7,7 @@
 		<description>Description</description>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
-		  <dependency id="LitS3"/>
+		  <dependency id="AWSSDK"/>
 		</dependencies>
 	</metadata>
 	<files>
