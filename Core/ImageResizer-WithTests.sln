@@ -111,6 +111,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imazen.LightResize", "..\To
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Faces", "..\Plugins\Faces\ImageResizer.Plugins.Faces.csproj", "{144686D8-7820-4BEE-9325-60C4E998C2B0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imazen.LightTest", "..\Tools\lightresize\tests\LightTest\Imazen.LightTest.csproj", "{0A412847-DF0F-462F-AD1B-01C7D3CF7681}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -993,6 +995,24 @@ Global
 		{144686D8-7820-4BEE-9325-60C4E998C2B0}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{144686D8-7820-4BEE-9325-60C4E998C2B0}.Trial|x64.ActiveCfg = Release|Any CPU
 		{144686D8-7820-4BEE-9325-60C4E998C2B0}.Trial|x86.ActiveCfg = Release|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Release|x64.ActiveCfg = Release|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Release|x86.ActiveCfg = Release|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Trial|x64.ActiveCfg = Release|Any CPU
+		{0A412847-DF0F-462F-AD1B-01C7D3CF7681}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
