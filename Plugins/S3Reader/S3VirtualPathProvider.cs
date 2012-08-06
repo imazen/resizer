@@ -126,7 +126,7 @@ namespace ImageResizer.Plugins.S3Reader
         public S3VirtualPathProvider(RewriteBucketAndKeyPath bucketFilterCallback, Boolean fastMode)
             : base()
         {
-            this.s3Client = new AmazonS3Client(new AmazonS3Config() { UseSecureStringForAwsSecretKey = false, CommunicationProtocol = Amazon.S3.Model.Protocol.HTTP });
+            this.s3Client = new AmazonS3Client(null,new AmazonS3Config() { UseSecureStringForAwsSecretKey = false, CommunicationProtocol = Amazon.S3.Model.Protocol.HTTP });
             this.PreS3RequestFilter += bucketFilterCallback;
             this.FastMode = fastMode;
         }

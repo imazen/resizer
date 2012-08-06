@@ -30,9 +30,11 @@ namespace ImageResizer.Plugins.S3Reader {
             S3Config.CommunicationProtocol = NameValueCollectionExtensions.Get(args, "useSsl", false) ? Amazon.S3.Model.Protocol.HTTPS : Amazon.S3.Model.Protocol.HTTP;
             S3Config.UseSecureStringForAwsSecretKey = false;
 
-            S3Client = new AmazonS3Client(S3Config);
-            if (!string.IsNullOrEmpty(args["accessKeyId"]) && !string.IsNullOrEmpty(args["secretAccessKey"])){
-                S3Client = new AmazonS3Client(args["accessKeyId"],args["secretAccessKey"],S3Config);
+            if (!string.IsNullOrEmpty(args["accessKeyId"]) && !string.IsNullOrEmpty(args["secretAccessKey"])) {
+                S3Client = new AmazonS3Client(args["accessKeyId"], args["secretAccessKey"], S3Config);
+            } else {
+
+                S3Client = new AmazonS3Client(null,S3Config);
             }
 
             
