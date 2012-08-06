@@ -12,12 +12,13 @@ using System.Configuration;
 using System.Collections.Specialized;
 using ImageResizer.Configuration.Issues;
 using System.Security;
+using ImageResizer.Configuration.Xml;
 namespace ImageResizer.Plugins.SqlReader
 {
     /// <summary>
     /// Specialized VirtualPathProvider that allows accessing database images as if they are on disk.
     /// </summary>
-    public class SqlReaderPlugin : VirtualPathProvider, IPlugin, IIssueProvider, IVirtualImageProvider, IMultiInstancePlugin
+    public class SqlReaderPlugin : VirtualPathProvider, IPlugin, IIssueProvider, IVirtualImageProvider, IMultiInstancePlugin, IRedactDiagnostics
     {
 
         SqlReaderSettings s = null;
@@ -411,6 +412,14 @@ namespace ImageResizer.Plugins.SqlReader
             return issues;
         }
 
+
+
+        public Configuration.Xml.Node RedactFrom(Node resizer) {
+            foreach (Node n in resizer.queryUncached("plugins.add")) {
+                if (n.Attrs["connectionString"] != null) n.Attrs.Set("connectionString", "[redacted]");
+            }
+            return resizer;
+        }
 
     }
 

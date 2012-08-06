@@ -11,9 +11,10 @@ using ImageResizer.Util;
 using System.Web;
 using ImageResizer.ExtensionMethods;
 using Amazon.S3;
+using ImageResizer.Configuration.Xml;
 
 namespace ImageResizer.Plugins.S3Reader {
-    public class S3Reader : IPlugin, IMultiInstancePlugin {
+    public class S3Reader : IPlugin, IMultiInstancePlugin, IRedactDiagnostics {
 
         string buckets, vpath;
         bool includeModifiedDate = false;
@@ -48,6 +49,15 @@ namespace ImageResizer.Plugins.S3Reader {
             UntrustedData = NameValueCollectionExtensions.Get(args, "untrustedData", UntrustedData);
             CacheUnmodifiedFiles = NameValueCollectionExtensions.Get(args, "cacheUnmodifiedFiles", CacheUnmodifiedFiles);
             
+        }
+
+
+        public Configuration.Xml.Node RedactFrom(Node resizer) {
+            foreach (Node n in resizer.queryUncached("plugins.add")) {
+                if (n.Attrs["accessKeyId"] != null) n.Attrs.Set("accessKeyId", "[redacted]");
+                if (n.Attrs["secretAccessKey"] != null) n.Attrs.Set("secretAccessKey", "[redacted]");
+            }
+            return resizer;
         }
     
         /// <summary>

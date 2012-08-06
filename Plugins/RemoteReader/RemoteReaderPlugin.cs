@@ -16,7 +16,13 @@ using System.Text.RegularExpressions;
 
 namespace ImageResizer.Plugins.RemoteReader {
 
-    public class RemoteReaderPlugin : BuilderExtension, IPlugin, IVirtualImageProvider, IIssueProvider {
+    public class RemoteReaderPlugin : BuilderExtension, IPlugin, IVirtualImageProvider, IIssueProvider, IRedactDiagnostics {
+
+        public Configuration.Xml.Node RedactFrom(Node resizer) {
+            if (resizer.queryFirst("remoteReader") != null) resizer.setAttr("remoteReader.signingKey", "[redacted]");
+
+            return resizer;
+        }
 
         private static string base64UrlKey = "urlb64";
 

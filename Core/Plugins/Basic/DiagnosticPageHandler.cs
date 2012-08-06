@@ -155,8 +155,13 @@ namespace ImageResizer.Plugins.Basic {
 				sb.AppendLine(p.ToString());
 
 			sb.AppendLine("\nConfiguration:\n");
-            //Start out the signing key. TODO: star out db passwords.
-            string config = c.getConfigXml().ToString();
+
+            //Let plugins redact sensitive information from the configuration before we display it
+            Node n = c.getConfigXml();
+            foreach (IRedactDiagnostics d in c.Plugins.GetAll<IRedactDiagnostics>())
+                n = d.RedactFrom(n);
+
+            string config = n.ToString();
             string pwd = c.get("remoteReader.signingKey", String.Empty);
             if (!string.IsNullOrEmpty(pwd)) config.Replace(pwd,"*********");
 			sb.AppendLine(config);

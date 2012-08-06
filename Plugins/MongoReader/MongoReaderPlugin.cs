@@ -11,7 +11,7 @@ using MongoDB.Bson;
 using System.IO;
 
 namespace ImageResizer.Plugins.MongoReader {
-    public class MongoReaderPlugin:IPlugin, IVirtualImageProvider, IMultiInstancePlugin {
+    public class MongoReaderPlugin:IPlugin, IVirtualImageProvider, IMultiInstancePlugin, IRedactDiagnostics {
         MongoDatabase db;
         MongoGridFSSettings gridSettings;
         MongoGridFS grid;
@@ -34,6 +34,13 @@ namespace ImageResizer.Plugins.MongoReader {
             this.db = MongoDatabase.Create(connectionString);
             gridSettings = new MongoGridFSSettings();
             grid = db.GetGridFS(gridSettings);
+        }
+
+        public Configuration.Xml.Node RedactFrom(Node resizer) {
+            foreach (Node n in resizer.queryUncached("plugins.add")) {
+                if (n.Attrs["connectionString"] != null) n.Attrs.Set("connectionString", "[redacted]");
+            }
+            return resizer;
         }
 
         private string _virtualFilesystemPrefix = null;
