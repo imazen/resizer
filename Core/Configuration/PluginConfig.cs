@@ -42,6 +42,7 @@ namespace ImageResizer.Configuration {
             allPlugins = new SafeList<IPlugin>();
             virtualProviderPlugins = new SafeList<IVirtualImageProvider>();
             settingsModifierPlugins = new SafeList<ISettingsModifier>();
+            configProviders = new SafeList<ICurrentConfigProvider>();
         }
 
 		[CLSCompliant(false)]
