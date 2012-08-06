@@ -35,6 +35,12 @@ namespace ImageResizer.Configuration {
                         if (_singleton == null)
                             _singleton = new Config(null);
 
+
+                foreach(ICurrentConfigProvider p in _singleton.Plugins.ConfigProviders){
+                    Config c = p.GetCurrentConfig();
+                    if (c != null) return c;
+                }
+                
                 return _singleton;
             }
         }

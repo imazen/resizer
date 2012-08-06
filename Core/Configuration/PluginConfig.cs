@@ -200,6 +200,14 @@ namespace ImageResizer.Configuration {
             return plugin.Uninstall(this.c);
         }
 
+
+        protected SafeList<ICurrentConfigProvider> configProviders = null;
+        /// <summary>
+        /// Currently registered ICurrentConfigProviders. 
+        /// </summary>
+        public SafeList<ICurrentConfigProvider> ConfigProviders { get { return configProviders; } }
+
+
         protected SafeList<BuilderExtension> imageBuilderExtensions = null;
         /// <summary>
         /// Currently registered set of ImageBuilderExtensions. 
@@ -329,8 +337,10 @@ namespace ImageResizer.Configuration {
             if (assemblyName != null) assemblies.Add(assemblyName);
             //2) Follow by searching the Core, the currently executing assembly
             assemblies.Add(""); // Defaults to current assembly
+            //3) Add ImageResizer.Plugins.X if it has no dot.
+            if (!pluginName.Contains(".")) assemblies.Add("ImageResizer.Plugins." + pluginName);
 
-            //3) Next, add all assemblies that have "ImageResizer" in their name 
+            //4) Next, add all assemblies that have "ImageResizer" in their name 
 
 
             List<string> otherAssemblies = new List<string>();
@@ -341,7 +351,7 @@ namespace ImageResizer.Configuration {
                 else
                     otherAssemblies.Add(", " + aname);
             }
-            //4) Last, add all remaining assemblies
+            //5) Last, add all remaining assemblies
             assemblies.AddRange(otherAssemblies);
             return assemblies;
         }
@@ -505,6 +515,7 @@ namespace ImageResizer.Configuration {
             if (plugin is BuilderExtension) ImageBuilderExtensions.Remove(plugin as BuilderExtension);
             if (plugin is IVirtualImageProvider) VirtualProviderPlugins.Remove(plugin as IVirtualImageProvider);
             if (plugin is ISettingsModifier) SettingsModifierPlugins.Remove(plugin as ISettingsModifier);
+            if (plugin is ICurrentConfigProvider) ConfigProviders.Remove(plugin as ICurrentConfigProvider);
             if (plugin is ILogManager && LogManager == plugin) LogManager = null;
         }
 
@@ -531,6 +542,7 @@ namespace ImageResizer.Configuration {
             if (plugin is BuilderExtension) ImageBuilderExtensions.Add(plugin as BuilderExtension);
             if (plugin is IVirtualImageProvider) VirtualProviderPlugins.Add(plugin as IVirtualImageProvider);
             if (plugin is ISettingsModifier) SettingsModifierPlugins.Add(plugin as ISettingsModifier);
+            if (plugin is ICurrentConfigProvider) ConfigProviders.Add(plugin as ICurrentConfigProvider);
             if (plugin is ILogManager) LogManager = plugin as ILogManager;
         }
 
