@@ -52,7 +52,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
                 }
 
                 // calculate new intensity levels
-                byte[] equalizedHistogram = Equalize(histogram, numberOfPixels);
+                byte[] equalizedHistogram = GimpEqualize(histogram, numberOfPixels);
 
                 // update pixels' intensities
                 ptr = (byte*)image.ImageData.ToPointer();
@@ -86,9 +86,9 @@ namespace ImageResizer.Plugins.AdvancedFilters {
                 }
 
                 // calculate new intensity levels
-                byte[] equalizedHistogramR = Equalize(histogramR, numberOfPixels);
-                byte[] equalizedHistogramG = Equalize(histogramG, numberOfPixels);
-                byte[] equalizedHistogramB = Equalize(histogramB, numberOfPixels);
+                byte[] equalizedHistogramR = GimpEqualize(histogramR, numberOfPixels);
+                byte[] equalizedHistogramG = GimpEqualize(histogramG, numberOfPixels);
+                byte[] equalizedHistogramB = GimpEqualize(histogramB, numberOfPixels);
 
                 // update pixels' intensities
                 ptr = (byte*)image.ImageData.ToPointer();
@@ -142,5 +142,62 @@ namespace ImageResizer.Plugins.AdvancedFilters {
 
             return equalizedHistogram;
         }
+
+        double magicVal = 0.006;
+
+                // Histogram 
+        private byte[] GimpEqualize(int[] histogram, long numPixel) {
+            
+            //Low and high indexes to stretch
+            int low = 0; int high = 255;
+
+            double totalPixels = (double)numPixel;
+
+            double new_count =0 ;
+
+            double pct;
+            double next_pct;
+
+            for (int i = 0; i < 255; i++) {
+                new_count += histogram[i];
+                pct = new_count / totalPixels;
+                next_pct = (new_count + histogram[i + 1]) / totalPixels;
+
+
+                if (Math.Abs(pct - magicVal) < Math.Abs(next_pct - magicVal)) {
+                    low = i + 1;
+                    break;
+                }
+            }
+            new_count = 0;
+
+            //Find high
+            for (int i = 255; i > 0; i--) {
+                new_count += histogram[i];
+                pct = new_count / totalPixels;
+                next_pct = (new_count + histogram[i - 1]) / totalPixels;
+
+
+                if (Math.Abs(pct - magicVal) < Math.Abs(next_pct - magicVal)) {
+                    high = i - 1;
+                    break;
+                }
+            }
+
+            //Calculate scale factor
+            double scale = 255.0 / (double)(high - low);
+
+            //Create the new, scaled mapping
+            byte[] equalizedHistogram = new byte[256];
+            for (int i = 0; i < 256; i++) {
+                equalizedHistogram[i] = (byte)Math.Max(0,Math.Min(255,Math.Round((double)(i - low) * scale)));
+            }
+
+            return equalizedHistogram;
+        }
+
+
+
+
     }
 }
