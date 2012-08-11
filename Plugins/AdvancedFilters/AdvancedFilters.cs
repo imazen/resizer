@@ -109,10 +109,16 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             if ("true".Equals(s.settings["a.equalize"], StringComparison.OrdinalIgnoreCase))
                 new HistogramEqualization().ApplyInPlace(s.destBitmap);
 
-            if ("true".Equals(s.settings["a.balancewhite"], StringComparison.OrdinalIgnoreCase))
-                new AutoWhiteBalance().ApplyInPlace(s.destBitmap);
+            ///White balance adjustment
+            var whiteAlg = s.settings.Get<HistogramThresholdAlgorithm>("a.balancewhite");
+            var whiteVal = s.settings.Get<double>("a.balancethreshold");
 
 
+            if (whiteAlg != null || whiteVal != null) {
+                var b = new AutoWhiteBalance(whiteAlg ?? HistogramThresholdAlgorithm.Area);
+                if (whiteVal != null) b.LowThreshold = b.HighThreshold = whiteVal.Value / 100;
+                b.ApplyInPlace(s.destBitmap);
+            }
 
             str = s.settings["a.posterize"]; //number of colors to merge
             if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i) && i > 0) {
@@ -193,7 +199,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
         public IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "blur", "sharpen" , "a.blur", "a.sharpen", "a.oilpainting", "a.removenoise", 
                                 "a.sobel", "a.threshold", "a.canny", "a.sepia", "a.equalize", "a.posterize", 
-                                "a.contrast", "a.brightness", "a.saturation","a.truncate","a.balancewhite"};
+                                "a.contrast", "a.brightness", "a.saturation","a.truncate","a.balancewhite", "a.balancethreshold"};
         }
     }
 }
