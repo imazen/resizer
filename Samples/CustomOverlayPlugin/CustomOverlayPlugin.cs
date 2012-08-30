@@ -11,6 +11,7 @@ using ImageResizer.Util;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.Drawing.Drawing2D;
+using System.Web.Hosting;
 
 namespace ImageResizer.Plugins.CustomOverlay {
     /// <summary>
@@ -68,7 +69,12 @@ namespace ImageResizer.Plugins.CustomOverlay {
             long hash = 0xab224895;
             int offset = 0;
             foreach (Overlay o in os) {
-                hash ^= o.GetDataHashCode() << (offset % 50);
+                int ohash = o.GetDataHashCode();
+                string physicalPath = HostingEnvironment.MapPath(o.OverlayPath);
+                try{
+                    ohash ^= (int)(File.GetLastWriteTimeUtc(physicalPath).Ticks / (TimeSpan.TicksPerMillisecond * 5));
+                }catch{}
+                hash ^= ohash << (offset % 50);
                 offset += 31;
             }
             //Store a hash of all the overlays, so the disk cache updates when an overlay changes
