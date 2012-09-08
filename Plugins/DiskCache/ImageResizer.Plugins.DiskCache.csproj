@@ -53,6 +53,9 @@
     </Compile>
     <Compile Include="Async\AsyncWriteCollection.cs" />
     <Compile Include="Async\AsyncWrite.cs" />
+    <Compile Include="OutputMemCache\MemCache.cs" />
+    <Compile Include="OutputMemCache\MemCacheHandler.cs" />
+    <Compile Include="OutputMemCache\MemCacheResult.cs" />
     <Compile Include="SourceMemCache\ConstrainedCache.cs" />
     <Compile Include="SourceMemCache\EventCountingDictionary.cs" />
     <Compile Include="Index\CachedFileInfo.cs" />
