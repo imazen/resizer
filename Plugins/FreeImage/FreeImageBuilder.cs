@@ -75,34 +75,40 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
                     //This prevents us from supporting output formats that don't already have registered encoders. Good, right?
 
                     bool supportsTransparency = managedEncoder.SupportsTransparency;
-                    //Do all the bitmap stuff in another method
-                    b = buildFiBitmap(s, job, supportsTransparency);
-                    if (b.IsNull) return RequestedAction.None;
 
-                    // Try to save the bitmap
-                    if (job.Dest is string || job.Dest is Stream) {
-                        FreeImageEncoderPlugin e = new FreeImageEncoderPlugin(job.Settings, path);
-                        if (job.Dest is string) {
-                            //Make physical and resolve variable references all at the same time.
-                            job.FinalPath = job.ResolveTemplatedPath(job.Dest as string,
-                                delegate(string var) {
-                                    if ("width".Equals(var, StringComparison.OrdinalIgnoreCase)) return FreeImage.GetWidth(b).ToString();
-                                    if ("height".Equals(var, StringComparison.OrdinalIgnoreCase)) return FreeImage.GetHeight(b).ToString();
-                                    if ("ext".Equals(var, StringComparison.OrdinalIgnoreCase)) return e.Extension;
-                                    return null;
-                                });
-                            //If requested, auto-create the parent directory(ies)
-                            if (job.CreateParentDirectory) {
-                                string dirName = Path.GetDirectoryName(job.FinalPath);
-                                if (!Directory.Exists(dirName)) Directory.CreateDirectory(dirName);
+
+                    b = (FIBITMAP)FreeImageDecoder.FreeImageDecoderPlugin.DecodeAndCall(s, job.Settings, delegate(FIBITMAP original, bool mayUnloadOriginal) {
+                        //Do all the bitmap stuff in another method
+                        b = buildFiBitmap(original, job, supportsTransparency, mayUnloadOriginal);
+                        if (b.IsNull) return RequestedAction.None;
+
+                        // Try to save the bitmap
+                        if (job.Dest is string || job.Dest is Stream) {
+                            FreeImageEncoderPlugin e = new FreeImageEncoderPlugin(job.Settings, path);
+                            if (job.Dest is string) {
+                                //Make physical and resolve variable references all at the same time.
+                                job.FinalPath = job.ResolveTemplatedPath(job.Dest as string,
+                                    delegate(string var) {
+                                        if ("width".Equals(var, StringComparison.OrdinalIgnoreCase)) return FreeImage.GetWidth(b).ToString();
+                                        if ("height".Equals(var, StringComparison.OrdinalIgnoreCase)) return FreeImage.GetHeight(b).ToString();
+                                        if ("ext".Equals(var, StringComparison.OrdinalIgnoreCase)) return e.Extension;
+                                        return null;
+                                    });
+                                //If requested, auto-create the parent directory(ies)
+                                if (job.CreateParentDirectory) {
+                                    string dirName = Path.GetDirectoryName(job.FinalPath);
+                                    if (!Directory.Exists(dirName)) Directory.CreateDirectory(dirName);
+                                }
+                                if (!FreeImage.Save(e.Format, b, job.FinalPath, e.EncodingOptions)) return RequestedAction.None;
+                            } else if (job.Dest is Stream) {
+                                if (!FreeImage.SaveToStream(b, (Stream)job.Dest, e.Format, e.EncodingOptions)) return RequestedAction.None;
                             }
-                            if (!FreeImage.Save(e.Format, b, job.FinalPath, e.EncodingOptions)) return RequestedAction.None;
-                        } else if (job.Dest is Stream) {
-                            if (!FreeImage.SaveToStream(b, (Stream)job.Dest, e.Format, e.EncodingOptions)) return RequestedAction.None;
-                        }
-                    } else if (job.Dest == typeof(Bitmap)) {
-                        job.Result = FreeImage.GetBitmap(b);
-                    } else return RequestedAction.None;
+                        } else if (job.Dest == typeof(Bitmap)) {
+                            job.Result = FreeImage.GetBitmap(b);
+                        } else return RequestedAction.None;
+                        return b;
+                    });
+
                 } finally {
                     //Ensure we unload the resulting bitmap
                    if (!b.IsNull) FreeImage.UnloadEx(ref b);
@@ -114,64 +120,60 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
             }
 
         }
+   
+
         /// <summary>
         /// Builds an FIBitmap from the stream and job.Settings 
         /// </summary>
         /// <param name="s"></param>
         /// <param name="job"></param>
         /// <returns></returns>
-        protected FIBITMAP buildFiBitmap(Stream s, ImageJob job, bool supportsTransparency){
+        protected FIBITMAP buildFiBitmap(FIBITMAP original, ImageJob job, bool supportsTransparency, bool mayUnloadOriginal) {
 
             ResizeSettings settings = job.Settings;
-            FIBITMAP original = FreeImage.LoadFromStream((Stream)s);
             if (original.IsNull) return FIBITMAP.Zero;
             FIBITMAP final = FIBITMAP.Zero;
-            
-            try{
-                //Find the image size
-                Size orig = new Size( (int)FreeImage.GetWidth(original),  (int)FreeImage.GetHeight(original));
 
-                //Calculate the new size of the image and the canvas.
-                ImageState state = new ImageState(settings, orig, true);
-                c.CurrentImageBuilder.Process(state);
-                RectangleF imageDest = PolygonMath.GetBoundingBox(state.layout["image"]);
+            //Find the image size
+            Size orig = new Size((int)FreeImage.GetWidth(original), (int)FreeImage.GetHeight(original));
 
-                if (imageDest.Width != orig.Width || imageDest.Height != orig.Height) {
-                    //Rescale
-                    bool temp;
-                    final = FreeImage.Rescale(original, (int)imageDest.Width, (int)imageDest.Height, FreeImageScalingPlugin.ParseResizeAlgorithm(settings["fi.scale"], FREE_IMAGE_FILTER.FILTER_BOX, out temp));
-                    FreeImage.UnloadEx(ref original);
-                    if (final.IsNull) return FIBITMAP.Zero;
-                } else {
-                    final = original;
-                }
+            //Calculate the new size of the image and the canvas.
+            ImageState state = new ImageState(settings, orig, true);
+            c.CurrentImageBuilder.Process(state);
+            RectangleF imageDest = PolygonMath.GetBoundingBox(state.layout["image"]);
 
-                RGBQUAD bgcolor = default(RGBQUAD);
-                bgcolor.Color = settings.BackgroundColor;
-                if (settings.BackgroundColor == Color.Transparent && !supportsTransparency)
-                    bgcolor.Color = Color.White;
-
-                //If we need to leave padding, do so.
-                BoxPadding outsideImage = new BoxPadding(imageDest.Left, imageDest.Top, state.destSize.Width - imageDest.Right, state.destSize.Height - imageDest.Bottom);
-
-                if (outsideImage.All != 0) {
-                    original = final;
-                    //Extend canvas
-                    final = FreeImage.EnlargeCanvas<RGBQUAD>(original,
-                                (int)outsideImage.Left, (int)outsideImage.Top, (int)outsideImage.Right, (int)outsideImage.Bottom, 
-                                bgcolor.Color != Color.Transparent ? new Nullable<RGBQUAD>(bgcolor) : null,
-                                FREE_IMAGE_COLOR_OPTIONS.FICO_RGBA);
- 
-                    FreeImage.UnloadEx(ref original);
-                    if (final.IsNull) return FIBITMAP.Zero;
-                }
-
-                return final;
-            
-            }finally{
-                //Ensure we unload the source bitmap (unless it's also the final one)
-                if (original != final && !original.IsNull) FreeImage.UnloadEx(ref original);
+            if (imageDest.Width != orig.Width || imageDest.Height != orig.Height) {
+                //Rescale
+                bool temp;
+                final = FreeImage.Rescale(original, (int)imageDest.Width, (int)imageDest.Height, FreeImageScalingPlugin.ParseResizeAlgorithm(settings["fi.scale"], FREE_IMAGE_FILTER.FILTER_BOX, out temp));
+                if (mayUnloadOriginal) FreeImage.UnloadEx(ref original);
+                if (final.IsNull) return FIBITMAP.Zero;
+            } else {
+                final = original;
             }
+
+            RGBQUAD bgcolor = default(RGBQUAD);
+            bgcolor.Color = settings.BackgroundColor;
+            if (settings.BackgroundColor == Color.Transparent && !supportsTransparency)
+                bgcolor.Color = Color.White;
+
+            //If we need to leave padding, do so.
+            BoxPadding outsideImage = new BoxPadding(imageDest.Left, imageDest.Top, state.destSize.Width - imageDest.Right, state.destSize.Height - imageDest.Bottom);
+
+            if (outsideImage.All != 0) {
+                var old = final;
+                //Extend canvas
+                final = FreeImage.EnlargeCanvas<RGBQUAD>(old,
+                            (int)outsideImage.Left, (int)outsideImage.Top, (int)outsideImage.Right, (int)outsideImage.Bottom,
+                            bgcolor.Color != Color.Transparent ? new Nullable<RGBQUAD>(bgcolor) : null,
+                            FREE_IMAGE_COLOR_OPTIONS.FICO_RGBA);
+
+                if (old != original || mayUnloadOriginal) FreeImage.UnloadEx(ref old);
+                if (final.IsNull) return FIBITMAP.Zero;
+            }
+
+            return final;
+
         }
 
 
