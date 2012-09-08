@@ -7,6 +7,7 @@ using FreeImageAPI;
 using System.Drawing;
 using System.IO;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace ImageResizer.Plugins.FreeImageDecoder {
     public class FreeImageDecoderPlugin : BuilderExtension, IPlugin, IFileExtensionPlugin, IIssueProvider {
@@ -59,23 +60,76 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
         }
 
         public Bitmap Decode(Stream s, ResizeSettings settings) {
+            return (Bitmap)DecodeAndCall(s, settings, delegate(FIBITMAP b, bool MayDispose) {
+                return Convert(b, ("true".Equals(settings["autorotate"], StringComparison.OrdinalIgnoreCase)));
+            });
+        }
+        public delegate object DecodeCallback(FIBITMAP b, bool mayUnloadOriginal);
+        /// <summary>
+        /// Decodes the given stream, selects the correct page or frame, rotates it correctly (if autorotate=true), then executes the callback, then cleans up.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="settings"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        public static object DecodeAndCall(Stream s, ResizeSettings settings, DecodeCallback callback){
             if (!FreeImageAPI.FreeImage.IsAvailable()) return null;
 
             FREE_IMAGE_LOAD_FLAGS flags = FREE_IMAGE_LOAD_FLAGS.DEFAULT;
             bool autorotate = ("true".Equals(settings["autorotate"], StringComparison.OrdinalIgnoreCase));
             if (autorotate) flags |= FREE_IMAGE_LOAD_FLAGS.JPEG_EXIFROTATE;
+
+            int page = 0;
+            if (!string.IsNullOrEmpty(settings["page"]) && !int.TryParse(settings["page"], NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out page))
+                page = 0;
+
+            int frame = 0;
+            if (!string.IsNullOrEmpty(settings["frame"]) && !int.TryParse(settings["frame"], NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out frame))
+                frame = 0;
+
+            if (page == 0 && frame != 0) page = frame; 
+
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            FIBITMAP original = FreeImage.LoadFromStream(s, flags);
-            sw.Stop();
-            if (original.IsNull) return null;
-            try {
-                Bitmap b =  FreeImage.GetBitmap(original);
-                if (autorotate) try { b.RemovePropertyItem(0x0112); } catch { }
-                return b;
-            } finally {
-                if (!original.IsNull) FreeImage.UnloadEx(ref original);
+
+            if (page > 1) {
+                FREE_IMAGE_FORMAT fmt = FREE_IMAGE_FORMAT.FIF_UNKNOWN;
+                FIMULTIBITMAP mb = FreeImage.OpenMultiBitmapFromStream(s, ref fmt, flags);
+                //Prevent asking for a non-existent page
+                int pages = FreeImage.GetPageCount(mb);
+                if (page > pages) page = pages; 
+                try {
+                    if (mb.IsNull) return null;
+                    FIBITMAP bPage = FreeImage.LockPage(mb, page - 1);
+                    if (bPage.IsNull) return null;
+                    try {
+                        sw.Stop();
+                        return callback(bPage, false);
+                    } finally {
+                        FreeImage.UnlockPage(mb, bPage, false);
+                    }
+
+                } finally {
+                    if (!mb.IsNull) FreeImage.CloseMultiBitmapEx(ref mb, FREE_IMAGE_SAVE_FLAGS.DEFAULT);
+                }
+
+            } else {
+                FIBITMAP original = FIBITMAP.Zero;
+                try {
+                    original = FreeImage.LoadFromStream(s, flags);
+                    sw.Stop();
+                    if (original.IsNull) return null;
+                    return callback(original, true);
+                } finally {
+                    if (!original.IsNull) FreeImage.UnloadEx(ref original);
+                }
             }
+        }
+
+        private Bitmap Convert(FIBITMAP fi, bool removeRotateFlag) {
+            Bitmap b = FreeImage.GetBitmap(fi);
+            if (removeRotateFlag) try { b.RemovePropertyItem(0x0112); } catch { }
+            return b;
         }
 
         public IEnumerable<IIssue> GetIssues() {
