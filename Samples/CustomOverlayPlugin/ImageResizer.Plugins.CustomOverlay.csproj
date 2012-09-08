@@ -44,6 +44,7 @@
     </Compile>
     <Compile Include="CachedOverlayProvider.cs" />
     <Compile Include="CustomOverlayPlugin.cs" />
+    <Compile Include="EtagsPlugin.cs" />
     <Compile Include="IOverlayProvider.cs" />
     <Compile Include="LayoutEngine.cs" />
     <Compile Include="Overlay.cs" />
