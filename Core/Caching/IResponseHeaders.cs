@@ -18,7 +18,7 @@ namespace ImageResizer.Caching {
         /// </summary>
         string ContentType { get; set; }
         /// <summary>
-        /// The cache setting. Defaults to private
+        /// The cache setting. Defaults to ServerAndPrivate
         /// </summary>
         HttpCacheability CacheControl { get; set; }
         /// <summary>
