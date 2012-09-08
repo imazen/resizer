@@ -67,6 +67,7 @@
     <Compile Include="AdvancedFilters.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="AutoWhiteBalance.cs" />
+    <Compile Include="FeatherEdge.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
