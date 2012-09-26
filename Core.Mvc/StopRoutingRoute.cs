@@ -16,8 +16,11 @@ namespace ImageResizer.Plugins.MvcRoutingShim {
             _contextItemsFlag = contextItemsFlag;
         }
         public override RouteData GetRouteData(System.Web.HttpContextBase httpContext) {
-            if (httpContext.Items[_contextItemsFlag] != null)
-                return new RouteData(this, new StopRoutingHandler());
+            try {
+                if (httpContext.Items[_contextItemsFlag] != null)
+                    return new RouteData(this, new StopRoutingHandler());
+            } catch (NotImplementedException) { } //For compatibility with Kendo UI and unit test/mocks which dont' implement .Items
+
             return null;
         }
 
