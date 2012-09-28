@@ -48,20 +48,18 @@ namespace ImageResizer.Plugins.S3Reader {
                         _exists = true;
                         _fileModifiedDate = response.LastModified;
                     }
-                } catch (System.Net.WebException exception) {
-                    var response = exception.Response as System.Net.HttpWebResponse;
-                    if (response != null && response.StatusCode == System.Net.HttpStatusCode.NotFound) {
+                } catch (AmazonS3Exception s3e) {
+                    if (s3e.StatusCode == System.Net.HttpStatusCode.NotFound || s3e.StatusCode == System.Net.HttpStatusCode.Forbidden) {
                         //Doesn't exist
                         _exists = false;
                         _fileModifiedDate = null;
-                    } else
-                        throw;
+                    } else throw;
                 }
                 //Now, save to the .net cache
                 object obj = (_fileModifiedDate == null) ? (object)false : (object)_fileModifiedDate.Value;
                 //If MetadataAbsoluteExpiration is MaxValue, use DateTime.MaxValue.
                 c.Insert(ckey, obj, null, provider.MetadataAbsoluteExpiration == TimeSpan.MaxValue ? DateTime.MaxValue : DateTime.UtcNow.Add(provider.MetadataAbsoluteExpiration), provider.MetadataSlidingExpiration);
-
+                
             }
         }
 
@@ -113,11 +111,9 @@ namespace ImageResizer.Plugins.S3Reader {
                     return StreamExtensions.CopyToMemoryStream(s.ResponseStream);
                 }
             } catch (AmazonS3Exception se) {
-               // if (HttpContext.Current != null && HttpContext.Current.Items[Config.Current.Pipeline.ResponseArgsKey]
-                if ("NoSuchKey".Equals(se.ErrorCode, StringComparison.OrdinalIgnoreCase)) throw new FileNotFoundException("Amazon S3 file not found", se);
-                else if ("AccessDenied".Equals(se.ErrorCode, StringComparison.OrdinalIgnoreCase)) throw new FileNotFoundException("Amazon S3 access denied - file may not exist", se);
+                if (se.StatusCode == System.Net.HttpStatusCode.NotFound || "NoSuchKey".Equals(se.ErrorCode, StringComparison.OrdinalIgnoreCase)) throw new FileNotFoundException("Amazon S3 file not found", se);
+                else if ( se.StatusCode == System.Net.HttpStatusCode.Forbidden || "AccessDenied".Equals(se.ErrorCode, StringComparison.OrdinalIgnoreCase)) throw new FileNotFoundException("Amazon S3 access denied - file may not exist", se);
                 else throw;
-                    //LitS3.S3ErrorCode.PermanentRedirect
             }
             return null;
         }
