@@ -125,6 +125,10 @@ namespace ImageResizer.Plugins.DiskCache {
 
             CacheResult result = new CacheResult(CacheQueryResult.Hit, physicalPath, relativePath);
 
+
+
+            bool compareModifiedDates = hasModifiedDate && !hashModifiedDate;
+            
             bool asyncFailed = false;
 
              //On the first check, verify the file exists using System.IO directly (the last 'true' parameter).
@@ -136,7 +140,7 @@ namespace ImageResizer.Plugins.DiskCache {
                     //On failure
                     result.Result = CacheQueryResult.Failed;
                 }
-            }else if ((!hasModifiedDate || hashModifiedDate) ? !Index.existsCertain(relativePath, physicalPath) : !Index.modifiedDateMatchesCertainExists(sourceModifiedUtc, relativePath, physicalPath)) {
+            } else if (!compareModifiedDates ? !Index.existsCertain(relativePath, physicalPath) : !Index.modifiedDateMatchesCertainExists(sourceModifiedUtc, relativePath, physicalPath)) {
                 
                 //Looks like a miss. Let's enter a lock for the creation of the file. This is a different locking system than for writing to the file - far less contention, as it doesn't include the 
                 //This prevents two identical requests from duplicating efforts. Different requests don't lock.
@@ -154,7 +158,7 @@ namespace ImageResizer.Plugins.DiskCache {
 
                         //On the second check, use cached data for speed. The cached data should be updated if another thread updated a file (but not if another process did).
                         if (t == null &&
-                            ((!hasModifiedDate || hashModifiedDate) ? !Index.exists(relativePath, physicalPath) : !Index.modifiedDateMatches(sourceModifiedUtc, relativePath, physicalPath))) {
+                            (!compareModifiedDates ? !Index.exists(relativePath, physicalPath) : !Index.modifiedDateMatches(sourceModifiedUtc, relativePath, physicalPath))) {
 
                                 result.Result = CacheQueryResult.Miss;
                             //Still a miss, we even rechecked the filesystem. Write to memory.
@@ -239,9 +243,12 @@ namespace ImageResizer.Plugins.DiskCache {
 
             bool hasModifiedDate = !sourceModifiedUtc.Equals(DateTime.MinValue);
 
+            bool compareModifiedDates = hasModifiedDate && !hashModifiedDate;
+            
+
             bool miss = true;
             if (recheckFS) {
-                miss = (!hasModifiedDate || hashModifiedDate) ? !Index.existsCertain(relativePath, physicalPath) : !Index.modifiedDateMatchesCertainExists(sourceModifiedUtc, relativePath, physicalPath);
+                miss = !compareModifiedDates ? !Index.existsCertain(relativePath, physicalPath) : !Index.modifiedDateMatchesCertainExists(sourceModifiedUtc, relativePath, physicalPath);
                 if (!miss) return true;
             }
                
@@ -251,7 +258,7 @@ namespace ImageResizer.Plugins.DiskCache {
                 delegate() {
 
                     //On the second check, use cached data for speed. The cached data should be updated if another thread updated a file (but not if another process did).
-                    if ((!hasModifiedDate || hashModifiedDate) ? !Index.exists(relativePath, physicalPath) : !Index.modifiedDateMatches(sourceModifiedUtc, relativePath, physicalPath)) {
+                    if (!compareModifiedDates ? !Index.exists(relativePath, physicalPath) : !Index.modifiedDateMatches(sourceModifiedUtc, relativePath, physicalPath)) {
 
                         //Create subdirectory if needed.
                         if (!Directory.Exists(Path.GetDirectoryName(physicalPath))) {
@@ -284,7 +291,7 @@ namespace ImageResizer.Plugins.DiskCache {
 
                             DateTime createdUtc = DateTime.UtcNow;
                             //Update the write time to match - this is how we know whether they are in sync.
-                            if (hasModifiedDate) System.IO.File.SetLastWriteTimeUtc(physicalPath, sourceModifiedUtc);
+                            if (compareModifiedDates) System.IO.File.SetLastWriteTimeUtc(physicalPath, sourceModifiedUtc);
                             //Set the created date, so we know the last time we updated the cache.s
                             System.IO.File.SetCreationTimeUtc(physicalPath, createdUtc);
                             //Update index
@@ -294,7 +301,7 @@ namespace ImageResizer.Plugins.DiskCache {
                             if (result != null) result.Result = CacheQueryResult.Miss;
                         } catch (IOException ex) {
 
-                            if ((!hasModifiedDate || hashModifiedDate) && IsFileLocked(ex)) {
+                            if (!compareModifiedDates && IsFileLocked(ex)) {
                                 //Somehow in between verifying the file didn't exist and trying to create it, the file was created and locked by someone else.
                                 //When hashModifiedDate==true, we don't care what the file contains, we just want it to exist. If the file is available for 
                                 //reading within timeoutMs, simply do nothing and let the file be returned as a hit.
