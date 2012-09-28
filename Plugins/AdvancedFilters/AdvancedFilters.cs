@@ -59,7 +59,6 @@ namespace ImageResizer.Plugins.AdvancedFilters {
                 if (s.preRenderBitmap != null) cropped = s.preRenderBitmap;
                 else if (s.copyRect.X != 0 || s.copyRect.Y != 0 || s.copyRect.Width != s.originalSize.Width || s.copyRect.Height != s.originalSize.Height || s.sourceBitmap.PixelFormat != PixelFormat.Format32bppArgb) {
                     cropped = s.sourceBitmap.Clone(s.copyRect, PixelFormat.Format32bppArgb);
-                    cropped.MakeTransparent();
                 } else {
                     cropped = s.sourceBitmap;
                 }
