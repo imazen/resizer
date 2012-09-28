@@ -6,6 +6,7 @@ using ImageResizer.Collections;
 using ImageResizer.Util;
 using System.Collections.Specialized;
 using ImageResizer.ExtensionMethods;
+using ImageResizer.Plugins.DiskCache;
 
 namespace ImageResizer.Plugins.SourceMemCache {
     public class SourceMemCachePlugin: IPlugin, IVirtualFileCache {
@@ -23,6 +24,8 @@ namespace ImageResizer.Plugins.SourceMemCache {
 
         }
 
+        private LockProvider locks = new LockProvider();
+
         private ConstrainedCache<string, CachedVirtualFile> cache;
 
         public IVirtualFile GetFileIfCached(string virtualPath, System.Collections.Specialized.NameValueCollection queryString, IVirtualFile original) {
@@ -33,11 +36,15 @@ namespace ImageResizer.Plugins.SourceMemCache {
             if (c != null) return c;
             //If not, let's cache it.
             if ("mem".Equals(queryString["scache"], StringComparison.OrdinalIgnoreCase)) {
-                //Optimization idea - use LockProvider to prevent duplicate requests. Would mean merging with DiskCache :(
-                using (Stream data = original.Open()) {//Very long-running call
-                    c = new CachedVirtualFile(original.VirtualPath,  StreamExtensions.CopyToBytes(data, true)); 
-                }
-                cache.Set(key, c); //Save to cache (may trigger cleanup)
+                locks.TryExecute(key, 3000, delegate() {
+                    c = cache.Get(key);
+                    if (c == null) {
+                        using (Stream data = original.Open()) {//Very long-running call
+                            c = new CachedVirtualFile(original.VirtualPath, StreamExtensions.CopyToBytes(data, true));
+                        }
+                        cache.Set(key, c);//Save to cache (may trigger cleanup)
+                    }
+                });
                 return c;
             }
             return null;
