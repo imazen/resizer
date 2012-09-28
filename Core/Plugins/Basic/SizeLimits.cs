@@ -30,7 +30,7 @@ namespace ImageResizer.Plugins.Basic {
             imageSize = new Size(imgWidth, imgHeight);
 
             int totalWidth = Math.Max(1, c.get("sizelimits.totalWidth", totalSize.Width));
-            int totalHeight = Math.Max(1, c.get("sizelimits.totaleHeight", totalSize.Height));
+            int totalHeight = Math.Max(1, c.get("sizelimits.totalHeight", totalSize.Height));
             if (totalWidth < 1 || totalHeight < 1)
                 AcceptIssue(new Issue("sizelimits.totalWidth and sizelimits.totalHeight must both be greater than 0. Reverting to defaults.", IssueSeverity.ConfigurationError));
             else
