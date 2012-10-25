@@ -124,6 +124,8 @@
     <Compile Include="Plugins\Basic\Presets.cs" />
     <Compile Include="Plugins\Basic\SpeedOrQuality.cs" />
     <Compile Include="Plugins\ICurrentConfigProvider.cs" />
+    <Compile Include="Plugins\ILicenseService.cs" />
+    <Compile Include="Plugins\ILicenseStore.cs" />
     <Compile Include="Plugins\IRedactDiagnostics.cs" />
     <Compile Include="Plugins\IVirtualFileSourceCacheKey.cs" />
     <Compile Include="Plugins\IVirtualFileCache.cs" />

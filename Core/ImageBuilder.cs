@@ -1003,7 +1003,9 @@ namespace ImageResizer
             areaSize.Height *= (float)zoom;
             targetSize.Width *= (float)zoom;
             targetSize.Height *= (float)zoom;
-                
+            
+            //Todo: automatic crop is permitted to break the scaling rules. Fix!!
+
             //Now do upscale/downscale checks. If they take effect, set targetSize to imageSize
             if (s.settings.Scale == ScaleMode.DownscaleOnly) {
                 if (PolygonMath.FitsInside(manualCropSize, targetSize)) {
@@ -1020,7 +1022,9 @@ namespace ImageResizer
             } else if (s.settings.Scale == ScaleMode.UpscaleCanvas) {
                 //Same as downscaleonly, except areaSize isn't changed.
                 if (PolygonMath.FitsInside(manualCropSize, targetSize)) {
-                    //The image is smaller or equal to its target polygon. Use original image coordinates instead.
+                    //The image is smaller or equal to its target polygon. 
+                    
+                    //Use manual copy rect/size instead.
 
                     targetSize = manualCropSize;
                     s.copyRect = manualCropRect;
