@@ -33,12 +33,19 @@ namespace ImageResizer.Configuration.Xml {
             }
             //Parse children
             if (e.HasChildNodes) {
+                StringBuilder sb = null;
                 foreach (XmlNode n in e.ChildNodes) {
                     if (n.NodeType == XmlNodeType.Element) {
                         XmlElement child = n as XmlElement;
                         if (child != null) children.Add(new Node(child, ir));
+                    //Collect text and whitespace
+                    } else if (n.NodeType == XmlNodeType.Text || n.NodeType == XmlNodeType.EntityReference || n.NodeType == XmlNodeType.SignificantWhitespace) { //|| n.NodeType == XmlNodeType.Whitespace
+                        if (sb == null) sb = new StringBuilder();
+                        sb.Append(n.Value);
                     }
                 }
+                //Save text/whitespace
+                if (sb != null) TextContents = sb.ToString();
             }
             
         }
@@ -50,6 +57,11 @@ namespace ImageResizer.Configuration.Xml {
             get { return attrs; }
             set { attrs = value; }
         }
+        /// <summary>
+        /// Access attributes by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public string this[string name] {
             get {
                 return attrs[name];
@@ -58,7 +70,11 @@ namespace ImageResizer.Configuration.Xml {
                 attrs[name] = value;
             }
         }
-
+        /// <summary>
+        /// The concatenated text, significant whitespace, and entity references within this element.
+        /// Not XML compliant for sure.
+        /// </summary>
+        public string TextContents { get; set; }
 
 
         private string name = null;
@@ -236,7 +252,9 @@ namespace ImageResizer.Configuration.Xml {
             if (this.children != null)
                 foreach (Node c in this.Children)
                     n.Children.Add(c.deepCopy());
-            
+            //Copy text contents
+            n.TextContents = this.TextContents;
+
             return n;
         }
 
@@ -264,6 +282,8 @@ namespace ImageResizer.Configuration.Xml {
             if (children != null)
                 foreach (Node c in children) 
                     e.AppendChild(c.ToXmlElement(doc));
+            //Copy text
+            if (TextContents != null) e.AppendChild(doc.CreateTextNode(this.TextContents));
 
             return e;
         }
