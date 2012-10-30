@@ -121,7 +121,7 @@ namespace ImageResizer.Plugins.Faces {
 
             RedEyeData d = new RedEyeData();
             try {
-                //Only detect eyes if it was requested.
+                //Only detect faces if it was requested.
                 if (detect) d.features = ConfigureDetection(s.settings).DetectFeatures(s.sourceBitmap);
             } catch (TypeInitializationException e) {
                 throw e;
@@ -182,7 +182,7 @@ namespace ImageResizer.Plugins.Faces {
             int[] count = NameValueCollectionExtensions.GetList<int>(s,"f.faces",null,1,2);
             if (count == null) {
                 f.MinFaces = 1;
-                f.MaxFaces = 1;
+                f.MaxFaces = 8;
             }else if (count.Length > 0){
                 f.MinFaces = f.MaxFaces = count[0];
                 if (count.Length > 1) f.MaxFaces = count[1];
