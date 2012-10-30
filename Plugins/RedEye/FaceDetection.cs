@@ -24,13 +24,13 @@ namespace ImageResizer.Plugins.RedEye {
             this.X2 = rect.Right;
             this.Y2 = rect.Bottom;
             this.Feature = type;
-            this.accuracy = 0;
+            this.Accuracy = 0;
         }
         public float X { get; set; }
         public float Y { get; set; }
         public float X2 { get; set; }
         public float Y2 { get; set; }
-        public float accuracy { get; set; }
+        public float Accuracy { get; set; }
         public FeatureType Feature { get; set; }
     }
 
