@@ -11,15 +11,49 @@ using System.Drawing.Imaging;
 using System.Drawing;
 using ImageResizer.Configuration;
 using ImageResizer.ExtensionMethods;
+using ImageResizer.Plugins.Faces;
+using ImageResizer.Caching;
 
 namespace ImageResizer.Plugins.RedEye {
-    public class RedEyePlugin:DetectionPlugin {
+    public class RedEyePlugin : BuilderExtension, IPlugin, IQuerystringPlugin {
         public RedEyePlugin() {
         }
 
+        protected Config c;
+        public IPlugin Install(Configuration.Config c) {
+            c.Plugins.add_plugin(this);
+            this.c = c;
+            c.Pipeline.PreHandleImage += Pipeline_PreHandleImage;
+            return this;
+        }
+
+        public bool Uninstall(Configuration.Config c) {
+            c.Plugins.remove_plugin(this);
+            c.Pipeline.PreHandleImage -= Pipeline_PreHandleImage;
+            return true;
+        }
 
         protected override RequestedAction Render(ImageState s) {
             if (base.Render(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
+
+            bool detecteyes = s.settings.Get<bool>("r.detecteyes", false);
+            bool getlayout = s.settings.Get<bool>("r.getlayout", false);
+            if (detecteyes || getlayout) {
+
+
+                var d = new DetectionResponse<ObjRect>();
+                try {
+                    //Only detect eyes if it was requested.
+                    if (detecteyes) d.features = new EyeDetection().DetectFeatures(s.sourceBitmap);
+                } catch (TypeInitializationException e) {
+                    throw e;
+                } catch (Exception e) {
+                    d.message = e.Message;
+                }
+                d.PopulateFrom(s);
+                throw d.GetResponseException(s.settings["callback"]);
+            }
+
 
             if (s.sourceBitmap == null) return RequestedAction.None;
 
@@ -45,13 +79,6 @@ namespace ImageResizer.Plugins.RedEye {
 
 
                         AdaptiveCircleFill.MarkEye(ui, new System.Drawing.Point((int)cx, (int)cy), (int)Math.Ceiling(radius), (float)(a > 6 ? radius / 4 : radius));
-
-                        /*if (eyes[i + 2] > 0) {
-                            AdaptiveCircleFill.MarkEye(ui, new System.Drawing.Point((int)eyes[i], (int)eyes[i + 1]),(int)Math.Ceiling(0.025 * Math.Max(ui.Width,ui.Height)),24);
-                            //CorrectRedEye(ui, (int)eyes[i], (int)eyes[i + 1], (int)eyes[i + 2]);
-                        }else{
-                            SemiAutoCorrectRedEye(ui, (int)eyes[i], (int)eyes[i + 1]);
-                        }*/
                     }
 
                 } finally {
@@ -73,7 +100,7 @@ namespace ImageResizer.Plugins.RedEye {
 
 
              if ("true".Equals(s.settings["r.autoeyes"], StringComparison.OrdinalIgnoreCase)) {
-                 List<ObjRect> eyes = new FaceDetection().DetectFeatures(s.sourceBitmap);
+                 List<ObjRect> eyes = new EyeDetection().DetectFeatures(s.sourceBitmap);
                  List<PointF> points = new List<PointF>();
                  foreach(ObjRect r in eyes) { points.Add(new PointF(r.X,r.Y)); points.Add(new PointF(r.X2,r.Y2));}
                  PointF[] newPoints = c.CurrentImageBuilder.TranslatePoints(points.ToArray(),s.originalSize,new ResizeSettings(s.settings));
@@ -114,34 +141,43 @@ namespace ImageResizer.Plugins.RedEye {
                     new CannyEdgeDetector().ApplyInPlace(s.destBitmap);
                 }
 
-                int sn = 1;
-                str = s.settings["r.sn"]; //multiple negative weights
-                if (string.IsNullOrEmpty(str) || int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out sn)) sn = 1;
+                //int sn = 1;
+                //str = s.settings["r.sn"]; //multiple negative weights
+                //if (string.IsNullOrEmpty(str) || int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out sn)) sn = 1;
                     
 
 
-                str = s.settings["r.conv"]; //convolution multiplier
-                if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
-                    new Convolution(EyeKernels.Scale(EyeKernels.GetStandardKernel(i),1,sn)).ApplyInPlace(s.destBitmap);
+                //str = s.settings["r.conv"]; //convolution multiplier
+                //if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
+                //    new Convolution(EyeKernels.Scale(EyeKernels.GetStandardKernel(i),1,sn)).ApplyInPlace(s.destBitmap);
 
-                str = s.settings["r.econv"]; //convolution multiplier
-                if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
-                    new Convolution(EyeKernels.Scale(EyeKernels.GetElongatedKernel(i), 1, sn)).ApplyInPlace(s.destBitmap);
+                //str = s.settings["r.econv"]; //convolution multiplier
+                //if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
+                //    new Convolution(EyeKernels.Scale(EyeKernels.GetElongatedKernel(i), 1, sn)).ApplyInPlace(s.destBitmap);
                 
 
             }
 
-            //TODO - add grayscale?
-
-            //For adding fax-like thresholding, use BradleyLocalThresholding
-
-            //For trimming solid-color whitespace, use Shrink
-
+    
             return RequestedAction.None;
         }
 
-        public override IEnumerable<string> GetSupportedQuerystringKeys() {
-            return new string[] { "r.detecteyes","r.conv","r.econv","r.sn","r.canny","r.threshold","r.sobel","r.filter","r.eyes","r.autoeyes"};
+
+        /// <summary>
+        /// This is where we hijack the resizing process, interrupt it, and send back the json data we created.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="context"></param>
+        /// <param name="e"></param>
+        void Pipeline_PreHandleImage(System.Web.IHttpModule sender, System.Web.HttpContext context, Caching.IResponseArgs e) {
+            if (NameValueCollectionExtensions.Get(e.RewrittenQuerystring, "r.detecteyes", false) ||
+                NameValueCollectionExtensions.Get(e.RewrittenQuerystring, "r.getlayout", false)) {
+                DetectionResponse<ObjRect>.InjectExceptionHandler(e as ResponseArgs);
+            }
+        }
+
+        public  IEnumerable<string> GetSupportedQuerystringKeys() {
+            return new string[] { "r.detecteyes", "r.getlayout", "r.conv","r.econv","r.sn","r.canny","r.threshold","r.sobel","r.filter","r.eyes","r.autoeyes"};
         }
     }
 }
