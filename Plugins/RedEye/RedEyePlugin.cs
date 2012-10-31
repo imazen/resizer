@@ -124,41 +124,8 @@ namespace ImageResizer.Plugins.RedEye {
                 using (s.destBitmap) {
                     s.destBitmap = new RedEyeFilter((short)i).Apply(s.destBitmap);
                 }
-
-                //Sobel only supports 8bpp grayscale images.
-                //true/false
-                if ("true".Equals(s.settings["r.sobel"], StringComparison.OrdinalIgnoreCase)) {
-                    new SobelEdgeDetector().ApplyInPlace(s.destBitmap);
-
-                    str = s.settings["r.threshold"]; //radius
-                    if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
-                        new Threshold(i).ApplyInPlace(s.destBitmap);
-
-                }
-                //Canny Edge Detector only supports 8bpp grayscale images.
-                //true/false
-                if ("true".Equals(s.settings["r.canny"], StringComparison.OrdinalIgnoreCase)) {
-                    new CannyEdgeDetector().ApplyInPlace(s.destBitmap);
-                }
-
-                //int sn = 1;
-                //str = s.settings["r.sn"]; //multiple negative weights
-                //if (string.IsNullOrEmpty(str) || int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out sn)) sn = 1;
-                    
-
-
-                //str = s.settings["r.conv"]; //convolution multiplier
-                //if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
-                //    new Convolution(EyeKernels.Scale(EyeKernels.GetStandardKernel(i),1,sn)).ApplyInPlace(s.destBitmap);
-
-                //str = s.settings["r.econv"]; //convolution multiplier
-                //if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
-                //    new Convolution(EyeKernels.Scale(EyeKernels.GetElongatedKernel(i), 1, sn)).ApplyInPlace(s.destBitmap);
-                
-
-            }
-
-    
+                //Note to future self: sobel/canny/eye kernel convolutions were not helpful; they were dead ends.
+             }
             return RequestedAction.None;
         }
 
