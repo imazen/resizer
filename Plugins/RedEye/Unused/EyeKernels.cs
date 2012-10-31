@@ -3,6 +3,24 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace ImageResizer.Plugins.RedEye {
+
+    //int sn = 1;
+    //str = s.settings["r.sn"]; //multiple negative weights
+    //if (string.IsNullOrEmpty(str) || int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out sn)) sn = 1;
+
+
+
+    //str = s.settings["r.conv"]; //convolution multiplier
+    //if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
+    //    new Convolution(EyeKernels.Scale(EyeKernels.GetStandardKernel(i),1,sn)).ApplyInPlace(s.destBitmap);
+
+    //str = s.settings["r.econv"]; //convolution multiplier
+    //if (!string.IsNullOrEmpty(str) && int.TryParse(str, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out i))
+    //    new Convolution(EyeKernels.Scale(EyeKernels.GetElongatedKernel(i), 1, sn)).ApplyInPlace(s.destBitmap);
+                
+
+
+
     public class EyeKernels {
 
         /// <summary>
