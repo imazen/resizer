@@ -34,7 +34,7 @@ namespace ImageResizer.Plugins.RedEye {
         public FeatureType Feature { get; set; }
     }
 
-    public class FaceDetection : FeatureDetectionBase<ObjRect> {
+    public class EyeDetection : FeatureDetectionBase<ObjRect> {
 
 
         /// <summary>

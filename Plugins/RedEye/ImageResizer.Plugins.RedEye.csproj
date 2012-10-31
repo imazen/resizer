@@ -58,17 +58,11 @@
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AdaptiveCircleFill.cs" />
-    <Compile Include="AutoThresholdCorrection.cs" />
-    <Compile Include="CSearcher.cs" />
-    <Compile Include="DetectionPlugin.cs" />
-    <Compile Include="EyeKernels.cs" />
-    <Compile Include="FaceDetection.cs" />
-    <Compile Include="GridSearch.cs" />
+    <Compile Include="EyeDetection.cs" />
     <Compile Include="ManualSearcher.cs" />
     <Compile Include="RedEyeFilter.cs" />
     <Compile Include="RedEyePlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResizingCanceledException.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
@@ -87,9 +81,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Unused\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
