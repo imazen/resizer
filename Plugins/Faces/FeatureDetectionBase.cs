@@ -21,6 +21,9 @@ namespace ImageResizer.Plugins.Faces {
             return new CvRect(rect.X + offset.X, rect.Y + offset.Y, rect.Width, rect.Height);
         }
     }
+    /// <summary>
+    /// Represents a detected feature, such as a face, eye, or eye pair
+    /// </summary>
     public interface IFeature {
         float X { get; set; }
         float Y { get; set; }

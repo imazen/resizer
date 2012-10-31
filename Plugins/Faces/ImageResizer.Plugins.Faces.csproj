@@ -48,12 +48,14 @@
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="CropAround.cs" />
+    <Compile Include="CropAroundPlugin.cs" />
+    <Compile Include="DetectionResponse.cs" />
     <Compile Include="FaceDetection.cs" />
     <Compile Include="FeatureDetectionBase.cs" />
+    <Compile Include="FeatureDetectionUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FacesPlugin.cs" />
-    <Compile Include="ResizingCanceledException.cs" />
+    <Compile Include="AlternateResponseException.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Native.xml">
