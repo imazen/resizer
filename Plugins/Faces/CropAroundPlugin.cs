@@ -8,7 +8,9 @@ using ImageResizer.ExtensionMethods;
 using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.CropAround {
-
+    /// <summary>
+    /// Enables cropping based on a set of rectangles to preserve
+    /// </summary>
     public class CropAroundPlugin:BuilderExtension, IPlugin,IQuerystringPlugin  {
      
         public IPlugin Install(Configuration.Config c) {
