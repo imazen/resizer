@@ -17,14 +17,9 @@ namespace ImageResizer.Plugins.Faces {
     public class FacesPlugin:BuilderExtension,IPlugin,IQuerystringPlugin {
         public FacesPlugin() {
         }
-
-
         protected Config c;
-        //protected CropAroundPlugin ca;
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
-            //ca = new CropAroundPlugin();
-            //c.Plugins.add_plugin(ca);
             this.c = c;
             c.Pipeline.PreHandleImage += Pipeline_PreHandleImage;
             return this;
@@ -32,7 +27,6 @@ namespace ImageResizer.Plugins.Faces {
 
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
-            //ca.Uninstall(c);
             c.Pipeline.PreHandleImage -= Pipeline_PreHandleImage;
             return true;
         }
@@ -67,8 +61,6 @@ namespace ImageResizer.Plugins.Faces {
 
 
         protected override RequestedAction PostRenderImage(ImageState s) {
-
-
             if (!"true".Equals(s.settings["f.show"], StringComparison.OrdinalIgnoreCase) ||
                 !s.layout.ContainsRing("faces") ||
                 s.destBitmap == null) return RequestedAction.None;
@@ -95,21 +87,6 @@ namespace ImageResizer.Plugins.Faces {
             return RequestedAction.None;
         }
 
-        class RedEyeData {
-            public float dx;
-            public float dy;
-            public float dw;
-            public float dh;
-            public float ow;
-            public float oh;
-            public float cropx;
-            public float cropy;
-            public float cropw;
-            public float croph;
-            public List<Face> features;
-            public string message;
-        }
-
 
         protected override RequestedAction Render(ImageState s) {
             bool detect = NameValueCollectionExtensions.Get(s.settings, "f.detect", false);
@@ -117,9 +94,8 @@ namespace ImageResizer.Plugins.Faces {
             if (!detect && !getlayout) return RequestedAction.None;
 
 
-            var ex = new ResizingCanceledException("Resizing was canceled as JSON data was requested instead");
-
-            RedEyeData d = new RedEyeData();
+           
+            var d = new DetectionResponse<Face>();
             try {
                 //Only detect faces if it was requested.
                 if (detect) d.features = ConfigureDetection(s.settings).DetectFeatures(s.sourceBitmap);
@@ -128,26 +104,8 @@ namespace ImageResizer.Plugins.Faces {
             } catch (Exception e) {
                 d.message = e.Message;
             }
-            d.ow = s.originalSize.Width;
-            d.oh = s.originalSize.Height;
-            d.cropx = s.copyRect.X;
-            d.cropy = s.copyRect.Y;
-            d.cropw = s.copyRect.Width;
-            d.croph = s.copyRect.Height;
-            RectangleF dest = PolygonMath.GetBoundingBox(s.layout["image"]);
-            d.dx = dest.X;
-            d.dy = dest.Y;
-            d.dw = dest.Width;
-            d.dh = dest.Height;
-            ex.ContentType = "application/json; charset=utf-8";
-            StringWriter sw = new StringWriter();
-            new Newtonsoft.Json.JsonSerializer().Serialize(sw, d);
-            string prefix = string.IsNullOrEmpty(s.settings["callback"]) ? "" : s.settings["callback"] + "(";
-            string suffix = string.IsNullOrEmpty(prefix) ? "" : ");";
-            ex.ResponseData = UTF8Encoding.UTF8.GetBytes(prefix + sw.ToString() + suffix);
-            ex.StatusCode = 200;
-
-            throw ex;
+            d.PopulateFrom(s);
+            throw d.GetResponseException(s.settings["callback"]);
         }
 
         /// <summary>
@@ -161,17 +119,7 @@ namespace ImageResizer.Plugins.Faces {
             bool getlayout = NameValueCollectionExtensions.Get(e.RewrittenQuerystring, "f.getlayout", false);
             if (!detect && !getlayout) return;
 
-            ResponseArgs ra = e as ResponseArgs;
-            e.ResponseHeaders.ContentType = "application/json; charset=utf-8";
-
-            var old = ra.ResizeImageToStream;
-            ra.ResizeImageToStream = new ResizeImageDelegate(delegate(Stream s) {
-                try {
-                    old(s);
-                } catch (ResizingCanceledException rce) {
-                    s.Write(rce.ResponseData, 0, rce.ResponseData.Length);
-                }
-            });
+            DetectionResponse<Face>.InjectExceptionHandler(e as ResponseArgs);
         }
 
         public FaceDetection ConfigureDetection(NameValueCollection s) {

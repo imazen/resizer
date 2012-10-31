@@ -24,7 +24,9 @@ namespace ImageResizer.Plugins.Faces {
         public float Y2 { get; set; }
         public float Accuracy { get; set; }
     }
-
+    /// <summary>
+    /// Provides a simple API for face detection
+    /// </summary>
     public class FaceDetection:FeatureDetectionBase<Face>{
 
         public FaceDetection():base(){
