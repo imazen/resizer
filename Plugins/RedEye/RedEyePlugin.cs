@@ -44,7 +44,7 @@ namespace ImageResizer.Plugins.RedEye {
                 var d = new DetectionResponse<ObjRect>();
                 try {
                     //Only detect eyes if it was requested.
-                    if (detecteyes) using (var ed = new EyeDetection()){ d.features = ed.DetectFeatures(s.sourceBitmap) }
+                    if (detecteyes) using (var ed = new EyeDetection()) { d.features = ed.DetectFeatures(s.sourceBitmap); }
                 } catch (TypeInitializationException e) {
                     throw e;
                 } catch (Exception e) {
