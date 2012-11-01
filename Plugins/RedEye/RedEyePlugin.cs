@@ -44,7 +44,7 @@ namespace ImageResizer.Plugins.RedEye {
                 var d = new DetectionResponse<ObjRect>();
                 try {
                     //Only detect eyes if it was requested.
-                    if (detecteyes) d.features = new EyeDetection().DetectFeatures(s.sourceBitmap);
+                    if (detecteyes) using (var ed = new EyeDetection()){ d.features = ed.DetectFeatures(s.sourceBitmap) }
                 } catch (TypeInitializationException e) {
                     throw e;
                 } catch (Exception e) {
@@ -100,7 +100,9 @@ namespace ImageResizer.Plugins.RedEye {
 
 
              if ("true".Equals(s.settings["r.autoeyes"], StringComparison.OrdinalIgnoreCase)) {
-                 List<ObjRect> eyes = new EyeDetection().DetectFeatures(s.sourceBitmap);
+                 List<ObjRect> eyes;
+                 using (var ed = new EyeDetection()) eyes = ed.DetectFeatures(s.sourceBitmap);
+
                  List<PointF> points = new List<PointF>();
                  foreach(ObjRect r in eyes) { points.Add(new PointF(r.X,r.Y)); points.Add(new PointF(r.X2,r.Y2));}
                  PointF[] newPoints = c.CurrentImageBuilder.TranslatePoints(points.ToArray(),s.originalSize,new ResizeSettings(s.settings));

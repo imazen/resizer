@@ -69,6 +69,7 @@ namespace ImageResizer.Plugins.Faces {
                     string full = basePath.TrimEnd('\\') + '\\' + fileNames[key];
                     if (File.Exists(full)) {
                         resolvedPath = Path.GetFullPath(full);
+                        //An ExecutionException will occur here if multiple OpenCv instances are loaded
                         Cascades[key] = Cv.Load<CvHaarClassifierCascade>(resolvedPath);
                         break;
                     }

@@ -31,6 +31,39 @@ namespace ImageResizer.Plugins.Faces {
             return true;
         }
 
+        /// <summary>
+        /// Returns a comma-delimited list of face coordinates (x,y,x2,y2,accuracy) for the given image (path, stream, Bitmap, etc).
+        /// Note that the face coordinates are relative to the unrotated, unflipped source image.
+        /// ImageResizer.js can *keep* these coordinates synced during rotations/flipping if they are stored in the 'f.rects' querystring key before the 'srotate' or 'sflip' commands are applied.
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        public string GetFacesFromImageAsString(object image, NameValueCollection settings) {
+            var faces = GetFacesFromImage(image, settings);
+            StringBuilder sb = new StringBuilder();
+            foreach (Face f in faces)
+                sb.Append(f.X + "," + f.Y + "," + f.X2 + "," + f.Y2 + "," + f.Accuracy + ",");
+
+            return sb.ToString().TrimEnd(',');
+        }
+
+        /// <summary>
+        /// Returns a list of face objects for the given image (path, stream, Bitmap, etc).
+        /// Note that the face coordinates are relative to the unrotated, unflipped source image.
+        /// ImageResizer.js can *keep* these coordinates synced during rotations/flipping if they are stored in the 'f.rects' querystring key before the 'srotate' or 'sflip' commands are applied.
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        public List<Face> GetFacesFromImage(object image, NameValueCollection settings) {
+            using (var b = c.CurrentImageBuilder.LoadImage(image, new ResizeSettings(settings))) {
+                using (var detector = ConfigureDetection(settings)) {
+                    return detector.DetectFeatures(b);
+                }
+            }
+        }
+
         protected override RequestedAction PostPrepareSourceBitmap(ImageState s) {
             if (s.sourceBitmap == null) return RequestedAction.None;
 
@@ -41,8 +74,10 @@ namespace ImageResizer.Plugins.Faces {
 
             //Perform face detection for either (or both) situations
             if (showFaces || focusFaces) {
-                //Store faces
-                s.Data["faces"] = faces =ConfigureDetection(s.settings).DetectFeatures(s.sourceBitmap);
+                using (var detector = ConfigureDetection(s.settings)) {
+                    //Store faces
+                    s.Data["faces"] = faces = detector.DetectFeatures(s.sourceBitmap);
+                }
                 //Store points
                 List<PointF> points = new List<PointF>();
                 foreach (Face r in faces) { points.Add(new PointF(r.X, r.Y)); points.Add(new PointF(r.X2, r.Y2)); }
@@ -98,7 +133,7 @@ namespace ImageResizer.Plugins.Faces {
             var d = new DetectionResponse<Face>();
             try {
                 //Only detect faces if it was requested.
-                if (detect) d.features = ConfigureDetection(s.settings).DetectFeatures(s.sourceBitmap);
+                if (detect) using (var detector =ConfigureDetection(s.settings)) d.features = detector.DetectFeatures(s.sourceBitmap);
             } catch (TypeInitializationException e) {
                 throw e;
             } catch (Exception e) {
