@@ -139,7 +139,7 @@ namespace ImageResizer.Plugins.Faces {
         /// Disposes all loaded cascades
         /// </summary>
         public void Dispose() {
-            foreach (string s in Cascades.Keys) {
+            foreach (string s in Cascades.Keys.ToArray()) {
                 if (Cascades[s] != null) {
                     Cascades[s].Dispose();
                     Cascades[s] = null;
