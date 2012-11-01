@@ -193,6 +193,10 @@
       <Project>{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}</Project>
       <Name>ImageResizer.Plugins.Watermark</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\WebP\ImageResizer.Plugins.WebP.csproj">
+      <Project>{E7637D84-D86B-4D37-9835-8DF374539693}</Project>
+      <Name>ImageResizer.Plugins.WebP</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\WhitespaceTrimmer\ImageResizer.Plugins.WhitespaceTrimmer.csproj">
       <Project>{167B88AF-E3EE-4005-A266-F4D712B3BC62}</Project>
       <Name>ImageResizer.Plugins.WhitespaceTrimmer</Name>
@@ -210,7 +214,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>49208</DevelopmentServerPort>
+          <DevelopmentServerPort>57984</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>
