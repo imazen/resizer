@@ -15,6 +15,7 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <UseIISExpress>false</UseIISExpress>
     <TargetFrameworkProfile />
+    <JSLintSkip>\griddata.js</JSLintSkip>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,39 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\StudioJS\ImageResizing.js">
-      <Link>js\ImageResizing.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery.imagestudio.js">
-      <Link>js\jquery.imagestudio.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery.Jcrop.js">
-      <Link>js\jquery.Jcrop.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery.jcrop.preview.js">
-      <Link>js\jquery.jcrop.preview.js</Link>
-    </Content>
-    <Content Include="..\..\StudioJS\jquery.overdraw.js">
-      <Link>js\jquery.overdraw.js</Link>
-    </Content>
-    <Content Include="css\Jcrop.gif" />
-    <Content Include="css\jquery.Jcrop.css" />
     <Content Include="griddata.js" />
-    <Content Include="css\ui-darkness\images\ui-bg_flat_30_cccccc_40x100.png" />
-    <Content Include="css\ui-darkness\images\ui-bg_flat_50_5c5c5c_40x100.png" />
-    <Content Include="css\ui-darkness\images\ui-bg_glass_20_555555_1x400.png" />
-    <Content Include="css\ui-darkness\images\ui-bg_glass_40_0078a3_1x400.png" />
-    <Content Include="css\ui-darkness\images\ui-bg_glass_40_ffc73d_1x400.png" />
-    <Content Include="css\ui-darkness\images\ui-bg_gloss-wave_25_333333_500x100.png" />
-    <Content Include="css\ui-darkness\images\ui-bg_highlight-soft_80_eeeeee_1x100.png" />
-    <Content Include="css\ui-darkness\images\ui-bg_inset-soft_25_000000_1x100.png" />
-    <Content Include="css\ui-darkness\images\ui-bg_inset-soft_30_f58400_1x100.png" />
-    <Content Include="css\ui-darkness\images\ui-icons_222222_256x240.png" />
-    <Content Include="css\ui-darkness\images\ui-icons_4b8e0b_256x240.png" />
-    <Content Include="css\ui-darkness\images\ui-icons_a83300_256x240.png" />
-    <Content Include="css\ui-darkness\images\ui-icons_cccccc_256x240.png" />
-    <Content Include="css\ui-darkness\images\ui-icons_ffffff_256x240.png" />
-    <Content Include="css\ui-darkness\jquery-ui-1.8.16.custom.css" />
     <Content Include="filters.js" />
     <Content Include="css\demo.css" />
     <Content Include="css\hover.css" />
@@ -90,7 +59,6 @@
     <Content Include="Plugins.htm" />
     <Content Include="Misc\Protected\rose-leaf.jpg" />
     <Content Include="Misc\RegressionTests.aspx" />
-    <Content Include="Studio.aspx" />
     <Content Include="studio.txt" />
     <Content Include="UploadSample.aspx" />
     <Content Include="Watermarks.htm" />
@@ -101,7 +69,6 @@
     <Content Include="Misc\WhitespaceTrimmerTest.aspx" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="css\reset.css" />
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -124,13 +91,6 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SamplePlugin.cs" />
-    <Compile Include="Studio.aspx.cs">
-      <DependentUpon>Studio.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Studio.aspx.designer.cs">
-      <DependentUpon>Studio.aspx</DependentUpon>
-    </Compile>
     <Compile Include="UploadSample.aspx.cs">
       <DependentUpon>UploadSample.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
