@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageStudio", "ImageStudio.csproj", "{392FDC52-85F1-4082-B754-7700A4B55095}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer", "..\..\Core\ImageResizer.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.AdvancedFilters", "..\..\Plugins\AdvancedFilters\ImageResizer.Plugins.AdvancedFilters.csproj", "{961A7785-80E0-4AB9-A406-FD7E2A9FA9D9}"
@@ -19,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.DiskCa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.RemoteReader", "..\..\Plugins\RemoteReader\ImageResizer.Plugins.RemoteReader.csproj", "{0E6BE1A7-C754-4E33-A8AC-75A8549FC68B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_ImageStudio", "_ImageStudio.csproj", "{86D5A690-75DB-4EF9-80C6-9016338674B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,12 +26,6 @@ Global
 		Trial|Any CPU = Trial|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{392FDC52-85F1-4082-B754-7700A4B55095}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{392FDC52-85F1-4082-B754-7700A4B55095}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{392FDC52-85F1-4082-B754-7700A4B55095}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{392FDC52-85F1-4082-B754-7700A4B55095}.Release|Any CPU.Build.0 = Release|Any CPU
-		{392FDC52-85F1-4082-B754-7700A4B55095}.Trial|Any CPU.ActiveCfg = Release|Any CPU
-		{392FDC52-85F1-4082-B754-7700A4B55095}.Trial|Any CPU.Build.0 = Release|Any CPU
 		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -80,6 +74,12 @@ Global
 		{0E6BE1A7-C754-4E33-A8AC-75A8549FC68B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0E6BE1A7-C754-4E33-A8AC-75A8549FC68B}.Trial|Any CPU.ActiveCfg = Trial|Any CPU
 		{0E6BE1A7-C754-4E33-A8AC-75A8549FC68B}.Trial|Any CPU.Build.0 = Trial|Any CPU
+		{86D5A690-75DB-4EF9-80C6-9016338674B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86D5A690-75DB-4EF9-80C6-9016338674B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86D5A690-75DB-4EF9-80C6-9016338674B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86D5A690-75DB-4EF9-80C6-9016338674B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86D5A690-75DB-4EF9-80C6-9016338674B1}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{86D5A690-75DB-4EF9-80C6-9016338674B1}.Trial|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
