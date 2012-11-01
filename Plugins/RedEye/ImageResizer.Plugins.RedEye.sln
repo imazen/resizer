@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.RedEye", "ImageResizer.Plugins.RedEye.csproj", "{054D5D5D-1041-4F03-B5E4-BFF0441586FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedEyeRemoval", "..\..\Samples\RedEyeRemoval\RedEyeRemoval.csproj", "{215B1D77-F110-4505-B406-99DFEA055A53}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer", "..\..\Core\ImageResizer.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.AdvancedFilters", "..\AdvancedFilters\ImageResizer.Plugins.AdvancedFilters.csproj", "{961A7785-80E0-4AB9-A406-FD7E2A9FA9D9}"
@@ -15,7 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.DiskCa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.SeamCarving", "..\SeamCarving\ImageResizer.Plugins.SeamCarving.csproj", "{7AEFB877-A720-4929-880C-1090A71C83EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.SqlReader", "..\SqlReader\ImageResizer.Plugins.SqlReader.csproj", "{2AB0FC98-8AD5-4D2A-BF06-0EA4DCF8764D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageStudio", "..\..\Samples\ImageStudio\ImageStudio.csproj", "{392FDC52-85F1-4082-B754-7700A4B55095}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Faces", "..\Faces\ImageResizer.Plugins.Faces.csproj", "{144686D8-7820-4BEE-9325-60C4E998C2B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,12 +30,6 @@ Global
 		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Trial|Any CPU.ActiveCfg = Release|Any CPU
 		{054D5D5D-1041-4F03-B5E4-BFF0441586FA}.Trial|Any CPU.Build.0 = Release|Any CPU
-		{215B1D77-F110-4505-B406-99DFEA055A53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{215B1D77-F110-4505-B406-99DFEA055A53}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{215B1D77-F110-4505-B406-99DFEA055A53}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{215B1D77-F110-4505-B406-99DFEA055A53}.Release|Any CPU.Build.0 = Release|Any CPU
-		{215B1D77-F110-4505-B406-99DFEA055A53}.Trial|Any CPU.ActiveCfg = Release|Any CPU
-		{215B1D77-F110-4505-B406-99DFEA055A53}.Trial|Any CPU.Build.0 = Release|Any CPU
 		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -66,12 +60,18 @@ Global
 		{7AEFB877-A720-4929-880C-1090A71C83EB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7AEFB877-A720-4929-880C-1090A71C83EB}.Trial|Any CPU.ActiveCfg = Trial|Any CPU
 		{7AEFB877-A720-4929-880C-1090A71C83EB}.Trial|Any CPU.Build.0 = Trial|Any CPU
-		{2AB0FC98-8AD5-4D2A-BF06-0EA4DCF8764D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2AB0FC98-8AD5-4D2A-BF06-0EA4DCF8764D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2AB0FC98-8AD5-4D2A-BF06-0EA4DCF8764D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2AB0FC98-8AD5-4D2A-BF06-0EA4DCF8764D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2AB0FC98-8AD5-4D2A-BF06-0EA4DCF8764D}.Trial|Any CPU.ActiveCfg = Trial|Any CPU
-		{2AB0FC98-8AD5-4D2A-BF06-0EA4DCF8764D}.Trial|Any CPU.Build.0 = Trial|Any CPU
+		{392FDC52-85F1-4082-B754-7700A4B55095}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{392FDC52-85F1-4082-B754-7700A4B55095}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{392FDC52-85F1-4082-B754-7700A4B55095}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{392FDC52-85F1-4082-B754-7700A4B55095}.Release|Any CPU.Build.0 = Release|Any CPU
+		{392FDC52-85F1-4082-B754-7700A4B55095}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{392FDC52-85F1-4082-B754-7700A4B55095}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{144686D8-7820-4BEE-9325-60C4E998C2B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{144686D8-7820-4BEE-9325-60C4E998C2B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{144686D8-7820-4BEE-9325-60C4E998C2B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{144686D8-7820-4BEE-9325-60C4E998C2B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{144686D8-7820-4BEE-9325-60C4E998C2B0}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{144686D8-7820-4BEE-9325-60C4E998C2B0}.Trial|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

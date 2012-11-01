@@ -7,10 +7,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ComplexWebApplication {
+namespace ImageStudio {
     
     
-    public partial class Studio {
+    public partial class _Default {
         
         /// <summary>
         /// form1 control.
