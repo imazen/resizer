@@ -9,9 +9,15 @@ samples/ComplexWebApplication/bin
 /docs/*/
 Tests/*/Results
 .DS_Store
+._*
 Thumbs.db
 *.suo
+*.cache
+*.FileAbsoluteList.txt
 *.user
 *.csproj.user
 */_ReSharper
 _ReSharper*
+*App_Data/cair.exe
+*App_Data/pthreadVSE2.dll
+
