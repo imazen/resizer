@@ -7,3 +7,6 @@
 [submodule "Tools/lightresize"]
 	path = Tools/lightresize
 	url = https://github.com/imazen/lightresize.git
+[submodule "Plugins/Libs/libwebp-net"]
+	path = Plugins/Libs/libwebp-net
+	url = https://github.com/imazen/libwebp-net
