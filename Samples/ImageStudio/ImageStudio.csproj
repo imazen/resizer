@@ -6,13 +6,13 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{215B1D77-F110-4505-B406-99DFEA055A53}</ProjectGuid>
+    <ProjectGuid>{392FDC52-85F1-4082-B754-7700A4B55095}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RedEyeRemoval</RootNamespace>
-    <AssemblyName>RedEyeRemoval</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <RootNamespace>Imazen.Samples.ImageStudio</RootNamespace>
+    <AssemblyName>Imazen.Samples.ImageStudio</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <UseIISExpress>false</UseIISExpress>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -33,29 +33,39 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web.Mobile" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\StudioJS\ImageResizing.js">
-      <Link>ImageResizing.js</Link>
+    <Content Include="..\..\StudioJS\ImageResizer.js">
+      <Link>StudioJS\ImageResizer.js</Link>
     </Content>
     <Content Include="..\..\StudioJS\jquery.imagestudio.js">
-      <Link>jquery.imagestudio.js</Link>
+      <Link>StudioJS\jquery.imagestudio.js</Link>
     </Content>
     <Content Include="..\..\StudioJS\jquery.Jcrop.js">
-      <Link>jquery.Jcrop.js</Link>
+      <Link>StudioJS\jquery.Jcrop.js</Link>
     </Content>
     <Content Include="..\..\StudioJS\jquery.jcrop.preview.js">
-      <Link>jquery.jcrop.preview.js</Link>
+      <Link>StudioJS\jquery.jcrop.preview.js</Link>
     </Content>
-    <Content Include="ListImages.aspx" />
-    <Content Include="Studio.aspx" />
+    <Content Include="..\..\StudioJS\jquery.overdraw.js">
+      <Link>StudioJS\jquery.overdraw.js</Link>
+    </Content>
+    <Content Include="Free.htm" />
+    <Content Include="Default.aspx" />
+    <Content Include="Simple.htm" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -65,22 +75,16 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ListImages.aspx.cs">
-      <DependentUpon>ListImages.aspx</DependentUpon>
+    <Compile Include="Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
+      <DependentUpon>Default.aspx</DependentUpon>
     </Compile>
-    <Compile Include="ListImages.aspx.designer.cs">
-      <DependentUpon>ListImages.aspx</DependentUpon>
+    <Compile Include="Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Studio.aspx.cs">
-      <DependentUpon>Studio.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Studio.aspx.designer.cs">
-      <DependentUpon>Studio.aspx</DependentUpon>
-    </Compile>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
@@ -94,9 +98,21 @@
       <Project>{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}</Project>
       <Name>ImageResizer.Plugins.DiskCache</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\Faces\ImageResizer.Plugins.Faces.csproj">
+      <Project>{144686D8-7820-4BEE-9325-60C4E998C2B0}</Project>
+      <Name>ImageResizer.Plugins.Faces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\RedEye\ImageResizer.Plugins.RedEye.csproj">
       <Project>{054D5D5D-1041-4F03-B5E4-BFF0441586FA}</Project>
       <Name>ImageResizer.Plugins.RedEye</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\RemoteReader\ImageResizer.Plugins.RemoteReader.csproj">
+      <Project>{0E6BE1A7-C754-4E33-A8AC-75A8549FC68B}</Project>
+      <Name>ImageResizer.Plugins.RemoteReader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\SeamCarving\ImageResizer.Plugins.SeamCarving.csproj">
+      <Project>{7AEFB877-A720-4929-880C-1090A71C83EB}</Project>
+      <Name>ImageResizer.Plugins.SeamCarving</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\SimpleFilters\ImageResizer.Plugins.SimpleFilters.csproj">
       <Project>{2A7D72F6-6DCB-4260-A921-6C7A6FC77812}</Project>
@@ -111,7 +127,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>52624</DevelopmentServerPort>
+          <DevelopmentServerPort>51729</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>
