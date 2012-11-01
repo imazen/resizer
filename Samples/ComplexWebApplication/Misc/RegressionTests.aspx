@@ -54,9 +54,9 @@
 
 <h3>No clipping should occur (original, followed by resized)</h3>
 <div style="background-color:white; padding:30px">
-<img src="218.gif" runat="server" />
+<img src="rounding-error-2.jpg" runat="server" />
 <br />
-<img src="218.gif?maxheight=50" runat="server" />
+<img src="rounding-error-2.jpg?maxheight=50" runat="server" />
 </div>
         <h3>This image (5x527) should appear in 3 sizes. 
         </h3>
