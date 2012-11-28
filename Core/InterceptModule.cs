@@ -110,7 +110,7 @@ namespace ImageResizer {
                     
                     //Run the rewritten path past the auth system again, using the result as the default "AllowAccess" value
                     bool isAllowed = true;
-                    if (canCheckUrl) try {
+                    if (canCheckUrl && !app.Context.SkipAuthorization) try {
                             isAllowed = UrlAuthorizationModule.CheckUrlAccessForPrincipal(virtualPath, user, "GET");
                         } catch (NotImplementedException) { } //For MONO support
 
