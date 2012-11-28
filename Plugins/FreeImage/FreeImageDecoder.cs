@@ -8,9 +8,17 @@ using System.Drawing;
 using System.IO;
 using System.Diagnostics;
 using System.Globalization;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.FreeImageDecoder {
-    public class FreeImageDecoderPlugin : BuilderExtension, IPlugin, IFileExtensionPlugin, IIssueProvider {
+
+    public enum ToneMappingAlgorithm {
+        None,
+        Reinhard,
+        Drago,
+        Fattal
+    }
+    public class FreeImageDecoderPlugin : BuilderExtension, IPlugin, IFileExtensionPlugin, IIssueProvider, IQuerystringPlugin {
         public FreeImageDecoderPlugin() {
         }
         private static IEnumerable<string> supportedExts = null;
@@ -60,11 +68,14 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
         }
 
         public Bitmap Decode(Stream s, ResizeSettings settings) {
-            return (Bitmap)DecodeAndCall(s, settings, delegate(FIBITMAP b, bool MayDispose) {
-                return Convert(b, ("true".Equals(settings["autorotate"], StringComparison.OrdinalIgnoreCase)));
+            return (Bitmap)DecodeAndCall(s, settings, delegate(ref FIBITMAP b, bool MayDispose) {
+                 bool usethumb = ("true".Equals(settings["usepreview"], StringComparison.OrdinalIgnoreCase));
+                bool autorotate = ("true".Equals(settings["autorotate"], StringComparison.OrdinalIgnoreCase));
+
+                return Convert(b, autorotate && !usethumb); //because usepreview prevents autorotate from working at the freeimage level
             });
         }
-        public delegate object DecodeCallback(FIBITMAP b, bool mayUnloadOriginal);
+        public delegate object DecodeCallback(ref FIBITMAP b, bool mayUnloadOriginal);
         /// <summary>
         /// Decodes the given stream, selects the correct page or frame, rotates it correctly (if autorotate=true), then executes the callback, then cleans up.
         /// </summary>
@@ -76,6 +87,13 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
             if (!FreeImageAPI.FreeImage.IsAvailable()) return null;
 
             FREE_IMAGE_LOAD_FLAGS flags = FREE_IMAGE_LOAD_FLAGS.DEFAULT;
+
+            //If we're not tone-mapping the raw file, convert it for display
+            if (!HasToneMappingCommands(settings)) flags |= FREE_IMAGE_LOAD_FLAGS.RAW_DISPLAY;
+
+            bool usethumb = ("true".Equals(settings["usepreview"], StringComparison.OrdinalIgnoreCase));
+            if (usethumb) flags |= FREE_IMAGE_LOAD_FLAGS.RAW_PREVIEW;
+
             bool autorotate = ("true".Equals(settings["autorotate"], StringComparison.OrdinalIgnoreCase));
             if (autorotate) flags |= FREE_IMAGE_LOAD_FLAGS.JPEG_EXIFROTATE;
 
@@ -104,7 +122,7 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
                     if (bPage.IsNull) return null;
                     try {
                         sw.Stop();
-                        return callback(bPage, false);
+                        return ToneMap(ref bPage, false, settings, callback);
                     } finally {
                         FreeImage.UnlockPage(mb, bPage, false);
                     }
@@ -119,10 +137,38 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
                     original = FreeImage.LoadFromStream(s, flags);
                     sw.Stop();
                     if (original.IsNull) return null;
-                    return callback(original, true);
+                    return ToneMap(ref original, true, settings, callback);
                 } finally {
                     if (!original.IsNull) FreeImage.UnloadEx(ref original);
                 }
+            }
+        }
+        private static bool HasToneMappingCommands(ResizeSettings settings) {
+            return false; //Tone mapping is disabled, not yet functional
+            return NameValueCollectionExtensions.Get<ToneMappingAlgorithm>(settings, "fi.tonemap", ToneMappingAlgorithm.None) != ToneMappingAlgorithm.None;
+
+        }
+
+        private static object ToneMap(ref FIBITMAP b, bool mayUnloadOriginal, ResizeSettings settings, DecodeCallback callback) {
+            return callback(ref b, mayUnloadOriginal);//Tone mapping is disabled, not yet functional
+
+            FIBITMAP m = FIBITMAP.Zero;
+            try {
+                var alg = NameValueCollectionExtensions.Get<ToneMappingAlgorithm>(settings, "fi.tonemap", ToneMappingAlgorithm.None);
+                if (alg == ToneMappingAlgorithm.Drago){
+                    m = FreeImage.TmoDrago03(b, 2.2, 0);
+                }else if (alg == ToneMappingAlgorithm.Reinhard){
+                    m = FreeImage.TmoReinhard05(b, 0, 0);
+                }else if (alg == ToneMappingAlgorithm.Fattal){
+                    m = FreeImage.TmoFattal02(b, 0.5, 0.85);
+                }else{
+                    return callback(ref b, mayUnloadOriginal);
+                }
+                if (mayUnloadOriginal) FreeImage.UnloadEx(ref b);
+
+                return callback(ref m, true);
+            } finally {
+                if (!m.IsNull) FreeImage.UnloadEx(ref m); 
             }
         }
 
@@ -136,6 +182,10 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
             List<IIssue> issues = new List<IIssue>();
             if (!FreeImageAPI.FreeImage.IsAvailable()) issues.Add(new Issue("The FreeImage library is not available! All FreeImage plugins will be disabled.", IssueSeverity.Error));
             return issues;
+        }
+
+        public IEnumerable<string> GetSupportedQuerystringKeys() {
+            return new string[] { "usepreview", "autorotate", "page", "frame" };
         }
     }
 }
