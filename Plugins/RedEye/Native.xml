@@ -1,39 +1,39 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <files>
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/cascades/haarcascade_frontalface_default.xml" name="haarcascade_frontalface_default.xml"  fileBytes="1,254,733" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/cascades/haarcascade_mcs_eyepair_big.xml" name="haarcascade_mcs_eyepair_big.xml"  fileBytes="369,315" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/cascades/haarcascade_mcs_eyepair_small.xml" name="haarcascade_mcs_eyepair_small.xml"  fileBytes="422,790" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/cascades/haarcascade_mcs_lefteye.xml" name="haarcascade_mcs_lefteye.xml"  fileBytes="801,512" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/cascades/haarcascade_mcs_righteye.xml" name="haarcascade_mcs_righteye.xml"  fileBytes="1,425,365" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/cascades/haarcascade_eye.xml" name="haarcascade_eye.xml"  fileBytes="506,314" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/cascades/haarcascade_frontalface_default.xml" name="haarcascade_frontalface_default.xml"  fileBytes="1,254,733" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/cascades/haarcascade_mcs_eyepair_big.xml" name="haarcascade_mcs_eyepair_big.xml"  fileBytes="369,315" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/cascades/haarcascade_mcs_eyepair_small.xml" name="haarcascade_mcs_eyepair_small.xml"  fileBytes="422,790" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/cascades/haarcascade_mcs_lefteye.xml" name="haarcascade_mcs_lefteye.xml"  fileBytes="801,512" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/cascades/haarcascade_mcs_righteye.xml" name="haarcascade_mcs_righteye.xml"  fileBytes="1,425,365" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/cascades/haarcascade_eye.xml" name="haarcascade_eye.xml"  fileBytes="506,314" />
   
   
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x86/opencv_legacy231.dll" name="opencv_legacy231.dll" bitness="32" fileBytes="762880" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x86/opencv_ml231.dll" name="opencv_ml231.dll" bitness="32" fileBytes="453120" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x86/opencv_ts231.dll" name="opencv_ts231.dll" bitness="32" fileBytes="567296" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x86/opencv_gpu231.dll" name="opencv_gpu231.dll" bitness="32" fileBytes="222208" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x86/opencv_objdetect231.dll" name="opencv_objdetect231.dll" bitness="32" fileBytes="558080" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x86/opencv_calib3d231.dll" name="opencv_calib3d231.dll" bitness="32" fileBytes="744960" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x86/opencv_features2d231.dll" name="opencv_features2d231.dll" bitness="32" fileBytes="879104" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x86/opencv_highgui231.dll" name="opencv_highgui231.dll" bitness="32" fileBytes="892928" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x86/opencv_flann231.dll" name="opencv_flann231.dll" bitness="32" fileBytes="396288" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x86/opencv_imgproc231.dll" name="opencv_imgproc231.dll" bitness="32" fileBytes="1649664" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x86/opencv_core231.dll" name="opencv_core231.dll" bitness="32" fileBytes="1717760" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x86/tbb.dll" name="tbb.dll" bitness="32" fileBytes="205728" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x86/opencv_legacy231.dll" name="opencv_legacy231.dll" bitness="32" fileBytes="762880" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x86/opencv_ml231.dll" name="opencv_ml231.dll" bitness="32" fileBytes="453120" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x86/opencv_ts231.dll" name="opencv_ts231.dll" bitness="32" fileBytes="567296" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x86/opencv_gpu231.dll" name="opencv_gpu231.dll" bitness="32" fileBytes="222208" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x86/opencv_objdetect231.dll" name="opencv_objdetect231.dll" bitness="32" fileBytes="558080" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x86/opencv_calib3d231.dll" name="opencv_calib3d231.dll" bitness="32" fileBytes="744960" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x86/opencv_features2d231.dll" name="opencv_features2d231.dll" bitness="32" fileBytes="879104" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x86/opencv_highgui231.dll" name="opencv_highgui231.dll" bitness="32" fileBytes="892928" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x86/opencv_flann231.dll" name="opencv_flann231.dll" bitness="32" fileBytes="396288" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x86/opencv_imgproc231.dll" name="opencv_imgproc231.dll" bitness="32" fileBytes="1649664" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x86/opencv_core231.dll" name="opencv_core231.dll" bitness="32" fileBytes="1717760" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x86/tbb.dll" name="tbb.dll" bitness="32" fileBytes="205728" />
 
 
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x64/opencv_legacy231.dll" name="opencv_legacy231.dll" bitness="64" fileBytes="987648" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x64/opencv_ml231.dll" name="opencv_ml231.dll" bitness="64" fileBytes="580096" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x64/opencv_ts231.dll" name="opencv_ts231.dll" bitness="64" fileBytes="789504" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x64/opencv_gpu231.dll" name="opencv_gpu231.dll" bitness="64" fileBytes="263168" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x64/opencv_objdetect231.dll" name="opencv_objdetect231.dll" bitness="64" fileBytes="781312" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x64/opencv_calib3d231.dll" name="opencv_calib3d231.dll" bitness="64" fileBytes="1068032" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x64/opencv_features2d231.dll" name="opencv_features2d231.dll" bitness="64" fileBytes="1259520" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x64/opencv_highgui231.dll" name="opencv_highgui231.dll" bitness="64" fileBytes="1158144" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x64/opencv_flann231.dll" name="opencv_flann231.dll" bitness="64" fileBytes="627712" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x64/opencv_imgproc231.dll" name="opencv_imgproc231.dll" bitness="64" fileBytes="2155008" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x64/opencv_core231.dll" name="opencv_core231.dll" bitness="64" fileBytes="2299392" />
-  <file url="http://dyn.imageresizing.net/opencv/2.3.1/x64/tbb.dll" name="tbb.dll" bitness="64" fileBytes="279456" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x64/opencv_legacy231.dll" name="opencv_legacy231.dll" bitness="64" fileBytes="987648" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x64/opencv_ml231.dll" name="opencv_ml231.dll" bitness="64" fileBytes="580096" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x64/opencv_ts231.dll" name="opencv_ts231.dll" bitness="64" fileBytes="789504" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x64/opencv_gpu231.dll" name="opencv_gpu231.dll" bitness="64" fileBytes="263168" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x64/opencv_objdetect231.dll" name="opencv_objdetect231.dll" bitness="64" fileBytes="781312" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x64/opencv_calib3d231.dll" name="opencv_calib3d231.dll" bitness="64" fileBytes="1068032" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x64/opencv_features2d231.dll" name="opencv_features2d231.dll" bitness="64" fileBytes="1259520" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x64/opencv_highgui231.dll" name="opencv_highgui231.dll" bitness="64" fileBytes="1158144" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x64/opencv_flann231.dll" name="opencv_flann231.dll" bitness="64" fileBytes="627712" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x64/opencv_imgproc231.dll" name="opencv_imgproc231.dll" bitness="64" fileBytes="2155008" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x64/opencv_core231.dll" name="opencv_core231.dll" bitness="64" fileBytes="2299392" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.3.1/x64/tbb.dll" name="tbb.dll" bitness="64" fileBytes="279456" />
 
 
 </files>

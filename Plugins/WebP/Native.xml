@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <files>
-  <file url="http://dyn.imageresizing.net/webp/0.2.0-c/x86/libwebp.dll" name="libwebp.dll" bitness="32" fileBytes="228,352" />
-  <file url="http://dyn.imageresizing.net/webp/0.2.0-c/x64/libwebp.dll" name="libwebp.dll"  bitness="64" fileBytes="267,776" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/webp/0.2.0-c/x86/libwebp.dll" name="libwebp.dll" bitness="32" fileBytes="228,352" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/webp/0.2.0-c/x64/libwebp.dll" name="libwebp.dll"  bitness="64" fileBytes="267,776" />
 </files>
