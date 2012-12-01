@@ -33,7 +33,7 @@ namespace ImageResizer.Configuration {
                 if (_singleton == null)
                     lock (_singletonLock)
                         if (_singleton == null)
-                            _singleton = new Config(null);
+                            _singleton = new Config(null); //Null lets configuration be loaded lazily, although this feature isn't really used.
 
 
                 foreach(ICurrentConfigProvider p in _singleton.Plugins.ConfigProviders){
@@ -72,16 +72,8 @@ namespace ImageResizer.Configuration {
             new ImageResizer.Plugins.Basic.Diagnostic().Install(this);
             if (isAspNet) new ImageResizer.Plugins.Basic.SizeLimiting().Install(this);
 
-            if (!isAspNet) {
-                //Not running asp.net app here. Load them immediately.
-                plugins.LoadPlugins();
-            } else {            
-                //Load plugins on the first request, unless they are already loaded.
-                pipeline.OnFirstRequest += delegate(IHttpModule sender, HttpContext context) {
-                    Plugins.LoadPlugins();
-                };
-            }
-
+            //Load plugins immediately. Lazy plugin loading causes problems.
+            plugins.LoadPlugins();
         }
 
         
