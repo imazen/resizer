@@ -40,6 +40,11 @@ namespace ImageResizer.Plugins.WicEncoder {
         /// </summary>
         public bool Dither { get; set; }
 
+        /// <summary>
+        /// If true, PNGs will be encoded in interlaced form.
+        /// </summary>
+        public bool? Interlace { get; set; }
+
         public WicEncoderPlugin() {
             this.Dither = true;
             this.Colors = -1;
@@ -58,6 +63,7 @@ namespace ImageResizer.Plugins.WicEncoder {
             if ("false".Equals(settings["dither"], StringComparison.OrdinalIgnoreCase) ||
                 "0".Equals(settings["dither"], StringComparison.OrdinalIgnoreCase)) Dither = false;
 
+            Interlace = settings.Get<bool>("interlace");
         }
 
 
@@ -181,7 +187,13 @@ namespace ImageResizer.Plugins.WicEncoder {
                     }
                 }
                 //PNG interlace
-                //InterlaceOption true/false (TODO)
+                if (guidEncoder.Equals(Consts.GUID_ContainerFormatPng)) {
+                    var interlaceOption = new PROPBAG2[1];
+                    interlaceOption[0].pstrName = "InterlaceOption";
+
+                    propBag.Write(1, interlaceOption, new object[] { Interlace ?? false });
+
+                }
 
                 //Apply the property bag
                 outputFrame.Initialize(propBag);
