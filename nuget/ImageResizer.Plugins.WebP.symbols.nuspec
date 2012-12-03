@@ -1,0 +1,19 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.WebP</id>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<description>Description</description>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		  <dependency id="Imazen.WebP"/>
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.WebP.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.WebP.pdb" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.WebP.xml" target="lib" />
+		<file src="..\Plugins\WebP\**\*.cs" target="src" />
+	</files>
+</package>

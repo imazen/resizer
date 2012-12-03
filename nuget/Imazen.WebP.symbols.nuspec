@@ -1,0 +1,15 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>Imazen.WebP</id>
+		<version>0.1</version>
+		<authors>$author$</authors>
+		<description>Description</description>
+	</metadata>
+	<files>
+		<file src="$pluginsdlldir$\Imazen.WebP.dll" target="lib" />
+		<file src="$pluginsdlldir$\Imazen.WebP.pdb" target="lib" />
+		<file src="$pluginsdlldir$\Imazen.WebP.xml" target="lib" />
+		<file src="..\Plugins\Libs\libwebp-net\**\*.cs" target="src" />
+	</files>
+</package>

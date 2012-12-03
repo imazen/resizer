@@ -1,0 +1,19 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>Imazen.WebP</id>
+		<title>Imazen.WebP - .NET wrapper for libwebp</title>
+		<version>.1</version>
+		<authors>$author$</authors>
+		<owners>$author$</owners>
+		<licenseUrl>https://github.com/imazen/libwebp-net</licenseUrl>
+		<projectUrl>https://github.com/imazen/libwebp-net</projectUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+<description>Decode and encode WebP images from .NET
+		<tags>image libwebp webp webppy</tags>
+	</metadata>
+  	<files>
+		<file src="$pluginsdlldir$\Imazen.WebP.dll" target="lib" />
+		<file src="$pluginsdlldir$\Imazen.WebP.xml" target="lib" />
+	</files>
+</package>
