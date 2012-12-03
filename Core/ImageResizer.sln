@@ -63,6 +63,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Faces"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.WebP", "..\Plugins\WebP\ImageResizer.Plugins.WebP.csproj", "{E7637D84-D86B-4D37-9835-8DF374539693}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imazen.WebP", "..\Plugins\Libs\libwebp-net\Imazen.WebP\Imazen.WebP.csproj", "{92F607A3-2F04-4536-8346-B6FEF8B774FF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -697,6 +699,24 @@ Global
 		{E7637D84-D86B-4D37-9835-8DF374539693}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{E7637D84-D86B-4D37-9835-8DF374539693}.Trial|x64.ActiveCfg = Release|Any CPU
 		{E7637D84-D86B-4D37-9835-8DF374539693}.Trial|x86.ActiveCfg = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|x64.ActiveCfg = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|x86.ActiveCfg = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|x64.ActiveCfg = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
