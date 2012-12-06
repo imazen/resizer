@@ -14,7 +14,7 @@ namespace ImageResizer.Plugins.SourceMemCache {
         /// <summary>
         /// Defaults to 10MB limit, and samples usage over the last 10 minutes when deciding what to remove. Stuff not used in the last 10 minutes gets discarded even if the limit hasn't been reached.
         /// </summary>
-        public SourceMemCachePlugin() : this(1024 * 1024 * 1024, new TimeSpan(0, 10, 0)) { }
+        public SourceMemCachePlugin() : this(10 * 1024 * 1024, new TimeSpan(0, 10, 0)) { }
 
         public SourceMemCachePlugin(long maxBytes, TimeSpan usageWindow) {
             //Cleanup at most once per minute, unless hitting the limits. 
