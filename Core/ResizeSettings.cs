@@ -206,7 +206,7 @@ namespace ImageResizer {
         /// </summary>
         public ProcessWhen Process {
             get {
-                return this.Get<ProcessWhen>(this["process"], this["useresizingpipeline"] != null ? ProcessWhen.Always : ProcessWhen.Default);
+                return this.Get<ProcessWhen>("process", this["useresizingpipeline"] != null ? ProcessWhen.Always : ProcessWhen.Default);
             }
             set {
                 this["process"] = value.ToString(); this.Remove("useresizingpipeline");
