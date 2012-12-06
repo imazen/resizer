@@ -36,6 +36,17 @@ namespace ImageResizer.Plugins.RedEye {
 
     public class EyeDetection : FeatureDetectionBase<ObjRect> {
 
+        public EyeDetection()
+            : base() {
+                this.fileNames = new Dictionary<string, string>(){
+                        {"FaceCascade",@"haarcascade_frontalface_default.xml"}, 
+            {"LeftEyeCascade" , @"haarcascade_mcs_lefteye.xml"},
+            {"RightEyeCascade" , @"haarcascade_mcs_righteye.xml"},
+            {"EyePair45" , @"haarcascade_mcs_eyepair_big.xml"},
+            {"EyePair22" , @"haarcascade_mcs_eyepair_small.xml"},
+            {"Eye" , @"haarcascade_eye.xml"}};
+        }
+
 
         /// <summary>
         /// Detects features on a grayscale image.
