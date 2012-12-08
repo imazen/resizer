@@ -609,10 +609,63 @@ namespace ImageResizer
             if (s.sourceBitmap != null && (s.settings.SourceFlip != RotateFlipType.RotateNoneFlipNone || !string.IsNullOrEmpty(s.settings["sRotate"]))) {
                 double angle = s.settings.Get<double>("sRotate",0);
 
-                s.sourceBitmap.RotateFlip(PolygonMath.CombineFlipAndRotate(s.settings.SourceFlip,angle));
-                s.originalSize = s.sourceBitmap.Size;
+                //Clone to PreRenderBitmap before rotating, so original copy isn't modified.
+                if (GetColorFormat(s.sourceBitmap) == ImageColorFormat.Cmyk) {
+                    //For CMYK images, we must use DrawImage instead.
+                    s.preRenderBitmap = new Bitmap(s.originalSize.Width, s.originalSize.Height, PixelFormat.Format24bppRgb);
+                    using (var g = Graphics.FromImage(s.preRenderBitmap)) {
+                        g.DrawImageUnscaled(s.sourceBitmap, 0, 0);
+                    }
+                } else {
+                    s.preRenderBitmap = s.sourceBitmap.Clone(new Rectangle(new Point(0, 0), s.sourceBitmap.Size), s.sourceBitmap.PixelFormat == PixelFormat.Format24bppRgb ? PixelFormat.Format24bppRgb : PixelFormat.Format32bppArgb);
+                }
+                s.preRenderBitmap.RotateFlip(PolygonMath.CombineFlipAndRotate(s.settings.SourceFlip, angle));
+                s.originalSize = s.preRenderBitmap.Size;
             }
             return RequestedAction.None;
+        }
+
+        private ImageColorFormat GetColorFormat(Bitmap bitmap)
+        {
+            const int pixelFormatIndexed = 0x00010000;
+            const int pixelFormat32bppCMYK = 0x200F;
+            const int pixelFormat16bppGrayScale = (4 | (16 << 8));
+
+            // Check image flags
+            var flags = (ImageFlags)bitmap.Flags;
+            if ((flags & ImageFlags.ColorSpaceCmyk) > 0 || (flags & (ImageFlags.ColorSpaceYcck)) > 0)
+            {
+                return ImageColorFormat.Cmyk;
+            }
+            else if ((flags & ImageFlags.ColorSpaceGray) > 0)
+            {
+                return ImageColorFormat.Grayscale;
+            }
+
+            // Check pixel format
+            var pixelFormat = (int)bitmap.PixelFormat;
+            if (pixelFormat == pixelFormat32bppCMYK)
+            {
+                return ImageColorFormat.Cmyk;
+            }
+            else if ((pixelFormat & pixelFormatIndexed) != 0)
+            {
+                return ImageColorFormat.Indexed;
+            }
+            else if (pixelFormat == pixelFormat16bppGrayScale)
+            {
+                return ImageColorFormat.Grayscale;
+            }
+
+            // Default to RGB
+            return ImageColorFormat.Rgb;
+        }
+
+        private enum ImageColorFormat {
+            Rgb,
+            Cmyk,
+            Indexed,
+            Grayscale
         }
 
 
