@@ -37,9 +37,17 @@ namespace ImageResizer.Plugins.Faces {
     /// <typeparam name="T"></typeparam>
     public abstract class FeatureDetectionBase<T> : IDisposable where T : IFeature {
         public FeatureDetectionBase() {
-            searchFolders.Add(System.IO.Path.GetDirectoryName(new Uri(this.GetType().Assembly.CodeBase).LocalPath));
-            searchFolders.Add(System.IO.Path.GetDirectoryName(this.GetType().Assembly.Location));
-            searchFolders.Add(@"C:\Users\Administrator\Documents\resizer\Plugins\Libs\OpenCV");
+            var a = this.GetType().Assembly;
+            //Use CodeBase if it is physical; this means we don't re-download each time we recycle. 
+            //If it's a URL, we fall back to Location, which is often the shadow-copied version.
+            var searchFolder = a.CodeBase.StartsWith("file:///", StringComparison.OrdinalIgnoreCase)
+                                ? a.CodeBase
+                                : a.Location;
+            //Convert UNC paths 
+            searchFolder = Path.GetDirectoryName(searchFolder.Replace("file:///", "").Replace("/", "\\"));
+
+            searchFolders.Add(searchFolder);
+            //searchFolders.Add(@"C:\Users\Administrator\Documents\resizer\Plugins\Libs\OpenCV");
         }
         public FeatureDetectionBase(string xmlFolder):this() {
             if (xmlFolder != null) searchFolders.Insert(0,xmlFolder);
@@ -47,14 +55,7 @@ namespace ImageResizer.Plugins.Faces {
 
         protected List<string> searchFolders = new List<string>() { };
 
-        protected Dictionary<string, string> fileNames = new Dictionary<string,string>(){ 
-            {"FaceCascade",@"haarcascade_frontalface_default.xml"}, 
-            {"LeftEyeCascade" , @"haarcascade_mcs_lefteye.xml"},
-            {"RightEyeCascade" , @"haarcascade_mcs_righteye.xml"},
-            {"EyePair45" , @"haarcascade_mcs_eyepair_big.xml"},
-            {"EyePair22" , @"haarcascade_mcs_eyepair_small.xml"},
-            {"Eye" , @"haarcascade_eye.xml"},
-        };
+        protected Dictionary<string, string> fileNames = new Dictionary<string,string>(){ };
 
         protected Dictionary<string, string> Files = null;
         protected Dictionary<string, CvHaarClassifierCascade> Cascades = null;
@@ -67,14 +68,14 @@ namespace ImageResizer.Plugins.Faces {
                 string resolvedPath = null;
                 foreach (string basePath in searchFolders) {
                     string full = basePath.TrimEnd('\\') + '\\' + fileNames[key];
-                    if (File.Exists(full)) {
+                    if (File.Exists(Path.GetFullPath(full))) {
                         resolvedPath = Path.GetFullPath(full);
                         //An ExecutionException will occur here if multiple OpenCv instances are loaded
                         Cascades[key] = Cv.Load<CvHaarClassifierCascade>(resolvedPath);
                         break;
                     }
                 }
-                if (resolvedPath == null) throw new FileNotFoundException("Failed to find " + fileNames[key] + " in any of the search directories. Verify the XML files have been copied to the same folder as ImageResizer.Plugins.RedEye.dll.");
+                if (resolvedPath == null) throw new ImageResizer.ImageProcessingException("Failed to find " + fileNames[key] + " in any of the search directories. Verify the XML files have been copied to the same folder as ImageResizer.dll.");
                 f[key] = resolvedPath;
             }
 
