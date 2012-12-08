@@ -30,6 +30,16 @@ namespace ImageResizer.Plugins.Watermark {
         }
 
 
+        public override object[] GetHashBasis()
+        {
+            var b = new object[] {Text, Vertical, TextColor,OutlineColor,GlowColor,Font,Angle,FontSize,Style,OutlineWidth,GlowWidth,Rendering };
+            var o = base.GetHashBasis();
+            object[] combined = new object[b.Length + o.Length];
+            Array.Copy(b, combined, b.Length);
+            Array.Copy(o, 0, combined, b.Length, o.Length);
+            return combined;
+        }
+
         private TextRenderingHint _rendering = TextRenderingHint.AntiAliasGridFit;
 
         public TextRenderingHint Rendering {
