@@ -5,18 +5,27 @@
 		<title>ImageResizer.Plugins.DiskCache</title>
 		<version>$version$</version>
 		<authors>$author$</authors>
-		<owners>$author$</owners>
+		<owners>$owners$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
-<description>Adds disk caching to the ImageResizer core. Fast, multithreaded, and self-managing. 
+<description>
+
+
+Adds disk caching to the ImageResizer core. Fast, multithreaded, and self-managing. 
 Drastically increases scalability and performance. Writing processed images to disk permits images to be served as static files by IIS, eliminating the typical RAM and CPU overhead assocatied with real-time image processing.
 
-Visit http://imageresizing.net for details, documenation, and free support. 
-E-mail support@imageresizing.net if you encounter any problems with the software. 
-The documentation for this plugin resides at http://imageresizing.net/plugins/diskcache</description>
-		<tags>$tags$</tags>
+Used by websites hosting hundreds of thousands of images, with hundreds of requests per second.
+
+Docs: http://imageresizing.net/plugins/diskcache
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+$plugins$
+</description>
+		<tags>ImageResizer DiskCache Imazen Resizer IIS static file caching</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

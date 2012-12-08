@@ -5,12 +5,15 @@
 		<title>ImageResizer.Plugins.SimpleFilters - Grayscale, sepia, transparency, and brightness adjustments</title>
 		<version>$version$</version>
 		<authors>$author$</authors>
-		<owners>$author$</owners>
+		<owners>$owners$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
-<description>Apply grayscale, sepia, alpha, or brightness filters via the URL.
+<description>
+
+Apply grayscale, sepia, alpha, or brightness filters via the URL.
+
 * &amp;s.grayscale=true|y|ry|ntsc|bt709|flat  (true, ntsc, and y produce identical results)
 * &amp;s.sepia=true
 * &amp;s.alpha= 0..1
@@ -19,10 +22,17 @@
 * &amp;s.saturation=-1..1
 * &amp;s.invert=true
 
-Visit http://imageresizing.net for details, documenation, and free support. 
-E-mail support@imageresizing.net if you encounter any problems with the software. 
-The documentation for this plugin resides at http://imageresizing.net/plugins/simplefilters</description>
-		<tags>$tags$</tags>
+
+Docs: http://imageresizing.net/plugins/simplefilters
+
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+$plugins$
+
+</description>
+		<tags>ImageResizer SimpleFilters sepia grayscale alpha brightness contrast saturation Imazen Resizer</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

@@ -5,17 +5,25 @@
 		<title>ImageResizer.Plugins.AnimatedGifs - Resize and process animated GIFs</title>
 		<version>$version$</version>
 		<authors>$author$</authors>
-		<owners>$author$</owners>
+		<owners>$owners$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
-<description>Replaces the .NET GIF encoding for animated gifs so that the animation can be preserved through the resizing and processing of all the frames.
+<description>
 
-Visit http://imageresizing.net for details, documenation, and free support. 
-E-mail support@imageresizing.net if you encounter any problems with the software. 
-The documentation for this plugin resides at http://imageresizing.net/plugins/animatedgifs</description>
-		<tags>$tags$</tags>
+Adds support for processing animated GIFs, resizing/cropping/editing each frame automatically before re-composing them. 
+
+Install and forget - no commands required.
+
+Docs: http://imageresizing.net/plugins/animatedgifs
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+$plugins$
+</description>
+		<tags>ImageResizer Imazen Resizer AnimatedGifs PrettyGifs gif gifs animated frames resizing</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

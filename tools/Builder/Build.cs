@@ -45,7 +45,8 @@ namespace ImageResizer.ReleaseBuilder {
 
         public NameValueCollection GetNugetVariables() {
             var nvc = new NameValueCollection();
-            nvc["author"] = "Nathanael Jones";
+            nvc["author"] = "Nathanael Jones, Imazen";
+            nvc["owners"] = "nathanaeljones, imazen";
             nvc["pluginsdlldir"] = @"..\dlls\trial";
             nvc["coredlldir"] = @"..\dlls\release";
             nvc["iconurl"] = "http://imageresizing.net/images/logos/ImageIconPSD100.png";
@@ -60,6 +61,16 @@ namespace ImageResizer.ReleaseBuilder {
             "content aware image resizing alpha channel grayscale y ry ntsc bt709 flat size limit sizelimiting getthumbnailimage bitmap SQL database query blob " +
             "watermark virtual folder text overlay image watermark automatic whitespace trimming product images thumbnails " + 
             "padding pad margin borders background color bgcolor InterpolationMode Fant wic IWICBitmap IWICBitmapSource";
+
+
+            nvc["plugins"] = "## 30+ plugins available\n\n" + 
+                    "Search 'ImageResizer' on nuget.org, or visit imageresizing.net to see 40+ plugins, including WPF, WIC, FreeImage, OpenCV, AForge &amp; Ghostscript (PDF) integrations. " + 
+                    "You'll also find  plugins for disk caching, memory caching, Microsoft SQL blob support, Amazon CloudFront, S3, Azure Blob Storage, MongoDB GridFS, automatic whitespace trimming, " +
+                    "automatic white balance, octree 8-bit gif/png quantization and transparency dithering, animated gif resizing, watermark &amp; text overlay support, content aware image resizing /" + 
+                    " seam carving (based on CAIR), grayscale, sepia, histogram, alpha, contrast, saturation, brightness, hue, Guassian blur, noise removal, and smart sharpen filters, psd editing &amp; " +
+                    "rendering, raw (CR2, NEF, DNG, etc.) file exposure, .webp (weppy) support, image batch processing &amp; compression into .zip archives, red eye auto-correction,  face detection, and " + 
+                    "secure (signed!) remote HTTP image processing. Most datastore plugins support the Virtual Path Provider system, and can be used for non-image files as well.\n\n";
+                    
 
             return nvc;
         }

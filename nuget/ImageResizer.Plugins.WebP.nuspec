@@ -5,16 +5,25 @@
 		<title>ImageResizer.Plugins.WebP - Read and write WebP images on the fly</title>
 		<version>$version$</version>
 		<authors>$author$</authors>
-		<owners>$author$</owners>
+		<owners>$owners$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
-<description>Decode and encode WebP images on the fly.
-Visit http://imageresizing.net for details, documenation, and free support. 
-E-mail support@imageresizing.net if you encounter any problems with the software. 
-The documentation for this plugin resides at http://imageresizing.net/plugins/advancedfilters</description>
-		<tags>$tags$</tags>
+<description>
+
+Decode and encode WebP images on the fly.
+
+Docs: http://imageresizing.net/plugins/webp
+
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+$plugins$
+
+</description>
+		<tags>ImageResizer webp encode deocode weppy resizer Imazen</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		  <dependency id="Imazen.WebP"/>

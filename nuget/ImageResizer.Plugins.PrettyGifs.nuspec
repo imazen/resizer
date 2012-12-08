@@ -5,17 +5,26 @@
 		<title>ImageResizer.Plugins.PrettyGifs - High-quality GIF and 8-bit PNG encoding plugin</title>
 		<version>$version$</version>
 		<authors>$author$</authors>
-		<owners>$author$</owners>
+		<owners>$owners$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
-<description>Replaces .NET's default GIF and 8-bit PNG encoding with high-quality Octree Quantization and multi-pass dithering support. 
+<description>
 
-Visit http://imageresizing.net for details, documenation, and free support. 
-E-mail support@imageresizing.net if you encounter any problems with the software. 
-The documentation for this plugin resides at http://imageresizing.net/plugins/prettygifs</description>
-		<tags>$tags$</tags>
+Replaces .NET's default GIF and 8-bit PNG encoding with high-quality Octree Quantization and multi-pass dithering support. 
+
+
+Docs: http://imageresizing.net/plugins/prettygifs
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+
+$plugins$
+
+</description>
+		<tags>ImageResizer PrettyGifs Imazen Resizer gif 8-bit png octree quantization encoding </tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

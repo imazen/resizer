@@ -2,21 +2,28 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
 		<id>ImageResizer.Plugins.FriendlyUrls</id>
-		<title>ImageResizer.Plugins.FriendlyUrls - /resize(w,h)/image.jpg syntax</title>
+		<title>ImageResizer.Plugins.FriendlyUrls - deprecated</title>
 		<version>$version$</version>
 		<authors>$author$</authors>
 		<owners>$author$</owners>
-		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<licenseUrl>http://imageresizing.net/licenses/freedom</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
-<description>Allows images to be resized by specifying a fake folder instead of using the querystring.
+<description>
+
+Allows images to be resized by specifying a fake folder instead of using the querystring.
 For example, `image.jpg?maxwidth=100&amp;maxheight=100` would become `/resize(100,100)/image.jpg`. 
 
-Visit http://imageresizing.net for details, documenation, and free support. 
-E-mail support@imageresizing.net if you encounter any problems with the software. 
-The documentation for this plugin resides at http://imageresizing.net/plugins/friendlyurls</description>
-		<tags>$tags$</tags>
+Docs: http://imageresizing.net/plugins/friendlyurls
+Support: http://imageresizing.net/support
+
+## 30+ plugins available
+
+Search 'ImageResizer' on nuget.org, or visit imageresizing.net to see 40+ plugins, including WPF, WIC, FreeImage, OpenCV, AForge &amp; Ghostscript (PDF) integrations. You'll also find  plugins for disk caching, memory caching, Microsoft SQL blob support, Amazon CloudFront, S3, Azure Blob Storage, MongoDB GridFS, automatic whitespace trimming, automatic white balance, octree 8-bit gif/png quantization and transparency dithering, animated gif resizing, watermark &amp; text overlay support, content aware image resizing / seam carving (based on CAIR), grayscale, sepia, histogram, alpha, contrast, saturation, brightness, hue, Guassian blur, noise removal, and smart sharpen filters, psd editing &amp; rendering, raw (CR2, NEF, DNG, etc.) file exposure, .webp (weppy) support, image batch processing &amp; compression into .zip archives, red eye auto-correction,  face detection, and secure (signed!) remote HTTP image processing. Most datastore plugins support the Virtual Path Provider system, and can be used for non-image files as well.
+
+</description>
+		<tags>ImageResizer FriendlyUrls</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

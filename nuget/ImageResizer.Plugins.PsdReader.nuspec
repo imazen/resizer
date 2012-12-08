@@ -5,17 +5,22 @@
 		<title>ImageResizer.Plugins.PsdReader - Read and convert PSD source files</title>
 		<version>$version$</version>
 		<authors>$author$</authors>
-		<owners>$author$</owners>
+		<owners>$owners$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
-<description>Adds instant support for .PSD source files, as if they were PNG or Jpeg files. No configuration required.
+<description>
+Adds instant ImageResizer support for .PSD source files, as if they were PNG or Jpeg files. No configuration required. 
  
-Visit http://imageresizing.net for details, documenation, and free support. 
-E-mail support@imageresizing.net if you encounter any problems with the software. 
-The documentation for this plugin resides at http://imageresizing.net/plugins/psdreader</description>
-		<tags>$tags$</tags>
+Docs: http://imageresizing.net/plugins/psdreader
+
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+$plugins$</description>
+		<tags>ImageResizer PsdReader PSD decoding Imazen Rezizer</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

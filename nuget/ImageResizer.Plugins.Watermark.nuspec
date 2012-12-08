@@ -5,17 +5,26 @@
 		<title>ImageResizer.Plugins.Watermark - Watermark images dynamically</title>
 		<version>$version$</version>
 		<authors>$author$</authors>
-		<owners>$author$</owners>
+		<owners>$owners$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
-<description>Allows dynamic watermarking of images.
+<description>
 
-Visit http://imageresizing.net for details, documenation, and free support. 
-E-mail support@imageresizing.net if you encounter any problems with the software. 
-The documentation for this plugin resides at http://imageresizing.net/plugins/watermark</description>
-		<tags>$tags$</tags>
+Dynamically apply an unlimited number of image and text over and under-lays with WPF-style layout.
+
+Docs: http://imageresizing.net/plugins/watermark
+
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+$plugins$
+
+
+</description>
+		<tags>ImageResizer Watermark overlay image text resizer Imazen</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>
