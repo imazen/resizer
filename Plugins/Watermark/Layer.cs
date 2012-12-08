@@ -38,6 +38,23 @@ namespace ImageResizer.Plugins.Watermark {
             other.Align = Align;
         }
 
+        public virtual object[] GetHashBasis()
+        {
+            return new object[] { Top, Left, Bottom, Right, Width, Height, RelativeTo, DrawAs, Align };
+        }
+
+        public int GetDataHash()
+        {
+            var sb = new StringBuilder();
+            foreach (object o in GetHashBasis())
+            {
+                if (o == null) sb.Append("null");
+                else sb.Append(o.ToString());
+                sb.Append("||");
+            }
+            return sb.ToString().GetHashCode();
+        }
+
         private DistanceUnit _top = null;
         /// <summary>
         /// The offset from the top of the container. Percentages are relative to the container height. Defines the upper boundary for the layer. 
