@@ -47,6 +47,17 @@ namespace ImageResizer.Plugins.Watermark {
             other.Path = Path;
             other.ImageQuery = new ResizeSettings(ImageQuery);
         }
+
+        public override object[] GetHashBasis()
+        {
+            var b = new object[]{Path,ImageQuery};
+            var o = base.GetHashBasis();
+            object[] combined = new object[b.Length + o.Length];
+            Array.Copy(b,combined,b.Length);
+            Array.Copy(o,0,combined,b.Length,o.Length);
+            return combined;
+        }
+
         public ImageLayer Copy() {
             ImageLayer l = new ImageLayer(this.c);
             this.CopyTo(l);

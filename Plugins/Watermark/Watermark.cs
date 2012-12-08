@@ -46,9 +46,11 @@ namespace ImageResizer.Plugins.Watermark
             this.c = c;
             this.OtherImages.ConfigInstance = c;
             _namedWatermarks = ParseWatermarks(c.getConfigXml().queryFirst("watermarks"), ref _otherImages);
+            c.Pipeline.PostRewrite += Pipeline_PostRewrite;
             return this;
         }
 
+      
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
@@ -107,6 +109,25 @@ namespace ImageResizer.Plugins.Watermark
         //imagesettings
         //align = topleft|topright|bottomleft|bottomright|...
 
+        void Pipeline_PostRewrite(IHttpModule sender, HttpContext context, IUrlEventArgs e)
+        {
+            //Cache breaking
+            string watermark = e.QueryString["watermark"]; //from the querystring
+            if (string.IsNullOrEmpty(watermark)) return;
+
+            string[] parts = watermark.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string w in parts)
+            {
+                if (NamedWatermarks.ContainsKey(w))
+                {
+                    IEnumerable<Layer> layers = NamedWatermarks[w];
+                    foreach (Layer l in layers)
+                    {
+                        e.QueryString["watermark-cachebreak"] = (e.QueryString["watermark-cachebreak"] ?? "") + "_" + l.GetDataHash().ToString();
+                    }
+                }
+            }
+        }
 
 
         protected RequestedAction RenderLayersForLevel(ImageState s, Layer.LayerPlacement only) {
