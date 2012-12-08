@@ -5,15 +5,24 @@
 		<title>ImageResizer.Mvc - MVC-friendly utilities</title>
 		<version>$version$</version>
 		<authors>$author$</authors>
-		<owners>$author$</owners>
+		<owners>$owners$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/freedom</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<summary>Provides MVC-friendly helper methods and the MvcRoutingShim plugin for the ImageResizer Core library.</summary>
+		<summary>Provides the MvcRoutingShim plugin for the ImageResizer Core library.</summary>
 
-		<description>Provides MVC-friendly helper methods and the MvcRoutingShim plugin for the ImageResizer Core library. |||| Go to http://imageresizing.net for details, documenation, and support.</description>
-		<tags>$tags$</tags>
+		<description>
+Provides the MvcRoutingShim plugin for the ImageResizer Core library, which enables compatibility with MVC routing.
+
+
+Docs: http://imageresizing.net/plugins/mvcroutingshim
+
+Support: http://imageresizing.net/support
+
+$plugins$
+</description>
+		<tags>ImageResizer Imazen Resizer MVC MvcRoutingShim System.Web.Routing</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

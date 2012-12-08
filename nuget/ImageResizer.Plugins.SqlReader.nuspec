@@ -5,16 +5,25 @@
 		<title>ImageResizer.Plugins.SqlReader - Serve (and resize) images (and documents) from the database</title>
 		<version>$version$</version>
 		<authors>$author$</authors>
-		<owners>$author$</owners>
+		<owners>$owners$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 <description>
-Visit http://imageresizing.net for details, documenation, and free support. 
-E-mail support@imageresizing.net if you encounter any problems with the software. 
-The documentation for this plugin resides at http://imageresizing.net/plugins/sqlreader</description>
-		<tags>$tags$</tags>
+
+Enables ImageResizer to access and process images located in a SQL database.
+
+Docs: http://imageresizing.net/plugins/sqlreader
+
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+$plugins$
+
+</description>
+		<tags>ImageResizer SqlReader SQL blob image resizer Imazen</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

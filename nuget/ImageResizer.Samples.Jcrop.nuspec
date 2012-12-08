@@ -5,13 +5,25 @@
 		<title>ImageResizer.Samples.Jcrop</title>
 		<version>$version$</version>
 		<authors>$author$</authors>
-		<owners>$author$</owners>
+		<owners>$owners$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/freedom</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<description>Cropping and resizing made simple with this easy, packaged demo. Install into any Web Application. Visit http://imageresizing.net for details, documenation, and support.</description>
-		<tags>$tags$</tags>
+		<description>
+
+Cropping and resizing made simple with this easy, packaged demo. 
+
+Install into any Web Application. 
+
+Docs: http://imageresizing.net/plugins/wic
+
+Support: http://imageresizing.net/support
+
+$plugins$
+
+</description>
+		<tags>ImageResizer jCrop crop image resize</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		  <dependency id="ImageResizer.WebConfig"/>

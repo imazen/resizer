@@ -5,12 +5,16 @@
 		<title>Imazen.WebP - .NET wrapper for libwebp</title>
 		<version>0.1</version>
 		<authors>$author$</authors>
-		<owners>$author$</owners>
+		<owners>$owners$</owners>
 		<licenseUrl>https://github.com/imazen/libwebp-net</licenseUrl>
 		<projectUrl>https://github.com/imazen/libwebp-net</projectUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-<description>Decode and encode WebP images from .NET</description>
-		<tags>image libwebp webp webppy</tags>
+<description>Decode and encode WebP images from .NET. 
+
+
+Search nuget for 'Imazen' to see other image processing libraries we've created, or visit imazen.io.
+</description>
+		<tags>imazen image libwebp webp webppy</tags>
 	</metadata>
   	<files>
 		<file src="$coredlldir$\Imazen.WebP.dll" target="lib" />

@@ -5,15 +5,22 @@
 	<title>ImageResizer Web.Config Installation</title>
     <version>$version$</version>
     <authors>$author$</authors>
-    <owners>$author$</owners>
+    <owners>$owners$</owners>
     <licenseUrl>http://imageresizing.net/licenses/</licenseUrl>
     <projectUrl>http://imageresizing.net</projectUrl>
     <iconUrl>$iconurl$</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
 	<description>
-	Installs the ImageResizer module by (carefully) modifying Web.Config. 
-	Visit http://imageresizing.net for details, documenation, and support.</description>
-    <tags>$tags$</tags>
+
+Installs the ImageResizer module by (carefully) modifying Web.Config. 
+
+Docs: http://imageresizing.net/
+
+Support: http://imageresizing.net/support
+
+$plugins$
+</description>
+    <tags>ImageResizer Imazen Resizer Web.Config</tags>
 	<dependencies>
 	  <dependency id="ImageResizer"/>
 	</dependencies>

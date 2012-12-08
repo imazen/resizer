@@ -5,16 +5,24 @@
 		<title>ImageResizer.Plugins.MongoReader - Serve (and resize) images from MongDB GridFS</title>
 		<version>$version$</version>
 		<authors>$author$</authors>
-		<owners>$author$</owners>
+		<owners>$owners$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 <description>
-Visit http://imageresizing.net for details, documenation, and free support. 
-E-mail support@imageresizing.net if you encounter any problems with the software. 
-The documentation for this plugin resides at http://imageresizing.net/plugins/mongoreader</description>
-		<tags>$tags$</tags>
+Enables ImageResizer to access and process images from MongoDB GridFS. 
+
+Docs: http://imageresizing.net/plugins/mongoreader
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+
+$plugins$
+
+</description>
+		<tags>ImageResizer MongoReader Imazen Resizer mongodb gridfs mongo blob cloud</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		  <dependency id="mongocsharpdriver"/>

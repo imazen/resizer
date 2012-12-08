@@ -5,12 +5,14 @@
 		<title>ImageResizer.Plugins.RemoteReader - Resize and process images located on other servers or websites</title>
 		<version>$version$</version>
 		<authors>$author$</authors>
-		<owners>$author$</owners>
+		<owners>$owners$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
-<description>The RemoteReader plugin allows the ImageResizer to resize and display images that are located at arbitrary URLs. Kind of like a resizing relay.
+<description>
+
+The RemoteReader plugin allows the ImageResizer to resize and display images that are located at arbitrary URLs. Kind of like a resizing relay.
 
 There are 3 layers of security to prevent abuse. 
 
@@ -19,10 +21,17 @@ There are 3 layers of security to prevent abuse.
 4. The  plugin requires that all remote images be decoded and re-encoded. Files are never returned as-is. This ensures that the files are valid images, and prevents XSS attacks.
 
 Please note, you must configure the &lt;remotereader signingKey="to a long and secure pass phrase" /> and set &lt;remotereader allowAllSignedRequests="true" /> if all code calling RemoteReaderPlugin.Current.CreateSignedUrl(remoteUrl,settings) is trusted.
-Visit http://imageresizing.net for details, documenation, and free support. 
-E-mail support@imageresizing.net if you encounter any problems with the software. 
-The documentation for this plugin resides at http://imageresizing.net/plugins/remotereader</description>
-		<tags>$tags$</tags>
+
+ 
+Docs: http://imageresizing.net/plugins/remotereader
+
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+$plugins$
+</description>
+		<tags>ImageResizer RemoteReader HTTP Imazen Resizer</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

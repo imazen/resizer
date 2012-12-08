@@ -5,17 +5,24 @@
 		<title>ImageResizer.Plugins.BatchZipper - Resize and zip multiple images asynchronously</title>
 		<version>$version$</version>
 		<authors>$author$</authors>
-		<owners>$author$</owners>
+		<owners>$owners$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
-<description>API for Resizing and combining multiple images (and files) into a .zip folder asynchronously (or synchronously, if needed).
-Visit http://imageresizing.net for details, documenation, and free support. 
-E-mail support@imageresizing.net if you encounter any problems with the software. 
-See http://imageresizing.net/plugins/batchzipper for documentation
+<description>
+
+Managed API for resizing/processing and combining multiple images (and files) into a .zip folder asynchronously (or synchronously, if needed).
+
+Docs: http://imageresizing.net/plugins/batchzipper
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+
+$plugins$
 </description>
-		<tags>$tags$</tags>
+		<tags>ImageResizer Imazen Resizer BatchZipper compress zip folder images archive</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		  <dependency id="DotNetZip.Reduced"/>

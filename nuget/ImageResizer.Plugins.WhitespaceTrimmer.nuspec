@@ -5,18 +5,26 @@
 		<title>ImageResizer.Plugins.WhitespaceTrimmer - Automatically crop whitespace off your images</title>
 		<version>$version$</version>
 		<authors>$author$</authors>
-		<owners>$author$</owners>
+		<owners>$owners$</owners>
 		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
-<description>Automatically trims off whitespace from product images, leaving only a specified margin around the object. Uses sobel energy analysis and adjustable thresholding for great accuracy. 
+<description>
+
+Automatically trims whitespace from product images, leaving only a specified margin around the object. Uses sobel energy analysis and adjustable thresholding for great accuracy. 
 URL commands: &amp;trim.threshold=80, &amp;trim.percentpadding=1
 
-Visit http://imageresizing.net for details, documenation, and free support. 
-E-mail support@imageresizing.net if you encounter any problems with the software. 
-The documentation for this plugin resides at http://imageresizing.net/plugins/advancedfilters</description>
-		<tags>$tags$</tags>
+Docs: http://imageresizing.net/plugins/whitespacetrimmer
+
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+$plugins$
+
+</description>
+		<tags>ImageResizer whitespacetrimmer trim whitespace product images Imazen resizer</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		  <dependency id="AForge.Imaging"/>
