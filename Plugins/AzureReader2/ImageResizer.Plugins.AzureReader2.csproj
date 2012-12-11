@@ -33,9 +33,6 @@
     <DocumentationFile>..\..\dlls\release\ImageResizer.Plugins.AzureReader2.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ImageResizer">
-      <HintPath>..\..\..\..\dlls\release\ImageResizer.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.WindowsAzure.Storage, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\Documents\GitHub\resizer\Plugins\Libs\Azure_2.0\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
@@ -53,6 +50,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="license.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\ImageResizer.csproj">
+      <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
+      <Name>ImageResizer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
