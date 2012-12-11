@@ -8,7 +8,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using ImageResizer.Util;
 
-namespace ImageResizer.Plugins.AzureReader {
+namespace ImageResizer.Plugins.AzureReader2 {
 
      public class AzureVirtualPathProvider : VirtualPathProvider, IVirtualImageProvider {
 

@@ -6,7 +6,7 @@ using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
-namespace ImageResizer.Plugins.AzureReader {
+namespace ImageResizer.Plugins.AzureReader2 {
 
     public class AzureFile : VirtualFile, IVirtualFile {
 
