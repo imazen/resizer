@@ -23,7 +23,7 @@ namespace ImageResizer.Plugins.SimpleFilters {
         }
 
         public IEnumerable<string> GetSupportedQuerystringKeys() {
-            return new string[] { "filter", "s.grayscale", "s.sepia", "s.alpha", "s.brightness", "s.contrast", "s.saturation", "s.invert","s.roundcorners" };
+            return new string[] { "filter", "s.grayscale", "s.overlay", "s.shift", "s.sepia", "s.alpha", "s.brightness", "s.contrast", "s.saturation", "s.invert","s.roundcorners" };
         }
 
         /// <summary>
@@ -122,6 +122,10 @@ namespace ImageResizer.Plugins.SimpleFilters {
             if ("true".Equals(s.settings["s.sepia"], StringComparison.OrdinalIgnoreCase)) filters.Add(Sepia());
             if ("true".Equals(s.settings["s.invert"], StringComparison.OrdinalIgnoreCase)) filters.Add(Invert());
 
+            Color? c = Util.ParseUtils.ParseColor(s.settings["s.shift"]);
+
+            if (c != null) filters.Add(Shift(c.Value));
+
             string alpha = s.settings["s.alpha"];
             string brightness = s.settings["s.brightness"];
             string contrast = s.settings["s.contrast"];
@@ -148,6 +152,18 @@ namespace ImageResizer.Plugins.SimpleFilters {
             }
 
 
+            return RequestedAction.None;
+        }
+
+
+        protected override RequestedAction PostRenderImage(ImageState s) {
+            Color? c = Util.ParseUtils.ParseColor(s.settings["s.overlay"]);
+
+            if (c != null && s.destGraphics != null) {
+                using (var b = new SolidBrush(c.Value)) {
+                    s.destGraphics.FillPolygon(b, s.layout["image"]);
+                }
+            }
             return RequestedAction.None;
         }
 
@@ -201,6 +217,38 @@ Q = 0.212 * R - 0.523 * G + 0.311 * B
             return Grayscale(r, g, b);
 
         }
+
+//Warming Filter (85) #EC8A00
+//Warming Filter (LBA) #FA9600
+//Warming Filter (81) #EBB113
+//Coolling Filter (80) #006DFF
+//Cooling Filter (LBB) #005DFF
+//Cooling Filter (82) #00B5FF
+//Red #EA1A1A
+//Orange #F38417
+//Yellow #F9E31C
+//Green #19C919
+//Cyan #1DCBEA
+//Blue #1D35EA
+//Violet #9B1DEA
+//Magenta #E318E3
+//Sepia #AC7A33
+//Deep Red #FF0000
+//Deep Blue #0022CD
+//Deep Emerald #008C00
+//Deep Yellow #FFD500
+//Underwater #00C1B1
+
+        static float[][] Shift(Color c) {
+            float percent = (float)c.A / 255.0f;
+            return (new float[][]{   
+                    new float[] {1 - percent,0,0, 0,0},
+                    new float[] {0, 1-percent, 0, 0,0},
+                    new float[] {0,0,1-percent, 0,  0},
+                    new float[] {     0,      0,      0, 1, 0},
+                    new float[] { ((float)c.R - 128f) / 128f * percent,      ((float)c.G - 128f) / 128f * percent,     ((float)c.B - 128f) / 128f * percent, 0, 1}});
+        }
+
         static float[][] Grayscale(float r, float g, float b) {
             return (new float[][]{   
                                   new float[]{r,r,r,0,0},

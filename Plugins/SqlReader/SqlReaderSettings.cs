@@ -102,7 +102,7 @@ namespace ImageResizer.Plugins.SqlReader {
         }
 
         /// <summary>
-        /// If true, SQL will be consulted on each image view to ensure the cached image is up to date and the original still exists. 
+        /// If true (default), SQL will be consulted on each image view to ensure the cached image is up to date and the original still exists. 
         /// </summary>
         public bool CheckForModifiedFiles{get;set;}
        
