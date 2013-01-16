@@ -37,7 +37,7 @@ namespace ImageResizer.Caching {
             //The check against the current time is because  files served from another server may have a modified date in the future, if the clocks are not synchronized.
             //ASP.NET incorrectly blocks an future modified date from being sent, with an ArgumentOutOfRangeException
             DateTime? utc = headers.LastModified.ToUniversalTime();
-            if (utc == DateTime.MinValue || utc >= DateTime.UtcNow) utc = null;
+            if (headers.LastModified == DateTime.MinValue || utc == DateTime.MinValue || utc >= DateTime.UtcNow) utc = null;
 
             //We can only update headers in Integrated mode. Otherwise we have to clear them to be able to change them.
             if (!HttpRuntime.UsingIntegratedPipeline) context.Response.ClearHeaders();
