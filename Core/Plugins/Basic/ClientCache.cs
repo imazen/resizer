@@ -34,10 +34,10 @@ namespace ImageResizer.Plugins.Basic {
             if (mins > 0)
                 e.ResponseHeaders.Expires = DateTime.UtcNow.AddMinutes(mins);
 
-            //Send the last-modified date if present
-            DateTime lastModified = e.GetModifiedDateUTC();
-            if (lastModified != DateTime.MinValue) e.ResponseHeaders.LastModified = lastModified;
-
+            //NDJ Jan-16-2013. The last modified date sent in the headers should NOT match the source modified date when using DiskCaching.
+            //Setting this will prevent 304s from being sent properly.
+            // (Moved to NoCache)
+     
             //Authenticated requests only allow caching on the client. 
             //Anonymous requests get caching on the server, proxy and client
             if (context.Request.IsAuthenticated)
