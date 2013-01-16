@@ -50,18 +50,7 @@ namespace ImageResizer.ReleaseBuilder {
             nvc["pluginsdlldir"] = @"..\dlls\trial";
             nvc["coredlldir"] = @"..\dlls\release";
             nvc["iconurl"] = "http://imageresizing.net/images/logos/ImageIconPSD100.png";
-            nvc["tags"] = "ImageResizer ImageResizing.Net Resize Resizer Resizing Crop Cropper Cropping automatic jCrop " +
-            "asp:Image Photo Image Rotate Flip Drawing System.Drawing WIC WPF disk caching jpeg jpg gif png ASP.NET MVC IIS " +
-            "transparency octree quanitization animated gifs dithering " +
-            "Gaussian blur sharpen sharpening radius contrast saturation hue brightness histogram sepia grayscale invert color " +
-            "pixel shader plugins noise removal exif rotation autorotate azure azurereader worker blob blobstore zip batch compress cache-control expires " +
-            "amazon cloudfront s3 quality jpeg format drop shadow 404 handling url rewriting gradient freeimage " +
-            "CatmullRom Lanczos3 bspline box bicubic bilinear CRW CR2 NEF RAF DNG MOS KDC DCR " +
-            "404 redirect actionresult routing logging nlog psd remote url download webclient virtual path provider virtualpathprovider CAIR seam carving " +
-            "content aware image resizing alpha channel grayscale y ry ntsc bt709 flat size limit sizelimiting getthumbnailimage bitmap SQL database query blob " +
-            "watermark virtual folder text overlay image watermark automatic whitespace trimming product images thumbnails " + 
-            "padding pad margin borders background color bgcolor InterpolationMode Fant wic IWICBitmap IWICBitmapSource";
-
+ 
 
             nvc["plugins"] = "## 30+ plugins available\n\n" + 
                     "Search 'ImageResizer' on nuget.org, or visit imageresizing.net to see 40+ plugins, including WPF, WIC, FreeImage, OpenCV, AForge &amp; Ghostscript (PDF) integrations. " + 
