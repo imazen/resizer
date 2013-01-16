@@ -158,7 +158,7 @@ namespace ImageResizer
                         throw new ImageCorruptedException("Cannot attempt fallback decoding path on a non-seekable stream", e);
 
                     b = DecodeStreamFailed(s, settings, path);
-                    if (b == null) throw e; //If none of the extensions loaded the image, throw the exception anyhow.
+                    if (b == null) throw; //If none of the extensions loaded the image, throw the exception anyhow.
                 }
             } catch (ArgumentException ae) {
                 ae.Data.Add("path", path);
