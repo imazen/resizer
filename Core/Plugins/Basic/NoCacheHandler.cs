@@ -23,6 +23,11 @@ namespace ImageResizer.Plugins.Basic {
         public void ProcessRequest(HttpContext context) {
             context.Response.StatusCode = 200;
             context.Response.BufferOutput = true; //Same as .Buffer. Allows bitmaps to be disposed quicker.
+
+            //Generally, it's OK to send the source file's last-modified date. But that causes problems with watermarks and other dependencies. 
+            //DateTime lastModified = e.GetModifiedDateUTC();
+            //if (lastModified != DateTime.MinValue && e.ResponseHeaders.LastModified == DateTime.MinValue) e.ResponseHeaders.LastModified = lastModified;
+
             e.ResponseHeaders.ApplyDuringPreSendRequestHeaders = false;
             e.ResponseHeaders.ApplyToResponse(e.ResponseHeaders, context);
             e.ResizeImageToStream(context.Response.OutputStream);
