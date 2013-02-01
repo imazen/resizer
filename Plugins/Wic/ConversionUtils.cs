@@ -176,7 +176,7 @@ namespace ImageResizer.Plugins.Wic {
             }
         } finally {
             if (converter != null) Marshal.ReleaseComObject(converter);
-            if (source != null) Marshal.ReleaseComObject(factory);
+            if (factory != null) Marshal.ReleaseComObject(factory);
         }
     }
 
