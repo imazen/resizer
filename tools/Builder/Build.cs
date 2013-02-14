@@ -233,13 +233,26 @@ namespace ImageResizer.ReleaseBuilder {
                 v.Save();
 
 
-                //8a Clean projects if specified
-                if (cleanAll) {
-                    CleanAll();
-                }
+                //Prepare searchersq
+                PrepareForPackaging();
 
-                //6 - if (c) was specified for any package, build all.
-                bool success = BuildAll(true); //isMakingNugetPackage);
+                bool success = false;
+                //Allows use to temporarily edit all the sample project files
+                using (RestorePoint rp = new RestorePoint(q.files(new Pattern("^/Plugins/*/*.(cs|vb)proj$"), new Pattern("^/Contrib/*/*.(cs|vb)proj$")))) {
+
+                    //Replace all project references temporarily
+                    foreach (string pf in rp.Paths) {
+                        new ProjectFileEditor(pf).RemoveStrongNameRefs();
+                    }
+
+                    //8a Clean projects if specified
+                    if (cleanAll) {
+                        CleanAll();
+                    }
+
+                    //6 - if (c) was specified for any package, build all.
+                    success = BuildAll(true); //isMakingNugetPackage);
+                }
 
                 //7 - Revert file to state at commit (remove 'full' version numbers and 'commit' value)
                 v.Contents = fileContents;
@@ -250,15 +263,13 @@ namespace ImageResizer.ReleaseBuilder {
                 //8b - run cleanup routine
                 RemoveUselessFiles();
 
-                //Prepare searchersq
-                PrepareForPackaging();
 
                 //Allows use to temporarily edit all the sample project files
                 using (RestorePoint rp = new RestorePoint(q.files(new Pattern("^/Samples/*/*.(cs|vb)proj$")))) {
 
                     //Replace all project references temporarily
                     foreach (string pf in q.files(new Pattern("^/Samples/[^/]+/*.(cs|vb)proj$"))) {
-                        new ProjectFileEditor(pf).ReplaceAllProjectReferencesWithDllReferences("..\\..\\dlls\\release");
+                        new ProjectFileEditor(pf).ReplaceAllProjectReferencesWithDllReferences("..\\..\\dlls\\release").RemoveStrongNameRefs();
                     }
 
 
@@ -360,7 +371,7 @@ namespace ImageResizer.ReleaseBuilder {
 
         public void RemoveUselessFiles() {
             var f = new Futile(Console.Out);
-            q = new FsQuery(this.f.ParentPath, new string[]{"/.git","^/Releases", "^/Tests/Builder"});
+            var q = new FsQuery(this.f.ParentPath, new string[]{"/.git","^/Releases", "^/Tests/Builder"});
 
 
             //delete /Tests/binaries  (*.pdb, *.xml, *.dll)
