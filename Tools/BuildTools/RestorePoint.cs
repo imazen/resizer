@@ -12,6 +12,11 @@ namespace BuildTools {
                 files.Add(s,new KeyValuePair<byte[],DateTime>( System.IO.File.ReadAllBytes(s), File.GetLastWriteTimeUtc(s)));
             }
         }
+        public IEnumerable<string> Paths {
+            get {
+                return files.Keys;
+           }
+        }
 
         private Dictionary<string, KeyValuePair<byte[], DateTime>> files = new Dictionary<string, KeyValuePair<byte[], DateTime>>();
         public void Dispose() {

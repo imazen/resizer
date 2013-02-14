@@ -19,7 +19,28 @@ namespace BuildTools {
             set { _Path = value; }
         }
 
-        public void ReplaceAllProjectReferencesWithDllReferences(string defaultDllFolder = null) {
+        public ProjectFileEditor RemoveStrongNameRefs() {
+            XDocument d = XDocument.Load(Path);
+            XNamespace ns = d.Root.Name.NamespaceName;
+            bool didsomething = false;
+
+            var iAttr =  "Include";
+
+            foreach(XElement r in d.Descendants().Where(p => p.Name.LocalName == "Reference").ToList()){
+                if (r.Attribute(iAttr) == null) continue;
+                var str = r.Attribute(iAttr).Value;
+                var ix = str.IndexOf(',');
+                if (ix < 0) continue;
+                var newval = str.Substring(0,ix);
+                r.Attribute(iAttr).SetValue(newval);
+                didsomething = true;
+            }
+            if (didsomething) d.Save(Path);
+            return this;
+        }
+
+
+        public ProjectFileEditor ReplaceAllProjectReferencesWithDllReferences(string defaultDllFolder = null) {
 
             XDocument d = XDocument.Load(Path);
             XNamespace ns = d.Root.Name.NamespaceName;
@@ -83,7 +104,7 @@ namespace BuildTools {
                       <HintPath>..\..\dlls\release\ImageResizer.Plugins.Watermark.dll</HintPath>
                     </Reference>*/
 
-
+            return this;
         }
 
         protected string collapsePath(string path) {
