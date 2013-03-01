@@ -18,6 +18,8 @@ namespace BuildTools {
         public string nugetExe = null;
         public string nugetDir = null;
 
+        public string apiKey = null;
+
         public void Pack(NPackageDescriptor desc) {
 
             //11 - Pack and upload nuget packages
@@ -33,7 +35,7 @@ namespace BuildTools {
         }
 
         public void Push(NPackageDescriptor desc) {
-            if (desc.SpecPath != null) exec("push \"" + desc.PackagePath + "\"");
+            if (desc.SpecPath != null) exec("push \"" + desc.PackagePath + "\"" + " " + apiKey ?? "");
             //We don't push the symbols, those are pushed automatically.
             //if (desc.SymbolSpecPath != null)exec("push \"" + desc.SymbolPackagePath + "\"");
         }
