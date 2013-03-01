@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CredentialStore.cs" />
     <Compile Include="Devenv.cs" />
     <Compile Include="FolderFinder.cs" />
     <Compile Include="FsQuery.cs" />

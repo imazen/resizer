@@ -178,7 +178,21 @@ namespace ImageResizer.ReleaseBuilder {
 
                 }
             }
+
+            var cs = new CredentialStore();
+            if (downloadPaths.Length > 0) {
+                cs.Need("S3ID", "Amazon S3 AccessKey ID");
+                cs.Need("S3KEY", "Amazon S3 SecretAccessKey");
+            }
+            if (isMakingNugetPackage) cs.Need("NugetKey", "NuGet API Key");
+
+            cs.AcquireCredentials();
+
+            nuget.apiKey = cs.Get("NugetKey",null);
+            s3.AccessKeyID = cs.Get("S3ID",null);
+            s3.SecretAccessKey = cs.Get("S3KEY", null);
             
+
             if (!isBuilding && isMakingNugetPackage) {
                 isBuilding = ask("You're creating 1 or more NuGet packages. Rebuild software?");
             }
