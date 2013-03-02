@@ -16,7 +16,7 @@ using ImageResizer.Util;
 #endif
 
 [assembly: AssemblyCompany("Imazen LLC")]
-[assembly: AssemblyCopyright("Copyright © 2012 Imazen LLC")]
+[assembly: AssemblyCopyright("Copyright © 2013 Imazen LLC")]
 
 // Version information for an assembly consists of the following four values:
 //
