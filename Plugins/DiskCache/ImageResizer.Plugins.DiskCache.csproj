@@ -56,6 +56,7 @@
     <Compile Include="OutputMemCache\MemCache.cs" />
     <Compile Include="OutputMemCache\MemCacheHandler.cs" />
     <Compile Include="OutputMemCache\MemCacheResult.cs" />
+    <Compile Include="SourceDiskCache\SourceDiskCache.cs" />
     <Compile Include="SourceMemCache\ConstrainedCache.cs" />
     <Compile Include="SourceMemCache\EventCountingDictionary.cs" />
     <Compile Include="Index\CachedFileInfo.cs" />
