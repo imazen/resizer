@@ -31,8 +31,11 @@ namespace ImageResizer.Plugins.MongoReader {
         public MongoReaderPlugin(NameValueCollection args) {
             VirtualFilesystemPrefix = string.IsNullOrEmpty(args["prefix"]) ? "~/gridfs/" : args["prefix"];
 
-            string connectionString = args["connectionString"];
-            this.db = MongoDatabase.Create(connectionString);
+            // Using new client, server database initialization. Wordy but recommended.
+            var mongoUrl = new MongoUrl(args["connectionString"]);
+            var mongoClient = new MongoClient(mongoUrl);
+            var mongoServer = mongoClient.GetServer();
+            db = mongoServer.GetDatabase(mongoUrl.DatabaseName);
             gridSettings = new MongoGridFSSettings();
             grid = db.GetGridFS(gridSettings);
         }
