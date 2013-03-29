@@ -111,6 +111,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.WebP",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.TinyCache", "..\Plugins\TinyCache\ImageResizer.Plugins.TinyCache.csproj", "{E879E2DD-CDBF-4749-88B7-6D15DE4E7C11}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.FFmpeg", "..\Plugins\FFmpeg\ImageResizer.Plugins.FFmpeg.csproj", "{41E1FB1A-826B-4C35-9034-8C44D2402941}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1134,6 +1136,24 @@ Global
 		{E879E2DD-CDBF-4749-88B7-6D15DE4E7C11}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{E879E2DD-CDBF-4749-88B7-6D15DE4E7C11}.Trial|x64.ActiveCfg = Release|Any CPU
 		{E879E2DD-CDBF-4749-88B7-6D15DE4E7C11}.Trial|x86.ActiveCfg = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Release|x64.ActiveCfg = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Release|x86.ActiveCfg = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Trial|x64.ActiveCfg = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
