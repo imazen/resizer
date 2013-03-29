@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer", "ImageResizer.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.AnimatedGifs", "..\Plugins\AnimatedGifs\ImageResizer.Plugins.AnimatedGifs.csproj", "{D97EA32A-0845-4E00-9C4D-68C5B93A1869}"
@@ -64,6 +64,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.WebP", "..\Plugins\WebP\ImageResizer.Plugins.WebP.csproj", "{E7637D84-D86B-4D37-9835-8DF374539693}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imazen.WebP", "..\Plugins\Libs\libwebp-net\Imazen.WebP\Imazen.WebP.csproj", "{92F607A3-2F04-4536-8346-B6FEF8B774FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.FFmpeg", "..\Plugins\FFmpeg\ImageResizer.Plugins.FFmpeg.csproj", "{41E1FB1A-826B-4C35-9034-8C44D2402941}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -717,6 +719,24 @@ Global
 		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|x64.ActiveCfg = Release|Any CPU
 		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|x86.ActiveCfg = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Release|x64.ActiveCfg = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Release|x86.ActiveCfg = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Trial|Mixed Platforms.ActiveCfg = Trial|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Trial|Mixed Platforms.Build.0 = Trial|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Trial|x64.ActiveCfg = Release|Any CPU
+		{41E1FB1A-826B-4C35-9034-8C44D2402941}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
