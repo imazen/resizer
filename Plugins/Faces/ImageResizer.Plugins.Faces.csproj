@@ -35,7 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\Libs\Json.NET-40r8\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\Libs\Json\net_35_4.5.11\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp">
       <HintPath>..\Libs\OpenCV\3.2.1\OpenCvSharp.dll</HintPath>
