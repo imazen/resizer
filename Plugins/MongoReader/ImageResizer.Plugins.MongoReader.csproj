@@ -32,6 +32,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\..\dlls\release\ImageResizer.Plugins.MongoReader.XML</DocumentationFile>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>ExtendedDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Trial|AnyCPU'">
     <OutputPath>..\..\dlls\trial\</OutputPath>
@@ -46,10 +48,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MongoDB.Bson">
-      <HintPath>..\Libs\mongocsharpdriver.1.3.1\MongoDB.Bson.dll</HintPath>
+      <HintPath>..\Libs\mongocsharpdriver.1.8\MongoDB.Bson.dll</HintPath>
     </Reference>
     <Reference Include="MongoDB.Driver">
-      <HintPath>..\Libs\mongocsharpdriver.1.3.1\MongoDB.Driver.dll</HintPath>
+      <HintPath>..\Libs\mongocsharpdriver.1.8\MongoDB.Driver.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -62,13 +64,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\ImageResizer.csproj">
-      <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
-      <Name>ImageResizer</Name>
-    </ProjectReference>
+    <Content Include="license.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="license.txt" />
+    <ProjectReference Include="..\..\Core\ImageResizer.csproj">
+      <Project>{fa5ef673-a6a4-498d-aa24-c025cc5267af}</Project>
+      <Name>ImageResizer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
