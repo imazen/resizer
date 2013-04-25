@@ -411,7 +411,7 @@ namespace ImageResizer.ReleaseBuilder {
 
         public string[] standardExclusions = new string[]{
                 "/.git","^/Releases","/Hidden/","^/Legacy","^/Tools/(Builder|BuildTools|docu)",
-				"^/Samples/Images/(extra|private)/","/Thumbs.db$","/.DS_Store$",".suo$",".user$", "/._","/~$", 
+				"^/Samples/Images/(extra|private)/","/Thumbs.db$","/.DS_Store$",".suo$",".cache$",".user$", "/._","/~$", 
                 "^/Samples/MvcSample/App_Data/"
 
             };
