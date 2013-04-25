@@ -152,7 +152,7 @@ namespace ImageResizer.Plugins.FFmpeg
         private XElement GetVideoInfo(FFmpegJob job)
         {
             //*ffprobe.exe -loglevel error -show_format -show_streams inputFile.extension -print_format json*/
-            string result = RunExecutable(GetFFprobePath(), " -loglevel error -show_format -show_streams -print_format xml -i \"" + job.SourcePath + "\"", job.Timeout /2);
+            string result = RunExecutable(GetFFprobePath(), " -loglevel error -show_format -print_format xml -i \"" + job.SourcePath + "\"", job.Timeout /2);
             return XElement.Parse(result);
         }
 
@@ -226,7 +226,7 @@ namespace ImageResizer.Plugins.FFmpeg
 
             bool bufferToTemp = !File.Exists(HostingEnvironment.MapPath(virtualPath));
 
-            job.SourcePath = bufferToTemp ? HostingEnvironment.MapPath(virtualPath) : Path.GetTempFileName();
+            job.SourcePath = !bufferToTemp ? HostingEnvironment.MapPath(virtualPath) : Path.GetTempFileName();
             try
             {
                 using (Stream input = c.Pipeline.GetFile(virtualPath,new System.Collections.Specialized.NameValueCollection()).Open())
