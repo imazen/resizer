@@ -26,6 +26,21 @@ namespace ImageResizer.Plugins.DiskCache {
         /// Synchronization object for modifications to the 'locks' dictionary
         /// </summary>
         protected object createLock = new object();
+
+        /// <summary>
+        /// Returns true if the given key *might* be locked.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public bool MayBeLocked(string key)
+        {
+            lock (createLock)
+            {
+                return locks.ContainsKey(key);
+            }
+        }
+
+
         /// <summary>
         /// Attempts to execute the 'success' callback inside a lock based on 'key'.  If successful, returns true.
         /// If the lock cannot be acquired within 'timoutMs', returns false
