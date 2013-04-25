@@ -49,8 +49,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ionic.Zip">
-      <HintPath>..\..\Plugins\Libs\DotNetZipLib-v1.9\Ionic.Zip.dll</HintPath>
+    <Reference Include="Ionic.Zip.Reduced">
+      <HintPath>..\..\Plugins\Libs\DotNetZipLib-v1.9\Ionic.Zip.Reduced.dll</HintPath>
     </Reference>
     <Reference Include="LitS3, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\LitS3.1.0.1\lib\LitS3.dll</HintPath>
