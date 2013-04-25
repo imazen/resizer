@@ -126,21 +126,27 @@ namespace ImageResizer.Plugins.DiskCache {
             CacheResult result = new CacheResult(CacheQueryResult.Hit, physicalPath, relativePath);
 
 
-
             bool compareModifiedDates = hasModifiedDate && !hashModifiedDate;
             
             bool asyncFailed = false;
+            
+
+            //2013-apr-25: What happens if the file is still being written to disk - it's present but not complete? To handle that, we use mayBeLocked.
+
+            bool mayBeLocked = Locks.MayBeLocked(relativePath.ToUpperInvariant());
 
              //On the first check, verify the file exists using System.IO directly (the last 'true' parameter).
             if (!asynchronous) {
                 //On the first check, verify the file exists using System.IO directly (the last 'true' parameter)
                 //May throw an IOException if the file cannot be opened, and is locked by an external processes for longer than timeoutMs. 
                 //This method may take longer than timeoutMs under absolute worst conditions. 
-                if (!TryWriteFile(result, physicalPath, relativePath, writeCallback, sourceModifiedUtc, timeoutMs, true)) {
+                if (!TryWriteFile(result, physicalPath, relativePath, writeCallback, sourceModifiedUtc, timeoutMs, !mayBeLocked)) {
                     //On failure
                     result.Result = CacheQueryResult.Failed;
                 }
-            } else if (!compareModifiedDates ? !Index.existsCertain(relativePath, physicalPath) : !Index.modifiedDateMatchesCertainExists(sourceModifiedUtc, relativePath, physicalPath)) {
+            }
+            else if ((!compareModifiedDates ? !Index.existsCertain(relativePath, physicalPath) : !Index.modifiedDateMatchesCertainExists(sourceModifiedUtc, relativePath, physicalPath)) || mayBeLocked)
+            {
                 
                 //Looks like a miss. Let's enter a lock for the creation of the file. This is a different locking system than for writing to the file - far less contention, as it doesn't include the 
                 //This prevents two identical requests from duplicating efforts. Different requests don't lock.
@@ -156,11 +162,15 @@ namespace ImageResizer.Plugins.DiskCache {
 
                         if (t != null) result.Data = t.GetReadonlyStream();
 
-                        //On the second check, use cached data for speed. The cached data should be updated if another thread updated a file (but not if another process did).
-                        if (t == null &&
-                            (!compareModifiedDates ? !Index.exists(relativePath, physicalPath) : !Index.modifiedDateMatches(sourceModifiedUtc, relativePath, physicalPath))) {
+                        
 
-                                result.Result = CacheQueryResult.Miss;
+                        //On the second check, use cached data for speed. The cached data should be updated if another thread updated a file (but not if another process did).
+                        //When t == null, and we're inside QueueLocks, all work on the file must be finished, so we have no need to consult mayBeLocked.
+                        if (t == null && 
+                            (!compareModifiedDates ? !Index.exists(relativePath, physicalPath) : !Index.modifiedDateMatches(sourceModifiedUtc, relativePath, physicalPath)))
+                        {
+
+                            result.Result = CacheQueryResult.Miss;
                             //Still a miss, we even rechecked the filesystem. Write to memory.
                             MemoryStream ms = new MemoryStream(4096);  //4K initial capacity is minimal, but this array will get copied around alot, better to underestimate.
                             //Read, resize, process, and encode the image. Lots of exceptions thrown here.
@@ -249,7 +259,7 @@ namespace ImageResizer.Plugins.DiskCache {
             bool miss = true;
             if (recheckFS) {
                 miss = !compareModifiedDates ? !Index.existsCertain(relativePath, physicalPath) : !Index.modifiedDateMatchesCertainExists(sourceModifiedUtc, relativePath, physicalPath);
-                if (!miss) return true;
+                if (!miss && !Locks.MayBeLocked(relativePath.ToUpperInvariant())) return true;
             }
                
 
