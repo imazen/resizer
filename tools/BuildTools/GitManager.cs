@@ -23,9 +23,14 @@ namespace BuildTools {
             //"ProgramFiles", "ProgramFiles(x86)","ProgramW6432"
             string[] vars = new string[] { "ProgramFiles", "ProgramFiles(x86)", "ProgramW6432" };
             foreach (string v in vars) {
-                string progFiles = Environment.GetEnvironmentVariable(v).TrimEnd('\\', '/');
-                string path = progFiles + @"\Git\bin\git.exe".Replace('\\', System.IO.Path.DirectorySeparatorChar);
-                if (File.Exists(path)) return path;
+                string[] subfolders = new string[] { @"\Git\bin", @"\SmartGitHg 4.5\git\bin", @"\SmartGitHg 4\git\bin" };
+
+                foreach (string subfolder in subfolders)
+                {
+                    string progFiles = Environment.GetEnvironmentVariable(v).TrimEnd('\\', '/');
+                    string path = progFiles + subfolder + @"\git.exe".Replace('\\', System.IO.Path.DirectorySeparatorChar);
+                    if (File.Exists(path)) return path;
+                }
             }
             Console.WriteLine("Failed to find git.exe.");
             return null;
