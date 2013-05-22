@@ -32,6 +32,7 @@ namespace ImageResizer.Plugins.SqlReader {
             UntrustedData = NameValueCollectionExtensions.Get(args, "untrustedData", UntrustedData);
             CacheUnmodifiedFiles = NameValueCollectionExtensions.Get(args, "cacheUnmodifiedFiles", CacheUnmodifiedFiles);
             CheckForModifiedFiles = NameValueCollectionExtensions.Get(args, "checkForModifiedFiles", true);
+            QueriesAreStoredProcedures = NameValueCollectionExtensions.Get(args, "queriesAreStoredProcedures", false);
         }
 
         /// <summary>
@@ -134,6 +135,8 @@ namespace ImageResizer.Plugins.SqlReader {
             get { return connectionString; }
             set { connectionString = value; }
         }
+
+        public bool QueriesAreStoredProcedures{get;set;}
 
         private string imageBlobQuery =
             "SELECT Content FROM Images WHERE ImageID=@id";
