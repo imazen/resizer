@@ -118,6 +118,7 @@ namespace ImageResizer.Plugins.SqlReader
             using (conn)
             {
                 SqlCommand sc = new SqlCommand(s.ImageBlobQuery, conn);
+                sc.CommandType = s.QueriesAreStoredProcedures ? System.Data.CommandType.StoredProcedure : System.Data.CommandType.Text;
                 sc.Parameters.Add(CreateIdParameter(id));
                 SqlDataReader sdr = sc.ExecuteReader();
                 using (sdr)
@@ -177,6 +178,7 @@ namespace ImageResizer.Plugins.SqlReader
             using (conn)
             {
                 SqlCommand sc = new SqlCommand(s.ImageExistsQuery, conn);
+                sc.CommandType = s.QueriesAreStoredProcedures ? System.Data.CommandType.StoredProcedure : System.Data.CommandType.Text;
                 sc.Parameters.Add(CreateIdParameter(id));
                 int count = (int)sc.ExecuteScalar();
                 if (count > 0) return true;
@@ -198,6 +200,7 @@ namespace ImageResizer.Plugins.SqlReader
             {
                 SqlCommand sc = new SqlCommand(s.ModifiedDateQuery, conn);
                 sc.Parameters.Add(CreateIdParameter(id));
+                sc.CommandType = s.QueriesAreStoredProcedures ? System.Data.CommandType.StoredProcedure : System.Data.CommandType.Text;
                 SqlDataReader sdr = sc.ExecuteReader();
                 using (sdr)
                 {
@@ -250,6 +253,7 @@ namespace ImageResizer.Plugins.SqlReader
         /// <returns></returns>
         public SqlCommand GetCacheDependencyQuery(string id){
             SqlCommand sc = new SqlCommand(s.ModifiedDateQuery, GetConnectionObj());
+            sc.CommandType = s.QueriesAreStoredProcedures ? System.Data.CommandType.StoredProcedure : System.Data.CommandType.Text;
             sc.Parameters.Add(CreateIdParameter(id));
             return sc;
         }
