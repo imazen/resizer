@@ -97,6 +97,19 @@ namespace ImageResizer.Tests {
         }
 
         [Test]
+        public void ProcessCropAndScaleDownFlippedDimensions() {
+            var resizeSettings = new ResizeSettings("width=504;height=672;mode=crop;scale=down");
+            using (var source = LoadSmpteColorBars())
+            using (var state = new ImageState(resizeSettings, source.Size, false)) {
+                state.sourceBitmap = source;
+
+                c.CurrentImageBuilder.Process(state);
+
+                AssertBitmapsEqual("CropAndScaleDownFlippedDimensions.png", state.destBitmap);
+            }
+        }
+
+        [Test]
         public void ProcessCropAndScaleBoth() {
             var resizeSettings = new ResizeSettings("width=504;height=672;mode=crop;scale=both");
             using (var source = LoadSmpteColorBars())
