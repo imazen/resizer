@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using Gallio.Framework;
 using Gallio.Framework.Assertions;
+using ImageResizer.Resizing;
 using MbUnit.Framework;
 using MbUnit.Core;
 using MbUnit.Framework.ContractVerifiers;
@@ -79,6 +80,19 @@ namespace ImageResizer.Tests {
                     actual.Save(expectedBitmapResourceFileName, ImageFormat.Png);
                     throw;
                 }
+            }
+        }
+
+        [Test]
+        public void ProcessCropAndScaleBoth() {
+            var resizeSettings = new ResizeSettings("width=504;height=672;mode=crop;scale=both");
+            using (var source = LoadSmpteColorBars())
+            using (var state = new ImageState(resizeSettings, source.Size, false)) {
+                state.sourceBitmap = source;
+                
+                c.CurrentImageBuilder.Process(state);
+
+                AssertBitmapsEqual("CropAndScaleBoth.png", state.destBitmap);
             }
         }
 
