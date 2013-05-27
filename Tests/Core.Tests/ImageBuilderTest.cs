@@ -72,7 +72,7 @@ namespace ImageResizer.Tests {
                     Assert.AreEqual(expected.Size, actual.Size);
                     for (var y = 0; y < expected.Height; y++) {
                         for (var x = 0; x < expected.Width; x++) {
-                            Assert.AreEqual(expected.GetPixel(x, y), actual.GetPixel(x, y));
+                            Assert.AreEqual(expected.GetPixel(x, y), actual.GetPixel(x, y), "Pixel: {0},{1}", x, y);
                         }
                     }
                 }
@@ -80,6 +80,19 @@ namespace ImageResizer.Tests {
                     actual.Save(expectedBitmapResourceFileName, ImageFormat.Png);
                     throw;
                 }
+            }
+        }
+
+        [Test]
+        public void ProcessCropAndScaleDownSmaller() {
+            var resizeSettings = new ResizeSettings("width=400;height=300;mode=crop;scale=down");
+            using (var source = LoadSmpteColorBars())
+            using (var state = new ImageState(resizeSettings, source.Size, false)) {
+                state.sourceBitmap = source;
+
+                c.CurrentImageBuilder.Process(state);
+
+                AssertBitmapsEqual("CropAndScaleDownSmaller.png", state.destBitmap);
             }
         }
 
