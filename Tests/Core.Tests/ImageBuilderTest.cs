@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Gallio.Framework;
 using MbUnit.Framework;
@@ -47,6 +48,15 @@ namespace ImageResizer.Tests {
         public void EncodeImage(int width, int height, string query){
             using (MemoryStream ms = new MemoryStream(8000)){
                 c.CurrentImageBuilder.Build(GetBitmap(width,height),ms,new ResizeSettings(query));
+            }
+        }
+
+        public Bitmap LoadSmpteColorBars()
+        {
+            var me = Assembly.GetExecutingAssembly();
+            using (var s = me.GetManifestResourceStream("ImageResizer.Core.Tests.SMPTE_Color_Bars.png"))
+            {
+                return c.CurrentImageBuilder.LoadImage(s, new ResizeSettings());
             }
         }
 
