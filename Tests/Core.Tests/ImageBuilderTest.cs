@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 using Gallio.Framework;
@@ -53,8 +54,14 @@ namespace ImageResizer.Tests {
 
         public Bitmap LoadSmpteColorBars()
         {
+            return LoadResourceBitmap("SMPTE_Color_Bars.png");
+        }
+
+        private Bitmap LoadResourceBitmap(string fileName)
+        {
             var me = Assembly.GetExecutingAssembly();
-            using (var s = me.GetManifestResourceStream("ImageResizer.Core.Tests.SMPTE_Color_Bars.png"))
+            var resourceName = String.Format(CultureInfo.InvariantCulture, "ImageResizer.Core.Tests.{0}", fileName);
+            using (var s = me.GetManifestResourceStream(resourceName))
             {
                 return c.CurrentImageBuilder.LoadImage(s, new ResizeSettings());
             }
