@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 using Gallio.Framework;
+using Gallio.Framework.Assertions;
 using MbUnit.Framework;
 using MbUnit.Core;
 using MbUnit.Framework.ContractVerifiers;
@@ -52,18 +53,32 @@ namespace ImageResizer.Tests {
             }
         }
 
-        public Bitmap LoadSmpteColorBars()
-        {
+        public Bitmap LoadSmpteColorBars() {
             return LoadResourceBitmap("SMPTE_Color_Bars.png");
         }
 
-        private Bitmap LoadResourceBitmap(string fileName)
-        {
+        private Bitmap LoadResourceBitmap(string fileName) {
             var me = Assembly.GetExecutingAssembly();
             var resourceName = String.Format(CultureInfo.InvariantCulture, "ImageResizer.Core.Tests.{0}", fileName);
-            using (var s = me.GetManifestResourceStream(resourceName))
-            {
+            using (var s = me.GetManifestResourceStream(resourceName)) {
                 return c.CurrentImageBuilder.LoadImage(s, new ResizeSettings());
+            }
+        }
+
+        private void AssertBitmapsEqual(string expectedBitmapResourceFileName, Bitmap actual) {
+            using (var expected = LoadResourceBitmap(expectedBitmapResourceFileName)) {
+                try {
+                    Assert.AreEqual(expected.Size, actual.Size);
+                    for (var y = 0; y < expected.Height; y++) {
+                        for (var x = 0; x < expected.Width; x++) {
+                            Assert.AreEqual(expected.GetPixel(x, y), actual.GetPixel(x, y));
+                        }
+                    }
+                }
+                catch (AssertionException) {
+                    actual.Save(expectedBitmapResourceFileName, ImageFormat.Png);
+                    throw;
+                }
             }
         }
 
