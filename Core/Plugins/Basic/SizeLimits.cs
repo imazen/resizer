@@ -44,7 +44,7 @@ namespace ImageResizer.Plugins.Basic {
         public void ValidateTotalSize(Size total) {
             if (TotalBehavior == TotalSizeBehavior.ThrowException && !FitsInsideTotalSize(total)) 
                 throw new SizeLimitException("The dimensions of the output image (" + total.Width + "x" + total.Height +
-                                ") exceed the maximum permitted dimensions of " + TotalSize.Width + "x" + TotalSize.Height + ".");
+                                ") exceed the configured maximum dimensions of " + TotalSize.Width + "x" + TotalSize.Height + ". You can change these limits in Web.config through the SizeLimiting plugin.");
         }
 
 
