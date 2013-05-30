@@ -1048,6 +1048,11 @@ namespace ImageResizer
                         manualCropRect = new RectangleF(0, 0, minWidth, minHeight);
                         s.copyRect = PolygonMath.ToRectangle(PolygonMath.AlignWith(manualCropRect, s.copyRect, s.settings.Anchor));
                     }
+                    else if (scale == ScaleMode.UpscaleCanvas) {
+                        targetSize = new SizeF(minWidth, minHeight);
+                        manualCropRect = new RectangleF(0, 0, minWidth, minHeight);
+                        s.copyRect = PolygonMath.ToRectangle(PolygonMath.AlignWith(manualCropRect, s.copyRect, s.settings.Anchor));
+                    }
                     else
                     {
                         //Determine the size of the area we are copying
