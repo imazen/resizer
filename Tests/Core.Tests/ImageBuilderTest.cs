@@ -110,6 +110,20 @@ namespace ImageResizer.Tests {
         }
 
         [Test]
+        public void ProcessCropAndScaleCanvasFlippedDimensions() {
+            var resizeSettings = new ResizeSettings("width=504;height=672;mode=crop;scale=canvas");
+            using (var source = LoadSmpteColorBars())
+            using (var state = new ImageState(resizeSettings, source.Size, false)) {
+                state.sourceBitmap = source;
+                state.supportsTransparency = true;
+
+                c.CurrentImageBuilder.Process(state);
+
+                AssertBitmapsEqual("CropAndScaleCanvasFlippedDimensions.png", state.destBitmap);
+            }
+        }
+
+        [Test]
         public void ProcessCropAndScaleBoth() {
             var resizeSettings = new ResizeSettings("width=504;height=672;mode=crop;scale=both");
             using (var source = LoadSmpteColorBars())

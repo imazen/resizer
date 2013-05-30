@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="CropAndScaleBoth.png" />
+    <EmbeddedResource Include="CropAndScaleCanvasFlippedDimensions.png" />
     <EmbeddedResource Include="CropAndScaleDownFlippedDimensions.png" />
     <EmbeddedResource Include="CropAndScaleDownSmaller.png" />
     <EmbeddedResource Include="SMPTE_Color_Bars.png" />
