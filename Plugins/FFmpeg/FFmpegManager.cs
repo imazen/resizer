@@ -229,12 +229,14 @@ namespace ImageResizer.Plugins.FFmpeg
             job.SourcePath = !bufferToTemp ? HostingEnvironment.MapPath(virtualPath) : Path.GetTempFileName();
             try
             {
-                using (Stream input = c.Pipeline.GetFile(virtualPath,new System.Collections.Specialized.NameValueCollection()).Open())
-                using (Stream output = File.Create(job.SourcePath))
+                if (bufferToTemp)
                 {
-                    StreamExtensions.CopyToStream(input, output);
+                    using (Stream input = c.Pipeline.GetFile(virtualPath, new System.Collections.Specialized.NameValueCollection()).Open())
+                    using (Stream output = File.Create(job.SourcePath))
+                    {
+                        StreamExtensions.CopyToStream(input, output);
+                    }
                 }
-
                 this.Execute(job);
 
                 return job.Result;
