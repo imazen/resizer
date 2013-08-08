@@ -110,6 +110,7 @@ namespace ImageResizer.Plugins.TinyCache {
                 EnsureDirExists();
                 using (var fs = new FileStream(PhysicalCacheFile, FileMode.Create, FileAccess.Write)) {
                     ProtoBuf.Serializer.Serialize<CacheFile>(fs, cache);
+                    fs.Flush(true);
                 }
                 lastFlush = DateTime.UtcNow;
             }
