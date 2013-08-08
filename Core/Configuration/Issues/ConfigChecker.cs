@@ -1,6 +1,7 @@
 ﻿/* Copyright (c) 2011 Nathanael Jones. See license.txt */
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using ImageResizer.Plugins.Basic;
 using System.Reflection;
@@ -44,6 +45,9 @@ namespace ImageResizer.Configuration.Issues {
                       "Without this permission, it may be possible for users to bypass UrlAuthorization rules you have defined for your website, and access images that would otherwise be protected. If you do not use UrlAuthorization rules, this should not be a concern. " +
                     "You may also re-implement your security rules by handling the Config.Current.Pipeline.AuthorizeImage event.", IssueSeverity.Critical));
 
+
+            if (File.Exists(Path.Combine(HostingEnvironment.ApplicationPhysicalPath, "PrecompiledApp.config")))
+                issues.Add(new Issue("Precompilation is enabled. Image providers may not work as expected."));
             
             string assembliesRunningHotfix = "";
             Assembly[] asms = AppDomain.CurrentDomain.GetAssemblies();
@@ -67,7 +71,7 @@ namespace ImageResizer.Configuration.Issues {
                     "Hotfix and release DLLs with the same version number are not the same - the release DLL should be used instead." +
                     "\nAssemblies marked as hotfix versions: " + assembliesRunningHotfix, IssueSeverity.Warning));
                     
-   
+
             return issues;
         }
     }
