@@ -53,7 +53,7 @@ namespace ImageResizer.Plugins.Basic {
         public ResizeSettings Modify(ResizeSettings settings) {
             if (!string.IsNullOrEmpty(settings["scale"])) return settings; //We only provide defaults, we don't override
 
-            bool explicitSize = (!string.IsNullOrEmpty(settings["width"]) || !string.IsNullOrEmpty(settings["height"]));
+            bool explicitSize = (!string.IsNullOrEmpty(settings["width"]) || !string.IsNullOrEmpty(settings["height"]) || !string.IsNullOrEmpty(settings["w"]) || !string.IsNullOrEmpty(settings["h"]));
             bool maxSize = (!string.IsNullOrEmpty(settings["maxwidth"]) || !string.IsNullOrEmpty(settings["maxheight"]));
             if (explicitSize && settings.Mode == FitMode.Max) {
                 explicitSize = false;
