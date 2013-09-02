@@ -158,6 +158,20 @@ namespace ImageResizer.Tests {
         }
 
         [Test]
+        public void TestImageJob()
+        {
+            var ms = new MemoryStream();
+            var j = new ImageJob(GetBitmap(100, 200), ms, new Instructions("width=50;format=jpg"));
+            j.Build();
+            Assert.AreEqual(j.SourceWidth, 100);
+            Assert.AreEqual(j.SourceHeight, 200);
+            Assert.AreEqual(j.ResultFileExtension, "jpg");
+            Assert.AreEqual(j.ResultMimeType, "image/jpeg");
+
+
+        }
+
+        [Test]
         public void TestSourceBitmapDisposed([Column(true, false)] bool dispose,
                                             [Column(true, false)] bool useDestinationStream,
                                             [Column(true, false)] bool useCorruptedSource,

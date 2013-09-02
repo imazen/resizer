@@ -14,11 +14,11 @@ namespace ImageResizer.Core.Tests {
             ResizeSettings s = new ResizeSettings();
             s.CropBottomRight = new System.Drawing.PointF(50, 50);
             s.CropTopLeft = new System.Drawing.PointF(0, 0);
-            Assert.AreEqual<string>( "?crop=(0,0,50,50)", s.ToString());
+            Assert.AreEqual<string>( "?crop=0,0,50,50", s.ToString());
             s.CropMode = CropMode.Auto;
             Assert.AreEqual<string>("?crop=auto", s.ToString());
             s.CropMode = CropMode.Custom;
-            Assert.AreEqual<string>("?crop=(0,0,0,0)", s.ToString());
+            Assert.AreEqual<string>("?crop=0,0,0,0", s.ToString());
         }
 
 
