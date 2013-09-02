@@ -13,6 +13,8 @@ namespace ImageResizer {
 
         public ImageJob(object source, object dest, Instructions instructions)
         {
+            this.RequestedInfo = new List<string>();
+            this.ResultInfo = new Dictionary<string, object>();
             this.Source = source;
             this.Dest = dest;
             this.Instructions = instructions;
@@ -30,6 +32,18 @@ namespace ImageResizer {
 
         public ImageJob(string sourcePath, string destPath, Instructions instructions)
             : this((object)sourcePath, (object)destPath, instructions) { }
+
+        /// <summary>
+        /// Creates an ImageJob that won't run a full build - it will only do enough work in order to supply the requested data fields.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="requestedImageInfo">Pass null to use "source.width","source.height", "result.ext","result.mime". </param>
+        public ImageJob(object source, IEnumerable<string> requestedImageInfo)
+        {
+            this.Source = source;
+            this.Dest = typeof(IDictionary<string, object>);
+            this.RequestedInfo = new List<string>(requestedImageInfo == null ? new string[]{"source.width","source.height", "result.ext","result.mime"} : requestedImageInfo);
+        }
 
 
         [Obsolete("Use Instructions instead of ResizeSettings")]
@@ -53,6 +67,16 @@ namespace ImageResizer {
             return ImageBuilder.Current.Build(this);
         }
 
+        /// <summary>
+        /// A list of strings which define properties that can be returned to the caller. "source.width", "source.height", "result.ext", "result.mime" are the most commonly used. Defaults to none
+        /// </summary>
+        public List<string> RequestedInfo { get; set; }
+
+        /// <summary>
+        /// A dictionary of key/value pairs provided along with the result.
+        /// </summary>
+        public Dictionary<string, object> ResultInfo { get; set; }
+
         private object _source = null;
         /// <summary>
         /// The source image's physical path, app-relative virtual path, or a Stream, byte array, Bitmap, VirtualFile, IVirtualFile, HttpPostedFile, or HttpPostedFileBase instance.
@@ -72,6 +96,8 @@ namespace ImageResizer {
             set { _dest = value; }
         }
 
+
+
         private object _result = null;
         /// <summary>
         /// The result if a Bitmap, BitmapSource, or IWICBitmapSource instance is requested. 
@@ -84,20 +110,20 @@ namespace ImageResizer {
         /// <summary>
         /// The width, in pixels, of the first frame or page in the source image file
         /// </summary>
-        public int SourceWidth { get; set; }
+        public int? SourceWidth { get { return DictionaryUtils.GetValueOrDefault<int?>(ResultInfo, "source.width", null); } }
         /// <summary>
         /// The height, in pixels, of the first frame or page in the source image file
         /// </summary>
-        public int SourceHeight { get; set; }
+        public int? SourceHeight { get { return DictionaryUtils.GetValueOrDefault<int?>(ResultInfo, "source.height", null); } }
 
         /// <summary>
         /// The correct file extension for the resulting file stream, without a leading dot. Will be null if the result is not an encoded image.
         /// </summary>
-        public string ResultFileExtension { get; set; }
+        public string ResultFileExtension { get { return DictionaryUtils.GetValueOrDefault<string>(ResultInfo, "result.ext", null); } }
         /// <summary>
         /// The correct mime type for the resulting file stream, without a leading dot. Will be null if the result is not an encoded image.
         /// </summary>
-        public string ResultMimeType { get; set; }
+        public string ResultMimeType { get { return DictionaryUtils.GetValueOrDefault<string>(ResultInfo, "result.mime", null); } }
 
 
 
