@@ -123,6 +123,7 @@ namespace ImageResizer
         /// <param name="settings">Will ignore ICC profile if ?ignoreicc=true.</param>
         /// <param name="restoreStreamPos">If true, the position of the source stream will be restored after being read</param>
         /// <returns>A Bitmap. The .Tag property will include a BitmapTag instance. If .Tag.Source is not null, remember to dispose it when you dispose the Bitmap.</returns>
+        [Obsolete("This method returns an unmanaged, shoot-yourself-in-the-foot Bitmap instance. Use Build(ImageJob) or LoadImageInfo(source, new string[]{\"source.width\",\"source.height\"})")]
         public virtual Bitmap LoadImage(object source, ResizeSettings settings, bool restoreStreamPos){
             if (source == null) throw new ArgumentNullException("source", "The source argument cannot be null; how do you load an image from a null value?");
 
@@ -347,6 +348,19 @@ namespace ImageResizer
             Build(source, dest, settings, true);
         }
 
+        /// <summary>
+        /// Resizes and processes the specified source image and stores the encoded result in the specified destination.
+        /// If passed a source Stream, Bitmap, or Image instance, it will be disposed after use. Use disposeSource=False to disable that behavior. 
+        /// </summary>
+        /// <param name="source">May be an instance of string (a physical path or app-relative virtual path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream. App-relative virtual paths will use the VirtualPathProvider system</param>
+        /// <param name="dest">May be a physical path (string), or a Stream instance. Does not have to be seekable.</param>
+        /// <param name="instructions">Resizing and processing command to apply to the image.</param>
+        public virtual ImageJob Build(object source, object dest, Instructions instructions)
+        {
+            var j = new ImageJob(source, dest, instructions, true, false);
+            Build(j);
+            return j;
+        }
 
         /// <summary>
         /// Resizes and processes the specified source image and stores the encoded result in the specified destination. 
@@ -359,6 +373,8 @@ namespace ImageResizer
         public virtual void Build(object source, object dest, ResizeSettings settings, bool disposeSource) {
             Build(source, dest, settings, disposeSource, false);
         }
+
+   
 
         /// <summary>
         /// Resizes and processes the specified source image and stores the encoded result in the specified destination. 
