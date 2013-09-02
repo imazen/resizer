@@ -100,9 +100,21 @@ namespace ImageResizer
         /// <param name="source">May  be an instance of string, VirtualFile, IVirtualFile IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.  If passed an Image instance, the image will be cloned, which will cause metadata, indexed state, and any additional frames to be lost. Accepts physical paths and application relative paths. (C:\... and ~/path) </param>
         /// <param name="settings">Will ignore ICC profile if ?ignoreicc=true.</param>
         /// <returns>A Bitmap. The .Tag property will include a BitmapTag instance. If .Tag.Source is not null, remember to dispose it when you dispose the Bitmap.</returns>
+        [Obsolete("This method returns an unmanaged, shoot-yourself-in-the-foot Bitmap instance. Use Build(ImageJob) or LoadImageInfo(source, new string[]{\"source.width\",\"source.height\"})")]
         public virtual Bitmap LoadImage(object source, ResizeSettings settings) {
             return LoadImage(source, settings, false);
         }
+
+        /// <summary>
+        /// Returns a dictionary of information about the given image. 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="requestedInfo">Pass null to get the defaults ("source.width", source.height")</param>
+        /// <returns></returns>
+        public virtual IDictionary<string,object> LoadImageInfo(object source, IEnumerable<string> requestedInfo){
+            return Build(new ImageJob(source, requestedInfo)).ResultInfo;
+        }
+
         /// <summary>
         /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag in a BitmapTag instance. The Bitmap.Tag.Path value may be a virtual, relative, UNC, windows, or unix path. 
         /// Does not dispose 'source' if it is a Stream or Image instance - that's the responsibility of the calling code.
@@ -302,6 +314,7 @@ namespace ImageResizer
         /// </summary>
         /// <param name="source">May be an instance of string (a physical path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.</param>
         /// <param name="settings">Resizing and processing command to apply to the.</param>
+        [Obsolete("Use ImageJob with dest=typeof(Bitmap) instead - but only as a last resort. This method returns an umanaged, un-garbage collected object that can kill your server. Use Build(source,dest, instructions) instead of handing the Bitmap instance yourself.")]
         public virtual Bitmap Build(object source, ResizeSettings settings) {
             return Build(source, settings, true);
         }
@@ -316,7 +329,7 @@ namespace ImageResizer
         /// <param name="source">May be an instance of string (a physical path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.</param>
         /// <param name="settings">Resizing and processing command to apply to the.</param>
         /// <param name="disposeSource">If false, 'source' will not be disposed. </param>
-       
+        [Obsolete("Use ImageJob with dest=typeof(Bitmap) instead - but only as a last resort. This method returns an umanaged, un-garbage collected object that can kill your server. Use Build(source,dest) instead of handing the Bitmap instance yourself.")]
         public virtual Bitmap Build(object source, ResizeSettings settings, bool disposeSource) {
             ImageJob j = new ImageJob(source, typeof(Bitmap), settings, disposeSource, false);
             Build(j);
@@ -357,11 +370,17 @@ namespace ImageResizer
         /// <param name="settings">Resizing and processing command to apply to the image.</param>
         /// <param name="disposeSource">True to dispose 'source' after use. False to leave intact.</param>
         /// <param name="addFileExtension">If true, will add the correct file extension to 'dest' if it is a string. </param>
+        [Obsolete("Use .Build(new ImageJob(source, dest, settings, disposeSource, addFileExtension)).FinalPath  instead")]
         public virtual string Build(object source, object dest, ResizeSettings settings, bool disposeSource, bool addFileExtension) {
             return Build(new ImageJob(source, dest, settings, disposeSource, addFileExtension)).FinalPath;
         }
         #endregion
 
+        /// <summary>
+        /// The most flexible method for processing an image
+        /// </summary>
+        /// <param name="job"></param>
+        /// <returns></returns>
         public virtual ImageJob Build(ImageJob job) {
             if (job == null) throw new ArgumentNullException("job", "ImageJob parameter null. Cannot Build a null ImageJob instance");
 
@@ -381,6 +400,8 @@ namespace ImageResizer
             }
         }
 
+
+
         protected override RequestedAction BuildJob(ImageJob job) {
             if (base.BuildJob(job) == RequestedAction.Cancel) return RequestedAction.Cancel;
 
@@ -394,25 +415,31 @@ namespace ImageResizer
                 //Save source path info
                 job.SourcePathData = (b != null && b.Tag != null && b.Tag is BitmapTag) ? ((BitmapTag)b.Tag).Path : null;
 
-                job.SourceWidth = b.Width;
-                job.SourceHeight = b.Height;
+                job.ResultInfo["source.width"] = b.Width;
+                job.ResultInfo["source.height"] = b.Height;
 
+                //Calucalte the appropriate file extension and mime type
+                if (job.Dest != typeof(Bitmap)){
+                    IEncoder e = this.EncoderProvider.GetEncoder(s, b);
+                    if (e != null)
+                    {
+                        job.ResultInfo["result.ext"] = e.Extension;
+                        job.ResultInfo["result.mime"] = e.MimeType;
+                    }
+                }
+
+                if (job.Dest == typeof(IDictionary<string, object>))
+                {
+                    ///They only want information/attributes
+                    job.Result = job.ResultInfo;
+                    return RequestedAction.Cancel;
+                }
 
                 //Fire PreAcquireStream(ref dest, settings) to modify 'dest'
                 object dest = job.Dest;
                 this.PreAcquireStream(ref dest, s);
                 job.Dest = dest;
-
-                //Calucalte the appropriate file extension and mime type
-                if (dest != typeof(Bitmap)){
-                    IEncoder e = this.EncoderProvider.GetEncoder(s, b);
-                    if (e != null)
-                    {
-                        job.ResultFileExtension = e.Extension;
-                        job.ResultMimeType = e.MimeType;
-                    }
-                }
-
+                
                 if (dest == typeof(Bitmap)) {
                     job.Result = buildToBitmap(b, s, true);
                     
@@ -952,6 +979,7 @@ namespace ImageResizer
             Process(s);
             return s.finalSize;
         }
+
 
   
 
