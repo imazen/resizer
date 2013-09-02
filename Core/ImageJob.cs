@@ -10,31 +10,40 @@ namespace ImageResizer {
     public class ImageJob {
         public ImageJob() {
         }
-        public ImageJob(string sourcePath, string destPath, ResizeSettings settings) {
-            this.Source = sourcePath;
-            this.Dest = destPath;
-            this.Settings = settings;
-        }
 
-        public ImageJob(Stream sourceStream, Stream destStream, ResizeSettings settings) {
-            this.Source = sourceStream;
-            this.Dest = destStream;
-            this.Settings = settings;
-        }
-
-        public ImageJob(object source, object dest, ResizeSettings settings) {
+        public ImageJob(object source, object dest, Instructions instructions)
+        {
             this.Source = source;
             this.Dest = dest;
-            this.Settings = settings;
+            this.Instructions = instructions;
         }
+        public ImageJob(object source, object dest, Instructions instructions, bool disposeSource, bool addFileExtension)
+            :this(source,dest,instructions)
 
-        public ImageJob(object source, object dest, ResizeSettings settings, bool disposeSource, bool addFileExtension) {
-            this.Source = source;
-            this.Dest = dest;
-            this.Settings = settings;
+        {
             this.DisposeSourceObject = disposeSource;
             this.AddFileExtension = addFileExtension;
         }
+
+        public ImageJob(Stream sourceStream, Stream destStream, Instructions instructions)
+            : this((object)sourceStream, (object)destStream, instructions) { }
+
+        public ImageJob(string sourcePath, string destPath, Instructions instructions)
+            : this((object)sourcePath, (object)destPath, instructions) { }
+
+
+        [Obsolete("Use Instructions instead of ResizeSettings")]
+        public ImageJob(string sourcePath, string destPath, ResizeSettings settings)
+            : this((object)sourcePath, (object)destPath, new Instructions(settings)){}
+        [Obsolete("Use Instructions instead of ResizeSettings")]
+        public ImageJob(Stream sourceStream, Stream destStream, ResizeSettings settings)
+            :this((object)sourceStream,(object)destStream,new Instructions(settings)) {}
+        [Obsolete("Use Instructions instead of ResizeSettings")]
+        public ImageJob(object source, object dest, ResizeSettings settings):
+            this(source,dest,new Instructions(settings)) {}
+        [Obsolete("Use Instructions instead of ResizeSettings")]
+        public ImageJob(object source, object dest, ResizeSettings settings, bool disposeSource, bool addFileExtension)
+            :this(source,dest,new Instructions(settings),disposeSource,addFileExtension){ }
 
         /// <summary>
         /// Shorthand method for ImageBuilder.Current.Build(this)
@@ -43,6 +52,7 @@ namespace ImageResizer {
         public ImageJob Build() {
             return ImageBuilder.Current.Build(this);
         }
+
         private object _source = null;
         /// <summary>
         /// The source image's physical path, app-relative virtual path, or a Stream, byte array, Bitmap, VirtualFile, IVirtualFile, HttpPostedFile, or HttpPostedFileBase instance.
@@ -71,14 +81,39 @@ namespace ImageResizer {
             set { _result = value; }
         }
 
-        private ResizeSettings _settings = null;
+        /// <summary>
+        /// The width, in pixels, of the first frame or page in the source image file
+        /// </summary>
+        public int SourceWidth { get; set; }
+        /// <summary>
+        /// The height, in pixels, of the first frame or page in the source image file
+        /// </summary>
+        public int SourceHeight { get; set; }
+
+        /// <summary>
+        /// The correct file extension for the resulting file stream, without a leading dot. Will be null if the result is not an encoded image.
+        /// </summary>
+        public string ResultFileExtension { get; set; }
+        /// <summary>
+        /// The correct mime type for the resulting file stream, without a leading dot. Will be null if the result is not an encoded image.
+        /// </summary>
+        public string ResultMimeType { get; set; }
+
+
+
         /// <summary>
         /// The image processing settings
-        /// </summary>
+        /// </summary> 
+        [Obsolete("Use Instructions instead.")]
         public ResizeSettings Settings {
-            get { return _settings; }
-            set { _settings = value; }
+            get { return new ResizeSettings(Instructions); }
+            set { Instructions = new Instructions(value); }
         }
+
+        /// <summary>
+        /// The image processing instructions
+        /// </summary>
+        public Instructions Instructions { get; set; }
 
         private bool _disposeSourceObject = true;
         /// <summary>
@@ -192,7 +227,14 @@ namespace ImageResizer {
                 string settingsPrefix = "settings.";
                 if (p.StartsWith(settingsPrefix, StringComparison.OrdinalIgnoreCase)) {
                     string subName = p.Substring(settingsPrefix.Length);
-                    return Settings[subName];
+                    return Instructions[subName];
+                }
+                //Access to the instructions collection
+                string instructionsPrefix = "instructions.";
+                if (p.StartsWith(instructionsPrefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    string subName = p.Substring(instructionsPrefix.Length);
+                    return Instructions[subName];
                 }
                 if ("filename".Equals(p,StringComparison.OrdinalIgnoreCase)){
                     if (SourcePathData == null) throw new ImageProcessingException("You cannot use the <filename> variable in a job that does not have a source filename, such as with a Stream or Bitmap instance");
