@@ -163,7 +163,14 @@ namespace ImageResizer {
         /// <summary>
         /// An X1,Y1,X2,Y2 array of coordinates. Unless CropXUnits and CropYUnits are specified, these are in the coordinate space of the original image.
         /// </summary>
+        [Obsolete("Use CropRectangle instead; this member is provided for backwards compatibility reasons only, and will be removed in the next major release")] //DROP4
         public double[] CropRectange {get { return NameValueCollectionExtensions.GetList<double>(this, "crop",0,4);}set{NameValueCollectionExtensions.SetList(this, "crop",value,true,4);}}
+
+        /// <summary>
+        /// An X1,Y1,X2,Y2 array of coordinates. Unless CropXUnits and CropYUnits are specified, these are in the coordinate space of the original image.
+        /// </summary>
+        public double[] CropRectangle { get { return NameValueCollectionExtensions.GetList<double>(this, "crop", 0, 4); } set { NameValueCollectionExtensions.SetList(this, "crop", value, true, 4); } }
+
 
         /// <summary>
         /// Automatically rotates images based on gravity sensor data embedded in Exif. Requires the AutoRotate plugin
