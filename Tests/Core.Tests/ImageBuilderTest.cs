@@ -26,7 +26,7 @@ namespace ImageResizer.Tests {
             return new Config[]{new Config(new ResizerSection())}; //TODO - add a variety of configuration options in here.
         }
 
-        private Bitmap GetBitmap(int width, int height) {
+        public static Bitmap GetBitmap(int width, int height) {
             Bitmap b = new Bitmap(width, height);
             using (Graphics g = Graphics.FromImage(b)) {
                 g.DrawString("Hello!", new Font(FontFamily.GenericSansSerif, 1), new SolidBrush(Color.Beige), new PointF(0, 0));
@@ -157,19 +157,6 @@ namespace ImageResizer.Tests {
 
         }
 
-        [Test]
-        public void TestImageJob()
-        {
-            var ms = new MemoryStream();
-            var j = new ImageJob(GetBitmap(100, 200), ms, new Instructions("width=50;format=jpg"));
-            j.Build();
-            Assert.AreEqual(j.SourceWidth, 100);
-            Assert.AreEqual(j.SourceHeight, 200);
-            Assert.AreEqual(j.ResultFileExtension, "jpg");
-            Assert.AreEqual(j.ResultMimeType, "image/jpeg");
-
-
-        }
 
         [Test]
         public void TestSourceBitmapDisposed([Column(true, false)] bool dispose,

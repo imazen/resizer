@@ -17,8 +17,6 @@ namespace ImageResizer.Core.Tests {
             Assert.AreEqual<string>( "?crop=0,0,50,50", s.ToString());
             s.CropMode = CropMode.Auto;
             Assert.AreEqual<string>("?crop=auto", s.ToString());
-            s.CropMode = CropMode.Custom;
-            Assert.AreEqual<string>("?crop=0,0,0,0", s.ToString());
         }
 
 
