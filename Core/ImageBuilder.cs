@@ -394,11 +394,24 @@ namespace ImageResizer
                 //Save source path info
                 job.SourcePathData = (b != null && b.Tag != null && b.Tag is BitmapTag) ? ((BitmapTag)b.Tag).Path : null;
 
+                job.SourceWidth = b.Width;
+                job.SourceHeight = b.Height;
+
 
                 //Fire PreAcquireStream(ref dest, settings) to modify 'dest'
                 object dest = job.Dest;
                 this.PreAcquireStream(ref dest, s);
                 job.Dest = dest;
+
+                //Calucalte the appropriate file extension and mime type
+                if (dest != typeof(Bitmap)){
+                    IEncoder e = this.EncoderProvider.GetEncoder(s, b);
+                    if (e != null)
+                    {
+                        job.ResultFileExtension = e.Extension;
+                        job.ResultMimeType = e.MimeType;
+                    }
+                }
 
                 if (dest == typeof(Bitmap)) {
                     job.Result = buildToBitmap(b, s, true);
@@ -409,8 +422,7 @@ namespace ImageResizer
                     job.FinalPath = job.ResolveTemplatedPath(dest as string,
                         delegate(string var) {
                             if ("ext".Equals(var, StringComparison.OrdinalIgnoreCase)) {
-                                IEncoder e = this.EncoderProvider.GetEncoder(s, b);
-                                if (e != null) return e.Extension;
+                                return job.ResultFileExtension;
                             }
                             if ("width".Equals(var, StringComparison.OrdinalIgnoreCase))
                                 return GetFinalSize(new System.Drawing.Size(b.Width, b.Height), new ResizeSettings(job.Settings)).Width.ToString(NumberFormatInfo.InvariantInfo);
