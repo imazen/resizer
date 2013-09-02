@@ -20,4 +20,4 @@ Thumbs.db
 _ReSharper*
 *App_Data/cair.exe
 *App_Data/pthreadVSE2.dll
-
+/packages/
