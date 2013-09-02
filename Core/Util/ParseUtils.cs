@@ -7,7 +7,7 @@ using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Util {
     /// <summary>
-    /// Provides invariant parsing & serialization of primitive types, like Enums, integers, floats, and booleans.
+    /// Provides invariant parsing &amp; serialization of primitive types, like Enums, integers, floats, and booleans.
     /// </summary>
     public class ParseUtils {
 
