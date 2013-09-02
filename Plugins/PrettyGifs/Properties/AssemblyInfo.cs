@@ -13,3 +13,4 @@ using ImageResizer.Util;
 
 // So the ImageResizer knows which bundle this assembly belongs to
 [assembly: Bundle("R3Bundle1")]
+[assembly: Edition("R3Performance")]

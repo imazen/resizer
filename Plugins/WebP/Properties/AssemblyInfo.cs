@@ -13,3 +13,6 @@ using ImageResizer.Util;
 
 //Inform NativeDependencyManager where to find the download manifest
 [assembly: NativeDependencies("Native.xml")]
+
+
+[assembly: Edition("R3Elite")]
