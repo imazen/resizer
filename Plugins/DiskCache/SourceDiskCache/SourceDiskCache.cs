@@ -150,7 +150,7 @@ namespace ImageResizer.Plugins.SourceDiskCache
         void Pipeline_AuthorizeImage(IHttpModule sender, HttpContext context, IUrlAuthorizationEventArgs e)
         {
             //Don't allow direct access to the cache.
-            if (e.VirtualPath.StartsWith(this.VirtualCacheDir, StringComparison.OrdinalIgnoreCase) e.AllowAccess = false;
+            if (e.VirtualPath.StartsWith(this.VirtualCacheDir, StringComparison.OrdinalIgnoreCase)) e.AllowAccess = false;
         }
 
         public bool Uninstall(Config c)
