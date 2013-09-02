@@ -270,8 +270,8 @@ namespace ImageResizer.Configuration {
         public ILogManager LogManager { get { return _logManager; } set { _logManager = value; if (LoggingAvailable != null && value != null) LoggingAvailable(value); } }
 
 
-        public delegate void LoggingAvaialbleEvent(ILogManager logger);
-        public LoggingAvaialbleEvent LoggingAvailable;
+        public delegate void LoggingAvaialableEvent(ILogManager logger);
+        public LoggingAvaialableEvent LoggingAvailable;
 
         /// <summary>
         /// Returns an instance of the first encoder that claims to be able to handle the specified settings.
