@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Hosting;
 using System.Web.Caching;
 using ImageResizer.Configuration;
+using System.IO;
 
 namespace ImageResizer.Plugins.Watermark {
     public class ImageLayer:Layer {
@@ -76,8 +77,14 @@ namespace ImageResizer.Plugins.Watermark {
             string key = virtualPath.ToLowerInvariant() + query.ToString();
             Bitmap b = HttpContext.Current.Cache[key] as Bitmap;
             if (b != null) return b;
-
-            b = c.CurrentImageBuilder.LoadImage(virtualPath, query);
+            try
+            {
+                b = c.CurrentImageBuilder.LoadImage(virtualPath, query);
+            }
+            catch (FileNotFoundException fe)
+            {
+                throw new ImageProcessingException(500, "Failed to located watermark " + virtualPath, "Failed to located a watermarking file", fe);
+            }
             //Query VPPs for cache dependency. TODO: Add support for IVirtualImageProviders to customize cache dependencies.
             CacheDependency cd = null;
             if (HostingEnvironment.VirtualPathProvider != null) cd = HostingEnvironment.VirtualPathProvider.GetCacheDependency(virtualPath, new string[] { }, DateTime.UtcNow);
