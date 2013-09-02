@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Reflection;
 using System.Text;
 using Gallio.Framework;
+using Gallio.Framework.Assertions;
+using ImageResizer.Resizing;
 using MbUnit.Framework;
 using MbUnit.Core;
 using MbUnit.Framework.ContractVerifiers;
@@ -47,6 +51,88 @@ namespace ImageResizer.Tests {
         public void EncodeImage(int width, int height, string query){
             using (MemoryStream ms = new MemoryStream(8000)){
                 c.CurrentImageBuilder.Build(GetBitmap(width,height),ms,new ResizeSettings(query));
+            }
+        }
+
+        public Bitmap LoadSmpteColorBars() {
+            return LoadResourceBitmap("SMPTE_Color_Bars.png");
+        }
+
+        private Bitmap LoadResourceBitmap(string fileName) {
+            var me = Assembly.GetExecutingAssembly();
+            var resourceName = String.Format(CultureInfo.InvariantCulture, "ImageResizer.Core.Tests.{0}", fileName);
+            using (var s = me.GetManifestResourceStream(resourceName)) {
+                return c.CurrentImageBuilder.LoadImage(s, new ResizeSettings());
+            }
+        }
+
+        private void AssertBitmapsEqual(string expectedBitmapResourceFileName, Bitmap actual) {
+            using (var expected = LoadResourceBitmap(expectedBitmapResourceFileName)) {
+                try {
+                    Assert.AreEqual(expected.Size, actual.Size);
+                    for (var y = 0; y < expected.Height; y++) {
+                        for (var x = 0; x < expected.Width; x++) {
+                            Assert.AreEqual(expected.GetPixel(x, y), actual.GetPixel(x, y), "Pixel: {0},{1}", x, y);
+                        }
+                    }
+                }
+                catch (AssertionException) {
+                    actual.Save(expectedBitmapResourceFileName, ImageFormat.Png);
+                    throw;
+                }
+            }
+        }
+
+        [Test]
+        public void ProcessCropAndScaleDownSmaller() {
+            var resizeSettings = new ResizeSettings("width=400;height=300;mode=crop;scale=down");
+            using (var source = LoadSmpteColorBars())
+            using (var state = new ImageState(resizeSettings, source.Size, false)) {
+                state.sourceBitmap = source;
+
+                c.CurrentImageBuilder.Process(state);
+
+                AssertBitmapsEqual("CropAndScaleDownSmaller.png", state.destBitmap);
+            }
+        }
+
+        [Test]
+        public void ProcessCropAndScaleDownFlippedDimensions() {
+            var resizeSettings = new ResizeSettings("width=504;height=672;mode=crop;scale=down");
+            using (var source = LoadSmpteColorBars())
+            using (var state = new ImageState(resizeSettings, source.Size, false)) {
+                state.sourceBitmap = source;
+
+                c.CurrentImageBuilder.Process(state);
+
+                AssertBitmapsEqual("CropAndScaleDownFlippedDimensions.png", state.destBitmap);
+            }
+        }
+
+        [Test]
+        public void ProcessCropAndScaleCanvasFlippedDimensions() {
+            var resizeSettings = new ResizeSettings("width=504;height=672;mode=crop;scale=canvas");
+            using (var source = LoadSmpteColorBars())
+            using (var state = new ImageState(resizeSettings, source.Size, false)) {
+                state.sourceBitmap = source;
+                state.supportsTransparency = true;
+
+                c.CurrentImageBuilder.Process(state);
+
+                AssertBitmapsEqual("CropAndScaleCanvasFlippedDimensions.png", state.destBitmap);
+            }
+        }
+
+        [Test]
+        public void ProcessCropAndScaleBoth() {
+            var resizeSettings = new ResizeSettings("width=504;height=672;mode=crop;scale=both");
+            using (var source = LoadSmpteColorBars())
+            using (var state = new ImageState(resizeSettings, source.Size, false)) {
+                state.sourceBitmap = source;
+                
+                c.CurrentImageBuilder.Process(state);
+
+                AssertBitmapsEqual("CropAndScaleBoth.png", state.destBitmap);
             }
         }
 
