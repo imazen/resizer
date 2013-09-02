@@ -105,47 +105,39 @@ namespace ImageResizer.Plugins.Basic {
 				sb.AppendLine(i.Source + "(" + i.Severity.ToString() + "):\t" + i.Summary  +
 					("\n" + i.Details).Replace("\n","\n\t\t\t") + "\n");
 
-            //What bundles are used?
-            Dictionary<string, bool> bundlesUsed = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            //What editions are used?
+            var editionsUsed = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (IPlugin p in c.Plugins.AllPlugins) {
-                object[] attrs = p.GetType().Assembly.GetCustomAttributes(typeof(Util.BundleAttribute), true);
-                if (attrs.Length > 0 && attrs[0] is BundleAttribute) {
-                    bundlesUsed[((BundleAttribute)attrs[0]).Value] = true;
+                object[] attrs = p.GetType().Assembly.GetCustomAttributes(typeof(Util.EditionAttribute), true);
+                if (attrs.Length > 0 && attrs[0] is EditionAttribute)
+                {
+                    editionsUsed[p.GetType().Name] = ((EditionAttribute)attrs[0]).Value;
                 }
             }
-            //Support multiple bundle ownership
-            List<string> keys = new List<string>(bundlesUsed.Keys);
-            foreach (string s in keys) {
-                if (s.IndexOf(',') > -1) {
-                    bool found = false;
-                    string[] bundles = s.Split(',');
-                    foreach (string b in bundles) {
-                        if (bundlesUsed.ContainsKey(b.Trim())) {
-                            bundlesUsed[b.Trim()] = true;
-                            bundlesUsed.Remove(s);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        //Ok, so none of those bundles are used elsewhere. Use the first bundle listed.
-                        bundlesUsed[bundles[0].Trim()] = true;
-                        bundlesUsed.Remove(s);
-                    }
+
+            string edition = null;
+            //Pick the largest edition
+            foreach (string s in new string[] { "R3Elite", "R3Creative", "R3Performance" })
+            {
+                if (new List<string>(editionsUsed.Values).Contains(s))
+                {
+                    edition = s;
+                    break;
                 }
             }
+
+            
 
             Dictionary<string, string> friendlyNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            friendlyNames.Add("R3Bundle1", "Performance Bundle");
-            friendlyNames.Add("R3Bundle2", "Design Bundle");
-            friendlyNames.Add("R3Bundle3", "Cloud Bundle");
-            friendlyNames.Add("R3Bundle4", "Extras Bundle");
+            friendlyNames.Add("R3Elite", "Elite Edition or Support Contract");
+            friendlyNames.Add("R3Creative", "Creative Edition");
+            friendlyNames.Add("R3Performance", "Performance Edition");
 
-            if (bundlesUsed.Count == 0) 
-                sb.AppendLine("\nYou are not using any paid bundles.");
+            if (edition == null) 
+                sb.AppendLine("\nYou are not using any paid plugins.");
             else {
-                sb.Append("\nYou are using paid bundles: ");
-                foreach (string s in bundlesUsed.Keys) sb.Append((friendlyNames.ContainsKey(s) ? friendlyNames[s] : s) + ", ");
+                sb.Append("\nYou are using plugins from the " + friendlyNames[edition] + ": ");
+                foreach (string s in editionsUsed.Keys) sb.Append(s + " (" +  friendlyNames[editionsUsed[s]] + "), ");
                 sb.Remove(sb.Length - 2, 2);
                 sb.AppendLine();
             }

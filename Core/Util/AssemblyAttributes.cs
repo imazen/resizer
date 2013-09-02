@@ -48,6 +48,23 @@ namespace ImageResizer.Util {
     }
 
     [AttributeUsage(AttributeTargets.Assembly)]
+    public class EditionAttribute : Attribute
+    {
+
+        string type;
+        public EditionAttribute() { type = string.Empty; }
+        public EditionAttribute(string txt) { type = txt; }
+
+        public string Value { get { return type; } }
+        public override string ToString()
+        {
+            return type;
+        }
+    }
+
+
+
+    [AttributeUsage(AttributeTargets.Assembly)]
     public class BuildTypeAttribute : Attribute {
 
         string type;
