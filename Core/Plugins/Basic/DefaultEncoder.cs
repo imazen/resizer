@@ -15,7 +15,7 @@ namespace ImageResizer.Plugins.Basic {
     /// <summary>
     /// Provides basic encoding functionality for Jpeg, png, and gif output. Allows adjustable Jpeg compression, but doesn't implement indexed PNG files or quantized GIF files.
     /// </summary>
-    public class DefaultEncoder :IEncoder, IQuerystringPlugin, IPlugin {
+    public class DefaultEncoder :IEncoder, IQuerystringPlugin, IPlugin, IFileSignatureProvider {
 
         public DefaultEncoder() {
         }
@@ -396,6 +396,27 @@ namespace ImageResizer.Plugins.Basic {
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
+        }
+
+        /// <summary>
+        /// Returns signatures for jpeg, bmp, gif, png, wmf, ico, and tif
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<FileSignature> GetSignatures()
+        {
+            //Source http://www.filesignatures.net/
+            return new FileSignature[]{
+                new FileSignature(new byte[] {0xFF, 0xD8, 0xFF}, "jpg", "image/jpeg"),
+                new FileSignature(new byte[] {0x42, 0x4D}, "bmp", "image/x-ms-bmp"), //Can be a BMP or DIB
+                new FileSignature(new byte[] {0x47,0x49,0x46, 0x38}, "gif", "image/gif"),
+                new FileSignature(new byte[] {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A}, "png","image/png"),
+                new FileSignature(new byte[] {0xD7, 0xCD, 0xC6, 0x9A}, "wmf", "image/x-wmf"),
+                new FileSignature(new byte[] {0x00, 0x00,0x01, 0x00}, "ico", "image/x-icon"), //Can be a printer spool or an icon
+                new FileSignature(new byte[] {0x49, 0x20, 0x49}, "tif", "image/tiff"),
+                new FileSignature(new byte[] {0x49, 0x49, 0x2A, 0x00}, "tif", "image/tiff"),
+                new FileSignature(new byte[] {0x4D, 0x4D, 0x00, 0x2A}, "tif", "image/tiff"),
+                new FileSignature(new byte[] {0x4D, 0x4D, 0x00, 0x2B}, "tif", "image/tiff")
+            };
         }
     }
 }
