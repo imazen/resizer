@@ -19,7 +19,7 @@ Support: http://imageresizing.net/support
 
 $plugins$
 </description>
-		<tags>ImageResizer Logging Nlog Imazen Resizer</tags>
+		<tags>ImageResizer Logging Nlog Imazen Resizer imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		  <dependency id="NLog" />

@@ -32,7 +32,7 @@ Requires license, see http://imageresizing.net/plugins
 $plugins$
 
 </description>
-		<tags>ImageResizer SimpleFilters sepia grayscale alpha brightness contrast saturation Imazen Resizer</tags>
+		<tags>ImageResizer SimpleFilters sepia grayscale alpha brightness contrast saturation Imazen Resizer imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

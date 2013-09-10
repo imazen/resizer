@@ -25,7 +25,7 @@ Requires license, see http://imageresizing.net/plugins
 
 $plugins$
 </description>
-		<tags>ImageResizer DiskCache Imazen Resizer IIS static file caching</tags>
+		<tags>ImageResizer DiskCache Imazen Resizer IIS static file caching imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

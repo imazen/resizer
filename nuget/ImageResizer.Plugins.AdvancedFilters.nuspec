@@ -25,7 +25,7 @@ Requires license, see http://imageresizing.net/plugins
 
 $plugins$
  </description>
-		<tags>ImageResizer Imazen Resizer AdvancedFilters guassian blur smart sharpen noise remove auto white balance filters</tags>
+		<tags>ImageResizer Imazen Resizer AdvancedFilters guassian blur smart sharpen noise remove auto white balance filters imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		  <dependency id="AForge.Imaging"/>

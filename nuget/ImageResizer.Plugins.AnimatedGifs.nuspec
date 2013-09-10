@@ -23,7 +23,7 @@ Requires license, see http://imageresizing.net/plugins
 
 $plugins$
 </description>
-		<tags>ImageResizer Imazen Resizer AnimatedGifs PrettyGifs gif gifs animated frames resizing</tags>
+		<tags>ImageResizer Imazen Resizer AnimatedGifs PrettyGifs gif gifs animated frames resizing imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

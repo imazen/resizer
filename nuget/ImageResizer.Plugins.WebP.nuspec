@@ -23,7 +23,7 @@ Requires license, see http://imageresizing.net/plugins
 $plugins$
 
 </description>
-		<tags>ImageResizer webp encode deocode weppy resizer Imazen</tags>
+		<tags>ImageResizer webp encode deocode weppy resizer Imazen imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		  <dependency id="Imazen.WebP"/>

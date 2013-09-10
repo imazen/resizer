@@ -23,7 +23,7 @@ Requires license, see http://imageresizing.net/plugins
 
 $plugins$
 </description>
-		<tags>ImageResizer WIC Windows Imaging Components Fant Imazen Resizer IWICBitmap IWICBitmapSource </tags>
+		<tags>ImageResizer WIC Windows Imaging Components Fant Imazen Resizer IWICBitmap IWICBitmapSource  imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

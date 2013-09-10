@@ -22,7 +22,7 @@ Support: http://imageresizing.net/support
 Requires license, see http://imageresizing.net/plugins
 
 $plugins$</description>
-		<tags>ImageResizer SeamCarving content aware image resizing Imazen Resizer</tags>
+		<tags>ImageResizer SeamCarving content aware image resizing Imazen Resizer imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

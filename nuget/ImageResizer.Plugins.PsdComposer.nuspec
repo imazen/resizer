@@ -22,7 +22,7 @@ Requires license, see http://imageresizing.net/plugins
 
 $plugins$
 </description>
-		<tags>ImageResizer PsdComposer Imazen Resizer PSD rendering editing </tags>
+		<tags>ImageResizer PsdComposer Imazen Resizer PSD rendering editing  imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

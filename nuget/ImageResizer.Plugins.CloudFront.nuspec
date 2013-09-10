@@ -27,7 +27,7 @@ Requires license, see http://imageresizing.net/plugins
 
 $plugins$
 </description>
-		<tags>ImageResizer Imazen Resizer CloudFront Amazon CDN Cloud</tags>
+		<tags>ImageResizer Imazen Resizer CloudFront Amazon CDN Cloud imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

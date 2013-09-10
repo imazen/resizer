@@ -24,7 +24,7 @@ Requires license, see http://imageresizing.net/plugins
 $plugins$
 
 </description>
-		<tags>ImageResizer whitespacetrimmer trim whitespace product images Imazen resizer</tags>
+		<tags>ImageResizer whitespacetrimmer trim whitespace product images Imazen resizer imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		  <dependency id="AForge.Imaging"/>

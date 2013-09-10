@@ -23,7 +23,7 @@ Support: http://imageresizing.net/support
 $plugins$
 
 </description>
-		<tags>ImageResizer jCrop crop image resize</tags>
+		<tags>ImageResizer jCrop crop image resize imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		  <dependency id="ImageResizer.WebConfig"/>

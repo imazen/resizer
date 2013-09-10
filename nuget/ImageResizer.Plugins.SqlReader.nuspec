@@ -23,7 +23,7 @@ Requires license, see http://imageresizing.net/plugins
 $plugins$
 
 </description>
-		<tags>ImageResizer SqlReader SQL blob image resizer Imazen</tags>
+		<tags>ImageResizer SqlReader SQL blob image resizer Imazen imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

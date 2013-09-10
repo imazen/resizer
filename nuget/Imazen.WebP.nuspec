@@ -14,7 +14,7 @@
 
 Search nuget for 'Imazen' to see other image processing libraries we've created, or visit imazen.io.
 </description>
-		<tags>imazen image libwebp webp webppy</tags>
+		<tags>imazen image libwebp webp webppy imaging</tags>
 	</metadata>
   	<files>
 		<file src="$coredlldir$\Imazen.WebP.dll" target="lib" />

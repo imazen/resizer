@@ -22,7 +22,7 @@ Requires license, see http://imageresizing.net/plugins
 $plugins$
 
 </description>
-		<tags>ImageResizer MongoReader Imazen Resizer mongodb gridfs mongo blob cloud</tags>
+		<tags>ImageResizer MongoReader Imazen Resizer mongodb gridfs mongo blob cloud imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		  <dependency id="mongocsharpdriver"/>
