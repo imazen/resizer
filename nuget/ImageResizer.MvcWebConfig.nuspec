@@ -20,7 +20,7 @@ Support: http://imageresizing.net/support
 
 $plugins$
 </description>
-    <tags>ImageResizer Imazen Resizer MVC Routing MvcRoutingShim WebConfig </tags>
+    <tags>ImageResizer Imazen Resizer MVC Routing MvcRoutingShim WebConfig  imaging</tags>
 	<dependencies>
 	  <dependency id="ImageResizer"/>
 	  <dependency id="ImageResizer.WebConfig"/>

@@ -20,7 +20,7 @@ Support: http://imageresizing.net/support
 Requires license, see http://imageresizing.net/plugins
 
 $plugins$</description>
-		<tags>ImageResizer PsdReader PSD decoding Imazen Rezizer</tags>
+		<tags>ImageResizer PsdReader PSD decoding Imazen Rezizer imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

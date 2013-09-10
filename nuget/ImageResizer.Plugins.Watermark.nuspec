@@ -24,7 +24,7 @@ $plugins$
 
 
 </description>
-		<tags>ImageResizer Watermark overlay image text resizer Imazen</tags>
+		<tags>ImageResizer Watermark overlay image text resizer Imazen imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

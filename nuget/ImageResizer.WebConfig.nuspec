@@ -20,7 +20,7 @@ Support: http://imageresizing.net/support
 
 $plugins$
 </description>
-    <tags>ImageResizer Imazen Resizer Web.Config</tags>
+    <tags>ImageResizer Imazen Resizer Web.Config imaging</tags>
 	<dependencies>
 	  <dependency id="ImageResizer"/>
 	</dependencies>

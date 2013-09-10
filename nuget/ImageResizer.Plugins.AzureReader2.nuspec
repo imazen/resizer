@@ -22,7 +22,7 @@ Requires license, see http://imageresizing.net/plugins
 $plugins$
 
 </description>
-		<tags>ImageResizer Imazen Resizer AzureReader Azure Blob Storage VirtualPathProvider cloud</tags>
+		<tags>ImageResizer Imazen Resizer AzureReader Azure Blob Storage VirtualPathProvider cloud imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

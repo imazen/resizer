@@ -22,7 +22,7 @@ Requires license, see http://imageresizing.net/plugins
 
 $plugins$
 </description>
-		<tags>ImageResizer Imazen Resizer BatchZipper compress zip folder images archive</tags>
+		<tags>ImageResizer Imazen Resizer BatchZipper compress zip folder images archive imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		  <dependency id="DotNetZip.Reduced"/>

@@ -20,7 +20,7 @@ Support: http://imageresizing.net/support
 Requires license, see http://imageresizing.net/plugins
 
 $plugins$</description>
-		<tags>ImageResizer S3Reader Amazon Cloud Imazen Resizer</tags>
+		<tags>ImageResizer S3Reader Amazon Cloud Imazen Resizer imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		  <dependency id="AWSSDK"/>

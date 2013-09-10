@@ -57,7 +57,7 @@ Third parties have made some excellent UI wrappers and plugins, including Ekspon
 
 </description>
 		<tags>ImageResizer image resize crop rotate jpeg jpg gif png server-safe-imaging nuget-needs-tokenization nuget-needs-markdown-descriptions
-		</tags>
+		 imaging</tags>
 	</metadata>
   	<files>
 		<file src="$coredlldir$\ImageResizer.dll" target="lib" />

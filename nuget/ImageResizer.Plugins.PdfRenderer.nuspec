@@ -21,7 +21,7 @@ Support: http://imageresizing.net/support
 $plugins$
 
 </description>
-		<tags>ImageResizer PdfRenderer PDF Imazen Resizer </tags>
+		<tags>ImageResizer PdfRenderer PDF Imazen Resizer  imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>

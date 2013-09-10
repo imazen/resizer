@@ -22,7 +22,7 @@ Support: http://imageresizing.net/support
 
 $plugins$
 </description>
-		<tags>ImageResizer Imazen Resizer MVC MvcRoutingShim System.Web.Routing</tags>
+		<tags>ImageResizer Imazen Resizer MVC MvcRoutingShim System.Web.Routing imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
 		</dependencies>
