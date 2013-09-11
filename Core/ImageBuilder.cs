@@ -991,11 +991,19 @@ namespace ImageResizer
         /// <returns></returns>
         public virtual Size GetFinalSize(Size originalSize, ResizeSettings q)
         {
-            ImageState s = new ImageState(q, originalSize, true);
+            return GetFinalSize(originalSize, new Instructions(q));
+        }
+
+        /// <summary>
+        /// Gets the final size of an image
+        /// </summary>
+        /// <returns></returns>
+        public virtual Size GetFinalSize(Size originalSize, Instructions q)
+        {
+            ImageState s = new ImageState(new ResizeSettings(q), originalSize, true);
             Process(s);
             return s.finalSize;
         }
-
 
   
 
