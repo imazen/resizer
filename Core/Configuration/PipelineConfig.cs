@@ -124,7 +124,7 @@ namespace ImageResizer.Configuration {
 
         /// <summary>
         /// The specified path must not include a querystring. Slashes, spaces, question marks, ampersands, and colons are not permitted in the extension.
-        /// If it contains a multipart extension like .txt.zip, only "zip" will be recognized.
+        /// If it contains a multipart extension like .txt.zip, only "zip" will be recognized. Must contain a dot - passing in "jpg" will fail.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
