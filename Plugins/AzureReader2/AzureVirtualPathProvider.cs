@@ -101,7 +101,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
 
                 // Strip prefix from virtual path; keep container and blob
                 // mb:12/8/2012 - need to prepend the blob client base uri to the url
-                string relativeBlobURL = string.Format("{0}/{1}",CloudBlobClient.BaseUri.OriginalString, virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim('/', '\\'));
+                string relativeBlobURL = string.Format("{0}/{1}",CloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\'), virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim('/', '\\'));
 
                 // Get a reference to the blob
                 // mb:12/8/2012 - this call now must be a uri
@@ -131,7 +131,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
                     if (!LazyExistenceCheck) {
                         // Get a reference to the blob
                         // mb: 12/8/2012 - creating uri here to keep the above relativeBlobURL as is to create & return an AzureFile
-                        Uri relativeBlobUri = new Uri(string.Format("{0}/{1}", CloudBlobClient.BaseUri.OriginalString, relativeBlobURL));
+                        Uri relativeBlobUri = new Uri(string.Format("{0}/{1}", CloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\'), relativeBlobURL));
                         ICloudBlob cloudBlob = CloudBlobClient.GetBlobReferenceFromServer(relativeBlobUri);
                         cloudBlob.FetchAttributes();
                     }
