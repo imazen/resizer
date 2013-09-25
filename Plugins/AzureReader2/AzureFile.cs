@@ -24,7 +24,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
 
             // Get a reference to the blob
             // mb: 12/8/2012 - the path needs to be a uri now, so combining blobclient baseuri with the virtualpath
-            Uri blobUri = new Uri(string.Format("{0}/{1}", parent.CloudBlobClient.BaseUri.OriginalString, VirtualPath));
+            Uri blobUri = new Uri(string.Format("{0}/{1}", parent.CloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\'), VirtualPath));
             ICloudBlob cloudBlob = parent.CloudBlobClient.GetBlobReferenceFromServer(blobUri);
 
             MemoryStream ms = new MemoryStream(4096); // 4kb is a good starting point.
