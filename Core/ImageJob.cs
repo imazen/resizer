@@ -43,6 +43,7 @@ namespace ImageResizer {
             this.Source = source;
             this.Dest = typeof(IDictionary<string, object>);
             this.RequestedInfo = new List<string>(requestedImageInfo == null ? new string[]{"source.width","source.height", "result.ext","result.mime"} : requestedImageInfo);
+            this.Instructions = new Instructions();
         }
 
 
