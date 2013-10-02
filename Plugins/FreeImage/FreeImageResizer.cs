@@ -63,6 +63,8 @@ namespace ImageResizer.Plugins.FreeImageScaling {
             SizeF targetSize = PolygonMath.getParallelogramSize(s.layout["image"]);
             targetSize = new SizeF((float)Math.Ceiling(targetSize.Width), (float)Math.Ceiling(targetSize.Height));
 
+            s.ApplyCropping();
+            s.EnsurePreRenderBitmap();
 
             //The size of the temporary bitmap. 
             //We want it larger than the size we'll use on the final copy, so we never upscale it
@@ -73,21 +75,17 @@ namespace ImageResizer.Plugins.FreeImageScaling {
             FIBITMAP src = FIBITMAP.Zero;
             FIBITMAP midway = FIBITMAP.Zero;
             try {
+                var oldbit = s.preRenderBitmap ?? s.sourceBitmap;
                 //Crop if needed, Convert, scale, then convert back.
-                if (s.preRenderBitmap != null || (s.copyRect.Width == s.originalSize.Width && s.copyRect.Height == s.originalSize.Height && s.copyRect.X == 0 && s.copyRect.Y == 0)){
-                    src = FreeImage.CreateFromBitmap(s.preRenderBitmap != null ? s.preRenderBitmap : s.sourceBitmap);
-                }else{
-
-                    using (Bitmap c = s.sourceBitmap.Clone(s.copyRect, System.Drawing.Imaging.PixelFormat.Format32bppArgb)) {
-                        src = FreeImage.CreateFromBitmap(c);
-                    }
-                }
+                src = FreeImage.CreateFromBitmap(oldbit);
+                
                 midway = FreeImage.Rescale(src, tempWidth, tempHeight, filter);
                 FreeImage.UnloadEx(ref src);
                 //Clear the old pre-rendered image if needed
                 if (s.preRenderBitmap != null) s.preRenderBitmap.Dispose();
                 //Reassign the pre-rendered image
                 s.preRenderBitmap = FreeImage.GetBitmap(midway);
+                s.copyRect = new RectangleF(0, 0, s.preRenderBitmap.Width, s.preRenderBitmap.Height);
                 FreeImage.UnloadEx(ref midway);
                 s.preRenderBitmap.MakeTransparent();
 

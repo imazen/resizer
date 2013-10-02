@@ -45,12 +45,10 @@ namespace ImageResizer.Plugins.SimpleFilters {
             Bitmap cropped = null;
             try{
                 //Make sure cropping is applied, and use existing prerendered bitmap if present.
-                if (s.preRenderBitmap != null) cropped = s.preRenderBitmap;
-                else if (s.copyRect.X != 0 || s.copyRect.Y != 0 || s.copyRect.Width != s.originalSize.Width || s.copyRect.Height != s.originalSize.Height){
-                    cropped = s.sourceBitmap.Clone(s.copyRect, PixelFormat.Format32bppArgb);
-                }else{
-                    cropped = s.sourceBitmap;
-                }
+                s.ApplyCropping();
+
+                cropped = s.preRenderBitmap ?? s.sourceBitmap;
+               
                 s.preRenderBitmap = new Bitmap(cropped.Width,cropped.Height, PixelFormat.Format32bppArgb);
 
                 int[] radius = new int[4];
