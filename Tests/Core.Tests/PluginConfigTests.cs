@@ -86,7 +86,7 @@ namespace ImageResizer.Tests {
         public void GetPluginsByType(string startingXML, Type kind, int expectedCount) {
             PluginConfig pc = new Config(new ResizerSection("<resizer><plugins>" + startingXML + "</plugins></resizer>")).Plugins;
             pc.RemoveAll();
-            pc.LoadPlugins(); //Then load from xml
+            pc.ForceLoadPlugins(); //Then load from xml
             Assert.AreEqual<int>(expectedCount, pc.GetPlugins(kind).Count);
         }
     }
