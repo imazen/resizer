@@ -10,7 +10,7 @@ using System.Text;
 
 namespace ImageResizer
 {
-    private class ImageUploadHelper
+    public class ImageUploadHelper
     {
         Config c;
         public ImageUploadHelper(Config c)
@@ -187,7 +187,7 @@ namespace ImageResizer
         /// <returns></returns>
         public string GenerateSafeImageName(Stream image = null, string originalPath = null, string unrecognizedImageExtension = ".unknown", string[] whitelistedFormats = null)
         {   
-            var ext = (GetWhitelistedExtension(image,originalPath,whitelistedFormats) ?? unrecognizedImageExtension;
+            var ext = GetWhitelistedExtension(image,originalPath,whitelistedFormats) ?? unrecognizedImageExtension;
             if (ext == null) throw new ArgumentException("The provided image type is not recognized as a whitelisted format");
             return Guid.NewGuid().ToString("N", NumberFormatInfo.InvariantInfo) + ext;
         }
