@@ -48,26 +48,16 @@ namespace ImageResizer.Plugins.AdvancedFilters {
 
         }
 
-        protected override RequestedAction PreRenderImage(ImageState s) {
+        protected override RequestedAction PreRenderImage(ImageState s)
+        {
             if (s.sourceBitmap == null) return RequestedAction.None;
             if (!s.settings.WasOneSpecified("a.featheredges")) return RequestedAction.None;
 
+            s.ApplyCropping();
+            s.EnsureRGBA();
+            s.EnsurePreRenderBitmap();
+            ApplyPreFiltersTo(ref s.preRenderBitmap, s);
 
-            Bitmap cropped = null;
-            try {
-                //Make sure cropping is applied, and use existing prerendered bitmap if present.
-                if (s.preRenderBitmap != null) cropped = s.preRenderBitmap;
-                else if (s.copyRect.X != 0 || s.copyRect.Y != 0 || s.copyRect.Width != s.originalSize.Width || s.copyRect.Height != s.originalSize.Height || s.sourceBitmap.PixelFormat != PixelFormat.Format32bppArgb) {
-                    cropped = s.sourceBitmap.Clone(s.copyRect, PixelFormat.Format32bppArgb);
-                } else {
-                    cropped = s.sourceBitmap;
-                }
-                ApplyPreFiltersTo(ref cropped, s);
-                s.preRenderBitmap = cropped;
-
-            } finally {
-                if (cropped != null & cropped != s.sourceBitmap && cropped != s.preRenderBitmap) cropped.Dispose();
-            }
             return RequestedAction.None;
         }
 

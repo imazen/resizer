@@ -93,6 +93,9 @@ namespace ImageResizer.Plugins.SeamCarving {
             //Skip this when we are doing simulations
             if (s.destGraphics == null) return RequestedAction.None;
 
+            s.ApplyCropping();
+            s.EnsurePreRenderBitmap();
+
             //Parse carve algorithm kind
             FilterType ftype = s.settings.Get<FilterType>("carve", FilterType.None);
             if ("true".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase)) ftype = FilterType.Prewitt;
