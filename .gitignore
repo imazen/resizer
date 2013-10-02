@@ -21,3 +21,4 @@ _ReSharper*
 *App_Data/cair.exe
 *App_Data/pthreadVSE2.dll
 /packages/
+/Tests/packages/
