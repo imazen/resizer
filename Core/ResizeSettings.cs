@@ -30,6 +30,7 @@ namespace ImageResizer {
         public ResizeSettings(NameValueCollection col) : base(col) { }
         /// <summary>
         /// Parses the specified querystring into name/value pairs. leading ? not required.
+        /// Discards everything after the first '#' character as a URL fragment.
         /// </summary>
         /// <param name="queryString"></param>
         public ResizeSettings(string queryString) : base(PathUtils.ParseQueryStringFriendlyAllowSemicolons(queryString)) { }

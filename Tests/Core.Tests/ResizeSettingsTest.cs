@@ -5,6 +5,9 @@ using System.Text;
 using Gallio.Framework;
 using MbUnit.Framework;
 using MbUnit.Framework.ContractVerifiers;
+using System.Drawing;
+using ImageResizer.Util;
+using System.Web;
 
 namespace ImageResizer.Core.Tests {
     [TestFixture]
@@ -37,10 +40,20 @@ namespace ImageResizer.Core.Tests {
         [Row("#fefefecc", "fefefecc")]
         [Row("gggaeee", "transparent")]
         public void TestBgColor(string from, string to) {
-            ResizeSettings s = new ResizeSettings("bgcolor=" + from);
+            ResizeSettings s = new ResizeSettings("bgcolor=" + HttpUtility.UrlEncode(from));
             s.BackgroundColor = s.BackgroundColor;
             Assert.AreEqual(to, s["bgcolor"], StringComparison.OrdinalIgnoreCase);
             
+        }
+
+        [Test]
+        [Row("red", "red")]
+        [Row("#44550099", "44550099")]
+        [Row("#fefefecc", "fefefecc")]
+        public void TestRoundTripColor(string from, string expected)
+        {
+            Color? parsed = ParseUtils.ParseColor(from).Value;
+            Assert.AreEqual(expected, ParseUtils.SerializeColor(parsed.Value), StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }
