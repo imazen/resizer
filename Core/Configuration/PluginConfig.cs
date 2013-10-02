@@ -61,6 +61,17 @@ namespace ImageResizer.Configuration {
             }
         }
         /// <summary>
+        /// Forces loading of the plugins specified in configuration, even if they have already been loaded. Will add duplicate plugins and throw exceptions if you do not call RemoveAll() first.
+        /// </summary>
+        public void ForceLoadPlugins()
+        {
+            lock (_loadPluginsSync)
+            {
+                loadPluginsInternal();
+                _pluginsLoaded = true;
+            }
+        }
+        /// <summary>
         /// Returns true if the &lt;plugins&gt; section has been processed
         /// </summary>
         public bool PluginsLoaded {
