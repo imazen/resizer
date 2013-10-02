@@ -69,6 +69,109 @@ namespace ImageResizer.Resizing {
         /// An optional intermediate bitmap, created by plugins who need to process the source bitmap it gets rendered to destBitmap. If defined, it should be used instead of sourceBitmap during RenderImage(), and disposed immediately after use.
         /// </summary>
         public Bitmap preRenderBitmap;
+
+        /// <summary>
+        /// If 'sourceBitmap' is CMYK and `preRenderBitmap` is null, converts `sourceBitmap` to RGB and stores in 'preRenderBitmap'
+        /// </summary>
+        public void ConvertIfCMYK(){
+             if (preRenderBitmap == null && GetColorFormat(sourceBitmap) == ImageColorFormat.Cmyk) {
+                //For CMYK images, we must use DrawImage instead.
+                preRenderBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height, PixelFormat.Format24bppRgb);
+                using (var g = Graphics.FromImage(preRenderBitmap)) {
+                    g.DrawImageUnscaled(sourceBitmap, 0, 0);
+                }
+             }
+        }
+        
+        /// <summary>
+        /// Clones 'sourceBitmap' into 'preRenderBitmap' if null.
+        /// </summary>
+        public void EnsurePreRenderBitmap(){
+            ConvertIfCMYK();
+            if (preRenderBitmap == null){
+                preRenderBitmap = sourceBitmap.Clone(new Rectangle(new Point(0, 0), sourceBitmap.Size), sourceBitmap.PixelFormat == PixelFormat.Format24bppRgb ? PixelFormat.Format24bppRgb : PixelFormat.Format32bppArgb);
+            }
+        }
+
+        /// <summary>
+        /// Applies copyRect (if it will have any effect), placing the result in preRenderBitmap, and resetting copyRect
+        /// </summary>
+        public void ApplyCropping(){
+            ConvertIfCMYK();
+            var latest = preRenderBitmap ?? sourceBitmap;
+            if (latest == null || copyRect.IsEmpty) return;
+            if (copyRect.X == 0 && copyRect.Y == 0 && copyRect.Width == latest.Width && copyRect.Height == latest.Height) return;
+            try{
+                preRenderBitmap = latest.Clone(copyRect, PixelFormat.Format32bppArgb);
+                copyRect = new RectangleF(0, 0, preRenderBitmap.Width, preRenderBitmap.Height);
+            }finally{
+                if (latest != sourceBitmap)
+                {
+                    latest.Dispose();
+                }
+            }
+
+        }
+        /// <summary>
+        /// Ensures that the working bitmap is in 32bpp RGBA format - otherwise it is converted.
+        /// </summary>
+        public void EnsureRGBA()
+        {
+            ConvertIfCMYK();
+            var latest = preRenderBitmap ?? sourceBitmap;
+            if (latest.PixelFormat != PixelFormat.Format32bppArgb){
+                try{
+                    preRenderBitmap = latest.Clone(new Rectangle(new Point(0, 0), latest.Size), PixelFormat.Format32bppArgb);
+                } finally{
+                    if (latest != sourceBitmap) latest.Dispose();
+                }
+            }
+        }
+        private enum ImageColorFormat {
+            Rgb,
+            Cmyk,
+            Indexed,
+            Grayscale
+        }
+
+
+        private ImageColorFormat GetColorFormat(Bitmap bitmap)
+        {
+            const int pixelFormatIndexed = 0x00010000;
+            const int pixelFormat32bppCMYK = 0x200F;
+            const int pixelFormat16bppGrayScale = (4 | (16 << 8));
+
+            // Check image flags
+            var flags = (ImageFlags)bitmap.Flags;
+            if ((flags & ImageFlags.ColorSpaceCmyk) > 0 || (flags & (ImageFlags.ColorSpaceYcck)) > 0)
+            {
+                return ImageColorFormat.Cmyk;
+            }
+            else if ((flags & ImageFlags.ColorSpaceGray) > 0)
+            {
+                return ImageColorFormat.Grayscale;
+            }
+
+            // Check pixel format
+            var pixelFormat = (int)bitmap.PixelFormat;
+            if (pixelFormat == pixelFormat32bppCMYK)
+            {
+                return ImageColorFormat.Cmyk;
+            }
+            else if ((pixelFormat & pixelFormatIndexed) != 0)
+            {
+                return ImageColorFormat.Indexed;
+            }
+            else if (pixelFormat == pixelFormat16bppGrayScale)
+            {
+                return ImageColorFormat.Grayscale;
+            }
+
+            // Default to RGB
+            return ImageColorFormat.Rgb;
+        }
+
+
         /// <summary>
         /// The destination bitmap.  If null, skip drawing commands, but continue layout logic.
         /// </summary>
