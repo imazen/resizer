@@ -235,7 +235,7 @@ namespace ImageResizer.Configuration {
         /// Processing may still not occur if no querystring values are specified. Add 'cache=always' to force caching to occur.
         /// </summary>
         public bool SkipFileTypeCheck {
-            get { return HttpContext.Current.Items[SkipFileTypeCheckKey] != null && (bool)HttpContext.Current.Items[SkipFileTypeCheckKey]; }
+            get { return HttpContext.Current != null && HttpContext.Current.Items[SkipFileTypeCheckKey] != null && (bool)HttpContext.Current.Items[SkipFileTypeCheckKey]; }
             set { HttpContext.Current.Items[SkipFileTypeCheckKey] = value; }
         }
 
