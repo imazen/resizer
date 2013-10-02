@@ -70,7 +70,7 @@ namespace ImageResizer {
         /// <param name="col"></param>
         public Instructions(NameValueCollection col) : base(col) { }
         /// <summary>
-        /// Parses the specified querystring into name/value pairs. Supports standard and semicolon syntaxes. The most readable format is 'key=value;key2=value2'
+        /// Parses the specified querystring into name/value pairs. Supports standard and semicolon syntaxes. The most readable format is 'key=value;key2=value2' Discards everything after the first '#' character as a URL fragment.
         /// </summary>
         /// <param name="queryString"></param>
         public Instructions(string queryString) : base(PathUtils.ParseQueryStringFriendlyAllowSemicolons(queryString)) { }
