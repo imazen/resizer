@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Name>ImageResizer.TestFSharp</Name>
     <TargetFSharpCoreVersion>4.3.0.0</TargetFSharpCoreVersion>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,27 +39,28 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="FsUnit.CustomMatchers">
-      <HintPath>..\packages\FsUnit.xUnit.1.2.1.2\Lib\Net40\FsUnit.CustomMatchers.dll</HintPath>
+      <HintPath>..\..\Packages\FsUnit.xUnit.1.2.1.2\Lib\Net40\FsUnit.CustomMatchers.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="FsUnit.Xunit">
-      <HintPath>..\packages\FsUnit.xUnit.1.2.1.2\Lib\Net40\FsUnit.Xunit.dll</HintPath>
+      <HintPath>..\..\Packages\FsUnit.xUnit.1.2.1.2\Lib\Net40\FsUnit.Xunit.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="NHamcrest">
-      <HintPath>..\packages\FsUnit.xUnit.1.2.1.2\Lib\Net40\NHamcrest.dll</HintPath>
+      <HintPath>..\..\Packages\FsUnit.xUnit.1.2.1.2\Lib\Net40\NHamcrest.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
-    <Reference Include="xunit, Version=1.9.1.1600, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c">
+    <Reference Include="xunit">
+      <HintPath>..\..\Packages\xunit.1.9.1\lib\net20\xunit.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="xunit.extensions">
-      <HintPath>..\packages\xunit.extensions.1.9.1\lib\net20\xunit.extensions.dll</HintPath>
+      <HintPath>..\..\Packages\xunit.extensions.1.9.1\lib\net20\xunit.extensions.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -91,6 +94,7 @@
     </Otherwise>
   </Choose>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
