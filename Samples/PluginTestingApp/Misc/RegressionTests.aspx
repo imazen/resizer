@@ -84,7 +84,7 @@
         <h2>Testing signed URLs</h2>
     <img src='<%=ImageResizer.Plugins.RemoteReader.RemoteReaderPlugin.Current.CreateSignedUrl("http://farm7.static.flickr.com/6021/5959854178_1c2ec6bd77_b.jpg","width=300") %>' />
     <h2>Testing human-friendly URLs and animated gif compatibility with RemoteReaderPlugin</h2>
-    <img id="Img1" src="~/remote/images.imageresizing.net/2_computers.gif?width=50" runat="server" />
+    <img id="Img1" src="~/remote/img.imageresizing.net/2_computers.gif?width=50" runat="server" />
 
     </div>
     
