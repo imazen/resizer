@@ -122,6 +122,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.AzureR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.S3Reader2", "Plugins\S3Reader2\ImageResizer.Plugins.S3Reader2.csproj", "{AC318404-15F2-4187-A7B1-AFE4E2798DE6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.UploadHelper", "Plugins\UploadHelper\ImageResizer.Plugins.UploadHelper.csproj", "{67F0982D-5851-4D3B-B29D-40B6760879DC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1161,6 +1163,24 @@ Global
 		{AC318404-15F2-4187-A7B1-AFE4E2798DE6}.Trial|Mixed Platforms.Build.0 = Trial|Any CPU
 		{AC318404-15F2-4187-A7B1-AFE4E2798DE6}.Trial|x64.ActiveCfg = Trial|Any CPU
 		{AC318404-15F2-4187-A7B1-AFE4E2798DE6}.Trial|x86.ActiveCfg = Trial|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Release|x64.ActiveCfg = Release|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Release|x86.ActiveCfg = Release|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Trial|x64.ActiveCfg = Release|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

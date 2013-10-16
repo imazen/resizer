@@ -72,7 +72,6 @@
     <Compile Include="BoxEdges.cs" />
     <Compile Include="Collections\QuerystringBase.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
-    <Compile Include="ImageUploadHelper.cs" />
     <Compile Include="Plugins\FileSignature.cs" />
     <Compile Include="Plugins\IFileSignatureProvider.cs" />
     <Compile Include="Configuration\Issues\ConfigChecker.cs" />
