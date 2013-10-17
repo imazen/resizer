@@ -25,7 +25,7 @@ namespace BuildTools {
         /// </summary>
         public static string DevenvPath{
             get{
-                string toolsDir = (Environment.GetEnvironmentVariable("VS100COMNTOOLS") ?? Environment.GetEnvironmentVariable("VS110COMNTOOLS")).TrimEnd('\\','/');
+                string toolsDir = (Environment.GetEnvironmentVariable("VS100COMNTOOLS") ?? Environment.GetEnvironmentVariable("VS110COMNTOOLS") ?? Environment.GetEnvironmentVariable("VS120COMNTOOLS")).TrimEnd('\\', '/');
                 return Path.Combine(Path.Combine(Path.GetDirectoryName(toolsDir),"IDE"), "devenv.exe");
 
             }
