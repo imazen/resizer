@@ -150,33 +150,42 @@ namespace ImageResizer.ReleaseBuilder {
 
             bool isMakingNugetPackage = false;
 
-            if (ask("Create or upload any NuGet packages?")) {
+            if (ask("Create or upload NuGet packages?")) {
 
-                say("For each nuget package, specify all operations to perform, then press enter. ");
-                say("(c (create and overwrite), u (upload to nuget.org)");
                 foreach (NPackageDescriptor desc in npackages) {
-
                     desc.VariableSubstitutions = GetNugetVariables();
                     desc.VariableSubstitutions["version"] = nugetVer;
-
                     desc.Version = nugetVer;
-
                     desc.OutputDirectory = Path.Combine(Path.Combine(f.ParentPath, "Releases", "nuget-packages"));
-                    string opts = "";
 
-                    ConsoleColor original = Console.ForegroundColor;
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    if (desc.PackageExists) say(Path.GetFileName(desc.PackagePath) + " exists");
-                    if (desc.SymbolPackageExists) say(Path.GetFileName(desc.SymbolPackagePath) + " exists");
-                    Console.ForegroundColor = original;
-
-                    Console.Write(desc.BaseName + " (" + opts + "):");
-                    opts = Console.ReadLine().Trim();
-
-                    desc.Options = opts;
-                    if (desc.Build) isMakingNugetPackage = true;
+                    say(Path.GetFileName(desc.PackagePath) + (desc.PackageExists ?  " exists" : " not found"), desc.PackageExists ? ConsoleColor.Green : ConsoleColor.Gray);
+                    say(Path.GetFileName(desc.SymbolPackagePath) + (desc.SymbolPackageExists ? " exists" : " not found"), desc.SymbolPackageExists ? ConsoleColor.Green : (desc.PackageExists ? ConsoleColor.Red : ConsoleColor.Gray));
 
                 }
+
+
+                say("What should we do with these packages? Enter multiple options like 'ou' ");
+                say("r (create missing packages), c (overwrite all packages), u (upload all packages to nuget.org), i (enter interactive mode - choose per package), s (skip)");
+
+                string selection = Console.ReadLine().Trim().ToLowerInvariant();
+                bool interactive = selection.IndexOf('i') > -1;
+                if (interactive) selection = selection.Replace("i","");
+
+                //Set the default for every package
+                foreach (NPackageDescriptor desc in npackages) desc.Options = selection;
+
+                //Let the user pick per package
+                if (interactive)
+                {
+                    foreach (NPackageDescriptor desc in npackages)
+                    {
+                        Console.Write(desc.BaseName + " (" + desc.Options + "):");
+                        desc.Options = Console.ReadLine().Trim().ToLowerInvariant();
+                    }
+                }
+
+                isMakingNugetPackage = npackages.Any(desc => desc.Build);
+
             }
 
             var cs = new CredentialStore();
