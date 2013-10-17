@@ -61,6 +61,14 @@ namespace BuildTools {
         /// <param name="text"></param>
         public void say(string text) { Console.WriteLine(text); }
 
+        public void say(string text, ConsoleColor color) {
+            ConsoleColor original = Console.ForegroundColor;
+            Console.ForegroundColor =color; 
+            Console.WriteLine(text);
+            Console.ForegroundColor = original;
+        }
+
+
         public void PromptDeleteBatch(string message, string[] paths) {
             List<string> exist = new List<string>();
             foreach (string s in paths)
