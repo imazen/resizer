@@ -118,7 +118,9 @@ namespace BuildTools {
             return packages;
         }
 
-        public bool Build { get { return options.IndexOf("c", StringComparison.OrdinalIgnoreCase) > -1 || options.IndexOf("b", StringComparison.OrdinalIgnoreCase) > -1; } }
+
+        public bool BuildIfMissing { get { return options.IndexOf("r", StringComparison.OrdinalIgnoreCase) > -1; } }
+        public bool Build { get { return options.IndexOf("c", StringComparison.OrdinalIgnoreCase) > -1 || (BuildIfMissing && (!this.PackageExists || !this.SymbolPackageExists)); } }
         public bool Upload { get { return options.IndexOf("u", StringComparison.OrdinalIgnoreCase) > -1; } }
         public bool Skip { get { return options.IndexOf("s", StringComparison.OrdinalIgnoreCase) > -1; } }
 
