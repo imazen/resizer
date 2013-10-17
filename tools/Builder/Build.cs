@@ -158,6 +158,8 @@ namespace ImageResizer.ReleaseBuilder {
                     desc.Version = nugetVer;
                     desc.OutputDirectory = Path.Combine(Path.Combine(f.ParentPath, "Releases", "nuget-packages"));
 
+                    if (!Directory.Exists(desc.OutputDirectory)) Directory.CreateDirectory(desc.OutputDirectory);
+
                     say(Path.GetFileName(desc.PackagePath) + (desc.PackageExists ?  " exists" : " not found"), desc.PackageExists ? ConsoleColor.Green : ConsoleColor.Gray);
                     say(Path.GetFileName(desc.SymbolPackagePath) + (desc.SymbolPackageExists ? " exists" : " not found"), desc.SymbolPackageExists ? ConsoleColor.Green : (desc.PackageExists ? ConsoleColor.Red : ConsoleColor.Gray));
 
