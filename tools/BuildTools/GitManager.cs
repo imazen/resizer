@@ -23,7 +23,7 @@ namespace BuildTools {
             //"ProgramFiles", "ProgramFiles(x86)","ProgramW6432"
             string[] vars = new string[] { "ProgramFiles", "ProgramFiles(x86)", "ProgramW6432" };
             foreach (string v in vars) {
-                string[] subfolders = new string[] { @"\Git\bin", @"\SmartGitHg 4.5\git\bin", @"\SmartGitHg 4\git\bin" };
+                string[] subfolders = new string[] { @"\Git\bin", @"\SmartGitHg 4.5\git\bin", @"\SmartGitHg 4.6\git\bin", @"\SmartGitHg 4\git\bin" };
 
                 foreach (string subfolder in subfolders)
                 {
