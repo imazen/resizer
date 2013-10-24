@@ -194,10 +194,20 @@ namespace ImageResizer.Plugins.RemoteReader {
                 string hmac = query[HmacKey];
                 query.Remove(Base64UrlKey);
                 query.Remove(HmacKey);
-                if (!SignData(data).Equals(hmac))
+                if (String.IsNullOrEmpty(hmac))
+                {
+                    args.SignedRequest = false;
+                    args.DenyRequest = true;
+                }
+                else if (SignData(data).Equals(hmac))
+                {
+                    args.SignedRequest = true;
+                }
+                else
+                {
                     throw new ImageProcessingException("Invalid request! This request was not properly signed, or has been tampered with since transmission.");
+                }
                 args.RemoteUrl = PathUtils.FromBase64UToString(data);
-                args.SignedRequest = true;
             } else {
                 args.RemoteUrl = "http://" + ReplaceInLeadingSegment(virtualPath.Substring(remotePrefix.Length).TrimStart('/', '\\'), "_", ".");
                 args.RemoteUrl = Uri.EscapeUriString(args.RemoteUrl);
