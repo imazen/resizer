@@ -120,21 +120,37 @@ namespace ImageResizer.Plugins.Wic {
         [DllImport("WindowsCodecs.dll", EntryPoint = "IWICImagingFactory_CreateBitmapFromMemory_Proxy")]
         internal static extern int CreateBitmapFromMemory(IWICComponentFactory factory, uint width, uint height, ref Guid pixelFormatGuid, uint stride, uint cbBufferSize, IntPtr pvPixels, out IWICBitmap ppIBitmap);
 
-
         public static IWICBitmap ToWic(IWICComponentFactory factory, Bitmap bit) {
             Guid pixelFormat = ConversionUtils.FromPixelFormat(bit.PixelFormat);
             if (pixelFormat == Guid.Empty) throw new NotSupportedException("PixelFormat " + bit.PixelFormat.ToString() + " not supported.");
             BitmapData bd = bit.LockBits(new Rectangle(0, 0, bit.Width, bit.Height), ImageLockMode.ReadOnly, bit.PixelFormat);
             IWICBitmap b = null;
+            IWICPalette p = null;
+            
             try {
                     //Create WIC bitmap directly from unmanaged memory
                 long result = CreateBitmapFromMemory(factory, (uint)bit.Width, (uint)bit.Height, ref pixelFormat, (uint)bd.Stride, (uint)(bd.Stride * bd.Height), bd.Scan0, out b);
                 //b = factory.CreateBitmapFromMemory((uint)bit.Width, (uint)bit.Height, ConversionUtils.FromPixelFormat(bit.PixelFormat), (uint)bd.Stride, (uint)(bd.Stride * bd.Height), bd.Scan0);
                 if (result == 0x80070057) throw new ArgumentException();
                 if (result < 0) throw new Exception("HRESULT " + result);
+
+                //Copy the bitmap palette if it exists
+                var sPalette = bit.Palette;
+                if (sPalette.Entries.Length > 0)
+                {
+                    p = factory.CreatePalette();
+                    uint[] colors = new uint[sPalette.Entries.Length];
+                    for (int i = 0; i < sPalette.Entries.Length; i++) {
+                        colors[i] = (uint)(((sPalette.Entries[i].A << 24) | (sPalette.Entries[i].R << 16) | (sPalette.Entries[i].G << 8) | sPalette.Entries[i].B) & 0xffffffffL);
+                    }
+                    p.InitializeCustom(colors, (uint)colors.Length);
+                    b.SetPalette(p);
+                }
+
                 return b;
             } finally {
                 bit.UnlockBits(bd);
+                if(p != null) Marshal.ReleaseComObject(p);
             }
         }
 
