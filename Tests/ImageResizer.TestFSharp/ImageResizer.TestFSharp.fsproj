@@ -70,6 +70,7 @@
     <Compile Include="RegressionTests.fs" />
     <EmbeddedResource Include="800x600white.png" />
     <None Include="packages.config" />
+    <Compile Include="PolygonMath.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
