@@ -9,6 +9,8 @@ namespace ImageResizer {
 
     public class ImageJob {
         public ImageJob() {
+            this.RequestedInfo = new List<string>();
+            this.ResultInfo = new Dictionary<string, object>();
         }
 
         public ImageJob(object source, object dest, Instructions instructions)
