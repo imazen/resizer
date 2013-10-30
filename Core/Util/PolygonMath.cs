@@ -743,7 +743,7 @@ namespace ImageResizer.Util
             for (int i = 0; i < c.Length; i++) {
                 bool xvalue = i % 2 == 0;
                 if (xvalue && xunits != 0) c[i] *= (imageSize.Width / xunits);
-                if (!xvalue && xunits != 0) c[i] *= (imageSize.Height / yunits);
+                if (!xvalue && yunits != 0) c[i] *= (imageSize.Height / yunits);
 
                 //Prohibit values larger than imageSize
                 if (xvalue && c[i] > imageSize.Width) c[i] = imageSize.Width;
