@@ -6,12 +6,9 @@ using ImageResizer.Configuration;
 using ImageResizer.Plugins.PrettyGifs;
 using ImageResizer;
 using System.Diagnostics;
-using ImageResizer.Plugins.FreeImageBuilder;
 using ImageResizer.Util;
 using System.IO;
-using ImageResizer.Plugins.FreeImageDecoder;
 using System.Drawing;
-using ImageResizer.Plugins.FreeImageEncoder;
 using ImageResizer.Plugins.Basic;
 using ImageResizer.Plugins.Watermark;
 
