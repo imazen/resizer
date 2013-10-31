@@ -93,10 +93,6 @@
       <Project>{D97EA32A-0845-4E00-9C4D-68C5B93A1869}</Project>
       <Name>ImageResizer.Plugins.AnimatedGifs</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\FreeImage\ImageResizer.Plugins.FreeImage.csproj">
-      <Project>{8E863AFE-B4CF-46AA-8382-0C3547C0EDE9}</Project>
-      <Name>ImageResizer.Plugins.FreeImage</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\PrettyGifs\ImageResizer.Plugins.PrettyGifs.csproj">
       <Project>{BB8EEB97-6550-4780-97B2-B0F2FCD80970}</Project>
       <Name>ImageResizer.Plugins.PrettyGifs</Name>
