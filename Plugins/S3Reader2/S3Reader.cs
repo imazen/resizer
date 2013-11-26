@@ -19,22 +19,26 @@ namespace ImageResizer.Plugins.S3Reader2 {
         string buckets, vpath;
         bool includeModifiedDate = false;
         bool asVpp = false;
+        AmazonS3Config s3config = null;
         public S3Reader2(NameValueCollection args ) {
 
-            var S3Config = new AmazonS3Config();
+            s3config = new AmazonS3Config();
 
             buckets = args["buckets"];
             vpath = args["prefix"];
 
             asVpp = NameValueCollectionExtensions.Get(args, "vpp", true);
 
-            S3Config.UseHttp = !NameValueCollectionExtensions.Get(args, "useSsl", false);
+            Region = args["region"] ?? "us-east-1";
+
+
+            s3config.UseHttp = !NameValueCollectionExtensions.Get(args, "useSsl", false);
 
             if (!string.IsNullOrEmpty(args["accessKeyId"]) && !string.IsNullOrEmpty(args["secretAccessKey"])) {
-                S3Client = new AmazonS3Client(args["accessKeyId"], args["secretAccessKey"], S3Config);
+                S3Client = new AmazonS3Client(args["accessKeyId"], args["secretAccessKey"], s3config);
             } else {
 
-                S3Client = new AmazonS3Client(null,S3Config);
+                S3Client = new AmazonS3Client(null, s3config);
             }
 
             includeModifiedDate = NameValueCollectionExtensions.Get(args, "includeModifiedDate", includeModifiedDate);
@@ -62,6 +66,14 @@ namespace ImageResizer.Plugins.S3Reader2 {
         public AmazonS3Client S3Client { get; set; }
 
 
+        public string Region
+        {
+            get { return this.s3config != null && this.s3config.RegionEndpoint != null ? this.s3config.RegionEndpoint.SystemName : null; }
+            set
+            {
+                this.s3config.RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(value);
+            }
+        }
 
         private bool _requireImageExtension = true;
         /// <summary>
@@ -115,16 +127,12 @@ namespace ImageResizer.Plugins.S3Reader2 {
                 bucketArray[i] = bucketArray[i].Trim();
 
 
-            vpp = new S3VirtualPathProvider(delegate(S3VirtualPathProvider s, S3PathEventArgs ev) {
+            vpp = new S3VirtualPathProvider(this.S3Client, vpath,TimeSpan.MaxValue, new TimeSpan(0, 1, 0, 0),  delegate(S3VirtualPathProvider s, S3PathEventArgs ev) {
                 if (bucketArray == null) ev.ThrowException();
                 ev.AssertBucketMatches(bucketArray);
             }, !includeModifiedDate);
 
             
-            vpp.S3Client = S3Client;
-
-            vpp.VirtualFilesystemPrefix = vpath;
-           // vpp.MetadataAbsoluteExpiration
 
 
             c.Pipeline.PostAuthorizeRequestStart += delegate(IHttpModule sender2, HttpContext context) {
