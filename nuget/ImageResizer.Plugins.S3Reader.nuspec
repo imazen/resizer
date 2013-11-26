@@ -23,7 +23,7 @@ $plugins$</description>
 		<tags>ImageResizer S3Reader Amazon Cloud Imazen Resizer imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
-		  <dependency id="AWSSDK"/>
+		  <dependency id="AWSSDK" version="(,2.0)" />
 		</dependencies>
 	</metadata>
   	<files>
