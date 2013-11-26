@@ -44,9 +44,9 @@
     <DocumentationFile>..\..\dlls\trial\ImageResizer.Plugins.S3Reader2.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AWSSDK, Version=2.0.0.3, Culture=neutral, PublicKeyToken=9f476d3089b52be3, processorArchitecture=MSIL">
+    <Reference Include="AWSSDK, Version=2.0.2.3, Culture=neutral, PublicKeyToken=9f476d3089b52be3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\AWSSDK.2.0.0.3-beta\lib\net35\AWSSDK.dll</HintPath>
+      <HintPath>..\..\Packages\AWSSDK.2.0.2.3\lib\net35\AWSSDK.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Web" />

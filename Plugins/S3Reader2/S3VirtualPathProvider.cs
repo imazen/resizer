@@ -117,20 +117,7 @@ namespace ImageResizer.Plugins.S3Reader2
             this.FastMode = fastMode;
         }
 
-        /// <summary>
-        /// Default settings: CommunicationProtocol=HTTP, VirtualFileSystemPrefix = "~/s3", SlidingExpiration = 1h, AbsoluteExpiration = maxvalue
-        /// No bucket filtering is performed, so any amazon-hosted bucket can be accessed through this provider unless you add a bucket filter.
-        /// </summary>
-        /// <param name="bucketFilterCallback">You should validate that the requested bucket is your own. If you only want one bucket, just prefix your bucket to the path.</param>
-        /// <param name="fastMode">If true, existence of bucket and key is assumed as long as prefix is present. Also, no modified date information is provided to the image resizer, so the cache never gets updated. Requires 1 request instead of 2 to download the image.</param>
-        public S3VirtualPathProvider(RewriteBucketAndKeyPath bucketFilterCallback, Boolean fastMode)
-            : base()
-        {
-            this.s3Client = new AmazonS3Client(null,new AmazonS3Config() { UseHttp = true });
-            this.PreS3RequestFilter += bucketFilterCallback;
-            this.FastMode = fastMode;
-        }
-  
+
         protected override void Initialize()
         {
 
