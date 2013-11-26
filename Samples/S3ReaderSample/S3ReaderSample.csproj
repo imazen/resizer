@@ -46,9 +46,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AWSSDK, Version=2.0.0.3, Culture=neutral, PublicKeyToken=9f476d3089b52be3, processorArchitecture=MSIL">
+    <Reference Include="AWSSDK, Version=2.0.2.3, Culture=neutral, PublicKeyToken=9f476d3089b52be3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\AWSSDK.2.0.0.3-beta\lib\net35\AWSSDK.dll</HintPath>
+      <HintPath>..\..\Packages\AWSSDK.2.0.2.3\lib\net35\AWSSDK.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -93,9 +93,9 @@
       <Project>{c3b00cd1-39ee-4ba8-bdc0-02e346f20694}</Project>
       <Name>ImageResizer.Plugins.DiskCache</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\S3Reader\ImageResizer.Plugins.S3Reader.csproj">
-      <Project>{A3B6F984-D500-40F1-B836-C02B46FCF14D}</Project>
-      <Name>ImageResizer.Plugins.S3Reader</Name>
+    <ProjectReference Include="..\..\Plugins\S3Reader2\ImageResizer.Plugins.S3Reader2.csproj">
+      <Project>{ac318404-15f2-4187-a7b1-afe4e2798de6}</Project>
+      <Name>ImageResizer.Plugins.S3Reader2</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\UploadHelper\ImageResizer.Plugins.UploadHelper.csproj">
       <Project>{67f0982d-5851-4d3b-b29d-40b6760879dc}</Project>
