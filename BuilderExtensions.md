@@ -42,6 +42,12 @@ their respective image types.
 <span style="color:red">**_Why is the `DecodeStream()` override not
 sufficient?  Why does this appear to get handled twice?_**</span>
 
+Some parsers only tell you that they can't handle a format by throwing an exception. However, if we tell the plugins to not throw exceptions, we won't get any feedback about other categories of problems.
+
+Thus, DecodeStream lets the first appropriate parser take a stab at the problem. The exception is later re-thrown if DecodeStreamFailed can't produce an alternate, working parser.
+
+DecodeStreamFailed indicates that file parsers should *not* throw any exceptions - they just pass control to the next plugin parser in the line.
+
 >### `public virtual Bitmap DecodeStream(Stream s, ResizeSettings settings, string optionalPath)`
 
 Called to decode an image `Stream` into a `Bitmap`.  The FreeImage, WIC,
