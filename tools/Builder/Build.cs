@@ -430,9 +430,9 @@ namespace ImageResizer.ReleaseBuilder {
         public void PrepareForPackaging() {
             if (q == null) q = new FsQuery(this.f.ParentPath, standardExclusions);
             //Don't copy XML or PDB files for the following libs:
-            q.exclusions.Add(new Pattern("/(Newtonsoft.Json|DotNetZip|Aforge|LitS3|Ionic|NLog|MongoDB)*.(xml|pdb)$"));
+            q.exclusions.Add(new Pattern("/(Newtonsoft.Json|DotNetZip|Aforge|LitS3|Ionic|NLog|MongoDB|Microsoft.|AWSSDK)*.(xml|pdb)$"));
             //Don't copy XML for these (but do keep pdb)
-            q.exclusions.Add(new Pattern("/(AWSSDK|OpenCvSharp|FreeImageNet|Microsoft.)*.xml$"));
+            q.exclusions.Add(new Pattern("/(OpenCvSharp|FreeImageNet)*.xml$"));
             //Exclude dependencies handled by NDP
             q.exclusions.Add(new Pattern("/(FreeImage|gsdll32|gsdll64).dll$")); 
             
