@@ -29,7 +29,7 @@ $plugins$
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.AzureReader.dll" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.AzureReader.xml" target="lib" />
+		<file src="$pluginsdlldir$\azure1\ImageResizer.Plugins.AzureReader.dll" target="lib" />
+		<file src="$pluginsdlldir$\azure1\ImageResizer.Plugins.AzureReader.xml" target="lib" />
 	</files>
 </package>

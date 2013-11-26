@@ -11,9 +11,9 @@
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.S3Reader.dll" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.S3Reader.pdb" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.S3Reader.xml" target="lib" />
+		<file src="$pluginsdlldir$\awssdk1\ImageResizer.Plugins.S3Reader.dll" target="lib" />
+		<file src="$pluginsdlldir$\awssdk1\ImageResizer.Plugins.S3Reader.pdb" target="lib" />
+		<file src="$pluginsdlldir$\awssdk1\ImageResizer.Plugins.S3Reader.xml" target="lib" />
 		<file src="..\Plugins\S3Reader\**\*.cs" target="src" />
 	</files>
 </package>
