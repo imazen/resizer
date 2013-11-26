@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.20827.3
+VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6BEFD728-E3C5-43CC-BA9E-292B7CA4429D}"
 	ProjectSection(SolutionItems) = preProject
@@ -123,6 +123,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.S3Reader2", "Plugins\S3Reader2\ImageResizer.Plugins.S3Reader2.csproj", "{AC318404-15F2-4187-A7B1-AFE4E2798DE6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.UploadHelper", "Plugins\UploadHelper\ImageResizer.Plugins.UploadHelper.csproj", "{67F0982D-5851-4D3B-B29D-40B6760879DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.AzureReader", "Plugins\AzureReader\ImageResizer.Plugins.AzureReader.csproj", "{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1181,6 +1183,24 @@ Global
 		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Trial|x64.ActiveCfg = Release|Any CPU
 		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Trial|x86.ActiveCfg = Release|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Release|x64.ActiveCfg = Release|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Release|x86.ActiveCfg = Release|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Trial|Any CPU.ActiveCfg = Trial|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Trial|Any CPU.Build.0 = Trial|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Trial|Mixed Platforms.ActiveCfg = Trial|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Trial|Mixed Platforms.Build.0 = Trial|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Trial|x64.ActiveCfg = Trial|Any CPU
+		{33D012BE-1B2A-4BFB-8C11-6B23ACC9AA7D}.Trial|x86.ActiveCfg = Trial|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

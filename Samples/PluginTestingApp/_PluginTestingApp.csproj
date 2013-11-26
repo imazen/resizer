@@ -219,10 +219,6 @@
       <Project>{ac318404-15f2-4187-a7b1-afe4e2798de6}</Project>
       <Name>ImageResizer.Plugins.S3Reader2</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\S3Reader\ImageResizer.Plugins.S3Reader.csproj">
-      <Project>{a3b6f984-d500-40f1-b836-c02b46fcf14d}</Project>
-      <Name>ImageResizer.Plugins.S3Reader</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\SeamCarving\ImageResizer.Plugins.SeamCarving.csproj">
       <Project>{7aefb877-a720-4929-880c-1090a71c83eb}</Project>
       <Name>ImageResizer.Plugins.SeamCarving</Name>
