@@ -10,7 +10,7 @@ namespace BuildTools {
     public class PackageDescriptor {
 
         public PackageDescriptor(string kind, PackageBuilder builder) {
-            this.path = path;
+   
             this.kind = kind;
             this.builder = builder;
         }
