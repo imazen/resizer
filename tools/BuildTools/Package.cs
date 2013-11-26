@@ -50,19 +50,44 @@ namespace BuildTools {
                 Console.WriteLine("No changes were made to the package");
                 return;
             }
-            z.Save();
+            z.ZipErrorAction = ZipErrorAction.InvokeErrorEvent;
+            z.ZipError += z_ZipError;
+            try
+            {
+                z.Save();
 
-            Console.WriteLine("Archive created successfully: " + z.Name);
-            Console.WriteLine((new FileInfo(z.Name).Length / 1024) + "k compressed.");
-            Console.WriteLine("Top 20 largest files (compressed)");
-            var bigFiles = z.Entries.OrderByDescending<ZipEntry, long>(delegate(ZipEntry e) { return e.CompressedSize; }).Take(20);
+                Console.WriteLine("Archive created successfully: " + z.Name);
+                Console.WriteLine((new FileInfo(z.Name).Length / 1024) + "k compressed.");
+                Console.WriteLine("Top 20 largest files (compressed)");
+                var bigFiles = z.Entries.OrderByDescending<ZipEntry, long>(delegate(ZipEntry e) { return e.CompressedSize; }).Take(20);
 
-            foreach (ZipEntry entry in bigFiles) {
-                Console.WriteLine((entry.CompressedSize / 1024) + "k " + entry.FileName);
+                foreach (ZipEntry entry in bigFiles)
+                {
+                    Console.WriteLine((entry.CompressedSize / 1024) + "k " + entry.FileName);
+                }
+
             }
+            finally
+            {
+                z.Dispose();
+            }
+        }
 
-            
-            z.Dispose();
+        void z_ZipError(object sender, ZipErrorEventArgs e)
+        {
+            Console.WriteLine("Error adding file " + e.FileName);
+            Console.WriteLine(e.Exception.Message);
+            Console.WriteLine("(s)kip, (r)etry, or (c)ancel?");
+            var key = Console.ReadKey();
+
+            if (key.Key == ConsoleKey.S)
+                e.CurrentEntry.ZipErrorAction = ZipErrorAction.Skip;
+            else if (key.Key == ConsoleKey.R)
+                e.CurrentEntry.ZipErrorAction = ZipErrorAction.Retry;
+            else if (key.Key == ConsoleKey.C)
+            {
+                e.CurrentEntry.ZipErrorAction = ZipErrorAction.Throw;
+            }
         }
     }
 }
