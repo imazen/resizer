@@ -342,8 +342,10 @@ implementation flushes the destination `Graphics` object and calls
 
 >### `protected virtual RequestedAction ProcessFinalBitmap(ImageState s)`
 
-Called for any non-rendering changes to the destination `Bitmap`.  No plugins
-currently implement this method.
+Called for any non-rendering changes to the destination `Bitmap`.
+
+The CopyMetadataPlugin extension implements this to copy metadata `PropertyItem`s
+from the source bitmap to the destination bitmap.
 
 After the plugins get a chance to handle `ProcessFinalBitmap()`,
 `ImageBuilder`'s implementation may perform a final rotation/flip.
