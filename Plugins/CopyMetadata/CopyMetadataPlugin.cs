@@ -19,6 +19,8 @@ namespace ImageResizer.Plugins.CopyMetadata
     [Obsolete("Quick opt-in metadata copying for V3. Will be redesigned in V4.")]
     public class CopyMetadataPlugin : BuilderExtension, IPlugin, IQuerystringPlugin
     {
+        private const string SettingsKey = "copymetadata";
+
         private List<int> excludedProperties = null;
 
         public IPlugin Install(Configuration.Config c)
@@ -35,12 +37,12 @@ namespace ImageResizer.Plugins.CopyMetadata
 
         public IEnumerable<string> GetSupportedQuerystringKeys()
         {
-            return new string[] { "metadata" };
+            return new string[] { SettingsKey };
         }
 
         protected override RequestedAction ProcessFinalBitmap(ImageState s)
         {
-            string metadata = s.settings["metadata"];
+            string metadata = s.settings[SettingsKey];
             Bitmap dest = s.destBitmap;
 
             if (dest == null ||

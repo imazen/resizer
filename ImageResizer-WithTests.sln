@@ -128,6 +128,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.AzureR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.CopyMetadata", "Plugins\CopyMetadata\ImageResizer.Plugins.CopyMetadata.csproj", "{2F34E4D1-68AF-4F51-B6B8-A806D47B3D35}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.CopyMetadata.Tests", "Tests\ImageResizer.Plugins.CopyMetadata.Tests\ImageResizer.Plugins.CopyMetadata.Tests.csproj", "{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1221,6 +1223,24 @@ Global
 		{2F34E4D1-68AF-4F51-B6B8-A806D47B3D35}.Trial|Mixed Platforms.Build.0 = Trial|Any CPU
 		{2F34E4D1-68AF-4F51-B6B8-A806D47B3D35}.Trial|x64.ActiveCfg = Trial|Any CPU
 		{2F34E4D1-68AF-4F51-B6B8-A806D47B3D35}.Trial|x86.ActiveCfg = Trial|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Release|x64.ActiveCfg = Release|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Release|x86.ActiveCfg = Release|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Trial|x64.ActiveCfg = Release|Any CPU
+		{D7F300E0-2B03-40B0-AFE0-0CCD543CFEE4}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
