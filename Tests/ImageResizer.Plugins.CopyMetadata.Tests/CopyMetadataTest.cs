@@ -95,6 +95,35 @@ namespace ImageResizer.Plugins.CopyMetadata.Tests
             }
         }
 
+        [Test(Order = 5)]
+        public void CopiedMetadataIncludesGeolocationInformation()
+        {
+            CopyMetadataPlugin plugin = new CopyMetadataPlugin();
+
+            using (ImageState state = CreateImageState(true))
+            {
+                RequestedAction requestedAction = CallProcessFinalBitmap(plugin, state);
+                Assert.AreEqual(RequestedAction.None, requestedAction);
+
+                // Make sure geolocation properties got copied...
+                int[] geolocationProperties = new int[] {
+                    0x0000, // PropertyTagGpsVer
+                    0x0001, // PropertyTagGpsLatitudeRef
+                    0x0002, // PropertyTagGpsLatitude
+                    0x0003, // PropertyTagGpsLongitudeRef
+                    0x0004, // PropertyTagGpsLongitude
+                    0x0005, // PropertyTagGpsAltitudeRef
+                    0x0006, // PropertyTagGpsAltitude
+                };
+
+                foreach (int propId in geolocationProperties)
+                {
+                    Assert.Exists(state.sourceBitmap.PropertyItems, prop => prop.Id == propId, "sourceBitmap did not include geolocation information!");
+                    Assert.Exists(state.destBitmap.PropertyItems, prop => prop.Id == propId, "destBitmap did not copy geolocation information!");
+                }
+            }
+        }
+
         private static ImageState CreateImageState(bool copyMetadata)
         {
             ImageState state = new ImageState(new ResizeSettings(), Size.Empty, false);
@@ -104,7 +133,7 @@ namespace ImageResizer.Plugins.CopyMetadata.Tests
                 state.settings["copymetadata"] = "true";
             }
 
-            state.sourceBitmap = (Bitmap)Bitmap.FromFile(@"..\..\..\Samples\Images\fountain-small.jpg");
+            state.sourceBitmap = (Bitmap)Bitmap.FromFile(@"..\..\..\Samples\Images\gps-metadata.jpg");
             state.destBitmap = new Bitmap(1, 1);
 
             return state;

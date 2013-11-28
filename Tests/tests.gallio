@@ -1,9 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<testProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.gallio.org/">
+<testProject xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.gallio.org/">
   <testPackage shadowCopy="false" debug="false">
     <files>
       <file>binaries\debug\ImageResizer.Core.Tests.dll</file>
       <file>binaries\debug\ImageResizer.AllPlugins.Tests.dll</file>
+      <file>binaries\debug\ImageResizer.Plugins.CopyMetadata.Tests.dll</file>
     </files>
     <hintDirectories>
       <hintDirectory>..\dlls\debug</hintDirectory>
