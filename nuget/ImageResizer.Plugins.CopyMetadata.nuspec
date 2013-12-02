@@ -1,0 +1,38 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.CopyMetadata</id>
+		<title>ImageResizer.Plugins.CopyMetadata</title>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<owners>$owners$</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>$iconurl$</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>
+
+Copies image metadata from your original images to your resized/processed images.
+
+Plugs into ImageResizer. 
+
+REST API example: image.jpg?copymetadata=true
+
+Docs: http://imageresizing.net/plugins/copymetadata
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+$plugins$
+ </description>
+		<tags>ImageResizer Imazen Resizer CopyMetadata metadata exif properties imaging</tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.CopyMetadata.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.CopyMetadata.xml" target="lib" />
+		<file src="..\Plugins\CopyMetadata\Web.config.transform" target="content" />
+	</files>
+</package>
