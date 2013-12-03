@@ -51,8 +51,23 @@ namespace ImageResizer.Plugins.AzureReader2 {
         
         public AzureVirtualPathProvider(string blobStorageConnection) {
             // Setup the connection to Windows Azure Storage
-            // mb:12/8/2012 - this needs to be the actual connection string not the config file connection string name
-            var cloudStorageAccount = CloudStorageAccount.Parse(blobStorageConnection);
+
+            // The 1.x Azure SDK offers a CloudStorageAccount.FromConfigurationSetting()
+            // method that looks up the connection string from the fabric's configuration
+            // and creates the CloudStorageAccount.  In 2.x, that method has disappeared
+            // and we have to talk to the CloudConfigurationManager directly.
+            var connectionString = CloudConfigurationManager.GetSetting(blobStorageConnection);
+
+            // Earlier versions of AzureReader2 simply assumed/required that the
+            // 'blobStorageConnection' value was the connection string itself, and
+            // not a config key.  Therefore, we fall back to that behavior if the
+            // configuration lookup fails.
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                connectionString = blobStorageConnection;
+            }
+
+            var cloudStorageAccount = CloudStorageAccount.Parse(connectionString);
             CloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
         }
 
