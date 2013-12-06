@@ -54,8 +54,14 @@ namespace ImageResizer.Plugins.DiagnosticJson
             // want to return.
             var info = new LayoutInformation(s);
             var serializer = new JsonSerializer();
-            // TODO: allow a setting to ask for indented JSON?
-            ////serializer.Formatting = Formatting.Indented;
+
+            // Check to see if indented JSON has been requested.  This is useful
+            // for human-readable output.
+            if (s.settings.Get("j.indented", false))
+            {
+                serializer.Formatting = Formatting.Indented;
+            }
+
             serializer.Converters.Add(new InstructionsConverter());
 
             StringWriter sw = new StringWriter();
