@@ -72,6 +72,7 @@
     <Content Include="js\hover.js" />
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="Misc\diagnostic-300x400.png" />
     <Content Include="Misc\diagnostic-31x23.png" />
     <Content Include="Misc\DiagnoticJson.htm" />
     <Content Include="Misc\UrlAuthorizationTests.aspx" />

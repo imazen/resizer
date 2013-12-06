@@ -81,8 +81,6 @@
     <script type="text/javascript">
         $(function () {
             //$('#sampleOutput').append('<div>jQuery is loaded!</div>');
-            var qsKey = 'diagnosticjson=';
-            var qsValue = 'layout';
 
             $('#diagnosticJsonSample').submit(function (e) {
                 console.log('requesting info...');
@@ -117,7 +115,16 @@
                 $('#regressionOutput').html('');
                 appendRegressionMessage('running layout regressions...');
 
-                // Basic sanity checks...
+                sanityChecks();
+                basicRegressionTests();
+
+                autoCropAndScalingTests();
+
+                e.preventDefault();
+                return false;
+            });
+
+            function sanityChecks() {
                 ////checkJsonResult('invalid URL', 'does-not-exist.jpg', {});
                 checkJsonResult('sanity check valid URL', 'diagnostic-31x23.png', {});
                 checkJsonResult('sanity check sourceRect', 'diagnostic-31x23.png', { sourceRect: { width: 31, height: 23 } });
@@ -128,7 +135,9 @@
                 checkJsonResult('sanity check imageDestPoly', 'diagnostic-31x23.png', {
                     imageDestPoly: { x: 0, y: 0, width: 31, height: 23, rect: true, points: [[0, 0], [31, 0], [31, 23], [0, 23]] }
                 });
+            }
 
+            function basicRegressionTests() {
                 // Cropping ('11,7,16,10' is '@11,7;5x3')...
                 checkJsonResult('crop', 'diagnostic-31x23.png?crop=11,7,16,10', {
                     finalRect: { width: 5, height: 3 },
@@ -221,18 +230,91 @@
                     preAdjustedSourceRect: { width: 31, height: 23 },   //?
                     preAdjustedImageSourcePoly: { x: 0, y: 0, width: 31, height: 23, rect: false, points: [[0, 23], [0, 0], [31, 0], [31, 23]] }
                 });
+            }
 
-                e.preventDefault();
-                return false;
-            });
+            function autoCropAndScalingTests() {
+                // TODO: remove when fix is verified
+                checkJsonResult('autocrop scale down BAD (current)',
+                    'diagnostic-300x400.png?width=400&height=300&mode=crop&scale=down', {
+                    finalRect: { width: 400, height: 300 },
+                    imageSourcePoly: { x: 0, y: 88, width: 300, height: 225, rect: true },
+                    imageDestPoly: { x: 0, y: 0, width: 400, height: 300, rect: true },
+                    imageDestAreaPoly: { x: 0, y: 0, width: 400, height: 300, rect: true }
+                });
+
+                // TODO: verify the desired source/dest-poly values
+                checkJsonResult('autocrop scale down GOOD (desired)',
+                    'diagnostic-300x400.png?width=400&height=300&mode=crop&scale=down', {
+                    finalRect: { width: 300, height: 300 },
+                    imageSourcePoly: { x: 0, y: 50, width: 300, height: 300, rect: true },
+                    imageDestPoly: { x: 0, y: 0, width: 300, height: 300, rect: true },
+                    imageDestAreaPoly: { x: 0, y: 0, width: 300, height: 300, rect: true }
+                });
+
+                // TODO: remove when fix is verified
+                checkJsonResult('autocrop scale canvas BAD (current)',
+                    'diagnostic-300x400.png?width=400&height=300&mode=crop&scale=canvas', {
+                    finalRect: { width: 400, height: 300 },
+                    imageSourcePoly: { x: 0, y: 88, width: 300, height: 225, rect: true },
+                    imageDestPoly: { x: 0, y: 0, width: 400, height: 300, rect: true },
+                    imageDestAreaPoly: { x: 0, y: 0, width: 400, height: 300, rect: true }
+                });
+
+                // TODO: verify the desired source/dest-poly values
+                checkJsonResult('autocrop scale canvas GOOD (desired)',
+                    'diagnostic-300x400.png?width=400&height=300&mode=crop&scale=canvas', {
+                    finalRect: { width: 400, height: 300 },
+                    imageSourcePoly: { x: 0, y: 50, width: 300, height: 300, rect: true },
+                    imageDestPoly: { x: 50, y: 0, width: 300, height: 300, rect: true },
+                    imageDestAreaPoly: { x: 0, y: 0, width: 400, height: 300, rect: true }
+                });
+
+                // REVIEW: Is the current behavior actually already correct?
+                // TODO: remove when fix is verified
+                checkJsonResult('autocrop scale both BAD (current)',
+                    'diagnostic-300x400.png?width=400&height=300&mode=crop&scale=both', {
+                        finalRect: { width: 400, height: 300 },
+                        imageSourcePoly: { x: 0, y: 88, width: 300, height: 225, rect: true },
+                        imageDestPoly: { x: 0, y: 0, width: 400, height: 300, rect: true },
+                        imageDestAreaPoly: { x: 0, y: 0, width: 400, height: 300, rect: true }
+                    });
+
+                // TODO: verify the desired source/dest-poly values
+                checkJsonResult('autocrop scale both GOOD (desired)',
+                    'diagnostic-300x400.png?width=400&height=300&mode=crop&scale=both', {
+                        finalRect: { width: 400, height: 300 },
+                        imageSourcePoly: { x: 0, y: 88, width: 300, height: 225, rect: true },
+                        imageDestPoly: { x: 0, y: 0, width: 400, height: 300, rect: true },
+                        imageDestAreaPoly: { x: 0, y: 0, width: 400, height: 300, rect: true }
+                    });
+
+                // Additional tests
+                checkJsonResult('manual/auto crop',
+                    'diagnostic-300x400.png?crop=10,10,50,100&width=40&height=40&mode=crop', {
+                        finalRect: { width: 40, height: 40 },
+                        imageSourcePoly: { x: 10, y: 35, width: 40, height: 40, rect: true },
+                        imageDestPoly: { x: 0, y: 0, width: 40, height: 40, rect: true },
+                        imageDestAreaPoly: { x: 0, y: 0, width: 40, height: 40, rect: true }
+                    });
+            }
 
             function sanitizeUrl(url) {
+                // TODO: A required settings object (as below) would be better
+                // than several disparate key/value variables...
+                ////var requiredSettings = { 'diagnosticjson': 'layout', 'j.indented': 'true' };
+                var qsKey = 'diagnosticjson=';
+                var qsValue = 'layout';
+                var qsKey2 = 'j.indented=';
+                var qsValue2 = 'true';
+
                 // ImageResizer allows ;-separated values as well, but we're
                 // just handling ?/& for now.
                 var parts = url.split(/[?&]/);
 
                 var cleaned = parts.filter(function (cur, i) {
-                    return i == 0 || cur.toLowerCase().indexOf(qsKey) != 0;
+                    return i == 0 ||
+                        cur.toLowerCase().indexOf(qsKey) != 0 ||
+                        cur.toLowerCase().indexOf(qsKey2) != 0;
                 });
 
                 url = cleaned.reduce(function (prev, cur, i) {
@@ -242,7 +324,7 @@
                     return prev + sep + cur;
                 }, '');
 
-                url = url + (cleaned.length <= 1 ? '?' : '&') + (qsKey + qsValue);
+                url = url + (cleaned.length <= 1 ? '?' : '&') + (qsKey + qsValue) + '&' + (qsKey2 + qsValue2);
 
                 return url;
             };
@@ -267,6 +349,7 @@
             // 'expected'.  We don't care about additional values in
             // 'expected'.
             function checkActual(name, scope, expected, actual) {
+                var passed = true;
                 for (var key in expected) {
                     var newScope = scope + '.' + key;
                     var expectedVal = expected[key];
@@ -276,16 +359,16 @@
 
                     if (actualVal === undefined) {
                         appendRegressionResult(false, name, 'missing actual value for "' + newScope + '".');
-                        return false;
+                        passed = false;
                     }
                     else if (actualType !== expectedType) {
                         appendRegressionResult(false, name, 'expected ' + expectedType + ', got ' + actualType + ' for "' + newScope + '".');
-                        return false;
+                        passed = false;
                     }
                     else if (expectedType === 'object') {
                         // if object/array, recurse!
                         if (!checkActual(name, newScope, expectedVal, actualVal)) {
-                            return false;
+                            passed = false;
                         }
                     }
                     else if (expectedType === 'number') {
@@ -294,15 +377,16 @@
                         var delta = Math.abs(actualVal - expectedVal);
                         if (delta > 1.0e-14) {
                             appendRegressionResult(false, name, 'expected "' + expectedVal + '", got "' + actualVal + '" for "' + newScope + '".');
+                            passed = false;
                         }
                     }
                     else if (actualVal != expectedVal) {
                         appendRegressionResult(false, name, 'expected "' + expectedVal + '", got "' + actualVal + '" for "' + newScope + '".');
-                        return false;
+                        passed = false;
                     }
                 }
 
-                return true;
+                return passed;
             }
 
             function appendRegressionResult(succeeded, name, message) {
