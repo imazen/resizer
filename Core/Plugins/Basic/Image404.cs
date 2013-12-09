@@ -10,17 +10,66 @@ using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
-    /// Redirects image 404 errors to a querystring-specified server-local location, while maintaining querystring values so layout isn't disrupted.
-	/// For example, missingimage.jpg?404=image.jpg&amp;width=200
-    /// with the default setting &lt;image404 baseDir="~/" /&gt; will redirect to ~/image.jpg?width=200.
-    /// You may also configure 'variables', which is the reccomended approach.
-    /// Ex. &lt;image404 propertyImageDefault="~/images/nophoto.png" /&gt; and use them like so: missingimage.jpg?404=propertImageDefault?width=200 -> ~/images/nophoto.png?width=200.
-    /// Querystring values in the variable value take precedence. For example, 
-	/// Ex. &lt;image404 propertyImageDefault="~/images/nophoto.png?format=png" /&gt; and missingimage.jpg?format=jpg&amp;404=propertImageDefault?width=200 -> ~/images/nophoto.png?format=png&amp;width=200.
+    /// Redirects image 404 errors to a querystring-specified server-local location,
+    /// while maintaining querystring values (by default) so layout isn't disrupted.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The image to use in place of missing images can be specified by the "404"
+    /// parameter in the querystring.  The "404" value can also refer to a named
+    /// value in the &lt;plugins&gt;/&lt;Image404&gt; setting in Web.config.
+    /// </para>
+    /// <para>
+    /// Querystring commands to remove from the 404 request can be specified in
+    /// the &lt;plugins&gt;/&lt;Image404&gt; setting in Web.config using the
+    /// "removeCommands" attribute with a comma-separated list.  You can also
+    /// use a "404.remove" querystring value (also a comma-separated list) to
+    /// indicate commands to remove for an individual image request.
+    /// </para>
+    /// </remarks>
+    /// <example>
+    /// <para>
+    /// Using <c>&lt;img src="missingimage.jpg?404=image.jpg&amp;width=200" /&gt;</c>
+    /// with the default setting (<c>&lt;image404 baseDir="~/" /&gt;</c>) will
+    /// redirect to <c>~/image.jpg?width=200</c>.
+    /// </para>
+    /// <para>
+    /// You may also configure 'variables', which is the recommended approach.
+    /// For example, <c>&lt;image404 propertyImageDefault="~/images/nophoto.png" /&gt;</c>
+    /// in the config file, and <c>&lt;img src="missingimage.jpg?404=propertyImageDefault&amp;width=200" /&gt;</c>
+    /// will result in a redirect to <c>~/images/nophoto.png?width=200</c>.
+    /// Any querystring values in the config variable take precedence over
+    /// querystring values in the image querystring.  For example,
+    /// <c>&lt;image404 propertyImageDefault="~/images/nophoto.png?format=png" /&gt;</c>
+    /// in the config file and
+    /// <c>&lt;img src="missingimage.jpg?format=jpg&amp;404=propertImageDefault&amp;width=200" /&gt;</c>
+    /// will result in a redirect to <c>~/images/nophoto.png?format=png&amp;width=200</c>.
+    /// </para>
+    /// <para>
+    /// <c>&lt;img src="notfound.jpg?rotate=45&amp;404=missing.jpg&amp;404.remove=rotate" /&gt;</c>
+    /// will redirect to <c>~/missing.jpg</c>, <em>without</em> the <c>rotate</c>
+    /// command.
+    /// </para>
+    /// <para>
+    /// Similarly, <c>&lt;image404 removeCommands="rotate,flip" /&gt;</c> in the
+    /// config file will ensure that <c>rotate</c> and <c>flip</c> commands are
+    /// always removed from the redirect; a reference to
+    /// <c>&lt;img src="notfound.jpg?flip=x&amp;width=50&amp;rotate=45&amp;404=missing.jpg" /&gt;</c>
+    /// would redirect to <c>~/missing.jpg?width=50</c>.
+    /// </para>
+    /// </example>
     public class Image404:IQuerystringPlugin,IPlugin {
 
         Config c;
+        private string[] removeCommands;
+
+        public Image404(NameValueCollection args) {
+            var commandList = args["removeCommands"];
+            if (!string.IsNullOrEmpty(commandList)) {
+                    this.removeCommands = commandList.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            }
+        }
+
         public IPlugin Install(Configuration.Config c) {
             this.c = c;
             if (c.Plugins.Has<Image404>()) throw new InvalidOperationException();
@@ -40,7 +89,26 @@ namespace ImageResizer.Plugins.Basic {
                 //Merge commands from the 404 querystring with ones from the original image. 
                 ResizeSettings imageQuery = new ResizeSettings(e.QueryString);
                 imageQuery.Normalize();
-                imageQuery.Remove("404"); //Remove the 404 ref
+
+                // remove commands listed for removal via the image querystring
+                var commandList = e.QueryString["404.remove"];
+                if (!string.IsNullOrEmpty(commandList)) {
+                    foreach (var command in commandList.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)) {
+                        imageQuery.Remove(command);
+                    }
+                }
+
+                // remove commands listed for removal via the Image404 configuration
+                if (this.removeCommands != null) {
+                    foreach (var command in this.removeCommands)
+                    {
+                        imageQuery.Remove(command);
+                    } 
+                }
+
+                // Always remove the '404' and '404.remove' settings.
+                imageQuery.Remove("404");
+                imageQuery.Remove("404.remove");
 
                 ResizeSettings i404Query = new ResizeSettings(Util.PathUtils.ParseQueryString(path));
                 i404Query.Normalize();
