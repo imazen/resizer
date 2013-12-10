@@ -183,7 +183,7 @@ namespace ImageResizer {
                 //Check for resize directive by removing ('non-resizing' items from the current querystring) 
                 NameValueCollection copy = new NameValueCollection(queryString);
                 copy.Remove("cache"); copy.Remove("process"); copy.Remove("useresizingpipeline"); copy.Remove("404");
-                copy.Remove("404.remove");
+                copy.Remove("404.filterMode"); copy.Remove("404.except");
                 //If the 'copy' still has directives, and it's an image request, then let's process it.
                 isProcessing = conf.IsAcceptedImageType(virtualPath) &&  conf.HasPipelineDirective(copy);
             }
