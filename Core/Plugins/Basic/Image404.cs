@@ -6,6 +6,7 @@ using System.Web.Hosting;
 using ImageResizer.Configuration;
 using System.Text.RegularExpressions;
 using System.Collections.Specialized;
+using ImageResizer.ExtensionMethods;
 using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.Basic {
@@ -18,13 +19,6 @@ namespace ImageResizer.Plugins.Basic {
     /// The image to use in place of missing images can be specified by the "404"
     /// parameter in the querystring.  The "404" value can also refer to a named
     /// value in the &lt;plugins&gt;/&lt;Image404&gt; setting in Web.config.
-    /// </para>
-    /// <para>
-    /// Querystring commands to remove from the 404 request can be specified in
-    /// the &lt;plugins&gt;/&lt;Image404&gt; setting in Web.config using the
-    /// "removeCommands" attribute with a comma-separated list.  You can also
-    /// use a "404.remove" querystring value (also a comma-separated list) to
-    /// indicate commands to remove for an individual image request.
     /// </para>
     /// </remarks>
     /// <example>
@@ -45,30 +39,101 @@ namespace ImageResizer.Plugins.Basic {
     /// <c>&lt;img src="missingimage.jpg?format=jpg&amp;404=propertImageDefault&amp;width=200" /&gt;</c>
     /// will result in a redirect to <c>~/images/nophoto.png?format=png&amp;width=200</c>.
     /// </para>
-    /// <para>
-    /// <c>&lt;img src="notfound.jpg?rotate=45&amp;404=missing.jpg&amp;404.remove=rotate" /&gt;</c>
-    /// will redirect to <c>~/missing.jpg</c>, <em>without</em> the <c>rotate</c>
-    /// command.
-    /// </para>
-    /// <para>
-    /// Similarly, <c>&lt;image404 removeCommands="rotate,flip" /&gt;</c> in the
-    /// config file will ensure that <c>rotate</c> and <c>flip</c> commands are
-    /// always removed from the redirect; a reference to
-    /// <c>&lt;img src="notfound.jpg?flip=x&amp;width=50&amp;rotate=45&amp;404=missing.jpg" /&gt;</c>
-    /// would redirect to <c>~/missing.jpg?width=50</c>.
-    /// </para>
     /// </example>
     public class Image404:IQuerystringPlugin,IPlugin {
 
-        Config c;
-        private string[] removeCommands;
-
-        public Image404(NameValueCollection args) {
-            var commandList = args["removeCommands"];
-            if (!string.IsNullOrEmpty(commandList)) {
-                    this.removeCommands = commandList.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            }
+        public enum FilterMode
+        {
+            IncludeUnknownCommands,
+            ExcludeUnknownCommands,
+            IncludeAllCommands,
+            ExcludeAllCommands,
         }
+
+        readonly static MatcherCollection DefaultWhitelist = new MatcherCollection(
+            // deterministic sizing and color -- copied by default
+            new Matcher("maxwidth"), 
+            new Matcher("maxheight"),
+            new Matcher("width"),
+            new Matcher("height"),
+            new Matcher("w"),
+            new Matcher("h"),
+            
+            new Matcher(delegate (string name, string value) { // crop=auto
+                return string.Equals(name, "crop", StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(value, "auto", StringComparison.OrdinalIgnoreCase); }),
+
+            new Matcher("mode"),
+            new Matcher("anchor"),
+            new Matcher("scale"),
+            new Matcher("zoom"),
+            new Matcher("bgcolor"),
+            new Matcher("paddingWidth"),
+            new Matcher("paddingColor"),
+            new Matcher("borderWidth"),
+            new Matcher("borderColor"),
+            new Matcher("shadowWidth"),
+            new Matcher("shadowOffset"),
+            new Matcher("shadowColor"),
+            new Matcher("margin"),
+            new Matcher("dpi"),
+
+            // output size, format -- copied by default
+            new Matcher("format"),
+            new Matcher("quality"),
+            new Matcher("colors"),
+            new Matcher("subsampling"),
+            new Matcher("dither"),
+            new Matcher("speed"),
+            new Matcher("ignoreicc"),
+
+            // visual filters (simple and advanced), post-processing -- copied by default
+            new Matcher(delegate(string name) { return name.StartsWith("s.", StringComparison.OrdinalIgnoreCase);}),
+            new Matcher(delegate(string name) { return name.StartsWith("a.", StringComparison.OrdinalIgnoreCase);}),
+            new Matcher("flip"),
+            new Matcher("rotate"));
+
+        readonly static MatcherCollection DefaultBlacklist = new MatcherCollection(
+            // not useful -- excluded by default
+            new Matcher("watermark"),
+            new Matcher("cache"),
+            new Matcher("process"),
+            new Matcher("builder"),
+            new Matcher("decoder"),
+            new Matcher("encoder"),
+
+            // unlikely to need -- excluded by default
+            new Matcher("sflip"),
+            new Matcher("srotate"),
+            new Matcher("autorotate"),
+
+            new Matcher(delegate (string name, string value) { // crop=anything-other-than-auto
+                return string.Equals(name, "crop", StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(value, "auto", StringComparison.OrdinalIgnoreCase); }),
+
+            new Matcher("cropxunits"),
+            new Matcher("cropyyunits"),
+            new Matcher("trim.threshold"),
+            new Matcher("trim.percentpadding"),
+
+            // never want to copy -- excluded by default
+            new Matcher("hmac"),
+            new Matcher("urlb64"),
+            new Matcher("frame"),
+            new Matcher("page"),
+            new Matcher("color1"),
+            new Matcher("color2"));
+
+        Config c;
+        private FilterMode filterMode = FilterMode.ExcludeUnknownCommands;
+        private MatcherCollection except = MatcherCollection.Empty;
+
+        // To support configurable include/exclude modes and exceptions, uncomment
+        // this constructor.
+        ////public Image404(NameValueCollection args) {
+        ////    this.filterMode = NameValueCollectionExtensions.Get(args, "mode", FilterMode.ExcludeUnknownCommands);
+        ////    this.except = MatcherCollection.Parse(args["except"]);
+        ////    }
 
         public IPlugin Install(Configuration.Config c) {
             this.c = c;
@@ -86,29 +151,46 @@ namespace ImageResizer.Plugins.Basic {
                 //Resolve to virtual path
                 path = Util.PathUtils.ResolveAppRelative(path);
 
-                //Merge commands from the 404 querystring with ones from the original image. 
+                // Merge commands from the 404 querystring with ones from the
+                // original image.  We start by sanitizing the querystring from
+                // the image.
                 ResizeSettings imageQuery = new ResizeSettings(e.QueryString);
                 imageQuery.Normalize();
 
-                // remove commands listed for removal via the image querystring
-                var commandList = e.QueryString["404.remove"];
-                if (!string.IsNullOrEmpty(commandList)) {
-                    foreach (var command in commandList.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)) {
-                        imageQuery.Remove(command);
+                // Use the configured settings by default.
+                var filterMode = this.filterMode;
+                var except = this.except;
+
+                // To support querystring-specifiable filter mode and exceptions,
+                // uncomment the if block below.
+                ////// If the imageQuery includes specific 404 command-filtering,
+                ////// (*either* of the values), use those instead of the
+                ////// configured defaults.
+                ////if (!string.IsNullOrEmpty(e.QueryString["404.filterMode"]) ||
+                ////    !string.IsNullOrEmpty(e.QueryString["404.except"]))
+                ////{
+                ////    filterMode = NameValueCollectionExtensions.Get(e.QueryString, "404.filterMode", FilterMode.ExcludeUnknownCommands);
+                ////    except = MatcherCollection.Parse(e.QueryString["404.except"]);
+                ////}
+
+                // remove all of the commands we're supposed to remove... we
+                // clone the list of keys so that we're not modifying the collection
+                // while we enumerate it.
+                var shouldRemove = CreateRemovalMatcher(filterMode, except);
+                var names = new List<string>(imageQuery.AllKeys);
+
+                foreach (var name in names)
+                {
+                    if (shouldRemove(name, imageQuery[name]))
+                    {
+                        imageQuery.Remove(name);
                     }
                 }
 
-                // remove commands listed for removal via the Image404 configuration
-                if (this.removeCommands != null) {
-                    foreach (var command in this.removeCommands)
-                    {
-                        imageQuery.Remove(command);
-                    } 
-                }
-
-                // Always remove the '404' and '404.remove' settings.
+                // Always remove the '404', '404.filterMode', and '404.except' settings.
                 imageQuery.Remove("404");
-                imageQuery.Remove("404.remove");
+                imageQuery.Remove("404.filterMode");
+                imageQuery.Remove("404.except");
 
                 ResizeSettings i404Query = new ResizeSettings(Util.PathUtils.ParseQueryString(path));
                 i404Query.Normalize();
@@ -120,6 +202,54 @@ namespace ImageResizer.Plugins.Basic {
                 //Redirect
                 context.Response.Redirect(path, true);
             }
+        }
+
+        private static Matcher.NameAndValue CreateRemovalMatcher(FilterMode filterMode, MatcherCollection except)
+        {
+            Matcher.NameAndValue shouldRemove = null;
+
+            switch (filterMode)
+            {
+                case FilterMode.IncludeUnknownCommands:
+                    // To include unknown commands, we remove blacklisted
+                    // and 'except' commands.
+                    shouldRemove = delegate(string name, string value)
+                    {
+                        return DefaultBlacklist.IsMatch(name, value) ||
+                                    except.IsMatch(name, value);
+                    };
+                    break;
+
+                case FilterMode.ExcludeUnknownCommands:
+                    // To exclude unknown commands, we *keep* whitelisted
+                    // and 'except' commands.
+                    shouldRemove = delegate(string name, string value)
+                    {
+                        return !(DefaultWhitelist.IsMatch(name, value) ||
+                                    except.IsMatch(name, value));
+                    };
+                    break;
+
+                case FilterMode.IncludeAllCommands:
+                    // To include all commands, we remove any of the 'except'
+                    // commands.
+                    shouldRemove = delegate(string name, string value)
+                    {
+                        return except.IsMatch(name, value);
+                    };
+                    break;
+
+                case FilterMode.ExcludeAllCommands:
+                    // To exclude all commands, we only keep the 'except'
+                    // commands.
+                    shouldRemove = delegate(string name, string value)
+                    {
+                        return !except.IsMatch(name, value);
+                    };
+                    break;
+            }
+
+            return shouldRemove;
         }
 
         protected string resolve404Path(string path) {
@@ -149,6 +279,94 @@ namespace ImageResizer.Plugins.Basic {
 
         public IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "404" };
+        }
+
+        private class MatcherCollection
+        {
+            private Matcher[] matchers;
+
+            public static MatcherCollection Empty = new MatcherCollection();
+
+            public static MatcherCollection Parse(string commandList)
+            {
+                if (string.IsNullOrEmpty(commandList))
+                {
+                    return MatcherCollection.Empty;
+                }
+
+                var commands = commandList.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                var matchers = new Matcher[commands.Length];
+
+                for (var i = 0; i < commands.Length; i++)
+                {
+                    matchers[i] = new Matcher(commands[i]);
+                }
+
+                return new MatcherCollection(matchers);
+            }
+
+            public MatcherCollection(params Matcher[] matchers)
+            {
+                this.matchers = matchers;
+            }
+
+            public bool IsMatch(string name, string value)
+            {
+                foreach (var matcher in this.matchers)
+                {
+                    if (matcher.IsMatch(name, value))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        private class Matcher
+        {
+            public delegate bool NameOnly(string name);
+            public delegate bool NameAndValue(string name, string value);
+
+            private string name;
+            private NameOnly nameTest;
+            private NameAndValue nameAndValueTest;
+
+            public Matcher(string name)
+            {
+                this.name = name;
+            }
+
+            public Matcher(NameOnly nameTest)
+            {
+                this.nameTest = nameTest;
+            }
+
+            public Matcher(NameAndValue nameAndValueTest)
+            {
+                this.nameAndValueTest = nameAndValueTest;
+            }
+
+            public bool IsMatch(string name, string value)
+            {
+                if (this.name != null)
+                {
+                    return string.Equals(this.name, name, StringComparison.OrdinalIgnoreCase);
+                }
+
+                if (this.nameTest != null)
+                {
+                    return this.nameTest(name);
+                }
+
+                if (this.nameAndValueTest != null)
+                {
+                    return this.nameAndValueTest(name, value);
+                }
+
+                return false;
+            }
         }
     }
 }
