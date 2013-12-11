@@ -1010,7 +1010,6 @@ namespace ImageResizer
             //Zoom factor
             double zoom = s.settings.Get<double>("zoom", 1);
 
-            ScaleMode scale = s.settings.Scale;
             //The target size for the image 
             SizeF targetSize = new SizeF(-1, -1);
             //Target area for the image
@@ -1057,10 +1056,9 @@ namespace ImageResizer
                 } else if (fit == FitMode.Crop) {
                     //We autocrop - so both target and area match the requested size
                     areaSize = targetSize = new SizeF((float)width, (float)height);
+                    RectangleF copyRect;
                     
-                    var minWidth = Math.Min(manualCropSize.Width, (float)width);
-                    var minHeight = Math.Min(manualCropSize.Height, (float)height);
-
+                    ScaleMode scale = s.settings.Scale;
                     bool cropWidthSmaller = manualCropSize.Width <= (float)width;
                     bool cropHeightSmaller = manualCropSize.Height <= (float)height;
 
@@ -1071,9 +1069,11 @@ namespace ImageResizer
                     if ((scale == ScaleMode.DownscaleOnly && (cropWidthSmaller != cropHeightSmaller)) ||
                         (scale == ScaleMode.UpscaleCanvas))
                     {
+                        var minWidth = Math.Min(manualCropSize.Width, (float)width);
+                        var minHeight = Math.Min(manualCropSize.Height, (float)height);
+
                         targetSize = new SizeF(minWidth, minHeight);
-                        manualCropRect = new RectangleF(0, 0, minWidth, minHeight);
-                        s.copyRect = PolygonMath.ToRectangle(PolygonMath.AlignWith(manualCropRect, s.copyRect, s.settings.Anchor));
+                        copyRect = manualCropRect = new RectangleF(0, 0, minWidth, minHeight);
 
                         // For DownscaleOnly, the areaSize is adjusted to the new targetSize as well.
                         if (scale == ScaleMode.DownscaleOnly)
@@ -1086,8 +1086,12 @@ namespace ImageResizer
                         //Determine the size of the area we are copying
                         Size sourceSize = PolygonMath.RoundPoints(PolygonMath.ScaleInside(areaSize, manualCropSize));
                         //Center the portion we are copying within the manualCropSize
-                        s.copyRect = PolygonMath.ToRectangle(PolygonMath.AlignWith(new RectangleF(0, 0, sourceSize.Width, sourceSize.Height), s.copyRect, s.settings.Anchor));
+                        copyRect = new RectangleF(0, 0, sourceSize.Width, sourceSize.Height);
                     }
+
+                    // Align the actual source-copy rectangle inside the available
+                    // space based on the anchor.
+                    s.copyRect = PolygonMath.ToRectangle(PolygonMath.AlignWith(copyRect, s.copyRect, s.settings.Anchor));
 
                 } else { //Stretch and carve both act like stretching, so do that:
                     areaSize = targetSize = new SizeF((float)width, (float)height);
