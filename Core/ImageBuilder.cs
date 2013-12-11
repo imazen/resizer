@@ -1010,6 +1010,7 @@ namespace ImageResizer
             //Zoom factor
             double zoom = s.settings.Get<double>("zoom", 1);
 
+            ScaleMode scale = s.settings.Scale;
             //The target size for the image 
             SizeF targetSize = new SizeF(-1, -1);
             //Target area for the image
@@ -1020,6 +1021,7 @@ namespace ImageResizer
                 //We first calculate the largest size the image can be under the width/height/maxwidth/maxheight restrictions.
                 //- pretending stretch=fill and scale=both
 
+                // TODO: why are doubles used here?  It just means lots of casts further down
                 //Temp vars - results stored in targetSize and areaSize
                 double width = s.settings.Width;
                 double height = s.settings.Height;
@@ -1056,10 +1058,28 @@ namespace ImageResizer
                 } else if (fit == FitMode.Crop) {
                     //We autocrop - so both target and area match the requested size
                     areaSize = targetSize = new SizeF((float)width, (float)height);
-                    //Determine the size of the area we are copying
-                    Size sourceSize = PolygonMath.RoundPoints(PolygonMath.ScaleInside(areaSize, manualCropSize)); 
-                    //Center the portion we are copying within the manualCropSize
-                    s.copyRect = PolygonMath.ToRectangle(PolygonMath.AlignWith(new RectangleF(0, 0, sourceSize.Width, sourceSize.Height), s.copyRect, s.settings.Anchor));
+                    var minWidth = Math.Min(manualCropSize.Width, (float)width);
+                    var minHeight = Math.Min(manualCropSize.Height, (float)height);
+                    if (scale == ScaleMode.DownscaleOnly 
+                        && ((manualCropSize.Width <= (float)width) != (manualCropSize.Height <= (float)height))) {
+                        // one of the dimensions is <= than the source (the other is not) and we're downscaling
+                        // TODO: what happens if mode=crop;scale=down but the target is larger than the source?
+                        areaSize = targetSize = new SizeF(minWidth, minHeight);
+                        manualCropRect = new RectangleF(0, 0, minWidth, minHeight);
+                        s.copyRect = PolygonMath.ToRectangle(PolygonMath.AlignWith(manualCropRect, s.copyRect, s.settings.Anchor));
+                    }
+                    else if (scale == ScaleMode.UpscaleCanvas) {
+                        targetSize = new SizeF(minWidth, minHeight);
+                        manualCropRect = new RectangleF(0, 0, minWidth, minHeight);
+                        s.copyRect = PolygonMath.ToRectangle(PolygonMath.AlignWith(manualCropRect, s.copyRect, s.settings.Anchor));
+                    }
+                    else
+                    {
+                        //Determine the size of the area we are copying
+                        Size sourceSize = PolygonMath.RoundPoints(PolygonMath.ScaleInside(areaSize, manualCropSize));
+                        //Center the portion we are copying within the manualCropSize
+                        s.copyRect = PolygonMath.ToRectangle(PolygonMath.AlignWith(new RectangleF(0, 0, sourceSize.Width, sourceSize.Height), s.copyRect, s.settings.Anchor));
+                    }
 
                 } else { //Stretch and carve both act like stretching, so do that:
                     areaSize = targetSize = new SizeF((float)width, (float)height);
