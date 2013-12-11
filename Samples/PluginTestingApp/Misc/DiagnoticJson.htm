@@ -233,17 +233,7 @@
             }
 
             function autoCropAndScalingTests() {
-                // TODO: remove when fix is verified
-                checkJsonResult('autocrop scale down BAD (current)',
-                    'diagnostic-300x400.png?width=400&height=300&mode=crop&scale=down', {
-                    finalRect: { width: 400, height: 300 },
-                    imageSourcePoly: { x: 0, y: 88, width: 300, height: 225, rect: true },
-                    imageDestPoly: { x: 0, y: 0, width: 400, height: 300, rect: true },
-                    imageDestAreaPoly: { x: 0, y: 0, width: 400, height: 300, rect: true }
-                });
-
-                // TODO: verify the desired source/dest-poly values
-                checkJsonResult('autocrop scale down GOOD (desired)',
+                checkJsonResult('autocrop scale down',
                     'diagnostic-300x400.png?width=400&height=300&mode=crop&scale=down', {
                     finalRect: { width: 300, height: 300 },
                     imageSourcePoly: { x: 0, y: 50, width: 300, height: 300, rect: true },
@@ -251,17 +241,7 @@
                     imageDestAreaPoly: { x: 0, y: 0, width: 300, height: 300, rect: true }
                 });
 
-                // TODO: remove when fix is verified
-                checkJsonResult('autocrop scale canvas BAD (current)',
-                    'diagnostic-300x400.png?width=400&height=300&mode=crop&scale=canvas', {
-                    finalRect: { width: 400, height: 300 },
-                    imageSourcePoly: { x: 0, y: 88, width: 300, height: 225, rect: true },
-                    imageDestPoly: { x: 0, y: 0, width: 400, height: 300, rect: true },
-                    imageDestAreaPoly: { x: 0, y: 0, width: 400, height: 300, rect: true }
-                });
-
-                // TODO: verify the desired source/dest-poly values
-                checkJsonResult('autocrop scale canvas GOOD (desired)',
+                checkJsonResult('autocrop scale canvas',
                     'diagnostic-300x400.png?width=400&height=300&mode=crop&scale=canvas', {
                     finalRect: { width: 400, height: 300 },
                     imageSourcePoly: { x: 0, y: 50, width: 300, height: 300, rect: true },
@@ -269,18 +249,7 @@
                     imageDestAreaPoly: { x: 0, y: 0, width: 400, height: 300, rect: true }
                 });
 
-                // REVIEW: Is the current behavior actually already correct?
-                // TODO: remove when fix is verified
-                checkJsonResult('autocrop scale both BAD (current)',
-                    'diagnostic-300x400.png?width=400&height=300&mode=crop&scale=both', {
-                        finalRect: { width: 400, height: 300 },
-                        imageSourcePoly: { x: 0, y: 88, width: 300, height: 225, rect: true },
-                        imageDestPoly: { x: 0, y: 0, width: 400, height: 300, rect: true },
-                        imageDestAreaPoly: { x: 0, y: 0, width: 400, height: 300, rect: true }
-                    });
-
-                // TODO: verify the desired source/dest-poly values
-                checkJsonResult('autocrop scale both GOOD (desired)',
+                checkJsonResult('autocrop scale both',
                     'diagnostic-300x400.png?width=400&height=300&mode=crop&scale=both', {
                         finalRect: { width: 400, height: 300 },
                         imageSourcePoly: { x: 0, y: 88, width: 300, height: 225, rect: true },
