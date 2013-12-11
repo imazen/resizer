@@ -114,15 +114,15 @@ namespace ImageResizer.Plugins.AzureReader2 {
             if (IsPathVirtual(virtualPath)) {
                 if (LazyExistenceCheck) return true;
 
-                // Strip prefix from virtual path; keep container and blob
-                // mb:12/8/2012 - need to prepend the blob client base uri to the url
-                string relativeBlobURL = string.Format("{0}/{1}",CloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\'), virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim('/', '\\'));
-
-                // Get a reference to the blob
-                // mb:12/8/2012 - this call now must be a uri
-                ICloudBlob cloudBlob = CloudBlobClient.GetBlobReferenceFromServer(new Uri(relativeBlobURL));
-
                 try {
+                    // Strip prefix from virtual path; keep container and blob
+                    // mb:12/8/2012 - need to prepend the blob client base uri to the url
+                    string relativeBlobURL = string.Format("{0}/{1}", CloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\'), virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim('/', '\\'));
+
+                    // Get a reference to the blob
+                    // mb:12/8/2012 - this call now must be a uri
+                    ICloudBlob cloudBlob = CloudBlobClient.GetBlobReferenceFromServer(new Uri(relativeBlobURL));
+
                     cloudBlob.FetchAttributes();
                     return true;
                 } catch (StorageException e) {
