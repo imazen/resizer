@@ -14,13 +14,25 @@ namespace ImageResizer.Plugins.Watermark {
     public class ImageLayer:Layer {
         public ImageLayer(NameValueCollection attrs, ResizeSettings defaultImageQuery, Config c)
             : base(attrs) {
-            Path = attrs["path"];
             this.c = c;
-            if (!string.IsNullOrEmpty(attrs["imageQuery"])) {
-                ImageQuery = new ResizeSettings(attrs["imageQuery"], defaultImageQuery);
-            } else {
-                ImageQuery = new ResizeSettings(defaultImageQuery);
+
+            var configPath = attrs["path"];
+            var configImageQuery = attrs["imageQuery"];
+
+            if (!string.IsNullOrEmpty(configPath))
+            {
+                this.Path = PathUtils.RemoveQueryString(configPath);
             }
+
+            // Combine the ResizeSettings from 'path', 'imageQuery', and any
+            // 'defaultImageQuery' settings as well.  Settings from 'imageQuery'
+            // take precedence over 'path', and both take precedence over the
+            // 'defaultImageQuery' settings.
+            var pathSettings = new ResizeSettings(configPath ?? string.Empty);
+            var imageQuerySettings = new ResizeSettings(configImageQuery ?? string.Empty);
+            var mergedSettings = new ResizeSettings(imageQuerySettings, pathSettings);
+
+            this.ImageQuery = new ResizeSettings(mergedSettings, defaultImageQuery);
         }
 
         public ImageLayer(Config c)
