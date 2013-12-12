@@ -34,6 +34,22 @@ namespace ImageResizer {
         /// </summary>
         /// <param name="queryString"></param>
         public ResizeSettings(string queryString) : base(PathUtils.ParseQueryStringFriendlyAllowSemicolons(queryString)) { }
+        /// <summary>
+        /// Merges the specified collection with a set of defaults into a new
+        /// ResizeSettings instance.
+        /// </summary>
+        /// <param name="col"></param>
+        /// <param name="defaultSettings"></param>
+        public ResizeSettings(NameValueCollection col, NameValueCollection defaultSettings)
+            : base(NameValueCollectionExtensions.MergeDefaults(col, defaultSettings)) { }
+        /// <summary>
+        /// Parses the specified querystring into name/value pairs and merges
+        /// it with defaultSettings in a new ResizeSettings instance.
+        /// </summary>
+        /// <param name="queryString"></param>
+        /// <param name="defaultSettings"></param>
+        public ResizeSettings(string queryString, NameValueCollection defaultSettings)
+            : this(PathUtils.ParseQueryStringFriendlyAllowSemicolons(queryString), defaultSettings) { }
 
         /// <summary>
         /// Creates a new resize settings object with the specified resizing settings
