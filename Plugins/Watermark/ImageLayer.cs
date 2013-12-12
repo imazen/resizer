@@ -12,14 +12,19 @@ using System.IO;
 
 namespace ImageResizer.Plugins.Watermark {
     public class ImageLayer:Layer {
-        public ImageLayer(NameValueCollection attrs, Config c)
+        public ImageLayer(NameValueCollection attrs, ResizeSettings defaultImageQuery, Config c)
             : base(attrs) {
-                Path = attrs["path"];
-                this.c = c;
-                if (!string.IsNullOrEmpty(attrs["imageQuery"])) ImageQuery = new ResizeSettings(attrs["imageQuery"]);
+            Path = attrs["path"];
+            this.c = c;
+            if (!string.IsNullOrEmpty(attrs["imageQuery"])) {
+                ImageQuery = new ResizeSettings(attrs["imageQuery"], defaultImageQuery);
+            } else {
+                ImageQuery = new ResizeSettings(defaultImageQuery);
+            }
         }
 
-        public ImageLayer(Config c) {
+        public ImageLayer(Config c)
+        {
             this.c = c;
         }
         protected string _path = null;

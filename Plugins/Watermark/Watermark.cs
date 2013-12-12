@@ -23,11 +23,24 @@ namespace ImageResizer.Plugins.Watermark
         public WatermarkPlugin() {
         }
 
+
+        private ResizeSettings _defaultImageQuery = new ResizeSettings("scache=true");
+        /// <summary>
+        /// Default querystring parameters for all image watermarks.
+        /// If not specified in the watermark configuration, defaults to
+        /// "scache=true".
+        /// </summary>
+        public ResizeSettings DefaultImageQuery
+        {
+            get { return _defaultImageQuery; }
+            set { _defaultImageQuery = value; }
+        }
+
         ImageLayer _otherImages = new ImageLayer(null);
         /// <summary>
         /// When a &amp;watermark command does not specify a named preset, it is assumed to be a file name. 
         /// Set OtherImages.Path to the search folder. All watermark images (except for presets) must be in the root of the search folder. 
-        /// The remainder of the settings affect how each watermrak will be positioned and displayed.
+        /// The remainder of the settings affect how each watermark will be positioned and displayed.
         /// </summary>
         public ImageLayer OtherImages {
             get { return _otherImages; }
@@ -45,7 +58,7 @@ namespace ImageResizer.Plugins.Watermark
             c.Plugins.add_plugin(this);
             this.c = c;
             this.OtherImages.ConfigInstance = c;
-            _namedWatermarks = ParseWatermarks(c.getConfigXml().queryFirst("watermarks"), ref _otherImages);
+            _namedWatermarks = ParseWatermarks(c.getConfigXml().queryFirst("watermarks"), ref _defaultImageQuery, ref _otherImages);
             c.Pipeline.PostRewrite += Pipeline_PostRewrite;
             return this;
         }
@@ -60,7 +73,13 @@ namespace ImageResizer.Plugins.Watermark
             return new string[] { "watermark" };
         }
 
-        protected Dictionary<string, IEnumerable<Layer>> ParseWatermarks(Node n, ref ImageLayer otherImageDefaults) {
+        protected Dictionary<string, IEnumerable<Layer>> ParseWatermarks(Node n, ref ResizeSettings defaultImageQuery, ref ImageLayer otherImageDefaults) {
+            // Grab the defaultImageQuery value (if it exists) from the watermarks
+            // node, so that we can apply them to any subsequent image watermarks.
+            if (n != null && !string.IsNullOrEmpty(n.Attrs["defaultImageQuery"])) {
+                defaultImageQuery = new ResizeSettings(n.Attrs["defaultImageQuery"]);
+            }
+
             Dictionary<string, IEnumerable<Layer>> dict = new Dictionary<string, IEnumerable<Layer>>(StringComparer.OrdinalIgnoreCase);
             if (n == null || n.Children == null) return dict;
             foreach (Node c in n.Children) {
@@ -77,16 +96,15 @@ namespace ImageResizer.Plugins.Watermark
                 }
 
                 
-
-                if (c.Name.Equals("otherimages", StringComparison.OrdinalIgnoreCase)) otherImageDefaults = new ImageLayer(c.Attrs, this.c);
-                if (c.Name.Equals("image", StringComparison.OrdinalIgnoreCase)) dict.Add(name, new Layer[]{new ImageLayer(c.Attrs, this.c)});
+                if (c.Name.Equals("otherimages", StringComparison.OrdinalIgnoreCase)) otherImageDefaults = new ImageLayer(c.Attrs, defaultImageQuery, this.c);
+                if (c.Name.Equals("image", StringComparison.OrdinalIgnoreCase)) dict.Add(name, new Layer[] { new ImageLayer(c.Attrs, defaultImageQuery, this.c) });
                 if (c.Name.Equals("text", StringComparison.OrdinalIgnoreCase)) dict.Add(name, new Layer[] {new TextLayer(c.Attrs) });
                 if (c.Name.Equals("group", StringComparison.OrdinalIgnoreCase)) {
                     
                     List<Layer> layers = new List<Layer>();
                     if (c.Children != null) {
                         foreach (Node layer in c.Children) {
-                            if (layer.Name.Equals("image", StringComparison.OrdinalIgnoreCase)) layers.Add(new ImageLayer(layer.Attrs, this.c));
+                            if (layer.Name.Equals("image", StringComparison.OrdinalIgnoreCase)) layers.Add(new ImageLayer(layer.Attrs, defaultImageQuery, this.c));
                             if (layer.Name.Equals("text", StringComparison.OrdinalIgnoreCase)) layers.Add(new TextLayer(layer.Attrs));
                         }
                     }
