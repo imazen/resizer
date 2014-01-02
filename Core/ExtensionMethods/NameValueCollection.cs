@@ -243,5 +243,26 @@ namespace ImageResizer.ExtensionMethods {
 
             return c;
         }
+
+        /// <summary>
+        /// Creates and returns a new NameValueCollection instance that contains all of the
+        /// keys/values from 'q', and any keys/values from 'defaults' that 'q' does not already
+        /// contain.
+        /// </summary>
+        /// <param name="q">The settings specific to a particular query</param>
+        /// <param name="defaults">Default settings to use when not overridden by 'q'.</param>
+        /// <returns></returns>
+        public static NameValueCollection MergeDefaults(NameValueCollection q, NameValueCollection defaults)
+        {
+            // Start with the defaults, and then blindly copy the keys/values
+            // from 'q'.  Any keys in both 'defaults' and 'q' will end up having
+            // the value from 'q', since that one is set last.
+            NameValueCollection c = new NameValueCollection(defaults);
+            foreach (string s in q.AllKeys) {
+                c[s] = q[s];
+            }
+
+            return c;
+        }
     }
 }

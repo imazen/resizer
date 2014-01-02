@@ -55,5 +55,23 @@ namespace ImageResizer.Core.Tests {
             Color? parsed = ParseUtils.ParseColor(from).Value;
             Assert.AreEqual(expected, ParseUtils.SerializeColor(parsed.Value), StringComparison.InvariantCultureIgnoreCase);
         }
+
+        [Test]
+        [Row("a=1", "", "?a=1")]
+        [Row("", "b=2", "?b=2")]
+        [Row("a=1", "b=2", "?a=1&b=2")]
+        [Row("b=1", "b=2", "?b=1")]
+        public void TestMergingConstructor(string q, string defaults, string expected)
+        {
+            ResizeSettings defaultSettings = new ResizeSettings(defaults);
+            ResizeSettings mergedSettings = new ResizeSettings(q, defaultSettings);
+            ResizeSettings expectedSettings = new ResizeSettings(expected);
+
+            Assert.AreEqual(expectedSettings.Count, mergedSettings.Count);
+            foreach (string key in expectedSettings.AllKeys)
+            {
+                Assert.AreEqual(expectedSettings[key], mergedSettings[key]);
+            }
+        }
     }
 }

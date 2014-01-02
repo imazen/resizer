@@ -39,10 +39,13 @@ namespace AzureWebImages {
                         blob.UploadFromStream(fuPicture.FileContent);
 
                         // Display images; use relative paths so the module will capture the urls
+                        string relativePath = string.Concat("/azure/imageresizer/", filename);
                         StringBuilder sb = new StringBuilder(2000);
-                        sb.Append("<img src=\"azure/imageresizer/" + filename + "?width=75\" border=\"0\"><br /><br />");
-                        sb.Append("<img src=\"/azure/imageresizer/" + filename + "?width=150&height=150&crop=auto\" border=\"0\"><br /><br />");
-                        sb.Append("<img src=\"/azure/imageresizer/" + filename + "\" border=\"0\">");
+
+                        sb.AppendFormat("<p>Image uploaded to {0}</p>", Server.HtmlEncode(relativePath));
+                        sb.AppendFormat("<p>width=75<br /><img src=\"{0}?width=75\" border=\"0\"></p>", relativePath);
+                        sb.AppendFormat("<p>width=150, height=150, crop=auto<br /><img src=\"{0}?width=150&height=150&crop=auto\" border=\"0\"></p>", relativePath);
+                        sb.AppendFormat("<p>original image<br /><img src=\"{0}\" border=\"0\"></p>", relativePath);
 
                         litImages.Text = sb.ToString();
                     }

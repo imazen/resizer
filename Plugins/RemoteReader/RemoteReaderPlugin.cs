@@ -99,7 +99,7 @@ namespace ImageResizer.Plugins.RemoteReader {
             //Turn URI instances into streams
             if (source is Uri) {
                 path = ((Uri)source).ToString();
-                return GetUriStream((Uri)source);
+                return SeekableStreamWrapper.FromStream(GetUriStream((Uri)source), ref disposeStream);
             }
             return null;
         }
@@ -362,7 +362,7 @@ namespace ImageResizer.Plugins.RemoteReader {
         }
 
         public System.IO.Stream Open() {
-            return parent.GetUriStream(new Uri(this.request.RemoteUrl));
+            return SeekableStreamWrapper.FromStream(parent.GetUriStream(new Uri(this.request.RemoteUrl)));
         }
 
         public string GetCacheKey(bool includeModifiedDate) {

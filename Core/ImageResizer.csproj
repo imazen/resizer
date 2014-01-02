@@ -171,6 +171,7 @@
     <Compile Include="Util\PolygonMath.cs" />
     <Compile Include="Plugins\IVirtualFileWithModifiedDate.cs" />
     <Compile Include="ResizeSettings.cs" />
+    <Compile Include="Util\SeekableStreamWrapper.cs" />
     <Compile Include="Util\StreamUtils.cs" />
     <Compile Include="Util\UrlHasher.cs" />
     <Compile Include="Util\Utils.cs" />

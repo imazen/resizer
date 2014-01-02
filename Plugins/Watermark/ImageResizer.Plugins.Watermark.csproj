@@ -54,7 +54,6 @@
     <Compile Include="ImageLayer.cs" />
     <Compile Include="Layer.cs" />
     <Compile Include="LegacyWatermarkFeatures.cs" />
-    <Compile Include="NameValueCollectin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextLayer.cs" />
     <Compile Include="Watermark.cs" />

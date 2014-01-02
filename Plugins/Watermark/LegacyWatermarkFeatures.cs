@@ -38,13 +38,18 @@ namespace ImageResizer.Plugins.Watermark {
         
 
         /// <summary>
-        /// Loads a bitmap, cached using asp.net's cache
+        /// Loads or caches a bitmap, using asp.net's cache (when available)
         /// </summary>
-        /// <param name="localfile"></param>
-        /// <returns></returns>
-        public Bitmap GetMemCachedBitmap(string virtualPath) {
+        /// <param name="virtualPath">The virtual path to the file to load.</param>
+        /// <param name="onlyLoadIfCacheExists">Whether to load the image when
+        /// no cache is available.  Pass <c>true</c> for pre-fetching, and
+        /// <c>false</c> if the image is needed immediately.</param>
+        /// <returns>Returns the Bitmap.  If no cache is available, and
+        /// <c>onlyLoadIfCacheExists</c> is <c>true</c>, returns <c>null</c>
+        /// rather than loading the Bitmap.</returns>
+        public Bitmap GetMemCachedBitmap(string virtualPath, bool onlyLoadIfCacheExists = false) {
             //If not ASP.NET, don't cache.
-            if (HttpContext.Current == null) return c.CurrentImageBuilder.LoadImage(virtualPath, new ResizeSettings());
+            if (HttpContext.Current == null) return onlyLoadIfCacheExists ? null : c.CurrentImageBuilder.LoadImage(virtualPath, new ResizeSettings());
 
             string key = virtualPath.ToLowerInvariant();
             Bitmap b = HttpContext.Current.Cache[key] as Bitmap;
@@ -59,41 +64,30 @@ namespace ImageResizer.Plugins.Watermark {
             return b;
         }
 
+        protected void LegacyPreFetchWatermark(ResizeSettings settings) {
+            string watermark;
+            if (this.LegacyParseWatermark(settings, out watermark)) {
+                this.GetMemCachedBitmap(watermark, onlyLoadIfCacheExists: true);
+            }
+        }
 
         protected bool LegacyDrawWatermark(ImageState s) {
-            string watermark = s.settings["watermark"]; //from the querystring
             Graphics g = s.destGraphics;
-            if (string.IsNullOrEmpty(watermark) || g == null) return false;
+            if (g == null) return false;
 
-            if (watermarkDir == null) return false;
-
-
+            string watermark;
+            if (!LegacyParseWatermark(s.settings, out watermark)) return false;
 
             RectangleF imageBox = PolygonMath.GetBoundingBox(s.layout["image"]);
-            //Floor and cieling values to prevent fractional placement.
+            //Floor and ceiling values to prevent fractional placement.
             imageBox.Width = (float)Math.Floor(imageBox.Width);
             imageBox.Height = (float)Math.Floor(imageBox.Height);
             imageBox.X = (float)Math.Ceiling(imageBox.X);
             imageBox.Y = (float)Math.Ceiling(imageBox.Y);
 
-            if (watermark.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) > -1 ||
-                watermark.IndexOfAny(new char[] { '\\', '/' }) > -1)
-                return false;
-
-            //Combine the directory with the base dir
-
-            //Is watermarkDir a physical path?
-            char slash = watermarkDir.Contains("/") ? '/' : '\\';
-
-            watermark = watermarkDir.TrimEnd(slash) + slash + watermark.TrimStart(slash);
-
-            //Verify the file exists if we're in ASP.NET. If the watermark doesn't exist, skip watermarking.
-            if (!c.Pipeline.FileExists(watermark, s.settings) && slash == '/') return false;
-
             SizeF watermarkSize = this.watermarkSize;
             SizeF topLeftPadding = this.topLeftPadding;
             SizeF bottomRightPadding = this.bottomRightPadding;
-
 
             //Load the file specified in the querystring,
             Bitmap wb = GetMemCachedBitmap(watermark);
@@ -196,6 +190,26 @@ namespace ImageResizer.Plugins.Watermark {
             return true;
         }
 
+        protected bool LegacyParseWatermark(ResizeSettings settings, out string watermark)
+        {
+            watermark = settings["watermark"]; //from the querystring
+            if (string.IsNullOrEmpty(watermark) || watermarkDir == null) return false;
 
+            if (watermark.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) > -1 ||
+                watermark.IndexOfAny(new char[] { '\\', '/' }) > -1)
+                return false;
+
+            //Combine the directory with the base dir
+
+            //Is watermarkDir a physical path?
+            char slash = watermarkDir.Contains("/") ? '/' : '\\';
+
+            watermark = watermarkDir.TrimEnd(slash) + slash + watermark.TrimStart(slash);
+
+            //Verify the file exists if we're in ASP.NET. If the watermark doesn't exist, skip watermarking.
+            if (!c.Pipeline.FileExists(watermark, settings) && slash == '/') return false;
+
+            return true;
+        }
     }
 }

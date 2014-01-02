@@ -72,6 +72,9 @@
     <Content Include="js\hover.js" />
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="Misc\diagnostic-300x400.png" />
+    <Content Include="Misc\diagnostic-31x23.png" />
+    <Content Include="Misc\DiagnoticJson.htm" />
     <Content Include="Misc\UrlAuthorizationTests.aspx" />
     <Content Include="Misc\UrlEncryption.aspx" />
     <Content Include="Plugins.htm" />
@@ -162,6 +165,10 @@
     <ProjectReference Include="..\..\Plugins\CloudFront\ImageResizer.Plugins.CloudFront.csproj">
       <Project>{9bfca7fb-eafb-4e89-b388-774cea6cd466}</Project>
       <Name>ImageResizer.Plugins.CloudFront</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\DiagnosticJson\ImageResizer.Plugins.DiagnosticJson.csproj">
+      <Project>{df78df74-d71e-470d-8be2-d827498e8af8}</Project>
+      <Name>ImageResizer.Plugins.DiagnosticJson</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\DiskCache\ImageResizer.Plugins.DiskCache.csproj">
       <Project>{c3b00cd1-39ee-4ba8-bdc0-02e346f20694}</Project>

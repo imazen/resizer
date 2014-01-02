@@ -51,8 +51,23 @@ namespace ImageResizer.Plugins.AzureReader2 {
         
         public AzureVirtualPathProvider(string blobStorageConnection) {
             // Setup the connection to Windows Azure Storage
-            // mb:12/8/2012 - this needs to be the actual connection string not the config file connection string name
-            var cloudStorageAccount = CloudStorageAccount.Parse(blobStorageConnection);
+
+            // The 1.x Azure SDK offers a CloudStorageAccount.FromConfigurationSetting()
+            // method that looks up the connection string from the fabric's configuration
+            // and creates the CloudStorageAccount.  In 2.x, that method has disappeared
+            // and we have to talk to the CloudConfigurationManager directly.
+            var connectionString = CloudConfigurationManager.GetSetting(blobStorageConnection);
+
+            // Earlier versions of AzureReader2 simply assumed/required that the
+            // 'blobStorageConnection' value was the connection string itself, and
+            // not a config key.  Therefore, we fall back to that behavior if the
+            // configuration lookup fails.
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                connectionString = blobStorageConnection;
+            }
+
+            var cloudStorageAccount = CloudStorageAccount.Parse(connectionString);
             CloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
         }
 
@@ -99,15 +114,15 @@ namespace ImageResizer.Plugins.AzureReader2 {
             if (IsPathVirtual(virtualPath)) {
                 if (LazyExistenceCheck) return true;
 
-                // Strip prefix from virtual path; keep container and blob
-                // mb:12/8/2012 - need to prepend the blob client base uri to the url
-                string relativeBlobURL = string.Format("{0}/{1}",CloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\'), virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim('/', '\\'));
-
-                // Get a reference to the blob
-                // mb:12/8/2012 - this call now must be a uri
-                ICloudBlob cloudBlob = CloudBlobClient.GetBlobReferenceFromServer(new Uri(relativeBlobURL));
-
                 try {
+                    // Strip prefix from virtual path; keep container and blob
+                    // mb:12/8/2012 - need to prepend the blob client base uri to the url
+                    string relativeBlobURL = string.Format("{0}/{1}", CloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\'), virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim('/', '\\'));
+
+                    // Get a reference to the blob
+                    // mb:12/8/2012 - this call now must be a uri
+                    ICloudBlob cloudBlob = CloudBlobClient.GetBlobReferenceFromServer(new Uri(relativeBlobURL));
+
                     cloudBlob.FetchAttributes();
                     return true;
                 } catch (StorageException e) {

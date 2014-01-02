@@ -1,0 +1,18 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.DiagnosticJson</id>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<description>Description</description>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.DiagnosticJson.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.DiagnosticJson.pdb" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.DiagnosticJson.xml" target="lib" />
+		<file src="..\Plugins\DiagnosticJson\**\*.cs" target="src" />
+	</files>
+</package>
