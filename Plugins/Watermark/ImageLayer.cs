@@ -12,14 +12,31 @@ using System.IO;
 
 namespace ImageResizer.Plugins.Watermark {
     public class ImageLayer:Layer {
-        public ImageLayer(NameValueCollection attrs, Config c)
+        public ImageLayer(NameValueCollection attrs, ResizeSettings defaultImageQuery, Config c)
             : base(attrs) {
-                Path = attrs["path"];
-                this.c = c;
-                if (!string.IsNullOrEmpty(attrs["imageQuery"])) ImageQuery = new ResizeSettings(attrs["imageQuery"]);
+            this.c = c;
+
+            var configPath = attrs["path"];
+            var configImageQuery = attrs["imageQuery"];
+
+            if (!string.IsNullOrEmpty(configPath))
+            {
+                this.Path = PathUtils.RemoveQueryString(configPath);
+            }
+
+            // Combine the ResizeSettings from 'path', 'imageQuery', and any
+            // 'defaultImageQuery' settings as well.  Settings from 'imageQuery'
+            // take precedence over 'path', and both take precedence over the
+            // 'defaultImageQuery' settings.
+            var pathSettings = new ResizeSettings(configPath ?? string.Empty);
+            var imageQuerySettings = new ResizeSettings(configImageQuery ?? string.Empty);
+            var mergedSettings = new ResizeSettings(imageQuerySettings, pathSettings);
+
+            this.ImageQuery = new ResizeSettings(mergedSettings, defaultImageQuery);
         }
 
-        public ImageLayer(Config c) {
+        public ImageLayer(Config c)
+        {
             this.c = c;
         }
         protected string _path = null;
@@ -64,15 +81,21 @@ namespace ImageResizer.Plugins.Watermark {
             this.CopyTo(l);
             return l;
         }
+
         /// <summary>
-        /// Loads a bitmap, cached using asp.net's cache
+        /// Loads or caches a bitmap, using asp.net's cache (when available)
         /// </summary>
         /// <param name="query"></param>
         /// <param name="virtualPath"></param>
-        /// <returns></returns>
-        public Bitmap GetMemCachedBitmap(string virtualPath, ResizeSettings query) {
+        /// <param name="onlyLoadIfCacheExists">Whether to load the image when
+        /// no cache is available.  Pass <c>true</c> for pre-fetching, and
+        /// <c>false</c> if the image is needed immediately.</param>
+        /// <returns>Returns the Bitmap.  If no cache is available, and
+        /// <c>onlyLoadIfCacheExists</c> is <c>true</c>, returns <c>null</c>
+        /// rather than loading the Bitmap.</returns>
+        public Bitmap GetMemCachedBitmap(string virtualPath, ResizeSettings query, bool onlyLoadIfCacheExists = false) {
             //If not ASP.NET, don't cache.
-            if (HttpContext.Current == null) return c.CurrentImageBuilder.LoadImage(virtualPath, query);
+            if (HttpContext.Current == null) return onlyLoadIfCacheExists ? null : c.CurrentImageBuilder.LoadImage(virtualPath, query);
 
             string key = virtualPath.ToLowerInvariant() + query.ToString();
             Bitmap b = HttpContext.Current.Cache[key] as Bitmap;
@@ -93,6 +116,12 @@ namespace ImageResizer.Plugins.Watermark {
             return b;
         }
 
+        public void PreFetchImage() {
+            if (this.ShouldLoadAsOriginalSize()) {
+                GetMemCachedBitmap(this.Path, this.ImageQuery, onlyLoadIfCacheExists: true);
+            }
+        }
+
         public override void RenderTo(Resizing.ImageState s) {
             if (string.IsNullOrEmpty(Path)) return;
 
@@ -100,11 +129,10 @@ namespace ImageResizer.Plugins.Watermark {
             s.destGraphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
             s.destGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
 
-            //If the image is a virtual gradient, allow delayed loading so the estimated width/height values can be used to create it the proper size. 
-            //Otherwise, load immediately.
             Bitmap img = null;
-            if (c.Pipeline.GetFile(Path,ImageQuery) == null || !(c.Pipeline.GetFile(Path,ImageQuery) is ImageResizer.Plugins.Basic.Gradient.GradientVirtualFile))
+            if (this.ShouldLoadAsOriginalSize()) {
                 img = GetMemCachedBitmap(Path, ImageQuery);
+            }
            
             //Calculate the location for the bitmap
             RectangleF imgBounds = this.CalculateLayerCoordinates(s, delegate(double maxwidth, double maxheight) {
@@ -140,6 +168,25 @@ namespace ImageResizer.Plugins.Watermark {
                 }
 
             }
+        }
+
+        /// <summary>
+        /// Whether the image should be loaded in its original size.  If it can,
+        /// it can also be pre-fetched.
+        /// </summary>
+        /// <returns></returns>
+        private bool ShouldLoadAsOriginalSize() {
+            if (string.IsNullOrEmpty(this.Path)) return false;
+
+            // If the image is a virtual gradient, we don't load in its "original
+            // size".  Instead, we allow later-estimated width/height values to
+            // be used to create it at the actual needed size.
+            var file = c.Pipeline.GetFile(this.Path, this.ImageQuery);
+            if (file != null && (file is ImageResizer.Plugins.Basic.Gradient.GradientVirtualFile)) {
+                return false;
+            }
+
+            return true;
         }
     }
 }

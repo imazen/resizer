@@ -16,6 +16,17 @@
     <br />
     This uses a a URL rewrite rule to affect an entire folder, eliminating need for individual specificaiton of the 404 command. Should also display a sun.
     <img src="/propertyimages/missing.jpg" runat="server" />
+    <br />
+    This 404 image is scaled the same way as the original request (width=100).
+    <img src="missing-file.jpg?width=100&404=/Sun_256.png" />
+    <br />
+    This 404 image is fliped the same way as the original request
+    because the flip command is allowed(flip=x).
+    <img src="missing-file.jpg?flip=x&404=/Sun_256.png" />
+    <br />
+    This 404 image is <em>not</em> source-fliped the same way as the original request
+    because the sFlip command is removed (sFlip=x).
+    <img src="missing-file.jpg?sFlip=x&404=/Sun_256.png" />
     </div>
     <h3>CloudFront test</h3>
         <div>

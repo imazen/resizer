@@ -1,0 +1,380 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Diagnostic JSON</title>
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js" type="text/javascript"></script>
+    <style type="text/css">
+        #request {
+            width: 30em;
+            padding: 3px;
+        }
+
+        .json {
+            /*font-family: Consolas, 'Lucida Console', 'DejaVu Sans Mono', monospace;*/
+            background-color: #f0f0f0;
+            padding: 0.25em;
+            margin: 0.25em;
+            /*max-width: 600px;*/
+        }
+
+        pre {
+            font-family: Consolas, 'Lucida Console', 'DejaVu Sans Mono', monospace;
+        }
+
+        .succeeded {
+            color: #008000;
+        }
+
+            .succeeded .status {
+                display: none;
+            }
+
+        .failed {
+            color: #ff0000;
+        }
+
+            .failed .status {
+                text-transform: uppercase;
+            }
+
+        .status {
+        }
+
+        .name {
+            font-weight: bold;
+        }
+
+        .message {
+        }
+    </style>
+</head>
+<body>
+    <h1>Diagnostic JSON</h1>
+
+    <p>
+        The DiagnoticJson plugin can return diagnostic information in place of
+        the requested image.
+    </p>
+
+    <p>
+        Sample requests:
+        <ul>
+            <li><code>/red-leaf.jpg?maxwidth=300</code></li>
+            <li><code>/red-leaf.jpg?maxwidth=300&amp;rotate=90</code></li>
+            <li><code>/red-leaf.jpg?maxwidth=300&amp;rotate=30</code></li>
+            <li><code>/red-leaf.jpg?crop=10,20,100,200</code></li>
+            <li><code>/red-leaf.jpg?sRotate=90&amp;crop=10,20,100,200</code></li>
+        </ul>
+    </p>
+
+    <form action="#" id="diagnosticJsonSample">
+        <input type="text" id="request" value="/red-leaf.jpg?maxwidth=300" />
+        <button id="test">Get diagnostic JSON...</button>
+    </form>
+
+    <div id="sampleOutput" style="margin-top: 1em"></div>
+
+    <p><a id="runRegressions" href="#">Run layout regression tests...</a></p>
+
+    <div id="regressionOutput"></div>
+
+    <script type="text/javascript">
+        $(function () {
+            //$('#sampleOutput').append('<div>jQuery is loaded!</div>');
+
+            $('#diagnosticJsonSample').submit(function (e) {
+                console.log('requesting info...');
+                $('#sampleOutput').html('<div>requesting info...</div>');
+
+                showJsonResult($('#request').val());
+
+                e.preventDefault();
+                return false;
+            });
+
+            function showJsonResult(request) {
+                request = sanitizeUrl(request);
+                // Get the result as text, not JSON-converted-to-object,
+                // so that we can show it to the user.
+                $.get(request, 'text')
+                    .done(function (data) {
+                        console.log('request succeeded.')
+                        $('#sampleOutput').html('<div>request succeeded:<pre class="request">' + request + '</pre><pre class="json">' + data + '</pre></div>');
+                    })
+                    .fail(function (e) {
+                        console.log('request failed.')
+                        $('#sampleOutput').html('<div>request failed (' + e.getAllResponseHeaders() + ').</div>');
+                    });
+            }
+
+            // ... and auto-submit when the page is ready!
+            ////$('#diagnosticJsonSample').submit();
+
+            $('#runRegressions').click(function (e) {
+                console.log('running layout regressions...');
+                $('#regressionOutput').html('');
+                appendRegressionMessage('running layout regressions...');
+
+                sanityChecks();
+                basicRegressionTests();
+
+                autoCropAndScalingTests();
+
+                e.preventDefault();
+                return false;
+            });
+
+            function sanityChecks() {
+                ////checkJsonResult('invalid URL', 'does-not-exist.jpg', {});
+                checkJsonResult('sanity check valid URL', 'diagnostic-31x23.png', {});
+                checkJsonResult('sanity check sourceRect', 'diagnostic-31x23.png', { sourceRect: { width: 31, height: 23 } });
+                checkJsonResult('sanity check finalRect', 'diagnostic-31x23.png', { finalRect: { width: 31, height: 23 } });
+                checkJsonResult('sanity check imageSourcePoly', 'diagnostic-31x23.png', {
+                    imageSourcePoly: { x: 0, y: 0, width: 31, height: 23, rect: true, points: [[0, 0], [31, 0], [31, 23], [0, 23]] }
+                });
+                checkJsonResult('sanity check imageDestPoly', 'diagnostic-31x23.png', {
+                    imageDestPoly: { x: 0, y: 0, width: 31, height: 23, rect: true, points: [[0, 0], [31, 0], [31, 23], [0, 23]] }
+                });
+            }
+
+            function basicRegressionTests() {
+                // Cropping ('11,7,16,10' is '@11,7;5x3')...
+                checkJsonResult('crop', 'diagnostic-31x23.png?crop=11,7,16,10', {
+                    finalRect: { width: 5, height: 3 },
+                    imageSourcePoly: { x: 11, y: 7, width: 5, height: 3, rect: true, points: [[11, 7], [16, 7], [16, 10], [11, 10]] },
+                    imageDestPoly: { x: 0, y: 0, width: 5, height: 3, rect: true, points: [[0, 0], [5, 0], [5, 3], [0, 3]] }
+                });
+
+                // flip
+                checkJsonResult('flip X', 'diagnostic-31x23.png?flip=x', {
+                    finalRect: { width: 31, height: 23 },
+                    imageDestPoly: { x: 0, y: 0, width: 31, height: 23, rect: true, points: [[0, 0], [31, 0], [31, 23], [0, 23]] }
+                });
+
+                checkJsonResult('flip Y', 'diagnostic-31x23.png?flip=y', {
+                    finalRect: { width: 31, height: 23 },
+                    imageDestPoly: { x: 0, y: 0, width: 31, height: 23, rect: true, points: [[0, 0], [31, 0], [31, 23], [0, 23]] }
+                });
+
+                checkJsonResult('flip XY', 'diagnostic-31x23.png?flip=xy', {
+                    finalRect: { width: 31, height: 23 },
+                    imageDestPoly: { x: 0, y: 0, width: 31, height: 23, rect: true, points: [[0, 0], [31, 0], [31, 23], [0, 23]] }
+                });
+
+                // rotate
+                checkJsonResult('rotate 90', 'diagnostic-31x23.png?rotate=90', {
+                    finalRect: { width: 23, height: 31 },
+                    imageDestPoly: { x: 0, y: 0, width: 23, height: 31, rect: false, points: [[23, 0], [23, 31], [0, 31], [0, 0]] }
+                });
+
+                checkJsonResult('rotate 180', 'diagnostic-31x23.png?rotate=180', {
+                    finalRect: { width: 31, height: 23 },
+                    imageDestPoly: { x: 0, y: 0, width: 31, height: 23, rect: false, points: [[31, 23], [0, 23], [0, 0], [31, 0]] }
+                });
+
+                checkJsonResult('rotate 270', 'diagnostic-31x23.png?rotate=270', {
+                    finalRect: { width: 23, height: 31 },
+                    imageDestPoly: { x: 0, y: 0, width: 23, height: 31, rect: false, points: [[0, 31], [0, 0], [23, 0], [23, 31]] }
+                });
+
+                checkJsonResult('rotate -90', 'diagnostic-31x23.png?rotate=-90', {
+                    finalRect: { width: 23, height: 31 },
+                    imageDestPoly: { x: 0, y: 0, width: 23, height: 31, rect: false, points: [[0, 31], [0, 0], [23, 0], [23, 31]] }
+                });
+
+                checkJsonResult('rotate 45', 'diagnostic-31x23.png?rotate=45', {
+                    finalRect: { width: 38, height: 38 },
+                    imageDestPoly: { x: 0, y: 0, width: 38.18377, height: 38.1837654, rect: false, points: [[16.2634563, 0.0], [38.18377, 21.920311], [21.920311, 38.1837654], [0.0, 16.2634563]] },
+                });
+
+                checkJsonResult('rotate 30', 'diagnostic-31x23.png?rotate=30', {
+                    finalRect: { width: 38, height: 35 },
+                    imageDestPoly: { x: 0, y: 0, width: 38.3467865, height: 35.4185829, rect: false, points: [[11.5, 0.0], [38.3467865, 15.5], [26.8467865, 35.4185829], [0.0, 19.9185848]] }
+                });
+
+                // width
+                checkJsonResult('width', 'diagnostic-31x23.png?width=17', {
+                    finalRect: { width: 17, height: 13 },
+                    imageDestPoly: { x: 0, y: 0, width: 17, height: 13, rect: true }
+                });
+
+                // height
+                checkJsonResult('height', 'diagnostic-31x23.png?height=17', {
+                    finalRect: { width: 23, height: 17 },
+                    imageDestPoly: { x: 0, y: 0, width: 23, height: 17, rect: true }
+                });
+
+                // width and height (pads)
+                checkJsonResult('width and height', 'diagnostic-31x23.png?width=17&height=17', {
+                    finalRect: { width: 17, height: 17 },
+                    imageDestPoly: { x: 0, y: 2, width: 17, height: 13, rect: true },
+                    imageDestAreaPoly: { x: 0, y: 0, width: 17, height: 17, rect: true }
+                });
+
+                // sFlip
+                checkJsonResult('sFlip X', 'diagnostic-31x23.png?sFlip=x', {
+                    sourceRect: { width: 31, height: 23 },
+                    finalRect: { width: 31, height: 23 },
+                    imageSourcePoly: { x: 0, y: 0, width: 31, height: 23, rect: true },
+                    imageDestPoly: { x: 0, y: 0, width: 31, height: 23, rect: true },
+                    preAdjustedSourceRect: { width: 31, height: 23 },
+                    preAdjustedImageSourcePoly: { x: 0, y: 0, width: 31, height: 23, rect: false, points: [[31, 0], [0, 0], [0, 23], [31, 23]] }
+                });
+
+                // sRotate
+                checkJsonResult('sRotate 90', 'diagnostic-31x23.png?sRotate=90', {
+                    sourceRect: { width: 23, height: 31 },
+                    finalRect: { width: 23, height: 31 },
+                    imageSourcePoly: { x: 0, y: 0, width: 23, height: 31, rect: true },
+                    imageDestPoly: { x: 0, y: 0, width: 23, height: 31, rect: true },
+                    preAdjustedSourceRect: { width: 31, height: 23 },   //?
+                    preAdjustedImageSourcePoly: { x: 0, y: 0, width: 31, height: 23, rect: false, points: [[0, 23], [0, 0], [31, 0], [31, 23]] }
+                });
+            }
+
+            function autoCropAndScalingTests() {
+                checkJsonResult('autocrop scale down',
+                    'diagnostic-300x400.png?width=400&height=300&mode=crop&scale=down', {
+                    finalRect: { width: 300, height: 300 },
+                    imageSourcePoly: { x: 0, y: 50, width: 300, height: 300, rect: true },
+                    imageDestPoly: { x: 0, y: 0, width: 300, height: 300, rect: true },
+                    imageDestAreaPoly: { x: 0, y: 0, width: 300, height: 300, rect: true }
+                });
+
+                checkJsonResult('autocrop scale canvas',
+                    'diagnostic-300x400.png?width=400&height=300&mode=crop&scale=canvas', {
+                    finalRect: { width: 400, height: 300 },
+                    imageSourcePoly: { x: 0, y: 50, width: 300, height: 300, rect: true },
+                    imageDestPoly: { x: 50, y: 0, width: 300, height: 300, rect: true },
+                    imageDestAreaPoly: { x: 0, y: 0, width: 400, height: 300, rect: true }
+                });
+
+                checkJsonResult('autocrop scale both',
+                    'diagnostic-300x400.png?width=400&height=300&mode=crop&scale=both', {
+                        finalRect: { width: 400, height: 300 },
+                        imageSourcePoly: { x: 0, y: 88, width: 300, height: 225, rect: true },
+                        imageDestPoly: { x: 0, y: 0, width: 400, height: 300, rect: true },
+                        imageDestAreaPoly: { x: 0, y: 0, width: 400, height: 300, rect: true }
+                    });
+
+                // Additional tests
+                checkJsonResult('manual/auto crop',
+                    'diagnostic-300x400.png?crop=10,10,50,100&width=40&height=40&mode=crop', {
+                        finalRect: { width: 40, height: 40 },
+                        imageSourcePoly: { x: 10, y: 35, width: 40, height: 40, rect: true },
+                        imageDestPoly: { x: 0, y: 0, width: 40, height: 40, rect: true },
+                        imageDestAreaPoly: { x: 0, y: 0, width: 40, height: 40, rect: true }
+                    });
+            }
+
+            function sanitizeUrl(url) {
+                // TODO: A required settings object (as below) would be better
+                // than several disparate key/value variables...
+                ////var requiredSettings = { 'diagnosticjson': 'layout', 'j.indented': 'true' };
+                var qsKey = 'diagnosticjson=';
+                var qsValue = 'layout';
+                var qsKey2 = 'j.indented=';
+                var qsValue2 = 'true';
+
+                // ImageResizer allows ;-separated values as well, but we're
+                // just handling ?/& for now.
+                var parts = url.split(/[?&]/);
+
+                var cleaned = parts.filter(function (cur, i) {
+                    return i == 0 ||
+                        cur.toLowerCase().indexOf(qsKey) != 0 ||
+                        cur.toLowerCase().indexOf(qsKey2) != 0;
+                });
+
+                url = cleaned.reduce(function (prev, cur, i) {
+                    var sep = '&';
+                    if (i == 0) sep = '';
+                    if (i == 1) sep = '?';
+                    return prev + sep + cur;
+                }, '');
+
+                url = url + (cleaned.length <= 1 ? '?' : '&') + (qsKey + qsValue) + '&' + (qsKey2 + qsValue2);
+
+                return url;
+            };
+
+            function checkJsonResult(name, request, expected) {
+                request = sanitizeUrl(request);
+                // Get the result as text, not JSON-converted-to-object,
+                // so that we can show it to the user.
+                $.getJSON(request)
+                    .done(function (data) {
+                        if (checkActual(name, 'result', expected, data)) {
+                            appendRegressionResult(true, name, 'passed');
+                        }
+                    })
+                    .fail(function (e) {
+                        appendRegressionResult(false, name,
+                            'request failed (' + e.status + ': ' + e.statusText + ')');
+                    });
+            }
+
+            // Check that all of the values in 'actual' are found in
+            // 'expected'.  We don't care about additional values in
+            // 'expected'.
+            function checkActual(name, scope, expected, actual) {
+                var passed = true;
+                for (var key in expected) {
+                    var newScope = scope + '.' + key;
+                    var expectedVal = expected[key];
+                    var actualVal = actual[key];
+                    var actualType = typeof (actualVal);
+                    var expectedType = typeof (expectedVal);
+
+                    if (actualVal === undefined) {
+                        appendRegressionResult(false, name, 'missing actual value for "' + newScope + '".');
+                        passed = false;
+                    }
+                    else if (actualType !== expectedType) {
+                        appendRegressionResult(false, name, 'expected ' + expectedType + ', got ' + actualType + ' for "' + newScope + '".');
+                        passed = false;
+                    }
+                    else if (expectedType === 'object') {
+                        // if object/array, recurse!
+                        if (!checkActual(name, newScope, expectedVal, actualVal)) {
+                            passed = false;
+                        }
+                    }
+                    else if (expectedType === 'number') {
+                        // allow equality if number is within epsilon (1.0e-14)
+                        // this is just an empirical value we've seen as a rounding error
+                        var delta = Math.abs(actualVal - expectedVal);
+                        if (delta > 1.0e-14) {
+                            appendRegressionResult(false, name, 'expected "' + expectedVal + '", got "' + actualVal + '" for "' + newScope + '".');
+                            passed = false;
+                        }
+                    }
+                    else if (actualVal != expectedVal) {
+                        appendRegressionResult(false, name, 'expected "' + expectedVal + '", got "' + actualVal + '" for "' + newScope + '".');
+                        passed = false;
+                    }
+                }
+
+                return passed;
+            }
+
+            function appendRegressionResult(succeeded, name, message) {
+                var status = succeeded ? 'succeeded' : 'failed';
+
+                console.log(status + ': ' + name + ': ' + message);
+
+                var status = succeeded ? 'succeeded' : 'failed';
+                appendRegressionMessage('<span class=' + status + '>' +
+                    ' <span class="name">' + name + ':</span>' +
+                    ' <span class="status">' + status + ' :</span>' +
+                    ' <span class="message">' + message + '</span></span>')
+            }
+
+            function appendRegressionMessage(message) {
+                $('#regressionOutput').append('<div>' + message + '</div>');
+            }
+
+        });
+    </script>
+</body>
+</html>

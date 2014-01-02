@@ -1,0 +1,38 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.DiagnosticJson</id>
+		<title>ImageResizer.Plugins.DiagnosticJson</title>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<owners>$owners$</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>$iconurl$</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>
+
+Returns JSON-formatted diagnostic information about the changes from your original images to your resized/processed images.
+
+Plugs into ImageResizer. 
+
+REST API example: image.jpg?diagnosticjson=layout
+
+Docs: http://imageresizing.net/plugins/diagnosticjson
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+$plugins$
+ </description>
+		<tags>ImageResizer Imazen Resizer DiagnosticJson diagnostic json metadata imaging</tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.DiagnosticJson.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.DiagnosticJson.xml" target="lib" />
+		<file src="..\Plugins\DiagnosticJson\Web.config.transform" target="content" />
+	</files>
+</package>
