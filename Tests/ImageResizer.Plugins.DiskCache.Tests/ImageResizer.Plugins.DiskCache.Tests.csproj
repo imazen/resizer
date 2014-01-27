@@ -84,10 +84,6 @@
       <Project>{6F830EA6-ACA6-456C-AA68-6D9ACCCC6647}</Project>
       <Name>ImageResizer.HttpTests</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LibCassini35\LibCassini35.csproj">
-      <Project>{0D9F0FEA-45F7-4CE4-9868-6FB9BBE3DD4C}</Project>
-      <Name>LibCassini35</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
