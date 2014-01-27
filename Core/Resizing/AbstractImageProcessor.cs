@@ -168,6 +168,7 @@ namespace ImageResizer.Resizing {
         /// <param name="dest"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
+        [Obsolete("This method will be removed in the next release. Do not override or implement.")]
         protected virtual RequestedAction buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
             if (exts != null) 
                 foreach (AbstractImageProcessor p in exts) 
@@ -185,6 +186,7 @@ namespace ImageResizer.Resizing {
         /// <param name="settings"></param>
         /// <param name="transparencySupported"></param>
         /// <returns></returns>
+        [Obsolete("This method will be removed in the next release. Do not override or implement.")]
         protected virtual Bitmap buildToBitmap(Bitmap source, ResizeSettings settings, bool transparencySupported) {
             if (exts != null) {
                 foreach (AbstractImageProcessor p in exts) {
