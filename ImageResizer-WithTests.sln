@@ -132,6 +132,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Licens
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.LicenseStore", "Plugins\LicenseStore\ImageResizer.Plugins.LicenseStore.csproj", "{BCFE5944-08E7-4183-A4E0-162770244017}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.LicenseVerifier.Tests", "Tests\ImageResizer.Plugins.LicenseVerifier.Tests\ImageResizer.Plugins.LicenseVerifier.Tests.csproj", "{081F4843-C4A2-4C7D-A869-03DD15982A8D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1258,6 +1260,24 @@ Global
 		{BCFE5944-08E7-4183-A4E0-162770244017}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{BCFE5944-08E7-4183-A4E0-162770244017}.Trial|x64.ActiveCfg = Release|Any CPU
 		{BCFE5944-08E7-4183-A4E0-162770244017}.Trial|x86.ActiveCfg = Release|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Release|x64.ActiveCfg = Release|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Release|x86.ActiveCfg = Release|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Trial|x64.ActiveCfg = Release|Any CPU
+		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
