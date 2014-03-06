@@ -38,6 +38,7 @@
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="FeatureState.cs" />
     <Compile Include="LicenseService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
