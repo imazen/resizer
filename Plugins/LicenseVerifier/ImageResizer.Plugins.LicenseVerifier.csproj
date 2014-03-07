@@ -39,6 +39,12 @@
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="FeatureState.cs" />
+    <Compile Include="Http\HttpClient.cs" />
+    <Compile Include="Http\HttpHeader.cs" />
+    <Compile Include="Http\HttpMethod.cs" />
+    <Compile Include="Http\HttpRequest.cs" />
+    <Compile Include="Http\HttpResponse.cs" />
+    <Compile Include="Http\IHttpClient.cs" />
     <Compile Include="LicenseService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
