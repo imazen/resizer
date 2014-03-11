@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using BuildTools;
-using LitS3;
 using System.Net;
 using System.Collections.Specialized;
+using Amazon.S3.Transfer;
 
 namespace ImageResizer.ReleaseBuilder {
     public class Build :Interaction {
@@ -17,8 +17,8 @@ namespace ImageResizer.ReleaseBuilder {
         VersionEditor v = null;
         GitManager g = null;
         NugetManager nuget = null;
-
-        S3Service s3 = new S3Service();
+        TransferUtility s3 = null;
+        
         string bucketName = "resizer-downloads";
         string linkBase = "http://downloads.imageresizing.net/";
         public Build() {
@@ -27,8 +27,7 @@ namespace ImageResizer.ReleaseBuilder {
             v = new VersionEditor(Path.Combine(f.FolderPath, "SharedAssemblyInfo.cs"));
             g = new GitManager(f.ParentPath);
             nuget = new NugetManager(Path.Combine(f.ParentPath, "nuget"));
-            s3.AccessKeyID = "***REMOVED***";
-            s3.SecretAccessKey = "***REMOVED***";
+            
             
             //TODO: nuget and s3 API key need to go.
 
@@ -200,9 +199,12 @@ namespace ImageResizer.ReleaseBuilder {
             cs.AcquireCredentials();
 
             nuget.apiKey = cs.Get("NugetKey",null);
-            s3.AccessKeyID = cs.Get("S3ID",null);
-            s3.SecretAccessKey = cs.Get("S3KEY", null);
-            
+
+            string s3ID = cs.Get("S3ID",null);
+            string s3Key = cs.Get("S3KEY", null);
+
+            s3 = new TransferUtility(s3ID, s3Key, Amazon.RegionEndpoint.USEast1);
+
 
             if (!isBuilding && isMakingNugetPackage) {
                 isBuilding = ask("You're creating 1 or more NuGet packages. Rebuild software?");
@@ -331,13 +333,21 @@ namespace ImageResizer.ReleaseBuilder {
                         say("Can't upload, file missing: " + pd.Path);
                         continue;
                     }
-                    CannedAcl perm =  pd.Private ? CannedAcl.Private : CannedAcl.PublicRead;
-                    say("Uploading " + Path.GetFileName(pd.Path) + " to " + bucketName + " with CannedAcl:" + perm.ToString());
+                    var request = new TransferUtilityUploadRequest();
+                    request.CannedACL = pd.Private ? Amazon.S3.S3CannedACL.Private : Amazon.S3.S3CannedACL.PublicRead;
+                    request.BucketName = bucketName;
+                    request.Timeout = null;
+                    request.ContentType = "application/zip";
+                    request.Key = Path.GetFileName(pd.Path);
+                    request.FilePath = pd.Path;
+
+
+                    say("Uploading " + Path.GetFileName(pd.Path) + " to " + bucketName + " with CannedAcl:" + request.CannedACL.ToString());
                     bool retry = false;
                     do {
                         //Upload
                         try {
-                            s3.AddObject(pd.Path, bucketName, Path.GetFileName(pd.Path), "application/zip", perm);
+                            s3.Upload(request);
                         } catch (Exception ex) {
                             say("Upload failed: " + ex.Message);
                             retry = ask("Retry upload?");
