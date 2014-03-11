@@ -262,10 +262,6 @@
       <Project>{4a55b40d-1e0d-4d1f-8d96-25f624847e53}</Project>
       <Name>ImageResizer.Plugins.Wic</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Tests\ImageResizer.Plugins.DiskCache.Tests\ImageResizer.Plugins.DiskCache.Tests.csproj">
-      <Project>{b4c23dcb-4247-4647-a01c-ad829ec31dfa}</Project>
-      <Name>ImageResizer.Plugins.DiskCache.Tests</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CustomOverlayPlugin\ImageResizer.Plugins.CustomOverlay.csproj">
       <Project>{589abebc-e5ee-47bf-8360-c799f714ba7f}</Project>
       <Name>ImageResizer.Plugins.CustomOverlay</Name>
