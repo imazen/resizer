@@ -92,17 +92,6 @@
     <h2>Testing human-friendly URLs and animated gif compatibility with RemoteReaderPlugin</h2>
     <img id="Img1" src="~/remote/img.imageresizing.net/2_computers.gif?width=50" runat="server" />
 
-
-    <h2>Image Formats</h2>
-    <p>All of the following images are the same 4000x3000 image, in different
-        formats, scaled down to 200x150.</p>
-    <p>
-        PNG:<img src="4000x3000-up-right.png?width=200" />
-        JPG:<img src="4000x3000-up-right.jpg?width=200" />
-        GIF:<img src="4000x3000-up-right.gif?width=200" />
-        TIFF:<img src="4000x3000-up-right.tif?width=200" />
-        TIFF (using FreeImage decoder):<img src="4000x3000-up-right.tif?decoder=freeimage&width=200" />
-    </p>
     </div>
     
   
