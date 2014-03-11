@@ -3,9 +3,6 @@ obj/
 Debug/
 imagecache/
 dlls/
-samples/*/bin
-samples/SimpleWebApplication/bin
-samples/ComplexWebApplication/bin
 /docs/*/
 Tests/*/Results
 .DS_Store
@@ -20,5 +17,5 @@ Thumbs.db
 _ReSharper*
 *App_Data/cair.exe
 *App_Data/pthreadVSE2.dll
-/packages/
-*/packages/
+packages/
+NuGet.exe
