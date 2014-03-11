@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <files>
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/freeimage/3.15.4-custom-nometa/x86/FreeImage.dll" name="FreeImage.dll" bitness="32" fileBytes="2,764,800" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/freeimage/3.15.4-custom-nometa/x64/FreeImage.dll" name="FreeImage.dll"  bitness="64" fileBytes="3,425,792" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/freeimage/3.16.0-custom/x86/FreeImage.dll" name="FreeImage.dll" bitness="32" fileBytes="3,489,792" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/freeimage/3.16.0-custom/x64/FreeImage.dll" name="FreeImage.dll"  bitness="64" fileBytes="4,387,328" />
 </files>
