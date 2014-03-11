@@ -133,7 +133,7 @@ namespace ImageResizer.Plugins.CopyMetadata.Tests
                 state.settings["copymetadata"] = "true";
             }
 
-            state.sourceBitmap = (Bitmap)Bitmap.FromFile(@"..\..\..\Samples\Images\gps-metadata.jpg");
+            state.sourceBitmap = (Bitmap)Bitmap.FromFile(@"..\..\..\Samples\Images\gps-metadata-holder.jpg");
             state.destBitmap = new Bitmap(1, 1);
 
             return state;
