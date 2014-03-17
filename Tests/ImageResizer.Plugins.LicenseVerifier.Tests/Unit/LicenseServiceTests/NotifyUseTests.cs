@@ -1,4 +1,7 @@
-﻿using Should;
+﻿using ImageResizer.Configuration;
+using ImageResizer.Plugins.LicenseVerifier.Http;
+using NSubstitute;
+using Should;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +27,12 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests.Unit.LicenseServiceTests {
                 featureOne = Guid.NewGuid();
                 featureTwo = Guid.NewGuid();
                 featureThree = Guid.NewGuid();
-                licenseService = new LicenseService();
+
+                var httpClient = Substitute.For<IHttpClient>();
+                licenseService = new LicenseService(httpClient);
+
+                var config = new Config();
+                licenseService.Install(config);
 
                 licenseService.NotifyUse(domain, featureOne);
                 licenseService.NotifyUse(domain, featureTwo);
