@@ -204,7 +204,7 @@ namespace ImageResizer.ReleaseBuilder {
             string s3Key = cs.Get("S3KEY", null);
 
             var s3config = new Amazon.S3.AmazonS3Config();
-            s3config.Timeout = null;
+            s3config.Timeout = TimeSpan.FromHours(12);
             s3config.RegionEndpoint = Amazon.RegionEndpoint.USEast1;
             var s3client = new Amazon.S3.AmazonS3Client(s3ID, s3Key,s3config);
             s3 = new TransferUtility(s3client);
