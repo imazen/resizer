@@ -1,15 +1,12 @@
-[submodule "tools/docu"]
-	path = tools/docu
+[submodule "submodules/docu"]
+	path = submodules/docu
 	url = https://github.com/jagregory/docu.git
-[submodule "StudioJS"]
-	path = StudioJS
-	url = https://github.com/nathanaeljones/studiojs.git
-	branch = master
-[submodule "tools/lightresize"]
-	path = tools/lightresize
-	url = https://github.com/imazen/lightresize.git
-	branch = master
-[submodule "Plugins/Libs/libwebp-net"]
-	path = Plugins/Libs/libwebp-net
+[submodule "submodules/libwebp-net"]
+	path = submodules/libwebp-net
 	url = https://github.com/imazen/libwebp-net
-	branch = master
+[submodule "submodules/studiojs"]
+	path = submodules/studiojs
+	url = https://github.com/imazen/studiojs.git
+[submodule "submodules/lightresize"]
+	path = submodules/lightresize
+	url = https://github.com/imazen/lightresize
