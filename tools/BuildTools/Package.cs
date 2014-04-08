@@ -26,15 +26,16 @@ namespace BuildTools {
             this.basePath = basePath.TrimEnd('/','\\');
         }
 
-        public void Add(IEnumerable<string> files, string targetDir = null) {
+        public void Add(IEnumerable<string> files, string targetDir = null, string sourceBaseDir = null) {
             if (z == null) return;
+            string relativeTo = sourceBaseDir != null ? Path.Combine(basePath,sourceBaseDir.Replace('/','\\')) : basePath;
             string lastDir = null;
             foreach (string s in files) {
                 string dir = targetDir;
-                if (dir == null){
+                if (dir == null || sourceBaseDir != null){
                     string relPath = Path.GetDirectoryName(s);
-                    if (relPath.StartsWith(basePath)) dir = relPath.Substring(basePath.Length).TrimStart('\\','/');
-                    else throw new Exception("SpecPath outside baseDir: " + relPath + " , " + basePath);
+                    if (relPath.StartsWith(relativeTo)) dir = Path.Combine(dir ?? "", relPath.Substring(relativeTo.Length).TrimStart('\\','/'));
+                    else throw new Exception("SpecPath outside baseDir: " + relPath + " , " + relativeTo);
                 }
                 dir = dir ?? "";
                 if (dir != lastDir) Console.WriteLine("\nIn folder \"" + dir + "\":");

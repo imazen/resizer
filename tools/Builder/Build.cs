@@ -431,7 +431,7 @@ namespace ImageResizer.ReleaseBuilder {
 
 
         public string[] standardExclusions = new string[]{
-                "/.git","^/Releases","/Hidden/","^/Legacy","^/Tools/(Builder|BuildTools|docu)",
+                "/.git","^/Releases","/Hidden/","^/Legacy","^/Tools/(Builder|BuildTools|docu)", "^/submodules/docu",
 				"^/Samples/Images/(extra|private)/","/Thumbs.db$","/.DS_Store$",".suo$",".cache$",".user$", "/._","/~$", 
                 "^/Samples/MvcSample/App_Data/"
 
@@ -472,7 +472,7 @@ namespace ImageResizer.ReleaseBuilder {
             // 'min' - /dlls/release/ImageResizer.* - /
             // /*.txt
             using (var p = new Package(desc.Path, this.f.ParentPath)) {
-                p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"), "/");
+                p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"), "/", "dlls/release");
                 p.Add(q.files("^/readme.txt$"));
                 p.Add(q.files("^/Core/license.txt$"), "");
                 p.Add(q.files("^/Web.config$"));
@@ -480,7 +480,7 @@ namespace ImageResizer.ReleaseBuilder {
         }
         public void PackAllBinaries(PackageDescriptor desc) {
             using (var p = new Package(desc.Path, this.f.ParentPath)) {
-                p.Add(q.files("^/dlls/release/*.(dll|pdb)$"), "/");
+                p.Add(q.files("^/dlls/release/*.(dll|pdb)$"), "/", "dlls/release");
                 p.Add(q.files("^/[^/]+.txt$"));
             }
         }
@@ -491,7 +491,8 @@ namespace ImageResizer.ReleaseBuilder {
                 p.Add(q.files("^/tools/COMInstaller"));
                 p.Add(q.files("^/dlls/(debug|release)"));
                 p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"), "/"); //Make a copy in the root
-                
+                p.Add(q.files("^/submodules/studiojs"), "/StudioJS"); //Copy submodules/studiojs -> /StudioJS
+                p.Add(q.files("^/submodules/(lightresize|libwebp-net)")); 
                 p.Add(q.files("^/[^/]+.txt$"));
                 p.Add(q.files("^/Web.config$"));
 
@@ -510,7 +511,8 @@ namespace ImageResizer.ReleaseBuilder {
             using (var p = new Package(desc.Path, this.f.ParentPath)) {
                 p.Add(q.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"), "/");
                 p.Add(q.files("^/dlls/(debug|release)/"));
-                p.Add(q.files("^/(core|samples|studiojs)/"));
+                p.Add(q.files("^/submodules/studiojs"), "/StudioJS"); //Copy submodules/studiojs -> /StudioJS
+                p.Add(q.files("^/(core|samples)/"));
                 p.Add(q.files("^/[^/]+.txt$"));
                 p.Add(q.files("^/Web.config$"));
             }
