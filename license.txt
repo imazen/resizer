@@ -11,13 +11,11 @@ The following DLLs are under the Freedom license:
 * ImageResizer.Plugins.Logging.dll 
 
 
-Development of this project is funded by people purchasing Pro and Enterprise licenses
-to the 4 paid plugin bundles. Both Pro and Enterprise licenses are as MIT-like as possible, 
-allowing redistribution, modification, and sub-licensing.
+Development of this project is funded by purchases of the Performance, Creative, and Elite editions. All licenses are as MIT-like as possible, allowing redistribution, modification, and sub-licensing.
 
 The free trial license permits use of the paid plugins for development and testing purposes, but not for production use. 
 http://imageresizing.net/licenses/trial
 
-Once you begin using them on a production server, you will need a Pro or Enterprise-wide license.
+Once you begin using them on a production server, you will need to purchase a license.
 
 See http://imageresizing.net/plugins for information on buying licuenses.
