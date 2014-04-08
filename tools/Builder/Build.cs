@@ -203,7 +203,11 @@ namespace ImageResizer.ReleaseBuilder {
             string s3ID = cs.Get("S3ID",null);
             string s3Key = cs.Get("S3KEY", null);
 
-            s3 = new TransferUtility(s3ID, s3Key, Amazon.RegionEndpoint.USEast1);
+            var s3config = new Amazon.S3.AmazonS3Config();
+            s3config.Timeout = null;
+            s3config.RegionEndpoint = Amazon.RegionEndpoint.USEast1;
+            var s3client = new Amazon.S3.AmazonS3Client(s3ID, s3Key,s3config);
+            s3 = new TransferUtility(s3client);
 
 
             if (!isBuilding && isMakingNugetPackage) {
@@ -336,7 +340,6 @@ namespace ImageResizer.ReleaseBuilder {
                     var request = new TransferUtilityUploadRequest();
                     request.CannedACL = pd.Private ? Amazon.S3.S3CannedACL.Private : Amazon.S3.S3CannedACL.PublicRead;
                     request.BucketName = bucketName;
-                    request.Timeout = null;
                     request.ContentType = "application/zip";
                     request.Key = Path.GetFileName(pd.Path);
                     request.FilePath = pd.Path;
@@ -347,6 +350,7 @@ namespace ImageResizer.ReleaseBuilder {
                     do {
                         //Upload
                         try {
+                            
                             s3.Upload(request);
                         } catch (Exception ex) {
                             say("Upload failed: " + ex.Message);
