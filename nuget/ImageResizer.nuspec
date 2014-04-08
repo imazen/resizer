@@ -19,7 +19,7 @@ Docs: http://imageresizing.net/
 
 Support: http://imageresizing.net/support
 
-Works with .NET 2, 3, 3.5, 4, 4.5, ASP.NET WebForms, MVC 1-4, WebAPI, Routing, IIS 5, 5.1, 6, 7, 7.5, &amp; 8 and nearly all CMSes.
+Works with .NET 4.5.1+, ASP.NET WebForms, MVC 1-4, WebAPI, Routing, IIS 7, 7.5, &amp; 8, 8.1 and nearly all CMSes.
 
 Use ether the URL API: image.jpg?width=100&amp;height=100 *or* the Managed API: ImageBuilder.Current.Build(source,dest,settings).
 
