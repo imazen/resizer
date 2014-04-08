@@ -12,6 +12,7 @@ Thumbs.db
 *.cache
 *.FileAbsoluteList.txt
 *.user
+*.userprefs
 *.csproj.user
 */_ReSharper
 _ReSharper*
