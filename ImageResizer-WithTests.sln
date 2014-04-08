@@ -96,8 +96,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomOverlaySample", "Samp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PsdReader", "Plugins\PsdReader\ImageResizer.Plugins.PsdReader.csproj", "{BCF28DA2-AF29-4C09-B37D-059F40FC9B95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imazen.WebP", "Plugins\Libs\libwebp-net\Imazen.WebP\Imazen.WebP.csproj", "{92F607A3-2F04-4536-8346-B6FEF8B774FF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_ImageStudio", "Samples\ImageStudio\_ImageStudio.csproj", "{86D5A690-75DB-4EF9-80C6-9016338674B1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_PluginTestingApp", "Samples\PluginTestingApp\_PluginTestingApp.csproj", "{685863E0-64B5-4814-8974-249FADCE875F}"
@@ -131,6 +129,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.LicenseVerifier.Tests", "Tests\ImageResizer.Plugins.LicenseVerifier.Tests\ImageResizer.Plugins.LicenseVerifier.Tests.csproj", "{081F4843-C4A2-4C7D-A869-03DD15982A8D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.LicenseStore.Tests", "Tests\ImageResizer.Plugins.LicenseStore.Tests\ImageResizer.Plugins.LicenseStore.Tests.csproj", "{28494A7A-7B55-45A3-B06A-FA8A241DDCA4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imazen.WebP", "submodules\libwebp-net\Imazen.WebP\Imazen.WebP.csproj", "{92F607A3-2F04-4536-8346-B6FEF8B774FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -931,24 +931,6 @@ Global
 		{BCF28DA2-AF29-4C09-B37D-059F40FC9B95}.Trial|Mixed Platforms.Build.0 = Trial|Any CPU
 		{BCF28DA2-AF29-4C09-B37D-059F40FC9B95}.Trial|x64.ActiveCfg = Trial|Any CPU
 		{BCF28DA2-AF29-4C09-B37D-059F40FC9B95}.Trial|x86.ActiveCfg = Trial|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|x64.ActiveCfg = Release|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|x86.ActiveCfg = Release|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|Any CPU.ActiveCfg = Release|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|Any CPU.Build.0 = Release|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|x64.ActiveCfg = Release|Any CPU
-		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|x86.ActiveCfg = Release|Any CPU
 		{86D5A690-75DB-4EF9-80C6-9016338674B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{86D5A690-75DB-4EF9-80C6-9016338674B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86D5A690-75DB-4EF9-80C6-9016338674B1}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -1255,6 +1237,24 @@ Global
 		{28494A7A-7B55-45A3-B06A-FA8A241DDCA4}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{28494A7A-7B55-45A3-B06A-FA8A241DDCA4}.Trial|x64.ActiveCfg = Release|Any CPU
 		{28494A7A-7B55-45A3-B06A-FA8A241DDCA4}.Trial|x86.ActiveCfg = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|x64.ActiveCfg = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Release|x86.ActiveCfg = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|x64.ActiveCfg = Release|Any CPU
+		{92F607A3-2F04-4536-8346-B6FEF8B774FF}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
