@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
 		<id>ImageResizer.Mvc</id>
-		<title>ImageResizer.Mvc - MVC-friendly utilities</title>
+		<title>ImageResizer.Mvc [deprecated - merged with ImageResizer core]</title>
 		<version>$version$</version>
 		<authors>$author$</authors>
 		<owners>$owners$</owners>
@@ -10,17 +10,9 @@
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<summary>Provides the MvcRoutingShim plugin for the ImageResizer Core library.</summary>
-
+		<summary>Deprecated. No longer required with ImageResizer 4+.</summary>
 		<description>
-Provides the MvcRoutingShim plugin for the ImageResizer Core library, which enables compatibility with MVC routing.
-
-
-Docs: http://imageresizing.net/plugins/mvcroutingshim
-
-Support: http://imageresizing.net/support
-
-$plugins$
+		If you are using ImageResizer 4+, you may safely remove this dependency from your project. 
 </description>
 		<tags>ImageResizer Imazen Resizer MVC MvcRoutingShim System.Web.Routing imaging</tags>
 		<dependencies>
@@ -28,7 +20,5 @@ $plugins$
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="$coredlldir$\ImageResizer.Mvc.dll" target="lib" />
-		<file src="$coredlldir$\ImageResizer.Mvc.xml" target="lib" />
 	</files>
 </package>

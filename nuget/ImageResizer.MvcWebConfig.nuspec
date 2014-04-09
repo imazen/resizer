@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>ImageResizer.MvcWebConfig</id>
-	<title>ImageResizer Web.Config Installation for MVC</title>
+	<title>ImageResizer Web.Config Installation</title>
     <version>$version$</version>
     <authors>$author$</authors>
     <owners>$owners$</owners>
@@ -12,7 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
 	<description>
 
-Installs the ImageResizer module (with MVC support) by (carefully) modifying Web.Config. 
+Installs ImageResizer by (carefully) modifying Web.Config. Duplicate of ImageResizer.WebConfig for ImageResizer 4+.
 
 Docs: http://imageresizing.net/
 
@@ -24,11 +24,9 @@ $plugins$
 	<dependencies>
 	  <dependency id="ImageResizer"/>
 	  <dependency id="ImageResizer.WebConfig"/>
-	  <dependency id="ImageResizer.Mvc"/>
 	</dependencies>
   </metadata>
   	<files>
-		<file src="..\Core.Mvc\Web.config.transform" target="content" />
 	</files>
 
 </package>

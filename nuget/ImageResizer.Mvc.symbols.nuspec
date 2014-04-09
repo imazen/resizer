@@ -10,9 +10,5 @@
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="..\dlls\debug\ImageResizer.Mvc.dll" target="lib" />
-		<file src="..\dlls\debug\ImageResizer.Mvc.pdb" target="lib" />
-		<file src="..\dlls\debug\ImageResizer.Mvc.xml" target="lib" />
-		<file src="..\Core.Mvc\**\*.cs" target="src" />
 	</files>
 </package>

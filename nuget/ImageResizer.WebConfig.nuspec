@@ -12,7 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
 	<description>
 
-Installs the ImageResizer module by (carefully) modifying Web.Config. 
+Installs ImageResizer module by (carefully) modifying Web.Config. 
 
 Docs: http://imageresizing.net/
 
