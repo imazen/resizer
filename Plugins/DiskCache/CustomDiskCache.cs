@@ -292,7 +292,7 @@ namespace ImageResizer.Plugins.DiskCache {
                                 using (fs) {
                                     //Run callback to write the cached data
                                     writeCallback(fs); //Can throw any number of exceptions.
-                                    fs.Flush();
+                                    fs.Flush(true);
                                     finished = true;
                                 }
                             } finally {

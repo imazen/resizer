@@ -481,7 +481,7 @@ namespace ImageResizer
                     System.IO.FileStream fs = new FileStream(job.FinalPath, FileMode.Create, FileAccess.Write);
                     using (fs) {
                         buildToStream(b, fs, s);
-                        fs.Flush();//TODO: Switch to .Flush(true) with .NET 4
+                        fs.Flush(true);
                     }
                     //Write to Unknown stream
                 } else if (dest is Stream) {
