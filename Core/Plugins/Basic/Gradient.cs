@@ -77,7 +77,7 @@ namespace ImageResizer.Plugins.Basic {
             }
 
             public string GetCacheKey(bool includeModifiedDate) {
-                return VirtualPath + PathUtils.BuildQueryString(NameValueCollectionExtensions.Keep(query, "width", "height", "w", "h", "maxwidth", "maxheight", "angle", "color1", "color2"));
+                return VirtualPath + PathUtils.BuildQueryString(query.Keep("width", "height", "w", "h", "maxwidth", "maxheight", "angle", "color1", "color2"));
             }
         }
     }

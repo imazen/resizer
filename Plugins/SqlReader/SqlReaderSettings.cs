@@ -21,18 +21,18 @@ namespace ImageResizer.Plugins.SqlReader {
         public SqlReaderSettings(System.Collections.Specialized.NameValueCollection args) {
             if (!string.IsNullOrEmpty(args["prefix"])) this.PathPrefix = args["prefix"];
             if (!string.IsNullOrEmpty(args["connectionString"])) this.ConnectionString = args["connectionString"];
-            this.ImageIdType = NameValueCollectionExtensions.Get(args, "idType",this.ImageIdType);
+            this.ImageIdType = args.Get("idType",this.ImageIdType);
             if (!string.IsNullOrEmpty(args["blobQuery"])) this.ImageBlobQuery = args["blobQuery"];
             if (!string.IsNullOrEmpty(args["existsQuery"])) this.ImageExistsQuery = args["existsQuery"];
             if (!string.IsNullOrEmpty(args["modifiedQuery"])) this.ModifiedDateQuery  = args["modifiedQuery"];
             
-            StripFileExtension = !NameValueCollectionExtensions.Get(args, "extensionPartOfId", false);
-            RegisterAsVirtualPathProvider = NameValueCollectionExtensions.Get(args, "vpp", true);
-            RequireImageExtension = NameValueCollectionExtensions.Get(args, "requireImageExtension", RequireImageExtension);
-            UntrustedData = NameValueCollectionExtensions.Get(args, "untrustedData", UntrustedData);
-            CacheUnmodifiedFiles = NameValueCollectionExtensions.Get(args, "cacheUnmodifiedFiles", CacheUnmodifiedFiles);
-            CheckForModifiedFiles = NameValueCollectionExtensions.Get(args, "checkForModifiedFiles", true);
-            QueriesAreStoredProcedures = NameValueCollectionExtensions.Get(args, "queriesAreStoredProcedures", false);
+            StripFileExtension = !args.Get("extensionPartOfId", false);
+            RegisterAsVirtualPathProvider = args.Get("vpp", true);
+            RequireImageExtension = args.Get("requireImageExtension", RequireImageExtension);
+            UntrustedData = args.Get("untrustedData", UntrustedData);
+            CacheUnmodifiedFiles = args.Get("cacheUnmodifiedFiles", CacheUnmodifiedFiles);
+            CheckForModifiedFiles = args.Get("checkForModifiedFiles", true);
+            QueriesAreStoredProcedures = args.Get("queriesAreStoredProcedures", false);
         }
 
         /// <summary>

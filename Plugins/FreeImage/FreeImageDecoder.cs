@@ -145,7 +145,7 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
         }
         private static bool HasToneMappingCommands(ResizeSettings settings) {
             return false; //Tone mapping is disabled, not yet functional
-            return NameValueCollectionExtensions.Get<ToneMappingAlgorithm>(settings, "fi.tonemap", ToneMappingAlgorithm.None) != ToneMappingAlgorithm.None;
+            return settings.Get<ToneMappingAlgorithm>("fi.tonemap", ToneMappingAlgorithm.None) != ToneMappingAlgorithm.None;
 
         }
 
@@ -154,7 +154,7 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
 
             FIBITMAP m = FIBITMAP.Zero;
             try {
-                var alg = NameValueCollectionExtensions.Get<ToneMappingAlgorithm>(settings, "fi.tonemap", ToneMappingAlgorithm.None);
+                var alg = settings.Get<ToneMappingAlgorithm>("fi.tonemap", ToneMappingAlgorithm.None);
                 if (alg == ToneMappingAlgorithm.Drago){
                     m = FreeImage.TmoDrago03(b, 2.2, 0);
                 }else if (alg == ToneMappingAlgorithm.Reinhard){

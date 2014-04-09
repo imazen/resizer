@@ -90,7 +90,7 @@ namespace ImageResizer.Plugins.DiagnosticJson
 
         private bool IsDiagnosticRequest(NameValueCollection nvc)
         {
-            var level = NameValueCollectionExtensions.Get(nvc, SettingsKey, DiagnosticLevel.None);
+            var level = nvc.Get(SettingsKey, DiagnosticLevel.None);
             return level != DiagnosticLevel.None;
         }
     }

@@ -27,12 +27,12 @@ namespace ImageResizer.Plugins.S3Reader2 {
             buckets = args["buckets"];
             vpath = args["prefix"];
 
-            asVpp = NameValueCollectionExtensions.Get(args, "vpp", true);
+            asVpp = args.Get("vpp", true);
 
             Region = args["region"] ?? "us-east-1";
 
 
-            s3config.UseHttp = !NameValueCollectionExtensions.Get(args, "useSsl", false);
+            s3config.UseHttp = !args.Get("useSsl", false);
 
             if (!string.IsNullOrEmpty(args["accessKeyId"]) && !string.IsNullOrEmpty(args["secretAccessKey"])) {
                 S3Client = new AmazonS3Client(args["accessKeyId"], args["secretAccessKey"], s3config);
@@ -41,13 +41,13 @@ namespace ImageResizer.Plugins.S3Reader2 {
                 S3Client = new AmazonS3Client(null, s3config);
             }
 
-            includeModifiedDate = NameValueCollectionExtensions.Get(args, "includeModifiedDate", includeModifiedDate);
+            includeModifiedDate = args.Get("includeModifiedDate", includeModifiedDate);
 
-            includeModifiedDate = NameValueCollectionExtensions.Get(args, "checkForModifiedFiles", includeModifiedDate);
+            includeModifiedDate = args.Get("checkForModifiedFiles", includeModifiedDate);
 
-            RequireImageExtension = NameValueCollectionExtensions.Get(args, "requireImageExtension", RequireImageExtension);
-            UntrustedData = NameValueCollectionExtensions.Get(args, "untrustedData", UntrustedData);
-            CacheUnmodifiedFiles = NameValueCollectionExtensions.Get(args, "cacheUnmodifiedFiles", CacheUnmodifiedFiles);
+            RequireImageExtension = args.Get("requireImageExtension", RequireImageExtension);
+            UntrustedData = args.Get("untrustedData", UntrustedData);
+            CacheUnmodifiedFiles = args.Get("cacheUnmodifiedFiles", CacheUnmodifiedFiles);
             
         }
 

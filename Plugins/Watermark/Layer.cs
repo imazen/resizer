@@ -21,9 +21,9 @@ namespace ImageResizer.Plugins.Watermark {
             Width = DistanceUnit.TryParse(settings["width"]);
             Height = DistanceUnit.TryParse(settings["height"]);
             if (!string.IsNullOrEmpty(settings["relativeTo"])) RelativeTo = settings["relativeTo"];
-            DrawAs = NameValueCollectionExtensions.Get(settings, "drawAs", DrawAs);
-            Align = NameValueCollectionExtensions.Get(settings, "align", Align);
-            Fill = NameValueCollectionExtensions.Get(settings, "fill", false);
+            DrawAs = settings.Get( "drawAs", DrawAs);
+            Align = settings.Get("align", Align);
+            Fill = settings.Get("fill", false);
         }
 
         public virtual void CopyTo(Layer other) {

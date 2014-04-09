@@ -41,7 +41,7 @@ namespace ImageResizer {
         /// <param name="col"></param>
         /// <param name="defaultSettings"></param>
         public ResizeSettings(NameValueCollection col, NameValueCollection defaultSettings)
-            : base(NameValueCollectionExtensions.MergeDefaults(col, defaultSettings)) { }
+            : base(col.MergeDefaults(defaultSettings)) { }
         /// <summary>
         /// Parses the specified querystring into name/value pairs and merges
         /// it with defaultSettings in a new ResizeSettings instance.
@@ -146,7 +146,7 @@ namespace ImageResizer {
         /// <param name="keys"></param>
         /// <returns></returns>
         public bool WasOneSpecified(params string[] keys) {
-            return NameValueCollectionExtensions.IsOneSpecified(this, keys);
+            return this.IsOneSpecified(keys);
         }
         /// <summary>
         /// ["rotate"] The degress to rotate the image clockwise. -360 to 360.
@@ -237,7 +237,7 @@ namespace ImageResizer {
         [Obsolete("Replaced by Mode=Crop. Use CropTopLeft and CropTopRight instead for setting a custom crop mode.")]
         public CropMode CropMode                                {get {
             if ("auto".Equals(this["crop"], StringComparison.OrdinalIgnoreCase)) return ImageResizer.CropMode.Auto;
-            if (NameValueCollectionExtensions.GetList<double>(this, "crop", 0, 4) != null) return ImageResizer.CropMode.Custom;
+            if (this.GetList<double>("crop", 0, 4) != null) return ImageResizer.CropMode.Custom;
             return ImageResizer.CropMode.None;
        } set {
                 if (value == ImageResizer.CropMode.None) this.Remove("crop");
@@ -252,11 +252,11 @@ namespace ImageResizer {
         protected double[] CropValues {
             get {
                 //Return (0,0,0,0) when null.
-                double[] vals = NameValueCollectionExtensions.GetList<double>(this, "crop", 0, 4);
+                double[] vals = this.GetList<double>( "crop", 0, 4);
                 return vals != null ? vals : new double[] { 0, 0, 0, 0 };
             }
             set {
-                NameValueCollectionExtensions.SetList(this, "crop", value, true, 4);
+                this.SetList("crop", value, true, 4);
             }
         }
 
@@ -429,7 +429,7 @@ namespace ImageResizer {
         /// <param name="primary"></param>
         /// <param name="secondary"></param>
         public ResizeSettings Normalize(string primary, string secondary) {
-            return (ResizeSettings)NameValueCollectionExtensions.Normalize(this, primary, secondary);
+            return (ResizeSettings)this.Normalize(primary, secondary);
         }
 
     }

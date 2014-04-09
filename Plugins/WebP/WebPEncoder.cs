@@ -7,6 +7,7 @@ using ImageResizer.Encoding;
 using System.Collections.Specialized;
 using Imazen.WebP;
 using System.Drawing;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.WebPEncoder {
     public class WebPEncoderPlugin:IPlugin, IEncoder {
@@ -27,9 +28,9 @@ namespace ImageResizer.Plugins.WebPEncoder {
             NoAlpha = false;
         }
         public WebPEncoderPlugin(NameValueCollection args):this() {
-            Lossless = ExtensionMethods.NameValueCollectionExtensions.Get<bool>(args, "lossless", Lossless);
-            Quality = ExtensionMethods.NameValueCollectionExtensions.Get<float>(args, "quality", Quality);
-            NoAlpha = ExtensionMethods.NameValueCollectionExtensions.Get<bool>(args, "noalpha", NoAlpha);
+            Lossless = args.Get<bool>("lossless", Lossless);
+            Quality = args.Get<float>("quality", Quality);
+            NoAlpha = args.Get<bool>("noalpha", NoAlpha);
             
         }
 

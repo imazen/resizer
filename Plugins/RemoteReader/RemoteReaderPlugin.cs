@@ -246,7 +246,7 @@ namespace ImageResizer.Plugins.RemoteReader {
             if (rr == null || string.IsNullOrEmpty(domain)) return false;
 
             foreach (Node n in rr.childrenByName("allow")) {
-                bool onlyWhenSigned = NameValueCollectionExtensions.Get(n.Attrs, "onlyWhenSigned", false);
+                bool onlyWhenSigned = n.Attrs.Get("onlyWhenSigned", false);
                 if (onlyWhenSigned && !request.SignedRequest) continue;
 
                 bool hostMatches = false, regexMatches = false;

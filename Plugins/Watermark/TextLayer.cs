@@ -16,17 +16,17 @@ namespace ImageResizer.Plugins.Watermark {
         public TextLayer(NameValueCollection attrs)
             : base(attrs) {
                 Text = attrs["text"];
-                Vertical = NameValueCollectionExtensions.Get(attrs, "vertical",false);
+                Vertical = attrs.Get("vertical",false);
                 TextColor = ParseUtils.ParseColor(attrs["color"], TextColor);
                 OutlineColor = ParseUtils.ParseColor(attrs["outlineColor"], OutlineColor);
                 GlowColor = ParseUtils.ParseColor(attrs["glowColor"], GlowColor);
                 Font = attrs["font"];
-                Angle = NameValueCollectionExtensions.Get(attrs, "angle", Angle);
-                FontSize = NameValueCollectionExtensions.Get(attrs, "fontSize", FontSize);
-                Style = NameValueCollectionExtensions.Get(attrs, "style", this.Style);
-                OutlineWidth = NameValueCollectionExtensions.Get(attrs, "outlineWidth", OutlineWidth);
-                GlowWidth = NameValueCollectionExtensions.Get(attrs, "glowWidth", GlowWidth);
-                Rendering = NameValueCollectionExtensions.Get(attrs, "rendering", this.Rendering);
+                Angle = attrs.Get("angle", Angle);
+                FontSize = attrs.Get("fontSize", FontSize);
+                Style = attrs.Get("style", this.Style);
+                OutlineWidth = attrs.Get("outlineWidth", OutlineWidth);
+                GlowWidth = attrs.Get("glowWidth", GlowWidth);
+                Rendering = attrs.Get("rendering", this.Rendering);
         }
 
 

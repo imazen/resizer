@@ -32,7 +32,7 @@ namespace ImageResizer.Plugins.CropAround {
             if (s.settings.Mode != FitMode.Crop || s.settings.Width < 0 || s.settings.Height < 0) return RequestedAction.None;
 
             //Calculate bounding box for all coordinates specified.
-            double[] focus = NameValueCollectionExtensions.GetList<double>(s.settings, "c.focus", null, 2, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72);
+            double[] focus = s.settings.GetList<double>("c.focus", null, 2, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72);
             if (focus == null) return RequestedAction.None;
             RectangleF box = PolygonMath.GetBoundingBox(focus);
 
@@ -45,7 +45,7 @@ namespace ImageResizer.Plugins.CropAround {
             SizeF copySize;
 
             //Now, we can either crop as closely as possible or as loosely as possible. 
-            if (NameValueCollectionExtensions.Get<bool>(s.settings, "c.zoom", false) && box.Width > 0 && box.Height > 0) {
+            if (s.settings.Get<bool>("c.zoom", false) && box.Width > 0 && box.Height > 0) {
                 //Crop close
                 copySize = PolygonMath.ScaleOutside(box.Size, targetSize);
             } else {
@@ -66,7 +66,7 @@ namespace ImageResizer.Plugins.CropAround {
 
 
             //So, if we haven't met the aspect ratio yet, what mode will we pass on?
-            var finalmode = NameValueCollectionExtensions.Get<FitMode>(s.settings, "c.finalmode", FitMode.Pad);
+            var finalmode = s.settings.Get<FitMode>("c.finalmode", FitMode.Pad);
 
             //Crop off 1 or 2 pixels instead of padding without worrying too much
             if (finalmode == FitMode.Pad && padding.Width + padding.Height < 3) finalmode = FitMode.Crop;

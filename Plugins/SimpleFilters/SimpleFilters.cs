@@ -33,7 +33,7 @@ namespace ImageResizer.Plugins.SimpleFilters {
         /// <returns></returns>
         protected override RequestedAction PreRenderImage(ImageState s) {
             if (s.sourceBitmap == null) return RequestedAction.None;
-            double[] vals = NameValueCollectionExtensions.GetList<double>(s.settings, "s.roundcorners",0,1,4);
+            double[] vals = s.settings.GetList<double>("s.roundcorners",0,1,4);
             if (vals == null) return RequestedAction.None;
 
             if (vals.Length == 1)  vals = new double[]{vals[0],vals[0],vals[0],vals[0]};

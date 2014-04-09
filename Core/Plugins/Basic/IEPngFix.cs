@@ -20,8 +20,8 @@ namespace ImageResizer.Plugins.Basic {
         public IEPngFix() {
         }
         public IEPngFix(NameValueCollection settings) {
-            CatchAll = NameValueCollectionExtensions.Get(settings, "catchAll", CatchAll);
-            Redirect = NameValueCollectionExtensions.Get(settings, "redirect", Redirect);
+            CatchAll = settings.Get("catchAll", CatchAll);
+            Redirect = settings.Get("redirect", Redirect);
         }
 
 
@@ -71,7 +71,7 @@ namespace ImageResizer.Plugins.Basic {
         }
 
         void Pipeline_PostRewrite(IHttpModule sender, HttpContext context, Configuration.IUrlEventArgs e) {
-            if (NameValueCollectionExtensions.Get(e.QueryString, "iefix",false) && NeedsPngFix(context) && DestFormatPng(e)){
+            if (e.QueryString.Get("iefix",false) && NeedsPngFix(context) && DestFormatPng(e)){
                 if (Redirect) {
                     //Get the original request URL, and change the 'format' setting to 'gif'. 
                     NameValueCollection newValues = new NameValueCollection();

@@ -58,7 +58,7 @@ namespace ImageResizer.Plugins.RedEye {
             if (s.sourceBitmap == null) return RequestedAction.None;
 
             if (!string.IsNullOrEmpty(s.settings["r.eyes"])) {
-                double[] eyes = NameValueCollectionExtensions.GetList<double>(s.settings, "r.eyes", 0);
+                double[] eyes = s.settings.GetList<double>("r.eyes", 0);
                 // lock source bitmap data
                 BitmapData data = s.sourceBitmap.LockBits(
                     new Rectangle(0, 0, s.sourceBitmap.Width, s.sourceBitmap.Height),
@@ -139,8 +139,9 @@ namespace ImageResizer.Plugins.RedEye {
         /// <param name="context"></param>
         /// <param name="e"></param>
         void Pipeline_PreHandleImage(System.Web.IHttpModule sender, System.Web.HttpContext context, Caching.IResponseArgs e) {
-            if (NameValueCollectionExtensions.Get(e.RewrittenQuerystring, "r.detecteyes", false) ||
-                NameValueCollectionExtensions.Get(e.RewrittenQuerystring, "r.getlayout", false)) {
+            if (e.RewrittenQuerystring.Get("r.detecteyes", false) ||
+                e.RewrittenQuerystring.Get("r.getlayout", false))
+            {
                 DetectionResponse<ObjRect>.InjectExceptionHandler(e as ResponseArgs);
             }
         }

@@ -581,7 +581,7 @@ namespace ImageResizer.Util {
         /// <param name="keepKeys"></param>
         /// <returns></returns>
         public static NameValueCollection FilterQueryString(ResizeSettings query, params string[] keepKeys) {
-            return NameValueCollectionExtensions.Keep(query, keepKeys);
+            return query.Keep(keepKeys);
         }
     }
 }

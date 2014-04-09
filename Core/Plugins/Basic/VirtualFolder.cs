@@ -35,7 +35,7 @@ namespace ImageResizer.Plugins.Basic {
             : base() {
             this.VirtualPath = args["virtualPath"];
             this.PhysicalPath = args["physicalPath"];
-            this.RegisterAsVpp = NameValueCollectionExtensions.Get(args, "vpp", true);
+            this.RegisterAsVpp = args.Get("vpp", true);
         }
 
 

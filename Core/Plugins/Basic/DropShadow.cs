@@ -33,7 +33,7 @@ namespace ImageResizer.Plugins.Basic {
             float shadowWidth = s.settings.Get<float>("shadowWidth", 0);
             if (shadowWidth != 0) {
 
-                var offset = NameValueCollectionExtensions.GetList<float>(s.settings, "shadowOffset", 0, 2);
+                var offset = s.settings.GetList<float>("shadowOffset", 0, 2);
                 PointF shadowOffset =  offset == null ? new PointF(0,0) : new PointF(offset[0], offset[1]);
 
                 //Clone last ring, then offset it - provides the inner bounds of the shadow later
