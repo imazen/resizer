@@ -176,7 +176,6 @@
     <Compile Include="Plugins\IVirtualFileWithModifiedDate.cs" />
     <Compile Include="ResizeSettings.cs" />
     <Compile Include="Util\SeekableStreamWrapper.cs" />
-    <Compile Include="Util\UrlHasher.cs" />
     <Compile Include="Util\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Plugins\Basic\VirtualFolder.cs" />
