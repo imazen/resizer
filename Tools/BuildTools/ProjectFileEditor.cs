@@ -68,6 +68,10 @@ namespace BuildTools {
                 string referencedProject = System.IO.Path.GetFullPath(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Path),include));
                 //Parse the referenced project, get the release build folder and the assembly name
                 string assemblyName = null;
+                if (!System.IO.File.Exists(referencedProject))
+                {
+                    continue;
+                }
                 string buildPath = findBuildPath(referencedProject,"Release", out assemblyName);
 
                 //If successful, build a relative path (relative to the parent project) that points to the dll destination.
