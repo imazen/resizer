@@ -82,8 +82,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.ImageS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Security", "Plugins\Security\ImageResizer.Plugins.Security.csproj", "{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Wpf", "Plugins\Wpf\ImageResizer.Plugins.Wpf.csproj", "{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Faces", "Plugins\Faces\ImageResizer.Plugins.Faces.csproj", "{144686D8-7820-4BEE-9325-60C4E998C2B0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.CustomOverlay", "Samples\CustomOverlayPlugin\ImageResizer.Plugins.CustomOverlay.csproj", "{589ABEBC-E5EE-47BF-8360-C799F714BA7F}"
@@ -794,24 +792,6 @@ Global
 		{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}.Trial|Mixed Platforms.Build.0 = Trial|Any CPU
 		{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}.Trial|x64.ActiveCfg = Trial|Any CPU
 		{6FDAE8BF-8629-47A8-86F6-67774B78C3FA}.Trial|x86.ActiveCfg = Trial|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Release|x64.ActiveCfg = Release|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Release|x86.ActiveCfg = Release|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Trial|Any CPU.ActiveCfg = Release|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Trial|Any CPU.Build.0 = Release|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Trial|x64.ActiveCfg = Release|Any CPU
-		{8405D498-AA53-4EF0-9D04-CC9F7DBA9C53}.Trial|x86.ActiveCfg = Release|Any CPU
 		{144686D8-7820-4BEE-9325-60C4E998C2B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{144686D8-7820-4BEE-9325-60C4E998C2B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{144686D8-7820-4BEE-9325-60C4E998C2B0}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
