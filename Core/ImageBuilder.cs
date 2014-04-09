@@ -478,11 +478,20 @@ namespace ImageResizer
                         string dirName = Path.GetDirectoryName(job.FinalPath);
                         if (!Directory.Exists(dirName)) Directory.CreateDirectory(dirName);
                     }
-                    System.IO.FileStream fs = new FileStream(job.FinalPath, FileMode.Create, FileAccess.Write);
-                    using (fs) {
-                        buildToStream(b, fs, s);
-                        fs.Flush(true);
+                    bool finishedWrite = false;
+                    try{
+                        System.IO.FileStream fs = new FileStream(job.FinalPath, FileMode.Create, FileAccess.Write);
+                        using (fs) {
+                            buildToStream(b, fs, s);
+                            fs.Flush(true);
+                            finishedWrite = true;
+                        }
+                    } finally {
+                        //Don't leave half-written files around.
+                        if (!finishedWrite) try { if (File.Exists(job.FinalPath)) File.Delete(job.FinalPath); }
+                            catch { }
                     }
+
                     //Write to Unknown stream
                 } else if (dest is Stream) {
                     buildToStream(b, (Stream)dest, s);
