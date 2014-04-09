@@ -86,7 +86,7 @@ namespace ImageResizer.Plugins.SourceDiskCache
             {
                 using (Stream data = original.Open())
                 {//Very long-running call
-                    StreamExtensions.CopyToStream(data, target);
+                    data.CopyToStream(target);
                 }
             }, DateTime.MinValue, 15 * 1000,true);
 

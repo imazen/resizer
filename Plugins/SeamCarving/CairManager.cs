@@ -55,14 +55,14 @@ namespace ImageResizer.Plugins.SeamCarving {
                 using (Stream input = Assembly.GetExecutingAssembly().GetManifestResourceStream("ImageResizer.Plugins.SeamCarving.pthreadVSE2.dll"))
                 using (Stream output = File.Create(dllPath))
                 {
-                    StreamExtensions.CopyToStream(input, output);
+                    input.CopyToStream(input);
                 }
 
                 string tempPath = Path.Combine(cairDir, "cair.exe");
 
                 using (Stream input = Assembly.GetExecutingAssembly().GetManifestResourceStream("ImageResizer.Plugins.SeamCarving.CAIR.exe"))
                 using (Stream output = File.Create(tempPath)) {
-                    StreamExtensions.CopyToStream(input, output);
+                    input.CopyToStream(output);
                 }
                 //Save the path.
                 cairPath = tempPath;

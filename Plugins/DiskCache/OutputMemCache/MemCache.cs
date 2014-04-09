@@ -50,7 +50,7 @@ namespace ImageResizer.Plugins.MemCache {
                 if (c == null) {
                     using (var data = new MemoryStream()){
                         e.ResizeImageToStream(data);//Very long-running call
-                        c = new MemCacheResult(StreamExtensions.CopyToBytes(data, true));
+                        c = new MemCacheResult(data.CopyToBytes(true));
                     }
                     cache.Set(key, c);//Save to cache (may trigger cleanup)
                 }

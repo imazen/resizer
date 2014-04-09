@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Resizing;
+using ImageResizer.ExtensionMethods;
 using System.Drawing;
 using System.IO;
 using Imazen.WebP;
@@ -34,7 +35,7 @@ namespace ImageResizer.Plugins.WebPDecoder {
 
         private Bitmap Decode(Stream s) {
             long length;
-            byte[] buffer = ExtensionMethods.StreamExtensions.CopyOrReturnBuffer(s, out length,false,4096);
+            byte[] buffer = s.CopyOrReturnBuffer(out length,false,4096);
             return new SimpleDecoder().DecodeFromBytes(buffer, length);
         }
 

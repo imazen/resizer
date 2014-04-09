@@ -40,7 +40,7 @@ namespace ImageResizer.Plugins.SourceMemCache {
                     c = cache.Get(key);
                     if (c == null) {
                         using (Stream data = original.Open()) {//Very long-running call
-                            c = new CachedVirtualFile(original.VirtualPath, StreamExtensions.CopyToBytes(data, true));
+                            c = new CachedVirtualFile(original.VirtualPath, data.CopyToBytes(true));
                         }
                         cache.Set(key, c);//Save to cache (may trigger cleanup)
                     }

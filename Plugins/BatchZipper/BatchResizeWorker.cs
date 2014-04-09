@@ -11,6 +11,7 @@ using ImageResizer.Configuration;
 using ImageResizer;
 using System.IO;
 using ImageResizer.Util;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.BatchZipper
 {
@@ -159,7 +160,7 @@ namespace ImageResizer.Plugins.BatchZipper
                 using (MemoryStream ms = new MemoryStream()) {
                     s.conf.CurrentImageBuilder.Build(i.PhysicalPath, ms, new ResizeSettings(i.ResizeQuerystring));
                     ms.Position = 0;
-                    StreamUtils.CopyTo(ms, stream);
+                    ms.CopyToStream(stream);
                 }
                 return; //We're done!
                 
@@ -176,14 +177,7 @@ namespace ImageResizer.Plugins.BatchZipper
         /// <param name="dest"></param>
         public static void CopyStreamTo(System.IO.Stream src, System.IO.Stream dest)
         {
-            int size = (src.CanSeek) ? Math.Min((int)(src.Length - src.Position), 0x2000) : 0x2000;
-            byte[] buffer = new byte[size];
-            int n;
-            do
-            {
-                n = src.Read(buffer, 0, buffer.Length);
-                dest.Write(buffer, 0, n);
-            } while (n != 0);
+            StreamExtensions.CopyToStream(src, dest);
         }
         /// <summary>
         /// Stores the results of the Zip file saving betweent he time Saving_Completed fires, and we close the ZipFile instance and fire our own event

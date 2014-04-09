@@ -234,7 +234,7 @@ namespace ImageResizer.Plugins.FFmpeg
                     using (Stream input = c.Pipeline.GetFile(virtualPath, new System.Collections.Specialized.NameValueCollection()).Open())
                     using (Stream output = File.Create(job.SourcePath))
                     {
-                        StreamExtensions.CopyToStream(input, output);
+                        input.CopyToStream(output);
                     }
                 }
                 this.Execute(job);

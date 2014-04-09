@@ -108,7 +108,7 @@ namespace ImageResizer.Plugins.S3Reader2 {
                 var req = new Amazon.S3.Model.GetObjectRequest() { BucketName = bucket, Key = key };
 
                 using (var s = provider.S3Client.GetObject(req)){
-                    return StreamExtensions.CopyToMemoryStream(s.ResponseStream);
+                    return s.ResponseStream.CopyToMemoryStream();
                 }
             } catch (AmazonS3Exception se) {
                 if (se.StatusCode == System.Net.HttpStatusCode.NotFound || "NoSuchKey".Equals(se.ErrorCode, StringComparison.OrdinalIgnoreCase)) throw new FileNotFoundException("Amazon S3 file not found", se);

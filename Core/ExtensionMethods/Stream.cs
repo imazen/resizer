@@ -65,7 +65,7 @@ namespace ImageResizer.ExtensionMethods {
         /// </summary>
         /// <param name="s"></param>
         /// <param name="other">The stream to write to</param>
-        public static void CopyToStream(Stream s, Stream other) {
+        public static void CopyToStream(this Stream s, Stream other) {
             CopyToStream(s, other, false);
         }
         /// <summary>

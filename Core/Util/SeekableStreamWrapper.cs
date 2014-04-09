@@ -64,7 +64,7 @@ namespace ImageResizer.Util
             // we're keeping it around so that its lifetime is consistent with
             // what it would be if the wrapper weren't being used.
             this.writable = true;
-            StreamExtensions.CopyToStream(inner, this);
+            inner.CopyToStream(this);
             this.writable = false;
 
             this.Seek(0, SeekOrigin.Begin);
