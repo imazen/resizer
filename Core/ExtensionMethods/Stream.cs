@@ -16,7 +16,7 @@ namespace ImageResizer.ExtensionMethods {
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static MemoryStream CopyToMemoryStream(Stream s) {
+        public static MemoryStream CopyToMemoryStream(this Stream s) {
             return CopyToMemoryStream(s, false);
         }
         /// <summary>
@@ -25,7 +25,7 @@ namespace ImageResizer.ExtensionMethods {
         /// <param name="s"></param>
         /// <param name="entireStream">True to copy entire stream if seeakable, false to only copy remaining data</param>
         /// <returns></returns>
-        public static MemoryStream CopyToMemoryStream(Stream s, bool entireStream) {
+        public static MemoryStream CopyToMemoryStream(this Stream s, bool entireStream) {
             return CopyToMemoryStream(s, entireStream,0x1000);
         }
 
@@ -36,7 +36,7 @@ namespace ImageResizer.ExtensionMethods {
         /// <param name="entireStream">True to copy entire stream if seeakable, false to only copy remaining data</param>
         /// <param name="chunkSize">The buffer size to use (in bytes) if a buffer is required. Default: 4KiB</param>
         /// <returns></returns>
-        public static MemoryStream CopyToMemoryStream(Stream s, bool entireStream, int chunkSize) {
+        public static MemoryStream CopyToMemoryStream(this Stream s, bool entireStream, int chunkSize) {
             MemoryStream ms = new MemoryStream(s.CanSeek ? ((int)s.Length + 8 - (entireStream ? 0 : (int)s.Position)) : chunkSize);
             CopyToStream(s, ms, entireStream, chunkSize);
             ms.Position = 0;
@@ -48,7 +48,7 @@ namespace ImageResizer.ExtensionMethods {
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static byte[] CopyToBytes(Stream s) {
+        public static byte[] CopyToBytes(this Stream s) {
             return CopyToBytes(s, false);
         }
         /// <summary>
@@ -57,7 +57,7 @@ namespace ImageResizer.ExtensionMethods {
         /// <param name="s"></param>
         /// <param name="entireStream">True to copy entire stream if seeakable, false to only copy remaining data</param>
         /// <returns></returns>
-        public static byte[] CopyToBytes(Stream s, bool entireStream) {
+        public static byte[] CopyToBytes(this Stream s, bool entireStream) {
             return CopyToBytes(s, entireStream, 0x1000);
         }
         /// <summary>
@@ -74,7 +74,7 @@ namespace ImageResizer.ExtensionMethods {
         /// <param name="s"></param>
         /// <param name="other">The stream to write to</param>
         /// <param name="entireStream">True to copy entire stream if seeakable, false to only copy remaining data</param>
-        public static void CopyToStream(Stream s, Stream other, bool entireStream) {
+        public static void CopyToStream(this Stream s, Stream other, bool entireStream) {
             CopyToStream(s, other, entireStream, 0x1000);
         }
 
@@ -89,7 +89,7 @@ namespace ImageResizer.ExtensionMethods {
         /// <param name="dest">The stream to write to</param>
         /// <param name="entireStream">True to copy entire stream if seeakable, false to only copy remaining data</param>
         /// <param name="chunkSize">True to copy entire stream if seeakable, false to only copy remaining data</param>
-        public static void CopyToStream(Stream src, Stream dest, bool entireStream, int chunkSize) {
+        public static void CopyToStream(this Stream src, Stream dest, bool entireStream, int chunkSize) {
             if (entireStream && src.CanSeek) src.Seek(0, SeekOrigin.Begin);
 
             if (src is MemoryStream && src.CanSeek) {
@@ -131,7 +131,7 @@ namespace ImageResizer.ExtensionMethods {
         /// <param name="entireStream">True to copy entire stream if seeakable, false to only copy remaining data.</param>
         /// <param name="chunkSize">The buffer size to use (in bytes) if a buffer is required. Default: 4KiB</param>
         /// <returns></returns>
-        public static byte[] CopyToBytes(Stream src, bool entireStream, int chunkSize) {
+        public static byte[] CopyToBytes(this Stream src, bool entireStream, int chunkSize) {
             byte[] bytes;
             if (src is MemoryStream) {
                 //Slice from 
@@ -186,7 +186,7 @@ namespace ImageResizer.ExtensionMethods {
         /// <param name="length"></param>
         /// <param name="chunkSize"></param>
         /// <returns></returns>
-        public static byte[] CopyOrReturnBuffer(Stream src, out long length, bool entireStream, int chunkSize) {
+        public static byte[] CopyOrReturnBuffer(this Stream src, out long length, bool entireStream, int chunkSize) {
             if (src is MemoryStream) {
                 if (entireStream || src.Position == 0) {
                     length = src.Length;

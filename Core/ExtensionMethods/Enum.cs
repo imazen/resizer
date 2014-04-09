@@ -98,7 +98,7 @@ namespace ImageResizer.ExtensionMethods {
         /// <param name="en"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static T Parse<T>(T en, string value, T defaultValue) where T : struct, IConvertible {
+        public static T Parse<T>(this T en, string value, T defaultValue) where T : struct, IConvertible {
             T? val = EnumExtensions.Parse<T>(en, value);
             return val == null ? defaultValue : val.Value;
         }
@@ -110,7 +110,7 @@ namespace ImageResizer.ExtensionMethods {
         /// <param name="en"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static T? Parse<T>(T en, string value) where T:struct, IConvertible {
+        public static T? Parse<T>(this T en, string value) where T:struct, IConvertible {
             return Parse<T>(value);
         }
         public static T? Parse<T>(string value) where T:struct, IConvertible {
@@ -153,7 +153,7 @@ namespace ImageResizer.ExtensionMethods {
         /// <param name="en"></param>
         /// <param name="lowerCase"></param>
         /// <returns></returns>
-        public static string ToPreferredString(Enum en, bool lowerCase) //ext method
+        public static string ToPreferredString(this Enum en, bool lowerCase) //ext method
         {
             Type t = en.GetType();
             bool isFlags = false; //Not supported yet t.IsDefined(typeof(FlagsAttribute), false);
