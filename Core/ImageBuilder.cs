@@ -435,7 +435,7 @@ namespace ImageResizer
                 job.ResultInfo["source.height"] = b.Height;
 
                 //Calucalte the appropriate file extension and mime type
-                if (job.Dest != typeof(Bitmap)){
+                if ((Type)job.Dest != typeof(Bitmap)){
                     IEncoder e = this.EncoderProvider.GetEncoder(s, b);
                     if (e != null)
                     {
@@ -444,9 +444,9 @@ namespace ImageResizer
                     }
                 }
 
-                if (job.Dest == typeof(IDictionary<string, object>))
+                if ((Type)job.Dest == typeof(IDictionary<string, object>))
                 {
-                    ///They only want information/attributes
+                    //They only want information/attributes
                     job.Result = job.ResultInfo;
                     return RequestedAction.Cancel;
                 }
@@ -455,9 +455,10 @@ namespace ImageResizer
                 object dest = job.Dest;
                 this.PreAcquireStream(ref dest, s);
                 job.Dest = dest;
-                
-                if (dest == typeof(Bitmap)) {
-                    job.Result = buildToBitmap(b, s, true);
+
+                if ((Type)dest == typeof(Bitmap))
+                {
+                    job.Result = BuildJobBitmapToBitmap(job, b, true);
                     
                     //Write to Physical file
                 } else if (dest is string) {
@@ -482,7 +483,7 @@ namespace ImageResizer
                     try{
                         System.IO.FileStream fs = new FileStream(job.FinalPath, FileMode.Create, FileAccess.Write);
                         using (fs) {
-                            buildToStream(b, fs, s);
+                            BuildJobBitmapToStream(job, b, fs);
                             fs.Flush(true);
                             finishedWrite = true;
                         }
@@ -494,7 +495,7 @@ namespace ImageResizer
 
                     //Write to Unknown stream
                 } else if (dest is Stream) {
-                    buildToStream(b, (Stream)dest, s);
+                    BuildJobBitmapToStream(job, b, (Stream)dest);
                 } else throw new ArgumentException("Destination may be a string or Stream.", "Dest");
 
             } finally {
@@ -522,12 +523,13 @@ namespace ImageResizer
         /// <param name="source"></param>
         /// <param name="dest"></param>
         /// <param name="settings"></param>
-        protected override RequestedAction buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
-            if (base.buildToStream(source, dest, settings) == RequestedAction.Cancel) return RequestedAction.None;
+        protected override RequestedAction BuildJobBitmapToStream(ImageJob job, Bitmap source, Stream dest) {
+            if (base.BuildJobBitmapToStream(job,source, dest) == RequestedAction.Cancel) return RequestedAction.None;
 
-            IEncoder e = this.EncoderProvider.GetEncoder(settings,source);
+            IEncoder e = this.EncoderProvider.GetEncoder(job.Settings,source);
             if (e == null) throw new ImageProcessingException("No image encoder was found for this request.");
-            using (Bitmap b = buildToBitmap(source, settings,e.SupportsTransparency)) {//Determines output format, includes code for saving in a variety of formats.
+            using (Bitmap b = BuildJobBitmapToBitmap(job, source, e.SupportsTransparency))
+            {//Determines output format, includes code for saving in a variety of formats.
                 //Save to stream
                 e.Write(b, dest);
             }
@@ -542,11 +544,9 @@ namespace ImageResizer
         /// <param name="settings"></param>
         /// <param name="transparencySupported">True if the output method will support transparency. If false, the image should be provided a matte color</param>
         /// <returns></returns>
-        protected override Bitmap buildToBitmap(Bitmap source, ResizeSettings settings, bool transparencySupported) {
-            Bitmap b = base.buildToBitmap(source,settings,transparencySupported);
-            if (b != null) return b; //Allow extensions to replace the method wholesale.
-
-            using (ImageState state = new ImageState(settings, source.Size, transparencySupported)) {
+        protected Bitmap BuildJobBitmapToBitmap(ImageJob job, Bitmap source, bool transparencySupported) {
+            Bitmap b = null;
+            using (ImageState state = new ImageState(job.Settings, source.Size, transparencySupported)) {
                 state.sourceBitmap = source;
 
                 //Generic processing of ImageState instances.

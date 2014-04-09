@@ -166,37 +166,16 @@ namespace ImageResizer.Resizing {
         /// </summary>
         /// <param name="source"></param>
         /// <param name="dest"></param>
-        /// <param name="settings"></param>
+        /// <param name="job"></param>
         /// <returns></returns>
-        [Obsolete("This method will be removed in the next release. Do not override or implement.")]
-        protected virtual RequestedAction buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
+        protected virtual RequestedAction BuildJobBitmapToStream(ImageJob job, Bitmap source, Stream dest){
             if (exts != null) 
-                foreach (AbstractImageProcessor p in exts) 
-                    if (p.buildToStream(source, dest, settings) == RequestedAction.Cancel) 
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.BuildJobBitmapToStream(job, source, dest) == RequestedAction.Cancel) 
                         return RequestedAction.Cancel;
             return RequestedAction.None;
         }
-        /// <summary>
-        /// Most calls funnel through here. Default behavior configures an ImageState instance and calls Process(imageState); 
-        /// Shouldn't be overriden for any reason I can think of - use the appropriate virtual method under Process().
-        /// If an extension returns a Bitmap instance, it will be used instead of the default behavior.
-        /// Does NOT dispose of 'source' or 'source's underlying stream.
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="settings"></param>
-        /// <param name="transparencySupported"></param>
-        /// <returns></returns>
-        [Obsolete("This method will be removed in the next release. Do not override or implement.")]
-        protected virtual Bitmap buildToBitmap(Bitmap source, ResizeSettings settings, bool transparencySupported) {
-            if (exts != null) {
-                foreach (AbstractImageProcessor p in exts) {
-                    Bitmap b = p.buildToBitmap(source, settings, transparencySupported);
-                    if (b != null) return b;
-                }
-            }
-            return null;
-        }
-
+ 
         /// <summary>
         /// Process.0 First step of the Process() method. Can replace the entire Process method if RequestAction.Cancel is returned.
         /// Can be used to add points to translate (for image maps), and also to modify the settings 

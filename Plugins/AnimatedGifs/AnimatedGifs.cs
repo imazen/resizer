@@ -34,15 +34,16 @@ namespace ImageResizer.Plugins.AnimatedGifs
         /// <param name="source"></param>
         /// <param name="dest"></param>
         /// <param name="settings"></param>
-        protected override RequestedAction buildToStream(Bitmap source, Stream dest, ResizeSettings settings) {
+        protected override RequestedAction BuildJobBitmapToStream(ImageJob job, Bitmap source, Stream dest)
+        {
             //Determines output format, includes code for saving in a variety of formats.
             if (ImageFormat.Gif.Equals(source.RawFormat) && //If it's a GIF
-                settings["frame"] == null &&    //With no frame specifier
+                job.Settings["frame"] == null &&    //With no frame specifier
                 source.FrameDimensionsList != null && source.FrameDimensionsList.Length > 0) { //With multiple frames
-                IEncoder enc = c.Plugins.EncoderProvider.GetEncoder(settings, source);
+                IEncoder enc = c.Plugins.EncoderProvider.GetEncoder(job.Settings, source);
                 
                 if (enc.MimeType.Equals("image/gif", StringComparison.OrdinalIgnoreCase) && source.GetFrameCount(FrameDimension.Time) > 1) {
-                    WriteAnimatedGif(source, dest, enc, settings);
+                    WriteAnimatedGif(source, dest, enc, job.Settings);
                     return RequestedAction.Cancel;
                 }
 
