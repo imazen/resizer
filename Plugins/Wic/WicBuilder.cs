@@ -150,6 +150,7 @@ namespace ImageResizer.Plugins.WicBuilder {
                 frame.GetPixelFormat(out pixelFormat);
                 //Calculate the new size of the image and the canvas.
                 ImageState state = new ImageState(settings, orig, true);
+                state.Job = job;
                 c.CurrentImageBuilder.Process(state);
 
 

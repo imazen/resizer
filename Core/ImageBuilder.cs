@@ -548,6 +548,7 @@ namespace ImageResizer
             Bitmap b = null;
             using (ImageState state = new ImageState(job.Settings, source.Size, transparencySupported)) {
                 state.sourceBitmap = source;
+                state.Job = job;
 
                 //Generic processing of ImageState instances.
                 Process(state);

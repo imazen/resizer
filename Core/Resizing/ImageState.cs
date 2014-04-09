@@ -171,7 +171,7 @@ namespace ImageResizer.Resizing {
             return ImageColorFormat.Rgb;
         }
 
-
+        public ImageJob Job { get; set; }
         /// <summary>
         /// The destination bitmap.  If null, skip drawing commands, but continue layout logic.
         /// </summary>
