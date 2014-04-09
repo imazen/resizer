@@ -12,7 +12,6 @@ namespace ImageResizer.ReleaseBuilder {
     public class Build :Interaction {
         FolderFinder f = new FolderFinder("Core" );
         Devenv d = null;
-        Devenv extras = null;
         FsQuery q = null;
         VersionEditor v = null;
         GitManager g = null;
@@ -23,7 +22,6 @@ namespace ImageResizer.ReleaseBuilder {
         string linkBase = "http://downloads.imageresizing.net/";
         public Build() {
             d = new Devenv(Path.Combine(f.FolderPath,"ImageResizer.sln"));
-            extras = new Devenv(Path.Combine(f.FolderPath, "Other-Plugins-With-External-Dependencies.sln"));
             v = new VersionEditor(Path.Combine(f.FolderPath, "SharedAssemblyInfo.cs"));
             g = new GitManager(f.ParentPath);
             nuget = new NugetManager(Path.Combine(f.ParentPath, "nuget"));
@@ -386,9 +384,6 @@ namespace ImageResizer.ReleaseBuilder {
             d.Run("/Clean Debug");
             d.Run("/Clean Release");
             d.Run("/Clean Trial");
-            extras.Run("/Clean Debug");
-            extras.Run("/Clean Release");
-            extras.Run("/Clean Trial");
 
         }
 
@@ -397,13 +392,7 @@ namespace ImageResizer.ReleaseBuilder {
             d.Run("/Build Trial");
             if (buildDebug) result += d.Run("/Build Debug");
 
-            int extrasResult =
-            extras.Run("/Build Release") +
-            extras.Run("/Build Trial");
-            if (buildDebug) extrasResult += extras.Run("/Build Debug");
-
             if (result > 0 && !ask("There may have been build errors. Continue?")) return false;
-            else if (extrasResult > 0 && !ask("There may have been build errors for Plugins With External Dependencies. Continue?")) return false;
             return true;
         }
 
