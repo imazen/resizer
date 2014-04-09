@@ -121,6 +121,15 @@ namespace ImageResizer {
         /// </summary>
         public int? SourceHeight { get { return ResultInfo.Get<int?>("source.height", null); } }
 
+        /// <summary>
+        /// The width, in pixels, of the first frame or page in the final image file
+        /// </summary>
+        public int? FinalWidth { get { return ResultInfo.Get<int?>("final.width", null); } }
+        /// <summary>
+        /// The height, in pixels, of the first frame or page in the final image file
+        /// </summary>
+        public int? FinalHeight { get { return ResultInfo.Get<int?>("final.height", null); } }
+
 
         /// <summary>
         /// The correct file extension for the resulting file stream, without a leading dot. Will be null if the result is not an encoded image.

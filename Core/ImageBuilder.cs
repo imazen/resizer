@@ -1167,7 +1167,13 @@ namespace ImageResizer
             return RequestedAction.None;
         }
 
-
+        protected override RequestedAction EndProcess(ImageState s)
+        {
+            //Save the final dimensions.
+            s.Job.ResultInfo["result.width"] = s.finalSize.Width;
+            s.Job.ResultInfo["result.height"] = s.finalSize.Height;
+            return RequestedAction.None;
+        }
 
         private readonly string[] _supportedFileExtensions = new string[]
              {"bmp","gif","exif","png","tif","tiff","tff","jpg","jpeg", "jpe","jif","jfif","jfi"};
