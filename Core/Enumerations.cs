@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2011 Nathanael Jones. See license.txt */
+﻿/* Copyright (c) 2014 Imazen See license.txt */
 using System;
 using ImageResizer.ExtensionMethods;
 

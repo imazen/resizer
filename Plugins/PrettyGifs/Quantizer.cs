@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2011 Nathanael Jones. See license.txt for your rights 
+ * Copyright (c) 2014 Imazen See license.txt for your rights 
  * 
  * This code has been *heavily* modified from its original versions
  * 
