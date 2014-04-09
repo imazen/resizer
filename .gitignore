@@ -20,3 +20,4 @@ _ReSharper*
 *App_Data/pthreadVSE2.dll
 packages/
 NuGet.exe
+!NuGet.targets
