@@ -147,8 +147,8 @@
     <Compile Include="Caching\ICache.cs" />
     <Compile Include="Collections\SafeList.cs" />
     <Compile Include="Plugins\Basic\DefaultEncoder.cs" />
-    <Compile Include="Encoding\IEncoderProvider.cs" />
-    <Compile Include="Encoding\IEncoder.cs" />
+    <Compile Include="Plugins\IEncoderProvider.cs" />
+    <Compile Include="Plugins\IEncoder.cs" />
     <Compile Include="Plugins\IQuerystringPlugin.cs" />
     <Compile Include="Plugins\Basic\SizeLimiting.cs" />
     <Compile Include="Plugins\IVirtualFile.cs" />
