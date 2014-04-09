@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using ImageResizer.Util;
 using System.Globalization;
+using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer {
 
@@ -114,20 +115,21 @@ namespace ImageResizer {
         /// <summary>
         /// The width, in pixels, of the first frame or page in the source image file
         /// </summary>
-        public int? SourceWidth { get { return DictionaryUtils.GetValueOrDefault<int?>(ResultInfo, "source.width", null); } }
+        public int? SourceWidth { get { return ResultInfo.Get<int?>("source.width", null); } }
         /// <summary>
         /// The height, in pixels, of the first frame or page in the source image file
         /// </summary>
-        public int? SourceHeight { get { return DictionaryUtils.GetValueOrDefault<int?>(ResultInfo, "source.height", null); } }
+        public int? SourceHeight { get { return ResultInfo.Get<int?>("source.height", null); } }
+
 
         /// <summary>
         /// The correct file extension for the resulting file stream, without a leading dot. Will be null if the result is not an encoded image.
         /// </summary>
-        public string ResultFileExtension { get { return DictionaryUtils.GetValueOrDefault<string>(ResultInfo, "result.ext", null); } }
+        public string ResultFileExtension { get { return ResultInfo.Get<string>("result.ext", null); } }
         /// <summary>
         /// The correct mime type for the resulting file stream, without a leading dot. Will be null if the result is not an encoded image.
         /// </summary>
-        public string ResultMimeType { get { return DictionaryUtils.GetValueOrDefault<string>(ResultInfo, "result.mime", null); } }
+        public string ResultMimeType { get { return ResultInfo.Get<string>("result.mime", null); } }
 
 
 

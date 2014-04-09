@@ -74,6 +74,7 @@
     <Compile Include="BoxEdges.cs" />
     <Compile Include="Collections\QuerystringBase.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
+    <Compile Include="ExtensionMethods\Dictionary.cs" />
     <Compile Include="Plugins\Basic\MvcRoutingShimPlugin.cs" />
     <Compile Include="Plugins\Basic\StopRoutingRoute.cs" />
     <Compile Include="Plugins\FileSignature.cs" />
@@ -169,7 +170,6 @@
     <Content Include="Resizing\UnitR.cs.txt" />
     <Compile Include="SharedAssemblyInfo.cs" />
     <Compile Include="Util\AssemblyAttributes.cs" />
-    <Compile Include="Util\DictionaryUtils.cs" />
     <Compile Include="Util\ParseUtils.cs" />
     <Compile Include="Util\PathUtils.cs" />
     <Compile Include="Util\PolygonMath.cs" />
