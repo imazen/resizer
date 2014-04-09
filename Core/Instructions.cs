@@ -35,15 +35,6 @@ namespace ImageResizer {
          * 
          */
 
-
-        //public static explicit operator string(Instructions s) {
-        //    return PathUtils.BuildQueryString(s, true);
-        //}
-
-        //public static explicit operator Instructions(string s) {
-        //    return new Instructions(PathUtils.ParseQueryStringFriendlyAllowSemicolons(s));
-        //}
-
         /// <summary>
         /// Returns a human-friendly representation of the instruction set. Not suitable for URL usage; use ToQueryString() for that.
         /// </summary>
@@ -159,12 +150,6 @@ namespace ImageResizer {
         /// Defines the vertical height of the crop rectangle's coordinate space. For example, setting this to 100 makes the crop Y1 and Y1 values percentages of the image height.
         /// </summary>
         public double? CropYUnits { get { return this.Get<double>("cropyunits"); } set { this.Set<double>("cropyunits", value); } }
-
-        /// <summary>
-        /// An X1,Y1,X2,Y2 array of coordinates. Unless CropXUnits and CropYUnits are specified, these are in the coordinate space of the original image.
-        /// </summary>
-        [Obsolete("Use CropRectangle instead; this member is provided for backwards compatibility reasons only, and will be removed in the next major release")] //DROP4
-        public double[] CropRectange {get { return this.GetList<double>("crop",0,4);}set{this.SetList("crop",value,true,4);}}
 
         /// <summary>
         /// An X1,Y1,X2,Y2 array of coordinates. Unless CropXUnits and CropYUnits are specified, these are in the coordinate space of the original image.
