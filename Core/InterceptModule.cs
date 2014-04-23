@@ -138,6 +138,9 @@ namespace ImageResizer {
                         } catch (System.IO.FileNotFoundException notFound) { //Some VPPs are optimisitic , or could be a race condition
                             FileMissing(app.Context, virtualPath, q);
                             throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
+                        } catch (System.IO.DirectoryNotFoundException notFound) {
+                            FileMissing(app.Context, virtualPath, q);
+                            throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
                         }
                     } else
                         FileMissing(app.Context, virtualPath, q);
@@ -279,6 +282,9 @@ namespace ImageResizer {
                     //This will be called later, if at all. 
                     FileMissing(context, virtualPath, queryString);
                     throw new ImageMissingException("The specified resource could not be located","File not found", notFound);
+                } catch (System.IO.DirectoryNotFoundException notFound) {
+                    FileMissing(context, virtualPath, queryString);
+                    throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
                 }
             });
 
