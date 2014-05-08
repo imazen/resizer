@@ -19,12 +19,18 @@ namespace BuildTools {
 
         public FsQuery(string dir, IEnumerable<string> exclude) {
             baseDir = dir.TrimEnd('\\','/');
-            _files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
-            _folders = Directory.GetDirectories(dir, "*", SearchOption.AllDirectories);
+            Rescan();
             exclusions = new List<Pattern>();
             if (exclude != null) AddExclusions(exclude);
            
         }
+
+        public void Rescan()
+        {
+            _files = Directory.GetFiles(baseDir, "*", SearchOption.AllDirectories);
+            _folders = Directory.GetDirectories(baseDir, "*", SearchOption.AllDirectories);
+        }
+
 
         public void AddExclusions(IEnumerable<string> exclude) {
             foreach (string s in exclude) exclusions.Add(new Pattern(s));
