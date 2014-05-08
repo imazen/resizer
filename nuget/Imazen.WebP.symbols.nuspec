@@ -10,6 +10,6 @@
 		<file src="$coredlldir$\Imazen.WebP.dll" target="lib" />
 		<file src="$coredlldir$\Imazen.WebP.pdb" target="lib" />
 		<file src="$coredlldir$\Imazen.WebP.xml" target="lib" />
-		<file src="..\Plugins\Libs\libwebp-net\**\*.cs" target="src" />
+		<file src="..\submodules\libwebp-net\**\*.cs" target="src" />
 	</files>
 </package>
