@@ -285,6 +285,7 @@ namespace ImageResizer.ReleaseBuilder {
 
                 //7 - Revert file to state at commit (remove 'full' version numbers and 'commit' value)
                 v.Contents = fileContents;
+                q.Rescan(); //Rescan filesystem to prevent errors building the archive (since we delete stuff in CleanAll())
                 v.Save();
 
                 if (!success) return; //If the build didn't go ok, pause and exit
