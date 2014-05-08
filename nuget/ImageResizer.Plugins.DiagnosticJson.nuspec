@@ -28,7 +28,9 @@ $plugins$
 		<tags>ImageResizer Imazen Resizer DiagnosticJson diagnostic json metadata imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
+		  <dependency id="Newtonsoft.Json"/>
 		</dependencies>
+
 	</metadata>
   	<files>
 		<file src="$pluginsdlldir$\ImageResizer.Plugins.DiagnosticJson.dll" target="lib" />
