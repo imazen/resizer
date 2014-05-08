@@ -337,7 +337,7 @@ namespace ImageResizer.ReleaseBuilder {
                     var request = new TransferUtilityUploadRequest();
                     request.CannedACL = pd.Private ? Amazon.S3.S3CannedACL.Private : Amazon.S3.S3CannedACL.PublicRead;
                     request.BucketName = bucketName;
-                    request.Timeout = null;
+                    request.Timeout = TimeSpan.FromHours(2);
                     request.ContentType = "application/zip";
                     request.Key = Path.GetFileName(pd.Path);
                     request.FilePath = pd.Path;
