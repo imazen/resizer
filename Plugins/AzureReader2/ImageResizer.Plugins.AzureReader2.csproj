@@ -90,9 +90,7 @@
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AzureFile.cs" />
     <Compile Include="AzureReader.cs" />
-    <Compile Include="AzureVirtualPathProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -102,6 +100,10 @@
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ImageResizer.Storage\ImageResizer.Storage.csproj">
+      <Project>{80bb303c-8f55-410c-ba91-342ecc435101}</Project>
+      <Name>ImageResizer.Storage</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

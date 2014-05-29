@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2014 Imazen See license.txt for your rights. */
+﻿ /* Copyright (c) 2014 Imazen See license.txt for your rights. */
 using System;
 using System.Collections.Generic;
 using System.Linq;
