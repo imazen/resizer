@@ -79,6 +79,10 @@
     <Compile Include="PluginLoadingHints.cs" />
     <Compile Include="Plugins\Basic\MvcRoutingShimPlugin.cs" />
     <Compile Include="Plugins\Basic\StopRoutingRoute.cs" />
+    <Compile Include="Plugins\IVirtualImageProviderVpp.cs" />
+    <Compile Include="Plugins\IVirtualImageProviderVppCaching.cs" />
+    <Compile Include="Plugins\VirtualFileShim.cs" />
+    <Compile Include="Plugins\VirtualPathProvderShim.cs" />
     <Compile Include="Plugins\FileSignature.cs" />
     <Compile Include="Plugins\IFileSignatureProvider.cs" />
     <Compile Include="Configuration\Issues\ConfigChecker.cs" />

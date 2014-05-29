@@ -10,7 +10,7 @@ namespace ImageResizer.Plugins {
     /// </summary>
     public interface IVirtualImageProvider {
         /// <summary>
-        /// Returns true if the specified file exists.
+        /// Returns true if the specified request should be handled by this virtual image provider
         /// </summary>
         /// <param name="virtualPath"></param>
         /// <param name="queryString"></param>
