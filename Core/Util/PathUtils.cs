@@ -184,7 +184,7 @@ namespace ImageResizer.Util {
                 suffix = virtualPath.Substring(fragment);
                 virtualPath = virtualPath.Substring(0, fragment);
             }
-
+            virtualPath = virtualPath.TrimEnd('?');
             if (virtualPath.IndexOf('?') > -1) virtualPath = virtualPath.TrimEnd('&') + '&';
             else virtualPath += '?';
 
