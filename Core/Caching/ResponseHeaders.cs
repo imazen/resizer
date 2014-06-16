@@ -56,7 +56,7 @@ namespace ImageResizer.Caching {
             context.Response.Cache.SetOmitVaryStar(headers.SuppressVaryHeader);
             //Add dependencies to the server cache
             foreach (CacheDependency d in headers.ServerCacheDependencies)
-                context.Response.AddCacheDependency(d);
+                context.Response.AddCacheDependency(new CacheDependency[]{d});
 
             //Set Cache-Control: header
             context.Response.Cache.SetCacheability(headers.CacheControl);
