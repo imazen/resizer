@@ -17,7 +17,7 @@
         AWS SECRET: <input type="password"
         name="awssecret" id="awssecret" /><br />
 
-        AWS Bucket: <asp:TextBox ID="bucket" runat="server" /></asp:TextBox>
+        AWS Bucket: <asp:TextBox ID="bucket" runat="server" />
         <br />
 
         <asp:FileUpload ID="upload" runat="server" />
