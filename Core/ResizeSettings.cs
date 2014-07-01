@@ -429,7 +429,7 @@ namespace ImageResizer {
         /// <param name="primary"></param>
         /// <param name="secondary"></param>
         public ResizeSettings Normalize(string primary, string secondary) {
-            return (ResizeSettings)this.Normalize(primary, secondary);
+            return (ResizeSettings)ImageResizer.ExtensionMethods.NameValueCollectionExtensions.Normalize(this, primary, secondary);
         }
 
     }
