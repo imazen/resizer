@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6BEFD728-E3C5-43CC-BA9E-292B7CA4429D}"
 	ProjectSection(SolutionItems) = preProject
@@ -121,6 +121,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imazen.WebP", "submodules\libwebp-net\Imazen.WebP\Imazen.WebP.csproj", "{92F607A3-2F04-4536-8346-B6FEF8B774FF}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ImageResizer.TestFSharp", "Tests\ImageResizer.TestFSharp\ImageResizer.TestFSharp.fsproj", "{841B8ED5-5994-46C9-B81A-74973FB9DE0E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imazen.Webp.Test", "submodules\libwebp-net\Imazen.WebP.Test\Imazen.Webp.Test.csproj", "{204C42D3-A66C-4636-BC97-E0FB9310AAAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1152,6 +1154,24 @@ Global
 		{841B8ED5-5994-46C9-B81A-74973FB9DE0E}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{841B8ED5-5994-46C9-B81A-74973FB9DE0E}.Trial|x64.ActiveCfg = Release|Any CPU
 		{841B8ED5-5994-46C9-B81A-74973FB9DE0E}.Trial|x86.ActiveCfg = Release|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Release|x64.ActiveCfg = Release|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Release|x86.ActiveCfg = Release|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Trial|x64.ActiveCfg = Release|Any CPU
+		{204C42D3-A66C-4636-BC97-E0FB9310AAAB}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
