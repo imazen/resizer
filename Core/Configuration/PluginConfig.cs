@@ -461,6 +461,11 @@ namespace ImageResizer.Configuration {
             return CreatePluginByType(t, args);
         }
 
+        public void LoadNativeDependenciesForType(Type t){
+            ndeps.EnsureLoaded(t.Assembly);
+        }
+
+
         protected IPlugin CreatePluginByType(Type t, NameValueCollection args) {
 
             //TODO - perhaps manually select the constructor ? 
