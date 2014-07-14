@@ -17,6 +17,7 @@ using ImageResizer.Configuration;
 using ImageResizer.Plugins;
 using System.Globalization;
 using ImageResizer.ExtensionMethods;
+using System.Web.Hosting;
 
 namespace ImageResizer
 {
@@ -249,8 +250,9 @@ namespace ImageResizer
                 path = source as string;
                 //Convert app-relative paths to VirtualFile instances
                 if (path.StartsWith("~", StringComparison.OrdinalIgnoreCase)) {
-                    source = this.VirtualFileProvider.GetFile(PathUtils.ResolveAppRelative(path), settings);
-                    if (source == null) throw new FileNotFoundException("The specified virtual file could not be found.", PathUtils.ResolveAppRelative(path));
+                    string virtualPath = HostingEnvironment.ApplicationVirtualPath == null ? path.TrimStart('~') : PathUtils.ResolveAppRelative(path);
+                    source = this.VirtualFileProvider.GetFile(virtualPath, settings);
+                    if (source == null) throw new FileNotFoundException("The specified virtual file could not be found.", virtualPath);
                 }
             }
 
