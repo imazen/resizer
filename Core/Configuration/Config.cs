@@ -127,6 +127,11 @@ namespace ImageResizer.Configuration {
             }
         }
 
+        public ImageJob Build(ImageJob job)
+        {
+            return CurrentImageBuilder.Build(job);
+        }
+
         /// <summary>
         /// Shortuct to CurrentImageBuilder.Build (Useful for COM clients). Also creates a destination folder if needed, unlike the normal .Build() call.
         /// 
@@ -146,6 +151,7 @@ namespace ImageResizer.Configuration {
             }
             CurrentImageBuilder.Build(source, dest, new ResizeSettings(settings));
         }
+
 
         protected void InvalidateImageBuilder() {
             lock (_imageBuilderSync) if (_imageBuilder != null) _imageBuilder = _imageBuilder.Create(plugins.ImageBuilderExtensions, plugins,pipeline,pipeline);
