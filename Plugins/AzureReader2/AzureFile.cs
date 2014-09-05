@@ -1,6 +1,7 @@
 ﻿/* Copyright (c) 2011 Wouter A. Alberts and Nathanael D. Jones. See license.txt for your rights. */
 using System;
 using System.IO;
+using System.Net;
 using System.Web.Hosting;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -37,13 +38,9 @@ namespace ImageResizer.Plugins.AzureReader2
             }
             catch (StorageException e)
             {
-                if (e.RequestInformation.ExtendedErrorInformation.ErrorCode == "BlobNotFound")
+                if (e.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
                 {
-                    throw new FileNotFoundException("Azure blob file not found", e);
-                }
-                if (e.RequestInformation.ExtendedErrorInformation.ErrorCode == "ContainerNotFound")
-                {
-                    throw new FileNotFoundException("Azure blob container not found", e);
+                    throw new FileNotFoundException("Azure error: " + e.RequestInformation.HttpStatusMessage, e);
                 }
                 throw;
             }
