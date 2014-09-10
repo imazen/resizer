@@ -1,6 +1,6 @@
 os: Windows Server 2012 R2
 
-shallow_clone: false
+clone_depth: 10
 
 version: 4.0.0.{build}
 
@@ -8,9 +8,9 @@ version: 4.0.0.{build}
 assembly_info:
   patch: true
   file: AssemblyInfo.*
-  assembly_version: "4.0.0."
+  assembly_version: "4.0.0.0"
   assembly_file_version: "{version}"
-  assembly_informational_version: "{version} {APPVEYOR_REPO_COMMIT}"
+  assembly_informational_version: "{version} git id: {APPVEYOR_REPO_COMMIT}"
 
 
 clone_folder: c:\projects\resizer
