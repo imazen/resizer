@@ -5,21 +5,19 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Gallio.Common.Reflection;
-using Gallio.Framework;
 using ImageResizer;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.CopyMetadata;
 using ImageResizer.Resizing;
-using MbUnit.Framework;
-using MbUnit.Framework.ContractVerifiers;
+using Xunit;
+using Xunit.Abstractions;
 
 namespace ImageResizer.Plugins.CopyMetadata.Tests
 {
-    [TestFixture]
+
     public class CopyMetadataTest
     {
-        [Test(Order = 1)]
+        [Fact]
         public void SupportsCopyMetadataQuerystring()
         {
             CopyMetadataPlugin plugin = new CopyMetadataPlugin();
@@ -27,7 +25,7 @@ namespace ImageResizer.Plugins.CopyMetadata.Tests
             plugin.GetSupportedQuerystringKeys().Contains("copymetadata");
         }
 
-        [Test(Order = 2)]
+        [Fact]
         public void ShouldCopyMetadataWhenRequested()
         {
             CopyMetadataPlugin plugin = new CopyMetadataPlugin();
@@ -35,26 +33,26 @@ namespace ImageResizer.Plugins.CopyMetadata.Tests
             using (ImageState state = CreateImageState(true))
             {
                 RequestedAction requestedAction = CallProcessFinalBitmap(plugin, state);
-                Assert.AreEqual(RequestedAction.None, requestedAction);
+                Assert.Equal(RequestedAction.None, requestedAction);
 
-                Assert.IsNotEmpty(state.destBitmap.PropertyIdList);
-                Assert.IsNotEmpty(state.destBitmap.PropertyItems);
+                Assert.NotEmpty(state.destBitmap.PropertyIdList);
+                Assert.NotEmpty(state.destBitmap.PropertyItems);
 
                 // Ensure that all the properties came from the original image...
                 foreach (PropertyItem prop in state.destBitmap.PropertyItems)
                 {
                     PropertyItem sourceProp = state.sourceBitmap.PropertyItems.SingleOrDefault(p => p.Id == prop.Id);
-                    Assert.IsNotNull(sourceProp, "destBitmap ended up with a property that sourceBitmap didn't have!");
+                    Assert.NotNull(sourceProp);//, "destBitmap ended up with a property that sourceBitmap didn't have!");
                    
-                    Assert.AreEqual(sourceProp.Len, prop.Len);
-                    Assert.AreEqual(sourceProp.Type, prop.Type);
-                    Assert.AreEqual(sourceProp.Len, prop.Len);
-                    Assert.AreElementsEqual(sourceProp.Value, prop.Value);
+                    Assert.Equal(sourceProp.Len, prop.Len);
+                    Assert.Equal(sourceProp.Type, prop.Type);
+                    Assert.Equal(sourceProp.Len, prop.Len);
+                    Assert.Equal(sourceProp.Value, prop.Value);
                 }
             }
         }
 
-        [Test(Order = 3)]
+        [Fact]
         public void ShouldNotCopyMetadataWhenNotRequested()
         {
             CopyMetadataPlugin plugin = new CopyMetadataPlugin();
@@ -62,14 +60,14 @@ namespace ImageResizer.Plugins.CopyMetadata.Tests
             using (ImageState state = CreateImageState(false))
             {
                 RequestedAction requestedAction = CallProcessFinalBitmap(plugin, state);
-                Assert.AreEqual(RequestedAction.None, requestedAction);
+                Assert.Equal(RequestedAction.None, requestedAction);
 
-                Assert.IsEmpty(state.destBitmap.PropertyIdList);
-                Assert.IsEmpty(state.destBitmap.PropertyItems);
+                Assert.Empty(state.destBitmap.PropertyIdList);
+                Assert.Empty(state.destBitmap.PropertyItems);
             }
         }
 
-        [Test(Order = 4)]
+        [Fact]
         public void ShouldNeverCopyExcludedProperties()
         {
             CopyMetadataPlugin plugin = new CopyMetadataPlugin();
@@ -77,33 +75,33 @@ namespace ImageResizer.Plugins.CopyMetadata.Tests
             using (ImageState state = CreateImageState(true))
             {
                 RequestedAction requestedAction = CallProcessFinalBitmap(plugin, state);
-                Assert.AreEqual(RequestedAction.None, requestedAction);
+                Assert.Equal(RequestedAction.None, requestedAction);
 
                 // Make sure some of properties were stripped...
                 
                 // PropertyTagOrientation
-                Assert.Exists(state.sourceBitmap.PropertyItems, prop => prop.Id == 0x0112);
-                Assert.DoesNotExist(state.destBitmap.PropertyItems, prop => prop.Id == 0x0112);
+                Assert.True(state.sourceBitmap.PropertyItems.Any( prop => prop.Id == 0x0112));
+                Assert.None(state.destBitmap.PropertyItems, prop => prop.Id == 0x0112);
 
                 // PropertyTagXResolution
-                Assert.Exists(state.sourceBitmap.PropertyItems, prop => prop.Id == 0x011A);
-                Assert.DoesNotExist(state.destBitmap.PropertyItems, prop => prop.Id == 0x011A);
+                Assert.True(state.sourceBitmap.PropertyItems.Any(prop => prop.Id == 0x011A));
+                Assert.None(state.destBitmap.PropertyItems, prop => prop.Id == 0x011A);
 
                 // PropertyTagYResolution
-                Assert.Exists(state.sourceBitmap.PropertyItems, prop => prop.Id == 0x011B);
-                Assert.DoesNotExist(state.destBitmap.PropertyItems, prop => prop.Id == 0x011B);
+                Assert.Single(state.sourceBitmap.PropertyItems, prop => prop.Id == 0x011B);
+                Assert.None(state.destBitmap.PropertyItems, prop => prop.Id == 0x011B);
             }
         }
 
-        [Test(Order = 5)]
-        public void CopiedMetadataIncludesGeolocationInformation()
+        [Fact]
+        public void CopiedAndOriginalMetadataIncludesGeolocationInformation()
         {
             CopyMetadataPlugin plugin = new CopyMetadataPlugin();
 
             using (ImageState state = CreateImageState(true))
             {
                 RequestedAction requestedAction = CallProcessFinalBitmap(plugin, state);
-                Assert.AreEqual(RequestedAction.None, requestedAction);
+                Assert.Equal(RequestedAction.None, requestedAction);
 
                 // Make sure geolocation properties got copied...
                 int[] geolocationProperties = new int[] {
@@ -118,8 +116,8 @@ namespace ImageResizer.Plugins.CopyMetadata.Tests
 
                 foreach (int propId in geolocationProperties)
                 {
-                    Assert.Exists(state.sourceBitmap.PropertyItems, prop => prop.Id == propId, "sourceBitmap did not include geolocation information!");
-                    Assert.Exists(state.destBitmap.PropertyItems, prop => prop.Id == propId, "destBitmap did not copy geolocation information!");
+                    Assert.Single(state.sourceBitmap.PropertyItems, prop => prop.Id == propId);//, "sourceBitmap did not include geolocation information!");
+                    Assert.Single(state.destBitmap.PropertyItems, prop => prop.Id == propId);//, "destBitmap did not copy geolocation information!");
                 }
             }
         }
@@ -141,15 +139,13 @@ namespace ImageResizer.Plugins.CopyMetadata.Tests
 
         private static RequestedAction CallProcessFinalBitmap(BuilderExtension plugin, ImageState state)
         {
-            ITypeInfo type = Reflector.Wrap(plugin.GetType());
+            var type = plugin.GetType();
 
-            IMethodInfo method = type.GetMethod("ProcessFinalBitmap", BindingFlags.Instance | BindingFlags.NonPublic);
-            Assert.IsNotNull(method, "Did not find 'ProcessFinalBitmap' method on plugin.");
+            var method = type.GetMethod("ProcessFinalBitmap", BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.NotNull(method);//, "Did not find 'ProcessFinalBitmap' method on plugin.");
 
-            MethodInfo m = method.Resolve(false);
-            Assert.IsNotNull(m);
 
-            RequestedAction requestedAction = (RequestedAction)m.Invoke(plugin, new object[] { state });
+            RequestedAction requestedAction = (RequestedAction)method.Invoke(plugin, new object[] { state });
 
             return requestedAction;
         }
