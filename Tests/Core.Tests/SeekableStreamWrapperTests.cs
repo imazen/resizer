@@ -4,36 +4,36 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Gallio.Framework;
+using Xunit;
 using ImageResizer.Util;
-using MbUnit.Framework;
+
 
 namespace ImageResizer.Core.Tests
 {
-    [TestFixture]
+  
     public class SeekableStreamWrapperTests
     {
-        [Test]
+        [Fact]
         public void DoesntWrapSeekableStream()
         {
             var s = new TestStream(true, "some data");
             using (var actual = SeekableStreamWrapper.FromStream(s))
             {
-                Assert.AreSame(s, actual);
-                Assert.IsTrue(actual.CanSeek);
+                Assert.Same(s, actual);
+                Assert.True(actual.CanSeek);
             }
         }
 
-        [Test]
+        [Fact]
         public void WrapsNonSeekableStream()
         {
             var s = new TestStream(false, "some data");
             using (var actual = SeekableStreamWrapper.FromStream(s))
             {
-                Assert.AreNotSame(s, actual);
-                Assert.IsInstanceOfType(typeof(SeekableStreamWrapper), actual);
-                Assert.IsTrue(actual.CanSeek);
-                Assert.IsFalse(actual.CanWrite);
+                Assert.NotSame(s, actual);
+                Assert.IsAssignableFrom(typeof(SeekableStreamWrapper), actual);
+                Assert.True(actual.CanSeek);
+                Assert.False(actual.CanWrite);
             }
         }
 

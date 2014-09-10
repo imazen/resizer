@@ -1,25 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Gallio.Framework;
-using MbUnit.Framework;
-using MbUnit.Core;
-using MbUnit.Framework.ContractVerifiers;
+using System.Text; 
 using ImageResizer.Configuration;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Drawing.Imaging;
 using System.Net;
+using Xunit;
+using System.Linq;
 
 namespace ImageResizer.Tests {
-    [TestFixture]
-    [Factory("GetConfigurations")]
+
     public class ImageBuilderTest {
 
         private Config c;
-        public ImageBuilderTest(Config c){
-            this.c  = c;
+        public ImageBuilderTest(){
+            this.c = new Config(new ResizerSection());
         }
 
         public static IEnumerable<Config> GetConfigurations(){
@@ -38,24 +35,24 @@ namespace ImageResizer.Tests {
      
 
 
-        [Test]
-        [Row(50,50,"format=jpg&quality=100")]
-        [Row(1,1,"format=jpg&quality=100")]
-        [Row(50,50,"format=jpg&quality=-300")]
-        [Row(50,50,"format=png")]
-        [Row(50,50,"format=gif")]
+        [Theory]
+        [InlineData(50, 50, "format=jpg&quality=100")]
+        [InlineData(1, 1, "format=jpg&quality=100")]
+        [InlineData(50, 50, "format=jpg&quality=-300")]
+        [InlineData(50, 50, "format=png")]
+        [InlineData(50, 50, "format=gif")]
         public void EncodeImage(int width, int height, string query){
             using (MemoryStream ms = new MemoryStream(8000)){
                 c.CurrentImageBuilder.Build(GetBitmap(width,height),ms,new ResizeSettings(query));
             }
         }
 
-        [Test]
-        [Row(50, 50, "format=jpg&quality=100")]
-        [Row(1, 1, "format=jpg&quality=100")]
-        [Row(50, 50, "format=jpg&quality=-300")]
-        [Row(50, 50, "format=png")]
-        [Row(50, 50, "format=gif")]
+        [Theory]
+        [InlineData(50, 50, "format=jpg&quality=100")]
+        [InlineData(1, 1, "format=jpg&quality=100")]
+        [InlineData(50, 50, "format=jpg&quality=-300")]
+        [InlineData(50, 50, "format=png")]
+        [InlineData(50, 50, "format=gif")]
         public void LoadImageStream(int width, int height, string encodeQuery) {
             using (MemoryStream ms = new MemoryStream(8000)) {
                 c.CurrentImageBuilder.Build(GetBitmap(width,height), ms, new ResizeSettings(encodeQuery));
@@ -63,68 +60,111 @@ namespace ImageResizer.Tests {
                 //Now we test the loading
 
                 using (Bitmap b = c.CurrentImageBuilder.LoadImage(ms, new ResizeSettings())) {
-                    Assert.AreEqual<Size>(new Size(width,height), b.Size);
+                    Assert.Equal<Size>(new Size(width,height), b.Size);
                 }
             }
         }
 
-        [Test]
-        [Row(50, 50, "format=jpg&quality=100")]
-        [Row(1, 1, "format=jpg&quality=100")]
-        [Row(50, 50, "format=jpg&quality=-300")]
-        [Row(50, 50, "format=png")]
-        [Row(50, 50, "format=gif")]
+        [Theory]
+        [InlineData(50, 50, "format=jpg&quality=100")]
+        [InlineData(1, 1, "format=jpg&quality=100")]
+        [InlineData(50, 50, "format=jpg&quality=-300")]
+        [InlineData(50, 50, "format=png")]
+        [InlineData(50, 50, "format=gif")]
         public void LoadImageBytes(int width, int height, string encodeQuery) {
             using (MemoryStream ms = new MemoryStream(8000)) {
                 c.CurrentImageBuilder.Build(GetBitmap(width, height), ms, new ResizeSettings(encodeQuery));
                 //Now we test the loading
                 using (Bitmap b = c.CurrentImageBuilder.LoadImage(ms.ToArray(), new ResizeSettings())) {
-                    Assert.AreEqual<Size>(new Size(width, height), b.Size);
+                    Assert.Equal<Size>(new Size(width, height), b.Size);
                 }
             }
         }
 
 
 
-        [Test]
-        [Row(200,200,50,50,"?width=50&height=50")]
-        [Row(10, 10, 50, 50, "?paddingWidth=10&borderWidth=10&borderColor=green")]
-        [Row(10, 10, 50, 50, "?paddingWidth=10&borderWidth=10")]
-        [Row(10, 10, 70, 70, "?paddingWidth=10&margin=10&borderWidth=10&borderColor=green")]
-        [Row(10, 10, 70, 70, "?paddingWidth=10&margin=10&borderWidth=10")]
+        [Theory]
+        [InlineData(200,200,50,50,"?width=50&height=50")]
+        [InlineData(10, 10, 50, 50, "?paddingWidth=10&borderWidth=10&borderColor=green")]
+        [InlineData(10, 10, 50, 50, "?paddingWidth=10&borderWidth=10")]
+        [InlineData(10, 10, 70, 70, "?paddingWidth=10&margin=10&borderWidth=10&borderColor=green")]
+        [InlineData(10, 10, 70, 70, "?paddingWidth=10&margin=10&borderWidth=10")]
         public void TestBitmapSize(int originalWidth, int originalHeight, int expectedWidth, int expectedHeight, string query) {
             ResizerSection config = new ResizerSection();
             Config c = new Config(config);
             using (Bitmap b = c.CurrentImageBuilder.Build(GetBitmap(originalWidth,originalHeight), new ResizeSettings(query))) {
-                Assert.AreEqual<Size>(new Size(expectedWidth,expectedHeight),b.Size);
+                Assert.Equal<Size>(new Size(expectedWidth,expectedHeight),b.Size);
             }
         }
+
+        public static T[] ArrayFromRange<T>(T[] originalArray, int startIndex, int length)
+        {
+          int actualLength = Math.Min(length, originalArray.Length - startIndex);
+          T[] copy = new T[actualLength];
+          Array.Copy(originalArray, startIndex, copy, 0, actualLength);
+          return copy;
+        }
+
+        public static List<object[]> Combinatorial(List<object[]> appendTo, object[] prefixed, params IEnumerable<object>[] columns){
+            var c = columns.Select( e => new List<object>(e));
+
+            System.Func<int,List<object>,int> f = (a, b) => (int)(a * Math.Max(1,b.Count));
+            var combinationCount = c.Aggregate<List<object>,int,int>(1, f, x => x);
+            var sets = appendTo == null ? new List<object[]>(combinationCount) : appendTo;
+            
+            foreach (var val in c.First()){
+
+                var prefix = new object[1 + (prefixed == null ? 0 : prefixed.Length)];
+                if (prefixed != null) prefixed.CopyTo(prefix,0);
+                prefix[prefix.Length - 1] = val;
+                if (c.Count() > 1){
+                    Combinatorial(sets,prefix, ArrayFromRange(c.ToArray(),1,c.Count() -1));
+                }else{
+                    sets.Add(prefix);
+                }
+            }
+            return sets;
+
+        }
+        public static IEnumerable<object[]> Combine(params IEnumerable<object>[] columns)
+        {
+            return Combinatorial(null, null, columns);
+        }
+
+        public static IEnumerable<object[]> Combine3(object[] a, object[] b, object[] c)
+        {
+            return Combinatorial(null, null,a,b,c);
+        }
+
+        public static IEnumerable<object[]> Combine5(object[] a, object[] b, object[] c, object[] d, object[] e)
+        {
+            return Combinatorial(null, null, a, b, c,d,e);
+        }
+
         /// <summary>
         /// Verifies GetFinalSize() and Build() always agree
         /// </summary>
         /// <param name="c"></param>
         /// <param name="original"></param>
         /// <param name="query"></param>
-        [Test]
-        [CombinatorialJoin]
-        [Row(100,1, "?width=20")]
-        [Row(20,100, "?height=30")]
-        public void GetFinalSize(int originalWidth,int originalHeight, string query){
+        [Theory]
+        [MemberData("Combine3", new object[] { 100, 20 }, new object[] { 1, 100 }, new object[] { "?width=20", "?height=30" })]
+        public void GetFinalSize(int originalWidth, int originalHeight, string query){
             using (Bitmap b = c.CurrentImageBuilder.Build(GetBitmap(originalWidth,originalHeight), new ResizeSettings(query))) {
-                Assert.AreEqual<Size>(b.Size,c.CurrentImageBuilder.GetFinalSize(new Size(originalWidth,originalHeight),new ResizeSettings(query)));
+                Assert.Equal<Size>(b.Size,c.CurrentImageBuilder.GetFinalSize(new Size(originalWidth,originalHeight),new ResizeSettings(query)));
             }
         }
 
-        [Test]
-        [Row(200,200,100,100,100,100,"rotate=90")]
-        [Row(200,200,100,100,50,50, "width=100")]
-        [Row(200,200,100,100,50,10, "width=100&height=20&stretch=fill")]
+        [Theory]
+        [InlineData(200,200,100,100,100,100,"rotate=90")]
+        [InlineData(200,200,100,100,50,50, "width=100")]
+        [InlineData(200,200,100,100,50,10, "width=100&height=20&stretch=fill")]
         public void TranslatePoints(int imgWidth, int imgHeight, float x, float y, float expectedX, float expectedY, string query) {
             PointF result = c.CurrentImageBuilder.TranslatePoints(new PointF[] { new PointF(x,y) }, new Size(imgWidth,imgHeight), new ResizeSettings(query))[0];
-            Assert.AreEqual<PointF>(new PointF(expectedX,expectedY), result );
+            Assert.Equal<PointF>(new PointF(expectedX,expectedY), result );
         }
 
-        [Test]
+        [Fact]
         public void TestWithWebResponseStream() {
             WebRequest request = WebRequest.Create("http://www.google.com/intl/en_com/images/srpr/logo2w.png");
             WebResponse response = request.GetResponse();
@@ -148,7 +188,7 @@ namespace ImageResizer.Tests {
 
         }
 
-        [Test]
+        [Fact]
         public void ResizeInPlace() {
             GetBitmap(100, 100).Save("test-image.png", ImageFormat.Png);
             ImageBuilder.Current.Build("test-image.png", "test-image.png", new ResizeSettings("width=20"));
@@ -158,12 +198,13 @@ namespace ImageResizer.Tests {
         }
 
 
-        [Test]
-        public void TestSourceBitmapDisposed([Column(true, false)] bool dispose,
-                                            [Column(true, false)] bool useDestinationStream,
-                                            [Column(true, false)] bool useCorruptedSource,
-                                            [Column(true, false)] bool loadTwice,
-                                            [Column(true, false)] bool useSourceStream) {
+        [Theory]
+        [MemberData("Combine5", new[] { true, false }, new[] { true, false }, new[] { true, false }, new[] { true, false }, new[] { true, false })]
+        public void TestSourceBitmapDisposed(bool dispose,
+                                            bool useDestinationStream,
+                                            bool useCorruptedSource,
+                                            bool loadTwice,
+                                            bool useSourceStream) {
             if (useCorruptedSource) useSourceStream = true;//Required
 
             object source = null;
@@ -197,7 +238,7 @@ namespace ImageResizer.Tests {
                     corrupted = true;
                     source = null;
                 }
-                Assert.AreEqual<bool>(useCorruptedSource,corrupted);
+                Assert.Equal<bool>(useCorruptedSource,corrupted);
             }
 
             if (source == null) return;
@@ -211,7 +252,7 @@ namespace ImageResizer.Tests {
             }catch(ImageCorruptedException){
                 wasCorrupted = true;
             }
-            Assert.AreEqual<bool>(useCorruptedSource,wasCorrupted);
+            Assert.Equal<bool>(useCorruptedSource,wasCorrupted);
 
             bool wasDisposed = false;
             try {
@@ -219,7 +260,7 @@ namespace ImageResizer.Tests {
                 if (source is MemoryStream) wasDisposed = !((MemoryStream)source).CanRead;
             }catch (ArgumentException){wasDisposed = true;}
 
-            Assert.AreEqual<bool>(dispose,wasDisposed);
+            Assert.Equal<bool>(dispose,wasDisposed);
 
         }
 

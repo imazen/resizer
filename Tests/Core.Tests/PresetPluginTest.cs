@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Gallio.Framework;
-using MbUnit.Framework;
-using MbUnit.Framework.ContractVerifiers;
+using Xunit;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins.Basic;
+using System.Linq;
 
 namespace ImageResizer.Tests {
-    [TestFixture]
+   
     public class PresetPluginTest {
-        [Test]
-        [Row("preset=p;width=50;height=50","width=50;height=100","width=100","height=100")]
+        [Theory]
+        [InlineData("preset=p;width=50;height=50","width=50;height=100","width=100","height=100")]
         public void Test(string original, string expected, string defaults, string overrides ) {
             Config c = new Config();
             var defs = new Dictionary<string, ResizeSettings>();
@@ -30,14 +29,14 @@ namespace ImageResizer.Tests {
             foreach(string k in e.QueryString.Keys)
                 dict[k] = e.QueryString[k];
 
-            Assert.AreElementsEqualIgnoringOrder<KeyValuePair<string, string>>(expectedDict,dict);
-
+            EqualIgnoreOrder<KeyValuePair<string, string>>(expectedDict, dict, (pair) => (pair.Key == null ? "null" : pair.Key) + "|" + (pair.Value == null ? "null" : pair.Value));
+        
 
         }
 
 
-        [Test]
-        [Row("preset=p;width=50;height=50", "width=50;height=100", "width=100", "height=100")]
+        [Theory]
+        [InlineData("preset=p;width=50;height=50", "width=50;height=100", "width=100", "height=100")]
         public void TestModifiySettings(string original, string expected, string defaults, string overrides) {
             var defs = new Dictionary<string, ResizeSettings>();
             defs.Add("p", new ResizeSettings(defaults));
@@ -54,7 +53,14 @@ namespace ImageResizer.Tests {
             foreach (string k in result.Keys)
                 dict[k] = result[k];
 
-            Assert.AreElementsEqualIgnoringOrder<KeyValuePair<string, string>>(expectedDict, dict);
+            EqualIgnoreOrder<KeyValuePair<string, string>>(expectedDict, dict, (pair) => (pair.Key == null ? "null" : pair.Key) + "|" + (pair.Value == null ? "null" : pair.Value));
+        }
+
+        public void EqualIgnoreOrder<T>(IEnumerable<T> a, IEnumerable<T> b, Func<T,string> stringify) 
+        {
+            var la = a.OrderBy(stringify).ToList();
+            var lb = b.OrderBy(stringify).ToList();
+            Assert.Equal(la, lb);
         }
     }
 }
