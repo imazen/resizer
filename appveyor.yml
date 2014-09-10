@@ -1,6 +1,6 @@
 os: Windows Server 2012 R2
 
-shallow_clone: true
+shallow_clone: false
 
 version: 4.0.0.{build}
 
@@ -17,8 +17,7 @@ clone_folder: c:\projects\resizer
 
 
 install:
-  - git submodule init
-  - git submodule update
+  - cmd: git submodule -q update --init
 
 # build platform, i.e. x86, x64, AnyCPU. This setting is optional.
 platform: 
