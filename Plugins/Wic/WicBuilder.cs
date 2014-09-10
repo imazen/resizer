@@ -72,7 +72,7 @@ namespace ImageResizer.Plugins.WicBuilder {
                 data = StreamExtensions.CopyOrReturnBuffer(s, out lData,false, 0x1000);
             } finally {
                 if (s != null && restoreStreamPosition && s.CanSeek) s.Seek(originalPosition, SeekOrigin.Begin);
-                if (disposeStream) s.Dispose();
+                if (disposeStream && s != null) s.Dispose();
             }
 
             //Ok, now we have our byte[] and length. 
