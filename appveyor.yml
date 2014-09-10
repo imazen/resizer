@@ -10,7 +10,7 @@ assembly_info:
   file: AssemblyInfo.*
   assembly_version: "4.0.0.0"
   assembly_file_version: "{version}"
-  assembly_informational_version: "{version} git id: {APPVEYOR_REPO_COMMIT}"
+  assembly_informational_version: "{version} git id: $(APPVEYOR_REPO_COMMIT)"
 
 
 clone_folder: c:\projects\resizer
@@ -31,7 +31,7 @@ build:
   publish_nuget: false             # package projects with .nuspec files and push to artifacts
 
   # MSBuild verbosity level
-  verbosity: minimal
+  verbosity: quiet
 
 
 # scripts to run before build
