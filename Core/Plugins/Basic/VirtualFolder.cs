@@ -118,8 +118,8 @@ namespace ImageResizer.Plugins.Basic {
         /// <param name="path"></param>
         /// <returns></returns>
         protected string resolvePhysicalPath(string path) {
-            
-            if (!Path.IsPathRooted(path)) path = Path.Combine(HostingEnvironment.ApplicationPhysicalPath, path);
+
+            if (!Path.IsPathRooted(path) && HostingEnvironment.ApplicationPhysicalPath != null) path = Path.Combine(HostingEnvironment.ApplicationPhysicalPath, path);
             if (NoIOPermission) return collapsePath(path);
 
             try {
