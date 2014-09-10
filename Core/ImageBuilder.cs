@@ -1171,9 +1171,12 @@ namespace ImageResizer
 
         protected override RequestedAction EndProcess(ImageState s)
         {
-            //Save the final dimensions.
-            s.Job.ResultInfo["result.width"] = s.finalSize.Width;
-            s.Job.ResultInfo["result.height"] = s.finalSize.Height;
+            if (s.Job != null)
+            {
+                //Save the final dimensions.
+                s.Job.ResultInfo["result.width"] = s.finalSize.Width;
+                s.Job.ResultInfo["result.height"] = s.finalSize.Height;
+            }
             return RequestedAction.None;
         }
 
