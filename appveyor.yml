@@ -19,6 +19,15 @@ clone_folder: c:\projects\resizer
 install:
   - cmd: git submodule -q update --init
 
+matrix:
+  allow_failures:
+    - platform: x86
+      configuration: Release
+    - platform: x64
+      configuration: Release
+    - platform: Any CPU
+      configuration: Release
+
 # build platform, i.e. x86, x64, AnyCPU. This setting is optional.
 platform: 
   - Any CPU
