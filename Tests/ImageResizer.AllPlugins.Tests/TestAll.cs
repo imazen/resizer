@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Gallio.Framework;
-using MbUnit.Framework;
-using MbUnit.Framework.ContractVerifiers;
+using Xunit;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins.Basic;
 using ImageResizer.Plugins.Watermark;
@@ -18,10 +16,10 @@ using System.Drawing;
 using System.IO;
 
 namespace ImageResizer.AllPlugins.Tests {
-    [TestFixture]
+ 
     public class TestAll {
 
-        public Config GetConfig() {
+        public static Config GetConfig() {
             Config c = new Config();
             //c.Pipeline.s
             WatermarkPlugin w = new ImageResizer.Plugins.Watermark.WatermarkPlugin();
@@ -49,6 +47,10 @@ namespace ImageResizer.AllPlugins.Tests {
             new SimpleFilters().Install(c);
             new DropShadow().Install(c);
             new WhitespaceTrimmerPlugin().Install(c);
+            new VirtualFolder("/images", "..\\..\\..\\Samples\\Images",false).Install(c);
+     
+            new ImageResizer.Plugins.SourceMemCache.SourceMemCachePlugin().Install(c);
+            
             //s3reader
             //sqlreader
 
@@ -56,7 +58,7 @@ namespace ImageResizer.AllPlugins.Tests {
 
         }
 
-        Dictionary<string, string[]> GetData() {
+        static Dictionary<string, string[]> GetData() {
             Dictionary<string, string[]> data = new Dictionary<string, string[]>();
             data.Add("width", new string[] { "-100", ".,,.,,", "40","100", "800", "2" });
             data.Add("height", new string[] { "-100", ".,,.,,", "40", "100", "800", "2" });
@@ -99,14 +101,14 @@ namespace ImageResizer.AllPlugins.Tests {
             return data;
         }
 
-        public List<object> GetSourceObjects() {
+        public static List<object> GetSourceObjects() {
             List<object> sources = new List<object>();
-            sources.Add("..\\..\\..\\Samples\\Images\\red-leaf.jpg");
+            sources.Add("~/images/red-leaf.jpg");
            // sources.Add("/gradient.png");
             return sources;
         }
 
-        public IEnumerable<object[]> RandomCombinations {
+        public static IEnumerable<object[]> RandomCombinations {
             get {
                 Dictionary<string,string[]> data = GetData();
                 List<object> sources = GetSourceObjects();
@@ -125,16 +127,20 @@ namespace ImageResizer.AllPlugins.Tests {
             }
         }
 
-        Dictionary<string, Bitmap> cachedImages = new Dictionary<string, Bitmap>();
+        static Dictionary<string, Bitmap> cachedImages = new Dictionary<string, Bitmap>();
 
-        public Bitmap GetCachedImage(string key, Config c) {
+        public void UseCachedImage(string key, Config c, Func<Bitmap, object> callback) {
             if (!cachedImages.ContainsKey(key))
                 cachedImages[key] = c.CurrentImageBuilder.LoadImage(key, new ResizeSettings());
-            return cachedImages[key];
+            lock (cachedImages[key])
+            {
+                callback(cachedImages[key]);
+            }
         }
 
         int counter = 0;
-        [Test, Factory("RandomCombinations")]
+        [Theory]
+        [MemberData("RandomCombinations")]
         public void RandomTest(object source, string query) {
             Config c = GetConfig();
 
@@ -144,13 +150,15 @@ namespace ImageResizer.AllPlugins.Tests {
 
             string dir = Path.GetFullPath("test-images\\");
             if (fname.Length + dir.Length > 250) fname = fname.Substring(0, 250 - dir.Length) + "...";
-
-            c.CurrentImageBuilder.Build(GetCachedImage(source as string, c), dir + fname, new ResizeSettings(query),false,true);
+            var instructions = new Instructions(query);
+            instructions["scache"] = "mem";
+            c.CurrentImageBuilder.Build(new ImageJob(source as string, dir + fname, instructions, false, true));
             counter++;
         }
 
         Random r = new Random();
-        [Test, Factory("RandomCombinations")]
+        [Theory]
+        [MemberData("RandomCombinations")]
         public void TestCombinationsFast(object source, string query) {
             Config c = GetConfig();
             c.CurrentImageBuilder.GetFinalSize(new Size(r.Next(10000),r.Next(10000)), new ResizeSettings(query));

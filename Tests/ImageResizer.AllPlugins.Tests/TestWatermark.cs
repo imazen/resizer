@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Gallio.Framework;
-using MbUnit.Framework;
-using MbUnit.Framework.ContractVerifiers;
+using Xunit;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins.Basic;
 
 namespace ImageResizer.Plugins.Watermark.Tests {
-    [TestFixture]
+ 
     public class TestWatermark {
-        [Test]
+        [Fact]
         public void Test() {
             //
             // TODO: Add test logic here
