@@ -120,8 +120,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imazen.WebP", "submodules\l
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ImageResizer.TestFSharp", "Tests\ImageResizer.TestFSharp\ImageResizer.TestFSharp.fsproj", "{841B8ED5-5994-46C9-B81A-74973FB9DE0E}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ImageResizer.Plugins.WebP.Test", "Tests\ImageResizer.Plugins.WebP.Test\ImageResizer.Plugins.WebP.Test.fsproj", "{848E25D6-341A-4589-96DE-84360D282B16}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1134,24 +1132,6 @@ Global
 		{841B8ED5-5994-46C9-B81A-74973FB9DE0E}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{841B8ED5-5994-46C9-B81A-74973FB9DE0E}.Trial|x64.ActiveCfg = Release|Any CPU
 		{841B8ED5-5994-46C9-B81A-74973FB9DE0E}.Trial|x86.ActiveCfg = Release|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Release|Any CPU.Build.0 = Release|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Release|x64.ActiveCfg = Release|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Release|x86.ActiveCfg = Release|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Trial|Any CPU.ActiveCfg = Release|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Trial|Any CPU.Build.0 = Release|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Trial|x64.ActiveCfg = Release|Any CPU
-		{848E25D6-341A-4589-96DE-84360D282B16}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
