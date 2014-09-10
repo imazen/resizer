@@ -16,6 +16,9 @@ assembly_info:
 clone_folder: c:\projects\resizer
 
 
+install:
+  - git submodule init
+  - git submodule update
 
 # build platform, i.e. x86, x64, AnyCPU. This setting is optional.
 platform: 
