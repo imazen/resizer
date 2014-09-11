@@ -13,42 +13,32 @@ namespace ImageResizer.Plugins.DiskCache {
     /// </summary>
     public class CleanupWorkItem {
 
-        private string relativePath = null;
-
-        private LazyTaskProvider lazyProvider = null;
+    
         /// <summary>
         /// Should be a delegate a CleanupWorkItem instance (which doesn't have LazyProvider value, but has RelativePath and PhyscialPath values). May return null
         /// </summary>
-        public LazyTaskProvider LazyProvider
-        {
-            get { return lazyProvider; }
-            set { lazyProvider = value; }
-        }
+        public LazyTaskProvider LazyProvider {get;  set;}
+        
         /// <summary>
         /// Cache-relative path 
         /// </summary>
-        public string RelativePath {
-            get { return relativePath; }
-        }
-        private string physicalPath = null;
+        public string RelativePath { get; private set;}
         /// <summary>
         /// Physcial path
         /// </summary>
-        public string PhysicalPath {
-            get { return physicalPath; }
-        }
+        public string PhysicalPath {get; private set;}
         public CleanupWorkItem(Kind task, string relativePath, string physicalPath) {
-            this.task = task;
-            this.relativePath = relativePath;
-            this.physicalPath = physicalPath;
-            if (this.relativePath.StartsWith("/")) {
+            this.Task = task;
+            this.RelativePath = relativePath;
+            this.RelativePath = physicalPath;
+            if (this.RelativePath.StartsWith("/")) {
                 Debug.WriteLine("Invalid relativePath value - should never have leading slash!");
             }
         }
 
         public CleanupWorkItem(Kind task, LazyTaskProvider callback) {
-            this.task = task;
-            this.lazyProvider = callback;
+            this.Task = task;
+            this.LazyProvider = callback;
         }
         public override int GetHashCode() {
             return base.GetHashCode();
@@ -89,13 +79,8 @@ namespace ImageResizer.Plugins.DiskCache {
 
         }
 
-        private Kind task = Kind.CleanFolderRecursive;
 
-
-        public Kind Task {
-            get { return task; }
-            set { task = value; }
-        }
+        public Kind Task{ get; set; }
 
     }
 }

@@ -25,7 +25,7 @@ namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
     /// <summary>
     ///   Provides a managed interface to Ghostscript API.
     /// </summary>
-    /// <seealso cref = "http://ghostscript.com/doc/current/API.htm" />
+    /// <seealso href = "http://ghostscript.com/doc/current/API.htm" />
     public class GhostscriptEngine
     {
         private delegate int GhostscriptMessageEventHandler(IntPtr instance, IntPtr source, int length);
