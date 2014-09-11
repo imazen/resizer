@@ -72,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncInterceptModule.cs" />
     <Compile Include="BoxEdges.cs" />
     <Compile Include="Collections\QuerystringBase.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
@@ -79,6 +80,10 @@
     <Compile Include="PluginLoadingHints.cs" />
     <Compile Include="Plugins\Basic\MvcRoutingShimPlugin.cs" />
     <Compile Include="Plugins\Basic\StopRoutingRoute.cs" />
+    <Compile Include="Plugins\IVirtualFileAsync.cs" />
+    <Compile Include="Plugins\IVirtualFileCacheAsync.cs" />
+    <Compile Include="Plugins\IVirtualFileWithModifiedDateAsync.cs" />
+    <Compile Include="Plugins\IVirtualImageProviderAsync.cs" />
     <Compile Include="Plugins\IVirtualImageProviderVpp.cs" />
     <Compile Include="Plugins\IVirtualImageProviderVppCaching.cs" />
     <Compile Include="Plugins\VirtualFileShim.cs" />

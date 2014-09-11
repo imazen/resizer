@@ -7,6 +7,7 @@ using ImageResizer.Configuration;
 using System.Collections.Specialized;
 using System.Web;
 using ImageResizer.Plugins;
+using System.Threading.Tasks;
 
 namespace ImageResizer.Configuration {
     public enum VppUsageOption {
@@ -73,6 +74,10 @@ namespace ImageResizer.Configuration {
         /// True once the InterceptModule has been installed. 
         /// </summary>
         bool ModuleInstalled { get; set; }
+        /// <summary>
+        /// True once the InterceptModuleAsync has been installed. 
+        /// </summary>
+        bool AsyncModuleInstalled { get; set; }
 
         /// <summary>
         /// Returns the value of Context.Items["resizer.newPath"] if present. If not, returns FilePath + PathInfo.
@@ -110,12 +115,28 @@ namespace ImageResizer.Configuration {
         new IVirtualFile GetFile(string virtualPath, NameValueCollection queryString);
 
         /// <summary>
+        /// Returns an IVirtualFileAsync instance if the specified file can be provided by an async provider 
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        Task<IVirtualFileAsync> GetFileAsync(string virtualPath, NameValueCollection queryString);
+
+        /// <summary>
         /// Returns true if (a) A registered IVirtualImageProvider says it exists, or (b) if the VirtualPathProvider chain says it exists.
         /// </summary>
         /// <param name="virtualPath"></param>
         /// <param name="queryString"></param>
         /// <returns></returns>
         new bool FileExists(string virtualPath, NameValueCollection queryString);
+
+        /// <summary>
+        /// Returns true if any registered IVirtualImageProviderAsync says it exists.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        Task<bool> FileExistsAsync(string virtualPath, NameValueCollection queryString);
 
 
         /// <summary>

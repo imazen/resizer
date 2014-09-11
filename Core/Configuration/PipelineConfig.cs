@@ -15,12 +15,15 @@ using System.Web;
 using System.Security.Permissions;
 using System.Runtime.InteropServices;
 using System.Security;
+using System.Threading.Tasks;
 using System.IO;
 
 namespace ImageResizer.Configuration {
     public class PipelineConfig : IPipelineConfig, ICacheProvider, ISettingsModifier{
         protected Config c;
         public PipelineConfig(Config c) {
+            this.ModuleInstalled = false;
+            this.AsyncModuleInstalled = false;
             this.c = c;
 
             c.Plugins.QuerystringPlugins.Changed += new SafeList<IQuerystringPlugin>.ChangedHandler(urlModifyingPlugins_Changed);
@@ -264,6 +267,34 @@ namespace ImageResizer.Configuration {
         }
 
         /// <summary>
+        /// Returns an IVirtualFileAsync instance if the specified file can be provided by an async provider 
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        public async Task<IVirtualFileAsync> GetFileAsync(string virtualPath, NameValueCollection queryString)
+        {
+            IVirtualFileAsync f = null;
+            foreach (IVirtualImageProviderAsync p in c.Plugins.GetAll<IVirtualImageProviderAsync>())
+            {
+                if (await p.FileExistsAsync(virtualPath, queryString)){
+                    f = await p.GetFileAsync(virtualPath, queryString);
+                    break;
+                }
+            }
+
+            //Now we have a reference to the real virtual file, let's see if it is source-cached.
+            IVirtualFileAsync cached = null;
+            foreach (IVirtualFileCacheAsync p in c.Plugins.GetAll<IVirtualFileCacheAsync>())
+            {
+                cached = await p.GetFileIfCachedAsync(virtualPath, queryString, f);
+                if (cached != null) return cached;
+            }
+            return f;
+        }
+
+
+        /// <summary>
         /// Returns either an IVirtualFile instance or a VirtualFile instance.
         /// </summary>
         /// <param name="virtualPath"></param>
@@ -315,6 +346,15 @@ namespace ImageResizer.Configuration {
                 if (p.FileExists(virtualPath, queryString)) return true;
             }
             return HostingEnvironment.VirtualPathProvider != null ? HostingEnvironment.VirtualPathProvider.FileExists(virtualPath) : false;
+        }
+
+        public async Task<bool> FileExistsAsync(string virtualPath, NameValueCollection queryString)
+        {
+            foreach (IVirtualImageProviderAsync p in c.Plugins.GetAll<IVirtualImageProviderAsync>())
+            {
+                if (await p.FileExistsAsync(virtualPath, queryString)) return true;
+            }
+            return false;
         }
 
 
@@ -482,18 +522,14 @@ namespace ImageResizer.Configuration {
         }
 
 
-        private bool _moduleInstalled = false;
         /// <summary>
         /// True once the InterceptModule has been installed and is intercepting requests.
         /// </summary>
-        public bool ModuleInstalled {
-            get {
-                return _moduleInstalled;
-            }
-            set {
-                _moduleInstalled = value;
-            }
-        }
+        public bool ModuleInstalled { get; set; }
+        /// <summary>
+        /// True once the InterceptModuleAsync has been installed. 
+        /// </summary>
+        bool AsyncModuleInstalled { get; set; }
 
         /// <summary>
         /// Returns true if the AppDomain has Unrestricted code access security
