@@ -247,32 +247,61 @@ namespace ImageResizer.Plugins.DiskCache {
                         // I.e, hashmodified=true is the only supported setting for multi-process environments.
                         //TODO: Catch UnathorizedAccessException and log issue about file permissions.
                         //... If we can wait for a read handle for a specified timeout.
-                        
-                        try {
-                            
-                            System.IO.FileStream fs = new FileStream(physicalPath, FileMode.Create, FileAccess.Write, FileShare.None);
+
+                        try
+                        {
+                            string tempFile = physicalPath + ".tmp_" + new Random().Next(int.MaxValue).ToString("x") + ".tmp";
+
+                            System.IO.FileStream fs = new FileStream(tempFile, FileMode.Create, FileAccess.Write, FileShare.None);
                             bool finished = false;
-                            try {
-                                using (fs) {
+                            try
+                            {
+                                using (fs)
+                                {
                                     //Run callback to write the cached data
                                     writeCallback(fs); //Can throw any number of exceptions.
                                     fs.Flush(true);
                                     finished = true;
                                 }
-                            } finally {
-                                //Don't leave half-written files around.
-                                if (!finished) try { if (File.Exists(physicalPath)) File.Delete(physicalPath);} catch { }
                             }
-
-                            DateTime createdUtc = DateTime.UtcNow;
-                            //Set the created date, so we know the last time we updated the cache.s
-                            System.IO.File.SetCreationTimeUtc(physicalPath, createdUtc);
-                            //Update index
-                            //TODO: what should sourceModifiedUtc be when there is no modified date?
-                            Index.setCachedFileInfo(relativePath, new CachedFileInfo(createdUtc, createdUtc, createdUtc));
-                            //This was a cache miss
-                            if (result != null) result.Result = CacheQueryResult.Miss;
-                        } catch (IOException ex) {
+                            finally
+                            {
+                                //Don't leave half-written files around.
+                                if (!finished)
+                                {
+                                    try { if (File.Exists(tempFile)) File.Delete(tempFile); }
+                                    catch { }
+                                }
+                            }
+                            bool moved = false;
+                            if (finished)
+                            {
+                                try
+                                {
+                                    File.Move(tempFile, physicalPath);
+                                    moved = true;
+                                }
+                                catch (IOException ioe)
+                                {
+                                    //Will throw IO exception if already exists. Which we consider a hit, so we delete the tempFile
+                                    try { if (File.Exists(tempFile)) File.Delete(tempFile); }
+                                    catch { }
+                                }
+                            }
+                            if (moved)
+                            {
+                                DateTime createdUtc = DateTime.UtcNow;
+                                //Set the created date, so we know the last time we updated the cache.s
+                                System.IO.File.SetCreationTimeUtc(physicalPath, createdUtc);
+                                //Update index
+                                //TODO: what should sourceModifiedUtc be when there is no modified date?
+                                Index.setCachedFileInfo(relativePath, new CachedFileInfo(createdUtc, createdUtc, createdUtc));
+                                //This was a cache miss
+                                if (result != null) result.Result = CacheQueryResult.Miss;
+                            }
+                        }
+                        catch (IOException ex)
+                        {
 
                             if (IsFileLocked(ex)) {
                                 //Somehow in between verifying the file didn't exist and trying to create it, the file was created and locked by someone else.
