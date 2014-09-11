@@ -118,6 +118,12 @@ namespace ImageResizer.Configuration {
         new bool FileExists(string virtualPath, NameValueCollection queryString);
 
 
+        /// <summary>
+        /// If true, AuthorizeImage will be called for all image requests, not just those with command directives.
+        /// </summary>
+        bool AuthorizeAllImages { get; set; }
+
+
         void FirePostAuthorizeRequest(IHttpModule sender, System.Web.HttpContext httpContext);
 
         void FireRewritingEvents(IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs ue);

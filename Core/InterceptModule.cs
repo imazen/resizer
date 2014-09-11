@@ -99,7 +99,8 @@ namespace ImageResizer {
                 //See if resizing is wanted (i.e. one of the querystring commands is present).
                 //Called after processPath so processPath can add them if needed.
                 //Checks for thumnail, format, width, height, maxwidth, maxheight and a lot more
-                if (conf.HasPipelineDirective(q)) {
+                if (conf.HasPipelineDirective(q) || conf.AuthorizeAllImages)
+                {
                     //Who's the user
                     IPrincipal user = app.Context.User as IPrincipal;
 
@@ -112,20 +113,22 @@ namespace ImageResizer {
                     
                     //Run the rewritten path past the auth system again, using the result as the default "AllowAccess" value
                     bool isAllowed = true;
-                    if (canCheckUrl && !app.Context.SkipAuthorization) try {
+                    if (canCheckUrl && !app.Context.SkipAuthorization) try
+                        {
                             isAllowed = UrlAuthorizationModule.CheckUrlAccessForPrincipal(virtualPath, user, "GET");
-                        } catch (NotImplementedException) { } //For MONO support
+                        }
+                        catch (NotImplementedException) { } //For MONO support
 
-                    
+
                     IUrlAuthorizationEventArgs authEvent = new UrlAuthorizationEventArgs(virtualPath, new NameValueCollection(q), isAllowed);
 
                     //Allow user code to deny access, but not modify the url or querystring.
                     conf.FireAuthorizeImage(this, app.Context, authEvent);
 
                     if (!authEvent.AllowAccess) throw new ImageProcessingException(403, "Access denied", "Access denied");
-
+                }
                     
-                    
+                if (conf.HasPipelineDirective(q)) {
                     //Does the file exist physically? (false if VppUsage=always or file is missing)
                     bool existsPhysically = (conf.VppUsage != VppUsageOption.Always) && System.IO.File.Exists(HostingEnvironment.MapPath(virtualPath));
 
@@ -307,7 +310,7 @@ namespace ImageResizer {
 
         /// <summary>
         /// We don't actually send the data - but we still want to control the headers on the data.
-        /// PreSendRequestHeaders allows us to change the content-type and cache headers at excatly the last
+        /// PreSendRequestHeaders allows us to change the content-type and cache headers at exactly the last moment
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

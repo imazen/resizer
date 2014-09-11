@@ -490,6 +490,24 @@ namespace ImageResizer.Configuration {
             permissionSet.AddPermission(new System.Security.Permissions.SecurityPermission(System.Security.Permissions.PermissionState.Unrestricted));
             return permissionSet.IsSubsetOf(AppDomain.CurrentDomain.PermissionSet);
         }
-        
+
+        private bool? _authorizeAllImages = null;
+        /// <summary>
+        /// If true, AuthorizeImage will be called for all image requests, not just those with command directives.
+        /// </summary>
+        public bool AuthorizeAllImages
+        {
+            get
+            {
+                if (_authorizeAllImages == null) {
+                    _authorizeAllImages = c.get("pipeline.authorizeAllImages", false);
+                }
+                return _authorizeAllImages.Value;
+            }
+            set
+            {
+                _authorizeAllImages = value;
+            }
+        }
     }
 }
