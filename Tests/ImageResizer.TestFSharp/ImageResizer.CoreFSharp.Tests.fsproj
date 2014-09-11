@@ -8,9 +8,9 @@
     <ProjectGuid>841b8ed5-5994-46c9-b81a-74973fb9de0e</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>ImageResizer.TestFSharp</RootNamespace>
-    <AssemblyName>ImageResizer.TestFSharp</AssemblyName>
+    <AssemblyName>ImageResizer.CoreFSharp.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
-    <Name>ImageResizer.TestFSharp</Name>
+    <Name>ImageResizer.CoreFSharp.Tests</Name>
     <TargetFSharpCoreVersion>4.3.0.0</TargetFSharpCoreVersion>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
