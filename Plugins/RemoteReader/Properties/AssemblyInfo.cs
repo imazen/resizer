@@ -4,9 +4,8 @@ using System.Runtime.InteropServices;
 using ImageResizer.Util;
 
 // So the ImageResizer knows which bundle this assembly belongs to
-[assembly: Bundle("R3Bundle3")]
 
-[assembly: Edition("R3Performance")]
+[assembly: Edition("R4Performance")]
 
 
 // General Information about an assembly is controlled through the following 

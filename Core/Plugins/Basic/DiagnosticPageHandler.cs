@@ -117,7 +117,7 @@ namespace ImageResizer.Plugins.Basic {
 
             string edition = null;
             //Pick the largest edition
-            foreach (string s in new string[] { "R3Elite", "R3Creative", "R3Performance" })
+            foreach (string s in new string[] { "R4Elite", "R4Creative", "R4Performance" })
             {
                 if (new List<string>(editionsUsed.Values).Contains(s))
                 {
@@ -129,9 +129,9 @@ namespace ImageResizer.Plugins.Basic {
             
 
             Dictionary<string, string> friendlyNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            friendlyNames.Add("R3Elite", "Elite Edition or Support Contract");
-            friendlyNames.Add("R3Creative", "Creative Edition");
-            friendlyNames.Add("R3Performance", "Performance Edition");
+            friendlyNames.Add("R4Elite", "Elite Edition or Support Contract");
+            friendlyNames.Add("R4Creative", "Creative Edition");
+            friendlyNames.Add("R4Performance", "Performance Edition");
 
             if (edition == null) 
                 sb.AppendLine("\nYou are not using any paid plugins.");

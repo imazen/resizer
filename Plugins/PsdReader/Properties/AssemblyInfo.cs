@@ -2,10 +2,8 @@
 using System.Runtime.InteropServices;
 using ImageResizer.Util;
 
-// So the ImageResizer knows which bundle this assembly belongs to
-[assembly: Bundle("R3Bundle2,R3Bundle4")]
 
-[assembly: Edition("R3Elite")]
+[assembly: Edition("R4Elite")]
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
