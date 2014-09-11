@@ -128,7 +128,7 @@ namespace ImageResizer.Plugins.Basic {
                 }
             }
             
-            if (new List<string>(editionsUsed.Values).Intersect(new string[] { "R4Elite", "R4Creative", "R4Performance" }).Count() > 0){
+            if (new List<string>(editionsUsed.Values).Intersect(new string[] { "R3Elite", "R3Creative", "R3Performance" }).Count() > 0){
                 sb.AppendLine("You are mixing V3 and V4 plugins; this is a bad idea.");
             }
             Dictionary<string, string> friendlyNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
