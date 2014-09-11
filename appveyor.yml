@@ -48,6 +48,11 @@ before_build:
   - cd C:\projects\resizer
   - nuget restore AppVeyor.sln -PackagesDirectory C:\projects\resizer\packages
 
+
+test:
+  # assemblies to test - optional
+  assemblies:
+    Tests\binaries\release\*test*.dll
 # scripts to run after build
 #after_build:
 
