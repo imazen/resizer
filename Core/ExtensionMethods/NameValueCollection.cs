@@ -12,6 +12,12 @@ namespace ImageResizer.ExtensionMethods {
         private static NumberStyles floatingPointStyle = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite | 
             NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands | NumberStyles.AllowExponent;
 
+        public static string GetAsString(this NameValueCollection t, string name, string defaultValue) 
+        {
+            var val = t.Get(name);
+            return string.IsNullOrEmpty(val) ? defaultValue : val;
+        }
+
         /// <summary>
         /// Provides culture-invariant parsing of int, double, float, bool, and enum values.
         /// </summary>
