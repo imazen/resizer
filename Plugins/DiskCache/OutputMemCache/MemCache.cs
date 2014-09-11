@@ -36,7 +36,7 @@ namespace ImageResizer.Plugins.MemCache {
         public void Process(System.Web.HttpContext current, IResponseArgs e) {
 
             //Use alternate cache key if provided
-            string key = e.RequestKey + (e.HasModifiedDate ? e.GetModifiedDateUTC().Ticks.ToString() : "");
+            string key = e.RequestKey;
 
             //If cached, serve it. 
             var c = cache.Get(key);

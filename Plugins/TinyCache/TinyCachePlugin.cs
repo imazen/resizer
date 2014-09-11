@@ -219,8 +219,7 @@ namespace ImageResizer.Plugins.TinyCache {
 
         public void Process(System.Web.HttpContext current, IResponseArgs e) {
             
-            var modDate = e.HasModifiedDate ? e.GetModifiedDateUTC() : DateTime.MinValue;
-            var key = e.RequestKey +  "|" + modDate.Ticks.ToString(NumberFormatInfo.InvariantInfo);
+            var key = e.RequestKey;
 
             CacheEntry entry;
             byte[] data;

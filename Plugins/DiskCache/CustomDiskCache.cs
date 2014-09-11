@@ -18,22 +18,20 @@ namespace ImageResizer.Plugins.DiskCache {
     /// Supports subfolders for scalability.
     /// </summary>
     public class CustomDiskCache {
-        protected string physicalCachePath;
-
-        public string PhysicalCachePath {
-            get { return physicalCachePath; }
-        }
+        public string PhysicalCachePath { get; protected set; }
         protected int subfolders;
-        protected bool hashModifiedDate;
         protected ILoggerProvider lp;
-        public CustomDiskCache(ILoggerProvider lp, string physicalCachePath, int subfolders, bool hashModifiedDate):this(lp,physicalCachePath,subfolders,hashModifiedDate, 1024*1024*10) {
+        public CustomDiskCache(ILoggerProvider lp, string physicalCachePath, int subfolders):this(lp,physicalCachePath,subfolders, 1024*1024*10) {
 
         }
-        public CustomDiskCache(ILoggerProvider lp, string physicalCachePath, int subfolders, bool hashModifiedDate, long asyncMaxQueuedBytes) {
+        public CustomDiskCache(ILoggerProvider lp, string physicalCachePath, int subfolders, long asyncMaxQueuedBytes) {
+            Locks = new LockProvider();
+            QueueLocks = new LockProvider();
+            Index = new CacheIndex();
+            CurrentWrites = new AsyncWriteCollection();
             this.lp = lp;
-            this.physicalCachePath = physicalCachePath;
+            this.PhysicalCachePath = physicalCachePath;
             this.subfolders = subfolders;
-            this.hashModifiedDate = hashModifiedDate;
             this.CurrentWrites.MaxQueueBytes = asyncMaxQueuedBytes;
         }
         /// <summary>
@@ -42,53 +40,36 @@ namespace ImageResizer.Plugins.DiskCache {
         public event CacheResultHandler CacheResultReturned; 
 
 
-        protected LockProvider locks = new LockProvider();
         /// <summary>
         /// Provides string-based locking for file write access.
         /// </summary>
-        public LockProvider Locks {
-            get { return locks; }
-        }
+        public LockProvider Locks {get;protected set;}
 
-        protected LockProvider queueLocks = new LockProvider();
         /// <summary>
         /// Provides string-based locking for image resizing (not writing, just processing). Prevents duplication of efforts in asynchronous mode, where 'Locks' is not being used.
         /// </summary>
-        public LockProvider QueueLocks {
-            get { return queueLocks; }
-        }
+        public LockProvider QueueLocks { get; protected set; }
 
-        private AsyncWriteCollection _currentWrites = new AsyncWriteCollection();
         /// <summary>
         /// Contains all the queued and in-progress writes to the cache. 
         /// </summary>
-        public AsyncWriteCollection CurrentWrites {
-            get { return _currentWrites; }
-        }
+        public AsyncWriteCollection CurrentWrites {get; private set;}
 
-
-
-        private CacheIndex index = new CacheIndex();
         /// <summary>
         /// Provides an in-memory index of the cache.
         /// </summary>
-        public CacheIndex Index {
-            get { return index; }
-        }
+        public CacheIndex Index { get; private set; }
         
-        
-
         /// <summary>
         /// If the cached data exists and is up-to-date, returns the path to it. Otherwise, this function tries to cache the data and return the path.
         /// </summary>
-        /// <param name="keyBasis">The basis for the key. Should not include the modified date, that is handled inside the function.</param>
+        /// <param name="keyBasis">The basis for the cache key.</param>
         /// <param name="extension">The extension to use for the cached file.</param>
         /// <param name="writeCallback">A method that accepts a Stream argument and writes the data to it.</param>
-        /// <param name="sourceModifiedUtc">The modified date of the source file. Should be DateTime.MinValue if not available</param>
-        /// <param name="timeoutMs"></param>
+        /// =<param name="timeoutMs"></param>
         /// <returns></returns>
-        public CacheResult GetCachedFile(string keyBasis, string extension, ResizeImageDelegate writeCallback, DateTime sourceModifiedUtc, int timeoutMs) {
-            return GetCachedFile(keyBasis, extension, writeCallback, sourceModifiedUtc, timeoutMs, false);
+        public CacheResult GetCachedFile(string keyBasis, string extension, ResizeImageDelegate writeCallback,  int timeoutMs) {
+            return GetCachedFile(keyBasis, extension, writeCallback,  timeoutMs, false);
         }
 
 
@@ -100,20 +81,11 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="keyBasis"></param>
         /// <param name="extension"></param>
         /// <param name="writeCallback"></param>
-        /// <param name="sourceModifiedUtc"></param>
         /// <param name="timeoutMs"></param>
         /// <returns></returns>
-        public CacheResult GetCachedFile(string keyBasis, string extension, ResizeImageDelegate writeCallback, DateTime sourceModifiedUtc, int timeoutMs, bool asynchronous) {
+        public CacheResult GetCachedFile(string keyBasis, string extension, ResizeImageDelegate writeCallback,  int timeoutMs, bool asynchronous) {
             Stopwatch sw = null;
             if (lp.Logger != null) { sw = new Stopwatch(); sw.Start(); }
-
-
-            bool hasModifiedDate = !sourceModifiedUtc.Equals(DateTime.MinValue);
-
-
-            //Hash the modified date if needed.
-            if (hashModifiedDate && hasModifiedDate)
-                keyBasis += "|" + sourceModifiedUtc.Ticks.ToString(NumberFormatInfo.InvariantInfo);
 
             //Relative to the cache directory. Not relative to the app or domain root
             string relativePath = new UrlHasher().hash(keyBasis, subfolders, "/") + '.' + extension;
@@ -125,9 +97,6 @@ namespace ImageResizer.Plugins.DiskCache {
 
             CacheResult result = new CacheResult(CacheQueryResult.Hit, physicalPath, relativePath);
 
-
-            bool compareModifiedDates = hasModifiedDate && !hashModifiedDate;
-            
             bool asyncFailed = false;
             
 
@@ -140,12 +109,12 @@ namespace ImageResizer.Plugins.DiskCache {
                 //On the first check, verify the file exists using System.IO directly (the last 'true' parameter)
                 //May throw an IOException if the file cannot be opened, and is locked by an external processes for longer than timeoutMs. 
                 //This method may take longer than timeoutMs under absolute worst conditions. 
-                if (!TryWriteFile(result, physicalPath, relativePath, writeCallback, sourceModifiedUtc, timeoutMs, !mayBeLocked)) {
+                if (!TryWriteFile(result, physicalPath, relativePath, writeCallback, timeoutMs, !mayBeLocked)) {
                     //On failure
                     result.Result = CacheQueryResult.Failed;
                 }
             }
-            else if ((!compareModifiedDates ? !Index.existsCertain(relativePath, physicalPath) : !Index.modifiedDateMatchesCertainExists(sourceModifiedUtc, relativePath, physicalPath)) || mayBeLocked)
+            else if (!Index.existsCertain(relativePath, physicalPath) || mayBeLocked)
             {
                 
                 //Looks like a miss. Let's enter a lock for the creation of the file. This is a different locking system than for writing to the file - far less contention, as it doesn't include the 
@@ -158,7 +127,7 @@ namespace ImageResizer.Plugins.DiskCache {
                         //Now, if the item we seek is in the queue, we have a memcached hit. If not, we should check the index. It's possible the item has been written to disk already.
                         //If both are a miss, we should see if there is enough room in the write queue. If not, switch to in-thread writing. 
 
-                        AsyncWrite t = CurrentWrites.Get(relativePath, sourceModifiedUtc);
+                        AsyncWrite t = CurrentWrites.Get(relativePath);
 
                         if (t != null) result.Data = t.GetReadonlyStream();
 
@@ -166,8 +135,7 @@ namespace ImageResizer.Plugins.DiskCache {
 
                         //On the second check, use cached data for speed. The cached data should be updated if another thread updated a file (but not if another process did).
                         //When t == null, and we're inside QueueLocks, all work on the file must be finished, so we have no need to consult mayBeLocked.
-                        if (t == null && 
-                            (!compareModifiedDates ? !Index.exists(relativePath, physicalPath) : !Index.modifiedDateMatches(sourceModifiedUtc, relativePath, physicalPath)))
+                        if (t == null && !Index.exists(relativePath, physicalPath))
                         {
 
                             result.Result = CacheQueryResult.Miss;
@@ -177,14 +145,14 @@ namespace ImageResizer.Plugins.DiskCache {
                             writeCallback(ms);
                             ms.Position = 0;
 
-                            AsyncWrite w = new AsyncWrite(CurrentWrites,ms, physicalPath, relativePath, sourceModifiedUtc);
+                            AsyncWrite w = new AsyncWrite(CurrentWrites,ms, physicalPath, relativePath);
                             if (CurrentWrites.Queue(w, delegate(AsyncWrite job) {
                                 try {
                                     Stopwatch swio = new Stopwatch();
                                     
                                     swio.Start();
                                     //TODO: perhaps a different timeout?
-                                    if (!TryWriteFile(null, job.PhysicalPath, job.RelativePath, delegate(Stream s) { ((MemoryStream)job.GetReadonlyStream()).WriteTo(s); }, job.ModifiedDateUtc, timeoutMs, true)) {
+                                    if (!TryWriteFile(null, job.PhysicalPath, job.Key, delegate(Stream s) { ((MemoryStream)job.GetReadonlyStream()).WriteTo(s); }, timeoutMs, true)) {
                                         swio.Stop();
                                         //We failed to lock the file.
                                         if (lp.Logger != null) 
@@ -212,7 +180,7 @@ namespace ImageResizer.Plugins.DiskCache {
                                 //We failed to queue it - either the ThreadPool was exhausted or we exceeded the MB limit for the write queue.
                                 //Write the MemoryStream to disk using the normal method.
                                 //This is nested inside a queuelock because if we failed here, the next one will also. Better to force it to wait until the file is written to disk.
-                                if (!TryWriteFile(result, physicalPath, relativePath, delegate(Stream s) { ms.WriteTo(s); }, sourceModifiedUtc, timeoutMs, false)) {
+                                if (!TryWriteFile(result, physicalPath, relativePath, delegate(Stream s) { ms.WriteTo(s); }, timeoutMs, false)) {
                                     if (lp.Logger != null)
                                         lp.Logger.Warn("Failed to queue async write, also failed to lock for sync writing: {0}", result.RelativePath);
                                         
@@ -249,16 +217,12 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="timeoutMs"></param>
         /// <param name="recheckFS"></param>
         /// <returns></returns>
-        private bool TryWriteFile(CacheResult result, string physicalPath, string relativePath, ResizeImageDelegate writeCallback, DateTime sourceModifiedUtc, int timeoutMs, bool recheckFS) {
+        private bool TryWriteFile(CacheResult result, string physicalPath, string relativePath, ResizeImageDelegate writeCallback, int timeoutMs, bool recheckFS) {
 
-            bool hasModifiedDate = !sourceModifiedUtc.Equals(DateTime.MinValue);
-
-            bool compareModifiedDates = hasModifiedDate && !hashModifiedDate;
             
-
             bool miss = true;
             if (recheckFS) {
-                miss = !compareModifiedDates ? !Index.existsCertain(relativePath, physicalPath) : !Index.modifiedDateMatchesCertainExists(sourceModifiedUtc, relativePath, physicalPath);
+                miss = !Index.existsCertain(relativePath, physicalPath);
                 if (!miss && !Locks.MayBeLocked(relativePath.ToUpperInvariant())) return true;
             }
                
@@ -268,7 +232,7 @@ namespace ImageResizer.Plugins.DiskCache {
                 delegate() {
 
                     //On the second check, use cached data for speed. The cached data should be updated if another thread updated a file (but not if another process did).
-                    if (!compareModifiedDates ? !Index.exists(relativePath, physicalPath) : !Index.modifiedDateMatches(sourceModifiedUtc, relativePath, physicalPath)) {
+                    if (!Index.exists(relativePath, physicalPath)) {
 
                         //Create subdirectory if needed.
                         if (!Directory.Exists(Path.GetDirectoryName(physicalPath))) {
@@ -301,18 +265,16 @@ namespace ImageResizer.Plugins.DiskCache {
                             }
 
                             DateTime createdUtc = DateTime.UtcNow;
-                            //Update the write time to match - this is how we know whether they are in sync.
-                            if (compareModifiedDates) System.IO.File.SetLastWriteTimeUtc(physicalPath, sourceModifiedUtc);
                             //Set the created date, so we know the last time we updated the cache.s
                             System.IO.File.SetCreationTimeUtc(physicalPath, createdUtc);
                             //Update index
                             //TODO: what should sourceModifiedUtc be when there is no modified date?
-                            Index.setCachedFileInfo(relativePath, new CachedFileInfo(sourceModifiedUtc, createdUtc, createdUtc));
+                            Index.setCachedFileInfo(relativePath, new CachedFileInfo(createdUtc, createdUtc, createdUtc));
                             //This was a cache miss
                             if (result != null) result.Result = CacheQueryResult.Miss;
                         } catch (IOException ex) {
 
-                            if (!compareModifiedDates && IsFileLocked(ex)) {
+                            if (IsFileLocked(ex)) {
                                 //Somehow in between verifying the file didn't exist and trying to create it, the file was created and locked by someone else.
                                 //When hashModifiedDate==true, we don't care what the file contains, we just want it to exist. If the file is available for 
                                 //reading within timeoutMs, simply do nothing and let the file be returned as a hit.

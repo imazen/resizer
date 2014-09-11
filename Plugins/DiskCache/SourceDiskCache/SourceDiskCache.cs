@@ -88,7 +88,7 @@ namespace ImageResizer.Plugins.SourceDiskCache
                 {//Very long-running call
                     data.CopyToStream(target);
                 }
-            }, DateTime.MinValue, 15 * 1000,true);
+            },  15 * 1000,true);
 
             if (r.Result == CacheQueryResult.Failed)
                 throw new ImageResizer.ImageProcessingException("Failed to acquire a lock on file \"" + r.PhysicalPath + "\" within 15 seconds. Source caching failed.");
@@ -194,7 +194,7 @@ namespace ImageResizer.Plugins.SourceDiskCache
                 //Init the writer.
                 writer = new WebConfigWriter(this, PhysicalCacheDir);
                 //Init the inner cache
-                cache = new CustomDiskCache(this, PhysicalCacheDir, 512, true, 1024 * 1024 * 30); //30MB
+                cache = new CustomDiskCache(this, PhysicalCacheDir, 512, 1024 * 1024 * 30); //30MB
                 //Init the cleanup strategy
                 var cleanupStrategy = new CleanupStrategy(); //Default settings if null
                 cleanupStrategy.TargetItemsPerFolder = 50;

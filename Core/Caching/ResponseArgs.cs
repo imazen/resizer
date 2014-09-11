@@ -11,58 +11,37 @@ namespace ImageResizer.Caching {
     /// </summary>
     public class ResponseArgs : IResponseArgs {
 
-        public ResponseArgs() { }
-
-        protected ModifiedDateDelegate getModifiedDateUTC;
-        /// <summary>
-        /// A callback method to return the last modified date of the source file if available, or DateTime.MinValue if not.
-        /// </summary>
-        /// <returns></returns>
-        public ModifiedDateDelegate GetModifiedDateUTC
-        {
-          get { return getModifiedDateUTC; }
-          set { getModifiedDateUTC = value; }
+        public ResponseArgs() {
+            HasModifiedDate = false;
         }
+
+        /// <summary>
+        /// Obsolete. Do not use;  RequestKey will include the modified date if present. 
+        /// </summary>
+        [Obsolete("RequestKey will include the modified date if present. No longer populated")]
+        public ModifiedDateDelegate GetModifiedDateUTC { get; set; }
 
 
         public GetSourceImageDelegate GetSourceImage {get;set;}
 
-        protected ResizeImageDelegate resizeImageToStream;
         /// <summary>
         /// A callback method that will resize and encode the image into a stream.
         /// </summary>
-        public ResizeImageDelegate ResizeImageToStream
-        {
-          get { return resizeImageToStream; }
-          set { resizeImageToStream = value; }
-        }
+        public ResizeImageDelegate ResizeImageToStream { get; set; }
 
-        protected string requestKey = null;
         /// <summary>
         /// A value derived from the request. Can be used as a cache key. 
         /// </summary>
-        public string RequestKey
-        {
-            get { return requestKey; }
-            set { requestKey = value; }
-        }
+        public string RequestKey { get; set; }
 
-        protected string suggestedExtension = null;
-
-        public string SuggestedExtension {
-            get { return suggestedExtension; }
-            set { suggestedExtension = value; }
-        }
-
-        protected bool hasModifiedDate;
+        public string SuggestedExtension { get; set; }
+        
+     
         /// <summary>
-        /// True if the source file/record has a modified date
+        /// Obsolete. Do not use;  RequestKey will include the modified date if present. 
         /// </summary>
-        public bool HasModifiedDate {
-            get { return hasModifiedDate; }
-            set { hasModifiedDate = value; }
-        }
-
+        [Obsolete("RequestKey will include the modified date if present. No longer populated")]
+        public bool HasModifiedDate { get; set; }
 
         protected IResponseHeaders responseHeaders = new ResponseHeaders();
         /// <summary>

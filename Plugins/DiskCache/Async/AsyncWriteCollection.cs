@@ -8,21 +8,17 @@ namespace ImageResizer.Plugins.DiskCache.Async {
     public class AsyncWriteCollection {
 
         public AsyncWriteCollection() {
+            MaxQueueBytes = 1024 * 1024 * 10;
         }
 
         private object _sync = new object();
 
         private Dictionary<string, AsyncWrite> c = new Dictionary<string, AsyncWrite>();
 
-
-        private long _maxQueueBytes = 1024 * 1024 * 10;
         /// <summary>
         /// How many bytes of buffered file data to hold in memory before refusing futher queue requests and forcing them to be executed synchronously.
         /// </summary>
-        public long MaxQueueBytes {
-            get { return _maxQueueBytes; }
-            set { _maxQueueBytes = value; }
-        }
+        public long MaxQueueBytes { get; set; }
 
         /// <summary>
         /// If the collection contains the specified item, it is returned. Otherwise, null is returned.
@@ -30,10 +26,10 @@ namespace ImageResizer.Plugins.DiskCache.Async {
         /// <param name="relativePath"></param>
         /// <param name="modifiedUtc"></param>
         /// <returns></returns>
-        public AsyncWrite Get(string relativePath, DateTime modifiedUtc) {
+        public AsyncWrite Get(string key) {
             lock (_sync) {
                 AsyncWrite result;
-                return c.TryGetValue(HashTogether(relativePath, modifiedUtc), out result) ? result : null;
+                return c.TryGetValue(key, out result) ? result : null;
             }
         }
 
@@ -58,7 +54,7 @@ namespace ImageResizer.Plugins.DiskCache.Async {
         /// <param name="w"></param>
         public void Remove(AsyncWrite w) {
             lock (_sync) {
-                c.Remove(HashTogether(w.RelativePath, w.ModifiedDateUtc));
+                c.Remove(w.Key);
             }
         }
         /// <summary>
@@ -69,7 +65,7 @@ namespace ImageResizer.Plugins.DiskCache.Async {
         public bool Queue(AsyncWrite w,WriterDelegate writerDelegate ){
             lock (_sync) {
                 if (GetQueuedBufferBytes() + w.GetBufferLength() > MaxQueueBytes) return false; //Because we would use too much ram.
-                if (c.ContainsKey(HashTogether(w.RelativePath, w.ModifiedDateUtc))) return false; //We already have a queued write for this data.
+                if (c.ContainsKey(w.Key)) return false; //We already have a queued write for this data.
                 if (!ThreadPool.QueueUserWorkItem(delegate(object state){
                     AsyncWrite job = state as AsyncWrite;
                     writerDelegate(job);
@@ -79,11 +75,6 @@ namespace ImageResizer.Plugins.DiskCache.Async {
         }
 
         public delegate void WriterDelegate(AsyncWrite w);
-
-        public string HashTogether(string relativePath, DateTime modifiedUtc) {
-            return relativePath.ToUpperInvariant() + "_" + modifiedUtc.Ticks.ToString(NumberFormatInfo.InvariantInfo);
-        }
-
 
     }
 }

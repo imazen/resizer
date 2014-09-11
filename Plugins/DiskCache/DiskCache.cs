@@ -35,11 +35,11 @@ namespace ImageResizer.Plugins.DiskCache
     /// </summary>
     public class DiskCache: ICache, IPlugin, IIssueProvider, ILoggerProvider
     {
-        private int subfolders = 32;
+        private int subfolders = 8192;
         /// <summary>
         /// Controls how many subfolders to use for disk caching. Rounded to the next power of to. (1->2, 3->4, 5->8, 9->16, 17->32, 33->64, 65->128,129->256,etc.)
         /// NTFS does not handle more than 8,000 files per folder well. Larger folders also make cleanup more resource-intensive.
-        /// Defaults to 32, which combined with the default setting of 400 images per folder, allows for scalability to 12,800 actively used image versions. 
+        /// Defaults to 8192, which combined with the default setting of 400 images per folder, allows for scalability to ~1.5 million actively used image versions. 
         /// For example, given a desired cache size of 100,000 items, this should be set to 256.
         /// </summary>
         public int Subfolders {
@@ -87,18 +87,6 @@ namespace ImageResizer.Plugins.DiskCache
             set { BeforeSettingChanged(); cacheAccessTimeout = Math.Max(value,0); }
         }
 
-        private bool hashModifiedDate = true;
-        /// <summary>
-        /// If true, when a source file is changed, a new file will be created instead of overwriting the old cached file.
-        /// This helps prevent file lock contention on high-traffic servers. Defaults to true.  
-        /// Do NOT set this to false in a Web Garden or if you have overlapped recycle enabled, as you may risk having occasional failed requests due
-        /// to write contention by separate proccesses.
-        /// Changes the hash function, so you should delete the cache folder whenever this setting is modified.
-        /// </summary>
-        public bool HashModifiedDate {
-            get { return hashModifiedDate; }
-            set { BeforeSettingChanged(); hashModifiedDate = value; }
-        }
 
         private bool _asyncWrites = false;
         /// <summary>
@@ -177,7 +165,6 @@ namespace ImageResizer.Plugins.DiskCache
             Enabled = c.get("diskcache.enabled", Enabled);
             AutoClean = c.get("diskcache.autoClean", AutoClean);
             VirtualCacheDir = c.get("diskcache.dir", VirtualCacheDir);
-            HashModifiedDate = c.get("diskcache.hashModifiedDate", HashModifiedDate);
             CacheAccessTimeout = c.get("diskcache.cacheAccessTimeout", CacheAccessTimeout);
             AsyncBufferSize = c.get("diskcache.asyncBufferSize", AsyncBufferSize);
             AsyncWrites = c.get("diskcache.asyncWrites", AsyncWrites);
@@ -186,6 +173,8 @@ namespace ImageResizer.Plugins.DiskCache
 
         protected ILogger log = null;
         public ILogger Logger { get { return log; } }
+
+        private Config c;
         /// <summary>
         /// Loads the settings from 'c', starts the cache, and registers the plugin.
         /// Will throw an invalidoperationexception if already started.
@@ -193,6 +182,7 @@ namespace ImageResizer.Plugins.DiskCache
         /// <param name="c"></param>
         /// <returns></returns>
         public IPlugin Install(Config c) {
+            this.c = c;
             if (c.get("diskcache.logging", false)) {
                 if (c.Plugins.LogManager != null) 
                     log = c.Plugins.LogManager.GetLogger("ImageResizer.Plugins.DiskCache");
@@ -260,7 +250,7 @@ namespace ImageResizer.Plugins.DiskCache
                 //Init the writer.
                 writer = new WebConfigWriter(this,PhysicalCacheDir);
                 //Init the inner cache
-                cache = new CustomDiskCache(this, PhysicalCacheDir, Subfolders, HashModifiedDate,AsyncBufferSize);
+                cache = new CustomDiskCache(this, PhysicalCacheDir, Subfolders,AsyncBufferSize);
                 //Init the cleanup strategy
                 if (AutoClean && cleanupStrategy == null) cleanupStrategy = new CleanupStrategy(); //Default settings if null
                 //Init the cleanup worker
@@ -314,17 +304,12 @@ namespace ImageResizer.Plugins.DiskCache
         }
 
         public CacheResult Process(IResponseArgs e) {
-            //Query for the modified date of the source file. If the source file changes on us during the write,
-            //we (may) end up saving the newer version in the cache properly, but with an older modified date.
-            //This will not cause any actual problems from a behavioral standpoint - the next request for the 
-            //image will cause the file to be overwritten and the modified date updated.
-            DateTime modDate = e.HasModifiedDate ? e.GetModifiedDateUTC() : DateTime.MinValue;
 
             //Verify web.config exists in the cache folder.
             writer.CheckWebConfigEvery5();
 
             //Cache the data to disk and return a path.
-            CacheResult r = cache.GetCachedFile(e.RequestKey, e.SuggestedExtension, e.ResizeImageToStream, modDate, CacheAccessTimeout,AsyncWrites);
+            CacheResult r = cache.GetCachedFile(e.RequestKey, e.SuggestedExtension, e.ResizeImageToStream, CacheAccessTimeout,AsyncWrites);
 
             //Fail
             if (r.Result == CacheQueryResult.Failed)
@@ -360,6 +345,8 @@ namespace ImageResizer.Plugins.DiskCache
             List<IIssue> issues = new List<IIssue>();
             if (cleaner != null) issues.AddRange(cleaner.GetIssues());
 
+            if (!c.get("diskcache.hashModifiedDate", true)) issues.Add(new Issue("DiskCache", "V4.0 no longer supports hashModifiedDate=false. Please remove this attribute.", IssueSeverity.ConfigurationError));
+
             if (!HasFileIOPermission()) 
                 issues.Add(new Issue("DiskCache", "Failed to start: Write access to the cache directory is prohibited by your .NET trust level configuration.", 
                 "Please configure your .NET trust level to permit writing to the cache directory. Most medium trust configurations allow this, but yours does not.", IssueSeverity.ConfigurationError));
@@ -371,9 +358,6 @@ namespace ImageResizer.Plugins.DiskCache
             if (!Started && !Enabled) issues.Add(new Issue("DiskCache", "DiskCache is disabled in Web.config. Set enabled=true on the <diskcache /> element to fix.", null, IssueSeverity.ConfigurationError));
 
             //Warn user about setting hashModifiedDate=false in a web garden.
-            if (this.cleaner != null && cleaner.ExteralProcessCleaning && !this.HashModifiedDate)
-                issues.Add(new Issue("DiskCache", "You should set hashModifiedDate=\"true\" on the <diskcache /> element in Web.config.",
-                    "Setting false for this value in a Web Garden scenario can cause failed requests. (DiskCache detects one or more other process on this machine working on the same cache directory).", IssueSeverity.Critical));
             if (this.AsyncBufferSize < 1024 * 1024 * 2)
                 issues.Add(new Issue("DiskCache", "The asyncBufferSize should not be set below 2 megabytes (2097152). Found in the <diskcache /> element in Web.config.",
                     "A buffer that is too small will cause requests to be processed synchronously. Remember to set the value to at least 4x the maximum size of an output image.", IssueSeverity.ConfigurationError));

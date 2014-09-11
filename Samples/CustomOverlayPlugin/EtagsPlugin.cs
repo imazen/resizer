@@ -35,7 +35,7 @@ namespace ImageResizer.Plugins.Etags {
         }
 
         public static string CalcualteETag(IResponseArgs e) {
-            return (e.RequestKey + (e.HasModifiedDate ? e.GetModifiedDateUTC().Ticks.ToString() : "")).GetHashCode().ToString("x");
+            return e.RequestKey.GetHashCode().ToString("x");
         }
 
         /// <summary>

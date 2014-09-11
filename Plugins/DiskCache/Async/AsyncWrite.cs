@@ -6,48 +6,28 @@ using System.IO;
 namespace ImageResizer.Plugins.DiskCache.Async {
     public class AsyncWrite {
 
-        public AsyncWrite(AsyncWriteCollection parent, MemoryStream data, string physicalPath, string relativePath, DateTime modifiedDateUtc) {
-            this._parent = parent;
+        public AsyncWrite(AsyncWriteCollection parent, MemoryStream data, string physicalPath, string key) {
+            this.Parent = parent;
             this._data = data;
-            this._physicalPath = physicalPath;
-            this._relativePath = relativePath;
-            this._modifiedDateUtc = modifiedDateUtc;
-            this._jobCreatedAt = DateTime.UtcNow;
+            this.PhysicalPath = physicalPath;
+            this.Key = key;
+            this.JobCreatedAt = DateTime.UtcNow;
         }
 
-        private AsyncWriteCollection _parent = null;
+      
+        public AsyncWriteCollection Parent {get; private set;}
+        
+        public string PhysicalPath { get; private set; }
 
-        public AsyncWriteCollection Parent {
-            get { return _parent; }
-        }
-
-        private MemoryStream _data;
-
-        private string _physicalPath = null;
-
-        public string PhysicalPath {
-            get { return _physicalPath; }
-        }
-
-        private string _relativePath = null;
-
-        public string RelativePath {
-            get { return _relativePath; }
-        }
-
-        private DateTime _modifiedDateUtc = DateTime.MinValue;
-
-        public DateTime ModifiedDateUtc {
-            get { return _modifiedDateUtc; }
-        }
-
-        private DateTime _jobCreatedAt;
+        public string Key { get; private set; }
         /// <summary>
         /// Returns the UTC time this AsyncWrite object was created.
         /// </summary>
-        public DateTime JobCreatedAt {
-            get { return _jobCreatedAt; }
-        }
+        public DateTime JobCreatedAt { get; private set; }
+
+
+
+        private MemoryStream _data;
 
         public long GetDataLength() {
             return _data.Length;

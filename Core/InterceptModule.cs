@@ -16,6 +16,7 @@ using System.IO;
 using ImageResizer.Resizing;
 using ImageResizer.Plugins.Basic;
 using ImageResizer.ExtensionMethods;
+using System.Globalization;
 
 // This namespace contains the most frequently used classes.
 namespace ImageResizer {
@@ -206,17 +207,7 @@ namespace ImageResizer {
             //Communicate to the MVC plugin this request should not be affected by the UrlRoutingModule.
             context.Items[conf.StopRoutingKey] = true;
 
-            //Find out if we have a modified date that we can work with
-            bool hasModifiedDate = (vf == null) || vf is IVirtualFileWithModifiedDate;
-            DateTime modDate = DateTime.MinValue;
-            if (hasModifiedDate && vf != null) {
-                modDate = ((IVirtualFileWithModifiedDate)vf).ModifiedDateUTC;
-                if (modDate == DateTime.MinValue || modDate == DateTime.MaxValue) {
-                    hasModifiedDate = false; //Skip modified date checking if the file has no modified date
-                }
-            }
-
-
+  
             IEncoder guessedEncoder = null;
             //Only use an encoder to determine extension/mime-type when it's an image extension or when we've set process = always.
             if (isProcessing) {
@@ -241,18 +232,21 @@ namespace ImageResizer {
             //Build CacheEventArgs
             ResponseArgs e = new ResponseArgs();
             e.RequestKey = virtualPath + PathUtils.BuildQueryString(queryString);
+
+            //Add the modified date to the request key, if present.
+            var modDate = (vf == null) ? System.IO.File.GetLastWriteTimeUtc(HostingEnvironment.MapPath(virtualPath)) : 
+                (vf is IVirtualFileWithModifiedDate ? ((IVirtualFileWithModifiedDate)vf).ModifiedDateUTC : DateTime.MinValue);
+
+            if (modDate != DateTime.MinValue && modDate != DateTime.MaxValue) {
+                e.RequestKey += "|" + modDate.Ticks.ToString(NumberFormatInfo.InvariantInfo);
+            }
+
+
+  
             e.RewrittenQuerystring = settings;
             e.ResponseHeaders.ContentType = isProcessing ? guessedEncoder.MimeType : fallbackContentType; 
             e.SuggestedExtension = isProcessing ? guessedEncoder.Extension : fallbackExtension;
-            e.HasModifiedDate = hasModifiedDate;
-            //Add delegate for retrieving the modified date of the source file. 
-            e.GetModifiedDateUTC = new ModifiedDateDelegate(delegate() {
-                if (vf == null)
-                    return System.IO.File.GetLastWriteTimeUtc(HostingEnvironment.MapPath(virtualPath));
-                else if (hasModifiedDate)
-                    return modDate;
-                else return DateTime.MinValue; //Won't be called, no modified date available.
-            });
+
 
             //A delegate for accessing the source file
             e.GetSourceImage = new GetSourceImageDelegate(delegate() {

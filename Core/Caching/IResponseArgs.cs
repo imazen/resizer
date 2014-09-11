@@ -49,12 +49,14 @@ namespace ImageResizer.Caching {
         /// </summary>
         IResponseHeaders ResponseHeaders { get; set; }
         /// <summary>
-        /// A delegate that returns the modified date of the source data.
+        /// Obsolete. Do not use;  RequestKey will include the modified date if present. 
         /// </summary>
+        [Obsolete("RequestKey will include the modified date if present. No longer populated")]
         ModifiedDateDelegate GetModifiedDateUTC { get; }
         /// <summary>
-        /// True if a modified date is available for verifying cache integrity.
+        /// Obsolete. Do not use; RequestKey includes all invalidation information
         /// </summary>
+        [Obsolete("RequestKey will include the modified date if present. No longer populated")]
         bool HasModifiedDate { get; }
         /// <summary>
         /// A callback method that will resize, encode, and write the data to the given stream.
