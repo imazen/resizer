@@ -1,5 +1,5 @@
 // LzmaBase.cs
-
+#pragma warning disable 1591
 namespace SevenZipReduced.Compression.LZMA
 {
 	internal abstract class Base

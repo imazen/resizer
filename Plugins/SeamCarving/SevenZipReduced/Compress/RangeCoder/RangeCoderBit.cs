@@ -1,5 +1,5 @@
 using System;
-
+#pragma warning disable 1591
 namespace SevenZipReduced.Compression.RangeCoder
 {
 	struct BitEncoder

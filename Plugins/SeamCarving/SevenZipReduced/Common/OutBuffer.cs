@@ -1,5 +1,5 @@
 // OutBuffer.cs
-
+#pragma warning disable 1591
 namespace SevenZipReduced.Buffer
 {
 	public class OutBuffer

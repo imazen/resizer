@@ -1,5 +1,5 @@
 // LzBinTree.cs
-
+#pragma warning disable 1591
 using System;
 
 namespace SevenZipReduced.Compression.LZ

@@ -1,5 +1,5 @@
 // LzOutWindow.cs
-
+#pragma warning disable 1591
 namespace SevenZipReduced.Compression.LZ
 {
 	public class OutWindow

@@ -281,7 +281,7 @@ namespace ImageResizer.Plugins.DiskCache {
                                     File.Move(tempFile, physicalPath);
                                     moved = true;
                                 }
-                                catch (IOException ioe)
+                                catch (IOException)
                                 {
                                     //Will throw IO exception if already exists. Which we consider a hit, so we delete the tempFile
                                     try { if (File.Exists(tempFile)) File.Delete(tempFile); }

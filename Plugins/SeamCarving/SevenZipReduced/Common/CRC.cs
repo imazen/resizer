@@ -1,5 +1,5 @@
 // Common/CRC.cs
-
+#pragma warning disable 1591
 namespace SevenZipReduced
 {
 	class CRC
