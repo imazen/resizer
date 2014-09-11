@@ -11,6 +11,7 @@ using ImageResizer.Util;
 using System.ComponentModel;
 using ImageResizer.Configuration.Xml;
 using System.Globalization;
+using System.Linq;
 using System.Security;
 
 namespace ImageResizer.Plugins.Basic {
@@ -107,6 +108,7 @@ namespace ImageResizer.Plugins.Basic {
 
             //What editions are used?
             var editionsUsed = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            
             foreach (IPlugin p in c.Plugins.AllPlugins) {
                 object[] attrs = p.GetType().Assembly.GetCustomAttributes(typeof(Util.EditionAttribute), true);
                 if (attrs.Length > 0 && attrs[0] is EditionAttribute)
@@ -125,19 +127,22 @@ namespace ImageResizer.Plugins.Basic {
                     break;
                 }
             }
-
             
-
+            if (new List<string>(editionsUsed.Values).Intersect(new string[] { "R4Elite", "R4Creative", "R4Performance" }).Count() > 0){
+                sb.AppendLine("You are mixing V3 and V4 plugins; this is a bad idea.");
+            }
             Dictionary<string, string> friendlyNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            friendlyNames.Add("R4Elite", "Elite Edition or Support Contract");
-            friendlyNames.Add("R4Creative", "Creative Edition");
-            friendlyNames.Add("R4Performance", "Performance Edition");
+            friendlyNames.Add("R4Elite", "V4 Elite Edition or Support Contract");
+            friendlyNames.Add("R4Creative", "V4 Creative Edition");
+            friendlyNames.Add("R4Performance", "V4 Performance Edition");
 
             if (edition == null) 
                 sb.AppendLine("\nYou are not using any paid plugins.");
             else {
                 sb.Append("\nYou are using plugins from the " + friendlyNames[edition] + ": ");
-                foreach (string s in editionsUsed.Keys) sb.Append(s + " (" +  friendlyNames[editionsUsed[s]] + "), ");
+                foreach (string s in editionsUsed.Keys) {
+                    sb.Append(s + " (" + (friendlyNames.ContainsKey(editionsUsed[s]) ? friendlyNames[editionsUsed[s]] : "Unrecognized SKU")+ "), ");
+                }
                 sb.Remove(sb.Length - 2, 2);
                 sb.AppendLine();
             }

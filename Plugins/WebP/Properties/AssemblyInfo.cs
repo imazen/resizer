@@ -15,4 +15,4 @@ using ImageResizer.Util;
 [assembly: NativeDependencies("Native.xml")]
 
 
-[assembly: Edition("R3Elite")]
+[assembly: Edition("R4Elite")]
