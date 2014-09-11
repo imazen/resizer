@@ -77,8 +77,7 @@ namespace ImageResizer.Plugins.TinyCache {
         protected bool HasFileIOPermission {
             get {
                 if (_hasFileioPermission == null) {
-                    FileIOPermission writePermission = new FileIOPermission(FileIOPermissionAccess.AllAccess, new string[] { PhysicalCacheFile });
-                    _hasFileioPermission = SecurityManager.IsGranted(writePermission);
+                    return PathUtils.HasIOPermission(new string[] { PhysicalCacheFile });
                 }
                 return _hasFileioPermission.Value;
             }

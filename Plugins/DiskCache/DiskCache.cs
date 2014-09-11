@@ -222,10 +222,8 @@ namespace ImageResizer.Plugins.DiskCache
         /// </summary>
         /// <returns></returns>
         protected bool HasFileIOPermission() {
-            FileIOPermission writePermission = new FileIOPermission(FileIOPermissionAccess.AllAccess,new string[]{PhysicalCacheDir, Path.Combine(PhysicalCacheDir,"web.config")});
-            return SecurityManager.IsGranted(writePermission);
+            return PathUtils.HasIOPermission(new string[] { PhysicalCacheDir, Path.Combine(PhysicalCacheDir, "web.config") });
         }
-
         
         protected CustomDiskCache cache = null;
         protected CleanupManager cleaner = null;
@@ -328,7 +326,7 @@ namespace ImageResizer.Plugins.DiskCache
                 File.WriteAllText(testFile, "You may delete this file - it is written and deleted just to verify permissions are configured correctly");
                 File.Delete(testFile);
                 return true;
-            } catch (Exception e){
+            } catch (Exception){
                 return false;
             }
         }

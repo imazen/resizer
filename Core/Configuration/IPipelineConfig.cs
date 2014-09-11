@@ -131,5 +131,7 @@ namespace ImageResizer.Configuration {
 
 
         NameValueCollection ModifiedQueryString { get; set; }
+
+        bool IsAppDomainUnrestricted();
     }
 }

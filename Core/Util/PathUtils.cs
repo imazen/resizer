@@ -9,6 +9,8 @@ using System.Text.RegularExpressions;
 using ImageResizer.ExtensionMethods;
 using System.Globalization;
 using System.Reflection;
+using System.Security;
+using System.Security.Permissions;
 
 namespace ImageResizer.Util {
     /// <summary>
@@ -582,6 +584,18 @@ namespace ImageResizer.Util {
         /// <returns></returns>
         public static NameValueCollection FilterQueryString(ResizeSettings query, params string[] keepKeys) {
             return query.Keep(keepKeys);
+        }
+
+        /// <summary>
+        /// Returns true if the current AppDomain has unrestricted .NET FileIOPermission to the given paths. 
+        /// Does NOT check NTFS permissions; that's completely separate.
+        /// </summary>
+        /// <param name="paths"></param>
+        /// <returns></returns>
+        public static bool HasIOPermission(string[] paths){
+            var permissionSet = new PermissionSet(PermissionState.None);
+            permissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.AllAccess, paths));
+            return permissionSet.IsSubsetOf(AppDomain.CurrentDomain.PermissionSet);
         }
     }
 }

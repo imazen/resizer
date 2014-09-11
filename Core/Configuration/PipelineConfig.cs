@@ -14,6 +14,7 @@ using ImageResizer.Collections;
 using System.Web;
 using System.Security.Permissions;
 using System.Runtime.InteropServices;
+using System.Security;
 
 namespace ImageResizer.Configuration {
     public class PipelineConfig : IPipelineConfig, ICacheProvider, ISettingsModifier{
@@ -479,5 +480,16 @@ namespace ImageResizer.Configuration {
                 _moduleInstalled = value;
             }
         }
+
+        /// <summary>
+        /// Returns true if the AppDomain has Unrestricted code access security
+        /// </summary>
+        /// <returns></returns>
+        public bool IsAppDomainUnrestricted(){
+            var permissionSet = new PermissionSet(PermissionState.Unrestricted);
+            permissionSet.AddPermission(new System.Security.Permissions.SecurityPermission(System.Security.Permissions.PermissionState.Unrestricted));
+            return permissionSet.IsSubsetOf(AppDomain.CurrentDomain.PermissionSet);
+        }
+        
     }
 }

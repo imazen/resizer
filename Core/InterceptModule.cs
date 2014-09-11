@@ -17,6 +17,8 @@ using ImageResizer.Resizing;
 using ImageResizer.Plugins.Basic;
 using ImageResizer.ExtensionMethods;
 using System.Globalization;
+using System.Security;
+using System.Security.Permissions;
 
 // This namespace contains the most frequently used classes.
 namespace ImageResizer {
@@ -106,8 +108,7 @@ namespace ImageResizer {
                         user = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), new string[0]);
 
                     //Do we have permission to call UrlAuthorizationModule.CheckUrlAccessForPrincipal?
-                    bool canCheckUrl = System.Security.SecurityManager.IsGranted(new System.Security.Permissions.SecurityPermission(System.Security.Permissions.PermissionState.Unrestricted));
-                    
+                    bool canCheckUrl = conf.IsAppDomainUnrestricted();
                     
                     //Run the rewritten path past the auth system again, using the result as the default "AllowAccess" value
                     bool isAllowed = true;

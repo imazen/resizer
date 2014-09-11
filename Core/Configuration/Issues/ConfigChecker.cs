@@ -27,7 +27,7 @@ namespace ImageResizer.Configuration.Issues {
             if (c.Pipeline.ProcessedCount < 1)
                 issues.Add(new Issue("To potentially see additional errors here, perform an image resize request.", IssueSeverity.Warning));
 
-            bool canCheckUrls = System.Security.SecurityManager.IsGranted(new System.Security.Permissions.SecurityPermission(System.Security.Permissions.PermissionState.Unrestricted));
+            bool canCheckUrls = c.Pipeline.IsAppDomainUnrestricted();
 
             if (canCheckUrls) {
                 try {
@@ -36,7 +36,7 @@ namespace ImageResizer.Configuration.Issues {
                 } catch (NotImplementedException) {
                     issues.Add(new Issue("UrlAuthorizationModule.CheckUrlAccessForPrincipal is not supported on this runtime (are you running Mono?)",
                          "It may be possible for users to bypass UrlAuthorization rules you have defined for your website, and access images that would otherwise be protected. If you do not use UrlAuthorization rules, this should not be a concern. " +
-                       "You may also re-implement your security rules by handling the Config.Current.Pipeline.AuthorizeImage event.", IssueSeverity.Warning));
+                       "You may also re-implement your security rules (but only for *processed* images) by handling the Config.Current.Pipeline.AuthorizeImage event.", IssueSeverity.Warning));
                 }
             }
                     

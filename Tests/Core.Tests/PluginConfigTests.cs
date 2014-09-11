@@ -43,8 +43,6 @@ namespace ImageResizer.Tests {
         [InlineData("ImageResizer.Plugins.PluginC.PluginCPlugin", typeof(PluginCPlugin))]
         [InlineData("PluginCPlugin", typeof(PluginCPlugin))]
         [InlineData("SampleNamespace.PluginD", typeof(PluginD))]
-        [System.Security.Permissions.ReflectionPermission(System.Security.Permissions.SecurityAction.Deny)]
-
         public void get_plugin_type(string name, Type type) {
             PluginConfig c = new PluginConfig(new Config(new ResizerSection()));
             Type t = c.FindPluginType(name);
@@ -58,7 +56,6 @@ namespace ImageResizer.Tests {
         [InlineData("<resizer><plugins><remove name='defaultencoder' /><add name='defaultencoder' /><remove name='nocache' /><add name='nocache' /></plugins></resizer>")]
         [InlineData("<resizer><plugins><clear type='caches' /><add name='nocache' /></plugins></resizer>")]
         [InlineData("<resizer><plugins><clear type='extensions' /></plugins></resizer>")]
-        [System.Security.Permissions.ReflectionPermission(System.Security.Permissions.SecurityAction.Deny)]
         public void LoadPlugins(string xml) {
             PluginConfig pc = new Config(new ResizerSection(xml)).Plugins;
             List<IIssue> oldIssues = new List<IIssue>(pc.GetIssues());
@@ -80,7 +77,6 @@ namespace ImageResizer.Tests {
         [InlineData("<add name='defaultencoder' /><add name='nocache' />", typeof(IEncoder), 1)]
         [InlineData("<add name='defaultencoder' /><add name='nocache' />", typeof(ICache), 1)]
         [InlineData("<add name='SizeLimiting' />", typeof(BuilderExtension), 1)]
-        [System.Security.Permissions.ReflectionPermission(System.Security.Permissions.SecurityAction.Deny)]
         public void GetPluginsByType(string startingXML, Type kind, int expectedCount) {
             PluginConfig pc = new Config(new ResizerSection("<resizer><plugins>" + startingXML + "</plugins></resizer>")).Plugins;
             pc.RemoveAll();
