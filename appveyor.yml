@@ -52,6 +52,10 @@ before_build:
 test:
   # assemblies to test - optional
   assemblies:
+    Tests\binaries\release\ImageResizer.Core.Tests.dll
+    Tests\binaries\release\ImageResizer.Plugins.CopyMetadata.Tests.dll
+    Tests\binaries\release\ImageResizer.TestFSharp.dll
+    Tests\binaries\release\ImageResizer.AllPlugins.Tests.dll
     Tests\binaries\release\*test*.dll
 # scripts to run after build
 #after_build:
