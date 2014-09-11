@@ -45,6 +45,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -137,10 +138,6 @@
     <ProjectReference Include="..\..\Contrib\PdfRenderer\PdfRenderer\ImageResizer.Plugins.PdfRenderer.csproj">
       <Project>{7c8a13f7-5c00-4074-b16e-45d0e231b70d}</Project>
       <Name>ImageResizer.Plugins.PdfRenderer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Core.Mvc\ImageResizer.Mvc.csproj">
-      <Project>{4181b9c4-1eaf-4070-8571-2ee25475547e}</Project>
-      <Name>ImageResizer.Mvc</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{fa5ef673-a6a4-498d-aa24-c025cc5267af}</Project>
