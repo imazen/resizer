@@ -35,18 +35,15 @@ namespace ImageResizer.Plugins.RemoteReader {
             get { return RemoteReaderPlugin.hmacKey; }
         }
 
-        private int _allowedRedirects = 5;
         /// <summary>
         /// How many redirects to follow before throwing an exception. Defaults to 5.
         /// </summary>
-        public int AllowedRedirects {
-            get { return _allowedRedirects; }
-            set { _allowedRedirects = value; }
-        }
+        public int AllowedRedirects { get; set; }
 
         protected string remotePrefix = "~/remote";
         Config c;
         public RemoteReaderPlugin() {
+            AllowedRedirects = 5;
             try {
                 remotePrefix = Util.PathUtils.ResolveAppRelativeAssumeAppRelative(remotePrefix);
                 //Remote prefix must never end in a slash - remote.jpg syntax...

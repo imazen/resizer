@@ -12,6 +12,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage.Blob;
 using ImageResizer.Storage;
+using ImageResizer.ExtensionMethods;
 using System.IO;
 
 namespace ImageResizer.Plugins.AzureReader2 {
@@ -25,18 +26,33 @@ namespace ImageResizer.Plugins.AzureReader2 {
 
         public bool RedirectToBlobIfUnmodified { get; set; }
 
+        public AzureReader2Plugin()
+            : base()
+        {
+
+        }
         public AzureReader2Plugin(NameValueCollection args):base() {
             LoadConfiguration(args);
             blobStorageConnection = args["connectionstring"];
-            blobStorageEndpoint = args["blobstorageendpoint"];
-            if (string.IsNullOrEmpty(blobStorageEndpoint)) blobStorageEndpoint = args["endpoint"];
+            blobStorageEndpoint = args.GetAsString("blobstorageendpoint", args.GetAsString("endpoint",null));
        }
 
 
         protected ICloudBlob GetBlobRef(string virtualPath)
         {
             string subPath = StripPrefix(virtualPath).Trim('/', '\\');
+
+            string containerName = subPath.TrimStart(new char[] { '/', '\\' });
+
+            //Split off the container name
+            //int keyStartsAt = containerName.IndexOf('/');
+            //if (keyStartsAt < 0) throw new InvalidOperationException(string.Format("No container found in the Azure blob path '{0}'",subPath));
+            //containerName = containerName.Substring(0, keyStartsAt);
+
+
             string relativeBlobURL = string.Format("{0}/{1}", CloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\'), subPath);
+
+
 
             return CloudBlobClient.GetBlobReferenceFromServer(new Uri(relativeBlobURL));
         }
@@ -46,9 +62,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
             try
             {
                 var cloudBlob = GetBlobRef(virtualPath);
-
-                cloudBlob.FetchAttributes();
-
+                
                 var meta = new BlobMetadata();
                 meta.Exists = true; //Otherwise an exception would have happened at FetchAttributes
                 var utc = cloudBlob.Properties.LastModified;
@@ -56,7 +70,6 @@ namespace ImageResizer.Plugins.AzureReader2 {
                 {
                     meta.LastModifiedDateUtc = utc.Value.UtcDateTime;
                 }
-
                 return meta;
             }
             catch (StorageException e)
@@ -85,21 +98,12 @@ namespace ImageResizer.Plugins.AzureReader2 {
             }
             catch (StorageException e)
             {
-                // mb: 12/8/2012 - not sure of the correctness of these following lines
-                // in other areas we just check e.RequestInformation.HttpStatusCode == 404 for a Not Found error
-                // don't know what the errorcodes that will be returned
-                if (e.RequestInformation.ExtendedErrorInformation.ErrorCode == "BlobNotFound")
+                if (e.RequestInformation.HttpStatusCode == 404)
                 {
                     throw new FileNotFoundException("Azure blob file not found", e);
                 }
-                else if (e.RequestInformation.ExtendedErrorInformation.ErrorCode == "ContainerNotFound")
-                {
-                    throw new FileNotFoundException("Azure blob container not found", e);
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
+                
             }
 
             ms.Seek(0, SeekOrigin.Begin); // Reset to beginning
@@ -108,32 +112,25 @@ namespace ImageResizer.Plugins.AzureReader2 {
 
         public IPlugin Install(Configuration.Config c) {
             if (string.IsNullOrEmpty(blobStorageConnection))
-                throw new InvalidOperationException("This plugin needs a connection string for the Azure blob storage.");
+                throw new InvalidOperationException("AzureReader2 requires a named connection string or a connection string to be specified with the 'connectionString' attribute.");
 
-            if (string.IsNullOrEmpty(blobStorageEndpoint))
-                throw new InvalidOperationException("This plugin needs a blob end point; the default will be [http|https]://myaccount.blob.core.windows.net.");
+            // Setup the connection to Windows Azure Storage
+            //Lookup named connection string first, then fall back.
+            var connectionString = CloudConfigurationManager.GetSetting(blobStorageConnection);
+            if (string.IsNullOrEmpty(connectionString)) { connectionString = blobStorageConnection; }
+            
 
+            CloudStorageAccount cloudStorageAccount;
+            if (CloudStorageAccount.TryParse(connectionString, out cloudStorageAccount)){
+                if (string.IsNullOrEmpty(blobStorageEndpoint)){
+                    blobStorageEndpoint = cloudStorageAccount.BlobEndpoint.ToString();
+                }
+            }else{
+                throw new InvalidOperationException("Invalid AzureReader2 connectionString value; rejected by Azure SDK.");
+            }
             if (!blobStorageEndpoint.EndsWith("/"))
                 blobStorageEndpoint += "/";
 
-            // Setup the connection to Windows Azure Storage
-
-            // The 1.x Azure SDK offers a CloudStorageAccount.FromConfigurationSetting()
-            // method that looks up the connection string from the fabric's configuration
-            // and creates the CloudStorageAccount.  In 2.x, that method has disappeared
-            // and we have to talk to the CloudConfigurationManager directly.
-            var connectionString = CloudConfigurationManager.GetSetting(blobStorageConnection);
-
-            // Earlier versions of AzureReader2 simply assumed/required that the
-            // 'blobStorageConnection' value was the connection string itself, and
-            // not a config key.  Therefore, we fall back to that behavior if the
-            // configuration lookup fails.
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                connectionString = blobStorageConnection;
-            }
-
-            var cloudStorageAccount = CloudStorageAccount.Parse(connectionString);
             CloudBlobClient = cloudStorageAccount.CreateCloudBlobClient();
             // Register rewrite
             c.Pipeline.PostRewrite += Pipeline_PostRewrite;
@@ -145,7 +142,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
 
         /// <summary>
         /// In case there is no querystring attached to the file (thus no operations on the fly) we can
-        /// redirect directly to the blob. This let us take advantage of the CDN (if configured).
+        /// redirect directly to the blob. This let us offload traffic to blob storage
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="context"></param>

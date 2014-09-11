@@ -12,22 +12,19 @@ namespace ImageResizer.Plugins.S3Reader2 {
     /// Class to allow modifying the bucket and key request path
     /// </summary>
     public class S3PathEventArgs : EventArgs {
-        protected string _path;
+  
         /// <summary>
         /// Create a new instance of S3PathEventArgs for modifying the bucket and key of incoming requests
         /// </summary>
         /// <param name="path"></param>
         public S3PathEventArgs(string path) {
-            _path = path;
+            this.Path = path;
         }
         /// <summary>
         /// Path contains the bucket and key in the form "bucket/key".
         /// Where key may contain additional forward slashes.
         /// </summary>
-        public string Path {
-            get { return _path; }
-            set { _path = value; }
-        }
+        public string Path { get; set; }
         /// <summary>
         /// Stops the request if it doesn't match one of the allowed buckets.
         /// Amazon S3 is case-sensitive. Thus, comparisons are case sensitive as well. To minimize headache, a different exception is thrown when only case differs.

@@ -10,7 +10,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using ImageResizer.Storage;
-
+using ImageResizer.ExtensionMethods;
 #endregion
 
 namespace ImageResizer.Plugins.MongoReader
@@ -47,7 +47,7 @@ namespace ImageResizer.Plugins.MongoReader
         /// <param name="args"></param>
         public MongoReaderPlugin(NameValueCollection args)
         {
-            VirtualFilesystemPrefix = string.IsNullOrEmpty(args["prefix"]) ? "~/gridfs/" : args["prefix"];
+            VirtualFilesystemPrefix = args.GetAsString("prefix","~/gridfs/");
 
             var mongoUrl = new MongoUrl(args["connectionString"]);
 

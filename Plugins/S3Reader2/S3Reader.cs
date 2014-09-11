@@ -19,29 +19,40 @@ using System.IO;
 namespace ImageResizer.Plugins.S3Reader2 {
     public class S3Reader2 : BlobProviderBase, IMultiInstancePlugin, IRedactDiagnostics {
 
-        string buckets;
         AmazonS3Config s3config = null;
-        public S3Reader2(NameValueCollection args ) {
-
+        public S3Reader2():base()
+        {
             VirtualFilesystemPrefix = "~/s3/";
             s3config = new AmazonS3Config();
+            UseHttps = false;
+            AllowedBuckets = new string[]{};
+        }
 
-            buckets = args["buckets"];
-            Region = args["region"] ?? "us-east-1";
+        
+        public S3Reader2(NameValueCollection args ):this() {
+            LoadConfiguration(args);
+            UseHttps = args.Get("useHttps", args.Get("useSsl", UseHttps));
+            Region = args.GetAsString("region", "us-east-1");
 
-
-            s3config.UseHttp = !args.Get("useSsl", false);
+            SetAllowedBuckets(args.GetAsString("buckets","").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
 
             if (!string.IsNullOrEmpty(args["accessKeyId"]) && !string.IsNullOrEmpty(args["secretAccessKey"])) {
                 S3Client = new AmazonS3Client(args["accessKeyId"], args["secretAccessKey"], s3config);
             } else {
-
                 S3Client = new AmazonS3Client(null, s3config);
             }
-      
         }
 
+        /// <summary>
+        /// If true, communications with S3 will happen over HTTPS.
+        /// </summary>
+        public bool UseHttps { get { return !s3config.UseHttp; } set { s3config.UseHttp = !value; } }
 
+        /// <summary>
+        /// Removes sensitive S3 access keys from the given XML configuration node.
+        /// </summary>
+        /// <param name="resizer"></param>
+        /// <returns></returns>
         public Configuration.Xml.Node RedactFrom(Node resizer) {
             resizer = base.RedactFrom(resizer);
             foreach (Node n in resizer.queryUncached("plugins.add")) {
@@ -56,7 +67,9 @@ namespace ImageResizer.Plugins.S3Reader2 {
         /// </summary>
         public AmazonS3Client S3Client { get; set; }
 
-
+        /// <summary>
+        /// Get or set the AWS region by system name (like us-east-1)
+        /// </summary>
         public string Region
         {
             get { return this.s3config != null && this.s3config.RegionEndpoint != null ? this.s3config.RegionEndpoint.SystemName : null; }
@@ -140,18 +153,29 @@ namespace ImageResizer.Plugins.S3Reader2 {
             return null;
         }
 
+        protected string[] AllowedBuckets{get;set;}
 
-        private string[] bucketArray = null;
+        public void SetAllowedBuckets(IEnumerable<string> buckets)
+        {   
+            var a = buckets.ToArray();
+            for (int i = 0; i < a.Length; i++)
+                a[i] = a[i].Trim();
+            AllowedBuckets = a;
+        }
+
+        public IEnumerable<string> GetAllowedBuckets()
+        {
+            return AllowedBuckets.ToArray();
+        }
+
+
+        
         public IPlugin Install(Configuration.Config c) {
 
-            if (!string.IsNullOrEmpty(buckets)) bucketArray = buckets.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            else c.configurationSectionIssues.AcceptIssue(new Issue("S3Reader", "S3Reader cannot function without a list of permitted bucket names.",
+            if (AllowedBuckets.Length < 1)
+                c.configurationSectionIssues.AcceptIssue(new Issue("S3Reader", "S3Reader cannot function without a list of permitted bucket names.",
                 "Please specify a comma-delimited list of buckets in the <add name='S3Reader' buckets='bucketa,bucketb' /> element.",
                  IssueSeverity.ConfigurationError));
-
-            for (int i = 0; i < bucketArray.Length; i++)
-                bucketArray[i] = bucketArray[i].Trim();
-
 
             this.PreS3RequestFilter += S3Reader2_PreS3RequestFilter;
            
@@ -163,8 +187,7 @@ namespace ImageResizer.Plugins.S3Reader2 {
 
         void S3Reader2_PreS3RequestFilter(S3Reader2 sender, S3PathEventArgs e)
         {
-            if (bucketArray == null) e.ThrowException();
-            e.AssertBucketMatches(bucketArray);
+            e.AssertBucketMatches(AllowedBuckets);
         }
 
 

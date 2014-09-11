@@ -24,15 +24,21 @@ namespace ImageResizer.Plugins.SqlReader
     public class SqlReaderPlugin : BlobProviderBase, IVirtualImageProviderVppCaching, IIssueProvider, IMultiInstancePlugin
     {
 
+        public SqlReaderPlugin():base(){
+            StripFileExtension = true;
+            QueriesAreStoredProcedures = false;
+            ImageBlobQuery = "SELECT Content FROM Images WHERE ImageID=@id";
+            ModifiedDateQuery = "Select ModifiedDate, CreatedDate From Images WHERE ImageID=@id";
+            VirtualFilesystemPrefix = "~/databaseimages";
+        }
         public SqlReaderPlugin(NameValueCollection args)
-            : base()
+            : this()
         {
-            this.VirtualFilesystemPrefix = "~/databaseimages";
-            if (!string.IsNullOrEmpty(args["connectionString"])) this.ConnectionString = args["connectionString"];
-            this.ImageIdType = args.Get("idType", this.ImageIdType);
-            if (!string.IsNullOrEmpty(args["blobQuery"])) this.ImageBlobQuery = args["blobQuery"];
-            if (!string.IsNullOrEmpty(args["modifiedQuery"])) this.ModifiedDateQuery = args["modifiedQuery"];
-
+            LoadConfiguration(args);
+            ConnectionString = args.GetAsString("connectionString",this.ConnectionString);
+            ImageIdType = args.Get("idType", this.ImageIdType);
+            ImageBlobQuery = args.GetAsString("blobQuery", this.ImageBlobQuery);
+            ModifiedDateQuery = args.GetAsString("modifiedQuery", this.ModifiedDateQuery);
             StripFileExtension = !args.Get("extensionPartOfId", false);
             QueriesAreStoredProcedures = args.Get("queriesAreStoredProcedures", false);
         }
@@ -58,52 +64,30 @@ namespace ImageResizer.Plugins.SqlReader
         /// When true, the last file extension segment will be removed from the URL before the SQL Id is parsed. Only relevant when ImageIdType is a string type. Always true for other values.
         /// Configured by setting 'extensionPartOfId' to the opposite value.
         /// </summary>
-        public bool StripFileExtension
-        {
-            get;
-            set;
-        }
+        public bool StripFileExtension { get; set; }
 
 
-
-
-
-
-        private string connectionString = null;
         /// <summary>
         /// The database connection string. Defaults to null. You can specify an existing web.config connection string using
         /// the "ConnectionStrings:namedKey" convention.
         /// </summary>
-        public string ConnectionString
-        {
-            get { return connectionString; }
-            set { connectionString = value; }
-        }
+        public string ConnectionString{get;set;}
 
+        /// <summary>
+        /// If true, the queries will executed as if they are sproc names.
+        /// </summary>
         public bool QueriesAreStoredProcedures { get; set; }
 
-        private string imageBlobQuery =
-            "SELECT Content FROM Images WHERE ImageID=@id";
         /// <summary>
         /// The query that returns the binary image data based on the ID. Defaults to "SELECT Content FROM Images WHERE ImageID=@id"
         /// </summary>
-        public string ImageBlobQuery
-        {
-            get { return imageBlobQuery; }
-            set { imageBlobQuery = value; }
-        }
+        public string ImageBlobQuery { get; set; }
 
-        private string modifiedDateQuery =
-            "Select ModifiedDate, CreatedDate From Images WHERE ImageID=@id";
         /// <summary>
         /// The query that returns the modified and created date of the image.  Defaults to "Select ModifiedDate, CreatedDate From Images WHERE ImageID=@id".
         /// Of all the dates returned by the query, the first non-empty date is used.
         /// </summary>
-        public string ModifiedDateQuery
-        {
-            get { return modifiedDateQuery; }
-            set { modifiedDateQuery = value; }
-        }
+        public string ModifiedDateQuery { get; set; }
 
 
         private System.Data.SqlDbType imageIdType = System.Data.SqlDbType.Int;
@@ -150,7 +134,7 @@ namespace ImageResizer.Plugins.SqlReader
         /// <param name="id"></param>
         public virtual void FireAuthorizeEvent(string id)
         {
-            s.FireBeforeAccess(id);
+            FireBeforeAccess(id);
         }
         /// <summary>
         /// Returns a stream to the 
@@ -164,8 +148,8 @@ namespace ImageResizer.Plugins.SqlReader
             conn.Open();
             using (conn)
             {
-                SqlCommand sc = new SqlCommand(s.ImageBlobQuery, conn);
-                sc.CommandType = s.QueriesAreStoredProcedures ? System.Data.CommandType.StoredProcedure : System.Data.CommandType.Text;
+                SqlCommand sc = new SqlCommand(ImageBlobQuery, conn);
+                sc.CommandType = QueriesAreStoredProcedures ? System.Data.CommandType.StoredProcedure : System.Data.CommandType.Text;
                 sc.Parameters.Add(CreateIdParameter(id));
                 SqlDataReader sdr = sc.ExecuteReader();
                 using (sdr)
@@ -184,39 +168,20 @@ namespace ImageResizer.Plugins.SqlReader
         /// <returns></returns>
         public SqlParameter CreateIdParameter(string id)
         {
-            SqlParameter sp = new SqlParameter("id", s.ImageIdType);
-            if (IsIntKey)
+            SqlParameter sp = new SqlParameter("id", ImageIdType);
+            if (IsIntType(ImageIdType))
             {
                 sp.Size = 4;
                 sp.Value = long.Parse(id);
             }
-            else if (s.ImageIdType == System.Data.SqlDbType.UniqueIdentifier)
+            else if (ImageIdType == System.Data.SqlDbType.UniqueIdentifier)
                 sp.Value = new Guid(id);
-            else if (IsStringKey)
+            else if (IsStringType(ImageIdType))
                 sp.Value = id;
 
             return sp;
         }
-        /// <summary>
-        /// Returns true if Settings.ImageIdType is a string type
-        /// </summary>
-        public bool IsStringKey
-        {
-            get
-            {
-                return IsStringType(ImageIdType);
-            }
-        }
-        /// <summary>
-        /// Returns true if Settings.ImageIdType  is an integer type
-        /// </summary>
-        public bool IsIntKey
-        {
-            get
-            {
-                return IsIntType(ImageIdType);
-            }
-        }
+  
 
         public override IBlobMetadata FetchMetadata(string virtualPath, NameValueCollection queryString)
         {
@@ -225,9 +190,9 @@ namespace ImageResizer.Plugins.SqlReader
             conn.Open();
             using (conn)
             {
-                SqlCommand sc = new SqlCommand(s.ModifiedDateQuery, conn);
+                SqlCommand sc = new SqlCommand(ModifiedDateQuery, conn);
                 sc.Parameters.Add(CreateIdParameter(id));
-                sc.CommandType = s.QueriesAreStoredProcedures ? System.Data.CommandType.StoredProcedure : System.Data.CommandType.Text;
+                sc.CommandType = QueriesAreStoredProcedures ? System.Data.CommandType.StoredProcedure : System.Data.CommandType.Text;
                 SqlDataReader sdr = sc.ExecuteReader();
                 using (sdr)
                 {
@@ -260,15 +225,15 @@ namespace ImageResizer.Plugins.SqlReader
         {
 
             //First, try the connection string as a connection string key.
-            if (System.Configuration.ConfigurationManager.ConnectionStrings[s.ConnectionString] != null)
-                return new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings[s.ConnectionString].ConnectionString);
+            if (System.Configuration.ConfigurationManager.ConnectionStrings[ConnectionString] != null)
+                return new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings[ConnectionString].ConnectionString);
 
             //Second, try the .NET syntax
             string prefix = "ConnectionStrings:";
             //ConnectionStrings:namedString convention
-            if (s.ConnectionString.Trim().StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            if (ConnectionString.Trim().StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
             {
-                string key = s.ConnectionString.Trim().Substring(prefix.Length).Trim();
+                string key = ConnectionString.Trim().Substring(prefix.Length).Trim();
                 if (System.Configuration.ConfigurationManager.ConnectionStrings[key] != null)
                     return new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings[key].ConnectionString);
                 else
@@ -277,7 +242,7 @@ namespace ImageResizer.Plugins.SqlReader
             }
 
             //Third, try it as an actual connection string
-            return new SqlConnection(s.ConnectionString);
+            return new SqlConnection(ConnectionString);
         }
 
         /// <summary>
@@ -308,7 +273,7 @@ namespace ImageResizer.Plugins.SqlReader
             //Strip slashes at beginning 
             id = id.TrimStart(new char[] { '/', '\\' });
             //Strip extension if not a string 
-            if (!IsStringKey || StripFileExtension)
+            if (!IsStringType(ImageIdType) || StripFileExtension)
             {
                 int length = id.LastIndexOf('.');
                 if (length > -1) id = id.Substring(0, length);
@@ -316,7 +281,7 @@ namespace ImageResizer.Plugins.SqlReader
             //Can't be empty.
             if (id.Length < 1) return null;
             //Verify only valid characters present
-            if (IsIntKey)
+            if (IsIntType(ImageIdType))
             {
                 long val = 0;
                 if (!long.TryParse(id, out val)) return null; // not a valid integer
@@ -333,7 +298,7 @@ namespace ImageResizer.Plugins.SqlReader
                 }
 
             }
-            else if (IsStringKey)
+            else if (IsStringType(ImageIdType))
             {
                 return id;
             }
@@ -366,9 +331,6 @@ namespace ImageResizer.Plugins.SqlReader
                     issues.Add(new Issue("SqlReader", "Failed to locate the named connection string '" + key + "' in web.config", "", IssueSeverity.ConfigurationError));
 
             }
-
-
-
             return issues;
         }
 
@@ -384,6 +346,11 @@ namespace ImageResizer.Plugins.SqlReader
         public string VppGetFileHash(string virtualPath, System.Collections.IEnumerable virtualPathDependencies)
         {
             return null;
+        }
+
+        public override Stream Open(string virtualPath, NameValueCollection queryString)
+        {
+            return this.GetStream(ParseIdFromVirtualPath(virtualPath));
         }
     }
 
