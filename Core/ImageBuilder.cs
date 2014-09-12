@@ -431,7 +431,7 @@ namespace ImageResizer
                 b = LoadImage(job.Source, s, job.ResetSourceStream);
 
                 //Save source path info
-                job.SourcePathData = (b != null && b.Tag != null && b.Tag is BitmapTag) ? ((BitmapTag)b.Tag).Path : null;
+                job.SourcePathData = (b != null && b.Tag != null && b.Tag is BitmapTag) ? ((BitmapTag)b.Tag).Path : job.SourcePathData;
 
                 job.ResultInfo["source.width"] = b.Width;
                 job.ResultInfo["source.height"] = b.Height;
