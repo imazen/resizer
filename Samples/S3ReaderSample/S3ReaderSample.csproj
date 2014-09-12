@@ -96,6 +96,10 @@
       <Project>{c3b00cd1-39ee-4ba8-bdc0-02e346f20694}</Project>
       <Name>ImageResizer.Plugins.DiskCache</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\ImageResizer.Storage\ImageResizer.Storage.csproj">
+      <Project>{80bb303c-8f55-410c-ba91-342ecc435101}</Project>
+      <Name>ImageResizer.Storage</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\S3Reader2\ImageResizer.Plugins.S3Reader2.csproj">
       <Project>{ac318404-15f2-4187-a7b1-afe4e2798de6}</Project>
       <Name>ImageResizer.Plugins.S3Reader2</Name>

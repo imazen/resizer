@@ -98,6 +98,10 @@
       <Project>{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}</Project>
       <Name>ImageResizer.Plugins.DiskCache</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\ImageResizer.Storage\ImageResizer.Storage.csproj">
+      <Project>{80bb303c-8f55-410c-ba91-342ecc435101}</Project>
+      <Name>ImageResizer.Storage</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\SqlReader\ImageResizer.Plugins.SqlReader.csproj">
       <Project>{2AB0FC98-8AD5-4D2A-BF06-0EA4DCF8764D}</Project>
       <Name>ImageResizer.Plugins.SqlReader</Name>
