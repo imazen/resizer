@@ -203,6 +203,15 @@ namespace ImageResizer.Plugins.Basic {
 
 			sb.AppendLine("IntegratedPipeline: " + (HttpRuntime.UsingIntegratedPipeline).ToString());
 
+
+            var modules = HttpContext.Current.ApplicationInstance.Modules;
+            sb.AppendLine("\nInstalled HttpModules: \n");
+            foreach (string key in modules.AllKeys)
+            {
+                sb.AppendLine(modules.Get(key).GetType().AssemblyQualifiedName + "          (under key" + key + ")");
+            }
+
+
             //List loaded assemblies, and also detect plugin assemblies that are not being used.
 			sb.AppendLine("\nLoaded assemblies:\n");
 
