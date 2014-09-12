@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Plugins;
 using ImageResizer.Caching;
+using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
@@ -11,7 +12,7 @@ namespace ImageResizer.Plugins.Basic {
     /// Useful for debugging purposes but unsuited for production use, and will use large quanities of RAM. (Scales to fewer than 5 concurrent requests).
     /// Serves content directly to the client from memory.
     /// </summary>
-    public class NoCache :ICache, IPlugin {
+    public class NoCache :IAsyncTyrantCache,ICache, IPlugin {
         /// <summary>
         /// Installs the caching system as the first choice.
         /// </summary>
@@ -44,6 +45,17 @@ namespace ImageResizer.Plugins.Basic {
 
         public bool CanProcess(System.Web.HttpContext current, IResponseArgs e) {
             return true;
+        }
+
+        public bool CanProcess(System.Web.HttpContext current, IAsyncResponsePlan e)
+        {
+            return true;
+        }
+
+        public System.Threading.Tasks.Task ProcessAsync(System.Web.HttpContext context, IAsyncResponsePlan e)
+        {
+            context.RemapHandler(new NoCacheAsyncHandler(e));
+            return Task.FromResult(true);
         }
     }
 

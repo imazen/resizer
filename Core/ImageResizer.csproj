@@ -79,7 +79,10 @@
     <Compile Include="ExtensionMethods\Dictionary.cs" />
     <Compile Include="PluginLoadingHints.cs" />
     <Compile Include="Plugins\Basic\MvcRoutingShimPlugin.cs" />
+    <Compile Include="Plugins\Basic\NoCacheAsyncHandler.cs" />
     <Compile Include="Plugins\Basic\StopRoutingRoute.cs" />
+    <Compile Include="Plugins\IAsyncResponsePlan.cs" />
+    <Compile Include="Plugins\IAsyncTyrantCache.cs" />
     <Compile Include="Plugins\IVirtualFileAsync.cs" />
     <Compile Include="Plugins\IVirtualFileCacheAsync.cs" />
     <Compile Include="Plugins\IVirtualFileWithModifiedDateAsync.cs" />
