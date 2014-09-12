@@ -16,6 +16,7 @@ using System.Security.Permissions;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Threading.Tasks;
+using System.Linq;
 using System.IO;
 
 namespace ImageResizer.Configuration {
@@ -23,7 +24,6 @@ namespace ImageResizer.Configuration {
         protected Config c;
         public PipelineConfig(Config c) {
             this.ModuleInstalled = false;
-            this.AsyncModuleInstalled = false;
             this.c = c;
 
             c.Plugins.QuerystringPlugins.Changed += new SafeList<IQuerystringPlugin>.ChangedHandler(urlModifyingPlugins_Changed);
@@ -282,13 +282,19 @@ namespace ImageResizer.Configuration {
                     break;
                 }
             }
-
-            //Now we have a reference to the real virtual file, let's see if it is source-cached.
-            IVirtualFileAsync cached = null;
-            foreach (IVirtualFileCacheAsync p in c.Plugins.GetAll<IVirtualFileCacheAsync>())
+            try
             {
-                cached = await p.GetFileIfCachedAsync(virtualPath, queryString, f);
-                if (cached != null) return cached;
+                //Now we have a reference to the real virtual file, let's see if it is source-cached.
+                IVirtualFileAsync cached = null;
+                foreach (IVirtualFileCacheAsync p in c.Plugins.GetAll<IVirtualFileCacheAsync>())
+                {
+                    cached = await p.GetFileIfCachedAsync(virtualPath, queryString, f);
+                    if (cached != null) return cached;
+                }
+            }catch (FileNotFoundException)
+            {
+                //IVirtualFileCache instances will .Open() and read the original IVirtualFile instance. 
+                return null; 
             }
             return f;
         }
@@ -523,13 +529,30 @@ namespace ImageResizer.Configuration {
 
 
         /// <summary>
-        /// True once the InterceptModule has been installed and is intercepting requests.
+        /// True once the InterceptModule or InterceptModuleAsync has been installed and is intercepting requests.
         /// </summary>
         public bool ModuleInstalled { get; set; }
+
+
+        private bool? _usingAsyncMode;
         /// <summary>
-        /// True once the InterceptModuleAsync has been installed. 
+        /// True if the InterceptModuleAsync has been installed. Null if we can't find out. 
         /// </summary>
-        public bool AsyncModuleInstalled { get; set; }
+        public bool? UsingAsyncMode
+        {
+            get
+            {
+                if (_usingAsyncMode == null && HttpContext.Current != null && HttpContext.Current.ApplicationInstance != null){
+                    var modules = HttpContext.Current.ApplicationInstance.Modules;
+                    IHttpModule[] list = new IHttpModule[modules.Count];
+                    modules.CopyTo(list, 0);
+
+                   _usingAsyncMode =list.Any((s) => s is AsyncInterceptModule);
+                }
+                return _usingAsyncMode;
+            }
+            set { _usingAsyncMode = value; }
+        }
 
         /// <summary>
         /// Returns true if the AppDomain has Unrestricted code access security

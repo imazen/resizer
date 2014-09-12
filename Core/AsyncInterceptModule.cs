@@ -47,7 +47,7 @@ namespace ImageResizer
         {
             var helper = new EventHandlerTaskAsyncHelper(CheckRequest_PostAuthorizeRequest_Async);
             context.AddOnPostAuthorizeRequestAsync(helper.BeginEventHandler, helper.EndEventHandler);
-            conf.AsyncModuleInstalled = true;
+            conf.ModuleInstalled = true;
         }
 
         protected IPipelineConfig conf { get { return Config.Current.Pipeline; } }

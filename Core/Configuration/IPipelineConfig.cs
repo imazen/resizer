@@ -75,9 +75,9 @@ namespace ImageResizer.Configuration {
         /// </summary>
         bool ModuleInstalled { get; set; }
         /// <summary>
-        /// True once the InterceptModuleAsync has been installed. 
+        /// True if we know that InterceptModuleAsync is registered. Null if we don't know.
         /// </summary>
-        bool AsyncModuleInstalled { get; set; }
+        bool? UsingAsyncMode { get; set; }
 
         /// <summary>
         /// Returns the value of Context.Items["resizer.newPath"] if present. If not, returns FilePath + PathInfo.
