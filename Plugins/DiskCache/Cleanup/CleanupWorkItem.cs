@@ -30,7 +30,7 @@ namespace ImageResizer.Plugins.DiskCache {
         public CleanupWorkItem(Kind task, string relativePath, string physicalPath) {
             this.Task = task;
             this.RelativePath = relativePath;
-            this.RelativePath = physicalPath;
+            this.PhysicalPath = physicalPath;
             if (this.RelativePath.StartsWith("/")) {
                 Debug.WriteLine("Invalid relativePath value - should never have leading slash!");
             }
