@@ -94,6 +94,10 @@
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\ImageResizer.Storage\ImageResizer.Storage.csproj">
+      <Project>{80bb303c-8f55-410c-ba91-342ecc435101}</Project>
+      <Name>ImageResizer.Storage</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\MongoReader\ImageResizer.Plugins.MongoReader.csproj">
       <Project>{C8D43F4E-103E-4CD7-B0D9-E97D9F708003}</Project>
       <Name>ImageResizer.Plugins.MongoReader</Name>
