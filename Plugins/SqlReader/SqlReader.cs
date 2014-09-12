@@ -419,6 +419,7 @@ namespace ImageResizer.Plugins.SqlReader
 
 
         public Configuration.Xml.Node RedactFrom(Node resizer) {
+            if (resizer == null || resizer.queryUncached("plugins.add") == null) return resizer;
             foreach (Node n in resizer.queryUncached("plugins.add")) {
                 if (n.Attrs["connectionString"] != null) n.Attrs.Set("connectionString", "[redacted]");
             }

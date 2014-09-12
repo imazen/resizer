@@ -19,7 +19,7 @@ namespace ImageResizer.Plugins.RemoteReader {
     public class RemoteReaderPlugin : BuilderExtension, IPlugin, IVirtualImageProvider, IIssueProvider, IRedactDiagnostics {
 
         public Configuration.Xml.Node RedactFrom(Node resizer) {
-            if (resizer.queryFirst("remoteReader") != null) resizer.setAttr("remoteReader.signingKey", "[redacted]");
+            if (resizer != null && resizer.queryFirst("remoteReader") != null) resizer.setAttr("remoteReader.signingKey", "[redacted]");
 
             return resizer;
         }

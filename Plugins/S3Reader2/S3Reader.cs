@@ -53,6 +53,7 @@ namespace ImageResizer.Plugins.S3Reader2 {
 
 
         public Configuration.Xml.Node RedactFrom(Node resizer) {
+            if (resizer == null || resizer.queryUncached("plugins.add") == null) return resizer;
             foreach (Node n in resizer.queryUncached("plugins.add")) {
                 if (n.Attrs["accessKeyId"] != null) n.Attrs.Set("accessKeyId", "[redacted]");
                 if (n.Attrs["secretAccessKey"] != null) n.Attrs.Set("secretAccessKey", "[redacted]");

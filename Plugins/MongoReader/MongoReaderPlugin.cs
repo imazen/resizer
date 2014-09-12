@@ -109,6 +109,7 @@ namespace ImageResizer.Plugins.MongoReader
         /// <returns></returns>
         public Node RedactFrom(Node resizer)
         {
+            if (resizer == null || resizer.queryUncached("plugins.add") == null) return resizer;
             foreach (var n in resizer.queryUncached("plugins.add"))
             {
                 if (n.Attrs["connectionString"] != null) n.Attrs.Set("connectionString", "[redacted]");
