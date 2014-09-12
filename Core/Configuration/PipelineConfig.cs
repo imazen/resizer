@@ -295,10 +295,12 @@ namespace ImageResizer.Configuration {
             catch (FileNotFoundException)
             {
                 //IVirtualFileCache instances will .Open() and read the original IVirtualFile instance.
-                //We must abstract the differences in thrown exception as much as possible.  Start with FileNotFound
+                //We must abstract the differences in thrown exception as much as possible.  Start with FileNotFound & DirectoryNotFound
                 return null;
 
             }
+            catch (DirectoryNotFoundException)
+            { return null; }
             return f;
         }
 
