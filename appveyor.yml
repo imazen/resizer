@@ -49,14 +49,14 @@ before_build:
   - nuget restore AppVeyor.sln -PackagesDirectory C:\projects\resizer\packages
 
 
-test:
-  # assemblies to test - optional
-  assemblies:
-    - Tests\binaries\**\ImageResizer.Core.Tests.dll
-    - Tests\binaries\**\ImageResizer.CoreFSharp.Tests.dll
-    - Tests\binaries\**\ImageResizer.Plugins.CopyMetadata.Tests.dll
-    - Tests\binaries\**\ImageResizer.AllPlugins.Tests.dll
-    - Tests\**\*.Tests.dll
+test_script:
+  - xunit.console.clr4.exe Tests\binaries\release\ImageResizer.Core.Tests.dll /appveyor
+  - xunit.console.clr4.x86.exe Tests\binaries\release\ImageResizer.Core.Tests.dll /appveyor
+  - xunit.console.clr4.exe Tests\binaries\release\ImageResizer.CoreFSharp.Tests /appveyor
+  - xunit.console.clr4.x86.exe Tests\binaries\release\ImageResizer.CoreFSharp.Tests /appveyor
+  - xunit.console.clr4.x86.exe Tests\binaries\release\ImageResizer.Plugins.CopyMetadata.Tests.dll /appveyor
+  - xunit.console.clr4.exe Tests\binaries\release\ImageResizer.AllPlugins.Tests.dll /appveyor
+
 # scripts to run after build
 #after_build:
 
