@@ -203,12 +203,14 @@ namespace ImageResizer.Plugins.Basic {
 
 			sb.AppendLine("IntegratedPipeline: " + (HttpRuntime.UsingIntegratedPipeline).ToString());
 
-
-            var modules = HttpContext.Current.ApplicationInstance.Modules;
-            sb.AppendLine("\nInstalled HttpModules: \n");
-            foreach (string key in modules.AllKeys)
+            if (HttpContext.Current != null && HttpContext.Current.ApplicationInstance != null && HttpContext.Current.ApplicationInstance.Modules != null)
             {
-                sb.AppendLine(modules.Get(key).GetType().AssemblyQualifiedName + "          (under key" + key + ")");
+                var modules = HttpContext.Current.ApplicationInstance.Modules;
+                sb.AppendLine("\nInstalled HttpModules: \n");
+                foreach (string key in modules.AllKeys)
+                {
+                    sb.AppendLine(modules.Get(key).GetType().AssemblyQualifiedName + "          (under key" + key + ")");
+                }
             }
 
 
