@@ -124,6 +124,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.ProviderTests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.TinyCache.Tests", "Tests\ImageResizer.Plugins.TinyCache.Tests\ImageResizer.Plugins.TinyCache.Tests.csproj", "{36FDAE2B-2D37-454C-8381-2D08CAE44083}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Storage", "Plugins\ImageResizer.Storage\ImageResizer.Storage.csproj", "{80BB303C-8F55-410C-BA91-342ECC435101}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1172,6 +1174,24 @@ Global
 		{36FDAE2B-2D37-454C-8381-2D08CAE44083}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{36FDAE2B-2D37-454C-8381-2D08CAE44083}.Trial|x64.ActiveCfg = Release|Any CPU
 		{36FDAE2B-2D37-454C-8381-2D08CAE44083}.Trial|x86.ActiveCfg = Release|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Release|x64.ActiveCfg = Release|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Release|x86.ActiveCfg = Release|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|x64.ActiveCfg = Release|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
