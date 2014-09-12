@@ -529,7 +529,7 @@ namespace ImageResizer.Configuration {
         /// <summary>
         /// True once the InterceptModuleAsync has been installed. 
         /// </summary>
-        bool AsyncModuleInstalled { get; set; }
+        public bool AsyncModuleInstalled { get; set; }
 
         /// <summary>
         /// Returns true if the AppDomain has Unrestricted code access security
