@@ -113,6 +113,10 @@
       <Project>{10e04bad-889b-4c01-ba0b-fac7ef63b859}</Project>
       <Name>ImageResizer.Plugins.Logging</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\Wic\ImageResizer.Plugins.Wic.csproj">
+      <Project>{4a55b40d-1e0d-4d1f-8d96-25f624847e53}</Project>
+      <Name>ImageResizer.Plugins.Wic</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
