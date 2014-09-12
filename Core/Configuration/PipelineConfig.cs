@@ -15,6 +15,7 @@ using System.Web;
 using System.Security.Permissions;
 using System.Runtime.InteropServices;
 using System.Security;
+using System.IO;
 
 namespace ImageResizer.Configuration {
     public class PipelineConfig : IPipelineConfig, ICacheProvider, ISettingsModifier{
@@ -282,10 +283,21 @@ namespace ImageResizer.Configuration {
             if (f == null) return null;
 
             //Now we have a reference to the real virtual file, let's see if it is source-cached.
-            IVirtualFile cached = null;
-            foreach (IVirtualFileCache p in c.Plugins.GetAll<IVirtualFileCache>()) {
-                cached = p.GetFileIfCached(virtualPath,queryString,f);
-                if (cached != null) return cached;
+            try
+            {
+                IVirtualFile cached = null;
+                foreach (IVirtualFileCache p in c.Plugins.GetAll<IVirtualFileCache>())
+                {
+                    cached = p.GetFileIfCached(virtualPath, queryString, f);
+                    if (cached != null) return cached;
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                //IVirtualFileCache instances will .Open() and read the original IVirtualFile instance.
+                //We must abstract the differences in thrown exception as much as possible.  Start with FileNotFound
+                return null;
+
             }
             return f;
         }
