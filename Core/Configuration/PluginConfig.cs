@@ -16,6 +16,7 @@ using ImageResizer.Collections;
 using ImageResizer.Configuration.Logging;
 using System.Web.Compilation;
 using ImageResizer.Configuration.Plugins;
+using System.Linq;
 
 namespace ImageResizer.Configuration {
     /// <summary>
@@ -44,6 +45,7 @@ namespace ImageResizer.Configuration {
             settingsModifierPlugins = new SafeList<ISettingsModifier>();
             configProviders = new SafeList<ICurrentConfigProvider>();
         }
+        internal PluginLoadingHints hints = new PluginLoadingHints();
 
 		[CLSCompliant(false)]
         protected volatile bool _pluginsLoaded = false;
@@ -368,87 +370,169 @@ namespace ImageResizer.Configuration {
             return assemblies;
         }
 
+        private Tuple<string, string> ParseName(string typeName)
+        {
+            int commaAt = typeName.IndexOf(',');
+            string assemblySearchName = commaAt > -1 ? typeName.Substring(commaAt + 1).Trim() : null;
+            assemblySearchName = string.IsNullOrEmpty(assemblySearchName) ? null : assemblySearchName;
+            string name = commaAt > -1 ? typeName.Substring(0, commaAt).Trim() : typeName.Trim();
+            return new Tuple<string, string>(name, assemblySearchName);
+
+        }
         /// <summary>
         /// Searches all loaded assemblies for the specified type, applying rules and prefixes to resolve the namespace and assembly.
         /// Returns null if it could not find the type, and logs an issue.
         /// </summary>
         /// <param name="searchName"></param>
         /// <returns></returns>
-        public Type FindPluginType(string searchName) {
+        public Type FindPluginType(string searchNameString) {
             Type t = null;
+            List<string> attemptedExpansions = new List<string>();
+            try
+            {
 
-            int commaAt = searchName.IndexOf(',');
-            int dotAt = searchName.IndexOf('.');
+                var searchName = ParseName(searchNameString);
+                bool preloadAssemblies = false;
 
-            //If there is a dot or period, try the exact name first.
-            if (dotAt > -1 || commaAt > -1)
-                t = Type.GetType(searchName, false, true);
+                //Load the assembly if specified.
+                if (preloadAssemblies & searchName.Item2 != null)
+                    Assembly.Load(searchName.Item2);
 
-            if (t != null) return t;
+                int dotAt = searchName.Item1.IndexOf('.');
 
-            //Split the name and assembly apart
-            string assembly = commaAt > -1 ? searchName.Substring(commaAt) : null;
-            string name = commaAt > -1 ? searchName.Substring(0, commaAt) : searchName;
+                //If there is a dot or period, try the exact name first.
+                if (dotAt > -1 || searchName.Item2 != null)
+                {
+                    attemptedExpansions.Add(searchNameString);
+                    t = Type.GetType(searchNameString, false, true);
+                }
 
-            //Without the assembly specified, does it still have a name?
-            bool hasDot = name.IndexOf('.') > -1;
+                if (t != null) return t;
 
-            List<string> alternateNames = new List<string>();
-            //ImageResizer.Plugins.Basic.DefaultEncoder
-            if (hasDot) alternateNames.Add(name);
-            //DefaultEncoder, NoCache, etc.
-            alternateNames.Add("ImageResizer.Plugins.Basic." + name.TrimStart('.'));
-            //Apr4-2012 - Deleted, never used: alternateNames.Add("ImageResizer.Plugins.Pro." + name.TrimStart('.'));
-            //AnimatedGifs
-            if (!hasDot) alternateNames.Add("ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.') + "Plugin");
-            //AnimatedGifsPlugin
-            if (!hasDot && name.EndsWith("Plugin"))
-                alternateNames.Add("ImageResizer.Plugins." + name.Substring(0, name.Length - 6).Trim('.') + "." + name.Trim('.'));
-            //Apr4-2012 - Deleted, never used: //Basic.DefaultEncoder
-            //Apr4-2012 - Deleted, never used: alternateNames.Add("ImageResizer.Plugins." + name.TrimStart('.'));
-            //For the deprecated convention of naming the plugin namespace and class the same.
-            if (!hasDot) alternateNames.Add("ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.'));
-            //Apr4-2012 - Deleted, never used: //Plugins.Basic.DefaultEncoder
-            //Apr4-2012 - Deleted, never used: alternateNames.Add("ImageResizer." + name.TrimStart('.'));
-            //PluginWithNoNamespace
-            if (!hasDot) alternateNames.Add(name);
+                var nameVariations = new[] { searchName.Item1, searchNameString, searchName.Item1.Replace("Plugin", ""), searchNameString.Replace("Plugin", "") }.Distinct(StringComparer.OrdinalIgnoreCase);
 
-            //Get a list of assemblies, sorted by likelyhood of a match
-            List<string> assemblies = GetOptimizedAssemblyList(assembly,name);
-            //Now multiply 
-            List<string> qualifiedNames = new List<string>(assemblies.Count * alternateNames.Count);
+                List<string> officialExpansions = new List<string>();
+                foreach (string nameVariant in nameVariations)
+                {
+                    var expansions = hints.GetExpansions(nameVariant);
+                    if (expansions != null)
+                        officialExpansions.AddRange(expansions);
+                }
 
-            //For each assembly, try each namespace-qualified class name.
-            foreach (string assemblyName in assemblies) {
-                foreach (string className in alternateNames)
-                    qualifiedNames.Add(className + assemblyName);
-            }
+                if (officialExpansions.Count > 0){
+                    foreach (string s in officialExpansions)
+                    {
+                        attemptedExpansions.Add(s);
+                        var parsedName = ParseName(s);
+                        if (preloadAssemblies && parsedName.Item2 != null)
+                        {
+                            Debug.WriteLine("PluginConfig is loading assembly " + parsedName.Item2 + " to try " + parsedName.Item1);
+                            var a = Assembly.Load(parsedName.Item2);
+                            t = a.GetType(parsedName.Item1, false, true);
+                        }
+                        else { 
+                            Debug.WriteLine("Trying " + s);
+                            t = Type.GetType(s, false, true);
+                        }
+                        if (t != null)
+                        {
+                            Debug.WriteLine("Success!");
+                            return t;
+                        }
+                    }
 
-            try {
-                //Now, try them all.
-                foreach (string s in qualifiedNames) {
-                    Debug.WriteLine("Trying " + s);
-                    t = Type.GetType(s, false, true);
-                    if (t != null) {
-                        Debug.WriteLine("Success!");
-                        return t;
+                    var searchedAssemblies = officialExpansions.Select((s) => s.IndexOf(',') > -1 ? s.Substring(s.IndexOf(',') + 1).Trim() : "").Distinct();
+
+                    
+                    StringBuilder attempts = new StringBuilder();
+                    foreach (string s in attemptedExpansions)
+                        attempts.Append(", \"" + s + "\"");
+
+                    StringBuilder assemblyNames = new StringBuilder();
+                    foreach(string s in searchedAssemblies)
+                        assemblyNames.Append("\"" + s + "\" ");
+                    this.AcceptIssue(new Issue("Failed to load plugin by name \"" + searchName + "\"",
+                        "Verify that " + assemblyNames.ToString() + " is located in /bin. \n" +
+                        "Attempted using \"" + searchName + "\"" + attempts.ToString() + ".", IssueSeverity.ConfigurationError));
+
+                }
+                else if (searchName.Item2 != null)
+                {
+                    this.AcceptIssue(new Issue("Failed to load plugin by name \"" + searchName + "\"",
+                        "Verify that \"" + searchName.Item2 + "\".dll is located in /bin, and that the name is spelled correctly.", IssueSeverity.ConfigurationError));
+                }
+                else
+                {
+
+                    List<string> possibleExpansions = new List<string>();
+                    //Split the name  apart
+                    string name = searchName.Item1;
+                    bool hasDot = name.IndexOf('.') > -1;
+
+                    List<string> alternateNames = new List<string>();
+                    //ImageResizer.Plugins.Basic.DefaultEncoder
+                    if (hasDot)
+                    {
+                        alternateNames.Add(name);
+                    }
+                    else
+                    {
+                        if (name.EndsWith("Plugin"))
+                        {
+                            //Standard syntax
+                            alternateNames.Add("ImageResizer.Plugins." + name.Substring(0, name.Length - 6).Trim('.') + "." + name.Trim('.'));
+                        }
+                        else
+                        {
+                            //Standard syntax
+                            alternateNames.Add("ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.') + "Plugin");
+                            //For the deprecated (but still used)convention of naming the plugin namespace and class the same.
+                            alternateNames.Add("ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.'));
+                        }
+                        //PluginWithNoNamespace
+                        alternateNames.Add(name);
+                    }
+
+                    //Get a list of assemblies, sorted by likelyhood of a match
+                    List<string> assemblies = GetOptimizedAssemblyList(searchName.Item2, name);
+                    //Now multiply - For each assembly, try each namespace-qualified class name.
+                    foreach (string assemblyName in assemblies)
+                    {
+                        foreach (string className in alternateNames)
+                            possibleExpansions.Add(className + assemblyName);
+                    }
+
+
+                    foreach (string s in possibleExpansions)
+                    {
+                        attemptedExpansions.Add(s);
+                        Debug.WriteLine("Trying " + s);
+                        t = Type.GetType(s, false, true);
+                        if (t != null)
+                        {
+                            Debug.WriteLine("Success!");
+                            return t;
+                        }
+                    }
+
+
+                    //Ok, time to log problem.
+                    if (t == null)
+                    {
+                        StringBuilder attempts = new StringBuilder();
+                        foreach (string s in attemptedExpansions)
+                            attempts.Append(", \"" + s + "\"");
+                        this.AcceptIssue(new Issue("Failed to load plugin by name \"" + searchName + "\"",
+                            "This is not a recognized plugin name. Check spelling. \n" +
+                            "Attempted using \"" + searchName + "\"" + attempts.ToString() + ".", IssueSeverity.ConfigurationError));
                     }
                 }
+
             } catch (System.Security.SecurityException sx) {
-                this.AcceptIssue(new Issue("Failed to load plugin \"" + searchName + "\" due to ASP.NET trust configuration. ",
+                this.AcceptIssue(new Issue("Failed to load plugin \"" + searchNameString + "\" due to ASP.NET trust configuration. ",
                                 "You may need to increase the trust level for this plugin to load properly. Error details: \n" +
                                 sx.Message + "\n" + sx.StackTrace, IssueSeverity.Error));
                 return null;
-            }
-
-            //Ok, time to log problem.
-            if (t == null) {
-                StringBuilder attempts = new StringBuilder();
-                foreach (string s in qualifiedNames)
-                    attempts.Append(", \"" + s + "\"");
-                this.AcceptIssue(new Issue("Failed to load plugin by name \"" + searchName + "\"",
-                    "Verify the plugin DLL is located in /bin, and that the name is spelled correctly. \n" +
-                    "Attempted using \"" + searchName + "\"" + attempts.ToString() + ".", IssueSeverity.ConfigurationError));
             }
             return t;
         }

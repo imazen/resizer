@@ -76,6 +76,7 @@
     <Compile Include="Collections\QuerystringBase.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
     <Compile Include="ExtensionMethods\Dictionary.cs" />
+    <Compile Include="PluginLoadingHints.cs" />
     <Compile Include="Plugins\Basic\MvcRoutingShimPlugin.cs" />
     <Compile Include="Plugins\Basic\StopRoutingRoute.cs" />
     <Compile Include="Plugins\FileSignature.cs" />
