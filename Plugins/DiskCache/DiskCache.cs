@@ -306,7 +306,7 @@ namespace ImageResizer.Plugins.DiskCache
 
 
         public void Process(HttpContext context, IResponseArgs e) {
-            if (!this.AsyncModuleMode) throw new InvalidOperationException("DiskCache cannot be used in synchronous mode if AsyncModuleMode=true");
+            if (this.AsyncModuleMode) throw new InvalidOperationException("DiskCache cannot be used in synchronous mode if AsyncModuleMode=true");
             CacheResult r = Process(e);
             context.Items["FinalCachedFile"] = r.PhysicalPath;
 
