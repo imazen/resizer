@@ -19,18 +19,13 @@ namespace ImageResizer.Plugins.DiskCache.Cleanup {
                 queue.AddLast(item);
             }
         }
-        private void ValidateItem(CleanupWorkItem item)
-        {
-            if (item.RelativePath == null) throw new ArgumentNullException("item.RelativePath");
-            if (item.PhysicalPath == null) throw new ArgumentNullException("item.PhysicalPath");
-        }
+
         /// <summary>
         /// Queues the item if no other identical items exist in the queue. Returns true if the item was added.
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
         public bool QueueIfUnique(CleanupWorkItem item) {
-            ValidateItem(item);
             lock (_sync) {
                 bool unique = !queue.Contains(item);
                 if (unique) queue.AddLast(item);
@@ -39,13 +34,11 @@ namespace ImageResizer.Plugins.DiskCache.Cleanup {
         }
 
         public bool Exists(CleanupWorkItem item) {
-            ValidateItem(item);
             lock (_sync) {
                 return queue.Contains(item);
             }
         }
         public void Insert(CleanupWorkItem item) {
-            ValidateItem(item);
             lock (_sync) {
                 queue.AddFirst(item);
             }
@@ -54,7 +47,6 @@ namespace ImageResizer.Plugins.DiskCache.Cleanup {
             lock (_sync) {
                 foreach (CleanupWorkItem item in items)
                 {
-                    ValidateItem(item);
                     queue.AddLast(item);
                 }
             }
@@ -69,7 +61,6 @@ namespace ImageResizer.Plugins.DiskCache.Cleanup {
                 ReverseEnumerable<CleanupWorkItem> reversed = new ReverseEnumerable<CleanupWorkItem>(new System.Collections.ObjectModel.ReadOnlyCollection<CleanupWorkItem>(items));
                 foreach (CleanupWorkItem item in reversed)
                 {
-                    ValidateItem(item);
                     queue.AddFirst(item);
 
                 }
