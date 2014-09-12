@@ -5,10 +5,12 @@ using ImageResizer.Plugins.DiskCache;
 using ImageResizer.Util;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Security;
 using System.Security.Permissions;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Hosting;
 
@@ -17,7 +19,7 @@ namespace ImageResizer.Plugins.SourceDiskCache
     /// <summary>
     /// Like DiskCache, but for source files. Not advisable if your source image collection is larger than available local storage.
     /// </summary>
-    public class SourceDiskCachePlugin : IVirtualFileCache, IPlugin, ILoggerProvider
+    public class SourceDiskCachePlugin : IVirtualFileCache, IPlugin, ILoggerProvider, IVirtualFileCacheAsync
     {
         /// <summary>
         /// Creates a new instance of SourceDiskCache
@@ -67,6 +69,7 @@ namespace ImageResizer.Plugins.SourceDiskCache
         
         
         protected CustomDiskCache cache = null;
+        protected AsyncCustomDiskCache asyncCache = null;
         protected CleanupManager cleaner = null;
         protected WebConfigWriter writer = null;
 
@@ -80,7 +83,8 @@ namespace ImageResizer.Plugins.SourceDiskCache
         public IVirtualFile GetFileIfCached(string virtualPath, System.Collections.Specialized.NameValueCollection queryString, IVirtualFile original)
         {
             if (!"disk".Equals(queryString["scache"], StringComparison.OrdinalIgnoreCase)) return null;
-
+            if (!this.AsyncModuleMode) throw new InvalidOperationException("SourceDiskCache cannot be used in synchronous mode if AsyncModuleMode=true");
+            
 
             //Verify web.config exists in the cache folder.
             writer.CheckWebConfigEvery5();
@@ -88,16 +92,17 @@ namespace ImageResizer.Plugins.SourceDiskCache
             //Use alternate cache key if provided
             string key = original is IVirtualFileSourceCacheKey ? ((IVirtualFileSourceCacheKey)original).GetCacheKey(false) : original.VirtualPath;
             //If cached, serve it. 
+            
             var r = cache.GetCachedFile(key, ".cache", delegate(Stream target)
-            {
-                using (Stream data = original.Open())
-                {//Very long-running call
-                    data.CopyToStream(target);
-                }
-            },  15 * 1000,true);
-
+             {
+                 using (Stream data = original.Open())
+                 {//Very long-running call
+                     data.CopyToStream(target);
+                 }
+             }, 15 * 1000, true);
+           
             if (r.Result == CacheQueryResult.Failed)
-                throw new ImageResizer.ImageProcessingException("Failed to acquire a lock on file \"" + r.PhysicalPath + "\" within 15 seconds. Source caching failed.");
+                return null;
 
             if (r.Result == CacheQueryResult.Hit && cleaner != null)
                 cleaner.UsedFile(r.RelativePath, r.PhysicalPath);
@@ -105,6 +110,41 @@ namespace ImageResizer.Plugins.SourceDiskCache
 
             return new SourceVirtualFile(original.VirtualPath,delegate(){
                 return r.Data ?? File.Open(r.PhysicalPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            });
+        }
+
+
+
+        public async Task<IVirtualFileAsync> GetFileIfCachedAsync(string virtualPath, NameValueCollection queryString, IVirtualFileAsync original)
+        {
+            if (!"disk".Equals(queryString["scache"], StringComparison.OrdinalIgnoreCase)) return null;
+            if (!this.AsyncModuleMode) throw new InvalidOperationException("SourceDiskCache cannot be used in asynchronous mode if AsyncModuleMode=false");
+            
+
+            //Verify web.config exists in the cache folder.
+            writer.CheckWebConfigEvery5();
+
+            //Use alternate cache key if provided
+            string key = original is IVirtualFileSourceCacheKey ? ((IVirtualFileSourceCacheKey)original).GetCacheKey(false) : original.VirtualPath;
+            //If cached, serve it. 
+            var r = await asyncCache.GetCachedFile(key, ".cache", async delegate(Stream target)
+            {
+                using (Stream data = await original.OpenAsync())
+                {//Very long-running call
+                    await data.CopyToAsync(target);
+                }
+            }, 15 * 1000, true);
+
+            if (r.Result == CacheQueryResult.Failed)
+                return null;
+
+            if (r.Result == CacheQueryResult.Hit && cleaner != null)
+                cleaner.UsedFile(r.RelativePath, r.PhysicalPath);
+
+
+            return new SourceVirtualFileAsync(original.VirtualPath, delegate()
+            {
+                return Task.FromResult(r.Data ?? File.Open(r.PhysicalPath, FileMode.Open, FileAccess.Read, FileShare.Read));
             });
         }
 
@@ -128,9 +168,35 @@ namespace ImageResizer.Plugins.SourceDiskCache
             }
         }
 
+        public class SourceVirtualFileAsync : IVirtualFileAsync
+        {
+            public delegate Task<Stream> OpenAsyncDelegate();
+            public SourceVirtualFileAsync(string virtualPath, OpenAsyncDelegate streamDelegate)
+            {
+                this.path = virtualPath;
+                this.stream = streamDelegate;
+            }
+            private string path;
+            public string VirtualPath
+            {
+                get { return path; }
+            }
+
+            private OpenAsyncDelegate stream;
+            public Stream Open()
+            {
+                return AsyncUtils.RunSync<Stream>(() => stream());
+            }
+        
+            public Task<Stream> OpenAsync()
+            {
+                return stream();
+            }
+        }
         
         protected ILogger log = null;
         public ILogger Logger { get { return log; } }
+
         /// <summary>
         /// Loads the settings from 'c', starts the cache, and registers the plugin.
         /// Will throw an invalidoperationexception if already started.
@@ -138,6 +204,11 @@ namespace ImageResizer.Plugins.SourceDiskCache
         /// <param name="c"></param>
         /// <returns></returns>
         public IPlugin Install(Config c) {
+            
+            bool? inAsyncMode = c.Pipeline.UsingAsyncMode;
+            if (inAsyncMode == null) throw new InvalidOperationException("You must set Config.Current.Pipeline.UsingAsyncMode before installing SourceDiskCache");
+            this.AsyncModuleMode = inAsyncMode.Value;
+
             if (c.get("diskcache.logging", false)) {
                 if (c.Plugins.LogManager != null) 
                     log = c.Plugins.LogManager.GetLogger("ImageResizer.Plugins.DiskCache");
@@ -188,6 +259,7 @@ namespace ImageResizer.Plugins.SourceDiskCache
             return PathUtils.HasIOPermission(new string[] { PhysicalCacheDir, Path.Combine(PhysicalCacheDir, "web.config") });
         }
 
+        public bool AsyncModuleMode { get; private set; }
 
         /// <summary>
         /// Attempts to start the DiskCache using the current settings. Returns true if succesful or if already started. Returns false on a configuration error.
@@ -203,13 +275,15 @@ namespace ImageResizer.Plugins.SourceDiskCache
 
                 //Init the writer.
                 writer = new WebConfigWriter(this, PhysicalCacheDir);
-                //Init the inner cache
-                cache = new CustomDiskCache(this, PhysicalCacheDir, 512, 1024 * 1024 * 30); //30MB
+
+                if (!AsyncModuleMode) cache = new CustomDiskCache(this, PhysicalCacheDir, 4096, 1024 * 1024 * 30);
+                if (AsyncModuleMode) asyncCache = new AsyncCustomDiskCache(this, PhysicalCacheDir, 4096, 1024 * 1024 * 30);
+
                 //Init the cleanup strategy
                 var cleanupStrategy = new CleanupStrategy(); //Default settings if null
                 cleanupStrategy.TargetItemsPerFolder = 50;
                 //Init the cleanup worker
-                cleaner = new CleanupManager(this, cache, cleanupStrategy);
+                cleaner = new CleanupManager(this, AsyncModuleMode ? (ICleanableCache)asyncCache : (ICleanableCache)cache, cleanupStrategy);
                 //If we're running with subfolders, enqueue the cache root for cleanup (after the 5 minute delay)
                 //so we don't eternally 'skip' files in the root or in other unused subfolders (since only 'accessed' subfolders are ever cleaned ). 
                 if (cleaner != null) cleaner.CleanAll();
