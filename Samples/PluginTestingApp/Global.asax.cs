@@ -5,6 +5,7 @@ using ImageResizer;
 using System.Drawing;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins.RemoteReader;
+using System.Diagnostics;
 
 namespace ComplexWebApplication {
     public class Global : System.Web.HttpApplication {
@@ -12,7 +13,8 @@ namespace ComplexWebApplication {
         protected void Application_Start(object sender, EventArgs e) {
             // Code that runs on application startup
 
-           
+            var sw = Stopwatch.StartNew();
+            
             //This is a URL rewrite rule. It sets the default value of '404' to '~/Sun_256.png' for all requests containing '/propertyimages/'
             Config.Current.Pipeline.RewriteDefaults += delegate(IHttpModule m, HttpContext c, ImageResizer.Configuration.IUrlEventArgs args) {
                 if (args.VirtualPath.IndexOf("/propertyimages/", StringComparison.OrdinalIgnoreCase) > -1)
@@ -31,6 +33,8 @@ namespace ComplexWebApplication {
                     }
                 }
             };
+            sw.Stop();
+            Debug.Write("ImageResizer loaded in " + sw.ElapsedMilliseconds.ToString() + "ms");
 
         }
 
