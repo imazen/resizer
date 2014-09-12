@@ -16,6 +16,7 @@ using ImageResizer.Configuration.Xml;
 using ImageResizer.Storage;
 using ImageResizer.ExtensionMethods;
 using System.Data;
+using System.Threading.Tasks;
 namespace ImageResizer.Plugins.SqlReader
 {
     /// <summary>
@@ -141,7 +142,7 @@ namespace ImageResizer.Plugins.SqlReader
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Stream GetStream(string id)
+        public async Task<Stream> GetStream(string id)
         {
             FireAuthorizeEvent(id);
             SqlConnection conn = GetConnectionObj();
@@ -151,10 +152,10 @@ namespace ImageResizer.Plugins.SqlReader
                 SqlCommand sc = new SqlCommand(ImageBlobQuery, conn);
                 sc.CommandType = QueriesAreStoredProcedures ? System.Data.CommandType.StoredProcedure : System.Data.CommandType.Text;
                 sc.Parameters.Add(CreateIdParameter(id));
-                SqlDataReader sdr = sc.ExecuteReader();
+                SqlDataReader sdr = await sc.ExecuteReaderAsync();
                 using (sdr)
                 {
-                    if (!sdr.Read()) throw new FileNotFoundException("Failed to find the specified image " + id + " in the database"); //0 rows
+                    if (!await sdr.ReadAsync()) throw new FileNotFoundException("Failed to find the specified image " + id + " in the database"); //0 rows
 
                     return sdr.GetSqlBytes(0).Stream; //No connection required for the stream, all cloned in memory.
                 }
@@ -183,7 +184,7 @@ namespace ImageResizer.Plugins.SqlReader
         }
   
 
-        public override IBlobMetadata FetchMetadata(string virtualPath, NameValueCollection queryString)
+        public override async Task<IBlobMetadata> FetchMetadataAsync(string virtualPath, NameValueCollection queryString)
         {
             var id = ParseIdFromVirtualPath(virtualPath);
             SqlConnection conn = GetConnectionObj();
@@ -193,10 +194,10 @@ namespace ImageResizer.Plugins.SqlReader
                 SqlCommand sc = new SqlCommand(ModifiedDateQuery, conn);
                 sc.Parameters.Add(CreateIdParameter(id));
                 sc.CommandType = QueriesAreStoredProcedures ? System.Data.CommandType.StoredProcedure : System.Data.CommandType.Text;
-                SqlDataReader sdr = sc.ExecuteReader();
+                SqlDataReader sdr = await sc.ExecuteReaderAsync();
                 using (sdr)
                 {
-                    if (!sdr.Read())
+                    if (!await sdr.ReadAsync())
                     {
                         return new BlobMetadata() { Exists = false }; //0 rows
                     }
@@ -348,7 +349,7 @@ namespace ImageResizer.Plugins.SqlReader
             return null;
         }
 
-        public override Stream Open(string virtualPath, NameValueCollection queryString)
+        public override Task<Stream> OpenAsync(string virtualPath, NameValueCollection queryString)
         {
             return this.GetStream(ParseIdFromVirtualPath(virtualPath));
         }

@@ -14,6 +14,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using ImageResizer.Storage;
 using ImageResizer.ExtensionMethods;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins.AzureReader2 {
 
@@ -38,7 +39,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
        }
 
 
-        protected ICloudBlob GetBlobRef(string virtualPath)
+        protected Task<ICloudBlob> GetBlobRefAsync(string virtualPath)
         {
             string subPath = StripPrefix(virtualPath).Trim('/', '\\');
 
@@ -53,15 +54,14 @@ namespace ImageResizer.Plugins.AzureReader2 {
             string relativeBlobURL = string.Format("{0}/{1}", CloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\'), subPath);
 
 
-
-            return CloudBlobClient.GetBlobReferenceFromServer(new Uri(relativeBlobURL));
+            return CloudBlobClient.GetBlobReferenceFromServerAsync(new Uri(relativeBlobURL));
         }
-        public override IBlobMetadata FetchMetadata(string virtualPath, NameValueCollection queryString)
+        public override async Task<IBlobMetadata> FetchMetadataAsync(string virtualPath, NameValueCollection queryString)
         {
             
             try
             {
-                var cloudBlob = GetBlobRef(virtualPath);
+                var cloudBlob = await GetBlobRefAsync(virtualPath);
                 
                 var meta = new BlobMetadata();
                 meta.Exists = true; //Otherwise an exception would have happened at FetchAttributes
@@ -85,7 +85,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
             }
         }
 
-        public override Stream Open(string virtualPath, NameValueCollection queryString)
+        public override async Task<Stream> OpenAsync(string virtualPath, NameValueCollection queryString)
         {
 
             MemoryStream ms = new MemoryStream(4096); // 4kb is a good starting point.
@@ -93,8 +93,8 @@ namespace ImageResizer.Plugins.AzureReader2 {
             // Synchronously download
             try
             {
-                var cloudBlob = GetBlobRef(virtualPath);
-                cloudBlob.DownloadToStream(ms);
+                var cloudBlob = await GetBlobRefAsync(virtualPath);
+                await cloudBlob.DownloadToStreamAsync(ms);
             }
             catch (StorageException e)
             {

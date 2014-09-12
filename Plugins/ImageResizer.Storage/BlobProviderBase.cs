@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageResizer.ExtensionMethods;
 using System.IO;
+using System.Web.Hosting;
 
 namespace ImageResizer.Storage
 {
@@ -22,7 +23,7 @@ namespace ImageResizer.Storage
         public bool? Exists { get; set; }
         public DateTime? LastModifiedDateUtc { get; set; } 
     }
-    public abstract class BlobProviderBase : IPlugin, IVirtualImageProvider, IVirtualImageProviderVpp, IRedactDiagnostics
+    public abstract class BlobProviderBase : IPlugin,IVirtualImageProviderAsync, IVirtualImageProvider, IVirtualImageProviderVpp, IRedactDiagnostics
     {
         public BlobProviderBase()
         {
@@ -127,8 +128,8 @@ namespace ImageResizer.Storage
         /// <param name="virtualPath"></param>
         /// <param name="queryString"></param>
         /// <returns></returns>
-        public abstract IBlobMetadata FetchMetadata(string virtualPath, NameValueCollection queryString);
-        public abstract Stream Open(string virtualPath, NameValueCollection queryString);
+        public abstract Task<IBlobMetadata> FetchMetadataAsync(string virtualPath, NameValueCollection queryString);
+        public abstract Task<Stream> OpenAsync(string virtualPath, NameValueCollection queryString);
 
         /// <summary>
         /// Cached access to FetchMetadata. Only provides caching when CacheMetadata=true && MetadataCache != null.
@@ -136,7 +137,7 @@ namespace ImageResizer.Storage
         /// <param name="virtualPath"></param>
         /// <param name="queryString"></param>
         /// <returns></returns>
-        public IBlobMetadata FetchMetadataCached(string virtualPath, NameValueCollection queryString)
+        public async Task<IBlobMetadata> FetchMetadataCachedAsync(string virtualPath, NameValueCollection queryString)
         {
             if (CacheMetadata && MetadataCache != null)
             {
@@ -144,12 +145,12 @@ namespace ImageResizer.Storage
                 var o = MetadataCache.Get(key) as IBlobMetadata;
                 if (o == null)
                 {
-                    o = FetchMetadata(virtualPath, queryString);
+                    o = await FetchMetadataAsync(virtualPath, queryString);
                     MetadataCache.Put(key, o);
                 }
                 return o;
             }else{
-                return FetchMetadata(virtualPath, queryString);
+                return await FetchMetadataAsync(virtualPath, queryString);
             }
         }
 
@@ -169,7 +170,7 @@ namespace ImageResizer.Storage
             set
             {
                 if (!value.EndsWith("/")) value += "/";
-                _virtualFilesystemPrefix = value != null ? PathUtils.ResolveAppRelativeAssumeAppRelative(value) : value;
+                _virtualFilesystemPrefix = value != null && HostingEnvironment.ApplicationVirtualPath != null ? PathUtils.ResolveAppRelativeAssumeAppRelative(value) : value;
 
             }
         }
@@ -193,12 +194,27 @@ namespace ImageResizer.Storage
             if (LazyExistenceCheck)
                 return belongs;
             else
-                return belongs && BlobExists(virtualPath, queryString);
+                return belongs && AsyncUtils.RunSync<bool>( () => BlobExistsAsync(virtualPath, queryString));
         }
 
         public IVirtualFile GetFile(string virtualPath, NameValueCollection queryString)
         {
             if (!FileExists(virtualPath, queryString)) return null;
+            return new Blob(this, virtualPath, queryString);
+        }
+
+        public async Task<bool> FileExistsAsync(string virtualPath, NameValueCollection queryString)
+        {
+            var belongs = Belongs(virtualPath);
+            if (LazyExistenceCheck)
+                return belongs;
+            else
+                return belongs && await BlobExistsAsync(virtualPath, queryString);
+        }
+
+        public async Task<IVirtualFileAsync> GetFileAsync(string virtualPath, NameValueCollection queryString)
+        {
+            if (!await FileExistsAsync(virtualPath, queryString)) return null;
             return new Blob(this, virtualPath, queryString);
         }
 
@@ -208,20 +224,20 @@ namespace ImageResizer.Storage
         /// <param name="subPath"></param>
         /// <param name="queryString"></param>
         /// <returns></returns>
-        public bool BlobExists(string virtualPath, NameValueCollection queryString)
+        public async Task<bool> BlobExistsAsync(string virtualPath, NameValueCollection queryString)
         {
-            var m = FetchMetadataCached(virtualPath, queryString);
+            var m = await FetchMetadataCachedAsync(virtualPath, queryString);
             return m.Exists.Value;
         }
         /// <summary>
-        /// Performs a cached metadata query to get the last modified date (UTC)
+        /// Performs a cached metadata query to get the last modified date (UTC). 
         /// </summary>
         /// <param name="virtualPath"></param>
         /// <param name="q"></param>
         /// <returns></returns>
-        public DateTime? GetModifiedDateUtc(string virtualPath, NameValueCollection queryString)
+        public async Task<DateTime?> GetModifiedDateUtcAsync(string virtualPath, NameValueCollection queryString)
         {
-            var m = FetchMetadataCached(virtualPath, queryString);
+            var m = await FetchMetadataCachedAsync(virtualPath, queryString);
             return m.LastModifiedDateUtc;
         }
 
@@ -239,7 +255,7 @@ namespace ImageResizer.Storage
         public virtual IPlugin Install(Configuration.Config c)
         {
             this.c = c;
-            c.Plugins.Install(this);
+            c.Plugins.add_plugin(this);
 
             c.Pipeline.PostAuthorizeRequestStart +=Pipeline_PostAuthorizeRequestStart; 
             c.Pipeline.RewriteDefaults +=Pipeline_RewriteDefaults;
@@ -284,7 +300,6 @@ namespace ImageResizer.Storage
 
             return c.Plugins.Uninstall(this);
         }
-
 
     }
 }

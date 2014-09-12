@@ -11,6 +11,7 @@ using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using ImageResizer.Storage;
 using ImageResizer.ExtensionMethods;
+using System.Threading.Tasks;
 #endregion
 
 namespace ImageResizer.Plugins.MongoReader
@@ -67,12 +68,12 @@ namespace ImageResizer.Plugins.MongoReader
             get { return _grid; }
         }
 
-        public override IBlobMetadata FetchMetadata(string virtualPath, NameValueCollection queryString)
+        public override Task<IBlobMetadata> FetchMetadataAsync(string virtualPath, NameValueCollection queryString)
         {
-            return new BlobMetadata() { Exists = true }; 
+            return Task.FromResult<IBlobMetadata>(new BlobMetadata() { Exists = true });
         }
 
-        public override Stream Open(string virtualPath, NameValueCollection queryString)
+        public override Task<Stream> OpenAsync(string virtualPath, NameValueCollection queryString)
         {
             var _filename = virtualPath.Substring(VirtualFilesystemPrefix.Length);
             //First try to get it by id, next by filename
@@ -90,10 +91,11 @@ namespace ImageResizer.Plugins.MongoReader
                     if (file == null)
                         throw new FileNotFoundException("Failed to locate blob " + sid + " on GridFS.");
 
-                    return file.OpenRead();
+                    return Task.FromResult<Stream>(file.OpenRead());
                 }
             }
-            return _grid.OpenRead(_filename);
+           
+            return Task.FromResult<Stream>(_grid.OpenRead(_filename));
         }
     }
 }

@@ -1,14 +1,16 @@
 ﻿using ImageResizer.Plugins;
+using ImageResizer.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ImageResizer.Storage
 {
-    public class Blob: IVirtualFile, IVirtualFileSourceCacheKey, IVirtualFileWithModifiedDate
+    public class Blob : IVirtualFile, IVirtualFileAsync, IVirtualFileSourceCacheKey, IVirtualFileWithModifiedDate, IVirtualFileWithModifiedDateAsync   
     {
         public Blob(BlobProviderBase provider, string virtualPath, NameValueCollection queryString)
         {
@@ -29,9 +31,9 @@ namespace ImageResizer.Storage
             protected set;
         }
 
-        public System.IO.Stream Open()
+        public Stream Open()
         {
-            return Provider.Open(VirtualPath, Query);
+            return AsyncUtils.RunSync<Stream>(() => Provider.OpenAsync(VirtualPath, Query));
         }
 
         public string GetCacheKey(bool includeModifiedDate)
@@ -43,15 +45,25 @@ namespace ImageResizer.Storage
         {
             get {
                 if (!Provider.CheckForModifiedFiles) return DateTime.MinValue;
-                var date = Provider.GetModifiedDateUtc(VirtualPath,Query);
-                if (date == null) return DateTime.MinValue;
-                return date.Value;
+                return AsyncUtils.RunSync<DateTime>(() => GetModifiedDateUTCAsync());
             }
         }
 
-        public IBlobMetadata FetchMetadata()
+        public Task<IBlobMetadata> FetchMetadataAsync()
         {
-            return Provider.FetchMetadataCached(VirtualPath, Query);
+            return Provider.FetchMetadataCachedAsync(VirtualPath, Query);
+        }
+
+        public async Task<DateTime> GetModifiedDateUTCAsync()
+        {
+            if (!Provider.CheckForModifiedFiles) return DateTime.MinValue;
+            var date = await Provider.GetModifiedDateUtcAsync(VirtualPath, Query);
+            return date != null ? date.Value : DateTime.MinValue;
+        }
+
+        public Task<System.IO.Stream> OpenAsync()
+        {
+            return Provider.OpenAsync(VirtualPath, Query);
         }
     }
 }

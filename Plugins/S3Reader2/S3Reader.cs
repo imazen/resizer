@@ -15,6 +15,7 @@ using ImageResizer.Configuration.Xml;
 using ImageResizer.Storage;
 using Amazon.S3.Model;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins.S3Reader2 {
     public class S3Reader2 : BlobProviderBase, IMultiInstancePlugin, IRedactDiagnostics {
@@ -111,7 +112,7 @@ namespace ImageResizer.Plugins.S3Reader2 {
             return e;
         }
 
-        public override IBlobMetadata FetchMetadata(string virtualPath, NameValueCollection queryString)
+        public override async Task<IBlobMetadata> FetchMetadataAsync(string virtualPath, NameValueCollection queryString)
         {
             var path = ParseAndFilterPath(virtualPath);
             //Looks like we have to execute a head request
@@ -119,7 +120,7 @@ namespace ImageResizer.Plugins.S3Reader2 {
 
             try
             {
-                GetObjectMetadataResponse response = S3Client.GetObjectMetadata(request);
+                GetObjectMetadataResponse response = await S3Client.GetObjectMetadataAsync(request);
 
                 return new BlobMetadata(){ Exists = true, LastModifiedDateUtc = response.LastModified};
             }
@@ -135,15 +136,15 @@ namespace ImageResizer.Plugins.S3Reader2 {
 
 
 
-        public override Stream Open(string virtualPath, NameValueCollection queryString)
+        public override async Task<Stream> OpenAsync(string virtualPath, NameValueCollection queryString)
         {
             var path = ParseAndFilterPath(virtualPath);
             //Synchronously download to memory stream
             try {
                 var req = new Amazon.S3.Model.GetObjectRequest() { BucketName = path.Bucket, Key = path.Key };
 
-                using (var s = S3Client.GetObject(req)){
-                    return s.ResponseStream.CopyToMemoryStream();
+                using (var s = await S3Client.GetObjectAsync(req)){
+                    return (Stream) await s.ResponseStream.CopyToMemoryStreamAsync();
                 }
             } catch (AmazonS3Exception se) {
                 if (se.StatusCode == System.Net.HttpStatusCode.NotFound || "NoSuchKey".Equals(se.ErrorCode, StringComparison.OrdinalIgnoreCase)) throw new FileNotFoundException("Amazon S3 file not found", se);
