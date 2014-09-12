@@ -58,6 +58,7 @@
     </Compile>
     <Compile Include="Async\AsyncWriteCollection.cs" />
     <Compile Include="Async\AsyncWrite.cs" />
+    <Compile Include="LockProvider.cs" />
     <Compile Include="OutputMemCache\MemCache.cs" />
     <Compile Include="OutputMemCache\MemCacheHandler.cs" />
     <Compile Include="OutputMemCache\MemCacheResult.cs" />
@@ -75,7 +76,7 @@
     <Compile Include="CustomDiskCache.cs" />
     <Compile Include="DiskCache.cs" />
     <Compile Include="Cleanup\CleanupStrategy.cs" />
-    <Compile Include="LockProvider.cs" />
+    <Compile Include="AsyncLockProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SourceMemCache\SourceMemCache.cs" />
     <Compile Include="UrlHasher.cs" />
