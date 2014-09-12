@@ -15,6 +15,7 @@ using ImageResizer.Plugins.Basic;
 using System.Security.Permissions;
 using System.Security;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins.DiskCache
 {
@@ -33,7 +34,7 @@ namespace ImageResizer.Plugins.DiskCache
     /// <summary>
     /// Provides methods for creating, maintaining, and securing the disk cache. 
     /// </summary>
-    public class DiskCache: ICache, IPlugin, IIssueProvider, ILoggerProvider
+    public class DiskCache: IAsyncTyrantCache, ICache, IPlugin, IIssueProvider, ILoggerProvider
     {
         private int subfolders = 8192;
         /// <summary>
@@ -171,7 +172,10 @@ namespace ImageResizer.Plugins.DiskCache
             AsyncBufferSize = c.get("diskcache.asyncBufferSize", AsyncBufferSize);
             AsyncWrites = c.get("diskcache.asyncWrites", AsyncWrites);
             CleanupStrategy.LoadFrom(c.getNode("cleanupStrategy"));
+            AsyncModuleMode = c.get("diskcache.asyncModuleMode", AsyncModuleMode);
         }
+       
+        public bool AsyncModuleMode {get; private set; }
 
         protected ILogger log = null;
         public ILogger Logger { get { return log; } }
@@ -233,6 +237,7 @@ namespace ImageResizer.Plugins.DiskCache
         }
         
         protected CustomDiskCache cache = null;
+        protected AsyncCustomDiskCache asyncCache = null;
         protected CleanupManager cleaner = null;
         protected WebConfigWriter writer = null;
 
@@ -255,11 +260,13 @@ namespace ImageResizer.Plugins.DiskCache
                 //Init the writer.
                 writer = new WebConfigWriter(this,PhysicalCacheDir);
                 //Init the inner cache
-                cache = new CustomDiskCache(this, PhysicalCacheDir, Subfolders,AsyncBufferSize);
+                if (!AsyncModuleMode) cache = new CustomDiskCache(this, PhysicalCacheDir, Subfolders,AsyncBufferSize);
+                if (AsyncModuleMode) asyncCache = new AsyncCustomDiskCache(this, PhysicalCacheDir, Subfolders, AsyncBufferSize);
+
                 //Init the cleanup strategy
                 if (AutoClean && cleanupStrategy == null) cleanupStrategy = new CleanupStrategy(); //Default settings if null
                 //Init the cleanup worker
-                if (AutoClean) cleaner = new CleanupManager(this, cache, cleanupStrategy);
+                if (AutoClean) cleaner = new CleanupManager(this, AsyncModuleMode ? (ICleanableCache)asyncCache : (ICleanableCache)cache, cleanupStrategy);
                 //If we're running with subfolders, enqueue the cache root for cleanup (after the 5 minute delay)
                 //so we don't eternally 'skip' files in the root or in other unused subfolders (since only 'accessed' subfolders are ever cleaned ). 
                 if (cleaner != null) cleaner.CleanAll();
@@ -285,6 +292,12 @@ namespace ImageResizer.Plugins.DiskCache
             if (((ResizeSettings)e.RewrittenQuerystring).Cache == ServerCacheMode.No) return false;
             return Started;//Add support for nocache
         }
+        public bool CanProcess(HttpContext current, IAsyncResponsePlan e)
+        {
+            //Disk caching will 'pass on' caching requests if 'cache=no'.
+            if (new Instructions(e.RewrittenQuerystring).Cache == ServerCacheMode.No) return false;
+            return Started;//Add support for nocache
+        }
 
 
         public void Process(HttpContext context, IResponseArgs e) {
@@ -306,6 +319,52 @@ namespace ImageResizer.Plugins.DiskCache
                 };
                 context.RemapHandler(new NoCacheHandler(e));
             }
+        }
+        public async Task ProcessAsync(HttpContext context, IAsyncResponsePlan e)
+        {
+            CacheResult r = await ProcessAsync(e);
+            context.Items["FinalCachedFile"] = r.PhysicalPath;
+
+            if (r.Data == null)
+            {
+
+                //Calculate the virtual path
+                string virtualPath = VirtualCacheDir.TrimEnd('/') + '/' + r.RelativePath.Replace('\\', '/').TrimStart('/');
+
+                //Rewrite to cached, resized image.
+                context.RewritePath(virtualPath, false);
+            }
+            else
+            {
+                //Remap the response args writer to use the existing stream.
+                e.CreateAndWriteResultAsync = delegate(Stream s, IAsyncResponsePlan plan)
+                {
+                    return ((MemoryStream)r.Data).CopyToAsync(s);
+                };
+                context.RemapHandler(new NoCacheAsyncHandler(e));
+            }
+        }
+
+
+        public async Task<CacheResult> ProcessAsync(IAsyncResponsePlan e)
+        {
+
+            //Verify web.config exists in the cache folder.
+            writer.CheckWebConfigEvery5();
+
+            //Cache the data to disk and return a path.
+            CacheResult r = await asyncCache.GetCachedFile(e.RequestCachingKey, e.EstimatedFileExtension, async delegate(Stream outStream){
+                await e.CreateAndWriteResultAsync(outStream, e);
+            }, CacheAccessTimeout, AsyncWrites);
+
+            //Fail
+            if (r.Result == CacheQueryResult.Failed)
+                throw new ImageResizer.ImageProcessingException("Failed to acquire a lock on file \"" + r.PhysicalPath + "\" within " + CacheAccessTimeout + "ms. Caching failed.");
+
+            if (r.Result == CacheQueryResult.Hit && cleaner != null)
+                cleaner.UsedFile(r.RelativePath, r.PhysicalPath);
+
+            return r;
         }
 
         public CacheResult Process(IResponseArgs e) {
@@ -387,5 +446,7 @@ namespace ImageResizer.Plugins.DiskCache
 
             return issues;
         }
+    
+
     }
 }

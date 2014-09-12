@@ -15,7 +15,7 @@ namespace ImageResizer.Plugins.DiskCache {
     /// Only keeps key/lock pairs in memory which are in use.
     /// Thread-safe.
     /// </summary>
-    public class LockProvider {
+    public class LockProvider:ILockProvider {
 
         /// <summary>
         /// The only objects in this collection should be for open files. 

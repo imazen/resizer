@@ -18,7 +18,7 @@ namespace ImageResizer.Plugins.DiskCache {
         EventWaitHandle _quitWait = new AutoResetEvent(false);
         CleanupStrategy cs = null;
         CleanupQueue queue = null;
-        CustomDiskCache cache = null;
+        ICleanableCache cache = null;
         ILoggerProvider lp = null;
         /// <summary>
         /// Creates and starts a thread that consumes the queue, pausing until notified when 'queue' empties.
@@ -26,8 +26,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="cs"></param>
         /// <param name="queue"></param>
         /// <param name="cache"></param>
-        /// <param name="lp"></param>
-        public CleanupWorker(ILoggerProvider lp, CleanupStrategy cs, CleanupQueue queue, CustomDiskCache cache):base("DiskCache-CleanupWorker") {
+        public CleanupWorker(ILoggerProvider lp, CleanupStrategy cs, CleanupQueue queue, ICleanableCache cache):base("DiskCache-CleanupWorker") {
             this.cs = cs;
             this.queue = queue;
             this.cache = cache;

@@ -58,6 +58,9 @@
     </Compile>
     <Compile Include="Async\AsyncWriteCollection.cs" />
     <Compile Include="Async\AsyncWrite.cs" />
+    <Compile Include="AsyncCustomDiskCache.cs" />
+    <Compile Include="ICleanableCache.cs" />
+    <Compile Include="ILockProvider.cs" />
     <Compile Include="LockProvider.cs" />
     <Compile Include="OutputMemCache\MemCache.cs" />
     <Compile Include="OutputMemCache\MemCacheHandler.cs" />

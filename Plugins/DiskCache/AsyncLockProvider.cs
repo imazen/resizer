@@ -17,7 +17,7 @@ namespace ImageResizer.Plugins.DiskCache {
     /// Thread-safe.
     /// Uses SemaphoreSlim instead of locks to be thread-context agnostic.
     /// </summary>
-    public class AsyncLockProvider {
+    public class AsyncLockProvider:ILockProvider {
 
         /// <summary>
         /// The only objects in this collection should be for open files. 
@@ -42,6 +42,10 @@ namespace ImageResizer.Plugins.DiskCache {
             }
         }
 
+        public bool TryExecute(string key, int timeoutMs, LockCallback success)
+        {
+            return TryExecuteAsync(key, timeoutMs, delegate() { success();  return Task.FromResult(false); }).Result;
+        }
 
         /// <summary>
         /// Attempts to execute the 'success' callback inside a lock based on 'key'.  If successful, returns true.
@@ -52,7 +56,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="success"></param>
         /// <param name="failure"></param>
         /// <param name="timeoutMs"></param>
-        public async Task<bool> TryExecute(string key, int timeoutMs, AsyncLockCallback success)
+        public async Task<bool> TryExecuteAsync(string key, int timeoutMs, AsyncLockCallback success)
         {
             //Record when we started. We don't want an infinite loop.
             DateTime startedAt = DateTime.UtcNow;

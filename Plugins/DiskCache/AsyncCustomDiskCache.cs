@@ -9,24 +9,28 @@ using System.Diagnostics;
 using System.Threading;
 using ImageResizer.Plugins.DiskCache.Async;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins.DiskCache {
-    public delegate void CacheResultHandler(ICleanableCache sender, CacheResult r);
 
     /// <summary>
     /// Handles access to a disk-based file cache. Handles locking and versioning. 
     /// Supports subfolders for scalability.
     /// </summary>
-    public class CustomDiskCache:ICleanableCache {
+    public class AsyncCustomDiskCache:ICleanableCache {
+
+        public delegate Task AsyncWriteResult(Stream output);
+
         public string PhysicalCachePath { get; protected set; }
         protected int subfolders;
         protected ILoggerProvider lp;
-        public CustomDiskCache(ILoggerProvider lp, string physicalCachePath, int subfolders):this(lp,physicalCachePath,subfolders, 1024*1024*10) {
+        public AsyncCustomDiskCache(ILoggerProvider lp, string physicalCachePath, int subfolders):this(lp,physicalCachePath,subfolders, 1024*1024*10) {
 
         }
-        public CustomDiskCache(ILoggerProvider lp, string physicalCachePath, int subfolders, long asyncMaxQueuedBytes) {
-            Locks = new LockProvider();
-            QueueLocks = new LockProvider();
+        public AsyncCustomDiskCache(ILoggerProvider lp, string physicalCachePath, int subfolders, long asyncMaxQueuedBytes)
+        {
+            Locks = new AsyncLockProvider();
+            QueueLocks = new AsyncLockProvider();
             Index = new CacheIndex();
             CurrentWrites = new AsyncWriteCollection();
             this.lp = lp;
@@ -68,7 +72,8 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="writeCallback">A method that accepts a Stream argument and writes the data to it.</param>
         /// =<param name="timeoutMs"></param>
         /// <returns></returns>
-        public CacheResult GetCachedFile(string keyBasis, string extension, ResizeImageDelegate writeCallback,  int timeoutMs) {
+        public Task<CacheResult> GetCachedFile(string keyBasis, string extension, AsyncWriteResult writeCallback, int timeoutMs)
+        {
             return GetCachedFile(keyBasis, extension, writeCallback,  timeoutMs, false);
         }
 
@@ -82,9 +87,9 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="extension"></param>
         /// <param name="writeCallback"></param>
         /// <param name="timeoutMs"></param>
-        /// <param name="asynchronous"></param>
         /// <returns></returns>
-        public CacheResult GetCachedFile(string keyBasis, string extension, ResizeImageDelegate writeCallback,  int timeoutMs, bool asynchronous) {
+        public async Task<CacheResult> GetCachedFile(string keyBasis, string extension, AsyncWriteResult writeCallback, int timeoutMs, bool asynchronous)
+        {
             Stopwatch sw = null;
             if (lp.Logger != null) { sw = new Stopwatch(); sw.Start(); }
 
@@ -110,7 +115,7 @@ namespace ImageResizer.Plugins.DiskCache {
                 //On the first check, verify the file exists using System.IO directly (the last 'true' parameter)
                 //May throw an IOException if the file cannot be opened, and is locked by an external processes for longer than timeoutMs. 
                 //This method may take longer than timeoutMs under absolute worst conditions. 
-                if (!TryWriteFile(result, physicalPath, relativePath, writeCallback, timeoutMs, !mayBeLocked)) {
+                if (!await TryWriteFile(result, physicalPath, relativePath, writeCallback, timeoutMs, !mayBeLocked)) {
                     //On failure
                     result.Result = CacheQueryResult.Failed;
                 }
@@ -122,8 +127,8 @@ namespace ImageResizer.Plugins.DiskCache {
                 //This prevents two identical requests from duplicating efforts. Different requests don't lock.
 
                 //Lock execution using relativePath as the sync basis. Ignore casing differences. This prevents duplicate entries in the write queue and wasted CPU/RAM usage.
-                if (!QueueLocks.TryExecute(relativePath.ToUpperInvariant(), timeoutMs,
-                    delegate() {
+                if (!await ((AsyncLockProvider)QueueLocks).TryExecuteAsync(relativePath.ToUpperInvariant(), timeoutMs,
+                    async delegate() {
 
                         //Now, if the item we seek is in the queue, we have a memcached hit. If not, we should check the index. It's possible the item has been written to disk already.
                         //If both are a miss, we should see if there is enough room in the write queue. If not, switch to in-thread writing. 
@@ -143,7 +148,7 @@ namespace ImageResizer.Plugins.DiskCache {
                             //Still a miss, we even rechecked the filesystem. Write to memory.
                             MemoryStream ms = new MemoryStream(4096);  //4K initial capacity is minimal, but this array will get copied around alot, better to underestimate.
                             //Read, resize, process, and encode the image. Lots of exceptions thrown here.
-                            writeCallback(ms);
+                            await writeCallback(ms);
                             ms.Position = 0;
 
                             AsyncWrite w = new AsyncWrite(CurrentWrites,ms, physicalPath, relativePath);
@@ -152,8 +157,9 @@ namespace ImageResizer.Plugins.DiskCache {
                                     Stopwatch swio = new Stopwatch();
                                     
                                     swio.Start();
-                                    //TODO: perhaps a different timeout?
-                                    if (!TryWriteFile(null, job.PhysicalPath, job.Key, delegate(Stream s) { ((MemoryStream)job.GetReadonlyStream()).WriteTo(s); }, timeoutMs, true)) {
+                                    //We want this to run synchronously, since it's in a background thread already.
+                                    if (!TryWriteFile(null, job.PhysicalPath, job.Key, delegate(Stream s) { ((MemoryStream)job.GetReadonlyStream()).CopyToAsync(s); return Task.FromResult(true); }, timeoutMs, true).Result)
+                                    {
                                         swio.Stop();
                                         //We failed to lock the file.
                                         if (lp.Logger != null) 
@@ -181,7 +187,7 @@ namespace ImageResizer.Plugins.DiskCache {
                                 //We failed to queue it - either the ThreadPool was exhausted or we exceeded the MB limit for the write queue.
                                 //Write the MemoryStream to disk using the normal method.
                                 //This is nested inside a queuelock because if we failed here, the next one will also. Better to force it to wait until the file is written to disk.
-                                if (!TryWriteFile(result, physicalPath, relativePath, delegate(Stream s) { ms.WriteTo(s); }, timeoutMs, false)) {
+                                if (!await TryWriteFile(result, physicalPath, relativePath, async delegate(Stream s) { await ms.CopyToAsync(s); }, timeoutMs, false)) {
                                     if (lp.Logger != null)
                                         lp.Logger.Warn("Failed to queue async write, also failed to lock for sync writing: {0}", result.RelativePath);
                                         
@@ -214,10 +220,12 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="physicalPath"></param>
         /// <param name="relativePath"></param>
         /// <param name="writeCallback"></param>
+        /// <param name="sourceModifiedUtc"></param>
         /// <param name="timeoutMs"></param>
         /// <param name="recheckFS"></param>
         /// <returns></returns>
-        private bool TryWriteFile(CacheResult result, string physicalPath, string relativePath, ResizeImageDelegate writeCallback, int timeoutMs, bool recheckFS) {
+        private async Task<bool> TryWriteFile(CacheResult result, string physicalPath, string relativePath, AsyncWriteResult writeCallback, int timeoutMs, bool recheckFS)
+        {
 
             
             bool miss = true;
@@ -228,8 +236,8 @@ namespace ImageResizer.Plugins.DiskCache {
                
 
             //Lock execution using relativePath as the sync basis. Ignore casing differences. This locking is process-local, but we also have code to handle file locking.
-            return Locks.TryExecute(relativePath.ToUpperInvariant(), timeoutMs,
-                delegate() {
+            return await ((AsyncLockProvider)Locks).TryExecuteAsync(relativePath.ToUpperInvariant(), timeoutMs,
+                async delegate() {
 
                     //On the second check, use cached data for speed. The cached data should be updated if another thread updated a file (but not if another process did).
                     if (!Index.exists(relativePath, physicalPath)) {
@@ -248,6 +256,8 @@ namespace ImageResizer.Plugins.DiskCache {
                         //TODO: Catch UnathorizedAccessException and log issue about file permissions.
                         //... If we can wait for a read handle for a specified timeout.
 
+                        IOException locked_exception = null;
+
                         try
                         {
                             string tempFile = physicalPath + ".tmp_" + new Random().Next(int.MaxValue).ToString("x") + ".tmp";
@@ -259,7 +269,8 @@ namespace ImageResizer.Plugins.DiskCache {
                                 using (fs)
                                 {
                                     //Run callback to write the cached data
-                                    writeCallback(fs); //Can throw any number of exceptions.
+                                    await writeCallback(fs); //Can throw any number of exceptions.
+                                    await fs.FlushAsync();
                                     fs.Flush(true);
                                     finished = true;
                                 }
@@ -303,28 +314,39 @@ namespace ImageResizer.Plugins.DiskCache {
                         catch (IOException ex)
                         {
 
-                            if (IsFileLocked(ex)) {
-                                //Somehow in between verifying the file didn't exist and trying to create it, the file was created and locked by someone else.
-                                //When hashModifiedDate==true, we don't care what the file contains, we just want it to exist. If the file is available for 
-                                //reading within timeoutMs, simply do nothing and let the file be returned as a hit.
-                                Stopwatch waitForFile = new Stopwatch();
-                                bool opened = false;
-                                while (!opened && waitForFile.ElapsedMilliseconds < timeoutMs) {
-                                    waitForFile.Start();
-                                    try {
-                                        using (FileStream temp = new FileStream(physicalPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                                            opened = true;
-                                    } catch (IOException iex) {
-                                        if (IsFileLocked(iex))
-                                            Thread.Sleep((int)Math.Min(30, Math.Round((float)timeoutMs / 3.0)));
-                                        else throw iex;
-                                    }
-                                    waitForFile.Stop();
-                                }
-                                if (!opened) throw; //By not throwing an exception, it is considered a hit by the rest of the code.
-
-                            } else throw;
+                            if (IsFileLocked(ex)) locked_exception = ex;
+                             else throw;
                         }
+                        if (locked_exception != null)
+                        {
+                            //Somehow in between verifying the file didn't exist and trying to create it, the file was created and locked by someone else.
+                            //When hashModifiedDate==true, we don't care what the file contains, we just want it to exist. If the file is available for 
+                            //reading within timeoutMs, simply do nothing and let the file be returned as a hit.
+                            Stopwatch waitForFile = new Stopwatch();
+                            bool opened = false;
+                            while (!opened && waitForFile.ElapsedMilliseconds < timeoutMs)
+                            {
+                                waitForFile.Start();
+                                bool waitABitMore = false;
+                                try
+                                {
+                                    using (FileStream temp = new FileStream(physicalPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                                        opened = true;
+                                }
+                                catch (IOException iex)
+                                {
+                                    if (IsFileLocked(iex))
+                                        waitABitMore = true;
+
+                                    else throw iex;
+                                }
+                                if (waitABitMore) { await Task.Delay((int)Math.Min(30, Math.Round((float)timeoutMs / 3.0))); }
+                                waitForFile.Stop();
+                            }
+                            if (!opened) throw locked_exception; //By not throwing an exception, it is considered a hit by the rest of the code.
+
+                        }
+
 
                     }
                 });

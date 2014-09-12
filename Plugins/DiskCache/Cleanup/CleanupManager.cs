@@ -11,19 +11,19 @@ namespace ImageResizer.Plugins.DiskCache {
 
    
     public class CleanupManager:IIssueProvider, IDisposable {
-        protected CustomDiskCache cache = null;
+        protected ICleanableCache cache = null;
         protected CleanupStrategy cs = null;
         protected CleanupQueue queue = null;
         protected CleanupWorker worker = null;
 
         protected ILoggerProvider lp = null;
-        public CleanupManager(ILoggerProvider lp, CustomDiskCache cache, CleanupStrategy cs) {
+        public CleanupManager(ILoggerProvider lp, ICleanableCache cache, CleanupStrategy cs) {
             this.cache = cache;
             this.cs = cs;
             this.lp = lp;
             queue = new CleanupQueue();
             //Called each request
-            cache.CacheResultReturned += delegate(CustomDiskCache sender, CacheResult r) {
+            cache.CacheResultReturned += delegate(ICleanableCache sender, CacheResult r) {
                 if (r.Result == CacheQueryResult.Miss)
                     this.AddedFile(r.RelativePath); //It was either updated or added.
                 else
