@@ -37,7 +37,7 @@ namespace DatabaseSampleCSharp
 
             //This is example code for protecting authorization 
             Config.Current.Plugins.LoadPlugins();
-            Config.Current.Plugins.Get<SqlReaderPlugin>().Settings.BeforeAccess += delegate(string id) {
+            Config.Current.Plugins.Get<SqlReaderPlugin>().BeforeAccess += delegate(string id) {
                 bool allowed = true;
                 //INSERT HERE: execute query or whatever to check authorization to view this files
                 //  SqlParameter pId = Config.Current.Plugins.Get<SqlReaderPlugin>().CreateIdParameter(id);

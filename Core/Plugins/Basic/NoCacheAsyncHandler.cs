@@ -22,7 +22,7 @@ namespace ImageResizer.Plugins.Basic
             this.e = e;
         }
 
-        protected Task ProcessRequestAsync(HttpContext context){
+         public override Task ProcessRequestAsync(HttpContext context){
             context.Response.StatusCode = 200;
             context.Response.BufferOutput = true; //Same as .Buffer. Allows bitmaps to be disposed quicker.
             context.Response.ContentType = e.EstimatedContentType;
