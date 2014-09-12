@@ -219,8 +219,8 @@ namespace ImageResizer.Plugins.DiskCache {
                     DoTask(queue.Pop());
                 } catch (Exception e) {
                     if (Debugger.IsAttached) throw;
-                    if (lp.Logger != null) lp.Logger.Error("Failed exeuting task {0}", e.Message + e.StackTrace);
-                    this.AcceptIssue(new Issue("Failed exeuting task", e.Message + e.StackTrace, IssueSeverity.Critical));
+                    if (lp.Logger != null) lp.Logger.Error("Failed executing task {0}", e.Message + e.StackTrace);
+                    this.AcceptIssue(new Issue("Failed executing task", e.Message + e.StackTrace, IssueSeverity.Critical));
                 }
             }
             return true;
@@ -324,13 +324,13 @@ namespace ImageResizer.Plugins.DiskCache {
         }
 
 
-        protected void CleanFolder(CleanupWorkItem item, bool recursvie) {
+        protected void CleanFolder(CleanupWorkItem item, bool recursive) {
             //If we don't have an up-to-date folder level, we can't work..
             if (!cache.Index.GetIsValid(item.RelativePath)) {
                 //Put this task back where it was, but with a 'populate/populaterecursive' right before it.
                 //We could actually make this Populate non-recursive, since the recursive Clean would just insert Populates beforehand anyway.
                 queue.InsertRange(new CleanupWorkItem[]{
-                        new CleanupWorkItem(recursvie ? CleanupWorkItem.Kind.PopulateFolderRecursive : CleanupWorkItem.Kind.PopulateFolder,item.RelativePath,item.PhysicalPath),
+                        new CleanupWorkItem(recursive ? CleanupWorkItem.Kind.PopulateFolderRecursive : CleanupWorkItem.Kind.PopulateFolder,item.RelativePath,item.PhysicalPath),
                         item});
                 return;
             }
