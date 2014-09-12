@@ -197,6 +197,11 @@ namespace ImageResizer.Plugins.DiskCache
                         if (log != null) log = c.Plugins.LogManager.GetLogger("ImageResizer.Plugins.DiskCache");
                     };
             }
+
+            bool? inAsyncMode = c.Pipeline.UsingAsyncMode;
+            if (inAsyncMode == null) throw new InvalidOperationException("You must set Config.Current.Pipeline.UsingAsyncMode before installing DiskCache");
+            this.AsyncModuleMode = inAsyncMode.Value;
+
             LoadSettings(c);
             Start();
             c.Pipeline.AuthorizeImage += Pipeline_AuthorizeImage;
@@ -301,7 +306,7 @@ namespace ImageResizer.Plugins.DiskCache
 
 
         public void Process(HttpContext context, IResponseArgs e) {
-
+            if (!this.AsyncModuleMode) throw new InvalidOperationException("DiskCache cannot be used in synchronous mode if AsyncModuleMode=true");
             CacheResult r = Process(e);
             context.Items["FinalCachedFile"] = r.PhysicalPath;
 
@@ -322,6 +327,7 @@ namespace ImageResizer.Plugins.DiskCache
         }
         public async Task ProcessAsync(HttpContext context, IAsyncResponsePlan e)
         {
+            if (!this.AsyncModuleMode) throw new InvalidOperationException("DiskCache cannot be used in asynchronous mode if AsyncModuleMode=false");
             CacheResult r = await ProcessAsync(e);
             context.Items["FinalCachedFile"] = r.PhysicalPath;
 
@@ -346,7 +352,7 @@ namespace ImageResizer.Plugins.DiskCache
         }
 
 
-        public async Task<CacheResult> ProcessAsync(IAsyncResponsePlan e)
+        private async Task<CacheResult> ProcessAsync(IAsyncResponsePlan e)
         {
 
             //Verify web.config exists in the cache folder.
