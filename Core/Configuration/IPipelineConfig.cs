@@ -106,6 +106,8 @@ namespace ImageResizer.Configuration {
         /// <returns></returns>
         ICacheProvider GetCacheProvider();
 
+        IAsyncTyrantCache GetAsyncCacheFor(HttpContext context, IAsyncResponsePlan plan);
+
 		/// <summary>
         /// Returns an IVirtualFile instance if the specified file exists.
 		/// </summary>

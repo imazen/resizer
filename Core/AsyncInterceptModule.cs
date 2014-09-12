@@ -17,11 +17,27 @@ using System.Web;
 using System.Web.Hosting;
 using System.Web.Security;
 using ImageResizer.ExtensionMethods;
+using System.Globalization;
 
 namespace ImageResizer
 {
     public class AsyncInterceptModule : IHttpModule
     {
+
+        public class AsyncResponsePlan:IAsyncResponsePlan{
+
+            public string EstimatedContentType { get; set; }
+
+            public string EstimatedFileExtension { get; set; }
+
+            public string RequestCachingKey { get; set; }
+
+            public NameValueCollection RewrittenQuerystring { get; set; }
+
+            public ReadStreamAsyncDelegate OpenSourceStreamAsync{get;set;}
+
+            public WriteResultAsyncDelegate CreateAndWriteResultAsync{get;set;}
+        }
         public void Dispose()
         {
             
@@ -112,7 +128,7 @@ namespace ImageResizer
                     //Does the file exist physically? (false if VppUsage=always or file is missing)
                     bool existsPhysically = (conf.VppUsage != VppUsageOption.Always);
                     if (existsPhysically){
-                        existsPhysically = await Task.Factory.StartNew(() => File.Exists(HostingEnvironment.MapPath(virtualPath)));
+                        existsPhysically = File.Exists(HostingEnvironment.MapPath(virtualPath));
                    }
 
                     //If not present physically (and VppUsage!=never), try to get the virtual file. Null indicates a missing file
@@ -195,18 +211,6 @@ namespace ImageResizer
             //Communicate to the MVC plugin this request should not be affected by the UrlRoutingModule.
             context.Items[conf.StopRoutingKey] = true;
 
-            //Find out if we have a modified date that we can work with
-            bool hasModifiedDate = (vf == null) || vf is IVirtualFileWithModifiedDateAsync;
-            DateTime modDate = DateTime.MinValue;
-            if (hasModifiedDate && vf != null)
-            {
-                modDate = await ((IVirtualFileWithModifiedDateAsync)vf).GetModifiedDateUTCAsync();
-                if (modDate == DateTime.MinValue || modDate == DateTime.MaxValue)
-                {
-                    hasModifiedDate = false; //Skip modified date checking if the file has no modified date
-                }
-            }
-
 
             IEncoder guessedEncoder = null;
             //Only use an encoder to determine extension/mime-type when it's an image extension or when we've set process = always.
@@ -231,30 +235,32 @@ namespace ImageResizer
 
 
             //Build CacheEventArgs
-            ResponseArgs e = new ResponseArgs();
-            e.RequestKey = virtualPath + PathUtils.BuildQueryString(queryString);
-            e.RewrittenQuerystring = settings;
-            e.ResponseHeaders.ContentType = isProcessing ? guessedEncoder.MimeType : fallbackContentType;
-            e.SuggestedExtension = isProcessing ? guessedEncoder.Extension : fallbackExtension;
-            e.HasModifiedDate = hasModifiedDate;
-            //Add delegate for retrieving the modified date of the source file. 
-            e.GetModifiedDateUTC = new ModifiedDateDelegate(delegate()
+            var e = new AsyncResponsePlan();
+            e.RequestCachingKey = virtualPath + PathUtils.BuildQueryString(queryString);
+
+            //Add the modified date to the request key, if present.
+            var modDate = (vf == null) ? System.IO.File.GetLastWriteTimeUtc(HostingEnvironment.MapPath(virtualPath)) :
+                (vf is IVirtualFileWithModifiedDateAsync ? await ((IVirtualFileWithModifiedDateAsync)vf).GetModifiedDateUTCAsync() : DateTime.MinValue);
+
+            if (modDate != DateTime.MinValue && modDate != DateTime.MaxValue)
             {
-                if (vf == null)
-                    return System.IO.File.GetLastWriteTimeUtc(HostingEnvironment.MapPath(virtualPath));
-                else if (hasModifiedDate)
-                    return modDate;
-                else return DateTime.MinValue; //Won't be called, no modified date available.
-            });
+                e.RequestCachingKey += "|" + modDate.Ticks.ToString(NumberFormatInfo.InvariantInfo);
+            };
+
+
+            e.RewrittenQuerystring = settings;
+            e.EstimatedContentType = isProcessing ? guessedEncoder.MimeType : fallbackContentType;
+            e.EstimatedFileExtension = isProcessing ? guessedEncoder.Extension : fallbackExtension;
+
 
             //A delegate for accessing the source file
-            e.GetSourceImage = new GetSourceImageDelegate(delegate()
+            e.OpenSourceStreamAsync = async delegate()
             {
-                return (vf != null) ? vf.Open() : File.o(HostingEnvironment.MapPath(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read);
-            });
+                return (vf != null) ? await vf.OpenAsync() : File.Open(HostingEnvironment.MapPath(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read);
+            };
 
             //Add delegate for writing the data stream
-            e.ResizeImageToStream = new ResizeImageDelegate(delegate(System.IO.Stream stream)
+            e.CreateAndWriteResultAsync = async delegate(System.IO.Stream stream, IAsyncResponsePlan plan)
             {
                 //This runs on a cache miss or cache invalid. This delegate is preventing from running in more
                 //than one thread at a time for the specified cache key
@@ -263,19 +269,31 @@ namespace ImageResizer
                     if (!isProcessing)
                     {
                         //Just duplicate the data
-                        using (Stream source = e.GetSourceImage())
-                            source.CopyToStream(stream); //4KiB buffer
+                        using (Stream source = await e.OpenSourceStreamAsync())
+                            await source.CopyToAsync(stream); //4KiB buffer
 
                     }
                     else
-                    {
-                        //Process the image
-                        if (vf != null)
-                            conf.GetImageBuilder().Build(vf, stream, settings);
-                        else
-                            conf.GetImageBuilder().Build(HostingEnvironment.MapPath(virtualPath), stream, settings); //Use a physical path to bypass virtual file system
-                    }
+                    {   
+                        var j = new ImageJob();
+                        j.Instructions = new Instructions(settings);
+                        j.SourcePathData = vf != null ? vf.VirtualPath : virtualPath;
 
+                        MemoryStream inBuffer = null;
+                        MemoryStream outBuffer = new MemoryStream(32 * 1024);
+                        using(var sourceStream = vf != null ? await vf.OpenAsync() : File.Open(HostingEnvironment.MapPath(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read)){
+                            inBuffer = new MemoryStream(sourceStream.CanSeek ? (int)sourceStream.Length : 128 * 1024);
+                            await sourceStream.CopyToAsync(inBuffer);
+                        }
+                        inBuffer.Seek(0, SeekOrigin.Begin);
+
+                        j.Source = inBuffer;
+                        j.Dest = outBuffer;
+                        
+                        await Task.Run( delegate(){ conf.GetImageBuilder().Build(j);});
+                        outBuffer.Seek(0,  SeekOrigin.Begin);
+                        await outBuffer.CopyToAsync(stream);
+                    }
                     //Catch not found exceptions
                 }
                 catch (System.IO.FileNotFoundException notFound)
@@ -289,28 +307,39 @@ namespace ImageResizer
                     FileMissing(context, virtualPath, queryString);
                     throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
                 }
-            });
+            };
 
 
+            //All bad from here down....
             context.Items[conf.ResponseArgsKey] = e; //store in context items
 
             //Fire events (for client-side caching plugins)
-            conf.FirePreHandleImage(this, context, e);
+            //conf.FirePreHandleImage(this, context, e);
 
             //Pass the rest of the work off to the caching module. It will handle rewriting/redirecting and everything. 
             //We handle request headers based on what is found in context.Items
-            ICache cache = conf.GetCacheProvider().GetCachingSystem(context, e);
+            IAsyncTyrantCache cache = conf.GetAsyncCacheFor(context, e);
 
             //Verify we have a caching system
-            if (cache == null) throw new ImageProcessingException("Image Resizer: No caching plugin was found for the request");
+            if (cache == null) throw new ImageProcessingException("Image Resizer: No async caching plugin was found for the request");
 
-            cache.Process(context, e);
+            await cache.ProcessAsync(context, e);
 
 
 
             s.Stop();
             context.Items["ResizingTime"] = s.ElapsedMilliseconds;
 
+        }
+
+
+        protected void FileMissing(HttpContext httpContext, string virtualPath, NameValueCollection q)
+        {
+            //Fire the event (for default image redirection, etc) 
+            conf.FireImageMissing(this, httpContext, new UrlEventArgs(virtualPath, new NameValueCollection(q)));
+
+            //Remove the image from context items so we don't try to write response headers.
+            httpContext.Items[conf.ResponseArgsKey] = null;
         }
     }
 }
