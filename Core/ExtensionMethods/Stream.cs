@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using ImageResizer.Util;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace ImageResizer.ExtensionMethods {
     /// <summary>
@@ -18,6 +19,14 @@ namespace ImageResizer.ExtensionMethods {
         /// <returns></returns>
         public static MemoryStream CopyToMemoryStream(this Stream s) {
             return CopyToMemoryStream(s, false);
+        }
+
+        public static async Task<MemoryStream> CopyToMemoryStreamAsync(this Stream s, int bufferSize = 4096)
+        {
+            MemoryStream ms = new MemoryStream(s.CanSeek ? ((int)s.Length + 8 -  (int)s.Position) : bufferSize);
+            await s.CopyToAsync(ms, bufferSize);
+            ms.Position = 0;
+            return ms;
         }
         /// <summary>
         /// Copies the current stream into a new MemoryStream instance.

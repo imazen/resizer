@@ -9,7 +9,7 @@ namespace ImageResizer.Plugins
     /// <summary>
     /// Always implement this if possible. Allows caching systems to detect changes to source files and invalidate cached data properly.
     /// </summary>
-    interface IVirtualFileWithModifiedDateAsync : IVirtualFile
+    public interface IVirtualFileWithModifiedDateAsync : IVirtualFile
     {
    
         /// <summary>
