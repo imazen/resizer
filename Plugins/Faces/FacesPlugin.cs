@@ -14,10 +14,28 @@ using System.Collections.Specialized;
 using ImageResizer.Plugins.CropAround;
 
 namespace ImageResizer.Plugins.Faces {
+
+    /// <summary>
+    /// FacesPlugin is used to detect and get face objects
+    /// </summary>
     public class FacesPlugin:BuilderExtension,IPlugin,IQuerystringPlugin {
+
+        /// <summary>
+        /// Empty constructor creates an instance of the Face Plugin
+        /// </summary>
         public FacesPlugin() {
         }
+
+        /// <summary>
+        /// ImageResizer configuration
+        /// </summary>
         protected Config c;
+
+        /// <summary>
+        /// Installs the FacesPlugin into the ImageResizer Configuration
+        /// </summary>
+        /// <param name="c">ImageResizer Configuration to install the plugin</param>
+        /// <returns>installed Faces plugin</returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             this.c = c;
@@ -25,6 +43,11 @@ namespace ImageResizer.Plugins.Faces {
             return this;
         }
 
+        /// <summary>
+        /// Uninstalls the Faces plugin from the ImageResizer Configuration
+        /// </summary>
+        /// <param name="c">ImageResizer Configuration to uninstall the plugin from</param>
+        /// <returns>true of plugin is uninstalled</returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             c.Pipeline.PreHandleImage -= Pipeline_PreHandleImage;
@@ -36,9 +59,9 @@ namespace ImageResizer.Plugins.Faces {
         /// Note that the face coordinates are relative to the unrotated, unflipped source image.
         /// ImageResizer.js can *keep* these coordinates synced during rotations/flipping if they are stored in the 'f.rects' querystring key before the 'srotate' or 'sflip' commands are applied.
         /// </summary>
-        /// <param name="image"></param>
-        /// <param name="settings"></param>
-        /// <returns></returns>
+        /// <param name="image">input image path, stream, BItmap</param>
+        /// <param name="settings">Resize settings to use</param>
+        /// <returns>a comma-delimited list of face coordinates (x,y,x2,y2,accuracy) for the given image</returns>
         public string GetFacesFromImageAsString(object image, NameValueCollection settings) {
             var faces = GetFacesFromImage(image, settings);
             StringBuilder sb = new StringBuilder();
@@ -53,9 +76,9 @@ namespace ImageResizer.Plugins.Faces {
         /// Note that the face coordinates are relative to the unrotated, unflipped source image.
         /// ImageResizer.js can *keep* these coordinates synced during rotations/flipping if they are stored in the 'f.rects' querystring key before the 'srotate' or 'sflip' commands are applied.
         /// </summary>
-        /// <param name="image"></param>
-        /// <param name="settings"></param>
-        /// <returns></returns>
+        /// <param name="image">input image path, stream, Bitmap</param>
+        /// <param name="settings">REsize settings to use </param>
+        /// <returns>a list of face objects for the given image</returns>
         public List<Face> GetFacesFromImage(object image, NameValueCollection settings) {
             using (var b = c.CurrentImageBuilder.LoadImage(image, new ResizeSettings(settings))) {
                 using (var detector = ConfigureDetection(settings)) {
@@ -64,6 +87,11 @@ namespace ImageResizer.Plugins.Faces {
             }
         }
 
+        /// <summary>
+        /// Detects Faces and stores the face data and data points to the input ImageState
+        /// </summary>
+        /// <param name="s">ImageState to store the detected Face Data to</param>
+        /// <returns>Requested action, which defaults to "None"</returns>
         protected override RequestedAction PostPrepareSourceBitmap(ImageState s) {
             if (s.sourceBitmap == null) return RequestedAction.None;
 
@@ -94,7 +122,11 @@ namespace ImageResizer.Plugins.Faces {
             return RequestedAction.None;
         }
 
-
+        /// <summary>
+        /// Draws the image face data based on the ImageState data
+        /// </summary>
+        /// <param name="s">ImageState data to draw</param>
+        /// <returns>Requested action, which defaults to "None"</returns>
         protected override RequestedAction PostRenderImage(ImageState s) {
             if (!"true".Equals(s.settings["f.show"], StringComparison.OrdinalIgnoreCase) ||
                 !s.layout.ContainsRing("faces") ||
@@ -122,7 +154,11 @@ namespace ImageResizer.Plugins.Faces {
             return RequestedAction.None;
         }
 
-
+        /// <summary>
+        /// Detects faces that were requested
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns>Requested action, which defaults to "None"</returns>
         protected override RequestedAction Render(ImageState s) {
             bool detect = s.settings.Get("f.detect", false);
             bool getlayout = s.settings.Get("f.getlayout", false);
