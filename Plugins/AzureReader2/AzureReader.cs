@@ -1,6 +1,8 @@
 ﻿/* Copyright (c) 2011 Wouter A. Alberts and Nathanael D. Jones. See license.txt for your rights. */
 using System;
 using System.Collections.Specialized;
+using System.IO;
+using System.Net;
 using System.Web;
 using System.Web.Hosting;
 using ImageResizer.Util;
@@ -9,6 +11,7 @@ using ImageResizer.Configuration.Issues;
 using System.Security;
 using ImageResizer.Configuration.Xml;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace ImageResizer.Plugins.AzureReader2
 {
@@ -21,6 +24,7 @@ namespace ImageResizer.Plugins.AzureReader2
         AzureVirtualPathProvider vpp;
         readonly string blobStorageConnection;
         string blobStorageEndpoint;
+        readonly int sharedAccessExpiryTime = 60;
         string vPath;
         readonly bool lazyExistenceCheck;
 
@@ -32,6 +36,7 @@ namespace ImageResizer.Plugins.AzureReader2
         /// connectionSting: The connection string, or name of connection string to be used for Blob Storage. (REQUIRED)
         /// blobStorageEndpoint: The http(s) base URL for the files. Can be used if you have a custom CNAME for your Storage Account or require HTTPS. Otherwise derived from connection string.
         /// endpoint: alias for blobStorageEndpoint
+        /// SharedAccessExpiryTime: Number of minutes to give read access to a private blob when generating a Shared Access Signature. Defaults to 60 minutes.
         /// prefix: can be used to override the default virtual path ("~/azure/")
         /// vpp: register as Virtual Path Provider? Defaults to false.
         /// </param>
@@ -40,6 +45,7 @@ namespace ImageResizer.Plugins.AzureReader2
             FailedToRegisterVpp = false;
             blobStorageConnection = args["connectionstring"];
             blobStorageEndpoint = args["blobstorageendpoint"];
+            sharedAccessExpiryTime = ParseUtils.ParsePrimitive(args["SharedAccessExpiryTime"], sharedAccessExpiryTime);
             if (string.IsNullOrEmpty(blobStorageEndpoint)) blobStorageEndpoint = args["endpoint"];
             vPath = args["prefix"];
             lazyExistenceCheck = ParseUtils.ParsePrimitive(args["lazyExistenceCheck"], lazyExistenceCheck);
@@ -148,9 +154,32 @@ namespace ImageResizer.Plugins.AzureReader2
 
                 // Strip prefix from virtual path; keep container and blob
                 string relativeBlobURL = e.VirtualPath.Substring(prefix.Length).TrimStart('/', '\\');
+                string sharedAccessSignature = "";
+
+                // If Lazy Existence Check is disabled, check with Blob Storage, and append a Shared Access Signature to the redirect URL if the blob is private.
+                if (!lazyExistenceCheck)
+                {
+                    CloudBlobClient cloudBlobClient = CloudStorageAccount.Parse(blobStorageConnection).CreateCloudBlobClient();
+                    try
+                    {
+                        ICloudBlob blob = cloudBlobClient.GetBlobReferenceFromServer(new Uri(blobStorageEndpoint + relativeBlobURL));
+                        sharedAccessSignature = blob.GetSharedAccessSignature(new SharedAccessBlobPolicy()
+                        {
+                            Permissions = SharedAccessBlobPermissions.Read,
+                            SharedAccessExpiryTime = new DateTimeOffset(DateTime.UtcNow.AddMinutes(sharedAccessExpiryTime))
+                        });
+                    }
+                    catch (StorageException storageException)
+                    {
+                        if (storageException.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
+                        {
+                            throw new FileNotFoundException("AzureReader2: File not found", storageException);
+                        }
+                    }
+                }
 
                 // Redirect to blob
-                context.Response.Redirect(blobStorageEndpoint + relativeBlobURL);
+                context.Response.Redirect(blobStorageEndpoint + relativeBlobURL + sharedAccessSignature);
             }
         }
 
