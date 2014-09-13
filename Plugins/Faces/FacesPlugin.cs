@@ -16,7 +16,7 @@ using ImageResizer.Plugins.CropAround;
 namespace ImageResizer.Plugins.Faces {
 
     /// <summary>
-    /// FacesPlugin is used to detect and get face objects
+    /// By using an object's coordinates Can respond with JSON or draw visible outlines
     /// </summary>
     public class FacesPlugin:BuilderExtension,IPlugin,IQuerystringPlugin {
 
@@ -59,7 +59,7 @@ namespace ImageResizer.Plugins.Faces {
         /// Note that the face coordinates are relative to the unrotated, unflipped source image.
         /// ImageResizer.js can *keep* these coordinates synced during rotations/flipping if they are stored in the 'f.rects' querystring key before the 'srotate' or 'sflip' commands are applied.
         /// </summary>
-        /// <param name="image">input image path, stream, BItmap</param>
+        /// <param name="image">given image path, stream, BItmap</param>
         /// <param name="settings">Resize settings to use</param>
         /// <returns>a comma-delimited list of face coordinates (x,y,x2,y2,accuracy) for the given image</returns>
         public string GetFacesFromImageAsString(object image, NameValueCollection settings) {
@@ -76,7 +76,7 @@ namespace ImageResizer.Plugins.Faces {
         /// Note that the face coordinates are relative to the unrotated, unflipped source image.
         /// ImageResizer.js can *keep* these coordinates synced during rotations/flipping if they are stored in the 'f.rects' querystring key before the 'srotate' or 'sflip' commands are applied.
         /// </summary>
-        /// <param name="image">input image path, stream, Bitmap</param>
+        /// <param name="image">given image path, stream, Bitmap</param>
         /// <param name="settings">REsize settings to use </param>
         /// <returns>a list of face objects for the given image</returns>
         public List<Face> GetFacesFromImage(object image, NameValueCollection settings) {
@@ -88,7 +88,7 @@ namespace ImageResizer.Plugins.Faces {
         }
 
         /// <summary>
-        /// Detects Faces and stores the face data and data points to the input ImageState
+        /// Detects Faces and stores the face data and data points to the given ImageState
         /// </summary>
         /// <param name="s">ImageState to store the detected Face Data to</param>
         /// <returns>Requested action, which defaults to "None"</returns>
@@ -157,7 +157,7 @@ namespace ImageResizer.Plugins.Faces {
         /// <summary>
         /// Detects faces that were requested
         /// </summary>
-        /// <param name="s"></param>
+        /// <param name="s">ImageState data to Render</param>
         /// <returns>Requested action, which defaults to "None"</returns>
         protected override RequestedAction Render(ImageState s) {
             bool detect = s.settings.Get("f.detect", false);
@@ -182,9 +182,9 @@ namespace ImageResizer.Plugins.Faces {
         /// <summary>
         /// This is where we hijack the resizing process, interrupt it, and send back the json data we created.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="context"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">sender of the request</param>
+        /// <param name="context">specefic information from the http request</param>
+        /// <param name="e">collection of data and callsbacks</param>
         void Pipeline_PreHandleImage(System.Web.IHttpModule sender, System.Web.HttpContext context, Caching.IResponseArgs e) {
             bool detect = e.RewrittenQuerystring.Get("f.detect", false);
             bool getlayout = e.RewrittenQuerystring.Get("f.getlayout", false);
@@ -193,6 +193,11 @@ namespace ImageResizer.Plugins.Faces {
             DetectionResponse<Face>.InjectExceptionHandler(e as ResponseArgs);
         }
 
+        /// <summary>
+        /// Sets up a Face detection configuration which controls how the faces will be detected
+        /// </summary>
+        /// <param name="s">coordinate configuration</param>
+        /// <returns>configurated FaceDetection</returns>
         public FaceDetection ConfigureDetection(NameValueCollection s) {
             
             var f = new FaceDetection();
@@ -230,6 +235,10 @@ namespace ImageResizer.Plugins.Faces {
             return f;
         }
 
+        /// <summary>
+        /// Array of query strings that could be used to query the the Faces object
+        /// </summary>
+        /// <returns>Array of valid query strings</returns>
         public  IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "f.show", "f.detect","f.faces", "f.threshold", "f.minsize", "f.expand"};
         }

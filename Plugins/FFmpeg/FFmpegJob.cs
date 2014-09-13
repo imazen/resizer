@@ -9,15 +9,25 @@ using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins.FFmpeg
 {
+    /// <summary>
+    /// Captures frames from a MPEG video
+    /// </summary>
     public class FFmpegJob
     {
 
+        /// <summary>
+        /// Creates an instance of the ffmpegJob class and sets the default timeout to 15 seconds
+        /// </summary>
         public FFmpegJob()
         {
             Timeout = 15000; //15 seconds
         }
 
-
+        /// <summary>
+        ///Sets up capture values for Seconds and Percent from the given query
+        ///The keys and values that can be used to query for capturing frames from the MPEG
+        /// </summary>
+        /// <param name="query">capture keys and values query</param>
         public FFmpegJob(NameValueCollection query) :this()
         {
 
@@ -28,9 +38,14 @@ namespace ImageResizer.Plugins.FFmpeg
 
         }
 
-
+        /// <summary>
+        /// Path to the MPEG data
+        /// </summary>
         public string SourcePath { get; set; }
 
+        /// <summary>
+        /// Memory Stream of the MPEG video
+        /// </summary>
         public Stream Result { get; set; }
 
         /// <summary>

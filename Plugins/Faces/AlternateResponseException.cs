@@ -5,7 +5,9 @@ using System.Text;
 namespace ImageResizer.Plugins.Faces {
 
     /// <summary>
-    /// Custom Exception with added Response data.  Includes the ResponseData, ContentType, and StatusCode.
+    /// AlternateResponseException is a hack that allows JSON data to be returned via the 
+    /// ImageResizer pipeline.  The Exception contains an alternate response, and bubbles 
+    /// up until it reaches a method that has the ability to replace the output stream. 
     /// </summary>
     public class AlternateResponseException:Exception {
 

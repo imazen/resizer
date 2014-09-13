@@ -11,17 +11,33 @@ using System.Globalization;
 using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.FreeImageDecoder {
-
+    /// <summary>
+    /// Tone Mapping or reproduction algorithms available
+    /// </summary>
     public enum ToneMappingAlgorithm {
         None,
         Reinhard,
         Drago,
         Fattal
     }
+
+    /// <summary>
+    /// FreeIMageDecoderPlugin to decode Free Image bitmap files
+    /// </summary>
     public class FreeImageDecoderPlugin : BuilderExtension, IPlugin, IFileExtensionPlugin, IIssueProvider, IQuerystringPlugin {
+
+        /// <summary>
+        /// Empty constructor creates an instance of the FreeImageDecoder Plugin
+        /// </summary>
         public FreeImageDecoderPlugin() {
         }
         private static IEnumerable<string> supportedExts = null;
+
+        /// <summary>
+        /// Install the FreeImageDecoder plugin to the given config
+        /// </summary>
+        /// <param name="c">ImageResizer Configuration to install the plugin</param>
+        /// <returns>FreeImageDecoder plugin that was installed</returns>
         public IPlugin Install(Configuration.Config c) {
             if (supportedExts == null && FreeImage.IsAvailable()) {
                 supportedExts = BuildSupportedList();
@@ -31,7 +47,10 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
         }
 
 
-
+        /// <summary>
+        /// Builds a list of potential Free Image Formats
+        /// </summary>
+        /// <returns>Collection of known free image formats</returns>
         public IEnumerable<string> BuildSupportedList() {
             FREE_IMAGE_FORMAT[] formats = (FREE_IMAGE_FORMAT[])Enum.GetValues(typeof(FREE_IMAGE_FORMAT));
             List<string> extensions = new List<string>();
@@ -42,22 +61,45 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
 
         }
 
+        /// <summary>
+        /// Uninstalls the plugin from the given ImageResizer Configuration
+        /// </summary>
+        /// <param name="c">ImageResizer Configuration</param>
+        /// <returns>true if plugin uninstalled</returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
         }
 
+        /// <summary>
+        /// Gets an IEnumerable collection of supported file extensions 
+        /// </summary>
+        /// <returns>collection of supported file extensions</returns>
         public IEnumerable<string> GetSupportedFileExtensions() {
             if (supportedExts == null) return new string[] { };
             else return supportedExts;
         }
 
+        /// <summary>
+        /// Decodes a IO stream to extrace a Bitmap image
+        /// </summary>
+        /// <param name="s">IO stream of data</param>
+        /// <param name="settings">ImageResizer settings to decode with</param>
+        /// <param name="optionalPath">optional extension path</param>
+        /// <returns>Decoded Bitmap</returns>
         public override System.Drawing.Bitmap DecodeStream(System.IO.Stream s, ResizeSettings settings, string optionalPath) {
             if (!"freeimage".Equals(settings["decoder"], StringComparison.OrdinalIgnoreCase)) return null;
 
             return Decode(s,  settings);
         }
 
+        /// <summary>
+        /// Try to decode a stream and if it can't be decoded return null
+        /// </summary>
+        /// <param name="s">IO stream of data</param>
+        /// <param name="settings">ImageResizer Settings to decode with </param>
+        /// <param name="optionalPath">option extension path</param>
+        /// <returns>Decoded Bitmap or null</returns>
         public override System.Drawing.Bitmap DecodeStreamFailed(System.IO.Stream s, ResizeSettings settings, string optionalPath) {
             try {
                  return Decode(s,settings);
@@ -67,6 +109,12 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
             }
         }
 
+        /// <summary>
+        /// Decode a Stream using the ImageResizer settings
+        /// </summary>
+        /// <param name="s">IO stream of the data</param>
+        /// <param name="settings">ImageResizer settings to decode with</param>
+        /// <returns>Decoded BItmap image</returns>
         public Bitmap Decode(Stream s, ResizeSettings settings) {
             return (Bitmap)DecodeAndCall(s, settings, delegate(ref FIBITMAP b, bool MayDispose) {
                  bool usethumb = ("true".Equals(settings["usepreview"], StringComparison.OrdinalIgnoreCase));
@@ -75,7 +123,15 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
                 return Convert(b, autorotate && !usethumb); //because usepreview prevents autorotate from working at the freeimage level
             });
         }
+
+        /// <summary>
+        /// delegate object that can be used in a decode callback used to unload the original bitmap when it's done being used
+        /// </summary>
+        /// <param name="b">Free Image Bitmap</param>
+        /// <param name="mayUnloadOriginal">option to unload original bitmap</param>
+        /// <returns>delegate object</returns>
         public delegate object DecodeCallback(ref FIBITMAP b, bool mayUnloadOriginal);
+
         /// <summary>
         /// Decodes the given stream, selects the correct page or frame, rotates it correctly (if autorotate=true), then executes the callback, then cleans up.
         /// </summary>
@@ -178,12 +234,20 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
             return b;
         }
 
+        /// <summary>
+        /// Collection of issues found using the FreeImage API
+        /// </summary>
+        /// <returns>IEnumberable collection of issues found</returns>
         public IEnumerable<IIssue> GetIssues() {
             List<IIssue> issues = new List<IIssue>();
             if (!FreeImageAPI.FreeImage.IsAvailable()) issues.Add(new Issue("The FreeImage library is not available! All FreeImage plugins will be disabled.", IssueSeverity.Error));
             return issues;
         }
 
+        /// <summary>
+        /// Gets a collection of supported query strings
+        /// </summary>
+        /// <returns>IEnumerable Collection of supported query strings</returns>
         public IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "usepreview", "autorotate", "page", "frame" };
         }
