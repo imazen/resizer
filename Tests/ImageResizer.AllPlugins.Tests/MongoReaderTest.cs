@@ -49,7 +49,7 @@ namespace ImageResizer.AllPlugins.Tests
             // Arrange
             bool expected = true;
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings["prefix"], dummyDatabaseRecordId.ToString("X"));
+            string virtualPath = Path.Combine(settings["prefix"], dummyDatabaseRecordId.ToString("B"));
             IVirtualImageProvider target = new MongoReaderPlugin(settings);
 
             // Act
@@ -105,7 +105,7 @@ namespace ImageResizer.AllPlugins.Tests
             // Arrange
             bool expected = false;
             var settings = this.Settings;
-            string virtualPath = dummyDatabaseRecordId.ToString("X");
+            string virtualPath = dummyDatabaseRecordId.ToString("B");
             IVirtualImageProvider target = new MongoReaderPlugin(settings);
 
             // Act
@@ -125,7 +125,7 @@ namespace ImageResizer.AllPlugins.Tests
             // Arrange
             bool expected = true;
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings["prefix"], dummyDatabaseRecordId.ToString("X"));
+            string virtualPath = Path.Combine(settings["prefix"], dummyDatabaseRecordId.ToString("B"));
             IVirtualImageProvider target = new MongoReaderPlugin(settings);
 
             // Act
@@ -165,7 +165,7 @@ namespace ImageResizer.AllPlugins.Tests
         {
             // Arrange
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings["prefix"], dummyDatabaseRecordId.ToString("X"));
+            string virtualPath = Path.Combine(settings["prefix"], dummyDatabaseRecordId.ToString("B"));
             IVirtualImageProvider target = new MongoReaderPlugin(settings);
 
             // Act
@@ -207,7 +207,7 @@ namespace ImageResizer.AllPlugins.Tests
         {
             // Arrange
             var settings = this.Settings;
-            string virtualPath = dummyDatabaseRecordId.ToString("X");
+            string virtualPath = dummyDatabaseRecordId.ToString("B");
             IVirtualImageProvider target = new MongoReaderPlugin(settings);
 
             // Act
@@ -289,7 +289,7 @@ namespace ImageResizer.AllPlugins.Tests
         {
             // Arrange
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings["prefix"], dummyDatabaseRecordId.ToString("X"));
+            string virtualPath = Path.Combine(settings["prefix"], dummyDatabaseRecordId.ToString("B"));
             IVirtualImageProvider reader = new MongoReaderPlugin(settings);
 
             var queryString = new NameValueCollection();

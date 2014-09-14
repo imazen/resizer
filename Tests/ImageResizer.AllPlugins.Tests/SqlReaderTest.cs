@@ -73,7 +73,7 @@ namespace ImageResizer.AllPlugins.Tests {
             // Arrange
             bool expected = true;
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("X"));
+            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("B"));
             IVirtualImageProvider target = new SqlReaderPlugin(settings);
 
             // Act
@@ -126,7 +126,7 @@ namespace ImageResizer.AllPlugins.Tests {
             // Arrange
             bool expected = false;
             var settings = this.Settings;
-            string virtualPath = dummyDatabaseRecordId.ToString("X");
+            string virtualPath = dummyDatabaseRecordId.ToString("B");
             IVirtualImageProvider target = new SqlReaderPlugin(settings);
 
             // Act
@@ -147,7 +147,7 @@ namespace ImageResizer.AllPlugins.Tests {
             bool expected = false;
             var settings = this.Settings;
             settings.CheckForModifiedFiles = true;
-            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("X"));
+            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("B"));
             IVirtualImageProvider target = new SqlReaderPlugin(settings);
 
             // Act
@@ -169,7 +169,7 @@ namespace ImageResizer.AllPlugins.Tests {
             bool expected = true;
             var settings = this.Settings;
             settings.CheckForModifiedFiles = true;
-            string virtualPath = Path.Combine(settings.PathPrefix, id.ToString("X"));
+            string virtualPath = Path.Combine(settings.PathPrefix, id.ToString("B"));
             IVirtualImageProvider target = new SqlReaderPlugin(settings);
 
             // Act
@@ -189,7 +189,7 @@ namespace ImageResizer.AllPlugins.Tests {
             // Arrange
             bool expected = true;
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("X"));
+            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("B"));
             IVirtualImageProvider target = new SqlReaderPlugin(settings);
 
             // Act
@@ -212,7 +212,7 @@ namespace ImageResizer.AllPlugins.Tests {
             bool expected = false;
             var settings = this.Settings;
             settings.CheckForModifiedFiles = true;
-            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("X"));
+            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("B"));
             IVirtualImageProvider target = new SqlReaderPlugin(settings);
 
             // Act
@@ -235,7 +235,7 @@ namespace ImageResizer.AllPlugins.Tests {
             bool expected = true;
             Guid id = this.CreateFileInDatabase();
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings.PathPrefix, id.ToString("X"));
+            string virtualPath = Path.Combine(settings.PathPrefix, id.ToString("B"));
             IVirtualImageProvider target = new SqlReaderPlugin(settings);
 
             // Act
@@ -259,7 +259,7 @@ namespace ImageResizer.AllPlugins.Tests {
             Guid id = this.CreateFileInDatabase();
             var settings = this.Settings;
             settings.CheckForModifiedFiles = true;
-            string virtualPath = Path.Combine(settings.PathPrefix, id.ToString("X"));
+            string virtualPath = Path.Combine(settings.PathPrefix, id.ToString("B"));
             IVirtualImageProvider target = new SqlReaderPlugin(settings);
 
             // Act
@@ -279,7 +279,7 @@ namespace ImageResizer.AllPlugins.Tests {
         public void GetFileWithoutVirtualPathPrefix() {
             // Arrange
             var settings = this.Settings;
-            string virtualPath = dummyDatabaseRecordId.ToString("X");
+            string virtualPath = dummyDatabaseRecordId.ToString("B");
             IVirtualImageProvider target = new SqlReaderPlugin(settings);
 
             // Act
@@ -331,7 +331,7 @@ namespace ImageResizer.AllPlugins.Tests {
             // Arrange
             Guid id = this.CreateFileInDatabase();
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings.PathPrefix, id.ToString("X"));
+            string virtualPath = Path.Combine(settings.PathPrefix, id.ToString("B"));
             IVirtualImageProvider reader = new SqlReaderPlugin(settings);
             var target = reader.GetFile(virtualPath, null);
 
@@ -351,7 +351,7 @@ namespace ImageResizer.AllPlugins.Tests {
         public void OpenInvalidId() {
             // Arrange
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("X"));
+            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("B"));
             IVirtualImageProvider reader = new SqlReaderPlugin(settings);
             var target = reader.GetFile(virtualPath, null);
 
