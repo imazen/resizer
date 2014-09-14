@@ -83,6 +83,9 @@
     <Compile Include="MongoReaderTest.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="RemoteReaderTest.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="SqlReaderTest.cs">
       <SubType>Code</SubType>
     </Compile>

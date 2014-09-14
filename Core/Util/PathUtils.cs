@@ -162,7 +162,7 @@ namespace ImageResizer.Util {
         /// <param name="virtualPath"></param>
         /// <returns></returns>
         public static string ResolveAppRelativeAssumeAppRelative(string virtualPath) {
-            string applicationVirtualPath = HostingEnvironment.ApplicationVirtualPath ?? AppDomain.CurrentDomain.BaseDirectory;
+            string applicationVirtualPath = HostingEnvironment.ApplicationVirtualPath ?? string.Empty;
             if (virtualPath.StartsWith("~"))
                 return applicationVirtualPath.TrimEnd('/') + "/" + virtualPath.TrimStart('~', '/');
             if (!virtualPath.StartsWith("/"))

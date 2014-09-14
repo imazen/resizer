@@ -1,25 +1,29 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using Xunit;
-using Xunit.Sdk;
-using ImageResizer.Plugins.SqlReader;
 using System.Collections.Specialized;
 using System.IO;
-using System.Web.Hosting;
+using System.Web;
 using ImageResizer.Configuration;
-using System.Data.SqlClient;
-using System.Drawing;
-using System.Reflection;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.RemoteReader;
+using Xunit;
 
 namespace ImageResizer.AllPlugins.Tests
 {
+    /// <summary>
+    /// Test the functionality of the <see cref="RemoteReaderPlugin"/> class.
+    /// </summary>
     public class RemoteReaderTest 
     {
-        private static string pathPrefix = @"remote";
+        /// <summary>
+        /// A GUID that can be used to represents a file that does not exist.
+        /// </summary>
+        private static Guid dummyDatabaseRecordId = Guid.NewGuid();
 
+        private static string pathPrefix = "/remote/farm7.static.flickr.com/6021/";
+
+        /// <summary>
+        /// Instantiate a new  <see cref="RemoteReaderPlugin"/> object and test for success.
+        /// </summary>
         [Fact]
         public void DefaultConstructor()
         {
@@ -33,12 +37,18 @@ namespace ImageResizer.AllPlugins.Tests
             Assert.IsType<RemoteReaderPlugin>(target);
         }
 
+        /// <summary>
+        /// Call the FileExists method with a null value for the queryString parameter.
+        /// </summary>
+        /// <remarks>
+        /// The queryString parameter is not used. The value passed should not affect the method outcome.
+        /// </remarks>
         [Fact]
         public void FileExistsWithNullQueryString()
         {
             // Arrange
-            bool expected = false;
-            string virtualPath = Path.Combine(pathPrefix, "{89A5100C-48F2-4024-AF9E-6AE662F720A2}");
+            bool expected = true;
+            string virtualPath = Path.Combine(pathPrefix, dummyDatabaseRecordId.ToString("B"));
             IVirtualImageProvider target = RemoteReaderPlugin.Current;
 
             // Act
@@ -48,6 +58,9 @@ namespace ImageResizer.AllPlugins.Tests
             Assert.StrictEqual<bool>(expected, actual);
         }
 
+        /// <summary>
+        /// Call the FileExists method with a null value for the virtualPath parameter.
+        /// </summary>
         [Fact]
         public void FileExistsWithNullVirtualPath()
         {
@@ -62,6 +75,9 @@ namespace ImageResizer.AllPlugins.Tests
             Assert.IsType<NullReferenceException>(actual);
         }
 
+        /// <summary>
+        /// Call the FileExists method with an empty string for the virtualPath parameter.
+        /// </summary>
         [Fact]
         public void FileExistsWithEmptyVirtualPath()
         {
@@ -76,12 +92,16 @@ namespace ImageResizer.AllPlugins.Tests
             Assert.StrictEqual<bool>(expected, actual);
         }
 
+        /// <summary>
+        /// Call the FileExists method with a virtualPath that does not include
+        /// the PathPrefix.
+        /// </summary>
         [Fact]
         public void FileExistsWithoutVirtualPath()
         {
             // Arrange
             bool expected = false;
-            string virtualPath = "{89A5100C-48F2-4024-AF9E-6AE662F720A2}";
+            string virtualPath = dummyDatabaseRecordId.ToString("B");
             IVirtualImageProvider target = new RemoteReaderPlugin();
 
             // Act
@@ -92,44 +112,59 @@ namespace ImageResizer.AllPlugins.Tests
         }
 
         [Fact]
-        public void FileExistCheckForModifiedFilesFileNotExisting()
-        {
+        public void GetFileNotSigned() {
             // Arrange
-            bool expected = false;
-            string virtualPath = Path.Combine(pathPrefix, "{89A5100C-48F2-4024-AF9E-6AE662F720A2}");
+            string virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
             IVirtualImageProvider target = new RemoteReaderPlugin();
+            var c = Config.Current;
+            ((IPlugin)target).Install(c);
+            var settings = this.Settings;
+            settings.Remove("hmac");
+            settings.Remove("urlb64");
 
             // Act
-            bool actual = target.FileExists(virtualPath, null);
+            var actual = Assert.Throws<ImageProcessingException>(() => target.GetFile(virtualPath, settings));
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.NotNull(actual);
+            Assert.IsType<ImageProcessingException>(actual);
         }
 
-        //[Fact]
-        //public void FileExistsCheckForModifiedFilesFileExisting()
-        //{
-        //    // Arrange
-        //    bool expected = true;
-        //    string virtualPath = Path.Combine(pathPrefix, id.ToString("X"));
-        //    IVirtualImageProvider target = new RemoteReaderPlugin();
-
-        //    // Act
-        //    bool actual = target.FileExists(virtualPath, null);
-
-        //    // Assert
-        //    Assert.StrictEqual<bool>(expected, actual);
-        //}
-
         [Fact]
-        public void GetFile()
-        {
+        public void GetFileNotSignedWhiteListed() {
             // Arrange
-            string virtualPath = Path.Combine(pathPrefix, "{89A5100C-48F2-4024-AF9E-6AE662F720A2}");
-            IVirtualImageProvider target = new RemoteReaderPlugin();
+            string virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
+            //IVirtualImageProvider target = new RemoteReaderPlugin();
+            var c = new Config();
+            RemoteReaderPlugin target = new RemoteReaderPlugin();
+            target.Install(c);
+            target.AllowRemoteRequest += delegate(object sender, RemoteRequestEventArgs args) {
+                args.DenyRequest = false;
+            }; 
+            var settings = this.Settings;
+            settings.Remove("hmac");
+            settings.Remove("urlb64");
 
             // Act
-            var actual = target.GetFile(virtualPath, new NameValueCollection());
+            var actual = ((IVirtualImageProvider)target).GetFile(virtualPath, settings);
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.IsAssignableFrom<IVirtualFile>(actual);
+        }
+
+        [Fact]
+        public void GetFileSigned()
+        {
+            // Arrange
+            string virtualPath = pathPrefix + dummyDatabaseRecordId.ToString("B");
+            IVirtualImageProvider target = new RemoteReaderPlugin();
+            var c = Config.Current;
+            ((RemoteReaderPlugin)target).Install(c);
+            var settings = this.Settings;
+
+            // Act
+            var actual = target.GetFile(virtualPath, settings);
 
             // Assert
             Assert.NotNull(actual);
@@ -140,14 +175,15 @@ namespace ImageResizer.AllPlugins.Tests
         public void GetFileWithoutVirtualPathPrefix()
         {
             // Arrange
-            string virtualPath = "{89A5100C-48F2-4024-AF9E-6AE662F720A2}";
+            string virtualPath = dummyDatabaseRecordId.ToString("B");
             IVirtualImageProvider target = new RemoteReaderPlugin();
 
             // Act
-            var actual = target.GetFile(virtualPath, new NameValueCollection());
+            var actual = Assert.Throws<FileNotFoundException>(() => target.GetFile(virtualPath, new NameValueCollection()));
 
             // Assert
-            Assert.Null(actual);
+            Assert.NotNull(actual);
+            Assert.IsType<FileNotFoundException>(actual);
         }
 
         [Fact]
@@ -171,17 +207,18 @@ namespace ImageResizer.AllPlugins.Tests
             IVirtualImageProvider target = new RemoteReaderPlugin();
 
             // Act
-            var actual = target.GetFile(string.Empty, null);
+            var actual = Assert.Throws<FileNotFoundException>(() => target.GetFile(string.Empty, new NameValueCollection()));
 
             // Assert
-            Assert.Null(actual);
+            Assert.NotNull(actual);
+            Assert.IsType<FileNotFoundException>(actual);
         }
 
         //[Fact]
         //public void Open()
         //{
         //    // Arrange
-        //    string virtualPath = Path.Combine(pathPrefix, id.ToString("X"));
+        //    string virtualPath = Path.Combine(pathPrefix, id.ToString("B"));
         //    IVirtualImageProvider reader = new RemoteReaderPlugin();
         //    var target = reader.GetFile(virtualPath, null);
 
@@ -197,7 +234,7 @@ namespace ImageResizer.AllPlugins.Tests
         public void OpenInvalidId()
         {
             // Arrange
-            string virtualPath = Path.Combine(pathPrefix, "{89A5100C-48F2-4024-AF9E-6AE662F720A2}");
+            string virtualPath = pathPrefix + dummyDatabaseRecordId.ToString("B");
             IVirtualImageProvider reader = new RemoteReaderPlugin();
             var target = reader.GetFile(virtualPath, new NameValueCollection());
 
@@ -207,6 +244,17 @@ namespace ImageResizer.AllPlugins.Tests
             // Assert
             Assert.NotNull(actual);
             Assert.IsType<FileNotFoundException>(actual);
+        }
+
+        private NameValueCollection Settings {
+            get {
+                var settings = new NameValueCollection();
+                settings["hmac"] = "a2099ba2099b";
+                settings["urlb64"] = "ag383ht23sag#laf#lafF#oyfafqewt;2twfqw";
+
+                return settings;
+
+            }
         }
     }
 }
