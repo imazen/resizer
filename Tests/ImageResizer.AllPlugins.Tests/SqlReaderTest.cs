@@ -14,6 +14,11 @@ namespace ImageResizer.AllPlugins.Tests {
     /// </summary>
     public class SqlReaderTest : IDisposable {
         /// <summary>
+        /// A GUID that can be used to represents a file that does not exist.
+        /// </summary>
+        private static Guid dummyDatabaseRecordId = Guid.NewGuid();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SqlReaderTest"/> class.
         /// </summary>
         public SqlReaderTest() {
@@ -68,7 +73,7 @@ namespace ImageResizer.AllPlugins.Tests {
             // Arrange
             bool expected = true;
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings.PathPrefix, "{89A5100C-48F2-4024-AF9E-6AE662F720A2}");
+            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("X"));
             IVirtualImageProvider target = new SqlReaderPlugin(settings);
 
             // Act
@@ -121,7 +126,7 @@ namespace ImageResizer.AllPlugins.Tests {
             // Arrange
             bool expected = false;
             var settings = this.Settings;
-            string virtualPath = "{89A5100C-48F2-4024-AF9E-6AE662F720A2}";
+            string virtualPath = dummyDatabaseRecordId.ToString("X");
             IVirtualImageProvider target = new SqlReaderPlugin(settings);
 
             // Act
@@ -142,7 +147,7 @@ namespace ImageResizer.AllPlugins.Tests {
             bool expected = false;
             var settings = this.Settings;
             settings.CheckForModifiedFiles = true;
-            string virtualPath = Path.Combine(settings.PathPrefix, "{89A5100C-48F2-4024-AF9E-6AE662F720A2}");
+            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("X"));
             IVirtualImageProvider target = new SqlReaderPlugin(settings);
 
             // Act
@@ -184,7 +189,7 @@ namespace ImageResizer.AllPlugins.Tests {
             // Arrange
             bool expected = true;
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings.PathPrefix, "{89A5100C-48F2-4024-AF9E-6AE662F720A2}");
+            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("X"));
             IVirtualImageProvider target = new SqlReaderPlugin(settings);
 
             // Act
@@ -207,7 +212,7 @@ namespace ImageResizer.AllPlugins.Tests {
             bool expected = false;
             var settings = this.Settings;
             settings.CheckForModifiedFiles = true;
-            string virtualPath = Path.Combine(settings.PathPrefix, "{89A5100C-48F2-4024-AF9E-6AE662F720A2}");
+            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("X"));
             IVirtualImageProvider target = new SqlReaderPlugin(settings);
 
             // Act
@@ -274,7 +279,7 @@ namespace ImageResizer.AllPlugins.Tests {
         public void GetFileWithoutVirtualPathPrefix() {
             // Arrange
             var settings = this.Settings;
-            string virtualPath = "{89A5100C-48F2-4024-AF9E-6AE662F720A2}";
+            string virtualPath = dummyDatabaseRecordId.ToString("X");
             IVirtualImageProvider target = new SqlReaderPlugin(settings);
 
             // Act
@@ -346,7 +351,7 @@ namespace ImageResizer.AllPlugins.Tests {
         public void OpenInvalidId() {
             // Arrange
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings.PathPrefix, "{89A5100C-48F2-4024-AF9E-6AE662F720A2}");
+            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("X"));
             IVirtualImageProvider reader = new SqlReaderPlugin(settings);
             var target = reader.GetFile(virtualPath, null);
 
@@ -446,6 +451,7 @@ namespace ImageResizer.AllPlugins.Tests {
         /// </param>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
+                // Remove database records after each test.
                 SqlConnection conn = new SqlConnection(this.Settings.ConnectionString);
                 conn.Open();
                 using (conn) {

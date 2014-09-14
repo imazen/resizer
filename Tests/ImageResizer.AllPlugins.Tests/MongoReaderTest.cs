@@ -16,6 +16,11 @@ namespace ImageResizer.AllPlugins.Tests
     public class MongoReaderTest 
     {
         /// <summary>
+        /// A GUID that can be used to represents a file that does not exist.
+        /// </summary>
+        private static Guid dummyDatabaseRecordId = Guid.NewGuid();
+
+        /// <summary>
         /// Instantiate a new  <see cref="MongoReaderPlugin"/> object and test for success.
         /// </summary>
         [Fact]
@@ -44,7 +49,7 @@ namespace ImageResizer.AllPlugins.Tests
             // Arrange
             bool expected = true;
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings["prefix"], "{89A5100C-48F2-4024-AF9E-6AE662F720A2}");
+            string virtualPath = Path.Combine(settings["prefix"], dummyDatabaseRecordId.ToString("X"));
             IVirtualImageProvider target = new MongoReaderPlugin(settings);
 
             // Act
@@ -100,7 +105,7 @@ namespace ImageResizer.AllPlugins.Tests
             // Arrange
             bool expected = false;
             var settings = this.Settings;
-            string virtualPath = "{89A5100C-48F2-4024-AF9E-6AE662F720A2}";
+            string virtualPath = dummyDatabaseRecordId.ToString("X");
             IVirtualImageProvider target = new MongoReaderPlugin(settings);
 
             // Act
@@ -120,7 +125,7 @@ namespace ImageResizer.AllPlugins.Tests
             // Arrange
             bool expected = true;
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings["prefix"], "{89A5100C-48F2-4024-AF9E-6AE662F720A2}");
+            string virtualPath = Path.Combine(settings["prefix"], dummyDatabaseRecordId.ToString("X"));
             IVirtualImageProvider target = new MongoReaderPlugin(settings);
 
             // Act
@@ -160,7 +165,7 @@ namespace ImageResizer.AllPlugins.Tests
         {
             // Arrange
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings["prefix"], "{89A5100C-48F2-4024-AF9E-6AE662F720A2}");
+            string virtualPath = Path.Combine(settings["prefix"], dummyDatabaseRecordId.ToString("X"));
             IVirtualImageProvider target = new MongoReaderPlugin(settings);
 
             // Act
@@ -202,7 +207,7 @@ namespace ImageResizer.AllPlugins.Tests
         {
             // Arrange
             var settings = this.Settings;
-            string virtualPath = "{89A5100C-48F2-4024-AF9E-6AE662F720A2}";
+            string virtualPath = dummyDatabaseRecordId.ToString("X");
             IVirtualImageProvider target = new MongoReaderPlugin(settings);
 
             // Act
@@ -284,7 +289,7 @@ namespace ImageResizer.AllPlugins.Tests
         {
             // Arrange
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings["prefix"], "{89A5100C-48F2-4024-AF9E-6AE662F720A2}");
+            string virtualPath = Path.Combine(settings["prefix"], dummyDatabaseRecordId.ToString("X"));
             IVirtualImageProvider reader = new MongoReaderPlugin(settings);
 
             var queryString = new NameValueCollection();
