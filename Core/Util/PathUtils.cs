@@ -162,13 +162,13 @@ namespace ImageResizer.Util {
         /// <param name="virtualPath"></param>
         /// <returns></returns>
         public static string ResolveAppRelativeAssumeAppRelative(string virtualPath) {
-
-            if (virtualPath.StartsWith("~")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/" + virtualPath.TrimStart('~', '/');
-            if (!virtualPath.StartsWith("/")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/" + virtualPath;
+            string applicationVirtualPath = HostingEnvironment.ApplicationVirtualPath ?? AppDomain.CurrentDomain.BaseDirectory;
+            if (virtualPath.StartsWith("~"))
+                return applicationVirtualPath.TrimEnd('/') + "/" + virtualPath.TrimStart('~', '/');
+            if (!virtualPath.StartsWith("/"))
+                return applicationVirtualPath.TrimEnd('/') + "/" + virtualPath;
             return virtualPath;
         }
-
-
 
         /// <summary>
         /// Joins the path and querystring. If the path already contains a querystring, they are 'append joined' with the correct character. Fragment is maintained as-is. 
