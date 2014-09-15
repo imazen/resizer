@@ -16,18 +16,36 @@ using ImageResizer.Configuration;
 using System.Web.Hosting;
 
 namespace ImageResizer.Plugins.FreeImageBuilder {
+
+    /// <summary>
+    /// Builds Free Image Bitmap files
+    /// </summary>
     public class FreeImageBuilderPlugin :BuilderExtension, IPlugin, IIssueProvider {
 
+        /// <summary>
+        /// Empty constructor creates an instance of the FreeImageBuilder Plugin
+        /// </summary>
         public FreeImageBuilderPlugin(){
         }
 
         Config c;
+
+        /// <summary>
+        /// Installs the plugin to the given configuration
+        /// </summary>
+        /// <param name="c">ImageResizer Configuration to install the plugin</param>
+        /// <returns>Plugin that was installed to the given configuration</returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             this.c = c;
             return this;
         }
 
+        /// <summary>
+        /// Uninstalls the plugin from the given configuration
+        /// </summary>
+        /// <param name="c">ImageResizer Configuration to uninstall the plugin from</param>
+        /// <returns>true if plugin was uninstalled</returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
@@ -35,12 +53,12 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
         }
 
         /// <summary>
-        /// Adds alternate pipeline based on FreeImage. Invoked by &builder=freeimage. 
+        /// Adds alternate pipeline based on FreeImage. Invoked by &amp;builder=freeimage. 
         /// This method doesn't handle job.DisposeSource or job.DesposeDest or settings filtering, that's handled by ImageBuilder.
         /// All the bitmap processing is handled by buildFiBitmap, this method handles all the I/O
         /// </summary>
-        /// <param name="job"></param>
-        /// <returns></returns>
+        /// <param name="job">Image job settings</param>
+        /// <returns>Requested action based on if there were I/O errors</returns>
         protected override RequestedAction BuildJob(ImageJob job) {
             if (!"freeimage".Equals(job.Settings["builder"])) return RequestedAction.None;
             if (!FreeImageAPI.FreeImage.IsAvailable()) return RequestedAction.None;
@@ -123,9 +141,11 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
         /// <summary>
         /// Builds an FIBitmap from the stream and job.Settings 
         /// </summary>
-        /// <param name="s"></param>
-        /// <param name="job"></param>
-        /// <returns></returns>
+        /// <param name="original">original given FIBITMAP</param>
+        /// <param name="job">job settings</param>
+        /// <param name="supportsTransparency">transparancy option</param>
+        /// <param name="mayUnloadOriginal">option to unload original</param>
+        /// <returns>modified FIBITMAP based on job settings</returns>
         protected FIBITMAP buildFiBitmap(ref FIBITMAP original, ImageJob job, bool supportsTransparency, bool mayUnloadOriginal) {
 
             ResizeSettings settings = job.Settings;
@@ -181,7 +201,10 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
 
         }
 
-
+        /// <summary>
+        /// Collection of issues found using the FreeImage API
+        /// </summary>
+        /// <returns>IEnumberable collection of issues found</returns>
         public IEnumerable<IIssue> GetIssues() {
             List<IIssue> issues = new List<IIssue>();
             if (!FreeImageAPI.FreeImage.IsAvailable()) issues.Add(new Issue("The FreeImage library is not available! All FreeImage plugins will be disabled.", IssueSeverity.Error));

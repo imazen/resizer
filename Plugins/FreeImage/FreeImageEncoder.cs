@@ -9,24 +9,42 @@ using System.Drawing.Imaging;
 using System.Globalization;
 
 namespace ImageResizer.Plugins.FreeImageEncoder {
+
+    /// <summary>
+    /// Plugin that Encodes in the FreeImage format
+    /// </summary>
     public class FreeImageEncoderPlugin : IPlugin, IEncoder {
 
         FREE_IMAGE_FORMAT format = FREE_IMAGE_FORMAT.FIF_JPEG;
 
-
+        /// <summary>
+        /// Gets or sets the Free Image format
+        /// </summary>
         public FREE_IMAGE_FORMAT Format {
             get { return format; }
             set { format = value; }
         }
         FREE_IMAGE_SAVE_FLAGS encodingOptions = FREE_IMAGE_SAVE_FLAGS.DEFAULT;
 
+        /// <summary>
+        /// Gets or sets the Encoding Options 
+        /// </summary>
         public FREE_IMAGE_SAVE_FLAGS EncodingOptions {
             get { return encodingOptions; }
             set { encodingOptions = value; }
         }
+
+        /// <summary>
+        /// Empty constructor creates an instance of the FreeImageEncoder Plugin
+        /// </summary>
         public FreeImageEncoderPlugin() {
         }
 
+        /// <summary>
+        /// Creates in instance of the FreeImageEncoder Plugin with the given ImageResizer settings and the original image object
+        /// </summary>
+        /// <param name="settings">ImageResizer settings to apply</param>
+        /// <param name="original">image object</param>
         public FreeImageEncoderPlugin(ResizeSettings settings, object original) {
             ImageFormat originalFormat = DefaultEncoder.GetOriginalFormat(original);
             if (!IsValidOutputFormat(originalFormat)) originalFormat = ImageFormat.Jpeg;//No valid info available about the original format. Use Jpeg.
@@ -67,17 +85,32 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
         }
         int colors = -1;
 
-
+        /// <summary>
+        /// Install the FreeImageEncoder plugin to the given config
+        /// </summary>
+        /// <param name="c">ImageResizer Configuration to install the plugin</param>
+        /// <returns>FreeImageEncoder plugin that was installed</returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             return this;
         }
 
+        /// <summary>
+        /// Uninstalls the FreeImageEncoder plugin from the given ImageResizer Configuration
+        /// </summary>
+        /// <param name="c">ImageResizer Configuration</param>
+        /// <returns>true if plugin uninstalled</returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
         }
 
+        /// <summary>
+        /// Does checks to verify the image can be encoded with the requested settings
+        /// </summary>
+        /// <param name="settings">ImageResizer settings to apply</param>
+        /// <param name="original">original image object</param>
+        /// <returns>returns the encoder plugin if it can be encoded and null if it can not</returns>
         public IEncoder CreateIfSuitable(ResizeSettings settings, object original) {
             
             ImageFormat requestedFormat = DefaultEncoder.GetRequestedFormat(settings.Format, ImageFormat.Jpeg);
@@ -96,7 +129,13 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
             return (ImageFormat.Gif.Equals(f) || ImageFormat.Png.Equals(f) || ImageFormat.Jpeg.Equals(f));
         }
 
-
+        /// <summary>
+        /// Saves the given image to the given stream
+        /// </summary>
+        /// <exception cref="ArgumentException">Argument Exception if it is not a valid bitmap</exception>"
+        /// <exception cref="ImageProcessingException">ImageProcessingException if it can't convert the bitmap to FIBITMAP</exception>
+        /// <param name="i">image to save</param>
+        /// <param name="s">stream to save the image to</param>
         public void Write(System.Drawing.Image i, System.IO.Stream s) {
             if (!(i is Bitmap)) throw new ArgumentException("FreeImageEncoder only works with bitmaps");
             FIBITMAP bit = FreeImage.CreateFromBitmap(i as Bitmap);
@@ -112,14 +151,23 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
             FreeImage.SaveToStream(ref bit, s, Format, EncodingOptions, true);
         }
 
+        /// <summary>
+        /// Returns true if it the format supports transparency
+        /// </summary>
         public bool SupportsTransparency {
             get { return Format != FREE_IMAGE_FORMAT.FIF_JPEG; }
         }
 
+        /// <summary>
+        /// Returns MimeType of the image format
+        /// </summary>
         public string MimeType {
             get { return FreeImage.GetFIFMimeType(Format); }
         }
 
+        /// <summary>
+        /// Gets the primary extension from the image format
+        /// </summary>
         public string Extension {
             get { return FreeImage.GetPrimaryExtensionFromFIF(Format); }
         }

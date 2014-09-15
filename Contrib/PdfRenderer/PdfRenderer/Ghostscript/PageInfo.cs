@@ -16,20 +16,38 @@ using System.Xml.Serialization;
 
 namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
 {
+    /// <summary>
+    /// Page information that can be retrieved from a PDF page
+    /// </summary>
     public class PageInfo
     {
+        /// <summary>
+        /// Page Number
+        /// </summary>
         [XmlAttribute("number")]
         public int Number { get; set; }
 
+        /// <summary>
+        /// Transparency of the page
+        /// </summary>
         [XmlAttribute("transparency")]
         public bool Transparency { get; set; }
 
+        /// <summary>
+        /// Degrees the page is Rotated
+        /// </summary>
         [XmlAttribute("rotate")]
         public int Rotate { get; set; }
 
+        /// <summary>
+        /// Media box can be used to select an image on the page
+        /// </summary>
         [XmlElement("mediaBox")]
         public BoundingBox MediaBox { get; set; }
 
+        /// <summary>
+        /// Crop box can be used to crop an area of the page
+        /// </summary>
         [XmlElement("cropBox")]
         public BoundingBox CropBox { get; set; }
     }

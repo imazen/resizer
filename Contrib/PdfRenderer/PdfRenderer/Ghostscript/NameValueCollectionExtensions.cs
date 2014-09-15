@@ -17,8 +17,18 @@ using System.Globalization;
 
 namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
 {
+    /// <summary>
+    /// Ghostcript extensions that aid in getting data from the given collection
+    /// </summary>
     public static class NameValueCollectionExtensions
     {
+        /// <summary>
+        /// Get page or bit data from the given NameValueCollection
+        /// </summary>
+        /// <param name="collection">collection that contains the data</param>
+        /// <param name="name">Name of Item requested</param>
+        /// <param name="defaultValue">default value to return if item can not be parsed</param>
+        /// <returns>value of given item in collection</returns>
         public static int GetValueOrDefault(this NameValueCollection collection, string name, int defaultValue)
         {
             if(collection != null)

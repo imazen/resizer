@@ -17,6 +17,9 @@ using System.Runtime.Serialization;
 
 namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [Serializable]
     public class GhostscriptException : Exception
     {
@@ -49,6 +52,11 @@ namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
         {
         }
 
+        /// <summary>
+        ///  Initializes a new instance of the <see cref = "GhostscriptException" /> class 
+        /// </summary>
+        /// <param name="info">data needed to serialize the settings</param>
+        /// <param name="context">destination of the serialization stream</param>
         protected GhostscriptException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {

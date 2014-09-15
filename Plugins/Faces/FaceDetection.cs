@@ -10,7 +10,16 @@ using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.Faces {
 
+    /// <summary>
+    /// Face object that holds face image data
+    /// </summary>
     public class Face:IFeature {
+
+        /// <summary>
+        /// Face coordinate location
+        /// </summary>
+        /// <param name="rect">rectangle area around the face</param>
+        /// <param name="accuracy">acceptable face detectection match accuracy</param>
         public Face(RectangleF rect, float accuracy) {
             this.X = rect.X;
             this.Y = rect.Y;
@@ -18,10 +27,30 @@ namespace ImageResizer.Plugins.Faces {
             this.Y2 = rect.Bottom;
             this.Accuracy = accuracy;
         }
+
+        /// <summary>
+        /// Face X coordinate
+        /// </summary>
         public float X { get; set; }
+
+        /// <summary>
+        /// Face Y coordinate
+        /// </summary>
         public float Y { get; set; }
+
+        /// <summary>
+        /// Face X2 or right side coordinate
+        /// </summary>
         public float X2 { get; set; }
+
+        /// <summary>
+        /// Face Y2 or bottom coordinate
+        /// </summary>
         public float Y2 { get; set; }
+
+        /// <summary>
+        /// acceptable face detectection match accuracy
+        /// </summary>
         public float Accuracy { get; set; }
     }
     /// <summary>
@@ -29,6 +58,9 @@ namespace ImageResizer.Plugins.Faces {
     /// </summary>
     public class FaceDetection:FeatureDetectionBase<Face>{
 
+        /// <summary>
+        /// Face detection constructor that sets default values for recognition of a face
+        /// </summary>
         public FaceDetection():base(){
             MinFaces = 1;
             MaxFaces = 10;
@@ -81,9 +113,9 @@ namespace ImageResizer.Plugins.Faces {
         /// <summary>
         /// Detects features on a grayscale image.
         /// </summary>
-        /// <param name="img"></param>
-        /// <param name="storage"></param>
-        /// <returns></returns>
+        /// <param name="img">Image given</param>
+        /// <param name="storage">memory used to store image</param>
+        /// <returns>List of detected faces from image</returns>
         protected override List<Face> DetectFeatures(IplImage img, CvMemStorage storage) {
             //Determine minimum face size
             var minSize = (int)Math.Round((double)MinSizePercent / 100.0 * Math.Min(img.Width, img.Height));

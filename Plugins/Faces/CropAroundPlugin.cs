@@ -13,20 +13,39 @@ namespace ImageResizer.Plugins.CropAround {
     /// </summary>
     public class CropAroundPlugin:BuilderExtension, IPlugin,IQuerystringPlugin  {
      
+        /// <summary>
+        /// Installs the plugin to the input ImageResizer configuration
+        /// </summary>
+        /// <param name="c">ImageResizer configuration to install plugin to </param>
+        /// <returns>ImageResizer plugin that was installed </returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             return this;
         }
 
+        /// <summary>
+        /// Removes the Plugin from the input configuration
+        /// </summary>
+        /// <param name="c">ImageResizer with the plugin to remove</param>
+        /// <returns>true if plugin uninstalled</returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
         }
 
+        /// <summary>
+        /// Gets strings that can be used to query on
+        /// </summary>
+        /// <returns>An IEnumerable collection of supported Query strings</returns>
         public IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "c.focus", "c.zoom", "c.finalmode" };
         }
 
+        /// <summary>
+        /// Perform the crop and fitting of the image in the Layout
+        /// </summary>
+        /// <param name="s">state of an Image being resized </param>
+        /// <returns>Default action, which defaults to none</returns>
         protected override RequestedAction LayoutImage(ImageState s) {
             //Only activated if both width and height are specified, and mode=crop.
             if (s.settings.Mode != FitMode.Crop || s.settings.Width < 0 || s.settings.Height < 0) return RequestedAction.None;
@@ -60,7 +79,7 @@ namespace ImageResizer.Plugins.CropAround {
 
             s.copyRect = box;
             
-            ///What is the vertical and horizontal aspect ratio different in result pixels?
+            //What is the vertical and horizontal aspect ratio different in result pixels?
             var padding = PolygonMath.ScaleInside(box.Size, targetSize);
             padding = new SizeF(targetSize.Width - padding.Width, targetSize.Height - padding.Height);
 

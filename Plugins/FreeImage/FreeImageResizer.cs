@@ -9,27 +9,69 @@ using System.Drawing;
 using ImageResizer.Plugins.FreeImageResizer;
 using ImageResizer.Plugins.FreeImageScaling;
 
-namespace ImageResizer.Plugins.FreeImageResizer { public class FreeImageResizerPlugin : FreeImageScalingPlugin { public FreeImageResizerPlugin() { } } }
+namespace ImageResizer.Plugins.FreeImageResizer { 
+    
+    /// <summary>
+    /// Plugin that Resizes the FreeImage image
+    /// </summary>
+    public class FreeImageResizerPlugin : FreeImageScalingPlugin { 
+
+        /// <summary>
+        /// Empty constructor creates an instance of the FreeImageResizer Plugin
+        /// </summary>
+        public FreeImageResizerPlugin() { } 
+    } 
+}
 
 
 namespace ImageResizer.Plugins.FreeImageScaling {
+
+    /// <summary>
+    /// Plugin that does Image Scaling
+    /// </summary>
     public class FreeImageScalingPlugin : BuilderExtension, IPlugin, IQuerystringPlugin {
+
+        /// <summary>
+        /// Empty constructor creates an instance of the FreeImageScaling Plugin
+        /// </summary>
         public FreeImageScalingPlugin() {
         }
+
+        /// <summary>
+        /// Install the FreeImageScaling plugin to the given config
+        /// </summary>
+        /// <param name="c">ImageResizer Configuration to install the plugin</param>
+        /// <returns>FreeImageScaling plugin that was installed</returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             return this;
         }
 
+        /// <summary>
+        /// Uninstalls the FreeImageScaling plugin from the given ImageResizer Configuration
+        /// </summary>
+        /// <param name="c">ImageResizer Configuration</param>
+        /// <returns>true if plugin uninstalled</returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
         }
 
+        /// <summary>
+        /// Gets a collection of supported query strings
+        /// </summary>
+        /// <returns>IEnumerable Collection of supported query strings</returns>
         public IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "fi.scale" };
         }
 
+        /// <summary>
+        /// Sets up the filter to use in scaling
+        /// </summary>
+        /// <param name="sf">string filter value</param>
+        /// <param name="defaultValue">FREE_IMAGE_FILTER</param>
+        /// <param name="valid">out parameter set denoting if filter is valid</param>
+        /// <returns>filters used in scaling</returns>
         public static FREE_IMAGE_FILTER ParseResizeAlgorithm(string sf, FREE_IMAGE_FILTER defaultValue, out bool valid){
             FREE_IMAGE_FILTER filter = defaultValue;
 
@@ -45,6 +87,11 @@ namespace ImageResizer.Plugins.FreeImageScaling {
             return filter;
         }
 
+        /// <summary>
+        /// Tries to render an image based on the current settings values
+        /// </summary>
+        /// <param name="s">Resizer ImageState data to draw</param>
+        /// <returns>Requested action, which defaults to "None"</returns>
         protected override RequestedAction PreRenderImage(ImageState s) {
             //Skip this when we are doing simulations
             if (s.destGraphics == null) return RequestedAction.None;

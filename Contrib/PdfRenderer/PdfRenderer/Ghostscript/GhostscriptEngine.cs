@@ -33,6 +33,9 @@ namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
         private static readonly object _syncObject = new object();
         private static Version _nativeVersion;
 
+        /// <summary>
+        /// Gets the Ghostscript FileName
+        /// </summary>
         public static string NativeFileName
         {
             get { return GhostscriptNativeMethods.FileName; }
@@ -72,6 +75,11 @@ namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
             return version != null && version.Major >= 9;
         }
 
+        /// <summary>
+        /// Applys the given Ghostscript settings
+        /// </summary>
+        /// <param name="settings">settings to apply</param>
+        /// <returns>output message</returns>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Intended to be member method.")]
         public string Execute(GhostscriptSettings settings)
         {
@@ -193,6 +201,13 @@ namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
             return new Version(versionText);
         }
 
+        /// <summary>
+        /// Formats an output message and adds it to the given StringBuilder
+        /// </summary>
+        /// <param name="builder">stores the message</param>
+        /// <param name="source">handle to unmanaged code that contains the message</param>
+        /// <param name="length">buffer length to use</param>
+        /// <returns>buffer length</returns>
         public int HandleOutputMessage(StringBuilder builder, IntPtr source, int length)
         {
             string text;

@@ -84,6 +84,10 @@ namespace ImageResizer.Plugins.PrettyGifs
 
         private ColorPalette _lastPalette;
         private readonly bool TransparencyAtZero = true; //Works much better than transparency at 255
+
+        /// <summary>
+        /// True if image dithering is set
+        /// </summary>
         protected bool _dither = false;
         /// <summary>
         /// Uses a Floyd-Steinberg dither
@@ -103,7 +107,11 @@ namespace ImageResizer.Plugins.PrettyGifs
                                                             {0,0,0.44f},
                                                             {0.19f,0.31f,0.06f}};
 
+        /// <summary>
+        /// Percent to dither
+        /// </summary>
         public float DitherPercent = .3f;
+
 		/// <summary>
 		/// Override this to process the pixel in the second pass of the algorithm
 		/// </summary>

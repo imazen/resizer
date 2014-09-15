@@ -11,11 +11,20 @@ using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins.FFmpeg
 {
+    /// <summary>
+    /// Plugin that handles capturing frames from a MPEG video
+    /// </summary>
     public class FFmpegPlugin : IVirtualImageProvider, IPlugin, IFileExtensionPlugin, IQuerystringPlugin
 
     {
 
         Config c;
+
+        /// <summary>
+        /// Install the FFmpegPlugin to the given config
+        /// </summary>
+        /// <param name="c">given configuration</param>
+        /// <returns>MPEG plugin that was added to the config</returns>
         public IPlugin Install(Config c)
         {
             this.c = c;
@@ -23,6 +32,11 @@ namespace ImageResizer.Plugins.FFmpeg
             return this;
         }
 
+        /// <summary>
+        /// Removes the plugin from the given config
+        /// </summary>
+        /// <param name="c">given config</param>
+        /// <returns>true if the plugin has been removed</returns>
         public bool Uninstall(Config c)
         {
             c.Plugins.remove_plugin(this);
@@ -30,7 +44,10 @@ namespace ImageResizer.Plugins.FFmpeg
         }
         private FFmpegManager mgr = new FFmpegManager();
 
-
+        /// <summary>
+        /// IEnumerable colleciton of supported MPEG File Extensions supported by the plugin
+        /// </summary>
+        /// <returns>IEnumerable collection of File extensions</returns>
         public IEnumerable<string> GetSupportedFileExtensions()
         {
             return new string[] {"avi", "mp4","avchd","flv","fla","swf","mpg","mpeg","mpe","mov","m4v","mkv","wmv" };
@@ -39,9 +56,9 @@ namespace ImageResizer.Plugins.FFmpeg
         /// <summary>
         /// Returns true if the specified file and querystring indicate a PSD composition request
         /// </summary>
-        /// <param name="virtualPath"></param>
-        /// <param name="queryString"></param>
-        /// <returns></returns>
+        /// <param name="virtualPath">virtual path to file</param>
+        /// <param name="queryString">keys and values to query on</param>
+        /// <returns>true if file found at virtualPath</returns>
         public bool FileExists(string virtualPath, NameValueCollection queryString)
         {
             return IsPathVideoFileWithOurCommands(virtualPath, queryString) && c.Pipeline.FileExists(virtualPath, new NameValueCollection());
@@ -51,8 +68,8 @@ namespace ImageResizer.Plugins.FFmpeg
         /// Returns a virtual file instance for the specified specified file and querystring, if they indicate a PSD composition request. 
         /// Otherwise, null is returned.
         /// </summary>
-        /// <param name="virtualPath"></param>
-        /// <param name="queryString"></param>
+        /// <param name="virtualPath">virtual path to file</param>
+        /// <param name="queryString">keys and values to query on</param>
         /// <returns></returns>
         public IVirtualFile GetFile(string virtualPath, NameValueCollection queryString)
         {
@@ -62,7 +79,10 @@ namespace ImageResizer.Plugins.FFmpeg
                 return null;
         }
 
-
+        /// <summary>
+        /// Gets a collection of supported query strings
+        /// </summary>
+        /// <returns>Collection of supported query strings</returns>
         public IEnumerable<string> GetSupportedQuerystringKeys()
         {
             return new string[] {"ffmpeg.seconds" ,"ffmpeg.percent","ffmpeg.skipblankframes" };
@@ -92,7 +112,12 @@ namespace ImageResizer.Plugins.FFmpeg
             return false;
         }
 
-
+        /// <summary>
+        /// Gets the frame stream from the given virtual path and queryString
+        /// </summary>
+        /// <param name="virtualPath">virtual path to file</param>
+        /// <param name="queryString">keys and values to query on</param>
+        /// <returns>Frame Stream that mataches given values</returns>
         public Stream GetFrameStream(string virtualPath, NameValueCollection queryString)
         {
            return mgr.GetFrameStream(c,virtualPath, queryString);
@@ -100,7 +125,9 @@ namespace ImageResizer.Plugins.FFmpeg
 
     }
 
-
+    /// <summary>
+    /// Virtual MPEG file that can be accessed from memory
+    /// </summary>
     public class FFmpegVirtualFile : IVirtualFile
     {
 
@@ -121,6 +148,12 @@ namespace ImageResizer.Plugins.FFmpeg
             }
         }
 
+        /// <summary>
+        /// Constructs a new FFmpegVIrtualFile Instance based on the given values
+        /// </summary>
+        /// <param name="virtualPath">virtual path of file in memory</param>
+        /// <param name="query">query of available keys and values</param>
+        /// <param name="provider">Plugin that captures frames from a MPEG video</param>
         public FFmpegVirtualFile(string virtualPath, NameValueCollection query, FFmpegPlugin provider)
         {
             this.provider = provider;
@@ -131,12 +164,18 @@ namespace ImageResizer.Plugins.FFmpeg
 
         private string _virtualPath = null;
 
+        /// <summary>
+        /// Virtual path to the MPEG video
+        /// </summary>
         public string VirtualPath
         {
             get { return _virtualPath; }
         }
         private NameValueCollection _query;
 
+        /// <summary>
+        /// Query for keys and values
+        /// </summary>
         public NameValueCollection Query
         {
             get { return _query; }
@@ -146,7 +185,7 @@ namespace ImageResizer.Plugins.FFmpeg
         /// <summary>
         /// Returns a stream of the encoded file bitmap using the current request querystring.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Frame Stream that mataches given values</returns>
         public Stream Open() { return provider.GetFrameStream(this.VirtualPath, this.Query); }
 
     }
