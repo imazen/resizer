@@ -9,13 +9,26 @@ namespace ImageResizer.Plugins.SeamCarving {
     public class LzwDecoder {
 
         private string alphabet;
+
+        /// <summary>
+        /// Initialize the LzDecoder
+        /// </summary>
         public LzwDecoder(){
         }
 
+        /// <summary>
+        /// Initialize the LzDecoder using the given custom  Alphabet
+        /// </summary>
+        /// <param name="customAlphabet"></param>
         public LzwDecoder(string customAlphabet){
             this.alphabet = customAlphabet;
         }
 
+        /// <summary>
+        /// Decode the array
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public string Decode(byte[] data) {
             var dict = new Dictionary<int, string>();
 

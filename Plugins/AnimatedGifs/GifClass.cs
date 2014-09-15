@@ -11,18 +11,53 @@ namespace ImageResizer.Plugins.AnimatedGifs
     /// </summary>
     public class GifClass
     {
+        /// <summary>
+        /// GIF Version
+        /// </summary>
         public GIFVersion m_Version = GIFVersion.GIF87a;
         
+        /// <summary>
+        /// Signature of GIF
+        /// </summary>
         public List<byte> m_GifSignature = new List<byte>();
+
+        /// <summary>
+        /// GIF ScreenDiscriptor
+        /// </summary>
         public List<byte> m_ScreenDescriptor = new List<byte>();
+
+        /// <summary>
+        /// GIF Color Table
+        /// </summary>
         public List<byte> m_ColorTable = new List<byte>();
+
+        /// <summary>
+        /// GIF Image Descriptor
+        /// </summary>
         public List<byte> m_ImageDescriptor = new List<byte>();
+
+        /// <summary>
+        /// GIF Image Data
+        /// </summary>
         public List<byte> m_ImageData = new List<byte>();
+
+        /// <summary>
+        /// Initialize GifClass
+        /// </summary>
         public GifClass()
         { }
+
+        /// <summary>
+        /// Load GIF Picture from file
+        /// </summary>
+        /// <param name="filename"></param>
         public void LoadGifPicture(string filename)
         { LoadGifPicture((Bitmap)Bitmap.FromFile(filename)); }
 
+        /// <summary>
+        /// Load GIFPicture from memory
+        /// </summary>
+        /// <param name="gifPicture"></param>
         public void LoadGifPicture(Bitmap gifPicture)
         {
             using (MemoryStream stream = new MemoryStream())
@@ -31,6 +66,11 @@ namespace ImageResizer.Plugins.AnimatedGifs
                 LoadGifPicture(stream);
             }
         }
+
+        /// <summary>
+        /// Load GIf from memory stream
+        /// </summary>
+        /// <param name="stream"></param>
         public void LoadGifPicture(MemoryStream stream)
         {
            //TODO: Eliminate double copying

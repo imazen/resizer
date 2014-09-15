@@ -24,6 +24,9 @@ namespace ImageResizer.Plugins.RedEye {
             get { return formatTranslations; }
         }
 
+        /// <summary>
+        /// Get or set the Algorithm to use in RedEye Filtering
+        /// </summary>
         public short Algorithm { get; set; }
 
         /// <summary>

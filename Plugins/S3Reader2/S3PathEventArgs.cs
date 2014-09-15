@@ -12,7 +12,12 @@ namespace ImageResizer.Plugins.S3Reader2 {
     /// Class to allow modifying the bucket and key request path
     /// </summary>
     public class S3PathEventArgs : EventArgs {
+
+        /// <summary>
+        /// S3 path
+        /// </summary>
         protected string _path;
+
         /// <summary>
         /// Create a new instance of S3PathEventArgs for modifying the bucket and key of incoming requests
         /// </summary>

@@ -40,6 +40,9 @@ namespace ImageResizer.Plugins.BatchZipper
         /// Used to store the results of each resized item.
         /// </summary>
         protected List<ItemResult> results = null;
+        /// <summary>
+        /// Timer for a job
+        /// </summary>
         protected Stopwatch jobTimer;
         /// <summary>
         /// When the job was started
@@ -184,11 +187,22 @@ namespace ImageResizer.Plugins.BatchZipper
         /// </summary>
         protected SaveProgressEventArgs savingCompletedEventArgs = null;
 
+        /// <summary>
+        /// Event fired to save Progress
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void  z_SaveProgress(object sender, SaveProgressEventArgs e)
         {
             if (e.EventType == ZipProgressEventType.Saving_Completed) savingCompletedEventArgs = e;
             if (e.EventType == ZipProgressEventType.Saving_AfterWriteEntry && e.CurrentEntry != null && e.CurrentEntry.IncludedInMostRecentSave) ItemCompleted(e);
         }
+
+        /// <summary>
+        /// Event fired when Item has an error
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void z_ZipError(object sender, ZipErrorEventArgs e)
         {
             //We can only deal with item errors here. We ignore job errors, they will throw an execption that bubbles up through Save()

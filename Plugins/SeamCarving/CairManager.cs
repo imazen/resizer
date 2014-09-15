@@ -13,7 +13,15 @@ using System.Globalization;
 using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.SeamCarving {
+
+    /// <summary>
+    /// CairManager handles the CAIR Seam Carving threading
+    /// </summary>
     public class CairManager {
+
+        /// <summary>
+        /// Initialize the CairManager
+        /// </summary>
         public CairManager() {
         }
 
@@ -39,8 +47,20 @@ namespace ImageResizer.Plugins.SeamCarving {
             set { _maxConcurrentWaitingThreads = value; }
         }
 
+        /// <summary>
+        /// Path to CAIR.EXE
+        /// </summary>
         protected string cairPath = null;
+
+        /// <summary>
+        /// Provides locking for CAIR.EXE
+        /// </summary>
         protected object cairLock = new object();
+
+        /// <summary>
+        /// Gets the path to CAIR.exe
+        /// </summary>
+        /// <returns>path to CAIR.exe</returns>
         public string GetCair(){
             if (cairPath != null) return cairPath;
             lock(cairLock){
@@ -70,6 +90,10 @@ namespace ImageResizer.Plugins.SeamCarving {
             
             return cairPath;
         }
+
+        /// <summary>
+        /// Reset if the CAIR.exe can't be found
+        /// </summary>
         public void CairMissing(){
             cairPath = null;
             GetCair();
@@ -87,6 +111,11 @@ namespace ImageResizer.Plugins.SeamCarving {
         /// </summary>
         private AutoResetEvent turnstile = new AutoResetEvent(true);
 
+        /// <summary>
+        /// Run the CairJob and return the result
+        /// </summary>
+        /// <param name="job">CAIR job to process</param>
+        /// <returns>true if CairJob succeeds</returns>
         public bool CairyIt(CairJob job) {
 
             //If we have too many threads waiting to run CAIR, just kill the request.

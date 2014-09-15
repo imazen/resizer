@@ -22,9 +22,19 @@ namespace ImageResizer.Plugins.SqlReader
     {
 
         SqlReaderSettings s = null;
+
+        /// <summary>
+        /// Initialize the SqlReaderPlugin
+        /// </summary>
+        /// <param name="args"></param>
         public SqlReaderPlugin(NameValueCollection args) :base(){
             this.s = new SqlReaderSettings(args);
         }
+
+        /// <summary>
+        /// Initialize the SqlReaderPlugin applying the given settings 
+        /// </summary>
+        /// <param name="s"></param>
         public SqlReaderPlugin(SqlReaderSettings s)
             : base()
         {
@@ -417,7 +427,11 @@ namespace ImageResizer.Plugins.SqlReader
         }
 
 
-
+        /// <summary>
+        /// Get the Redacted Resizer
+        /// </summary>
+        /// <param name="resizer"></param>
+        /// <returns></returns>
         public Configuration.Xml.Node RedactFrom(Node resizer) {
             foreach (Node n in resizer.queryUncached("plugins.add")) {
                 if (n.Attrs["connectionString"] != null) n.Attrs.Set("connectionString", "[redacted]");
@@ -451,6 +465,11 @@ namespace ImageResizer.Plugins.SqlReader
             }
         }
 
+        /// <summary>
+        /// Initialize the DatabaseFile using the given arguments
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="provider"></param>
         public DatabaseFile(string virtualPath, SqlReaderPlugin provider)
             : base(virtualPath)
         {

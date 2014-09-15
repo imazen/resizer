@@ -23,23 +23,42 @@ namespace ImageResizer.Plugins.CopyMetadata
 
         private List<int> excludedProperties = null;
 
+        /// <summary>
+        /// Install the plugin to the given config
+        /// </summary>
+        /// <param name="c">ImageResizer configuration</param>
+        /// <returns>plugin that was added to the config</returns>
         public IPlugin Install(Configuration.Config c)
         {
             c.Plugins.add_plugin(this);
             return this;
         }
 
+        /// <summary>
+        /// Removes the plugin from the given config
+        /// </summary>
+        /// <param name="c">ImageResizer config</param>
+        /// <returns>true if the plugin has been removed</returns>
         public bool Uninstall(Configuration.Config c)
         {
             c.Plugins.remove_plugin(this);
             return true;
         }
 
+        /// <summary>
+        /// Gets a collection of items that can be changed
+        /// </summary>
+        /// <returns>Collection of supported query strings</returns>
         public IEnumerable<string> GetSupportedQuerystringKeys()
         {
             return new string[] { SettingsKey };
         }
 
+        /// <summary>
+        /// Processes the Final Bitmap found in the ImageState
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         protected override RequestedAction ProcessFinalBitmap(ImageState s)
         {
             string metadata = s.settings[SettingsKey];

@@ -13,6 +13,7 @@ using System.Web.Caching;
 using ImageResizer.Configuration.Xml;
 using ImageResizer.Configuration.Issues;
 
+#pragma warning disable 1591
 namespace ImageResizer.Plugins.Watermark
 {
     /// <summary>

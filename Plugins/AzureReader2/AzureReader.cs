@@ -11,6 +11,9 @@ using ImageResizer.Configuration.Xml;
 
 namespace ImageResizer.Plugins.AzureReader2 {
 
+    /// <summary>
+    /// AzureReader2Plugin handles Azure image files for use with the ImageResizer
+    /// </summary>
     public class AzureReader2Plugin : IPlugin, IIssueProvider, IMultiInstancePlugin, IRedactDiagnostics {
 
         AzureVirtualPathProvider vpp = null;
@@ -19,6 +22,10 @@ namespace ImageResizer.Plugins.AzureReader2 {
         string vPath;
         bool lazyExistenceCheck = false;
 
+        /// <summary>
+        /// Initialize the AzureReader2Plugin
+        /// </summary>
+        /// <param name="args"></param>
         public AzureReader2Plugin(NameValueCollection args) {
             blobStorageConnection = args["connectionstring"];
             blobStorageEndpoint = args["blobstorageendpoint"];
@@ -47,7 +54,11 @@ namespace ImageResizer.Plugins.AzureReader2 {
             set { _registerAsVirtualPathProvider = value; }
         }
 
-
+        /// <summary>
+        /// Install the plugin to the given config
+        /// </summary>
+        /// <param name="c">ImageResizer configuration</param>
+        /// <returns>plugin that was added to the config</returns>
         public IPlugin Install(Configuration.Config c) {
             if (vpp != null)
                 throw new InvalidOperationException("This plugin can only be installed once, and cannot be uninstalled and reinstalled.");
@@ -85,6 +96,11 @@ namespace ImageResizer.Plugins.AzureReader2 {
             return this;
         }
 
+        /// <summary>
+        /// Gets Redacted resizer node
+        /// </summary>
+        /// <param name="resizer"></param>
+        /// <returns></returns>
         public Configuration.Xml.Node RedactFrom(Node resizer) {
             foreach (Node n in resizer.queryUncached("plugins.add")) {
                 if (n.Attrs["connectionString"] != null) n.Attrs.Set("connectionString", "[redacted]");
@@ -113,6 +129,11 @@ namespace ImageResizer.Plugins.AzureReader2 {
             }
         }
 
+        /// <summary>
+        /// Removes the plugin from the given config
+        /// </summary>
+        /// <param name="c">ImageResizer config</param>
+        /// <returns>true if the plugin has been removed</returns>
         public bool Uninstall(Configuration.Config c) {
             //We can uninstall if it wasn't installed as a VPP
             if (!RegisterAsVirtualPathProvider || FailedToRegisterVpp) {

@@ -8,10 +8,21 @@ using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace ImageResizer.Plugins.AzureReader2 {
 
+    /// <summary>
+    /// Handle images from Azure
+    /// </summary>
     public class AzureFile : VirtualFile, IVirtualFile {
 
+        /// <summary>
+        /// Provider where the image comes from
+        /// </summary>
         protected readonly AzureVirtualPathProvider parent;
 
+        /// <summary>
+        /// Initialize teh Azure file
+        /// </summary>
+        /// <param name="blobName"></param>
+        /// <param name="parentProvider"></param>
         public AzureFile(string blobName, AzureVirtualPathProvider parentProvider) : base(blobName) {
             parent = parentProvider;
         }

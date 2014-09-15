@@ -14,12 +14,21 @@ using Amazon.S3;
 using ImageResizer.Configuration.Xml;
 
 namespace ImageResizer.Plugins.S3Reader2 {
+
+    /// <summary>
+    /// Read Amazon S3 file format
+    /// </summary>
     public class S3Reader2 : IPlugin, IMultiInstancePlugin, IRedactDiagnostics {
 
         string buckets, vpath;
         bool includeModifiedDate = false;
         bool asVpp = false;
         AmazonS3Config s3config = null;
+
+        /// <summary>
+        /// Initialize S3Reader2 class
+        /// </summary>
+        /// <param name="args"></param>
         public S3Reader2(NameValueCollection args ) {
 
             s3config = new AmazonS3Config();
@@ -51,7 +60,11 @@ namespace ImageResizer.Plugins.S3Reader2 {
             
         }
 
-
+        /// <summary>
+        /// Gets the signing key from the given Resizer
+        /// </summary>
+        /// <param name="resizer">RemoteReader Signing key</param>
+        /// <returns>Redacted Key</returns>
         public Configuration.Xml.Node RedactFrom(Node resizer) {
             foreach (Node n in resizer.queryUncached("plugins.add")) {
                 if (n.Attrs["accessKeyId"] != null) n.Attrs.Set("accessKeyId", "[redacted]");
@@ -65,7 +78,9 @@ namespace ImageResizer.Plugins.S3Reader2 {
         /// </summary>
         public AmazonS3Client S3Client { get; set; }
 
-
+        /// <summary>
+        /// S3 File region
+        /// </summary>
         public string Region
         {
             get { return this.s3config != null && this.s3config.RegionEndpoint != null ? this.s3config.RegionEndpoint.SystemName : null; }
@@ -111,6 +126,11 @@ namespace ImageResizer.Plugins.S3Reader2 {
 
         S3VirtualPathProvider vpp = null;
 
+        /// <summary>
+        /// Install the S3ReaderPlugin to the given config
+        /// </summary>
+        /// <param name="c">ImageResizer configuration</param>
+        /// <returns>plugin that was added to the config</returns>
         public IPlugin Install(Configuration.Config c) {
 
             if (vpp != null) throw new InvalidOperationException("This plugin can only be installed once, and cannot be uninstalled and reinstalled.");

@@ -18,6 +18,11 @@ namespace ImageResizer.Plugins.S3Reader2
     public class S3VirtualPathProvider : VirtualPathProvider, IVirtualImageProvider
     {
 
+        /// <summary>
+        /// delegate to Rewrite bucket and key path
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public delegate void RewriteBucketAndKeyPath(S3VirtualPathProvider sender, S3PathEventArgs e);
 
         /// <summary>
@@ -117,7 +122,9 @@ namespace ImageResizer.Plugins.S3Reader2
             this.FastMode = fastMode;
         }
 
-
+        /// <summary>
+        /// Initialize the S3VIrtualPathProvider
+        /// </summary>
         protected override void Initialize()
         {
 
@@ -137,6 +144,11 @@ namespace ImageResizer.Plugins.S3Reader2
             return virtualPath.StartsWith(VirtualFilesystemPrefix, StringComparison.OrdinalIgnoreCase);
         }
 
+        /// <summary>
+        /// True if the file exists
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
         public override bool FileExists(string virtualPath)
         {
             if (IsPathVirtual(virtualPath))
@@ -147,7 +159,11 @@ namespace ImageResizer.Plugins.S3Reader2
                 return Previous.FileExists(virtualPath);
         }
 
-
+        /// <summary>
+        /// Gets the virtual file form the virtual path
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
         public override VirtualFile GetFile(string virtualPath)
         {
             if (IsPathVirtual(virtualPath))
@@ -167,6 +183,13 @@ namespace ImageResizer.Plugins.S3Reader2
             }
         }
         
+        /// <summary>
+        /// Gets the Cache Dependency from the virtual path dependencies
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="virtualPathDependencies"></param>
+        /// <param name="utcStart"></param>
+        /// <returns></returns>
         public override CacheDependency GetCacheDependency(
           string virtualPath,
           System.Collections.IEnumerable virtualPathDependencies,
@@ -180,11 +203,22 @@ namespace ImageResizer.Plugins.S3Reader2
 
 
 
-
+        /// <summary>
+        /// True if file exists
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
         public bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
             return IsPathVirtual(virtualPath) && new S3File(virtualPath, this).Exists;
         }
 
+        /// <summary>
+        /// Gets the virtual file from the virtual path
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
         public IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
             return (IsPathVirtual(virtualPath)) ? new S3File(virtualPath, this) : null;
         }

@@ -16,8 +16,16 @@ using System.Text.RegularExpressions;
 
 namespace ImageResizer.Plugins.RemoteReader {
 
+    /// <summary>
+    /// Plug in to handle reading remote files
+    /// </summary>
     public class RemoteReaderPlugin : BuilderExtension, IPlugin, IVirtualImageProvider, IIssueProvider, IRedactDiagnostics {
 
+        /// <summary>
+        /// Gets the signing key from the given Resizer
+        /// </summary>
+        /// <param name="resizer">RemoteReader Signing key</param>
+        /// <returns>Redacted signingKey</returns>
         public Configuration.Xml.Node RedactFrom(Node resizer) {
             if (resizer.queryFirst("remoteReader") != null) resizer.setAttr("remoteReader.signingKey", "[redacted]");
 
@@ -26,11 +34,17 @@ namespace ImageResizer.Plugins.RemoteReader {
 
         private static string base64UrlKey = "urlb64";
 
+        /// <summary>
+        /// Gets the Base64UrlKey from the RemoteReaderPlugin
+        /// </summary>
         public static string Base64UrlKey {
             get { return RemoteReaderPlugin.base64UrlKey; }
         }
         private static string hmacKey = "hmac";
 
+        /// <summary>
+        /// Gets the HmacKey from the RemoteReaderPlugin
+        /// </summary>
         public static string HmacKey {
             get { return RemoteReaderPlugin.hmacKey; }
         }
@@ -44,8 +58,15 @@ namespace ImageResizer.Plugins.RemoteReader {
             set { _allowedRedirects = value; }
         }
 
+        /// <summary>
+        /// Prefix for remote connections
+        /// </summary>
         protected string remotePrefix = "~/remote";
         Config c;
+
+        /// <summary>
+        /// Initialize the RemoteReaderPlugin setting the remotePrefix
+        /// </summary>
         public RemoteReaderPlugin() {
             try {
                 remotePrefix = Util.PathUtils.ResolveAppRelativeAssumeAppRelative(remotePrefix);
@@ -53,6 +74,11 @@ namespace ImageResizer.Plugins.RemoteReader {
             } catch { }
         }
 
+        /// <summary>
+        /// Install the RemoteReaderPlugin to the given config
+        /// </summary>
+        /// <param name="c">ImageResizer configuration</param>
+        /// <returns>RemoteReader plugin that was added to the config</returns>
         public IPlugin Install(Configuration.Config c) {
             this.c = c;
             c.Plugins.add_plugin(this);
@@ -68,7 +94,11 @@ namespace ImageResizer.Plugins.RemoteReader {
             if (IsRemotePath(c.Pipeline.PreRewritePath)) c.Pipeline.SkipFileTypeCheck = true;
         }
 
-
+        /// <summary>
+        /// Removes the plugin from the given config
+        /// </summary>
+        /// <param name="c">ImageResizer config</param>
+        /// <returns>true if the plugin has been removed</returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             c.Pipeline.RewriteDefaults -= Pipeline_RewriteDefaults;
@@ -147,10 +177,23 @@ namespace ImageResizer.Plugins.RemoteReader {
             return remotePrefix + ".jpg.ashx" + PathUtils.BuildQueryString(settings);
         }
 
+        /// <summary>
+        /// Generates a signed domain-relative URL in the form "/app/remote.jpg.ashx?width=200&amp;urlb64=aHnSh3haSh...&amp;hmac=913f3KJGK3hj"
+        /// </summary>
+        /// <param name="remoteUrl"></param>
+        /// <param name="settings"></param>
+        /// <returns></returns>
         public string CreateSignedUrl(string remoteUrl, string settings) {
             return CreateSignedUrl(remoteUrl, new ResizeSettings(settings));
         }
 
+        /// <summary>
+        /// Generates a signed domain-relative URL in the form "/app/remote.jpg.ashx?width=200&amp;urlb64=aHnSh3haSh...&amp;hmac=913f3KJGK3hj"
+        /// </summary>
+        /// <param name="remoteUrl"></param>
+        /// <param name="settings"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public string CreateSignedUrlWithKey(string remoteUrl, string settings, string key) {
             NameValueCollection s = new ResizeSettings(settings);
             s[Base64UrlKey] = PathUtils.ToBase64U(remoteUrl);
@@ -158,12 +201,24 @@ namespace ImageResizer.Plugins.RemoteReader {
             return remotePrefix + ".jpg.ashx" + PathUtils.BuildQueryString(s);
         }
 
+        /// <summary>
+        ///  signed domain-relative URL
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public string SignData(string data) {
 
             string key = c.get("remoteReader.signingKey", String.Empty);
             if (string.IsNullOrEmpty(key)) throw new ImageResizer.ImageProcessingException("You are required to set a passphrase for securing remote URLs. <resizer><remotereader signingKey=\"put a long and randam passphrase here\" /> </resizer>");
             return SignDataWithKey(data, key);
         }
+
+        /// <summary>
+        ///  signed domain-relative URL with encrypted key 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public string SignDataWithKey(string data, string key) {
 
             HMACSHA256 hmac = new HMACSHA256(UTF8Encoding.UTF8.GetBytes(key));
@@ -224,13 +279,23 @@ namespace ImageResizer.Plugins.RemoteReader {
             return path.Substring(0, firstslash).Replace(from, to) + path.Substring(firstslash);
         }
 
-
+        /// <summary>
+        /// Returns true if given path is remote
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <returns></returns>
         public bool IsRemotePath(string virtualPath) {
             return (virtualPath.Length > remotePrefix.Length && 
                 virtualPath.StartsWith(remotePrefix, StringComparison.OrdinalIgnoreCase)
                 && (virtualPath[remotePrefix.Length] == '.' || virtualPath[remotePrefix.Length] == '/'));
         }
 
+        /// <summary>
+        /// Returns true if given file exists
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
         public bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
             return IsRemotePath(virtualPath);
         }
@@ -274,6 +339,12 @@ namespace ImageResizer.Plugins.RemoteReader {
             return false;
         }
 
+        /// <summary>
+        /// Gets virtual file
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
         public IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
             RemoteRequestEventArgs request = ParseRequest(virtualPath, queryString);
             if (request == null) throw new FileNotFoundException();
@@ -291,6 +362,10 @@ namespace ImageResizer.Plugins.RemoteReader {
             return new RemoteSiteFile(virtualPath, request, this);
         }
 
+        /// <summary>
+        /// Collection of issues found using the RemoteReaderPlugin
+        /// </summary>
+        /// <returns>IEnumberable collection of issues found</returns>
         public IEnumerable<IIssue> GetIssues() {
             List<IIssue> issues = new List<IIssue>();
             string key = c.get("remoteReader.signingKey", String.Empty);
@@ -345,26 +420,54 @@ namespace ImageResizer.Plugins.RemoteReader {
         }
     }
 
+    /// <summary>
+    /// Deals with files on remote site
+    /// </summary>
     public class RemoteSiteFile : IVirtualFile, IVirtualFileSourceCacheKey {
 
+        /// <summary>
+        /// virtual file path
+        /// </summary>
         protected string virtualPath;
+
+        /// <summary>
+        /// Remote reader plugin parent
+        /// </summary>
         protected RemoteReaderPlugin parent;
         private RemoteRequestEventArgs request;
 
+        /// <summary>
+        /// sets File on remote site to this instance
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="request"></param>
+        /// <param name="parent"></param>
         public RemoteSiteFile(string virtualPath, RemoteRequestEventArgs request, RemoteReaderPlugin parent) {
             this.virtualPath = virtualPath;
             this.request = request;
             this.parent = parent;
         }
 
+        /// <summary>
+        /// Virtual path to file
+        /// </summary>
         public string VirtualPath {
             get { return virtualPath; }
         }
 
+        /// <summary>
+        /// Open remote file into a stream
+        /// </summary>
+        /// <returns></returns>
         public System.IO.Stream Open() {
             return SeekableStreamWrapper.FromStream(parent.GetUriStream(new Uri(this.request.RemoteUrl)));
         }
 
+        /// <summary>
+        /// Gets Remote Url
+        /// </summary>
+        /// <param name="includeModifiedDate"></param>
+        /// <returns></returns>
         public string GetCacheKey(bool includeModifiedDate) {
             return this.request.RemoteUrl;
         }

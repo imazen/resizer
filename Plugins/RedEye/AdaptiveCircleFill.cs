@@ -152,6 +152,10 @@ namespace ImageResizer.Plugins.RedEye {
         /// A queue of points which have been filled, but their neighbors not yet evalutated.
         /// </summary>
         Queue<System.Drawing.Point> q;
+
+        /// <summary>
+        /// First pass updates the fill based on the First Pass algorithm
+        /// </summary>
         public void FirstPass() {
             filledArray = new bool[red.Height, red.Width];
             q = new Queue<System.Drawing.Point>();
@@ -193,6 +197,9 @@ namespace ImageResizer.Plugins.RedEye {
             }
         }
 
+        /// <summary>
+        /// Second Pass does a reset
+        /// </summary>
         public void SecondPass() {
             ClearArray();
             SumX = 0;
@@ -325,6 +332,13 @@ namespace ImageResizer.Plugins.RedEye {
             q.Enqueue(p);
         }
 
+        /// <summary>
+        /// Set the pixel fill
+        /// </summary>
+        /// <param name="target">image</param>
+        /// <param name="x">x coordinate</param>
+        /// <param name="y">y coordinate</param>
+        /// <param name="color">color array</param>
         public unsafe void SetPixel(UnmanagedImage target, int x, int y, byte[] color) {
 
             int pixelSize = System.Drawing.Image.GetPixelFormatSize(target.PixelFormat) / 8;
@@ -333,6 +347,13 @@ namespace ImageResizer.Plugins.RedEye {
             Marshal.Copy(color, 0, (IntPtr)((long)target.ImageData + y * target.Stride + (x) * pixelSize), pixelSize);
         }
 
+        /// <summary>
+        /// Marks Pixels as filled 
+        /// </summary>
+        /// <param name="target">image</param>
+        /// <param name="xoffset">offset from x coordinate</param>
+        /// <param name="yoffset">offset from y coordinate</param>
+        /// <param name="color">color array</param>
         public unsafe void MarkFilledPixels(UnmanagedImage target, int xoffset, int yoffset, byte[] color) {
             
             int pixelSize =   System.Drawing.Image.GetPixelFormatSize(target.PixelFormat) / 8;
@@ -353,6 +374,10 @@ namespace ImageResizer.Plugins.RedEye {
 
         }
 
+        /// <summary>
+        /// Applys a GassianBlur mask to the image
+        /// </summary>
+        /// <returns>blurred image mask</returns>
         public UnmanagedImage GetBlurredMask() {
             using (UnmanagedImage ui = UnmanagedImage.Create(filledArray.GetLength(1),filledArray.GetLength(0), PixelFormat.Format8bppIndexed)) {
                 MarkFilledPixels(ui, 0, 0, new byte[] { 255 });

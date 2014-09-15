@@ -10,38 +10,122 @@ using System.IO;
 using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.SeamCarving {
+
+    /// <summary>
+    /// Plugin for editing images using Seam Carving
+    /// </summary>
     public class SeamCarvingPlugin : BuilderExtension, IQuerystringPlugin, IPlugin {
 
         CairManager cair = new CairManager();
+
+        /// <summary>
+        /// Initialize the SeamCarvingPlugin class
+        /// </summary>
         public SeamCarvingPlugin() {
 
         }
+
+        /// <summary>
+        /// Types of filters to use in Seam Carving
+        /// </summary>
         public enum FilterType {
+
+            /// <summary>
+            /// No filter
+            /// </summary>
             None = 10,
+
+            /// <summary>
+            /// Prewitt filter
+            /// </summary>
             Prewitt = 0,
+
+            /// <summary>
+            /// V1 filter
+            /// </summary>
             V1 = 1,
+
+            /// <summary>
+            /// VSquare filter
+            /// </summary>
             VSquare = 2,
+
+            /// <summary>
+            /// Sobel filter
+            /// </summary>
             Sobel = 3,
+
+            /// <summary>
+            /// Laplacian filter
+            /// </summary>
             Laplacian = 4
         }
 
+        /// <summary>
+        /// Types of output from the Seam Carving
+        /// </summary>
         public enum OutputType {
+            /// <summary>
+            /// CAIR output
+            /// </summary>
             CAIR=  0,
+
+            /// <summary>
+            /// Grayscale Output
+            /// </summary>
             Grayscale =  1,
+
+            /// <summary>
+            /// Edge Output
+            /// </summary>
             Edge=  2,
+
+            /// <summary>
+            /// VerticalEnergy output
+            /// </summary>
             VerticalEnergy =  3,
+
+            /// <summary>
+            /// HorizontalEnergy output
+            /// </summary>
             HorizontalEnergy =  4,
+
+            /// <summary>
+            /// Removal output
+            /// </summary>
             Removal= 5,
+
+            /// <summary>
+            /// CAIR HD output
+            /// </summary>
             CAIR_HD=  6
 
         }
+
+        /// <summary>
+        /// Types of Seam Carving Energy
+        /// </summary>
         public enum EnergyType {
+
+            /// <summary>
+            /// Backward Energy
+            /// </summary>
             Backward = 0,
+
+            /// <summary>
+            /// Forward Energy
+            /// </summary>
             Forward = 1
         }
 
         private const string CarveData = "CarveData";
 
+
+        /// <summary>
+        /// Performs Seam Carving based on the given ImageState data
+        /// </summary>
+        /// <param name="s">ImageState data to draw</param>
+        /// <returns>Requested action, which defaults to "None"</returns>
         protected override RequestedAction LayoutImage(ImageState s) {
             if (s.sourceBitmap == null) return RequestedAction.None;
 
@@ -81,14 +165,22 @@ namespace ImageResizer.Plugins.SeamCarving {
 
         }
 
-
+        /// <summary>
+        /// Performs Post Layout Image processing
+        /// </summary>
+        /// <param name="s">ImageState data to draw</param>
+        /// <returns>Requested action, which defaults to "None"</returns>
         protected override RequestedAction PostLayoutImage(ImageState s) {
             
             return RequestedAction.None;
         }
 
 
-
+        /// <summary>
+        /// Performs a PreRender Image processing
+        /// </summary>
+        /// <param name="s">ImageState data to draw</param>
+        /// <returns>Requested action"</returns>
         protected override RequestedAction PreRenderImage(ImageState s) {
             //Skip this when we are doing simulations
             if (s.destGraphics == null) return RequestedAction.None;
@@ -201,17 +293,30 @@ namespace ImageResizer.Plugins.SeamCarving {
 
 
 
+        /// <summary>
+        /// Gets a collection of items that can be changed
+        /// </summary>
+        /// <returns>Collection of supported query strings</returns>
         public IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "carve" };
         }
 
+        /// <summary>
+        /// Install the plugin to the given config
+        /// </summary>
+        /// <param name="c">ImageResizer configuration</param>
+        /// <returns>plugin that was added to the config</returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             return this;
         }
 
 
-
+        /// <summary>
+        /// Removes the plugin from the given config
+        /// </summary>
+        /// <param name="c">ImageResizer config</param>
+        /// <returns>true if the plugin has been removed</returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;

@@ -15,12 +15,28 @@ namespace ImageResizer.Plugins.CloudFront {
     /// </summary>
     public class CloudFrontPlugin : IPlugin {
 
+        /// <summary>
+        /// Initialize the CLoudFrontPlugin
+        /// </summary>
         public CloudFrontPlugin() { }
 
         Config c;
 
+        /// <summary>
+        /// Redirect Through
+        /// </summary>
         protected string redirectThrough = null;
+
+        /// <summary>
+        /// true if redirect is Permanent redirect
+        /// </summary>
         protected bool redirectPermanent = false;
+
+        /// <summary>
+        /// Install the plugin to the given config
+        /// </summary>
+        /// <param name="c">ImageResizer configuration</param>
+        /// <returns>plugin that was added to the config</returns>
         public IPlugin Install(Configuration.Config c) {
             this.c = c;
             c.Plugins.add_plugin(this);
@@ -84,6 +100,11 @@ namespace ImageResizer.Plugins.CloudFront {
 
         }
 
+        /// <summary>
+        /// Removes the plugin from the given config
+        /// </summary>
+        /// <param name="c">ImageResizer config</param>
+        /// <returns>true if the plugin has been removed</returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             c.Pipeline.RewriteDefaults -= Pipeline_RewriteDefaults;

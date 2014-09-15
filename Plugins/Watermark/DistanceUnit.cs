@@ -4,6 +4,7 @@ using System.Text;
 using ImageResizer.Util;
 using System.Globalization;
 
+#pragma warning disable 1591
 namespace ImageResizer.Plugins.Watermark {
     public class DistanceUnit {
         public DistanceUnit(double value, Units type) {

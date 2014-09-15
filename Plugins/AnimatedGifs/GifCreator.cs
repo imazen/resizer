@@ -5,15 +5,40 @@ using System.IO;
 using System.Text;
 namespace ImageResizer.Plugins.AnimatedGifs
 {
+    /// <summary>
+    /// Supported versions of Gif images
+    /// </summary>
     public enum GIFVersion
     {
+        /// <summary>
+        /// GIF87a
+        /// </summary>
         GIF87a,
+
+        /// <summary>
+        /// GIF89a
+        /// </summary>
         GIF89a
     }
+
+    /// <summary>
+    /// Types of Gif Blocks
+    /// </summary>
     public enum GIFBlockType
     {
+        /// <summary>
+        /// ImageDescriptor
+        /// </summary>
         ImageDescriptor = 0x2C,
+
+        /// <summary>
+        /// Extension
+        /// </summary>
         Extension = 0x21,
+
+        /// <summary>
+        /// Trailer
+        /// </summary>
         Trailer = 0x3B
     }
     /// <summary>
@@ -21,6 +46,12 @@ namespace ImageResizer.Plugins.AnimatedGifs
     /// </summary>
     public class GifCreator
     {
+        /// <summary>
+        /// Create given Animated Gives and output to file
+        /// </summary>
+        /// <param name="gifFiles"></param>
+        /// <param name="delay"></param>
+        /// <param name="outputFile"></param>
         public static void CreateAnimatedGif(List<string> gifFiles, int delay, string outputFile)
         {
             BinaryWriter writer = new BinaryWriter(new FileStream(outputFile, FileMode.Create, FileAccess.ReadWrite));

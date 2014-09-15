@@ -10,6 +10,9 @@ using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.AzureReader2 {
 
+    /// <summary>
+    /// AzureVirtualPathProvider handles using Azure image files
+    /// </summary>
      public class AzureVirtualPathProvider : VirtualPathProvider, IVirtualImageProvider {
 
         private string _virtualFilesystemPrefix = PathUtils.ResolveAppRelative("~/azure/");
@@ -39,7 +42,9 @@ namespace ImageResizer.Plugins.AzureReader2 {
             set { _lazyExistenceCheck = value; }
         }
 
-
+         /// <summary>
+         /// gets or sets the cloud blob client 
+         /// </summary>
         public CloudBlobClient CloudBlobClient {
             get {
                 return _cloudBlobClient;
@@ -49,6 +54,10 @@ namespace ImageResizer.Plugins.AzureReader2 {
             }
         }
         
+         /// <summary>
+         /// Initialize the AzureVirtualPathProvider and setup a connection to the Azure image location
+         /// </summary>
+         /// <param name="blobStorageConnection"></param>
         public AzureVirtualPathProvider(string blobStorageConnection) {
             // Setup the connection to Windows Azure Storage
 
@@ -136,6 +145,12 @@ namespace ImageResizer.Plugins.AzureReader2 {
             return false;
         }
 
+         /// <summary>
+         /// Gets teh Azure file from the Azure blob
+         /// </summary>
+         /// <param name="virtualPath"></param>
+         /// <param name="queryString"></param>
+         /// <returns></returns>
         public IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
             if (IsPathVirtual(virtualPath)) {
                 // Strip prefix from virtual path; keep container and blob

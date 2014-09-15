@@ -5,15 +5,36 @@ using System.Drawing;
 using System.Drawing.Imaging;
 
 namespace ImageResizer.Plugins.SeamCarving {
+
+    /// <summary>
+    /// Modify a bitmap with seam carving using the Carve dataPlotter
+    /// </summary>
     public class CarveDataPlotter {
 
-
+        /// <summary>
+        /// Gets or sets the BlockCount
+        /// </summary>
         public int BlockCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Stride
+        /// </summary>
         public int Stride { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Rows
+        /// </summary>
         public int Rows { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Grid
+        /// </summary>
         public byte[][] Grid { get; set; }
 
+        /// <summary>
+        /// Initialize the Grid
+        /// </summary>
+        /// <param name="data"></param>
         public void Init(string data) {
             Grid = new byte[Rows][];
             for (int i = 0; i < Rows; i++)
@@ -26,7 +47,12 @@ namespace ImageResizer.Plugins.SeamCarving {
             }
         }
 
-
+        /// <summary>
+        /// Save Bitmap file 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
         public void SaveBitmapAs(string path, int width, int height) {
             int blockSize = (int)Math.Floor(Math.Sqrt(width * height / (double)BlockCount));
             using (Bitmap bit = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb))

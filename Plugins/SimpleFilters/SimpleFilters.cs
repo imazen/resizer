@@ -11,17 +11,36 @@ using System.Drawing.Drawing2D;
 using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.SimpleFilters {
+
+    /// <summary>
+    /// Simple filters that can be applied to the ImageResizer
+    /// </summary>
     public class SimpleFilters : BuilderExtension, IPlugin, IQuerystringPlugin {
+
+        /// <summary>
+        /// Install the plugin to the given config
+        /// </summary>
+        /// <param name="c">ImageResizer configuration</param>
+        /// <returns>plugin that was added to the config</returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             return this;
         }
 
+        /// <summary>
+        /// Removes the plugin from the given config
+        /// </summary>
+        /// <param name="c">ImageResizer config</param>
+        /// <returns>true if the plugin has been removed</returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
         }
 
+        /// <summary>
+        /// Gets a collection of items that can be changed
+        /// </summary>
+        /// <returns>Collection of supported query strings</returns>
         public IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "filter", "s.grayscale", "s.overlay", "s.shift", "s.sepia", "s.alpha", "s.brightness", "s.contrast", "s.saturation", "s.invert","s.roundcorners" };
         }
@@ -85,6 +104,11 @@ namespace ImageResizer.Plugins.SimpleFilters {
             return RequestedAction.None;
         }
 
+        /// <summary>
+        /// Adds all fillters in the settings
+        /// </summary>
+        /// <param name="s">ImageState data to draw</param>
+        /// <returns>Requested action, which defaults to "None"</returns>
         protected override RequestedAction PostCreateImageAttributes(ImageState s) {
             if (s.copyAttibutes == null) return RequestedAction.None;
 
@@ -153,7 +177,11 @@ namespace ImageResizer.Plugins.SimpleFilters {
             return RequestedAction.None;
         }
 
-
+        /// <summary>
+        /// Post rendering based on the given settings
+        /// </summary>
+        /// <param name="s">ImageState data to draw</param>
+        /// <returns>Requested action, which defaults to "None"</returns>
         protected override RequestedAction PostRenderImage(ImageState s) {
             Color? c = Util.ParseUtils.ParseColor(s.settings["s.overlay"]);
 

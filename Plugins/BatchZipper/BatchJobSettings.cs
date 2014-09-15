@@ -10,8 +10,16 @@ using ImageResizer;
 
 namespace ImageResizer.Plugins.BatchZipper
 {
+    /// <summary>
+    /// Callback for Item
+    /// </summary>
+    /// <param name="e"></param>
     public delegate void ItemCallback(ItemEventArgs e);
 
+    /// <summary>
+    /// Callback for Job
+    /// </summary>
+    /// <param name="e"></param>
     public delegate void JobCallback(JobEventArgs e);
 
     /// <summary>
@@ -82,11 +90,17 @@ namespace ImageResizer.Plugins.BatchZipper
             set { ThowIfInvalid(); targetFilename = value; }
         }
 
+        /// <summary>
+        /// Throws an InvalidOperationException if instance is immutable
+        /// </summary>
         protected void ThowIfInvalid()
         {
             if (!mutable) throw new InvalidOperationException("This instance is marked as immutable.");
         }
 
+        /// <summary>
+        /// Is batch job mutable
+        /// </summary>
         protected bool mutable = true;
 
         /// <summary>
@@ -105,6 +119,10 @@ namespace ImageResizer.Plugins.BatchZipper
             mutable = false;
         }
 
+        /// <summary>
+        /// returns batch job settings
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return base.ToString() + "{PhysicalPath=\"" + PhysicalPath + "\", TargetFilename=\"" + TargetFilename + "\", ResizeQuerystring=\"" + ResizeQuerystring + "\", mutable=" + mutable + "}";
@@ -122,7 +140,7 @@ namespace ImageResizer.Plugins.BatchZipper
         /// </summary>
         /// <param name="jobId">The job ID, can be generated with Guid.NewGuid() </param>
         /// <param name="destinationFile">The physical path to the destination archive</param>
-        /// <param name="files">A List<BatchResizeItem> of items to to resize and place in the folder.</param>
+        /// <param name="files">A List<BatchResizeItem> of items to to resize and place in the folder</param>
         public BatchResizeSettings(string destinationFile, Guid jobId, IList<BatchResizeItem> files)
         {
             this.jobId = jobId;
@@ -131,10 +149,24 @@ namespace ImageResizer.Plugins.BatchZipper
             this.conf = Config.Current;
         }
         //Input settings
+        /// <summary>
+        /// Unique batch job id
+        /// </summary>
         public Guid jobId;
+
+        /// <summary>
+        /// list of files to be resized
+        /// </summary>
         public IList<BatchResizeItem> files;
+
+        /// <summary>
+        /// Destination file name
+        /// </summary>
         public string destinationFile;
 
+        /// <summary>
+        /// Configuration
+        /// </summary>
         public Config conf = null;
 
         //Progress/failure callbacks
@@ -151,10 +183,19 @@ namespace ImageResizer.Plugins.BatchZipper
         /// </summary>
         public event JobCallback JobEvent;
 
+        /// <summary>
+        /// Event that Fires for an Item
+        /// </summary>
+        /// <param name="e"></param>
         protected internal void FireItemEvent(ItemEventArgs e)
         {
             if (ItemEvent != null) ItemEvent(e);
         }
+
+        /// <summary>
+        /// Event that Fires for a job
+        /// </summary>
+        /// <param name="e"></param>
         protected internal void FireJobEvent(JobEventArgs e)
         {
             if (JobEvent != null) JobEvent(e);

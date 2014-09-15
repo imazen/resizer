@@ -8,8 +8,18 @@ using System.Drawing;
 using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.AdvancedFilters {
+
+    /// <summary>
+    /// Feather Edge of image
+    /// </summary>
     public class FeatherEdge : BaseInPlacePartialFilter {
 
+        /// <summary>
+        /// Initialize teh FeatherEdge
+        /// </summary>
+        /// <param name="outerAlpha"></param>
+        /// <param name="innerAlpha"></param>
+        /// <param name="width"></param>
         public FeatherEdge(double outerAlpha, double innerAlpha, double width ):this() {
             this.OuterAlpha = outerAlpha;
             this.InnerAlpha = innerAlpha;
@@ -17,19 +27,34 @@ namespace ImageResizer.Plugins.AdvancedFilters {
 
         }
 
+        /// <summary>
+        /// Get or Set the Outer Alpha channel
+        /// </summary>
         public double OuterAlpha { get; set; }
 
+        /// <summary>
+        /// Get or Set the Inner Alpha channel
+        /// </summary>
         public double InnerAlpha { get; set; }
 
+        /// <summary>
+        /// Get or set the width
+        /// </summary>
         public double Width { get; set; }
 
         private Dictionary<PixelFormat, PixelFormat> formatTranslations = new Dictionary<PixelFormat, PixelFormat>();
+
+        /// <summary>
+        /// Gets the formatTranslations
+        /// </summary>
         public override Dictionary<PixelFormat, PixelFormat> FormatTranslations {
             get { return formatTranslations; }
         }
 
 
-
+        /// <summary>
+        /// Applys the format Translations Pixel Format
+        /// </summary>
         public FeatherEdge() {
             formatTranslations[PixelFormat.Format32bppArgb] = PixelFormat.Format32bppArgb;
         }
@@ -37,7 +62,11 @@ namespace ImageResizer.Plugins.AdvancedFilters {
 
 
 
-
+        /// <summary>
+        /// Process the FeatherEdge filter on the image
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="rect"></param>
         protected override unsafe void ProcessFilter(UnmanagedImage image, Rectangle rect) {
             int pixelSize = (image.PixelFormat == PixelFormat.Format8bppIndexed) ? 1 :
                 (image.PixelFormat == PixelFormat.Format24bppRgb) ? 3 : 4;

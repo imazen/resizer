@@ -11,6 +11,7 @@ using System.Web.Hosting;
 using ImageResizer.Configuration;
 using System.Web.Caching;
 
+#pragma warning disable 1591
 namespace ImageResizer.Plugins.Watermark {
     /// <summary>
     /// Provides extensibility points for drawing watermarks and even modifying resizing/image settings

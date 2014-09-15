@@ -8,6 +8,10 @@ using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.SqlReader {
 
+    /// <summary>
+    /// Delegate for AUthorizing and Event based on given id
+    /// </summary>
+    /// <param name="id"></param>
     public delegate void AuthorizeEvent(String id);
 
     /// <summary>
@@ -15,9 +19,16 @@ namespace ImageResizer.Plugins.SqlReader {
     /// </summary>
     public class SqlReaderSettings {
 
+        /// <summary>
+        /// Initialize the SqlReaderSettings
+        /// </summary>
         public SqlReaderSettings() {
         }
 
+        /// <summary>
+        /// Initialize the SqlReaderSettings using given collection arguments
+        /// </summary>
+        /// <param name="args"></param>
         public SqlReaderSettings(System.Collections.Specialized.NameValueCollection args) {
             if (!string.IsNullOrEmpty(args["prefix"])) this.PathPrefix = args["prefix"];
             if (!string.IsNullOrEmpty(args["connectionString"])) this.ConnectionString = args["connectionString"];
@@ -136,6 +147,9 @@ namespace ImageResizer.Plugins.SqlReader {
             set { connectionString = value; }
         }
 
+        /// <summary>
+        /// Returns true if queries are SQL stored procedure
+        /// </summary>
         public bool QueriesAreStoredProcedures{get;set;}
 
         private string imageBlobQuery =

@@ -15,11 +15,28 @@ using ImageResizer.Plugins.Faces;
 using ImageResizer.Caching;
 
 namespace ImageResizer.Plugins.RedEye {
+
+    /// <summary>
+    /// RedEye plugin handles finding and fixing RedEye
+    /// </summary>
     public class RedEyePlugin : BuilderExtension, IPlugin, IQuerystringPlugin {
+
+        /// <summary>
+        /// Initialize the RedEyePlugin
+        /// </summary>
         public RedEyePlugin() {
         }
 
+        /// <summary>
+        /// ImageResizer configuration
+        /// </summary>
         protected Config c;
+
+        /// <summary>
+        /// Install the RedEyePlugin to the given config
+        /// </summary>
+        /// <param name="c">ImageResizer configuration</param>
+        /// <returns>RedEye plugin that was added to the config</returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             this.c = c;
@@ -27,12 +44,22 @@ namespace ImageResizer.Plugins.RedEye {
             return this;
         }
 
+        /// <summary>
+        /// Removes the plugin from the given config
+        /// </summary>
+        /// <param name="c">ImageResizer config</param>
+        /// <returns>true if the plugin has been removed</returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             c.Pipeline.PreHandleImage -= Pipeline_PreHandleImage;
             return true;
         }
 
+        /// <summary>
+        /// Detects RedEye as requested
+        /// </summary>
+        /// <param name="s">ImageState data to Render</param>
+        /// <returns>Requested action, which defaults to "None"</returns>
         protected override RequestedAction Render(ImageState s) {
             if (base.Render(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
 
@@ -90,7 +117,11 @@ namespace ImageResizer.Plugins.RedEye {
 
         }
 
- 
+        /// <summary>
+        /// Draws the image data based on the ImageState data
+        /// </summary>
+        /// <param name="s">ImageState data to draw</param>
+        /// <returns>Requested action, which defaults to "None"</returns>
         protected override RequestedAction PostRenderImage(ImageState s) {
 
             if (s.destBitmap == null) return RequestedAction.None;
@@ -146,6 +177,10 @@ namespace ImageResizer.Plugins.RedEye {
             }
         }
 
+        /// <summary>
+        /// Gets a collection of items that can be changed
+        /// </summary>
+        /// <returns>Collection of supported query strings</returns>
         public  IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "r.detecteyes", "r.getlayout", "r.conv","r.econv","r.sn","r.canny","r.threshold","r.sobel","r.filter","r.eyes","r.autoeyes"};
         }

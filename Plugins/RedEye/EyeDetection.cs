@@ -10,14 +10,36 @@ using ImageResizer.Plugins.Faces;
 
 namespace ImageResizer.Plugins.RedEye {
 
-
+    /// <summary>
+    /// Type of facial feature
+    /// </summary>
     public enum FeatureType {
+        /// <summary>
+        /// Eye
+        /// </summary>
         Eye,
+        
+        /// <summary>
+        /// Pair of Eyes
+        /// </summary>
         EyePair,
+
+        /// <summary>
+        /// Face
+        /// </summary>
         Face
     }
 
+    /// <summary>
+    /// Rectangle around an feature
+    /// </summary>
     public class ObjRect : IFeature {
+
+        /// <summary>
+        /// Initializes a rectangle around a feature
+        /// </summary>
+        /// <param name="rect">rectangle coordinates</param>
+        /// <param name="type">type of feature</param>
         public ObjRect(RectangleF rect, FeatureType type) {
             this.X = rect.X;
             this.Y = rect.Y;
@@ -26,16 +48,46 @@ namespace ImageResizer.Plugins.RedEye {
             this.Feature = type;
             this.Accuracy = 0;
         }
+
+        /// <summary>
+        /// Rectangle x coordinate
+        /// </summary>
         public float X { get; set; }
+
+        /// <summary>
+        /// Rectangle y coordinate
+        /// </summary>
         public float Y { get; set; }
+
+        /// <summary>
+        /// Rectangle X2 or right side coordinate
+        /// </summary>
         public float X2 { get; set; }
+
+        /// <summary>
+        /// Rectangle Y2 or bottom side coordinate
+        /// </summary>
         public float Y2 { get; set; }
+
+        /// <summary>
+        /// Accuracy to used in detection
+        /// </summary>
         public float Accuracy { get; set; }
+
+        /// <summary>
+        /// Type of facial feature
+        /// </summary>
         public FeatureType Feature { get; set; }
     }
 
+    /// <summary>
+    /// Detects Eyes from an image
+    /// </summary>
     public class EyeDetection : FeatureDetectionBase<ObjRect> {
 
+        /// <summary>
+        /// Initialize EyeDetection
+        /// </summary>
         public EyeDetection()
             : base() {
                 this.fileNames = new Dictionary<string, string>(){

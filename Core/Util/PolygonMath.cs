@@ -233,7 +233,7 @@ namespace ImageResizer.Util
         /// <summary>
         /// Returns a bounding box for the specified set of points. Odd points are Y values, even points are X values
         /// </summary>
-        /// <param name="points"></param>
+        /// <param name="flattenedPoints"></param>
         /// <returns></returns>
         public static RectangleF GetBoundingBox(double[] flattenedPoints)  {
             double? minx = null, maxx = null, miny = null, maxy = null;
@@ -663,8 +663,8 @@ namespace ImageResizer.Util
         /// <summary>
         /// Returns the distance between two points
         /// </summary>
-        /// <param name="pointF"></param>
-        /// <param name="pointF_2"></param>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
         /// <returns></returns>
         public static double Dist(PointF a, PointF b) {
             return Math.Sqrt((b.X - a.X) * (b.X - a.X) + (b.Y - a.Y) * (b.Y - a.Y));

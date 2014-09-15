@@ -9,6 +9,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using ImageResizer.ExtensionMethods;
 
+#pragma warning disable 1591
 namespace ImageResizer.Plugins.Watermark {
     public class TextLayer:Layer {
 

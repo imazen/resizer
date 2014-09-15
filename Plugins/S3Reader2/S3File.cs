@@ -16,6 +16,9 @@ using Amazon.S3;
 
 namespace ImageResizer.Plugins.S3Reader2 {
 
+    /// <summary>
+    /// Class to hold Amazon S3 file data
+    /// </summary>
     public class S3File : VirtualFile, IVirtualFile, IVirtualFileWithModifiedDate, IVirtualFileSourceCacheKey {
         private string bucket;
         private string key;
@@ -63,6 +66,9 @@ namespace ImageResizer.Plugins.S3Reader2 {
             }
         }
 
+        /// <summary>
+        /// true if file exists
+        /// </summary>
         public bool Exists {
             get {
                 if (_exists == null && provider.FastMode) return true; //Assume it exists in fast mode.
@@ -71,6 +77,11 @@ namespace ImageResizer.Plugins.S3Reader2 {
             }
         }
 
+        /// <summary>
+        /// Initialize the S3file
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="provider"></param>
         public S3File(string virtualPath, S3VirtualPathProvider provider)
             : base(virtualPath) {
             this.provider = provider;
@@ -101,7 +112,10 @@ namespace ImageResizer.Plugins.S3Reader2 {
         }
 
 
-
+        /// <summary>
+        /// Open the S3 file stream
+        /// </summary>
+        /// <returns></returns>
         public override Stream Open() {
             //Synchronously download to memory stream
             try {
@@ -118,6 +132,9 @@ namespace ImageResizer.Plugins.S3Reader2 {
             return null;
         }
 
+        /// <summary>
+        /// File modified date in UTC format
+        /// </summary>
         public DateTime ModifiedDateUTC {
             get {
                 if (_fileModifiedDate == null && provider.FastMode) return DateTime.MinValue; //In fast mode, Return flag value that means no info available.
@@ -126,7 +143,11 @@ namespace ImageResizer.Plugins.S3Reader2 {
             }
         }
 
-
+        /// <summary>
+        /// Get the file cache key
+        /// </summary>
+        /// <param name="includeModifiedDate"></param>
+        /// <returns></returns>
         public string GetCacheKey(bool includeModifiedDate) {
             return VirtualPath + (includeModifiedDate ? ("_" + ModifiedDateUTC.Ticks.ToString()) : "");
         }

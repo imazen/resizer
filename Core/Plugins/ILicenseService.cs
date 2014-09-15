@@ -12,7 +12,6 @@ namespace ImageResizer.Plugins {
         /// </summary>
         /// <param name="domain"></param>
         /// <param name="feature"></param>
-        /// <param name="featureDisplayName"></param>
         void NotifyUse(string domain, Guid feature);
         /// <summary>
         /// Configure the display name for the given feature id

@@ -5,8 +5,16 @@ using System.Collections.Specialized;
 
 namespace ImageResizer.Plugins.RemoteReader {
 
+    /// <summary>
+    /// delegate providing remote request to the Reader
+    /// </summary>
+    /// <param name="sender">sender of the request</param>
+    /// <param name="args">Remote Request configuration</param>
     public delegate void RemoteRequest(object sender, RemoteRequestEventArgs args);
 
+    /// <summary>
+    /// Event args for RemoteRequest connection and configuration
+    /// </summary>
     public class RemoteRequestEventArgs {
 
         private string remoteUrl = null;
@@ -43,6 +51,9 @@ namespace ImageResizer.Plugins.RemoteReader {
         /// </summary>
         private bool denyRequest = true;
 
+        /// <summary>
+        /// True to deny the request
+        /// </summary>
         public bool DenyRequest {
             get { return denyRequest; }
             set { denyRequest = value; }

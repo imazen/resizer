@@ -10,6 +10,7 @@ using System.Web.Caching;
 using ImageResizer.Configuration;
 using System.IO;
 
+#pragma warning disable 1591
 namespace ImageResizer.Plugins.Watermark {
     public class ImageLayer:Layer {
         public ImageLayer(NameValueCollection attrs, ResizeSettings defaultImageQuery, Config c)

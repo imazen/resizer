@@ -13,16 +13,35 @@ using ImageResizer.Configuration;
 using ImageResizer.Plugins.Basic;
 namespace ImageResizer.Plugins.AnimatedGifs
 {
+    /// <summary>
+    /// Handles Animated Gif images
+    /// </summary>
     public class AnimatedGifs : BuilderExtension, IPlugin
     {
         Config c;
+
+        /// <summary>
+        /// Initialize the AnimatedGifs
+        /// </summary>
         public AnimatedGifs(){}
+
+
+        /// <summary>
+        /// Install the plugin to the given config
+        /// </summary>
+        /// <param name="c">ImageResizer configuration</param>
+        /// <returns>plugin that was added to the config</returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             this.c = c;
             return this;
         }
 
+        /// <summary>
+        /// Removes the plugin from the given config
+        /// </summary>
+        /// <param name="c">ImageResizer config</param>
+        /// <returns>true if the plugin has been removed</returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
@@ -33,7 +52,7 @@ namespace ImageResizer.Plugins.AnimatedGifs
         /// </summary>
         /// <param name="source"></param>
         /// <param name="dest"></param>
-        /// <param name="settings"></param>
+        /// <param name="job"></param>
         protected override RequestedAction BuildJobBitmapToStream(ImageJob job, Bitmap source, Stream dest)
         {
             //Determines output format, includes code for saving in a variety of formats.
@@ -133,6 +152,11 @@ namespace ImageResizer.Plugins.AnimatedGifs
 
               return null;
           }
+        /// <summary>
+        /// Get AnimatedGif delays
+        /// </summary>
+        /// <param name="items"></param>
+        /// <returns></returns>
           protected static int[] GetDelays(PropertyItem[] items)
           {
               //Property item ID 20736 http://bytes.com/groups/net-vb/692099-problem-animated-gifs
@@ -146,6 +170,12 @@ namespace ImageResizer.Plugins.AnimatedGifs
               return vals;
               
           }
+
+        /// <summary>
+        /// Get Animated Gif Loops
+        /// </summary>
+        /// <param name="items"></param>
+        /// <returns></returns>
           protected static int GetLoops(PropertyItem[] items)
           {
             // http://weblogs.asp.net/justin_rogers/archive/2004/01/19/60424.aspx

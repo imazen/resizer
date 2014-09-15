@@ -9,6 +9,9 @@ using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.AdvancedFilters {
 
+    /// <summary>
+    /// Algorithms for filtering Histogram Threshold
+    /// </summary>
     public enum HistogramThresholdAlgorithm {
         /// <summary>
         /// Simple upper and lower usage thresholds are applied to the values in each channel's histogram to determine the input start/stop points for each individual channel. The start/stop points are used to calcualte the scale factor and offset for the channel.
@@ -25,17 +28,31 @@ namespace ImageResizer.Plugins.AdvancedFilters {
         GIMP
     }
 
+    /// <summary>
+    /// Uses Histogram Thresholding to adjust White Balance
+    /// </summary>
     public class AutoWhiteBalance : BaseInPlacePartialFilter {
 
+        /// <summary>
+        /// Initialize the AutoWhiteBalance
+        /// </summary>
         public AutoWhiteBalance()
             : this(HistogramThresholdAlgorithm.Area) {
         }
 
-
+        /// <summary>
+        /// Initialize the AutoWhiteBalance using the given algorithm
+        /// </summary>
+        /// <param name="algorithm"></param>
         public AutoWhiteBalance(HistogramThresholdAlgorithm algorithm)
             : this(algorithm, algorithm == HistogramThresholdAlgorithm.Simple ? 0.0006 : 0.006) {
         }
 
+        /// <summary>
+        /// Initialize the AutoWhiteBalance using the given algorithm and threshold
+        /// </summary>
+        /// <param name="algorithm"></param>
+        /// <param name="threshold"></param>
         public AutoWhiteBalance(HistogramThresholdAlgorithm algorithm, double threshold) {
             formatTranslations[PixelFormat.Format8bppIndexed] = PixelFormat.Format8bppIndexed;
             formatTranslations[PixelFormat.Format24bppRgb] = PixelFormat.Format24bppRgb;
@@ -59,12 +76,20 @@ namespace ImageResizer.Plugins.AdvancedFilters {
         public double HighThreshold { get; set; }
 
         private Dictionary<PixelFormat, PixelFormat> formatTranslations = new Dictionary<PixelFormat, PixelFormat>();
+        
+        /// <summary>
+        /// Gets the AutoWhiteBalance format translations
+        /// </summary>
         public override Dictionary<PixelFormat, PixelFormat> FormatTranslations {
             get { return formatTranslations; }
         }
 
 
-
+        /// <summary>
+        /// Process the filter on the image
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="rect"></param>
         protected override unsafe void ProcessFilter(UnmanagedImage image, Rectangle rect) {
             int pixelSize = (image.PixelFormat == PixelFormat.Format8bppIndexed) ? 1 :
                 (image.PixelFormat == PixelFormat.Format24bppRgb) ? 3 : 4;

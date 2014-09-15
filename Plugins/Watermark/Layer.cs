@@ -7,9 +7,10 @@ using System.Drawing;
 using ImageResizer.Util;
 using ImageResizer.ExtensionMethods;
 
+#pragma warning disable 1591
 namespace ImageResizer.Plugins.Watermark {
-    public class Layer {
-
+    public class Layer
+    {
         public Layer() {
         }
 
@@ -180,6 +181,8 @@ namespace ImageResizer.Plugins.Watermark {
         /// 
         /// </summary>
         /// <param name="s"></param>
+        /// <param name="actualSizeCalculator"></param>
+        /// <param name="forceInsideCanvas"></param>
         /// <returns></returns>
         public RectangleF CalculateLayerCoordinates(ImageState s, CalculateLayerContentSize actualSizeCalculator, bool forceInsideCanvas) {
             //Find container 

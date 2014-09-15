@@ -13,15 +13,33 @@ using ImageResizer.ExtensionMethods;
 using System.Drawing.Imaging;
 
 namespace ImageResizer.Plugins.AdvancedFilters {
+
+    /// <summary>
+    /// Advanced Filters available to the ImageResizer
+    /// </summary>
     public class AdvancedFilters:BuilderExtension, IPlugin, IQuerystringPlugin {
+
+        /// <summary>
+        /// Initialize AdvancedFilters
+        /// </summary>
         public AdvancedFilters() {
         }
 
+        /// <summary>
+        /// Install the plugin to the given config
+        /// </summary>
+        /// <param name="c">ImageResizer configuration</param>
+        /// <returns>plugin that was added to the config</returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             return this;
         }
 
+        /// <summary>
+        /// Removes the plugin from the given config
+        /// </summary>
+        /// <param name="c">ImageResizer config</param>
+        /// <returns>true if the plugin has been removed</returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
@@ -33,6 +51,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
         /// <param name="s"></param>
         /// <param name="key"></param>
         /// <param name="key2"></param>
+        /// <param name="units"></param>
         /// <returns></returns>
         protected int GetRadius(ImageState s, string key, string key2, double units) {
             string str = s.settings[key];
@@ -48,6 +67,11 @@ namespace ImageResizer.Plugins.AdvancedFilters {
 
         }
 
+        /// <summary>
+        /// Applies Pre Rendering processing and filters to the Image
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         protected override RequestedAction PreRenderImage(ImageState s)
         {
             if (s.sourceBitmap == null) return RequestedAction.None;
@@ -61,6 +85,11 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             return RequestedAction.None;
         }
 
+        /// <summary>
+        /// Applies Post Rendering processing and filters to the image
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         protected override RequestedAction PostRenderImage(ImageState s) {
             if (s.destBitmap == null) return RequestedAction.None;
             Bitmap b = s.destBitmap;
@@ -69,6 +98,11 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             return RequestedAction.None;
         }
 
+        /// <summary>
+        /// Applies Pre Filters to image
+        /// </summary>
+        /// <param name="b"></param>
+        /// <param name="s"></param>
         protected void ApplyPreFiltersTo(ref Bitmap b, ImageState s) {
             string str = null;
             int i = 0;
@@ -81,6 +115,12 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             i = GetRadius(s, "a.featheredges", null, units * (Util.PolygonMath.GetShortestPair(s.layout["image"]) / Math.Min(b.Width,b.Height)));
             if (i > 0) new FeatherEdge(fout, fin, i).ApplyInPlace(b);
         }
+
+        /// <summary>
+        /// Applies Filters to image
+        /// </summary>
+        /// <param name="b"></param>
+        /// <param name="s"></param>
         protected void ApplyFiltersTo(ref Bitmap b, ImageState s){
 
             //TODO: if the image is unrotated, use a rectangle to limit the effect to the desired area
@@ -234,6 +274,10 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             }
         }
 
+        /// <summary>
+        /// Gets a collection of items that can be changed
+        /// </summary>
+        /// <returns>Collection of supported query strings</returns>
         public IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "blur", "sharpen" , "a.blur", "a.sharpen", "a.oilpainting", "a.removenoise", 
                                 "a.sobel", "a.threshold", "a.canny", "a.sepia", "a.equalize", "a.posterize", 
