@@ -13,6 +13,11 @@ namespace ImageResizer.AllPlugins.Tests
     /// <summary>
     /// Test the functionality of the <see cref="MongoReaderPlugin"/> class.
     /// </summary>
+    /// <remarks>
+    /// These tests exercise the methods from <see cref="IVirtualImageProvider"/> as
+    /// implemented by <see cref="MongoReaderPlugin"/>. Also The methods 
+    /// implementations of <see cref="IVirtualFile"/>.
+    /// </remarks>
     public class MongoReaderTest 
     {
         /// <summary>

@@ -12,6 +12,11 @@ namespace ImageResizer.AllPlugins.Tests {
     /// <summary>
     /// Test the functionality of the <see cref="SqlReaderPlugin"/> class.
     /// </summary>
+    /// <remarks>
+    /// These tests exercise the methods from <see cref="IVirtualImageProvider"/> as
+    /// implemented by <see cref="SqlReaderPlugin"/>. Also The methods 
+    /// implementations of <see cref="IVirtualFile"/>.
+    /// </remarks>
     public class SqlReaderTest : IDisposable {
         /// <summary>
         /// A GUID that can be used to represents a file that does not exist.

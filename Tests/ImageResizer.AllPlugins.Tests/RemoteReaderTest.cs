@@ -12,6 +12,11 @@ namespace ImageResizer.AllPlugins.Tests
     /// <summary>
     /// Test the functionality of the <see cref="RemoteReaderPlugin"/> class.
     /// </summary>
+    /// <remarks>
+    /// These tests exercise the methods from <see cref="IVirtualImageProvider"/> as
+    /// implemented by <see cref="RemoteReaderPlugin"/>. Also The methods 
+    /// implementations of <see cref="IVirtualFile"/>.
+    /// </remarks>
     public class RemoteReaderTest 
     {
         /// <summary>
@@ -157,10 +162,11 @@ namespace ImageResizer.AllPlugins.Tests
         public void GetFileSigned()
         {
             // Arrange
-            string virtualPath = pathPrefix + dummyDatabaseRecordId.ToString("B");
+            string virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
             IVirtualImageProvider target = new RemoteReaderPlugin();
-            var c = Config.Current;
-            ((RemoteReaderPlugin)target).Install(c);
+            var rs = new ResizerSection("<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"true\" /></resizer>");
+            var c = new Config(rs);
+            ((IPlugin)target).Install(c);
             var settings = this.Settings;
 
             // Act
@@ -214,21 +220,32 @@ namespace ImageResizer.AllPlugins.Tests
             Assert.IsType<FileNotFoundException>(actual);
         }
 
-        //[Fact]
-        //public void Open()
-        //{
-        //    // Arrange
-        //    string virtualPath = Path.Combine(pathPrefix, id.ToString("B"));
-        //    IVirtualImageProvider reader = new RemoteReaderPlugin();
-        //    var target = reader.GetFile(virtualPath, null);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Requires a file to be present at http://farm7.static.flickr.com/6021/5959854178_1c2ec6bd77_b.jpg
+        /// </remarks>
+        [Fact]
+        public void Open() {
+            // Arrange
+            string virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
+            IVirtualImageProvider reader = new RemoteReaderPlugin();
+            var rs = new ResizerSection("<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"true\" /></resizer>");
+            var c = new Config(rs);
+            ((RemoteReaderPlugin)reader).Install(c);
+            var settings = this.Settings;
+            settings["hmac"] = "k_RU-UFkOaA";
+            settings["urlb64"] = "aHR0cDovL2Zhcm03LnN0YXRpYy5mbGlja3IuY29tLzYwMjEvNTk1OTg1NDE3OF8xYzJlYzZiZDc3X2IuanBn";
+            var target = reader.GetFile(virtualPath, settings);
 
-        //    // Act
-        //    var actual = target.Open();
+            // Act
+            var actual = target.Open();
 
-        //    // Assert
-        //    Assert.NotNull(actual);
-        //    Assert.IsAssignableFrom<Stream>(actual);
-        //}
+            // Assert
+            Assert.NotNull(actual);
+            Assert.IsAssignableFrom<Stream>(actual);
+        }
 
         [Fact]
         public void OpenInvalidId()
@@ -236,7 +253,13 @@ namespace ImageResizer.AllPlugins.Tests
             // Arrange
             string virtualPath = pathPrefix + dummyDatabaseRecordId.ToString("B");
             IVirtualImageProvider reader = new RemoteReaderPlugin();
-            var target = reader.GetFile(virtualPath, new NameValueCollection());
+            var rs = new ResizerSection("<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"true\" /></resizer>");
+            var c = new Config(rs);
+            ((RemoteReaderPlugin)reader).Install(c);
+            var settings = this.Settings;
+            settings["hmac"] = "k_RU-UFkOaA";
+            settings["urlb64"] = "aHR0cDovL2Zhcm03LnN0YXRpYy5mbGlja3IuY29tLzYwMjEvNTk1OTg1NDE3OF8xYzJlYzZiZDc3X2IuanBn";
+            var target = reader.GetFile(virtualPath, settings);
 
             // Act
             var actual = Assert.Throws<FileNotFoundException>(() => target.Open());
@@ -249,8 +272,8 @@ namespace ImageResizer.AllPlugins.Tests
         private NameValueCollection Settings {
             get {
                 var settings = new NameValueCollection();
-                settings["hmac"] = "a2099ba2099b";
-                settings["urlb64"] = "ag383ht23sag#laf#lafF#oyfafqewt;2twfqw";
+                settings["hmac"] = "k_RU-UFkOaA";
+                settings["urlb64"] = "aHR0cDovL2Zhcm03LnN0YXRpYy5mbGlja3IuY29tLzYwMjEvNTk1OTg1NDE3OF8xYzJlYzZiZDc3X2IuanBn";
 
                 return settings;
 
