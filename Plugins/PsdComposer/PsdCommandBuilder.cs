@@ -13,17 +13,41 @@ namespace ImageResizer.Plugins.PsdComposer
     /// </summary>
     public class PsdCommandBuilder 
     {
+        /// <summary>
+        /// Colors found each layer
+        /// </summary>
         public Dictionary<string, Color> layerColors = new Dictionary<string, Color>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Visibility of each layer
+        /// </summary>
         public Dictionary<string, bool> layerVisibility = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// LayerRedraw for each layer
+        /// </summary>
         public Dictionary<string, bool> layerRedraw = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Text found in each layer
+        /// </summary>
         public Dictionary<string, string> layerText = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         /// <summary>
         /// Set the renderer. graphicsmill and psdplugin are the currently supported values
         /// </summary>
         public string renderer = "psdplugin";
+
+        /// <summary>
+        /// Initialize the PsdCommandBuilder class
+        /// </summary>
         public PsdCommandBuilder()
         {
         }
+
+        /// <summary>
+        /// Initialize the PsdCommandBuilder class 
+        /// </summary>
+        /// <param name="queryString">queryString to apply to current settings values</param>
         public PsdCommandBuilder(NameValueCollection queryString)
         {
             this.layerColors = parseColorDict(queryString["layerColors"]);
@@ -33,6 +57,10 @@ namespace ImageResizer.Plugins.PsdComposer
             this.renderer = queryString["renderer"];
         }
 
+        /// <summary>
+        /// Saves query of current settings values
+        /// </summary>
+        /// <param name="queryString">query string to save current settings values to</param>
         public void SaveToQuerystring(NameValueCollection queryString)
         {
             queryString["layerColors"] = serializeColorDict(layerColors);
@@ -42,7 +70,11 @@ namespace ImageResizer.Plugins.PsdComposer
             queryString["renderer"] = renderer;
         }
 
-
+        /// <summary>
+        /// Gets the dictionary color from the given string
+        /// </summary>
+        /// <param name="str">color</param>
+        /// <returns>Valid dictionary color</returns>
         public Dictionary<string, Color> parseColorDict(string str)
         {
             if (string.IsNullOrEmpty(str)) return new Dictionary<string, System.Drawing.Color>();
@@ -57,6 +89,12 @@ namespace ImageResizer.Plugins.PsdComposer
             }
             return dict;
         }
+
+        /// <summary>
+        /// Get the color string from the color dictionary
+        /// </summary>
+        /// <param name="dict">dictionary color</param>
+        /// <returns>string value of color</returns>
         public string serializeColorDict(Dictionary<string, Color> dict)
         {
             StringBuilder sb = new StringBuilder();
@@ -69,6 +107,13 @@ namespace ImageResizer.Plugins.PsdComposer
             }
             return sb.ToString();
         }
+
+
+        /// <summary>
+        /// Gets the dictionary color from the given string
+        /// </summary>
+        /// <param name="str">color</param>
+        /// <returns>Valid dictionary color</returns>
         public Dictionary<string, string> parseStringDict(string str)
         {
             if (string.IsNullOrEmpty(str)) return new Dictionary<string, string>();
@@ -84,6 +129,12 @@ namespace ImageResizer.Plugins.PsdComposer
             }
             return dict;
         }
+
+        /// <summary>
+        /// Get the serialized color string from the color dictionary
+        /// </summary>
+        /// <param name="dict">dictionary color</param>
+        /// <returns>string value of color</returns>
         public string serializeStringDict(Dictionary<string, string> dict)
         {
             StringBuilder sb = new StringBuilder();
@@ -97,7 +148,11 @@ namespace ImageResizer.Plugins.PsdComposer
             return sb.ToString();
         }
 
-
+        /// <summary>
+        /// Gets the boolean dictionary color from the given string
+        /// </summary>
+        /// <param name="str">color</param>
+        /// <returns>Valid dictionary color</returns>
         public Dictionary<string, bool> parseBooleanDict(string str)
         {
             if (string.IsNullOrEmpty(str)) return new Dictionary<string, bool>();
@@ -112,7 +167,12 @@ namespace ImageResizer.Plugins.PsdComposer
             }
             return dict;
         }
-        
+
+        /// <summary>
+        /// Get the color string from the boolean color dictionary
+        /// </summary>
+        /// <param name="dict">dictionary color</param>
+        /// <returns>string value of color</returns>
         public string serializeBooleanDict(Dictionary<string, bool> dict)
         {
             StringBuilder sb = new StringBuilder();
@@ -128,7 +188,12 @@ namespace ImageResizer.Plugins.PsdComposer
 
 
 
-
+        /// <summary>
+        /// Sets a color to a given layer
+        /// </summary>
+        /// <param name="layer">layer to set color to</param>
+        /// <param name="color">layer color</param>
+        /// <param name="opacity">opacity amount</param>
         public void Color(string layer, Color color, double opacity)
         {
             if (opacity > 1 || opacity < 0) throw new ArgumentOutOfRangeException("opacity","Cannot be less than 0 or greater than 1");
@@ -136,22 +201,48 @@ namespace ImageResizer.Plugins.PsdComposer
 
             Color(layer, System.Drawing.Color.FromArgb(alpha, color));
         }
+
+        /// <summary>
+        /// Adds layer and color to the layerColors
+        /// </summary>
+        /// <param name="layer">layer to set color to</param>
+        /// <param name="color">layer color</param>
         public void Color(string layer, Color color)
         {
             layerColors.Add(layer, color);
         }
+
+        /// <summary>
+        /// set layer visibility to true
+        /// </summary>
+        /// <param name="layer">layer to show</param>
         public void Show(string layer)
         {
             layerVisibility[layer] = true;
         }
+
+        /// <summary>
+        /// set layer visibility to false
+        /// </summary>
+        /// <param name="layer">layer to hide</param>
         public void Hide(string layer)
         {
             layerVisibility[layer] = false;
         }
+
+        /// <summary>
+        /// Redraws layer
+        /// </summary>
+        /// <param name="layer">layer to redraw</param>
         public void Redraw(string layer) {
             layerRedraw[layer] = true;
         }
 
+        /// <summary>
+        /// Set text in layer
+        /// </summary>
+        /// <param name="layer">layer name</param>
+        /// <param name="text">text to apply to layer</param>
         public void SetText(string layer, string text) {
             this.layerText[layer] = text;
         }
@@ -168,11 +259,18 @@ namespace ImageResizer.Plugins.PsdComposer
             return new System.Text.UTF8Encoding().GetString(Convert.FromBase64String(s.Replace('-', '+').Replace('_', '/')));
         }
 
+        /// <summary>
+        /// Gets a collection of items that can be changed
+        /// </summary>
+        /// <returns>Collection of supported query strings</returns>
         public static IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "layerColors", "layerVisibility", "layerRedraw", "layerText", "renderer" };
         }
     }
 
+    /// <summary>
+    /// PsdCommand Seracher searches handles searching through wildcard keys
+    /// </summary>
     public class PsdCommandSearcher
     {
         PsdCommandBuilder b = null;
@@ -180,6 +278,11 @@ namespace ImageResizer.Plugins.PsdComposer
         string[] cKeys = null;//Wildcard keys
         string[] rKeys = null;//Wildcard keys
         string[] tKeys = null;//Wildcard keys
+
+        /// <summary>
+        /// Initialize the PsdCommandsearcher with keys from given PsdCommandBUilder
+        /// </summary>
+        /// <param name="b">Wildcard keys to use</param>
         public PsdCommandSearcher(PsdCommandBuilder b)
         {
             this.b = b;
@@ -189,6 +292,11 @@ namespace ImageResizer.Plugins.PsdComposer
             tKeys = b.layerText.Keys.Where(key => key.Contains('*')).ToArray();
         }
 
+        /// <summary>
+        /// Gets if a layer is set to redraw
+        /// </summary>
+        /// <param name="layer">layer to redraw</param>
+        /// <returns>layer set to redraw or null if not</returns>
         public Nullable<bool> getRedraw(string layer)
         {
             //Try case-insensitive exact match
@@ -199,6 +307,12 @@ namespace ImageResizer.Plugins.PsdComposer
             if (matchingKey == null) return null;
             else return b.layerRedraw[matchingKey];
         }
+
+        /// <summary>
+        /// Gets replacement text if there is any
+        /// </summary>
+        /// <param name="layer">layer that may have replacement text</param>
+        /// <returns>replacement text or null if none</returns>
         public string getReplacementText(string layer)
         {
             //Try case-insensitive exact match
@@ -209,6 +323,12 @@ namespace ImageResizer.Plugins.PsdComposer
             if (matchingKey == null) return null;
             else return b.layerText[matchingKey];
         }
+
+        /// <summary>
+        /// Get visibility setting of the given layer
+        /// </summary>
+        /// <param name="layer">layer to check visibility</param>
+        /// <returns>if layer has givibility or null</returns>
         public Nullable<bool> getVisibility(string layer)
         {
             //Try case-insensitive exact match
@@ -219,6 +339,12 @@ namespace ImageResizer.Plugins.PsdComposer
             if (matchingKey == null) return null;
             else return b.layerVisibility[matchingKey];
         }
+
+        /// <summary>
+        /// Search for color in layer
+        /// </summary>
+        /// <param name="layer">layer to search</param>
+        /// <returns>color or null if color not found</returns>
         public Nullable<Color> getColor(string layer)
         {
             //Try case-insensitive exact match
@@ -230,6 +356,12 @@ namespace ImageResizer.Plugins.PsdComposer
             else return b.layerColors[matchingKey];
         }
 
+        /// <summary>
+        /// Gets the first matching wildcard from the layer
+        /// </summary>
+        /// <param name="layer">layer name to check</param>
+        /// <param name="wildcards">array of wildcards</param>
+        /// <returns>returns the first wildcard found in the layer</returns>
         public string getFirstMatchingWildcard(string layer, string[] wildcards)
         {
             foreach (string s in wildcards)

@@ -36,7 +36,9 @@ namespace ImageResizer.Plugins.PdfRenderer
     /// </summary>
     public class PdfRendererPlugin : BuilderExtension, IPlugin, IFileExtensionPlugin, IIssueProvider, IQuerystringPlugin
     {
-
+        /// <summary>
+        /// Initialize the PdfRendererPlugin
+        /// </summary>
         public PdfRendererPlugin() {
         }
 
@@ -145,6 +147,13 @@ namespace ImageResizer.Plugins.PdfRenderer
 
         #endregion
 
+        /// <summary>
+        /// Decodes a given stream extracting a Bitmap
+        /// </summary>
+        /// <param name="s">I/O Stream</param>
+        /// <param name="settings">ImageResizer settings to apply</param>
+        /// <param name="optionalPath">File Extension</param>
+        /// <returns>generated Bitmap</returns>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Need to retain stream for bitmap backing store.")]
         public override Bitmap DecodeStream(Stream s, ResizeSettings settings, string optionalPath)
         {
@@ -274,6 +283,11 @@ namespace ImageResizer.Plugins.PdfRenderer
             }
         }
 
+        /// <summary>
+        /// Install the PdfRenderer to the given config
+        /// </summary>
+        /// <param name="c">ImageResizer configuration</param>
+        /// <returns>PdfRenderer plugin that was added to the config</returns>
         public IPlugin Install(Config c)
         {
             if(c != null)
@@ -283,6 +297,11 @@ namespace ImageResizer.Plugins.PdfRenderer
             return this;
         }
 
+        /// <summary>
+        /// Removes the plugin from the given config
+        /// </summary>
+        /// <param name="c">ImageResizer config</param>
+        /// <returns>true if the plugin has been removed</returns>
         public bool Uninstall(Config c)
         {
             if(c != null)
@@ -292,6 +311,10 @@ namespace ImageResizer.Plugins.PdfRenderer
             return true;
         }
 
+        /// <summary>
+        /// Collection of issues found using the PdfRenderer API
+        /// </summary>
+        /// <returns>IEnumberable collection of issues found</returns>
         public IEnumerable<IIssue> GetIssues()
         {
             if(!GhostscriptEngine.IsAvailable()) //Cached inside Ghostscript engine. 
@@ -303,11 +326,19 @@ namespace ImageResizer.Plugins.PdfRenderer
             return Enumerable.Empty<IIssue>();
         }
 
+        /// <summary>
+        /// IEnumerable colleciton of supported PdfRenderer File Extensions supported by the plugin
+        /// </summary>
+        /// <returns>IEnumerable collection of File extensions</returns>
         public IEnumerable<string> GetSupportedFileExtensions()
         {
             return _supportedExtensions;
         }
 
+        /// <summary>
+        /// Gets a collection of supported query strings
+        /// </summary>
+        /// <returns>Collection of supported query strings</returns>
         public IEnumerable<string> GetSupportedQuerystringKeys()
         {
             return _queryStringKeys;

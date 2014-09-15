@@ -8,8 +8,20 @@ using System.Drawing;
 
 namespace ImageResizer.Plugins.PsdComposer
 {
+    /// <summary>
+    /// PsdPlugin renderer used to render a Bitmap image
+    /// </summary>
     public class PsdPluginRenderer: IPsdRenderer
     {
+        /// <summary>
+        /// Render the image into a Bitmap
+        /// </summary>
+        /// <param name="s">I/O Stream</param>
+        /// <param name="layers">List of PsdLayers</param>
+        /// <param name="size">drawing size</param>
+        /// <param name="showLayerCallback">show image layers</param>
+        /// <param name="composeLayer">compose the layers</param>
+        /// <returns>rendered Bitmap</returns>
         public Bitmap Render(Stream s, out IList<IPsdLayer> layers, out Size size,ShowLayerDelegate showLayerCallback, ComposeLayerDelegate composeLayer)
         {
             PsdFile file = new PsdFile();
@@ -41,13 +53,24 @@ namespace ImageResizer.Plugins.PsdComposer
             return b;
         }
 
-       
+       /// <summary>
+       /// Gets layers from an I/O stream of an image
+       /// </summary>
+       /// <param name="s">I/O Stream of an image</param>
+       /// <returns>List of PsdLayers</returns>
         public IList<IPsdLayer> GetLayers(Stream s)
         {
             PsdFile file = new PsdFile();
             file.Load(s);
             return getLayers(file);
         }
+
+        /// <summary>
+        /// Gets Layers and size from an I/O stream of an image
+        /// </summary>
+        /// <param name="s">I/O Stream of an image</param>
+        /// <param name="size">size of image</param>
+        /// <returns>List of PsdLayers</returns>
         public IList<IPsdLayer> GetLayersAndSize(Stream s, out Size size) {
             PsdFile file = new PsdFile();
             file.Load(s);

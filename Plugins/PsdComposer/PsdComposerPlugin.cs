@@ -20,18 +20,34 @@ using ImageResizer.Configuration;
 using System.Globalization;
 namespace ImageResizer.Plugins.PsdComposer
 {
+    /// <summary>
+    /// Creates and handles Photoshop PSD images
+    /// </summary>
     public class PsdComposerPlugin : IPlugin, IVirtualImageProvider, IQuerystringPlugin, IFileExtensionPlugin
     {
-
+        /// <summary>
+        /// Initialize the PsdComposerPlugin
+        /// </summary>
         public PsdComposerPlugin(): base()  { }
 
         internal Config c;
+
+        /// <summary>
+        /// Install the PsdCOmposerPlugin to the given config
+        /// </summary>
+        /// <param name="c">ImageResizer configuration</param>
+        /// <returns>MPEG plugin that was added to the config</returns>
         public IPlugin Install(Config c) {
             this.c = c;
             this.c.Plugins.add_plugin(this);
             return this;
         }
 
+        /// <summary>
+        /// Removes the plugin from the given config
+        /// </summary>
+        /// <param name="c">ImageResizer config</param>
+        /// <returns>true if the plugin has been removed</returns>
         public bool Uninstall(Config c) {
             c.Plugins.remove_plugin(this);
             return true;
@@ -61,16 +77,26 @@ namespace ImageResizer.Plugins.PsdComposer
                 return null;
         }
 
-
+        /// <summary>
+        /// Gets supported QueryStrings for the PsdComposerPlugin
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<string> GetSupportedQuerystringKeys() {
             return PsdCommandBuilder.GetSupportedQuerystringKeys();
         }
 
+        /// <summary>
+        /// Gets an array of supported file extensions
+        /// </summary>
+        /// <returns>collection of supported file extensions</returns>
         public IEnumerable<string> GetSupportedFileExtensions() {
             return new string[] { "psd" };
         }
 
-
+        /// <summary>
+        /// Gets if PsdComposer is in StrictMode
+        /// </summary>
+        /// <returns>true if PsdComposer is in StrictMode</returns>
         protected bool isStrictMode()
         {
             return c.get("psdcomposer.strictMode", true);
@@ -89,8 +115,9 @@ namespace ImageResizer.Plugins.PsdComposer
         /// <summary>
         /// Returns a stream to the composed file, encoded in the format requested by the querystring or fake extension
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="virtualPath">path to image object</param>
+        /// <param name="queryString">ImageResizer settings to apply to stream</param>
+        /// <returns>stream to image</returns>
         public Stream ComposeStream(string virtualPath, NameValueCollection queryString) {
 
             Stopwatch sw = new Stopwatch();
@@ -118,8 +145,9 @@ namespace ImageResizer.Plugins.PsdComposer
         /// <summary>
         /// Returns a Bitmap instance of the composed result
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="virtualPath">path to image object</param>
+        /// <param name="queryString">ImageResizer settings to apply to stream</param>
+        /// <returns>Bitmap image</returns>
         public System.Drawing.Bitmap ComposeBitmap(string virtualPath, NameValueCollection queryString) {
             //Renderer object
             IPsdRenderer renderer = GetSelectedRenderer(queryString);
@@ -402,7 +430,9 @@ namespace ImageResizer.Plugins.PsdComposer
   
     }
 
-
+    /// <summary>
+    /// Virtual file of Psd that handles access to a Psd file
+    /// </summary>
     public class PsdVirtualFile : IVirtualFile, IVirtualBitmapFile
     {
   
@@ -422,6 +452,12 @@ namespace ImageResizer.Plugins.PsdComposer
             }
         }
 
+        /// <summary>
+        /// Initializes the PsdVIrtualFile
+        /// </summary>
+        /// <param name="virtualPath">path to image</param>
+        /// <param name="query">ImageResizer query options</param>
+        /// <param name="provider">Creates and Handles Psd Images</param>
         public PsdVirtualFile(string virtualPath, NameValueCollection query, PsdComposerPlugin provider)
         {
             this.provider = provider;
@@ -432,11 +468,17 @@ namespace ImageResizer.Plugins.PsdComposer
 
         private string _virtualPath = null;
 
+        /// <summary>
+        /// Gets the Virtual path of the Psd
+        /// </summary>
         public string VirtualPath {
             get { return _virtualPath; }
         }
         private NameValueCollection _query;
 
+        /// <summary>
+        /// Get or set the ImageResizer query for the Psd
+        /// </summary>
         public NameValueCollection Query {
             get { return _query; }
             set { _query = value; }

@@ -53,7 +53,7 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
         }
 
         /// <summary>
-        /// Adds alternate pipeline based on FreeImage. Invoked by &builder=freeimage. 
+        /// Adds alternate pipeline based on FreeImage. Invoked by &amp;builder=freeimage. 
         /// This method doesn't handle job.DisposeSource or job.DesposeDest or settings filtering, that's handled by ImageBuilder.
         /// All the bitmap processing is handled by buildFiBitmap, this method handles all the I/O
         /// </summary>

@@ -49,6 +49,11 @@ namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
         {
         }
 
+        /// <summary>
+        /// Initialize the GhostscriptSettings class using the given values
+        /// </summary>
+        /// <param name="info">data needed to serialize the settings</param>
+        /// <param name="context">destination of the serialization stream</param>
         protected GhostscriptSettings(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {

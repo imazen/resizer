@@ -136,6 +136,9 @@ namespace ImageResizer.Plugins.PrettyGifs
           
         }
 
+        /// <summary>
+        /// Validates property values and if fails then throws a Generic exception
+        /// </summary>
         protected virtual void ValidatePropertyValues() {
             if (!FullTrust && !OmitFinalStage) throw new Exception("If FullTrust=False, OmitFinalStage must be set to true. The final stage requires full trust.");
             if (!FullTrust && FourPass) throw new Exception("If FullTrust=False, FourPass must be false also. Four-pass quantization requires full trust.");
@@ -146,7 +149,7 @@ namespace ImageResizer.Plugins.PrettyGifs
         /// <summary>
         /// Quantize an image and return the resulting output bitmap
         /// </summary>
-        /// <param name="source">The image to quantize</param>
+        /// <param name="src">The image to quantize</param>
         /// <returns>A quantized version of the image</returns>
         public Bitmap Quantize(Image src) {
             //We just set up the Bitmap copies and handle their disposal - the real work happens in 
@@ -215,7 +218,14 @@ namespace ImageResizer.Plugins.PrettyGifs
         }
         
 
-
+        /// <summary>
+        /// Quantize given image with Full Trust
+        /// </summary>
+        /// <param name="firstPass">Bitmap to quantize</param>
+        /// <param name="copy">copy of Bitmap</param>
+        /// <param name="copy2">second copy of Bitmap</param>
+        /// <param name="output">output Bitmap</param>
+        /// <returns>Quantized Batmap</returns>
         protected Bitmap QuantizeFullTrust(Bitmap firstPass, Bitmap copy, Bitmap copy2, Bitmap output) {
             Rectangle bounds = new Rectangle(0, 0, copy.Width, copy.Height);
             int width = copy.Width;
@@ -299,6 +309,15 @@ namespace ImageResizer.Plugins.PrettyGifs
             }
             return null;
         }
+
+        /// <summary>
+        /// Quantize given image with Low Trust
+        /// </summary>
+        /// <param name="firstPass">Bitmap to quantize</param>
+        /// <param name="copy">copy of Bitmap</param>
+        /// <param name="copy2">second copy of Bitmap</param>
+        /// <param name="output">output Bitmap</param>
+        /// <returns>Quantized Batmap</returns>
         protected Bitmap QuantizeLowTrust(Bitmap firstPass, Bitmap copy, Bitmap copy2, Bitmap output) {
             Rectangle bounds = new Rectangle(0, 0, copy.Width, copy.Height);
             int width = copy.Width;
@@ -343,6 +362,13 @@ namespace ImageResizer.Plugins.PrettyGifs
                 pSourceRow = (IntPtr)((long)pSourceRow + sourceData.Stride);
             }
         }
+
+        /// <summary>
+        /// Inital Quantize of image
+        /// </summary>
+        /// <param name="b">original bitmap</param>
+        /// <param name="width">width of area to get pixel </param>
+        /// <param name="height">height of area to get pixel</param>
         protected virtual void AnalyzeImageLowTrust(Bitmap b, int width, int height) {
             // Loop through each row
             for (int row = 0; row < height; row++) {
@@ -477,12 +503,18 @@ namespace ImageResizer.Plugins.PrettyGifs
             Marshal.StructureToPtr(c, p, true); //False to not dispose old block. Since no reference to it exists (I believe PtrToStructure from Color32 copies, not references), this should be safe
   
         }
-        //Truncates an int to a byte. 5-18-09 ndj
+        
+        /// <summary>
+        /// Truncates an int to a byte. 5-18-09 ndj
+        /// </summary>
+        /// <param name="i">integer</param>
+        /// <returns>converted byte</returns>
         protected byte ToByte(int i) {
             if (i < 0) return 0;
             if (i > 255) return 255;
             return (byte)i;
         }
+
         //protected void AdjustNeighborSourceLowTrust(int offsetX, int offsetY, int deltaR, int deltaG, int deltaB, int deltaA) {
         //    if (secondPassIntermediateBitmap == null) return;
         //    int x = secondPassX + offsetX;
@@ -543,6 +575,10 @@ namespace ImageResizer.Plugins.PrettyGifs
         [StructLayout(LayoutKind.Explicit)]
         public struct Color32
         {
+            /// <summary>
+            /// Sets 32bit color
+            /// </summary>
+            /// <param name="c">drawing color</param>
             public Color32(Color c){
                 this.ARGB = c.ToArgb();
                 Blue = c.B;
@@ -550,6 +586,11 @@ namespace ImageResizer.Plugins.PrettyGifs
                 Red = c.R;
                 Alpha = c.A;
             }
+
+            /// <summary>
+            /// Sets the 32 bit color from the handle of the pixel source
+            /// </summary>
+            /// <param name="pSourcePixel">handle of pixel source</param>
             public Color32(IntPtr pSourcePixel)
             {
               this = (Color32) Marshal.PtrToStructure(pSourcePixel, typeof(Color32));

@@ -36,6 +36,12 @@ namespace ImageResizer.Plugins.PsdComposer
                 return subkeys[subkey];
             }
         }
+
+        /// <summary>
+        /// Sets the subkey where to case an item
+        /// </summary>
+        /// <param name="subkey">subkey in memory</param>
+        /// <param name="item">item to save</param>
         public void SetSubkey(string subkey, object item)
         {
             lock (subkey_syncobj)
@@ -88,7 +94,13 @@ namespace ImageResizer.Plugins.PsdComposer
         /// </summary>
         private static Dictionary<string, MemCachedFile> _fallbackCache = new Dictionary<string, MemCachedFile>();
 
-        
+        /// <summary>
+        /// Gets the memory cashed virtual file
+        /// </summary>
+        /// <param name="path">path to virtual file</param>
+        /// <param name="provider">Provider to handle Asp.net access</param>
+        /// <param name="queryString">collection</param>
+        /// <returns></returns>
         public static MemCachedFile GetCachedVirtualFile(string path, IVirtualImageProvider provider, NameValueCollection queryString){
             string key = provider != null ? getVirtualCacheKey(path,queryString) : getCacheKey(path);
             MemCachedFile file = null;

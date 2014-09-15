@@ -15,9 +15,24 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
     /// Tone Mapping or reproduction algorithms available
     /// </summary>
     public enum ToneMappingAlgorithm {
+        /// <summary>
+        /// No selected Tone Mapping Algorithm
+        /// </summary>
         None,
+
+        /// <summary>
+        /// Reinhard Tone Mapping Algorithm
+        /// </summary>
         Reinhard,
+
+        /// <summary>
+        /// Drago Tone Mapping Algorithm
+        /// </summary>
         Drago,
+
+        /// <summary>
+        /// Fattal Tone Mapping ALgorithm
+        /// </summary>
         Fattal
     }
 

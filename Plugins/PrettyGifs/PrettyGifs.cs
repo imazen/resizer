@@ -16,11 +16,24 @@ using System.Globalization;
 using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.PrettyGifs {
+
+    /// <summary>
+    /// Modify image colors, dithering, etc.
+    /// </summary>
     public class PrettyGifs :IEncoder, IPlugin, IQuerystringPlugin {
+
+        /// <summary>
+        /// Initialize the PrettyGifs class
+        /// </summary>
         public PrettyGifs() { }
 
         private ResizeSettings query;
 
+        /// <summary>
+        /// Initialize the PrettyGifs class with ImageResizer settings and given image
+        /// </summary>
+        /// <param name="settings">ImageResizer settings</param>
+        /// <param name="original">image object</param>
         public PrettyGifs(ResizeSettings settings, object original) {
 
             this.query = new ResizeSettings(settings);
@@ -78,7 +91,15 @@ namespace ImageResizer.Plugins.PrettyGifs {
         /// Enables dithering for PNG8 and GIF
         /// </summary>
         public bool Dither = false;
+
+        /// <summary>
+        /// Enables Four Pass dithering for PNG8 and GIF
+        /// </summary>
         public bool FourPassDither = false;
+
+        /// <summary>
+        /// Percentage to dither
+        /// </summary>
         public int DitherPercent = 30;
 
         private ImageFormat _outputFormat = ImageFormat.Gif;
@@ -96,8 +117,8 @@ namespace ImageResizer.Plugins.PrettyGifs {
         /// <summary>
         /// Returns an encoder instance if a Gif or 8-bit png is requested.
         /// </summary>
-        /// <param name="originalImage"></param>
-        /// <param name="settings"></param>
+        /// <param name="settings">ImageResizer settings</param>
+        /// <param name="original">original image</param>
         /// <returns></returns>
         public IEncoder CreateIfSuitable( ResizeSettings settings, object original) {
             //Opt out if the user is requesting a different one.
@@ -108,6 +129,12 @@ namespace ImageResizer.Plugins.PrettyGifs {
             return null;
         }
 
+        /// <summary>
+        /// Get image format if valid
+        /// </summary>
+        /// <param name="settings">ImageResizer settings</param>
+        /// <param name="original">image object</param>
+        /// <returns>Valid image format or null if not</returns>
         public ImageFormat GetFormatIfSuitable(ResizeSettings settings, object original) {
             //What format was the image originally (used as a fallback).
             ImageFormat originalFormat = DefaultEncoder.GetOriginalFormat(original);
@@ -156,7 +183,6 @@ namespace ImageResizer.Plugins.PrettyGifs {
         /// <param name="dither"></param>
         /// <param name="fourPass"></param>
         /// <param name="ditherPercent"></param>
-        /// <param name="useGdiQuantization"></param>
         public void SaveIndexed(System.Drawing.Imaging.ImageFormat format, Image img, Stream target, byte colors, bool dither, bool fourPass, int ditherPercent) {
       
 
@@ -250,30 +276,50 @@ namespace ImageResizer.Plugins.PrettyGifs {
             return (ImageFormat.Gif.Equals(f) || ImageFormat.Png.Equals(f));
         }
 
-
+        /// <summary>
+        /// True if image supports transparency
+        /// </summary>
         public bool SupportsTransparency {
             get { return true; }
         }
 
+        /// <summary>
+        /// MimeType output formate for image
+        /// </summary>
         public string MimeType {
             get { return DefaultEncoder.GetContentTypeFromImageFormat(OutputFormat); }
         }
 
+        /// <summary>
+        /// Image file extension
+        /// </summary>
         public string Extension {
             get { return DefaultEncoder.GetExtensionFromImageFormat(OutputFormat); }
         }
 
-
-
+        /// <summary>
+        /// Gets a collection of supported query strings
+        /// </summary>
+        /// <returns>Collection of supported query strings</returns>
         public virtual IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "colors", "dither" };
         }
 
+        /// <summary>
+        /// Install the PrettyGifs plugin to the given config
+        /// </summary>
+        /// <param name="c">given configuration</param>
+        /// <returns>PrettyGifs plugin that was added to the config</returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             return this;
         }
 
+        /// <summary>
+        /// Removes the plugin from the given config
+        /// </summary>
+        /// <param name="c">ImageResizer config</param>
+        /// <returns>true if the plugin has been removed</returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
