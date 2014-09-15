@@ -5,11 +5,11 @@ using System.IO;
 using System.Reflection;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.MongoReader;
+using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Xunit;
 
-namespace ImageResizer.AllPlugins.Tests
-{
+namespace ImageResizer.AllPlugins.Tests {
     /// <summary>
     /// Test the functionality of the <see cref="MongoReaderPlugin"/> class.
     /// </summary>
@@ -18,10 +18,9 @@ namespace ImageResizer.AllPlugins.Tests
     /// implemented by <see cref="MongoReaderPlugin"/>. Also The methods 
     /// implementations of <see cref="IVirtualFile"/>.
     /// </remarks>
-    public class MongoReaderTest 
-    {
+    public class MongoReaderTest {
         /// <summary>
-        /// A GUID that can be used to represents a file that does not exist.
+        /// A GUID that can be used to represent a file that does not exist.
         /// </summary>
         private static Guid dummyDatabaseRecordId = Guid.NewGuid();
 
@@ -29,13 +28,72 @@ namespace ImageResizer.AllPlugins.Tests
         /// Instantiate a new  <see cref="MongoReaderPlugin"/> object and test for success.
         /// </summary>
         [Fact]
-        public void NameValueConstructor()
-        {
+        public void NameValueConstructor() {
             // Arrange
             var settings = this.Settings;
 
             // Act
             IVirtualImageProvider target = new MongoReaderPlugin(settings);
+
+            // Assert
+            Assert.NotNull(target);
+            Assert.IsType<MongoReaderPlugin>(target);
+        }
+
+        /// <summary>
+        /// Instantiate a new  <see cref="MongoReaderPlugin"/> object and test for success.
+        /// </summary>
+        [Fact]
+        public void NameValueConstructorDefaultPrefix() {
+            // Arrange
+            var settings = this.Settings;
+            settings.Remove("prefix");
+
+            // Act
+            IVirtualImageProvider target = new MongoReaderPlugin(settings);
+
+            // Assert
+            Assert.NotNull(target);
+            Assert.IsType<MongoReaderPlugin>(target);
+        }
+
+        /// <summary>
+        /// Instantiate a new  <see cref="MongoReaderPlugin"/> object and test for success.
+        /// </summary>
+        [Fact]
+        public void NameValueConstructorNoTrailingSlashPrefix() {
+            // Arrange
+            var settings = this.Settings;
+            settings["prefix"] = settings["prefix"].Substring(0, settings["prefix"].Length - 1);
+
+            // Act
+            IVirtualImageProvider target = new MongoReaderPlugin(settings);
+
+            // Assert
+            Assert.NotNull(target);
+            Assert.IsType<MongoReaderPlugin>(target);
+        }
+
+        /// <summary>
+        /// Instantiate a new  <see cref="MongoReaderPlugin"/> object and test for success.
+        /// </summary>
+        [Fact]
+        public void ValueConstructor() {
+            // Arrange
+            var settings = this.Settings;
+            var mongoUrl = new MongoUrl(settings["connectionString"]);
+
+            // Using new client, server database initialization. Wordy but recommended.
+            var mongoClient = new MongoClient(mongoUrl);
+            var mongoServer = mongoClient.GetServer();
+            var db = mongoServer.GetDatabase(mongoUrl.DatabaseName);
+            var gridSettings = new MongoGridFSSettings();
+
+            // Act
+            IVirtualImageProvider target = new MongoReaderPlugin(
+                settings["prefix"],
+                db,
+                gridSettings);
 
             // Assert
             Assert.NotNull(target);
@@ -49,8 +107,7 @@ namespace ImageResizer.AllPlugins.Tests
         /// The queryString parameter is not used. The value passed should not affect the method outcome.
         /// </remarks>
         [Fact]
-        public void FileExistsWithNullQueryString()
-        {
+        public void FileExistsWithNullQueryString() {
             // Arrange
             bool expected = true;
             var settings = this.Settings;
@@ -68,8 +125,7 @@ namespace ImageResizer.AllPlugins.Tests
         /// Call the FileExists method with a null value for the virtualPath parameter.
         /// </summary>
         [Fact]
-        public void FileExistsWithNullVirtualPath()
-        {
+        public void FileExistsWithNullVirtualPath() {
             // Arrange
             var settings = this.Settings;
             IVirtualImageProvider target = new MongoReaderPlugin(settings);
@@ -86,8 +142,7 @@ namespace ImageResizer.AllPlugins.Tests
         /// Call the FileExists method with an empty string for the virtualPath parameter.
         /// </summary>
         [Fact]
-        public void FileExistsWithEmptyVirtualPath()
-        {
+        public void FileExistsWithEmptyVirtualPath() {
             // Arrange
             bool expected = false;
             var settings = this.Settings;
@@ -105,8 +160,7 @@ namespace ImageResizer.AllPlugins.Tests
         /// the PathPrefix.
         /// </summary>
         [Fact]
-        public void FileExistsWithoutVirtualPath()
-        {
+        public void FileExistsWithoutVirtualPath() {
             // Arrange
             bool expected = false;
             var settings = this.Settings;
@@ -125,8 +179,7 @@ namespace ImageResizer.AllPlugins.Tests
         /// the PathPrefix and a record id that does not exist. 
         /// </summary>
         [Fact]
-        public void FileExistFileNotExisting()
-        {
+        public void FileExistFileNotExisting() {
             // Arrange
             bool expected = true;
             var settings = this.Settings;
@@ -145,8 +198,7 @@ namespace ImageResizer.AllPlugins.Tests
         /// the PathPrefix and a record id that does exist. 
         /// </summary>
         [Fact]
-        public void FileExistsFileExisting()
-        {
+        public void FileExistsFileExisting() {
             // Arrange
             string id = this.CreateFileInDatabase();
             bool expected = true;
@@ -166,8 +218,7 @@ namespace ImageResizer.AllPlugins.Tests
         /// the PathPrefix and a record id that does not exist. 
         /// </summary>
         [Fact]
-        public void GetFileInvalid()
-        {
+        public void GetFileInvalid() {
             // Arrange
             var settings = this.Settings;
             string virtualPath = Path.Combine(settings["prefix"], dummyDatabaseRecordId.ToString("B"));
@@ -179,6 +230,7 @@ namespace ImageResizer.AllPlugins.Tests
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<IVirtualFile>(actual);
+            Assert.StrictEqual<string>(virtualPath, actual.VirtualPath);
         }
 
         /// <summary>
@@ -186,8 +238,7 @@ namespace ImageResizer.AllPlugins.Tests
         /// the PathPrefix and a record id that does exist. 
         /// </summary>
         [Fact]
-        public void GetFileValid()
-        {
+        public void GetFileValid() {
             // Arrange
             string id = this.CreateFileInDatabase();
             var settings = this.Settings;
@@ -201,6 +252,7 @@ namespace ImageResizer.AllPlugins.Tests
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<IVirtualFile>(actual);
+            Assert.StrictEqual<string>(virtualPath, actual.VirtualPath);
         }
 
         /// <summary>
@@ -208,8 +260,7 @@ namespace ImageResizer.AllPlugins.Tests
         /// the PathPrefix and a record id that does not exist. 
         /// </summary>
         [Fact]
-        public void GetFileWithoutVirtualPathPrefix()
-        {
+        public void GetFileWithoutVirtualPathPrefix() {
             // Arrange
             var settings = this.Settings;
             string virtualPath = dummyDatabaseRecordId.ToString("B");
@@ -226,8 +277,7 @@ namespace ImageResizer.AllPlugins.Tests
         /// Call the GetFile method with a null value for the virtualPath parameter.
         /// </summary>
         [Fact]
-        public void GetFileWithNullVirtualPath()
-        {
+        public void GetFileWithNullVirtualPath() {
             // Arrange
             var settings = this.Settings;
             IVirtualImageProvider target = new MongoReaderPlugin(settings);
@@ -244,8 +294,7 @@ namespace ImageResizer.AllPlugins.Tests
         /// Call the GetFile method with an empty string for the virtualPath parameter. 
         /// </summary>
         [Fact]
-        public void GetFileWithEmptyVirtualPath()
-        {
+        public void GetFileWithEmptyVirtualPath() {
             // Arrange
             var settings = this.Settings;
             IVirtualImageProvider target = new MongoReaderPlugin(settings);
@@ -259,11 +308,10 @@ namespace ImageResizer.AllPlugins.Tests
 
         /// <summary>
         /// Call the Open method with a virtualPath to a database record that 
-        /// does exist.
+        /// does exist. 
         /// </summary>
         [Fact]
-        public void OpenValidId()
-        {
+        public void OpenValidId() {
             // Arrange
             string id = this.CreateFileInDatabase();
             var settings = this.Settings;
@@ -283,18 +331,62 @@ namespace ImageResizer.AllPlugins.Tests
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<Stream>(actual);
+            Assert.StrictEqual<string>(virtualPath, target.VirtualPath);
         }
 
         /// <summary>
         /// Call the Open method with a virtualPath to a database record that 
-        /// does not exist.
+        /// does not exist. Without id prefix.
         /// </summary>
         [Fact]
-        public void OpenInvalidId()
-        {
+        public void OpenInvalidIdWithoutIdPrefix() {
             // Arrange
             var settings = this.Settings;
-            string virtualPath = Path.Combine(settings["prefix"], dummyDatabaseRecordId.ToString("B"));
+            string virtualPath = Path.Combine(settings["prefix"], dummyDatabaseRecordId.ToString("N").Substring(0, 24) + ".jpg");
+            IVirtualImageProvider reader = new MongoReaderPlugin(settings);
+
+            var queryString = new NameValueCollection();
+            var target = reader.GetFile(virtualPath, queryString);
+
+            // Act
+            var actual = Assert.Throws<FileNotFoundException>(() => target.Open());
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.IsType<FileNotFoundException>(actual);
+        }
+
+        /// <summary>
+        /// Call the Open method with a virtualPath to a database record that 
+        /// does not exist. With id prefix. With invalid sid
+        /// </summary>
+        [Fact]
+        public void OpenInvalidIdWithIdPrefixInvalidSid() {
+            // Arrange
+            var settings = this.Settings;
+            string virtualPath = Path.Combine(settings["prefix"], "id/" + dummyDatabaseRecordId.ToString("N") + ".jpg");
+            IVirtualImageProvider reader = new MongoReaderPlugin(settings);
+
+            var queryString = new NameValueCollection();
+            var target = reader.GetFile(virtualPath, queryString);
+
+            // Act
+            var actual = Assert.Throws<FileNotFoundException>(() => target.Open());
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.IsType<FileNotFoundException>(actual);
+        }
+
+        /// <summary>
+        /// Call the Open method with a virtualPath to a database record that 
+        /// does not exist. With id prefix.
+        /// </summary>
+        [Fact]
+        public void OpenInvalidIdWithIdPrefix() {
+            // Arrange
+            var settings = this.Settings;
+            string virtualPath = Path.Combine(settings["prefix"], "id/" + dummyDatabaseRecordId.ToString("N").Substring(0, 24) + ".jpg");
             IVirtualImageProvider reader = new MongoReaderPlugin(settings);
 
             var queryString = new NameValueCollection();
@@ -311,14 +403,12 @@ namespace ImageResizer.AllPlugins.Tests
         /// <summary>
         /// Gets a settings object for a  <see cref="MongoReaderPlugin"/>.
         /// </summary>
-        private NameValueCollection Settings
-        {
-            get
-            {
+        private NameValueCollection Settings {
+            get {
                 var settings = new NameValueCollection();
                 settings["prefix"] = "/gridfs/";
                 settings["connectionString"] = "mongodb://test:test@staff.mongohq.com:10040/resizer2";
-                
+
                 return settings;
             }
         }
@@ -327,13 +417,10 @@ namespace ImageResizer.AllPlugins.Tests
         /// Create an entry in the database.
         /// </summary>
         /// <returns>The id of the entry created.</returns>
-        private string CreateFileInDatabase()
-        {
+        private string CreateFileInDatabase() {
             string name = "ImageResizer.AllPlugins.Tests.junk.jpg";
-            using (var image = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream(name)))
-            {
-                using (MemoryStream ms = new MemoryStream())
-                {
+            using (var image = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream(name))) {
+                using (MemoryStream ms = new MemoryStream()) {
                     image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 
                     // Upload the byte array to SQL
@@ -349,15 +436,14 @@ namespace ImageResizer.AllPlugins.Tests
         /// <param name="extension">The file extension indicating the file type.</param>
         /// <param name="fileName">THe full name of the file.</param>
         /// <returns>The id of the record created.</returns>
-        private string StoreFile(MemoryStream data, string extension, string fileName)
-        {
+        private string StoreFile(MemoryStream data, string extension, string fileName) {
             data.Seek(0, SeekOrigin.Begin);
             MongoGridFS g = new MongoReaderPlugin(this.Settings).GridFS;
 
             // Resize to a memory stream, max 2000x2000 jpeg
             MemoryStream temp = new MemoryStream(4096);
             new ImageJob(data, temp, new Instructions("width=2000;height=2000;mode=max;format=jpg")).Build();
-            
+
             // Reset the streams
             temp.Seek(0, SeekOrigin.Begin);
 

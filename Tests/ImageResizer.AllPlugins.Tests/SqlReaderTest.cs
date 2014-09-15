@@ -19,7 +19,7 @@ namespace ImageResizer.AllPlugins.Tests {
     /// </remarks>
     public class SqlReaderTest : IDisposable {
         /// <summary>
-        /// A GUID that can be used to represents a file that does not exist.
+        /// A GUID that can be used to represent a file that does not exist.
         /// </summary>
         private static Guid dummyDatabaseRecordId = Guid.NewGuid();
 
@@ -227,6 +227,7 @@ namespace ImageResizer.AllPlugins.Tests {
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<DatabaseFile>(actual);
             Assert.StrictEqual<bool>(expected, ((DatabaseFile)actual).Exists);
+            Assert.StrictEqual<string>(virtualPath, actual.VirtualPath);
         }
 
         /// <summary>
@@ -250,6 +251,7 @@ namespace ImageResizer.AllPlugins.Tests {
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<DatabaseFile>(actual);
             Assert.StrictEqual<bool>(expected, ((DatabaseFile)actual).Exists);
+            Assert.StrictEqual<string>(virtualPath, actual.VirtualPath);
         }
 
         /// <summary>
@@ -274,6 +276,7 @@ namespace ImageResizer.AllPlugins.Tests {
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<DatabaseFile>(actual);
             Assert.StrictEqual<bool>(expected, ((DatabaseFile)actual).Exists);
+            Assert.StrictEqual<string>(virtualPath, actual.VirtualPath);
         }
 
         /// <summary>
@@ -366,6 +369,7 @@ namespace ImageResizer.AllPlugins.Tests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsType<FileNotFoundException>(actual);
+            Assert.StrictEqual<string>(virtualPath, target.VirtualPath);
         }
 
         /// <summary>
