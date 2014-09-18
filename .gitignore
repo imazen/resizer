@@ -21,3 +21,4 @@ _ReSharper*
 packages/
 NuGet.exe
 !NuGet.targets
+*.coverage
