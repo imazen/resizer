@@ -53,6 +53,11 @@ namespace ImageResizer.Plugins.RemoteReader {
             } catch { }
         }
 
+        /// <summary>
+        /// Adds the plugin to the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
             this.c = c;
             c.Plugins.add_plugin(this);
@@ -68,7 +73,11 @@ namespace ImageResizer.Plugins.RemoteReader {
             if (IsRemotePath(c.Pipeline.PreRewritePath)) c.Pipeline.SkipFileTypeCheck = true;
         }
 
-
+        /// <summary>
+        /// Removes the plugin from the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             c.Pipeline.RewriteDefaults -= Pipeline_RewriteDefaults;

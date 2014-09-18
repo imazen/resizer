@@ -181,7 +181,7 @@ namespace ImageResizer.Plugins.Watermark {
         /// </summary>
         /// <param name="s"></param>
         /// <param name="actualSizeCalculator"></param>
-        /// <param name="foceInsideCanvas"></param>
+        /// <param name="forceInsideCanvas"></param>
         /// <returns></returns>
         public RectangleF CalculateLayerCoordinates(ImageState s, CalculateLayerContentSize actualSizeCalculator, bool forceInsideCanvas) {
             //Find container 

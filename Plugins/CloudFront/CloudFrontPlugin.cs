@@ -15,12 +15,20 @@ namespace ImageResizer.Plugins.CloudFront {
     /// </summary>
     public class CloudFrontPlugin : IPlugin {
 
+        /// <summary>
+        /// Creates a new instance of the CloutFront Plugin
+        /// </summary>
         public CloudFrontPlugin() { }
 
         Config c;
 
         protected string redirectThrough = null;
         protected bool redirectPermanent = false;
+        /// <summary>
+        /// Adds the plugin to the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
             this.c = c;
             c.Plugins.add_plugin(this);
@@ -84,6 +92,11 @@ namespace ImageResizer.Plugins.CloudFront {
 
         }
 
+        /// <summary>
+        /// Removes the plugin from the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             c.Pipeline.RewriteDefaults -= Pipeline_RewriteDefaults;

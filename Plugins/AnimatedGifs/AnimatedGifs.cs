@@ -13,16 +13,31 @@ using ImageResizer.Configuration;
 using ImageResizer.Plugins.Basic;
 namespace ImageResizer.Plugins.AnimatedGifs
 {
+    /// <summary>
+    /// Adds support for resizing animated gifs. Once added, animated gifs will be resized while maintaining all animated frames. By default, .NET only saves the first frame of the GIF image.
+    /// </summary>
     public class AnimatedGifs : BuilderExtension, IPlugin
     {
         Config c;
+        /// <summary>
+        /// Creates a new instance of the AnimatedGifs plugin.
+        /// </summary>
         public AnimatedGifs(){}
+        /// <summary>
+        /// Adds the plugin to the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
-            this.c = c;
+            this.c = c; 
             return this;
         }
-
+        /// <summary>
+        /// Removes the plugin from the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;

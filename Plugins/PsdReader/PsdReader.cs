@@ -8,20 +8,38 @@ using System.IO;
 using System;
 using System.Globalization;
 namespace ImageResizer.Plugins.PsdReader {
+    /// <summary>
+    /// Adds support for .PSD source files. No configuration required.
+    /// </summary>
     public class PsdReader : ImageResizer.Resizing.BuilderExtension, IPlugin, IFileExtensionPlugin {
 
+        /// <summary>
+        /// Creates a new instance of PsdReader
+        /// </summary>
         public PsdReader() { }
 
+        /// <summary>
+        /// Adds the plugin to the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             return this;
         }
-
+        /// <summary>
+        /// Removes the plugin from the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
         }
-
+        /// <summary>
+        /// Additional file types this plugin adds support for decoding.
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<string> GetSupportedFileExtensions() {
             return new string[] { ".psd" };
         }

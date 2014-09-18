@@ -30,7 +30,10 @@ namespace ImageResizer.Plugins.FFmpeg
         }
         private FFmpegManager mgr = new FFmpegManager();
 
-
+        /// <summary>
+        /// Additional file types this plugin adds support for decoding.
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<string> GetSupportedFileExtensions()
         {
             return new string[] {"avi", "mp4","avchd","flv","fla","swf","mpg","mpeg","mpe","mov","m4v","mkv","wmv" };
@@ -62,7 +65,10 @@ namespace ImageResizer.Plugins.FFmpeg
                 return null;
         }
 
-
+        /// <summary>
+        /// Returns the querystrings command keys supported by this plugin. 
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<string> GetSupportedQuerystringKeys()
         {
             return new string[] {"ffmpeg.seconds" ,"ffmpeg.percent","ffmpeg.skipblankframes" };

@@ -15,11 +15,22 @@ using ImageResizer.Plugins.Faces;
 using ImageResizer.Caching;
 
 namespace ImageResizer.Plugins.RedEye {
+    /// <summary>
+    /// Provides automatic and manual red-eye detection and correction. 
+    /// </summary>
     public class RedEyePlugin : BuilderExtension, IPlugin, IQuerystringPlugin {
+        /// <summary>
+        /// Creates a new instance of RedEyePlugin
+        /// </summary>
         public RedEyePlugin() {
         }
 
         protected Config c;
+        /// <summary>
+        /// Adds the plugin to the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             this.c = c;
@@ -27,6 +38,11 @@ namespace ImageResizer.Plugins.RedEye {
             return this;
         }
 
+        /// <summary>
+        /// Removes the plugin from the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             c.Pipeline.PreHandleImage -= Pipeline_PreHandleImage;
@@ -146,6 +162,10 @@ namespace ImageResizer.Plugins.RedEye {
             }
         }
 
+        /// <summary>
+        /// Returns the querystrings command keys supported by this plugin. 
+        /// </summary>
+        /// <returns></returns>
         public  IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "r.detecteyes", "r.getlayout", "r.conv","r.econv","r.sn","r.canny","r.threshold","r.sobel","r.filter","r.eyes","r.autoeyes"};
         }

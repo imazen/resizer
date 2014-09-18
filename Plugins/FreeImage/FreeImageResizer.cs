@@ -9,23 +9,41 @@ using System.Drawing;
 using ImageResizer.Plugins.FreeImageResizer;
 using ImageResizer.Plugins.FreeImageScaling;
 
+/// Adds support for FreeImage resizing algorithms, which include CatmullRom, Lanczos3, bspline, box, bicubic, and bilinear filters.
 namespace ImageResizer.Plugins.FreeImageResizer { public class FreeImageResizerPlugin : FreeImageScalingPlugin { public FreeImageResizerPlugin() { } } }
 
-
 namespace ImageResizer.Plugins.FreeImageScaling {
+    /// <summary>
+    /// Adds support for scaling.
+    /// </summary>
     public class FreeImageScalingPlugin : BuilderExtension, IPlugin, IQuerystringPlugin {
+        /// <summary>
+        /// Creates a new instance of the FreeImageScaling plugin.
+        /// </summary>
         public FreeImageScalingPlugin() {
         }
+        /// <summary>
+        /// Adds the plugin to the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             return this;
         }
-
+        /// <summary>
+        /// Removes the plugin from the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
         }
-
+        /// <summary>
+        /// Returns the querystrings command keys supported by this plugin. 
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "fi.scale" };
         }

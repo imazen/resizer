@@ -14,17 +14,32 @@ using System.Collections.Specialized;
 using ImageResizer.Plugins.CropAround;
 
 namespace ImageResizer.Plugins.Faces {
+    /// <summary>
+    /// Human face detection plugin. Provides automatic face detection, as well as the CropAround plugin, which can even be combined in a single request (using &amp;c.focus=faces) to provide face-focused/face-preserving cropping.
+    /// </summary>
     public class FacesPlugin:BuilderExtension,IPlugin,IQuerystringPlugin {
+        /// <summary>
+        /// Creates a new instance of the Faces plugin.
+        /// </summary>
         public FacesPlugin() {
         }
         protected Config c;
+        /// <summary>
+        /// Adds the plugin to the given configuration container.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             this.c = c;
             c.Pipeline.PreHandleImage += Pipeline_PreHandleImage;
             return this;
         }
-
+        /// <summary>
+        /// Removes the plugin from the given configuration container.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             c.Pipeline.PreHandleImage -= Pipeline_PreHandleImage;
@@ -193,7 +208,10 @@ namespace ImageResizer.Plugins.Faces {
 
             return f;
         }
-
+        /// <summary>
+        /// Returns the querystrings command keys supported by this plugin. 
+        /// </summary>
+        /// <returns></returns>
         public  IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "f.show", "f.detect","f.faces", "f.threshold", "f.minsize", "f.expand"};
         }

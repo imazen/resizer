@@ -11,17 +11,32 @@ using System.Drawing.Drawing2D;
 using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.SimpleFilters {
+    /// <summary>
+    /// This plugin provides grayscale, sepia, brightness, saturation, contrast, inversion, and alpha filtering options. It also includes beta support for rounded corners.
+    /// </summary>
     public class SimpleFilters : BuilderExtension, IPlugin, IQuerystringPlugin {
+        /// <summary>
+        /// Adds the plugin to the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             return this;
         }
-
+        /// <summary>
+        /// Removes the plugin from the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
         }
-
+        /// <summary>
+        /// Returns the querystrings command keys supported by this plugin. 
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "filter", "s.grayscale", "s.overlay", "s.shift", "s.sepia", "s.alpha", "s.brightness", "s.contrast", "s.saturation", "s.invert","s.roundcorners" };
         }

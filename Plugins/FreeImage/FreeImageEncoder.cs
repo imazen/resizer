@@ -9,6 +9,9 @@ using System.Drawing.Imaging;
 using System.Globalization;
 
 namespace ImageResizer.Plugins.FreeImageEncoder {
+    /// <summary>
+    /// FreeImageEncoder can encode jpegs 2-3x as fast as GDI can, and offers more encoding options.
+    /// </summary>
     public class FreeImageEncoderPlugin : IPlugin, IEncoder {
 
         FREE_IMAGE_FORMAT format = FREE_IMAGE_FORMAT.FIF_JPEG;
@@ -24,6 +27,9 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
             get { return encodingOptions; }
             set { encodingOptions = value; }
         }
+        /// <summary>
+        /// Adds a new instance of FreeImageEncoderPlugin
+        /// </summary>
         public FreeImageEncoderPlugin() {
         }
 
@@ -67,12 +73,21 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
         }
         int colors = -1;
 
-
+        /// <summary>
+        /// Adds the plugin to the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             return this;
         }
 
+        /// <summary>
+        /// Removes the plugin from the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
@@ -111,15 +126,21 @@ namespace ImageResizer.Plugins.FreeImageEncoder {
             }
             FreeImage.SaveToStream(ref bit, s, Format, EncodingOptions, true);
         }
-
+        /// <summary>
+        /// If the configured encoding settings support transparency.
+        /// </summary>
         public bool SupportsTransparency {
             get { return Format != FREE_IMAGE_FORMAT.FIF_JPEG; }
         }
-
+        /// <summary>
+        /// The suggested mime-type for the output image produced by this encoder
+        /// </summary>
         public string MimeType {
             get { return FreeImage.GetFIFMimeType(Format); }
         }
-
+        /// <summary>
+        /// The suggested extension for the output image produced by this encoder
+        /// </summary>
         public string Extension {
             get { return FreeImage.GetPrimaryExtensionFromFIF(Format); }
         }

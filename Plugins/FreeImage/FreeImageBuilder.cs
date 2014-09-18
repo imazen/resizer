@@ -16,18 +16,33 @@ using ImageResizer.Configuration;
 using System.Web.Hosting;
 
 namespace ImageResizer.Plugins.FreeImageBuilder {
+    /// <summary>
+    /// Provides an alternate resizing pipeline that never touches GDI. Only supports width/maxwidth/height/maxheight/scale/marginWidth/paddingWidth/fi.scale settings. Only operates on requests specifying builder=freeimage
+    /// </summary>
     public class FreeImageBuilderPlugin :BuilderExtension, IPlugin, IIssueProvider {
 
+        /// <summary>
+        /// Creates a new instance of FreeImageBuilderPlugin
+        /// </summary>
         public FreeImageBuilderPlugin(){
         }
 
         Config c;
+        /// <summary>
+        /// Adds the plugin to the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             this.c = c;
             return this;
         }
-
+        /// <summary>
+        /// Removes the plugin from the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
@@ -184,6 +199,10 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
         }
 
 
+        /// <summary>
+        /// Returns the issue "The FreeImage library is not available! All FreeImage plugins will be disabled" if the FreeImage library is not available.
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<IIssue> GetIssues() {
             List<IIssue> issues = new List<IIssue>();
             if (!FreeImageAPI.FreeImage.IsAvailable()) issues.Add(new Issue("The FreeImage library is not available! All FreeImage plugins will be disabled.", IssueSeverity.Error));

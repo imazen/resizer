@@ -20,6 +20,9 @@ namespace ImageResizer.Plugins.Watermark
     /// </summary>
     public class WatermarkPlugin : LegacyWatermarkFeatures, IPlugin, IQuerystringPlugin
     {
+        /// <summary>
+        /// Creates a new instance of the watermark plugin.
+        /// </summary>
         public WatermarkPlugin() {
         }
 
@@ -54,6 +57,11 @@ namespace ImageResizer.Plugins.Watermark
             get { return _namedWatermarks; }
             set { _namedWatermarks = value; }
         }
+        /// <summary>
+        /// Adds the plugin to the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             this.c = c;
@@ -63,12 +71,19 @@ namespace ImageResizer.Plugins.Watermark
             return this;
         }
 
-      
+      /// <summary>
+      /// Removes the plugin from the given configuration container
+      /// </summary>
+      /// <param name="c"></param>
+      /// <returns></returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
         }
-
+        /// <summary>
+        /// Returns the querystrings command keys supported by this plugin. 
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "watermark" };
         }

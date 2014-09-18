@@ -25,9 +25,21 @@ namespace ImageResizer.Plugins.Faces {
     /// Represents a detected feature, such as a face, eye, or eye pair
     /// </summary>
     public interface IFeature {
+        /// <summary>
+        /// First X coordinate of the detected feature.
+        /// </summary>
         float X { get; set; }
+        /// <summary>
+        /// First Y coordinate of the detected feature.
+        /// </summary>
         float Y { get; set; }
+        /// <summary>
+        /// Second X coordinate of the detected feature.
+        /// </summary>
         float X2 { get; set; }
+        /// <summary>
+        /// Fifth Y coordinate of the detected feature (just kidding, it's the second).
+        /// </summary>
         float Y2 { get; set; }
     }
 
@@ -36,6 +48,9 @@ namespace ImageResizer.Plugins.Faces {
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public abstract class FeatureDetectionBase<T> : IDisposable where T : IFeature {
+        /// <summary>
+        /// Creates new instance of FeatureDetectionBase.
+        /// </summary>
         public FeatureDetectionBase() {
             var a = this.GetType().Assembly;
             //Use CodeBase if it is physical; this means we don't re-download each time we recycle. 

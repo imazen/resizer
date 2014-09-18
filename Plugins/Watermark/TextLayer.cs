@@ -148,6 +148,10 @@ namespace ImageResizer.Plugins.Watermark {
             set { _style = value; }
         }
 
+        /// <summary>
+        /// Sets the font for the text layer. Default is Generic Sans Serif.
+        /// </summary>
+        /// <returns></returns>
         public Font GetFont() {
             FontFamily ff = string.IsNullOrEmpty(Font) ? FontFamily.GenericSansSerif : new FontFamily(Font);
             

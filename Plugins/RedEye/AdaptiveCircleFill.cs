@@ -357,7 +357,10 @@ namespace ImageResizer.Plugins.RedEye {
 
 
         }
-
+        /// <summary>
+        /// Bulrs edges of filled red-eye.
+        /// </summary>
+        /// <returns></returns>
         public UnmanagedImage GetBlurredMask() {
             using (UnmanagedImage ui = UnmanagedImage.Create(filledArray.GetLength(1),filledArray.GetLength(0), PixelFormat.Format8bppIndexed)) {
                 MarkFilledPixels(ui, 0, 0, new byte[] { 255 });

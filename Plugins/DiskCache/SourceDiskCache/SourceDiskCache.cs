@@ -14,8 +14,14 @@ using System.Web.Hosting;
 
 namespace ImageResizer.Plugins.SourceDiskCache
 {
+    /// <summary>
+    /// Like DiskCache, but for source files. Not advisable if your source image collection is larger than available local storage.
+    /// </summary>
     public class SourceDiskCachePlugin : IVirtualFileCache, IPlugin, ILoggerProvider
     {
+        /// <summary>
+        /// Creates a new instance of SourceDiskCache
+        /// </summary>
         public SourceDiskCachePlugin() { }
 
         protected string virtualDir = HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/cache/sourceimages";
@@ -153,6 +159,11 @@ namespace ImageResizer.Plugins.SourceDiskCache
             if (e.VirtualPath.StartsWith(this.VirtualCacheDir, StringComparison.OrdinalIgnoreCase)) e.AllowAccess = false;
         }
 
+        /// <summary>
+        /// Removes this plugin from the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Uninstall(Config c)
         {
             c.Plugins.remove_plugin(this);

@@ -123,6 +123,10 @@ namespace ImageResizer.Plugins.BatchZipper
             return s;
         }
     }
+
+    /// <summary>
+    /// Gives the result: success or failure to create a .zip. Also gives a snapshot of the job's statistics.
+    /// </summary>
     public class JobResult
     {
         private bool successful;

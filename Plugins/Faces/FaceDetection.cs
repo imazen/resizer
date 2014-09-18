@@ -9,8 +9,15 @@ using ImageResizer.Util;
 
 
 namespace ImageResizer.Plugins.Faces {
-
+    /// <summary>
+    /// Creates a rectangle to frame the face in face recognition.
+    /// </summary>
     public class Face:IFeature {
+        /// <summary>
+        /// Creates a new instance of Face
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="accuracy"></param>
         public Face(RectangleF rect, float accuracy) {
             this.X = rect.X;
             this.Y = rect.Y;
@@ -18,10 +25,25 @@ namespace ImageResizer.Plugins.Faces {
             this.Y2 = rect.Bottom;
             this.Accuracy = accuracy;
         }
+        /// <summary>
+        /// Sets the upper left hand corner X coordinates.
+        /// </summary>
         public float X { get; set; }
+        /// <summary>
+        /// Sets the upper left hand corner Y coordinates
+        /// </summary>
         public float Y { get; set; }
+        /// <summary>
+        /// Sets the lower right hand corner X coordinates
+        /// </summary>
         public float X2 { get; set; }
+        /// <summary>
+        /// Sets the lower right hand corner Y coordinates.
+        /// </summary>
         public float Y2 { get; set; }
+        /// <summary>
+        /// Confidence of accuracy in setting X and Y coordinates.
+        /// </summary>
         public float Accuracy { get; set; }
     }
     /// <summary>
@@ -29,6 +51,9 @@ namespace ImageResizer.Plugins.Faces {
     /// </summary>
     public class FaceDetection:FeatureDetectionBase<Face>{
 
+        /// <summary>
+        /// Creates a new instance of FaceDetection
+        /// </summary>
         public FaceDetection():base(){
             MinFaces = 1;
             MaxFaces = 10;

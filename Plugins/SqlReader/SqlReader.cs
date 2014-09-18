@@ -46,7 +46,7 @@ namespace ImageResizer.Plugins.SqlReader
         }
 
         /// <summary>
-        /// Installes the plugin into the specified configuration. Once installed, it cannot be uninstalled.
+        /// Installs the plugin into the specified configuration. Once installed, it cannot be uninstalled.
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>

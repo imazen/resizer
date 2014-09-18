@@ -8,19 +8,33 @@ using System.Drawing;
 using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.AdvancedFilters {
+    /// <summary>
+    /// Allows for feathered edges.
+    /// </summary>
     public class FeatherEdge : BaseInPlacePartialFilter {
-
+        /// <summary>
+        /// Declares the edges of the feathered image.
+        /// </summary>
+        /// <param name="outerAlpha"></param>
+        /// <param name="innerAlpha"></param>
+        /// <param name="width"></param>
         public FeatherEdge(double outerAlpha, double innerAlpha, double width ):this() {
             this.OuterAlpha = outerAlpha;
             this.InnerAlpha = innerAlpha;
             this.Width = width;
 
         }
-
+        /// <summary>
+        /// Outside limit of the feathered edge.
+        /// </summary>
         public double OuterAlpha { get; set; }
-
+        /// <summary>
+        /// Inside limit of the feathered edge.
+        /// </summary>
         public double InnerAlpha { get; set; }
-
+        /// <summary>
+        /// Width of the feathered edge.
+        /// </summary>
         public double Width { get; set; }
 
         private Dictionary<PixelFormat, PixelFormat> formatTranslations = new Dictionary<PixelFormat, PixelFormat>();
@@ -29,7 +43,9 @@ namespace ImageResizer.Plugins.AdvancedFilters {
         }
 
 
-
+        /// <summary>
+        /// Creates a new instance of FeatherEdge.
+        /// </summary>
         public FeatherEdge() {
             formatTranslations[PixelFormat.Format32bppArgb] = PixelFormat.Format32bppArgb;
         }

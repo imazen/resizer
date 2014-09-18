@@ -76,7 +76,9 @@ namespace ImageResizer.Plugins.DiskCache
             set { BeforeSettingChanged(); cleanupStrategy = value; }
         }
 
-
+        /// <summary>
+        /// Sets the timeout time to 15 seconds as default.
+        /// </summary>
         protected int cacheAccessTimeout = 15000;
         /// <summary>
         /// How many milliseconds to wait for a cached item to be available. Values below 0 are set to 0. Defaults to 15 seconds.
@@ -203,6 +205,11 @@ namespace ImageResizer.Plugins.DiskCache
             if (e.VirtualPath.StartsWith(this.VirtualCacheDir, StringComparison.OrdinalIgnoreCase)) e.AllowAccess = false;
         }
 
+        /// <summary>
+        /// Removes the plugin from the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Uninstall(Config c) {
             c.Plugins.remove_plugin(this);
             c.Pipeline.AuthorizeImage -= Pipeline_AuthorizeImage;

@@ -22,6 +22,11 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
         public FreeImageDecoderPlugin() {
         }
         private static IEnumerable<string> supportedExts = null;
+        /// <summary>
+        /// Adds the plugin to the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
             if (supportedExts == null && FreeImage.IsAvailable()) {
                 supportedExts = BuildSupportedList();
@@ -42,11 +47,19 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
 
         }
 
+        /// <summary>
+        /// Removes the plugin from the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;
         }
-
+        /// <summary>
+        /// Additional file types this plugin adds support for decoding.
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<string> GetSupportedFileExtensions() {
             if (supportedExts == null) return new string[] { };
             else return supportedExts;
@@ -178,12 +191,19 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
             return b;
         }
 
+        /// <summary>
+        /// Returns the issue "The FreeImage library is not available! All FreeImage plugins will be disabled" if the FreeImage library is not available.
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<IIssue> GetIssues() {
             List<IIssue> issues = new List<IIssue>();
             if (!FreeImageAPI.FreeImage.IsAvailable()) issues.Add(new Issue("The FreeImage library is not available! All FreeImage plugins will be disabled.", IssueSeverity.Error));
             return issues;
         }
-
+        /// <summary>
+        /// Returns the querystrings command keys supported by this plugin. 
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "usepreview", "autorotate", "page", "frame" };
         }

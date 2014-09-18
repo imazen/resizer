@@ -9,9 +9,14 @@ using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins.FFmpeg
 {
+    /// <summary>
+    /// Dynamically extract frames from videos by time or percentage. Includes basic blank frame avoidance. Based on ffmpeg.
+    /// </summary>
     public class FFmpegJob
     {
-
+        /// <summary>
+        /// Creates a new instance of FFmpegJob, and forces a timeout after 15 seconds.
+        /// </summary>
         public FFmpegJob()
         {
             Timeout = 15000; //15 seconds

@@ -29,9 +29,17 @@ namespace ImageResizer.Plugins.DiskCache.Async {
 
         private MemoryStream _data;
 
+        /// <summary>
+        /// Returns the length of the Data
+        /// </summary>
+        /// <returns></returns>
         public long GetDataLength() {
             return _data.Length;
         }
+        /// <summary>
+        /// Returns the length of the buffer capacity
+        /// </summary>
+        /// <returns></returns>
         public long GetBufferLength() {
             return _data.Capacity;
         }

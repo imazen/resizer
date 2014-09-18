@@ -14,6 +14,9 @@ using Amazon.S3;
 using ImageResizer.Configuration.Xml;
 
 namespace ImageResizer.Plugins.S3Reader2 {
+    /// <summary>
+    /// Allows images located on Amazon S3 to be processed and resized as if they were located locally on the disk. Also serves files located on S3 - not restricted to images (unless vpp="false") is used.
+    /// </summary>
     public class S3Reader2 : IPlugin, IMultiInstancePlugin, IRedactDiagnostics {
 
         string buckets, vpath;
@@ -111,7 +114,11 @@ namespace ImageResizer.Plugins.S3Reader2 {
 
 
         S3VirtualPathProvider vpp = null;
-
+        /// <summary>
+        /// Adds the plugin to the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
 
             if (vpp != null) throw new InvalidOperationException("This plugin can only be installed once, and cannot be uninstalled and reinstalled.");
