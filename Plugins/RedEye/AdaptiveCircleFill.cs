@@ -152,6 +152,9 @@ namespace ImageResizer.Plugins.RedEye {
         /// A queue of points which have been filled, but their neighbors not yet evalutated.
         /// </summary>
         Queue<System.Drawing.Point> q;
+        /// <summary>
+        /// Initial fill to determine actual center and radius.
+        /// </summary>
         public void FirstPass() {
             filledArray = new bool[red.Height, red.Width];
             q = new Queue<System.Drawing.Point>();
@@ -192,7 +195,9 @@ namespace ImageResizer.Plugins.RedEye {
                 }
             }
         }
-
+        /// <summary>
+        /// Recalculate pixels to modify based on first pass.
+        /// </summary>
         public void SecondPass() {
             ClearArray();
             SumX = 0;

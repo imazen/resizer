@@ -185,6 +185,7 @@ namespace ImageResizer.ExtensionMethods {
         /// <param name="src"></param>
         /// <param name="length"></param>
         /// <param name="chunkSize"></param>
+        /// <param name="entireStream"></param>
         /// <returns></returns>
         public static byte[] CopyOrReturnBuffer(this Stream src, out long length, bool entireStream, int chunkSize) {
             if (src is MemoryStream) {

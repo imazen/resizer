@@ -154,7 +154,7 @@ namespace ImageResizer.Plugins.Watermark {
         /// (defaults false). When true, the image or text will attempt to fill 1 of the layer's bounds, even if upscaling is required. 
         /// When Width is not specified, and both left and right are not specififed, this causes the image to fill the container width (if possible).
         /// When Height is not specified, and both top and bottom are not specififed, this causes the image to fill the container height (if possible).
-        /// This causes &scale=both to be used on images unless another setting is specified in imageQuery.
+        /// This causes &amp;scale=both to be used on images unless another setting is specified in imageQuery.
         /// </summary>
         public bool Fill {
             get { return _fill; }
@@ -180,6 +180,8 @@ namespace ImageResizer.Plugins.Watermark {
         /// 
         /// </summary>
         /// <param name="s"></param>
+        /// <param name="actualSizeCalculator"></param>
+        /// <param name="foceInsideCanvas"></param>
         /// <returns></returns>
         public RectangleF CalculateLayerCoordinates(ImageState s, CalculateLayerContentSize actualSizeCalculator, bool forceInsideCanvas) {
             //Find container 

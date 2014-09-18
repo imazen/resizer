@@ -33,7 +33,7 @@ namespace ImageResizer.Plugins.AnimatedGifs
         /// </summary>
         /// <param name="source"></param>
         /// <param name="dest"></param>
-        /// <param name="settings"></param>
+        /// <param name="job"></param>
         protected override RequestedAction BuildJobBitmapToStream(ImageJob job, Bitmap source, Stream dest)
         {
             //Determines output format, includes code for saving in a variety of formats.

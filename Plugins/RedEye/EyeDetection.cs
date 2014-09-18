@@ -10,14 +10,32 @@ using ImageResizer.Plugins.Faces;
 
 namespace ImageResizer.Plugins.RedEye {
 
-
+    /// <summary>
+    /// Types of facial features detected.
+    /// </summary>
     public enum FeatureType {
+        /// <summary>
+        /// Individual eyes.
+        /// </summary>
         Eye,
+        /// <summary>
+        /// Pairs of eyes.
+        /// </summary>
         EyePair,
+        /// <summary>
+        /// Faces.
+        /// </summary>
         Face
     }
-
+    /// <summary>
+    /// Creates a rectangle in which facial features are isolated.
+    /// </summary>
     public class ObjRect : IFeature {
+        /// <summary>
+        /// Declares coordinates of rectangle for isolating facial features.
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="type"></param>
         public ObjRect(RectangleF rect, FeatureType type) {
             this.X = rect.X;
             this.Y = rect.Y;
@@ -26,16 +44,38 @@ namespace ImageResizer.Plugins.RedEye {
             this.Feature = type;
             this.Accuracy = 0;
         }
+        /// <summary>
+        /// X coordinate of top left point of the facial features recognition rectangle.
+        /// </summary>
         public float X { get; set; }
+        /// <summary>
+        /// Y coordinate of the facial features recognition rectangle.
+        /// </summary>
         public float Y { get; set; }
+        /// <summary>
+        /// X coordinate of bottom right point of the facial features recognition rectangle.
+        /// </summary>
         public float X2 { get; set; }
+        /// <summary>
+        /// Y coordinate of bottom right point of the facial features recognition rectangle.
+        /// </summary>
         public float Y2 { get; set; }
+        /// <summary>
+        /// Confidence level for facial recognition rectangle
+        /// </summary>
         public float Accuracy { get; set; }
+        /// <summary>
+        /// Which feature is being isolated.
+        /// </summary>
         public FeatureType Feature { get; set; }
     }
-
+    /// <summary>
+    /// Eye detection feature.
+    /// </summary>
     public class EyeDetection : FeatureDetectionBase<ObjRect> {
-
+        /// <summary>
+        /// Eye detection feature.
+        /// </summary>
         public EyeDetection()
             : base() {
                 this.fileNames = new Dictionary<string, string>(){

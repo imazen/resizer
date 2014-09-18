@@ -60,7 +60,6 @@ namespace ImageResizer.Collections {
         /// Provides culture-invariant serialization of value types, in lower case for querystring readability. Setting a key to null removes it.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="q"></param>
         /// <param name="name"></param>
         /// <param name="val"></param>
         /// <returns></returns>

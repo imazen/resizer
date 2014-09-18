@@ -383,7 +383,7 @@ namespace ImageResizer.Configuration {
         /// Searches all loaded assemblies for the specified type, applying rules and prefixes to resolve the namespace and assembly.
         /// Returns null if it could not find the type, and logs an issue.
         /// </summary>
-        /// <param name="searchName"></param>
+        /// <param name="searchNameString"></param>
         /// <returns></returns>
         public Type FindPluginType(string searchNameString) {
             Type t = null;

@@ -218,6 +218,7 @@ namespace ImageResizer.ExtensionMethods {
         /// If both the the primary and secondary are present, the secondary is removed. 
         /// Otherwise, the secondary is renamed to the primary name.
         /// </summary>
+        /// <param name="q"></param>
         /// <param name="primary"></param>
         /// <param name="secondary"></param>
         public static NameValueCollection Normalize(this NameValueCollection q, string primary, string secondary) {

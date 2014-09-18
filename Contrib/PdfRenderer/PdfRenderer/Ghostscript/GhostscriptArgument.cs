@@ -2,8 +2,9 @@ namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
 {
     /// <summary>
     ///   Ghostscript argument names
+    ///  
     /// </summary>
-    /// <see cref = "http://ghostscript.com/doc/current/Use.htm" />
+    /// <see cref = "!:http://ghostscript.com/doc/current/Use.htm" />
     public static class GhostscriptArgument
     {
         #region Rendering

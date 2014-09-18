@@ -60,7 +60,7 @@ namespace ImageResizer.Plugins.CropAround {
 
             s.copyRect = box;
             
-            ///What is the vertical and horizontal aspect ratio different in result pixels?
+            //What is the vertical and horizontal aspect ratio different in result pixels?
             var padding = PolygonMath.ScaleInside(box.Size, targetSize);
             padding = new SizeF(targetSize.Width - padding.Width, targetSize.Height - padding.Height);
 

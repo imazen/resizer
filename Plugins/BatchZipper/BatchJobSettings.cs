@@ -25,7 +25,7 @@ namespace ImageResizer.Plugins.BatchZipper
         /// <param name="physicalPath">Filesystem path, such as C:\Web\Project\Image\file.jpg</param>
         /// <param name="targetFilename">The target filename to use in the compressed folder. If left null, the filename of physicalPath will be used.
         /// Should not include the file extension, that will be assigned based on resizeQuerystring and the original extension.</param>
-        /// <param name="resizeQuerystring">The resize/crop settings applied to the file, ex. ?width=100&height=100&crop=auto&format=png</param>
+        /// <param name="resizeQuerystring">The resize/crop settings applied to the file, ex. ?width=100&amp;height=100&amp;crop=auto&amp;format=png</param>
          public BatchResizeItem(string physicalPath, string targetFilename, string resizeQuerystring)
         {
             this.physicalPath = physicalPath;
@@ -38,7 +38,7 @@ namespace ImageResizer.Plugins.BatchZipper
         /// <param name="physicalPath">Filesystem path, such as C:\Web\Project\Image\file.jpg</param>
         /// <param name="targetFilename">The target filename to use in the compressed folder. If left null, the filename of physicalPath will be used.
         /// Should not include the file extension, that will be assigned based on resizeQuerystring and the original extension.</param>
-        /// <param name="resizeQuerystring">The resize/crop settings applied to the file, ex. ?width=100&height=100&crop=auto&format=png</param>
+        /// <param name="resizeQuerystring">The resize/crop settings applied to the file, ex. ?width=100&amp;height=100&amp;crop=auto&amp;format=png</param>
         /// <param name="mutable">If false, an InvalidOperationException exception will be thrown when you attempt to modify the instance. Set this to true when building a job.</param>
         protected internal BatchResizeItem(string physicalPath, string targetFilename, string resizeQuerystring, bool mutable)
         {
@@ -61,7 +61,7 @@ namespace ImageResizer.Plugins.BatchZipper
 
         private string resizeQuerystring;
         /// <summary>
-        /// The resize/crop settings applied to the file, ex. ?width=100&height=100&crop=auto&format=png. Throws an InvalidOperationException if you attempt to modify an immutable instance. 
+        /// The resize/crop settings applied to the file, ex. ?width=100&amp;height=100&amp;crop=auto&amp;format=png. Throws an InvalidOperationException if you attempt to modify an immutable instance. 
         /// </summary>
         public string ResizeQuerystring
         {
@@ -122,7 +122,7 @@ namespace ImageResizer.Plugins.BatchZipper
         /// </summary>
         /// <param name="jobId">The job ID, can be generated with Guid.NewGuid() </param>
         /// <param name="destinationFile">The physical path to the destination archive</param>
-        /// <param name="files">A List<BatchResizeItem> of items to to resize and place in the folder.</param>
+        /// <param name="files">A List of items to to resize and place in the folder.</param>
         public BatchResizeSettings(string destinationFile, Guid jobId, IList<BatchResizeItem> files)
         {
             this.jobId = jobId;

@@ -47,9 +47,8 @@ namespace ImageResizer.Plugins.DiskCache {
         /// In a worst-case scenario, it could take up to twice as long as 'timeoutMs' to return false.
         /// </summary>
         /// <param name="key"></param>
-        /// <param name="success"></param>
-        /// <param name="failure"></param>
         /// <param name="timeoutMs"></param>
+        /// <param name="success"></param>
         public bool TryExecute(string key, int timeoutMs, LockCallback success){
             //Record when we started. We don't want an infinite loop.
             DateTime startedAt = DateTime.UtcNow;

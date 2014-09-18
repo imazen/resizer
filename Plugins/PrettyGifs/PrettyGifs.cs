@@ -16,11 +16,22 @@ using System.Globalization;
 using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.PrettyGifs {
+    /// <summary>
+    /// Replaces .NET's poor default GIF encoding algorithm with Octree quantization and dithering, and allows 8-bit PNG creation. Compatible with all plugins.
+    /// </summary>
     public class PrettyGifs :IEncoder, IPlugin, IQuerystringPlugin {
+        /// <summary>
+        /// Creates a new instance of the plugin
+        /// </summary>
         public PrettyGifs() { }
 
         private ResizeSettings query;
 
+        /// <summary>
+        /// Creates a new instance of the plugin as an encoder 
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="original"></param>
         public PrettyGifs(ResizeSettings settings, object original) {
 
             this.query = new ResizeSettings(settings);
@@ -78,7 +89,15 @@ namespace ImageResizer.Plugins.PrettyGifs {
         /// Enables dithering for PNG8 and GIF
         /// </summary>
         public bool Dither = false;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public bool FourPassDither = false;
+
+        /// <summary>
+        /// How much of the error should be passed on (in negative form) to neighbor pixels
+        /// </summary>
         public int DitherPercent = 30;
 
         private ImageFormat _outputFormat = ImageFormat.Gif;
@@ -96,7 +115,7 @@ namespace ImageResizer.Plugins.PrettyGifs {
         /// <summary>
         /// Returns an encoder instance if a Gif or 8-bit png is requested.
         /// </summary>
-        /// <param name="originalImage"></param>
+        /// <param name="original"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
         public IEncoder CreateIfSuitable( ResizeSettings settings, object original) {
@@ -108,6 +127,12 @@ namespace ImageResizer.Plugins.PrettyGifs {
             return null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="original"></param>
+        /// <returns></returns>
         public ImageFormat GetFormatIfSuitable(ResizeSettings settings, object original) {
             //What format was the image originally (used as a fallback).
             ImageFormat originalFormat = DefaultEncoder.GetOriginalFormat(original);
@@ -156,7 +181,6 @@ namespace ImageResizer.Plugins.PrettyGifs {
         /// <param name="dither"></param>
         /// <param name="fourPass"></param>
         /// <param name="ditherPercent"></param>
-        /// <param name="useGdiQuantization"></param>
         public void SaveIndexed(System.Drawing.Imaging.ImageFormat format, Image img, Stream target, byte colors, bool dither, bool fourPass, int ditherPercent) {
       
 
@@ -250,30 +274,51 @@ namespace ImageResizer.Plugins.PrettyGifs {
             return (ImageFormat.Gif.Equals(f) || ImageFormat.Png.Equals(f));
         }
 
-
+        /// <summary>
+        /// If the configured encoding settings support transparency.
+        /// </summary>
         public bool SupportsTransparency {
             get { return true; }
         }
 
+        /// <summary>
+        /// The suggested mime-type for the output image produced by this encoder
+        /// </summary>
         public string MimeType {
             get { return DefaultEncoder.GetContentTypeFromImageFormat(OutputFormat); }
         }
 
+        /// <summary>
+        /// The suggested extension for the output image produced by this encoder
+        /// </summary>
         public string Extension {
             get { return DefaultEncoder.GetExtensionFromImageFormat(OutputFormat); }
         }
 
 
-
+        /// <summary>
+        /// Returns the querystrings command keys supported by this plugin. 
+        /// </summary>
+        /// <returns></returns>
         public virtual IEnumerable<string> GetSupportedQuerystringKeys() {
             return new string[] { "colors", "dither" };
         }
 
+        /// <summary>
+        /// Adds the plugin to the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
             return this;
         }
 
+        /// <summary>
+        /// Removes the plugin from the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
             return true;

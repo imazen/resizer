@@ -33,6 +33,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
         /// <param name="s"></param>
         /// <param name="key"></param>
         /// <param name="key2"></param>
+        /// <param name="units"></param>
         /// <returns></returns>
         protected int GetRadius(ImageState s, string key, string key2, double units) {
             string str = s.settings[key];
@@ -148,7 +149,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             if ("true".Equals(s.settings["a.equalize"], StringComparison.OrdinalIgnoreCase))
                 new HistogramEqualization().ApplyInPlace(b);
 
-            ///White balance adjustment
+            //White balance adjustment
             var whiteAlg = s.settings.Get<HistogramThresholdAlgorithm>("a.balancewhite");
             var whiteVal = s.settings.Get<double>("a.balancethreshold");
 

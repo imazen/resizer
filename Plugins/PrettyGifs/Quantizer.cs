@@ -146,7 +146,7 @@ namespace ImageResizer.Plugins.PrettyGifs
         /// <summary>
         /// Quantize an image and return the resulting output bitmap
         /// </summary>
-        /// <param name="source">The image to quantize</param>
+        /// <param name="src">The image to quantize</param>
         /// <returns>A quantized version of the image</returns>
         public Bitmap Quantize(Image src) {
             //We just set up the Bitmap copies and handle their disposal - the real work happens in 

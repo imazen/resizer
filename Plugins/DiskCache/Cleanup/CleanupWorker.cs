@@ -26,6 +26,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="cs"></param>
         /// <param name="queue"></param>
         /// <param name="cache"></param>
+        /// <param name="lp"></param>
         public CleanupWorker(ILoggerProvider lp, CleanupStrategy cs, CleanupQueue queue, CustomDiskCache cache):base("DiskCache-CleanupWorker") {
             this.cs = cs;
             this.queue = queue;

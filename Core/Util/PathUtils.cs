@@ -350,7 +350,7 @@ namespace ImageResizer.Util {
         /// <summary>
         /// Parses the querystring from the given path into a NameValueCollection. 
         /// accepts "file?key=value" and "?key=value&amp;key2=value2" formats. (no path is required)
-        /// UrlDecodes keys and values. Does not enforce correct syntax, I.E. '?key=value?key2=value2' is allowed. However, '&key=value?key2=value' will only get key2 parsed. 
+        /// UrlDecodes keys and values. Does not enforce correct syntax, I.E. '?key=value?key2=value2' is allowed. However, '&amp;key=value?key2=value' will only get key2 parsed. 
         /// When allowSemicolons is true, semicolon paths like ';key=value;key2=value2' are allowed, as are hybrid paths: ';key=value?key2=value2&amp;key3=value3'.
         /// </summary>
         /// <param name="path"></param>
@@ -364,7 +364,7 @@ namespace ImageResizer.Util {
         /// <summary>
         /// Parses the querystring from the given path into a NameValueCollection. 
         /// accepts "file?key=value" and "?key=value&amp;key2=value2" formats. (no path is required)
-        /// UrlDecodes keys and values. Does not enforce correct syntax, I.E. '?key=value?key2=value2' is allowed. However, '&key=value?key2=value' will only get key2 parsed. 
+        /// UrlDecodes keys and values. Does not enforce correct syntax, I.E. '?key=value?key2=value2' is allowed. However, '&amp;key=value?key2=value' will only get key2 parsed. 
         /// When allowSemicolons is true, semicolon paths like ';key=value;key2=value2' are allowed, as are hybrid paths: ';key=value?key2=value2&amp;key3=value3'.
         /// 
         /// Does NOT parse fragments correctly.
@@ -372,6 +372,7 @@ namespace ImageResizer.Util {
         /// <param name="path"></param>
         /// <param name="allowSemicolons"></param>
         /// <param name="beforeQuery">Returns the portion of the 'path' before the querystring. May include the scheme, server, port, path and path info, depending upon what 'path' contained.</param>
+        /// <param name="fragment"></param>
         /// <returns></returns>
         public static NameValueCollection ParseQueryString(string path, bool allowSemicolons, out string beforeQuery, out string fragment) {
             //Separate the fragment if it's present, and restore it later

@@ -82,6 +82,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="extension"></param>
         /// <param name="writeCallback"></param>
         /// <param name="timeoutMs"></param>
+        /// <param name="asynchronous"></param>
         /// <returns></returns>
         public CacheResult GetCachedFile(string keyBasis, string extension, ResizeImageDelegate writeCallback,  int timeoutMs, bool asynchronous) {
             Stopwatch sw = null;
@@ -213,7 +214,6 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="physicalPath"></param>
         /// <param name="relativePath"></param>
         /// <param name="writeCallback"></param>
-        /// <param name="sourceModifiedUtc"></param>
         /// <param name="timeoutMs"></param>
         /// <param name="recheckFS"></param>
         /// <returns></returns>

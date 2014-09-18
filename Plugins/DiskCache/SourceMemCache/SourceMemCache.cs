@@ -27,7 +27,13 @@ namespace ImageResizer.Plugins.SourceMemCache {
         private LockProvider locks = new LockProvider();
 
         private ConstrainedCache<string, CachedVirtualFile> cache;
-
+        /// <summary>
+        /// Retrieves file if cached.
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <param name="original"></param>
+        /// <returns></returns>
         public IVirtualFile GetFileIfCached(string virtualPath, System.Collections.Specialized.NameValueCollection queryString, IVirtualFile original) {
             //Use alternate cache key if provided
             string key = original is IVirtualFileSourceCacheKey ? ((IVirtualFileSourceCacheKey)original).GetCacheKey(true) : original.VirtualPath;
@@ -62,7 +68,9 @@ namespace ImageResizer.Plugins.SourceMemCache {
 
 
     }
-
+    /// <summary>
+    /// Source file cached in memory.
+    /// </summary>
     public class CachedVirtualFile : IVirtualFile {
 
         public CachedVirtualFile(string virtualPath, byte[] data) {

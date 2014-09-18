@@ -61,7 +61,6 @@ namespace ImageResizer.Plugins.DiskCache {
         /// If CheckWebConfig has never executed, it is executed immediately, but only once. 
         /// Verifies a Web.config file is present in the directory, and creates it if needed.
         /// </summary>
-        /// <param name="physicalPath"></param>
         public void CheckWebConfigOnce() {
             if (_checkedWebConfigOnce) return;
             lock (_webConfigSyncObj) {
@@ -81,7 +80,6 @@ namespace ImageResizer.Plugins.DiskCache {
         /// Should only be called inside a lock. Creates the cache dir and the web.config file if they are missing. Updates
         /// _lastCheckedWebConfig and _checkedWebConfigOnce
         /// </summary>
-        /// <param name="physicalPath"></param>
         protected void _checkWebConfig() {
             try {
                 string webConfigPath = physicalDirPath.TrimEnd('/', '\\') + System.IO.Path.DirectorySeparatorChar + "Web.config";

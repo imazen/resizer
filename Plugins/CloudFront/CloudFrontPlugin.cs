@@ -10,7 +10,7 @@ using ImageResizer.Util;
 namespace ImageResizer.Plugins.CloudFront {
     /// <summary>
     /// Allows querystrings to be expressed with '/' or ';' instead of '?', allow the querystring to survive the cloudfront guillotine. 
-    /// Since IIS can't stand '&' symbols in the path, you have to replace both '?' and '&' with ';'
+    /// Since IIS can't stand ampersand symbols in the path, you have to replace both '?' and '&amp;' with ';'
     /// Later I hope to include control adapters to automate the process.
     /// </summary>
     public class CloudFrontPlugin : IPlugin {
@@ -69,7 +69,7 @@ namespace ImageResizer.Plugins.CloudFront {
         }
 
         void Pipeline_RewriteDefaults(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
-            ///Handle redirectThrough behavior
+            //Handle redirectThrough behavior
             if (redirectThrough != null && context.Items[c.Pipeline.ModifiedPathKey + ".hadquery"] != null) {
                 //It had a querystring originally - which means the request didn't come from CloudFront, it came directly from the browser. Perform a redirect, rewriting the querystring appropriately
                 string finalPath = redirectThrough + e.VirtualPath + PathUtils.BuildSemicolonQueryString(e.QueryString, true);

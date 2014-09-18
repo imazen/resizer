@@ -97,6 +97,7 @@ namespace ImageResizer.ExtensionMethods {
         /// </summary>
         /// <param name="en"></param>
         /// <param name="value"></param>
+        /// <param name="defaultValue"></param>
         /// <returns></returns>
         public static T Parse<T>(this T en, string value, T defaultValue) where T : struct, IConvertible {
             T? val = EnumExtensions.Parse<T>(en, value);

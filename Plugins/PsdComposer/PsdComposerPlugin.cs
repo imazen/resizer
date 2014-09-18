@@ -89,7 +89,8 @@ namespace ImageResizer.Plugins.PsdComposer
         /// <summary>
         /// Returns a stream to the composed file, encoded in the format requested by the querystring or fake extension
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
         /// <returns></returns>
         public Stream ComposeStream(string virtualPath, NameValueCollection queryString) {
 
@@ -118,7 +119,8 @@ namespace ImageResizer.Plugins.PsdComposer
         /// <summary>
         /// Returns a Bitmap instance of the composed result
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
         /// <returns></returns>
         public System.Drawing.Bitmap ComposeBitmap(string virtualPath, NameValueCollection queryString) {
             //Renderer object

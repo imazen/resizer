@@ -23,8 +23,7 @@ namespace ImageResizer.Plugins.DiskCache.Async {
         /// <summary>
         /// If the collection contains the specified item, it is returned. Otherwise, null is returned.
         /// </summary>
-        /// <param name="relativePath"></param>
-        /// <param name="modifiedUtc"></param>
+        /// <param name="key"></param>
         /// <returns></returns>
         public AsyncWrite Get(string key) {
             lock (_sync) {
@@ -61,6 +60,7 @@ namespace ImageResizer.Plugins.DiskCache.Async {
         /// Returns false when (a) the specified AsyncWrite value already exists, (b) the queue is full, or (c) the thread pool queue is full
         /// </summary>
         /// <param name="w"></param>
+        /// <param name="writerDelegate"></param>
         /// <returns></returns>
         public bool Queue(AsyncWrite w,WriterDelegate writerDelegate ){
             lock (_sync) {

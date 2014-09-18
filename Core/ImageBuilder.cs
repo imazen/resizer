@@ -522,9 +522,9 @@ namespace ImageResizer
         /// Override this when you need to override the behavior of image encoding and/or Bitmap processing
         /// Not for external use. Does NOT dispose of 'source' or 'source's underlying stream.
         /// </summary>
+        /// <param name="job"></param>
         /// <param name="source"></param>
         /// <param name="dest"></param>
-        /// <param name="settings"></param>
         protected override RequestedAction BuildJobBitmapToStream(ImageJob job, Bitmap source, Stream dest) {
             if (base.BuildJobBitmapToStream(job,source, dest) == RequestedAction.Cancel) return RequestedAction.None;
 
@@ -543,7 +543,7 @@ namespace ImageResizer
         /// Not for external use. Does NOT dispose of 'source' or 'source's underlying stream.
         /// </summary>
         /// <param name="source"></param>
-        /// <param name="settings"></param>
+        /// <param name="job"></param>
         /// <param name="transparencySupported">True if the output method will support transparency. If false, the image should be provided a matte color</param>
         /// <returns></returns>
         protected Bitmap BuildJobBitmapToBitmap(ImageJob job, Bitmap source, bool transparencySupported) {
