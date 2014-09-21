@@ -9,7 +9,7 @@ using ImageResizer.Plugins.S3Reader2;
 using ImageResizer.Plugins.SqlReader;
 using Xunit;
 
-namespace ImageResizer.AllPlugins.Tests {
+namespace ImageResizer.ProviderTests {
     /// <summary>
     /// Test the functionality of the <see cref="S3Reader2"/> class.
     /// </summary>

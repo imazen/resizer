@@ -5,9 +5,11 @@ using ImageResizer.Plugins;
 using ImageResizer.Plugins.AzureReader2;
 using Xunit;
 
-namespace ImageResizer.AllPlugins.Tests {
+namespace ImageResizer.ProviderTests.Tests {
     public class AzureReaderTest {
         public AzureReaderTest() {
+            CloudStorageEmulatorShepherd shepherd = new CloudStorageEmulatorShepherd();
+            shepherd.Start();
         }
 
         [Fact]

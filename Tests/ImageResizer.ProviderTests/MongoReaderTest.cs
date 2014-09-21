@@ -9,7 +9,7 @@ using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Xunit;
 
-namespace ImageResizer.AllPlugins.Tests {
+namespace ImageResizer.ProviderTests {
     /// <summary>
     /// Test the functionality of the <see cref="MongoReaderPlugin"/> class.
     /// </summary>
@@ -118,7 +118,7 @@ namespace ImageResizer.AllPlugins.Tests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace ImageResizer.AllPlugins.Tests {
             var actual = target.FileExists(string.Empty, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -171,7 +171,7 @@ namespace ImageResizer.AllPlugins.Tests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -190,7 +190,7 @@ namespace ImageResizer.AllPlugins.Tests {
             bool actual = target.FileExists(virtualPath, new NameValueCollection());
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace ImageResizer.AllPlugins.Tests {
             bool actual = target.FileExists(virtualPath, new NameValueCollection());
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -230,7 +230,7 @@ namespace ImageResizer.AllPlugins.Tests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<IVirtualFile>(actual);
-            Assert.StrictEqual<string>(virtualPath, actual.VirtualPath);
+            Assert.Equal<string>(virtualPath, actual.VirtualPath);
         }
 
         /// <summary>
@@ -252,7 +252,7 @@ namespace ImageResizer.AllPlugins.Tests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<IVirtualFile>(actual);
-            Assert.StrictEqual<string>(virtualPath, actual.VirtualPath);
+            Assert.Equal<string>(virtualPath, actual.VirtualPath);
         }
 
         /// <summary>
@@ -331,7 +331,7 @@ namespace ImageResizer.AllPlugins.Tests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<Stream>(actual);
-            Assert.StrictEqual<string>(virtualPath, target.VirtualPath);
+            Assert.Equal<string>(virtualPath, target.VirtualPath);
         }
 
         /// <summary>
@@ -418,7 +418,7 @@ namespace ImageResizer.AllPlugins.Tests {
         /// </summary>
         /// <returns>The id of the entry created.</returns>
         private string CreateFileInDatabase() {
-            string name = "ImageResizer.AllPlugins.Tests.rose-leaf.jpg";
+            string name = "ImageResizer.ProviderTests.rose-leaf.jpg";
             using (var image = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream(name))) {
                 using (MemoryStream ms = new MemoryStream()) {
                     image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
