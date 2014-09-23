@@ -473,55 +473,66 @@ static inline LineContribType *_gdContributionsCalc(unsigned int line_size, unsi
 static inline void
 _gdScaleOneAxis(gdImagePtr pSrc, gdImagePtr dst,
 unsigned int dst_len, unsigned int row, LineContribType *contrib,
-gdAxis axis)
+gdAxis axis, float *source_buffer, unsigned int source_buffer_len, float *dest_buffer, unsigned int dest_buffer_len)
 {
 	unsigned int ndx;
+	unsigned int source_pixel_count = source_buffer_len / 4;
+
 	unsigned int **sourcePixels = pSrc->tpixels;
 	unsigned int **destPixels = dst->tpixels;
 
+	unsigned int bix;
+	if (axis == HORIZONTAL){
+		for (bix = 0; bix < source_buffer_len; bix++){
+			source_buffer[bix] = (float)((unsigned char *)sourcePixels[row])[bix];
+		}
+	}
+	else{
+		for (bix = 0; bix < source_pixel_count; bix++){
+			source_buffer[bix * 4] = (float)gdTrueColorGetRed(sourcePixels[bix][row]);
+			source_buffer[bix * 4 + 1] = (float)gdTrueColorGetGreen(sourcePixels[bix][row]);
+			source_buffer[bix * 4 + 2] = (float)gdTrueColorGetBlue(sourcePixels[bix][row]);
+			source_buffer[bix * 4 + 3] = (float)gdTrueColorGetAlpha(sourcePixels[bix][row]);
+		}
+	}
 
 
 	for (ndx = 0; ndx < dst_len; ndx++) {
 		float r = 0, g = 0, b = 0, a = 0;
 		const int left = contrib->ContribRow[ndx].Left;
 		const int right = contrib->ContribRow[ndx].Right;
-		unsigned int *dest = (axis == HORIZONTAL) ?
-			&destPixels[row][ndx] :
-			&destPixels[ndx][row];
 
 		int i;
 
-		if (axis == HORIZONTAL){
-			//#pragma loop(ivdep)
-			/* Accumulate each channel */
-			for (i = left; i <= right; i++) {
-				const float weight = contrib->ContribRow[ndx].Weights[i - left];
+		/* Accumulate each channel */
+		for (i = left; i <= right; i++) {
+			const float weight = contrib->ContribRow[ndx].Weights[i - left];
 
 
-				r += weight * (float)(gdTrueColorGetRed(sourcePixels[row][i]));
-				g += weight * (float)(gdTrueColorGetGreen(sourcePixels[row][i]));
-				b += weight * (float)(gdTrueColorGetBlue(sourcePixels[row][i]));
-				a += weight * (float)(gdTrueColorGetAlpha(sourcePixels[row][i]));
-			}/* for */
-		}
-		else{
-			/* Accumulate each channel */
-			for (i = left; i <= right; i++) {
-				const float weight = contrib->ContribRow[ndx].Weights[i - left];
+			r += weight * source_buffer[i * 4];
+			g += weight * source_buffer[i * 4 + 1];
+			b += weight * source_buffer[i * 4 + 2];
+			a += weight * source_buffer[i * 4 + 3];
+		}/* for */
+	
+		dest_buffer[ndx * 4] = r;
+		dest_buffer[ndx * 4 + 1] = r;
+		dest_buffer[ndx * 4 + 2] = r;
+		dest_buffer[ndx * 4 + 3] = r;
 
 
-				r += weight * (float)(gdTrueColorGetRed((axis == HORIZONTAL) ? sourcePixels[row][i] : sourcePixels[i][row]));
-				g += weight * (float)(gdTrueColorGetGreen((axis == HORIZONTAL) ? sourcePixels[row][i] : sourcePixels[i][row]));
-				b += weight * (float)(gdTrueColorGetBlue((axis == HORIZONTAL) ? sourcePixels[row][i] : sourcePixels[i][row]));
-				a += weight * (float)(gdTrueColorGetAlpha((axis == HORIZONTAL) ? sourcePixels[row][i] : sourcePixels[i][row]));
-			}/* for */
-		}
-
-
-		*dest = gdTrueColorAlpha(uchar_clamp(r, 0xFF), uchar_clamp(g, 0xFF),
-			uchar_clamp(b, 0xFF),
-			uchar_clamp(a, 0xFF)); /* alpha is 0..127 */
-	}/* for */
+	}
+	
+	for (bix = 0; bix < dst_len; bix++){
+		unsigned int *dest = (axis == HORIZONTAL) ?
+			&destPixels[row][bix] :
+			&destPixels[bix][row];
+		
+		*dest = gdTrueColorAlpha(uchar_clamp(dest_buffer[bix * 4], 0xFF), uchar_clamp(dest_buffer[bix * 4 + 1], 0xFF),
+			uchar_clamp(dest_buffer[bix * 4 + 2], 0xFF),
+			uchar_clamp(dest_buffer[bix * 4 + 3], 0xFF)); /* alpha is 0..127 */
+	}
+	/* for */
 }/* _gdScaleOneAxis*/
 
 
@@ -545,10 +556,15 @@ static inline int _gdScalePass(const gdImagePtr pSrc, const unsigned int src_len
 		return 0;
 	}
 
+	float *sourceBuffer = (float *)gdMalloc(sizeof(float) * src_len * 4);
+	float *destBuffer = (float *)gdMalloc(sizeof(float) * dst_len * 4);
+
 	/* Scale each line */
 	for (line_ndx = 0; line_ndx < num_lines; line_ndx++) {
-		_gdScaleOneAxis(pSrc, pDst, dst_len, line_ndx, contrib, axis);
+		_gdScaleOneAxis(pSrc, pDst, dst_len, line_ndx, contrib, axis, sourceBuffer, src_len * 4, destBuffer, dst_len * 4);
 	}
+	gdFree(sourceBuffer);
+	gdFree(destBuffer);
 	_gdContributionsFree(contrib);
 
 	return 1;
