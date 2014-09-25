@@ -74,6 +74,10 @@ namespace ImageResizer.Plugins.AzureReader2 {
                 } catch (SecurityException) {
                     this._failedToRegisterVpp = true;
                     c.Plugins.VirtualProviderPlugins.Add(vpp); //Fall back to VIP instead.
+                } catch (InvalidOperationException) {
+                    // This occurs when called from unit tests.
+                    this._failedToRegisterVpp = true;
+                    c.Plugins.VirtualProviderPlugins.Add(vpp); //Fall back to VIP instead.
                 }
             }
 

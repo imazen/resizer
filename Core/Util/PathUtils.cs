@@ -151,7 +151,10 @@ namespace ImageResizer.Util {
         /// <returns></returns>
         public static string ResolveAppRelative(string virtualPath) {
             //resolve tilde
-            if (virtualPath.StartsWith("~", StringComparison.OrdinalIgnoreCase)) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/' + virtualPath.TrimStart('~', '/');
+            if (virtualPath.StartsWith("~", StringComparison.OrdinalIgnoreCase))
+                return HostingEnvironment.ApplicationVirtualPath != null
+                    ? HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/' + virtualPath.TrimStart('~', '/')
+                    : Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
             return virtualPath;
         }
 

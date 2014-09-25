@@ -11,7 +11,7 @@ namespace ImageResizer.ProviderTests {
     /// <summary>
     /// Test the functionality of the <see cref="S3Reader2"/> class.
     /// </summary>
-    public class S3ReaderTest /*: IDisposable*/ {
+    public class S3ReaderTest {
 
         private const string PathPrefix = "/s3/";
 

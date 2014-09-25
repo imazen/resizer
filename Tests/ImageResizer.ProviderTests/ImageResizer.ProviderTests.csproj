@@ -92,6 +92,9 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="AzureReaderTest.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="CloudStorageEmulatorShepherd.cs" />
     <Compile Include="MongoReaderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

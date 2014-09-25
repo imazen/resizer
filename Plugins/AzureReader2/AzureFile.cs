@@ -37,6 +37,11 @@ namespace ImageResizer.Plugins.AzureReader2 {
                 // mb: 12/8/2012 - not sure of the correctness of these following lines
                 // in other areas we just check e.RequestInformation.HttpStatusCode == 404 for a Not Found error
                 // don't know what the errorcodes that will be returned
+                if (e.RequestInformation.ExtendedErrorInformation == null) {
+                    if (e.RequestInformation.HttpStatusCode == 404) {
+                        throw new FileNotFoundException(e.RequestInformation.HttpStatusMessage);
+                    }
+                }
                 if (e.RequestInformation.ExtendedErrorInformation.ErrorCode == "BlobNotFound") {
                     throw new FileNotFoundException("Azure blob file not found", e);
                 }
