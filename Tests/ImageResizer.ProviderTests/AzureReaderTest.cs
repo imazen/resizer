@@ -11,10 +11,22 @@ using Xunit;
 
 namespace ImageResizer.ProviderTests {
     /// <summary>
-    /// http://stackoverflow.com/questions/23318350/azure-storage-emulator-error-and-does-not-start
+    /// Test the functionality of the <see cref="AzureReader2Plugin"/> class.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// These tests exercise the methods from <see cref="IVirtualImageProvider"/> as
+    /// implemented by <see cref="AzureVirtualPathProvider"/>. Also The method 
+    /// implementations of <see cref="IVirtualFile"/>.
+    /// </para>
+    /// <para>
+    /// These tests require Microsoft Azure 2.4 to be installed on the machine 
+    /// and port 10000 to be free for its use. See 
+    /// http://stackoverflow.com/questions/23318350/azure-storage-emulator-error-and-does-not-start
+    /// for any problems.
+    /// </para>
+    /// </remarks>
     public class AzureReaderTest {
-
         private const string PathPrefix = "/azure/image-resizer/";
 
         private const string Filename = "rose-leaf.jpg";
@@ -376,6 +388,9 @@ namespace ImageResizer.ProviderTests {
             Assert.IsType<FileNotFoundException>(actual);
         }
 
+        /// <summary>
+        /// Gets a settings object for a  <see cref="AzureReader2Plugin"/>.
+        /// </summary>
         private NameValueCollection Settings {
             get {
                 var settings = new NameValueCollection();
@@ -393,7 +408,6 @@ namespace ImageResizer.ProviderTests {
         /// <summary>
         /// Create an entry in the database.
         /// </summary>
-        /// <returns>The id of the entry created.</returns>
         private void CreateFileInDatabase() {
             string name = "ImageResizer.ProviderTests.rose-leaf.jpg";
             using (var image = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream(name))) {
@@ -402,9 +416,11 @@ namespace ImageResizer.ProviderTests {
 
                     var storageAccount = CloudStorageAccount.DevelopmentStorageAccount;
                     var blobClient = storageAccount.CreateCloudBlobClient();
+
                     // Get and create the container
                     var blobContainer = blobClient.GetContainerReference("image-resizer");
                     blobContainer.CreateIfNotExists();
+
                     // upload a text blob
                     var blob = blobContainer.GetBlockBlobReference("rose-leaf.jpg");
                     byte[] data = ms.ToArray();

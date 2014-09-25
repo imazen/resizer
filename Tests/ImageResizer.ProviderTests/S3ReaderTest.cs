@@ -11,8 +11,12 @@ namespace ImageResizer.ProviderTests {
     /// <summary>
     /// Test the functionality of the <see cref="S3Reader2"/> class.
     /// </summary>
+    /// <remarks>
+    /// These tests exercise the methods from <see cref="IVirtualImageProvider"/> as
+    /// implemented by <see cref="S3VirtualPathProvider"/>. Also The method 
+    /// implementations of <see cref="IVirtualFile"/>.
+    /// </remarks>
     public class S3ReaderTest {
-
         private const string PathPrefix = "/s3/";
 
         private const string Filename = "resizer-downloads/examples/fountain-small.jpg";
@@ -20,7 +24,7 @@ namespace ImageResizer.ProviderTests {
         private const string Settings = "<resizer><plugins><add name=\"S3Reader2\" buckets=\"resizer-downloads,resizer-images,resizer-web\" vpp=\"false\" /></plugins></resizer>";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SqlReaderTest"/> class.
+        /// Initializes a new instance of the <see cref="S3ReaderTest"/> class.
         /// </summary>
         public S3ReaderTest() {
             HttpContext.Current = new HttpContext(
