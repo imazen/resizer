@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.WindowsAzure.Storage.RetryPolicies;
 
 namespace ImageResizer.ProviderTests {
     public class CloudStorageEmulatorShepherd {
@@ -11,19 +12,20 @@ namespace ImageResizer.ProviderTests {
                 CloudStorageAccount storageAccount = CloudStorageAccount.DevelopmentStorageAccount;
 
                 CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-                CloudBlobContainer container = blobClient.GetContainerReference("test");
+                CloudBlobContainer container = blobClient.GetContainerReference("image-resizer");
                 container.CreateIfNotExists(
                     new BlobRequestOptions() {
-                        RetryPolicy = new Microsoft.WindowsAzure.Storage.RetryPolicies.NoRetry(),
+                        RetryPolicy = new NoRetry(),
                         ServerTimeout = new TimeSpan(0, 0, 0, 1)
                     });
             }
-            catch (TimeoutException) {
+            catch (Microsoft.WindowsAzure.Storage.StorageException) {
+                string executable = "WAStorageEmulator.exe";
+                string path = @"C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator";
+
                 ProcessStartInfo processStartInfo = new ProcessStartInfo() {
-                    FileName = Path.Combine(
-                        @"C:\Program Files\Microsoft SDKs\Windows Azure\Emulator",
-                        "csrun.exe"),
-                    Arguments = @"/devstore",
+                    FileName = Path.Combine(path, executable),
+                    Arguments = @"start",
                 };
 
                 using (Process process = Process.Start(processStartInfo)) {
