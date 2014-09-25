@@ -7,6 +7,9 @@ using Microsoft.WindowsAzure.Storage.RetryPolicies;
 
 namespace ImageResizer.ProviderTests {
     public class CloudStorageEmulatorShepherd {
+        /// <summary>
+        /// Start the developer azure service if it is not started already.
+        /// </summary>
         public void Start() {
             try {
                 CloudStorageAccount storageAccount = CloudStorageAccount.DevelopmentStorageAccount;
