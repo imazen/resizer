@@ -13,17 +13,14 @@ using ImageResizer.ExtensionMethods;
 using Amazon.S3;
 using ImageResizer.Configuration.Xml;
 
-namespace ImageResizer.Plugins.S3Reader2
-{
-    public class S3Reader2 : IPlugin, IMultiInstancePlugin, IRedactDiagnostics
-    {
+namespace ImageResizer.Plugins.S3Reader2 {
+    public class S3Reader2 : IPlugin, IMultiInstancePlugin, IRedactDiagnostics {
 
         string buckets, vpath;
         bool includeModifiedDate = false;
         bool asVpp = false;
         AmazonS3Config s3config = null;
-        public S3Reader2(NameValueCollection args)
-        {
+        public S3Reader2(NameValueCollection args) {
 
             s3config = new AmazonS3Config();
 
@@ -37,12 +34,10 @@ namespace ImageResizer.Plugins.S3Reader2
 
             s3config.UseHttp = !args.Get("useSsl", false);
 
-            if (!string.IsNullOrEmpty(args["accessKeyId"]) && !string.IsNullOrEmpty(args["secretAccessKey"]))
-            {
+            if (!string.IsNullOrEmpty(args["accessKeyId"]) && !string.IsNullOrEmpty(args["secretAccessKey"])) {
                 S3Client = new AmazonS3Client(args["accessKeyId"], args["secretAccessKey"], s3config);
             }
-            else
-            {
+            else {
 
                 S3Client = new AmazonS3Client(null, s3config);
             }
@@ -58,12 +53,10 @@ namespace ImageResizer.Plugins.S3Reader2
         }
 
 
-        public Configuration.Xml.Node RedactFrom(Node resizer)
-        {
+        public Configuration.Xml.Node RedactFrom(Node resizer) {
             if (resizer == null || resizer.queryUncached("plugins.add") == null)
                 return resizer;
-            foreach (Node n in resizer.queryUncached("plugins.add"))
-            {
+            foreach (Node n in resizer.queryUncached("plugins.add")) {
                 if (n.Attrs["accessKeyId"] != null)
                     n.Attrs.Set("accessKeyId", "[redacted]");
                 if (n.Attrs["secretAccessKey"] != null)
@@ -78,11 +71,9 @@ namespace ImageResizer.Plugins.S3Reader2
         public AmazonS3Client S3Client { get; set; }
 
 
-        public string Region
-        {
+        public string Region {
             get { return this.s3config != null && this.s3config.RegionEndpoint != null ? this.s3config.RegionEndpoint.SystemName : null; }
-            set
-            {
+            set {
                 this.s3config.RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(value);
             }
         }
@@ -95,8 +86,7 @@ namespace ImageResizer.Plugins.S3Reader2
         /// This setting is designed to support non-image file serving from the DB.
         /// It will also cause conflicts if PathPrefix overlaps with a folder name used for something else.
         /// </summary>
-        public bool RequireImageExtension
-        {
+        public bool RequireImageExtension {
             get { return _requireImageExtension; }
             set { _requireImageExtension = value; }
         }
@@ -106,8 +96,7 @@ namespace ImageResizer.Plugins.S3Reader2
         /// (default: false) When true, all requests will be re-encoded before being served to the client. Invalid or malicious images will fail with an error if they cannot be read as images.
         /// This should prevent malicious files from being served to the client.
         /// </summary>
-        public bool UntrustedData
-        {
+        public bool UntrustedData {
             get { return _untrustedData; }
             set { _untrustedData = value; }
         }
@@ -117,8 +106,7 @@ namespace ImageResizer.Plugins.S3Reader2
         /// (default true). When true, files and unmodified images (i.e, no querystring) will be cached to disk (if they are requested that way) instead of only caching requests for resized images.
         /// DiskCache plugin must be installed for this to have any effect.
         /// </summary>
-        public bool CacheUnmodifiedFiles
-        {
+        public bool CacheUnmodifiedFiles {
             get { return _cacheUnmodifiedFiles; }
             set { _cacheUnmodifiedFiles = value; }
         }
@@ -126,8 +114,7 @@ namespace ImageResizer.Plugins.S3Reader2
 
         S3VirtualPathProvider vpp = null;
 
-        public IPlugin Install(Configuration.Config c)
-        {
+        public IPlugin Install(Configuration.Config c) {
 
             if (vpp != null)
                 throw new InvalidOperationException("This plugin can only be installed once, and cannot be uninstalled and reinstalled.");
@@ -147,8 +134,7 @@ namespace ImageResizer.Plugins.S3Reader2
                 bucketArray[i] = bucketArray[i].Trim();
 
 
-            vpp = new S3VirtualPathProvider(this.S3Client, vpath, TimeSpan.MaxValue, new TimeSpan(0, 1, 0, 0), delegate(S3VirtualPathProvider s, S3PathEventArgs ev)
-            {
+            vpp = new S3VirtualPathProvider(this.S3Client, vpath, TimeSpan.MaxValue, new TimeSpan(0, 1, 0, 0), delegate(S3VirtualPathProvider s, S3PathEventArgs ev) {
                 if (bucketArray == null)
                     ev.ThrowException();
                 ev.AssertBucketMatches(bucketArray);
@@ -157,8 +143,7 @@ namespace ImageResizer.Plugins.S3Reader2
 
 
 
-            c.Pipeline.PostAuthorizeRequestStart += delegate(IHttpModule sender2, HttpContext context)
-            {
+            c.Pipeline.PostAuthorizeRequestStart += delegate(IHttpModule sender2, HttpContext context) {
                 //Only work with database images
                 //This allows us to resize database images without putting ".jpg" after the ID in the path.
                 if (!RequireImageExtension && vpp.IsPathVirtual(c.Pipeline.PreRewritePath))
@@ -166,8 +151,7 @@ namespace ImageResizer.Plugins.S3Reader2
             };
 
 
-            c.Pipeline.RewriteDefaults += delegate(IHttpModule sender, HttpContext context, Configuration.IUrlEventArgs e)
-            {
+            c.Pipeline.RewriteDefaults += delegate(IHttpModule sender, HttpContext context, Configuration.IUrlEventArgs e) {
                 //Only work with database images
                 //Non-images will be served as-is
                 //Cache all file types, whether they are processed or not.
@@ -176,8 +160,7 @@ namespace ImageResizer.Plugins.S3Reader2
 
 
             };
-            c.Pipeline.PostRewrite += delegate(IHttpModule sender, HttpContext context, Configuration.IUrlEventArgs e)
-            {
+            c.Pipeline.PostRewrite += delegate(IHttpModule sender, HttpContext context, Configuration.IUrlEventArgs e) {
                 //Only work with database images
                 //If the data is untrusted, always re-encode each file.
                 if (UntrustedData && vpp.IsPathVirtual(e.VirtualPath))
@@ -185,23 +168,19 @@ namespace ImageResizer.Plugins.S3Reader2
 
             };
 
-            if (asVpp)
-            {
-                try
-                {
+            if (asVpp) {
+                try {
                     //Registers the virtual path provider.
                     HostingEnvironment.RegisterVirtualPathProvider(vpp);
                 }
-                catch (SecurityException)
-                {
+                catch (SecurityException) {
                     asVpp = false;
                     c.configurationSectionIssues.AcceptIssue(new Issue("S3Reader", "S3Reader could not be installed as a VirtualPathProvider due to missing AspNetHostingPermission."
                     , "It was installed as an IVirtualImageProvider instead, which means that only image URLs will be accessible, and only if they contain a querystring.\n" +
                     "Set vpp=false to tell S3Reader to register as an IVirtualImageProvider instead. <add name='S3Reader' vpp=false />", IssueSeverity.Error));
                 }
             }
-            if (!asVpp)
-            {
+            if (!asVpp) {
                 c.Plugins.VirtualProviderPlugins.Add(vpp);
             }
 
@@ -218,10 +197,8 @@ namespace ImageResizer.Plugins.S3Reader2
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
-        public bool Uninstall(Configuration.Config c)
-        {
-            if (!asVpp)
-            {
+        public bool Uninstall(Configuration.Config c) {
+            if (!asVpp) {
                 c.Plugins.VirtualProviderPlugins.Remove(vpp);
                 return true;
             }
