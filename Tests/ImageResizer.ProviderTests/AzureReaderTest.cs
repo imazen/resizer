@@ -2,8 +2,10 @@
 using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using ImageResizer.Configuration;
+using ImageResizer.Configuration.Issues;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.AzureReader2;
 using Microsoft.WindowsAzure.Storage;
@@ -56,6 +58,189 @@ namespace ImageResizer.ProviderTests {
             // Assert
             Assert.NotNull(target);
             Assert.IsType<AzureReader2Plugin>(target);
+        }
+
+        /// <summary>
+        /// Test <see cref="AzureReader2Plugin"/> install capabilities.
+        /// Can only be installed once.
+        /// </summary>
+        [Fact]
+        public void InstallTwiceTest() {
+            // Arrange
+            var settings = this.Settings;
+            var c = new Config();
+            var target = new AzureReader2Plugin(settings);
+
+            // Act
+            var dummy = target.Install(c);
+            var actual = Assert.Throws<InvalidOperationException>(() => target.Install(c));
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.IsType<InvalidOperationException>(actual);
+        }
+
+        /// <summary>
+        /// Test <see cref="AzureReader2Plugin"/> install capabilities.
+        /// Can only be installed once, even if un-installed first..
+        /// </summary>
+        [Fact]
+        public void InstallTwiceUninstallOnceTest() {
+            // Arrange
+            var settings = this.Settings;
+            var c = new Config();
+            var target = new AzureReader2Plugin(settings);
+
+            // Act
+            var dummy = target.Install(c);
+            var wasUninstalled = target.Uninstall(c);
+            var actual = Assert.Throws<InvalidOperationException>(() => target.Install(c));
+
+            // Assert
+            Assert.True(wasUninstalled);
+            Assert.NotNull(actual);
+            Assert.IsType<InvalidOperationException>(actual);
+        }
+
+        /// <summary>
+        /// Test <see cref="AzureReader2Plugin"/> RegisterAsVirtualPathProvider property.
+        /// </summary>
+        [Fact]
+        public void RegisterAsVirtualPathProviderTest() {
+            // Arrange
+            bool expected = false; // Default is true, force property to change.
+            var settings = this.Settings;
+            var target = new AzureReader2Plugin(settings);
+
+            // Act
+            target.RegisterAsVirtualPathProvider = expected;
+            var actual = target.RegisterAsVirtualPathProvider;
+
+            // Assert
+            Assert.StrictEqual<bool>(expected, actual);
+        }
+
+        /// <summary>
+        /// Test <see cref="AzureReader2Plugin"/> Issues.
+        /// Simple constructor should not create any issues.
+        /// </summary>
+        [Fact]
+        public void WithoutIssuesTest() {
+            // Arrange
+            int expected = 0; // No issues to report.
+            var settings = this.Settings;
+            var target = new AzureReader2Plugin(settings);
+
+            // Act
+            var actual = target.GetIssues().ToList().Count;
+
+            // Assert
+            Assert.StrictEqual<int>(expected, actual);
+        }
+
+        /// <summary>
+        /// Test <see cref="AzureReader2Plugin"/> Issues.
+        /// Config.Install(...) should create one issues.
+        /// </summary>
+        [Fact]
+        public void WithIssuesTest() {
+            // Arrange
+            int expected = 1; // Should generate one issue.
+            var rs = new ResizerSection(ConfigXml);
+            var c = new Config(rs);
+            IVirtualImageProvider target = c.Plugins.VirtualProviderPlugins.First;
+
+            // Act
+            var actual = 0;
+            foreach (var provider in c.Plugins.GetAll<IIssueProvider>()) {
+                if (provider is AzureReader2Plugin) {
+                    actual = provider.GetIssues().ToList().Count;
+                }
+            }
+
+            // Assert
+            Assert.StrictEqual<int>(expected, actual);
+        }
+
+        /// <summary>
+        /// Test <see cref="AzureReader2Plugin"/> Issues.
+        /// Config.Install(...) should create one issues.
+        /// </summary>
+        [Fact]
+        public void UninstalWithoutInstallingTest() {
+            // Arrange
+            bool expected = false;
+            var rs = new ResizerSection(ConfigXml);
+            var c = new Config(rs);
+            var settings = this.Settings;
+            var target = new AzureReader2Plugin(settings);
+
+            // Act
+            bool actual = target.Uninstall(c);
+
+            // Assert
+            Assert.StrictEqual<bool>(expected, actual);
+        }
+
+        /// <summary>
+        /// Test <see cref="AzureReader2Plugin"/> constructor and install capabilities.
+        /// Omit the connection string from the configuration.
+        /// </summary>
+        [Fact]
+        public void InstallWithoutBlobStorageConnectionStringTest() {
+            // Arrange
+            var settings = this.Settings;
+            settings.Remove("connectionstring");
+            var c = new Config();
+            var target = new AzureReader2Plugin(settings);
+
+            // Act
+            var actual = Assert.Throws<InvalidOperationException>(() => target.Install(c));
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.IsType<InvalidOperationException>(actual);
+        }
+
+        /// <summary>
+        /// Test <see cref="AzureReader2Plugin"/> constructor and install capabilities.
+        /// Send an end point URL without trailing slash.
+        /// </summary>
+        [Fact]
+        public void InstallWithoutBlobStorageEndpointTrailingSlashConnectionTest() {
+            // Arrange
+            var settings = this.Settings;
+            settings["blobstorageendpoint"] = settings["blobstorageendpoint"].Substring(0, settings["blobstorageendpoint"].Length - 1);
+            var c = new Config();
+            var target = new AzureReader2Plugin(settings);
+
+            // Act
+            var actual = target.Install(c);
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.IsAssignableFrom<IPlugin>(actual);
+        }
+
+        /// <summary>
+        /// Test <see cref="AzureReader2Plugin"/> constructor and install capabilities.
+        /// Omit the end point URL from the configuration.
+        /// </summary>
+        [Fact]
+        public void InstallWithoutBlobStorageEndpointTest() {
+            // Arrange
+            var settings = this.Settings;
+            settings.Remove("blobstorageendpoint");
+            settings.Remove("endpoint");
+            var c = new Config();
+            var target = new AzureReader2Plugin(settings);
+
+            // Act
+            var actual = Assert.Throws<InvalidOperationException>(() => target.Install(c));
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.IsType<InvalidOperationException>(actual);
         }
 
         /// <summary>
@@ -181,6 +366,73 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
+        /// Call the FileExists method with a virtualPath that does include
+        /// the PathPrefix and a record id that does not exist. The call is
+        /// not forced to check the database.
+        /// </summary>
+        [Fact]
+        public void FileExistFastModeFileNotExisting() {
+            // Arrange
+            bool expected = true; // Fast Mode assumes the file exists.
+            var rs = new ResizerSection(ConfigXml);
+            var c = new Config(rs);
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            ((AzureVirtualPathProvider)target).LazyExistenceCheck = true;
+            string virtualPath = Path.Combine(PathPrefix, "fountain-xxxx.jpg");
+
+            // Act
+            bool actual = target.FileExists(virtualPath, null);
+
+            // Assert
+            Assert.StrictEqual<bool>(expected, actual);
+        }
+
+        /// <summary>
+        /// Call the FileExists method with a virtualPath that does include
+        /// the PathPrefix and a record id that does exist. The call is
+        /// not forced to check the database.
+        /// </summary>
+        [Fact]
+        public void FileExistsFastModeFileExisting() {
+            // Arrange
+            bool expected = true;
+            var rs = new ResizerSection(ConfigXml);
+            var c = new Config(rs);
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            ((AzureVirtualPathProvider)target).LazyExistenceCheck = true;
+            string virtualPath = Path.Combine(PathPrefix, Filename);
+
+            // Act
+            bool actual = target.FileExists(virtualPath, null);
+
+            // Assert
+            Assert.StrictEqual<bool>(expected, actual);
+        }
+
+        /// <summary>
+        /// Call the FileExists method with a virtualPath that does include
+        /// the PathPrefix and a record id that does exist. The call is
+        /// forced to check the database. The connection string is not valid
+        /// and should generate a StorageException.
+        /// </summary>
+        [Fact]
+        public void FileExistsNotFastModeFileExistingStorageException() {
+            // Arrange
+            var rs = new ResizerSection("<resizer><plugins><add name=\"AzureReader2\" connectionString=\"DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==\" endpoint=\"http://127.0.0.1:10000/devstoreaccount1/\" /></plugins></resizer>");
+            var c = new Config(rs);
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            ((AzureVirtualPathProvider)target).LazyExistenceCheck = false;
+            string virtualPath = Path.Combine(PathPrefix, Filename);
+
+            // Act
+            var actual = Assert.Throws<StorageException>(() => target.FileExists(virtualPath, null));
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.IsType<StorageException>(actual);
+        }
+
+        /// <summary>
         /// Call the GetFile method with a virtualPath that does include
         /// the PathPrefix and a record id that does not exist. Do not 
         /// check the database.
@@ -225,6 +477,28 @@ namespace ImageResizer.ProviderTests {
 
         /// <summary>
         /// Call the GetFile method with a virtualPath that does include
+        /// the PathPrefix and a record id that does exist. Do check
+        /// the database. The connection string should generate a StorageExcetion.
+        /// </summary>
+        [Fact]
+        public void GetFileInvalidNotFastModeStorageException() {
+            // Arrange
+            var rs = new ResizerSection("<resizer><plugins><add name=\"AzureReader2\" connectionString=\"DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==\" endpoint=\"http://127.0.0.1:10000/devstoreaccount1/\" /></plugins></resizer>");
+            var c = new Config(rs);
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            ((AzureVirtualPathProvider)target).LazyExistenceCheck = false;
+            string virtualPath = Path.Combine(PathPrefix, "fountain-xxxx.jpg");
+
+            // Act
+            var actual = Assert.Throws<StorageException>(() => target.GetFile(virtualPath, null));
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.IsType<StorageException>(actual);
+        }
+
+        /// <summary>
+        /// Call the GetFile method with a virtualPath that does include
         /// the PathPrefix and a record id that does exist. Do not check
         /// the database.
         /// </summary>
@@ -265,6 +539,29 @@ namespace ImageResizer.ProviderTests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<AzureFile>(actual);
+        }
+
+        /// <summary>
+        /// Call the GetFile method with a virtualPath that does include
+        /// the PathPrefix and a record id that does exist. Do check
+        /// the database. The connection string should generate a StorageExcetion.
+        /// </summary>
+        [Fact]
+        public void GetFileValidNotFastModeStorageException() {
+            // Arrange
+            var rs = new ResizerSection("<resizer><plugins><add name=\"AzureReader2\" connectionString=\"DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==\" endpoint=\"http://127.0.0.1:10000/devstoreaccount1/\" /></plugins></resizer>");
+            var c = new Config(rs);
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            ((AzureVirtualPathProvider)target).LazyExistenceCheck = false;
+            ((AzureVirtualPathProvider)target).LazyExistenceCheck = false;
+            string virtualPath = Path.Combine(PathPrefix, Filename);
+
+            // Act
+            var actual = Assert.Throws<StorageException>(() => target.GetFile(virtualPath, null));
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.IsType<StorageException>(actual);
         }
 
         /// <summary>
@@ -342,6 +639,26 @@ namespace ImageResizer.ProviderTests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<Stream>(actual);
+        }
+        /// <summary>
+        /// Call the Open method with a virtualPath to a database record that 
+        /// does exist. THe connection string should generate an exception.
+        /// </summary>
+        [Fact]
+        public void OpenValidIdStorageException() {
+            // Arrange
+            var rs = new ResizerSection("<resizer><plugins><add name=\"AzureReader2\" connectionString=\"DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==\" endpoint=\"http://127.0.0.1:10000/devstoreaccount1/\" /></plugins></resizer>");
+            var c = new Config(rs);
+            IVirtualImageProvider reader = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            string virtualPath = Path.Combine(PathPrefix, Filename);
+            var target = reader.GetFile(virtualPath, null);
+
+            // Act
+            var actual = Assert.Throws<StorageException>(() => target.Open());
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.IsType<StorageException>(actual);
         }
 
         /// <summary>

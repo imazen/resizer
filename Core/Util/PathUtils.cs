@@ -154,7 +154,7 @@ namespace ImageResizer.Util {
             if (virtualPath.StartsWith("~", StringComparison.OrdinalIgnoreCase))
                 return HostingEnvironment.ApplicationVirtualPath != null
                     ? HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/' + virtualPath.TrimStart('~', '/')
-                    : Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+                    : Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath).TrimEnd('/') + '/' + virtualPath.TrimStart('~', '/');
             return virtualPath;
         }
 
