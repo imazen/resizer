@@ -640,27 +640,7 @@ namespace ImageResizer.ProviderTests {
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<Stream>(actual);
         }
-        /// <summary>
-        /// Call the Open method with a virtualPath to a database record that 
-        /// does exist. THe connection string should generate an exception.
-        /// </summary>
-        [Fact]
-        public void OpenValidIdStorageException() {
-            // Arrange
-            var rs = new ResizerSection("<resizer><plugins><add name=\"AzureReader2\" connectionString=\"DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==\" endpoint=\"http://127.0.0.1:10000/devstoreaccount1/\" /></plugins></resizer>");
-            var c = new Config(rs);
-            IVirtualImageProvider reader = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            string virtualPath = Path.Combine(PathPrefix, Filename);
-            var target = reader.GetFile(virtualPath, null);
-
-            // Act
-            var actual = Assert.Throws<StorageException>(() => target.Open());
-
-            // Assert
-            Assert.NotNull(actual);
-            Assert.IsType<StorageException>(actual);
-        }
-
+        
         /// <summary>
         /// Call the Open method with a virtualPath to a database record that 
         /// does not exist.
