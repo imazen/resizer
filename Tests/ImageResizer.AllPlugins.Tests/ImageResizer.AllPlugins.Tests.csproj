@@ -44,12 +44,6 @@
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MongoDB.Bson">
-      <HintPath>..\..\Packages\mongocsharpdriver.1.9.2\lib\net35\MongoDB.Bson.dll</HintPath>
-    </Reference>
-    <Reference Include="MongoDB.Driver">
-      <HintPath>..\..\Packages\mongocsharpdriver.1.9.2\lib\net35\MongoDB.Driver.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
@@ -65,29 +59,12 @@
     <Reference Include="System.Data.DataSetExtensions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Packages\xunit.abstractions.2.0.0-beta4-build2738\lib\net35\xunit.abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="xunit.assert, Version=2.0.0.2738, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Packages\xunit.assert.2.0.0-beta4-build2738\lib\portable-net45+win+wpa81+wp80+monoandroid+monotouch10\xunit.assert.dll</HintPath>
-    </Reference>
     <Reference Include="xunit.core, Version=2.0.0.2738, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Packages\xunit.core.2.0.0-beta4-build2738\lib\portable-net45+win+wpa81+wp80+monotouch+monoandroid\xunit.core.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MongoReaderTest.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="RemoteReaderTest.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="SqlReaderTest.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="TestAll.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestWatermark.cs" />
@@ -105,10 +82,6 @@
       <Project>{D97EA32A-0845-4E00-9C4D-68C5B93A1869}</Project>
       <Name>ImageResizer.Plugins.AnimatedGifs</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\AzureReader2\ImageResizer.Plugins.AzureReader2.csproj">
-      <Project>{3a7c958a-626d-43ea-bdad-42943e192af8}</Project>
-      <Name>ImageResizer.Plugins.AzureReader2</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\CloudFront\ImageResizer.Plugins.CloudFront.csproj">
       <Project>{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}</Project>
       <Name>ImageResizer.Plugins.CloudFront</Name>
@@ -117,21 +90,13 @@
       <Project>{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}</Project>
       <Name>ImageResizer.Plugins.DiskCache</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\MongoReader\ImageResizer.Plugins.MongoReader.csproj">
-      <Project>{c8d43f4e-103e-4cd7-b0d9-e97d9f708003}</Project>
-      <Name>ImageResizer.Plugins.MongoReader</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\PrettyGifs\ImageResizer.Plugins.PrettyGifs.csproj">
       <Project>{BB8EEB97-6550-4780-97B2-B0F2FCD80970}</Project>
       <Name>ImageResizer.Plugins.PrettyGifs</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\RemoteReader\ImageResizer.Plugins.RemoteReader.csproj">
-      <Project>{0E6BE1A7-C754-4E33-A8AC-75A8549FC68B}</Project>
+      <Project>{0e6be1a7-c754-4e33-a8ac-75a8549fc68b}</Project>
       <Name>ImageResizer.Plugins.RemoteReader</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\S3Reader2\ImageResizer.Plugins.S3Reader2.csproj">
-      <Project>{ac318404-15f2-4187-a7b1-afe4e2798de6}</Project>
-      <Name>ImageResizer.Plugins.S3Reader2</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\SeamCarving\ImageResizer.Plugins.SeamCarving.csproj">
       <Project>{7AEFB877-A720-4929-880C-1090A71C83EB}</Project>
@@ -140,10 +105,6 @@
     <ProjectReference Include="..\..\Plugins\SimpleFilters\ImageResizer.Plugins.SimpleFilters.csproj">
       <Project>{2A7D72F6-6DCB-4260-A921-6C7A6FC77812}</Project>
       <Name>ImageResizer.Plugins.SimpleFilters</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\SqlReader\ImageResizer.Plugins.SqlReader.csproj">
-      <Project>{2AB0FC98-8AD5-4D2A-BF06-0EA4DCF8764D}</Project>
-      <Name>ImageResizer.Plugins.SqlReader</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Watermark\ImageResizer.Plugins.Watermark.csproj">
       <Project>{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}</Project>
@@ -156,22 +117,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="..\..\Samples\Images\rose-leaf.jpg">
-      <Link>rose-leaf.jpg</Link>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\..\Samples\SqlReaderSample\App_Data\database.mdf">
-      <Link>App_Data\database.mdf</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\Samples\SqlReaderSample\App_Data\database_log.ldf">
-      <Link>App_Data\database_log.ldf</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>database.mdf</DependentUpon>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

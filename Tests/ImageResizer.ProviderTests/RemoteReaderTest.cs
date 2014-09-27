@@ -7,7 +7,7 @@ using ImageResizer.Plugins;
 using ImageResizer.Plugins.RemoteReader;
 using Xunit;
 
-namespace ImageResizer.AllPlugins.Tests {
+namespace ImageResizer.ProviderTests {
     /// <summary>
     /// Test the functionality of the <see cref="RemoteReaderPlugin"/> class.
     /// </summary>
@@ -56,7 +56,7 @@ namespace ImageResizer.AllPlugins.Tests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace ImageResizer.AllPlugins.Tests {
             var actual = target.FileExists(string.Empty, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace ImageResizer.AllPlugins.Tests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace ImageResizer.AllPlugins.Tests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<IVirtualFile>(actual);
-            Assert.StrictEqual<string>(virtualPath, actual.VirtualPath);
+            Assert.Equal<string>(virtualPath, actual.VirtualPath);
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace ImageResizer.AllPlugins.Tests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<IVirtualFile>(actual);
-            Assert.StrictEqual<string>(virtualPath, actual.VirtualPath);
+            Assert.Equal<string>(virtualPath, actual.VirtualPath);
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace ImageResizer.AllPlugins.Tests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<IVirtualFile>(actual);
-            Assert.StrictEqual<string>(virtualPath, actual.VirtualPath);
+            Assert.Equal<string>(virtualPath, actual.VirtualPath);
         }
 
         /// <summary>
@@ -302,7 +302,7 @@ namespace ImageResizer.AllPlugins.Tests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<Stream>(actual);
-            Assert.StrictEqual<string>(virtualPath, target.VirtualPath);
+            Assert.Equal<string>(virtualPath, target.VirtualPath);
         }
 
         /// <summary>

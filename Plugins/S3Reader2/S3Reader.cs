@@ -23,7 +23,7 @@ namespace ImageResizer.Plugins.S3Reader2 {
         bool includeModifiedDate = false;
         bool asVpp = false;
         AmazonS3Config s3config = null;
-        public S3Reader2(NameValueCollection args ) {
+        public S3Reader2(NameValueCollection args) {
 
             s3config = new AmazonS3Config();
 
@@ -39,7 +39,8 @@ namespace ImageResizer.Plugins.S3Reader2 {
 
             if (!string.IsNullOrEmpty(args["accessKeyId"]) && !string.IsNullOrEmpty(args["secretAccessKey"])) {
                 S3Client = new AmazonS3Client(args["accessKeyId"], args["secretAccessKey"], s3config);
-            } else {
+            }
+            else {
 
                 S3Client = new AmazonS3Client(null, s3config);
             }
@@ -51,30 +52,31 @@ namespace ImageResizer.Plugins.S3Reader2 {
             RequireImageExtension = args.Get("requireImageExtension", RequireImageExtension);
             UntrustedData = args.Get("untrustedData", UntrustedData);
             CacheUnmodifiedFiles = args.Get("cacheUnmodifiedFiles", CacheUnmodifiedFiles);
-            
+
         }
 
 
         public Configuration.Xml.Node RedactFrom(Node resizer) {
-            if (resizer == null || resizer.queryUncached("plugins.add") == null) return resizer;
+            if (resizer == null || resizer.queryUncached("plugins.add") == null)
+                return resizer;
             foreach (Node n in resizer.queryUncached("plugins.add")) {
-                if (n.Attrs["accessKeyId"] != null) n.Attrs.Set("accessKeyId", "[redacted]");
-                if (n.Attrs["secretAccessKey"] != null) n.Attrs.Set("secretAccessKey", "[redacted]");
+                if (n.Attrs["accessKeyId"] != null)
+                    n.Attrs.Set("accessKeyId", "[redacted]");
+                if (n.Attrs["secretAccessKey"] != null)
+                    n.Attrs.Set("secretAccessKey", "[redacted]");
             }
             return resizer;
         }
-    
+
         /// <summary>
         /// Configure AWS access keys
         /// </summary>
         public AmazonS3Client S3Client { get; set; }
 
 
-        public string Region
-        {
+        public string Region {
             get { return this.s3config != null && this.s3config.RegionEndpoint != null ? this.s3config.RegionEndpoint.SystemName : null; }
-            set
-            {
+            set {
                 this.s3config.RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(value);
             }
         }
@@ -121,26 +123,31 @@ namespace ImageResizer.Plugins.S3Reader2 {
         /// <returns></returns>
         public IPlugin Install(Configuration.Config c) {
 
-            if (vpp != null) throw new InvalidOperationException("This plugin can only be installed once, and cannot be uninstalled and reinstalled.");
+            if (vpp != null)
+                throw new InvalidOperationException("This plugin can only be installed once, and cannot be uninstalled and reinstalled.");
 
-            if (string.IsNullOrEmpty(vpath)) vpath = "~/s3/";
+            if (string.IsNullOrEmpty(vpath))
+                vpath = "~/s3/";
 
             string[] bucketArray = null;
-            if (!string.IsNullOrEmpty(buckets)) bucketArray = buckets.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            else c.configurationSectionIssues.AcceptIssue(new Issue("S3Reader", "S3Reader cannot function without a list of permitted bucket names.",
-                "Please specify a comma-delimited list of buckets in the <add name='S3Reader' buckets='bucketa,bucketb' /> element.",
-                 IssueSeverity.ConfigurationError));
+            if (!string.IsNullOrEmpty(buckets))
+                bucketArray = buckets.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            else
+                c.configurationSectionIssues.AcceptIssue(new Issue("S3Reader", "S3Reader cannot function without a list of permitted bucket names.",
+                    "Please specify a comma-delimited list of buckets in the <add name='S3Reader' buckets='bucketa,bucketb' /> element.",
+                IssueSeverity.ConfigurationError));
 
             for (int i = 0; i < bucketArray.Length; i++)
                 bucketArray[i] = bucketArray[i].Trim();
 
 
-            vpp = new S3VirtualPathProvider(this.S3Client, vpath,TimeSpan.MaxValue, new TimeSpan(0, 1, 0, 0),  delegate(S3VirtualPathProvider s, S3PathEventArgs ev) {
-                if (bucketArray == null) ev.ThrowException();
+            vpp = new S3VirtualPathProvider(this.S3Client, vpath, TimeSpan.MaxValue, new TimeSpan(0, 1, 0, 0), delegate(S3VirtualPathProvider s, S3PathEventArgs ev) {
+                if (bucketArray == null)
+                    ev.ThrowException();
                 ev.AssertBucketMatches(bucketArray);
             }, !includeModifiedDate);
 
-            
+
 
 
             c.Pipeline.PostAuthorizeRequestStart += delegate(IHttpModule sender2, HttpContext context) {
@@ -167,15 +174,16 @@ namespace ImageResizer.Plugins.S3Reader2 {
                     e.QueryString["process"] = ImageResizer.ProcessWhen.Always.ToString();
 
             };
-            
+
             if (asVpp) {
                 try {
                     //Registers the virtual path provider.
                     HostingEnvironment.RegisterVirtualPathProvider(vpp);
-                } catch (SecurityException) {
+                }
+                catch (SecurityException) {
                     asVpp = false;
                     c.configurationSectionIssues.AcceptIssue(new Issue("S3Reader", "S3Reader could not be installed as a VirtualPathProvider due to missing AspNetHostingPermission."
-                    ,"It was installed as an IVirtualImageProvider instead, which means that only image URLs will be accessible, and only if they contain a querystring.\n" +
+                    , "It was installed as an IVirtualImageProvider instead, which means that only image URLs will be accessible, and only if they contain a querystring.\n" +
                     "Set vpp=false to tell S3Reader to register as an IVirtualImageProvider instead. <add name='S3Reader' vpp=false />", IssueSeverity.Error));
                 }
             }
@@ -185,7 +193,7 @@ namespace ImageResizer.Plugins.S3Reader2 {
 
             //
             c.Plugins.add_plugin(this);
-            
+
             return this;
 
         }
@@ -200,8 +208,9 @@ namespace ImageResizer.Plugins.S3Reader2 {
             if (!asVpp) {
                 c.Plugins.VirtualProviderPlugins.Remove(vpp);
                 return true;
-            }else
-            return false;
+            }
+            else
+                return false;
         }
 
     }

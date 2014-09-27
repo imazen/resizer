@@ -8,7 +8,7 @@ using ImageResizer.Plugins;
 using ImageResizer.Plugins.SqlReader;
 using Xunit;
 
-namespace ImageResizer.AllPlugins.Tests {
+namespace ImageResizer.ProviderTests {
     /// <summary>
     /// Test the functionality of the <see cref="SqlReaderPlugin"/> class.
     /// </summary>
@@ -17,11 +17,16 @@ namespace ImageResizer.AllPlugins.Tests {
     /// implemented by <see cref="SqlReaderPlugin"/>. Also The methods 
     /// implementations of <see cref="IVirtualFile"/>.
     /// </remarks>
-    public class SqlReaderTest : IDisposable {
+    public class SqlReaderTest /*: IDisposable*/ {
         /// <summary>
         /// A GUID that can be used to represent a file that does not exist.
         /// </summary>
         private static Guid dummyDatabaseRecordId = Guid.NewGuid();
+
+        /// <summary>
+        /// A GUID that can be used to represent a file that does exist.
+        /// </summary>
+        private Guid realDatabaseRecordId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlReaderTest"/> class.
@@ -33,6 +38,8 @@ namespace ImageResizer.AllPlugins.Tests {
             AppDomain.CurrentDomain.SetData(
                 "DataDirectory",
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data"));
+
+            this.realDatabaseRecordId = this.CreateFileInDatabase();
         }
 
         /// <summary>
@@ -85,7 +92,116 @@ namespace ImageResizer.AllPlugins.Tests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
+        }
+
+        /// <summary>
+        /// Call the FileExists method with an invalid Guid for the queryString parameter.
+        /// </summary>
+        /// <remarks>
+        /// The queryString parameter is not used. The value passed should not affect the method outcome.
+        /// </remarks>
+        [Fact]
+        public void FileExistsWithInvaludGuidId() {
+            // Arrange
+            bool expected = false;
+            var settings = this.Settings;
+            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("B").Substring(0, 5));
+            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+
+            // Act
+            bool actual = target.FileExists(virtualPath, null);
+
+            // Assert
+            Assert.Equal<bool>(expected, actual);
+        }
+
+        /// <summary>
+        /// Call the FileExists method with a string image type id for the queryString parameter.
+        /// </summary>
+        /// <remarks>
+        /// The queryString parameter is not used. The value passed should not affect the method outcome.
+        /// </remarks>
+        [Fact]
+        public void FileExistsWithStringImageIdType() {
+            // Arrange
+            bool expected = true;
+            var settings = this.Settings;
+            settings.ImageIdType = System.Data.SqlDbType.NVarChar;
+            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("B") + ".jpg");
+            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+
+            // Act
+            bool actual = target.FileExists(virtualPath, null);
+
+            // Assert
+            Assert.Equal<bool>(expected, actual);
+        }
+
+        /// <summary>
+        /// Call the FileExists method with an integer image type id for the queryString parameter.
+        /// </summary>
+        /// <remarks>
+        /// The queryString parameter is not used. The value passed should not affect the method outcome.
+        /// </remarks>
+        [Fact]
+        public void FileExistsWithIntegerImageIdType() {
+            // Arrange
+            bool expected = true;
+            var settings = this.Settings;
+            settings.ImageIdType = System.Data.SqlDbType.Int;
+            string virtualPath = Path.Combine(settings.PathPrefix, "22");
+            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+
+            // Act
+            bool actual = target.FileExists(virtualPath, null);
+
+            // Assert
+            Assert.Equal<bool>(expected, actual);
+        }
+
+        /// <summary>
+        /// Call the FileExists method with an invalid integer image type id for the queryString parameter.
+        /// </summary>
+        /// <remarks>
+        /// The queryString parameter is not used. The value passed should not affect the method outcome.
+        /// </remarks>
+        [Fact]
+        public void FileExistsWithInvalidIntegerImageIdType() {
+            // Arrange
+            bool expected = false;
+            var settings = this.Settings;
+            settings.ImageIdType = System.Data.SqlDbType.Int;
+            string virtualPath = Path.Combine(settings.PathPrefix, "TEST");
+            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+
+            // Act
+            bool actual = target.FileExists(virtualPath, null);
+
+            // Assert
+            Assert.Equal<bool>(expected, actual);
+        }
+
+        /// <summary>
+        /// Call the FileExists method with a null value for the queryString parameter.
+        /// </summary>
+        /// <remarks>
+        /// The queryString parameter is not used. The value passed should not affect the method outcome.
+        /// </remarks>
+        [Fact]
+        public void FileExistsWithEmptyStringImageIdType() {
+            // Arrange
+            bool expected = false;
+            var settings = this.Settings;
+            settings.ImageIdType = System.Data.SqlDbType.NVarChar;
+            string virtualPath = Path.Combine(settings.PathPrefix, string.Empty);
+            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+
+            // Act
+            bool actual = target.FileExists(virtualPath, null);
+
+            // Assert
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -119,7 +235,7 @@ namespace ImageResizer.AllPlugins.Tests {
             var actual = target.FileExists(string.Empty, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -138,7 +254,7 @@ namespace ImageResizer.AllPlugins.Tests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -159,7 +275,7 @@ namespace ImageResizer.AllPlugins.Tests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -170,7 +286,7 @@ namespace ImageResizer.AllPlugins.Tests {
         [Fact]
         public void FileExistsCheckForModifiedFilesFileExisting() {
             // Arrange
-            Guid id = this.CreateFileInDatabase();
+            Guid id = this.realDatabaseRecordId; ////this.CreateFileInDatabase();
             bool expected = true;
             var settings = this.Settings;
             settings.CheckForModifiedFiles = true;
@@ -181,7 +297,7 @@ namespace ImageResizer.AllPlugins.Tests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -203,7 +319,7 @@ namespace ImageResizer.AllPlugins.Tests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<DatabaseFile>(actual);
-            Assert.StrictEqual<bool>(expected, ((DatabaseFile)actual).Exists);
+            Assert.Equal<bool>(expected, ((DatabaseFile)actual).Exists);
         }
 
         /// <summary>
@@ -226,8 +342,8 @@ namespace ImageResizer.AllPlugins.Tests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<DatabaseFile>(actual);
-            Assert.StrictEqual<bool>(expected, ((DatabaseFile)actual).Exists);
-            Assert.StrictEqual<string>(virtualPath, actual.VirtualPath);
+            Assert.Equal<bool>(expected, ((DatabaseFile)actual).Exists);
+            Assert.Equal<string>(virtualPath, actual.VirtualPath);
         }
 
         /// <summary>
@@ -239,7 +355,7 @@ namespace ImageResizer.AllPlugins.Tests {
         public void GetFileValidWithoutCheckForModifiedFiles() {
             // Arrange
             bool expected = true;
-            Guid id = this.CreateFileInDatabase();
+            Guid id = this.realDatabaseRecordId; ////this.CreateFileInDatabase();
             var settings = this.Settings;
             string virtualPath = Path.Combine(settings.PathPrefix, id.ToString("B"));
             IVirtualImageProvider target = new SqlReaderPlugin(settings);
@@ -250,8 +366,8 @@ namespace ImageResizer.AllPlugins.Tests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<DatabaseFile>(actual);
-            Assert.StrictEqual<bool>(expected, ((DatabaseFile)actual).Exists);
-            Assert.StrictEqual<string>(virtualPath, actual.VirtualPath);
+            Assert.Equal<bool>(expected, ((DatabaseFile)actual).Exists);
+            Assert.Equal<string>(virtualPath, actual.VirtualPath);
         }
 
         /// <summary>
@@ -263,7 +379,7 @@ namespace ImageResizer.AllPlugins.Tests {
         public void GetFileValidWithCheckForModifiedFiles() {
             // Arrange
             bool expected = true;
-            Guid id = this.CreateFileInDatabase();
+            Guid id = this.realDatabaseRecordId; ////this.CreateFileInDatabase();
             var settings = this.Settings;
             settings.CheckForModifiedFiles = true;
             string virtualPath = Path.Combine(settings.PathPrefix, id.ToString("B"));
@@ -275,8 +391,8 @@ namespace ImageResizer.AllPlugins.Tests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<DatabaseFile>(actual);
-            Assert.StrictEqual<bool>(expected, ((DatabaseFile)actual).Exists);
-            Assert.StrictEqual<string>(virtualPath, actual.VirtualPath);
+            Assert.Equal<bool>(expected, ((DatabaseFile)actual).Exists);
+            Assert.Equal<string>(virtualPath, actual.VirtualPath);
         }
 
         /// <summary>
@@ -337,7 +453,7 @@ namespace ImageResizer.AllPlugins.Tests {
         [Fact]
         public void OpenValidId() {
             // Arrange
-            Guid id = this.CreateFileInDatabase();
+            Guid id = this.realDatabaseRecordId; ////this.CreateFileInDatabase();
             var settings = this.Settings;
             string virtualPath = Path.Combine(settings.PathPrefix, id.ToString("B"));
             IVirtualImageProvider reader = new SqlReaderPlugin(settings);
@@ -369,7 +485,29 @@ namespace ImageResizer.AllPlugins.Tests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsType<FileNotFoundException>(actual);
-            Assert.StrictEqual<string>(virtualPath, target.VirtualPath);
+            Assert.Equal<string>(virtualPath, target.VirtualPath);
+        }
+
+        /// <summary>
+        /// Gets a settings object for a  <see cref="SqlReaderPlugin"/>.
+        /// </summary>
+        private NameValueCollection SettingsCollection {
+            get {
+                var s = new NameValueCollection();
+                    // This is for LocalDB 2014. If you are using a previous version change "MSSQLLocalDB" to "v11.0"
+                    s["connectionString"] = @"Server=(LocalDb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|database.mdf;Integrated Security=true;";
+                    s["prefix"] = @"/databaseimages/";
+                    s["extensionPartOfId"] = "true";
+                    s["idType"] = System.Data.SqlDbType.UniqueIdentifier.ToString();
+                    s["blobQuery"] = "SELECT Content FROM Images WHERE ImageID=@id";
+                    s["modifiedQuery"] = "Select ModifiedDate, CreatedDate From Images WHERE ImageID=@id";
+                    s["existsQuery"] = "Select COUNT(ImageID) From Images WHERE ImageID=@id";
+                    s["cacheUnmodifiedFiles"] = "true";
+                    s["requireImageExtension"] = "false";
+                    s["checkForModifiedFiles"] = "false";
+
+                return s;
+            }
         }
 
         /// <summary>
@@ -400,7 +538,7 @@ namespace ImageResizer.AllPlugins.Tests {
         /// </summary>
         /// <returns>The id of the entry created.</returns>
         private Guid CreateFileInDatabase() {
-            string name = "ImageResizer.AllPlugins.Tests.rose-leaf.jpg";
+            string name = "ImageResizer.ProviderTests.rose-leaf.jpg";
             using (var image = new Bitmap(Assembly.GetExecutingAssembly().GetManifestResourceStream(name))) {
                 using (MemoryStream ms = new MemoryStream()) {
                     image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
@@ -442,33 +580,33 @@ namespace ImageResizer.AllPlugins.Tests {
             }
         }
 
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, 
-        /// releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose() {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+        ///// <summary>
+        ///// Performs application-defined tasks associated with freeing, 
+        ///// releasing, or resetting unmanaged resources.
+        ///// </summary>
+        //public void Dispose() {
+        //    this.Dispose(true);
+        //    GC.SuppressFinalize(this);
+        //}
 
-        /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
-        /// </summary>
-        /// <param name="disposing">
-        /// <c>true</c> to release both managed and unmanaged resources; 
-        /// <c>false</c> to release only unmanaged resources.
-        /// </param>
-        protected virtual void Dispose(bool disposing) {
-            if (disposing) {
-                // Remove database records after each test.
-                SqlConnection conn = new SqlConnection(this.Settings.ConnectionString);
-                conn.Open();
-                using (conn) {
-                    using (SqlCommand sc = new SqlCommand("DELETE FROM Images", conn)) {
-                        sc.ExecuteNonQuery();
-                    }
-                }
-            }
-        }
+        ///// <summary>
+        ///// Releases unmanaged and - optionally - managed resources.
+        ///// </summary>
+        ///// <param name="disposing">
+        ///// <c>true</c> to release both managed and unmanaged resources; 
+        ///// <c>false</c> to release only unmanaged resources.
+        ///// </param>
+        //protected virtual void Dispose(bool disposing) {
+        //    if (disposing) {
+        //        // Remove database records after each test.
+        //        SqlConnection conn = new SqlConnection(this.Settings.ConnectionString);
+        //        conn.Open();
+        //        using (conn) {
+        //            using (SqlCommand sc = new SqlCommand("DELETE FROM Images", conn)) {
+        //                sc.ExecuteNonQuery();
+        //            }
+        //        }
+        //    }
+        //}
     }
 }
