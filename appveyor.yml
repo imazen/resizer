@@ -50,13 +50,14 @@ before_build:
 
 
 test_script:
-  - xunit.console.clr4.exe Tests\binaries\release\ImageResizer.Core.Tests.dll /appveyor
-  - xunit.console.clr4.x86.exe Tests\binaries\release\ImageResizer.Core.Tests.dll /appveyor
-  - xunit.console.clr4.exe Tests\binaries\release\ImageResizer.CoreFSharp.Tests.dll /appveyor
-  - xunit.console.clr4.x86.exe Tests\binaries\release\ImageResizer.CoreFSharp.Tests.dll /appveyor
-  - xunit.console.clr4.x86.exe Tests\binaries\release\ImageResizer.Plugins.CopyMetadata.Tests.dll /appveyor
-  - xunit.console.clr4.exe Tests\binaries\release\ImageResizer.AllPlugins.Tests.dll /appveyor
-  - xunit.console.clr4.exe Tests\binaries\release\ImageResizer.ProviderTests.dll /appveyor
+  - ps: .\Tests\app_veyor_run_test.ps1 -assembly ImageResizer.Core.Tests
+  - ps: .\Tests\app_veyor_run_test.ps1 -assembly ImageResizer.Core.Tests -use32bit
+  - ps: .\Tests\app_veyor_run_test.ps1 -assembly ImageResizer.CoreFSharp.Tests
+  - ps: .\Tests\app_veyor_run_test.ps1 -assembly ImageResizer.CoreFSharp.Tests -use32bit
+  - ps: .\Tests\app_veyor_run_test.ps1 -assembly ImageResizer.CopyMetadata.Tests 
+  - ps: .\Tests\app_veyor_run_test.ps1 -assembly ImageResizer.AllPlugins.Tests 
+  - ps: .\Tests\app_veyor_run_test.ps1 -assembly ImageResizer.ProviderTests.Tests 
+
 
 # scripts to run after build
 #after_build:
