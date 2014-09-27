@@ -47,8 +47,7 @@ build:
 before_build:
   - cd C:\projects\resizer
   - nuget restore AppVeyor.sln -PackagesDirectory C:\projects\resizer\packages
-  - nuget install xunit.runners -Pre -PackagesDirectory C:\projects\resizer\packages
-
+  - nuget install xunit.runners -Pre 
 
 test_script:
   - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.Core.Tests
