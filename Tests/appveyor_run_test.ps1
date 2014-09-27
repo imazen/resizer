@@ -1,6 +1,5 @@
 param([string]$assembly, [switch]$run32bit)
 
-.\.nuget\nuget.exe install xunit.runners -Pre
 cd Packages/xunit.runners*/Tools
 
 

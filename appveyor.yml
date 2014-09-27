@@ -47,6 +47,7 @@ build:
 before_build:
   - cd C:\projects\resizer
   - nuget restore AppVeyor.sln -PackagesDirectory C:\projects\resizer\packages
+  - nuget install xunit.runners -Pre -PackagesDirectory C:\projects\resizer\packages
 
 
 test_script:
