@@ -187,6 +187,13 @@ namespace ImageResizer.ProviderTests {
             targetAsVpp.MetadataSlidingExpiration = TimeSpan.Zero;
             targetAsVpp.MetadataAbsoluteExpiration = new TimeSpan(1, 0, 0);
             string virtualPath = Path.Combine(PathPrefix, Filename);
+
+            // Clear the Cache to ensure our file isn't in there.
+            var enumerator = HttpContext.Current.Cache.GetEnumerator();
+            while (enumerator.MoveNext()) {
+                HttpContext.Current.Cache.Remove((string)enumerator.Key);
+            }
+
             int preTestCount = HttpContext.Current.Cache.Count;
 
             // Ask for a file to be put in the cache.

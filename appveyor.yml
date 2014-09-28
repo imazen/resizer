@@ -48,6 +48,8 @@ before_build:
   - cd C:\projects\resizer
   - nuget restore AppVeyor.sln -PackagesDirectory C:\projects\resizer\packages
 
+services:
+  - mssql2008r2sp2
 
 test_script:
   - xunit.console.clr4.exe Tests\binaries\release\ImageResizer.Core.Tests.dll /appveyor

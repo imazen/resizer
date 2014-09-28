@@ -17,7 +17,7 @@ namespace ImageResizer.ProviderTests {
     /// implemented by <see cref="SqlReaderPlugin"/>. Also The methods 
     /// implementations of <see cref="IVirtualFile"/>.
     /// </remarks>
-    public class SqlReaderTest /*: IDisposable*/ {
+    public class SqlReaderTest {
         /// <summary>
         /// A GUID that can be used to represent a file that does not exist.
         /// </summary>
@@ -495,7 +495,11 @@ namespace ImageResizer.ProviderTests {
             get {
                 SqlReaderSettings s = new SqlReaderSettings {
                     // This is for LocalDB 2014. If you are using a previous version change "MSSQLLocalDB" to "v11.0"
+#if DEBUG
                     ConnectionString = @"Server=(LocalDb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|database.mdf;Integrated Security=true;",
+#else
+                    ConnectionString = @"Server=(local)\SQL2008R2SP2;User ID=sa;Password=Password12!;AttachDbFilename=|DataDirectory|database.mdf;",
+#endif
                     PathPrefix = @"/databaseimages/",
                     StripFileExtension = true,
                     ImageIdType = System.Data.SqlDbType.UniqueIdentifier,
@@ -557,34 +561,5 @@ namespace ImageResizer.ProviderTests {
                 return id;
             }
         }
-
-        ///// <summary>
-        ///// Performs application-defined tasks associated with freeing, 
-        ///// releasing, or resetting unmanaged resources.
-        ///// </summary>
-        //public void Dispose() {
-        //    this.Dispose(true);
-        //    GC.SuppressFinalize(this);
-        //}
-
-        ///// <summary>
-        ///// Releases unmanaged and - optionally - managed resources.
-        ///// </summary>
-        ///// <param name="disposing">
-        ///// <c>true</c> to release both managed and unmanaged resources; 
-        ///// <c>false</c> to release only unmanaged resources.
-        ///// </param>
-        //protected virtual void Dispose(bool disposing) {
-        //    if (disposing) {
-        //        // Remove database records after each test.
-        //        SqlConnection conn = new SqlConnection(this.Settings.ConnectionString);
-        //        conn.Open();
-        //        using (conn) {
-        //            using (SqlCommand sc = new SqlCommand("DELETE FROM Images", conn)) {
-        //                sc.ExecuteNonQuery();
-        //            }
-        //        }
-        //    }
-        //}
     }
 }
