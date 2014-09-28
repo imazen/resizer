@@ -501,7 +501,7 @@ namespace ImageResizer.ProviderTests {
                     // This is for full SQL Server.
                     ////ConnectionString = @"Data Source=.;Integrated Security=true;Initial Catalog=Resizer;AttachDbFilename=|DataDirectory|database.mdf;",
 #else
-                    ConnectionString = @"Data Source=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Initial Catalog=Resizer;AttachDbFilename=|DataDirectory|database.mdf;",
+                    ConnectionString = @"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Database=Resizer;AttachDbFilename=|DataDirectory|database.mdf;",
 #endif
                     PathPrefix = @"/databaseimages/",
                     StripFileExtension = true,
