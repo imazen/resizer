@@ -497,8 +497,11 @@ namespace ImageResizer.ProviderTests {
                     // This is for LocalDB 2014. If you are using a previous version change "MSSQLLocalDB" to "v11.0"
 #if DEBUG
                     ConnectionString = @"Server=(LocalDb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|database.mdf;Integrated Security=true;",
+                    
+                    // This is for full SQL Server.
+                    ////ConnectionString = @"Data Source=.;Integrated Security=true;Initial Catalog=Resizer;AttachDbFilename=|DataDirectory|database.mdf;",
 #else
-                    ConnectionString = @"Server=(local)\SQL2008R2SP2;User ID=sa;Password=Password12!;AttachDbFilename=|DataDirectory|database.mdf;",
+                    ConnectionString = @"Server=(local)\SQL2008R2SP2;User ID=sa;Password=Password12!;Initial Catalog=Resizer;AttachDbFilename=|DataDirectory|database.mdf;",
 #endif
                     PathPrefix = @"/databaseimages/",
                     StripFileExtension = true,
