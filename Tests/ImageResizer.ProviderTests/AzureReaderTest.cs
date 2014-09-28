@@ -39,8 +39,7 @@ namespace ImageResizer.ProviderTests {
         /// Initializes a new instance of the <see cref="AzureReaderTest"/> class.
         /// </summary>
         public AzureReaderTest() {
-            CloudStorageEmulatorShepherd shepherd = new CloudStorageEmulatorShepherd();
-            shepherd.Start();
+            CloudStorageEmulatorShepherd.Start();
             this.CreateFileInDatabase();
         }
 
@@ -167,7 +166,7 @@ namespace ImageResizer.ProviderTests {
         /// Config.Install(...) should create one issues.
         /// </summary>
         [Fact]
-        public void UninstalWithoutInstallingTest() {
+        public void UninstallWithoutInstallingTest() {
             // Arrange
             bool expected = false;
             var rs = new ResizerSection(ConfigXml);

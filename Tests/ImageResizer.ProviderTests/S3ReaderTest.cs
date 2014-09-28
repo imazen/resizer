@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.IO;
 using System.Web;
 using ImageResizer.Configuration;
@@ -29,7 +30,7 @@ namespace ImageResizer.ProviderTests {
         public S3ReaderTest() {
             HttpContext.Current = new HttpContext(
                 new HttpRequest(string.Empty, "http://tempuri.org", string.Empty),
-                new HttpResponse(new StringWriter()));
+                new HttpResponse(new StringWriter(CultureInfo.InvariantCulture)));
         }
 
         /// <summary>
@@ -181,9 +182,10 @@ namespace ImageResizer.ProviderTests {
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
             IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((S3VirtualPathProvider)target).FastMode = false;
-            ((S3VirtualPathProvider)target).MetadataSlidingExpiration = TimeSpan.Zero;
-            ((S3VirtualPathProvider)target).MetadataAbsoluteExpiration = new TimeSpan(1, 0, 0);
+            var targetAsVpp = (S3VirtualPathProvider)target;
+            targetAsVpp.FastMode = false;
+            targetAsVpp.MetadataSlidingExpiration = TimeSpan.Zero;
+            targetAsVpp.MetadataAbsoluteExpiration = new TimeSpan(1, 0, 0);
             string virtualPath = Path.Combine(PathPrefix, Filename);
             int preTestCount = HttpContext.Current.Cache.Count;
 

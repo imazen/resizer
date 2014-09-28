@@ -424,7 +424,7 @@ namespace ImageResizer.ProviderTests {
                     image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 
                     // Upload the byte array to SQL
-                    return this.StoreFile(ms, ".jpg", "rose-leaf.jpg");
+                    return this.StoreFile(ms, "rose-leaf.jpg");
                 }
             }
         }
@@ -433,24 +433,25 @@ namespace ImageResizer.ProviderTests {
         /// Store an image in the database
         /// </summary>
         /// <param name="data">The bytes of the image.</param>
-        /// <param name="extension">The file extension indicating the file type.</param>
-        /// <param name="fileName">THe full name of the file.</param>
+        /// <param name="fileName">The full name of the file.</param>
         /// <returns>The id of the record created.</returns>
-        private string StoreFile(MemoryStream data, string extension, string fileName) {
+        private string StoreFile(MemoryStream data, string fileName) {
             data.Seek(0, SeekOrigin.Begin);
             MongoGridFS g = new MongoReaderPlugin(this.Settings).GridFS;
+            MongoGridFSFileInfo fi;
 
             // Resize to a memory stream, max 2000x2000 jpeg
-            MemoryStream temp = new MemoryStream(4096);
-            new ImageJob(data, temp, new Instructions("width=2000;height=2000;mode=max;format=jpg")).Build();
+            using (MemoryStream temp = new MemoryStream(4096)) {
+                new ImageJob(data, temp, new Instructions("width=2000;height=2000;mode=max;format=jpg")).Build();
 
-            // Reset the streams
-            temp.Seek(0, SeekOrigin.Begin);
+                // Reset the streams
+                temp.Seek(0, SeekOrigin.Begin);
 
-            MongoGridFSCreateOptions opts = new MongoGridFSCreateOptions();
-            opts.ContentType = "image/jpeg";
+                MongoGridFSCreateOptions opts = new MongoGridFSCreateOptions();
+                opts.ContentType = "image/jpeg";
 
-            MongoGridFSFileInfo fi = g.Upload(temp, Path.GetFileName(fileName), opts);
+                fi = g.Upload(temp, Path.GetFileName(fileName), opts);
+            }
 
             return "id/" + fi.Id.AsObjectId.ToString() + ".jpg";
         }

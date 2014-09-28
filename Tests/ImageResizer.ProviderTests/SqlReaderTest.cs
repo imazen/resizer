@@ -102,7 +102,7 @@ namespace ImageResizer.ProviderTests {
         /// The queryString parameter is not used. The value passed should not affect the method outcome.
         /// </remarks>
         [Fact]
-        public void FileExistsWithInvaludGuidId() {
+        public void FileExistsWithInvalidGuidId() {
             // Arrange
             bool expected = false;
             var settings = this.Settings;
@@ -491,28 +491,6 @@ namespace ImageResizer.ProviderTests {
         /// <summary>
         /// Gets a settings object for a  <see cref="SqlReaderPlugin"/>.
         /// </summary>
-        private NameValueCollection SettingsCollection {
-            get {
-                var s = new NameValueCollection();
-                    // This is for LocalDB 2014. If you are using a previous version change "MSSQLLocalDB" to "v11.0"
-                    s["connectionString"] = @"Server=(LocalDb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|database.mdf;Integrated Security=true;";
-                    s["prefix"] = @"/databaseimages/";
-                    s["extensionPartOfId"] = "true";
-                    s["idType"] = System.Data.SqlDbType.UniqueIdentifier.ToString();
-                    s["blobQuery"] = "SELECT Content FROM Images WHERE ImageID=@id";
-                    s["modifiedQuery"] = "Select ModifiedDate, CreatedDate From Images WHERE ImageID=@id";
-                    s["existsQuery"] = "Select COUNT(ImageID) From Images WHERE ImageID=@id";
-                    s["cacheUnmodifiedFiles"] = "true";
-                    s["requireImageExtension"] = "false";
-                    s["checkForModifiedFiles"] = "false";
-
-                return s;
-            }
-        }
-
-        /// <summary>
-        /// Gets a settings object for a  <see cref="SqlReaderPlugin"/>.
-        /// </summary>
         private SqlReaderSettings Settings {
             get {
                 SqlReaderSettings s = new SqlReaderSettings {
@@ -557,10 +535,10 @@ namespace ImageResizer.ProviderTests {
         /// <param name="fileName">THe full name of the file.</param>
         /// <returns>The id of the record created.</returns>
         private Guid StoreFile(byte[] data, string extension, string fileName) {
-            SqlConnection conn = new SqlConnection(this.Settings.ConnectionString);
-            conn.Open();
-            using (conn) {
-                Guid id = Guid.NewGuid();
+            Guid id = Guid.Empty;
+            using (SqlConnection conn = new SqlConnection(this.Settings.ConnectionString)) {
+                conn.Open();
+                id = Guid.NewGuid();
 
                 // Select ModifiedDate, CreatedDate From Images WHERE ImageID=@id
                 using (SqlCommand sc = new SqlCommand(

@@ -6,11 +6,11 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 
 namespace ImageResizer.ProviderTests {
-    public class CloudStorageEmulatorShepherd {
+    public static class CloudStorageEmulatorShepherd {
         /// <summary>
         /// Start the developer azure service if it is not started already.
         /// </summary>
-        public void Start() {
+        public static void Start() {
             try {
                 CloudStorageAccount storageAccount = CloudStorageAccount.DevelopmentStorageAccount;
 
