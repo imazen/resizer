@@ -578,9 +578,9 @@ namespace ImageResizer.ProviderTests {
                 conn.Open();
 
                 using (SqlCommand sc = new SqlCommand(
-                    "SELECT [name] FROM sys.databases WHERE [name] = N'Resizer'",
+                    "USE [master]; SELECT COUNT([name]) FROM sys.databases WHERE [name] = N'Resizer'",
                     conn)) {
-                    databaseCreated = sc.ExecuteNonQuery() == 1;
+                    databaseCreated = (int)sc.ExecuteScalar() != 0;
                 }
     
                 if (!databaseCreated) {
