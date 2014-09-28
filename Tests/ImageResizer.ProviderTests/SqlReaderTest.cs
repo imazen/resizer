@@ -574,21 +574,28 @@ namespace ImageResizer.ProviderTests {
         /// Store an image in the database
         /// </summary>
         private void CreateDatabase() {
-            if (!databaseCreated) {
-                using (SqlConnection conn = new SqlConnection(@"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;")) {
-                    conn.Open();
+            using (SqlConnection conn = new SqlConnection(@"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;")) {
+                conn.Open();
 
+                using (SqlCommand sc = new SqlCommand(
+                    "SELECT [name] FROM sys.databases WHERE [name] = N'Resizer')",
+                    conn)) {
+                    databaseCreated = sc.ExecuteNonQuery() == 1;
+                }
+    
+                if (!databaseCreated) {
                     using (SqlCommand sc = new SqlCommand(
                         "USE [master]; CREATE DATABASE [Resizer];",
                         conn)) {
                         sc.ExecuteNonQuery();
                     }
+
                     using (SqlCommand sc = new SqlCommand(
                         "USE [Resizer]; " +
                         "SET ANSI_NULLS ON; SET QUOTED_IDENTIFIER ON; SET ANSI_PADDING ON;" +
-    "CREATE TABLE [dbo].[Images]([ImageID] [uniqueidentifier] NOT NULL,[FileName] [nvarchar](256) NULL,[Extension] [varchar](50) NULL,[ContentLength] [int] NOT NULL,[Content] [varbinary](max) NULL,[ModifiedDate] [datetime] NULL,[CreatedDate] [datetime] NULL,CONSTRAINT [PK_Images2] PRIMARY KEY CLUSTERED ([ImageID] ASC) WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]) ON [PRIMARY];" +
-    "SET ANSI_PADDING OFF;" +
-    "ALTER TABLE [dbo].[Images] ADD  CONSTRAINT [DF_Images_CreatedDate]  DEFAULT (getdate()) FOR [CreatedDate];",
+                        "CREATE TABLE [dbo].[Images]([ImageID] [uniqueidentifier] NOT NULL,[FileName] [nvarchar](256) NULL,[Extension] [varchar](50) NULL,[ContentLength] [int] NOT NULL,[Content] [varbinary](max) NULL,[ModifiedDate] [datetime] NULL,[CreatedDate] [datetime] NULL,CONSTRAINT [PK_Images2] PRIMARY KEY CLUSTERED ([ImageID] ASC) WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]) ON [PRIMARY];" +
+                        "SET ANSI_PADDING OFF;" +
+                        "ALTER TABLE [dbo].[Images] ADD  CONSTRAINT [DF_Images_CreatedDate]  DEFAULT (getdate()) FOR [CreatedDate];",
                         conn)) {
                         sc.ExecuteNonQuery();
                     }
