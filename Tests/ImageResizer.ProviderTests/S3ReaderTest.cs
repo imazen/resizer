@@ -67,7 +67,7 @@ namespace ImageResizer.ProviderTests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace ImageResizer.ProviderTests {
             var actual = target.FileExists(string.Empty, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace ImageResizer.ProviderTests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace ImageResizer.ProviderTests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace ImageResizer.ProviderTests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -196,8 +196,8 @@ namespace ImageResizer.ProviderTests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
-            Assert.StrictEqual<int>(preTestCount + 1, HttpContext.Current.Cache.Count);
+            Assert.Equal<bool>(expected, actual);
+            Assert.Equal<int>(preTestCount + 1, HttpContext.Current.Cache.Count);
         }
 
         /// <summary>
@@ -220,7 +220,7 @@ namespace ImageResizer.ProviderTests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<S3File>(actual);
-            Assert.StrictEqual<bool>(expected, ((S3File)actual).Exists);
+            Assert.Equal<bool>(expected, ((S3File)actual).Exists);
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace ImageResizer.ProviderTests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<S3File>(actual);
-            Assert.StrictEqual<bool>(expected, ((S3File)actual).Exists);
+            Assert.Equal<bool>(expected, ((S3File)actual).Exists);
         }
 
         /// <summary>
@@ -267,7 +267,7 @@ namespace ImageResizer.ProviderTests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<S3File>(actual);
-            Assert.StrictEqual<bool>(expected, ((S3File)actual).Exists);
+            Assert.Equal<bool>(expected, ((S3File)actual).Exists);
         }
 
         /// <summary>
@@ -291,7 +291,7 @@ namespace ImageResizer.ProviderTests {
             // Assert
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<S3File>(actual);
-            Assert.StrictEqual<bool>(expected, ((S3File)actual).Exists);
+            Assert.Equal<bool>(expected, ((S3File)actual).Exists);
         }
 
         /// <summary>
