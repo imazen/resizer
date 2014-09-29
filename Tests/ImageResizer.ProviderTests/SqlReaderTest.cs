@@ -41,9 +41,10 @@ namespace ImageResizer.ProviderTests {
                 "DataDirectory",
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data"));
 
-#if !DEBUG
-            this.CreateDatabase();
-#endif
+            if (Environment.GetEnvironmentVariable("APPVEYOR").ToLower() == "true") {
+                this.CreateDatabase();
+            }
+
             this.realDatabaseRecordId = this.CreateFileInDatabase();
         }
 
@@ -500,14 +501,10 @@ namespace ImageResizer.ProviderTests {
             get {
                 SqlReaderSettings s = new SqlReaderSettings {
                     // This is for LocalDB 2014. If you are using a previous version change "MSSQLLocalDB" to "v11.0"
-#if DEBUG
                     ConnectionString = @"Server=(LocalDb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|database.mdf;Integrated Security=true;",
                     
                     // This is for full SQL Server.
                     ////ConnectionString = @"Data Source=.;Integrated Security=true;Initial Catalog=Resizer;AttachDbFilename=|DataDirectory|database.mdf;",
-#else
-                    ConnectionString = @"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Database=Resizer;",
-#endif
                     PathPrefix = @"/databaseimages/",
                     StripFileExtension = true,
                     ImageIdType = System.Data.SqlDbType.UniqueIdentifier,
@@ -518,6 +515,10 @@ namespace ImageResizer.ProviderTests {
                     RequireImageExtension = false,
                     CheckForModifiedFiles = false
                 };
+
+                if (Environment.GetEnvironmentVariable("APPVEYOR").ToLower() == "true") {
+                    s.ConnectionString = @"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Database=Resizer;";
+                }
 
                 return s;
             }
