@@ -59,7 +59,7 @@ test_script:
   - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.CoreFSharp.Tests -use32bit
   - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.CopyMetadata.Tests 
   - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.AllPlugins.Tests 
-  - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.ProviderTests.Tests 
+  - xunit.console.clr4.exe Tests\binaries\release\ImageResizer.ProviderTests.Tests 
 
 
 # scripts to run after build
