@@ -13,7 +13,7 @@ switch ($run32bit){
 }
 
 
-& "$($runner)"  $dll_path "/appveyor"
+& "$($runner)"  $dll_path "-appveyor"
 
 # "-xmlv1" "$($xml_out_file)"
 
