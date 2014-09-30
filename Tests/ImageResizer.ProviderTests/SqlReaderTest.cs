@@ -517,7 +517,8 @@ namespace ImageResizer.ProviderTests {
                 };
 
                 if (Environment.GetEnvironmentVariable("APPVEYOR").ToLower() == "true") {
-                    s.ConnectionString = @"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Database=Resizer;";
+                    s.ConnectionString = @"Server=(LocalDb)\v11.0;AttachDbFilename=|DataDirectory|database.mdf;User ID=sa;Password=Password12!;";
+                    //s.ConnectionString = @"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Database=Resizer;";
                 }
 
                 return s;
