@@ -41,9 +41,12 @@ namespace ImageResizer.ProviderTests {
                 "DataDirectory",
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data"));
 
-            if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
-                this.CreateDatabase();
-            }
+            // SQL Server does not have permissions on the executable folder in 
+            // AppVeyor to attach a LocalDB database. So we create a database in Full
+            // SQL Server as we do have sa privileges.
+            //if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
+            //    this.CreateDatabase();
+            //}
 
             this.realDatabaseRecordId = this.CreateFileInDatabase();
         }
@@ -500,7 +503,7 @@ namespace ImageResizer.ProviderTests {
         private SqlReaderSettings Settings {
             get {
                 SqlReaderSettings s = new SqlReaderSettings {
-                    // This is for LocalDB 2014. If you are using a previous version change "MSSQLLocalDB" to "v11.0"
+                    // This is for LocalDB 2012. If you are using LocalDB 2014 change "v11.0" to "MSSQLLocalDB". 
                     ConnectionString = @"Server=(LocalDb)\v11.0;AttachDbFilename=|DataDirectory|database.mdf;Integrated Security=true;",
                     
                     // This is for full SQL Server.
@@ -516,10 +519,9 @@ namespace ImageResizer.ProviderTests {
                     CheckForModifiedFiles = false
                 };
 
-                if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
-                    s.ConnectionString = @"Server=(LocalDb)\v11.0;AttachDbFilename=|DataDirectory|database.mdf;Integrated Security=true;";
-                    //s.ConnectionString = @"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Database=Resizer;";
-                }
+                //if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
+                //    s.ConnectionString = @"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Database=Resizer;";
+                //}
 
                 return s;
             }
@@ -573,8 +575,13 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Store an image in the database
+        /// Create A database in SQL Server
         /// </summary>
+        /// <remarks>
+        /// SQL Server does not have permissions on the executable folder in 
+        /// AppVeyor to attach a LocalDB database. So we create a database in Full
+        /// SQL Server as we do have sa privileges.
+        /// </remarks>
         private void CreateDatabase() {
             using (SqlConnection conn = new SqlConnection(@"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;")) {
                 conn.Open();
