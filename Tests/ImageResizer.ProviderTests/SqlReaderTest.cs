@@ -44,9 +44,9 @@ namespace ImageResizer.ProviderTests {
             // SQL Server does not have permissions on the executable folder in 
             // AppVeyor to attach a LocalDB database. So we create a database in Full
             // SQL Server as we do have sa privileges.
-            //if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
-            //    this.CreateDatabase();
-            //}
+            if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
+                this.CreateDatabase();
+            }
 
             this.realDatabaseRecordId = this.CreateFileInDatabase();
         }
@@ -519,9 +519,9 @@ namespace ImageResizer.ProviderTests {
                     CheckForModifiedFiles = false
                 };
 
-                //if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
-                //    s.ConnectionString = @"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Database=Resizer;";
-                //}
+                if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
+                    s.ConnectionString = @"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Database=Resizer;";
+                }
 
                 return s;
             }
