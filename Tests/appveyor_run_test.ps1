@@ -13,11 +13,11 @@ switch ($run32bit){
 }
 
 
-& "$($runner)"  $dll_path "-xmlv1" "$($xml_out_file)"
+& "$($runner)"  $dll_path "-appveyor" 
 
 
 # upload results to AppVeyor
-$wc = New-Object 'System.Net.WebClient'
-$wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $xml_out_file))
+# $wc = New-Object 'System.Net.WebClient'
+# $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $xml_out_file))
 
 cd ..\..\..\
