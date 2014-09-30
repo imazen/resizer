@@ -41,7 +41,7 @@ namespace ImageResizer.ProviderTests {
                 "DataDirectory",
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data"));
 
-            if (Environment.GetEnvironmentVariable("APPVEYOR").ToLower() == "true") {
+            if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
                 this.CreateDatabase();
             }
 
@@ -501,7 +501,7 @@ namespace ImageResizer.ProviderTests {
             get {
                 SqlReaderSettings s = new SqlReaderSettings {
                     // This is for LocalDB 2014. If you are using a previous version change "MSSQLLocalDB" to "v11.0"
-                    ConnectionString = @"Server=(LocalDb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|database.mdf;Integrated Security=true;",
+                    ConnectionString = @"Server=(LocalDb)\v11.0;AttachDbFilename=|DataDirectory|database.mdf;Integrated Security=true;",
                     
                     // This is for full SQL Server.
                     ////ConnectionString = @"Data Source=.;Integrated Security=true;Initial Catalog=Resizer;AttachDbFilename=|DataDirectory|database.mdf;",
@@ -516,8 +516,8 @@ namespace ImageResizer.ProviderTests {
                     CheckForModifiedFiles = false
                 };
 
-                if (Environment.GetEnvironmentVariable("APPVEYOR").ToLower() == "true") {
-                    s.ConnectionString = @"Server=(LocalDb)\v11.0;AttachDbFilename=|DataDirectory|database.mdf;User ID=sa;Password=Password12!;";
+                if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
+                    s.ConnectionString = @"Server=(LocalDb)\v11.0;AttachDbFilename=|DataDirectory|database.mdf;Integrated Security=true;";
                     //s.ConnectionString = @"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Database=Resizer;";
                 }
 
