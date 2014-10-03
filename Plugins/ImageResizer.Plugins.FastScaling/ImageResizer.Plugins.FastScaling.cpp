@@ -628,6 +628,14 @@ static void gdImageDestroy(gdImagePtr im)
 	gdFree(im);
 }
 
+static void unpack24bitRow(int width, void * sourceLine, unsigned int * destArray){
+	for (int i = 0; i < width; i++){
+		destArray[i] = (*(unsigned int *)((long)sourceLine + (i * 3))) | 0xFF000000;
+	}
+}
+
+
+
 
 #pragma managed
 
@@ -636,7 +644,7 @@ using namespace System;
 using namespace System::Drawing;
 using namespace System::Drawing::Imaging;
 using namespace ImageResizer::Resizing;
-
+using namespace System::Diagnostics;
 namespace ImageResizer{
 	namespace Plugins{
 		namespace FastScaling {
@@ -649,7 +657,7 @@ namespace ImageResizer{
 					gdImagePtr gdResult;
 					try{
 						gdSource = BitmapToGd(source, crop);
-						gdResult = gdImageScaleTwoPass(gdSource, target.Width, target.Height);
+						gdResult = Scale(gdSource, target.Width, target.Height);
 						CopyGdToBitmap(gdResult, dest, target);
 					}finally{
 						if (gdSource != 0) {
@@ -663,8 +671,13 @@ namespace ImageResizer{
 
 					}
 				}
+				 
 
 			private:
+
+				gdImagePtr Scale(gdImagePtr source, int width, int height){
+					return  gdImageScaleTwoPass(source, width, height);
+				}
 
 				void CopyGdToBitmap(gdImagePtr source, Bitmap^ target, Rectangle targetArea){
 					if (target->PixelFormat != PixelFormat::Format32bppArgb){
@@ -740,9 +753,7 @@ namespace ImageResizer{
 									memcpy(im->tpixels[i], linePtr, sx * 4);
 								}
 								else{
-									for (j = 0; j < sx; j++){
-										im->tpixels[i][j] = (*(unsigned int *)((long)linePtr + (j * 3))) | 0xFF000000;
-									}
+									unpack24bitRow(sx, linePtr, im->tpixels[i]);
 								}
 							}
 
