@@ -1171,6 +1171,7 @@ namespace ImageResizer
 
         protected override RequestedAction EndProcess(ImageState s)
         {
+            if (base.EndProcess(s) == RequestedAction.Cancel) return RequestedAction.Cancel;
             if (s.Job != null)
             {
                 //Save the final dimensions.
