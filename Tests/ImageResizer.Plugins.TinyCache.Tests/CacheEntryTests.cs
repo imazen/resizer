@@ -22,7 +22,7 @@ namespace ImageResizer.Plugins.TinyCache.Tests
             e.read_count = 0;
             e.recreated_count = 0;
             e.cost_ms = 100;
-            Assert.Equal<float>(0.6337003f, e.GetPreservationPriority());
+            Assert.InRange(e.GetPreservationPriority(), 0.6337f, 0.6338f);
         }
     }
 }
