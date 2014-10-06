@@ -134,7 +134,7 @@ namespace ImageResizer.ProviderTests {
         /// in the white-list. 
         /// </summary>
         [Fact]
-        public void GetFileNotSignedWhiteListed() {
+        public void GetFileNotSignedWhitelisted() {
             // Arrange
             string virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
             var rs = new ResizerSection("<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"false\"><allow domain=\"farm7.static.flickr.com\" /></remotereader></resizer>");

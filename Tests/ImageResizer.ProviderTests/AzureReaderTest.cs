@@ -39,8 +39,7 @@ namespace ImageResizer.ProviderTests {
         /// Initializes a new instance of the <see cref="AzureReaderTest"/> class.
         /// </summary>
         public AzureReaderTest() {
-            CloudStorageEmulatorShepherd shepherd = new CloudStorageEmulatorShepherd();
-            shepherd.Start();
+            CloudStorageEmulatorShepherd.Start();
             this.CreateFileInDatabase();
         }
 
@@ -117,7 +116,7 @@ namespace ImageResizer.ProviderTests {
             var actual = target.RegisterAsVirtualPathProvider;
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -135,7 +134,7 @@ namespace ImageResizer.ProviderTests {
             var actual = target.GetIssues().ToList().Count;
 
             // Assert
-            Assert.StrictEqual<int>(expected, actual);
+            Assert.Equal<int>(expected, actual);
         }
 
         /// <summary>
@@ -159,7 +158,7 @@ namespace ImageResizer.ProviderTests {
             }
 
             // Assert
-            Assert.StrictEqual<int>(expected, actual);
+            Assert.Equal<int>(expected, actual);
         }
 
         /// <summary>
@@ -167,7 +166,7 @@ namespace ImageResizer.ProviderTests {
         /// Config.Install(...) should create one issues.
         /// </summary>
         [Fact]
-        public void UninstalWithoutInstallingTest() {
+        public void UninstallWithoutInstallingTest() {
             // Arrange
             bool expected = false;
             var rs = new ResizerSection(ConfigXml);
@@ -179,7 +178,7 @@ namespace ImageResizer.ProviderTests {
             bool actual = target.Uninstall(c);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -262,7 +261,7 @@ namespace ImageResizer.ProviderTests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -298,7 +297,7 @@ namespace ImageResizer.ProviderTests {
             var actual = target.FileExists(string.Empty, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -318,7 +317,7 @@ namespace ImageResizer.ProviderTests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -340,7 +339,7 @@ namespace ImageResizer.ProviderTests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -362,7 +361,7 @@ namespace ImageResizer.ProviderTests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -384,7 +383,7 @@ namespace ImageResizer.ProviderTests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
@@ -406,7 +405,7 @@ namespace ImageResizer.ProviderTests {
             bool actual = target.FileExists(virtualPath, null);
 
             // Assert
-            Assert.StrictEqual<bool>(expected, actual);
+            Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>

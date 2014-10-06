@@ -17,7 +17,7 @@ namespace ImageResizer.ProviderTests {
     /// implemented by <see cref="SqlReaderPlugin"/>. Also The methods 
     /// implementations of <see cref="IVirtualFile"/>.
     /// </remarks>
-    public class SqlReaderTest /*: IDisposable*/ {
+    public class SqlReaderTest {
         /// <summary>
         /// A GUID that can be used to represent a file that does not exist.
         /// </summary>
@@ -27,6 +27,8 @@ namespace ImageResizer.ProviderTests {
         /// A GUID that can be used to represent a file that does exist.
         /// </summary>
         private Guid realDatabaseRecordId;
+
+        private static bool databaseCreated;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlReaderTest"/> class.
@@ -38,6 +40,13 @@ namespace ImageResizer.ProviderTests {
             AppDomain.CurrentDomain.SetData(
                 "DataDirectory",
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data"));
+
+            // SQL Server does not have permissions on the executable folder in 
+            // AppVeyor to attach a LocalDB database. So we create a database in Full
+            // SQL Server as we do have sa privileges.
+            if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
+                this.CreateDatabase();
+            }
 
             this.realDatabaseRecordId = this.CreateFileInDatabase();
         }
@@ -102,7 +111,7 @@ namespace ImageResizer.ProviderTests {
         /// The queryString parameter is not used. The value passed should not affect the method outcome.
         /// </remarks>
         [Fact]
-        public void FileExistsWithInvaludGuidId() {
+        public void FileExistsWithInvalidGuidId() {
             // Arrange
             bool expected = false;
             var settings = this.Settings;
@@ -491,33 +500,14 @@ namespace ImageResizer.ProviderTests {
         /// <summary>
         /// Gets a settings object for a  <see cref="SqlReaderPlugin"/>.
         /// </summary>
-        private NameValueCollection SettingsCollection {
-            get {
-                var s = new NameValueCollection();
-                    // This is for LocalDB 2014. If you are using a previous version change "MSSQLLocalDB" to "v11.0"
-                    s["connectionString"] = @"Server=(LocalDb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|database.mdf;Integrated Security=true;";
-                    s["prefix"] = @"/databaseimages/";
-                    s["extensionPartOfId"] = "true";
-                    s["idType"] = System.Data.SqlDbType.UniqueIdentifier.ToString();
-                    s["blobQuery"] = "SELECT Content FROM Images WHERE ImageID=@id";
-                    s["modifiedQuery"] = "Select ModifiedDate, CreatedDate From Images WHERE ImageID=@id";
-                    s["existsQuery"] = "Select COUNT(ImageID) From Images WHERE ImageID=@id";
-                    s["cacheUnmodifiedFiles"] = "true";
-                    s["requireImageExtension"] = "false";
-                    s["checkForModifiedFiles"] = "false";
-
-                return s;
-            }
-        }
-
-        /// <summary>
-        /// Gets a settings object for a  <see cref="SqlReaderPlugin"/>.
-        /// </summary>
         private SqlReaderSettings Settings {
             get {
                 SqlReaderSettings s = new SqlReaderSettings {
-                    // This is for LocalDB 2014. If you are using a previous version change "MSSQLLocalDB" to "v11.0"
-                    ConnectionString = @"Server=(LocalDb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|database.mdf;Integrated Security=true;",
+                    // This is for LocalDB 2012. If you are using LocalDB 2014 change "v11.0" to "MSSQLLocalDB". 
+                    ConnectionString = @"Server=(LocalDb)\v11.0;AttachDbFilename=|DataDirectory|database.mdf;Integrated Security=true;",
+                    
+                    // This is for full SQL Server.
+                    ////ConnectionString = @"Data Source=.;Integrated Security=true;Initial Catalog=Resizer;AttachDbFilename=|DataDirectory|database.mdf;",
                     PathPrefix = @"/databaseimages/",
                     StripFileExtension = true,
                     ImageIdType = System.Data.SqlDbType.UniqueIdentifier,
@@ -528,6 +518,10 @@ namespace ImageResizer.ProviderTests {
                     RequireImageExtension = false,
                     CheckForModifiedFiles = false
                 };
+
+                if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
+                    s.ConnectionString = @"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Database=Resizer;";
+                }
 
                 return s;
             }
@@ -557,10 +551,10 @@ namespace ImageResizer.ProviderTests {
         /// <param name="fileName">THe full name of the file.</param>
         /// <returns>The id of the record created.</returns>
         private Guid StoreFile(byte[] data, string extension, string fileName) {
-            SqlConnection conn = new SqlConnection(this.Settings.ConnectionString);
-            conn.Open();
-            using (conn) {
-                Guid id = Guid.NewGuid();
+            Guid id = Guid.Empty;
+            using (SqlConnection conn = new SqlConnection(this.Settings.ConnectionString)) {
+                conn.Open();
+                id = Guid.NewGuid();
 
                 // Select ModifiedDate, CreatedDate From Images WHERE ImageID=@id
                 using (SqlCommand sc = new SqlCommand(
@@ -580,33 +574,44 @@ namespace ImageResizer.ProviderTests {
             }
         }
 
-        ///// <summary>
-        ///// Performs application-defined tasks associated with freeing, 
-        ///// releasing, or resetting unmanaged resources.
-        ///// </summary>
-        //public void Dispose() {
-        //    this.Dispose(true);
-        //    GC.SuppressFinalize(this);
-        //}
+        /// <summary>
+        /// Create A database in SQL Server
+        /// </summary>
+        /// <remarks>
+        /// SQL Server does not have permissions on the executable folder in 
+        /// AppVeyor to attach a LocalDB database. So we create a database in Full
+        /// SQL Server as we do have sa privileges.
+        /// </remarks>
+        private void CreateDatabase() {
+            using (SqlConnection conn = new SqlConnection(@"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;")) {
+                conn.Open();
 
-        ///// <summary>
-        ///// Releases unmanaged and - optionally - managed resources.
-        ///// </summary>
-        ///// <param name="disposing">
-        ///// <c>true</c> to release both managed and unmanaged resources; 
-        ///// <c>false</c> to release only unmanaged resources.
-        ///// </param>
-        //protected virtual void Dispose(bool disposing) {
-        //    if (disposing) {
-        //        // Remove database records after each test.
-        //        SqlConnection conn = new SqlConnection(this.Settings.ConnectionString);
-        //        conn.Open();
-        //        using (conn) {
-        //            using (SqlCommand sc = new SqlCommand("DELETE FROM Images", conn)) {
-        //                sc.ExecuteNonQuery();
-        //            }
-        //        }
-        //    }
-        //}
+                using (SqlCommand sc = new SqlCommand(
+                    "USE [master]; SELECT COUNT([name]) FROM sys.databases WHERE [name] = N'Resizer'",
+                    conn)) {
+                    databaseCreated = (int)sc.ExecuteScalar() != 0;
+                }
+    
+                if (!databaseCreated) {
+                    using (SqlCommand sc = new SqlCommand(
+                        "USE [master]; CREATE DATABASE [Resizer];",
+                        conn)) {
+                        sc.ExecuteNonQuery();
+                    }
+
+                    using (SqlCommand sc = new SqlCommand(
+                        "USE [Resizer]; " +
+                        "SET ANSI_NULLS ON; SET QUOTED_IDENTIFIER ON; SET ANSI_PADDING ON;" +
+                        "CREATE TABLE [dbo].[Images]([ImageID] [uniqueidentifier] NOT NULL,[FileName] [nvarchar](256) NULL,[Extension] [varchar](50) NULL,[ContentLength] [int] NOT NULL,[Content] [varbinary](max) NULL,[ModifiedDate] [datetime] NULL,[CreatedDate] [datetime] NULL,CONSTRAINT [PK_Images2] PRIMARY KEY CLUSTERED ([ImageID] ASC) WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]) ON [PRIMARY];" +
+                        "SET ANSI_PADDING OFF;" +
+                        "ALTER TABLE [dbo].[Images] ADD  CONSTRAINT [DF_Images_CreatedDate]  DEFAULT (getdate()) FOR [CreatedDate];",
+                        conn)) {
+                        sc.ExecuteNonQuery();
+                    }
+
+                    databaseCreated = true;
+                }
+            }
+        }
     }
 }

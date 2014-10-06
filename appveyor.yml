@@ -19,6 +19,9 @@ clone_folder: c:\projects\resizer
 install:
   - cmd: git submodule -q update --init
 
+services:
+  - mssql2012sp1
+
 matrix:
   allow_failures:
     - platform: x86
@@ -51,13 +54,13 @@ before_build:
 
 test_script:
   - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.Core.Tests
-  - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.Core.Tests -use32bit
+  - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.Core.Tests -run32bit
   - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.CoreFSharp.Tests
-  - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.CoreFSharp.Tests -use32bit
+  - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.CoreFSharp.Tests -run32bit
   - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.CopyMetadata.Tests 
   - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.AllPlugins.Tests 
   - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.ProviderTests
-
+  - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.ProviderTests -run32bit
 
 # scripts to run after build
 #after_build:
