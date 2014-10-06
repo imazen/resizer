@@ -61,6 +61,7 @@ test_script:
   - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.AllPlugins.Tests 
   - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.ProviderTests
   - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.ProviderTests -run32bit
+  - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.Plugins.TinyCache.Tests
 
 # scripts to run after build
 #after_build:

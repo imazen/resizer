@@ -77,8 +77,8 @@ namespace ImageResizer.Plugins.TinyCache {
 
             //How long has it been since the average of the last 8 reads?
             //Divide by last 30 minutes
-            float recent_usage = (float)Math.Min(0, 1 - Math.Max(30, recent_reads.Average(d => now.Subtract(d).TotalMinutes)) / 30.0);
-
+            float recent_usage = recent_reads.Count == 0 ? 0 : (float)Math.Min(0, 1 - Math.Max(30, recent_reads.Average(d => now.Subtract(d).TotalMinutes)) / 30.0);
+            
             float recent_usage_weight = 1 - (float)(Math.Max(30, now.Subtract(loaded).TotalMinutes) / 30);
 
             //If the entry has been cleared and recreated 
