@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 using System.IO;
+using System.Drawing.Imaging;
 
 // Contains classes for calculating and rendering images, as well as for building image processing plugins.
 namespace ImageResizer.Resizing {
@@ -155,6 +156,34 @@ namespace ImageResizer.Resizing {
                         return RequestedAction.Cancel;
             return RequestedAction.None;
         }
+
+        protected virtual RequestedAction BeforeEncode(ImageResizer.ImageJob job)
+        {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.BeforeEncode(job) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
+        }
+
+        protected virtual RequestedAction EndBuildJob(ImageResizer.ImageJob job)
+        {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.EndBuildJob(job) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
+        }
+
+        protected virtual RequestedAction InternalGraphicsDrawImage(ImageState state, Bitmap dest, Bitmap source, PointF[] targetArea, RectangleF sourceArea, ImageAttributes imageAttributes) {
+            if (exts != null)
+                foreach (AbstractImageProcessor p in exts)
+                    if (p.InternalGraphicsDrawImage(state, dest,source,targetArea,sourceArea,imageAttributes) == RequestedAction.Cancel)
+                        return RequestedAction.Cancel;
+            return RequestedAction.None;
+
+        }
+     
 
 
         /// <summary>

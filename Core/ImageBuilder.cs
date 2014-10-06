@@ -410,6 +410,7 @@ namespace ImageResizer
             try {
                 //Allow everything else to be overriden
                 if (BuildJob(job) != RequestedAction.Cancel) throw new ImageProcessingException("Nobody did the job");
+                EndBuildJob(job);
                 return job;
             } finally {
                 //Follow the dispose requests
@@ -533,6 +534,7 @@ namespace ImageResizer
             using (Bitmap b = BuildJobBitmapToBitmap(job, source, e.SupportsTransparency))
             {//Determines output format, includes code for saving in a variety of formats.
                 //Save to stream
+                BeforeEncode(job);
                 e.Write(b, dest);
             }
             return RequestedAction.None;
