@@ -116,7 +116,7 @@ namespace ImageResizer.ProviderTests {
             bool expected = false;
             var settings = this.Settings;
             string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("B").Substring(0, 5));
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            IVirtualImageProvider target = new SqlReaderPlugin();
 
             // Act
             bool actual = target.FileExists(virtualPath, null);
@@ -500,31 +500,30 @@ namespace ImageResizer.ProviderTests {
         /// <summary>
         /// Gets a settings object for a  <see cref="SqlReaderPlugin"/>.
         /// </summary>
-        private SqlReaderSettings Settings {
-            get {
-                SqlReaderSettings s = new SqlReaderSettings {
-                    // This is for LocalDB 2012. If you are using LocalDB 2014 change "v11.0" to "MSSQLLocalDB". 
-                    ConnectionString = @"Server=(LocalDb)\v11.0;AttachDbFilename=|DataDirectory|database.mdf;Integrated Security=true;",
+        private SqlReaderPlugin CreateSqlReaderPlugin() {
+            var p = new SqlReaderPlugin();
+            
+            // This is for LocalDB 2012. If you are using LocalDB 2014 change "v11.0" to "MSSQLLocalDB". 
+            p.ConnectionString = @"Server=(LocalDb)\v11.0;AttachDbFilename=|DataDirectory|database.mdf;Integrated Security=true;";
                     
-                    // This is for full SQL Server.
-                    ////ConnectionString = @"Data Source=.;Integrated Security=true;Initial Catalog=Resizer;AttachDbFilename=|DataDirectory|database.mdf;",
-                    PathPrefix = @"/databaseimages/",
-                    StripFileExtension = true,
-                    ImageIdType = System.Data.SqlDbType.UniqueIdentifier,
-                    ImageBlobQuery = "SELECT Content FROM Images WHERE ImageID=@id",
-                    ModifiedDateQuery = "Select ModifiedDate, CreatedDate From Images WHERE ImageID=@id",
-                    ImageExistsQuery = "Select COUNT(ImageID) From Images WHERE ImageID=@id",
-                    CacheUnmodifiedFiles = true,
-                    RequireImageExtension = false,
-                    CheckForModifiedFiles = false
-                };
+            // This is for full SQL Server.
+            ////ConnectionString = @"Data Source=.;Integrated Security=true;Initial Catalog=Resizer;AttachDbFilename=|DataDirectory|database.mdf;",
+            p.VirtualFilesystemPrefix = @"/databaseimages/";
+            p.StripFileExtension = true;
+            p.ImageIdType = System.Data.SqlDbType.UniqueIdentifier;
+            p.ImageBlobQuery = "SELECT Content FROM Images WHERE ImageID=@id";
+            p.ModifiedDateQuery = "Select ModifiedDate, CreatedDate From Images WHERE ImageID=@id";
+            p.CacheUnmodifiedFiles = true;
+            p.RequireImageExtension = false;
+            p.CheckForModifiedFiles = false;
+               
 
-                if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
-                    s.ConnectionString = @"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Database=Resizer;";
-                }
-
-                return s;
+            if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
+                p.ConnectionString = @"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Database=Resizer;";
             }
+
+            return p;
+            
         }
 
         /// <summary>

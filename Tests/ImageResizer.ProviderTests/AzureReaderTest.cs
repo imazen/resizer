@@ -105,15 +105,16 @@ namespace ImageResizer.ProviderTests {
         /// Test <see cref="AzureReader2Plugin"/> RegisterAsVirtualPathProvider property.
         /// </summary>
         [Fact]
-        public void RegisterAsVirtualPathProviderTest() {
+        public void ExposeAsVppTest()
+        {
             // Arrange
             bool expected = false; // Default is true, force property to change.
             var settings = this.Settings;
             var target = new AzureReader2Plugin(settings);
 
             // Act
-            target.RegisterAsVirtualPathProvider = expected;
-            var actual = target.RegisterAsVirtualPathProvider;
+            target.ExposeAsVpp = expected;
+            var actual = target.ExposeAsVpp;
 
             // Assert
             Assert.Equal<bool>(expected, actual);
