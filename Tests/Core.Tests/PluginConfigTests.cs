@@ -32,7 +32,6 @@ namespace ImageResizer.Tests {
     public class PluginConfigTests {
         [Theory]
         [InlineData("DefaultEncoder",typeof(DefaultEncoder))]
-        [InlineData(".DefaultEncoder", typeof(DefaultEncoder))]
         [InlineData("ImageResizer.Plugins.Basic.DefaultEncoder", typeof(DefaultEncoder))]
         [InlineData("DefaultEncoder234", null)]
         [InlineData("ImageResizer.Plugins.PluginA", typeof(PluginA))]
