@@ -1,9 +1,10 @@
-﻿/* Copyright (c) 2014 Imazen See license.txt */
+/* Copyright (c) 2014 Imazen See license.txt */
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Web;
 using ImageResizer.Caching;
+using System.IO;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
@@ -30,7 +31,10 @@ namespace ImageResizer.Plugins.Basic {
 
             e.ResponseHeaders.ApplyDuringPreSendRequestHeaders = false;
             e.ResponseHeaders.ApplyToResponse(e.ResponseHeaders, context);
-            e.ResizeImageToStream(context.Response.OutputStream);
+            MemoryStream ms = new MemoryStream();
+            e.ResizeImageToStream(ms);
+            ms.Seek(0, SeekOrigin.Begin);
+            ms.CopyTo(context.Response.OutputStream);
         }
     }
 }
