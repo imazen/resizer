@@ -139,7 +139,11 @@ namespace ImageResizer.Plugins.AzureReader2 {
 
             return this;
         }
-
+        /// <summary>
+        /// Removes the plugin from the given configuration container
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public override bool Uninstall(Configuration.Config c)
         {
             c.Pipeline.PostRewrite -= Pipeline_PostRewrite;

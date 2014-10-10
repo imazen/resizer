@@ -81,7 +81,9 @@ namespace ImageResizer.Plugins.BatchZipper
             get { return targetFilename; }
             set { ThowIfInvalid(); targetFilename = value; }
         }
-
+        /// <summary>
+        /// Throws an error if the instance is immutable.
+        /// </summary>
         protected void ThowIfInvalid()
         {
             if (!mutable) throw new InvalidOperationException("This instance is marked as immutable.");

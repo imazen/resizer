@@ -25,17 +25,31 @@ namespace ImageResizer.Plugins.AdvancedFilters {
         GIMP
     }
 
+    /// <summary>
+    /// In-place auto white balance filter with adjustable thresholds and 3 strategies.
+    /// </summary>
     public class AutoWhiteBalance : BaseInPlacePartialFilter {
 
+        /// <summary>
+        /// Creates an in-place auto-white-balance filter using the Area strategy and a threshold of 0.006 (0.6 percent)
+        /// </summary>
         public AutoWhiteBalance()
             : this(HistogramThresholdAlgorithm.Area) {
         }
 
-
+        /// <summary>
+        /// Creates an in-place auto-white-balance filter, using the given strategy. If Simple is used, a threshold of 0.0006 is used; otherwise 0.006 is used.
+        /// </summary>
+        /// <param name="algorithm"></param>
         public AutoWhiteBalance(HistogramThresholdAlgorithm algorithm)
             : this(algorithm, algorithm == HistogramThresholdAlgorithm.Simple ? 0.0006 : 0.006) {
         }
 
+        /// <summary>
+        /// Creates an in-place auto-white-balance filter, using the given strategy and (0..1) percent threshold.
+        /// </summary>
+        /// <param name="algorithm"></param>
+        /// <param name="threshold"></param>
         public AutoWhiteBalance(HistogramThresholdAlgorithm algorithm, double threshold) {
             formatTranslations[PixelFormat.Format8bppIndexed] = PixelFormat.Format8bppIndexed;
             formatTranslations[PixelFormat.Format24bppRgb] = PixelFormat.Format24bppRgb;
@@ -59,16 +73,27 @@ namespace ImageResizer.Plugins.AdvancedFilters {
         public double HighThreshold { get; set; }
 
         private Dictionary<PixelFormat, PixelFormat> formatTranslations = new Dictionary<PixelFormat, PixelFormat>();
+
+ 
+        /// <summary>
+        /// Defines which pixel formats are supported for source images
+        /// and which pixel format will be used for resulting image.
+        /// See AForge.Imaging.Filters.IFilterInformation.FormatTranslations for more info.
+        /// </summary>
         public override Dictionary<PixelFormat, PixelFormat> FormatTranslations {
-            get { return formatTranslations; }
+            get { return formatTranslations;}
         }
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="rect"></param>
         protected override unsafe void ProcessFilter(UnmanagedImage image, Rectangle rect) {
             int pixelSize = (image.PixelFormat == PixelFormat.Format8bppIndexed) ? 1 :
                 (image.PixelFormat == PixelFormat.Format24bppRgb) ? 3 : 4;
-
+         
             int startX = rect.Left;
             int startY = rect.Top;
             int stopX = startX + rect.Width;
