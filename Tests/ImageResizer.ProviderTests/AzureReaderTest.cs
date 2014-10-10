@@ -2,13 +2,13 @@
 using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using ImageResizer.Configuration;
-using ImageResizer.Configuration.Issues;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.AzureReader2;
+using ImageResizer.Storage;
 using Microsoft.WindowsAzure.Storage;
+using NSubstitute;
 using Xunit;
 
 namespace ImageResizer.ProviderTests {
@@ -18,7 +18,7 @@ namespace ImageResizer.ProviderTests {
     /// <remarks>
     /// <para>
     /// These tests exercise the methods from <see cref="IVirtualImageProvider"/> as
-    /// implemented by <see cref="AzureVirtualPathProvider"/>. Also The method 
+    /// implemented by <see cref="AzureReader2Plugin"/>. Also The method 
     /// implementations of <see cref="IVirtualFile"/>.
     /// </para>
     /// <para>
@@ -29,11 +29,13 @@ namespace ImageResizer.ProviderTests {
     /// </para>
     /// </remarks>
     public class AzureReaderTest {
+        private IMetadataCache model;
+
         private const string PathPrefix = "/azure/image-resizer/";
 
         private const string Filename = "rose-leaf.jpg";
 
-        private const string ConfigXml = "<resizer><plugins><add name=\"AzureReader2\" connectionString=\"UseDevelopmentStorage=true\" endpoint=\"http://127.0.0.1:10000/devstoreaccount1/\" /></plugins></resizer>";
+        private const string ConfigXml = "<resizer><plugins><add name=\"AzureReader2\" prefix=\"/azure/\" connectionString=\"UseDevelopmentStorage=true\" endpoint=\"http://127.0.0.1:10000/devstoreaccount1/\" /></plugins></resizer>";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AzureReaderTest"/> class.
@@ -41,6 +43,9 @@ namespace ImageResizer.ProviderTests {
         public AzureReaderTest() {
             CloudStorageEmulatorShepherd.Start();
             this.CreateFileInDatabase();
+
+            this.model = Substitute.For<IMetadataCache>();
+            this.model.Get(Arg.Any<string>()).Returns(x => null);
         }
 
         /// <summary>
@@ -61,7 +66,7 @@ namespace ImageResizer.ProviderTests {
 
         /// <summary>
         /// Test <see cref="AzureReader2Plugin"/> install capabilities.
-        /// Can only be installed once.
+        /// This plugin can be installed more than once.
         /// </summary>
         [Fact]
         public void InstallTwiceTest() {
@@ -72,16 +77,16 @@ namespace ImageResizer.ProviderTests {
 
             // Act
             var dummy = target.Install(c);
-            var actual = Assert.Throws<InvalidOperationException>(() => target.Install(c));
+            var actual = target.Install(c);
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsType<InvalidOperationException>(actual);
+            Assert.IsType<AzureReader2Plugin>(actual);
         }
 
         /// <summary>
         /// Test <see cref="AzureReader2Plugin"/> install capabilities.
-        /// Can only be installed once, even if un-installed first..
+        /// Can only be installed more than once.
         /// </summary>
         [Fact]
         public void InstallTwiceUninstallOnceTest() {
@@ -93,20 +98,19 @@ namespace ImageResizer.ProviderTests {
             // Act
             var dummy = target.Install(c);
             var wasUninstalled = target.Uninstall(c);
-            var actual = Assert.Throws<InvalidOperationException>(() => target.Install(c));
+            var actual = target.Install(c);
 
             // Assert
             Assert.True(wasUninstalled);
             Assert.NotNull(actual);
-            Assert.IsType<InvalidOperationException>(actual);
+            Assert.IsType<AzureReader2Plugin>(actual);
         }
 
         /// <summary>
         /// Test <see cref="AzureReader2Plugin"/> RegisterAsVirtualPathProvider property.
         /// </summary>
         [Fact]
-        public void ExposeAsVppTest()
-        {
+        public void ExposeAsVppTest() {
             // Arrange
             bool expected = false; // Default is true, force property to change.
             var settings = this.Settings;
@@ -120,56 +124,56 @@ namespace ImageResizer.ProviderTests {
             Assert.Equal<bool>(expected, actual);
         }
 
+        ///// <summary>
+        ///// Test <see cref="AzureReader2Plugin"/> Issues.
+        ///// Simple constructor should not create any issues.
+        ///// </summary>
+        //[Fact]
+        //public void WithoutIssuesTest() {
+        //    // Arrange
+        //    int expected = 0; // No issues to report.
+        //    var settings = this.Settings;
+        //    var target = new AzureReader2Plugin(settings);
+
+        //    // Act
+        //    //var actual = target.GetIssues().ToList().Count;
+
+        //    // Assert
+        //    //Assert.Equal<int>(expected, actual);
+        //}
+
+        ///// <summary>
+        ///// Test <see cref="AzureReader2Plugin"/> Issues.
+        ///// Config.Install(...) should create one issues.
+        ///// </summary>
+        //[Fact]
+        //public void WithIssuesTest() {
+        //    // Arrange
+        //    int expected = 1; // Should generate one issue.
+        //    var rs = new ResizerSection(ConfigXml);
+        //    var c = new Config(rs);
+        //    IVirtualImageProvider target = c.Plugins.Get<AzureReader2Plugin>();
+
+        //    // Act
+        //    var actual = 0;
+        //    foreach (var provider in c.Plugins.GetAll<IIssueProvider>()) {
+        //        if (provider is AzureReader2Plugin) {
+        //            actual = provider.GetIssues().ToList().Count;
+        //        }
+        //    }
+
+        //    // Assert
+        //    Assert.Equal<int>(expected, actual);
+        //}
+
         /// <summary>
-        /// Test <see cref="AzureReader2Plugin"/> Issues.
-        /// Simple constructor should not create any issues.
-        /// </summary>
-        [Fact]
-        public void WithoutIssuesTest() {
-            // Arrange
-            int expected = 0; // No issues to report.
-            var settings = this.Settings;
-            var target = new AzureReader2Plugin(settings);
-
-            // Act
-            var actual = target.GetIssues().ToList().Count;
-
-            // Assert
-            Assert.Equal<int>(expected, actual);
-        }
-
-        /// <summary>
-        /// Test <see cref="AzureReader2Plugin"/> Issues.
-        /// Config.Install(...) should create one issues.
-        /// </summary>
-        [Fact]
-        public void WithIssuesTest() {
-            // Arrange
-            int expected = 1; // Should generate one issue.
-            var rs = new ResizerSection(ConfigXml);
-            var c = new Config(rs);
-            IVirtualImageProvider target = c.Plugins.VirtualProviderPlugins.First;
-
-            // Act
-            var actual = 0;
-            foreach (var provider in c.Plugins.GetAll<IIssueProvider>()) {
-                if (provider is AzureReader2Plugin) {
-                    actual = provider.GetIssues().ToList().Count;
-                }
-            }
-
-            // Assert
-            Assert.Equal<int>(expected, actual);
-        }
-
-        /// <summary>
-        /// Test <see cref="AzureReader2Plugin"/> Issues.
-        /// Config.Install(...) should create one issues.
+        /// Test <see cref="AzureReader2Plugin"/> constructor and install capabilities.
+        /// Should not uninstall if not installed. Failure is silent.
         /// </summary>
         [Fact]
         public void UninstallWithoutInstallingTest() {
             // Arrange
-            bool expected = false;
+            bool expected = true;
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
             var settings = this.Settings;
@@ -236,11 +240,11 @@ namespace ImageResizer.ProviderTests {
             var target = new AzureReader2Plugin(settings);
 
             // Act
-            var actual = Assert.Throws<InvalidOperationException>(() => target.Install(c));
+            var actual = target.Install(c);
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsType<InvalidOperationException>(actual);
+            Assert.IsType<AzureReader2Plugin>(actual);
         }
 
         /// <summary>
@@ -255,7 +259,7 @@ namespace ImageResizer.ProviderTests {
             bool expected = true;
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
             string virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
@@ -273,7 +277,7 @@ namespace ImageResizer.ProviderTests {
             // Arrange
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
 
             // Act
             var actual = Assert.Throws<NullReferenceException>(() => target.FileExists(null, null));
@@ -292,7 +296,7 @@ namespace ImageResizer.ProviderTests {
             bool expected = false;
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
 
             // Act
             var actual = target.FileExists(string.Empty, null);
@@ -311,7 +315,7 @@ namespace ImageResizer.ProviderTests {
             bool expected = false;
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
             string virtualPath = Filename;
 
             // Act
@@ -332,8 +336,9 @@ namespace ImageResizer.ProviderTests {
             bool expected = false;
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((AzureVirtualPathProvider)target).LazyExistenceCheck = false;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
+            ((AzureReader2Plugin)target).LazyExistenceCheck = false;
+            ((AzureReader2Plugin)target).MetadataCache = model;
             string virtualPath = Path.Combine(PathPrefix, "fountain-xxxx.jpg");
 
             // Act
@@ -354,8 +359,9 @@ namespace ImageResizer.ProviderTests {
             bool expected = true;
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((AzureVirtualPathProvider)target).LazyExistenceCheck = false;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
+            ((AzureReader2Plugin)target).LazyExistenceCheck = false;
+            ((AzureReader2Plugin)target).MetadataCache = model;
             string virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
@@ -376,8 +382,9 @@ namespace ImageResizer.ProviderTests {
             bool expected = true; // Fast Mode assumes the file exists.
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((AzureVirtualPathProvider)target).LazyExistenceCheck = true;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
+            ((AzureReader2Plugin)target).LazyExistenceCheck = true;
+            ((AzureReader2Plugin)target).MetadataCache = model;
             string virtualPath = Path.Combine(PathPrefix, "fountain-xxxx.jpg");
 
             // Act
@@ -398,8 +405,9 @@ namespace ImageResizer.ProviderTests {
             bool expected = true;
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((AzureVirtualPathProvider)target).LazyExistenceCheck = true;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
+            ((AzureReader2Plugin)target).LazyExistenceCheck = true;
+            ((AzureReader2Plugin)target).MetadataCache = model;
             string virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
@@ -418,10 +426,11 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void FileExistsNotFastModeFileExistingStorageException() {
             // Arrange
-            var rs = new ResizerSection("<resizer><plugins><add name=\"AzureReader2\" connectionString=\"DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==\" endpoint=\"http://127.0.0.1:10000/devstoreaccount1/\" /></plugins></resizer>");
+            var rs = new ResizerSection("<resizer><plugins><add name=\"AzureReader2\" prefix=\"/azure/\" connectionString=\"DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==\" endpoint=\"http://127.0.0.1:10000/devstoreaccount1/\" /></plugins></resizer>");
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((AzureVirtualPathProvider)target).LazyExistenceCheck = false;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
+            ((AzureReader2Plugin)target).LazyExistenceCheck = false;
+            ((AzureReader2Plugin)target).MetadataCache = model;
             string virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
@@ -442,8 +451,9 @@ namespace ImageResizer.ProviderTests {
             // Arrange
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((AzureVirtualPathProvider)target).LazyExistenceCheck = true;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
+            ((AzureReader2Plugin)target).LazyExistenceCheck = true;
+            ((AzureReader2Plugin)target).MetadataCache = model;
             string virtualPath = Path.Combine(PathPrefix, "fountain-xxxx.jpg");
 
             // Act
@@ -451,7 +461,7 @@ namespace ImageResizer.ProviderTests {
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsAssignableFrom<AzureFile>(actual);
+            Assert.IsAssignableFrom<Blob>(actual);
         }
 
         /// <summary>
@@ -464,8 +474,9 @@ namespace ImageResizer.ProviderTests {
             // Arrange
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((AzureVirtualPathProvider)target).LazyExistenceCheck = false;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
+            ((AzureReader2Plugin)target).LazyExistenceCheck = false;
+            ((AzureReader2Plugin)target).MetadataCache = model;
             string virtualPath = Path.Combine(PathPrefix, "fountain-xxxx.jpg");
 
             // Act
@@ -483,10 +494,11 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void GetFileInvalidNotFastModeStorageException() {
             // Arrange
-            var rs = new ResizerSection("<resizer><plugins><add name=\"AzureReader2\" connectionString=\"DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==\" endpoint=\"http://127.0.0.1:10000/devstoreaccount1/\" /></plugins></resizer>");
+            var rs = new ResizerSection("<resizer><plugins><add name=\"AzureReader2\" prefix=\"/azure/\" connectionString=\"DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==\" endpoint=\"http://127.0.0.1:10000/devstoreaccount1/\" /></plugins></resizer>");
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((AzureVirtualPathProvider)target).LazyExistenceCheck = false;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
+            ((AzureReader2Plugin)target).LazyExistenceCheck = false;
+            ((AzureReader2Plugin)target).MetadataCache = model;
             string virtualPath = Path.Combine(PathPrefix, "fountain-xxxx.jpg");
 
             // Act
@@ -507,8 +519,9 @@ namespace ImageResizer.ProviderTests {
             // Arrange
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((AzureVirtualPathProvider)target).LazyExistenceCheck = true;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
+            ((AzureReader2Plugin)target).LazyExistenceCheck = true;
+            ((AzureReader2Plugin)target).MetadataCache = model;
             string virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
@@ -516,7 +529,7 @@ namespace ImageResizer.ProviderTests {
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsAssignableFrom<AzureFile>(actual);
+            Assert.IsAssignableFrom<Blob>(actual);
         }
 
         /// <summary>
@@ -529,8 +542,9 @@ namespace ImageResizer.ProviderTests {
             // Arrange
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((AzureVirtualPathProvider)target).LazyExistenceCheck = false;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
+            ((AzureReader2Plugin)target).LazyExistenceCheck = false;
+            ((AzureReader2Plugin)target).MetadataCache = model;
             string virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
@@ -538,7 +552,7 @@ namespace ImageResizer.ProviderTests {
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsAssignableFrom<AzureFile>(actual);
+            Assert.IsAssignableFrom<Blob>(actual);
         }
 
         /// <summary>
@@ -549,11 +563,11 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void GetFileValidNotFastModeStorageException() {
             // Arrange
-            var rs = new ResizerSection("<resizer><plugins><add name=\"AzureReader2\" connectionString=\"DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==\" endpoint=\"http://127.0.0.1:10000/devstoreaccount1/\" /></plugins></resizer>");
+            var rs = new ResizerSection("<resizer><plugins><add name=\"AzureReader2\" prefix=\"/azure/\" connectionString=\"DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==\" endpoint=\"http://127.0.0.1:10000/devstoreaccount1/\" /></plugins></resizer>");
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((AzureVirtualPathProvider)target).LazyExistenceCheck = false;
-            ((AzureVirtualPathProvider)target).LazyExistenceCheck = false;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
+            ((AzureReader2Plugin)target).LazyExistenceCheck = false;
+            ((AzureReader2Plugin)target).MetadataCache = model;
             string virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
@@ -573,7 +587,7 @@ namespace ImageResizer.ProviderTests {
             // Arrange
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
             string virtualPath = Filename;
 
             // Act
@@ -591,7 +605,7 @@ namespace ImageResizer.ProviderTests {
             // Arrange
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
             string virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
@@ -610,7 +624,7 @@ namespace ImageResizer.ProviderTests {
             // Arrange
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
             string virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
@@ -629,7 +643,7 @@ namespace ImageResizer.ProviderTests {
             // Arrange
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider reader = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            IVirtualImageProvider reader = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
             string virtualPath = Path.Combine(PathPrefix, Filename);
             var target = reader.GetFile(virtualPath, null);
 
@@ -640,7 +654,7 @@ namespace ImageResizer.ProviderTests {
             Assert.NotNull(actual);
             Assert.IsAssignableFrom<Stream>(actual);
         }
-        
+
         /// <summary>
         /// Call the Open method with a virtualPath to a database record that 
         /// does not exist.
@@ -650,8 +664,8 @@ namespace ImageResizer.ProviderTests {
             // Arrange
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider reader = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((AzureVirtualPathProvider)reader).LazyExistenceCheck = true;
+            IVirtualImageProvider reader = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
+            ((AzureReader2Plugin)reader).LazyExistenceCheck = true;
             string virtualPath = Path.Combine(PathPrefix, "fountain-xxxx.jpg");
             var target = reader.GetFile(virtualPath, null);
 
@@ -672,8 +686,8 @@ namespace ImageResizer.ProviderTests {
             // Arrange
             var rs = new ResizerSection(ConfigXml);
             var c = new Config(rs);
-            IVirtualImageProvider reader = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((AzureVirtualPathProvider)reader).LazyExistenceCheck = true;
+            IVirtualImageProvider reader = (IVirtualImageProvider)c.Plugins.Get<AzureReader2Plugin>();
+            ((AzureReader2Plugin)reader).LazyExistenceCheck = true;
             string virtualPath = Path.Combine(PathPrefix.Substring(0, PathPrefix.Length - 2) + "/", "fountain-xxxx.jpg");
             var target = reader.GetFile(virtualPath, null);
 
