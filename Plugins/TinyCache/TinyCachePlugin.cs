@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,7 +21,7 @@ namespace ImageResizer.Plugins.TinyCache {
         }
 
 
-        protected string virtualCacheFile = HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/App_Data/tiny_cache.cache";
+        protected string virtualCacheFile = (HostingEnvironment.ApplicationVirtualPath ?? string.Empty).TrimEnd('/') + "/App_Data/tiny_cache.cache";
         /// <summary>
         /// Sets the location of the cache file
         /// </summary>
@@ -40,7 +40,16 @@ namespace ImageResizer.Plugins.TinyCache {
         /// </summary>
         public string PhysicalCacheFile {
             get {
-                if (!string.IsNullOrEmpty(VirtualCacheFile)) return HostingEnvironment.MapPath(VirtualCacheFile);
+                if (!string.IsNullOrEmpty(VirtualCacheFile)) {
+                    if (HostingEnvironment.ApplicationVirtualPath == null) {
+                        return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, this.VirtualCacheFile.TrimStart('/'));
+                    }
+                    else {
+                        return HostingEnvironment.MapPath(VirtualCacheFile);
+                    }
+                }
+                    
+
                 return null;
             }
         }
@@ -64,7 +73,7 @@ namespace ImageResizer.Plugins.TinyCache {
         
         public bool CanOperate {
             get {
-                return HasFileIOPermission && !string.IsNullOrEmpty(VirtualCacheFile) ;
+                return !string.IsNullOrEmpty(VirtualCacheFile) && HasFileIOPermission;
             }
         }
 
@@ -212,6 +221,10 @@ namespace ImageResizer.Plugins.TinyCache {
    
      
         public bool CanProcess(System.Web.HttpContext current, IResponseArgs e) {
+            if (e == null) {
+                throw new ArgumentNullException("e");
+            }
+
             if (((ResizeSettings)e.RewrittenQuerystring).Cache == ServerCacheMode.No) return false;
             return CanOperate;
         }
