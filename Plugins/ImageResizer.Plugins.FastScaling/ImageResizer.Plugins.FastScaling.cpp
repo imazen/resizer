@@ -407,7 +407,7 @@ static inline LineContribType * _gdContributionsAlloc(unsigned int line_length, 
 	res->ContribRow = (ContributionType *)gdMalloc(line_length * sizeof(ContributionType));
 
 	for (u = 0; u < line_length; u++) {
-		res->ContribRow[u].Weights = (float *)gdMalloc(windows_size * sizeof(float) * 4);
+		res->ContribRow[u].Weights = (float *)gdMalloc(windows_size * sizeof(float));
 	}
 	return res;
 }
@@ -468,7 +468,7 @@ static inline LineContribType *_gdContributionsCalc(unsigned int line_size, unsi
 
 		for (iSrc = iLeft; iSrc <= iRight; iSrc++) {
 			
-			dTotalWeight += (weights[(iSrc - iLeft) * 4] = scale_f_d * (*pFilter)(scale_f_d * (dCenter - (double)iSrc)));
+			dTotalWeight += (weights[iSrc - iLeft] = scale_f_d * (*pFilter)(scale_f_d * (dCenter - (double)iSrc)));
 		}
 
 		if (dTotalWeight < 0.0) {
@@ -478,11 +478,8 @@ static inline LineContribType *_gdContributionsCalc(unsigned int line_size, unsi
 
 		if (dTotalWeight > 0.0) {
 			for (iSrc = iLeft; iSrc <= iRight; iSrc++) {
-				weights[(iSrc - iLeft) * 4] /= dTotalWeight;
+				weights[iSrc - iLeft] /= dTotalWeight;
 			}
-		}
-		for (iSrc = 0; iSrc <= (iRight - iLeft) * 4; iSrc+=4) {
-			weights[iSrc + 3] = weights[iSrc  + 2] = weights[iSrc  + 1] = weights[iSrc];
 		}
 	}
 	return res;
@@ -502,29 +499,42 @@ gdAxis axis, float *source_buffer, unsigned int source_buffer_len, float *dest_b
 	unsigned int **destPixels = dst->tpixels;
 
 	unsigned int bix;
-	for (bix = 0; bix < source_pixel_count; bix++){
-		source_buffer[bix] = (float)gdTrueColorGetRed((axis == HORIZONTAL) ? sourcePixels[row][bix] : sourcePixels[bix][row]);
-		source_buffer[source_pixel_count + bix] = (float)gdTrueColorGetGreen((axis == HORIZONTAL) ? sourcePixels[row][bix] : sourcePixels[bix][row]);
-		source_buffer[source_pixel_count * 2 + bix] = (float)gdTrueColorGetBlue((axis == HORIZONTAL) ? sourcePixels[row][bix] : sourcePixels[bix][row]);
-		source_buffer[source_pixel_count * 3 + bix] = (float)gdTrueColorGetAlpha((axis == HORIZONTAL) ? sourcePixels[row][bix] : sourcePixels[bix][row]);
+	unsigned int i;
+	for (i = 0; i < 4; i++){
+		unsigned int base_index = i * source_pixel_count;
+		if (axis == HORIZONTAL){
+            unsigned char * rowBytes = (unsigned char *)sourcePixels[row] + i;
+			for (bix = 0; bix < source_pixel_count; bix++){
+                source_buffer[base_index + bix] = (float)*(rowBytes + bix * 4);
+			}
+		}
+		else{
+            unsigned int offset = row * 4 + i;
+			for (bix = 0; bix < source_pixel_count; bix++){
+                source_buffer[base_index + bix] = (float)*(((unsigned char *)sourcePixels[bix]) + offset);
+			}
+		}
+
 	}
-	
+
 	int channel;
 
 	for (ndx = 0; ndx < dst_len; ndx++) {
 		const int left = contrib->ContribRow[ndx].Left;
 		const int right = contrib->ContribRow[ndx].Right;
-
+        const int windowWidth = right - left + 1;
 		int i;
 
 		float *weights = contrib->ContribRow[ndx].Weights;
 
-		for (channel = 1; channel <= 4; channel++){
-			const int dest_float = ndx * channel;
-			const int source_start = left * channel;
-			for (i = 0; i <= (right-left) * channel; i++) {
-				dest_buffer[dest_float] += weights[i] * source_buffer[i + source_start];
+		for (channel = 0; channel < 4; channel++){
+            const int dest_float = ndx + (channel  * dst_len);
+            const float * sourceWindow = source_buffer + left + channel * source_pixel_count;
+			register float acc = 0;
+            for (i = 0; i < windowWidth; i++) {
+                acc += weights[i] * *(sourceWindow + i);
 			}
+            dest_buffer[dest_float] = acc / windowWidth;
 		}
 
 	}
@@ -533,10 +543,11 @@ gdAxis axis, float *source_buffer, unsigned int source_buffer_len, float *dest_b
 		unsigned int *dest = (axis == HORIZONTAL) ?
 			&destPixels[row][bix] :
 			&destPixels[bix][row];
-		
-		*dest = gdTrueColorAlpha(uchar_clamp(dest_buffer[bix], 0xFF), uchar_clamp(dest_buffer[dst_len + bix], 0xFF),
-			uchar_clamp(dest_buffer[dst_len * 2 + bix], 0xFF),
-			uchar_clamp(dest_buffer[dst_len * 3 + bix], 0xFF)); /* alpha is 0..127 */
+
+		*dest = gdTrueColorAlpha(uchar_clamp(dest_buffer[bix], 0xFF),
+			uchar_clamp(dest_buffer[bix + dst_len], 0xFF),
+			uchar_clamp(dest_buffer[bix + dst_len + dst_len], 0xFF),
+			uchar_clamp(dest_buffer[bix + dst_len + dst_len + dst_len], 0xFF));
 	}
 
 
