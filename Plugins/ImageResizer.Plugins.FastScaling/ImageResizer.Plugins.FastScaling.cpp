@@ -467,8 +467,9 @@ static inline LineContribType *_gdContributionsCalc(unsigned int line_size, unsi
 		res->ContribRow[u].Right = iRight;
 
 		for (iSrc = iLeft; iSrc <= iRight; iSrc++) {
-			
-			dTotalWeight += (weights[iSrc - iLeft] = scale_f_d * (*pFilter)(scale_f_d * (dCenter - (double)iSrc)));
+            float w = scale_f_d * (*pFilter)(scale_f_d * (dCenter - (double)iSrc));
+            weights[iSrc - iLeft] = w;
+			dTotalWeight +=w;
 		}
 
 		if (dTotalWeight < 0.0) {
@@ -511,7 +512,7 @@ gdAxis axis, float *source_buffer, unsigned int source_buffer_len, float *dest_b
 		else{
             unsigned int offset = row * 4 + i;
 			for (bix = 0; bix < source_pixel_count; bix++){
-                source_buffer[base_index + bix] = (float)*(((unsigned char *)sourcePixels[bix]) + offset);
+                source_buffer[base_index + bix] = (float)*((unsigned char *)sourcePixels[bix] + offset);
 			}
 		}
 
@@ -534,7 +535,7 @@ gdAxis axis, float *source_buffer, unsigned int source_buffer_len, float *dest_b
             for (i = 0; i < windowWidth; i++) {
                 acc += weights[i] * *(sourceWindow + i);
 			}
-            dest_buffer[dest_float] = acc / windowWidth;
+            dest_buffer[dest_float] = acc; // (float)windowWidth;
 		}
 
 	}
