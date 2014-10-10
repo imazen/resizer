@@ -1,32 +1,25 @@
-﻿using ImageResizer.Configuration.Xml;
+﻿using System;
+using System.Collections.Specialized;
+using System.IO;
+using System.Threading.Tasks;
+using System.Web.Hosting;
+using ImageResizer.Configuration.Xml;
+using ImageResizer.ExtensionMethods;
 using ImageResizer.Plugins;
 using ImageResizer.Util;
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ImageResizer.ExtensionMethods;
-using System.IO;
-using System.Web.Hosting;
 
-namespace ImageResizer.Storage
-{
+namespace ImageResizer.Storage {
 
-    public interface IBlobMetadata{
+    public interface IBlobMetadata {
         bool? Exists { get; set; }
-        DateTime? LastModifiedDateUtc { get; set; } 
+        DateTime? LastModifiedDateUtc { get; set; }
     }
-    public class BlobMetadata:IBlobMetadata
-    {
+    public class BlobMetadata : IBlobMetadata {
         public bool? Exists { get; set; }
-        public DateTime? LastModifiedDateUtc { get; set; } 
+        public DateTime? LastModifiedDateUtc { get; set; }
     }
-    public abstract class BlobProviderBase : IPlugin,IVirtualImageProviderAsync, IVirtualImageProvider, IVirtualImageProviderVpp, IRedactDiagnostics
-    {
-        public BlobProviderBase()
-        {
+    public abstract class BlobProviderBase : IPlugin, IVirtualImageProviderAsync, IVirtualImageProvider, IVirtualImageProviderVpp, IRedactDiagnostics {
+        public BlobProviderBase() {
             this.UntrustedData = false;
             this.RequireImageExtension = true;
             this.LazyExistenceCheck = true;
@@ -37,9 +30,8 @@ namespace ImageResizer.Storage
             MetadataCache = new StandardMetadataCache();
         }
 
-        public virtual void LoadConfiguration(NameValueCollection args){
-            if (!string.IsNullOrEmpty(args["prefix"]))
-            {
+        public virtual void LoadConfiguration(NameValueCollection args) {
+            if (!string.IsNullOrEmpty(args["prefix"])) {
                 VirtualFilesystemPrefix = args["prefix"];
             }
             CacheMetadata = args.Get<bool>("cacheMetadata", CacheMetadata);
@@ -56,14 +48,15 @@ namespace ImageResizer.Storage
         /// </summary>
         /// <param name="resizer"></param>
         /// <returns></returns>
-        public Configuration.Xml.Node RedactFrom(Node resizer)
-        {
-            if (resizer == null) return null;
+        public Configuration.Xml.Node RedactFrom(Node resizer) {
+            if (resizer == null)
+                return null;
             var nodes = resizer.queryUncached("plugins.add");
-            if (nodes == null) return resizer;
-            foreach (Node n in nodes)
-            {
-                if (n.Attrs["connectionString"] != null) n.Attrs.Set("connectionString", "[redacted]");
+            if (nodes == null)
+                return resizer;
+            foreach (Node n in nodes) {
+                if (n.Attrs["connectionString"] != null)
+                    n.Attrs.Set("connectionString", "[redacted]");
             }
             return resizer;
         }
@@ -79,7 +72,7 @@ namespace ImageResizer.Storage
         /// <summary>
         /// If true, will cause additional requests to verify the remote resource is up-to-date.
         /// </summary>
-        public bool CheckForModifiedFiles {get;set;}
+        public bool CheckForModifiedFiles { get; set; }
 
         /// <summary>
         /// To avoid an extra request, it is possible to 'fail late', throwing FileNotFound when Open() is called instead of earlier.
@@ -117,8 +110,7 @@ namespace ImageResizer.Storage
         /// </summary>
         /// <param name="virtualPath"></param>
         /// <returns></returns>
-        public virtual bool Belongs(string virtualPath)
-        {
+        public virtual bool Belongs(string virtualPath) {
             return virtualPath.StartsWith(VirtualFilesystemPrefix, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -137,46 +129,40 @@ namespace ImageResizer.Storage
         /// <param name="virtualPath"></param>
         /// <param name="queryString"></param>
         /// <returns></returns>
-        public async Task<IBlobMetadata> FetchMetadataCachedAsync(string virtualPath, NameValueCollection queryString)
-        {
-            if (CacheMetadata && MetadataCache != null)
-            {
+        public async Task<IBlobMetadata> FetchMetadataCachedAsync(string virtualPath, NameValueCollection queryString) {
+            if (CacheMetadata && MetadataCache != null) {
                 var key = DeriveMetadataCacheKey(virtualPath, queryString);
                 var o = MetadataCache.Get(key) as IBlobMetadata;
-                if (o == null)
-                {
+                if (o == null) {
                     o = await FetchMetadataAsync(virtualPath, queryString);
                     MetadataCache.Put(key, o);
                 }
                 return o;
-            }else{
+            }
+            else {
                 return await FetchMetadataAsync(virtualPath, queryString);
             }
         }
 
-        protected virtual string DeriveMetadataCacheKey(string virtualPath, NameValueCollection q)
-        {
+        protected virtual string DeriveMetadataCacheKey(string virtualPath, NameValueCollection q) {
             return virtualPath;
         }
 
         private string _virtualFilesystemPrefix = null;
 
-        public string VirtualFilesystemPrefix
-        {
-            get
-            {
+        public string VirtualFilesystemPrefix {
+            get {
                 return _virtualFilesystemPrefix;
             }
-            set
-            {
-                if (!value.EndsWith("/")) value += "/";
+            set {
+                if (!value.EndsWith("/"))
+                    value += "/";
                 _virtualFilesystemPrefix = value != null && HostingEnvironment.ApplicationVirtualPath != null ? PathUtils.ResolveAppRelativeAssumeAppRelative(value) : value;
 
             }
         }
 
-        protected string StripPrefix(string virtualPath)
-        {
+        protected string StripPrefix(string virtualPath) {
             if (!virtualPath.StartsWith(VirtualFilesystemPrefix, StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException();
             return virtualPath.Substring(VirtualFilesystemPrefix.Length);
@@ -188,23 +174,21 @@ namespace ImageResizer.Storage
         /// <param name="virtualPath"></param>
         /// <param name="queryString"></param>
         /// <returns></returns>
-        public bool FileExists(string virtualPath, NameValueCollection queryString)
-        {
+        public bool FileExists(string virtualPath, NameValueCollection queryString) {
             var belongs = Belongs(virtualPath);
             if (LazyExistenceCheck)
                 return belongs;
             else
-                return belongs && AsyncUtils.RunSync<bool>( () => BlobExistsAsync(virtualPath, queryString));
+                return belongs && AsyncUtils.RunSync<bool>(() => BlobExistsAsync(virtualPath, queryString));
         }
 
-        public IVirtualFile GetFile(string virtualPath, NameValueCollection queryString)
-        {
-            if (!FileExists(virtualPath, queryString)) return null;
+        public IVirtualFile GetFile(string virtualPath, NameValueCollection queryString) {
+            if (!FileExists(virtualPath, queryString))
+                return null;
             return new Blob(this, virtualPath, queryString);
         }
 
-        public async Task<bool> FileExistsAsync(string virtualPath, NameValueCollection queryString)
-        {
+        public async Task<bool> FileExistsAsync(string virtualPath, NameValueCollection queryString) {
             var belongs = Belongs(virtualPath);
             if (LazyExistenceCheck)
                 return belongs;
@@ -212,9 +196,9 @@ namespace ImageResizer.Storage
                 return belongs && await BlobExistsAsync(virtualPath, queryString);
         }
 
-        public async Task<IVirtualFileAsync> GetFileAsync(string virtualPath, NameValueCollection queryString)
-        {
-            if (!await FileExistsAsync(virtualPath, queryString)) return null;
+        public async Task<IVirtualFileAsync> GetFileAsync(string virtualPath, NameValueCollection queryString) {
+            if (!await FileExistsAsync(virtualPath, queryString))
+                return null;
             return new Blob(this, virtualPath, queryString);
         }
 
@@ -224,8 +208,7 @@ namespace ImageResizer.Storage
         /// <param name="subPath"></param>
         /// <param name="queryString"></param>
         /// <returns></returns>
-        public async Task<bool> BlobExistsAsync(string virtualPath, NameValueCollection queryString)
-        {
+        public async Task<bool> BlobExistsAsync(string virtualPath, NameValueCollection queryString) {
             var m = await FetchMetadataCachedAsync(virtualPath, queryString);
             return m.Exists.Value;
         }
@@ -235,8 +218,7 @@ namespace ImageResizer.Storage
         /// <param name="virtualPath"></param>
         /// <param name="q"></param>
         /// <returns></returns>
-        public async Task<DateTime?> GetModifiedDateUtcAsync(string virtualPath, NameValueCollection queryString)
-        {
+        public async Task<DateTime?> GetModifiedDateUtcAsync(string virtualPath, NameValueCollection queryString) {
             var m = await FetchMetadataCachedAsync(virtualPath, queryString);
             return m.LastModifiedDateUtc;
         }
@@ -246,26 +228,23 @@ namespace ImageResizer.Storage
         /// </summary>
         /// <param name="virtualPath"></param>
         /// <returns></returns>
-        public bool VppExposeFile(string virtualPath)
-        {
+        public bool VppExposeFile(string virtualPath) {
             return ExposeAsVpp;
         }
 
         protected Configuration.Config c;
-        public virtual IPlugin Install(Configuration.Config c)
-        {
+        public virtual IPlugin Install(Configuration.Config c) {
             this.c = c;
             c.Plugins.add_plugin(this);
 
-            c.Pipeline.PostAuthorizeRequestStart +=Pipeline_PostAuthorizeRequestStart; 
-            c.Pipeline.RewriteDefaults +=Pipeline_RewriteDefaults;
-            c.Pipeline.PostRewrite +=Pipeline_PostRewrite; 
+            c.Pipeline.PostAuthorizeRequestStart += Pipeline_PostAuthorizeRequestStart;
+            c.Pipeline.RewriteDefaults += Pipeline_RewriteDefaults;
+            c.Pipeline.PostRewrite += Pipeline_PostRewrite;
 
             return this;
         }
 
-        void Pipeline_PostRewrite(System.Web.IHttpModule sender, System.Web.HttpContext context, Configuration.IUrlEventArgs e)
-        {
+        void Pipeline_PostRewrite(System.Web.IHttpModule sender, System.Web.HttpContext context, Configuration.IUrlEventArgs e) {
             //Only work with database images
             //If the data is untrusted, always re-encode each file.
             if (UntrustedData && Belongs(e.VirtualPath))
@@ -273,8 +252,7 @@ namespace ImageResizer.Storage
 
         }
 
-        void Pipeline_RewriteDefaults(System.Web.IHttpModule sender, System.Web.HttpContext context, Configuration.IUrlEventArgs e)
-        {
+        void Pipeline_RewriteDefaults(System.Web.IHttpModule sender, System.Web.HttpContext context, Configuration.IUrlEventArgs e) {
             //Only works with blob provided files
             //Non-images will be served as-is
             //Cache all file types, whether they are processed or not.
@@ -283,22 +261,27 @@ namespace ImageResizer.Storage
 
         }
 
-        void Pipeline_PostAuthorizeRequestStart(System.Web.IHttpModule sender, System.Web.HttpContext context)
-        {
+        void Pipeline_PostAuthorizeRequestStart(System.Web.IHttpModule sender, System.Web.HttpContext context) {
             //Only work with blob images
             //This allows us to resize database images without putting ".jpg" after the ID in the path.
             if ((!RequireImageExtension || UntrustedData) && Belongs(c.Pipeline.PreRewritePath))
                 c.Pipeline.SkipFileTypeCheck = true; //Skip the file extension check. FakeExtensions will still be stripped.
-         
+
         }
 
-        public virtual bool Uninstall(Configuration.Config c)
-        {
+        public virtual bool Uninstall(Configuration.Config c) {
             c.Pipeline.PostAuthorizeRequestStart -= Pipeline_PostAuthorizeRequestStart;
             c.Pipeline.RewriteDefaults -= Pipeline_RewriteDefaults;
-            c.Pipeline.PostRewrite -= Pipeline_PostRewrite; 
+            c.Pipeline.PostRewrite -= Pipeline_PostRewrite;
 
-            return c.Plugins.Uninstall(this);
+            try {
+                c.Plugins.remove_plugin(this);
+            }
+            catch (Exception) {
+                return false;
+            }
+
+            return true;
         }
 
     }

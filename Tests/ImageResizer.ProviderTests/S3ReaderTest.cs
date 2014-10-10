@@ -6,6 +6,8 @@ using System.Web;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.S3Reader2;
+using ImageResizer.Storage;
+using NSubstitute;
 using Xunit;
 
 namespace ImageResizer.ProviderTests {
@@ -18,7 +20,9 @@ namespace ImageResizer.ProviderTests {
     /// implementations of <see cref="IVirtualFile"/>.
     /// </remarks>
     public class S3ReaderTest {
-        private const string PathPrefix = "/s3/";
+        private IMetadataCache model;
+
+        private const string PathPrefix = "~/s3/";
 
         private const string Filename = "resizer-downloads/examples/fountain-small.jpg";
 
@@ -31,6 +35,11 @@ namespace ImageResizer.ProviderTests {
             HttpContext.Current = new HttpContext(
                 new HttpRequest(string.Empty, "http://tempuri.org", string.Empty),
                 new HttpResponse(new StringWriter(CultureInfo.InvariantCulture)));
+
+            object cachedValue = null;
+            this.model = Substitute.For<IMetadataCache>();
+            this.model.Get(Arg.Any<string>()).Returns(x => cachedValue);
+            this.model.When(x => x.Put(Arg.Any<string>(), Arg.Any<object>())).Do(x => cachedValue = x[1]);
         }
 
         /// <summary>
@@ -138,7 +147,8 @@ namespace ImageResizer.ProviderTests {
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
             IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((S3VirtualPathProvider)target).FastMode = false;
+            ((S3Reader2)target).LazyExistenceCheck = false;
+            ((S3Reader2)target).MetadataCache = model;
             string virtualPath = Path.Combine(PathPrefix, "resizer-downloads/examples/fountain-xxxx.jpg");
 
             // Act
@@ -160,7 +170,8 @@ namespace ImageResizer.ProviderTests {
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
             IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((S3VirtualPathProvider)target).FastMode = false;
+            ((S3Reader2)target).LazyExistenceCheck = false;
+            ((S3Reader2)target).MetadataCache = model;
             string virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
@@ -182,19 +193,10 @@ namespace ImageResizer.ProviderTests {
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
             IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            var targetAsVpp = (S3VirtualPathProvider)target;
-            targetAsVpp.FastMode = false;
-            targetAsVpp.MetadataSlidingExpiration = TimeSpan.Zero;
-            targetAsVpp.MetadataAbsoluteExpiration = new TimeSpan(1, 0, 0);
+            var targetAsVpp = (S3Reader2)target;
+            targetAsVpp.LazyExistenceCheck = false;
+            targetAsVpp.MetadataCache = model;
             string virtualPath = Path.Combine(PathPrefix, Filename);
-
-            // Clear the Cache to ensure our file isn't in there.
-            var enumerator = HttpContext.Current.Cache.GetEnumerator();
-            while (enumerator.MoveNext()) {
-                HttpContext.Current.Cache.Remove((string)enumerator.Key);
-            }
-
-            int preTestCount = HttpContext.Current.Cache.Count;
 
             // Ask for a file to be put in the cache.
             bool dummy = target.FileExists(virtualPath, null);
@@ -204,7 +206,8 @@ namespace ImageResizer.ProviderTests {
 
             // Assert
             Assert.Equal<bool>(expected, actual);
-            Assert.Equal<int>(preTestCount + 1, HttpContext.Current.Cache.Count);
+            this.model.Received(2).Get(Arg.Is<string>(x => x == virtualPath));
+            this.model.Received(1).Put(Arg.Is<string>(x => x == virtualPath), Arg.Any<object>());
         }
 
         /// <summary>
@@ -215,7 +218,6 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void GetFileInvalidFastMode() {
             // Arrange
-            bool expected = true;
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
             IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
@@ -226,8 +228,7 @@ namespace ImageResizer.ProviderTests {
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsAssignableFrom<S3File>(actual);
-            Assert.Equal<bool>(expected, ((S3File)actual).Exists);
+            Assert.IsAssignableFrom<Blob>(actual);
         }
 
         /// <summary>
@@ -238,20 +239,18 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void GetFileInvalidNotFastMode() {
             // Arrange
-            bool expected = false;
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
             IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((S3VirtualPathProvider)target).FastMode = false;
+            ((S3Reader2)target).LazyExistenceCheck = false;
+            ((S3Reader2)target).MetadataCache = model;
             string virtualPath = Path.Combine(PathPrefix, "resizer-downloads/examples/fountain-xxxx.jpg");
 
             // Act
             var actual = target.GetFile(virtualPath, null);
 
             // Assert
-            Assert.NotNull(actual);
-            Assert.IsAssignableFrom<S3File>(actual);
-            Assert.Equal<bool>(expected, ((S3File)actual).Exists);
+            Assert.Null(actual);
         }
 
         /// <summary>
@@ -262,7 +261,6 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void GetFileValidFastMode() {
             // Arrange
-            bool expected = true;
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
             IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
@@ -273,8 +271,7 @@ namespace ImageResizer.ProviderTests {
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsAssignableFrom<S3File>(actual);
-            Assert.Equal<bool>(expected, ((S3File)actual).Exists);
+            Assert.IsAssignableFrom<Blob>(actual);
         }
 
         /// <summary>
@@ -285,11 +282,11 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void GetFileValidNotFastMode() {
             // Arrange
-            bool expected = true;
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
             IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            ((S3VirtualPathProvider)target).FastMode = false;
+            ((S3Reader2)target).LazyExistenceCheck = false;
+            ((S3Reader2)target).MetadataCache = model;
             string virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
@@ -297,8 +294,7 @@ namespace ImageResizer.ProviderTests {
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsAssignableFrom<S3File>(actual);
-            Assert.Equal<bool>(expected, ((S3File)actual).Exists);
+            Assert.IsAssignableFrom<Blob>(actual);
         }
 
         /// <summary>
