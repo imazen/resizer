@@ -1,4 +1,4 @@
-﻿using ImageResizer.Configuration;
+using ImageResizer.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -27,11 +27,11 @@ namespace ImageResizer.Plugins.FastScaling.Tests
         [Fact]
         public void CheckForBlurredEdges()
         {
-            var  background = Color.FromArgb(255, 240, 200, 100);
+            var  background = Color.FromArgb(255, 0, 0, 0);
             var inner = Color.FromArgb(255, 240, 189, 35);
             var w = 200;
             var h = 86;
-            var margin = 10;
+            var margin = 6;
 
             var b = new Bitmap(w, h);
             using (var g = Graphics.FromImage(b))
