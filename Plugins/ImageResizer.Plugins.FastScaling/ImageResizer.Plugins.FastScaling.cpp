@@ -407,7 +407,7 @@ static inline LineContribType * _gdContributionsAlloc(unsigned int line_length, 
 	res->ContribRow = (ContributionType *)gdMalloc(line_length * sizeof(ContributionType));
 
 	for (u = 0; u < line_length; u++) {
-		res->ContribRow[u].Weights = (float *)gdMalloc(windows_size * sizeof(float));
+		res->ContribRow[u].Weights = (float *)gdMalloc(windows_size * sizeof(float) * 4);
 	}
 	return res;
 }
@@ -460,11 +460,15 @@ static inline LineContribType *_gdContributionsCalc(unsigned int line_size, unsi
 			}
 		}
 
+		float *weights = res->ContribRow[u].Weights;
+		
+
 		res->ContribRow[u].Left = iLeft;
 		res->ContribRow[u].Right = iRight;
 
 		for (iSrc = iLeft; iSrc <= iRight; iSrc++) {
-			dTotalWeight += (res->ContribRow[u].Weights[iSrc - iLeft] = scale_f_d * (*pFilter)(scale_f_d * (dCenter - (double)iSrc)));
+			
+			dTotalWeight += (weights[(iSrc - iLeft) * 4] = scale_f_d * (*pFilter)(scale_f_d * (dCenter - (double)iSrc)));
 		}
 
 		if (dTotalWeight < 0.0) {
@@ -474,19 +478,23 @@ static inline LineContribType *_gdContributionsCalc(unsigned int line_size, unsi
 
 		if (dTotalWeight > 0.0) {
 			for (iSrc = iLeft; iSrc <= iRight; iSrc++) {
-				res->ContribRow[u].Weights[iSrc - iLeft] /= dTotalWeight;
+				weights[(iSrc - iLeft) * 4] /= dTotalWeight;
 			}
+		}
+		for (iSrc = 0; iSrc <= (iRight - iLeft) * 4; iSrc+=4) {
+			weights[iSrc + 3] = weights[iSrc  + 2] = weights[iSrc  + 1] = weights[iSrc];
 		}
 	}
 	return res;
 }
 
 
-static inline void
+static void
 _gdScaleOneAxis(gdImagePtr pSrc, gdImagePtr dst,
 unsigned int dst_len, unsigned int row, LineContribType *contrib,
 gdAxis axis, float *source_buffer, unsigned int source_buffer_len, float *dest_buffer, unsigned int dest_buffer_len)
 {
+	
 	unsigned int ndx;
 	unsigned int source_pixel_count = source_buffer_len / 4;
 
@@ -494,45 +502,30 @@ gdAxis axis, float *source_buffer, unsigned int source_buffer_len, float *dest_b
 	unsigned int **destPixels = dst->tpixels;
 
 	unsigned int bix;
-	if (axis == HORIZONTAL){
-		for (bix = 0; bix < source_buffer_len; bix++){
-			source_buffer[bix] = (float)((unsigned char *)sourcePixels[row])[bix];
-		}
+	for (bix = 0; bix < source_pixel_count; bix++){
+		source_buffer[bix] = (float)gdTrueColorGetRed((axis == HORIZONTAL) ? sourcePixels[row][bix] : sourcePixels[bix][row]);
+		source_buffer[source_pixel_count + bix] = (float)gdTrueColorGetGreen((axis == HORIZONTAL) ? sourcePixels[row][bix] : sourcePixels[bix][row]);
+		source_buffer[source_pixel_count * 2 + bix] = (float)gdTrueColorGetBlue((axis == HORIZONTAL) ? sourcePixels[row][bix] : sourcePixels[bix][row]);
+		source_buffer[source_pixel_count * 3 + bix] = (float)gdTrueColorGetAlpha((axis == HORIZONTAL) ? sourcePixels[row][bix] : sourcePixels[bix][row]);
 	}
-	else{
-		for (bix = 0; bix < source_pixel_count; bix++){
-			unsigned char * spix = (unsigned char *)sourcePixels[bix] + (row * 4);
-			source_buffer[bix * 4] = (float)*spix; spix++;
-			source_buffer[bix * 4 + 1] = (float)*(spix); spix++;
-			source_buffer[bix * 4 + 2] = (float)*(spix); spix++;
-			source_buffer[bix * 4 + 3] = (float)*(spix);
-		}
-	}
-
+	
+	int channel;
 
 	for (ndx = 0; ndx < dst_len; ndx++) {
-		float r = 0, g = 0, b = 0, a = 0;
 		const int left = contrib->ContribRow[ndx].Left;
 		const int right = contrib->ContribRow[ndx].Right;
 
 		int i;
 
-		/* Accumulate each channel */
-		for (i = left; i <= right; i++) {
-			const float weight = contrib->ContribRow[ndx].Weights[i - left];
+		float *weights = contrib->ContribRow[ndx].Weights;
 
-
-			a += weight * source_buffer[i * 4];
-			r += weight * source_buffer[i * 4 + 1];
-			g += weight * source_buffer[i * 4 + 2];
-			b += weight * source_buffer[i * 4 + 3];
-		}/* for */
-	
-		dest_buffer[ndx * 4] = a;
-		dest_buffer[ndx * 4 + 1] = r;
-		dest_buffer[ndx * 4 + 2] = g;
-		dest_buffer[ndx * 4 + 3] = b;
-
+		for (channel = 1; channel <= 4; channel++){
+			const int dest_float = ndx * channel;
+			const int source_start = left * channel;
+			for (i = 0; i <= (right-left) * channel; i++) {
+				dest_buffer[dest_float] += weights[i] * source_buffer[i + source_start];
+			}
+		}
 
 	}
 	
@@ -541,11 +534,12 @@ gdAxis axis, float *source_buffer, unsigned int source_buffer_len, float *dest_b
 			&destPixels[row][bix] :
 			&destPixels[bix][row];
 		
-		*dest = gdTrueColorAlpha(uchar_clamp(dest_buffer[bix * 4], 0xFF),
-			uchar_clamp(dest_buffer[bix * 4 + 1], 0xFF),
-			uchar_clamp(dest_buffer[bix * 4 + 2], 0xFF),
-			uchar_clamp(dest_buffer[bix * 4 + 3], 0xFF),); /* alpha is 0..127 */
+		*dest = gdTrueColorAlpha(uchar_clamp(dest_buffer[bix], 0xFF), uchar_clamp(dest_buffer[dst_len + bix], 0xFF),
+			uchar_clamp(dest_buffer[dst_len * 2 + bix], 0xFF),
+			uchar_clamp(dest_buffer[dst_len * 3 + bix], 0xFF)); /* alpha is 0..127 */
 	}
+
+
 	/* for */
 }/* _gdScaleOneAxis*/
 
@@ -631,14 +625,6 @@ const unsigned int new_height)
 }/* gdImageScaleTwoPass*/
 
 
-static void unpack24bitRow(int width, void * sourceLine, unsigned int * destArray){
-	for (int i = 0; i < width; i++){
-		destArray[i] = (*(unsigned int *)((long)sourceLine + (i * 3))) | 0xFF000000;
-	}
-}
-
-
-
 
 #pragma managed
 
@@ -647,7 +633,7 @@ using namespace System;
 using namespace System::Drawing;
 using namespace System::Drawing::Imaging;
 using namespace ImageResizer::Resizing;
-using namespace System::Diagnostics;
+
 namespace ImageResizer{
 	namespace Plugins{
 		namespace FastScaling {
@@ -660,7 +646,7 @@ namespace ImageResizer{
 					gdImagePtr gdResult;
 					try{
 						gdSource = BitmapToGd(source, crop);
-						gdResult = Scale(gdSource, target.Width, target.Height);
+						gdResult = gdImageScaleTwoPass(gdSource, target.Width, target.Height);
 						CopyGdToBitmap(gdResult, dest, target);
 					}finally{
 						if (gdSource != 0) {
@@ -674,13 +660,8 @@ namespace ImageResizer{
 
 					}
 				}
-				 
 
 			private:
-
-				gdImagePtr Scale(gdImagePtr source, int width, int height){
-					return  gdImageScaleTwoPass(source, width, height);
-				}
 
 				void CopyGdToBitmap(gdImagePtr source, Bitmap^ target, Rectangle targetArea){
 					if (target->PixelFormat != PixelFormat::Format32bppArgb){
@@ -756,7 +737,9 @@ namespace ImageResizer{
 									memcpy(im->tpixels[i], linePtr, sx * 4);
 								}
 								else{
-									unpack24bitRow(sx, linePtr, im->tpixels[i]);
+									for (j = 0; j < sx; j++){
+										im->tpixels[i][j] = (*(unsigned int *)((long)linePtr + (j * 3))) | 0xFF000000;
+									}
 								}
 							}
 
