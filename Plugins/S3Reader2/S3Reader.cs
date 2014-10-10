@@ -171,7 +171,7 @@ namespace ImageResizer.Plugins.S3Reader2 {
 
 
         
-        public IPlugin Install(Configuration.Config c) {
+        public override IPlugin Install(Configuration.Config c) {
 
             if (AllowedBuckets.Length < 1)
                 c.configurationSectionIssues.AcceptIssue(new Issue("S3Reader", "S3Reader cannot function without a list of permitted bucket names.",
@@ -179,11 +179,17 @@ namespace ImageResizer.Plugins.S3Reader2 {
                  IssueSeverity.ConfigurationError));
 
             this.PreS3RequestFilter += S3Reader2_PreS3RequestFilter;
-           
-            c.Plugins.Install(this);
+
+            base.Install(c);
             
             return this;
 
+        }
+
+        public override bool Uninstall(Configuration.Config c)
+        {
+            this.PreS3RequestFilter -= S3Reader2_PreS3RequestFilter;
+            return base.Uninstall(c);
         }
 
         void S3Reader2_PreS3RequestFilter(S3Reader2 sender, S3PathEventArgs e)

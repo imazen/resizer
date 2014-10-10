@@ -298,13 +298,8 @@ namespace ImageResizer.Storage
             c.Pipeline.RewriteDefaults -= Pipeline_RewriteDefaults;
             c.Pipeline.PostRewrite -= Pipeline_PostRewrite;
 
-            try {
-                c.Plugins.remove_plugin(this);
-            }
-            catch (Exception) {
-                return false;
-            }
-
+            c.Plugins.remove_plugin(this);
+            
             return true;
         }
 

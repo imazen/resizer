@@ -140,6 +140,12 @@ namespace ImageResizer.Plugins.AzureReader2 {
             return this;
         }
 
+        public override bool Uninstall(Configuration.Config c)
+        {
+            c.Pipeline.PostRewrite -= Pipeline_PostRewrite;
+            return base.Uninstall(c);
+        }
+
         /// <summary>
         /// In case there is no querystring attached to the file (thus no operations on the fly) we can
         /// redirect directly to the blob. This let us offload traffic to blob storage
