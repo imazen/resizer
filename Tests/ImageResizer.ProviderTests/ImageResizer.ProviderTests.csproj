@@ -98,6 +98,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="TinyCacheTest.cs" />
     <Compile Include="AzureReaderTest.cs" />
     <Compile Include="CloudStorageEmulatorShepherd.cs" />
     <Compile Include="MongoReaderTest.cs" />
@@ -138,6 +139,10 @@
     <ProjectReference Include="..\..\Plugins\SqlReader\ImageResizer.Plugins.SqlReader.csproj">
       <Project>{2ab0fc98-8ad5-4d2a-bf06-0ea4dcf8764d}</Project>
       <Name>ImageResizer.Plugins.SqlReader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\TinyCache\ImageResizer.Plugins.TinyCache.csproj">
+      <Project>{e879e2dd-cdbf-4749-88b7-6d15de4e7c11}</Project>
+      <Name>ImageResizer.Plugins.TinyCache</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
