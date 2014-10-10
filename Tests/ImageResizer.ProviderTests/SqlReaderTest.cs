@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Data.SqlClient;
 using System.Drawing;
@@ -334,7 +334,6 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void GetFileInvalidWithoutCheckForModifiedFiles() {
             // Arrange
-            bool expected = true;
             IVirtualImageProvider target = this.CreateSqlReaderPlugin();
             var settings = (SqlReaderPlugin)target;
             string virtualPath = Path.Combine(settings.VirtualFilesystemPrefix, dummyDatabaseRecordId.ToString("B"));
@@ -355,7 +354,6 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void GetFileInvalidWithCheckForModifiedFiles() {
             // Arrange
-            bool expected = false;
             IVirtualImageProvider target = this.CreateSqlReaderPlugin();
             var settings = (SqlReaderPlugin)target;
             settings.CheckForModifiedFiles = true;
@@ -378,8 +376,7 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void GetFileValidWithoutCheckForModifiedFiles() {
             // Arrange
-            bool expected = true;
-            Guid id = this.realDatabaseRecordId; ////this.CreateFileInDatabase();
+            Guid id = this.realDatabaseRecordId; 
             IVirtualImageProvider target = this.CreateSqlReaderPlugin();
             var settings = (SqlReaderPlugin)target;
             string virtualPath = Path.Combine(settings.VirtualFilesystemPrefix, id.ToString("B"));
