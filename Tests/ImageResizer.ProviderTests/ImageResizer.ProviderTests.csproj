@@ -68,6 +68,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="NSubstitute">
+      <HintPath>..\..\Packages\NSubstitute.1.7.2.0\lib\NET45\NSubstitute.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
@@ -95,9 +98,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="AzureReaderTest.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="AzureReaderTest.cs" />
     <Compile Include="CloudStorageEmulatorShepherd.cs" />
     <Compile Include="MongoReaderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

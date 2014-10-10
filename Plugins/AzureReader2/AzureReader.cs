@@ -1,20 +1,14 @@
 ﻿/* Copyright (c) 2011 Wouter A. Alberts and Nathanael D. Jones. See license.txt for your rights. */
 using System;
 using System.Collections.Specialized;
-using System.Web;
-using System.Web.Hosting;
-using ImageResizer.Util;
-using System.Collections.Generic;
-using ImageResizer.Configuration.Issues;
-using System.Security;
-using ImageResizer.Configuration.Xml;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Storage.Blob;
-using ImageResizer.Storage;
-using ImageResizer.ExtensionMethods;
 using System.IO;
 using System.Threading.Tasks;
+using System.Web;
+using ImageResizer.ExtensionMethods;
+using ImageResizer.Storage;
+using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace ImageResizer.Plugins.AzureReader2 {
 
@@ -28,19 +22,18 @@ namespace ImageResizer.Plugins.AzureReader2 {
         public bool RedirectToBlobIfUnmodified { get; set; }
 
         public AzureReader2Plugin()
-            : base()
-        {
+            : base() {
 
         }
-        public AzureReader2Plugin(NameValueCollection args):base() {
+        public AzureReader2Plugin(NameValueCollection args)
+            : base() {
             LoadConfiguration(args);
             blobStorageConnection = args["connectionstring"];
-            blobStorageEndpoint = args.GetAsString("blobstorageendpoint", args.GetAsString("endpoint",null));
-       }
+            blobStorageEndpoint = args.GetAsString("blobstorageendpoint", args.GetAsString("endpoint", null));
+        }
 
 
-        protected Task<ICloudBlob> GetBlobRefAsync(string virtualPath)
-        {
+        protected Task<ICloudBlob> GetBlobRefAsync(string virtualPath) {
             string subPath = StripPrefix(virtualPath).Trim('/', '\\');
 
             string containerName = subPath.TrimStart(new char[] { '/', '\\' });
@@ -56,61 +49,51 @@ namespace ImageResizer.Plugins.AzureReader2 {
 
             return CloudBlobClient.GetBlobReferenceFromServerAsync(new Uri(relativeBlobURL));
         }
-        public override async Task<IBlobMetadata> FetchMetadataAsync(string virtualPath, NameValueCollection queryString)
-        {
-            
-            try
-            {
+        public override async Task<IBlobMetadata> FetchMetadataAsync(string virtualPath, NameValueCollection queryString) {
+
+            try {
                 var cloudBlob = await GetBlobRefAsync(virtualPath);
-                
+
                 var meta = new BlobMetadata();
                 meta.Exists = true; //Otherwise an exception would have happened at FetchAttributes
                 var utc = cloudBlob.Properties.LastModified;
-                if (utc != null)
-                {
+                if (utc != null) {
                     meta.LastModifiedDateUtc = utc.Value.UtcDateTime;
                 }
                 return meta;
             }
-            catch (StorageException e)
-            {
-                if (e.RequestInformation.HttpStatusCode == 404)
-                {
+            catch (StorageException e) {
+                if (e.RequestInformation.HttpStatusCode == 404) {
                     return new BlobMetadata() { Exists = false };
                 }
-                else
-                {
+                else {
                     throw;
                 }
             }
         }
 
-        public override async Task<Stream> OpenAsync(string virtualPath, NameValueCollection queryString)
-        {
+        public override async Task<Stream> OpenAsync(string virtualPath, NameValueCollection queryString) {
 
             MemoryStream ms = new MemoryStream(4096); // 4kb is a good starting point.
 
             // Synchronously download
-            try
-            {
+            try {
                 var cloudBlob = await GetBlobRefAsync(virtualPath);
                 await cloudBlob.DownloadToStreamAsync(ms);
             }
-            catch (StorageException e)
-            {
-                if (e.RequestInformation.HttpStatusCode == 404)
-                {
+            catch (StorageException e) {
+                if (e.RequestInformation.HttpStatusCode == 404) {
                     throw new FileNotFoundException("Azure blob file not found", e);
                 }
                 throw;
-                
+
             }
 
             ms.Seek(0, SeekOrigin.Begin); // Reset to beginning
             return ms;
         }
 
-        public IPlugin Install(Configuration.Config c) {
+        public override IPlugin Install(Configuration.Config c) {
             if (string.IsNullOrEmpty(blobStorageConnection))
                 throw new InvalidOperationException("AzureReader2 requires a named connection string or a connection string to be specified with the 'connectionString' attribute.");
 
@@ -118,14 +101,15 @@ namespace ImageResizer.Plugins.AzureReader2 {
             //Lookup named connection string first, then fall back.
             var connectionString = CloudConfigurationManager.GetSetting(blobStorageConnection);
             if (string.IsNullOrEmpty(connectionString)) { connectionString = blobStorageConnection; }
-            
+
 
             CloudStorageAccount cloudStorageAccount;
-            if (CloudStorageAccount.TryParse(connectionString, out cloudStorageAccount)){
-                if (string.IsNullOrEmpty(blobStorageEndpoint)){
+            if (CloudStorageAccount.TryParse(connectionString, out cloudStorageAccount)) {
+                if (string.IsNullOrEmpty(blobStorageEndpoint)) {
                     blobStorageEndpoint = cloudStorageAccount.BlobEndpoint.ToString();
                 }
-            }else{
+            }
+            else {
                 throw new InvalidOperationException("Invalid AzureReader2 connectionString value; rejected by Azure SDK.");
             }
             if (!blobStorageEndpoint.EndsWith("/"))
@@ -135,7 +119,8 @@ namespace ImageResizer.Plugins.AzureReader2 {
             // Register rewrite
             c.Pipeline.PostRewrite += Pipeline_PostRewrite;
 
-            c.Plugins.add_plugin(this);
+            base.Install(c);
+            //c.Plugins.add_plugin(this);
 
             return this;
         }

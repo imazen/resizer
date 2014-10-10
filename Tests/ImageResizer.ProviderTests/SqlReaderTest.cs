@@ -2,10 +2,14 @@
 using System.Collections.Specialized;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Web;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.SqlReader;
+using ImageResizer.Storage;
+using NSubstitute;
 using Xunit;
 
 namespace ImageResizer.ProviderTests {
@@ -18,6 +22,8 @@ namespace ImageResizer.ProviderTests {
     /// implementations of <see cref="IVirtualFile"/>.
     /// </remarks>
     public class SqlReaderTest {
+        private IMetadataCache model;
+
         /// <summary>
         /// A GUID that can be used to represent a file that does not exist.
         /// </summary>
@@ -41,6 +47,13 @@ namespace ImageResizer.ProviderTests {
                 "DataDirectory",
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data"));
 
+            HttpContext.Current = new HttpContext(
+                new HttpRequest(string.Empty, "http://tempuri.org", string.Empty),
+                new HttpResponse(new StringWriter(CultureInfo.InvariantCulture)));
+
+            this.model = Substitute.For<IMetadataCache>();
+            this.model.Get(Arg.Any<string>()).Returns(x => null);
+
             // SQL Server does not have permissions on the executable folder in 
             // AppVeyor to attach a LocalDB database. So we create a database in Full
             // SQL Server as we do have sa privileges.
@@ -57,10 +70,9 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void SettingsConstructor() {
             // Arrange
-            var settings = this.Settings;
 
             // Act
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
 
             // Assert
             Assert.NotNull(target);
@@ -93,9 +105,9 @@ namespace ImageResizer.ProviderTests {
         public void FileExistsWithNullQueryString() {
             // Arrange
             bool expected = true;
-            var settings = this.Settings;
-            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("B"));
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
+            var settings = (SqlReaderPlugin)target;
+            string virtualPath = Path.Combine(settings.VirtualFilesystemPrefix, dummyDatabaseRecordId.ToString("B"));
 
             // Act
             bool actual = target.FileExists(virtualPath, null);
@@ -113,16 +125,18 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void FileExistsWithInvalidGuidId() {
             // Arrange
-            bool expected = false;
-            var settings = this.Settings;
-            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("B").Substring(0, 5));
-            IVirtualImageProvider target = new SqlReaderPlugin();
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
+            var settings = (SqlReaderPlugin)target;
+            settings.LazyExistenceCheck = false;
+            settings.MetadataCache = model;
+            string virtualPath = Path.Combine(settings.VirtualFilesystemPrefix, dummyDatabaseRecordId.ToString("B").Substring(0, 5));
 
             // Act
-            bool actual = target.FileExists(virtualPath, null);
+            var actual = Assert.Throws<ArgumentNullException>(() => target.FileExists(virtualPath, null));
 
             // Assert
-            Assert.Equal<bool>(expected, actual);
+            Assert.NotNull(actual);
+            Assert.IsType<ArgumentNullException>(actual);
         }
 
         /// <summary>
@@ -135,10 +149,10 @@ namespace ImageResizer.ProviderTests {
         public void FileExistsWithStringImageIdType() {
             // Arrange
             bool expected = true;
-            var settings = this.Settings;
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
+            var settings = (SqlReaderPlugin)target;
             settings.ImageIdType = System.Data.SqlDbType.NVarChar;
-            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("B") + ".jpg");
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            string virtualPath = Path.Combine(settings.VirtualFilesystemPrefix, dummyDatabaseRecordId.ToString("B") + ".jpg");
 
             // Act
             bool actual = target.FileExists(virtualPath, null);
@@ -157,10 +171,10 @@ namespace ImageResizer.ProviderTests {
         public void FileExistsWithIntegerImageIdType() {
             // Arrange
             bool expected = true;
-            var settings = this.Settings;
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
+            var settings = (SqlReaderPlugin)target;
             settings.ImageIdType = System.Data.SqlDbType.Int;
-            string virtualPath = Path.Combine(settings.PathPrefix, "22");
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            string virtualPath = Path.Combine(settings.VirtualFilesystemPrefix, "22");
 
             // Act
             bool actual = target.FileExists(virtualPath, null);
@@ -178,17 +192,19 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void FileExistsWithInvalidIntegerImageIdType() {
             // Arrange
-            bool expected = false;
-            var settings = this.Settings;
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
+            var settings = (SqlReaderPlugin)target;
             settings.ImageIdType = System.Data.SqlDbType.Int;
-            string virtualPath = Path.Combine(settings.PathPrefix, "TEST");
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            settings.LazyExistenceCheck = false;
+            settings.MetadataCache = model;
+            string virtualPath = Path.Combine(settings.VirtualFilesystemPrefix, "TEST");
 
             // Act
-            bool actual = target.FileExists(virtualPath, null);
+            var actual = Assert.Throws<ArgumentNullException>(() => target.FileExists(virtualPath, null));
 
             // Assert
-            Assert.Equal<bool>(expected, actual);
+            Assert.NotNull(actual);
+            Assert.IsType<ArgumentNullException>(actual);
         }
 
         /// <summary>
@@ -200,17 +216,19 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void FileExistsWithEmptyStringImageIdType() {
             // Arrange
-            bool expected = false;
-            var settings = this.Settings;
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
+            var settings = (SqlReaderPlugin)target;
+            settings.LazyExistenceCheck = false;
+            settings.MetadataCache = model;
             settings.ImageIdType = System.Data.SqlDbType.NVarChar;
-            string virtualPath = Path.Combine(settings.PathPrefix, string.Empty);
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            string virtualPath = Path.Combine(settings.VirtualFilesystemPrefix, string.Empty);
 
             // Act
-            bool actual = target.FileExists(virtualPath, null);
+            var actual = Assert.Throws<SqlException>(() => target.FileExists(virtualPath, null));
 
             // Assert
-            Assert.Equal<bool>(expected, actual);
+            Assert.NotNull(actual);
+            Assert.IsType<SqlException>(actual);
         }
 
         /// <summary>
@@ -219,8 +237,7 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void FileExistsWithNullVirtualPath() {
             // Arrange
-            var settings = this.Settings;
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
 
             // Act
             var actual = Assert.Throws<NullReferenceException>(() => target.FileExists(null, null));
@@ -237,8 +254,7 @@ namespace ImageResizer.ProviderTests {
         public void FileExistsWithEmptyVirtualPath() {
             // Arrange
             bool expected = false;
-            var settings = this.Settings;
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
 
             // Act
             var actual = target.FileExists(string.Empty, null);
@@ -255,9 +271,9 @@ namespace ImageResizer.ProviderTests {
         public void FileExistsWithoutVirtualPath() {
             // Arrange
             bool expected = false;
-            var settings = this.Settings;
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
+            var settings = (SqlReaderPlugin)target;
             string virtualPath = dummyDatabaseRecordId.ToString("B");
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
 
             // Act
             bool actual = target.FileExists(virtualPath, null);
@@ -275,10 +291,11 @@ namespace ImageResizer.ProviderTests {
         public void FileExistCheckForModifiedFilesFileNotExisting() {
             // Arrange
             bool expected = false;
-            var settings = this.Settings;
-            settings.CheckForModifiedFiles = true;
-            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("B"));
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
+            var settings = (SqlReaderPlugin)target;
+            settings.LazyExistenceCheck = false;
+            settings.MetadataCache = model;
+            string virtualPath = Path.Combine(settings.VirtualFilesystemPrefix, dummyDatabaseRecordId.ToString("B"));
 
             // Act
             bool actual = target.FileExists(virtualPath, null);
@@ -297,10 +314,10 @@ namespace ImageResizer.ProviderTests {
             // Arrange
             Guid id = this.realDatabaseRecordId; ////this.CreateFileInDatabase();
             bool expected = true;
-            var settings = this.Settings;
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
+            var settings = (SqlReaderPlugin)target;
             settings.CheckForModifiedFiles = true;
-            string virtualPath = Path.Combine(settings.PathPrefix, id.ToString("B"));
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            string virtualPath = Path.Combine(settings.VirtualFilesystemPrefix, id.ToString("B"));
 
             // Act
             bool actual = target.FileExists(virtualPath, null);
@@ -318,17 +335,16 @@ namespace ImageResizer.ProviderTests {
         public void GetFileInvalidWithoutCheckForModifiedFiles() {
             // Arrange
             bool expected = true;
-            var settings = this.Settings;
-            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("B"));
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
+            var settings = (SqlReaderPlugin)target;
+            string virtualPath = Path.Combine(settings.VirtualFilesystemPrefix, dummyDatabaseRecordId.ToString("B"));
 
             // Act
             var actual = target.GetFile(virtualPath, null);
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsAssignableFrom<DatabaseFile>(actual);
-            Assert.Equal<bool>(expected, ((DatabaseFile)actual).Exists);
+            Assert.IsAssignableFrom<Blob>(actual);
         }
 
         /// <summary>
@@ -340,18 +356,17 @@ namespace ImageResizer.ProviderTests {
         public void GetFileInvalidWithCheckForModifiedFiles() {
             // Arrange
             bool expected = false;
-            var settings = this.Settings;
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
+            var settings = (SqlReaderPlugin)target;
             settings.CheckForModifiedFiles = true;
-            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("B"));
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            string virtualPath = Path.Combine(settings.VirtualFilesystemPrefix, dummyDatabaseRecordId.ToString("B"));
 
             // Act
             var actual = target.GetFile(virtualPath, null);
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsAssignableFrom<DatabaseFile>(actual);
-            Assert.Equal<bool>(expected, ((DatabaseFile)actual).Exists);
+            Assert.IsAssignableFrom<Blob>(actual);
             Assert.Equal<string>(virtualPath, actual.VirtualPath);
         }
 
@@ -365,17 +380,16 @@ namespace ImageResizer.ProviderTests {
             // Arrange
             bool expected = true;
             Guid id = this.realDatabaseRecordId; ////this.CreateFileInDatabase();
-            var settings = this.Settings;
-            string virtualPath = Path.Combine(settings.PathPrefix, id.ToString("B"));
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
+            var settings = (SqlReaderPlugin)target;
+            string virtualPath = Path.Combine(settings.VirtualFilesystemPrefix, id.ToString("B"));
 
             // Act
             var actual = target.GetFile(virtualPath, null);
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsAssignableFrom<DatabaseFile>(actual);
-            Assert.Equal<bool>(expected, ((DatabaseFile)actual).Exists);
+            Assert.IsAssignableFrom<Blob>(actual);
             Assert.Equal<string>(virtualPath, actual.VirtualPath);
         }
 
@@ -387,20 +401,18 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void GetFileValidWithCheckForModifiedFiles() {
             // Arrange
-            bool expected = true;
             Guid id = this.realDatabaseRecordId; ////this.CreateFileInDatabase();
-            var settings = this.Settings;
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
+            var settings = (SqlReaderPlugin)target;
             settings.CheckForModifiedFiles = true;
-            string virtualPath = Path.Combine(settings.PathPrefix, id.ToString("B"));
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            string virtualPath = Path.Combine(settings.VirtualFilesystemPrefix, id.ToString("B"));
 
             // Act
             var actual = target.GetFile(virtualPath, null);
 
             // Assert
             Assert.NotNull(actual);
-            Assert.IsAssignableFrom<DatabaseFile>(actual);
-            Assert.Equal<bool>(expected, ((DatabaseFile)actual).Exists);
+            Assert.IsAssignableFrom<Blob>(actual);
             Assert.Equal<string>(virtualPath, actual.VirtualPath);
         }
 
@@ -411,9 +423,8 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void GetFileWithoutVirtualPathPrefix() {
             // Arrange
-            var settings = this.Settings;
             string virtualPath = dummyDatabaseRecordId.ToString("B");
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
 
             // Act
             var actual = target.GetFile(virtualPath, null);
@@ -428,8 +439,7 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void GetFileWithNullVirtualPath() {
             // Arrange
-            var settings = this.Settings;
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
 
             // Act
             var actual = Assert.Throws<NullReferenceException>(() => target.GetFile(null, null));
@@ -445,8 +455,7 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void GetFileWithEmptyVirtualPath() {
             // Arrange
-            var settings = this.Settings;
-            IVirtualImageProvider target = new SqlReaderPlugin(settings);
+            IVirtualImageProvider target = this.CreateSqlReaderPlugin();
 
             // Act
             var actual = target.GetFile(string.Empty, null);
@@ -463,9 +472,9 @@ namespace ImageResizer.ProviderTests {
         public void OpenValidId() {
             // Arrange
             Guid id = this.realDatabaseRecordId; ////this.CreateFileInDatabase();
-            var settings = this.Settings;
-            string virtualPath = Path.Combine(settings.PathPrefix, id.ToString("B"));
-            IVirtualImageProvider reader = new SqlReaderPlugin(settings);
+            IVirtualImageProvider reader = this.CreateSqlReaderPlugin();
+            var settings = (SqlReaderPlugin)reader;
+            string virtualPath = Path.Combine(settings.VirtualFilesystemPrefix, id.ToString("B"));
             var target = reader.GetFile(virtualPath, null);
 
             // Act
@@ -483,9 +492,9 @@ namespace ImageResizer.ProviderTests {
         [Fact]
         public void OpenInvalidId() {
             // Arrange
-            var settings = this.Settings;
-            string virtualPath = Path.Combine(settings.PathPrefix, dummyDatabaseRecordId.ToString("B"));
-            IVirtualImageProvider reader = new SqlReaderPlugin(settings);
+            IVirtualImageProvider reader = this.CreateSqlReaderPlugin();
+            var settings = (SqlReaderPlugin)reader;
+            string virtualPath = Path.Combine(settings.VirtualFilesystemPrefix, dummyDatabaseRecordId.ToString("B"));
             var target = reader.GetFile(virtualPath, null);
 
             // Act
@@ -502,10 +511,10 @@ namespace ImageResizer.ProviderTests {
         /// </summary>
         private SqlReaderPlugin CreateSqlReaderPlugin() {
             var p = new SqlReaderPlugin();
-            
+
             // This is for LocalDB 2012. If you are using LocalDB 2014 change "v11.0" to "MSSQLLocalDB". 
             p.ConnectionString = @"Server=(LocalDb)\v11.0;AttachDbFilename=|DataDirectory|database.mdf;Integrated Security=true;";
-                    
+
             // This is for full SQL Server.
             ////ConnectionString = @"Data Source=.;Integrated Security=true;Initial Catalog=Resizer;AttachDbFilename=|DataDirectory|database.mdf;",
             p.VirtualFilesystemPrefix = @"/databaseimages/";
@@ -515,15 +524,15 @@ namespace ImageResizer.ProviderTests {
             p.ModifiedDateQuery = "Select ModifiedDate, CreatedDate From Images WHERE ImageID=@id";
             p.CacheUnmodifiedFiles = true;
             p.RequireImageExtension = false;
-            p.CheckForModifiedFiles = false;
-               
+            p.LazyExistenceCheck = true;
+
 
             if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
                 p.ConnectionString = @"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Database=Resizer;";
             }
 
             return p;
-            
+
         }
 
         /// <summary>
@@ -551,7 +560,7 @@ namespace ImageResizer.ProviderTests {
         /// <returns>The id of the record created.</returns>
         private Guid StoreFile(byte[] data, string extension, string fileName) {
             Guid id = Guid.Empty;
-            using (SqlConnection conn = new SqlConnection(this.Settings.ConnectionString)) {
+            using (SqlConnection conn = new SqlConnection(this.CreateSqlReaderPlugin().ConnectionString)) {
                 conn.Open();
                 id = Guid.NewGuid();
 
@@ -590,7 +599,7 @@ namespace ImageResizer.ProviderTests {
                     conn)) {
                     databaseCreated = (int)sc.ExecuteScalar() != 0;
                 }
-    
+
                 if (!databaseCreated) {
                     using (SqlCommand sc = new SqlCommand(
                         "USE [master]; CREATE DATABASE [Resizer];",
