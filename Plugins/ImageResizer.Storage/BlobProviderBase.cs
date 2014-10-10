@@ -296,9 +296,16 @@ namespace ImageResizer.Storage
         {
             c.Pipeline.PostAuthorizeRequestStart -= Pipeline_PostAuthorizeRequestStart;
             c.Pipeline.RewriteDefaults -= Pipeline_RewriteDefaults;
-            c.Pipeline.PostRewrite -= Pipeline_PostRewrite; 
+            c.Pipeline.PostRewrite -= Pipeline_PostRewrite;
 
-            return c.Plugins.Uninstall(this);
+            try {
+                c.Plugins.remove_plugin(this);
+            }
+            catch (Exception) {
+                return false;
+            }
+
+            return true;
         }
 
     }

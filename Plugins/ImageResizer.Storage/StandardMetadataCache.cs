@@ -51,12 +51,12 @@ namespace ImageResizer.Storage
 
         public object Get(string key)
         {
-            return HttpContext.Current.Cache.Get(key);
+            return HttpRuntime.Cache.Get(key);
         }
 
         public void Put(string key, object data)
         {
-            HttpContext.Current.Cache.Insert(key, data, null, MetadataAbsoluteExpiration == TimeSpan.MaxValue ? DateTime.MaxValue : DateTime.UtcNow.Add(MetadataAbsoluteExpiration), MetadataSlidingExpiration);
+            HttpRuntime.Cache.Insert(key, data, null, MetadataAbsoluteExpiration == TimeSpan.MaxValue ? DateTime.MaxValue : DateTime.UtcNow.Add(MetadataAbsoluteExpiration), MetadataSlidingExpiration);
         }
     }
 }

@@ -110,7 +110,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
             return ms;
         }
 
-        public IPlugin Install(Configuration.Config c) {
+        public override IPlugin Install(Configuration.Config c) {
             if (string.IsNullOrEmpty(blobStorageConnection))
                 throw new InvalidOperationException("AzureReader2 requires a named connection string or a connection string to be specified with the 'connectionString' attribute.");
 
@@ -135,7 +135,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
             // Register rewrite
             c.Pipeline.PostRewrite += Pipeline_PostRewrite;
 
-            c.Plugins.add_plugin(this);
+            base.Install(c);
 
             return this;
         }
