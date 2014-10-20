@@ -859,15 +859,21 @@ namespace ImageResizer
             s.copyAttibutes.SetWrapMode(WrapMode.TileFlipXY);
             if (s.preRenderBitmap != null) {
                 using (Bitmap b = s.preRenderBitmap) { //Dispose the intermediate bitmap aggressively
-                    s.destGraphics.DrawImage(s.preRenderBitmap, PolygonMath.getParallelogram(s.layout["image"]), 
-                        s.copyRect, GraphicsUnit.Pixel, s.copyAttibutes);
+                    this.InternalGraphicsDrawImage(s, s.destBitmap, s.preRenderBitmap, PolygonMath.getParallelogram(s.layout["image"]), 
+                        s.copyRect, s.copyAttibutes);
                 }
-            } else {
-                s.destGraphics.DrawImage(s.sourceBitmap, PolygonMath.getParallelogram(s.layout["image"]), s.copyRect, GraphicsUnit.Pixel, s.copyAttibutes);
+            } else { 
+                this.InternalGraphicsDrawImage(s,s.destBitmap,s.sourceBitmap, PolygonMath.getParallelogram(s.layout["image"]), s.copyRect,  s.copyAttibutes);
             }
             return RequestedAction.None;
         }
 
+        protected override RequestedAction InternalGraphicsDrawImage(ImageState state, Bitmap dest, Bitmap source, PointF[] targetArea, RectangleF sourceArea, ImageAttributes imageAttributes)
+        {
+            if (base.InternalGraphicsDrawImage(state, dest, source, targetArea, sourceArea, imageAttributes) == RequestedAction.Cancel) return RequestedAction.Cancel;
+            state.destGraphics.DrawImage(source, targetArea, sourceArea, GraphicsUnit.Pixel, imageAttributes);
+            return RequestedAction.Cancel;
+        }
         protected override RequestedAction RenderBorder(ImageState s) {
             if (base.RenderBorder(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
