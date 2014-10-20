@@ -62,7 +62,7 @@ namespace Endogine.Codecs.Photoshop
     [XmlInclude(typeof(ImageResources.VersionInfo))]
     [XmlInclude(typeof(ImageResources.XMLInfo))]
     public class ImageResource
-	{
+    {
         public enum ResourceIDs
         {
             Undefined = 0,
@@ -137,7 +137,7 @@ namespace Endogine.Codecs.Photoshop
         [XmlIgnoreAttribute()]
         public string Name; //Doesn't seem to be used..?
         [XmlIgnoreAttribute()]
-		public byte[] Data;
+        public byte[] Data;
         public string DataForXml
         {
             get
@@ -152,31 +152,31 @@ namespace Endogine.Codecs.Photoshop
         [XmlIgnoreAttribute()]
         public static Dictionary<ResourceIDs, Type> ResourceTypes;
 
-		public ImageResource()
-		{
-		}
+        public ImageResource()
+        {
+        }
         
-		public ImageResource(ImageResource imgRes)
-		{
-			this.ID = imgRes.ID;
-			this.Name = imgRes.Name;
-		}
+        public ImageResource(ImageResource imgRes)
+        {
+            this.ID = imgRes.ID;
+            this.Name = imgRes.Name;
+        }
 
-		public ImageResource(BinaryPSDReader reader)
-		{
-			this.ID = reader.ReadUInt16();
-			this.Name = reader.ReadPascalString();
-			uint settingLength = reader.ReadUInt32();
-			this.Data = reader.ReadBytes((int)settingLength);
-			if (reader.BaseStream.Position % 2 == 1)
-				reader.ReadByte();
-		}
+        public ImageResource(BinaryPSDReader reader)
+        {
+            this.ID = reader.ReadUInt16();
+            this.Name = reader.ReadPascalString();
+            uint settingLength = reader.ReadUInt32();
+            this.Data = reader.ReadBytes((int)settingLength);
+            if (reader.BaseStream.Position % 2 == 1)
+                reader.ReadByte();
+        }
 
-		public BinaryPSDReader GetDataReader()
-		{
-			System.IO.MemoryStream stream = new System.IO.MemoryStream(this.Data);
-			return new BinaryPSDReader(stream);
-		}
+        public BinaryPSDReader GetDataReader()
+        {
+            System.IO.MemoryStream stream = new System.IO.MemoryStream(this.Data);
+            return new BinaryPSDReader(stream);
+        }
 
         public virtual ResourceIDs[] AcceptedResourceIDs
         {
@@ -281,5 +281,5 @@ namespace Endogine.Codecs.Photoshop
             System.Reflection.ConstructorInfo ci = type.GetConstructor(new Type[] { });
             return (ImageResource)ci.Invoke(new object[] { });
         }
-	}
+    }
 }

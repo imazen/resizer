@@ -30,37 +30,37 @@ using System;
 
 namespace Endogine.Codecs.Photoshop.ImageResources
 {
-	/// <summary>
-	/// Summary description for ResolutionInfo.
-	/// </summary>
-	public class ResolutionInfo : ImageResource
-	{
-		public short hRes = 72;
-		public int hResUnit = 1;
-		public short widthUnit = 2;
+    /// <summary>
+    /// Summary description for ResolutionInfo.
+    /// </summary>
+    public class ResolutionInfo : ImageResource
+    {
+        public short hRes = 72;
+        public int hResUnit = 1;
+        public short widthUnit = 2;
 
-		public short vRes = 72;
-		public int vResUnit = 1;
-		public short heightUnit = 2;
+        public short vRes = 72;
+        public int vResUnit = 1;
+        public short heightUnit = 2;
 
         public ResolutionInfo()
         { }
 
-		public ResolutionInfo(ImageResource imgRes) : base(imgRes)
-		{
-			//m_bResolutionInfoFilled = true;
-			BinaryPSDReader reader = imgRes.GetDataReader();
+        public ResolutionInfo(ImageResource imgRes) : base(imgRes)
+        {
+            //m_bResolutionInfoFilled = true;
+            BinaryPSDReader reader = imgRes.GetDataReader();
 
-			this.hRes = reader.ReadInt16();
-			this.hResUnit = reader.ReadInt32();
-			this.widthUnit = reader.ReadInt16();
+            this.hRes = reader.ReadInt16();
+            this.hResUnit = reader.ReadInt32();
+            this.widthUnit = reader.ReadInt16();
 
-			this.vRes = reader.ReadInt16();
-			this.vResUnit = reader.ReadInt32();
-			this.heightUnit = reader.ReadInt16();
+            this.vRes = reader.ReadInt16();
+            this.vResUnit = reader.ReadInt32();
+            this.heightUnit = reader.ReadInt16();
 
-			reader.Close();
-		}
+            reader.Close();
+        }
 
         protected override void SubWrite(BinaryPSDWriter writer)
         {
@@ -72,5 +72,5 @@ namespace Endogine.Codecs.Photoshop.ImageResources
             writer.Write(this.vResUnit);
             writer.Write(this.heightUnit);
         }
-	}
+    }
 }

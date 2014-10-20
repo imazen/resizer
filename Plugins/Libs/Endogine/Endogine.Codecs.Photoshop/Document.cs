@@ -37,20 +37,20 @@ using System.Xml.Serialization;
 
 namespace Endogine.Codecs.Photoshop
 {
-	public enum ColorModes
-	{
-		Bitmap=0, Grayscale=1, Indexed=2, RGB=3, CMYK=4, Multichannel=7, Duotone=8, Lab=9
-	};
+    public enum ColorModes
+    {
+        Bitmap=0, Grayscale=1, Indexed=2, RGB=3, CMYK=4, Multichannel=7, Duotone=8, Lab=9
+    };
 
     //http://www.pcpix.com/Photoshop/char.htm
     //http://www.soft-gems.net:8080/browse/~raw,r=99/Library/GraphicEx/Source/GraphicEx.pas
 
-	/// <summary>
-	/// Summary description for Photoshop.
-	/// </summary>
+    /// <summary>
+    /// Summary description for Photoshop.
+    /// </summary>
     [XmlRoot("PsdDocument")]
-	public class Document
-	{
+    public class Document
+    {
         //private Dictionary<int, Layer> _layers;
 
         ////[XmlArray("Layers"), XmlArrayItem("Layer", typeof(Layer))]
@@ -130,7 +130,7 @@ namespace Endogine.Codecs.Photoshop
         [XmlArray("ColorTable"), XmlArrayItem("Color", typeof(Color))]
         public List<Color> ColorTable;
         //[XmlIgnoreAttribute()]
-		
+        
         [XmlIgnoreAttribute()]
         public ushort Version
         {
@@ -247,8 +247,8 @@ namespace Endogine.Codecs.Photoshop
             if (File.Exists(filename))
                 File.Delete(filename);
 
-			FileStream stream = new FileStream(filename,
-				FileMode.OpenOrCreate, FileAccess.Write);
+            FileStream stream = new FileStream(filename,
+                FileMode.OpenOrCreate, FileAccess.Write);
 
             BinaryPSDWriter writer = new BinaryPSDWriter(stream);
 
@@ -296,18 +296,18 @@ namespace Endogine.Codecs.Photoshop
                 this._globalImage.Save(writer);
         }
 
-		public Document(string a_sFilename)
-		{
+        public Document(string a_sFilename)
+        {
             this.Init();
 
-			FileStream stream = new FileStream(a_sFilename,
-				FileMode.Open, FileAccess.Read);
-			//stream.
-			BinaryPSDReader reader = new BinaryPSDReader(stream);
+            FileStream stream = new FileStream(a_sFilename,
+                FileMode.Open, FileAccess.Read);
+            //stream.
+            BinaryPSDReader reader = new BinaryPSDReader(stream);
 
-			string signature = new string(reader.ReadPSDChars(4));
-			if (signature != "8BPS")
-				return;
+            string signature = new string(reader.ReadPSDChars(4));
+            if (signature != "8BPS")
+                return;
 
             this._header = new Header(reader);
             //this.Version = reader.ReadUInt16();
@@ -323,36 +323,36 @@ namespace Endogine.Codecs.Photoshop
             
             #region Palette
             uint nPaletteLength = reader.ReadUInt32();
-			if (nPaletteLength > 0)
-			{
+            if (nPaletteLength > 0)
+            {
                 this.ColorTable = new List<Color>();
                 for (int i = 0; i < nPaletteLength; i+=3)
                 {
                     this.ColorTable.Add(Color.FromArgb((int)reader.ReadByte(), (int)reader.ReadByte(), (int)reader.ReadByte()));
                 }
                 //this.ColorTable.Add(Color.FromArgb(255, 10, 20));
-				
-				if (this.ColorMode == ColorModes.Duotone)
-				{
-				}
-				else
-				{
-				}
+                
+                if (this.ColorMode == ColorModes.Duotone)
+                {
+                }
+                else
+                {
+                }
             }
             #endregion
 
 
             uint nResLength = reader.ReadUInt32(); //? Number of bytes, or number of entries??
-			if (nResLength > 0)
-			{
-				//read settings
+            if (nResLength > 0)
+            {
+                //read settings
                 this._imageResources = ImageResource.ReadImageResources(reader);
-			}
+            }
 
             
-			//reader.JumpToEvenNthByte(4);
-			uint nTotalLayersBytes = reader.ReadUInt32();
-			long nAfterLayersDefinitions = reader.BaseStream.Position + nTotalLayersBytes;
+            //reader.JumpToEvenNthByte(4);
+            uint nTotalLayersBytes = reader.ReadUInt32();
+            long nAfterLayersDefinitions = reader.BaseStream.Position + nTotalLayersBytes;
 
             if (nTotalLayersBytes == 8)
             {
@@ -440,9 +440,9 @@ namespace Endogine.Codecs.Photoshop
                 //Bitmap bmp = this._globalImage.Bitmap;
             }
 
-			reader.Close();
-			stream.Close();
-		}
+            reader.Close();
+            stream.Close();
+        }
 
 
         public void CreateSprites()
@@ -461,5 +461,5 @@ namespace Endogine.Codecs.Photoshop
             this._layers.Add(layer);
             return layer;
         }
-	}
+    }
 }

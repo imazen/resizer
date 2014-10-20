@@ -26,7 +26,7 @@ using System.Web.Hosting;
 using Microsoft.Win32.SafeHandles;
 
 namespace LibCassini {
-	
+    
     public class Request : SimpleWorkerRequest {
         static char[] badPathChars = new char[] { '%', '>', '<', ':', '\\' };
         static string[] defaultFileNames = new string[] { "default.aspx", "default.htm", "default.html" };
@@ -264,7 +264,7 @@ namespace LibCassini {
 
             ByteString urlBytes = elems[1];
             _url = urlBytes.GetString();
-			
+            
             if (elems.Length == 3) {
                 _prot = elems[2].GetString();
             }
@@ -304,7 +304,7 @@ namespace LibCassini {
                 else {
                     _url = _path;
                 }
-			}
+            }
 
             // path info
 

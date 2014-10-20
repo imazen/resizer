@@ -33,8 +33,8 @@ using System.Xml.Serialization;
 
 namespace Endogine.Codecs.Photoshop
 {
-	public class Layer
-	{
+    public class Layer
+    {
         Document _document;
         public Document Document
         {
@@ -68,8 +68,8 @@ namespace Endogine.Codecs.Photoshop
             get { return this.Document.BitsPerPixel; }
         }
 
-		//public Page page;
-		//public ushort NumChannels;
+        //public Page page;
+        //public ushort NumChannels;
 
         Dictionary<int, Channel> _channels;
         [XmlIgnoreAttribute()]
@@ -210,28 +210,28 @@ namespace Endogine.Codecs.Photoshop
         //    this._channels.Add(ch.Usage, ch);
         //}
 
-		public Layer(BinaryPSDReader reader, Document document)
-		{
+        public Layer(BinaryPSDReader reader, Document document)
+        {
             this._document = document;
 
             this._rect = reader.ReadPSDRectangle();
 
-			ushort numChannels = reader.ReadUInt16();
+            ushort numChannels = reader.ReadUInt16();
             this._channels = new Dictionary<int, Channel>();
             for (int channelNum = 0; channelNum < numChannels; channelNum++)
-			{
+            {
                 Channel ch = new Channel(reader, this);
                 if (this._channels.ContainsKey(ch.Usage))
                     continue; //TODO: !!
                 this._channels.Add(ch.Usage, ch);
-			}
+            }
 
-			string sHeader = new string(reader.ReadPSDChars(4));
-			if (sHeader != "8BIM")
-				throw(new Exception("Layer Channelheader error!"));
+            string sHeader = new string(reader.ReadPSDChars(4));
+            if (sHeader != "8BIM")
+                throw(new Exception("Layer Channelheader error!"));
             
             //'levl'=Levels 'curv'=Curves 'brit'=Brightness/contrast 'blnc'=Color balance 'hue '=Old Hue/saturation, Photoshop 4.0 'hue2'=New Hue/saturation, Photoshop 5.0 'selc'=Selective color 'thrs'=Threshold 'nvrt'=Invert 'post'=Posterize
-			this.BlendKey = new string(reader.ReadPSDChars(4));
+            this.BlendKey = new string(reader.ReadPSDChars(4));
             int nBlend = -1;
             try
             {
@@ -248,46 +248,46 @@ namespace Endogine.Codecs.Photoshop
             }
 
             this.Opacity = reader.ReadByte();
-			this.Clipping = reader.ReadByte();
-			this.Flags = reader.ReadByte();
+            this.Clipping = reader.ReadByte();
+            this.Flags = reader.ReadByte();
             
-	        reader.ReadByte(); //padding
+            reader.ReadByte(); //padding
 
 
-			uint extraDataSize = reader.ReadUInt32();
-			long nChannelEndPos = reader.BaseStream.Position + (long)extraDataSize;
-			if (extraDataSize > 0)
-			{
-				uint nLength;
+            uint extraDataSize = reader.ReadUInt32();
+            long nChannelEndPos = reader.BaseStream.Position + (long)extraDataSize;
+            if (extraDataSize > 0)
+            {
+                uint nLength;
 
                 this._mask = new Mask(reader, this);
                 if (this._mask.Rectangle == null)
                     this._mask = null;
 
-				//blending ranges
+                //blending ranges
                 this._blendRanges = new List<System.Drawing.Color>();
-				nLength = reader.ReadUInt32();
+                nLength = reader.ReadUInt32();
                 //First come Composite gray blend source / destination; Contains 2 black values followed by 2 white values. Present but irrelevant for Lab & Grayscale.
                 //Then 4+4 for each channel (source + destination colors)
-				for (uint i = 0; i < nLength/8; i++)
-				{
+                for (uint i = 0; i < nLength/8; i++)
+                {
                     this._blendRanges.Add(System.Drawing.Color.FromArgb((int)reader.ReadUInt32()));
                     this._blendRanges.Add(System.Drawing.Color.FromArgb((int)reader.ReadUInt32()));
                 }
 
-				//Name
+                //Name
                 //nLength = (uint)reader.ReadByte();
                 //reader.BaseStream.Position -= 1; //TODO: wtf did I do here?
-				this.Name = reader.ReadPascalString();
+                this.Name = reader.ReadPascalString();
 
-				//TODO: sometimes there's a 2-byte padding here, but it's not 4-aligned... What is it?
+                //TODO: sometimes there's a 2-byte padding here, but it's not 4-aligned... What is it?
                 long posBefore = reader.BaseStream.Position;
-				sHeader = new string(reader.ReadPSDChars(4));
-				if (sHeader != "8BIM")
-				{
-					reader.BaseStream.Position-=2;
-					sHeader = new string(reader.ReadPSDChars(4));
-				}
+                sHeader = new string(reader.ReadPSDChars(4));
+                if (sHeader != "8BIM")
+                {
+                    reader.BaseStream.Position-=2;
+                    sHeader = new string(reader.ReadPSDChars(4));
+                }
                 if (sHeader != "8BIM")
                     reader.BaseStream.Position = posBefore;
                 else
@@ -297,8 +297,8 @@ namespace Endogine.Codecs.Photoshop
                 }
                 if (reader.BaseStream.Position != nChannelEndPos)
                     reader.BaseStream.Position = nChannelEndPos;
-			}
-		}
+            }
+        }
 
         public void ReadPixels(BinaryPSDReader reader)
         {
@@ -517,5 +517,5 @@ namespace Endogine.Codecs.Photoshop
             if (this._mask != null)
                 this._mask.WritePixels(writer);
         }
-	}
+    }
 }

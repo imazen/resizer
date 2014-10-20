@@ -25,9 +25,9 @@ namespace PhotoshopFile.Text
         public static Color getColor(object tree, string selector)
         {
             /*{
-					Type:1,
-					Values:[1,0,0.20001,0.79999],
-			}*/
+                    Type:1,
+                    Values:[1,0,0.20001,0.79999],
+            }*/
             //Get the color object
             Dictionary<string, object> d = getDict(tree, selector);
             //Type should always be one, we don't know how to parse anything else.

@@ -33,11 +33,11 @@ using System.Xml.Serialization;
 
 namespace Endogine.Codecs.Photoshop.ImageResources
 {
-	/// <summary>
-	/// Summary description for CopyRightInfo.
-	/// </summary>
-	public class ColorTransferFunctions : ImageResource
-	{
+    /// <summary>
+    /// Summary description for CopyRightInfo.
+    /// </summary>
+    public class ColorTransferFunctions : ImageResource
+    {
         public class ColorTransferFunction
         {
             [XmlIgnoreAttribute]
@@ -78,16 +78,16 @@ namespace Endogine.Codecs.Photoshop.ImageResources
 
         public ColorTransferFunctions(ImageResource imgRes)
             : base(imgRes)
-		{
-			BinaryPSDReader reader = imgRes.GetDataReader();
+        {
+            BinaryPSDReader reader = imgRes.GetDataReader();
             this.Functions = new List<ColorTransferFunction>();
             for (int i = 0; i < 4; i++)
                 this.Functions.Add(new ColorTransferFunction(reader));
             reader.Close();
-		}
+        }
 
         protected override void SubWrite(BinaryPSDWriter writer)
         {
         }
-	}
+    }
 }

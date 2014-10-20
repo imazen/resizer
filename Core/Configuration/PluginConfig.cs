@@ -47,7 +47,7 @@ namespace ImageResizer.Configuration {
         }
         internal PluginLoadingHints hints = new PluginLoadingHints();
 
-		[CLSCompliant(false)]
+        [CLSCompliant(false)]
         protected volatile bool _pluginsLoaded = false;
 
         protected object _loadPluginsSync = new object();

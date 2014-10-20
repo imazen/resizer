@@ -259,7 +259,7 @@ namespace ImageResizer.Util {
         /// Keys and values are UrlEncoded if urlEncode=true.
         /// </summary>
         /// <param name="QueryString"></param>
-		/// <param name="urlEncode"></param>
+        /// <param name="urlEncode"></param>
         /// <returns></returns>
         public static string BuildQueryString(NameValueCollection QueryString, bool urlEncode) {
             return BuildQueryString(QueryString, urlEncode, true, '?', '&', '=');

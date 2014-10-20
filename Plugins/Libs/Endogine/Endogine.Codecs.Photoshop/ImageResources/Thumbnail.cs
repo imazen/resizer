@@ -31,15 +31,15 @@ using System.Xml.Serialization;
 
 namespace Endogine.Codecs.Photoshop.ImageResources
 {
-	/// <summary>
-	/// Summary description for Thumbnail.
-	/// </summary>
-	public class Thumbnail : ImageResource
-	{
+    /// <summary>
+    /// Summary description for Thumbnail.
+    /// </summary>
+    public class Thumbnail : ImageResource
+    {
         [XmlAttributeAttribute()]
-		public int Format;
+        public int Format;
         [XmlAttributeAttribute()]
-		public int Width;
+        public int Width;
         [XmlAttributeAttribute()]
         public int Height;
         [XmlAttributeAttribute()]
@@ -112,5 +112,5 @@ namespace Endogine.Codecs.Photoshop.ImageResources
             //int nTotalData = this.nSize - 28; // header
             //TODO: writer.Write(this._readPixels);
         }
-	}
+    }
 }

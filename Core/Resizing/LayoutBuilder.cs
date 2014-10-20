@@ -183,8 +183,8 @@ namespace ImageResizer.Resizing {
         /// <summary>
         /// Translates and scales all rings and invisible polygons as specified. 
         /// </summary>
-		/// <param name="from"></param>
-		/// <param name="to"></param>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
         public void Shift(RectangleF from, RectangleF to) {
 
             PointF fromOrigin = new PointF(from.X + (from.Width /2), from.Y + (from.Height /2));

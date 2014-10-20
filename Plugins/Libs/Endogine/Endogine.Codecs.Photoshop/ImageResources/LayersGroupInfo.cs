@@ -33,11 +33,11 @@ using System.Xml.Serialization;
 
 namespace Endogine.Codecs.Photoshop.ImageResources
 {
-	/// <summary>
+    /// <summary>
     ///  2 bytes per layer containing a group ID for the dragging groups. Layers in a group have the same group ID.
-	/// </summary>
-	public class LayersGroupInfo : ImageResource
-	{
+    /// </summary>
+    public class LayersGroupInfo : ImageResource
+    {
         [XmlIgnoreAttribute]
         public List<ushort> GroupIds;
         [XmlAttributeAttribute]
@@ -58,18 +58,18 @@ namespace Endogine.Codecs.Photoshop.ImageResources
 
         public LayersGroupInfo(ImageResource imgRes)
             : base(imgRes)
-		{
-			BinaryPSDReader reader = imgRes.GetDataReader();
+        {
+            BinaryPSDReader reader = imgRes.GetDataReader();
 
             this.GroupIds = new List<ushort>();
             while (reader.BytesToEnd > 0)
                 this.GroupIds.Add(reader.ReadUInt16());
 
-			reader.Close();
-		}
+            reader.Close();
+        }
 
         protected override void SubWrite(BinaryPSDWriter writer)
         {
         }
-	}
+    }
 }

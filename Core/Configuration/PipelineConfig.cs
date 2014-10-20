@@ -40,10 +40,10 @@ namespace ImageResizer.Configuration {
 
         protected object _cachedUrlDataSync = new object();
 
-		[CLSCompliant(false)]
+        [CLSCompliant(false)]
         protected volatile Dictionary<string, bool> _cachedDirectives = null;
 
-		[CLSCompliant(false)]
+        [CLSCompliant(false)]
         protected volatile Dictionary<string, bool> _cachedExtensions = null;
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace ImageResizer.Configuration {
             return false;
         }
 
-		[CLSCompliant(false)]
+        [CLSCompliant(false)]
         protected volatile IList<string> _fakeExtensions = null;
 
         /// <summary>
@@ -423,7 +423,7 @@ namespace ImageResizer.Configuration {
 
         public event CacheSelectionHandler SelectCachingSystem;
 
-		[CLSCompliant(false)]
+        [CLSCompliant(false)]
         protected volatile bool firedFirstRequest = false;
 
         protected volatile bool firstRequestFinished = false;

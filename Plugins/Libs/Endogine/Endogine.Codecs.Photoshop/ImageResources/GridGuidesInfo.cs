@@ -91,8 +91,8 @@ namespace Endogine.Codecs.Photoshop.ImageResources
 
         public GridGuidesInfo(ImageResource imgRes)
             : base(imgRes)
-		{
-			BinaryPSDReader reader = imgRes.GetDataReader();
+        {
+            BinaryPSDReader reader = imgRes.GetDataReader();
 
             uint Version = reader.ReadUInt32();
             
@@ -107,8 +107,8 @@ namespace Endogine.Codecs.Photoshop.ImageResources
                 this.Guides.Add(guide);
             }
 
-			reader.Close();
-		}
+            reader.Close();
+        }
 
         protected override void SubWrite(BinaryPSDWriter writer)
         {

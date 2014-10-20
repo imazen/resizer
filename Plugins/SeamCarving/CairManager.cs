@@ -193,6 +193,6 @@ namespace ImageResizer.Plugins.SeamCarving {
 
 
 
-		
+        
     }
 }

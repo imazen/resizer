@@ -35,10 +35,10 @@ namespace ImageResizer {
         }
         protected object nSync = new object();
 
-		[CLSCompliant(false)]
+        [CLSCompliant(false)]
         protected volatile Node n = new Node("resizer");
 
-		[CLSCompliant(false)]
+        [CLSCompliant(false)]
         protected volatile XmlDocument xmlDoc = new XmlDocument();
 
 

@@ -174,8 +174,8 @@ namespace ImageResizer {
         /// </summary>
         /// <param name="context"></param>
         /// <param name="virtualPath"></param>
-		/// <param name="queryString"></param>
-		/// <param name="vf"></param>
+        /// <param name="queryString"></param>
+        /// <param name="vf"></param>
         protected virtual void HandleRequest(HttpContext context, string virtualPath, NameValueCollection queryString, IVirtualFile vf) {
             Stopwatch s = new Stopwatch();
             s.Start();

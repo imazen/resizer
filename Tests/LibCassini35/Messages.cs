@@ -35,16 +35,16 @@ namespace LibCassini {
 
         const string _httpStyle = 
 @"        <style>
-        	body {font-family:""Verdana"";font-weight:normal;font-size: 8pt;color:black;} 
-        	p {font-family:""Verdana"";font-weight:normal;color:black;margin-top: -5px}
-        	b {font-family:""Verdana"";font-weight:bold;color:black;margin-top: -5px}
-        	h1 { font-family:""Verdana"";font-weight:normal;font-size:18pt;color:red }
-        	h2 { font-family:""Verdana"";font-weight:normal;font-size:14pt;color:maroon }
-        	pre {font-family:""Lucida Console"";font-size: 8pt}
-        	.marker {font-weight: bold; color: black;text-decoration: none;}
-        	.version {color: gray;}
-        	.error {margin-bottom: 10px;}
-        	.expandable { text-decoration:underline; font-weight:bold; color:navy; cursor:hand; }
+            body {font-family:""Verdana"";font-weight:normal;font-size: 8pt;color:black;} 
+            p {font-family:""Verdana"";font-weight:normal;color:black;margin-top: -5px}
+            b {font-family:""Verdana"";font-weight:bold;color:black;margin-top: -5px}
+            h1 { font-family:""Verdana"";font-weight:normal;font-size:18pt;color:red }
+            h2 { font-family:""Verdana"";font-weight:normal;font-size:14pt;color:maroon }
+            pre {font-family:""Lucida Console"";font-size: 8pt}
+            .marker {font-weight: bold; color: black;text-decoration: none;}
+            .version {color: gray;}
+            .error {margin-bottom: 10px;}
+            .expandable { text-decoration:underline; font-weight:bold; color:navy; cursor:hand; }
         </style>
 ";
 

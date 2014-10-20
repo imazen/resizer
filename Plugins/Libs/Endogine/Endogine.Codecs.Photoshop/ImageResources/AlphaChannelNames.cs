@@ -45,8 +45,8 @@ namespace Endogine.Codecs.Photoshop.ImageResources
 
         public AlphaChannelNames(ImageResource imgRes)
             : base(imgRes)
-		{
-			BinaryPSDReader reader = imgRes.GetDataReader();
+        {
+            BinaryPSDReader reader = imgRes.GetDataReader();
             while (reader.BytesToEnd > 0)
             {
                 //no padding in these strings!
@@ -55,8 +55,8 @@ namespace Endogine.Codecs.Photoshop.ImageResources
                 if (name.Length > 0)
                     this._names.Add(name);
             }
-			reader.Close();
-		}
+            reader.Close();
+        }
 
         protected override void SubWrite(BinaryPSDWriter writer)
         {

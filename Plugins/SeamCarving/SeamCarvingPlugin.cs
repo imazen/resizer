@@ -194,7 +194,7 @@ namespace ImageResizer.Plugins.SeamCarving {
                 //Load the new intermediate file from disk
                 s.preRenderBitmap = new Bitmap(outputTempFile);
                 s.preRenderBitmap.MakeTransparent();
-				
+                
                 //Reset the s.copyRect to match the new bitmap
                 s.copyRect = new RectangleF(new PointF(0,0), new SizeF(targetSize.Width, targetSize.Height));
 

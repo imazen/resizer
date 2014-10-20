@@ -47,16 +47,16 @@ namespace ImageResizer.Resizing {
         /// <summary>
         /// Contains the set of extensions that are called for every method. 
         /// </summary>
-		[CLSCompliant(false)]
+        [CLSCompliant(false)]
         protected volatile IEnumerable<BuilderExtension> exts;
 
         /// <summary>
         /// Extend this to allow additional types of source objects to be accepted by transforming them into Bitmap instances.
         /// </summary>
         /// <param name="source"></param>
-		/// <param name="path"></param>
-		/// <param name="disposeSource"></param>
-		/// <param name="settings"></param>
+        /// <param name="path"></param>
+        /// <param name="disposeSource"></param>
+        /// <param name="settings"></param>
         protected virtual void PreLoadImage(ref object source, ref string path, ref bool disposeSource, ref ResizeSettings settings) {
             if (exts != null) foreach (AbstractImageProcessor p in exts) p.PreLoadImage(ref source, ref path, ref disposeSource, ref settings);
         }

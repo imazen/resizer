@@ -141,13 +141,13 @@ namespace Endogine.Codecs.Photoshop
             }
 
             for (int i = 0; i < headers.Count; i++)
-			{
+            {
                 if (headers[i] != null)
                 {
                     writer.BaseStream.Position = headerPositions[i];
                     writer.Write(headers[i]);
                 }
-			}
+            }
             writer.BaseStream.Position = writer.BaseStream.Length - 1;
 
             return lengths;

@@ -64,7 +64,7 @@ namespace Endogine.Codecs.Photoshop.LayerResources
                 this._resources.Add(res.Tag, res);
                 //    case "sofi": //unknown
             }
-				
+                
             this.Data = null;
         }
         protected override void SubWrite(BinaryPSDWriter writer)

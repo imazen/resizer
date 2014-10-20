@@ -12,7 +12,7 @@ namespace ImageResizer.Caching {
         /// Selects a caching system for the specified request and response
         /// </summary>
         /// <param name="context"></param>
-		/// <param name="responseArgs"></param>
+        /// <param name="responseArgs"></param>
         /// <returns></returns>
         ICache GetCachingSystem(System.Web.HttpContext context, IResponseArgs responseArgs);
     }

@@ -53,7 +53,7 @@ namespace ImageResizer.Configuration.Issues {
             Assembly[] asms = AppDomain.CurrentDomain.GetAssemblies();
             foreach (Assembly a in asms) {
                 //Only check DLLs with ImageResizer in their name
-				AssemblyName assemblyName = new AssemblyName(a.FullName);
+                AssemblyName assemblyName = new AssemblyName(a.FullName);
                 if (assemblyName.Name.IndexOf("ImageResizer",  StringComparison.OrdinalIgnoreCase) < 0) continue;
                 
                 object[] attrs;

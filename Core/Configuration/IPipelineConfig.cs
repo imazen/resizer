@@ -108,12 +108,12 @@ namespace ImageResizer.Configuration {
 
         IAsyncTyrantCache GetAsyncCacheFor(HttpContext context, IAsyncResponsePlan plan);
 
-		/// <summary>
+        /// <summary>
         /// Returns an IVirtualFile instance if the specified file exists.
-		/// </summary>
-		/// <param name="virtualPath"></param>
-		/// <param name="queryString"></param>
-		/// <returns></returns>
+        /// </summary>
+        /// <param name="virtualPath"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
         new IVirtualFile GetFile(string virtualPath, NameValueCollection queryString);
 
         /// <summary>

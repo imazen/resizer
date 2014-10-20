@@ -31,16 +31,16 @@ using System.Xml.Serialization;
 
 namespace Endogine.Codecs.Photoshop.ImageResources
 {
-	/// <summary>
-	/// Summary description for DisplayInfo.
-	/// </summary>
-	public class DisplayInfo : ImageResource
-	{
-		public ColorModes ColorSpace = ColorModes.RGB;
+    /// <summary>
+    /// Summary description for DisplayInfo.
+    /// </summary>
+    public class DisplayInfo : ImageResource
+    {
+        public ColorModes ColorSpace = ColorModes.RGB;
         [XmlIgnoreAttribute()]
         public short[] Color = new short[] { -1, 0, 0, 0 };
-		public short Opacity = 100;			// 0..100
-		public bool kind = false;				// selected = false, protected = true
+        public short Opacity = 100;			// 0..100
+        public bool kind = false;				// selected = false, protected = true
 
 
         public DisplayInfo()
@@ -48,18 +48,18 @@ namespace Endogine.Codecs.Photoshop.ImageResources
 
         public DisplayInfo(ImageResource imgRes)
             : base(imgRes)
-		{
-			BinaryPSDReader reader = imgRes.GetDataReader();
+        {
+            BinaryPSDReader reader = imgRes.GetDataReader();
 
-			this.ColorSpace = (ColorModes)reader.ReadInt16();
+            this.ColorSpace = (ColorModes)reader.ReadInt16();
             for (int i = 0; i < 4; i++)
                 this.Color[i] = reader.ReadInt16();
 
-			this.Opacity = (short)Math.Max(0,Math.Min(100,(int)reader.ReadInt16()));
-			this.kind = reader.ReadByte()==0?false:true;
+            this.Opacity = (short)Math.Max(0,Math.Min(100,(int)reader.ReadInt16()));
+            this.kind = reader.ReadByte()==0?false:true;
 
-			reader.Close();
-		}
+            reader.Close();
+        }
 
         protected override void SubWrite(BinaryPSDWriter writer)
         {
@@ -69,5 +69,5 @@ namespace Endogine.Codecs.Photoshop.ImageResources
             writer.Write(this.Opacity);
             writer.Write((byte)(this.kind ? 1 : 0));
         }
-	}
+    }
 }
