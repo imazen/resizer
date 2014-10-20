@@ -1,0 +1,169 @@
+﻿using ImageResizer;
+using ImageResizer.Plugins;
+using ImageResizer.Resizing;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Bench
+{
+
+
+    public class TimingNodeObserverPlugin : BuilderExtension, ISettingsModifier, IPlugin
+    {
+
+
+        protected override RequestedAction BuildJob(ImageJob job)
+        {
+            Modify(job.Settings);
+            StartTime(job.Instructions, "job");
+            return base.BuildJob(job);
+        }
+
+        protected override void PreLoadImage(ref object source, ref string path, ref bool disposeSource, ref ResizeSettings settings)
+        {
+            Modify(settings);
+            StartTime(settings, IsRunning(settings, "job") ? "job/encode" : "loadimage");
+            base.PreLoadImage(ref source, ref path, ref disposeSource, ref settings);
+        }
+
+        protected override RequestedAction PostDecodeStream(ref Bitmap img, ResizeSettings settings)
+        {
+            StopTime(settings, IsRunning(settings, "job") ? "job/encode" : "loadimage");
+            return base.PostDecodeStream(ref img, settings);
+        }
+        protected override void PreAcquireStream(ref object dest, ResizeSettings settings)
+        {
+            StopTime(settings, IsRunning(settings, "job") ? "job/encode" : "loadimage", true);
+            StartTime(settings, "job/bit");
+        }
+
+        protected override RequestedAction OnProcess(ImageState s)
+        {
+            StartTime(s.settings, "job/bit/process");
+            return base.OnProcess(s);
+        }
+
+        protected override RequestedAction PrepareSourceBitmap(ImageState s)
+        {
+            StartTime(s.settings, "job/bit/process/prepsource");
+            return base.PrepareSourceBitmap(s);
+        }
+        protected override RequestedAction Layout(ImageState s)
+        {
+            StopTime(s.settings, "job/bit/process/prepsource");
+            StartTime(s.settings, "job/bit/process/layout");
+            return base.Layout(s);
+        }
+        protected override RequestedAction EndLayout(ImageState s)
+        {
+            StopTime(s.settings, "job/bit/process/layout");
+            StartTime(s.settings, "job/bit/process/prepdest");
+            return base.EndLayout(s);
+        }
+
+        protected override RequestedAction Render(ImageState s)
+        {
+            StopTime(s.settings, "job/bit/process/prepdest");
+            StartTime(s.settings, "job/bit/process/render");
+            return base.Render(s);
+        }
+
+        protected override RequestedAction PostFlushChanges(ImageState s)
+        {
+            StopTime(s.settings, "job/bit/process/render");
+            return RequestedAction.None;
+        }
+        protected override RequestedAction EndProcess(ImageState s)
+        {
+            StopTime(s.settings, "job/bit/process");
+            return base.EndProcess(s);
+        }
+
+        protected override RequestedAction BeforeEncode(ImageJob job)
+        {
+            StopTime(job.Instructions, "job/bit");
+            StartTime(job.Instructions, "job/encode");
+            return base.BeforeEncode(job);
+        }
+
+        protected override RequestedAction EndBuildJob(ImageJob job)
+        {
+            StopTime(job.Instructions, "job/bit", true);
+            StopTime(job.Instructions, "job/encode", true);
+            StopTime(job.Instructions, "job");
+            if (job.ResultInfo == null) job.ResultInfo = new Dictionary<string, object>();
+            job.ResultInfo["job_timing"] = GetOrCreate(job.Settings, "job");
+            return base.EndBuildJob(job);
+        }
+
+
+
+
+
+        ConcurrentDictionary<string, TimingNode> timers = new ConcurrentDictionary<string, TimingNode>();
+
+        private TimingNode GetOrCreate(NameValueCollection settings, string name)
+        {
+            string id = settings["timing_id"];
+            if (id == null) throw new ArgumentException("settings", "timing_id must be present in instructions");
+            TimingNode root;
+            if (!timers.TryGetValue(id, out root))
+            {
+                timers[id] = root = new TimingNode();
+            }
+            return root.GetOrCreate(name);
+        }
+
+        private bool IsRunning(NameValueCollection settings, string name)
+        {
+            return GetOrCreate(settings, name).IsRunning;
+        }
+        private void StartTime(NameValueCollection settings, string name)
+        {
+            GetOrCreate(settings, name).Start();
+        }
+        private void StopTime(NameValueCollection settings, string name, bool onlyIfRunning = false)
+        {
+            var sw = GetOrCreate(settings, name);
+
+            if (onlyIfRunning && !sw.IsRunning)
+            {
+            }
+            else
+            {
+                sw.Stop();
+            }
+
+            
+        }
+
+
+
+        public ResizeSettings Modify(ResizeSettings settings)
+        {
+            if (settings["timing_id"] == null) settings["timing_id"] = Guid.NewGuid().ToString();
+            return settings;
+        }
+
+        public IPlugin Install(ImageResizer.Configuration.Config c)
+        {
+            c.Plugins.add_plugin(this);
+            return this;
+        }
+
+        public bool Uninstall(ImageResizer.Configuration.Config c)
+        {
+            c.Plugins.remove_plugin(this);
+            return true;
+        }
+    }
+
+}

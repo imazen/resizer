@@ -59,8 +59,30 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Benchmarking.cs" />
+    <Compile Include="Benchmarking\BenchmarkRunner.cs" />
+    <Compile Include="Benchmarking\OpBenchmarkResults.cs" />
+    <Compile Include="ImageProvider.cs" />
+    <Compile Include="ImageResizer.Profiling\JobProfiler.cs" />
+    <Content Include="OldBenchmarkingObserver.cs.txt" />
+    <Compile Include="Profiling\ConcurrencyResult.cs" />
+    <Compile Include="Profiling\ConcurrencyResultExtensions.cs" />
+    <Compile Include="Profiling\ConcurrencyResultFormatter.cs" />
+    <Compile Include="Profiling\IConcurrencyResults.cs" />
+    <Compile Include="Profiling\CostlyBaseline.cs" />
+    <Compile Include="Profiling\InstrumentedMemoryStream.cs" />
+    <Compile Include="Profiling\IProfilingAdapter.cs" />
+    <Compile Include="Profiling\Profiler.cs" />
+    <Compile Include="Profiling\ProfilingNode.cs" />
+    <Compile Include="ImageResizer.Profiling\ProfilingObserverPlugin.cs" />
+    <Compile Include="Profiling\ProfilingResultExtensions.cs" />
+    <Compile Include="Profiling\ProfilingResultFormatter.cs" />
+    <Compile Include="Profiling\ProfilingResultNode.cs" />
+    <Compile Include="Profiling\SegmentStats.cs" />
+    <Compile Include="Profiling\Stat.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="OldTimingNode.cs.txt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
@@ -91,22 +113,6 @@
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\FreeImage\ImageResizer.Plugins.FreeImage.csproj">
-      <Project>{8E863AFE-B4CF-46AA-8382-0C3547C0EDE9}</Project>
-      <Name>ImageResizer.Plugins.FreeImage</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\Libs\FreeImage\Wrapper\FreeImage.NET\cs\Library\WrapperFreeImage.NET.csproj">
-      <Project>{6598A7CD-8F27-4D3F-A675-5AE63113A7C3}</Project>
-      <Name>WrapperFreeImage.NET</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\PrettyGifs\ImageResizer.Plugins.PrettyGifs.csproj">
-      <Project>{BB8EEB97-6550-4780-97B2-B0F2FCD80970}</Project>
-      <Name>ImageResizer.Plugins.PrettyGifs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\Watermark\ImageResizer.Plugins.Watermark.csproj">
-      <Project>{2B21B3E4-559C-45CB-A25C-09DF02AB63BC}</Project>
-      <Name>ImageResizer.Plugins.Watermark</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,0 +1,176 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BenchLegacyTiming
+{
+    public class TimingNode
+    {
+        public string name;
+        public Stopwatch sw = new Stopwatch();
+        public DateTime start = DateTime.MinValue;
+        public DateTime stopped = DateTime.MinValue;
+        public List<TimingNode> children = new List<TimingNode>();
+        public TimingNode parent = null;
+
+        public long TicksExclusive
+        {
+            get
+            {
+                return sw.ElapsedTicks - children.Sum((c) => c.sw.ElapsedTicks);
+            }
+        }
+        public long TicksInclusive { get { return sw.ElapsedTicks; } }
+
+        public void Start()
+        {
+            if (HasRunningPredeccessor) throw new InvalidOperationException("You cannot start a child node unless its earlier siblings are finished. ");
+            if (HasStoppedParent) throw new InvalidOperationException("You cannot start a child node unless its ancestors are running.");
+
+            start = DateTime.UtcNow;
+            sw.Start();
+        }
+        public void Stop()
+        {
+            stopped = DateTime.UtcNow;
+            sw.Stop();
+            if (HasRunningChildren) throw new InvalidOperationException("You cannot stop a parent TimingNode until all children have been stopped;");
+        }
+
+        public bool HasRunningPredeccessor
+        {
+            get
+            {
+                //We only deal with the named part of the tree
+                if (parent == null || parent.name == null) return false;
+                //Check for running predecessor
+                if (parent.children.Take(parent.children.IndexOf(this)).Any((s) => s.IsRunning)) return true;
+                //Check parent
+                return parent.HasRunningPredeccessor;
+            }
+        }
+
+        public bool HasStoppedParent
+        {
+            get
+            {
+                //We only deal with the named part of the tree
+                if (parent == null || parent.name == null) return false;
+                //Check for stopped parent
+                if (!parent.IsRunning) return true;
+                //Check parent
+                return parent.HasStoppedParent;
+            }
+        }
+        public bool IsRunning { get { return sw.IsRunning; } }
+        public bool HasRunningChildren
+        {
+            get
+            {
+                return children.Any((n) => n.IsRunning || n.HasRunningChildren);
+            }
+        }
+        public bool All
+        {
+            get
+            {
+                return children.Any((n) => n.HasRunningChildren);
+            }
+        }
+
+        public TimingNode GetOrCreate(string name)
+        {
+            var parts = name.Split('/');
+            var child = children.Find((n) => n.name.Equals(parts.First(), StringComparison.OrdinalIgnoreCase));
+            if (child == null)
+            {
+                if (parts.Length > 1) throw new InvalidOperationException(String.Format("Cannot locate or create node {0}, missing parent {1}. Did you start a child timer before its parent?", name, parts.First()));
+
+                var result = new TimingNode() { name = name };
+                children.Add(result);
+                result.parent = this;
+                return result;
+            }
+            else if (parts.Length > 1)
+            {
+                return child.GetOrCreate(String.Join("/", parts.Skip(1)));
+            }
+            else
+            {
+                return child;
+            }
+        }
+
+        public static string PrintStats(IEnumerable<TimingNode> runs, string indentation = "")
+        {
+            double f = (double)Stopwatch.Frequency / 1000.0;
+            long threshold = Stopwatch.Frequency / 10000;
+            var sb = new StringBuilder();
+            var first = runs.First();
+            if (runs.Count() == 1)
+            {
+                if (first.children.Count > 1)
+                    sb.AppendFormat("{0} inclusive: {1:F}ms exclusive: {2:F}\n", indentation + first.name, first.TicksInclusive / f, first.TicksExclusive / f);
+                else if (first.TicksInclusive > threshold)
+                    sb.AppendFormat("{0} {1:F}ms\n", indentation + first.name, first.TicksInclusive / f);
+            }
+            else if (runs.Count() > 1)
+            {
+                var maxDelta = Math.Max(runs.Max((n) => n.TicksInclusive) - runs.Min((n) => n.TicksInclusive),
+                        runs.Max((n) => n.TicksExclusive) - runs.Min((n) => n.TicksExclusive));
+                var maxDeltaPct = maxDelta * 100.0 / runs.Max((n) => n.TicksInclusive);
+                if (maxDeltaPct > 80)
+                {
+                    sb.AppendLine(indentation + first.name + "runs: " + String.Join("  ", runs.Select((n) => n.TicksInclusive * 1000 / Stopwatch.Frequency)));
+                }
+                if (first.children.Count > 1)
+                {
+                    if (maxDeltaPct > 5)
+                    {
+                        sb.AppendFormat("{0} inclusive: {1:F} .. {2:F}ms    exclusive: {3:F} .. {4:F}ms\n",
+                            indentation + first.name,
+                                runs.Min((n) => n.TicksInclusive) / f,
+                                runs.Max((n) => n.TicksInclusive) / f,
+                                runs.Min((n) => n.TicksExclusive) / f,
+                                runs.Max((n) => n.TicksExclusive) / f);
+                    }
+                    else
+                    {
+                        sb.AppendFormat("{0} inclusive: {1:F}ms exclusive:{2:F}\n",
+                           indentation + first.name,
+                                runs.Min((n) => n.TicksInclusive) / f,
+                                runs.Min((n) => n.TicksExclusive) / f);
+                    }
+                }
+                else if (runs.Max((n) => n.TicksInclusive) > threshold)
+                {
+                    if (maxDeltaPct > 5)
+                    {
+                        sb.AppendFormat("{0} {1:F} .. {2:F}ms\n",
+                        indentation + first.name,
+                            runs.Min((n) => n.TicksInclusive) / f,
+                            runs.Max((n) => n.TicksInclusive) / f);
+                    }
+                    else
+                    {
+                        sb.AppendFormat("{0} {1:F}ms\n", indentation + first.name, runs.Min((n) => n.TicksInclusive) / f);
+                    }
+                }
+            }
+            else { return null; }
+
+            for (var i = 0; i < first.children.Count(); i++)
+            {
+                if (runs.Any((ins) => ins.children.Count != first.children.Count)) throw new ArgumentOutOfRangeException("runs", "All run trees must have identical structure.");
+
+                sb.Append(PrintStats(runs.Select((instance) => instance.children[i]), "  " + indentation));
+            }
+            return sb.ToString();
+        }
+
+    }
+
+}
