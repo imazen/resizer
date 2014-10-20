@@ -325,6 +325,27 @@ namespace ImageResizer.Configuration {
 
             p.Install(c);
         }
+        /// <summary>
+        /// Returns null on failure. Check GetIssues() for causes.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public IPlugin AddPluginByName(string name, NameValueCollection pluginConfig = null)
+        {
+            IPlugin p = CreatePluginByName(name, pluginConfig);
+            if (p == null) return null; //failed
+            
+            //Don't allow duplicates
+            if (!(p is IMultiInstancePlugin) && HasPlugin(p.GetType()))
+            {
+                AcceptIssue(new Issue("An instance of the specified plugin (" + p.GetType().ToString() + ") has already been added. Implement IMultiInstancePlugin if the plugin supports multiple instances.", IssueSeverity.ConfigurationError));
+                return null;
+            }
+
+            p.Install(c);
+            return p;
+        }
         protected void clear_plugins_by_type(string type) {
             Type t = null;
             if ("encoders".Equals(type, StringComparison.OrdinalIgnoreCase)) t = typeof(IEncoder);
