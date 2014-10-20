@@ -83,6 +83,7 @@
     <Compile Include="Plugins\Basic\StopRoutingRoute.cs" />
     <Compile Include="Plugins\IAsyncResponsePlan.cs" />
     <Compile Include="Plugins\IAsyncTyrantCache.cs" />
+    <Compile Include="Plugins\IProfiler.cs" />
     <Compile Include="Plugins\IVirtualFileAsync.cs" />
     <Compile Include="Plugins\IVirtualFileCacheAsync.cs" />
     <Compile Include="Plugins\IVirtualFileWithModifiedDateAsync.cs" />
