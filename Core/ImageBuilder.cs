@@ -1183,8 +1183,8 @@ namespace ImageResizer
             if (s.Job != null)
             {
                 //Save the final dimensions.
-                s.Job.ResultInfo["result.width"] = s.finalSize.Width;
-                s.Job.ResultInfo["result.height"] = s.finalSize.Height;
+                s.Job.ResultInfo["final.width"] = s.finalSize.Width;
+                s.Job.ResultInfo["final.height"] = s.finalSize.Height;
             }
             return RequestedAction.None;
         }
