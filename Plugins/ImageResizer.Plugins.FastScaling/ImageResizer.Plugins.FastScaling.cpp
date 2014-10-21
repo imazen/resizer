@@ -7,6 +7,53 @@
 #include "math.h"
 #include "ImageResizer.Plugins.FastScaling.h"
 
+#pragma unmanaged
+
+/*
+Group: Types
+
+typedef: gdImage
+
+typedef: gdImagePtr
+
+The data structure in which gd stores images. <gdImageCreate>,
+<gdImageCreateTrueColor> and the various image file-loading functions
+return a pointer to this type, and the other functions expect to
+receive a pointer to this type as their first argument.
+
+*gdImagePtr* is a pointer to *gdImage*.
+
+(Previous versions of this library encouraged directly manipulating
+the contents ofthe struct but we are attempting to move away from
+this practice so the fields are no longer documented here.  If you
+need to poke at the internals of this struct, feel free to look at
+*gd.h*.)
+*/
+typedef struct gdImageStruct {
+
+	int sx;
+	int sy;
+
+	/* Truecolor flag and pixels. New 2.0 fields appear here at the
+	end to minimize breakage of existing object code. */
+	int trueColor;
+	int **tpixels;
+	/* Should alpha channel be copied, or applied, each time a
+	pixel is drawn? This applies to truecolor images only.
+	No attempt is made to alpha-blend in palette images,
+	even if semitransparent palette entries exist.
+	To do that, build your image as a truecolor image,
+	then quantize down to 8 bits. */
+	int alphaBlendingFlag;
+	/* Should the alpha channel of the image be saved? This affects
+	PNG at the moment; other future formats may also
+	have that capability. JPEG doesn't. */
+	int saveAlphaFlag;
+}
+gdImage;
+
+typedef gdImage *gdImagePtr;
+
 #define DEFAULT_FILTER_BICUBIC				3.0
 
 #ifndef MIN
@@ -536,4 +583,191 @@ const unsigned int new_height)
 
 	return dst;
 }/* gdImageScaleTwoPass*/
+static void gdImageDestroy(gdImagePtr im)
+{
+	int i;
 
+	if (im->tpixels) {
+		for (i = 0; (i < im->sy); i++) {
+			gdFree(im->tpixels[i]);
+		}
+		gdFree(im->tpixels);
+	}
+	gdFree(im);
+}
+
+
+#pragma managed
+
+
+using namespace System;
+using namespace System::Drawing;
+using namespace System::Drawing::Imaging;
+using namespace ImageResizer::Resizing;
+
+namespace ImageResizer{
+	namespace Plugins{
+		namespace FastScaling {
+
+			public ref class BitmapScaler
+			{
+			public:
+				void ScaleBitmap(Bitmap^ source, Bitmap^ dest, Rectangle crop, Rectangle target){
+					gdImagePtr gdSource;
+					gdImagePtr gdResult;
+					try{
+						gdSource = BitmapToGd(source, crop);
+						gdResult = gdImageScaleTwoPass(gdSource, target.Width, target.Height);
+						CopyGdToBitmap(gdResult, dest, target);
+					}finally{
+						if (gdSource != 0) {
+							gdImageDestroy(gdSource);
+							gdSource = 0;
+						}
+						if (gdResult != 0){
+							gdImageDestroy(gdResult);
+							gdResult = 0;
+						}
+
+					}
+				}
+
+			private:
+
+				void CopyGdToBitmap(gdImagePtr source, Bitmap^ target, Rectangle targetArea){
+					if (target->PixelFormat != PixelFormat::Format32bppArgb){
+						throw gcnew ArgumentOutOfRangeException("target", "Invalid pixel format " + target->PixelFormat.ToString());
+					}
+					BitmapData ^sourceData;
+					try{
+						sourceData = target->LockBits(targetArea, ImageLockMode::ReadOnly, target->PixelFormat);
+						int sy = source->sy;
+						int sx = source->sx;
+						int i;
+						IntPtr^ scan0intptr = sourceData->Scan0;
+						void *scan0 = scan0intptr->ToPointer();
+						for (i = 0; (i < sy); i++) {
+							void * linePtr = (void *)((long)scan0 + (sourceData->Stride * i) + (targetArea.Left * 4));
+							memcpy(linePtr, source->tpixels[i], sx * 4);
+						}
+					}
+					finally{
+						target->UnlockBits(sourceData);
+					}
+				}
+
+				gdImagePtr BitmapToGd(Bitmap^ source, Rectangle from){
+					int i;
+					int j;
+					bool hasAlpha = source->PixelFormat == PixelFormat::Format32bppArgb;
+					if (source->PixelFormat != PixelFormat::Format32bppArgb && source->PixelFormat != PixelFormat::Format24bppRgb){
+						throw gcnew ArgumentOutOfRangeException("source", "Invalid pixel format " + source->PixelFormat.ToString());
+					}
+					if (from.X < 0 || from.Y < 0 || from.Right > source->Width || from.Bottom > source->Height) {
+						throw gcnew ArgumentOutOfRangeException("from");
+					}
+					int sx = from.Width;
+					int sy = from.Height;
+
+					int mask = ((INT_MAX >> 8) << 8);
+					gdImagePtr im;
+					im = (gdImage *)gdMalloc(sizeof(gdImage));
+					if (!im) {
+						return 0;
+					}
+					memset(im, 0, sizeof(gdImage));
+
+					im->tpixels = (int **)gdMalloc(sizeof(int *) * sy);
+					if (!im->tpixels) {
+						gdFree(im);
+						return 0;
+					}
+					BitmapData ^sourceData;
+					try{
+						sourceData = source->LockBits(from, ImageLockMode::ReadWrite, source->PixelFormat);
+
+						for (i = 0; (i < sy); i++) {
+							im->tpixels[i] = (int *)gdCalloc(sx, 4);
+							if (!im->tpixels[i]) {
+								/* 2.0.34 */
+								i--;
+								while (i >= 0) {
+									gdFree(im->tpixels[i]);
+									i--;
+								}
+								gdFree(im->tpixels);
+								gdFree(im);
+								return 0;
+							}
+							else{
+								IntPtr^ scan0intptr = sourceData->Scan0;
+
+								void *scan0 = scan0intptr->ToPointer();
+								void * linePtr = (void *)((long)scan0 + (sourceData->Stride * i) + (from.Left * (hasAlpha ? 4 : 3)));
+								if (hasAlpha){
+									memcpy(im->tpixels[i], linePtr, sx * 4);
+								}
+								else{
+									for (j = 0; j < sx; j++){
+
+										im->tpixels[i][j] = *(int *)((long)linePtr + (j * 3)) & mask;
+									}
+								}
+							}
+
+						}
+					}
+					finally{
+						source->UnlockBits(sourceData);
+					}
+					im->sx = sx;
+					im->sy = sy;
+
+					im->trueColor = 1;
+					/* 2.0.2: alpha blending is now on by default, and saving of alpha is
+					off by default. This allows font antialiasing to work as expected
+					on the first try in JPEGs -- quite important -- and also allows
+					for smaller PNGs when saving of alpha channel is not really
+					desired, which it usually isn't! */
+					im->saveAlphaFlag = 0;
+					im->alphaBlendingFlag = 1;
+
+					return im;
+				}
+			};
+
+
+			public ref class FastScalingPlugin : public ImageResizer::Resizing::BuilderExtension, IPlugin
+			{
+			protected:
+				virtual RequestedAction InternalGraphicsDrawImage(ImageState^ s, Bitmap^ dest, Bitmap^ source, array<PointF>^ targetArea, RectangleF sourceArea, ImageAttributes^ imageAttributes) override{
+				/*	System::Collections::Specialized::NameValueCollection^ query = safe_cast<System::Collections::Specialized::NameValueCollection^>(s->settings);
+
+
+					String^ fastScale = query->Get("fastscale");
+					String^ sTrue = "true";
+					if (fastScale != sTrue){
+						return RequestedAction::None;
+					}*/
+					RectangleF targetBox = ImageResizer::Util::PolygonMath::GetBoundingBox(targetArea);
+					if (targetBox.Location != targetArea[0] || targetBox.Width != (targetArea[1].X - targetArea[0].X)){
+						return RequestedAction::None;
+					}
+					BitmapScaler ^scaler = gcnew BitmapScaler();
+					scaler->ScaleBitmap(source, dest, Util::PolygonMath::ToRectangle(sourceArea), Util::PolygonMath::ToRectangle(targetBox));
+					return RequestedAction::Cancel;
+					
+				}
+			public: 
+				virtual ImageResizer::Plugins::IPlugin^ Install(ImageResizer::Configuration::Config^ c) override{
+					c->Plugins->add_plugin(this);
+					return this;
+				}
+				virtual bool Uninstall(ImageResizer::Configuration::Config^ c) override{
+					c->Plugins->remove_plugin(this);
+					return true;
+				}
+			};
+			
+		}
+	}

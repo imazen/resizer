@@ -11,11 +11,11 @@ using namespace System::Security::Permissions;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly:AssemblyTitleAttribute(L"ImageResizerPluginsFastScaling")];
+[assembly:AssemblyTitleAttribute(L"ImageResizer.Plugins.FastScaling")];
 [assembly:AssemblyDescriptionAttribute(L"")];
 [assembly:AssemblyConfigurationAttribute(L"")];
 [assembly:AssemblyCompanyAttribute(L"")];
-[assembly:AssemblyProductAttribute(L"ImageResizerPluginsFastScaling")];
+[assembly:AssemblyProductAttribute(L"ImageResizer.Plugins.FastScaling")];
 [assembly:AssemblyCopyrightAttribute(L"Copyright (c)  2014")];
 [assembly:AssemblyTrademarkAttribute(L"")];
 [assembly:AssemblyCultureAttribute(L"")];
