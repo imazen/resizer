@@ -9,6 +9,8 @@
 
 #pragma unmanaged
 
+
+//GDI+ uses BGR/BGRA byte order.
 /*
 Group: Types
 
@@ -37,7 +39,7 @@ typedef struct gdImageStruct {
 	/* Truecolor flag and pixels. New 2.0 fields appear here at the
 	end to minimize breakage of existing object code. */
 	int trueColor;
-	int **tpixels;
+	unsigned int **tpixels;
 	/* Should alpha channel be copied, or applied, each time a
 	pixel is drawn? This applies to truecolor images only.
 	No attempt is made to alpha-blend in palette images,
@@ -94,7 +96,7 @@ typedef gdImage *gdImagePtr;
 #define gdRedMax 255
 #define gdGreenMax 255
 #define gdBlueMax 255
-#define gdTrueColorGetAlpha(c) (((c) & 0x7F000000) >> 24)
+#define gdTrueColorGetAlpha(c) (((c) & 0xFF000000) >> 24)
 #define gdTrueColorGetRed(c) (((c) & 0xFF0000) >> 16)
 #define gdTrueColorGetGreen(c) (((c) & 0x00FF00) >> 8)
 #define gdTrueColorGetBlue(c) ((c) & 0x0000FF)
@@ -307,13 +309,13 @@ static gdImagePtr gdImageCreateTrueColor(int sx, int sy)
 	}
 	memset(im, 0, sizeof(gdImage));
 
-	im->tpixels = (int **)gdMalloc(sizeof(int *) * sy);
+	im->tpixels = (unsigned int **)gdMalloc(sizeof(unsigned int *) * sy);
 	if (!im->tpixels) {
 		gdFree(im);
 		return 0;
 	}
 	for (i = 0; (i < sy); i++) {
-		im->tpixels[i] = (int *)gdCalloc(sx, sizeof(int));
+		im->tpixels[i] = (unsigned int *)gdCalloc(sx, sizeof(unsigned int));
 		if (!im->tpixels[i]) {
 			/* 2.0.34 */
 			i--;
@@ -479,7 +481,7 @@ gdAxis axis)
 		double r = 0, g = 0, b = 0, a = 0;
 		const int left = contrib->ContribRow[ndx].Left;
 		const int right = contrib->ContribRow[ndx].Right;
-		int *dest = (axis == HORIZONTAL) ?
+		unsigned int *dest = (axis == HORIZONTAL) ?
 			&dst->tpixels[row][ndx] :
 			&dst->tpixels[ndx][row];
 
@@ -504,7 +506,7 @@ gdAxis axis)
 
 		*dest = gdTrueColorAlpha(uchar_clamp(r, 0xFF), uchar_clamp(g, 0xFF),
 			uchar_clamp(b, 0xFF),
-			uchar_clamp(a, 0x7F)); /* alpha is 0..127 */
+			uchar_clamp(a, 0xFF)); /* alpha is 0..127 */
 	}/* for */
 }/* _gdScaleOneAxis*/
 
@@ -677,7 +679,7 @@ namespace ImageResizer{
 					}
 					memset(im, 0, sizeof(gdImage));
 
-					im->tpixels = (int **)gdMalloc(sizeof(int *) * sy);
+					im->tpixels = (unsigned int **)gdMalloc(sizeof(unsigned int *) * sy);
 					if (!im->tpixels) {
 						gdFree(im);
 						return 0;
@@ -687,7 +689,7 @@ namespace ImageResizer{
 						sourceData = source->LockBits(from, ImageLockMode::ReadWrite, source->PixelFormat);
 
 						for (i = 0; (i < sy); i++) {
-							im->tpixels[i] = (int *)gdCalloc(sx, 4);
+							im->tpixels[i] = (unsigned int *)gdCalloc(sx, 4);
 							if (!im->tpixels[i]) {
 								/* 2.0.34 */
 								i--;
@@ -709,8 +711,7 @@ namespace ImageResizer{
 								}
 								else{
 									for (j = 0; j < sx; j++){
-
-										im->tpixels[i][j] = *(int *)((long)linePtr + (j * 3)) & mask;
+										im->tpixels[i][j] = (*(unsigned int *)((long)linePtr + (j * 3))) | 0xFF000000;
 									}
 								}
 							}
@@ -771,3 +772,4 @@ namespace ImageResizer{
 			
 		}
 	}
+}
