@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bench.Profiling
+namespace Imazen.Profiling
 {
     public class CostlyBaseline
     {

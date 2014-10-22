@@ -1,4 +1,4 @@
-﻿using Bench.Profiling;
+﻿using Imazen.Profiling;
 using ImageResizer.Plugins;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bench.ImageResizerProfiling
+namespace Bench
 {
     public class JobProfiler:Profiler, IProfiler
     {

@@ -1,13 +1,11 @@
-﻿using Bench.Profiling;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Bench.Profiling;
 using System.Diagnostics;
 
-namespace Bench.Benchmarking
+namespace Imazen.Profiling
 {
     public class OpBenchmarkResults : IConcurrencyResults
     {

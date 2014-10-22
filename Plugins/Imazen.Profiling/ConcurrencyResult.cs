@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bench.Profiling
+namespace Imazen.Profiling
 {
     public class ConcurrencyResult :IConcurrencyResults
     {

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bench.Profiling
+namespace Imazen.Profiling
 {
-    public class Profiler : Bench.Profiling.IProfilingAdapter
+    public class Profiler : Imazen.Profiling.IProfilingAdapter
     {
         public Profiler() : this("op") { }
         public Profiler(string rootNodeName)

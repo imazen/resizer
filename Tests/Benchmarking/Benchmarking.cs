@@ -1,6 +1,4 @@
-﻿using Bench.Benchmarking;
-using Bench.ImageResizerProfiling;
-using Bench.Profiling;
+﻿using Imazen.Profiling;
 using ImageResizer;
 using ImageResizer.Configuration;
 using ImageResizer.Encoding;
@@ -27,8 +25,7 @@ namespace Bench
 
         public static void PrintConcurrencyResult(OpBenchmarkResults r)
         {
-            List<BenchmarkRunner> a;
-
+            
             //TODO, make work with segment selection.
             //
             var s = r.StatsForSegment();

@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
-namespace Bench.Profiling
+namespace Imazen.Profiling
 {
     public class InstrumentedMemoryStream : MemoryStream
     {

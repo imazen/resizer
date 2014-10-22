@@ -15,9 +15,7 @@ using System.Drawing.Imaging;
 using ImageResizer.Resizing;
 using System.Collections.Specialized;
 using System.Threading;
-using Bench.Profiling;
-using Bench.Benchmarking;
-using Bench.ImageResizerProfiling;
+using Imazen.Profiling;
 
 namespace Bench
 {
@@ -52,7 +50,7 @@ namespace Bench
 
         public BenchmarkRunner<int, JobProfiler> EstablishBaseline()
         {
-            var r = new Bench.Benchmarking.BenchmarkRunner<int, JobProfiler>();
+            var r = new Imazen.Profiling.BenchmarkRunner<int, JobProfiler>();
             r.Operation = new Action<JobProfiler, int>((p, _) => new CostlyBaseline().DoWork());
             r.ParallelThreads = 8;
             r.SequentialRuns = 4;

@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Bench.Profiling
+namespace Imazen.Profiling
 {
     public interface IProfilingAdapter
     {
