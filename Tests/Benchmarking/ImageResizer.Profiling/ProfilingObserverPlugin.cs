@@ -100,7 +100,7 @@ namespace Bench.ImageResizerProfiling
         protected override RequestedAction BeforeEncode(ImageJob job)
         {
             stop("bit");
-            stop("encode");
+            start("encode");
             return base.BeforeEncode(job);
         }
 

@@ -67,7 +67,7 @@ namespace Bench
                 var ms = new MemoryStream();
                 await r.GetResponseStream().CopyToAsync(ms);
                 ms.Seek(0, SeekOrigin.Begin);
-                using (var fs = File.OpenWrite(CachedPathFor(u)))
+                using (var fs = OpenWriteCreateDirs(CachedPathFor(u)))
                 {
                     await ms.CopyToAsync(fs);
                 }
@@ -83,7 +83,7 @@ namespace Bench
                     ImageDict[CachedPathFor(d)] = d;
                 }
                 ms.Seek(0, SeekOrigin.Begin);
-                using (var fs = File.OpenWrite(CachedPathFor(d)))
+                using (var fs = OpenWriteCreateDirs(CachedPathFor(d)))
                 {
                     await ms.CopyToAsync(fs);
                 }
@@ -94,6 +94,17 @@ namespace Bench
             await Task.WhenAll(remainingBlankImages);
         }
 
+        private void CreateDirs(string path)
+        {
+            var dir = Path.GetDirectoryName(path);
+            if (dir.Trim().Length == 0) return;
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+        }
+        private FileStream OpenWriteCreateDirs(string path)
+        {
+            CreateDirs(path);
+            return File.OpenWrite(path);
+        }
         /// <summary>
         /// Returns a list of paths to all existing locally cached files (based on remote and blank image queries)
         /// </summary>

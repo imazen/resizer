@@ -99,6 +99,16 @@ namespace Bench.Profiling
             return s;
         }
 
+        public static double FastestSequentialMs(this IConcurrencyResults r)
+        {
+            return r.GetStats().SequentialMs.Min;
+        }
+
+        public static double ParallelRealMs(this IConcurrencyResults r)
+        {
+            return r.GetStats().ParallelRealMs;
+        }
+
         public static SegmentStats StatsForSegment(this IConcurrencyResults r, string segmentName = "op")
         {
             return FindSet(r, segmentName).GetStats();

@@ -54,5 +54,16 @@ namespace Bench.Benchmarking
 
 
         public string SegmentName { get; set; }
+
+
+
+        public long PrivateBytesBefore { get; set; }
+        public long PrivateBytesWarm { get; set; }
+        public long PrivateBytesAfter { get; set; }
+
+        public long ManagedBytesBefore { get; set; }
+
+        public long ManagedBytesWarm { get; set; }
+        public long ManagedBytesAfter { get; set; }
     }
 }

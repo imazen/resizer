@@ -23,11 +23,13 @@ namespace Bench.Benchmarking
 
         public OpBenchmarkResults Benchmark()
         {
-            WarmupThreads();
-            ResetGC();
-
 
             var r = new OpBenchmarkResults();
+            WarmupThreads();
+            ResetGC();
+            r.PrivateBytesBefore = Process.GetCurrentProcess().PrivateMemorySize64;
+            r.ManagedBytesBefore = GC.GetTotalMemory(true);
+
             r.ThrowawayThreads = this.ThrowawayThreads;
             r.ParallelThreads = this.ParallelThreads;
             r.CoreCount = Environment.ProcessorCount;
@@ -35,6 +37,9 @@ namespace Bench.Benchmarking
 
             //Throwaway run for warmup
             r.ThrowawayRuns = TimeOperation(ThrowawayRuns, ThrowawayThreads);
+
+            r.PrivateBytesWarm = Process.GetCurrentProcess().PrivateMemorySize64;
+            r.ManagedBytesWarm = GC.GetTotalMemory(false);
 
             //Time in parallel
             var wallClock = Stopwatch.StartNew();
@@ -49,6 +54,12 @@ namespace Bench.Benchmarking
             r.SequentialWallTicks = wallClock.ElapsedTicks;
 
             r.ParallelUniqueTicks = r.ParallelRuns.DeduplicateTime();
+
+            ResetGC();
+            r.ManagedBytesAfter = GC.GetTotalMemory(true);
+
+            r.PrivateBytesAfter = Process.GetCurrentProcess().PrivateMemorySize64;
+
             return r;
 
         }
