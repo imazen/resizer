@@ -32,7 +32,7 @@ namespace Imazen.Profiling
             r.ThrowawayThreads = this.ThrowawayThreads;
             r.ParallelThreads = this.ParallelThreads;
             r.CoreCount = Environment.ProcessorCount;
-            r.SegmentName = "";
+            r.SegmentName = "op";
 
             //Throwaway run for warmup
             r.ThrowawayRuns = TimeOperation(ThrowawayRuns, ThrowawayThreads);
@@ -90,6 +90,7 @@ namespace Imazen.Profiling
             SequentialRuns = 8;
             ParallelRuns = 2;
             ParallelThreads = 8;
+            ProfilerProvider = (rootNodeName, threads) => (P)(new P()).Create(rootNodeName);
         }
 
 
@@ -97,14 +98,17 @@ namespace Imazen.Profiling
         public Action<P, T> Operation { get; set; }
         public Action<T> Teardown { get; set; }
 
-
+        /// <summary>
+        /// Lambda to create a Profiler with the given root name and correct thread count (can be used to barrier/isolate segments)
+        /// </summary>
+        public Func<string,int, P> ProfilerProvider { get; set; }
 
 
         public override IEnumerable<ProfilingResultNode> TimeOperation(int batches, int threadsPerBatch)
         {
-            return BenchmarkRunner<T, P>.TimeOperation(Setup, Operation, Teardown, batches, threadsPerBatch);
+            return BenchmarkRunner<T, P>.TimeOperation(Setup, ProfilerProvider, Operation, Teardown, batches, threadsPerBatch);
         }
-        public static IEnumerable<ProfilingResultNode> TimeOperation(Func<T> setUp, Action<P, T> op, Action<T> tearDown, int batches, int threadsPerBatch)
+        public static IEnumerable<ProfilingResultNode> TimeOperation(Func<T> setUp, Func<string,int, P> profilerProvider, Action<P, T> op, Action<T> tearDown, int batches, int threadsPerBatch)
         {
             if (batches < 1) return new ProfilingResultNode[] { };
             string rootNodeName = "op";
@@ -121,7 +125,7 @@ namespace Imazen.Profiling
             for (var i = 0; i < batches; i++)
             {
 
-                var inputs = new int[threadsPerBatch].Select(x => new Tuple<P, T>((P)(new P()).Create(rootNodeName), setUp != null ? setUp() : default(T))).ToList();
+                var inputs = new int[threadsPerBatch].Select(x => new Tuple<P, T>(profilerProvider(rootNodeName, threadsPerBatch), setUp != null ? setUp() : default(T))).ToList();
                 try
                 {
                     ResetGC();

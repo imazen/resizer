@@ -36,7 +36,7 @@ namespace Imazen.Profiling
             }
         }
 
-        public void Start(string segmentName, bool allowRecursion = false)
+        public virtual void Start(string segmentName, bool allowRecursion = false)
         {
             if (!allowRecursion && IsRunning(segmentName))
                 throw new InvalidOperationException(string.Format("The given profiling segment {0} has already been started, and allowRecursion=false", segmentName));
@@ -49,7 +49,7 @@ namespace Imazen.Profiling
             return VisibleCallstack.Any((n) => n.SegmentName == segmentName);
         }
 
-        public void Stop(string segmentName, bool assertStarted = true, bool stopChildren = false)
+        public virtual void Stop(string segmentName, bool assertStarted = true, bool stopChildren = false)
         {
             if (stopChildren){
                 var topmost = VisibleCallstack.First((n) => n.SegmentName == segmentName);
