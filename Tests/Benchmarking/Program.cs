@@ -41,8 +41,15 @@ namespace Bench
             //action buffered? action profiled?
             //IO read qty?
 
-            CheckGdMemoryUse();
 
+            ///CompareGdToDefault();
+
+            //CompareGdToDefault("bit");
+
+            //CompareGdToDefault("bit");
+            //CompareGdToDefault("encode");
+
+            CompareFreeImageToDefault();
 
             Console.Write("Done\n");
             Console.ReadKey();
@@ -105,6 +112,7 @@ namespace Bench
                 ExcludeIO = true;
                 ShowProfileTree = true;
                 SegmentNameFilter = "op";
+                UseBarrierAroundSegment = false;
             }
             public int ThrowawayRuns { get; set; }
             public int ThrowawayThreads { get; set; }
@@ -126,6 +134,8 @@ namespace Bench
             public bool ShowProfileTree { get; set; }
 
             public string SegmentNameFilter { get; set; }
+
+            public bool UseBarrierAroundSegment { get; set; }
         }
 
         public static void Compare(BenchmarkingSettings settings, IEnumerable<Tuple<string, Instructions>> plugins){
@@ -137,10 +147,13 @@ namespace Bench
         public static void Compare(BenchmarkingSettings settings,
             IEnumerable<Tuple<Config, Instructions, string>> configsAndLabels)
         {
+            settings.Images.PrepareImagesAsync().Wait();
             foreach (var pair in settings.Images.GetImagesAndDescriptions())
             {
                 Console.WriteLine();
-                Console.WriteLine("Using {0} seq. runs, {1} || on {2} threads. Filter segment '{4}' Data: {3}", settings.SequentialRuns,settings.ParallelRuns,settings.ParallelThreads,pair.Item2, settings.SegmentNameFilter);
+                Console.WriteLine("Using {0} seq. runs, {1} || on {2} threads. Filter segment '{4}'{5} Data: {3}", 
+                    settings.SequentialRuns,settings.ParallelRuns,settings.ParallelThreads,pair.Item2, settings.SegmentNameFilter,
+                    settings.UseBarrierAroundSegment ? " WITH Memory Barrier" : "");
 
                 var widths = CalcColumnWidths(ConsoleWidth, 4, -2, -2, -2, -4);
 
@@ -159,6 +172,11 @@ namespace Bench
                         runner.ThrowawayThreads = settings.ThrowawayThreads;
                         runner.ThrowawayRuns = settings.ThrowawayRuns;
 
+                        if (settings.UseBarrierAroundSegment)
+                            runner.ProfilerProvider = (s,t) => new JobProfiler(s).JoinThreadsAroundSegment(settings.SegmentNameFilter,t);
+                        else
+                            runner.ProfilerProvider = (s, t) => new JobProfiler(s);
+
                         var results = runner.Benchmark();
 
                         Action<IConcurrencyResults> printStats = r =>
@@ -168,7 +186,6 @@ namespace Bench
                             Console.WriteLine(Distribute(widths, statStrs.ToArray()));
                         };
                         var set = results.FindSet(settings.SegmentNameFilter);
-
                         printStats(set);
 
                         if (settings.ShowProfileTree)
@@ -183,16 +200,16 @@ namespace Bench
 
                     var seqList = comparableResults.OrderBy(r => r.Item2.FastestSequentialMs()).
                                                     Select((r, i) => string.Format("{0}. {1} {3:F2}X slower {2}",
-                                                        i, r.Item1, r.Item2.GetStats().SequentialMs.ToString(0.05), 
+                                                        i + 1, r.Item1, r.Item2.GetStats().SequentialMs.ToString(0.05), 
                                 r.Item2.FastestSequentialMs() / comparableResults.Min(c => c.Item2.FastestSequentialMs())));
 
 
                     Console.WriteLine("Sequential: \n" + string.Join("\n", seqList));
 
                     var parList = comparableResults.OrderBy(r => r.Item2.ParallelRealMs()).
-                                                    Select((r, i) => string.Format("{0}. {1} {3:F2}X slower {2:F2}ms total",
-                                                        i, r.Item1, r.Item2.GetStats().ParallelRealMs, 
-                                r.Item2.ParallelRealMs() / comparableResults.Min(c => c.Item2.ParallelRealMs())));
+                                                    Select((r, i) => string.Format("{0}. {1} {3:F2}X less throughput {2:F2}ms total. {4:F}% concurrent",
+                                                        i + 1, r.Item1, r.Item2.GetStats().ParallelRealMs, 
+                                r.Item2.ParallelRealMs() / comparableResults.Min(c => c.Item2.ParallelRealMs()), r.Item2.GetStats().ParallelConcurrencyPercent));
 
                     Console.WriteLine("Paralell: \n" + string.Join("\n", parList));
                     Console.WriteLine("\n");
@@ -279,26 +296,32 @@ namespace Bench
         
         }
 
-        public static void CompareGdToDefault()
+        public static void CompareGdToDefault(string segment = "op")
         {
             var settings = new BenchmarkingSettings();
-            settings.Images = new ImageProvider().AddLocalImages(imageDir, "quality-original.jpg", "fountain-small.jpg");
+            settings.Images = new ImageProvider();
+            settings.Images.AddLocalImages(imageDir, "fountain-small.jpg");
+                //.AddBlankImages(new Tuple<int, int, string>[] { new Tuple<int, int, string>(2200, 2200, "jpg") });
+                //.AddLocalImages(imageDir, "quality-original.jpg", "fountain-small.jpg");
             settings.SharedInstructions = new Instructions[]{new Instructions(
-                "maxwidth=200&maxheight=200"), 
-                new Instructions("maxwidth=800&maxheight=800")};
+                "width=800&scale=both")};
             settings.ExcludeEncoding = false;
             settings.ExcludeDecoding = false;
             settings.ExcludeBuilding = false;
             settings.ExcludeIO = true;
-            settings.ParallelRuns = 4;
-            settings.ParallelThreads = 16;
-            settings.SequentialRuns = 32;
+            settings.ParallelRuns = 2;
+            settings.SegmentNameFilter = segment;
+            settings.ParallelThreads = 8;
+            settings.SequentialRuns = 16;
+            settings.ThrowawayRuns = 2;
+            settings.ThrowawayThreads = 8;
+            settings.UseBarrierAroundSegment = true;
 
             var configs = new Tuple<Config, Instructions, string>[]{
                     new Tuple<Config, Instructions, string>(ConfigWithPlugins(),null,"Default"),
                     new Tuple<Config, Instructions, string>(ConfigWithPlugins("GdBuilder"),new Instructions("builder=gd"),"GdBuilder")};
 
-            Compare(settings, configs);
+            Compare(settings, configs.Reverse());
 
 
         }

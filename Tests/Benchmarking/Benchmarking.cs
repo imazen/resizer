@@ -68,6 +68,7 @@ namespace Bench
 
             //Profile ImageBuild steps
             c.Plugins.GetOrInstall<ProfilingObserverPlugin>();
+            b.ProfilerProvider = (s, ix) => new JobProfiler(s);
 
             b.Setup = jobProvider;
         
