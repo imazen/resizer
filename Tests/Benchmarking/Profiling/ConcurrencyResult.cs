@@ -25,5 +25,10 @@ namespace Bench.Profiling
         public int ParallelThreads { get; private set; }
 
         public string SegmentName { get; private set; }
+
+        public override string ToString()
+        {
+            return String.Format("ConcurrencyResult \"{0}\"", SegmentName);
+        }
     }
 }

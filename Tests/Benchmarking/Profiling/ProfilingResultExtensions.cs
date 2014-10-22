@@ -21,21 +21,21 @@ namespace Bench.Profiling
 
         public static Stat<double> ExclusiveMs(this IEnumerable<ProfilingResultNode> s)
         {
-            if (s == null) return ZeroStat();
+            if (s == null || s.Count() == 0) return ZeroStat();
             return new Stat<double>(s.Min(n => n.TicksExclusiveTotal), s.Max(n => n.TicksExclusiveTotal), s.Sum(n => n.TicksExclusiveTotal), s.Count(), "ms", "F").
                 ConvertTo<double>(n => n * 1000 / Stopwatch.Frequency);
         }
 
         public static Stat<double> InclusiveMs(this IEnumerable<ProfilingResultNode> s)
         {
-            if (s == null) return ZeroStat();
+            if (s == null || s.Count() == 0) return ZeroStat();
             return new Stat<double>(s.Min(n => n.TicksInclusiveTotal), s.Max(n => n.TicksInclusiveTotal), s.Sum(n => n.TicksInclusiveTotal), s.Count(), "ms", "F").
                 ConvertTo<double>(n => n * 1000 / Stopwatch.Frequency);
         }
 
         public static Stat<long> Invocations(this IEnumerable<ProfilingResultNode> s)
         {
-            if (s == null) return new Stat<long>(0, 0, 0, 0, "(n/a)", "");
+            if (s == null || s.Count() == 0) return new Stat<long>(0, 0, 0, 0, "(n/a)", "");
             return new Stat<long>(s.Min(n => n.Invocations), s.Max(n => n.Invocations), s.Sum(n => n.Invocations), s.Count(), "", "");
         }
 

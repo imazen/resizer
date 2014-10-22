@@ -143,5 +143,14 @@ namespace Bench.Profiling
             return childSets;
         }
 
+
+        public static string DebugPrintTree(this IConcurrencyResults r)
+        {
+            var f = new ConcurrencyResultFormatter() { DeltaAbnormalRatio = 100, DeltaSignificantRatio = 0, ExclusiveTimeSignificantMs = 0 };
+            var s = f.PrintCallTree(r);
+            Debug.Write(s);
+            return s;
+        }
+
     }
 }
