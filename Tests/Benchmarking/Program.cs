@@ -43,8 +43,10 @@ namespace Bench
             //action buffered? action profiled?
             //IO read qty?
 
-            CompareFreeImageToDefault();
+            CheckGdMemoryUse();
 
+
+            Console.Write("Done\n");
             Console.ReadKey();
         }
 
@@ -104,6 +106,7 @@ namespace Bench
                 ExcludeBuilding = false;
                 ExcludeIO = true;
                 ShowProfileTree = true;
+                SegmentNameFilter = "op";
             }
             public int ThrowawayRuns { get; set; }
             public int ThrowawayThreads { get; set; }
@@ -123,6 +126,8 @@ namespace Bench
             public bool ExcludeIO { get; set; }
 
             public bool ShowProfileTree { get; set; }
+
+            public string SegmentNameFilter { get; set; }
         }
 
         public static void Compare(BenchmarkingSettings settings, IEnumerable<Tuple<string, Instructions>> plugins){
@@ -137,17 +142,18 @@ namespace Bench
             foreach (var pair in settings.Images.GetImagesAndDescriptions())
             {
                 Console.WriteLine();
-                Console.WriteLine("Using {0} runs, {1} parallel runs on {2} threads. Data: {3}", settings.SequentialRuns,settings.ParallelRuns,settings.ParallelThreads,pair.Item2);
+                Console.WriteLine("Using {0} seq. runs, {1} || on {2} threads. Filter segment '{4}' Data: {3}", settings.SequentialRuns,settings.ParallelRuns,settings.ParallelThreads,pair.Item2, settings.SegmentNameFilter);
 
                 var widths = CalcColumnWidths(ConsoleWidth, 4, -2, -2, -2, -4);
 
                 Console.WriteLine(Distribute(widths, "Config", "Sequential", "Parallel", "Percent concurrent", "Instructions"));
                 foreach (var instructions in settings.SharedInstructions)
                 {
-                    foreach (var triple in configsAndLabels)
+
+                    var comparableResults = configsAndLabels.Select(triple =>
                     {
                         var combined = triple.Item2 == null ? instructions : new Instructions(triple.Item2.MergeDefaults(instructions));
-                        var runner =Benchmark.BenchmarkInMemory(triple.Item1,pair.Item1,combined,settings.ExcludeDecoding,settings.ExcludeEncoding);
+                        var runner = Benchmark.BenchmarkInMemory(triple.Item1, pair.Item1, combined, settings.ExcludeDecoding, settings.ExcludeEncoding);
                         runner.ParallelRuns = settings.ParallelRuns;
                         runner.ParallelThreads = settings.ParallelThreads;
                         runner.SequentialRuns = settings.SequentialRuns;
@@ -157,22 +163,42 @@ namespace Bench
 
                         var results = runner.Benchmark();
 
-                        Action<SegmentStats> printStats = (s) =>
+                        Action<IConcurrencyResults> printStats = r =>
                         {
-                            var statStrs = new List<string>(GetStats(triple.Item3, s));
+                            var statStrs = new List<string>(GetStats(triple.Item3, r.GetStats()));
                             statStrs.Add(combined.ToString());
                             Console.WriteLine(Distribute(widths, statStrs.ToArray()));
                         };
+                        var set = results.FindSet(settings.SegmentNameFilter);
 
-                        printStats(results.StatsForSegment());
+                        printStats(set);
 
                         if (settings.ShowProfileTree)
                         {
                             var f = new ConcurrencyResultFormatter();
-                            Console.WriteLine(f.PrintCallTree(results.FindSet()));
+                            Console.WriteLine(f.PrintCallTree(set));
                         }
-                        
-                    }
+                        return new Tuple<string, IConcurrencyResults>(triple.Item3, set);
+                    }).ToArray();
+
+                   
+
+                    var seqList = comparableResults.OrderBy(r => r.Item2.FastestSequentialMs()).
+                                                    Select((r, i) => string.Format("{0}. {1} {3:F2}X slower {2}",
+                                                        i, r.Item1, r.Item2.GetStats().SequentialMs.ToString(0.05), 
+                                r.Item2.FastestSequentialMs() / comparableResults.Min(c => c.Item2.FastestSequentialMs())));
+
+
+                    Console.WriteLine("Sequential: \n" + string.Join("\n", seqList));
+
+                    var parList = comparableResults.OrderBy(r => r.Item2.ParallelRealMs()).
+                                                    Select((r, i) => string.Format("{0}. {1} {3:F2}X slower {2:F2}ms total",
+                                                        i, r.Item1, r.Item2.GetStats().ParallelRealMs, 
+                                r.Item2.ParallelRealMs() / comparableResults.Min(c => c.Item2.ParallelRealMs())));
+
+                    Console.WriteLine("Paralell: \n" + string.Join("\n", parList));
+                    Console.WriteLine("\n");
+
                 }
             }
         }
@@ -226,6 +252,58 @@ namespace Bench
 
         }
 
+        public static void CheckGdMemoryUse()
+        {
+            var imageSrc = new ImageProvider().AddBlankImages(new Tuple<int, int, string>[] { new Tuple<int, int, string>(4000, 4000, "jpg") });
+            imageSrc.PrepareImagesAsync().Wait();
+            var runner = Benchmark.BenchmarkInMemory(ConfigWithPlugins("GdBuilder"), imageSrc.GetImages().First(),
+                new Instructions("builder=gd&width=400"), false, false);
+            runner.Label = "GD";
+            CheckMemoryUse(runner, 2);
+        }
+
+        public static void CheckMemoryUse(BenchmarkRunner<ImageJob,JobProfiler> runner, int runMultiplier)
+        {
+            runner.ParallelRuns = runMultiplier;
+            runner.ParallelThreads = 8;
+            runner.SequentialRuns = runMultiplier * 8;
+            runner.ThrowawayThreads = 8;
+            runner.ThrowawayRuns = runMultiplier * 2;
+
+
+            Console.Write("Running {0} warmup (t={1}), {2} parallel (t={3}), {4} sequenetial\n", runner.ThrowawayRuns * runner.ThrowawayThreads, runner.ThrowawayThreads,
+                runner.ParallelRuns * runner.ParallelThreads, runner.ParallelThreads,
+                runner.SequentialRuns);
+            var results = runner.Benchmark();
+
+            Console.Write("Private bytes before: {0:F2}MB warm: {1:F2}MB after {2:F2}MB\n", results.PrivateBytesBefore / 1000000.0, results.PrivateBytesWarm / 1000000.0, results.PrivateBytesAfter / 1000000.0);
+            Console.Write("Managed bytes before: {0:F2}MB warm: {1:F2}MB after {2:F2}MB\n", results.ManagedBytesBefore / 1000000.0, results.ManagedBytesWarm / 1000000.0, results.ManagedBytesAfter / 1000000.0);
+        
+        }
+
+        public static void CompareGdToDefault()
+        {
+            var settings = new BenchmarkingSettings();
+            settings.Images = new ImageProvider().AddLocalImages(imageDir, "quality-original.jpg", "fountain-small.jpg");
+            settings.SharedInstructions = new Instructions[]{new Instructions(
+                "maxwidth=200&maxheight=200"), 
+                new Instructions("maxwidth=800&maxheight=800")};
+            settings.ExcludeEncoding = false;
+            settings.ExcludeDecoding = false;
+            settings.ExcludeBuilding = false;
+            settings.ExcludeIO = true;
+            settings.ParallelRuns = 4;
+            settings.ParallelThreads = 16;
+            settings.SequentialRuns = 32;
+
+            var configs = new Tuple<Config, Instructions, string>[]{
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins(),null,"Default"),
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("GdBuilder"),new Instructions("builder=gd"),"GdBuilder")};
+
+            Compare(settings, configs);
+
+
+        }
 
 
         private static NameValueCollection AutoLoadNative()
