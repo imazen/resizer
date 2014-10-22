@@ -60,26 +60,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Benchmarking.cs" />
-    <Compile Include="Benchmarking\BenchmarkRunner.cs" />
-    <Compile Include="Benchmarking\OpBenchmarkResults.cs" />
     <Compile Include="ImageProvider.cs" />
     <Compile Include="ImageResizer.Profiling\JobProfiler.cs" />
     <Content Include="OldBenchmarkingObserver.cs.txt" />
-    <Compile Include="Profiling\ConcurrencyResult.cs" />
-    <Compile Include="Profiling\ConcurrencyResultExtensions.cs" />
-    <Compile Include="Profiling\ConcurrencyResultFormatter.cs" />
-    <Compile Include="Profiling\IConcurrencyResults.cs" />
-    <Compile Include="Profiling\CostlyBaseline.cs" />
-    <Compile Include="Profiling\InstrumentedMemoryStream.cs" />
-    <Compile Include="Profiling\IProfilingAdapter.cs" />
-    <Compile Include="Profiling\Profiler.cs" />
-    <Compile Include="Profiling\ProfilingNode.cs" />
     <Compile Include="ImageResizer.Profiling\ProfilingObserverPlugin.cs" />
-    <Compile Include="Profiling\ProfilingResultExtensions.cs" />
-    <Compile Include="Profiling\ProfilingResultFormatter.cs" />
-    <Compile Include="Profiling\ProfilingResultNode.cs" />
-    <Compile Include="Profiling\SegmentStats.cs" />
-    <Compile Include="Profiling\Stat.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="OldTimingNode.cs.txt" />
@@ -113,6 +97,10 @@
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\Imazen.Profiling\Imazen.Profiling.csproj">
+      <Project>{35c46578-8bd7-410d-94e9-2afb11629083}</Project>
+      <Name>Imazen.Profiling</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

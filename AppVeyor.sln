@@ -1,4 +1,3 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30723.0
@@ -125,6 +124,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.TinyCache.Tests", "Tests\ImageResizer.Plugins.TinyCache.Tests\ImageResizer.Plugins.TinyCache.Tests.csproj", "{36FDAE2B-2D37-454C-8381-2D08CAE44083}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Storage", "Plugins\ImageResizer.Storage\ImageResizer.Storage.csproj", "{80BB303C-8F55-410C-BA91-342ECC435101}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imazen.Profiling", "Plugins\Imazen.Profiling\Imazen.Profiling.csproj", "{35C46578-8BD7-410D-94E9-2AFB11629083}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -562,6 +563,7 @@ Global
 		{10E04BAD-889B-4C01-BA0B-FAC7EF63B859}.Trial|x64.ActiveCfg = Release|Any CPU
 		{10E04BAD-889B-4C01-BA0B-FAC7EF63B859}.Trial|x86.ActiveCfg = Release|Any CPU
 		{7D496099-EE56-4875-9A96-7036698F5D26}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{7D496099-EE56-4875-9A96-7036698F5D26}.Debug|Any CPU.Build.0 = Debug|x86
 		{7D496099-EE56-4875-9A96-7036698F5D26}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{7D496099-EE56-4875-9A96-7036698F5D26}.Debug|Mixed Platforms.Build.0 = Debug|x86
 		{7D496099-EE56-4875-9A96-7036698F5D26}.Debug|x64.ActiveCfg = Debug|x86
@@ -1192,6 +1194,24 @@ Global
 		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|x64.ActiveCfg = Release|Any CPU
 		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|x86.ActiveCfg = Release|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Release|x64.ActiveCfg = Release|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Release|x86.ActiveCfg = Release|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Trial|x64.ActiveCfg = Release|Any CPU
+		{35C46578-8BD7-410D-94E9-2AFB11629083}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

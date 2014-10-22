@@ -1,4 +1,4 @@
-﻿using ImageResizer.Plugins;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
