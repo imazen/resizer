@@ -69,16 +69,7 @@ namespace Imazen.Profiling
         /// <returns></returns>
         public static IEnumerable<IConcurrencyResults> Traverse(this IConcurrencyResults tree, bool breadthFirst, bool includeRoot = true)
         {
-            if (includeRoot) yield return tree;
-            var children = tree.CollectChildSets();
-            if (breadthFirst)
-                foreach (var c in children) yield return c;
-
-            foreach (var c in children)
-                foreach (var cc in c.Traverse(breadthFirst,!breadthFirst))
-                    yield return cc;
-
-            yield break;
+            return tree.TraverseTree(breadthFirst, includeRoot, n => n.CollectChildSets());
         }
 
 

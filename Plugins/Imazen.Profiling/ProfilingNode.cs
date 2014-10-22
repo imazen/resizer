@@ -100,7 +100,7 @@ namespace Imazen.Profiling
             return CollapseInvocations(new ProfilingNode[] { this });
         }
 
-        public string ToString()
+        public override string ToString()
         {
             return string.Format("{0} {1}ms ({2})", SegmentName, ElapsedTicks / Stopwatch.Frequency, 
                 string.Join(" ", NonNullChildren.Select(c => c.ToString())));

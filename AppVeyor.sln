@@ -127,6 +127,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Storage", "Plu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imazen.Profiling", "Plugins\Imazen.Profiling\Imazen.Profiling.csproj", "{35C46578-8BD7-410D-94E9-2AFB11629083}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imazen.Profiling.Tests", "Tests\Imazen.Profiling.Tests\Imazen.Profiling.Tests.csproj", "{DAEE2528-5587-436D-A2EF-2B387CF3260D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1212,6 +1214,24 @@ Global
 		{35C46578-8BD7-410D-94E9-2AFB11629083}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{35C46578-8BD7-410D-94E9-2AFB11629083}.Trial|x64.ActiveCfg = Release|Any CPU
 		{35C46578-8BD7-410D-94E9-2AFB11629083}.Trial|x86.ActiveCfg = Release|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Release|x64.ActiveCfg = Release|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Release|x86.ActiveCfg = Release|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Trial|x64.ActiveCfg = Release|Any CPU
+		{DAEE2528-5587-436D-A2EF-2B387CF3260D}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

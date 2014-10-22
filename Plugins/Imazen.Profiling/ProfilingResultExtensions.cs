@@ -61,6 +61,45 @@ namespace Imazen.Profiling
                 Math.Max(acc.Item2, elem.Item2))).Item1;
         }
 
+
+        /// <summary>
+        /// Provides an enumerator which traverses the tree (either depth-first or breadth-first)
+        /// </summary>
+        /// <param name="tree"></param>
+        /// <param name="breadthFirst"></param>
+        /// <param name="includeRoot"></param>
+        /// <returns></returns>
+        public static IEnumerable<IEnumerable<ProfilingResultNode>> Traverse(this IEnumerable<ProfilingResultNode> tree, bool breadthFirst, bool includeRoot = true)
+        {
+            return tree.TraverseTree(breadthFirst, includeRoot, n => n.CollectChildSets());
+        }
+
+        public static IEnumerable<T> TraverseTree<T>(this T node, bool breadthFirst, bool includeRoot, Func<T, IEnumerable<T>> getChildren) 
+        {
+            if (includeRoot) yield return node;
+
+            if (breadthFirst)
+            {
+                var q = new Queue<T>();
+                q.Enqueue(node);
+                while (q.Count() > 0)
+                {
+                    var n = q.Dequeue();
+                    if (!node.Equals(n)) yield return n;
+                    foreach (var c in getChildren(n))
+                        q.Enqueue(c);
+                }
+            }
+            else
+            {
+
+                foreach (var c in getChildren(node))
+                    foreach (var cc in c.TraverseTree(false, true, getChildren))
+                        yield return cc;
+            }
+            yield break;
+        }
+
         public static IEnumerable<IEnumerable<ProfilingResultNode>> CollectChildSets(this IEnumerable<ProfilingResultNode> runs)
         {
             List<IEnumerable<ProfilingResultNode>> childSets = new List<IEnumerable<ProfilingResultNode>>();
@@ -99,15 +138,7 @@ namespace Imazen.Profiling
         /// <returns></returns>
         public static IEnumerable<ProfilingResultNode> FindSegment(this IEnumerable<ProfilingResultNode> tree, string name)
         {
-            if (tree.Count() == 0) return null;
-            if (tree.First().SegmentName == name) return tree;
-            var childSets = CollectChildSets(tree);
-            foreach (var set in childSets)
-            {
-                var segment = FindSegment(set, name);
-                if (segment != null) return segment;
-            }
-            return null;
+            return tree.Traverse(true).First(c => c.Count() > 0 && c.First().SegmentName == name);
         }
     }
 }
