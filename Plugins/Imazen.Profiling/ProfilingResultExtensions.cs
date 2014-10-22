@@ -69,15 +69,14 @@ namespace Imazen.Profiling
         /// <param name="breadthFirst"></param>
         /// <param name="includeRoot"></param>
         /// <returns></returns>
-        public static IEnumerable<IEnumerable<ProfilingResultNode>> Traverse(this IEnumerable<ProfilingResultNode> tree, bool breadthFirst, bool includeRoot = true)
+        public static IEnumerable<IEnumerable<ProfilingResultNode>> Traverse(this IEnumerable<ProfilingResultNode> tree, bool breadthFirst)
         {
-            return tree.TraverseTree(breadthFirst, includeRoot, n => n.CollectChildSets());
+            return tree.TraverseTree(n => n.CollectChildSets(), null, breadthFirst);
         }
 
-        public static IEnumerable<T> TraverseTree<T>(this T node, bool breadthFirst, bool includeRoot, Func<T, IEnumerable<T>> getChildren) 
+        public static IEnumerable<T> TraverseTree<T>(this T node, Func<T, IEnumerable<T>> getChildren, Func<T,bool> filter, bool breadthFirst, bool filterAffectsSubtrees = false)
         {
-            if (includeRoot) yield return node;
-
+            
             if (breadthFirst)
             {
                 var q = new Queue<T>();
@@ -85,17 +84,19 @@ namespace Imazen.Profiling
                 while (q.Count() > 0)
                 {
                     var n = q.Dequeue();
-                    if (!node.Equals(n)) yield return n;
+                    if (filter == null || filter(n)) yield return n;
                     foreach (var c in getChildren(n))
                         q.Enqueue(c);
                 }
             }
             else
             {
+                if (filter == null || filter(node)) yield return node;
 
                 foreach (var c in getChildren(node))
-                    foreach (var cc in c.TraverseTree(false, true, getChildren))
-                        yield return cc;
+                    foreach (var cc in c.TraverseTree(getChildren, null, false, filterAffectsSubtrees))
+                        if (filter == null || filter(cc))
+                            yield return cc;
             }
             yield break;
         }
@@ -136,9 +137,24 @@ namespace Imazen.Profiling
         /// <param name="tree"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static IEnumerable<ProfilingResultNode> FindSegment(this IEnumerable<ProfilingResultNode> tree, string name)
+        public static IEnumerable<ProfilingResultNode> FindSegment(this IEnumerable<ProfilingResultNode> tree, string name, bool expectOnlyOne = true)
         {
-            return tree.Traverse(true).First(c => c.Count() > 0 && c.First().SegmentName == name);
+            var results = FindSegments(tree, name);
+            if (results.Count() > 1) throw new ArgumentOutOfRangeException("tree", "More than one matching segment found in tree");
+            return results.First();
+        }
+
+        public static IEnumerable<IEnumerable<ProfilingResultNode>> FindSegments(this IEnumerable<ProfilingResultNode> tree, string name)
+        {
+            return tree.TraverseTree(n => n.CollectChildSets(), c =>c.Count() > 0 && c.First().SegmentName == name,true);
+        }
+
+        public static string DebugPrintTree(this  IEnumerable<ProfilingResultNode> r)
+        {
+            var f = new ProfilingResultFormatter() { ExclusiveTimeSignificantMs = 0 };
+            var s = f.PrintCallTree(r);
+            Debug.Write(s);
+            return s;
         }
     }
 }

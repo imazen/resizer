@@ -83,7 +83,7 @@ namespace Imazen.Profiling
             if (r == null || !r.HasRuns()) return null;
             var sb = new StringBuilder();
 
-            if (r.MaxExclusiveMs() > ExclusiveTimeSignificantMs)
+            if (r.MaxExclusiveMs() >= ExclusiveTimeSignificantMs)
             {
                 sb.AppendFormat("{0}{1} {2}\n", prefix, r.SegmentName, GetTimingInfo(r));
                 sb.Append(string.Join("", r.CollectChildSets().Select(s => PrintStats(s, prefix + Indentation))));

@@ -49,14 +49,23 @@ namespace Imazen.Profiling
             return r.SequentialRuns.Invocations().Combine(r.ParallelRuns.Invocations());
         }
         /// <summary>
-        /// Traverses the tree and grabs a set of maching subtrees with the given segment name. Returns null if the segment cannot be found.
+        /// Traverses the tree and grabs a set of maching subtrees with the given segment name.
         /// </summary>
         /// <param name="tree"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static IConcurrencyResults FindSet(this IConcurrencyResults r, string segmentName = "op")
+        public static IConcurrencyResults FindSet(this IConcurrencyResults r, string segmentName = "op", bool expectOnlyOne = true)
         {
-            return r.Traverse(true).First(c => c.SegmentName == segmentName);
+            var results = FindSets(r, segmentName);
+            if (results.Count() > 1) throw new ArgumentOutOfRangeException("tree", "More than one matching set found in tree");
+            return results.First();
+        }
+
+
+
+        public static IEnumerable<IConcurrencyResults> FindSets(this IConcurrencyResults tree, string segmentName = "op")
+        {
+            return tree.TraverseTree(n => n.CollectChildSets(), c => c.SegmentName == segmentName, true);
         }
 
 
@@ -67,9 +76,9 @@ namespace Imazen.Profiling
         /// <param name="breadthFirst"></param>
         /// <param name="includeRoot"></param>
         /// <returns></returns>
-        public static IEnumerable<IConcurrencyResults> Traverse(this IConcurrencyResults tree, bool breadthFirst, bool includeRoot = true)
+        public static IEnumerable<IConcurrencyResults> Traverse(this IConcurrencyResults tree, bool breadthFirst)
         {
-            return tree.TraverseTree(breadthFirst, includeRoot, n => n.CollectChildSets());
+            return tree.TraverseTree(n => n.CollectChildSets(), null, breadthFirst);
         }
 
 
@@ -107,8 +116,7 @@ namespace Imazen.Profiling
 
         public static void Validate(this IConcurrencyResults r)
         {
-            r.SequentialRuns.ValidateSet("Within " + r.SegmentName);
-            r.ParallelRuns.ValidateSet("Within " + r.SegmentName);
+            r.AllRuns().ValidateSet("Within " + r.SegmentName);
         }
 
 
@@ -126,7 +134,9 @@ namespace Imazen.Profiling
                 var childSeq = r.SequentialRuns.Select(instance => instance.Children[i]).ToArray();
                 var childPar = r.ParallelRuns.Select(instance => instance.Children[i]).ToArray();
 
-                var child = new ConcurrencyResult(childSeq, childPar, r.ParallelThreads, r.SequentialRuns.First().SegmentName);
+                var name = (childSeq.FirstOrDefault() ?? childPar.FirstOrDefault()).SegmentName;
+
+                var child = new ConcurrencyResult(childSeq, childPar, r.ParallelThreads, name);
                 child.Validate();
 
                 childSets.Add(child);

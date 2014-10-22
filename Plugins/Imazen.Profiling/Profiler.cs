@@ -24,6 +24,18 @@ namespace Imazen.Profiling
             get { return true; }
         }
 
+        public IEnumerable<ProfilingNode> VisibleCallstack
+        {
+            get{
+                foreach (var e in callstack)
+                {
+                    yield return e;
+                    if (e.Isolate) yield break;
+                }
+                yield break;
+            }
+        }
+
         public void Start(string segmentName, bool allowRecursion = false)
         {
             if (!allowRecursion && IsRunning(segmentName))
@@ -34,16 +46,16 @@ namespace Imazen.Profiling
 
         public bool IsRunning(string segmentName)
         {
-            return callstack.Any((n) => n.SegmentName == segmentName);
+            return VisibleCallstack.Any((n) => n.SegmentName == segmentName);
         }
 
         public void Stop(string segmentName, bool assertStarted = true, bool stopChildren = false)
         {
             if (stopChildren){
-                var topmost = callstack.First((n) => n.SegmentName == segmentName);
+                var topmost = VisibleCallstack.First((n) => n.SegmentName == segmentName);
                 if (topmost != null)
                 {
-                    var children = callstack.TakeWhile((n) => n.SegmentName != segmentName).ToArray();
+                    var children = VisibleCallstack.TakeWhile((n) => n.SegmentName != segmentName).ToArray();
                     children.Select((n) => { Stop(n.SegmentName, true, false); return n; });
                     Stop(segmentName, assertStarted, false);
                 }else if (assertStarted) throw new InvalidOperationException(string.Format("The given profiling segment {0} is not running anywhere in the callstack; it cannot be stopped.", segmentName));
@@ -52,6 +64,7 @@ namespace Imazen.Profiling
                 if (callstack.Peek().SegmentName == segmentName){
                     var n = callstack.Pop();
                     n.Stop();
+                    if (n.Drop) return; 
                     if (callstack.Count > 0)
                         callstack.Peek().AddChild(n);
                     else if (RootNode.SegmentName == n.SegmentName && !RootNode.HasChildren)

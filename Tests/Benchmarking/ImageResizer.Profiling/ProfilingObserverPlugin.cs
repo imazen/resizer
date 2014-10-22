@@ -34,23 +34,26 @@ namespace Bench
             if (job.Profiler != null && job.Profiler.Active){
                 CallContext.LogicalSetData(Key, job.Profiler);
             }
-            start("job");
+            start("job [isolate]");
             return base.BuildJob(job);
         }
 
         protected override void PreLoadImage(ref object source, ref string path, ref bool disposeSource, ref ResizeSettings settings)
         {
             start("loadimage");
+            start("decode");
             base.PreLoadImage(ref source, ref path, ref disposeSource, ref settings);
         }
 
         protected override RequestedAction PostDecodeStream(ref Bitmap img, ResizeSettings settings)
         {
+            stop("decode");
             stop("loadimage");
             return base.PostDecodeStream(ref img, settings);
         }
         protected override void PreAcquireStream(ref object dest, ResizeSettings settings)
         {
+            stop("decode",false);
             stop("loadimage", false);
             start("bit");
         }

@@ -92,7 +92,7 @@ namespace Imazen.Profiling
             if (runs == null || runs.Count() < 1) return null;
             var sb = new StringBuilder();
 
-            if (runs.Max(n => n.TicksExclusiveTotal) > ExclusiveTimeSignificantMs * Stopwatch.Frequency / 1000)
+            if (runs.Max(n => n.TicksExclusiveTotal) >= ExclusiveTimeSignificantMs * Stopwatch.Frequency / 1000.0)
             {
                 sb.AppendFormat("{0}{1} {2}\n", prefix, runs.First().SegmentName, GetTimingInfo(runs));
                 sb.Append(string.Join("", runs.CollectChildSets().Select(s => PrintStats(s, prefix + Indentation))));

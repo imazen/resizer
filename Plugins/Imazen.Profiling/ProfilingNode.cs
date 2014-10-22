@@ -10,8 +10,8 @@ namespace Imazen.Profiling
     public class ProfilingNode
     {
 
-        public long start;
-        public long stopped;
+        public long StartTicks { get; set; }
+        public long StopTicks { get; set; }
 
         public long TicksExclusive
         {
@@ -25,31 +25,52 @@ namespace Imazen.Profiling
         {
             get
             {
-                return stopped - start;
+                return StopTicks - StartTicks;
             }
         }
         public long TicksInclusive { get { return ElapsedTicks; } }
 
         public void Start()
         {
-            start = Stopwatch.GetTimestamp();
+            StartTicks = Stopwatch.GetTimestamp();
         }
         public void Stop()
         {
-            stopped = Stopwatch.GetTimestamp();
-            if (stopped < start) stopped = start;
+            StopTicks = Stopwatch.GetTimestamp();
+            if (StopTicks < StartTicks) StopTicks = StartTicks;
         }
 
+        /// <summary>
+        /// Indicates that child profiling operations should be isolated (permits controlled recursion)
+        /// </summary>
+        public bool Isolate{ get; set; }
+
+        /// <summary>
+        /// Indicates that this node and its child nodes should be discarded.
+        /// </summary>
+        public bool Drop { get; set; }
 
         public string SegmentName { get; set; }
 
         public static ProfilingNode StartNew(string name)
         {
             var n = new ProfilingNode();
-            n.SegmentName = name;
+
+            if (name.IndexOf("[drop]", StringComparison.OrdinalIgnoreCase) > -1)
+            {
+                n.Drop = true;
+                name = name.Replace("[drop]", "");
+            }
+            if (name.IndexOf("[isolate]", StringComparison.OrdinalIgnoreCase) > -1)
+            {
+                n.Isolate = true;
+                name = name.Replace("[isolate]", "");
+            }
+            n.SegmentName = name.Trim();
             n.Start();
             return n;
         }
+
 
         public void AddChild(ProfilingNode n)
         {
@@ -89,8 +110,8 @@ namespace Imazen.Profiling
                 invocations.Count(),
                 invocations.Aggregate<ProfilingNode, long>(0, (d, n) => d + n.TicksExclusive),
                 invocations.Aggregate<ProfilingNode, long>(0, (d, n) => d + n.TicksInclusive),
-                invocations.Select(n => n.start).Min(),
-                invocations.Select(n => n.stopped).Max(),
+                invocations.Select(n => n.StartTicks).Min(),
+                invocations.Select(n => n.StopTicks).Max(),
                 invocations.SelectMany(n => n.NonNullChildren).GroupBy(n => n.SegmentName).Select(group => CollapseInvocations(group)).ToList()
                 );
         }
