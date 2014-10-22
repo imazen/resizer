@@ -49,7 +49,8 @@ namespace Bench
             //CompareGdToDefault("bit");
             //CompareGdToDefault("encode");
 
-            CompareFreeImageToDefault();
+            CheckFastScalingMemoryUse();
+            CompareFastScalingToDefault("bit");
 
             Console.Write("Done\n");
             Console.ReadKey();
@@ -320,6 +321,48 @@ namespace Bench
             var configs = new Tuple<Config, Instructions, string>[]{
                     new Tuple<Config, Instructions, string>(ConfigWithPlugins(),null,"Default"),
                     new Tuple<Config, Instructions, string>(ConfigWithPlugins("GdBuilder"),new Instructions("builder=gd"),"GdBuilder")};
+
+            Compare(settings, configs.Reverse());
+
+
+        }
+
+
+        public static void CheckFastScalingMemoryUse()
+        {
+            var imageSrc = new ImageProvider().AddBlankImages(new Tuple<int, int, string>[] { new Tuple<int, int, string>(4000, 4000, "jpg") });
+            imageSrc.PrepareImagesAsync().Wait();
+            var runner = Benchmark.BenchmarkInMemory(ConfigWithPlugins("FastScaling"), imageSrc.GetImages().First(),
+                new Instructions("builder=gd&width=400"), false, false);
+            runner.Label = "FastScaling";
+            CheckMemoryUse(runner, 2);
+        }
+
+
+        public static void CompareFastScalingToDefault(string segment = "op")
+        {
+            var settings = new BenchmarkingSettings();
+            settings.Images = new ImageProvider();
+            settings.Images.AddLocalImages(imageDir, "fountain-small.jpg");
+            //.AddBlankImages(new Tuple<int, int, string>[] { new Tuple<int, int, string>(2200, 2200, "jpg") });
+            //.AddLocalImages(imageDir, "quality-original.jpg", "fountain-small.jpg");
+            settings.SharedInstructions = new Instructions[]{new Instructions(
+                "width=800&scale=both")};
+            settings.ExcludeEncoding = false;
+            settings.ExcludeDecoding = false;
+            settings.ExcludeBuilding = false;
+            settings.ExcludeIO = true;
+            settings.ParallelRuns = 2;
+            settings.SegmentNameFilter = segment;
+            settings.ParallelThreads = 8;
+            settings.SequentialRuns = 16;
+            settings.ThrowawayRuns = 2;
+            settings.ThrowawayThreads = 8;
+            settings.UseBarrierAroundSegment = true;
+
+            var configs = new Tuple<Config, Instructions, string>[]{
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins(),null,"Default"),
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),null,"FastScaling")};
 
             Compare(settings, configs.Reverse());
 

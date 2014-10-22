@@ -369,6 +369,18 @@ static gdImagePtr gdImageClone(gdImagePtr src) {
 	return dst;
 }
 
+static void gdImageDestroy(gdImagePtr im)
+{
+    int i;
+
+    if (im->tpixels) {
+        for (i = 0; (i < im->sy); i++) {
+            gdFree(im->tpixels[i]);
+        }
+        gdFree(im->tpixels);
+    }
+    gdFree(im);
+}
 
 
 static double filter_bicubic(const double t)
@@ -612,23 +624,12 @@ const unsigned int new_height)
 	}/* if */
 
 	if (src != tmp_im) {
-		gdFree(tmp_im);
+        gdImageDestroy(tmp_im);
 	}/* if */
 
 	return dst;
 }/* gdImageScaleTwoPass*/
-static void gdImageDestroy(gdImagePtr im)
-{
-	int i;
 
-	if (im->tpixels) {
-		for (i = 0; (i < im->sy); i++) {
-			gdFree(im->tpixels[i]);
-		}
-		gdFree(im->tpixels);
-	}
-	gdFree(im);
-}
 
 static void unpack24bitRow(int width, void * sourceLine, unsigned int * destArray){
 	for (int i = 0; i < width; i++){
