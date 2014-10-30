@@ -1,13 +1,10 @@
 ﻿/* Copyright (c) 2014 Imazen See license.txt */
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Drawing;
 using System.Collections.Specialized;
 using System.Globalization;
 using ImageResizer.Resizing;
-using System.Drawing.Drawing2D;
-using System.Web;
 using System.IO;
 using ImageResizer.ExtensionMethods;
 
@@ -31,8 +28,8 @@ namespace ImageResizer.Util {
         /// <returns></returns>
         public static double[] parseList(string text, double defaultValue) {
             text = text.Trim(' ', '(', ')');
-            string[] parts = text.Split(new char[] { ',' }, StringSplitOptions.None);
-            double[] vals = new double[parts.Length];
+            var parts = text.Split(new[] { ',' }, StringSplitOptions.None);
+            var vals = new double[parts.Length];
             for (int i = 0; i < parts.Length; i++) {
                 if (!double.TryParse(parts[i], floatingPointStyle, NumberFormatInfo.InvariantInfo, out vals[i]))
                     vals[i] = defaultValue;

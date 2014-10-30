@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ImageResizer.Util;
+﻿using ImageResizer.Util;
 using System.Globalization;
 
 namespace ImageResizer {
@@ -15,6 +12,7 @@ namespace ImageResizer {
             if (coords == null) return fallbackValue; //Failed to parse, or was empty
 
             if (coords.Length == 1) return new BoxEdges(coords[0]);
+
             if (coords.Length == 4) return new BoxEdges(coords[0], coords[1], coords[2], coords[3]);
 
             return fallbackValue;
@@ -25,7 +23,7 @@ namespace ImageResizer {
         /// </summary>
         /// <param name="all"></param>
         public BoxEdges(double all) {
-            this.all = all;
+            this.All = all;
         }
         /// <summary>
         /// Create a box, specifying individual widths for each size
@@ -35,25 +33,26 @@ namespace ImageResizer {
         /// <param name="right"></param>
         /// <param name="bottom"></param>
         public BoxEdges(double left, double top, double right, double bottom) {
-            this.top = top; this.left = left; this.bottom = bottom; this.right = right;
+            Top = top;
+            Left = left;
+            Right = right;
+            Bottom = bottom;
         }
         /// <summary>
         /// Copies the specified BoxEdges instance
         /// </summary>
         /// <param name="original"></param>
         public BoxEdges(BoxEdges original) {
-            this.top = original.top;
-            this.bottom = original.bottom;
-            this.right = original.right;
-            this.left = original.left;
+            Top = original.Top;
+            Bottom = original.Bottom;
+            Right = original.Right;
+            Left = original.Left;
         }
 
-        protected double top = 0, left = 0, bottom = 0, right = 0;
-
-        public double Top { get { return top; } }
-        public double Left { get { return left; } }
-        public double Right { get { return right; } }
-        public double Bottom { get { return bottom; } }
+        public double Top { get; private set; }
+        public double Left { get; private set; }
+        public double Right { get; private set; }
+        public double Bottom { get; private set; }
 
         /// <summary>
         /// Sets the width of all edges, returning a new instance
@@ -61,40 +60,41 @@ namespace ImageResizer {
         /// <param name="all"></param>
         /// <returns></returns>
         public BoxEdges SetAll(double all) {
-            BoxEdges b = new BoxEdges(this); b.all = all;
+            var b = new BoxEdges(this); b.All = all;
             return b;
         }
         public BoxEdges SetTop(double top) {
-            BoxEdges b = new BoxEdges(this); b.top = top;
+            var b = new BoxEdges(this); b.Top = top;
             return b;
         }
         public BoxEdges SetLeft(double left) {
-            BoxEdges b = new BoxEdges(this); b.left = left;
+            var b = new BoxEdges(this); b.Left = left;
             return b;
         }
         public BoxEdges SetRight(double right) {
-            BoxEdges b = new BoxEdges(this); b.right = right;
+            var b = new BoxEdges(this); b.Right = right;
             return b;
         }
         public BoxEdges SetBottom(double bottom) {
-            BoxEdges b = new BoxEdges(this); b.bottom = bottom;
+            var b = new BoxEdges(this); b.Bottom = bottom;
             return b;
         }
 
         /// <summary>
         /// Returns double.NaN unless all edges are the same width, in which case that width is returned
         /// </summary>
-        public double All { get { return this.all; } }
+        public double All { 
+            get { 
+                if (Top == Left && Left == Bottom && Bottom == Right) return Top;
 
-        protected double all {
-            get {
-                if (top == left && left == bottom && bottom == right) return top;
-                else return double.NaN;
+                return double.NaN;
             }
-            set {
-                top = left = bottom = right = value;
+            private set{
+                Top = Left = Bottom = Right = value;
             }
         }
+
+        
         /// <summary>
         /// Returns an instance with a width of 0
         /// </summary>
@@ -102,13 +102,13 @@ namespace ImageResizer {
         /// <summary>
         /// Returns true if th
         /// </summary>
-        public bool IsEmpty { get { return all == 0; } }
+        public bool IsEmpty { get { return All == 0; } }
         /// <summary>
         /// Gets edge offsets as a clockwise array, starting with Top.
         /// </summary>
         /// <returns></returns>
         public float[] GetEdgeOffsets() {
-            return new float[4] { (float)top, (float)right, (float)bottom, (float)left };
+            return new[]{ (float)Top, (float)Right, (float)Bottom, (float)Left };
         }
 
         public override string ToString() {
