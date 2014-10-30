@@ -633,7 +633,7 @@ const unsigned int new_height)
 
 static void unpack24bitRow(int width, void * sourceLine, unsigned int * destArray){
 	for (int i = 0; i < width; i++){
-		destArray[i] = (*(unsigned int *)((long)sourceLine + (i * 3))) | 0xFF000000;
+        destArray[i] = (*(unsigned int *)((unsigned long  long)sourceLine + (i * 3))) | 0xFF000000;
 	}
 }
 
@@ -695,7 +695,7 @@ namespace ImageResizer{
 						IntPtr^ scan0intptr = sourceData->Scan0;
 						void *scan0 = scan0intptr->ToPointer();
 						for (i = 0; (i < sy); i++) {
-							void * linePtr = (void *)((long)scan0 + (sourceData->Stride * i) + (targetArea.Left * 4));
+                            void * linePtr = (void *)((unsigned long  long)scan0 + (sourceData->Stride * i) + (targetArea.Left * 4));
 							memcpy(linePtr, source->tpixels[i], sx * 4);
 						}
 					}
@@ -751,7 +751,7 @@ namespace ImageResizer{
 								IntPtr^ scan0intptr = sourceData->Scan0;
 
 								void *scan0 = scan0intptr->ToPointer();
-								void * linePtr = (void *)((long)scan0 + (sourceData->Stride * i) + (from.Left * (hasAlpha ? 4 : 3)));
+                                void *linePtr = (void *)((unsigned long long)scan0 + (unsigned long  long)((sourceData->Stride * i) + (from.Left * (hasAlpha ? 4 : 3))));
 								if (hasAlpha){
 									memcpy(im->tpixels[i], linePtr, sx * 4);
 								}
