@@ -652,13 +652,20 @@ namespace ImageResizer{
 			public ref class BitmapScaler
 			{
 			public:
-				void ScaleBitmap(Bitmap^ source, Bitmap^ dest, Rectangle crop, Rectangle target){
+				void ScaleBitmap(Bitmap^ source, Bitmap^ dest, Rectangle crop, Rectangle target, IProfiler^ p){
 					gdImagePtr gdSource;
 					gdImagePtr gdResult;
 					try{
+                        p->Start("BitmapToGd",false);
 						gdSource = BitmapToGd(source, crop);
+                        p->Stop("BitmapToGd", true, false);
+                        p->Start("Scale", false);
 						gdResult = Scale(gdSource, target.Width, target.Height);
+                        p->Stop("Scale", true, false);
+                        p->Start("CopyGdToBitmap", false);
 						CopyGdToBitmap(gdResult, dest, target);
+                        p->Stop("CopyGdToBitmap", true, false);
+                        p->Start("GdDispose", false);
 					}finally{
 						if (gdSource != 0) {
 							gdImageDestroy(gdSource);
@@ -668,6 +675,7 @@ namespace ImageResizer{
 							gdImageDestroy(gdResult);
 							gdResult = 0;
 						}
+                        p->Stop("GdDispose", true, false);
 
 					}
 				}
@@ -760,18 +768,20 @@ namespace ImageResizer{
 				virtual RequestedAction InternalGraphicsDrawImage(ImageState^ s, Bitmap^ dest, Bitmap^ source, array<PointF>^ targetArea, RectangleF sourceArea, ImageAttributes^ imageAttributes) override{
 				/*	System::Collections::Specialized::NameValueCollection^ query = safe_cast<System::Collections::Specialized::NameValueCollection^>(s->settings);
 
-
+                
 					String^ fastScale = query->Get("fastscale");
 					String^ sTrue = "true";
 					if (fastScale != sTrue){
 						return RequestedAction::None;
 					}*/
+
+                    
 					RectangleF targetBox = ImageResizer::Util::PolygonMath::GetBoundingBox(targetArea);
 					if (targetBox.Location != targetArea[0] || targetBox.Width != (targetArea[1].X - targetArea[0].X)){
 						return RequestedAction::None;
 					}
 					BitmapScaler ^scaler = gcnew BitmapScaler();
-					scaler->ScaleBitmap(source, dest, Util::PolygonMath::ToRectangle(sourceArea), Util::PolygonMath::ToRectangle(targetBox));
+                    scaler->ScaleBitmap(source, dest, Util::PolygonMath::ToRectangle(sourceArea), Util::PolygonMath::ToRectangle(targetBox), s->Job->Profiler);
 					return RequestedAction::Cancel;
 					
 				}
