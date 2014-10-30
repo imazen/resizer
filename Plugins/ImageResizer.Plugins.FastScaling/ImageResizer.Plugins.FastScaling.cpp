@@ -309,25 +309,24 @@ static gdImagePtr gdImageCreateTrueColor(int sx, int sy)
 	}
 	memset(im, 0, sizeof(gdImage));
 
-	im->tpixels = (unsigned int **)gdMalloc(sizeof(unsigned int *) * sy);
+	im->tpixels = (unsigned int **)gdMalloc(sizeof(unsigned int *)* sy);
+
 	if (!im->tpixels) {
 		gdFree(im);
 		return 0;
 	}
-	for (i = 0; (i < sy); i++) {
-		im->tpixels[i] = (unsigned int *)gdCalloc(sx, sizeof(unsigned int));
-		if (!im->tpixels[i]) {
-			/* 2.0.34 */
-			i--;
-			while (i >= 0) {
-				gdFree(im->tpixels[i]);
-				i--;
-			}
-			gdFree(im->tpixels);
-			gdFree(im);
-			return 0;
-		}
-	}
+
+	im->tpixels[0] = (unsigned int *)gdCalloc(sx*sy, sizeof(unsigned int));
+
+	for (i = 1; (i < sy); i++)
+		im->tpixels[i] = &im->tpixels[0][i*sx];
+
+	if (!im->tpixels[0]) {
+		gdFree(im->tpixels);
+		gdFree(im);
+		return 0;
+	}/**/
+
 	im->sx = sx;
 	im->sy = sy;
 
@@ -374,9 +373,7 @@ static void gdImageDestroy(gdImagePtr im)
     int i;
 
     if (im->tpixels) {
-        for (i = 0; (i < im->sy); i++) {
-            gdFree(im->tpixels[i]);
-        }
+		gdFree(im->tpixels[0]);
         gdFree(im->tpixels);
     }
     gdFree(im);
@@ -718,48 +715,23 @@ namespace ImageResizer{
 					int sy = from.Height;
 
 					int mask = ((INT_MAX >> 8) << 8);
-					gdImagePtr im;
-					im = (gdImage *)gdMalloc(sizeof(gdImage));
-					if (!im) {
-						return 0;
-					}
-					memset(im, 0, sizeof(gdImage));
-
-					im->tpixels = (unsigned int **)gdMalloc(sizeof(unsigned int *) * sy);
-					if (!im->tpixels) {
-						gdFree(im);
-						return 0;
-					}
+					gdImagePtr im = gdImageCreateTrueColor(sx, sy);
+					
 					BitmapData ^sourceData;
 					try{
 						sourceData = source->LockBits(from, ImageLockMode::ReadWrite, source->PixelFormat);
 
 						for (i = 0; (i < sy); i++) {
-							im->tpixels[i] = (unsigned int *)gdCalloc(sx, 4);
-							if (!im->tpixels[i]) {
-								/* 2.0.34 */
-								i--;
-								while (i >= 0) {
-									gdFree(im->tpixels[i]);
-									i--;
-								}
-								gdFree(im->tpixels);
-								gdFree(im);
-								return 0;
+							IntPtr^ scan0intptr = sourceData->Scan0;
+
+							void *scan0 = scan0intptr->ToPointer();
+							void *linePtr = (void *)((unsigned long long)scan0 + (unsigned long  long)((sourceData->Stride * i) + (from.Left * (hasAlpha ? 4 : 3))));
+							if (hasAlpha){
+								memcpy(im->tpixels[i], linePtr, sx * 4);
 							}
 							else{
-								IntPtr^ scan0intptr = sourceData->Scan0;
-
-								void *scan0 = scan0intptr->ToPointer();
-                                void *linePtr = (void *)((unsigned long long)scan0 + (unsigned long  long)((sourceData->Stride * i) + (from.Left * (hasAlpha ? 4 : 3))));
-								if (hasAlpha){
-									memcpy(im->tpixels[i], linePtr, sx * 4);
-								}
-								else{
-									unpack24bitRow(sx, linePtr, im->tpixels[i]);
-								}
+								unpack24bitRow(sx, linePtr, im->tpixels[i]);
 							}
-
 						}
 					}
 					finally{
