@@ -380,7 +380,7 @@ static void gdImageDestroy(gdImagePtr im)
 }
 
 
-static double filter_bicubic(const double t)
+static inline double filter_bicubic(const double t)
 {
 	const double abs_t = (double)fabs(t);
 	const double abs_t_sq = abs_t * abs_t;
@@ -467,7 +467,6 @@ static inline LineContribType *_gdContributionsCalc(unsigned int line_size, unsi
         else{
             res->ContribRow[u].Weights = (float *)gdMalloc(windows_size * sizeof(float));
             
-
             for (iSrc = iLeft; iSrc <= iRight; iSrc++) {
                 dTotalWeight += (res->ContribRow[u].Weights[iSrc - iLeft] = scale_f_d * (*pFilter)(scale_f_d * (dCenter - (double)iSrc)));
             }
@@ -486,7 +485,7 @@ static inline LineContribType *_gdContributionsCalc(unsigned int line_size, unsi
 	}
 	return res;
 }
-
+//#define ScaleAlpha
 
 static inline void
 _gdScale(float *source_buffer, unsigned int source_buffer_count, unsigned int source_buffer_len,
@@ -505,16 +504,20 @@ float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len
         for (i = left; i <= right; i++) {
             const float weight = weightArray[i - left];
 
-            a += weight * source_buffer[i * 4];
-            r += weight * source_buffer[i * 4 + 1];
-            g += weight * source_buffer[i * 4 + 2];
-            b += weight * source_buffer[i * 4 + 3];
+            b += weight * source_buffer[i * 4];
+            g += weight * source_buffer[i * 4 + 1];
+            r += weight * source_buffer[i * 4 + 2];
+#ifdef ScaleAlpha
+            a += weight * source_buffer[i * 4 + 3];
+#endif
         }
 
-        dest_buffer[ndx * 4] = a;
-        dest_buffer[ndx * 4 + 1] = r;
-        dest_buffer[ndx * 4 + 2] = g;
-        dest_buffer[ndx * 4 + 3] = b;
+        dest_buffer[ndx * 4] = b;
+        dest_buffer[ndx * 4 + 1] = g;
+        dest_buffer[ndx * 4 + 2] = r;
+#ifdef ScaleAlpha
+        dest_buffer[ndx * 4 + 3] = a;
+#endif   
     }
 
 }
@@ -524,20 +527,31 @@ static inline void _gdScaleXAndPivotRow(unsigned char * source_row, unsigned int
 
     unsigned int bix;
 
-    for (bix = 0; bix < source_buffer_len; bix++){
+   //This copy seems responsible for about 8% of runtime
+   for (bix = 0; bix < source_buffer_len; bix++){
         source_buffer[bix] = lut[source_row[bix]];
     }
-
+    
+   //Actual scaling seems responsible for about 40% of execution time
     _gdScale(source_buffer, source_pixel_count, source_buffer_len, dest_buffer, dest->sy, dest_buffer_len, weights);
 
 
-
+   //This copy seems responsible for about 12% of runtime
     for (bix = 0; bix < dest->sy; bix++){
+
+#ifdef ScaleAlpha
         dest->tpixels[bix][dest_column_index] = gdTrueColorAlpha(
             uchar_clamp(dest_buffer[bix * 4], 0xFF),
             uchar_clamp(dest_buffer[bix * 4 + 1], 0xFF),
             uchar_clamp(dest_buffer[bix * 4 + 2], 0xFF),
-            uchar_clamp(dest_buffer[bix * 4 + 3], 0xFF)); /* alpha is 0..256 */
+            uchar_clamp(dest_buffer[bix * 4 + 3], 0xFF)); /* alpha is 0..255 */
+#endif
+#ifndef ScaleAlpha
+       dest->tpixels[bix][dest_column_index] = gdTrueColorAlpha(
+            uchar_clamp(dest_buffer[bix * 4], 0xFF),
+            uchar_clamp(dest_buffer[bix * 4 + 1], 0xFF),
+            uchar_clamp(dest_buffer[bix * 4 + 2], 0xFF),0xFF); 
+#endif
     }
 
 }
