@@ -348,7 +348,7 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
         }
     }
 }
-
+//TODO: troubleshoot segfault when scaling leaf to 800px
 
 static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
     const BitmapBgraPtr pDst, float *lut)
@@ -385,12 +385,84 @@ static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
     ContributionsFree(contrib);
 
     return 1;
-}/* _gdScalePass*/
+}
+
+
+static inline void HalveRow(unsigned char* from, unsigned short * to, unsigned int to_count){
+    register int to_b, from_b;
+    const register int to_bytes = to_count * 4;
+    for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += 8){
+        for (int i = 0; i < 4; i++){
+            to[to_b + i] += from[from_b + i] + from[from_b + 4 + i];
+        }
+    }
+}
+
+static inline void HalveRowByDivisor(unsigned char* from, unsigned short * to, const unsigned int to_count, const unsigned int divisor){
+    register int to_b, from_b;
+    const register int to_bytes = to_count * 4;
+    for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += 4 * divisor){
+        for (int i = 0; i < 4; i++){
+            to[to_b + i] += from[from_b + i] + from[from_b + i + 4];
+            /*for (int f = 0; f < divisor * 4; f += 4){
+                to[to_b + i] += from[from_b + i + f];
+            }*/
+        }
+    }
+}
+
+
+
+
+static inline int HalveInternal(const BitmapBgraPtr from,
+    const BitmapBgraPtr to, const int to_w, const int to_h, const int to_stride, const int divisor)
+{
+
+    int to_w_bytes = to_w * 4;
+    unsigned short *buffer = (unsigned short *)calloc(to_w_bytes, sizeof(unsigned short));
+
+    int y, b, d;
+    const int divisorSqr = divisor * divisor;
+
+    //TODO: Ensure that from is equal or greater than divisorx to_w and t_h
+
+    for (y = 0; y < to_h; y++){
+        memset(buffer, 0, sizeof(short) * to_w_bytes);
+        for (d = 0; d < divisor; d++){
+            HalveRowByDivisor(from->pixels + (y * 2 + d) * from->stride, buffer, to_w, divisor);
+        }
+        register unsigned char * dest_line = to->pixels + y * to_stride;
+        for (b = 0; b < to_w_bytes; b++){
+            dest_line[b] = buffer[b] / 4;// divisorSqr;
+        }
+    }
+
+    free(buffer);
+
+    return 1;
+}
+
+static inline int Halve(const BitmapBgraPtr from, const BitmapBgraPtr to, int divisor){
+    return HalveInternal(from, to, to->w, to->h, to->stride,divisor);
+}
+
+
+static inline int HalveInPlace(const BitmapBgraPtr from, int divisor)
+{
+    int to_w = from->w / divisor;
+    int to_h = from->h / divisor;
+    int r = HalveInternal(from, from, to_w, to_h, to_w * 4, divisor);
+    from->w = to_w;
+    from->h = to_h;
+    return r;
+}
+
+
 
 
 static void unpack24bitRow(int width, void * sourceLine, unsigned int * destArray){
-	for (int i = 0; i < width; i++){
-        destArray[i] = (*(unsigned int *)((unsigned long  long)sourceLine + (i * 3))) | 0xFF000000;
+	for (register unsigned int i = 0; i < width; i++){
+        destArray[i] = *(unsigned int *)((size_t)sourceLine + i + i + i) | 0xFF000000;
 	}
 }
 
@@ -419,9 +491,9 @@ namespace ImageResizer{
                         p->Start("SysDrawingToBgra",false);
                         bbSource = SysDrawingToBgra(source, crop);
                         p->Stop("SysDrawingToBgra", true, false);
-                        p->Start("ScaleBgra", false);
-                        bbResult = ScaleBgra(bbSource, target.Width, target.Height, p);
-                        p->Stop("ScaleBgra", true, false);
+                        
+                        bbResult = ScaleBgraWithHalving(bbSource, target.Width, target.Height, p);
+                        
                         p->Start("BgraToSysDrawing", false);
                         BgraToSysDrawing(bbResult, dest, target);
                         p->Stop("BgraToSysDrawing", true, false);
@@ -442,13 +514,38 @@ namespace ImageResizer{
 				 
 
 			private:
+                BitmapBgraPtr ScaleBgraWithHalving(BitmapBgraPtr source, int width, int height, IProfiler^ p){
+                    p->Start("ScaleBgraWithHalving", false);
+                    BitmapBgraPtr halved = NULL; 
+                    try{
+                        if (width * 2 <= source->w && height * 2 <= source->h){
+
+                            p->Start("Halving", false);
+                            HalveInPlace(source,2);
+                            p->Stop("Halving", true, false);
+
+                        }
+
+                        return ScaleBgra(halved != 0 ? halved : source, width, height, p);
+                    }
+                    finally{
+                        if (halved != 0){
+                            DestroyBitmapBgra(halved);
+                            halved = 0;
+                        }
+                        p->Stop("ScaleBgraWithHalving", true, false);
+                    }
+                    
+                }
 
                 BitmapBgraPtr ScaleBgra(BitmapBgraPtr source, int width, int height, IProfiler^ p){
-
+                    p->Start("ScaleBrga",true);
+                    if (source->w == width && source->h == height){
+                        return source;
+                    }
+                    
                     BitmapBgraPtr tmp_im = NULL;
                     BitmapBgraPtr dst = NULL;
-
-
                     float lut[256];
                     for (int n = 0; n < 256; n++) lut[n] = (float)n;
 
@@ -482,6 +579,7 @@ namespace ImageResizer{
                         p->Start("destroy temp image", false);
                         DestroyBitmapBgra(tmp_im);
                         p->Stop("destroy temp image", true, false);
+                        p->Stop("ScaleBrga", true, false);
                     }
                     return dst;
 				}
