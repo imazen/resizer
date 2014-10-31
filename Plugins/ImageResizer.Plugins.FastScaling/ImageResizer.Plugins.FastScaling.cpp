@@ -306,55 +306,31 @@ float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len
 }
 
 
-static inline void ScaleXAndPivotRow(unsigned char * source_row, unsigned int source_pixel_count, ContributionType * weights, BitmapBgraPtr dest, unsigned int dest_column_index, float *source_buffer, unsigned int source_buffer_len, float *dest_buffer, unsigned int dest_buffer_len, float *lut){
-    unsigned int bix;
-   //This copy seems responsible for about 8% of runtime
-   for (bix = 0; bix < source_buffer_len; bix++){
-        source_buffer[bix] = lut[source_row[bix]];
-    }
-    
-   //Actual scaling seems responsible for about 40% of execution time
-   ScaleBgraFloat(source_buffer, source_pixel_count, source_buffer_len, dest_buffer, dest->h, dest_buffer_len, weights);
-
-
-   //This copy seems responsible for about 12% of runtime
-    for (bix = 0; bix < dest->h; bix++){
-
-#ifdef ScaleAlpha
-        dest->pixelInts[bix * dest->w + dest_column_index] = gdTrueColorAlpha(
-            uchar_clamp(dest_buffer[bix * 4], 0xFF),
-            uchar_clamp(dest_buffer[bix * 4 + 1], 0xFF),
-            uchar_clamp(dest_buffer[bix * 4 + 2], 0xFF),
-            uchar_clamp(dest_buffer[bix * 4 + 3], 0xFF)); /* alpha is 0..255 */
-#endif
-#ifndef ScaleAlpha
-        dest->pixelInts[bix * dest->w + dest_column_index] = gdTrueColorAlpha(
-            uchar_clamp(dest_buffer[bix * 4], 0xFF),
-            uchar_clamp(dest_buffer[bix * 4 + 1], 0xFF),
-            uchar_clamp(dest_buffer[bix * 4 + 2], 0xFF),0xFF); 
-#endif
-    }
-}
-
-
 static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int start_row, unsigned int row_count,  ContributionType * weights, BitmapBgraPtr dest, float *source_buffers, unsigned int source_buffer_len, float *dest_buffers, unsigned int dest_buffer_len, float *lut){
 
-    unsigned char * scan_start = source_bitmap->pixels + start_row * source_bitmap->stride;
+    const register unsigned char * scan_start = source_bitmap->pixels + start_row * source_bitmap->stride;
 
 
-    unsigned int bix, bufferSet;
+    register unsigned int bix, bufferSet;
+    const register unsigned int source_buffer_bytes = source_buffer_len * row_count;
+    const register unsigned int from_pixel_count = source_bitmap->w;
+    const register unsigned int to_pixel_count = dest->h;
+    const register unsigned int other_axis_count = dest->w;
     
-    for (bix = 0; bix < source_buffer_len * row_count; bix++){
+    for (bix = 0; bix < source_buffer_bytes; bix++){
         source_buffers[bix] = lut[scan_start[bix]];
     }
     
     //Actual scaling seems responsible for about 40% of execution time
     for (bufferSet = 0; bufferSet < row_count; bufferSet++){
-        ScaleBgraFloat(source_buffers + (source_buffer_len * bufferSet), source_bitmap->w, source_buffer_len, dest_buffers + (dest_buffer_len * bufferSet), dest->h, dest_buffer_len, weights);
+        ScaleBgraFloat(source_buffers + (source_buffer_len * bufferSet), from_pixel_count, source_buffer_len, 
+                        dest_buffers + (dest_buffer_len * bufferSet), to_pixel_count, dest_buffer_len, weights);
     }
     
-    for (bix = 0; bix < dest->h; bix++){
+    for (bix = 0; bix < to_pixel_count; bix++){
+        const register int dest_start = bix * other_axis_count + start_row;
         for (bufferSet = 0; bufferSet < row_count; bufferSet++){
+            const register int dest_buffer_start = bufferSet * dest_buffer_len + bix * 4;
     #ifdef ScaleAlpha
             dest->pixelInts[bix * dest->w + start_row + bufferSet] = gdTrueColorAlpha(
                 uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4], 0xFF),
@@ -363,10 +339,10 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
                 uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4 + 3], 0xFF));
     #endif
     #ifndef ScaleAlpha
-            dest->pixelInts[bix * dest->w + start_row + bufferSet] = gdTrueColorAlpha(
-                  uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4], 0xFF),
-                  uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4 + 1], 0xFF),
-                  uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4 + 2], 0xFF), 0xFF);
+            dest->pixelInts[dest_start + bufferSet] = gdTrueColorAlpha(
+                uchar_clamp(dest_buffers[dest_buffer_start], 0xFF),
+                uchar_clamp(dest_buffers[dest_buffer_start + 1], 0xFF),
+                uchar_clamp(dest_buffers[dest_buffer_start + 2], 0xFF), 0xFF);
     #endif
         }
     }
@@ -385,7 +361,7 @@ static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
         return 0;
     }
 
-    int buffer = 1; //using buffer=5 seems about 6% better than most other non-zero values. 
+    int buffer = 4; //using buffer=5 seems about 6% better than most other non-zero values. 
 
 
     unsigned int source_buffer_len = pSrc->stride;
@@ -395,20 +371,11 @@ static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
     float *destBuffers = (float *)malloc(sizeof(float) * dest_buffer_len * buffer);
 
 
-    if (buffer == 1){
-        for (line_ndx = 0; line_ndx < pSrc->h; line_ndx++) {
+    /* Scale each line */
+    for (line_ndx = 0; line_ndx < pSrc->h; line_ndx += buffer) {
 
-            ScaleXAndPivotRow(pSrc->pixels + line_ndx * pSrc->stride, pSrc->w, contrib->ContribRow, pDst, line_ndx,
+        ScaleXAndPivotRows(pSrc, line_ndx, MIN(pSrc->h - line_ndx, buffer), contrib->ContribRow, pDst,
                 sourceBuffers, source_buffer_len, destBuffers, dest_buffer_len, lut);
-        }
-    }
-    else{
-        /* Scale each line */
-        for (line_ndx = 0; line_ndx < pSrc->h; line_ndx += buffer) {
-
-            ScaleXAndPivotRows(pSrc, line_ndx, MIN(pSrc->h - line_ndx, buffer), contrib->ContribRow, pDst,
-                 sourceBuffers, source_buffer_len, destBuffers, dest_buffer_len, lut);
-        }
     }
 
     free(sourceBuffers);
