@@ -478,6 +478,42 @@ static inline LineContribType *_gdContributionsCalc(unsigned int line_size, unsi
 	}
 	return res;
 }
+
+
+
+static inline void _gdScaleXAndPivotRowUnbuffered(unsigned char * source_row, unsigned int source_pixel_count, ContributionType * weights, gdImagePtr dest, unsigned int dest_column_index, float *lut){
+
+    unsigned int dest_count = dest->sy;
+
+    unsigned int ndx;
+    for (ndx = 0; ndx < dest_count; ndx++) {
+        int r = 0, g = 0, b = 0, a = 0;
+        const int left = weights[ndx].Left;
+        const int right = weights[ndx].Right;
+
+        const float * weightArray = weights[ndx].Weights;
+        int i;
+
+        /* Accumulate each channel */
+        for (i = left; i <= right; i++) {
+            const float weight = weightArray[i - left];
+
+            a += weight *  lut[source_row[i * 4]];
+            r += weight * lut[source_row[i * 4 + 1]];
+            g += weight * lut[source_row[i * 4 + 2]];
+            b += weight * lut[source_row[i * 4 + 3]];
+        }
+
+        dest->tpixels[ndx][dest_column_index] = gdTrueColorAlpha(
+            uchar_clamp(a, 0xFF),
+            uchar_clamp(r, 0xFF),
+            uchar_clamp(g, 0xFF),
+            uchar_clamp(b, 0xFF));
+    }
+
+}
+
+
 //#define ScaleAlpha
 
 static inline void
@@ -550,39 +586,41 @@ static inline void _gdScaleXAndPivotRow(unsigned char * source_row, unsigned int
 }
 
 
+static inline void _gdScaleXAndPivotRows(unsigned char * source_bitmap, unsigned int source_pixel_count, ContributionType * weights, gdImagePtr dest, unsigned int dest_column_index, unsigned int count, float *source_buffers, unsigned int source_buffer_len, float *dest_buffers, unsigned int dest_buffer_len, float *lut){
 
+    unsigned int bix, bufferSet;
 
-static inline void _gdScaleXAndPivotRowUnbuffered(unsigned char * source_row, unsigned int source_pixel_count, ContributionType * weights, gdImagePtr dest, unsigned int dest_column_index, float *lut){
+    for (bix = 0; bix < source_buffer_len * count; bix++){
+        source_buffers[bix] = lut[source_bitmap[bix]];
+    }
 
-    unsigned int dest_count = dest->sy;
+    //Actual scaling seems responsible for about 40% of execution time
+    for (bufferSet = 0; bufferSet < count; bufferSet++){
+        _gdScale(source_buffers + (source_buffer_len * bufferSet), source_pixel_count, source_buffer_len, dest_buffers + (dest_buffer_len * bufferSet), dest->sy, dest_buffer_len, weights);
+    }
 
-    unsigned int ndx;
-    for (ndx = 0; ndx < dest_count; ndx++) {
-        int r = 0, g = 0, b = 0, a = 0;
-        const int left = weights[ndx].Left;
-        const int right = weights[ndx].Right;
-
-        const float * weightArray = weights[ndx].Weights;
-        int i;
-
-        /* Accumulate each channel */
-        for (i = left; i <= right; i++) {
-            const float weight = weightArray[i - left];
-
-            a += weight *  lut[source_row[i * 4]];
-            r += weight * lut[source_row[i * 4 + 1]];
-            g += weight * lut[source_row[i * 4 + 2]];
-            b += weight * lut[source_row[i * 4 + 3]];
+    for (bix = 0; bix < dest->sy; bix++){
+        for (bufferSet = 0; bufferSet < count; bufferSet++){
+    #ifdef ScaleAlpha
+            const int pixelStart = bufferSet * dest_buffer_len + bix * 4;
+            dest->tpixels[bix][dest_column_index + bufferSet] = gdTrueColorAlpha(
+                uchar_clamp(dest_buffers[pixelStart], 0xFF),
+                uchar_clamp(dest_buffers[pixelStart + 1], 0xFF),
+                uchar_clamp(dest_buffers[pixelStart + 2], 0xFF), 
+                uchar_clamp(dest_buffers[pixelStart + 3], 0xFF));
+    #endif
+    #ifndef ScaleAlpha
+              dest->tpixels[bix][dest_column_index + bufferSet] = gdTrueColorAlpha(
+                  uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4], 0xFF),
+                  uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4 + 1], 0xFF),
+                  uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4 + 2], 0xFF), 0xFF);;
+    #endif
         }
-
-        dest->tpixels[ndx][dest_column_index] = gdTrueColorAlpha(
-            uchar_clamp(a, 0xFF),
-            uchar_clamp(r, 0xFF),
-            uchar_clamp(g, 0xFF),
-            uchar_clamp(b, 0xFF));
     }
 
 }
+
+
 
 
 
@@ -602,22 +640,34 @@ static inline int _gdScaleXAndPivot(const gdImagePtr pSrc,
         return 0;
     }
 
-    int buffer = 1;
+    int buffer = 5; //using buffer=5 seems about 6% better than most other non-zero values. 
 
-    if (buffer == 1){
+    if (buffer > 0){
         unsigned int source_buffer_len = pSrc->sx * 4;
-        float *sourceBuffer = (float *)gdMalloc(sizeof(float) * source_buffer_len);
+        float *sourceBuffers = (float *)gdMalloc(sizeof(float) * source_buffer_len * buffer);
 
         unsigned int dest_buffer_len = pDst->sy * 4;
-        float *destBuffer = (float *)gdMalloc(sizeof(float) * dest_buffer_len);
+        float *destBuffers = (float *)gdMalloc(sizeof(float) * dest_buffer_len * buffer);
 
-        /* Scale each line */
-        for (line_ndx = 0; line_ndx < pSrc->sy; line_ndx++) {
-            _gdScaleXAndPivotRow((unsigned char *)(pSrc->tpixels[line_ndx]), pSrc->sx, contrib->ContribRow, pDst, line_ndx,
-                sourceBuffer, source_buffer_len, destBuffer, dest_buffer_len, lut);
+
+        if (buffer == 0){
+            for (line_ndx = 0; line_ndx < pSrc->sy; line_ndx++) {
+
+                _gdScaleXAndPivotRow((unsigned char *)(pSrc->tpixels[line_ndx]), pSrc->sx, contrib->ContribRow, pDst, line_ndx,
+                    sourceBuffers, source_buffer_len, destBuffers, dest_buffer_len, lut);
+            }
         }
-        gdFree(sourceBuffer);
-        gdFree(destBuffer);
+        else{
+            /* Scale each line */
+            for (line_ndx = 0; line_ndx < pSrc->sy; line_ndx += buffer) {
+
+                _gdScaleXAndPivotRows((unsigned char *)(pSrc->tpixels[line_ndx]), pSrc->sx, contrib->ContribRow, pDst, line_ndx,
+                    MIN(pSrc->sy - line_ndx, buffer), sourceBuffers, source_buffer_len, destBuffers, dest_buffer_len, lut);
+            }
+        }
+
+        gdFree(sourceBuffers);
+        gdFree(destBuffers);
     }
     else{
         for (line_ndx = 0; line_ndx < pSrc->sy; line_ndx++) {
