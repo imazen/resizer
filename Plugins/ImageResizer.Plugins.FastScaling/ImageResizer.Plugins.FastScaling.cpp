@@ -646,7 +646,7 @@ namespace ImageResizer{
 						gdSource = BitmapToGd(source, crop);
                         p->Stop("BitmapToGd", true, false);
                         p->Start("Scale", false);
-						gdResult = Scale(gdSource, target.Width, target.Height);
+						gdResult = Scale(gdSource, target.Width, target.Height, p);
                         p->Stop("Scale", true, false);
                         p->Start("CopyGdToBitmap", false);
 						CopyGdToBitmap(gdResult, dest, target);
@@ -669,8 +669,47 @@ namespace ImageResizer{
 
 			private:
 
-				gdImagePtr Scale(gdImagePtr source, int width, int height){
-					return  gdImageScaleTwoPass(source, width, height);
+                gdImagePtr Scale(gdImagePtr source, int width, int height, IProfiler^ p){
+
+                    gdImagePtr tmp_im = NULL;
+                    gdImagePtr dst = NULL;
+
+
+                    float lut[256];
+                    for (int n = 0; n < 256; n++) lut[n] = (float)n;
+
+                    p->Start("create temp image(sy x dx)", false);
+                    /* Scale horizontally  */
+                    tmp_im = gdImageCreateTrueColor(source->sy, width);
+                   
+                    if (tmp_im == NULL) {
+                        return NULL;
+                    }
+                    try{
+                        p->Stop("create temp image(sy x dx)", true, false);
+
+                        p->Start("scale and pivot to temp", false);
+                        _gdScaleXAndPivot(source, tmp_im, lut);
+                        p->Stop("scale and pivot to temp", true, false);
+
+                        p->Start("create image(dx x dy)", false);
+                        /* Otherwise, we need to scale vertically. */
+                        dst = gdImageCreateTrueColor(width, height);
+                        p->Stop("create image(dx x dy)", true, false);
+                        if (dst == NULL) {
+                            return NULL;
+                        }
+
+                        p->Start("scale and pivot to final", false);
+                        _gdScaleXAndPivot(tmp_im, dst, lut);
+                        p->Stop("scale and pivot to final", true, false);
+                    }
+                    finally{
+                        p->Start("destroy temp image", false);
+                        gdImageDestroy(tmp_im);
+                        p->Stop("destroy temp image", true, false);
+                    }
+                    return dst;
 				}
 
 				void CopyGdToBitmap(gdImagePtr source, Bitmap^ target, Rectangle targetArea){
