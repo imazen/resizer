@@ -403,17 +403,18 @@ static inline LineContribType * _gdContributionsAlloc(unsigned int line_length, 
 	res->LineLength = line_length;
 	res->ContribRow = (ContributionType *)gdMalloc(line_length * sizeof(ContributionType));
 
-	for (u = 0; u < line_length; u++) {
-		res->ContribRow[u].Weights = (float *)gdMalloc(windows_size * sizeof(float));
-	}
 	return res;
 }
 
 static inline void _gdContributionsFree(LineContribType * p)
 {
 	unsigned int u;
+    float * last = 0;
 	for (u = 0; u < p->LineLength; u++)  {
-		gdFree(p->ContribRow[u].Weights);
+        if (last != p->ContribRow[u].Weights){
+            gdFree(p->ContribRow[u].Weights);
+        }
+        last = p->ContribRow[u].Weights;
 	}
 	gdFree(p->ContribRow);
 	gdFree(p);
@@ -460,20 +461,28 @@ static inline LineContribType *_gdContributionsCalc(unsigned int line_size, unsi
 		res->ContribRow[u].Left = iLeft;
 		res->ContribRow[u].Right = iRight;
 
-		for (iSrc = iLeft; iSrc <= iRight; iSrc++) {
-			dTotalWeight += (res->ContribRow[u].Weights[iSrc - iLeft] = scale_f_d * (*pFilter)(scale_f_d * (dCenter - (double)iSrc)));
-		}
+        if (u > 0 && res->ContribRow[u - 1].Right - res->ContribRow[u - 1].Left == iRight - iLeft){
+            res->ContribRow[u].Weights = res->ContribRow[u - 1].Weights;
+        }
+        else{
+            res->ContribRow[u].Weights = (float *)gdMalloc(windows_size * sizeof(float));
+            
 
-		if (dTotalWeight < 0.0) {
-			_gdContributionsFree(res);
-			return NULL;
-		}
+            for (iSrc = iLeft; iSrc <= iRight; iSrc++) {
+                dTotalWeight += (res->ContribRow[u].Weights[iSrc - iLeft] = scale_f_d * (*pFilter)(scale_f_d * (dCenter - (double)iSrc)));
+            }
 
-		if (dTotalWeight > 0.0) {
-			for (iSrc = iLeft; iSrc <= iRight; iSrc++) {
-				res->ContribRow[u].Weights[iSrc - iLeft] /= dTotalWeight;
-			}
-		}
+            if (dTotalWeight < 0.0) {
+                _gdContributionsFree(res);
+                return NULL;
+            }
+
+            if (dTotalWeight > 0.0) {
+                for (iSrc = iLeft; iSrc <= iRight; iSrc++) {
+                    res->ContribRow[u].Weights[iSrc - iLeft] /= dTotalWeight;
+                }
+            }
+        }
 	}
 	return res;
 }
@@ -523,7 +532,7 @@ gdAxis axis, float *source_buffer, unsigned int source_buffer_len, float *dest_b
 			r += weight * source_buffer[i * 4 + 1];
 			g += weight * source_buffer[i * 4 + 2];
 			b += weight * source_buffer[i * 4 + 3];
-		}/* for */
+		}
 	
 		dest_buffer[ndx * 4 + 1] = r;
 		dest_buffer[ndx * 4 + 2] = g;
