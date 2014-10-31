@@ -545,6 +545,39 @@ static inline void _gdScaleXAndPivotRow(unsigned char * source_row, unsigned int
 
 
 
+static inline void _gdScaleXAndPivotRowUnbuffered(unsigned char * source_row, unsigned int source_pixel_count, ContributionType * weights, gdImagePtr dest, unsigned int dest_column_index, float *lut){
+
+    unsigned int dest_count = dest->sy;
+
+    unsigned int ndx;
+    for (ndx = 0; ndx < dest_count; ndx++) {
+        int r = 0, g = 0, b = 0, a = 0;
+        const int left = weights[ndx].Left;
+        const int right = weights[ndx].Right;
+
+        const float * weightArray = weights[ndx].Weights;
+        int i;
+
+        /* Accumulate each channel */
+        for (i = left; i <= right; i++) {
+            const float weight = weightArray[i - left];
+
+            a += weight *  lut[source_row[i * 4]];
+            r += weight * lut[source_row[i * 4 + 1]];
+            g += weight * lut[source_row[i * 4 + 2]];
+            b += weight * lut[source_row[i * 4 + 3]];
+        }
+
+        dest->tpixels[ndx][dest_column_index] = gdTrueColorAlpha(
+            uchar_clamp(a, 0xFF),
+            uchar_clamp(r, 0xFF),
+            uchar_clamp(g, 0xFF),
+            uchar_clamp(b, 0xFF));
+    }
+
+}
+
+
 
 static inline int _gdScaleXAndPivot(const gdImagePtr pSrc,
     const gdImagePtr pDst, float *lut)
@@ -562,19 +595,28 @@ static inline int _gdScaleXAndPivot(const gdImagePtr pSrc,
         return 0;
     }
 
-    unsigned int source_buffer_len = pSrc->sx * 4;
-    float *sourceBuffer = (float *)gdMalloc(sizeof(float) * source_buffer_len);
+    int buffer = 1;
 
-    unsigned int dest_buffer_len = pDst->sy * 4;
-    float *destBuffer = (float *)gdMalloc(sizeof(float) * dest_buffer_len);
+    if (buffer == 1){
+        unsigned int source_buffer_len = pSrc->sx * 4;
+        float *sourceBuffer = (float *)gdMalloc(sizeof(float) * source_buffer_len);
 
-    /* Scale each line */
-    for (line_ndx = 0; line_ndx < pSrc->sy; line_ndx++) {
-        _gdScaleXAndPivotRow((unsigned char *)(pSrc->tpixels[line_ndx]), pSrc->sx, contrib->ContribRow, pDst, line_ndx,
-            sourceBuffer, source_buffer_len, destBuffer, dest_buffer_len, lut);
+        unsigned int dest_buffer_len = pDst->sy * 4;
+        float *destBuffer = (float *)gdMalloc(sizeof(float) * dest_buffer_len);
+
+        /* Scale each line */
+        for (line_ndx = 0; line_ndx < pSrc->sy; line_ndx++) {
+            _gdScaleXAndPivotRow((unsigned char *)(pSrc->tpixels[line_ndx]), pSrc->sx, contrib->ContribRow, pDst, line_ndx,
+                sourceBuffer, source_buffer_len, destBuffer, dest_buffer_len, lut);
+        }
+        gdFree(sourceBuffer);
+        gdFree(destBuffer);
     }
-    gdFree(sourceBuffer);
-    gdFree(destBuffer);
+    else{
+        for (line_ndx = 0; line_ndx < pSrc->sy; line_ndx++) {
+            _gdScaleXAndPivotRowUnbuffered((unsigned char *)(pSrc->tpixels[line_ndx]), pSrc->sx, contrib->ContribRow, pDst, line_ndx, lut);
+        }
+    }
     _gdContributionsFree(contrib);
 
     return 1;
