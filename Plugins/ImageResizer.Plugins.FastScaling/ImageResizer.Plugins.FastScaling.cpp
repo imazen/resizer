@@ -388,15 +388,7 @@ static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
 }
 
 
-static inline void HalveRow(unsigned char* from, unsigned short * to, unsigned int to_count){
-    register int to_b, from_b;
-    const register int to_bytes = to_count * 4;
-    for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += 8){
-        for (int i = 0; i < 4; i++){
-            to[to_b + i] += from[from_b + i] + from[from_b + 4 + i];
-        }
-    }
-}
+
 
 static inline void HalveRowByDivisor(const unsigned char* from, unsigned short * to, const unsigned int to_count, const int divisor){
     int to_b, from_b;
@@ -586,10 +578,12 @@ namespace ImageResizer{
                     p->Start("ScaleBgraWithHalving", false);
                     BitmapBgraPtr halved = NULL; 
                     try{
-                        if (width * 2 <= source->w && height * 2 <= source->h){
 
+                        int divisor = MIN(source->w / width, source->h / height);
+                        
+                        if (divisor > 1){
                             p->Start("Halving", false);
-                            HalveInPlace(source,2);
+                            HalveInPlace(source,divisor);
                             p->Stop("Halving", true, false);
 
                         }
@@ -607,11 +601,11 @@ namespace ImageResizer{
                 }
 
                 BitmapBgraPtr ScaleBgra(BitmapBgraPtr source, int width, int height, IProfiler^ p){
-                    p->Start("ScaleBrga",true);
-                    if (source->w == width && source->h == height){
+                   if (source->w == width && source->h == height){
                         return source;
                     }
-                    
+                   p->Start("ScaleBgra", true);
+
                     BitmapBgraPtr tmp_im = NULL;
                     BitmapBgraPtr dst = NULL;
                     float lut[256];
@@ -621,10 +615,11 @@ namespace ImageResizer{
                     /* Scale horizontally  */
                     tmp_im = CreateBitmapBgraPtr(source->h, width,false);
                    
-                    if (tmp_im == NULL) {
-                        return NULL;
-                    }
+                    
                     try{
+                        if (tmp_im == NULL) {
+                            return NULL;
+                        }
                         p->Stop("create temp image(sy x dx)", true, false);
 
                         p->Start("scale and pivot to temp", false);
@@ -647,7 +642,7 @@ namespace ImageResizer{
                         p->Start("destroy temp image", false);
                         DestroyBitmapBgra(tmp_im);
                         p->Stop("destroy temp image", true, false);
-                        p->Stop("ScaleBrga", true, false);
+                        p->Stop("ScaleBgra", true, false);
                     }
                     return dst;
 				}
