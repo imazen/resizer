@@ -146,6 +146,62 @@ static BitmapBgraPtr CreateBitmapBgraPtr(int sx, int sy, int zeroed)
 	return im;
 }
 
+static BitmapPlanarPtr CreateBitmapPlanarPtr(int sx, int sy, int channels, int zeroed)
+{
+    int i;
+    BitmapPlanarPtr im;
+
+    if (overflow2(sx, sy) || overflow2(sizeof(int *), sy) || overflow2(sizeof(int), sx)) {
+        return NULL;
+    }
+
+
+    im = (BitmapPlanar *)malloc(sizeof(BitmapPlanar));
+    if (!im) {
+        return 0;
+    }
+    memset(im, 0, sizeof(BitmapPlanar));
+    im->w = sx;
+    im->h = sy;
+    im->channels = channels;
+
+    im->planes = (float **)calloc(channels, sizeof(float *));
+    if (!im->planes) {
+        free(im->planar);
+        return 0;
+    }
+
+    if (zeroed){
+        im->planar = (float *)calloc(sy * sx * channels, sizeof(float));
+    }
+    else{
+        im->planar = (float *)malloc(sy * sx * channels* sizeof(float));
+    }
+    if (!im->planar) {
+        free(im->planes);
+        free(im);
+        return 0;
+    }
+
+    for (i = 0; i < channels; i++){
+        im->planes[i] = im->planar + i * sx * sy;
+    }
+    return im;
+}
+
+
+static void DestroyBitmapPlanar(BitmapPlanarPtr im)
+{
+    int i;
+    if (im->planar) {
+        free(im->planar);
+    }
+    if (im->planes) {
+        free(im->planes);
+    }
+    free(im);
+}
+
 
 static void DestroyBitmapBgra(BitmapBgraPtr im)
 {
@@ -306,6 +362,49 @@ float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len
 
 }
 
+static inline void ScalePlanarChannel(float *from, unsigned int from_count, float *to, unsigned int to_count, ContributionType * weights){
+
+    register unsigned int ndx, i;
+    for (ndx = 0; ndx < to_count; ndx++) {
+        const int left = weights[ndx].Left;
+        const int right = weights[ndx].Right;
+        const float * weightArray = weights[ndx].Weights;
+        register float a;
+
+        /* Accumulate each channel */
+        for (i = left; i <= right; i++) {
+            a += weightArray[i - left] * from[i];
+        }
+
+        to[ndx] = a;
+    }
+}
+
+
+static inline void ScaleXAndPivotRowsPlanar(BitmapPlanarPtr from, unsigned int start_row, unsigned int row_count, ContributionType * weights, 
+    BitmapPlanarPtr to, float *dest_buffers){
+
+    register unsigned int x, row_offset, c;
+    register unsigned int from_count = from->w;
+    register unsigned int to_count = to->h;
+    register unsigned int to_stride = to->w;
+
+    for (c = 0; c < from->channels; c++){
+        float * plane = from->planes[c];
+        for (row_offset = 0; row_offset < row_count; row_offset++){
+            ScalePlanarChannel(plane + from_count * row_offset, from_count, dest_buffers + (to_count * row_offset), to_count, weights);
+        }
+        for (row_offset = 0; row_offset < row_count; row_offset++){
+            for (x = 0; x < to_count; x++){
+                *(plane + x * to_stride + row_offset) = dest_buffers[to_count * row_offset + x];
+            }
+        }
+    }
+
+}
+
+
+
 
 static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int start_row, unsigned int row_count,  ContributionType * weights, BitmapBgraPtr dest, float *source_buffers, unsigned int source_buffer_len, float *dest_buffers, unsigned int dest_buffer_len, float *lut){
 
@@ -387,12 +486,77 @@ static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
     return 1;
 }/* _gdScalePass*/
 
+static inline int ScaleXAndPivotPlanar(const BitmapPlanarPtr from,
+    const BitmapPlanarPtr to)
+{
+    unsigned int line_ndx;
+    LineContribType * contrib;
+
+    contrib = ContributionsCalc(to->h, from->w,
+        (double)to->h / (double)from->w, filter_bicubic);
+    if (contrib == NULL) {
+        return 0;
+    }
+
+    int buffer = 4; //using buffer=5 seems about 6% better than most other non-zero values. 
+
+    float *destBuffers = (float *)malloc(sizeof(float) * to->h * buffer);
+
+
+    /* Scale each line */
+    for (line_ndx = 0; line_ndx < from->h; line_ndx += buffer) {
+
+        ScaleXAndPivotRowsPlanar(from, line_ndx, MIN(from->h - line_ndx, buffer), contrib->ContribRow, to, destBuffers);
+    }
+    free(destBuffers);
+
+    ContributionsFree(contrib);
+
+    return 1;
+}/* _gdScalePass*/
+
+
 
 static void unpack24bitRow(int width, void * sourceLine, unsigned int * destArray){
 	for (int i = 0; i < width; i++){
         destArray[i] = (*(unsigned int *)((unsigned long  long)sourceLine + (i * 3))) | 0xFF000000;
 	}
 }
+
+static void copyToPlanar(int channels, unsigned char * bytes, int stride, int x_start, int x_stop, int y_start, int y_stop, BitmapPlanarPtr target){
+    float lut[256];
+    for (int n = 0; n < 256; n++) lut[n] = (float)n;
+
+
+    register int y, x, c;
+    for (y = y_start; y < y_stop; y++){
+        for (x = x_start; x < x_stop; x++){
+            for (c = 0; c < channels; c++){
+                *(target->planes[c] + target->w * (y - y_start) + (x - x_start)) = lut[*(bytes + stride * y  + x * channels + c)];
+            }
+        }
+    }
+}
+
+static void copyPlanarToBgra(const BitmapPlanarPtr from,  unsigned char * to, const int to_stride, const int to_x_offset, const int to_y_offset){
+    register const int w = from->w;
+    register const int h = from->h;
+    register const int channels = from->channels;
+
+    register int y, x, c;
+    for (c = 0; c < channels; c++){
+        register const float * plane = from->planes[c];
+        for (y = 0; y < h; y++){
+            for (x = 0; x < w; x++){
+                *(to + to_stride * (y + to_y_offset) + 4 * (x + to_x_offset) + c) = 0xFF;//uchar_clamp(*(plane + y * w + x), 0xFF);
+            }
+        }
+    }
+}
+
+
+
+
 
 
 
@@ -408,6 +572,136 @@ using namespace System::Diagnostics;
 namespace ImageResizer{
 	namespace Plugins{
 		namespace FastScaling {
+            public ref class PlanarScaler
+            {
+            public:
+                void ScaleBitmap(Bitmap^ source, Bitmap^ dest, Rectangle crop, Rectangle target, IProfiler^ p){
+                    BitmapPlanarPtr s;
+                    BitmapPlanarPtr r;
+                    try{
+                        p->Start("SysDrawingToPlanar", false);
+                        s = SysDrawingToPlanar(source, crop);
+                        p->Stop("SysDrawingToPlanar", true, false);
+
+                        p->Start("ScalePlanar", false);
+                        r = ScalePlanar(s, target.Width, target.Height, p);
+                        p->Stop("ScalePlanar", true, false);
+
+                        p->Start("PlanarToSysDrawing", false);
+                        PlanarToSysDrawing(r, dest, target);
+                        p->Stop("PlanarToSysDrawing", true, false);
+                        p->Start("PlanarDispose", false);
+                    }
+                    finally{
+                        if (s != 0) {
+                            DestroyBitmapPlanar(s);
+                            s = 0;
+                        }
+                        if (r != 0){
+                            DestroyBitmapPlanar(r);
+                            r = 0;
+                        }
+                        p->Stop("PlanarDispose", true, false);
+
+                    }
+                }
+
+
+            private:
+
+                BitmapPlanarPtr ScalePlanar(BitmapPlanarPtr source, int width, int height, IProfiler^ p){
+
+                    BitmapPlanarPtr tmp_im = NULL;
+                    BitmapPlanarPtr dst = NULL;
+
+
+                    float lut[256];
+                    for (int n = 0; n < 256; n++) lut[n] = (float)n;
+
+                    p->Start("create temp image(sy x dx)", false);
+                    /* Scale horizontally  */
+                    tmp_im = CreateBitmapPlanarPtr(source->h, width, source->channels,false);
+
+                    if (tmp_im == NULL) {
+                        return NULL;
+                    }
+                    try{
+                        p->Stop("create temp image(sy x dx)", true, false);
+
+                        p->Start("scale and pivot to temp", false);
+                        ScaleXAndPivotPlanar(source, tmp_im);
+                        p->Stop("scale and pivot to temp", true, false);
+
+                        p->Start("create image(dx x dy)", false);
+                        /* Otherwise, we need to scale vertically. */
+                        dst = CreateBitmapPlanarPtr(width, height, source->channels, false);
+                        p->Stop("create image(dx x dy)", true, false);
+                        if (dst == NULL) {
+                            return NULL;
+                        }
+
+                        p->Start("scale and pivot to final", false);
+                        ScaleXAndPivotPlanar(tmp_im, dst);
+                        p->Stop("scale and pivot to final", true, false);
+                    }
+                    finally{
+                        p->Start("destroy temp image", false);
+                        DestroyBitmapPlanar(tmp_im);
+                        p->Stop("destroy temp image", true, false);
+                    }
+                    return dst;
+                }
+
+                void PlanarToSysDrawing(BitmapPlanarPtr source, Bitmap^ target, Rectangle targetArea){
+                    if (target->PixelFormat != PixelFormat::Format32bppArgb){
+                        throw gcnew ArgumentOutOfRangeException("target", "Invalid pixel format " + target->PixelFormat.ToString());
+                    }
+                    BitmapData ^targetData;
+                    try{
+                        targetData = target->LockBits(targetArea, ImageLockMode::ReadOnly, target->PixelFormat);
+                        int sy = source->h;
+                        int sx = source->w;
+                        int i;
+                        IntPtr^ scan0intptr = targetData->Scan0;
+                        unsigned char *scan0 = (unsigned char *)scan0intptr->ToPointer();
+                        copyPlanarToBgra(source, scan0, targetData->Stride, targetArea.Left, targetArea.Top);
+                    }
+                    finally{
+                        target->UnlockBits(targetData);
+                    }
+                }
+
+                BitmapPlanarPtr SysDrawingToPlanar(Bitmap^ source, Rectangle from){
+                    int i;
+                    int j;
+                    bool hasAlpha = source->PixelFormat == PixelFormat::Format32bppArgb;
+                    if (source->PixelFormat != PixelFormat::Format32bppArgb && source->PixelFormat != PixelFormat::Format24bppRgb){
+                        throw gcnew ArgumentOutOfRangeException("source", "Invalid pixel format " + source->PixelFormat.ToString());
+                    }
+                    if (from.X < 0 || from.Y < 0 || from.Right > source->Width || from.Bottom > source->Height) {
+                        throw gcnew ArgumentOutOfRangeException("from");
+                    }
+                    int sx = from.Width;
+                    int sy = from.Height;
+
+                    int mask = ((INT_MAX >> 8) << 8);
+                    BitmapPlanarPtr im = CreateBitmapPlanarPtr(sx, sy, hasAlpha ? 4 : 3, false);
+
+                    BitmapData ^sourceData;
+                    try{
+                        sourceData = source->LockBits(from, ImageLockMode::ReadWrite, source->PixelFormat);
+                        IntPtr^ scan0intptr = sourceData->Scan0;
+                        copyToPlanar(im->channels, (unsigned char *)(scan0intptr->ToPointer()), sourceData->Stride, from.Left, from.Right, from.Top, from.Bottom, im);
+                    }
+                    finally{
+                        source->UnlockBits(sourceData);
+                    }
+                    im->w = sx;
+                    im->h = sy;
+
+                    return im;
+                }
+            };
 
 			public ref class BgraScaler
 			{
@@ -571,7 +865,8 @@ namespace ImageResizer{
 					if (targetBox.Location != targetArea[0] || targetBox.Width != (targetArea[1].X - targetArea[0].X)){
 						return RequestedAction::None;
 					}
-                    BgraScaler ^scaler = gcnew BgraScaler();
+                    //BgraScaler ^scaler = gcnew BgraScaler();
+                    PlanarScaler ^scaler = gcnew PlanarScaler();
                     scaler->ScaleBitmap(source, dest, Util::PolygonMath::ToRectangle(sourceArea), Util::PolygonMath::ToRectangle(targetBox), s->Job->Profiler);
 					return RequestedAction::Cancel;
 					
