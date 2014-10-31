@@ -398,21 +398,67 @@ static inline void HalveRow(unsigned char* from, unsigned short * to, unsigned i
     }
 }
 
-static inline void HalveRowByDivisor(unsigned char* from, unsigned short * to, const unsigned int to_count, const unsigned int divisor){
-    register int to_b, from_b;
-    const register int to_bytes = to_count * 4;
-    for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += 4 * divisor){
-        for (int i = 0; i < 4; i++){
-            to[to_b + i] += from[from_b + i] + from[from_b + i + 4];
-            /*for (int f = 0; f < divisor * 4; f += 4){
-                to[to_b + i] += from[from_b + i + f];
-            }*/
+static inline void HalveRowByDivisor(const unsigned char* from, unsigned short * to, const unsigned int to_count, const int divisor){
+    int to_b, from_b;
+    const int to_bytes = to_count * 4;
+    const int divisor_stride = 4 * divisor;
+    if (divisor == 2)
+    {
+        if (to_count % 2 == 0){
+            for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 8, from_b += 16){
+                for (int i = 0; i < 8; i++){
+                    to[to_b + i] += from[from_b + i] + from[from_b + i + 4];
+                }
+            }
+        }
+        else{
+            for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += 8){
+                for (int i = 0; i < 4; i++){
+                    to[to_b + i] += from[from_b + i] + from[from_b + i + 4];
+                }
+            }
+        }
+
+    }
+    else if (divisor == 3){
+        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += 12){
+            for (int i = 0; i < 4; i++){
+                to[to_b + i] += from[from_b + i] + from[from_b + i + 4] + from[from_b + i + 8];
+            }
+        }
+    }
+    else if (divisor == 4){
+        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += 16){
+            for (int i = 0; i < 4; i++){
+                to[to_b + i] += from[from_b + i] + from[from_b + i + 4] + from[from_b + i + 8] + from[from_b + i + 12];
+            }
+        }
+    }
+    else{
+        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += divisor_stride){
+            for (int i = 0; i < 4; i++){
+                for (int f = 0; f < divisor_stride; f += 4){
+                   to[to_b + i] += from[from_b + i + f];
+                    
+                }
+            }
         }
     }
 }
 
+static int intlog2(unsigned int val) {
+     int ret = -1;
+    while (val != 0) {
+        val >>= 1;
+        ret++;
+    }
+    return ret;
+}
 
-
+static inline int isPowerOfTwo(unsigned int x)
+{
+    return ((x != 0) && !(x & (x - 1)));
+}
 
 static inline int HalveInternal(const BitmapBgraPtr from,
     const BitmapBgraPtr to, const int to_w, const int to_h, const int to_stride, const int divisor)
@@ -422,7 +468,11 @@ static inline int HalveInternal(const BitmapBgraPtr from,
     unsigned short *buffer = (unsigned short *)calloc(to_w_bytes, sizeof(unsigned short));
 
     int y, b, d;
-    const int divisorSqr = divisor * divisor;
+    const unsigned short divisorSqr = divisor * divisor;
+    unsigned int shift = 0;
+    if (isPowerOfTwo(divisorSqr)){
+        shift = intlog2(divisorSqr);
+    }
 
     //TODO: Ensure that from is equal or greater than divisorx to_w and t_h
 
@@ -432,8 +482,26 @@ static inline int HalveInternal(const BitmapBgraPtr from,
             HalveRowByDivisor(from->pixels + (y * 2 + d) * from->stride, buffer, to_w, divisor);
         }
         register unsigned char * dest_line = to->pixels + y * to_stride;
-        for (b = 0; b < to_w_bytes; b++){
-            dest_line[b] = buffer[b] / 4;// divisorSqr;
+
+        if (shift == 2){
+            for (b = 0; b < to_w_bytes; b++){
+                dest_line[b] = buffer[b] >> 2;
+            }
+        }
+        else if (shift == 3){
+            for (b = 0; b < to_w_bytes; b++){
+                dest_line[b] = buffer[b] >> 3;
+            }
+        }
+        else if (shift > 0){
+            for (b = 0; b < to_w_bytes; b++){
+                dest_line[b] = buffer[b] >> shift;
+            }
+        }
+        else{
+            for (b = 0; b < to_w_bytes; b++){
+                dest_line[b] = buffer[b] / divisorSqr;
+            }
         }
     }
 
