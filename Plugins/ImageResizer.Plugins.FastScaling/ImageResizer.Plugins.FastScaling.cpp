@@ -403,19 +403,18 @@ static inline LineContribType * _gdContributionsAlloc(unsigned int line_length, 
 	res->LineLength = line_length;
 	res->ContribRow = (ContributionType *)gdMalloc(line_length * sizeof(ContributionType));
 
+
+    float *allWeights = (float *)gdMalloc(windows_size * line_length * sizeof(float));
+    
+    for (int i = 0; i < line_length; i++)
+        res->ContribRow[i].Weights = allWeights + (i * windows_size);
+
 	return res;
 }
 
 static inline void _gdContributionsFree(LineContribType * p)
 {
-	unsigned int u;
-    float * last = 0;
-	for (u = 0; u < p->LineLength; u++)  {
-        if (last != p->ContribRow[u].Weights){
-            gdFree(p->ContribRow[u].Weights);
-        }
-        last = p->ContribRow[u].Weights;
-	}
+    gdFree(p->ContribRow[0].Weights);
 	gdFree(p->ContribRow);
 	gdFree(p);
 }
@@ -461,27 +460,21 @@ static inline LineContribType *_gdContributionsCalc(unsigned int line_size, unsi
 		res->ContribRow[u].Left = iLeft;
 		res->ContribRow[u].Right = iRight;
 
-        if (u > 0 && res->ContribRow[u - 1].Right - res->ContribRow[u - 1].Left == iRight - iLeft){
-            res->ContribRow[u].Weights = res->ContribRow[u - 1].Weights;
+        for (iSrc = iLeft; iSrc <= iRight; iSrc++) {
+            dTotalWeight += (res->ContribRow[u].Weights[iSrc - iLeft] = scale_f_d * (*pFilter)(scale_f_d * (dCenter - (double)iSrc)));
         }
-        else{
-            res->ContribRow[u].Weights = (float *)gdMalloc(windows_size * sizeof(float));
-            
+
+        if (dTotalWeight < 0.0) {
+            _gdContributionsFree(res);
+            return NULL;
+        }
+
+        if (dTotalWeight > 0.0) {
             for (iSrc = iLeft; iSrc <= iRight; iSrc++) {
-                dTotalWeight += (res->ContribRow[u].Weights[iSrc - iLeft] = scale_f_d * (*pFilter)(scale_f_d * (dCenter - (double)iSrc)));
-            }
-
-            if (dTotalWeight < 0.0) {
-                _gdContributionsFree(res);
-                return NULL;
-            }
-
-            if (dTotalWeight > 0.0) {
-                for (iSrc = iLeft; iSrc <= iRight; iSrc++) {
-                    res->ContribRow[u].Weights[iSrc - iLeft] /= dTotalWeight;
-                }
+                res->ContribRow[u].Weights[iSrc - iLeft] /= dTotalWeight;
             }
         }
+        
 	}
 	return res;
 }
