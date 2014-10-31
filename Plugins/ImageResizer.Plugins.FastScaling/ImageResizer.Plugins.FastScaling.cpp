@@ -479,10 +479,11 @@ static inline LineContribType *_gdContributionsCalc(unsigned int line_size, unsi
 }
 
 
+
 static inline void
 _gdScaleOneAxis(gdImagePtr pSrc, gdImagePtr dst,
 unsigned int dst_len, unsigned int row, LineContribType *contrib,
-gdAxis axis, float *source_buffer, unsigned int source_buffer_len, float *dest_buffer, unsigned int dest_buffer_len)
+gdAxis axis, float *source_buffer, unsigned int source_buffer_len, float *dest_buffer, unsigned int dest_buffer_len, float *lut)
 {
 	unsigned int ndx;
 	unsigned int source_pixel_count = source_buffer_len / 4;
@@ -493,16 +494,16 @@ gdAxis axis, float *source_buffer, unsigned int source_buffer_len, float *dest_b
 	unsigned int bix;
 	if (axis == HORIZONTAL){
 		for (bix = 0; bix < source_buffer_len; bix++){
-			source_buffer[bix] = (float)((unsigned char *)sourcePixels[row])[bix];
+			source_buffer[bix] = lut[((unsigned char *)sourcePixels[row])[bix]];
 		}
 	}
 	else{
 		for (bix = 0; bix < source_pixel_count; bix++){
 			unsigned char * spix = (unsigned char *)sourcePixels[bix] + (row * 4);
 			spix++;
-			source_buffer[bix * 4 + 1] = (float)*(spix); spix++;
-			source_buffer[bix * 4 + 2] = (float)*(spix); spix++;
-			source_buffer[bix * 4 + 3] = (float)*(spix);
+			source_buffer[bix * 4 + 1] = lut[*(spix)]; spix++;
+			source_buffer[bix * 4 + 2] = lut[*(spix)]; spix++;
+			source_buffer[bix * 4 + 3] = lut[*(spix)];
 		}
 	}
 
@@ -550,7 +551,7 @@ gdAxis axis, float *source_buffer, unsigned int source_buffer_len, float *dest_b
 static inline int _gdScalePass(const gdImagePtr pSrc, const unsigned int src_len,
 	const gdImagePtr pDst, const unsigned int dst_len,
 	const unsigned int num_lines,
-	const gdAxis axis)
+	const gdAxis axis, float *lut)
 {
 	unsigned int line_ndx;
 	LineContribType * contrib;
@@ -570,7 +571,7 @@ static inline int _gdScalePass(const gdImagePtr pSrc, const unsigned int src_len
 
 	/* Scale each line */
 	for (line_ndx = 0; line_ndx < num_lines; line_ndx++) {
-		_gdScaleOneAxis(pSrc, pDst, dst_len, line_ndx, contrib, axis, sourceBuffer, src_len * 4, destBuffer, dst_len * 4);
+		_gdScaleOneAxis(pSrc, pDst, dst_len, line_ndx, contrib, axis, sourceBuffer, src_len * 4, destBuffer, dst_len * 4,lut);
 	}
 	gdFree(sourceBuffer);
 	gdFree(destBuffer);
@@ -594,6 +595,12 @@ const unsigned int new_height)
 		return gdImageClone(src);
 	}/* if */
 
+
+    float lut[256];
+    for (int n = 0; n < 256; n++) lut[n] = (float)n / 255.0f;
+    
+
+
 	/* Scale horizontally unless sizes are the same. */
 	if (src_width == new_width) {
 		tmp_im = src;
@@ -603,7 +610,7 @@ const unsigned int new_height)
 		if (tmp_im == NULL) {
 			return NULL;
 		}
-		_gdScalePass(src, src_width, tmp_im, new_width, src_height, HORIZONTAL);
+		_gdScalePass(src, src_width, tmp_im, new_width, src_height, HORIZONTAL,lut);
 	}/* if .. else*/
 
 	/* If vertical sizes match, we're done. */
@@ -615,7 +622,7 @@ const unsigned int new_height)
 	/* Otherwise, we need to scale vertically. */
 	dst = gdImageCreateTrueColor(new_width, new_height);
 	if (dst != NULL) {
-		_gdScalePass(tmp_im, src_height, dst, new_height, new_width, VERTICAL);
+		_gdScalePass(tmp_im, src_height, dst, new_height, new_width, VERTICAL,lut);
 	}/* if */
 
 	if (src != tmp_im) {
