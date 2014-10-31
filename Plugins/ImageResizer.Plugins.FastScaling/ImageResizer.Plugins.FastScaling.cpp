@@ -499,7 +499,7 @@ gdAxis axis, float *source_buffer, unsigned int source_buffer_len, float *dest_b
 	else{
 		for (bix = 0; bix < source_pixel_count; bix++){
 			unsigned char * spix = (unsigned char *)sourcePixels[bix] + (row * 4);
-			source_buffer[bix * 4] = (float)*spix; spix++;
+			spix++;
 			source_buffer[bix * 4 + 1] = (float)*(spix); spix++;
 			source_buffer[bix * 4 + 2] = (float)*(spix); spix++;
 			source_buffer[bix * 4 + 3] = (float)*(spix);
@@ -519,13 +519,11 @@ gdAxis axis, float *source_buffer, unsigned int source_buffer_len, float *dest_b
 			const float weight = contrib->ContribRow[ndx].Weights[i - left];
 
 
-			a += weight * source_buffer[i * 4];
 			r += weight * source_buffer[i * 4 + 1];
 			g += weight * source_buffer[i * 4 + 2];
 			b += weight * source_buffer[i * 4 + 3];
 		}/* for */
 	
-		dest_buffer[ndx * 4] = a;
 		dest_buffer[ndx * 4 + 1] = r;
 		dest_buffer[ndx * 4 + 2] = g;
 		dest_buffer[ndx * 4 + 3] = b;
@@ -538,7 +536,7 @@ gdAxis axis, float *source_buffer, unsigned int source_buffer_len, float *dest_b
 			&destPixels[row][bix] :
 			&destPixels[bix][row];
 		
-		*dest = gdTrueColorAlpha(uchar_clamp(dest_buffer[bix * 4], 0xFF),
+		*dest = gdTrueColorAlpha(0xFF,
 			uchar_clamp(dest_buffer[bix * 4 + 1], 0xFF),
 			uchar_clamp(dest_buffer[bix * 4 + 2], 0xFF),
 			uchar_clamp(dest_buffer[bix * 4 + 3], 0xFF),); /* alpha is 0..127 */
