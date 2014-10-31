@@ -9,54 +9,26 @@
 
 #pragma unmanaged
 
+typedef struct BitmapBgraStruct{
+    int w;
+    int h;
+    int stride;
+    unsigned char *pixels;
+    unsigned int *pixelInts;
+    int hasAlpha;
+} BitmapBgra;
 
-//GDI+ uses BGR/BGRA byte order.
-/*
-Group: Types
+typedef BitmapBgra *BitmapBgraPtr;
 
-typedef: gdImage
+typedef struct BitmapPlanarStruct{
+    int w;
+    int h;
+    int channels;
+    float **planes;
+}BitmapPlanar;
 
-typedef: gdImagePtr
+typedef BitmapPlanar *BitmapPlanarPtr;
 
-The data structure in which gd stores images. <gdImageCreate>,
-<gdImageCreateTrueColor> and the various image file-loading functions
-return a pointer to this type, and the other functions expect to
-receive a pointer to this type as their first argument.
-
-*gdImagePtr* is a pointer to *gdImage*.
-
-(Previous versions of this library encouraged directly manipulating
-the contents ofthe struct but we are attempting to move away from
-this practice so the fields are no longer documented here.  If you
-need to poke at the internals of this struct, feel free to look at
-*gd.h*.)
-*/
-typedef struct gdImageStruct {
-
-	int sx;
-	int sy;
-
-	/* Truecolor flag and pixels. New 2.0 fields appear here at the
-	end to minimize breakage of existing object code. */
-	int trueColor;
-	unsigned int **tpixels;
-	/* Should alpha channel be copied, or applied, each time a
-	pixel is drawn? This applies to truecolor images only.
-	No attempt is made to alpha-blend in palette images,
-	even if semitransparent palette entries exist.
-	To do that, build your image as a truecolor image,
-	then quantize down to 8 bits. */
-	int alphaBlendingFlag;
-	/* Should the alpha channel of the image be saved? This affects
-	PNG at the moment; other future formats may also
-	have that capability. JPEG doesn't. */
-	int saveAlphaFlag;
-}
-gdImage;
-
-typedef gdImage *gdImagePtr;
-
-#define DEFAULT_FILTER_BICUBIC				3.0
 
 #ifndef MIN
 #define MIN(a,b) ((a)<(b)?(a):(b))
@@ -67,82 +39,11 @@ typedef gdImage *gdImagePtr;
 #endif
 #define MAX3(a,b,c) ((a)<(b)?(MAX(b,c)):(MAX(a,c)))
 
-#define DEFAULT_FILTER_BICUBIC				3.0
-#define DEFAULT_FILTER_BOX					0.5
-#define DEFAULT_FILTER_GENERALIZED_CUBIC	0.5
-#define DEFAULT_FILTER_RADIUS				1.0
-#define DEFAULT_LANCZOS8_RADIUS				8.0
-#define DEFAULT_LANCZOS3_RADIUS				3.0
-#define DEFAULT_HERMITE_RADIUS				1.0
-#define DEFAULT_BOX_RADIUS					0.5
-#define DEFAULT_TRIANGLE_RADIUS				1.0
-#define DEFAULT_BELL_RADIUS					1.5
-#define DEFAULT_CUBICSPLINE_RADIUS			2.0
-#define DEFAULT_MITCHELL_RADIUS				2.0
-#define DEFAULT_COSINE_RADIUS				1.0
-#define DEFAULT_CATMULLROM_RADIUS			2.0
-#define DEFAULT_QUADRATIC_RADIUS			1.5
-#define DEFAULT_QUADRATICBSPLINE_RADIUS		1.5
-#define DEFAULT_CUBICCONVOLUTION_RADIUS		3.0
-#define DEFAULT_GAUSSIAN_RADIUS				1.0
-#define DEFAULT_HANNING_RADIUS				1.0
-#define DEFAULT_HAMMING_RADIUS				1.0
-#define DEFAULT_SINC_RADIUS					1.0
-
-#define DEFAULT_WELSH_RADIUS				1.0
-#define gdAlphaMax 127
-#define gdAlphaOpaque 0
-#define gdAlphaTransparent 127
-#define gdRedMax 255
-#define gdGreenMax 255
-#define gdBlueMax 255
-#define gdTrueColorGetAlpha(c) (((c) & 0xFF000000) >> 24)
-#define gdTrueColorGetRed(c) (((c) & 0xFF0000) >> 16)
-#define gdTrueColorGetGreen(c) (((c) & 0x00FF00) >> 8)
-#define gdTrueColorGetBlue(c) ((c) & 0x0000FF)
-#define gdEffectReplace 0
-#define gdEffectAlphaBlend 1
-#define gdEffectNormal 2
-#define gdEffectOverlay 3
-
-#define gdEffectMultiply 4
 #define NULL 0
-
-
-typedef enum {
-	HORIZONTAL,
-	VERTICAL,
-} gdAxis;
-
 
 #define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
-/* only used here, let do a generic fixed point integers later if required by other
-part of GD */
-typedef long gdFixed;
-/* Integer to fixed point */
-#define gd_itofx(x) ((x) << 8)
-
-/* Float to fixed point */
-#define gd_ftofx(x) (long)((x) * 256)
-
-/*  Double to fixed point */
-#define gd_dtofx(x) (long)((x) * 256)
-
-/* Fixed point to integer */
-#define gd_fxtoi(x) ((x) >> 8)
-
-/* Fixed point to float */
-# define gd_fxtof(x) ((float)(x) / 256)
-
-/* Fixed point to double */
-#define gd_fxtod(x) ((double)(x) / 256)
-
-/* Multiply a fixed by a fixed */
-#define gd_mulfx(x,y) (((x) * (y)) >> 8)
-
-/* Divide a fixed by a fixed */
-#define gd_divfx(x,y) (((x) << 8) / (y))
+#define DEFAULT_BOX_RADIUS					0.5
 
 typedef struct
 {
@@ -160,10 +61,6 @@ typedef struct
 #define gdTrueColor(r, g, b) (((r) << 16) + \
 			      ((g) << 8) +  \
 			      (b))
-
-/* Returns a truecolor value with an alpha channel component.
-gdAlphaMax (127, **NOT 255**) is transparent, 0 is completely
-opaque. */
 
 #define gdTrueColorAlpha(r, g, b, a) (((a) << 24) + \
 				      ((r) << 16) + \
@@ -197,6 +94,67 @@ uchar_clamp(float clr, unsigned char max) {
 }/* uchar_clamp*/
 
 
+
+
+/* Interpolation function ptr */
+typedef double(*interpolation_method)(double);
+
+static int overflow2(int a, int b)
+{
+	if (a <= 0 || b <= 0) {
+		return 1;
+	}
+	if (a > INT_MAX / b) {
+		return 1;
+	}
+	return 0;
+}
+
+
+static BitmapBgraPtr CreateBitmapBgraPtr(int sx, int sy, int zeroed)
+{
+	int i;
+    BitmapBgraPtr im;
+
+    if (overflow2(sx, sy) || overflow2(sizeof(int *), sy) || overflow2(sizeof(int), sx)) {
+		return NULL;
+	}
+
+
+    im = (BitmapBgra *)malloc(sizeof(BitmapBgra));
+	if (!im) {
+		return 0;
+	}
+    memset(im, 0, sizeof(BitmapBgra));
+    im->w = sx;
+    im->h = sy;
+    im->stride = sx * 4;
+	
+    if (zeroed){
+        im->pixels = (unsigned char *)calloc(sy * im->stride, sizeof(unsigned char));
+    }
+    else{
+        im->pixels = (unsigned char *)malloc(sy * im->stride);
+    }
+    im->pixelInts = (unsigned int *)im->pixels;
+
+    if (!im->pixels) {
+        free(im);
+        return 0;
+    }
+	return im;
+}
+
+
+static void DestroyBitmapBgra(BitmapBgraPtr im)
+{
+    int i;
+    if (im->pixels) {
+		free(im->pixels);
+    }
+    free(im);
+}
+
 /**
 * Bicubic interpolation kernel (a=-1):
 \verbatim
@@ -208,203 +166,31 @@ h(t) = | 4-8|t|+5|t|**2-|t|**3     , if 1<=|t|<2
 \endverbatim
 * ***bd*** 2.2004
 */
-typedef enum {
-	GD_DEFAULT = 0,
-	GD_BELL,
-	GD_BESSEL,
-	GD_BILINEAR_FIXED,
-	GD_BICUBIC,
-	GD_BICUBIC_FIXED,
-	GD_BLACKMAN,
-	GD_BOX,
-	GD_BSPLINE,
-	GD_CATMULLROM,
-	GD_GAUSSIAN,
-	GD_GENERALIZED_CUBIC,
-	GD_HERMITE,
-	GD_HAMMING,
-	GD_HANNING,
-	GD_MITCHELL,
-	GD_NEAREST_NEIGHBOUR,
-	GD_POWER,
-	GD_QUADRATIC,
-	GD_SINC,
-	GD_TRIANGLE,
-	GD_WEIGHTED4,
-	GD_METHOD_COUNT = 21
-} gdInterpolationMethod;
-
-/* define struct with name and func ptr and add it to gdImageStruct gdInterpolationMethod interpolation; */
-
-/* Interpolation function ptr */
-typedef double(*interpolation_method)(double);
-
-void * gdCalloc(size_t nmemb, size_t size)
-{
-	return calloc(nmemb, size);
-}
-
-void *
-gdMalloc(size_t size)
-{
-	return malloc(size);
-}
-
-void *
-gdRealloc(void *ptr, size_t size)
-{
-	return realloc(ptr, size);
-}
-
- void gdFree(void *ptr)
-{
-	free(ptr);
-}
-
-void *
-gdReallocEx(void *ptr, size_t size)
-{
-	void *newPtr = gdRealloc(ptr, size);
-	if (!newPtr && ptr)
-		gdFree(ptr);
-	return newPtr;
-}
-
-
-
-int overflow2(int a, int b)
-{
-	if (a <= 0 || b <= 0) {
-		//gd_error_ex(GD_WARNING, "one parameter to a memory allocation multiplication is negative or zero, failing operation gracefully\n");
-		return 1;
-	}
-	if (a > INT_MAX / b) {
-		//gd_error_ex(GD_WARNING, "product of memory allocation multiplication would exceed INT_MAX, failing operation gracefully\n");
-		return 1;
-	}
-	return 0;
-}
-
-
-static gdImagePtr gdImageCreateTrueColor(int sx, int sy)
-{
-	int i;
-	gdImagePtr im;
-
-	if (overflow2(sx, sy)) {
-		return NULL;
-	}
-
-	if (overflow2(sizeof(int *), sy)) {
-		return 0;
-	}
-
-	if (overflow2(sizeof(int), sx)) {
-		return NULL;
-	}
-
-	im = (gdImage *)gdMalloc(sizeof(gdImage));
-	if (!im) {
-		return 0;
-	}
-	memset(im, 0, sizeof(gdImage));
-
-	im->tpixels = (unsigned int **)gdMalloc(sizeof(unsigned int *)* sy);
-
-	if (!im->tpixels) {
-		gdFree(im);
-		return 0;
-	}
-
-	im->tpixels[0] = (unsigned int *)gdCalloc(sx*sy, sizeof(unsigned int));
-
-	for (i = 1; (i < sy); i++)
-		im->tpixels[i] = &im->tpixels[0][i*sx];
-
-	if (!im->tpixels[0]) {
-		gdFree(im->tpixels);
-		gdFree(im);
-		return 0;
-	}/**/
-
-	im->sx = sx;
-	im->sy = sy;
-
-	im->trueColor = 1;
-	/* 2.0.2: alpha blending is now on by default, and saving of alpha is
-	off by default. This allows font antialiasing to work as expected
-	on the first try in JPEGs -- quite important -- and also allows
-	for smaller PNGs when saving of alpha channel is not really
-	desired, which it usually isn't! */
-	im->saveAlphaFlag = 0;
-	im->alphaBlendingFlag = 1;
-
-	return im;
-}
-
-
-static gdImagePtr gdImageClone(gdImagePtr src) {
-	gdImagePtr dst;
-	register int i, x;
-
-	dst = gdImageCreateTrueColor(src->sx, src->sy);
-	
-
-	if (dst == NULL) {
-		return NULL;
-	}
-
-	for (i = 0; i < src->sy; i++) {
-		for (x = 0; x < src->sx; x++) {
-			dst->tpixels[i][x] = src->tpixels[i][x];
-		}
-	}
-	
-
-	dst->alphaBlendingFlag = src->alphaBlendingFlag;
-	dst->saveAlphaFlag = src->saveAlphaFlag;
-
-	
-	return dst;
-}
-
-static void gdImageDestroy(gdImagePtr im)
-{
-    int i;
-
-    if (im->tpixels) {
-		gdFree(im->tpixels[0]);
-        gdFree(im->tpixels);
-    }
-    gdFree(im);
-}
-
-
 static inline double filter_bicubic(const double t)
 {
-	const double abs_t = (double)fabs(t);
-	const double abs_t_sq = abs_t * abs_t;
-	if (abs_t<1) return 1 - 2 * abs_t_sq + abs_t_sq*abs_t;
-	if (abs_t<2) return 4 - 8 * abs_t + 5 * abs_t_sq - abs_t_sq*abs_t;
-	return 0;
+    const double abs_t = (double)fabs(t);
+    const double abs_t_sq = abs_t * abs_t;
+    if (abs_t<1) return 1 - 2 * abs_t_sq + abs_t_sq*abs_t;
+    if (abs_t<2) return 4 - 8 * abs_t + 5 * abs_t_sq - abs_t_sq*abs_t;
+    return 0;
 }
 
 
-static inline LineContribType * _gdContributionsAlloc(unsigned int line_length, unsigned int windows_size)
+static inline LineContribType *  ContributionsAlloc(unsigned int line_length, unsigned int windows_size)
 {
 	unsigned int u = 0;
 	LineContribType *res;
 
-	res = (LineContribType *)gdMalloc(sizeof(LineContribType));
+	res = (LineContribType *)malloc(sizeof(LineContribType));
 	if (!res) {
 		return NULL;
 	}
 	res->WindowSize = windows_size;
 	res->LineLength = line_length;
-	res->ContribRow = (ContributionType *)gdMalloc(line_length * sizeof(ContributionType));
+	res->ContribRow = (ContributionType *)malloc(line_length * sizeof(ContributionType));
 
 
-    float *allWeights = (float *)gdMalloc(windows_size * line_length * sizeof(float));
+    float *allWeights = (float *)malloc(windows_size * line_length * sizeof(float));
     
     for (int i = 0; i < line_length; i++)
         res->ContribRow[i].Weights = allWeights + (i * windows_size);
@@ -412,14 +198,14 @@ static inline LineContribType * _gdContributionsAlloc(unsigned int line_length, 
 	return res;
 }
 
-static inline void _gdContributionsFree(LineContribType * p)
+static inline void ContributionsFree(LineContribType * p)
 {
-    gdFree(p->ContribRow[0].Weights);
-	gdFree(p->ContribRow);
-	gdFree(p);
+    free(p->ContribRow[0].Weights);
+	free(p->ContribRow);
+	free(p);
 }
 
-static inline LineContribType *_gdContributionsCalc(unsigned int line_size, unsigned int src_size, double scale_d, const interpolation_method pFilter)
+static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigned int src_size, double scale_d, const interpolation_method pFilter)
 {
 	double width_d;
 	double scale_f_d = 1.0;
@@ -437,7 +223,7 @@ static inline LineContribType *_gdContributionsCalc(unsigned int line_size, unsi
 	}
 
 	windows_size = 2 * (int)ceil(width_d) + 1;
-	res = _gdContributionsAlloc(line_size, windows_size);
+	res = ContributionsAlloc(line_size, windows_size);
 
 	for (u = 0; u < line_size; u++) {
 		const double dCenter = (double)u / scale_d;
@@ -465,7 +251,7 @@ static inline LineContribType *_gdContributionsCalc(unsigned int line_size, unsi
         }
 
         if (dTotalWeight < 0.0) {
-            _gdContributionsFree(res);
+            ContributionsFree(res);
             return NULL;
         }
 
@@ -481,43 +267,11 @@ static inline LineContribType *_gdContributionsCalc(unsigned int line_size, unsi
 
 
 
-static inline void _gdScaleXAndPivotRowUnbuffered(unsigned char * source_row, unsigned int source_pixel_count, ContributionType * weights, gdImagePtr dest, unsigned int dest_column_index, float *lut){
-
-    unsigned int dest_count = dest->sy;
-
-    unsigned int ndx;
-    for (ndx = 0; ndx < dest_count; ndx++) {
-        int r = 0, g = 0, b = 0, a = 0;
-        const int left = weights[ndx].Left;
-        const int right = weights[ndx].Right;
-
-        const float * weightArray = weights[ndx].Weights;
-        int i;
-
-        /* Accumulate each channel */
-        for (i = left; i <= right; i++) {
-            const float weight = weightArray[i - left];
-
-            a += weight *  lut[source_row[i * 4]];
-            r += weight * lut[source_row[i * 4 + 1]];
-            g += weight * lut[source_row[i * 4 + 2]];
-            b += weight * lut[source_row[i * 4 + 3]];
-        }
-
-        dest->tpixels[ndx][dest_column_index] = gdTrueColorAlpha(
-            uchar_clamp(a, 0xFF),
-            uchar_clamp(r, 0xFF),
-            uchar_clamp(g, 0xFF),
-            uchar_clamp(b, 0xFF));
-    }
-
-}
-
 
 //#define ScaleAlpha
 
 static inline void
-_gdScale(float *source_buffer, unsigned int source_buffer_count, unsigned int source_buffer_len,
+ScaleBgraFloat(float *source_buffer, unsigned int source_buffer_count, unsigned int source_buffer_len,
 float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len, ContributionType * weights){
 
     unsigned int ndx;
@@ -552,165 +306,118 @@ float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len
 }
 
 
-static inline void _gdScaleXAndPivotRow(unsigned char * source_row, unsigned int source_pixel_count, ContributionType * weights, gdImagePtr dest, unsigned int dest_column_index, float *source_buffer, unsigned int source_buffer_len, float *dest_buffer, unsigned int dest_buffer_len, float *lut){
-
+static inline void ScaleXAndPivotRow(unsigned char * source_row, unsigned int source_pixel_count, ContributionType * weights, BitmapBgraPtr dest, unsigned int dest_column_index, float *source_buffer, unsigned int source_buffer_len, float *dest_buffer, unsigned int dest_buffer_len, float *lut){
     unsigned int bix;
-
    //This copy seems responsible for about 8% of runtime
    for (bix = 0; bix < source_buffer_len; bix++){
         source_buffer[bix] = lut[source_row[bix]];
     }
     
    //Actual scaling seems responsible for about 40% of execution time
-    _gdScale(source_buffer, source_pixel_count, source_buffer_len, dest_buffer, dest->sy, dest_buffer_len, weights);
+   ScaleBgraFloat(source_buffer, source_pixel_count, source_buffer_len, dest_buffer, dest->h, dest_buffer_len, weights);
 
 
    //This copy seems responsible for about 12% of runtime
-    for (bix = 0; bix < dest->sy; bix++){
+    for (bix = 0; bix < dest->h; bix++){
 
 #ifdef ScaleAlpha
-        dest->tpixels[bix][dest_column_index] = gdTrueColorAlpha(
+        dest->pixelInts[bix * dest->w + dest_column_index] = gdTrueColorAlpha(
             uchar_clamp(dest_buffer[bix * 4], 0xFF),
             uchar_clamp(dest_buffer[bix * 4 + 1], 0xFF),
             uchar_clamp(dest_buffer[bix * 4 + 2], 0xFF),
             uchar_clamp(dest_buffer[bix * 4 + 3], 0xFF)); /* alpha is 0..255 */
 #endif
 #ifndef ScaleAlpha
-       dest->tpixels[bix][dest_column_index] = gdTrueColorAlpha(
+        dest->pixelInts[bix * dest->w + dest_column_index] = gdTrueColorAlpha(
             uchar_clamp(dest_buffer[bix * 4], 0xFF),
             uchar_clamp(dest_buffer[bix * 4 + 1], 0xFF),
             uchar_clamp(dest_buffer[bix * 4 + 2], 0xFF),0xFF); 
 #endif
     }
-
 }
 
 
-static inline void _gdScaleXAndPivotRows(unsigned char * source_bitmap, unsigned int source_pixel_count, ContributionType * weights, gdImagePtr dest, unsigned int dest_column_index, unsigned int count, float *source_buffers, unsigned int source_buffer_len, float *dest_buffers, unsigned int dest_buffer_len, float *lut){
+static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int start_row, unsigned int row_count,  ContributionType * weights, BitmapBgraPtr dest, float *source_buffers, unsigned int source_buffer_len, float *dest_buffers, unsigned int dest_buffer_len, float *lut){
+
+    unsigned char * scan_start = source_bitmap->pixels + start_row * source_bitmap->stride;
+
 
     unsigned int bix, bufferSet;
-
-    for (bix = 0; bix < source_buffer_len * count; bix++){
-        source_buffers[bix] = lut[source_bitmap[bix]];
+    
+    for (bix = 0; bix < source_buffer_len * row_count; bix++){
+        source_buffers[bix] = lut[scan_start[bix]];
     }
-
+    
     //Actual scaling seems responsible for about 40% of execution time
-    for (bufferSet = 0; bufferSet < count; bufferSet++){
-        _gdScale(source_buffers + (source_buffer_len * bufferSet), source_pixel_count, source_buffer_len, dest_buffers + (dest_buffer_len * bufferSet), dest->sy, dest_buffer_len, weights);
+    for (bufferSet = 0; bufferSet < row_count; bufferSet++){
+        ScaleBgraFloat(source_buffers + (source_buffer_len * bufferSet), source_bitmap->w, source_buffer_len, dest_buffers + (dest_buffer_len * bufferSet), dest->h, dest_buffer_len, weights);
     }
-
-    for (bix = 0; bix < dest->sy; bix++){
-        for (bufferSet = 0; bufferSet < count; bufferSet++){
+    
+    for (bix = 0; bix < dest->h; bix++){
+        for (bufferSet = 0; bufferSet < row_count; bufferSet++){
     #ifdef ScaleAlpha
-            const int pixelStart = bufferSet * dest_buffer_len + bix * 4;
-            dest->tpixels[bix][dest_column_index + bufferSet] = gdTrueColorAlpha(
-                uchar_clamp(dest_buffers[pixelStart], 0xFF),
-                uchar_clamp(dest_buffers[pixelStart + 1], 0xFF),
-                uchar_clamp(dest_buffers[pixelStart + 2], 0xFF), 
-                uchar_clamp(dest_buffers[pixelStart + 3], 0xFF));
+            dest->pixelInts[bix * dest->w + start_row + bufferSet] = gdTrueColorAlpha(
+                uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4], 0xFF),
+                uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4 + 1], 0xFF),
+                uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4 + 2], 0xFF), 
+                uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4 + 3], 0xFF));
     #endif
     #ifndef ScaleAlpha
-              dest->tpixels[bix][dest_column_index + bufferSet] = gdTrueColorAlpha(
+            dest->pixelInts[bix * dest->w + start_row + bufferSet] = gdTrueColorAlpha(
                   uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4], 0xFF),
                   uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4 + 1], 0xFF),
-                  uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4 + 2], 0xFF), 0xFF);;
+                  uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4 + 2], 0xFF), 0xFF);
     #endif
         }
     }
-
 }
 
 
-
-
-
-static inline int _gdScaleXAndPivot(const gdImagePtr pSrc,
-    const gdImagePtr pDst, float *lut)
+static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
+    const BitmapBgraPtr pDst, float *lut)
 {
     unsigned int line_ndx;
     LineContribType * contrib;
-    /* Same dim, just copy it. */
-    //assert(dst_len != src_len); // TODO: caller should handle this.
 
-
-    contrib = _gdContributionsCalc(pDst->sy, pSrc->sx,
-        (double)pDst->sy / (double)pSrc->sx,
-        filter_bicubic);
+    contrib = ContributionsCalc(pDst->h, pSrc->w,
+                        (double)pDst->h / (double)pSrc->w, filter_bicubic);
     if (contrib == NULL) {
         return 0;
     }
 
-    int buffer = 5; //using buffer=5 seems about 6% better than most other non-zero values. 
-
-    if (buffer > 0){
-        unsigned int source_buffer_len = pSrc->sx * 4;
-        float *sourceBuffers = (float *)gdMalloc(sizeof(float) * source_buffer_len * buffer);
-
-        unsigned int dest_buffer_len = pDst->sy * 4;
-        float *destBuffers = (float *)gdMalloc(sizeof(float) * dest_buffer_len * buffer);
+    int buffer = 1; //using buffer=5 seems about 6% better than most other non-zero values. 
 
 
-        if (buffer == 0){
-            for (line_ndx = 0; line_ndx < pSrc->sy; line_ndx++) {
+    unsigned int source_buffer_len = pSrc->stride;
+    float *sourceBuffers = (float *)malloc(sizeof(float) * source_buffer_len * buffer);
 
-                _gdScaleXAndPivotRow((unsigned char *)(pSrc->tpixels[line_ndx]), pSrc->sx, contrib->ContribRow, pDst, line_ndx,
-                    sourceBuffers, source_buffer_len, destBuffers, dest_buffer_len, lut);
-            }
+    unsigned int dest_buffer_len = pSrc->h * 4;
+    float *destBuffers = (float *)malloc(sizeof(float) * dest_buffer_len * buffer);
+
+
+    if (buffer == 1){
+        for (line_ndx = 0; line_ndx < pSrc->h; line_ndx++) {
+
+            ScaleXAndPivotRow(pSrc->pixels + line_ndx * pSrc->stride, pSrc->w, contrib->ContribRow, pDst, line_ndx,
+                sourceBuffers, source_buffer_len, destBuffers, dest_buffer_len, lut);
         }
-        else{
-            /* Scale each line */
-            for (line_ndx = 0; line_ndx < pSrc->sy; line_ndx += buffer) {
-
-                _gdScaleXAndPivotRows((unsigned char *)(pSrc->tpixels[line_ndx]), pSrc->sx, contrib->ContribRow, pDst, line_ndx,
-                    MIN(pSrc->sy - line_ndx, buffer), sourceBuffers, source_buffer_len, destBuffers, dest_buffer_len, lut);
-            }
-        }
-
-        gdFree(sourceBuffers);
-        gdFree(destBuffers);
     }
     else{
-        for (line_ndx = 0; line_ndx < pSrc->sy; line_ndx++) {
-            _gdScaleXAndPivotRowUnbuffered((unsigned char *)(pSrc->tpixels[line_ndx]), pSrc->sx, contrib->ContribRow, pDst, line_ndx, lut);
+        /* Scale each line */
+        for (line_ndx = 0; line_ndx < pSrc->h; line_ndx += buffer) {
+
+            ScaleXAndPivotRows(pSrc, line_ndx, MIN(pSrc->h - line_ndx, buffer), contrib->ContribRow, pDst,
+                 sourceBuffers, source_buffer_len, destBuffers, dest_buffer_len, lut);
         }
     }
-    _gdContributionsFree(contrib);
+
+    free(sourceBuffers);
+    free(destBuffers);
+    
+    ContributionsFree(contrib);
 
     return 1;
 }/* _gdScalePass*/
-
-
-static gdImagePtr
-gdImageScaleTwoPass(const gdImagePtr src, const unsigned int new_width,
-const unsigned int new_height)
-{
-    gdImagePtr tmp_im = NULL;
-    gdImagePtr dst = NULL;
-
-
-    float lut[256];
-    for (int n = 0; n < 256; n++) lut[n] = (float)n;
-
-    /* Scale horizontally  */
-    tmp_im = gdImageCreateTrueColor(src->sy, new_width);
-    if (tmp_im == NULL) {
-        return NULL;
-    }
-    _gdScaleXAndPivot(src, tmp_im, lut);
-
-
-    /* Otherwise, we need to scale vertically. */
-    dst = gdImageCreateTrueColor(new_width, new_height);
-    if (dst != NULL) {
-        _gdScaleXAndPivot(tmp_im, dst, lut);
-    }
-
-    if (src != tmp_im) {
-        gdImageDestroy(tmp_im);
-    }
-
-    return dst;
-}/* gdImageScaleTwoPass*/
 
 
 static void unpack24bitRow(int width, void * sourceLine, unsigned int * destArray){
@@ -738,27 +445,27 @@ namespace ImageResizer{
 			{
 			public:
 				void ScaleBitmap(Bitmap^ source, Bitmap^ dest, Rectangle crop, Rectangle target, IProfiler^ p){
-					gdImagePtr gdSource;
-					gdImagePtr gdResult;
+					BitmapBgraPtr bbSource;
+                    BitmapBgraPtr bbResult;
 					try{
-                        p->Start("BitmapToGd",false);
-						gdSource = BitmapToGd(source, crop);
-                        p->Stop("BitmapToGd", true, false);
+                        p->Start("FromGDI+",false);
+                        bbSource = FromGDI(source, crop);
+                        p->Stop("FromGDI+", true, false);
                         p->Start("Scale", false);
-						gdResult = Scale(gdSource, target.Width, target.Height, p);
+                        bbResult = Scale(bbSource, target.Width, target.Height, p);
                         p->Stop("Scale", true, false);
-                        p->Start("CopyGdToBitmap", false);
-						CopyGdToBitmap(gdResult, dest, target);
-                        p->Stop("CopyGdToBitmap", true, false);
+                        p->Start("ToGDI+", false);
+                        ToGDI(bbResult, dest, target);
+                        p->Stop("ToGDI+", true, false);
                         p->Start("GdDispose", false);
 					}finally{
-						if (gdSource != 0) {
-							gdImageDestroy(gdSource);
-							gdSource = 0;
+                        if (bbSource != 0) {
+                            DestroyBitmapBgra(bbSource);
+                            bbSource = 0;
 						}
-						if (gdResult != 0){
-							gdImageDestroy(gdResult);
-							gdResult = 0;
+                        if (bbResult != 0){
+                            DestroyBitmapBgra(bbResult);
+                            bbResult = 0;
 						}
                         p->Stop("GdDispose", true, false);
 
@@ -768,10 +475,10 @@ namespace ImageResizer{
 
 			private:
 
-                gdImagePtr Scale(gdImagePtr source, int width, int height, IProfiler^ p){
+                BitmapBgraPtr Scale(BitmapBgraPtr source, int width, int height, IProfiler^ p){
 
-                    gdImagePtr tmp_im = NULL;
-                    gdImagePtr dst = NULL;
+                    BitmapBgraPtr tmp_im = NULL;
+                    BitmapBgraPtr dst = NULL;
 
 
                     float lut[256];
@@ -779,7 +486,7 @@ namespace ImageResizer{
 
                     p->Start("create temp image(sy x dx)", false);
                     /* Scale horizontally  */
-                    tmp_im = gdImageCreateTrueColor(source->sy, width);
+                    tmp_im = CreateBitmapBgraPtr(source->h, width,false);
                    
                     if (tmp_im == NULL) {
                         return NULL;
@@ -788,52 +495,52 @@ namespace ImageResizer{
                         p->Stop("create temp image(sy x dx)", true, false);
 
                         p->Start("scale and pivot to temp", false);
-                        _gdScaleXAndPivot(source, tmp_im, lut);
+                        ScaleXAndPivot(source, tmp_im, lut);
                         p->Stop("scale and pivot to temp", true, false);
 
                         p->Start("create image(dx x dy)", false);
                         /* Otherwise, we need to scale vertically. */
-                        dst = gdImageCreateTrueColor(width, height);
+                        dst = CreateBitmapBgraPtr(width, height,false);
                         p->Stop("create image(dx x dy)", true, false);
                         if (dst == NULL) {
                             return NULL;
                         }
 
                         p->Start("scale and pivot to final", false);
-                        _gdScaleXAndPivot(tmp_im, dst, lut);
+                        ScaleXAndPivot(tmp_im, dst, lut);
                         p->Stop("scale and pivot to final", true, false);
                     }
                     finally{
                         p->Start("destroy temp image", false);
-                        gdImageDestroy(tmp_im);
+                        DestroyBitmapBgra(tmp_im);
                         p->Stop("destroy temp image", true, false);
                     }
                     return dst;
 				}
 
-				void CopyGdToBitmap(gdImagePtr source, Bitmap^ target, Rectangle targetArea){
+                void ToGDI(BitmapBgraPtr source, Bitmap^ target, Rectangle targetArea){
 					if (target->PixelFormat != PixelFormat::Format32bppArgb){
 						throw gcnew ArgumentOutOfRangeException("target", "Invalid pixel format " + target->PixelFormat.ToString());
 					}
-					BitmapData ^sourceData;
+                    BitmapData ^targetData;
 					try{
-						sourceData = target->LockBits(targetArea, ImageLockMode::ReadOnly, target->PixelFormat);
-						int sy = source->sy;
-						int sx = source->sx;
+						targetData = target->LockBits(targetArea, ImageLockMode::ReadOnly, target->PixelFormat);
+						int sy = source->h;
+						int sx = source->w;
 						int i;
-						IntPtr^ scan0intptr = sourceData->Scan0;
+                        IntPtr^ scan0intptr = targetData->Scan0;
 						void *scan0 = scan0intptr->ToPointer();
 						for (i = 0; (i < sy); i++) {
-                            void * linePtr = (void *)((unsigned long  long)scan0 + (sourceData->Stride * i) + (targetArea.Left * 4));
-							memcpy(linePtr, source->tpixels[i], sx * 4);
+                            void * linePtr = (void *)((unsigned long  long)scan0 + (targetData->Stride * i) + (targetArea.Left * 4));
+							memcpy(linePtr, &source->pixels[i * source->stride], sx * 4);
 						}
 					}
 					finally{
-						target->UnlockBits(sourceData);
+                        target->UnlockBits(targetData);
 					}
 				}
 
-				gdImagePtr BitmapToGd(Bitmap^ source, Rectangle from){
+                BitmapBgraPtr FromGDI(Bitmap^ source, Rectangle from){
 					int i;
 					int j;
 					bool hasAlpha = source->PixelFormat == PixelFormat::Format32bppArgb;
@@ -847,7 +554,7 @@ namespace ImageResizer{
 					int sy = from.Height;
 
 					int mask = ((INT_MAX >> 8) << 8);
-					gdImagePtr im = gdImageCreateTrueColor(sx, sy);
+					BitmapBgraPtr im = CreateBitmapBgraPtr(sx, sy,false);
 					
 					BitmapData ^sourceData;
 					try{
@@ -859,28 +566,20 @@ namespace ImageResizer{
 							void *scan0 = scan0intptr->ToPointer();
 							void *linePtr = (void *)((unsigned long long)scan0 + (unsigned long  long)((sourceData->Stride * i) + (from.Left * (hasAlpha ? 4 : 3))));
 							if (hasAlpha){
-								memcpy(im->tpixels[i], linePtr, sx * 4);
+								memcpy(&im->pixels[i * im->stride], linePtr, sx * 4);
 							}
 							else{
-								unpack24bitRow(sx, linePtr, im->tpixels[i]);
+								unpack24bitRow(sx, linePtr, (unsigned int*)&im->pixels[i * im->stride]);
 							}
 						}
 					}
 					finally{
 						source->UnlockBits(sourceData);
 					}
-					im->sx = sx;
-					im->sy = sy;
+					im->w = sx;
+					im->h = sy;
 
-					im->trueColor = 1;
-					/* 2.0.2: alpha blending is now on by default, and saving of alpha is
-					off by default. This allows font antialiasing to work as expected
-					on the first try in JPEGs -- quite important -- and also allows
-					for smaller PNGs when saving of alpha channel is not really
-					desired, which it usually isn't! */
-					im->saveAlphaFlag = 0;
-					im->alphaBlendingFlag = 1;
-
+                    im->hasAlpha = hasAlpha;
 					return im;
 				}
 			};
