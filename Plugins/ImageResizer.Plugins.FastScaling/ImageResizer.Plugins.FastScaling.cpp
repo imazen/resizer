@@ -25,6 +25,7 @@ typedef struct BitmapPlanarStruct{
     int h;
     int channels;
     float **planes;
+    float * planar;
 }BitmapPlanar;
 
 typedef BitmapPlanar *BitmapPlanarPtr;
@@ -408,23 +409,23 @@ namespace ImageResizer{
 	namespace Plugins{
 		namespace FastScaling {
 
-			public ref class BitmapScaler
+			public ref class BgraScaler
 			{
 			public:
 				void ScaleBitmap(Bitmap^ source, Bitmap^ dest, Rectangle crop, Rectangle target, IProfiler^ p){
 					BitmapBgraPtr bbSource;
                     BitmapBgraPtr bbResult;
 					try{
-                        p->Start("FromGDI+",false);
-                        bbSource = FromGDI(source, crop);
-                        p->Stop("FromGDI+", true, false);
-                        p->Start("Scale", false);
-                        bbResult = Scale(bbSource, target.Width, target.Height, p);
-                        p->Stop("Scale", true, false);
-                        p->Start("ToGDI+", false);
-                        ToGDI(bbResult, dest, target);
-                        p->Stop("ToGDI+", true, false);
-                        p->Start("GdDispose", false);
+                        p->Start("SysDrawingToBgra",false);
+                        bbSource = SysDrawingToBgra(source, crop);
+                        p->Stop("SysDrawingToBgra", true, false);
+                        p->Start("ScaleBgra", false);
+                        bbResult = ScaleBgra(bbSource, target.Width, target.Height, p);
+                        p->Stop("ScaleBgra", true, false);
+                        p->Start("BgraToSysDrawing", false);
+                        BgraToSysDrawing(bbResult, dest, target);
+                        p->Stop("BgraToSysDrawing", true, false);
+                        p->Start("BgraDispose", false);
 					}finally{
                         if (bbSource != 0) {
                             DestroyBitmapBgra(bbSource);
@@ -434,7 +435,7 @@ namespace ImageResizer{
                             DestroyBitmapBgra(bbResult);
                             bbResult = 0;
 						}
-                        p->Stop("GdDispose", true, false);
+                        p->Stop("BgraDispose", true, false);
 
 					}
 				}
@@ -442,7 +443,7 @@ namespace ImageResizer{
 
 			private:
 
-                BitmapBgraPtr Scale(BitmapBgraPtr source, int width, int height, IProfiler^ p){
+                BitmapBgraPtr ScaleBgra(BitmapBgraPtr source, int width, int height, IProfiler^ p){
 
                     BitmapBgraPtr tmp_im = NULL;
                     BitmapBgraPtr dst = NULL;
@@ -485,7 +486,7 @@ namespace ImageResizer{
                     return dst;
 				}
 
-                void ToGDI(BitmapBgraPtr source, Bitmap^ target, Rectangle targetArea){
+                void BgraToSysDrawing(BitmapBgraPtr source, Bitmap^ target, Rectangle targetArea){
 					if (target->PixelFormat != PixelFormat::Format32bppArgb){
 						throw gcnew ArgumentOutOfRangeException("target", "Invalid pixel format " + target->PixelFormat.ToString());
 					}
@@ -498,7 +499,7 @@ namespace ImageResizer{
                         IntPtr^ scan0intptr = targetData->Scan0;
 						void *scan0 = scan0intptr->ToPointer();
 						for (i = 0; (i < sy); i++) {
-                            void * linePtr = (void *)((unsigned long  long)scan0 + (targetData->Stride * i) + (targetArea.Left * 4));
+                            void * linePtr = (void *)((unsigned long  long)scan0 + (targetData->Stride * (i + targetArea.Top)) + (targetArea.Left * 4));
 							memcpy(linePtr, &source->pixels[i * source->stride], sx * 4);
 						}
 					}
@@ -507,7 +508,7 @@ namespace ImageResizer{
 					}
 				}
 
-                BitmapBgraPtr FromGDI(Bitmap^ source, Rectangle from){
+                BitmapBgraPtr SysDrawingToBgra(Bitmap^ source, Rectangle from){
 					int i;
 					int j;
 					bool hasAlpha = source->PixelFormat == PixelFormat::Format32bppArgb;
@@ -531,7 +532,7 @@ namespace ImageResizer{
 							IntPtr^ scan0intptr = sourceData->Scan0;
 
 							void *scan0 = scan0intptr->ToPointer();
-							void *linePtr = (void *)((unsigned long long)scan0 + (unsigned long  long)((sourceData->Stride * i) + (from.Left * (hasAlpha ? 4 : 3))));
+							void *linePtr = (void *)((unsigned long long)scan0 + (unsigned long  long)((sourceData->Stride * (i + from.Top)) + (from.Left * (hasAlpha ? 4 : 3))));
 							if (hasAlpha){
 								memcpy(&im->pixels[i * im->stride], linePtr, sx * 4);
 							}
@@ -570,7 +571,7 @@ namespace ImageResizer{
 					if (targetBox.Location != targetArea[0] || targetBox.Width != (targetArea[1].X - targetArea[0].X)){
 						return RequestedAction::None;
 					}
-					BitmapScaler ^scaler = gcnew BitmapScaler();
+                    BgraScaler ^scaler = gcnew BgraScaler();
                     scaler->ScaleBitmap(source, dest, Util::PolygonMath::ToRectangle(sourceArea), Util::PolygonMath::ToRectangle(targetBox), s->Job->Profiler);
 					return RequestedAction::Cancel;
 					
