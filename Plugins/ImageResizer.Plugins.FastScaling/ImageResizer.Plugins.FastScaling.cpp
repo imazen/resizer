@@ -514,6 +514,7 @@ static inline int HalveInPlace(const BitmapBgraPtr from, int divisor)
     int r = HalveInternal(from, from, to_w, to_h, to_w * 4, divisor);
     from->w = to_w;
     from->h = to_h;
+    from->stride = to_w * 4;
     return r;
 }
 
@@ -561,6 +562,8 @@ namespace ImageResizer{
 					}finally{
                         if (bbSource != 0) {
                             DestroyBitmapBgra(bbSource);
+                            if (bbResult == bbSource)
+                                bbResult = 0;
                             bbSource = 0;
 						}
                         if (bbResult != 0){
