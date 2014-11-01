@@ -521,9 +521,11 @@ static inline int HalveInPlace(const BitmapBgraPtr from, int divisor)
 
 
 
-static void unpack24bitRow(int width, void * sourceLine, unsigned int * destArray){
+static void unpack24bitRow(int width, unsigned char* sourceLine, unsigned char* destArray){
 	for (register unsigned int i = 0; i < width; i++){
-        destArray[i] = *(unsigned int *)((size_t)sourceLine + i + i + i) | 0xFF000000;
+        
+        memcpy(destArray, sourceLine + i*3, 3);
+        destArray[i+3] = 255;
 	}
 }
 
@@ -701,7 +703,7 @@ namespace ImageResizer{
 								memcpy(&im->pixels[i * im->stride], linePtr, sx * 4);
 							}
 							else{
-								unpack24bitRow(sx, linePtr, (unsigned int*)&im->pixels[i * im->stride]);
+								unpack24bitRow(sx, (unsigned char*)linePtr, &im->pixels[i * im->stride]);
 							}
 						}
 					}
