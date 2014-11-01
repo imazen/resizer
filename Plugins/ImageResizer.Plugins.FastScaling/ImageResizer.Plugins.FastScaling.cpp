@@ -471,7 +471,7 @@ static inline int HalveInternal(const BitmapBgraPtr from,
     for (y = 0; y < to_h; y++){
         memset(buffer, 0, sizeof(short) * to_w_bytes);
         for (d = 0; d < divisor; d++){
-            HalveRowByDivisor(from->pixels + (y * 2 + d) * from->stride, buffer, to_w, divisor);
+            HalveRowByDivisor(from->pixels + (y * divisor + d) * from->stride, buffer, to_w, divisor);
         }
         register unsigned char * dest_line = to->pixels + y * to_stride;
 
@@ -511,10 +511,11 @@ static inline int HalveInPlace(const BitmapBgraPtr from, int divisor)
 {
     int to_w = from->w / divisor;
     int to_h = from->h / divisor;
-    int r = HalveInternal(from, from, to_w, to_h, to_w * 4, divisor);
+    int to_stride = to_w * 4;
+    int r = HalveInternal(from, from, to_w, to_h, to_stride, divisor);
     from->w = to_w;
     from->h = to_h;
-    from->stride = to_w * 4;
+    from->stride = to_stride;
     return r;
 }
 
@@ -581,7 +582,6 @@ namespace ImageResizer{
 			private:
                 BitmapBgraPtr ScaleBgraWithHalving(BitmapBgraPtr source, int width, int height, IProfiler^ p){
                     p->Start("ScaleBgraWithHalving", false);
-                    BitmapBgraPtr halved = NULL; 
                     try{
 
                         int divisor = MIN(source->w / width, source->h / height);
@@ -593,13 +593,9 @@ namespace ImageResizer{
 
                         }
 
-                        return ScaleBgra(halved != 0 ? halved : source, width, height, p);
+                        return ScaleBgra(source, width, height, p);
                     }
                     finally{
-                        if (halved != 0){
-                            DestroyBitmapBgra(halved);
-                            halved = 0;
-                        }
                         p->Stop("ScaleBgraWithHalving", true, false);
                     }
                     
