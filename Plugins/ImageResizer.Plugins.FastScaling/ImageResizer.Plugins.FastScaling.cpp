@@ -524,8 +524,8 @@ static inline int HalveInPlace(const BitmapBgraPtr from, int divisor)
 static void unpack24bitRow(int width, unsigned char* sourceLine, unsigned char* destArray){
 	for (register unsigned int i = 0; i < width; i++){
         
-        memcpy(destArray, sourceLine + i*3, 3);
-        destArray[i+3] = 255;
+        memcpy(destArray + i*4, sourceLine + i*3, 3);
+        destArray[i*4 + 3] = 255;
 	}
 }
 
@@ -555,7 +555,8 @@ namespace ImageResizer{
                         bbSource = SysDrawingToBgra(source, crop);
                         p->Stop("SysDrawingToBgra", true, false);
                         
-                        bbResult = ScaleBgraWithHalving(bbSource, target.Width, target.Height, p);
+                        //bbResult = ScaleBgraWithHalving(bbSource, target.Width, target.Height, p);
+                        bbResult = ScaleBgra(bbSource, target.Width, target.Height, p);
                         
                         p->Start("BgraToSysDrawing", false);
                         BgraToSysDrawing(bbResult, dest, target);
