@@ -368,7 +368,7 @@ static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
     unsigned int source_buffer_len = pSrc->stride;
     float *sourceBuffers = (float *)malloc(sizeof(float) * source_buffer_len * buffer);
 
-    unsigned int dest_buffer_len = pSrc->h * 4;
+    unsigned int dest_buffer_len = pDst->h * 4;
     float *destBuffers = (float *)malloc(sizeof(float) * dest_buffer_len * buffer);
 
 
@@ -555,8 +555,7 @@ namespace ImageResizer{
                         bbSource = SysDrawingToBgra(source, crop);
                         p->Stop("SysDrawingToBgra", true, false);
                         
-                        //bbResult = ScaleBgraWithHalving(bbSource, target.Width, target.Height, p);
-                        bbResult = ScaleBgra(bbSource, target.Width, target.Height, p);
+                        bbResult = ScaleBgraWithHalving(bbSource, target.Width, target.Height, p);
                         
                         p->Start("BgraToSysDrawing", false);
                         BgraToSysDrawing(bbResult, dest, target);
@@ -589,7 +588,7 @@ namespace ImageResizer{
                         
                         if (divisor > 1){
                             p->Start("Halving", false);
-                            HalveInPlace(source,divisor);
+                            HalveInPlace(source, divisor);
                             p->Stop("Halving", true, false);
 
                         }
@@ -607,11 +606,11 @@ namespace ImageResizer{
                 }
 
                 BitmapBgraPtr ScaleBgra(BitmapBgraPtr source, int width, int height, IProfiler^ p){
-                   if (source->w == width && source->h == height){
+                    if (source->w == width && source->h == height){
                         return source;
                     }
-                   p->Start("ScaleBgra", true);
-
+                    p->Start("ScaleBgra", true);
+                    
                     BitmapBgraPtr tmp_im = NULL;
                     BitmapBgraPtr dst = NULL;
                     float lut[256];
@@ -619,7 +618,7 @@ namespace ImageResizer{
 
                     p->Start("create temp image(sy x dx)", false);
                     /* Scale horizontally  */
-                    tmp_im = CreateBitmapBgraPtr(source->h, width,false);
+                    tmp_im = CreateBitmapBgraPtr(source->h, width, false);
                    
                     
                     try{
@@ -634,7 +633,7 @@ namespace ImageResizer{
 
                         p->Start("create image(dx x dy)", false);
                         /* Otherwise, we need to scale vertically. */
-                        dst = CreateBitmapBgraPtr(width, height,false);
+                        dst = CreateBitmapBgraPtr(width, height, false);
                         p->Stop("create image(dx x dy)", true, false);
                         if (dst == NULL) {
                             return NULL;
