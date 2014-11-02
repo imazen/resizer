@@ -325,8 +325,11 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
     const register unsigned int other_axis_count = dest->w;
     
     for (row = 0; row < row_count; row++)
-    for (bix = 0; bix < source_buffer_len; bix++)
-        source_buffers[row * source_buffer_len + bix] = lut[*(source_bitmap->pixels + (start_row + row)*source_bitmap->stride + bix)];
+    {
+        unsigned char *src_start = source_bitmap->pixels + (start_row + row)*source_bitmap->stride;
+        for (bix = 0; bix < source_buffer_len; bix++)
+            source_buffers[row * source_buffer_len + bix] = lut[src_start[bix]];
+    }
     
     //Actual scaling seems responsible for about 40% of execution time
     for (bufferSet = 0; bufferSet < row_count; bufferSet++){
