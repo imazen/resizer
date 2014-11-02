@@ -567,13 +567,11 @@ namespace ImageResizer{
 					try{
                         p->Start("SysDrawingToBgra",false);
                         bbSource = SysDrawingToBgra(source, crop);
+                        bbResult = SysDrawingToBgra(dest, target);
                         p->Stop("SysDrawingToBgra", true, false);
                         
-                        bbResult = ScaleBgraWithHalving(bbSource, target.Width, target.Height, p);
+                        ScaleBgraWithHalving(bbSource, target.Width, target.Height, bbResult, p);
                         
-                        p->Start("BgraToSysDrawing", false);
-                        BgraToSysDrawing(bbResult, dest, target);
-                        p->Stop("BgraToSysDrawing", true, false);
                         p->Start("BgraDispose", false);
 					}finally{
                         if (bbSource != 0) {
@@ -593,7 +591,7 @@ namespace ImageResizer{
 				 
 
 			private:
-                BitmapBgraPtr ScaleBgraWithHalving(BitmapBgraPtr source, int width, int height, IProfiler^ p){
+                BitmapBgraPtr ScaleBgraWithHalving(BitmapBgraPtr source, int width, int height, BitmapBgraPtr dst, IProfiler^ p){
                     p->Start("ScaleBgraWithHalving", false);
                     try{
 
@@ -603,10 +601,9 @@ namespace ImageResizer{
                             p->Start("Halving", false);
                             HalveInPlace(source, divisor);
                             p->Stop("Halving", true, false);
-
                         }
 
-                        return ScaleBgra(source, width, height, p);
+                        return ScaleBgra(source, width, height, dst, p);
                     }
                     finally{
                         p->Stop("ScaleBgraWithHalving", true, false);
@@ -614,14 +611,43 @@ namespace ImageResizer{
                     
                 }
 
-                BitmapBgraPtr ScaleBgra(BitmapBgraPtr source, int width, int height, IProfiler^ p){
+                void CopyBgra(BitmapBgraPtr src, BitmapBgraPtr dst)
+                {
+                    // TODO: check sizes / overflows
+
+                    if (src->bpp == 4)
+                    {
+                        // recalculate line width as it can be different from the stride
+                        for (int y = 0; y < src->h; y++)
+                            memcpy(dst->pixels + y*dst->stride, src->pixels + y*src->stride, src->w*src->bpp);
+                    }
+                    else
+                    {
+                        for (int y = 0; y < src->h; y++)
+                            unpack24bitRow(src->w, src->pixels + y*src->stride, dst->pixels + y*dst->stride);
+                    }
+                }
+
+                BitmapBgraPtr ScaleBgra(BitmapBgraPtr source, int width, int height, BitmapBgraPtr dst, IProfiler^ p){
+
+                    p->Start("create image(dx x dy)", false);
+
+                    if (!dst)
+                        dst = CreateBitmapBgraPtr(width, height, false);
+                    p->Stop("create image(dx x dy)", true, false);
+
+                    if (dst == NULL) {
+                        return NULL;
+                    }
+
                     if (source->w == width && source->h == height){
-                        return source;
+                        // In case of both halfinplace and noresize we still need to copy the data
+                        CopyBgra(source, dst);
+                        return dst;
                     }
                     p->Start("ScaleBgra", true);
                     
                     BitmapBgraPtr tmp_im = NULL;
-                    BitmapBgraPtr dst = NULL;
                     float lut[256];
                     for (int n = 0; n < 256; n++) lut[n] = (float)n;
 
@@ -640,13 +666,8 @@ namespace ImageResizer{
                         ScaleXAndPivot(source, tmp_im, lut);
                         p->Stop("scale and pivot to temp", true, false);
 
-                        p->Start("create image(dx x dy)", false);
+                        
                         /* Otherwise, we need to scale vertically. */
-                        dst = CreateBitmapBgraPtr(width, height, false);
-                        p->Stop("create image(dx x dy)", true, false);
-                        if (dst == NULL) {
-                            return NULL;
-                        }
 
                         p->Start("scale and pivot to final", false);
                         ScaleXAndPivot(tmp_im, dst, lut);
