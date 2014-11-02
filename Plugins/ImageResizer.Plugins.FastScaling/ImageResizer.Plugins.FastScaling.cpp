@@ -541,6 +541,8 @@ using namespace System::Drawing;
 using namespace System::Drawing::Imaging;
 using namespace ImageResizer::Resizing;
 using namespace System::Diagnostics;
+using namespace System::Collections::Specialized;
+
 namespace ImageResizer{
 	namespace Plugins{
 		namespace FastScaling {
@@ -719,15 +721,15 @@ namespace ImageResizer{
 			{
 			protected:
 				virtual RequestedAction InternalGraphicsDrawImage(ImageState^ s, Bitmap^ dest, Bitmap^ source, array<PointF>^ targetArea, RectangleF sourceArea, ImageAttributes^ imageAttributes) override{
-				/*	System::Collections::Specialized::NameValueCollection^ query = safe_cast<System::Collections::Specialized::NameValueCollection^>(s->settings);
-
-                
-					String^ fastScale = query->Get("fastscale");
+                    
+                    NameValueCollection ^query = s->settingsAsCollection();
+                    String^ fastScale = query->Get("fastscale");
 					String^ sTrue = "true";
 					if (fastScale != sTrue){
 						return RequestedAction::None;
-					}*/
+					}
 
+                    
                     
 					RectangleF targetBox = ImageResizer::Util::PolygonMath::GetBoundingBox(targetArea);
 					if (targetBox.Location != targetArea[0] || targetBox.Width != (targetArea[1].X - targetArea[0].X)){

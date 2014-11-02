@@ -1,6 +1,7 @@
 ﻿/* Copyright (c) 2014 Imazen See license.txt */
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -23,6 +24,11 @@ namespace ImageResizer.Resizing {
         /// The commands to apply to the bitmap
         /// </summary>
         public ResizeSettings settings;
+
+        public NameValueCollection settingsAsCollection()
+        {
+            return settings;
+        }
 
         /// <summary>
         /// The original size of the source bitmap. Use this instead of accessing the bitmap directly for this information, since the bitmap may not always be available
