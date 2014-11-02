@@ -17,6 +17,7 @@ typedef struct BitmapBgraStruct{
     unsigned int *pixelInts;
     int hasAlpha;
     int ownMem;
+    int bpp;
 } BitmapBgra;
 
 typedef BitmapBgra *BitmapBgraPtr;
@@ -131,6 +132,7 @@ static BitmapBgraPtr CreateBitmapBgraPtr(int sx, int sy, int zeroed, int alloc=1
     im->w = sx;
     im->h = sy;
     im->stride = sx * 4;
+    im->bpp = 4;
 	
     if (alloc)
     {
@@ -315,25 +317,21 @@ float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len
 }
 
 
-static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int start_row, unsigned int row_count,  ContributionType * weights, BitmapBgraPtr dest, float *source_buffers, unsigned int source_buffer_len, float *dest_buffers, unsigned int dest_buffer_len, float *lut, int from_step=4){
+static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int start_row, unsigned int row_count,  ContributionType * weights, BitmapBgraPtr dest, float *source_buffers, unsigned int source_buffer_len, float *dest_buffers, unsigned int dest_buffer_len, float *lut){
 
-    const register unsigned char * scan_start = source_bitmap->pixels + start_row * source_bitmap->stride;
-
-
-    register unsigned int bix, bufferSet;
-    const register unsigned int source_buffer_bytes = source_buffer_len * row_count;
+    register unsigned int row, bix, bufferSet;
     const register unsigned int from_pixel_count = source_bitmap->w;
     const register unsigned int to_pixel_count = dest->h;
     const register unsigned int other_axis_count = dest->w;
     
-    for (bix = 0; bix < source_buffer_bytes; bix++){
-        source_buffers[bix] = lut[scan_start[bix]];
-    }
+    for (row = 0; row < row_count; row++)
+    for (bix = 0; bix < source_buffer_len; bix++)
+        source_buffers[row * source_buffer_len + bix] = lut[*(source_bitmap->pixels + (start_row + row)*source_bitmap->stride + bix)];
     
     //Actual scaling seems responsible for about 40% of execution time
     for (bufferSet = 0; bufferSet < row_count; bufferSet++){
         ScaleBgraFloat(source_buffers + (source_buffer_len * bufferSet), from_pixel_count, source_buffer_len, 
-            dest_buffers + (dest_buffer_len * bufferSet), to_pixel_count, dest_buffer_len, weights, from_step);
+            dest_buffers + (dest_buffer_len * bufferSet), to_pixel_count, dest_buffer_len, weights, source_bitmap->bpp);
     }
     
     for (bix = 0; bix < to_pixel_count; bix++){
@@ -371,9 +369,8 @@ static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
     }
 
     int buffer = 4; //using buffer=5 seems about 6% better than most other non-zero values. 
-    int from_step = (!pSrc->ownMem && !pSrc->hasAlpha) ? 3 : 4;
 
-    unsigned int source_buffer_len = pSrc->w * from_step;
+    unsigned int source_buffer_len = pSrc->w * pSrc->bpp;
     float *sourceBuffers = (float *)malloc(sizeof(float) * source_buffer_len * buffer);
 
     unsigned int dest_buffer_len = pDst->h * 4;
@@ -384,7 +381,7 @@ static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
     for (line_ndx = 0; line_ndx < pSrc->h; line_ndx += buffer) {
 
         ScaleXAndPivotRows(pSrc, line_ndx, MIN(pSrc->h - line_ndx, buffer), contrib->ContribRow, pDst,
-            sourceBuffers, source_buffer_len, destBuffers, dest_buffer_len, lut, from_step);
+            sourceBuffers, source_buffer_len, destBuffers, dest_buffer_len, lut);
     }
 
     free(sourceBuffers);
@@ -480,7 +477,7 @@ static inline int HalveInternal(const BitmapBgraPtr from,
     for (y = 0; y < to_h; y++){
         memset(buffer, 0, sizeof(short) * to_w_bytes);
         for (d = 0; d < divisor; d++){
-            HalveRowByDivisor(from->pixels + (y * divisor + d) * from->stride, buffer, to_w, divisor, (!from->ownMem && !from->hasAlpha) ? 3 : 4);
+            HalveRowByDivisor(from->pixels + (y * divisor + d) * from->stride, buffer, to_w, divisor, from->bpp);
         }
         register unsigned char * dest_line = to->pixels + y * to_stride;
 
@@ -525,6 +522,7 @@ static inline int HalveInPlace(const BitmapBgraPtr from, int divisor)
     from->w = to_w;
     from->h = to_h;
     from->stride = to_stride;
+    from->bpp = 4;
     return r;
 }
 
@@ -568,8 +566,7 @@ namespace ImageResizer{
                         bbSource = SysDrawingToBgra(source, crop);
                         p->Stop("SysDrawingToBgra", true, false);
                         
-                        //bbResult = ScaleBgraWithHalving(bbSource, target.Width, target.Height, p);
-                        bbResult = ScaleBgra(bbSource, target.Width, target.Height, p);
+                        bbResult = ScaleBgraWithHalving(bbSource, target.Width, target.Height, p);
                         
                         p->Start("BgraToSysDrawing", false);
                         BgraToSysDrawing(bbResult, dest, target);
@@ -718,6 +715,8 @@ namespace ImageResizer{
 					im->h = sy;
 
                     im->hasAlpha = hasAlpha;
+                    if (!hasAlpha)
+                        im->bpp = 3;
 					return im;
 				}
 			};
