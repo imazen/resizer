@@ -16,6 +16,7 @@ typedef struct BitmapBgraStruct{
     unsigned char *pixels;
     unsigned int *pixelInts;
     int hasAlpha;
+    int ownMem;
 } BitmapBgra;
 
 typedef BitmapBgra *BitmapBgraPtr;
@@ -112,7 +113,7 @@ static int overflow2(int a, int b)
 }
 
 
-static BitmapBgraPtr CreateBitmapBgraPtr(int sx, int sy, int zeroed)
+static BitmapBgraPtr CreateBitmapBgraPtr(int sx, int sy, int zeroed, int alloc=1)
 {
 	int i;
     BitmapBgraPtr im;
@@ -131,18 +132,25 @@ static BitmapBgraPtr CreateBitmapBgraPtr(int sx, int sy, int zeroed)
     im->h = sy;
     im->stride = sx * 4;
 	
-    if (zeroed){
-        im->pixels = (unsigned char *)calloc(sy * im->stride, sizeof(unsigned char));
-    }
-    else{
-        im->pixels = (unsigned char *)malloc(sy * im->stride);
-    }
-    im->pixelInts = (unsigned int *)im->pixels;
+    if (alloc)
+    {
+        im->ownMem = 1;
+        if (zeroed){
+            im->pixels = (unsigned char *)calloc(sy * im->stride, sizeof(unsigned char));
+        }
+        else{
+            im->pixels = (unsigned char *)malloc(sy * im->stride);
+        }
+        im->pixelInts = (unsigned int *)im->pixels;
 
-    if (!im->pixels) {
-        free(im);
-        return 0;
+        if (!im->pixels) {
+            free(im);
+            return 0;
+        }
     }
+    else
+        im->ownMem = 0;
+
 	return im;
 }
 
@@ -150,7 +158,7 @@ static BitmapBgraPtr CreateBitmapBgraPtr(int sx, int sy, int zeroed)
 static void DestroyBitmapBgra(BitmapBgraPtr im)
 {
     int i;
-    if (im->pixels) {
+    if (im->pixels && im->ownMem) {
 		free(im->pixels);
     }
     free(im);
@@ -268,12 +276,12 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
 
 
 
-
+// TODO: port alpha switch to soft ifs?
 //#define ScaleAlpha
 
 static inline void
 ScaleBgraFloat(float *source_buffer, unsigned int source_buffer_count, unsigned int source_buffer_len,
-float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len, ContributionType * weights){
+float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len, ContributionType * weights, int from_step=4){
 
     unsigned int ndx;
     for (ndx = 0; ndx < dest_buffer_count; ndx++) {
@@ -288,11 +296,11 @@ float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len
         for (i = left; i <= right; i++) {
             const float weight = weightArray[i - left];
 
-            b += weight * source_buffer[i * 4];
-            g += weight * source_buffer[i * 4 + 1];
-            r += weight * source_buffer[i * 4 + 2];
+            b += weight * source_buffer[i * from_step];
+            g += weight * source_buffer[i * from_step + 1];
+            r += weight * source_buffer[i * from_step + 2];
 #ifdef ScaleAlpha
-            a += weight * source_buffer[i * 4 + 3];
+            a += weight * source_buffer[i * from_step + 3];
 #endif
         }
 
@@ -307,7 +315,7 @@ float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len
 }
 
 
-static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int start_row, unsigned int row_count,  ContributionType * weights, BitmapBgraPtr dest, float *source_buffers, unsigned int source_buffer_len, float *dest_buffers, unsigned int dest_buffer_len, float *lut){
+static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int start_row, unsigned int row_count,  ContributionType * weights, BitmapBgraPtr dest, float *source_buffers, unsigned int source_buffer_len, float *dest_buffers, unsigned int dest_buffer_len, float *lut, int from_step=4){
 
     const register unsigned char * scan_start = source_bitmap->pixels + start_row * source_bitmap->stride;
 
@@ -325,7 +333,7 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
     //Actual scaling seems responsible for about 40% of execution time
     for (bufferSet = 0; bufferSet < row_count; bufferSet++){
         ScaleBgraFloat(source_buffers + (source_buffer_len * bufferSet), from_pixel_count, source_buffer_len, 
-                        dest_buffers + (dest_buffer_len * bufferSet), to_pixel_count, dest_buffer_len, weights);
+            dest_buffers + (dest_buffer_len * bufferSet), to_pixel_count, dest_buffer_len, weights, from_step);
     }
     
     for (bix = 0; bix < to_pixel_count; bix++){
@@ -363,9 +371,9 @@ static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
     }
 
     int buffer = 4; //using buffer=5 seems about 6% better than most other non-zero values. 
+    int from_step = (!pSrc->ownMem && !pSrc->hasAlpha) ? 3 : 4;
 
-
-    unsigned int source_buffer_len = pSrc->stride;
+    unsigned int source_buffer_len = pSrc->w * from_step;
     float *sourceBuffers = (float *)malloc(sizeof(float) * source_buffer_len * buffer);
 
     unsigned int dest_buffer_len = pDst->h * 4;
@@ -376,7 +384,7 @@ static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
     for (line_ndx = 0; line_ndx < pSrc->h; line_ndx += buffer) {
 
         ScaleXAndPivotRows(pSrc, line_ndx, MIN(pSrc->h - line_ndx, buffer), contrib->ContribRow, pDst,
-                sourceBuffers, source_buffer_len, destBuffers, dest_buffer_len, lut);
+            sourceBuffers, source_buffer_len, destBuffers, dest_buffer_len, lut, from_step);
     }
 
     free(sourceBuffers);
@@ -390,46 +398,47 @@ static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
 
 
 
-static inline void HalveRowByDivisor(const unsigned char* from, unsigned short * to, const unsigned int to_count, const int divisor){
+static inline void HalveRowByDivisor(const unsigned char* from, unsigned short * to, const unsigned int to_count, const int divisor, const int from_step=4){
     int to_b, from_b;
     const int to_bytes = to_count * 4;
-    const int divisor_stride = 4 * divisor;
+    const int divisor_stride = from_step * divisor;
+
     if (divisor == 2)
     {
         if (to_count % 2 == 0){
-            for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 8, from_b += 16){
+            for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 8, from_b += 4*from_step){
                 for (int i = 0; i < 8; i++){
-                    to[to_b + i] += from[from_b + i] + from[from_b + i + 4];
+                    to[to_b + i] += from[from_b + i] + from[from_b + i + from_step];
                 }
             }
         }
         else{
-            for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += 8){
+            for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += 2*from_step){
                 for (int i = 0; i < 4; i++){
-                    to[to_b + i] += from[from_b + i] + from[from_b + i + 4];
+                    to[to_b + i] += from[from_b + i] + from[from_b + i + from_step];
                 }
             }
         }
 
     }
     else if (divisor == 3){
-        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += 12){
+        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += 3*from_step){
             for (int i = 0; i < 4; i++){
-                to[to_b + i] += from[from_b + i] + from[from_b + i + 4] + from[from_b + i + 8];
+                to[to_b + i] += from[from_b + i] + from[from_b + i + from_step] + from[from_b + i + 2*from_step];
             }
         }
     }
     else if (divisor == 4){
-        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += 16){
+        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += 4*from_step){
             for (int i = 0; i < 4; i++){
-                to[to_b + i] += from[from_b + i] + from[from_b + i + 4] + from[from_b + i + 8] + from[from_b + i + 12];
+                to[to_b + i] += from[from_b + i] + from[from_b + i + from_step] + from[from_b + i + 2*from_step] + from[from_b + i + 3*from_step];
             }
         }
     }
     else{
         for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += divisor_stride){
             for (int i = 0; i < 4; i++){
-                for (int f = 0; f < divisor_stride; f += 4){
+                for (int f = 0; f < divisor_stride; f += from_step){
                    to[to_b + i] += from[from_b + i + f];
                     
                 }
@@ -471,7 +480,7 @@ static inline int HalveInternal(const BitmapBgraPtr from,
     for (y = 0; y < to_h; y++){
         memset(buffer, 0, sizeof(short) * to_w_bytes);
         for (d = 0; d < divisor; d++){
-            HalveRowByDivisor(from->pixels + (y * divisor + d) * from->stride, buffer, to_w, divisor);
+            HalveRowByDivisor(from->pixels + (y * divisor + d) * from->stride, buffer, to_w, divisor, (!from->ownMem && !from->hasAlpha) ? 3 : 4);
         }
         register unsigned char * dest_line = to->pixels + y * to_stride;
 
@@ -542,6 +551,7 @@ using namespace System::Drawing::Imaging;
 using namespace ImageResizer::Resizing;
 using namespace System::Diagnostics;
 using namespace System::Collections::Specialized;
+using namespace System::Runtime::InteropServices;
 
 namespace ImageResizer{
 	namespace Plugins{
@@ -558,7 +568,8 @@ namespace ImageResizer{
                         bbSource = SysDrawingToBgra(source, crop);
                         p->Stop("SysDrawingToBgra", true, false);
                         
-                        bbResult = ScaleBgraWithHalving(bbSource, target.Width, target.Height, p);
+                        //bbResult = ScaleBgraWithHalving(bbSource, target.Width, target.Height, p);
+                        bbResult = ScaleBgra(bbSource, target.Width, target.Height, p);
                         
                         p->Start("BgraToSysDrawing", false);
                         BgraToSysDrawing(bbResult, dest, target);
@@ -685,25 +696,20 @@ namespace ImageResizer{
 					int sx = from.Width;
 					int sy = from.Height;
 
-					int mask = ((INT_MAX >> 8) << 8);
-					BitmapBgraPtr im = CreateBitmapBgraPtr(sx, sy,false);
+					BitmapBgraPtr im = CreateBitmapBgraPtr(sx, sy, false, false);
 					
 					BitmapData ^sourceData;
 					try{
 						sourceData = source->LockBits(from, ImageLockMode::ReadWrite, source->PixelFormat);
 
-						for (i = 0; (i < sy); i++) {
-							IntPtr^ scan0intptr = sourceData->Scan0;
+						IntPtr^ scan0intptr = sourceData->Scan0;
 
-							void *scan0 = scan0intptr->ToPointer();
-							void *linePtr = (void *)((unsigned long long)scan0 + (unsigned long  long)((sourceData->Stride * (i + from.Top)) + (from.Left * (hasAlpha ? 4 : 3))));
-							if (hasAlpha){
-								memcpy(&im->pixels[i * im->stride], linePtr, sx * 4);
-							}
-							else{
-								unpack24bitRow(sx, (unsigned char*)linePtr, &im->pixels[i * im->stride]);
-							}
-						}
+						void *scan0 = scan0intptr->ToPointer();
+						void *linePtr = (void *)((unsigned long long)scan0 + (unsigned long  long)((sourceData->Stride * from.Top) + (from.Left * (hasAlpha ? 4 : 3))));
+						
+                        im->pixels = (unsigned char *)linePtr;
+                        im->pixelInts = (unsigned int *)linePtr;
+                        im->stride = sourceData->Stride;
 					}
 					finally{
 						source->UnlockBits(sourceData);
