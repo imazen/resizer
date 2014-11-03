@@ -49,8 +49,7 @@ namespace Bench
             //CompareGdToDefault("bit");
             //CompareGdToDefault("encode");
 
-            CheckFastScalingMemoryUse();
-            CompareFastScalingToDefault("bit");
+            CompareFastScaling("bit");
 
             Console.Write("Done\n");
             Console.ReadKey();
@@ -363,6 +362,37 @@ namespace Bench
             var configs = new Tuple<Config, Instructions, string>[]{
                     new Tuple<Config, Instructions, string>(ConfigWithPlugins(),null,"Default"),
                     new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),null,"FastScaling")};
+
+            Compare(settings, configs.Reverse());
+
+
+        }
+        public static void CompareFastScaling(string segment = "op")
+        {
+            var settings = new BenchmarkingSettings();
+            settings.Images = new ImageProvider();
+            settings.Images.AddBlankImages(new Tuple<int, int, string>[] { new Tuple<int, int, string>(2200, 2200, "jpg") });
+            //.AddLocalImages(imageDir, "quality-original.jpg", "fountain-small.jpg");
+            settings.SharedInstructions = new Instructions[]{new Instructions(
+                "width=800&scale=both")};
+            settings.ExcludeEncoding = false;
+            settings.ExcludeDecoding = false;
+            settings.ExcludeBuilding = false;
+            settings.ExcludeIO = true;
+            settings.ParallelRuns = 2;
+            settings.SegmentNameFilter = segment;
+            settings.ParallelThreads = 8;
+            settings.SequentialRuns = 16;
+            settings.ThrowawayRuns = 2;
+            settings.ThrowawayThreads = 8;
+            settings.UseBarrierAroundSegment = true;
+            var c = ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling");
+            var configs = new Tuple<Config, Instructions, string>[]{
+                    new Tuple<Config, Instructions, string>(new Config(),null,"Default"),
+                    new Tuple<Config, Instructions, string>(c,new Instructions("&fastscale=true"),"FastScaling"),
+                    new Tuple<Config, Instructions, string>(c,new Instructions("&fastscale=true&turbo=true"),"FastScaling+Halving"),
+                    new Tuple<Config, Instructions, string>(c,new Instructions("&fastscale=true&f=7&blur=0.54"),"FastScaling Lanczos"),
+                    new Tuple<Config, Instructions, string>(c,new Instructions("&fastscale=true&f=7&blur=0.54&sharpen=20"),"FastScaling Lanczos + Sharpen")};
 
             Compare(settings, configs.Reverse());
 
