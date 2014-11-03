@@ -353,6 +353,7 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
             *dst_start = uchar_clamp(dest_buffers[dest_buffer_start], 0xFF);
             *(dst_start + 1) = uchar_clamp(dest_buffers[dest_buffer_start + 1], 0xFF);
             *(dst_start + 2) = uchar_clamp(dest_buffers[dest_buffer_start + 2], 0xFF);
+            *(dst_start + 3) = 0xFF;
     #endif
         }
     }
