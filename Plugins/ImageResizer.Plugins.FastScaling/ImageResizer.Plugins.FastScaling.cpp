@@ -562,7 +562,7 @@ namespace ImageResizer{
 			public ref class BgraScaler
 			{
 			public:
-				void ScaleBitmap(Bitmap^ source, Bitmap^ dest, Rectangle crop, Rectangle target, IProfiler^ p){
+				void ScaleBitmap(Bitmap^ source, Bitmap^ dest, Rectangle crop, Rectangle target, int withHalving, IProfiler^ p){
 					BitmapBgraPtr bbSource;
                     BitmapBgraPtr bbResult;
 					try{
@@ -571,7 +571,10 @@ namespace ImageResizer{
                         bbResult = SysDrawingToBgra(dest, target);
                         p->Stop("SysDrawingToBgra", true, false);
                         
-                        ScaleBgraWithHalving(bbSource, target.Width, target.Height, bbResult, p);
+                        if (withHalving)
+                            ScaleBgraWithHalving(bbSource, target.Width, target.Height, bbResult, p);
+                        else
+                            ScaleBgra(bbSource, target.Width, target.Height, bbResult, p);
                         
                         p->Start("BgraDispose", false);
 					}finally{
@@ -753,11 +756,18 @@ namespace ImageResizer{
 				virtual RequestedAction InternalGraphicsDrawImage(ImageState^ s, Bitmap^ dest, Bitmap^ source, array<PointF>^ targetArea, RectangleF sourceArea, ImageAttributes^ imageAttributes) override{
                     
                     NameValueCollection ^query = s->settingsAsCollection();
+
                     String^ fastScale = query->Get("fastscale");
 					String^ sTrue = "true";
+
 					if (fastScale != sTrue){
 						return RequestedAction::None;
 					}
+
+                    int withHalving = 0;
+                    String^ turbo = query->Get("turbo");
+                    if (turbo == sTrue)
+                        withHalving = 1;
 
                     
                     
@@ -766,7 +776,7 @@ namespace ImageResizer{
 						return RequestedAction::None;
 					}
                     BgraScaler ^scaler = gcnew BgraScaler();
-                    scaler->ScaleBitmap(source, dest, Util::PolygonMath::ToRectangle(sourceArea), Util::PolygonMath::ToRectangle(targetBox), s->Job->Profiler);
+                    scaler->ScaleBitmap(source, dest, Util::PolygonMath::ToRectangle(sourceArea), Util::PolygonMath::ToRectangle(targetBox), withHalving, s->Job->Profiler);
 					return RequestedAction::Cancel;
 					
 				}
