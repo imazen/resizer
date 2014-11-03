@@ -33,6 +33,8 @@ typedef struct InterpolationDetailsStruct{
     detailed_interpolation_method filter;
     int use_halving;
     int allow_source_mutation;
+    int post_resize_sharpen_percent;
+    int filter_var_a;
 }InterpolationDetails;
 
 
@@ -214,6 +216,24 @@ static inline double filter_bicubic_fast(const InterpolationDetailsPtr d, const 
     return 0;
 }
 
+#define IR_PI  double (3.1415926535897932384626433832795)
+#define IR_SINC(value) (value == 0 ? 1 : sin(value * IR_PI) / (value * IR_PI))
+
+static inline double filter_lanczos(const InterpolationDetailsPtr d, const double t)
+{
+    const double width = d->filter_var_a;
+
+    const double abs_t = (double)fabs(t) / d->blur;
+    if (abs_t < width)	{
+        return (IR_SINC(abs_t) * IR_SINC(abs_t / width));
+    }
+    return 0;
+}
+
+
+
+
+
 static InterpolationDetailsPtr CreateBicubicCustom(double window, double blur, double B, double C){
     InterpolationDetailsPtr d = (InterpolationDetails *)malloc(sizeof(InterpolationDetails));
     d->blur = blur;
@@ -221,6 +241,18 @@ static InterpolationDetailsPtr CreateBicubicCustom(double window, double blur, d
     d->filter = filter_flex_cubic;
     d->window = window;
     return d;
+}
+
+static InterpolationDetailsPtr DetailsLanczosCustom(double window, double blur){
+    InterpolationDetailsPtr d = (InterpolationDetails *)malloc(sizeof(InterpolationDetails));
+    d->blur = blur;
+    d->filter = filter_lanczos;
+    d->window = window;
+    d->filter_var_a = 3;
+    return d;
+}
+static InterpolationDetailsPtr DetailsLanczos(){
+    return DetailsLanczosCustom(0.5, 1);
 }
 
 static InterpolationDetailsPtr DetailsDefault(){
@@ -661,6 +693,34 @@ static void unpack24bitRow(int width, unsigned char* sourceLine, unsigned char* 
 
 
 
+
+static void BgraSharpenInPlaceX(BitmapBgraPtr im, int pct)
+{
+    int x, y, current, prev, next, i;
+    
+    const int sx = im->w;
+    const int sy = im->h;
+    const int stride = im->stride;
+    const int bpp = im->bpp;
+    const float outer_coeff = -pct / 400.0;
+    const float inner_coeff = 1 - 2 * outer_coeff;
+
+    if (pct <= 0 || im->w < 3 || bpp < 3) return;
+    
+    for (y = 0; y < sy; y++)
+    {
+        unsigned char *row = im->pixels + y * stride;
+        for (current = bpp, prev = 0, next = bpp + bpp; next < stride; prev = current, current = next, next += bpp){
+            //We never sharpen the alpha channel
+            for (int i = 0; i < 3; i++)
+                row[current + i] = uchar_clamp_ff(outer_coeff * (float)row[prev + i] + inner_coeff * (float)row[current + i] + outer_coeff * (float)row[next + i]);
+        } 
+    }
+}
+
+
+
+
 #pragma managed
 
 
@@ -798,12 +858,23 @@ namespace ImageResizer{
                         ScaleXAndPivot(source, tmp_im,details, lut);
                         p->Stop("scale and pivot to temp", true, false);
 
+                        if (details->post_resize_sharpen_percent > 0){
+                            p->Start("sharpening along X axis", false); 
+                            BgraSharpenInPlaceX(tmp_im, details->post_resize_sharpen_percent);
+                            p->Stop("sharpening along X axis", true, false);
+                        }
                         
-                        /* Otherwise, we need to scale vertically. */
-
+                        
                         p->Start("scale and pivot to final", false);
                         ScaleXAndPivot(tmp_im, dst, details, lut);
                         p->Stop("scale and pivot to final", true, false);
+
+                        if (details->post_resize_sharpen_percent > 0){
+                            p->Start("sharpening along Y axis", false);
+                            BgraSharpenInPlaceX(dst, details->post_resize_sharpen_percent);
+                            p->Stop("sharpening along Y axis", true, false);
+                        }
+
                     }
                     finally{
                         p->Start("destroy temp image", false);
@@ -904,7 +975,10 @@ namespace ImageResizer{
                     double window = System::String::IsNullOrEmpty(query->Get("window")) ? 0 :
                         System::Double::Parse(query->Get("window"));
 
-                    
+                    double sharpen = System::String::IsNullOrEmpty(query->Get("sharpen")) ? 0 :
+                        System::Double::Parse(query->Get("sharpen"));
+
+
 					RectangleF targetBox = ImageResizer::Util::PolygonMath::GetBoundingBox(targetArea);
 					if (targetBox.Location != targetArea[0] || targetBox.Width != (targetArea[1].X - targetArea[0].X)){
 						return RequestedAction::None;
@@ -931,11 +1005,14 @@ namespace ImageResizer{
                     if (query->Get("f") == "6"){
                         details = DetailsHermite();
                     }
-
+                    if (query->Get("f") == "7"){
+                        details = DetailsLanczos();
+                    }
                     details->allow_source_mutation = true;
                     details->use_halving = withHalving;
                     details->blur *= blur;
-                    if (window != 0) details->window = 0.70710678118654752440084436210484903928483593768847;
+                    details->post_resize_sharpen_percent = (int)sharpen;
+                    if (window != 0) details->window = window;
                         
                     BgraScaler ^scaler = gcnew BgraScaler();
                     scaler->ScaleBitmap(source, dest, Util::PolygonMath::ToRectangle(sourceArea), Util::PolygonMath::ToRectangle(targetBox), details, s->Job->Profiler);
