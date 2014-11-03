@@ -615,7 +615,7 @@ namespace ImageResizer{
                         p->Stop("SysDrawingToBgra", true, false);
                         
                         if (withHalving)
-                            ScaleBgraWithHalving(bbSource, target.Width, target.Height, bbResult, p);
+                            ScaleBgraWithHalving(bbSource, target.Width, target.Height, bbResult, 1, p);
                         else
                             ScaleBgra(bbSource, target.Width, target.Height, bbResult, p);
                         
@@ -638,15 +638,29 @@ namespace ImageResizer{
 				 
 
 			private:
-                BitmapBgraPtr ScaleBgraWithHalving(BitmapBgraPtr source, int width, int height, BitmapBgraPtr dst, IProfiler^ p){
+                BitmapBgraPtr ScaleBgraWithHalving(BitmapBgraPtr source, int width, int height, BitmapBgraPtr dst, int inplace, IProfiler^ p){
                     p->Start("ScaleBgraWithHalving", false);
                     try{
 
                         int divisor = MIN(source->w / width, source->h / height);
+                        BitmapBgraPtr tmp_im = 0;
                         
                         if (divisor > 1){
                             p->Start("Halving", false);
-                            HalveInPlace(source, divisor);
+
+                            if (inplace)
+                              HalveInPlace(source, divisor);
+                            else
+                            {
+                                tmp_im = CreateBitmapBgraPtr(source->w / divisor, source->h / divisor, false, 1, source->bpp);
+                                if (!tmp_im)
+                                    return 0;
+
+                                Halve(source, tmp_im, divisor);
+
+                                p->Stop("Halving", true, false);
+                                return ScaleBgra(tmp_im, width, height, dst, p);
+                            }
                             p->Stop("Halving", true, false);
                         }
 
