@@ -22,15 +22,18 @@ typedef struct BitmapBgraStruct{
 
 typedef BitmapBgra *BitmapBgraPtr;
 
-typedef struct BitmapPlanarStruct{
-    int w;
-    int h;
-    int channels;
-    float **planes;
-    float * planar;
-}BitmapPlanar;
+typedef struct InterpolationDetailsStruct *InterpolationDetailsPtr;
 
-typedef BitmapPlanar *BitmapPlanarPtr;
+typedef double(*detailed_interpolation_method)(InterpolationDetailsPtr, double);
+
+typedef struct InterpolationDetailsStruct{
+    double window;
+    double * cubic_coefficients;
+    double blur;
+    detailed_interpolation_method filter;
+    int use_halving;
+    int allow_source_mutation;
+}InterpolationDetails;
 
 
 #ifndef MIN
@@ -110,9 +113,6 @@ uchar_clamp_ff(float clr) {
 
 
 
-/* Interpolation function ptr */
-typedef double(*interpolation_method)(double);
-
 static int overflow2(int a, int b)
 {
 	if (a <= 0 || b <= 0) {
@@ -177,25 +177,81 @@ static void DestroyBitmapBgra(BitmapBgraPtr im)
     free(im);
 }
 
-/**
-* Bicubic interpolation kernel (a=-1):
-\verbatim
-/
-| 1-2|t|**2+|t|**3          , if |t| < 1
-h(t) = | 4-8|t|+5|t|**2-|t|**3     , if 1<=|t|<2
-| 0                         , otherwise
-\
-\endverbatim
-* ***bd*** 2.2004
-*/
-static inline double filter_bicubic(const double t)
+
+static double * derive_cubic_coefficients(double B, double C){
+    double bx2 = B + B;
+    double co[7] = { 1.0 - (1.0 / 3.0)*B,
+        -3.0 + bx2 + C,
+        2.0 - 1.5*B - C,
+        (4.0 / 3.0)*B + 4.0*C,
+        -8.0*C - bx2,
+        B + 5.0*C,
+        (-1.0 / 6.0)*B - C };
+    return co;
+}
+
+
+static inline double filter_flex_cubic(const InterpolationDetailsPtr d, const double x)
 {
-    const double abs_t = (double)fabs(t);
+    const double t = (double)fabs(x) / d->blur;
+
+
+    const double * co = d->cubic_coefficients;
+    if (t < 1.0){
+        return (co[0] + t * (t* (co[1] + t*co[2])));
+    }
+    if (t < 2.0){
+        return(co[3] + t*(co[4] + t* (co[5] + t*co[6])));
+    }
+    return(0.0);
+}
+static inline double filter_bicubic_fast(const InterpolationDetailsPtr d, const double t)
+{
+    const double abs_t = (double)fabs(t) / d->blur;
     const double abs_t_sq = abs_t * abs_t;
     if (abs_t<1) return 1 - 2 * abs_t_sq + abs_t_sq*abs_t;
     if (abs_t<2) return 4 - 8 * abs_t + 5 * abs_t_sq - abs_t_sq*abs_t;
     return 0;
 }
+
+static InterpolationDetailsPtr CreateBicubicCustom(double window, double blur, double B, double C){
+    InterpolationDetailsPtr d = (InterpolationDetails *)malloc(sizeof(InterpolationDetails));
+    d->blur = blur;
+    d->cubic_coefficients = derive_cubic_coefficients(B,C);
+    d->filter = filter_flex_cubic;
+    d->window = window;
+    return d;
+}
+
+static InterpolationDetailsPtr DetailsDefault(){
+    return CreateBicubicCustom( 0.5,1, 1, 0);
+}
+
+static InterpolationDetailsPtr DetailsGeneralCubic(){
+    return CreateBicubicCustom(0.70710678118654752440084436210484903928483593768847, 2, 1, 0);
+}
+static InterpolationDetailsPtr DetailsCatmullRom(){
+    return CreateBicubicCustom(0.70710678118654752440084436210484903928483593768847, 2, 0, 0.5);
+}
+static InterpolationDetailsPtr DetailsMitchell(){
+    return CreateBicubicCustom(0.70710678118654752440084436210484903928483593768847, 8.0 / 7.0, 1. / 3., 1. / 3.);
+}
+static InterpolationDetailsPtr DetailsRobidoux(){
+    return CreateBicubicCustom(0.70710678118654752440084436210484903928483593768847, 1.1685777620836932,
+        0.37821575509399867, 0.31089212245300067);
+}
+
+static InterpolationDetailsPtr DetailsRobidouxSharp(){
+    return CreateBicubicCustom(0.70710678118654752440084436210484903928483593768847, 1.105822933719019,
+        0.2620145123990142, 0.3689927438004929);
+}
+static InterpolationDetailsPtr DetailsHermite(){
+    return CreateBicubicCustom(0.70710678118654752440084436210484903928483593768847, 2, 1, 0);
+}
+
+
+
+
 
 
 static inline LineContribType *  ContributionsAlloc(unsigned int line_length, unsigned int windows_size)
@@ -227,11 +283,11 @@ static inline void ContributionsFree(LineContribType * p)
 	free(p);
 }
 
-static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigned int src_size, double scale_d, const interpolation_method pFilter)
+static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigned int src_size, double scale_d, const InterpolationDetailsPtr details)
 {
 	double width_d;
 	double scale_f_d = 1.0;
-	const double filter_width_d = DEFAULT_BOX_RADIUS;
+    const double filter_width_d = details->window;
 	int windows_size;
 	unsigned int u;
 	LineContribType *res;
@@ -268,8 +324,8 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
 		res->ContribRow[u].Left = iLeft;
 		res->ContribRow[u].Right = iRight;
 
-        for (iSrc = iLeft; iSrc <= iRight; iSrc++) {
-            dTotalWeight += (res->ContribRow[u].Weights[iSrc - iLeft] = scale_f_d * (*pFilter)(scale_f_d * (dCenter - (double)iSrc)));
+        for (iSrc = iLeft; iSrc <= iRight; iSrc++) { 
+            dTotalWeight += (res->ContribRow[u].Weights[iSrc - iLeft] = scale_f_d * (*details->filter)(details, scale_f_d * (dCenter - (double)iSrc)));
         }
 
         if (dTotalWeight < 0.0) {
@@ -423,13 +479,13 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
 
 
 static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
-    const BitmapBgraPtr pDst, float *lut)
+    const BitmapBgraPtr pDst, const InterpolationDetailsPtr details, float *lut)
 {
     unsigned int line_ndx;
     LineContribType * contrib;
 
     contrib = ContributionsCalc(pDst->h, pSrc->w,
-                        (double)pDst->h / (double)pSrc->w, filter_bicubic);
+                        (double)pDst->h / (double)pSrc->w, details);
     if (contrib == NULL) {
         return 0;
     }
@@ -623,7 +679,7 @@ namespace ImageResizer{
 			public ref class BgraScaler
 			{
 			public:
-				void ScaleBitmap(Bitmap^ source, Bitmap^ dest, Rectangle crop, Rectangle target, int withHalving, IProfiler^ p){
+                void ScaleBitmap(Bitmap^ source, Bitmap^ dest, Rectangle crop, Rectangle target, const InterpolationDetailsPtr details, IProfiler^ p){
 					BitmapBgraPtr bbSource;
                     BitmapBgraPtr bbResult;
 					try{
@@ -632,10 +688,10 @@ namespace ImageResizer{
                         bbResult = SysDrawingToBgra(dest, target);
                         p->Stop("SysDrawingToBgra", true, false);
                         
-                        if (withHalving)
-                            ScaleBgraWithHalving(bbSource, target.Width, target.Height, bbResult, 1, p);
+                        if (details->use_halving)
+                            ScaleBgraWithHalving(bbSource, target.Width, target.Height, bbResult, details, p);
                         else
-                            ScaleBgra(bbSource, target.Width, target.Height, bbResult, p);
+                            ScaleBgra(bbSource, target.Width, target.Height, bbResult, details, p);
                         
                         p->Start("BgraDispose", false);
 					}finally{
@@ -656,7 +712,7 @@ namespace ImageResizer{
 				 
 
 			private:
-                BitmapBgraPtr ScaleBgraWithHalving(BitmapBgraPtr source, int width, int height, BitmapBgraPtr dst, int inplace, IProfiler^ p){
+                BitmapBgraPtr ScaleBgraWithHalving(BitmapBgraPtr source, int width, int height, BitmapBgraPtr dst, const InterpolationDetailsPtr details, IProfiler^ p){
                     p->Start("ScaleBgraWithHalving", false);
                     try{
 
@@ -666,7 +722,7 @@ namespace ImageResizer{
                         if (divisor > 1){
                             p->Start("Halving", false);
 
-                            if (inplace)
+                            if (details->allow_source_mutation)
                               HalveInPlace(source, divisor);
                             else
                             {
@@ -677,12 +733,12 @@ namespace ImageResizer{
                                 Halve(source, tmp_im, divisor);
 
                                 p->Stop("Halving", true, false);
-                                return ScaleBgra(tmp_im, width, height, dst, p);
+                                return ScaleBgra(tmp_im, width, height, dst,details, p);
                             }
                             p->Stop("Halving", true, false);
                         }
 
-                        return ScaleBgra(source, width, height, dst, p);
+                        return ScaleBgra(source, width, height, dst, details, p);
                     }
                     finally{
                         p->Stop("ScaleBgraWithHalving", true, false);
@@ -707,7 +763,7 @@ namespace ImageResizer{
                     }
                 }
 
-                BitmapBgraPtr ScaleBgra(BitmapBgraPtr source, int width, int height, BitmapBgraPtr dst, IProfiler^ p){
+                BitmapBgraPtr ScaleBgra(BitmapBgraPtr source, int width, int height, BitmapBgraPtr dst, const InterpolationDetailsPtr details, IProfiler^ p){
 
                     p->Start("create image(dx x dy)", false);
                     if (!dst) dst = CreateBitmapBgraPtr(width, height, false, 1, source->bpp);
@@ -739,14 +795,14 @@ namespace ImageResizer{
                         p->Stop("create temp image(sy x dx)", true, false);
 
                         p->Start("scale and pivot to temp", false);
-                        ScaleXAndPivot(source, tmp_im, lut);
+                        ScaleXAndPivot(source, tmp_im,details, lut);
                         p->Stop("scale and pivot to temp", true, false);
 
                         
                         /* Otherwise, we need to scale vertically. */
 
                         p->Start("scale and pivot to final", false);
-                        ScaleXAndPivot(tmp_im, dst, lut);
+                        ScaleXAndPivot(tmp_im, dst, details, lut);
                         p->Stop("scale and pivot to final", true, false);
                     }
                     finally{
@@ -832,24 +888,59 @@ namespace ImageResizer{
                     String^ fastScale = query->Get("fastscale");
 					String^ sTrue = "true";
 
+                    
 					if (fastScale != sTrue){
 						return RequestedAction::None;
 					}
-
+                    
                     int withHalving = 0;
                     String^ turbo = query->Get("turbo");
                     if (turbo == sTrue)
                         withHalving = 1;
 
+                    double blur = System::String::IsNullOrEmpty(query->Get("blur")) ? 1.0 :
+                        System::Double::Parse(query->Get("blur"));
                     
+                    double window = System::String::IsNullOrEmpty(query->Get("window")) ? 0 :
+                        System::Double::Parse(query->Get("window"));
+
                     
 					RectangleF targetBox = ImageResizer::Util::PolygonMath::GetBoundingBox(targetArea);
 					if (targetBox.Location != targetArea[0] || targetBox.Width != (targetArea[1].X - targetArea[0].X)){
 						return RequestedAction::None;
-					}
+                    }
+                    
+                    InterpolationDetailsPtr details;
+                    details = DetailsDefault();
+                    
+                    if (query->Get("f") == "1"){
+                        details = DetailsGeneralCubic();
+                    }
+                    if (query->Get("f") == "2"){
+                        details = DetailsCatmullRom();
+                    }
+                    if (query->Get("f") == "3"){
+                        details = DetailsMitchell();
+                    }
+                    if (query->Get("f") == "4"){
+                        details = DetailsRobidoux();
+                    }
+                    if (query->Get("f") == "5"){
+                        details = DetailsRobidouxSharp();
+                    }
+                    if (query->Get("f") == "6"){
+                        details = DetailsHermite();
+                    }
+
+                    details->allow_source_mutation = true;
+                    details->use_halving = withHalving;
+                    details->blur *= blur;
+                    if (window != 0) details->window = 0.70710678118654752440084436210484903928483593768847;
+                        
                     BgraScaler ^scaler = gcnew BgraScaler();
-                    scaler->ScaleBitmap(source, dest, Util::PolygonMath::ToRectangle(sourceArea), Util::PolygonMath::ToRectangle(targetBox), withHalving, s->Job->Profiler);
-					return RequestedAction::Cancel;
+                    scaler->ScaleBitmap(source, dest, Util::PolygonMath::ToRectangle(sourceArea), Util::PolygonMath::ToRectangle(targetBox), details, s->Job->Profiler);
+                    free(details);
+                    return RequestedAction::Cancel;
 					
 				}
 			public: 
