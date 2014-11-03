@@ -322,7 +322,6 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
     register unsigned int row, bix, bufferSet;
     const register unsigned int from_pixel_count = source_bitmap->w;
     const register unsigned int to_pixel_count = dest->h;
-    const register unsigned int other_axis_count = dest->w;
     
     for (row = 0; row < row_count; row++)
     {
@@ -338,18 +337,16 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
     }
     
     for (bix = 0; bix < to_pixel_count; bix++){
-        const register int dest_start = bix * other_axis_count + start_row;
         for (bufferSet = 0; bufferSet < row_count; bufferSet++){
+            unsigned char *dst_start = dest->pixels + (bix * dest->stride) + (start_row + bufferSet) * dest->bpp;
             const register int dest_buffer_start = bufferSet * dest_buffer_len + bix * 4;
     #ifdef ScaleAlpha
-            unsigned char *dst_start = dest->pixels + (dest_start + bufferSet) * 4;
             *dst_start = uchar_clamp(dest_buffers[dest_buffer_start], 0xFF);
             *(dst_start + 1) = uchar_clamp(dest_buffers[dest_buffer_start + 1], 0xFF);
             *(dst_start + 2) = uchar_clamp(dest_buffers[dest_buffer_start + 2], 0xFF);
             *(dst_start + 3) = uchar_clamp(dest_buffers[dest_buffer_start + 3], 0xFF);
     #endif
     #ifndef ScaleAlpha
-            unsigned char *dst_start = dest->pixels + (dest_start + bufferSet) * 4;
             *dst_start = uchar_clamp(dest_buffers[dest_buffer_start], 0xFF);
             *(dst_start + 1) = uchar_clamp(dest_buffers[dest_buffer_start + 1], 0xFF);
             *(dst_start + 2) = uchar_clamp(dest_buffers[dest_buffer_start + 2], 0xFF);
