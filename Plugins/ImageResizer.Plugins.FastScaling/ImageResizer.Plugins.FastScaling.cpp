@@ -342,17 +342,17 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
         for (bufferSet = 0; bufferSet < row_count; bufferSet++){
             const register int dest_buffer_start = bufferSet * dest_buffer_len + bix * 4;
     #ifdef ScaleAlpha
-            dest->pixelInts[bix * dest->w + start_row + bufferSet] = gdTrueColorAlpha(
-                uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4], 0xFF),
-                uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4 + 1], 0xFF),
-                uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4 + 2], 0xFF), 
-                uchar_clamp(dest_buffers[bufferSet * dest_buffer_len + bix * 4 + 3], 0xFF));
+            unsigned char *dst_start = dest->pixels + (dest_start + bufferSet) * 4;
+            *dst_start = uchar_clamp(dest_buffers[dest_buffer_start], 0xFF);
+            *(dst_start + 1) = uchar_clamp(dest_buffers[dest_buffer_start + 1], 0xFF);
+            *(dst_start + 2) = uchar_clamp(dest_buffers[dest_buffer_start + 2], 0xFF);
+            *(dst_start + 3) = uchar_clamp(dest_buffers[dest_buffer_start + 3], 0xFF);
     #endif
     #ifndef ScaleAlpha
-            dest->pixelInts[dest_start + bufferSet] = gdTrueColorAlpha(
-                uchar_clamp(dest_buffers[dest_buffer_start], 0xFF),
-                uchar_clamp(dest_buffers[dest_buffer_start + 1], 0xFF),
-                uchar_clamp(dest_buffers[dest_buffer_start + 2], 0xFF), 0xFF);
+            unsigned char *dst_start = dest->pixels + (dest_start + bufferSet) * 4;
+            *dst_start = uchar_clamp(dest_buffers[dest_buffer_start], 0xFF);
+            *(dst_start + 1) = uchar_clamp(dest_buffers[dest_buffer_start + 1], 0xFF);
+            *(dst_start + 2) = uchar_clamp(dest_buffers[dest_buffer_start + 2], 0xFF);
     #endif
         }
     }
