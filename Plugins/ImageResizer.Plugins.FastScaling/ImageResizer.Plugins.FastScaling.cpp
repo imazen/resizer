@@ -96,6 +96,17 @@ uchar_clamp(float clr, unsigned char max) {
 	return result;
 }/* uchar_clamp*/
 
+static inline unsigned char
+uchar_clamp_ff(float clr) {
+    unsigned short result;
+    result = (unsigned short)(short)(clr + 0.5);
+    if (result > 255) {
+        result = (clr < 0) ? 0 : 255;
+    }
+
+    return result;
+}
+
 
 
 
@@ -365,10 +376,11 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
     for (bix = 0; bix < to_pixel_count; bix++){
         unsigned char *dst_start = dest->pixels + (bix * dest->stride) + start_row * dest->bpp;
         int dest_buffer_start = bix * dest->bpp;
+
         for (bufferSet = 0; bufferSet < row_count; bufferSet++){
-            *dst_start = uchar_clamp(dest_buffers[dest_buffer_start], 0xFF);
-            *(dst_start + 1) = uchar_clamp(dest_buffers[dest_buffer_start + 1], 0xFF);
-            *(dst_start + 2) = uchar_clamp(dest_buffers[dest_buffer_start + 2], 0xFF);
+            *dst_start = uchar_clamp_ff(dest_buffers[dest_buffer_start]);
+            *(dst_start + 1) = uchar_clamp_ff(dest_buffers[dest_buffer_start + 1]);
+            *(dst_start + 2) = uchar_clamp_ff(dest_buffers[dest_buffer_start + 2]);
 
             dest_buffer_start += dest_buffer_len;
             dst_start += dest->bpp;
@@ -384,7 +396,7 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
                 unsigned char *dst_start = dest->pixels + (bix * dest->stride) + start_row * dest->bpp;
                 int dest_buffer_start = bix * dest->bpp;
                 for (bufferSet = 0; bufferSet < row_count; bufferSet++){
-                    *(dst_start + 3) = uchar_clamp(dest_buffers[dest_buffer_start + 3], 0xFF);
+                    *(dst_start + 3) = uchar_clamp_ff(dest_buffers[dest_buffer_start + 3]);
                     dest_buffer_start += dest_buffer_len;
                     dst_start += dest->bpp;
                 }
@@ -402,7 +414,7 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
         }
     }
 }
-//TODO: troubleshoot segfault when scaling leaf to 800px
+
 
 static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
     const BitmapBgraPtr pDst, float *lut)
@@ -692,22 +704,19 @@ namespace ImageResizer{
                 BitmapBgraPtr ScaleBgra(BitmapBgraPtr source, int width, int height, BitmapBgraPtr dst, IProfiler^ p){
 
                     p->Start("create image(dx x dy)", false);
-
-                    if (!dst)
-                        dst = CreateBitmapBgraPtr(width, height, false, 1, source->bpp);
+                    if (!dst) dst = CreateBitmapBgraPtr(width, height, false, 1, source->bpp);
                     p->Stop("create image(dx x dy)", true, false);
+                    if (dst == NULL) return NULL;
 
-                    if (dst == NULL) {
-                        return NULL;
-                    }
 
                     if (source->w == width && source->h == height){
                         // In case of both halfinplace and noresize we still need to copy the data
                         CopyBgra(source, dst);
                         return dst;
                     }
+
+
                     p->Start("ScaleBgra", true);
-                    
                     BitmapBgraPtr tmp_im = NULL;
                     float lut[256];
                     for (int n = 0; n < 256; n++) lut[n] = (float)n;
