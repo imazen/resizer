@@ -469,15 +469,15 @@ static inline void HalveRowByDivisor(const unsigned char* from, unsigned short *
     if (divisor == 2)
     {
         if (to_count % 2 == 0){
-            for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 8, from_b += 4*from_step){
-                for (int i = 0; i < 8; i++){
+            for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 2*to_step, from_b += 4*from_step){
+                for (int i = 0; i < 2*to_step; i++){
                     to[to_b + i] += from[from_b + i] + from[from_b + i + from_step];
                 }
             }
         }
         else{
-            for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += 2*from_step){
-                for (int i = 0; i < 4; i++){
+            for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += to_step, from_b += 2 * from_step){
+                for (int i = 0; i < to_step; i++){
                     to[to_b + i] += from[from_b + i] + from[from_b + i + from_step];
                 }
             }
@@ -485,22 +485,22 @@ static inline void HalveRowByDivisor(const unsigned char* from, unsigned short *
 
     }
     else if (divisor == 3){
-        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += 3*from_step){
-            for (int i = 0; i < 4; i++){
+        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += to_step, from_b += 3 * from_step){
+            for (int i = 0; i < to_step; i++){
                 to[to_b + i] += from[from_b + i] + from[from_b + i + from_step] + from[from_b + i + 2*from_step];
             }
         }
     }
     else if (divisor == 4){
-        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += 4*from_step){
-            for (int i = 0; i < 4; i++){
+        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += to_step, from_b += 4 * from_step){
+            for (int i = 0; i < to_step; i++){
                 to[to_b + i] += from[from_b + i] + from[from_b + i + from_step] + from[from_b + i + 2*from_step] + from[from_b + i + 3*from_step];
             }
         }
     }
     else{
-        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += divisor_stride){
-            for (int i = 0; i < 4; i++){
+        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += to_step, from_b += divisor_stride){
+            for (int i = 0; i < to_step; i++){
                 for (int f = 0; f < divisor_stride; f += from_step){
                    to[to_b + i] += from[from_b + i + f];
                     
