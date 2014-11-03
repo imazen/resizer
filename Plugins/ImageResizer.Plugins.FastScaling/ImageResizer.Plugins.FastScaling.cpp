@@ -114,7 +114,7 @@ static int overflow2(int a, int b)
 }
 
 
-static BitmapBgraPtr CreateBitmapBgraPtr(int sx, int sy, int zeroed, int alloc=1)
+static BitmapBgraPtr CreateBitmapBgraPtr(int sx, int sy, int zeroed, int alloc=1, int bpp=4)
 {
 	int i;
     BitmapBgraPtr im;
@@ -131,8 +131,8 @@ static BitmapBgraPtr CreateBitmapBgraPtr(int sx, int sy, int zeroed, int alloc=1
     memset(im, 0, sizeof(BitmapBgra));
     im->w = sx;
     im->h = sy;
-    im->stride = sx * 4;
-    im->bpp = 4;
+    im->bpp = bpp;
+    im->stride = sx * bpp;
 	
     if (alloc)
     {
@@ -278,40 +278,65 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
 
 
 
-// TODO: port alpha switch to soft ifs?
-//#define ScaleAlpha
 
 static inline void
 ScaleBgraFloat(float *source_buffer, unsigned int source_buffer_count, unsigned int source_buffer_len,
-float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len, ContributionType * weights, int from_step=4){
+float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len, ContributionType * weights, int from_step=4, int to_step=4){
 
     unsigned int ndx;
-    for (ndx = 0; ndx < dest_buffer_count; ndx++) {
-        float r = 0, g = 0, b = 0, a = 0;
-        const int left = weights[ndx].Left;
-        const int right = weights[ndx].Right;
 
-        const float * weightArray = weights[ndx].Weights;
-        int i;
+    // if both have alpha, process it
+    if (from_step == 4 && to_step == 4)
+    {
+        for (ndx = 0; ndx < dest_buffer_count; ndx++) {
+            float r = 0, g = 0, b = 0, a = 0;
+            const int left = weights[ndx].Left;
+            const int right = weights[ndx].Right;
 
-        /* Accumulate each channel */
-        for (i = left; i <= right; i++) {
-            const float weight = weightArray[i - left];
+            const float * weightArray = weights[ndx].Weights;
+            int i;
 
-            b += weight * source_buffer[i * from_step];
-            g += weight * source_buffer[i * from_step + 1];
-            r += weight * source_buffer[i * from_step + 2];
-#ifdef ScaleAlpha
-            a += weight * source_buffer[i * from_step + 3];
-#endif
+            /* Accumulate each channel */
+            for (i = left; i <= right; i++) {
+                const float weight = weightArray[i - left];
+
+                b += weight * source_buffer[i * from_step];
+                g += weight * source_buffer[i * from_step + 1];
+                r += weight * source_buffer[i * from_step + 2];
+                a += weight * source_buffer[i * from_step + 3];
+            }
+
+            dest_buffer[ndx * to_step] = b;
+            dest_buffer[ndx * to_step + 1] = g;
+            dest_buffer[ndx * to_step + 2] = r;
+            dest_buffer[ndx * to_step + 3] = a;
         }
+    }
+    // otherwise do the same thing without 4th chan
+    // (ifs in loops are expensive..)
+    else
+    {
+        for (ndx = 0; ndx < dest_buffer_count; ndx++) {
+            float r = 0, g = 0, b = 0;
+            const int left = weights[ndx].Left;
+            const int right = weights[ndx].Right;
 
-        dest_buffer[ndx * 4] = b;
-        dest_buffer[ndx * 4 + 1] = g;
-        dest_buffer[ndx * 4 + 2] = r;
-#ifdef ScaleAlpha
-        dest_buffer[ndx * 4 + 3] = a;
-#endif   
+            const float * weightArray = weights[ndx].Weights;
+            int i;
+
+            /* Accumulate each channel */
+            for (i = left; i <= right; i++) {
+                const float weight = weightArray[i - left];
+
+                b += weight * source_buffer[i * from_step];
+                g += weight * source_buffer[i * from_step + 1];
+                r += weight * source_buffer[i * from_step + 2];
+            }
+
+            dest_buffer[ndx * to_step] = b;
+            dest_buffer[ndx * to_step + 1] = g;
+            dest_buffer[ndx * to_step + 2] = r;
+        }
     }
 
 }
@@ -333,25 +358,47 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
     //Actual scaling seems responsible for about 40% of execution time
     for (bufferSet = 0; bufferSet < row_count; bufferSet++){
         ScaleBgraFloat(source_buffers + (source_buffer_len * bufferSet), from_pixel_count, source_buffer_len, 
-            dest_buffers + (dest_buffer_len * bufferSet), to_pixel_count, dest_buffer_len, weights, source_bitmap->bpp);
+            dest_buffers + (dest_buffer_len * bufferSet), to_pixel_count, dest_buffer_len, weights, source_bitmap->bpp, dest->bpp);
     }
     
+    // process rgb first
     for (bix = 0; bix < to_pixel_count; bix++){
+        unsigned char *dst_start = dest->pixels + (bix * dest->stride) + start_row * dest->bpp;
+        int dest_buffer_start = bix * dest->bpp;
         for (bufferSet = 0; bufferSet < row_count; bufferSet++){
-            unsigned char *dst_start = dest->pixels + (bix * dest->stride) + (start_row + bufferSet) * dest->bpp;
-            const register int dest_buffer_start = bufferSet * dest_buffer_len + bix * 4;
-    #ifdef ScaleAlpha
             *dst_start = uchar_clamp(dest_buffers[dest_buffer_start], 0xFF);
             *(dst_start + 1) = uchar_clamp(dest_buffers[dest_buffer_start + 1], 0xFF);
             *(dst_start + 2) = uchar_clamp(dest_buffers[dest_buffer_start + 2], 0xFF);
-            *(dst_start + 3) = uchar_clamp(dest_buffers[dest_buffer_start + 3], 0xFF);
-    #endif
-    #ifndef ScaleAlpha
-            *dst_start = uchar_clamp(dest_buffers[dest_buffer_start], 0xFF);
-            *(dst_start + 1) = uchar_clamp(dest_buffers[dest_buffer_start + 1], 0xFF);
-            *(dst_start + 2) = uchar_clamp(dest_buffers[dest_buffer_start + 2], 0xFF);
-            *(dst_start + 3) = 0xFF;
-    #endif
+
+            dest_buffer_start += dest_buffer_len;
+            dst_start += dest->bpp;
+        }
+    }
+
+    // copy alpha if we had it or 255-fill
+    if (dest->bpp == 4)
+    {
+        if (source_bitmap->bpp == 4)
+        {
+            for (bix = 0; bix < to_pixel_count; bix++){
+                unsigned char *dst_start = dest->pixels + (bix * dest->stride) + start_row * dest->bpp;
+                int dest_buffer_start = bix * dest->bpp;
+                for (bufferSet = 0; bufferSet < row_count; bufferSet++){
+                    *(dst_start + 3) = uchar_clamp(dest_buffers[dest_buffer_start + 3], 0xFF);
+                    dest_buffer_start += dest_buffer_len;
+                    dst_start += dest->bpp;
+                }
+            }
+        }
+        else
+        {
+            for (bix = 0; bix < to_pixel_count; bix++){
+                unsigned char *dst_start = dest->pixels + (bix * dest->stride) + start_row * dest->bpp;
+                for (bufferSet = 0; bufferSet < row_count; bufferSet++){
+                    *(dst_start + 3) = 0xFF;
+                    dst_start += dest->bpp;
+                }
+            }
         }
     }
 }
@@ -374,7 +421,7 @@ static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
     unsigned int source_buffer_len = pSrc->w * pSrc->bpp;
     float *sourceBuffers = (float *)malloc(sizeof(float) * source_buffer_len * buffer);
 
-    unsigned int dest_buffer_len = pDst->h * 4;
+    unsigned int dest_buffer_len = pDst->h * pDst->bpp;
     float *destBuffers = (float *)malloc(sizeof(float) * dest_buffer_len * buffer);
 
 
@@ -396,9 +443,9 @@ static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
 
 
 
-static inline void HalveRowByDivisor(const unsigned char* from, unsigned short * to, const unsigned int to_count, const int divisor, const int from_step=4){
+static inline void HalveRowByDivisor(const unsigned char* from, unsigned short * to, const unsigned int to_count, const int divisor, const int from_step=4, const int to_step=4){
     int to_b, from_b;
-    const int to_bytes = to_count * 4;
+    const int to_bytes = to_count * to_step;
     const int divisor_stride = from_step * divisor;
 
     if (divisor == 2)
@@ -463,7 +510,7 @@ static inline int HalveInternal(const BitmapBgraPtr from,
     const BitmapBgraPtr to, const int to_w, const int to_h, const int to_stride, const int divisor)
 {
 
-    int to_w_bytes = to_w * 4;
+    int to_w_bytes = to_w * to->bpp;
     unsigned short *buffer = (unsigned short *)calloc(to_w_bytes, sizeof(unsigned short));
 
     int y, b, d;
@@ -478,7 +525,7 @@ static inline int HalveInternal(const BitmapBgraPtr from,
     for (y = 0; y < to_h; y++){
         memset(buffer, 0, sizeof(short) * to_w_bytes);
         for (d = 0; d < divisor; d++){
-            HalveRowByDivisor(from->pixels + (y * divisor + d) * from->stride, buffer, to_w, divisor, from->bpp);
+            HalveRowByDivisor(from->pixels + (y * divisor + d) * from->stride, buffer, to_w, divisor, from->bpp, to->bpp);
         }
         register unsigned char * dest_line = to->pixels + y * to_stride;
 
@@ -518,12 +565,11 @@ static inline int HalveInPlace(const BitmapBgraPtr from, int divisor)
 {
     int to_w = from->w / divisor;
     int to_h = from->h / divisor;
-    int to_stride = to_w * 4;
+    int to_stride = to_w * from->bpp;
     int r = HalveInternal(from, from, to_w, to_h, to_stride, divisor);
     from->w = to_w;
     from->h = to_h;
     from->stride = to_stride;
-    from->bpp = 4;
     return r;
 }
 
@@ -634,7 +680,7 @@ namespace ImageResizer{
                     p->Start("create image(dx x dy)", false);
 
                     if (!dst)
-                        dst = CreateBitmapBgraPtr(width, height, false);
+                        dst = CreateBitmapBgraPtr(width, height, false, 1, source->bpp);
                     p->Stop("create image(dx x dy)", true, false);
 
                     if (dst == NULL) {
@@ -654,7 +700,7 @@ namespace ImageResizer{
 
                     p->Start("create temp image(sy x dx)", false);
                     /* Scale horizontally  */
-                    tmp_im = CreateBitmapBgraPtr(source->h, width, false);
+                    tmp_im = CreateBitmapBgraPtr(source->h, width, false, 1, source->bpp);
                    
                     
                     try{
