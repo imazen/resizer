@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageResizer.Plugins.FastScaling", "ImageResizer.Plugins.FastScaling.vcxproj", "{9B97D952-2969-4F46-9758-9E712CDF3F72}"
 EndProject
@@ -13,6 +13,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.FastScaling.Tests", "..\..\Tests\ImageResizer.Plugins.FastScaling.Tests\ImageResizer.Plugins.FastScaling.Tests.csproj", "{77263155-750D-4A46-90A5-CBFC2D5E9A35}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imazen.Profiling", "..\Imazen.Profiling\Imazen.Profiling.csproj", "{35C46578-8BD7-410D-94E9-2AFB11629083}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageCompare", "..\..\Samples\ImageCompare\ImageCompare.csproj", "{7FA1116A-0D5C-4A48-93A8-56C091EA202E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -136,6 +138,20 @@ Global
 		{35C46578-8BD7-410D-94E9-2AFB11629083}.Release|x64.Build.0 = Release|x64
 		{35C46578-8BD7-410D-94E9-2AFB11629083}.Release|x86.ActiveCfg = Release|Any CPU
 		{35C46578-8BD7-410D-94E9-2AFB11629083}.Release|x86.Build.0 = Release|Any CPU
+		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Release|Win32.ActiveCfg = Release|Any CPU
+		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Release|x64.ActiveCfg = Release|Any CPU
+		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
