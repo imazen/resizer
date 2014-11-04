@@ -40,13 +40,13 @@ namespace ImageResizer{
                         withHalving = 1;
 
                     double blur = System::String::IsNullOrEmpty(query->Get("blur")) ? 1.0 :
-                        System::Double::Parse(query->Get("blur"));
+                        System::Double::Parse(query->Get("blur"), System::Globalization::NumberFormatInfo::InvariantInfo);
                     
                     double window = System::String::IsNullOrEmpty(query->Get("window")) ? 0 :
-                        System::Double::Parse(query->Get("window"));
+                        System::Double::Parse(query->Get("window"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
                     double sharpen = System::String::IsNullOrEmpty(query->Get("sharpen")) ? 0 :
-                        System::Double::Parse(query->Get("sharpen"));
+                        System::Double::Parse(query->Get("sharpen"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
 
 					RectangleF targetBox = ImageResizer::Util::PolygonMath::GetBoundingBox(targetArea);
