@@ -377,10 +377,10 @@ namespace Bench
         {
             var settings = new BenchmarkingSettings();
             settings.Images = new ImageProvider();
-            settings.Images.AddBlankImages(new Tuple<int, int, string>[] { new Tuple<int, int, string>(2200, 2200, "jpg") });
+            settings.Images.AddBlankImages(new Tuple<int, int, string>[] { new Tuple<int, int, string>(3264, 2448, "jpg"), new Tuple<int, int, string>(1200, 900, "png") });
             //.AddLocalImages(imageDir, "quality-original.jpg", "fountain-small.jpg");
             settings.SharedInstructions = new Instructions[]{new Instructions(
-                "width=800&scale=both")};
+                "width=800&scale=both") , new Instructions("width=200&scale=both")};
             settings.ExcludeEncoding = false;
             settings.ExcludeDecoding = false;
             settings.ExcludeBuilding = false;
@@ -394,7 +394,7 @@ namespace Bench
             settings.UseBarrierAroundSegment = true;
             var c = ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling");
             var configs = new Tuple<Config, Instructions, string>[]{
-                    new Tuple<Config, Instructions, string>(new Config(),null,"Default"),
+                    new Tuple<Config, Instructions, string>(new Config(),null,"System.Drawing"),
                     new Tuple<Config, Instructions, string>(c,new Instructions("&fastscale=true"),"FastScaling"),
                     new Tuple<Config, Instructions, string>(c,new Instructions("&fastscale=true&turbo=true"),"FastScaling+Halving"),
                     new Tuple<Config, Instructions, string>(c,new Instructions("&fastscale=true&f=7&blur=0.54"),"FastScaling Lanczos"),
@@ -412,6 +412,7 @@ namespace Bench
             n["downloadNativeDependencies"] = "true";
             return n;
         }
+
         public static void CompareFreeImageEncoderToDefault()
         {
             string[] images = new string[] { imageDir + "quality-original.jpg", imageDir + "fountain-small.jpg", 

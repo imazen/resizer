@@ -13,11 +13,12 @@
         <option value="quality-original.jpg">quality-original.jpg</option>
         <option value="rose-leaf.jpg">rose-leaf.jpg</option>
         <option value="Sun_256.png">Sun_256.png</option>
+        <option value="rings.png">rings.png</option>
     </select>
 
     <input id="newx" value="700" style="width: 30px" onchange="regen();" />px<br /><br />
 
-    <input id="set1" value="fastscale=true&turbo=true" style="width: 250px" onchange="regen();" /> vs 
+    <input id="set1" value="fastscale=true&blur=0.6&f" style="width: 250px" onchange="regen();" /> vs 
     <input id="set2" value="" style="width: 250px" onchange="regen();" />
 
     <hr />
