@@ -28,7 +28,7 @@ typedef double(*detailed_interpolation_method)(InterpolationDetailsPtr, double);
 
 typedef struct InterpolationDetailsStruct{
     double window;
-    double * cubic_coefficients;
+    double p1, p2, p3, q1, q2, q3, q4;
     double blur;
     detailed_interpolation_method filter;
     int use_halving;
@@ -180,16 +180,15 @@ static void DestroyBitmapBgra(BitmapBgraPtr im)
 }
 
 
-static double * derive_cubic_coefficients(double B, double C){
+static void derive_cubic_coefficients(double B, double C, InterpolationDetailsPtr out){
     double bx2 = B + B;
-    double co[7] = { 1.0 - (1.0 / 3.0)*B,
-        -3.0 + bx2 + C,
-        2.0 - 1.5*B - C,
-        (4.0 / 3.0)*B + 4.0*C,
-        -8.0*C - bx2,
-        B + 5.0*C,
-        (-1.0 / 6.0)*B - C };
-    return co;
+    out->p1 = 1.0 - (1.0 / 3.0)*B;
+    out->p2 = -3.0 + bx2 + C;
+    out->p3 = 2.0 - 1.5*B - C;
+    out->q1 = (4.0 / 3.0)*B + 4.0*C;
+    out->q2 = -8.0*C - bx2;
+    out->q3 = B + 5.0*C;
+    out->q4 = (-1.0 / 6.0)*B - C;
 }
 
 
@@ -197,13 +196,11 @@ static inline double filter_flex_cubic(const InterpolationDetailsPtr d, const do
 {
     const double t = (double)fabs(x) / d->blur;
 
-
-    const double * co = d->cubic_coefficients;
     if (t < 1.0){
-        return (co[0] + t * (t* (co[1] + t*co[2])));
+        return (d->p1 + t * (t* (d->p2 + t*d->p3)));
     }
     if (t < 2.0){
-        return(co[3] + t*(co[4] + t* (co[5] + t*co[6])));
+        return(d->q1 + t*(d->q2 + t* (d->q3 + t*d->q4)));
     }
     return(0.0);
 }
@@ -237,7 +234,7 @@ static inline double filter_lanczos(const InterpolationDetailsPtr d, const doubl
 static InterpolationDetailsPtr CreateBicubicCustom(double window, double blur, double B, double C){
     InterpolationDetailsPtr d = (InterpolationDetails *)malloc(sizeof(InterpolationDetails));
     d->blur = blur;
-    d->cubic_coefficients = derive_cubic_coefficients(B,C);
+    derive_cubic_coefficients(B,C,d);
     d->filter = filter_flex_cubic;
     d->window = window;
     return d;
