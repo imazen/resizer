@@ -51,8 +51,6 @@ typedef struct InterpolationDetailsStruct{
 
 #define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
-#define DEFAULT_BOX_RADIUS					0.5
-
 typedef struct
 {
 	float *Weights;  /* Normalized weights of neighboring pixels */
@@ -66,40 +64,6 @@ typedef struct
 		LineLength;      /* Length of line (no. or rows / cols) */
 } LineContribType;
 
-#define gdTrueColor(r, g, b) (((r) << 16) + \
-			      ((g) << 8) +  \
-			      (b))
-
-#define gdTrueColorAlpha(r, g, b, a) (((a) << 24) + \
-				      ((r) << 16) + \
-				      ((g) << 8) +  \
-				      (b))
-
-/* Convert a float to an unsigned char, rounding to the nearest
-* integer and clamping the result between 0 and max.  The absolute
-* value of clr must be less than the maximum value of an unsigned
-* short. */
-static inline unsigned char
-uchar_clamp(float clr, unsigned char max) {
-	unsigned short result;
-
-	//assert(fabs(clr) <= SHRT_MAX);
-
-	/* Casting a negative float to an unsigned short is undefined.
-	* However, casting a float to a signed truncates toward zero and
-	* casting a negative signed value to an unsigned of the same size
-	* results in a bit-identical value (assuming twos-complement
-	* arithmetic).	 This is what we want: all legal negative values
-	* for clr will be greater than 255. */
-
-	/* Convert and clamp. */
-	result = (unsigned short)(short)(clr + 0.5);
-	if (result > max) {
-		result = (clr < 0) ? 0 : max;
-	}/* if */
-
-	return result;
-}/* uchar_clamp*/
 
 static inline unsigned char
 uchar_clamp_ff(float clr) {
@@ -111,8 +75,6 @@ uchar_clamp_ff(float clr) {
 
     return result;
 }
-
-
 
 
 static int overflow2(int a, int b)
@@ -265,25 +227,25 @@ static InterpolationDetailsPtr DetailsDefault(){
 }
 
 static InterpolationDetailsPtr DetailsGeneralCubic(){
-    return CreateBicubicCustom(0.70710678118654752440084436210484903928483593768847, 2, 1, 0);
+    return CreateBicubicCustom(0.5, 2, 1, 0);
 }
 static InterpolationDetailsPtr DetailsCatmullRom(){
-    return CreateBicubicCustom(0.70710678118654752440084436210484903928483593768847, 2, 0, 0.5);
+    return CreateBicubicCustom(0.5, 2, 0, 0.5);
 }
 static InterpolationDetailsPtr DetailsMitchell(){
-    return CreateBicubicCustom(0.70710678118654752440084436210484903928483593768847, 8.0 / 7.0, 1. / 3., 1. / 3.);
+    return CreateBicubicCustom(0.5, 8.0 / 7.0, 1. / 3., 1. / 3.);
 }
 static InterpolationDetailsPtr DetailsRobidoux(){
-    return CreateBicubicCustom(0.70710678118654752440084436210484903928483593768847, 1.1685777620836932,
+    return CreateBicubicCustom(0.5, 1.1685777620836932,
         0.37821575509399867, 0.31089212245300067);
 }
 
 static InterpolationDetailsPtr DetailsRobidouxSharp(){
-    return CreateBicubicCustom(0.70710678118654752440084436210484903928483593768847, 1.105822933719019,
+    return CreateBicubicCustom(0.5, 1.105822933719019,
         0.2620145123990142, 0.3689927438004929);
 }
 static InterpolationDetailsPtr DetailsHermite(){
-    return CreateBicubicCustom(0.70710678118654752440084436210484903928483593768847, 2, 1, 0);
+    return CreateBicubicCustom(0.5, 2, 1, 0);
 }
 
 
