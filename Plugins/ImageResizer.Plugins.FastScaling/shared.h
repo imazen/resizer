@@ -1,33 +1,57 @@
 #pragma once
 #pragma unmanaged
 
+typedef struct BitmapBgraStruct *BitmapBgraPtr;
 
-typedef struct{
+typedef struct BitmapBgraStruct{
+    //bitmap width in pixels
     int w;
+    //bitmap height in pixels
     int h;
+    //byte length of each row (may include any amount of padding)
     int stride;
-    unsigned char *pixels;
-    unsigned int *pixelInts; //Type aliasing
-    bool hasAlpha; 
-    bool ownMem; 
+    //pointer to pixel 0,0; should be of length > h * stride
+    unsigned char *pixels; 
+    //If true, we don't dispose of *pixels with the struct
+    bool borrowed_pixels; 
+    //If false, we can even ignore the alpha channel on 4bpp
+    bool alpha_meaningful; 
+    //If false, we can edit pixels without affecting the stride
+    bool pixels_readonly; 
+    //If false, we can change the stride of the image.
+    bool stride_readonly; 
+    //Number of *bytes* (not bits) per pixel
     int bpp;
 } BitmapBgra;
 
-typedef BitmapBgra *BitmapBgraPtr;
+
 
 typedef struct InterpolationDetailsStruct *InterpolationDetailsPtr;
 
 typedef double(*detailed_interpolation_method)(InterpolationDetailsPtr, double);
 
 typedef struct InterpolationDetailsStruct{
+    //0.5 is the sane default; minimal overlapping between windows
     double window;
+    //Coefficients for bucubic weighting
     double p1, p2, p3, q1, q2, q3, q4;
+    //Blurring factor when > 1, sharpening factor when < 1. Applied to weights.
     double blur;
+    //pointer to the weight calculation function
     detailed_interpolation_method filter;
+    //If true, use area averaging for initial reduction
     bool use_halving;
+    //If true, only halve when both dimensions are multiples of the halving factor
+    bool halve_only_when_common_factor;
+    //The final percentage (0..1) of scaling which must be perfomed by true interpolation
+    double use_interpolation_for_percent;
+    //If true, we can 'reuse' the source image as a performance optimization when halving
     bool allow_source_mutation;
-    int post_resize_sharpen_percent;
+    //If greater than 0, a percentage to sharpen the result along each axis;
+    double post_resize_sharpen_percent;
+    //Reserved for passing data to new filters
     int filter_var_a;
+
 }InterpolationDetails;
 
 
@@ -100,46 +124,49 @@ static inline int isPowerOfTwo(unsigned int x)
     return ((x != 0) && !(x & (x - 1)));
 }
 
-
-static BitmapBgraPtr CreateBitmapBgraPtr(int sx, int sy, int zeroed, bool alloc = true, int bpp = 4)
-{
-    int i;
+static BitmapBgraPtr CreateBitmapBgraHeader(int sx, int sy){
     BitmapBgraPtr im;
 
     if (overflow2(sx, sy) || overflow2(sizeof(int *), sy) || overflow2(sizeof(int), sx)) {
         return NULL;
     }
 
-
     im = (BitmapBgra *)malloc(sizeof(BitmapBgra));
     if (!im) {
-        return 0;
+        return NULL;
     }
     memset(im, 0, sizeof(BitmapBgra));
     im->w = sx;
     im->h = sy;
+    im->pixels = NULL;
+    im->pixels_readonly = true;
+    im->stride_readonly = true;
+    im->borrowed_pixels = true;
+    return im;
+}
+
+
+static BitmapBgraPtr CreateBitmapBgra(int sx, int sy, bool zeroed, int bpp)
+{
+    BitmapBgraPtr im = CreateBitmapBgraHeader(sx, sy);
+    if (im == NULL){ return NULL; }
+
     im->bpp = bpp;
-    im->stride = sx * bpp;
-
-    if (alloc)
-    {
-        im->ownMem = 1;
-        if (zeroed){
-            im->pixels = (unsigned char *)calloc(sy * im->stride, sizeof(unsigned char));
-        }
-        else{
-            im->pixels = (unsigned char *)malloc(sy * im->stride);
-        }
-        im->pixelInts = (unsigned int *)im->pixels;
-
-        if (!im->pixels) {
-            free(im);
-            return 0;
-        }
+    im->stride = im->w * bpp;
+    im->pixels_readonly = false;
+    im->stride_readonly = false;
+    im->borrowed_pixels = false;
+    im->alpha_meaningful = bpp == 4;
+    if (zeroed){
+        im->pixels = (unsigned char *)calloc(sy * im->stride, sizeof(unsigned char));
     }
-    else
-        im->ownMem = 0;
-
+    else{
+        im->pixels = (unsigned char *)malloc(sy * im->stride);
+    }
+    if (!im->pixels) {
+        free(im);
+        return 0;
+    }
     return im;
 }
 
@@ -147,7 +174,9 @@ static BitmapBgraPtr CreateBitmapBgraPtr(int sx, int sy, int zeroed, bool alloc 
 static void DestroyBitmapBgra(BitmapBgraPtr im)
 {
     int i;
-    if (im->pixels && im->ownMem) {
+    if (im == NULL) return;
+
+    if (!im->borrowed_pixels) {
         free(im->pixels);
     }
     free(im);
@@ -165,3 +194,16 @@ static void unpack24bitRow(int width, unsigned char* sourceLine, unsigned char* 
 }
 
 
+static InterpolationDetailsPtr CreateInterpolationDetails(){
+    InterpolationDetailsPtr d = (InterpolationDetails *)calloc(1, sizeof(InterpolationDetails));
+    d->blur = 1;
+    d->window = 0.5;
+    d->p1 = d->q1 = 0;
+    d->p2 = d->q2 = d->p3 = d->q3 = d->q4 = 1;
+    d->allow_source_mutation = false;
+    d->halve_only_when_common_factor = false;
+    d->post_resize_sharpen_percent = 0;
+    d->use_halving = false;
+    d->use_interpolation_for_percent = 0.3;
+    return d;
+}

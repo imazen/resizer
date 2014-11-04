@@ -55,7 +55,7 @@ static inline double filter_lanczos(const InterpolationDetailsPtr d, const doubl
 
 
 static InterpolationDetailsPtr CreateBicubicCustom(double window, double blur, double B, double C){
-    InterpolationDetailsPtr d = (InterpolationDetails *)malloc(sizeof(InterpolationDetails));
+    InterpolationDetailsPtr d = CreateInterpolationDetails();
     d->blur = blur;
     derive_cubic_coefficients(B, C, d);
     d->filter = filter_flex_cubic;
@@ -64,7 +64,7 @@ static InterpolationDetailsPtr CreateBicubicCustom(double window, double blur, d
 }
 
 static InterpolationDetailsPtr DetailsLanczosCustom(double window, double blur){
-    InterpolationDetailsPtr d = (InterpolationDetails *)malloc(sizeof(InterpolationDetails));
+    InterpolationDetailsPtr d = CreateInterpolationDetails();
     d->blur = blur;
     d->filter = filter_lanczos;
     d->window = window;
@@ -76,7 +76,7 @@ static InterpolationDetailsPtr DetailsLanczos(){
 }
 
 static InterpolationDetailsPtr DetailsOriginal(){
-    InterpolationDetailsPtr d = (InterpolationDetails *)malloc(sizeof(InterpolationDetails));
+    InterpolationDetailsPtr d = CreateInterpolationDetails();
     d->blur = 1;
     d->filter = filter_bicubic_fast;
     d->window = 0.5;

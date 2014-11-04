@@ -84,6 +84,8 @@ namespace ImageResizer{
                     details->use_halving = withHalving;
                     details->blur *= blur;
                     details->post_resize_sharpen_percent = (int)sharpen;
+                    details->use_interpolation_for_percent = 0.3;
+
                     if (window != 0) details->window = window;
                         
                     BgraScaler ^scaler = gcnew BgraScaler();

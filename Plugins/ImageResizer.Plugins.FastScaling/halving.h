@@ -59,6 +59,7 @@ static inline int HalveInternal(const BitmapBgraPtr from,
 
     int to_w_bytes = to_w * to->bpp;
     unsigned short *buffer = (unsigned short *)calloc(to_w_bytes, sizeof(unsigned short));
+    if (buffer == NULL) return NULL;
 
     int y, b, d;
     const unsigned short divisorSqr = divisor * divisor;
