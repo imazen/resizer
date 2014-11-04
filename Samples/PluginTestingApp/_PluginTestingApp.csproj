@@ -91,6 +91,7 @@
     <Content Include="Misc\WhitespaceTrimmerTest.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BmpEncoder.cs" />
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
