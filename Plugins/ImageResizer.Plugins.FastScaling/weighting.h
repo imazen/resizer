@@ -164,7 +164,7 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
     res = ContributionsAlloc(line_size, windows_size);
 
     for (u = 0; u < line_size; u++) {
-        const double dCenter = (double)u / scale_d;
+        const double dCenter = ((double)u) / scale_d + 0.5;
         /* get the significant edge points affecting the pixel */
         register int iLeft = MAX(0, (int)floor(dCenter - width_d));
         int iRight = MIN((int)ceil(dCenter + width_d), (int)src_size - 1);
@@ -173,7 +173,7 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
 
         /* Cut edge points to fit in filter window in case of spill-off */
         if (iRight - iLeft + 1 > windows_size)  {
-            if (iLeft < ((int)src_size - 1 / 2))  {
+            if (iLeft < ((int)src_size - 1) / 2)  {
                 iLeft++;
             }
             else {
