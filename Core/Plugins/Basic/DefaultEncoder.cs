@@ -269,7 +269,7 @@ namespace ImageResizer.Plugins.Basic {
             else if (ImageFormat.Gif.Equals(format))
                 return "image/gif";
             else if (ImageFormat.Bmp.Equals(format))
-                return "image/x-ms-bmp";
+                return "image/bmp";
             else if (ImageFormat.Tiff.Equals(format))
                 return "image/tiff";
             else
