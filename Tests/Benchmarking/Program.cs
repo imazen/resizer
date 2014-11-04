@@ -151,9 +151,15 @@ namespace Bench
             foreach (var pair in settings.Images.GetImagesAndDescriptions())
             {
                 Console.WriteLine();
-                Console.WriteLine("Using {0} seq. runs, {1} || on {2} threads. Filter segment '{4}'{5} Data: {3}", 
-                    settings.SequentialRuns,settings.ParallelRuns,settings.ParallelThreads,pair.Item2, settings.SegmentNameFilter,
-                    settings.UseBarrierAroundSegment ? " WITH Memory Barrier" : "");
+                String isolation = (settings.SegmentNameFilter != "op" && !settings.UseBarrierAroundSegment) ? 
+                                "Measuring '" + settings.SegmentNameFilter + "' without memory barrier; multi-threaded results invalid." 
+                                : (settings.UseBarrierAroundSegment ? "Segment '" +  settings.SegmentNameFilter + "' w/ mem barrier." 
+                                : "Segment '" + settings.SegmentNameFilter +"'.");
+
+
+                Console.WriteLine("Using {0} seq. runs, {1} || on {2} threads({5}). {4} Input: {3}", 
+                    settings.SequentialRuns,settings.ParallelRuns,settings.ParallelThreads,pair.Item2, isolation,
+                    Environment.Is64BitProcess ? "64-bit" : "32-bit");
 
                 var widths = CalcColumnWidths(ConsoleWidth, 4, -2, -2, -2, -4);
 
