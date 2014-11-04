@@ -160,9 +160,13 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bitmap_scaler.h" />
+    <ClInclude Include="halving.h" />
     <ClInclude Include="ImageResizer.Plugins.FastScaling.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="scaling.h" />
+    <ClInclude Include="shared.h" />
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="weighting.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
@@ -176,12 +180,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="app.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="app.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
