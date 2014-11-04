@@ -255,6 +255,14 @@ static InterpolationDetailsPtr DetailsLanczos(){
     return DetailsLanczosCustom(0.5, 1);
 }
 
+static InterpolationDetailsPtr DetailsOriginal(){
+    InterpolationDetailsPtr d = (InterpolationDetails *)malloc(sizeof(InterpolationDetails));
+    d->blur = 1;
+    d->filter = filter_bicubic_fast;
+    d->window = 0.5;
+    return d;
+}
+
 static InterpolationDetailsPtr DetailsDefault(){
     return CreateBicubicCustom( 0.5,1, 1, 0);
 }
@@ -985,8 +993,10 @@ namespace ImageResizer{
                     }
                     
                     InterpolationDetailsPtr details;
-                    details = DetailsDefault();
-                    
+                    details = DetailsOriginal();
+                    if (query->Get("f") == "0"){
+                        details = DetailsDefault();
+                    }
                     if (query->Get("f") == "1"){
                         details = DetailsGeneralCubic();
                     }
