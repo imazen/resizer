@@ -45,5 +45,17 @@ namespace ImageResizer.Core.Tests
            Assert.Equal(j.ResultMimeType, "image/jpeg");
         }
 
+
+        [Fact]
+        public void TestReplaceFileInPalce()
+        {
+            var path = Path.GetTempFileName();
+            ImageBuilderTest.GetBitmap(100, 200).Save(path,ImageFormat.Jpeg);
+
+            var j = new ImageJob(path,path, new Instructions("width=50;format=jpg"));
+            c.CurrentImageBuilder.Build(j);
+            
+        }
+
     }
 }
