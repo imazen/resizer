@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Text;
 using System.IO;
 using ImageResizer.Util;
@@ -76,15 +77,23 @@ namespace ImageResizer {
         [Obsolete("Use Instructions instead of ResizeSettings")]
         public ImageJob(string sourcePath, string destPath, ResizeSettings settings)
             : this((object)sourcePath, (object)destPath, new Instructions(settings)){}
+        public ImageJob(string sourcePath, string destPath, NameValueCollection settings)
+            : this((object)sourcePath, (object)destPath, new Instructions(settings)) { }
         [Obsolete("Use Instructions instead of ResizeSettings")]
         public ImageJob(Stream sourceStream, Stream destStream, ResizeSettings settings)
             :this((object)sourceStream,(object)destStream,new Instructions(settings)) {}
+        public ImageJob(Stream sourceStream, Stream destStream, NameValueCollection settings)
+            : this((object)sourceStream, (object)destStream, new Instructions(settings)) { }
         [Obsolete("Use Instructions instead of ResizeSettings")]
         public ImageJob(object source, object dest, ResizeSettings settings):
             this(source,dest,new Instructions(settings)) {}
+        public ImageJob(object source, object dest, NameValueCollection settings) :
+            this(source, dest, new Instructions(settings)) { }
         [Obsolete("Use Instructions instead of ResizeSettings")]
         public ImageJob(object source, object dest, ResizeSettings settings, bool disposeSource, bool addFileExtension)
             :this(source,dest,new Instructions(settings),disposeSource,addFileExtension){ }
+        public ImageJob(object source, object dest, NameValueCollection settings, bool disposeSource, bool addFileExtension)
+            : this(source, dest, new Instructions(settings), disposeSource, addFileExtension) { }
 
         /// <summary>
         /// Shorthand method for ImageBuilder.Current.Build(this)
