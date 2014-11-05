@@ -113,6 +113,7 @@ namespace Bench
                 ShowProfileTree = true;
                 SegmentNameFilter = "op";
                 UseBarrierAroundSegment = false;
+                ExclusiveTimeSignificantMs = 5;
             }
             public int ThrowawayRuns { get; set; }
             public int ThrowawayThreads { get; set; }
@@ -121,6 +122,11 @@ namespace Bench
             public int ParallelRuns { get; set; }
             public int ParallelThreads { get; set; }
 
+            /// <summary>
+            /// Segments with less exclusive time than this will not be rendered
+            /// </summary>
+            /// 
+            public double ExclusiveTimeSignificantMs { get; set; }
             public ImageProvider Images { get; set; }
 
             public IEnumerable<Instructions> SharedInstructions { get; set; }
@@ -197,6 +203,7 @@ namespace Bench
                         if (settings.ShowProfileTree)
                         {
                             var f = new ConcurrencyResultFormatter();
+                            f.ExclusiveTimeSignificantMs = settings.ExclusiveTimeSignificantMs;
                             Console.WriteLine(f.PrintCallTree(set));
                         }
                         return new Tuple<string, IConcurrencyResults>(triple.Item3, set);
@@ -368,7 +375,7 @@ namespace Bench
         {
             var settings = ScalingComparisonDefault();
             settings.SegmentNameFilter = segment;
-
+            settings.ExclusiveTimeSignificantMs = 1;
             var configs = new Tuple<Config, Instructions, string>[]{
                     new Tuple<Config, Instructions, string>(ConfigWithPlugins(),null,"Default"),
                     new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),null,"FastScaling")};
