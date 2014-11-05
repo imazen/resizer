@@ -48,6 +48,10 @@ namespace ImageResizer{
                     double sharpen = System::String::IsNullOrEmpty(query->Get("sharpen")) ? 0 :
                         System::Double::Parse(query->Get("sharpen"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
+                    double min_scaled_weighted = System::String::IsNullOrEmpty(query->Get("min_scaled_weighted")) ? 0 :
+                        System::Double::Parse(query->Get("min_scaled_weighted"), System::Globalization::NumberFormatInfo::InvariantInfo);
+
+
 
 					RectangleF targetBox = ImageResizer::Util::PolygonMath::GetBoundingBox(targetArea);
 					if (targetBox.Location != targetArea[0] || targetBox.Width != (targetArea[1].X - targetArea[0].X)){
@@ -84,7 +88,9 @@ namespace ImageResizer{
                     details->use_halving = withHalving;
                     details->blur *= blur;
                     details->post_resize_sharpen_percent = (int)sharpen;
-                    details->use_interpolation_for_percent = 0.3;
+
+
+                    details->use_interpolation_for_percent = min_scaled_weighted > 0 ? min_scaled_weighted :  0.3;
 
                     if (window != 0) details->window = window;
                         
