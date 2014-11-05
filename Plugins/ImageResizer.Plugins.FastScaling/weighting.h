@@ -143,6 +143,9 @@ static inline void ContributionsFree(LineContribType * p)
     free(p);
 }
 
+
+#define TONY 0.00001
+
 static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigned int src_size, const InterpolationDetailsPtr details)
 {
     double width_d;
@@ -154,21 +157,21 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
     LineContribType *res;
 
     if (scale_d < 1.0) {
-        width_d = filter_width_d / scale_d;
+        width_d = 0.5 / scale_d + filter_width_d;
         scale_f_d = scale_d;
     }
     else {
         width_d = filter_width_d;
     }
 
-    windows_size = 2 * (int)ceil(width_d) + 1;
+    windows_size = (int)ceil(2 * (width_d - TONY)) + 1;
     res = ContributionsAlloc(line_size, windows_size);
 
     for (u = 0; u < line_size; u++) {
         const double dCenter = ((double)u + 0.5) / scale_d - 0.5;
         /* get the significant edge points affecting the pixel */
-        register int iLeft = MAX(0, (int)floor(dCenter - width_d));
-        int iRight = MIN((int)ceil(dCenter + width_d), (int)src_size - 1);
+        register int iLeft = MAX(0, (int)ceil(dCenter - width_d - TONY));
+        int iRight = MIN((int)floor(dCenter + width_d + TONY), (int)src_size - 1);
         double dTotalWeight = 0.0;
         int iSrc;
 

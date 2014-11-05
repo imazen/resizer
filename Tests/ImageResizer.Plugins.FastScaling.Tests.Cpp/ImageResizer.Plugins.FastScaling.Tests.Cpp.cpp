@@ -6,18 +6,54 @@
 #include "..\..\Plugins\ImageResizer.Plugins.FastScaling\weighting.h"
 
 
-bool test_contribs_unman()
+bool test_contrib_windows(char *msg)
 {
-    bool result = false;
-    unsigned int from_w = 20;
-    unsigned int to_w = 10;
+    int bad = -1;
     LineContribType *lct = 0;
-    
-    lct = ContributionsCalc(to_w, from_w, DetailsDefault());
-    result = true;
 
+    // assumes included edge cases
+
+    unsigned int from_w = 6;
+    unsigned int to_w = 3;
+    unsigned int corr36[3][2] = { { 0, 2 }, { 1, 4 }, { 3, 5 } };
+    lct = ContributionsCalc(to_w, from_w, DetailsDefault());
+
+    for (int i = 0; i < lct->LineLength; i++)
+    if (lct->ContribRow[i].Left != corr36[i][0]) { bad = i; break; }
+    else if (lct->ContribRow[i].Right != corr36[i][1]) { bad = i; break; }
+    
+    if (bad != -1)
+    {
+        sprintf(msg, "at 6->3 invalid value (%d; %d) at %d, expected (%d; %d)",
+            lct->ContribRow[bad].Left,
+            lct->ContribRow[bad].Right,
+            bad, corr36[bad][0], corr36[bad][1]);
+        ContributionsFree(lct);
+        return false;
+    }
     ContributionsFree(lct);
-    return result;
+
+    from_w = 6;
+    to_w = 4;
+    unsigned int corr46[4][2] = { { 0, 1 }, { 1, 3 }, { 2, 4 }, { 4, 5 } };
+    lct = ContributionsCalc(to_w, from_w, DetailsDefault());
+
+    for (int i = 0; i < lct->LineLength; i++)
+    if (lct->ContribRow[i].Left != corr46[i][0]) { bad = i; break; }
+    else if (lct->ContribRow[i].Right != corr46[i][1]) { bad = i; break; }
+
+    if (bad != -1)
+    {
+        sprintf(msg, "at 6->4 invalid value (%d; %d) at %d, expected (%d; %d)",
+            lct->ContribRow[bad].Left,
+            lct->ContribRow[bad].Right,
+            bad, corr46[bad][0], corr46[bad][1]);
+        ContributionsFree(lct);
+        return false;
+    }
+    ContributionsFree(lct);
+
+    return true;
 }
 
 
@@ -60,7 +96,9 @@ namespace ImageResizerPluginsFastScalingTestsCpp {
         [Fact]
         void ContributionsCalcTest()
         {
-            Assert::True(test_contribs_unman());
+            char msg[256];
+            bool r = test_contrib_windows(msg);
+            Assert::True(r, gcnew String(msg));
         }
     };
 }
