@@ -143,9 +143,10 @@ static inline void ContributionsFree(LineContribType * p)
     free(p);
 }
 
-static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigned int src_size, double scale_d, const InterpolationDetailsPtr details)
+static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigned int src_size, const InterpolationDetailsPtr details)
 {
     double width_d;
+    double scale_d = (double)line_size / (double)src_size;
     double scale_f_d = 1.0;
     const double filter_width_d = details->window;
     int windows_size;

@@ -169,8 +169,7 @@ static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
     unsigned int line_ndx;
     LineContribType * contrib;
 
-    contrib = ContributionsCalc(pDst->h, pSrc->w,
-        (double)pDst->h / (double)pSrc->w, details);
+    contrib = ContributionsCalc(pDst->h, pSrc->w, details);
     if (contrib == NULL) {
         return 0;
     }
