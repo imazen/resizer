@@ -157,7 +157,7 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
     LineContribType *res;
 
     if (scale_d < 1.0) {
-        width_d = 0.5 / scale_d + filter_width_d;
+        width_d = filter_width_d / scale_d;
         scale_f_d = scale_d;
     }
     else {
@@ -174,16 +174,6 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
         int iRight = MIN((int)floor(dCenter + width_d + TONY), (int)src_size - 1);
         double dTotalWeight = 0.0;
         int iSrc;
-
-        /* Cut edge points to fit in filter window in case of spill-off */
-        if (iRight - iLeft + 1 > windows_size)  {
-            if (iLeft < ((int)src_size - 1) / 2)  {
-                iLeft++;
-            }
-            else {
-                iRight--;
-            }
-        }
 
         res->ContribRow[u].Left = iLeft;
         res->ContribRow[u].Right = iRight;
