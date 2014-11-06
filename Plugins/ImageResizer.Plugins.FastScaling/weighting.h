@@ -154,22 +154,29 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
     const double downscale_factor = MAX(1.0, scale_factor);
     const double half_source_window = details->window / downscale_factor;
 
-    const int windows_size = (int)ceil(2 * (half_source_window - TONY)) + 1;
+    const int allocated_window_size = (int)floor(2 * (half_source_window + TONY)) + 1;
     unsigned int u, ix;
-    LineContribType *res = ContributionsAlloc(line_size, windows_size);
+    LineContribType *res = ContributionsAlloc(line_size, allocated_window_size);
 
     for (u = 0; u < line_size; u++) {
-        const double center_src_pixel = ((double)u + 0.5) / scale_factor - 0.5;
-        const int left_src_pixel = MAX(0, (int)ceil(center_src_pixel - half_source_window - TONY));
-        const int right_src_pixel = MIN(MAX((int)floor(center_src_pixel + half_source_window + TONY), left_src_pixel), (int)src_size - 1);
+        const double center_src_pixel = ((double)u + 0.5) / scale_factor;
+        const int left_src_pixel = MAX(0, (int)floor(center_src_pixel - half_source_window + TONY));
+        const int right_src_pixel = MIN(MAX((int)floor(center_src_pixel + half_source_window - TONY), left_src_pixel), (int)src_size - 1);
         double total_weight = 0.0;
 
+        const int source_pixel_count = right_src_pixel - left_src_pixel + 1;
+        
+        if (source_pixel_count > allocated_window_size){
+            ContributionsFree(res);
+            return NULL;
+        }
+        
         res->ContribRow[u].Left = left_src_pixel;
         res->ContribRow[u].Right = right_src_pixel;
-
-        for (ix = left_src_pixel; ix <= right_src_pixel; ix++) {
-            total_weight += (res->ContribRow[u].Weights[ix - left_src_pixel] = 
-                downscale_factor * (*details->filter)(details, downscale_factor * (center_src_pixel - (double)ix)));
+        
+        for (ix = 0; ix < source_pixel_count; ix++) {
+            total_weight += (res->ContribRow[u].Weights[ix] = 
+                downscale_factor * (*details->filter)(details, downscale_factor * (center_src_pixel - ((double)ix + left_src_pixel + 0.5))));
         }
 
         if (total_weight < 0.0) {
@@ -177,12 +184,9 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
             return NULL;
         }
 
-        if (total_weight > 0.0) {
-            for (ix = left_src_pixel; ix <= right_src_pixel; ix++) {
-                res->ContribRow[u].Weights[ix - left_src_pixel] /= total_weight;
-            }
+        for (ix = 0; ix < source_pixel_count; ix++) {
+            res->ContribRow[u].Weights[ix] /= total_weight;
         }
-
     }
     return res;
 }
