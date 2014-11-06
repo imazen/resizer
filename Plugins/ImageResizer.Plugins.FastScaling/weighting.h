@@ -155,7 +155,7 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
     double scale_f_d = 1.0;
     const double filter_width_d = details->window;
     int windows_size;
-    unsigned int u;
+    unsigned int u, ix;
     LineContribType *res;
 
     if (scale_d < 1.0) {
@@ -170,28 +170,27 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
     res = ContributionsAlloc(line_size, windows_size);
 
     for (u = 0; u < line_size; u++) {
-        const double dCenter = ((double)u + 0.5) / scale_d - 0.5;
-        /* get the significant edge points affecting the pixel */
-        register int iLeft = MAX(0, (int)ceil(dCenter - width_d - TONY));
-        int iRight = MIN(MAX((int)floor(dCenter + width_d + TONY), iLeft), (int)src_size - 1);
-        double dTotalWeight = 0.0;
-        int iSrc;
+        const double center_src_pixel = ((double)u + 0.5) / scale_d - 0.5;
+        const int left_src_pixel = MAX(0, (int)ceil(center_src_pixel - width_d - TONY));
+        const int right_src_pixel = MIN(MAX((int)floor(center_src_pixel + width_d + TONY), left_src_pixel), (int)src_size - 1);
+        double total_weight = 0.0;
 
-        res->ContribRow[u].Left = iLeft;
-        res->ContribRow[u].Right = iRight;
+        res->ContribRow[u].Left = left_src_pixel;
+        res->ContribRow[u].Right = right_src_pixel;
 
-        for (iSrc = iLeft; iSrc <= iRight; iSrc++) {
-            dTotalWeight += (res->ContribRow[u].Weights[iSrc - iLeft] = scale_f_d * (*details->filter)(details, scale_f_d * (dCenter - (double)iSrc)));
+        for (ix = left_src_pixel; ix <= right_src_pixel; ix++) {
+            total_weight += (res->ContribRow[u].Weights[ix - left_src_pixel] = 
+                scale_f_d * (*details->filter)(details, scale_f_d * (center_src_pixel - (double)ix)));
         }
 
-        if (dTotalWeight < 0.0) {
+        if (total_weight < 0.0) {
             ContributionsFree(res);
             return NULL;
         }
 
-        if (dTotalWeight > 0.0) {
-            for (iSrc = iLeft; iSrc <= iRight; iSrc++) {
-                res->ContribRow[u].Weights[iSrc - iLeft] /= dTotalWeight;
+        if (total_weight > 0.0) {
+            for (ix = left_src_pixel; ix <= right_src_pixel; ix++) {
+                res->ContribRow[u].Weights[ix - left_src_pixel] /= total_weight;
             }
         }
 
