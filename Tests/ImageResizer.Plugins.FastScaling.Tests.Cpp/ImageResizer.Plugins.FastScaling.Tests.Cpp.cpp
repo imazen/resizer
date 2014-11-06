@@ -66,7 +66,7 @@ bool test_weigth_steps(InterpolationDetailsPtr details, char *msg, double c_val,
     double t_val = (*details->filter)(details, c_loc);
     if (t_val > c_val)
     {
-        sprintf(msg+strlen(msg), "value %.2f exceeds previous %.2f at %.2f", t_val, c_val, c_loc);
+        sprintf(msg + strlen(msg), "value %.2f exceeds previous %.2f at %.2f", t_val, c_val, c_loc);
         return false;
     }
     
@@ -84,14 +84,14 @@ bool test_details(InterpolationDetailsPtr details, char *msg)
     double edge = (*details->filter)(details, 1);
     if (edge - local_tony > 0 || edge + local_tony < 0)
     {
-        sprintf(msg + strlen(msg), "near edge value exceeds TONY (%.2f at +1)", edge);
+        sprintf(msg + strlen(msg), "near edge value exceeds TONY of %.2f (%.2f at +1)", local_tony, edge);
         return false;
     }
 
     edge = (*details->filter)(details, -1);
     if (edge - local_tony > 0 || edge + local_tony < 0)
     {
-        sprintf(msg + strlen(msg), "near edge value exceeds TONY (%.2f at -1)", edge);
+        sprintf(msg + strlen(msg), "near edge value exceeds TONY of %.2f (%.2f at -1)", local_tony, edge);
         return false;
     }
 
