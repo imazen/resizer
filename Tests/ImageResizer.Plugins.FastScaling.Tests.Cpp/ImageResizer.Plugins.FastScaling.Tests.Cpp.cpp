@@ -56,7 +56,7 @@ bool test_contrib_windows(char *msg)
     return true;
 }
 
-bool test_weigth_steps(InterpolationDetailsPtr details, char *msg, double c_val, double c_loc, double step, double limit, double cmp=1)
+bool test_weigth_steps(InterpolationDetailsPtr details, char *msg, double c_val, double c_loc, double step, double limit, int less=0)
 {
     c_loc += step;
 
@@ -64,13 +64,19 @@ bool test_weigth_steps(InterpolationDetailsPtr details, char *msg, double c_val,
         return true;
 
     double t_val = (*details->filter)(details, c_loc);
-    if (t_val*cmp > c_val)
+    
+    if (t_val < c_val && less)
+    {
+        sprintf(msg + strlen(msg), "value %.2f is below %.2f at %.2f", t_val, c_val, c_loc);
+        return false;
+    }
+    else if (t_val > c_val && !less)
     {
         sprintf(msg + strlen(msg), "value %.2f exceeds %.2f at %.2f", t_val, c_val, c_loc);
         return false;
     }
     
-    return test_weigth_steps(details, msg, c_val, c_loc, step, limit);
+    return test_weigth_steps(details, msg, c_val, c_loc, step, limit, less);
 }
 
 bool test_details(InterpolationDetailsPtr details, char *msg, int test_neg=0)
@@ -101,16 +107,16 @@ bool test_details(InterpolationDetailsPtr details, char *msg, int test_neg=0)
     // test after-edge
     if (test_neg)
     {
-        local_tony = 0.002;
+        local_tony = -0.001;
         char *msg2 = msg + strlen(msg);
-        if (test_weigth_steps(details, msg, local_tony, +1, +0.05, +3, -1))
+        if (test_weigth_steps(details, msg, local_tony, +1, +0.05, +3, 1))
         {
-            sprintf(msg2, "no negatives within 1..3 found exceeding %.4f", local_tony*-1);
+            sprintf(msg2, "no negatives within 1..3 found exceeding %.2f", local_tony);
             return false;
         }
-        if (test_weigth_steps(details, msg, local_tony, -1, -0.05, -3, -1))
+        if (test_weigth_steps(details, msg, local_tony, -1, -0.05, -3, 1))
         {
-            sprintf(msg2, "no negatives within -1..-3 found exceeding %.4f", local_tony*-1);
+            sprintf(msg2, "no negatives within -1..-3 found exceeding %.2f", local_tony);
             return false;
         }
     }
@@ -129,7 +135,7 @@ bool test_weight_distrib(char *msg)
 
     sprintf(msg, "DetailsGeneralCubic() ");
     details = DetailsGeneralCubic();
-    if (!test_details(details, msg, 1)) return false;
+    if (!test_details(details, msg)) return false;
     free(details);
 
     sprintf(msg, "DetailsCatmullRom() ");
@@ -139,7 +145,7 @@ bool test_weight_distrib(char *msg)
 
     sprintf(msg, "DetailsMitchell() ");
     details = DetailsMitchell();
-    if (!test_details(details, msg, 1)) return false;
+    if (!test_details(details, msg)) return false;
     free(details);
 
     sprintf(msg, "DetailsRobidoux() ");
@@ -154,7 +160,7 @@ bool test_weight_distrib(char *msg)
 
     sprintf(msg, "DetailsHermite() ");
     details = DetailsHermite();
-    if (!test_details(details, msg, 1)) return false;
+    if (!test_details(details, msg)) return false;
     free(details);
 
     sprintf(msg, "DetailsLanczos() ");
