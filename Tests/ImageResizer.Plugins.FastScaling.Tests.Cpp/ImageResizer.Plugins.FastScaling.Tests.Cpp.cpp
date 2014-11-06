@@ -15,7 +15,7 @@ bool test_contrib_windows(char *msg)
 
     unsigned int from_w = 6;
     unsigned int to_w = 3;
-    unsigned int corr36[3][2] = { { 0, 2 }, { 1, 4 }, { 3, 5 } };
+    unsigned int corr36[3][2] = { { 0, 1 }, { 2, 3 }, { 4, 5 } };
     lct = ContributionsCalc(to_w, from_w, DetailsDefault());
 
     for (int i = 0; i < lct->LineLength; i++)
@@ -35,7 +35,7 @@ bool test_contrib_windows(char *msg)
 
     from_w = 6;
     to_w = 4;
-    unsigned int corr46[4][2] = { { 0, 1 }, { 1, 3 }, { 2, 4 }, { 4, 5 } };
+    unsigned int corr46[4][2] = { { 0, 1 }, { 1, 2 }, { 3, 4 }, { 4, 5 } };
     lct = ContributionsCalc(to_w, from_w, DetailsDefault());
 
     for (int i = 0; i < lct->LineLength; i++)
