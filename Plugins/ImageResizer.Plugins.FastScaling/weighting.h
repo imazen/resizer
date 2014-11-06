@@ -15,8 +15,9 @@ static void derive_cubic_coefficients(double B, double C, InterpolationDetailsPt
 }
 
 
-static inline double filter_flex_cubic(const InterpolationDetailsPtr d, const double x)
+static inline double filter_flex_cubic(const InterpolationDetailsPtr d, double x)
 {
+    x *= 2;
     const double t = (double)fabs(x) / d->blur;
 
     if (t < 1.0){
@@ -39,8 +40,9 @@ static inline double filter_bicubic_fast(const InterpolationDetailsPtr d, const 
 #define IR_PI  double (3.1415926535897932384626433832795)
 #define IR_SINC(value) (value == 0 ? 1 : sin(value * IR_PI) / (value * IR_PI))
 
-static inline double filter_lanczos(const InterpolationDetailsPtr d, const double t)
+static inline double filter_lanczos(const InterpolationDetailsPtr d, double t)
 {
+    t *= 3;
     const double width = d->filter_var_a;
 
     const double abs_t = (double)fabs(t) / d->blur;

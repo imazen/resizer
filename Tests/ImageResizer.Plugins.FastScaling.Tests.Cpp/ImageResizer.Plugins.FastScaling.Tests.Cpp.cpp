@@ -70,7 +70,7 @@ bool test_weigth_steps(InterpolationDetailsPtr details, char *msg, double c_val,
         return false;
     }
     
-    return test_weigth_steps(details, msg, t_val, c_loc, step, limit);
+    return test_weigth_steps(details, msg, c_val, c_loc, step, limit);
 }
 
 bool test_details(InterpolationDetailsPtr details, char *msg)
@@ -80,7 +80,7 @@ bool test_details(InterpolationDetailsPtr details, char *msg)
     if (!test_weigth_steps(details, msg, top, 0, +0.05, +1)) return false;
     if (!test_weigth_steps(details, msg, top, 0, -0.05, -1)) return false;
 
-    double local_tony = 0.57;
+    double local_tony = 0.2;
     double edge = (*details->filter)(details, 1);
     if (edge - local_tony > 0 || edge + local_tony < 0)
     {
