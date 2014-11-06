@@ -179,7 +179,7 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
                 downscale_factor * (*details->filter)(details, downscale_factor * (center_src_pixel - ((double)ix + left_src_pixel + 0.5))));
         }
 
-        if (total_weight < 0.0) {
+        if (total_weight <= TONY) {
             ContributionsFree(res);
             return NULL;
         }
