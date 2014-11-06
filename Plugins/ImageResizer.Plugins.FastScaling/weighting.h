@@ -173,7 +173,7 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
         const double dCenter = ((double)u + 0.5) / scale_d - 0.5;
         /* get the significant edge points affecting the pixel */
         register int iLeft = MAX(0, (int)ceil(dCenter - width_d - TONY));
-        int iRight = MIN((int)floor(dCenter + width_d + TONY), (int)src_size - 1);
+        int iRight = MIN(MAX((int)floor(dCenter + width_d + TONY), iLeft), (int)src_size - 1);
         double dTotalWeight = 0.0;
         int iSrc;
 
