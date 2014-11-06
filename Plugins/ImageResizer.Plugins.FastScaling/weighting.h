@@ -176,7 +176,7 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
         
         for (ix = 0; ix < source_pixel_count; ix++) {
             total_weight += (res->ContribRow[u].Weights[ix] = 
-                downscale_factor * (*details->filter)(details, downscale_factor * (center_src_pixel - ((double)ix + left_src_pixel + 0.5))));
+                downscale_factor * (*details->filter)(details, downscale_factor * (center_src_pixel - (double)(ix + left_src_pixel))));
         }
 
         if (total_weight <= TONY) {
