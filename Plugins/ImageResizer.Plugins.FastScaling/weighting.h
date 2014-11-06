@@ -152,22 +152,23 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
 {
     const double scale_factor = (double)line_size / (double)src_size;
     const double downscale_factor = MAX(1.0, scale_factor);
-    const double half_source_window = details->window / downscale_factor;
+    const double half_source_window = details->window / downscale_factor - TONY;
 
-    const int allocated_window_size = (int)floor(2 * (half_source_window + TONY)) + 1;
+    const int allocated_window_size = (int)ceil(2 * half_source_window) + 1;
     unsigned int u, ix;
     LineContribType *res = ContributionsAlloc(line_size, allocated_window_size);
 
     for (u = 0; u < line_size; u++) {
         const double center_src_pixel = ((double)u + 0.5) / scale_factor;
-        const int left_src_pixel = MAX(0, (int)floor(center_src_pixel - half_source_window + TONY));
-        const int right_src_pixel = MIN(MAX((int)floor(center_src_pixel + half_source_window - TONY), left_src_pixel), (int)src_size - 1);
+        const int left_src_pixel = MAX(0, (int)floor(center_src_pixel - half_source_window));
+        const int right_src_pixel = MIN(MAX((int)floor(center_src_pixel + half_source_window), left_src_pixel), (int)src_size - 1);
         double total_weight = 0.0;
 
         const int source_pixel_count = right_src_pixel - left_src_pixel + 1;
         
         if (source_pixel_count > allocated_window_size){
             ContributionsFree(res);
+            exit(1);
             return NULL;
         }
         
