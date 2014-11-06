@@ -36,19 +36,33 @@ namespace ImageResizer.Plugins.FastScaling.Tests
             }
             return b;
         }
-        public static void AssertBorderColor(Color expected, Bitmap b){
-            AssertBorderColor(expected,b,0,0,b.Width,b.Height);
+        public static void AssertBorderColor(Color expected, Bitmap b, Side side = Side.All){
+            AssertBorderColor(expected,b,0,0,b.Width,b.Height, side);
+        }
+        [Flags()]
+        public enum Side
+        {
+            None = 0,
+            Left = 1, 
+            Top= 2, 
+            Right = 4, 
+            Bottom = 8, 
+            All = 15
         }
 
-        public static void AssertBorderColor(Color expected, Bitmap b, int x, int y, int w, int h){
-            Assert.Equal(expected, b.GetPixel(x, y));
-            Assert.Equal(expected, b.GetPixel(x + w / 2, y));
-            Assert.Equal(expected, b.GetPixel(x + w - 1, y));
-            Assert.Equal(expected, b.GetPixel(x + w - 1, y + h / 2));
-            Assert.Equal(expected, b.GetPixel(x + w - 1, y + h -1));
-            Assert.Equal(expected, b.GetPixel(x + w / 2 , y + h -1));
-            Assert.Equal(expected, b.GetPixel(x, y + h -1));
-            Assert.Equal(expected, b.GetPixel(x, y + h / 2));  
+        public static void AssertBorderColor(Color expected, Bitmap b, int x, int y, int w, int h, Side side= Side.All){
+
+            
+            if ((side & Side.Right) > 0) Assert.Equal(expected, b.GetPixel(x + w - 1, y + h / 2));
+            if ((side & Side.Bottom) > 0) Assert.Equal(expected, b.GetPixel(x + w / 2, y + h - 1));
+            if ((side & Side.Top) > 0) Assert.Equal(expected, b.GetPixel(x + w / 2, y));
+            if ((side & Side.Left) > 0) Assert.Equal(expected, b.GetPixel(x, y + h / 2));  
+
+
+            if ((side & Side.Top) > 0 || (side & Side.Right) > 0) Assert.Equal(expected, b.GetPixel(x + w - 1, y));
+            if ((side & Side.Right) > 0 || (side & Side.Bottom) > 0) Assert.Equal(expected, b.GetPixel(x + w - 1, y + h - 1));
+            if ((side & Side.Left) > 0 || (side & Side.Bottom) > 0) Assert.Equal(expected, b.GetPixel(x, y + h - 1));
+            if ((side & Side.Left) > 0 || (side & Side.Top) > 0) Assert.Equal(expected, b.GetPixel(x, y));
         }
 
         public static Bitmap BuildWithFastScaling(Bitmap source, Instructions instructions)
@@ -102,21 +116,27 @@ namespace ImageResizer.Plugins.FastScaling.Tests
             }
         }
 
-        [Fact]
-        public void CheckForLostBorder()
+        [Theory]
+        [InlineData("window=0.1", Side.Right | Side.Bottom)]
+        [InlineData("window=0.1", Side.Left | Side.Top)]
+        [InlineData("window=0.3", Side.Right | Side.Bottom)]
+        [InlineData("window=0.3", Side.Left | Side.Top)]
+        [InlineData("window=0.5", Side.Right | Side.Bottom)]
+        [InlineData("window=0.5", Side.Left | Side.Top)]
+        [InlineData("window=1", Side.Right | Side.Bottom)]
+        [InlineData("window=1", Side.Left | Side.Top)]
+        public void CheckForLostBorder(string instructions, Side toCheck)
         {
             var background = Color.FromArgb(255, 255, 0, 0);
             var border = Color.FromArgb(255, 0,255,0);
-            var b = CreateRingedBitmap(200, 86, border, background, 1);
+            var b = CreateRingedBitmap(200, 86, border, background, 2);
 
-            var i = new Instructions()
-            {
-                Width = 50
-            };
+            var i = new Instructions(instructions);
+            i.Width = 50;
             using (var result = BuildWithFastScaling(b, i))
             {
-                AssertBorderColor(border, result);
-                AssertBorderColor(background, result, 3, 3, result.Width - 7, result.Height - 7);
+                AssertBorderColor(border, result,toCheck);
+                AssertBorderColor(background, result, 3, 3, result.Width - 7, result.Height - 7, toCheck);
             }
         }
 
