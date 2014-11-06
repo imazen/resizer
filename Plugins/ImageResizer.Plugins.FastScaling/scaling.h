@@ -33,7 +33,7 @@ static void BgraSharpenInPlaceX(BitmapBgraPtr im, int pct)
 
 static inline void
 ScaleBgraFloat(float *source_buffer, unsigned int source_buffer_count, unsigned int source_buffer_len,
-float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len, ContributionType * weights, int from_step = 4, int to_step = 4, int mirror_space=0){
+float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len, ContributionType * weights, int from_step = 4, int to_step = 4){
 
     unsigned int ndx;
 
@@ -52,10 +52,10 @@ float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len
             for (i = left; i <= right; i++) {
                 const float weight = weightArray[i - left];
 
-                b += weight * source_buffer[(i + mirror_space) * from_step];
-                g += weight * source_buffer[(i + mirror_space) * from_step + 1];
-                r += weight * source_buffer[(i + mirror_space) * from_step + 2];
-                a += weight * source_buffer[(i + mirror_space) * from_step + 3];
+                b += weight * source_buffer[i * from_step];
+                g += weight * source_buffer[i * from_step + 1];
+                r += weight * source_buffer[i * from_step + 2];
+                a += weight * source_buffer[i * from_step + 3];
             }
 
             dest_buffer[ndx * to_step] = b;
@@ -80,9 +80,9 @@ float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len
             for (i = left; i <= right; i++) {
                 const float weight = weightArray[i - left];
 
-                b += weight * source_buffer[(i + mirror_space) * from_step];
-                g += weight * source_buffer[(i + mirror_space) * from_step + 1];
-                r += weight * source_buffer[(i + mirror_space) * from_step + 2];
+                b += weight * source_buffer[i * from_step];
+                g += weight * source_buffer[i * from_step + 1];
+                r += weight * source_buffer[i * from_step + 2];
             }
 
             dest_buffer[ndx * to_step] = b;
@@ -96,28 +96,21 @@ float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len
 
 static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int start_row, unsigned int row_count, ContributionType * weights, BitmapBgraPtr dest, float *source_buffers, unsigned int source_buffer_len, float *dest_buffers, unsigned int dest_buffer_len, float *lut){
 
-    register unsigned int row, bufferSet;
-    register int bix;
+    register unsigned int row, bix, bufferSet;
     const register unsigned int from_pixel_count = source_bitmap->w;
     const register unsigned int to_pixel_count = dest->h;
-
-    int mirror_space = -weights[0].Left;
-    if (mirror_space < 0) mirror_space = 0;
 
     for (row = 0; row < row_count; row++)
     {
         unsigned char *src_start = source_bitmap->pixels + (start_row + row)*source_bitmap->stride;
-        for (bix = -mirror_space; bix < source_buffer_len / 2 + 1; bix++)
-        {
-            source_buffers[row * source_buffer_len + bix + mirror_space] = lut[src_start[abs(bix)]];
-            source_buffers[(row + 1) * source_buffer_len - bix - 1 + mirror_space] = lut[src_start[source_buffer_len - abs(bix) - 1]];
-        }
+        for (bix = 0; bix < source_buffer_len; bix++)
+            source_buffers[row * source_buffer_len + bix] = lut[src_start[bix]];
     }
 
     //Actual scaling seems responsible for about 40% of execution time
     for (bufferSet = 0; bufferSet < row_count; bufferSet++){
         ScaleBgraFloat(source_buffers + (source_buffer_len * bufferSet), from_pixel_count, source_buffer_len,
-            dest_buffers + (dest_buffer_len * bufferSet), to_pixel_count, dest_buffer_len, weights, source_bitmap->bpp, dest->bpp, mirror_space);
+            dest_buffers + (dest_buffer_len * bufferSet), to_pixel_count, dest_buffer_len, weights, source_bitmap->bpp, dest->bpp);
     }
 
     // process rgb first
@@ -180,13 +173,10 @@ static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
     if (contrib == NULL) {
         return 0;
     }
-    
+
     int buffer = 4; //using buffer=5 seems about 6% better than most other non-zero values. 
 
-    int mirror_space = -2 * contrib->ContribRow[0].Left;
-    if (mirror_space < 0) mirror_space = 0;
-
-    unsigned int source_buffer_len = (mirror_space + pSrc->w) * pSrc->bpp;
+    unsigned int source_buffer_len = pSrc->w * pSrc->bpp;
     float *sourceBuffers = (float *)malloc(sizeof(float) * source_buffer_len * buffer);
 
     unsigned int dest_buffer_len = pDst->h * pDst->bpp;

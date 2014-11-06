@@ -56,6 +56,95 @@ bool test_contrib_windows(char *msg)
     return true;
 }
 
+bool test_weigth_steps(InterpolationDetailsPtr details, char *msg, double c_val, double c_loc, double step, double limit)
+{
+    c_loc += step;
+
+    if (abs(c_loc) > abs(limit))
+        return true;
+
+    double t_val = (*details->filter)(details, c_loc);
+    if (t_val > c_val)
+    {
+        sprintf(msg+strlen(msg), "value %.2f exceeds previous %.2f at %.2f", t_val, c_val, c_loc);
+        return false;
+    }
+    
+    return test_weigth_steps(details, msg, t_val, c_loc, step, limit);
+}
+
+bool test_details(InterpolationDetailsPtr details, char *msg)
+{
+    double top = (*details->filter)(details, 0);
+
+    if (!test_weigth_steps(details, msg, top, 0, +0.05, +1)) return false;
+    if (!test_weigth_steps(details, msg, top, 0, -0.05, -1)) return false;
+
+    double local_tony = 0.57;
+    double edge = (*details->filter)(details, 1);
+    if (edge - local_tony > 0 || edge + local_tony < 0)
+    {
+        sprintf(msg + strlen(msg), "near edge value exceeds TONY (%.2f at +1)", edge);
+        return false;
+    }
+
+    edge = (*details->filter)(details, -1);
+    if (edge - local_tony > 0 || edge + local_tony < 0)
+    {
+        sprintf(msg + strlen(msg), "near edge value exceeds TONY (%.2f at -1)", edge);
+        return false;
+    }
+
+    return true;
+}
+
+bool test_weight_distrib(char *msg)
+{
+    InterpolationDetailsPtr details;
+
+    sprintf(msg, "DetailsDefault() ");
+    details = DetailsDefault();
+    if (!test_details(details, msg)) return false;
+    free(details);
+
+    sprintf(msg, "DetailsGeneralCubic() ");
+    details = DetailsGeneralCubic();
+    if (!test_details(details, msg)) return false;
+    free(details);
+
+    sprintf(msg, "DetailsCatmullRom() ");
+    details = DetailsCatmullRom();
+    if (!test_details(details, msg)) return false;
+    free(details);
+
+    sprintf(msg, "DetailsMitchell() ");
+    details = DetailsMitchell();
+    if (!test_details(details, msg)) return false;
+    free(details);
+
+    sprintf(msg, "DetailsRobidoux() ");
+    details = DetailsRobidoux();
+    if (!test_details(details, msg)) return false;
+    free(details);
+
+    sprintf(msg, "DetailsRobidouxSharp() ");
+    details = DetailsRobidouxSharp();
+    if (!test_details(details, msg)) return false;
+    free(details);
+
+    sprintf(msg, "DetailsHermite() ");
+    details = DetailsHermite();
+    if (!test_details(details, msg)) return false;
+    free(details);
+
+    sprintf(msg, "DetailsLanczos() ");
+    details = DetailsLanczos();
+    if (!test_details(details, msg)) return false;
+    free(details);
+
+    return true;
+}
+
 
 #pragma managed
 
@@ -72,7 +161,6 @@ namespace ImageResizerPluginsFastScalingTestsCpp {
     public ref class TestsCpp
     {
     public:
-
         /*[Fact]
         void DummyTest()
         {
@@ -98,6 +186,14 @@ namespace ImageResizerPluginsFastScalingTestsCpp {
         {
             char msg[256];
             bool r = test_contrib_windows(msg);
+            Assert::True(r, gcnew String(msg));
+        }
+
+        [Fact]
+        void WeightFuncTest()
+        {
+            char msg[256];
+            bool r = test_weight_distrib(msg);
             Assert::True(r, gcnew String(msg));
         }
     };
