@@ -165,10 +165,12 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
         double total_weight = 0.0;
 
         const int source_pixel_count = right_src_pixel - left_src_pixel + 1;
-        
+        // const double restricted_window_scale = (double)source_pixel_count / (2 * (half_source_window - TONY));
+        const double restricted_mapping_scale = MIN(1, MIN(center_src_pixel - left_src_pixel, right_src_pixel - center_src_pixel) / (0.5 / downscale_factor));
+
         if (source_pixel_count > allocated_window_size){
             ContributionsFree(res);
-            exit(1);
+            exit(200);
             return NULL;
         }
         
@@ -177,7 +179,7 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
         
         for (ix = 0; ix < source_pixel_count; ix++) {
             total_weight += (res->ContribRow[u].Weights[ix] = 
-                downscale_factor * (*details->filter)(details, downscale_factor * (center_src_pixel - (double)(ix + left_src_pixel))));
+                downscale_factor * (*details->filter)(details, restricted_mapping_scale * downscale_factor * (center_src_pixel - (double)(ix + left_src_pixel))));
         }
 
         if (total_weight <= TONY) {
