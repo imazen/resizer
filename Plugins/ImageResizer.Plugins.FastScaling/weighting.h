@@ -151,7 +151,7 @@ static inline void ContributionsFree(LineContribType * p)
 static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigned int src_size, const InterpolationDetailsPtr details)
 {
     const double scale_factor = (double)line_size / (double)src_size;
-    const double downscale_factor = MAX(1.0, scale_factor);
+    const double downscale_factor = MIN(1.0, scale_factor);
     const double half_source_window = details->window / downscale_factor - TONY;
 
     const int allocated_window_size = (int)ceil(2 * (half_source_window - TONY)) + 1;
