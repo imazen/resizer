@@ -26,7 +26,3 @@ ImageResizer has a very simple (and powerful) URL API. Check out the [documentat
 
 ![Fit modes](http://z.zr.io/rw/diagrams/resizing-modes.png)
 
-## Notes for building ImageResizer
-
-* Make sure you have NuGet 2.7 installed with package restore enabled. Also, VS2010 or higher is best (we use 2013). Install the .NET 4.5.2 targeting packs. 
-
