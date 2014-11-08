@@ -8,7 +8,7 @@ The website contains the most up-to-date installation instructions, but here's t
 2) Change the Project's web.config file to match the settings in the included Web.Config file.
 
 * If you have NuGet, simply go to Tools->Library Package Manager->Package Manager Console
-and run "Install-Package ImageResizer.MvcWebConfig"
+and run "Install-Package ImageResizer.WebConfig"
 
 * If you're installing this on an IIS website, 
 

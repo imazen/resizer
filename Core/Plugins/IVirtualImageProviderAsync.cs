@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace ImageResizer.Plugins
 {
     /// <summary>
-    /// Implement this to allow your class (or VirtualPathProvider subclass) to be used without registering it with the whole ASP.NET system.
+    /// Implement this to allow ImageResizer to access your custom blob store
     /// </summary>
     public interface IVirtualImageProviderAsync
     {
