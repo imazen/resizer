@@ -3,7 +3,15 @@ obj/
 Debug/
 imagecache/
 dlls/
-/Samples/Images/large.jpg
+*.jpg
+*.bmp
+*.png
+*.gif
+*.tiff
+/Samples/Images/
+*.pdb
+*.dll
+*.a
 /docs/*/
 Tests/*/Results
 .DS_Store
@@ -51,4 +59,3 @@ ipch/
 *.metagen
 *.lastbuildstate
 *.res
-*.pdb
