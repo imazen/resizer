@@ -48,7 +48,7 @@ Over half of ImageResizer's plugins are available under the Apache 2.0 license. 
 
 Replace  `InterceptModule` with `AsyncInterceptModule` in Web.Config, and you'll be using our asynchronous pipeline.
 
-Keep in mind that the async pipeline ignores files exclusively provided through the VirtualPathProvider system. For optimal benefit, you should update any custom plugins to implement IVirtualFileAsync (or inherit from BlobProviderBase.
+Keep in mind that the async pipeline can only access data from plugins which implement IVirtualFileAsync (or inherit from BlobProviderBase). The standard pipeline can access files exposed by any VirtualPathProvider.
 
 ### Virtual file (blob provider) plugins are now much easier to create.
 
@@ -62,7 +62,7 @@ New interfaces include: IVirtualImageProviderAsync, IVirtualFileAsync, IVirtualI
 
 In V3, we used a convention-based approach to generate dozens of possible fully-qualified type names, and then tried those against each loaded assembly. This approach was slow, and broke with .NET 4, as it only loads assemblies with explicit references. We now maintain a hints file (which includes the assembly name), and use that to ensure a faster and more reliable load-time experience.  
 
-Custom plugins will need to be referenced by their fully-qualified name, such as "MyRootNamespace.MyPluginNamespace.MyPluginClass, MyAssembly"
+When installed via `Web.config`, custom plugins will need to be referenced by their fully-qualified name, such as "MyRootNamespace.MyPluginNamespace.MyPluginClass, MyAssembly"
 
 ### Our blob providers have been rewritten. 
 
@@ -98,7 +98,7 @@ Core: Add IProfiler interface and ImageJob.Profiler property.
 
 Core: Add PluginConfig.AddPluginByName(string name, NameValueCollection pluginConfig = null) to enable code-driven installation of arbitrary plugins.
 
-Add ImageResizer.Util.AsyncUtils class. Fix IVirtualFileWithModifiedDate visibility. Add CopyToMemoryStreamAsync extension method.
+Add ImageResizer.Util.AsyncUtils class and CopyToMemoryStreamAsync extension method.
 
 
 
