@@ -180,9 +180,12 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
         res->ContribRow[u].Left = left_src_pixel;
         res->ContribRow[u].Right = right_src_pixel;
         
-        for (ix = left_edge; ix <= right_edge; ix++) {
-            int tx = MIN(MAX(ix, left_src_pixel), right_src_pixel) - left_src_pixel;
-            double add = (*details->filter)(details, 2 * downscale_factor * ((double)ix - center_src_pixel));
+        //commented: additional weight for edges (doesn't seem to be too effective)
+        //for (ix = left_edge; ix <= right_edge; ix++) {
+        for (ix = left_src_pixel; ix <= right_src_pixel; ix++) {
+            int tx = ix - left_src_pixel;
+            //int tx = MIN(MAX(ix, left_src_pixel), right_src_pixel) - left_src_pixel;
+            double add = (*details->filter)(details, downscale_factor * ((double)ix - center_src_pixel));
 
             //res->ContribRow[u].Weights[tx] += add;
             res->ContribRow[u].Weights[tx] = add;
