@@ -2,6 +2,7 @@
 
 #include "Stdafx.h"
 #include "ImageResizer.Plugins.FastScaling.h"
+#include "colormatrix.h"
 #include "bitmap_scaler.h"
 
 #pragma managed
@@ -28,7 +29,7 @@ namespace ImageResizer{
 
                     String^ fastScale = query->Get("fastscale");
 					String^ sTrue = "true";
-
+                    
                     
 					if (fastScale != sTrue){
 						return RequestedAction::None;
@@ -109,6 +110,13 @@ namespace ImageResizer{
 					c->Plugins->remove_plugin(this);
 					return true;
 				}
+                void ApplyMatrix(Bitmap ^img, float m[5][5])
+                {
+                    BitmapBgraPtr bb;
+                    WrappedBitmap ^wb = gcnew WrappedBitmap(img, bb);
+                    InternalApplyMatrix(bb, m);
+                    delete wb;
+                }
 			};
 			
 		}

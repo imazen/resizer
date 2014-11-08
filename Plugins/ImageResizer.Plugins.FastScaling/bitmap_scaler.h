@@ -59,6 +59,15 @@ namespace ImageResizer{
                         else
                             ScaleBgra(bbSource->bgra, target.Width, target.Height, bbResult->bgra, details, p);
 
+                        /*float m[5][5] = {
+                            {2, 0, 0, 0, 0},        // red scaling factor of 2 
+                            {0, 1, 0, 0, 0},        // green scaling factor of 1 
+                            {0, 0, 1, 0, 0},        // blue scaling factor of 1 
+                            {0, 0, 0, 1, 0},        // alpha scaling factor of 1 
+                            {.2f, .2f, .2f, 0, 1} };    // three translations of 0.2
+
+                        InternalApplyMatrix(bbResult->bgra, m);*/
+
                         p->Start("BgraDispose", false);
                     }
                     finally{
