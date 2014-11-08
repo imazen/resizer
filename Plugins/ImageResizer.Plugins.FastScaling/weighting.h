@@ -130,7 +130,7 @@ static inline LineContribType *  ContributionsAlloc(unsigned int line_length, un
     res->ContribRow = (ContributionType *)malloc(line_length * sizeof(ContributionType));
 
 
-    float *allWeights = (float *)malloc(windows_size * line_length * sizeof(float));
+    float *allWeights = (float *)calloc(windows_size * line_length, sizeof(float));
 
     for (int i = 0; i < line_length; i++)
         res->ContribRow[i].Weights = allWeights + (i * windows_size);
@@ -152,7 +152,7 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
 {
     const double scale_factor = (double)line_size / (double)src_size;
     const double downscale_factor = MIN(1.0, scale_factor);
-    const double half_source_window = details->window / downscale_factor - TONY;
+    const double half_source_window = details->window / downscale_factor;
 
     const int allocated_window_size = (int)ceil(2 * (half_source_window - TONY)) + 1;
     unsigned int u, ix;
@@ -160,13 +160,16 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
 
     for (u = 0; u < line_size; u++) {
         const double center_src_pixel = ((double)u + 0.5) / scale_factor - 0.5;
-        const int left_src_pixel = MAX(0, (int)ceil(center_src_pixel - half_source_window - TONY));
-        const int right_src_pixel = MIN(MAX((int)floor(center_src_pixel + half_source_window + TONY), left_src_pixel), (int)src_size - 1);
+
+        const int left_edge = (int)ceil(center_src_pixel - half_source_window - 0.5 + TONY);
+        const int right_edge = (int)floor(center_src_pixel + half_source_window + 0.5 - TONY);
+
+        const int left_src_pixel = MAX(0, left_edge);
+        const int right_src_pixel = MIN(right_edge, (int)src_size - 1);
+
         double total_weight = 0.0;
 
         const int source_pixel_count = right_src_pixel - left_src_pixel + 1;
-        // const double restricted_window_scale = (double)source_pixel_count / (2 * (half_source_window - TONY));
-        const double restricted_mapping_scale = MIN(1, MIN(center_src_pixel - left_src_pixel, right_src_pixel - center_src_pixel) / (0.5 / downscale_factor));
 
         if (source_pixel_count > allocated_window_size){
             ContributionsFree(res);
@@ -177,9 +180,13 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
         res->ContribRow[u].Left = left_src_pixel;
         res->ContribRow[u].Right = right_src_pixel;
         
-        for (ix = 0; ix < source_pixel_count; ix++) {
-            total_weight += (res->ContribRow[u].Weights[ix] = 
-                downscale_factor * (*details->filter)(details, restricted_mapping_scale * downscale_factor * (center_src_pixel - (double)(ix + left_src_pixel))));
+        for (ix = left_edge; ix <= right_edge; ix++) {
+            int tx = MIN(MAX(ix, left_src_pixel), right_src_pixel) - left_src_pixel;
+            double add = (*details->filter)(details, 2 * downscale_factor * ((double)ix - center_src_pixel));
+
+            //res->ContribRow[u].Weights[tx] += add;
+            res->ContribRow[u].Weights[tx] = add;
+            total_weight += add;
         }
 
         if (total_weight <= TONY) {
