@@ -79,7 +79,6 @@ namespace ImageResizer.Plugins.AdvancedFilters {
         }
 
         protected void ApplyPreFiltersTo(ref Bitmap b, ImageState s) {
-            string str = null;
             int i = 0;
 
             double units = s.settings.Get<double>("a.radiusunits", 1000);

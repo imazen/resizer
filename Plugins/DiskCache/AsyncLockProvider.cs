@@ -54,7 +54,6 @@ namespace ImageResizer.Plugins.DiskCache {
         /// </summary>
         /// <param name="key"></param>
         /// <param name="success"></param>
-        /// <param name="failure"></param>
         /// <param name="timeoutMs"></param>
         public async Task<bool> TryExecuteAsync(string key, int timeoutMs, AsyncLockCallback success)
         {

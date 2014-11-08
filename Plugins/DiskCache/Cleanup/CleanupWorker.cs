@@ -23,6 +23,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <summary>
         /// Creates and starts a thread that consumes the queue, pausing until notified when 'queue' empties.
         /// </summary>
+        /// <param name="lp"></param>
         /// <param name="cs"></param>
         /// <param name="queue"></param>
         /// <param name="cache"></param>

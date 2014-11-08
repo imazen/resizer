@@ -220,7 +220,6 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="physicalPath"></param>
         /// <param name="relativePath"></param>
         /// <param name="writeCallback"></param>
-        /// <param name="sourceModifiedUtc"></param>
         /// <param name="timeoutMs"></param>
         /// <param name="recheckFS"></param>
         /// <returns></returns>

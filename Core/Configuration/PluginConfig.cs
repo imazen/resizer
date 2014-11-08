@@ -329,7 +329,7 @@ namespace ImageResizer.Configuration {
         /// Returns null on failure. Check GetIssues() for causes.
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="args"></param>
+        /// <param name="pluginConfig"></param>
         /// <returns></returns>
         public IPlugin AddPluginByName(string name, NameValueCollection pluginConfig = null)
         {

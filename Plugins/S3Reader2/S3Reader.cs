@@ -151,7 +151,6 @@ namespace ImageResizer.Plugins.S3Reader2 {
                 else if ( se.StatusCode == System.Net.HttpStatusCode.Forbidden || "AccessDenied".Equals(se.ErrorCode, StringComparison.OrdinalIgnoreCase)) throw new FileNotFoundException("Amazon S3 access denied - file may not exist", se);
                 else throw;
             }
-            return null;
         }
 
         protected string[] AllowedBuckets{get;set;}

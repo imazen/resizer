@@ -158,7 +158,7 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
         }
         private static bool HasToneMappingCommands(ResizeSettings settings) {
             return false; //Tone mapping is disabled, not yet functional
-            return settings.Get<ToneMappingAlgorithm>("fi.tonemap", ToneMappingAlgorithm.None) != ToneMappingAlgorithm.None;
+            //return settings.Get<ToneMappingAlgorithm>("fi.tonemap", ToneMappingAlgorithm.None) != ToneMappingAlgorithm.None;
 
         }
 

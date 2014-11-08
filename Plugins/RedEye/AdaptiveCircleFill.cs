@@ -213,7 +213,7 @@ namespace ImageResizer.Plugins.RedEye {
             
             Point p;
             byte pval;
-            double pdist;
+            //double pdist;
             while (q.Count > 0) {
                 //Dequeue the parent point 
                 p = q.Dequeue();

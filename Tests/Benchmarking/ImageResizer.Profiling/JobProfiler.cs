@@ -15,8 +15,7 @@ namespace Bench
         public JobProfiler() { 
 
         }
-        private string rootNodeName;
-
+        
 
         public override void Start(string segmentName, bool allowRecursion = false)
         {
