@@ -31,9 +31,7 @@ namespace ImageResizer.Plugins.DiskCache {
             this.Task = task;
             this.RelativePath = relativePath;
             this.PhysicalPath = physicalPath;
-           
-            if (Task == null && RelativePath == null) throw new ArgumentNullException("item.RelativePath and Task cannot both be null");
-            if (Task == null && PhysicalPath == null) throw new ArgumentNullException("item.PhysicalPath and Task cannot both be null");
+
 
             if (this.RelativePath.StartsWith("/")) {
                 Debug.WriteLine("Invalid relativePath value - should never have leading slash!");
