@@ -50,3 +50,5 @@ ipch/
 *.tlog
 *.metagen
 *.lastbuildstate
+*.res
+*.pdb
