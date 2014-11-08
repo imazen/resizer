@@ -140,6 +140,42 @@ namespace ImageResizer.Plugins.FastScaling.Tests
             }
         }
 
+        [Fact]
+        public void CompareToGDI()
+        {
+            String source = "..\\..\\..\\..\\Samples\\Images\\rings2.png";
+            int cmp_size = 3;
+
+            var c = new Config();
+            var i1 = new Instructions();
+            new FastScalingPlugin().Install(c);
+
+            i1["width"] = "500";
+            i1["window"] = "0.5";
+            i1["f"] = "0";
+
+            var i2 = new Instructions(i1);
+            i2["fastscale"] = "true";
+            
+            var job1 = new ImageJob(source, typeof(Bitmap), i1);
+            c.Build(job1);
+
+            var job2 = new ImageJob(source, typeof(Bitmap), i2);
+            c.Build(job2);
+
+            Bitmap b1 = (job1.Result as Bitmap);
+            Bitmap b2 = (job2.Result as Bitmap);
+
+            for (int x = 0; x < cmp_size; x++ )
+            for (int y = 0; y < cmp_size; y++ )
+            {
+                Assert.True((b1.GetPixel(x, y) == b2.GetPixel(x, y)),
+                            "Mismatch at px " + x.ToString() + ";" + y.ToString() +
+                            " got " + b2.GetPixel(x, y).ToString() +
+                            " expected " + b1.GetPixel(x, y).ToString());
+            }
+        }
+
 
     }
 }
