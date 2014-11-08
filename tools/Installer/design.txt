@@ -1,7 +1,0 @@
-﻿A MRU list of project/site paths.  If the path doesn't exist, it will be deleted.
-
-
-//Edit .csproj if present. 
-
-//Edit 
-
