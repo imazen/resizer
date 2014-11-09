@@ -184,10 +184,6 @@
       <Project>{8e863afe-b4cf-46aa-8382-0c3547c0ede9}</Project>
       <Name>ImageResizer.Plugins.FreeImage</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\ImageStudio\ImageResizer.Plugins.ImageStudio.csproj">
-      <Project>{987e8b0f-0658-48e8-b323-6399c159bbd5}</Project>
-      <Name>ImageResizer.Plugins.ImageStudio</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Libs\FreeImage\Wrapper\FreeImage.NET\cs\Library\WrapperFreeImage.NET.csproj">
       <Project>{6598a7cd-8f27-4d3f-a675-5ae63113a7c3}</Project>
       <Name>WrapperFreeImage.NET</Name>
