@@ -45,7 +45,7 @@ namespace ImageResizer{
             public ref class BgraScaler
             {
             public:
-                void ScaleBitmap(Bitmap^ source, Bitmap^ dest, Rectangle crop, Rectangle target, const InterpolationDetailsPtr details, IProfiler^ p){
+                void ScaleBitmap(Bitmap^ source, Bitmap^ dest, Rectangle crop, Rectangle target, array<float, 2>^ colorMatrix, const InterpolationDetailsPtr details, IProfiler^ p){
                     WrappedBitmap^ bbSource;
                     WrappedBitmap^ bbResult;
                     try{
@@ -59,14 +59,15 @@ namespace ImageResizer{
                         else
                             ScaleBgra(bbSource->bgra, target.Width, target.Height, bbResult->bgra, details, p);
 
-                        /*float m[5][5] = {
-                            {2, 0, 0, 0, 0},        // red scaling factor of 2 
-                            {0, 1, 0, 0, 0},        // green scaling factor of 1 
-                            {0, 0, 1, 0, 0},        // blue scaling factor of 1 
-                            {0, 0, 0, 1, 0},        // alpha scaling factor of 1 
-                            {.2f, .2f, .2f, 0, 1} };    // three translations of 0.2
-
-                        InternalApplyMatrix(bbResult->bgra, m);*/
+                        p->Start("ApplyMatrix", false);
+                        float *cm[5];
+                        for (int i = 0; i < 5; i++)
+                        {
+                            pin_ptr<float> row = &colorMatrix[i, 0];
+                            cm[i] = row;
+                        }
+                        InternalApplyMatrix(bbResult->bgra, cm);
+                        p->Stop("ApplyMatrix", false, true);
 
                         p->Start("BgraDispose", false);
                     }

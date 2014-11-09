@@ -3,7 +3,7 @@
 #pragma once
 #pragma unmanaged
 
-void InternalApplyMatrix(BitmapBgraPtr b, float m[5][5])
+void InternalApplyMatrix(BitmapBgraPtr b, float *m[5])
 {
     if (b->bpp == 4)
     {

@@ -89,14 +89,14 @@ namespace ImageResizer{
                     details->use_halving = withHalving;
                     details->blur *= blur;
                     details->post_resize_sharpen_percent = (int)sharpen;
-
+                    
 
                     details->use_interpolation_for_percent = min_scaled_weighted > 0 ? min_scaled_weighted :  0.3;
 
                     if (window != 0) details->window = window;
                         
                     BgraScaler ^scaler = gcnew BgraScaler();
-                    scaler->ScaleBitmap(source, dest, Util::PolygonMath::ToRectangle(sourceArea), Util::PolygonMath::ToRectangle(targetBox), details, s->Job->Profiler);
+                    scaler->ScaleBitmap(source, dest, Util::PolygonMath::ToRectangle(sourceArea), Util::PolygonMath::ToRectangle(targetBox), colorMatrix, details, s->Job->Profiler);
                     free(details);
                     return RequestedAction::Cancel;
 					
@@ -110,11 +110,17 @@ namespace ImageResizer{
 					c->Plugins->remove_plugin(this);
 					return true;
 				}
-                void ApplyMatrix(Bitmap ^img, float m[5][5])
+                void ApplyMatrix(Bitmap ^img, array<float, 2>^ colorMatrix)
                 {
                     BitmapBgraPtr bb;
                     WrappedBitmap ^wb = gcnew WrappedBitmap(img, bb);
-                    InternalApplyMatrix(bb, m);
+                    float *cm[5];
+                    for (int i = 0; i < 5; i++)
+                    {
+                        pin_ptr<float> row = &colorMatrix[i, 0];
+                        cm[i] = row;
+                    }
+                    InternalApplyMatrix(bb, cm);
                     delete wb;
                 }
 			};
