@@ -175,10 +175,10 @@ namespace ImageResizer.Resizing {
             return RequestedAction.None;
         }
 
-        protected virtual RequestedAction InternalGraphicsDrawImage(ImageState state, Bitmap dest, Bitmap source, PointF[] targetArea, RectangleF sourceArea, ImageAttributes imageAttributes) {
+        protected virtual RequestedAction InternalGraphicsDrawImage(ImageState state, Bitmap dest, Bitmap source, PointF[] targetArea, RectangleF sourceArea, float[][] colorMatrix) {
             if (exts != null)
                 foreach (AbstractImageProcessor p in exts)
-                    if (p.InternalGraphicsDrawImage(state, dest,source,targetArea,sourceArea,imageAttributes) == RequestedAction.Cancel)
+                    if (p.InternalGraphicsDrawImage(state, dest,source,targetArea,sourceArea,colorMatrix) == RequestedAction.Cancel)
                         return RequestedAction.Cancel;
             return RequestedAction.None;
 

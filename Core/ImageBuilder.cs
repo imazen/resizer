@@ -842,7 +842,6 @@ namespace ImageResizer
 
         protected override RequestedAction CreateImageAttribues(ImageState s) {
             if (base.CreateImageAttribues(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
-            if (s.copyAttibutes == null) s.copyAttibutes = new ImageAttributes();
             return RequestedAction.None;
         }
 
@@ -856,22 +855,28 @@ namespace ImageResizer
                 s.destGraphics.InterpolationMode = s.settings.Get<InterpolationMode>("gdi.filter", s.destGraphics.InterpolationMode);
             }
 
-            s.copyAttibutes.SetWrapMode(WrapMode.TileFlipXY);
             if (s.preRenderBitmap != null) {
                 using (Bitmap b = s.preRenderBitmap) { //Dispose the intermediate bitmap aggressively
                     this.InternalGraphicsDrawImage(s, s.destBitmap, s.preRenderBitmap, PolygonMath.getParallelogram(s.layout["image"]), 
-                        s.copyRect, s.copyAttibutes);
+                        s.copyRect, s.colorMatrix);
                 }
             } else { 
-                this.InternalGraphicsDrawImage(s,s.destBitmap,s.sourceBitmap, PolygonMath.getParallelogram(s.layout["image"]), s.copyRect,  s.copyAttibutes);
+                this.InternalGraphicsDrawImage(s,s.destBitmap,s.sourceBitmap, PolygonMath.getParallelogram(s.layout["image"]), s.copyRect,  s.colorMatrix);
             }
             return RequestedAction.None;
         }
 
-        protected override RequestedAction InternalGraphicsDrawImage(ImageState state, Bitmap dest, Bitmap source, PointF[] targetArea, RectangleF sourceArea, ImageAttributes imageAttributes)
+        protected override RequestedAction InternalGraphicsDrawImage(ImageState state, Bitmap dest, Bitmap source, PointF[] targetArea, RectangleF sourceArea, float[][] colorMatrix)
         {
-            if (base.InternalGraphicsDrawImage(state, dest, source, targetArea, sourceArea, imageAttributes) == RequestedAction.Cancel) return RequestedAction.Cancel;
-            state.destGraphics.DrawImage(source, targetArea, sourceArea, GraphicsUnit.Pixel, imageAttributes);
+            if (base.InternalGraphicsDrawImage(state, dest, source, targetArea, sourceArea, colorMatrix) == RequestedAction.Cancel) return RequestedAction.Cancel;
+            using (var ia = new ImageAttributes())
+            {
+                ia.SetWrapMode(WrapMode.TileFlipXY);
+            
+                if (colorMatrix != null) ia.SetColorMatrix(new ColorMatrix(colorMatrix));
+                state.destGraphics.DrawImage(source, targetArea, sourceArea, GraphicsUnit.Pixel, ia);
+            
+            }
             return RequestedAction.Cancel;
         }
         protected override RequestedAction RenderBorder(ImageState s) {

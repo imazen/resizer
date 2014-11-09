@@ -172,7 +172,7 @@ namespace ImageResizer.Resizing {
             {
                 return ImageColorFormat.Grayscale;
             }
-
+            
             // Default to RGB
             return ImageColorFormat.Rgb;
         }
@@ -189,7 +189,8 @@ namespace ImageResizer.Resizing {
         /// <summary>
         /// Allows color correction/modification during the image copy.
         /// </summary>
-        public ImageAttributes copyAttibutes;
+        public float[][] colorMatrix;
+
 
         private Dictionary<string, object> data = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
         /// <summary>
@@ -222,11 +223,8 @@ namespace ImageResizer.Resizing {
                     try {
                         if (destBitmap != null) destBitmap.Dispose();
                     } finally {
-                        try {
-                            if (copyAttibutes != null) copyAttibutes.Dispose();
-                        } finally {
-                            if (preRenderBitmap != null) preRenderBitmap.Dispose();
-                        }
+                        if (preRenderBitmap != null) preRenderBitmap.Dispose();
+                        
                     }
                 }
 

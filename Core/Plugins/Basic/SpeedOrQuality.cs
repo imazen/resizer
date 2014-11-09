@@ -6,18 +6,23 @@ using System.Drawing.Drawing2D;
 using ImageResizer.Util;
 using System.Drawing;
 using System.Globalization;
+using System.Drawing.Imaging;
 
 namespace ImageResizer.Plugins.Basic {
     public class SpeedOrQuality:BuilderExtension, IPlugin {
 
         public SpeedOrQuality() { }
 
+        Configuration.Config c;
+
         public IPlugin Install(Configuration.Config c) {
+            this.c = c;
             c.Plugins.add_plugin(this);
             return this;
         }
 
         public bool Uninstall(Configuration.Config c) {
+            this.c = c;
             c.Plugins.remove_plugin(this);
             return true;
         }
@@ -45,10 +50,13 @@ namespace ImageResizer.Plugins.Basic {
             s.destGraphics.PixelOffsetMode = PixelOffsetMode.HighSpeed;
             s.destGraphics.SmoothingMode = SmoothingMode.HighSpeed;
 
-            s.copyAttibutes.SetWrapMode(WrapMode.TileFlipXY);
-
             if (speed < 3) {
-                s.destGraphics.DrawImage(s.sourceBitmap, PolygonMath.getParallelogram(s.layout["image"]), s.copyRect, GraphicsUnit.Pixel, s.copyAttibutes);
+                using (var ia = new ImageAttributes())
+                {
+                    ia.SetWrapMode(WrapMode.TileFlipXY);
+                    if (s.colorMatrix != null) ia.SetColorMatrix(new ColorMatrix(s.colorMatrix));
+                    s.destGraphics.DrawImage(s.sourceBitmap, PolygonMath.getParallelogram(s.layout["image"]), s.copyRect, GraphicsUnit.Pixel, ia);
+                }
                 
             } else if (speed < 4) {
                 Rectangle midsize = PolygonMath.ToRectangle(PolygonMath.GetBoundingBox(s.layout["image"]));
@@ -62,7 +70,12 @@ namespace ImageResizer.Plugins.Basic {
                                                         (float)(s.copyRect.Height * yfactor));
                     if (Math.Floor(copyPart.Height) == thumb.Height || Math.Ceiling(copyPart.Height) == thumb.Height) copyPart.Height = thumb.Height;
                     if (Math.Floor(copyPart.Width) == thumb.Width || Math.Ceiling(copyPart.Width) == thumb.Width) copyPart.Width = thumb.Width;
-                    s.destGraphics.DrawImage(thumb, PolygonMath.getParallelogram(s.layout["image"]), copyPart, GraphicsUnit.Pixel, s.copyAttibutes);
+                    using (var ia = new ImageAttributes())
+                    {
+                        ia.SetWrapMode(WrapMode.TileFlipXY);
+                        if (s.colorMatrix != null) ia.SetColorMatrix(new ColorMatrix(s.colorMatrix));
+                        s.destGraphics.DrawImage(thumb, PolygonMath.getParallelogram(s.layout["image"]), copyPart, GraphicsUnit.Pixel, ia);
+                    }
                 }
             } else {
                 RectangleF box = PolygonMath.GetBoundingBox(PolygonMath.getParallelogram(s.layout["image"]));
