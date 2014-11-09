@@ -73,9 +73,7 @@ namespace ImageResizer.Plugins.FreeImageScaling {
             FREE_IMAGE_FILTER filter = ParseResizeAlgorithm(sf, FREE_IMAGE_FILTER.FILTER_CATMULLROM, out validAlg);
             if (!validAlg) throw new ImageProcessingException("The specified resizing filter '" + sf + "' did not match bicubic, bilinear, box, bspline, catmullrom, or lanczos.");
 
-            //Set copy attributes
-            s.copyAttibutes.SetWrapMode(WrapMode.TileFlipXY);
-
+            
 
             //The minimum dimensions of the temporary bitmap.
             SizeF targetSize = PolygonMath.getParallelogramSize(s.layout["image"]);

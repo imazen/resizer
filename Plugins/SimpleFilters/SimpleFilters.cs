@@ -101,8 +101,7 @@ namespace ImageResizer.Plugins.SimpleFilters {
         }
 
         protected override RequestedAction PostCreateImageAttributes(ImageState s) {
-            if (s.copyAttibutes == null) return RequestedAction.None;
-
+            
             if (!s.settings.WasOneSpecified((string[])GetSupportedQuerystringKeys())) return RequestedAction.None;
 
             List<float[][]> filters = new List<float[][]>();
@@ -152,7 +151,7 @@ namespace ImageResizer.Plugins.SimpleFilters {
 
 
             if (filters.Count == 0) return RequestedAction.None;
-            if (filters.Count == 1) s.copyAttibutes.SetColorMatrix(new ColorMatrix(filters[0]));
+            if (filters.Count == 1) s.colorMatrix = filters[0];
             else {
                 //Multiple all the filters
                 float[][] first = filters[0];
@@ -160,7 +159,7 @@ namespace ImageResizer.Plugins.SimpleFilters {
                 for (int i = 1; i < filters.Count; i++) {
                     first = Multiply(first, filters[i]);
                 }
-                s.copyAttibutes.SetColorMatrix(new ColorMatrix(first));
+                s.colorMatrix = first;
 
             }
 
