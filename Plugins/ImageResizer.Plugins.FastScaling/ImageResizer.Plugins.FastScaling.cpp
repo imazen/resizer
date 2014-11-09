@@ -23,7 +23,7 @@ namespace ImageResizer{
 			public ref class FastScalingPlugin : public ImageResizer::Resizing::BuilderExtension, IPlugin
 			{
 			protected:
-				virtual RequestedAction InternalGraphicsDrawImage(ImageState^ s, Bitmap^ dest, Bitmap^ source, array<PointF>^ targetArea, RectangleF sourceArea, ImageAttributes^ imageAttributes) override{
+                 virtual RequestedAction InternalGraphicsDrawImage(ImageState^ s, Bitmap^ dest, Bitmap^ source, array<PointF>^ targetArea, RectangleF sourceArea, array<float, 2>^ colorMatrix) override{
                     
                     NameValueCollection ^query = s->settingsAsCollection();
 
