@@ -16,6 +16,7 @@ using ImageResizer.Resizing;
 using System.Collections.Specialized;
 using System.Threading;
 using Imazen.Profiling;
+using System.Reflection;
 
 namespace Bench
 {
@@ -27,6 +28,8 @@ namespace Bench
         public static int ConsoleWidth = 200;
         static void Main(string[] args)
         {
+            SearchNearbyForPlugins(); 
+
             Config c = new Config();
 
             Console.WindowWidth = ConsoleWidth;
@@ -67,7 +70,33 @@ namespace Bench
             return r;
         }
 
+        public static void SearchNearbyForPlugins()
+        {
+            
+            var searchFolders = 
+               new []{Assembly.GetExecutingAssembly().Location, 
+                Assembly.GetAssembly(typeof(ImageResizer.ImageJob)).Location}
+                .SelectMany(s => new []{Path.GetDirectoryName(s), Path.GetDirectoryName(Path.GetDirectoryName(s))})
+                .SelectMany(s =>
+                    new []{ Path.Combine(s, Environment.Is64BitProcess ? "x64" : "x86"),
+                        Path.Combine(s, Environment.Is64BitProcess ? "x64" : "Win32"),
+                        s}
+                ).Distinct().Where(s => Directory.Exists(s)).ToArray();
+            
+            
+            AppDomain.CurrentDomain.AssemblyResolve += delegate(object sender, ResolveEventArgs args)
+            { 
+                var dllName = new AssemblyName(args.Name).Name + ".dll";
+                var searchLocations = searchFolders.Select(dir => Path.Combine(dir, dllName));
+                var existsAt = searchLocations.Where(p => File.Exists(p)).ToArray();
+                if (existsAt.Length < 1)
+                {
+                    throw new FileNotFoundException(dllName);
+                }
+                return Assembly.LoadFrom(existsAt.First());
 
+            };
+        }
 
    
 
