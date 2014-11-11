@@ -162,5 +162,7 @@ namespace ImageResizer.Configuration {
         NameValueCollection ModifiedQueryString { get; set; }
 
         bool IsAppDomainUnrestricted();
+
+        string DropQuerystringKeys { get; set; }
     }
 }
