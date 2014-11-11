@@ -60,7 +60,7 @@
       <Project>{fa5ef673-a6a4-498d-aa24-c025cc5267af}</Project>
       <Name>ImageResizer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\ImageResizer.Plugins.FastScaling\ImageResizer.Plugins.FastScaling.vcxproj">
+    <ProjectReference Include="..\..\Plugins\FastScaling\ImageResizer.Plugins.FastScaling.vcxproj">
       <Project>{9b97d952-2969-4f46-9758-9e712cdf3f72}</Project>
       <Name>ImageResizer.Plugins.FastScaling</Name>
     </ProjectReference>
