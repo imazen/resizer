@@ -223,7 +223,21 @@ namespace ImageResizer.Configuration {
             get {
                 if (HttpContext.Current == null) return null;
                 if (HttpContext.Current.Items[ModifiedQueryStringKey] == null)
-                    HttpContext.Current.Items[ModifiedQueryStringKey] = new NameValueCollection(HttpContext.Current.Request.QueryString);
+                {
+                    NameValueCollection qs = new NameValueCollection(HttpContext.Current.Request.QueryString);
+
+                    //see if we have query string parameters that we want to have ignored, e.g. cachebusters
+                    string dropQuerystringKeys = this.DropQuerystringKeys;
+                    if (!string.IsNullOrEmpty(dropQuerystringKeys))
+                    {
+                        foreach (string dropQuerystringKey in dropQuerystringKeys.Split(','))
+                        {
+                            qs.Remove(dropQuerystringKey);
+                        }
+                    }
+
+                    HttpContext.Current.Items[ModifiedQueryStringKey] = qs;
+                }
 
                 return (NameValueCollection)HttpContext.Current.Items[ModifiedQueryStringKey];
             }
@@ -597,6 +611,27 @@ namespace ImageResizer.Configuration {
             }
 
             return defaultCache;
+        }
+
+        private string _dropQuerystringKeys = null;
+
+        /// <summary>
+        /// If specified, DropQuerystringKeys will cause certain query string parameters to be excluded from processing.
+        /// </summary>
+        public string DropQuerystringKeys
+        {
+            get
+            {
+                if (_dropQuerystringKeys == null)
+                {
+                    _dropQuerystringKeys = c.get("pipeline.dropQuerystringKeys", "");
+                }
+                return _dropQuerystringKeys;
+            }
+            set
+            {
+                _dropQuerystringKeys = value;
+            }
         }
     }
 }
