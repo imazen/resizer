@@ -82,6 +82,16 @@ namespace ImageResizer {
                 //Copy the querystring so we can mod it to death without messing up other stuff.
                 NameValueCollection q = conf.ModifiedQueryString;
 
+                //see if we have query string parameters that we want to have ignored, e.g. cachebusters
+                string ignoredQueryStringParameters = Config.Current.get("ignoredquerystringparameters.parameternames", "");
+                if(!string.IsNullOrEmpty(ignoredQueryStringParameters))
+                {
+                    foreach(string ignoredQueryStringParameter in ignoredQueryStringParameters.Split(','))
+                    {
+                        q.Remove(ignoredQueryStringParameter);
+                    }
+                }
+
                 //Call URL rewriting events
                 UrlEventArgs ue = new UrlEventArgs(filePath, q);
                 conf.FireRewritingEvents(this, app.Context,ue);
