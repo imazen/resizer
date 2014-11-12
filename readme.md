@@ -2,6 +2,8 @@
 
 develop branch: [![Build status](https://ci.appveyor.com/api/projects/status/77a52n4hd0y36ybs/branch/develop?svg=true)](https://ci.appveyor.com/project/imazen/resizer/branch/develop) develop-must-rebase branch: [![Build status](https://ci.appveyor.com/api/projects/status/77a52n4hd0y36ybs/branch/develop-must-rebase?svg=true)](https://ci.appveyor.com/project/imazen/resizer/branch/develop-must-rebase)
 
+We use submodules - clone with `git clone -b develop --recursive https://github.com/imazen/resizer` or run `git submodule update --init --recursive` afterwards.
+
 [Visit our home page for details and documentation](http://imageresizing.net). 
 
 What is it?
