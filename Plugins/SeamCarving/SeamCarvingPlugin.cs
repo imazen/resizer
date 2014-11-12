@@ -8,6 +8,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using ImageResizer.ExtensionMethods;
+using System.Collections.Specialized;
 
 namespace ImageResizer.Plugins.SeamCarving {
     /// <summary>
@@ -20,8 +21,16 @@ namespace ImageResizer.Plugins.SeamCarving {
         /// Creates a new instance of SeamCarvingPlugin
         /// </summary>
         public SeamCarvingPlugin() {
-
+            Timeout = 5000;
         }
+
+        public SeamCarvingPlugin(NameValueCollection args):this()
+        {
+            Timeout = args.Get<int>("timeout", Timeout);
+        }
+
+        public int Timeout { get; set; }
+
         public enum FilterType {
             None = 10,
             Prewitt = 0,
@@ -178,7 +187,7 @@ namespace ImageResizer.Plugins.SeamCarving {
                         job.DestPath = outputTempFile;
                         job.Size = intTargetSize;
                         job.Filter = ftype;
-                        job.Timeout = 5000;
+                        job.Timeout = Timeout;
                         cair.CairyIt(job);
                     } finally {
                         if (maskFile != null) File.Delete(maskFile);
