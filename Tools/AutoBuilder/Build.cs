@@ -62,26 +62,25 @@ namespace ImageResizer.ReleaseBuilder {
 
         [STAThread]
         public void Run() {
-            MakeConsoleNicer();
-            //PrepareForPackaging();
-            //using (RestorePoint rp = new RestorePoint(q.files(new Pattern("^/Samples/*/*.(cs|vb)proj$")))) {
-
-            //    //Replace all project references temporarily
-            //    foreach (string pf in q.files(new Pattern("^/Samples/[^/]+/*.(cs|vb)proj$"))) {
-            //        new ProjectFileEditor(pf).ReplaceAllProjectReferencesWithDllReferences("..\\..\\dlls\\release");
-            //    }
-
-            //}
-
             say("Project root: " + f.ParentPath);
             nl();
             //The base name for creating zip packags.
             string packageBase = v.get("PackageName"); //    // [assembly: PackageName("Resizer")]
 
-
+            // Load env vars
             nuget.apiKey = Environment.GetEnvironmentVariable("ab_nugetkey");
             string s3ID = Environment.GetEnvironmentVariable("ab_s3id");
             string s3Key = Environment.GetEnvironmentVariable("ab_s3key");
+            string ab_s3bucket = Environment.GetEnvironmentVariable("ab_s3bucket");
+
+            if (ab_s3bucket != null)
+                bucketName = ab_s3bucket;
+
+            string ab_version = Environment.GetEnvironmentVariable("ab_version");
+            string ab_hotfix = Environment.GetEnvironmentVariable("ab_hotfix");
+            string ab_downloadserver = Environment.GetEnvironmentVariable("ab_downloadserver");
+            string ab_nugetserver = Environment.GetEnvironmentVariable("ab_nugetserver");
+
 
             if(s3ID == null || s3Key == null || nuget.apiKey == null)
             {
@@ -97,7 +96,6 @@ namespace ImageResizer.ReleaseBuilder {
 
 
             // if set, replace assemnly version info
-            string ab_version = Environment.GetEnvironmentVariable("ab_version");
             if (ab_version != null)
             {
                 fileVer = ab_version;
@@ -113,30 +111,23 @@ namespace ImageResizer.ReleaseBuilder {
 
             
             // if set, assume hotfix
-            string ab_hotfix = Environment.GetEnvironmentVariable("ab_hotfix");
             bool isHotfix = (ab_hotfix != null);
             string packageHotfix = isHotfix ? ("-hotfix-" + DateTime.Now.ToString("htt").ToLower()) : "";
 
 
             //Get the download server from env or SharedAssemblyInfo.cs
             string downloadServer = v.get("DownloadServer");
-            string ab_downloadserver = Environment.GetEnvironmentVariable("ab_downloadserver");
-
             if (ab_downloadserver != null) downloadServer = ab_downloadserver;
             else if (downloadServer == null) downloadServer = "http://downloads.imageresizing.net/";
 
 
-            // For each package, specify options: choose 'c' (create and/or overwrite), 'u' (upload), 'p' (make private). 
-            // use cu mode for all for autobuild
-            
-            bool isBuilding = false;
+
             StringBuilder downloadPaths = new StringBuilder();
             foreach (PackageDescriptor desc in packages) {
                 desc.Path = getReleasePath(packageBase, infoVer, desc.Kind, packageHotfix);
                 string opts = "cu";
                 
                 desc.Options = opts;
-                if (desc.Build) isBuilding = true;
                 if (desc.Upload) {
                     downloadPaths.AppendLine(downloadServer + Path.GetFileName(desc.Path));
                 }
@@ -169,9 +160,10 @@ namespace ImageResizer.ReleaseBuilder {
 
 
 
-            string selection = "cu";
+           
 
             //Set the default for every package
+            string selection = "cu";
             foreach (NPackageDescriptor desc in npackages) desc.Options = selection;
             isMakingNugetPackage = npackages.Any(desc => desc.Build);
 
@@ -182,67 +174,56 @@ namespace ImageResizer.ReleaseBuilder {
             s3 = new TransferUtility(s3client);
 
 
-            if (isBuilding) {
 
-                //1 (moved execution to 8a)
-                bool cleanAll = true;
+            //1 (moved execution to 8a)
+            bool cleanAll = true;
 
-                //2 - Set version numbers (with *, if missing)
-                string originalContents = v.Contents; //Save for checking changes.
-                v.set("AssemblyFileVersion", v.join(fileVer, "*"));
-                v.set("AssemblyVersion", v.join(assemblyVer, "*"));
-                v.set("AssemblyInformationalVersion", infoVer);
-                v.set("NugetVersion", nugetVer);
-                v.set("Commit", "git-commit-guid-here");
-                v.Save();
-                //Save contents for reverting later
-                string fileContents = v.Contents;
+            //2 - Set version numbers (with *, if missing)
+            string originalContents = v.Contents; //Save for checking changes.
+            v.set("AssemblyFileVersion", v.join(fileVer, "*"));
+            v.set("AssemblyVersion", v.join(assemblyVer, "*"));
+            v.set("AssemblyInformationalVersion", infoVer);
+            v.set("NugetVersion", nugetVer);
+            v.set("Commit", "git-commit-guid-here");
+            v.Save();
+            //Save contents for reverting later
+            string fileContents = v.Contents;
 
                 
-                //Generate hard revision number for building (so all dlls use the same number)
-                short revision = (short)(DateTime.UtcNow.TimeOfDay.Milliseconds % short.MaxValue); //the part under 32767. Can actually go up to, 65534, but what's the point.
-                string exactVersion = v.join(fileVer, revision.ToString());
-                string fullInfoVer = infoVer + (isHotfix ? ("-temp-hotfix-" + DateTime.Now.ToString("MMM-d-yyyy-htt").ToLower()) : "");
-                string tag = "resizer" + v.join(infoVer, revision.ToString()) + (isHotfix ? "-hotfix": "");
+            //Generate hard revision number for building (so all dlls use the same number)
+            short revision = (short)(DateTime.UtcNow.TimeOfDay.Milliseconds % short.MaxValue); //the part under 32767. Can actually go up to, 65534, but what's the point.
+            string exactVersion = v.join(fileVer, revision.ToString());
+            string fullInfoVer = infoVer + (isHotfix ? ("-temp-hotfix-" + DateTime.Now.ToString("MMM-d-yyyy-htt").ToLower()) : "");
+            string tag = "resizer" + v.join(infoVer, revision.ToString()) + (isHotfix ? "-hotfix": "");
 
-
-                //if (ask("Tag HEAD with '" + tag + "'?"))
-                //    g.Tag(tag);
-
-                //[assembly: Commit("git-commit-guid-here")]
-                //4 - Embed git commit value
-                //string gitCommit = g.CanExecute ? g.GetHeadHash() : "git-could-not-run-during-build";
-                //v.set("Commit", gitCommit);
-
-                //4b - change to hard version number for building
+            //4b - change to hard version number for building
                 
-                v.set("AssemblyFileVersion", exactVersion);
-                v.set("AssemblyVersion", exactVersion);
-                //Add hotfix suffix for hotfixes
-                v.set("AssemblyInformationalVersion", fullInfoVer);
-                v.Save();
+            v.set("AssemblyFileVersion", exactVersion);
+            v.set("AssemblyVersion", exactVersion);
+            //Add hotfix suffix for hotfixes
+            v.set("AssemblyInformationalVersion", fullInfoVer);
+            v.Save();
 
 
-                //Prepare searchersq
-                PrepareForPackaging();
+            //Prepare searchersq
+            PrepareForPackaging();
 
-                bool success = false;
-                //Allows use to temporarily edit all the sample project files
-                using (RestorePoint rp = new RestorePoint(q.files(new Pattern("^/Plugins/*/*.(cs|vb)proj$"), new Pattern("^/Contrib/*/*.(cs|vb)proj$")))) {
+            bool success = false;
+            //Allows use to temporarily edit all the sample project files
+            using (RestorePoint rp = new RestorePoint(q.files(new Pattern("^/Plugins/*/*.(cs|vb)proj$"), new Pattern("^/Contrib/*/*.(cs|vb)proj$")))) {
 
-                    //Replace all project references temporarily
-                    foreach (string pf in rp.Paths) {
-                        new ProjectFileEditor(pf).RemoveStrongNameRefs();
-                    }
-
-                    //8a Clean projects if specified
-                    if (cleanAll) {
-                        CleanAll();
-                    }
-
-                    //6 - if (c) was specified for any package, build all.
-                    success = BuildAll(true); //isMakingNugetPackage);
+                //Replace all project references temporarily
+                foreach (string pf in rp.Paths) {
+                    new ProjectFileEditor(pf).RemoveStrongNameRefs();
                 }
+
+                //8a Clean projects if specified
+                if (cleanAll) {
+                    CleanAll();
+                }
+
+                //6 - if (c) was specified for any package, build all.
+                success = BuildAll(true); //isMakingNugetPackage);
 
                 //7 - Revert file to state at commit (remove 'full' version numbers and 'commit' value)
                 v.Contents = fileContents;
@@ -253,32 +234,31 @@ namespace ImageResizer.ReleaseBuilder {
 
                 //8b - run cleanup routine
                 RemoveUselessFiles();
+            }
 
+            //Allows use to temporarily edit all the sample project files
+            using (RestorePoint rp = new RestorePoint(q.files(new Pattern("^/Samples/*/*.(cs|vb)proj$")))) {
 
-                //Allows use to temporarily edit all the sample project files
-                using (RestorePoint rp = new RestorePoint(q.files(new Pattern("^/Samples/*/*.(cs|vb)proj$")))) {
-
-                    //Replace all project references temporarily
-                    foreach (string pf in q.files(new Pattern("^/Samples/[^/]+/*.(cs|vb)proj$"))) {
-                        new ProjectFileEditor(pf).ReplaceAllProjectReferencesWithDllReferences("..\\..\\dlls\\release").RemoveStrongNameRefs();
-                    }
-
-
-                    //9 - Pacakge all selected zip configurations
-                    foreach (PackageDescriptor pd in packages) {
-                        if (pd.Skip || !pd.Build) continue;
-                        if (pd.Exists && pd.Build) {
-                            File.Delete(pd.Path);
-                            say("Deleted " + pd.Path);
-                        }
-                        pd.Builder(pd);
-                        //Copy to a 'tozip' version for e-mailing
-                        //File.Copy(pd.Path, pd.Path.Replace(".zip", ".tozip"), true);
-                    }
+                //Replace all project references temporarily
+                foreach (string pf in q.files(new Pattern("^/Samples/[^/]+/*.(cs|vb)proj$"))) {
+                    new ProjectFileEditor(pf).ReplaceAllProjectReferencesWithDllReferences("..\\..\\dlls\\release").RemoveStrongNameRefs();
                 }
 
 
-            } 
+                //9 - Pacakge all selected zip configurations
+                foreach (PackageDescriptor pd in packages) {
+                    if (pd.Skip || !pd.Build) continue;
+                    if (pd.Exists && pd.Build) {
+                        File.Delete(pd.Path);
+                        say("Deleted " + pd.Path);
+                    }
+                    pd.Builder(pd);
+                    //Copy to a 'tozip' version for e-mailing
+                    //File.Copy(pd.Path, pd.Path.Replace(".zip", ".tozip"), true);
+                }
+            }
+
+
 
 
             //10 - Pacakge all nuget configurations
@@ -310,8 +290,8 @@ namespace ImageResizer.ReleaseBuilder {
                     do {
                         //Upload
                         try {
-                            
                             s3.Upload(request);
+                            retry = -1;
                         } catch (Exception ex) {
                             retry--;
                         }
@@ -325,7 +305,7 @@ namespace ImageResizer.ReleaseBuilder {
             //2 - Upload all nuget configurations
             foreach (NPackageDescriptor pd in npackages) {
                 if (pd.Skip || !pd.Upload) continue;
-                nuget.Push(pd, Environment.GetEnvironmentVariable("ab_nugetserver"));
+                nuget.Push(pd, ab_nugetserver);
 
             }
 
