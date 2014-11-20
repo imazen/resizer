@@ -25,9 +25,6 @@ namespace ImageResizer.ReleaseBuilder {
             v = new VersionEditor(Path.Combine(f.FolderPath, "SharedAssemblyInfo.cs"));
             g = new GitManager(f.ParentPath);
             nuget = new NugetManager(Path.Combine(f.ParentPath, "nuget"));
-            
-            
-            //TODO: nuget and s3 API key need to go.
 
 
             packages.Add(new PackageDescriptor("min", PackMin));
@@ -80,6 +77,18 @@ namespace ImageResizer.ReleaseBuilder {
             nl();
             //The base name for creating zip packags.
             string packageBase = v.get("PackageName"); //    // [assembly: PackageName("Resizer")]
+
+
+            nuget.apiKey = Environment.GetEnvironmentVariable("ab_nugetkey");
+            string s3ID = Environment.GetEnvironmentVariable("ab_s3id");
+            string s3Key = Environment.GetEnvironmentVariable("ab_s3key");
+
+            if(s3ID == null || s3Key == null || nuget.apiKey == null)
+            {
+                say("Env vars ab_s3id, ab_s3key and ab_nugetkey must be specified.");
+                return;
+            }
+
 
             string fileVer = v.get("AssemblyFileVersion").TrimEnd('.', '*');
             string assemblyVer = v.get("AssemblyVersion").TrimEnd('.', '*');
@@ -165,10 +174,6 @@ namespace ImageResizer.ReleaseBuilder {
             //Set the default for every package
             foreach (NPackageDescriptor desc in npackages) desc.Options = selection;
             isMakingNugetPackage = npackages.Any(desc => desc.Build);
-
-            //nuget.apiKey = cs.Get("NugetKey",null);
-            string s3ID = Environment.GetEnvironmentVariable("ab_s3id");
-            string s3Key = Environment.GetEnvironmentVariable("ab_s3key");
 
             var s3config = new Amazon.S3.AmazonS3Config();
             s3config.Timeout = TimeSpan.FromHours(12);
@@ -301,17 +306,16 @@ namespace ImageResizer.ReleaseBuilder {
 
 
                     say("Uploading " + Path.GetFileName(pd.Path) + " to " + bucketName + " with CannedAcl:" + request.CannedACL.ToString());
-                    bool retry = false;
+                    int retry = 3;
                     do {
                         //Upload
                         try {
                             
                             s3.Upload(request);
                         } catch (Exception ex) {
-                            say("Upload failed: " + ex.Message);
-                            retry = ask("Retry upload?");
+                            retry--;
                         }
-                    } while (retry);
+                    } while (retry >= 0);
 
                     say("Finished uploading " + Path.GetFileName(pd.Path));
                 } 
@@ -321,7 +325,7 @@ namespace ImageResizer.ReleaseBuilder {
             //2 - Upload all nuget configurations
             foreach (NPackageDescriptor pd in npackages) {
                 if (pd.Skip || !pd.Upload) continue;
-                nuget.Push(pd);
+                nuget.Push(pd, Environment.GetEnvironmentVariable("ab_nugetserver"));
 
             }
 
