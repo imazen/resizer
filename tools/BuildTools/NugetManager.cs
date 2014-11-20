@@ -36,7 +36,7 @@ namespace BuildTools {
 
         public void Push(NPackageDescriptor desc, string dest=null) {
             string extra = (dest != null) ? " -s " + dest : "";
-            if (desc.SpecPath != null) exec("push \"" + desc.PackagePath + "\"" + " " + apiKey ?? "" + extra);
+            if (desc.SpecPath != null) exec("push \"" + desc.PackagePath + "\"" + " " + (apiKey ?? "") + extra);
             //We don't push the symbols, those are pushed automatically.
             //if (desc.SymbolSpecPath != null)exec("push \"" + desc.SymbolPackagePath + "\"");
         }
