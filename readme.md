@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/imazen/resizer.png?label=ready&title=Ready)](https://waffle.io/imazen/resizer)
 # ImageResizer - Much more than image resizing
 
 [Visit our home page for details and documentation](http://imageresizing.net).
