@@ -1,25 +1,23 @@
 
-# Reporting issues
+## Reporting issues
 
-The GitHub issue list is strictly for reporting bugs. 
-
-Bug reports should clearly explain the issue, describe the difference between expected and actual behavior, and provide steps to reproduce in an empty project. Including a [Gist](https://gist.github.com/) of `/resizer.debug` is also recommended.
+The GitHub issue list is strictly for reporting bugs.  Bug reports should clearly explain the issue, describe the difference between expected and actual behavior, and provide steps to reproduce in an empty project. Including a [Gist](https://gist.github.com/) of `/resizer.debug` is also recommended.
 
 [Follow this guide if you need support](http://imageresizing.net/support). Most embarrassing mistakes can be avoided by visiting ImageResizer’s self-diagnostics page at `/resizer.debug.ashx`. If you get a 404 for that URL, you’ve messed up Web.config somehow.
 
 [StackOverflow has over 260 questions tagged [imageresizer]](http://stackoverflow.com/questions/tagged/imageresizer), so that’s a good place to search if the [FAQ](http://imageresizing.net/docs/faq) or [Troubleshooting guide](http://imageresizing.net/docs/troubleshoot) didn’t help.
 
-# Discussing enhancements
+## Discussing enhancements
 
 All new code comes with long-term maintenance cost. We use [UserVoice](http://resizer.uservoice.com/forums/108373-image-resizer), support interactions, and surveys to get a better picture of which expensive features are most wanted. Deleting code to add functionality is always best ;)
 
 ImageResizer’s API allows you to create your own plugins; this is typically the best way to extend functionality, and is nearly always the path we take when adding features.
 
-If you’re interested in having (non-trivial) code added to the official repository, you should probably discuss your plan with us on [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/imazen/resizer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge).
+If you’re interested in having (non-trivial) code added to the official repository, you should probably discuss your plan with us on [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/imazen/resizer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge).
 
 Even if they belong in a separate repository, [you should let us know about any plugins you build so we can link to them on the Community page](http://imageresizing.net/docs/community).
 
-# Contributing code
+## Contributing code
 
 All development [happens on the official GitHub repository](https://github.com/imazen/resizer).
 
@@ -34,7 +32,7 @@ Pull requests should be made against the ‘develop’ branch. We accept nearly 
 Providing good xUnit tests (and reading this document) typically results in immediate acceptance of your pull request. 
 
 
-## Contributing code - legally
+### Contributing code - legally
 
 Since we use the Apache license, you will need to release your commits under the corresponding Contributor Agreement. Small commits can simply include this statement: 
 
@@ -126,7 +124,7 @@ Unless you’re creating an emergency hotfix for a production server, pull reque
 
     Describe the problem the commit solves. Justify why you chose
     the particular solution. Reference the issue number if not
-    addressed in the title.```
+    addressed in the title.  ```
 * Compile successfully.
 * Never contain binaries or images, these will grind the repository to a halt. Think carefully about adding any file > 20KiB. 
 
@@ -134,12 +132,12 @@ Unless you’re creating an emergency hotfix for a production server, pull reque
 ## Tagging commit messages
 
 * Prefix your commit messages with the name of the affected area. This allows easy visual scanning for changes related to a given area of functionality.
-* * Core: Add pipeline.fakeExtensions setting
-* * SimpleFilters: Add black and white filter
-* * Builder: Add nuget upload support
-* * Docs: Add CONTRIBUTING.md draft
+    * Core: Add pipeline.fakeExtensions setting
+    * SimpleFilters: Add black and white filter
+    * Builder: Add nuget upload support
+    * Docs: Add CONTRIBUTING.md draft
 * Fixing a bug in a published version - always reference the GitHub issue number. Consistency is very important, and allows us to create accurate release notes.
-* * Core Bugfix: Prevent NullReferenceException... Fixes #63
+    * Core Bugfix: Prevent NullReferenceException... Fixes #63
 * Fixing a bug that was never released - use phrasing “Fix recent bug”
-* * Core: Fix recent bug ...
+    * Core: Fix recent bug ...
 
