@@ -1,7 +1,9 @@
-[![Stories in Ready](https://badge.waffle.io/imazen/resizer.png?label=ready&title=Ready)](https://waffle.io/imazen/resizer)
+Everything exciting is happening on the [develop branch. Why not head over there?](https://github.com/imazen/resizer/tree/develop)
+
 # ImageResizer - Much more than image resizing
 
 [Visit our home page for details and documentation](http://imageresizing.net).
+
 
 What is it?
 
