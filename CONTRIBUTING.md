@@ -34,13 +34,17 @@ Providing good xUnit tests (and reading this document) typically results in imme
 
 ### Contributing code - legally
 
-Since we use the Apache license, you will need to release your commits under the corresponding Contributor Agreement. Small commits can simply include this statement: 
+Since we use the Apache license, you will need to release your commits under the corresponding Contributor Agreement. The easiest way is by [using clahub.com](https://www.clahub.com/agreements/imazen/resizer), which takes seconds. 
+
+If for some reason that doesn't work for you, there are other options:
+
+Small commits can simply include this statement: 
 
         I release these contributions under the terms of the Imazen Contributor Agreement V1.0 
         (http://imageresizing.net/licenses/contribute), the terms of which I accept and agree.
         - [Name] [Date]
 
-Frequent or heavy commiters should [sign and date the actual agreement](http://imageresizing.net/licenses/contribute), which only needs to be done once. Digital signatures or scanned copies are accepted. 
+Frequent or heavy commiters should [sign and date the actual agreement](http://imageresizing.net/licenses/contribute), which only needs to be done once. Digital signatures or scanned copies are accepted; send them to support@imageresizing.net. 
 
 If you are introducing any new dependencies, those licenses may obligate you to create a notice.txt or license.txt file in your plugin folder.
 
