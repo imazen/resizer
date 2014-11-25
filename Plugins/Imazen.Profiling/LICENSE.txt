@@ -1,4 +1,4 @@
-﻿/Core
+/Plugins/Imazen.Profiling
 
 This license  applies to all source files in this directory and subdirectories.
 See /LICENSE.md for more information and alternate license options.
