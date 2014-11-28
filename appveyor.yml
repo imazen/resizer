@@ -13,6 +13,8 @@ environment:
   #  secure: RP9hZqS0Pt2SLeias0iZpt2E9OltVX8OPfhWnGET6fQKZ05Fy6y0z1JcWWvONhF0
 
 before_build:
+  - curl -L -o Tools\nuget.exe http://www.nuget.org/nuget.exe > nul 2>&1
+  
   - cd submodules
   - rmdir libwebp-net
   - git clone https://github.com/imazen/libwebp-net --depth 1
