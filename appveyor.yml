@@ -1,78 +1,27 @@
-os: Windows Server 2012 R2
-
-clone_depth: 10
-
+clone_depth: 1
 version: 4.0.0.{build}
 
-# enable patching of AssemblyInfo.* files
-assembly_info:
-  patch: true
-  file: AssemblyInfo.*
-  assembly_version: "4.0.0.0"
-  assembly_file_version: "{version}"
-  assembly_informational_version: "{version} git id: $(APPVEYOR_REPO_COMMIT)"
+environment:
+  fb_nuget_url: https://www.myget.org/F/test-test-test/
+  fb_nuget_key:
+    secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
+  
+  #ab_s3_bucket: imazen-test
+  #ab_s3_id:
+  #  secure: Qi7mSLHr94NfJaH0CzQSVPEl1peaOoJADyfHwiVtJzo=
+  #ab_s3_key:
+  #  secure: RP9hZqS0Pt2SLeias0iZpt2E9OltVX8OPfhWnGET6fQKZ05Fy6y0z1JcWWvONhF0
 
-
-clone_folder: c:\projects\resizer
-
-
-install:
-  - cmd: git submodule -q update --init
-
-services:
-  - mssql2012sp1
-
-matrix:
-  allow_failures:
-    - platform: x86
-      configuration: Release
-    - platform: x64
-      configuration: Release
-    - platform: Any CPU
-      configuration: Release
-
-# build platform, i.e. x86, x64, AnyCPU. This setting is optional.
-platform: 
-  - Any CPU
-
-# build Configuration, i.e. Debug, Release, etc.
-configuration: Release
-
-build:
-  project: AppVeyor.sln      # path to Visual Studio solution or project
-  publish_nuget: false             # package projects with .nuspec files and push to artifacts
-
-  # MSBuild verbosity level
-  verbosity: quiet
-
-
-# scripts to run before build
 before_build:
-  - cd C:\projects\resizer
-  - nuget restore AppVeyor.sln -PackagesDirectory C:\projects\resizer\packages
-  - nuget install xunit.runners -Pre 
+  - cd submodules
+  - rmdir libwebp-net
+  - git clone https://github.com/imazen/libwebp-net --depth 1
+  - cd ..
+  
+  - nuget restore Core\ImageResizer.sln
+  - nuget Install FAKE -ExcludeVersion
 
-test_script:
-  - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.Core.Tests
-  - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.Core.Tests -run32bit
-  - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.CoreFSharp.Tests
-  - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.CoreFSharp.Tests -run32bit
-  - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.CopyMetadata.Tests 
-  - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.AllPlugins.Tests 
-  - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.ProviderTests
-  - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.ProviderTests -run32bit
-  - ps: .\Tests\appveyor_run_test.ps1 -assembly ImageResizer.Plugins.TinyCache.Tests
-
-# scripts to run after build
-#after_build:
-
-# to run your custom scripts instead of automatic MSBuild
-#build_script:
-
-#---------------------------------#
-#      artifacts configuration    #
-#---------------------------------#
-
-#test_script:
-#  - xunit.console.clr4.exe Imazen.Test.WebP\bin\Release\Imazen.Test.Webp.dll /appveyor
-#  - xunit.console.clr4.x86.exe Imazen.Test.WebP\bin\Release\Imazen.Test.Webp.dll /appveyor
+build_script:
+  - cd Tools
+  - ..\packages\FAKE\tools\Fake FakeBuilder\build.fsx
+  - cd ..
