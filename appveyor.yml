@@ -15,10 +15,8 @@ environment:
 before_build:
   - curl -L -o Tools\nuget.exe http://www.nuget.org/nuget.exe > nul 2>&1
   
-  - cd submodules
-  - rmdir libwebp-net
-  - git clone https://github.com/imazen/libwebp-net --depth 1
-  - cd ..
+  - git submodule init
+  - git submodule update
   
   - nuget restore Core\ImageResizer.sln
   - nuget Install FAKE -ExcludeVersion
