@@ -7,7 +7,7 @@ open System.Text
 open System.Text.RegularExpressions
 
 
-let rootDir = "../"
+let rootDir = Path.GetFullPath("..") + "/"
 let coreDir = rootDir + "Core/"
 let mainSolution = coreDir + "ImageResizer.sln"
 let assemblyInfoFile = coreDir + "SharedAssemblyInfo.cs"
@@ -65,46 +65,34 @@ let replaceNuspec (file:string) (savefile:string) =
     File.WriteAllText(savefile, fileContents, UTF8Encoding.UTF8)
 
 let nuPack nuSpec =
-    let publish =
-        if fb_nuget_url = null then false
-        elif fb_nuget_url = "" then false
-        else true
+    ExecProcess(fun info ->
+        info.FileName <- "nuget"
+        info.Arguments <- (sprintf "pack -Version %s -OutputDirectory %s %s" version (rootDir + "Releases/nuget-packages") nuSpec))
+        (TimeSpan.FromMinutes 1.0)
+            |> ignore
+
+let nuPush nuPkg =
+    let args =
+        if fb_nuget_url = null or fb_nuget_url = "" then
+            (sprintf "push %s %s" nuPkg fb_nuget_key)
+        else (sprintf "push %s %s -s %s" nuPkg fb_nuget_key fb_nuget_url)
     
-    NuGet (fun p -> 
-      {p with
-          PublishUrl = fb_nuget_url
-          AccessKey = fb_nuget_key
-          Publish = publish
-          OutputPath = rootDir + "Releases/nuget-packages"
-          WorkingDir = rootDir + "nuget"
-          Project = Path.GetFileNameWithoutExtension(nuSpec)
-          Version = version })
-          nuSpec
+    // hide command so the api key doesn't leak
+    let tracing = enableProcessTracing
+    enableProcessTracing <- false
+    
+    ExecProcess(fun info ->
+        info.FileName <- "nuget"
+        info.Arguments <- args)
+        (TimeSpan.FromMinutes 1.0)
+            |> ignore
+    
+    // restore settings
+    enableProcessTracing <- tracing
 
 
 
 // S3 packing
-(*
-let excludes =
-    !! (rootDir + "**/.git/**")
-    ++ (rootDir + "**/Hidden/**")
-    ++ (rootDir + "Releases/**")
-    ++ (rootDir + "Legacy/**")
-    ++ (rootDir + "Tools/Builder/**")
-    ++ (rootDir + "Tools/BuildTools/**")
-    ++ (rootDir + "Tools/docu/**")
-    ++ (rootDir + "Tools/AutoBuilder/**")
-    ++ (rootDir + "Tools/FakeBuilder/**")
-    ++ (rootDir + "submodules/docu/**")
-    ++ (rootDir + "Samples/Images/extra/**")
-    ++ (rootDir + "Samples/Images/private/**")
-    ++ (rootDir + "Samples/MvcSample/App_Data/**")
-    ++ (rootDir + "**/Thumbs.db")
-    ++ (rootDir + "**/.DS_Store")
-    ++ (rootDir + "**/*.suo")
-    ++ (rootDir + "**/*.cache")
-    ++ (rootDir + "**/*.user")
-*)
 
 let packMin =
     !! (rootDir + "dlls/release/ImageResizer.???")
@@ -185,23 +173,36 @@ Target "PatchInfo" (fun _ ->
 )
 
 Target "NuDeploy" (fun _ ->
-    CleanDirs [rootDir + "Releases/nuspec-tmp"]
+    CleanDirs [rootDir + "tmp"]
     CleanDirs [rootDir + "Releases/nuget-packages"]
+    
+    let publish =
+        if fb_nuget_key = null then false
+        elif fb_nuget_key = "" then false
+        else true
     
     // replace nuget vars
     for nuSpec in Directory.GetFiles(rootDir + "nuget", "*.nuspec") do
-        replaceNuspec nuSpec (rootDir+"Releases/nuspec-tmp/"+Path.GetFileName(nuSpec))
+        replaceNuspec nuSpec (rootDir+"tmp/"+Path.GetFileName(nuSpec))
     
-    // process symbol packages first
-    for nuSpec in Directory.GetFiles(rootDir + "Releases/nuspec-tmp", "*.symbols.nuspec") do
+    // process symbol packages first (as they need to be renamed)
+    for nuSpec in Directory.GetFiles(rootDir + "tmp", "*.symbols.nuspec") do
         nuPack nuSpec
         let baseName = rootDir + "Releases/nuget-packages/" + Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(nuSpec)) + "." + version
         File.Move(baseName + ".nupkg", baseName + ".symbols.nupkg")
     
     // process regular packages
-    for nuSpec in Directory.GetFiles(rootDir + "Releases/nuspec-tmp", "*.nuspec") do
+    for nuSpec in Directory.GetFiles(rootDir + "tmp", "*.nuspec") do
         if not (nuSpec.Contains(".symbols.nuspec")) then
             nuPack nuSpec
+    
+    // push
+    if publish then
+        for nuPkg in Directory.GetFiles(rootDir + "Releases/nuget-packages", "*.nupkg") do
+            nuPush nuPkg
+    
+    // remove any mess
+    DeleteDir (rootDir + "tmp")
 )
 
 Target "S3Deploy" (fun _ ->
