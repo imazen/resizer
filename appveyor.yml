@@ -25,3 +25,5 @@ build_script:
   - cd Tools
   - ..\packages\FAKE\tools\Fake FakeBuilder\build.fsx
   - cd ..
+
+test: off
