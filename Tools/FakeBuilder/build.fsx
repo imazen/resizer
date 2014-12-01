@@ -65,11 +65,16 @@ let replaceNuspec (file:string) (savefile:string) =
     File.WriteAllText(savefile, fileContents, UTF8Encoding.UTF8)
 
 let nuPack nuSpec =
-    ExecProcess(fun info ->
-        info.FileName <- "nuget"
-        info.Arguments <- (sprintf "pack -Version %s -OutputDirectory %s %s" version (rootDir + "Releases/nuget-packages") nuSpec))
-        (TimeSpan.FromMinutes 1.0)
-            |> ignore
+    try
+        let args = sprintf "pack -Version %s -OutputDirectory %s %s" version (rootDir + "Releases/nuget-packages") nuSpec
+        let result =
+            ExecProcess(fun info ->
+                info.FileName <- "nuget"
+                info.Arguments <- args)
+                (TimeSpan.FromMinutes 1.0)
+        if result <> 0 then failwithf "Error during NuGet packing (%s)" args
+    with exn ->
+        raise exn
 
 let nuPush nuPkg =
     let args =
@@ -81,11 +86,15 @@ let nuPush nuPkg =
     let tracing = enableProcessTracing
     enableProcessTracing <- false
     
-    ExecProcess(fun info ->
-        info.FileName <- "nuget"
-        info.Arguments <- args)
-        (TimeSpan.FromMinutes 1.0)
-            |> ignore
+    try
+        let result =
+            ExecProcess(fun info ->
+                info.FileName <- "nuget"
+                info.Arguments <- args)
+                (TimeSpan.FromMinutes 1.0)
+        if result <> 0 then failwithf "Error during NuGet push (%s)" nuPkg
+    with exn ->
+        raise exn
     
     // restore settings
     enableProcessTracing <- tracing
