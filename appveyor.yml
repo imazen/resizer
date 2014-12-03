@@ -18,6 +18,7 @@ before_build:
   
   - nuget restore Core\ImageResizer.sln
   - nuget Install FAKE -ExcludeVersion
+  - nuget Install SharpZipLib -ExcludeVersion
 
 build_script:
   - cd Tools
