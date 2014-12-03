@@ -75,7 +75,7 @@ Target "Test" (fun _ ->
     for testDll in (!! (rootDir + "Tests/binaries/release/*Tests.dll")) do
         let basename = (Path.GetFileNameWithoutExtension(testDll))
         
-        if not (List.exists (fun x -> x = testDll) skipable) then
+        if not (List.exists (fun x -> x = basename) skipable) then
             try
                 let args = sprintf "-ExecutionPolicy ByPass tests\\appveyor_run_test.ps1 -assembly %s" basename
                 let result =
@@ -88,7 +88,7 @@ Target "Test" (fun _ ->
             with exn ->
                 raise exn
         
-        if not (List.exists (fun x -> x = testDll) skipable32) then
+        if not (List.exists (fun x -> x = basename) skipable32) then
             try
                 let args2 = sprintf "-ExecutionPolicy ByPass tests\\appveyor_run_test.ps1 -assembly %s -run32bit" basename
                 let result2 =
