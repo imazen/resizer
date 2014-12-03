@@ -16,7 +16,7 @@ before_build:
   - git submodule init
   - git submodule update
   
-  - nuget restore Core\ImageResizer.sln
+  - nuget restore AppVeyor.sln
   - nuget Install FAKE -ExcludeVersion
   - nuget Install SharpZipLib -ExcludeVersion
 
