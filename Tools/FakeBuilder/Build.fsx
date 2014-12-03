@@ -30,7 +30,7 @@ let fb_s3_key = EnvironmentHelper.environVar "fb_s3_key"
 
 let rootDir = Path.GetFullPath(__SOURCE_DIRECTORY__ + "/../..") + "\\"
 let coreDir = rootDir + "Core/"
-let mainSolution = coreDir + "ImageResizer.sln"
+let mainSolution = rootDir + "AppVeyor.sln"
 let assemblyInfoFile = coreDir + "SharedAssemblyInfo.cs"
 
 let mutable version = AssemblyPatcher.getInfo assemblyInfoFile "AssemblyVersion"
@@ -128,51 +128,50 @@ Target "PackZips" (fun _ ->
         DeleteFile file
     
     let inventory = FsInventory(rootDir)
-    let excludes = toPatterns ["/.git";"^/Releases";"/Hidden/";"^/Legacy";"^/Tools/(Builder|BuildTools|docu)"; "^/submodules/docu";
-        "^/Samples/Images/(extra|private)/";"/Thumbs.db$";"/.DS_Store$";".suo$";".cache$";".user$"; "/._";"/~$"; 
-        "^/Samples/MvcSample/App_Data/"]
-    
-    let mutable query = FsQuery(inventory, excludes)
+    let mutable query = FsQuery(inventory, (toPatterns ["/.git";"^/Releases";"/Hidden/";"^/Legacy";"^/Tools/(Builder|BuildTools|docu)";
+        "^/submodules/docu"; "^/Samples/Images/(extra|private)/";"/Thumbs.db$";"/.DS_Store$";".suo$";".cache$";".user$"; "/._";"/~$"; 
+        "^/Samples/MvcSample/App_Data/"]))
     
     query <- query.exclude(["/(Newtonsoft.Json|DotNetZip|Aforge|LitS3|Ionic|NLog|MongoDB|Microsoft.|AWSSDK)*.(xml|pdb)$";
-        "/(OpenCvSharp|FreeImageNet)*.xml$"; "/(FreeImage|gsdll32|gsdll64).dll$"; "/ImageResizerGUI.exe$";
-        "_ReSharper"; "^/Contrib/*/(bin|obj|imagecache|uploads|results)/*";
-        "^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|hidden|results)/"; "^/Core(.Mvc)?/obj/";
-        "^/Tests/binaries"; "^/Tests/LibDevCassini"; "^/Tests/ComparisonBenchmark/Images"; "^/Samples/SqlReaderSampleVarChar";
-        ".config.transform$"; "^/Plugins/Libs/FreeImage/Examples/"; "^/Plugins/Libs/FreeImage/Wrapper/(Delphi|VB6|FreeImagePlus)";
+        "/(OpenCvSharp|FreeImageNet)*.xml$"; "/(FreeImage|gsdll32|gsdll64).dll$";
+        "/ImageResizerGUI.exe$";
+        "_ReSharper";
+        "^/Contrib/*/(bin|obj|imagecache|uploads|results)/*";
+        "^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|hidden|results)/";
+        "^/Core(.Mvc)?/obj/";
+        "^/Tests/binaries";
+        "^/Tests/LibDevCassini";
+        "^/Tests/ComparisonBenchmark/Images";
+        "^/Samples/SqlReaderSampleVarChar";
+        ".config.transform$";
+        "^/Plugins/Libs/FreeImage/Examples/";
+        "^/Plugins/Libs/FreeImage/Wrapper/(Delphi|VB6|FreeImagePlus)";
         "^/Plugins/Libs/FreeImage/Wrapper/FreeImage.NET/cs/[^L]*/"])
     
-    let outDir =
-        rootDir + "Releases/"
+    let outDir = rootDir + "Releases/"
+    let makeName rtype = outDir + "Resizer" + (version.Replace('.', '-')) + "-" + rtype + "-" + (DateTime.UtcNow.ToString("MMM-d-yyyy")) + ".zip"
     
-    let makename rtype =
-        outDir + "Resizer" + (version.Replace('.', '-')) + "-" + rtype + "-" + (DateTime.UtcNow.ToString("MMM-d-yyyy")) + ".zip"
     
     // packmin
-    let minname = sprintf "Resizer4-0-0-allbinaries-dec-2-2014"
     let mutable minfiles =
         List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), false))
             (query.files(["^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"; "^/Core/license.txt$"]))
-    
     minfiles <-
         List.append minfiles
             (List.map (fun x -> CustomFile(x, snd((tupleRelative rootDir [x]).[0]), false))
             (query.files(["^/readme.txt$"; "^/Web.config$"])))
-    
-    CreateZip rootDir (makename "min") "" 7 false minfiles
+    CreateZip rootDir (makeName "min") "" 5 false minfiles
     
     
     // packbin
     let mutable binfiles =
         List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), false))
             (query.files("^/[^/]+.txt$"))
-    
     binfiles <-
         List.append binfiles
             (List.map (fun x -> CustomFile(x, snd((tupleRelative (rootDir+"dlls\\release\\") [x]).[0]), false))
             (query.files("^/dlls/release/*.(dll|pdb)$")))
-    
-    CreateZip rootDir (makename "allbinaries") "" 7 false binfiles
+    CreateZip rootDir (makeName "allbinaries") "" 5 false binfiles
     
     
     // packfull
@@ -180,18 +179,15 @@ Target "PackZips" (fun _ ->
         List.map (fun x -> CustomFile(x, snd((tupleRelative rootDir [x]).[0]), false))
             (query.files(["^/(core|contrib|core.mvc|plugins|samples|tests|studiojs)/"; "^/tools/COMInstaller";
                 "^/dlls/(debug|release)"; "^/submodules/(lightresize|libwebp-net)"; "^/[^/]+.txt$"; "^/Web.config$"]))
-    
     fullfiles <-
         List.append fullfiles
             (List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), false))
             (query.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$")))
-    
     fullfiles <-
         List.append fullfiles
             (List.map (fun x -> CustomFile(x, ("StudioJS/" + snd((tupleRelative (rootDir+"submodules\\studiojs\\") [x]).[0])), false))
             (query.files("^/submodules/studiojs")))
-    
-    CreateZip rootDir (makename "full") "" 7 false fullfiles
+    CreateZip rootDir (makeName "full") "" 5 false fullfiles
     
     
     // packstandard
@@ -199,18 +195,15 @@ Target "PackZips" (fun _ ->
     let mutable standard =
         List.map (fun x -> CustomFile(x, snd((tupleRelative rootDir [x]).[0]), false))
             (query.files(["^/dlls/(debug|release)/"; "^/(core|samples)/"; "^/[^/]+.txt$"; "^/Web.config$"]))
-    
     standard <-
         List.append standard
             (List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), false))
             (query.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$")))
-    
     standard <-
         List.append standard
             (List.map (fun x -> CustomFile(x, ("StudioJS/" + snd((tupleRelative (rootDir+"submodules\\studiojs\\") [x]).[0])), false))
             (query.files("^/submodules/studiojs")))
-    
-    CreateZip rootDir (makename "standard") "" 7 false standard
+    CreateZip rootDir (makeName "standard") "" 5 false standard
     
     ()
 )
