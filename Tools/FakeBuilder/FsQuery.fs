@@ -30,7 +30,10 @@ type FsQuery(inventory:FsInventory, exclusions: list<PathPattern>) =
            (queries |> List.tryFind(fun e -> e.IsMatch(r)) <> None)) 
           |> List.map (fun (f,r) -> f)
 
-
+  
+  member this.exclude([<ParamArray>] exclusions: string list) = 
+    new FsQuery(inv,excl @ toPatterns exclusions)
+  
   member this.exclude([<ParamArray>] exclusions: string[]) = 
     new FsQuery(inv,excl @ toPatterns exclusions)
   

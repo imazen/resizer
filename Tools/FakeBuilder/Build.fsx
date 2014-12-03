@@ -5,20 +5,18 @@
 #load "FsQuery.fs"
 #load "ZipHelper2.fs"
 #load "Nuget.fs"
+#load "AssemblyPatcher.fs"
 
 open Fake
+open Amazon.S3.Transfer
+
+open FsQuery
+open FakeBuilder
+
 open System
 open System.IO
 open System.Text
 open System.Text.RegularExpressions
-open FsQuery
-open FakeBuilder
-open Amazon.S3.Transfer
-
-let rootDir = Path.GetFullPath(__SOURCE_DIRECTORY__ + "/../..") + "\\"
-let coreDir = rootDir + "Core/"
-let mainSolution = coreDir + "ImageResizer.sln"
-let assemblyInfoFile = coreDir + "SharedAssemblyInfo.cs"
 
 
 // Settings
@@ -30,56 +28,15 @@ let fb_s3_bucket = EnvironmentHelper.environVar "fb_s3_bucket"
 let fb_s3_id = EnvironmentHelper.environVar "fb_s3_id"
 let fb_s3_key = EnvironmentHelper.environVar "fb_s3_key"
 
+let rootDir = Path.GetFullPath(__SOURCE_DIRECTORY__ + "/../..") + "\\"
+let coreDir = rootDir + "Core/"
+let mainSolution = coreDir + "ImageResizer.sln"
+let assemblyInfoFile = coreDir + "SharedAssemblyInfo.cs"
 
-
-// AssemblyInfo
-
-let mutable assemblyInfo = File.ReadAllText(assemblyInfoFile, UTF8Encoding.UTF8)
-
-// replaces or appends assembly info
-let setInfo info key value : string =
-    let pattern = "(\\[assembly:\\s+" + key + "[^\]]*\\])"
-    let replace = "[assembly: " + key + "(\"" + value + "\")]"
-    let result = Regex.Replace(info, pattern, replace)
-    // replace might have worked, but matches source
-    if result.Contains(replace) then result
-    else info + replace + "\n"
-
-let getInfo info key : string =
-    let pattern = "\\[assembly:\\s+" + key + "\\s*\\(\"([^\"]*)"
-    let m = Regex.Match(info, pattern)
-    if m.Success then m.Groups.[1].Value
-    else ""
-
-let mutable version = getInfo assemblyInfo "AssemblyVersion"
+let mutable version = AssemblyPatcher.getInfo assemblyInfoFile "AssemblyVersion"
 version <- version.Replace(".*", "")
 if AppVeyor.AppVeyorEnvironment.BuildVersion <> null then
     version <- AppVeyor.AppVeyorEnvironment.BuildVersion
-
-
-
-// Zip packing
-
-let inventory = FsInventory(rootDir)
-let excludes = toPatterns ["/.git";"^/Releases";"/Hidden/";"^/Legacy";"^/Tools/(Builder|BuildTools|docu)"; "^/submodules/docu";
-                "^/Samples/Images/(extra|private)/";"/Thumbs.db$";"/.DS_Store$";".suo$";".cache$";".user$"; "/._";"/~$"; 
-                "^/Samples/MvcSample/App_Data/"]
-
-let deletableFiles =
-    !! (rootDir + "Tests/binaries/**")
-    ++ (rootDir + "Core/obj/**")
-    ++ (rootDir + "Plugins/**/obj/**")
-    ++ (rootDir + "Samples/MvcSample/App_Data/**")
-    ++ (rootDir + "dlls/**/Aforge*.pdb")
-    ++ (rootDir + "dlls/**/Aforge*.xml")
-    ++ (rootDir + "dlls/**/LitS3*.pdb")
-    ++ (rootDir + "dlls/**/LitS3*.xml")
-    ++ (rootDir + "dlls/**/Ionic*.pdb")
-    ++ (rootDir + "dlls/**/Ionic*.xml")
-    ++ (rootDir + "**/Thumbs.db")
-    ++ (rootDir + "**/.DS_Store")
-    ++ (rootDir + "Releases/*.zip")
-
 
 
 // Targets
@@ -97,20 +54,36 @@ Target "Build" (fun _ ->
     MSBuild "" "Build" ["Configuration","Release"] [mainSolution] |> ignore
     MSBuild "" "Build" ["Configuration","Debug"] [mainSolution] |> ignore
     MSBuild "" "Build" ["Configuration","Trial"] [mainSolution] |> ignore
+    
+    // remove any mess
+    let deletableFiles =
+        !! (rootDir + "Tests/binaries/**")
+        ++ (rootDir + "Core/obj/**")
+        ++ (rootDir + "Plugins/**/obj/**")
+        ++ (rootDir + "Samples/MvcSample/App_Data/**")
+        ++ (rootDir + "dlls/**/Aforge*.pdb")
+        ++ (rootDir + "dlls/**/Aforge*.xml")
+        ++ (rootDir + "dlls/**/LitS3*.pdb")
+        ++ (rootDir + "dlls/**/LitS3*.xml")
+        ++ (rootDir + "dlls/**/Ionic*.pdb")
+        ++ (rootDir + "dlls/**/Ionic*.xml")
+        ++ (rootDir + "**/Thumbs.db")
+        ++ (rootDir + "**/.DS_Store")
+    
+    for file in deletableFiles do
+        DeleteFile file
 )
 
 Target "PatchInfo" (fun _ ->
     let commit = Git.Information.getCurrentSHA1 ".."
     if commit <> null then
-        assemblyInfo <- setInfo assemblyInfo "Commit" commit
+        AssemblyPatcher.setInfo assemblyInfoFile ["Commit", commit]
     
     if version <> null then
-        assemblyInfo <- setInfo assemblyInfo "AssemblyVersion" version
-        assemblyInfo <- setInfo assemblyInfo "AssemblyFileVersion" version
-        assemblyInfo <- setInfo assemblyInfo "AssemblyInformationalVersion" (version.Replace('.', '-'))
-        assemblyInfo <- setInfo assemblyInfo "NugetVersion" version
-    
-    File.WriteAllText(assemblyInfoFile, assemblyInfo, UTF8Encoding.UTF8)
+        AssemblyPatcher.setInfo assemblyInfoFile ["AssemblyVersion", version;
+            "AssemblyFileVersion", version;
+            "AssemblyInformationalVersion",(version.Replace('.', '-'));
+            "NugetVersion", version]
 )
 
 Target "PackNuget" (fun _ ->
@@ -151,32 +124,23 @@ Target "PackNuget" (fun _ ->
 )
 
 Target "PackZips" (fun _ ->
-    for file in deletableFiles do
+    for file in !! (rootDir + "Releases/*.zip") do
         DeleteFile file
     
-    let publish =
-        if fb_s3_key = null then false
-        elif fb_s3_key = "" then false
-        else true
+    let inventory = FsInventory(rootDir)
+    let excludes = toPatterns ["/.git";"^/Releases";"/Hidden/";"^/Legacy";"^/Tools/(Builder|BuildTools|docu)"; "^/submodules/docu";
+        "^/Samples/Images/(extra|private)/";"/Thumbs.db$";"/.DS_Store$";".suo$";".cache$";".user$"; "/._";"/~$"; 
+        "^/Samples/MvcSample/App_Data/"]
     
     let mutable query = FsQuery(inventory, excludes)
     
-    query <- query.exclude("/(Newtonsoft.Json|DotNetZip|Aforge|LitS3|Ionic|NLog|MongoDB|Microsoft.|AWSSDK)*.(xml|pdb)$")
-    query <- query.exclude("/(OpenCvSharp|FreeImageNet)*.xml$")
-    query <- query.exclude("/(FreeImage|gsdll32|gsdll64).dll$")
-    query <- query.exclude("/ImageResizerGUI.exe$")
-    query <- query.exclude("_ReSharper")
-    query <- query.exclude("^/Contrib/*/(bin|obj|imagecache|uploads|results)/*")
-    query <- query.exclude("^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|hidden|results)/")
-    query <- query.exclude("^/Core(.Mvc)?/obj/")
-    query <- query.exclude("^/Tests/binaries")
-    query <- query.exclude("^/Tests/LibDevCassini")
-    query <- query.exclude("^/Tests/ComparisonBenchmark/Images")
-    query <- query.exclude("^/Samples/SqlReaderSampleVarChar")
-    query <- query.exclude(".config.transform$")
-    query <- query.exclude("^/Plugins/Libs/FreeImage/Examples/")
-    query <- query.exclude("^/Plugins/Libs/FreeImage/Wrapper/(Delphi|VB6|FreeImagePlus)")
-    query <- query.exclude("^/Plugins/Libs/FreeImage/Wrapper/FreeImage.NET/cs/[^L]*/")
+    query <- query.exclude(["/(Newtonsoft.Json|DotNetZip|Aforge|LitS3|Ionic|NLog|MongoDB|Microsoft.|AWSSDK)*.(xml|pdb)$";
+        "/(OpenCvSharp|FreeImageNet)*.xml$"; "/(FreeImage|gsdll32|gsdll64).dll$"; "/ImageResizerGUI.exe$";
+        "_ReSharper"; "^/Contrib/*/(bin|obj|imagecache|uploads|results)/*";
+        "^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|hidden|results)/"; "^/Core(.Mvc)?/obj/";
+        "^/Tests/binaries"; "^/Tests/LibDevCassini"; "^/Tests/ComparisonBenchmark/Images"; "^/Samples/SqlReaderSampleVarChar";
+        ".config.transform$"; "^/Plugins/Libs/FreeImage/Examples/"; "^/Plugins/Libs/FreeImage/Wrapper/(Delphi|VB6|FreeImagePlus)";
+        "^/Plugins/Libs/FreeImage/Wrapper/FreeImage.NET/cs/[^L]*/"])
     
     let outDir =
         rootDir + "Releases/"
