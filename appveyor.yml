@@ -6,11 +6,11 @@ environment:
   fb_nuget_key:
     secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
   
-  #ab_s3_bucket: imazen-test
-  #ab_s3_id:
-  #  secure: Qi7mSLHr94NfJaH0CzQSVPEl1peaOoJADyfHwiVtJzo=
-  #ab_s3_key:
-  #  secure: RP9hZqS0Pt2SLeias0iZpt2E9OltVX8OPfhWnGET6fQKZ05Fy6y0z1JcWWvONhF0
+  fb_s3_bucket: imazen-test
+  fb_s3_id:
+    secure: Qi7mSLHr94NfJaH0CzQSVPEl1peaOoJADyfHwiVtJzo=
+  fb_s3_key:
+    secure: RP9hZqS0Pt2SLeias0iZpt2E9OltVX8OPfhWnGET6fQKZ05Fy6y0z1JcWWvONhF0
 
 before_build:
   - git submodule init

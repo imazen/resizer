@@ -2,6 +2,7 @@
 
 echo - Updating FAKE...
 nuget Install FAKE -ExcludeVersion && echo - Done! || goto fail
+nuget Install SharpZipLib -ExcludeVersion && echo - Done! || goto fail
 
 echo - Gathering settings...
 set fb_nuget_url=

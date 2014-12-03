@@ -1,16 +1,32 @@
 #r @"..\..\packages\FAKE\tools\FakeLib.dll"
+#r @"..\..\packages\SharpZipLib\lib\20\ICSharpCode.SharpZipLib.dll"
+#r @"..\..\packages\AWSSDK.2.2.4.0\lib\net45\AWSSDK.dll"
+
+#load "FsQuery.fs"
+#load "ZipHelper2.fs"
 
 open Fake
 open System
 open System.IO
 open System.Text
 open System.Text.RegularExpressions
+open FsQuery
+open Amazon.S3.Transfer
 
-
-let rootDir = Path.GetFullPath("..") + "/"
+let rootDir = Path.GetFullPath(__SOURCE_DIRECTORY__ + "/../..") + "\\"
 let coreDir = rootDir + "Core/"
 let mainSolution = coreDir + "ImageResizer.sln"
 let assemblyInfoFile = coreDir + "SharedAssemblyInfo.cs"
+
+
+// Settings
+
+let fb_nuget_url = EnvironmentHelper.environVar "fb_nuget_url"
+let fb_nuget_key = EnvironmentHelper.environVar "fb_nuget_key"
+
+let fb_s3_bucket = EnvironmentHelper.environVar "fb_s3_bucket"
+let fb_s3_id = EnvironmentHelper.environVar "fb_s3_id"
+let fb_s3_key = EnvironmentHelper.environVar "fb_s3_key"
 
 
 
@@ -42,13 +58,10 @@ if AppVeyor.AppVeyorEnvironment.BuildVersion <> null then
 
 // Nuget
 
-let fb_nuget_url = EnvironmentHelper.environVar "fb_nuget_url"
-let fb_nuget_key = EnvironmentHelper.environVar "fb_nuget_key"
-
 let nvc = ["author", "Nathanael Jones, Imazen";
            "owners", "nathanaeljones, imazen";
-           "pluginsdlldir", @"..\dlls\trial";
-           "coredlldir", @"..\dlls\release";
+           "pluginsdlldir", (rootDir+"dlls/trial");
+           "coredlldir", (rootDir+"dlls/release");
            "iconurl", "http://imageresizing.net/images/logos/ImageIconPSD100.png";
            "plugins", "## 30+ plugins available\n\n" + 
                "Search 'ImageResizer' on nuget.org, or visit imageresizing.net to see 40+ plugins, including WPF, WIC, FreeImage, OpenCV, AForge &amp; Ghostscript (PDF) integrations. " + 
@@ -78,7 +91,7 @@ let nuPack nuSpec =
 
 let nuPush nuPkg =
     let args =
-        if fb_nuget_url = null or fb_nuget_url = "" then
+        if fb_nuget_url = null || fb_nuget_url = "" then
             (sprintf "push %s %s" nuPkg fb_nuget_key)
         else (sprintf "push %s %s -s %s" nuPkg fb_nuget_key fb_nuget_url)
     
@@ -101,37 +114,12 @@ let nuPush nuPkg =
 
 
 
-// S3 packing
+// Zip packing
 
-let packMin =
-    !! (rootDir + "dlls/release/ImageResizer.???")
-    ++ (rootDir + "readme.txt")
-    ++ (rootDir + "Core/license.txt")
-    ++ (rootDir + "Web.config")
-
-let packAllBinaries =
-    !! (rootDir + "dlls/release/*.dll")
-    ++ (rootDir + "dlls/release/*.pdb")
-    ++ (rootDir + "*.txt")
-
-let packStandard =
-    !! (rootDir + "dlls/release/ImageResizer.???")
-    ++ (rootDir + "dlls/debug/**")
-    ++ (rootDir + "dlls/release/**")
-    ++ (rootDir + "submodules/studiojs/**")
-    ++ (rootDir + "core/**")
-    ++ (rootDir + "samples/**")
-    ++ (rootDir + "*.txt")
-    ++ (rootDir + "Web.config")
-    -- (rootDir + "**/.git/**")
-    -- (rootDir + "Samples/Images/extra/**")
-    -- (rootDir + "Samples/Images/private/**")
-    -- (rootDir + "Samples/MvcSample/App_Data/**")
-    -- (rootDir + "**/Thumbs.db")
-    -- (rootDir + "**/.DS_Store")
-    -- (rootDir + "**/*.suo")
-    -- (rootDir + "**/*.cache")
-    -- (rootDir + "**/*.user")
+let inventory = FsInventory(rootDir)
+let excludes = toPatterns ["/.git";"^/Releases";"/Hidden/";"^/Legacy";"^/Tools/(Builder|BuildTools|docu)"; "^/submodules/docu";
+                "^/Samples/Images/(extra|private)/";"/Thumbs.db$";"/.DS_Store$";".suo$";".cache$";".user$"; "/._";"/~$"; 
+                "^/Samples/MvcSample/App_Data/"]
 
 let deletableFiles =
     !! (rootDir + "Tests/binaries/**")
@@ -218,17 +206,126 @@ Target "S3Deploy" (fun _ ->
     for file in deletableFiles do
         DeleteFile file
     
-    let mutable zipable = []
+    let publish =
+        if fb_s3_key = null then false
+        elif fb_s3_key = "" then false
+        else true
     
-    for file in packStandard do
-        zipable <- List.append zipable [file]
+    let mutable query = FsQuery(inventory, excludes)
     
-    Zip rootDir (rootDir + "standard-test.zip") (List.toSeq zipable)
+    query <- query.exclude("/(Newtonsoft.Json|DotNetZip|Aforge|LitS3|Ionic|NLog|MongoDB|Microsoft.|AWSSDK)*.(xml|pdb)$")
+    query <- query.exclude("/(OpenCvSharp|FreeImageNet)*.xml$")
+    query <- query.exclude("/(FreeImage|gsdll32|gsdll64).dll$")
+    query <- query.exclude("/ImageResizerGUI.exe$")
+    query <- query.exclude("_ReSharper")
+    query <- query.exclude("^/Contrib/*/(bin|obj|imagecache|uploads|results)/*")
+    query <- query.exclude("^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|hidden|results)/")
+    query <- query.exclude("^/Core(.Mvc)?/obj/")
+    query <- query.exclude("^/Tests/binaries")
+    query <- query.exclude("^/Tests/LibDevCassini")
+    query <- query.exclude("^/Tests/ComparisonBenchmark/Images")
+    query <- query.exclude("^/Samples/SqlReaderSampleVarChar")
+    query <- query.exclude(".config.transform$")
+    query <- query.exclude("^/Plugins/Libs/FreeImage/Examples/")
+    query <- query.exclude("^/Plugins/Libs/FreeImage/Wrapper/(Delphi|VB6|FreeImagePlus)")
+    query <- query.exclude("^/Plugins/Libs/FreeImage/Wrapper/FreeImage.NET/cs/[^L]*/")
+    
+    let outDir =
+        rootDir + "Releases/"
+    
+    let makename rtype =
+        outDir + "Resizer" + (version.Replace('.', '-')) + "-" + rtype + "-" + (DateTime.UtcNow.ToString("MMM-d-yyyy")) + ".zip"
+    
+    // packmin
+    let minname = sprintf "Resizer4-0-0-allbinaries-dec-2-2014"
+    let mutable minfiles =
+        List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), false))
+            (query.files(["^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"; "^/Core/license.txt$"]))
+    
+    minfiles <-
+        List.append minfiles
+            (List.map (fun x -> CustomFile(x, snd((tupleRelative rootDir [x]).[0]), false))
+            (query.files(["^/readme.txt$"; "^/Web.config$"])))
+    
+    CreateZip rootDir (makename "min") "" 7 false minfiles
+    
+    
+    // packbin
+    let mutable binfiles =
+        List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), false))
+            (query.files("^/[^/]+.txt$"))
+    
+    binfiles <-
+        List.append binfiles
+            (List.map (fun x -> CustomFile(x, snd((tupleRelative (rootDir+"dlls\\release\\") [x]).[0]), false))
+            (query.files("^/dlls/release/*.(dll|pdb)$")))
+    
+    CreateZip rootDir (makename "allbinaries") "" 7 false binfiles
+    
+    
+    // packfull
+    let mutable fullfiles =
+        List.map (fun x -> CustomFile(x, snd((tupleRelative rootDir [x]).[0]), false))
+            (query.files(["^/(core|contrib|core.mvc|plugins|samples|tests|studiojs)/"; "^/tools/COMInstaller";
+                "^/dlls/(debug|release)"; "^/submodules/(lightresize|libwebp-net)"; "^/[^/]+.txt$"; "^/Web.config$"]))
+    
+    fullfiles <-
+        List.append fullfiles
+            (List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), false))
+            (query.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$")))
+    
+    fullfiles <-
+        List.append fullfiles
+            (List.map (fun x -> CustomFile(x, ("StudioJS/" + snd((tupleRelative (rootDir+"submodules\\studiojs\\") [x]).[0])), false))
+            (query.files("^/submodules/studiojs")))
+    
+    CreateZip rootDir (makename "full") "" 7 false fullfiles
+    
+    
+    // packstandard
+    query <- query.exclude("^/Core/[^/]+.sln")
+    let mutable standard =
+        List.map (fun x -> CustomFile(x, snd((tupleRelative rootDir [x]).[0]), false))
+            (query.files(["^/dlls/(debug|release)/"; "^/(core|samples)/"; "^/[^/]+.txt$"; "^/Web.config$"]))
+    
+    standard <-
+        List.append standard
+            (List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), false))
+            (query.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$")))
+    
+    standard <-
+        List.append standard
+            (List.map (fun x -> CustomFile(x, ("StudioJS/" + snd((tupleRelative (rootDir+"submodules\\studiojs\\") [x]).[0])), false))
+            (query.files("^/submodules/studiojs")))
+    
+    CreateZip rootDir (makename "standard") "" 7 false standard
+    
+    
+    // push
+    if publish then
+        let s3config = new Amazon.S3.AmazonS3Config()
+        s3config.Timeout <- System.Nullable (TimeSpan.FromHours(12.0))
+        s3config.RegionEndpoint <- Amazon.RegionEndpoint.USEast1
+        let s3client = new Amazon.S3.AmazonS3Client(fb_s3_id, fb_s3_key, s3config)
+        let s3 = new TransferUtility(s3client)
+        
+        for zipPkg in Directory.GetFiles(rootDir + "Releases", "*.zip") do
+            let request = new TransferUtilityUploadRequest()
+            request.CannedACL <- Amazon.S3.S3CannedACL.PublicRead
+            request.BucketName <- fb_s3_bucket
+            request.ContentType <- "application/zip"
+            request.Key <- Path.GetFileName(zipPkg)
+            request.FilePath <- zipPkg
+            
+            printf "Uploading %s to S3/%s...\n" (Path.GetFileName(zipPkg)) fb_s3_bucket
+            s3.Upload(request)
+    
+    ()
 )
 
 Target "Deploy" (fun _ ->
     Run "NuDeploy"
-    //Run "S3Deploy"
+    Run "S3Deploy"
 )
 
 "CleanAll"
