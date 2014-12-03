@@ -70,10 +70,12 @@ Target "PatchInfo" (fun _ ->
 
 Target "Test" (fun _ ->
     let skipable = ["ImageResizer.Plugins.LicenseVerifier.Tests"; "ImageResizer.CoreFSharp.Tests"]
+    let skipable32 = List.append skipable ["ImageResizer.AllPlugins.Tests"]
     
     for testDll in (!! (rootDir + "Tests/binaries/release/*Tests.dll")) do
+        let basename = (Path.GetFileNameWithoutExtension(testDll))
+        
         if not (List.exists (fun x -> x = testDll) skipable) then
-            let basename = (Path.GetFileNameWithoutExtension(testDll))
             try
                 let args = sprintf "-ExecutionPolicy ByPass tests\\appveyor_run_test.ps1 -assembly %s" basename
                 let result =
@@ -85,7 +87,8 @@ Target "Test" (fun _ ->
                 if result <> 0 then failwithf "Error during test %s" basename
             with exn ->
                 raise exn
-            
+        
+        if not (List.exists (fun x -> x = testDll) skipable32) then
             try
                 let args2 = sprintf "-ExecutionPolicy ByPass tests\\appveyor_run_test.ps1 -assembly %s -run32bit" basename
                 let result2 =
