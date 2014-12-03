@@ -1,11 +1,10 @@
 @echo off
 
 echo - Running Restore...
-nuget restore ..\AppVeyor.sln
+nuget restore ..\AppVeyor.sln && echo - Done! || goto fail
 
 echo - Fetching extra packaeges...
-nuget Install FAKE -ExcludeVersion && echo - Done! || goto fail
-nuget Install SharpZipLib -ExcludeVersion && echo - Done! || goto fail
+nuget restore FakeBuilder\packages.config && echo - Done! || goto fail
 
 echo - Gathering settings...
 
@@ -29,7 +28,7 @@ set /p fb_s3_bucket=S3 bucket:
 :no2
 
 echo - Executing Build.fsx...
-..\packages\FAKE\tools\Fake FakeBuilder\Build.fsx && echo - Done! || goto fail
+..\Packages\FAKE.3.11.0\tools\Fake FakeBuilder\Build.fsx && echo - Done! || goto fail
 
 pause
 exit /b 0

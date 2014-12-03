@@ -17,12 +17,11 @@ before_build:
   - git submodule update
   
   - nuget restore AppVeyor.sln
-  - nuget Install FAKE -ExcludeVersion
-  - nuget Install SharpZipLib -ExcludeVersion
+  - nuget restore Tools\FakeBuilder\packages.config
 
 build_script:
   - cd Tools
-  - ..\packages\FAKE\tools\Fake FakeBuilder\build.fsx
+  - ..\Packages\FAKE.3.11.0\tools\Fake FakeBuilder\Build.fsx
   - cd ..
 
 test: off

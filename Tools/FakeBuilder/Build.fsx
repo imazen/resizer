@@ -1,5 +1,5 @@
-#r @"..\..\packages\FAKE\tools\FakeLib.dll"
-#r @"..\..\packages\SharpZipLib\lib\20\ICSharpCode.SharpZipLib.dll"
+#r @"..\..\packages\FAKE.3.11.0\tools\FakeLib.dll"
+#r @"..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll"
 #r @"..\..\packages\AWSSDK.2.2.4.0\lib\net45\AWSSDK.dll"
 
 #load "FsQuery.fs"
@@ -54,24 +54,6 @@ Target "Build" (fun _ ->
     MSBuild "" "Build" ["Configuration","Release"] [mainSolution] |> ignore
     MSBuild "" "Build" ["Configuration","Debug"] [mainSolution] |> ignore
     MSBuild "" "Build" ["Configuration","Trial"] [mainSolution] |> ignore
-    
-    // remove any mess
-    let deletableFiles =
-        !! (rootDir + "Tests/binaries/**")
-        ++ (rootDir + "Core/obj/**")
-        ++ (rootDir + "Plugins/**/obj/**")
-        ++ (rootDir + "Samples/MvcSample/App_Data/**")
-        ++ (rootDir + "dlls/**/Aforge*.pdb")
-        ++ (rootDir + "dlls/**/Aforge*.xml")
-        ++ (rootDir + "dlls/**/LitS3*.pdb")
-        ++ (rootDir + "dlls/**/LitS3*.xml")
-        ++ (rootDir + "dlls/**/Ionic*.pdb")
-        ++ (rootDir + "dlls/**/Ionic*.xml")
-        ++ (rootDir + "**/Thumbs.db")
-        ++ (rootDir + "**/.DS_Store")
-    
-    for file in deletableFiles do
-        DeleteFile file
 )
 
 Target "PatchInfo" (fun _ ->
@@ -84,6 +66,22 @@ Target "PatchInfo" (fun _ ->
             "AssemblyFileVersion", version;
             "AssemblyInformationalVersion",(version.Replace('.', '-'));
             "NugetVersion", version]
+)
+
+Target "Test" (fun _ ->
+    for testDll in (!! (rootDir + "Tests/binaries/release/*Tests.dll")) do
+        try
+            let basename = (Path.GetFileNameWithoutExtension(testDll))
+            let args = sprintf "-ExecutionPolicy ByPass tests\\appveyor_run_test.ps1 -assembly %s" basename
+            let result =
+                ExecProcess(fun info ->
+                    info.FileName <- "powershell"
+                    info.WorkingDirectory <- rootDir
+                    info.Arguments <- args)
+                    (TimeSpan.FromMinutes 5.0)
+            if result <> 0 then failwithf "Error during test %s" basename
+        with exn ->
+            raise exn
 )
 
 Target "PackNuget" (fun _ ->
@@ -256,9 +254,30 @@ Target "Push" (fun _ ->
         printf "No s3 server information present, skipping push\n"
 )
 
+Target "Unmess" (fun _ ->
+    let deletableFiles =
+        !! (rootDir + "Tests/binaries/**")
+        ++ (rootDir + "Core/obj/**")
+        ++ (rootDir + "Plugins/**/obj/**")
+        ++ (rootDir + "Samples/MvcSample/App_Data/**")
+        ++ (rootDir + "dlls/**/Aforge*.pdb")
+        ++ (rootDir + "dlls/**/Aforge*.xml")
+        ++ (rootDir + "dlls/**/LitS3*.pdb")
+        ++ (rootDir + "dlls/**/LitS3*.xml")
+        ++ (rootDir + "dlls/**/Ionic*.pdb")
+        ++ (rootDir + "dlls/**/Ionic*.xml")
+        ++ (rootDir + "**/Thumbs.db")
+        ++ (rootDir + "**/.DS_Store")
+    
+    for file in deletableFiles do
+        DeleteFile file
+)
+
 "Clean"
 ==> "PatchInfo"
 ==> "Build"
+==> "Test"
+==> "Unmess"
 ==> "Pack"
 ==> "Push"
 
