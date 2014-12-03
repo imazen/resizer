@@ -69,19 +69,34 @@ Target "PatchInfo" (fun _ ->
 )
 
 Target "Test" (fun _ ->
+    let skipable = ["ImageResizer.Plugins.LicenseVerifier.Tests"; "ImageResizer.CoreFSharp.Tests"]
+    
     for testDll in (!! (rootDir + "Tests/binaries/release/*Tests.dll")) do
-        try
+        if not (List.exists (fun x -> x = testDll) skipable) then
             let basename = (Path.GetFileNameWithoutExtension(testDll))
-            let args = sprintf "-ExecutionPolicy ByPass tests\\appveyor_run_test.ps1 -assembly %s" basename
-            let result =
-                ExecProcess(fun info ->
-                    info.FileName <- "powershell"
-                    info.WorkingDirectory <- rootDir
-                    info.Arguments <- args)
-                    (TimeSpan.FromMinutes 5.0)
-            if result <> 0 then failwithf "Error during test %s" basename
-        with exn ->
-            raise exn
+            try
+                let args = sprintf "-ExecutionPolicy ByPass tests\\appveyor_run_test.ps1 -assembly %s" basename
+                let result =
+                    ExecProcess(fun info ->
+                        info.FileName <- "powershell"
+                        info.WorkingDirectory <- rootDir
+                        info.Arguments <- args)
+                        (TimeSpan.FromMinutes 5.0)
+                if result <> 0 then failwithf "Error during test %s" basename
+            with exn ->
+                raise exn
+            
+            try
+                let args2 = sprintf "-ExecutionPolicy ByPass tests\\appveyor_run_test.ps1 -assembly %s -run32bit" basename
+                let result2 =
+                    ExecProcess(fun info ->
+                        info.FileName <- "powershell"
+                        info.WorkingDirectory <- rootDir
+                        info.Arguments <- args2)
+                        (TimeSpan.FromMinutes 5.0)
+                if result2 <> 0 then failwithf "Error during test %s" basename
+            with exn ->
+                raise exn
 )
 
 Target "PackNuget" (fun _ ->
