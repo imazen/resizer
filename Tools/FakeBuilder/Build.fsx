@@ -257,7 +257,7 @@ Target "PushNuget" (fun _ ->
         else ""
     
     for nuPkg in Directory.GetFiles(rootDir + "Releases/nuget-packages", "*.nupkg") do
-        if not (nuPkg.Contains(".symbols.nuspec")) then
+        if not (nuPkg.Contains(".symbols.nupkg")) then
             Nuget.push nuPkg fb_nuget_url fb_nuget_key
         elif symbolServ <> "" then
             Nuget.push nuPkg symbolServ fb_nuget_key
