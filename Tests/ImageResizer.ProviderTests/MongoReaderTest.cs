@@ -407,7 +407,7 @@ namespace ImageResizer.ProviderTests {
             get {
                 var settings = new NameValueCollection();
                 settings["prefix"] = "/gridfs/";
-                settings["connectionString"] = "mongodb://test:test@staff.mongohq.com:10040/resizer2";
+                settings["connectionString"] = "mongodb://localhost:27017/resizer2";
 
                 return settings;
             }
