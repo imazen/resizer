@@ -70,7 +70,7 @@ Target "PatchInfo" (fun _ ->
 
 Target "Test" (fun _ ->
     let skipable = ["ImageResizer.Plugins.LicenseVerifier.Tests"; "ImageResizer.CoreFSharp.Tests"]
-    let skipable32 = List.append skipable ["ImageResizer.AllPlugins.Tests"]
+    let skipable32 = List.append skipable ["ImageResizer.AllPlugins.Tests"; "ImageResizer.CopyMetadata.Tests"; "ImageResizer.Plugins.TinyCache.Tests"]
     
     for testDll in (!! (rootDir + "Tests/binaries/release/*Tests.dll")) do
         let basename = (Path.GetFileNameWithoutExtension(testDll))
