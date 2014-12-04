@@ -1,5 +1,10 @@
+os: Windows Server 2012 R2
+
 clone_depth: 1
 version: 4.0.0.{build}
+
+services:
+  - mssql2012sp1
 
 environment:
   fb_nuget_url: https://www.myget.org/F/test-test-test/
