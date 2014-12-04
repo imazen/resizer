@@ -15,9 +15,14 @@ let tupleRelative baseDir (pathStrings:list<string>) =
     List.filter(fun item -> item.StartsWith(baseDir)) |>
     List.map(fun item -> (item, item.Substring(baseDir.Length).TrimEnd('\\', '/')))
 
-type FsInventory(folder :string) = 
+type FsInventory(folder :string) =
+  let mutable iFiles = []
   member this.baseDir = folder.TrimEnd('\\','/')
-  member this.files = Directory.GetFiles(this.baseDir, "*", SearchOption.AllDirectories) |>  Array.toList |> tupleRelative this.baseDir 
+  member this.files
+    with get () =
+      if iFiles = [] then Directory.GetFiles(this.baseDir, "*", SearchOption.AllDirectories) |>  Array.toList |> tupleRelative this.baseDir
+      else iFiles
+    and set (value) = iFiles <- value
   member this.folders = Directory.GetDirectories(this.baseDir, "*", SearchOption.AllDirectories) |>  Array.toList |> tupleRelative(this.baseDir)
 
 type FsQuery(inventory:FsInventory, exclusions: list<PathPattern>) = 
