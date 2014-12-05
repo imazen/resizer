@@ -185,8 +185,8 @@ Target "PackZips" (fun _ ->
                 (List.map (fun x -> CustomFileTransform(x, (targetDir + snd((tupleRelative baseDir [x]).[0])), true, find, replace)) tFiles)
         else
             List.append
-                (List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), true)) tFiles)
-                (List.map (fun x -> CustomFileTransform(x, (targetDir + snd((tupleRelative baseDir [x]).[0])), true, find, replace)) nFiles)
+                (List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), true)) nFiles)
+                (List.map (fun x -> CustomFileTransform(x, (targetDir + snd((tupleRelative baseDir [x]).[0])), true, find, replace)) tFiles)
     
     
     // packmin
