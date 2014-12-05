@@ -4,6 +4,8 @@ module Fake.ZipHelper2
  
 open Fake
 open System.IO
+open System.Text
+open System.Text.RegularExpressions
 open ICSharpCode.SharpZipLib.Zip
 open ICSharpCode.SharpZipLib.Core
 open System
@@ -14,8 +16,9 @@ let DefaultZipLevel = 7
 type ZipInputFile = 
         | File of sourcePath : string
         | CustomFile of sourcePath : string * destPath : string * required : bool
+        | CustomFileTransform of sourcePath : string * destPath : string * required : bool * find : string * replace : string
    
-type ZipFileInfo = { sourcePath:string; destPath:string; required:bool; info:FileInfo;}
+type ZipFileInfo = { sourcePath:string; destPath:string; required:bool; info:FileInfo; find:string; replace:string;}
     
  
 /// Creates a zip file with the given files
@@ -43,8 +46,9 @@ let CreateZip workingDir fileName comment level flatten (files:seq<ZipInputFile>
    
     let getFileInfo (zif:ZipInputFile) = 
         match zif with
-        | File x -> {sourcePath=x; destPath=getDestName(fileInfo x); required=false; info=(fileInfo x)}
-        | CustomFile(x, destPath, required) -> {sourcePath=x; destPath=destPath; required=required; info=(fileInfo x)}
+        | File x -> {sourcePath=x; destPath=getDestName(fileInfo x); required=false; info=(fileInfo x); find=null; replace=null}
+        | CustomFile(x, destPath, required) -> {sourcePath=x; destPath=destPath; required=required; info=(fileInfo x); find=null; replace=null}
+        | CustomFileTransform(x, destPath, required, find, replace) -> {sourcePath=x; destPath=destPath; required=required; info=(fileInfo x); find=find; replace=replace}
         
  
     let fileRecs = Seq.map getFileInfo files
@@ -61,17 +65,30 @@ let CreateZip workingDir fileName comment level flatten (files:seq<ZipInputFile>
                 
                 let itemSpec = ZipEntry.CleanName item.destPath
                 logfn "Adding File %s" itemSpec
-                let entry = new ZipEntry(itemSpec)
-                entry.DateTime <- item.info.LastWriteTime
-                entry.Size <- item.info.Length
-                use stream2 = item.info.OpenRead()
-                stream.PutNextEntry(entry)
-                let length = ref stream2.Length
-                stream2.Seek(0L, SeekOrigin.Begin) |> ignore
-                while !length > 0L do
-                    let count = stream2.Read(buffer, 0, buffer.Length)
-                    stream.Write(buffer, 0, count)
-                    length := !length - (int64 count)
+                
+                if item.find = null then
+                    let entry = new ZipEntry(itemSpec)
+                    entry.DateTime <- item.info.LastWriteTime
+                    entry.Size <- item.info.Length
+                    use stream2 = item.info.OpenRead()
+                    stream.PutNextEntry(entry)
+                    let length = ref stream2.Length
+                    stream2.Seek(0L, SeekOrigin.Begin) |> ignore
+                    
+                    while !length > 0L do
+                        let count = stream2.Read(buffer, 0, buffer.Length)
+                        stream.Write(buffer, 0, count)
+                        length := !length - (int64 count)
+                
+                else
+                    use stream2 = item.info.OpenText()
+                    let contents = stream2.ReadToEnd()
+                    let transform = Regex.Replace(contents, item.find, item.replace)
+                    let entry = new ZipEntry(itemSpec)
+                    entry.DateTime <- item.info.LastWriteTime
+                    entry.Size <- int64 transform.Length
+                    stream.PutNextEntry(entry)
+                    stream.Write(Encoding.ASCII.GetBytes(transform), 0, transform.Length)
             
             elif item.required then
                 failwithf "CreateZip: could not find required file %s to create %s" item.sourcePath fileName
