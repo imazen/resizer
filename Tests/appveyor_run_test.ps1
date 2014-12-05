@@ -1,5 +1,6 @@
 param([string]$assembly, [switch]$run32bit)
 
+$ErrorActionPreference = "Stop"
 cd Packages/xunit.runners*/Tools
 
 
