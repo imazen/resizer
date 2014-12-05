@@ -168,24 +168,25 @@ Target "PackZips" (fun _ ->
     let makeName rtype = outDir + "Resizer" + (version.Replace('.', '-')) + "-" + rtype + "-" + (DateTime.UtcNow.ToString("MMM-d-yyyy")) + ".zip"
     
     let toZipEntries (q : FsQuery) (patterns : string list) (baseDir : string) (targetDir : string) (inRoot : bool) =
-        let mutable files = q.files(patterns)
+        let files = q.files(patterns)
         
-        let tmpInv = FsInventory("")
-        tmpInv.files <- tupleRelative "" files
+        let tmpInv = FsInventory(rootDir)
         let transFiles = FsQuery(tmpInv, []).files("^/Samples/*/*.(cs|vb)proj$")
-        let otherFiles = List.filter (fun x -> not (List.exists ((=) x) transFiles)) files
+        
+        let tFiles = List.filter (fun x -> (List.exists ((=) x) transFiles)) files
+        let nFiles = List.filter (fun x -> not (List.exists ((=) x) transFiles)) files
         
         let find = @"<ProjectReference.*?<Name>(.*?)</Name>.*?</ProjectReference>"
         let replace = "<Reference Include=\"$1\"><HintPath>..\\..\\dlls\\release\$1.dll</HintPath></Reference>"
         
         if not inRoot then
             List.append
-                (List.map (fun x -> CustomFile(x, (targetDir + snd((tupleRelative baseDir [x]).[0])), true)) otherFiles)
-                (List.map (fun x -> CustomFileTransform(x, (targetDir + snd((tupleRelative baseDir [x]).[0])), true, find, replace)) transFiles)
+                (List.map (fun x -> CustomFile(x, (targetDir + snd((tupleRelative baseDir [x]).[0])), true)) nFiles)
+                (List.map (fun x -> CustomFileTransform(x, (targetDir + snd((tupleRelative baseDir [x]).[0])), true, find, replace)) tFiles)
         else
             List.append
-                (List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), true)) otherFiles)
-                (List.map (fun x -> CustomFileTransform(x, (targetDir + snd((tupleRelative baseDir [x]).[0])), true, find, replace)) transFiles)
+                (List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), true)) tFiles)
+                (List.map (fun x -> CustomFileTransform(x, (targetDir + snd((tupleRelative baseDir [x]).[0])), true, find, replace)) nFiles)
     
     
     // packmin
@@ -290,7 +291,7 @@ Target "Unmess" (fun _ ->
 "Clean"
 ==> "PatchInfo"
 ==> "Build"
-//==> "Test"
+==> "Test"
 ==> "Unmess"
 ==> "Pack"
 ==> "Push"
