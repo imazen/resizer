@@ -175,8 +175,8 @@ Target "PackZips" (fun _ ->
         let transFiles = FsQuery(tmpInv, []).files("^/Samples/*/*.(cs|vb)proj$")
         let otherFiles = List.filter (fun x -> not (List.exists ((=) x) transFiles)) files
         
-        let find = null
-        let replace = null
+        let find = @"<ProjectReference.*?<Name>(.*?)</Name>.*?</ProjectReference>"
+        let replace = "<Reference Include=\"$1\"><HintPath>..\\..\\dlls\\release\$1.dll</HintPath></Reference>"
         
         if not inRoot then
             List.append
