@@ -83,7 +83,7 @@ let CreateZip workingDir fileName comment level flatten (files:seq<ZipInputFile>
                 else
                     use stream2 = item.info.OpenText()
                     let contents = stream2.ReadToEnd()
-                    let transform = Regex.Replace(contents, item.find, item.replace)
+                    let transform = Regex.Replace(contents, item.find, item.replace, RegexOptions.Multiline)
                     let entry = new ZipEntry(itemSpec)
                     entry.DateTime <- item.info.LastWriteTime
                     entry.Size <- int64 transform.Length

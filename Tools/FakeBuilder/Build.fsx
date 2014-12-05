@@ -290,7 +290,7 @@ Target "Unmess" (fun _ ->
 "Clean"
 ==> "PatchInfo"
 ==> "Build"
-==> "Test"
+//==> "Test"
 ==> "Unmess"
 ==> "Pack"
 ==> "Push"
