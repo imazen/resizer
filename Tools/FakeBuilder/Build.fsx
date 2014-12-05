@@ -176,7 +176,7 @@ Target "PackZips" (fun _ ->
         List.append minfiles
             (List.map (fun x -> CustomFile(x, snd((tupleRelative rootDir [x]).[0]), false))
             (query.files(["^/readme.txt$"; "^/Web.config$"])))
-    CreateZip rootDir (makeName "min") "" 5 false minfiles
+    CreateZip rootDir (makeName "min") "" 5 true minfiles
     
     
     // packbin
@@ -187,7 +187,7 @@ Target "PackZips" (fun _ ->
         List.append binfiles
             (List.map (fun x -> CustomFile(x, snd((tupleRelative (rootDir+"dlls\\release\\") [x]).[0]), false))
             (query.files("^/dlls/release/*.(dll|pdb)$")))
-    CreateZip rootDir (makeName "allbinaries") "" 5 false binfiles
+    CreateZip rootDir (makeName "allbinaries") "" 5 true binfiles
     
     
     // packfull
@@ -203,7 +203,7 @@ Target "PackZips" (fun _ ->
         List.append fullfiles
             (List.map (fun x -> CustomFile(x, ("StudioJS/" + snd((tupleRelative (rootDir+"submodules\\studiojs\\") [x]).[0])), false))
             (query.files("^/submodules/studiojs")))
-    CreateZip rootDir (makeName "full") "" 5 false fullfiles
+    CreateZip rootDir (makeName "full") "" 5 true fullfiles
     
     
     // packstandard
@@ -219,7 +219,7 @@ Target "PackZips" (fun _ ->
         List.append standard
             (List.map (fun x -> CustomFile(x, ("StudioJS/" + snd((tupleRelative (rootDir+"submodules\\studiojs\\") [x]).[0])), false))
             (query.files("^/submodules/studiojs")))
-    CreateZip rootDir (makeName "standard") "" 5 false standard
+    CreateZip rootDir (makeName "standard") "" 5 true standard
     
     ()
 )

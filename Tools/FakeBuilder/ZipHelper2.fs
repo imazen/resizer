@@ -56,22 +56,29 @@ let CreateZip workingDir fileName comment level flatten (files:seq<ZipInputFile>
     if not (String.IsNullOrEmpty comment) then stream.SetComment comment
     let buffer = Array.create 32768 0uy
     for item in fileRecs do
-        
-        if item.info.Exists then 
+        try
+            if item.info.Exists then 
+                
+                let itemSpec = ZipEntry.CleanName item.destPath
+                logfn "Adding File %s" itemSpec
+                let entry = new ZipEntry(itemSpec)
+                entry.DateTime <- item.info.LastWriteTime
+                entry.Size <- item.info.Length
+                use stream2 = item.info.OpenRead()
+                stream.PutNextEntry(entry)
+                let length = ref stream2.Length
+                stream2.Seek(0L, SeekOrigin.Begin) |> ignore
+                while !length > 0L do
+                    let count = stream2.Read(buffer, 0, buffer.Length)
+                    stream.Write(buffer, 0, count)
+                    length := !length - (int64 count)
             
-            let itemSpec = ZipEntry.CleanName item.destPath
-            logfn "Adding File %s" itemSpec
-            let entry = new ZipEntry(itemSpec)
-            entry.DateTime <- item.info.LastWriteTime
-            entry.Size <- item.info.Length
-            use stream2 = item.info.OpenRead()
-            stream.PutNextEntry(entry)
-            let length = ref stream2.Length
-            stream2.Seek(0L, SeekOrigin.Begin) |> ignore
-            while !length > 0L do
-                let count = stream2.Read(buffer, 0, buffer.Length)
-                stream.Write(buffer, 0, count)
-                length := !length - (int64 count)
+            elif item.required then
+                failwithf "CreateZip: could not find required file %s to create %s" item.sourcePath fileName
+        
+        with exn ->
+            raise exn
+    
     stream.Finish()
     tracefn "Zip successfully created %s" fileName
  
