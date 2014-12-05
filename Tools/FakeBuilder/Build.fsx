@@ -167,59 +167,41 @@ Target "PackZips" (fun _ ->
     let outDir = rootDir + "Releases/"
     let makeName rtype = outDir + "Resizer" + (version.Replace('.', '-')) + "-" + rtype + "-" + (DateTime.UtcNow.ToString("MMM-d-yyyy")) + ".zip"
     
+    let toZipEntries (q: FsQuery) (patterns : string list) (baseDir : string) (targetDir : string) (required : bool) (inRoot : bool) =
+        if not inRoot then
+            List.map (fun x -> CustomFile(x, (targetDir + snd((tupleRelative baseDir [x]).[0])), required)) (q.files(patterns))
+        else
+            List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), required)) (q.files(patterns))
+    
     
     // packmin
-    let mutable minfiles =
-        List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), false))
-            (query.files(["^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"; "^/Core/license.txt$"]))
-    minfiles <-
-        List.append minfiles
-            (List.map (fun x -> CustomFile(x, snd((tupleRelative rootDir [x]).[0]), false))
-            (query.files(["^/readme.txt$"; "^/Web.config$"])))
-    CreateZip rootDir (makeName "min") "" 5 true minfiles
+    let minfiles = toZipEntries query ["^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$";
+        "^/Core/license.txt$"; "^/readme.txt$"; "^/Web.config$"] "" "" true true
+    CreateZip rootDir (makeName "min") "" 5 false minfiles
     
     
     // packbin
-    let mutable binfiles =
-        List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), false))
-            (query.files("^/[^/]+.txt$"))
-    binfiles <-
-        List.append binfiles
-            (List.map (fun x -> CustomFile(x, snd((tupleRelative (rootDir+"dlls\\release\\") [x]).[0]), false))
-            (query.files("^/dlls/release/*.(dll|pdb)$")))
-    CreateZip rootDir (makeName "allbinaries") "" 5 true binfiles
+    let mutable binfiles = toZipEntries query ["^/[^/]+.txt$"] "" "" true true
+    binfiles <- List.append binfiles (toZipEntries query ["^/dlls/release/*.(dll|pdb)$"] (rootDir+"dlls\\release\\") "" true false)
+    CreateZip rootDir (makeName "allbinaries") "" 5 false binfiles
     
     
     // packfull
-    let mutable fullfiles =
-        List.map (fun x -> CustomFile(x, snd((tupleRelative rootDir [x]).[0]), false))
-            (query.files(["^/(core|contrib|core.mvc|plugins|samples|tests|studiojs)/"; "^/tools/COMInstaller";
-                "^/dlls/(debug|release)"; "^/submodules/(lightresize|libwebp-net)"; "^/[^/]+.txt$"; "^/Web.config$"]))
-    fullfiles <-
-        List.append fullfiles
-            (List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), false))
-            (query.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$")))
-    fullfiles <-
-        List.append fullfiles
-            (List.map (fun x -> CustomFile(x, ("StudioJS/" + snd((tupleRelative (rootDir+"submodules\\studiojs\\") [x]).[0])), false))
-            (query.files("^/submodules/studiojs")))
-    CreateZip rootDir (makeName "full") "" 5 true fullfiles
+    let mutable fullfiles = toZipEntries query ["^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"] "" "" true true
+    fullfiles <- List.append fullfiles (toZipEntries query
+        ["^/(core|contrib|core.mvc|plugins|samples|tests|studiojs)/"; "^/tools/COMInstaller"; "^/dlls/(debug|release)";
+        "^/submodules/(lightresize|libwebp-net)"; "^/[^/]+.txt$"; "^/Web.config$"] rootDir "" true false)
+    fullfiles <- List.append fullfiles (toZipEntries query ["^/submodules/studiojs"] (rootDir+"submodules\\studiojs") "StudioJS" true false)
+    CreateZip rootDir (makeName "full") "" 5 false fullfiles
     
     
     // packstandard
     query <- query.exclude("^/Core/[^/]+.sln")
-    let mutable standard =
-        List.map (fun x -> CustomFile(x, snd((tupleRelative rootDir [x]).[0]), false))
-            (query.files(["^/dlls/(debug|release)/"; "^/(core|samples)/"; "^/[^/]+.txt$"; "^/Web.config$"]))
-    standard <-
-        List.append standard
-            (List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), false))
-            (query.files("^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$")))
-    standard <-
-        List.append standard
-            (List.map (fun x -> CustomFile(x, ("StudioJS/" + snd((tupleRelative (rootDir+"submodules\\studiojs\\") [x]).[0])), false))
-            (query.files("^/submodules/studiojs")))
-    CreateZip rootDir (makeName "standard") "" 5 true standard
+    let mutable standard = toZipEntries query ["^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"] "" "" true true
+    standard <- List.append standard (toZipEntries query ["^/dlls/(debug|release)/"; "^/(core|samples)/";
+        "^/[^/]+.txt$"; "^/Web.config$"] rootDir "" true false)
+    standard <- List.append standard (toZipEntries query ["^/submodules/studiojs"] (rootDir+"submodules\\studiojs") "StudioJS" true false)
+    CreateZip rootDir (makeName "standard") "" 5 false standard
     
     ()
 )
