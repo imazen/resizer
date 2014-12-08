@@ -12,6 +12,8 @@ open Amazon.S3.Transfer
 
 open FsQuery
 open FakeBuilder
+open StringHelper
+open XUnit2Helper
 
 open System
 open System.IO
@@ -69,37 +71,21 @@ Target "PatchInfo" (fun _ ->
 )
 
 Target "Test" (fun _ ->
-    let skipable = ["ImageResizer.Plugins.LicenseVerifier.Tests"; "ImageResizer.CoreFSharp.Tests"]
-    let skipable32 = List.append skipable ["ImageResizer.AllPlugins.Tests"; "ImageResizer.CopyMetadata.Tests"; "ImageResizer.Plugins.TinyCache.Tests"]
+    let xunit = Seq.nth 0 (!! (rootDir + "Packages/xunit.runners*/tools/xunit.console.exe"))
+    let xunit32 = replace "xunit.console.exe" "xunit.console.x86.exe" xunit
+      
+    !! (rootDir + "Tests/binaries/release/*Tests.dll")
+        -- "*ImageResizer.Plugins.LicenseVerifier.Tests.dll"
+        -- "*ImageResizer.CoreFSharp.Tests.dll"
+            |> xUnit (fun p -> {p with ToolPath = xunit})
     
-    for testDll in (!! (rootDir + "Tests/binaries/release/*Tests.dll")) do
-        let basename = (Path.GetFileNameWithoutExtension(testDll))
-        
-        if not (List.exists (fun x -> x = basename) skipable) then
-            try
-                let args = sprintf "-ExecutionPolicy ByPass tests\\appveyor_run_test.ps1 -assembly %s" basename
-                let result =
-                    ExecProcess(fun info ->
-                        info.FileName <- "powershell"
-                        info.WorkingDirectory <- rootDir
-                        info.Arguments <- args)
-                        (TimeSpan.FromMinutes 5.0)
-                if result <> 0 then failwithf "Error during test %s" basename
-            with exn ->
-                raise exn
-        
-        if not (List.exists (fun x -> x = basename) skipable32) then
-            try
-                let args2 = sprintf "-ExecutionPolicy ByPass tests\\appveyor_run_test.ps1 -assembly %s -run32bit" basename
-                let result2 =
-                    ExecProcess(fun info ->
-                        info.FileName <- "powershell"
-                        info.WorkingDirectory <- rootDir
-                        info.Arguments <- args2)
-                        (TimeSpan.FromMinutes 5.0)
-                if result2 <> 0 then failwithf "Error during test %s" basename
-            with exn ->
-                raise exn
+    !! (rootDir + "Tests/binaries/release/*Tests.dll")
+        -- "*ImageResizer.Plugins.LicenseVerifier.Tests.dll"
+        -- "*ImageResizer.CoreFSharp.Tests.dll"
+        -- "*ImageResizer.AllPlugins.Tests.dll"
+        -- "*ImageResizer.CopyMetadata.Tests.dll"
+        -- "*ImageResizer.Plugins.TinyCache.Tests.dll"
+            |> xUnit (fun p -> {p with ToolPath = xunit32})
 )
 
 Target "PackNuget" (fun _ ->
@@ -287,6 +273,7 @@ Target "Unmess" (fun _ ->
     for file in deletableFiles do
         DeleteFile file
 )
+
 
 "Clean"
 ==> "PatchInfo"
