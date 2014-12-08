@@ -75,16 +75,16 @@ Target "Test" (fun _ ->
     let xunit32 = replace "xunit.console.exe" "xunit.console.x86.exe" xunit
       
     !! (rootDir + "Tests/binaries/release/*Tests.dll")
-        -- "*ImageResizer.Plugins.LicenseVerifier.Tests.dll"
-        -- "*ImageResizer.CoreFSharp.Tests.dll"
+        -- (rootDir + "**/ImageResizer.Plugins.LicenseVerifier.Tests.dll")
+        -- (rootDir + "**/ImageResizer.CoreFSharp.Tests.dll")
             |> xUnit (fun p -> {p with ToolPath = xunit})
     
     !! (rootDir + "Tests/binaries/release/*Tests.dll")
-        -- "*ImageResizer.Plugins.LicenseVerifier.Tests.dll"
-        -- "*ImageResizer.CoreFSharp.Tests.dll"
-        -- "*ImageResizer.AllPlugins.Tests.dll"
-        -- "*ImageResizer.CopyMetadata.Tests.dll"
-        -- "*ImageResizer.Plugins.TinyCache.Tests.dll"
+        -- (rootDir + "**/ImageResizer.Plugins.LicenseVerifier.Tests.dll")
+        -- (rootDir + "**/ImageResizer.CoreFSharp.Tests.dll")
+        -- (rootDir + "**/ImageResizer.AllPlugins.Tests.dll")
+        -- (rootDir + "**/ImageResizer.CopyMetadata.Tests.dll")
+        -- (rootDir + "**/ImageResizer.Plugins.TinyCache.Tests.dll")
             |> xUnit (fun p -> {p with ToolPath = xunit32})
 )
 
