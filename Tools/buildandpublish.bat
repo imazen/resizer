@@ -1,5 +1,9 @@
 @echo off
 
+echo - Fetching Submodules...
+git submodule init
+git submodule update
+
 echo - Running Restore...
 nuget restore ..\AppVeyor.sln && echo - Done! || goto fail
 

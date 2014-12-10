@@ -33,6 +33,7 @@ let fb_s3_key = EnvironmentHelper.environVar "fb_s3_key"
 let rootDir = Path.GetFullPath(__SOURCE_DIRECTORY__ + "/../..") + "\\"
 let coreDir = rootDir + "Core/"
 let mainSolution = rootDir + "AppVeyor.sln"
+let fastScaleSln = rootDir + "Plugins/FastScaling/ImageResizer.Plugins.FastScaling.sln"
 let assemblyInfoFile = coreDir + "SharedAssemblyInfo.cs"
 
 let mutable version = AssemblyPatcher.getInfo assemblyInfoFile "AssemblyVersion"
@@ -41,21 +42,46 @@ if AppVeyor.AppVeyorEnvironment.BuildVersion <> null then
     version <- AppVeyor.AppVeyorEnvironment.BuildVersion
 
 
+// Default build settings
+
+let setParams defaults =
+        { defaults with
+            Verbosity = Some(Quiet)
+            Targets = ["Build"]
+            Properties =
+                [
+                    "Optimize", "True"
+                    "DebugSymbols", "True"
+                    "Configuration", "Relese"
+                    "Platform", "Any CPU"
+                ]
+        }
+
 // Targets
 
 Target "Clean" (fun _ ->
+    MSBuildDefaults <- setParams MSBuildDefaults
+    
     MSBuild "" "Clean" ["Configuration","Release"] [mainSolution] |> ignore
     MSBuild "" "Clean" ["Configuration","Debug"] [mainSolution] |> ignore
     MSBuild "" "Clean" ["Configuration","Trial"] [mainSolution] |> ignore
+    
     CleanDirs [rootDir + "dlls/release"]
     CleanDirs [rootDir + "dlls/debug"]
     CleanDirs [rootDir + "dlls/trial"]
 )
 
 Target "Build" (fun _ ->
+    MSBuildDefaults <- setParams MSBuildDefaults
+    
     MSBuild "" "Build" ["Configuration","Release"] [mainSolution] |> ignore
     MSBuild "" "Build" ["Configuration","Debug"] [mainSolution] |> ignore
     MSBuild "" "Build" ["Configuration","Trial"] [mainSolution] |> ignore
+    
+    MSBuild "" "Build" ["Configuration","Release"; "Platform","x86"] [fastScaleSln] |> ignore
+    MSBuild "" "Build" ["Configuration","Debug"; "Platform","x86"] [fastScaleSln] |> ignore
+    MSBuild "" "Build" ["Configuration","Release"; "Platform","x64"] [fastScaleSln] |> ignore
+    MSBuild "" "Build" ["Configuration","Debug"; "Platform","x64"] [fastScaleSln] |> ignore
 )
 
 Target "PatchInfo" (fun _ ->
