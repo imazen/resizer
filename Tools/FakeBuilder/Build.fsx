@@ -52,16 +52,16 @@ let setParams defaults =
                 [
                     "Optimize", "True"
                     "DebugSymbols", "True"
-                    "Configuration", "Relese"
                     "Platform", "Any CPU"
                 ]
         }
 
+MSBuildDefaults <- setParams MSBuildDefaults
+
+
 // Targets
 
 Target "Clean" (fun _ ->
-    MSBuildDefaults <- setParams MSBuildDefaults
-    
     MSBuild "" "Clean" ["Configuration","Release"] [mainSolution] |> ignore
     MSBuild "" "Clean" ["Configuration","Debug"] [mainSolution] |> ignore
     MSBuild "" "Clean" ["Configuration","Trial"] [mainSolution] |> ignore
@@ -72,8 +72,6 @@ Target "Clean" (fun _ ->
 )
 
 Target "Build" (fun _ ->
-    MSBuildDefaults <- setParams MSBuildDefaults
-    
     MSBuild "" "Build" ["Configuration","Release"] [mainSolution] |> ignore
     MSBuild "" "Build" ["Configuration","Debug"] [mainSolution] |> ignore
     MSBuild "" "Build" ["Configuration","Trial"] [mainSolution] |> ignore
