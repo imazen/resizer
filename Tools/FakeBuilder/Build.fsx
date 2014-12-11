@@ -29,6 +29,7 @@ let fb_nuget_key = EnvironmentHelper.environVar "fb_nuget_key"
 let fb_s3_bucket = EnvironmentHelper.environVar "fb_s3_bucket"
 let fb_s3_id = EnvironmentHelper.environVar "fb_s3_id"
 let fb_s3_key = EnvironmentHelper.environVar "fb_s3_key"
+let fb_pub_url = EnvironmentHelper.environVar "fb_pub_url"
 
 let rootDir = Path.GetFullPath(__SOURCE_DIRECTORY__ + "/../..") + "\\"
 let coreDir = rootDir + "Core/"
@@ -302,6 +303,15 @@ Target "Unmess" (fun _ ->
         DeleteFile file
 )
 
+Target "PrintInfo" (fun _ ->
+    //TODO: add stats to detect large files in zips
+    
+    if fb_pub_url <> null then
+        printf "Download urls:\n"
+        for zipPkg in Directory.GetFiles(rootDir + "Releases", "*.zip") do
+            printf "%s/%s\n" fb_pub_url (Path.GetFileName(zipPkg))
+)
+
 
 "Clean"
 ==> "PatchInfo"
@@ -310,5 +320,6 @@ Target "Unmess" (fun _ ->
 ==> "Unmess"
 ==> "Pack"
 ==> "Push"
+==> "PrintInfo"
 
-RunTargetOrDefault "Push"
+RunTargetOrDefault "PrintInfo"
