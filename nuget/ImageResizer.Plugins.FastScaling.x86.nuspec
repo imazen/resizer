@@ -1,0 +1,32 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.FastScaling.x86</id>
+		<title>ImageResizer.Plugins.FastScaling.x86</title>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<owners>$owners$</owners>
+		<licenseUrl>http://imageresizing.net/licenses/fastscaling</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>$iconurl$</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>
+
+
+
+Docs: http://imageresizing.net/plugins/fastscaling
+
+Support: http://imageresizing.net/support
+
+$plugins$
+
+</description>
+		<tags>ImageResizer FastScaling Imazen Resizer imaging</tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		</dependencies>
+	</metadata>
+  	<files>
+ 		<file src="$coredlldir$\x86\ImageResizer.Plugins.FastScaling.dll" target="lib" />
+	</files>
+</package>
