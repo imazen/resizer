@@ -98,14 +98,16 @@ Target "Test" (fun _ ->
     let xunit = Seq.nth 0 (!! (rootDir + "Packages/xunit.runners*/tools/xunit.console.exe"))
     let xunit32 = replace "xunit.console.exe" "xunit.console.x86.exe" xunit
       
-    !! (rootDir + "Tests/binaries/release/**/*Tests.dll")
-        ++ (rootDir + "Tests/binaries/release/**/*Tests.Cpp.dll")
+    !! (rootDir + "Tests/binaries/release/*Tests.dll")
+        ++ (rootDir + "Tests/binaries/release/x64/*Tests.dll")
+        ++ (rootDir + "Tests/binaries/release/x64/*Tests.Cpp.dll")
         -- (rootDir + "**/ImageResizer.Plugins.LicenseVerifier.Tests.dll")
         -- (rootDir + "**/ImageResizer.CoreFSharp.Tests.dll")
             |> xUnit (fun p -> {p with ToolPath = xunit})
     
-    !! (rootDir + "Tests/binaries/release/**/*Tests.dll")
-        ++ (rootDir + "Tests/binaries/release/**/*Tests.Cpp.dll")
+    !! (rootDir + "Tests/binaries/release/*Tests.dll")
+        ++ (rootDir + "Tests/binaries/release/x86/*Tests.dll")
+        ++ (rootDir + "Tests/binaries/release/x86/*Tests.Cpp.dll")
         -- (rootDir + "**/ImageResizer.Plugins.LicenseVerifier.Tests.dll")
         -- (rootDir + "**/ImageResizer.CoreFSharp.Tests.dll")
         -- (rootDir + "**/ImageResizer.AllPlugins.Tests.dll")
