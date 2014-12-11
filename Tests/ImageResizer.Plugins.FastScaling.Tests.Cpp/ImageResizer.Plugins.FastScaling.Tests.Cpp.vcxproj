@@ -133,13 +133,17 @@
       </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+    <ItemGroup>
+    <ProjectReference Include="..\..\Core\ImageResizer.csproj">
+      <Project>{fa5ef673-a6a4-498d-aa24-c025cc5267af}</Project>
+      <Name>ImageResizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\FastScaling\ImageResizer.Plugins.FastScaling.vcxproj">
+      <Project>{9b97d952-2969-4f46-9758-9e712cdf3f72}</Project>
+      <Name>ImageResizer.Plugins.FastScaling</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
-    <Reference Include="ImageResizer">
-      <HintPath>..\..\dlls\release\ImageResizer.dll</HintPath>
-    </Reference>
-    <Reference Include="ImageResizer.Plugins.FastScaling">
-      <HintPath>..\..\dlls\release\x64\ImageResizer.Plugins.FastScaling.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />

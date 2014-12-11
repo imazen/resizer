@@ -45,7 +45,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AForge.Imaging">
-      <HintPath>..\Libs\AForge\AForge.Imaging.dll</HintPath>
+      <HintPath>..\..\Packages\AForge.Imaging.2.2.5\lib\AForge.Imaging.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
