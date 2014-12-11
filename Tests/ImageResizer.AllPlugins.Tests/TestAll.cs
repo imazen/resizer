@@ -139,7 +139,7 @@ namespace ImageResizer.AllPlugins.Tests {
         }
 
         int counter = 0;
-        [Theory]
+        [Theory(Skip="Disabled for CI builds by default")]
         [MemberData("RandomCombinations")]
         public void RandomTest(object source, string query) {
             Config c = GetConfig();
