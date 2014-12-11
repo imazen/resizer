@@ -9,6 +9,8 @@
 
 open Fake
 open Amazon.S3.Transfer
+open ICSharpCode.SharpZipLib.Zip
+open ICSharpCode.SharpZipLib.Core
 
 open FsQuery
 open FakeBuilder
@@ -304,10 +306,18 @@ Target "Unmess" (fun _ ->
 )
 
 Target "PrintInfo" (fun _ ->
-    //TODO: add stats to detect large files in zips
+    for zipPkg in Directory.GetFiles(rootDir + "Releases", "*.zip") do
+        printf "\nLarge files in %s:\n" (Path.GetFileName(zipPkg))
+        let zip = new ZipInputStream(File.OpenRead(zipPkg))
+        let mutable entry = zip.GetNextEntry()
+        while entry <> null do
+            if (int entry.CompressedSize) > 500 * 1024 then
+                printf "%dk %s\n" (entry.CompressedSize/1024L) entry.Name
+            entry <- zip.GetNextEntry()
+    
     
     if fb_pub_url <> null then
-        printf "Download urls:\n"
+        printf "\nDownload urls:\n"
         for zipPkg in Directory.GetFiles(rootDir + "Releases", "*.zip") do
             printf "%s/%s\n" fb_pub_url (Path.GetFileName(zipPkg))
 )
