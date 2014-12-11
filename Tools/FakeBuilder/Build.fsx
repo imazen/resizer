@@ -311,7 +311,7 @@ Target "PrintInfo" (fun _ ->
         let zip = new ZipInputStream(File.OpenRead(zipPkg))
         let mutable entry = zip.GetNextEntry()
         while entry <> null do
-            if (int entry.CompressedSize) > 500 * 1024 then
+            if (int entry.CompressedSize) > 300 * 1024 then
                 printf "%dk %s\n" (entry.CompressedSize/1024L) entry.Name
             entry <- zip.GetNextEntry()
     
