@@ -66,7 +66,7 @@
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Configuration">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Packages\Microsoft.WindowsAzure.ConfigurationManager.2.0.3\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
+      <HintPath>..\..\Packages\Microsoft.WindowsAzure.ConfigurationManager.2.0.2.0\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Storage">
       <SpecificVersion>False</SpecificVersion>
