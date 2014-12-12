@@ -406,8 +406,13 @@ namespace ImageResizer.ProviderTests {
         private NameValueCollection Settings {
             get {
                 var settings = new NameValueCollection();
+                var mongodb = Environment.GetEnvironmentVariable("resizer_test_mongo_db");
+                
                 settings["prefix"] = "/gridfs/";
-                settings["connectionString"] = "mongodb://test:test@staff.mongohq.com:10040/resizer2";
+                if(mongodb == null)
+                    settings["connectionString"] = "mongodb://test:test@staff.mongohq.com:10040/resizer2";
+                else
+                    settings["connectionString"] = mongodb;
 
                 return settings;
             }

@@ -15,9 +15,14 @@ assembly_info:
 
 clone_folder: c:\projects\resizer
 
+environment:
+  resizer_test_mongo_db: mongodb://localhost:27017/resizer2
 
 install:
   - cmd: git submodule -q update --init
+  - ps: Invoke-WebRequest https://s3.amazonaws.com/public-unit-test-resources/mongodb/mongod.exe.zip -OutFile mongodb.zip
+  - 7z x -o.\ mongodb.zip
+  - mongod.exe --logpath=mongo.log --dbpath=. --smallfiles --install
 
 services:
   - mssql2012sp1
