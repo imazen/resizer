@@ -322,14 +322,27 @@ Target "PrintInfo" (fun _ ->
             printf "%s/%s\n" fb_pub_url (Path.GetFileName(zipPkg))
 )
 
+Target "Custom" (fun _ ->
+    let targets = getBuildParamOrDefault "targets" ""
+    let tlist = split ';' targets
+    
+    if tlist.Length > 0 then
+        for i=0 to tlist.Length-2 do
+            tlist.[i] ==> tlist.[i+1]
+        Run tlist.[tlist.Length-1]
+)
 
-"Clean"
-==> "PatchInfo"
-==> "Build"
-==> "Test"
-==> "Unmess"
-==> "Pack"
-==> "Push"
-==> "PrintInfo"
+Target "DoAll" (fun _ ->
+    "Clean"
+    ==> "PatchInfo"
+    ==> "Build"
+    ==> "Test"
+    ==> "Unmess"
+    ==> "Pack"
+    ==> "Push"
+    ==> "PrintInfo"
+    
+    Run "PrintInfo"
+)
 
-RunTargetOrDefault "PrintInfo"
+RunTargetOrDefault "DoAll"
