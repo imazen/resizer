@@ -258,6 +258,7 @@ Target "PushS3" (fun _ ->
     let s3 = new TransferUtility(s3client)
     
     for zipPkg in Directory.GetFiles(rootDir + "Releases", "*.zip") do
+        let mutable tries = 3
         let request = new TransferUtilityUploadRequest()
         request.CannedACL <- Amazon.S3.S3CannedACL.PublicRead
         request.BucketName <- fb_s3_bucket
@@ -265,8 +266,15 @@ Target "PushS3" (fun _ ->
         request.Key <- Path.GetFileName(zipPkg)
         request.FilePath <- zipPkg
         
-        printf "Uploading %s to S3/%s...\n" (Path.GetFileName(zipPkg)) fb_s3_bucket
-        s3.Upload(request)
+        while tries > 0 do
+            try
+                printf "Uploading %s to S3/%s...\n" (Path.GetFileName(zipPkg)) fb_s3_bucket
+                s3.Upload(request)
+                tries <- 0
+            with exn ->
+                tries <- tries-1
+                if tries=0 then
+                    raise exn
 )
 
 Target "Pack" (fun _ ->
