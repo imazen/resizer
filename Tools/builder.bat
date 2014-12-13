@@ -1,4 +1,5 @@
 @echo off
+pushd %~dp0
 
 set fake=..\Packages\FAKE.3.11.0\tools\Fake
 set fsx=FakeBuilder\Build.fsx
@@ -45,7 +46,7 @@ goto loop
 
 
 %fake% %fsx% Custom targets=%target%
-exit /b
+goto exit
 
 
 :update
@@ -56,7 +57,7 @@ exit /b
   nuget restore ..\AppVeyor.sln
   echo - Fetching extra packaeges...
   nuget restore FakeBuilder\packages.config
-  exit /b
+  goto exit
 
 
 :help
@@ -80,3 +81,8 @@ exit /b
   echo pack_all    - pack zips and nuget
   echo push_zips ^<s3_id^> ^<s3_key^> ^<s3_bucket^>
   echo push_nuget ^<nuget_key^> [nuget_feed]
+  goto exit
+
+:exit
+  popd
+  exit /b
