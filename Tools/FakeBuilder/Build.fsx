@@ -332,7 +332,7 @@ Target "PrintInfo" (fun _ ->
 
 Target "Custom" (fun _ ->
     let targets = getBuildParamOrDefault "targets" ""
-    let tlist = split ';' targets
+    let tlist = List.map (fun x -> (split ' ' x).[0]) (split ';' targets)
     
     if tlist.Length > 0 then
         for i=0 to tlist.Length-2 do

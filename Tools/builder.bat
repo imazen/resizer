@@ -45,7 +45,7 @@ goto loop
 :end
 
 
-%fake% %fsx% Custom targets=%target%
+%fake% %fsx% Custom "targets=%target%"
 goto exit
 
 
