@@ -34,15 +34,21 @@ let push nuPkg url key =
     let tracing = enableProcessTracing
     enableProcessTracing <- false
     
-    try
-        let result =
-            ExecProcess(fun info ->
-                info.FileName <- "nuget"
-                info.Arguments <- args)
-                (TimeSpan.FromMinutes 1.0)
-        if result <> 0 then failwithf "Error during NuGet push (%s)" nuPkg
-    with exn ->
-        raise exn
+    let mutable tries = 3
+    
+    while tries > 0 do
+        try
+            let result =
+                ExecProcess(fun info ->
+                    info.FileName <- "nuget"
+                    info.Arguments <- args)
+                    (TimeSpan.FromMinutes 1.0)
+            if result <> 0 then failwithf "Error during NuGet push (%s)" nuPkg
+            else tries <- 0
+        with exn ->
+            tries <- tries-1
+            if tries=0 then
+                raise exn
     
     // restore settings
     enableProcessTracing <- tracing
