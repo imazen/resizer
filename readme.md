@@ -1,40 +1,22 @@
-## [ImageResizer](http://imageresizing.net) - The flexible image server
+<a name="develop"></a>
+## [ImageResizer](http://imageresizing.net) - The Flexible Image Server
 develop branch: [![Build status](https://ci.appveyor.com/api/projects/status/77a52n4hd0y36ybs/branch/develop?svg=true)](https://ci.appveyor.com/project/imazen/resizer/branch/develop) ![Issue Count](http://img.shields.io/github/issues/imazen/resizer.svg) [![Issues ready for work](https://badge.waffle.io/imazen/resizer.png?label=ready&title=Issues%20ready%20for%20work&svg=true)](https://waffle.io/imazen/resizer)  
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/imazen/resizer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) ![ImageResizer core downloads](http://img.shields.io/nuget/dt/ImageResizer.svg) ![Latest NuGet version](http://img.shields.io/nuget/vpre/ImageResizer.svg)
 
-What is it?
+#What is it?
 
 * An IIS/ASP.NET HttpModule & image server. On-demand image manipulation, delivery, and optimization &mdash; with low latency &mdash; makes responsive images easy
 * An image processing library optimized and secured for server-side use
 * A framework and collection of 40+ plugins to accomplish most common web imaging needs. 
 
-## Install from NuGet
-
-Nearly all [ImageResizer plugins are on NuGet (33+)](https://www.nuget.org/packages?q=nathanaeljones).
-
-Get the basics:
-```
-PM> Install-Package ImageResizer.WebConfig
-PM> Install-Package ImageResizer.Plugins.DiskCache
-PM> Install-Package ImageResizer.Plugins.PrettyGifs
-```
-
-## Clone from GitHub
-
-We use submodules - clone with `git clone -b develop --recursive https://github.com/imazen/resizer` or run `git submodule update --init --recursive` afterwards.
-
-All work happens on the `develop` branch. See [CONTRIBUTING](https://github.com/imazen/resizer/blob/develop/CONTRIBUTING.md) for details.
-
-## Intro
-
-ImageResizer has a very simple (and powerful) URL API. Check out the [documentation](http://imageresizing.net/docs).
+ImageResizer has a very simple (and powerful) URL API.
 
 ![Fit modes](http://z.zr.io/rw/diagrams/resizing-modes.png)
 
+For more informaiton, [check out our website](http://www.imageresizing.net). To contribute, see [CONTRIBUTING](https://github.com/imazen/resizer/blob/develop/CONTRIBUTING.md).
 
-## License
-
-Over half of ImageResizer's plugins are available under the Apache 2.0 license. See [license.txt for details](https://github.com/imazen/resizer/blob/develop/license.txt).
+#### License
+Over half of ImageResizer's plugins are available under the Apache 2.0 license. See [license.txt for details]( https://github.com/imazen/resizer/blob/develop/license.txt).
 
 
 # Major changes in V4
