@@ -1,8 +1,8 @@
 Everything exciting is happening on the [develop branch. Why not head over there?](https://github.com/imazen/resizer/tree/develop)
 
-<a name="v3"></a>
+<a name="v3"></a><a name="top"></a>
 ## [ImageResizer](http://imageresizing.net) - The Flexible Image Server
-![Issue Count](http://img.shields.io/github/issues/imazen/resizer.svg)[![Issues ready for work](https://badge.waffle.io/imazen/resizer.png?label=ready&title=Issues%20ready%20for%20work&svg=true)](https://waffle.io/imazen/resizer) View ReadMe for [latest](https://github.com/imazen/resizer/tree/develop), [stable](https://github.com/imazen/resizer/tree/master), [v2](https://github.com/imazen/resizer/tree/support/v2), and [v4](https://github.com/imazen/resizer/tree/support/v4).
+![Issue Count](http://img.shields.io/github/issues/imazen/resizer.svg)[![Issues ready for work](https://badge.waffle.io/imazen/resizer.png?label=ready&title=Issues%20ready%20for%20work&svg=true)](https://waffle.io/imazen/resizer) View ReadMe for [latest](https://github.com/imazen/resizer/tree/develop#top), [stable](https://github.com/imazen/resizer/tree/master#top), [v2](https://github.com/imazen/resizer/tree/support/v2#top), [v3](https://github.com/imazen/resizer/tree/support/v3#top), and [v4](https://github.com/imazen/resizer/tree/support/v4#top).
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/imazen/resizer?utm_source=badge&utm_medium=```c#badge&utm_campaign=pr-badge) ![ImageResizer core downloads](http://img.shields.io/nuget/dt/ImageResizer.svg) ![Latest NuGet version](http://img.shields.io/nuget/vpre/ImageResizer.svg)
 
