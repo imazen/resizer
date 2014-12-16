@@ -1,9 +1,8 @@
-<a name="develop"></a>
+<a name="top"></a>
 ## [ImageResizer](http://imageresizing.net) - The Flexible Image Server
-develop branch: [![Build status](https://ci.appveyor.com/api/projects/status/77a52n4hd0y36ybs/branch/develop?svg=true)](https://ci.appveyor.com/project/imazen/resizer/branch/develop) View ReadMe for [stable](https://github.com/imazen/resizer/tree/master), [v2](https://github.com/imazen/resizer/tree/support/v2), [v3]( https://github.com/imazen/resizer/tree/support/v3) and [v4](https://github.com/imazen/resizer/tree/support/v4).
+[![Build status - develop](https://ci.appveyor.com/api/projects/status/77a52n4hd0y36ybs/branch/develop?svg=true&passingText=develop%20-%20passing&failingText=develop%20-%20failed)](https://ci.appveyor.com/project/imazen/resizer/branch/develop) &nbsp; View ReadMe for [latest (develop)](https://github.com/imazen/resizer/tree/develop#top), [stable (master)](https://github.com/imazen/resizer/tree/master#top), [v2](https://github.com/imazen/resizer/tree/support/v2#top), [v3]( https://github.com/imazen/resizer/tree/support/v3#top) and [v4](https://github.com/imazen/resizer/tree/support/v4#top).
 
-![Issue Count](http://img.shields.io/github/issues/imazen/resizer.svg) [![Issues ready for work](https://badge.waffle.io/imazen/resizer.png?label=ready&title=Issues%20ready%20for%20work&svg=true)](https://waffle.io/imazen/resizer)  
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/imazen/resizer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) ![ImageResizer core downloads](http://img.shields.io/nuget/dt/ImageResizer.svg) ![Latest NuGet version](http://img.shields.io/nuget/vpre/ImageResizer.svg)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/imazen/resizer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) ![ImageResizer core downloads](http://img.shields.io/nuget/dt/ImageResizer.svg) ![Latest NuGet version](http://img.shields.io/nuget/vpre/ImageResizer.svg) ![Issue Count](http://img.shields.io/github/issues/imazen/resizer.svg) [![Issues ready for work](https://badge.waffle.io/imazen/resizer.png?label=ready&title=up for grabs&svg=true)](https://waffle.io/imazen/resizer)
 
 #What is it?
 
