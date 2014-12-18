@@ -22,8 +22,8 @@ environment:
 before_build:
   - ps: $env:fb_asmver="4.0.0.0"
   - ps: $env:fb_filever=$env:APPVEYOR_BUILD_VERSION
-  - ps: $env:fb_nugetver=$env:fb_filever+"-nightly"
-  - ps: $env:fb_infover=$env:fb_nugetver -replace "\.", "-"
+  - ps: $env:fb_nugetver=$env:fb_filever
+  - ps: $env:fb_infover=$env:fb_nugetver+"-nightly" -replace "\.", "-"
   
   - ps: md $env:temp\mongo\data
   - ps: Push-Location $env:temp\mongo
