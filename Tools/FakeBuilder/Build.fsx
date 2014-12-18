@@ -95,11 +95,10 @@ Target "patch_commit" (fun _ ->
 )
 
 Target "patch_ver" (fun _ ->
-    if version <> null then
-        AssemblyPatcher.setInfo assemblyInfoFile ["AssemblyVersion", settings.["fb_asmver"];
-            "AssemblyFileVersion", settings.["fb_filever"];
-            "AssemblyInformationalVersion", settings.["fb_infover"];
-            "NugetVersion", settings.["fb_nugetver"]]
+    AssemblyPatcher.setInfo assemblyInfoFile ["AssemblyVersion", settings.["fb_asmver"];
+        "AssemblyFileVersion", settings.["fb_filever"];
+        "AssemblyInformationalVersion", settings.["fb_infover"];
+        "NugetVersion", settings.["fb_nugetver"]]
 )
 
 Target "patch_info" (fun _ ->
@@ -153,14 +152,14 @@ Target "pack_nuget" (fun _ ->
     
     // process symbol packages first (as they need to be renamed)
     for nuSpec in Directory.GetFiles(rootDir + "tmp", "*.symbols.nuspec") do
-        Nuget.pack nuSpec version (rootDir + "Releases/nuget-packages")
+        Nuget.pack nuSpec settings.["fb_nugetver"] (rootDir + "Releases/nuget-packages")
         let baseName = rootDir + "Releases/nuget-packages/" + Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(nuSpec)) + "." + version
         File.Move(baseName + ".nupkg", baseName + ".symbols.nupkg")
     
     // process regular packages
     for nuSpec in Directory.GetFiles(rootDir + "tmp", "*.nuspec") do
         if not (nuSpec.Contains(".symbols.nuspec")) then
-            Nuget.pack nuSpec version (rootDir + "Releases/nuget-packages")
+            Nuget.pack nuSpec settings.["fb_nugetver"] (rootDir + "Releases/nuget-packages")
     
     // remove any mess
     DeleteDir (rootDir + "tmp")
@@ -192,7 +191,7 @@ Target "pack_zips" (fun _ ->
         "^/Plugins/Libs/FreeImage/Wrapper/FreeImage.NET/cs/[^L]*/"])
     
     let outDir = rootDir + "Releases/"
-    let makeName rtype = outDir + "Resizer" + (version.Replace('.', '-')) + "-" + rtype + "-" + (DateTime.UtcNow.ToString("MMM-d-yyyy")) + ".zip"
+    let makeName rtype = outDir + "Resizer" + settings.["fb_infover"] + "-" + rtype + "-" + (DateTime.UtcNow.ToString("MMM-d-yyyy")) + ".zip"
     
     let toZipEntries (q : FsQuery) (patterns : string list) (baseDir : string) (targetDir : string) (inRoot : bool) =
         let files = q.files(patterns)
