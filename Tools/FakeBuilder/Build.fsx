@@ -349,10 +349,10 @@ Target "custom" (fun _ ->
 
 Target "do_all" (fun _ ->
     "clean"
-    ==> "PatchInfo"
+    ==> "patch_info"
     ==> "build"
     ==> "test"
-    ==> "Unmess"
+    ==> "unmess"
     ==> "pack"
     ==> "push"
     ==> "print_stats"
