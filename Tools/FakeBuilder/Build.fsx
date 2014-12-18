@@ -25,13 +25,12 @@ open System.Text.RegularExpressions
 
 // Settings
 
-let fb_nuget_url = EnvironmentHelper.environVar "fb_nuget_url"
-let fb_nuget_key = EnvironmentHelper.environVar "fb_nuget_key"
+let envlist = ["fb_nuget_url"; "fb_nuget_key";
+               "fb_s3_bucket"; "fb_s3_id"; "fb_s3_key"; "fb_pub_url";
+               "fb_asmver"; "fb_filever"; "fb_infover"; "fb_nugetver";]
 
-let fb_s3_bucket = EnvironmentHelper.environVar "fb_s3_bucket"
-let fb_s3_id = EnvironmentHelper.environVar "fb_s3_id"
-let fb_s3_key = EnvironmentHelper.environVar "fb_s3_key"
-let fb_pub_url = EnvironmentHelper.environVar "fb_pub_url"
+let settings = seq {for x in envlist -> x, (EnvironmentHelper.environVar x)} |> Map.ofSeq
+
 
 let rootDir = Path.GetFullPath(__SOURCE_DIRECTORY__ + "/../..") + "\\"
 let coreDir = rootDir + "Core/"
@@ -247,35 +246,35 @@ Target "pack_zips" (fun _ ->
 
 Target "push_nuget" (fun _ ->
     let symbolServ =
-        if fb_nuget_url.Contains("myget.org") then "http://nuget.gw.SymbolSource.org/MyGet/"
+        if settings.["fb_nuget_url"].Contains("myget.org") then "http://nuget.gw.SymbolSource.org/MyGet/"
         else ""
     
     for nuPkg in Directory.GetFiles(rootDir + "Releases/nuget-packages", "*.nupkg") do
         if not (nuPkg.Contains(".symbols.nupkg")) then
-            Nuget.push nuPkg fb_nuget_url fb_nuget_key
+            Nuget.push nuPkg settings.["fb_nuget_url"] settings.["fb_nuget_key"]
         elif symbolServ <> "" then
-            Nuget.push nuPkg symbolServ fb_nuget_key
+            Nuget.push nuPkg symbolServ settings.["fb_nuget_key"]
 )
 
 Target "push_zips" (fun _ ->
     let s3config = new Amazon.S3.AmazonS3Config()
     s3config.Timeout <- System.Nullable (TimeSpan.FromHours(12.0))
     s3config.RegionEndpoint <- Amazon.RegionEndpoint.USEast1
-    let s3client = new Amazon.S3.AmazonS3Client(fb_s3_id, fb_s3_key, s3config)
+    let s3client = new Amazon.S3.AmazonS3Client(settings.["fb_s3_id"], settings.["fb_s3_key"], s3config)
     let s3 = new TransferUtility(s3client)
     
     for zipPkg in Directory.GetFiles(rootDir + "Releases", "*.zip") do
         let mutable tries = 3
         let request = new TransferUtilityUploadRequest()
         request.CannedACL <- Amazon.S3.S3CannedACL.PublicRead
-        request.BucketName <- fb_s3_bucket
+        request.BucketName <- settings.["fb_s3_bucket"]
         request.ContentType <- "application/zip"
         request.Key <- Path.GetFileName(zipPkg)
         request.FilePath <- zipPkg
         
         while tries > 0 do
             try
-                printf "Uploading %s to S3/%s...\n" (Path.GetFileName(zipPkg)) fb_s3_bucket
+                printf "Uploading %s to S3/%s...\n" (Path.GetFileName(zipPkg)) settings.["fb_s3_bucket"]
                 s3.Upload(request)
                 tries <- 0
             with exn ->
@@ -290,12 +289,12 @@ Target "pack" (fun _ ->
 )
 
 Target "push" (fun _ ->
-    if fb_nuget_key <> null && fb_nuget_key <> "" then
+    if settings.["fb_nuget_key"] <> null && settings.["fb_nuget_key"] <> "" then
         Run "push_nuget"
     else
         printf "No nuget server information present, skipping push\n"
     
-    if fb_s3_key <> null && fb_s3_key <> "" then
+    if settings.["fb_s3_key"] <> null && settings.["fb_s3_key"] <> "" then
         Run "push_zips"
     else
         printf "No s3 server information present, skipping push\n"
@@ -331,10 +330,10 @@ Target "print_stats" (fun _ ->
             entry <- zip.GetNextEntry()
     
     
-    if fb_pub_url <> null then
+    if settings.["fb_pub_url"] <> null then
         printf "\nDownload urls:\n"
         for zipPkg in Directory.GetFiles(rootDir + "Releases", "*.zip") do
-            printf "%s/%s\n" fb_pub_url (Path.GetFileName(zipPkg))
+            printf "%s/%s\n" settings.["fb_pub_url"] (Path.GetFileName(zipPkg))
 )
 
 Target "custom" (fun _ ->
