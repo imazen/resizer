@@ -20,6 +20,11 @@ environment:
   fb_pub_url: https://s3.amazonaws.com/imazen-test
 
 before_build:
+  - ps: $env:fb_asmver="4.0.0.0"
+  - ps: $env:fb_filever=$env:APPVEYOR_BUILD_VERSION
+  - ps: $env:fb_nugetver=$env:fb_filever+"-nightly"
+  - ps: $env:fb_infover=$env:fb_nugetver -replace "\.", "-"
+  
   - ps: md $env:temp\mongo\data
   - ps: Push-Location $env:temp\mongo
   - ps: Invoke-WebRequest https://s3.amazonaws.com/public-unit-test-resources/mongodb/mongod.exe.zip -OutFile mongodb.zip
