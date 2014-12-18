@@ -64,7 +64,7 @@ MSBuildDefaults <- setParams MSBuildDefaults
 
 // Targets
 
-Target "Clean" (fun _ ->
+Target "clean" (fun _ ->
     MSBuild "" "Clean" ["Configuration","Release"] [mainSolution] |> ignore
     MSBuild "" "Clean" ["Configuration","Debug"] [mainSolution] |> ignore
     MSBuild "" "Clean" ["Configuration","Trial"] [mainSolution] |> ignore
@@ -74,7 +74,7 @@ Target "Clean" (fun _ ->
     CleanDirs [rootDir + "dlls/trial"]
 )
 
-Target "Build" (fun _ ->
+Target "build" (fun _ ->
     MSBuild "" "Build" ["Configuration","Release"] [mainSolution] |> ignore
     MSBuild "" "Build" ["Configuration","Debug"] [mainSolution] |> ignore
     MSBuild "" "Build" ["Configuration","Trial"] [mainSolution] |> ignore
@@ -85,11 +85,13 @@ Target "Build" (fun _ ->
     MSBuild "" "Build" ["Configuration","Debug"; "Platform","x64"] [fastScaleSln] |> ignore
 )
 
-Target "PatchInfo" (fun _ ->
+Target "patch_commit" (fun _ ->
     let commit = Git.Information.getCurrentSHA1 ".."
     if commit <> null then
         AssemblyPatcher.setInfo assemblyInfoFile ["Commit", commit]
-    
+)
+
+Target "patch_ver" (fun _ ->
     if version <> null then
         AssemblyPatcher.setInfo assemblyInfoFile ["AssemblyVersion", version;
             "AssemblyFileVersion", version;
@@ -97,7 +99,12 @@ Target "PatchInfo" (fun _ ->
             "NugetVersion", version]
 )
 
-Target "Test" (fun _ ->
+Target "patch_info" (fun _ ->
+    Run "patch_commit"
+    Run "patch_ver"
+)
+
+Target "test" (fun _ ->
     let xunit = Seq.nth 0 (!! (rootDir + "Packages/xunit.runners*/tools/xunit.console.exe"))
     let xunit32 = replace "xunit.console.exe" "xunit.console.x86.exe" xunit
       
@@ -119,7 +126,7 @@ Target "Test" (fun _ ->
             |> xUnit (fun p -> {p with ToolPath = xunit32})
 )
 
-Target "PackNuget" (fun _ ->
+Target "pack_nuget" (fun _ ->
     CleanDirs [rootDir + "tmp"]
     CleanDirs [rootDir + "Releases/nuget-packages"]
     
@@ -156,7 +163,7 @@ Target "PackNuget" (fun _ ->
     DeleteDir (rootDir + "tmp")
 )
 
-Target "PackZips" (fun _ ->
+Target "pack_zips" (fun _ ->
     for file in !! (rootDir + "Releases/*.zip") do
         DeleteFile file
     
@@ -238,7 +245,7 @@ Target "PackZips" (fun _ ->
     ()
 )
 
-Target "PushNuget" (fun _ ->
+Target "push_nuget" (fun _ ->
     let symbolServ =
         if fb_nuget_url.Contains("myget.org") then "http://nuget.gw.SymbolSource.org/MyGet/"
         else ""
@@ -250,7 +257,7 @@ Target "PushNuget" (fun _ ->
             Nuget.push nuPkg symbolServ fb_nuget_key
 )
 
-Target "PushS3" (fun _ ->
+Target "push_zips" (fun _ ->
     let s3config = new Amazon.S3.AmazonS3Config()
     s3config.Timeout <- System.Nullable (TimeSpan.FromHours(12.0))
     s3config.RegionEndpoint <- Amazon.RegionEndpoint.USEast1
@@ -277,24 +284,24 @@ Target "PushS3" (fun _ ->
                     raise exn
 )
 
-Target "Pack" (fun _ ->
-    Run "PackNuget"
-    Run "PackZips"
+Target "pack" (fun _ ->
+    Run "pack_nuget"
+    Run "pack_zips"
 )
 
-Target "Push" (fun _ ->
+Target "push" (fun _ ->
     if fb_nuget_key <> null && fb_nuget_key <> "" then
-        Run "PushNuget"
+        Run "push_nuget"
     else
         printf "No nuget server information present, skipping push\n"
     
     if fb_s3_key <> null && fb_s3_key <> "" then
-        Run "PushS3"
+        Run "push_zips"
     else
         printf "No s3 server information present, skipping push\n"
 )
 
-Target "Unmess" (fun _ ->
+Target "unmess" (fun _ ->
     let deletableFiles =
         !! (rootDir + "Tests/binaries/**")
         ++ (rootDir + "Core/obj/**")
@@ -313,7 +320,7 @@ Target "Unmess" (fun _ ->
         DeleteFile file
 )
 
-Target "PrintInfo" (fun _ ->
+Target "print_stats" (fun _ ->
     for zipPkg in Directory.GetFiles(rootDir + "Releases", "*.zip") do
         printf "\nLarge files in %s:\n" (Path.GetFileName(zipPkg))
         let zip = new ZipInputStream(File.OpenRead(zipPkg))
@@ -330,7 +337,7 @@ Target "PrintInfo" (fun _ ->
             printf "%s/%s\n" fb_pub_url (Path.GetFileName(zipPkg))
 )
 
-Target "Custom" (fun _ ->
+Target "custom" (fun _ ->
     let targets = getBuildParamOrDefault "targets" ""
     let tlist = List.map (fun x -> (split ' ' x).[0]) (split ';' targets)
     
@@ -340,17 +347,17 @@ Target "Custom" (fun _ ->
         Run tlist.[tlist.Length-1]
 )
 
-Target "DoAll" (fun _ ->
-    "Clean"
+Target "do_all" (fun _ ->
+    "clean"
     ==> "PatchInfo"
-    ==> "Build"
-    ==> "Test"
+    ==> "build"
+    ==> "test"
     ==> "Unmess"
-    ==> "Pack"
-    ==> "Push"
-    ==> "PrintInfo"
+    ==> "pack"
+    ==> "push"
+    ==> "print_stats"
     
-    Run "PrintInfo"
+    Run "print_stats"
 )
 
-RunTargetOrDefault "DoAll"
+RunTargetOrDefault "do_all"

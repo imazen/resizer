@@ -5,26 +5,13 @@ set fake=..\Packages\FAKE.3.11.0\tools\Fake
 set fsx=FakeBuilder\Build.fsx
 
 
-set fb_nuget_url=
-set fb_nuget_key=
-set fb_s3_id=
-set fb_s3_key=
-set fb_s3_bucket=
-
-
 if [%1]==[] goto help
+if [%1]==[help] goto help
 if [%1]==[update] goto update
 set target=%*
 
-set target=%target:Rebuild=Clean;Build%
-set target=%target:clean=Clean%
-set target=%target:build=Build%
-set target=%target:test=Test%
-set target=%target:pack_zips=PackZips;PrintInfo%
-set target=%target:pack_nuget=PackNuget%
-set target=%target:pack_all=PackNuget;PackZips;PrintInfo%
-set target=%target:push_zips=PushS3%
-set target=%target:push_nuget=PushNuget%
+set target=%target:rebuild=clean;build%
+set target=%target:pack_all=pack_nuget;pack_zips;print_stats%
 
 
 :loop
@@ -45,7 +32,7 @@ goto loop
 :end
 
 
-%fake% %fsx% Custom "targets=%target%"
+%fake% %fsx% custom "targets=%target%"
 goto exit
 
 
@@ -67,6 +54,7 @@ goto exit
   echo builder ^<command^>;[command];[command];...
   echo.
   echo A single fake call will be used for the multi-command intarface
+  echo Multi-command can't use help/update
   echo.
   echo Commands:
   echo.
@@ -76,11 +64,13 @@ goto exit
   echo build
   echo rebuild     - clean and build
   echo test
-  echo pack_zips
+  echo pack_zips   - pack commands will delete old files before running
   echo pack_nuget
   echo pack_all    - pack zips and nuget
   echo push_zips ^<s3_id^> ^<s3_key^> ^<s3_bucket^>
-  echo push_nuget ^<nuget_key^> [nuget_feed]
+  echo push_nuget ^<nuget_key^> [nuget_feed=nuget.org]
+rem  echo patch_commit [hash=cur_head]
+rem  echo patch_ver ^<filever^> ^<nugetver^> ^<infover^> [assemblyver=4.0.0.0]
   goto exit
 
 :exit
