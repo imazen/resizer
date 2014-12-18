@@ -29,7 +29,7 @@ let envlist = ["fb_nuget_url"; "fb_nuget_key";
                "fb_s3_bucket"; "fb_s3_id"; "fb_s3_key"; "fb_pub_url";
                "fb_asmver"; "fb_filever"; "fb_infover"; "fb_nugetver";]
 
-let settings = seq {for x in envlist -> x, (EnvironmentHelper.environVar x)} |> Map.ofSeq
+let mutable settings = seq {for x in envlist -> x, (EnvironmentHelper.environVar x)} |> Map.ofSeq
 
 
 let rootDir = Path.GetFullPath(__SOURCE_DIRECTORY__ + "/../..") + "\\"
@@ -42,6 +42,10 @@ let mutable version = AssemblyPatcher.getInfo assemblyInfoFile "AssemblyVersion"
 version <- version.Replace(".*", "")
 if AppVeyor.AppVeyorEnvironment.BuildVersion <> null then
     version <- AppVeyor.AppVeyorEnvironment.BuildVersion
+if settings.["fb_asmver"] = null then settings <- settings.Add("fb_asmver", version)
+if settings.["fb_filever"] = null then settings <- settings.Add("fb_filever", version)
+if settings.["fb_infover"] = null then settings <- settings.Add("fb_infover", (version.Replace('.', '-')))
+if settings.["fb_nugetver"] = null then settings <- settings.Add("fb_nugetver", version)
 
 
 // Default build settings
@@ -92,10 +96,10 @@ Target "patch_commit" (fun _ ->
 
 Target "patch_ver" (fun _ ->
     if version <> null then
-        AssemblyPatcher.setInfo assemblyInfoFile ["AssemblyVersion", version;
-            "AssemblyFileVersion", version;
-            "AssemblyInformationalVersion",(version.Replace('.', '-'));
-            "NugetVersion", version]
+        AssemblyPatcher.setInfo assemblyInfoFile ["AssemblyVersion", settings.["fb_asmver"];
+            "AssemblyFileVersion", settings.["fb_filever"];
+            "AssemblyInformationalVersion", settings.["fb_infover"];
+            "NugetVersion", settings.["fb_nugetver"]]
 )
 
 Target "patch_info" (fun _ ->
