@@ -93,10 +93,7 @@ namespace ImageResizer.Plugins.Faces {
             List<T> features;
             //Type Intializer Exception occurs if you reuse an appdomain. Always restart the server.
             using (IplImage orig = OpenCvSharp.BitmapConverter.ToIplImage(b))
-            using (IplImage gray = new IplImage(orig.Size, BitDepth.U8, 1)) {
-
-                //Make grayscale version
-                Cv.CvtColor(orig, gray, ColorConversion.BgrToGray);
+            using (IplImage gray = GetOriginalImageInGrayScale(orig)) {
 
                 int w = orig.Width; int h = orig.Height;
                 double ratio = (double)w / (double)h;
@@ -146,6 +143,20 @@ namespace ImageResizer.Plugins.Faces {
                     Cascades[s] = null;
                 }
             }
+        }
+
+        private static IplImage GetOriginalImageInGrayScale(IplImage originalImage)
+        {
+            if (originalImage.NChannels == 1)
+            {
+                // the image is already in grayscale, so no need to convert it
+                return originalImage;
+            }
+
+            //Make grayscale version
+            IplImage grayScaleImage = new IplImage(originalImage.Size, BitDepth.U8, 1);
+            Cv.CvtColor(originalImage, grayScaleImage, ColorConversion.BgrToGray);
+            return grayScaleImage;
         }
     }
 }
