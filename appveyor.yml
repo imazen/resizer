@@ -11,6 +11,10 @@ environment:
   fb_nuget_key:
     secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
   
+  fb_nuget_rel_url: https://www.myget.org/F/resizer-rel-test/
+  fb_nuget_rel_key:
+    secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
+  
   fb_s3_bucket: imazen-test
   fb_s3_id:
     secure: Qi7mSLHr94NfJaH0CzQSVPEl1peaOoJADyfHwiVtJzo=
@@ -20,11 +24,6 @@ environment:
   fb_pub_url: https://s3.amazonaws.com/imazen-test
 
 before_build:
-  - ps: $env:fb_asmver="4.0.0.0"
-  - ps: $env:fb_filever=$env:APPVEYOR_BUILD_VERSION
-  - ps: $env:fb_nugetver=$env:fb_filever
-  - ps: $env:fb_infover=$env:fb_nugetver+"-nightly" -replace "\.", "-"
-  
   - ps: md $env:temp\mongo\data
   - ps: Push-Location $env:temp\mongo
   - ps: Invoke-WebRequest https://s3.amazonaws.com/public-unit-test-resources/mongodb/mongod.exe.zip -OutFile mongodb.zip

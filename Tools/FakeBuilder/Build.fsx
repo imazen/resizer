@@ -12,8 +12,10 @@ open Amazon.S3.Transfer
 open ICSharpCode.SharpZipLib.Zip
 open ICSharpCode.SharpZipLib.Core
 
+open EnvironmentHelper
 open FsQuery
 open FakeBuilder
+open SemVerHelper
 open StringHelper
 open XUnit2Helper
 
@@ -29,7 +31,7 @@ let envlist = ["fb_nuget_url"; "fb_nuget_key";
                "fb_s3_bucket"; "fb_s3_id"; "fb_s3_key"; "fb_pub_url";
                "fb_asmver"; "fb_filever"; "fb_infover"; "fb_nugetver";]
 
-let mutable settings = seq {for x in envlist -> x, (EnvironmentHelper.environVar x)} |> Map.ofSeq
+let mutable settings = seq {for x in envlist -> x, (environVar x)} |> Map.ofSeq
 
 
 let rootDir = Path.GetFullPath(__SOURCE_DIRECTORY__ + "/../..") + "\\"
@@ -38,14 +40,25 @@ let mainSolution = rootDir + "AppVeyor.sln"
 let fastScaleSln = rootDir + "Plugins/FastScaling/ImageResizer.Plugins.FastScaling.sln"
 let assemblyInfoFile = coreDir + "SharedAssemblyInfo.cs"
 
-let mutable version = AssemblyPatcher.getInfo assemblyInfoFile "AssemblyVersion"
-version <- version.Replace(".*", "")
-if AppVeyor.AppVeyorEnvironment.BuildVersion <> null then
-    version <- AppVeyor.AppVeyorEnvironment.BuildVersion
-if settings.["fb_asmver"] = null then settings <- settings.Add("fb_asmver", version)
-if settings.["fb_filever"] = null then settings <- settings.Add("fb_filever", version)
-if settings.["fb_infover"] = null then settings <- settings.Add("fb_infover", (version.Replace('.', '-')))
-if settings.["fb_nugetver"] = null then settings <- settings.Add("fb_nugetver", version)
+
+// Versioning
+
+let mutable version = parse (AssemblyPatcher.getInfo assemblyInfoFile "AssemblyInformationalVersion")
+let buildNo =
+    if isNotNullOrEmpty (environVar "APPVEYOR_BUILD_NUMBER") then environVar "APPVEYOR_BUILD_NUMBER"
+    else DateTime.Now.ToString("htt").ToLower()
+let prerel =
+    if version.PreRelease <> None then version.PreRelease.Value.Origin
+    else "nightly"
+version <-
+    { version with
+        Build = buildNo
+        PreRelease = PreRelease.TryParse prerel
+    }
+
+// todo: process git tags
+
+let nugetVer = { version with Build = "" }
 
 
 // Default build settings
@@ -95,10 +108,25 @@ Target "patch_commit" (fun _ ->
 )
 
 Target "patch_ver" (fun _ ->
-    AssemblyPatcher.setInfo assemblyInfoFile ["AssemblyVersion", settings.["fb_asmver"];
-        "AssemblyFileVersion", settings.["fb_filever"];
-        "AssemblyInformationalVersion", settings.["fb_infover"];
-        "NugetVersion", settings.["fb_nugetver"]]
+    let asmVer =
+        { version with
+            Minor = 0
+            Patch = 0
+            Build = ""
+            PreRelease = PreRelease.TryParse ""
+        }
+    
+    let fileVer =
+        { version with
+            Build = ""
+            PreRelease = PreRelease.TryParse ""
+        }
+    
+    AssemblyPatcher.setInfo assemblyInfoFile [
+        "AssemblyVersion", asmVer.ToString()+".0";
+        "AssemblyFileVersion", fileVer.ToString()+"."+buildNo;
+        "AssemblyInformationalVersion", version.ToString();
+        "NugetVersion", nugetVer.ToString()]
 )
 
 Target "patch_info" (fun _ ->
@@ -152,14 +180,14 @@ Target "pack_nuget" (fun _ ->
     
     // process symbol packages first (as they need to be renamed)
     for nuSpec in Directory.GetFiles(rootDir + "tmp", "*.symbols.nuspec") do
-        Nuget.pack nuSpec settings.["fb_nugetver"] (rootDir + "Releases/nuget-packages")
-        let baseName = rootDir + "Releases/nuget-packages/" + Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(nuSpec)) + "." + version
+        Nuget.pack nuSpec nugetVer.ToString() (rootDir + "Releases/nuget-packages")
+        let baseName = rootDir + "Releases/nuget-packages/" + Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(nuSpec)) + "." + nugetVer.ToString()
         File.Move(baseName + ".nupkg", baseName + ".symbols.nupkg")
     
     // process regular packages
     for nuSpec in Directory.GetFiles(rootDir + "tmp", "*.nuspec") do
         if not (nuSpec.Contains(".symbols.nuspec")) then
-            Nuget.pack nuSpec settings.["fb_nugetver"] (rootDir + "Releases/nuget-packages")
+            Nuget.pack nuSpec nugetVer.ToString() (rootDir + "Releases/nuget-packages")
     
     // remove any mess
     DeleteDir (rootDir + "tmp")

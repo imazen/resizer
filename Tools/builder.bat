@@ -51,7 +51,7 @@ goto exit
   echo pack_all    - pack zips and nuget
   echo push_zips   - env vars: fb_s3_bucket fb_s3_id fb_s3_key
   echo push_nuget  - env vars: fb_nuget_url fb_nuget_key
-  echo patch_info  - env vars: fb_asmver fb_filever fb_infover fb_nugetver
+  echo patch_info
   goto exit
 
 :exit
