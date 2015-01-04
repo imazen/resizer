@@ -180,14 +180,14 @@ Target "pack_nuget" (fun _ ->
     
     // process symbol packages first (as they need to be renamed)
     for nuSpec in Directory.GetFiles(rootDir + "tmp", "*.symbols.nuspec") do
-        Nuget.pack nuSpec nugetVer.ToString() (rootDir + "Releases/nuget-packages")
+        Nuget.pack nuSpec (nugetVer.ToString()) (rootDir + "Releases/nuget-packages")
         let baseName = rootDir + "Releases/nuget-packages/" + Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(nuSpec)) + "." + nugetVer.ToString()
         File.Move(baseName + ".nupkg", baseName + ".symbols.nupkg")
     
     // process regular packages
     for nuSpec in Directory.GetFiles(rootDir + "tmp", "*.nuspec") do
         if not (nuSpec.Contains(".symbols.nuspec")) then
-            Nuget.pack nuSpec nugetVer.ToString() (rootDir + "Releases/nuget-packages")
+            Nuget.pack nuSpec (nugetVer.ToString()) (rootDir + "Releases/nuget-packages")
     
     // remove any mess
     DeleteDir (rootDir + "tmp")
