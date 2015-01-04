@@ -15,6 +15,7 @@ open ICSharpCode.SharpZipLib.Core
 open EnvironmentHelper
 open FsQuery
 open FakeBuilder
+open Git.CommandHelper
 open SemVerHelper
 open StringHelper
 open XUnit2Helper
@@ -46,7 +47,7 @@ let assemblyInfoFile = coreDir + "SharedAssemblyInfo.cs"
 let mutable version = parse (AssemblyPatcher.getInfo assemblyInfoFile "AssemblyInformationalVersion")
 let buildNo =
     if isNotNullOrEmpty (environVar "APPVEYOR_BUILD_NUMBER") then environVar "APPVEYOR_BUILD_NUMBER"
-    else DateTime.Now.ToString("htt").ToLower()
+    else DateTime.Now.ToString("HH").ToLower()
 let prerel =
     if version.PreRelease <> None then version.PreRelease.Value.Origin
     else "nightly"
@@ -56,7 +57,10 @@ version <-
         PreRelease = PreRelease.TryParse prerel
     }
 
-// todo: process git tags
+let ok,msg,errors = runGitCommand "" "describe --exact-match --abbrev=0"
+version <-
+    if ok && msg.Count > 0 then parse msg.[0]
+    else version
 
 let nugetVer = { version with Build = "" }
 
