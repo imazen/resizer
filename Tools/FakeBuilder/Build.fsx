@@ -2,10 +2,12 @@
 #r @"..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll"
 #r @"..\..\packages\AWSSDK.2.2.4.0\lib\net45\AWSSDK.dll"
 
-#load "FsQuery.fs"
-#load "ZipHelper2.fs"
-#load "Nuget.fs"
 #load "AssemblyPatcher.fs"
+#load "FsQuery.fs"
+#load "Nuget.fs"
+#load "SemVerHelper2.fs"
+#load "ZipHelper2.fs"
+
 
 open Fake
 open Amazon.S3.Transfer
@@ -17,6 +19,7 @@ open FsQuery
 open FakeBuilder
 open Git.CommandHelper
 open SemVerHelper
+open SemVerHelper2
 open StringHelper
 open XUnit2Helper
 
@@ -59,11 +62,12 @@ version <-
 
 let ok,msg,errors = runGitCommand "" "describe --exact-match --abbrev=0"
 version <-
-    if ok && msg.Count > 0 then parse msg.[0]
+    if ok && msg.Count > 0 && (validSem msg.[0]) then parse msg.[0]
     else version
 
 let nugetVer = { version with Build = "" }
 
+printf "%s\n" (version.ToString())
 
 // Default build settings
 
