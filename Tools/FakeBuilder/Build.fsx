@@ -170,6 +170,10 @@ Target "pack_nuget" (fun _ ->
     CleanDirs [rootDir + "tmp"]
     CleanDirs [rootDir + "Releases/nuget-packages"]
     
+    let ver =
+        if isRelease then nugetVer.ToString()
+        else nugetVer.ToString() + sprintf "%04d" (int32 buildNo)
+    
     let nvc = ["author", "Nathanael Jones, Imazen";
            "owners", "nathanaeljones, imazen";
            "pluginsdlldir", (rootDir+"dlls/trial");
@@ -190,8 +194,8 @@ Target "pack_nuget" (fun _ ->
     
     // process symbol packages first (as they need to be renamed)
     for nuSpec in Directory.GetFiles(rootDir + "tmp", "*.symbols.nuspec") do
-        Nuget.pack nuSpec (nugetVer.ToString()) (rootDir + "Releases/nuget-packages")
-        let baseName = rootDir + "Releases/nuget-packages/" + Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(nuSpec)) + "." + nugetVer.ToString()
+        Nuget.pack nuSpec ver (rootDir + "Releases/nuget-packages")
+        let baseName = rootDir + "Releases/nuget-packages/" + Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(nuSpec)) + "." + ver
         File.Move(baseName + ".nupkg", baseName + ".symbols.nupkg")
     
     // process regular packages
