@@ -11,14 +11,20 @@ environment:
   fb_nuget_key:
     secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
   
-  fb_nuget_rel_url: https://www.myget.org/F/resizer-rel-test/
-  fb_nuget_rel_key:
-    secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
-  
   fb_s3_bucket: imazen-test
   fb_s3_id:
     secure: Qi7mSLHr94NfJaH0CzQSVPEl1peaOoJADyfHwiVtJzo=
   fb_s3_key:
+    secure: RP9hZqS0Pt2SLeias0iZpt2E9OltVX8OPfhWnGET6fQKZ05Fy6y0z1JcWWvONhF0
+  
+  fb_nuget_rel_url: https://www.myget.org/F/resizer-rel-test/
+  fb_nuget_rel_key:
+    secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
+  
+  fb_s3_rel_bucket: imazen-test-rel
+  fb_s3_rel_id:
+    secure: Qi7mSLHr94NfJaH0CzQSVPEl1peaOoJADyfHwiVtJzo=
+  fb_s3_rel_key:
     secure: RP9hZqS0Pt2SLeias0iZpt2E9OltVX8OPfhWnGET6fQKZ05Fy6y0z1JcWWvONhF0
   
   fb_pub_url: https://s3.amazonaws.com/imazen-test

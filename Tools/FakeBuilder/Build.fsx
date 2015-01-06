@@ -33,7 +33,8 @@ open System.Text.RegularExpressions
 
 let envlist = ["fb_nuget_url"; "fb_nuget_key";
                "fb_s3_bucket"; "fb_s3_id"; "fb_s3_key"; "fb_pub_url";
-               "fb_asmver"; "fb_filever"; "fb_infover"; "fb_nugetver";]
+               "fb_nuget_rel_url"; "fb_nuget_rel_key";
+               "fb_s3_rel_bucket"; "fb_s3_rel_id"; "fb_s3_rel_key";]
 
 let mutable settings = seq {for x in envlist -> x, (environVar x)} |> Map.ofSeq
 
@@ -50,24 +51,25 @@ let assemblyInfoFile = coreDir + "SharedAssemblyInfo.cs"
 let mutable version = parse (AssemblyPatcher.getInfo assemblyInfoFile "AssemblyInformationalVersion")
 let buildNo =
     if isNotNullOrEmpty (environVar "APPVEYOR_BUILD_NUMBER") then environVar "APPVEYOR_BUILD_NUMBER"
-    else DateTime.Now.ToString("HH").ToLower()
+    else (DateTime.UtcNow.TimeOfDay.Milliseconds % int Int16.MaxValue).ToString()
 let prerel =
     if version.PreRelease <> None then version.PreRelease.Value.Origin
-    else "nightly"
+    else "prerelease"
 version <-
     { version with
         Build = buildNo
         PreRelease = PreRelease.TryParse prerel
     }
 
+let mutable isRelease = false
 let ok,msg,errors = runGitCommand "" "describe --exact-match --abbrev=0"
-version <-
-    if ok && msg.Count > 0 && (validSem msg.[0]) then parse msg.[0]
-    else version
+if ok && msg.Count > 0 && (isValidSemVer msg.[0]) then
+    version <- parse msg.[0]
+    isRelease <- true
 
 let nugetVer = { version with Build = "" }
 
-printf "%s\n" (version.ToString())
+
 
 // Default build settings
 
@@ -284,42 +286,58 @@ Target "pack_zips" (fun _ ->
 )
 
 Target "push_nuget" (fun _ ->
-    let symbolServ =
-        if settings.["fb_nuget_url"].Contains("myget.org") then "http://nuget.gw.SymbolSource.org/MyGet/"
-        else ""
+    let (nuget_url, nuget_key) =
+        if isRelease then (settings.["fb_nuget_rel_url"], settings.["fb_nuget_rel_key"])
+        else (settings.["fb_nuget_url"], settings.["fb_nuget_key"])
     
-    for nuPkg in Directory.GetFiles(rootDir + "Releases/nuget-packages", "*.nupkg") do
-        if not (nuPkg.Contains(".symbols.nupkg")) then
-            Nuget.push nuPkg settings.["fb_nuget_url"] settings.["fb_nuget_key"]
-        elif symbolServ <> "" then
-            Nuget.push nuPkg symbolServ settings.["fb_nuget_key"]
+    if isNullOrEmpty nuget_key then
+        printf "No nuget information present, skipping push\n"
+    else
+        
+        let symbolServ =
+            if nuget_url.Contains("myget.org") then "http://nuget.gw.SymbolSource.org/MyGet/"
+            else ""
+        
+        for nuPkg in Directory.GetFiles(rootDir + "Releases/nuget-packages", "*.nupkg") do
+            if not (nuPkg.Contains(".symbols.nupkg")) then
+                Nuget.push nuPkg nuget_url nuget_key
+            elif symbolServ <> "" then
+                Nuget.push nuPkg symbolServ nuget_key
 )
 
 Target "push_zips" (fun _ ->
-    let s3config = new Amazon.S3.AmazonS3Config()
-    s3config.Timeout <- System.Nullable (TimeSpan.FromHours(12.0))
-    s3config.RegionEndpoint <- Amazon.RegionEndpoint.USEast1
-    let s3client = new Amazon.S3.AmazonS3Client(settings.["fb_s3_id"], settings.["fb_s3_key"], s3config)
-    let s3 = new TransferUtility(s3client)
+    let (s3_id, s3_key, s3_bucket) =
+        if isRelease then (settings.["fb_s3_rel_id"], settings.["fb_s3_rel_key"], settings.["fb_s3_rel_bucket"])
+        else (settings.["fb_s3_id"], settings.["fb_s3_key"], settings.["fb_s3_bucket"])
     
-    for zipPkg in Directory.GetFiles(rootDir + "Releases", "*.zip") do
-        let mutable tries = 3
-        let request = new TransferUtilityUploadRequest()
-        request.CannedACL <- Amazon.S3.S3CannedACL.PublicRead
-        request.BucketName <- settings.["fb_s3_bucket"]
-        request.ContentType <- "application/zip"
-        request.Key <- Path.GetFileName(zipPkg)
-        request.FilePath <- zipPkg
+    if isNullOrEmpty s3_key then
+        printf "No s3 server information present, skipping push\n"
+    else
         
-        while tries > 0 do
-            try
-                printf "Uploading %s to S3/%s...\n" (Path.GetFileName(zipPkg)) settings.["fb_s3_bucket"]
-                s3.Upload(request)
-                tries <- 0
-            with exn ->
-                tries <- tries-1
-                if tries=0 then
-                    raise exn
+        let s3config = new Amazon.S3.AmazonS3Config()
+        s3config.Timeout <- System.Nullable (TimeSpan.FromHours(12.0))
+        s3config.RegionEndpoint <- Amazon.RegionEndpoint.USEast1
+        let s3client = new Amazon.S3.AmazonS3Client(s3_id, s3_key, s3config)
+        let s3 = new TransferUtility(s3client)
+        
+        for zipPkg in Directory.GetFiles(rootDir + "Releases", "*.zip") do
+            let mutable tries = 3
+            let request = new TransferUtilityUploadRequest()
+            request.CannedACL <- Amazon.S3.S3CannedACL.PublicRead
+            request.BucketName <- s3_bucket
+            request.ContentType <- "application/zip"
+            request.Key <- Path.GetFileName(zipPkg)
+            request.FilePath <- zipPkg
+            
+            while tries > 0 do
+                try
+                    printf "Uploading %s to S3/%s...\n" (Path.GetFileName(zipPkg)) s3_bucket
+                    s3.Upload(request)
+                    tries <- 0
+                with exn ->
+                    tries <- tries-1
+                    if tries=0 then
+                        raise exn
 )
 
 Target "pack" (fun _ ->
@@ -328,15 +346,8 @@ Target "pack" (fun _ ->
 )
 
 Target "push" (fun _ ->
-    if settings.["fb_nuget_key"] <> null && settings.["fb_nuget_key"] <> "" then
-        Run "push_nuget"
-    else
-        printf "No nuget server information present, skipping push\n"
-    
-    if settings.["fb_s3_key"] <> null && settings.["fb_s3_key"] <> "" then
-        Run "push_zips"
-    else
-        printf "No s3 server information present, skipping push\n"
+    Run "push_nuget"
+    Run "push_zips"
 )
 
 Target "unmess" (fun _ ->
