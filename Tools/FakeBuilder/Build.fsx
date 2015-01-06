@@ -229,7 +229,10 @@ Target "pack_zips" (fun _ ->
         "^/Plugins/Libs/FreeImage/Wrapper/FreeImage.NET/cs/[^L]*/"])
     
     let outDir = rootDir + "Releases/"
-    let makeName rtype = outDir + "Resizer" + settings.["fb_infover"] + "-" + rtype + "-" + (DateTime.UtcNow.ToString("MMM-d-yyyy")) + ".zip"
+    let extra_buildNo =
+        if isRelease then ""
+        else "-" + buildNo
+    let makeName rtype = outDir + "Resizer" + version.Major.ToString() + "-" + version.Minor.ToString() + "-" + version.Patch.ToString() + extra_buildNo + "-" + rtype + "-" + (DateTime.UtcNow.ToString("MMM-d-yyyy")) + ".zip"
     
     let toZipEntries (q : FsQuery) (patterns : string list) (baseDir : string) (targetDir : string) (inRoot : bool) =
         let files = q.files(patterns)
