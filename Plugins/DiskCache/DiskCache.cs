@@ -120,7 +120,7 @@ namespace ImageResizer.Plugins.DiskCache
         }
 
 
-        protected string virtualDir =  HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/imagecache";
+        protected string virtualDir =  HostingEnvironment.ApplicationVirtualPath.TrimEnd(ParseUtils.ForwardSlash) + "/imagecache";
         /// <summary>
         /// Sets the location of the cache directory. 
         /// Can be a virtual path (like /App/imagecache) or an application-relative path (like ~/imagecache, the default).
@@ -300,7 +300,7 @@ namespace ImageResizer.Plugins.DiskCache
             if (r.Data == null) {
 
                 //Calculate the virtual path
-                string virtualPath = VirtualCacheDir.TrimEnd('/') + '/' + r.RelativePath.Replace('\\', '/').TrimStart('/');
+                string virtualPath = VirtualCacheDir.TrimEnd(ParseUtils.ForwardSlash) + '/' + r.RelativePath.Replace('\\', '/').TrimStart(ParseUtils.ForwardSlash);
 
                 //Rewrite to cached, resized image.
                 context.RewritePath(virtualPath, false);

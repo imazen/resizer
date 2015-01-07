@@ -109,7 +109,7 @@ namespace ImageResizer.Plugins.Basic {
         /// <param name="path"></param>
         /// <returns></returns>
         protected string normalizeVirtualPath(string path) {
-            if (!path.StartsWith("/")) path = HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/' + (path.StartsWith("~") ? path.Substring(1) : path).TrimStart('/');
+            if (!path.StartsWith("/")) path = HostingEnvironment.ApplicationVirtualPath.TrimEnd(ParseUtils.ForwardSlash) + '/' + (path.StartsWith("~") ? path.Substring(1) : path).TrimStart(ParseUtils.ForwardSlash);
             return path;
         }
         /// <summary>
@@ -174,7 +174,7 @@ namespace ImageResizer.Plugins.Basic {
         public string LocalMapPath(string virtualPath) {
             virtualPath = normalizeVirtualPath(virtualPath);
             if (virtualPath.StartsWith(this.VirtualPath, StringComparison.OrdinalIgnoreCase)) {
-                return Path.Combine(PhysicalPath, virtualPath.Substring(this.VirtualPath.Length).TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+                return Path.Combine(PhysicalPath, virtualPath.Substring(this.VirtualPath.Length).TrimStart(ParseUtils.ForwardSlash).Replace('/', Path.DirectorySeparatorChar));
             }
             return null;
         }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Drawing;
 using OpenCvSharp;
 using System.IO;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.Faces {
     public static class OpenCvExtensions {
@@ -67,7 +68,7 @@ namespace ImageResizer.Plugins.Faces {
             foreach (string key in fileNames.Keys) {
                 string resolvedPath = null;
                 foreach (string basePath in searchFolders) {
-                    string full = basePath.TrimEnd('\\') + '\\' + fileNames[key];
+                    string full = basePath.TrimEnd(ParseUtils.BackSlash) + '\\' + fileNames[key];
                     if (File.Exists(Path.GetFullPath(full))) {
                         resolvedPath = Path.GetFullPath(full);
                         //An ExecutionException will occur here if multiple OpenCv instances are loaded

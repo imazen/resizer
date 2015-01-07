@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.FFmpeg
 {
@@ -77,8 +78,8 @@ namespace ImageResizer.Plugins.FFmpeg
         {
             var exts = GetSupportedFileExtensions();
 
-            var full = ImageResizer.Util.PathUtils.GetFullExtension(virtualPath).ToLowerInvariant().TrimStart('.');
-            var parts = full.Split('.');
+            var full = ImageResizer.Util.PathUtils.GetFullExtension(virtualPath).ToLowerInvariant().TrimStart(ParseUtils.Period);
+            var parts = full.Split(ParseUtils.Period);
             if (parts.Length < 1) return false;
             //Only accept the file if our querystring is on it.
             if (exts.Contains(parts[parts.Length - 1]))

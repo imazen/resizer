@@ -43,9 +43,13 @@ namespace ImageResizer.Plugins.Faces {
             var faces = GetFacesFromImage(image, settings);
             StringBuilder sb = new StringBuilder();
             foreach (Face f in faces)
-                sb.Append(f.X + "," + f.Y + "," + f.X2 + "," + f.Y2 + "," + f.Accuracy + ",");
-
-            return sb.ToString().TrimEnd(',');
+                sb.Append(f.X.ToString(NumberFormatInfo.InvariantInfo)).Append(',')
+                    .Append(f.Y.ToString(NumberFormatInfo.InvariantInfo)).Append(',')
+                    .Append(f.X2.ToString(NumberFormatInfo.InvariantInfo)).Append(',')
+                    .Append(f.Y2.ToString(NumberFormatInfo.InvariantInfo)).Append(',')
+                    .Append(f.Accuracy.ToString(NumberFormatInfo.InvariantInfo)).Append(',');
+            if (sb.Length > 0) sb.Length--; // trim trailing comma
+            return sb.ToString();
         }
 
         /// <summary>

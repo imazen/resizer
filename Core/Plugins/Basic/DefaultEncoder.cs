@@ -10,6 +10,7 @@ using ImageResizer.Plugins;
 using ImageResizer.Encoding;
 using ImageResizer.Resizing;
 using System.Globalization;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
@@ -232,7 +233,7 @@ namespace ImageResizer.Plugins.Basic {
         {
             if (string.IsNullOrEmpty(ext)) return null;
             lock (_syncExts) {
-                ext = ext.Trim(' ', '.').ToLowerInvariant();
+                ext = ext.Trim(ParseUtils.SpaceOrPeriod).ToLowerInvariant();
                 if (!imageExtensions.ContainsKey(ext)) return null;
                 return imageExtensions[ext];
             }
@@ -244,12 +245,12 @@ namespace ImageResizer.Plugins.Basic {
         /// <param name="matchingFormat"></param>
         private static void addImageExtension(string extension, ImageFormat matchingFormat) {
             //In case first call is to this method, use the property. Will be recursive, but that's fine, since it won't be null.
-            imageExtensions.Add(extension.TrimStart('.', ' ').ToLowerInvariant(), matchingFormat);
+            imageExtensions.Add(extension.TrimStart(ParseUtils.SpaceOrPeriod).ToLowerInvariant(), matchingFormat);
         }
 
         public static void AddImageExtension(string extension, ImageFormat matchingFormat){
             lock (_syncExts) {//In case first call is to this method, use the property. Will be recursive, but that's fine, since it won't be null.
-                imageExtensions.Add(extension.TrimStart('.', ' ').ToLowerInvariant(), matchingFormat);
+                imageExtensions.Add(extension.TrimStart(ParseUtils.SpaceOrPeriod).ToLowerInvariant(), matchingFormat);
             }
         }
 

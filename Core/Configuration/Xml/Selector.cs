@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ImageResizer.Util;
 
 namespace ImageResizer.Configuration.Xml {
     /// <summary>
@@ -11,8 +12,9 @@ namespace ImageResizer.Configuration.Xml {
         public Selector(List<string> items) {
             this.AddRange(items);
         }
-        public Selector(string selector):base(selector.Trim('.').Split(new char[]{'.'}, StringSplitOptions.RemoveEmptyEntries)) {
-            
+
+        public Selector(string selector) : base(selector.Trim(ParseUtils.Period).Split(ParseUtils.Period, StringSplitOptions.RemoveEmptyEntries))
+        {
         }
 
         public string Last {

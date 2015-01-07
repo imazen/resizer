@@ -7,12 +7,13 @@ using System.Web.UI.WebControls;
 using System.IO;
 using System.Text;
 using System.Web.Hosting;
+using ImageResizer.Util;
 
 namespace ComplexWebApplication {
     public partial class WhitespaceTrimmerTest : System.Web.UI.Page {
         protected void Page_Load(object sender, EventArgs e) {
-            
-            string dir = Path.Combine(Path.Combine(Path.GetDirectoryName(HostingEnvironment.ApplicationPhysicalPath.TrimEnd('/','\\')),  "Images"), "private");
+
+            string dir = Path.Combine(Path.Combine(Path.GetDirectoryName(HostingEnvironment.ApplicationPhysicalPath.TrimEnd(ParseUtils.Slashes)), "Images"), "private");
             if (!Directory.Exists(dir)) return;
             string[] files = Directory.GetFiles(dir,"*.jpg");
             StringBuilder sb = new StringBuilder();

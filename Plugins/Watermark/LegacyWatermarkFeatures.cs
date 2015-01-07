@@ -196,7 +196,7 @@ namespace ImageResizer.Plugins.Watermark {
             if (string.IsNullOrEmpty(watermark) || watermarkDir == null) return false;
 
             if (watermark.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) > -1 ||
-                watermark.IndexOfAny(new char[] { '\\', '/' }) > -1)
+                watermark.IndexOfAny(ParseUtils.Slashes) > -1)
                 return false;
 
             //Combine the directory with the base dir

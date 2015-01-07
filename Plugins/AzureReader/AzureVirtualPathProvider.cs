@@ -98,7 +98,7 @@ namespace ImageResizer.Plugins.AzureReader {
                 if (LazyExistenceCheck) return true;
 
                 // Strip prefix from virtual path; keep container and blob
-                string relativeBlobURL = virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim('/', '\\');
+                string relativeBlobURL = virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim(ParseUtils.Slashes);
 
                 // Get a reference to the blob
                 CloudBlob cloudBlob = CloudBlobClient.GetBlobReference(relativeBlobURL);
@@ -120,7 +120,7 @@ namespace ImageResizer.Plugins.AzureReader {
         public IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
             if (IsPathVirtual(virtualPath)) {
                 // Strip prefix from virtual path; keep container and blob
-                string relativeBlobURL = virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim('/', '\\');
+                string relativeBlobURL = virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim(ParseUtils.Slashes);
 
 
                 try {

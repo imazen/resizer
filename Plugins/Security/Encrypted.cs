@@ -81,13 +81,13 @@ namespace ImageResizer.Plugins.Encrypted {
         public string EncryptPathAndQuery(string virtualPathAndQuery) {
             
             if (virtualPathAndQuery.StartsWith(PathUtils.AppVirtualPath)){
-                virtualPathAndQuery = "~/" + virtualPathAndQuery.Substring(PathUtils.AppVirtualPath.Length).TrimStart('/');
+                virtualPathAndQuery = "~/" + virtualPathAndQuery.Substring(PathUtils.AppVirtualPath.Length).TrimStart(ParseUtils.ForwardSlash);
             }
 
             if (!virtualPathAndQuery.StartsWith("~/")) throw new ArgumentException();
 
 
-            return VirtualPrefix.TrimEnd('/') + '/' + Encrypt(virtualPathAndQuery.Substring(1).TrimStart('/')) + ".ashx";
+            return VirtualPrefix.TrimEnd(ParseUtils.ForwardSlash) + '/' + Encrypt(virtualPathAndQuery.Substring(1).TrimStart(ParseUtils.ForwardSlash)) + ".ashx";
 
         }
 
@@ -103,7 +103,7 @@ namespace ImageResizer.Plugins.Encrypted {
             Stopwatch sw = new Stopwatch();
             sw.Start();
             string both = c.Pipeline.PreRewritePath.Substring(VirtualPrefix.Length); //Strip prefix
-            string[] parts = both.Split('/'); //Split
+            string[] parts = both.Split(ParseUtils.ForwardSlash); //Split
 
             if (parts.Length != 2) return; //There must be exactly two parts
 

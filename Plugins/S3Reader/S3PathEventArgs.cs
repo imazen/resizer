@@ -6,6 +6,7 @@ using System.Text;
 using System.Web;
 using System.IO;
 using ImageResizer.Resizing;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.S3Reader {
     /// <summary>
@@ -63,8 +64,8 @@ namespace ImageResizer.Plugins.S3Reader {
         /// </summary>
         /// <param name="bucket"></param>
         public void PrefixBucket(String bucket) {
-            bucket = bucket.Trim('\\', '/');
-            Path = bucket + "/" + Path.TrimStart('/');
+            bucket = bucket.Trim(ParseUtils.Slashes);
+            Path = bucket + "/" + Path.TrimStart(ParseUtils.ForwardSlash);
         }
         /// <summary>
         /// Parses the bucket from Path
@@ -73,7 +74,7 @@ namespace ImageResizer.Plugins.S3Reader {
         public string Bucket {
             get {
                 //strip leading slashes
-                string path = Path.TrimStart(new char[] { '/', '\\' });
+                string path = Path.TrimStart(ParseUtils.Slashes);
 
                 int keyStartsAt = path.IndexOf('/');
                 if (keyStartsAt < 0) return path; //No key present
@@ -88,15 +89,14 @@ namespace ImageResizer.Plugins.S3Reader {
         public string Key {
             get {
                 //strip leading slashes
-                string path = Path.TrimStart(new char[] { '/', '\\' });
+                string path = Path.TrimStart(ParseUtils.Slashes);
 
                 int keyStartsAt = path.IndexOf('/');
                 if (keyStartsAt < 0) return null; //no key
 
                 //Get key
-                return path.Substring(keyStartsAt + 1).TrimStart(new char[] { '/', '\\' });
+                return path.Substring(keyStartsAt + 1).TrimStart(ParseUtils.Slashes);
             }
         }
     }
-
 }

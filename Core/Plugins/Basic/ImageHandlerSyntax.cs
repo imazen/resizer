@@ -4,6 +4,7 @@ using System.Text;
 using ImageResizer.Configuration;
 using System.Web.Hosting;
 using System.Collections.Specialized;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
@@ -26,7 +27,7 @@ namespace ImageResizer.Plugins.Basic {
         }
 
         void Pipeline_PostAuthorizeRequestStart(System.Web.IHttpModule sender, System.Web.HttpContext context) {
-            string prefix = HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/';
+            string prefix = HostingEnvironment.ApplicationVirtualPath.TrimEnd(ParseUtils.ForwardSlash) + '/';
 
             if (c.Pipeline.PreRewritePath.Equals(prefix + "ImageHandler.ashx", StringComparison.OrdinalIgnoreCase) &&
                 !string.IsNullOrEmpty(context.Request.QueryString["src"])) {

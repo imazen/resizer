@@ -13,6 +13,7 @@ using System.Collections.Specialized;
 using ImageResizer.Configuration.Issues;
 using System.Security;
 using ImageResizer.Configuration.Xml;
+using ImageResizer.Util;
 namespace ImageResizer.Plugins.SqlReader
 {
     /// <summary>
@@ -277,7 +278,7 @@ namespace ImageResizer.Plugins.SqlReader
             if (!checkPath.StartsWith(s.VirtualPathPrefix, StringComparison.OrdinalIgnoreCase)) return null;
             string id = checkPath.Substring(s.VirtualPathPrefix.Length); //Strip prefix
             //Strip slashes at beginning 
-            id = id.TrimStart(new char[] { '/', '\\' });
+            id = id.TrimStart(ParseUtils.Slashes);
             //Strip extension if not a string 
             if (!IsStringKey || s.StripFileExtension) {
                 int length = id.LastIndexOf('.');

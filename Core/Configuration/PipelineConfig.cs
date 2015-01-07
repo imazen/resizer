@@ -14,6 +14,7 @@ using ImageResizer.Collections;
 using System.Web;
 using System.Security.Permissions;
 using System.Runtime.InteropServices;
+using ImageResizer.Util;
 
 namespace ImageResizer.Configuration {
     public class PipelineConfig : IPipelineConfig, ICacheProvider, ISettingsModifier{
@@ -62,7 +63,7 @@ namespace ImageResizer.Configuration {
                 vals = p.GetSupportedFileExtensions();
                 if (vals != null)
                     foreach (string e in vals)
-                        exts[e.TrimStart('.')] = true;
+                        exts[e.TrimStart(ParseUtils.Period)] = true;
             }
 
 
@@ -72,7 +73,7 @@ namespace ImageResizer.Configuration {
                 vals = b.GetSupportedFileExtensions();
                 if (vals != null)
                     foreach (string e in vals)
-                        exts[e.TrimStart('.')] = true;
+                        exts[e.TrimStart(ParseUtils.Period)] = true;
 
                 vals = b.GetSupportedQuerystringKeys();
                 if (vals != null)
@@ -117,7 +118,7 @@ namespace ImageResizer.Configuration {
 
         protected string getExtension(string path) {
             //Trim off the extension
-            int lastDot = path.LastIndexOfAny(new char[] { '.', '/', ' ', '\\', '?', '&', ':' });
+            int lastDot = path.LastIndexOfAny(ParseUtils.PathParts);
             if (lastDot > -1 && path[lastDot] == '.') return path.Substring(lastDot + 1);
             else return null;
         }
@@ -158,7 +159,7 @@ namespace ImageResizer.Configuration {
             get {
                 IList<string> temp = _fakeExtensions;
                 if (temp != null) return temp;
-                else temp = new List<string>(c.get("pipeline.fakeExtensions",".ashx").Split(new char[]{','}, StringSplitOptions.RemoveEmptyEntries));
+                else temp = new List<string>(c.get("pipeline.fakeExtensions",".ashx").Split(ParseUtils.Comma, StringSplitOptions.RemoveEmptyEntries));
                 for (int i = 0; i < temp.Count; i++) {
                     if (!temp[i].StartsWith(".", StringComparison.OrdinalIgnoreCase)) temp[i] = "." + temp[i];
                 }
@@ -174,7 +175,7 @@ namespace ImageResizer.Configuration {
         public string TrimFakeExtensions(string path) {
             foreach (string s in FakeExtensions) {
                 if (path.EndsWith(s, StringComparison.OrdinalIgnoreCase)) {
-                    path = path.Substring(0, path.Length - s.Length).TrimEnd('.');
+                    path = path.Substring(0, path.Length - s.Length).TrimEnd(ParseUtils.Period);
                     break;
                 }
             }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Drawing;
 using System.Collections.Specialized;
 using System.Globalization;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.PsdComposer
 {
@@ -46,7 +47,7 @@ namespace ImageResizer.Plugins.PsdComposer
         public Dictionary<string, Color> parseColorDict(string str)
         {
             if (string.IsNullOrEmpty(str)) return new Dictionary<string, System.Drawing.Color>();
-            string[] parts = str.Trim('|').Split('|');
+            string[] parts = str.Trim(ParseUtils.VBar).Split(ParseUtils.VBar);
             
             if (parts.Length % 2 != 0) throw new ArgumentException("Invalid string! Must have an even number of parts.");
             Dictionary<string, Color> dict = new Dictionary<string, Color>();
@@ -63,9 +64,9 @@ namespace ImageResizer.Plugins.PsdComposer
             foreach (KeyValuePair<string, Color> p in dict)
             {
                 sb.Append(Base64UrlEncode(p.Key));
-                sb.Append("|");
+                sb.Append('|');
                 sb.Append(p.Value.ToArgb().ToString("x", NumberFormatInfo.InvariantInfo));
-                sb.Append("|");
+                sb.Append('|');
             }
             return sb.ToString();
         }
@@ -73,7 +74,7 @@ namespace ImageResizer.Plugins.PsdComposer
         {
             if (string.IsNullOrEmpty(str)) return new Dictionary<string, string>();
             if (str.EndsWith("|")) str = str.Substring(0, str.Length - 1);
-            string[] parts = str.Split(new char[]{'|'},StringSplitOptions.None);
+            string[] parts = str.Split(ParseUtils.VBar, StringSplitOptions.None);
 
             if (parts.Length % 2 != 0) throw new ArgumentException("Invalid string! Must have an even number of parts.");
             Dictionary<string, string> dict = new Dictionary<string, string>();
@@ -90,9 +91,9 @@ namespace ImageResizer.Plugins.PsdComposer
             foreach (KeyValuePair<string, string> p in dict)
             {
                 sb.Append(Base64UrlEncode(p.Key));
-                sb.Append("|");
+                sb.Append('|');
                 sb.Append(Base64UrlEncode(p.Value != null ? p.Value : ""));
-                sb.Append("|");
+                sb.Append('|');
             }
             return sb.ToString();
         }
@@ -101,7 +102,7 @@ namespace ImageResizer.Plugins.PsdComposer
         public Dictionary<string, bool> parseBooleanDict(string str)
         {
             if (string.IsNullOrEmpty(str)) return new Dictionary<string, bool>();
-            string[] parts = str.Trim('|').Split('|');
+            string[] parts = str.Trim(ParseUtils.VBar).Split(ParseUtils.VBar);
             if (parts.Length % 2 != 0) throw new ArgumentException("Invalid string! Must have an even number of parts.");
             Dictionary<string, bool> dict = new Dictionary<string, bool>();
 
@@ -119,9 +120,9 @@ namespace ImageResizer.Plugins.PsdComposer
             foreach (KeyValuePair<string, bool> p in dict)
             {
                 sb.Append(Base64UrlEncode(p.Key));
-                sb.Append("|");
-                sb.Append(p.Value ? "1" : "0");
-                sb.Append("|");
+                sb.Append('|');
+                sb.Append(p.Value ? '1' : '0');
+                sb.Append('|');
             }
             return sb.ToString();
         }
@@ -236,7 +237,7 @@ namespace ImageResizer.Plugins.PsdComposer
             {
                 if (s.Equals("*")) return s; //Only used by unit tests
 
-                string trimmed = s.Trim('*');
+                string trimmed = s.Trim(ParseUtils.Asterisk);
                 //Contains query
                 if (s.StartsWith("*") && s.EndsWith("*"))
                 {

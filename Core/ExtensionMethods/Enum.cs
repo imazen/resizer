@@ -4,6 +4,7 @@ using System.Text;
 using ImageResizer.Collections;
 using System.Reflection;
 using System.Globalization;
+using ImageResizer.Util;
 
 namespace ImageResizer.ExtensionMethods {
 
@@ -126,7 +127,7 @@ namespace ImageResizer.ExtensionMethods {
             //Always parse flags, mimic Enum.Parse behavior. 
             long num = 0;
             bool parsedSomething = false;
-            string[] parts = value.Split(',');
+            string[] parts = value.Split(ParseUtils.Comma);
             for (int i = 0; i < parts.Length; i++) {
                 string p = parts[i].Trim();
                 if (p.Length == 0) continue;

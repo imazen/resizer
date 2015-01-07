@@ -9,6 +9,7 @@ using ImageResizer.Configuration.Issues;
 using System.Diagnostics;
 using ImageResizer.Configuration.Logging;
 using System.Globalization;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.DiskCache {
     public class CleanupWorker : IssueSink, IDisposable {
@@ -261,7 +262,7 @@ namespace ImageResizer.Plugins.DiskCache {
         protected string addSlash(string s, bool physical) {
             if (string.IsNullOrEmpty(s)) return s; //On empty or null, dont' add aslash.
             if (physical) return s.TrimEnd(System.IO.Path.DirectorySeparatorChar) + System.IO.Path.DirectorySeparatorChar;
-            else return s.TrimEnd('/') + '/';
+            else return s.TrimEnd(ParseUtils.ForwardSlash) + '/';
         }
 
         protected void PopulateFolder(CleanupWorkItem item, bool recursive) {

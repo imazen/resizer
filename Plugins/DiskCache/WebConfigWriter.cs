@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Configuration.Logging;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.DiskCache {
     /// <summary>
@@ -84,7 +85,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <param name="physicalPath"></param>
         protected void _checkWebConfig() {
             try {
-                string webConfigPath = physicalDirPath.TrimEnd('/', '\\') + System.IO.Path.DirectorySeparatorChar + "Web.config";
+                string webConfigPath = physicalDirPath.TrimEnd(ParseUtils.Slashes) + System.IO.Path.DirectorySeparatorChar + "Web.config";
                 if (lp.Logger != null) lp.Logger.Debug("Verifying Web.config exists in cache directory.");
                 if (System.IO.File.Exists(webConfigPath)) return; //Already exists, quit
 

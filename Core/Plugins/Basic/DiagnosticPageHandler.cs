@@ -91,7 +91,7 @@ namespace ImageResizer.Plugins.Basic {
                     groups += "\n" + v + " assemblies: ";
                     foreach(string a in versions[v])
                         groups += a + ", ";
-                    groups = groups.TrimEnd(' ', ',');
+                    groups = groups.TrimEnd(ParseUtils.SpaceOrComma);
                 }
                 issues.Add(new Issue("Potentially incompatible ImageResizer assemblies were detected.",
                     "Please make sure all ImageResizer assemblies are from the same version. Compatibility issues are possible if you mix plugins from different releases." + groups, IssueSeverity.Warning));

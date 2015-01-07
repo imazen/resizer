@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Security.Principal;
 using System.Web.Security;
 using System.Web.Hosting;
+using ImageResizer.Util;
 
 namespace ImageResizer.Configuration.Issues {
     public class ConfigChecker:IIssueProvider {
@@ -31,8 +32,8 @@ namespace ImageResizer.Configuration.Issues {
 
             if (canCheckUrls) {
                 try {
-                    IPrincipal user = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), new string[0]);
-                    UrlAuthorizationModule.CheckUrlAccessForPrincipal(HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/', user, "GET");
+                    IPrincipal user = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), ParseUtils.EmptyStringArray);
+                    UrlAuthorizationModule.CheckUrlAccessForPrincipal(HostingEnvironment.ApplicationVirtualPath.TrimEnd(ParseUtils.ForwardSlash) + '/', user, "GET");
                 } catch (NotImplementedException) {
                     issues.Add(new Issue("UrlAuthorizationModule.CheckUrlAccessForPrincipal is not supported on this runtime (are you running Mono?)",
                          "It may be possible for users to bypass UrlAuthorization rules you have defined for your website, and access images that would otherwise be protected. If you do not use UrlAuthorization rules, this should not be a concern. " +
@@ -63,7 +64,7 @@ namespace ImageResizer.Configuration.Issues {
                     if (((AssemblyInformationalVersionAttribute)attrs[0]).InformationalVersion.IndexOf("hotfix",StringComparison.OrdinalIgnoreCase) > -1)
                         assembliesRunningHotfix += assemblyName.Name + ", ";
             }
-            assembliesRunningHotfix = assembliesRunningHotfix.TrimEnd(',',' ');
+            assembliesRunningHotfix = assembliesRunningHotfix.TrimEnd(ParseUtils.SpaceOrComma);
 
             if (!string.IsNullOrEmpty(assembliesRunningHotfix))
                 issues.Add(new Issue("You are running a hotfix version of the ImageResizer.",

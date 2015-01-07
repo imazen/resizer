@@ -118,7 +118,7 @@ namespace ImageResizer.Plugins.S3Reader2 {
             if (string.IsNullOrEmpty(vpath)) vpath = "~/s3/";
 
             string[] bucketArray = null;
-            if (!string.IsNullOrEmpty(buckets)) bucketArray = buckets.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if (!string.IsNullOrEmpty(buckets)) bucketArray = buckets.Split(ParseUtils.Comma, StringSplitOptions.RemoveEmptyEntries);
             else c.configurationSectionIssues.AcceptIssue(new Issue("S3Reader", "S3Reader cannot function without a list of permitted bucket names.",
                 "Please specify a comma-delimited list of buckets in the <add name='S3Reader' buckets='bucketa,bucketb' /> element.",
                  IssueSeverity.ConfigurationError));

@@ -34,7 +34,7 @@ namespace MvcSample {
 
         static void Pipeline_Rewrite(IHttpModule sender, HttpContext context, IUrlEventArgs e) {
             if (e.VirtualPath.StartsWith(PathUtils.ResolveAppRelative("~/photos/"), StringComparison.OrdinalIgnoreCase)) 
-                e.VirtualPath = PathUtils.ResolveAppRelative("~/App_Data/") + e.VirtualPath.Substring(PathUtils.AppVirtualPath.Length).TrimStart('/');
+                e.VirtualPath = PathUtils.ResolveAppRelative("~/App_Data/") + e.VirtualPath.Substring(PathUtils.AppVirtualPath.Length).TrimStart(ParseUtils.ForwardSlash);
         }
 
         protected void Application_Start() {

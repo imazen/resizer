@@ -106,7 +106,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
             if (e.VirtualPath.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) && e.QueryString.Count == 0) {
 
                 // Strip prefix from virtual path; keep container and blob
-                string relativeBlobURL = e.VirtualPath.Substring(prefix.Length).TrimStart('/', '\\');
+                string relativeBlobURL = e.VirtualPath.Substring(prefix.Length).TrimStart(ParseUtils.Slashes);
 
                 // Redirect to blob
                 context.Response.Redirect(blobStorageEndpoint + relativeBlobURL);

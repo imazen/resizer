@@ -17,6 +17,29 @@ namespace ImageResizer.Util {
         public const NumberStyles FloatingPointStyle = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite |
             NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands | NumberStyles.AllowExponent;
 
+        public static readonly char[] Comma = new char[] { ',' };
+        public static readonly char[] Period = new char[] { '.' };
+        public static readonly char[] EqualSign = new char[] { '=' };
+        public static readonly char[] VBar = new char[] { '|' };
+        public static readonly char[] Octothorpe = new char[] { '#' };
+        public static readonly char[] Ampersand = new char[] { '&' };
+        public static readonly char[] Asterisk = new char[] { '*' };
+        public static readonly char[] DoubleQuote = new char[] { '"' };
+        public static readonly char[] QueryOrFragment = new char[] { '?', '#' };
+        public static readonly char[] QueryPartsWithSemi = new char[] { '?', '&', ';' };
+        public static readonly char[] QueryParts = new char[] { '?', '&' };
+        public static readonly char[] ForwardSlash = new char[] { '/' };
+        public static readonly char[] BackSlash = new char[] { '\\' };
+        public static readonly char[] ForwardSlashOrTilde = new char[] { '/', '~' };
+        public static readonly char[] Slashes = new char[] { '/', '\\' };
+        public static readonly char[] SpaceOrSlashes = new char[] { ' ', '/', '\\' };
+        public static readonly char[] SpaceOrPeriod = new char[] { ' ', '.' };
+        public static readonly char[] SpaceOrComma = new char[] { ' ', ',' };
+        public static readonly char[] ListNoise = new char[] { ' ', '(', ')' };
+        public static readonly char[] ListParts = new char[] { ' ', '(', ')', ',' };
+        public static readonly char[] PathParts = new char[] { '.', '/', ' ', '\\', '?', '&', ':' };
+        public static readonly char[] VirtualPathParts = new char[] { '/', '\\', '~' };
+        public static readonly string[] EmptyStringArray = new string[0];
 
         public static Color ParseColor(string value, Color defaultValue) {
             Color? c = ParseColor(value);
@@ -24,7 +47,7 @@ namespace ImageResizer.Util {
         }
         public static Color? ParseColor(string value) {
             if (string.IsNullOrEmpty(value)) return null;
-            value = value.TrimStart('#');
+            value = value.TrimStart(Octothorpe);
             //try hex first
             int val;
             if (int.TryParse(value, System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out val)) {
@@ -50,7 +73,7 @@ namespace ImageResizer.Util {
         public static string SerializeColor(Color value) {
             string text = System.Drawing.ColorTranslator.ToHtml(value);
             if (text.StartsWith("#")) {
-                text = text.TrimStart('#');
+                text = text.TrimStart(Octothorpe);
                 if (value.A != 255) text += value.A.ToString("X2", NumberFormatInfo.InvariantInfo);
             }
             return text;
