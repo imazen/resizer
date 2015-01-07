@@ -1,6 +1,7 @@
 Everything exciting is happening on the [develop branch. Why not head over there?](https://github.com/imazen/resizer/tree/develop)
 
 <a name="v3"></a><a name="top"></a>
+
 ## [ImageResizer](http://imageresizing.net) - The Flexible Image Server
 ![Issue Count](http://img.shields.io/github/issues/imazen/resizer.svg)[![Issues ready for work](https://badge.waffle.io/imazen/resizer.png?label=ready&title=Issues%20ready%20for%20work&svg=true)](https://waffle.io/imazen/resizer) View ReadMe for [latest](https://github.com/imazen/resizer/tree/develop#top), [stable](https://github.com/imazen/resizer/tree/master#top), [v2](https://github.com/imazen/resizer/tree/support/v2#top), [v3](https://github.com/imazen/resizer/tree/support/v3#top), and [v4](https://github.com/imazen/resizer/tree/support/v4#top).
 
@@ -43,6 +44,7 @@ See [license.txt]( https://github.com/imazen/resizer/blob/support/v3/license.txt
   3. [Contact Us](#contact)
 
 <a name="getting_started"></a>
+
 #Getting Started
 
 Below is a basic installation guide, although a more comprehensive one can be found [on our website](http://www.imageresizing.net/docs/install).
@@ -52,6 +54,7 @@ Below is a basic installation guide, although a more comprehensive one can be fo
 We use submodules - clone with `git clone -b develop --recursive https://github.com/imazen/resizer` or run `git submodule update --init --recursive` afterwards. Make sure to add a project reference.
 
 <a name="installation"></a>
+
 ##Basic Installation Guide
 **Important!**: The MVC Routing plugin is required on .NET4+
 
@@ -68,6 +71,7 @@ PM> Install-Package ImageResizer.MvcWebConfig
 ```
 
 <a name="install_plugin"></a>
+
 #### Manual Plugin Installation
 
 1. In *your* project, add a reference to the plugin DLL (or project, if you're using the source).
@@ -83,8 +87,10 @@ You will need need to add the appopriate namespace reference to access the plugi
 Most configuration and plugin installation issues can be resolved by checking ImageResizer’s self-diagnostics page. If your local website is running at `http://localhost:5000/`, then you should browse to `http://localhost:5000/resizer.debug.ashx` to access it. See [the Troubleshooting](#troubleshooting section) for more details. 
 
 <a name="reference"></a>
+
 #Reference
 <a name="plugins_list"></a>
+
 ## List of Plugins
 
 The following is a list of all plugins currently available on ImageResizer, and links to their more detailed documentation on our website. They are grouped according to the license necessary to access them. **Higher level licenses include all plugins from lower level licenses.** Their order, from lowest to highest, is Essential, Performance, Creative, Elite. If you have any further questions about ImageResizer licenses, we encourage you to look at our [licenses page](http://www.imageresizing.net/licenses).
@@ -152,6 +158,7 @@ The following is a list of all plugins currently available on ImageResizer, and 
 * [PsdReader plugin](http://www.imageresizing.net/plugins/psdreader) - Adds support for PSD source files. *Deprecated in favor of FreeImageDecoder and PsdComposer.* Available at the Elite level.
 
 <a name="full_command"></a>
+
 ##Full Command Reference
 
 #### Selecting a frame or page
@@ -281,6 +288,7 @@ In addition to jpeg quality and gif/png colors, you can configure the jpeg subsa
 * **subsampling**==444|422|420
 
 <a name="managed_api"></a>
+
 ##Managed API examples
 
 Most tasks with the managed API only require one line:
@@ -334,6 +342,7 @@ You can create one like so:
 	ImageBuilder.Current.Build("~/images/photo.jpg","~/images/photo.jpg", 
 														 new ResizeSettings("width=100&height=200&crop=auto"));
 ```	
+
 #### Using Variables in the Destination Path (3.1.3+)
 
 Variables include the correct extension <ext>, random GUID <guid>, source path <path>, source filename <filename>, <width>, <height>, and any settings value <settings.*>. 
@@ -352,6 +361,7 @@ With the new feature, a proper upload system is 3 lines:
 You can also filter values. `<filename:A-Za-z0-9>` keeps only the alphanumeric characters from the original filename.
 
 <a name="config_reference"></a>
+
 ##Configuration Reference
 
 The following is a basic, typical configuration, V3+. [Click here](http://www.imageresizing.net/docs/2to3/configuration) to see a configuration example that mimics the V2 defaults.
@@ -392,9 +402,11 @@ The following is a basic, typical configuration, V3+. [Click here](http://www.im
 	</configuration>
 ```
 <a name="tricks"></a>
+
 #Nifty Tricks
 
 <a name="watermark"></a>
+
 ##Watermark Images Based on Folder Name or Display Size
 
 The *PostRewrite* event is the last of the URL rewriting events, and can be used to enforce certain settings.
@@ -445,6 +457,7 @@ To prevent this, you should add some more code inside PostRewrite
 ```
 
 <a name="thumbnails"></a>
+
 ##Generate Thumbnails and Multiple Sizes to Disk
 
 While the ImageResizer shines at on-the-fly image processing, you can also use it to drastically simplify pre-processing and ahead-of-time resizing as well. **We strongly recommend using the dynamic method instead of pre-generating your images, as pre-generating versions reduces agility and flexibility.** In the examples below, only one line is required to perform all the image decoding, format conversion, processing, resizing, and re-encoding. The rest is path/filename logic. Two different solutions are presented - 1 for processing images as they are uploaded, and another for processing images that are already saved to disk.
@@ -480,6 +493,7 @@ This method generates 3 versions of an image as it is uploaded, adding a \_thumb
 	}
 
 ```
+
 #### After Upload
 
 This example method generates 3 versions of the specified file, and returns a list of the final path names.
@@ -519,6 +533,7 @@ And will return a list of those paths.
 	}
 ```
 <a name="resize_upload"></a>
+
 ##Convert and Resize Images as They Are Uploaded
 
 Resizing and processing images as they are uploaded is very straightforward. Most of the required code is about paths and directories.
@@ -557,9 +572,11 @@ The following sample code generates a GUID filename for each upload, determines 
 	Next
 ```
 <a name="troubleshooting_guide"></a>
+
 #Troubleshooting
 
 <a name="self_diagnostics"></a>
+
 ##Accessing Self-Diagnostics
 
 Most configuration and plugin installation issues can be resolved by checking ImageResizer’s self-diagnostics page. If your local website is running at `http://localhost:5000/`, then you can visit it at `http://localhost:5000/resizer.debug.ashx`.
@@ -577,11 +594,13 @@ To override, add one of the following to the &lt;resizer&gt; section.
 	<diagnostics enableFor="None" />
 
 ```
+
 #### ASP.NET MVC Notes
 
 If you can't access the diagnostics page, make sure the [MvcRoutingShim plugin](http://www.imageresizing.net/plugins/mvcroutingshim) is installed.
 
 <a name="error_messages"></a>
+
 ##Getting Detailed Error Messages
 
 If some images are not displaying correctly, you *must* visit the image url directly to get the exact error message.
@@ -607,6 +626,7 @@ You may also have to **temporarily** change &lt;deployment retail to "False" for
 The customErrors setting is case-sensitive; use "Off", "On", and "RemoteOnly".
 
 <a home="troubleshooting_guide"></a>
+
 ##What Might Be Wrong
 
 To get support or use this guide, [make sure you get the detailed error message from visiting the image URL directly](#error_messages). This guide cannot offer a solution to a generic 500 error, 404 error, or a "broken image icon", as those symptoms are far to generic to be useful. 
@@ -734,6 +754,7 @@ This can occur in certain medium or low trust environments. To correct, set `req
 		</configSections>
 		...
 ```
+
 #### Error parsing Web.Config
 
 If you are using NuGet and recently upgraded from an older release, there may be duplicate XML elements in Web.Config. Delete the one lacking the requirePermission="false" attribute.
@@ -741,6 +762,7 @@ If you are using NuGet and recently upgraded from an older release, there may be
 	<section name="resizer" type="ImageResizer.ResizerSection"/>
 	<section name="resizer" type="ImageResizer.ResizerSection" requirePermission="false"/>
 ```
+
 #### Quality loss when resizing 8-bit Grayscale Jpeg images
 
 This is a known bug in GDI+. GDI+ opens 8-bit grayscale Jpeg images as 4-bit images. Here's the [bug report at Microsoft Connect](http://connect.microsoft.com/VisualStudio/feedback/details/649605/gdi-and-wic-opening-an-8bpp-grayscale-jpeg-results-in-quality-loss).
@@ -781,9 +803,11 @@ You need at minimum the following IIS modules installed for correct operation:
 * ASP.NET 4.5
 
 <a name="everything_else"></a>
+
 #Everything Else
 
 <a name="licensing_and_contract_info"></a>
+
 ##Licensing and Support Contract Information
 
 ##Licenses
@@ -796,6 +820,7 @@ For those times when (not if) everything breaks all at once, it's good to have u
 All ImageResizer support contracts come with a non-expiring Elite license, and free major upgrades for the duration of the contract. To see the different options available, check out [our support contracts page](http://www.imageresizing.net/support/contracts).
 
 <a name="contact"></a>
+
 ##Contact Us
 
 We can be reached at support@imageresizing.net. We usually respond within 2 or 3 business days. Of course, you could also leave comments on our [website](http://www.imageresizing.net), tag issues, or send smoke signals (Note: We do not actually advise sending smoke signals. Terrible waste of firewood, and bad for asthmatics to boot).
