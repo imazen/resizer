@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S3ReaderSample", "S3ReaderSample.csproj", "{8A750B3B-CFDE-43E8-A7EA-35DC84178088}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer", "..\..\Core\ImageResizer.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.DiskCache", "..\..\Plugins\DiskCache\ImageResizer.Plugins.DiskCache.csproj", "{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.UploadHelper", "..\..\Plugins\UploadHelper\ImageResizer.Plugins.UploadHelper.csproj", "{67F0982D-5851-4D3B-B29D-40B6760879DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.S3Reader2", "..\..\Plugins\S3Reader2\ImageResizer.Plugins.S3Reader2.csproj", "{AC318404-15F2-4187-A7B1-AFE4E2798DE6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Trial|Any CPU = Trial|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{8A750B3B-CFDE-43E8-A7EA-35DC84178088}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{FA5EF673-A6A4-498D-AA24-C025CC5267AF}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}.Trial|Any CPU.ActiveCfg = Trial|Any CPU
+		{C3B00CD1-39EE-4BA8-BDC0-02E346F20694}.Trial|Any CPU.Build.0 = Trial|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{AC318404-15F2-4187-A7B1-AFE4E2798DE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC318404-15F2-4187-A7B1-AFE4E2798DE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC318404-15F2-4187-A7B1-AFE4E2798DE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC318404-15F2-4187-A7B1-AFE4E2798DE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC318404-15F2-4187-A7B1-AFE4E2798DE6}.Trial|Any CPU.ActiveCfg = Trial|Any CPU
+		{AC318404-15F2-4187-A7B1-AFE4E2798DE6}.Trial|Any CPU.Build.0 = Trial|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
