@@ -3,6 +3,7 @@ Everything exciting is happening on the [develop branch. Why not head over there
 <a name="v3"></a><a name="top"></a>
 
 ## [ImageResizer](http://imageresizing.net) - The Flexible Image Server
+
 ![Issue Count](http://img.shields.io/github/issues/imazen/resizer.svg)[![Issues ready for work](https://badge.waffle.io/imazen/resizer.png?label=ready&title=Issues%20ready%20for%20work&svg=true)](https://waffle.io/imazen/resizer) View ReadMe for [latest](https://github.com/imazen/resizer/tree/develop#top), [stable](https://github.com/imazen/resizer/tree/master#top), [v2](https://github.com/imazen/resizer/tree/support/v2#top), [v3](https://github.com/imazen/resizer/tree/support/v3#top), and [v4](https://github.com/imazen/resizer/tree/support/v4#top).
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/imazen/resizer?utm_source=badge&utm_medium=```c#badge&utm_campaign=pr-badge) ![ImageResizer core downloads](http://img.shields.io/nuget/dt/ImageResizer.svg) ![Latest NuGet version](http://img.shields.io/nuget/vpre/ImageResizer.svg)
@@ -20,6 +21,7 @@ ImageResizer has a very simple (and powerful) URL API.
 For more informaiton, [check out our website](http://www.imageresizing.net). To contribute, see [CONTRIBUTING](https://github.com/imazen/resizer/blob/develop/CONTRIBUTING.md).
 
 #### License
+
 See [license.txt]( https://github.com/imazen/resizer/blob/support/v3/license.txt).
 
 #Table of Contents
@@ -56,6 +58,7 @@ We use submodules - clone with `git clone -b develop --recursive https://github.
 <a name="installation"></a>
 
 ##Basic Installation Guide
+
 **Important!**: The MVC Routing plugin is required on .NET4+
 
 ####Install from NuGet
@@ -89,6 +92,7 @@ Most configuration and plugin installation issues can be resolved by checking Im
 <a name="reference"></a>
 
 #Reference
+
 <a name="plugins_list"></a>
 
 ## List of Plugins
@@ -153,6 +157,7 @@ The following is a list of all plugins currently available on ImageResizer, and 
 * [VirtualFolder plugin](http://www.imageresizing.net/plugins/virtualfolder) - Create an IIS-like virtual folder that works in Cassini as well as IIS, and doesn't require IIS configuration.
 
 ####Deprecated Plugins
+
 * [AzureReader plugin](http://www.imageresizing.net/plugins/azurereader) - Allows blobstore images to be resized and served. (Azure 1.X compatible) *Deprecated in favore of AzureReader2.* Available at the Performance level.
 * [S3Reader plugin](http://www.imageresizing.net/plugins/s3reader) - Process and resize images located on a remote Amazon S3 bucket. A VirtualPathProvider. Works best when combined with DiskCache. *Deprecated in favor of S3Reader2.* Available at the Performance level.
 * [PsdReader plugin](http://www.imageresizing.net/plugins/psdreader) - Adds support for PSD source files. *Deprecated in favor of FreeImageDecoder and PsdComposer.* Available at the Elite level.
@@ -200,6 +205,7 @@ The following is a list of all plugins currently available on ImageResizer, and 
 * **margin=3 or margin=5,5,10,10** Specify a universal margin or left,top,right,bottom widths (new in V3.1.
 
 #### Output format
+
 * **format=jpg\|png\|gif** - The output format to use.
 * **quality** - Jpeg compression: 0-100 100=best, 90=very good balance, 0=ugly .
 * **colors=2-255** – Control the palette size of PNG and GIF images. If omitted, PNGs will be 24-bit ([PrettyGifs plugin](http://www.imageresizing.net/plugins/prettygifs) required).
@@ -557,6 +563,7 @@ The following sample code generates a GUID filename for each upload, determines 
 ```
 
 #### For VB.NET Users
+
 ```vbnet
 	'Loop through each uploaded file
 	For Each fileKey As String In HttpContext.Current.Request.Files.Keys
@@ -815,6 +822,7 @@ You need at minimum the following IIS modules installed for correct operation:
 The short version: ImageResizer has several license packages that have different tiers of access to our plugins, including free packages in our [essential](http://imageresizing.net/plugins/editions/free) and [trial](http://imageresizing.net/licenses/trial) packages. To find out about our license packages, [visit our website](http://imageresizing.net/licenses).
 
 ##Support Contracts
+
 For those times when (not if) everything breaks all at once, it's good to have us in your corner. Our support contracts come with architecture planning, hot-fixes, guaranteed rapid-response, emergency telephone numbers, and lots of other cool stuff. Furthermore, you can customize your plan to get just the right amount of support that you need. Remember: contracts can *save money* in the long-term, and we do our best to make sure our support contract customers get maximum bang for minimal buck.
 
 All ImageResizer support contracts come with a non-expiring Elite license, and free major upgrades for the duration of the contract. To see the different options available, check out [our support contracts page](http://www.imageresizing.net/support/contracts).
