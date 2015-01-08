@@ -337,7 +337,19 @@ namespace ImageResizer.Plugins.Basic {
                 {
                     p.Param[0] = ep;
                     //save
-                    b.Save(target, GetImageCodeInfo("image/jpeg"), p);
+                    if (!target.CanSeek)
+                    {
+                        //Write to an intermediate, seekable memory stream (PNG compression requires it)
+                        using (MemoryStream ms = new MemoryStream(4096))
+                        {
+                            b.Save(ms, GetImageCodeInfo("image/jpeg"), p);
+                            ms.WriteTo(target);
+                        }
+                    }
+                    else
+                    {
+                        b.Save(target, GetImageCodeInfo("image/jpeg"), p);
+                    }
                 }
             }
         }
@@ -363,16 +375,38 @@ namespace ImageResizer.Plugins.Basic {
         }
         public static void SaveBmp(Image img, Stream target)
         {
-            //  image/bmp
-            //  The parameter list requires 0 bytes.
-            img.Save(target, ImageFormat.Bmp);
+            if (!target.CanSeek)
+            {
+                //Write to an intermediate, seekable memory stream (PNG compression requires it)
+                using (MemoryStream ms = new MemoryStream(4096))
+                {
+                    img.Save(ms, ImageFormat.Bmp);
+                    ms.WriteTo(target);
+                }
+            }
+            else
+            {//  image/bmp
+                //  The parameter list requires 0 bytes.
+                img.Save(target, ImageFormat.Bmp);
+            }
         }
 
 
         public static void SaveGif(Image img, Stream target) {
-            //image/gif
-            //  The parameter list requires 0 bytes.
-            img.Save(target, ImageFormat.Gif);
+            if (!target.CanSeek)
+            {
+                //Write to an intermediate, seekable memory stream (PNG compression requires it)
+                using (MemoryStream ms = new MemoryStream(4096))
+                {
+                    img.Save(ms, ImageFormat.Gif);
+                    ms.WriteTo(target);
+                }
+            }
+            else
+            {//image/gif
+                //  The parameter list requires 0 bytes.
+                img.Save(target, ImageFormat.Gif);
+            }
         }
 
         #endregion
