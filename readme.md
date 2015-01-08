@@ -99,6 +99,10 @@ Most configuration and plugin installation issues can be resolved by checking Im
 
 The following is a list of all plugins currently available on ImageResizer, and links to their more detailed documentation on our website. They are grouped according to the license necessary to access them. **Higher level licenses include all plugins from lower level licenses.** Their order, from lowest to highest, is Essential, Performance, Creative, Elite. If you have any further questions about ImageResizer licenses, we encourage you to look at our [licenses page](http://www.imageresizing.net/licenses).
 
+##Test
+
+<a name="test"></a>
+
 ####Elite License Plugins
 
 * [CropAround plugin](http://www.imageresizing.net/plugins/croparound) - Automatic cropping based on a set of areas to preserve specified areas.
