@@ -45,6 +45,10 @@ let mainSolution = rootDir + "AppVeyor.sln"
 let fastScaleSln = rootDir + "Plugins/FastScaling/ImageResizer.Plugins.FastScaling.sln"
 let assemblyInfoFile = coreDir + "SharedAssemblyInfo.cs"
 
+let isAutoBuild =
+    if isNotNullOrEmpty (environVar "APPVEYOR") then true
+    else false
+
 
 // Versioning
 
@@ -62,9 +66,12 @@ version <-
     }
 
 let mutable isRelease = false
+let mutable releaseVersionString = ""
+
 let ok,msg,errors = runGitCommand "" "describe --exact-match --abbrev=0"
 if ok && msg.Count > 0 && (isValidSemVer msg.[0]) then
-    version <- parse msg.[0]
+    releaseVersionString <- msg.[0]
+    version <- parse releaseVersionString
     isRelease <- true
 
 let nugetVer = { version with Build = "" }
@@ -395,11 +402,21 @@ Target "print_stats" (fun _ ->
 
 Target "custom" (fun _ ->
     let targets = getBuildParamOrDefault "targets" ""
-    let tlist = List.map (fun x -> (split ' ' x).[0]) (split ';' targets)
+    let cliVersionString = ref ""
     
-    if tlist.Length > 0 then
+    let tlist = List.map (fun x -> (
+        let pts = (split ' ' x)
+        if pts.[0] = "release" then
+            cliVersionString := pts.[1]
+        pts.[0])) (split ';' targets)
+    
+    if (targets.Contains("push") || targets.Contains("do_all")) && isRelease && not isAutoBuild && releaseVersionString <> !cliVersionString then
+        printf "Error: pushing of releases disabled from cli. To continue add 'release <semver>' to the target list that matches git tag."
+    
+    elif tlist.Length > 0 then
         for i=0 to tlist.Length-2 do
             tlist.[i] ==> tlist.[i+1]
+        
         Run tlist.[tlist.Length-1]
 )
 
