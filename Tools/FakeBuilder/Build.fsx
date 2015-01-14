@@ -411,7 +411,10 @@ Target "custom" (fun _ ->
         pts.[0])) (split ';' targets)
     
     if (targets.Contains("push") || targets.Contains("do_all")) && isRelease && not isAutoBuild && releaseVersionString <> !cliVersionString then
-        printf "Error: pushing of releases disabled from cli. To continue add 'release <semver>' to the target list that matches git tag."
+        if !cliVersionString = "" then
+            printf "Error: pushing of releases disabled from cli. To continue add 'release <semver>' to the target list that matches git tag."
+        else
+            printf "Error: git tag doesn't match cli release input (git: %s, cli: %s)" releaseVersionString !cliVersionString
     
     elif tlist.Length > 0 then
         for i=0 to tlist.Length-2 do
