@@ -68,11 +68,14 @@ version <-
 let mutable isRelease = false
 let mutable releaseVersionString = ""
 
-let ok,msg,errors = runGitCommand "" "describe --exact-match --abbrev=0"
-if ok && msg.Count > 0 && (isValidSemVer msg.[0]) then
-    releaseVersionString <- msg.[0]
-    version <- parse releaseVersionString
-    isRelease <- true
+let ok,msg,errors = runGitCommand "" "describe --tags --exact-match --abbrev=0"
+if ok && msg.Count > 0 then
+    if isValidSemVer msg.[0] then
+        releaseVersionString <- msg.[0]
+        version <- parse releaseVersionString
+        isRelease <- true
+    else
+        printf "Warning: git tag is not a valid semver; not processing as a release\n"
 
 let nugetVer = { version with Build = "" }
 
@@ -412,15 +415,14 @@ Target "custom" (fun _ ->
     
     if (targets.Contains("push") || targets.Contains("do_all")) && isRelease && not isAutoBuild && releaseVersionString <> !cliVersionString then
         if !cliVersionString = "" then
-            printf "Error: pushing of releases disabled from cli. To continue add 'release <semver>' to the target list that matches git tag."
+            failwith "Error: pushing of releases disabled from cli. To continue add 'release <semver>' to the target list that matches git tag."
         else
-            printf "Error: git tag doesn't match cli release input (git: %s, cli: %s)" releaseVersionString !cliVersionString
+            failwith (sprintf "Error: git tag doesn't match cli release input (git: %s, cli: %s)" releaseVersionString !cliVersionString)
     
     elif tlist.Length > 0 then
-        for i=0 to tlist.Length-2 do
-            tlist.[i] ==> tlist.[i+1]
-        
-        Run tlist.[tlist.Length-1]
+        for i=0 to tlist.Length-1 do
+            if tlist.[i] <> "release" then
+                Run tlist.[i]
 )
 
 Target "do_all" (fun _ ->
