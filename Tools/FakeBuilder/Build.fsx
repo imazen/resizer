@@ -31,12 +31,12 @@ open System.Text.RegularExpressions
 
 // Settings
 
-let envlist = ["fb_nuget_url"; "fb_nuget_key";
-               "fb_s3_bucket"; "fb_s3_id"; "fb_s3_key"; "fb_pub_url";
-               "fb_nuget_rel_url"; "fb_nuget_rel_key";
-               "fb_s3_rel_bucket"; "fb_s3_rel_id"; "fb_s3_rel_key";]
+let variableList = ["fb_nuget_url"; "fb_nuget_key";
+                    "fb_s3_bucket"; "fb_s3_id"; "fb_s3_key"; "fb_pub_url";
+                    "fb_nuget_rel_url"; "fb_nuget_rel_key";
+                    "fb_s3_rel_bucket"; "fb_s3_rel_id"; "fb_s3_rel_key";]
 
-let mutable settings = seq {for x in envlist -> x, (environVar x)} |> Map.ofSeq
+let mutable settings = seq {for x in variableList -> x, (environVar x)} |> Map.ofSeq
 
 
 let rootDir = Path.GetFullPath(__SOURCE_DIRECTORY__ + "/../..") + "\\"
@@ -254,20 +254,20 @@ Target "pack_zips" (fun _ ->
         let tmpInv = FsInventory(rootDir)
         let transFiles = FsQuery(tmpInv, []).files("^/Samples/*/*.(cs|vb)proj$")
         
-        let tFiles = List.filter (fun x -> (List.exists ((=) x) transFiles)) files
-        let nFiles = List.filter (fun x -> not (List.exists ((=) x) transFiles)) files
+        let transFileList = List.filter (fun x -> (List.exists ((=) x) transFiles)) files
+        let otherFileList = List.filter (fun x -> not (List.exists ((=) x) transFiles)) files
         
         let find = @"<ProjectReference.*?<Name>(.*?)</Name>.*?</ProjectReference>"
         let replace = "<Reference Include=\"$1\"><HintPath>..\\..\\dlls\\release\$1.dll</HintPath></Reference>"
         
         if not inRoot then
             List.append
-                (List.map (fun x -> CustomFile(x, (targetDir + snd((tupleRelative baseDir [x]).[0])), true)) nFiles)
-                (List.map (fun x -> CustomFileTransform(x, (targetDir + snd((tupleRelative baseDir [x]).[0])), true, find, replace)) tFiles)
+                (List.map (fun x -> CustomFile(x, (targetDir + snd((tupleRelative baseDir [x]).[0])), true)) otherFileList)
+                (List.map (fun x -> CustomFileTransform(x, (targetDir + snd((tupleRelative baseDir [x]).[0])), true, find, replace)) transFileList)
         else
             List.append
-                (List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), true)) nFiles)
-                (List.map (fun x -> CustomFileTransform(x, (targetDir + snd((tupleRelative baseDir [x]).[0])), true, find, replace)) tFiles)
+                (List.map (fun x -> CustomFile(x, (Path.GetFileName(x)), true)) otherFileList)
+                (List.map (fun x -> CustomFileTransform(x, (targetDir + snd((tupleRelative baseDir [x]).[0])), true, find, replace)) transFileList)
     
     
     // packmin
@@ -407,11 +407,11 @@ Target "custom" (fun _ ->
     let targets = getBuildParamOrDefault "targets" ""
     let cliVersionString = ref ""
     
-    let tlist = List.map (fun x -> (
-        let pts = (split ' ' x)
-        if pts.[0] = "release" then
-            cliVersionString := pts.[1]
-        pts.[0])) (split ';' targets)
+    let targetList = List.map (fun x -> (
+                        let parts = (split ' ' x)
+                        if parts.[0] = "release" then
+                            cliVersionString := parts.[1]
+                        parts.[0])) (split ';' targets)
     
     if (targets.Contains("push") || targets.Contains("do_all")) && isRelease && not isAutoBuild && releaseVersionString <> !cliVersionString then
         if !cliVersionString = "" then
@@ -419,10 +419,10 @@ Target "custom" (fun _ ->
         else
             failwith (sprintf "Error: git tag doesn't match cli release input (git: %s, cli: %s)" releaseVersionString !cliVersionString)
     
-    elif tlist.Length > 0 then
-        for i=0 to tlist.Length-1 do
-            if tlist.[i] <> "release" then
-                Run tlist.[i]
+    elif targetList.Length > 0 then
+        for i=0 to targetList.Length-1 do
+            if targetList.[i] <> "release" then
+                Run targetList.[i]
 )
 
 Target "do_all" (fun _ ->
