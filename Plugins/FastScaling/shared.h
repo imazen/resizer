@@ -91,20 +91,32 @@ typedef struct
 #define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
 
+#ifdef ENABLE_GAMMA_CORRECTION
 static inline unsigned char
-uchar_clamp_ff(float clr) {
+linear_to_srgb_uchar(float clr) {
     unsigned short result;
 
-#ifdef ENABLE_GAMMA_CORRECTION
     // Gamma correction
     // http://www.4p8.com/eric.brasseur/gamma.html#formulas
 
     result = (clr <= 0.0031308) ?
         (unsigned short)(short)(12.92f * clr * 255.0f + 0.5f) :
         (unsigned short)(short)(1.055f * pow(clr, 0.41666666f) * 255.0f - 13.525f);
-#else
-    result = (unsigned short)(short)(clr + 0.5);
+
+
+    if (result > 255) {
+        result = (clr < 0) ? 0 : 255;
+    }
+
+    return result;
+}
 #endif
+
+static inline unsigned char
+uchar_clamp_ff(float clr) {
+    unsigned short result;
+
+    result = (unsigned short)(short)(clr + 0.5);
 
     if (result > 255) {
         result = (clr < 0) ? 0 : 255;

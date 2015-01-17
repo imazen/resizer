@@ -103,8 +103,26 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
     for (row = 0; row < row_count; row++)
     {
         unsigned char *src_start = source_bitmap->pixels + (start_row + row)*source_bitmap->stride;
+#ifndef ENABLE_GAMMA_CORRECTION
         for (bix = 0; bix < source_buffer_len; bix++)
             source_buffers[row * source_buffer_len + bix] = lut[src_start[bix]];
+#else
+        if (source_bitmap->bpp == 3)
+        {
+            for (bix = 0; bix < source_buffer_len; bix++)
+                source_buffers[row * source_buffer_len + bix] = lut[src_start[bix]];
+        }
+        else
+        {
+            for (bix = 0; bix < source_buffer_len; bix += 4)
+            {
+                source_buffers[row * source_buffer_len + bix] = lut[src_start[bix]];
+                source_buffers[row * source_buffer_len + bix + 1] = lut[src_start[bix + 1]];
+                source_buffers[row * source_buffer_len + bix + 2] = lut[src_start[bix + 2]];
+                source_buffers[row * source_buffer_len + bix + 3] = lut[src_start[bix + 3] + 256];
+            }
+        }
+#endif
     }
 
     //Actual scaling seems responsible for about 40% of execution time
@@ -121,10 +139,15 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
         int dest_buffer_start = bix * dest->bpp;
 
         for (bufferSet = 0; bufferSet < row_count; bufferSet++){
+#ifndef ENABLE_GAMMA_CORRECTION
             *dst_start = uchar_clamp_ff(dest_buffers[dest_buffer_start]);
             *(dst_start + 1) = uchar_clamp_ff(dest_buffers[dest_buffer_start + 1]);
             *(dst_start + 2) = uchar_clamp_ff(dest_buffers[dest_buffer_start + 2]);
-
+#else
+            *dst_start = linear_to_srgb_uchar(dest_buffers[dest_buffer_start]);
+            *(dst_start + 1) = linear_to_srgb_uchar(dest_buffers[dest_buffer_start + 1]);
+            *(dst_start + 2) = linear_to_srgb_uchar(dest_buffers[dest_buffer_start + 2]);
+#endif
             dest_buffer_start += dest_buffer_len;
             dst_start += dest->bpp;
         }
