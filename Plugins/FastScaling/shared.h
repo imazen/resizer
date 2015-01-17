@@ -1,6 +1,7 @@
 #pragma once
 #pragma unmanaged
 
+#include <limits.h>
 #define ENABLE_GAMMA_CORRECTION
 
 
@@ -98,16 +99,13 @@ uchar_clamp_ff(float clr) {
     // Gamma correction
     // http://www.4p8.com/eric.brasseur/gamma.html#formulas
 
-    float a = 0.055;
-    if (clr <= 0.0031308)
-        clr = 12.92 * clr;
-    else
-        clr = (1 + a) * pow(clr, 1.0f / 2.4f) - a;
-
-    clr *= 255.0f;
+    result = (clr <= 0.0031308) ?
+        (unsigned short)(short)(12.92f * clr * 255.0f + 0.5f) :
+        (unsigned short)(short)(1.055f * pow(clr, 0.41666666f) * 255.0f - 13.525f);
+#else
+    result = (unsigned short)(short)(clr + 0.5);
 #endif
 
-    result = (unsigned short)(short)(clr + 0.5);
     if (result > 255) {
         result = (clr < 0) ? 0 : 255;
     }

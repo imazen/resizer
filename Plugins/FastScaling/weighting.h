@@ -1,7 +1,7 @@
 #include "Stdafx.h"
-#include "shared.h"
 #pragma once
 #pragma unmanaged
+#include "shared.h"
 
 static void derive_cubic_coefficients(double B, double C, InterpolationDetailsPtr out){
     double bx2 = B + B;
