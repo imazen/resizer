@@ -8,6 +8,7 @@
 </head>
 <body>
     <select id="pic" onchange="regen();">
+        <option value="gamma-test.jpg">gamma-test.jpg</option>
         <option value="fountain-small.jpg">fountain-small.jpg</option>
         <option value="red-leaf.jpg">red-leaf.jpg</option>
         <option value="quality-original.jpg">quality-original.jpg</option>
@@ -18,7 +19,7 @@
         <option value="rings2.png">rings2.png</option>
     </select>
 
-    <input id="newx" value="700" style="width: 30px" onchange="regen();" />px<br /><br />
+    <input id="newx" value="256" style="width: 30px" onchange="regen();" />px<br /><br />
 
     <input id="set1" value="fastscale=true&f" style="width: 250px" onchange="regen();" /> vs 
     <input id="set2" value="" style="width: 250px" onchange="regen();" />
