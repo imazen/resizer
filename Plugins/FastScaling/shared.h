@@ -1,6 +1,9 @@
 #pragma once
 #pragma unmanaged
 
+#define ENABLE_GAMMA_CORRECTION
+
+
 typedef struct BitmapBgraStruct *BitmapBgraPtr;
 
 typedef struct BitmapBgraStruct{
@@ -91,6 +94,7 @@ static inline unsigned char
 uchar_clamp_ff(float clr) {
     unsigned short result;
 
+#ifdef ENABLE_GAMMA_CORRECTION
     // Gamma correction
     // http://www.4p8.com/eric.brasseur/gamma.html#formulas
 
@@ -101,6 +105,7 @@ uchar_clamp_ff(float clr) {
         clr = (1 + a) * pow(clr, 1.0f / 2.4f) - a;
 
     clr *= 255.0f;
+#endif
 
     result = (unsigned short)(short)(clr + 0.5);
     if (result > 255) {

@@ -1,3 +1,4 @@
+#include "shared.h"
 #include "Stdafx.h"
 #include "ImageResizer.Plugins.FastScaling.h"
 #pragma once
@@ -176,10 +177,13 @@ namespace ImageResizer{
                     p->Start("ScaleBgra", true);
                     BitmapBgraPtr tmp_im = NULL;
 
+                    float lut[256];
+#ifndef ENABLE_GAMMA_CORRECTION
+                    for (int n = 0; n < 256; n++) lut[n] = float(n);
+#else
                     // Gamma correction
                     // http://www.4p8.com/eric.brasseur/gamma.html#formulas
 
-                    float lut[256];
                     float a = 0.055;
                     for (int n = 0; n < 256; n++)
                     {
@@ -189,6 +193,7 @@ namespace ImageResizer{
                         else
                             lut[n] = pow((s + a) / (1 + a), 2.4f);
                     }
+#endif
 
                     p->Start("create temp image(sy x dx)", false);
                     /* Scale horizontally  */
