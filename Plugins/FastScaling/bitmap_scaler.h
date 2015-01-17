@@ -175,8 +175,20 @@ namespace ImageResizer{
 
                     p->Start("ScaleBgra", true);
                     BitmapBgraPtr tmp_im = NULL;
+
+                    // Gamma correction
+                    // http://www.4p8.com/eric.brasseur/gamma.html#formulas
+
                     float lut[256];
-                    for (int n = 0; n < 256; n++) lut[n] = (float)n;
+                    float a = 0.055;
+                    for (int n = 0; n < 256; n++)
+                    {
+                        float s = n / 255.0;
+                        if (s <= 0.04045)
+                            lut[n] = s / 12.92;
+                        else
+                            lut[n] = pow((s + a) / (1 + a), 2.4f);
+                    }
 
                     p->Start("create temp image(sy x dx)", false);
                     /* Scale horizontally  */
