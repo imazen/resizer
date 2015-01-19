@@ -49,8 +49,9 @@ namespace ImageResizer{
                 void ScaleBitmap(Bitmap^ source, Bitmap^ dest, Rectangle crop, Rectangle target, array<array<float, 1>^, 1>^ colorMatrix, const InterpolationDetailsPtr details, IProfiler^ p){
                     WrappedBitmap^ bbSource;
                     WrappedBitmap^ bbResult;
-                    
+
 #ifdef ENABLE_GDI_PREMULT
+                    p->Start("AlphaPremultGDI", false);
                     Rectangle src_rect = Rectangle(0, 0, source->Width, source->Height);
                     Rectangle dst_rect = Rectangle(0, 0, dest->Width, dest->Height);
                     Bitmap ^pm_src = gcnew Bitmap(source->Width, source->Height, PixelFormat::Format32bppPArgb);
@@ -58,6 +59,7 @@ namespace ImageResizer{
                     Graphics ^src_gfx = Graphics::FromImage(pm_src);
                     Graphics ^dst_gfx = Graphics::FromImage(dest);
                     src_gfx->DrawImage(source, crop, crop, GraphicsUnit::Pixel);
+                    p->Stop("AlphaPremultGDI", false, true);
 #endif
 
                     try{
@@ -94,6 +96,7 @@ namespace ImageResizer{
                     finally{
                         delete bbSource;
                         delete bbResult;
+                        p->Stop("BgraDispose", false, true);
 
 #ifdef ENABLE_GDI_PREMULT
                         dst_gfx->DrawImage(pm_dst, target, target, GraphicsUnit::Pixel);
@@ -102,8 +105,6 @@ namespace ImageResizer{
                         delete src_gfx;
                         delete pm_src;
 #endif
-
-                        p->Stop("BgraDispose", false, true);
                     }
                 }
 
