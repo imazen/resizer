@@ -8,6 +8,7 @@
 </head>
 <body>
     <select id="pic" onchange="regen();">
+        <option value="premult-test.png">premult-test.png</option>
         <option value="gamma-test.jpg">gamma-test.jpg</option>
         <option value="fountain-small.jpg">fountain-small.jpg</option>
         <option value="red-leaf.jpg">red-leaf.jpg</option>
