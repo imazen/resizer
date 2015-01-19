@@ -49,10 +49,26 @@ namespace ImageResizer{
                 void ScaleBitmap(Bitmap^ source, Bitmap^ dest, Rectangle crop, Rectangle target, array<array<float, 1>^, 1>^ colorMatrix, const InterpolationDetailsPtr details, IProfiler^ p){
                     WrappedBitmap^ bbSource;
                     WrappedBitmap^ bbResult;
+                    
+#ifdef ENABLE_GDI_PREMULT
+                    Rectangle src_rect = Rectangle(0, 0, source->Width, source->Height);
+                    Rectangle dst_rect = Rectangle(0, 0, dest->Width, dest->Height);
+                    Bitmap ^pm_src = gcnew Bitmap(source->Width, source->Height, PixelFormat::Format32bppPArgb);
+                    Bitmap ^pm_dst = gcnew Bitmap(dest->Width, dest->Height, PixelFormat::Format32bppPArgb);
+                    Graphics ^src_gfx = Graphics::FromImage(pm_src);
+                    Graphics ^dst_gfx = Graphics::FromImage(dest);
+                    src_gfx->DrawImage(source, crop, crop, GraphicsUnit::Pixel);
+#endif
+
                     try{
                         p->Start("SysDrawingToBgra", false);
-                        bbSource = WrapBitmapAsBgra(source, crop, !details->allow_source_mutation,true);
-                        bbResult = WrapBitmapAsBgra(dest, target,false,true);
+#ifdef ENABLE_GDI_PREMULT
+                        bbSource = WrapBitmapAsBgra(pm_src, crop, false, true);
+                        bbResult = WrapBitmapAsBgra(pm_dst, target, false, true);
+#else
+                        bbSource = WrapBitmapAsBgra(source, crop, !details->allow_source_mutation, true);
+                        bbResult = WrapBitmapAsBgra(dest, target, false, true);
+#endif
                         p->Stop("SysDrawingToBgra", true, false);
 
                         if (details->use_halving)
@@ -78,6 +94,15 @@ namespace ImageResizer{
                     finally{
                         delete bbSource;
                         delete bbResult;
+
+#ifdef ENABLE_GDI_PREMULT
+                        dst_gfx->DrawImage(pm_dst, target, target, GraphicsUnit::Pixel);
+                        delete dst_gfx;
+                        delete pm_dst;
+                        delete src_gfx;
+                        delete pm_src;
+#endif
+
                         p->Stop("BgraDispose", false, true);
                     }
                 }
@@ -244,8 +269,8 @@ namespace ImageResizer{
                 WrappedBitmap^ WrapBitmapAsBgra(Bitmap^ source, Rectangle from, bool readonly, bool alpha_meaningful){
                     int i;
                     int j;
-                    bool hasAlpha = source->PixelFormat == PixelFormat::Format32bppArgb;
-                    if (source->PixelFormat != PixelFormat::Format32bppArgb && source->PixelFormat != PixelFormat::Format24bppRgb){
+                    bool hasAlpha = source->PixelFormat == PixelFormat::Format32bppArgb || source->PixelFormat == PixelFormat::Format32bppPArgb;
+                    if (source->PixelFormat != PixelFormat::Format32bppArgb && source->PixelFormat != PixelFormat::Format24bppRgb && source->PixelFormat != PixelFormat::Format32bppPArgb){
                         throw gcnew ArgumentOutOfRangeException("source", "Invalid pixel format " + source->PixelFormat.ToString());
                     }
                     if (from.X < 0 || from.Y < 0 || from.Right > source->Width || from.Bottom > source->Height || from.Width < 1 || from.Height < 1) {

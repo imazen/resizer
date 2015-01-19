@@ -2,6 +2,7 @@
 #pragma unmanaged
 
 #include <limits.h>
+//#define ENABLE_GDI_PREMULT
 #define ENABLE_GAMMA_CORRECTION
 
 
