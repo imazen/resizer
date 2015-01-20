@@ -226,7 +226,19 @@ namespace ImageResizerPluginsFastScalingTestsCpp {
             Color ^px = output->GetPixel(5, 5);
             Color ^tst = Color::FromArgb(128, 0, 255, 0);
             
-            Assert::True(*px == *tst, "Expected: " + tst->ToString() + "Got: " + px->ToString());
+            Assert::True(*px == *tst, "Expected: " + tst->ToString() + " Got: " + px->ToString());
+        }
+
+        [Fact]
+        void GammaTest()
+        {
+            String ^imgdir = gcnew String("..\\..\\..\\..\\Samples\\Images\\");
+            Bitmap ^output = BuildFast(gcnew Bitmap(imgdir + "gamma-test.jpg"), "fastscale=true&width=256");
+
+            Color ^px = output->GetPixel(90, 70);
+            Color ^tst = Color::FromArgb(255, 188, 188, 188);
+
+            Assert::True(*px == *tst, "Expected: " + tst->ToString() + " Got: " + px->ToString());
         }
     };
 }
