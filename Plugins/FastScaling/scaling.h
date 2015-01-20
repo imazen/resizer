@@ -95,19 +95,28 @@ float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len
 
 
 #ifdef ENABLE_INTERNAL_PREMULT
-#define ALPHA_LUT_PREMULT(x) uchar_clamp_ff(lut[src_start[bix + x]] * lut[src_start[bix + 3]] / 255.0f)
-#define RESTORE_ALPHA * 255.0f / dest_buffers[dest_buffer_start + 3]
+#define ALPHA_LUT_PREMULT(x) uchar_clamp_ff(lut[src_start[bix + x]] * lut[src_start[bix + 3]] / 255)
 #else
 #define ALPHA_LUT_PREMULT(x) src_start[bix + x]
-#define RESTORE_ALPHA
 #endif
 
 #ifdef ENABLE_GAMMA_CORRECTION
 #define RESTORE_GAMMA(x) linear_to_srgb(x)
 #define GAMMA_LUT_OFFSET 256 +
 #else
-#define RESTORE_GAMMA(x) x
+#define RESTORE_GAMMA(x) (x)
 #define GAMMA_LUT_OFFSET
+#endif
+
+#ifdef ENABLE_COMPOSITING
+#define COMPOSIT_ALPHA + lut[dst_start[3]] * float(1 - dest_buffers[dest_buffer_start + 3] / 255)
+#define BLEND_ALPHA(ch, x) ((x + lut[dst_start[ch]] * lut[*(dst_start + 3)] / 255 * (1 - dest_buffers[dest_buffer_start + 3] / 255)) / out_alpha * 255)
+#elif defined(ENABLE_INTERNAL_PREMULT)
+#define COMPOSIT_ALPHA
+#define BLEND_ALPHA(ch, x) (x * 255 / dest_buffers[dest_buffer_start + 3])
+#else
+#define COMPOSIT_ALPHA
+#define BLEND_ALPHA(ch, x) (x)
 #endif
 
 
@@ -144,40 +153,34 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
             dest_buffers + (dest_buffer_len * bufferSet), to_pixel_count, dest_buffer_len, weights, source_bitmap->bpp, dest->bpp);
     }
 
-    // process rgb first
+    
+
     unsigned char *dst_start = dest->pixels + start_row * dest->bpp;
     int stride_offset = dest->stride - dest->bpp * row_count;
+    float out_alpha;
 
 
     if (source_bitmap->bpp == 4)
     {
-        for (bix = 0; bix < to_pixel_count; bix++){
-            int dest_buffer_start = bix * dest->bpp;
-
-            for (bufferSet = 0; bufferSet < row_count; bufferSet++){
-                *dst_start = uchar_clamp_ff(RESTORE_GAMMA(dest_buffers[dest_buffer_start]) RESTORE_ALPHA);
-                *(dst_start + 1) = uchar_clamp_ff(RESTORE_GAMMA(dest_buffers[dest_buffer_start + 1]) RESTORE_ALPHA);
-                *(dst_start + 2) = uchar_clamp_ff(RESTORE_GAMMA(dest_buffers[dest_buffer_start + 2]) RESTORE_ALPHA);
-                dest_buffer_start += dest_buffer_len;
-                dst_start += dest->bpp;
-            }
-
-            dst_start += stride_offset;
-        }
-
         if (dest->bpp == 4)
         {
-            dst_start = dest->pixels + start_row * dest->bpp;
-
             for (bix = 0; bix < to_pixel_count; bix++){
                 int dest_buffer_start = bix * dest->bpp;
                 for (bufferSet = 0; bufferSet < row_count; bufferSet++){
-                    *(dst_start + 3) = uchar_clamp_ff(dest_buffers[dest_buffer_start + 3]);
+                    out_alpha = dest_buffers[dest_buffer_start + 3] COMPOSIT_ALPHA;
+                    *dst_start = uchar_clamp_ff(BLEND_ALPHA(0, RESTORE_GAMMA(dest_buffers[dest_buffer_start])));
+                    *(dst_start + 1) = uchar_clamp_ff(BLEND_ALPHA(1, RESTORE_GAMMA(dest_buffers[dest_buffer_start + 1])));
+                    *(dst_start + 2) = uchar_clamp_ff(BLEND_ALPHA(2, RESTORE_GAMMA(dest_buffers[dest_buffer_start + 2])));
+                    *(dst_start + 3) = uchar_clamp_ff(out_alpha);
                     dest_buffer_start += dest_buffer_len;
                     dst_start += dest->bpp;
                 }
                 dst_start += stride_offset;
             }
+        }
+        else
+        {
+            // shouldn't be possible?
         }
     }
     else

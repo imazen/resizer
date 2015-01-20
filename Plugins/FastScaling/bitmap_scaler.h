@@ -192,6 +192,7 @@ namespace ImageResizer{
                     if (!dst)throw gcnew ArgumentNullException("dst");
 
                     if (source->w == width && source->h == height){
+                        // TODO: composit on copy
                         // In case of both halfinplace and noresize we still need to copy the data
                         CopyBgra(source, dst);
                         return;
