@@ -30,6 +30,7 @@ namespace ImageResizer{
                     this->bgra->pixels_readonly = true;
                     this->bgra->stride_readonly = true;
                     this->bgra->compositing_mode = BitmapCompositingMode::Blend_with_self;
+                    this->bgra->matte_color = 0;
                 }
 
                 ~WrappedBitmap(){
@@ -37,6 +38,8 @@ namespace ImageResizer{
                         underlying_bitmap->UnlockBits(locked_bitmap_data);
                     }
                     if (bgra != NULL){
+                        if (bgra->matte_color)
+                            delete bgra->matte_color;
                         DestroyBitmapBgra(bgra);
                         bgra = NULL;
                     }

@@ -106,12 +106,15 @@ float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len
 #ifdef ENABLE_COMPOSITING
 #define composit_alpha + lut[dst_start[3]] * (1 - dest_buffers[dest_buffer_start + 3] / 255.0f)
 #define blend_alpha(ch, x) (((x) + lut[dst_start[ch]] * lut[dst_start[3]] / 255.0f * (1 - dest_buffers[dest_buffer_start + 3] / 255.0f)) / out_alpha * 255.0f)
+#define blend_matte(ch, x) ((x) + lut[dest->matte_color[ch]] * (1 - dest_buffers[dest_buffer_start + 3] / 255.0f))
 #elif defined(ENABLE_INTERNAL_PREMULT)
 #define composit_alpha
 #define blend_alpha(ch, x) ((x) * 255.0f / dest_buffers[dest_buffer_start + 3])
+#define blend_matte(ch, x) ((x) * 255.0f / dest_buffers[dest_buffer_start + 3])
 #else
 #define composit_alpha
 #define blend_alpha(ch, x) (x)
+#define blend_matte(ch, x) (x)
 #endif
 
 #define srgb_to_linear(x) (lut[256 + (x)])
@@ -173,6 +176,21 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
                         dst_start[1] = uchar_clamp_ff(blend_alpha(1, linear_to_srgb(dest_buffers[dest_buffer_start + 1])));
                         dst_start[2] = uchar_clamp_ff(blend_alpha(2, linear_to_srgb(dest_buffers[dest_buffer_start + 2])));
                         dst_start[3] = uchar_clamp_ff(out_alpha);
+                        dest_buffer_start += dest_buffer_len;
+                        dst_start += dest->bpp;
+                    }
+                    dst_start += stride_offset;
+                }
+            }
+            else if (dest->compositing_mode == BitmapCompositingMode::Blend_with_matte)
+            {
+                for (bix = 0; bix < to_pixel_count; bix++){
+                    int dest_buffer_start = bix * dest->bpp;
+                    for (bufferSet = 0; bufferSet < row_count; bufferSet++){
+                        dst_start[0] = uchar_clamp_ff(blend_matte(0, linear_to_srgb(dest_buffers[dest_buffer_start + 0])));
+                        dst_start[1] = uchar_clamp_ff(blend_matte(1, linear_to_srgb(dest_buffers[dest_buffer_start + 1])));
+                        dst_start[2] = uchar_clamp_ff(blend_matte(2, linear_to_srgb(dest_buffers[dest_buffer_start + 2])));
+                        dst_start[3] = 255;
                         dest_buffer_start += dest_buffer_len;
                         dst_start += dest->bpp;
                     }
