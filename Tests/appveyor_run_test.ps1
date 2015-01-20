@@ -1,5 +1,6 @@
 param([string]$assembly, [switch]$run32bit)
 
+$ErrorActionPreference = "Stop"
 cd Packages/xunit.runners*/Tools
 
 
@@ -14,6 +15,7 @@ switch ($run32bit){
 
 
 & "$($runner)"  $dll_path "-appveyor"
+$return = $LastExitCode
 
 # "-xmlv1" "$($xml_out_file)"
 
@@ -23,3 +25,4 @@ switch ($run32bit){
 # $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $xml_out_file))
 
 cd ..\..\..\
+exit $return
