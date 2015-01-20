@@ -2,7 +2,11 @@
 #pragma unmanaged
 
 #include <limits.h>
+
+// Alpha channel premultiplication, use only one
 //#define ENABLE_GDI_PREMULT
+#define ENABLE_INTERNAL_PREMULT
+
 #define ENABLE_GAMMA_CORRECTION
 
 
@@ -93,23 +97,16 @@ typedef struct
 
 
 #ifdef ENABLE_GAMMA_CORRECTION
-static inline unsigned char
-linear_to_srgb_uchar(float clr) {
-    unsigned short result;
-
+static inline float
+linear_to_srgb(float clr) {
     // Gamma correction
     // http://www.4p8.com/eric.brasseur/gamma.html#formulas
 
-    result = (clr <= 0.0031308) ?
-        (unsigned short)(short)(12.92f * clr * 255.0f + 0.5f) :
-        (unsigned short)(short)(1.055f * pow(clr, 0.41666666f) * 255.0f - 13.525f);
+    if (clr <= 0.0031308)
+        return 12.92f * clr * 255.0f;
 
-
-    if (result > 255) {
-        result = (clr < 0) ? 0 : 255;
-    }
-
-    return result;
+    // a = 0.055; ret ((1+a) * s**(1/2.4) - a) * 255
+    return 1.055f * pow(clr, 0.41666666f) * 255.0f - 14.025f;
 }
 #endif
 

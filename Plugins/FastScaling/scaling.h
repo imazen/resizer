@@ -94,6 +94,23 @@ float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len
 }
 
 
+#ifdef ENABLE_INTERNAL_PREMULT
+#define ALPHA_LUT_PREMULT(x) uchar_clamp_ff(lut[src_start[bix + x]] * lut[src_start[bix + 3]] / 255.0f)
+#define RESTORE_ALPHA * 255.0f / dest_buffers[dest_buffer_start + 3]
+#else
+#define ALPHA_LUT_PREMULT(x) src_start[bix + x]
+#define RESTORE_ALPHA
+#endif
+
+#ifdef ENABLE_GAMMA_CORRECTION
+#define RESTORE_GAMMA(x) linear_to_srgb(x)
+#define GAMMA_LUT_OFFSET 256 +
+#else
+#define RESTORE_GAMMA(x) x
+#define GAMMA_LUT_OFFSET
+#endif
+
+
 static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int start_row, unsigned int row_count, ContributionType * weights, BitmapBgraPtr dest, float *source_buffers, unsigned int source_buffer_len, float *dest_buffers, unsigned int dest_buffer_len, float *lut){
 
     register unsigned int row, bix, bufferSet;
@@ -103,26 +120,22 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
     for (row = 0; row < row_count; row++)
     {
         unsigned char *src_start = source_bitmap->pixels + (start_row + row)*source_bitmap->stride;
-#ifndef ENABLE_GAMMA_CORRECTION
-        for (bix = 0; bix < source_buffer_len; bix++)
-            source_buffers[row * source_buffer_len + bix] = lut[src_start[bix]];
-#else
+
         if (source_bitmap->bpp == 3)
         {
             for (bix = 0; bix < source_buffer_len; bix++)
-                source_buffers[row * source_buffer_len + bix] = lut[src_start[bix]];
+                source_buffers[row * source_buffer_len + bix] = lut[GAMMA_LUT_OFFSET src_start[bix]];
         }
         else
         {
             for (bix = 0; bix < source_buffer_len; bix += 4)
             {
-                source_buffers[row * source_buffer_len + bix] = lut[src_start[bix]];
-                source_buffers[row * source_buffer_len + bix + 1] = lut[src_start[bix + 1]];
-                source_buffers[row * source_buffer_len + bix + 2] = lut[src_start[bix + 2]];
-                source_buffers[row * source_buffer_len + bix + 3] = lut[src_start[bix + 3] + 256];
+                source_buffers[row * source_buffer_len + bix] = lut[GAMMA_LUT_OFFSET ALPHA_LUT_PREMULT(0)];
+                source_buffers[row * source_buffer_len + bix + 1] = lut[GAMMA_LUT_OFFSET ALPHA_LUT_PREMULT(1)];
+                source_buffers[row * source_buffer_len + bix + 2] = lut[GAMMA_LUT_OFFSET ALPHA_LUT_PREMULT(2)];
+                source_buffers[row * source_buffer_len + bix + 3] = lut[src_start[bix + 3]];
             }
         }
-#endif
     }
 
     //Actual scaling seems responsible for about 40% of execution time
@@ -135,33 +148,27 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
     unsigned char *dst_start = dest->pixels + start_row * dest->bpp;
     int stride_offset = dest->stride - dest->bpp * row_count;
 
-    for (bix = 0; bix < to_pixel_count; bix++){
-        int dest_buffer_start = bix * dest->bpp;
 
-        for (bufferSet = 0; bufferSet < row_count; bufferSet++){
-#ifndef ENABLE_GAMMA_CORRECTION
-            *dst_start = uchar_clamp_ff(dest_buffers[dest_buffer_start]);
-            *(dst_start + 1) = uchar_clamp_ff(dest_buffers[dest_buffer_start + 1]);
-            *(dst_start + 2) = uchar_clamp_ff(dest_buffers[dest_buffer_start + 2]);
-#else
-            *dst_start = linear_to_srgb_uchar(dest_buffers[dest_buffer_start]);
-            *(dst_start + 1) = linear_to_srgb_uchar(dest_buffers[dest_buffer_start + 1]);
-            *(dst_start + 2) = linear_to_srgb_uchar(dest_buffers[dest_buffer_start + 2]);
-#endif
-            dest_buffer_start += dest_buffer_len;
-            dst_start += dest->bpp;
+    if (source_bitmap->bpp == 4)
+    {
+        for (bix = 0; bix < to_pixel_count; bix++){
+            int dest_buffer_start = bix * dest->bpp;
+
+            for (bufferSet = 0; bufferSet < row_count; bufferSet++){
+                *dst_start = uchar_clamp_ff(RESTORE_GAMMA(dest_buffers[dest_buffer_start]) RESTORE_ALPHA);
+                *(dst_start + 1) = uchar_clamp_ff(RESTORE_GAMMA(dest_buffers[dest_buffer_start + 1]) RESTORE_ALPHA);
+                *(dst_start + 2) = uchar_clamp_ff(RESTORE_GAMMA(dest_buffers[dest_buffer_start + 2]) RESTORE_ALPHA);
+                dest_buffer_start += dest_buffer_len;
+                dst_start += dest->bpp;
+            }
+
+            dst_start += stride_offset;
         }
 
-        dst_start += stride_offset;
-    }
-
-    // copy alpha if we had it or 255-fill
-    if (dest->bpp == 4)
-    {
-        dst_start = dest->pixels + start_row * dest->bpp;
-
-        if (source_bitmap->bpp == 4)
+        if (dest->bpp == 4)
         {
+            dst_start = dest->pixels + start_row * dest->bpp;
+
             for (bix = 0; bix < to_pixel_count; bix++){
                 int dest_buffer_start = bix * dest->bpp;
                 for (bufferSet = 0; bufferSet < row_count; bufferSet++){
@@ -172,8 +179,27 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
                 dst_start += stride_offset;
             }
         }
-        else
+    }
+    else
+    {
+        for (bix = 0; bix < to_pixel_count; bix++){
+            int dest_buffer_start = bix * dest->bpp;
+
+            for (bufferSet = 0; bufferSet < row_count; bufferSet++){
+                *dst_start = uchar_clamp_ff(RESTORE_GAMMA(dest_buffers[dest_buffer_start]));
+                *(dst_start + 1) = uchar_clamp_ff(RESTORE_GAMMA(dest_buffers[dest_buffer_start + 1]));
+                *(dst_start + 2) = uchar_clamp_ff(RESTORE_GAMMA(dest_buffers[dest_buffer_start + 2]));
+                dest_buffer_start += dest_buffer_len;
+                dst_start += dest->bpp;
+            }
+
+            dst_start += stride_offset;
+        }
+
+        if (dest->bpp == 4)
         {
+            dst_start = dest->pixels + start_row * dest->bpp;
+
             for (bix = 0; bix < to_pixel_count; bix++){
                 for (bufferSet = 0; bufferSet < row_count; bufferSet++){
                     *(dst_start + 3) = 0xFF;

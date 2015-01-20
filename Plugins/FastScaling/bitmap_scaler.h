@@ -52,8 +52,6 @@ namespace ImageResizer{
 
 #ifdef ENABLE_GDI_PREMULT
                     p->Start("AlphaPremultGDI", false);
-                    Rectangle src_rect = Rectangle(0, 0, source->Width, source->Height);
-                    Rectangle dst_rect = Rectangle(0, 0, dest->Width, dest->Height);
                     Bitmap ^pm_src = gcnew Bitmap(source->Width, source->Height, PixelFormat::Format32bppPArgb);
                     Bitmap ^pm_dst = gcnew Bitmap(dest->Width, dest->Height, PixelFormat::Format32bppPArgb);
                     Graphics ^src_gfx = Graphics::FromImage(pm_src);
@@ -210,18 +208,18 @@ namespace ImageResizer{
                     // Gamma correction
                     // http://www.4p8.com/eric.brasseur/gamma.html#formulas
 
-                    // Store gamma adjusted in 0-255, linear in 256-512
+                    // Store gamma adjusted in 256-511, linear in 0-255
                     float lut[512];
                     float a = 0.055;
                     
                     for (int n = 0; n < 256; n++)
                     {
-                        lut[256+n] = float(n);
+                        lut[n] = float(n);
                         float s = n / 255.0;
                         if (s <= 0.04045)
-                            lut[n] = s / 12.92;
+                            lut[256 + n] = s / 12.92;
                         else
-                            lut[n] = pow((s + a) / (1 + a), 2.4f);
+                            lut[256 + n] = pow((s + a) / (1 + a), 2.4f);
                     }
 #endif
 
