@@ -177,6 +177,7 @@ bool test_weight_distrib(char *msg)
 using namespace System;
 using namespace System::Drawing;
 using namespace System::Collections::Specialized;
+using namespace System::IO;
 using namespace Xunit;
 using namespace ImageResizer;
 using namespace ImageResizer::Configuration;
@@ -186,27 +187,20 @@ namespace ImageResizerPluginsFastScalingTestsCpp {
 
     public ref class TestsCpp
     {
-    public:
-        /*[Fact]
-        void DummyTest()
+        static Bitmap ^BuildFast(Bitmap ^source, String ^i)
         {
-            String ^imgdir = gcnew String("..\\..\\..\\..\\Samples\\Images\\");
             Config ^c = gcnew Config();
-            FastScalingPlugin ^fs = gcnew FastScalingPlugin();
 
+            FastScalingPlugin ^fs = gcnew FastScalingPlugin();
             fs->Install(c);
 
-            NameValueCollection ^s = gcnew NameValueCollection();
-            s->Add("width", "400");
-            s->Add("fastscale", "true");
+            Stream ^dest = gcnew MemoryStream();
+            c->BuildImage((System::Object ^)source, (System::Object ^)dest, i);
 
-            //ImageJob ^ij = gcnew ImageJob();
-            //ImageJob ^ij = gcnew ImageJob(imgdir + "red-leaf.jpg", "out.jpg", s);
-            //c->CurrentImageBuilder->Build(ij);
+            return gcnew Bitmap(dest);
+        }
 
-            c->BuildImage(imgdir + "red-leaf.jpg", "out.jpg", "width=400&fastscale=true&turbo=true");
-        }*/
-
+    public:
         [Fact]
         void ContributionsCalcTest()
         {
@@ -221,6 +215,18 @@ namespace ImageResizerPluginsFastScalingTestsCpp {
             char msg[256];
             bool r = test_weight_distrib(msg);
             Assert::True(r, gcnew String(msg));
+        }
+
+        [Fact]
+        void AlphaMultTest()
+        {
+            String ^imgdir = gcnew String("..\\..\\..\\..\\Samples\\Images\\");
+            Bitmap ^output = BuildFast(gcnew Bitmap(imgdir + "premult-test.png"), "fastscale=true&width=256");
+
+            Color ^px = output->GetPixel(5, 5);
+            Color ^tst = Color::FromArgb(128, 0, 255, 0);
+            
+            Assert::True(*px == *tst, "Expected: " + tst->ToString() + "Got: " + px->ToString());
         }
     };
 }
