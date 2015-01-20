@@ -3,35 +3,55 @@
 
 #include <limits.h>
 
-// Alpha channel premultiplication, use only one
-//#define ENABLE_GDI_PREMULT
 #define ENABLE_INTERNAL_PREMULT
-
-#define ENABLE_COMPOSITING
-#define ENABLE_GAMMA_CORRECTION
+#define ENABLE_COMPOSITING // needs premult
 
 
+enum BitmapPixelFormat {
+    None = 0,
+    Bgr24 = 24,
+    Bgra32 = 32,
+    Gray8 = 8
+};
+enum BitmapCompositingMode{
+    Replace_self = 0,
+    Blend_with_self = 1,
+    Blend_with_matte = 2
+};
 typedef struct BitmapBgraStruct *BitmapBgraPtr;
 
+//non-indexed bitmap
 typedef struct BitmapBgraStruct{
+
     //bitmap width in pixels
-    int w;
+    int32_t w;
     //bitmap height in pixels
-    int h;
+    int32_t h;
     //byte length of each row (may include any amount of padding)
-    int stride;
+    int32_t stride;
     //pointer to pixel 0,0; should be of length > h * stride
-    unsigned char *pixels; 
-    //If true, we don't dispose of *pixels with the struct
-    bool borrowed_pixels; 
+    unsigned char *pixels;
+    //If true, we don't dispose of *pixels when we dispose the struct
+    bool borrowed_pixels;
     //If false, we can even ignore the alpha channel on 4bpp
-    bool alpha_meaningful; 
+    bool alpha_meaningful;
     //If false, we can edit pixels without affecting the stride
-    bool pixels_readonly; 
+    bool pixels_readonly;
     //If false, we can change the stride of the image.
-    bool stride_readonly; 
-    //Number of *bytes* (not bits) per pixel
-    int bpp;
+    bool stride_readonly;
+
+    //TODO: rename to bytes_pp
+    int32_t bpp;
+
+    BitmapPixelFormat pixel_format;
+
+    //When using compositing mode blend_with_matte, this color will be used
+    unsigned char *matte_color;
+    ///If true, we don't dispose of *pixels when we dispose the struct
+    bool borrowed_matte_color;
+
+    BitmapCompositingMode compositing_mode;
+
 } BitmapBgra;
 
 
@@ -97,7 +117,6 @@ typedef struct
 #define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
 
-#ifdef ENABLE_GAMMA_CORRECTION
 static inline float
 linear_to_srgb(float clr) {
     // Gamma correction
@@ -109,7 +128,6 @@ linear_to_srgb(float clr) {
     // a = 0.055; ret ((1+a) * s**(1/2.4) - a) * 255
     return 1.055f * pow(clr, 0.41666666f) * 255.0f - 14.025f;
 }
-#endif
 
 static inline unsigned char
 uchar_clamp_ff(float clr) {

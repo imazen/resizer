@@ -94,30 +94,29 @@ float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len
 }
 
 
-#ifdef ENABLE_INTERNAL_PREMULT
-#define ALPHA_LUT_PREMULT(x) uchar_clamp_ff(lut[src_start[bix + x]] * lut[src_start[bix + 3]] / 255)
-#else
-#define ALPHA_LUT_PREMULT(x) src_start[bix + x]
-#endif
 
-#ifdef ENABLE_GAMMA_CORRECTION
-#define RESTORE_GAMMA(x) linear_to_srgb(x)
-#define GAMMA_LUT_OFFSET 256 +
+#ifdef ENABLE_INTERNAL_PREMULT
+#define premultiply_alpha(x) (uchar_clamp_ff(lut[src_start[bix + (x)]] * lut[src_start[bix + 3]] / 255.0f))
+#define demultiply_alpha(x) ((x) * 255.0f / dest_buffers[dest_buffer_start + 3])
 #else
-#define RESTORE_GAMMA(x) (x)
-#define GAMMA_LUT_OFFSET
+#define premultiply_alpha(x) (src_start[bix + x])
+#define demultiply_alpha(x) (x)
 #endif
 
 #ifdef ENABLE_COMPOSITING
-#define COMPOSIT_ALPHA + lut[dst_start[3]] * float(1 - dest_buffers[dest_buffer_start + 3] / 255)
-#define BLEND_ALPHA(ch, x) ((x + lut[dst_start[ch]] * lut[*(dst_start + 3)] / 255 * (1 - dest_buffers[dest_buffer_start + 3] / 255)) / out_alpha * 255)
+#define composit_alpha + lut[dst_start[3]] * (1 - dest_buffers[dest_buffer_start + 3] / 255.0f)
+#define blend_alpha(ch, x) (((x) + lut[dst_start[ch]] * lut[dst_start[3]] / 255.0f * (1 - dest_buffers[dest_buffer_start + 3] / 255.0f)) / out_alpha * 255.0f)
 #elif defined(ENABLE_INTERNAL_PREMULT)
-#define COMPOSIT_ALPHA
-#define BLEND_ALPHA(ch, x) (x * 255 / dest_buffers[dest_buffer_start + 3])
+#define composit_alpha
+#define blend_alpha(ch, x) ((x) * 255.0f / dest_buffers[dest_buffer_start + 3])
 #else
-#define COMPOSIT_ALPHA
-#define BLEND_ALPHA(ch, x) (x)
+#define composit_alpha
+#define blend_alpha(ch, x) (x)
 #endif
+
+#define srgb_to_linear(x) (lut[256 + (x)])
+
+
 
 
 static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int start_row, unsigned int row_count, ContributionType * weights, BitmapBgraPtr dest, float *source_buffers, unsigned int source_buffer_len, float *dest_buffers, unsigned int dest_buffer_len, float *lut){
@@ -133,15 +132,15 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
         if (source_bitmap->bpp == 3)
         {
             for (bix = 0; bix < source_buffer_len; bix++)
-                source_buffers[row * source_buffer_len + bix] = lut[GAMMA_LUT_OFFSET src_start[bix]];
+                source_buffers[row * source_buffer_len + bix] = srgb_to_linear(src_start[bix]);
         }
         else
         {
             for (bix = 0; bix < source_buffer_len; bix += 4)
             {
-                source_buffers[row * source_buffer_len + bix] = lut[GAMMA_LUT_OFFSET ALPHA_LUT_PREMULT(0)];
-                source_buffers[row * source_buffer_len + bix + 1] = lut[GAMMA_LUT_OFFSET ALPHA_LUT_PREMULT(1)];
-                source_buffers[row * source_buffer_len + bix + 2] = lut[GAMMA_LUT_OFFSET ALPHA_LUT_PREMULT(2)];
+                source_buffers[row * source_buffer_len + bix] = srgb_to_linear(premultiply_alpha(0));
+                source_buffers[row * source_buffer_len + bix + 1] = srgb_to_linear(premultiply_alpha(1));
+                source_buffers[row * source_buffer_len + bix + 2] = srgb_to_linear(premultiply_alpha(2));
                 source_buffers[row * source_buffer_len + bix + 3] = lut[src_start[bix + 3]];
             }
         }
@@ -164,18 +163,37 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
     {
         if (dest->bpp == 4)
         {
-            for (bix = 0; bix < to_pixel_count; bix++){
-                int dest_buffer_start = bix * dest->bpp;
-                for (bufferSet = 0; bufferSet < row_count; bufferSet++){
-                    out_alpha = dest_buffers[dest_buffer_start + 3] COMPOSIT_ALPHA;
-                    *dst_start = uchar_clamp_ff(BLEND_ALPHA(0, RESTORE_GAMMA(dest_buffers[dest_buffer_start])));
-                    *(dst_start + 1) = uchar_clamp_ff(BLEND_ALPHA(1, RESTORE_GAMMA(dest_buffers[dest_buffer_start + 1])));
-                    *(dst_start + 2) = uchar_clamp_ff(BLEND_ALPHA(2, RESTORE_GAMMA(dest_buffers[dest_buffer_start + 2])));
-                    *(dst_start + 3) = uchar_clamp_ff(out_alpha);
-                    dest_buffer_start += dest_buffer_len;
-                    dst_start += dest->bpp;
+            if (dest->compositing_mode == BitmapCompositingMode::Blend_with_self)
+            {
+                for (bix = 0; bix < to_pixel_count; bix++){
+                    int dest_buffer_start = bix * dest->bpp;
+                    for (bufferSet = 0; bufferSet < row_count; bufferSet++){
+                        out_alpha = dest_buffers[dest_buffer_start + 3] composit_alpha;
+                        dst_start[0] = uchar_clamp_ff(blend_alpha(0, linear_to_srgb(dest_buffers[dest_buffer_start + 0])));
+                        dst_start[1] = uchar_clamp_ff(blend_alpha(1, linear_to_srgb(dest_buffers[dest_buffer_start + 1])));
+                        dst_start[2] = uchar_clamp_ff(blend_alpha(2, linear_to_srgb(dest_buffers[dest_buffer_start + 2])));
+                        dst_start[3] = uchar_clamp_ff(out_alpha);
+                        dest_buffer_start += dest_buffer_len;
+                        dst_start += dest->bpp;
+                    }
+                    dst_start += stride_offset;
                 }
-                dst_start += stride_offset;
+            }
+            else if (dest->compositing_mode == BitmapCompositingMode::Replace_self)
+            {
+                for (bix = 0; bix < to_pixel_count; bix++){
+                    int dest_buffer_start = bix * dest->bpp;
+                    for (bufferSet = 0; bufferSet < row_count; bufferSet++){
+                        out_alpha = dest_buffers[dest_buffer_start + 3];
+                        dst_start[0] = uchar_clamp_ff(demultiply_alpha(linear_to_srgb(dest_buffers[dest_buffer_start + 0])));
+                        dst_start[1] = uchar_clamp_ff(demultiply_alpha(linear_to_srgb(dest_buffers[dest_buffer_start + 1])));
+                        dst_start[2] = uchar_clamp_ff(demultiply_alpha(linear_to_srgb(dest_buffers[dest_buffer_start + 2])));
+                        dst_start[3] = uchar_clamp_ff(dest_buffers[dest_buffer_start + 3]);
+                        dest_buffer_start += dest_buffer_len;
+                        dst_start += dest->bpp;
+                    }
+                    dst_start += stride_offset;
+                }
             }
         }
         else
@@ -189,9 +207,9 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
             int dest_buffer_start = bix * dest->bpp;
 
             for (bufferSet = 0; bufferSet < row_count; bufferSet++){
-                *dst_start = uchar_clamp_ff(RESTORE_GAMMA(dest_buffers[dest_buffer_start]));
-                *(dst_start + 1) = uchar_clamp_ff(RESTORE_GAMMA(dest_buffers[dest_buffer_start + 1]));
-                *(dst_start + 2) = uchar_clamp_ff(RESTORE_GAMMA(dest_buffers[dest_buffer_start + 2]));
+                *dst_start = uchar_clamp_ff(linear_to_srgb(dest_buffers[dest_buffer_start]));
+                *(dst_start + 1) = uchar_clamp_ff(linear_to_srgb(dest_buffers[dest_buffer_start + 1]));
+                *(dst_start + 2) = uchar_clamp_ff(linear_to_srgb(dest_buffers[dest_buffer_start + 2]));
                 dest_buffer_start += dest_buffer_len;
                 dst_start += dest->bpp;
             }

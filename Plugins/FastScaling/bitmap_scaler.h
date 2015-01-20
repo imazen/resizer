@@ -29,6 +29,7 @@ namespace ImageResizer{
                     this->bgra = bb;
                     this->bgra->pixels_readonly = true;
                     this->bgra->stride_readonly = true;
+                    this->bgra->compositing_mode = BitmapCompositingMode::Blend_with_self;
                 }
 
                 ~WrappedBitmap(){
@@ -50,25 +51,10 @@ namespace ImageResizer{
                     WrappedBitmap^ bbSource;
                     WrappedBitmap^ bbResult;
 
-#ifdef ENABLE_GDI_PREMULT
-                    p->Start("AlphaPremultGDI", false);
-                    Bitmap ^pm_src = gcnew Bitmap(source->Width, source->Height, PixelFormat::Format32bppPArgb);
-                    Bitmap ^pm_dst = gcnew Bitmap(dest->Width, dest->Height, PixelFormat::Format32bppPArgb);
-                    Graphics ^src_gfx = Graphics::FromImage(pm_src);
-                    Graphics ^dst_gfx = Graphics::FromImage(dest);
-                    src_gfx->DrawImage(source, crop, crop, GraphicsUnit::Pixel);
-                    p->Stop("AlphaPremultGDI", false, true);
-#endif
-
                     try{
                         p->Start("SysDrawingToBgra", false);
-#ifdef ENABLE_GDI_PREMULT
-                        bbSource = WrapBitmapAsBgra(pm_src, crop, false, true);
-                        bbResult = WrapBitmapAsBgra(pm_dst, target, false, true);
-#else
                         bbSource = WrapBitmapAsBgra(source, crop, !details->allow_source_mutation, true);
                         bbResult = WrapBitmapAsBgra(dest, target, false, true);
-#endif
                         p->Stop("SysDrawingToBgra", true, false);
 
                         if (details->use_halving)
@@ -95,14 +81,6 @@ namespace ImageResizer{
                         delete bbSource;
                         delete bbResult;
                         p->Stop("BgraDispose", false, true);
-
-#ifdef ENABLE_GDI_PREMULT
-                        dst_gfx->DrawImage(pm_dst, target, target, GraphicsUnit::Pixel);
-                        delete dst_gfx;
-                        delete pm_dst;
-                        delete src_gfx;
-                        delete pm_src;
-#endif
                     }
                 }
 
@@ -202,10 +180,6 @@ namespace ImageResizer{
                     p->Start("ScaleBgra", true);
                     BitmapBgraPtr tmp_im = NULL;
 
-#ifndef ENABLE_GAMMA_CORRECTION
-                    float lut[256];
-                    for (int n = 0; n < 256; n++) lut[n] = float(n);
-#else
                     // Gamma correction
                     // http://www.4p8.com/eric.brasseur/gamma.html#formulas
 
@@ -222,12 +196,12 @@ namespace ImageResizer{
                         else
                             lut[256 + n] = pow((s + a) / (1 + a), 2.4f);
                     }
-#endif
 
                     p->Start("create temp image(sy x dx)", false);
                     /* Scale horizontally  */
                     tmp_im = CreateBitmapBgra(source->h, width, false, source->bpp);
                     if (tmp_im == NULL) { throw gcnew OutOfMemoryException(); }
+                    tmp_im->compositing_mode = BitmapCompositingMode::Replace_self;
 
                     try{
                         
