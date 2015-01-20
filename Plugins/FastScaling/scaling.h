@@ -162,7 +162,7 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
     float out_alpha;
 
 
-    if (source_bitmap->bpp == 4)
+    if (source_bitmap->bpp == 4 && source_bitmap->alpha_meaningful)
     {
         if (dest->bpp == 4)
         {
