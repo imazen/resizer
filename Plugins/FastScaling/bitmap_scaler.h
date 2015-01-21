@@ -29,7 +29,7 @@ namespace ImageResizer{
                     this->bgra = bb;
                     this->bgra->pixels_readonly = true;
                     this->bgra->stride_readonly = true;
-                    this->bgra->compositing_mode = BitmapCompositingMode::Blend_with_self;
+                    this->bgra->compositing_mode = ::BitmapCompositingMode::Blend_with_self;
                     this->bgra->matte_color = 0;
                 }
 
@@ -204,7 +204,7 @@ namespace ImageResizer{
                     /* Scale horizontally  */
                     tmp_im = CreateBitmapBgra(source->h, width, false, source->bpp);
                     if (tmp_im == NULL) { throw gcnew OutOfMemoryException(); }
-                    tmp_im->compositing_mode = BitmapCompositingMode::Replace_self;
+                    tmp_im->compositing_mode = ::BitmapCompositingMode::Replace_self;
 
                     try{
                         
