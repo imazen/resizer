@@ -1,0 +1,33 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.Faces</id>
+		<title>ImageResizer.Plugins.Faces - Human face detection plugin</title>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<owners>$owners$</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>$iconurl$</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>
+Provides automatic face detection, as well as the CropAround plugin, which can even be combined in a single request (using &amp;c.focus=faces) to provide face-focused/face-preserving cropping.
+ 
+Docs: http://imageresizing.net/plugins/Faces
+
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+$plugins$</description>
+		<tags>ImageResizer Faces face detection Imazen Resizer imaging</tags>
+		<dependencies>
+		  <dependency id="ImageResizer"/>
+		  <dependency id="OpenCvSharp-WithoutDll" version="[2.4.10.20141111)" />
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.Faces.dll" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.Faces.xml" target="lib" />
+	</files>
+</package>
