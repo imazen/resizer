@@ -1,0 +1,34 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.RedEye</id>
+		<title>ImageResizer.Plugins.RedEye - Red-eye correction plugin</title>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<owners>$owners$</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>$iconurl$</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>
+Provides automatic and manual red-eye detection and correction.
+ 
+Docs: http://imageresizing.net/plugins/redeye
+
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+$plugins$</description>
+		<tags>ImageResizer RedEye face detection Imazen Resizer imaging</tags>
+		<dependencies>
+		  <dependency id="ImageResizer" version="[$version$,)" />
+		  <dependency id="ImageResizer.Plugins.Faces" version="[$version$,)" />
+		  <dependency id="OpenCvSharp-WithoutDll" version="[2.4.10.20141111,)" />
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.RedEye.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.RedEye.xml" target="lib\net45" />
+	</files>
+</package>

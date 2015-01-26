@@ -1,0 +1,20 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.RedEye</id>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<description>Description</description>
+		<dependencies>
+		  <dependency id="ImageResizer" version="[$version$,)" />
+		  <dependency id="ImageResizer.Plugins.Faces" version="[$version$,)" />
+		  <dependency id="OpenCvSharp-WithoutDll" version="[2.4.10.20141111,)" />
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.RedEye.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.RedEye.pdb" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.RedEye.xml" target="lib\net45" />
+		<file src="..\Plugins\RedEye\**\*.cs" target="src" />
+	</files>
+</package>
