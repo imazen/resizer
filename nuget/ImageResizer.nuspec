@@ -60,8 +60,8 @@ Third parties have made some excellent UI wrappers and plugins, including Ekspon
 		 imaging</tags>
 	</metadata>
   	<files>
-		<file src="$coredlldir$\ImageResizer.dll" target="lib" />
-		<file src="$coredlldir$\ImageResizer.xml" target="lib" />
+		<file src="$coredlldir$\ImageResizer.dll" target="lib\net45" />
+		<file src="$coredlldir$\ImageResizer.xml" target="lib\net45" />
 	</files>
 </package>
 

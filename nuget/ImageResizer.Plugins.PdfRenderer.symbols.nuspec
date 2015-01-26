@@ -10,9 +10,9 @@
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="$coredlldir$\ImageResizer.Plugins.PdfRenderer.dll" target="lib" />
-		<file src="$coredlldir$\ImageResizer.Plugins.PdfRenderer.pdb" target="lib" />
-		<file src="$coredlldir$\ImageResizer.Plugins.PdfRenderer.xml" target="lib" />
+		<file src="$coredlldir$\ImageResizer.Plugins.PdfRenderer.dll" target="lib\net45" />
+		<file src="$coredlldir$\ImageResizer.Plugins.PdfRenderer.pdb" target="lib\net45" />
+		<file src="$coredlldir$\ImageResizer.Plugins.PdfRenderer.xml" target="lib\net45" />
 		<file src="..\Contrib\PdfRenderer\PdfRenderer\**\*.cs" target="src\PdfRenderer" />
 	</files>
 </package>

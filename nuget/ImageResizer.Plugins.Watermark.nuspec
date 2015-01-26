@@ -30,7 +30,7 @@ $plugins$
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.Watermark.dll" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.Watermark.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.Watermark.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.Watermark.xml" target="lib\net45" />
 	</files>
 </package>

@@ -11,9 +11,9 @@
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.Faces.dll" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.Faces.pdb" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.Faces.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.Faces.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.Faces.pdb" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.Faces.xml" target="lib\net45" />
 		<file src="..\Plugins\Faces\**\*.cs" target="src" />
 	</files>
 </package>

@@ -11,9 +11,9 @@
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.S3Reader2.dll" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.S3Reader2.pdb" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.S3Reader2.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.S3Reader2.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.S3Reader2.pdb" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.S3Reader2.xml" target="lib\net45" />
 		<file src="..\Plugins\S3Reader2\**\*.cs" target="src" />
 	</files>
 </package>

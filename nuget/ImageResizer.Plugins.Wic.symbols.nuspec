@@ -10,9 +10,9 @@
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.Wic.dll" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.Wic.pdb" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.Wic.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.Wic.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.Wic.pdb" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.Wic.xml" target="lib\net45" />
 		<file src="..\Plugins\Wic\**\*.cs" target="src" />
 	</files>
 </package>

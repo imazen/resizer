@@ -27,7 +27,7 @@ $plugins$</description>
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.S3Reader2.dll" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.S3Reader2.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.S3Reader2.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.S3Reader2.xml" target="lib\net45" />
 	</files>
 </package>

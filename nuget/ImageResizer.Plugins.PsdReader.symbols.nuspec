@@ -10,11 +10,11 @@
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdReader.dll" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdReader.pdb" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdReader.xml" target="lib" />
-		<file src="$pluginsdlldir$\PsdFile.dll" target="lib" />
-		<file src="$pluginsdlldir$\PsdFile.pdb" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdReader.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdReader.pdb" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdReader.xml" target="lib\net45" />
+		<file src="$pluginsdlldir$\PsdFile.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\PsdFile.pdb" target="lib\net45" />
 		<file src="..\Plugins\PsdReader\**\*.cs" target="src\PsdReader" />
 		<file src="..\Plugins\Libs\PsdPlugin\PsdFile\**\*.cs" target="src\PsdFile" />
 	</files>

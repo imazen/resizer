@@ -27,7 +27,7 @@ $plugins$
 		</dependencies>
 	</metadata>
   	<files>
- 		<file src="$coredlldir$\ImageResizer.Plugins.PdfRenderer.dll" target="lib" />
-		<file src="$coredlldir$\ImageResizer.Plugins.PdfRenderer.xml" target="lib" />
+ 		<file src="$coredlldir$\ImageResizer.Plugins.PdfRenderer.dll" target="lib\net45" />
+		<file src="$coredlldir$\ImageResizer.Plugins.PdfRenderer.xml" target="lib\net45" />
 	</files>
 </package>

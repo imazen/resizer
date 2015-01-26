@@ -10,9 +10,9 @@
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.DiagnosticJson.dll" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.DiagnosticJson.pdb" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.DiagnosticJson.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.DiagnosticJson.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.DiagnosticJson.pdb" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.DiagnosticJson.xml" target="lib\net45" />
 		<file src="..\Plugins\DiagnosticJson\**\*.cs" target="src" />
 	</files>
 </package>

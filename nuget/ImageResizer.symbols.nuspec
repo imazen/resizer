@@ -14,9 +14,9 @@
 		<description>Description</description>
 	</metadata>
 	<files>
-		<file src="..\dlls\debug\ImageResizer.dll" target="lib" />
-		<file src="..\dlls\debug\ImageResizer.pdb" target="lib" />
-		<file src="..\dlls\debug\ImageResizer.xml" target="lib" />
+		<file src="..\dlls\debug\ImageResizer.dll" target="lib\net45" />
+		<file src="..\dlls\debug\ImageResizer.pdb" target="lib\net45" />
+		<file src="..\dlls\debug\ImageResizer.xml" target="lib\net45" />
 		<file src="..\Core\**\*.cs" target="src" />
 	</files>
 </package>

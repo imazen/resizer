@@ -10,8 +10,8 @@
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="$coredlldir$\x64\ImageResizer.Plugins.FastScaling.dll" target="lib" />
-		<file src="$coredlldir$\x64\ImageResizer.Plugins.FastScaling.pdb" target="lib" />
+		<file src="$coredlldir$\x64\ImageResizer.Plugins.FastScaling.dll" target="lib\net45" />
+		<file src="$coredlldir$\x64\ImageResizer.Plugins.FastScaling.pdb" target="lib\net45" />
 		<file src="..\Plugins\FastScaling\**.cpp" target="src\FastScaling" />
 		<file src="..\Plugins\FastScaling\**.h" target="src\FastScaling" />
 	</files>

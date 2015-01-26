@@ -29,7 +29,7 @@ $plugins$
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.MongoReader.dll" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.MongoReader.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.MongoReader.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.MongoReader.xml" target="lib\net45" />
 	</files>
 </package>

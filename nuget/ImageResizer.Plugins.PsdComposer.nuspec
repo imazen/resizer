@@ -28,9 +28,9 @@ $plugins$
 		</dependencies>
 	</metadata>
   	<files>
- 		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdComposer.dll" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdComposer.xml" target="lib" />
-		<file src="$pluginsdlldir$\PsdFile.dll" target="lib" />
+ 		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdComposer.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.PsdComposer.xml" target="lib\net45" />
+		<file src="$pluginsdlldir$\PsdFile.dll" target="lib\net45" />
 		<file src="..\Plugins\PsdComposer\Web.config.transform" target="content" />
 	</files>
 </package>

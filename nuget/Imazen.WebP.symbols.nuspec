@@ -7,9 +7,9 @@
 		<description>Description</description>
 	</metadata>
 	<files>
-		<file src="$coredlldir$\Imazen.WebP.dll" target="lib" />
-		<file src="$coredlldir$\Imazen.WebP.pdb" target="lib" />
-		<file src="$coredlldir$\Imazen.WebP.xml" target="lib" />
+		<file src="$coredlldir$\Imazen.WebP.dll" target="lib\net45" />
+		<file src="$coredlldir$\Imazen.WebP.pdb" target="lib\net45" />
+		<file src="$coredlldir$\Imazen.WebP.xml" target="lib\net45" />
 		<file src="..\submodules\libwebp-net\**\*.cs" target="src" />
 	</files>
 </package>

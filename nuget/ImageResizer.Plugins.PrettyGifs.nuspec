@@ -30,8 +30,8 @@ $plugins$
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.PrettyGifs.dll" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.PrettyGifs.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.PrettyGifs.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.PrettyGifs.xml" target="lib\net45" />
 		<file src="..\Plugins\PrettyGifs\Web.config.transform" target="content" />
 	</files>
 </package>

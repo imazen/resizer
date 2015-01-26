@@ -26,8 +26,8 @@ $plugins$
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="$coredlldir$\ImageResizer.Plugins.Logging.dll" target="lib" />
-		<file src="$coredlldir$\ImageResizer.Plugins.Logging.xml" target="lib" />
+		<file src="$coredlldir$\ImageResizer.Plugins.Logging.dll" target="lib\net45" />
+		<file src="$coredlldir$\ImageResizer.Plugins.Logging.xml" target="lib\net45" />
 		<file src="..\Plugins\Logging\Web.config.transform" target="content" />
 	</files>
 </package>

@@ -10,9 +10,9 @@
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.RemoteReader.dll" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.RemoteReader.pdb" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.RemoteReader.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.RemoteReader.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.RemoteReader.pdb" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.RemoteReader.xml" target="lib\net45" />
 		<file src="..\Plugins\RemoteReader\**\*.cs" target="src" />
 	</files>
 </package>

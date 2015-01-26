@@ -28,8 +28,8 @@ $plugins$</description>
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.SeamCarving.dll" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.SeamCarving.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.SeamCarving.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.SeamCarving.xml" target="lib\net45" />
 		<file src="..\Plugins\SeamCarving\Web.config.transform" target="content" />
 	</files>
 </package>

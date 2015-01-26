@@ -11,9 +11,9 @@
 		</dependencies>
 	</metadata>
   	<files>
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.AzureReader2.dll" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.AzureReader2.pdb" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.AzureReader2.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.AzureReader2.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.AzureReader2.pdb" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.AzureReader2.xml" target="lib\net45" />
 		<file src="..\Plugins\AzureReader2\**\*.cs" target="src" />
 	</files>
 </package>

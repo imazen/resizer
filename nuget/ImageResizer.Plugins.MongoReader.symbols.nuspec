@@ -11,9 +11,9 @@
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.MongoReader.dll" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.MongoReader.pdb" target="lib" />
-		<file src="$pluginsdlldir$\ImageResizer.Plugins.MongoReader.xml" target="lib" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.MongoReader.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.MongoReader.pdb" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.MongoReader.xml" target="lib\net45" />
 		<file src="..\Plugins\MongoReader\**\*.cs" target="src" />
 	</files>
 </package>
