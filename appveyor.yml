@@ -3,13 +3,12 @@ os: Windows Server 2012 R2
 clone_depth: 1
 version: 4.0.0.{build}
 
-environment:
-  resizer_test_mongo_db: mongodb://localhost:27017/resizer2
-
 services:
   - mssql2012sp1
 
 environment:
+  resizer_test_mongo_db: mongodb://localhost:27017/resizer2
+  
   fb_nuget_url: https://www.myget.org/F/test-test-test/
   fb_nuget_key:
     secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
