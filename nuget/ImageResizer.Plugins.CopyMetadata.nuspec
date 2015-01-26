@@ -27,7 +27,7 @@ $plugins$
  </description>
 		<tags>ImageResizer Imazen Resizer CopyMetadata metadata exif properties imaging</tags>
 		<dependencies>
-		  <dependency id="ImageResizer"/>
+		  <dependency id="ImageResizer" version="[$version$,)" />
 		</dependencies>
 	</metadata>
   	<files>

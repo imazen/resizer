@@ -25,7 +25,7 @@ $plugins$
 </description>
 		<tags>ImageResizer SqlReader SQL blob image resizer Imazen imaging</tags>
 		<dependencies>
-		  <dependency id="ImageResizer"/>
+		  <dependency id="ImageResizer" version="[$version$,)" />
 		</dependencies>
 	</metadata>
   	<files>

@@ -26,7 +26,7 @@ $plugins$
 </description>
 		<tags>ImageResizer PrettyGifs Imazen Resizer gif 8-bit png octree quantization encoding  imaging</tags>
 		<dependencies>
-		  <dependency id="ImageResizer"/>
+		  <dependency id="ImageResizer" version="[$version$,)" />
 		</dependencies>
 	</metadata>
   	<files>

@@ -22,8 +22,8 @@ $plugins$
 </description>
     <tags>ImageResizer Imazen Resizer MVC Routing MvcRoutingShim WebConfig  imaging</tags>
 	<dependencies>
-	  <dependency id="ImageResizer"/>
-	  <dependency id="ImageResizer.WebConfig"/>
+	  <dependency id="ImageResizer" version="[$version$,)" />
+	  <dependency id="ImageResizer.WebConfig" version="[$version$,)" />
 	</dependencies>
   </metadata>
   	<files>

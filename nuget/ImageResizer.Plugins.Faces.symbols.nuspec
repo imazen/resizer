@@ -6,8 +6,8 @@
 		<authors>$author$</authors>
 		<description>Description</description>
 		<dependencies>
-		  <dependency id="ImageResizer"/>
-		  <dependency id="OpenCvSharp-WithoutDll" version="[2.4.10]" />
+		  <dependency id="ImageResizer" version="[$version$,)" />
+		  <dependency id="OpenCvSharp-WithoutDll" version="[2.4.10.20141111,)" />
 		</dependencies>
 	</metadata>
 	<files>

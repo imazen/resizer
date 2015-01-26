@@ -24,7 +24,7 @@ $plugins$
 </description>
 		<tags>ImageResizer MongoReader Imazen Resizer mongodb gridfs mongo blob cloud imaging</tags>
 		<dependencies>
-		  <dependency id="ImageResizer"/>
+		  <dependency id="ImageResizer" version="[$version$,)" />
 		  <dependency id="mongocsharpdriver"/>
 		</dependencies>
 	</metadata>

@@ -21,7 +21,7 @@ $plugins$
 </description>
 		<tags>ImageResizer Logging Nlog Imazen Resizer imaging</tags>
 		<dependencies>
-		  <dependency id="ImageResizer"/>
+		  <dependency id="ImageResizer" version="[$version$,)" />
 		  <dependency id="NLog" />
 		</dependencies>
 	</metadata>

@@ -25,7 +25,7 @@ $plugins$
 </description>
 		<tags>ImageResizer WIC Windows Imaging Components Fant Imazen Resizer IWICBitmap IWICBitmapSource  imaging</tags>
 		<dependencies>
-		  <dependency id="ImageResizer"/>
+		  <dependency id="ImageResizer" version="[$version$,)" />
 		</dependencies>
 	</metadata>
   	<files>

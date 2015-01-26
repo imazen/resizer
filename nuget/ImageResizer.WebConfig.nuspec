@@ -22,7 +22,7 @@ $plugins$
 </description>
     <tags>ImageResizer Imazen Resizer Web.Config imaging</tags>
 	<dependencies>
-	  <dependency id="ImageResizer"/>
+	  <dependency id="ImageResizer" version="[$version$,)" />
 	</dependencies>
   </metadata>
   	<files>

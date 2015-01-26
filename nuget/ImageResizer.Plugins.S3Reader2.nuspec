@@ -22,7 +22,7 @@ Requires license, see http://imageresizing.net/plugins
 $plugins$</description>
 		<tags>ImageResizer S3Reader Amazon Cloud Imazen Resizer imaging</tags>
 		<dependencies>
-		  <dependency id="ImageResizer"/>
+		  <dependency id="ImageResizer" version="[$version$,)" />
 		  <dependency id="AWSSDK" version="[2.0,3.0)" />
 		</dependencies>
 	</metadata>

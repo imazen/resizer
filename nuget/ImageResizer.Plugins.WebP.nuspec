@@ -25,7 +25,7 @@ $plugins$
 </description>
 		<tags>ImageResizer webp encode deocode weppy resizer Imazen imaging</tags>
 		<dependencies>
-		  <dependency id="ImageResizer"/>
+		  <dependency id="ImageResizer" version="[$version$,)" />
 		  <dependency id="Imazen.WebP"/>
 		</dependencies>
 	</metadata>

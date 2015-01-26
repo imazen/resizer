@@ -16,7 +16,7 @@
 </description>
 		<tags>ImageResizer Imazen Resizer MVC MvcRoutingShim System.Web.Routing imaging</tags>
 		<dependencies>
-		  <dependency id="ImageResizer"/>
+		  <dependency id="ImageResizer" version="[$version$,)" />
 		</dependencies>
 	</metadata>
   	<files>

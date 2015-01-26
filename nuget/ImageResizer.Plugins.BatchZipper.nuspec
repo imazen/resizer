@@ -24,7 +24,7 @@ $plugins$
 </description>
 		<tags>ImageResizer Imazen Resizer BatchZipper compress zip folder images archive imaging</tags>
 		<dependencies>
-		  <dependency id="ImageResizer"/>
+		  <dependency id="ImageResizer" version="[$version$,)" />
 		  <dependency id="DotNetZip.Reduced"/>
 		</dependencies>
 	</metadata>

@@ -22,8 +22,8 @@ Requires license, see http://imageresizing.net/plugins
 $plugins$</description>
 		<tags>ImageResizer Faces face detection Imazen Resizer imaging</tags>
 		<dependencies>
-		  <dependency id="ImageResizer"/>
-		  <dependency id="OpenCvSharp-WithoutDll" version="[2.4.10]" />
+		  <dependency id="ImageResizer" version="[$version$,)" />
+		  <dependency id="OpenCvSharp-WithoutDll" version="[2.4.10.20141111,)" />
 		</dependencies>
 	</metadata>
   	<files>

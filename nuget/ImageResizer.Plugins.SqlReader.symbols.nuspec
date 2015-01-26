@@ -6,7 +6,7 @@
 		<authors>$author$</authors>
 		<description>Description</description>
 		<dependencies>
-		  <dependency id="ImageResizer"/>
+		  <dependency id="ImageResizer" version="[$version$,)" />
 		</dependencies>
 	</metadata>
 	<files>

@@ -23,7 +23,7 @@ $plugins$
 </description>
 		<tags>ImageResizer PdfRenderer PDF Imazen Resizer  imaging</tags>
 		<dependencies>
-		  <dependency id="ImageResizer"/>
+		  <dependency id="ImageResizer" version="[$version$,)" />
 		</dependencies>
 	</metadata>
   	<files>

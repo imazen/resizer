@@ -34,7 +34,7 @@ $plugins$
 </description>
 		<tags>ImageResizer SimpleFilters sepia grayscale alpha brightness contrast saturation Imazen Resizer imaging</tags>
 		<dependencies>
-		  <dependency id="ImageResizer"/>
+		  <dependency id="ImageResizer" version="[$version$,)" />
 		</dependencies>
 	</metadata>
   	<files>
