@@ -7,7 +7,7 @@
 		<description>Description</description>
 		<dependencies>
 		  <dependency id="ImageResizer" version="[$version$,)" />
-		  <dependency id="Imazen.WebP"/>
+		  <dependency id="Imazen.WebP" version="[$version$,)" />
 		</dependencies>
 	</metadata>
 	<files>
