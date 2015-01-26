@@ -1,28 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <files>
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x86/avcodec-55.dll" name="avcodec-55.dll" bitness="32" fileBytes="14003712" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x86/avdevice-55.dll" name="avdevice-55.dll" bitness="32" fileBytes="1188864" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x86/avfilter-3.dll" name="avfilter-3.dll" bitness="32" fileBytes="1653248" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x86/avformat-55.dll" name="avformat-55.dll" bitness="32" fileBytes="4700160" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x86/avutil-52.dll" name="avutil-52.dll" bitness="32" fileBytes="250368" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x86/ffmpeg.exe" name="ffmpeg.exe" bitness="32" fileBytes="287232" />
-  <!--<file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x86/ffplay.exe" name="ffplay.exe" bitness="32" fileBytes="453120" />-->
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x86/ffprobe.exe" name="ffprobe.exe" bitness="32" fileBytes="125440" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x86/postproc-52.dll" name="postproc-52.dll" bitness="32" fileBytes="142336" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x86/swresample-0.dll" name="swresample-0.dll" bitness="32" fileBytes="290816" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x86/swscale-2.dll" name="swscale-2.dll" bitness="32" fileBytes="342528" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x86/avcodec-56.dll" name="avcodec-56.dll" bitness="32" fileBytes="19996160" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x86/avdevice-56.dll" name="avdevice-56.dll" bitness="32" fileBytes="1376256" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x86/avfilter-5.dll" name="avfilter-5.dll" bitness="32" fileBytes="2335232" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x86/avformat-56.dll" name="avformat-56.dll" bitness="32" fileBytes="5859328" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x86/avutil-54.dll" name="avutil-54.dll" bitness="32" fileBytes="468480" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x86/ffmpeg.exe" name="ffmpeg.exe" bitness="32" fileBytes="326656" />
+  <!--<file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x86/ffplay.exe" name="ffplay.exe" bitness="32" fileBytes="475136" />-->
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x86/ffprobe.exe" name="ffprobe.exe" bitness="32" fileBytes="152576" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x86/postproc-53.dll" name="postproc-53.dll" bitness="32" fileBytes="121344" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x86/swresample-1.dll" name="swresample-1.dll" bitness="32" fileBytes="280064" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x86/swscale-3.dll" name="swscale-3.dll" bitness="32" fileBytes="450560" />
 
 
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x64/avcodec-55.dll" name="avcodec-55.dll" bitness="64" fileBytes="14658048" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x64/avdevice-55.dll" name="avdevice-55.dll" bitness="64" fileBytes="856064" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x64/avfilter-3.dll" name="avfilter-3.dll" bitness="64" fileBytes="1744896" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x64/avformat-55.dll" name="avformat-55.dll" bitness="64" fileBytes="4806144" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x64/avutil-52.dll" name="avutil-52.dll" bitness="64" fileBytes="264192" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x64/ffmpeg.exe" name="ffmpeg.exe" bitness="64" fileBytes="297984" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x64/ffprobe.exe" name="ffprobe.exe" bitness="64" fileBytes="136704" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x64/postproc-52.dll" name="postproc-52.dll" bitness="64" fileBytes="152064" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x64/swresample-0.dll" name="swresample-0.dll" bitness="64" fileBytes="302592" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20130329-git-551f683/x64/swscale-2.dll" name="swscale-2.dll" bitness="64" fileBytes="353792" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x64/avcodec-56.dll" name="avcodec-56.dll" bitness="64" fileBytes="22065664" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x64/avdevice-56.dll" name="avdevice-56.dll" bitness="64" fileBytes="1503232" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x64/avfilter-5.dll" name="avfilter-5.dll" bitness="64" fileBytes="2542592" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x64/avformat-56.dll" name="avformat-56.dll" bitness="64" fileBytes="6144000" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x64/avutil-54.dll" name="avutil-54.dll" bitness="64" fileBytes="445440" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x64/ffmpeg.exe" name="ffmpeg.exe" bitness="64" fileBytes="334336" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x64/ffprobe.exe" name="ffprobe.exe" bitness="64" fileBytes="163328" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x64/postproc-53.dll" name="postproc-53.dll" bitness="64" fileBytes="129536" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x64/swresample-1.dll" name="swresample-1.dll" bitness="64" fileBytes="292864" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/ffmpeg/20150126-git-f994000/x64/swscale-3.dll" name="swscale-3.dll" bitness="64" fileBytes="468480" />
   
 </files>
 
