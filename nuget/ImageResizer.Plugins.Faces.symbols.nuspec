@@ -7,7 +7,7 @@
 		<description>Description</description>
 		<dependencies>
 		  <dependency id="ImageResizer"/>
-		  <dependency id="OpenCvSharp-WithoutDll" version="[2.4.10.20141111)" />
+		  <dependency id="OpenCvSharp-WithoutDll" version="[2.4.10]" />
 		</dependencies>
 	</metadata>
 	<files>
