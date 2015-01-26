@@ -13,7 +13,7 @@
 <description>
 Provides automatic face detection, as well as the CropAround plugin, which can even be combined in a single request (using &amp;c.focus=faces) to provide face-focused/face-preserving cropping.
  
-Docs: http://imageresizing.net/plugins/Faces
+Docs: http://imageresizing.net/plugins/faces
 
 Support: http://imageresizing.net/support
 
