@@ -9,7 +9,7 @@ services:
 environment:
   resizer_test_mongo_db: mongodb://localhost:27017/resizer2
   
-  fb_nuget_url: https://www.myget.org/F/test-test-test/
+  fb_nuget_url: https://www.myget.org/F/imazen-nightlies/
   fb_nuget_key:
     secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
   
@@ -19,6 +19,7 @@ environment:
   fb_s3_key:
     secure: RP9hZqS0Pt2SLeias0iZpt2E9OltVX8OPfhWnGET6fQKZ05Fy6y0z1JcWWvONhF0
   
+  # a nuget url should go here eventually
   fb_nuget_rel_url: https://www.myget.org/F/resizer-rel-test/
   fb_nuget_rel_key:
     secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
