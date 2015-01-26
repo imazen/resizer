@@ -211,7 +211,7 @@ Target "pack_nuget" (fun _ ->
     // process regular packages
     for nuSpec in Directory.GetFiles(rootDir + "tmp", "*.nuspec") do
         if not (nuSpec.Contains(".symbols.nuspec")) then
-            Nuget.pack nuSpec (nugetVer.ToString()) (rootDir + "Releases/nuget-packages")
+            Nuget.pack nuSpec ver (rootDir + "Releases/nuget-packages")
     
     // remove any mess
     DeleteDir (rootDir + "tmp")
