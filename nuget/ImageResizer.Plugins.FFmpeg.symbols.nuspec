@@ -1,0 +1,18 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.FFmpeg</id>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<description>Description</description>
+		<dependencies>
+		  <dependency id="ImageResizer" version="[$version$,)" />
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.FFmpeg.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.FFmpeg.pdb" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.FFmpeg.xml" target="lib\net45" />
+		<file src="..\Plugins\FFmpeg\**\*.cs" target="src" />
+	</files>
+</package>
