@@ -1,0 +1,34 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.FreeImage</id>
+		<title>ImageResizer.Plugins.FreeImage</title>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<owners>$owners$</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>$iconurl$</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>
+ImageResizer.Plugins.FreeImage contains several plugins, all based around the abilities offered by the C/C++ FreeImage library. These plugins are alpha-level.
+
+Docs: http://imageresizing.net/plugins/freeimage
+
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+$plugins$</description>
+		<tags>ImageResizer FreeImage Imazen Resizer imaging</tags>
+		<dependencies>
+		  <dependency id="ImageResizer" version="[$version$,)" />
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.FreeImage.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.FreeImage.xml" target="lib\net45" />
+		<file src="$pluginsdlldir$\FreeImageNET.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\FreeImageNET.xml" target="lib\net45" />
+	</files>
+</package>

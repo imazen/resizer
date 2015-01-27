@@ -1,0 +1,21 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.FreeImage</id>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<description>Description</description>
+		<dependencies>
+		  <dependency id="ImageResizer" version="[$version$,)" />
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.FreeImage.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.FreeImage.pdb" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.FreeImage.xml" target="lib\net45" />
+		<file src="$pluginsdlldir$\FreeImageNET.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\FreeImageNET.pdb" target="lib\net45" />
+		<file src="$pluginsdlldir$\FreeImageNET.xml" target="lib\net45" />
+		<file src="..\Plugins\FreeImage\**\*.cs" target="src" />
+	</files>
+</package>
