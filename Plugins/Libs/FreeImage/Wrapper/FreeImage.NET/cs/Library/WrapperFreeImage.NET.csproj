@@ -53,7 +53,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
+    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\..\..\..\..\..\dlls\release\</OutputPath>
     <DefineConstants>
@@ -87,8 +87,7 @@
     <DocumentationFile>bin\Release\FreeImageNET.XML</DocumentationFile>
     <Optimize>true</Optimize>
     <FileAlignment>512</FileAlignment>
-    <DebugType>
-    </DebugType>
+    <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>none</ErrorReport>
@@ -112,8 +111,7 @@
     <DocumentationFile>bin\Release\FreeImageNET.XML</DocumentationFile>
     <Optimize>true</Optimize>
     <FileAlignment>512</FileAlignment>
-    <DebugType>
-    </DebugType>
+    <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>none</ErrorReport>
