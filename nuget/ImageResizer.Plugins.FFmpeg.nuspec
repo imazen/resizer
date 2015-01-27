@@ -1,0 +1,32 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.FFmpeg</id>
+		<title>ImageResizer.Plugins.FFmpeg - Images from videos</title>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<owners>$owners$</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>$iconurl$</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>
+Dynamically extract frames from videos by time or percentage. Includes basic blank frame avoidance. Based on ffmpeg.
+
+Docs: http://imageresizing.net/plugins/ffmpeg
+
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+$plugins$</description>
+		<tags>ImageResizer FFmpeg face detection Imazen Resizer imaging</tags>
+		<dependencies>
+		  <dependency id="ImageResizer" version="[$version$,)" />
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.FFmpeg.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.FFmpeg.xml" target="lib\net45" />
+	</files>
+</package>
