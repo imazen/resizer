@@ -20,7 +20,7 @@ Support: http://imageresizing.net/support
 Requires license, see http://imageresizing.net/plugins
 
 $plugins$</description>
-		<tags>ImageResizer FFmpeg face detection Imazen Resizer imaging</tags>
+		<tags>ImageResizer FFmpeg video Imazen Resizer imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer" version="[$version$,)" />
 		</dependencies>
