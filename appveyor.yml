@@ -31,8 +31,28 @@ environment:
     secure: RP9hZqS0Pt2SLeias0iZpt2E9OltVX8OPfhWnGET6fQKZ05Fy6y0z1JcWWvONhF0
   
   fb_pub_url: https://s3.amazonaws.com/imazen-test
+  
+  fb_imageserver_repo: github.com/imazen/resizer-images.git
+  fb_imageserver_path: resizer-images
+  fb_imageserver_branch: develop
+  # should be set to master when resizer-images is updated
+  fb_imageserver_rel_branch: develop
+  
+  imageserver_user: resizer-bot
+  imageserver_mail:
+    secure: Ki6EM9c3O3ioPTfrbWZMtQ==
+  imageserver_token:
+    secure: ShmRBY5OrRHdAfze81bt2iqFr+6JHh0FAnApuB4d+bGgksdicVa/BJinCQyS/92B
 
 before_build:
+  
+  # add imageserver key
+  - git config --global credential.helper wincred
+  - git config --global user.name "%imageserver_user%"
+  - git config --global user.email "%imageserver_mail%"
+  - git clone --depth 1 --branch %fb_imageserver_branch% https://%imageserver_user%:%imageserver_token%@%fb_imageserver_repo% Tools\%fb_imageserver_path%
+  
+  # set up mongodb
   - ps: md $env:temp\mongo\data
   - ps: Push-Location $env:temp\mongo
   - ps: Invoke-WebRequest https://s3.amazonaws.com/public-unit-test-resources/mongodb/mongod.exe.zip -OutFile mongodb.zip

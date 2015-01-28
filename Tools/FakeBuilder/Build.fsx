@@ -15,9 +15,11 @@ open ICSharpCode.SharpZipLib.Zip
 open ICSharpCode.SharpZipLib.Core
 
 open EnvironmentHelper
+open FileUtils
 open FsQuery
 open FakeBuilder
 open Git.CommandHelper
+open ProcessHelper
 open SemVerHelper
 open SemVerHelper2
 open StringHelper
@@ -34,7 +36,8 @@ open System.Text.RegularExpressions
 let variableList = ["fb_nuget_url"; "fb_nuget_key";
                     "fb_s3_bucket"; "fb_s3_id"; "fb_s3_key"; "fb_pub_url";
                     "fb_nuget_rel_url"; "fb_nuget_rel_key";
-                    "fb_s3_rel_bucket"; "fb_s3_rel_id"; "fb_s3_rel_key";]
+                    "fb_s3_rel_bucket"; "fb_s3_rel_id"; "fb_s3_rel_key";
+                    "fb_imageserver_repo"; "fb_imageserver_branch"; "fb_imageserver_rel_branch"; "fb_imageserver_path";]
 
 let mutable settings = seq {for x in variableList -> x, (environVar x)} |> Map.ofSeq
 
@@ -362,6 +365,50 @@ Target "push_zips" (fun _ ->
                         raise exn
 )
 
+Target "update_imageserv" (fun _ ->
+    let img_repo = settings.["fb_imageserver_repo"]
+    let img_path = settings.["fb_imageserver_path"]
+    let img_branch =
+        if isRelease then settings.["fb_imageserver_rel_branch"]
+        else settings.["fb_imageserver_branch"]
+    
+    let ver =
+        if isRelease then nugetVer.ToString()
+        else nugetVer.ToString() + sprintf "%04d" (int32 buildNo)
+    
+    if isNullOrEmpty img_repo then
+        printf "No image server information present, skipping update\n"
+    else
+        
+        if not (directoryExists img_path) then
+            gitCommand "." ("clone --depth 1 --branch "+img_branch+" https://"+img_repo+" "+img_path)
+        cd img_path
+        gitCommand "." ("pull")
+        
+        WriteFile "paket.references" ["Appfail.WebForms"]
+        WriteFile "paket.dependencies" ["source https://nuget.org/api/v2";
+                                        "source https://www.myget.org/F/imazen-nightlies";
+                                        "";
+                                        "nuget Appfail.WebForms";]
+        
+        for nuSpec in Directory.GetFiles(rootDir + "nuget", "*.nuspec") do
+            if not (nuSpec.Contains(".symbols.nuspec")) then
+                let pkg = (fileNameWithoutExt nuSpec)
+                WriteToFile true "paket.dependencies" ["nuget " + pkg + " " + ver]
+                WriteToFile true "paket.references" [pkg]
+        
+        Shell.Exec (".paket\\paket.bootstrapper.exe")
+        Shell.Exec (".paket\\paket.exe", "update")
+        
+        gitCommand "." ("add paket.*")
+        gitCommand "." ("add *.sln")
+        gitCommand "." ("add *.csproj")
+        gitCommand "." ("commit -m \"AutoCommit: CI build "+ver+"\"")
+        gitCommand "." ("push")
+        
+        cd ".."
+)
+
 Target "pack" (fun _ ->
     Run "pack_nuget"
     Run "pack_zips"
@@ -438,6 +485,7 @@ Target "do_all" (fun _ ->
     ==> "unmess"
     ==> "pack"
     ==> "push"
+    ==> "update_imageserv"
     ==> "print_stats"
     
     Run "print_stats"
