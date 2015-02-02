@@ -393,10 +393,11 @@ Target "update_imageserv" (fun _ ->
         
         for nuSpec in Directory.GetFiles(rootDir + "nuget", "*.nuspec") do
             if not (nuSpec.Contains(".symbols.nuspec")) then
-                if not (nuSpec.Contains("Sample")) then
-                    let pkg = (fileNameWithoutExt nuSpec)
-                    WriteToFile true "paket.dependencies" ["nuget " + pkg + " " + ver]
-                    WriteToFile true "paket.references" [pkg]
+                if not (nuSpec.Contains(".x86")) then
+                    if not (nuSpec.Contains("Sample")) then
+                        let pkg = (fileNameWithoutExt nuSpec)
+                        WriteToFile true "paket.dependencies" ["nuget " + pkg + " " + ver]
+                        WriteToFile true "paket.references" [pkg]
         
         Shell.Exec (".paket\\paket.bootstrapper.exe")
         Shell.Exec (".paket\\paket.exe", "update")
