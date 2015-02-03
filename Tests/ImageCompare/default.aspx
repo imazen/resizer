@@ -18,9 +18,12 @@
         <option value="rings.png">rings.png</option>
         
         <option value="rings2.png">rings2.png</option>
+        <%= String.Join("\n",System.IO.Directory.GetFiles(System.IO.Path.Combine(MapPath("~/"),@"..\..\Samples\Images\private"), "*.jpg").Select(path => "private/" + System.IO.Path.GetFileName(path)).Select(p => "<option value=\"" + p + "\">" + p + "</option>")) %>
+        
+    
     </select>
 
-    <input id="newx" value="256" style="width: 30px" onchange="regen();" />px<br /><br />
+    <input id="newx" value="500" style="width: 30px" onchange="regen();" />px<br /><br />
 
     <input id="set1" value="fastscale=true&f" style="width: 250px" onchange="regen();" /> vs 
     <input id="set2" value="" style="width: 250px" onchange="regen();" />
@@ -28,8 +31,10 @@
     <hr />
 
     <img id="cmp" src="" alt="" onmouseover="set2();" onmouseout="set1();" onload="done();" /><br />
-    <input readonly="readonly" id="status" style="width: 1000px" />
-
+    <input readonly="readonly" id="status" style="width: 1000px" /> <br />
+    <a id="link"></a>
+    <br />
+    <a id="original">original</a>
     <form id="form1" runat="server">
         <%= System.Reflection.Assembly.GetAssembly(typeof(ImageResizer.Plugins.FastScaling.FastScalingPlugin)).GetName().Version.ToString() %>
  Last built
@@ -40,6 +45,9 @@
      <script>
          cmp = document.getElementById("cmp");
          st = document.getElementById("status");
+
+         link = document.getElementById("link");
+         original = document.getElementById("original");
          url1 = "";
          url2 = "";
          last = "";
@@ -53,21 +61,30 @@
 
              r = Math.random();
 
-             url1 = pic + "?width=" + x + "&" + s1 + "&r=" + r;
-             url2 = pic + "?width=" + x + "&" + s2 + "&r=" + r;
+             original.href = pic + "?cache=always";
 
+             url1 = pic + "?width=" + x + "&" + s1 + "&r=" + r;
+             if (s2.substring(0,1) == ":") {
+                 url2 = pic.replace(/_org|_orig|_original/, "_").replace(".", s2.replace(/^\:/, "") + ".") + "?cache=always";
+             } else {
+                 url2 = pic + "?width=" + x + "&" + s2 + "&r=" + r;
+             }
              set1();
          }
 
          function set1() {
              last = url1;
              cmp.src = last;
+             link.href = last;
+             link.innerText = last;
              st.value = "loading: " + last;
          }
 
          function set2() {
              last = url2;
              cmp.src = last;
+             link.href = last;
+             link.innerText = last;
              st.value = "loading: " + last;
          }
 
