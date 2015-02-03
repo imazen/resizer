@@ -33,7 +33,7 @@ static inline double filter_bicubic_fast(const InterpolationDetailsPtr d, const 
     const double abs_t = (double)fabs(t) / d->blur;
     const double abs_t_sq = abs_t * abs_t;
     if (abs_t<1) return 1 - 2 * abs_t_sq + abs_t_sq*abs_t;
-    if (abs_t<2) return 4 - 8 * abs_t + 5 * abs_t_sq - abs_t_sq*abs_t;
+    if (abs_t<2) return d->negative_multiplier * (4 - 8 * abs_t + 5 * abs_t_sq - abs_t_sq*abs_t);
     return 0;
 }
 
@@ -168,6 +168,8 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
         const int right_src_pixel = MIN(right_edge, (int)src_size - 1);
 
         double total_weight = 0.0;
+        double positive_weight = 0.0;
+        double negative_weight = 0.0;
 
         const int source_pixel_count = right_src_pixel - left_src_pixel + 1;
 
@@ -176,10 +178,13 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
             exit(200);
             return NULL;
         }
-        
+
         res->ContribRow[u].Left = left_src_pixel;
         res->ContribRow[u].Right = right_src_pixel;
-        
+
+
+        float *weights = res->ContribRow[u].Weights;
+
         //commented: additional weight for edges (doesn't seem to be too effective)
         //for (ix = left_edge; ix <= right_edge; ix++) {
         for (ix = left_src_pixel; ix <= right_src_pixel; ix++) {
@@ -188,8 +193,10 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
             double add = (*details->filter)(details, downscale_factor * ((double)ix - center_src_pixel));
 
             //res->ContribRow[u].Weights[tx] += add;
-            res->ContribRow[u].Weights[tx] = add;
+            weights[tx] = add;
             total_weight += add;
+            if (add > 0) positive_weight += add;
+            if (add < 0) negative_weight -= add;
         }
 
         if (total_weight <= TONY) {
@@ -197,8 +204,20 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
             return NULL;
         }
 
+        double negative_factor = 1 / total_weight;
+        if (details->integrated_sharpen_percent > 0 && negative_weight / positive_weight * 100.0 < details->integrated_sharpen_percent){
+            const double new_neg_weight = (details->integrated_sharpen_percent / 100.0 * positive_weight);
+            total_weight -= new_neg_weight - negative_weight;
+
+            negative_factor = (new_neg_weight / negative_weight) / total_weight;
+            negative_weight = new_neg_weight;
+
+        }
+        double positive_factor = 1 / total_weight;
+
+        float *weigths;
         for (ix = 0; ix < source_pixel_count; ix++) {
-            res->ContribRow[u].Weights[ix] /= total_weight;
+            weights[ix] = weights[ix] > 0 ? weights[ix] * positive_factor : weights[ix] * negative_factor;
         }
     }
     return res;

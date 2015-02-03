@@ -49,6 +49,12 @@ namespace ImageResizer{
                     double sharpen = System::String::IsNullOrEmpty(query->Get("sharpen")) ? 0 :
                         System::Double::Parse(query->Get("sharpen"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
+                    double neg_mult = System::String::IsNullOrEmpty(query->Get("f.nm")) ? 1 :
+                        System::Double::Parse(query->Get("f.nm"), System::Globalization::NumberFormatInfo::InvariantInfo);
+
+                    double integ_sharpen = System::String::IsNullOrEmpty(query->Get("f.is")) ? 0 :
+                        System::Double::Parse(query->Get("f.is"), System::Globalization::NumberFormatInfo::InvariantInfo);
+
                     double min_scaled_weighted = System::String::IsNullOrEmpty(query->Get("min_scaled_weighted")) ? 0 :
                         System::Double::Parse(query->Get("min_scaled_weighted"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
@@ -91,9 +97,10 @@ namespace ImageResizer{
                     details->use_halving = withHalving;
                     details->blur *= blur;
                     details->post_resize_sharpen_percent = (int)sharpen;
-                    
+                    details->negative_multiplier = neg_mult;
 
                     details->use_interpolation_for_percent = min_scaled_weighted > 0 ? min_scaled_weighted :  0.3;
+                    details->integrated_sharpen_percent = integ_sharpen;
 
                     if (window != 0) details->window = window;
                         

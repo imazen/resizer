@@ -67,6 +67,8 @@ typedef struct InterpolationDetailsStruct{
     double p1, p2, p3, q1, q2, q3, q4;
     //Blurring factor when > 1, sharpening factor when < 1. Applied to weights.
     double blur;
+    //Multiplier applied to negative weights (certain filters only). Creates sharpening effect when window is large enough. may need to be adjusted based on window size.
+    double negative_multiplier;
     //pointer to the weight calculation function
     detailed_interpolation_method filter;
     //If true, use area averaging for initial reduction
@@ -77,6 +79,8 @@ typedef struct InterpolationDetailsStruct{
     double use_interpolation_for_percent;
     //If true, we can 'reuse' the source image as a performance optimization when halving
     bool allow_source_mutation;
+
+    double integrated_sharpen_percent;
     //If greater than 0, a percentage to sharpen the result along each axis;
     double post_resize_sharpen_percent;
     //Reserved for passing data to new filters
@@ -248,6 +252,8 @@ static InterpolationDetailsPtr CreateInterpolationDetails(){
     d->halve_only_when_common_factor = false;
     d->post_resize_sharpen_percent = 0;
     d->use_halving = false;
+    d->negative_multiplier = 1;
     d->use_interpolation_for_percent = 0.3;
+    d->integrated_sharpen_percent = 0;
     return d;
 }
