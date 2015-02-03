@@ -103,6 +103,14 @@ namespace ImageResizer{
                     details->integrated_sharpen_percent = integ_sharpen;
 
                     if (window != 0) details->window = window;
+
+                    System::Diagnostics::Debug::WriteLine("filter={0}, window={1}, blur={2}", query->Get("f"), details->window, details->blur);
+                    System::Diagnostics::Debug::WriteLine("y={0} + {1}*x^2 + {2} * x^3, y={3} + {4}*x + {5}*x^2 + {6} * x ^ 3",
+                        details->p1, details->p2, details->p3, details->q1, details->q2, details->q3, details->q4);
+
+                    for (double x = -3.0; x < 3; x += 0.25){
+                        System::Diagnostics::Debug::WriteLine(x.ToString()->PadRight(5) + details->filter(details, x).ToString());
+                    }
                         
                     BgraScaler ^scaler = gcnew BgraScaler();
                     scaler->ScaleBitmap(source, dest, Util::PolygonMath::ToRectangle(sourceArea), Util::PolygonMath::ToRectangle(targetBox), colorMatrix, details, s->Job->Profiler);

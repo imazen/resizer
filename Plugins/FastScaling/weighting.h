@@ -42,7 +42,6 @@ static inline double filter_bicubic_fast(const InterpolationDetailsPtr d, const 
 
 static inline double filter_lanczos(const InterpolationDetailsPtr d, double t)
 {
-    t *= 3;
     const double width = d->filter_var_a;
 
     const double abs_t = (double)fabs(t) / d->blur;
@@ -65,16 +64,16 @@ static InterpolationDetailsPtr CreateBicubicCustom(double window, double blur, d
     return d;
 }
 
-static InterpolationDetailsPtr DetailsLanczosCustom(double window, double blur){
+static InterpolationDetailsPtr DetailsLanczosCustom(double window, double blur, double width){
     InterpolationDetailsPtr d = CreateInterpolationDetails();
     d->blur = blur;
     d->filter = filter_lanczos;
     d->window = window;
-    d->filter_var_a = 3;
+    d->filter_var_a = width;
     return d;
 }
 static InterpolationDetailsPtr DetailsLanczos(){
-    return DetailsLanczosCustom(0.5, 1);
+    return DetailsLanczosCustom(1, 1,3);
 }
 
 static InterpolationDetailsPtr DetailsOriginal(){
