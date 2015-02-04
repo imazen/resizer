@@ -81,6 +81,8 @@ typedef struct InterpolationDetailsStruct{
     bool allow_source_mutation;
 
     double integrated_sharpen_percent;
+    float * sharpen_kernel;
+    int sharpen_radius;
     //If greater than 0, a percentage to sharpen the result along each axis;
     double post_resize_sharpen_percent;
     //Reserved for passing data to new filters

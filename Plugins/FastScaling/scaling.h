@@ -31,6 +31,68 @@ static void BgraSharpenInPlaceX(BitmapBgraPtr im, int pct)
 
 
 
+static void
+SharpenBgraFloatInPlace(float *source_buffer, unsigned int source_buffer_count, unsigned int source_buffer_len, const float *kernel, int radius,
+int step = 4){
+
+    unsigned int ndx;
+
+    // if both have alpha, process it
+    if (step == 4)
+    {
+        for (ndx = radius; ndx < source_buffer_count - radius; ndx++) {
+            float r = 0, g = 0, b = 0, a = 0;
+            const int left = MAX(0,ndx - radius);
+            const int right = MIN(ndx + radius, source_buffer_count - 1);
+            const int offset = ndx - radius;
+            int i;
+
+            /* Accumulate each channel */
+            for (i = left; i <= right; i++) {
+                const float weight = kernel[i - offset];
+
+                b += weight * source_buffer[i * 4];
+                g += weight * source_buffer[i * 4 + 1];
+                r += weight * source_buffer[i * 4 + 2];
+                a += weight * source_buffer[i * 4 + 3];
+            }
+
+            source_buffer[ndx * 4] = b;
+            source_buffer[ndx * 4 + 1] = g;
+            source_buffer[ndx * 4 + 2] = r;
+            source_buffer[ndx * 4 + 3] = a;
+        }
+    }
+    // otherwise do the same thing without 4th chan
+    // (ifs in loops are expensive..)
+    else
+    {
+        for (ndx = radius; ndx < source_buffer_count - radius; ndx++) {
+            float r = 0, g = 0, b = 0;
+            const int left = MAX(0, ndx - radius);
+            const int right = MIN(ndx + radius, source_buffer_count - 1);
+            const int offset = ndx - radius;
+            int i;
+
+            /* Accumulate each channel */
+            for (i = left; i <= right; i++) {
+                const float weight = kernel[i - offset];
+
+                b += weight * source_buffer[i * step];
+                g += weight * source_buffer[i * step + 1];
+                r += weight * source_buffer[i * step + 2];
+            }
+
+            source_buffer[ndx * step] = b;
+            source_buffer[ndx * step + 1] = g;
+            source_buffer[ndx * step + 2] = r;
+        }
+    }
+
+}
+
+
+
 static inline void
 ScaleBgraFloat(float *source_buffer, unsigned int source_buffer_count, unsigned int source_buffer_len,
 float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len, ContributionType * weights, int from_step = 4, int to_step = 4){
@@ -122,7 +184,7 @@ float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len
 
 
 
-static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int start_row, unsigned int row_count, ContributionType * weights, BitmapBgraPtr dest, float *source_buffers, unsigned int source_buffer_len, float *dest_buffers, unsigned int dest_buffer_len, float *lut){
+static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int start_row, unsigned int row_count, ContributionType * weights, BitmapBgraPtr dest, float *source_buffers, unsigned int source_buffer_len, float *dest_buffers, unsigned int dest_buffer_len, float *lut, float *kernel, int kernel_radius){
 
     register unsigned int row, bix, bufferSet;
     const register unsigned int from_pixel_count = source_bitmap->w;
@@ -153,8 +215,10 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
     for (bufferSet = 0; bufferSet < row_count; bufferSet++){
         ScaleBgraFloat(source_buffers + (source_buffer_len * bufferSet), from_pixel_count, source_buffer_len,
             dest_buffers + (dest_buffer_len * bufferSet), to_pixel_count, dest_buffer_len, weights, source_bitmap->bpp, dest->bpp);
+        if (kernel_radius > 0){
+            SharpenBgraFloatInPlace(dest_buffers + (dest_buffer_len * bufferSet), to_pixel_count, dest_buffer_len, kernel, kernel_radius, dest->bpp);
+        }
     }
-
     
 
     unsigned char *dst_start = dest->pixels + start_row * dest->bpp;
@@ -275,7 +339,7 @@ static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
     for (line_ndx = 0; line_ndx < pSrc->h; line_ndx += buffer) {
 
         ScaleXAndPivotRows(pSrc, line_ndx, MIN(pSrc->h - line_ndx, buffer), contrib->ContribRow, pDst,
-            sourceBuffers, source_buffer_len, destBuffers, dest_buffer_len, lut);
+            sourceBuffers, source_buffer_len, destBuffers, dest_buffer_len, lut,details->sharpen_kernel,details->sharpen_radius);
     }
 
     free(sourceBuffers);
