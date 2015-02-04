@@ -17,7 +17,7 @@ static void derive_cubic_coefficients(double B, double C, InterpolationDetailsPt
 
 static inline double filter_flex_cubic(const InterpolationDetailsPtr d, double x)
 {
-    x *= 2;
+    
     const double t = (double)fabs(x) / d->blur;
 
     if (t < 1.0){
@@ -51,7 +51,16 @@ static inline double filter_lanczos(const InterpolationDetailsPtr d, double t)
     return 0;
 }
 
+static inline double filter_sinc(const InterpolationDetailsPtr d, double t)
+{
 
+    const double abs_t = (double)fabs(t) / d->blur;
+    if (abs_t == 0) { return 1; } //Avoid division by zero
+    if (abs_t > 2){ return 0; }
+    const double a = abs_t * IR_PI;
+    const double r = sin(a) / a;
+    return r > 0 ? r : d->negative_multiplier * r;
+}
 
 
 
@@ -72,6 +81,14 @@ static InterpolationDetailsPtr DetailsLanczosCustom(double window, double blur, 
     d->filter_var_a = width;
     return d;
 }
+static InterpolationDetailsPtr DetailsLanczosSharp(){
+    InterpolationDetailsPtr d = CreateInterpolationDetails();
+    d->blur = 0.9549963639785485;
+    d->filter = filter_sinc;
+    d->window = 1.5;
+    return d;
+}
+
 static InterpolationDetailsPtr DetailsLanczos(){
     return DetailsLanczosCustom(1, 1,3);
 }
@@ -191,7 +208,6 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
             //int tx = MIN(MAX(ix, left_src_pixel), right_src_pixel) - left_src_pixel;
             double add = (*details->filter)(details, downscale_factor * ((double)ix - center_src_pixel));
 
-            //res->ContribRow[u].Weights[tx] += add;
             weights[tx] = add;
             total_weight += add;
             if (add > 0) positive_weight += add;
@@ -204,7 +220,7 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
         }
 
         double negative_factor = 1 / total_weight;
-        if (details->integrated_sharpen_percent > 0 && negative_weight / positive_weight * 100.0 < details->integrated_sharpen_percent){
+        if (details->integrated_sharpen_percent > 0){
             const double new_neg_weight = (details->integrated_sharpen_percent / 100.0 * positive_weight);
             total_weight -= new_neg_weight - negative_weight;
 

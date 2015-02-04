@@ -93,6 +93,11 @@ namespace ImageResizer{
                     if (query->Get("f") == "7"){
                         details = DetailsLanczos();
                     }
+                    if (query->Get("f") == "8"){
+                        details = DetailsLanczosSharp();
+                    }
+                    
+
                     details->allow_source_mutation = true;
                     details->use_halving = withHalving;
                     details->blur *= blur;
