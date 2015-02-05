@@ -253,7 +253,7 @@ static void unpack24bitRow(int width, unsigned char* sourceLine, unsigned char* 
 static InterpolationDetailsPtr CreateInterpolationDetails(){
     InterpolationDetailsPtr d = (InterpolationDetails *)calloc(1, sizeof(InterpolationDetails));
     d->blur = 1;
-    d->window = 0.5;
+    d->window = 2;
     d->p1 = d->q1 = 0;
     d->p2 = d->q2 = d->p3 = d->q3 = d->q4 = 1;
     d->allow_source_mutation = false;

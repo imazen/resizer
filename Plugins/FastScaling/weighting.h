@@ -83,46 +83,46 @@ static InterpolationDetailsPtr DetailsLanczosSharp(){
     InterpolationDetailsPtr d = CreateInterpolationDetails();
     d->blur = 0.9549963639785485;
     d->filter = filter_sinc;
-    d->window = 1.5;
+    d->window = 3;
     return d;
 }
 
 static InterpolationDetailsPtr DetailsLanczos(){
-    return DetailsLanczosCustom(1, 1,3);
+    return DetailsLanczosCustom(2, 1,3);
 }
 
 static InterpolationDetailsPtr DetailsOriginal(){
     InterpolationDetailsPtr d = CreateInterpolationDetails();
     d->blur = 1;
     d->filter = filter_bicubic_fast;
-    d->window = 0.5;
+    d->window = 1;
     return d;
 }
 
 static InterpolationDetailsPtr DetailsDefault(){
-    return CreateBicubicCustom(0.5, 1, 1, 0);
+    return CreateBicubicCustom(1, 1, 1, 0);
 }
 
 static InterpolationDetailsPtr DetailsGeneralCubic(){
-    return CreateBicubicCustom(0.5, 2, 1, 0);
+    return CreateBicubicCustom(1, 2, 1, 0);
 }
 static InterpolationDetailsPtr DetailsCatmullRom(){
-    return CreateBicubicCustom(0.5, 2, 0, 0.5);
+    return CreateBicubicCustom(1, 2, 0, 0.5);
 }
 static InterpolationDetailsPtr DetailsMitchell(){
-    return CreateBicubicCustom(0.5, 8.0 / 7.0, 1. / 3., 1. / 3.);
+    return CreateBicubicCustom(2, 8.0 / 7.0, 1. / 3., 1. / 3.);
 }
 static InterpolationDetailsPtr DetailsRobidoux(){
-    return CreateBicubicCustom(0.5, 1.1685777620836932,
+    return CreateBicubicCustom(2, 1.1685777620836932,
         0.37821575509399867, 0.31089212245300067);
 }
 
 static InterpolationDetailsPtr DetailsRobidouxSharp(){
-    return CreateBicubicCustom(0.5, 1.105822933719019,
+    return CreateBicubicCustom(1, 1.105822933719019,
         0.2620145123990142, 0.3689927438004929);
 }
 static InterpolationDetailsPtr DetailsHermite(){
-    return CreateBicubicCustom(0.5, 2, 1, 0);
+    return CreateBicubicCustom(1, 2, 1, 0);
 }
 
 
@@ -166,7 +166,7 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
 {
     const double scale_factor = (double)line_size / (double)src_size;
     const double downscale_factor = MIN(1.0, scale_factor);
-    const double half_source_window = details->window / downscale_factor;
+    const double half_source_window = details->window * 0.5 / downscale_factor;
 
     const int allocated_window_size = (int)ceil(2 * (half_source_window - TONY)) + 1;
     unsigned int u, ix;
