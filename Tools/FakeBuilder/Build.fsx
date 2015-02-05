@@ -376,7 +376,11 @@ Target "update_imageserv" (fun _ ->
         if isRelease then nugetVer.ToString()
         else nugetVer.ToString() + sprintf "%04d" (int32 buildNo)
     
-    if isNullOrEmpty img_repo then
+    let branch = environVar "APPVEYOR_REPO_BRANCH"
+    
+    if branch <> "master" && branch <> "develop" then
+        printf "Only master and develop branches are allowed to update imageserv, skipping\n"
+    elif isNullOrEmpty img_repo then
         printf "No image server information present, skipping update\n"
     else
         
