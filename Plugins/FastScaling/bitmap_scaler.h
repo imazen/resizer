@@ -201,17 +201,8 @@ namespace ImageResizer{
                     }
 
                     
-                    const bool linear_sharpen = true;
-                    if (linear_sharpen && details->post_resize_sharpen_percent > 0){
-                        
-                        details->sharpen_radius = MAX(1, details->sharpen_radius);
-                        details->sharpen_kernel = (float *) malloc(sizeof(float) * (1 + (2 * details->sharpen_radius)));
-                        if (details->sharpen_radius == 1){
-                            double pct = MIN(100, MAX(0, details->post_resize_sharpen_percent));
-                            float* k = details->sharpen_kernel;
-                            k[0] = k[2] = pct / -200.0;
-                            k[1] = 1 - (pct / 100.0);
-                        }
+                    if (details->kernel_radius > 0){
+                        details->convolution_kernel = create_guassian_sharpen_kernel(details->unsharp_sigma, details->kernel_radius);
                     }
 
 
@@ -230,7 +221,7 @@ namespace ImageResizer{
                         ScaleXAndPivot(source, tmp_im, details, lut);
                         p->Stop("scale and pivot to temp", true, false);
 
-                        if (!linear_sharpen && details->post_resize_sharpen_percent > 0){
+                        if (details->post_resize_sharpen_percent > 0 && !details->linear_sharpen){
                             p->Start("sharpening along Y axis", false);
                             BgraSharpenInPlaceX(tmp_im, details->post_resize_sharpen_percent);
                             p->Stop("sharpening along Y axis", true, false);
@@ -241,7 +232,7 @@ namespace ImageResizer{
                         ScaleXAndPivot(tmp_im, dst, details, lut);
                         p->Stop("scale and pivot to final", true, false);
 
-                        if (!linear_sharpen && details->post_resize_sharpen_percent > 0){
+                        if (details->post_resize_sharpen_percent > 0 && !details->linear_sharpen){
                             p->Start("sharpening along X axis", false);
                             BgraSharpenInPlaceX(dst, details->post_resize_sharpen_percent);
                             p->Stop("sharpening along X axis", true, false);
@@ -249,9 +240,9 @@ namespace ImageResizer{
 
                     }
                     finally{
-                        if (details->sharpen_kernel != 0){
-                            free(details->sharpen_kernel);
-                            details->sharpen_kernel = 0;
+                        if (details->convolution_kernel != 0){
+                            free(details->convolution_kernel);
+                            details->convolution_kernel = 0;
                         }
                         p->Start("destroy temp image", false);
                         DestroyBitmapBgra(tmp_im);

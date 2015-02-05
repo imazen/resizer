@@ -81,12 +81,14 @@ typedef struct InterpolationDetailsStruct{
     bool allow_source_mutation;
 
     double integrated_sharpen_percent;
-    float * sharpen_kernel;
-    int sharpen_radius;
+    float * convolution_kernel;
+    int kernel_radius;
+    float unsharp_sigma;
     //If greater than 0, a percentage to sharpen the result along each axis;
     double post_resize_sharpen_percent;
     //Reserved for passing data to new filters
     int filter_var_a;
+    bool linear_sharpen;
 
 }InterpolationDetails;
 
@@ -261,5 +263,8 @@ static InterpolationDetailsPtr CreateInterpolationDetails(){
     d->negative_multiplier = 1;
     d->use_interpolation_for_percent = 0.3;
     d->integrated_sharpen_percent = 0;
+    d->kernel_radius = 0;
+    d->unsharp_sigma = 1.4;
+    d->linear_sharpen = true;
     return d;
 }

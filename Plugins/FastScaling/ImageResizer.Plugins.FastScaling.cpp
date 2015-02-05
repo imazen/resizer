@@ -49,6 +49,8 @@ namespace ImageResizer{
                     double sharpen = System::String::IsNullOrEmpty(query->Get("f.sharpen")) ? 0 :
                         System::Double::Parse(query->Get("f.sharpen"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
+                    bool linear_sharpen = System::String::IsNullOrEmpty(query->Get("f.ss")) ? false : true;
+
                     double neg_mult = System::String::IsNullOrEmpty(query->Get("f.nm")) ? 1 :
                         System::Double::Parse(query->Get("f.nm"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
@@ -57,6 +59,11 @@ namespace ImageResizer{
 
                     double min_scaled_weighted = System::String::IsNullOrEmpty(query->Get("min_scaled_weighted")) ? 0 :
                         System::Double::Parse(query->Get("min_scaled_weighted"), System::Globalization::NumberFormatInfo::InvariantInfo);
+
+                    int kernel_radius = System::String::IsNullOrEmpty(query->Get("f.unsharp.radius")) ? 0 :
+                        System::Double::Parse(query->Get("f.unsharp.radius"), System::Globalization::NumberFormatInfo::InvariantInfo);
+                    double unsharp_sigma = System::String::IsNullOrEmpty(query->Get("f.unsharp.sigma")) ? 0 :
+                        System::Double::Parse(query->Get("f.unsharp.sigma"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
 
 
@@ -103,9 +110,11 @@ namespace ImageResizer{
                     details->blur *= blur;
                     details->post_resize_sharpen_percent = (int)sharpen;
                     details->negative_multiplier = neg_mult;
-
+                    details->kernel_radius = kernel_radius;
+                    details->unsharp_sigma = unsharp_sigma;
                     details->use_interpolation_for_percent = min_scaled_weighted > 0 ? min_scaled_weighted :  0.3;
                     details->integrated_sharpen_percent = integ_sharpen;
+                    details->linear_sharpen = linear_sharpen;
 
                     if (window != 0) details->window = window;
 
