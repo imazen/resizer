@@ -42,14 +42,13 @@ int step = 4){
     {
         for (ndx = radius; ndx < source_buffer_count - radius; ndx++) {
             float r = 0, g = 0, b = 0, a = 0;
-            const int left = MAX(0,ndx - radius);
-            const int right = MIN(ndx + radius, source_buffer_count - 1);
-            const int offset = ndx - radius;
+            const int left = ndx - radius;
+            const int right = ndx + radius;
             int i;
 
             /* Accumulate each channel */
             for (i = left; i <= right; i++) {
-                const float weight = kernel[i - offset];
+                const float weight = kernel[i - left];
 
                 b += weight * source_buffer[i * 4];
                 g += weight * source_buffer[i * 4 + 1];
@@ -69,14 +68,13 @@ int step = 4){
     {
         for (ndx = radius; ndx < source_buffer_count - radius; ndx++) {
             float r = 0, g = 0, b = 0;
-            const int left = MAX(0, ndx - radius);
-            const int right = MIN(ndx + radius, source_buffer_count - 1);
-            const int offset = ndx - radius;
+            const int left = ndx - radius;
+            const int right = ndx + radius;
             int i;
 
             /* Accumulate each channel */
             for (i = left; i <= right; i++) {
-                const float weight = kernel[i - offset];
+                const float weight = kernel[i - left];
 
                 b += weight * source_buffer[i * step];
                 g += weight * source_buffer[i * step + 1];
