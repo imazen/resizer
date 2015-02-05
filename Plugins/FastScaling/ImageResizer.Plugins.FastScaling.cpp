@@ -98,12 +98,23 @@ namespace ImageResizer{
                         details = DetailsHermite();
                     }
                     if (query->Get("f") == "7"){
-                        details = DetailsLanczos();
+                        details = DetailsLanczos3();
                     }
                     if (query->Get("f") == "8"){
-                        details = DetailsLanczosSharp();
+                        details = DetailsLanczos3Sharp();
                     }
-                    
+                    if (query->Get("f") == "9"){
+                        details = DetailsLanczos2();
+                    }
+                    if (query->Get("f") == "10"){
+                        details = DetailsLanczos2Sharp();
+                    }
+                    if (query->Get("f") == "12"){
+                        details = DetailsTriangle();
+                    }
+                    if (query->Get("f") == "11"){
+                        details = DetailsLanczos();
+                    }
 
                     details->allow_source_mutation = true;
                     details->use_halving = withHalving;

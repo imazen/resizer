@@ -60,7 +60,14 @@ static inline double filter_sinc(const InterpolationDetailsPtr d, double t)
     return r > 0 ? r : d->negative_multiplier * r;
 }
 
+static inline double filter_triangle(const InterpolationDetailsPtr d, double t)
+{
 
+    const double x = (double)fabs(t) / d->blur;
+    if (x < 1.0)
+        return(1.0 - x);
+    return(0.0);
+}
 
 static InterpolationDetailsPtr CreateBicubicCustom(double window, double blur, double B, double C){
     InterpolationDetailsPtr d = CreateInterpolationDetails();
@@ -79,9 +86,39 @@ static InterpolationDetailsPtr DetailsLanczosCustom(double window, double blur, 
     d->filter_var_a = width;
     return d;
 }
-static InterpolationDetailsPtr DetailsLanczosSharp(){
+static InterpolationDetailsPtr DetailsTriangle(){
+    InterpolationDetailsPtr d = CreateInterpolationDetails();
+    d->blur = 1;
+    d->filter = filter_triangle;
+    d->window = 1;
+    return d;
+}
+
+static InterpolationDetailsPtr DetailsLanczos2(){
+    InterpolationDetailsPtr d = CreateInterpolationDetails();
+    d->blur = 1;
+    d->filter = filter_sinc;
+    d->window = 2;
+    return d;
+}
+
+static InterpolationDetailsPtr DetailsLanczos3(){
+    InterpolationDetailsPtr d = CreateInterpolationDetails();
+    d->blur = 1;
+    d->filter = filter_sinc;
+    d->window = 3;
+    return d;
+}
+static InterpolationDetailsPtr DetailsLanczos2Sharp(){
     InterpolationDetailsPtr d = CreateInterpolationDetails();
     d->blur = 0.9549963639785485;
+    d->filter = filter_sinc;
+    d->window = 2;
+    return d;
+}
+static InterpolationDetailsPtr DetailsLanczos3Sharp(){
+    InterpolationDetailsPtr d = CreateInterpolationDetails();
+    d->blur = 0.9812505644269356;
     d->filter = filter_sinc;
     d->window = 3;
     return d;
@@ -104,25 +141,25 @@ static InterpolationDetailsPtr DetailsDefault(){
 }
 
 static InterpolationDetailsPtr DetailsGeneralCubic(){
-    return CreateBicubicCustom(1, 2, 1, 0);
+    return CreateBicubicCustom(2, 0.5, 1, 0);
 }
 static InterpolationDetailsPtr DetailsCatmullRom(){
-    return CreateBicubicCustom(1, 2, 0, 0.5);
+    return CreateBicubicCustom(2, 0.5, 0, 0.5);
 }
 static InterpolationDetailsPtr DetailsMitchell(){
-    return CreateBicubicCustom(2, 8.0 / 7.0, 1. / 3., 1. / 3.);
+    return CreateBicubicCustom(2, 7.0 / 8.0, 1.0 / 3.0, 1.0 / 3.0);
 }
 static InterpolationDetailsPtr DetailsRobidoux(){
-    return CreateBicubicCustom(2, 1.1685777620836932,
+    return CreateBicubicCustom(2, 1. / 1.1685777620836932,
         0.37821575509399867, 0.31089212245300067);
 }
 
 static InterpolationDetailsPtr DetailsRobidouxSharp(){
-    return CreateBicubicCustom(1, 1.105822933719019,
+    return CreateBicubicCustom(2, 1. /1.105822933719019,
         0.2620145123990142, 0.3689927438004929);
 }
 static InterpolationDetailsPtr DetailsHermite(){
-    return CreateBicubicCustom(1, 2, 1, 0);
+    return CreateBicubicCustom(1, 1, 0, 0);
 }
 
 
@@ -228,9 +265,9 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
         }
         double positive_factor = 1 / total_weight;
 
-        float *weigths;
+        
         for (ix = 0; ix < source_pixel_count; ix++) {
-            weights[ix] = weights[ix] > 0 ? weights[ix] * positive_factor : weights[ix] * negative_factor;
+            weights[ix] *= weights[ix] > 0 ?positive_factor : negative_factor;
         }
     }
     return res;
