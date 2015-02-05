@@ -37,8 +37,6 @@ static inline double filter_bicubic_fast(const InterpolationDetailsPtr d, const 
     return 0;
 }
 
-#define IR_PI  double (3.1415926535897932384626433832795)
-#define IR_SINC(value) (value == 0 ? 1 : sin(value * IR_PI) / (value * IR_PI))
 
 static inline double filter_lanczos(const InterpolationDetailsPtr d, double t)
 {

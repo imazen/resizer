@@ -105,6 +105,10 @@ typedef struct
 } LineContribType;
 
 
+#define IR_PI  double (3.1415926535897932384626433832795)
+#define IR_SINC(value) (value == 0 ? 1 : sin(value * IR_PI) / (value * IR_PI))
+
+#define IR_GUASSIAN(x, stdDev) (exp((-x * x) / (2 * stdDev * stdDev)) / (sqrt(2 * IR_PI) * stdDev))
 
 #ifndef MIN
 #   define MIN(a,b) ((a)<(b)?(a):(b))
