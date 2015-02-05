@@ -40,14 +40,14 @@ namespace ImageResizer{
                     if (turbo == sTrue)
                         withHalving = 1;
 
-                    double blur = System::String::IsNullOrEmpty(query->Get("blur")) ? 1.0 :
-                        System::Double::Parse(query->Get("blur"), System::Globalization::NumberFormatInfo::InvariantInfo);
+                    double blur = System::String::IsNullOrEmpty(query->Get("f.blur")) ? 1.0 :
+                        System::Double::Parse(query->Get("f.blur"), System::Globalization::NumberFormatInfo::InvariantInfo);
                     
-                    double window = System::String::IsNullOrEmpty(query->Get("window")) ? 0 :
-                        System::Double::Parse(query->Get("window"), System::Globalization::NumberFormatInfo::InvariantInfo);
+                    double window = System::String::IsNullOrEmpty(query->Get("f.window")) ? 0 :
+                        System::Double::Parse(query->Get("f.window"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
-                    double sharpen = System::String::IsNullOrEmpty(query->Get("sharpen")) ? 0 :
-                        System::Double::Parse(query->Get("sharpen"), System::Globalization::NumberFormatInfo::InvariantInfo);
+                    double sharpen = System::String::IsNullOrEmpty(query->Get("f.sharpen")) ? 0 :
+                        System::Double::Parse(query->Get("f.sharpen"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
                     double neg_mult = System::String::IsNullOrEmpty(query->Get("f.nm")) ? 1 :
                         System::Double::Parse(query->Get("f.nm"), System::Globalization::NumberFormatInfo::InvariantInfo);
