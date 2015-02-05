@@ -47,6 +47,7 @@ environment:
 before_build:
   
   # add imageserver key
+  - git config --global push.default simple
   - git config --global credential.helper wincred
   - git config --global user.name "%imageserver_user%"
   - git config --global user.email "%imageserver_mail%"
