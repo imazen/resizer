@@ -397,7 +397,7 @@ Target "update_imageserv" (fun _ ->
         
         for nuSpec in Directory.GetFiles(rootDir + "nuget", "*.nuspec") do
             if not (nuSpec.Contains(".symbols.nuspec")) then
-                if not (nuSpec.Contains(".x86")) then
+                if not (nuSpec.Contains(".x64")) then
                     if not (nuSpec.Contains("Sample")) then
                         let pkg = (fileNameWithoutExt nuSpec)
                         WriteToFile true "paket.dependencies" ["nuget " + pkg + " " + ver]
