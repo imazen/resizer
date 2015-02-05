@@ -32,6 +32,12 @@
     <ClInclude Include="bitmap_scaler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="colormatrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImageResizer.Plugins.FastScaling.cpp">

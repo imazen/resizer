@@ -4,3 +4,4 @@
 #include "weighting.h"
 #include "halving.h"
 #include "scaling.h"
+#include "filters.h"

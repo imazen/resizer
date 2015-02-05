@@ -162,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="bitmap_scaler.h" />
     <ClInclude Include="colormatrix.h" />
+    <ClInclude Include="filters.h" />
     <ClInclude Include="halving.h" />
     <ClInclude Include="ImageResizer.Plugins.FastScaling.h" />
     <ClInclude Include="scaling.h" />
