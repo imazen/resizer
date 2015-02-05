@@ -196,11 +196,36 @@ static inline void ContributionsFree(LineContribType * p)
     free(p);
 }
 
-
 #define TONY 0.00001
 
-static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigned int src_size, const InterpolationDetailsPtr details)
+static double percent_negative_weight(const InterpolationDetailsPtr details){
+    const int samples = 50;
+    double step = details->window / (double)samples;
+
+    
+    double last_height = details->filter(details, -step);
+    double positive_area = 0;
+    double negative_area = 0;
+    for (int i = 0; i <= samples + 2; i++){
+        const double height = details->filter(details, i * step);
+        const double area = (height + last_height) / 2.0 * step;
+        last_height = height;
+        if (area > 0) positive_area += area;
+        else negative_area -= area;
+    }
+    return negative_area / positive_area;
+}
+
+
+static LineContribType *ContributionsCalc(unsigned int line_size, unsigned int src_size, const InterpolationDetailsPtr details)
 {
+    const double sharpen_ratio =  percent_negative_weight(details);
+    const double desired_sharpen_ratio = details->integrated_sharpen_percent / 100.0;
+    const double extra_negative_weight = desired_sharpen_ratio > 0 ?
+        (desired_sharpen_ratio + sharpen_ratio) / sharpen_ratio :
+        0;
+
+
     const double scale_factor = (double)line_size / (double)src_size;
     const double downscale_factor = MIN(1.0, scale_factor);
     const double half_source_window = details->window * 0.5 / downscale_factor;
@@ -219,8 +244,6 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
         const int right_src_pixel = MIN(right_edge, (int)src_size - 1);
 
         double total_weight = 0.0;
-        double positive_weight = 0.0;
-        double negative_weight = 0.0;
 
         const int source_pixel_count = right_src_pixel - left_src_pixel + 1;
 
@@ -242,11 +265,11 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
             int tx = ix - left_src_pixel;
             //int tx = MIN(MAX(ix, left_src_pixel), right_src_pixel) - left_src_pixel;
             double add = (*details->filter)(details, downscale_factor * ((double)ix - center_src_pixel));
-
+            if (add < 0 && extra_negative_weight != 0){
+                add *= extra_negative_weight;
+            }
             weights[tx] = add;
             total_weight += add;
-            if (add > 0) positive_weight += add;
-            if (add < 0) negative_weight -= add;
         }
 
         if (total_weight <= TONY) {
@@ -254,20 +277,10 @@ static inline LineContribType *ContributionsCalc(unsigned int line_size, unsigne
             return NULL;
         }
 
-        double negative_factor = 1 / total_weight;
-        if (details->integrated_sharpen_percent > 0){
-            const double new_neg_weight = (details->integrated_sharpen_percent / 100.0 * positive_weight);
-            total_weight -= new_neg_weight - negative_weight;
-
-            negative_factor = (new_neg_weight / negative_weight) / total_weight;
-            negative_weight = new_neg_weight;
-
-        }
-        double positive_factor = 1 / total_weight;
-
         
+        const double total_factor = 1.0 / total_weight;
         for (ix = 0; ix < source_pixel_count; ix++) {
-            weights[ix] *= weights[ix] > 0 ?positive_factor : negative_factor;
+            weights[ix] *= total_factor;
         }
     }
     return res;

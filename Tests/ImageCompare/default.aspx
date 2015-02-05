@@ -25,8 +25,8 @@
 
     <input id="newx" value="500" style="width: 30px" onchange="regen();" />px<br /><br />
 
-    <input id="set1" value="fastscale=true&f=8" style="width: 250px" onchange="regen();" /> vs 
-    <input id="set2" value="fastscale=true" style="width: 250px" onchange="regen();" />
+    <input id="set1" value="fastscale=true&f=8&f.is=30" style="width: 250px" onchange="regen();" /> vs 
+    <input id="set2" value="fastscale=true&f=8" style="width: 250px" onchange="regen();" />
 
     <hr />
 

@@ -374,7 +374,7 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
 }
 
 
-static inline int ScaleXAndPivot(const BitmapBgraPtr pSrc,
+static int ScaleXAndPivot(const BitmapBgraPtr pSrc,
     const BitmapBgraPtr pDst, const InterpolationDetailsPtr details, float *lut)
 {
     unsigned int line_ndx;
