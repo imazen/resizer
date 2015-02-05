@@ -36,7 +36,7 @@ namespace ImageResizer{
 					}
                     
                     int withHalving = 0;
-                    String^ turbo = query->Get("turbo");
+                    String^ turbo = query->Get("f.turbo");
                     if (turbo == sTrue)
                         withHalving = 1;
 
