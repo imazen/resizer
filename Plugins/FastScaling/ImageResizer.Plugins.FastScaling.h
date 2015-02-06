@@ -5,3 +5,4 @@
 #include "halving.h"
 #include "scaling.h"
 #include "filters.h"
+#include "sharpening.h"

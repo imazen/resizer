@@ -38,6 +38,9 @@
     <ClInclude Include="filters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="sharpening.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImageResizer.Plugins.FastScaling.cpp">

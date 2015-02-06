@@ -167,6 +167,7 @@
     <ClInclude Include="ImageResizer.Plugins.FastScaling.h" />
     <ClInclude Include="scaling.h" />
     <ClInclude Include="shared.h" />
+    <ClInclude Include="sharpening.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="weighting.h" />
   </ItemGroup>
