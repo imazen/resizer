@@ -136,7 +136,7 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
         if (use_luv){
             for (bix = 0; bix < source_buffer_len; bix += source_bitmap->bpp)
             {
-                linear_to_luv(src_row_start + bix);
+                linear_to_yxz(src_row_start + bix);
             }
         }
 
@@ -151,7 +151,7 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
         if (use_luv){
             for (bix = 0; bix < dest_buffer_len; bix += dest->bpp)
             {
-                luv_to_linear(dest_row_start + bix);
+                yxz_to_linear(dest_row_start + bix);
             }
         }
     }

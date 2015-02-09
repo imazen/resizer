@@ -177,7 +177,17 @@ static inline void linear_to_luv_2(float * bgr){
     bgr[2] = luv_v;
 
 }
+static inline void linear_to_yxz(float * bgr){
 
+    const float R = bgr[2];
+    const float G = bgr[1];
+    const float B = bgr[0];
+
+    bgr[0] = 0.212671*R + 0.71516 *G + 0.072169*B; //Y
+    bgr[1] = 0.412453*R + 0.35758 *G + 0.180423*B; //X
+    bgr[2] = 0.019334*R + 0.119193*G + 0.950227*B; //Z
+
+}
 
 static inline void linear_to_luv(float * bgr){
     //Observer= 2°, Illuminant= D65
@@ -243,6 +253,18 @@ static inline void luv_to_linear(float * luv){
     const float g = -0.969256*X + 1.875991*Y + 0.041556*Z;
     const float b = 0.055648*X - 0.204043*Y + 1.057311*Z;
     luv[0] = b; luv[1] = g; luv[2] = r;
+
+}
+
+static inline void yxz_to_linear(float * yxz){
+    //D65 white point :
+    const float Y = yxz[0];
+    const float X = yxz[1];
+    const float Z = yxz[2];
+
+    yxz[2] = 3.240479*X - 1.53715 *Y - 0.498535*Z; //r
+    yxz[1] = -0.969256*X + 1.875991*Y + 0.041556*Z; //g
+    yxz[0] = 0.055648*X - 0.204043*Y + 1.057311*Z; //b
 
 }
 
