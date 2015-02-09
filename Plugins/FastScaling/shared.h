@@ -83,6 +83,7 @@ typedef struct InterpolationDetailsStruct{
     double integrated_sharpen_percent;
     float * convolution_kernel;
     int kernel_radius;
+    float kernel_threshold;
     float unsharp_sigma;
     //If greater than 0, a percentage to sharpen the result along each axis;
     double post_resize_sharpen_percent;

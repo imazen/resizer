@@ -90,13 +90,17 @@ int step = 4){
 
 
 static void
-ConvolveBgraFloatInPlace(float *source_buffer, const unsigned int source_buffer_count, unsigned int source_buffer_len, const float *kernel, const int radius,
+ConvolveBgraFloatInPlace(float *source_buffer, const unsigned int source_buffer_count, unsigned int source_buffer_len, const float *kernel, const int radius, float threshold,
 const int step = 4){
 
     if (source_buffer_count < radius + 1) return; //Do nothing unless the image is at least half as wide as the kernel.
     unsigned int ndx;
     const int buffer_count = radius + 1;
-    float*  buffer = (float *)malloc(sizeof(float) * buffer_count * step);
+    float* buffer = (float *)malloc(sizeof(float) * buffer_count * step);
+    float* total_delta = NULL;
+    if (threshold > 0){
+        total_delta = (float *)malloc(sizeof(float) * buffer_count);
+    }
     float * avg = (float *)malloc(sizeof(float) * step);
     int circular_idx = 0;
 
@@ -104,8 +108,10 @@ const int step = 4){
     for (ndx = 0; ndx < source_buffer_count + buffer_count; ndx++) {
         //Flush old value
         if (ndx >= buffer_count){
-            for (int j = 0; j < step; j++)
-                source_buffer[(ndx - buffer_count) * step + j] = buffer[circular_idx * step + j];
+            memcpy(&source_buffer[(ndx - buffer_count) * step], &buffer[circular_idx * step], step * sizeof(float));
+
+            //for (int j = 0; j < step; j++)
+            //    source_buffer[(ndx - buffer_count) * step + j] = buffer[circular_idx * step + j];
         }
         //Calculate and enqueue new value
         if (ndx < source_buffer_count){
@@ -134,15 +140,31 @@ const int step = 4){
                 }
             }
 
-            //Enqueue new value
-            for (int j = 0; j < step; j++)
-                buffer[circular_idx * step + j] = avg[j];
+            //Enqueue difference
+            memcpy(&buffer[circular_idx * step], avg, step * sizeof(float));
+
+            //for (int j = 0; j < step; j++)
+            //    buffer[circular_idx * step + j] = avg[j];
+
+            if (threshold > 0){
+                float change = 0;
+                for (int j = 0; j < step; j++)
+                    change += fabs(source_buffer[ndx * step + j] - avg[j]);
+                if (change < threshold){
+                    memcpy(&buffer[circular_idx * step], &source_buffer[ndx * step], step * sizeof(float));
+
+                    //for (int j = 0; j < step; j++)
+                    //    buffer[circular_idx * step + j] = source_buffer[ndx * step + j] - avg[j];
+
+                }
+            }
         }
         circular_idx = (circular_idx + 1) % buffer_count;
 
     }
     free(avg);
     free(buffer);
+    free(total_delta);
 }
 
 

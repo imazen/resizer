@@ -66,6 +66,9 @@ namespace ImageResizer{
                     double unsharp_sigma = System::String::IsNullOrEmpty(query->Get("f.unsharp.sigma")) ? 1.4 :
                         System::Double::Parse(query->Get("f.unsharp.sigma"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
+                    double threshold = System::String::IsNullOrEmpty(query->Get("f.unsharp.threshold")) ? 0 :
+                        System::Double::Parse(query->Get("f.unsharp.threshold"), System::Globalization::NumberFormatInfo::InvariantInfo);
+
 
 
 					RectangleF targetBox = ImageResizer::Util::PolygonMath::GetBoundingBox(targetArea);
@@ -127,6 +130,7 @@ namespace ImageResizer{
                     details->use_interpolation_for_percent = min_scaled_weighted > 0 ? min_scaled_weighted :  0.3;
                     details->integrated_sharpen_percent = integ_sharpen;
                     details->linear_sharpen = linear_sharpen;
+                    details->kernel_threshold = threshold;
 
                     if (window != 0) details->window = window;
 
