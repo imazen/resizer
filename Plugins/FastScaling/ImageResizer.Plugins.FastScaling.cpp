@@ -60,9 +60,10 @@ namespace ImageResizer{
                     double min_scaled_weighted = System::String::IsNullOrEmpty(query->Get("f.min_scaled_weighted")) ? 0 :
                         System::Double::Parse(query->Get("f.min_scaled_weighted"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
+
                     int kernel_radius = System::String::IsNullOrEmpty(query->Get("f.unsharp.radius")) ? 0 :
                         System::Double::Parse(query->Get("f.unsharp.radius"), System::Globalization::NumberFormatInfo::InvariantInfo);
-                    double unsharp_sigma = System::String::IsNullOrEmpty(query->Get("f.unsharp.sigma")) ? 0 :
+                    double unsharp_sigma = System::String::IsNullOrEmpty(query->Get("f.unsharp.sigma")) ? 1.4 :
                         System::Double::Parse(query->Get("f.unsharp.sigma"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
 

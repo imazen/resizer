@@ -90,60 +90,108 @@ int step = 4){
 
 
 static void
-ConvolveBgraFloatInPlace(float *source_buffer, unsigned int source_buffer_count, unsigned int source_buffer_len, const float *kernel, int radius,
-int step = 4){
+ConvolveBgraFloatInPlace(float *source_buffer, const unsigned int source_buffer_count, unsigned int source_buffer_len, const float *kernel, const int radius,
+const int step = 4){
+
+    if (source_buffer_count < radius + 1) return; //Do nothing unless the image is at least half as wide as the kernel.
+    unsigned int ndx;
+    const int buffer_count = radius + 1;
+    float*  buffer = (float *)malloc(sizeof(float) * buffer_count * step);
+    float * avg = (float *)malloc(sizeof(float) * step);
+    int circular_idx = 0;
+
+
+    for (ndx = 0; ndx < source_buffer_count + buffer_count; ndx++) {
+        //Flush old value
+        if (ndx >= buffer_count){
+            for (int j = 0; j < step; j++)
+                source_buffer[(ndx - buffer_count) * step + j] = buffer[circular_idx * step + j];
+        }
+        //Calculate and enqueue new value
+        if (ndx < source_buffer_count){
+            const int left = ndx - radius;
+            const int right = ndx + radius;
+            int i;
+
+            memset(avg, 0, sizeof(float) * step);
+
+            if (left < 0 || right >= source_buffer_count){
+                /* Accumulate each channel */
+                for (i = left; i <= right; i++) {
+                    const float weight = kernel[i - left];
+                    //const int ix = i < 0 ? i * -1 : i >= source_buffer_count ? (source_buffer_count - i + source_buffer_count - 2) : i;
+                    const int ix = i < 0 ? 0 : i >= source_buffer_count ? source_buffer_count - 1 : i;
+                    for (int j = 0; j < step; j++)
+                        avg[j] += weight * source_buffer[ix * step + j];
+                }
+            }
+            else{
+                /* Accumulate each channel */
+                for (i = left; i <= right; i++) {
+                    const float weight = kernel[i - left];
+                    for (int j = 0; j < step; j++)
+                        avg[j] += weight * source_buffer[i * step + j];
+                }
+            }
+
+            //Enqueue new value
+            for (int j = 0; j < step; j++)
+                buffer[circular_idx * step + j] = avg[j];
+        }
+        circular_idx = (circular_idx + 1) % buffer_count;
+
+    }
+    free(avg);
+    free(buffer);
+}
+
+
+static void
+ConvolveBgraFloatDoubleBuffer(float *source_buffer, const unsigned int source_buffer_count, unsigned int source_buffer_len, const float *kernel, const int radius,
+const int step = 4){
+
+    float *buf = (float*)malloc(sizeof(float) * source_buffer_len);
+    memcpy(buf, source_buffer, sizeof(float) * source_buffer_len);
+
 
     unsigned int ndx;
+    float * avg = (float *)malloc(sizeof(float) * step);
 
-    // if both have alpha, process it
-    if (step == 4)
-    {
-        for (ndx = radius; ndx < source_buffer_count - radius; ndx++) {
-            float r = 0, g = 0, b = 0, a = 0;
+
+    for (ndx = 0; ndx < source_buffer_count; ndx++) {
+
             const int left = ndx - radius;
             const int right = ndx + radius;
             int i;
 
-            /* Accumulate each channel */
-            for (i = left; i <= right; i++) {
-                const float weight = kernel[i - left];
+            memset(avg, 0, sizeof(float) * step);
 
-                b += weight * source_buffer[i * 4];
-                g += weight * source_buffer[i * 4 + 1];
-                r += weight * source_buffer[i * 4 + 2];
-                a += weight * source_buffer[i * 4 + 3];
+            if (left < 0 || right >= source_buffer_count){
+                /* Accumulate each channel */
+                for (i = left; i <= right; i++) {
+                    const float weight = kernel[i - left];
+                    const int ix = i < 0 ? i * -1 : i >= source_buffer_count ? (source_buffer_count - i + source_buffer_count - 2) : i;
+                    for (int j = 0; j < step; j++)
+                        avg[j] += weight * buf[ix * step + j];
+                }
             }
-            //Todo - add threshold
-            source_buffer[ndx * 4] = b;
-            source_buffer[ndx * 4 + 1] = g;
-            source_buffer[ndx * 4 + 2] = r;
-            source_buffer[ndx * 4 + 3] = a;
-        }
-    }
-    // otherwise do the same thing without 4th chan
-    // (ifs in loops are expensive..)
-    else
-    {
-        for (ndx = radius; ndx < source_buffer_count - radius; ndx++) {
-            float r = 0, g = 0, b = 0;
-            const int left = ndx - radius;
-            const int right = ndx + radius;
-            int i;
-
-            /* Accumulate each channel */
-            for (i = left; i <= right; i++) {
-                const float weight = kernel[i - left];
-
-                b += weight * source_buffer[i * step];
-                g += weight * source_buffer[i * step + 1];
-                r += weight * source_buffer[i * step + 2];
+            else{
+                /* Accumulate each channel */
+                for (i = left; i <= right; i++) {
+                    const float weight = kernel[i - left];
+                    for (int j = 0; j < step; j++)
+                        avg[j] += weight * buf[i * step + j];
+                }
             }
 
-            source_buffer[ndx * step] = b;
-            source_buffer[ndx * step + 1] = g;
-            source_buffer[ndx * step + 2] = r;
-        }
+
+
+            //Store values
+            for (int j = 0; j < step; j++)
+                source_buffer[ndx * step + j] = avg[j];
+       
     }
+    free(buf);
 
 }
 

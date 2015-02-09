@@ -8,7 +8,7 @@ float* create_guassian_kernel(double stdDev, double radius){
     int size = radius * 2 + 1;
     float *kernel = (float *)malloc(sizeof(float) * size);
     for (int i = 0; i < size; i++){
-        kernel[i] = IR_GUASSIAN(i - radius, stdDev);
+        kernel[i] = IR_GUASSIAN(fabs(radius - i), stdDev);
     }
     return kernel;
 }
@@ -26,6 +26,12 @@ void normalize_kernel(float* kernel, int size, double desiredSum){
     for (int i = 0; i < size; i++){
         kernel[i] *= factor;
     }
+}
+float* create_guassian_kernel_normalized(double stdDev, double radius){
+    float *kernel = create_guassian_kernel(stdDev, radius);
+    int size = radius * 2 + 1;
+    normalize_kernel(kernel, size, 1);
+    return kernel;
 }
 
 float* create_guassian_sharpen_kernel(double stdDev, double radius){
