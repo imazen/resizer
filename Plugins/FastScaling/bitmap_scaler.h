@@ -202,7 +202,7 @@ namespace ImageResizer{
 
                     
                     if (details->kernel_radius > 0){
-                        details->convolution_kernel = create_guassian_kernel_normalized(details->unsharp_sigma, details->kernel_radius);
+                        details->convolution_kernel = create_guassian_sharpen_kernel(details->unsharp_sigma, details->kernel_radius);
                     }
 
 
