@@ -98,7 +98,7 @@ float *dest_buffer, unsigned int dest_buffer_count, unsigned int dest_buffer_len
 
 
 
-static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int start_row, unsigned int row_count, ContributionType * weights, BitmapBgraPtr dest, float *source_buffers, unsigned int source_buffer_len, float *dest_buffers, unsigned int dest_buffer_len, float *lut, float sharpen_percent, float *kernel, int kernel_radius, float kernel_threshold){
+static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int start_row, unsigned int row_count, ContributionType * weights, BitmapBgraPtr dest, float *source_buffers, unsigned int source_buffer_len, float *dest_buffers, unsigned int dest_buffer_len, float *lut, float sharpen_percent, float *kernel, int kernel_radius, float kernel_threshold, bool use_luv){
 
     register unsigned int row, bix, bufferSet;
     const register unsigned int from_pixel_count = source_bitmap->w;
@@ -123,24 +123,43 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
                 source_buffers[row * source_buffer_len + bix + 3] = lut[src_start[bix + 3]];
             }
         }
+
+
     }
 
     //Actual scaling seems responsible for about 40% of execution time
     for (bufferSet = 0; bufferSet < row_count; bufferSet++){
-        ScaleBgraFloat(source_buffers + (source_buffer_len * bufferSet), from_pixel_count, source_buffer_len,
-            dest_buffers + (dest_buffer_len * bufferSet), to_pixel_count, dest_buffer_len, weights, source_bitmap->bpp, dest->bpp);
+
+        float *src_row_start = source_buffers + (source_buffer_len * bufferSet);
+        float *dest_row_start = dest_buffers + (dest_buffer_len * bufferSet);
+
+        if (use_luv){
+            for (bix = 0; bix < source_buffer_len; bix += source_bitmap->bpp)
+            {
+                linear_to_luv(src_row_start + bix);
+            }
+        }
+
+        ScaleBgraFloat(src_row_start, from_pixel_count, source_buffer_len, dest_row_start, to_pixel_count, dest_buffer_len, weights, source_bitmap->bpp, dest->bpp);
         if (kernel_radius > 0){
-            ConvolveBgraFloatInPlace(dest_buffers + (dest_buffer_len * bufferSet), to_pixel_count, dest_buffer_len, kernel, kernel_radius,kernel_threshold, dest->bpp);
+            ConvolveBgraFloatInPlace(dest_row_start, to_pixel_count, dest_buffer_len, kernel, kernel_radius, kernel_threshold, dest->bpp, use_luv ? 1 : dest->bpp);
         }
         if (sharpen_percent > 0){
-            SharpenBgraFloatInPlace(dest_buffers + (dest_buffer_len * bufferSet), to_pixel_count, sharpen_percent, dest->bpp);
+            SharpenBgraFloatInPlace(dest_row_start, to_pixel_count, sharpen_percent, dest->bpp);
+        }
+
+        if (use_luv){
+            for (bix = 0; bix < dest_buffer_len; bix += dest->bpp)
+            {
+                luv_to_linear(dest_row_start + bix);
+            }
         }
     }
-    
 
     unsigned char *dst_start = dest->pixels + start_row * dest->bpp;
     int stride_offset = dest->stride - dest->bpp * row_count;
     float out_alpha;
+
 
 
     if (source_bitmap->bpp == 4 && source_bitmap->alpha_meaningful)
@@ -256,7 +275,7 @@ static int ScaleXAndPivot(const BitmapBgraPtr pSrc,
     for (line_ndx = 0; line_ndx < pSrc->h; line_ndx += buffer) {
 
         ScaleXAndPivotRows(pSrc, line_ndx, MIN(pSrc->h - line_ndx, buffer), contrib->ContribRow, pDst,
-            sourceBuffers, source_buffer_len, destBuffers, dest_buffer_len, lut,details->linear_sharpen ? details->post_resize_sharpen_percent : 0,details->convolution_kernel,details->kernel_radius, details->kernel_threshold);
+            sourceBuffers, source_buffer_len, destBuffers, dest_buffer_len, lut,details->linear_sharpen ? details->post_resize_sharpen_percent : 0,details->convolution_kernel,details->kernel_radius, details->kernel_threshold, details->use_luv);
     }
 
     free(sourceBuffers);

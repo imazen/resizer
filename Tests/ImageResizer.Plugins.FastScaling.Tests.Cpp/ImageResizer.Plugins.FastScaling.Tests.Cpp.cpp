@@ -240,5 +240,62 @@ namespace ImageResizerPluginsFastScalingTestsCpp {
 
             Assert::True(*px == *tst, "Expected: " + tst->ToString() + " Got: " + px->ToString());
         }
+
+
+
+        [Fact]
+        void TestLinearToLuvZero(){
+            float bgra[4];
+
+            bgra[0] = 0;
+            bgra[1] = 0;
+            bgra[2] = 0;
+            bgra[3] = 0;
+
+            linear_to_luv(bgra);
+
+            Assert::InRange(bgra[0], 0.0f, 0.0f);
+            Assert::InRange(bgra[1], 100.0f, 101.0f);
+            Assert::InRange(bgra[2], 100.0f, 101.0f);
+
+        }
+
+
+        [Fact]
+        void TestLuv(){
+            float bgra[4];
+
+            bgra[0] = 0.2;
+            bgra[1] = 0.2;
+            bgra[2] = 0.2;
+            bgra[3] = 1;
+
+            linear_to_luv(bgra);
+            luv_to_linear(bgra);
+
+            Assert::InRange(bgra[0], 0.199f, 0.201f);
+            Assert::InRange(bgra[1], 0.199f, 0.201f);
+            Assert::InRange(bgra[2], 0.199f, 0.201f);
+
+        }
+
+        [Fact]
+        void TestLuvZero(){
+            float bgra[4];
+
+            bgra[0] = 0;
+            bgra[1] = 0;
+            bgra[2] =0;
+            bgra[3] =0;
+
+            linear_to_luv(bgra);
+            luv_to_linear(bgra);
+
+            Assert::Equal(0.0f, bgra[0]);
+            Assert::Equal(0.0f, bgra[1]);
+            Assert::Equal(0.0f, bgra[2]);
+            Assert::Equal(0.0f, bgra[3]);
+
+        }
     };
 }

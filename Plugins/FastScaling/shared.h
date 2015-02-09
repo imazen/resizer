@@ -90,7 +90,7 @@ typedef struct InterpolationDetailsStruct{
     //Reserved for passing data to new filters
     int filter_var_a;
     bool linear_sharpen;
-
+    bool use_luv;
 }InterpolationDetails;
 
 
@@ -141,6 +141,112 @@ linear_to_srgb(float clr) {
     // a = 0.055; ret ((1+a) * s**(1/2.4) - a) * 255
     return 1.055f * pow(clr, 0.41666666f) * 255.0f - 14.025f;
 }
+
+
+static inline void linear_to_luv_2(float * bgr){
+    //Observer= 2°, Illuminant= D65
+
+    const float r = bgr[2];
+    const float g = bgr[1];
+    const float b = bgr[0];
+ 
+    const float x = r * 0.4124 + g * 0.3576 + b * 0.1805;
+    const float y = r * 0.2126 + g * 0.7152 + b * 0.0722;
+    const float z = r * 0.0193 + g * 0.1192 + b * 0.9505;
+
+    const float u = (4 * x) / (x + (15 * y) + (3 * z));
+    const float v = (9 * y) / (x + (15 * y) + (3 * z));
+
+
+    float var_Y = y / 100;
+    if (var_Y > 0.008856) var_Y = pow(var_Y, (1 / 3));
+    else                    var_Y = (7.787 * var_Y) + (16 / 116);
+
+    const float ref_X = 95.047;
+    const float ref_Y = 100.000;
+    const float ref_Z = 108.883;
+
+    const float ref_U = (4 * ref_X) / (ref_X + (15 * ref_Y) + (3 * ref_Z));
+    const float ref_V = (9 * ref_Y) / (ref_X + (15 * ref_Y) + (3 * ref_Z));
+
+    const float luv_l = (116 * var_Y) - 16;
+    const float luv_u = 13 * luv_l * (u - ref_U);
+    const float luv_v = 13 * luv_l * (v - ref_V);
+    bgr[0] = luv_l;
+    bgr[1] = luv_u;
+    bgr[2] = luv_v;
+
+}
+
+
+static inline void linear_to_luv(float * bgr){
+    //Observer= 2°, Illuminant= D65
+
+    const float xn = 0.312713;
+    const float yn = 0.329016;
+    const float Yn = 1.0;
+    const float un = 4 * xn / (-2 * xn + 12 * yn + 3);
+    const float vn = 9 * yn / (-2 * xn + 12 * yn + 3);
+    const float y_split = 0.00885645;
+    const float y_adjust = 903.3;
+
+    const float R = bgr[2];
+    const float G = bgr[1];
+    const float B = bgr[0];
+
+    if (R == 0 && G == 0 && B == 0){
+        bgr[0] = 0;
+        bgr[1] = bgr[2] = 100;
+        return;
+    }
+
+    const float X = 0.412453*R + 0.35758 *G + 0.180423*B;
+    const float Y = 0.212671*R + 0.71516 *G + 0.072169*B;
+    const float Z = 0.019334*R + 0.119193*G + 0.950227*B;
+
+
+
+    const float Yd = Y / Yn;
+
+    const float u = 4 * X / (X + 15 * Y + 3 * Z);
+    const float v = 9 * Y / (X + 15 * Y + 3 * Z);
+    const float L = bgr[0] /* L */ = Yd > y_split ? (116 * pow(Yd, (float)(1.0 / 3.0)) - 16) : y_adjust * Yd;
+    bgr[1]/* U */ = 13 * L*(u - un) + 100;
+    bgr[2] /* V */ = 13 * L*(v - vn) + 100;
+}
+
+static inline void luv_to_linear(float * luv){
+    //D65 white point :
+    const float L = luv[0];
+    const float U = luv[1] - 100;
+    const float V = luv[2] - 100;
+    if (L == 0){
+        luv[0] = luv[1] = luv[2] = 0;
+        return;
+    }
+
+    const float xn = 0.312713;
+    const float yn = 0.329016;
+    const float Yn =1.0;
+    const float un = 4 * xn / (-2 * xn + 12 * yn + 3);
+    const float vn = 9 * yn / (-2 * xn + 12 * yn + 3);
+    const float y_adjust_2 = 0.00110705645;
+
+    const float u = U / (13 * L) + un;
+    const float v = V / (13 * L) + vn;
+    const float Y = L > 8 ? Yn * pow((L + 16) / 116, 3) : Yn * L * y_adjust_2;
+    const float X = (9 / 4.0) * Y * u / v;// -9 * Y * u / ((u - 4) * v - u * v) = (9 / 4) * Y * u / v;
+    const float Z = (9 * Y - 15 * v * Y - v * X) / (3 * v);
+
+
+    const float r = 3.240479*X - 1.53715 *Y - 0.498535*Z;
+    const float g = -0.969256*X + 1.875991*Y + 0.041556*Z;
+    const float b = 0.055648*X - 0.204043*Y + 1.057311*Z;
+    luv[0] = b; luv[1] = g; luv[2] = r;
+
+}
+
+
 
 static inline unsigned char
 uchar_clamp_ff(float clr) {
@@ -267,5 +373,7 @@ static InterpolationDetailsPtr CreateInterpolationDetails(){
     d->kernel_radius = 0;
     d->unsharp_sigma = 1.4;
     d->linear_sharpen = true;
+    d->kernel_threshold = 0;
+    d->use_luv = true;
     return d;
 }

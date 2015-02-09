@@ -51,6 +51,9 @@ namespace ImageResizer{
 
                     bool linear_sharpen = System::String::IsNullOrEmpty(query->Get("f.ss")) ? false : true;
 
+                    bool luv_sharpen = System::String::IsNullOrEmpty(query->Get("f.rgb")) ? true : false;
+
+
                     double neg_mult = System::String::IsNullOrEmpty(query->Get("f.nm")) ? 1 :
                         System::Double::Parse(query->Get("f.nm"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
@@ -131,6 +134,7 @@ namespace ImageResizer{
                     details->integrated_sharpen_percent = integ_sharpen;
                     details->linear_sharpen = linear_sharpen;
                     details->kernel_threshold = threshold;
+                    details->use_luv = luv_sharpen;
 
                     if (window != 0) details->window = window;
 
