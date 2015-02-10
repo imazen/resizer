@@ -133,14 +133,18 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
         float *src_row_start = source_buffers + (source_buffer_len * bufferSet);
         float *dest_row_start = dest_buffers + (dest_buffer_len * bufferSet);
 
+       
+        ScaleBgraFloat(src_row_start, from_pixel_count, source_buffer_len, dest_row_start, to_pixel_count, dest_buffer_len, weights, source_bitmap->bpp, dest->bpp);
+        
+        
         if (use_luv){
-            for (bix = 0; bix < source_buffer_len; bix += source_bitmap->bpp)
+            for (bix = 0; bix < dest_buffer_len; bix += dest->bpp)
             {
-                linear_to_yxz(src_row_start + bix);
+                linear_to_luv(dest_row_start + bix);
             }
         }
 
-        ScaleBgraFloat(src_row_start, from_pixel_count, source_buffer_len, dest_row_start, to_pixel_count, dest_buffer_len, weights, source_bitmap->bpp, dest->bpp);
+
         if (kernel_radius > 0){
             ConvolveBgraFloatInPlace(dest_row_start, to_pixel_count, dest_buffer_len, kernel, kernel_radius, kernel_threshold, dest->bpp, use_luv ? 1 : dest->bpp);
         }
@@ -151,7 +155,7 @@ static inline void ScaleXAndPivotRows(BitmapBgraPtr source_bitmap, unsigned int 
         if (use_luv){
             for (bix = 0; bix < dest_buffer_len; bix += dest->bpp)
             {
-                yxz_to_linear(dest_row_start + bix);
+                luv_to_linear(dest_row_start + bix);
             }
         }
     }
