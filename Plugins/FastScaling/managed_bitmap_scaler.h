@@ -74,7 +74,7 @@ namespace ImageResizer{
                                 pin_ptr<float> row = &colorMatrix[i][0];
                                 cm[i] = row;
                             }
-                            InternalApplyMatrix(bbResult->bgra, cm);
+                            apply_color_matrix(bbResult->bgra, cm);
                             p->Stop("ApplyMatrix", false, true);
                         }
 
@@ -156,12 +156,12 @@ namespace ImageResizer{
                     if (src->bpp == 4 && dst->bpp == 4)
                     {
                         // recalculate line width as it can be different from the stride
-                        for (int y = 0; y < src->h; y++)
+                        for (uint32_t y = 0; y < src->h; y++)
                             memcpy(dst->pixels + y*dst->stride, src->pixels + y*src->stride, src->w*src->bpp);
                     }
                     else if (src->bpp == 3 && dst->bpp == 4)
                     {
-                        for (int y = 0; y < src->h; y++)
+                        for (uint32_t y = 0; y < src->h; y++)
                             unpack24bitRow(src->w, src->pixels + y*src->stride, dst->pixels + y*dst->stride);
                     }
                     else{
@@ -188,14 +188,14 @@ namespace ImageResizer{
 
                     // Store gamma adjusted in 256-511, linear in 0-255
                     float lut[512];
-                    float a = 0.055;
+                    float a = 0.055f;
                     
-                    for (int n = 0; n < 256; n++)
+                    for (uint32_t n = 0; n < 256; n++)
                     {
                         lut[n] = float(n);
-                        float s = n / 255.0;
-                        if (s <= 0.04045)
-                            lut[256 + n] = s / 12.92;
+                        float s = n / 255.0f;
+                        if (s <= 0.04045f)
+                            lut[256 + n] = s / 12.92f;
                         else
                             lut[256 + n] = pow((s + a) / (1 + a), 2.4f);
                     }
@@ -218,7 +218,10 @@ namespace ImageResizer{
                         p->Stop("create temp image(sy x dx)", true, false);
 
                         p->Start("scale and pivot to temp", false);
-                        ScaleXAndPivot(source, tmp_im, details, lut);
+                        int result = ScaleXAndPivot(source, tmp_im, details, lut);
+                        if (result){
+                            throw gcnew Exception("Error code returned");
+                        }
                         p->Stop("scale and pivot to temp", true, false);
 
                         if (details->post_resize_sharpen_percent > 0 && !details->linear_sharpen){
@@ -229,7 +232,10 @@ namespace ImageResizer{
 
 
                         p->Start("scale and pivot to final", false);
-                        ScaleXAndPivot(tmp_im, dst, details, lut);
+                        result = ScaleXAndPivot(tmp_im, dst, details, lut);
+                        if (result){
+                            throw gcnew Exception("Error code returned");
+                        }
                         p->Stop("scale and pivot to final", true, false);
 
                         if (details->post_resize_sharpen_percent > 0 && !details->linear_sharpen){
@@ -254,8 +260,6 @@ namespace ImageResizer{
 
 
                 WrappedBitmap^ WrapBitmapAsBgra(Bitmap^ source, Rectangle from, bool readonly, bool alpha_meaningful){
-                    int i;
-                    int j;
                     bool hasAlpha = source->PixelFormat == PixelFormat::Format32bppArgb || source->PixelFormat == PixelFormat::Format32bppPArgb;
                     if (source->PixelFormat != PixelFormat::Format32bppArgb && source->PixelFormat != PixelFormat::Format24bppRgb && source->PixelFormat != PixelFormat::Format32bppPArgb){
                         throw gcnew ArgumentOutOfRangeException("source", "Invalid pixel format " + source->PixelFormat.ToString());

@@ -4,5 +4,5 @@
 #include "weighting.h"
 #include "halving.h"
 #include "scaling.h"
-#include "filters.h"
+#include "convolution.h"
 #include "sharpening.h"

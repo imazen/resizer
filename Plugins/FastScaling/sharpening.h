@@ -5,15 +5,15 @@
 
 
 
-static void BgraSharpenInPlaceX(BitmapBgraPtr im, int pct)
+static void BgraSharpenInPlaceX(BitmapBgraPtr im, float pct)
 {
-    int x, y, current, prev, next, i;
+    uint32_t y, current, prev, next;
 
-    const int sx = im->w;
-    const int sy = im->h;
-    const int stride = im->stride;
-    const int bpp = im->bpp;
-    const float outer_coeff = -pct / 400.0;
+    const uint32_t sx = im->w;
+    const uint32_t sy = im->h;
+    const uint32_t stride = im->stride;
+    const uint32_t bpp = im->bpp;
+    const float outer_coeff = -pct / 400.0f;
     const float inner_coeff = 1 - 2 * outer_coeff;
 
     if (pct <= 0 || im->w < 3 || bpp < 3) return;
@@ -23,7 +23,7 @@ static void BgraSharpenInPlaceX(BitmapBgraPtr im, int pct)
         unsigned char *row = im->pixels + y * stride;
         for (current = bpp, prev = 0, next = bpp + bpp; next < stride; prev = current, current = next, next += bpp){
             //We never sharpen the alpha channel
-            for (int i = 0; i < 3; i++)
+            for (uint32_t i = 0; i < 3; i++)
                 row[current + i] = uchar_clamp_ff(outer_coeff * (float)row[prev + i] + inner_coeff * (float)row[current + i] + outer_coeff * (float)row[next + i]);
         }
     }
@@ -34,7 +34,7 @@ static void
 SharpenBgraFloatInPlace(float* buf, unsigned int count, double pct,
 int step = 4){
 
-    const float c_o = -pct / 400.0;
+    const float c_o = (float)(-pct / 400.0f);
     const float c_i = 1 - 2 * c_o;
 
     unsigned int ndx;
@@ -86,88 +86,5 @@ int step = 4){
 
 }
 
-
-
-
-static void
-ConvolveBgraFloatInPlace(float *source_buffer, const unsigned int source_buffer_count, unsigned int source_buffer_len, const float *kernel, const int radius, float threshold,
-const int step = 4, const int convolve_channels = 4){
-
-    if (source_buffer_count < radius + 1) return; //Do nothing unless the image is at least half as wide as the kernel.
-    unsigned int ndx;
-    const int buffer_count = radius + 1;
-    int circular_idx = 0;
-
-    bool luv = false;
-
-    if (luv){
-        for (ndx = 0; ndx < source_buffer_count; ndx++){
-            linear_to_luv(&source_buffer[ndx * step]);
-        }
-    }
-
-    const int ch_used = convolve_channels;// luv ? 1 : step;
-
-    float* buffer = (float *)malloc(sizeof(float) * buffer_count * ch_used);
-    float * avg = (float *)malloc(sizeof(float) * ch_used);
-    
-
-    for (ndx = 0; ndx < source_buffer_count + buffer_count; ndx++) {
-        //Flush old value
-        if (ndx >= buffer_count){
-            memcpy(&source_buffer[(ndx - buffer_count) * step], &buffer[circular_idx * ch_used], ch_used * sizeof(float));
-        }
-        //Calculate and enqueue new value
-        if (ndx < source_buffer_count){
-            const int left = ndx - radius;
-            const int right = ndx + radius;
-            int i;
-
-            memset(avg, 0, sizeof(float) * ch_used);
-
-            if (left < 0 || right >= source_buffer_count){
-                /* Accumulate each channel */
-                for (i = left; i <= right; i++) {
-                    const float weight = kernel[i - left];
-                    //const int ix = i < 0 ? i * -1 : i >= source_buffer_count ? (source_buffer_count - i + source_buffer_count - 2) : i;
-                    const int ix = i < 0 ? 0 : i >= source_buffer_count ? source_buffer_count - 1 : i;
-                    for (int j = 0; j < ch_used; j++)
-                        avg[j] += weight * source_buffer[ix * step + j];
-                }
-            }
-            else{
-                /* Accumulate each channel */
-                for (i = left; i <= right; i++) {
-                    const float weight = kernel[i - left];
-                    for (int j = 0; j < ch_used; j++)
-                        avg[j] += weight * source_buffer[i * step + j];
-                }
-            }
-
-            //Enqueue difference
-            memcpy(&buffer[circular_idx * ch_used], avg, ch_used * sizeof(float));
-
-            if (threshold > 0){
-                float change = 0;
-                for (int j = 0; j < ch_used; j++)
-                    change += fabs(source_buffer[ndx * step + j] - avg[j]);
-                
-                if (change < threshold){
-                    memcpy(&buffer[circular_idx * ch_used], &source_buffer[ndx * step], ch_used * sizeof(float));
-                }
-            }
-        }
-        circular_idx = (circular_idx + 1) % buffer_count;
-
-    }
-    if (luv){
-        for (ndx = 0; ndx < source_buffer_count; ndx++){
-            luv_to_linear(&source_buffer[ndx * step]);
-        }
-    }
-
-    free(avg);
-    free(buffer);
-}
 
 

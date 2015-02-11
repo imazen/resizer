@@ -83,7 +83,7 @@ static InterpolationDetailsPtr DetailsLanczosCustom(double window, double blur, 
     d->blur = blur;
     d->filter = filter_lanczos;
     d->window = window;
-    d->filter_var_a = width;
+    d->filter_var_a = (float)width;
     return d;
 }
 static InterpolationDetailsPtr DetailsTriangle(){
@@ -167,23 +167,25 @@ static InterpolationDetailsPtr DetailsHermite(){
 
 
 
-static inline LineContribType *  ContributionsAlloc(unsigned int line_length, unsigned int windows_size)
+static inline LineContribType *  ContributionsAlloc(const uint32_t line_length, const uint32_t windows_size)
 {
-    unsigned int u = 0;
-    LineContribType *res;
-
-    res = (LineContribType *)malloc(sizeof(LineContribType));
+    LineContribType *res = (LineContribType *)malloc(sizeof(LineContribType));
     if (!res) {
         return NULL;
     }
     res->WindowSize = windows_size;
     res->LineLength = line_length;
     res->ContribRow = (ContributionType *)malloc(line_length * sizeof(ContributionType));
-
+    if (!res->ContribRow) {
+        return NULL;
+    }
 
     float *allWeights = (float *)calloc(windows_size * line_length, sizeof(float));
+    if (!allWeights) {
+        return NULL;
+    }
 
-    for (int i = 0; i < line_length; i++)
+    for (uint32_t i = 0; i < line_length; i++)
         res->ContribRow[i].Weights = allWeights + (i * windows_size);
 
     return res;
@@ -217,7 +219,7 @@ static double percent_negative_weight(const InterpolationDetailsPtr details){
 }
 
 
-static LineContribType *ContributionsCalc(unsigned int line_size, unsigned int src_size, const InterpolationDetailsPtr details)
+static LineContribType *ContributionsCalc(const uint32_t line_size, const uint32_t src_size, const InterpolationDetailsPtr details)
 {
     const double sharpen_ratio =  percent_negative_weight(details);
     const double desired_sharpen_ratio = details->integrated_sharpen_percent / 100.0;
@@ -230,8 +232,8 @@ static LineContribType *ContributionsCalc(unsigned int line_size, unsigned int s
     const double downscale_factor = MIN(1.0, scale_factor);
     const double half_source_window = details->window * 0.5 / downscale_factor;
 
-    const int allocated_window_size = (int)ceil(2 * (half_source_window - TONY)) + 1;
-    unsigned int u, ix;
+    const uint32_t allocated_window_size = (int)ceil(2 * (half_source_window - TONY)) + 1;
+    uint32_t u, ix;
     LineContribType *res = ContributionsAlloc(line_size, allocated_window_size);
 
     for (u = 0; u < line_size; u++) {
@@ -240,12 +242,12 @@ static LineContribType *ContributionsCalc(unsigned int line_size, unsigned int s
         const int left_edge = (int)ceil(center_src_pixel - half_source_window - 0.5 + TONY);
         const int right_edge = (int)floor(center_src_pixel + half_source_window + 0.5 - TONY);
 
-        const int left_src_pixel = MAX(0, left_edge);
-        const int right_src_pixel = MIN(right_edge, (int)src_size - 1);
+        const uint32_t left_src_pixel = MAX(0, left_edge);
+        const uint32_t right_src_pixel = MIN(right_edge, (int)src_size - 1);
 
         double total_weight = 0.0;
 
-        const int source_pixel_count = right_src_pixel - left_src_pixel + 1;
+        const uint32_t source_pixel_count = right_src_pixel - left_src_pixel + 1;
 
         if (source_pixel_count > allocated_window_size){
             ContributionsFree(res);
@@ -268,7 +270,7 @@ static LineContribType *ContributionsCalc(unsigned int line_size, unsigned int s
             if (add < 0 && extra_negative_weight != 0){
                 add *= extra_negative_weight;
             }
-            weights[tx] = add;
+            weights[tx] = (float)add;
             total_weight += add;
         }
 
@@ -278,7 +280,7 @@ static LineContribType *ContributionsCalc(unsigned int line_size, unsigned int s
         }
 
         
-        const double total_factor = 1.0 / total_weight;
+        const float total_factor = (float)(1.0f / total_weight);
         for (ix = 0; ix < source_pixel_count; ix++) {
             weights[ix] *= total_factor;
         }

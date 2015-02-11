@@ -29,16 +29,28 @@
     <ClInclude Include="shared.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="bitmap_scaler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="colormatrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="filters.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="sharpening.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="color_spaces.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="math_functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bitmap_formats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="managed_bitmap_scaler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="convolution.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="color_matrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bitmap_compositing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,8 +2,8 @@
 
 #include "Stdafx.h"
 #include "ImageResizer.Plugins.FastScaling.h"
-#include "colormatrix.h"
-#include "bitmap_scaler.h"
+#include "color_matrix.h"
+#include "managed_bitmap_scaler.h"
 
 #pragma managed
 
@@ -64,7 +64,7 @@ namespace ImageResizer{
                         System::Double::Parse(query->Get("f.min_scaled_weighted"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
 
-                    int kernel_radius = System::String::IsNullOrEmpty(query->Get("f.unsharp.radius")) ? 0 :
+                    double kernel_radius = System::String::IsNullOrEmpty(query->Get("f.unsharp.radius")) ? 0 :
                         System::Double::Parse(query->Get("f.unsharp.radius"), System::Globalization::NumberFormatInfo::InvariantInfo);
                     double unsharp_sigma = System::String::IsNullOrEmpty(query->Get("f.unsharp.sigma")) ? 1.4 :
                         System::Double::Parse(query->Get("f.unsharp.sigma"), System::Globalization::NumberFormatInfo::InvariantInfo);
@@ -124,16 +124,16 @@ namespace ImageResizer{
                     }
 
                     details->allow_source_mutation = true;
-                    details->use_halving = withHalving;
+                    details->use_halving = withHalving == 1;
                     details->blur *= blur;
-                    details->post_resize_sharpen_percent = (int)sharpen;
+                    details->post_resize_sharpen_percent = (float)sharpen;
                     details->negative_multiplier = neg_mult;
-                    details->kernel_radius = kernel_radius;
-                    details->unsharp_sigma = unsharp_sigma;
+                    details->kernel_radius = (int)round(kernel_radius);
+                    details->unsharp_sigma = (float)unsharp_sigma;
                     details->use_interpolation_for_percent = min_scaled_weighted > 0 ? min_scaled_weighted :  0.3;
-                    details->integrated_sharpen_percent = integ_sharpen;
+                    details->integrated_sharpen_percent = (float)integ_sharpen;
                     details->linear_sharpen = linear_sharpen;
-                    details->kernel_threshold = threshold;
+                    details->kernel_threshold = (float)threshold;
                     details->use_luv = luv_sharpen;
 
                     if (window != 0) details->window = window;
@@ -165,7 +165,7 @@ namespace ImageResizer{
                 {
                     if (colorMatrix == nullptr) return;
 
-                    BitmapBgraPtr bb;
+                    BitmapBgraPtr bb = CreateBitmapBgraHeader(img->Width, img->Height);
                     WrappedBitmap ^wb = gcnew WrappedBitmap(img, bb);
                     float *cm[5];
                     for (int i = 0; i < 5; i++)
@@ -173,7 +173,7 @@ namespace ImageResizer{
                         pin_ptr<float> row = &colorMatrix[i][0];
                         cm[i] = row;
                     }
-                    InternalApplyMatrix(bb, cm);
+                    apply_color_matrix(bb, cm);
                     delete wb;
                 }
 			};
