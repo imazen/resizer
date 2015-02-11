@@ -53,6 +53,9 @@
     <ClInclude Include="bitmap_compositing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="rendering.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImageResizer.Plugins.FastScaling.cpp">

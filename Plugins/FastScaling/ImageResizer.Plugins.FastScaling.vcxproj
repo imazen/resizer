@@ -169,6 +169,7 @@
     <ClInclude Include="halving.h" />
     <ClInclude Include="ImageResizer.Plugins.FastScaling.h" />
     <ClInclude Include="math_functions.h" />
+    <ClInclude Include="rendering.h" />
     <ClInclude Include="scaling.h" />
     <ClInclude Include="shared.h" />
     <ClInclude Include="sharpening.h" />
