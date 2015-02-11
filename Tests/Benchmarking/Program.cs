@@ -438,7 +438,8 @@ namespace Bench
             settings.ExclusiveTimeSignificantMs = 1;
             var configs = new Tuple<Config, Instructions, string>[]{
                     new Tuple<Config, Instructions, string>(ConfigWithPlugins(),null,"System.Drawing"),
-                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true;window=1.4"),"FastScaling with superior quality")};
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true"),"FastScaling with superior quality"),
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true;f=8"),"FastScaling - lanczos")};
 
             Compare(settings, configs.Reverse());
 
