@@ -40,37 +40,41 @@ static void unpack24bitRow(uint32_t width, unsigned char* sourceLine, unsigned c
 
 
 
-static int convert_srgb_to_linear( BitmapBgraPtr src, const uint32_t from_row,   BitmapFloatPtr dest, const uint32_t dest_row, const uint32_t row_count, float* const __restrict lut){
+static int convert_srgb_to_linear(BitmapBgraPtr src, const uint32_t from_row, BitmapFloatPtr dest, const uint32_t dest_row, const uint32_t row_count, float* const __restrict lut){
 
-    if (src->w != dest->w || src->bpp != dest->channels) return -1;
-    
+    if (src->w != dest->w || src->bpp < dest->channels) return -1;
+
     const uint32_t w = src->w;
-    const uint32_t units = w * dest->channels;
+    const uint32_t units = w * src->bpp;
+    const uint32_t from_step = src->bpp;
+    const uint32_t to_step = src->bpp;
+    const uint32_t copy_step = MIN(from_step, to_step);
 
     for (uint32_t row = 0; row < row_count; row++)
     {
         const  uint8_t*   src_start = src->pixels + (from_row + row)*src->stride;
-        float* buf = dest->pixels   + (dest->float_stride * (row + dest_row));
-        if (src->bpp == 3)
+        float* buf = dest->pixels + (dest->float_stride * (row + dest_row));
+        if (copy_step == 3)
         {
-            for (uint32_t bix = 0; bix < units; bix += 3){
-                buf[bix] = srgb_to_linear(src_start[bix]);
-                buf[bix + 1] = srgb_to_linear(src_start[bix + 1]);
-                buf[bix + 2] = srgb_to_linear(src_start[bix + 2]);
+            for (uint32_t to_x = 0, bix = 0; bix < units; to_x += to_step, bix += from_step){
+                buf[to_x] = srgb_to_linear(src_start[bix]);
+                buf[to_x + 1] = srgb_to_linear(src_start[bix + 1]);
+                buf[to_x + 2] = srgb_to_linear(src_start[bix + 2]);
             }
         }
-        else if (src->bpp ==4)
+        else if (copy_step == 4)
         {
-            for (uint32_t bix = 0; bix < units; bix += 4)
-            {
-                buf[bix] = srgb_to_linear(premultiply_alpha(0));
-                buf[bix + 1] = srgb_to_linear(premultiply_alpha(1));
-                buf[bix + 2] = srgb_to_linear(premultiply_alpha(2));
-                buf[bix + 3] = lut[src_start[bix + 3]];
+            for (uint32_t to_x = 0, bix = 0; bix < units; to_x += to_step, bix += from_step){
+                {
+                    buf[to_x] = srgb_to_linear(premultiply_alpha(0));
+                    buf[to_x + 1] = srgb_to_linear(premultiply_alpha(1));
+                    buf[to_x + 2] = srgb_to_linear(premultiply_alpha(2));
+                    buf[to_x + 3] = lut[src_start[bix + 3]];
+                }
             }
         }
+        return 0;
     }
-    return 0;
 }
 
 

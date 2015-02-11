@@ -168,12 +168,13 @@ static int ScaleXAndPivot(const BitmapBgraPtr pSrc,
 
     uint32_t buffer = 4; //using buffer=5 seems about 6% better than most other non-zero values. 
 
-    BitmapFloatPtr source_buf = CreateBitmapFloat(pSrc->w, buffer, pSrc->bpp, false);
+    uint32_t scaling_bpp = (pSrc->bpp == 4 && !pSrc->alpha_meaningful) ? 3 : pSrc->bpp;
+
+    BitmapFloatPtr source_buf = CreateBitmapFloat(pSrc->w, buffer, scaling_bpp, false);
     if (source_buf == NULL)  { return_code = -1; goto cleanup; }
-    BitmapFloatPtr dest_buf = CreateBitmapFloat(pDst->h, buffer, pSrc->bpp, false);
+    BitmapFloatPtr dest_buf = CreateBitmapFloat(pDst->h, buffer, scaling_bpp, false);
     if (source_buf == NULL)  { return_code = -1; goto cleanup; }
     
-
     /* Scale each set of lines */
     for (line_ndx = 0; line_ndx < pSrc->h; line_ndx += buffer) {
         const uint32_t row_count = MIN(pSrc->h - line_ndx, buffer);
