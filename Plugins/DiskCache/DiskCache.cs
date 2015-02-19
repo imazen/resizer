@@ -50,7 +50,7 @@ namespace ImageResizer.Plugins.DiskCache
 
         private bool enabled = true;
         /// <summary>
-        /// Allows disk caching to be disabled for debuginng purposes. Defaults to true.
+        /// Allows disk caching to be disabled for debugging purposes. Defaults to true.
         /// </summary>
         public bool Enabled {
             get { return enabled; }
