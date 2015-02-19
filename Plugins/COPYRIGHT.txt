@@ -1,0 +1,25 @@
+This file applies to source code within most subdirectories of /Plugins
+
+Unless a subdirectory contains a COPYRIGHT.txt (or is a third-party library), this file shall apply.
+
+See /LICENSE.md for alternate license options and information about files outside this directory.
+
+The AGPL V3.0 is not your only license option. 
+
+Imazen sells a variety of commerical licenses to fit every need - including SaaS usage and OEM redistribution. Visit http://imageresizing.net/ for more impormation.
+
+
+Copyright (c) 2010-2015 Imazen LLC
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>
