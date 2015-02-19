@@ -22,6 +22,7 @@ Directories containing permissively licensed code ([Apache 2](#apache-2-license)
     /Tools/Builder
     /Tools/BuildTools
     /Tools/COMInstaller
+    /Tools/FakeBuilder
     /Samples/
     /Samples/CustomOverlayPlugin
     /Plugins/DiagnosticJson

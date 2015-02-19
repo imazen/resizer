@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+// This file is licensed CC0, and can be considered 'insignificant'
+// Apply whichever license you like
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System;

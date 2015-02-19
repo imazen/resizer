@@ -1,3 +1,7 @@
+// Copyright (c) Imazen LLC.
+// No part of this project, including this file, may be copied, modified,
+// propagated, or distributed except as permitted in COPYRIGHT.txt.
+// Licensed under the Apache License, Version 2.0.
 #r @"..\..\packages\FAKE.3.11.0\tools\FakeLib.dll"
 #r @"..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll"
 #r @"..\..\packages\AWSSDK.2.2.4.0\lib\net45\AWSSDK.dll"

@@ -1,17 +1,21 @@
-This license  applies to all source files in this directory (/Plugins/Logging) and its subdirectories.
-See /LICENSE.md for more information and alternate license options.
+This file applies to source code within the directory and subdirectories of:
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use these files except in compliance with the License.
-You may obtain a copy of the License at
+/Plugins/Logging
 
-    http://www.apache.org/licenses/LICENSE-2.0
+See /LICENSE.md for alternate license options and information about files outside this directory.
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+Copyright (c) 2011-2015 Imazen LLC <support@imageresizing.net> All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+these files except in compliance with the License. You may obtain a copy of the
+License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
 
 
 This project depends upon the NLog library. NLog is released under the following license:

@@ -1,0 +1,35 @@
+This file applies to source code within the directory and subdirectories of:
+
+/Tests
+
+With exceptions:
+
+This file does not apply to third-party javascript or CSS. 
+This file does not apply to dependencies or binaries.
+
+-----------
+ADVISORY
+
+Please note that CSS, javascript, binaries, and dependencies used by these test projects may be provided by their respective publishers under different licenses. It is your responsibility to locate and comply with the respective license terms for each dependency.
+
+Many ImageResizer plugins used in the tests are ONLY available under the AGPL or a commercial license, NOT the Apache license. You may need to either purchase a license or comply with the terms of the AGPL to use some plugins. 
+
+Worded differently, only the test code is Apache licensed - the software it tests may or may not be. 
+
+See /LICENSE.md for alternate license options and information about files outside this directory.
+-----------
+
+Copyright (c) 2008-2015 Imazen LLC <support@imageresizing.net> All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+these files except in compliance with the License. You may obtain a copy of the
+License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
+
+

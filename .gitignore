@@ -1,19 +1,27 @@
+/Samples/Images/
+/docs/docu/
+/docs/doxygen
+Tests/*/Results
+packages/
+
+#Folders for binaries and caches
 bin/
 obj/
 Debug/
 imagecache/
 dlls/
+
+#any image binaries
 *.jpg
 *.bmp
 *.png
 *.gif
 *.tiff
-/Samples/Images/
+
+
 *.pdb
 *.dll
 *.a
-/docs/*/
-Tests/*/Results
 .DS_Store
 ._*
 Thumbs.db
@@ -27,7 +35,6 @@ Thumbs.db
 _ReSharper*
 *App_Data/cair.exe
 *App_Data/pthreadVSE2.dll
-packages/
 NuGet.exe
 !NuGet.targets
 *.coverage
