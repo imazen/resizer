@@ -438,8 +438,9 @@ namespace Bench
             settings.ExclusiveTimeSignificantMs = 1;
             var configs = new Tuple<Config, Instructions, string>[]{
                     new Tuple<Config, Instructions, string>(ConfigWithPlugins(),null,"System.Drawing"),
-                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true"),"FastScaling with superior quality"),
-                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true;f=8"),"FastScaling - lanczos")};
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true;f=0;f.sharpen=15"),"FS FastCubic with sharpening"),
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true;f=10"),"FS Lanczos2sharp"),
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true;f=0&f.blur=0.75&f.window=0.6"),"FastSharp FastCubic constrainedsharp")};
 
             Compare(settings, configs.Reverse());
 
