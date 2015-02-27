@@ -55,7 +55,7 @@ float* create_guassian_sharpen_kernel(double stdDev, uint32_t radius){
 
 
 static int
-ConvolveBgraFloatInPlace(BitmapFloatPtr buf, const float *kernel, const uint32_t radius, float threshold, const uint32_t convolve_channels = 4, const uint32_t from_row = 0, const int row_count = -1){
+ConvolveBgraFloatInPlace(BitmapFloatPtr buf, const float *kernel, const uint32_t radius, float threshold_min, float threshold_max, const uint32_t convolve_channels = 4, const uint32_t from_row = 0, const int row_count = -1){
 
     if (buf->w < radius + 1) return -2; //Do nothing unless the image is at least half as wide as the kernel.
    
@@ -115,12 +115,12 @@ ConvolveBgraFloatInPlace(BitmapFloatPtr buf, const float *kernel, const uint32_t
                 //Enqueue difference
                 memcpy(&buffer[circular_idx * ch_used], avg, ch_used * sizeof(float));
 
-                if (threshold > 0){
+                if (threshold_min > 0 || threshold_max > 0){
                     float change = 0;
                     for (uint32_t j = 0; j < ch_used; j++)
                         change += fabs(source_buffer[ndx * step + j] - avg[j]);
 
-                    if (change < threshold){
+                    if (change < threshold_min || change > threshold_max){
                         memcpy(&buffer[circular_idx * ch_used], &source_buffer[ndx * step], ch_used * sizeof(float));
                     }
                 }

@@ -26,10 +26,31 @@ _declspec(noalias) _declspec(restrict) inline void* _ir_aligned_calloc(size_t co
 #endif
 
 #include "math_functions.h"
-#include "color_spaces.h"
 #include "bitmap_formats.h"
-#include "bitmap_compositing.h"
+#include "color_spaces.h"
 #include "convolution.h"
+
+enum InterpolationFilter{
+    Filter_CubicFast,
+    Filter_Cubic,
+    Filter_CatmullRom,
+    Filter_Mitchell,
+    Filter_Robidoux,
+    Filter_RobidouxSharp,
+    Filter_Hermite,
+    Filter_Lanczos3,
+    Filter_Lanczos3Sharp,
+    Filter_Lanczos2,
+    Filter_Lanczos2Sharp,
+    Filter_Triangle,
+};
+
+enum Rotate{
+    RotateNone = 0,
+    Rotate90 = 1,
+    Rotate180 = 2,
+    Rotate270 = 3
+};
 
 
 typedef struct InterpolationDetailsStruct *InterpolationDetailsPtr;
@@ -37,36 +58,19 @@ typedef struct InterpolationDetailsStruct *InterpolationDetailsPtr;
 typedef double(*detailed_interpolation_method)(InterpolationDetailsPtr, double);
 
 typedef struct InterpolationDetailsStruct{
-    //0.5 is the sane default; minimal overlapping between windows
+    //1 is the default; near-zero overlapping between windows. 2 overlaps 50% on each side.
     double window;
     //Coefficients for bucubic weighting
     double p1, p2, p3, q1, q2, q3, q4;
     //Blurring factor when > 1, sharpening factor when < 1. Applied to weights.
     double blur;
-    //Multiplier applied to negative weights (certain filters only). Creates sharpening effect when window is large enough. may need to be adjusted based on window size.
-    double negative_multiplier;
+
     //pointer to the weight calculation function
     detailed_interpolation_method filter;
-    //If true, use area averaging for initial reduction
-    bool use_halving;
-    //If true, only halve when both dimensions are multiples of the halving factor
-    bool halve_only_when_common_factor;
-    //The final percentage (0..1) of scaling which must be perfomed by true interpolation
-    double use_interpolation_for_percent;
-    //If true, we can 'reuse' the source image as a performance optimization when halving
-    bool allow_source_mutation;
 
-    float integrated_sharpen_percent;
-    float * convolution_kernel;
-    int kernel_radius;
-    float kernel_threshold;
-    float unsharp_sigma;
-    //If greater than 0, a percentage to sharpen the result along each axis;
-    float post_resize_sharpen_percent;
-    //Reserved for passing data to new filters
-    int filter_var_a;
-    bool linear_sharpen;
-    bool use_luv;
+    float sharpen_percent_goal;
+    bool sharpen_successful;
+
 }InterpolationDetails;
 
 
@@ -84,24 +88,148 @@ typedef struct
 } LineContribType;
 
 
+typedef struct LookupTablesStruct *LookupTablesPtr;
+
+typedef struct LookupTablesStruct{
+    const float srgb_to_linear[256]; //Converts 0..255 -> 0..1, but knowing that 0.255 has sRGB gamma.
+    const float linear[256]; //Converts 0..255 -> 0..1
+    const uint8_t linear_to_srgb[1024]; //Converts from 0..1023 to 0.255, going from linear to sRGB gamma.
+} LookupTables;
+
+
+
+
+typedef struct RenderDetailsStruct *RenderDetailsPtr;
+
+
+typedef struct RenderDetailsStruct{
+
+    //Original scaling values, if required.
+    //scale/scale_h are sans-transpose. 
+    //final_w/final_h is the actual result size expected afer all operations
+    //uint32_t from_w, scale_w, final_w, from_h, final_h, scale_h;
+
+
+    InterpolationDetailsPtr interpolation;
+
+    float minimum_sample_window_to_interposharpen;
+
+    
+    bool apply_color_matrix;
+
+    // If possible to do correctly, halve the image until it is [interpolate_last_percent] times larger than needed. 3 or greater reccomended. Specify -1 to disable halving.
+    float interpolate_last_percent; 
+
+    //If true, only halve when both dimensions are multiples of the halving factor
+    bool halve_only_when_common_factor;
+
+    //The actual halving factor to use.
+    uint32_t halving_divisor;
+
+
+
+    float * kernel_a;
+    float kernel_a_min;
+    float kernel_a_max;
+    uint32_t kernel_a_radius;
+
+    float * kernel_b;
+    float kernel_b_min;
+    float kernel_b_max;
+    uint32_t kernel_b_radius;
+
+
+
+    //If greater than 0, a percentage to sharpen the result along each axis;
+    float sharpen_percent_goal;
+
+    
+    float color_matrix_data[25];
+    float *color_matrix[5];
+
+    bool post_transpose;
+    bool post_flip_x;
+    bool post_flip_y;
+ 
+}RenderDetails;
 
 static InterpolationDetailsPtr CreateInterpolationDetails(){
-    InterpolationDetailsPtr d = (InterpolationDetails *)calloc(1, sizeof(InterpolationDetails));
+    InterpolationDetailsPtr d = (InterpolationDetailsPtr)calloc(1, sizeof(InterpolationDetails));
     d->blur = 1;
     d->window = 2;
     d->p1 = d->q1 = 0;
     d->p2 = d->q2 = d->p3 = d->q3 = d->q4 = 1;
-    d->allow_source_mutation = false;
-    d->halve_only_when_common_factor = false;
-    d->post_resize_sharpen_percent = 0;
-    d->use_halving = false;
-    d->negative_multiplier = 1;
-    d->use_interpolation_for_percent = 0.3;
-    d->integrated_sharpen_percent = 0;
-    d->kernel_radius = 0;
-    d->unsharp_sigma = 1.4f;
-    d->linear_sharpen = true;
-    d->kernel_threshold = 0;
-    d->use_luv = true;
+    d->sharpen_percent_goal = 0;
+    d->sharpen_successful = false;
     return d;
+}
+
+static RenderDetailsPtr CreateRenderDetails(){
+    RenderDetailsPtr d = (RenderDetailsPtr)calloc(1, sizeof(RenderDetails));
+    for (int i = 0; i < 5; i++){
+        d->color_matrix[i] = &(d->color_matrix_data[i * 5]);
+    }
+    d->interpolate_last_percent = 3;
+    d->halve_only_when_common_factor = true;
+    d->minimum_sample_window_to_interposharpen = 1.5;
+    d->apply_color_matrix = false;
+    return d;
+}
+
+
+static void DestroyRenderDetails(RenderDetailsPtr d){
+    if (d->interpolation != NULL) free(d->interpolation);
+
+    if (d->kernel_a != NULL) ir_free(d->kernel_a);
+
+    if (d->kernel_b != NULL) ir_free(d->kernel_b);
+
+    free(d);
+}
+
+
+
+
+static LookupTablesPtr GetLookupTables(){
+    static LookupTablesPtr table = NULL;
+
+    if (table == NULL){
+        LookupTablesPtr temp = (LookupTablesPtr)ir_malloc(sizeof(LookupTablesStruct));
+
+        // Gamma correction
+        // http://www.4p8.com/eric.brasseur/gamma.html#formulas
+
+        // Store gamma adjusted in 256-511, linear in 0-255
+
+        float *lin = (float *)temp->linear;
+        float *to_lin = (float *)temp->srgb_to_linear;
+        uint8_t *to_srgb = (uint8_t *)temp->linear_to_srgb;
+        
+        const float a = 0.055f;
+
+        for (uint32_t n = 0; n < 256; n++)
+        {
+            const float s = ((float)n) / 255.0f;
+            lin[n] = s;
+
+            if (s <= 0.04045f)
+                to_lin[n] = s / 12.92f;
+            else
+                to_lin[n] = pow((s + a) / (1 + a), 2.4f);
+        }
+        for (uint32_t n = 0; n < 1024; n++){
+            to_srgb[n] = uchar_clamp_ff(linear_to_srgb((float)n / 1024.0f));
+        }
+        
+        
+        if (table == NULL){
+            //A race condition could cause a 3KB, one-time memory leak between these two lines. 
+            //we're OK with that.
+            table = temp;
+        }
+        else{
+            ir_free(temp);
+        }
+    }
+    return table;
 }

@@ -3,16 +3,16 @@
 #pragma once
 #pragma unmanaged
 
-void apply_color_matrix(BitmapBgraPtr bmp, float* const __restrict  m[5])
+void apply_color_matrix(BitmapBgraPtr bmp, const uint32_t row, const uint32_t count, float* const __restrict  m[5])
 {
     const uint32_t stride = bmp->stride;
     const uint32_t ch = bmp->bpp;
     const uint32_t w = bmp->w;
-    const uint32_t h = bmp->h;
+    const uint32_t h = MIN(row + count, bmp->h);
     if (ch == 4)
     {
         
-        for (uint32_t y = 0; y < h; y++)
+        for (uint32_t y = row; y < h; y++)
             for (uint32_t x = 0; x < w; x++)
         {
             uint8_t* const __restrict data = bmp->pixels + stride * y + x * ch;
@@ -32,7 +32,7 @@ void apply_color_matrix(BitmapBgraPtr bmp, float* const __restrict  m[5])
     else if (ch == 3)
     {
         
-        for (uint32_t y = 0; y < h; y++)
+        for (uint32_t y = row; y < h; y++)
             for (uint32_t x = 0; x < w; x++)
         {
             unsigned char* const __restrict data = bmp->pixels + stride * y + x * ch;
@@ -50,16 +50,16 @@ void apply_color_matrix(BitmapBgraPtr bmp, float* const __restrict  m[5])
 }
 
 
-void apply_color_matrix_float(BitmapFloatPtr bmp, const  float* __restrict m[5])
+void apply_color_matrix_float(BitmapFloatPtr bmp, const uint32_t row, const uint32_t count, float*  m[5])
 {
     const uint32_t stride = bmp->float_stride;
     const uint32_t ch = bmp->channels;
     const uint32_t w = bmp->w;
-    const uint32_t h = bmp->h;
+    const uint32_t h = MIN(row + count,bmp->h);
     if (ch == 4)
     {
 
-        for (uint32_t y = 0; y < h; y++)
+        for (uint32_t y = row; y < h; y++)
             for (uint32_t x = 0; x < w; x++)
             {
                 float* const __restrict data = bmp->pixels + stride * y + x * ch;
@@ -80,7 +80,7 @@ void apply_color_matrix_float(BitmapFloatPtr bmp, const  float* __restrict m[5])
     else if (ch == 3)
     {
 
-        for (uint32_t y = 0; y < h; y++)
+        for (uint32_t y = row; y < h; y++)
             for (uint32_t x = 0; x < w; x++)
             {
                 

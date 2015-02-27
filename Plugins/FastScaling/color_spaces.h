@@ -1,15 +1,8 @@
 #pragma once
 #pragma unmanaged
+#include "Stdafx.h"
+#include "shared.h"
 
-
-enum ColorSpace{
-    ColorSpace_None = 0,
-    ColorSpace_sRGB_BGR = 1,
-    ColorSpace_RGBLinear_BGR = 2,
-    ColorSpace_LUV = 3,
-    ColorSpace_XYZ_YXZ = 4,
-    ColorSpace_Sigmoid = 5
-};
 
 
 static inline float
@@ -115,3 +108,45 @@ static inline void yxz_to_linear(float * yxz){
     yxz[0] = 0.055648f*X - 0.204043f*Y + 1.057311f*Z; //b
 
 }
+
+
+
+
+
+
+
+static int linear_to_luv_rows(BitmapFloatPtr bit, const uint32_t start_row, const  uint32_t row_count)
+{
+    if ((bit->w * bit->channels) != bit->float_stride)
+    {
+        return -1;
+    }
+     float * start_at = bit->float_stride * start_row  + bit->pixels;
+
+    const float * end_at = bit->float_stride * (start_row + row_count) + bit->pixels;
+
+    for (float* pix = start_at; pix < end_at; pix++){
+        linear_to_luv(pix);
+    }
+    return 0;
+}
+
+static int luv_to_linear_rows(BitmapFloatPtr bit, const uint32_t start_row, const  uint32_t row_count)
+{
+    if ((bit->w * bit->channels) != bit->float_stride)
+    {
+        return -1;
+    }
+    float * start_at = bit->float_stride * start_row + bit->pixels;
+
+    const float * end_at = bit->float_stride * (start_row + row_count) + bit->pixels;
+
+    for (float* pix = start_at; pix < end_at; pix++){
+        luv_to_linear(pix);
+    }
+    return 0;
+}
+
+
+
+

@@ -39,6 +39,18 @@ uchar_clamp_ff(float clr) {
     return (uint8_t)result;
 }
 
+static inline
+uint16_t
+clamp_01_to_01024(float clr) {
+    const uint16_t result = (uint16_t)(clr * 1023 + 0.5);
+
+    if (result > 1023) {
+        return clr < 0 ? 0 : 1023;
+    }
+    return result;
+}
+
+
 
 static inline
 int overflow2(int a, int b)

@@ -1,20 +1,24 @@
-#include "Stdafx.h"
 #pragma once
 #pragma unmanaged
+#include "Stdafx.h"
+
 #include "shared.h"
 
 
 
 static void BgraSharpenInPlaceX(BitmapBgraPtr im, float pct)
 {
+
+    const float outer_coeff = -pct / 400.0f;
+    const float inner_coeff = 1 - 2 * outer_coeff;
+
     uint32_t y, current, prev, next;
 
     const uint32_t sx = im->w;
     const uint32_t sy = im->h;
     const uint32_t stride = im->stride;
     const uint32_t bpp = im->bpp;
-    const float outer_coeff = -pct / 400.0f;
-    const float inner_coeff = 1 - 2 * outer_coeff;
+
 
     if (pct <= 0 || im->w < 3 || bpp < 3) return;
 
@@ -23,6 +27,7 @@ static void BgraSharpenInPlaceX(BitmapBgraPtr im, float pct)
         unsigned char *row = im->pixels + y * stride;
         for (current = bpp, prev = 0, next = bpp + bpp; next < stride; prev = current, current = next, next += bpp){
             //We never sharpen the alpha channel
+            //TODO - we need to buffer the left pixel to prevent it from affecting later calculations
             for (uint32_t i = 0; i < 3; i++)
                 row[current + i] = uchar_clamp_ff(outer_coeff * (float)row[prev + i] + inner_coeff * (float)row[current + i] + outer_coeff * (float)row[next + i]);
         }
@@ -88,3 +93,11 @@ int step = 4){
 
 
 
+
+
+static void
+SharpenBgraFloatRowsInPlace(BitmapFloatPtr im, uint32_t start_row, uint32_t row_count, double pct){
+    for (uint32_t row = start_row; row < start_row + row_count; row++){
+        SharpenBgraFloatInPlace(im->pixels + (im->float_stride * row), im->w, pct, im->channels);
+    }
+}

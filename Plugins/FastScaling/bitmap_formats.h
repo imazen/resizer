@@ -13,6 +13,16 @@ enum BitmapCompositingMode{
     Blend_with_self = 1,
     Blend_with_matte = 2
 };
+
+enum ColorSpace{
+    ColorSpace_None = 0,
+    ColorSpace_sRGB_BGR = 1,
+    ColorSpace_RGBLinear_BGR = 2,
+    ColorSpace_LUV = 3,
+    ColorSpace_XYZ_YXZ = 4,
+    ColorSpace_Sigmoid = 5
+};
+
 typedef struct BitmapBgraStruct *BitmapBgraPtr;
 
 //non-indexed bitmap
@@ -35,6 +45,8 @@ typedef struct BitmapBgraStruct{
     //If false, we can change the stride of the image.
     bool stride_readonly;
 
+    //If true, we can reuse the allocated memory for other purposes. 
+    bool can_reuse_space; 
     //TODO: rename to bytes_pp
     uint32_t bpp;
 
@@ -93,6 +105,7 @@ static BitmapBgraPtr CreateBitmapBgraHeader(int sx, int sy){
     im->pixels_readonly = true;
     im->stride_readonly = true;
     im->borrowed_pixels = true;
+    im->can_reuse_space = false;
     return im;
 }
 
