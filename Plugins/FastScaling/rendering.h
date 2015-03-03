@@ -367,6 +367,10 @@ namespace ImageResizer{
                     uint32_t from_count = pSrc->w;
                     uint32_t to_count = transpose ? pDst->h : pDst->w;
 
+                    if (details->interpolation->window == 0){
+                        throw gcnew ArgumentOutOfRangeException();
+                    }
+
                     p->Start("ContributionsCalc", false);
                     LineContribType * contrib = ContributionsCalc(to_count, from_count, details->interpolation);  /*Handle errors */ if (contrib == NULL) { return_code = -1; goto cleanup; }
                     p->Stop("ContributionsCalc", true, false);
@@ -424,6 +428,9 @@ namespace ImageResizer{
                     if (dest_buf != NULL) DestroyBitmapFloat(dest_buf);
                     p->Stop("Free Contributions,FloatBuffers", true,false);
 
+                    if (return_code != 0){
+                        throw gcnew OutOfMemoryException(String::Format("ScaleAndRender1D failed with code {0}", return_code));
+                    }
                     return return_code;
                 }
 
