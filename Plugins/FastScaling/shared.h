@@ -71,7 +71,6 @@ typedef struct InterpolationDetailsStruct{
     detailed_interpolation_method filter;
 
     float sharpen_percent_goal;
-    bool sharpen_successful;
 
 }InterpolationDetails;
 
@@ -87,6 +86,7 @@ typedef struct
     ContributionType *ContribRow; /* Row (or column) of contribution weights */
     unsigned int WindowSize,      /* Filter window size (of affecting source pixels) */
         LineLength;      /* Length of line (no. or rows / cols) */
+    double percent_negative; /*estimates the sharpening effect*/
 } LineContribType;
 
 
@@ -162,7 +162,6 @@ static InterpolationDetailsPtr CreateInterpolationDetails(){
     d->p1 = d->q1 = 0;
     d->p2 = d->q2 = d->p3 = d->q3 = d->q4 = 1;
     d->sharpen_percent_goal = 0;
-    d->sharpen_successful = false;
     return d;
 }
 

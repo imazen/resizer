@@ -225,7 +225,6 @@ namespace ImageResizer{
                         details->minimum_sample_window_to_interposharpen <= details->interpolation->window){
 
                         details->interpolation->sharpen_percent_goal = details->sharpen_percent_goal;
-                        details->interpolation->sharpen_successful = false;
                     }
 
 
@@ -305,7 +304,7 @@ namespace ImageResizer{
                 }
 
 
-                static int ApplyConvolutionsFloat1D(BitmapFloatPtr img, const uint32_t from_row, const uint32_t row_count, const RenderDetailsPtr details, IProfiler^ p){
+                static int ApplyConvolutionsFloat1D(BitmapFloatPtr img, const uint32_t from_row, const uint32_t row_count, double sharpening_applied, const RenderDetailsPtr details, IProfiler^ p){
                     p->Start("convolve kernel a", false);
                     if (details->kernel_a_radius > 0 && ConvolveBgraFloatInPlace(img, details->kernel_a, details->kernel_a_radius, details->kernel_a_min, details->kernel_a_max, img->channels, from_row, row_count)){
                         return -3;
@@ -317,10 +316,9 @@ namespace ImageResizer{
                     }
                     p->Stop("convolve kernel b", true, false);
 
-                    if (!details->interpolation->sharpen_successful &&
-                        details->sharpen_percent_goal > 0){
+                    if (details->sharpen_percent_goal > sharpening_applied + 0.01 ){
                         p->Start("SharpenBgraFloatRowsInPlace", false);
-                        SharpenBgraFloatRowsInPlace(img, from_row, row_count, details->sharpen_percent_goal);
+                        SharpenBgraFloatRowsInPlace(img, from_row, row_count, details->sharpen_percent_goal - sharpening_applied);
                         p->Stop("SharpenBgraFloatRowsInPlace", true, false);
                     }
                     return 0;
@@ -404,7 +402,7 @@ namespace ImageResizer{
                         ScaleBgraFloatRows(source_buf, 0, dest_buf, 0, row_count, contrib->ContribRow);
                         p->Stop("ScaleBgraFloatRows", true, false);
 
-                        if (ApplyConvolutionsFloat1D(dest_buf, 0, row_count, details, p)){
+                        if (ApplyConvolutionsFloat1D(dest_buf, 0, row_count, contrib->percent_negative,details,    p)){
                             return_code = -3; goto cleanup;
                         }
                         if (details->apply_color_matrix && call_number == 2) { ApplyColorMatrix(dest_buf, 0, row_count, details, p); }
@@ -460,7 +458,7 @@ namespace ImageResizer{
                         if (convert_srgb_to_linear(pSrc, source_start_row, buf, 0, row_count)){
                             return_code = -2; goto cleanup;
                         }
-                        if (Renderer::ApplyConvolutionsFloat1D(buf, 0, row_count, details, this->p)){
+                        if (Renderer::ApplyConvolutionsFloat1D(buf, 0, row_count, 0, details, this->p)){
                             return_code = -3; goto cleanup;
                         }
                         if (details->apply_color_matrix && call_number == 2) { ApplyColorMatrix(buf, 0, row_count, details,p); }

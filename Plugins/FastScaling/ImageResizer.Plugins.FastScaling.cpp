@@ -76,9 +76,9 @@ namespace ImageResizer{
 
 
                     opts->SharpeningPercentGoal = System::String::IsNullOrEmpty(query->Get("f.sharpen")) ? 0 :
-                        System::Single::Parse(query->Get("f.sharpen"), System::Globalization::NumberFormatInfo::InvariantInfo);
+                        System::Single::Parse(query->Get("f.sharpen"), System::Globalization::NumberFormatInfo::InvariantInfo) / 200.0;
 
-                    
+                    opts->SharpeningPercentGoal = MIN(MAX(0, opts->SharpeningPercentGoal), 0.5);
                    
 
                     //TODO: permit it to work with increments of 90 rotation

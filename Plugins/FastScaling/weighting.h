@@ -179,9 +179,6 @@ static LineContribType *ContributionsCalc(const uint32_t line_size, const uint32
         (desired_sharpen_ratio + sharpen_ratio) / sharpen_ratio :
         0;
 
-    if (extra_negative_weight != 0){
-        details->sharpen_successful = true; 
-    }
 
     const double scale_factor = (double)line_size / (double)src_size;
     const double downscale_factor = MIN(1.0, scale_factor);
@@ -191,6 +188,8 @@ static LineContribType *ContributionsCalc(const uint32_t line_size, const uint32
     uint32_t u, ix;
     LineContribType *res = ContributionsAlloc(line_size, allocated_window_size);
 
+    double negative_area = 0;
+    double positive_area = 0;
 
     for (u = 0; u < line_size; u++) {
         const double center_src_pixel = ((double)u + 0.5) / scale_factor - 0.5;
@@ -239,8 +238,15 @@ static LineContribType *ContributionsCalc(const uint32_t line_size, const uint32
         const float total_factor = (float)(1.0f / total_weight);
         for (ix = 0; ix < source_pixel_count; ix++) {
             weights[ix] *= total_factor;
+            if (weights[ix] < 0){
+                negative_area -= weights[ix];
+            }
+            else{
+                positive_area += weights[ix];
+            }
         }
     }
+    res->percent_negative = negative_area / positive_area;
     return res;
 }
 
