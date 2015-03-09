@@ -46,6 +46,13 @@ static inline double filter_sinc(const InterpolationDetailsPtr d, double t)
     return sin(a) / a;
 }
 
+static inline double filter_box(const InterpolationDetailsPtr d, double t)
+{
+
+    const double x = t / d->blur;
+    return (x >= -1 * d->window && x < d->window) ? 1 : 0;
+}
+
 static inline double filter_triangle(const InterpolationDetailsPtr d, double t)
 {
     const double x = (double)fabs(t) / d->blur;
@@ -72,6 +79,7 @@ static InterpolationDetailsPtr CreateCustom(double window, double blur, detailed
 
 static InterpolationDetailsPtr CreateInterpolation(InterpolationFilter filter){
     switch (filter){
+        case Filter_Linear:
         case InterpolationFilter::Filter_Triangle:
             return CreateCustom(1, 1, filter_triangle);
         case InterpolationFilter::Filter_Lanczos2:
@@ -98,6 +106,8 @@ static InterpolationDetailsPtr CreateInterpolation(InterpolationFilter filter){
                 0.2620145123990142, 0.3689927438004929);
         case Filter_Hermite:
             return CreateBicubicCustom(1, 1, 0, 0);
+        case Filter_Box:
+            return CreateCustom(0.5, 1, filter_box);
 
     }
     return NULL;

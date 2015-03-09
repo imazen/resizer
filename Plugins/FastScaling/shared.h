@@ -43,6 +43,8 @@ enum InterpolationFilter{
     Filter_Lanczos2,
     Filter_Lanczos2Sharp,
     Filter_Triangle,
+    Filter_Linear,
+    Filter_Box,
 };
 
 enum Rotate{
