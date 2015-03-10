@@ -388,6 +388,9 @@ namespace ImageResizer{
                     source_buf->alpha_meaningful = pSrc->alpha_meaningful;
                     dest_buf->alpha_meaningful = source_buf->alpha_meaningful;
 
+                    source_buf->alpha_premultiplied = source_buf->channels == 4;
+                    dest_buf->alpha_premultiplied = source_buf->alpha_premultiplied;
+
                     p->Stop("CreateBitmapFloat (buffers)", true, false);
 
                     /* Scale each set of lines */
@@ -452,6 +455,10 @@ namespace ImageResizer{
                     uint32_t scaling_bpp = (pSrc->bpp == 4 && !pSrc->alpha_meaningful) ? 3 : pSrc->bpp;
 
                     BitmapFloatPtr buf = CreateBitmapFloat(pSrc->w, buffer_row_count, scaling_bpp, false); /*Handle errors */  if (buf == NULL)  { return_code = -1; goto cleanup; }
+                    buf->alpha_meaningful = pSrc->alpha_meaningful;
+                    buf->alpha_premultiplied = buf->channels == 4;
+                    
+
 
                     /* Scale each set of lines */
                     for (uint32_t source_start_row = 0; source_start_row < pSrc->h; source_start_row += buffer_row_count) {

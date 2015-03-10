@@ -31,7 +31,7 @@ static int convert_srgb_to_linear(BitmapBgraPtr src, const uint32_t from_row, Bi
                 buf[to_x + 1] = t->srgb_to_linear[src_start[bix + 1]];
                 buf[to_x + 2] = t->srgb_to_linear[src_start[bix + 2]];
             }
-            dest->alpha_premultiplied = false;
+            //We're only working on a portion... dest->alpha_premultiplied = false;
         }
         else if (copy_step == 4)
         {
@@ -44,7 +44,7 @@ static int convert_srgb_to_linear(BitmapBgraPtr src, const uint32_t from_row, Bi
                     buf[to_x + 3] = alpha; 
                 }
             }
-            dest->alpha_premultiplied = true;
+            //We're only working on a portion... dest->alpha_premultiplied = true;
         }
         else{
             return -1;
@@ -102,14 +102,39 @@ static int  copy_bitmap_bgra(BitmapBgraPtr src, BitmapBgraPtr dst)
 }
 
 static int blend_matte(BitmapFloatPtr src, const uint32_t from_row, const uint32_t row_count, const uint8_t* const matte){
-    //TODO, implement
+    //We assume that matte is BGRA, regardless.
+
+    LookupTables*   t = GetLookupTables();
+    const float matte_a = t->linear[matte[3]];
+    const float b = t->srgb_to_linear[matte[0]];
+    const float g = t->srgb_to_linear[matte[1]];
+    const float r = t->srgb_to_linear[matte[2]];
+    
+
+
+    for (uint32_t row = from_row; row < from_row + row_count; row++){
+        uint32_t start_ix = row * src->float_stride;
+        uint32_t end_ix = start_ix + src->w * src->channels;
+
+        for (uint32_t ix = start_ix; ix < end_ix; ix += 4){
+            const float src_a = src->pixels[ix + 3];
+            const float a = (1.0 - src_a) * matte_a;
+            const float final_alpha = src_a + a;
+
+            src->pixels[ix] = (src->pixels[ix] + b * a) / final_alpha;
+            src->pixels[ix + 1] = (src->pixels[ix + 1] + g * a) / final_alpha;
+            src->pixels[ix + 2] = (src->pixels[ix + 2] + r * a) / final_alpha;
+            src->pixels[ix + 3] = final_alpha;
+
+        }
+    }
+
 
     //Ensure alpha is demultiplied
     return 0;
 }
 
 static void demultiply_alpha(BitmapFloatPtr src, const uint32_t from_row, const uint32_t row_count){
-    //TODO, implement
     for (uint32_t row = from_row; row < from_row + row_count; row++){
         uint32_t start_ix = row * src->float_stride;
         uint32_t end_ix = start_ix + src->w * src->channels;
@@ -161,6 +186,48 @@ static void copy_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row, B
 
 }
 
+static void compose_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row, BitmapBgraPtr dest, const uint32_t dest_row, const uint32_t row_count, const bool transpose){
+
+    LookupTables*   t = GetLookupTables();
+    const uint32_t dest_row_stride = transpose ? dest->bpp : dest->stride;
+    const uint32_t dest_pixel_stride = transpose ? dest->stride : dest->bpp;
+    const uint32_t srcitems = src->w *src->channels;
+    const uint32_t ch = src->channels;
+
+    const bool dest_alpha = dest->bpp == 4 && dest->alpha_meaningful;
+
+
+    for (uint32_t row = 0; row < row_count; row++){
+        //const float * const __restrict src_row = src->pixels + (row + from_row) * src->float_stride;
+        float * src_row = src->pixels + (row + from_row) * src->float_stride;
+
+        uint8_t * dest_row_bytes = dest->pixels + (dest_row + row) * dest_row_stride;
+
+        for (uint32_t ix = 0; ix < srcitems; ix += ch){ 
+            const float src_a = src_row[ix + 3];
+            const float a = (1.0 - src_a) * (dest_alpha ? t->linear[dest_row_bytes[3]] : 1.0f);
+            const float b = t->srgb_to_linear[dest_row_bytes[0]] * a;
+            const float g = t->srgb_to_linear[dest_row_bytes[1]] * a;
+            const float r = t->srgb_to_linear[dest_row_bytes[2]] * a;
+            const float final_alpha = src_a + a;
+
+
+
+            dest_row_bytes[0] = t->linear_to_srgb[clamp_01_to_04096((src_row[ix] + b) / final_alpha)];
+            dest_row_bytes[1] = t->linear_to_srgb[clamp_01_to_04096((src_row[ix + 1] + g) / final_alpha)];
+            dest_row_bytes[2] = t->linear_to_srgb[clamp_01_to_04096((src_row[ix + 2] + r) / final_alpha)];
+            if (dest_alpha){
+                dest_row_bytes[3] = uchar_clamp_ff(final_alpha * 255);
+
+            }
+            dest_row_bytes += dest_pixel_stride;
+        }
+    }
+
+}
+
+
+
 
 static int pivoting_composite_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row, BitmapBgraPtr dest, const uint32_t dest_row, const uint32_t row_count, const bool transpose){
     if (transpose ? src->w != dest->h : src->w != dest->w) return -1; //Add more bounds checks
@@ -170,6 +237,7 @@ static int pivoting_composite_linear_over_srgb(BitmapFloatPtr src, const uint32_
         if (blend_matte(src, from_row, row_count, dest->matte_color)){
             return -9;
         }
+        src->alpha_premultiplied = false;
     }
     if (src->channels == 4 && src->alpha_premultiplied && dest->compositing_mode != BitmapCompositingMode::Blend_with_self){
         //Demultiply
@@ -178,140 +246,13 @@ static int pivoting_composite_linear_over_srgb(BitmapFloatPtr src, const uint32_
     
     bool can_compose = dest->compositing_mode == BitmapCompositingMode::Blend_with_self && src->alpha_meaningful && src->channels == 4;
     
+    if (can_compose && !src->alpha_premultiplied) return -10; //Something went wrong. We should always have alpha premultiplied.
+
     if (can_compose){
-        //TODO handle composition
+        compose_linear_over_srgb(src, from_row, dest, dest_row, row_count, transpose);
     }
     else{
         copy_linear_over_srgb(src, from_row, dest, dest_row, row_count, transpose);
     }
-    //
-    //const LookupTables* __restrict t = GetLookupTables();
-
-
-    //float* const __restrict dest_buffers = src->pixels;
-    //const uint32_t dest_buffer_len = src->float_stride;
-
-    //const uint32_t dst_row_offset = transpose ? dest->bpp : dest->stride;
-    //uint8_t *dst_start = dest->pixels + dest_row * dst_row_offset;
-    //const uint32_t stride_offset = transpose ? (dest->stride - dest->bpp * row_count) :33333333333333333;
-    //
-    //float out_alpha;
-
-    //uint32_t bix, bufferSet;
-    //const uint32_t w = src->w;
-   
-
-
-    //if (src->channels == 4 && src->alpha_meaningful && dest->bpp == 4)
-    //{
-    //    if (dest->compositing_mode == BitmapCompositingMode::Blend_with_self)
-    //    {
-    //        for (bix = 0; bix < w; bix++){
-    //            uint32_t dest_buffer_start = bix * src->channels;
-    //            for (bufferSet = 0; bufferSet < row_count; bufferSet++){
-    //                out_alpha = dest_buffers[dest_buffer_start + 3] composit_alpha;
-    //                dst_start[0] = uchar_clamp_ff(blend_alpha(0, linear_to_srgb(dest_buffers[dest_buffer_start + 0])));
-    //                dst_start[1] = uchar_clamp_ff(blend_alpha(1, linear_to_srgb(dest_buffers[dest_buffer_start + 1])));
-    //                dst_start[2] = uchar_clamp_ff(blend_alpha(2, linear_to_srgb(dest_buffers[dest_buffer_start + 2])));
-    //                dst_start[3] = uchar_clamp_ff(out_alpha);
-    //                dest_buffer_start += dest_buffer_len;
-    //                dst_start += dest->bpp;
-    //            }
-    //            dst_start += stride_offset;
-    //        }
-    //    }
-    //    else if (dest->compositing_mode == BitmapCompositingMode::Blend_with_matte)
-    //    {
-    //        for (bix = 0; bix < w; bix++){
-    //            uint32_t dest_buffer_start = bix * src->channels;
-    //            for (bufferSet = 0; bufferSet < row_count; bufferSet++){
-    //                dst_start[0] = uchar_clamp_ff(blend_matte(0, linear_to_srgb(dest_buffers[dest_buffer_start + 0])));
-    //                dst_start[1] = uchar_clamp_ff(blend_matte(1, linear_to_srgb(dest_buffers[dest_buffer_start + 1])));
-    //                dst_start[2] = uchar_clamp_ff(blend_matte(2, linear_to_srgb(dest_buffers[dest_buffer_start + 2])));
-    //                dst_start[3] = 255;
-    //                dest_buffer_start += dest_buffer_len;
-    //                dst_start += dest->bpp;
-    //            }
-    //            dst_start += stride_offset;
-    //        }
-    //    }
-    //    else if (dest->compositing_mode == BitmapCompositingMode::Replace_self)
-    //    {
-    //        for (bix = 0; bix < w; bix++){
-    //            uint32_t dest_buffer_start = bix * src->channels;
-    //            for (bufferSet = 0; bufferSet < row_count; bufferSet++){
-    //                out_alpha = dest_buffers[dest_buffer_start + 3];
-    //                dst_start[0] = uchar_clamp_ff(demultiply_alpha(linear_to_srgb(dest_buffers[dest_buffer_start + 0])));
-    //                dst_start[1] = uchar_clamp_ff(demultiply_alpha(linear_to_srgb(dest_buffers[dest_buffer_start + 1])));
-    //                dst_start[2] = uchar_clamp_ff(demultiply_alpha(linear_to_srgb(dest_buffers[dest_buffer_start + 2])));
-    //                dst_start[3] = uchar_clamp_ff(dest_buffers[dest_buffer_start + 3]);
-    //                dest_buffer_start += dest_buffer_len;
-    //                dst_start += dest->bpp;
-    //            }
-    //            dst_start += stride_offset;
-    //        }
-    //    }
-    //}
-    //// shouldn't be possible?
-
-
-    //else
-    //{
-    //    for (bix = 0; bix < w; bix++){
-    //        uint32_t dest_buffer_start = bix * src->channels;
-
-    //        for (bufferSet = 0; bufferSet < row_count; bufferSet++){
-    //            *dst_start =       t->linear_to_srgb[clamp_01_to_01024(dest_buffers[dest_buffer_start])];
-    //            *(dst_start + 1) = t->linear_to_srgb[clamp_01_to_01024(dest_buffers[dest_buffer_start + 1])];
-    //            *(dst_start + 2) = t->linear_to_srgb[clamp_01_to_01024(dest_buffers[dest_buffer_start + 2])];
-    //            dest_buffer_start += dest_buffer_len;
-    //            dst_start += dest->bpp;
-    //        }
-
-    //        dst_start += stride_offset;
-    //    }
-
-    //    if (dest->bpp == 4)
-    //    {
-    //        dst_start = dest->pixels + dest_row * dest->bpp;
-
-    //        for (bix = 0; bix < w; bix++){
-    //            for (bufferSet = 0; bufferSet < row_count; bufferSet++){
-    //                *(dst_start + 3) = 0xFF;
-    //                dst_start += dest->bpp;
-    //            }
-    //            dst_start += stride_offset;
-    //        }
-    //    }
-    //}
     return 0;
 }
-
-
-//#ifdef ENABLE_INTERNAL_PREMULT
-//#define premultiply_alpha(x) (uchar_clamp_ff(t->linear[src_start[bix + (x)]] * t->linear[src_start[bix + 3]] / 255.0f))
-//#define demultiply_alpha(x) ((x) * 255.0f / dest_buffers[dest_buffer_start + 3])
-//#else
-//#define premultiply_alpha(x) (src_start[bix + x])
-//#define demultiply_alpha(x) (x)
-//#endif
-//
-//#ifdef ENABLE_COMPOSITING
-//#define composit_alpha + lut[dst_start[3]] * (1 - dest_buffers[dest_buffer_start + 3] / 255.0f)
-//#define blend_alpha(ch, x) (((x) + lut[dst_start[ch]] * lut[dst_start[3]] / 255.0f * (1 - dest_buffers[dest_buffer_start + 3] / 255.0f)) / out_alpha * 255.0f)
-//#define blend_matte(ch, x) ((x) + lut[dest->matte_color[ch]] * (1 - dest_buffers[dest_buffer_start + 3] / 255.0f))
-//#elif defined(ENABLE_INTERNAL_PREMULT)
-//#define composit_alpha
-//#define blend_alpha(ch, x) ((x) * 255.0f / dest_buffers[dest_buffer_start + 3])
-//#define blend_matte(ch, x) ((x) * 255.0f / dest_buffers[dest_buffer_start + 3])
-//#else
-//#define composit_alpha
-//#define blend_alpha(ch, x) (x)
-//#define blend_matte(ch, x) (x)
-//#endif
-//
-//#define srgb_to_linear(x) (t->srgb_to_linear[x])
-//
-//
-//
-//#undef ro

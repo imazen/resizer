@@ -110,7 +110,7 @@ namespace ImageResizer{
                     b->AlphaMeaningful = true; 
                     b->Crop = Util::PolygonMath::ToRectangle(targetBox);
                     b->Bitmap = dest;
-                    b->Compositing = BitmapCompositingMode::Replace_self;
+                    b->Compositing = BitmapCompositingMode::Blend_with_self;
 
                     opts->ColorMatrix = colorMatrix;
 
