@@ -13,11 +13,11 @@ environment:
   fb_nuget_key:
     secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
   
-  fb_s3_bucket: imazen-test
+  fb_s3_bucket: resizer-nightlies
   fb_s3_id:
-    secure: Qi7mSLHr94NfJaH0CzQSVPEl1peaOoJADyfHwiVtJzo=
+    secure: mx+xpHdJQkR3uu0BiLt2QV8xF5hUuZUdC5eiUrHMnjI=
   fb_s3_key:
-    secure: RP9hZqS0Pt2SLeias0iZpt2E9OltVX8OPfhWnGET6fQKZ05Fy6y0z1JcWWvONhF0
+    secure: zDprokKssnwwiYb2wL6jaUavU4KklFiJN2cHy1Uwo5dTWiq6b3e9vigy3dsKhiwj
   
   # a nuget url should go here eventually
   fb_nuget_rel_url: https://www.myget.org/F/resizer-rel-test/
