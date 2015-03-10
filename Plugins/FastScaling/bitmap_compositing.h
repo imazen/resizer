@@ -170,9 +170,9 @@ static void copy_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row, B
         uint8_t * dest_row_bytes = dest->pixels + (dest_row + row) * dest_row_stride + (from_col * dest_pixel_stride);
 
         for (uint32_t ix = from_col * ch; ix < srcitems; ix += ch){
-            dest_row_bytes[0] = linear_to_srgb(src_row[ix]);
-            dest_row_bytes[1] = linear_to_srgb(src_row[ix + 1]);
-            dest_row_bytes[2] = linear_to_srgb(src_row[ix + 2]);
+            dest_row_bytes[0] = uchar_clamp_ff(linear_to_srgb(src_row[ix]));
+            dest_row_bytes[1] = uchar_clamp_ff(linear_to_srgb(src_row[ix + 1]));
+            dest_row_bytes[2] = uchar_clamp_ff(linear_to_srgb(src_row[ix + 2]));
             if (copy_alpha){
                 dest_row_bytes[3] = uchar_clamp_ff(src_row[ix + 3] * 255.0f);
 
@@ -224,9 +224,9 @@ static void compose_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row
             
             const float final_alpha = src_a + a;
 
-            dest_row_bytes[0] = linear_to_srgb(b / final_alpha);
-            dest_row_bytes[1] = linear_to_srgb(g / final_alpha);
-            dest_row_bytes[2] = linear_to_srgb(r / final_alpha);
+            dest_row_bytes[0] = uchar_clamp_ff(linear_to_srgb(b / final_alpha));
+            dest_row_bytes[1] = uchar_clamp_ff(linear_to_srgb(g / final_alpha));
+            dest_row_bytes[2] = uchar_clamp_ff(linear_to_srgb(r / final_alpha));
             if (dest_alpha){
                 dest_row_bytes[3] =  uchar_clamp_ff(final_alpha * 255);
             }
