@@ -108,7 +108,7 @@ namespace ImageResizerPluginsFastScalingTestsCpp {
             convert_srgb_to_linear(bit, 0, buf, 0, h);
 
             demultiply_alpha(buf, 0, h);
-            copy_linear_over_srgb(buf, 0, final, 0, h, false);
+            copy_linear_over_srgb(buf, 0, final, 0, h,0,buf->w, false);
 
             for (int y = 0; y < bit->h; y++){
                 for (int x = 0; x < bit->w; x++){
