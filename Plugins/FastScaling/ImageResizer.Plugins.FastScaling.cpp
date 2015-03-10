@@ -7,8 +7,10 @@
 
 #include "Stdafx.h"
 #include "ImageResizer.Plugins.FastScaling.h"
-#include "colormatrix.h"
-#include "bitmap_scaler.h"
+#include "color_matrix.h"
+
+#include "managed_bitmap_wrapper.h"
+#include "rendering.h"
 
 #pragma managed
 
@@ -27,7 +29,28 @@ namespace ImageResizer{
 
 			public ref class FastScalingPlugin : public ImageResizer::Resizing::BuilderExtension, IPlugin
 			{
+                void SetupConvolutions(NameValueCollection ^query, RenderOptions^ addTo){
+                    double kernel_radius = System::String::IsNullOrEmpty(query->Get("f.unsharp.radius")) ? 0 :
+                        System::Double::Parse(query->Get("f.unsharp.radius"), System::Globalization::NumberFormatInfo::InvariantInfo);
+                    double unsharp_sigma = System::String::IsNullOrEmpty(query->Get("f.unsharp.sigma")) ? 1.4 :
+                        System::Double::Parse(query->Get("f.unsharp.sigma"), System::Globalization::NumberFormatInfo::InvariantInfo);
+
+                    double threshold = System::String::IsNullOrEmpty(query->Get("f.unsharp.threshold")) ? 0 :
+                        System::Double::Parse(query->Get("f.unsharp.threshold"), System::Globalization::NumberFormatInfo::InvariantInfo);
+
+                    if (kernel_radius > 0){
+                        addTo->ConvolutionA = gcnew array<float, 1>(kernel_radius * 2 + 1);
+
+                        float * kern = create_guassian_sharpen_kernel(unsharp_sigma, kernel_radius);
+                        for (int i = 0; i < addTo->ConvolutionA->Length; i++)
+                            addTo->ConvolutionA[i] = kern[i];
+                        free(kern);
+                    }
+
+                }
 			protected:
+
+       
                 virtual RequestedAction InternalGraphicsDrawImage(ImageState^ s, Bitmap^ dest, Bitmap^ source, array<PointF>^ targetArea, RectangleF sourceArea, array<array<float, 1>^, 1>^ colorMatrix) override{
                     
                     NameValueCollection ^query = s->settingsAsCollection();
@@ -36,75 +59,74 @@ namespace ImageResizer{
 					String^ sTrue = "true";
                     
                     
-					if (fastScale != sTrue){
+                    if (fastScale != sTrue && System::String::IsNullOrEmpty(query->Get("f"))){
 						return RequestedAction::None;
 					}
                     
-                    int withHalving = 0;
-                    String^ turbo = query->Get("turbo");
-                    if (turbo == sTrue)
-                        withHalving = 1;
-
-                    double blur = System::String::IsNullOrEmpty(query->Get("blur")) ? 1.0 :
-                        System::Double::Parse(query->Get("blur"), System::Globalization::NumberFormatInfo::InvariantInfo);
+                    RenderOptions^ opts = gcnew RenderOptions();
                     
-                    double window = System::String::IsNullOrEmpty(query->Get("window")) ? 0 :
-                        System::Double::Parse(query->Get("window"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
-                    double sharpen = System::String::IsNullOrEmpty(query->Get("sharpen")) ? 0 :
-                        System::Double::Parse(query->Get("sharpen"), System::Globalization::NumberFormatInfo::InvariantInfo);
+                    opts->SamplingBlurFactor = System::String::IsNullOrEmpty(query->Get("f.blur")) ? 1.0 :
+                        System::Single::Parse(query->Get("f.blur"), System::Globalization::NumberFormatInfo::InvariantInfo);
+                    
+                    opts->SamplingWindowOverride = System::String::IsNullOrEmpty(query->Get("f.window")) ? 0 :
+                        System::Single::Parse(query->Get("f.window"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
-                    double min_scaled_weighted = System::String::IsNullOrEmpty(query->Get("min_scaled_weighted")) ? 0 :
-                        System::Double::Parse(query->Get("min_scaled_weighted"), System::Globalization::NumberFormatInfo::InvariantInfo);
+                    opts->Filter = (InterpolationFilter)(System::String::IsNullOrEmpty(query->Get("f")) ? 0 :
+                        System::Int32::Parse(query->Get("f"), System::Globalization::NumberFormatInfo::InvariantInfo));
+
+                    //opts->InterpolateLastPercent = -1;
+                    SetupConvolutions(query, opts); 
 
 
 
+                    opts->SharpeningPercentGoal = System::String::IsNullOrEmpty(query->Get("f.sharpen")) ? 0 :
+                        System::Single::Parse(query->Get("f.sharpen"), System::Globalization::NumberFormatInfo::InvariantInfo) / 200.0;
+
+                    opts->SharpeningPercentGoal = MIN(MAX(0, opts->SharpeningPercentGoal), 0.5);
+                   
+
+                    //TODO: permit it to work with increments of 90 rotation
 					RectangleF targetBox = ImageResizer::Util::PolygonMath::GetBoundingBox(targetArea);
                     if (targetBox.Location != targetArea[0] || targetArea[1].Y != targetArea[0].Y || targetArea[2].X != targetArea[0].X){
 						return RequestedAction::None;
                     }
 
-
-                    
-                    InterpolationDetailsPtr details;
-                    details = DetailsOriginal();
-                    if (query->Get("f") == "0"){
-                        details = DetailsDefault();
-                    }
-                    if (query->Get("f") == "1"){
-                        details = DetailsGeneralCubic();
-                    }
-                    if (query->Get("f") == "2"){
-                        details = DetailsCatmullRom();
-                    }
-                    if (query->Get("f") == "3"){
-                        details = DetailsMitchell();
-                    }
-                    if (query->Get("f") == "4"){
-                        details = DetailsRobidoux();
-                    }
-                    if (query->Get("f") == "5"){
-                        details = DetailsRobidouxSharp();
-                    }
-                    if (query->Get("f") == "6"){
-                        details = DetailsHermite();
-                    }
-                    if (query->Get("f") == "7"){
-                        details = DetailsLanczos();
-                    }
-                    details->allow_source_mutation = true;
-                    details->use_halving = withHalving;
-                    details->blur *= blur;
-                    details->post_resize_sharpen_percent = (int)sharpen;
                     
 
-                    details->use_interpolation_for_percent = min_scaled_weighted > 0 ? min_scaled_weighted :  0.3;
+                   
+                   /* System::Diagnostics::Debug::WriteLine("filter={0}, window={1}, blur={2}", query->Get("f"), details->window, details->blur);
+                    System::Diagnostics::Debug::WriteLine("y={0} + {1}*x^2 + {2} * x^3, y={3} + {4}*x + {5}*x^2 + {6} * x ^ 3",
+                        details->p1, details->p2, details->p3, details->q1, details->q2, details->q3, details->q4);
 
-                    if (window != 0) details->window = window;
-                        
-                    BgraScaler ^scaler = gcnew BgraScaler();
-                    scaler->ScaleBitmap(source, dest, Util::PolygonMath::ToRectangle(sourceArea), Util::PolygonMath::ToRectangle(targetBox), colorMatrix, details, s->Job->Profiler);
-                    free(details);
+                    for (double x = -3.0; x < 3; x += 0.25){
+                        System::Diagnostics::Debug::WriteLine(x.ToString()->PadRight(5) + details->filter(details, x).ToString());
+                    }*/
+                    
+                    BitmapOptions^ a = gcnew BitmapOptions();
+                    a->AllowSpaceReuse = false;
+                    a->AlphaMeaningful = true;
+                    a->Crop = Util::PolygonMath::ToRectangle(sourceArea);
+                    a->Bitmap = source;
+
+
+                    BitmapOptions^ b = gcnew BitmapOptions();
+                    b->AllowSpaceReuse = false;
+                    b->AlphaMeaningful = true; 
+                    b->Crop = Util::PolygonMath::ToRectangle(targetBox);
+                    b->Bitmap = dest;
+                    b->Compositing = BitmapCompositingMode::Blend_with_self;
+
+                    opts->ColorMatrix = colorMatrix;
+
+                    Renderer^ renderer;
+                    try{
+                        renderer = gcnew Renderer(a, b, opts, s->Job->Profiler);
+                        renderer->Render();
+                    }
+                    finally{
+                        delete renderer;
+                    }
                     return RequestedAction::Cancel;
 					
 				}
@@ -117,21 +139,7 @@ namespace ImageResizer{
 					c->Plugins->remove_plugin(this);
 					return true;
 				}
-                void ApplyMatrix(Bitmap ^img, array<array<float, 1>^, 1>^ colorMatrix)
-                {
-                    if (colorMatrix == nullptr) return;
-
-                    BitmapBgraPtr bb;
-                    WrappedBitmap ^wb = gcnew WrappedBitmap(img, bb);
-                    float *cm[5];
-                    for (int i = 0; i < 5; i++)
-                    {
-                        pin_ptr<float> row = &colorMatrix[i][0];
-                        cm[i] = row;
-                    }
-                    InternalApplyMatrix(bb, cm);
-                    delete wb;
-                }
+             
 			};
 			
 		}

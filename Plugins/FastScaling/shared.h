@@ -9,58 +9,65 @@
 #pragma unmanaged
 
 #include <limits.h>
+#include <malloc.h>
 
 #define ENABLE_INTERNAL_PREMULT
 #define ENABLE_COMPOSITING // needs premult
 
+#define ALIGN_ALLOCATIONS
+#ifdef ALIGN_ALLOCATIONS
+#define ir_malloc(size) _aligned_malloc(size, 32)
+#define ir_free(ptr) _aligned_free(ptr)
+_declspec(noalias) _declspec(restrict) inline void* _ir_aligned_calloc(size_t count, size_t elsize, size_t alignment){
+    if (elsize == 0 || count >= SIZE_MAX / elsize) { return NULL; } // Watch out for overflow
+    size_t size = count * elsize;
+    void *memory = _aligned_malloc(size, alignment);
+    if (memory != NULL) { memset(memory, 0, size); }
+    return memory; 
+}
+#define ir_calloc(count, element_size) _ir_aligned_calloc(count,element_size, 32)
+#else
+#define ir_malloc(size) malloc(size)
+#define ir_free(ptr) free(ptr)
+#define ir_calloc(count, element_size) calloc(count,element_size)
+#endif
 
-enum BitmapPixelFormat {
-    None = 0,
-    Bgr24 = 24,
-    Bgra32 = 32,
-    Gray8 = 8
+#include "fastapprox.h"
+#include "math_functions.h"
+#include "bitmap_formats.h"
+#include "color_spaces.h"
+#include "convolution.h"
+
+enum InterpolationFilter{
+    Filter_CubicFast,
+    Filter_Cubic,
+    Filter_CatmullRom,
+    Filter_Mitchell,
+    Filter_Robidoux,
+    Filter_RobidouxSharp,
+    Filter_Hermite,
+    Filter_Lanczos3,
+    Filter_Lanczos3Sharp,
+    Filter_Lanczos2,
+    Filter_Lanczos2Sharp,
+    Filter_Triangle,
+    Filter_Linear,
+    Filter_Box,
+    Filter_CubicBSpline,
+    Filter_Lanczos3Windowed,
+    Filter_Lanczos3SharpWindowed,
+    Filter_Lanczos2Windowed,
+    Filter_Lanczos2SharpWindowed,
+    Filter_CatmullRomFast,
+    Filter_CatmullRomFastSharp
 };
-enum BitmapCompositingMode{
-    Replace_self = 0,
-    Blend_with_self = 1,
-    Blend_with_matte = 2
+
+enum Rotate{
+    RotateNone = 0,
+    Rotate90 = 1,
+    Rotate180 = 2,
+    Rotate270 = 3
 };
-typedef struct BitmapBgraStruct *BitmapBgraPtr;
-
-//non-indexed bitmap
-typedef struct BitmapBgraStruct{
-
-    //bitmap width in pixels
-    int32_t w;
-    //bitmap height in pixels
-    int32_t h;
-    //byte length of each row (may include any amount of padding)
-    int32_t stride;
-    //pointer to pixel 0,0; should be of length > h * stride
-    unsigned char *pixels;
-    //If true, we don't dispose of *pixels when we dispose the struct
-    bool borrowed_pixels;
-    //If false, we can even ignore the alpha channel on 4bpp
-    bool alpha_meaningful;
-    //If false, we can edit pixels without affecting the stride
-    bool pixels_readonly;
-    //If false, we can change the stride of the image.
-    bool stride_readonly;
-
-    //TODO: rename to bytes_pp
-    int32_t bpp;
-
-    BitmapPixelFormat pixel_format;
-
-    //When using compositing mode blend_with_matte, this color will be used
-    unsigned char *matte_color;
-    ///If true, we don't dispose of *pixels when we dispose the struct
-    bool borrowed_matte_color;
-
-    BitmapCompositingMode compositing_mode;
-
-} BitmapBgra;
-
 
 
 typedef struct InterpolationDetailsStruct *InterpolationDetailsPtr;
@@ -68,26 +75,17 @@ typedef struct InterpolationDetailsStruct *InterpolationDetailsPtr;
 typedef double(*detailed_interpolation_method)(InterpolationDetailsPtr, double);
 
 typedef struct InterpolationDetailsStruct{
-    //0.5 is the sane default; minimal overlapping between windows
+    //1 is the default; near-zero overlapping between windows. 2 overlaps 50% on each side.
     double window;
     //Coefficients for bucubic weighting
     double p1, p2, p3, q1, q2, q3, q4;
     //Blurring factor when > 1, sharpening factor when < 1. Applied to weights.
     double blur;
+
     //pointer to the weight calculation function
     detailed_interpolation_method filter;
-    //If true, use area averaging for initial reduction
-    bool use_halving;
-    //If true, only halve when both dimensions are multiples of the halving factor
-    bool halve_only_when_common_factor;
-    //The final percentage (0..1) of scaling which must be perfomed by true interpolation
-    double use_interpolation_for_percent;
-    //If true, we can 'reuse' the source image as a performance optimization when halving
-    bool allow_source_mutation;
-    //If greater than 0, a percentage to sharpen the result along each axis;
-    double post_resize_sharpen_percent;
-    //Reserved for passing data to new filters
-    int filter_var_a;
+
+    float sharpen_percent_goal;
 
 }InterpolationDetails;
 
@@ -103,158 +101,147 @@ typedef struct
     ContributionType *ContribRow; /* Row (or column) of contribution weights */
     unsigned int WindowSize,      /* Filter window size (of affecting source pixels) */
         LineLength;      /* Length of line (no. or rows / cols) */
+    double percent_negative; /*estimates the sharpening effect*/
 } LineContribType;
 
 
+typedef struct LookupTablesStruct *LookupTablesPtr;
 
-#ifndef MIN
-#   define MIN(a,b) ((a)<(b)?(a):(b))
-#endif
-#   define MIN3(a,b,c) ((a)<(b)?(MIN(a,c)):(MIN(b,c)))
-#ifndef MAX
-#   define MAX(a,b) ((a)<(b)?(b):(a))
-#endif
-#ifndef MAX3
-#   define MAX3(a,b,c) ((a)<(b)?(MAX(b,c)):(MAX(a,c)))
-#endif
-#ifndef NULL
-#   define NULL 0
-#endif
-
-#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
-
-
-static inline float
-linear_to_srgb(float clr) {
-    // Gamma correction
-    // http://www.4p8.com/eric.brasseur/gamma.html#formulas
-
-    if (clr <= 0.0031308)
-        return 12.92f * clr * 255.0f;
-
-    // a = 0.055; ret ((1+a) * s**(1/2.4) - a) * 255
-    return 1.055f * pow(clr, 0.41666666f) * 255.0f - 14.025f;
-}
-
-static inline unsigned char
-uchar_clamp_ff(float clr) {
-    unsigned short result;
-
-    result = (unsigned short)(short)(clr + 0.5);
-
-    if (result > 255) {
-        result = (clr < 0) ? 0 : 255;
-    }
-
-    return result;
-}
-
-
-static int overflow2(int a, int b)
-{
-    if (a <= 0 || b <= 0) {
-        return 1;
-    }
-    if (a > INT_MAX / b) {
-        return 1;
-    }
-    return 0;
-}
-
-static int intlog2(unsigned int val) {
-    int ret = -1;
-    while (val != 0) {
-        val >>= 1;
-        ret++;
-    }
-    return ret;
-}
-
-static inline int isPowerOfTwo(unsigned int x)
-{
-    return ((x != 0) && !(x & (x - 1)));
-}
-
-static BitmapBgraPtr CreateBitmapBgraHeader(int sx, int sy){
-    BitmapBgraPtr im;
-
-    if (overflow2(sx, sy) || overflow2(sizeof(int *), sy) || overflow2(sizeof(int), sx)) {
-        return NULL;
-    }
-
-    im = (BitmapBgra *)malloc(sizeof(BitmapBgra));
-    if (!im) {
-        return NULL;
-    }
-    memset(im, 0, sizeof(BitmapBgra));
-    im->w = sx;
-    im->h = sy;
-    im->pixels = NULL;
-    im->pixels_readonly = true;
-    im->stride_readonly = true;
-    im->borrowed_pixels = true;
-    return im;
-}
-
-
-static BitmapBgraPtr CreateBitmapBgra(int sx, int sy, bool zeroed, int bpp)
-{
-    BitmapBgraPtr im = CreateBitmapBgraHeader(sx, sy);
-    if (im == NULL){ return NULL; }
-
-    im->bpp = bpp;
-    im->stride = im->w * bpp;
-    im->pixels_readonly = false;
-    im->stride_readonly = false;
-    im->borrowed_pixels = false;
-    im->alpha_meaningful = bpp == 4;
-    if (zeroed){
-        im->pixels = (unsigned char *)calloc(sy * im->stride, sizeof(unsigned char));
-    }
-    else{
-        im->pixels = (unsigned char *)malloc(sy * im->stride);
-    }
-    if (!im->pixels) {
-        free(im);
-        return 0;
-    }
-    return im;
-}
-
-
-static void DestroyBitmapBgra(BitmapBgraPtr im)
-{
-    int i;
-    if (im == NULL) return;
-
-    if (!im->borrowed_pixels) {
-        free(im->pixels);
-    }
-    free(im);
-}
+typedef struct LookupTablesStruct{
+    const float srgb_to_linear[256]; //Converts 0..255 -> 0..1, but knowing that 0.255 has sRGB gamma.
+    const float linear[256]; //Converts 0..255 -> 0..1
+    const uint8_t linear_to_srgb[4097]; //Converts from 0..4096 to 0.255, going from linear to sRGB gamma.
+} LookupTables;
 
 
 
 
-static void unpack24bitRow(int width, unsigned char* sourceLine, unsigned char* destArray){
-    for (register unsigned int i = 0; i < width; i++){
+typedef struct RenderDetailsStruct *RenderDetailsPtr;
 
-        memcpy(destArray + i * 4, sourceLine + i * 3, 3);
-        destArray[i * 4 + 3] = 255;
-    }
-}
 
+typedef struct RenderDetailsStruct{
+
+    //Original scaling values, if required.
+    //scale/scale_h are sans-transpose. 
+    //final_w/final_h is the actual result size expected afer all operations
+    //uint32_t from_w, scale_w, final_w, from_h, final_h, scale_h;
+
+
+    InterpolationDetailsPtr interpolation;
+
+    float minimum_sample_window_to_interposharpen;
+
+    
+    bool apply_color_matrix;
+
+    // If possible to do correctly, halve the image until it is [interpolate_last_percent] times larger than needed. 3 or greater reccomended. Specify -1 to disable halving.
+    float interpolate_last_percent; 
+
+    //If true, only halve when both dimensions are multiples of the halving factor
+    bool halve_only_when_common_factor;
+
+    //The actual halving factor to use.
+    uint32_t halving_divisor;
+
+
+
+    float * kernel_a;
+    float kernel_a_min;
+    float kernel_a_max;
+    uint32_t kernel_a_radius;
+
+    float * kernel_b;
+    float kernel_b_min;
+    float kernel_b_max;
+    uint32_t kernel_b_radius;
+
+
+
+    //If greater than 0, a percentage to sharpen the result along each axis;
+    float sharpen_percent_goal;
+
+    
+    float color_matrix_data[25];
+    float *color_matrix[5];
+
+    bool post_transpose;
+    bool post_flip_x;
+    bool post_flip_y;
+ 
+}RenderDetails;
 
 static InterpolationDetailsPtr CreateInterpolationDetails(){
-    InterpolationDetailsPtr d = (InterpolationDetails *)calloc(1, sizeof(InterpolationDetails));
+    InterpolationDetailsPtr d = (InterpolationDetailsPtr)calloc(1, sizeof(InterpolationDetails));
     d->blur = 1;
-    d->window = 0.5;
+    d->window = 2;
     d->p1 = d->q1 = 0;
     d->p2 = d->q2 = d->p3 = d->q3 = d->q4 = 1;
-    d->allow_source_mutation = false;
-    d->halve_only_when_common_factor = false;
-    d->post_resize_sharpen_percent = 0;
-    d->use_halving = false;
-    d->use_interpolation_for_percent = 0.3;
+    d->sharpen_percent_goal = 0;
     return d;
+}
+
+static RenderDetailsPtr CreateRenderDetails(){
+    RenderDetailsPtr d = (RenderDetailsPtr)calloc(1, sizeof(RenderDetails));
+    for (int i = 0; i < 5; i++){
+        d->color_matrix[i] = &(d->color_matrix_data[i * 5]);
+    }
+    d->interpolate_last_percent = 3;
+    d->halve_only_when_common_factor = true;
+    d->minimum_sample_window_to_interposharpen = 1.5;
+    d->apply_color_matrix = false;
+    return d;
+}
+
+
+static void DestroyRenderDetails(RenderDetailsPtr d){
+    if (d->interpolation != NULL) free(d->interpolation);
+
+    if (d->kernel_a != NULL) ir_free(d->kernel_a);
+
+    if (d->kernel_b != NULL) ir_free(d->kernel_b);
+
+    free(d);
+}
+
+
+
+
+static LookupTablesPtr GetLookupTables(){
+    static LookupTablesPtr table = NULL;
+
+    if (table == NULL){
+        LookupTablesPtr temp = (LookupTablesPtr)ir_malloc(sizeof(LookupTablesStruct));
+
+        // Gamma correction
+        // http://www.4p8.com/eric.brasseur/gamma.html#formulas
+
+        // Store gamma adjusted in 256-511, linear in 0-255
+
+        float *lin = (float *)temp->linear;
+        float *to_lin = (float *)temp->srgb_to_linear;
+        uint8_t *to_srgb = (uint8_t *)temp->linear_to_srgb;
+        
+        const float a = 0.055f;
+
+        for (uint32_t n = 0; n < 256; n++)
+        {
+            const float s = ((float)n) / 255.0f;
+            lin[n] = s;
+            to_lin[n] = srgb_to_linear(s);
+        }
+        for (uint32_t n = 0; n < 4097; n++){
+            to_srgb[n] = uchar_clamp_ff(linear_to_srgb((float)n / 4096.0f));
+        }
+        
+        
+        if (table == NULL){
+            //A race condition could cause a 3KB, one-time memory leak between these two lines. 
+            //we're OK with that.
+            table = temp;
+        }
+        else{
+            ir_free(temp);
+        }
+    }
+    return table;
 }

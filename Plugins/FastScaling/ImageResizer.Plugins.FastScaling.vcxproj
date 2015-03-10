@@ -160,13 +160,22 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bitmap_scaler.h" />
-    <ClInclude Include="colormatrix.h" />
+    <ClInclude Include="bitmap_formats.h" />
+    <ClInclude Include="bitmap_compositing.h" />
+    <ClInclude Include="fastapprox.h" />
+    <ClInclude Include="managed_bitmap_wrapper.h" />
+    <ClInclude Include="color_matrix.h" />
+    <ClInclude Include="color_spaces.h" />
+    <ClInclude Include="convolution.h" />
     <ClInclude Include="halving.h" />
     <ClInclude Include="ImageResizer.Plugins.FastScaling.h" />
+    <ClInclude Include="math_functions.h" />
+    <ClInclude Include="rendering.h" />
     <ClInclude Include="scaling.h" />
     <ClInclude Include="shared.h" />
+    <ClInclude Include="sharpening.h" />
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="trim_whitespace.h" />
     <ClInclude Include="weighting.h" />
   </ItemGroup>
   <ItemGroup>
