@@ -48,6 +48,19 @@ namespace ImageResizerPluginsFastScalingTestsCpp {
 
 
         [Fact]
+        void CompositingTest()
+        {
+            String ^imgdir = gcnew String("..\\..\\..\\..\\Samples\\Images\\");
+            Bitmap^ input = gcnew Bitmap(imgdir + "premult-test.png");
+            Bitmap ^output = BuildFast(input, "fastscale=true&width=256&bgcolor=blue");
+
+            Color ^px = output->GetPixel(5, 5);
+            Color ^tst = Color::FromArgb(255, 0, 188, 187);
+            Assert::True(*px == *tst, "Expected: " + tst->ToString() + " Got: " + px->ToString());
+        }
+
+
+        [Fact]
         void AlphaMultTest()
         {
             String ^imgdir = gcnew String("..\\..\\..\\..\\Samples\\Images\\");
