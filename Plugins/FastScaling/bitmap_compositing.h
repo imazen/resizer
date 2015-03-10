@@ -3,7 +3,7 @@
 #include "Stdafx.h"
 #include "shared.h"
 
-
+#pragma unmanaged
 
 
 static int convert_srgb_to_linear(BitmapBgraPtr src, const uint32_t from_row, BitmapFloatPtr dest, const uint32_t dest_row, const uint32_t row_count){
@@ -151,14 +151,14 @@ static void demultiply_alpha(BitmapFloatPtr src, const uint32_t from_row, const 
 }
 
 
-static void copy_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row, BitmapBgraPtr dest, const uint32_t dest_row, const uint32_t row_count, const bool transpose){
+static void copy_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row, BitmapBgraPtr dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose){
 
      LookupTables*   t = GetLookupTables();
 
 
     const uint32_t dest_row_stride = transpose ? dest->bpp : dest->stride;
     const uint32_t dest_pixel_stride = transpose ? dest->stride : dest->bpp;
-    const uint32_t srcitems = src->w *src->channels;
+    const uint32_t srcitems = MIN(from_col + col_count, src->w) *src->channels;
     const uint32_t ch = src->channels;
     const bool copy_alpha = dest->bpp == 4 && src->channels == 4 && src->alpha_meaningful;
     const bool clean_alpha = !copy_alpha && dest->bpp == 4;
@@ -167,14 +167,14 @@ static void copy_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row, B
         //const float * const __restrict src_row = src->pixels + (row + from_row) * src->float_stride;
         float * src_row = src->pixels + (row + from_row) * src->float_stride;
         
-        uint8_t * dest_row_bytes = dest->pixels + (dest_row + row) * dest_row_stride;
+        uint8_t * dest_row_bytes = dest->pixels + (dest_row + row) * dest_row_stride + (from_col * dest_pixel_stride);
 
-        for (uint32_t ix = 0; ix < srcitems; ix += ch){
-            dest_row_bytes[0] = t->linear_to_srgb[clamp_01_to_04096(src_row[ix])];
-            dest_row_bytes[1] = t->linear_to_srgb[clamp_01_to_04096(src_row[ix + 1])];
-            dest_row_bytes[2] = t->linear_to_srgb[clamp_01_to_04096(src_row[ix + 2])];
+        for (uint32_t ix = from_col * ch; ix < srcitems; ix += ch){
+            dest_row_bytes[0] = linear_to_srgb(src_row[ix]);
+            dest_row_bytes[1] = linear_to_srgb(src_row[ix + 1]);
+            dest_row_bytes[2] = linear_to_srgb(src_row[ix + 2]);
             if (copy_alpha){
-                dest_row_bytes[3] = uchar_clamp_ff(src_row[ix + 3] * 255);
+                dest_row_bytes[3] = uchar_clamp_ff(src_row[ix + 3] * 255.0f);
 
             }
             if (clean_alpha){
@@ -186,40 +186,51 @@ static void copy_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row, B
 
 }
 
-static void compose_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row, BitmapBgraPtr dest, const uint32_t dest_row, const uint32_t row_count, const bool transpose){
+static void compose_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row, BitmapBgraPtr dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose){
 
     LookupTables*   t = GetLookupTables();
     const uint32_t dest_row_stride = transpose ? dest->bpp : dest->stride;
     const uint32_t dest_pixel_stride = transpose ? dest->stride : dest->bpp;
-    const uint32_t srcitems = src->w *src->channels;
+    const uint32_t srcitems = MIN(from_col + col_count, src->w) *src->channels;
     const uint32_t ch = src->channels;
 
     const bool dest_alpha = dest->bpp == 4 && dest->alpha_meaningful;
 
-
+    const uint8_t dest_alpha_weight = dest_alpha ? 1 : 0;
+    const uint8_t dest_alpha_neg_weight = dest_alpha ? 0 : 1;
+    const uint8_t dest_alpha_index = dest_alpha ? 3 : 0;
+    const float dest_alpha_to_float_coeff = dest_alpha_weight * 1.0 / 255.0;
+    const float dest_alpha_to_float_offset = dest_alpha_neg_weight;
     for (uint32_t row = 0; row < row_count; row++){
         //const float * const __restrict src_row = src->pixels + (row + from_row) * src->float_stride;
         float * src_row = src->pixels + (row + from_row) * src->float_stride;
 
-        uint8_t * dest_row_bytes = dest->pixels + (dest_row + row) * dest_row_stride;
+        uint8_t * dest_row_bytes = dest->pixels + (dest_row + row) * dest_row_stride + (from_col * dest_pixel_stride);
 
-        for (uint32_t ix = 0; ix < srcitems; ix += ch){ 
+        for (uint32_t ix = from_col * ch; ix < srcitems; ix += ch){ 
+
+            const uint8_t dest_b = dest_row_bytes[0];
+            const uint8_t dest_g = dest_row_bytes[1];
+            const uint8_t dest_r = dest_row_bytes[2];
+            const uint8_t dest_a = dest_row_bytes[dest_alpha_index];
+
+            const float src_b = src_row[ix + 0];
+            const float src_g = src_row[ix + 1];
+            const float src_r = src_row[ix + 2];
             const float src_a = src_row[ix + 3];
-            const float a = (1.0 - src_a) * (dest_alpha ? t->linear[dest_row_bytes[3]] : 1.0f);
-            const float b = t->srgb_to_linear[dest_row_bytes[0]] * a;
-            const float g = t->srgb_to_linear[dest_row_bytes[1]] * a;
-            const float r = t->srgb_to_linear[dest_row_bytes[2]] * a;
+            const float a = (1.0f - src_a) * (dest_alpha_to_float_coeff * dest_a + dest_alpha_to_float_offset);
+            
+            const float b = t->srgb_to_linear[dest_b] * a + src_b;
+            const float g = t->srgb_to_linear[dest_g] * a + src_g;
+            const float r = t->srgb_to_linear[dest_r] * a + src_r;
+            
             const float final_alpha = src_a + a;
 
+            dest_row_bytes[0] = linear_to_srgb(b / final_alpha);
+            dest_row_bytes[1] = linear_to_srgb(g / final_alpha);
+            dest_row_bytes[2] = linear_to_srgb(r / final_alpha);
+            dest_row_bytes[dest_alpha_index] = dest_alpha_neg_weight * dest_row_bytes[dest_alpha_index]  + dest_alpha_weight * uchar_clamp_ff(final_alpha * 255);
 
-
-            dest_row_bytes[0] = t->linear_to_srgb[clamp_01_to_04096((src_row[ix] + b) / final_alpha)];
-            dest_row_bytes[1] = t->linear_to_srgb[clamp_01_to_04096((src_row[ix + 1] + g) / final_alpha)];
-            dest_row_bytes[2] = t->linear_to_srgb[clamp_01_to_04096((src_row[ix + 2] + r) / final_alpha)];
-            if (dest_alpha){
-                dest_row_bytes[3] = uchar_clamp_ff(final_alpha * 255);
-
-            }
             dest_row_bytes += dest_pixel_stride;
         }
     }
@@ -248,11 +259,36 @@ static int pivoting_composite_linear_over_srgb(BitmapFloatPtr src, const uint32_
     
     if (can_compose && !src->alpha_premultiplied) return -10; //Something went wrong. We should always have alpha premultiplied.
 
-    if (can_compose){
-        compose_linear_over_srgb(src, from_row, dest, dest_row, row_count, transpose);
+    //Tiling does not appear to show benefits when benchmarking - only breifly investigated
+    bool tile_when_transposing = false;
+
+    if (transpose && tile_when_transposing){
+        
+        //Let's try to tile within 2kb, get some cache coherency
+        const float dest_opt_rows = 2048.0f / (float)dest->stride;
+
+        const int tile_width = MAX(4, dest_opt_rows);
+        const int tiles = src->w / tile_width;
+
+        if (can_compose){
+            for (int i = 0; i < tiles; i++){
+                compose_linear_over_srgb(src, from_row, dest, dest_row, row_count, i * tile_width, tile_width, transpose);
+            }
+        }
+        else{
+            for (int i = 0; i < tiles; i++){
+                copy_linear_over_srgb(src, from_row, dest, dest_row, row_count, i * tile_width, tile_width, transpose);
+            }
+        }
     }
     else{
-        copy_linear_over_srgb(src, from_row, dest, dest_row, row_count, transpose);
+        if (can_compose){
+            compose_linear_over_srgb(src, from_row, dest, dest_row, row_count, 0, src->w, transpose);
+        }
+        else{
+            copy_linear_over_srgb(src, from_row, dest, dest_row, row_count, 0,src->w,transpose);
+        }
     }
+
     return 0;
 }
