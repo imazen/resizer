@@ -133,7 +133,7 @@
       </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-    <ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{fa5ef673-a6a4-498d-aa24-c025cc5267af}</Project>
       <Name>ImageResizer</Name>
@@ -159,29 +159,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Plugins\FastScaling\weighting.h" />
-    <ClInclude Include="ImageResizer.Plugins.FastScaling.Tests.Cpp.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="TestRendering.h" />
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="weighting_test_helpers.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
-    <ClCompile Include="ImageResizer.Plugins.FastScaling.Tests.Cpp.cpp" />
+    <ClCompile Include="TestRendering.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="app.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="app.ico" />
+    <ClCompile Include="TestColorMath.cpp" />
+    <ClCompile Include="weighting_test_helpers.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

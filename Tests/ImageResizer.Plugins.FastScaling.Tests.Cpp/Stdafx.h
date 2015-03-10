@@ -5,3 +5,6 @@
 #pragma once
 
 
+
+#include "..\..\Plugins\FastScaling\weighting.h"
+#include "..\..\Plugins\FastScaling\bitmap_compositing.h"
