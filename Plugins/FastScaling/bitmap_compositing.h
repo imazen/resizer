@@ -115,10 +115,12 @@ static void demultiply_alpha(BitmapFloatPtr src, const uint32_t from_row, const 
         uint32_t end_ix = start_ix + src->w * src->channels;
 
         for (uint32_t ix = start_ix; ix < end_ix; ix += 4){
-            const float alpha = 1.0f / src->pixels[ix + 3];
-            src->pixels[ix] *= alpha;
-            src->pixels[ix + 1] *= alpha;
-            src->pixels[ix + 2] *= alpha;
+            const float alpha = src->pixels[ix + 3];
+            if (alpha > 0){
+                src->pixels[ix] /= alpha;
+                src->pixels[ix + 1] /= alpha;
+                src->pixels[ix + 2] /= alpha;
+            }
         }
     }
 }
