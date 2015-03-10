@@ -290,6 +290,8 @@ namespace ImageResizer{
                         int r = Halve(source, tmp_im, divisor);
                         if (r == NULL) throw gcnew OutOfMemoryException();
 
+                        tmp_im->alpha_meaningful = source->alpha_meaningful;
+
                         this->source = nullptr;
                         //We no longer need/want wbSource and source
                         delete wbSource;

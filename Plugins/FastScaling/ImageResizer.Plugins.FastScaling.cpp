@@ -100,14 +100,14 @@ namespace ImageResizer{
                     
                     BitmapOptions^ a = gcnew BitmapOptions();
                     a->AllowSpaceReuse = false;
-                    a->AlphaMeaningful = false;
+                    a->AlphaMeaningful = true;
                     a->Crop = Util::PolygonMath::ToRectangle(sourceArea);
                     a->Bitmap = source;
 
 
                     BitmapOptions^ b = gcnew BitmapOptions();
                     b->AllowSpaceReuse = false;
-                    b->AlphaMeaningful = false;
+                    b->AlphaMeaningful = true; 
                     b->Crop = Util::PolygonMath::ToRectangle(targetBox);
                     b->Bitmap = dest;
                     b->Compositing = BitmapCompositingMode::Replace_self;
