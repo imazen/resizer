@@ -234,9 +234,11 @@ Target "pack_zips" (fun _ ->
         DeleteFile file
     
     let inventory = FsInventory(rootDir)
+
     let mutable query = FsQuery(inventory, (toPatterns ["/.git";"^/Releases";"/Hidden/";"^/Legacy";"^/Tools/(Builder|BuildTools|docu)";
-        "^/submodules/docu"; "^/Samples/Images/(extra|private)/";"/Thumbs.db$";"/.DS_Store$";".suo$";".cache$";".user$"; "/._";"/~$"; 
-        "^/Samples/MvcSample/App_Data/";".pch$"]))
+        "^/submodules/docu"; "^/Samples/Images/(extra|private)/";"/Thumbs.db$"; "/._";"/~$";".FileAbsoluteList.txt$";"/(pthreadVSE2.dll|cair.exe|Nuget.exe)$";
+        "^/Samples/MvcSample/App_Data/";"/ipch/";"_ReSharper";"_(i|p).c$";
+        ".(DS_Store|pch|opensdf|sdf|sbr|unsuccessfulbuild|coverage|tlog|metagen|lastbuildstate|res|log|ilk|Cache|cache|bak|tlh|tlb|suo|ncb|vspscc|vssscc|aps|user|obj|coverage|user|userprefs)$"]))
     
     query <- query.exclude(["/(Newtonsoft.Json|DotNetZip|Aforge|LitS3|Ionic|NLog|MongoDB|Microsoft.|AWSSDK)*.(xml|pdb)$";
         "/(OpenCvSharp|FreeImageNet)*.xml$"; "/(FreeImage|gsdll32|gsdll64).dll$";
@@ -366,7 +368,7 @@ Target "push_zips" (fun _ ->
                 with exn ->
                     tries <- tries-1
                     if tries=0 then
-                        raise exn
+                        reraise()
 )
 
 Target "update_imageserv" (fun _ ->
