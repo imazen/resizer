@@ -50,6 +50,8 @@ enum InterpolationFilter{
     Filter_Lanczos3SharpWindowed,
     Filter_Lanczos2Windowed,
     Filter_Lanczos2SharpWindowed,
+    Filter_CatmullRomFast,
+    Filter_CatmullRomFastSharp
 };
 
 enum Rotate{
