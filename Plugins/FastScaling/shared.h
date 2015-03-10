@@ -217,11 +217,7 @@ static LookupTablesPtr GetLookupTables(){
         {
             const float s = ((float)n) / 255.0f;
             lin[n] = s;
-
-            if (s <= 0.04045f)
-                to_lin[n] = s / 12.92f;
-            else
-                to_lin[n] = pow((s + a) / (1 + a), 2.4f);
+            to_lin[n] = srgb_to_linear(s);
         }
         for (uint32_t n = 0; n < 4097; n++){
             to_srgb[n] = uchar_clamp_ff(linear_to_srgb((float)n / 4096.0f));

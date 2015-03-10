@@ -18,6 +18,17 @@ linear_to_srgb(float clr) {
 }
 
 
+static inline float
+srgb_to_linear(float s) {
+    if (s <= 0.04045f)
+       return s / 12.92f;
+    else
+        return pow((s + 0.055f) / (1 + 0.055f), 2.4f);
+}
+
+
+
+
 static inline void linear_to_yxz(float * bgr){
 
     const float R = bgr[2];
