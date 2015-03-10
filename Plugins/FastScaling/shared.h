@@ -45,6 +45,11 @@ enum InterpolationFilter{
     Filter_Triangle,
     Filter_Linear,
     Filter_Box,
+    Filter_CubicBSpline,
+    Filter_Lanczos3Windowed,
+    Filter_Lanczos3SharpWindowed,
+    Filter_Lanczos2Windowed,
+    Filter_Lanczos2SharpWindowed,
 };
 
 enum Rotate{

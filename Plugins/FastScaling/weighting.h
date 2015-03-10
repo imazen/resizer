@@ -37,7 +37,7 @@ static inline double filter_bicubic_fast(const InterpolationDetailsPtr d, const 
 }
 
 
-static inline double filter_sinc(const InterpolationDetailsPtr d, double t)
+static inline double filter_sinc_2(const InterpolationDetailsPtr d, double t)
 {
     const double abs_t = (double)fabs(t) / d->blur;
     if (abs_t == 0) { return 1; } //Avoid division by zero
@@ -61,6 +61,18 @@ static inline double filter_triangle(const InterpolationDetailsPtr d, double t)
     return(0.0);
 }
 
+
+static inline double filter_sinc_windowed(const InterpolationDetailsPtr d, double t)
+{
+    const double x = t / d->blur;
+    const double abs_t = (double)fabs(x);
+    if (abs_t == 0) { return 1; } //Avoid division by zero
+    if (abs_t > d->window){ return 0; }
+    return d->window * sin(IR_PI * x / d->window) * sin(x * IR_PI) / (IR_PI * IR_PI * x * x);
+}
+
+
+
 static InterpolationDetailsPtr CreateBicubicCustom(double window, double blur, double B, double C){
     InterpolationDetailsPtr d = CreateInterpolationDetails();
     d->blur = blur;
@@ -83,13 +95,28 @@ static InterpolationDetailsPtr CreateInterpolation(InterpolationFilter filter){
         case InterpolationFilter::Filter_Triangle:
             return CreateCustom(1, 1, filter_triangle);
         case InterpolationFilter::Filter_Lanczos2:
-            return CreateCustom(2, 1, filter_sinc);
-        case InterpolationFilter::Filter_Lanczos3:
-            return CreateCustom(3, 1, filter_sinc);
+            return CreateCustom(2, 1, filter_sinc_2);
+        case InterpolationFilter::Filter_Lanczos3: //Note - not a 3 lobed function - truncated to 2
+            return CreateCustom(3, 1, filter_sinc_2);
         case InterpolationFilter::Filter_Lanczos2Sharp:
-            return CreateCustom(2, 0.9549963639785485, filter_sinc);
-        case InterpolationFilter::Filter_Lanczos3Sharp:
-            return CreateCustom(3, 0.9812505644269356, filter_sinc);
+            return CreateCustom(2, 0.9549963639785485, filter_sinc_2); 
+        case InterpolationFilter::Filter_Lanczos3Sharp://Note - not a 3 lobed function - truncated to 2
+            return CreateCustom(3, 0.9812505644269356, filter_sinc_2);
+        
+        //Hermite and BSpline no negative weights
+        case Filter_CubicBSpline:
+            return CreateBicubicCustom(2, 1, 1, 0);
+
+        case InterpolationFilter::Filter_Lanczos2Windowed:
+            return CreateCustom(2, 1, filter_sinc_windowed);
+        case InterpolationFilter::Filter_Lanczos3Windowed:
+            return CreateCustom(3, 1, filter_sinc_windowed);
+        case InterpolationFilter::Filter_Lanczos2SharpWindowed:
+            return CreateCustom(2, 0.9549963639785485, filter_sinc_windowed);
+        case InterpolationFilter::Filter_Lanczos3SharpWindowed:
+            return CreateCustom(3, 0.9812505644269356, filter_sinc_windowed);
+
+           
         case Filter_CubicFast:
             return CreateCustom(1, 1, filter_bicubic_fast);
         case Filter_Cubic:
