@@ -182,6 +182,19 @@ namespace ImageResizer {
         /// </summary>
         public Instructions Instructions { get; set; }
 
+
+        public string InstructionsAsString
+        {
+            get
+            {
+                return Instructions.ToQueryString();
+            }
+            set
+            {
+                Instructions = new Instructions(value);
+            }
+        }
+
         private bool _disposeSourceObject = true;
         /// <summary>
         /// If true, and if 'source' is a IDisposable instead like Bitmap or Stream instance, it will be disposed after it has been used. Defaults to true.
