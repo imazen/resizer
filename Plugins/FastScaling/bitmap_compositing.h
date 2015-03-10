@@ -196,11 +196,9 @@ static void compose_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row
 
     const bool dest_alpha = dest->bpp == 4 && dest->alpha_meaningful;
 
-    const uint8_t dest_alpha_weight = dest_alpha ? 1 : 0;
-    const uint8_t dest_alpha_neg_weight = dest_alpha ? 0 : 1;
     const uint8_t dest_alpha_index = dest_alpha ? 3 : 0;
-    const float dest_alpha_to_float_coeff = dest_alpha_weight * 1.0 / 255.0;
-    const float dest_alpha_to_float_offset = dest_alpha_neg_weight;
+    const float dest_alpha_to_float_coeff = dest_alpha ? 1.0 / 255.0 : 0.0;
+    const float dest_alpha_to_float_offset = dest_alpha ? 0 : 1;
     for (uint32_t row = 0; row < row_count; row++){
         //const float * const __restrict src_row = src->pixels + (row + from_row) * src->float_stride;
         float * src_row = src->pixels + (row + from_row) * src->float_stride;
@@ -229,8 +227,9 @@ static void compose_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row
             dest_row_bytes[0] = linear_to_srgb(b / final_alpha);
             dest_row_bytes[1] = linear_to_srgb(g / final_alpha);
             dest_row_bytes[2] = linear_to_srgb(r / final_alpha);
-            dest_row_bytes[dest_alpha_index] = dest_alpha_neg_weight * dest_row_bytes[dest_alpha_index]  + dest_alpha_weight * uchar_clamp_ff(final_alpha * 255);
-
+            if (dest_alpha){
+                dest_row_bytes[3] =  uchar_clamp_ff(final_alpha * 255);
+            }
             dest_row_bytes += dest_pixel_stride;
         }
     }
