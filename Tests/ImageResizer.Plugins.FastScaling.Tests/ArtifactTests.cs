@@ -117,14 +117,14 @@ namespace ImageResizer.Plugins.FastScaling.Tests
         }
 
         [Theory]
-        [InlineData("window=0.1", Side.Right | Side.Bottom)]
-        [InlineData("window=0.1", Side.Left | Side.Top)]
-        [InlineData("window=0.3", Side.Right | Side.Bottom)]
-        [InlineData("window=0.3", Side.Left | Side.Top)]
-        [InlineData("window=0.5", Side.Right | Side.Bottom)]
-        [InlineData("window=0.5", Side.Left | Side.Top)]
+        [InlineData("window=0.2", Side.Right | Side.Bottom)]
+        [InlineData("window=0.2", Side.Left | Side.Top)]
+        [InlineData("window=0.6", Side.Right | Side.Bottom)]
+        [InlineData("window=0.6", Side.Left | Side.Top)]
         [InlineData("window=1", Side.Right | Side.Bottom)]
         [InlineData("window=1", Side.Left | Side.Top)]
+        [InlineData("window=2", Side.Right | Side.Bottom)]
+        [InlineData("window=2", Side.Left | Side.Top)]
         public void CheckForLostBorder(string instructions, Side toCheck)
         {
             var background = Color.FromArgb(255, 255, 0, 0);
@@ -132,7 +132,7 @@ namespace ImageResizer.Plugins.FastScaling.Tests
             var b = CreateRingedBitmap(200, 86, border, background, 2);
 
             var i = new Instructions(instructions);
-            i.Width = 50;
+            i.Width = 100;
             using (var result = BuildWithFastScaling(b, i))
             {
                 AssertBorderColor(border, result,toCheck);
