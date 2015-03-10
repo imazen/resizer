@@ -162,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="bitmap_formats.h" />
     <ClInclude Include="bitmap_compositing.h" />
+    <ClInclude Include="fastapprox.h" />
     <ClInclude Include="managed_bitmap_wrapper.h" />
     <ClInclude Include="color_matrix.h" />
     <ClInclude Include="color_spaces.h" />

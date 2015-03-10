@@ -14,7 +14,7 @@ linear_to_srgb(float clr) {
         return 12.92f * clr * 255.0f;
 
     // a = 0.055; ret ((1+a) * s**(1/2.4) - a) * 255
-    return 1.055f * pow(clr, 0.41666666f) * 255.0f - 14.025f;
+    return 1.055f  * 255.0f * pow(clr, 0.41666666f) - 14.025f;
 }
 
 
@@ -42,7 +42,7 @@ static inline void linear_to_yxz(float * bgr){
 }
 
 static inline void linear_to_luv(float * bgr){
-    //Observer= 2°, Illuminant= D65
+    //Observer= 2ï¿½, Illuminant= D65
 
     const float xn = 0.312713f;
     const float yn = 0.329016f;

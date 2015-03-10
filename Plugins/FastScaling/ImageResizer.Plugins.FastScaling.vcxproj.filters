@@ -59,6 +59,9 @@
     <ClInclude Include="trim_whitespace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fastapprox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImageResizer.Plugins.FastScaling.cpp">
