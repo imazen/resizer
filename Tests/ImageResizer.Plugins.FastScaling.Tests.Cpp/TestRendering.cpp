@@ -1,8 +1,11 @@
 // This is the main DLL file.
 #include "stdafx.h"
+
+
+//TODO: Test compositing with scaling
+
 //TODO: Test blend with matte
 //TODO: Test compositing
-//TODO: Test compositing with scaling
 //TODO: Test blending with scaling
 //TODO: Test color matrix without scaling
 //TODO: Test rotation and flipping
@@ -20,27 +23,12 @@ using namespace ImageResizer;
 using namespace ImageResizer::Configuration;
 using namespace ImageResizer::Plugins::FastScaling;
 
+
 namespace ImageResizerPluginsFastScalingTestsCpp {
 
     public ref class TestsCpp 
     {
-        static Bitmap ^BuildFast(Bitmap ^source, String ^i)
-        {
-            Config ^c = gcnew Config();
-
-            FastScalingPlugin ^fs = gcnew FastScalingPlugin();
-            fs->Install(c);
-
-            Stream ^dest = gcnew MemoryStream();
-            ImageJob^ j = gcnew ImageJob();
-            j->InstructionsAsString = i; 
-            j->Source = source;
-            j->Dest = Bitmap::typeid;
-
-            c->Build(j);
-            return (Bitmap^)j->Result;
-        }
-
+ 
     public:
         [Fact]
         void ContributionsCalcTest()
@@ -58,13 +46,14 @@ namespace ImageResizerPluginsFastScalingTestsCpp {
             Assert::True(r, gcnew String(msg));
         }
 
+
         [Fact]
         void AlphaMultTest()
         {
             String ^imgdir = gcnew String("..\\..\\..\\..\\Samples\\Images\\");
             Bitmap^ input = gcnew Bitmap(imgdir + "premult-test.png");
             Bitmap ^output = BuildFast(input, "fastscale=true&width=256");
-
+            
             Color ^px = output->GetPixel(5, 5);
             Color ^tst = Color::FromArgb(128, 0, 255, 0);
             
@@ -97,28 +86,33 @@ namespace ImageResizerPluginsFastScalingTestsCpp {
 
                 double vscale = (2 * height / 3) * -1 / buffer[width / 2];
                 int x_axis_y = 2 * height / 3;
+                int y_axis_x = width / 2;
 
                 Bitmap^ b = gcnew Bitmap(width, height);;
                 
                 Graphics^ g = Graphics::FromImage(b);
 
-                g->DrawLine(Pens::Gray, 0, x_axis_y, width, x_axis_y);
-                g->DrawLine(Pens::Gray, width / 2, 0, width /2, height);
+                g->DrawLine(Pens::LightGray, 0, x_axis_y, width, x_axis_y);
+                g->DrawLine(Pens::LightGray, y_axis_x, 0, y_axis_x, height);
 
                 //Plot integers of X
                 for (int j = 0; j <= ceil(window); j++){
-                    double offset = (width / 2.0) / window * j;
-                    g->DrawLine(Pens::Red, width / 2 + (int)offset, x_axis_y - 5, width / 2 + (int)offset, x_axis_y + 5);
-                    g->DrawLine(Pens::Red, width / 2 - (int)offset, x_axis_y - 5, width / 2 - (int)offset, x_axis_y + 5);
+                    int offset = (width / 2.0) / window * j;
+                    g->DrawLine(Pens::Red, y_axis_x + (int)offset + 2, x_axis_y - 8, y_axis_x + (int)offset - 2, x_axis_y + 8);
+                    g->DrawLine(Pens::Red, y_axis_x - (int)offset - 2, x_axis_y - 8, y_axis_x - (int)offset + 2, x_axis_y + 8);
                 }
                 //Plot ideal window bounds
                 double filter_window = (width / 2.0) / window * details->window;
-                g->DrawLine(Pens::Blue, width / 2 + (int)filter_window, 0, width / 2 + (int)filter_window, height - 1);
-                g->DrawLine(Pens::Blue, width / 2 - (int)filter_window, 0, width / 2 - (int)filter_window, height - 1);
+                g->DrawLine(Pens::Blue, y_axis_x + (int)filter_window, 0, y_axis_x + (int)filter_window, height - 1);
+                g->DrawLine(Pens::Blue, y_axis_x - (int)filter_window, 0, y_axis_x - (int)filter_window, height - 1);
 
                 //Plot filter weights 
                 for (int j = 0; j < width; j++){
-                    b->SetPixel(j, (int)round(buffer[j] * vscale) + x_axis_y, Color::Black);
+                    int y = (int)round(buffer[j] * vscale) + x_axis_y; 
+                    if (isnan(buffer[j]) || buffer[j] > buffer[width /2]){
+                        throw gcnew ArgumentOutOfRangeException("filter","filter produced an invalid value, either NaN, or a peak other than x=0");
+                    }
+                    b->SetPixel(j, y, Color::Black);
                 }
 
                 b->Save(String::Format("..\\..\\..\\..\\Tests\\ImageResizer.Plugins.FastScaling.Tests.Cpp\\PlotFilter{0}.png", i));

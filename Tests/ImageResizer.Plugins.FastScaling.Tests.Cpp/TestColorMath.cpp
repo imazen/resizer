@@ -19,24 +19,6 @@ namespace ImageResizerPluginsFastScalingTestsCpp {
     {
 
     public:
-        static Bitmap ^BuildFast(Bitmap ^source, String ^i)
-        {
-            Config ^c = gcnew Config();
-
-            FastScalingPlugin ^fs = gcnew FastScalingPlugin();
-            fs->Install(c);
-
-            Stream ^dest = gcnew MemoryStream();
-            ImageJob^ j = gcnew ImageJob();
-            j->InstructionsAsString = i;
-            j->Source = source;
-            j->Dest = Bitmap::typeid;
-
-            c->Build(j);
-            return (Bitmap^)j->Result;
-        }
-
-    public:
       
 
         [Fact]

@@ -158,6 +158,7 @@ bool test_weight_distrib(char *msg)
 
     ///
     if (!test_filter(InterpolationFilter::Filter_Lanczos2Windowed, msg, 1, 2, 1, 0.08, 2)) return false;
+
     if (!test_filter(InterpolationFilter::Filter_Lanczos2SharpWindowed, msg, 0.954, 1.86, 1, 0.08, 2)) return false;
 
     //These should be negative between x=1 and x=2, positive between 2 and 3, but should end at 3
