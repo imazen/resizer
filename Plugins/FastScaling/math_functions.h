@@ -41,11 +41,11 @@ uchar_clamp_ff(float clr) {
 
 static inline
 uint16_t
-clamp_01_to_01024(float clr) {
-    const uint16_t result = (uint16_t)(clr * 1023 + 0.5);
+clamp_01_to_04096(float clr) {
+    const uint16_t result = (uint16_t)lround(clr * 4096.0f);
 
-    if (result > 1023) {
-        return clr < 0 ? 0 : 1023;
+    if (result > 4096) {
+        return clr < 0 ? 0 : 4096;
     }
     return result;
 }

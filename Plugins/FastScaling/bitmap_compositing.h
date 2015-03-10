@@ -145,9 +145,9 @@ static void copy_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row, B
         uint8_t * dest_row_bytes = dest->pixels + (dest_row + row) * dest_row_stride;
 
         for (uint32_t ix = 0; ix < srcitems; ix += ch){
-            dest_row_bytes[0] = t->linear_to_srgb[clamp_01_to_01024(src_row[ix])];
-            dest_row_bytes[1] = t->linear_to_srgb[clamp_01_to_01024(src_row[ix + 1])];
-            dest_row_bytes[2] = t->linear_to_srgb[clamp_01_to_01024(src_row[ix + 2])];
+            dest_row_bytes[0] = t->linear_to_srgb[clamp_01_to_04096(src_row[ix])];
+            dest_row_bytes[1] = t->linear_to_srgb[clamp_01_to_04096(src_row[ix + 1])];
+            dest_row_bytes[2] = t->linear_to_srgb[clamp_01_to_04096(src_row[ix + 2])];
             if (copy_alpha){
                 dest_row_bytes[3] = uchar_clamp_ff(src_row[ix + 3] * 255);
 

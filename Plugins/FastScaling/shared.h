@@ -95,7 +95,7 @@ typedef struct LookupTablesStruct *LookupTablesPtr;
 typedef struct LookupTablesStruct{
     const float srgb_to_linear[256]; //Converts 0..255 -> 0..1, but knowing that 0.255 has sRGB gamma.
     const float linear[256]; //Converts 0..255 -> 0..1
-    const uint8_t linear_to_srgb[1024]; //Converts from 0..1023 to 0.255, going from linear to sRGB gamma.
+    const uint8_t linear_to_srgb[4097]; //Converts from 0..4096 to 0.255, going from linear to sRGB gamma.
 } LookupTables;
 
 
@@ -218,8 +218,8 @@ static LookupTablesPtr GetLookupTables(){
             else
                 to_lin[n] = pow((s + a) / (1 + a), 2.4f);
         }
-        for (uint32_t n = 0; n < 1024; n++){
-            to_srgb[n] = uchar_clamp_ff(linear_to_srgb((float)n / 1024.0f));
+        for (uint32_t n = 0; n < 4097; n++){
+            to_srgb[n] = uchar_clamp_ff(linear_to_srgb((float)n / 4096.0f));
         }
         
         
