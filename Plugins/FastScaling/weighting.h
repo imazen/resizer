@@ -120,9 +120,9 @@ static InterpolationDetailsPtr CreateInterpolation(InterpolationFilter filter){
         case Filter_CubicFast:
             return CreateCustom(1, 1, filter_bicubic_fast);
         case Filter_Cubic:
-            return CreateBicubicCustom(2, 0.5, 1, 0);
+            return CreateBicubicCustom(2, 1, 0,1);
         case Filter_CatmullRom:
-            return CreateBicubicCustom(2, 0.5, 0, 0.5);
+            return CreateBicubicCustom(2, 1, 0, 0.5);
         case Filter_Mitchell:
             return CreateBicubicCustom(2, 7.0 / 8.0, 1.0 / 3.0, 1.0 / 3.0);
         case Filter_Robidoux:
