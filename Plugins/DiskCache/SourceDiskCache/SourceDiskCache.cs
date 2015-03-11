@@ -88,7 +88,7 @@ namespace ImageResizer.Plugins.SourceDiskCache
         public IVirtualFile GetFileIfCached(string virtualPath, System.Collections.Specialized.NameValueCollection queryString, IVirtualFile original)
         {
             if (!"disk".Equals(queryString["scache"], StringComparison.OrdinalIgnoreCase)) return null;
-            if (!this.AsyncModuleMode) throw new InvalidOperationException("SourceDiskCache cannot be used in synchronous mode if AsyncModuleMode=true");
+            if (this.AsyncModuleMode) throw new InvalidOperationException("SourceDiskCache cannot be used in synchronous mode if AsyncModuleMode=true");
             
 
             //Verify web.config exists in the cache folder.
