@@ -410,7 +410,7 @@ Target "update_imageserv" (fun _ ->
                         WriteToFile true "paket.references" [pkg]
         
         Shell.Exec (".paket\\paket.bootstrapper.exe")
-        Shell.Exec (".paket\\paket.exe", "update")
+        Shell.Exec (".paket\\paket.exe", "update --redirects")
         
         gitCommand "." ("add *")
         gitCommand "." ("commit -m \"AutoCommit: CI build "+ver+"\"")
