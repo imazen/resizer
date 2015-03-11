@@ -8,7 +8,7 @@
   <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x86/opencv_ml2410.dll" name="opencv_ml2410.dll" bitness="32" fileBytes="507904" />
   <!--<file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x86/opencv_ts2410.dll" name="opencv_ts2410.dll" bitness="32" fileBytes="567296" />-->
   <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x86/opencv_gpu2410.dll" name="opencv_gpu2410.dll" bitness="32" fileBytes="431104" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x86/opencv_objdetect2410.dll" name="opencv_objdetect2410.dll" bitness="32" fileBytes="1432576" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x86/opencv_objdetect2410.dll" name="opencv_objdetect2410.dll" bitness="32" fileBytes="654848" />
   <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x86/opencv_calib3d2410.dll" name="opencv_calib3d2410.dll" bitness="32" fileBytes="984064" />
   <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x86/opencv_features2d2410.dll" name="opencv_features2d2410.dll" bitness="32" fileBytes="722432" />
   <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x86/opencv_highgui2410.dll" name="opencv_highgui2410.dll" bitness="32" fileBytes="2147840" />
@@ -17,17 +17,19 @@
   <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x86/opencv_core2410.dll" name="opencv_core2410.dll" bitness="32" fileBytes="2140672" />
 
 
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x64/opencv_legacy2410.dll" name="opencv_legacy2410.dll" bitness="64" fileBytes="1489408" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x64/opencv_ml2410.dll" name="opencv_ml2410.dll" bitness="64" fileBytes="597504" />
+
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x64/opencv_legacy2410.dll" name="opencv_legacy2410.dll" bitness="64" fileBytes="1239040" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x64/opencv_ml2410.dll" name="opencv_ml2410.dll" bitness="64" fileBytes="507904" />
   <!--<file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x64/opencv_ts2410.dll" name="opencv_ts2410.dll" bitness="64" fileBytes="789504" />-->
   <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x64/opencv_gpu2410.dll" name="opencv_gpu2410.dll" bitness="64" fileBytes="482304" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x64/opencv_objdetect2410.dll" name="opencv_objdetect2410.dll" bitness="64" fileBytes="805888" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x64/opencv_objdetect2410.dll" name="opencv_objdetect2410.dll" bitness="64" fileBytes="654848" />
   <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x64/opencv_calib3d2410.dll" name="opencv_calib3d2410.dll" bitness="64" fileBytes="1200128" />
   <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x64/opencv_features2d2410.dll" name="opencv_features2d2410.dll" bitness="64" fileBytes="868864" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x64/opencv_highgui2410.dll" name="opencv_highgui2410.dll" bitness="64" fileBytes="2410496" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x64/opencv_highgui2410.dll" name="opencv_highgui2410.dll" bitness="64" fileBytes="2147840" />
   <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x64/opencv_flann2410.dll" name="opencv_flann2410.dll" bitness="64" fileBytes="656384" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x64/opencv_imgproc2410.dll" name="opencv_imgproc2410.dll" bitness="64" fileBytes="2236416" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x64/opencv_imgproc2410.dll" name="opencv_imgproc2410.dll" bitness="64" fileBytes="1891840" />
   <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x64/opencv_core2410.dll" name="opencv_core2410.dll" bitness="64" fileBytes="2573824" />
+
 
 
 </files>
