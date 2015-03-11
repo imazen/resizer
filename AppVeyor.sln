@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6BEFD728-E3C5-43CC-BA9E-292B7CA4429D}"
 	ProjectSection(SolutionItems) = preProject
@@ -1172,8 +1172,8 @@ Global
 		{80BB303C-8F55-410C-BA91-342ECC435101}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{80BB303C-8F55-410C-BA91-342ECC435101}.Release|x64.ActiveCfg = Release|Any CPU
 		{80BB303C-8F55-410C-BA91-342ECC435101}.Release|x86.ActiveCfg = Release|Any CPU
-		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|Any CPU.ActiveCfg = Release|Any CPU
-		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|Any CPU.ActiveCfg = Trial|Any CPU
+		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|Any CPU.Build.0 = Trial|Any CPU
 		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|x64.ActiveCfg = Release|Any CPU
