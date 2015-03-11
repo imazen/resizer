@@ -92,8 +92,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
         protected void ApplyFiltersTo(ref Bitmap b, ImageState s){
 
             var imageRectF = s.layout.GetRingAsRectF("image");
-            var areaOfEffect = imageRectF == null ? new Rectangle(0,0,b.Width,b.Height) : PolygonMath.ToRectangle(imageRectF.Value);
-
+            var areaOfEffect = imageRectF == null ? new Rectangle(0, 0, b.Width, b.Height) : PolygonMath.ToRectangleShrinkRound(imageRectF.Value);
 
             //TODO: if the image is unrotated, use a rectangle to limit the effect to the desired area
 
@@ -103,6 +102,8 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             //If radiusunits is specified, use that code path.
             double units = s.settings.Get<double>("a.radiusunits",1000);
            
+            //TODO: move blur/sharpen aliases to a compatibility shim, deprecate them
+
             i = GetRadius(s, "blur", "a.blur", units);
             if (i > 0) new GaussianBlur(1.4, i).ApplyInPlace(b, areaOfEffect);
 

@@ -584,7 +584,20 @@ namespace ImageResizer.Util
         /// <returns></returns>
         public static Rectangle ToRectangle(RectangleF r)
         {
-            return new Rectangle((int)Math.Round(r.X), (int)Math.Round(r.Y), (int)Math.Round(r.Width),(int)Math.Round( r.Height));
+            return new Rectangle((int)Math.Round(r.X), (int)Math.Round(r.Y), (int)Math.Round(r.Width), (int)Math.Round(r.Height));
+
+
+        }
+
+        /// <summary>
+        /// Round a floating-point rectangle by apply ceil to x/y and floor to width/height
+        /// </summary>
+        /// <param name="r"></param>
+        /// <returns></returns>
+        public static Rectangle ToRectangleShrinkRound(RectangleF r)
+        {
+
+            return new Rectangle((int)Math.Ceiling(r.X), (int)Math.Ceiling(r.Y), (int)Math.Floor(r.Width - (Math.Ceiling(r.X) - r.X)), (int)Math.Floor(r.Height - (Math.Ceiling(r.Y) - r.Y)));
         }
 
         public static Size RoundPoints(SizeF sizeF) {
