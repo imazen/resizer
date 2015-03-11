@@ -38,6 +38,7 @@ _ReSharper*
 NuGet.exe
 !NuGet.targets
 *.coverage
+/tmp/
 
 #Visual Studio files
 *.[Oo]bj
