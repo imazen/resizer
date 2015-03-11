@@ -82,9 +82,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="license.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>

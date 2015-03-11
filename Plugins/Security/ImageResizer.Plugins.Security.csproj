@@ -62,7 +62,6 @@
     <Compile Include="SimpleSecureEncryption.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="license.txt" />
     <Content Include="todo.txt" />
   </ItemGroup>
   <ItemGroup>

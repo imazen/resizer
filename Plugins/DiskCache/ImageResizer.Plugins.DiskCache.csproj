@@ -94,7 +94,6 @@
   <ItemGroup>
     <Content Include="configuration.txt" />
     <Content Include="LastAccessedUtc.txt" />
-    <Content Include="license.txt" />
     <Content Include="todo.txt" />
   </ItemGroup>
   <ItemGroup />

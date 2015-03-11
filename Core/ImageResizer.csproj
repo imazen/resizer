@@ -182,6 +182,7 @@
     <Compile Include="Resizing\LayoutBuilder.cs" />
     <Compile Include="Plugins\Basic\SizeLimits.cs" />
     <Compile Include="Resizing\BitmapTag.cs" />
+    <Content Include="COPYRIGHT.txt" />
     <Content Include="Resizing\UnitR.cs.txt" />
     <Compile Include="SharedAssemblyInfo.cs" />
     <Compile Include="Util\AssemblyAttributes.cs" />
@@ -227,7 +228,6 @@
     <Content Include="bugs.txt" />
     <Content Include="exceptions.txt" />
     <Content Include="gdi-bugs.txt" />
-    <Content Include="license.txt" />
     <Content Include="plugin-notes.txt" />
     <Content Include="totest.txt" />
   </ItemGroup>
