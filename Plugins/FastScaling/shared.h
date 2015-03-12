@@ -12,15 +12,16 @@
 
 #include <limits.h>
 
-#include <malloc.h>
-
-
 #define ENABLE_INTERNAL_PREMULT
 #define ENABLE_COMPOSITING // needs premult
 
 
+
 //#define ALIGN_ALLOCATIONS
 #ifdef ALIGN_ALLOCATIONS
+
+#include "malloc.h"
+
 #define ir_malloc(size) _aligned_malloc(size, 32)
 #define ir_free(ptr) _aligned_free(ptr)
 
