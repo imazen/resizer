@@ -25,7 +25,7 @@ namespace Bench
         {
             int threadsTotal = 0;
             if (JoinThreadsBeforeSegmentsStart != null && JoinThreadsBeforeSegmentsStart.TryGetValue(segmentName, out threadsTotal)){
-                Wait(segmentName + "_start", threadsTotal);
+                WaitStart(segmentName, threadsTotal);
             }
             base.Start(segmentName, allowRecursion);
         }
@@ -37,18 +37,27 @@ namespace Bench
             int threadsTotal = 0;
             if (JoinThreadsAfterSegmentsEnd != null && JoinThreadsAfterSegmentsEnd.TryGetValue(segmentName, out threadsTotal))
             {
-                Wait(segmentName + "_stop", threadsTotal);
+                WaitStop(segmentName, threadsTotal);
             }
         }
 
 
-        private static ConcurrentDictionary<string, Barrier> barriers = new ConcurrentDictionary<string, Barrier>(StringComparer.Ordinal);
-        private void Wait(string key, int threads)
+        private static ConcurrentDictionary<string, Barrier> startBarriers = new ConcurrentDictionary<string, Barrier>(8, 128, StringComparer.Ordinal);
+        private static ConcurrentDictionary<string, Barrier> stopBarriers = new ConcurrentDictionary<string, Barrier>(8, 128, StringComparer.Ordinal);
+        private void WaitStart(string key, int threads)
         {
             if (threads == 1) return;
-            var b = barriers.GetOrAdd(key, s => new Barrier(threads));
+            var b = startBarriers.GetOrAdd(key, s => new Barrier(threads));
             b.SignalAndWait();
         }
+
+        private void WaitStop(string key, int threads)
+        {
+            if (threads == 1) return;
+            var b = stopBarriers.GetOrAdd(key, s => new Barrier(threads));
+            b.SignalAndWait();
+        }
+
 
         public JobProfiler JoinThreadsAroundSegment(string name, int threadCount)
         {
@@ -56,6 +65,7 @@ namespace Bench
                 JoinThreadsBeforeSegmentsStart = new Dictionary<string, int>(StringComparer.Ordinal);
 
             JoinThreadsBeforeSegmentsStart.Add(name,threadCount);
+
             if (JoinThreadsAfterSegmentsEnd == null)
                 JoinThreadsAfterSegmentsEnd = new Dictionary<string, int>(StringComparer.Ordinal);
 
