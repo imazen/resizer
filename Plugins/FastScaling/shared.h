@@ -14,10 +14,12 @@
 #define ENABLE_INTERNAL_PREMULT
 #define ENABLE_COMPOSITING // needs premult
 
-#define ALIGN_ALLOCATIONS
+
+//#define ALIGN_ALLOCATIONS
 #ifdef ALIGN_ALLOCATIONS
 #define ir_malloc(size) _aligned_malloc(size, 32)
 #define ir_free(ptr) _aligned_free(ptr)
+
 _declspec(noalias) _declspec(restrict) inline void* _ir_aligned_calloc(size_t count, size_t elsize, size_t alignment){
     if (elsize == 0 || count >= SIZE_MAX / elsize) { return NULL; } // Watch out for overflow
     size_t size = count * elsize;

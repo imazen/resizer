@@ -1,0 +1,77 @@
+require 'rake/loaders/makefile'
+Rake.application.add_loader('d', Rake::MakefileLoader.new)
+
+CLEAN = Rake::FileList["**/*~", "**/*.bak", "**/core"]
+CLEAN.clear_exclude.exclude { |fn|
+  fn.pathmap("%f").downcase == 'core' && File.directory?(fn)
+}
+
+CLEAN.include('*.o')
+
+desc "Remove any temporary products."
+task :clean do
+  CLEAN.each do |fn|
+    rm_rf fn
+    if Rake::Task.task_defined?(fn)
+      task = Rake::Task[fn]
+      task.reenable
+    end
+  end
+end
+
+CLOBBER = Rake::FileList.new
+
+desc "Remove any generated file."
+task :clobber => [:clean] do
+  CLOBBER.each { |fn| rm_r fn rescue nil }
+end
+
+
+class String
+  def to_task
+    Rake::Task[self]
+  end
+end
+
+
+task :default => "libfastscaling.so"
+
+CFLAGS=%Q{-Wall -Wno-unused-function -Wno-unused-but-set-variable -Wno-return-type -Werror -fPIC}
+
+CLEAN.include('*.o')
+CLEAN.include('*.d')
+CLEAN.include('*.mf')
+%w{}.each do |file|
+  CLEAN.include(file) if File.exists?(file)
+end
+%w{ fastscaling }.each { |file| CLOBBER.include(file) if File.exists?(file) }
+
+rule '.o' => '.cpp' do |t|
+  sh "g++ #{CFLAGS} -MMD -c -o #{t.name} #{t.source}"
+end
+
+rule '.d' => '.cpp' do |t|
+  verbose(false) do 
+    sh "g++ -MM -MG -MF #{t.name} #{t.source}"
+  end
+end
+
+OBJECTS=%{ fastscaling.o }
+
+
+desc "build a fastscaling program"
+file "fastscaling" => OBJECTS do |t|
+  sh "g++ -Werror #{t.prerequisites.join(" ")}  -o #{t.name}"
+end
+
+
+desc "build the fastscaling library"
+file "libfastscaling.so" => %w{  } do |t|
+  sh "g++ --shared -o #{t.name} #{t.prerequisites.join(' ')}"
+end
+
+FileList['*.cpp'].each do |source_file|
+  dependency_file = source_file.pathmap("%X.d")
+  dependency_file.to_task
+  import dependency_file
+end

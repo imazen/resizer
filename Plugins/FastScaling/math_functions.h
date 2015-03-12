@@ -6,7 +6,9 @@
  * Commercial licenses available at http://imageresizing.net/
  */
 #pragma once
+#ifdef MSC
 #pragma unmanaged
+#endif
 
 
 #define IR_PI  double (3.1415926535897932384626433832795)
