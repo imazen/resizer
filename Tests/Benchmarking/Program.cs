@@ -29,7 +29,9 @@ namespace Bench
 
         public static string imageDir = "..\\..\\Samples\\Images\\";// "..\\..\\..\\..\\Samples\\Images\\";
 
-        public static int ConsoleWidth = 200;
+        public static int ConsoleWidth = 150;
+
+        public static int parallelThreads = 8;
         static void Main(string[] args)
         {
             SearchNearbyForPlugins(); 
@@ -68,7 +70,7 @@ namespace Bench
         {
             var r = new Imazen.Profiling.BenchmarkRunner<int, JobProfiler>();
             r.Operation = new Action<JobProfiler, int>((p, _) => new CostlyBaseline().DoWork());
-            r.ParallelThreads = 8;
+            r.ParallelThreads = parallelThreads;
             r.SequentialRuns = 4;
             r.ParallelRuns = 2;
             return r;
@@ -140,7 +142,7 @@ namespace Bench
                 ThrowawayRuns = 1;
                 SequentialRuns = 8;
                 ParallelRuns = 2;
-                ParallelThreads = 8;
+                ParallelThreads = parallelThreads;
                 ExcludeDecoding = false;
                 ExcludeEncoding = true;
                 ExcludeBuilding = false;
@@ -328,9 +330,9 @@ namespace Bench
         public static void CheckMemoryUse(BenchmarkRunner<ImageJob,JobProfiler> runner, int runMultiplier)
         {
             runner.ParallelRuns = runMultiplier;
-            runner.ParallelThreads = 8;
+            runner.ParallelThreads = parallelThreads;
             runner.SequentialRuns = runMultiplier * 8;
-            runner.ThrowawayThreads = 8;
+            runner.ThrowawayThreads = parallelThreads;
             runner.ThrowawayRuns = runMultiplier * 2;
 
 
@@ -359,10 +361,10 @@ namespace Bench
             settings.ExcludeIO = true;
             settings.ParallelRuns = 2;
             settings.SegmentNameFilter = segment;
-            settings.ParallelThreads = 8;
+            settings.ParallelThreads = parallelThreads;
             settings.SequentialRuns = 16;
             settings.ThrowawayRuns = 2;
-            settings.ThrowawayThreads = 8;
+            settings.ThrowawayThreads = parallelThreads;
             settings.UseBarrierAroundSegment = true;
 
             var configs = new Tuple<Config, Instructions, string>[]{
@@ -384,10 +386,10 @@ namespace Bench
             settings.ExcludeIO = true;
             settings.ParallelRuns = 2;
 
-            settings.ParallelThreads = 8;
+            settings.ParallelThreads = parallelThreads;
             settings.SequentialRuns = 16;
             settings.ThrowawayRuns = 2;
-            settings.ThrowawayThreads = 8;
+            settings.ThrowawayThreads = parallelThreads;
             settings.UseBarrierAroundSegment = true;
             return settings;
         }
@@ -440,11 +442,11 @@ namespace Bench
 
             settings.SegmentNameFilter = segment;
             settings.ExclusiveTimeSignificantMs = 1;
+            //settings.ParallelThreads = 2;
             var configs = new Tuple<Config, Instructions, string>[]{
                     new Tuple<Config, Instructions, string>(ConfigWithPlugins(),null,"System.Drawing"),
-                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true;f=0;f.sharpen=15"),"FS FastCubic with sharpening"),
-                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true;f=10"),"FS Lanczos2sharp"),
-                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true;f=0&f.blur=0.75&f.window=0.6"),"FastSharp FastCubic constrainedsharp")};
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true;f=0"),"FastCubic"),
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true;f=2"),"CatmullRom")};
 
             Compare(settings, configs.Reverse());
 
