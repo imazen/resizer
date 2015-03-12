@@ -12,6 +12,7 @@
 #include "managed_bitmap_wrapper.h"
 #include "rendering.h"
 
+#include "unmanaged_renderer.h"
 #pragma managed
 
 

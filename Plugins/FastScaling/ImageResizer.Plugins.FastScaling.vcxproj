@@ -176,6 +176,7 @@
     <ClInclude Include="sharpening.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="trim_whitespace.h" />
+    <ClInclude Include="unmanaged_renderer.h" />
     <ClInclude Include="weighting.h" />
   </ItemGroup>
   <ItemGroup>
