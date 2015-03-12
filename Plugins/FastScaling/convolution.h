@@ -10,6 +10,10 @@
 
 #ifdef _MSC_VER
 #pragma unmanaged
+#ifndef alloca
+#include "malloc.h"
+#define alloca _alloca
+#endif
 #endif
 
 
