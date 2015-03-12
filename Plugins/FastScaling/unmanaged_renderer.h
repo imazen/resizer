@@ -183,6 +183,9 @@ int ScaleAndRender1D(const RendererPtr r,
     bool transpose,
     int call_number)
 {
+    LineContribType * contrib = NULL;
+    BitmapFloatPtr source_buf = NULL;
+    BitmapFloatPtr dest_buf = NULL;
 
     int return_code = 0;
     uint32_t from_count = pSrc->w;
@@ -193,10 +196,6 @@ int ScaleAndRender1D(const RendererPtr r,
         //throw gcnew ArgumentOutOfRangeException();
     }
 
-    //p->Start("ContributionsCalc", false);
-    LineContribType * contrib = ContributionsCalc(to_count, from_count, details->interpolation);  /*Handle errors */ if (contrib == NULL) { return_code = -1; goto cleanup; }
-    //p->Stop("ContributionsCalc", true, false);
-
 
     //How many rows to buffer and process at a time.
     const uint32_t buffer_row_count = 4; //using buffer=5 seems about 6% better than most other non-zero values. 
@@ -204,9 +203,19 @@ int ScaleAndRender1D(const RendererPtr r,
     //How many bytes per pixel are we scaling?
     uint32_t scaling_bpp = (pSrc->bpp == 4 && !pSrc->alpha_meaningful) ? 3 : pSrc->bpp;
 
+
+
+    //p->Start("ContributionsCalc", false);
+    
+    contrib = ContributionsCalc(to_count, from_count, details->interpolation);  /*Handle errors */ if (contrib == NULL) { return_code = -1; goto cleanup; }
+    //p->Stop("ContributionsCalc", true, false);
+
+
     //p->Start("CreateBitmapFloat (buffers)", false);
-    BitmapFloatPtr source_buf = CreateBitmapFloat(from_count, buffer_row_count, scaling_bpp, false); /*Handle errors */  if (source_buf == NULL)  { return_code = -1; goto cleanup; }
-    BitmapFloatPtr dest_buf = CreateBitmapFloat(to_count, buffer_row_count, scaling_bpp, false);  /*Handle errors */   if (source_buf == NULL)  { return_code = -1; goto cleanup; }
+
+    source_buf = CreateBitmapFloat(from_count, buffer_row_count, scaling_bpp, false); /*Handle errors */  if (source_buf == NULL)  { return_code = -1; goto cleanup; }
+    
+    dest_buf = CreateBitmapFloat(to_count, buffer_row_count, scaling_bpp, false);  /*Handle errors */   if (source_buf == NULL)  { return_code = -1; goto cleanup; }
     source_buf->alpha_meaningful = pSrc->alpha_meaningful;
     dest_buf->alpha_meaningful = source_buf->alpha_meaningful;
 
