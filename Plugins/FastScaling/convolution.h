@@ -29,7 +29,7 @@ float* create_guassian_kernel(double stdDev, uint32_t radius){
     return kernel;
 }
 
-inline double sum_of_kernel(float* kernel, uint32_t size){
+ double sum_of_kernel(float* kernel, uint32_t size){
     double sum = 0;
     for (uint32_t i = 0; i < size; i++){
         sum += kernel[i];

@@ -63,7 +63,7 @@ static inline void HalveRowByDivisor(const unsigned char* from, unsigned short *
 }
 
 
-static inline int HalveInternal(const BitmapBgraPtr from,
+static int HalveInternal(const BitmapBgraPtr from,
     const BitmapBgraPtr to, const int to_w, const int to_h, const int to_stride, const int divisor)
 {
 
@@ -114,12 +114,12 @@ static inline int HalveInternal(const BitmapBgraPtr from,
     return 1;
 }
 
-static inline int Halve(const BitmapBgraPtr from, const BitmapBgraPtr to, int divisor){
+static int Halve(const BitmapBgraPtr from, const BitmapBgraPtr to, int divisor){
     return HalveInternal(from, to, to->w, to->h, to->stride, divisor);
 }
 
 
-static inline int HalveInPlace(const BitmapBgraPtr from, int divisor)
+static  int HalveInPlace(const BitmapBgraPtr from, int divisor)
 {
     int to_w = from->w / divisor;
     int to_h = from->h / divisor;

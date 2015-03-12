@@ -16,7 +16,7 @@
 
 
 
-static inline void
+static void
 ScaleBgraFloatRows(BitmapFloatPtr from, const uint32_t from_row, BitmapFloatPtr to, const uint32_t to_row, const uint32_t row_count, ContributionType * weights){
 
     const uint32_t from_step = from->channels;

@@ -26,7 +26,7 @@ static void derive_cubic_coefficients(double B, double C, InterpolationDetailsPt
 }
 
 
-static inline double filter_flex_cubic(const InterpolationDetailsPtr d, double x)
+static double filter_flex_cubic(const InterpolationDetailsPtr d, double x)
 {
     const double t = (double)fabs(x) / d->blur;
 
@@ -38,7 +38,7 @@ static inline double filter_flex_cubic(const InterpolationDetailsPtr d, double x
     }
     return(0.0);
 }
-static inline double filter_bicubic_fast(const InterpolationDetailsPtr d, const double t)
+static double filter_bicubic_fast(const InterpolationDetailsPtr d, const double t)
 {
     const double abs_t = (double)fabs(t) / d->blur;
     const double abs_t_sq = abs_t * abs_t;
@@ -48,7 +48,7 @@ static inline double filter_bicubic_fast(const InterpolationDetailsPtr d, const 
 }
 
 
-static inline double filter_sinc_2(const InterpolationDetailsPtr d, double t)
+static double filter_sinc_2(const InterpolationDetailsPtr d, double t)
 {
     const double abs_t = (double)fabs(t) / d->blur;
     if (abs_t == 0) { return 1; } //Avoid division by zero
@@ -57,14 +57,14 @@ static inline double filter_sinc_2(const InterpolationDetailsPtr d, double t)
     return sin(a) / a;
 }
 
-static inline double filter_box(const InterpolationDetailsPtr d, double t)
+static double filter_box(const InterpolationDetailsPtr d, double t)
 {
 
     const double x = t / d->blur;
     return (x >= -1 * d->window && x < d->window) ? 1 : 0;
 }
 
-static inline double filter_triangle(const InterpolationDetailsPtr d, double t)
+static double filter_triangle(const InterpolationDetailsPtr d, double t)
 {
     const double x = (double)fabs(t) / d->blur;
     if (x < 1.0)
@@ -73,7 +73,7 @@ static inline double filter_triangle(const InterpolationDetailsPtr d, double t)
 }
 
 
-static inline double filter_sinc_windowed(const InterpolationDetailsPtr d, double t)
+static double filter_sinc_windowed(const InterpolationDetailsPtr d, double t)
 {
     const double x = t / d->blur;
     const double abs_t = (double)fabs(x);
@@ -161,7 +161,7 @@ static InterpolationDetailsPtr CreateInterpolation(InterpolationFilter filter){
 
 
 
-static inline LineContribType *  ContributionsAlloc(const uint32_t line_length, const uint32_t windows_size)
+static LineContribType *  ContributionsAlloc(const uint32_t line_length, const uint32_t windows_size)
 {
     LineContribType *res = (LineContribType *)malloc(sizeof(LineContribType));
     if (!res) {
@@ -185,7 +185,7 @@ static inline LineContribType *  ContributionsAlloc(const uint32_t line_length, 
     return res;
 }
 
-static inline void ContributionsFree(LineContribType * p)
+static void ContributionsFree(LineContribType * p)
 {
     free(p->ContribRow[0].Weights);
     free(p->ContribRow);
