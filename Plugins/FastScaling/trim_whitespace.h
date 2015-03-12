@@ -8,7 +8,10 @@
 #include "Stdafx.h"
 #include "shared.h"
 #pragma once
+
+#ifdef _MSC_VER
 #pragma unmanaged
+#endif
 
 
 typedef struct Rect{

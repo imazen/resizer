@@ -6,7 +6,7 @@
  * Commercial licenses available at http://imageresizing.net/
  */
 #pragma once
-#ifdef MSC
+#ifdef _MSC_VER
 #pragma unmanaged
 #endif
 

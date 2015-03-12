@@ -6,11 +6,12 @@
  * Commercial licenses available at http://imageresizing.net/
  */
 #pragma once
-#pragma unmanaged
 #include "Stdafx.h"
 #include "shared.h"
 
-
+#ifdef _MSC_VER
+#pragma unmanaged
+#endif
 
 static inline float
 linear_to_srgb(float clr) {

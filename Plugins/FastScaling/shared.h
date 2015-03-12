@@ -6,10 +6,14 @@
  * Commercial licenses available at http://imageresizing.net/
  */
 #pragma once
+#ifdef _MSC_VER
 #pragma unmanaged
+#endif
 
 #include <limits.h>
+
 #include <malloc.h>
+
 
 #define ENABLE_INTERNAL_PREMULT
 #define ENABLE_COMPOSITING // needs premult

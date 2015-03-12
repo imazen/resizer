@@ -8,7 +8,9 @@
 #include "Stdafx.h"
 #include "shared.h"
 #pragma once
+#ifdef _MSC_VER
 #pragma unmanaged
+#endif
 
 void apply_color_matrix(BitmapBgraPtr bmp, const uint32_t row, const uint32_t count, float* const __restrict  m[5])
 {

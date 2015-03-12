@@ -8,7 +8,10 @@
 #include "Stdafx.h"
 #include "shared.h"
 #pragma once
+
+#ifdef _MSC_VER
 #pragma unmanaged
+#endif
 
 static inline void HalveRowByDivisor(const unsigned char* from, unsigned short * to, const unsigned int to_count, const int divisor, const int from_step = 4, const int to_step = 4){
     int to_b, from_b;

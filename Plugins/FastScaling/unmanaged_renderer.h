@@ -17,6 +17,9 @@
 #include "color_matrix.h"
 #pragma once
 
+#ifdef _MSC_VER
+#pragma unmanaged
+#endif
 
 typedef struct RendererStruct *RendererPtr;
 

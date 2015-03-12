@@ -5,10 +5,14 @@
  * Licensed under the GNU Affero General Public License, Version 3.0.
  * Commercial licenses available at http://imageresizing.net/
  */
-#include "Stdafx.h"
+
 #pragma once
-#pragma unmanaged
+#include "Stdafx.h"
 #include "shared.h"
+
+#ifdef _MSC_VER
+#pragma unmanaged
+#endif
 
 static void derive_cubic_coefficients(double B, double C, InterpolationDetailsPtr out){
     double bx2 = B + B;

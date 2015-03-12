@@ -7,7 +7,10 @@
  */
 
 #pragma once
+
+#ifdef _MSC_VER
 #pragma unmanaged
+#endif
 
 #ifndef MSC
 #define _malloca malloc

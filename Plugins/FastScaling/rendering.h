@@ -8,10 +8,9 @@
 #include "unmanaged_renderer.h"
 #pragma once
 
-
-
-
+#ifdef _MSC_VER
 #pragma managed
+#endif
 
 
 using namespace System;

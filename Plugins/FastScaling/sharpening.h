@@ -6,11 +6,13 @@
  * Commercial licenses available at http://imageresizing.net/
  */
 #pragma once
-#pragma unmanaged
 #include "Stdafx.h"
 
 #include "shared.h"
 
+#ifdef _MSC_VER
+#pragma unmanaged
+#endif
 
 
 static void BgraSharpenInPlaceX(BitmapBgraPtr im, float pct)

@@ -9,8 +9,10 @@
 #include "shared.h"
 #include "sharpening.h"
 #pragma once
-#pragma unmanaged
 
+#ifdef _MSC_VER
+#pragma unmanaged
+#endif
 
 
 

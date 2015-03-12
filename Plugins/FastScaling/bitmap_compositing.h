@@ -6,11 +6,15 @@
  * Commercial licenses available at http://imageresizing.net/
  */
 #pragma once
-#pragma unmanaged
+
 #include "Stdafx.h"
 #include "shared.h"
 
+#pragma once
+
+#ifdef _MSC_VER
 #pragma unmanaged
+#endif
 
 
 static int convert_srgb_to_linear(BitmapBgraPtr src, const uint32_t from_row, BitmapFloatPtr dest, const uint32_t dest_row, const uint32_t row_count){
