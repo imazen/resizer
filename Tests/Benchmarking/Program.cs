@@ -240,6 +240,7 @@ namespace Bench
                         if (settings.ShowProfileTree)
                         {
                             var f = new ConcurrencyResultFormatter();
+                            f.DeltaAbnormalRatio = 1000000;
                             f.ExclusiveTimeSignificantMs = settings.ExclusiveTimeSignificantMs;
                             Console.WriteLine(f.PrintCallTree(set));
                         }
