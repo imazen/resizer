@@ -85,7 +85,7 @@ ScaleBgraFloatRows(BitmapFloatPtr from, const uint32_t from_row, BitmapFloatPtr 
         }
         else{
             const uint32_t min_channels = MIN(from_step, to_step);
-            float* avg = (float*)_malloca(min_channels * sizeof(float));
+            float* avg = (float*)alloca(min_channels * sizeof(float));
             for (ndx = 0; ndx < dest_buffer_count; ndx++) {
                 const int left = weights[ndx].Left;
                 const int right = weights[ndx].Right;
@@ -103,7 +103,6 @@ ScaleBgraFloatRows(BitmapFloatPtr from, const uint32_t from_row, BitmapFloatPtr 
                 for (uint32_t j = 0; j < min_channels; j++)
                     dest_buffer[ndx * to_step + j] = avg[j];
             }
-            _freea(avg);
         }
     }
 }

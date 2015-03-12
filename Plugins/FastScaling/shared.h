@@ -210,12 +210,15 @@ static void DestroyRenderDetails(RenderDetailsPtr d){
     free(d);
 }
 
+static LookupTablesPtr table = NULL;
 
 
+static void FreeLookupTables() { 
+    free(table); 
+    table = NULL;
+}
 
-static LookupTablesPtr GetLookupTables(){
-    static LookupTablesPtr table = NULL;
-
+static LookupTablesPtr GetLookupTables() {
     if (table == NULL){
         LookupTablesPtr temp = (LookupTablesPtr)ir_malloc(sizeof(LookupTablesStruct));
 

@@ -24,6 +24,7 @@ int test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, InterpolationFilter
   DestroyBitmapBgra(source);
   DestroyBitmapBgra(canvas);
 
+  FreeLookupTables();
 }
 
 

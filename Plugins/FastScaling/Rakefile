@@ -80,6 +80,11 @@ file "libfastscaling.so" => %w{  } do |t|
   sh "#{CXX}  --shared -o #{t.name} #{t.prerequisites.join(' ')}"
 end
 
+desc "run with valgrind"
+task "valgrind" => "fastscaling" do
+  sh "valgrind --leak-check=full --show-leak-kinds=all ./fastscaling"
+end
+
 FileList['*.cpp'].each do |source_file|
   dependency_file = source_file.pathmap("%X.d")
   dependency_file.to_task

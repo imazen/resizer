@@ -12,10 +12,6 @@
 #pragma unmanaged
 #endif
 
-#ifndef MSC
-#define _malloca malloc
-#define _freea free
-#endif
 
 
 
@@ -83,11 +79,10 @@ ConvolveBgraFloatInPlace(BitmapFloatPtr buf, const float *kernel, const uint32_t
 
     const uint32_t ch_used = convolve_channels;
 
-    float* __restrict buffer = (float *)_malloca(sizeof(float) * buffer_count * ch_used);
+    float* __restrict buffer = (float *)alloca(sizeof(float) * buffer_count * ch_used);
     if (buffer == NULL) return -1;
-    float* __restrict avg = (float *)_malloca(sizeof(float) * ch_used);
+    float* __restrict avg = (float *)alloca(sizeof(float) * ch_used);
     if (avg == NULL) {
-        _freea(buffer);  
         return -1;
     }
     
@@ -145,10 +140,6 @@ ConvolveBgraFloatInPlace(BitmapFloatPtr buf, const float *kernel, const uint32_t
 
         }
     }
-
-
-    _freea(avg);
-    _freea(buffer);
     return 0;
 }
 
