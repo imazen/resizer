@@ -29,7 +29,8 @@ typedef struct RendererStruct{
     bool destroy_source;
     BitmapBgraPtr canvas;
     BitmapBgraPtr transposed;
-
+    //Todo - profiling callbacks
+    //TODO - custom memory pool?
 }Renderer;
 
 
@@ -146,36 +147,37 @@ int CompleteHalving(RendererPtr r){
 }
 
 
-static int ApplyConvolutionsFloat1D(BitmapFloatPtr img, const uint32_t from_row, const uint32_t row_count, double sharpening_applied, const RenderDetailsPtr details){
+static int ApplyConvolutionsFloat1D(const RendererPtr r, BitmapFloatPtr img, const uint32_t from_row, const uint32_t row_count, double sharpening_applied){
     //p->Start("convolve kernel a", false);
-    if (details->kernel_a_radius > 0 && ConvolveBgraFloatInPlace(img, details->kernel_a, details->kernel_a_radius, details->kernel_a_min, details->kernel_a_max, img->channels, from_row, row_count)){
+    if (r->details->kernel_a_radius > 0 && ConvolveBgraFloatInPlace(img, r->details->kernel_a, r->details->kernel_a_radius, r->details->kernel_a_min, r->details->kernel_a_max, img->channels, from_row, row_count)){
         return -3;
     }
     //p->Stop("convolve kernel a", true, false);
     //p->Start("convolve kernel b", false);
-    if (details->kernel_b_radius > 0 && ConvolveBgraFloatInPlace(img, details->kernel_b, details->kernel_b_radius, details->kernel_b_min, details->kernel_b_max, img->channels, from_row, row_count)){
+    if (r->details->kernel_b_radius > 0 && ConvolveBgraFloatInPlace(img, r->details->kernel_b, r->details->kernel_b_radius, r->details->kernel_b_min, r->details->kernel_b_max, img->channels, from_row, row_count)){
         return -3;
     }
     //p->Stop("convolve kernel b", true, false);
 
-    if (details->sharpen_percent_goal > sharpening_applied + 0.01){
+    if (r->details->sharpen_percent_goal > sharpening_applied + 0.01){
         //p->Start("SharpenBgraFloatRowsInPlace", false);
-        SharpenBgraFloatRowsInPlace(img, from_row, row_count, details->sharpen_percent_goal - sharpening_applied);
+        SharpenBgraFloatRowsInPlace(img, from_row, row_count, r->details->sharpen_percent_goal - sharpening_applied);
         //p->Stop("SharpenBgraFloatRowsInPlace", true, false);
     }
     return 0;
 }
 
-static void ApplyColorMatrix(BitmapFloatPtr img, const uint32_t from_row, const uint32_t row_count, const RenderDetailsPtr details){
+static void ApplyColorMatrix(const RendererPtr r, BitmapFloatPtr img, const uint32_t from_row, const uint32_t row_count){
     //p->Start("apply_color_matrix_float", false);
-    apply_color_matrix_float(img, 0, row_count, details->color_matrix);
+    apply_color_matrix_float(img, 0, row_count, r->details->color_matrix);
     //p->Stop("apply_color_matrix_float", true, false);
 }
 
 
 
 
-int ScaleAndRender1D(const BitmapBgraPtr pSrc,
+int ScaleAndRender1D(const RendererPtr r, 
+    const BitmapBgraPtr pSrc,
     const BitmapBgraPtr pDst,
     const RenderDetailsPtr details,
     bool transpose,
@@ -227,10 +229,10 @@ int ScaleAndRender1D(const BitmapBgraPtr pSrc,
         ScaleBgraFloatRows(source_buf, 0, dest_buf, 0, row_count, contrib->ContribRow);
         //p->Stop("ScaleBgraFloatRows", true, false);
 
-        if (ApplyConvolutionsFloat1D(dest_buf, 0, row_count, contrib->percent_negative, details)){
+        if (ApplyConvolutionsFloat1D(r, dest_buf, 0, row_count, contrib->percent_negative)){
             return_code = -3; goto cleanup;
         }
-        if (details->apply_color_matrix && call_number == 2) { ApplyColorMatrix(dest_buf, 0, row_count, details); }
+        if (details->apply_color_matrix && call_number == 2) { ApplyColorMatrix(r, dest_buf, 0, row_count); }
 
         //p->Start("pivoting_composite_linear_over_srgb", false);
         if (pivoting_composite_linear_over_srgb(dest_buf, 0, pDst, source_start_row, row_count, transpose)){
@@ -259,7 +261,8 @@ cleanup:
 
 
 
-int Render1D(const BitmapBgraPtr pSrc,
+int Render1D(const RendererPtr r, 
+    const BitmapBgraPtr pSrc,
     const BitmapBgraPtr pDst,
     const RenderDetailsPtr details,
     bool transpose,
@@ -287,10 +290,10 @@ int Render1D(const BitmapBgraPtr pSrc,
         if (convert_srgb_to_linear(pSrc, source_start_row, buf, 0, row_count)){
             return_code = -2; goto cleanup;
         }
-        if (ApplyConvolutionsFloat1D(buf, 0, row_count, 0, details)){
+        if (ApplyConvolutionsFloat1D(r, buf, 0, row_count, 0)){
             return_code = -3; goto cleanup;
         }
-        if (details->apply_color_matrix && call_number == 2) { ApplyColorMatrix(buf, 0, row_count, details); }
+        if (details->apply_color_matrix && call_number == 2) { ApplyColorMatrix(r, buf, 0, row_count); }
 
         if (pivoting_composite_linear_over_srgb(buf, 0, pDst, source_start_row, row_count, transpose)){
             return_code = -4; goto cleanup;
@@ -306,7 +309,7 @@ cleanup:
 }
 
 
-int RenderWrapper1D(const BitmapBgraPtr pSrc,
+int RenderWrapper1D(const RendererPtr r, const BitmapBgraPtr pSrc,
     const BitmapBgraPtr pDst,
     const RenderDetailsPtr details,
     bool transpose,
@@ -317,10 +320,10 @@ int RenderWrapper1D(const BitmapBgraPtr pSrc,
     //try{
     // p->Start(name, false);
     if (perfect_size){
-        return Render1D(pSrc, pDst, details, transpose, call_number);
+        return Render1D(r, pSrc, pDst, details, transpose, call_number);
     }
     else{
-        return ScaleAndRender1D(pSrc, pDst, details, transpose, call_number);
+        return ScaleAndRender1D(r, pSrc, pDst, details, transpose, call_number);
     }
     // }
     // finally{
@@ -329,7 +332,7 @@ int RenderWrapper1D(const BitmapBgraPtr pSrc,
 
 }
 
-int Render(RendererPtr r){
+int PerformRender(RendererPtr r){
     CompleteHalving(r);
 
     bool skip_last_transpose = r->details->post_transpose;
@@ -381,7 +384,7 @@ int Render(RendererPtr r){
 
 
     //Apply kernels, scale, and transpose
-    if (RenderWrapper1D(r->source, r->transposed, r->details, true, 1)){
+    if (RenderWrapper1D(r, r->source, r->transposed, r->details, true, 1)){
         return -3;
     }
 
@@ -398,7 +401,7 @@ int Render(RendererPtr r){
 
     //Apply kernels, color matrix, scale,  (transpose?) and (compose?)
 
-    if (RenderWrapper1D(r->transposed, finalDest, r->details, !skip_last_transpose, 2)){
+    if (RenderWrapper1D(r, r->transposed, finalDest, r->details, !skip_last_transpose, 2)){
         return -6;
     }
 
