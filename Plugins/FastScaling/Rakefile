@@ -1,4 +1,5 @@
 require 'rake/loaders/makefile'
+require 'rbconfig'
 Rake.application.add_loader('d', Rake::MakefileLoader.new)
 
 CLEAN = Rake::FileList["**/*~", "**/*.bak", "**/core"]
@@ -7,6 +8,14 @@ CLEAN.clear_exclude.exclude { |fn|
 }
 
 CLEAN.include('*.o')
+
+if /darwin|mac os/ =~ RbConfig::CONFIG['host_os']
+  CXX = "g++-4.9"
+else
+  CXX = "g++"
+end
+
+
 
 desc "Remove any temporary products."
 task :clean do
@@ -48,12 +57,12 @@ end
 %w{ fastscaling }.each { |file| CLOBBER.include(file) if File.exists?(file) }
 
 rule '.o' => '.cpp' do |t|
-  sh "g++ #{CFLAGS} -MMD -c -o #{t.name} #{t.source}"
+  sh "#{CXX}  #{CFLAGS} -MMD -c -o #{t.name} #{t.source}"
 end
 
 rule '.d' => '.cpp' do |t|
   verbose(false) do 
-    sh "g++ -MM -MG -MF #{t.name} #{t.source}"
+    sh "#{CXX}  -MM -MG -MF #{t.name} #{t.source}"
   end
 end
 
@@ -62,13 +71,13 @@ OBJECTS=%w{ fastscaling.o }
 
 desc "build a fastscaling program"
 file "fastscaling" => OBJECTS do |t|
-  sh "g++ -Werror #{t.prerequisites.join(" ")}  -o #{t.name}"
+  sh "#{CXX} -Werror #{t.prerequisites.join(" ")}  -o #{t.name}"
 end
 
 
 desc "build the fastscaling library"
 file "libfastscaling.so" => %w{  } do |t|
-  sh "g++ --shared -o #{t.name} #{t.prerequisites.join(' ')}"
+  sh "#{CXX}  --shared -o #{t.name} #{t.prerequisites.join(' ')}"
 end
 
 FileList['*.cpp'].each do |source_file|
