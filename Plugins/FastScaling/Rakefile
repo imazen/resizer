@@ -34,9 +34,9 @@ class String
 end
 
 
-task :default => "libfastscaling.so"
+task :default => "fastscaling"
 
-CFLAGS=%Q{-Wall -Wno-unused-function -Wno-unused-but-set-variable -Wno-return-type -Werror -fPIC}
+CFLAGS=%Q{-Wall -Wno-unused-function -Wno-unused-but-set-variable -Wno-return-type -fPIC -std=gnu++11 -fpermissive}
 
 CLEAN.include('*.o')
 CLEAN.include('*.d')
@@ -56,7 +56,7 @@ rule '.d' => '.cpp' do |t|
   end
 end
 
-OBJECTS=%{ fastscaling.o }
+OBJECTS=%w{ fastscaling.o }
 
 
 desc "build a fastscaling program"
