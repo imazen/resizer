@@ -407,8 +407,8 @@ namespace Bench
         {
             var imageSrc = new ImageProvider().AddBlankImages(new Tuple<int, int, string>[] { new Tuple<int, int, string>(4000, 4000, "jpg") });
             imageSrc.PrepareImagesAsync().Wait();
-            var runner = Benchmark.BenchmarkInMemory(ConfigWithPlugins("FastScaling"), imageSrc.GetImages().First(),
-                new Instructions("builder=gd&width=400"), false, false);
+            var runner = Benchmark.BenchmarkInMemory(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"), imageSrc.GetImages().First(),
+                new Instructions("f=7"), false, false);
             runner.Label = "FastScaling";
             CheckMemoryUse(runner, 2);
         }
