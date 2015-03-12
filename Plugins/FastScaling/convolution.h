@@ -9,6 +9,12 @@
 #pragma once
 #pragma unmanaged
 
+#ifndef MSC
+#define _malloca malloc
+#define _freea free
+#endif
+
+
 
 float* create_guassian_kernel(double stdDev, uint32_t radius){
     uint32_t size = radius * 2 + 1;
