@@ -1,0 +1,9 @@
+language: cpp
+
+os:
+  - linux
+  - osx
+
+script:
+  - cd Plugins/FastScaling
+  - rake valgrind
