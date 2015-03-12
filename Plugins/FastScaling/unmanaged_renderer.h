@@ -76,7 +76,7 @@ void DestroyRenderer(RendererPtr r){
         DestroyBitmapBgra(r->transposed);
         r->transposed = nullptr;
     }
-                   
+    free(r);              
 }
 
 RendererPtr CreateRenderer(BitmapBgraPtr editInPlace, RenderDetailsPtr details){
@@ -351,7 +351,7 @@ int PerformRender(RendererPtr r){
 
     /*
     //We can optimize certain code paths - later, if needed
-    
+
     bool scaling_required = (r->canvas != nullptr) && (r->details->post_transpose ? (r->canvas->w != r->source->h || r->canvas->h != r->source->w) :
         (r->canvas->h != r->source->h || r->canvas->w != r->source->w));
 
