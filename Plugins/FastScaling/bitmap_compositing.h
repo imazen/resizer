@@ -164,8 +164,6 @@ static void demultiply_alpha(BitmapFloatPtr src, const uint32_t from_row, const 
 
 static void copy_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row, BitmapBgraPtr dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose){
 
-     LookupTables*   t = GetLookupTables();
-
 
     const uint32_t dest_row_stride = transpose ? dest->bpp : dest->stride;
     const uint32_t dest_pixel_stride = transpose ? dest->stride : dest->bpp;

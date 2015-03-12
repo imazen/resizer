@@ -23,7 +23,6 @@ static void BgraSharpenInPlaceX(BitmapBgraPtr im, float pct)
 
     uint32_t y, current, prev, next;
 
-    const uint32_t sx = im->w;
     const uint32_t sy = im->h;
     const uint32_t stride = im->stride;
     const uint32_t bpp = im->bpp;

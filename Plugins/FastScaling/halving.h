@@ -85,7 +85,7 @@ static inline int HalveInternal(const BitmapBgraPtr from,
         for (d = 0; d < divisor; d++){
             HalveRowByDivisor(from->pixels + (y * divisor + d) * from->stride, buffer, to_w, divisor, from->bpp, to->bpp);
         }
-        register unsigned char * dest_line = to->pixels + y * to_stride;
+        unsigned char * dest_line = to->pixels + y * to_stride;
 
         if (shift == 2){
             for (b = 0; b < to_w_bytes; b++){

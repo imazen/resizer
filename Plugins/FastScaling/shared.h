@@ -228,8 +228,6 @@ static LookupTablesPtr GetLookupTables(){
         float *to_lin = (float *)temp->srgb_to_linear;
         uint8_t *to_srgb = (uint8_t *)temp->linear_to_srgb;
         
-        const float a = 0.055f;
-
         for (uint32_t n = 0; n < 256; n++)
         {
             const float s = ((float)n) / 255.0f;

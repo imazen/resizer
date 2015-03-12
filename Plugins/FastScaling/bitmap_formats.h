@@ -6,8 +6,9 @@
  * Commercial licenses available at http://imageresizing.net/
  */
 #pragma once
+#ifdef _MSC_VER
 #pragma unmanaged
-
+#endif
 
 enum BitmapPixelFormat {
     None = 0,

@@ -120,7 +120,7 @@ int CompleteHalving(RendererPtr r){
 
     if (r->source->can_reuse_space){
         int result = HalveInPlace(r->source, divisor);
-        if (result == NULL) return -101;
+        if (result == 0) return -101;
     }
     else {
 
@@ -130,7 +130,7 @@ int CompleteHalving(RendererPtr r){
         //p->Stop("create temp image for halving", true, false);
 
         int result = Halve(r->source, tmp_im, divisor);
-        if (result == NULL) {
+        if (result == 0) {
             return -103;
         }
 
@@ -349,21 +349,25 @@ int PerformRender(RendererPtr r){
 
     bool skip_last_transpose = r->details->post_transpose;
 
+    /*
+    //We can optimize certain code paths - later, if needed
+    
     bool scaling_required = (r->canvas != nullptr) && (r->details->post_transpose ? (r->canvas->w != r->source->h || r->canvas->h != r->source->w) :
         (r->canvas->h != r->source->h || r->canvas->w != r->source->w));
 
+    
     bool someTranspositionRequired = r->details->sharpen_percent_goal > 0 ||
         skip_last_transpose ||
         r->details->kernel_a_radius > 0 ||
         r->details->kernel_b_radius > 0 ||
         scaling_required;
 
-    //We can optimize certain code paths - later, if needed.
-    //if (!someTranspositionRequired && canvas == nullptr){
-    //    SimpleRenderInPlace(); 
-    //      p->Stop("Render", true, false);
-    //    return; //Nothing left to do here.
-    //}
+    if (!someTranspositionRequired && canvas == nullptr){
+        SimpleRenderInPlace(); 
+          p->Stop("Render", true, false);
+        return; //Nothing left to do here.
+    }
+    */
 
     bool vflip_source = (r->details->post_flip_y && !skip_last_transpose) || (skip_last_transpose && r->details->post_flip_x);
     bool vflip_transposed = ((r->details->post_flip_x && !skip_last_transpose) || (skip_last_transpose && r->details->post_flip_y));

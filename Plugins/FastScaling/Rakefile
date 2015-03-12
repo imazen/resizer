@@ -33,7 +33,8 @@ class String
   end
 end
 
-
+task "malloc.h" do end
+  
 task :default => "fastscaling"
 
 CFLAGS=%Q{-Wall -Wno-unused-function -Wno-unused-but-set-variable -Wno-return-type -fPIC -std=gnu++11 -fpermissive}
