@@ -2,7 +2,7 @@
 /docs/docu/
 /docs/doxygen
 Tests/*/Results
-packages/
+Packages/
 
 #Folders for binaries and caches
 bin/
