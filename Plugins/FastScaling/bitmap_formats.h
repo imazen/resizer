@@ -144,7 +144,7 @@ static BitmapBgraPtr CreateBitmapBgra(int sx, int sy, bool zeroed, int bpp)
 }
 
 
-static void DestroyBitmapBgra(BitmapBgraPtr im)
+inline void DestroyBitmapBgra(BitmapBgraPtr im)
 {
     if (im == NULL) return;
 

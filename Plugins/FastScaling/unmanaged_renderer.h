@@ -64,19 +64,16 @@ int DetermineDivisor(RendererPtr r)
 
 void DestroyRenderer(RendererPtr r)
 {
-    if (r->destroy_source && r->source != nullptr) {
+    if (r->destroy_source) {
         DestroyBitmapBgra(r->source);
     }
     r->source = nullptr;
+    DestroyBitmapBgra(r->transposed);
+    r->transposed = nullptr;
     r->canvas = nullptr;
-
-    if (r->details != NULL) {
+    if (r->details != nullptr) {
         DestroyRenderDetails(r->details);
-        r->details = NULL;
-    }
-    if (r->transposed != nullptr) {
-        DestroyBitmapBgra(r->transposed);
-        r->transposed = nullptr;
+        r->details = nullptr;
     }
     free(r);              
 }
