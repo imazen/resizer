@@ -53,7 +53,7 @@ CFLAGS=%Q{-Wall -Wno-unused-function -Wno-unused-but-set-variable -Wno-return-ty
 CLEAN.include('*.o')
 CLEAN.include('*.d')
 CLEAN.include('*.mf')
-%w{ fastscaling }.each { |file| CLOBBER.include(file) if File.exists?(file) }
+%w{ fastscaling libfastscaling.so }.each { |file| CLOBBER.include(file) if File.exists?(file) }
 
 rule '.o' => '.cpp' do |t|
   sh "#{CXX}  #{CFLAGS} -MMD -c -o #{t.name} #{t.source}"
@@ -89,13 +89,13 @@ end
 
 
 desc "build the fastscaling library"
-file "libfastscaling.so" => %w{  } do |t|
+file "libfastscaling.so" => %w{ libfastscaling.o } do |t|
   sh "#{CXX}  --shared -o #{t.name} #{t.prerequisites.join(' ')}"
 end
 
 desc "run with valgrind"
-task :valgrind => "fastscaling" do
-  sh "valgrind --leak-check=full --show-leak-kinds=all ./fastscaling"
+task :valgrind => TEST_PROGRAM do
+  sh "valgrind --leak-check=full --show-leak-kinds=all ./#{TEST_PROGRAM}"
 end
 
 desc "build the test program"

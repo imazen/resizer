@@ -64,6 +64,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="bitmap_compositing.h" />
+    <ClInclude Include="bitmap_formats.h" />
+    <ClInclude Include="catch.hpp" />
+    <ClInclude Include="color_matrix.h" />
+    <ClInclude Include="color_spaces.h" />
+    <ClInclude Include="convolution.h" />
+    <ClInclude Include="fastapprox.h" />
+    <ClInclude Include="halving.h" />
+    <ClInclude Include="math_functions.h" />
+    <ClInclude Include="scaling.h" />
+    <ClInclude Include="shared.h" />
+    <ClInclude Include="sharpening.h" />
+    <ClInclude Include="trim_whitespace.h" />
+    <ClInclude Include="unmanaged_renderer.h" />
+    <ClInclude Include="weighting.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
