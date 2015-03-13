@@ -24,6 +24,22 @@
 
 //This kind of describes the API as-is, not as it should be
 
+/* Proposed changes
+
+combine BitmapBgraStruct->bpp and BitmapBgraStruct->pixel_format somehow.
+
+Make  BitmapBgraStruct->matte_color a fixed 4 bytes sRGBA value, remove ->borrowed_matte_color
+
+Drop ColorSpace. We assume sRGB for BitmapBgra, RGBLinear for BitmapFloat
+
+Rename things for clarity. 
+
+Use const/restrict where appropriate
+
+Refactor everything around convolution kernels; perhaps they should have their own struct?
+
+*/
+
 enum BitmapPixelFormat {
     None = 0,
     Bgr24 = 24,
@@ -74,7 +90,7 @@ typedef struct BitmapBgraStruct{
     //Todo - combine with bpp somehow. DRY this out
     BitmapPixelFormat pixel_format;
 
-    //When using compositing mode blend_with_matte, this color will be used. We should probably define this as always being sRGBA 
+    //When using compositing mode blend_with_matte, this color will be used. We should probably define this as always being sRGBA, 4 bytes.  
     unsigned char *matte_color;
     ///If true, we don't dispose of *pixels when we dispose the struct
     bool borrowed_matte_color;
@@ -123,13 +139,6 @@ enum InterpolationFilter{
     Filter_Lanczos2SharpWindowed,
     Filter_CatmullRomFast,
     Filter_CatmullRomFastSharp
-};
-
-enum Rotate{
-    RotateNone = 0,
-    Rotate90 = 1,
-    Rotate180 = 2,
-    Rotate270 = 3
 };
 
 
@@ -187,9 +196,6 @@ typedef struct RenderDetailsStruct{
     //If true, only halve when both dimensions are multiples of the halving factor
     bool halve_only_when_common_factor;
 
-    //The actual halving factor to use.
-    uint32_t halving_divisor;
-
 
 
     float * kernel_a;
@@ -214,6 +220,11 @@ typedef struct RenderDetailsStruct{
     bool post_transpose;
     bool post_flip_x;
     bool post_flip_y;
+
+    //The actual halving factor to use. (private)
+    uint32_t halving_divisor;
+
+
  
 } RenderDetails;
 
@@ -266,7 +277,8 @@ static double filter_sinc_windowed(const InterpolationDetailsPtr d, double t);
 
 static InterpolationDetailsPtr CreateBicubicCustom(double window, double blur, double B, double C);
 static InterpolationDetailsPtr CreateCustom(double window, double blur, detailed_interpolation_method filter);
-static InterpolationDetailsPtr CreateInterpolation(InterpolationFilter filter);static void ContributionsFree(LineContribType * p);
+static InterpolationDetailsPtr CreateInterpolation(InterpolationFilter filter);
+static void ContributionsFree(LineContribType * p);
 static double percent_negative_weight(const InterpolationDetailsPtr details);
 
 static LineContribType *ContributionsCalc(const uint32_t line_size, const uint32_t src_size, const InterpolationDetailsPtr details);
