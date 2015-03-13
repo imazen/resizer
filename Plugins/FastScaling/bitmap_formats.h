@@ -104,7 +104,7 @@ static BitmapBgraPtr CreateBitmapBgraHeader(int sx, int sy){
     }
 
     im = (BitmapBgra *)ir_calloc(1,sizeof(BitmapBgra));
-    if (!im) {
+    if (im == NULL) {
         return NULL;
     }
     im->w = sx;
@@ -121,21 +121,22 @@ static BitmapBgraPtr CreateBitmapBgraHeader(int sx, int sy){
 static BitmapBgraPtr CreateBitmapBgra(int sx, int sy, bool zeroed, int bpp)
 {
     BitmapBgraPtr im = CreateBitmapBgraHeader(sx, sy);
-    if (im == NULL){ return NULL; }
-
+    if (im == NULL) { 
+	return NULL;
+    }
     im->bpp = bpp;
     im->stride = im->w * bpp;
     im->pixels_readonly = false;
     im->stride_readonly = false;
     im->borrowed_pixels = false;
     im->alpha_meaningful = bpp == 4;
-    if (zeroed){
+    if (zeroed) {
         im->pixels = (unsigned char *)ir_calloc(sy * im->stride, sizeof(unsigned char));
     }
-    else{
+    else {
         im->pixels = (unsigned char *)ir_malloc(sy * im->stride);
     }
-    if (!im->pixels) {
+    if (im->pixels == NULL) {
         ir_free(im);
         return NULL;
     }
