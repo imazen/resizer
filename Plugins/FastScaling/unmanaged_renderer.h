@@ -87,6 +87,7 @@ RendererPtr CreateRenderer(BitmapBgraPtr editInPlace, RenderDetailsPtr details){
     r->details = details;
     return r;
 }
+
 RendererPtr CreateRenderer(BitmapBgraPtr source, BitmapBgraPtr canvas, RenderDetailsPtr details){
     RendererPtr r = (RendererPtr)calloc(1, sizeof(RendererStruct));
     r->source = source;
@@ -123,7 +124,6 @@ int CompleteHalving(RendererPtr r){
         if (result == 0) return -101;
     }
     else {
-
         //p->Start("create temp image for halving", false);
         BitmapBgraPtr tmp_im = CreateBitmapBgra(halved_width, halved_height, true, r->source->bpp);
         if (tmp_im == NULL) return -102;
@@ -133,19 +133,15 @@ int CompleteHalving(RendererPtr r){
         if (result == 0) {
             return -103;
         }
-
         tmp_im->alpha_meaningful = r->source->alpha_meaningful;
-
 
         if (r->destroy_source) {
             DestroyBitmapBgra(r->source);
         }
         r->source = tmp_im;
         r->destroy_source = true; //Cleanup tmp_im
-
     }
     return 0;
-
     // p->Stop("CompleteHalving", true, false);
 }
 
@@ -346,7 +342,6 @@ int RenderWrapper1D(const RendererPtr r, const BitmapBgraPtr pSrc,
 
 int PerformRender(RendererPtr r){
     CompleteHalving(r);
-
     bool skip_last_transpose = r->details->post_transpose;
 
     /*
@@ -377,19 +372,18 @@ int PerformRender(RendererPtr r){
         return -1;
     }
 
-
     //Create transposition byffer
     //p->Start("allocate temp image(sy x dx)", false);
 
     /* Scale horizontally  */
     r->transposed = CreateBitmapBgra(r->source->h, r->canvas == nullptr ? r->source->w : (skip_last_transpose ? r->canvas->h : r->canvas->w), false, r->source->bpp);
     if (r->transposed == NULL) { return -2;  }
-    r->transposed->compositing_mode = ::BitmapCompositingMode::Replace_self;
+    r->transposed->compositing_mode = BitmapCompositingMode::Replace_self;
     //p->Stop("allocate temp image(sy x dx)", true, false);
 
     //Don't composite if we're working in-place
     if (r->canvas == nullptr){
-        r->source->compositing_mode = ::BitmapCompositingMode::Replace_self;
+        r->source->compositing_mode = BitmapCompositingMode::Replace_self;
     }
     //Unsharpen when interpolating if we can
     if (r->details->sharpen_percent_goal > 0 &&

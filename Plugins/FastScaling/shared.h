@@ -81,7 +81,7 @@ typedef struct InterpolationDetailsStruct *InterpolationDetailsPtr;
 
 typedef double(*detailed_interpolation_method)(InterpolationDetailsPtr, double);
 
-typedef struct InterpolationDetailsStruct{
+typedef struct InterpolationDetailsStruct {
     //1 is the default; near-zero overlapping between windows. 2 overlaps 50% on each side.
     double window;
     //Coefficients for bucubic weighting
@@ -175,7 +175,7 @@ typedef struct RenderDetailsStruct{
     bool post_flip_x;
     bool post_flip_y;
  
-}RenderDetails;
+} RenderDetails;
 
 static InterpolationDetailsPtr CreateInterpolationDetails(){
     InterpolationDetailsPtr d = (InterpolationDetailsPtr)calloc(1, sizeof(InterpolationDetails));
@@ -189,7 +189,7 @@ static InterpolationDetailsPtr CreateInterpolationDetails(){
 
 static RenderDetailsPtr CreateRenderDetails(){
     RenderDetailsPtr d = (RenderDetailsPtr)calloc(1, sizeof(RenderDetails));
-    for (int i = 0; i < 5; i++){
+    for (int i = 0; i < 5; i++) {
         d->color_matrix[i] = &(d->color_matrix_data[i * 5]);
     }
     d->interpolate_last_percent = 3;
