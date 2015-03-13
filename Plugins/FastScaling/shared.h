@@ -214,8 +214,9 @@ static LookupTablesPtr table = NULL;
 
 
 static void FreeLookupTables() { 
-    free(table); 
+    LookupTablesPtr temp =  table;
     table = NULL;
+    free(temp); 
 }
 
 static LookupTablesPtr GetLookupTables() {
