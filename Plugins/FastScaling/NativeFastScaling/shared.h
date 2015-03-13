@@ -10,7 +10,7 @@
 #pragma unmanaged
 #endif
 
-#include <limits.h>
+#include <stdlib.h>
 
 #define ENABLE_INTERNAL_PREMULT
 #define ENABLE_COMPOSITING // needs premult
@@ -39,7 +39,6 @@ _declspec(noalias) _declspec(restrict) inline void* _ir_aligned_calloc(size_t co
 #define ir_calloc(count, element_size) calloc(count,element_size)
 #endif
 
-//#include "fastapprox.h"
 #include "math_functions.h"
 #include "bitmap_formats.h"
 #include "color_spaces.h"

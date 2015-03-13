@@ -6,7 +6,6 @@
 * Commercial licenses available at http://imageresizing.net/
 */
 
-#include "Stdafx.h"
 #include "shared.h"
 #include "weighting.h"
 #include "halving.h"

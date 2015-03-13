@@ -1,6 +1,6 @@
-//#include "Stdafx.h"
 
 #include "unmanaged_renderer.h"
+#include <stdio.h>
 
 int test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, InterpolationFilter filter)
 {

@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <string.h>
+
 #ifdef _MSC_VER
 #pragma unmanaged
 #ifndef alloca

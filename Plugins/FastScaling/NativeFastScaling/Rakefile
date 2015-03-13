@@ -11,8 +11,10 @@ CLEAN.include('*.o')
 
 if /darwin|mac os/ =~ RbConfig::CONFIG['host_os']
   CXX = "g++-4.9"
+  CC = "gcc-4.9"
 else
   CXX = "g++"
+  CC = "gcc"
 end
 
 
@@ -51,20 +53,29 @@ CFLAGS=%Q{-Wall -Wno-unused-function -Wno-unused-but-set-variable -Wno-return-ty
 CLEAN.include('*.o')
 CLEAN.include('*.d')
 CLEAN.include('*.mf')
-%w{}.each do |file|
-  CLEAN.include(file) if File.exists?(file)
-end
 %w{ fastscaling }.each { |file| CLOBBER.include(file) if File.exists?(file) }
 
 rule '.o' => '.cpp' do |t|
   sh "#{CXX}  #{CFLAGS} -MMD -c -o #{t.name} #{t.source}"
 end
 
+rule '.o' => '.c' do |t|
+  sh "#{CC}  #{CFLAGS} -MMD -c -o #{t.name} #{t.source}"
+end
+
+
 rule '.d' => '.cpp' do |t|
   verbose(false) do 
     sh "#{CXX}  -MM -MG -MF #{t.name} #{t.source}"
   end
 end
+
+rule '.d' => '.c' do |t|
+  verbose(false) do 
+    sh "#{CC}  -MM -MG -MF #{t.name} #{t.source}"
+  end
+end
+
 
 OBJECTS=%w{ fastscaling.o }
 

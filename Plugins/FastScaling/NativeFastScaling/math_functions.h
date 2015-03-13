@@ -10,6 +10,11 @@
 #pragma unmanaged
 #endif
 
+#include <stdint.h>
+#include <math.h>
+#include <limits.h>
+
+
 
 #define IR_PI  double (3.1415926535897932384626433832795)
 #define IR_SINC(value) (value == 0 ? 1 : sin(value * IR_PI) / (value * IR_PI))

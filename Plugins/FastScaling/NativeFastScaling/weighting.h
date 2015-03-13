@@ -7,7 +7,6 @@
  */
 
 #pragma once
-#include "Stdafx.h"
 #include "shared.h"
 
 #ifdef _MSC_VER
