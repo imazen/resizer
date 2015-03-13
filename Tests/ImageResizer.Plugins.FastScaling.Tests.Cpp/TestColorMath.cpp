@@ -80,7 +80,7 @@ namespace ImageResizerPluginsFastScalingTestsCpp {
 
             for (int x = 0; x < 256; x++){
                 from[x] = x;
-                to[x] = t->linear_to_srgb[clamp_01_to_04096(t->srgb_to_linear[x])];
+                to[x] = uchar_clamp_ff(linear_to_srgb(t->srgb_to_linear[x]));
             }
 
 
