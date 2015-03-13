@@ -1,4 +1,4 @@
-#ifdef MSC
+#ifdef _MSC_VER
 #ifndef DLLPROJECT_API 
 #define DLLPROJECT_API __declspec(dllimport)
 #endif

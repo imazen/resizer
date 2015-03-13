@@ -1,4 +1,4 @@
-#ifdef MSC
+#ifdef _MSC_VER
 #define DLLPROJECT_API __declspec(dllexport)
 #endif
 

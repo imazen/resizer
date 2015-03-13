@@ -3,6 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageResizer.Plugins.FastScaling", "ImageResizer.Plugins.FastScaling.vcxproj", "{9B97D952-2969-4F46-9758-9E712CDF3F72}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3EEA8539-9AC8-4859-91AB-EE9807820401} = {3EEA8539-9AC8-4859-91AB-EE9807820401}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer", "..\..\Core\ImageResizer.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
 EndProject
@@ -26,6 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{89298D
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeFastScaling", "NativeFastScaling\NativeFastScaling.vcxproj", "{3EEA8539-9AC8-4859-91AB-EE9807820401}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DllProject", "..\DllProject\DllProject.vcxproj", "{89FFE39F-2878-471A-871B-899000EB1BBD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -158,9 +163,24 @@ Global
 		{3EEA8539-9AC8-4859-91AB-EE9807820401}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{3EEA8539-9AC8-4859-91AB-EE9807820401}.Release|Win32.ActiveCfg = Release|Win32
 		{3EEA8539-9AC8-4859-91AB-EE9807820401}.Release|Win32.Build.0 = Release|Win32
-		{3EEA8539-9AC8-4859-91AB-EE9807820401}.Release|x64.ActiveCfg = Release|Win32
+		{3EEA8539-9AC8-4859-91AB-EE9807820401}.Release|x64.ActiveCfg = Release|x64
+		{3EEA8539-9AC8-4859-91AB-EE9807820401}.Release|x64.Build.0 = Release|x64
 		{3EEA8539-9AC8-4859-91AB-EE9807820401}.Release|x86.ActiveCfg = Release|Win32
 		{3EEA8539-9AC8-4859-91AB-EE9807820401}.Release|x86.Build.0 = Release|Win32
+		{89FFE39F-2878-471A-871B-899000EB1BBD}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{89FFE39F-2878-471A-871B-899000EB1BBD}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{89FFE39F-2878-471A-871B-899000EB1BBD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{89FFE39F-2878-471A-871B-899000EB1BBD}.Debug|Win32.Build.0 = Debug|Win32
+		{89FFE39F-2878-471A-871B-899000EB1BBD}.Debug|x64.ActiveCfg = Debug|Win32
+		{89FFE39F-2878-471A-871B-899000EB1BBD}.Debug|x86.ActiveCfg = Debug|Win32
+		{89FFE39F-2878-471A-871B-899000EB1BBD}.Debug|x86.Build.0 = Debug|Win32
+		{89FFE39F-2878-471A-871B-899000EB1BBD}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{89FFE39F-2878-471A-871B-899000EB1BBD}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{89FFE39F-2878-471A-871B-899000EB1BBD}.Release|Win32.ActiveCfg = Release|Win32
+		{89FFE39F-2878-471A-871B-899000EB1BBD}.Release|Win32.Build.0 = Release|Win32
+		{89FFE39F-2878-471A-871B-899000EB1BBD}.Release|x64.ActiveCfg = Release|Win32
+		{89FFE39F-2878-471A-871B-899000EB1BBD}.Release|x86.ActiveCfg = Release|Win32
+		{89FFE39F-2878-471A-871B-899000EB1BBD}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

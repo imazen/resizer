@@ -88,6 +88,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\..\dlls\$(Configuration)\$(Platform)\</OutDir>
     <IntDir>.\obj\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>E:\Plugins\FastScaling\NativeFastScaling;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -160,24 +161,10 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bitmap_formats.h" />
-    <ClInclude Include="bitmap_compositing.h" />
-    <ClInclude Include="fastapprox.h" />
     <ClInclude Include="managed_bitmap_wrapper.h" />
-    <ClInclude Include="color_matrix.h" />
-    <ClInclude Include="color_spaces.h" />
-    <ClInclude Include="convolution.h" />
-    <ClInclude Include="halving.h" />
     <ClInclude Include="ImageResizer.Plugins.FastScaling.h" />
-    <ClInclude Include="math_functions.h" />
     <ClInclude Include="rendering.h" />
-    <ClInclude Include="scaling.h" />
-    <ClInclude Include="shared.h" />
-    <ClInclude Include="sharpening.h" />
     <ClInclude Include="Stdafx.h" />
-    <ClInclude Include="trim_whitespace.h" />
-    <ClInclude Include="unmanaged_renderer.h" />
-    <ClInclude Include="weighting.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
@@ -195,6 +182,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{fa5ef673-a6a4-498d-aa24-c025cc5267af}</Project>
+    </ProjectReference>
+    <ProjectReference Include="NativeFastScaling\NativeFastScaling.vcxproj">
+      <Project>{3eea8539-9ac8-4859-91ab-ee9807820401}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

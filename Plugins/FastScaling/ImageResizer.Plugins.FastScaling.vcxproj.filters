@@ -17,52 +17,10 @@
     <ClInclude Include="Stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Scaling.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="weighting.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="halving.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="sharpening.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="color_spaces.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="math_functions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="bitmap_formats.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="convolution.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="color_matrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="bitmap_compositing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="rendering.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="managed_bitmap_wrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="trim_whitespace.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="fastapprox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="unmanaged_renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

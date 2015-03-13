@@ -48,7 +48,7 @@ task "malloc.h" do end
   
 task :default => "fastscaling"
 
-CFLAGS=%Q{-Wall -Wno-unused-function -Wno-unused-but-set-variable -Wno-return-type -Werror -fPIC -std=gnu++11}
+CFLAGS=%Q{-Wall -Wpedantic -Wno-unused-function -Wno-unused-but-set-variable -Wno-return-type -Werror -fPIC -std=gnu++11}
 
 CLEAN.include('*.o')
 CLEAN.include('*.d')

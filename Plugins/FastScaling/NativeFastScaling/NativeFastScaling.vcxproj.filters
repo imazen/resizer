@@ -60,5 +60,13 @@
     <ClInclude Include="weighting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fastscaling.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="libfastscaling.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
