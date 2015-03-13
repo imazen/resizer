@@ -24,7 +24,7 @@
 typedef struct RendererStruct *RendererPtr;
 
 
-typedef struct RendererStruct{
+typedef struct RendererStruct {
 
 
     RenderDetailsPtr details;
@@ -39,7 +39,8 @@ typedef struct RendererStruct{
 
              
 
-int DetermineDivisor(RendererPtr r){
+int DetermineDivisor(RendererPtr r) 
+{
     if (r->canvas == nullptr) return 0;
 
     int width = r->details->post_transpose ? r->canvas->h : r->canvas->w;
@@ -52,8 +53,8 @@ int DetermineDivisor(RendererPtr r){
     divisor_max = divisor_max / r->details->interpolate_last_percent;
 
     int divisor = (int)floor(divisor_max);
-    if (r->details->halve_only_when_common_factor){
-        while (divisor > 0 && ((r->source->h % divisor != 0) || (r->source->w % divisor == 0))){
+    if (r->details->halve_only_when_common_factor) {
+        while (divisor > 0 && ((r->source->h % divisor != 0) || (r->source->w % divisor == 0))) {
             divisor--;
         }
     }
@@ -61,25 +62,27 @@ int DetermineDivisor(RendererPtr r){
 }
 
 
-void DestroyRenderer(RendererPtr r){
-    if (r->destroy_source && r->source != nullptr){
+void DestroyRenderer(RendererPtr r)
+{
+    if (r->destroy_source && r->source != nullptr) {
         DestroyBitmapBgra(r->source);
     }
     r->source = nullptr;
     r->canvas = nullptr;
 
-    if (r->details != NULL){
+    if (r->details != NULL) {
         DestroyRenderDetails(r->details);
         r->details = NULL;
     }
-    if (r->transposed != nullptr){
+    if (r->transposed != nullptr) {
         DestroyBitmapBgra(r->transposed);
         r->transposed = nullptr;
     }
     free(r);              
 }
 
-RendererPtr CreateRenderer(BitmapBgraPtr editInPlace, RenderDetailsPtr details){
+RendererPtr CreateRenderer(BitmapBgraPtr editInPlace, RenderDetailsPtr details)
+{
     if (details->post_transpose) return nullptr; //We can't transpose in place. 
     RendererPtr r = (RendererPtr)calloc(1, sizeof(RendererStruct));
     r->source = editInPlace;
@@ -88,7 +91,8 @@ RendererPtr CreateRenderer(BitmapBgraPtr editInPlace, RenderDetailsPtr details){
     return r;
 }
 
-RendererPtr CreateRenderer(BitmapBgraPtr source, BitmapBgraPtr canvas, RenderDetailsPtr details){
+RendererPtr CreateRenderer(BitmapBgraPtr source, BitmapBgraPtr canvas, RenderDetailsPtr details)
+{
     RendererPtr r = (RendererPtr)calloc(1, sizeof(RendererStruct));
     r->source = source;
     r->canvas = canvas;
@@ -98,7 +102,8 @@ RendererPtr CreateRenderer(BitmapBgraPtr source, BitmapBgraPtr canvas, RenderDet
 }
     
   
-void SimpleRenderInPlace(){
+void SimpleRenderInPlace() 
+{
     //against source:
 
     //fliph
@@ -108,7 +113,8 @@ void SimpleRenderInPlace(){
 
 }
 
-int CompleteHalving(RendererPtr r){
+int CompleteHalving(RendererPtr r)
+{
     double divisor = r->details->halving_divisor;
     if (divisor <= 1){
         return 0;
@@ -146,7 +152,8 @@ int CompleteHalving(RendererPtr r){
 }
 
 
-static int ApplyConvolutionsFloat1D(const RendererPtr r, BitmapFloatPtr img, const uint32_t from_row, const uint32_t row_count, double sharpening_applied){
+static int ApplyConvolutionsFloat1D(const RendererPtr r, BitmapFloatPtr img, const uint32_t from_row, const uint32_t row_count, double sharpening_applied)
+{
     //p->Start("convolve kernel a", false);
     if (r->details->kernel_a_radius > 0 && ConvolveBgraFloatInPlace(img, r->details->kernel_a, r->details->kernel_a_radius, r->details->kernel_a_min, r->details->kernel_a_max, img->channels, from_row, row_count)){
         return -3;
@@ -166,7 +173,8 @@ static int ApplyConvolutionsFloat1D(const RendererPtr r, BitmapFloatPtr img, con
     return 0;
 }
 
-static void ApplyColorMatrix(const RendererPtr r, BitmapFloatPtr img, const uint32_t from_row, const uint32_t row_count){
+static void ApplyColorMatrix(const RendererPtr r, BitmapFloatPtr img, const uint32_t from_row, const uint32_t row_count)
+{
     //p->Start("apply_color_matrix_float", false);
     apply_color_matrix_float(img, 0, row_count, r->details->color_matrix);
     //p->Stop("apply_color_matrix_float", true, false);
@@ -317,11 +325,13 @@ cleanup:
 }
 
 
-int RenderWrapper1D(const RendererPtr r, const BitmapBgraPtr pSrc,
+int RenderWrapper1D(
+    const RendererPtr r, 
+    const BitmapBgraPtr pSrc,
     const BitmapBgraPtr pDst,
     const RenderDetailsPtr details,
     bool transpose,
-    int call_number){
+    int call_number) {
     bool perfect_size = transpose ? (pSrc->h == pDst->w && pDst->h == pSrc->w) : (pSrc->w == pDst->w && pSrc->h == pDst->h);
     //String^ name = String::Format("{0}Render1D (call {1})", perfect_size ? "" : "ScaleAnd", call_number);
 
@@ -337,10 +347,9 @@ int RenderWrapper1D(const RendererPtr r, const BitmapBgraPtr pSrc,
     // finally{
     // p->Stop(name, true, true);
     //}
-
 }
 
-int PerformRender(RendererPtr r){
+int PerformRender(RendererPtr r) {
     CompleteHalving(r);
     bool skip_last_transpose = r->details->post_transpose;
 
