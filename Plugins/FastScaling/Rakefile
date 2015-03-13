@@ -68,6 +68,8 @@ end
 
 OBJECTS=%w{ fastscaling.o }
 
+TEST_PROGRAM = "test_program"
+
 
 desc "build a fastscaling program"
 file "fastscaling" => OBJECTS do |t|
@@ -81,8 +83,26 @@ file "libfastscaling.so" => %w{  } do |t|
 end
 
 desc "run with valgrind"
-task "valgrind" => "fastscaling" do
+task :valgrind => "fastscaling" do
   sh "valgrind --leak-check=full --show-leak-kinds=all ./fastscaling"
+end
+
+desc "build the test program"
+file TEST_PROGRAM => "test.o" do |t|
+  sh "#{CXX} -Werror #{t.prerequisites.join(" ")}  -o #{t.name}"
+end
+
+task :test => "test_program" do
+  sh "./#{TEST_PROGRAM}"
+end
+
+desc "runs each test case sequentially in a separate process"
+task :test_each_case_in_separate_process => "test_program" do
+  test_name_lines = `./#{TEST_PROGRAM} --list-test-names-only`
+  test_names = test_name_lines.split("\n")
+  test_names.each do |test_name|
+    sh "./#{TEST_PROGRAM} '#{test_name}'"
+  end
 end
 
 FileList['*.cpp'].each do |source_file|
@@ -90,3 +110,4 @@ FileList['*.cpp'].each do |source_file|
   dependency_file.to_task
   import dependency_file
 end
+
