@@ -12,7 +12,8 @@ before_install:
   - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; alias g++="g++-4.8"; alias gcc="gcc-4.8"; fi
   - wget https://s3.amazonaws.com/public-unit-test-resources/valgrind-3.10.1.tar.bz2 && tar xjvf valgrind-3.10.1.tar.bz2
-  - cd valgrind-3.10.1 && ./configure && make && make install
+  - cd valgrind-3.10.1 && ./configure && make
+  - sudo make install
   
 script:
   - cd $(TRAVIS_BUILD_DIR)/Plugins/FastScaling/NativeFastScaling
