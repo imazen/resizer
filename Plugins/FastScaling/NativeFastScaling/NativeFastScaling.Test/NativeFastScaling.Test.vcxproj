@@ -145,6 +145,11 @@
   <ItemGroup>
     <ClCompile Include="..\test.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NativeFastScaling.vcxproj">
+      <Project>{3eea8539-9ac8-4859-91ab-ee9807820401}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

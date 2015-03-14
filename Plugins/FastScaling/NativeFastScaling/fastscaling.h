@@ -3,11 +3,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#ifdef LIBRARY_EXPORTS
-#  define FASTSCALING_API __declspec(dllimport)
-#else
-#  define FASTSCALING_API
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,8 +55,6 @@ typedef struct BitmapBgraStruct {
     BitmapCompositingMode compositing_mode;
 
 } BitmapBgra;
-
-FASTSCALING_API BitmapBgra * CreateBitmapBgra(int sx, int sy, bool zeroed, int bpp);
 
 typedef struct RendererStruct Renderer;
 
@@ -159,14 +152,6 @@ typedef struct RenderDetailsStruct{
  
 } RenderDetails;
 
-FASTSCALING_API RenderDetails * CreateRenderDetails(void);
-FASTSCALING_API InterpolationDetails * CreateInterpolationDetails(void);
-FASTSCALING_API InterpolationDetails * CreateInterpolation(InterpolationFilter filter);
-FASTSCALING_API Renderer * CreateRenderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details);
-FASTSCALING_API int PerformRender(Renderer * r);
-FASTSCALING_API void DestroyRenderer(Renderer * r);
-FASTSCALING_API void DestroyBitmapBgra(BitmapBgra * im);
-
 typedef struct LookupTablesStruct *LookupTablesPtr;
 
 typedef struct LookupTablesStruct {
@@ -175,9 +160,18 @@ typedef struct LookupTablesStruct {
     //const uint8_t linear_to_srgb[4097]; //Converts from 0..4096 to 0.255, going from linear to sRGB gamma.
 } LookupTables;
 
-FASTSCALING_API void FreeLookupTables();
-FASTSCALING_API LookupTables * GetLookupTables();
-
+/* exported functions */
+BitmapBgra * CreateBitmapBgra(int sx, int sy, bool zeroed, int bpp);
+RenderDetails * CreateRenderDetails(void);
+InterpolationDetails * CreateInterpolationDetails(void);
+InterpolationDetails * CreateInterpolation(InterpolationFilter filter);
+Renderer * CreateRenderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details);
+int PerformRender(Renderer * r);
+void DestroyRenderer(Renderer * r);
+void DestroyBitmapBgra(BitmapBgra * im);
+void FreeLookupTables();
+LookupTables * GetLookupTables();
+/* end exported functions */
 
 #ifdef __cplusplus
 }

@@ -1,0 +1,12 @@
+LIBRARY NativeFastScaling
+EXPORTS
+	CreateBitmapBgra
+	CreateRenderDetails
+	CreateInterpolationDetails
+	CreateInterpolation
+	CreateRenderer
+	PerformRender
+	DestroyRenderer
+	DestroyBitmapBgra
+	FreeLookupTables
+	GetLookupTables

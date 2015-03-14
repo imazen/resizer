@@ -31,6 +31,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeFastScaling", "NativeFastScaling\NativeFastScaling.vcxproj", "{3EEA8539-9AC8-4859-91AB-EE9807820401}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeFastScaling.Test", "NativeFastScaling\NativeFastScaling.Test\NativeFastScaling.Test.vcxproj", "{29CB4D97-77F0-4E93-9922-C37FCE9F314A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3EEA8539-9AC8-4859-91AB-EE9807820401} = {3EEA8539-9AC8-4859-91AB-EE9807820401}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
