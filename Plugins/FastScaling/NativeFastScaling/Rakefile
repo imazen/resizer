@@ -87,7 +87,7 @@ CXXFLAGS="#{COMMON_FLAGS} -std=gnu++11"
 %w{ test_program fastscaling libfastscaling.so }.each { |file| CLOBBER.include(file) if File.exists?(file) }
 
 
-OBJECTS=%w{ bitmap_compositing.o bitmap_formats.o lookup_tables.o color_matrix.o unmanaged_renderer.o }
+OBJECTS=%w{ libfastscaling.o bitmap_compositing.o bitmap_formats.o lookup_tables.o color_matrix.o unmanaged_renderer.o }
 SO_FILE="libfastscaling.so"
 
 
@@ -101,13 +101,13 @@ end
 
 
 desc "build the fastscaling library"
-file SO_FILE => OBJECTS + ["libfastscaling.o"] do |t|
+file SO_FILE => OBJECTS do |t|
   sh "#{CC}  --shared -o #{t.name} #{t.prerequisites.join(' ')}"
 end
 
 desc "run with valgrind"
 task :valgrind => TEST_PROGRAM do
-  sh "valgrind --leak-check=full --show-leak-kinds=all ./#{TEST_PROGRAM}"
+  sh "LD_LIBRARY_PATH=. valgrind --leak-check=full --show-leak-kinds=all ./#{TEST_PROGRAM}"
 end
 
 desc "build the test program"
