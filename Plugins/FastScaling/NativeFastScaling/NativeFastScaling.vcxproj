@@ -76,6 +76,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>LIBRARY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -86,6 +87,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>LIBRARY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -98,6 +100,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>LIBRARY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -113,6 +116,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>LIBRARY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -122,25 +126,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="bitmap_compositing.c" />
+    <ClCompile Include="bitmap_formats.c" />
+    <ClCompile Include="color_matrix.c" />
+    <ClCompile Include="fastscaling.c" />
+    <ClCompile Include="libfastscaling.c" />
+    <ClCompile Include="lookup_tables.c" />
+    <ClCompile Include="unmanaged_renderer.c" />
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="bitmap_compositing.h" />
     <ClInclude Include="bitmap_formats.h" />
     <ClInclude Include="catch.hpp" />
-    <ClInclude Include="color_matrix.h" />
     <ClInclude Include="color_spaces.h" />
     <ClInclude Include="convolution.h" />
+    <ClInclude Include="draft_interface.h" />
     <ClInclude Include="fastapprox.h" />
     <ClInclude Include="fastscaling.h" />
     <ClInclude Include="halving.h" />
+    <ClInclude Include="ir_alloc.h" />
     <ClInclude Include="math_functions.h" />
     <ClInclude Include="scaling.h" />
     <ClInclude Include="shared.h" />
     <ClInclude Include="sharpening.h" />
     <ClInclude Include="trim_whitespace.h" />
-    <ClInclude Include="unmanaged_renderer.h" />
     <ClInclude Include="weighting.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="libfastscaling.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -14,7 +14,7 @@
 #endif
 
 
-static void BgraSharpenInPlaceX(BitmapBgraPtr im, float pct)
+static void BgraSharpenInPlaceX(BitmapBgra * im, float pct)
 {
     const float n = -pct / (pct - 1); //if 0 < pct < 1
     const float outer_coeff = n / -2.0f;
@@ -105,7 +105,7 @@ int step)
 
 
 static void
-SharpenBgraFloatRowsInPlace(BitmapFloatPtr im, uint32_t start_row, uint32_t row_count, double pct){
+SharpenBgraFloatRowsInPlace(BitmapFloat * im, uint32_t start_row, uint32_t row_count, double pct){
     for (uint32_t row = start_row; row < start_row + row_count; row++){
         SharpenBgraFloatInPlace(im->pixels + (im->float_stride * row), im->w, pct, im->channels);
     }

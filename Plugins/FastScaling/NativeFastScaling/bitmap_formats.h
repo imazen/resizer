@@ -14,6 +14,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "fastscaling.h"
+
 
 typedef enum ColorSpaceEnum {
     ColorSpace_None = 0,
@@ -24,13 +26,8 @@ typedef enum ColorSpaceEnum {
     ColorSpace_Sigmoid = 5
 } ColorSpace;
 
-typedef struct BitmapBgraStruct *BitmapBgraPtr;
-
 // non-indexed bitmap
-
-typedef struct BitmapFloatStruct *BitmapFloatPtr;
-
-typedef struct BitmapFloatStruct{
+typedef struct BitmapFloatStruct {
     //buffer width in pixels
     uint32_t w;
     //buffer height in pixels
@@ -55,12 +52,10 @@ typedef struct BitmapFloatStruct{
 
 
 
-BitmapBgraPtr CreateBitmapBgraHeader(int sx, int sy);
+BitmapBgra * CreateBitmapBgraHeader(int sx, int sy);
 
+BitmapFloat * CreateBitmapFloatHeader(int sx, int sy, int channels);
 
+BitmapFloat * CreateBitmapFloat(int sx, int sy, int channels, bool zeroed);
 
-BitmapFloatPtr CreateBitmapFloatHeader(int sx, int sy, int channels);
-
-BitmapFloatPtr CreateBitmapFloat(int sx, int sy, int channels, bool zeroed);
-
-void DestroyBitmapFloat(BitmapFloatPtr im);
+void DestroyBitmapFloat(BitmapFloat * im);

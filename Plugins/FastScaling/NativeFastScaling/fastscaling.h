@@ -3,12 +3,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#ifdef _MSC_VER
-#ifndef FASTSCALING_API 
-#define FASTSCALING_API __declspec(dllimport)
-#endif
+#ifdef LIBRARY_EXPORTS
+#  define FASTSCALING_API __declspec(dllimport)
 #else
-#define FASTSCALING_API
+#  define FASTSCALING_API
 #endif
 
 #ifdef __cplusplus

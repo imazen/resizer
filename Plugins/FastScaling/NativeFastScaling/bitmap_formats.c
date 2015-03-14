@@ -14,8 +14,8 @@
 #include "ir_alloc.h"
 #include "fastscaling.h"
 
-BitmapBgraPtr CreateBitmapBgraHeader(int sx, int sy){
-    BitmapBgraPtr im;
+BitmapBgra * CreateBitmapBgraHeader(int sx, int sy){
+    BitmapBgra * im;
 
     if (overflow2(sx, sy) || overflow2(sizeof(int *), sy) || overflow2(sizeof(int), sx)) {
         return NULL;
@@ -36,9 +36,9 @@ BitmapBgraPtr CreateBitmapBgraHeader(int sx, int sy){
 }
 
 
-BitmapBgraPtr CreateBitmapBgra(int sx, int sy, bool zeroed, int bpp)
+BitmapBgra * CreateBitmapBgra(int sx, int sy, bool zeroed, int bpp)
 {
-    BitmapBgraPtr im = CreateBitmapBgraHeader(sx, sy);
+    BitmapBgra * im = CreateBitmapBgraHeader(sx, sy);
     if (im == NULL) { 
 	return NULL;
     }
@@ -61,7 +61,7 @@ BitmapBgraPtr CreateBitmapBgra(int sx, int sy, bool zeroed, int bpp)
     return im;
 }
 
-void DestroyBitmapBgra(BitmapBgraPtr im)
+void DestroyBitmapBgra(BitmapBgra * im)
 {
     if (im == NULL) return;
 
@@ -71,8 +71,8 @@ void DestroyBitmapBgra(BitmapBgraPtr im)
     ir_free(im);
 }
 
-BitmapFloatPtr CreateBitmapFloatHeader(int sx, int sy, int channels){
-    BitmapFloatPtr im;
+BitmapFloat * CreateBitmapFloatHeader(int sx, int sy, int channels){
+    BitmapFloat * im;
 
     if (overflow2(sx, sy) || overflow2(sizeof(int *), sy) || overflow2(sizeof(int), sx)) {
         return NULL;
@@ -96,9 +96,9 @@ BitmapFloatPtr CreateBitmapFloatHeader(int sx, int sy, int channels){
 }
 
 
-BitmapFloatPtr CreateBitmapFloat(int sx, int sy, int channels, bool zeroed)
+BitmapFloat * CreateBitmapFloat(int sx, int sy, int channels, bool zeroed)
 {
-    BitmapFloatPtr im = CreateBitmapFloatHeader(sx, sy, channels);
+    BitmapFloat * im = CreateBitmapFloatHeader(sx, sy, channels);
     if (im == NULL){ return NULL; }
     im->pixels_borrowed = false;
     if (zeroed){
@@ -115,7 +115,7 @@ BitmapFloatPtr CreateBitmapFloat(int sx, int sy, int channels, bool zeroed)
 }
 
 
-void DestroyBitmapFloat(BitmapFloatPtr im)
+void DestroyBitmapFloat(BitmapFloat * im)
 {
     if (im == NULL) return;
 

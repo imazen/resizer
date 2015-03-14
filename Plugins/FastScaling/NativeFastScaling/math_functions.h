@@ -7,7 +7,7 @@
  */
 #pragma once
 #ifdef _MSC_VER
-#pragma unmanaged
+#define inline __inline
 #endif
 
 #include <stdint.h>

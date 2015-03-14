@@ -15,7 +15,7 @@
 #endif
 
 
-int convert_srgb_to_linear(BitmapBgra * src, const uint32_t from_row, BitmapFloat * dest, const uint32_t dest_row, const uint32_t row_count) 
+int convert_srgb_to_linear(BitmapBgra * src, uint32_t from_row, BitmapFloat * dest, uint32_t dest_row, uint32_t row_count) 
 {
 
     if (src->w != dest->w || src->bpp < dest->channels) return -1;
@@ -74,7 +74,7 @@ static void unpack24bitRow(uint32_t width, unsigned char* sourceLine, unsigned c
 }
 
 
-int vertical_flip_bgra(BitmapBgraPtr b)
+int vertical_flip_bgra(BitmapBgra * b)
 {
     void* swap = ir_malloc(b->stride);
     if (swap == NULL){
@@ -90,7 +90,7 @@ int vertical_flip_bgra(BitmapBgraPtr b)
     ir_free(swap);
     return 0;
 }
-static int  copy_bitmap_bgra(BitmapBgraPtr src, BitmapBgraPtr dst)
+static int  copy_bitmap_bgra(BitmapBgra * src, BitmapBgra * dst)
 {
     // TODO: check sizes / overflows
     if (dst->w != src->w || dst->h != src->h) return -1;
@@ -112,7 +112,7 @@ static int  copy_bitmap_bgra(BitmapBgraPtr src, BitmapBgraPtr dst)
     return 0;
 }
 
-static int blend_matte(BitmapFloatPtr src, const uint32_t from_row, const uint32_t row_count, const uint8_t* const matte){
+static int blend_matte(BitmapFloat * src, const uint32_t from_row, const uint32_t row_count, const uint8_t* const matte){
     //We assume that matte is BGRA, regardless.
 
     LookupTables*   t = GetLookupTables();
@@ -145,7 +145,7 @@ static int blend_matte(BitmapFloatPtr src, const uint32_t from_row, const uint32
     return 0;
 }
 
-static void demultiply_alpha(BitmapFloatPtr src, const uint32_t from_row, const uint32_t row_count){
+static void demultiply_alpha(BitmapFloat * src, const uint32_t from_row, const uint32_t row_count){
     for (uint32_t row = from_row; row < from_row + row_count; row++){
         uint32_t start_ix = row * src->float_stride;
         uint32_t end_ix = start_ix + src->w * src->channels;
@@ -162,7 +162,7 @@ static void demultiply_alpha(BitmapFloatPtr src, const uint32_t from_row, const 
 }
 
 
-static void copy_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row, BitmapBgraPtr dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose){
+static void copy_linear_over_srgb(BitmapFloat * src, const uint32_t from_row, BitmapBgra * dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose){
 
 
     const uint32_t dest_row_stride = transpose ? dest->bpp : dest->stride;
@@ -195,7 +195,7 @@ static void copy_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row, B
 
 }
 
-static void compose_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row, BitmapBgraPtr dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose){
+static void compose_linear_over_srgb(BitmapFloat * src, const uint32_t from_row, BitmapBgra * dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose){
 
     LookupTables*   t = GetLookupTables();
     const uint32_t dest_row_stride = transpose ? dest->bpp : dest->stride;
@@ -248,7 +248,7 @@ static void compose_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row
 
 
 
-int pivoting_composite_linear_over_srgb(BitmapFloatPtr src, const uint32_t from_row, BitmapBgraPtr dest, const uint32_t dest_row, const uint32_t row_count, const bool transpose) 
+int pivoting_composite_linear_over_srgb(BitmapFloat * src, uint32_t from_row, BitmapBgra * dest, uint32_t dest_row, uint32_t row_count, bool transpose) 
 {
     if (transpose ? src->w != dest->h : src->w != dest->w) return -1; //Add more bounds checks
 

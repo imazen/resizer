@@ -74,7 +74,7 @@ inline float* create_guassian_sharpen_kernel(double stdDev, uint32_t radius){
 }
 
 
-static int ConvolveBgraFloatInPlace(BitmapFloatPtr buf, const float *kernel, const uint32_t radius, float threshold_min, float threshold_max, const uint32_t convolve_channels, const uint32_t from_row, const int row_count) {
+static int ConvolveBgraFloatInPlace(BitmapFloat * buf, const float *kernel, const uint32_t radius, float threshold_min, float threshold_max, const uint32_t convolve_channels, const uint32_t from_row, const int row_count) {
 
     if (buf->w < radius + 1) return -2; //Do nothing unless the image is at least half as wide as the kernel.
    

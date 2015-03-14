@@ -15,58 +15,76 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bitmap_compositing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="bitmap_formats.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="catch.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="color_matrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="color_spaces.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="convolution.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="fastapprox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="halving.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="math_functions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="scaling.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shared.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="sharpening.h">
+    <ClCompile Include="bitmap_compositing.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bitmap_formats.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="color_matrix.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fastscaling.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libfastscaling.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lookup_tables.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="unmanaged_renderer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="weighting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="trim_whitespace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="unmanaged_renderer.h">
+    <ClInclude Include="sharpening.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="weighting.h">
+    <ClInclude Include="shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scaling.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="math_functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ir_alloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="halving.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fastscaling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="libfastscaling.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClInclude Include="fastapprox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="draft_interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="convolution.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="color_spaces.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="catch.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bitmap_formats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bitmap_compositing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -16,7 +16,7 @@
 
 
 static void
-ScaleBgraFloatRows(BitmapFloatPtr from, const uint32_t from_row, BitmapFloatPtr to, const uint32_t to_row, const uint32_t row_count, ContributionType * weights){
+ScaleBgraFloatRows(BitmapFloat * from, const uint32_t from_row, BitmapFloat * to, const uint32_t to_row, const uint32_t row_count, ContributionType * weights){
 
     const uint32_t from_step = from->channels;
     const uint32_t to_step = to->channels;

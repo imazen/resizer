@@ -6,6 +6,11 @@
 * Commercial licenses available at http://imageresizing.net/
 */
 
+#ifdef _MSC_VER
+#pragma unmanaged
+#endif
+
+
 #include "shared.h"
 #include "weighting.h"
 #include "halving.h"
@@ -13,11 +18,9 @@
 #include "convolution.h"
 #include "sharpening.h"
 #include "bitmap_compositing.h"
+#include "fastscaling.h"
 
 
-#ifdef _MSC_VER
-#pragma unmanaged
-#endif
 
 typedef struct RendererStruct {
     RenderDetails * details;
@@ -106,7 +109,7 @@ void DestroyRenderer(Renderer * r)
     free(r);              
 }
 
-Renderer * CreateRendererInPlace(BitmapBgraPtr editInPlace, RenderDetails * details)
+Renderer * CreateRendererInPlace(BitmapBgra * editInPlace, RenderDetails * details)
 {
     if (details->post_transpose) return NULL; //We can't transpose in place. 
     Renderer * r = (Renderer *)calloc(1, sizeof(Renderer));
@@ -116,7 +119,7 @@ Renderer * CreateRendererInPlace(BitmapBgraPtr editInPlace, RenderDetails * deta
     return r;
 }
 
-Renderer * CreateRenderer(BitmapBgraPtr source, BitmapBgraPtr canvas, RenderDetails * details)
+Renderer * CreateRenderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details)
 {
     Renderer * r = (Renderer *)calloc(1, sizeof(Renderer));
     r->source = source;
@@ -156,7 +159,7 @@ int CompleteHalving(Renderer * r)
     }
     else {
         //p->Start("create temp image for halving", false);
-        BitmapBgraPtr tmp_im = CreateBitmapBgra(halved_width, halved_height, true, r->source->bpp);
+        BitmapBgra * tmp_im = CreateBitmapBgra(halved_width, halved_height, true, r->source->bpp);
         if (tmp_im == NULL) return -102;
         //p->Stop("create temp image for halving", true, false);
 
@@ -177,7 +180,7 @@ int CompleteHalving(Renderer * r)
 }
 
 
-static int ApplyConvolutionsFloat1D(const Renderer * r, BitmapFloatPtr img, const uint32_t from_row, const uint32_t row_count, double sharpening_applied)
+static int ApplyConvolutionsFloat1D(const Renderer * r, BitmapFloat * img, const uint32_t from_row, const uint32_t row_count, double sharpening_applied)
 {
     //p->Start("convolve kernel a", false);
     if (r->details->kernel_a_radius > 0 && ConvolveBgraFloatInPlace(img, r->details->kernel_a, r->details->kernel_a_radius, r->details->kernel_a_min, r->details->kernel_a_max, img->channels, from_row, row_count)){
@@ -198,7 +201,7 @@ static int ApplyConvolutionsFloat1D(const Renderer * r, BitmapFloatPtr img, cons
     return 0;
 }
 
-static void ApplyColorMatrix(const Renderer * r, BitmapFloatPtr img, const uint32_t from_row, const uint32_t row_count)
+static void ApplyColorMatrix(const Renderer * r, BitmapFloat * img, const uint32_t from_row, const uint32_t row_count)
 {
     //p->Start("apply_color_matrix_float", false);
     apply_color_matrix_float(img, 0, row_count, r->details->color_matrix);
@@ -209,15 +212,15 @@ static void ApplyColorMatrix(const Renderer * r, BitmapFloatPtr img, const uint3
 
 
 int ScaleAndRender1D(const Renderer * r, 
-    const BitmapBgraPtr pSrc,
-    const BitmapBgraPtr pDst,
+    BitmapBgra * pSrc,
+    BitmapBgra * pDst,
     const RenderDetails * details,
     bool transpose,
     int call_number)
 {
     LineContribType * contrib = NULL;
-    BitmapFloatPtr source_buf = NULL;
-    BitmapFloatPtr dest_buf = NULL;
+    BitmapFloat * source_buf = NULL;
+    BitmapFloat * dest_buf = NULL;
 
     int return_code = 0;
     uint32_t from_count = pSrc->w;
@@ -303,8 +306,8 @@ cleanup:
 
 
 int Render1D(const Renderer * r, 
-    const BitmapBgraPtr pSrc,
-    const BitmapBgraPtr pDst,
+    BitmapBgra * pSrc,
+    BitmapBgra * pDst,
     const RenderDetails * details,
     bool transpose,
     int call_number)
@@ -318,7 +321,7 @@ int Render1D(const Renderer * r,
     //How many bytes per pixel are we scaling?
     uint32_t scaling_bpp = (pSrc->bpp == 4 && !pSrc->alpha_meaningful) ? 3 : pSrc->bpp;
 
-    BitmapFloatPtr buf = CreateBitmapFloat(pSrc->w, buffer_row_count, scaling_bpp, false); /*Handle errors */  if (buf == NULL)  { return_code = -1; goto cleanup; }
+    BitmapFloat * buf = CreateBitmapFloat(pSrc->w, buffer_row_count, scaling_bpp, false); /*Handle errors */  if (buf == NULL)  { return_code = -1; goto cleanup; }
     buf->alpha_meaningful = pSrc->alpha_meaningful;
     buf->alpha_premultiplied = buf->channels == 4;
 
@@ -352,8 +355,8 @@ cleanup:
 
 int RenderWrapper1D(
     const Renderer * r, 
-    const BitmapBgraPtr pSrc,
-    const BitmapBgraPtr pDst,
+    BitmapBgra * pSrc,
+    BitmapBgra * pDst,
     const RenderDetails * details,
     bool transpose,
     int call_number) {
@@ -442,7 +445,7 @@ int PerformRender(Renderer * r)
         return -5;
     }
 
-    BitmapBgraPtr finalDest = r->canvas == NULL ? r->source : r->canvas;
+    BitmapBgra * finalDest = r->canvas == NULL ? r->source : r->canvas;
 
     //Apply kernels, color matrix, scale,  (transpose?) and (compose?)
 

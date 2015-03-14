@@ -127,13 +127,7 @@ static inline void yxz_to_linear(float * yxz){
 
 }
 
-
-
-
-
-
-
-static int linear_to_luv_rows(BitmapFloatPtr bit, const uint32_t start_row, const  uint32_t row_count)
+static int linear_to_luv_rows(BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count)
 {
     if ((bit->w * bit->channels) != bit->float_stride)
     {
@@ -149,7 +143,7 @@ static int linear_to_luv_rows(BitmapFloatPtr bit, const uint32_t start_row, cons
     return 0;
 }
 
-static int luv_to_linear_rows(BitmapFloatPtr bit, const uint32_t start_row, const  uint32_t row_count)
+static int luv_to_linear_rows(BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count)
 {
     if ((bit->w * bit->channels) != bit->float_stride)
     {

@@ -43,6 +43,6 @@ typedef struct
 
 
 
-void apply_color_matrix_float(BitmapFloatPtr bmp, const uint32_t row, const uint32_t count, float*  m[5]);
-void apply_color_matrix(BitmapBgraPtr bmp, const uint32_t row, const uint32_t count, float* const __restrict  m[5]);
+void apply_color_matrix_float(BitmapFloat * bmp, const uint32_t row, const uint32_t count, float*  m[5]);
+void apply_color_matrix(BitmapBgra * bmp, const uint32_t row, const uint32_t count, float* const __restrict  m[5]);
 
