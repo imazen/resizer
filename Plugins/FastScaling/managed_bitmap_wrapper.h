@@ -116,6 +116,44 @@ namespace ImageResizer{
             };
 
 
+           
+            public ref class WeightingFilter{
+
+            private:
+              InterpolationDetails* details;
+              WeightingFilter(){}
+            public:
+              double window;
+              static WeightingFilter^ CreateIfValid(InterpolationFilter filter);
+
+              WeightingFilter(InterpolationFilter f){
+                details = CreateInterpolation(f);
+                window = details->window;
+                if (details == nullptr) throw gcnew ArgumentOutOfRangeException("f");
+              }
+
+              void SampleFilter( double x_from, double x_to, array<double,1>^ buffer, int samples){
+                for (int i = 0; i < samples; i++){
+                  double x = (x_to - x_from) * ((double)i / (double)samples) + x_from;
+                  buffer[i] = details->filter(details, x);
+                }
+              }
+
+
+              ~WeightingFilter(){
+                free(details);
+              }
+            };
+
+             WeightingFilter^ WeightingFilter::CreateIfValid(InterpolationFilter filter){
+              InterpolationDetails* d = CreateInterpolation(filter);
+              if (d == nullptr) return nullptr;
+              WeightingFilter^ f = gcnew WeightingFilter();
+              f->details = d;
+              f->window = d->window;
+              return f;
+            }
+
             public ref class RenderOptions{
             public:
                 RenderOptions(){
