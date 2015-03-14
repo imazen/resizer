@@ -1,5 +1,5 @@
 language:
-  - c++
+  - cpp
 
 compiler:
   - clang
@@ -8,13 +8,14 @@ compiler:
 before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
-  - sudo apt-get install valgrind -y
   - if [ "$CXX" = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev; fi
   - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; alias g++="g++-4.8"; alias gcc="gcc-4.8"; fi
-
+  - wget https://s3.amazonaws.com/public-unit-test-resources/valgrind-3.10.1.tar.bz2 && tar xjvf valgrind-3.10.1.tar.bz2
+  - cd valgrind-3.10.1 && ./configure && make && make install
+  
 script:
-  - cd Plugins/FastScaling/NativeFastScaling
+  - cd $(TRAVIS_BUILD_DIR)/Plugins/FastScaling/NativeFastScaling
   - valgrind --version
   - rake valgrind
   - rake test
