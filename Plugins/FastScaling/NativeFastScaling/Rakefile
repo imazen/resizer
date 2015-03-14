@@ -136,6 +136,13 @@ task :cachegrind => TEST_PROGRAM do |t|
   end
   sh "cg_annotate #{cachegrind_out_file}"
 end
+
+desc "run with callgrind"
+task :callgrind => TEST_PROGRAM do |t|
+  with_ld_library_path('.') do
+    sh "valgrind --tool=callgrind --dump-instr=yes --cache-sim=yes --branch-sim=yes ./#{t.prerequisites.first}"
+  end
+end
   
 
 desc "build the test program"
