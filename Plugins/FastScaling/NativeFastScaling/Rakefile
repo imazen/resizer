@@ -10,14 +10,21 @@ CLEAN.clear_exclude.exclude { |fn|
 
 CLEAN.include('*.o')
 
-if /darwin|mac os/ =~ RbConfig::CONFIG['host_os']
-  CXX = "g++-4.9"
-  CC = "gcc-4.9"
-else
-  CXX = "g++"
-  CC = "gcc"
-end
+MACOS = !!(/darwin|mac os/ =~ RbConfig::CONFIG['host_os'])
 
+
+cxx = ENV['CXX'] || "g++"
+cc = ENV['CC'] || "gcc"
+CXX = MACOS && cxx == "g++" ? "g++-4.9" : cxx;
+CC = MACOS && cc == "gcc" ? "gcc-4.9" : cc;
+
+
+COMMON_FLAGS=" -fPIC -O2 -Wpointer-arith -Wcast-qual -Wpedantic -Wall -Wextra -Wuninitialized -Wno-unused-function -Wno-return-type -Wredundant-decls"
+CFLAGS="#{COMMON_FLAGS} -std=c11 -Wstrict-prototypes -Wmissing-prototypes -Wc++-compat -Wshadow"
+
+CXXFLAGS="#{COMMON_FLAGS} -std=gnu++11"
+
+#-std=c++11
 
 
 desc "Remove any temporary products."
@@ -76,9 +83,6 @@ end
   import dependency_file
 end
 
-COMMON_FLAGS=" -fPIC -O2 -Wpointer-arith -Wcast-qual -Wpedantic -Wall -Wextra -Wuninitialized -Wno-unused-function -Wno-unused-but-set-variable -Wno-return-type -Werror -Wredundant-decls"
-CFLAGS="#{COMMON_FLAGS} -std=c11 -Wstrict-prototypes -Wmissing-prototypes -Wc++-compat -Wshadow"
-CXXFLAGS="#{COMMON_FLAGS} -std=gnu++11"
 
 
 task "malloc.h" do end

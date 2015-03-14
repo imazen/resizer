@@ -1,3 +1,5 @@
 libfastscaling.so
 test_program
 fastscaling
+*.d
+*.o
