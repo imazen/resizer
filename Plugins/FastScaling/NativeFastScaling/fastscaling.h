@@ -162,6 +162,7 @@ typedef struct LookupTablesStruct {
 
 /* exported functions */
 BitmapBgra * CreateBitmapBgra(int sx, int sy, bool zeroed, int bpp);
+BitmapBgra * CreateBitmapBgraHeader(int sx, int sy);
 RenderDetails * CreateRenderDetails(void);
 InterpolationDetails * CreateInterpolationDetails(void);
 InterpolationDetails * CreateInterpolation(InterpolationFilter filter);

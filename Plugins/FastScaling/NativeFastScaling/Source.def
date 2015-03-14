@@ -1,6 +1,7 @@
 LIBRARY NativeFastScaling
 EXPORTS
 	CreateBitmapBgra
+	CreateBitmapBgraHeader
 	CreateRenderDetails
 	CreateInterpolationDetails
 	CreateInterpolation
