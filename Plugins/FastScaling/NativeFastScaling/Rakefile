@@ -76,13 +76,15 @@ end
   import dependency_file
 end
 
+COMMON_FLAGS=" -fPIC -O2 -Wcast-qual -Wpedantic -Wall -Wextra -Wuninitialized -Wno-unused-function -Wno-unused-but-set-variable -Wno-return-type -Werror"
+CFLAGS="#{COMMON_FLAGS} -std=c11 -Wstrict-prototypes -Wc++-compat -Wshadow"
+CXXFLAGS="#{COMMON_FLAGS} -std=gnu++11"
+
+
 task "malloc.h" do end
   
 task :default => "fastscaling"
 
-COMMON_FLAGS="-Wall -Wpedantic -Wno-unused-function -Wno-unused-but-set-variable -Wno-return-type -Werror -fPIC"
-CFLAGS="#{COMMON_FLAGS} -std=c11"
-CXXFLAGS="#{COMMON_FLAGS} -std=gnu++11"
 
 %w{ test_program fastscaling libfastscaling.so }.each { |file| CLOBBER.include(file) if File.exists?(file) }
 

@@ -130,7 +130,7 @@ Renderer * CreateRenderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetail
 }
     
   
-void SimpleRenderInPlace() 
+static void SimpleRenderInPlace(void) 
 {
     //against source:
 
@@ -201,7 +201,7 @@ static int ApplyConvolutionsFloat1D(const Renderer * r, BitmapFloat * img, const
     return 0;
 }
 
-static void ApplyColorMatrix(const Renderer * r, BitmapFloat * img, const uint32_t from_row, const uint32_t row_count)
+static void ApplyColorMatrix(const Renderer * r, BitmapFloat * img, const uint32_t row_count)
 {
     //p->Start("apply_color_matrix_float", false);
     apply_color_matrix_float(img, 0, row_count, r->details->color_matrix);
@@ -276,7 +276,7 @@ int ScaleAndRender1D(const Renderer * r,
         if (ApplyConvolutionsFloat1D(r, dest_buf, 0, row_count, contrib->percent_negative)){
             return_code = -3; goto cleanup;
         }
-        if (details->apply_color_matrix && call_number == 2) { ApplyColorMatrix(r, dest_buf, 0, row_count); }
+        if (details->apply_color_matrix && call_number == 2) { ApplyColorMatrix(r, dest_buf, row_count); }
 
         //p->Start("pivoting_composite_linear_over_srgb", false);
         if (pivoting_composite_linear_over_srgb(dest_buf, 0, pDst, source_start_row, row_count, transpose)){
@@ -337,7 +337,7 @@ int Render1D(const Renderer * r,
         if (ApplyConvolutionsFloat1D(r, buf, 0, row_count, 0)){
             return_code = -3; goto cleanup;
         }
-        if (details->apply_color_matrix && call_number == 2) { ApplyColorMatrix(r, buf, 0, row_count); }
+        if (details->apply_color_matrix && call_number == 2) { ApplyColorMatrix(r, buf, row_count); }
 
         if (pivoting_composite_linear_over_srgb(buf, 0, pDst, source_start_row, row_count, transpose)){
             return_code = -4; goto cleanup;

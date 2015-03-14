@@ -155,8 +155,8 @@ typedef struct RenderDetailsStruct{
 typedef struct LookupTablesStruct *LookupTablesPtr;
 
 typedef struct LookupTablesStruct {
-    const float srgb_to_linear[256]; //Converts 0..255 -> 0..1, but knowing that 0.255 has sRGB gamma.
-    const float linear[256]; //Converts 0..255 -> 0..1
+    float srgb_to_linear[256]; //Converts 0..255 -> 0..1, but knowing that 0.255 has sRGB gamma.
+    float linear[256]; //Converts 0..255 -> 0..1
     //const uint8_t linear_to_srgb[4097]; //Converts from 0..4096 to 0.255, going from linear to sRGB gamma.
 } LookupTables;
 
@@ -169,8 +169,8 @@ Renderer * CreateRenderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetail
 int PerformRender(Renderer * r);
 void DestroyRenderer(Renderer * r);
 void DestroyBitmapBgra(BitmapBgra * im);
-void FreeLookupTables();
-LookupTables * GetLookupTables();
+void FreeLookupTables(void);
+LookupTables * GetLookupTables(void);
 /* end exported functions */
 
 #ifdef __cplusplus
