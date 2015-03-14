@@ -145,7 +145,7 @@ static int blend_matte(BitmapFloat * src, const uint32_t from_row, const uint32_
     return 0;
 }
 
-static void demultiply_alpha(BitmapFloat * src, const uint32_t from_row, const uint32_t row_count){
+void demultiply_alpha(BitmapFloat * src, const uint32_t from_row, const uint32_t row_count) {
     for (uint32_t row = from_row; row < from_row + row_count; row++){
         uint32_t start_ix = row * src->float_stride;
         uint32_t end_ix = start_ix + src->w * src->channels;
@@ -162,7 +162,8 @@ static void demultiply_alpha(BitmapFloat * src, const uint32_t from_row, const u
 }
 
 
-static void copy_linear_over_srgb(BitmapFloat * src, const uint32_t from_row, BitmapBgra * dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose){
+void copy_linear_over_srgb(BitmapFloat * src, const uint32_t from_row, BitmapBgra * dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose)
+{
 
 
     const uint32_t dest_row_stride = transpose ? dest->bpp : dest->stride;

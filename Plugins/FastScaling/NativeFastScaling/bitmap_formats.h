@@ -6,9 +6,6 @@
  * Commercial licenses available at http://imageresizing.net/
  */
 #pragma once
-#ifdef _MSC_VER
-#pragma unmanaged
-#endif
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -51,11 +48,14 @@ typedef struct BitmapFloatStruct {
 } BitmapFloat;
 
 
-
-BitmapBgra * CreateBitmapBgraHeader(int sx, int sy);
-
+#ifdef __cplusplus
+extern "C" {
+#endif 
 BitmapFloat * CreateBitmapFloatHeader(int sx, int sy, int channels);
 
 BitmapFloat * CreateBitmapFloat(int sx, int sy, int channels, bool zeroed);
 
 void DestroyBitmapFloat(BitmapFloat * im);
+#ifdef __cplusplus
+}
+#endif
