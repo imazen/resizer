@@ -57,7 +57,7 @@ RenderDetails * CreateRenderDetails()
     return d;
 }
 
-void DestroyRenderDetails(RenderDetails * d){
+static void DestroyRenderDetails(RenderDetails * d){
     if (d->interpolation != NULL) free(d->interpolation);
 
     if (d->kernel_a != NULL) ir_free(d->kernel_a);
@@ -70,7 +70,7 @@ void DestroyRenderDetails(RenderDetails * d){
 
              
 
-int DetermineDivisor(Renderer * r) 
+static int DetermineDivisor(Renderer * r) 
 {
     if (r->canvas == NULL) return 0;
 
@@ -109,7 +109,7 @@ void DestroyRenderer(Renderer * r)
     free(r);              
 }
 
-Renderer * CreateRendererInPlace(BitmapBgra * editInPlace, RenderDetails * details)
+static Renderer * CreateRendererInPlace(BitmapBgra * editInPlace, RenderDetails * details)
 {
     if (details->post_transpose) return NULL; //We can't transpose in place. 
     Renderer * r = (Renderer *)calloc(1, sizeof(Renderer));
@@ -141,7 +141,7 @@ static void SimpleRenderInPlace(void)
 
 }
 
-int CompleteHalving(Renderer * r)
+static int CompleteHalving(Renderer * r)
 {
     double divisor = r->details->halving_divisor;
     if (divisor <= 1){
@@ -211,7 +211,7 @@ static void ApplyColorMatrix(const Renderer * r, BitmapFloat * img, const uint32
 
 
 
-int ScaleAndRender1D(const Renderer * r, 
+static int ScaleAndRender1D(const Renderer * r, 
     BitmapBgra * pSrc,
     BitmapBgra * pDst,
     const RenderDetails * details,
@@ -305,7 +305,7 @@ cleanup:
 
 
 
-int Render1D(const Renderer * r, 
+static int Render1D(const Renderer * r, 
     BitmapBgra * pSrc,
     BitmapBgra * pDst,
     const RenderDetails * details,
@@ -353,7 +353,7 @@ cleanup:
 }
 
 
-int RenderWrapper1D(
+static int RenderWrapper1D(
     const Renderer * r, 
     BitmapBgra * pSrc,
     BitmapBgra * pDst,

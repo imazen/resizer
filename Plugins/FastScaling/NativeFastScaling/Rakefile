@@ -76,8 +76,8 @@ end
   import dependency_file
 end
 
-COMMON_FLAGS=" -fPIC -O2 -Wcast-qual -Wpedantic -Wall -Wextra -Wuninitialized -Wno-unused-function -Wno-unused-but-set-variable -Wno-return-type -Werror"
-CFLAGS="#{COMMON_FLAGS} -std=c11 -Wstrict-prototypes -Wc++-compat -Wshadow"
+COMMON_FLAGS=" -fPIC -O2 -Wpointer-arith -Wcast-qual -Wpedantic -Wall -Wextra -Wuninitialized -Wno-unused-function -Wno-unused-but-set-variable -Wno-return-type -Werror"
+CFLAGS="#{COMMON_FLAGS} -std=c11 -Wstrict-prototypes -Wmissing-prototypes -Wc++-compat -Wshadow"
 CXXFLAGS="#{COMMON_FLAGS} -std=gnu++11"
 
 
@@ -89,7 +89,7 @@ task :default => "fastscaling"
 %w{ test_program fastscaling libfastscaling.so }.each { |file| CLOBBER.include(file) if File.exists?(file) }
 
 
-OBJECTS=%w{ libfastscaling.o bitmap_compositing.o bitmap_formats.o lookup_tables.o color_matrix.o unmanaged_renderer.o }
+OBJECTS=%w{ bitmap_compositing.o bitmap_formats.o lookup_tables.o color_matrix.o unmanaged_renderer.o }
 SO_FILE="libfastscaling.so"
 
 

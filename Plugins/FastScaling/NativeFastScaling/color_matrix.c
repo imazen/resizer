@@ -12,6 +12,7 @@
 #include "fastscaling.h"
 #include "math_functions.h"
 #include "bitmap_formats.h"
+#include "shared.h"
 
 
 void apply_color_matrix(BitmapBgra * bmp, const uint32_t row, const uint32_t count, float* const __restrict  m[5])
