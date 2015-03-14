@@ -95,33 +95,33 @@ bool test_contrib_windows(char *msg)
             return true;
 }
 
-bool function_bounded(InterpolationDetails* details, char *msg, double input_start_value, double stop_at_abs, double input_step, double result_low_threshold, double result_high_threshold)
+bool function_bounded(InterpolationDetails* details, char *msg, double input_start_value, double stop_at_abs, double input_step, double result_low_threshold, double result_high_threshold, const char *name)
 {
     double input_value = input_start_value;
 
-    if (abs(input_value) > abs(stop_at_abs))
+    if (fabs(input_value) >= fabs(stop_at_abs))
         return true;
 
     double result_value = (*details->filter)(details, input_value);
 
     if (result_value < result_low_threshold)
     {
-      snprintf(msg + strlen(msg), 255 - strlen(msg), "value %.4f is below %.4f at x=%.4f", result_value, result_low_threshold, input_value);
+      snprintf(msg + strlen(msg), 255 - strlen(msg), "value %.4f is below %.4f at x=%.4f (%s)", result_value, result_low_threshold, input_value, name);
         return false;
     }
     else if (result_value > result_high_threshold)
     {
-      snprintf(msg + strlen(msg), 255 - strlen(msg), "value %.4f exceeds %.4f at x=%.4f", result_value, result_high_threshold, input_value);
+      snprintf(msg + strlen(msg), 255 - strlen(msg), "value %.4f exceeds %.4f at x=%.4f (%s)", result_value, result_high_threshold, input_value,name);
         return false;
     }
 
-    return function_bounded(details, msg, input_value + input_step, stop_at_abs, input_step, result_low_threshold, result_high_threshold);
+    return function_bounded(details, msg, input_value + input_step, stop_at_abs, input_step, result_low_threshold, result_high_threshold, name);
 }
 
-bool function_bounded_bi(InterpolationDetails* details, char *msg, double input_start_value, double stop_at_abs, double input_step, double result_low_threshold, double result_high_threshold)
+bool function_bounded_bi(InterpolationDetails* details, char *msg, double input_start_value, double stop_at_abs, double input_step, double result_low_threshold, double result_high_threshold, const char* name)
 {
-    return function_bounded(details, msg, input_start_value, stop_at_abs, input_step, result_low_threshold, result_high_threshold) &&
-        function_bounded(details, msg, input_start_value * -1.0f, stop_at_abs, input_step * -1.0f, result_low_threshold, result_high_threshold);
+    return function_bounded(details, msg, input_start_value, stop_at_abs, input_step, result_low_threshold, result_high_threshold, name) &&
+        function_bounded(details, msg, input_start_value * -1.0f, stop_at_abs, input_step * -1.0f, result_low_threshold, result_high_threshold, name);
 }
 
 bool test_details(InterpolationDetails* details, char *msg, double expected_first_crossing, double expected_second_crossing, double expected_near0, double near0_threshold, double expected_end)
@@ -129,27 +129,27 @@ bool test_details(InterpolationDetails* details, char *msg, double expected_firs
     double top = (*details->filter)(details, 0);
 
     // Verify peak is at x = 0
-    if (!function_bounded_bi(details, msg, 0, expected_end, 0.05, -500, top)) return false;
+    if (!function_bounded_bi(details, msg, 0, expected_end, 0.05, -500, top, "should peak at x=0")) return false;
 
     // Verify we drop below a certain threshold between expected_near0 and expected_second_crossing or expected_end
-    if (!function_bounded_bi(details, msg, expected_near0, expected_second_crossing > 0 ? expected_second_crossing : expected_end, 0.05, -500, near0_threshold)) return false;
+    if (!function_bounded_bi(details, msg, expected_near0, expected_second_crossing > 0 ? expected_second_crossing : expected_end, 0.05, -500, near0_threshold, "should near 0")) return false;
 
     //Ensure ended at expected_end
-    if (!function_bounded_bi(details, msg, expected_end, expected_end + 1, 0.05, -0.0001, 0.0001)) return false;
+    if (!function_bounded_bi(details, msg, expected_end, expected_end + 1, 0.05, -0.0001f, 0.0001f, "should end at expected_end")) return false;
 
     if (expected_first_crossing != 0 && expected_second_crossing != 0){
         //Ensure everything between the two crossings is negative
-        if (!function_bounded_bi(details, msg, expected_first_crossing + 0.05, expected_second_crossing - 0.05, 0.05, -500, -0.001)) return false;
+        if (!function_bounded_bi(details, msg, expected_first_crossing + 0.05, expected_second_crossing - 0.05, 0.05, -500, -0.0001f, "should be negative between crossing 1 and 2")) return false;
 
         //Ensure everything between second crossing and end is positive - if significant
         if (expected_end > expected_second_crossing + 0.1){
-            if (!function_bounded_bi(details, msg, expected_second_crossing + 0.05, expected_end - 0.02, 0.02, 0, 500)) return false;
+            if (!function_bounded_bi(details, msg, expected_second_crossing + 0.05, expected_end - 0.02, 0.02, 0, 500, "should be positive between crossing 2 and expected_end")) return false;
 
         }
     }
     else{
         //Ensure everything is non-negative
-        if (!function_bounded_bi(details, msg, expected_near0, expected_end, 0.05, -0.0001, 500)) return false;
+        if (!function_bounded_bi(details, msg, expected_near0, expected_end, 0.05, -0.0001, 500, "this function should only produce positive weights")) return false;
 
     }
 
