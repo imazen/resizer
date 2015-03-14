@@ -125,11 +125,17 @@ file TEST_PROGRAM => ["test.o", SO_FILE] do |t|
 end
 
 task :test => "test_program" do
+  #use shared library in current directory
+  ENV['LD_LIBRARY_PATH'] = "."
+
   sh "./#{TEST_PROGRAM}"
 end
 
 desc "runs each test case sequentially in a separate process"
 task :test_each_case_in_separate_process => "test_program" do
+  #use shared library in current directory
+  ENV['LD_LIBRARY_PATH'] = "."
+
   test_name_lines = `./#{TEST_PROGRAM} --list-test-names-only`
   test_names = test_name_lines.split("\n")
   test_names.each do |test_name|
