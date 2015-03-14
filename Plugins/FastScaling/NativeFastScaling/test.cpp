@@ -6,7 +6,7 @@
 #include "scaling.h"
 #include "weighting_test_helpers.h"
 
-bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, InterpolationFilter filter)
+bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bool flipx, bool flipy, InterpolationFilter filter)
 {
     BitmapBgra * source = CreateBitmapBgra(sx, sy, true, sbpp);
     BitmapBgra * canvas = CreateBitmapBgra(cx, cy, true, cbpp);
@@ -16,6 +16,9 @@ bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, InterpolationFilte
     details->interpolation = CreateInterpolation(filter);
 
     details->sharpen_percent_goal = 50;
+    details->post_flip_x = flipx;
+    details->post_flip_y = flipy;
+    details->post_transpose = transpose;
 
 
     Renderer * p = CreateRenderer(source, canvas, details);
@@ -32,11 +35,19 @@ bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, InterpolationFilte
 }
 
 TEST_CASE( "Render without crashing", "[fastscaling]") {
-    REQUIRE( test(4000,3000,4,200,40,4,(InterpolationFilter)0) );
+    REQUIRE( test(400,300,4,200,40,4,false,false,false,(InterpolationFilter)0) );
 }
 
-TEST_CASE( "Render with crashing", "[fastscaling]") {
-    REQUIRE( test(200, 40, 4, 4000, 3000, 4, (InterpolationFilter)0) );
+TEST_CASE( "Render - upscale", "[fastscaling]") {
+  REQUIRE(test(200, 40, 4, 500, 300, 4, false, false, false, (InterpolationFilter)0));
+}
+
+TEST_CASE("Render - downscale 24->32", "[fastscaling]") {
+  REQUIRE(test(400, 200, 3, 200, 100, 4, false, false, false, (InterpolationFilter)0));
+}
+
+TEST_CASE("Render and rotate", "[fastscaling]") {
+  REQUIRE(test(200, 40, 4, 500, 300, 4,true,true,true,(InterpolationFilter)0));
 }
 
 TEST_CASE("Test contrib windows", "[fastscaling]") {
@@ -178,22 +189,25 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
     
       THEN(" and so forth ") {
 
+        bool exact_match = true;
         for (size_t y = 0; y < bit->h; y++){
           for (size_t x = 0; x < bit->w; x++){
               uint8_t* from = bit->pixels + (y * bit->stride) + (x * bit->bpp);
               uint8_t* to = final->pixels + (y * final->stride) + (x * final->bpp);
 
-              REQUIRE(*from == *to);
+              if (*from != *to) exact_match = false;
               from++; to++;
-              REQUIRE(*from == *to);
+              if (*from != *to) exact_match = false;
               from++; to++;
-              REQUIRE(*from == *to);
+              if (*from != *to) exact_match = false;
               from++; to++;
-              REQUIRE(*from == *to);
+              if (*from != *to) exact_match = false;
               from++; to++;
           }
         }
+        REQUIRE(exact_match);
       }
+      
     }
   }
 }
