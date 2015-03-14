@@ -33,9 +33,9 @@ typedef struct RendererStruct {
 } Renderer;
 
 
-InterpolationDetailsPtr CreateInterpolationDetails()
+InterpolationDetails* CreateInterpolationDetails()
 {
-    InterpolationDetailsPtr d = (InterpolationDetailsPtr)calloc(1, sizeof(InterpolationDetails));
+    InterpolationDetails* d = (InterpolationDetails*)calloc(1, sizeof(InterpolationDetails));
     d->blur = 1;
     d->window = 2;
     d->p1 = d->q1 = 0;

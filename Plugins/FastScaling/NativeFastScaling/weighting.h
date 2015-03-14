@@ -195,7 +195,7 @@ static void ContributionsFree(LineContribType * p)
 
 #define TONY 0.00001
 
-static double percent_negative_weight(const InterpolationDetailsPtr details){
+static double percent_negative_weight(const InterpolationDetails* details){
     const int samples = 50;
     double step = details->window / (double)samples;
 
@@ -214,7 +214,7 @@ static double percent_negative_weight(const InterpolationDetailsPtr details){
 }
 
 
-static LineContribType *ContributionsCalc(const uint32_t line_size, const uint32_t src_size, const InterpolationDetailsPtr details)
+static LineContribType *ContributionsCalc(const uint32_t line_size, const uint32_t src_size, const InterpolationDetails* details)
 {
     const double sharpen_ratio =  percent_negative_weight(details);
     const double desired_sharpen_ratio = details->sharpen_percent_goal / 100.0;

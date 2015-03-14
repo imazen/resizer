@@ -25,8 +25,6 @@ enum Rotate{
 };
 
 
-typedef struct InterpolationDetailsStruct *InterpolationDetailsPtr;
-
 typedef struct
 {
     float *Weights;  /* Normalized weights of neighboring pixels */
