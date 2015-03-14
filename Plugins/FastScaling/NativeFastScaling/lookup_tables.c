@@ -21,13 +21,13 @@ LookupTables * GetLookupTables() {
 
         // Store gamma adjusted in 256-511, linear in 0-255
 
-        float *lin = (float *)temp->linear;
-        float *to_lin = (float *)temp->srgb_to_linear;
+        float *lin = temp->linear;
+        float *to_lin = temp->srgb_to_linear;
        // uint8_t *to_srgb = (uint8_t *)temp->linear_to_srgb;
         
         for (uint32_t n = 0; n < 256; n++)
         {
-            const float s = ((float)n) / 255.0f;
+            float s = ((float)n) / 255.0f;
             lin[n] = s;
             to_lin[n] = srgb_to_linear(s);
         }
