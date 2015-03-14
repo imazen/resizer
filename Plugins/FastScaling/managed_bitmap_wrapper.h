@@ -40,7 +40,7 @@ namespace ImageResizer{
                 BitmapOptions^ options;
                 Bitmap^ underlying_bitmap; 
                 BitmapData^ locked_bitmap_data; 
-                BitmapBgraPtr bgra;
+                BitmapBgra* bgra;
                 Rectangle crop_window;
 
             public: 
@@ -62,7 +62,7 @@ namespace ImageResizer{
                     int sx = from.Width;
                     int sy = from.Height;
 
-                    BitmapBgraPtr im = CreateBitmapBgraHeader(sx, sy);
+                    BitmapBgra* im = CreateBitmapBgraHeader(sx, sy);
                     if (im == NULL) throw gcnew InvalidOperationException("Failed to create Bgra Header");
 
                     this->underlying_bitmap = source;

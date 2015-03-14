@@ -5,7 +5,8 @@
  * Licensed under the GNU Affero General Public License, Version 3.0.
  * Commercial licenses available at http://imageresizing.net/
  */
-#include "unmanaged_renderer.h"
+
+#include "fastscaling.h"
 #pragma once
 
 #ifdef _MSC_VER
@@ -25,7 +26,7 @@ namespace ImageResizer{
     namespace Plugins{
         namespace FastScaling {
 
-            public ref class Renderer
+            public ref class ManagedRenderer
             {
 
                 float* CopyFloatArray(array<float, 1>^ a){
@@ -38,7 +39,7 @@ namespace ImageResizer{
                     return copy;
                 }
 
-                void CopyBasics(RenderOptions^ from, RenderDetailsPtr to){
+                void CopyBasics(RenderOptions^ from, RenderDetails* to){
                     if (from->ColorMatrix != nullptr)
                     {
                         for (int i = 0; i < 5; i++)
@@ -78,7 +79,7 @@ namespace ImageResizer{
                 }
 
                 
-                ~Renderer(){
+                ~ManagedRenderer(){
                     if (p != nullptr) p->Start("Renderer: dispose", false);
                     DestroyRenderer(r);
                     
@@ -93,7 +94,7 @@ namespace ImageResizer{
                     
                     if (p != nullptr) p->Stop("Renderer: dispose", true, false);
                 }
-                RendererPtr r;
+                Renderer* r;
                 RenderOptions^ originalOptions;
                 WrappedBitmap^ wbSource;
                 WrappedBitmap^ wbCanvas;
@@ -102,7 +103,7 @@ namespace ImageResizer{
             public:
 
 
-                Renderer(BitmapOptions^ editInPlace, RenderOptions^ opts, IProfiler^ p){
+                ManagedRenderer(BitmapOptions^ editInPlace, RenderOptions^ opts, IProfiler^ p){
                     this->p = p;
                     originalOptions = opts;
                     
@@ -110,7 +111,7 @@ namespace ImageResizer{
                     if (opts->RequiresTransposeStep) throw gcnew ArgumentException("Cannot transpose image in place.");
 
 
-                    RenderDetailsPtr details = CreateRenderDetails();
+                    RenderDetails* details = CreateRenderDetails();
                     CopyBasics(opts, details);
                     p->Start("SysDrawingToBgra", false);
                     wbSource = gcnew WrappedBitmap(editInPlace);
@@ -118,11 +119,11 @@ namespace ImageResizer{
 
                 }
 
-                Renderer(BitmapOptions^ source, BitmapOptions^ canvas, RenderOptions^ opts, IProfiler^ p){
+                ManagedRenderer(BitmapOptions^ source, BitmapOptions^ canvas, RenderOptions^ opts, IProfiler^ p){
 
                     this->p = p;
                     originalOptions = opts;
-                    RenderDetailsPtr details = CreateRenderDetails();
+                    RenderDetails* details = CreateRenderDetails();
                     CopyBasics(opts, details);
                     p->Start("SysDrawingToBgra", false);
                     wbSource = gcnew WrappedBitmap(source);

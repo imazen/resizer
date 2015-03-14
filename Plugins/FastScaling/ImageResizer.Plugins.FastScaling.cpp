@@ -7,12 +7,10 @@
 
 #include "Stdafx.h"
 #include "ImageResizer.Plugins.FastScaling.h"
-#include "color_matrix.h"
 
 #include "managed_bitmap_wrapper.h"
 #include "rendering.h"
 
-#include "unmanaged_renderer.h"
 #pragma managed
 
 
@@ -120,9 +118,9 @@ namespace ImageResizer{
 
                     opts->ColorMatrix = colorMatrix;
 
-                    Renderer^ renderer;
+                    ManagedRenderer^ renderer;
                     try{
-                        renderer = gcnew Renderer(a, b, opts, s->Job->Profiler);
+                        renderer = gcnew ManagedRenderer(a, b, opts, s->Job->Profiler);
                         renderer->Render();
                     }
                     finally{
