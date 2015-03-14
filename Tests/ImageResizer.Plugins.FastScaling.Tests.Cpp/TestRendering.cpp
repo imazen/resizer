@@ -14,8 +14,9 @@
 //TODO: Test color matrix without scaling
 //TODO: Test rotation and flipping
 
-#include "Stdafx.h"
-#include "weighting_test_helpers.h"
+#include "fastscaling.h"
+
+
 #pragma managed
 
 using namespace System;
@@ -34,23 +35,7 @@ namespace ImageResizerPluginsFastScalingTestsCpp {
     {
  
     public:
-        [Fact]
-        void ContributionsCalcTest()
-        {
-            char msg[256];
-            bool r = test_contrib_windows(msg);
-            Assert::True(r, gcnew String(msg));
-        }
-
-        [Fact]
-        void WeightFuncTest()
-        {
-            char msg[256];
-            bool r = test_weight_distrib(msg);
-            Assert::True(r, gcnew String(msg));
-        }
-
-
+     
         [Fact]
         void CompositingTest()
         {
@@ -89,51 +74,59 @@ namespace ImageResizerPluginsFastScalingTestsCpp {
             Assert::True(*px == *tst, "Expected: " + tst->ToString() + " Got: " + px->ToString());
         }
 
+
+         
+    
+
         [Fact]
         void PlotFunctions(){
 
             int width = 320;
             int height = 200;
-            double* buffer = (double *) calloc(width, sizeof(double));
+            array<double, 1>^ buffer = gcnew array<double, 1>(width);
+
+            //double* buffer = (double *) calloc(width, sizeof(double));
             double window = 3.2;
 
             for (int i = 0; i < 30; i++){
-                InterpolationDetailsPtr details = sample_filter((InterpolationFilter)i, -1 * window, window, buffer, width);
-                if (details == NULL) break;
 
-                double vscale = (2 * height / 3) * -1 / buffer[width / 2];
-                int x_axis_y = 2 * height / 3;
-                int y_axis_x = width / 2;
+              WeightingFilter^ f = WeightingFilter::CreateIfValid((InterpolationFilter)i);
+              if (f == nullptr) continue;
+              f->SampleFilter(-1 * window, window, buffer, width);
 
-                Bitmap^ b = gcnew Bitmap(width, height);;
-                
-                Graphics^ g = Graphics::FromImage(b);
+              double vscale = (2 * height / 3) * -1 / buffer[width / 2];
+              int x_axis_y = 2 * height / 3;
+              int y_axis_x = width / 2;
 
-                g->DrawLine(Pens::LightGray, 0, x_axis_y, width, x_axis_y);
-                g->DrawLine(Pens::LightGray, y_axis_x, 0, y_axis_x, height);
+              Bitmap^ b = gcnew Bitmap(width, height);;
 
-                //Plot integers of X
-                for (int j = 0; j <= ceil(window); j++){
-                    int offset = (width / 2.0) / window * j;
-                    g->DrawLine(Pens::Red, y_axis_x + (int)offset + 2, x_axis_y - 8, y_axis_x + (int)offset - 2, x_axis_y + 8);
-                    g->DrawLine(Pens::Red, y_axis_x - (int)offset - 2, x_axis_y - 8, y_axis_x - (int)offset + 2, x_axis_y + 8);
+              Graphics^ g = Graphics::FromImage(b);
+
+              g->DrawLine(Pens::LightGray, 0, x_axis_y, width, x_axis_y);
+              g->DrawLine(Pens::LightGray, y_axis_x, 0, y_axis_x, height);
+
+              //Plot integers of X
+              for (int j = 0; j <= ceil(window); j++){
+                int offset = (width / 2.0) / window * j;
+                g->DrawLine(Pens::Red, y_axis_x + (int)offset + 2, x_axis_y - 8, y_axis_x + (int)offset - 2, x_axis_y + 8);
+                g->DrawLine(Pens::Red, y_axis_x - (int)offset - 2, x_axis_y - 8, y_axis_x - (int)offset + 2, x_axis_y + 8);
+              }
+              //Plot ideal window bounds
+              double filter_window = (width / 2.0) / window * f->window;
+              g->DrawLine(Pens::Blue, y_axis_x + (int)filter_window, 0, y_axis_x + (int)filter_window, height - 1);
+              g->DrawLine(Pens::Blue, y_axis_x - (int)filter_window, 0, y_axis_x - (int)filter_window, height - 1);
+
+              //Plot filter weights 
+              for (int j = 0; j < width; j++){
+                int y = (int)round(buffer[j] * vscale) + x_axis_y;
+                if (isnan(buffer[j]) || buffer[j] > buffer[width / 2]){
+                  throw gcnew ArgumentOutOfRangeException("filter", "filter produced an invalid value, either NaN, or a peak other than x=0");
                 }
-                //Plot ideal window bounds
-                double filter_window = (width / 2.0) / window * details->window;
-                g->DrawLine(Pens::Blue, y_axis_x + (int)filter_window, 0, y_axis_x + (int)filter_window, height - 1);
-                g->DrawLine(Pens::Blue, y_axis_x - (int)filter_window, 0, y_axis_x - (int)filter_window, height - 1);
+                b->SetPixel(j, y, Color::Black);
+              }
 
-                //Plot filter weights 
-                for (int j = 0; j < width; j++){
-                    int y = (int)round(buffer[j] * vscale) + x_axis_y; 
-                    if (isnan(buffer[j]) || buffer[j] > buffer[width /2]){
-                        throw gcnew ArgumentOutOfRangeException("filter","filter produced an invalid value, either NaN, or a peak other than x=0");
-                    }
-                    b->SetPixel(j, y, Color::Black);
-                }
-
-                b->Save(String::Format("..\\..\\..\\..\\Tests\\ImageResizer.Plugins.FastScaling.Tests.Cpp\\PlotFilter{0}.png", i));
-                free(details);
+              b->Save(String::Format("..\\..\\..\\..\\Tests\\ImageResizer.Plugins.FastScaling.Tests.Cpp\\PlotFilter{0}.png", i));
+              
             }
 
         }

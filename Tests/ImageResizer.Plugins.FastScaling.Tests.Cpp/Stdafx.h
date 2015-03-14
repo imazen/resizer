@@ -9,14 +9,9 @@
 // but are changed infrequently
 
 #pragma once
-
-
-
-#include "..\..\Plugins\FastScaling\weighting.h"
-#include "..\..\Plugins\FastScaling\bitmap_compositing.h"
-
-
-
+#include "fastscaling.h"
+#include "malloc.h"
+#include "math.h"
 #pragma managed
 
 using namespace System;
