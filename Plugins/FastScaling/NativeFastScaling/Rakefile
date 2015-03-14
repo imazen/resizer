@@ -113,7 +113,10 @@ end
 
 desc "run with valgrind"
 task :valgrind => TEST_PROGRAM do
-  sh "LD_LIBRARY_PATH=. valgrind --leak-check=full --show-leak-kinds=all ./#{TEST_PROGRAM}"
+  path = ENV['LD_LIBRARY_PATH']
+  ENV['LD_LIBRARY_PATH'] = "."
+  sh "valgrind --leak-check=full --show-leak-kinds=all ./#{TEST_PROGRAM}"
+  ENV['LD_LIBRARY_PATH'] = path
 end
 
 desc "build the test program"
