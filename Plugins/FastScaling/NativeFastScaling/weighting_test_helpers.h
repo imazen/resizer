@@ -14,7 +14,7 @@ bool function_bounded_bi(InterpolationDetails* details, char *msg, double input_
 
 bool test_details(InterpolationDetails* details, char *msg, double expected_first_crossing, double expected_second_crossing, double expected_near0, double near0_threshold, double expected_end);
 
-bool test_filter(InterpolationFilter filter, char *msg, double expected_first_crossing, double expected_second_crossing, double expected_near0, double near0_threshold, double expected_end);
+char * test_filter(InterpolationFilter filter, char *msg, double expected_first_crossing, double expected_second_crossing, double expected_near0, double near0_threshold, double expected_end);
 
 bool test_weight_distrib(char *msg);
 

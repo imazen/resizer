@@ -120,7 +120,7 @@ task :valgrind => TEST_PROGRAM do
 end
 
 desc "build the test program"
-file TEST_PROGRAM => ["test.o", SO_FILE] do |t|
+file TEST_PROGRAM => ["test.o", "test_helpers.o", "weighting_test_helpers.o", SO_FILE] do |t|
   sh "#{CXX} -Werror #{t.prerequisites.join(" ")}  -o #{t.name}"
 end
 
