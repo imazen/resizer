@@ -10,10 +10,12 @@
 
 #include <string.h>
 
-#ifdef _MSC_VER
+#ifndef _MSC_VER
+#include <alloca.h>
+#else
 #pragma unmanaged
 #ifndef alloca
-#include "malloc.h"
+#include <malloc.h>
 #define alloca _alloca
 #endif
 #endif
@@ -21,7 +23,7 @@
 
 
 
-float* create_guassian_kernel(double stdDev, uint32_t radius){
+inline float* create_guassian_kernel(double stdDev, uint32_t radius){
     uint32_t size = radius * 2 + 1;
     float *kernel = (float *)malloc(sizeof(float) * size);
     if (kernel == NULL) return NULL;
@@ -31,7 +33,7 @@ float* create_guassian_kernel(double stdDev, uint32_t radius){
     return kernel;
 }
 
- double sum_of_kernel(float* kernel, uint32_t size){
+inline double sum_of_kernel(float* kernel, uint32_t size){
     double sum = 0;
     for (uint32_t i = 0; i < size; i++){
         sum += kernel[i];
@@ -39,13 +41,13 @@ float* create_guassian_kernel(double stdDev, uint32_t radius){
     return sum;
 }
 
-void normalize_kernel(float* kernel, uint32_t size, float desiredSum){
+inline void normalize_kernel(float* kernel, uint32_t size, float desiredSum){
     float factor = (float)(desiredSum / sum_of_kernel(kernel,size));
     for (uint32_t i = 0; i < size; i++){
         kernel[i] *= factor;
     }
 }
-float* create_guassian_kernel_normalized(double stdDev, uint32_t radius){
+inline float* create_guassian_kernel_normalized(double stdDev, uint32_t radius){
     float *kernel = create_guassian_kernel(stdDev, radius);
     if (kernel == NULL) return NULL;
     uint32_t size = radius * 2 + 1;
@@ -53,7 +55,7 @@ float* create_guassian_kernel_normalized(double stdDev, uint32_t radius){
     return kernel;
 }
 
-float* create_guassian_sharpen_kernel(double stdDev, uint32_t radius){
+inline float* create_guassian_sharpen_kernel(double stdDev, uint32_t radius){
     float *kernel = create_guassian_kernel(stdDev, radius);
     if (kernel == NULL) return NULL;
     uint32_t size = radius * 2 + 1;
@@ -72,8 +74,7 @@ float* create_guassian_sharpen_kernel(double stdDev, uint32_t radius){
 }
 
 
-static int
-ConvolveBgraFloatInPlace(BitmapFloatPtr buf, const float *kernel, const uint32_t radius, float threshold_min, float threshold_max, const uint32_t convolve_channels = 4, const uint32_t from_row = 0, const int row_count = -1){
+static int ConvolveBgraFloatInPlace(BitmapFloatPtr buf, const float *kernel, const uint32_t radius, float threshold_min, float threshold_max, const uint32_t convolve_channels, const uint32_t from_row, const int row_count) {
 
     if (buf->w < radius + 1) return -2; //Do nothing unless the image is at least half as wide as the kernel.
    

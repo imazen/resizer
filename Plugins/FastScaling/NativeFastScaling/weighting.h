@@ -8,12 +8,10 @@
 
 #pragma once
 #include "shared.h"
+#include "fastscaling.h"
 
-#ifdef _MSC_VER
-#pragma unmanaged
-#endif
 
-static void derive_cubic_coefficients(double B, double C, InterpolationDetailsPtr out){
+static void derive_cubic_coefficients(double B, double C, InterpolationDetails * out){
     double bx2 = B + B;
     out->p1 = 1.0 - (1.0 / 3.0)*B;
     out->p2 = -3.0 + bx2 + C;
@@ -25,7 +23,7 @@ static void derive_cubic_coefficients(double B, double C, InterpolationDetailsPt
 }
 
 
-static double filter_flex_cubic(const InterpolationDetailsPtr d, double x)
+static double filter_flex_cubic(const InterpolationDetails * d, double x)
 {
     const double t = (double)fabs(x) / d->blur;
 
@@ -37,7 +35,7 @@ static double filter_flex_cubic(const InterpolationDetailsPtr d, double x)
     }
     return(0.0);
 }
-static double filter_bicubic_fast(const InterpolationDetailsPtr d, const double t)
+static double filter_bicubic_fast(const InterpolationDetails * d, const double t)
 {
     const double abs_t = (double)fabs(t) / d->blur;
     const double abs_t_sq = abs_t * abs_t;
@@ -47,7 +45,7 @@ static double filter_bicubic_fast(const InterpolationDetailsPtr d, const double 
 }
 
 
-static double filter_sinc_2(const InterpolationDetailsPtr d, double t)
+static double filter_sinc_2(const InterpolationDetails * d, double t)
 {
     const double abs_t = (double)fabs(t) / d->blur;
     if (abs_t == 0) { return 1; } //Avoid division by zero
@@ -56,14 +54,14 @@ static double filter_sinc_2(const InterpolationDetailsPtr d, double t)
     return sin(a) / a;
 }
 
-static double filter_box(const InterpolationDetailsPtr d, double t)
+static double filter_box(const InterpolationDetails * d, double t)
 {
 
     const double x = t / d->blur;
     return (x >= -1 * d->window && x < d->window) ? 1 : 0;
 }
 
-static double filter_triangle(const InterpolationDetailsPtr d, double t)
+static double filter_triangle(const InterpolationDetails * d, double t)
 {
     const double x = (double)fabs(t) / d->blur;
     if (x < 1.0)
@@ -72,7 +70,7 @@ static double filter_triangle(const InterpolationDetailsPtr d, double t)
 }
 
 
-static double filter_sinc_windowed(const InterpolationDetailsPtr d, double t)
+static double filter_sinc_windowed(const InterpolationDetails * d, double t)
 {
     const double x = t / d->blur;
     const double abs_t = (double)fabs(x);
@@ -83,47 +81,48 @@ static double filter_sinc_windowed(const InterpolationDetailsPtr d, double t)
 
 
 
-static InterpolationDetailsPtr CreateBicubicCustom(double window, double blur, double B, double C){
-    InterpolationDetailsPtr d = CreateInterpolationDetails();
+static InterpolationDetails * CreateBicubicCustom(double window, double blur, double B, double C){
+    InterpolationDetails * d = CreateInterpolationDetails();
     d->blur = blur;
     derive_cubic_coefficients(B, C, d);
     d->filter = filter_flex_cubic;
     d->window = window;
     return d;
 }
-static InterpolationDetailsPtr CreateCustom(double window, double blur, detailed_interpolation_method filter){
-    InterpolationDetailsPtr d = CreateInterpolationDetails();
+static InterpolationDetails * CreateCustom(double window, double blur, detailed_interpolation_method filter){
+    InterpolationDetails * d = CreateInterpolationDetails();
     d->blur = blur;
     d->filter = filter;
     d->window = window;
     return d;
 }
 
-static InterpolationDetailsPtr CreateInterpolation(InterpolationFilter filter){
+InterpolationDetails * CreateInterpolation(InterpolationFilter filter)
+{
     switch (filter){
         case Filter_Linear:
-        case InterpolationFilter::Filter_Triangle:
+        case Filter_Triangle:
             return CreateCustom(1, 1, filter_triangle);
-        case InterpolationFilter::Filter_Lanczos2:
+        case Filter_Lanczos2:
             return CreateCustom(2, 1, filter_sinc_2);
-        case InterpolationFilter::Filter_Lanczos3: //Note - not a 3 lobed function - truncated to 2
+        case Filter_Lanczos3: //Note - not a 3 lobed function - truncated to 2
             return CreateCustom(3, 1, filter_sinc_2);
-        case InterpolationFilter::Filter_Lanczos2Sharp:
+        case Filter_Lanczos2Sharp:
             return CreateCustom(2, 0.9549963639785485, filter_sinc_2); 
-        case InterpolationFilter::Filter_Lanczos3Sharp://Note - not a 3 lobed function - truncated to 2
+        case Filter_Lanczos3Sharp://Note - not a 3 lobed function - truncated to 2
             return CreateCustom(3, 0.9812505644269356, filter_sinc_2);
         
         //Hermite and BSpline no negative weights
         case Filter_CubicBSpline:
             return CreateBicubicCustom(2, 1, 1, 0);
 
-        case InterpolationFilter::Filter_Lanczos2Windowed:
+        case Filter_Lanczos2Windowed:
             return CreateCustom(2, 1, filter_sinc_windowed);
-        case InterpolationFilter::Filter_Lanczos3Windowed:
+        case Filter_Lanczos3Windowed:
             return CreateCustom(3, 1, filter_sinc_windowed);
-        case InterpolationFilter::Filter_Lanczos2SharpWindowed:
+        case Filter_Lanczos2SharpWindowed:
             return CreateCustom(2, 0.9549963639785485, filter_sinc_windowed);
-        case InterpolationFilter::Filter_Lanczos3SharpWindowed:
+        case Filter_Lanczos3SharpWindowed:
             return CreateCustom(3, 0.9812505644269356, filter_sinc_windowed);
 
            

@@ -13,34 +13,52 @@
 #include "convolution.h"
 #include "sharpening.h"
 #include "bitmap_compositing.h"
-#include "color_matrix.h"
-#pragma once
+
 
 #ifdef _MSC_VER
 #pragma unmanaged
 #endif
 
-typedef struct RendererStruct *RendererPtr;
+InterpolationDetailsPtr CreateInterpolationDetails()
+{
+    InterpolationDetailsPtr d = (InterpolationDetailsPtr)calloc(1, sizeof(InterpolationDetails));
+    d->blur = 1;
+    d->window = 2;
+    d->p1 = d->q1 = 0;
+    d->p2 = d->q2 = d->p3 = d->q3 = d->q4 = 1;
+    d->sharpen_percent_goal = 0;
+    return d;
+}
 
+RenderDetails * CreateRenderDetails()
+{
+    RenderDetails * d = (RenderDetails *)calloc(1, sizeof(RenderDetails));
+    for (int i = 0; i < 5; i++) {
+        d->color_matrix[i] = &(d->color_matrix_data[i * 5]);
+    }
+    d->interpolate_last_percent = 3;
+    d->halve_only_when_common_factor = true;
+    d->minimum_sample_window_to_interposharpen = 1.5;
+    d->apply_color_matrix = false;
+    return d;
+}
 
-typedef struct RendererStruct {
+void DestroyRenderDetails(RenderDetails * d){
+    if (d->interpolation != NULL) free(d->interpolation);
 
+    if (d->kernel_a != NULL) ir_free(d->kernel_a);
 
-    RenderDetailsPtr details;
-    BitmapBgraPtr source;
-    bool destroy_source;
-    BitmapBgraPtr canvas;
-    BitmapBgraPtr transposed;
-    //Todo - profiling callbacks
-    //TODO - custom memory pool?
-}Renderer;
+    if (d->kernel_b != NULL) ir_free(d->kernel_b);
+
+    free(d);
+}
 
 
              
 
-int DetermineDivisor(RendererPtr r) 
+int DetermineDivisor(Renderer * r) 
 {
-    if (r->canvas == nullptr) return 0;
+    if (r->canvas == NULL) return 0;
 
     int width = r->details->post_transpose ? r->canvas->h : r->canvas->w;
     int height = r->details->post_transpose ? r->canvas->w : r->canvas->h;
@@ -61,35 +79,35 @@ int DetermineDivisor(RendererPtr r)
 }
 
 
-void DestroyRenderer(RendererPtr r)
+void DestroyRenderer(Renderer * r)
 {
     if (r->destroy_source) {
         DestroyBitmapBgra(r->source);
     }
-    r->source = nullptr;
+    r->source = NULL;
     DestroyBitmapBgra(r->transposed);
-    r->transposed = nullptr;
-    r->canvas = nullptr;
-    if (r->details != nullptr) {
+    r->transposed = NULL;
+    r->canvas = NULL;
+    if (r->details != NULL) {
         DestroyRenderDetails(r->details);
-        r->details = nullptr;
+        r->details = NULL;
     }
     free(r);              
 }
 
-RendererPtr CreateRenderer(BitmapBgraPtr editInPlace, RenderDetailsPtr details)
+Renderer * CreateRendererInPlace(BitmapBgraPtr editInPlace, RenderDetailsPtr details)
 {
-    if (details->post_transpose) return nullptr; //We can't transpose in place. 
-    RendererPtr r = (RendererPtr)calloc(1, sizeof(RendererStruct));
+    if (details->post_transpose) return NULL; //We can't transpose in place. 
+    RendererPtr r = (RendererPtr)calloc(1, sizeof(Renderer));
     r->source = editInPlace;
     r->destroy_source = false;
     r->details = details;
     return r;
 }
 
-RendererPtr CreateRenderer(BitmapBgraPtr source, BitmapBgraPtr canvas, RenderDetailsPtr details)
+Renderer * CreateRenderer(BitmapBgraPtr source, BitmapBgraPtr canvas, RenderDetailsPtr details)
 {
-    RendererPtr r = (RendererPtr)calloc(1, sizeof(RendererStruct));
+    RendererPtr r = (RendererPtr)calloc(1, sizeof(Renderer));
     r->source = source;
     r->canvas = canvas;
     r->destroy_source = false;
@@ -345,14 +363,15 @@ int RenderWrapper1D(
     //}
 }
 
-int PerformRender(RendererPtr r) {
+int PerformRender(RendererPtr r) 
+{
     CompleteHalving(r);
     bool skip_last_transpose = r->details->post_transpose;
 
     /*
     //We can optimize certain code paths - later, if needed
 
-    bool scaling_required = (r->canvas != nullptr) && (r->details->post_transpose ? (r->canvas->w != r->source->h || r->canvas->h != r->source->w) :
+    bool scaling_required = (r->canvas != NULL) && (r->details->post_transpose ? (r->canvas->w != r->source->h || r->canvas->h != r->source->w) :
         (r->canvas->h != r->source->h || r->canvas->w != r->source->w));
 
     
@@ -362,7 +381,7 @@ int PerformRender(RendererPtr r) {
         r->details->kernel_b_radius > 0 ||
         scaling_required;
 
-    if (!someTranspositionRequired && canvas == nullptr){
+    if (!someTranspositionRequired && canvas == NULL){
         SimpleRenderInPlace(); 
           p->Stop("Render", true, false);
         return; //Nothing left to do here.
@@ -381,14 +400,14 @@ int PerformRender(RendererPtr r) {
     //p->Start("allocate temp image(sy x dx)", false);
 
     /* Scale horizontally  */
-    r->transposed = CreateBitmapBgra(r->source->h, r->canvas == nullptr ? r->source->w : (skip_last_transpose ? r->canvas->h : r->canvas->w), false, r->source->bpp);
+    r->transposed = CreateBitmapBgra(r->source->h, r->canvas == NULL ? r->source->w : (skip_last_transpose ? r->canvas->h : r->canvas->w), false, r->source->bpp);
     if (r->transposed == NULL) { return -2;  }
-    r->transposed->compositing_mode = BitmapCompositingMode::Replace_self;
+    r->transposed->compositing_mode = Replace_self;
     //p->Stop("allocate temp image(sy x dx)", true, false);
 
     //Don't composite if we're working in-place
-    if (r->canvas == nullptr){
-        r->source->compositing_mode = BitmapCompositingMode::Replace_self;
+    if (r->canvas == NULL){
+        r->source->compositing_mode = Replace_self;
     }
     //Unsharpen when interpolating if we can
     if (r->details->sharpen_percent_goal > 0 &&
@@ -412,7 +431,7 @@ int PerformRender(RendererPtr r) {
         return -5;
     }
 
-    BitmapBgraPtr finalDest = r->canvas == nullptr ? r->source : r->canvas;
+    BitmapBgraPtr finalDest = r->canvas == NULL ? r->source : r->canvas;
 
     //Apply kernels, color matrix, scale,  (transpose?) and (compose?)
 
@@ -424,3 +443,4 @@ int PerformRender(RendererPtr r) {
     //GC::KeepAlive(wbSource);
     //GC::KeepAlive(wbCanvas);
 }
+

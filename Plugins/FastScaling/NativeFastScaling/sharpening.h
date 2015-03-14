@@ -44,7 +44,8 @@ static void BgraSharpenInPlaceX(BitmapBgraPtr im, float pct)
 
 static void
 SharpenBgraFloatInPlace(float* buf, unsigned int count, double pct,
-int step = 4){
+int step)
+{
 
     const float n = -pct / (pct - 1); //if 0 < pct < 1
     const float c_o = n / -2.0;

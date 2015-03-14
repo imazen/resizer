@@ -1,3 +1,4 @@
+# -*- mode: ruby -*-
 require 'rake/loaders/makefile'
 require 'rbconfig'
 Rake.application.add_loader('d', Rake::MakefileLoader.new)
@@ -44,19 +45,12 @@ class String
   end
 end
 
-task "malloc.h" do end
-  
-task :default => "fastscaling"
-
-CFLAGS=%Q{-Wall -Wpedantic -Wno-unused-function -Wno-unused-but-set-variable -Wno-return-type -Werror -fPIC -std=gnu++11}
-
 CLEAN.include('*.o')
 CLEAN.include('*.d')
 CLEAN.include('*.mf')
-%w{ fastscaling libfastscaling.so }.each { |file| CLOBBER.include(file) if File.exists?(file) }
 
 rule '.o' => '.cpp' do |t|
-  sh "#{CXX}  #{CFLAGS} -MMD -c -o #{t.name} #{t.source}"
+  sh "#{CXX}  #{CXXFLAGS} -MMD -c -o #{t.name} #{t.source}"
 end
 
 rule '.o' => '.c' do |t|
@@ -66,31 +60,49 @@ end
 
 rule '.d' => '.cpp' do |t|
   verbose(false) do 
-    sh "#{CXX}  -MM -MG -MF #{t.name} #{t.source}"
+    sh "#{CXX} -MM -MG -MF #{t.name} #{t.source}"
   end
 end
 
 rule '.d' => '.c' do |t|
   verbose(false) do 
-    sh "#{CC}  -MM -MG -MF #{t.name} #{t.source}"
+    sh "#{CC} -MM -MG -MF #{t.name} #{t.source}"
   end
 end
 
+(FileList['*.c'] + FileList['*.cpp']).each do |source_file|
+  dependency_file = source_file.pathmap("%X.d")
+  dependency_file.to_task
+  import dependency_file
+end
 
-OBJECTS=%w{ fastscaling.o }
+task "malloc.h" do end
+  
+task :default => "fastscaling"
+
+COMMON_FLAGS="-Wall -Wpedantic -Wno-unused-function -Wno-unused-but-set-variable -Wno-return-type -Werror -fPIC"
+CFLAGS="#{COMMON_FLAGS} -std=c11"
+CXXFLAGS="#{COMMON_FLAGS} -std=gnu++11"
+
+%w{ test_program fastscaling libfastscaling.so }.each { |file| CLOBBER.include(file) if File.exists?(file) }
+
+
+OBJECTS=%w{ bitmap_compositing.o bitmap_formats.o lookup_tables.o color_matrix.o unmanaged_renderer.o }
+SO_FILE="libfastscaling.so"
+
 
 TEST_PROGRAM = "test_program"
 
 
 desc "build a fastscaling program"
-file "fastscaling" => OBJECTS do |t|
-  sh "#{CXX} -Werror #{t.prerequisites.join(" ")}  -o #{t.name}"
+file "fastscaling" => ['fastscaling.o', SO_FILE]  do |t|
+  sh "#{CC} -o #{t.name} -Werror #{t.prerequisites.join(" ")}  -lm"
 end
 
 
 desc "build the fastscaling library"
-file "libfastscaling.so" => %w{ libfastscaling.o } do |t|
-  sh "#{CXX}  --shared -o #{t.name} #{t.prerequisites.join(' ')}"
+file SO_FILE => OBJECTS + ["libfastscaling.o"] do |t|
+  sh "#{CC}  --shared -o #{t.name} #{t.prerequisites.join(' ')}"
 end
 
 desc "run with valgrind"
@@ -99,7 +111,7 @@ task :valgrind => TEST_PROGRAM do
 end
 
 desc "build the test program"
-file TEST_PROGRAM => "test.o" do |t|
+file TEST_PROGRAM => ["test.o", SO_FILE] do |t|
   sh "#{CXX} -Werror #{t.prerequisites.join(" ")}  -o #{t.name}"
 end
 
@@ -114,11 +126,5 @@ task :test_each_case_in_separate_process => "test_program" do
   test_names.each do |test_name|
     sh "./#{TEST_PROGRAM} '#{test_name}'"
   end
-end
-
-FileList['*.cpp'].each do |source_file|
-  dependency_file = source_file.pathmap("%X.d")
-  dependency_file.to_task
-  import dependency_file
 end
 

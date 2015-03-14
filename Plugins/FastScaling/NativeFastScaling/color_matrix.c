@@ -5,13 +5,16 @@
  * Licensed under the GNU Affero General Public License, Version 3.0.
  * Commercial licenses available at http://imageresizing.net/
  */
-#include "shared.h"
-#pragma once
 #ifdef _MSC_VER
 #pragma unmanaged
 #endif
 
-void apply_color_matrix(BitmapBgraPtr bmp, const uint32_t row, const uint32_t count, float* const __restrict  m[5])
+#include "fastscaling.h"
+#include "math_functions.h"
+#include "bitmap_formats.h"
+
+
+void apply_color_matrix(BitmapBgra * bmp, const uint32_t row, const uint32_t count, float* const __restrict  m[5])
 {
     const uint32_t stride = bmp->stride;
     const uint32_t ch = bmp->bpp;
@@ -58,7 +61,7 @@ void apply_color_matrix(BitmapBgraPtr bmp, const uint32_t row, const uint32_t co
 }
 
 
-void apply_color_matrix_float(BitmapFloatPtr bmp, const uint32_t row, const uint32_t count, float*  m[5])
+void apply_color_matrix_float(BitmapFloat * bmp, const uint32_t row, const uint32_t count, float*  m[5])
 {
     const uint32_t stride = bmp->float_stride;
     const uint32_t ch = bmp->channels;
