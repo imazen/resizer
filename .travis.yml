@@ -1,5 +1,6 @@
 language:
   - c++
+
 compiler:
   - clang
   - gcc
@@ -12,6 +13,6 @@ before_install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; alias g++="g++-4.8"; alias gcc="gcc-4.8"; fi
 
 script:
-  - cd Plugins/FastScaling
+  - cd Plugins/FastScaling/NativeFastScaling
   - rake valgrind
   - rake test
