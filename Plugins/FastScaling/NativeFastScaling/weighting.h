@@ -10,6 +10,9 @@
 #include "shared.h"
 #include "fastscaling.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 static void derive_cubic_coefficients(double B, double C, InterpolationDetails * out){
     double bx2 = B + B;
@@ -290,4 +293,6 @@ static LineContribType *ContributionsCalc(const uint32_t line_size, const uint32
     return res;
 }
 
-
+#ifdef __cplusplus
+}
+#endif
