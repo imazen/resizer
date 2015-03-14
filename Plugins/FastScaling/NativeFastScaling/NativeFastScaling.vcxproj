@@ -134,7 +134,6 @@
     <ClCompile Include="bitmap_formats.c" />
     <ClCompile Include="color_matrix.c" />
     <ClCompile Include="fastscaling.c" />
-    <ClCompile Include="libfastscaling.c" />
     <ClCompile Include="lookup_tables.c" />
     <ClCompile Include="unmanaged_renderer.c" />
   </ItemGroup>

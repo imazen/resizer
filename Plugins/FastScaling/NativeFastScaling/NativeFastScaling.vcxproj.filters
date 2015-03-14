@@ -27,9 +27,6 @@
     <ClCompile Include="fastscaling.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="libfastscaling.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="lookup_tables.c">
       <Filter>Source Files</Filter>
     </ClCompile>
