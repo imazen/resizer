@@ -18,6 +18,6 @@ before_install:
   
 script:
   - cd $TRAVIS_BUILD_DIR/Plugins/FastScaling/NativeFastScaling
-  - valgrind --version
-  - rake valgrind
   - rake test
+  - rake clean
+  - rake valgrind
