@@ -158,11 +158,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\test.cpp" />
+    <ClCompile Include="..\test_helpers.cpp" />
+    <ClCompile Include="..\weighting_test_helpers.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NativeFastScaling.vcxproj">
       <Project>{3eea8539-9ac8-4859-91ab-ee9807820401}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\weighting_test_helpers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
