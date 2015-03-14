@@ -19,6 +19,17 @@
 #pragma unmanaged
 #endif
 
+typedef struct RendererStruct {
+    RenderDetails * details;
+    BitmapBgra * source;
+    bool destroy_source;
+    BitmapBgra * canvas;
+    BitmapBgra * transposed;
+    //Todo - profiling callbacks
+    //TODO - custom memory pool?
+} Renderer;
+
+
 InterpolationDetailsPtr CreateInterpolationDetails()
 {
     InterpolationDetailsPtr d = (InterpolationDetailsPtr)calloc(1, sizeof(InterpolationDetails));
@@ -95,19 +106,19 @@ void DestroyRenderer(Renderer * r)
     free(r);              
 }
 
-Renderer * CreateRendererInPlace(BitmapBgraPtr editInPlace, RenderDetailsPtr details)
+Renderer * CreateRendererInPlace(BitmapBgraPtr editInPlace, RenderDetails * details)
 {
     if (details->post_transpose) return NULL; //We can't transpose in place. 
-    RendererPtr r = (RendererPtr)calloc(1, sizeof(Renderer));
+    Renderer * r = (Renderer *)calloc(1, sizeof(Renderer));
     r->source = editInPlace;
     r->destroy_source = false;
     r->details = details;
     return r;
 }
 
-Renderer * CreateRenderer(BitmapBgraPtr source, BitmapBgraPtr canvas, RenderDetailsPtr details)
+Renderer * CreateRenderer(BitmapBgraPtr source, BitmapBgraPtr canvas, RenderDetails * details)
 {
-    RendererPtr r = (RendererPtr)calloc(1, sizeof(Renderer));
+    Renderer * r = (Renderer *)calloc(1, sizeof(Renderer));
     r->source = source;
     r->canvas = canvas;
     r->destroy_source = false;
@@ -127,7 +138,7 @@ void SimpleRenderInPlace()
 
 }
 
-int CompleteHalving(RendererPtr r)
+int CompleteHalving(Renderer * r)
 {
     double divisor = r->details->halving_divisor;
     if (divisor <= 1){
@@ -166,7 +177,7 @@ int CompleteHalving(RendererPtr r)
 }
 
 
-static int ApplyConvolutionsFloat1D(const RendererPtr r, BitmapFloatPtr img, const uint32_t from_row, const uint32_t row_count, double sharpening_applied)
+static int ApplyConvolutionsFloat1D(const Renderer * r, BitmapFloatPtr img, const uint32_t from_row, const uint32_t row_count, double sharpening_applied)
 {
     //p->Start("convolve kernel a", false);
     if (r->details->kernel_a_radius > 0 && ConvolveBgraFloatInPlace(img, r->details->kernel_a, r->details->kernel_a_radius, r->details->kernel_a_min, r->details->kernel_a_max, img->channels, from_row, row_count)){
@@ -187,7 +198,7 @@ static int ApplyConvolutionsFloat1D(const RendererPtr r, BitmapFloatPtr img, con
     return 0;
 }
 
-static void ApplyColorMatrix(const RendererPtr r, BitmapFloatPtr img, const uint32_t from_row, const uint32_t row_count)
+static void ApplyColorMatrix(const Renderer * r, BitmapFloatPtr img, const uint32_t from_row, const uint32_t row_count)
 {
     //p->Start("apply_color_matrix_float", false);
     apply_color_matrix_float(img, 0, row_count, r->details->color_matrix);
@@ -197,10 +208,10 @@ static void ApplyColorMatrix(const RendererPtr r, BitmapFloatPtr img, const uint
 
 
 
-int ScaleAndRender1D(const RendererPtr r, 
+int ScaleAndRender1D(const Renderer * r, 
     const BitmapBgraPtr pSrc,
     const BitmapBgraPtr pDst,
-    const RenderDetailsPtr details,
+    const RenderDetails * details,
     bool transpose,
     int call_number)
 {
@@ -291,10 +302,10 @@ cleanup:
 
 
 
-int Render1D(const RendererPtr r, 
+int Render1D(const Renderer * r, 
     const BitmapBgraPtr pSrc,
     const BitmapBgraPtr pDst,
-    const RenderDetailsPtr details,
+    const RenderDetails * details,
     bool transpose,
     int call_number)
 {
@@ -340,10 +351,10 @@ cleanup:
 
 
 int RenderWrapper1D(
-    const RendererPtr r, 
+    const Renderer * r, 
     const BitmapBgraPtr pSrc,
     const BitmapBgraPtr pDst,
-    const RenderDetailsPtr details,
+    const RenderDetails * details,
     bool transpose,
     int call_number) {
     bool perfect_size = transpose ? (pSrc->h == pDst->w && pDst->h == pSrc->w) : (pSrc->w == pDst->w && pSrc->h == pDst->h);
@@ -363,7 +374,7 @@ int RenderWrapper1D(
     //}
 }
 
-int PerformRender(RendererPtr r) 
+int PerformRender(Renderer * r) 
 {
     CompleteHalving(r);
     bool skip_last_transpose = r->details->post_transpose;
