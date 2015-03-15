@@ -1,5 +1,47 @@
 #pragma once
 
+
+/** 
+  
+  Currently we only support BGR24 and BGRA32 pixel formats. (And BGR32, where we ignore the alpha channel, but that's not precisely a separate format)
+
+  Eventually we will need to support 
+
+  * 8-bit grayscale
+  * CMYK
+  * YCbCr
+
+  and possibly others. For V1, the API we expose is only used by projects in the same repository, running under the same tests. 
+
+  In V2, we can change the API as we wish; we are not constrained to what we design here. 
+
+  Perhaps it is best to explicitly limit the structure to represent what we process at this time?
+
+  If our buffers and structures actually describe their contents, then we need to support all permitted values in all functions. This is problematic.
+
+  We heavily experimented with LUV and XYZ color spaces, but determined that better results occur using RGB linear. 
+
+  A custom sigmoidized color space could perhaps improve things, but would introduce significant overhead.
+**/
+
+//This kind of describes the API as-is, not as it should be
+
+/* Proposed changes
+
+combine BitmapBgraStruct->bpp and BitmapBgraStruct->pixel_format somehow.
+
+Make  BitmapBgraStruct->matte_color a fixed 4 bytes sRGBA value, remove ->borrowed_matte_color
+
+Drop ColorSpace. We assume sRGB for BitmapBgra, RGBLinear for BitmapFloat
+
+Rename things for clarity. 
+
+Use const/restrict where appropriate
+
+Refactor everything around convolution kernels; perhaps they should have their own struct?
+
+*/
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -8,19 +50,20 @@
 extern "C" {
 #endif
 
-typedef enum  {
+typedef enum _BitmapPixelFormat {
     None = 0,
     Bgr24 = 24,
     Bgra32 = 32,
     Gray8 = 8
 } BitmapPixelFormat;
 
-typedef enum {
+typedef enum _BitmapCompositingMode {
     Replace_self = 0,
     Blend_with_self = 1,
     Blend_with_matte = 2
 } BitmapCompositingMode;
 
+//non-indexed bitmap
 typedef struct BitmapBgraStruct {
 
     //bitmap width in pixels
@@ -44,10 +87,10 @@ typedef struct BitmapBgraStruct {
     bool can_reuse_space; 
     //TODO: rename to bytes_pp
     uint32_t bpp;
-
+    //Todo - combine with bpp somehow. DRY this out
     BitmapPixelFormat pixel_format;
 
-    //When using compositing mode blend_with_matte, this color will be used
+    //When using compositing mode blend_with_matte, this color will be used. We should probably define this as always being sRGBA, 4 bytes.  
     unsigned char *matte_color;
     ///If true, we don't dispose of *pixels when we dispose the struct
     bool borrowed_matte_color;
@@ -160,19 +203,53 @@ typedef struct LookupTablesStruct {
     //const uint8_t linear_to_srgb[4097]; //Converts from 0..4096 to 0.255, going from linear to sRGB gamma.
 } LookupTables;
 
-/* exported functions */
 BitmapBgra * CreateBitmapBgra(int sx, int sy, bool zeroed, int bpp);
 BitmapBgra * CreateBitmapBgraHeader(int sx, int sy);
+
 RenderDetails * CreateRenderDetails(void);
-InterpolationDetails * CreateInterpolationDetails(void);
-InterpolationDetails * CreateInterpolation(InterpolationFilter filter);
+
 Renderer * CreateRenderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details);
 int PerformRender(Renderer * r);
 void DestroyRenderer(Renderer * r);
 void DestroyBitmapBgra(BitmapBgra * im);
+
+//These filters are stored in a struct as function pointers, which I assume means they can't be inlined. Likely 5 * w * h invocations.
+double filter_flex_cubic(const InterpolationDetails * d, double x);
+double filter_bicubic_fast(const InterpolationDetails * d, double t);
+double filter_sinc_2(const InterpolationDetails * d, double t);
+double filter_box(const InterpolationDetails * d, double t);
+double filter_triangle(const InterpolationDetails * d, double t);
+double filter_sinc_windowed(const InterpolationDetails * d, double t);
+double percent_negative_weight(const InterpolationDetails * details);
+
+
+InterpolationDetails * CreateInterpolationDetails(void);
+InterpolationDetails * CreateBicubicCustom(double window, double blur, double B, double C);
+InterpolationDetails * CreateCustom(double window, double blur, detailed_interpolation_method filter);
+InterpolationDetails * CreateInterpolation(InterpolationFilter filter);
+
+
+
+typedef struct
+{
+    float *Weights;  /* Normalized weights of neighboring pixels */
+    int Left, Right;   /* Bounds of source pixels window */
+} ContributionType;  /* Contirbution information for a single pixel */
+
+typedef struct
+{
+    ContributionType *ContribRow; /* Row (or column) of contribution weights */
+    unsigned int WindowSize,      /* Filter window size (of affecting source pixels) */
+        LineLength;      /* Length of line (no. or rows / cols) */
+    double percent_negative; /*estimates the sharpening effect*/
+} LineContribType;
+
+LineContribType *ContributionsCalc(const uint32_t line_size, const uint32_t src_size, const InterpolationDetails * details);
+void ContributionsFree(LineContribType * p);
+
+// do these need to be public??
 void FreeLookupTables(void);
 LookupTables * GetLookupTables(void);
-/* end exported functions */
 
 #ifdef __cplusplus
 }

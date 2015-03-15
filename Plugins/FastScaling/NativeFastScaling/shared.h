@@ -25,19 +25,6 @@ enum Rotate{
 };
 
 
-typedef struct
-{
-    float *Weights;  /* Normalized weights of neighboring pixels */
-    int Left, Right;   /* Bounds of source pixels window */
-} ContributionType;  /* Contirbution information for a single pixel */
-
-typedef struct
-{
-    ContributionType *ContribRow; /* Row (or column) of contribution weights */
-    unsigned int WindowSize,      /* Filter window size (of affecting source pixels) */
-        LineLength;      /* Length of line (no. or rows / cols) */
-    double percent_negative; /*estimates the sharpening effect*/
-} LineContribType;
 
 
 

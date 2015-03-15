@@ -33,6 +33,9 @@
     <ClCompile Include="unmanaged_renderer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="weighting.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="weighting.h">

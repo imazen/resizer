@@ -460,7 +460,7 @@ int PerformRender(Renderer * r)
 
 InterpolationDetails * CreateInterpolation(InterpolationFilter filter)
 {
-    switch (filter){
+    switch (filter) {
         case Filter_Linear:
         case Filter_Triangle:
             return CreateCustom(1, 1, filter_triangle);
