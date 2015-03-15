@@ -1,6 +1,7 @@
 
 [*]
-end_of_line = LF
+end_of_line = lf
+insert_final_newline = true
 
 [*.cs]
 indent_style = space
@@ -8,13 +9,8 @@ indent_size = 4
 charset = utf-8
 
 
-[*.cpp]
+[*.{c,cpp,h,hpp}]
 indent_style = space
-indent_size = 2
+indent_size = 4
 charset = utf-8
-
-
-[*.h]
-indent_style = space
-indent_size = 2
-charset = utf-8
+trim_trailing_whitespace = true

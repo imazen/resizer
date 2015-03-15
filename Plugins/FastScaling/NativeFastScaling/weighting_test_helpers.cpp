@@ -13,7 +13,7 @@
 
 #define snprintf c99_snprintf
 
-#include "STDARG.H"
+#include <stdarg.h>
 
 
 inline int c99_vsnprintf(char* str, size_t size, const char* format, va_list ap)
