@@ -192,7 +192,8 @@ typedef struct RenderDetailsStruct{
     bool post_transpose;
     bool post_flip_x;
     bool post_flip_y;
- 
+    bool enable_profiling;
+
 } RenderDetails;
 
 typedef struct LookupTablesStruct *LookupTablesPtr;
@@ -202,6 +203,32 @@ typedef struct LookupTablesStruct {
     float linear[256]; //Converts 0..255 -> 0..1
     //const uint8_t linear_to_srgb[4097]; //Converts from 0..4096 to 0.255, going from linear to sRGB gamma.
 } LookupTables;
+
+
+typedef enum _ProfilingEntryFlags {
+    Profiling_none = 0,
+    Profiling_start_allow_recursion = 8,
+    Profiling_stop_children = 4,
+    Profiling_assert_started = 2
+
+} ProfilingEntryFlags;
+
+
+typedef struct{
+    int64_t time;
+    const char * name;
+    int32_t flags;
+} ProfilingEntry;
+
+typedef struct{
+    ProfilingEntry * log;
+    uint32_t count;
+    uint32_t capacity;
+} ProfilingLog;
+
+int64_t get_profiler_frequency(void);
+
+ProfilingLog * access_profiling_log(Renderer * r);
 
 BitmapBgra * create_bitmap_bgra(int sx, int sy, bool zeroed, int bpp);
 BitmapBgra * create_bitmap_bgra_header(int sx, int sy);

@@ -6,7 +6,7 @@
 #include "scaling.h"
 #include "weighting_test_helpers.h"
 
-bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bool flipx, bool flipy, InterpolationFilter filter)
+bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bool flipx, bool flipy, bool profile, InterpolationFilter filter)
 {
     BitmapBgra * source = create_bitmap_bgra(sx, sy, true, sbpp);
     BitmapBgra * canvas = create_bitmap_bgra(cx, cy, true, cbpp);
@@ -19,6 +19,7 @@ bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bo
     details->post_flip_x = flipx;
     details->post_flip_y = flipy;
     details->post_transpose = transpose;
+    details->enable_profiling = profile;
 
 
     Renderer * p = create_renderer(source, canvas, details);
@@ -35,19 +36,23 @@ bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bo
 }
 
 TEST_CASE( "Render without crashing", "[fastscaling]") {
-    REQUIRE( test(400,300,4,200,40,4,false,false,false,(InterpolationFilter)0) );
+    REQUIRE( test(400,300,4,200,40,4,false,false,false,false,(InterpolationFilter)0) );
 }
 
 TEST_CASE( "Render - upscale", "[fastscaling]") {
-    REQUIRE(test(200, 40, 4, 500, 300, 4, false, false, false, (InterpolationFilter)0));
+    REQUIRE(test(200, 40, 4, 500, 300, 4, false, false, false, false,(InterpolationFilter)0));
 }
 
 TEST_CASE("Render - downscale 24->32", "[fastscaling]") {
-    REQUIRE(test(400, 200, 3, 200, 100, 4, false, false, false, (InterpolationFilter)0));
+    REQUIRE(test(400, 200, 3, 200, 100, 4, false, false, false, false,(InterpolationFilter)0));
 }
 
 TEST_CASE("Render and rotate", "[fastscaling]") {
-    REQUIRE(test(200, 40, 4, 500, 300, 4,true,true,true,(InterpolationFilter)0));
+    REQUIRE(test(200, 40, 4, 500, 300, 4,true,true,true,false,(InterpolationFilter)0));
+}
+
+TEST_CASE("Render and rotate with profiling", "[fastscaling]") {
+    REQUIRE(test(200, 40, 4, 500, 300, 4,true,true,true,true,(InterpolationFilter)0));
 }
 
 TEST_CASE("Test contrib windows", "[fastscaling]") {

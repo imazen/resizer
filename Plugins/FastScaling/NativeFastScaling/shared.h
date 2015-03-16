@@ -24,8 +24,23 @@ enum Rotate{
     Rotate270 = 3
 };
 
+int64_t get_high_precision_ticks(void);
+
+#define ALLOW_PROFILING
 
 
+
+#ifdef ALLOW_PROFILING
+#define prof_start(r, name, allow_recursion) if (r->log != NULL){ profiler_start(r,name,allow_recursion);}
+#define prof_stop(r, name, assert_started, stop_children) if (r->log != NULL){ profiler_stop(r,name,assert_started, stop_children);}
+#else
+#define prof_start(r, name, allow_recursion)
+#define prof_stop(r, name, assert_started, stop_children)
+#endif
+
+
+void profiler_start(Renderer * r, const char * name, bool allow_recursion);
+void profiler_stop(Renderer * r, const char * name, bool assert_started, bool stop_children);
 
 
 void apply_color_matrix_float(BitmapFloat * bmp, const uint32_t row, const uint32_t count, float*  m[5]);

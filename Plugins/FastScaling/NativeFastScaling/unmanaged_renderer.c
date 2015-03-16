@@ -28,8 +28,7 @@ typedef struct RendererStruct {
     bool destroy_source;
     BitmapBgra * canvas;
     BitmapBgra * transposed;
-    //Todo - profiling callbacks
-    //TODO - custom memory pool?
+    ProfilingLog * log;
 } Renderer;
 
 
@@ -52,6 +51,7 @@ RenderDetails * create_render_details()
     for (int i = 0; i < 5; i++) {
         d->color_matrix[i] = &(d->color_matrix_data[i * 5]);
     }
+    d->enable_profiling=false;
     d->interpolate_last_percent = 3;
     d->halve_only_when_common_factor = true;
     d->minimum_sample_window_to_interposharpen = 1.5;
@@ -108,7 +108,54 @@ void destroy_renderer(Renderer * r)
         DestroyRenderDetails(r->details);
         r->details = NULL;
     }
+    if (r->log != NULL){
+        free(r->log->log);
+        free(r->log);
+        r->log = NULL;
+    }
     free(r);
+}
+
+
+
+inline void profiler_start(Renderer * r, const char * name, bool allow_recursion){
+    ProfilingEntry * current = &(r->log->log[r->log->count]);
+    r->log->count++;
+    if (r->log->count >= r->log->capacity) return;
+
+    current->time =get_high_precision_ticks();
+    current->name = name;
+    current->flags = allow_recursion ? Profiling_start_allow_recursion : Profiling_none;
+}
+inline void profiler_stop(Renderer * r, const char * name, bool assert_started, bool stop_children){
+    ProfilingEntry * current = &(r->log->log[r->log->count]);
+    r->log->count++;
+    if (r->log->count >= r->log->capacity) return;
+
+    current->time =get_high_precision_ticks();
+    current->name = name;
+    current->flags = assert_started ? Profiling_assert_started : Profiling_none;
+    if (stop_children) {current->flags = current->flags | Profiling_stop_children; }
+}
+
+
+ProfilingLog * access_profiling_log(Renderer * r){
+    return r->log;
+}
+
+static ProfilingLog * create_profiling_log(uint32_t capacity){
+    ProfilingLog *  p = (ProfilingLog *)calloc(1, sizeof(ProfilingLog));
+    if (p == NULL) return NULL;
+
+    ProfilingEntry * log = (ProfilingEntry *)malloc(sizeof(ProfilingEntry) * capacity);
+    if (log == NULL){
+        free(p);
+        return NULL;
+    }
+    p->log = log;
+    p->capacity = capacity;
+    p->count = 0;
+    return p;
 }
 
 static Renderer * create_rendererInPlace(BitmapBgra * editInPlace, RenderDetails * details)
@@ -119,6 +166,9 @@ static Renderer * create_rendererInPlace(BitmapBgra * editInPlace, RenderDetails
     r->source = editInPlace;
     r->destroy_source = false;
     r->details = details;
+    if (details->enable_profiling){
+        r->log = create_profiling_log((r->source->h + r->source->w) * 20 + 50);
+    }
     return r;
 }
 
@@ -130,6 +180,9 @@ Renderer * create_renderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetai
     r->canvas = canvas;
     r->destroy_source = false;
     r->details = details;
+    if (details->enable_profiling){
+        r->log = create_profiling_log((r->source->w + r->source->h + r->canvas->w + r->canvas->h) * 20 + 50);
+    }
     return r;
 }
 
@@ -383,6 +436,7 @@ static int RenderWrapper1D(
 
 int perform_render(Renderer * r)
 {
+    prof_start(r,"perform_render", false);
     CompleteHalving(r);
     bool skip_last_transpose = r->details->post_transpose;
 
@@ -457,6 +511,7 @@ int perform_render(Renderer * r)
         return -6;
     }
 
+    prof_stop(r,"perform_render", true, false);
     //p->Stop("Render", true, false);
     //GC::KeepAlive(wbSource);
     //GC::KeepAlive(wbCanvas);
@@ -518,3 +573,73 @@ InterpolationDetails * create_interpolation(InterpolationFilter filter)
     }
     return NULL;
 }
+
+
+#ifndef _TIMERS_IMPLEMENTED
+#define _TIMERS_IMPLEMENTED
+#ifdef _WIN32
+    #include <winbase.h>
+    inline int64_t get_high_precision_ticks(void){
+        int64_t val;
+        QueryPerformanceCounter(&val);
+        return val;
+    }
+    int64_t get_profiler_frequency(void){
+        int64_t val;
+        QueryPerformanceFrequency(&val);
+        return val;
+    }
+#else
+    #include <sys/time.h>
+    #if defined(_POSIX_VERSION)
+    #if defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0)
+    #if defined(CLOCK_MONOTONIC_PRECISE)
+            /* BSD. --------------------------------------------- */
+            #define PROFILER_CLOCK_ID id = CLOCK_MONOTONIC_PRECISE;
+    #elif defined(CLOCK_MONOTONIC_RAW)
+            /* Linux. ------------------------------------------- */
+            #define PROFILER_CLOCK_ID id = CLOCK_MONOTONIC_RAW;
+    #elif defined(CLOCK_HIGHRES)
+            /* Solaris. ----------------------------------------- */
+            #define PROFILER_CLOCK_ID id = CLOCK_HIGHRES;
+    #elif defined(CLOCK_MONOTONIC)
+            /* AIX, BSD, Linux, POSIX, Solaris. ----------------- */
+            #define PROFILER_CLOCK_ID id = CLOCK_MONOTONIC;
+    #elif defined(CLOCK_REALTIME)
+            /* AIX, BSD, HP-UX, Linux, POSIX. ------------------- */
+            #define PROFILER_CLOCK_ID id = CLOCK_REALTIME;
+    #endif
+    #endif
+    #endif
+
+
+    inline int64_t get_high_precision_ticks(void){
+        #ifdef PROFILER_CLOCK_ID
+            timespec ts;
+            if (clock_gettime(PROFILER_CLOCK_ID, &ts) != 0){
+                return -1;
+            }
+            return ts->tv_sec * 1000000 +  ts->tv_nsec;
+        #else
+            struct timeval tm;
+            if (gettimeofday( &tm, NULL) != 0){
+                return -1;
+            }
+            return tm.tv_sec * 1000000 + tm.tv_usec;
+        #endif
+    }
+
+    int64_t get_profiler_frequency(void){
+        #ifdef PROFILER_CLOCK_ID
+            timespec ts;
+            if (clock_getres(PROFILER_CLOCK_ID, &ts) != 0){
+                return -1;
+            }
+            return ts->tv_nsec;
+        #else
+            return 1000000;
+        #endif
+    }
+
+#endif
+#endif
