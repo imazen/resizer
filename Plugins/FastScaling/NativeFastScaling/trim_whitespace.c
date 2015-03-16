@@ -26,9 +26,9 @@ Rect detect_content(BitmapBgra * b, uint8_t threshold)
     info.threshold = threshold;
 
     //Let's aim for a minimum dimension of 7px per window
-    //We want to glean as much as possible from horizontal strips, as they are faster. 
+    //We want to glean as much as possible from horizontal strips, as they are faster.
 
-    //left half, middle, -> 
+    //left half, middle, ->
     check_region(4, 0, 0.5, 0.5, 0.5, &info);
     //right half, middle, <-
     check_region(2, 0.5, 1, 0.5, 0.5, &info);
@@ -66,7 +66,7 @@ Rect detect_content(BitmapBgra * b, uint8_t threshold)
     else{
 
         //Finish by scanning everything that is left. Should be a smaller set.
-        //Corners will overlap, and be scanned twice, if they are whitespace. 
+        //Corners will overlap, and be scanned twice, if they are whitespace.
         check_region(1, 0, 1, 0, 1, &info);
         check_region(4, 0, 1, 0, 1, &info);
         check_region(2, 0, 1, 0, 1, &info);
@@ -181,7 +181,7 @@ void sobel_scharr_detect(SearchInfo* __restrict info /*, int edgeTRBL */)
 
 
 
-void check_region(const int edgeTRBL, const float x_1_percent, const  float x_2_percent, const float y_1_percent, const  float y_2_percent, SearchInfo* __restrict info)
+void check_region(int edgeTRBL, float x_1_percent, float x_2_percent, float y_1_percent, float y_2_percent, SearchInfo* __restrict info)
 {
     uint32_t x1 = (uint32_t) MAX(0, MIN(info->w, floor(x_1_percent * (float)info->w) - 1));
     uint32_t x2 = (uint32_t) MAX(0, MIN(info->w, ceil(x_2_percent * (float)info->w) + 1));
@@ -250,7 +250,7 @@ void check_region(const int edgeTRBL, const float x_1_percent, const  float x_2_
             const bool excluded_x = (info->min_x <= info->buf_x && info->max_x >= buf_x2);
 
             const bool excluded_y = (info->min_y <= info->buf_y && info->max_y >= buf_y2);
-            
+
             if (excluded_x && excluded_y){
                 //Entire window has already been excluded
                 continue;
@@ -270,11 +270,11 @@ void check_region(const int edgeTRBL, const float x_1_percent, const  float x_2_
                 info->buf_y = MIN(buf_y2 - 3, info->max_y);
                 info->buf_h = buf_y2 - info->buf_y;
             }
-            
+
             if (info->buf_y + info->buf_h > info->h ||
                 info->buf_x + info->buf_w > info->w){
-                //We're out of bounds on the image somehow. 
-                continue; 
+                //We're out of bounds on the image somehow.
+                continue;
             }
 
             fill_buffer(info);

@@ -570,16 +570,19 @@ InterpolationDetails * create_interpolation(InterpolationFilter filter)
 #ifndef _TIMERS_IMPLEMENTED
 #define _TIMERS_IMPLEMENTED
 #ifdef _WIN32
+    #define STRICT
+    #define WIN32_LEAN_AND_MEAN
+    #include <windows.h>
     #include <winbase.h>
     inline int64_t get_high_precision_ticks(void){
-        int64_t val;
+        LARGE_INTEGER val;
         QueryPerformanceCounter(&val);
-        return val;
+        return val.QuadPart;
     }
     int64_t get_profiler_frequency(void){
-        int64_t val;
+        LARGE_INTEGER val;
         QueryPerformanceFrequency(&val);
-        return val;
+        return val.QuadPart;
     }
 #else
     #include <sys/time.h>

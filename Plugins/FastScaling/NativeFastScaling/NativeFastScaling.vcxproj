@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -134,31 +134,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="bitmap_compositing.c" />
     <ClCompile Include="bitmap_formats.c" />
-    <ClCompile Include="color_matrix.c" />
+    <ClCompile Include="compositing.c" />
     <ClCompile Include="convolution.c" />
     <ClCompile Include="lookup_tables.c" />
-    <ClCompile Include="unmanaged_renderer.c" />
+    <ClCompile Include="renderer.c" />
+    <ClCompile Include="scaling.c" />
+    <ClCompile Include="trim_whitespace.c" />
     <ClCompile Include="weighting.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bitmap_compositing.h" />
     <ClInclude Include="bitmap_formats.h" />
-    <ClInclude Include="catch.hpp" />
-    <ClInclude Include="color_spaces.h" />
-    <ClInclude Include="convolution.h" />
-    <ClInclude Include="draft_interface.h" />
+    <ClInclude Include="color.h" />
     <ClInclude Include="fastapprox.h" />
     <ClInclude Include="fastscaling.h" />
-    <ClInclude Include="halving.h" />
+    <ClInclude Include="fastscaling_private.h" />
     <ClInclude Include="ir_alloc.h" />
     <ClInclude Include="math_functions.h" />
-    <ClInclude Include="scaling.h" />
-    <ClInclude Include="fastscaling_private.h" />
-    <ClInclude Include="sharpening.h" />
     <ClInclude Include="trim_whitespace.h" />
-    <ClInclude Include="weighting.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
