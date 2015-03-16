@@ -54,9 +54,9 @@ RenderDetails * create_render_details()
 static void DestroyRenderDetails(RenderDetails * d){
     if (d->interpolation != NULL) free(d->interpolation);
 
-    if (d->kernel_a != NULL) ir_free(d->kernel_a);
+    if (d->kernel_a != NULL) free_convolution_kernel(d->kernel_a);
 
-    if (d->kernel_b != NULL) ir_free(d->kernel_b);
+    if (d->kernel_b != NULL) free_convolution_kernel(d->kernel_b);
 
     free(d);
 }
@@ -232,12 +232,12 @@ static int CompleteHalving(Renderer * r)
 static int ApplyConvolutionsFloat1D(const Renderer * r, BitmapFloat * img, const uint32_t from_row, const uint32_t row_count, double sharpening_applied)
 {
     //p->Start("convolve kernel a", false);
-    if (r->details->kernel_a_radius > 0 && ConvolveBgraFloatInPlace(img, r->details->kernel_a, r->details->kernel_a_radius, r->details->kernel_a_min, r->details->kernel_a_max, img->channels, from_row, row_count)){
+    if (r->details->kernel_a != NULL && ConvolveBgraFloatInPlace(img, r->details->kernel_a, img->channels, from_row, row_count)){
         return -3;
     }
     //p->Stop("convolve kernel a", true, false);
     //p->Start("convolve kernel b", false);
-    if (r->details->kernel_b_radius > 0 && ConvolveBgraFloatInPlace(img, r->details->kernel_b, r->details->kernel_b_radius, r->details->kernel_b_min, r->details->kernel_b_max, img->channels, from_row, row_count)){
+    if (r->details->kernel_b != NULL && ConvolveBgraFloatInPlace(img, r->details->kernel_b, img->channels, from_row, row_count)){
         return -3;
     }
     //p->Stop("convolve kernel b", true, false);

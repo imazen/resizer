@@ -23,60 +23,92 @@
 #endif
 #endif
 
+ConvolutionKernel * create_convolution_kernel(uint32_t radius){
+    ConvolutionKernel * k = (ConvolutionKernel *)calloc(1,sizeof(ConvolutionKernel));
+    //For the actual array;
+    float * a = (float *)calloc(radius * 2 + 1, sizeof(float));
+    //we assume a maximum of 4 channels are going to need buffering during convolution
+    float * buf = (float *)malloc((radius +2) * 4 * sizeof(float));
 
-float* create_guassian_kernel(double stdDev, uint32_t radius){
-    uint32_t size = radius * 2 + 1;
-    float *kernel = (float *)malloc(sizeof(float) * size);
-    if (kernel == NULL) return NULL;
-    for (uint32_t i = 0; i < size; i++){
-        kernel[i] = (float)(IR_GUASSIAN(fabs((float)(radius - i)), stdDev));
+    if (k == NULL || a == NULL || buf == NULL){
+        free(k); free(a); free(buf);
+        return NULL;
     }
-    return kernel;
+    k->kernel = a;
+    k->width = radius * 2 + 1;
+    k->buffer = buf;
+    k->radius = radius;
+    return k;
+
+}
+void free_convolution_kernel(ConvolutionKernel * kernel){
+    if (kernel != NULL){
+        free(kernel->kernel);
+        free(kernel->buffer);
+        kernel->kernel = NULL;
+        kernel->buffer = NULL;
+    }
+    free(kernel);
 }
 
-double sum_of_kernel(float* kernel, uint32_t size){
+
+
+ConvolutionKernel * create_guassian_kernel(double stdDev, uint32_t radius){
+    ConvolutionKernel * k = create_convolution_kernel(radius);
+    if (k != NULL){
+        for (uint32_t i = 0; i < k->width; i++){
+            k->kernel[i] = (float)(IR_GUASSIAN(fabs((float)(radius - i)), stdDev));
+        }
+    }
+    return k;
+}
+
+double sum_of_kernel(ConvolutionKernel * kernel){
     double sum = 0;
-    for (uint32_t i = 0; i < size; i++){
-        sum += kernel[i];
+    for (uint32_t i = 0; i < kernel->width; i++){
+        sum += kernel->kernel[i];
     }
     return sum;
 }
 
-void normalize_kernel(float* kernel, uint32_t size, float desiredSum){
-    float factor = (float)(desiredSum / sum_of_kernel(kernel,size));
-    for (uint32_t i = 0; i < size; i++){
-        kernel[i] *= factor;
+void normalize_kernel(ConvolutionKernel * kernel, float desiredSum){
+    float factor = (float)(desiredSum / sum_of_kernel(kernel));
+    for (uint32_t i = 0; i < kernel->width; i++){
+        kernel->kernel[i] *= factor;
     }
 }
- float* create_guassian_kernel_normalized(double stdDev, uint32_t radius){
-    float *kernel = create_guassian_kernel(stdDev, radius);
-    if (kernel == NULL) return NULL;
-    uint32_t size = radius * 2 + 1;
-    normalize_kernel(kernel, size, 1);
+ ConvolutionKernel * create_guassian_kernel_normalized(double stdDev, uint32_t radius){
+    ConvolutionKernel *kernel = create_guassian_kernel(stdDev, radius);
+    if (kernel != NULL){
+        normalize_kernel(kernel, 1);
+    }
     return kernel;
 }
 
- float* create_guassian_sharpen_kernel(double stdDev, uint32_t radius){
-    float *kernel = create_guassian_kernel(stdDev, radius);
-    if (kernel == NULL) return NULL;
-    uint32_t size = radius * 2 + 1;
-    double sum = sum_of_kernel(kernel, size);
-
-    for (uint32_t i = 0; i < size; i++){
-        if (i == radius){
-            kernel[i] = (float)(2 * sum - kernel[i]);
-        }
-        else{
-            kernel[i] *= -1;
+ ConvolutionKernel * create_guassian_sharpen_kernel(double stdDev, uint32_t radius){
+    ConvolutionKernel *kernel = create_guassian_kernel(stdDev, radius);
+    if (kernel != NULL){
+        double sum = sum_of_kernel(kernel);
+        for (uint32_t i = 0; i < kernel->width; i++){
+            if (i == radius){
+                kernel->kernel[i] = (float)(2 * sum - kernel->kernel[i]);
+            }
+            else{
+                kernel->kernel[i] *= -1;
+            }
         }
     }
-    normalize_kernel(kernel, size,1);
+    normalize_kernel(kernel, 1);
     return kernel;
 }
 
 
-int ConvolveBgraFloatInPlace(BitmapFloat * buf, const float *kernel, uint32_t radius, float threshold_min, float threshold_max, uint32_t convolve_channels, uint32_t from_row, int row_count)
+int ConvolveBgraFloatInPlace(BitmapFloat * buf,  ConvolutionKernel *kernel, uint32_t convolve_channels, uint32_t from_row, int row_count)
 {
+
+    const uint32_t radius = kernel->radius;
+    const float threshold_min = kernel->threshold_min_change;
+    const float threshold_max = kernel->threshold_max_change;
 
     if (buf->w < radius + 1) return -2; //Do nothing unless the image is at least half as wide as the kernel.
 
@@ -88,13 +120,10 @@ int ConvolveBgraFloatInPlace(BitmapFloat * buf, const float *kernel, uint32_t ra
 
     const uint32_t ch_used = convolve_channels;
 
-    float* __restrict buffer = (float *)alloca(sizeof(float) * buffer_count * ch_used);
-    if (buffer == NULL) return -1;
-    float* __restrict avg = (float *)alloca(sizeof(float) * ch_used);
-    if (avg == NULL) {
-        return -1;
-    }
+    float* __restrict buffer =  kernel->buffer;
+    float* __restrict avg = &kernel->buffer[buffer_count * ch_used];
 
+    const float const * __restrict kern = kernel->kernel;
 
     for (uint32_t row = from_row; row < until_row; row++){
 
@@ -117,7 +146,7 @@ int ConvolveBgraFloatInPlace(BitmapFloat * buf, const float *kernel, uint32_t ra
                 if (left < 0 || right >= (int32_t)w){
                     /* Accumulate each channel */
                     for (i = left; i <= right; i++) {
-                        const float weight = kernel[i - left];
+                        const float weight = kern[i - left];
                         const uint32_t ix = CLAMP(i, 0, (int32_t)w);
                         for (uint32_t j = 0; j < ch_used; j++)
                             avg[j] += weight * source_buffer[ix * step + j];
@@ -126,7 +155,7 @@ int ConvolveBgraFloatInPlace(BitmapFloat * buf, const float *kernel, uint32_t ra
                 else{
                     /* Accumulate each channel */
                     for (i = left; i <= right; i++) {
-                        const float weight = kernel[i - left];
+                        const float weight = kern[i - left];
                         for (uint32_t j = 0; j < ch_used; j++)
                             avg[j] += weight * source_buffer[i * step + j];
                     }

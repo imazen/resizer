@@ -146,6 +146,16 @@ typedef struct InterpolationDetailsStruct {
 
 } InterpolationDetails;
 
+
+typedef struct ConvolutionKernelStruct{
+    float * kernel;
+    uint32_t width;
+    uint32_t radius;
+    float threshold_min_change; //These change values are on a somewhat arbitrary scale between 0 and 4;
+    float threshold_max_change;
+    float * buffer;
+} ConvolutionKernel;
+
 typedef struct RenderDetailsStruct{
     //Interpolation and scaling details
     InterpolationDetails * interpolation;
@@ -164,17 +174,8 @@ typedef struct RenderDetailsStruct{
     uint32_t halving_divisor;
 
 
-
-    float * kernel_a;
-    float kernel_a_min;
-    float kernel_a_max;
-    uint32_t kernel_a_radius;
-
-    float * kernel_b;
-    float kernel_b_min;
-    float kernel_b_max;
-    uint32_t kernel_b_radius;
-
+    ConvolutionKernel * kernel_a;
+    ConvolutionKernel * kernel_b;
 
 
     //If greater than 0, a percentage to sharpen the result along each axis;
@@ -186,9 +187,12 @@ typedef struct RenderDetailsStruct{
     float color_matrix_data[25];
     float *color_matrix[5];
 
+    //Transpose, flipx, flipy - combined, these give you all 90 interval rotations
     bool post_transpose;
     bool post_flip_x;
     bool post_flip_y;
+
+    //Enables profiling
     bool enable_profiling;
 
 } RenderDetails;
@@ -197,7 +201,7 @@ typedef struct LookupTablesStruct *LookupTablesPtr;
 
 typedef struct LookupTablesStruct {
     float srgb_to_linear[256]; //Converts 0..255 -> 0..1, but knowing that 0.255 has sRGB gamma.
-    float linear[256]; //Converts 0..255 -> 0..1
+    float linear[256]; //Converts 0..255 -> 0..1, linear mapping
 } LookupTables;
 
 
@@ -274,12 +278,15 @@ void free_lookup_tables(void);
 LookupTables * get_lookup_tables(void);
 
 
+ConvolutionKernel * create_convolution_kernel(uint32_t radius);
+void free_convolution_kernel(ConvolutionKernel * kernel);
 
-float* create_guassian_kernel(double stdDev, uint32_t radius);
-double sum_of_kernel(float* kernel, uint32_t size);
-void normalize_kernel(float* kernel, uint32_t size, float desiredSum);
-float* create_guassian_kernel_normalized(double stdDev, uint32_t radius);
-float* create_guassian_sharpen_kernel(double stdDev, uint32_t radius);
+
+ConvolutionKernel* create_guassian_kernel(double stdDev, uint32_t radius);
+double sum_of_kernel(ConvolutionKernel* kernel);
+void normalize_kernel(ConvolutionKernel* kernel, float desiredSum);
+ConvolutionKernel* create_guassian_kernel_normalized(double stdDev, uint32_t radius);
+ConvolutionKernel* create_guassian_sharpen_kernel(double stdDev, uint32_t radius);
 
 #ifdef __cplusplus
 }
