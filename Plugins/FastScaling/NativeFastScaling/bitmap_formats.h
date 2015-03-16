@@ -14,14 +14,6 @@
 #include "fastscaling.h"
 
 
-typedef enum ColorSpaceEnum {
-    ColorSpace_None = 0,
-    ColorSpace_sRGB_BGR = 1,
-    ColorSpace_RGBLinear_BGR = 2,
-    ColorSpace_LUV = 3,
-    ColorSpace_XYZ_YXZ = 4,
-    ColorSpace_Sigmoid = 5
-} ColorSpace;
 
 // non-indexed bitmap
 typedef struct BitmapFloatStruct {
@@ -39,8 +31,7 @@ typedef struct BitmapFloatStruct {
     uint32_t float_count;
     //The number of floats betwen (0,0) and (0,1)
     uint32_t float_stride;
-    //The color space currently in use
-    ColorSpace color;
+
     //If true, alpha has been premultiplied
     bool alpha_premultiplied;
     //If true, the alpha channel holds meaningful data
@@ -50,7 +41,7 @@ typedef struct BitmapFloatStruct {
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 BitmapFloat * CreateBitmapFloatHeader(int sx, int sy, int channels);
 
 BitmapFloat * CreateBitmapFloat(int sx, int sy, int channels, bool zeroed);

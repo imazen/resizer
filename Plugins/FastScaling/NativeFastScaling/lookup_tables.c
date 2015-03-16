@@ -23,7 +23,6 @@ LookupTables * get_lookup_tables() {
 
         float *lin = temp->linear;
         float *to_lin = temp->srgb_to_linear;
-       // uint8_t *to_srgb = (uint8_t *)temp->linear_to_srgb;
 
         for (uint32_t n = 0; n < 256; n++)
         {
@@ -31,10 +30,6 @@ LookupTables * get_lookup_tables() {
             lin[n] = s;
             to_lin[n] = srgb_to_linear(s);
         }
-        //for (uint32_t n = 0; n < 4097; n++){
-        //    to_srgb[n] = uchar_clamp_ff(linear_to_srgb((float)n / 4096.0f));
-        //}
-
 
         if (table == NULL){
             //A race condition could cause a 3KB, one-time memory leak between these two lines.

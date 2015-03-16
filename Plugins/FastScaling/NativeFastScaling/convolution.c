@@ -6,7 +6,7 @@
  * Commercial licenses available at http://imageresizing.net/
  */
 
-#include "scaling.h"
+#include "fastscaling_private.h"
 #include "bitmap_formats.h"
 #include "math_functions.h"
 #include <string.h>
@@ -22,107 +22,62 @@
 #endif
 
 
-void ScaleBgraFloatRows(BitmapFloat * from, uint32_t from_row, BitmapFloat * to, uint32_t to_row, uint32_t row_count, ContributionType * weights)
-{
+float* create_guassian_kernel(double stdDev, uint32_t radius){
+    uint32_t size = radius * 2 + 1;
+    float *kernel = (float *)malloc(sizeof(float) * size);
+    if (kernel == NULL) return NULL;
+    for (uint32_t i = 0; i < size; i++){
+        kernel[i] = (float)(IR_GUASSIAN(fabs((float)(radius - i)), stdDev));
+    }
+    return kernel;
+}
 
-    const uint32_t from_step = from->channels;
-    const uint32_t to_step = to->channels;
-    const uint32_t dest_buffer_count = to->w;
-    const uint32_t min_channels = MIN(from_step, to_step);
-    //TODO: assert min_channels < 5
-    float avg[4];
+double sum_of_kernel(float* kernel, uint32_t size){
+    double sum = 0;
+    for (uint32_t i = 0; i < size; i++){
+        sum += kernel[i];
+    }
+    return sum;
+}
 
+void normalize_kernel(float* kernel, uint32_t size, float desiredSum){
+    float factor = (float)(desiredSum / sum_of_kernel(kernel,size));
+    for (uint32_t i = 0; i < size; i++){
+        kernel[i] *= factor;
+    }
+}
+ float* create_guassian_kernel_normalized(double stdDev, uint32_t radius){
+    float *kernel = create_guassian_kernel(stdDev, radius);
+    if (kernel == NULL) return NULL;
+    uint32_t size = radius * 2 + 1;
+    normalize_kernel(kernel, size, 1);
+    return kernel;
+}
 
-    for (uint32_t row = 0; row < row_count; row++)
-    {
-        const float* __restrict source_buffer = from->pixels + ((from_row + row) * from->float_stride);
-        float* __restrict dest_buffer = to->pixels + ((to_row + row) * to->float_stride);
+ float* create_guassian_sharpen_kernel(double stdDev, uint32_t radius){
+    float *kernel = create_guassian_kernel(stdDev, radius);
+    if (kernel == NULL) return NULL;
+    uint32_t size = radius * 2 + 1;
+    double sum = sum_of_kernel(kernel, size);
 
-        uint32_t ndx;
-
-        // if both have alpha, process it
-        if (from_step == 4 && to_step == 4)
-        {
-            for (ndx = 0; ndx < dest_buffer_count; ndx++) {
-                float r = 0, g = 0, b = 0, a = 0;
-                const int left = weights[ndx].Left;
-                const int right = weights[ndx].Right;
-
-                const float* __restrict weightArray = weights[ndx].Weights;
-                int i;
-
-                /* Accumulate each channel */
-                for (i = left; i <= right; i++) {
-                    const float weight = weightArray[i - left];
-
-                    b += weight * source_buffer[i * from_step];
-                    g += weight * source_buffer[i * from_step + 1];
-                    r += weight * source_buffer[i * from_step + 2];
-                    a += weight * source_buffer[i * from_step + 3];
-                }
-
-                dest_buffer[ndx * to_step] = b;
-                dest_buffer[ndx * to_step + 1] = g;
-                dest_buffer[ndx * to_step + 2] = r;
-                dest_buffer[ndx * to_step + 3] = a;
-            }
-        }
-        else if (from_step == 3 && to_step == 3)
-        {
-            for (ndx = 0; ndx < dest_buffer_count; ndx++) {
-                float r = 0, g = 0, b = 0;
-                const int left = weights[ndx].Left;
-                const int right = weights[ndx].Right;
-
-                const float * weightArray = weights[ndx].Weights;
-                int i;
-
-                /* Accumulate each channel */
-                for (i = left; i <= right; i++) {
-                    const float weight = weightArray[i - left];
-
-                    b += weight * source_buffer[i * from_step];
-                    g += weight * source_buffer[i * from_step + 1];
-                    r += weight * source_buffer[i * from_step + 2];
-                }
-
-                dest_buffer[ndx * to_step] = b;
-                dest_buffer[ndx * to_step + 1] = g;
-                dest_buffer[ndx * to_step + 2] = r;
-            }
+    for (uint32_t i = 0; i < size; i++){
+        if (i == radius){
+            kernel[i] = (float)(2 * sum - kernel[i]);
         }
         else{
-            avg[0] = 0;
-            avg[1] = 0;
-            avg[2] = 0;
-            avg[3] = 0;
-            for (ndx = 0; ndx < dest_buffer_count; ndx++) {
-                const int left = weights[ndx].Left;
-                const int right = weights[ndx].Right;
-
-                const float* __restrict weightArray = weights[ndx].Weights;
-
-                /* Accumulate each channel */
-                for (int i = left; i <= right; i++) {
-                    const float weight = weightArray[i - left];
-
-                    for (uint32_t j = 0; j < min_channels; j++)
-                        avg[j] += weight * source_buffer[i * from_step + j];
-                }
-
-                for (uint32_t j = 0; j < min_channels; j++)
-                    dest_buffer[ndx * to_step + j] = avg[j];
-            }
+            kernel[i] *= -1;
         }
     }
+    normalize_kernel(kernel, size,1);
+    return kernel;
 }
 
 
-int ConvolveBgraFloatInPlace(BitmapFloat * buf, const float *kernel, uint32_t radius, float threshold_min, float threshold_max, uint32_t convolve_channels, uint32_t from_row, int row_count) 
+int ConvolveBgraFloatInPlace(BitmapFloat * buf, const float *kernel, uint32_t radius, float threshold_min, float threshold_max, uint32_t convolve_channels, uint32_t from_row, int row_count)
 {
 
     if (buf->w < radius + 1) return -2; //Do nothing unless the image is at least half as wide as the kernel.
-   
+
     const uint32_t buffer_count = radius + 1;
     const uint32_t w = buf->w;
     const uint32_t step = buf->channels;
@@ -137,7 +92,7 @@ int ConvolveBgraFloatInPlace(BitmapFloat * buf, const float *kernel, uint32_t ra
     if (avg == NULL) {
         return -1;
     }
-    
+
 
     for (uint32_t row = from_row; row < until_row; row++){
 
@@ -196,3 +151,100 @@ int ConvolveBgraFloatInPlace(BitmapFloat * buf, const float *kernel, uint32_t ra
 }
 
 
+
+static void BgraSharpenInPlaceX(BitmapBgra * im, float pct)
+{
+    const float n = -pct / (pct - 1); //if 0 < pct < 1
+    const float outer_coeff = n / -2.0f;
+    const float inner_coeff = n + 1;
+
+    uint32_t y, current, prev, next;
+
+    const uint32_t sy = im->h;
+    const uint32_t stride = im->stride;
+    const uint32_t bpp = im->bpp;
+
+
+    if (pct <= 0 || im->w < 3 || bpp < 3) return;
+
+    for (y = 0; y < sy; y++)
+    {
+        unsigned char *row = im->pixels + y * stride;
+        for (current = bpp, prev = 0, next = bpp + bpp; next < stride; prev = current, current = next, next += bpp){
+            //We never sharpen the alpha channel
+            //TODO - we need to buffer the left pixel to prevent it from affecting later calculations
+            for (uint32_t i = 0; i < 3; i++)
+                row[current + i] = uchar_clamp_ff(outer_coeff * (float)row[prev + i] + inner_coeff * (float)row[current + i] + outer_coeff * (float)row[next + i]);
+        }
+    }
+}
+
+
+static void
+SharpenBgraFloatInPlace(float* buf, unsigned int count, double pct,
+int step)
+{
+
+    const float n = (float)(-pct / (pct - 1)); //if 0 < pct < 1
+    const float c_o = n / -2.0f;
+    const float c_i = n + 1;
+
+    unsigned int ndx;
+
+    // if both have alpha, process it
+    if (step == 4)
+    {
+        float left_b = buf[0 * 4 + 0];
+        float left_g = buf[0 * 4 + 1];
+        float left_r = buf[0 * 4 + 2];
+        float left_a = buf[0 * 4 + 3];
+
+        for (ndx = 1; ndx < count - 1; ndx++) {
+            const float b = buf[ndx * 4 + 0];
+            const float g = buf[ndx * 4 + 1];
+            const float r = buf[ndx * 4 + 2];
+            const float a = buf[ndx * 4 + 3];
+            buf[ndx * 4 + 0] = left_b * c_o + b * c_i + buf[(ndx + 1) * 4 + 0] * c_o;
+            buf[ndx * 4 + 1] = left_g * c_o + g * c_i + buf[(ndx + 1) * 4 + 1] * c_o;
+            buf[ndx * 4 + 2] = left_r * c_o + r * c_i + buf[(ndx + 1) * 4 + 2] * c_o;
+            buf[ndx * 4 + 3] = left_a * c_o + a * c_i + buf[(ndx + 1) * 4 + 3] * c_o;
+            left_b = b;
+            left_g = g;
+            left_r = r;
+            left_a = a;
+        }
+    }
+    // otherwise do the same thing without 4th chan
+    // (ifs in loops are expensive..)
+    else
+    {
+        float left_b = buf[0 * 3 + 0];
+        float left_g = buf[0 * 3 + 1];
+        float left_r = buf[0 * 3 + 2];
+
+        for (ndx = 1; ndx < count - 1; ndx++) {
+            const float b = buf[ndx * 3 + 0];
+            const float g = buf[ndx * 3 + 1];
+            const float r = buf[ndx * 3 + 2];
+            buf[ndx * 3 + 0] = left_b * c_o + b * c_i + buf[(ndx + 1) * 3 + 0] * c_o;
+            buf[ndx * 3 + 1] = left_g * c_o + g * c_i + buf[(ndx + 1) * 3 + 1] * c_o;
+            buf[ndx * 3 + 2] = left_r * c_o + r * c_i + buf[(ndx + 1) * 3 + 2] * c_o;
+            left_b = b;
+            left_g = g;
+            left_r = r;
+        }
+
+    }
+
+}
+
+
+
+
+
+void
+SharpenBgraFloatRowsInPlace(BitmapFloat * im, uint32_t start_row, uint32_t row_count, double pct){
+    for (uint32_t row = start_row; row < start_row + row_count; row++){
+        SharpenBgraFloatInPlace(im->pixels + (im->float_stride * row), im->w, pct, im->channels);
+    }
+}

@@ -155,7 +155,7 @@
     <ClInclude Include="ir_alloc.h" />
     <ClInclude Include="math_functions.h" />
     <ClInclude Include="scaling.h" />
-    <ClInclude Include="shared.h" />
+    <ClInclude Include="fastscaling_private" />
     <ClInclude Include="sharpening.h" />
     <ClInclude Include="trim_whitespace.h" />
     <ClInclude Include="weighting.h" />

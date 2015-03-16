@@ -5,7 +5,7 @@
  * Licensed under the GNU Affero General Public License, Version 3.0.
  * Commercial licenses available at http://imageresizing.net/
  */
-#include "shared.h"
+#include "fastscaling_private"
 #pragma once
 
 #ifdef _MSC_VER

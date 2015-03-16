@@ -47,7 +47,7 @@
     <ClInclude Include="sharpening.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shared.h">
+    <ClInclude Include="fastscaling_private">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="scaling.h">

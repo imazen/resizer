@@ -10,7 +10,7 @@
 #include "math_functions.h"
 #include <stdlib.h>
 
-static void derive_cubic_coefficients(double B, double C, InterpolationDetails * out)
+void derive_cubic_coefficients(double B, double C, InterpolationDetails * out)
 {
     double bx2 = B + B;
     out->p1 = 1.0 - (1.0 / 3.0)*B;
@@ -115,7 +115,7 @@ InterpolationDetails * create_custom(double window, double blur, detailed_interp
     return d;
 }
 
-static LineContribType * ContributionsAlloc(const uint32_t line_length, const uint32_t windows_size)
+LineContribType * ContributionsAlloc(const uint32_t line_length, const uint32_t windows_size)
 {
     LineContribType *res = (LineContribType *)malloc(sizeof(LineContribType));
     if (!res) {

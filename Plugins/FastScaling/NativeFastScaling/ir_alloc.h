@@ -2,11 +2,6 @@
 
 #include <stdlib.h>
 
-#define ENABLE_INTERNAL_PREMULT
-#define ENABLE_COMPOSITING // needs premult
-
-
-
 //#define ALIGN_ALLOCATIONS
 #ifdef ALIGN_ALLOCATIONS
 
@@ -21,7 +16,7 @@ _declspec(noalias) _declspec(restrict) inline void* _ir_aligned_calloc(size_t co
     size_t size = count * elsize;
     void *memory = _aligned_malloc(size, alignment);
     if (memory != NULL) { memset(memory, 0, size); }
-    return memory; 
+    return memory;
 }
 
 #define ir_calloc(count, element_size) _ir_aligned_calloc(count,element_size, 32)

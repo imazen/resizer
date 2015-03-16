@@ -1,25 +1,25 @@
 #pragma once
 
 
-/** 
-  
+/**
+
   Currently we only support BGR24 and BGRA32 pixel formats. (And BGR32, where we ignore the alpha channel, but that's not precisely a separate format)
 
-  Eventually we will need to support 
+  Eventually we will need to support
 
   * 8-bit grayscale
   * CMYK
   * YCbCr
 
-  and possibly others. For V1, the API we expose is only used by projects in the same repository, running under the same tests. 
+  and possibly others. For V1, the API we expose is only used by projects in the same repository, running under the same tests.
 
-  In V2, we can change the API as we wish; we are not constrained to what we design here. 
+  In V2, we can change the API as we wish; we are not constrained to what we design here.
 
   Perhaps it is best to explicitly limit the structure to represent what we process at this time?
 
   If our buffers and structures actually describe their contents, then we need to support all permitted values in all functions. This is problematic.
 
-  We heavily experimented with LUV and XYZ color spaces, but determined that better results occur using RGB linear. 
+  We heavily experimented with LUV and XYZ color spaces, but determined that better results occur using RGB linear.
 
   A custom sigmoidized color space could perhaps improve things, but would introduce significant overhead.
 **/
@@ -34,7 +34,7 @@ Make  BitmapBgraStruct->matte_color a fixed 4 bytes sRGBA value, remove ->borrow
 
 Drop ColorSpace. We assume sRGB for BitmapBgra, RGBLinear for BitmapFloat
 
-Rename things for clarity. 
+Rename things for clarity.
 
 Use const/restrict where appropriate
 
@@ -83,14 +83,14 @@ typedef struct BitmapBgraStruct {
     //If false, we can change the stride of the image.
     bool stride_readonly;
 
-    //If true, we can reuse the allocated memory for other purposes. 
-    bool can_reuse_space; 
+    //If true, we can reuse the allocated memory for other purposes.
+    bool can_reuse_space;
     //TODO: rename to bytes_pp
     uint32_t bpp;
     //Todo - combine with bpp somehow. DRY this out
     BitmapPixelFormat pixel_format;
 
-    //When using compositing mode blend_with_matte, this color will be used. We should probably define this as always being sRGBA, 4 bytes.  
+    //When using compositing mode blend_with_matte, this color will be used. We should probably define this as always being sRGBA, 4 bytes.
     unsigned char *matte_color;
     ///If true, we don't dispose of *pixels when we dispose the struct
     bool borrowed_matte_color;
@@ -147,7 +147,7 @@ typedef struct InterpolationDetailsStruct {
 typedef struct RenderDetailsStruct{
 
     //Original scaling values, if required.
-    //scale/scale_h are sans-transpose. 
+    //scale/scale_h are sans-transpose.
     //final_w/final_h is the actual result size expected afer all operations
     //uint32_t from_w, scale_w, final_w, from_h, final_h, scale_h;
 
@@ -156,11 +156,11 @@ typedef struct RenderDetailsStruct{
 
     float minimum_sample_window_to_interposharpen;
 
-    
+
     bool apply_color_matrix;
 
     // If possible to do correctly, halve the image until it is [interpolate_last_percent] times larger than needed. 3 or greater reccomended. Specify -1 to disable halving.
-    float interpolate_last_percent; 
+    float interpolate_last_percent;
 
     //If true, only halve when both dimensions are multiples of the halving factor
     bool halve_only_when_common_factor;
@@ -185,7 +185,7 @@ typedef struct RenderDetailsStruct{
     //If greater than 0, a percentage to sharpen the result along each axis;
     float sharpen_percent_goal;
 
-    
+
     float color_matrix_data[25];
     float *color_matrix[5];
 
@@ -277,6 +277,14 @@ void contributions_free(LineContribType * p);
 // do these need to be public??
 void free_lookup_tables(void);
 LookupTables * get_lookup_tables(void);
+
+
+
+float* create_guassian_kernel(double stdDev, uint32_t radius);
+double sum_of_kernel(float* kernel, uint32_t size);
+void normalize_kernel(float* kernel, uint32_t size, float desiredSum);
+float* create_guassian_kernel_normalized(double stdDev, uint32_t radius);
+float* create_guassian_sharpen_kernel(double stdDev, uint32_t radius);
 
 #ifdef __cplusplus
 }
