@@ -15,4 +15,4 @@
 
 
 
-void ScaleBgraFloatRows(BitmapFloat * from, const uint32_t from_row, BitmapFloat * to, const uint32_t to_row, const uint32_t row_count, ContributionType * weights);
+void ScaleBgraFloatRows(BitmapFloat * from, uint32_t from_row, BitmapFloat * to, uint32_t to_row, uint32_t row_count, ContributionType * weights);

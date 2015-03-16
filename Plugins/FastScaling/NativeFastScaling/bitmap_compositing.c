@@ -208,7 +208,7 @@ static void compose_linear_over_srgb(BitmapFloat * src, const uint32_t from_row,
 
     const uint8_t dest_alpha_index = dest_alpha ? 3 : 0;
     const float dest_alpha_to_float_coeff = dest_alpha ? 1.0f / 255.0f : 0.0f;
-    const float dest_alpha_to_float_offset = dest_alpha ? 0 : 1;
+    const float dest_alpha_to_float_offset = dest_alpha ? 0.0f : 1.0f;
     for (uint32_t row = 0; row < row_count; row++){
         //const float * const __restrict src_row = src->pixels + (row + from_row) * src->float_stride;
         float * src_row = src->pixels + (row + from_row) * src->float_stride;

@@ -74,7 +74,7 @@ inline float* create_guassian_sharpen_kernel(double stdDev, uint32_t radius){
 int ConvolveBgraFloatInPlace(
     BitmapFloat * buf, 
     const float *kernel, 
-    const uint32_t radius, 
+    uint32_t radius, 
     float threshold_min, 
     float threshold_max, 
     uint32_t convolve_channels, 

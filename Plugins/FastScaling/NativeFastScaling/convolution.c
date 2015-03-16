@@ -22,7 +22,7 @@
 #endif
 
 
-void ScaleBgraFloatRows(BitmapFloat * from, const uint32_t from_row, BitmapFloat * to, const uint32_t to_row, const uint32_t row_count, ContributionType * weights)
+void ScaleBgraFloatRows(BitmapFloat * from, uint32_t from_row, BitmapFloat * to, uint32_t to_row, uint32_t row_count, ContributionType * weights)
 {
 
     const uint32_t from_step = from->channels;
@@ -114,7 +114,7 @@ void ScaleBgraFloatRows(BitmapFloat * from, const uint32_t from_row, BitmapFloat
 }
 
 
-int ConvolveBgraFloatInPlace(BitmapFloat * buf, const float *kernel, const uint32_t radius, float threshold_min, float threshold_max, const uint32_t convolve_channels, const uint32_t from_row, const int row_count) 
+int ConvolveBgraFloatInPlace(BitmapFloat * buf, const float *kernel, uint32_t radius, float threshold_min, float threshold_max, uint32_t convolve_channels, uint32_t from_row, int row_count) 
 {
 
     if (buf->w < radius + 1) return -2; //Do nothing unless the image is at least half as wide as the kernel.
