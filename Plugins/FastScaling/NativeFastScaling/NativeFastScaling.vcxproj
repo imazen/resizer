@@ -160,9 +160,6 @@
     <ClInclude Include="trim_whitespace.h" />
     <ClInclude Include="weighting.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Source.def" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
