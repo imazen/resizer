@@ -3,3 +3,9 @@ test_program
 fastscaling
 *.d
 *.o
+*.lastcodeanalysissucceeded
+*.nativecodeanalysis.xml
+*.nativecodeanalysis.all.xml
+*.exe
+*.lib.lastcodeanalysissucceeded
+*.Test.exe

@@ -94,7 +94,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).exe</Command>
+      <Command>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).exe -d yes</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -111,7 +111,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).exe</Command>
+      <Command>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).exe -d yes</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -132,7 +132,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).exe</Command>
+      <Command>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).exe -d yes</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -153,7 +153,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).exe</Command>
+      <Command>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).exe -d yes</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
