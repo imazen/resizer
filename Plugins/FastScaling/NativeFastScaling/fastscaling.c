@@ -1,8 +1,11 @@
 
 #include "fastscaling.h"
 #include <stdio.h>
+#include <string.h>
 
-static int test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, InterpolationFilter filter)
+bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bool flipx, bool flipy, InterpolationFilter filter);
+
+bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bool flipx, bool flipy, InterpolationFilter filter)
 {
     BitmapBgra * source = create_bitmap_bgra(sx, sy, true, sbpp);
     BitmapBgra * canvas = create_bitmap_bgra(cx, cy, true, cbpp);
@@ -12,6 +15,20 @@ static int test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, Interpolatio
     details->interpolation = create_interpolation(filter);
 
     details->sharpen_percent_goal = 50;
+    details->post_flip_x = flipx;
+    details->post_flip_y = flipy;
+    details->post_transpose = transpose;
+
+
+    float sepia[25] = { .769f, .686f, .534f, 0, 0,
+                        .189f, .168f, .131f, 0, 0,
+                        0, 0, 0, 1, 0,
+                        0, 0, 0, 0, 1,
+                        0, 0, 0, 0, 0};
+
+    memcpy( &details->color_matrix_data, &sepia, sizeof sepia);
+
+    details->apply_color_matrix = true;
 
 
     Renderer * p = create_renderer(source, canvas, details);
@@ -24,13 +41,15 @@ static int test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, Interpolatio
     destroy_bitmap_bgra(canvas);
 
     free_lookup_tables();
+    return true;
 }
+
 
 
 int main(void) 
 {
-    test(4000,3000,4,200,40,4,(InterpolationFilter)0);
-  
-    printf("flesk\n");
+    test(4000,3000,3,800,600,4,true, true,false,(InterpolationFilter)0);
+    test(4000,3000,3,1600,1200,4,false,true,true,(InterpolationFilter)0);
+    test(1200,800,4,200,150,4,false,false,false,(InterpolationFilter)0);
     return 0;
 }

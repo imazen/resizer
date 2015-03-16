@@ -5,6 +5,7 @@ task "malloc.h" do end
 task :default => "fastscaling"
 
 
+
 %w{ test_program fastscaling libfastscaling.so }.each { |file| CLOBBER.include(file) if File.exists?(file) }
 
 
@@ -14,10 +15,11 @@ SO_FILE="libfastscaling.so"
 
 TEST_PROGRAM = "test_program"
 
+PROFILING_PROGRAM = "fastscaling"
 
 desc "build a fastscaling program"
-file "fastscaling" => ['fastscaling.o', SO_FILE]  do |t|
-  sh "#{CC} -o #{t.name} -Werror #{t.prerequisites.join(" ")}  -lm"
+file PROFILING_PROGRAM => ['fastscaling.o', SO_FILE]  do |t|
+  sh "#{CC} -o #{t.name} -Werror #{t.prerequisites.join(" ")} -lm"
 end
 
 
@@ -37,25 +39,25 @@ def with_ld_library_path(ld_library_path, &block)
 end
 
 desc "run with valgrind"
-task :valgrind => TEST_PROGRAM do
+task :valgrind => PROFILING_PROGRAM do
   with_ld_library_path('.') do 
-    sh "valgrind --leak-check=full --show-leak-kinds=all ./#{TEST_PROGRAM}"
+    sh "valgrind #{VALGRIND_OPTS} --leak-check=full --show-leak-kinds=all ./#{t.prerequisites.first}"
   end
 end
 
 desc "run with cachegrind"
-task :cachegrind => TEST_PROGRAM do |t|
+task :cachegrind => PROFILING_PROGRAM do |t|
   cachegrind_out_file = "/tmp/cachegrind-out-file"
   with_ld_library_path('.') do
-    sh "valgrind --tool=cachegrind --branch-sim=yes --cachegrind-out-file=#{cachegrind_out_file} ./#{t.prerequisites.first}"
+    sh "valgrind #{VALGRIND_OPTS} --tool=cachegrind --branch-sim=yes --cachegrind-out-file=#{cachegrind_out_file} ./#{t.prerequisites.first}"
   end
   sh "cg_annotate #{cachegrind_out_file}"
 end
 
 desc "run with callgrind"
-task :callgrind => TEST_PROGRAM do |t|
+task :callgrind => PROFILING_PROGRAM do |t|
   with_ld_library_path('.') do
-    sh "valgrind --tool=callgrind --dump-instr=yes --cache-sim=yes --branch-sim=yes ./#{t.prerequisites.first}"
+    sh "valgrind #{VALGRIND_OPTS} --tool=callgrind --dump-instr=yes --cache-sim=yes --branch-sim=yes ./#{t.prerequisites.first}"
   end
 end
   
