@@ -61,7 +61,7 @@ BitmapBgra * create_bitmap_bgra(int sx, int sy, bool zeroed, int bpp)
     return im;
 }
 
-void DestroyBitmapBgra(BitmapBgra * im)
+void destroy_bitmap_bgra(BitmapBgra * im)
 {
     if (im == NULL) return;
 

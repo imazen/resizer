@@ -49,12 +49,12 @@ bool test_contrib_windows(char *msg)
 
     // assumes included edge cases
 
-    InterpolationDetails* cubicFast = CreateInterpolation(InterpolationFilter::Filter_CubicFast);
+    InterpolationDetails* cubicFast = create_interpolation(InterpolationFilter::Filter_CubicFast);
 
     unsigned int from_w = 6;
     unsigned int to_w = 3;
     unsigned int corr36[3][2] = { { 0, 1 }, { 2, 3 }, { 4, 5 } };
-    lct = ContributionsCalc(to_w, from_w, cubicFast);
+    lct = contributions_calc(to_w, from_w, cubicFast);
 
     for (uint32_t i = 0; i < lct->LineLength; i++)
         if (lct->ContribRow[i].Left != (int)corr36[i][0]) { bad = i; break; }
@@ -67,15 +67,15 @@ bool test_contrib_windows(char *msg)
                 lct->ContribRow[bad].Left,
                 lct->ContribRow[bad].Right,
                 bad, corr36[bad][0], corr36[bad][1]);
-            ContributionsFree(lct);
+            contributions_free(lct);
             return false;
         }
-        ContributionsFree(lct);
+        contributions_free(lct);
 
         from_w = 6;
         to_w = 4;
         unsigned int corr46[4][2] = { { 0, 1 }, { 1, 2 }, { 3, 4 }, { 4, 5 } };
-        lct = ContributionsCalc(to_w, from_w, cubicFast);
+        lct = contributions_calc(to_w, from_w, cubicFast);
 
         for (uint32_t i = 0; i < lct->LineLength; i++)
             if (lct->ContribRow[i].Left != (int)corr46[i][0]) { bad = i; break; }
@@ -87,10 +87,10 @@ bool test_contrib_windows(char *msg)
                     lct->ContribRow[bad].Left,
                     lct->ContribRow[bad].Right,
                     bad, corr46[bad][0], corr46[bad][1]);
-                ContributionsFree(lct);
+                contributions_free(lct);
                 return false;
             }
-            ContributionsFree(lct);
+            contributions_free(lct);
 
             return true;
 }
@@ -158,7 +158,7 @@ bool test_details(InterpolationDetails* details, char *msg, double expected_firs
 }
 
 char * test_filter(InterpolationFilter filter, char *msg, double expected_first_crossing, double expected_second_crossing, double expected_near0, double near0_threshold, double expected_end){
-    InterpolationDetails* details = CreateInterpolation(filter);
+    InterpolationDetails* details = create_interpolation(filter);
     snprintf(msg,255, "Filter=(%d) ", filter);
     bool result = test_details(details, msg, expected_first_crossing, expected_second_crossing, expected_near0, near0_threshold, expected_end);
     free(details);
@@ -215,7 +215,7 @@ bool test_weight_distrib(char *msg)
 }
 
 InterpolationDetails*  sample_filter(InterpolationFilter filter, double x_from, double x_to, double *buffer, int samples){
-    InterpolationDetails* details = CreateInterpolation(filter);
+    InterpolationDetails* details = create_interpolation(filter);
     if (details == NULL) return NULL;
     for (int i = 0; i < samples; i++){
         double x = (x_to - x_from) * ((double)i / (double)samples) + x_from;

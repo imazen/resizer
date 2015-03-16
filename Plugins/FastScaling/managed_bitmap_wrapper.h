@@ -107,7 +107,7 @@ namespace ImageResizer{
                     if (bgra != NULL){
                         if (bgra->matte_color)
                             delete bgra->matte_color;
-                        DestroyBitmapBgra(bgra);
+                        destroy_bitmap_bgra(bgra);
                         bgra = NULL;
                     }
 

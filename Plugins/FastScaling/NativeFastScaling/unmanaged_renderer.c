@@ -33,7 +33,7 @@ typedef struct RendererStruct {
 } Renderer;
 
 
-InterpolationDetails* CreateInterpolationDetails()
+InterpolationDetails* create_interpolation_details()
 {
     InterpolationDetails* d = (InterpolationDetails*)calloc(1, sizeof(InterpolationDetails));
     d->blur = 1;
@@ -96,10 +96,10 @@ static int DetermineDivisor(Renderer * r)
 void destroy_renderer(Renderer * r)
 {
     if (r->destroy_source) {
-        DestroyBitmapBgra(r->source);
+        destroy_bitmap_bgra(r->source);
     }
     r->source = NULL;
-    DestroyBitmapBgra(r->transposed);
+    destroy_bitmap_bgra(r->transposed);
     r->transposed = NULL;
     r->canvas = NULL;
     if (r->details != NULL) {
@@ -170,7 +170,7 @@ static int CompleteHalving(Renderer * r)
         tmp_im->alpha_meaningful = r->source->alpha_meaningful;
 
         if (r->destroy_source) {
-            DestroyBitmapBgra(r->source);
+            destroy_bitmap_bgra(r->source);
         }
         r->source = tmp_im;
         r->destroy_source = true; //Cleanup tmp_im
@@ -240,10 +240,10 @@ static int ScaleAndRender1D(const Renderer * r,
 
 
 
-    //p->Start("ContributionsCalc", false);
+    //p->Start("contributions_calc", false);
 
-    contrib = ContributionsCalc(to_count, from_count, details->interpolation);  /*Handle errors */ if (contrib == NULL) { return_code = -1; goto cleanup; }
-    //p->Stop("ContributionsCalc", true, false);
+    contrib = contributions_calc(to_count, from_count, details->interpolation);  /*Handle errors */ if (contrib == NULL) { return_code = -1; goto cleanup; }
+    //p->Stop("contributions_calc", true, false);
 
 
     //p->Start("CreateBitmapFloat (buffers)", false);
@@ -291,7 +291,7 @@ static int ScaleAndRender1D(const Renderer * r,
 cleanup:
     //p->Start("Free Contributions,FloatBuffers", false);
 
-    if (contrib != NULL) ContributionsFree(contrib);
+    if (contrib != NULL) contributions_free(contrib);
 
     if (source_buf != NULL) DestroyBitmapFloat(source_buf);
     if (dest_buf != NULL) DestroyBitmapFloat(dest_buf);
@@ -459,57 +459,57 @@ int perform_render(Renderer * r)
     return 0; // is this correct?
 }
 
-InterpolationDetails * CreateInterpolation(InterpolationFilter filter)
+InterpolationDetails * create_interpolation(InterpolationFilter filter)
 {
     switch (filter) {
         case Filter_Linear:
         case Filter_Triangle:
-            return CreateCustom(1, 1, filter_triangle);
+            return create_custom(1, 1, filter_triangle);
         case Filter_Lanczos2:
-            return CreateCustom(2, 1, filter_sinc_2);
+            return create_custom(2, 1, filter_sinc_2);
         case Filter_Lanczos3: //Note - not a 3 lobed function - truncated to 2
-            return CreateCustom(3, 1, filter_sinc_2);
+            return create_custom(3, 1, filter_sinc_2);
         case Filter_Lanczos2Sharp:
-            return CreateCustom(2, 0.9549963639785485, filter_sinc_2);
+            return create_custom(2, 0.9549963639785485, filter_sinc_2);
         case Filter_Lanczos3Sharp://Note - not a 3 lobed function - truncated to 2
-            return CreateCustom(3, 0.9812505644269356, filter_sinc_2);
+            return create_custom(3, 0.9812505644269356, filter_sinc_2);
 
         //Hermite and BSpline no negative weights
         case Filter_CubicBSpline:
-            return CreateBicubicCustom(2, 1, 1, 0);
+            return create_bicubic_custom(2, 1, 1, 0);
 
         case Filter_Lanczos2Windowed:
-            return CreateCustom(2, 1, filter_sinc_windowed);
+            return create_custom(2, 1, filter_sinc_windowed);
         case Filter_Lanczos3Windowed:
-            return CreateCustom(3, 1, filter_sinc_windowed);
+            return create_custom(3, 1, filter_sinc_windowed);
         case Filter_Lanczos2SharpWindowed:
-            return CreateCustom(2, 0.9549963639785485, filter_sinc_windowed);
+            return create_custom(2, 0.9549963639785485, filter_sinc_windowed);
         case Filter_Lanczos3SharpWindowed:
-            return CreateCustom(3, 0.9812505644269356, filter_sinc_windowed);
+            return create_custom(3, 0.9812505644269356, filter_sinc_windowed);
 
 
         case Filter_CubicFast:
-            return CreateCustom(1, 1, filter_bicubic_fast);
+            return create_custom(1, 1, filter_bicubic_fast);
         case Filter_Cubic:
-            return CreateBicubicCustom(2, 1, 0,1);
+            return create_bicubic_custom(2, 1, 0,1);
         case Filter_CatmullRom:
-            return CreateBicubicCustom(2, 1, 0, 0.5);
+            return create_bicubic_custom(2, 1, 0, 0.5);
         case Filter_CatmullRomFast:
-            return CreateBicubicCustom(1, 1, 0, 0.5);
+            return create_bicubic_custom(1, 1, 0, 0.5);
         case Filter_CatmullRomFastSharp:
-            return CreateBicubicCustom(1, 13.0 / 16.0, 0, 0.5);
+            return create_bicubic_custom(1, 13.0 / 16.0, 0, 0.5);
         case Filter_Mitchell:
-            return CreateBicubicCustom(2, 7.0 / 8.0, 1.0 / 3.0, 1.0 / 3.0);
+            return create_bicubic_custom(2, 7.0 / 8.0, 1.0 / 3.0, 1.0 / 3.0);
         case Filter_Robidoux:
-            return CreateBicubicCustom(2, 1. / 1.1685777620836932,
+            return create_bicubic_custom(2, 1. / 1.1685777620836932,
                 0.37821575509399867, 0.31089212245300067);
         case Filter_RobidouxSharp:
-            return CreateBicubicCustom(2, 1. / 1.105822933719019,
+            return create_bicubic_custom(2, 1. / 1.105822933719019,
                 0.2620145123990142, 0.3689927438004929);
         case Filter_Hermite:
-            return CreateBicubicCustom(1, 1, 0, 0);
+            return create_bicubic_custom(1, 1, 0, 0);
         case Filter_Box:
-            return CreateCustom(0.5, 1, filter_box);
+            return create_custom(0.5, 1, filter_box);
 
     }
     return NULL;

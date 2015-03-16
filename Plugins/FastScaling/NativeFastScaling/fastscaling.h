@@ -211,7 +211,7 @@ RenderDetails * create_render_details(void);
 Renderer * create_renderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details);
 int perform_render(Renderer * r);
 void destroy_renderer(Renderer * r);
-void DestroyBitmapBgra(BitmapBgra * im);
+void destroy_bitmap_bgra(BitmapBgra * im);
 
 //These filters are stored in a struct as function pointers, which I assume means they can't be inlined. Likely 5 * w * h invocations.
 double filter_flex_cubic(const InterpolationDetails * d, double x);
@@ -223,10 +223,10 @@ double filter_sinc_windowed(const InterpolationDetails * d, double t);
 double percent_negative_weight(const InterpolationDetails * details);
 
 
-InterpolationDetails * CreateInterpolationDetails(void);
-InterpolationDetails * CreateBicubicCustom(double window, double blur, double B, double C);
-InterpolationDetails * CreateCustom(double window, double blur, detailed_interpolation_method filter);
-InterpolationDetails * CreateInterpolation(InterpolationFilter filter);
+InterpolationDetails * create_interpolation_details(void);
+InterpolationDetails * create_bicubic_custom(double window, double blur, double B, double C);
+InterpolationDetails * create_custom(double window, double blur, detailed_interpolation_method filter);
+InterpolationDetails * create_interpolation(InterpolationFilter filter);
 
 
 
@@ -244,12 +244,12 @@ typedef struct
     double percent_negative; /*estimates the sharpening effect*/
 } LineContribType;
 
-LineContribType *ContributionsCalc(const uint32_t line_size, const uint32_t src_size, const InterpolationDetails * details);
-void ContributionsFree(LineContribType * p);
+LineContribType * contributions_calc(const uint32_t line_size, const uint32_t src_size, const InterpolationDetails * details);
+void contributions_free(LineContribType * p);
 
 // do these need to be public??
-void FreeLookupTables(void);
-LookupTables * GetLookupTables(void);
+void free_lookup_tables(void);
+LookupTables * get_lookup_tables(void);
 
 #ifdef __cplusplus
 }

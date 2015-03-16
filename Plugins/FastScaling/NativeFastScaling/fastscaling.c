@@ -9,7 +9,7 @@ static int test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, Interpolatio
 
     RenderDetails * details = create_render_details();
 
-    details->interpolation = CreateInterpolation(filter);
+    details->interpolation = create_interpolation(filter);
 
     details->sharpen_percent_goal = 50;
 
@@ -20,10 +20,10 @@ static int test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, Interpolatio
 
     destroy_renderer(p);
 
-    DestroyBitmapBgra(source);
-    DestroyBitmapBgra(canvas);
+    destroy_bitmap_bgra(source);
+    destroy_bitmap_bgra(canvas);
 
-    FreeLookupTables();
+    free_lookup_tables();
 }
 
 

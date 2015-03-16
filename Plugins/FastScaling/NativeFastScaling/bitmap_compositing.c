@@ -20,7 +20,7 @@ int convert_srgb_to_linear(BitmapBgra * src, uint32_t from_row, BitmapFloat * de
 
     if (src->w != dest->w || src->bpp < dest->channels) return -1;
 
-    const LookupTables*  t = GetLookupTables();
+    const LookupTables*  t = get_lookup_tables();
 
     const uint32_t w = src->w;
     const uint32_t units = w * src->bpp;
@@ -115,7 +115,7 @@ static int  copy_bitmap_bgra(BitmapBgra * src, BitmapBgra * dst)
 static int blend_matte(BitmapFloat * src, const uint32_t from_row, const uint32_t row_count, const uint8_t* const matte){
     //We assume that matte is BGRA, regardless.
 
-    LookupTables*   t = GetLookupTables();
+    LookupTables*   t = get_lookup_tables();
     const float matte_a = t->linear[matte[3]];
     const float b = t->srgb_to_linear[matte[0]];
     const float g = t->srgb_to_linear[matte[1]];
@@ -198,7 +198,7 @@ void copy_linear_over_srgb(BitmapFloat * src, const uint32_t from_row, BitmapBgr
 
 static void compose_linear_over_srgb(BitmapFloat * src, const uint32_t from_row, BitmapBgra * dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose){
 
-    LookupTables*   t = GetLookupTables();
+    LookupTables*   t = get_lookup_tables();
     const uint32_t dest_row_stride = transpose ? dest->bpp : dest->stride;
     const uint32_t dest_pixel_stride = transpose ? dest->stride : dest->bpp;
     const uint32_t srcitems = MIN(from_col + col_count, src->w) *src->channels;

@@ -99,16 +99,16 @@ double percent_negative_weight(const InterpolationDetails* details){
     return negative_area / positive_area;
 }
 
-InterpolationDetails * CreateBicubicCustom(double window, double blur, double B, double C){
-    InterpolationDetails * d = CreateInterpolationDetails();
+InterpolationDetails * create_bicubic_custom(double window, double blur, double B, double C){
+    InterpolationDetails * d = create_interpolation_details();
     d->blur = blur;
     derive_cubic_coefficients(B, C, d);
     d->filter = filter_flex_cubic;
     d->window = window;
     return d;
 }
-InterpolationDetails * CreateCustom(double window, double blur, detailed_interpolation_method filter){
-    InterpolationDetails * d = CreateInterpolationDetails();
+InterpolationDetails * create_custom(double window, double blur, detailed_interpolation_method filter){
+    InterpolationDetails * d = create_interpolation_details();
     d->blur = blur;
     d->filter = filter;
     d->window = window;
@@ -139,7 +139,7 @@ static LineContribType * ContributionsAlloc(const uint32_t line_length, const ui
     return res;
 }
 
-void ContributionsFree(LineContribType * p)
+void contributions_free(LineContribType * p)
 {
     free(p->ContribRow[0].Weights);
     free(p->ContribRow);
@@ -147,7 +147,7 @@ void ContributionsFree(LineContribType * p)
 }
 
 
-LineContribType *ContributionsCalc(const uint32_t line_size, const uint32_t src_size, const InterpolationDetails* details)
+LineContribType *contributions_calc(const uint32_t line_size, const uint32_t src_size, const InterpolationDetails* details)
 {
     const double sharpen_ratio =  percent_negative_weight(details);
     const double desired_sharpen_ratio = details->sharpen_percent_goal / 100.0;
@@ -181,7 +181,7 @@ LineContribType *ContributionsCalc(const uint32_t line_size, const uint32_t src_
         const uint32_t source_pixel_count = right_src_pixel - left_src_pixel + 1;
 
         if (source_pixel_count > allocated_window_size){
-            ContributionsFree(res);
+            contributions_free(res);
             exit(200);
             return NULL;
         }
@@ -206,7 +206,7 @@ LineContribType *ContributionsCalc(const uint32_t line_size, const uint32_t src_
         }
 
         if (total_weight <= TONY) {
-            ContributionsFree(res);
+            contributions_free(res);
             return NULL;
         }
 

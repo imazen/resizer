@@ -104,7 +104,7 @@ static int vertical_flip_bgra(BitmapBgraPtr b);
 static int copy_bitmap_bgra(BitmapBgraPtr src, BitmapBgraPtr dst);
 static BitmapBgraPtr create_bitmap_bgra_header(int sx, int sy);
 static BitmapBgraPtr create_bitmap_brgra(int sx, int sy, bool zeroed, int bpp);
-inline void DestroyBitmapBgra(BitmapBgraPtr im);
+inline void destroy_bitmap_bgra(BitmapBgraPtr im);
 
 float srgb_to_linear(float s);
 float linear_to_srgb(float s);
@@ -234,12 +234,12 @@ RendererPtr create_renderer(BitmapBgraPtr source, BitmapBgraPtr canvas, RenderDe
 
 void destroy_renderer(RendererPtr r)
 
-static InterpolationDetailsPtr CreateInterpolationDetails();
+static InterpolationDetailsPtr create_interpolation_details();
 
 static RenderDetailsPtr create_render_details();
 static void DestroyRenderDetails(RenderDetailsPtr d);
-static void FreeLookupTables() ;
-static LookupTablesPtr GetLookupTables();
+static void free_lookup_tables() ;
+static LookupTablesPtr get_lookup_tables();
 
 static void BgraSharpenInPlaceX(BitmapBgraPtr im, float pct);
 
@@ -275,13 +275,13 @@ static double filter_sinc_windowed(const InterpolationDetailsPtr d, double t);
 
 
 
-static InterpolationDetailsPtr CreateBicubicCustom(double window, double blur, double B, double C);
-static InterpolationDetailsPtr CreateCustom(double window, double blur, detailed_interpolation_method filter);
-static InterpolationDetailsPtr CreateInterpolation(InterpolationFilter filter);
-static void ContributionsFree(LineContribType * p);
+static InterpolationDetailsPtr create_bicubic_custom(double window, double blur, double B, double C);
+static InterpolationDetailsPtr create_custom(double window, double blur, detailed_interpolation_method filter);
+static InterpolationDetailsPtr create_interpolation(InterpolationFilter filter);
+static void contributions_free(LineContribType * p);
 static double percent_negative_weight(const InterpolationDetailsPtr details);
 
-static LineContribType *ContributionsCalc(const uint32_t line_size, const uint32_t src_size, const InterpolationDetailsPtr details);
+static LineContribType *contributions_calc(const uint32_t line_size, const uint32_t src_size, const InterpolationDetailsPtr details);
 
 
 

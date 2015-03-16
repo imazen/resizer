@@ -6,13 +6,13 @@
 static LookupTables * table = NULL;
 
 
-void FreeLookupTables() { 
+void free_lookup_tables() { 
     LookupTables * temp =  table;
     table = NULL;
     free(temp); 
 }
 
-LookupTables * GetLookupTables() {
+LookupTables * get_lookup_tables() {
     if (table == NULL){
         LookupTables * temp = (LookupTables*)ir_malloc(sizeof(LookupTables));
 
