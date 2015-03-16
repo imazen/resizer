@@ -19,10 +19,14 @@ CC = MACOS && cc == "gcc" ? "gcc-4.9" : cc;
 
 VALGRIND_OPTS =  MACOS ? "--dsymutil=yes" : ""
 
-COMMON_FLAGS=" -fPIC -O2 -g -Wno-error=unknown-warning -Wno-unknown-warning-option -Wpointer-arith -Wcast-qual -Wpedantic -Wall -Wextra -Wuninitialized -Wno-unused-function -Wno-return-type -Wredundant-decls -Wfloat-conversion  -Werror"
-CFLAGS="#{COMMON_FLAGS} -std=c11 -Wstrict-prototypes -Wmissing-prototypes -Wc++-compat -Wshadow"
 
-CXXFLAGS="#{COMMON_FLAGS} -std=gnu++11"
+COMMON_FLAGS=" -fPIC -O2 -g -Wpointer-arith -Wcast-qual -Wpedantic -Wall -Wextra -Wuninitialized -Wno-unused-function -Wno-return-type -Wredundant-decls -Werror"
+
+TRAVIS_USAFE_FLAGS = " -Wfloat-conversion "
+
+CFLAGS="#{COMMON_FLAGS} #{ENV['CI'] ? '' : TRAVIS_USAFE_FLAGS} -std=c11 -Wstrict-prototypes -Wmissing-prototypes -Wc++-compat -Wshadow"
+
+CXXFLAGS="#{COMMON_FLAGS} #{ENV['CI'] ? '' : TRAVIS_USAFE_FLAGS} -std=gnu++11"
 
 #-std=c++11
 
