@@ -92,7 +92,6 @@ void ScaleBgraFloatRows(BitmapFloat * from, uint32_t from_row, BitmapFloat * to,
             }
         }
         else{
-            const uint32_t min_channels = MIN(from_step, to_step);
             avg[0] = 0;
             avg[1] = 0;
             avg[2] = 0;
