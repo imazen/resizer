@@ -1,7 +1,6 @@
 #include "catch.hpp"
 
 #include "fastscaling_private.h"
-#include "bitmap_formats.h"
 #include "weighting_test_helpers.h"
 
 bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bool flipx, bool flipy, bool profile, InterpolationFilter filter)
@@ -65,7 +64,7 @@ TEST_CASE("Test contrib windows", "[fastscaling]") {
 TEST_CASE("Test Weighting", "[fastscaling]") {
 
     char msg[256];
- 
+
 
     //These have window = 1, and shouldnt' have negative values. They should also end at 1
     CHECK(test_filter(InterpolationFilter::Filter_Hermite, msg, 0, 0, 0.99, 0.08, 1) == nullptr);
@@ -185,11 +184,11 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
 	    Renderer* r = create_renderer(bit, final, details);
 
 	    perform_render(r);
-      
-	    //convert_srgb_to_linear(bit, 0, buf, 0, h);      
+
+	    //convert_srgb_to_linear(bit, 0, buf, 0, h);
 	    //demultiply_alpha(buf, 0, h);
 	    //copy_linear_over_srgb(buf, 0, final, 0, h, 0, buf->w, false);
-    
+
 	    THEN(" and so forth ") {
 
 		bool exact_match = true;
@@ -210,7 +209,7 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
 		}
 		REQUIRE(exact_match);
 	    }
-      
+
 	}
     }
 }

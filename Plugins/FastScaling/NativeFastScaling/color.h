@@ -11,7 +11,6 @@
 #pragma unmanaged
 #endif
 
-#include "fastscaling_private.h"
 
 
 #ifdef __cplusplus
@@ -133,38 +132,12 @@ static inline void yxz_to_linear(float * yxz){
 
 }
 
-static int linear_to_luv_rows(BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count)
-{
-    if ((bit->w * bit->channels) != bit->float_stride)
-    {
-        return -1;
-    }
-     float * start_at = bit->float_stride * start_row  + bit->pixels;
+int linear_to_luv_rows(BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count);
+int luv_to_linear_rows(BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count);
 
-    const float * end_at = bit->float_stride * (start_row + row_count) + bit->pixels;
 
-    for (float* pix = start_at; pix < end_at; pix++){
-        linear_to_luv(pix);
-    }
-    return 0;
-}
-
-static int luv_to_linear_rows(BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count)
-{
-    if ((bit->w * bit->channels) != bit->float_stride)
-    {
-        return -1;
-    }
-    float * start_at = bit->float_stride * start_row + bit->pixels;
-
-    const float * end_at = bit->float_stride * (start_row + row_count) + bit->pixels;
-
-    for (float* pix = start_at; pix < end_at; pix++){
-        luv_to_linear(pix);
-    }
-    return 0;
-}
-
+void apply_color_matrix_float(BitmapFloat * bmp, const uint32_t row, const uint32_t count, float*  m[5]);
+void apply_color_matrix(BitmapBgra * bmp, const uint32_t row, const uint32_t count, float* const __restrict  m[5]);
 
 
 #ifdef __cplusplus

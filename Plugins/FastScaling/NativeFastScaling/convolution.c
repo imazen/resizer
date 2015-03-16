@@ -5,10 +5,12 @@
  * Licensed under the GNU Affero General Public License, Version 3.0.
  * Commercial licenses available at http://imageresizing.net/
  */
+#ifdef _MSC_VER
+#pragma unmanaged
+#endif
 
 #include "fastscaling_private.h"
-#include "bitmap_formats.h"
-#include "math_functions.h"
+
 #include <string.h>
 
 #ifndef _MSC_VER

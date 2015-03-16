@@ -5,9 +5,12 @@
  * Licensed under the GNU Affero General Public License, Version 3.0.
  * Commercial licenses available at http://imageresizing.net/
  */
+#ifdef _MSC_VER
+#pragma unmanaged
+#endif
 
-#include "fastscaling.h"
-#include "math_functions.h"
+#include "fastscaling_private.h"
+
 #include <stdlib.h>
 
 static void derive_cubic_coefficients(double B, double C, InterpolationDetails * out)

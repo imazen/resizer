@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) Imazen LLC.
+ * No part of this project, including this file, may be copied, modified,
+ * propagated, or distributed except as permitted in COPYRIGHT.txt.
+ * Licensed under the GNU Affero General Public License, Version 3.0.
+ * Commercial licenses available at http://imageresizing.net/
+ */
+#ifdef _MSC_VER
+#pragma unmanaged
+#endif
 
 #include "fastscaling.h"
 #include <stdio.h>
@@ -46,7 +56,7 @@ bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bo
 
 
 
-int main(void) 
+int main(void)
 {
     test(4000,3000,3,800,600,4,true, true,false,(InterpolationFilter)0);
     test(4000,3000,3,1600,1200,4,false,true,true,(InterpolationFilter)0);

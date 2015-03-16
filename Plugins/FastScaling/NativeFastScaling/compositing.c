@@ -5,14 +5,13 @@
  * Licensed under the GNU Affero General Public License, Version 3.0.
  * Commercial licenses available at http://imageresizing.net/
  */
-
-
-#include "fastscaling_private.h"
-#include <string.h>
-
 #ifdef _MSC_VER
 #pragma unmanaged
 #endif
+
+#include "fastscaling_private.h"
+
+#include <string.h>
 
 
 int convert_srgb_to_linear(BitmapBgra * src, uint32_t from_row, BitmapFloat * dest, uint32_t dest_row, uint32_t row_count)

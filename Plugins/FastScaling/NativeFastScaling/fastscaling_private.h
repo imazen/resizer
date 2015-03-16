@@ -11,10 +11,35 @@
 #endif
 
 #include "fastscaling.h"
+
+ //floating-point bitmap, typically linear RGBA, premultiplied
+typedef struct BitmapFloatStruct {
+    //buffer width in pixels
+    uint32_t w;
+    //buffer height in pixels
+    uint32_t h;
+    //The number of floats per pixel
+    uint32_t channels;
+    //The pixel data
+    float *pixels;
+    //If true, don't dispose the buffer with the struct
+    bool pixels_borrowed;
+    //The number of floats in the buffer
+    uint32_t float_count;
+    //The number of floats betwen (0,0) and (0,1)
+    uint32_t float_stride;
+
+    //If true, alpha has been premultiplied
+    bool alpha_premultiplied;
+    //If true, the alpha channel holds meaningful data
+    bool alpha_meaningful;
+} BitmapFloat;
+
 #include "ir_alloc.h"
 #include "math_functions.h"
-#include "bitmap_formats.h"
 #include "color.h"
+
+
 
 
 
@@ -33,6 +58,13 @@
 extern "C" {
 #endif
 
+
+BitmapFloat * CreateBitmapFloatHeader(int sx, int sy, int channels);
+
+BitmapFloat * CreateBitmapFloat(int sx, int sy, int channels, bool zeroed);
+
+void DestroyBitmapFloat(BitmapFloat * im);
+
 int64_t get_high_precision_ticks(void);
 
 
@@ -40,8 +72,6 @@ void profiler_start(Renderer * r, const char * name, bool allow_recursion);
 void profiler_stop(Renderer * r, const char * name, bool assert_started, bool stop_children);
 
 
-void apply_color_matrix_float(BitmapFloat * bmp, const uint32_t row, const uint32_t count, float*  m[5]);
-void apply_color_matrix(BitmapBgra * bmp, const uint32_t row, const uint32_t count, float* const __restrict  m[5]);
 
 void ScaleBgraFloatRows(BitmapFloat * from, uint32_t from_row, BitmapFloat * to, uint32_t to_row, uint32_t row_count, ContributionType * weights);
 int ConvolveBgraFloatInPlace(BitmapFloat * buf, const float *kernel, uint32_t radius, float threshold_min, float threshold_max, uint32_t convolve_channels, uint32_t from_row, int row_count);
@@ -86,6 +116,7 @@ int Halve(const BitmapBgra * from, const BitmapBgra * to, int divisor);
 
 // is it correct to use an int as the divisor here?
 int HalveInPlace(BitmapBgra * from, int divisor);
+
 #ifdef __cplusplus
 }
 #endif

@@ -11,9 +11,9 @@ task :default => "fastscaling"
 
 OBJECTS=%w{
 bitmap_formats.o
+color.o
 compositing.o
 convolution.o
-lookup_tables.o
 renderer.o
 scaling.o
 trim_whitespace.o

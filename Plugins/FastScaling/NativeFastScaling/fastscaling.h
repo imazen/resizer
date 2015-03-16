@@ -50,6 +50,7 @@ Refactor everything around convolution kernels; perhaps they should have their o
 extern "C" {
 #endif
 
+//Compact format for bitmaps. sRGB or gamma adjusted - *NOT* linear
 typedef enum _BitmapPixelFormat {
     None = 0,
     Bgr24 = 24,
@@ -91,13 +92,14 @@ typedef struct BitmapBgraStruct {
     BitmapPixelFormat pixel_format;
 
     //When using compositing mode blend_with_matte, this color will be used. We should probably define this as always being sRGBA, 4 bytes.
-    unsigned char *matte_color;
-    ///If true, we don't dispose of *pixels when we dispose the struct
-    bool borrowed_matte_color;
+    uint8_t matte_color[4];
 
     BitmapCompositingMode compositing_mode;
 
 } BitmapBgra;
+
+
+
 
 typedef struct RendererStruct Renderer;
 
@@ -139,25 +141,18 @@ typedef struct InterpolationDetailsStruct {
 
     //pointer to the weight calculation function
     detailed_interpolation_method filter;
-
+    //How much sharpening we are requesting
     float sharpen_percent_goal;
 
 } InterpolationDetails;
 
 typedef struct RenderDetailsStruct{
-
-    //Original scaling values, if required.
-    //scale/scale_h are sans-transpose.
-    //final_w/final_h is the actual result size expected afer all operations
-    //uint32_t from_w, scale_w, final_w, from_h, final_h, scale_h;
-
-
+    //Interpolation and scaling details
     InterpolationDetails * interpolation;
-
+    //How large the interoplation window needs to be before we even attempt to apply a sharpening
+    //percentage to the given filter
     float minimum_sample_window_to_interposharpen;
 
-
-    bool apply_color_matrix;
 
     // If possible to do correctly, halve the image until it is [interpolate_last_percent] times larger than needed. 3 or greater reccomended. Specify -1 to disable halving.
     float interpolate_last_percent;
@@ -185,6 +180,8 @@ typedef struct RenderDetailsStruct{
     //If greater than 0, a percentage to sharpen the result along each axis;
     float sharpen_percent_goal;
 
+    //If true, we should apply the color matrix
+    bool apply_color_matrix;
 
     float color_matrix_data[25];
     float *color_matrix[5];
@@ -201,7 +198,6 @@ typedef struct LookupTablesStruct *LookupTablesPtr;
 typedef struct LookupTablesStruct {
     float srgb_to_linear[256]; //Converts 0..255 -> 0..1, but knowing that 0.255 has sRGB gamma.
     float linear[256]; //Converts 0..255 -> 0..1
-    //const uint8_t linear_to_srgb[4097]; //Converts from 0..4096 to 0.255, going from linear to sRGB gamma.
 } LookupTables;
 
 
@@ -257,18 +253,17 @@ InterpolationDetails * create_interpolation(InterpolationFilter filter);
 
 
 
-typedef struct
-{
-    float *Weights;  /* Normalized weights of neighboring pixels */
-    int Left, Right;   /* Bounds of source pixels window */
-} ContributionType;  /* Contirbution information for a single pixel */
+typedef struct {
+    float *Weights;/* Normalized weights of neighboring pixels */
+    int Left;      /* Bounds of source pixels window */
+    int Right;
+} ContributionType;/* Contirbution information for a single pixel */
 
-typedef struct
-{
+typedef struct {
     ContributionType *ContribRow; /* Row (or column) of contribution weights */
-    unsigned int WindowSize,      /* Filter window size (of affecting source pixels) */
-        LineLength;      /* Length of line (no. or rows / cols) */
-    double percent_negative; /*estimates the sharpening effect*/
+    uint32_t WindowSize;      /* Filter window size (of affecting source pixels) */
+    uint32_t LineLength;      /* Length of line (no. or rows / cols) */
+    double percent_negative; /* Estimates the sharpening effect actually applied*/
 } LineContribType;
 
 LineContribType * contributions_calc(const uint32_t line_size, const uint32_t src_size, const InterpolationDetails * details);
