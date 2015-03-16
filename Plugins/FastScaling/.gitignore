@@ -9,3 +9,5 @@ fastscaling
 *.exe
 *.lib.lastcodeanalysissucceeded
 *.Test.exe
+callgrind.out.*
+*dSYM*
