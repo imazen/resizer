@@ -32,7 +32,7 @@ namespace ImageResizer{
                 float* CopyFloatArray(array<float, 1>^ a){
                     if (a == nullptr) return NULL;
 
-                    float * copy = (float *)ir_malloc(sizeof(float) * a->Length);
+                    float * copy = (float *)malloc(sizeof(float) * a->Length);
                     if (copy == NULL) throw gcnew OutOfMemoryException();
                     for (int i = 0; i < a->Length; i++)
                         copy[i] = a[i];

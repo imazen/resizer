@@ -49,25 +49,25 @@ namespace ImageResizer{
                 }
 			protected:
 
-       
+
                 virtual RequestedAction InternalGraphicsDrawImage(ImageState^ s, Bitmap^ dest, Bitmap^ source, array<PointF>^ targetArea, RectangleF sourceArea, array<array<float, 1>^, 1>^ colorMatrix) override{
-                    
+
                     NameValueCollection ^query = s->settingsAsCollection();
 
                     String^ fastScale = query->Get("fastscale");
 					String^ sTrue = "true";
-                    
-                    
+
+
                     if (fastScale != sTrue && System::String::IsNullOrEmpty(query->Get("f"))){
 						return RequestedAction::None;
 					}
-                    
+
                     RenderOptions^ opts = gcnew RenderOptions();
-                    
+
 
                     opts->SamplingBlurFactor = System::String::IsNullOrEmpty(query->Get("f.blur")) ? 1.0 :
                         System::Single::Parse(query->Get("f.blur"), System::Globalization::NumberFormatInfo::InvariantInfo);
-                    
+
                     opts->SamplingWindowOverride = System::String::IsNullOrEmpty(query->Get("f.window")) ? 0 :
                         System::Single::Parse(query->Get("f.window"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
@@ -75,15 +75,15 @@ namespace ImageResizer{
                         System::Int32::Parse(query->Get("f"), System::Globalization::NumberFormatInfo::InvariantInfo));
 
                     //opts->InterpolateLastPercent = -1;
-                    SetupConvolutions(query, opts); 
+                    SetupConvolutions(query, opts);
 
 
 
                     opts->SharpeningPercentGoal = System::String::IsNullOrEmpty(query->Get("f.sharpen")) ? 0 :
                         System::Single::Parse(query->Get("f.sharpen"), System::Globalization::NumberFormatInfo::InvariantInfo) / 200.0;
 
-                    opts->SharpeningPercentGoal = MIN(MAX(0, opts->SharpeningPercentGoal), 0.5);
-                   
+                    opts->SharpeningPercentGoal = fminf(fmaxf(0.0f, opts->SharpeningPercentGoal), 0.5f);
+
 
                     //TODO: permit it to work with increments of 90 rotation
 					RectangleF targetBox = ImageResizer::Util::PolygonMath::GetBoundingBox(targetArea);
@@ -91,9 +91,9 @@ namespace ImageResizer{
 						return RequestedAction::None;
                     }
 
-                    
 
-                   
+
+
                    /* System::Diagnostics::Debug::WriteLine("filter={0}, window={1}, blur={2}", query->Get("f"), details->window, details->blur);
                     System::Diagnostics::Debug::WriteLine("y={0} + {1}*x^2 + {2} * x^3, y={3} + {4}*x + {5}*x^2 + {6} * x ^ 3",
                         details->p1, details->p2, details->p3, details->q1, details->q2, details->q3, details->q4);
@@ -101,7 +101,7 @@ namespace ImageResizer{
                     for (double x = -3.0; x < 3; x += 0.25){
                         System::Diagnostics::Debug::WriteLine(x.ToString()->PadRight(5) + details->filter(details, x).ToString());
                     }*/
-                    
+
                     BitmapOptions^ a = gcnew BitmapOptions();
                     a->AllowSpaceReuse = false;
                     a->AlphaMeaningful = true;
@@ -111,7 +111,7 @@ namespace ImageResizer{
 
                     BitmapOptions^ b = gcnew BitmapOptions();
                     b->AllowSpaceReuse = false;
-                    b->AlphaMeaningful = true; 
+                    b->AlphaMeaningful = true;
                     b->Crop = Util::PolygonMath::ToRectangle(targetBox);
                     b->Bitmap = dest;
                     b->Compositing = BitmapCompositingMode::Blend_with_self;
@@ -127,9 +127,9 @@ namespace ImageResizer{
                         delete renderer;
                     }
                     return RequestedAction::Cancel;
-					
+
 				}
-			public: 
+			public:
 				virtual ImageResizer::Plugins::IPlugin^ Install(ImageResizer::Configuration::Config^ c) override{
 					c->Plugins->add_plugin(this);
 					return this;
@@ -138,9 +138,9 @@ namespace ImageResizer{
 					c->Plugins->remove_plugin(this);
 					return true;
 				}
-             
+
 			};
-			
+
 		}
 	}
 }

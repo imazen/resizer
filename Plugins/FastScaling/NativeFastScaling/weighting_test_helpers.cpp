@@ -5,12 +5,15 @@
 
 #include <stdio.h>
 
-#include "fastscaling_private.h"
-
 #include <string.h>
+
+#include "fastscaling_private.h"
 
 
 #ifdef _MSC_VER
+
+
+#include <stdarg.h>
 
 #define snprintf c99_snprintf
 
@@ -62,7 +65,7 @@ bool test_contrib_windows(char *msg)
 
         if (bad != -1)
         {
-         
+
             snprintf(msg, 255, "at 6->3 invalid value (%d; %d) at %d, expected (%d; %d)",
                 lct->ContribRow[bad].Left,
                 lct->ContribRow[bad].Right,

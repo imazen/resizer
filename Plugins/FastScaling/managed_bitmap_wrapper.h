@@ -5,7 +5,7 @@
  * Licensed under the GNU Affero General Public License, Version 3.0.
  * Commercial licenses available at http://imageresizing.net/
  */
-#include "fastscaling_private"
+#include "fastscaling.h"
 #include "Stdafx.h"
 #include "ImageResizer.Plugins.FastScaling.h"
 #pragma once
@@ -23,6 +23,13 @@ using namespace System::Runtime::InteropServices;
 namespace ImageResizer{
     namespace Plugins{
         namespace FastScaling {
+
+            enum Rotate{
+                RotateNone = 0,
+                Rotate90 = 1,
+                Rotate180 = 2,
+                Rotate270 = 3
+            };
 
             public ref class BitmapOptions{
             public:
@@ -204,7 +211,7 @@ namespace ImageResizer{
 
                 property bool RequiresTransposeStep{
                     bool get(){
-                        return this->Rotation == Rotate::Rotate270 || this->Rotation == ::Rotate90;
+                        return this->Rotation == Rotate::Rotate270 || this->Rotation == Rotate::Rotate90;
                     }
                 }
                 property bool RequiresVerticalFlipStep{

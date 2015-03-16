@@ -6,8 +6,7 @@
 #include "stdafx.h"
 
 #include "fastscaling.h"
-#include "math_functions.h"
-#include "color_spaces.h"
+#include "color.h"
 #pragma managed
 
 using namespace System;

@@ -133,6 +133,7 @@
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).exe -d yes</Command>
+      <Message>Run native tests</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -154,6 +155,7 @@
     </Link>
     <PostBuildEvent>
       <Command>$(SolutionDir)$(Platform)\$(Configuration)\$(ProjectName).exe -d yes</Command>
+      <Message>Run native tests</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
