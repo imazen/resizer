@@ -6,9 +6,9 @@
  * Commercial licenses available at http://imageresizing.net/
  */
 
+
 #include "fastscaling_private.h"
-#include "bitmap_compositing.h"
-#include "fastscaling.h"
+#include <string.h>
 
 #ifdef _MSC_VER
 #pragma unmanaged

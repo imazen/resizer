@@ -5,15 +5,15 @@
 
 #include <stdio.h>
 
-#include "fastscaling.h"
-#include "weighting.h"
-#include "bitmap_compositing.h"
+#include "fastscaling_private.h"
+
+#include <string.h>
+
 
 #ifdef _MSC_VER
 
 #define snprintf c99_snprintf
 
-#include <stdarg.h>
 
 
 inline int c99_vsnprintf(char* str, size_t size, const char* format, va_list ap)

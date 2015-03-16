@@ -5,14 +5,13 @@
  * Licensed under the GNU Affero General Public License, Version 3.0.
  * Commercial licenses available at http://imageresizing.net/
  */
-#include "fastscaling_private"
-#include "sharpening.h"
-#pragma once
 
 #ifdef _MSC_VER
 #pragma unmanaged
 #endif
 
+#include "fastscaling_private.h"
+#include <string.h>
 
 
 
@@ -227,13 +226,13 @@ static int HalveInternal(const BitmapBgra * from,
 }
 
 // int as divisior???
-static int Halve(const BitmapBgra * from, const BitmapBgra * to, int divisor){
+int Halve(const BitmapBgra * from, const BitmapBgra * to, int divisor){
     return HalveInternal(from, to, to->w, to->h, to->stride, divisor);
 }
 
 
 // is it correct to use an int as the divisor here?
-static  int HalveInPlace(BitmapBgra * from, int divisor)
+int HalveInPlace(BitmapBgra * from, int divisor)
 {
     int to_w = from->w / divisor;
     int to_h = from->h / divisor;

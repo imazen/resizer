@@ -45,16 +45,16 @@ Rect detect_content(BitmapBgra * b, uint8_t threshold)
     //top half, center \/
     check_region(1, 0.5, 0.5, 0, 0.5, &info);
     //top half, right third
-    check_region(1, 0.677, 0.677, 0, 0.5, &info);
+    check_region(1, 0.677f, 0.677f, 0, 0.5, &info);
     //top half, left third.
-    check_region(1, 0.333, 0.333, 0, 0.5, &info);
+    check_region(1, 0.333f, 0.333f, 0, 0.5, &info);
 
     //bottom half, center \/
     check_region(3, 0.5, 0.5, 0.5, 1, &info);
     //bottom half, right third
-    check_region(3, 0.677, 0.677, 0.5, 1, &info);
+    check_region(3, 0.677f, 0.677f, 0.5, 1, &info);
     //bottom half, left third.
-    check_region(3, 0.333, 0.333, 0.5, 1, &info);
+    check_region(3, 0.333f, 0.333f, 0.5, 1, &info);
 
 
     //We should now have a good idea of where boundaries lie. However... if it seems that more than 25% is whitespace, we should do a different type of scan.
@@ -82,8 +82,9 @@ Rect detect_content(BitmapBgra * b, uint8_t threshold)
     result.x2 = info.max_x;
 
     ir_free(info.buf);
+    return result;
 }
-static int fill_buffer(SearchInfo* __restrict info){
+int fill_buffer(SearchInfo* __restrict info){
     /* Red: 0.299;
     Green: 0.587;
     Blue: 0.114;
@@ -133,7 +134,7 @@ static int fill_buffer(SearchInfo* __restrict info){
 
 
 
-void sobel_scharr_detect(SearchInfo* __restrict info, const int edgeTRBL)
+void sobel_scharr_detect(SearchInfo* __restrict info /*, int edgeTRBL */)
 {
     #define COEFFA = 3
     #define COEFFB = 10;
@@ -149,7 +150,7 @@ void sobel_scharr_detect(SearchInfo* __restrict info, const int edgeTRBL)
         for (uint32_t x = 1; x < x_end; x++){
             const int gx = -3 * buf[buf_ix - w - 1] + -10 * buf[buf_ix - 1] + -3 * buf[buf_ix + w - 1] + +3 * buf[buf_ix - w + 1] + 10 * buf[buf_ix + 1] +  3 * buf[buf_ix + w + 1];
             const int gy = 3 * buf[buf_ix - w - 1] + 10 * (buf[buf_ix - w]) + 3 * buf[buf_ix - w + 1] + -3 * buf[buf_ix + w - 1] + -10 * (buf[buf_ix + w]) + -3 * buf[buf_ix + w + 1];
-            const int value = abs(gx) + abs(gy);
+            const size_t value = abs(gx) + abs(gy);
             if (value > threshold){
                 const uint32_t x1 = info->buf_x + x - 1;
                 const uint32_t x2 = info->buf_x + x + 1;
@@ -182,11 +183,11 @@ void sobel_scharr_detect(SearchInfo* __restrict info, const int edgeTRBL)
 
 void check_region(const int edgeTRBL, const float x_1_percent, const  float x_2_percent, const float y_1_percent, const  float y_2_percent, SearchInfo* __restrict info)
 {
-    uint32_t x1 = MAX(0, MIN(info->w, floor(x_1_percent * (float)info->w) - 1));
-    uint32_t x2 = MAX(0, MIN(info->w, ceil(x_2_percent * (float)info->w) + 1));
+    uint32_t x1 = (uint32_t) MAX(0, MIN(info->w, floor(x_1_percent * (float)info->w) - 1));
+    uint32_t x2 = (uint32_t) MAX(0, MIN(info->w, ceil(x_2_percent * (float)info->w) + 1));
 
-    uint32_t y1 = MAX(0, MIN(info->h, floor(y_1_percent * (float)info->h) - 1));
-    uint32_t y2 = MAX(0, MIN(info->h, ceil(y_2_percent * (float)info->h) + 1));
+    uint32_t y1 = (uint32_t) MAX(0, MIN(info->h, floor(y_1_percent * (float)info->h) - 1));
+    uint32_t y2 = (uint32_t) MAX(0, MIN(info->h, ceil(y_2_percent * (float)info->h) + 1));
 
     //Snap the boundary depending on which side we're searching
     if (edgeTRBL == 4) {
@@ -240,8 +241,8 @@ void check_region(const int edgeTRBL, const float x_1_percent, const  float x_2_
             info->buf_x = x1 + (window_width * window_column);
             info->buf_y = y1 + (window_height * window_row);
 
-            info->buf_w = MIN(3, x2 - info->buf_x, window_width);
-            info->buf_h = MIN(3, y2 - info->buf_y, window_height);
+            info->buf_w = MIN3(3, x2 - info->buf_x, window_width);
+            info->buf_h = MIN3(3, y2 - info->buf_y, window_height);
             uint32_t buf_x2 = info->buf_x + info->buf_w;
             uint32_t buf_y2 = info->buf_y + info->buf_h;
 
@@ -277,7 +278,7 @@ void check_region(const int edgeTRBL, const float x_1_percent, const  float x_2_
             }
 
             fill_buffer(info);
-            sobel_scharr_detect(info, edgeTRBL);
+            sobel_scharr_detect(info /*, edgeTRBL*/);
         }
     }
 }

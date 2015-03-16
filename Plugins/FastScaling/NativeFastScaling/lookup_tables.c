@@ -1,6 +1,5 @@
-#include "fastscaling.h"
+#include "fastscaling_private.h"
 #include "ir_alloc.h"
-#include "color_spaces.h"
 #include <stdlib.h>
 
 static LookupTables * table = NULL;

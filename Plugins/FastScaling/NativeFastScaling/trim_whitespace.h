@@ -5,12 +5,13 @@
  * Licensed under the GNU Affero General Public License, Version 3.0.
  * Commercial licenses available at http://imageresizing.net/
  */
-#include "fastscaling_private"
 #pragma once
 
 #ifdef _MSC_VER
 #pragma unmanaged
 #endif
+
+#include "fastscaling_private.h"
 
 
 typedef struct RectStruct {
@@ -37,8 +38,8 @@ extern "C" {
 
 Rect detect_content(BitmapBgra * b, uint8_t threshold);
 int fill_buffer(SearchInfo * __restrict info);
-void sobel_scharr_detect(SearchInfo* __restrict info, const int edgeTRBL);
-void check_region(const int edgeTRBL, const float x_1_percent, const  float x_2_percent, const float y_1_percent, const  float y_2_percent, SearchInfo* __restrict info);
+void sobel_scharr_detect(SearchInfo* __restrict info /*, int edgeTRBL*/);
+void check_region(int edgeTRBL, float x_1_percent, float x_2_percent, float y_1_percent, float y_2_percent, SearchInfo* __restrict info);
 
 
 #ifdef __cplusplus

@@ -11,15 +11,7 @@
 #endif
 
 
-#include "fastscaling_private"
-#include "weighting.h"
-#include "halving.h"
-#include "scaling.h"
-#include "convolution.h"
-#include "sharpening.h"
-#include "bitmap_compositing.h"
-#include "fastscaling.h"
-
+#include "fastscaling_private.h"
 
 
 typedef struct RendererStruct {

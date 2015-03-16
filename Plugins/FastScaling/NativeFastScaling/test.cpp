@@ -1,9 +1,7 @@
 #include "catch.hpp"
 
-#include "fastscaling.h"
+#include "fastscaling_private.h"
 #include "bitmap_formats.h"
-#include "bitmap_compositing.h"
-#include "scaling.h"
 #include "weighting_test_helpers.h"
 
 bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bool flipx, bool flipy, bool profile, InterpolationFilter filter)

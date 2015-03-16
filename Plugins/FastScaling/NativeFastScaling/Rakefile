@@ -9,7 +9,16 @@ task :default => "fastscaling"
 %w{ test_program fastscaling libfastscaling.so }.each { |file| CLOBBER.include(file) if File.exists?(file) }
 
 
-OBJECTS=%w{ bitmap_compositing.o bitmap_formats.o lookup_tables.o color_matrix.o weighting.o unmanaged_renderer.o convolution.o trim_whitespace.o }
+OBJECTS=%w{
+bitmap_formats.o
+compositing.o
+convolution.o
+lookup_tables.o
+renderer.o
+scaling.o
+trim_whitespace.o
+weighting.o 
+}
 SO_FILE="libfastscaling.so"
 
 
@@ -38,12 +47,20 @@ def with_ld_library_path(ld_library_path, &block)
   end
 end
 
-desc "run with valgrind"
-task :valgrind => PROFILING_PROGRAM do |t|
-  with_ld_library_path('.') do 
-    sh "valgrind #{VALGRIND_OPTS} --leak-check=full --show-leak-kinds=all ./#{t.prerequisites.first}"
+
+def valgrind_task(valgrind_params_string, name_and_dependencies)
+  task name_and_dependencies do |t|
+    with_ld_library_path('.') do 
+      sh "valgrind #{VALGRIND_OPTS} #{valgrind_params_string} ./#{t.prerequisites.first}"
+    end
   end
 end
+
+desc "run with valgrind"
+valgrind_task("--leak-check=full --show-leak-kinds=all", :valgrind => PROFILING_PROGRAM)
+
+desc "run with callgrind"
+valgrind_task("--tool=callgrind --dump-instr=yes --cache-sim=yes --branch-sim=yes", :callgrind => PROFILING_PROGRAM)
 
 desc "run with cachegrind"
 task :cachegrind => PROFILING_PROGRAM do |t|
@@ -53,14 +70,6 @@ task :cachegrind => PROFILING_PROGRAM do |t|
   end
   sh "cg_annotate #{cachegrind_out_file}"
 end
-
-desc "run with callgrind"
-task :callgrind => PROFILING_PROGRAM do |t|
-  with_ld_library_path('.') do
-    sh "valgrind #{VALGRIND_OPTS} --tool=callgrind --dump-instr=yes --cache-sim=yes --branch-sim=yes ./#{t.prerequisites.first}"
-  end
-end
-  
 
 desc "build the test program"
 file TEST_PROGRAM => ["test.o", "test_helpers.o", "weighting_test_helpers.o"] + OBJECTS do |t|
@@ -72,6 +81,9 @@ task :test => "test_program" do
     sh "./#{TEST_PROGRAM}"
   end
 end
+
+desc "Run the test program with valgrind"
+valgrind_task("--leak-check=full --show-leak-kinds=all", :test_with_valgrind => TEST_PROGRAM)
 
 desc "runs each test case sequentially in a separate process"
 task :test_each_case_in_separate_process => "test_program" do
