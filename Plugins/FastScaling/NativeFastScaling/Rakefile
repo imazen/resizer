@@ -39,7 +39,7 @@ def with_ld_library_path(ld_library_path, &block)
 end
 
 desc "run with valgrind"
-task :valgrind => PROFILING_PROGRAM do
+task :valgrind => PROFILING_PROGRAM do |t|
   with_ld_library_path('.') do 
     sh "valgrind #{VALGRIND_OPTS} --leak-check=full --show-leak-kinds=all ./#{t.prerequisites.first}"
   end
