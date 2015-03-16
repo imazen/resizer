@@ -28,7 +28,9 @@ void ScaleBgraFloatRows(BitmapFloat * from, uint32_t from_row, BitmapFloat * to,
     const uint32_t from_step = from->channels;
     const uint32_t to_step = to->channels;
     const uint32_t dest_buffer_count = to->w;
-
+    const uint32_t min_channels = MIN(from_step, to_step);
+    //TODO: assert min_channels < 5
+    float avg[4];
 
 
     for (uint32_t row = 0; row < row_count; row++)
@@ -91,7 +93,10 @@ void ScaleBgraFloatRows(BitmapFloat * from, uint32_t from_row, BitmapFloat * to,
         }
         else{
             const uint32_t min_channels = MIN(from_step, to_step);
-            float* avg = (float*)alloca(min_channels * sizeof(float));
+            avg[0] = 0;
+            avg[1] = 0;
+            avg[2] = 0;
+            avg[3] = 0;
             for (ndx = 0; ndx < dest_buffer_count; ndx++) {
                 const int left = weights[ndx].Left;
                 const int right = weights[ndx].Right;

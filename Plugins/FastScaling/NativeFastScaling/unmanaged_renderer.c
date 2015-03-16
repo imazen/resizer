@@ -36,6 +36,7 @@ typedef struct RendererStruct {
 InterpolationDetails* create_interpolation_details()
 {
     InterpolationDetails* d = (InterpolationDetails*)calloc(1, sizeof(InterpolationDetails));
+    if (d == NULL) return NULL;
     d->blur = 1;
     d->window = 2;
     d->p1 = d->q1 = 0;
@@ -47,6 +48,7 @@ InterpolationDetails* create_interpolation_details()
 RenderDetails * create_render_details()
 {
     RenderDetails * d = (RenderDetails *)calloc(1, sizeof(RenderDetails));
+    if (d == NULL) return NULL;
     for (int i = 0; i < 5; i++) {
         d->color_matrix[i] = &(d->color_matrix_data[i * 5]);
     }
@@ -113,6 +115,7 @@ static Renderer * create_rendererInPlace(BitmapBgra * editInPlace, RenderDetails
 {
     if (details->post_transpose) return NULL; //We can't transpose in place.
     Renderer * r = (Renderer *)calloc(1, sizeof(Renderer));
+    if (r == NULL) return NULL;
     r->source = editInPlace;
     r->destroy_source = false;
     r->details = details;
@@ -122,6 +125,7 @@ static Renderer * create_rendererInPlace(BitmapBgra * editInPlace, RenderDetails
 Renderer * create_renderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details)
 {
     Renderer * r = (Renderer *)calloc(1, sizeof(Renderer));
+    if (r == NULL) return NULL;
     r->source = source;
     r->canvas = canvas;
     r->destroy_source = false;
