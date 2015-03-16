@@ -67,7 +67,7 @@ namespace ImageResizer{
                         to->interpolation = nullptr;
                     }
 
-                    to->interpolation = CreateInterpolation(from->Filter);
+                    to->interpolation = create_interpolation(from->Filter);
                     if (to->interpolation == nullptr) throw gcnew ArgumentOutOfRangeException("Invalid filter value");
                     to->interpolation->blur *= from->SamplingBlurFactor;
                     if (from->SamplingWindowOverride != 0) {

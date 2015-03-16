@@ -127,7 +127,7 @@ namespace ImageResizer{
               static WeightingFilter^ CreateIfValid(InterpolationFilter filter);
 
               WeightingFilter(InterpolationFilter f){
-                details = CreateInterpolation(f);
+                details = create_interpolation(f);
                 window = details->window;
                 if (details == nullptr) throw gcnew ArgumentOutOfRangeException("f");
               }
@@ -146,7 +146,7 @@ namespace ImageResizer{
             };
 
              WeightingFilter^ WeightingFilter::CreateIfValid(InterpolationFilter filter){
-              InterpolationDetails* d = CreateInterpolation(filter);
+              InterpolationDetails* d = create_interpolation(filter);
               if (d == nullptr) return nullptr;
               WeightingFilter^ f = gcnew WeightingFilter();
               f->details = d;
