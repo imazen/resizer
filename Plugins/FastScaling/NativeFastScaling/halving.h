@@ -12,6 +12,10 @@
 #pragma unmanaged
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static inline void HalveRowByDivisor(const unsigned char* from, unsigned short * to, const unsigned int to_count, const int divisor, const int from_step, const int to_step){
     int to_b, from_b;
     const int to_bytes = to_count * to_step;
@@ -132,4 +136,7 @@ static  int HalveInPlace(BitmapBgra * from, int divisor)
     return r;
 }
 
+#ifdef __cplusplus
+}
+#endif
 

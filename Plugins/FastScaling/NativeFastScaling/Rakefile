@@ -9,7 +9,7 @@ task :default => "fastscaling"
 %w{ test_program fastscaling libfastscaling.so }.each { |file| CLOBBER.include(file) if File.exists?(file) }
 
 
-OBJECTS=%w{ bitmap_compositing.o bitmap_formats.o lookup_tables.o color_matrix.o weighting.o unmanaged_renderer.o convolution.o }
+OBJECTS=%w{ bitmap_compositing.o bitmap_formats.o lookup_tables.o color_matrix.o weighting.o unmanaged_renderer.o convolution.o trim_whitespace.o }
 SO_FILE="libfastscaling.so"
 
 

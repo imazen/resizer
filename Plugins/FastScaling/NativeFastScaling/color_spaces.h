@@ -12,6 +12,10 @@
 #pragma unmanaged
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static inline float
 linear_to_srgb(float clr) {
     // Gamma correction
@@ -159,6 +163,7 @@ static int luv_to_linear_rows(BitmapFloat * bit, const uint32_t start_row, const
     return 0;
 }
 
-
-
+#ifdef __cplusplus
+}
+#endif
 

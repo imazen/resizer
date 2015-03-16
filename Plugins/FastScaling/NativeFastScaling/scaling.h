@@ -14,5 +14,13 @@
 #endif
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void ScaleBgraFloatRows(BitmapFloat * from, uint32_t from_row, BitmapFloat * to, uint32_t to_row, uint32_t row_count, ContributionType * weights);
+
+#ifdef __cplusplus
+}
+#endif
+

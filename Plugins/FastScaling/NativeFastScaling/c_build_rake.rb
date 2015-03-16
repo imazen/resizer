@@ -19,10 +19,9 @@ CC = MACOS && cc == "gcc" ? "gcc-4.9" : cc;
 
 VALGRIND_OPTS =  MACOS ? "--dsymutil=yes" : ""
 
+TRAVIS_USAFE_FLAGS = " -Wfloat-conversion "
 
 COMMON_FLAGS=" -fPIC -O2 -g -Wpointer-arith -Wcast-qual -Wpedantic -Wall -Wextra -Wuninitialized -Wno-unused-function -Wno-return-type -Wredundant-decls -Werror"
-
-TRAVIS_USAFE_FLAGS = " -Wfloat-conversion "
 
 CFLAGS="#{COMMON_FLAGS} #{ENV['CI'] ? '' : TRAVIS_USAFE_FLAGS} -std=c11 -Wstrict-prototypes -Wmissing-prototypes -Wc++-compat -Wshadow"
 
