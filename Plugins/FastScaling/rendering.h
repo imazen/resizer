@@ -78,11 +78,11 @@ namespace ImageResizer{
 
                 }
 
-                
+
                 ~ManagedRenderer(){
                     if (p != nullptr) p->Start("Renderer: dispose", false);
-                    DestroyRenderer(r);
-                    
+                    destroy_renderer(r);
+
                     if (wbSource != nullptr){
                         delete wbSource;
                         wbSource = nullptr;
@@ -91,7 +91,7 @@ namespace ImageResizer{
                         delete wbCanvas;
                         wbCanvas = nullptr;
                     }
-                    
+
                     if (p != nullptr) p->Stop("Renderer: dispose", true, false);
                 }
                 Renderer* r;
@@ -106,12 +106,12 @@ namespace ImageResizer{
                 ManagedRenderer(BitmapOptions^ editInPlace, RenderOptions^ opts, IProfiler^ p){
                     this->p = p;
                     originalOptions = opts;
-                    
+
 
                     if (opts->RequiresTransposeStep) throw gcnew ArgumentException("Cannot transpose image in place.");
 
 
-                    RenderDetails* details = CreateRenderDetails();
+                    RenderDetails* details = create_render_details();
                     CopyBasics(opts, details);
                     p->Start("SysDrawingToBgra", false);
                     wbSource = gcnew WrappedBitmap(editInPlace);
@@ -123,19 +123,19 @@ namespace ImageResizer{
 
                     this->p = p;
                     originalOptions = opts;
-                    RenderDetails* details = CreateRenderDetails();
+                    RenderDetails* details = create_render_details();
                     CopyBasics(opts, details);
                     p->Start("SysDrawingToBgra", false);
                     wbSource = gcnew WrappedBitmap(source);
                     wbCanvas = gcnew WrappedBitmap(canvas);
                     p->Stop("SysDrawingToBgra", true, false);
 
-                    r = CreateRenderer(wbSource->bgra,wbCanvas->bgra, details);
+                    r = create_renderer(wbSource->bgra,wbCanvas->bgra, details);
                 }
 
 
                 void Render(){
-                    PerformRender(r);
+                    perform_render(r);
                 }
 
             };

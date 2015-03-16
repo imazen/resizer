@@ -36,14 +36,14 @@ namespace ImageResizer{
             };
 
             public ref class WrappedBitmap{
-            public: 
+            public:
                 BitmapOptions^ options;
-                Bitmap^ underlying_bitmap; 
-                BitmapData^ locked_bitmap_data; 
+                Bitmap^ underlying_bitmap;
+                BitmapData^ locked_bitmap_data;
                 BitmapBgra* bgra;
                 Rectangle crop_window;
 
-            public: 
+            public:
                 WrappedBitmap(BitmapOptions^ opts)
                 {
 
@@ -62,7 +62,7 @@ namespace ImageResizer{
                     int sx = from.Width;
                     int sy = from.Height;
 
-                    BitmapBgra* im = CreateBitmapBgraHeader(sx, sy);
+                    BitmapBgra* im = create_bitmap_bgra_header(sx, sy);
                     if (im == NULL) throw gcnew InvalidOperationException("Failed to create Bgra Header");
 
                     this->underlying_bitmap = source;
@@ -97,7 +97,7 @@ namespace ImageResizer{
 
                     this->underlying_bitmap = source;
                     this->bgra = im;
-                    
+
                 }
 
                 ~WrappedBitmap(){
@@ -112,11 +112,11 @@ namespace ImageResizer{
                     }
 
                 }
-                
+
             };
 
 
-           
+
             public ref class WeightingFilter{
 
             private:
@@ -162,7 +162,7 @@ namespace ImageResizer{
                     SamplingBlurFactor = 1;
                     SharpeningPercentGoal = 0;
                     MinSamplingWindowToIntegrateSharpening = 1.5;
-                 
+
                     InterpolateLastPercent = 3;
                     HalveOnlyWhenPerfect = true;
                     ConvolutionA_MaxChangeThreshold = 0;
@@ -180,7 +180,7 @@ namespace ImageResizer{
 
                 property float SharpeningPercentGoal;
                 property float MinSamplingWindowToIntegrateSharpening;
-           
+
                 property array<array<float, 1>^, 1>^ ColorMatrix;
 
                 // If possible to do correctly, halve the image until it is [halve_until] times larger than needed. 3 or greater reccomended. Specify -1 to disable halving.

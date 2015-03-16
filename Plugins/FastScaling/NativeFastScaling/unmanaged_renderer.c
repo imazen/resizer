@@ -68,9 +68,9 @@ static void DestroyRenderDetails(RenderDetails * d){
 }
 
 
-             
 
-static int DetermineDivisor(Renderer * r) 
+
+static int DetermineDivisor(Renderer * r)
 {
     if (r->canvas == NULL) return 0;
 
@@ -106,12 +106,12 @@ void destroy_renderer(Renderer * r)
         DestroyRenderDetails(r->details);
         r->details = NULL;
     }
-    free(r);              
+    free(r);
 }
 
 static Renderer * create_rendererInPlace(BitmapBgra * editInPlace, RenderDetails * details)
 {
-    if (details->post_transpose) return NULL; //We can't transpose in place. 
+    if (details->post_transpose) return NULL; //We can't transpose in place.
     Renderer * r = (Renderer *)calloc(1, sizeof(Renderer));
     r->source = editInPlace;
     r->destroy_source = false;
@@ -128,9 +128,9 @@ Renderer * create_renderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetai
     r->details = details;
     return r;
 }
-    
-  
-static void SimpleRenderInPlace(void) 
+
+
+static void SimpleRenderInPlace(void)
 {
     //against source:
 
@@ -211,7 +211,7 @@ static void ApplyColorMatrix(const Renderer * r, BitmapFloat * img, const uint32
 
 
 
-static int ScaleAndRender1D(const Renderer * r, 
+static int ScaleAndRender1D(const Renderer * r,
     BitmapBgra * pSrc,
     BitmapBgra * pDst,
     const RenderDetails * details,
@@ -233,7 +233,7 @@ static int ScaleAndRender1D(const Renderer * r,
 
 
     //How many rows to buffer and process at a time.
-    const uint32_t buffer_row_count = 4; //using buffer=5 seems about 6% better than most other non-zero values. 
+    const uint32_t buffer_row_count = 4; //using buffer=5 seems about 6% better than most other non-zero values.
 
     //How many bytes per pixel are we scaling?
     uint32_t scaling_bpp = (pSrc->bpp == 4 && !pSrc->alpha_meaningful) ? 3 : pSrc->bpp;
@@ -241,7 +241,7 @@ static int ScaleAndRender1D(const Renderer * r,
 
 
     //p->Start("ContributionsCalc", false);
-    
+
     contrib = ContributionsCalc(to_count, from_count, details->interpolation);  /*Handle errors */ if (contrib == NULL) { return_code = -1; goto cleanup; }
     //p->Stop("ContributionsCalc", true, false);
 
@@ -249,7 +249,7 @@ static int ScaleAndRender1D(const Renderer * r,
     //p->Start("CreateBitmapFloat (buffers)", false);
 
     source_buf = CreateBitmapFloat(from_count, buffer_row_count, scaling_bpp, false); /*Handle errors */  if (source_buf == NULL)  { return_code = -1; goto cleanup; }
-    
+
     dest_buf = CreateBitmapFloat(to_count, buffer_row_count, scaling_bpp, false);  /*Handle errors */   if (source_buf == NULL)  { return_code = -1; goto cleanup; }
     source_buf->alpha_meaningful = pSrc->alpha_meaningful;
     dest_buf->alpha_meaningful = source_buf->alpha_meaningful;
@@ -305,7 +305,7 @@ cleanup:
 
 
 
-static int Render1D(const Renderer * r, 
+static int Render1D(const Renderer * r,
     BitmapBgra * pSrc,
     BitmapBgra * pDst,
     const RenderDetails * details,
@@ -316,7 +316,7 @@ static int Render1D(const Renderer * r,
     int return_code = 0;
 
     //How many rows to buffer and process at a time.
-    uint32_t buffer_row_count = 4; //using buffer=5 seems about 6% better than most other non-zero values. 
+    uint32_t buffer_row_count = 4; //using buffer=5 seems about 6% better than most other non-zero values.
 
     //How many bytes per pixel are we scaling?
     uint32_t scaling_bpp = (pSrc->bpp == 4 && !pSrc->alpha_meaningful) ? 3 : pSrc->bpp;
@@ -354,7 +354,7 @@ cleanup:
 
 
 static int RenderWrapper1D(
-    const Renderer * r, 
+    const Renderer * r,
     BitmapBgra * pSrc,
     BitmapBgra * pDst,
     const RenderDetails * details,
@@ -377,7 +377,7 @@ static int RenderWrapper1D(
     //}
 }
 
-int perform_render(Renderer * r) 
+int perform_render(Renderer * r)
 {
     CompleteHalving(r);
     bool skip_last_transpose = r->details->post_transpose;
@@ -388,7 +388,7 @@ int perform_render(Renderer * r)
     bool scaling_required = (r->canvas != NULL) && (r->details->post_transpose ? (r->canvas->w != r->source->h || r->canvas->h != r->source->w) :
         (r->canvas->h != r->source->h || r->canvas->w != r->source->w));
 
-    
+
     bool someTranspositionRequired = r->details->sharpen_percent_goal > 0 ||
         skip_last_transpose ||
         r->details->kernel_a_radius > 0 ||
@@ -396,7 +396,7 @@ int perform_render(Renderer * r)
         scaling_required;
 
     if (!someTranspositionRequired && canvas == NULL){
-        SimpleRenderInPlace(); 
+        SimpleRenderInPlace();
           p->Stop("Render", true, false);
         return; //Nothing left to do here.
     }
@@ -456,6 +456,7 @@ int perform_render(Renderer * r)
     //p->Stop("Render", true, false);
     //GC::KeepAlive(wbSource);
     //GC::KeepAlive(wbCanvas);
+    return 0; // is this correct?
 }
 
 InterpolationDetails * CreateInterpolation(InterpolationFilter filter)
@@ -469,10 +470,10 @@ InterpolationDetails * CreateInterpolation(InterpolationFilter filter)
         case Filter_Lanczos3: //Note - not a 3 lobed function - truncated to 2
             return CreateCustom(3, 1, filter_sinc_2);
         case Filter_Lanczos2Sharp:
-            return CreateCustom(2, 0.9549963639785485, filter_sinc_2); 
+            return CreateCustom(2, 0.9549963639785485, filter_sinc_2);
         case Filter_Lanczos3Sharp://Note - not a 3 lobed function - truncated to 2
             return CreateCustom(3, 0.9812505644269356, filter_sinc_2);
-        
+
         //Hermite and BSpline no negative weights
         case Filter_CubicBSpline:
             return CreateBicubicCustom(2, 1, 1, 0);
@@ -486,7 +487,7 @@ InterpolationDetails * CreateInterpolation(InterpolationFilter filter)
         case Filter_Lanczos3SharpWindowed:
             return CreateCustom(3, 0.9812505644269356, filter_sinc_windowed);
 
-           
+
         case Filter_CubicFast:
             return CreateCustom(1, 1, filter_bicubic_fast);
         case Filter_Cubic:
