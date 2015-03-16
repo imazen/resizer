@@ -137,7 +137,7 @@
     <ClCompile Include="bitmap_compositing.c" />
     <ClCompile Include="bitmap_formats.c" />
     <ClCompile Include="color_matrix.c" />
-    <ClCompile Include="fastscaling.c" />
+    <ClCompile Include="convolution.c" />
     <ClCompile Include="lookup_tables.c" />
     <ClCompile Include="unmanaged_renderer.c" />
     <ClCompile Include="weighting.c" />

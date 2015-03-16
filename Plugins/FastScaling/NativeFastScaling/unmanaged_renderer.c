@@ -44,7 +44,7 @@ InterpolationDetails* CreateInterpolationDetails()
     return d;
 }
 
-RenderDetails * CreateRenderDetails()
+RenderDetails * create_render_details()
 {
     RenderDetails * d = (RenderDetails *)calloc(1, sizeof(RenderDetails));
     for (int i = 0; i < 5; i++) {
@@ -93,7 +93,7 @@ static int DetermineDivisor(Renderer * r)
 }
 
 
-void DestroyRenderer(Renderer * r)
+void destroy_renderer(Renderer * r)
 {
     if (r->destroy_source) {
         DestroyBitmapBgra(r->source);
@@ -109,7 +109,7 @@ void DestroyRenderer(Renderer * r)
     free(r);              
 }
 
-static Renderer * CreateRendererInPlace(BitmapBgra * editInPlace, RenderDetails * details)
+static Renderer * create_rendererInPlace(BitmapBgra * editInPlace, RenderDetails * details)
 {
     if (details->post_transpose) return NULL; //We can't transpose in place. 
     Renderer * r = (Renderer *)calloc(1, sizeof(Renderer));
@@ -119,7 +119,7 @@ static Renderer * CreateRendererInPlace(BitmapBgra * editInPlace, RenderDetails 
     return r;
 }
 
-Renderer * CreateRenderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details)
+Renderer * create_renderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details)
 {
     Renderer * r = (Renderer *)calloc(1, sizeof(Renderer));
     r->source = source;
@@ -143,12 +143,12 @@ static void SimpleRenderInPlace(void)
 
 static int CompleteHalving(Renderer * r)
 {
-    double divisor = r->details->halving_divisor;
+    int divisor = r->details->halving_divisor;
     if (divisor <= 1){
         return 0;
     }
-    int halved_width = r->source->w / divisor;
-    int halved_height = r->source->h / divisor;
+    int halved_width = (int)(r->source->w / divisor);
+    int halved_height = (int)(r->source->h / divisor);
 
     //p->Start("CompleteHalving", false);
     r->details->halving_divisor = 0; //Don't halve twice
@@ -159,7 +159,7 @@ static int CompleteHalving(Renderer * r)
     }
     else {
         //p->Start("create temp image for halving", false);
-        BitmapBgra * tmp_im = CreateBitmapBgra(halved_width, halved_height, true, r->source->bpp);
+        BitmapBgra * tmp_im = create_bitmap_bgra(halved_width, halved_height, true, r->source->bpp);
         if (tmp_im == NULL) return -102;
         //p->Stop("create temp image for halving", true, false);
 
@@ -377,7 +377,7 @@ static int RenderWrapper1D(
     //}
 }
 
-int PerformRender(Renderer * r) 
+int perform_render(Renderer * r) 
 {
     CompleteHalving(r);
     bool skip_last_transpose = r->details->post_transpose;
@@ -414,7 +414,7 @@ int PerformRender(Renderer * r)
     //p->Start("allocate temp image(sy x dx)", false);
 
     /* Scale horizontally  */
-    r->transposed = CreateBitmapBgra(r->source->h, r->canvas == NULL ? r->source->w : (skip_last_transpose ? r->canvas->h : r->canvas->w), false, r->source->bpp);
+    r->transposed = create_bitmap_bgra(r->source->h, r->canvas == NULL ? r->source->w : (skip_last_transpose ? r->canvas->h : r->canvas->w), false, r->source->bpp);
     if (r->transposed == NULL) { return -2;  }
     r->transposed->compositing_mode = Replace_self;
     //p->Stop("allocate temp image(sy x dx)", true, false);

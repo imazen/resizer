@@ -24,9 +24,6 @@
     <ClCompile Include="color_matrix.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fastscaling.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="lookup_tables.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -34,6 +31,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="weighting.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="convolution.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

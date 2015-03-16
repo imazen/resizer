@@ -15,7 +15,7 @@
 #endif
 
 
-int convert_srgb_to_linear(BitmapBgra * src, uint32_t from_row, BitmapFloat * dest, uint32_t dest_row, uint32_t row_count) 
+int convert_srgb_to_linear(BitmapBgra * src, uint32_t from_row, BitmapFloat * dest, uint32_t dest_row, uint32_t row_count)
 {
 
     if (src->w != dest->w || src->bpp < dest->channels) return -1;
@@ -32,7 +32,7 @@ int convert_srgb_to_linear(BitmapBgra * src, uint32_t from_row, BitmapFloat * de
     {
         //const   uint8_t*  __restrict  src_start = src->pixels + (from_row + row)*src->stride;
            uint8_t*    src_start = src->pixels + (from_row + row)*src->stride;
-        
+
         float* buf = dest->pixels + (dest->float_stride * (row + dest_row));
         if (copy_step == 3)
         {
@@ -51,7 +51,7 @@ int convert_srgb_to_linear(BitmapBgra * src, uint32_t from_row, BitmapFloat * de
                     buf[to_x] =     alpha * t->srgb_to_linear[src_start[bix]];
                     buf[to_x + 1] = alpha * t->srgb_to_linear[src_start[bix + 1]];
                     buf[to_x + 2] = alpha * t->srgb_to_linear[src_start[bix + 2]];
-                    buf[to_x + 3] = alpha; 
+                    buf[to_x + 3] = alpha;
                 }
             }
             //We're only working on a portion... dest->alpha_premultiplied = true;
@@ -59,7 +59,7 @@ int convert_srgb_to_linear(BitmapBgra * src, uint32_t from_row, BitmapFloat * de
         else{
             return -1;
         }
-        
+
     }
     return 0;
 }
@@ -120,7 +120,7 @@ static int blend_matte(BitmapFloat * src, const uint32_t from_row, const uint32_
     const float b = t->srgb_to_linear[matte[0]];
     const float g = t->srgb_to_linear[matte[1]];
     const float r = t->srgb_to_linear[matte[2]];
-    
+
 
 
     for (uint32_t row = from_row; row < from_row + row_count; row++){
@@ -129,7 +129,7 @@ static int blend_matte(BitmapFloat * src, const uint32_t from_row, const uint32_
 
         for (uint32_t ix = start_ix; ix < end_ix; ix += 4){
             const float src_a = src->pixels[ix + 3];
-            const float a = (1.0 - src_a) * matte_a;
+            const float a = (1.0f - src_a) * matte_a;
             const float final_alpha = src_a + a;
 
             src->pixels[ix] = (src->pixels[ix] + b * a) / final_alpha;
@@ -176,7 +176,7 @@ void copy_linear_over_srgb(BitmapFloat * src, const uint32_t from_row, BitmapBgr
     for (uint32_t row = 0; row < row_count; row++){
         //const float * const __restrict src_row = src->pixels + (row + from_row) * src->float_stride;
         float * src_row = src->pixels + (row + from_row) * src->float_stride;
-        
+
         uint8_t * dest_row_bytes = dest->pixels + (dest_row + row) * dest_row_stride + (from_col * dest_pixel_stride);
 
         for (uint32_t ix = from_col * ch; ix < srcitems; ix += ch){
@@ -207,7 +207,7 @@ static void compose_linear_over_srgb(BitmapFloat * src, const uint32_t from_row,
     const bool dest_alpha = dest->bpp == 4 && dest->alpha_meaningful;
 
     const uint8_t dest_alpha_index = dest_alpha ? 3 : 0;
-    const float dest_alpha_to_float_coeff = dest_alpha ? 1.0 / 255.0 : 0.0;
+    const float dest_alpha_to_float_coeff = dest_alpha ? 1.0f / 255.0f : 0.0f;
     const float dest_alpha_to_float_offset = dest_alpha ? 0 : 1;
     for (uint32_t row = 0; row < row_count; row++){
         //const float * const __restrict src_row = src->pixels + (row + from_row) * src->float_stride;
@@ -215,7 +215,7 @@ static void compose_linear_over_srgb(BitmapFloat * src, const uint32_t from_row,
 
         uint8_t * dest_row_bytes = dest->pixels + (dest_row + row) * dest_row_stride + (from_col * dest_pixel_stride);
 
-        for (uint32_t ix = from_col * ch; ix < srcitems; ix += ch){ 
+        for (uint32_t ix = from_col * ch; ix < srcitems; ix += ch){
 
             const uint8_t dest_b = dest_row_bytes[0];
             const uint8_t dest_g = dest_row_bytes[1];
@@ -227,11 +227,11 @@ static void compose_linear_over_srgb(BitmapFloat * src, const uint32_t from_row,
             const float src_r = src_row[ix + 2];
             const float src_a = src_row[ix + 3];
             const float a = (1.0f - src_a) * (dest_alpha_to_float_coeff * dest_a + dest_alpha_to_float_offset);
-            
+
             const float b = t->srgb_to_linear[dest_b] * a + src_b;
             const float g = t->srgb_to_linear[dest_g] * a + src_g;
             const float r = t->srgb_to_linear[dest_r] * a + src_r;
-            
+
             const float final_alpha = src_a + a;
 
             dest_row_bytes[0] = uchar_clamp_ff(linear_to_srgb(b / final_alpha));
@@ -249,11 +249,11 @@ static void compose_linear_over_srgb(BitmapFloat * src, const uint32_t from_row,
 
 
 
-int pivoting_composite_linear_over_srgb(BitmapFloat * src, uint32_t from_row, BitmapBgra * dest, uint32_t dest_row, uint32_t row_count, bool transpose) 
+int pivoting_composite_linear_over_srgb(BitmapFloat * src, uint32_t from_row, BitmapBgra * dest, uint32_t dest_row, uint32_t row_count, bool transpose)
 {
     if (transpose ? src->w != dest->h : src->w != dest->w) return -1; //Add more bounds checks
 
-    
+
     if (src->alpha_meaningful && src->channels == 4 && dest->compositing_mode == Blend_with_matte){
         if (blend_matte(src, from_row, row_count, dest->matte_color)){
             return -9;
@@ -264,20 +264,20 @@ int pivoting_composite_linear_over_srgb(BitmapFloat * src, uint32_t from_row, Bi
         //Demultiply
         demultiply_alpha(src, from_row, row_count);
     }
-    
+
     bool can_compose = dest->compositing_mode == Blend_with_self && src->alpha_meaningful && src->channels == 4;
-    
+
     if (can_compose && !src->alpha_premultiplied) return -10; //Something went wrong. We should always have alpha premultiplied.
 
     //Tiling does not appear to show benefits when benchmarking - only breifly investigated
     bool tile_when_transposing = false;
 
     if (transpose && tile_when_transposing){
-        
+
         //Let's try to tile within 2kb, get some cache coherency
         const float dest_opt_rows = 2048.0f / (float)dest->stride;
 
-        const int tile_width = MAX(4, dest_opt_rows);
+        const int tile_width = MAX(4, (int)dest_opt_rows);
         const int tiles = src->w / tile_width;
 
         if (can_compose){

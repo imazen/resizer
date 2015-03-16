@@ -102,8 +102,8 @@ typedef struct BitmapBgraStruct{
 
 static int vertical_flip_bgra(BitmapBgraPtr b);
 static int copy_bitmap_bgra(BitmapBgraPtr src, BitmapBgraPtr dst);
-static BitmapBgraPtr CreateBitmapBgraHeader(int sx, int sy);
-static BitmapBgraPtr CreateBitmapBgra(int sx, int sy, bool zeroed, int bpp);
+static BitmapBgraPtr create_bitmap_bgra_header(int sx, int sy);
+static BitmapBgraPtr create_bitmap_brgra(int sx, int sy, bool zeroed, int bpp);
 inline void DestroyBitmapBgra(BitmapBgraPtr im);
 
 float srgb_to_linear(float s);
@@ -228,15 +228,15 @@ typedef struct RenderDetailsStruct{
  
 } RenderDetails;
 
-RendererPtr CreateRenderer(BitmapBgraPtr editInPlace, RenderDetailsPtr details);
+RendererPtr create_renderer(BitmapBgraPtr editInPlace, RenderDetailsPtr details);
 
-RendererPtr CreateRenderer(BitmapBgraPtr source, BitmapBgraPtr canvas, RenderDetailsPtr details);
+RendererPtr create_renderer(BitmapBgraPtr source, BitmapBgraPtr canvas, RenderDetailsPtr details);
 
-void DestroyRenderer(RendererPtr r)
+void destroy_renderer(RendererPtr r)
 
 static InterpolationDetailsPtr CreateInterpolationDetails();
 
-static RenderDetailsPtr CreateRenderDetails();
+static RenderDetailsPtr create_render_details();
 static void DestroyRenderDetails(RenderDetailsPtr d);
 static void FreeLookupTables() ;
 static LookupTablesPtr GetLookupTables();
@@ -254,7 +254,7 @@ static Rect detect_content(BitmapBgraPtr b, uint8_t threshold);
 
 typedef struct RendererStruct *RendererPtr;
 
-int PerformRender(RendererPtr r);
+int perform_render(RendererPtr r);
 
 
 

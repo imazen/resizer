@@ -113,11 +113,13 @@ static int HalveInternal(const BitmapBgra * from,
     return 1;
 }
 
+// int as divisior???
 static int Halve(const BitmapBgra * from, const BitmapBgra * to, int divisor){
     return HalveInternal(from, to, to->w, to->h, to->stride, divisor);
 }
 
 
+// is it correct to use an int as the divisor here?
 static  int HalveInPlace(BitmapBgra * from, int divisor)
 {
     int to_w = from->w / divisor;

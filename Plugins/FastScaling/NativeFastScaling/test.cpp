@@ -8,10 +8,10 @@
 
 bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bool flipx, bool flipy, InterpolationFilter filter)
 {
-    BitmapBgra * source = CreateBitmapBgra(sx, sy, true, sbpp);
-    BitmapBgra * canvas = CreateBitmapBgra(cx, cy, true, cbpp);
+    BitmapBgra * source = create_bitmap_bgra(sx, sy, true, sbpp);
+    BitmapBgra * canvas = create_bitmap_bgra(cx, cy, true, cbpp);
 
-    RenderDetails * details = CreateRenderDetails();
+    RenderDetails * details = create_render_details();
 
     details->interpolation = CreateInterpolation(filter);
 
@@ -21,11 +21,11 @@ bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bo
     details->post_transpose = transpose;
 
 
-    Renderer * p = CreateRenderer(source, canvas, details);
+    Renderer * p = create_renderer(source, canvas, details);
 
-    PerformRender(p);
+    perform_render(p);
 
-    DestroyRenderer(p);
+    destroy_renderer(p);
 
     DestroyBitmapBgra(source);
     DestroyBitmapBgra(canvas);
@@ -160,7 +160,7 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
 	int w = 256;
 	int h = 256;
 
-	BitmapBgra* bit = CreateBitmapBgra(w, h, true, 4);
+	BitmapBgra* bit = create_bitmap_bgra(w, h, true, 4);
 
 	for (size_t y = 1; y < bit->h; y++){
 	    for (size_t x = 0; x < bit->w; x++){
@@ -173,15 +173,15 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
 	    }
 	}
 
-	BitmapBgra* final = CreateBitmapBgra(w, h, true, 4);
+	BitmapBgra* final = create_bitmap_bgra(w, h, true, 4);
 	// BitmapFloat* buf = CreateBitmapFloat(w, h, 4, true);
 
 	WHEN ("we do stuff") {
 
-	    RenderDetails* details = CreateRenderDetails();
-	    Renderer* r = CreateRenderer(bit, final, details);
+	    RenderDetails* details = create_render_details();
+	    Renderer* r = create_renderer(bit, final, details);
 
-	    PerformRender(r);
+	    perform_render(r);
       
 	    //convert_srgb_to_linear(bit, 0, buf, 0, h);      
 	    //demultiply_alpha(buf, 0, h);

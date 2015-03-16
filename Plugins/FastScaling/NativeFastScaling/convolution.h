@@ -8,19 +8,16 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 
-#ifndef _MSC_VER
-#include <alloca.h>
-#else
-#pragma unmanaged
-#ifndef alloca
-#include <malloc.h>
-#define alloca _alloca
+typedef struct BitmapFloatStruct BitmapFloat;
+
+
+#ifdef __cplusplus
+extern "C" {
 #endif
-#endif
-
-
 
 
 inline float* create_guassian_kernel(double stdDev, uint32_t radius){
@@ -74,80 +71,17 @@ inline float* create_guassian_sharpen_kernel(double stdDev, uint32_t radius){
 }
 
 
-static int ConvolveBgraFloatInPlace(BitmapFloat * buf, const float *kernel, const uint32_t radius, float threshold_min, float threshold_max, const uint32_t convolve_channels, const uint32_t from_row, const int row_count) {
+int ConvolveBgraFloatInPlace(
+    BitmapFloat * buf, 
+    const float *kernel, 
+    const uint32_t radius, 
+    float threshold_min, 
+    float threshold_max, 
+    uint32_t convolve_channels, 
+    uint32_t from_row, 
+    int row_count);
 
-    if (buf->w < radius + 1) return -2; //Do nothing unless the image is at least half as wide as the kernel.
-   
-    const uint32_t buffer_count = radius + 1;
-    const uint32_t w = buf->w;
-    const uint32_t step = buf->channels;
-
-    const uint32_t until_row = row_count < 0 ? buf->h : from_row + (unsigned)row_count;
-
-    const uint32_t ch_used = convolve_channels;
-
-    float* __restrict buffer = (float *)alloca(sizeof(float) * buffer_count * ch_used);
-    if (buffer == NULL) return -1;
-    float* __restrict avg = (float *)alloca(sizeof(float) * ch_used);
-    if (avg == NULL) {
-        return -1;
-    }
-    
-
-    for (uint32_t row = from_row; row < until_row; row++){
-
-        float* __restrict source_buffer = &buf->pixels[row * buf->float_stride];
-        int circular_idx = 0;
-
-        for (uint32_t ndx = 0; ndx < w + buffer_count; ndx++) {
-            //Flush old value
-            if (ndx >= buffer_count){
-                memcpy(&source_buffer[(ndx - buffer_count) * step], &buffer[circular_idx * ch_used], ch_used * sizeof(float));
-            }
-            //Calculate and enqueue new value
-            if (ndx < w){
-                const int left = ndx - radius;
-                const int right = ndx + radius;
-                int i;
-
-                memset(avg, 0, sizeof(float) * ch_used);
-
-                if (left < 0 || right >= (int32_t)w){
-                    /* Accumulate each channel */
-                    for (i = left; i <= right; i++) {
-                        const float weight = kernel[i - left];
-                        const uint32_t ix = CLAMP(i, 0, (int32_t)w);
-                        for (uint32_t j = 0; j < ch_used; j++)
-                            avg[j] += weight * source_buffer[ix * step + j];
-                    }
-                }
-                else{
-                    /* Accumulate each channel */
-                    for (i = left; i <= right; i++) {
-                        const float weight = kernel[i - left];
-                        for (uint32_t j = 0; j < ch_used; j++)
-                            avg[j] += weight * source_buffer[i * step + j];
-                    }
-                }
-
-                //Enqueue difference
-                memcpy(&buffer[circular_idx * ch_used], avg, ch_used * sizeof(float));
-
-                if (threshold_min > 0 || threshold_max > 0){
-                    float change = 0;
-                    for (uint32_t j = 0; j < ch_used; j++)
-                        change += (float)fabs(source_buffer[ndx * step + j] - avg[j]);
-
-                    if (change < threshold_min || change > threshold_max){
-                        memcpy(&buffer[circular_idx * ch_used], &source_buffer[ndx * step], ch_used * sizeof(float));
-                    }
-                }
-            }
-            circular_idx = (circular_idx + 1) % buffer_count;
-
-        }
-    }
-    return 0;
+#ifdef __cplusplus
 }
-
+#endif
 

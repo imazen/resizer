@@ -203,14 +203,14 @@ typedef struct LookupTablesStruct {
     //const uint8_t linear_to_srgb[4097]; //Converts from 0..4096 to 0.255, going from linear to sRGB gamma.
 } LookupTables;
 
-BitmapBgra * CreateBitmapBgra(int sx, int sy, bool zeroed, int bpp);
-BitmapBgra * CreateBitmapBgraHeader(int sx, int sy);
+BitmapBgra * create_bitmap_bgra(int sx, int sy, bool zeroed, int bpp);
+BitmapBgra * create_bitmap_bgra_header(int sx, int sy);
 
-RenderDetails * CreateRenderDetails(void);
+RenderDetails * create_render_details(void);
 
-Renderer * CreateRenderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details);
-int PerformRender(Renderer * r);
-void DestroyRenderer(Renderer * r);
+Renderer * create_renderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details);
+int perform_render(Renderer * r);
+void destroy_renderer(Renderer * r);
 void DestroyBitmapBgra(BitmapBgra * im);
 
 //These filters are stored in a struct as function pointers, which I assume means they can't be inlined. Likely 5 * w * h invocations.

@@ -14,7 +14,7 @@
 #include "ir_alloc.h"
 #include "fastscaling.h"
 
-BitmapBgra * CreateBitmapBgraHeader(int sx, int sy){
+BitmapBgra * create_bitmap_bgra_header(int sx, int sy){
     BitmapBgra * im;
 
     if (overflow2(sx, sy) || overflow2(sizeof(int *), sy) || overflow2(sizeof(int), sx)) {
@@ -36,9 +36,9 @@ BitmapBgra * CreateBitmapBgraHeader(int sx, int sy){
 }
 
 
-BitmapBgra * CreateBitmapBgra(int sx, int sy, bool zeroed, int bpp)
+BitmapBgra * create_bitmap_bgra(int sx, int sy, bool zeroed, int bpp)
 {
-    BitmapBgra * im = CreateBitmapBgraHeader(sx, sy);
+    BitmapBgra * im = create_bitmap_bgra_header(sx, sy);
     if (im == NULL) { 
 	return NULL;
     }

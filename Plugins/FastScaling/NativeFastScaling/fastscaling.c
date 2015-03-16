@@ -4,21 +4,21 @@
 
 static int test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, InterpolationFilter filter)
 {
-    BitmapBgra * source = CreateBitmapBgra(sx, sy, true, sbpp);
-    BitmapBgra * canvas = CreateBitmapBgra(cx, cy, true, cbpp);
+    BitmapBgra * source = create_bitmap_bgra(sx, sy, true, sbpp);
+    BitmapBgra * canvas = create_bitmap_bgra(cx, cy, true, cbpp);
 
-    RenderDetails * details = CreateRenderDetails();
+    RenderDetails * details = create_render_details();
 
     details->interpolation = CreateInterpolation(filter);
 
     details->sharpen_percent_goal = 50;
 
 
-    Renderer * p = CreateRenderer(source, canvas, details);
+    Renderer * p = create_renderer(source, canvas, details);
 
-    PerformRender(p);
+    perform_render(p);
 
-    DestroyRenderer(p);
+    destroy_renderer(p);
 
     DestroyBitmapBgra(source);
     DestroyBitmapBgra(canvas);
@@ -27,7 +27,7 @@ static int test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, Interpolatio
 }
 
 
-int main(int argc, char ** argv) 
+int main(void) 
 {
     test(4000,3000,4,200,40,4,(InterpolationFilter)0);
   
