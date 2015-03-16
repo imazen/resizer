@@ -10,7 +10,7 @@
 #include "math_functions.h"
 #include <stdlib.h>
 
-static void derive_cubic_coefficients(double B, double C, InterpolationDetails * out) 
+static void derive_cubic_coefficients(double B, double C, InterpolationDetails * out)
 {
     double bx2 = B + B;
     out->p1 = 1.0 - (1.0 / 3.0)*B;
@@ -35,10 +35,10 @@ double filter_flex_cubic(const InterpolationDetails * d, double x)
     }
     return(0.0);
 }
-double filter_bicubic_fast(const InterpolationDetails * d, const double t)
+double filter_bicubic_fast(const InterpolationDetails * d, double t)
 {
-    const double abs_t = (double)fabs(t) / d->blur;
-    const double abs_t_sq = abs_t * abs_t;
+    double abs_t = (double)fabs(t) / d->blur;
+    double abs_t_sq = abs_t * abs_t;
     if (abs_t<1) return 1 - 2 * abs_t_sq + abs_t_sq*abs_t;
     if (abs_t<2) return  (4 - 8 * abs_t + 5 * abs_t_sq - abs_t_sq*abs_t);
     return 0;
@@ -85,7 +85,7 @@ double percent_negative_weight(const InterpolationDetails* details){
     const int samples = 50;
     double step = details->window / (double)samples;
 
-    
+
     double last_height = details->filter(details, -step);
     double positive_area = 0;
     double negative_area = 0;
@@ -210,7 +210,7 @@ LineContribType *ContributionsCalc(const uint32_t line_size, const uint32_t src_
             return NULL;
         }
 
-        
+
         const float total_factor = (float)(1.0f / total_weight);
         for (ix = 0; ix < source_pixel_count; ix++) {
             weights[ix] *= total_factor;

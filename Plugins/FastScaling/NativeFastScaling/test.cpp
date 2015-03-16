@@ -136,7 +136,7 @@ TEST_CASE("Roundtrip RGB<->LUV 0.2,0.2,0.2 ", "[fastscaling]") {
 
 TEST_CASE("Roundtrip sRGB<->linear RGB<->LUV", "[fastscaling]") {
     for (int x = 0; x < 256; x++){
-	CHECK(x == uchar_clamp_ff(linear_to_srgb(srgb_to_linear(x / 255.0f))));
+	CHECK(x == uchar_clamp_ff(linear_to_srgb(srgb_to_linear((float)x / 255.0f))));
     }
 }
 

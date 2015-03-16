@@ -47,8 +47,8 @@ SharpenBgraFloatInPlace(float* buf, unsigned int count, double pct,
 int step)
 {
 
-    const float n = -pct / (pct - 1); //if 0 < pct < 1
-    const float c_o = n / -2.0;
+    const float n = (float)(-pct / (pct - 1)); //if 0 < pct < 1
+    const float c_o = n / -2.0f;
     const float c_i = n + 1;
 
     unsigned int ndx;

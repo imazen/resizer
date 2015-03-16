@@ -21,7 +21,7 @@ linear_to_srgb(float clr) {
         return 12.92f * clr * 255.0f;
 
     // a = 0.055; ret ((1+a) * s**(1/2.4) - a) * 255
-	return 1.055f  * 255.0f * pow(clr, 0.41666666f) - 14.025f;
+    return 1.055f  * 255.0f * ((float)pow(clr, 0.41666666f)) - 14.025f;
 }
 
 
@@ -30,7 +30,7 @@ srgb_to_linear(float s) {
     if (s <= 0.04045f)
        return s / 12.92f;
     else
-        return pow((s + 0.055f) / (1 + 0.055f), 2.4f);
+        return (float)pow((s + 0.055f) / (1 + 0.055f), 2.4f);
 }
 
 
@@ -79,7 +79,7 @@ static inline void linear_to_luv(float * bgr){
 
     const float u = 4 * X / (X + 15 * Y + 3 * Z);
     const float v = 9 * Y / (X + 15 * Y + 3 * Z);
-    const float L = bgr[0] /* L */ = Yd > y_split ? (116 * pow(Yd, (float)(1.0f / 3.0f)) - 16) : y_adjust * Yd;
+    const float L = bgr[0] /* L */ = Yd > y_split ? (116 * ((float)pow(Yd, (float)(1.0f / 3.0f))) - 16) : y_adjust * Yd;
     bgr[1]/* U */ = 13 * L*(u - un) + 100;
     bgr[2] /* V */ = 13 * L*(v - vn) + 100;
 }
@@ -103,7 +103,7 @@ static inline void luv_to_linear(float * luv){
 
     const float u = U / (13 * L) + un;
     const float v = V / (13 * L) + vn;
-    const float Y = L > 8 ? Yn * pow((L + 16) / 116, 3) : Yn * L * y_adjust_2;
+    const float Y = L > 8 ? Yn * ((float)pow((L + 16) / 116, 3)) : Yn * L * y_adjust_2;
     const float X = (9 / 4.0f) * Y * u / v;// -9 * Y * u / ((u - 4) * v - u * v) = (9 / 4) * Y * u / v;
     const float Z = (9 * Y - 15 * v * Y - v * X) / (3 * v);
 

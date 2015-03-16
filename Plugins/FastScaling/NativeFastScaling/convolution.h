@@ -82,7 +82,7 @@ static int ConvolveBgraFloatInPlace(BitmapFloat * buf, const float *kernel, cons
     const uint32_t w = buf->w;
     const uint32_t step = buf->channels;
 
-    const uint32_t until_row = row_count < 0 ? buf->h : from_row + row_count;
+    const uint32_t until_row = row_count < 0 ? buf->h : from_row + (unsigned)row_count;
 
     const uint32_t ch_used = convolve_channels;
 
@@ -136,7 +136,7 @@ static int ConvolveBgraFloatInPlace(BitmapFloat * buf, const float *kernel, cons
                 if (threshold_min > 0 || threshold_max > 0){
                     float change = 0;
                     for (uint32_t j = 0; j < ch_used; j++)
-                        change += fabs(source_buffer[ndx * step + j] - avg[j]);
+                        change += (float)fabs(source_buffer[ndx * step + j] - avg[j]);
 
                     if (change < threshold_min || change > threshold_max){
                         memcpy(&buffer[circular_idx * ch_used], &source_buffer[ndx * step], ch_used * sizeof(float));
