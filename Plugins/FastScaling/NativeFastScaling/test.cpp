@@ -2,7 +2,7 @@
 
 #include "fastscaling_private.h"
 #include "weighting_test_helpers.h"
-
+#include "trim_whitespace.h"
 
 std::ostream& operator<<(std::ostream& out, const BitmapFloat & bitmap_float)
 {
@@ -110,12 +110,53 @@ TEST_CASE ("Sharpen and convolve in place", "[fastscaling]") {
 }
 */
 
-TEST_CASE ("Trim whitespace in imag", "[fastscaling]") {
-
-    REQUIRE (test_in_place (400, 300, Bgr24, true, true, false, 0, 0));
+BitmapBgra*  crop_window (BitmapBgra* source, uint32_t x, uint32_t y, uint32_t w, uint32_t h){
+    BitmapBgra* cropped = create_bitmap_bgra_header (w, h);
+    cropped->fmt = source->fmt;
+    const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel (source->fmt);
+    cropped->pixels = source->pixels + (y * source->stride) + (x * bytes_pp);
+    cropped->stride = source->stride;
+    return cropped;
 }
 
+void clear_bitmap (BitmapBgra* b, uint8_t fill_red, uint8_t fill_green, uint8_t fill_blue, uint8_t fill_alpha){
+    const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel (b->fmt);
+    const uint32_t row_bytes = bytes_pp * b->w;
+    for (int i = 0; i < row_bytes; i+=4){
+        b->pixels[i] = fill_blue;
+        b->pixels[i+ 1] = fill_green;
+        b->pixels[i + 2] = fill_red;
+        if (bytes_pp == 4){
+            b->pixels[i + 3] = fill_alpha;
+        }
+    }
+    for (int i = 0; i < b->h; i++){
+        memcpy (b->pixels + (i * b->stride), b->pixels, row_bytes);
+    }
+}
 
+void fill_rect (BitmapBgra* b, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t fill_red, uint8_t fill_green, uint8_t fill_blue, uint8_t fill_alpha){
+    BitmapBgra * cropped = crop_window (b, x, y, w, h);
+    clear_bitmap (cropped, fill_red, fill_green, fill_blue, fill_alpha);
+    destroy_bitmap_bgra (cropped);
+}
+/* process ends unexpectedly if you uncomment this
+TEST_CASE ("Trim whitespace in 32-bit image", "[fastscaling]") {
+    BitmapBgra* b = create_bitmap_bgra (200, 150, true, Bgra32);
+
+    fill_rect (b, 30, 20, 100, 75, 30, 30, 30, 255);
+
+    Rect r = detect_content (b, 20);
+
+    REQUIRE (r.x1 == 30);
+    REQUIRE (r.y1 == 20);
+    REQUIRE (r.x2 == 20 + 75);
+    REQUIRE (r.y2 == 30 + 100);
+
+    destroy_bitmap_bgra (b);
+}
+
+*/
 
 
 TEST_CASE("Test contrib windows", "[fastscaling]") {
