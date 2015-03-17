@@ -161,7 +161,8 @@ namespace ImageResizer{
                 private:
                     void replay_log (){
                         ProfilingLog * log = access_profiling_log (r);
-                        if (log->count == log->capacity) throw gcnew OutOfMemoryException ("Profiling log was not large enough to contain all messages");
+                        if (log == nullptr) return;
+                        if (log->count >= log->capacity) throw gcnew OutOfMemoryException ("Profiling log was not large enough to contain all messages");
                         for (int i = 0; i < log->count; i++){
                             ProfilingEntry entry = log->log[i];
                             bool start = (entry.flags & ProfilingEntryFlags::Profiling_start) > 0;

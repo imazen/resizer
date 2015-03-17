@@ -175,6 +175,9 @@ Renderer * create_renderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetai
     if (details->enable_profiling){
         r->log = create_profiling_log((r->source->w + r->source->h + r->canvas->w + r->canvas->h) * 20 + 50);
     }
+    else{
+        r->log = NULL;
+    }
     return r;
 }
 
