@@ -15,11 +15,12 @@
 
 #include <stdarg.h>
 
+
+#pragma warning(disable : 4996)
 #define snprintf _snprintf
 
 #endif // _MSC_VER
 
-#pragma warning(disable : 4996)
 
 bool test_contrib_windows(char *msg)
 {

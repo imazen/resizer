@@ -3,6 +3,7 @@
 #include "fastscaling_private.h"
 #include "weighting_test_helpers.h"
 #include "trim_whitespace.h"
+#include "string.h"
 
 std::ostream& operator<<(std::ostream& out, const BitmapFloat & bitmap_float)
 {
@@ -48,7 +49,7 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
 }
 
 
-bool test_in_place (int sx, int sy, BitmapPixelFormat sbpp, bool flipx, bool flipy, bool profile, double sharpen, uint32_t kernelRadius)
+bool test_in_place (int sx, int sy, BitmapPixelFormat sbpp, bool flipx, bool flipy, bool profile, float sharpen, uint32_t kernelRadius)
 {
     BitmapBgra * source = create_bitmap_bgra (sx, sy, true, sbpp);
 
@@ -122,7 +123,7 @@ BitmapBgra*  crop_window (BitmapBgra* source, uint32_t x, uint32_t y, uint32_t w
 void clear_bitmap (BitmapBgra* b, uint8_t fill_red, uint8_t fill_green, uint8_t fill_blue, uint8_t fill_alpha){
     const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel (b->fmt);
     const uint32_t row_bytes = bytes_pp * b->w;
-    for (int i = 0; i < row_bytes; i+=4){
+    for (uint32_t i = 0; i < row_bytes; i+=4){
         b->pixels[i] = fill_blue;
         b->pixels[i+ 1] = fill_green;
         b->pixels[i + 2] = fill_red;
@@ -130,7 +131,7 @@ void clear_bitmap (BitmapBgra* b, uint8_t fill_red, uint8_t fill_green, uint8_t 
             b->pixels[i + 3] = fill_alpha;
         }
     }
-    for (int i = 0; i < b->h; i++){
+    for (uint32_t i = 0; i < b->h; i++){
         memcpy (b->pixels + (i * b->stride), b->pixels, row_bytes);
     }
 }
