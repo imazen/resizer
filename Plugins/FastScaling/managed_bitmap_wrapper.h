@@ -100,12 +100,8 @@ namespace ImageResizer{
                     if (locked_bitmap_data != nullptr){
                         underlying_bitmap->UnlockBits(locked_bitmap_data);
                     }
-                    if (bgra != NULL){
-                        if (bgra->matte_color)
-                            delete bgra->matte_color;
-                        destroy_bitmap_bgra(bgra);
-                        bgra = NULL;
-                    }
+                    destroy_bitmap_bgra(bgra);
+                    bgra = NULL;
 
                 }
 

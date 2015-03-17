@@ -97,7 +97,10 @@ namespace ImageResizer{
 
                 ~ManagedRenderer(){
                     if (p != nullptr) p->Start("Renderer: dispose", false);
-                    destroy_renderer(r);
+                    Renderer* temp = r;
+                    r = NULL;
+                    destroy_renderer(temp);
+
 
                     if (wbSource != nullptr){
                         delete wbSource;

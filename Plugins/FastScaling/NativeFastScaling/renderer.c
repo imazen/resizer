@@ -89,6 +89,7 @@ static int DetermineDivisor(Renderer * r)
 
 void destroy_renderer(Renderer * r)
 {
+    if (r == NULL) return;
     if (r->destroy_source) {
         destroy_bitmap_bgra(r->source);
     }
