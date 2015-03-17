@@ -35,12 +35,20 @@
 #   define NULL 0
 #endif
 
+inline int min(int a, int b) { return a <= b ? a : b; }
+inline int max(int a, int b) { return a >= b ? a : b; }
+
+inline unsigned int umin(unsigned int a, unsigned int b) { return a <= b ? a : b; }
+inline unsigned int umax(unsigned int a, unsigned int b) { return a >= b ? a : b; }
+
+
+
 #define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
 
 
-static inline 
-uint8_t 
+static inline
+uint8_t
 uchar_clamp_ff(float clr) {
     uint16_t result;
 

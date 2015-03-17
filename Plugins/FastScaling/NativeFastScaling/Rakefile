@@ -85,6 +85,15 @@ end
 desc "Run the test program with valgrind"
 valgrind_task("--leak-check=full --show-leak-kinds=all", :test_with_valgrind => TEST_PROGRAM)
 
+desc "Run the test program with valgrind, fast"
+task :something_else  => TEST_PROGRAM do 
+  with_ld_library_path('.') do 
+    sh "valgrind  ./#{TEST_PROGRAM}"
+  end
+end
+
+
+
 desc "runs each test case sequentially in a separate process"
 task :test_each_case_in_separate_process => "test_program" do
   #use shared library in current directory

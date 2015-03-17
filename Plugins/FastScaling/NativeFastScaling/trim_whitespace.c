@@ -15,7 +15,8 @@
 Rect detect_content(BitmapBgra * b, uint8_t threshold)
 {
     SearchInfo info;
-
+    info.w = b->w;
+    info.h = b->h;
     info.buff_size = 2048;
     info.buf = (uint8_t*)ir_malloc(info.buff_size);
     info.max_x = 0;
@@ -136,7 +137,7 @@ int fill_buffer(SearchInfo* __restrict info){
 
 
 
-void sobel_scharr_detect(SearchInfo* __restrict info /*, int edgeTRBL */)
+void sobel_scharr_detect(SearchInfo* info /*, int edgeTRBL */)
 {
     #define COEFFA = 3
     #define COEFFB = 10;
@@ -147,9 +148,10 @@ void sobel_scharr_detect(SearchInfo* __restrict info /*, int edgeTRBL */)
     const uint32_t threshold = info->threshold;
 
     uint8_t * __restrict buf = info->buf;
-    uint32_t buf_ix = 0;
+    uint32_t buf_ix = w + 1;
     for (uint32_t y = 1; y < y_end; y++){
         for (uint32_t x = 1; x < x_end; x++){
+
             const int gx = -3 * buf[buf_ix - w - 1] + -10 * buf[buf_ix - 1] + -3 * buf[buf_ix + w - 1] + +3 * buf[buf_ix - w + 1] + 10 * buf[buf_ix + 1] +  3 * buf[buf_ix + w + 1];
             const int gy = 3 * buf[buf_ix - w - 1] + 10 * (buf[buf_ix - w]) + 3 * buf[buf_ix - w + 1] + -3 * buf[buf_ix + w - 1] + -10 * (buf[buf_ix + w]) + -3 * buf[buf_ix + w + 1];
             const size_t value = abs(gx) + abs(gy);
@@ -175,6 +177,7 @@ void sobel_scharr_detect(SearchInfo* __restrict info /*, int edgeTRBL */)
             }
             buf_ix++;
         }
+        buf_ix +=2;
     }
 
 
@@ -185,27 +188,27 @@ void sobel_scharr_detect(SearchInfo* __restrict info /*, int edgeTRBL */)
 
 void check_region(int edgeTRBL, float x_1_percent, float x_2_percent, float y_1_percent, float y_2_percent, SearchInfo* __restrict info)
 {
-    uint32_t x1 = (uint32_t) MAX(0, MIN(info->w, floor(x_1_percent * (float)info->w) - 1));
-    uint32_t x2 = (uint32_t) MAX(0, MIN(info->w, ceil(x_2_percent * (float)info->w) + 1));
+    uint32_t x1 = (uint32_t) umax(0, umin(info->w, (uint32_t)floor(x_1_percent * (float)info->w) - 1));
+    uint32_t x2 = (uint32_t) umax(0, umin(info->w, (uint32_t)ceil(x_2_percent * (float)info->w) + 1));
 
-    uint32_t y1 = (uint32_t) MAX(0, MIN(info->h, floor(y_1_percent * (float)info->h) - 1));
-    uint32_t y2 = (uint32_t) MAX(0, MIN(info->h, ceil(y_2_percent * (float)info->h) + 1));
+    uint32_t y1 = (uint32_t) umax(0, umin(info->h, (uint32_t)floor(y_1_percent * (float)info->h) - 1));
+    uint32_t y2 = (uint32_t) umax(0, umin(info->h, (uint32_t)ceil(y_2_percent * (float)info->h) + 1));
 
     //Snap the boundary depending on which side we're searching
     if (edgeTRBL == 4) {
         x1 = 0;
-        x2 = MIN(x2, info->min_x);
+        x2 = umin(x2, info->min_x);
     }
     if (edgeTRBL == 2) {
-        x1 = MAX(x1,info->max_x);
+        x1 = umax(x1,info->max_x);
         x2 = info->w;
     }
     if (edgeTRBL == 1){
         y1 = 0;
-        y2 = MIN(y2, info->min_y);
+        y2 = umin(y2, info->min_y);
     }
     if (edgeTRBL == 3){
-        y1 = MAX(y1, info->max_y);
+        y1 = umax(y1, info->max_y);
         y2 = info->h;
     }
     if (x1 == x2 || y1 == y2) return; //Nothing left to search.
@@ -215,12 +218,12 @@ void check_region(int edgeTRBL, float x_1_percent, float x_2_percent, float y_1_
     uint32_t min_region_height = (edgeTRBL == 1 || edgeTRBL == 3) ? 3 : 7;
 
     while (y2 - y1 < min_region_height){
-        y1 = MAX(0, y1 - 1);
-        y2 = MIN(info->h, y2 + 1);
+        y1 = umax(0, y1 - 1);
+        y2 = umin(info->h, y2 + 1);
     }
     while (x2 - x1 < min_region_width){
-        x1 = MAX(0, x1 - 1);
-        x2 = MIN(info->w, x2 + 1);
+        x1 = umax(0, x1 - 1);
+        x2 = umin(info->w, x2 + 1);
     }
 
     //Now we need to split this section into regions that fit in the buffer. Might as well do it vertically, so our scans are minimal.
@@ -229,8 +232,8 @@ void check_region(int edgeTRBL, float x_1_percent, float x_2_percent, float y_1_
     const uint32_t h = y2 - y1;
 
     //If we are doing a full scan, make them wide along the X axis. Otherwise, make them square.
-    const uint32_t window_width = MIN(w, (edgeTRBL == 0 ? info->buff_size / 7 : (uint32_t)ceil(sqrt((float)info->buff_size))));
-    const uint32_t window_height = MIN(h, info->buff_size / window_width);
+    const uint32_t window_width = umin(w, (edgeTRBL == 0 ? info->buff_size / 7 : (uint32_t)ceil(sqrt((float)info->buff_size))));
+    const uint32_t window_height = umin(h, info->buff_size / window_width);
 
     const uint32_t vertical_windows = (uint32_t)ceil((float)h / (float)window_height);
     const uint32_t horizantal_windows = (uint32_t)ceil((float)w / (float)window_width);
@@ -243,8 +246,8 @@ void check_region(int edgeTRBL, float x_1_percent, float x_2_percent, float y_1_
             info->buf_x = x1 + (window_width * window_column);
             info->buf_y = y1 + (window_height * window_row);
 
-            info->buf_w = MIN3(3, x2 - info->buf_x, window_width);
-            info->buf_h = MIN3(3, y2 - info->buf_y, window_height);
+            info->buf_w = umin(umin(3, x2 - info->buf_x), window_width);
+            info->buf_h = umin(umin(3, y2 - info->buf_y), window_height);
             uint32_t buf_x2 = info->buf_x + info->buf_w;
             uint32_t buf_y2 = info->buf_y + info->buf_h;
 
@@ -258,18 +261,18 @@ void check_region(int edgeTRBL, float x_1_percent, float x_2_percent, float y_1_
                 continue;
             }
             if (excluded_y && info->min_x < buf_x2 && buf_x2 < info->max_x){
-                info->buf_w = MAX(3, info->min_x - info->buf_x);
+                info->buf_w = umax(3, info->min_x - info->buf_x);
             }
             else if (excluded_y && info->max_x > info->buf_x && info->buf_x > info->min_x){
-                info->buf_x = MIN(buf_x2 - 3, info->max_x);
+                info->buf_x = umin(buf_x2 - 3, info->max_x);
                 info->buf_w = buf_x2 - info->buf_x;
 
             }
             if (excluded_x && info->min_y < buf_y2 && buf_y2 < info->max_y){
-                info->buf_h = MAX(3, info->min_y - info->buf_y);
+                info->buf_h = umax(3, info->min_y - info->buf_y);
             }
             else if (excluded_x && info->max_y > info->buf_y && info->buf_y > info->min_y){
-                info->buf_y = MIN(buf_y2 - 3, info->max_y);
+                info->buf_y = umin(buf_y2 - 3, info->max_y);
                 info->buf_h = buf_y2 - info->buf_y;
             }
 
