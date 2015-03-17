@@ -17,5 +17,10 @@ namespace ImageResizer.Plugins
         bool IsRunning(string segmentName);
 
         void Stop(string segmentName, bool assertRunning = true, bool stopChildren = false);
+
+        void LogStart(long ticks, string segmentName, bool allowRecursion = false);
+        void LogStop(long ticks, string segmentName, bool assertRunning = true, bool stopChildren = false);
+    
     }
+
 }

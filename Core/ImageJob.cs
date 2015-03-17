@@ -35,6 +35,17 @@ namespace ImageResizer {
             {
               
             }
+
+
+            public void LogStart(long ticks, string segmentName, bool allowRecursion = false)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void LogStop(long ticks, string segmentName, bool assertRunning = true, bool stopChildren = false)
+            {
+                throw new NotImplementedException();
+            }
         }
         public ImageJob() {
             this.RequestedInfo = new List<string>();
