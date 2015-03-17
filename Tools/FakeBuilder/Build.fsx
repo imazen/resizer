@@ -112,8 +112,8 @@ Target "clean" (fun _ ->
     MSBuild "" "Clean" ["Configuration","Debug"] [mainSolution] |> ignore
     MSBuild "" "Clean" ["Configuration","Trial"] [mainSolution] |> ignore
     
-    MSBuild "" "Clean" ["Configuration","Release"; "Platform","x86"] [fastScaleSln] |> ignore
-    MSBuild "" "Clean" ["Configuration","Debug"; "Platform","x86"] [fastScaleSln] |> ignore
+    MSBuild "" "Clean" ["Configuration","Release"; "Platform","Win32"] [fastScaleSln] |> ignore
+    MSBuild "" "Clean" ["Configuration","Debug"; "Platform","Win32"] [fastScaleSln] |> ignore
     MSBuild "" "Clean" ["Configuration","Release"; "Platform","x64"] [fastScaleSln] |> ignore
     MSBuild "" "Clean" ["Configuration","Debug"; "Platform","x64"] [fastScaleSln] |> ignore
     
