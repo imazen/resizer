@@ -7,6 +7,7 @@
  */
 
 #include "fastscaling.h"
+#include "render_options.h"
 #pragma once
 
 #ifdef _MSC_VER
@@ -39,6 +40,21 @@ namespace ImageResizer{
                     return copy;
                 }
 
+                ConvolutionKernel* CopyKernel (ConvKernel^ from){
+                    if (from == nullptr) return nullptr;
+                    ConvolutionKernel* k = create_convolution_kernel (from->Radius);
+                    if (k == nullptr) return nullptr;
+                    k->threshold_max_change = from->MaxChangeThreshold;
+                    k->threshold_min_change = from->MinChangeThreshold;
+
+
+                    for (int i = 0; i < Math::Min((uint32_t)from->Kernel->Length, k->width); i++)
+                        k->kernel[i] = (float)from->Kernel[i];
+                    return k;
+                }
+
+
+
                 void CopyBasics(RenderOptions^ from, RenderDetails* to){
                     if (from->ColorMatrix != nullptr)
                     {
@@ -53,12 +69,12 @@ namespace ImageResizer{
                     to->post_flip_y = from->RequiresVerticalFlipStep;
                     to->halve_only_when_common_factor = from->HalveOnlyWhenPerfect;
                     to->sharpen_percent_goal = from->SharpeningPercentGoal;
-                    to->kernel_a_min = from->ConvolutionA_MinChangeThreshold;
-                    to->kernel_a_max = from->ConvolutionA_MaxChangeThreshold;
-                    to->kernel_b_min = from->ConvolutionB_MinChangeThreshold;
-                    to->kernel_b_max = from->ConvolutionB_MaxChangeThreshold;
-                    to->kernel_a = CopyFloatArray(from->ConvolutionA);
-                    to->kernel_b = CopyFloatArray(from->ConvolutionB);
+
+                    to->kernel_a = from->KernelA_Struct != nullptr ? from->KernelA_Struct :
+                        from->KernelA != nullptr ? CopyKernel (from->KernelA) : nullptr;
+                    to->kernel_b = from->KernelB_Struct != nullptr ? from->KernelB_Struct :
+                        from->KernelB != nullptr ? CopyKernel (from->KernelB) : nullptr;
+
                     to->interpolate_last_percent = from->InterpolateLastPercent;
 
 

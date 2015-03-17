@@ -168,6 +168,7 @@
     <ClInclude Include="managed_bitmap_wrapper.h" />
     <ClInclude Include="ImageResizer.Plugins.FastScaling.h" />
     <ClInclude Include="rendering.h" />
+    <ClInclude Include="render_options.h" />
     <ClInclude Include="Stdafx.h" />
   </ItemGroup>
   <ItemGroup>

@@ -7,6 +7,8 @@
  */
 #pragma once
 
+#include "fastscaling_private.h"
+
 #ifdef _MSC_VER
 #pragma unmanaged
 #endif

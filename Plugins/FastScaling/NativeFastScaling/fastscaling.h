@@ -1,44 +1,26 @@
 #pragma once
-
-
 /**
 
-  Currently we only support BGR24 and BGRA32 pixel formats. (And BGR32, where we ignore the alpha channel, but that's not precisely a separate format)
-
+  Currently we only support BGR24 and BGRA32 pixel formats.
+  (And BGR32, where we ignore the alpha channel, but that's not precisely a separate format)
   Eventually we will need to support
-
   * 8-bit grayscale
   * CMYK
   * YCbCr
-
   and possibly others. For V1, the API we expose is only used by projects in the same repository, running under the same tests.
-
   In V2, we can change the API as we wish; we are not constrained to what we design here.
-
   Perhaps it is best to explicitly limit the structure to represent what we process at this time?
-
-  If our buffers and structures actually describe their contents, then we need to support all permitted values in all functions. This is problematic.
-
-  We heavily experimented with LUV and XYZ color spaces, but determined that better results occur using RGB linear.
-
-  A custom sigmoidized color space could perhaps improve things, but would introduce significant overhead.
+ If our buffers and structures actually describe their contents, then we need to support all permitted values in all functions. This is problematic.
+* We heavily experimented with LUV and XYZ color spaces, but determined that better results occur using RGB linear.
+* A custom sigmoidized color space could perhaps improve things, but would introduce significant overhead.
 **/
-
-//This kind of describes the API as-is, not as it should be
 
 /* Proposed changes
 
 combine BitmapBgraStruct->bpp and BitmapBgraStruct->pixel_format somehow.
 
-Make  BitmapBgraStruct->matte_color a fixed 4 bytes sRGBA value, remove ->borrowed_matte_color
-
-Drop ColorSpace. We assume sRGB for BitmapBgra, RGBLinear for BitmapFloat
-
 Rename things for clarity.
-
-Use const/restrict where appropriate
-
-Refactor everything around convolution kernels; perhaps they should have their own struct?
+Prefix things, perhaps?
 
 */
 

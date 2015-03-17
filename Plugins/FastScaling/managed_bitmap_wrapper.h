@@ -24,12 +24,6 @@ namespace ImageResizer{
     namespace Plugins{
         namespace FastScaling {
 
-            enum Rotate{
-                RotateNone = 0,
-                Rotate90 = 1,
-                Rotate180 = 2,
-                Rotate270 = 3
-            };
 
             public ref class BitmapOptions{
             public:
@@ -92,14 +86,9 @@ namespace ImageResizer{
                     im->alpha_meaningful = hasAlpha && opts->AlphaMeaningful;
 
                     im->compositing_mode = opts->Compositing;
-                    if (opts->Matte_Color == nullptr){
-                        im->matte_color = 0;
-                    }
-                    else{
-                        int length = opts->Matte_Color->Length;
-                        im->matte_color = (uint8_t*)malloc(length);
-                        for (int i = 0; i < length; i++)
-                            im->matte_color[i] = (uint8_t)opts->Matte_Color->GetValue(i); //TODO: Does this cast work right?
+                    if (opts->Matte_Color != nullptr ){
+                        for (int i = 0; i < Math::Min(4,opts->Matte_Color->Length); i++)
+                           im->matte_color[i] = (uint8_t)opts->Matte_Color->GetValue(i); //TODO: Does this cast work right?
                     }
 
                     this->underlying_bitmap = source;
@@ -161,80 +150,6 @@ namespace ImageResizer{
               return f;
             }
 
-            public ref class RenderOptions{
-            public:
-                RenderOptions(){
-                    this->Filter = InterpolationFilter::Filter_CubicFast;
-                    SamplingWindowOverride = 0;
-                    SamplingBlurFactor = 1;
-                    SharpeningPercentGoal = 0;
-                    MinSamplingWindowToIntegrateSharpening = 1.5;
-
-                    InterpolateLastPercent = 3;
-                    HalveOnlyWhenPerfect = true;
-                    ConvolutionA_MaxChangeThreshold = 0;
-                    ConvolutionA_MinChangeThreshold = 0;
-                    ConvolutionB_MaxChangeThreshold = 0;
-                    ConvolutionB_MinChangeThreshold = 0;
-                }
-
-
-
-                property InterpolationFilter Filter;
-                property float SamplingWindowOverride;
-                property float SamplingBlurFactor;
-
-
-                property float SharpeningPercentGoal;
-                property float MinSamplingWindowToIntegrateSharpening;
-
-                property array<array<float, 1>^, 1>^ ColorMatrix;
-
-                // If possible to do correctly, halve the image until it is [halve_until] times larger than needed. 3 or greater reccomended. Specify -1 to disable halving.
-                property double InterpolateLastPercent;
-
-                //If true, only halve when both dimensions are multiples of the halving factor
-                property bool HalveOnlyWhenPerfect;
-
-                property array<float, 1>^ ConvolutionA;
-
-                property float ConvolutionA_MinChangeThreshold;
-                property float ConvolutionA_MaxChangeThreshold;
-
-                property array<float, 1>^ ConvolutionB;
-                property float ConvolutionB_MinChangeThreshold;
-                property float ConvolutionB_MaxChangeThreshold;
-
-                property Rotate Rotation;
-                property bool FlipVertical;
-                property bool FlipHorizontal;
-
-                property bool RequiresTransposeStep{
-                    bool get(){
-                        return this->Rotation == Rotate::Rotate270 || this->Rotation == Rotate::Rotate90;
-                    }
-                }
-                property bool RequiresVerticalFlipStep{
-                    bool get(){
-                        int vflips = 0;
-                        if (this->Rotation == Rotate::Rotate270) vflips++;
-                        if (this->Rotation == Rotate::Rotate180) vflips++;
-                        if (FlipVertical) vflips++;
-
-                        return vflips % 2 == 1;
-                    }
-                }
-                property bool RequiresHorizontalFlipStep{
-                    bool get(){
-                        int hflips = 0;
-                        if (this->Rotation == Rotate::Rotate90) hflips++;
-                        if (this->Rotation == Rotate::Rotate180) hflips++;
-                        if (FlipHorizontal) hflips++;
-
-                        return hflips % 2 == 1;
-                    }
-                }
-            };
 
         }
     }

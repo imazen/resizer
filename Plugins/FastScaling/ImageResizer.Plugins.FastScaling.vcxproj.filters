@@ -23,6 +23,9 @@
     <ClInclude Include="managed_bitmap_wrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="render_options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImageResizer.Plugins.FastScaling.cpp">

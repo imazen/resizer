@@ -38,12 +38,9 @@ namespace ImageResizer{
                         System::Double::Parse(query->Get("f.unsharp.threshold"), System::Globalization::NumberFormatInfo::InvariantInfo);
 
                     if (kernel_radius > 0){
-                        addTo->ConvolutionA = gcnew array<float, 1>(kernel_radius * 2 + 1);
 
-                        float * kern = create_guassian_sharpen_kernel(unsharp_sigma, kernel_radius);
-                        for (int i = 0; i < addTo->ConvolutionA->Length; i++)
-                            addTo->ConvolutionA[i] = kern[i];
-                        free(kern);
+                        addTo->KernelA_Struct = create_guassian_sharpen_kernel(unsharp_sigma, kernel_radius);
+
                     }
 
                 }

@@ -12,6 +12,10 @@
 
 #include "fastscaling.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
  //floating-point bitmap, typically linear RGBA, premultiplied
 typedef struct BitmapFloatStruct {
     //buffer width in pixels
@@ -54,9 +58,7 @@ typedef struct BitmapFloatStruct {
 #endif
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 BitmapFloat * CreateBitmapFloatHeader(int sx, int sy, int channels);

@@ -27,9 +27,6 @@
     <ClCompile Include="renderer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lookup_tables.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="convolution.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -37,6 +34,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="bitmap_formats.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="color.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -60,9 +60,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="color.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="bitmap_formats.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

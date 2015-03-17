@@ -130,6 +130,7 @@ int fill_buffer(SearchInfo* __restrict info){
             bgra += remnant;
         }
     }
+    return 0;
 }
 
 
