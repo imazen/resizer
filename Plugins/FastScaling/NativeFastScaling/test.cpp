@@ -232,8 +232,11 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
 		    }
 		}
 		REQUIRE(exact_match);
-	    }
-
+	    }	    
+	    destroy_renderer(r);
 	}
+	destroy_bitmap_bgra(final);
+	destroy_bitmap_bgra(bit);
+	free_lookup_tables();
     }
 }

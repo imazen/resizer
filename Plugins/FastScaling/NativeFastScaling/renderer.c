@@ -570,6 +570,11 @@ InterpolationDetails * create_interpolation(InterpolationFilter filter)
     return NULL;
 }
 
+void destroy_interpolation_details(InterpolationDetails * doomed)
+{
+    free(doomed);
+}
+
 
 #ifndef _TIMERS_IMPLEMENTED
 #define _TIMERS_IMPLEMENTED

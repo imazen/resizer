@@ -237,6 +237,7 @@ InterpolationDetails * create_interpolation_details(void);
 InterpolationDetails * create_bicubic_custom(double window, double blur, double B, double C);
 InterpolationDetails * create_custom(double window, double blur, detailed_interpolation_method filter);
 InterpolationDetails * create_interpolation(InterpolationFilter filter);
+void destroy_interpolation_details(InterpolationDetails *);
 
 
 

@@ -21,26 +21,26 @@
 
 inline int c99_vsnprintf(char* str, size_t size, const char* format, va_list ap)
 {
-  int count = -1;
+    int count = -1;
 
-  if (size != 0)
-    count = _vsnprintf_s(str, size, _TRUNCATE, format, ap);
-  if (count == -1)
-    count = _vscprintf(format, ap);
+    if (size != 0)
+	count = _vsnprintf_s(str, size, _TRUNCATE, format, ap);
+    if (count == -1)
+	count = _vscprintf(format, ap);
 
-  return count;
+    return count;
 }
 
 inline int c99_snprintf(char* str, size_t size, const char* format, ...)
 {
-  int count;
-  va_list ap;
+    int count;
+    va_list ap;
 
-  va_start(ap, format);
-  count = c99_vsnprintf(str, size, format, ap);
-  va_end(ap);
+    va_start(ap, format);
+    count = c99_vsnprintf(str, size, format, ap);
+    va_end(ap);
 
-  return count;
+    return count;
 }
 
 #endif // _MSC_VER
@@ -63,39 +63,36 @@ bool test_contrib_windows(char *msg)
         if (lct->ContribRow[i].Left != (int)corr36[i][0]) { bad = i; break; }
         else if (lct->ContribRow[i].Right != (int)corr36[i][1]) { bad = i; break; }
 
-        if (bad != -1)
-        {
+    if (bad != -1) {	
+	snprintf(msg, 255, "at 6->3 invalid value (%d; %d) at %d, expected (%d; %d)",
+		 lct->ContribRow[bad].Left,
+		 lct->ContribRow[bad].Right,
+		 bad, corr36[bad][0], corr36[bad][1]);
+	contributions_free(lct);
+	return false;
+    }
+    contributions_free(lct);
 
-            snprintf(msg, 255, "at 6->3 invalid value (%d; %d) at %d, expected (%d; %d)",
-                lct->ContribRow[bad].Left,
-                lct->ContribRow[bad].Right,
-                bad, corr36[bad][0], corr36[bad][1]);
-            contributions_free(lct);
-            return false;
-        }
-        contributions_free(lct);
+    from_w = 6;
+    to_w = 4;
+    unsigned int corr46[4][2] = { { 0, 1 }, { 1, 2 }, { 3, 4 }, { 4, 5 } };
+    lct = contributions_calc(to_w, from_w, cubicFast);
+    destroy_interpolation_details(cubicFast);
 
-        from_w = 6;
-        to_w = 4;
-        unsigned int corr46[4][2] = { { 0, 1 }, { 1, 2 }, { 3, 4 }, { 4, 5 } };
-        lct = contributions_calc(to_w, from_w, cubicFast);
+    for (uint32_t i = 0; i < lct->LineLength; i++)
+	if (lct->ContribRow[i].Left != (int)corr46[i][0]) { bad = i; break; }
+	else if (lct->ContribRow[i].Right != (int)corr46[i][1]) { bad = i; break; }
 
-        for (uint32_t i = 0; i < lct->LineLength; i++)
-            if (lct->ContribRow[i].Left != (int)corr46[i][0]) { bad = i; break; }
-            else if (lct->ContribRow[i].Right != (int)corr46[i][1]) { bad = i; break; }
-
-            if (bad != -1)
-            {
-              snprintf(msg, 255, "at 6->4 invalid value (%d; %d) at %d, expected (%d; %d)",
-                    lct->ContribRow[bad].Left,
-                    lct->ContribRow[bad].Right,
-                    bad, corr46[bad][0], corr46[bad][1]);
-                contributions_free(lct);
-                return false;
-            }
-            contributions_free(lct);
-
-            return true;
+    if (bad != -1) {
+	snprintf(msg, 255, "at 6->4 invalid value (%d; %d) at %d, expected (%d; %d)",
+		 lct->ContribRow[bad].Left,
+		 lct->ContribRow[bad].Right,
+		 bad, corr46[bad][0], corr46[bad][1]);
+	contributions_free(lct);
+	return false;
+    }
+    contributions_free(lct);	
+    return true;
 }
 
 bool function_bounded(InterpolationDetails* details, char *msg, double input_start_value, double stop_at_abs, double input_step, double result_low_threshold, double result_high_threshold, const char *name)
@@ -107,15 +104,13 @@ bool function_bounded(InterpolationDetails* details, char *msg, double input_sta
 
     double result_value = (*details->filter)(details, input_value);
 
-    if (result_value < result_low_threshold)
-    {
-      snprintf(msg + strlen(msg), 255 - strlen(msg), "value %.4f is below %.4f at x=%.4f (%s)", result_value, result_low_threshold, input_value, name);
-        return false;
+    if (result_value < result_low_threshold) {
+	snprintf(msg + strlen(msg), 255 - strlen(msg), "value %.4f is below %.4f at x=%.4f (%s)", result_value, result_low_threshold, input_value, name);
+	return false;
     }
-    else if (result_value > result_high_threshold)
-    {
-      snprintf(msg + strlen(msg), 255 - strlen(msg), "value %.4f exceeds %.4f at x=%.4f (%s)", result_value, result_high_threshold, input_value,name);
-        return false;
+    else if (result_value > result_high_threshold) {
+	snprintf(msg + strlen(msg), 255 - strlen(msg), "value %.4f exceeds %.4f at x=%.4f (%s)", result_value, result_high_threshold, input_value,name);
+	return false;
     }
 
     return function_bounded(details, msg, input_value + input_step, stop_at_abs, input_step, result_low_threshold, result_high_threshold, name);
@@ -189,9 +184,9 @@ bool test_weight_distrib(char *msg)
     if (!test_filter(InterpolationFilter::Filter_CubicBSpline, msg, 0, 0, 1.75, 0.08, 2)) return false;
 
 
-   // if (!test_filter(InterpolationFilter::Filter_Mitchell, msg, 1, 1.74, 1, 0.08, 1.75)) return false;
-   // if (!test_filter(InterpolationFilter::Filter_Robidoux, msg, 1, 1.6, 1, 0.08, 1.75)) return false;
-   // if (!test_filter(InterpolationFilter::Filter_RobidouxSharp, msg, 1, 1.8, 1, 0.08, 1.8)) return false;
+    // if (!test_filter(InterpolationFilter::Filter_Mitchell, msg, 1, 1.74, 1, 0.08, 1.75)) return false;
+    // if (!test_filter(InterpolationFilter::Filter_Robidoux, msg, 1, 1.6, 1, 0.08, 1.75)) return false;
+    // if (!test_filter(InterpolationFilter::Filter_RobidouxSharp, msg, 1, 1.8, 1, 0.08, 1.8)) return false;
 
 
     //Sinc filters. These have second crossings.

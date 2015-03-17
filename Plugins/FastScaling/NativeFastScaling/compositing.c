@@ -16,7 +16,6 @@
 
 int convert_srgb_to_linear(BitmapBgra * src, uint32_t from_row, BitmapFloat * dest, uint32_t dest_row, uint32_t row_count)
 {
-
     if (src->w != dest->w || src->bpp < dest->channels) return -1;
 
     const LookupTables*  t = get_lookup_tables();
