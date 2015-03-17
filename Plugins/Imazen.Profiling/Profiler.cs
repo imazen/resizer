@@ -40,6 +40,21 @@ namespace Imazen.Profiling
             }
         }
 
+
+        public virtual void LogStart(long ticks, string segmentName, bool allowRecursion = false)
+        {
+            if (!allowRecursion && IsRunning(segmentName))
+                throw new InvalidOperationException(string.Format("The given profiling segment {0} has already been started, and allowRecursion=false", segmentName));
+
+            callstack.Push(ProfilingNode.StartNewAt(segmentName, ticks));
+
+        }
+        public virtual void LogStop(long ticks, string segmentName, bool assertRunning = true, bool stopChildren = false)
+        {
+            StopAt(ticks, segmentName, assertRunning, stopChildren);
+        }
+    
+
         public virtual void Start(string segmentName, bool allowRecursion = false)
         {
             if (!allowRecursion && IsRunning(segmentName))
@@ -55,19 +70,23 @@ namespace Imazen.Profiling
 
         public virtual void Stop(string segmentName, bool assertStarted = true, bool stopChildren = false)
         {
+            StopAt(-1, segmentName, assertStarted, stopChildren);
+        }
+        public virtual void StopAt(long ticks, string segmentName, bool assertStarted = true, bool stopChildren = false)
+        {
             if (stopChildren){
                 var topmost = VisibleCallstack.First((n) => n.SegmentName == segmentName);
                 if (topmost != null)
                 {
                     var children = VisibleCallstack.TakeWhile((n) => n.SegmentName != segmentName).ToArray();
-                    children.Select((n) => { Stop(n.SegmentName, true, false); return n; });
-                    Stop(segmentName, assertStarted, false);
+                    children.Select((n) => { StopAt(ticks,n.SegmentName, true, false); return n; });
+                    StopAt(ticks,segmentName, assertStarted, false);
                 }else if (assertStarted) throw new InvalidOperationException(string.Format("The given profiling segment {0} is not running anywhere in the callstack; it cannot be stopped.", segmentName));
             
             }else{
                 if (callstack.Peek().SegmentName == segmentName){
                     var n = callstack.Pop();
-                    n.Stop();
+                    n.StopAt(ticks);
                     if (n.Drop) return; 
                     if (callstack.Count > 0)
                         callstack.Peek().AddChild(n);

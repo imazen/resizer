@@ -40,10 +40,14 @@ namespace Imazen.Profiling
         }
         public void Stop()
         {
-            StopTicks = Stopwatch.GetTimestamp();
-            if (StopTicks < StartTicks) StopTicks = StartTicks;
+            StopAt(-1);
         }
 
+        public void StopAt(long ticks)
+        {
+            StopTicks = ticks > 0 ? ticks : Stopwatch.GetTimestamp();
+            if (StopTicks < StartTicks) StopTicks = StartTicks;
+        }
         /// <summary>
         /// Indicates that child profiling operations should be isolated (permits controlled recursion)
         /// </summary>
@@ -58,6 +62,10 @@ namespace Imazen.Profiling
 
         public static ProfilingNode StartNew(string name)
         {
+            return StartNewAt(name, -1);
+        }
+        public static ProfilingNode StartNewAt(string name, long ticks)
+        {
             var n = new ProfilingNode();
 
             if (name.IndexOf("[drop]", StringComparison.OrdinalIgnoreCase) > -1)
@@ -71,7 +79,13 @@ namespace Imazen.Profiling
                 name = name.Replace("[isolate]", "");
             }
             n.SegmentName = name.Trim();
-            n.Start();
+            if (ticks > 0)
+            {
+                n.StartTicks = ticks;
+            }
+            else { 
+                n.Start();
+            }
             return n;
         }
 
