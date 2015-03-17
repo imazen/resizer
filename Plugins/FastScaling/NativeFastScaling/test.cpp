@@ -6,7 +6,7 @@
 
 std::ostream& operator<<(std::ostream& out, const BitmapFloat & bitmap_float) 
 {
-    out << "BitmapFloat: w:" << bitmap_float.w << " h: " << bitmap_float.h << " channels:" << bitmap_float.channels << '\n';
+    return out << "BitmapFloat: w:" << bitmap_float.w << " h: " << bitmap_float.h << " channels:" << bitmap_float.channels << '\n';
 }
 
 TEST_CASE("Argument checking for convert_sgrp_to_linear") {
