@@ -193,15 +193,15 @@ static void BgraSharpenInPlaceX(BitmapBgra * im, float pct)
 
     const uint32_t sy = im->h;
     const uint32_t stride = im->stride;
-    const uint32_t bpp = im->bpp;
+    const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel (im->fmt);
 
 
-    if (pct <= 0 || im->w < 3 || bpp < 3) return;
+    if (pct <= 0 || im->w < 3 || bytes_pp < 3) return;
 
     for (y = 0; y < sy; y++)
     {
         unsigned char *row = im->pixels + y * stride;
-        for (current = bpp, prev = 0, next = bpp + bpp; next < stride; prev = current, current = next, next += bpp){
+        for (current = bytes_pp, prev = 0, next = bytes_pp + bytes_pp; next < stride; prev = current, current = next, next += bytes_pp){
             //We never sharpen the alpha channel
             //TODO - we need to buffer the left pixel to prevent it from affecting later calculations
             for (uint32_t i = 0; i < 3; i++)

@@ -91,9 +91,10 @@ int fill_buffer(SearchInfo* __restrict info){
     */
     const uint32_t w = info->buf_w;
     const uint32_t h = info->buf_h;
-    const uint32_t remnant = info->bitmap->stride - (info->bitmap->bpp * w);
-    uint8_t  const  * __restrict bgra = info->bitmap->pixels + (info->bitmap->stride * info->buf_y) + (info->bitmap->bpp * info->buf_x);
-    const uint8_t channels = info->bitmap->bpp;
+    const uint32_t bytes_per_pixel = BitmapPixelFormat_bytes_per_pixel (info->bitmap->fmt);
+    const uint32_t remnant = info->bitmap->stride - (bytes_per_pixel * w);
+    uint8_t  const  * __restrict bgra = info->bitmap->pixels + (info->bitmap->stride * info->buf_y) + (bytes_per_pixel * info->buf_x);
+    const uint8_t channels = bytes_per_pixel;
     if (channels == 4 && info->bitmap->alpha_meaningful){
         uint32_t buf_ix = 0;
         for (uint32_t y = 0; y < h; y++){
@@ -105,7 +106,7 @@ int fill_buffer(SearchInfo* __restrict info){
             bgra += remnant;
         }
     }
-    else if (channels == 3 || (channels == 4 && info->bitmap->alpha_meaningful)){
+    else if (channels == 3 || (channels == 4 && !info->bitmap->alpha_meaningful)){
         uint32_t buf_ix = 0;
         for (uint32_t y = 0; y < h; y++){
             for (uint32_t x = 0; x < w; x++){

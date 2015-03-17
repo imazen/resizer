@@ -13,9 +13,9 @@
 #include <stdio.h>
 #include <string.h>
 
-bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bool flipx, bool flipy, InterpolationFilter filter);
+bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFormat cbpp, bool transpose, bool flipx, bool flipy, InterpolationFilter filter);
 
-bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bool flipx, bool flipy, InterpolationFilter filter)
+bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFormat cbpp, bool transpose, bool flipx, bool flipy, InterpolationFilter filter)
 {
     BitmapBgra * source = create_bitmap_bgra(sx, sy, true, sbpp);
     BitmapBgra * canvas = create_bitmap_bgra(cx, cy, true, cbpp);
@@ -58,8 +58,8 @@ bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bo
 
 int main(void)
 {
-    test(4000,3000,3,800,600,4,true, true,false,(InterpolationFilter)0);
-    test(4000,3000,3,1600,1200,4,false,true,true,(InterpolationFilter)0);
-    test(1200,800,4,200,150,4,false,false,false,(InterpolationFilter)0);
+    test (4000, 3000, Bgr24, 800, 600, Bgra32, true, true, false, (InterpolationFilter)0);
+    test (4000, 3000, Bgr24, 1600, 1200, Bgra32, false, true, true, (InterpolationFilter)0);
+    test (1200, 800, Bgra32, 200, 150, Bgra32, false, false, false, (InterpolationFilter)0);
     return 0;
 }

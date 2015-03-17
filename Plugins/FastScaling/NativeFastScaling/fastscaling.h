@@ -34,11 +34,11 @@ extern "C" {
 
 //Compact format for bitmaps. sRGB or gamma adjusted - *NOT* linear
 typedef enum _BitmapPixelFormat {
-    None = 0,
-    Bgr24 = 24,
-    Bgra32 = 32,
-    Gray8 = 8
+    Bgr24 = 3,
+    Bgra32 = 4,
+    Gray8 = 1
 } BitmapPixelFormat;
+
 
 typedef enum _BitmapCompositingMode {
     Replace_self = 0,
@@ -68,10 +68,8 @@ typedef struct BitmapBgraStruct {
 
     //If true, we can reuse the allocated memory for other purposes.
     bool can_reuse_space;
-    //TODO: rename to bytes_pp
-    uint32_t bpp;
-    //Todo - combine with bpp somehow. DRY this out
-    BitmapPixelFormat pixel_format;
+
+    BitmapPixelFormat fmt;
 
     //When using compositing mode blend_with_matte, this color will be used. We should probably define this as always being sRGBA, 4 bytes.
     uint8_t matte_color[4];
@@ -213,7 +211,7 @@ int64_t get_profiler_frequency(void);
 
 ProfilingLog * access_profiling_log(Renderer * r);
 
-BitmapBgra * create_bitmap_bgra(int sx, int sy, bool zeroed, int bpp);
+BitmapBgra * create_bitmap_bgra(int sx, int sy, bool zeroed, BitmapPixelFormat format);
 BitmapBgra * create_bitmap_bgra_header(int sx, int sy);
 
 RenderDetails * create_render_details(void);
@@ -240,6 +238,7 @@ InterpolationDetails * create_interpolation(InterpolationFilter filter);
 void destroy_interpolation_details(InterpolationDetails *);
 
 
+uint32_t BitmapPixelFormat_bytes_per_pixel (BitmapPixelFormat format);
 
 typedef struct {
     float *Weights;/* Normalized weights of neighboring pixels */

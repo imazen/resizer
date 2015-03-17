@@ -87,7 +87,7 @@ LookupTables * get_lookup_tables(void) {
 void apply_color_matrix(BitmapBgra * bmp, const uint32_t row, const uint32_t count, float* const __restrict  m[5])
 {
     const uint32_t stride = bmp->stride;
-    const uint32_t ch = bmp->bpp;
+    const uint32_t ch = BitmapPixelFormat_bytes_per_pixel(bmp->fmt);
     const uint32_t w = bmp->w;
     const uint32_t h = MIN(row + count, bmp->h);
     if (ch == 4)

@@ -72,12 +72,12 @@ namespace ImageResizer{
 
                     //LockBits handles cropping for us.
                     this->locked_bitmap_data = source->LockBits(from, opts->Readonly ? ImageLockMode::ReadOnly : ImageLockMode::ReadWrite, source->PixelFormat);
-                    im->bpp = hasAlpha ? 4 : 3;
+                    im->fmt = hasAlpha ? Bgra32 : Bgr24;
                     im->pixels = (unsigned char *)safe_cast<void *>(this->locked_bitmap_data->Scan0);
                     im->stride = this->locked_bitmap_data->Stride;
 
                     im->pixels_readonly = opts->Readonly;
-                    im->stride_readonly = opts->Readonly || (im->stride - (im->bpp * im->w) > im->bpp); //We can never mess with the stride when lockbits is used - unless there is no padding.
+                    im->stride_readonly = opts->Readonly || (im->stride - (BitmapPixelFormat_bytes_per_pixel (im->fmt) * im->w) > BitmapPixelFormat_bytes_per_pixel (im->fmt)); //We can never mess with the stride when lockbits is used - unless there is no padding.
                     im->can_reuse_space = !im->stride_readonly && opts->AllowSpaceReuse;
 
                     im->w = sx;

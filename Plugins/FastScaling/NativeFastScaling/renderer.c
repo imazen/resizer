@@ -212,7 +212,7 @@ static int CompleteHalving(Renderer * r)
     }
     else {
         //p->Start("create temp image for halving", false);
-        BitmapBgra * tmp_im = create_bitmap_bgra(halved_width, halved_height, true, r->source->bpp);
+        BitmapBgra * tmp_im = create_bitmap_bgra(halved_width, halved_height, true, r->source->fmt);
         if (tmp_im == NULL) return -102;
         //p->Stop("create temp image for halving", true, false);
 
@@ -289,9 +289,7 @@ static int ScaleAndRender1D(const Renderer * r,
     const uint32_t buffer_row_count = 4; //using buffer=5 seems about 6% better than most other non-zero values.
 
     //How many bytes per pixel are we scaling?
-    uint32_t scaling_bpp = (pSrc->bpp == 4 && !pSrc->alpha_meaningful) ? 3 : pSrc->bpp;
-
-
+    BitmapPixelFormat scaling_format = (pSrc->fmt == Bgra32 && !pSrc->alpha_meaningful) ? Bgr24 : pSrc->fmt;
 
     //p->Start("contributions_calc", false);
 
@@ -301,9 +299,9 @@ static int ScaleAndRender1D(const Renderer * r,
 
     //p->Start("create_bitmap_float (buffers)", false);
 
-    source_buf = create_bitmap_float(from_count, buffer_row_count, scaling_bpp, false); /*Handle errors */  if (source_buf == NULL)  { return_code = -1; goto cleanup; }
+    source_buf = create_bitmap_float(from_count, buffer_row_count, scaling_format, false); /*Handle errors */  if (source_buf == NULL)  { return_code = -1; goto cleanup; }
 
-    dest_buf = create_bitmap_float(to_count, buffer_row_count, scaling_bpp, false);  /*Handle errors */   if (source_buf == NULL)  { return_code = -1; goto cleanup; }
+    dest_buf = create_bitmap_float(to_count, buffer_row_count, scaling_format, false);  /*Handle errors */   if (source_buf == NULL)  { return_code = -1; goto cleanup; }
     source_buf->alpha_meaningful = pSrc->alpha_meaningful;
     dest_buf->alpha_meaningful = source_buf->alpha_meaningful;
 
@@ -372,9 +370,10 @@ static int Render1D(const Renderer * r,
     uint32_t buffer_row_count = 4; //using buffer=5 seems about 6% better than most other non-zero values.
 
     //How many bytes per pixel are we scaling?
-    uint32_t scaling_bpp = (pSrc->bpp == 4 && !pSrc->alpha_meaningful) ? 3 : pSrc->bpp;
+     BitmapPixelFormat scaling_format = (pSrc->fmt == Bgra32 && !pSrc->alpha_meaningful) ? Bgr24 : pSrc->fmt;
 
-    BitmapFloat * buf = create_bitmap_float(pSrc->w, buffer_row_count, scaling_bpp, false); /*Handle errors */  if (buf == NULL)  { return_code = -1; goto cleanup; }
+
+     BitmapFloat * buf = create_bitmap_float (pSrc->w, buffer_row_count, scaling_format, false); /*Handle errors */  if (buf == NULL)  { return_code = -1; goto cleanup; }
     buf->alpha_meaningful = pSrc->alpha_meaningful;
     buf->alpha_premultiplied = buf->channels == 4;
 
@@ -468,7 +467,7 @@ int perform_render(Renderer * r)
     //p->Start("allocate temp image(sy x dx)", false);
 
     /* Scale horizontally  */
-    r->transposed = create_bitmap_bgra(r->source->h, r->canvas == NULL ? r->source->w : (skip_last_transpose ? r->canvas->h : r->canvas->w), false, r->source->bpp);
+    r->transposed = create_bitmap_bgra(r->source->h, r->canvas == NULL ? r->source->w : (skip_last_transpose ? r->canvas->h : r->canvas->w), false, r->source->fmt);
     if (r->transposed == NULL) { return -2;  }
     r->transposed->compositing_mode = Replace_self;
     //p->Stop("allocate temp image(sy x dx)", true, false);

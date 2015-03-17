@@ -16,13 +16,13 @@
 
 int convert_srgb_to_linear(BitmapBgra * src, uint32_t from_row, BitmapFloat * dest, uint32_t dest_row, uint32_t row_count)
 {
-    if (src->w != dest->w || src->bpp < dest->channels) return -1;
+    if (src->w != dest->w || BitmapPixelFormat_bytes_per_pixel(src->fmt) < dest->channels) return -1;
 
     const LookupTables*  t = get_lookup_tables();
 
     const uint32_t w = src->w;
-    const uint32_t units = w * src->bpp;
-    const uint32_t from_step = src->bpp;
+    const uint32_t units = w * BitmapPixelFormat_bytes_per_pixel(src->fmt);
+    const uint32_t from_step = BitmapPixelFormat_bytes_per_pixel(src->fmt);
     const uint32_t to_step = dest->channels;
     const uint32_t copy_step = MIN(from_step, to_step);
 
@@ -93,13 +93,14 @@ static int  copy_bitmap_bgra(BitmapBgra * src, BitmapBgra * dst)
     // TODO: check sizes / overflows
     if (dst->w != src->w || dst->h != src->h) return -1;
 
-    if (src->bpp == dst->bpp)
+    if (src->fmt == dst->fmt)
     {
+        const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel (src->fmt);
         // recalculate line width as it can be different from the stride
         for (uint32_t y = 0; y < src->h; y++)
-            memcpy(dst->pixels + y*dst->stride, src->pixels + y*src->stride, src->w*src->bpp);
+            memcpy(dst->pixels + y*dst->stride, src->pixels + y*src->stride, src->w*bytes_pp);
     }
-    else if (src->bpp == 3 && dst->bpp == 4)
+    else if (src->fmt == Bgr24 && dst->fmt == Bgra32)
     {
         for (uint32_t y = 0; y < src->h; y++)
             unpack24bitRow(src->w, src->pixels + y*src->stride, dst->pixels + y*dst->stride);
@@ -163,13 +164,14 @@ void demultiply_alpha(BitmapFloat * src, const uint32_t from_row, const uint32_t
 void copy_linear_over_srgb(BitmapFloat * src, const uint32_t from_row, BitmapBgra * dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose)
 {
 
+    const uint32_t dest_bytes_pp = BitmapPixelFormat_bytes_per_pixel (dest->fmt);
 
-    const uint32_t dest_row_stride = transpose ? dest->bpp : dest->stride;
-    const uint32_t dest_pixel_stride = transpose ? dest->stride : dest->bpp;
+    const uint32_t dest_row_stride = transpose ? dest_bytes_pp : dest->stride;
+    const uint32_t dest_pixel_stride = transpose ? dest->stride : dest_bytes_pp;
     const uint32_t srcitems = MIN(from_col + col_count, src->w) *src->channels;
     const uint32_t ch = src->channels;
-    const bool copy_alpha = dest->bpp == 4 && src->channels == 4 && src->alpha_meaningful;
-    const bool clean_alpha = !copy_alpha && dest->bpp == 4;
+    const bool copy_alpha = dest->fmt == Bgra32 && src->channels == 4 && src->alpha_meaningful;
+    const bool clean_alpha = !copy_alpha && dest->fmt == Bgra32;
 
     for (uint32_t row = 0; row < row_count; row++){
         //const float * const __restrict src_row = src->pixels + (row + from_row) * src->float_stride;
@@ -197,12 +199,13 @@ void copy_linear_over_srgb(BitmapFloat * src, const uint32_t from_row, BitmapBgr
 static void compose_linear_over_srgb(BitmapFloat * src, const uint32_t from_row, BitmapBgra * dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose){
 
     LookupTables*   t = get_lookup_tables();
-    const uint32_t dest_row_stride = transpose ? dest->bpp : dest->stride;
-    const uint32_t dest_pixel_stride = transpose ? dest->stride : dest->bpp;
+    const uint32_t dest_bytes_pp = BitmapPixelFormat_bytes_per_pixel (dest->fmt);
+    const uint32_t dest_row_stride = transpose ? dest_bytes_pp : dest->stride;
+    const uint32_t dest_pixel_stride = transpose ? dest->stride : dest_bytes_pp;
     const uint32_t srcitems = MIN(from_col + col_count, src->w) *src->channels;
     const uint32_t ch = src->channels;
 
-    const bool dest_alpha = dest->bpp == 4 && dest->alpha_meaningful;
+    const bool dest_alpha = dest->fmt == Bgra32 && dest->alpha_meaningful;
 
     const uint8_t dest_alpha_index = dest_alpha ? 3 : 0;
     const float dest_alpha_to_float_coeff = dest_alpha ? 1.0f / 255.0f : 0.0f;

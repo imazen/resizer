@@ -11,6 +11,9 @@
 
 #include "fastscaling_private.h"
 
+uint32_t BitmapPixelFormat_bytes_per_pixel (BitmapPixelFormat format){
+    return (uint32_t)format;
+}
 
 BitmapBgra * create_bitmap_bgra_header(int sx, int sy){
     BitmapBgra * im;
@@ -34,18 +37,18 @@ BitmapBgra * create_bitmap_bgra_header(int sx, int sy){
 }
 
 
-BitmapBgra * create_bitmap_bgra(int sx, int sy, bool zeroed, int bpp)
+BitmapBgra * create_bitmap_bgra (int sx, int sy, bool zeroed, BitmapPixelFormat format)
 {
     BitmapBgra * im = create_bitmap_bgra_header(sx, sy);
     if (im == NULL) {
 	return NULL;
     }
-    im->bpp = bpp;
-    im->stride = im->w * bpp;
+    im->fmt = format;
+    im->stride = im->w * BitmapPixelFormat_bytes_per_pixel(format);
     im->pixels_readonly = false;
     im->stride_readonly = false;
     im->borrowed_pixels = false;
-    im->alpha_meaningful = bpp == 4;
+    im->alpha_meaningful = format == Bgra32;
     if (zeroed) {
         im->pixels = (unsigned char *)ir_calloc(sy * im->stride, sizeof(unsigned char));
     }

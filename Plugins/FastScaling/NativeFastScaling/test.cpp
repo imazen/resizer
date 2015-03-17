@@ -4,13 +4,13 @@
 #include "weighting_test_helpers.h"
 
 
-std::ostream& operator<<(std::ostream& out, const BitmapFloat & bitmap_float) 
+std::ostream& operator<<(std::ostream& out, const BitmapFloat & bitmap_float)
 {
     return out << "BitmapFloat: w:" << bitmap_float.w << " h: " << bitmap_float.h << " channels:" << bitmap_float.channels << '\n';
 }
 
 TEST_CASE("Argument checking for convert_sgrp_to_linear") {
-    BitmapBgra * src = create_bitmap_bgra(2, 3, true, 4);
+    BitmapBgra * src = create_bitmap_bgra(2, 3, true, Bgra32);
     BitmapFloat * dest = create_bitmap_float(1, 1, 4, false);
     convert_srgb_to_linear(src, 3, dest, 0, 0);
     destroy_bitmap_bgra(src);
@@ -18,7 +18,7 @@ TEST_CASE("Argument checking for convert_sgrp_to_linear") {
     destroy_bitmap_float(dest);
 }
 
-bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bool flipx, bool flipy, bool profile, InterpolationFilter filter)
+bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFormat cbpp, bool transpose, bool flipx, bool flipy, bool profile, InterpolationFilter filter)
 {
     BitmapBgra * source = create_bitmap_bgra(sx, sy, true, sbpp);
     BitmapBgra * canvas = create_bitmap_bgra(cx, cy, true, cbpp);
@@ -48,23 +48,23 @@ bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bo
 }
 
 TEST_CASE( "Render without crashing", "[fastscaling]") {
-    REQUIRE( test(400,300,4,200,40,4,false,false,false,false,(InterpolationFilter)0) );
+    REQUIRE (test (400, 300, Bgra32, 200, 40, Bgra32, false, false, false, false, (InterpolationFilter)0));
 }
 
 TEST_CASE( "Render - upscale", "[fastscaling]") {
-    REQUIRE(test(200, 40, 4, 500, 300, 4, false, false, false, false,(InterpolationFilter)0));
+    REQUIRE (test (200, 40, Bgra32, 500, 300, Bgra32, false, false, false, false, (InterpolationFilter)0));
 }
 
 TEST_CASE("Render - downscale 24->32", "[fastscaling]") {
-    REQUIRE(test(400, 200, 3, 200, 100, 4, false, false, false, false,(InterpolationFilter)0));
+    REQUIRE (test (400, 200, Bgr24, 200, 100, Bgra32, false, false, false, false, (InterpolationFilter)0));
 }
 
 TEST_CASE("Render and rotate", "[fastscaling]") {
-    REQUIRE(test(200, 40, 4, 500, 300, 4,true,true,true,false,(InterpolationFilter)0));
+    REQUIRE (test (200, 40, Bgra32, 500, 300, Bgra32, true, true, true, false, (InterpolationFilter)0));
 }
 
 TEST_CASE("Render and rotate with profiling", "[fastscaling]") {
-    REQUIRE(test(200, 40, 4, 500, 300, 4,true,true,true,true,(InterpolationFilter)0));
+    REQUIRE (test (200, 40, Bgra32, 500, 300, Bgra32, true, true, true, true, (InterpolationFilter)0));
 }
 
 TEST_CASE("Test contrib windows", "[fastscaling]") {
@@ -203,11 +203,12 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
 	int w = 256;
 	int h = 256;
 
-	BitmapBgra* bit = create_bitmap_bgra(w, h, true, 4);
+	BitmapBgra* bit = create_bitmap_bgra(w, h, true, Bgra32);
+    const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel (bit->fmt);
 
 	for (size_t y = 1; y < bit->h; y++){
 	    for (size_t x = 0; x < bit->w; x++){
-		uint8_t* pix = bit->pixels + (y * bit->stride) + (x * bit->bpp);
+		uint8_t* pix = bit->pixels + (y * bit->stride) + (x * bytes_pp);
 
 		*pix = (uint8_t)x;
 		*(pix + 1) = (uint8_t)x;
@@ -216,7 +217,7 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
 	    }
 	}
 
-	BitmapBgra* final = create_bitmap_bgra(w, h, true, 4);
+	BitmapBgra* final = create_bitmap_bgra(w, h, true, Bgra32);
 	// BitmapFloat* buf = create_bitmap_float(w, h, 4, true);
 
 	WHEN ("we do stuff") {
@@ -235,8 +236,8 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
 		bool exact_match = true;
 		for (size_t y = 0; y < bit->h; y++){
 		    for (size_t x = 0; x < bit->w; x++){
-			uint8_t* from = bit->pixels + (y * bit->stride) + (x * bit->bpp);
-			uint8_t* to = final->pixels + (y * final->stride) + (x * final->bpp);
+			uint8_t* from = bit->pixels + (y * bit->stride) + (x * bytes_pp);
+			uint8_t* to = final->pixels + (y * final->stride) + (x * bytes_pp);
 
 			if (*from != *to) exact_match = false;
 			from++; to++;
@@ -249,7 +250,7 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
 		    }
 		}
 		REQUIRE(exact_match);
-	    }	    
+	    }
 	    destroy_renderer(r);
 	}
 	destroy_bitmap_bgra(final);

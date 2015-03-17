@@ -178,7 +178,7 @@ static int HalveInternal(const BitmapBgra * from,
     const BitmapBgra * to, const int to_w, const int to_h, const int to_stride, const int divisor)
 {
 
-    int to_w_bytes = to_w * to->bpp;
+    const int to_w_bytes = to_w * BitmapPixelFormat_bytes_per_pixel (to->fmt);
     unsigned short *buffer = (unsigned short *)calloc(to_w_bytes, sizeof(unsigned short));
     if (buffer == NULL) return 0;
 
@@ -189,12 +189,15 @@ static int HalveInternal(const BitmapBgra * from,
         shift = intlog2(divisorSqr);
     }
 
+    const uint32_t from_bytes_pp = BitmapPixelFormat_bytes_per_pixel (from->fmt);
+    const uint32_t to_bytes_pp = BitmapPixelFormat_bytes_per_pixel (to->fmt);
+
     //TODO: Ensure that from is equal or greater than divisorx to_w and t_h
 
     for (y = 0; y < to_h; y++){
         memset(buffer, 0, sizeof(short) * to_w_bytes);
         for (d = 0; d < divisor; d++){
-            HalveRowByDivisor(from->pixels + (y * divisor + d) * from->stride, buffer, to_w, divisor, from->bpp, to->bpp);
+            HalveRowByDivisor (from->pixels + (y * divisor + d) * from->stride, buffer, to_w, divisor, from_bytes_pp, to_bytes_pp);
         }
         unsigned char * dest_line = to->pixels + y * to_stride;
 
@@ -236,7 +239,7 @@ int HalveInPlace(BitmapBgra * from, int divisor)
 {
     int to_w = from->w / divisor;
     int to_h = from->h / divisor;
-    int to_stride = to_w * from->bpp;
+    int to_stride = to_w * BitmapPixelFormat_bytes_per_pixel (from->fmt);
     int r = HalveInternal(from, from, to_w, to_h, to_stride, divisor);
     from->w = to_w;
     from->h = to_h;
