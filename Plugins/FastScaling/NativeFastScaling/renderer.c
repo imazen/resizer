@@ -117,7 +117,7 @@ inline void profiler_start(Renderer * r, const char * name, bool allow_recursion
 
     current->time =get_high_precision_ticks();
     current->name = name;
-    current->flags = allow_recursion ? Profiling_start_allow_recursion : Profiling_none;
+    current->flags = allow_recursion ? Profiling_start_allow_recursion : Profiling_start;
 }
 inline void profiler_stop(Renderer * r, const char * name, bool assert_started, bool stop_children){
     ProfilingEntry * current = &(r->log->log[r->log->count]);
@@ -126,7 +126,7 @@ inline void profiler_stop(Renderer * r, const char * name, bool assert_started, 
 
     current->time =get_high_precision_ticks();
     current->name = name;
-    current->flags = assert_started ? Profiling_assert_started : Profiling_none;
+    current->flags = assert_started ? Profiling_stop_assert_started : Profiling_stop;
     if (stop_children) {current->flags = current->flags | Profiling_stop_children; }
 }
 

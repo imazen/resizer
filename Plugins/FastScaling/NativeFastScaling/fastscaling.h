@@ -188,10 +188,11 @@ typedef struct LookupTablesStruct {
 
 
 typedef enum _ProfilingEntryFlags {
-    Profiling_none = 0,
-    Profiling_start_allow_recursion = 8,
-    Profiling_stop_children = 4,
-    Profiling_assert_started = 2
+    Profiling_start = 2,
+    Profiling_start_allow_recursion = 2 | 4,
+    Profiling_stop = 8,
+    Profiling_stop_assert_started = 8 | 16,
+    Profiling_stop_children = 8 | 16 | 32,
 
 } ProfilingEntryFlags;
 
