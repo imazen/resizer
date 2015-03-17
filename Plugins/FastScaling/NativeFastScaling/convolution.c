@@ -123,7 +123,7 @@ int ConvolveBgraFloatInPlace(BitmapFloat * buf,  ConvolutionKernel *kernel, uint
     float* __restrict buffer =  kernel->buffer;
     float* __restrict avg = &kernel->buffer[buffer_count * ch_used];
 
-    const float const * __restrict kern = kernel->kernel;
+    const float  * __restrict kern = kernel->kernel;
 
     for (uint32_t row = from_row; row < until_row; row++){
 
