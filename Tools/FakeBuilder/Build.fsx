@@ -127,8 +127,8 @@ Target "build" (fun _ ->
     MSBuild "" "Build" ["Configuration","Debug"] [mainSolution] |> ignore
     MSBuild "" "Build" ["Configuration","Trial"] [mainSolution] |> ignore
     
-    MSBuild "" "Build" ["Configuration","Release"; "Platform","x86"] [fastScaleSln] |> ignore
-    MSBuild "" "Build" ["Configuration","Debug"; "Platform","x86"] [fastScaleSln] |> ignore
+    MSBuild "" "Build" ["Configuration","Release"; "Platform","Win32"] [fastScaleSln] |> ignore
+    MSBuild "" "Build" ["Configuration","Debug"; "Platform","Win32"] [fastScaleSln] |> ignore
     MSBuild "" "Build" ["Configuration","Release"; "Platform","x64"] [fastScaleSln] |> ignore
     MSBuild "" "Build" ["Configuration","Debug"; "Platform","x64"] [fastScaleSln] |> ignore
 )
