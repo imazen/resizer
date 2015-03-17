@@ -11,19 +11,29 @@
 
 #include "fastscaling_private.h"
 
+const int MAX_BPP = 4;
+
+static bool are_valid_bitmap_dimensions(int sx, int sy)
+{
+    return sx > 0 && sy > 0 && sx * sy * MAX_BPP < INT_MAX;
+}
+
 uint32_t BitmapPixelFormat_bytes_per_pixel (BitmapPixelFormat format){
     return (uint32_t)format;
 }
 
-BitmapBgra * create_bitmap_bgra_header(int sx, int sy){
+
+BitmapBgra * create_bitmap_bgra_header(Context * context, int sx, int sy){
     BitmapBgra * im;
 
-    if (overflow2(sx, sy) || overflow2(sizeof(int *), sy) || overflow2(sizeof(int), sx)) {
+    if (!are_valid_bitmap_dimensions(sx, sy)) {
+	CONTEXT_SET_LAST_ERROR(context, Invalid_BitmapBgra_dimensions);
         return NULL;
     }
 
     im = (BitmapBgra *)ir_calloc(1,sizeof(BitmapBgra));
     if (im == NULL) {
+	CONTEXT_SET_LAST_ERROR(context, Out_of_memory);
         return NULL;
     }
     im->w = sx;
@@ -37,9 +47,9 @@ BitmapBgra * create_bitmap_bgra_header(int sx, int sy){
 }
 
 
-BitmapBgra * create_bitmap_bgra (int sx, int sy, bool zeroed, BitmapPixelFormat format)
+BitmapBgra * create_bitmap_bgra(Context * context, int sx, int sy, bool zeroed, BitmapPixelFormat format)
 {
-    BitmapBgra * im = create_bitmap_bgra_header(sx, sy);
+    BitmapBgra * im = create_bitmap_bgra_header(context, sx, sy);
     if (im == NULL) {
 	return NULL;
     }
@@ -71,7 +81,8 @@ void destroy_bitmap_bgra(BitmapBgra * im)
     ir_free(im);
 }
 
-BitmapFloat * create_bitmap_floatHeader(int sx, int sy, int channels){
+
+BitmapFloat * create_bitmap_float_header(int sx, int sy, int channels){
     BitmapFloat * im;
 
     if (overflow2(sx, sy) || overflow2(sizeof(int *), sy) || overflow2(sizeof(int), sx)) {
@@ -97,7 +108,7 @@ BitmapFloat * create_bitmap_floatHeader(int sx, int sy, int channels){
 
 BitmapFloat * create_bitmap_float(int sx, int sy, int channels, bool zeroed)
 {
-    BitmapFloat * im = create_bitmap_floatHeader(sx, sy, channels);
+    BitmapFloat * im = create_bitmap_float_header(sx, sy, channels);
     if (im == NULL){ return NULL; }
     im->pixels_borrowed = false;
     if (zeroed){

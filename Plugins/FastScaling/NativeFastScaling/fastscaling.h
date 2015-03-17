@@ -24,13 +24,27 @@ Prefix things, perhaps?
 
 */
 
+#include "status_code.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct _Context {
+    const char * file;
+    int line;
+    StatusCode reason;
+} Context;
+
+void Context_initialize(Context * context);
+void Context_set_last_error(Context * context, StatusCode code, const char * file, int line);
+const char * Context_last_error_message(Context * context, char * buffer, size_t buffer_size);
+
+#define CONTEXT_SET_LAST_ERROR(context, status_code) Context_set_last_error(context, status_code, __FILE__, __LINE__)
 
 //Compact format for bitmaps. sRGB or gamma adjusted - *NOT* linear
 typedef enum _BitmapPixelFormat {
@@ -211,14 +225,14 @@ int64_t get_profiler_frequency(void);
 
 ProfilingLog * access_profiling_log(Renderer * r);
 
-BitmapBgra * create_bitmap_bgra(int sx, int sy, bool zeroed, BitmapPixelFormat format);
-BitmapBgra * create_bitmap_bgra_header(int sx, int sy);
+BitmapBgra * create_bitmap_bgra(Context * context, int sx, int sy, bool zeroed, BitmapPixelFormat format);
+BitmapBgra * create_bitmap_bgra_header(Context * context, int sx, int sy);
 
 RenderDetails * create_render_details(void);
 
 Renderer * create_renderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details);
-Renderer * create_renderer_in_place (BitmapBgra * editInPlace, RenderDetails * details);
-int perform_render(Renderer * r);
+Renderer * create_renderer_in_place(BitmapBgra * editInPlace, RenderDetails * details);
+int perform_render(Context * context, Renderer * r);
 void destroy_renderer(Renderer * r);
 void destroy_bitmap_bgra(BitmapBgra * im);
 

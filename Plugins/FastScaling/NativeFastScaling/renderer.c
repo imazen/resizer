@@ -12,7 +12,7 @@
 
 
 #include "fastscaling_private.h"
-
+#include <stdio.h>
 
 typedef struct RendererStruct {
     RenderDetails * details;
@@ -194,7 +194,7 @@ static void SimpleRenderInPlace(void)
 
 }
 
-static int CompleteHalving(Renderer * r)
+static int complete_halving(Context * context, Renderer * r)
 {
     int divisor = r->details->halving_divisor;
     if (divisor <= 1){
@@ -212,7 +212,7 @@ static int CompleteHalving(Renderer * r)
     }
     else {
         prof_start(r,"create temp image for halving", false);
-        BitmapBgra * tmp_im = create_bitmap_bgra(halved_width, halved_height, true, r->source->fmt);
+        BitmapBgra * tmp_im = create_bitmap_bgra(context, halved_width, halved_height, true, r->source->fmt);
         if (tmp_im == NULL) return -102;
         prof_stop(r,"create temp image for halving", true, false);
 
@@ -262,8 +262,28 @@ static void ApplyColorMatrix(const Renderer * r, BitmapFloat * img, const uint32
     prof_stop(r,"apply_color_matrix_float", true, false);
 }
 
+void Context_initialize(Context * context) 
+{
+    context->file = NULL;
+    context->line = -1;
+    context->reason = No_Error;
+}
 
+void Context_set_last_error(Context * context, StatusCode code, const char * file, int line)
+{
+}
 
+const char * TheStatus = "The almight status has happened";
+static const char * status_code_to_string(StatusCode code) 
+{
+    return TheStatus;
+}
+
+const char * Context_last_error_message(Context * context, char * buffer, size_t buffer_size)
+{
+    snprintf(buffer, buffer_size, "Error in file: %s line: %d reason: %s", context->file, context->line, status_code_to_string(context->reason));
+    return buffer;
+}
 
 static int ScaleAndRender1D(const Renderer * r,
     BitmapBgra * pSrc,
@@ -433,10 +453,10 @@ static int RenderWrapper1D(
     //}
 }
 
-int perform_render(Renderer * r)
+int perform_render(Context * context, Renderer * r)
 {
     prof_start(r,"perform_render", false);
-    CompleteHalving(r);
+    complete_halving(context, r);
     bool skip_last_transpose = r->details->post_transpose;
 
     /*
@@ -471,7 +491,12 @@ int perform_render(Renderer * r)
     //p->Start("allocate temp image(sy x dx)", false);
 
     /* Scale horizontally  */
-    r->transposed = create_bitmap_bgra(r->source->h, r->canvas == NULL ? r->source->w : (skip_last_transpose ? r->canvas->h : r->canvas->w), false, r->source->fmt);
+    r->transposed = create_bitmap_bgra(
+	context, 
+	r->source->h, 
+	r->canvas == NULL ? r->source->w : (skip_last_transpose ? r->canvas->h : r->canvas->w), 
+	false, 
+	r->source->fmt);
     if (r->transposed == NULL) { return -2;  }
     r->transposed->compositing_mode = Replace_self;
     //p->Stop("allocate temp image(sy x dx)", true, false);

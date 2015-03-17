@@ -10,19 +10,34 @@ std::ostream& operator<<(std::ostream& out, const BitmapFloat & bitmap_float)
     return out << "BitmapFloat: w:" << bitmap_float.w << " h: " << bitmap_float.h << " channels:" << bitmap_float.channels << '\n';
 }
 
-TEST_CASE("Argument checking for convert_sgrp_to_linear") {
-    BitmapBgra * src = create_bitmap_bgra(2, 3, true, Bgra32);
+TEST_CASE("Argument checking for convert_sgrp_to_linear", "[error_handling]") {
+    Context context;
+    Context_initialize(&context);
+    BitmapBgra * src = create_bitmap_bgra(&context, 2, 3, true, Bgra32);
+    char error_msg[1024];
+    CAPTURE(Context_last_error_message(&context, error_msg, sizeof error_msg));
+    REQUIRE(src != NULL);
     BitmapFloat * dest = create_bitmap_float(1, 1, 4, false);
     convert_srgb_to_linear(src, 3, dest, 0, 0);
     destroy_bitmap_bgra(src);
     CAPTURE(*dest);
+    REQUIRE(dest->float_count == 4); // 1x1x4 channels
     destroy_bitmap_float(dest);
+}
+
+TEST_CASE("With context", "[error_handling]") {
+    Context context;
+    Context_initialize(&context);
+    BitmapBgra * source = create_bitmap_bgra(&context, 1, 1, true, (BitmapPixelFormat)2);
+    destroy_bitmap_bgra(source);
 }
 
 bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFormat cbpp, bool transpose, bool flipx, bool flipy, bool profile, InterpolationFilter filter)
 {
-    BitmapBgra * source = create_bitmap_bgra(sx, sy, true, sbpp);
-    BitmapBgra * canvas = create_bitmap_bgra(cx, cy, true, cbpp);
+    Context context;
+    Context_initialize(&context);
+    BitmapBgra * source = create_bitmap_bgra(&context, sx, sy, true, sbpp);
+    BitmapBgra * canvas = create_bitmap_bgra(&context, cx, cy, true, cbpp);
 
     RenderDetails * details = create_render_details();
 
@@ -37,7 +52,7 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
 
     Renderer * p = create_renderer(source, canvas, details);
 
-    perform_render(p);
+    perform_render(&context, p);
 
     destroy_renderer(p);
 
@@ -51,7 +66,8 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
 
 bool test_in_place (int sx, int sy, BitmapPixelFormat sbpp, bool flipx, bool flipy, bool profile, float sharpen, uint32_t kernelRadius)
 {
-    BitmapBgra * source = create_bitmap_bgra (sx, sy, true, sbpp);
+    Context context;
+    BitmapBgra * source = create_bitmap_bgra(&context, sx, sy, true, sbpp);
 
     RenderDetails * details = create_render_details ();
 
@@ -66,14 +82,14 @@ bool test_in_place (int sx, int sy, BitmapPixelFormat sbpp, bool flipx, bool fli
 
 
     Renderer * p = create_renderer_in_place (source, details);
+    
+    perform_render(&context, p);
 
-    perform_render (p);
+    destroy_renderer(p);
 
-    destroy_renderer (p);
+    destroy_bitmap_bgra(source);
 
-    destroy_bitmap_bgra (source);
-
-    free_lookup_tables ();
+    free_lookup_tables();
     return true;
 }
 
@@ -111,9 +127,10 @@ TEST_CASE ("Sharpen and convolve in place", "[fastscaling]") {
 //*/
 
 BitmapBgra*  crop_window (BitmapBgra* source, uint32_t x, uint32_t y, uint32_t w, uint32_t h){
-    BitmapBgra* cropped = create_bitmap_bgra_header (w, h);
+    Context context;
+    BitmapBgra* cropped = create_bitmap_bgra_header(&context, w, h);
     cropped->fmt = source->fmt;
-    const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel (source->fmt);
+    const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel(source->fmt);
     cropped->pixels = source->pixels + (y * source->stride) + (x * bytes_pp);
     cropped->stride = source->stride;
     return cropped;
@@ -295,9 +312,10 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
     GIVEN("A 256x256 image, grayscale gradient along the x axis, alpha along the y") {
 	int w = 256;
 	int h = 256;
-
-	BitmapBgra* bit = create_bitmap_bgra(w, h, true, Bgra32);
-    const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel (bit->fmt);
+	Context context;
+	Context_initialize(&context);
+	BitmapBgra* bit = create_bitmap_bgra(&context, w, h, true, Bgra32);
+	const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel(bit->fmt);
 
 	for (size_t y = 1; y < bit->h; y++){
 	    for (size_t x = 0; x < bit->w; x++){
@@ -310,7 +328,7 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
 	    }
 	}
 
-	BitmapBgra* final = create_bitmap_bgra(w, h, true, Bgra32);
+	BitmapBgra* final = create_bitmap_bgra(&context, w, h, true, Bgra32);
 	// BitmapFloat* buf = create_bitmap_float(w, h, 4, true);
 
 	WHEN ("we do stuff") {
@@ -318,7 +336,7 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
 	    RenderDetails* details = create_render_details();
 	    Renderer* r = create_renderer(bit, final, details);
 
-	    perform_render(r);
+	    perform_render(&context, r);
 
 	    //convert_srgb_to_linear(bit, 0, buf, 0, h);
 	    //demultiply_alpha(buf, 0, h);

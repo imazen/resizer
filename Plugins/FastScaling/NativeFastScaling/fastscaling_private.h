@@ -55,7 +55,7 @@ typedef struct BitmapFloatStruct {
 #endif
 
 
-BitmapFloat * create_bitmap_floatHeader(int sx, int sy, int channels);
+BitmapFloat * create_bitmap_float_header(int sx, int sy, int channels);
 
 BitmapFloat * create_bitmap_float(int sx, int sy, int channels, bool zeroed);
 
