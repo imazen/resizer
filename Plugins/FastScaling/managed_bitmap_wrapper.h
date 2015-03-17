@@ -62,8 +62,8 @@ namespace ImageResizer{
                     }
                     int sx = from.Width;
                     int sy = from.Height;
-
-                    BitmapBgra* im = create_bitmap_bgra_header(sx, sy);
+                    Context context;
+                    BitmapBgra* im = create_bitmap_bgra_header(&context, sx, sy);
                     if (im == NULL) throw gcnew InvalidOperationException("Failed to create Bgra Header");
 
                     this->underlying_bitmap = source;

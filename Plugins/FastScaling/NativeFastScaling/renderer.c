@@ -8,6 +8,8 @@
 
 #ifdef _MSC_VER
 #pragma unmanaged
+#pragma warning(disable : 4996)
+#define snprintf _snprintf
 #endif
 
 

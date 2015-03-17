@@ -156,7 +156,8 @@ namespace ImageResizer{
 
                 void Render(){
                     p->Start ("perform_render", false);
-                    perform_render(r);
+                    Context context;
+                    perform_render(&context, r);
                     replay_log ();
                     p->Stop ("perform_render", true, false);
                 }
