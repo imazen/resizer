@@ -111,7 +111,7 @@ void destroy_renderer(Renderer * r)
 
 
 
-inline void profiler_start(Renderer * r, const char * name, bool allow_recursion){
+inline void profiler_start(const Renderer * r, const char * name, bool allow_recursion){
     ProfilingEntry * current = &(r->log->log[r->log->count]);
     r->log->count++;
     if (r->log->count >= r->log->capacity) return;
@@ -120,7 +120,7 @@ inline void profiler_start(Renderer * r, const char * name, bool allow_recursion
     current->name = name;
     current->flags = allow_recursion ? Profiling_start_allow_recursion : Profiling_start;
 }
-inline void profiler_stop(Renderer * r, const char * name, bool assert_started, bool stop_children){
+inline void profiler_stop(const Renderer * r, const char * name, bool assert_started, bool stop_children){
     ProfilingEntry * current = &(r->log->log[r->log->count]);
     r->log->count++;
     if (r->log->count >= r->log->capacity) return;
@@ -203,7 +203,7 @@ static int CompleteHalving(Renderer * r)
     int halved_width = (int)(r->source->w / divisor);
     int halved_height = (int)(r->source->h / divisor);
 
-    //p->Start("CompleteHalving", false);
+    prof_start(r, "CompleteHalving", false);
     r->details->halving_divisor = 0; //Don't halve twice
 
     if (r->source->can_reuse_space){
@@ -211,10 +211,10 @@ static int CompleteHalving(Renderer * r)
         if (result == 0) return -101;
     }
     else {
-        //p->Start("create temp image for halving", false);
+        prof_start(r,"create temp image for halving", false);
         BitmapBgra * tmp_im = create_bitmap_bgra(halved_width, halved_height, true, r->source->fmt);
         if (tmp_im == NULL) return -102;
-        //p->Stop("create temp image for halving", true, false);
+        prof_stop(r,"create temp image for halving", true, false);
 
         int result = Halve(r->source, tmp_im, divisor);
         if (result == 0) {
@@ -229,36 +229,37 @@ static int CompleteHalving(Renderer * r)
         r->destroy_source = true; //Cleanup tmp_im
     }
     return 0;
-    // p->Stop("CompleteHalving", true, false);
+    prof_stop(r,"CompleteHalving", true, false);
 }
 
 
 static int ApplyConvolutionsFloat1D(const Renderer * r, BitmapFloat * img, const uint32_t from_row, const uint32_t row_count, double sharpening_applied)
 {
-    //p->Start("convolve kernel a", false);
+    prof_start(r,"convolve kernel a",  false);
     if (r->details->kernel_a != NULL && ConvolveBgraFloatInPlace(img, r->details->kernel_a, img->channels, from_row, row_count)){
         return -3;
     }
-    //p->Stop("convolve kernel a", true, false);
-    //p->Start("convolve kernel b", false);
+    prof_stop(r,"convolve kernel a", true, false);
+
+    prof_start(r,"convolve kernel b",  false);
     if (r->details->kernel_b != NULL && ConvolveBgraFloatInPlace(img, r->details->kernel_b, img->channels, from_row, row_count)){
         return -3;
     }
-    //p->Stop("convolve kernel b", true, false);
+    prof_stop(r,"convolve kernel b", true, false);
 
     if (r->details->sharpen_percent_goal > sharpening_applied + 0.01){
-        //p->Start("SharpenBgraFloatRowsInPlace", false);
+        prof_start(r,"SharpenBgraFloatRowsInPlace", false);
         SharpenBgraFloatRowsInPlace(img, from_row, row_count, r->details->sharpen_percent_goal - sharpening_applied);
-        //p->Stop("SharpenBgraFloatRowsInPlace", true, false);
+        prof_stop(r,"SharpenBgraFloatRowsInPlace", true, false);
     }
     return 0;
 }
 
 static void ApplyColorMatrix(const Renderer * r, BitmapFloat * img, const uint32_t row_count)
 {
-    //p->Start("apply_color_matrix_float", false);
+    prof_start(r,"apply_color_matrix_float", false);
     apply_color_matrix_float(img, 0, row_count, r->details->color_matrix);
-    //p->Stop("apply_color_matrix_float", true, false);
+    prof_stop(r,"apply_color_matrix_float", true, false);
 }
 
 
@@ -291,13 +292,13 @@ static int ScaleAndRender1D(const Renderer * r,
     //How many bytes per pixel are we scaling?
     BitmapPixelFormat scaling_format = (pSrc->fmt == Bgra32 && !pSrc->alpha_meaningful) ? Bgr24 : pSrc->fmt;
 
-    //p->Start("contributions_calc", false);
+    prof_start(r,"contributions_calc", false);
 
     contrib = contributions_calc(to_count, from_count, details->interpolation);  /*Handle errors */ if (contrib == NULL) { return_code = -1; goto cleanup; }
-    //p->Stop("contributions_calc", true, false);
+    prof_stop(r,"contributions_calc", true, false);
 
 
-    //p->Start("create_bitmap_float (buffers)", false);
+    prof_start(r,"create_bitmap_float (buffers)", false);
 
     source_buf = create_bitmap_float(from_count, buffer_row_count, scaling_format, false); /*Handle errors */  if (source_buf == NULL)  { return_code = -1; goto cleanup; }
 
@@ -308,32 +309,35 @@ static int ScaleAndRender1D(const Renderer * r,
     source_buf->alpha_premultiplied = source_buf->channels == 4;
     dest_buf->alpha_premultiplied = source_buf->alpha_premultiplied;
 
-    // p->Stop("create_bitmap_float (buffers)", true, false);
+    prof_stop(r,"create_bitmap_float (buffers)", true, false);
+
 
     /* Scale each set of lines */
     for (uint32_t source_start_row = 0; source_start_row < pSrc->h; source_start_row += buffer_row_count) {
         const uint32_t row_count = MIN(pSrc->h - source_start_row, buffer_row_count);
 
-        //p->Start("convert_srgb_to_linear", false);
+        prof_start(r,"convert_srgb_to_linear", false);
         if (convert_srgb_to_linear(pSrc, source_start_row, source_buf, 0, row_count)){
             return_code = -2; goto cleanup;
         }
-        // p->Stop("convert_srgb_to_linear", true, false);
+        prof_stop(r,"convert_srgb_to_linear", true, false);
 
-        //p->Start("ScaleBgraFloatRows", false);
+        prof_start(r,"ScaleBgraFloatRows", false);
         ScaleBgraFloatRows(source_buf, 0, dest_buf, 0, row_count, contrib->ContribRow);
-        //p->Stop("ScaleBgraFloatRows", true, false);
+        prof_stop(r,"ScaleBgraFloatRows", true, false);
+
 
         if (ApplyConvolutionsFloat1D(r, dest_buf, 0, row_count, contrib->percent_negative)){
             return_code = -3; goto cleanup;
         }
         if (details->apply_color_matrix && call_number == 2) { ApplyColorMatrix(r, dest_buf, row_count); }
 
-        //p->Start("pivoting_composite_linear_over_srgb", false);
+        prof_start(r,"pivoting_composite_linear_over_srgb", false);
         if (pivoting_composite_linear_over_srgb(dest_buf, 0, pDst, source_start_row, row_count, transpose)){
             return_code = -4; goto cleanup;
         }
-        //p->Stop("pivoting_composite_linear_over_srgb", true, false);
+        prof_stop(r,"pivoting_composite_linear_over_srgb", true, false);
+
     }
     //sRGB sharpening
     //Color matrix

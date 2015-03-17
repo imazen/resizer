@@ -64,8 +64,8 @@ void destroy_bitmap_float(BitmapFloat * im);
 int64_t get_high_precision_ticks(void);
 
 
-void profiler_start(Renderer * r, const char * name, bool allow_recursion);
-void profiler_stop(Renderer * r, const char * name, bool assert_started, bool stop_children);
+void profiler_start(const Renderer * r, const char * name, bool allow_recursion);
+void profiler_stop(const Renderer * r, const char * name, bool assert_started, bool stop_children);
 
 
 
