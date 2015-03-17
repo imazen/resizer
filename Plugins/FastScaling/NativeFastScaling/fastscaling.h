@@ -217,6 +217,7 @@ BitmapBgra * create_bitmap_bgra_header(int sx, int sy);
 RenderDetails * create_render_details(void);
 
 Renderer * create_renderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details);
+Renderer * create_renderer_in_place (BitmapBgra * editInPlace, RenderDetails * details);
 int perform_render(Renderer * r);
 void destroy_renderer(Renderer * r);
 void destroy_bitmap_bgra(BitmapBgra * im);

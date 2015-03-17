@@ -47,6 +47,36 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
     return true;
 }
 
+
+bool test_in_place (int sx, int sy, BitmapPixelFormat sbpp, bool flipx, bool flipy, bool profile, double sharpen, uint32_t kernelRadius)
+{
+    BitmapBgra * source = create_bitmap_bgra (sx, sy, true, sbpp);
+
+    RenderDetails * details = create_render_details ();
+
+
+    details->sharpen_percent_goal = sharpen;
+    details->post_flip_x = flipx;
+    details->post_flip_y = flipy;
+    details->enable_profiling = profile;
+    if (kernelRadius > 0) {
+        details->kernel_a = create_guassian_kernel_normalized (1.4, kernelRadius);
+    }
+
+
+    Renderer * p = create_renderer_in_place (source, details);
+
+    perform_render (p);
+
+    destroy_renderer (p);
+
+    destroy_bitmap_bgra (source);
+
+    free_lookup_tables ();
+    return true;
+}
+
+
 TEST_CASE( "Render without crashing", "[fastscaling]") {
     REQUIRE (test (400, 300, Bgra32, 200, 40, Bgra32, false, false, false, false, (InterpolationFilter)0));
 }
@@ -66,6 +96,27 @@ TEST_CASE("Render and rotate", "[fastscaling]") {
 TEST_CASE("Render and rotate with profiling", "[fastscaling]") {
     REQUIRE (test (200, 40, Bgra32, 500, 300, Bgra32, true, true, true, true, (InterpolationFilter)0));
 }
+
+TEST_CASE ("Flip in place", "[fastscaling]") {
+    REQUIRE (test_in_place (400, 300, Bgra32, true, true, false, 0, 0));
+}
+TEST_CASE ("Flip in place 24 bit", "[fastscaling]") {
+    REQUIRE (test_in_place (400, 300, Bgr24, true, true, false, 0, 0));
+}
+/*
+segfaults or otherwise kills the process
+TEST_CASE ("Sharpen and convolve in place", "[fastscaling]") {
+    REQUIRE (test_in_place (400, 300, Bgr24, false, false, false, 0.5, 3));
+}
+*/
+
+TEST_CASE ("Trim whitespace in imag", "[fastscaling]") {
+
+    REQUIRE (test_in_place (400, 300, Bgr24, true, true, false, 0, 0));
+}
+
+
+
 
 TEST_CASE("Test contrib windows", "[fastscaling]") {
 

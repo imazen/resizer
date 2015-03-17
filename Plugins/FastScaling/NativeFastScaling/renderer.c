@@ -151,7 +151,7 @@ static ProfilingLog * create_profiling_log(uint32_t capacity){
     return p;
 }
 
-static Renderer * create_rendererInPlace(BitmapBgra * editInPlace, RenderDetails * details)
+Renderer * create_renderer_in_place(BitmapBgra * editInPlace, RenderDetails * details)
 {
     if (details->post_transpose) return NULL; //We can't transpose in place.
     Renderer * r = (Renderer *)calloc(1, sizeof(Renderer));
