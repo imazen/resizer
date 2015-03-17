@@ -481,7 +481,8 @@ int perform_render(Renderer * r)
         r->source->compositing_mode = Replace_self;
     }
     //Unsharpen when interpolating if we can
-    if (r->details->sharpen_percent_goal > 0 &&
+    if (r->details->interpolation != NULL &&
+        r->details->sharpen_percent_goal > 0 &&
         r->details->minimum_sample_window_to_interposharpen <= r->details->interpolation->window){
 
         r->details->interpolation->sharpen_percent_goal = r->details->sharpen_percent_goal;
