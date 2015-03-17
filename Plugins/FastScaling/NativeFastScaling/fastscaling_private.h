@@ -12,6 +12,12 @@
 
 #include "fastscaling.h"
 
+#include "ir_alloc.h"
+#include "math_functions.h"
+#include "color.h"
+
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,14 +45,6 @@ typedef struct BitmapFloatStruct {
     bool alpha_meaningful;
 } BitmapFloat;
 
-#include "ir_alloc.h"
-#include "math_functions.h"
-#include "color.h"
-
-
-
-
-
 #define ALLOW_PROFILING
 
 #ifdef ALLOW_PROFILING
@@ -56,9 +54,6 @@ typedef struct BitmapFloatStruct {
 #define prof_start(r, name, allow_recursion)
 #define prof_stop(r, name, assert_started, stop_children)
 #endif
-
-
-
 
 
 BitmapFloat * CreateBitmapFloatHeader(int sx, int sy, int channels);

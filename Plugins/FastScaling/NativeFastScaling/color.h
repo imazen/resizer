@@ -7,17 +7,15 @@
  */
 #pragma once
 
-#include "fastscaling_private.h"
-
 #ifdef _MSC_VER
 #pragma unmanaged
 #endif
 
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct BitmapFloatStruct BitmapFloat;
 
 static inline float
 linear_to_srgb(float clr) {

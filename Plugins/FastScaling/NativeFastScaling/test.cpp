@@ -3,6 +3,13 @@
 #include "fastscaling_private.h"
 #include "weighting_test_helpers.h"
 
+TEST_CASE("Argument checking for convert_sgrp_to_linear") {
+    BitmapBgra * src = create_bitmap_bgra(2, 3, true, 4);
+    BitmapFloat * dest = CreateBitmapFloat(1, 1, 4, false);
+    convert_srgb_to_linear(src, 3, dest, 0, 0);
+    
+}
+
 bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bool flipx, bool flipy, bool profile, InterpolationFilter filter)
 {
     BitmapBgra * source = create_bitmap_bgra(sx, sy, true, sbpp);
@@ -112,6 +119,8 @@ TEST_CASE("Test Weighting", "[fastscaling]") {
     CHECK(test_filter(InterpolationFilter::Filter_Lanczos3SharpWindowed, msg, 0.98, 1.9625, 1, 0.1, 2.943) == nullptr);
 
 }
+
+
 
 
 TEST_CASE("Test Linear RGB 000 -> LUV ", "[fastscaling]") {
@@ -240,3 +249,4 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
 	free_lookup_tables();
     }
 }
+
