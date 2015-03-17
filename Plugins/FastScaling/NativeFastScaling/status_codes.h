@@ -1,0 +1,2 @@
+enum _StatusCodes {
+} StatusCodes;
