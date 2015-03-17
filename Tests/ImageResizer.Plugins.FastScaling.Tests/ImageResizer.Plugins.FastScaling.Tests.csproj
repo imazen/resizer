@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="ArtifactTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RenderingTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">

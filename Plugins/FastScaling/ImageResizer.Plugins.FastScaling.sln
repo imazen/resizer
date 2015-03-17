@@ -15,12 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.FastSc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imazen.Profiling", "..\Imazen.Profiling\Imazen.Profiling.csproj", "{35C46578-8BD7-410D-94E9-2AFB11629083}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageResizer.Plugins.FastScaling.Tests.Cpp", "..\..\Tests\ImageResizer.Plugins.FastScaling.Tests.Cpp\ImageResizer.Plugins.FastScaling.Tests.Cpp.vcxproj", "{522F9B2F-E798-4232-B40C-408D2EB98122}"
-	ProjectSection(ProjectDependencies) = postProject
-		{9B97D952-2969-4F46-9758-9E712CDF3F72} = {9B97D952-2969-4F46-9758-9E712CDF3F72}
-		{FA5EF673-A6A4-498D-AA24-C025CC5267AF} = {FA5EF673-A6A4-498D-AA24-C025CC5267AF}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageCompare", "..\..\Tests\ImageCompare\ImageCompare.csproj", "{7FA1116A-0D5C-4A48-93A8-56C091EA202E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{89298DFF-BF01-4C73-8BF9-E20FB27007DE}"
@@ -83,14 +77,6 @@ Global
 		{35C46578-8BD7-410D-94E9-2AFB11629083}.Release|Win32.Build.0 = Release|Any CPU
 		{35C46578-8BD7-410D-94E9-2AFB11629083}.Release|x64.ActiveCfg = Release|Any CPU
 		{35C46578-8BD7-410D-94E9-2AFB11629083}.Release|x64.Build.0 = Release|Any CPU
-		{522F9B2F-E798-4232-B40C-408D2EB98122}.Debug|Win32.ActiveCfg = Debug|Win32
-		{522F9B2F-E798-4232-B40C-408D2EB98122}.Debug|Win32.Build.0 = Debug|Win32
-		{522F9B2F-E798-4232-B40C-408D2EB98122}.Debug|x64.ActiveCfg = Debug|x64
-		{522F9B2F-E798-4232-B40C-408D2EB98122}.Debug|x64.Build.0 = Debug|x64
-		{522F9B2F-E798-4232-B40C-408D2EB98122}.Release|Win32.ActiveCfg = Release|Win32
-		{522F9B2F-E798-4232-B40C-408D2EB98122}.Release|Win32.Build.0 = Release|Win32
-		{522F9B2F-E798-4232-B40C-408D2EB98122}.Release|x64.ActiveCfg = Release|x64
-		{522F9B2F-E798-4232-B40C-408D2EB98122}.Release|x64.Build.0 = Release|x64
 		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Debug|Win32.ActiveCfg = Debug|x86
 		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Debug|Win32.Build.0 = Debug|x86
 		{7FA1116A-0D5C-4A48-93A8-56C091EA202E}.Debug|x64.ActiveCfg = Debug|x64
