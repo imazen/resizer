@@ -15,35 +15,11 @@
 
 #include <stdarg.h>
 
-#define snprintf c99_snprintf
-
-
-
-inline int c99_vsnprintf(char* str, size_t size, const char* format, va_list ap)
-{
-    int count = -1;
-
-    if (size != 0)
-	count = _vsnprintf_s(str, size, _TRUNCATE, format, ap);
-    if (count == -1)
-	count = _vscprintf(format, ap);
-
-    return count;
-}
-
-inline int c99_snprintf(char* str, size_t size, const char* format, ...)
-{
-    int count;
-    va_list ap;
-
-    va_start(ap, format);
-    count = c99_vsnprintf(str, size, format, ap);
-    va_end(ap);
-
-    return count;
-}
+#define snprintf _snprintf
 
 #endif // _MSC_VER
+
+#pragma warning(disable : 4996)
 
 bool test_contrib_windows(char *msg)
 {
@@ -63,7 +39,7 @@ bool test_contrib_windows(char *msg)
         if (lct->ContribRow[i].Left != (int)corr36[i][0]) { bad = i; break; }
         else if (lct->ContribRow[i].Right != (int)corr36[i][1]) { bad = i; break; }
 
-    if (bad != -1) {	
+    if (bad != -1) {
 	snprintf(msg, 255, "at 6->3 invalid value (%d; %d) at %d, expected (%d; %d)",
 		 lct->ContribRow[bad].Left,
 		 lct->ContribRow[bad].Right,
@@ -91,7 +67,7 @@ bool test_contrib_windows(char *msg)
 	contributions_free(lct);
 	return false;
     }
-    contributions_free(lct);	
+    contributions_free(lct);
     return true;
 }
 
