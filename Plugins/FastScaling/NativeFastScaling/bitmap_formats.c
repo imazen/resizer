@@ -68,7 +68,7 @@ void destroy_bitmap_bgra(BitmapBgra * im)
     ir_free(im);
 }
 
-BitmapFloat * CreateBitmapFloatHeader(int sx, int sy, int channels){
+BitmapFloat * create_bitmap_floatHeader(int sx, int sy, int channels){
     BitmapFloat * im;
 
     if (overflow2(sx, sy) || overflow2(sizeof(int *), sy) || overflow2(sizeof(int), sx)) {
@@ -92,9 +92,9 @@ BitmapFloat * CreateBitmapFloatHeader(int sx, int sy, int channels){
 }
 
 
-BitmapFloat * CreateBitmapFloat(int sx, int sy, int channels, bool zeroed)
+BitmapFloat * create_bitmap_float(int sx, int sy, int channels, bool zeroed)
 {
-    BitmapFloat * im = CreateBitmapFloatHeader(sx, sy, channels);
+    BitmapFloat * im = create_bitmap_floatHeader(sx, sy, channels);
     if (im == NULL){ return NULL; }
     im->pixels_borrowed = false;
     if (zeroed){
@@ -111,7 +111,7 @@ BitmapFloat * CreateBitmapFloat(int sx, int sy, int channels, bool zeroed)
 }
 
 
-void DestroyBitmapFloat(BitmapFloat * im)
+void destroy_bitmap_float(BitmapFloat * im)
 {
     if (im == NULL) return;
 

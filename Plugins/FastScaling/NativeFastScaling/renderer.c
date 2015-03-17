@@ -299,18 +299,18 @@ static int ScaleAndRender1D(const Renderer * r,
     //p->Stop("contributions_calc", true, false);
 
 
-    //p->Start("CreateBitmapFloat (buffers)", false);
+    //p->Start("create_bitmap_float (buffers)", false);
 
-    source_buf = CreateBitmapFloat(from_count, buffer_row_count, scaling_bpp, false); /*Handle errors */  if (source_buf == NULL)  { return_code = -1; goto cleanup; }
+    source_buf = create_bitmap_float(from_count, buffer_row_count, scaling_bpp, false); /*Handle errors */  if (source_buf == NULL)  { return_code = -1; goto cleanup; }
 
-    dest_buf = CreateBitmapFloat(to_count, buffer_row_count, scaling_bpp, false);  /*Handle errors */   if (source_buf == NULL)  { return_code = -1; goto cleanup; }
+    dest_buf = create_bitmap_float(to_count, buffer_row_count, scaling_bpp, false);  /*Handle errors */   if (source_buf == NULL)  { return_code = -1; goto cleanup; }
     source_buf->alpha_meaningful = pSrc->alpha_meaningful;
     dest_buf->alpha_meaningful = source_buf->alpha_meaningful;
 
     source_buf->alpha_premultiplied = source_buf->channels == 4;
     dest_buf->alpha_premultiplied = source_buf->alpha_premultiplied;
 
-    // p->Stop("CreateBitmapFloat (buffers)", true, false);
+    // p->Stop("create_bitmap_float (buffers)", true, false);
 
     /* Scale each set of lines */
     for (uint32_t source_start_row = 0; source_start_row < pSrc->h; source_start_row += buffer_row_count) {
@@ -346,8 +346,8 @@ cleanup:
 
     if (contrib != NULL) contributions_free(contrib);
 
-    if (source_buf != NULL) DestroyBitmapFloat(source_buf);
-    if (dest_buf != NULL) DestroyBitmapFloat(dest_buf);
+    if (source_buf != NULL) destroy_bitmap_float(source_buf);
+    if (dest_buf != NULL) destroy_bitmap_float(dest_buf);
     ///p->Stop("Free Contributions,FloatBuffers", true, false);
 
     if (return_code != 0){
@@ -374,7 +374,7 @@ static int Render1D(const Renderer * r,
     //How many bytes per pixel are we scaling?
     uint32_t scaling_bpp = (pSrc->bpp == 4 && !pSrc->alpha_meaningful) ? 3 : pSrc->bpp;
 
-    BitmapFloat * buf = CreateBitmapFloat(pSrc->w, buffer_row_count, scaling_bpp, false); /*Handle errors */  if (buf == NULL)  { return_code = -1; goto cleanup; }
+    BitmapFloat * buf = create_bitmap_float(pSrc->w, buffer_row_count, scaling_bpp, false); /*Handle errors */  if (buf == NULL)  { return_code = -1; goto cleanup; }
     buf->alpha_meaningful = pSrc->alpha_meaningful;
     buf->alpha_premultiplied = buf->channels == 4;
 
@@ -401,7 +401,7 @@ static int Render1D(const Renderer * r,
 
 
 cleanup:
-    if (buf != NULL) DestroyBitmapFloat(buf);
+    if (buf != NULL) destroy_bitmap_float(buf);
     return return_code;
 }
 

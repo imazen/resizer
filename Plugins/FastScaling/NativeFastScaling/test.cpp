@@ -3,11 +3,19 @@
 #include "fastscaling_private.h"
 #include "weighting_test_helpers.h"
 
+
+std::ostream& operator<<(std::ostream& out, const BitmapFloat & bitmap_float) 
+{
+    out << "BitmapFloat: w:" << bitmap_float.w << " h: " << bitmap_float.h << " channels:" << bitmap_float.channels << '\n';
+}
+
 TEST_CASE("Argument checking for convert_sgrp_to_linear") {
     BitmapBgra * src = create_bitmap_bgra(2, 3, true, 4);
-    BitmapFloat * dest = CreateBitmapFloat(1, 1, 4, false);
+    BitmapFloat * dest = create_bitmap_float(1, 1, 4, false);
     convert_srgb_to_linear(src, 3, dest, 0, 0);
-    
+    destroy_bitmap_bgra(src);
+    CAPTURE(*dest);
+    destroy_bitmap_float(dest);
 }
 
 bool test(int sx, int sy, int sbpp, int cx, int cy, int cbpp, bool transpose, bool flipx, bool flipy, bool profile, InterpolationFilter filter)
@@ -209,7 +217,7 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
 	}
 
 	BitmapBgra* final = create_bitmap_bgra(w, h, true, 4);
-	// BitmapFloat* buf = CreateBitmapFloat(w, h, 4, true);
+	// BitmapFloat* buf = create_bitmap_float(w, h, 4, true);
 
 	WHEN ("we do stuff") {
 

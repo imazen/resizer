@@ -11,7 +11,6 @@
 #endif
 
 #include "fastscaling.h"
-
 #include "ir_alloc.h"
 #include "math_functions.h"
 #include "color.h"
@@ -56,11 +55,11 @@ typedef struct BitmapFloatStruct {
 #endif
 
 
-BitmapFloat * CreateBitmapFloatHeader(int sx, int sy, int channels);
+BitmapFloat * create_bitmap_floatHeader(int sx, int sy, int channels);
 
-BitmapFloat * CreateBitmapFloat(int sx, int sy, int channels, bool zeroed);
+BitmapFloat * create_bitmap_float(int sx, int sy, int channels, bool zeroed);
 
-void DestroyBitmapFloat(BitmapFloat * im);
+void destroy_bitmap_float(BitmapFloat * im);
 
 int64_t get_high_precision_ticks(void);
 
