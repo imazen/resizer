@@ -140,6 +140,7 @@ namespace ImageResizer{
                     this->p = p;
                     originalOptions = opts;
                     RenderDetails* details = create_render_details();
+                    details->enable_profiling = p->Active;
                     CopyBasics(opts, details);
                     p->Start("SysDrawingToBgra", false);
                     wbSource = gcnew WrappedBitmap(source);
@@ -151,8 +152,33 @@ namespace ImageResizer{
 
 
                 void Render(){
+                    p->Start ("perform_render", false);
                     perform_render(r);
+                    replay_log ();
+                    p->Stop ("perform_render", true, false);
                 }
+
+                private:
+                    void replay_log (){
+                        ProfilingLog * log = access_profiling_log (r);
+                        if (log->count == log->capacity) throw gcnew OutOfMemoryException ("Profiling log was not large enough to contain all messages");
+                        for (int i = 0; i < log->count; i++){
+                            ProfilingEntry entry = log->log[i];
+                            bool start = (entry.flags & ProfilingEntryFlags::Profiling_start) > 0;
+                            bool allowRecursion = (entry.flags & ProfilingEntryFlags::Profiling_start_allow_recursion) > 0;
+                            bool stop = (entry.flags & ProfilingEntryFlags::Profiling_stop) > 0;
+                            bool assert_started =  (entry.flags & ProfilingEntryFlags::Profiling_stop_assert_started) > 0;
+                            bool stop_children =  (entry.flags & ProfilingEntryFlags::Profiling_stop_children) > 0;
+
+                            if (start){
+                                p->LogStart (entry.time, gcnew String (entry.name), allowRecursion);
+                            }
+                            else if (stop){
+                                p->LogStop (entry.time, gcnew String (entry.name), assert_started, stop_children);
+                            }
+
+                        }
+                    }
 
             };
 
