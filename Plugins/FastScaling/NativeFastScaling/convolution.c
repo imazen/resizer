@@ -57,7 +57,8 @@ ConvolutionKernel * create_guassian_kernel(double stdDev, uint32_t radius){
     ConvolutionKernel * k = create_convolution_kernel(radius);
     if (k != NULL){
         for (uint32_t i = 0; i < k->width; i++){
-            k->kernel[i] = (float)(IR_GUASSIAN(fabs((float)(radius - i)), stdDev));
+
+            k->kernel[i] = (float)ir_guassian(fabs(radius - i), stdDev);
         }
     }
     return k;

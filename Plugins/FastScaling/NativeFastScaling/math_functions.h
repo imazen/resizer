@@ -17,9 +17,6 @@
 
 
 #define IR_PI  3.1415926535897932384626433832795
-#define IR_SINC(value) (value == 0 ? 1 : sin(value * IR_PI) / (value * IR_PI))
-
-#define IR_GUASSIAN(x, stdDev) (exp((-x * x) / (2 * stdDev * stdDev)) / (sqrt(2 * IR_PI) * stdDev))
 
 inline int min(int a, int b) { return a <= b ? a : b; }
 inline int max(int a, int b) { return a >= b ? a : b; }
@@ -31,7 +28,10 @@ inline unsigned int umax(unsigned int a, unsigned int b) { return a >= b ? a : b
 
 #define EVIL_CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
-
+static inline
+double ir_guassian(double x, double stdDev){
+    return (exp((-x * x) / (2 * stdDev * stdDev)) / (sqrt(2 * IR_PI) * stdDev));
+}
 
 static inline
 uint8_t
