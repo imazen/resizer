@@ -66,7 +66,7 @@ static void DestroyRenderDetails(RenderDetails * d){
 
 
 
-/*
+
 static int DetermineDivisor(Renderer * r)
 {
     if (r->canvas == NULL) return 0;
@@ -88,7 +88,7 @@ static int DetermineDivisor(Renderer * r)
     }
     return max(1, divisor);
 }
-*/
+
 
 void destroy_renderer(Renderer * r)
 {
@@ -181,6 +181,9 @@ Renderer * create_renderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetai
     }
     else{
         r->log = NULL;
+    }
+    if (r->details->halving_divisor == 0) {
+        r->details->halving_divisor = DetermineDivisor(r);
     }
     return r;
 }
