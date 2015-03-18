@@ -36,5 +36,10 @@ TEST_CASE("Creating BitmapBgra", "[error_handling]") {
 	REQUIRE(Context_has_error(&context));
 	//REQUIRE(Context_error_message(&context));
     }
+    SECTION("A huge bitmap is also invalid") {
+	source = create_bitmap_bgra(&context, 1, INT_MAX, true, (BitmapPixelFormat)2);
+	REQUIRE(source == NULL);
+	REQUIRE(Context_has_error(&context));
+    }
     destroy_bitmap_bgra(source);	
 }
