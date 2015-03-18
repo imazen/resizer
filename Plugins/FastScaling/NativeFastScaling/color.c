@@ -13,6 +13,7 @@
 
 int linear_to_luv_rows(BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count)
 {
+    //Ensure that start_row + row_count is not > bit->h
     if ((bit->w * bit->channels) != bit->float_stride)
     {
         return -1;
@@ -29,6 +30,7 @@ int linear_to_luv_rows(BitmapFloat * bit, const uint32_t start_row, const  uint3
 
 int luv_to_linear_rows(BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count)
 {
+    //Ensure that start_row + row_count is not > bit->h
     if ((bit->w * bit->channels) != bit->float_stride)
     {
         return -1;

@@ -193,7 +193,7 @@ static int HalveInternal(const BitmapBgra * from,
     const uint32_t to_bytes_pp = BitmapPixelFormat_bytes_per_pixel (to->fmt);
 
     //TODO: Ensure that from is equal or greater than divisorx to_w and t_h
-
+    //Ensure that shift > 0 && divisorSqr > 0 && divisor > 0
     for (y = 0; y < to_h; y++){
         memset(buffer, 0, sizeof(short) * to_w_bytes);
         for (d = 0; d < divisor; d++){

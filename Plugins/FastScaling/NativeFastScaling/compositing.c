@@ -18,6 +18,7 @@ int convert_srgb_to_linear(BitmapBgra * src, uint32_t from_row, BitmapFloat * de
 {
     if (src->w != dest->w || BitmapPixelFormat_bytes_per_pixel(src->fmt) < dest->channels) return -1;
 
+    //TODO: Ensure that from_row + row_count is not > src->h, and dest_row + row_count is not > dest->h
     const LookupTables*  t = get_lookup_tables();
 
     const uint32_t w = src->w;
@@ -76,6 +77,8 @@ static void unpack24bitRow(uint32_t width, unsigned char* sourceLine, unsigned c
 
 int vertical_flip_bgra(BitmapBgra * b)
 {
+    //Not actually correct; This should only copy bytes_per_pixel * width, not the entire stride
+    //This could be windowed!
     void* swap = ir_malloc(b->stride);
     if (swap == NULL){
         return -1;
