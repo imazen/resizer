@@ -17,8 +17,10 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
 
 bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFormat cbpp, bool transpose, bool flipx, bool flipy, InterpolationFilter filter)
 {
-    BitmapBgra * source = create_bitmap_bgra(sx, sy, true, sbpp);
-    BitmapBgra * canvas = create_bitmap_bgra(cx, cy, true, cbpp);
+    Context context;
+    Context_initialize(&context);
+    BitmapBgra * source = create_bitmap_bgra(&context, sx, sy, true, sbpp);
+    BitmapBgra * canvas = create_bitmap_bgra(&context, cx, cy, true, cbpp);
 
     RenderDetails * details = create_render_details();
 
@@ -43,7 +45,7 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
 
     Renderer * p = create_renderer(source, canvas, details);
 
-    perform_render(p);
+    perform_render(&context, p);
 
     destroy_renderer(p);
 

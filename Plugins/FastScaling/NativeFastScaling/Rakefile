@@ -109,3 +109,11 @@ task :test_each_case_in_separate_process => "test_program" do
   end
 end
 
+desc "Checked git commit"
+task :commit => [:test_with_valgrind, PROFILING_PROGRAM] do
+  sh "git add -u"
+  sh "git status --porcelain | grep '^?'" do |ok, res|
+    raise "Unadded files" if ok
+  end
+  sh "git commit -v"
+end

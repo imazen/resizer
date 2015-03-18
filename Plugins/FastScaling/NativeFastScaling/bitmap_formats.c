@@ -22,8 +22,8 @@ static bool are_valid_bitmap_dimensions(int sx, int sy)
 {
     return (
 	sx > 0 && sy > 0 // positive dimensions
-	&&  sx < INT_MAX / sy // no integer overflow
-	&& sx * sy * MAX_BYTES_PP < INT_MAX - MAX_BYTES_PP); // bytes allocated less than INT_MAX
+	&& sx < INT_MAX / sy // no integer overflow
+	&& sx * sy * MAX_BYTES_PP < INT_MAX - MAX_BYTES_PP); // then we can safely check
 }
 
 
@@ -38,7 +38,7 @@ BitmapBgra * create_bitmap_bgra_header(Context * context, int sx, int sy){
 	CONTEXT_SET_LAST_ERROR(context, Invalid_BitmapBgra_dimensions);
         return NULL;
     }
-    im = (BitmapBgra *)ir_calloc(1,sizeof(BitmapBgra));
+    im = (BitmapBgra *)context->calloc(1, sizeof(BitmapBgra));
     if (im == NULL) {
 	CONTEXT_SET_LAST_ERROR(context, Out_of_memory);
         return NULL;

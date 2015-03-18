@@ -40,6 +40,7 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
 bool test_in_place (int sx, int sy, BitmapPixelFormat sbpp, bool flipx, bool flipy, bool profile, float sharpen, uint32_t kernelRadius)
 {
     Context context;
+    Context_initialize(&context);
     BitmapBgra * source = create_bitmap_bgra(&context, sx, sy, true, sbpp);
 
     RenderDetails * details = create_render_details ();
