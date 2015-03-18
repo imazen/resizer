@@ -46,6 +46,13 @@ namespace Imazen.Profiling
             if (!allowRecursion && IsRunning(segmentName))
                 throw new InvalidOperationException(string.Format("The given profiling segment {0} has already been started, and allowRecursion=false", segmentName));
 
+            if (VisibleCallstack.Count() > 0)
+            {
+                var top = VisibleCallstack.First();
+                if (top.StartTicks > ticks)
+                    throw new InvalidOperationException(string.Format("You cannot log a profiling segment {0} {1} that starts before its parent {1} {2} ", segmentName, ticks, top.SegmentName,top.StartTicks));
+            }
+
             callstack.Push(ProfilingNode.StartNewAt(segmentName, ticks));
 
         }
