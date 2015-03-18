@@ -65,7 +65,7 @@ static void DestroyRenderDetails(RenderDetails * d){
 
 
 
-
+/*
 static int DetermineDivisor(Renderer * r)
 {
     if (r->canvas == NULL) return 0;
@@ -87,7 +87,7 @@ static int DetermineDivisor(Renderer * r)
     }
     return MAX(1, divisor);
 }
-
+*/
 
 void destroy_renderer(Renderer * r)
 {
@@ -184,7 +184,7 @@ Renderer * create_renderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetai
     return r;
 }
 
-
+/*
 static void SimpleRenderInPlace(void)
 {
     //against source:
@@ -195,6 +195,7 @@ static void SimpleRenderInPlace(void)
     //color matrix (srgb)
 
 }
+*/
 
 static int complete_halving(Context * context, Renderer * r)
 {
@@ -273,6 +274,9 @@ void Context_initialize(Context * context)
 
 void Context_set_last_error(Context * context, StatusCode code, const char * file, int line)
 {
+    context->reason = code;
+    context->file = file;
+    context->line = line;
 }
 
 const char * TheStatus = "The almight status has happened";

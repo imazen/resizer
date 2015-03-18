@@ -182,7 +182,7 @@ int ConvolveBgraFloatInPlace(BitmapFloat * buf,  ConvolutionKernel *kernel, uint
 }
 
 
-
+/*
 static void BgraSharpenInPlaceX(BitmapBgra * im, float pct)
 {
     const float n = -pct / (pct - 1); //if 0 < pct < 1
@@ -209,7 +209,7 @@ static void BgraSharpenInPlaceX(BitmapBgra * im, float pct)
         }
     }
 }
-
+*/
 
 static void
 SharpenBgraFloatInPlace(float* buf, unsigned int count, double pct,

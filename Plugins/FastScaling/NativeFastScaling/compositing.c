@@ -63,6 +63,7 @@ int convert_srgb_to_linear(BitmapBgra * src, uint32_t from_row, BitmapFloat * de
 }
 
 
+/*
 static void unpack24bitRow(uint32_t width, unsigned char* sourceLine, unsigned char* destArray){
     for (uint32_t i = 0; i < width; i++){
 
@@ -70,6 +71,7 @@ static void unpack24bitRow(uint32_t width, unsigned char* sourceLine, unsigned c
         destArray[i * 4 + 3] = 255;
     }
 }
+*/
 
 
 int vertical_flip_bgra(BitmapBgra * b)
@@ -88,6 +90,8 @@ int vertical_flip_bgra(BitmapBgra * b)
     ir_free(swap);
     return 0;
 }
+
+/*
 static int  copy_bitmap_bgra(BitmapBgra * src, BitmapBgra * dst)
 {
     // TODO: check sizes / overflows
@@ -110,6 +114,7 @@ static int  copy_bitmap_bgra(BitmapBgra * src, BitmapBgra * dst)
     }
     return 0;
 }
+*/
 
 static int blend_matte(BitmapFloat * src, const uint32_t from_row, const uint32_t row_count, const uint8_t* const matte){
     //We assume that matte is BGRA, regardless.
