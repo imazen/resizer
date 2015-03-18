@@ -24,6 +24,7 @@ public:
 	its_always_return_null = false;
 	allocation_failure_threshold = INT_MAX / 4;
 	allocation_failure_size = allocation_failure_threshold;
+    last_allocation = 0;
     }
 
     void * calloc(size_t instances, size_t size_of_instance) {

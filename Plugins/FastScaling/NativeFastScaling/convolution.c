@@ -98,8 +98,8 @@ void normalize_kernel(ConvolutionKernel * kernel, float desiredSum){
                 kernel->kernel[i] *= -1;
             }
         }
+        normalize_kernel(kernel, 1);
     }
-    normalize_kernel(kernel, 1);
     return kernel;
 }
 
