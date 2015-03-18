@@ -21,20 +21,6 @@
 
 #define IR_GUASSIAN(x, stdDev) (exp((-x * x) / (2 * stdDev * stdDev)) / (sqrt(2 * IR_PI) * stdDev))
 
-#ifndef MIN
-#   define MIN(a,b) ((a)<(b)?(a):(b))
-#endif
-#   define MIN3(a,b,c) ((a)<(b)?(MIN(a,c)):(MIN(b,c)))
-#ifndef MAX
-#   define MAX(a,b) ((a)<(b)?(b):(a))
-#endif
-#ifndef MAX3
-#   define MAX3(a,b,c) ((a)<(b)?(MAX(b,c)):(MAX(a,c)))
-#endif
-#ifndef NULL
-#   define NULL 0
-#endif
-
 inline int min(int a, int b) { return a <= b ? a : b; }
 inline int max(int a, int b) { return a >= b ? a : b; }
 
@@ -43,7 +29,7 @@ inline unsigned int umax(unsigned int a, unsigned int b) { return a >= b ? a : b
 
 
 
-#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
+#define EVIL_CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
 
 
@@ -59,31 +45,6 @@ uchar_clamp_ff(float clr) {
     }
 
     return (uint8_t)result;
-}
-
-static inline
-uint16_t
-clamp_01_to_04096(float clr) {
-    const uint16_t result = (uint16_t)lround(clr * 4096.0f);
-
-    if (result > 4096) {
-        return clr < 0 ? 0 : 4096;
-    }
-    return result;
-}
-
-
-
-static inline
-int overflow2(int a, int b)
-{
-    if (a < 1 || b < 1) {
-        return 1;
-    }
-    if (a > INT_MAX / b) {
-        return 1;
-    }
-    return 0;
 }
 
 static inline

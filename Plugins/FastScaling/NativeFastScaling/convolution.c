@@ -114,6 +114,7 @@ int ConvolveBgraFloatInPlace(BitmapFloat * buf,  ConvolutionKernel *kernel, uint
 
     const uint32_t buffer_count = radius + 1;
     const uint32_t w = buf->w;
+    const int32_t int_w = (int32_t)buf->w;
     const uint32_t step = buf->channels;
 
     const uint32_t until_row = row_count < 0 ? buf->h : from_row + (unsigned)row_count;
@@ -147,7 +148,7 @@ int ConvolveBgraFloatInPlace(BitmapFloat * buf,  ConvolutionKernel *kernel, uint
                     /* Accumulate each channel */
                     for (i = left; i <= right; i++) {
                         const float weight = kern[i - left];
-                        const uint32_t ix = CLAMP(i, 0, (int32_t)w);
+                        const uint32_t ix = EVIL_CLAMP(i, 0, int_w);
                         for (uint32_t j = 0; j < ch_used; j++)
                             avg[j] += weight * source_buffer[ix * step + j];
                     }
