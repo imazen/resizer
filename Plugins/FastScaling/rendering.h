@@ -155,11 +155,11 @@ namespace ImageResizer{
 
 
                 void Render(){
-                    p->Start ("perform_render", false);
+                    p->Start ("managed_perform_render", false);
                     Context context;
                     perform_render(&context, r);
                     replay_log ();
-                    p->Stop ("perform_render", true, false);
+                    p->Stop ("managed_perform_render", true, true);
                 }
 
                 private:
