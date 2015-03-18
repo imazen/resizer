@@ -52,7 +52,7 @@ end
 def valgrind_task(valgrind_params_string, name_and_dependencies)
   task name_and_dependencies do |t|
     with_ld_library_path('.') do 
-      sh "valgrind #{VALGRIND_OPTS} #{valgrind_params_string} ./#{t.prerequisites.first}"
+      sh "valgrind #{VALGRIND_OPTS} #{valgrind_params_string} ./#{t.prerequisites.first} #{ENV['ARGS']}"
     end
   end
 end
@@ -81,7 +81,7 @@ end
 
 task :test => "test_program" do
   with_ld_library_path('.') do 
-    sh "./#{TEST_PROGRAM}"
+    sh "./#{TEST_PROGRAM} #{ENV['ARGS']}"
   end
 end
 
@@ -89,11 +89,7 @@ desc "Run the test program with valgrind"
 valgrind_task("--leak-check=full --show-leak-kinds=all", :test_with_valgrind => TEST_PROGRAM)
 
 desc "Run the test program with valgrind, fast"
-task :something_else  => TEST_PROGRAM do 
-  with_ld_library_path('.') do 
-    sh "valgrind  ./#{TEST_PROGRAM}"
-  end
-end
+valgrind_task("", :something_else  => TEST_PROGRAM)
 
 
 

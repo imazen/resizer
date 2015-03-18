@@ -107,12 +107,9 @@ void copy_linear_over_srgb(
     const uint32_t col_count,
     const bool transpose);
 
-// int as divisior???
-int Halve(const BitmapBgra * from, const BitmapBgra * to, int divisor);
+int Halve(Context * context, const BitmapBgra * from, BitmapBgra * to, int divisor);
 
-
-// is it correct to use an int as the divisor here?
-int HalveInPlace(BitmapBgra * from, int divisor);
+int HalveInPlace(Context * context, BitmapBgra * from, int divisor);
 
 #ifdef __cplusplus
 }

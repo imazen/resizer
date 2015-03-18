@@ -15,6 +15,7 @@
 
 #include "fastscaling_private.h"
 #include <stdio.h>
+#include <assert.h>
 
 typedef struct RendererStruct {
     RenderDetails * details;
@@ -210,16 +211,17 @@ static int complete_halving(Context * context, Renderer * r)
     r->details->halving_divisor = 0; //Don't halve twice
 
     if (r->source->can_reuse_space){
-        int result = HalveInPlace(r->source, divisor);
+        int result = HalveInPlace(context, r->source, divisor);
         if (result == 0) return -101;
     }
     else {
         prof_start(r,"create temp image for halving", false);
         BitmapBgra * tmp_im = create_bitmap_bgra(context, halved_width, halved_height, true, r->source->fmt);
-        if (tmp_im == NULL) return -102;
+        if (tmp_im == NULL) 
+	    return -1;
         prof_stop(r,"create temp image for halving", true, false);
 
-        int result = Halve(r->source, tmp_im, divisor);
+        int result = Halve(context, r->source, tmp_im, divisor);
         if (result == 0) {
             return -103;
         }
@@ -437,7 +439,9 @@ static int RenderWrapper1D(
 int perform_render(Context * context, Renderer * r)
 {
     prof_start(r,"perform_render", false);
-    complete_halving(context, r);
+    if (complete_halving(context, r) != 0) {
+	return -1;
+    }
     bool skip_last_transpose = r->details->post_transpose;
 
     /*

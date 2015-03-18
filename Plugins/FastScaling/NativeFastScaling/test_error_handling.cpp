@@ -14,6 +14,7 @@ public:
     size_t last_allocation;
     bool its_always_return_null;
     size_t allocation_failure_threshold;
+    size_t allocation_failure_size;
     static void * calloc_shim(size_t instances, size_t size_of_instance) {
 	return self->calloc(instances, size_of_instance);
     }
@@ -22,6 +23,7 @@ public:
 	self = this;
 	its_always_return_null = false;
 	allocation_failure_threshold = INT_MAX / 4;
+	allocation_failure_size = allocation_failure_threshold;
     }
 
     void * calloc(size_t instances, size_t size_of_instance) {
@@ -32,11 +34,18 @@ public:
 	if (allocation_failure_threshold < last_allocation) {
 	    return NULL;
 	}
+	if (allocation_failure_size == last_allocation) {
+	    return NULL;
+	}
 	return ::calloc(instances, size_of_instance);
     }
 
     void always_fail_allocation() {
 	its_always_return_null = true;
+    }
+
+    void fail_allocation_of(size_t byte_count) {
+	allocation_failure_size = byte_count;
     }
 
     void fail_allocation_if_size_larger_than(size_t byte_count) {
@@ -48,11 +57,40 @@ Fixture * Fixture::self = NULL;
 
 
 TEST_CASE_METHOD(Fixture, "Perform Rendering", "[ error_handling ]") {
+    REQUIRE((2 / 10) == 0);
     Context context;
     Context_initialize(&context);
     context.calloc = Fixture::calloc_shim;
-    BitmapBgra * source = NULL;
-    //source = create_bitmap_bgra(&context, 1, 1, true, (BitmapPixelFormat)2);
+    BitmapBgra * source = create_bitmap_bgra(&context, 4, 4, true, Bgra32);
+    BitmapBgra * canvas = create_bitmap_bgra(&context, 2, 2, true, Bgra32);
+    RenderDetails * details = create_render_details();
+    details->interpolation = create_interpolation(Filter_CubicFast);
+    details->sharpen_percent_goal = 50;
+    details->post_flip_x = true;
+    details->post_flip_y = false;
+    details->post_transpose = false;
+    Renderer * p = create_renderer(source, canvas, details);
+
+    SECTION("Render failure invalid bitmap dimensions for tmp_im") {
+	details->halving_divisor = 5;
+	REQUIRE(perform_render(&context, p) < 0);
+	REQUIRE(Context_has_error(&context));
+    	REQUIRE(Context_error_reason(&context) == Invalid_BitmapBgra_dimensions);
+    }
+
+    // SECTION("Render failure due to buffer allocation failure in HalveInternal") {
+    // 	fail_allocation_of(canvas->w * sizeof(short));
+    // 	int result = perform_render(&context, p);
+    // 	REQUIRE(last_allocation == 0);
+    // 	REQUIRE(result < 0);
+    // 	REQUIRE(Context_has_error(&context));
+    // 	REQUIRE(Context_error_reason(&context) == Out_of_memory);	
+    // }
+    destroy_renderer(p);
+
+    destroy_bitmap_bgra(source);
+    destroy_bitmap_bgra(canvas);
+    free_lookup_tables();
 }
 
 TEST_CASE_METHOD(Fixture, "Creating BitmapBgra", "[ error_handling ]") {
@@ -62,8 +100,8 @@ TEST_CASE_METHOD(Fixture, "Creating BitmapBgra", "[ error_handling ]") {
     BitmapBgra * source = NULL;
     SECTION("Creating a 1x1 bitmap is valid") {
     	source = create_bitmap_bgra(&context, 1, 1, true, (BitmapPixelFormat)2);
-    	REQUIRE(source != NULL);
-    	REQUIRE(!Context_has_error(&context));
+    	REQUIRE_FALSE(source == NULL);
+    	REQUIRE_FALSE(Context_has_error(&context));
     }
     SECTION("A 0x0 bitmap is invalid") {
     	source = create_bitmap_bgra(&context, 0, 0, true, (BitmapPixelFormat)2);

@@ -174,12 +174,18 @@ static inline void HalveRowByDivisor(const unsigned char* from, unsigned short *
 }
 
 
-static int HalveInternal(const BitmapBgra * from,
-    const BitmapBgra * to, const int to_w, const int to_h, const int to_stride, const int divisor)
+static int HalveInternal(
+    Context * context,
+    const BitmapBgra * from,
+    BitmapBgra * to, 
+    const int to_w, 
+    const int to_h, 
+    const int to_stride, 
+    const int divisor)
 {
 
     const int to_w_bytes = to_w * BitmapPixelFormat_bytes_per_pixel (to->fmt);
-    unsigned short *buffer = (unsigned short *)calloc(to_w_bytes, sizeof(unsigned short));
+    unsigned short *buffer = (unsigned short *)context->calloc(to_w_bytes, sizeof(unsigned short));
     if (buffer == NULL) return 0;
 
     int y, b, d;
@@ -228,19 +234,16 @@ static int HalveInternal(const BitmapBgra * from,
     return 1;
 }
 
-// int as divisior???
-int Halve(const BitmapBgra * from, const BitmapBgra * to, int divisor){
-    return HalveInternal(from, to, to->w, to->h, to->stride, divisor);
+int Halve(Context * context, const BitmapBgra * from, BitmapBgra * to, int divisor){
+    return HalveInternal(context, from, to, to->w, to->h, to->stride, divisor);
 }
 
-
-// is it correct to use an int as the divisor here?
-int HalveInPlace(BitmapBgra * from, int divisor)
+int HalveInPlace(Context * context, BitmapBgra * from, int divisor)
 {
     int to_w = from->w / divisor;
     int to_h = from->h / divisor;
     int to_stride = to_w * BitmapPixelFormat_bytes_per_pixel (from->fmt);
-    int r = HalveInternal(from, from, to_w, to_h, to_stride, divisor);
+    int r = HalveInternal(context, from, from, to_w, to_h, to_stride, divisor);
     from->w = to_w;
     from->h = to_h;
     from->stride = to_stride;
