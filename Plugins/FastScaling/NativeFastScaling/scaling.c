@@ -12,7 +12,7 @@
 
 #include "fastscaling_private.h"
 #include <string.h>
-
+#include <assert.h>
 
 
 void ScaleBgraFloatRows(BitmapFloat * from, uint32_t from_row, BitmapFloat * to, uint32_t to_row, uint32_t row_count, ContributionType * weights)
@@ -185,9 +185,13 @@ static int HalveInternal(
 {
 
     const int to_w_bytes = to_w * BitmapPixelFormat_bytes_per_pixel (to->fmt);
-    unsigned short *buffer = (unsigned short *)context->calloc(to_w_bytes, sizeof(unsigned short));
-    if (buffer == NULL) return 0;
-
+    //unsigned short *buffer = (unsigned short *)context->calloc(to_w_bytes, sizeof(unsigned short));
+    unsigned short *buffer = (unsigned short *)CONTEXT_calloc(context, to_w_bytes, sizeof(unsigned short));
+    if (buffer == NULL) {
+	// here that sets the error context
+	return -1;
+    }
+    assert(false);
     int y, b, d;
     const unsigned short divisorSqr = divisor * divisor;
     unsigned int shift = 0;
@@ -200,7 +204,7 @@ static int HalveInternal(
 
     //TODO: Ensure that from is equal or greater than divisorx to_w and t_h
     //Ensure that shift > 0 && divisorSqr > 0 && divisor > 0
-    for (y = 0; y < to_h; y++){
+    for (y = 0; y < to_h; y++) {
         memset(buffer, 0, sizeof(short) * to_w_bytes);
         for (d = 0; d < divisor; d++){
             HalveRowByDivisor (from->pixels + (y * divisor + d) * from->stride, buffer, to_w, divisor, from_bytes_pp, to_bytes_pp);
@@ -231,7 +235,7 @@ static int HalveInternal(
 
     free(buffer);
 
-    return 1;
+    return 0;
 }
 
 int Halve(Context * context, const BitmapBgra * from, BitmapBgra * to, int divisor){

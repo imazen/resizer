@@ -38,7 +38,7 @@ BitmapBgra * create_bitmap_bgra_header(Context * context, int sx, int sy){
 	CONTEXT_SET_LAST_ERROR(context, Invalid_BitmapBgra_dimensions);
         return NULL;
     }
-    im = (BitmapBgra *)context->calloc(1, sizeof(BitmapBgra));
+    im = (BitmapBgra *)CONTEXT_calloc(context, 1, sizeof(BitmapBgra));
     if (im == NULL) {
 	CONTEXT_SET_LAST_ERROR(context, Out_of_memory);
         return NULL;
@@ -67,10 +67,10 @@ BitmapBgra * create_bitmap_bgra(Context * context, int sx, int sy, bool zeroed, 
     im->borrowed_pixels = false;
     im->alpha_meaningful = im->fmt == Bgra32;
     if (zeroed) {
-        im->pixels = (unsigned char *)context->calloc(im->h * im->stride, sizeof(unsigned char));
+        im->pixels = (unsigned char *)CONTEXT_calloc(context, im->h * im->stride, sizeof(unsigned char));
     }
     else {
-        im->pixels = (unsigned char *)context->malloc(im->h * im->stride);
+        im->pixels = (unsigned char *)CONTEXT_malloc(context, im->h * im->stride);
     }
     if (im->pixels == NULL) {
         ir_free(im);

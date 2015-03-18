@@ -204,7 +204,7 @@ static void SimpleRenderInPlace(void)
 static int complete_halving(Context * context, Renderer * r)
 {
     int divisor = r->details->halving_divisor;
-    if (divisor <= 1){
+    if (divisor <= 1) {
         return 0;
     }
     int halved_width = (int)(r->source->w / divisor);
@@ -225,7 +225,7 @@ static int complete_halving(Context * context, Renderer * r)
         prof_stop(r,"create temp image for halving", true, false);
 
         int result = Halve(context, r->source, tmp_im, divisor);
-        if (result == 0) {
+        if (result != 0) {
             return -103;
         }
         tmp_im->alpha_meaningful = r->source->alpha_meaningful;

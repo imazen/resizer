@@ -44,18 +44,23 @@ typedef struct _Context {
 	int line;
 	StatusCode reason;
     } error;
-    malloc_function malloc;
-    free_function free;
-    calloc_function calloc;
+    malloc_function internal_malloc;
+    free_function internal_free;
+    calloc_function internal_calloc;
 } Context;
 
 void Context_initialize(Context * context);
 void Context_set_last_error(Context * context, StatusCode code, const char * file, int line);
-const char * Context_last_error_message(Context * context, char * buffer, size_t buffer_size);
+const char * Context_error_message(Context * context, char * buffer, size_t buffer_size);
 bool Context_has_error(Context * context);
 int Context_error_reason(Context * context);
+void * Context_calloc(Context * context, size_t, size_t, const char * file, int line);
+void * Context_malloc(Context * context, size_t, const char * file, int line);
 
 #define CONTEXT_SET_LAST_ERROR(context, status_code) Context_set_last_error(context, status_code, __FILE__, __LINE__)
+#define CONTEXT_calloc(context, instance_count, size_of_instance) Context_calloc(context, instance_count, size_of_instance, __FILE__, __LINE__)
+#define CONTEXT_malloc(context, byte_count) Context_malloc(context, byte_count, __FILE__, __LINE__)
+
 
 //Compact format for bitmaps. sRGB or gamma adjusted - *NOT* linear
 typedef enum _BitmapPixelFormat {
