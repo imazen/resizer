@@ -128,11 +128,14 @@ static LineContribType * ContributionsAlloc(const uint32_t line_length, const ui
     res->LineLength = line_length;
     res->ContribRow = (ContributionType *)malloc(line_length * sizeof(ContributionType));
     if (!res->ContribRow) {
+        free(res);
         return NULL;
     }
 
     float *allWeights = (float *)calloc(windows_size * line_length, sizeof(float));
     if (!allWeights) {
+        free(res);
+        free (res->ContribRow);
         return NULL;
     }
 
