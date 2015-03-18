@@ -11,11 +11,11 @@
 
 #include "fastscaling_private.h"
 
-const int MAX_BPP = 4;
+const int MAX_BYTES_PP = 4;
 
 static bool are_valid_bitmap_dimensions(int sx, int sy)
 {
-    return sx > 0 && sy > 0 && sx * sy * MAX_BPP < INT_MAX;
+    return sx > 0 && sy > 0 && sx * sy * 2 * MAX_BYTES_PP < INT_MAX;
 }
 
 uint32_t BitmapPixelFormat_bytes_per_pixel (BitmapPixelFormat format){
