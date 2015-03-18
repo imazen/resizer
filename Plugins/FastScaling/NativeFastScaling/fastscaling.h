@@ -34,16 +34,26 @@ Prefix things, perhaps?
 extern "C" {
 #endif
 
+typedef void * (*calloc_function)(size_t, size_t);
+typedef void * (*malloc_function)(size_t);
+typedef void (*free_function)(void *);
+
 typedef struct _Context {
-    const char * file;
-    int line;
-    StatusCode reason;
+    struct {
+	const char * file;
+	int line;
+	StatusCode reason;
+    } error;
+    malloc_function malloc;
+    free_function free;
+    calloc_function calloc;
 } Context;
 
 void Context_initialize(Context * context);
 void Context_set_last_error(Context * context, StatusCode code, const char * file, int line);
 const char * Context_last_error_message(Context * context, char * buffer, size_t buffer_size);
 bool Context_has_error(Context * context);
+int Context_error_reason(Context * context);
 
 #define CONTEXT_SET_LAST_ERROR(context, status_code) Context_set_last_error(context, status_code, __FILE__, __LINE__)
 

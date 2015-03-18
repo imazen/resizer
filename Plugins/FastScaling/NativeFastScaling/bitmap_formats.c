@@ -25,12 +25,11 @@ uint32_t BitmapPixelFormat_bytes_per_pixel (BitmapPixelFormat format){
 
 BitmapBgra * create_bitmap_bgra_header(Context * context, int sx, int sy){
     BitmapBgra * im;
-
     if (!are_valid_bitmap_dimensions(sx, sy)) {
 	CONTEXT_SET_LAST_ERROR(context, Invalid_BitmapBgra_dimensions);
         return NULL;
     }
-
+    assert(false);
     im = (BitmapBgra *)ir_calloc(1,sizeof(BitmapBgra));
     if (im == NULL) {
 	CONTEXT_SET_LAST_ERROR(context, Out_of_memory);

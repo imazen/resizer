@@ -265,36 +265,6 @@ static void ApplyColorMatrix(const Renderer * r, BitmapFloat * img, const uint32
     prof_stop(r,"apply_color_matrix_float", true, false);
 }
 
-void Context_initialize(Context * context) 
-{
-    context->file = NULL;
-    context->line = -1;
-    context->reason = No_Error;
-}
-
-void Context_set_last_error(Context * context, StatusCode code, const char * file, int line)
-{
-    context->reason = code;
-    context->file = file;
-    context->line = line;
-}
-
-bool Context_has_error(Context * context)
-{
-    return context->reason != No_Error;
-}
-
-const char * TheStatus = "The almight status has happened";
-static const char * status_code_to_string(StatusCode code) 
-{
-    return TheStatus;
-}
-
-const char * Context_last_error_message(Context * context, char * buffer, size_t buffer_size)
-{
-    snprintf(buffer, buffer_size, "Error in file: %s line: %d reason: %s", context->file, context->line, status_code_to_string(context->reason));
-    return buffer;
-}
 
 static int ScaleAndRender1D(const Renderer * r,
     BitmapBgra * pSrc,

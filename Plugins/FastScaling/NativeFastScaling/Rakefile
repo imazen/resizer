@@ -17,7 +17,8 @@ convolution.o
 renderer.o
 scaling.o
 trim_whitespace.o
-weighting.o 
+weighting.o
+context.o
 }
 SO_FILE="libfastscaling.so"
 
