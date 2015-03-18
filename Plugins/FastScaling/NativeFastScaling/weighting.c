@@ -160,7 +160,7 @@ LineContribType *contributions_calc(const uint32_t line_size, const uint32_t src
 
 
     const double scale_factor = (double)line_size / (double)src_size;
-    const double downscale_factor = MIN(1.0, scale_factor);
+    const double downscale_factor = fmin(1.0, scale_factor);
     const double half_source_window = details->window * 0.5 / downscale_factor;
 
     const uint32_t allocated_window_size = (int)ceil(2 * (half_source_window - TONY)) + 1;
@@ -176,8 +176,8 @@ LineContribType *contributions_calc(const uint32_t line_size, const uint32_t src
         const int left_edge = (int)ceil(center_src_pixel - half_source_window - 0.5 + TONY);
         const int right_edge = (int)floor(center_src_pixel + half_source_window + 0.5 - TONY);
 
-        const uint32_t left_src_pixel = MAX(0, left_edge);
-        const uint32_t right_src_pixel = MIN(right_edge, (int)src_size - 1);
+        const uint32_t left_src_pixel = (uint32_t)max(0, left_edge);
+        const uint32_t right_src_pixel = (uint32_t)min(right_edge, (int)src_size - 1);
 
         double total_weight = 0.0;
 
@@ -199,7 +199,7 @@ LineContribType *contributions_calc(const uint32_t line_size, const uint32_t src
         //for (ix = left_edge; ix <= right_edge; ix++) {
         for (ix = left_src_pixel; ix <= right_src_pixel; ix++) {
             int tx = ix - left_src_pixel;
-            //int tx = MIN(MAX(ix, left_src_pixel), right_src_pixel) - left_src_pixel;
+            //int tx = min(max(ix, left_src_pixel), right_src_pixel) - left_src_pixel;
             double add = (*details->filter)(details, downscale_factor * ((double)ix - center_src_pixel));
             if (add < 0 && extra_negative_weight != 0){
                 add *= extra_negative_weight;

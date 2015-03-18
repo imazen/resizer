@@ -21,7 +21,7 @@ void ScaleBgraFloatRows(BitmapFloat * from, uint32_t from_row, BitmapFloat * to,
     const uint32_t from_step = from->channels;
     const uint32_t to_step = to->channels;
     const uint32_t dest_buffer_count = to->w;
-    const uint32_t min_channels = MIN(from_step, to_step);
+    const uint32_t min_channels = umin(from_step, to_step);
     uint32_t ndx;
     //TODO: assert min_channels < 5
     float avg[4];

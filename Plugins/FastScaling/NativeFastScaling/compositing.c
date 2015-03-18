@@ -24,7 +24,7 @@ int convert_srgb_to_linear(BitmapBgra * src, uint32_t from_row, BitmapFloat * de
     const uint32_t units = w * BitmapPixelFormat_bytes_per_pixel(src->fmt);
     const uint32_t from_step = BitmapPixelFormat_bytes_per_pixel(src->fmt);
     const uint32_t to_step = dest->channels;
-    const uint32_t copy_step = MIN(from_step, to_step);
+    const uint32_t copy_step = umin(from_step, to_step);
 
     for (uint32_t row = 0; row < row_count; row++)
     {
@@ -173,7 +173,7 @@ void copy_linear_over_srgb(BitmapFloat * src, const uint32_t from_row, BitmapBgr
 
     const uint32_t dest_row_stride = transpose ? dest_bytes_pp : dest->stride;
     const uint32_t dest_pixel_stride = transpose ? dest->stride : dest_bytes_pp;
-    const uint32_t srcitems = MIN(from_col + col_count, src->w) *src->channels;
+    const uint32_t srcitems = umin(from_col + col_count, src->w) *src->channels;
     const uint32_t ch = src->channels;
     const bool copy_alpha = dest->fmt == Bgra32 && src->channels == 4 && src->alpha_meaningful;
     const bool clean_alpha = !copy_alpha && dest->fmt == Bgra32;
@@ -207,7 +207,7 @@ static void compose_linear_over_srgb(BitmapFloat * src, const uint32_t from_row,
     const uint32_t dest_bytes_pp = BitmapPixelFormat_bytes_per_pixel (dest->fmt);
     const uint32_t dest_row_stride = transpose ? dest_bytes_pp : dest->stride;
     const uint32_t dest_pixel_stride = transpose ? dest->stride : dest_bytes_pp;
-    const uint32_t srcitems = MIN(from_col + col_count, src->w) *src->channels;
+    const uint32_t srcitems = umin(from_col + col_count, src->w) *src->channels;
     const uint32_t ch = src->channels;
 
     const bool dest_alpha = dest->fmt == Bgra32 && dest->alpha_meaningful;
@@ -283,7 +283,7 @@ int pivoting_composite_linear_over_srgb(BitmapFloat * src, uint32_t from_row, Bi
         //Let's try to tile within 2kb, get some cache coherency
         const float dest_opt_rows = 2048.0f / (float)dest->stride;
 
-        const int tile_width = MAX(4, (int)dest_opt_rows);
+        const int tile_width = max(4, (int)dest_opt_rows);
         const int tiles = src->w / tile_width;
 
         if (can_compose){

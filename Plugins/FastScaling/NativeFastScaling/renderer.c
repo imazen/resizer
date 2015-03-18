@@ -74,7 +74,7 @@ static int DetermineDivisor(Renderer * r)
     int height = r->details->post_transpose ? r->canvas->w : r->canvas->h;
 
 
-    double divisor_max = MIN((double)r->source->w / (double)width,
+    double divisor_max = fmin((double)r->source->w / (double)width,
         (double)r->source->h / (double)height);
 
     divisor_max = divisor_max / r->details->interpolate_last_percent;
@@ -85,7 +85,7 @@ static int DetermineDivisor(Renderer * r)
             divisor--;
         }
     }
-    return MAX(1, divisor);
+    return max(1, divisor);
 }
 */
 
@@ -340,7 +340,7 @@ static int ScaleAndRender1D(const Renderer * r,
 
     /* Scale each set of lines */
     for (uint32_t source_start_row = 0; source_start_row < pSrc->h; source_start_row += buffer_row_count) {
-        const uint32_t row_count = MIN(pSrc->h - source_start_row, buffer_row_count);
+        const uint32_t row_count = umin(pSrc->h - source_start_row, buffer_row_count);
 
         prof_start(r,"convert_srgb_to_linear", false);
         if (convert_srgb_to_linear(pSrc, source_start_row, source_buf, 0, row_count)){
@@ -411,7 +411,7 @@ static int Render1D(const Renderer * r,
 
     /* Scale each set of lines */
     for (uint32_t source_start_row = 0; source_start_row < pSrc->h; source_start_row += buffer_row_count) {
-        const uint32_t row_count = MIN(pSrc->h - source_start_row, buffer_row_count);
+        const uint32_t row_count = umin(pSrc->h - source_start_row, buffer_row_count);
 
         if (convert_srgb_to_linear(pSrc, source_start_row, buf, 0, row_count)){
             return_code = -2; goto cleanup;
