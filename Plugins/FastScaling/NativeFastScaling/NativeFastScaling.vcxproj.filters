@@ -39,6 +39,9 @@
     <ClCompile Include="color.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="context.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="trim_whitespace.h">
@@ -60,6 +63,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="color.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="status_code.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

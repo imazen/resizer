@@ -158,6 +158,7 @@
     <ClCompile Include="bitmap_formats.c" />
     <ClCompile Include="color.c" />
     <ClCompile Include="compositing.c" />
+    <ClCompile Include="context.c" />
     <ClCompile Include="convolution.c" />
     <ClCompile Include="renderer.c" />
     <ClCompile Include="scaling.c" />
@@ -171,6 +172,7 @@
     <ClInclude Include="fastscaling_private.h" />
     <ClInclude Include="ir_alloc.h" />
     <ClInclude Include="math_functions.h" />
+    <ClInclude Include="status_code.h" />
     <ClInclude Include="trim_whitespace.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
