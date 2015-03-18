@@ -19,3 +19,4 @@ char * test_filter(InterpolationFilter filter, char *msg, double expected_first_
 bool test_weight_distrib(char *msg);
 
 InterpolationDetails*  sample_filter(InterpolationFilter filter, double x_from, double x_to, double *buffer, int samples);
+
