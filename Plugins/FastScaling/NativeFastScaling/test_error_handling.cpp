@@ -1,6 +1,8 @@
 #include "catch.hpp"
 #include "fastscaling_private.h"
 
+const int MAX_BYTES_PP = 16;
+
 static std::ostream& operator<<(std::ostream& out, const BitmapFloat & bitmap_float)
 {
     return out << "BitmapFloat: w:" << bitmap_float.w << " h: " << bitmap_float.h << " channels:" << bitmap_float.channels << '\n';
@@ -21,25 +23,32 @@ TEST_CASE("Argument checking for convert_sgrp_to_linear", "[error_handling]") {
     destroy_bitmap_float(dest);
 }
 
-TEST_CASE("Creating BitmapBgra", "[error_handling]") {
+TEST_CASE("Creating BitmapBgra", "[ error_handling ]") {
     Context context;
     Context_initialize(&context);
     BitmapBgra * source = NULL;
     SECTION("Creating a 1x1 bitmap is valid") {
-	source = create_bitmap_bgra(&context, 1, 1, true, (BitmapPixelFormat)2);
-	REQUIRE(source != NULL);
-	REQUIRE(!Context_has_error(&context));
+    	source = create_bitmap_bgra(&context, 1, 1, true, (BitmapPixelFormat)2);
+    	REQUIRE(source != NULL);
+    	REQUIRE(!Context_has_error(&context));
     }
     SECTION("A 0x0 bitmap is invalid") {
-	source = create_bitmap_bgra(&context, 0, 0, true, (BitmapPixelFormat)2);
+    	source = create_bitmap_bgra(&context, 0, 0, true, (BitmapPixelFormat)2);
+    	REQUIRE(source == NULL);
+    	REQUIRE(Context_has_error(&context));
+    	REQUIRE(Context_error_reason(&context) == Invalid_BitmapBgra_dimensions);
+    	//REQUIRE(Context_error_message(&context));
+    }
+    SECTION("A gargantuan bitmap is also invalid") {
+	//source = create_bitmap_bgra(&context, 1, INT_MAX, true, (BitmapPixelFormat)2);
+	source = create_bitmap_bgra_header(&context, 1, INT_MAX);
 	REQUIRE(source == NULL);
 	REQUIRE(Context_has_error(&context));
-	//REQUIRE(Context_error_message(&context));
+	REQUIRE(Context_error_reason(&context) == Invalid_BitmapBgra_dimensions);
     }
-    SECTION("A huge bitmap is also invalid") {
-	source = create_bitmap_bgra(&context, 1, INT_MAX, true, (BitmapPixelFormat)2);
-	REQUIRE(source == NULL);
-	REQUIRE(Context_has_error(&context));
-    }
+	    
+    // SECTION("A bitmap that exhausts memory is invalid too") {
+	
+    // }
     destroy_bitmap_bgra(source);	
 }

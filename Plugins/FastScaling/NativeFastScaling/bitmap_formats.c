@@ -10,13 +10,22 @@
 #endif
 
 #include "fastscaling_private.h"
+#include <assert.h>
 
 const int MAX_BYTES_PP = 16;
 
+
+// Ha, ha. The result of sx * sy * MAX_BYTES_PP will overflow if the result is bigger than INT_MAX
+// causing it to wrap around and be true. This is what the sx < INT_MAX / sy code does
+
 static bool are_valid_bitmap_dimensions(int sx, int sy)
 {
-    return sx > 0 && sy > 0 && sx * sy * MAX_BYTES_PP < INT_MAX - MAX_BYTES_PP;
+    return (
+	sx > 0 && sy > 0 // positive dimensions
+	&&  sx < INT_MAX / sy // no integer overflow
+	&& sx * sy * MAX_BYTES_PP < INT_MAX - MAX_BYTES_PP); // bytes allocated less than INT_MAX
 }
+
 
 uint32_t BitmapPixelFormat_bytes_per_pixel (BitmapPixelFormat format){
     return (uint32_t)format;
@@ -29,7 +38,6 @@ BitmapBgra * create_bitmap_bgra_header(Context * context, int sx, int sy){
 	CONTEXT_SET_LAST_ERROR(context, Invalid_BitmapBgra_dimensions);
         return NULL;
     }
-    assert(false);
     im = (BitmapBgra *)ir_calloc(1,sizeof(BitmapBgra));
     if (im == NULL) {
 	CONTEXT_SET_LAST_ERROR(context, Out_of_memory);
