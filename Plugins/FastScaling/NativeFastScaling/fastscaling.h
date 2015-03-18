@@ -43,6 +43,7 @@ typedef struct _Context {
 void Context_initialize(Context * context);
 void Context_set_last_error(Context * context, StatusCode code, const char * file, int line);
 const char * Context_last_error_message(Context * context, char * buffer, size_t buffer_size);
+bool Context_has_error(Context * context);
 
 #define CONTEXT_SET_LAST_ERROR(context, status_code) Context_set_last_error(context, status_code, __FILE__, __LINE__)
 

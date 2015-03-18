@@ -279,6 +279,11 @@ void Context_set_last_error(Context * context, StatusCode code, const char * fil
     context->line = line;
 }
 
+bool Context_has_error(Context * context)
+{
+    return context->reason != No_Error;
+}
+
 const char * TheStatus = "The almight status has happened";
 static const char * status_code_to_string(StatusCode code) 
 {

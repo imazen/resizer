@@ -25,11 +25,22 @@ TEST_CASE("Argument checking for convert_sgrp_to_linear", "[error_handling]") {
     destroy_bitmap_float(dest);
 }
 
-TEST_CASE("With context", "[error_handling]") {
+TEST_CASE("Creating BitmapBgra", "[error_handling]") {
     Context context;
     Context_initialize(&context);
-    BitmapBgra * source = create_bitmap_bgra(&context, 1, 1, true, (BitmapPixelFormat)2);
-    destroy_bitmap_bgra(source);
+    BitmapBgra * source = NULL;
+    SECTION("Creating a 1x1 bitmap is valid") {
+	source = create_bitmap_bgra(&context, 1, 1, true, (BitmapPixelFormat)2);
+	REQUIRE(source != NULL);
+	REQUIRE(!Context_has_error(&context));
+    }
+    SECTION("A 0x0 bitmap is invalid") {
+	source = create_bitmap_bgra(&context, 0, 0, true, (BitmapPixelFormat)2);
+	REQUIRE(source == NULL);
+	REQUIRE(Context_has_error(&context));
+	//REQUIRE(Context_error_message(&context));
+    }
+    destroy_bitmap_bgra(source);	
 }
 
 bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFormat cbpp, bool transpose, bool flipx, bool flipy, bool profile, InterpolationFilter filter)
