@@ -67,10 +67,10 @@ BitmapBgra * create_bitmap_bgra(Context * context, int sx, int sy, bool zeroed, 
     im->borrowed_pixels = false;
     im->alpha_meaningful = im->fmt == Bgra32;
     if (zeroed) {
-        im->pixels = (unsigned char *)ir_calloc(im->h * im->stride, sizeof(unsigned char));
+        im->pixels = (unsigned char *)context->calloc(im->h * im->stride, sizeof(unsigned char));
     }
     else {
-        im->pixels = (unsigned char *)ir_malloc(im->h * im->stride);
+        im->pixels = (unsigned char *)context->malloc(im->h * im->stride);
     }
     if (im->pixels == NULL) {
         ir_free(im);

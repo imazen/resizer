@@ -87,9 +87,10 @@ TEST_CASE_METHOD(Fixture, "Creating BitmapBgra", "[ error_handling ]") {
 	REQUIRE(Context_error_reason(&context) == Out_of_memory);	
     }
     SECTION("Exhausting memory in the pixel allocation is also handled") {
-	fail_allocation_if_size_larger_than(sizeof(BitmapPixelFormat));
-	source = create_bitmap_bgra(&context, 1, 1, true, (BitmapPixelFormat)2);
+	fail_allocation_if_size_larger_than(sizeof(BitmapBgra));
+	source = create_bitmap_bgra(&context, 640, 480, true, (BitmapPixelFormat)2);
 	REQUIRE(source == NULL);
+	REQUIRE(last_allocation == 640 * 480 * 2); // the failed allocation tried to allocate the pixels
 	REQUIRE(Context_has_error(&context));
 	REQUIRE(Context_error_reason(&context) == Out_of_memory);		
     }
