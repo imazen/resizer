@@ -45,10 +45,16 @@ typedef struct _HeapManager{
     void * _private_state;
 } HeapManager;
 
-typedef struct _ErrorInfo{
+typedef struct _ErrorCallstackLine{
     const char * file;
     int line;
-    StatusCode reason;
+} ErrorCallstackLine;
+
+typedef struct _ErrorInfo{
+  StatusCode reason;
+  ErrorCallstackLine callstack[8]; 
+  int callstack_count;
+  int callstack_capacity;
 } ErrorInfo;
 
 
@@ -89,6 +95,9 @@ Context * Context_create(void);
 void Context_destroy(Context * context);
 
 void Context_set_last_error(Context * context, StatusCode code, const char * file, int line);
+void Context_add_to_callstack(Context * context, const char * file, int line);
+
+
 const char * Context_error_message(Context * context, char * buffer, size_t buffer_size);
 bool Context_has_error(Context * context);
 int  Context_error_reason(Context * context);
@@ -109,6 +118,11 @@ ProfilingLog * Context_get_profiler_log(Context * context);
 #define CONTEXT_malloc(context, byte_count) Context_malloc(context, byte_count, __FILE__, __LINE__)
 #define CONTEXT_free(context, pointer) Context_free(context, pointer, __FILE__, __LINE__)
 #define CONTEXT_error(context, status_code) CONTEXT_SET_LAST_ERROR(context,status_code)
+
+#define CONTEXT_add_to_callstack(context) Context_add_to_callstack(context, __FILE__,__LINE__)
+
+#define CONTEXT_error_return(context) Context_add_to_callstack(context, __FILE__,__LINE__); return false
+
 
 //Compact format for bitmaps. sRGB or gamma adjusted - *NOT* linear
 typedef enum _BitmapPixelFormat {

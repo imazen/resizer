@@ -17,13 +17,21 @@ int Context_error_reason(Context * context)
 void Context_set_last_error(Context * context, StatusCode code, const char * file, int line)
 {
     context->error.reason = code;
-    context->error.file = file;
-    context->error.line = line;
+    Context_add_to_callstack(context, file,line);
 #ifdef DEBUG
     char buffer[1024];
     fprintf(stderr, "%s:%d Context_set_last_error the error registered was: %s\n", file, line, Context_error_message(context, buffer, sizeof(buffer)));
 #endif
 }
+
+void Context_add_to_callstack(Context * context, const char * file, int line){
+    if (context->error.callstack_count < context->error.callstack_capacity){
+        context->error.callstack[context->error.callstack_count].file = file;
+        context->error.callstack[context->error.callstack_count].line = line;
+        context->error.callstack_count++;
+    }
+}
+
 
 bool Context_has_error(Context * context)
 {
@@ -38,7 +46,8 @@ static const char * status_code_to_string(StatusCode code)
 
 const char * Context_error_message(Context * context, char * buffer, size_t buffer_size)
 {
-    snprintf(buffer, buffer_size, "Error in file: %s line: %d status_code: %d reason: %s", context->error.file, context->error.line, context->error.reason, status_code_to_string(context->error.reason));
+    snprintf(buffer, buffer_size, "Error in file: %s line: %d status_code: %d reason: %s", context->error.callstack[0].file, context->error.callstack[0].line, context->error.reason, status_code_to_string(context->error.reason));
+
     return buffer;
 }
 
@@ -84,8 +93,8 @@ void Context_initialize(Context * context){
     context->log.log = NULL;
     context->log.capacity = 0;
     context->log.count = 0;
-    context->error.file = NULL;
-    context->error.line = -1;
+    context->error.callstack_capacity = 8;
+    context->error.callstack_count = 0;
     context->error.reason = No_Error;
     DefaultHeapManager_initialize(&context->heap);
 }
