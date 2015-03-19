@@ -6,6 +6,7 @@ typedef enum _StatusCode {
     Invalid_internal_state,
     Transpose_not_permitted_in_place,
     Invalid_interpolation_filter,
-    Invalid_argument
+    Invalid_argument,
+    Interpolation_details_missing,
 
 } StatusCode;

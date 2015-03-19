@@ -445,6 +445,11 @@ bool Renderer_perform_render(Context * context, Renderer * r)
     bool scaling_required = (r->canvas != NULL) && (r->details->post_transpose ? (r->canvas->w != r->source->h || r->canvas->h != r->source->w) :
         (r->canvas->h != r->source->h || r->canvas->w != r->source->w));
 
+    if (scaling_required && r->details->interpolation == NULL){
+        CONTEXT_error(context, Interpolation_details_missing);
+        return false;
+    }
+    /*
 
     bool someTranspositionRequired = r->details->sharpen_percent_goal > 0 ||
         skip_last_transpose ||
