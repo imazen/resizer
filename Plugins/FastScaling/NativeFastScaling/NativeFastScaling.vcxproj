@@ -170,7 +170,6 @@
     <ClInclude Include="fastapprox.h" />
     <ClInclude Include="fastscaling.h" />
     <ClInclude Include="fastscaling_private.h" />
-    <ClInclude Include="ir_alloc.h" />
     <ClInclude Include="math_functions.h" />
     <ClInclude Include="status_code.h" />
     <ClInclude Include="trim_whitespace.h" />

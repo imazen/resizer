@@ -50,9 +50,6 @@
     <ClInclude Include="math_functions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ir_alloc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="fastscaling_private.h">
       <Filter>Header Files</Filter>
     </ClInclude>

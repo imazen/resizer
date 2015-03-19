@@ -97,9 +97,9 @@ namespace ImageResizer{
 
                 ~ManagedRenderer(){
                     if (p != nullptr) p->Start("Renderer: dispose", false);
-                    Renderer* temp = r;
-                    r = NULL;
-                    Renderer_destroy (c->GetContext (), temp);
+                    RenderDetails* temp = details;
+                    details = NULL;
+                    RenderDetails_destroy (c->GetContext (), temp);
 
 
                     if (wbSource != nullptr){
@@ -113,7 +113,7 @@ namespace ImageResizer{
 
                     if (p != nullptr) p->Stop("Renderer: dispose", true, false);
                 }
-                Renderer* r;
+                RenderDetails* details;
                 RenderOptions^ originalOptions;
                 WrappedBitmap^ wbSource;
                 WrappedBitmap^ wbCanvas;
@@ -125,12 +125,13 @@ namespace ImageResizer{
 
                 ManagedRenderer (ExecutionContext^ c, BitmapOptions^ editInPlace, RenderOptions^ opts, IProfiler^ p){
                     this->p = p;
+                    this->c = c;
                     originalOptions = opts;
 
 
                     if (opts->RequiresTransposeStep) throw gcnew ArgumentException("Cannot transpose image in place.");
 
-                    RenderDetails* details = RenderDetails_create (c->GetContext());
+                    details = RenderDetails_create (c->GetContext());
                     CopyBasics(opts, details);
                     p->Start("SysDrawingToBgra", false);
                     wbSource = gcnew WrappedBitmap(c,editInPlace);
@@ -141,9 +142,10 @@ namespace ImageResizer{
                 ManagedRenderer(ExecutionContext^ c, BitmapOptions^ source, BitmapOptions^ canvas, RenderOptions^ opts, IProfiler^ p){
 
                     this->p = p;
+                    this->c = c;
                     originalOptions = opts;
 
-                    RenderDetails* details = RenderDetails_create(c->GetContext());
+                    details = RenderDetails_create(c->GetContext());
                     details->enable_profiling = p->Active;
                     CopyBasics(opts, details);
                     p->Start("SysDrawingToBgra", false);
@@ -151,13 +153,18 @@ namespace ImageResizer{
                     wbCanvas = gcnew WrappedBitmap(c, canvas);
                     p->Stop("SysDrawingToBgra", true, false);
 
-                    r = Renderer_create(c->GetContext(), wbSource->bgra,wbCanvas->bgra, details);
                 }
 
 
                 void Render(){
                     p->Start ("managed_perform_render", false);
-                    Renderer_perform_render(c->GetContext(), r);
+
+                    if (wbCanvas == nullptr){
+                        RenderDetails_render_in_place (c->GetContext (), details, wbSource->bgra);
+                    }
+                    else{
+                        RenderDetails_render (c->GetContext (), details, wbSource->bgra, wbCanvas->bgra);
+                    }
                     replay_log ();
                     p->Stop ("managed_perform_render", true, true);
                 }
@@ -165,7 +172,7 @@ namespace ImageResizer{
                 private:
                     void replay_log (){
                         ProfilingLog * log = Context_get_profiler_log (c->GetContext ());
-                        if (log == nullptr) return;
+                        if (log == nullptr || log->capacity == 0) return;
                         if (log->count >= log->capacity) throw gcnew OutOfMemoryException ("Profiling log was not large enough to contain all messages");
                         for (int i = 0; i < log->count; i++){
                             ProfilingEntry entry = log->log[i];
