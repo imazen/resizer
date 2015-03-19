@@ -1,6 +1,7 @@
 #include "fastscaling_private.h"
 #include "ir_alloc.h"
 #include <stdio.h>
+#include <string.h>
 
 #ifdef _MSC_VER
 #pragma unmanaged
@@ -95,6 +96,9 @@ void Context_initialize(Context * context){
     context->log.count = 0;
     context->error.callstack_capacity = 8;
     context->error.callstack_count = 0;
+    context->error.callstack[0].file = NULL;
+    context->error.callstack[0].line = -1;    
+    //memset(context->error.callstack, 0, sizeof context->error.callstack);
     context->error.reason = No_Error;
     DefaultHeapManager_initialize(&context->heap);
 }
