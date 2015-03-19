@@ -132,7 +132,6 @@ TEST_CASE_METHOD(Fixture, "Perform Rendering", "[error_handling]")
         char buffer[1024];
         CAPTURE(Context_error_message(&context, buffer, sizeof(buffer)));
         CHECK(Context_error_reason(&context) == Invalid_BitmapBgra_dimensions);
-
     }
 
 
