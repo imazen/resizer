@@ -29,40 +29,8 @@
 extern "C" {
 #endif
 
-struct _Context;
 
-
-/** Context: Heap Manager **/
-
-typedef void * (*context_calloc_function)(struct _Context * context, size_t count, size_t element_size, const char * file, int line);
-typedef void * (*context_malloc_function)(struct _Context * context, size_t byte_count, const char * file, int line);
-typedef void   (*context_free_function)  (struct _Context * context, void * pointer, const char * file, int line);
-typedef void   (*context_terminate_function)  (struct _Context * context);
-
-typedef struct _HeapManager{
-    context_calloc_function _calloc;
-    context_malloc_function _malloc;
-    context_free_function  _free;
-    context_terminate_function _context_terminate;
-    void * _private_state;
-} HeapManager;
-
-void DefaultHeapManager_initialize(HeapManager * context);
-
-/** Context: ErrorInfo **/
-
-
-typedef struct _ErrorCallstackLine{
-    const char * file;
-    int line;
-} ErrorCallstackLine;
-
-typedef struct _ErrorInfo{
-  StatusCode reason;
-  ErrorCallstackLine callstack[8]; 
-  int callstack_count;
-  int callstack_capacity;
-} ErrorInfo;
+typedef struct ContextStruct Context;
 
 /** Context: ProfilingLog **/
 
@@ -86,51 +54,19 @@ typedef struct{
     ProfilingEntry * log;
     uint32_t count;
     uint32_t capacity;
+    int64_t ticks_per_second;
 } ProfilingLog;
 
-/** Context: main structure **/
+ProfilingLog * Context_get_profiler_log(Context * context);
 
-typedef struct _Context {
-    ErrorInfo error;
-    HeapManager heap;
-    ProfilingLog log;
-} Context;
-
-
-void Context_initialize(Context * context);
-void Context_terminate(Context * context);
 
 Context * Context_create(void);
 void Context_destroy(Context * context);
-
-void Context_set_last_error(Context * context, StatusCode code, const char * file, int line);
-void Context_add_to_callstack(Context * context, const char * file, int line);
-
 
 const char * Context_error_message(Context * context, char * buffer, size_t buffer_size);
 bool Context_has_error(Context * context);
 int  Context_error_reason(Context * context);
 
-void * Context_calloc(Context * context, size_t, size_t, const char * file, int line);
-void * Context_malloc(Context * context, size_t, const char * file, int line);
-void Context_free(Context * context, void * pointer, const char * file, int line);
-
-bool Context_enable_profiling(Context * context,uint32_t default_capacity);
-
-int64_t Context_get_profiler_ticks_per_second(Context * context);
-ProfilingLog * Context_get_profiler_log(Context * context);
-
-
-#define CONTEXT_SET_LAST_ERROR(context, status_code) Context_set_last_error(context, status_code, __FILE__, __LINE__)
-#define CONTEXT_calloc(context, instance_count, element_size) Context_calloc(context, instance_count, element_size, __FILE__, __LINE__)
-#define CONTEXT_calloc_array(context, instance_count, type_name) (type_name *) Context_calloc(context, instance_count, sizeof(type_name), __FILE__, __LINE__)
-#define CONTEXT_malloc(context, byte_count) Context_malloc(context, byte_count, __FILE__, __LINE__)
-#define CONTEXT_free(context, pointer) Context_free(context, pointer, __FILE__, __LINE__)
-#define CONTEXT_error(context, status_code) CONTEXT_SET_LAST_ERROR(context,status_code)
-
-#define CONTEXT_add_to_callstack(context) Context_add_to_callstack(context, __FILE__,__LINE__)
-
-#define CONTEXT_error_return(context) Context_add_to_callstack(context, __FILE__,__LINE__); return false
 
 
 //Compact format for bitmaps. sRGB or gamma adjusted - *NOT* linear
@@ -279,36 +215,29 @@ typedef struct RenderDetailsStruct{
 
 } RenderDetails;
 
-typedef struct LookupTablesStruct *LookupTablesPtr;
-
-typedef struct LookupTablesStruct {
-    float srgb_to_linear[256]; //Converts 0..255 -> 0..1, but knowing that 0.255 has sRGB gamma.
-    float linear[256]; //Converts 0..255 -> 0..1, linear mapping
-} LookupTables;
-
 
 
 BitmapBgra * BitmapBgra_create(Context * context, int sx, int sy, bool zeroed, BitmapPixelFormat format);
 BitmapBgra * BitmapBgra_create_header(Context * context, int sx, int sy);
+void BitmapBgra_destroy(Context * context, BitmapBgra * im);
 
 RenderDetails * RenderDetails_create(Context * context);
+RenderDetails * RenderDetails_create_with(Context * context, InterpolationFilter filter);
+
 
 Renderer * Renderer_create(Context * context, BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details);
 Renderer * Renderer_create_in_place(Context * context, BitmapBgra * editInPlace, RenderDetails * details);
 bool Renderer_perform_render(Context * context, Renderer * r);
 void Renderer_destroy(Context * context, Renderer * r);
-void BitmapBgra_destroy(Context * context, BitmapBgra * im);
 
-
-double InterpolationDetails_percent_negative_weight(const InterpolationDetails * details);
 
 
 InterpolationDetails * InterpolationDetails_create(Context * context);
 InterpolationDetails * InterpolationDetails_create_bicubic_custom(Context * context,double window, double blur, double B, double C);
 InterpolationDetails * InterpolationDetails_create_custom(Context * context,double window, double blur, detailed_interpolation_method filter);
 InterpolationDetails * InterpolationDetails_create_from(Context * context,InterpolationFilter filter);
+double InterpolationDetails_percent_negative_weight(const InterpolationDetails * details);
 void InterpolationDetails_destroy(Context * context, InterpolationDetails *);
-
 
 uint32_t BitmapPixelFormat_bytes_per_pixel (BitmapPixelFormat format);
 
@@ -327,11 +256,6 @@ typedef struct {
 
 LineContributions * LineContributions_create(Context * context, const uint32_t output_line_size, const uint32_t input_line_size, const InterpolationDetails * details);
 void LineContributions_destroy(Context * context, LineContributions * p);
-
-// do these need to be public??
-void free_lookup_tables(void);
-LookupTables * get_lookup_tables(void);
-
 
 ConvolutionKernel * ConvolutionKernel_create(Context * context, uint32_t radius);
 void ConvolutionKernel_destroy(Context * context, ConvolutionKernel * kernel);

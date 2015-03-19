@@ -126,6 +126,7 @@ TEST_CASE_METHOD(Fixture, "Perform Rendering", "[error_handling]") {
     Renderer_destroy(&context,p);
     BitmapBgra_destroy(&context,source);
     BitmapBgra_destroy(&context,canvas);
+    Context_terminate(&context);
     free_lookup_tables();
 }
 
@@ -220,7 +221,7 @@ TEST_CASE("Context", "[error_handling]") {
 
     SECTION("Context_error_message should be safe when no error has ocurred yet") {
         char error_msg[1024];
-        REQUIRE(std::string("Error in file: (null) line: -1 status_code: 0 reason: Status code lookup not implemented") 
+        REQUIRE(std::string("Error in file: (null) line: -1 status_code: 0 reason: Status code lookup not implemented")
                 == Context_error_message(&context, error_msg, sizeof error_msg));
     }
 }

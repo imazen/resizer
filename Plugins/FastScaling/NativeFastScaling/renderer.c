@@ -45,9 +45,24 @@ RenderDetails * RenderDetails_create(Context * context)
     return d;
 }
 
+RenderDetails * RenderDetails_create_with(Context * context, InterpolationFilter filter)
+{
+    InterpolationDetails * id = InterpolationDetails_create_from(context, filter);
+    if (id == NULL){
+        return NULL;
+    }
+    RenderDetails * d = RenderDetails_create(context);
+    if (d == NULL) {
+        InterpolationDetails_destroy(context, id);
+    }else{
+        d->interpolation = id;
+    }
+    return d;
+}
+
 static void RenderDetails_destroy(Context * context, RenderDetails * d){
     if (d != NULL){
-        CONTEXT_free(context, d->interpolation);
+        InterpolationDetails_destroy(context, d->interpolation);
         ConvolutionKernel_destroy(context, d->kernel_a);
         ConvolutionKernel_destroy(context, d->kernel_b);
     }
@@ -155,7 +170,7 @@ static void SimpleRenderInPlace(void)
 
 
 // TODO: find better name
-static bool HalveInTempImage(Context * context, Renderer * r, int divisor) 
+static bool HalveInTempImage(Context * context, Renderer * r, int divisor)
 {
     bool result = true;
     prof_start(context,"create temp image for halving", false);
@@ -174,7 +189,7 @@ static bool HalveInTempImage(Context * context, Renderer * r, int divisor)
         result = false;
     }
     tmp_im->alpha_meaningful = r->source->alpha_meaningful;
-    
+
     if (r->destroy_source) {
         BitmapBgra_destroy(context,r->source);
     }
@@ -439,8 +454,7 @@ bool Renderer_perform_render(Context * context, Renderer * r)
     }
     bool skip_last_transpose = r->details->post_transpose;
 
-    /*
-    //We can optimize certain code paths - later, if needed
+        //We can optimize certain code paths - later, if needed
 
     bool scaling_required = (r->canvas != NULL) && (r->details->post_transpose ? (r->canvas->w != r->source->h || r->canvas->h != r->source->w) :
         (r->canvas->h != r->source->h || r->canvas->w != r->source->w));

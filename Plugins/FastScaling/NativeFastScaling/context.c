@@ -1,5 +1,4 @@
 #include "fastscaling_private.h"
-#include "ir_alloc.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -9,9 +8,6 @@
 #define snprintf _snprintf
 #endif
 
-int64_t Context_get_profiler_ticks_per_second(Context * context){
-    return get_profiler_ticks_per_second();
-}
 
 int Context_error_reason(Context * context)
 {
@@ -76,13 +72,13 @@ void Context_free(Context * context, void * pointer, const char * file, int line
     context->heap._free(context, pointer, file, line);
 }
 
-static void * DefaultHeapManager_calloc(struct _Context * context, size_t count, size_t element_size, const char * file, int line){
+static void * DefaultHeapManager_calloc(struct ContextStruct * context, size_t count, size_t element_size, const char * file, int line){
     return calloc(count, element_size);
 }
-static void * DefaultHeapManager_malloc(struct _Context * context, size_t byte_count, const char * file, int line){
+static void * DefaultHeapManager_malloc(struct ContextStruct * context, size_t byte_count, const char * file, int line){
     return malloc(byte_count);
 }
-static void  DefaultHeapManager_free(struct _Context * context, void * pointer, const char * file, int line){
+static void  DefaultHeapManager_free(struct ContextStruct * context, void * pointer, const char * file, int line){
     free(pointer);
 }
 
@@ -100,7 +96,7 @@ void Context_initialize(Context * context){
     context->error.callstack_capacity = 8;
     context->error.callstack_count = 0;
     context->error.callstack[0].file = NULL;
-    context->error.callstack[0].line = -1;    
+    context->error.callstack[0].line = -1;
     //memset(context->error.callstack, 0, sizeof context->error.callstack);
     context->error.reason = No_Error;
     DefaultHeapManager_initialize(&context->heap);
@@ -137,6 +133,9 @@ bool Context_enable_profiling(Context * context, uint32_t default_capacity){
             context->log.capacity = default_capacity;
             context->log.count = 0;
         }
+        context->log.ticks_per_second = get_profiler_ticks_per_second();
+
+
     }else{
         //TODO: grow and copy array
         return false;
@@ -173,3 +172,30 @@ bool Context_enable_profiling(Context * context, uint32_t default_capacity){
 ProfilingLog * Context_get_profiler_log(Context * context){
     return &context->log;
 }
+
+
+/* Aligned allocations
+
+#include <stdlib.h>
+#include "malloc.h"
+
+#define ir_malloc(size) _aligned_malloc(size, 32)
+#define ir_free(ptr) _aligned_free(ptr)
+
+
+_declspec(noalias) _declspec(restrict) inline void* _ir_aligned_calloc(size_t count, size_t elsize, size_t alignment){
+    if (elsize == 0 || count >= SIZE_MAX / elsize) { return NULL; } // Watch out for overflow
+    size_t size = count * elsize;
+    void *memory = _aligned_malloc(size, alignment);
+    if (memory != NULL) { memset(memory, 0, size); }
+    return memory;
+}
+
+#define ir_calloc(count, element_size) _ir_aligned_calloc(count,element_size, 32)
+#else
+#define ir_malloc(size) malloc(size)
+#define ir_free(ptr) free(ptr)
+#define ir_calloc(count, element_size) calloc(count,element_size)
+#endif
+*/
+

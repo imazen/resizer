@@ -11,7 +11,6 @@
 #endif
 
 #include "fastscaling.h"
-#include "ir_alloc.h"
 #include "math_functions.h"
 #include "color.h"
 
@@ -45,6 +44,79 @@ typedef struct BitmapFloatStruct {
     bool alpha_meaningful;
 } BitmapFloat;
 
+
+
+
+/** Context: Heap Manager **/
+
+typedef void * (*context_calloc_function)(struct ContextStruct * context, size_t count, size_t element_size, const char * file, int line);
+typedef void * (*context_malloc_function)(struct ContextStruct * context, size_t byte_count, const char * file, int line);
+typedef void   (*context_free_function)  (struct ContextStruct * context, void * pointer, const char * file, int line);
+typedef void   (*context_terminate_function)  (struct ContextStruct * context);
+
+typedef struct _HeapManager{
+    context_calloc_function _calloc;
+    context_malloc_function _malloc;
+    context_free_function  _free;
+    context_terminate_function _context_terminate;
+    void * _private_state;
+} HeapManager;
+
+void DefaultHeapManager_initialize(HeapManager * context);
+
+
+/** Context: ErrorInfo **/
+
+
+typedef struct _ErrorCallstackLine{
+    const char * file;
+    int line;
+} ErrorCallstackLine;
+
+typedef struct _ErrorInfo{
+  StatusCode reason;
+  ErrorCallstackLine callstack[8];
+  int callstack_count;
+  int callstack_capacity;
+} ErrorInfo;
+
+
+/** Context: main structure **/
+
+typedef struct ContextStruct {
+    ErrorInfo error;
+    HeapManager heap;
+    ProfilingLog log;
+} Context;
+
+
+
+void Context_initialize(Context * context);
+void Context_terminate(Context * context);
+
+
+void * Context_calloc(Context * context, size_t, size_t, const char * file, int line);
+void * Context_malloc(Context * context, size_t, const char * file, int line);
+void Context_free(Context * context, void * pointer, const char * file, int line);
+bool Context_enable_profiling(Context * context,uint32_t default_capacity);
+void Context_set_last_error(Context * context, StatusCode code, const char * file, int line);
+void Context_add_to_callstack(Context * context, const char * file, int line);
+
+
+
+#define CONTEXT_SET_LAST_ERROR(context, status_code) Context_set_last_error(context, status_code, __FILE__, __LINE__)
+#define CONTEXT_calloc(context, instance_count, element_size) Context_calloc(context, instance_count, element_size, __FILE__, __LINE__)
+#define CONTEXT_calloc_array(context, instance_count, type_name) (type_name *) Context_calloc(context, instance_count, sizeof(type_name), __FILE__, __LINE__)
+#define CONTEXT_malloc(context, byte_count) Context_malloc(context, byte_count, __FILE__, __LINE__)
+#define CONTEXT_free(context, pointer) Context_free(context, pointer, __FILE__, __LINE__)
+#define CONTEXT_error(context, status_code) CONTEXT_SET_LAST_ERROR(context,status_code)
+
+#define CONTEXT_add_to_callstack(context) Context_add_to_callstack(context, __FILE__,__LINE__)
+
+#define CONTEXT_error_return(context) Context_add_to_callstack(context, __FILE__,__LINE__); return false
+
+
+
 #define ALLOW_PROFILING
 
 #ifdef ALLOW_PROFILING
@@ -57,6 +129,21 @@ typedef struct BitmapFloatStruct {
 
 void Context_profiler_start(Context * context, const char * name, bool allow_recursion);
 void Context_profiler_stop(Context * context, const char * name, bool assert_started, bool stop_children);
+
+
+typedef struct LookupTablesStruct *LookupTablesPtr;
+
+typedef struct LookupTablesStruct {
+    float srgb_to_linear[256]; //Converts 0..255 -> 0..1, but knowing that 0.255 has sRGB gamma.
+    float linear[256]; //Converts 0..255 -> 0..1, linear mapping
+} LookupTables;
+
+
+// do these need to be public??
+void free_lookup_tables(void);
+LookupTables * get_lookup_tables(void);
+
+
 
 BitmapFloat * BitmapFloat_create_header(Context * context, int sx, int sy, int channels);
 
