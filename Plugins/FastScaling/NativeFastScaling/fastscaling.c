@@ -19,12 +19,12 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
 {
     Context context;
     Context_initialize(&context);
-    BitmapBgra * source = create_bitmap_bgra(&context, sx, sy, true, sbpp);
-    BitmapBgra * canvas = create_bitmap_bgra(&context, cx, cy, true, cbpp);
+    BitmapBgra * source = BitmapBgra_create(&context, sx, sy, true, sbpp);
+    BitmapBgra * canvas = BitmapBgra_create(&context, cx, cy, true, cbpp);
 
-    RenderDetails * details = create_render_details();
+    RenderDetails * details = RenderDetails_create(&context);
 
-    details->interpolation = create_interpolation(filter);
+    details->interpolation = InterpolationDetails_create_from(&context, filter);
 
     details->sharpen_percent_goal = 50;
     details->post_flip_x = flipx;
@@ -43,14 +43,14 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
     details->apply_color_matrix = true;
 
 
-    Renderer * p = create_renderer(source, canvas, details);
+    Renderer * p = Renderer_create(&context, source, canvas, details);
 
-    perform_render(&context, p);
+    Renderer_perform_render(&context, p);
 
-    destroy_renderer(p);
+    Renderer_destroy(&context, p);
 
-    destroy_bitmap_bgra(source);
-    destroy_bitmap_bgra(canvas);
+    BitmapBgra_destroy(&context, source);
+    BitmapBgra_destroy(&context, canvas);
 
     free_lookup_tables();
     return true;
@@ -66,5 +66,5 @@ int main(void)
     	test (1200, 800, Bgra32, 200, 150, Bgra32, false, false, false, (InterpolationFilter)0);
     }
     return 0;
-    
+
 }

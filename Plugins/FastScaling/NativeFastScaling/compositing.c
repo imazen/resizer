@@ -14,12 +14,19 @@
 #include <string.h>
 
 
-int convert_srgb_to_linear(BitmapBgra * src, uint32_t from_row, BitmapFloat * dest, uint32_t dest_row, uint32_t row_count)
+bool BitmapBgra_convert_srgb_to_linear(Context * context, BitmapBgra * src, uint32_t from_row, BitmapFloat * dest, uint32_t dest_row, uint32_t row_count)
 {
-    if (src->w != dest->w || BitmapPixelFormat_bytes_per_pixel(src->fmt) < dest->channels) return -1;
+    if (src->w != dest->w || BitmapPixelFormat_bytes_per_pixel(src->fmt) < dest->channels){
+        CONTEXT_error(context, Invalid_internal_state);
+        return false;
+    }
 
     //TODO: Ensure that from_row + row_count is not > src->h, and dest_row + row_count is not > dest->h
     const LookupTables*  t = get_lookup_tables();
+    if (t == NULL){
+        CONTEXT_error(context, Out_of_memory);
+        return false;
+    }
 
     const uint32_t w = src->w;
     const uint32_t units = w * BitmapPixelFormat_bytes_per_pixel(src->fmt);
@@ -30,7 +37,7 @@ int convert_srgb_to_linear(BitmapBgra * src, uint32_t from_row, BitmapFloat * de
     for (uint32_t row = 0; row < row_count; row++)
     {
         //const   uint8_t*  __restrict  src_start = src->pixels + (from_row + row)*src->stride;
-           uint8_t*    src_start = src->pixels + (from_row + row)*src->stride;
+        uint8_t*    src_start = src->pixels + (from_row + row)*src->stride;
 
         float* buf = dest->pixels + (dest->float_stride * (row + dest_row));
         if (copy_step == 3)
@@ -56,11 +63,12 @@ int convert_srgb_to_linear(BitmapBgra * src, uint32_t from_row, BitmapFloat * de
             //We're only working on a portion... dest->alpha_premultiplied = true;
         }
         else{
-            return -1;
+            CONTEXT_error(context, Invalid_internal_state);
+            return false;
         }
 
     }
-    return 0;
+    return true;
 }
 
 
@@ -75,13 +83,14 @@ static void unpack24bitRow(uint32_t width, unsigned char* sourceLine, unsigned c
 */
 
 
-int vertical_flip_bgra(BitmapBgra * b)
+bool BitmapBgra_flip_vertical(Context * context, BitmapBgra * b)
 {
     //Not actually correct; This should only copy bytes_per_pixel * width, not the entire stride
     //This could be windowed!
-    void* swap = ir_malloc(b->stride);
+    void* swap = CONTEXT_malloc(context,b->stride);
     if (swap == NULL){
-        return -1;
+        CONTEXT_error(context, Out_of_memory);
+        return false;
     }
     for (uint32_t i = 0; i < b->h / 2; i++){
         void* top = b->pixels + (i * b->stride);
@@ -90,8 +99,8 @@ int vertical_flip_bgra(BitmapBgra * b)
         memcpy(top, bottom, b->stride);
         memcpy(bottom, swap, b->stride);
     }
-    ir_free(swap);
-    return 0;
+    CONTEXT_free(context,swap);
+    return true;
 }
 
 /*
@@ -119,10 +128,15 @@ static int  copy_bitmap_bgra(BitmapBgra * src, BitmapBgra * dst)
 }
 */
 
-static int blend_matte(BitmapFloat * src, const uint32_t from_row, const uint32_t row_count, const uint8_t* const matte){
+static bool BitmapFloat_blend_matte(Context * context, BitmapFloat * src, const uint32_t from_row, const uint32_t row_count, const uint8_t* const matte){
     //We assume that matte is BGRA, regardless.
 
-    LookupTables*   t = get_lookup_tables();
+    const LookupTables*  t = get_lookup_tables();
+    if (t == NULL){
+        CONTEXT_error(context, Out_of_memory);
+        return false;
+    }
+
     const float matte_a = t->linear[matte[3]];
     const float b = t->srgb_to_linear[matte[0]];
     const float g = t->srgb_to_linear[matte[1]];
@@ -149,10 +163,10 @@ static int blend_matte(BitmapFloat * src, const uint32_t from_row, const uint32_
 
 
     //Ensure alpha is demultiplied
-    return 0;
+    return true;
 }
 
-void demultiply_alpha(BitmapFloat * src, const uint32_t from_row, const uint32_t row_count) {
+bool BitmapFloat_demultiply_alpha(Context * context, BitmapFloat * src, const uint32_t from_row, const uint32_t row_count) {
     for (uint32_t row = from_row; row < from_row + row_count; row++){
         uint32_t start_ix = row * src->float_stride;
         uint32_t end_ix = start_ix + src->w * src->channels;
@@ -166,10 +180,11 @@ void demultiply_alpha(BitmapFloat * src, const uint32_t from_row, const uint32_t
             }
         }
     }
+    return true;
 }
 
 
-void copy_linear_over_srgb(BitmapFloat * src, const uint32_t from_row, BitmapBgra * dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose)
+bool BitmapFloat_copy_linear_over_srgb(Context * context, BitmapFloat * src, const uint32_t from_row, BitmapBgra * dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose)
 {
 
     const uint32_t dest_bytes_pp = BitmapPixelFormat_bytes_per_pixel (dest->fmt);
@@ -201,12 +216,17 @@ void copy_linear_over_srgb(BitmapFloat * src, const uint32_t from_row, BitmapBgr
             dest_row_bytes += dest_pixel_stride;
         }
     }
+    return true;
 
 }
 
-static void compose_linear_over_srgb(BitmapFloat * src, const uint32_t from_row, BitmapBgra * dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose){
+static bool BitmapFloat_compose_linear_over_srgb(Context * context, BitmapFloat * src, const uint32_t from_row, BitmapBgra * dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose){
 
-    LookupTables*   t = get_lookup_tables();
+    const LookupTables*  t = get_lookup_tables();
+    if (t == NULL){
+        CONTEXT_error(context, Out_of_memory);
+        return false;
+    }
     const uint32_t dest_bytes_pp = BitmapPixelFormat_bytes_per_pixel (dest->fmt);
     const uint32_t dest_row_stride = transpose ? dest_bytes_pp : dest->stride;
     const uint32_t dest_pixel_stride = transpose ? dest->stride : dest_bytes_pp;
@@ -252,31 +272,41 @@ static void compose_linear_over_srgb(BitmapFloat * src, const uint32_t from_row,
             dest_row_bytes += dest_pixel_stride;
         }
     }
+    return true;
 
 }
 
 
 
 
-int pivoting_composite_linear_over_srgb(BitmapFloat * src, uint32_t from_row, BitmapBgra * dest, uint32_t dest_row, uint32_t row_count, bool transpose)
+bool BitmapFloat_pivoting_composite_linear_over_srgb(Context * context, BitmapFloat * src, uint32_t from_row, BitmapBgra * dest, uint32_t dest_row, uint32_t row_count, bool transpose)
 {
-    if (transpose ? src->w != dest->h : src->w != dest->w) return -1; //Add more bounds checks
-
+    if (transpose ? src->w != dest->h : src->w != dest->w) {
+         //TODO: Add more bounds checks
+        CONTEXT_error(context, Invalid_internal_state);
+        return false;
+    }
 
     if (src->alpha_meaningful && src->channels == 4 && dest->compositing_mode == Blend_with_matte){
-        if (blend_matte(src, from_row, row_count, dest->matte_color)){
-            return -9;
+        if (!BitmapFloat_blend_matte(context, src, from_row, row_count, dest->matte_color)){
+            return false;
         }
         src->alpha_premultiplied = false;
     }
     if (src->channels == 4 && src->alpha_premultiplied && dest->compositing_mode != Blend_with_self){
         //Demultiply
-        demultiply_alpha(src, from_row, row_count);
+        if (!BitmapFloat_demultiply_alpha(context, src, from_row, row_count)){
+            return false;
+        }
     }
 
     bool can_compose = dest->compositing_mode == Blend_with_self && src->alpha_meaningful && src->channels == 4;
 
-    if (can_compose && !src->alpha_premultiplied) return -10; //Something went wrong. We should always have alpha premultiplied.
+    if (can_compose && !src->alpha_premultiplied){
+        //Something went wrong. We should always have alpha premultiplied.
+        CONTEXT_error(context, Invalid_internal_state);
+        return false;
+    }
 
     //Tiling does not appear to show benefits when benchmarking - only breifly investigated
     bool tile_when_transposing = false;
@@ -291,23 +321,31 @@ int pivoting_composite_linear_over_srgb(BitmapFloat * src, uint32_t from_row, Bi
 
         if (can_compose){
             for (int i = 0; i < tiles; i++){
-                compose_linear_over_srgb(src, from_row, dest, dest_row, row_count, i * tile_width, tile_width, transpose);
+                if (!BitmapFloat_compose_linear_over_srgb(context, src, from_row, dest, dest_row, row_count, i * tile_width, tile_width, transpose)){
+                    return false;
+                }
             }
         }
         else{
             for (int i = 0; i < tiles; i++){
-                copy_linear_over_srgb(src, from_row, dest, dest_row, row_count, i * tile_width, tile_width, transpose);
+                if (!BitmapFloat_copy_linear_over_srgb(context, src, from_row, dest, dest_row, row_count, i * tile_width, tile_width, transpose)){
+                    return false;
+                }
             }
         }
     }
     else{
         if (can_compose){
-            compose_linear_over_srgb(src, from_row, dest, dest_row, row_count, 0, src->w, transpose);
+            if (!BitmapFloat_compose_linear_over_srgb(context, src, from_row, dest, dest_row, row_count, 0, src->w, transpose)){
+                return false;
+            }
         }
         else{
-            copy_linear_over_srgb(src, from_row, dest, dest_row, row_count, 0,src->w,transpose);
+            if (!BitmapFloat_copy_linear_over_srgb(context, src, from_row, dest, dest_row, row_count, 0,src->w,transpose)){
+                return false;
+            }
         }
     }
 
-    return 0;
+    return true;
 }

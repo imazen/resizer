@@ -15,7 +15,7 @@
 #include <assert.h>
 
 
-void ScaleBgraFloatRows(BitmapFloat * from, uint32_t from_row, BitmapFloat * to, uint32_t to_row, uint32_t row_count, ContributionType * weights)
+bool BitmapFloat_scale_rows(Context * context, BitmapFloat * from, uint32_t from_row, BitmapFloat * to, uint32_t to_row, uint32_t row_count, PixelContributions * weights)
 {
 
     const uint32_t from_step = from->channels;
@@ -23,7 +23,10 @@ void ScaleBgraFloatRows(BitmapFloat * from, uint32_t from_row, BitmapFloat * to,
     const uint32_t dest_buffer_count = to->w;
     const uint32_t min_channels = umin(from_step, to_step);
     uint32_t ndx;
-    //TODO: assert min_channels < 5
+    if (min_channels > 4){
+        CONTEXT_error(context, Invalid_internal_state);
+        return false;
+    }
     float avg[4];
 
 
@@ -121,6 +124,7 @@ void ScaleBgraFloatRows(BitmapFloat * from, uint32_t from_row, BitmapFloat * to,
             }
         }
     }
+    return true;
 }
 
 
@@ -174,13 +178,13 @@ static inline void HalveRowByDivisor(const unsigned char* from, unsigned short *
 }
 
 
-static int HalveInternal(
+static bool HalveInternal(
     Context * context,
     const BitmapBgra * from,
-    BitmapBgra * to, 
-    const int to_w, 
-    const int to_h, 
-    const int to_stride, 
+    BitmapBgra * to,
+    const int to_w,
+    const int to_h,
+    const int to_stride,
     const int divisor)
 {
 
@@ -188,10 +192,9 @@ static int HalveInternal(
     //unsigned short *buffer = (unsigned short *)context->calloc(to_w_bytes, sizeof(unsigned short));
     unsigned short *buffer = (unsigned short *)CONTEXT_calloc(context, to_w_bytes, sizeof(unsigned short));
     if (buffer == NULL) {
-	// here that sets the error context
-	return -1;
+	   CONTEXT_error(context, Out_of_memory);
+	   return false;
     }
-    assert(false);
     int y, b, d;
     const unsigned short divisorSqr = divisor * divisor;
     unsigned int shift = 0;
@@ -233,21 +236,21 @@ static int HalveInternal(
         }
     }
 
-    free(buffer);
+    CONTEXT_free(context, buffer);
 
-    return 0;
+    return true;
 }
 
-int Halve(Context * context, const BitmapBgra * from, BitmapBgra * to, int divisor){
+bool Halve(Context * context, const BitmapBgra * from, BitmapBgra * to, int divisor){
     return HalveInternal(context, from, to, to->w, to->h, to->stride, divisor);
 }
 
-int HalveInPlace(Context * context, BitmapBgra * from, int divisor)
+bool HalveInPlace(Context * context, BitmapBgra * from, int divisor)
 {
     int to_w = from->w / divisor;
     int to_h = from->h / divisor;
     int to_stride = to_w * BitmapPixelFormat_bytes_per_pixel (from->fmt);
-    int r = HalveInternal(context, from, from, to_w, to_h, to_stride, divisor);
+    bool r = HalveInternal(context, from, from, to_w, to_h, to_stride, divisor);
     from->w = to_w;
     from->h = to_h;
     from->stride = to_stride;

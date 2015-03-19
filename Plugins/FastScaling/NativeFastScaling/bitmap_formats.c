@@ -21,9 +21,9 @@ const int MAX_BYTES_PP = 16;
 static bool are_valid_bitmap_dimensions(int sx, int sy)
 {
     return (
-	sx > 0 && sy > 0 // positive dimensions
-	&& sx < INT_MAX / sy // no integer overflow
-	&& sx * sy * MAX_BYTES_PP < INT_MAX - MAX_BYTES_PP); // then we can safely check
+    sx > 0 && sy > 0 // positive dimensions
+    && sx < INT_MAX / sy // no integer overflow
+    && sx * sy * MAX_BYTES_PP < INT_MAX - MAX_BYTES_PP); // then we can safely check
 }
 
 
@@ -32,15 +32,15 @@ uint32_t BitmapPixelFormat_bytes_per_pixel (BitmapPixelFormat format){
 }
 
 
-BitmapBgra * create_bitmap_bgra_header(Context * context, int sx, int sy){
+BitmapBgra * BitmapBgra_create_header(Context * context, int sx, int sy){
     BitmapBgra * im;
     if (!are_valid_bitmap_dimensions(sx, sy)) {
-	CONTEXT_SET_LAST_ERROR(context, Invalid_BitmapBgra_dimensions);
+        CONTEXT_error(context, Invalid_BitmapBgra_dimensions);
         return NULL;
     }
     im = (BitmapBgra *)CONTEXT_calloc(context, 1, sizeof(BitmapBgra));
     if (im == NULL) {
-	CONTEXT_SET_LAST_ERROR(context, Out_of_memory);
+        CONTEXT_error(context, Out_of_memory);
         return NULL;
     }
     im->w = sx;
@@ -54,11 +54,11 @@ BitmapBgra * create_bitmap_bgra_header(Context * context, int sx, int sy){
 }
 
 
-BitmapBgra * create_bitmap_bgra(Context * context, int sx, int sy, bool zeroed, BitmapPixelFormat format)
+BitmapBgra * BitmapBgra_create(Context * context, int sx, int sy, bool zeroed, BitmapPixelFormat format)
 {
-    BitmapBgra * im = create_bitmap_bgra_header(context, sx, sy);
+    BitmapBgra * im = BitmapBgra_create_header(context, sx, sy);
     if (im == NULL) {
-	return NULL;
+        return NULL;
     }
     im->fmt = format;
     im->stride = im->w * BitmapPixelFormat_bytes_per_pixel(im->fmt);
@@ -73,32 +73,33 @@ BitmapBgra * create_bitmap_bgra(Context * context, int sx, int sy, bool zeroed, 
         im->pixels = (unsigned char *)CONTEXT_malloc(context, im->h * im->stride);
     }
     if (im->pixels == NULL) {
-        ir_free(im);
-	CONTEXT_SET_LAST_ERROR(context, Out_of_memory);
+        CONTEXT_free(context, im);
+        CONTEXT_error(context, Out_of_memory);
         return NULL;
     }
     return im;
 }
 
-void destroy_bitmap_bgra(BitmapBgra * im)
+void BitmapBgra_destroy(Context* context, BitmapBgra * im)
 {
     if (im == NULL) return;
     if (!im->borrowed_pixels) {
-        ir_free(im->pixels);
+        CONTEXT_free(context, im->pixels);
     }
-    ir_free(im);
+    CONTEXT_free(context, im);
 }
 
 
-BitmapFloat * create_bitmap_float_header(int sx, int sy, int channels){
+BitmapFloat * BitmapFloat_create_header(Context* context,int sx, int sy, int channels){
     BitmapFloat * im;
 
     if (!are_valid_bitmap_dimensions(sx, sy)) {
-        return NULL;
+        CONTEXT_error(context, Invalid_BitmapFloat_dimensions);
     }
 
-    im = (BitmapFloat *)ir_calloc(1,sizeof(BitmapFloat));
-    if (!im) {
+    im = (BitmapFloat *)CONTEXT_calloc(context,1,sizeof(BitmapFloat));
+    if (im == NULL) {
+        CONTEXT_error(context, Out_of_memory);
         return NULL;
     }
     im->w = sx;
@@ -114,33 +115,36 @@ BitmapFloat * create_bitmap_float_header(int sx, int sy, int channels){
 }
 
 
-BitmapFloat * create_bitmap_float(int sx, int sy, int channels, bool zeroed)
+BitmapFloat * BitmapFloat_create(Context* context, int sx, int sy, int channels, bool zeroed)
 {
-    BitmapFloat * im = create_bitmap_float_header(sx, sy, channels);
-    if (im == NULL){ return NULL; }
+    BitmapFloat * im = BitmapFloat_create_header(context, sx, sy, channels);
+    if (im == NULL){
+        return NULL;
+    }
     im->pixels_borrowed = false;
     if (zeroed){
-        im->pixels = (float*)ir_calloc(im->float_count, sizeof(float));
+        im->pixels = (float*)CONTEXT_calloc(context,im->float_count, sizeof(float));
     }
     else{
-        im->pixels = (float *)ir_malloc(im->float_count * sizeof(float));
+        im->pixels = (float *)CONTEXT_malloc(context,im->float_count * sizeof(float));
     }
-    if (!im->pixels) {
-        ir_free(im);
+    if (im->pixels == NULL) {
+        CONTEXT_free(context, im);
+        CONTEXT_error(context, Out_of_memory);
         return NULL;
     }
     return im;
 }
 
 
-void destroy_bitmap_float(BitmapFloat * im)
+void BitmapFloat_destroy(Context* context, BitmapFloat * im)
 {
     if (im == NULL) return;
 
     if (!im->pixels_borrowed) {
-        ir_free(im->pixels);
+        CONTEXT_free(context, im->pixels);
     }
     im->pixels = NULL;
-    ir_free(im);
+    CONTEXT_free(context, im);
 }
 

@@ -84,7 +84,7 @@ double filter_sinc_windowed(const InterpolationDetails * d, double t)
 
 #define TONY 0.00001
 
-double percent_negative_weight(const InterpolationDetails* details){
+double InterpolationDetails_percent_negative_weight(const InterpolationDetails* details){
     const int samples = 50;
     double step = details->window / (double)samples;
 
@@ -102,40 +102,47 @@ double percent_negative_weight(const InterpolationDetails* details){
     return negative_area / positive_area;
 }
 
-InterpolationDetails * create_bicubic_custom(double window, double blur, double B, double C){
-    InterpolationDetails * d = create_interpolation_details();
-    d->blur = blur;
-    derive_cubic_coefficients(B, C, d);
-    d->filter = filter_flex_cubic;
-    d->window = window;
+InterpolationDetails * InterpolationDetails_create_bicubic_custom(Context * context, double window, double blur, double B, double C){
+    InterpolationDetails * d = InterpolationDetails_create(context);
+    if (d != NULL){
+        d->blur = blur;
+        derive_cubic_coefficients(B, C, d);
+        d->filter = filter_flex_cubic;
+        d->window = window;
+    }
     return d;
 }
-InterpolationDetails * create_custom(double window, double blur, detailed_interpolation_method filter){
-    InterpolationDetails * d = create_interpolation_details();
-    d->blur = blur;
-    d->filter = filter;
-    d->window = window;
+InterpolationDetails * InterpolationDetails_create_custom(Context * context, double window, double blur, detailed_interpolation_method filter){
+    InterpolationDetails * d = InterpolationDetails_create(context);
+    if (d != NULL){
+        d->blur = blur;
+        d->filter = filter;
+        d->window = window;
+    }
     return d;
 }
 
-static LineContribType * ContributionsAlloc(const uint32_t line_length, const uint32_t windows_size)
+static LineContributions * LineContributions_alloc(Context * context, const uint32_t line_length, const uint32_t windows_size)
 {
-    LineContribType *res = (LineContribType *)malloc(sizeof(LineContribType));
-    if (!res) {
+    LineContributions *res = (LineContributions *)CONTEXT_malloc(context, sizeof(LineContributions));
+    if (res == NULL) {
+        CONTEXT_error(context, Out_of_memory);
         return NULL;
     }
     res->WindowSize = windows_size;
     res->LineLength = line_length;
-    res->ContribRow = (ContributionType *)malloc(line_length * sizeof(ContributionType));
+    res->ContribRow = (PixelContributions *)CONTEXT_malloc(context, line_length * sizeof(PixelContributions));
     if (!res->ContribRow) {
-        free(res);
+        CONTEXT_free(context, res);
+        CONTEXT_error(context, Out_of_memory);
         return NULL;
     }
 
-    float *allWeights = (float *)calloc(windows_size * line_length, sizeof(float));
+    float *allWeights = CONTEXT_calloc_array(context, windows_size * line_length, float);
     if (!allWeights) {
-        free (res->ContribRow);
-        free(res);
+        CONTEXT_free(context, res->ContribRow);
+        CONTEXT_free(context, res);
+        CONTEXT_error(context, Out_of_memory);
         return NULL;
     }
 
@@ -145,50 +152,56 @@ static LineContribType * ContributionsAlloc(const uint32_t line_length, const ui
     return res;
 }
 
-void contributions_free(LineContribType * p)
+void LineContributions_destroy(Context * context, LineContributions * p)
 {
-    free(p->ContribRow[0].Weights);
-    free(p->ContribRow);
-    free(p);
+
+    if (p != NULL){
+        if (p->ContribRow != NULL){
+            CONTEXT_free(context, p->ContribRow[0].Weights);
+        }
+        CONTEXT_free(context, p->ContribRow);
+
+    }
+    CONTEXT_free(context, p);
 }
 
 
-LineContribType *contributions_calc(const uint32_t line_size, const uint32_t src_size, const InterpolationDetails* details)
+LineContributions *LineContributions_create(Context * context,  const uint32_t output_line_size, const uint32_t input_line_size,  const InterpolationDetails* details)
 {
-    const double sharpen_ratio =  percent_negative_weight(details);
+    const double sharpen_ratio =  InterpolationDetails_percent_negative_weight(details);
     const double desired_sharpen_ratio = details->sharpen_percent_goal / 100.0;
     const double extra_negative_weight = sharpen_ratio > 0 && desired_sharpen_ratio > 0 ?
         (desired_sharpen_ratio + sharpen_ratio) / sharpen_ratio :
         0;
 
 
-    const double scale_factor = (double)line_size / (double)src_size;
+    const double scale_factor = (double)output_line_size / (double)input_line_size;
     const double downscale_factor = fmin(1.0, scale_factor);
     const double half_source_window = details->window * 0.5 / downscale_factor;
 
     const uint32_t allocated_window_size = (int)ceil(2 * (half_source_window - TONY)) + 1;
     uint32_t u, ix;
-    LineContribType *res = ContributionsAlloc(line_size, allocated_window_size);
+    LineContributions *res = LineContributions_alloc(context, output_line_size, allocated_window_size);
 
     double negative_area = 0;
     double positive_area = 0;
 
-    for (u = 0; u < line_size; u++) {
+    for (u = 0; u < output_line_size; u++) {
         const double center_src_pixel = ((double)u + 0.5) / scale_factor - 0.5;
 
         const int left_edge = (int)ceil(center_src_pixel - half_source_window - 0.5 + TONY);
         const int right_edge = (int)floor(center_src_pixel + half_source_window + 0.5 - TONY);
 
         const uint32_t left_src_pixel = (uint32_t)max(0, left_edge);
-        const uint32_t right_src_pixel = (uint32_t)min(right_edge, (int)src_size - 1);
+        const uint32_t right_src_pixel = (uint32_t)min(right_edge, (int)input_line_size - 1);
 
         double total_weight = 0.0;
 
         const uint32_t source_pixel_count = right_src_pixel - left_src_pixel + 1;
 
         if (source_pixel_count > allocated_window_size){
-            contributions_free(res);
-            exit(200);
+            LineContributions_destroy(context, res);
+            CONTEXT_error(context, Invalid_internal_state);
             return NULL;
         }
 
@@ -212,7 +225,7 @@ LineContribType *contributions_calc(const uint32_t line_size, const uint32_t src
         }
 
         if (total_weight <= TONY) {
-            contributions_free(res);
+            LineContributions_destroy(context, res);
             return NULL;
         }
 

@@ -23,15 +23,18 @@
 #endif
 #endif
 
-ConvolutionKernel * create_convolution_kernel(uint32_t radius){
-    ConvolutionKernel * k = (ConvolutionKernel *)calloc(1,sizeof(ConvolutionKernel));
+ConvolutionKernel * ConvolutionKernel_create(Context * context, uint32_t radius){
+    ConvolutionKernel * k = CONTEXT_calloc_array(context, 1, ConvolutionKernel);
     //For the actual array;
-    float * a = (float *)calloc(radius * 2 + 1, sizeof(float));
+    float * a = CONTEXT_calloc_array(context,radius * 2 + 1, float);
     //we assume a maximum of 4 channels are going to need buffering during convolution
-    float * buf = (float *)malloc((radius +2) * 4 * sizeof(float));
+    float * buf = (float *)CONTEXT_malloc(context, (radius +2) * 4 * sizeof(float));
 
     if (k == NULL || a == NULL || buf == NULL){
-        free(k); free(a); free(buf);
+        CONTEXT_free(context, k);
+        CONTEXT_free(context, a);
+        CONTEXT_free(context, buf);
+        CONTEXT_error(context, Out_of_memory);
         return NULL;
     }
     k->kernel = a;
@@ -41,20 +44,20 @@ ConvolutionKernel * create_convolution_kernel(uint32_t radius){
     return k;
 
 }
-void free_convolution_kernel(ConvolutionKernel * kernel){
+void ConvolutionKernel_destroy(Context * context, ConvolutionKernel * kernel){
     if (kernel != NULL){
-        free(kernel->kernel);
-        free(kernel->buffer);
+        CONTEXT_free(context, kernel->kernel);
+        CONTEXT_free(context, kernel->buffer);
         kernel->kernel = NULL;
         kernel->buffer = NULL;
     }
-    free(kernel);
+    CONTEXT_free(context, kernel);
 }
 
 
 
-ConvolutionKernel * create_guassian_kernel(double stdDev, uint32_t radius){
-    ConvolutionKernel * k = create_convolution_kernel(radius);
+ConvolutionKernel * ConvolutionKernel_create_guassian(Context * context, double stdDev, uint32_t radius){
+    ConvolutionKernel * k = ConvolutionKernel_create(context, radius);
     if (k != NULL){
         for (uint32_t i = 0; i < k->width; i++){
 
@@ -64,7 +67,7 @@ ConvolutionKernel * create_guassian_kernel(double stdDev, uint32_t radius){
     return k;
 }
 
-double sum_of_kernel(ConvolutionKernel * kernel){
+double ConvolutionKernel_sum(ConvolutionKernel * kernel){
     double sum = 0;
     for (uint32_t i = 0; i < kernel->width; i++){
         sum += kernel->kernel[i];
@@ -72,24 +75,26 @@ double sum_of_kernel(ConvolutionKernel * kernel){
     return sum;
 }
 
-void normalize_kernel(ConvolutionKernel * kernel, float desiredSum){
-    float factor = (float)(desiredSum / sum_of_kernel(kernel));
+void ConvolutionKernel_normalize(ConvolutionKernel * kernel, float desiredSum){
+    double sum = ConvolutionKernel_sum(kernel);
+    if (sum == 0) return; //nothing to do here, zeroes are as normalized as you can get ;)
+    float factor = (float)(desiredSum / sum);
     for (uint32_t i = 0; i < kernel->width; i++){
         kernel->kernel[i] *= factor;
     }
 }
- ConvolutionKernel * create_guassian_kernel_normalized(double stdDev, uint32_t radius){
-    ConvolutionKernel *kernel = create_guassian_kernel(stdDev, radius);
+ ConvolutionKernel * ConvolutionKernel_create_guassian_normalized(Context * context, double stdDev, uint32_t radius){
+    ConvolutionKernel *kernel = ConvolutionKernel_create_guassian(context, stdDev, radius);
     if (kernel != NULL){
-        normalize_kernel(kernel, 1);
+        ConvolutionKernel_normalize(kernel, 1);
     }
     return kernel;
 }
 
- ConvolutionKernel * create_guassian_sharpen_kernel(double stdDev, uint32_t radius){
-    ConvolutionKernel *kernel = create_guassian_kernel(stdDev, radius);
+ ConvolutionKernel * ConvolutionKernel_create_guassian_sharpen(Context * context, double stdDev, uint32_t radius){
+    ConvolutionKernel *kernel = ConvolutionKernel_create_guassian(context, stdDev, radius);
     if (kernel != NULL){
-        double sum = sum_of_kernel(kernel);
+        double sum = ConvolutionKernel_sum(kernel);
         for (uint32_t i = 0; i < kernel->width; i++){
             if (i == radius){
                 kernel->kernel[i] = (float)(2 * sum - kernel->kernel[i]);
@@ -98,20 +103,21 @@ void normalize_kernel(ConvolutionKernel * kernel, float desiredSum){
                 kernel->kernel[i] *= -1;
             }
         }
-        normalize_kernel(kernel, 1);
+        ConvolutionKernel_normalize(kernel, 1);
     }
     return kernel;
 }
 
 
-int ConvolveBgraFloatInPlace(BitmapFloat * buf,  ConvolutionKernel *kernel, uint32_t convolve_channels, uint32_t from_row, int row_count)
+bool BitmapFloat_convolve_rows(Context * context, BitmapFloat * buf,  ConvolutionKernel *kernel, uint32_t convolve_channels, uint32_t from_row, int row_count)
 {
 
     const uint32_t radius = kernel->radius;
     const float threshold_min = kernel->threshold_min_change;
     const float threshold_max = kernel->threshold_max_change;
 
-    if (buf->w < radius + 1) return -2; //Do nothing unless the image is at least half as wide as the kernel.
+    //Do nothing unless the image is at least half as wide as the kernel.
+    if (buf->w < radius + 1) return true;
 
     const uint32_t buffer_count = radius + 1;
     const uint32_t w = buf->w;
@@ -180,7 +186,7 @@ int ConvolveBgraFloatInPlace(BitmapFloat * buf,  ConvolutionKernel *kernel, uint
 
         }
     }
-    return 0;
+    return true;
 }
 
 
@@ -275,9 +281,9 @@ int step)
 
 
 
-void
-SharpenBgraFloatRowsInPlace(BitmapFloat * im, uint32_t start_row, uint32_t row_count, double pct){
+bool BitmapFloat_sharpen_rows(Context * context, BitmapFloat * im, uint32_t start_row, uint32_t row_count, double pct){
     for (uint32_t row = start_row; row < start_row + row_count; row++){
         SharpenBgraFloatInPlace(im->pixels + (im->float_stride * row), im->w, pct, im->channels);
     }
+    return true;
 }

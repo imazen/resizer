@@ -24,6 +24,25 @@ namespace ImageResizer{
     namespace Plugins{
         namespace FastScaling {
 
+            public ref class ExecutionContext{
+            public:
+                ExecutionContext (){
+                    c = Context_create ();
+                }
+                ~ExecutionContext (){
+                    if (c != nullptr){
+                        Context_destroy (c);
+                    }
+                    c = nullptr;
+                }
+            private:
+                Context* c;
+            internal:
+
+                Context * GetContext (){
+                    return c;
+                }
+            };
 
             public ref class BitmapOptions{
             public:
@@ -43,11 +62,11 @@ namespace ImageResizer{
                 BitmapData^ locked_bitmap_data;
                 BitmapBgra* bgra;
                 Rectangle crop_window;
-
+                ExecutionContext^ c;
             public:
-                WrappedBitmap(BitmapOptions^ opts)
+                WrappedBitmap(ExecutionContext^ c, BitmapOptions^ opts)
                 {
-
+                    this->c = c;
                     Bitmap^ source = opts->Bitmap;
                     PixelFormat format = opts->Bitmap->PixelFormat;
 
@@ -62,8 +81,7 @@ namespace ImageResizer{
                     }
                     int sx = from.Width;
                     int sy = from.Height;
-                    Context context;
-                    BitmapBgra* im = create_bitmap_bgra_header(&context, sx, sy);
+                    BitmapBgra* im = BitmapBgra_create_header(c->GetContext(), sx, sy);
                     if (im == NULL) throw gcnew InvalidOperationException("Failed to create Bgra Header");
 
                     this->underlying_bitmap = source;
@@ -100,7 +118,7 @@ namespace ImageResizer{
                     if (locked_bitmap_data != nullptr){
                         underlying_bitmap->UnlockBits(locked_bitmap_data);
                     }
-                    destroy_bitmap_bgra(bgra);
+                    BitmapBgra_destroy(c->GetContext(), bgra);
                     bgra = NULL;
 
                 }
@@ -114,12 +132,14 @@ namespace ImageResizer{
             private:
               InterpolationDetails* details;
               WeightingFilter(){}
+              Context * c;
             public:
               double window;
               static WeightingFilter^ CreateIfValid(int filter);
 
               WeightingFilter(int f){
-                details = create_interpolation((InterpolationFilter)f);
+                c = Context_create ();
+                details = InterpolationDetails_create_from(c, (InterpolationFilter)f);
                 window = details->window;
                 if (details == nullptr) throw gcnew ArgumentOutOfRangeException("f");
               }
@@ -133,18 +153,28 @@ namespace ImageResizer{
 
 
               ~WeightingFilter(){
-                free(details);
+                  if (c != nullptr)
+                      InterpolationDetails_destroy (c, details);
+                  details = nullptr;
+                  Context_destroy (c);
+                  c = nullptr;
               }
             };
 
              WeightingFilter^ WeightingFilter::CreateIfValid(int filter){
-              InterpolationDetails* d = create_interpolation((InterpolationFilter)filter);
-              if (d == nullptr) return nullptr;
-              WeightingFilter^ f = gcnew WeightingFilter();
-              f->details = d;
-              f->window = d->window;
-              return f;
-            }
+                 Context * c = Context_create();
+                 InterpolationDetails* d = InterpolationDetails_create_from(c, (InterpolationFilter)filter);
+                 if (d == nullptr) {
+
+                     Context_destroy (c);
+                     return nullptr;
+                 }
+                  WeightingFilter^ f = gcnew WeightingFilter();
+                  f->details = d;
+                  f->window = d->window;
+                  f->c = c;
+                  return f;
+                }
 
 
         }

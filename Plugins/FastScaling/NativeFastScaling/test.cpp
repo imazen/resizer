@@ -9,12 +9,13 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
 {
     Context context;
     Context_initialize(&context);
-    BitmapBgra * source = create_bitmap_bgra(&context, sx, sy, true, sbpp);
-    BitmapBgra * canvas = create_bitmap_bgra(&context, cx, cy, true, cbpp);
 
-    RenderDetails * details = create_render_details();
+    BitmapBgra * source = BitmapBgra_create(&context, sx, sy, true, sbpp);
+    BitmapBgra * canvas = BitmapBgra_create(&context, cx, cy, true, cbpp);
 
-    details->interpolation = create_interpolation(filter);
+    RenderDetails * details = RenderDetails_create(&context);
+
+    details->interpolation = InterpolationDetails_create_from(&context,filter);
 
     details->sharpen_percent_goal = 50;
     details->post_flip_x = flipx;
@@ -22,17 +23,19 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
     details->post_transpose = transpose;
     details->enable_profiling = profile;
 
+    //Should we even have Renderer_* functions, or just 1 call that does it all?
+    //If we add memory use estimation, we should keep Renderer
+    Renderer * r = Renderer_create(&context,source, canvas, details);
 
-    Renderer * p = create_renderer(source, canvas, details);
+    Renderer_perform_render(&context, r);
 
-    perform_render(&context, p);
+    Renderer_destroy(&context, r);
 
-    destroy_renderer(p);
-
-    destroy_bitmap_bgra(source);
-    destroy_bitmap_bgra(canvas);
+    BitmapBgra_destroy(&context, source);
+    BitmapBgra_destroy(&context, canvas);
 
     free_lookup_tables();
+    Context_terminate(&context);
     return true;
 }
 
@@ -41,9 +44,9 @@ bool test_in_place (int sx, int sy, BitmapPixelFormat sbpp, bool flipx, bool fli
 {
     Context context;
     Context_initialize(&context);
-    BitmapBgra * source = create_bitmap_bgra(&context, sx, sy, true, sbpp);
+    BitmapBgra * source = BitmapBgra_create(&context, sx, sy, true, sbpp);
 
-    RenderDetails * details = create_render_details ();
+    RenderDetails * details = RenderDetails_create (&context);
 
 
     details->sharpen_percent_goal = sharpen;
@@ -51,19 +54,21 @@ bool test_in_place (int sx, int sy, BitmapPixelFormat sbpp, bool flipx, bool fli
     details->post_flip_y = flipy;
     details->enable_profiling = profile;
     if (kernelRadius > 0) {
-        details->kernel_a = create_guassian_kernel_normalized (1.4, kernelRadius);
+        details->kernel_a = ConvolutionKernel_create_guassian_normalized (&context,1.4, kernelRadius);
     }
 
 
-    Renderer * p = create_renderer_in_place (source, details);
-    
-    perform_render(&context, p);
+    Renderer * p = Renderer_create_in_place (&context,source, details);
 
-    destroy_renderer(p);
+    Renderer_perform_render(&context, p);
 
-    destroy_bitmap_bgra(source);
+    Renderer_destroy(&context,p);
+
+    BitmapBgra_destroy(&context,source);
 
     free_lookup_tables();
+
+    Context_terminate(&context);
     return true;
 }
 
@@ -100,9 +105,8 @@ TEST_CASE ("Sharpen and convolve in place", "[fastscaling]") {
 }
 //*/
 
-BitmapBgra*  crop_window (BitmapBgra* source, uint32_t x, uint32_t y, uint32_t w, uint32_t h){
-    Context context;
-    BitmapBgra* cropped = create_bitmap_bgra_header(&context, w, h);
+BitmapBgra*  crop_window (Context * context, BitmapBgra* source, uint32_t x, uint32_t y, uint32_t w, uint32_t h){
+    BitmapBgra* cropped = BitmapBgra_create_header(context, w, h);
     cropped->fmt = source->fmt;
     const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel(source->fmt);
     cropped->pixels = source->pixels + (y * source->stride) + (x * bytes_pp);
@@ -126,10 +130,10 @@ void clear_bitmap (BitmapBgra* b, uint8_t fill_red, uint8_t fill_green, uint8_t 
     }
 }
 
-void fill_rect (BitmapBgra* b, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t fill_red, uint8_t fill_green, uint8_t fill_blue, uint8_t fill_alpha){
-    BitmapBgra * cropped = crop_window (b, x, y, w, h);
+void fill_rect (Context * context, BitmapBgra* b, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t fill_red, uint8_t fill_green, uint8_t fill_blue, uint8_t fill_alpha){
+    BitmapBgra * cropped = crop_window (context, b, x, y, w, h);
     clear_bitmap (cropped, fill_red, fill_green, fill_blue, fill_alpha);
-    destroy_bitmap_bgra (cropped);
+    BitmapBgra_destroy (context, cropped);
 }
 
 /*/ segfaults the process if you uncomment this
@@ -154,62 +158,74 @@ TEST_CASE ("Trim whitespace in 32-bit image", "[fastscaling]") {
 TEST_CASE("Test contrib windows", "[fastscaling]") {
 
     char msg[256];
-    bool r = test_contrib_windows(msg);
+
+
+    Context context;
+    Context_initialize(&context);
+
+
+    bool r = test_contrib_windows(&context, msg);
+
 
     if (!r) FAIL(msg);
     REQUIRE(r);
+    Context_terminate(&context);
 }
 
 TEST_CASE("Test Weighting", "[fastscaling]") {
 
     char msg[256];
 
+    Context context;
+    Context_initialize(&context);
+
 
     //These have window = 1, and shouldnt' have negative values. They should also end at 1
-    CHECK(test_filter(InterpolationFilter::Filter_Hermite, msg, 0, 0, 0.99, 0.08, 1) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Hermite, msg, 0, 0, 0.99, 0.08, 1) == nullptr);
     //Also called a linear filter
-    CHECK(test_filter(InterpolationFilter::Filter_Triangle, msg, 0, 0, 0.99, 0.08, 1) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Triangle, msg, 0, 0, 0.99, 0.08, 1) == nullptr);
     //Box should only return a value from -0.5..0.5
-    CHECK(test_filter(InterpolationFilter::Filter_Box, msg, 0, 0, 0.51, 0.001, 0.51) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Box, msg, 0, 0, 0.51, 0.001, 0.51) == nullptr);
 
 
 
     //These should go negative between x=1 and x=2, but should end at x=2
-    CHECK(test_filter(InterpolationFilter::Filter_CatmullRom, msg, 1, 2, 1, 0.08, 2) == nullptr);
-    CHECK(test_filter(InterpolationFilter::Filter_CubicFast, msg, 1, 2, 1, 0.08, 2) == nullptr);
-    CHECK(test_filter(InterpolationFilter::Filter_Cubic, msg, 1, 2, 1, 0.08, 2) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_CatmullRom, msg, 1, 2, 1, 0.08, 2) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_CubicFast, msg, 1, 2, 1, 0.08, 2) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Cubic, msg, 1, 2, 1, 0.08, 2) == nullptr);
 
     //BSpline is a smoothing filter, always positive
-    CHECK(test_filter(InterpolationFilter::Filter_CubicBSpline, msg, 0, 0, 1.75, 0.08, 2) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_CubicBSpline, msg, 0, 0, 1.75, 0.08, 2) == nullptr);
 
-    CHECK(test_filter(InterpolationFilter::Filter_Mitchell, msg, 1.0f, 1.75f, 1, 0.08, 1.75) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Mitchell, msg, 1.0f, 1.75f, 1, 0.08, 1.75) == nullptr);
 
 
-    CHECK(test_filter(InterpolationFilter::Filter_Robidoux, msg, 1, 1.65, 1, 0.08, 1.75) == nullptr);
-    CHECK(test_filter(InterpolationFilter::Filter_RobidouxSharp, msg, 1, 1.8, 1, 0.08, 1.8) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Robidoux, msg, 1, 1.65, 1, 0.08, 1.75) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_RobidouxSharp, msg, 1, 1.8, 1, 0.08, 1.8) == nullptr);
 
 
     //Sinc filters. These have second crossings.
-    CHECK(test_filter(InterpolationFilter::Filter_Lanczos2, msg, 1, 2, 1, 0.08, 2) == nullptr);
-    CHECK(test_filter(InterpolationFilter::Filter_Lanczos2Sharp, msg, 0.954, 1.86, 1, 0.08, 2) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos2, msg, 1, 2, 1, 0.08, 2) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos2Sharp, msg, 0.954, 1.86, 1, 0.08, 2) == nullptr);
 
     //These should be negative between x=1 and x=2, positive between 2 and 3, but should end at 3
 
-    CHECK(test_filter(InterpolationFilter::Filter_Lanczos3, msg, 1, 2, 1, 0.1, 3) == nullptr);
-    CHECK(test_filter(InterpolationFilter::Filter_Lanczos3Sharp, msg, 0.98, 1.9625, 1, 0.1, 2.943) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos3, msg, 1, 2, 1, 0.1, 3) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos3Sharp, msg, 0.98, 1.9625, 1, 0.1, 2.943) == nullptr);
 
     ///
-    CHECK(test_filter(InterpolationFilter::Filter_Lanczos2Windowed, msg, 1, 2, 1, 0.08, 2) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos2Windowed, msg, 1, 2, 1, 0.08, 2) == nullptr);
 
-    CHECK(test_filter(InterpolationFilter::Filter_Lanczos2SharpWindowed, msg, 0.954, 1.86, 1, 0.08, 2) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos2SharpWindowed, msg, 0.954, 1.86, 1, 0.08, 2) == nullptr);
 
     //These should be negative between x=1 and x=2, positive between 2 and 3, but should end at 3
 
-    CHECK(test_filter(InterpolationFilter::Filter_Lanczos3Windowed, msg, 1, 2, 1, 0.1, 3) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos3Windowed, msg, 1, 2, 1, 0.1, 3) == nullptr);
 
 
-    CHECK(test_filter(InterpolationFilter::Filter_Lanczos3SharpWindowed, msg, 0.98, 1.9625, 1, 0.1, 2.943) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos3SharpWindowed, msg, 0.98, 1.9625, 1, 0.1, 2.943) == nullptr);
 
+    Context_terminate(&context);
 }
 
 
@@ -239,7 +255,7 @@ TEST_CASE("Roundtrip RGB<->LUV 0.2,0.2,0.2 ", "[fastscaling]") {
 
 TEST_CASE("Roundtrip sRGB<->linear RGB<->LUV", "[fastscaling]") {
     for (int x = 0; x < 256; x++){
-	CHECK(x == uchar_clamp_ff(linear_to_srgb(srgb_to_linear((float)x / 255.0f))));
+        CHECK(x == uchar_clamp_ff(linear_to_srgb(srgb_to_linear((float)x / 255.0f))));
     }
 }
 
@@ -284,63 +300,64 @@ for (int bits = 16; bits > 11; bits--){
 
 SCENARIO("sRGB roundtrip", "[fastscaling]") {
     GIVEN("A 256x256 image, grayscale gradient along the x axis, alpha along the y") {
-	int w = 256;
-	int h = 256;
-	Context context;
-	Context_initialize(&context);
-	BitmapBgra* bit = create_bitmap_bgra(&context, w, h, true, Bgra32);
-	const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel(bit->fmt);
+        int w = 256;
+        int h = 256;
+        Context context;
+        Context_initialize(&context);
+        BitmapBgra* bit = BitmapBgra_create(&context, w, h, true, Bgra32);
+        const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel(bit->fmt);
 
-	for (size_t y = 1; y < bit->h; y++){
-	    for (size_t x = 0; x < bit->w; x++){
-		uint8_t* pix = bit->pixels + (y * bit->stride) + (x * bytes_pp);
+        for (size_t y = 1; y < bit->h; y++){
+            for (size_t x = 0; x < bit->w; x++){
+                uint8_t* pix = bit->pixels + (y * bit->stride) + (x * bytes_pp);
 
-		*pix = (uint8_t)x;
-		*(pix + 1) = (uint8_t)x;
-		*(pix + 2) = (uint8_t)x;
-		*(pix + 3) = (uint8_t)y;
-	    }
-	}
+                *pix = (uint8_t)x;
+                *(pix + 1) = (uint8_t)x;
+                *(pix + 2) = (uint8_t)x;
+                *(pix + 3) = (uint8_t)y;
+            }
+        }
 
-	BitmapBgra* final = create_bitmap_bgra(&context, w, h, true, Bgra32);
-	// BitmapFloat* buf = create_bitmap_float(w, h, 4, true);
+        BitmapBgra* final = BitmapBgra_create(&context, w, h, true, Bgra32);
+        // BitmapFloat* buf = create_bitmap_float(w, h, 4, true);
 
-	WHEN ("we do stuff") {
+        WHEN ("we do stuff") {
 
-	    RenderDetails* details = create_render_details();
-	    Renderer* r = create_renderer(bit, final, details);
+            RenderDetails* details = RenderDetails_create(&context);
+            Renderer* r = Renderer_create(&context, bit, final, details);
 
-	    perform_render(&context, r);
+            CHECK(Renderer_perform_render(&context, r));
 
-	    //convert_srgb_to_linear(bit, 0, buf, 0, h);
-	    //demultiply_alpha(buf, 0, h);
-	    //copy_linear_over_srgb(buf, 0, final, 0, h, 0, buf->w, false);
+            //convert_srgb_to_linear(bit, 0, buf, 0, h);
+            //demultiply_alpha(buf, 0, h);
+            //copy_linear_over_srgb(buf, 0, final, 0, h, 0, buf->w, false);
 
-	    THEN(" and so forth ") {
+            THEN(" and so forth ") {
 
-		bool exact_match = true;
-		for (size_t y = 0; y < bit->h; y++){
-		    for (size_t x = 0; x < bit->w; x++){
-			uint8_t* from = bit->pixels + (y * bit->stride) + (x * bytes_pp);
-			uint8_t* to = final->pixels + (y * final->stride) + (x * bytes_pp);
+            bool exact_match = true;
+            for (size_t y = 0; y < bit->h; y++){
+                for (size_t x = 0; x < bit->w; x++){
+                uint8_t* from = bit->pixels + (y * bit->stride) + (x * bytes_pp);
+                uint8_t* to = final->pixels + (y * final->stride) + (x * bytes_pp);
 
-			if (*from != *to) exact_match = false;
-			from++; to++;
-			if (*from != *to) exact_match = false;
-			from++; to++;
-			if (*from != *to) exact_match = false;
-			from++; to++;
-			if (*from != *to) exact_match = false;
-			from++; to++;
-		    }
-		}
-		REQUIRE(exact_match);
-	    }
-	    destroy_renderer(r);
-	}
-	destroy_bitmap_bgra(final);
-	destroy_bitmap_bgra(bit);
-	free_lookup_tables();
+                if (*from != *to) exact_match = false;
+                from++; to++;
+                if (*from != *to) exact_match = false;
+                from++; to++;
+                if (*from != *to) exact_match = false;
+                from++; to++;
+                if (*from != *to) exact_match = false;
+                from++; to++;
+                }
+            }
+            REQUIRE(exact_match);
+            }
+            Renderer_destroy(&context, r);
+        }
+        BitmapBgra_destroy(&context, final);
+        BitmapBgra_destroy(&context, bit);
+        free_lookup_tables();
+        Context_terminate(&context);
     }
 }
 

@@ -15,7 +15,7 @@
 
 
 typedef struct RectStruct {
-    uint32_t x1, y1, x2, y2;
+    int32_t x1, y1, x2, y2;
 } Rect;
 
 
@@ -36,10 +36,10 @@ extern "C" {
 #endif
 
 
-Rect detect_content(BitmapBgra * b, uint8_t threshold);
-int fill_buffer(SearchInfo * __restrict info);
-void sobel_scharr_detect(SearchInfo* __restrict info /*, int edgeTRBL*/);
-void check_region(int edgeTRBL, float x_1_percent, float x_2_percent, float y_1_percent, float y_2_percent, SearchInfo* __restrict info);
+Rect detect_content(Context * context, BitmapBgra * b, uint8_t threshold);
+bool fill_buffer(Context * context, SearchInfo * __restrict info);
+bool sobel_scharr_detect(Context * context, SearchInfo* __restrict info );
+bool check_region(Context * context,int edgeTRBL, float x_1_percent, float x_2_percent, float y_1_percent, float y_2_percent, SearchInfo* __restrict info);
 
 
 #ifdef __cplusplus

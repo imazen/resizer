@@ -42,7 +42,7 @@ namespace ImageResizer{
 
                 ConvolutionKernel* CopyKernel (ConvKernel^ from){
                     if (from == nullptr) return nullptr;
-                    ConvolutionKernel* k = create_convolution_kernel (from->Radius);
+                    ConvolutionKernel* k = ConvolutionKernel_create (c->GetContext(), from->Radius);
                     if (k == nullptr) return nullptr;
                     k->threshold_max_change = from->MaxChangeThreshold;
                     k->threshold_min_change = from->MinChangeThreshold;
@@ -83,7 +83,7 @@ namespace ImageResizer{
                         to->interpolation = nullptr;
                     }
 
-                    to->interpolation = create_interpolation(from->Filter);
+                    to->interpolation = InterpolationDetails_create_from (c->GetContext (),from->Filter);
                     if (to->interpolation == nullptr) throw gcnew ArgumentOutOfRangeException("Invalid filter value");
                     to->interpolation->blur *= from->SamplingBlurFactor;
                     if (from->SamplingWindowOverride != 0) {
@@ -99,7 +99,7 @@ namespace ImageResizer{
                     if (p != nullptr) p->Start("Renderer: dispose", false);
                     Renderer* temp = r;
                     r = NULL;
-                    destroy_renderer(temp);
+                    Renderer_destroy (c->GetContext (), temp);
 
 
                     if (wbSource != nullptr){
@@ -118,53 +118,53 @@ namespace ImageResizer{
                 WrappedBitmap^ wbSource;
                 WrappedBitmap^ wbCanvas;
                 IProfiler^ p;
+                ExecutionContext^ c;
 
             public:
 
 
-                ManagedRenderer(BitmapOptions^ editInPlace, RenderOptions^ opts, IProfiler^ p){
+                ManagedRenderer (ExecutionContext^ c, BitmapOptions^ editInPlace, RenderOptions^ opts, IProfiler^ p){
                     this->p = p;
                     originalOptions = opts;
 
 
                     if (opts->RequiresTransposeStep) throw gcnew ArgumentException("Cannot transpose image in place.");
 
-
-                    RenderDetails* details = create_render_details();
+                    RenderDetails* details = RenderDetails_create (c->GetContext());
                     CopyBasics(opts, details);
                     p->Start("SysDrawingToBgra", false);
-                    wbSource = gcnew WrappedBitmap(editInPlace);
+                    wbSource = gcnew WrappedBitmap(c,editInPlace);
                     p->Stop("SysDrawingToBgra", true, false);
 
                 }
 
-                ManagedRenderer(BitmapOptions^ source, BitmapOptions^ canvas, RenderOptions^ opts, IProfiler^ p){
+                ManagedRenderer(ExecutionContext^ c, BitmapOptions^ source, BitmapOptions^ canvas, RenderOptions^ opts, IProfiler^ p){
 
                     this->p = p;
                     originalOptions = opts;
-                    RenderDetails* details = create_render_details();
+
+                    RenderDetails* details = RenderDetails_create(c->GetContext());
                     details->enable_profiling = p->Active;
                     CopyBasics(opts, details);
                     p->Start("SysDrawingToBgra", false);
-                    wbSource = gcnew WrappedBitmap(source);
-                    wbCanvas = gcnew WrappedBitmap(canvas);
+                    wbSource = gcnew WrappedBitmap(c, source);
+                    wbCanvas = gcnew WrappedBitmap(c, canvas);
                     p->Stop("SysDrawingToBgra", true, false);
 
-                    r = create_renderer(wbSource->bgra,wbCanvas->bgra, details);
+                    r = Renderer_create(c->GetContext(), wbSource->bgra,wbCanvas->bgra, details);
                 }
 
 
                 void Render(){
                     p->Start ("managed_perform_render", false);
-                    Context context;
-                    perform_render(&context, r);
+                    Renderer_perform_render(c->GetContext(), r);
                     replay_log ();
                     p->Stop ("managed_perform_render", true, true);
                 }
 
                 private:
                     void replay_log (){
-                        ProfilingLog * log = access_profiling_log (r);
+                        ProfilingLog * log = Context_get_profiler_log (c->GetContext ());
                         if (log == nullptr) return;
                         if (log->count >= log->capacity) throw gcnew OutOfMemoryException ("Profiling log was not large enough to contain all messages");
                         for (int i = 0; i < log->count; i++){

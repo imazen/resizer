@@ -11,12 +11,13 @@
 
 #include "fastscaling_private.h"
 
-int linear_to_luv_rows(BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count)
+bool BitmapFloat_linear_to_luv_rows(Context * context, BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count)
 {
-    //Ensure that start_row + row_count is not > bit->h
+    //TODO: Ensure that start_row + row_count is not > bit->h
     if ((bit->w * bit->channels) != bit->float_stride)
     {
-        return -1;
+        CONTEXT_error(context, Invalid_internal_state);
+        return false;
     }
      float * start_at = bit->float_stride * start_row  + bit->pixels;
 
@@ -25,15 +26,16 @@ int linear_to_luv_rows(BitmapFloat * bit, const uint32_t start_row, const  uint3
     for (float* pix = start_at; pix < end_at; pix++){
         linear_to_luv(pix);
     }
-    return 0;
+    return true;
 }
 
-int luv_to_linear_rows(BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count)
+bool BitmapFloat_luv_to_linear_rows(Context * context, BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count)
 {
-    //Ensure that start_row + row_count is not > bit->h
+    //TODO: Ensure that start_row + row_count is not > bit->h
     if ((bit->w * bit->channels) != bit->float_stride)
     {
-        return -1;
+        CONTEXT_error(context, Invalid_internal_state);
+        return false;
     }
     float * start_at = bit->float_stride * start_row + bit->pixels;
 
@@ -42,13 +44,13 @@ int luv_to_linear_rows(BitmapFloat * bit, const uint32_t start_row, const  uint3
     for (float* pix = start_at; pix < end_at; pix++){
         luv_to_linear(pix);
     }
-    return 0;
+    return true;
 }
 
 
 static LookupTables * table = NULL;
 
-void free_lookup_tables(void) {
+void free_lookup_tables() {
     LookupTables * temp =  table;
     table = NULL;
     free(temp);
@@ -56,7 +58,7 @@ void free_lookup_tables(void) {
 
 LookupTables * get_lookup_tables(void) {
     if (table == NULL){
-        LookupTables * temp = (LookupTables*)ir_malloc(sizeof(LookupTables));
+        LookupTables * temp = (LookupTables*)malloc(sizeof(LookupTables));
         if (temp == NULL) return NULL;
         // Gamma correction
         // http://www.4p8.com/eric.brasseur/gamma.html#formulas
@@ -75,18 +77,18 @@ LookupTables * get_lookup_tables(void) {
 
         if (table == NULL){
             //A race condition could cause a 3KB, one-time memory leak between these two lines.
-            //we're OK with that.
+            //we're OK with that. Better than locking during an inner loop
             table = temp;
         }
         else{
-            ir_free(temp);
+            free(temp);
         }
     }
     return table;
 }
 
 
-void apply_color_matrix(BitmapBgra * bmp, const uint32_t row, const uint32_t count, float* const __restrict  m[5])
+bool BitmapBgra_apply_color_matrix(Context * context, BitmapBgra * bmp, const uint32_t row, const uint32_t count, float* const __restrict  m[5])
 {
     const uint32_t stride = bmp->stride;
     const uint32_t ch = BitmapPixelFormat_bytes_per_pixel(bmp->fmt);
@@ -129,11 +131,15 @@ void apply_color_matrix(BitmapBgra * bmp, const uint32_t row, const uint32_t cou
             newdata[1] = g;
             newdata[2] = r;
         }
+    }else{
+        CONTEXT_error(context, Invalid_internal_state);
+        return false;
     }
+    return true;
 }
 
 
-void apply_color_matrix_float(BitmapFloat * bmp, const uint32_t row, const uint32_t count, float*  m[5])
+bool BitmapFloat_apply_color_matrix(Context * context, BitmapFloat * bmp, const uint32_t row, const uint32_t count, float*  m[5])
 {
     const uint32_t stride = bmp->float_stride;
     const uint32_t ch = bmp->channels;
@@ -178,5 +184,9 @@ void apply_color_matrix_float(BitmapFloat * bmp, const uint32_t row, const uint3
                 newdata[1] = g;
                 newdata[2] = r;
             }
+    }else{
+        CONTEXT_error(context, Invalid_internal_state);
+        return false;
     }
+    return true;
 }

@@ -17,11 +17,6 @@
 
 /* Proposed changes
 
-combine BitmapBgraStruct->bpp and BitmapBgraStruct->pixel_format somehow.
-
-Rename things for clarity.
-Prefix things, perhaps?
-
 */
 
 #include "status_code.h"
@@ -34,33 +29,86 @@ Prefix things, perhaps?
 extern "C" {
 #endif
 
-typedef void * (*calloc_function)(size_t, size_t);
-typedef void * (*malloc_function)(size_t);
-typedef void (*free_function)(void *);
+struct _Context;
+
+
+typedef void * (*context_calloc_function)(struct _Context * context, size_t count, size_t element_size, const char * file, int line);
+typedef void * (*context_malloc_function)(struct _Context * context, size_t byte_count, const char * file, int line);
+typedef void   (*context_free_function)  (struct _Context * context, void * pointer, const char * file, int line);
+typedef void   (*context_terminate_function)  (struct _Context * context);
+
+typedef struct _HeapManager{
+    context_calloc_function _calloc;
+    context_malloc_function _malloc;
+    context_free_function  _free;
+    context_terminate_function _context_terminate;
+    void * _private_state;
+} HeapManager;
+
+typedef struct _ErrorInfo{
+    const char * file;
+    int line;
+    StatusCode reason;
+} ErrorInfo;
+
+
+typedef enum _ProfilingEntryFlags {
+    Profiling_start = 2,
+    Profiling_start_allow_recursion = 2 | 4,
+    Profiling_stop = 8,
+    Profiling_stop_assert_started = 8 | 16,
+    Profiling_stop_children = 8 | 16 | 32,
+
+} ProfilingEntryFlags;
+
+
+typedef struct{
+    int64_t time;
+    const char * name;
+    ProfilingEntryFlags flags;
+} ProfilingEntry;
+
+typedef struct{
+    ProfilingEntry * log;
+    uint32_t count;
+    uint32_t capacity;
+} ProfilingLog;
 
 typedef struct _Context {
-    struct {
-	const char * file;
-	int line;
-	StatusCode reason;
-    } error;
-    malloc_function internal_malloc;
-    free_function internal_free;
-    calloc_function internal_calloc;
+    ErrorInfo error;
+    HeapManager heap;
+    ProfilingLog log;
 } Context;
 
+void DefaultHeapManager_initialize(HeapManager * context);
+
 void Context_initialize(Context * context);
+void Context_terminate(Context * context);
+
+Context * Context_create(void);
+void Context_destroy(Context * context);
+
 void Context_set_last_error(Context * context, StatusCode code, const char * file, int line);
 const char * Context_error_message(Context * context, char * buffer, size_t buffer_size);
 bool Context_has_error(Context * context);
-int Context_error_reason(Context * context);
+int  Context_error_reason(Context * context);
+
 void * Context_calloc(Context * context, size_t, size_t, const char * file, int line);
 void * Context_malloc(Context * context, size_t, const char * file, int line);
+void Context_free(Context * context, void * pointer, const char * file, int line);
+
+bool Context_enable_profiling(Context * context,uint32_t default_capacity);
+
+int64_t Context_get_profiler_ticks_per_second(Context * context);
+ProfilingLog * Context_get_profiler_log(Context * context);
+
 
 #define CONTEXT_SET_LAST_ERROR(context, status_code) Context_set_last_error(context, status_code, __FILE__, __LINE__)
-#define CONTEXT_calloc(context, instance_count, size_of_instance) Context_calloc(context, instance_count, size_of_instance, __FILE__, __LINE__)
+#define CONTEXT_calloc(context, instance_count, element_size) Context_calloc(context, instance_count, element_size, __FILE__, __LINE__)
+#define CONTEXT_calloc_array(context, instance_count, type_name) (type_name *) Context_calloc(context, instance_count, sizeof(type_name), __FILE__, __LINE__)
 #define CONTEXT_malloc(context, byte_count) Context_malloc(context, byte_count, __FILE__, __LINE__)
-
+#define CONTEXT_free(context, pointer) Context_free(context, pointer, __FILE__, __LINE__)
+#define CONTEXT_error(context, status_code) CONTEXT_SET_LAST_ERROR(context,status_code)
 
 //Compact format for bitmaps. sRGB or gamma adjusted - *NOT* linear
 typedef enum _BitmapPixelFormat {
@@ -215,42 +263,17 @@ typedef struct LookupTablesStruct {
 } LookupTables;
 
 
-typedef enum _ProfilingEntryFlags {
-    Profiling_start = 2,
-    Profiling_start_allow_recursion = 2 | 4,
-    Profiling_stop = 8,
-    Profiling_stop_assert_started = 8 | 16,
-    Profiling_stop_children = 8 | 16 | 32,
 
-} ProfilingEntryFlags;
+BitmapBgra * BitmapBgra_create(Context * context, int sx, int sy, bool zeroed, BitmapPixelFormat format);
+BitmapBgra * BitmapBgra_create_header(Context * context, int sx, int sy);
 
+RenderDetails * RenderDetails_create(Context * context);
 
-typedef struct{
-    int64_t time;
-    const char * name;
-    int32_t flags;
-} ProfilingEntry;
-
-typedef struct{
-    ProfilingEntry * log;
-    uint32_t count;
-    uint32_t capacity;
-} ProfilingLog;
-
-int64_t get_profiler_frequency(void);
-
-ProfilingLog * access_profiling_log(Renderer * r);
-
-BitmapBgra * create_bitmap_bgra(Context * context, int sx, int sy, bool zeroed, BitmapPixelFormat format);
-BitmapBgra * create_bitmap_bgra_header(Context * context, int sx, int sy);
-
-RenderDetails * create_render_details(void);
-
-Renderer * create_renderer(BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details);
-Renderer * create_renderer_in_place(BitmapBgra * editInPlace, RenderDetails * details);
-int perform_render(Context * context, Renderer * r);
-void destroy_renderer(Renderer * r);
-void destroy_bitmap_bgra(BitmapBgra * im);
+Renderer * Renderer_create(Context * context, BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details);
+Renderer * Renderer_create_in_place(Context * context, BitmapBgra * editInPlace, RenderDetails * details);
+bool Renderer_perform_render(Context * context, Renderer * r);
+void Renderer_destroy(Context * context, Renderer * r);
+void BitmapBgra_destroy(Context * context, BitmapBgra * im);
 
 //These filters are stored in a struct as function pointers, which I assume means they can't be inlined. Likely 5 * w * h invocations.
 double filter_flex_cubic(const InterpolationDetails * d, double x);
@@ -259,14 +282,15 @@ double filter_sinc_2(const InterpolationDetails * d, double t);
 double filter_box(const InterpolationDetails * d, double t);
 double filter_triangle(const InterpolationDetails * d, double t);
 double filter_sinc_windowed(const InterpolationDetails * d, double t);
-double percent_negative_weight(const InterpolationDetails * details);
+
+double InterpolationDetails_percent_negative_weight(const InterpolationDetails * details);
 
 
-InterpolationDetails * create_interpolation_details(void);
-InterpolationDetails * create_bicubic_custom(double window, double blur, double B, double C);
-InterpolationDetails * create_custom(double window, double blur, detailed_interpolation_method filter);
-InterpolationDetails * create_interpolation(InterpolationFilter filter);
-void destroy_interpolation_details(InterpolationDetails *);
+InterpolationDetails * InterpolationDetails_create(Context * context);
+InterpolationDetails * InterpolationDetails_create_bicubic_custom(Context * context,double window, double blur, double B, double C);
+InterpolationDetails * InterpolationDetails_create_custom(Context * context,double window, double blur, detailed_interpolation_method filter);
+InterpolationDetails * InterpolationDetails_create_from(Context * context,InterpolationFilter filter);
+void InterpolationDetails_destroy(Context * context, InterpolationDetails *);
 
 
 uint32_t BitmapPixelFormat_bytes_per_pixel (BitmapPixelFormat format);
@@ -275,32 +299,33 @@ typedef struct {
     float *Weights;/* Normalized weights of neighboring pixels */
     int Left;      /* Bounds of source pixels window */
     int Right;
-} ContributionType;/* Contirbution information for a single pixel */
+} PixelContributions;/* Contirbution information for a single pixel */
 
 typedef struct {
-    ContributionType *ContribRow; /* Row (or column) of contribution weights */
+    PixelContributions *ContribRow; /* Row (or column) of contribution weights */
     uint32_t WindowSize;      /* Filter window size (of affecting source pixels) */
     uint32_t LineLength;      /* Length of line (no. or rows / cols) */
     double percent_negative; /* Estimates the sharpening effect actually applied*/
-} LineContribType;
+} LineContributions;
 
-LineContribType * contributions_calc(const uint32_t line_size, const uint32_t src_size, const InterpolationDetails * details);
-void contributions_free(LineContribType * p);
+LineContributions * LineContributions_create(Context * context, const uint32_t output_line_size, const uint32_t input_line_size, const InterpolationDetails * details);
+void LineContributions_destroy(Context * context, LineContributions * p);
 
 // do these need to be public??
 void free_lookup_tables(void);
 LookupTables * get_lookup_tables(void);
 
 
-ConvolutionKernel * create_convolution_kernel(uint32_t radius);
-void free_convolution_kernel(ConvolutionKernel * kernel);
+ConvolutionKernel * ConvolutionKernel_create(Context * context, uint32_t radius);
+void ConvolutionKernel_destroy(Context * context, ConvolutionKernel * kernel);
 
 
-ConvolutionKernel* create_guassian_kernel(double stdDev, uint32_t radius);
-double sum_of_kernel(ConvolutionKernel* kernel);
-void normalize_kernel(ConvolutionKernel* kernel, float desiredSum);
-ConvolutionKernel* create_guassian_kernel_normalized(double stdDev, uint32_t radius);
-ConvolutionKernel* create_guassian_sharpen_kernel(double stdDev, uint32_t radius);
+ConvolutionKernel* ConvolutionKernel_create_guassian(Context * context, double stdDev, uint32_t radius);
+//The only error these 2 could generate would be a null pointer. Should they have a context just for this?
+double ConvolutionKernel_sum(ConvolutionKernel* kernel);
+void ConvolutionKernel_normalize(ConvolutionKernel* kernel, float desiredSum);
+ConvolutionKernel* ConvolutionKernel_create_guassian_normalized(Context * context, double stdDev, uint32_t radius);
+ConvolutionKernel* ConvolutionKernel_create_guassian_sharpen(Context * context, double stdDev, uint32_t radius);
 
 #ifdef __cplusplus
 }

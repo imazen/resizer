@@ -132,12 +132,12 @@ static inline void yxz_to_linear(float * yxz){
 
 }
 
-int linear_to_luv_rows(BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count);
-int luv_to_linear_rows(BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count);
+bool BitmapFloat_linear_to_luv_rows(Context * context, BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count);
+bool BitmapFloat_luv_to_linear_rows(Context * context, BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count);
 
 
-void apply_color_matrix_float(BitmapFloat * bmp, const uint32_t row, const uint32_t count, float*  m[5]);
-void apply_color_matrix(BitmapBgra * bmp, const uint32_t row, const uint32_t count, float* const __restrict  m[5]);
+bool BitmapFloat_apply_color_matrix(Context * context, BitmapFloat * bmp, const uint32_t row, const uint32_t count, float*  m[5]);
+bool BitmapBgra_apply_color_matrix(Context * context, BitmapBgra * bmp, const uint32_t row, const uint32_t count, float* const __restrict  m[5]);
 
 
 #ifdef __cplusplus

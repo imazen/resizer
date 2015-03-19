@@ -48,41 +48,41 @@ typedef struct BitmapFloatStruct {
 #define ALLOW_PROFILING
 
 #ifdef ALLOW_PROFILING
-#define prof_start(r, name, allow_recursion) if (r->log != NULL){ profiler_start(r,name,allow_recursion);}
-#define prof_stop(r, name, assert_started, stop_children) if (r->log != NULL){ profiler_stop(r,name,assert_started, stop_children);}
+#define prof_start(context, name, allow_recursion)  Context_profiler_start(context,name,allow_recursion);
+#define prof_stop(context, name, assert_started, stop_children) Context_profiler_stop(context,name,assert_started, stop_children);
 #else
-#define prof_start(r, name, allow_recursion)
-#define prof_stop(r, name, assert_started, stop_children)
+#define prof_start(context, name, allow_recursion)
+#define prof_stop(context, name, assert_started, stop_children)
 #endif
 
-
-BitmapFloat * create_bitmap_float_header(int sx, int sy, int channels);
-
-BitmapFloat * create_bitmap_float(int sx, int sy, int channels, bool zeroed);
-
-void destroy_bitmap_float(BitmapFloat * im);
+void Context_profiler_start(Context * context, const char * name, bool allow_recursion);
+void Context_profiler_stop(Context * context, const char * name, bool assert_started, bool stop_children);
 
 int64_t get_high_precision_ticks(void);
 
 
-void profiler_start(const Renderer * r, const char * name, bool allow_recursion);
-void profiler_stop(const Renderer * r, const char * name, bool assert_started, bool stop_children);
 
 
+BitmapFloat * BitmapFloat_create_header(Context * context, int sx, int sy, int channels);
 
-void ScaleBgraFloatRows(BitmapFloat * from, uint32_t from_row, BitmapFloat * to, uint32_t to_row, uint32_t row_count, ContributionType * weights);
-int ConvolveBgraFloatInPlace(BitmapFloat * buf, ConvolutionKernel *kernel,  uint32_t convolve_channels, uint32_t from_row, int row_count);
-void SharpenBgraFloatRowsInPlace(BitmapFloat * im, uint32_t start_row, uint32_t row_count, double pct);
+BitmapFloat * BitmapFloat_create(Context * context, int sx, int sy, int channels, bool zeroed);
+
+void BitmapFloat_destroy(Context * context, BitmapFloat * im);
+
+bool BitmapFloat_scale_rows(Context * context, BitmapFloat * from, uint32_t from_row, BitmapFloat * to, uint32_t to_row, uint32_t row_count, PixelContributions * weights);
+bool BitmapFloat_convolve_rows(Context * context, BitmapFloat * buf, ConvolutionKernel *kernel,  uint32_t convolve_channels, uint32_t from_row, int row_count);
+
+bool BitmapFloat_sharpen_rows(Context * context, BitmapFloat * im, uint32_t start_row, uint32_t row_count, double pct);
 
 
-int convert_srgb_to_linear(
+bool BitmapBgra_convert_srgb_to_linear(Context * context,
     BitmapBgra * src,
     uint32_t from_row,
     BitmapFloat * dest,
     uint32_t dest_row,
     uint32_t row_count);
 
-int pivoting_composite_linear_over_srgb(
+bool BitmapFloat_pivoting_composite_linear_over_srgb(Context * context,
     BitmapFloat * src,
     uint32_t from_row,
     BitmapBgra * dest,
@@ -90,14 +90,16 @@ int pivoting_composite_linear_over_srgb(
     uint32_t row_count,
     bool transpose);
 
-int vertical_flip_bgra(BitmapBgra * b);
+bool BitmapBgra_flip_vertical(Context * context, BitmapBgra * b);
 
-void demultiply_alpha(
+bool BitmapFloat_demultiply_alpha(
+    Context * context,
     BitmapFloat * src,
     const uint32_t from_row,
     const uint32_t row_count);
 
-void copy_linear_over_srgb(
+bool BitmapFloat_copy_linear_over_srgb(
+    Context * context,
     BitmapFloat * src,
     const uint32_t from_row,
     BitmapBgra * dest,
@@ -107,9 +109,9 @@ void copy_linear_over_srgb(
     const uint32_t col_count,
     const bool transpose);
 
-int Halve(Context * context, const BitmapBgra * from, BitmapBgra * to, int divisor);
+bool Halve(Context * context, const BitmapBgra * from, BitmapBgra * to, int divisor);
 
-int HalveInPlace(Context * context, BitmapBgra * from, int divisor);
+bool HalveInPlace(Context * context, BitmapBgra * from, int divisor);
 
 #ifdef __cplusplus
 }

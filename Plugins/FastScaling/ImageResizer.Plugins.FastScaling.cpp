@@ -28,7 +28,7 @@ namespace ImageResizer{
 
 			public ref class FastScalingPlugin : public ImageResizer::Resizing::BuilderExtension, IPlugin
 			{
-                void SetupConvolutions(NameValueCollection ^query, RenderOptions^ addTo){
+                void SetupConvolutions(ExecutionContext^ c, NameValueCollection ^query, RenderOptions^ addTo){
                     double kernel_radius = System::String::IsNullOrEmpty(query->Get("f.unsharp.radius")) ? 0 :
                         System::Double::Parse(query->Get("f.unsharp.radius"), System::Globalization::NumberFormatInfo::InvariantInfo);
                     double unsharp_sigma = System::String::IsNullOrEmpty(query->Get("f.unsharp.sigma")) ? 1.4 :
@@ -39,7 +39,7 @@ namespace ImageResizer{
 
                     if (kernel_radius > 0){
 
-                        addTo->KernelA_Struct = create_guassian_sharpen_kernel(unsharp_sigma, kernel_radius);
+                        addTo->KernelA_Struct = ConvolutionKernel_create_guassian_sharpen (c->GetContext (), unsharp_sigma, kernel_radius);
 
                     }
 
@@ -72,7 +72,6 @@ namespace ImageResizer{
                         System::Int32::Parse(query->Get("f"), System::Globalization::NumberFormatInfo::InvariantInfo));
 
                     //opts->InterpolateLastPercent = -1;
-                    SetupConvolutions(query, opts);
 
 
 
@@ -115,13 +114,21 @@ namespace ImageResizer{
 
                     opts->ColorMatrix = colorMatrix;
 
-                    ManagedRenderer^ renderer;
+                    ExecutionContext^ context = gcnew ExecutionContext ();
                     try{
-                        renderer = gcnew ManagedRenderer(a, b, opts, s->Job->Profiler);
-                        renderer->Render();
-                    }
-                    finally{
-                        delete renderer;
+                        SetupConvolutions (context, query, opts);
+
+
+                        ManagedRenderer^ renderer;
+                        try{
+                            renderer = gcnew ManagedRenderer (context, a, b, opts, s->Job->Profiler);
+                            renderer->Render ();
+                        }
+                        finally{
+                            delete renderer;
+                        }
+                    }finally{
+                        delete context;
                     }
                     return RequestedAction::Cancel;
 

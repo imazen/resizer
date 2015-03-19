@@ -12,13 +12,21 @@
 #pragma unmanaged
 #endif
 
-Rect detect_content(BitmapBgra * b, uint8_t threshold)
+const Rect RectFailure = {
+    -1,-1,-1,-1
+};
+
+Rect detect_content(Context * context, BitmapBgra * b, uint8_t threshold)
 {
     SearchInfo info;
     info.w = b->w;
     info.h = b->h;
     info.buff_size = 2048;
-    info.buf = (uint8_t*)ir_malloc(info.buff_size);
+    info.buf = (uint8_t*)CONTEXT_malloc(context, info.buff_size);
+    if (info.buf == NULL){
+        CONTEXT_error(context, Out_of_memory);
+        return RectFailure;
+    }
     info.max_x = 0;
     info.min_x = b->w;
     info.min_y = b->h;
@@ -30,48 +38,49 @@ Rect detect_content(BitmapBgra * b, uint8_t threshold)
     //We want to glean as much as possible from horizontal strips, as they are faster.
 
     //left half, middle, ->
-    check_region(4, 0, 0.5, 0.5, 0.5, &info);
+    if (!check_region(context, 4, 0, 0.5, 0.5, 0.5, &info)) return RectFailure;
     //right half, middle, <-
-    check_region(2, 0.5, 1, 0.5, 0.5, &info);
+    if (!check_region(context, 2, 0.5, 1, 0.5, 0.5, &info)) return RectFailure;
 
     //left half, bottom third ->
-    check_region(4, 0, 0.5, 0.677f, 0.677f, &info);
+    if (!check_region(context, 4, 0, 0.5, 0.677f, 0.677f, &info)) return RectFailure;
     //right half, bottom third -<
-    check_region(2, 0.5, 1, 0.677f, 0.677f, &info);
+    if (!check_region(context, 2, 0.5, 1, 0.677f, 0.677f, &info)) return RectFailure;
     //left half, top third ->
-    check_region(4, 0, 0.5, 0.333f, 0.333f, &info);
+    if (!check_region(context, 4, 0, 0.5, 0.333f, 0.333f, &info)) return RectFailure;
     //right half, top third -<
-    check_region(2, 0.5, 1, 0.333f, 0.333f, &info);
+    if (!check_region(context, 2, 0.5, 1, 0.333f, 0.333f, &info)) return RectFailure;
 
     //top half, center \/
-    check_region(1, 0.5, 0.5, 0, 0.5, &info);
+    if (!check_region(context, 1, 0.5, 0.5, 0, 0.5, &info)) return RectFailure;
     //top half, right third
-    check_region(1, 0.677f, 0.677f, 0, 0.5, &info);
+    if (!check_region(context, 1, 0.677f, 0.677f, 0, 0.5, &info)) return RectFailure;
     //top half, left third.
-    check_region(1, 0.333f, 0.333f, 0, 0.5, &info);
+    if (!check_region(context, 1, 0.333f, 0.333f, 0, 0.5, &info)) return RectFailure;
 
     //bottom half, center \/
-    check_region(3, 0.5, 0.5, 0.5, 1, &info);
+    if (!check_region(context, 3, 0.5, 0.5, 0.5, 1, &info)) return RectFailure;
     //bottom half, right third
-    check_region(3, 0.677f, 0.677f, 0.5, 1, &info);
+    if (!check_region(context, 3, 0.677f, 0.677f, 0.5, 1, &info)) return RectFailure;
     //bottom half, left third.
-    check_region(3, 0.333f, 0.333f, 0.5, 1, &info);
+    if (!check_region(context, 3, 0.333f, 0.333f, 0.5, 1, &info)) return RectFailure;
 
 
     //We should now have a good idea of where boundaries lie. However... if it seems that more than 25% is whitespace, we should do a different type of scan.
     long area_to_scan_separately = info.min_x * info.h + info.min_y * info.w + (info.w - info.max_x) * info.h + (info.h - info.max_y) * info.h;
 
     if (area_to_scan_separately > info.h * info.w){
-        check_region(0, 0, 1, 0, 1, &info); //Just scan it all at once, non-directionally
+        //Just scan it all at once, non-directionally
+        if (!check_region(context, 0, 0, 1, 0, 1, &info)) return RectFailure;
     }
     else{
 
         //Finish by scanning everything that is left. Should be a smaller set.
         //Corners will overlap, and be scanned twice, if they are whitespace.
-        check_region(1, 0, 1, 0, 1, &info);
-        check_region(4, 0, 1, 0, 1, &info);
-        check_region(2, 0, 1, 0, 1, &info);
-        check_region(3, 0, 1, 0, 1, &info);
+        if (!check_region(context, 1, 0, 1, 0, 1, &info)) return RectFailure;
+        if (!check_region(context, 4, 0, 1, 0, 1, &info)) return RectFailure;
+        if (!check_region(context, 2, 0, 1, 0, 1, &info)) return RectFailure;
+        if (!check_region(context, 3, 0, 1, 0, 1, &info)) return RectFailure;
     }
 
 
@@ -82,10 +91,10 @@ Rect detect_content(BitmapBgra * b, uint8_t threshold)
     result.y2 = info.max_y;
     result.x2 = info.max_x;
 
-    ir_free(info.buf);
+    CONTEXT_free(context, info.buf);
     return result;
 }
-int fill_buffer(SearchInfo* __restrict info){
+bool fill_buffer(Context * context, SearchInfo* __restrict info){
     /* Red: 0.299;
     Green: 0.587;
     Blue: 0.114;
@@ -132,12 +141,12 @@ int fill_buffer(SearchInfo* __restrict info){
             bgra += remnant;
         }
     }
-    return 0;
+    return true;
 }
 
 
 
-void sobel_scharr_detect(SearchInfo* info /*, int edgeTRBL */)
+bool sobel_scharr_detect(Context * context, SearchInfo* info)
 {
     #define COEFFA = 3
     #define COEFFB = 10;
@@ -179,14 +188,14 @@ void sobel_scharr_detect(SearchInfo* info /*, int edgeTRBL */)
         }
         buf_ix +=2;
     }
-
+    return true;
 
 
 }
 
 
 
-void check_region(int edgeTRBL, float x_1_percent, float x_2_percent, float y_1_percent, float y_2_percent, SearchInfo* __restrict info)
+bool check_region(Context * context, int edgeTRBL, float x_1_percent, float x_2_percent, float y_1_percent, float y_2_percent, SearchInfo* __restrict info)
 {
     uint32_t x1 = (uint32_t) umax(0, umin(info->w, (uint32_t)floor(x_1_percent * (float)info->w) - 1));
     uint32_t x2 = (uint32_t) umax(0, umin(info->w, (uint32_t)ceil(x_2_percent * (float)info->w) + 1));
@@ -211,7 +220,7 @@ void check_region(int edgeTRBL, float x_1_percent, float x_2_percent, float y_1_
         y1 = umax(y1, info->max_y);
         y2 = info->h;
     }
-    if (x1 == x2 || y1 == y2) return; //Nothing left to search.
+    if (x1 == x2 || y1 == y2) return true; //Nothing left to search.
 
     //Let's make sure that we're searching at least 7 pixels in the perpendicular direction
     uint32_t min_region_width = (edgeTRBL == 2 || edgeTRBL == 4) ? 3 : 7;
@@ -282,10 +291,11 @@ void check_region(int edgeTRBL, float x_1_percent, float x_2_percent, float y_1_
                 continue;
             }
 
-            fill_buffer(info);
-            sobel_scharr_detect(info /*, edgeTRBL*/);
+            if (!fill_buffer(context, info)) return false;
+            if (!sobel_scharr_detect(context, info)) return false;
         }
     }
+    return true;
 }
 
 
