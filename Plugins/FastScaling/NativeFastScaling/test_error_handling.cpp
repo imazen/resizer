@@ -46,7 +46,7 @@ public:
 
     }
 
-    bool attempt_alloc(size_t byte_count){
+    bool is_alloc_allowed(size_t byte_count) {
         last_attempted_allocation_size = byte_count;
         if (always_return_null) {
             return false;
@@ -65,14 +65,14 @@ public:
         return true;
     }
     void * malloc(size_t byte_count) {
-        if (attempt_alloc(byte_count)){
+        if (is_alloc_allowed(byte_count)){
             return ::malloc(byte_count);
         }
         return NULL;
     }
 
     void * calloc(size_t instances, size_t size_of_instance) {
-        if (attempt_alloc(instances * size_of_instance)){
+        if (is_alloc_allowed(instances * size_of_instance)){
             return ::calloc(instances, size_of_instance);
         }
         return NULL;
@@ -131,7 +131,7 @@ TEST_CASE_METHOD(Fixture, "Perform Rendering", "[error_handling]") {
 
 TEST_CASE_METHOD(Fixture, "Test allocation failure handling", "[error_handling]") {
     using namespace Catch::Generators;
-    int fail_alloc_x = GENERATE( between( 0, 9 ) );
+    int fail_alloc_x = GENERATE( between( 0, 9) );
 
 
     Context context;
@@ -167,8 +167,8 @@ TEST_CASE_METHOD(Fixture, "Test allocation failure handling", "[error_handling]"
 
 
     Renderer_destroy(&context,p);
-    BitmapBgra_destroy(&context,source);
-    BitmapBgra_destroy(&context,canvas);
+    BitmapBgra_destroy(&context, source);
+    BitmapBgra_destroy(&context, canvas);
     free_lookup_tables();
 }
 
@@ -212,6 +212,11 @@ TEST_CASE_METHOD(Fixture, "Creating BitmapBgra", "[error_handling]") {
         REQUIRE(Context_error_reason(&context) == Out_of_memory);
     }
     BitmapBgra_destroy(&context,source);
+}
+
+TEST_CASE("Context", "[error_handling]") {
+    Context context;
+    Context_initialize(&context);
 }
 
 TEST_CASE("Argument checking for convert_sgrp_to_linear", "[error_handling]") {

@@ -167,46 +167,55 @@ static void SimpleRenderInPlace(void)
 }
 */
 
+
+// TODO: find better name
+static bool HalveInTempImage(Context * context, Renderer * r, int divisor) 
+{
+    bool result = true;
+    prof_start(context,"create temp image for halving", false);
+    int halved_width = (int)(r->source->w / divisor);
+    int halved_height = (int)(r->source->h / divisor);
+    BitmapBgra * tmp_im = BitmapBgra_create(context, halved_width, halved_height, true, r->source->fmt);
+    if (tmp_im == NULL){
+        //TODO: we should probably log the caller as well
+        return false;
+    }
+    // from here we have a temp image
+    prof_stop(context,"create temp image for halving", true, false);
+
+    if (!Halve(context, r->source, tmp_im, divisor)){
+        // we cannot return here, or tmp_im will leak
+        result = false;
+    }
+    tmp_im->alpha_meaningful = r->source->alpha_meaningful;
+    
+    if (r->destroy_source) {
+        BitmapBgra_destroy(context,r->source);
+    }
+    r->source = tmp_im;
+    r->destroy_source = true; //Cleanup tmp_im
+    return result;
+}
+
 static bool Renderer_complete_halving(Context * context, Renderer * r)
 {
     int divisor = r->details->halving_divisor;
     if (divisor <= 1) {
         return true;
     }
-    int halved_width = (int)(r->source->w / divisor);
-    int halved_height = (int)(r->source->h / divisor);
-
+    bool result = true;
     prof_start(context, "CompleteHalving", false);
     r->details->halving_divisor = 0; //Don't halve twice
-
     if (r->source->can_reuse_space){
         if (!HalveInPlace(context, r->source, divisor)){
-            return false;
+            result = false;
         }
     }
     else {
-        prof_start(context,"create temp image for halving", false);
-        BitmapBgra * tmp_im = BitmapBgra_create(context, halved_width, halved_height, true, r->source->fmt);
-        if (tmp_im == NULL){
-            //TODO: we should probably log the caller as well
-            return false;
-        }
-        prof_stop(context,"create temp image for halving", true, false);
-
-        if (!Halve(context, r->source, tmp_im, divisor)){
-            return false;
-        }
-        tmp_im->alpha_meaningful = r->source->alpha_meaningful;
-
-        if (r->destroy_source) {
-            BitmapBgra_destroy(context,r->source);
-        }
-        r->source = tmp_im;
-        r->destroy_source = true; //Cleanup tmp_im
+        result = HalveInTempImage(context, r, divisor);
     }
-
     prof_stop(context,"CompleteHalving", true, false);
-    return true;
+    return result;
 }
 
 
