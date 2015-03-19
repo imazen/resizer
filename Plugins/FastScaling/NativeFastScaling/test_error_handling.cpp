@@ -15,7 +15,7 @@ public:
     size_t allocation_failure_size_threshold;
     size_t allocation_failure_size;
     int allow_successful_allocs;
-    int allocs_allowed;
+    int alloc_count;
     int total_successful_allocs;
 
     static void * _calloc(Context * context, size_t count, size_t element_size, const char * file, int line){
@@ -41,7 +41,7 @@ public:
         allocation_failure_size = allocation_failure_size_threshold;
         allow_successful_allocs = INT_MAX;
         last_attempted_allocation_size = -1;
-        allocs_allowed = 0;
+        alloc_count = 0;
         total_successful_allocs = 0;
 
     }
@@ -57,10 +57,10 @@ public:
         if (allocation_failure_size == last_attempted_allocation_size) {
             return false;
         }
-        if (allocs_allowed >= allow_successful_allocs) {
+        if (alloc_count >= allow_successful_allocs) {
             return false;
         }
-        allocs_allowed++;
+        alloc_count++;
         total_successful_allocs++;
         return true;
     }
@@ -92,7 +92,7 @@ public:
 
 
     void fail_alloc_after(int times) {
-        allocs_allowed = 0;
+        alloc_count = 0;
         allow_successful_allocs = times;
     }
 };
@@ -155,7 +155,7 @@ TEST_CASE_METHOD(Fixture, "Test allocation failure handling", "[error_handling]"
     bool result = Renderer_perform_render(&context, p);
     CAPTURE(fail_alloc_x);
 
-    CAPTURE(allocs_allowed);
+    CAPTURE(alloc_count);
 
     CAPTURE(total_successful_allocs);
     CAPTURE(last_attempted_allocation_size);

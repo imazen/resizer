@@ -6163,7 +6163,7 @@ namespace Catch {
     Context() : m_config(NULL), m_runner(NULL), m_resultCapture(NULL) {}
     Context(Context const&);
     void operator=(Context const&);
-
+    
   public: // IContext
     virtual IResultCapture* getResultCapture() {
       return m_resultCapture;
@@ -6197,7 +6197,12 @@ namespace Catch {
     }
 
     friend IMutableContext& getCurrentMutableContext();
-
+      
+    virtual ~Context() {
+        for (auto it = m_generatorsByTestName.begin(); it != m_generatorsByTestName.end(); ++it) {
+            delete (*it).second;
+        }
+    }
   private:
     IGeneratorsForTest* findGeneratorsForCurrentTest() {
       std::string testName = getResultCapture()->getCurrentTestName();
