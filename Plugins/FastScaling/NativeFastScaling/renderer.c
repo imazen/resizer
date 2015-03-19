@@ -61,11 +61,9 @@ RenderDetails * RenderDetails_create(Context * context)
 
 static void RenderDetails_destroy(Context * context, RenderDetails * d){
     if (d != NULL){
-        if (d->interpolation != NULL) CONTEXT_free(context, d->interpolation);
-
-        if (d->kernel_a != NULL) ConvolutionKernel_destroy(context, d->kernel_a);
-
-        if (d->kernel_b != NULL) ConvolutionKernel_destroy(context, d->kernel_b);
+        CONTEXT_free(context, d->interpolation);
+        ConvolutionKernel_destroy(context, d->kernel_a);
+        ConvolutionKernel_destroy(context, d->kernel_b);
     }
     CONTEXT_free(context, d);
 }
