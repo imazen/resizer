@@ -165,6 +165,7 @@ bool BitmapFloat_apply_color_matrix(Context * context, BitmapFloat * bmp, const 
                 newdata[3] = a;
 
             }
+        return true;
     }
     case 3:
     {
@@ -184,11 +185,11 @@ bool BitmapFloat_apply_color_matrix(Context * context, BitmapFloat * bmp, const 
                 newdata[1] = g;
                 newdata[2] = r;
             }
+        return true;
     }
     default: {
         CONTEXT_error(context, Invalid_internal_state);
         return false;
     }
     }
-    return true;
 }

@@ -68,7 +68,6 @@ static void RenderDetails_destroy(Context * context, RenderDetails * d){
     CONTEXT_free(context, d);
 }
 
-
 static int Renderer_determine_divisor(Renderer * r)
 {
     if (r->canvas == NULL) return 0;
@@ -91,7 +90,6 @@ static int Renderer_determine_divisor(Renderer * r)
     return max(1, divisor);
 }
 
-
 void Renderer_destroy(Context * context, Renderer * r)
 {
     if (r == NULL) return;
@@ -107,9 +105,6 @@ void Renderer_destroy(Context * context, Renderer * r)
 
     CONTEXT_free(context, r);
 }
-
-
-
 
 Renderer * Renderer_create_in_place(Context * context, BitmapBgra * editInPlace, RenderDetails * details)
 {
