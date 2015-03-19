@@ -4,14 +4,21 @@ task "malloc.h" do end
   
 task :default => "fastscaling"
 
-
-
 %w{ test_program fastscaling libfastscaling.so }.each { |file| CLOBBER.include(file) if File.exists?(file) }
 
 
-LIB_OBJECTS = FileList['lib/*.c'].ext('.o')
-SRC_OBJECTS = FileList['src/*.c'].ext('.o')
-TEST_OBJECTS = FileList['tests/*.cpp'].ext('.o')
+TRAVIS_USAFE_FLAGS = " -Wfloat-conversion "
+
+COMMON_FLAGS="-Iinclude -iquotelib -fPIC -O2 -g -Wpointer-arith -Wcast-qual -Wpedantic -Wall -Wextra -Wno-unused-parameter -Wuninitialized -Wredundant-decls -Werror"
+
+CFLAGS=ENV.fetch("CFLAGS", "#{COMMON_FLAGS} #{ENV['CI'] ? '' : TRAVIS_USAFE_FLAGS} -std=c11 -Wstrict-prototypes -Wmissing-prototypes -Wc++-compat -Wshadow")
+
+CXXFLAGS=ENV.fetch("CXXFLAGS", "#{COMMON_FLAGS} #{ENV['CI'] ? '' : TRAVIS_USAFE_FLAGS} -std=gnu++11")
+
+
+LIB_OBJECTS = FileList[File.absolute_path('lib/*.c')].ext('.o')
+SRC_OBJECTS = FileList[File.absolute_path('src/*.c')].ext('.o')
+TEST_OBJECTS = FileList[File.absolute_path('tests/*.cpp')].ext('.o')
 
 SO_FILE="libfastscaling.so"
 TEST_PROGRAM = "test_program"
@@ -62,13 +69,20 @@ task :cachegrind => PROFILING_PROGRAM do |t|
   sh "cg_annotate #{cachegrind_out_file}"
 end
 
+LIB_THEFT = 'libtheft.a'
+# desc "build the theft library"
+# file LIB_THEFT do
+#   cd "theft" do
+#     sh "make"
+#   end
+# end
 
 desc "build the test program"
 file TEST_PROGRAM => TEST_OBJECTS + LIB_OBJECTS do |t|
-  sh "#{CXX} -Werror #{t.prerequisites.join(" ")}  -o #{t.name}"
+  sh "#{CXX} -Werror #{t.prerequisites.join(" ")} -ltheft -o #{t.name}"
 end
 
-task :test => "test_program" do
+task :test => TEST_PROGRAM do
   with_ld_library_path('.') do 
     sh "./#{TEST_PROGRAM} #{ENV['ARGS']}"
   end

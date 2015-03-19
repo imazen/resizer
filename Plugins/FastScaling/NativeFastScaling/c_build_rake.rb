@@ -15,13 +15,6 @@ CXX = ENV['CXX'] || GPP
 CC = ENV['CC'] || GCC
 VALGRIND_OPTS =  MACOS ? "--dsymutil=yes --error-exitcode=2" : "--error-exitcode=2"
 
-TRAVIS_USAFE_FLAGS = " -Wfloat-conversion "
-
-COMMON_FLAGS=" -fPIC -O2 -g -Wpointer-arith -Wcast-qual -Wpedantic -Wall -Wextra -Wno-unused-parameter -Wuninitialized -Wredundant-decls -Werror"
-
-CFLAGS=ENV.fetch("CFLAGS", "#{COMMON_FLAGS} #{ENV['CI'] ? '' : TRAVIS_USAFE_FLAGS} -std=c11 -Wstrict-prototypes -Wmissing-prototypes -Wc++-compat -Wshadow")
-
-CXXFLAGS=ENV.fetch("CXXFLAGS", "#{COMMON_FLAGS} #{ENV['CI'] ? '' : TRAVIS_USAFE_FLAGS} -std=gnu++11")
 
 EXTRA_CFLAGS=ENV['EXTRA_CFLAGS']
 
