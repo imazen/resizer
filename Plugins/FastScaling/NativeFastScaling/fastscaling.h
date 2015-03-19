@@ -32,6 +32,8 @@ extern "C" {
 struct _Context;
 
 
+/** Context: Heap Manager **/
+
 typedef void * (*context_calloc_function)(struct _Context * context, size_t count, size_t element_size, const char * file, int line);
 typedef void * (*context_malloc_function)(struct _Context * context, size_t byte_count, const char * file, int line);
 typedef void   (*context_free_function)  (struct _Context * context, void * pointer, const char * file, int line);
@@ -45,6 +47,11 @@ typedef struct _HeapManager{
     void * _private_state;
 } HeapManager;
 
+void DefaultHeapManager_initialize(HeapManager * context);
+
+/** Context: ErrorInfo **/
+
+
 typedef struct _ErrorCallstackLine{
     const char * file;
     int line;
@@ -57,6 +64,8 @@ typedef struct _ErrorInfo{
   int callstack_capacity;
 } ErrorInfo;
 
+/** Context: ProfilingLog **/
+
 
 typedef enum _ProfilingEntryFlags {
     Profiling_start = 2,
@@ -66,7 +75,6 @@ typedef enum _ProfilingEntryFlags {
     Profiling_stop_children = 8 | 16 | 32,
 
 } ProfilingEntryFlags;
-
 
 typedef struct{
     int64_t time;
@@ -80,13 +88,14 @@ typedef struct{
     uint32_t capacity;
 } ProfilingLog;
 
+/** Context: main structure **/
+
 typedef struct _Context {
     ErrorInfo error;
     HeapManager heap;
     ProfilingLog log;
 } Context;
 
-void DefaultHeapManager_initialize(HeapManager * context);
 
 void Context_initialize(Context * context);
 void Context_terminate(Context * context);
@@ -245,8 +254,9 @@ typedef struct RenderDetailsStruct{
     //The actual halving factor to use.
     uint32_t halving_divisor;
 
-
+    //The first convolution to apply
     ConvolutionKernel * kernel_a;
+    //A second convolution to apply
     ConvolutionKernel * kernel_b;
 
 
@@ -289,13 +299,6 @@ bool Renderer_perform_render(Context * context, Renderer * r);
 void Renderer_destroy(Context * context, Renderer * r);
 void BitmapBgra_destroy(Context * context, BitmapBgra * im);
 
-//These filters are stored in a struct as function pointers, which I assume means they can't be inlined. Likely 5 * w * h invocations.
-double filter_flex_cubic(const InterpolationDetails * d, double x);
-double filter_bicubic_fast(const InterpolationDetails * d, double t);
-double filter_sinc_2(const InterpolationDetails * d, double t);
-double filter_box(const InterpolationDetails * d, double t);
-double filter_triangle(const InterpolationDetails * d, double t);
-double filter_sinc_windowed(const InterpolationDetails * d, double t);
 
 double InterpolationDetails_percent_negative_weight(const InterpolationDetails * details);
 
@@ -340,6 +343,9 @@ double ConvolutionKernel_sum(ConvolutionKernel* kernel);
 void ConvolutionKernel_normalize(ConvolutionKernel* kernel, float desiredSum);
 ConvolutionKernel* ConvolutionKernel_create_guassian_normalized(Context * context, double stdDev, uint32_t radius);
 ConvolutionKernel* ConvolutionKernel_create_guassian_sharpen(Context * context, double stdDev, uint32_t radius);
+
+
+
 
 #ifdef __cplusplus
 }

@@ -9,6 +9,9 @@
 #define snprintf _snprintf
 #endif
 
+int64_t Context_get_profiler_ticks_per_second(Context * context){
+    return get_profiler_ticks_per_second();
+}
 
 int Context_error_reason(Context * context)
 {

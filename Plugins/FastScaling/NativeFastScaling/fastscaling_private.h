@@ -58,11 +58,6 @@ typedef struct BitmapFloatStruct {
 void Context_profiler_start(Context * context, const char * name, bool allow_recursion);
 void Context_profiler_stop(Context * context, const char * name, bool assert_started, bool stop_children);
 
-int64_t get_high_precision_ticks(void);
-
-
-
-
 BitmapFloat * BitmapFloat_create_header(Context * context, int sx, int sy, int channels);
 
 BitmapFloat * BitmapFloat_create(Context * context, int sx, int sy, int channels, bool zeroed);
@@ -112,6 +107,81 @@ bool BitmapFloat_copy_linear_over_srgb(
 bool Halve(Context * context, const BitmapBgra * from, BitmapBgra * to, int divisor);
 
 bool HalveInPlace(Context * context, BitmapBgra * from, int divisor);
+
+
+
+#ifndef _TIMERS_IMPLEMENTED
+#define _TIMERS_IMPLEMENTED
+#ifdef _WIN32
+    #define STRICT
+    #define WIN32_LEAN_AND_MEAN
+    #include <windows.h>
+    #include <winbase.h>
+    inline int64_t get_high_precision_ticks(void){
+        LARGE_INTEGER val;
+        QueryPerformanceCounter(&val);
+        return val.QuadPart;
+    }
+    inline int64_t get_profiler_ticks_per_second(void){
+        LARGE_INTEGER val;
+        QueryPerformanceFrequency(&val);
+        return val.QuadPart;
+    }
+#else
+    #include <sys/time.h>
+    #if defined(_POSIX_VERSION)
+    #if defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0)
+    #if defined(CLOCK_MONOTONIC_PRECISE)
+            /* BSD. --------------------------------------------- */
+            #define PROFILER_CLOCK_ID id = CLOCK_MONOTONIC_PRECISE;
+    #elif defined(CLOCK_MONOTONIC_RAW)
+            /* Linux. ------------------------------------------- */
+            #define PROFILER_CLOCK_ID id = CLOCK_MONOTONIC_RAW;
+    #elif defined(CLOCK_HIGHRES)
+            /* Solaris. ----------------------------------------- */
+            #define PROFILER_CLOCK_ID id = CLOCK_HIGHRES;
+    #elif defined(CLOCK_MONOTONIC)
+            /* AIX, BSD, Linux, POSIX, Solaris. ----------------- */
+            #define PROFILER_CLOCK_ID id = CLOCK_MONOTONIC;
+    #elif defined(CLOCK_REALTIME)
+            /* AIX, BSD, HP-UX, Linux, POSIX. ------------------- */
+            #define PROFILER_CLOCK_ID id = CLOCK_REALTIME;
+    #endif
+    #endif
+    #endif
+
+
+    inline int64_t get_high_precision_ticks(void){
+        #ifdef PROFILER_CLOCK_ID
+            timespec ts;
+            if (clock_gettime(PROFILER_CLOCK_ID, &ts) != 0){
+                return -1;
+            }
+            return ts->tv_sec * 1000000 +  ts->tv_nsec;
+        #else
+            struct timeval tm;
+            if (gettimeofday( &tm, NULL) != 0){
+                return -1;
+            }
+            return tm.tv_sec * 1000000 + tm.tv_usec;
+        #endif
+    }
+
+    inline int64_t get_profiler_ticks_per_second(void){
+        #ifdef PROFILER_CLOCK_ID
+            timespec ts;
+            if (clock_getres(PROFILER_CLOCK_ID, &ts) != 0){
+                return -1;
+            }
+            return ts->tv_nsec;
+        #else
+            return 1000000;
+        #endif
+    }
+
+#endif
+#endif
+
 
 #ifdef __cplusplus
 }

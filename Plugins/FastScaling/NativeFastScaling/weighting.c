@@ -26,7 +26,7 @@ static void derive_cubic_coefficients(double B, double C, InterpolationDetails *
 }
 
 
-double filter_flex_cubic(const InterpolationDetails * d, double x)
+static double filter_flex_cubic(const InterpolationDetails * d, double x)
 {
     const double t = (double)fabs(x) / d->blur;
 
@@ -38,7 +38,7 @@ double filter_flex_cubic(const InterpolationDetails * d, double x)
     }
     return(0.0);
 }
-double filter_bicubic_fast(const InterpolationDetails * d, double t)
+static double filter_bicubic_fast(const InterpolationDetails * d, double t)
 {
     double abs_t = (double)fabs(t) / d->blur;
     double abs_t_sq = abs_t * abs_t;
@@ -48,7 +48,7 @@ double filter_bicubic_fast(const InterpolationDetails * d, double t)
 }
 
 
-double filter_sinc_2(const InterpolationDetails * d, double t)
+static double filter_sinc_2(const InterpolationDetails * d, double t)
 {
     const double abs_t = (double)fabs(t) / d->blur;
     if (abs_t == 0) { return 1; } //Avoid division by zero
@@ -57,14 +57,14 @@ double filter_sinc_2(const InterpolationDetails * d, double t)
     return sin(a) / a;
 }
 
-double filter_box(const InterpolationDetails * d, double t)
+static double filter_box(const InterpolationDetails * d, double t)
 {
 
     const double x = t / d->blur;
     return (x >= -1 * d->window && x < d->window) ? 1 : 0;
 }
 
-double filter_triangle(const InterpolationDetails * d, double t)
+static double filter_triangle(const InterpolationDetails * d, double t)
 {
     const double x = (double)fabs(t) / d->blur;
     if (x < 1.0)
@@ -73,7 +73,7 @@ double filter_triangle(const InterpolationDetails * d, double t)
 }
 
 
-double filter_sinc_windowed(const InterpolationDetails * d, double t)
+static double filter_sinc_windowed(const InterpolationDetails * d, double t)
 {
     const double x = t / d->blur;
     const double abs_t = (double)fabs(x);
@@ -102,6 +102,22 @@ double InterpolationDetails_percent_negative_weight(const InterpolationDetails* 
     return negative_area / positive_area;
 }
 
+InterpolationDetails* InterpolationDetails_create(Context * context)
+{
+    InterpolationDetails* d = CONTEXT_calloc_array(context, 1, InterpolationDetails);
+    if (d == NULL) {
+        CONTEXT_error(context, Out_of_memory);
+        return NULL;
+    }
+    d->blur = 1;
+    d->window = 2;
+    d->p1 = d->q1 = 0;
+    d->p2 = d->q2 = d->p3 = d->q3 = d->q4 = 1;
+    d->sharpen_percent_goal = 0;
+    return d;
+}
+
+
 InterpolationDetails * InterpolationDetails_create_bicubic_custom(Context * context, double window, double blur, double B, double C){
     InterpolationDetails * d = InterpolationDetails_create(context);
     if (d != NULL){
@@ -121,6 +137,70 @@ InterpolationDetails * InterpolationDetails_create_custom(Context * context, dou
     }
     return d;
 }
+
+void InterpolationDetails_destroy(Context * context, InterpolationDetails * details)
+{
+    CONTEXT_free(context, details);
+}
+
+InterpolationDetails * InterpolationDetails_create_from(Context * context, InterpolationFilter filter)
+{
+    switch (filter) {
+        case Filter_Linear:
+        case Filter_Triangle:
+            return InterpolationDetails_create_custom(context, 1, 1, filter_triangle);
+        case Filter_Lanczos2:
+            return InterpolationDetails_create_custom(context, 2, 1, filter_sinc_2);
+        case Filter_Lanczos3: //Note - not a 3 lobed function - truncated to 2
+            return InterpolationDetails_create_custom(context, 3, 1, filter_sinc_2);
+        case Filter_Lanczos2Sharp:
+            return InterpolationDetails_create_custom(context, 2, 0.9549963639785485, filter_sinc_2);
+        case Filter_Lanczos3Sharp://Note - not a 3 lobed function - truncated to 2
+            return InterpolationDetails_create_custom(context, 3, 0.9812505644269356, filter_sinc_2);
+
+        //Hermite and BSpline no negative weights
+        case Filter_CubicBSpline:
+            return InterpolationDetails_create_bicubic_custom(context, 2, 1, 1, 0);
+
+        case Filter_Lanczos2Windowed:
+            return InterpolationDetails_create_custom(context, 2, 1, filter_sinc_windowed);
+        case Filter_Lanczos3Windowed:
+            return InterpolationDetails_create_custom(context, 3, 1, filter_sinc_windowed);
+        case Filter_Lanczos2SharpWindowed:
+            return InterpolationDetails_create_custom(context, 2, 0.9549963639785485, filter_sinc_windowed);
+        case Filter_Lanczos3SharpWindowed:
+            return InterpolationDetails_create_custom(context, 3, 0.9812505644269356, filter_sinc_windowed);
+
+
+        case Filter_CubicFast:
+            return InterpolationDetails_create_custom(context, 1, 1, filter_bicubic_fast);
+        case Filter_Cubic:
+            return InterpolationDetails_create_bicubic_custom(context, 2, 1, 0,1);
+        case Filter_CatmullRom:
+            return InterpolationDetails_create_bicubic_custom(context, 2, 1, 0, 0.5);
+        case Filter_CatmullRomFast:
+            return InterpolationDetails_create_bicubic_custom(context, 1, 1, 0, 0.5);
+        case Filter_CatmullRomFastSharp:
+            return InterpolationDetails_create_bicubic_custom(context, 1, 13.0 / 16.0, 0, 0.5);
+        case Filter_Mitchell:
+            return InterpolationDetails_create_bicubic_custom(context, 2, 7.0 / 8.0, 1.0 / 3.0, 1.0 / 3.0);
+        case Filter_Robidoux:
+            return InterpolationDetails_create_bicubic_custom(context, 2, 1. / 1.1685777620836932,
+                0.37821575509399867, 0.31089212245300067);
+        case Filter_RobidouxSharp:
+            return InterpolationDetails_create_bicubic_custom(context, 2, 1. / 1.105822933719019,
+                0.2620145123990142, 0.3689927438004929);
+        case Filter_Hermite:
+            return InterpolationDetails_create_bicubic_custom(context, 1, 1, 0, 0);
+        case Filter_Box:
+            return InterpolationDetails_create_custom(context, 0.5, 1, filter_box);
+
+    }
+    CONTEXT_error(context, Invalid_interpolation_filter);
+    return NULL;
+}
+
+
 
 static LineContributions * LineContributions_alloc(Context * context, const uint32_t line_length, const uint32_t windows_size)
 {
