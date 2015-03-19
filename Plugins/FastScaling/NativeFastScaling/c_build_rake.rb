@@ -7,8 +7,6 @@ CLEAN.clear_exclude.exclude { |fn|
   fn.pathmap("%f").downcase == 'core' && File.directory?(fn)
 }
 
-CLEAN.include('*.o')
-
 MACOS = !!(/darwin|mac os/ =~ RbConfig::CONFIG['host_os'])
 
 GCC = MACOS ? "gcc-4.9" : "gcc"
@@ -53,10 +51,6 @@ class String
   end
 end
 
-CLEAN.include('*.o')
-CLEAN.include('*.d')
-CLEAN.include('*.mf')
-
 rule '.o' => '.cpp' do |t|
   sh "#{CXX}  #{CXXFLAGS} #{EXTRA_CFLAGS} -MMD -c -o #{t.name} #{t.source}"
 end
@@ -78,10 +72,13 @@ rule '.d' => '.c' do |t|
   end
 end
 
-(FileList['*.c'] + FileList['*.cpp']).each do |source_file|
-  dependency_file = source_file.pathmap("%X.d")
-  dependency_file.to_task
-  import dependency_file
+def register_objects(object_files)
+  object_files.each { |object| CLEAN << object }
+  dependency_files = object_files.map { |object_file| object_file.pathmap("%X.d") }
+  dependency_files.each do |dependency_file| 
+    dependency_file.to_task
+    import dependency_file
+  end
 end
 
 

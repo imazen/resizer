@@ -9,32 +9,22 @@ task :default => "fastscaling"
 %w{ test_program fastscaling libfastscaling.so }.each { |file| CLOBBER.include(file) if File.exists?(file) }
 
 
-OBJECTS=%w{
-bitmap_formats.o
-color.o
-compositing.o
-convolution.o
-renderer.o
-scaling.o
-trim_whitespace.o
-weighting.o
-context.o
-}
+LIB_OBJECTS = FileList['lib/*.c'].ext('.o')
+SRC_OBJECTS = FileList['src/*.c'].ext('.o')
+TEST_OBJECTS = FileList['tests/*.cpp'].ext('.o')
+
 SO_FILE="libfastscaling.so"
-
-
 TEST_PROGRAM = "test_program"
-
 PROFILING_PROGRAM = "fastscaling"
 
 desc "build a fastscaling program"
-file PROFILING_PROGRAM => ['fastscaling.o', SO_FILE]  do |t|
+file PROFILING_PROGRAM => SRC_OBJECTS + LIB_OBJECTS  do |t|
   sh "#{CC} -o #{t.name} -Werror #{t.prerequisites.join(" ")} -lm"
 end
 
 
 desc "build the fastscaling library"
-file SO_FILE => OBJECTS do |t|
+file SO_FILE => LIB_OBJECTS do |t|
   sh "#{CC}  --shared -o #{t.name} #{t.prerequisites.join(' ')}"
 end
 
@@ -72,10 +62,9 @@ task :cachegrind => PROFILING_PROGRAM do |t|
   sh "cg_annotate #{cachegrind_out_file}"
 end
 
-TEST_OBJECTS = ["test.o", "test_error_handling.o", "test_helpers.o", "weighting_test_helpers.o", "test_rendering.o"]
 
 desc "build the test program"
-file TEST_PROGRAM => TEST_OBJECTS + OBJECTS do |t|
+file TEST_PROGRAM => TEST_OBJECTS + LIB_OBJECTS do |t|
   sh "#{CXX} -Werror #{t.prerequisites.join(" ")}  -o #{t.name}"
 end
 
@@ -115,3 +104,5 @@ task :commit => [:test_with_valgrind, PROFILING_PROGRAM] do
   end
   sh "git commit -v"
 end
+
+register_objects(LIB_OBJECTS + TEST_OBJECTS + SRC_OBJECTS)
