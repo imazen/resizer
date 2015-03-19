@@ -11,23 +11,21 @@ CLEAN.include('*.o')
 
 MACOS = !!(/darwin|mac os/ =~ RbConfig::CONFIG['host_os'])
 
-
-cxx = ENV['CXX'] || "g++"
-cc = ENV['CC'] || "gcc"
-CXX = MACOS && cxx == "g++" ? "g++-4.9" : cxx;
-CC = MACOS && cc == "gcc" ? "gcc-4.9" : cc;
-
+GCC = MACOS ? "gcc-4.9" : "gcc"
+GPP = MACOS ? "g++-4.9" : "g++"
+CXX = ENV['CXX'] || GPP
+CC = ENV['CC'] || GCC
 VALGRIND_OPTS =  MACOS ? "--dsymutil=yes" : ""
 
 TRAVIS_USAFE_FLAGS = " -Wfloat-conversion "
 
-COMMON_FLAGS=" -fPIC -O2 -g -Wpointer-arith -Wcast-qual -Wpedantic -Wall -Wextra -Wno-unused-parameter -Wuninitialized -Wredundant-decls -Werror #{ENV['CFLAGS']}"
+COMMON_FLAGS=" -fPIC -O2 -g -Wpointer-arith -Wcast-qual -Wpedantic -Wall -Wextra -Wno-unused-parameter -Wuninitialized -Wredundant-decls -Werror"
 
-CFLAGS="#{COMMON_FLAGS} #{ENV['CI'] ? '' : TRAVIS_USAFE_FLAGS} -std=c11 -Wstrict-prototypes -Wmissing-prototypes -Wc++-compat -Wshadow"
+CFLAGS=ENV.fetch("CFLAGS", "#{COMMON_FLAGS} #{ENV['CI'] ? '' : TRAVIS_USAFE_FLAGS} -std=c11 -Wstrict-prototypes -Wmissing-prototypes -Wc++-compat -Wshadow")
 
-CXXFLAGS="#{COMMON_FLAGS} #{ENV['CI'] ? '' : TRAVIS_USAFE_FLAGS} -std=gnu++11"
+CXXFLAGS=ENV.fetch("CXXFLAGS", "#{COMMON_FLAGS} #{ENV['CI'] ? '' : TRAVIS_USAFE_FLAGS} -std=gnu++11")
 
-#-std=c++11
+EXTRA_CFLAGS=ENV['EXTRA_CFLAGS']
 
 
 desc "Remove any temporary products."
@@ -60,11 +58,11 @@ CLEAN.include('*.d')
 CLEAN.include('*.mf')
 
 rule '.o' => '.cpp' do |t|
-  sh "#{CXX}  #{CXXFLAGS} -MMD -c -o #{t.name} #{t.source}"
+  sh "#{CXX}  #{CXXFLAGS} #{EXTRA_CFLAGS} -MMD -c -o #{t.name} #{t.source}"
 end
 
 rule '.o' => '.c' do |t|
-  sh "#{CC}  #{CFLAGS} -MMD -c -o #{t.name} #{t.source}"
+  sh "#{CC}  #{CFLAGS} #{EXTRA_CFLAGS} -MMD -c -o #{t.name} #{t.source}"
 end
 
 
