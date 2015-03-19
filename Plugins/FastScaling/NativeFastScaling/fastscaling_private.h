@@ -210,13 +210,13 @@ bool HalveInPlace(Context * context, BitmapBgra * from, int divisor);
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <winbase.h>
-inline int64_t get_high_precision_ticks(void)
+static inline int64_t get_high_precision_ticks(void)
 {
     LARGE_INTEGER val;
     QueryPerformanceCounter(&val);
     return val.QuadPart;
 }
-inline int64_t get_profiler_ticks_per_second(void)
+static inline int64_t get_profiler_ticks_per_second(void)
 {
     LARGE_INTEGER val;
     QueryPerformanceFrequency(&val);
@@ -246,7 +246,7 @@ inline int64_t get_profiler_ticks_per_second(void)
 #endif
 
 
-inline int64_t get_high_precision_ticks(void)
+static inline int64_t get_high_precision_ticks(void)
 {
 #ifdef PROFILER_CLOCK_ID
     timespec ts;
@@ -263,7 +263,7 @@ inline int64_t get_high_precision_ticks(void)
 #endif
 }
 
-inline int64_t get_profiler_ticks_per_second(void)
+static inline int64_t get_profiler_ticks_per_second(void)
 {
 #ifdef PROFILER_CLOCK_ID
     timespec ts;
