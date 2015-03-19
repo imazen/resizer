@@ -110,9 +110,7 @@ public:
     }
 };
 
-TEST_CASE_METHOD(Fixture, "Perform Rendering", "[error_handling]")
-{
-    REQUIRE((2 / 10) == 0);
+TEST_CASE_METHOD(Fixture, "Perform Rendering", "[error_handling]") {
     Context context;
     Context_initialize(&context);
     initialize_heap(&context);

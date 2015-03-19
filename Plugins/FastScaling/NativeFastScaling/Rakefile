@@ -72,7 +72,7 @@ task :cachegrind => PROFILING_PROGRAM do |t|
   sh "cg_annotate #{cachegrind_out_file}"
 end
 
-TEST_OBJECTS = ["test.o", "test_error_handling.o", "test_helpers.o", "weighting_test_helpers.o"]
+TEST_OBJECTS = ["test.o", "test_error_handling.o", "test_helpers.o", "weighting_test_helpers.o", "test_rendering.o"]
 
 desc "build the test program"
 file TEST_PROGRAM => TEST_OBJECTS + OBJECTS do |t|
