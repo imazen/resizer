@@ -38,18 +38,15 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
     details->apply_color_matrix = true;
 
 
-    Renderer * p = Renderer_create(context, source, canvas, details);
-
-    Renderer_perform_render(context, p);
-
-    Renderer_destroy(context, p);
+    RenderDetails_render(context, details, source, canvas);
+    RenderDetails_destroy(context, details);
 
     BitmapBgra_destroy(context, source);
     BitmapBgra_destroy(context, canvas);
 
     Context_destroy(context);
+    Context_free_static_caches(); 
 
-    free_lookup_tables();
     return true;
 }
 

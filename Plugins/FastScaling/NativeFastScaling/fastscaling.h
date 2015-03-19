@@ -67,6 +67,7 @@ const char * Context_error_message(Context * context, char * buffer, size_t buff
 bool Context_has_error(Context * context);
 int  Context_error_reason(Context * context);
 
+void Context_free_static_caches(void);
 
 
 //Compact format for bitmaps. sRGB or gamma adjusted - *NOT* linear
@@ -224,12 +225,9 @@ void BitmapBgra_destroy(Context * context, BitmapBgra * im);
 RenderDetails * RenderDetails_create(Context * context);
 RenderDetails * RenderDetails_create_with(Context * context, InterpolationFilter filter);
 
-
-Renderer * Renderer_create(Context * context, BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details);
-Renderer * Renderer_create_in_place(Context * context, BitmapBgra * editInPlace, RenderDetails * details);
-bool Renderer_perform_render(Context * context, Renderer * r);
-void Renderer_destroy(Context * context, Renderer * r);
-
+bool RenderDetails_render(Context * context, RenderDetails * details, BitmapBgra * source, BitmapBgra * canvas);
+bool RenderDetails_render_in_place(Context * context, RenderDetails * details, BitmapBgra * edit_in_place);
+void RenderDetails_destroy(Context * context, RenderDetails * d);
 
 
 InterpolationDetails * InterpolationDetails_create(Context * context);

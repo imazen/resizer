@@ -145,6 +145,12 @@ LookupTables * get_lookup_tables(void);
 
 
 
+Renderer * Renderer_create(Context * context, BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details);
+Renderer * Renderer_create_in_place(Context * context, BitmapBgra * editInPlace, RenderDetails * details);
+bool Renderer_perform_render(Context * context, Renderer * r);
+void Renderer_destroy(Context * context, Renderer * r);
+
+
 BitmapFloat * BitmapFloat_create_header(Context * context, int sx, int sy, int channels);
 
 BitmapFloat * BitmapFloat_create(Context * context, int sx, int sy, int channels, bool zeroed);

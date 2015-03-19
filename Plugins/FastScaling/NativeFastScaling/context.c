@@ -72,6 +72,10 @@ void Context_free(Context * context, void * pointer, const char * file, int line
     context->heap._free(context, pointer, file, line);
 }
 
+void Context_free_static_caches(void){
+    free_lookup_tables();
+}
+
 static void * DefaultHeapManager_calloc(struct ContextStruct * context, size_t count, size_t element_size, const char * file, int line){
     return calloc(count, element_size);
 }

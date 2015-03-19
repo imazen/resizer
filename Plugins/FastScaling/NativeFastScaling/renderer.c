@@ -19,6 +19,7 @@
 
 typedef struct RendererStruct {
     RenderDetails * details;
+    bool destroy_details;
     BitmapBgra * source;
     bool destroy_source;
     BitmapBgra * canvas;
@@ -60,7 +61,7 @@ RenderDetails * RenderDetails_create_with(Context * context, InterpolationFilter
     return d;
 }
 
-static void RenderDetails_destroy(Context * context, RenderDetails * d){
+void RenderDetails_destroy(Context * context, RenderDetails * d){
     if (d != NULL){
         InterpolationDetails_destroy(context, d->interpolation);
         ConvolutionKernel_destroy(context, d->kernel_a);
@@ -68,6 +69,46 @@ static void RenderDetails_destroy(Context * context, RenderDetails * d){
     }
     CONTEXT_free(context, d);
 }
+
+bool RenderDetails_render(
+    Context * context,
+    RenderDetails * details,
+    BitmapBgra * source,
+    BitmapBgra * canvas){
+
+
+    bool destroy_source = false;
+
+    Renderer * r = Renderer_create(context, source, canvas, details);
+    if (r == NULL){
+        if (destroy_source){
+            BitmapBgra_destroy(context, source);
+        }
+        return false;
+    }
+    r->destroy_details = false;
+    r->destroy_source = destroy_source;
+    bool result = Renderer_perform_render(context, r);
+    Renderer_destroy(context, r);
+    return result;
+}
+
+bool RenderDetails_render_in_place(
+    Context * context,
+    RenderDetails * details,
+    BitmapBgra * edit_in_place){
+
+    Renderer * r = Renderer_create_in_place(context, edit_in_place, details);
+    if (r == NULL){
+        return false;
+    }
+    r->destroy_details = false;
+    r->destroy_source = false;
+    bool result = Renderer_perform_render(context, r);
+    Renderer_destroy(context, r);
+    return result;
+}
+
 
 static int Renderer_determine_divisor(Renderer * r)
 {
@@ -101,8 +142,10 @@ void Renderer_destroy(Context * context, Renderer * r)
     BitmapBgra_destroy(context, r->transposed);
     r->transposed = NULL;
     r->canvas = NULL;
-    RenderDetails_destroy(context, r->details);
-    r->details = NULL;
+    if (r->destroy_details){
+        RenderDetails_destroy(context, r->details);
+        r->details = NULL;
+    }
 
     CONTEXT_free(context, r);
 }
