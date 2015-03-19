@@ -145,9 +145,9 @@ bool BitmapFloat_apply_color_matrix(Context * context, BitmapFloat * bmp, const 
     const uint32_t ch = bmp->channels;
     const uint32_t w = bmp->w;
     const uint32_t h = umin(row + count,bmp->h);
-    if (ch == 4)
+    switch (ch) {
+    case 4: 
     {
-
         for (uint32_t y = row; y < h; y++)
             for (uint32_t x = 0; x < w; x++)
             {
@@ -166,7 +166,7 @@ bool BitmapFloat_apply_color_matrix(Context * context, BitmapFloat * bmp, const 
 
             }
     }
-    else if (ch == 3)
+    case 3:
     {
 
         for (uint32_t y = row; y < h; y++)
@@ -184,9 +184,11 @@ bool BitmapFloat_apply_color_matrix(Context * context, BitmapFloat * bmp, const 
                 newdata[1] = g;
                 newdata[2] = r;
             }
-    }else{
+    }
+    default: {
         CONTEXT_error(context, Invalid_internal_state);
         return false;
+    }
     }
     return true;
 }
