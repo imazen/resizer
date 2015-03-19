@@ -217,6 +217,12 @@ TEST_CASE_METHOD(Fixture, "Creating BitmapBgra", "[error_handling]") {
 TEST_CASE("Context", "[error_handling]") {
     Context context;
     Context_initialize(&context);
+
+    SECTION("Context_error_message should be safe when no error has ocurred yet") {
+        char error_msg[1024];
+        REQUIRE(std::string("Error in file: (null) line: -1 status_code: 0 reason: Status code lookup not implemented") 
+                == Context_error_message(&context, error_msg, sizeof error_msg));
+    }
 }
 
 TEST_CASE("Argument checking for convert_sgrp_to_linear", "[error_handling]") {
