@@ -18,7 +18,8 @@ extern "C" {
 typedef struct BitmapFloatStruct BitmapFloat;
 
 static inline float
-linear_to_srgb(float clr) {
+linear_to_srgb(float clr)
+{
     // Gamma correction
     // http://www.4p8.com/eric.brasseur/gamma.html#formulas
 
@@ -31,9 +32,10 @@ linear_to_srgb(float clr) {
 
 
 static inline float
-srgb_to_linear(float s) {
+srgb_to_linear(float s)
+{
     if (s <= 0.04045f)
-       return s / 12.92f;
+        return s / 12.92f;
     else
         return (float)pow((s + 0.055f) / (1 + 0.055f), 2.4f);
 }
@@ -41,7 +43,8 @@ srgb_to_linear(float s) {
 
 
 
-static inline void linear_to_yxz(float * bgr){
+static inline void linear_to_yxz(float * bgr)
+{
 
     const float R = bgr[2];
     const float G = bgr[1];
@@ -53,7 +56,8 @@ static inline void linear_to_yxz(float * bgr){
 
 }
 
-static inline void linear_to_luv(float * bgr){
+static inline void linear_to_luv(float * bgr)
+{
     //Observer= 2�, Illuminant= D65
 
     const float xn = 0.312713f;
@@ -68,7 +72,7 @@ static inline void linear_to_luv(float * bgr){
     const float G = bgr[1];
     const float B = bgr[0];
 
-    if (R == 0 && G == 0 && B == 0){
+    if (R == 0 && G == 0 && B == 0) {
         bgr[0] = 0;
         bgr[1] = bgr[2] = 100;
         return;
@@ -89,12 +93,13 @@ static inline void linear_to_luv(float * bgr){
     bgr[2] /* V */ = 13 * L*(v - vn) + 100;
 }
 
-static inline void luv_to_linear(float * luv){
+static inline void luv_to_linear(float * luv)
+{
     //D65 white point :
     const float L = luv[0];
     const float U = luv[1] - 100.0f;
     const float V = luv[2] - 100.0f;
-    if (L == 0){
+    if (L == 0) {
         luv[0] = luv[1] = luv[2] = 0;
         return;
     }
@@ -116,11 +121,14 @@ static inline void luv_to_linear(float * luv){
     const float r = 3.240479f*X - 1.53715f *Y - 0.498535f*Z;
     const float g = -0.969256f*X + 1.875991f*Y + 0.041556f*Z;
     const float b = 0.055648f*X - 0.204043f*Y + 1.057311f*Z;
-    luv[0] = b; luv[1] = g; luv[2] = r;
+    luv[0] = b;
+    luv[1] = g;
+    luv[2] = r;
 
 }
 
-static inline void yxz_to_linear(float * yxz){
+static inline void yxz_to_linear(float * yxz)
+{
     //D65 white point :
     const float Y = yxz[0];
     const float X = yxz[1];

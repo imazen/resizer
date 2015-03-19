@@ -21,18 +21,20 @@ const int MAX_BYTES_PP = 16;
 static bool are_valid_bitmap_dimensions(int sx, int sy)
 {
     return (
-    sx > 0 && sy > 0 // positive dimensions
-    && sx < INT_MAX / sy // no integer overflow
-    && sx * sy * MAX_BYTES_PP < INT_MAX - MAX_BYTES_PP); // then we can safely check
+               sx > 0 && sy > 0 // positive dimensions
+               && sx < INT_MAX / sy // no integer overflow
+               && sx * sy * MAX_BYTES_PP < INT_MAX - MAX_BYTES_PP); // then we can safely check
 }
 
 
-uint32_t BitmapPixelFormat_bytes_per_pixel (BitmapPixelFormat format){
+uint32_t BitmapPixelFormat_bytes_per_pixel (BitmapPixelFormat format)
+{
     return (uint32_t)format;
 }
 
 
-BitmapBgra * BitmapBgra_create_header(Context * context, int sx, int sy){
+BitmapBgra * BitmapBgra_create_header(Context * context, int sx, int sy)
+{
     BitmapBgra * im;
     if (!are_valid_bitmap_dimensions(sx, sy)) {
         CONTEXT_error(context, Invalid_BitmapBgra_dimensions);
@@ -68,8 +70,7 @@ BitmapBgra * BitmapBgra_create(Context * context, int sx, int sy, bool zeroed, B
     im->alpha_meaningful = im->fmt == Bgra32;
     if (zeroed) {
         im->pixels = (unsigned char *)CONTEXT_calloc(context, im->h * im->stride, sizeof(unsigned char));
-    }
-    else {
+    } else {
         im->pixels = (unsigned char *)CONTEXT_malloc(context, im->h * im->stride);
     }
     if (im->pixels == NULL) {
@@ -90,7 +91,8 @@ void BitmapBgra_destroy(Context* context, BitmapBgra * im)
 }
 
 
-BitmapFloat * BitmapFloat_create_header(Context* context,int sx, int sy, int channels){
+BitmapFloat * BitmapFloat_create_header(Context* context,int sx, int sy, int channels)
+{
     BitmapFloat * im;
 
     if (!are_valid_bitmap_dimensions(sx, sy)) {
@@ -118,14 +120,13 @@ BitmapFloat * BitmapFloat_create_header(Context* context,int sx, int sy, int cha
 BitmapFloat * BitmapFloat_create(Context* context, int sx, int sy, int channels, bool zeroed)
 {
     BitmapFloat * im = BitmapFloat_create_header(context, sx, sy, channels);
-    if (im == NULL){
+    if (im == NULL) {
         return NULL;
     }
     im->pixels_borrowed = false;
-    if (zeroed){
+    if (zeroed) {
         im->pixels = (float*)CONTEXT_calloc(context,im->float_count, sizeof(float));
-    }
-    else{
+    } else {
         im->pixels = (float *)CONTEXT_malloc(context,im->float_count * sizeof(float));
     }
     if (im->pixels == NULL) {

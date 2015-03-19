@@ -44,13 +44,13 @@ typedef enum _ProfilingEntryFlags {
 
 } ProfilingEntryFlags;
 
-typedef struct{
+typedef struct {
     int64_t time;
     const char * name;
     ProfilingEntryFlags flags;
 } ProfilingEntry;
 
-typedef struct{
+typedef struct {
     ProfilingEntry * log;
     uint32_t count;
     uint32_t capacity;
@@ -165,7 +165,7 @@ typedef struct InterpolationDetailsStruct {
 } InterpolationDetails;
 
 
-typedef struct ConvolutionKernelStruct{
+typedef struct ConvolutionKernelStruct {
     float * kernel;
     uint32_t width;
     uint32_t radius;
@@ -174,7 +174,7 @@ typedef struct ConvolutionKernelStruct{
     float * buffer;
 } ConvolutionKernel;
 
-typedef struct RenderDetailsStruct{
+typedef struct RenderDetailsStruct {
     //Interpolation and scaling details
     InterpolationDetails * interpolation;
     //How large the interoplation window needs to be before we even attempt to apply a sharpening

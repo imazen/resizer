@@ -16,14 +16,14 @@
 
 bool BitmapBgra_convert_srgb_to_linear(Context * context, BitmapBgra * src, uint32_t from_row, BitmapFloat * dest, uint32_t dest_row, uint32_t row_count)
 {
-    if (src->w != dest->w || BitmapPixelFormat_bytes_per_pixel(src->fmt) < dest->channels){
+    if (src->w != dest->w || BitmapPixelFormat_bytes_per_pixel(src->fmt) < dest->channels) {
         CONTEXT_error(context, Invalid_internal_state);
         return false;
     }
 
     //TODO: Ensure that from_row + row_count is not > src->h, and dest_row + row_count is not > dest->h
     const LookupTables*  t = get_lookup_tables();
-    if (t == NULL){
+    if (t == NULL) {
         CONTEXT_error(context, Out_of_memory);
         return false;
     }
@@ -34,24 +34,20 @@ bool BitmapBgra_convert_srgb_to_linear(Context * context, BitmapBgra * src, uint
     const uint32_t to_step = dest->channels;
     const uint32_t copy_step = umin(from_step, to_step);
 
-    for (uint32_t row = 0; row < row_count; row++)
-    {
+    for (uint32_t row = 0; row < row_count; row++) {
         //const   uint8_t*  __restrict  src_start = src->pixels + (from_row + row)*src->stride;
         uint8_t*    src_start = src->pixels + (from_row + row)*src->stride;
 
         float* buf = dest->pixels + (dest->float_stride * (row + dest_row));
-        if (copy_step == 3)
-        {
-            for (uint32_t to_x = 0, bix = 0; bix < units; to_x += to_step, bix += from_step){
+        if (copy_step == 3) {
+            for (uint32_t to_x = 0, bix = 0; bix < units; to_x += to_step, bix += from_step) {
                 buf[to_x] =     t->srgb_to_linear[src_start[bix]];
                 buf[to_x + 1] = t->srgb_to_linear[src_start[bix + 1]];
                 buf[to_x + 2] = t->srgb_to_linear[src_start[bix + 2]];
             }
             //We're only working on a portion... dest->alpha_premultiplied = false;
-        }
-        else if (copy_step == 4)
-        {
-            for (uint32_t to_x = 0, bix = 0; bix < units; to_x += to_step, bix += from_step){
+        } else if (copy_step == 4) {
+            for (uint32_t to_x = 0, bix = 0; bix < units; to_x += to_step, bix += from_step) {
                 {
                     const float alpha = t->linear[src_start[bix + 3]];
                     buf[to_x] =     alpha * t->srgb_to_linear[src_start[bix]];
@@ -61,8 +57,7 @@ bool BitmapBgra_convert_srgb_to_linear(Context * context, BitmapBgra * src, uint
                 }
             }
             //We're only working on a portion... dest->alpha_premultiplied = true;
-        }
-        else{
+        } else {
             CONTEXT_error(context, Invalid_internal_state);
             return false;
         }
@@ -88,11 +83,11 @@ bool BitmapBgra_flip_vertical(Context * context, BitmapBgra * b)
     //Not actually correct; This should only copy bytes_per_pixel * width, not the entire stride
     //This could be windowed!
     void* swap = CONTEXT_malloc(context,b->stride);
-    if (swap == NULL){
+    if (swap == NULL) {
         CONTEXT_error(context, Out_of_memory);
         return false;
     }
-    for (uint32_t i = 0; i < b->h / 2; i++){
+    for (uint32_t i = 0; i < b->h / 2; i++) {
         void* top = b->pixels + (i * b->stride);
         void* bottom = b->pixels + ((b->h - 1 - i) * b->stride);
         memcpy(swap, top, b->stride);
@@ -128,11 +123,12 @@ static int  copy_bitmap_bgra(BitmapBgra * src, BitmapBgra * dst)
 }
 */
 
-static bool BitmapFloat_blend_matte(Context * context, BitmapFloat * src, const uint32_t from_row, const uint32_t row_count, const uint8_t* const matte){
+static bool BitmapFloat_blend_matte(Context * context, BitmapFloat * src, const uint32_t from_row, const uint32_t row_count, const uint8_t* const matte)
+{
     //We assume that matte is BGRA, regardless.
 
     const LookupTables*  t = get_lookup_tables();
-    if (t == NULL){
+    if (t == NULL) {
         CONTEXT_error(context, Out_of_memory);
         return false;
     }
@@ -144,11 +140,11 @@ static bool BitmapFloat_blend_matte(Context * context, BitmapFloat * src, const 
 
 
 
-    for (uint32_t row = from_row; row < from_row + row_count; row++){
+    for (uint32_t row = from_row; row < from_row + row_count; row++) {
         uint32_t start_ix = row * src->float_stride;
         uint32_t end_ix = start_ix + src->w * src->channels;
 
-        for (uint32_t ix = start_ix; ix < end_ix; ix += 4){
+        for (uint32_t ix = start_ix; ix < end_ix; ix += 4) {
             const float src_a = src->pixels[ix + 3];
             const float a = (1.0f - src_a) * matte_a;
             const float final_alpha = src_a + a;
@@ -166,14 +162,15 @@ static bool BitmapFloat_blend_matte(Context * context, BitmapFloat * src, const 
     return true;
 }
 
-bool BitmapFloat_demultiply_alpha(Context * context, BitmapFloat * src, const uint32_t from_row, const uint32_t row_count) {
-    for (uint32_t row = from_row; row < from_row + row_count; row++){
+bool BitmapFloat_demultiply_alpha(Context * context, BitmapFloat * src, const uint32_t from_row, const uint32_t row_count)
+{
+    for (uint32_t row = from_row; row < from_row + row_count; row++) {
         uint32_t start_ix = row * src->float_stride;
         uint32_t end_ix = start_ix + src->w * src->channels;
 
-        for (uint32_t ix = start_ix; ix < end_ix; ix += 4){
+        for (uint32_t ix = start_ix; ix < end_ix; ix += 4) {
             const float alpha = src->pixels[ix + 3];
-            if (alpha > 0){
+            if (alpha > 0) {
                 src->pixels[ix] /= alpha;
                 src->pixels[ix + 1] /= alpha;
                 src->pixels[ix + 2] /= alpha;
@@ -196,21 +193,21 @@ bool BitmapFloat_copy_linear_over_srgb(Context * context, BitmapFloat * src, con
     const bool copy_alpha = dest->fmt == Bgra32 && src->channels == 4 && src->alpha_meaningful;
     const bool clean_alpha = !copy_alpha && dest->fmt == Bgra32;
 
-    for (uint32_t row = 0; row < row_count; row++){
+    for (uint32_t row = 0; row < row_count; row++) {
         //const float * const __restrict src_row = src->pixels + (row + from_row) * src->float_stride;
         float * src_row = src->pixels + (row + from_row) * src->float_stride;
 
         uint8_t * dest_row_bytes = dest->pixels + (dest_row + row) * dest_row_stride + (from_col * dest_pixel_stride);
 
-        for (uint32_t ix = from_col * ch; ix < srcitems; ix += ch){
+        for (uint32_t ix = from_col * ch; ix < srcitems; ix += ch) {
             dest_row_bytes[0] = uchar_clamp_ff(linear_to_srgb(src_row[ix]));
             dest_row_bytes[1] = uchar_clamp_ff(linear_to_srgb(src_row[ix + 1]));
             dest_row_bytes[2] = uchar_clamp_ff(linear_to_srgb(src_row[ix + 2]));
-            if (copy_alpha){
+            if (copy_alpha) {
                 dest_row_bytes[3] = uchar_clamp_ff(src_row[ix + 3] * 255.0f);
 
             }
-            if (clean_alpha){
+            if (clean_alpha) {
                 dest_row_bytes[3] = 0xff;
             }
             dest_row_bytes += dest_pixel_stride;
@@ -220,10 +217,11 @@ bool BitmapFloat_copy_linear_over_srgb(Context * context, BitmapFloat * src, con
 
 }
 
-static bool BitmapFloat_compose_linear_over_srgb(Context * context, BitmapFloat * src, const uint32_t from_row, BitmapBgra * dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose){
+static bool BitmapFloat_compose_linear_over_srgb(Context * context, BitmapFloat * src, const uint32_t from_row, BitmapBgra * dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose)
+{
 
     const LookupTables*  t = get_lookup_tables();
-    if (t == NULL){
+    if (t == NULL) {
         CONTEXT_error(context, Out_of_memory);
         return false;
     }
@@ -238,13 +236,13 @@ static bool BitmapFloat_compose_linear_over_srgb(Context * context, BitmapFloat 
     const uint8_t dest_alpha_index = dest_alpha ? 3 : 0;
     const float dest_alpha_to_float_coeff = dest_alpha ? 1.0f / 255.0f : 0.0f;
     const float dest_alpha_to_float_offset = dest_alpha ? 0.0f : 1.0f;
-    for (uint32_t row = 0; row < row_count; row++){
+    for (uint32_t row = 0; row < row_count; row++) {
         //const float * const __restrict src_row = src->pixels + (row + from_row) * src->float_stride;
         float * src_row = src->pixels + (row + from_row) * src->float_stride;
 
         uint8_t * dest_row_bytes = dest->pixels + (dest_row + row) * dest_row_stride + (from_col * dest_pixel_stride);
 
-        for (uint32_t ix = from_col * ch; ix < srcitems; ix += ch){
+        for (uint32_t ix = from_col * ch; ix < srcitems; ix += ch) {
 
             const uint8_t dest_b = dest_row_bytes[0];
             const uint8_t dest_g = dest_row_bytes[1];
@@ -266,7 +264,7 @@ static bool BitmapFloat_compose_linear_over_srgb(Context * context, BitmapFloat 
             dest_row_bytes[0] = uchar_clamp_ff(linear_to_srgb(b / final_alpha));
             dest_row_bytes[1] = uchar_clamp_ff(linear_to_srgb(g / final_alpha));
             dest_row_bytes[2] = uchar_clamp_ff(linear_to_srgb(r / final_alpha));
-            if (dest_alpha){
+            if (dest_alpha) {
                 dest_row_bytes[3] =  uchar_clamp_ff(final_alpha * 255);
             }
             dest_row_bytes += dest_pixel_stride;
@@ -282,27 +280,27 @@ static bool BitmapFloat_compose_linear_over_srgb(Context * context, BitmapFloat 
 bool BitmapFloat_pivoting_composite_linear_over_srgb(Context * context, BitmapFloat * src, uint32_t from_row, BitmapBgra * dest, uint32_t dest_row, uint32_t row_count, bool transpose)
 {
     if (transpose ? src->w != dest->h : src->w != dest->w) {
-         //TODO: Add more bounds checks
+        //TODO: Add more bounds checks
         CONTEXT_error(context, Invalid_internal_state);
         return false;
     }
 
-    if (src->alpha_meaningful && src->channels == 4 && dest->compositing_mode == Blend_with_matte){
-        if (!BitmapFloat_blend_matte(context, src, from_row, row_count, dest->matte_color)){
+    if (src->alpha_meaningful && src->channels == 4 && dest->compositing_mode == Blend_with_matte) {
+        if (!BitmapFloat_blend_matte(context, src, from_row, row_count, dest->matte_color)) {
             return false;
         }
         src->alpha_premultiplied = false;
     }
-    if (src->channels == 4 && src->alpha_premultiplied && dest->compositing_mode != Blend_with_self){
+    if (src->channels == 4 && src->alpha_premultiplied && dest->compositing_mode != Blend_with_self) {
         //Demultiply
-        if (!BitmapFloat_demultiply_alpha(context, src, from_row, row_count)){
+        if (!BitmapFloat_demultiply_alpha(context, src, from_row, row_count)) {
             return false;
         }
     }
 
     bool can_compose = dest->compositing_mode == Blend_with_self && src->alpha_meaningful && src->channels == 4;
 
-    if (can_compose && !src->alpha_premultiplied){
+    if (can_compose && !src->alpha_premultiplied) {
         //Something went wrong. We should always have alpha premultiplied.
         CONTEXT_error(context, Invalid_internal_state);
         return false;
@@ -311,7 +309,7 @@ bool BitmapFloat_pivoting_composite_linear_over_srgb(Context * context, BitmapFl
     //Tiling does not appear to show benefits when benchmarking - only breifly investigated
     bool tile_when_transposing = false;
 
-    if (transpose && tile_when_transposing){
+    if (transpose && tile_when_transposing) {
 
         //Let's try to tile within 2kb, get some cache coherency
         const float dest_opt_rows = 2048.0f / (float)dest->stride;
@@ -319,29 +317,26 @@ bool BitmapFloat_pivoting_composite_linear_over_srgb(Context * context, BitmapFl
         const int tile_width = max(4, (int)dest_opt_rows);
         const int tiles = src->w / tile_width;
 
-        if (can_compose){
-            for (int i = 0; i < tiles; i++){
-                if (!BitmapFloat_compose_linear_over_srgb(context, src, from_row, dest, dest_row, row_count, i * tile_width, tile_width, transpose)){
+        if (can_compose) {
+            for (int i = 0; i < tiles; i++) {
+                if (!BitmapFloat_compose_linear_over_srgb(context, src, from_row, dest, dest_row, row_count, i * tile_width, tile_width, transpose)) {
+                    return false;
+                }
+            }
+        } else {
+            for (int i = 0; i < tiles; i++) {
+                if (!BitmapFloat_copy_linear_over_srgb(context, src, from_row, dest, dest_row, row_count, i * tile_width, tile_width, transpose)) {
                     return false;
                 }
             }
         }
-        else{
-            for (int i = 0; i < tiles; i++){
-                if (!BitmapFloat_copy_linear_over_srgb(context, src, from_row, dest, dest_row, row_count, i * tile_width, tile_width, transpose)){
-                    return false;
-                }
-            }
-        }
-    }
-    else{
-        if (can_compose){
-            if (!BitmapFloat_compose_linear_over_srgb(context, src, from_row, dest, dest_row, row_count, 0, src->w, transpose)){
+    } else {
+        if (can_compose) {
+            if (!BitmapFloat_compose_linear_over_srgb(context, src, from_row, dest, dest_row, row_count, 0, src->w, transpose)) {
                 return false;
             }
-        }
-        else{
-            if (!BitmapFloat_copy_linear_over_srgb(context, src, from_row, dest, dest_row, row_count, 0,src->w,transpose)){
+        } else {
+            if (!BitmapFloat_copy_linear_over_srgb(context, src, from_row, dest, dest_row, row_count, 0,src->w,transpose)) {
                 return false;
             }
         }

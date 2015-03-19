@@ -73,39 +73,48 @@ bool test_in_place (int sx, int sy, BitmapPixelFormat sbpp, bool flipx, bool fli
 }
 
 
-TEST_CASE( "Render without crashing", "[fastscaling]") {
+TEST_CASE( "Render without crashing", "[fastscaling]")
+{
     REQUIRE (test (400, 300, Bgra32, 200, 40, Bgra32, false, false, false, false, (InterpolationFilter)0));
 }
 
-TEST_CASE( "Render - upscale", "[fastscaling]") {
+TEST_CASE( "Render - upscale", "[fastscaling]")
+{
     REQUIRE (test (200, 40, Bgra32, 500, 300, Bgra32, false, false, false, false, (InterpolationFilter)0));
 }
 
-TEST_CASE("Render - downscale 24->32", "[fastscaling]") {
+TEST_CASE("Render - downscale 24->32", "[fastscaling]")
+{
     REQUIRE (test (400, 200, Bgr24, 200, 100, Bgra32, false, false, false, false, (InterpolationFilter)0));
 }
 
-TEST_CASE("Render and rotate", "[fastscaling]") {
+TEST_CASE("Render and rotate", "[fastscaling]")
+{
     REQUIRE (test (200, 40, Bgra32, 500, 300, Bgra32, true, true, true, false, (InterpolationFilter)0));
 }
 
-TEST_CASE("Render and rotate with profiling", "[fastscaling]") {
+TEST_CASE("Render and rotate with profiling", "[fastscaling]")
+{
     REQUIRE (test (200, 40, Bgra32, 500, 300, Bgra32, true, true, true, true, (InterpolationFilter)0));
 }
 
-TEST_CASE ("Flip in place", "[fastscaling]") {
+TEST_CASE ("Flip in place", "[fastscaling]")
+{
     REQUIRE (test_in_place (400, 300, Bgra32, true, true, false, 0, 0));
 }
-TEST_CASE ("Flip in place 24 bit", "[fastscaling]") {
+TEST_CASE ("Flip in place 24 bit", "[fastscaling]")
+{
     REQUIRE (test_in_place (400, 300, Bgr24, true, true, false, 0, 0));
 }
 //segfaults the process
-TEST_CASE ("Sharpen and convolve in place", "[fastscaling]") {
+TEST_CASE ("Sharpen and convolve in place", "[fastscaling]")
+{
     REQUIRE (test_in_place (400, 300, Bgr24, false, false, false, 0.5, 0));
 }
 //*/
 
-BitmapBgra*  crop_window (Context * context, BitmapBgra* source, uint32_t x, uint32_t y, uint32_t w, uint32_t h){
+BitmapBgra*  crop_window (Context * context, BitmapBgra* source, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+{
     BitmapBgra* cropped = BitmapBgra_create_header(context, w, h);
     cropped->fmt = source->fmt;
     const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel(source->fmt);
@@ -114,23 +123,25 @@ BitmapBgra*  crop_window (Context * context, BitmapBgra* source, uint32_t x, uin
     return cropped;
 }
 
-void clear_bitmap (BitmapBgra* b, uint8_t fill_red, uint8_t fill_green, uint8_t fill_blue, uint8_t fill_alpha){
+void clear_bitmap (BitmapBgra* b, uint8_t fill_red, uint8_t fill_green, uint8_t fill_blue, uint8_t fill_alpha)
+{
     const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel (b->fmt);
     const uint32_t row_bytes = bytes_pp * b->w;
-    for (uint32_t i = 0; i < row_bytes; i+=4){
+    for (uint32_t i = 0; i < row_bytes; i+=4) {
         b->pixels[i] = fill_blue;
         b->pixels[i+ 1] = fill_green;
         b->pixels[i + 2] = fill_red;
-        if (bytes_pp == 4){
+        if (bytes_pp == 4) {
             b->pixels[i + 3] = fill_alpha;
         }
     }
-    for (uint32_t i = 0; i < b->h; i++){
+    for (uint32_t i = 0; i < b->h; i++) {
         memcpy (b->pixels + (i * b->stride), b->pixels, row_bytes);
     }
 }
 
-void fill_rect (Context * context, BitmapBgra* b, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t fill_red, uint8_t fill_green, uint8_t fill_blue, uint8_t fill_alpha){
+void fill_rect (Context * context, BitmapBgra* b, uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint8_t fill_red, uint8_t fill_green, uint8_t fill_blue, uint8_t fill_alpha)
+{
     BitmapBgra * cropped = crop_window (context, b, x, y, w, h);
     clear_bitmap (cropped, fill_red, fill_green, fill_blue, fill_alpha);
     BitmapBgra_destroy (context, cropped);
@@ -155,7 +166,8 @@ TEST_CASE ("Trim whitespace in 32-bit image", "[fastscaling]") {
 //*/
 
 
-TEST_CASE("Test contrib windows", "[fastscaling]") {
+TEST_CASE("Test contrib windows", "[fastscaling]")
+{
 
     char msg[256];
 
@@ -172,7 +184,8 @@ TEST_CASE("Test contrib windows", "[fastscaling]") {
     Context_terminate(&context);
 }
 
-TEST_CASE("Test Weighting", "[fastscaling]") {
+TEST_CASE("Test Weighting", "[fastscaling]")
+{
 
     char msg[256];
 
@@ -231,7 +244,8 @@ TEST_CASE("Test Weighting", "[fastscaling]") {
 
 
 
-TEST_CASE("Test Linear RGB 000 -> LUV ", "[fastscaling]") {
+TEST_CASE("Test Linear RGB 000 -> LUV ", "[fastscaling]")
+{
     float bgra[4] = { 0, 0, 0, 0 };
 
     linear_to_luv(bgra);
@@ -241,7 +255,8 @@ TEST_CASE("Test Linear RGB 000 -> LUV ", "[fastscaling]") {
     CHECK(bgra[2] == 100.0f);
 }
 
-TEST_CASE("Roundtrip RGB<->LUV 0.2,0.2,0.2 ", "[fastscaling]") {
+TEST_CASE("Roundtrip RGB<->LUV 0.2,0.2,0.2 ", "[fastscaling]")
+{
     float bgra[4] = { 0.2f, 0.2f, 0.2f, 1 };
 
     linear_to_luv(bgra);
@@ -253,8 +268,9 @@ TEST_CASE("Roundtrip RGB<->LUV 0.2,0.2,0.2 ", "[fastscaling]") {
 }
 
 
-TEST_CASE("Roundtrip sRGB<->linear RGB<->LUV", "[fastscaling]") {
-    for (int x = 0; x < 256; x++){
+TEST_CASE("Roundtrip sRGB<->linear RGB<->LUV", "[fastscaling]")
+{
+    for (int x = 0; x < 256; x++) {
         CHECK(x == uchar_clamp_ff(linear_to_srgb(srgb_to_linear((float)x / 255.0f))));
     }
 }
@@ -262,7 +278,8 @@ TEST_CASE("Roundtrip sRGB<->linear RGB<->LUV", "[fastscaling]") {
 
 
 
-TEST_CASE("Roundtrip RGB<->LUV 0,0,0,0 ", "[fastscaling]") {
+TEST_CASE("Roundtrip RGB<->LUV 0,0,0,0 ", "[fastscaling]")
+{
     float bgra[4] = { 0, 0, 0, 0 };
 
     linear_to_luv(bgra);
@@ -298,7 +315,8 @@ for (int bits = 16; bits > 11; bits--){
     Assert::Equal (from, to);
 }*/
 
-SCENARIO("sRGB roundtrip", "[fastscaling]") {
+SCENARIO("sRGB roundtrip", "[fastscaling]")
+{
     GIVEN("A 256x256 image, grayscale gradient along the x axis, alpha along the y") {
         int w = 256;
         int h = 256;
@@ -307,8 +325,8 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
         BitmapBgra* bit = BitmapBgra_create(&context, w, h, true, Bgra32);
         const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel(bit->fmt);
 
-        for (size_t y = 1; y < bit->h; y++){
-            for (size_t x = 0; x < bit->w; x++){
+        for (size_t y = 1; y < bit->h; y++) {
+            for (size_t x = 0; x < bit->w; x++) {
                 uint8_t* pix = bit->pixels + (y * bit->stride) + (x * bytes_pp);
 
                 *pix = (uint8_t)x;
@@ -334,23 +352,27 @@ SCENARIO("sRGB roundtrip", "[fastscaling]") {
 
             THEN(" and so forth ") {
 
-            bool exact_match = true;
-            for (size_t y = 0; y < bit->h; y++){
-                for (size_t x = 0; x < bit->w; x++){
-                uint8_t* from = bit->pixels + (y * bit->stride) + (x * bytes_pp);
-                uint8_t* to = final->pixels + (y * final->stride) + (x * bytes_pp);
+                bool exact_match = true;
+                for (size_t y = 0; y < bit->h; y++) {
+                    for (size_t x = 0; x < bit->w; x++) {
+                        uint8_t* from = bit->pixels + (y * bit->stride) + (x * bytes_pp);
+                        uint8_t* to = final->pixels + (y * final->stride) + (x * bytes_pp);
 
-                if (*from != *to) exact_match = false;
-                from++; to++;
-                if (*from != *to) exact_match = false;
-                from++; to++;
-                if (*from != *to) exact_match = false;
-                from++; to++;
-                if (*from != *to) exact_match = false;
-                from++; to++;
+                        if (*from != *to) exact_match = false;
+                        from++;
+                        to++;
+                        if (*from != *to) exact_match = false;
+                        from++;
+                        to++;
+                        if (*from != *to) exact_match = false;
+                        from++;
+                        to++;
+                        if (*from != *to) exact_match = false;
+                        from++;
+                        to++;
+                    }
                 }
-            }
-            REQUIRE(exact_match);
+                REQUIRE(exact_match);
             }
             Renderer_destroy(&context, r);
         }

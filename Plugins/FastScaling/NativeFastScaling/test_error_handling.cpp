@@ -8,7 +8,8 @@ static std::ostream& operator<<(std::ostream& out, const BitmapFloat & bitmap_fl
     return out << "BitmapFloat: w:" << bitmap_float.w << " h: " << bitmap_float.h << " channels:" << bitmap_float.channels << '\n';
 }
 
-class Fixture {
+class Fixture
+{
 public:
     size_t last_attempted_allocation_size;
     bool always_return_null;
@@ -18,24 +19,29 @@ public:
     int alloc_count;
     int total_successful_allocs;
 
-    static void * _calloc(Context * context, size_t count, size_t element_size, const char * file, int line){
+    static void * _calloc(Context * context, size_t count, size_t element_size, const char * file, int line)
+    {
         return ((Fixture *)context->heap._private_state)->calloc(count, element_size);
     }
-    static void * _malloc(Context * context, size_t byte_count, const char * file, int line){
+    static void * _malloc(Context * context, size_t byte_count, const char * file, int line)
+    {
         return ((Fixture *)context->heap._private_state)->malloc(byte_count);
     }
-    static void  _free(Context * context, void * pointer, const char * file, int line){
+    static void  _free(Context * context, void * pointer, const char * file, int line)
+    {
         free(pointer);
     }
 
-    void initialize_heap(Context * context) {
+    void initialize_heap(Context * context)
+    {
         context->heap._private_state = this;
         context->heap._calloc = _calloc;
         context->heap._malloc = _malloc;
         context->heap._free = _free;
         context->heap._context_terminate = NULL;
     }
-    Fixture() {
+    Fixture()
+    {
         always_return_null = false;
         allocation_failure_size_threshold = INT_MAX / 4;
         allocation_failure_size = allocation_failure_size_threshold;
@@ -46,7 +52,8 @@ public:
 
     }
 
-    bool is_alloc_allowed(size_t byte_count) {
+    bool is_alloc_allowed(size_t byte_count)
+    {
         last_attempted_allocation_size = byte_count;
         if (always_return_null) {
             return false;
@@ -64,40 +71,47 @@ public:
         total_successful_allocs++;
         return true;
     }
-    void * malloc(size_t byte_count) {
-        if (is_alloc_allowed(byte_count)){
+    void * malloc(size_t byte_count)
+    {
+        if (is_alloc_allowed(byte_count)) {
             return ::malloc(byte_count);
         }
         return NULL;
     }
 
-    void * calloc(size_t instances, size_t size_of_instance) {
-        if (is_alloc_allowed(instances * size_of_instance)){
+    void * calloc(size_t instances, size_t size_of_instance)
+    {
+        if (is_alloc_allowed(instances * size_of_instance)) {
             return ::calloc(instances, size_of_instance);
         }
         return NULL;
     }
 
-    void always_fail_allocation() {
+    void always_fail_allocation()
+    {
         always_return_null = true;
     }
 
-    void fail_allocation_of(size_t byte_count) {
+    void fail_allocation_of(size_t byte_count)
+    {
         allocation_failure_size = byte_count;
     }
 
-    void fail_allocation_if_size_larger_than(size_t byte_count) {
+    void fail_allocation_if_size_larger_than(size_t byte_count)
+    {
         allocation_failure_size_threshold = byte_count;
     }
 
 
-    void fail_alloc_after(int times) {
+    void fail_alloc_after(int times)
+    {
         alloc_count = 0;
         allow_successful_allocs = times;
     }
 };
 
-TEST_CASE_METHOD(Fixture, "Perform Rendering", "[error_handling]") {
+TEST_CASE_METHOD(Fixture, "Perform Rendering", "[error_handling]")
+{
     REQUIRE((2 / 10) == 0);
     Context context;
     Context_initialize(&context);
@@ -130,7 +144,8 @@ TEST_CASE_METHOD(Fixture, "Perform Rendering", "[error_handling]") {
     free_lookup_tables();
 }
 
-TEST_CASE_METHOD(Fixture, "Test allocation failure handling", "[error_handling]") {
+TEST_CASE_METHOD(Fixture, "Test allocation failure handling", "[error_handling]")
+{
     using namespace Catch::Generators;
     int fail_alloc_x = GENERATE( between( 0, 9) );
 
@@ -173,7 +188,8 @@ TEST_CASE_METHOD(Fixture, "Test allocation failure handling", "[error_handling]"
     free_lookup_tables();
 }
 
-TEST_CASE_METHOD(Fixture, "Creating BitmapBgra", "[error_handling]") {
+TEST_CASE_METHOD(Fixture, "Creating BitmapBgra", "[error_handling]")
+{
     Context context;
     Context_initialize(&context);
     initialize_heap(&context);
@@ -215,7 +231,8 @@ TEST_CASE_METHOD(Fixture, "Creating BitmapBgra", "[error_handling]") {
     BitmapBgra_destroy(&context,source);
 }
 
-TEST_CASE("Context", "[error_handling]") {
+TEST_CASE("Context", "[error_handling]")
+{
     Context context;
     Context_initialize(&context);
 
@@ -226,7 +243,8 @@ TEST_CASE("Context", "[error_handling]") {
     }
 }
 
-TEST_CASE("Argument checking for convert_sgrp_to_linear", "[error_handling]") {
+TEST_CASE("Argument checking for convert_sgrp_to_linear", "[error_handling]")
+{
     Context context;
     Context_initialize(&context);
     BitmapBgra * src = BitmapBgra_create(&context, 2, 3, true, Bgra32);

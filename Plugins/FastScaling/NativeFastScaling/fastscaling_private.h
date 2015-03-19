@@ -21,7 +21,7 @@
 extern "C" {
 #endif
 
- //floating-point bitmap, typically linear RGBA, premultiplied
+//floating-point bitmap, typically linear RGBA, premultiplied
 typedef struct BitmapFloatStruct {
     //buffer width in pixels
     uint32_t w;
@@ -54,7 +54,7 @@ typedef void * (*context_malloc_function)(struct ContextStruct * context, size_t
 typedef void   (*context_free_function)  (struct ContextStruct * context, void * pointer, const char * file, int line);
 typedef void   (*context_terminate_function)  (struct ContextStruct * context);
 
-typedef struct _HeapManager{
+typedef struct _HeapManager {
     context_calloc_function _calloc;
     context_malloc_function _malloc;
     context_free_function  _free;
@@ -68,16 +68,16 @@ void DefaultHeapManager_initialize(HeapManager * context);
 /** Context: ErrorInfo **/
 
 
-typedef struct _ErrorCallstackLine{
+typedef struct _ErrorCallstackLine {
     const char * file;
     int line;
 } ErrorCallstackLine;
 
-typedef struct _ErrorInfo{
-  StatusCode reason;
-  ErrorCallstackLine callstack[8];
-  int callstack_count;
-  int callstack_capacity;
+typedef struct _ErrorInfo {
+    StatusCode reason;
+    ErrorCallstackLine callstack[8];
+    int callstack_count;
+    int callstack_capacity;
 } ErrorInfo;
 
 
@@ -164,19 +164,19 @@ bool BitmapFloat_sharpen_rows(Context * context, BitmapFloat * im, uint32_t star
 
 
 bool BitmapBgra_convert_srgb_to_linear(Context * context,
-    BitmapBgra * src,
-    uint32_t from_row,
-    BitmapFloat * dest,
-    uint32_t dest_row,
-    uint32_t row_count);
+                                       BitmapBgra * src,
+                                       uint32_t from_row,
+                                       BitmapFloat * dest,
+                                       uint32_t dest_row,
+                                       uint32_t row_count);
 
 bool BitmapFloat_pivoting_composite_linear_over_srgb(Context * context,
-    BitmapFloat * src,
-    uint32_t from_row,
-    BitmapBgra * dest,
-    uint32_t dest_row,
-    uint32_t row_count,
-    bool transpose);
+        BitmapFloat * src,
+        uint32_t from_row,
+        BitmapBgra * dest,
+        uint32_t dest_row,
+        uint32_t row_count,
+        bool transpose);
 
 bool BitmapBgra_flip_vertical(Context * context, BitmapBgra * b);
 
@@ -206,71 +206,75 @@ bool HalveInPlace(Context * context, BitmapBgra * from, int divisor);
 #ifndef _TIMERS_IMPLEMENTED
 #define _TIMERS_IMPLEMENTED
 #ifdef _WIN32
-    #define STRICT
-    #define WIN32_LEAN_AND_MEAN
-    #include <windows.h>
-    #include <winbase.h>
-    inline int64_t get_high_precision_ticks(void){
-        LARGE_INTEGER val;
-        QueryPerformanceCounter(&val);
-        return val.QuadPart;
-    }
-    inline int64_t get_profiler_ticks_per_second(void){
-        LARGE_INTEGER val;
-        QueryPerformanceFrequency(&val);
-        return val.QuadPart;
-    }
+#define STRICT
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <winbase.h>
+inline int64_t get_high_precision_ticks(void)
+{
+    LARGE_INTEGER val;
+    QueryPerformanceCounter(&val);
+    return val.QuadPart;
+}
+inline int64_t get_profiler_ticks_per_second(void)
+{
+    LARGE_INTEGER val;
+    QueryPerformanceFrequency(&val);
+    return val.QuadPart;
+}
 #else
-    #include <sys/time.h>
-    #if defined(_POSIX_VERSION)
-    #if defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0)
-    #if defined(CLOCK_MONOTONIC_PRECISE)
-            /* BSD. --------------------------------------------- */
-            #define PROFILER_CLOCK_ID id = CLOCK_MONOTONIC_PRECISE;
-    #elif defined(CLOCK_MONOTONIC_RAW)
-            /* Linux. ------------------------------------------- */
-            #define PROFILER_CLOCK_ID id = CLOCK_MONOTONIC_RAW;
-    #elif defined(CLOCK_HIGHRES)
-            /* Solaris. ----------------------------------------- */
-            #define PROFILER_CLOCK_ID id = CLOCK_HIGHRES;
-    #elif defined(CLOCK_MONOTONIC)
-            /* AIX, BSD, Linux, POSIX, Solaris. ----------------- */
-            #define PROFILER_CLOCK_ID id = CLOCK_MONOTONIC;
-    #elif defined(CLOCK_REALTIME)
-            /* AIX, BSD, HP-UX, Linux, POSIX. ------------------- */
-            #define PROFILER_CLOCK_ID id = CLOCK_REALTIME;
-    #endif
-    #endif
-    #endif
+#include <sys/time.h>
+#if defined(_POSIX_VERSION)
+#if defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0)
+#if defined(CLOCK_MONOTONIC_PRECISE)
+/* BSD. --------------------------------------------- */
+#define PROFILER_CLOCK_ID id = CLOCK_MONOTONIC_PRECISE;
+#elif defined(CLOCK_MONOTONIC_RAW)
+/* Linux. ------------------------------------------- */
+#define PROFILER_CLOCK_ID id = CLOCK_MONOTONIC_RAW;
+#elif defined(CLOCK_HIGHRES)
+/* Solaris. ----------------------------------------- */
+#define PROFILER_CLOCK_ID id = CLOCK_HIGHRES;
+#elif defined(CLOCK_MONOTONIC)
+/* AIX, BSD, Linux, POSIX, Solaris. ----------------- */
+#define PROFILER_CLOCK_ID id = CLOCK_MONOTONIC;
+#elif defined(CLOCK_REALTIME)
+/* AIX, BSD, HP-UX, Linux, POSIX. ------------------- */
+#define PROFILER_CLOCK_ID id = CLOCK_REALTIME;
+#endif
+#endif
+#endif
 
 
-    inline int64_t get_high_precision_ticks(void){
-        #ifdef PROFILER_CLOCK_ID
-            timespec ts;
-            if (clock_gettime(PROFILER_CLOCK_ID, &ts) != 0){
-                return -1;
-            }
-            return ts->tv_sec * 1000000 +  ts->tv_nsec;
-        #else
-            struct timeval tm;
-            if (gettimeofday( &tm, NULL) != 0){
-                return -1;
-            }
-            return tm.tv_sec * 1000000 + tm.tv_usec;
-        #endif
+inline int64_t get_high_precision_ticks(void)
+{
+#ifdef PROFILER_CLOCK_ID
+    timespec ts;
+    if (clock_gettime(PROFILER_CLOCK_ID, &ts) != 0) {
+        return -1;
     }
-
-    inline int64_t get_profiler_ticks_per_second(void){
-        #ifdef PROFILER_CLOCK_ID
-            timespec ts;
-            if (clock_getres(PROFILER_CLOCK_ID, &ts) != 0){
-                return -1;
-            }
-            return ts->tv_nsec;
-        #else
-            return 1000000;
-        #endif
+    return ts->tv_sec * 1000000 +  ts->tv_nsec;
+#else
+    struct timeval tm;
+    if (gettimeofday( &tm, NULL) != 0) {
+        return -1;
     }
+    return tm.tv_sec * 1000000 + tm.tv_usec;
+#endif
+}
+
+inline int64_t get_profiler_ticks_per_second(void)
+{
+#ifdef PROFILER_CLOCK_ID
+    timespec ts;
+    if (clock_getres(PROFILER_CLOCK_ID, &ts) != 0) {
+        return -1;
+    }
+    return ts->tv_nsec;
+#else
+    return 1000000;
+#endif
+}
 
 #endif
 #endif

@@ -31,7 +31,8 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
                         .189f, .168f, .131f, 0, 0,
                         0, 0, 0, 1, 0,
                         0, 0, 0, 0, 1,
-                        0, 0, 0, 0, 0};
+                        0, 0, 0, 0, 0
+                      };
 
     memcpy( &details->color_matrix_data, &sepia, sizeof sepia);
 
@@ -45,7 +46,7 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
     BitmapBgra_destroy(context, canvas);
 
     Context_destroy(context);
-    Context_free_static_caches(); 
+    Context_free_static_caches();
 
     return true;
 }
@@ -54,10 +55,10 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
 
 int main(void)
 {
-	for (int i =0; i < 10; i++){
-   		test (4000, 3000, Bgr24, 800, 600, Bgra32, true, true, false, (InterpolationFilter)0);
-    	test (4000, 3000, Bgr24, 1600, 1200, Bgra32, false, true, true, (InterpolationFilter)0);
-    	test (1200, 800, Bgra32, 200, 150, Bgra32, false, false, false, (InterpolationFilter)0);
+    for (int i =0; i < 10; i++) {
+        test (4000, 3000, Bgr24, 800, 600, Bgra32, true, true, false, (InterpolationFilter)0);
+        test (4000, 3000, Bgr24, 1600, 1200, Bgra32, false, true, true, (InterpolationFilter)0);
+        test (1200, 800, Bgra32, 200, 150, Bgra32, false, false, false, (InterpolationFilter)0);
     }
     return 0;
 

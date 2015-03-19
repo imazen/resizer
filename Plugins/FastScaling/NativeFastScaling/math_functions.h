@@ -18,24 +18,38 @@
 
 #define IR_PI  3.1415926535897932384626433832795
 
-static inline int min(int a, int b) { return a <= b ? a : b; }
-static inline int max(int a, int b) { return a >= b ? a : b; }
+static inline int min(int a, int b)
+{
+    return a <= b ? a : b;
+}
+static inline int max(int a, int b)
+{
+    return a >= b ? a : b;
+}
 
-static inline unsigned int umin(unsigned int a, unsigned int b) { return a <= b ? a : b; }
-static inline unsigned int umax(unsigned int a, unsigned int b) { return a >= b ? a : b; }
+static inline unsigned int umin(unsigned int a, unsigned int b)
+{
+    return a <= b ? a : b;
+}
+static inline unsigned int umax(unsigned int a, unsigned int b)
+{
+    return a >= b ? a : b;
+}
 
 
 
 #define EVIL_CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
 static inline
-double ir_guassian(double x, double stdDev){
+double ir_guassian(double x, double stdDev)
+{
     return (exp((-x * x) / (2 * stdDev * stdDev)) / (sqrt(2 * IR_PI) * stdDev));
 }
 
 static inline
 uint8_t
-uchar_clamp_ff(float clr) {
+uchar_clamp_ff(float clr)
+{
     uint16_t result;
 
     result = (uint16_t)(int16_t)(clr + 0.5);
@@ -48,7 +62,8 @@ uchar_clamp_ff(float clr) {
 }
 
 static inline
-int intlog2(unsigned int val) {
+int intlog2(unsigned int val)
+{
     int ret = -1;
     while (val != 0) {
         val >>= 1;

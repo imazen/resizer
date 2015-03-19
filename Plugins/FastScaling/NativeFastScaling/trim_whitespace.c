@@ -23,7 +23,7 @@ Rect detect_content(Context * context, BitmapBgra * b, uint8_t threshold)
     info.h = b->h;
     info.buff_size = 2048;
     info.buf = (uint8_t*)CONTEXT_malloc(context, info.buff_size);
-    if (info.buf == NULL){
+    if (info.buf == NULL) {
         CONTEXT_error(context, Out_of_memory);
         return RectFailure;
     }
@@ -69,11 +69,10 @@ Rect detect_content(Context * context, BitmapBgra * b, uint8_t threshold)
     //We should now have a good idea of where boundaries lie. However... if it seems that more than 25% is whitespace, we should do a different type of scan.
     long area_to_scan_separately = info.min_x * info.h + info.min_y * info.w + (info.w - info.max_x) * info.h + (info.h - info.max_y) * info.h;
 
-    if (area_to_scan_separately > info.h * info.w){
+    if (area_to_scan_separately > info.h * info.w) {
         //Just scan it all at once, non-directionally
         if (!check_region(context, 0, 0, 1, 0, 1, &info)) return RectFailure;
-    }
-    else{
+    } else {
 
         //Finish by scanning everything that is left. Should be a smaller set.
         //Corners will overlap, and be scanned twice, if they are whitespace.
@@ -94,7 +93,8 @@ Rect detect_content(Context * context, BitmapBgra * b, uint8_t threshold)
     CONTEXT_free(context, info.buf);
     return result;
 }
-bool fill_buffer(Context * context, SearchInfo* __restrict info){
+bool fill_buffer(Context * context, SearchInfo* __restrict info)
+{
     /* Red: 0.299;
     Green: 0.587;
     Blue: 0.114;
@@ -105,32 +105,30 @@ bool fill_buffer(Context * context, SearchInfo* __restrict info){
     const uint32_t remnant = info->bitmap->stride - (bytes_per_pixel * w);
     uint8_t  const  * __restrict bgra = info->bitmap->pixels + (info->bitmap->stride * info->buf_y) + (bytes_per_pixel * info->buf_x);
     const uint8_t channels = bytes_per_pixel;
-    if (channels == 4 && info->bitmap->alpha_meaningful){
+    if (channels == 4 && info->bitmap->alpha_meaningful) {
         uint32_t buf_ix = 0;
-        for (uint32_t y = 0; y < h; y++){
-            for (uint32_t x = 0; x < w; x++){
+        for (uint32_t y = 0; y < h; y++) {
+            for (uint32_t x = 0; x < w; x++) {
                 info->buf[buf_ix] = (114 * bgra[0] + 587 * bgra[1] + 299 * bgra[2]) * bgra[3] / 255000;
                 bgra += 4;
                 buf_ix++;
             }
             bgra += remnant;
         }
-    }
-    else if (channels == 3 || (channels == 4 && !info->bitmap->alpha_meaningful)){
+    } else if (channels == 3 || (channels == 4 && !info->bitmap->alpha_meaningful)) {
         uint32_t buf_ix = 0;
-        for (uint32_t y = 0; y < h; y++){
-            for (uint32_t x = 0; x < w; x++){
+        for (uint32_t y = 0; y < h; y++) {
+            for (uint32_t x = 0; x < w; x++) {
                 info->buf[buf_ix] = (114 * bgra[0] + 587 * bgra[1] + 299 * bgra[2]) / 255000;
                 bgra += channels;
                 buf_ix++;
             }
             bgra += remnant;
         }
-    }
-    else {
+    } else {
         uint32_t buf_ix = 0;
-        for (uint32_t y = 0; y < h; y++){
-            for (uint32_t x = 0; x < w; x++){
+        for (uint32_t y = 0; y < h; y++) {
+            for (uint32_t x = 0; x < w; x++) {
                 uint32_t sum = 0;
                 for (uint8_t ch = 0; ch < channels; ch++)
                     sum += bgra[ch];
@@ -148,8 +146,8 @@ bool fill_buffer(Context * context, SearchInfo* __restrict info){
 
 bool sobel_scharr_detect(Context * context, SearchInfo* info)
 {
-    #define COEFFA = 3
-    #define COEFFB = 10;
+#define COEFFA = 3
+#define COEFFB = 10;
     const uint32_t w = info->buf_w;
     const uint32_t h = info->buf_h;
     const uint32_t y_end = h - 1;
@@ -158,29 +156,29 @@ bool sobel_scharr_detect(Context * context, SearchInfo* info)
 
     uint8_t * __restrict buf = info->buf;
     uint32_t buf_ix = w + 1;
-    for (uint32_t y = 1; y < y_end; y++){
-        for (uint32_t x = 1; x < x_end; x++){
+    for (uint32_t y = 1; y < y_end; y++) {
+        for (uint32_t x = 1; x < x_end; x++) {
 
             const int gx = -3 * buf[buf_ix - w - 1] + -10 * buf[buf_ix - 1] + -3 * buf[buf_ix + w - 1] + +3 * buf[buf_ix - w + 1] + 10 * buf[buf_ix + 1] +  3 * buf[buf_ix + w + 1];
             const int gy = 3 * buf[buf_ix - w - 1] + 10 * (buf[buf_ix - w]) + 3 * buf[buf_ix - w + 1] + -3 * buf[buf_ix + w - 1] + -10 * (buf[buf_ix + w]) + -3 * buf[buf_ix + w + 1];
             const size_t value = abs(gx) + abs(gy);
-            if (value > threshold){
+            if (value > threshold) {
                 const uint32_t x1 = info->buf_x + x - 1;
                 const uint32_t x2 = info->buf_x + x + 1;
                 const uint32_t y1 = info->buf_y + y - 1;
                 const uint32_t y2 = info->buf_y + y + 1;
 
 
-                if (x1 < info->min_x){
+                if (x1 < info->min_x) {
                     info->min_x = x1;
                 }
-                if (x2 > info->max_x){
+                if (x2 > info->max_x) {
                     info->max_x = x2;
                 }
-                if (y1 < info->min_y){
+                if (y1 < info->min_y) {
                     info->min_y = y1;
                 }
-                if (y2 > info->max_y){
+                if (y2 > info->max_y) {
                     info->max_y = y2;
                 }
             }
@@ -212,11 +210,11 @@ bool check_region(Context * context, int edgeTRBL, float x_1_percent, float x_2_
         x1 = umax(x1,info->max_x);
         x2 = info->w;
     }
-    if (edgeTRBL == 1){
+    if (edgeTRBL == 1) {
         y1 = 0;
         y2 = umin(y2, info->min_y);
     }
-    if (edgeTRBL == 3){
+    if (edgeTRBL == 3) {
         y1 = umax(y1, info->max_y);
         y2 = info->h;
     }
@@ -226,11 +224,11 @@ bool check_region(Context * context, int edgeTRBL, float x_1_percent, float x_2_
     uint32_t min_region_width = (edgeTRBL == 2 || edgeTRBL == 4) ? 3 : 7;
     uint32_t min_region_height = (edgeTRBL == 1 || edgeTRBL == 3) ? 3 : 7;
 
-    while (y2 - y1 < min_region_height){
+    while (y2 - y1 < min_region_height) {
         y1 = umax(0, y1 - 1);
         y2 = umin(info->h, y2 + 1);
     }
-    while (x2 - x1 < min_region_width){
+    while (x2 - x1 < min_region_width) {
         x1 = umax(0, x1 - 1);
         x2 = umin(info->w, x2 + 1);
     }
@@ -248,8 +246,8 @@ bool check_region(Context * context, int edgeTRBL, float x_1_percent, float x_2_
     const uint32_t horizantal_windows = (uint32_t)ceil((float)w / (float)window_width);
 
 
-    for (uint32_t window_row = 0; window_row < vertical_windows; window_row++){
-        for (uint32_t window_column = 0; window_column < horizantal_windows; window_column++){
+    for (uint32_t window_row = 0; window_row < vertical_windows; window_row++) {
+        for (uint32_t window_column = 0; window_column < horizantal_windows; window_column++) {
 
 
             info->buf_x = x1 + (window_width * window_column);
@@ -265,28 +263,26 @@ bool check_region(Context * context, int edgeTRBL, float x_1_percent, float x_2_
 
             const bool excluded_y = (info->min_y <= info->buf_y && info->max_y >= buf_y2);
 
-            if (excluded_x && excluded_y){
+            if (excluded_x && excluded_y) {
                 //Entire window has already been excluded
                 continue;
             }
-            if (excluded_y && info->min_x < buf_x2 && buf_x2 < info->max_x){
+            if (excluded_y && info->min_x < buf_x2 && buf_x2 < info->max_x) {
                 info->buf_w = umax(3, info->min_x - info->buf_x);
-            }
-            else if (excluded_y && info->max_x > info->buf_x && info->buf_x > info->min_x){
+            } else if (excluded_y && info->max_x > info->buf_x && info->buf_x > info->min_x) {
                 info->buf_x = umin(buf_x2 - 3, info->max_x);
                 info->buf_w = buf_x2 - info->buf_x;
 
             }
-            if (excluded_x && info->min_y < buf_y2 && buf_y2 < info->max_y){
+            if (excluded_x && info->min_y < buf_y2 && buf_y2 < info->max_y) {
                 info->buf_h = umax(3, info->min_y - info->buf_y);
-            }
-            else if (excluded_x && info->max_y > info->buf_y && info->buf_y > info->min_y){
+            } else if (excluded_x && info->max_y > info->buf_y && info->buf_y > info->min_y) {
                 info->buf_y = umin(buf_y2 - 3, info->max_y);
                 info->buf_h = buf_y2 - info->buf_y;
             }
 
             if (info->buf_y + info->buf_h > info->h ||
-                info->buf_x + info->buf_w > info->w){
+                    info->buf_x + info->buf_w > info->w) {
                 //We're out of bounds on the image somehow.
                 continue;
             }
