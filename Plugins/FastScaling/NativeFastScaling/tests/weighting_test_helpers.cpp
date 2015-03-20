@@ -10,18 +10,6 @@
 #include "fastscaling_private.h"
 
 
-#ifdef _MSC_VER
-
-
-#include <stdarg.h>
-
-
-#pragma warning(disable : 4996)
-#define snprintf _snprintf
-
-#endif // _MSC_VER
-
-
 bool test_contrib_windows(Context * context, char *msg)
 {
     int bad = -1;
