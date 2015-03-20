@@ -15,7 +15,7 @@ GCC = MACOS ? "gcc-4.9" : "gcc"
 GPP = MACOS ? "g++-4.9" : "g++"
 CXX = ENV['CXX'] || GPP
 CC = ENV['CC'] || GCC
-VALGRIND_OPTS =  MACOS ? "--dsymutil=yes" : ""
+VALGRIND_OPTS =  MACOS ? "--dsymutil=yes --error-exitcode=2" : "--error-exitcode=2"
 
 TRAVIS_USAFE_FLAGS = " -Wfloat-conversion "
 
