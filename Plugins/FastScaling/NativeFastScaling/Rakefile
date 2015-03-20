@@ -119,4 +119,4 @@ task :commit => [:test_with_valgrind, PROFILING_PROGRAM] do
   sh "git commit -v"
 end
 
-register_objects(LIB_OBJECTS + TEST_OBJECTS + SRC_OBJECTS)
+register_objects(LIB_OBJECTS + TEST_OBJECTS + SRC_OBJECTS + THEFT_TEST_OBJECTS)

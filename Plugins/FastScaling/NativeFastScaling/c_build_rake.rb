@@ -68,7 +68,8 @@ end
 def register_objects(object_files)
   object_files.each { |object| CLEAN << object }
   dependency_files = object_files.map { |object_file| object_file.pathmap("%X.d") }
-  dependency_files.each do |dependency_file| 
+  dependency_files.each do |dependency_file|
+    CLEAN << dependency_file
     dependency_file.to_task
     import dependency_file
   end
