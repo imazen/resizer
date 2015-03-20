@@ -21,3 +21,4 @@ script:
   - rake test
   - rake clean
   - rake valgrind
+  - rake test_with_valgrind
