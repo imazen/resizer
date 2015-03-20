@@ -86,7 +86,7 @@ task :test => TEST_PROGRAM do
 end
 
 desc "Run the test program with valgrind"
-valgrind_task("--leak-check=full --show-leak-kinds=all", :test_with_valgrind => TEST_PROGRAM)
+valgrind_task("--leak-check=full --show-leak-kinds=all --error-exitcode=2", :test_with_valgrind => TEST_PROGRAM)
 
 desc "Run theft_test with valgrind"
 valgrind_task("--leak-check=full --show-leak-kinds=all", :theft_test_with_valgrind => "theft_test")

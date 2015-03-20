@@ -1,5 +1,6 @@
 libfastscaling.so
 test_program
+theft_test
 fastscaling
 *.d
 *.o
