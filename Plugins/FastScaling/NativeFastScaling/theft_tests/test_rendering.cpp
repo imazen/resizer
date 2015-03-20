@@ -30,8 +30,8 @@ static theft_trial_res before_and_after_should_match(float * bgra_array) {
     linear_to_luv(copy);
     luv_to_linear(copy);
     for (int i = 0; i < 4; i++) {
-        printf("bgra_array is %f\n", bgra_array[i]);
-        printf("copy       is %f\n\n", copy[i]);
+        //printf("bgra_array is %f\n", bgra_array[i]);
+        //printf("copy       is %f\n\n", copy[i]);
         if (bgra_array[i] != Approx(copy[i])) {
             return THEFT_TRIAL_FAIL;
         }
@@ -55,11 +55,12 @@ void free_bitmap(void * bitmap, void * unused)
 
 
 TEST_CASE("Roundtrip RGB<->LUV property", "[fastscaling][thief]") {
-    theft_seed seed;
-    if (!get_time_seed(&seed)) REQUIRE(false);
     Context context;
     Context_initialize(&context);
-    theft * t = theft_init(0);
+
+    theft_seed seed;
+    if (!get_time_seed(&seed)) REQUIRE(false);
+
 
     theft_type_info bitmap_type_info;
     memset(&bitmap_type_info, 0, sizeof bitmap_type_info);
@@ -73,13 +74,13 @@ TEST_CASE("Roundtrip RGB<->LUV property", "[fastscaling][thief]") {
     cfg.seed = seed;
     cfg.name = __func__;
     cfg.fun = (theft_propfun*)before_and_after_should_match;
-    memset(&(cfg.type_info), 0, sizeof cfg.type_info);
     cfg.type_info[0] = &bitmap_type_info;
-    cfg.trials = 10;
+    cfg.trials = 100000;
     cfg.report = &report;
+
+    theft * t = theft_init(0);
     theft_run_res res = theft_run(t, &cfg);
     theft_free(t);
     printf("\n");
-    FAIL("Balle");
     REQUIRE(THEFT_RUN_PASS == res);
 }
