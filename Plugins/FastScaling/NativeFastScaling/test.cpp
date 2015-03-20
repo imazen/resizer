@@ -25,11 +25,10 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
 
     //Should we even have Renderer_* functions, or just 1 call that does it all?
     //If we add memory use estimation, we should keep Renderer
-    Renderer * r = Renderer_create(&context,source, canvas, details);
 
-    Renderer_perform_render(&context, r);
+    RenderDetails_render(&context,details, source, canvas);
 
-    Renderer_destroy(&context, r);
+    RenderDetails_destroy(&context, details);
 
     BitmapBgra_destroy(&context, source);
     BitmapBgra_destroy(&context, canvas);
@@ -58,11 +57,9 @@ bool test_in_place (int sx, int sy, BitmapPixelFormat sbpp, bool flipx, bool fli
     }
 
 
-    Renderer * p = Renderer_create_in_place (&context,source, details);
+    RenderDetails_render_in_place(&context,details, source);
 
-    Renderer_perform_render(&context, p);
-
-    Renderer_destroy(&context,p);
+    RenderDetails_destroy(&context, details);
 
     BitmapBgra_destroy(&context,source);
 
@@ -342,9 +339,9 @@ SCENARIO("sRGB roundtrip", "[fastscaling]")
         WHEN ("we do stuff") {
 
             RenderDetails* details = RenderDetails_create(&context);
-            Renderer* r = Renderer_create(&context, bit, final, details);
+            CHECK(RenderDetails_render(&context,details, bit, final));
 
-            CHECK(Renderer_perform_render(&context, r));
+
 
             //convert_srgb_to_linear(bit, 0, buf, 0, h);
             //demultiply_alpha(buf, 0, h);
@@ -374,7 +371,8 @@ SCENARIO("sRGB roundtrip", "[fastscaling]")
                 }
                 REQUIRE(exact_match);
             }
-            Renderer_destroy(&context, r);
+            RenderDetails_destroy(&context, details);
+
         }
         BitmapBgra_destroy(&context, final);
         BitmapBgra_destroy(&context, bit);

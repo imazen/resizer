@@ -118,17 +118,16 @@ TEST_CASE_METHOD(Fixture, "Perform Rendering", "[error_handling]")
     initialize_heap(&context);
     BitmapBgra * source = BitmapBgra_create(&context, 4, 4, true, Bgra32);
     BitmapBgra * canvas = BitmapBgra_create(&context, 2, 2, true, Bgra32);
-    RenderDetails * details = RenderDetails_create(&context);
-    details->interpolation = InterpolationDetails_create_from(&context,Filter_CubicFast);
+    RenderDetails * details = RenderDetails_create_with(&context,Filter_CubicFast);
     details->sharpen_percent_goal = 50;
     details->post_flip_x = true;
     details->post_flip_y = false;
     details->post_transpose = false;
-    Renderer * p = Renderer_create(&context, source, canvas, details);
 
     SECTION("Render failure invalid bitmap dimensions for tmp_im") {
         details->halving_divisor = 5;
-        CHECK(Renderer_perform_render(&context, p) == false);
+
+        CHECK(RenderDetails_render(&context, details, source, canvas) == false);
         CHECK(Context_has_error(&context));
         char buffer[1024];
         CAPTURE(Context_error_message(&context, buffer, sizeof(buffer)));
@@ -137,7 +136,7 @@ TEST_CASE_METHOD(Fixture, "Perform Rendering", "[error_handling]")
     }
 
 
-    Renderer_destroy(&context,p);
+    RenderDetails_destroy(&context,details);
     BitmapBgra_destroy(&context,source);
     BitmapBgra_destroy(&context,canvas);
     Context_terminate(&context);
@@ -147,7 +146,7 @@ TEST_CASE_METHOD(Fixture, "Perform Rendering", "[error_handling]")
 TEST_CASE_METHOD(Fixture, "Test allocation failure handling", "[error_handling]")
 {
     using namespace Catch::Generators;
-    int fail_alloc_x = GENERATE( between( 0, 9) );
+    int fail_alloc_x = GENERATE( between( 0, 10) );
 
 
     Context context;
@@ -162,13 +161,13 @@ TEST_CASE_METHOD(Fixture, "Test allocation failure handling", "[error_handling]"
     details->post_flip_x = true;
     details->post_flip_y = false;
     details->post_transpose = false;
-    Renderer * p = Renderer_create(&context, source, canvas, details);
 
     // think about strategies to make it easier to pinpoint which allocation should fail
     details->halving_divisor = 2;
 
     fail_alloc_after(fail_alloc_x);
-    bool result = Renderer_perform_render(&context, p);
+
+    bool result = RenderDetails_render(&context, details, source, canvas);
     CAPTURE(fail_alloc_x);
 
     CAPTURE(alloc_count);
@@ -182,7 +181,7 @@ TEST_CASE_METHOD(Fixture, "Test allocation failure handling", "[error_handling]"
     CHECK(Context_error_reason(&context) == Out_of_memory);
 
 
-    Renderer_destroy(&context,p);
+    RenderDetails_destroy(&context,details);
     BitmapBgra_destroy(&context, source);
     BitmapBgra_destroy(&context, canvas);
     free_lookup_tables();

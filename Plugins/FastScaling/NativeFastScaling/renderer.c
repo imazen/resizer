@@ -27,6 +27,11 @@ typedef struct RendererStruct {
 } Renderer;
 
 
+Renderer * Renderer_create(Context * context, BitmapBgra * source, BitmapBgra * canvas, RenderDetails * details);
+Renderer * Renderer_create_in_place(Context * context, BitmapBgra * editInPlace, RenderDetails * details);
+bool Renderer_perform_render(Context * context, Renderer * r);
+void Renderer_destroy(Context * context, Renderer * r);
+
 
 RenderDetails * RenderDetails_create(Context * context)
 {
