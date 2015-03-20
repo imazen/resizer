@@ -19,9 +19,11 @@ CXXFLAGS=ENV.fetch("CXXFLAGS", "#{COMMON_FLAGS} #{ENV['CI'] ? '' : TRAVIS_USAFE_
 LIB_OBJECTS = FileList[File.absolute_path('lib/*.c')].ext('.o')
 SRC_OBJECTS = FileList[File.absolute_path('src/*.c')].ext('.o')
 TEST_OBJECTS = FileList[File.absolute_path('tests/*.cpp')].ext('.o')
+THEFT_TEST_OBJECTS = FileList[File.absolute_path('theft_tests/*.cpp')].ext('o')
 
 SO_FILE="libfastscaling.so"
 TEST_PROGRAM = "test_program"
+THEFT_TEST_PROGRAM = "theft_test"
 PROFILING_PROGRAM = "fastscaling"
 
 desc "build a fastscaling program"
@@ -69,27 +71,25 @@ task :cachegrind => PROFILING_PROGRAM do |t|
   sh "cg_annotate #{cachegrind_out_file}"
 end
 
-LIB_THEFT = 'libtheft.a'
-# desc "build the theft library"
-# file LIB_THEFT do
-#   cd "theft" do
-#     sh "make"
-#   end
-# end
-
 desc "build the test program"
 file TEST_PROGRAM => TEST_OBJECTS + LIB_OBJECTS do |t|
+  sh "#{CXX} -Werror #{t.prerequisites.join(" ")} -o #{t.name}"
+end
+
+desc "build the theft_test program"
+file "theft_test" => THEFT_TEST_OBJECTS + LIB_OBJECTS do |t|
   sh "#{CXX} -Werror #{t.prerequisites.join(" ")} -ltheft -o #{t.name}"
 end
 
 task :test => TEST_PROGRAM do
-  with_ld_library_path('.') do 
-    sh "./#{TEST_PROGRAM} #{ENV['ARGS']}"
-  end
+  sh "./#{TEST_PROGRAM} #{ENV['ARGS']}"
 end
 
 desc "Run the test program with valgrind"
 valgrind_task("--leak-check=full --show-leak-kinds=all", :test_with_valgrind => TEST_PROGRAM)
+
+desc "Run theft_test with valgrind"
+valgrind_task("--leak-check=full --show-leak-kinds=all", :theft_test_with_valgrind => "theft_test")
 
 desc "Run the test program with valgrind, (without --dsymutil on mac)"
 task :something_else  => TEST_PROGRAM do 

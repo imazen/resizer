@@ -1,5 +1,7 @@
 #include "fastscaling_private.h"
 
+#define CATCH_CONFIG_MAIN // tell catch to generate main
+
 #include "catch.hpp"
 extern "C" {
 #include <theft.h>
@@ -7,6 +9,7 @@ extern "C" {
 #include <assert.h>
 #include <sys/time.h>
 #include <string.h>
+
 
 static bool get_time_seed(theft_seed *seed)
 {
@@ -27,6 +30,8 @@ static theft_trial_res before_and_after_should_match(float * bgra_array) {
     linear_to_luv(copy);
     luv_to_linear(copy);
     for (int i = 0; i < 4; i++) {
+        printf("bgra_array is %f\n", bgra_array[i]);
+        printf("copy       is %f\n\n", copy[i]);
         if (bgra_array[i] != Approx(copy[i])) {
             return THEFT_TRIAL_FAIL;
         }
@@ -70,10 +75,11 @@ TEST_CASE("Roundtrip RGB<->LUV property", "[fastscaling][thief]") {
     cfg.fun = (theft_propfun*)before_and_after_should_match;
     memset(&(cfg.type_info), 0, sizeof cfg.type_info);
     cfg.type_info[0] = &bitmap_type_info;
-    cfg.trials = 10000;
+    cfg.trials = 10;
     cfg.report = &report;
     theft_run_res res = theft_run(t, &cfg);
     theft_free(t);
     printf("\n");
+    FAIL("Balle");
     REQUIRE(THEFT_RUN_PASS == res);
 }
