@@ -12,6 +12,7 @@
 #include "fastscaling_private.h"
 
 #include <string.h>
+#include <assert.h>
 
 
 bool BitmapBgra_convert_srgb_to_linear(Context * context, BitmapBgra * src, uint32_t from_row, BitmapFloat * dest, uint32_t dest_row, uint32_t row_count)
@@ -22,6 +23,8 @@ bool BitmapBgra_convert_srgb_to_linear(Context * context, BitmapBgra * src, uint
     }
 
     //TODO: Ensure that from_row + row_count is not > src->h, and dest_row + row_count is not > dest->h
+    assert(from_row + row_count <= src->h);
+    assert(dest_row + row_count <= dest->h);
     const LookupTables*  t = get_lookup_tables();
     if (t == NULL) {
         CONTEXT_error(context, Out_of_memory);
