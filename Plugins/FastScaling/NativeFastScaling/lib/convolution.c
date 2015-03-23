@@ -286,6 +286,10 @@ SharpenBgraFloatInPlace(float* buf, unsigned int count, double pct,
 
 bool BitmapFloat_sharpen_rows(Context * context, BitmapFloat * im, uint32_t start_row, uint32_t row_count, double pct)
 {
+    if (!(start_row + row_count <= im->h)) {
+        CONTEXT_error(context, Invalid_internal_state);
+        return false;        
+    }
     for (uint32_t row = start_row; row < start_row + row_count; row++) {
         SharpenBgraFloatInPlace(im->pixels + (im->float_stride * row), im->w, pct, im->channels);
     }
