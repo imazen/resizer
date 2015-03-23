@@ -11,9 +11,13 @@
 
 #include "fastscaling_private.h"
 
+
 bool BitmapFloat_linear_to_luv_rows(Context * context, BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count)
 {
-    //TODO: Ensure that start_row + row_count is not > bit->h
+    if (!(start_row + row_count <= bit->h)) {
+        CONTEXT_error(context, Invalid_internal_state);
+        return false;        
+    }
     if ((bit->w * bit->channels) != bit->float_stride) {
         CONTEXT_error(context, Invalid_internal_state);
         return false;
@@ -30,7 +34,10 @@ bool BitmapFloat_linear_to_luv_rows(Context * context, BitmapFloat * bit, const 
 
 bool BitmapFloat_luv_to_linear_rows(Context * context, BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count)
 {
-    //TODO: Ensure that start_row + row_count is not > bit->h
+    if (!(start_row + row_count <= bit->h)) {
+        CONTEXT_error(context, Invalid_internal_state);
+        return false;        
+    }
     if ((bit->w * bit->channels) != bit->float_stride) {
         CONTEXT_error(context, Invalid_internal_state);
         return false;

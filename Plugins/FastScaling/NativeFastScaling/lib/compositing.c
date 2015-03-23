@@ -21,10 +21,10 @@ bool BitmapBgra_convert_srgb_to_linear(Context * context, BitmapBgra * src, uint
         CONTEXT_error(context, Invalid_internal_state);
         return false;
     }
-
-    //TODO: Ensure that from_row + row_count is not > src->h, and dest_row + row_count is not > dest->h
-    assert(from_row + row_count <= src->h);
-    assert(dest_row + row_count <= dest->h);
+    if (!(from_row + row_count <= src->h && dest_row + row_count <= dest->h)) {
+        CONTEXT_error(context, Invalid_internal_state);
+        return false;        
+    }
     const LookupTables*  t = get_lookup_tables();
     if (t == NULL) {
         CONTEXT_error(context, Out_of_memory);
