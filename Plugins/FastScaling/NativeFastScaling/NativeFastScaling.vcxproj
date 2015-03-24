@@ -87,6 +87,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>LIBRARY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CompileAs>CompileAsCpp</CompileAs>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -100,6 +101,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>LIBRARY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CompileAs>CompileAsCpp</CompileAs>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -121,6 +123,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -145,6 +148,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FunctionLevelLinking>false</FunctionLevelLinking>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -155,24 +159,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="bitmap_formats.c" />
-    <ClCompile Include="color.c" />
-    <ClCompile Include="compositing.c" />
-    <ClCompile Include="context.c" />
-    <ClCompile Include="convolution.c" />
-    <ClCompile Include="renderer.c" />
-    <ClCompile Include="scaling.c" />
-    <ClCompile Include="trim_whitespace.c" />
-    <ClCompile Include="weighting.c" />
+    <ClInclude Include="include\fastscaling.h" />
+    <ClInclude Include="include\status_code.h" />
+    <ClInclude Include="lib\color.h" />
+    <ClInclude Include="lib\fastapprox.h" />
+    <ClInclude Include="lib\fastscaling_private.h" />
+    <ClInclude Include="lib\math_functions.h" />
+    <ClInclude Include="lib\trim_whitespace.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="color.h" />
-    <ClInclude Include="fastapprox.h" />
-    <ClInclude Include="fastscaling.h" />
-    <ClInclude Include="fastscaling_private.h" />
-    <ClInclude Include="math_functions.h" />
-    <ClInclude Include="status_code.h" />
-    <ClInclude Include="trim_whitespace.h" />
+    <ClCompile Include="lib\bitmap_formats.c" />
+    <ClCompile Include="lib\color.c" />
+    <ClCompile Include="lib\compositing.c" />
+    <ClCompile Include="lib\context.c" />
+    <ClCompile Include="lib\convolution.c" />
+    <ClCompile Include="lib\renderer.c" />
+    <ClCompile Include="lib\scaling.c" />
+    <ClCompile Include="lib\trim_whitespace.c" />
+    <ClCompile Include="lib\weighting.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

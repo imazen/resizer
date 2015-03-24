@@ -97,7 +97,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalOptions>/d2Zi+ %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\NativeFastScaling</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\NativeFastScaling\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -110,7 +110,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(ProjectDir)\NativeFastScaling</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\NativeFastScaling\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -132,7 +132,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <CompileAsManaged>true</CompileAsManaged>
       <AdditionalOptions>/Qvec-report:2 /d2Zi+ %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\NativeFastScaling</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\NativeFastScaling\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -152,7 +152,7 @@
       <Optimization>Full</Optimization>
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(ProjectDir)\NativeFastScaling</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\NativeFastScaling\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
