@@ -239,7 +239,16 @@ namespace ImageResizer.Plugins.LicenseVerifier {
 
             if (s.destBitmap != null && ShouldDisplayDot(c, s))
             {
-                s.destBitmap.SetPixel(s.destBitmap.Width - 1, s.destBitmap.Height - 1, Color.Red);
+                int w = s.destBitmap.Width;
+                int h = s.destBitmap.Height;
+                int dot_w = 3;
+                int dot_h = 3;
+                if (w > dot_w && h > dot_h)
+                {
+                    for (int y = 0; y < dot_h; y++)
+                        for (int x = 0; x < dot_w; x++ )
+                            s.destBitmap.SetPixel(w - 1 - x, h - 1 - y, Color.Red);
+                }
             }
             return RequestedAction.None;
         }
