@@ -74,8 +74,10 @@ namespace ImageResizer.Configuration {
             new ImageResizer.Plugins.Basic.NoCache().Install(this);
             new ImageResizer.Plugins.Basic.ClientCache().Install(this);
             new ImageResizer.Plugins.Basic.Diagnostic().Install(this);
+            
             if (isAspNet)
             {
+                new ImageResizer.Plugins.Basic.WebConfigLicenseReader().Install(this);
                 new ImageResizer.Plugins.Basic.SizeLimiting().Install(this);
                 new ImageResizer.Plugins.Basic.MvcRoutingShimPlugin().Install(this);
             }

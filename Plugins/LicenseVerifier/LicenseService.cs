@@ -4,152 +4,257 @@
 // Licensed under the GNU Affero General Public License, Version 3.0.
 // Commercial licenses available at http://imageresizing.net/
 ﻿using ImageResizer.Configuration;
-using ImageResizer.Plugins.LicenseVerifier.Async;
-using ImageResizer.Plugins.LicenseVerifier.Http;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Collections.Concurrent;
+using System.Linq;
+using System.Threading;
+using System.Numerics;
+using ImageResizer.Configuration.Issues;
+using ImageResizer.Resizing;
+using System.Drawing;
 
 namespace ImageResizer.Plugins.LicenseVerifier {
     
-    public class LicenseService : ILicenseService {
 
-        private readonly IHttpClient httpClient;
 
-        private readonly object lockFeatures = new object();
-
-        private readonly Dictionary<string, Dictionary<Guid, FeatureState>> featureStates;
-        public IDictionary<string, Dictionary<Guid, FeatureState>> FeatureStates { get { return featureStates; } }
-
-        private readonly Dictionary<string, List<Guid>> pendingFeatures;
-        public IDictionary<string, List<Guid>> PendingFeatures { get { return pendingFeatures; } }
-
-        private Config config;
-
-        public Guid AppId { get; set; }
-        public Uri LicensingUrl { get; set; }
-        public string PublicKeyXml { get; set; }
-        public TimeSpan VerificationInterval { get; set; }
-        public string LicenseCacheFilePattern { get; set; }
-
-        public LicenseService(IHttpClient httpClient) {
-            this.httpClient = httpClient;
-
-            featureStates = new Dictionary<string, Dictionary<Guid, FeatureState>>(StringComparer.OrdinalIgnoreCase);
-            pendingFeatures = new Dictionary<string, List<Guid>>(StringComparer.OrdinalIgnoreCase);
-
-            VerificationInterval = new TimeSpan(0, 10, 0);//10 mins
+    internal class LicenseService  {
+        IEnumerable<ILicenseProvider> licenseSources;
+        RSADecryptPublic rsa;
+        IIssueReceiver sink;
+        public LicenseService(IEnumerable<ILicenseProvider> licenseSources,  BigInteger keyMod, BigInteger keyExponent, IIssueReceiver sink){
+            rsa = new RSADecryptPublic(keyMod, keyExponent);
+            this.sink = sink;
+            this.licenseSources = licenseSources;
         }
 
-        /// <summary>
-        /// Notify the license service that the given feature is being used for the given domain. 
-        /// </summary>
-        /// <param name="domain">The domain the feature is used for.</param>
-        /// <param name="feature">The feature being used.</param>
-        public void NotifyUse(string domain, Guid feature) {
-            domain = NormalizeDomain(domain);
-
-            FeatureState state;
+        bool licenseProblems = false;
+ 
+        public IDictionary<string, ISet<string>> CollectDomainFeatures(){
+            Dictionary<string, ISet<string>> dict = new Dictionary<string,ISet<string>>(StringComparer.OrdinalIgnoreCase);
             
-            lock (lockFeatures) {
-                // Find out what the state of this feature is in the local cache, or initialize to Pending if unknown.
-                Dictionary<Guid, FeatureState> features;
-                if (!featureStates.TryGetValue(domain, out features)) {
-                    features = new Dictionary<Guid, FeatureState>();
-                    featureStates[domain] = features;
-                }
+            foreach(var source in licenseSources){
+                var rawLicenses = source.GetLicenses();
+                foreach (string rawLicense in rawLicenses){
+                    try{
+                        var blob = LicenseBlob.Deserialize(rawLicense);
+                        StringBuilder log = new StringBuilder();
+                        bool valid_signature = new LicenseValidator().Validate(blob, rsa, log);
+                        bool expired = blob.Details.Expires < DateTime.UtcNow;
+                        bool invalid_time = blob.Details.Issued > DateTime.UtcNow;
 
-                if (!features.TryGetValue(feature, out state)) {
-                    features[feature] = state = FeatureState.Pending;
+                        if (expired || invalid_time)
+                        {
+                            sink.AcceptIssue(new Issue("License key " + (expired ? "has expired: " : "was issued in the future; check system clock: ") + blob.Details.Domain, IssueSeverity.Warning));
+                        }
+                        if (!valid_signature){
+                            sink.AcceptIssue(new Issue("Invalid license key: failed to validate signature.",log.ToString(), IssueSeverity.Error));
+                        }
+                        if (valid_signature && !invalid_time && !expired){
 
-                    //Add to shortlist pendingFeatures
-                    List<Guid> forDomain;
-                    if (!pendingFeatures.TryGetValue(domain, out forDomain)) {
-                        forDomain = new List<Guid>();
-                        pendingFeatures[domain] = forDomain;
+                            dict[blob.Details.Domain] = new HashSet<string>(Enumerable.Concat(blob.Details.Features, dict.ContainsKey(blob.Details.Domain) ?  dict[blob.Details.Domain]  : Enumerable.Empty<string>()));
+                        }
+                        else
+                        {
+                            licenseProblems = true;
+                        }
+                    }catch (Exception e){
+                        sink.AcceptIssue(new Issue("Error parsing & validating license key: " + e.Message,e.StackTrace, IssueSeverity.Error));
+                        licenseProblems = true;
                     }
-                    forDomain.Add(feature);
                 }
             }
+            return dict;
 
-            // TODO: Mark the request if feature license invalid. We'll deal with it later.
-
-            PingBackgroundVerification();
         }
 
-        public void SetFriendlyName(Guid id, string featureDisplayName) {
-            throw new NotImplementedException();
+        public void InvalidateLicenseCache(){
+           lock(_cacheLock){
+               _cachedFeatures = null;
+           }
         }
 
-        public long VerifyAuthenticity(Guid feature) {
-            throw new NotImplementedException();
+        IDictionary<string, ISet<string>> _cachedFeatures = null;
+        object _cacheLock = new object();
+        internal IDictionary<string, ISet<string>> LicensedFeatures{
+            get{
+                if (_cachedFeatures == null){
+                    lock(_cacheLock){
+                        if (_cachedFeatures == null) _cachedFeatures = CollectDomainFeatures();
+                    }
+                }
+                return _cachedFeatures;
+            }
         }
 
-        public string GetLicensingOverview(bool forceVerification) {
-            throw new NotImplementedException();
+        public bool CheckFeaturesLicensed(string domain, IEnumerable<IEnumerable<string>> require_one_from_each_collection, bool alsoRequireCleanLicenses)
+        {
+            if (alsoRequireCleanLicenses && licenseProblems) return false;
+            
+            var norm = NormalizeDomain(domain);
+
+            ISet<string> domain_features;
+            bool found = false;
+            if (LicensedFeatures.TryGetValue(norm, out domain_features))
+            {
+                found = require_one_from_each_collection.All(coll => domain_features.Intersect(coll).Count() > 0);
+            }
+            if (!found)
+            {
+                sink.AcceptIssue(new Issue(string.Format("No license found for domain {0} - features installed: {1}", domain, String.Join(" AND ", require_one_from_each_collection.Select(coll => String.Join(" or ", coll)))), IssueSeverity.Error));
+            }
+            return found;
         }
 
-        /// <summary>
-        /// Installs the plugin in the specified Config instance. The plugin must handle all the work of loading settings, registering the plugin etc.
-        /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        public IPlugin Install(Config c) {
-            config = c;
+
+        ConcurrentDictionary<string, string> normalized_domains = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public string NormalizeDomain(string domain)
+        {
+            var licensed = LicensedFeatures;
+            if (licensed.ContainsKey(domain)) return domain;
+            
+            string normal;
+            if (normalized_domains.TryGetValue(domain, out normal)) return normal;
+
+            normal = domain.ToLowerInvariant(); 
+            ///Deal with localhost, IP addresses, etc, hosts file
+
+            if (!licensed.ContainsKey(normal))
+            {
+                //Try to find the first licensed that is a subset of the provided domain
+                normal = licensed.Keys.Where(d => normal.EndsWith(d, StringComparison.Ordinal)).FirstOrDefault(d => normal.EndsWith("." + d, StringComparison.Ordinal)) ?? normal;
+            }
+            normalized_domains[domain] = normal;
+            return normal;
+        }
+
+        public string GetLicensedFeaturesDescription()
+        {
+            return String.Join("\n",LicensedFeatures.Select(pair => String.Format("{0} => {1}", pair.Key, String.Join(" ", pair.Value))));
+        }
+
+
+    }
+    internal class LicenseEnforcer<T> : BuilderExtension, IPlugin
+    {
+
+        public LicenseEnforcer(){}
+
+        //Map plugin names to feature sets?
+        //ILicensedPlugin -> feature code strings
+
+        private string pubkey_exponent = "65537";
+        private string pubkey_modulus = "28178177427582259905122756905913963624440517746414712044433894631438407111916149031583287058323879921298234454158166031934230083094710974550125942791690254427377300877691173542319534371793100994953897137837772694304619234054383162641475011138179669415510521009673718000682851222831185756777382795378538121010194881849505437499638792289283538921706236004391184253166867653735050981736002298838523242717690667046044130539971131293603078008447972889271580670305162199959939004819206804246872436611558871928921860176200657026263241409488257640191893499783065332541392967986495144643652353104461436623253327708136399114561";
+
+        private Configuration.Config c;
+        private LicenseService GetService(Configuration.Config c)
+        {
+            return new LicenseService(c.Plugins.GetAll<ILicenseProvider>().ToList(), BigInteger.Parse(pubkey_modulus), BigInteger.Parse(pubkey_exponent), c.configurationSectionIssues);
+        }
+
+        private Dictionary<string, string> GetDomainMappings(Configuration.Config c)
+        {
+            Dictionary<string, string> mappings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var n = c.getNode("licenses");
+            if (n == null) return mappings;
+            foreach (var map in n.childrenByName("maphost"))
+            {
+                var from = map.Attrs["from"];
+                var to = map.Attrs["to"];
+                if (from == null || to == null)
+                {
+                    c.configurationSectionIssues.AcceptIssue(new Issue("Both from= and to= attributes are required on maphost: " + map.ToString(), IssueSeverity.ConfigurationError));
+
+                }
+                else
+                {
+                    from = from.ToLowerInvariant();
+                    if (from.Replace(".local", "").IndexOf('.') > -1)
+                    {
+                        c.configurationSectionIssues.AcceptIssue(new Issue("You can only map non-public hostnames to arbitrary licenses. Skipping " + from, IssueSeverity.ConfigurationError));
+                    }
+                    else
+                    {
+                        mappings[from] = to;
+                    }
+                }
+            }
+            return mappings;
+        }
+
+        private void LogLicenseConfiguration(Configuration.Config c)
+        {
+            if (_mappings.Count > 0){
+                //TODO: make informational
+                c.configurationSectionIssues.AcceptIssue(new Issue("You have local host mappings in place", String.Join(", ", _mappings.Select(pair => string.Format("{0} => {1}", pair.Key, pair.Value))), IssueSeverity.Warning));
+            }
+
+            var licenses = _service.GetLicensedFeaturesDescription();
+
+            if (licenses.Length > 0)
+            {
+                //TODO: make informational
+                c.configurationSectionIssues.AcceptIssue(new Issue("You have licenses in place", licenses, IssueSeverity.Warning));
+            }
+        }
+
+        DateTime first_request = DateTime.MinValue;
+        int invalidated_count = 0;
+        LicenseService _service = null;
+        IEnumerable<IEnumerable<string>> _installed_features;
+        Dictionary<string, string> _mappings;
+        private bool ShouldDisplayDot(Configuration.Config c, ImageState s)
+        {
+            //We want to invalidate the caches after 5 and 30 seconds.
+            if (first_request == DateTime.MinValue) first_request = DateTime.UtcNow;
+            bool invalidate = invalidated_count == 0 && DateTime.UtcNow - first_request > TimeSpan.FromSeconds(5) ||
+                invalidated_count == 1 && DateTime.UtcNow - first_request > TimeSpan.FromSeconds(30);
+
+
+            if (invalidate) invalidated_count++;
+
+            //Cache a LicenseService and nested enumeration of installed feature codes
+            if (_service == null || invalidate) _service = GetService(c);
+            if (_installed_features == null|| invalidate) _installed_features = c.Plugins.GetAll<ILicensedPlugin>().Select(p => p.LicenseFeatureCodes).ToList();
+            if (_mappings == null|| invalidate) _mappings = GetDomainMappings(c);
+
+            if (invalidated_count == 1) LogLicenseConfiguration(c);
+
+            var domain = System.Web.HttpContext.Current.Request.UserHostName;
+            
+            //Handles remapping
+            if (_mappings.ContainsKey(domain))
+            {
+                domain = _mappings[domain];
+            }
+
+            return !_service.CheckFeaturesLicensed(domain, _installed_features, false); //show an error if there are any issues parsing a lc
+
+        }
+
+
+        protected override RequestedAction PreFlushChanges(ImageState s)
+        {
+
+            if (s.destBitmap != null && ShouldDisplayDot(c, s))
+            {
+                s.destBitmap.SetPixel(s.destBitmap.Width - 1, s.destBitmap.Height - 1, Color.Red);
+            }
+            return RequestedAction.None;
+        }
+
+        public IPlugin Install(Configuration.Config c)
+        {
+            this.c = c;
             c.Plugins.add_plugin(this);
-            // TODO: Read config for initial settings
             return this;
         }
 
-        /// <summary>
-        /// The LicenseService cannot be uninstalled.
-        /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        public bool Uninstall(Config c) {
-            return false;
-        }
-
-        private string NormalizeDomain(string domain) {
-            //lowercase
-            domain = domain.ToLowerInvariant();
-            
-            //Strip www prefix off.
-            if (domain.StartsWith("www.")) domain = domain.Substring(4);
-
-            return domain;
-        }
-
-        private DateTime lastScheduledVerification = DateTime.MinValue;
-        private DateTime lastEndedVerification = DateTime.MinValue;
-        private object lockStart = new object();
-
-        private void PingBackgroundVerification() {
-            var now = DateTime.UtcNow;
-            if (lastEndedVerification >= lastScheduledVerification && lastScheduledVerification + VerificationInterval < now && lastEndedVerification + VerificationInterval < now) {
-                lock (lockStart) {
-                    if (lastScheduledVerification + VerificationInterval > now) return; //Exit from race condition.
-                    lastScheduledVerification = now;
-                    var appId = GetAppId();
-                    //var verifyAction = new VerifyAction(httpClient, appId, pendingFeatures);
-                    //verifyAction.Finished += verifyAction_Finished;
-                    //verifyAction.Begin(); //If it failed to queue, we'll get it next time.
-                }
-            }
-        }
-
-        private void verifyAction_Finished(object sender, ActionFinishedEventArgs e) {
-            lastEndedVerification = DateTime.UtcNow;
-        }
-
-        private Guid GetAppId() {
-            if (config == null) throw new Exception("Please install the LicenseService plugin into a config before using.");
-
-            string appStr = config.get("licenses.auto.appId", null);
-
-            if (string.IsNullOrEmpty(appStr)) return Guid.Empty;
-
-            return new Guid(appStr);
+        public bool Uninstall(Configuration.Config c)
+        {
+            c.Plugins.remove_plugin(this);
+            return true;
         }
     }
 }

@@ -83,6 +83,7 @@
     <Compile Include="Plugins\Basic\StopRoutingRoute.cs" />
     <Compile Include="Plugins\IAsyncResponsePlan.cs" />
     <Compile Include="Plugins\IAsyncTyrantCache.cs" />
+    <Compile Include="Plugins\ILicensedPlugin.cs" />
     <Compile Include="Plugins\IProfiler.cs" />
     <Compile Include="Plugins\IVirtualFileAsync.cs" />
     <Compile Include="Plugins\IVirtualFileCacheAsync.cs" />
@@ -146,8 +147,7 @@
     <Compile Include="Plugins\Basic\Presets.cs" />
     <Compile Include="Plugins\Basic\SpeedOrQuality.cs" />
     <Compile Include="Plugins\ICurrentConfigProvider.cs" />
-    <Compile Include="Plugins\ILicenseService.cs" />
-    <Compile Include="Plugins\ILicenseStore.cs" />
+    <Compile Include="Plugins\ILicenseProvider.cs" />
     <Compile Include="Plugins\IRedactDiagnostics.cs" />
     <Compile Include="Plugins\IVirtualFileSourceCacheKey.cs" />
     <Compile Include="Plugins\IVirtualFileCache.cs" />
@@ -169,6 +169,7 @@
     <Compile Include="Plugins\Basic\SizeLimiting.cs" />
     <Compile Include="Plugins\IVirtualFile.cs" />
     <Compile Include="Plugins\IVirtualImageProvider.cs" />
+    <Compile Include="Plugins\WebConfigLicenseReader.cs" />
     <Compile Include="Resizing\AbstractImageProcessor.cs" />
     <Compile Include="Resizing\BoxPadding.cs" />
     <Compile Include="Enumerations.cs" />
