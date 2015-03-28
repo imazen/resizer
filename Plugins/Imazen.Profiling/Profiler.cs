@@ -72,7 +72,8 @@ namespace Imazen.Profiling
 
         public bool IsRunning(string segmentName)
         {
-            return VisibleCallstack.Any((n) => n.SegmentName == segmentName);
+            var name = ProfilingNode.NormalizeNodeName(segmentName);
+            return VisibleCallstack.Any((n) => n.SegmentName == name);
         }
 
         public virtual void Stop(string segmentName, bool assertStarted = true, bool stopChildren = false)
@@ -81,17 +82,20 @@ namespace Imazen.Profiling
         }
         public virtual void StopAt(long ticks, string segmentName, bool assertStarted = true, bool stopChildren = false)
         {
+        	var normalized_name = ProfilingNode.NormalizeNodeName(segmentName);
             if (stopChildren){
-                var topmost = VisibleCallstack.First((n) => n.SegmentName == segmentName);
+                var topmost = VisibleCallstack.First((n) => n.SegmentName == normalized_name);
                 if (topmost != null)
                 {
-                    var children = VisibleCallstack.TakeWhile((n) => n.SegmentName != segmentName).ToArray();
+                    var children = VisibleCallstack.TakeWhile((n) => n.SegmentName != normalized_name).ToArray();
                     children.Select((n) => { StopAt(ticks,n.SegmentName, true, false); return n; });
                     StopAt(ticks,segmentName, assertStarted, false);
-                }else if (assertStarted) throw new InvalidOperationException(string.Format("The given profiling segment {0} is not running anywhere in the callstack; it cannot be stopped.", segmentName));
+                }
+                else if (assertStarted) throw new InvalidOperationException(string.Format("The given profiling segment {0} is not running anywhere in the callstack; it cannot be stopped.", normalized_name));
             
             }else{
-                if (callstack.Peek().SegmentName == segmentName){
+                if (callstack.Peek().SegmentName == normalized_name)
+                {
                     var n = callstack.Pop();
                     n.StopAt(ticks);
                     if (n.Drop) return; 
@@ -102,7 +106,8 @@ namespace Imazen.Profiling
                     else
                         RootNode.AddChild(n);
 
-                }else if (assertStarted) throw new InvalidOperationException(string.Format("The given profiling segment {0} is not running at the top of the callstack; it cannot be stopped.", segmentName));
+                }
+                else if (assertStarted) throw new InvalidOperationException(string.Format("The given profiling segment {0} is not running at the top of the callstack; it cannot be stopped.", normalized_name));
             }
         }
     

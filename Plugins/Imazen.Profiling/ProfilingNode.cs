@@ -89,6 +89,14 @@ namespace Imazen.Profiling
             return n;
         }
 
+        public static string NormalizeNodeName(string name){
+            if (name.IndexOf("[", StringComparison.OrdinalIgnoreCase) > -1)
+            {
+                name = name.Replace("[drop]", "").Replace("[isolate]", "").Trim();
+            }
+            return name;
+        }
+
 
         public void AddChild(ProfilingNode n)
         {
