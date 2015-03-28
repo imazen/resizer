@@ -24,7 +24,7 @@ namespace ImageResizer.Plugins.SourceDiskCache
     /// <summary>
     /// Like DiskCache, but for source files. Not advisable if your source image collection is larger than available local storage.
     /// </summary>
-    public class SourceDiskCachePlugin : IVirtualFileCache, IPlugin, ILoggerProvider, IVirtualFileCacheAsync
+    public class SourceDiskCachePlugin : IVirtualFileCache, IPlugin, ILoggerProvider, IVirtualFileCacheAsync, ILicensedPlugin
     {
         /// <summary>
         /// Creates a new instance of SourceDiskCache
@@ -311,5 +311,12 @@ namespace ImageResizer.Plugins.SourceDiskCache
 
 
 
+        /// <summary>
+        /// Returns the license key feature codes that are able to activate this plugins.
+        /// </summary>
+        public IEnumerable<string> LicenseFeatureCodes
+        {
+            get { yield return "R4Performance"; yield return "R4SourceDiskCache"; }
+        }
     }
 }

@@ -28,8 +28,16 @@ namespace ImageResizer.Storage
         public bool? Exists { get; set; }
         public DateTime? LastModifiedDateUtc { get; set; } 
     }
-    public abstract class BlobProviderBase : IPlugin,IVirtualImageProviderAsync, IVirtualImageProvider, IVirtualImageProviderVpp, IRedactDiagnostics
+    public abstract class BlobProviderBase : IPlugin,IVirtualImageProviderAsync, IVirtualImageProvider, IVirtualImageProviderVpp, IRedactDiagnostics, ILicensedPlugin
     {
+        /// <summary>
+        /// Returns the license key feature codes that are able to activate this plugins.
+        /// </summary>
+        public IEnumerable<string> LicenseFeatureCodes
+        {
+            get { yield return "R4Performance"; yield return "R4BlobProviders"; }
+        }
+
         public BlobProviderBase()
         {
             this.UntrustedData = false;
@@ -264,8 +272,8 @@ namespace ImageResizer.Storage
 
             c.Pipeline.PostAuthorizeRequestStart +=Pipeline_PostAuthorizeRequestStart; 
             c.Pipeline.RewriteDefaults +=Pipeline_RewriteDefaults;
-            c.Pipeline.PostRewrite +=Pipeline_PostRewrite; 
-
+            c.Pipeline.PostRewrite +=Pipeline_PostRewrite;
+            c.Plugins.GetOrInstall<ImageResizer.Plugins.LicenseVerifier.LicenseEnforcer<BlobProviderBase>>();
             return this;
         }
 

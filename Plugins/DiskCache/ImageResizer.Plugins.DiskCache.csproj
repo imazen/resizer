@@ -50,11 +50,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\LicenseVerifier\LicenseService.cs">
+      <Link>LicenseService.cs</Link>
+    </Compile>
+    <Compile Include="..\LicenseVerifier\LicenseVerifier.cs">
+      <Link>LicenseVerifier.cs</Link>
     </Compile>
     <Compile Include="Async\AsyncWriteCollection.cs" />
     <Compile Include="Async\AsyncWrite.cs" />

@@ -15,7 +15,7 @@ using ImageResizer.Plugins.DiskCache;
 using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins.SourceMemCache {
-    public class SourceMemCachePlugin: IPlugin, IVirtualFileCache , IVirtualFileCacheAsync{
+    public class SourceMemCachePlugin: IPlugin, IVirtualFileCache, IVirtualFileCacheAsync, ILicensedPlugin{
 
         /// <summary>
         /// Defaults to 10MB limit, and samples usage over the last 10 minutes when deciding what to remove. Stuff not used in the last 10 minutes gets discarded even if the limit hasn't been reached.
@@ -99,8 +99,13 @@ namespace ImageResizer.Plugins.SourceMemCache {
             c.Plugins.remove_plugin(this);
             return true;
         }
-
-
+        /// <summary>
+        /// Returns the license key feature codes that are able to activate this plugins.
+        /// </summary>
+        public IEnumerable<string> LicenseFeatureCodes
+        {
+            get { yield return "R4Performance"; yield return "R4SourceMemCache"; }
+        }
 
     }
     /// <summary>

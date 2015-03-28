@@ -15,9 +15,15 @@ using ImageResizer.ExtensionMethods;
 using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins.MemCache {
-    public class MemCachePlugin:IPlugin,ICache, IAsyncTyrantCache {
+    public class MemCachePlugin:IPlugin,ICache, IAsyncTyrantCache, ILicensedPlugin {
 
-
+        /// <summary>
+        /// Returns the license key feature codes that are able to activate this plugins.
+        /// </summary>
+        public IEnumerable<string> LicenseFeatureCodes
+        {
+            get { yield return "R4Performance"; yield return "R4MemCache"; }
+        }
         
         /// <summary>
         /// Defaults to 10MB limit, and samples usage over the last 10 minutes when deciding what to remove. Stuff not used in the last 10 minutes gets discarded even if the limit hasn't been reached.

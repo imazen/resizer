@@ -18,7 +18,7 @@ namespace ImageResizer.Plugins.Watermark
     /// <summary>
     /// Provides extensibility points for drawing watermarks and even modifying resizing/image settings
     /// </summary>
-    public class WatermarkPlugin : LegacyWatermarkFeatures, IPlugin, IQuerystringPlugin
+    public class WatermarkPlugin : LegacyWatermarkFeatures, IPlugin, IQuerystringPlugin, ILicensedPlugin
     {
         /// <summary>
         /// Creates a new instance of the watermark plugin.
@@ -68,6 +68,7 @@ namespace ImageResizer.Plugins.Watermark
             this.OtherImages.ConfigInstance = c;
             _namedWatermarks = ParseWatermarks(c.getConfigXml().queryFirst("watermarks"), ref _defaultImageQuery, ref _otherImages);
             c.Pipeline.PostRewrite += Pipeline_PostRewrite;
+            c.Plugins.GetOrInstall<LicenseVerifier.LicenseEnforcer<WatermarkPlugin>>();
             return this;
         }
 
@@ -302,6 +303,13 @@ namespace ImageResizer.Plugins.Watermark
 
             string[] parts = watermark.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
             return parts;
+        }
+        /// <summary>
+        /// Returns the license key feature codes that are able to activate this plugins.
+        /// </summary>
+        public IEnumerable<string> LicenseFeatureCodes
+        {
+            get { yield return "R4Creative"; yield return "R4Watermark"; }
         }
     }
 }

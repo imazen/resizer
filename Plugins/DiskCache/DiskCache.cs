@@ -34,8 +34,9 @@ namespace ImageResizer.Plugins.DiskCache
     /// <summary>
     /// Provides methods for creating, maintaining, and securing the disk cache. 
     /// </summary>
-    public class DiskCache: IAsyncTyrantCache, ICache, IPlugin, IIssueProvider, ILoggerProvider
+    public class DiskCache: IAsyncTyrantCache, ICache, IPlugin, IIssueProvider, ILoggerProvider, ILicensedPlugin
     {
+
         private int subfolders = 8192;
         /// <summary>
         /// Controls how many subfolders to use for disk caching. Rounded to the next power of to. (1->2, 3->4, 5->8, 9->16, 17->32, 33->64, 65->128,129->256,etc.)
@@ -206,6 +207,7 @@ namespace ImageResizer.Plugins.DiskCache
             Start();
             c.Pipeline.AuthorizeImage += Pipeline_AuthorizeImage;
             c.Plugins.add_plugin(this);
+            c.Plugins.GetOrInstall<ImageResizer.Plugins.LicenseVerifier.LicenseEnforcer<DiskCache>>();
             return this;
         }
 
@@ -304,12 +306,12 @@ namespace ImageResizer.Plugins.DiskCache
             return Started;//Add support for nocache
         }
 
+        
 
         public void Process(HttpContext context, IResponseArgs e) {
             if (this.AsyncModuleMode) throw new InvalidOperationException("DiskCache cannot be used in synchronous mode if AsyncModuleMode=true");
             CacheResult r = Process(e);
             context.Items["FinalCachedFile"] = r.PhysicalPath;
-
             if (r.Data == null) {
 
                 //Calculate the virtual path
@@ -452,7 +454,15 @@ namespace ImageResizer.Plugins.DiskCache
 
             return issues;
         }
-    
 
+
+
+        /// <summary>
+        /// Returns the license key feature codes that are able to activate this plugins.
+        /// </summary>
+        public IEnumerable<string> LicenseFeatureCodes
+        {
+            get { yield return "R4Performance"; yield return "R4DiskCache"; }
+        }
     }
 }
