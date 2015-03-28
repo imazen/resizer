@@ -85,15 +85,15 @@ namespace ImageResizer.Plugins.CopyMetadata.Tests
                 
                 // PropertyTagOrientation
                 Assert.True(state.sourceBitmap.PropertyItems.Any( prop => prop.Id == 0x0112));
-                Assert.None(state.destBitmap.PropertyItems, prop => prop.Id == 0x0112);
+                Assert.False(state.destBitmap.PropertyItems.Any(prop => prop.Id == 0x0112));
 
                 // PropertyTagXResolution
                 Assert.True(state.sourceBitmap.PropertyItems.Any(prop => prop.Id == 0x011A));
-                Assert.None(state.destBitmap.PropertyItems, prop => prop.Id == 0x011A);
+                Assert.False(state.destBitmap.PropertyItems.Any(prop => prop.Id == 0x011A));
 
                 // PropertyTagYResolution
                 Assert.Single(state.sourceBitmap.PropertyItems, prop => prop.Id == 0x011B);
-                Assert.None(state.destBitmap.PropertyItems, prop => prop.Id == 0x011B);
+                Assert.False(state.destBitmap.PropertyItems.Any(prop => prop.Id == 0x011B));
             }
         }
 
