@@ -206,6 +206,8 @@ namespace ImageResizer.Plugins.LicenseVerifier {
         Dictionary<string, string> _mappings;
         private bool ShouldDisplayDot(Configuration.Config c, ImageState s)
         {
+            if (c == null || c.configurationSectionIssues == null || System.Web.HttpContext.Current == null) return false;
+
             //We want to invalidate the caches after 5 and 30 seconds.
             if (first_request == DateTime.MinValue) first_request = DateTime.UtcNow;
             bool invalidate = invalidated_count == 0 && DateTime.UtcNow - first_request > TimeSpan.FromSeconds(5) ||
