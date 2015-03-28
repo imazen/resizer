@@ -15,6 +15,7 @@ using ImageResizer.Storage;
 using ImageResizer.ExtensionMethods;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Azure;
 
 namespace ImageResizer.Plugins.AzureReader2 {
 
