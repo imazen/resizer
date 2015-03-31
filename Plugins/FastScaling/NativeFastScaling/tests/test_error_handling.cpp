@@ -194,6 +194,7 @@ TEST_CASE_METHOD(Fixture, "Test allocation failure handling", "[error_handling]"
     BitmapBgra_destroy(&context, source);
     BitmapBgra_destroy(&context, canvas);
     free_lookup_tables();
+    Context_terminate (&context);
 }
 
 TEST_CASE_METHOD(Fixture, "Creating BitmapBgra", "[error_handling]")
@@ -249,6 +250,7 @@ TEST_CASE("Context", "[error_handling]")
         REQUIRE(std::string("Error in file: (null) line: -1 status_code: 0 reason: Status code lookup not implemented")
                 == Context_error_message(&context, error_msg, sizeof error_msg));
     }
+    Context_terminate (&context);
 }
 
 TEST_CASE("Argument checking for convert_sgrp_to_linear", "[error_handling]")
@@ -265,4 +267,41 @@ TEST_CASE("Argument checking for convert_sgrp_to_linear", "[error_handling]")
     CAPTURE(*dest);
     REQUIRE(dest->float_count == 4); // 1x1x4 channels
     BitmapFloat_destroy(&context,dest);
+    Context_terminate (&context);
 }
+
+TEST_CASE ("Test stacktrace serialization", "[error_handling]")
+{
+    using namespace Catch::Generators;
+    Context context;
+    Context_initialize (&context);
+    CONTEXT_error (&context, Out_of_memory);
+    CONTEXT_add_to_callstack (&context);
+    CONTEXT_add_to_callstack (&context);
+    CONTEXT_add_to_callstack (&context);
+    CONTEXT_add_to_callstack (&context);
+    CONTEXT_add_to_callstack (&context);
+    CONTEXT_add_to_callstack (&context);
+    CONTEXT_add_to_callstack (&context);
+    CONTEXT_add_to_callstack (&context);
+    CONTEXT_add_to_callstack (&context);
+    CONTEXT_add_to_callstack (&context);
+    CONTEXT_add_to_callstack (&context);
+
+
+    int stacktrace_buffer_size = GENERATE (between (1, 8)) * 32;
+
+    char * stacktrace = (char *) malloc (stacktrace_buffer_size);
+
+    CAPTURE (stacktrace_buffer_size);
+    CAPTURE (Context_stacktrace (&context, stacktrace, 1024));
+
+
+    free (stacktrace);
+
+
+    Context_terminate (&context);
+}
+
+
+

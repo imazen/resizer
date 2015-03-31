@@ -50,6 +50,27 @@ const char * Context_error_message(Context * context, char * buffer, size_t buff
     return buffer;
 }
 
+const char * Context_stacktrace (Context * context, char * buffer, size_t buffer_size)
+{
+    size_t remaining_space = buffer_size - 1; //For null character
+    char * line = buffer;
+    for (int i = 0; i < context->error.callstack_count; i++){
+
+        //Trim the directory
+        const char * file = context->error.callstack[i].file;
+        const char * lastslash = (const char *)max((size_t)strchr (file, '\\'), (size_t)strchr (file, '/'));
+        file = max (lastslash, file);
+
+        int used = snprintf (line, remaining_space, "%s: line %d\n", file , context->error.callstack[i].line);
+        if (used > 0 && used < remaining_space){
+            remaining_space -= used;
+            line += remaining_space;
+        }
+    }
+    return buffer;
+}
+
+
 void * Context_calloc(Context * context, size_t instance_count, size_t instance_size, const char * file, int line)
 {
 #ifdef DEBUG

@@ -64,6 +64,9 @@ Context * Context_create(void);
 void Context_destroy(Context * context);
 
 const char * Context_error_message(Context * context, char * buffer, size_t buffer_size);
+
+const char * Context_stacktrace (Context * context, char * buffer, size_t buffer_size);
+
 bool Context_has_error(Context * context);
 int  Context_error_reason(Context * context);
 
