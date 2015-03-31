@@ -59,7 +59,7 @@ const char * Context_stacktrace (Context * context, char * buffer, size_t buffer
         //Trim the directory
         const char * file = context->error.callstack[i].file;
         const char * lastslash = (const char *)umax64((uint64_t)strchr (file, '\\'), (uint64_t)strchr (file, '/'));
-        file = (const char *)umax64((uint64_t)lastslash, (uint64_t)file);
+        file = (const char *)umax64((uint64_t)lastslash + 1, (uint64_t)file);
 
         uint32_t used = snprintf (line, remaining_space, "%s: line %d\n", file , context->error.callstack[i].line);
         if (used > 0 && used < remaining_space){
