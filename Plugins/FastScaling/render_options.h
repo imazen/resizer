@@ -24,6 +24,11 @@ namespace ImageResizer{
     namespace Plugins {
         namespace FastScaling{
 
+#define STATUS_CODE_NAME
+#define STATUS_CODE_ENUM_NAME public enum class FastScalingResult
+
+#include "status_code.h"
+
             enum Rotate{
                 RotateNone = 0,
                 Rotate90 = 1,

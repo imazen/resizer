@@ -159,14 +159,29 @@ namespace ImageResizer{
                 void Render(){
                     p->Start ("managed_perform_render", false);
 
+                    bool result = false;
                     if (wbCanvas == nullptr){
-                        RenderDetails_render_in_place (c->GetContext (), details, wbSource->bgra);
+                        result = RenderDetails_render_in_place (c->GetContext (), details, wbSource->bgra);
                     }
                     else{
-                        RenderDetails_render (c->GetContext (), details, wbSource->bgra, wbCanvas->bgra);
+                        result = RenderDetails_render (c->GetContext (), details, wbSource->bgra, wbCanvas->bgra);
+                    }
+                    if (!result){
+                       char buffer[2048];
+
+                        FastScalingResult result_code = (FastScalingResult)Context_error_reason (this->c->GetContext ());
+                        String^ message = result_code.ToString () + gcnew String ("\n") + gcnew String (Context_stacktrace (c->GetContext (), buffer, 2047));
+
+                        //TODO: refactor and ensure call stack and status code are returned.
+                        if (result_code == FastScalingResult::Out_of_memory)
+                            throw gcnew OutOfMemoryException (message);
+                        else
+                            throw gcnew Exception (message);
+
                     }
                     replay_log ();
                     p->Stop ("managed_perform_render", true, true);
+
                 }
 
                 private:
