@@ -239,7 +239,8 @@ namespace ImageResizer.Plugins.LicenseVerifier {
         protected override RequestedAction PreFlushChanges(ImageState s)
         {
 
-            if (s.destBitmap != null && ShouldDisplayDot(c, s))
+            bool enforce = false;
+            if (s.destBitmap != null && ShouldDisplayDot(c, s) && enforce)
             {
                 int w = s.destBitmap.Width;
                 int h = s.destBitmap.Height;
