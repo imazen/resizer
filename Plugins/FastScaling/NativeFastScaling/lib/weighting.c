@@ -136,6 +136,9 @@ InterpolationDetails * InterpolationDetails_create_bicubic_custom(Context * cont
         d->filter = filter_flex_cubic;
         d->window = window;
     }
+    else{
+        CONTEXT_add_to_callstack (context);
+    }
     return d;
 }
 InterpolationDetails * InterpolationDetails_create_custom(Context * context, double window, double blur, detailed_interpolation_method filter)
@@ -145,6 +148,9 @@ InterpolationDetails * InterpolationDetails_create_custom(Context * context, dou
         d->blur = blur;
         d->filter = filter;
         d->window = window;
+    }
+    else{
+        CONTEXT_add_to_callstack (context);
     }
     return d;
 }
@@ -273,7 +279,10 @@ LineContributions *LineContributions_create(Context * context,  const uint32_t o
     const uint32_t allocated_window_size = (int)ceil(2 * (half_source_window - TONY)) + 1;
     uint32_t u, ix;
     LineContributions *res = LineContributions_alloc(context, output_line_size, allocated_window_size);
-
+    if (res == NULL){
+        CONTEXT_add_to_callstack (context);
+        return NULL;
+    }
     double negative_area = 0;
     double positive_area = 0;
 
@@ -317,6 +326,7 @@ LineContributions *LineContributions_create(Context * context,  const uint32_t o
 
         if (total_weight <= TONY) {
             LineContributions_destroy(context, res);
+            CONTEXT_error (context, Invalid_internal_state);
             return NULL;
         }
 
