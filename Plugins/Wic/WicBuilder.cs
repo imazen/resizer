@@ -25,6 +25,8 @@ using System.Globalization;
 using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.WicBuilder {
+
+    [Obsolete("This plugin uses Windows Imaging Components, which is buggy and closed-source; see FastScaling for a better alternative.")]
     public class WicBuilderPlugin : BuilderExtension, IPlugin, IIssueProvider, IFileExtensionPlugin {
 
         public WicBuilderPlugin() {

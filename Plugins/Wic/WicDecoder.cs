@@ -24,6 +24,7 @@ namespace ImageResizer.Plugins.WicDecoder {
     /// While ImageBuilder handles this, your code may not. It's best not to directly call LoadImage with &decoder=wic. 
     /// This decoder returns Bitmap instances with .Tag set to a GCHandle instance. You must call ((GCHandle)b.Tag).Free() after disposing the Bitmap.
     /// </summary>
+    [Obsolete("This plugin uses Windows Imaging Components, which is buggy and closed-source; see FastScaling for a better alternative.")]
     public class WicDecoderPlugin : BuilderExtension, IPlugin, IFileExtensionPlugin, IIssueProvider {
 
         public WicDecoderPlugin() {

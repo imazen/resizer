@@ -18,6 +18,8 @@ using ImageResizer.Plugins.Wic;
 using System.Runtime.InteropServices.ComTypes;
 
 namespace ImageResizer.Plugins.WicEncoder {
+
+    [Obsolete("This plugin uses Windows Imaging Components, which is buggy and closed-source; see FastScaling for a better alternative.")]
     public class WicEncoderPlugin : DefaultEncoder, IPlugin, IEncoder {
 
 
