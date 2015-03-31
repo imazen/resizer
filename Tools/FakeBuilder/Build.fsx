@@ -99,6 +99,7 @@ let setParams defaults =
                     "Optimize", "True"
                     "DebugSymbols", "True"
                     "Platform", "Any CPU"
+                    "NoWarn", "1591,1573"
                 ]
         }
 
