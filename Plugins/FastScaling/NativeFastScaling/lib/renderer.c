@@ -15,7 +15,6 @@
 
 #include "fastscaling_private.h"
 #include <stdio.h>
-#include <assert.h>
 
 typedef struct RendererStruct {
     RenderDetails * details;
@@ -55,10 +54,12 @@ RenderDetails * RenderDetails_create_with(Context * context, InterpolationFilter
 {
     InterpolationDetails * id = InterpolationDetails_create_from(context, filter);
     if (id == NULL) {
+        CONTEXT_add_to_callstack (context);
         return NULL;
     }
     RenderDetails * d = RenderDetails_create(context);
     if (d == NULL) {
+        CONTEXT_add_to_callstack (context);
         InterpolationDetails_destroy(context, id);
     } else {
         d->interpolation = id;
@@ -88,6 +89,7 @@ bool RenderDetails_render(
 
     Renderer * r = Renderer_create(context, source, canvas, details);
     if (r == NULL) {
+        CONTEXT_add_to_callstack (context);
         if (destroy_source) {
             BitmapBgra_destroy(context, source);
         }
@@ -96,6 +98,9 @@ bool RenderDetails_render(
     r->destroy_details = false;
     r->destroy_source = destroy_source;
     bool result = Renderer_perform_render(context, r);
+    if (!result) {
+        CONTEXT_add_to_callstack (context);
+    }
     Renderer_destroy(context, r);
     return result;
 }
@@ -108,11 +113,15 @@ bool RenderDetails_render_in_place(
 
     Renderer * r = Renderer_create_in_place(context, edit_in_place, details);
     if (r == NULL) {
+        CONTEXT_add_to_callstack (context);
         return false;
     }
     r->destroy_details = false;
     r->destroy_source = false;
     bool result = Renderer_perform_render(context, r);
+    if (!result) {
+        CONTEXT_add_to_callstack (context);
+    }
     Renderer_destroy(context, r);
     return result;
 }
@@ -172,6 +181,7 @@ Renderer * Renderer_create_in_place(Context * context, BitmapBgra * editInPlace,
     if (details->enable_profiling) {
         uint32_t default_capacity = (r->source->h + r->source->w) * 20 + 5;
         if (!Context_enable_profiling(context, default_capacity)) {
+            CONTEXT_add_to_callstack (context);
             CONTEXT_free(context, r);
             return NULL;
         }
@@ -196,6 +206,7 @@ Renderer * Renderer_create(Context * context, BitmapBgra * source, BitmapBgra * 
     if (details->enable_profiling) {
         uint32_t default_capacity = (r->source->w + r->source->h + r->canvas->w + r->canvas->h) * 20 + 50;
         if (!Context_enable_profiling(context, default_capacity)) {
+            CONTEXT_add_to_callstack (context);
             CONTEXT_free(context, r);
             return NULL;
         }
@@ -229,7 +240,7 @@ static bool HalveInTempImage(Context * context, Renderer * r, int divisor)
     int halved_height = (int)(r->source->h / divisor);
     BitmapBgra * tmp_im = BitmapBgra_create(context, halved_width, halved_height, true, r->source->fmt);
     if (tmp_im == NULL) {
-        //TODO: we should probably log the caller as well
+        CONTEXT_add_to_callstack (context);
         return false;
     }
     // from here we have a temp image
@@ -237,6 +248,7 @@ static bool HalveInTempImage(Context * context, Renderer * r, int divisor)
 
     if (!Halve(context, r->source, tmp_im, divisor)) {
         // we cannot return here, or tmp_im will leak
+        CONTEXT_add_to_callstack (context);
         result = false;
     }
     tmp_im->alpha_meaningful = r->source->alpha_meaningful;
@@ -260,10 +272,14 @@ static bool Renderer_complete_halving(Context * context, Renderer * r)
     r->details->halving_divisor = 0; //Don't halve twice
     if (r->source->can_reuse_space) {
         if (!HalveInPlace(context, r->source, divisor)) {
+            CONTEXT_add_to_callstack (context);
             result = false;
         }
     } else {
         result = HalveInTempImage(context, r, divisor);
+        if (!result){
+            CONTEXT_add_to_callstack (context);
+        }
     }
     prof_stop(context,"CompleteHalving", true, false);
     return result;
@@ -274,14 +290,14 @@ static bool ApplyConvolutionsFloat1D(Context * context, const Renderer * r, Bitm
 {
     prof_start(context,"convolve kernel a",  false);
     if (r->details->kernel_a != NULL && !BitmapFloat_convolve_rows(context, img, r->details->kernel_a, img->channels, from_row, row_count)) {
-        //Additional stack frame could be useful here
+        CONTEXT_add_to_callstack (context);
         return false;
     }
     prof_stop(context,"convolve kernel a", true, false);
 
     prof_start(context,"convolve kernel b",  false);
     if (r->details->kernel_b != NULL && !BitmapFloat_convolve_rows(context, img,  r->details->kernel_b, img->channels, from_row, row_count)) {
-        //Additional stack frame could be useful here
+        CONTEXT_add_to_callstack (context);
         return false;
     }
     prof_stop(context,"convolve kernel b", true, false);
@@ -289,6 +305,7 @@ static bool ApplyConvolutionsFloat1D(Context * context, const Renderer * r, Bitm
     if (r->details->sharpen_percent_goal > sharpening_applied + 0.01) {
         prof_start(context,"SharpenBgraFloatRowsInPlace", false);
         if (!BitmapFloat_sharpen_rows(context, img, from_row, row_count, r->details->sharpen_percent_goal - sharpening_applied)) {
+            CONTEXT_add_to_callstack (context);
             return false;
         }
         prof_stop(context,"SharpenBgraFloatRowsInPlace", true, false);
@@ -337,6 +354,7 @@ static bool ScaleAndRender1D(Context * context, const Renderer * r,
 
     contrib = LineContributions_create(context, to_count, from_count, details->interpolation);
     if (contrib == NULL) {
+        CONTEXT_add_to_callstack (context);
         success = false;
         goto cleanup;
     }
@@ -347,11 +365,13 @@ static bool ScaleAndRender1D(Context * context, const Renderer * r,
 
     source_buf = BitmapFloat_create(context, from_count, buffer_row_count, scaling_format, false);
     if (source_buf == NULL) {
+        CONTEXT_add_to_callstack (context);
         success = false;
         goto cleanup;
     }
     dest_buf = BitmapFloat_create(context, to_count, buffer_row_count, scaling_format, false);
     if (dest_buf == NULL) {
+        CONTEXT_add_to_callstack (context);
         success = false;
         goto cleanup;
     }
@@ -370,6 +390,7 @@ static bool ScaleAndRender1D(Context * context, const Renderer * r,
 
         prof_start(context,"convert_srgb_to_linear", false);
         if (!BitmapBgra_convert_srgb_to_linear(context,pSrc, source_start_row, source_buf, 0, row_count)) {
+            CONTEXT_add_to_callstack (context);
             success=false;
             goto cleanup;
         }
@@ -377,6 +398,7 @@ static bool ScaleAndRender1D(Context * context, const Renderer * r,
 
         prof_start(context,"ScaleBgraFloatRows", false);
         if (!BitmapFloat_scale_rows(context, source_buf, 0, dest_buf, 0, row_count, contrib->ContribRow)) {
+            CONTEXT_add_to_callstack (context);
             success=false;
             goto cleanup;
         }
@@ -384,11 +406,13 @@ static bool ScaleAndRender1D(Context * context, const Renderer * r,
 
 
         if (!ApplyConvolutionsFloat1D(context, r, dest_buf, 0, row_count, contrib->percent_negative)) {
+            CONTEXT_add_to_callstack (context);
             success=false;
             goto cleanup;
         }
         if (details->apply_color_matrix && call_number == 2) {
             if (!ApplyColorMatrix(context, r, dest_buf, row_count)) {
+                CONTEXT_add_to_callstack (context);
                 success=false;
                 goto cleanup;
             }
@@ -396,6 +420,7 @@ static bool ScaleAndRender1D(Context * context, const Renderer * r,
 
         prof_start(context,"pivoting_composite_linear_over_srgb", false);
         if (!BitmapFloat_pivoting_composite_linear_over_srgb(context, dest_buf, 0, pDst, source_start_row, row_count, transpose)) {
+            CONTEXT_add_to_callstack (context);
             success=false;
             goto cleanup;
         }
@@ -451,21 +476,25 @@ static bool Render1D(Context * context,
         const uint32_t row_count = umin(pSrc->h - source_start_row, buffer_row_count);
 
         if (!BitmapBgra_convert_srgb_to_linear(context, pSrc, source_start_row, buf, 0, row_count)) {
+            CONTEXT_add_to_callstack (context);
             success=false;
             goto cleanup;
         }
         if (!ApplyConvolutionsFloat1D(context, r, buf, 0, row_count, 0)) {
+            CONTEXT_add_to_callstack (context);
             success=false;
             goto cleanup;
         }
         if (details->apply_color_matrix && call_number == 2) {
             if (!ApplyColorMatrix(context, r, buf, row_count)) {
+                CONTEXT_add_to_callstack (context);
                 success=false;
                 goto cleanup;
             }
         }
 
         if (!BitmapFloat_pivoting_composite_linear_over_srgb(context, buf, 0, pDst, source_start_row, row_count, transpose)) {
+            CONTEXT_add_to_callstack (context);
             success=false;
             goto cleanup;
         }
@@ -542,6 +571,7 @@ bool Renderer_perform_render(Context * context, Renderer * r)
 
     //vertical flip before transposition is the same as a horizontal flip afterwards. Dealing with more pixels, though.
     if (vflip_source && !BitmapBgra_flip_vertical(context,r->source)) {
+        CONTEXT_add_to_callstack (context);
         return false;
     }
 
@@ -557,6 +587,7 @@ bool Renderer_perform_render(Context * context, Renderer * r)
                         r->source->fmt);
 
     if (r->transposed == NULL) {
+        CONTEXT_add_to_callstack (context);
         return false;
     }
     r->transposed->compositing_mode = Replace_self;
@@ -577,15 +608,18 @@ bool Renderer_perform_render(Context * context, Renderer * r)
 
     //Apply kernels, scale, and transpose
     if (!RenderWrapper1D(context, r, r->source, r->transposed, r->details, true, 1)) {
+        CONTEXT_add_to_callstack (context);
         return false;
     }
 
     //Apply flip to transposed
     if (vflip_transposed && !BitmapBgra_flip_vertical(context,r->transposed)) {
+        CONTEXT_add_to_callstack (context);
         return false;
     }
     //Restore the source bitmap if we flipped it in place incorrectly
     if (vflip_source && r->source->pixels_readonly && !BitmapBgra_flip_vertical(context,r->source)) {
+        CONTEXT_add_to_callstack (context);
         return false;
     }
 
@@ -594,6 +628,7 @@ bool Renderer_perform_render(Context * context, Renderer * r)
     //Apply kernels, color matrix, scale,  (transpose?) and (compose?)
 
     if (!RenderWrapper1D(context, r, r->transposed, finalDest, r->details, !skip_last_transpose, 2)) {
+        CONTEXT_add_to_callstack (context);
         return false;
     }
 
@@ -601,7 +636,7 @@ bool Renderer_perform_render(Context * context, Renderer * r)
     //p->Stop("Render", true, false);
     //GC::KeepAlive(wbSource);
     //GC::KeepAlive(wbCanvas);
-    return true;; // is this correct?
+    return true; // is this correct?
 }
 
 

@@ -38,32 +38,32 @@ Rect detect_content(Context * context, BitmapBgra * b, uint8_t threshold)
     //We want to glean as much as possible from horizontal strips, as they are faster.
 
     //left half, middle, ->
-    if (!check_region(context, 4, 0, 0.5, 0.5, 0.5, &info)) return RectFailure;
+    if (!check_region (context, 4, 0, 0.5, 0.5, 0.5, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
     //right half, middle, <-
-    if (!check_region(context, 2, 0.5, 1, 0.5, 0.5, &info)) return RectFailure;
+    if (!check_region (context, 2, 0.5, 1, 0.5, 0.5, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
 
     //left half, bottom third ->
-    if (!check_region(context, 4, 0, 0.5, 0.677f, 0.677f, &info)) return RectFailure;
+    if (!check_region (context, 4, 0, 0.5, 0.677f, 0.677f, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
     //right half, bottom third -<
-    if (!check_region(context, 2, 0.5, 1, 0.677f, 0.677f, &info)) return RectFailure;
+    if (!check_region (context, 2, 0.5, 1, 0.677f, 0.677f, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
     //left half, top third ->
-    if (!check_region(context, 4, 0, 0.5, 0.333f, 0.333f, &info)) return RectFailure;
+    if (!check_region (context, 4, 0, 0.5, 0.333f, 0.333f, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
     //right half, top third -<
-    if (!check_region(context, 2, 0.5, 1, 0.333f, 0.333f, &info)) return RectFailure;
+    if (!check_region (context, 2, 0.5, 1, 0.333f, 0.333f, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
 
     //top half, center \/
-    if (!check_region(context, 1, 0.5, 0.5, 0, 0.5, &info)) return RectFailure;
+    if (!check_region (context, 1, 0.5, 0.5, 0, 0.5, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
     //top half, right third
-    if (!check_region(context, 1, 0.677f, 0.677f, 0, 0.5, &info)) return RectFailure;
+    if (!check_region (context, 1, 0.677f, 0.677f, 0, 0.5, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
     //top half, left third.
-    if (!check_region(context, 1, 0.333f, 0.333f, 0, 0.5, &info)) return RectFailure;
+    if (!check_region (context, 1, 0.333f, 0.333f, 0, 0.5, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
 
     //bottom half, center \/
-    if (!check_region(context, 3, 0.5, 0.5, 0.5, 1, &info)) return RectFailure;
+    if (!check_region (context, 3, 0.5, 0.5, 0.5, 1, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
     //bottom half, right third
-    if (!check_region(context, 3, 0.677f, 0.677f, 0.5, 1, &info)) return RectFailure;
+    if (!check_region (context, 3, 0.677f, 0.677f, 0.5, 1, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
     //bottom half, left third.
-    if (!check_region(context, 3, 0.333f, 0.333f, 0.5, 1, &info)) return RectFailure;
+    if (!check_region (context, 3, 0.333f, 0.333f, 0.5, 1, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
 
 
     //We should now have a good idea of where boundaries lie. However... if it seems that more than 25% is whitespace, we should do a different type of scan.
@@ -71,15 +71,15 @@ Rect detect_content(Context * context, BitmapBgra * b, uint8_t threshold)
 
     if (area_to_scan_separately > info.h * info.w) {
         //Just scan it all at once, non-directionally
-        if (!check_region(context, 0, 0, 1, 0, 1, &info)) return RectFailure;
+        if (!check_region (context, 0, 0, 1, 0, 1, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
     } else {
 
         //Finish by scanning everything that is left. Should be a smaller set.
         //Corners will overlap, and be scanned twice, if they are whitespace.
-        if (!check_region(context, 1, 0, 1, 0, 1, &info)) return RectFailure;
-        if (!check_region(context, 4, 0, 1, 0, 1, &info)) return RectFailure;
-        if (!check_region(context, 2, 0, 1, 0, 1, &info)) return RectFailure;
-        if (!check_region(context, 3, 0, 1, 0, 1, &info)) return RectFailure;
+        if (!check_region (context, 1, 0, 1, 0, 1, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
+        if (!check_region (context, 4, 0, 1, 0, 1, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
+        if (!check_region (context, 2, 0, 1, 0, 1, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
+        if (!check_region (context, 3, 0, 1, 0, 1, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
     }
 
 
@@ -287,8 +287,14 @@ bool check_region(Context * context, int edgeTRBL, float x_1_percent, float x_2_
                 continue;
             }
 
-            if (!fill_buffer(context, info)) return false;
-            if (!sobel_scharr_detect(context, info)) return false;
+            if (!fill_buffer (context, info)) {
+                CONTEXT_add_to_callstack (context);
+                return false;
+            }
+            if (!sobel_scharr_detect (context, info)) {
+                CONTEXT_add_to_callstack (context);
+                return false;
+            }
         }
     }
     return true;

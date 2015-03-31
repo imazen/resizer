@@ -12,7 +12,6 @@
 #include "fastscaling_private.h"
 
 #include <string.h>
-#include <assert.h>
 
 
 bool BitmapBgra_convert_srgb_to_linear(Context * context, BitmapBgra * src, uint32_t from_row, BitmapFloat * dest, uint32_t dest_row, uint32_t row_count)
@@ -23,7 +22,7 @@ bool BitmapBgra_convert_srgb_to_linear(Context * context, BitmapBgra * src, uint
     }
     if (!(from_row + row_count <= src->h && dest_row + row_count <= dest->h)) {
         CONTEXT_error(context, Invalid_internal_state);
-        return false;        
+        return false;
     }
     const LookupTables*  t = get_lookup_tables();
     if (t == NULL) {
@@ -38,7 +37,6 @@ bool BitmapBgra_convert_srgb_to_linear(Context * context, BitmapBgra * src, uint
     const uint32_t copy_step = umin(from_step, to_step);
 
     for (uint32_t row = 0; row < row_count; row++) {
-        //const   uint8_t*  __restrict  src_start = src->pixels + (from_row + row)*src->stride;
         uint8_t*    src_start = src->pixels + (from_row + row)*src->stride;
 
         float* buf = dest->pixels + (dest->float_stride * (row + dest_row));
@@ -61,7 +59,7 @@ bool BitmapBgra_convert_srgb_to_linear(Context * context, BitmapBgra * src, uint
             }
             //We're only working on a portion... dest->alpha_premultiplied = true;
         } else {
-            CONTEXT_error(context, Invalid_internal_state);
+            CONTEXT_error (context, Unsupported_pixel_format);
             return false;
         }
 
@@ -83,19 +81,19 @@ static void unpack24bitRow(uint32_t width, unsigned char* sourceLine, unsigned c
 
 bool BitmapBgra_flip_vertical(Context * context, BitmapBgra * b)
 {
-    //Not actually correct; This should only copy bytes_per_pixel * width, not the entire stride
-    //This could be windowed!
     void* swap = CONTEXT_malloc(context,b->stride);
     if (swap == NULL) {
         CONTEXT_error(context, Out_of_memory);
         return false;
     }
+    //Dont' copy the full stride (padding), it could be windowed!
+    uint32_t row_length = umin (b->stride, b->w *  BitmapPixelFormat_bytes_per_pixel (b->fmt));
     for (uint32_t i = 0; i < b->h / 2; i++) {
         void* top = b->pixels + (i * b->stride);
         void* bottom = b->pixels + ((b->h - 1 - i) * b->stride);
-        memcpy(swap, top, b->stride);
-        memcpy(top, bottom, b->stride);
-        memcpy(bottom, swap, b->stride);
+        memcpy (swap, top, row_length);
+        memcpy(top, bottom, row_length);
+        memcpy (bottom, swap, row_length);
     }
     CONTEXT_free(context,swap);
     return true;
@@ -290,6 +288,7 @@ bool BitmapFloat_pivoting_composite_linear_over_srgb(Context * context, BitmapFl
 
     if (src->alpha_meaningful && src->channels == 4 && dest->compositing_mode == Blend_with_matte) {
         if (!BitmapFloat_blend_matte(context, src, from_row, row_count, dest->matte_color)) {
+            CONTEXT_add_to_callstack (context);
             return false;
         }
         src->alpha_premultiplied = false;
@@ -297,6 +296,7 @@ bool BitmapFloat_pivoting_composite_linear_over_srgb(Context * context, BitmapFl
     if (src->channels == 4 && src->alpha_premultiplied && dest->compositing_mode != Blend_with_self) {
         //Demultiply
         if (!BitmapFloat_demultiply_alpha(context, src, from_row, row_count)) {
+            CONTEXT_add_to_callstack (context);
             return false;
         }
     }
@@ -323,12 +323,14 @@ bool BitmapFloat_pivoting_composite_linear_over_srgb(Context * context, BitmapFl
         if (can_compose) {
             for (int i = 0; i < tiles; i++) {
                 if (!BitmapFloat_compose_linear_over_srgb(context, src, from_row, dest, dest_row, row_count, i * tile_width, tile_width, transpose)) {
+                    CONTEXT_add_to_callstack (context);
                     return false;
                 }
             }
         } else {
             for (int i = 0; i < tiles; i++) {
                 if (!BitmapFloat_copy_linear_over_srgb(context, src, from_row, dest, dest_row, row_count, i * tile_width, tile_width, transpose)) {
+                    CONTEXT_add_to_callstack (context);
                     return false;
                 }
             }
@@ -336,10 +338,12 @@ bool BitmapFloat_pivoting_composite_linear_over_srgb(Context * context, BitmapFl
     } else {
         if (can_compose) {
             if (!BitmapFloat_compose_linear_over_srgb(context, src, from_row, dest, dest_row, row_count, 0, src->w, transpose)) {
+                CONTEXT_add_to_callstack (context);
                 return false;
             }
         } else {
             if (!BitmapFloat_copy_linear_over_srgb(context, src, from_row, dest, dest_row, row_count, 0,src->w,transpose)) {
+                CONTEXT_add_to_callstack (context);
                 return false;
             }
         }

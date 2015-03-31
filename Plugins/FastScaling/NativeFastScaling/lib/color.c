@@ -15,11 +15,11 @@
 bool BitmapFloat_linear_to_luv_rows(Context * context, BitmapFloat * bit, const uint32_t start_row, const  uint32_t row_count)
 {
     if (!(start_row + row_count <= bit->h)) {
-        CONTEXT_error(context, Invalid_internal_state);
-        return false;        
+        CONTEXT_error(context, Invalid_internal_state); //Don't access rows past the end of the bitmap
+        return false;
     }
     if ((bit->w * bit->channels) != bit->float_stride) {
-        CONTEXT_error(context, Invalid_internal_state);
+        CONTEXT_error(context, Invalid_internal_state); //This algorithm can't handle padding, if present
         return false;
     }
     float * start_at = bit->float_stride * start_row  + bit->pixels;
@@ -36,7 +36,7 @@ bool BitmapFloat_luv_to_linear_rows(Context * context, BitmapFloat * bit, const 
 {
     if (!(start_row + row_count <= bit->h)) {
         CONTEXT_error(context, Invalid_internal_state);
-        return false;        
+        return false;
     }
     if ((bit->w * bit->channels) != bit->float_stride) {
         CONTEXT_error(context, Invalid_internal_state);
@@ -132,7 +132,7 @@ bool BitmapBgra_apply_color_matrix(Context * context, BitmapBgra * bmp, const ui
                 newdata[2] = r;
             }
     } else {
-        CONTEXT_error(context, Invalid_internal_state);
+        CONTEXT_error (context, Unsupported_pixel_format);
         return false;
     }
     return true;
@@ -184,7 +184,7 @@ bool BitmapFloat_apply_color_matrix(Context * context, BitmapFloat * bmp, const 
         return true;
     }
     default: {
-        CONTEXT_error(context, Invalid_internal_state);
+        CONTEXT_error (context, Unsupported_pixel_format);
         return false;
     }
     }

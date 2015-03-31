@@ -12,7 +12,6 @@
 
 #include "fastscaling_private.h"
 #include <string.h>
-#include <assert.h>
 
 
 bool BitmapFloat_scale_rows(Context * context, BitmapFloat * from, uint32_t from_row, BitmapFloat * to, uint32_t to_row, uint32_t row_count, PixelContributions * weights)
@@ -178,7 +177,6 @@ static bool HalveInternal(
 {
 
     const int to_w_bytes = to_w * BitmapPixelFormat_bytes_per_pixel (to->fmt);
-    //unsigned short *buffer = (unsigned short *)context->calloc(to_w_bytes, sizeof(unsigned short));
     unsigned short *buffer = (unsigned short *)CONTEXT_calloc(context, to_w_bytes, sizeof(unsigned short));
     if (buffer == NULL) {
         CONTEXT_error(context, Out_of_memory);
@@ -229,7 +227,11 @@ static bool HalveInternal(
 
 bool Halve(Context * context, const BitmapBgra * from, BitmapBgra * to, int divisor)
 {
-    return HalveInternal(context, from, to, to->w, to->h, to->stride, divisor);
+    bool r = HalveInternal(context, from, to, to->w, to->h, to->stride, divisor);
+    if (!r){
+        CONTEXT_add_to_callstack (context);
+    }
+    return r;
 }
 
 bool HalveInPlace(Context * context, BitmapBgra * from, int divisor)
@@ -238,6 +240,9 @@ bool HalveInPlace(Context * context, BitmapBgra * from, int divisor)
     int to_h = from->h / divisor;
     int to_stride = to_w * BitmapPixelFormat_bytes_per_pixel (from->fmt);
     bool r = HalveInternal(context, from, from, to_w, to_h, to_stride, divisor);
+    if (!r){
+        CONTEXT_add_to_callstack (context);
+    }
     from->w = to_w;
     from->h = to_h;
     from->stride = to_stride;

@@ -10,7 +10,6 @@
 #endif
 
 #include "fastscaling_private.h"
-#include <assert.h>
 
 const int MAX_BYTES_PP = 16;
 
@@ -23,7 +22,7 @@ static bool are_valid_bitmap_dimensions(int sx, int sy)
     return (
                sx > 0 && sy > 0 // positive dimensions
                && sx < INT_MAX / sy // no integer overflow
-               && sx * sy * MAX_BYTES_PP < INT_MAX - MAX_BYTES_PP); // then we can safely check
+               && sx * MAX_BYTES_PP < ((INT_MAX - MAX_BYTES_PP) / sy)); // then we can safely check
 }
 
 
@@ -60,6 +59,7 @@ BitmapBgra * BitmapBgra_create(Context * context, int sx, int sy, bool zeroed, B
 {
     BitmapBgra * im = BitmapBgra_create_header(context, sx, sy);
     if (im == NULL) {
+        CONTEXT_add_to_callstack (context);
         return NULL;
     }
     im->fmt = format;
@@ -121,6 +121,7 @@ BitmapFloat * BitmapFloat_create(Context* context, int sx, int sy, int channels,
 {
     BitmapFloat * im = BitmapFloat_create_header(context, sx, sy, channels);
     if (im == NULL) {
+        CONTEXT_add_to_callstack (context);
         return NULL;
     }
     im->pixels_borrowed = false;
