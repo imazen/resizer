@@ -6,7 +6,7 @@
 		<version>$version$</version>
 		<authors>$author$</authors>
 		<owners>$owners$</owners>
-		<licenseUrl>http://imageresizing.net/licenses/fastscaling</licenseUrl>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
 		<projectUrl>http://imageresizing.net</projectUrl>
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
