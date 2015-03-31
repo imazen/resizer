@@ -43,24 +43,8 @@ namespace ImageResizer.Plugins.Basic {
 
 
             List<IIssue> issues = new List<IIssue>(c.AllIssues.GetIssues());
-            
-            //Verify we are using MvcRoutingShim if System.Web.Routing is loaded.
-            bool routingLoaded = false;
-            foreach (Assembly a in asms) {
-                if (new AssemblyName(a.FullName).Name.StartsWith("System.Web.Routing", StringComparison.OrdinalIgnoreCase)) {
-                    routingLoaded = true; break;
-                }
-            }
-            bool usingRoutingShim = false;
-            foreach (IPlugin p in c.Plugins.AllPlugins){
-                if (p.GetType().Name.EndsWith("MvcRoutingShimPlugin", StringComparison.OrdinalIgnoreCase)) {
-                    usingRoutingShim = true; break;
-                }
-            }
 
-            if (routingLoaded && !usingRoutingShim) issues.Add(new Issue(
-                "The MvcRoutingShim plugin must be installed if you are using MVC or System.Web.Routing",
-                "System.Web.Routing is loaded. You must install the MvcRoutingShim plugin. Add ImageResizer.Mvc.dll to your project, and add '<add name=\"MvcRoutingShim\" />' to the <plugins> section of web.config.", IssueSeverity.Critical));
+            
 
             if (!HttpRuntime.UsingIntegratedPipeline && context != null && context.Request != null) {
                 string server = context.Request.ServerVariables["SERVER_SOFTWARE"];
@@ -83,8 +67,12 @@ namespace ImageResizer.Plugins.Basic {
             //Verify we're using the same general version of all ImageResizer assemblies.
             Dictionary<string, List<string>> versions = new Dictionary<string, List<string>>();
             foreach (Assembly a in asms) {
+                
+                var copyright = a.GetCustomAttribute<AssemblyCopyrightAttribute>();
+                var is_imazen_assembly = copyright != null && copyright.Copyright.Contains("Imazen");
+
                 AssemblyName an = new AssemblyName(a.FullName);
-                if (an.Name.StartsWith("ImageResizer", StringComparison.OrdinalIgnoreCase)) {
+                if (an.Name.StartsWith("ImageResizer", StringComparison.OrdinalIgnoreCase) && is_imazen_assembly) {
                     string key = an.Version.Major + "." + an.Version.Minor + "." + an.Version.Build;
                     if (!versions.ContainsKey(key)) versions[key] = new List<string>();
                     versions[key].Add(an.Name);
@@ -99,7 +87,7 @@ namespace ImageResizer.Plugins.Basic {
                     groups = groups.TrimEnd(' ', ',');
                 }
                 issues.Add(new Issue("Potentially incompatible ImageResizer assemblies were detected.",
-                    "Please make sure all ImageResizer assemblies are from the same version. Compatibility issues are possible if you mix plugins from different releases." + groups, IssueSeverity.Warning));
+                    "Please make sure all ImageResizer assemblies are from the same version. Compatibility issues are possible if you mix plugins from different releases: " + groups, IssueSeverity.Warning));
 
             }
 
@@ -121,35 +109,40 @@ namespace ImageResizer.Plugins.Basic {
                 }
             }
 
-            string edition = null;
-            //Pick the largest edition
-            foreach (string s in new string[] { "R4Elite", "R4Creative", "R4Performance" })
-            {
-                if (new List<string>(editionsUsed.Values).Contains(s))
-                {
-                    edition = s;
-                    break;
-                }
-            }
+            string edition = editionsUsed.Values.First(s => new string[] { "R4Elite", "R4Creative", "R4Performance" }.Contains(s));
+
             
             if (new List<string>(editionsUsed.Values).Intersect(new string[] { "R3Elite", "R3Creative", "R3Performance" }).Count() > 0){
-                sb.AppendLine("You are mixing V3 and V4 plugins; this is a bad idea.");
+                sb.AppendLine("You are mixing V3 and V4 plugins; this is a very bad idea.");
             }
             Dictionary<string, string> friendlyNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            friendlyNames.Add("R4Elite", "V4 Elite Edition or Support Contract");
+            friendlyNames.Add("R4Elite", "V4 Elite Edition or a support contract");
             friendlyNames.Add("R4Creative", "V4 Creative Edition");
             friendlyNames.Add("R4Performance", "V4 Performance Edition");
 
-            if (edition == null) 
-                sb.AppendLine("\nYou are not using any paid plugins.");
-            else {
-                sb.Append("\nYou are using plugins from the " + friendlyNames[edition] + ": ");
-                foreach (string s in editionsUsed.Keys) {
-                    sb.Append(s + " (" + (friendlyNames.ContainsKey(editionsUsed[s]) ? friendlyNames[editionsUsed[s]] : "Unrecognized SKU")+ "), ");
-                }
-                sb.Remove(sb.Length - 2, 2);
-                sb.AppendLine();
+            sb.AppendLine("Assembly use report: \n");
+
+            if (asms.Any(a => a.FullName.Contains("PdfRenderer")))
+            {
+                sb.AppendLine("You are using a GPL/AGPL-only assembly. Consult the PdfRenderer licensing at http://imageresizing.net/licenses/pdfrenderer");
             }
+
+            if (edition == null) 
+                sb.AppendLine("You do not seem to be using any plugins from (commerical/AGPL) editions.");
+            else {
+                sb.AppendLine("\nYou are using plugins and assemblies from the " + friendlyNames[edition] + ".");
+                //foreach (string s in editionsUsed.Keys) {
+                //    sb.Append(s + " (" + (friendlyNames.ContainsKey(editionsUsed[s]) ? friendlyNames[editionsUsed[s]] : "Unrecognized SKU")+ "), ");
+                //}
+                //sb.Remove(sb.Length - 2, 2);
+                //sb.AppendLine();
+            }
+
+            sb.AppendLine();
+
+            foreach (IDiagnosticsProvider diagProvider in c.Plugins.GetAll<IDiagnosticsProvider>())
+                sb.AppendLine(diagProvider.ProvideDiagnostics());
+
 
             sb.AppendLine("\nRegistered plugins:\n");
             foreach (IPlugin p in c.Plugins.AllPlugins)
@@ -268,7 +261,7 @@ namespace ImageResizer.Plugins.Basic {
                     "The Logging plugin depends on: NLog.dll\n" +
                     "The AdvancedFilters, RedEye, and WhitespaceTrimmer plugins depend on: AForge.dll, AForge.Math.dll, and AForge.Imaging.dll\n" +
                     "The PsdReader and PsdComposer plugins depend on: PsdFile.dll\n" +
-                    "The S3Reader plugin depends on: LitS3.dll\n" +
+                    "The S3Reader plugin depends on: AWSSDK.dll\n" +
                     "The BatchZipper plugin depends on: Ionic.Zip.Reduced.dll\n" + 
                     "The PdfRenderer plugin depends on gsdll32.dll or gdsll32.dll\n" + 
                     "The RedEye plugin depends on several dozen files... see the plugin docs.\n");

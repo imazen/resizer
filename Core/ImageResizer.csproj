@@ -78,6 +78,7 @@
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
     <Compile Include="ExtensionMethods\Dictionary.cs" />
     <Compile Include="PluginLoadingHints.cs" />
+    <Compile Include="Plugins\Basic\IDiagnosticsProvider.cs" />
     <Compile Include="Plugins\Basic\MvcRoutingShimPlugin.cs" />
     <Compile Include="Plugins\Basic\NoCacheAsyncHandler.cs" />
     <Compile Include="Plugins\Basic\StopRoutingRoute.cs" />

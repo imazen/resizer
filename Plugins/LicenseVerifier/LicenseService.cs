@@ -14,6 +14,7 @@ using System.Numerics;
 using ImageResizer.Configuration.Issues;
 using ImageResizer.Resizing;
 using System.Drawing;
+using ImageResizer.Plugins.Basic;
 
 namespace ImageResizer.Plugins.LicenseVerifier {
     
@@ -136,7 +137,7 @@ namespace ImageResizer.Plugins.LicenseVerifier {
 
 
     }
-    internal class LicenseEnforcer<T> : BuilderExtension, IPlugin
+    internal class LicenseEnforcer<T> : BuilderExtension, IPlugin, IDiagnosticsProvider
     {
 
         public LicenseEnforcer(){}
@@ -183,21 +184,39 @@ namespace ImageResizer.Plugins.LicenseVerifier {
             return mappings;
         }
 
-        private void LogLicenseConfiguration(Configuration.Config c)
+
+        public string ProvideDiagnostics()
         {
-            if (_mappings.Count > 0){
-                //TODO: make informational
-                c.configurationSectionIssues.AcceptIssue(new Issue("You have local host mappings in place", String.Join(", ", _mappings.Select(pair => string.Format("{0} => {1}", pair.Key, pair.Value))), IssueSeverity.Warning));
+            StringBuilder sb = new StringBuilder();
+
+            var mappings = _mappings ?? GetDomainMappings(c);
+            var service = _service ?? GetService(c);
+            var features = _installed_features ?? c.Plugins.GetAll<ILicensedPlugin>().Select(p => p.LicenseFeatureCodes).ToList();
+
+            sb.AppendLine("\n----------------\n");
+            sb.AppendLine("License keys");
+            if (mappings.Count > 0)
+            {
+                sb.AppendLine("For licensing, you have mapped the following local (non-public) domains or addresses as follows:\n" +
+                    String.Join(", ", mappings.Select(pair => string.Format("{0} => {1}", pair.Key, pair.Value))));
             }
 
-            var licenses = _service.GetLicensedFeaturesDescription();
-
+            var licenses = service.GetLicensedFeaturesDescription();
+            sb.AppendLine();
             if (licenses.Length > 0)
             {
-                //TODO: make informational
-                c.configurationSectionIssues.AcceptIssue(new Issue("You have licenses in place", licenses, IssueSeverity.Warning));
+                sb.AppendLine("List of installed domain licenses:\n" + licenses);
             }
+            else
+            {
+                sb.AppendLine("You do not have any license keys installed.");
+            
+            }
+            sb.AppendLine("\n----------------\n");
+            return sb.ToString();
         }
+
+   
 
         DateTime first_request = DateTime.MinValue;
         int invalidated_count = 0;
@@ -221,7 +240,7 @@ namespace ImageResizer.Plugins.LicenseVerifier {
             if (_installed_features == null|| invalidate) _installed_features = c.Plugins.GetAll<ILicensedPlugin>().Select(p => p.LicenseFeatureCodes).ToList();
             if (_mappings == null|| invalidate) _mappings = GetDomainMappings(c);
 
-            if (invalidated_count == 1) LogLicenseConfiguration(c);
+            //if (invalidated_count == 1) LogLicenseConfiguration(c);
 
             var domain = System.Web.HttpContext.Current.Request.UserHostName;
             
@@ -268,5 +287,6 @@ namespace ImageResizer.Plugins.LicenseVerifier {
             c.Plugins.remove_plugin(this);
             return true;
         }
+
     }
 }
