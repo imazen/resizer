@@ -12,8 +12,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{69F03F37-ECF8-4215-82A2-CE05C7F4F257}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.LicenseVerifier.Tests", "ImageResizer.Plugins.LicenseVerifier.Tests\ImageResizer.Plugins.LicenseVerifier.Tests.csproj", "{081F4843-C4A2-4C7D-A869-03DD15982A8D}"
@@ -62,3 +60,4 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
+

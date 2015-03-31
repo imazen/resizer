@@ -23,7 +23,7 @@
     <OldToolsVersion>4.0</OldToolsVersion>
     <MvcProjectUpgradeChecked>true</MvcProjectUpgradeChecked>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
+    
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
