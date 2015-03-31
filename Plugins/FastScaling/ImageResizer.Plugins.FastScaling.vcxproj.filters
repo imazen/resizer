@@ -29,6 +29,9 @@
     <ClInclude Include="NativeFastScaling\include\status_code.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="error_translation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImageResizer.Plugins.FastScaling.cpp">

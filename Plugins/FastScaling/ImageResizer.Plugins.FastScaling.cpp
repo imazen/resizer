@@ -21,6 +21,7 @@ using namespace ImageResizer::Resizing;
 using namespace System::Diagnostics;
 using namespace System::Collections::Specialized;
 using namespace System::Runtime::InteropServices;
+using namespace ImageResizer::Plugins::FastScaling::internal_use_only;
 
 namespace ImageResizer{
 	namespace Plugins{
@@ -99,7 +100,7 @@ namespace ImageResizer{
                     b->AlphaMeaningful = true;
                     b->Crop = Util::PolygonMath::ToRectangle(targetBox);
                     b->Bitmap = dest;
-                    b->Compositing = BitmapCompositingMode::Blend_with_self;
+                    b->Compositing = ImageResizer::Plugins::FastScaling::internal_use_only::BitmapCompositingMode::Blend_with_self;
 
                     opts->ColorMatrix = colorMatrix;
 

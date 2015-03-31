@@ -165,6 +165,7 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="error_translation.h" />
     <ClInclude Include="managed_bitmap_wrapper.h" />
     <ClInclude Include="ImageResizer.Plugins.FastScaling.h" />
     <ClInclude Include="NativeFastScaling\include\status_code.h" />

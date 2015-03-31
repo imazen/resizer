@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using ImageResizer.Plugins.FastScaling.internal_use_only;
+
 
 namespace ImageResizer.Plugins.FastScaling.Tests
 {

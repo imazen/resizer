@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArtifactTests.cs" />
+    <Compile Include="ErrorHandlingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RenderingTests.cs" />
   </ItemGroup>
