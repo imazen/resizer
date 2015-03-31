@@ -144,14 +144,26 @@ TEST_CASE_METHOD(Fixture, "Test allocation failure handling", "[error_handling]"
 {
     using namespace Catch::Generators;
     int fail_alloc_x = GENERATE( between( 0, 10) );
+    int halving = GENERATE (between (0, 1));
+
+
+    int sw = halving ? 4 : GENERATE (between (1, 3)) * 4;
+    int sh = halving ? 4 : GENERATE (between (1, 3)) * 4;
+    int cw = halving ? 2 : GENERATE (between (1, 3)) * 4 - 1;
+    int ch = halving ? 2 : GENERATE (between (1, 3)) * 4 - 1;
+
+    CAPTURE (sw);
+    CAPTURE (sh);
+    CAPTURE (cw);
+    CAPTURE (ch);
 
 
     Context context;
     Context_initialize(&context);
     initialize_heap(&context);
 
-    BitmapBgra * source = BitmapBgra_create(&context, 4, 4, true, Bgra32);
-    BitmapBgra * canvas = BitmapBgra_create(&context, 2, 2, true, Bgra32);
+    BitmapBgra * source = BitmapBgra_create(&context, sw, sh, true, Bgra32);
+    BitmapBgra * canvas = BitmapBgra_create(&context, cw, ch, true, Bgra32);
     RenderDetails * details = RenderDetails_create(&context);
     details->interpolation = InterpolationDetails_create_from(&context,Filter_CubicFast);
     details->sharpen_percent_goal = 50;
@@ -160,7 +172,7 @@ TEST_CASE_METHOD(Fixture, "Test allocation failure handling", "[error_handling]"
     details->post_transpose = false;
 
     // think about strategies to make it easier to pinpoint which allocation should fail
-    details->halving_divisor = 2;
+    details->halving_divisor = halving ? 2 : 0;
 
     fail_alloc_after(fail_alloc_x);
 
