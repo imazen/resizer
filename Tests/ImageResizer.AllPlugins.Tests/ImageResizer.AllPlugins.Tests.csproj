@@ -84,6 +84,7 @@
     <Compile Include="TestAll.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestWatermark.cs" />
+    <Compile Include="TestWic.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
@@ -129,6 +130,10 @@
     <ProjectReference Include="..\..\Plugins\WhitespaceTrimmer\ImageResizer.Plugins.WhitespaceTrimmer.csproj">
       <Project>{167B88AF-E3EE-4005-A266-F4D712B3BC62}</Project>
       <Name>ImageResizer.Plugins.WhitespaceTrimmer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\Wic\ImageResizer.Plugins.Wic.csproj">
+      <Project>{4a55b40d-1e0d-4d1f-8d96-25f624847e53}</Project>
+      <Name>ImageResizer.Plugins.Wic</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
