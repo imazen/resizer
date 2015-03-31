@@ -168,7 +168,7 @@ Target "patch_info" (fun _ ->
 )
 
 Target "test" (fun _ ->
-    let xunit = Seq.nth 0 (!! (rootDir + "Packages/xunit.runners*/tools/xunit.console.exe"))
+    let xunit = Seq.nth 0 (!! (rootDir + "Packages/xunit.runner.*/tools/xunit.console.exe"))
     let xunit32 = replace "xunit.console.exe" "xunit.console.x86.exe" xunit
       
     !! (rootDir + "Tests/binaries/release/*Tests.dll")
