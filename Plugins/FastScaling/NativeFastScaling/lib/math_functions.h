@@ -36,6 +36,16 @@ static inline unsigned int umax(unsigned int a, unsigned int b)
     return a >= b ? a : b;
 }
 
+static inline uint64_t umin64(uint64_t a, uint64_t b)
+{
+    return a <= b ? a : b;
+}
+static inline uint64_t umax64(uint64_t a, uint64_t b)
+{
+    return a >= b ? a : b;
+}
+
+
 
 
 #define EVIL_CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))

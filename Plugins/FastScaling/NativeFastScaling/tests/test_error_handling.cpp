@@ -294,7 +294,7 @@ TEST_CASE ("Test stacktrace serialization", "[error_handling]")
     char * stacktrace = (char *) malloc (stacktrace_buffer_size);
 
     CAPTURE (stacktrace_buffer_size);
-    CAPTURE (Context_stacktrace (&context, stacktrace, 1024));
+    CAPTURE (Context_stacktrace (&context, stacktrace, stacktrace_buffer_size));
 
 
     free (stacktrace);
