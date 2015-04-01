@@ -27,7 +27,7 @@ namespace ImageResizer{
 	namespace Plugins{
 		namespace FastScaling {
 
-			public ref class FastScalingPlugin : public ImageResizer::Resizing::BuilderExtension, IPlugin
+			public ref class FastScalingPlugin : public ImageResizer::Resizing::BuilderExtension, IPlugin, IQuerystringPlugin
 			{
                 void SetupConvolutions(ExecutionContext^ c, NameValueCollection ^query, RenderOptions^ addTo){
                     double kernel_radius = System::String::IsNullOrEmpty(query->Get("f.unsharp.radius")) ? 0 :
@@ -132,6 +132,10 @@ namespace ImageResizer{
 					c->Plugins->remove_plugin(this);
 					return true;
 				}
+
+                virtual System::Collections::Generic::IEnumerable<System::String^>^ GetSupportedQuerystringKeys (){
+                    return gcnew array < String^, 1 > {"f.sharpen", "f.unsharp.radius"};
+                }
 
 			};
 
