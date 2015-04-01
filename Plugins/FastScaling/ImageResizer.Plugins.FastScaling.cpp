@@ -47,6 +47,17 @@ namespace ImageResizer{
                 }
 			protected:
 
+                System::Double GetDouble (NameValueCollection^ query, String^ key, double defaultValue){
+                    double d = 0;
+
+                    if (System::String::IsNullOrEmpty (query->Get (key)) || !double::TryParse (query->Get (key), System::Globalization::NumberStyles::Any, System::Globalization::CultureInfo::InvariantCulture, d))
+                    {
+                        return defaultValue;
+                    }
+                    else{
+                        return d;
+                    }
+                }
 
                 virtual RequestedAction InternalGraphicsDrawImage(ImageState^ s, Bitmap^ dest, Bitmap^ source, array<PointF>^ targetArea, RectangleF sourceArea, array<array<float, 1>^, 1>^ colorMatrix) override{
 
@@ -56,28 +67,27 @@ namespace ImageResizer{
 					String^ sTrue = "true";
 
 
-                    if (fastScale != sTrue && System::String::IsNullOrEmpty(query->Get("f"))){
+                    if (System::String::IsNullOrEmpty (query->Get ("f")) && (fastScale == nullptr || fastScale->ToLowerInvariant () != sTrue)){
 						return RequestedAction::None;
 					}
 
                     RenderOptions^ opts = gcnew RenderOptions();
 
 
-                    opts->SamplingBlurFactor = System::String::IsNullOrEmpty(query->Get("f.blur")) ? 1.0 :
-                        System::Single::Parse(query->Get("f.blur"), System::Globalization::NumberFormatInfo::InvariantInfo);
+                    opts->SamplingBlurFactor = (float)GetDouble (query, "f.blur", 1.0);
 
-                    opts->SamplingWindowOverride = System::String::IsNullOrEmpty(query->Get("f.window")) ? 0 :
-                        System::Single::Parse(query->Get("f.window"), System::Globalization::NumberFormatInfo::InvariantInfo);
+                    opts->SamplingWindowOverride = (float)GetDouble (query, "f.window", 0);
 
-                    opts->Filter = (InterpolationFilter)(System::String::IsNullOrEmpty(query->Get("f")) ? 0 :
-                        System::Int32::Parse(query->Get("f"), System::Globalization::NumberFormatInfo::InvariantInfo));
+                    opts->Filter = (InterpolationFilter)(uint32_t)(float)GetDouble (query, "f", 0);
 
 
-                    opts->SharpeningPercentGoal = System::String::IsNullOrEmpty(query->Get("f.sharpen")) ? 0 :
-                        System::Single::Parse(query->Get("f.sharpen"), System::Globalization::NumberFormatInfo::InvariantInfo) / 200.0;
+                    opts->SharpeningPercentGoal = (float)GetDouble (query, "f.sharpen", 0) / 200.0;
 
                     opts->SharpeningPercentGoal = fminf(fmaxf(0.0f, opts->SharpeningPercentGoal), 0.5f);
 
+                    opts->InterpolateLastPercent = GetDouble (query, "f.interpolate_at_least", opts->InterpolateLastPercent);
+
+                    opts->InterpolateLastPercent = opts->InterpolateLastPercent < 1 ? -1 : opts->InterpolateLastPercent;
 
                     //TODO: permit it to work with increments of 90 rotation
                     //Write polygon math method to determin the angle of the target area.
