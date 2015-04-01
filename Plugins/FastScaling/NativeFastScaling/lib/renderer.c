@@ -43,6 +43,7 @@ RenderDetails * RenderDetails_create(Context * context)
         d->color_matrix[i] = &(d->color_matrix_data[i * 5]);
     }
     d->enable_profiling=false;
+    d->halving_divisor = 0;
     d->interpolate_last_percent = 3;
     d->halve_only_when_common_factor = true;
     d->minimum_sample_window_to_interposharpen = 1.5;
@@ -270,17 +271,12 @@ static bool Renderer_complete_halving(Context * context, Renderer * r)
     bool result = true;
     prof_start(context, "CompleteHalving", false);
     r->details->halving_divisor = 0; //Don't halve twice
-    if (r->source->can_reuse_space) {
-        if (!HalveInPlace(context, r->source, divisor)) {
-            CONTEXT_add_to_callstack (context);
-            result = false;
-        }
-    } else {
-        result = HalveInTempImage(context, r, divisor);
-        if (!result){
-            CONTEXT_add_to_callstack (context);
-        }
+
+    result = r->source->can_reuse_space ? HalveInPlace (context, r->source, divisor) : HalveInTempImage (context, r, divisor);
+    if (!result){
+        CONTEXT_add_to_callstack (context);
     }
+
     prof_stop(context,"CompleteHalving", true, false);
     return result;
 }
@@ -288,20 +284,22 @@ static bool Renderer_complete_halving(Context * context, Renderer * r)
 
 static bool ApplyConvolutionsFloat1D(Context * context, const Renderer * r, BitmapFloat * img, const uint32_t from_row, const uint32_t row_count, double sharpening_applied)
 {
-    prof_start(context,"convolve kernel a",  false);
-    if (r->details->kernel_a != NULL && !BitmapFloat_convolve_rows(context, img, r->details->kernel_a, img->channels, from_row, row_count)) {
-        CONTEXT_add_to_callstack (context);
-        return false;
+    if (r->details->kernel_a != NULL){
+        prof_start (context, "convolve kernel a", false);
+        if (!BitmapFloat_convolve_rows (context, img, r->details->kernel_a, img->channels, from_row, row_count)) {
+            CONTEXT_add_to_callstack (context);
+            return false;
+        }
+        prof_stop (context, "convolve kernel a", true, false);
     }
-    prof_stop(context,"convolve kernel a", true, false);
-
-    prof_start(context,"convolve kernel b",  false);
-    if (r->details->kernel_b != NULL && !BitmapFloat_convolve_rows(context, img,  r->details->kernel_b, img->channels, from_row, row_count)) {
-        CONTEXT_add_to_callstack (context);
-        return false;
+    if (r->details->kernel_b != NULL){
+        prof_start (context, "convolve kernel b", false);
+        if (!BitmapFloat_convolve_rows (context, img, r->details->kernel_b, img->channels, from_row, row_count)) {
+            CONTEXT_add_to_callstack (context);
+            return false;
+        }
+        prof_stop (context, "convolve kernel b", true, false);
     }
-    prof_stop(context,"convolve kernel b", true, false);
-
     if (r->details->sharpen_percent_goal > sharpening_applied + 0.01) {
         prof_start(context,"SharpenBgraFloatRowsInPlace", false);
         if (!BitmapFloat_sharpen_rows(context, img, from_row, row_count, r->details->sharpen_percent_goal - sharpening_applied)) {
@@ -538,6 +536,7 @@ bool Renderer_perform_render(Context * context, Renderer * r)
 {
     prof_start(context,"perform_render", false);
     if (!Renderer_complete_halving(context, r)) {
+        CONTEXT_add_to_callstack (context);
         return false;
     }
     bool skip_last_transpose = r->details->post_transpose;
@@ -551,17 +550,17 @@ bool Renderer_perform_render(Context * context, Renderer * r)
         CONTEXT_error(context, Interpolation_details_missing);
         return false;
     }
-    /*
 
+    /*
     bool someTranspositionRequired = r->details->sharpen_percent_goal > 0 ||
         skip_last_transpose ||
-        r->details->kernel_a_radius > 0 ||
-        r->details->kernel_b_radius > 0 ||
+        r->details->kernel_a->radius > 0 ||
+        r->details->kernel_b->radius > 0 ||
         scaling_required;
 
-    if (!someTranspositionRequired && canvas == NULL){
+    if (!someTranspositionRequired && r->canvas == NULL){
         SimpleRenderInPlace();
-          p->Stop("Render", true, false);
+        prof_stop (context, "perform_render", true, false);
         return; //Nothing left to do here.
     }
     */
