@@ -120,48 +120,66 @@ bool BitmapFloat_scale_rows(Context * context, BitmapFloat * from, uint32_t from
 }
 
 
-static inline void HalveRowByDivisor(const unsigned char* from, unsigned short * to, const unsigned int to_count, const int divisor, const int from_step, const int to_step)
+static inline void HalveRowByDivisor(const unsigned char* from, unsigned short * to, const unsigned int to_count, const int divisor, const int step)
 {
     int to_b, from_b;
-    const int to_bytes = to_count * to_step;
-    const int divisor_stride = from_step * divisor;
+    const int to_bytes = to_count * step;
+    const int divisor_stride = step * divisor;
+    if (divisor > 4) {
+        if (step == 3){
+            for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 3, from_b += divisor_stride) {
+                for (int f = 0; f < divisor_stride; f += 3) {
+                    to[to_b + 0] += from[from_b + f + 0];
+                    to[to_b + 1] += from[from_b + f + 1];
+                    to[to_b + 2] += from[from_b + f + 2];
+                }
+
+            }
+        }
+        else if (step == 4){
+            for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += divisor_stride) {
+                for (int f = 0; f < divisor_stride; f += 4) {
+                    to[to_b + 0] += from[from_b + f + 0];
+                    to[to_b + 1] += from[from_b + f + 1];
+                    to[to_b + 2] += from[from_b + f + 2];
+                    to[to_b + 3] += from[from_b + f + 3];
+                }
+            }
+        }
+        return;
+    }
 
     if (divisor == 2) {
         if (to_count % 2 == 0) {
-            for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 2 * to_step, from_b += 4 * from_step) {
-                for (int i = 0; i < 2 * to_step; i++) {
-                    to[to_b + i] += from[from_b + i] + from[from_b + i + from_step];
+            for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 2 * step, from_b += 4 * step) {
+                for (int i = 0; i < 2 * step; i++) {
+                    to[to_b + i] += from[from_b + i] + from[from_b + i + step];
                 }
             }
         } else {
-            for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += to_step, from_b += 2 * from_step) {
-                for (int i = 0; i < to_step; i++) {
-                    to[to_b + i] += from[from_b + i] + from[from_b + i + from_step];
+            for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += step, from_b += 2 * step) {
+                for (int i = 0; i < step; i++) {
+                    to[to_b + i] += from[from_b + i] + from[from_b + i + step];
                 }
             }
         }
-
-    } else if (divisor == 3) {
-        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += to_step, from_b += 3 * from_step) {
-            for (int i = 0; i < to_step; i++) {
-                to[to_b + i] += from[from_b + i] + from[from_b + i + from_step] + from[from_b + i + 2 * from_step];
+        return;
+    }
+    if (divisor == 3) {
+        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += step, from_b += 3 * step) {
+            for (int i = 0; i < step; i++) {
+                to[to_b + i] += from[from_b + i] + from[from_b + i + step] + from[from_b + i + 2 * step];
             }
         }
-    } else if (divisor == 4) {
-        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += to_step, from_b += 4 * from_step) {
-            for (int i = 0; i < to_step; i++) {
-                to[to_b + i] += from[from_b + i] + from[from_b + i + from_step] + from[from_b + i + 2 * from_step] + from[from_b + i + 3 * from_step];
+        return;
+    }
+    if (divisor == 4) {
+        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += step, from_b += 4 * step) {
+            for (int i = 0; i < step; i++) {
+                to[to_b + i] += from[from_b + i] + from[from_b + i + step] + from[from_b + i + 2 * step] + from[from_b + i + 3 * step];
             }
         }
-    } else {
-        for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += to_step, from_b += divisor_stride) {
-            for (int i = 0; i < to_step; i++) {
-                for (int f = 0; f < divisor_stride; f += from_step) {
-                    to[to_b + i] += from[from_b + i + f];
-
-                }
-            }
-        }
+        return;
     }
 }
 
@@ -182,6 +200,12 @@ static bool HalveInternal(
         CONTEXT_error(context, Out_of_memory);
         return false;
     }
+    //Force the from and to formate to be the same
+    if (from->fmt != to->fmt || (BitmapPixelFormat_bytes_per_pixel (from->fmt) != 3 && BitmapPixelFormat_bytes_per_pixel (from->fmt) != 4)){
+        CONTEXT_error (context, Invalid_internal_state);
+        return false;
+    }
+
     int y, b, d;
     const unsigned short divisorSqr = divisor * divisor;
     unsigned int shift = 0;
@@ -189,15 +213,14 @@ static bool HalveInternal(
         shift = intlog2(divisorSqr);
     }
 
-    const uint32_t from_bytes_pp = BitmapPixelFormat_bytes_per_pixel (from->fmt);
-    const uint32_t to_bytes_pp = BitmapPixelFormat_bytes_per_pixel (to->fmt);
+    const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel (from->fmt);
 
     //TODO: Ensure that from is equal or greater than divisorx to_w and t_h
     //Ensure that shift > 0 && divisorSqr > 0 && divisor > 0
     for (y = 0; y < to_h; y++) {
         memset(buffer, 0, sizeof(short) * to_w_bytes);
         for (d = 0; d < divisor; d++) {
-            HalveRowByDivisor (from->pixels + (y * divisor + d) * from->stride, buffer, to_w, divisor, from_bytes_pp, to_bytes_pp);
+            HalveRowByDivisor (from->pixels + (y * divisor + d) * from->stride, buffer, to_w, divisor, bytes_pp);
         }
         unsigned char * dest_line = to->pixels + y * to_stride;
 
