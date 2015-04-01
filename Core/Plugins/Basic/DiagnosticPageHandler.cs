@@ -140,8 +140,7 @@ namespace ImageResizer.Plugins.Basic {
 
             sb.AppendLine();
 
-            foreach (IDiagnosticsProvider diagProvider in c.Plugins.GetAll<IDiagnosticsProvider>())
-                sb.AppendLine(diagProvider.ProvideDiagnostics());
+            sb.AppendLine(String.Join("\n",c.Plugins.GetAll<IDiagnosticsProvider>().Select(p => p.ProvideDiagnostics()).Distinct()));
 
 
             sb.AppendLine("\nRegistered plugins:\n");
