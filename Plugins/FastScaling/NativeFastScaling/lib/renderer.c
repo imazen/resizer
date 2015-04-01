@@ -142,7 +142,7 @@ static int Renderer_determine_divisor(Renderer * r)
 
     int divisor = (int)floor(divisor_max);
     if (r->details->halve_only_when_common_factor) {
-        while (divisor > 0 && ((r->source->h % divisor != 0) || (r->source->w % divisor == 0))) {
+        while (divisor > 0 && ((r->source->h % divisor != 0) || (r->source->w % divisor != 0))) {
             divisor--;
         }
     }
