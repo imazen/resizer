@@ -118,9 +118,19 @@ bool BitmapFloat_scale_rows(Context * context, BitmapFloat * from, uint32_t from
     }
     return true;
 }
+/*
+This halves in sRGB space instead of linear. Not significantly faster on modern hardware, it appears?
+#define  HALVING_TYPE unsigned short
+#define TO_HALVING_TYPE(x) x
+#define FROM_HALVING_TYPE(x) x
+#define ALLOW_SHIFTING_HALVING_TYPE
+*/
 
+#define  HALVING_TYPE float
+#define TO_HALVING_TYPE(x)  t->srgb_to_linear[x]
+#define FROM_HALVING_TYPE(x)  uchar_clamp_ff(linear_to_srgb(x))
 
-static inline void HalveRowByDivisor(const unsigned char* from, unsigned short * to, const unsigned int to_count, const int divisor, const int step)
+static inline void HalveRowByDivisor (const LookupTables* t, const unsigned char* from, HALVING_TYPE * to, const unsigned int to_count, const int divisor, const int step)
 {
     int to_b, from_b;
     const int to_bytes = to_count * step;
@@ -129,9 +139,9 @@ static inline void HalveRowByDivisor(const unsigned char* from, unsigned short *
         if (step == 3){
             for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 3, from_b += divisor_stride) {
                 for (int f = 0; f < divisor_stride; f += 3) {
-                    to[to_b + 0] += from[from_b + f + 0];
-                    to[to_b + 1] += from[from_b + f + 1];
-                    to[to_b + 2] += from[from_b + f + 2];
+                    to[to_b + 0] += TO_HALVING_TYPE(from[from_b + f + 0]);
+                    to[to_b + 1] += TO_HALVING_TYPE (from[from_b + f + 1]);
+                    to[to_b + 2] += TO_HALVING_TYPE (from[from_b + f + 2]);
                 }
 
             }
@@ -139,10 +149,10 @@ static inline void HalveRowByDivisor(const unsigned char* from, unsigned short *
         else if (step == 4){
             for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 4, from_b += divisor_stride) {
                 for (int f = 0; f < divisor_stride; f += 4) {
-                    to[to_b + 0] += from[from_b + f + 0];
-                    to[to_b + 1] += from[from_b + f + 1];
-                    to[to_b + 2] += from[from_b + f + 2];
-                    to[to_b + 3] += from[from_b + f + 3];
+                    to[to_b + 0] += TO_HALVING_TYPE (from[from_b + f + 0]);
+                    to[to_b + 1] += TO_HALVING_TYPE (from[from_b + f + 1]);
+                    to[to_b + 2] += TO_HALVING_TYPE (from[from_b + f + 2]);
+                    to[to_b + 3] += TO_HALVING_TYPE (from[from_b + f + 3]);
                 }
             }
         }
@@ -153,13 +163,13 @@ static inline void HalveRowByDivisor(const unsigned char* from, unsigned short *
         if (to_count % 2 == 0) {
             for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += 2 * step, from_b += 4 * step) {
                 for (int i = 0; i < 2 * step; i++) {
-                    to[to_b + i] += from[from_b + i] + from[from_b + i + step];
+                    to[to_b + i] += TO_HALVING_TYPE (from[from_b + i]) + TO_HALVING_TYPE (from[from_b + i + step]);
                 }
             }
         } else {
             for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += step, from_b += 2 * step) {
                 for (int i = 0; i < step; i++) {
-                    to[to_b + i] += from[from_b + i] + from[from_b + i + step];
+                    to[to_b + i] += TO_HALVING_TYPE (from[from_b + i]) + TO_HALVING_TYPE (from[from_b + i + step]);
                 }
             }
         }
@@ -168,7 +178,7 @@ static inline void HalveRowByDivisor(const unsigned char* from, unsigned short *
     if (divisor == 3) {
         for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += step, from_b += 3 * step) {
             for (int i = 0; i < step; i++) {
-                to[to_b + i] += from[from_b + i] + from[from_b + i + step] + from[from_b + i + 2 * step];
+                to[to_b + i] += TO_HALVING_TYPE (from[from_b + i]) + TO_HALVING_TYPE (from[from_b + i + step]) + TO_HALVING_TYPE (from[from_b + i + 2 * step]);
             }
         }
         return;
@@ -176,7 +186,7 @@ static inline void HalveRowByDivisor(const unsigned char* from, unsigned short *
     if (divisor == 4) {
         for (to_b = 0, from_b = 0; to_b < to_bytes; to_b += step, from_b += 4 * step) {
             for (int i = 0; i < step; i++) {
-                to[to_b + i] += from[from_b + i] + from[from_b + i + step] + from[from_b + i + 2 * step] + from[from_b + i + 3 * step];
+                to[to_b + i] += TO_HALVING_TYPE (from[from_b + i]) + TO_HALVING_TYPE (from[from_b + i + step]) + TO_HALVING_TYPE (from[from_b + i + 2 * step]) + TO_HALVING_TYPE (from[from_b + i + 3 * step]);
             }
         }
         return;
@@ -195,7 +205,7 @@ static bool HalveInternal(
 {
 
     const int to_w_bytes = to_w * BitmapPixelFormat_bytes_per_pixel (to->fmt);
-    unsigned short *buffer = (unsigned short *)CONTEXT_calloc(context, to_w_bytes, sizeof(unsigned short));
+    HALVING_TYPE *buffer = (HALVING_TYPE *)CONTEXT_calloc(context, to_w_bytes, sizeof(HALVING_TYPE));
     if (buffer == NULL) {
         CONTEXT_error(context, Out_of_memory);
         return false;
@@ -206,41 +216,50 @@ static bool HalveInternal(
         return false;
     }
 
+    const LookupTables* t = get_lookup_tables ();
+    if (t == NULL) {
+        CONTEXT_error (context, Out_of_memory);
+        return false;
+    }
+
     int y, b, d;
     const unsigned short divisorSqr = divisor * divisor;
-    unsigned int shift = 0;
-    if (isPowerOfTwo(divisorSqr)) {
-        shift = intlog2(divisorSqr);
-    }
+    const unsigned int shift = isPowerOfTwo (divisorSqr) ? intlog2(divisorSqr) : 0;
+
 
     const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel (from->fmt);
 
     //TODO: Ensure that from is equal or greater than divisorx to_w and t_h
     //Ensure that shift > 0 && divisorSqr > 0 && divisor > 0
     for (y = 0; y < to_h; y++) {
-        memset(buffer, 0, sizeof(short) * to_w_bytes);
+        memset(buffer, 0, sizeof(HALVING_TYPE) * to_w_bytes);
         for (d = 0; d < divisor; d++) {
-            HalveRowByDivisor (from->pixels + (y * divisor + d) * from->stride, buffer, to_w, divisor, bytes_pp);
+            HalveRowByDivisor (t, from->pixels + (y * divisor + d) * from->stride, buffer, to_w, divisor, bytes_pp);
         }
         unsigned char * dest_line = to->pixels + y * to_stride;
-
+#ifdef ALLOW_SHIFTING_HALVING_TYPE
         if (shift == 2) {
             for (b = 0; b < to_w_bytes; b++) {
-                dest_line[b] = buffer[b] >> 2;
+                dest_line[b] = FROM_HALVING_TYPE(buffer[b] >> 2);
             }
         } else if (shift == 3) {
             for (b = 0; b < to_w_bytes; b++) {
-                dest_line[b] = buffer[b] >> 3;
+                dest_line[b] = FROM_HALVING_TYPE (buffer[b] >> 3);
             }
         } else if (shift > 0) {
             for (b = 0; b < to_w_bytes; b++) {
-                dest_line[b] = buffer[b] >> shift;
-            }
-        } else {
-            for (b = 0; b < to_w_bytes; b++) {
-                dest_line[b] = buffer[b] / divisorSqr;
+                dest_line[b] = FROM_HALVING_TYPE (buffer[b] >> shift);
             }
         }
+        if (shift == 0){
+#endif
+
+            for (b = 0; b < to_w_bytes; b++) {
+                dest_line[b] = FROM_HALVING_TYPE (buffer[b] / divisorSqr);
+            }
+#ifdef ALLOW_SHIFTING_HALVING_TYPE
+        }
+#endif
     }
 
     CONTEXT_free(context, buffer);
