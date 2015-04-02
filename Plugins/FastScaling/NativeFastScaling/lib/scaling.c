@@ -224,8 +224,9 @@ static bool HalveInternal(
 
     int y, b, d;
     const unsigned short divisorSqr = divisor * divisor;
+#ifdef ALLOW_SHIFTING_HALVING_TYPE
     const unsigned int shift = isPowerOfTwo (divisorSqr) ? intlog2(divisorSqr) : 0;
-
+#endif
 
     const uint32_t bytes_pp = BitmapPixelFormat_bytes_per_pixel (from->fmt);
 
