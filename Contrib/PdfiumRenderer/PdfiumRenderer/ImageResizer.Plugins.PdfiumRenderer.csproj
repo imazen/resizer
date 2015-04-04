@@ -28,6 +28,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\ImageResizer.Plugins.PdfiumRenderer.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PdfiumViewer, Version=1.6.0.0, Culture=neutral, PublicKeyToken=91e4789cfb0609e0, processorArchitecture=MSIL">

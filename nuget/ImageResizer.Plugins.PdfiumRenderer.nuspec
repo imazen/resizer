@@ -1,0 +1,32 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.PdfiumRenderer</id>
+		<title>ImageResizer.Plugins.PdfiumRenderer - Read PDF files like images</title>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<owners>$owners$</owners>
+		<licenseUrl>http://imageresizing.net/licenses/trial</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>$iconurl$</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>
+Dynamically render PDF files (page-by-page) to any size, then (optionally) process them as if they were images.
+ 
+Docs: http://imageresizing.net/plugins/pdfiumrenderer
+
+Support: http://imageresizing.net/support
+
+Requires license, see http://imageresizing.net/plugins
+
+$plugins$</description>
+		<tags>ImageResizer PdfiumRenderer PDF Imazen Resizer  imaging</tags>
+		<dependencies>
+		  <dependency id="ImageResizer" version="[$version$,)" />
+		</dependencies>
+	</metadata>
+  	<files>
+ 		<file src="$coredlldir$\ImageResizer.Plugins.PdfiumRenderer.dll" target="lib\net45" />
+		<file src="$coredlldir$\ImageResizer.Plugins.PdfiumRenderer.xml" target="lib\net45" />
+	</files>
+</package>

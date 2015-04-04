@@ -13,6 +13,7 @@ Directories containing permissively licensed code ([Apache 2](#apache-2-license)
 
     /Contrib/AdditionalFileExtensions
     /Contrib/PdfRenderer (copyleft when used with Ghostscript!)
+    /Contrib/PdfiumRenderer
     /Core
     /Core/Plugins/Basic
     /submodules/StudioJS
