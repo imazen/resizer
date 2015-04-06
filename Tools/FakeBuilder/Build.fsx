@@ -203,8 +203,8 @@ Target "pack_nuget" (fun _ ->
            "coredlldir", (rootDir+"dlls/release");
            "iconurl", "http://imageresizing.net/images/logos/ImageIconPSD100.png";
            "plugins", "## 30+ plugins available\n\n" + 
-               "Search 'ImageResizer' on nuget.org, or visit imageresizing.net to see 40+ plugins, including WPF, WIC, FreeImage, OpenCV, AForge &amp; Ghostscript (PDF) integrations. " + 
-               "You'll also find  plugins for disk caching, memory caching, Microsoft SQL blob support, Amazon CloudFront, S3, Azure Blob Storage, MongoDB GridFS, automatic whitespace trimming, " +
+               "Search 'ImageResizer' on nuget.org, or visit imageresizing.net to see 40+ plugins. Some offer 4-30x performance improvements; some render PDFs and PSDs; others detect faces and trim whitespace.\n" + 
+               "You'll find  plugins for disk caching, memory caching, Microsoft SQL blob support, Amazon CloudFront, S3, Azure Blob Storage, MongoDB GridFS, automatic whitespace trimming, " +
                "automatic white balance, octree 8-bit gif/png quantization and transparency dithering, animated gif resizing, watermark &amp; text overlay support, content aware image resizing /" + 
                " seam carving (based on CAIR), grayscale, sepia, histogram, alpha, contrast, saturation, brightness, hue, Guassian blur, noise removal, and smart sharpen filters, psd editing &amp; " +
                "rendering, raw (CR2, NEF, DNG, etc.) file exposure, .webp (weppy) support, image batch processing &amp; compression into .zip archives, red eye auto-correction,  face detection, and " + 
