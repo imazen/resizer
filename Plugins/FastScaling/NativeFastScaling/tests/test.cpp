@@ -218,7 +218,7 @@ TEST_CASE("Test Weighting", "[fastscaling]")
     //These should be negative between x=1 and x=2, positive between 2 and 3, but should end at 3
 
     CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos3, msg, 1, 2, 1, 0.1, 3) == nullptr);
-    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos3Sharp, msg, 0.98, 1.9625, 1, 0.1, 2.943) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos3Sharp, msg, 0.98, 1.9625, 1, 0.1, 3) == nullptr);
 
     ///
     CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos2Windowed, msg, 1, 2, 1, 0.08, 2) == nullptr);

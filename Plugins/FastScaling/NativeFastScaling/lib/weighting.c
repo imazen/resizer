@@ -48,13 +48,13 @@ static double filter_bicubic_fast(const InterpolationDetails * d, double t)
 }
 
 
-static double filter_sinc_2(const InterpolationDetails * d, double t)
+static double filter_sinc(const InterpolationDetails * d, double t)
 {
     const double abs_t = (double)fabs(t) / d->blur;
     if (abs_t == 0) {
         return 1;    //Avoid division by zero
     }
-    if (abs_t > 2) {
+    if (abs_t > d->window) {
         return 0;
     }
     const double a = abs_t * IR_PI;
@@ -167,13 +167,13 @@ InterpolationDetails * InterpolationDetails_create_from(Context * context, Inter
     case Filter_Triangle:
         return InterpolationDetails_create_custom(context, 1, 1, filter_triangle);
     case Filter_Lanczos2:
-        return InterpolationDetails_create_custom(context, 2, 1, filter_sinc_2);
+        return InterpolationDetails_create_custom(context, 2, 1, filter_sinc);
     case Filter_Lanczos3: //Note - not a 3 lobed function - truncated to 2
-        return InterpolationDetails_create_custom(context, 3, 1, filter_sinc_2);
+        return InterpolationDetails_create_custom(context, 3, 1, filter_sinc);
     case Filter_Lanczos2Sharp:
-        return InterpolationDetails_create_custom(context, 2, 0.9549963639785485, filter_sinc_2);
-    case Filter_Lanczos3Sharp://Note - not a 3 lobed function - truncated to 2
-        return InterpolationDetails_create_custom(context, 3, 0.9812505644269356, filter_sinc_2);
+        return InterpolationDetails_create_custom(context, 2, 0.9549963639785485, filter_sinc);
+    case Filter_Lanczos3Sharp:
+        return InterpolationDetails_create_custom(context, 3, 0.9812505644269356, filter_sinc);
 
     //Hermite and BSpline no negative weights
     case Filter_CubicBSpline:
