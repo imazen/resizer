@@ -9,6 +9,17 @@
 #pragma unmanaged
 #endif
 
+#ifdef _MSC_VER
+#define BESSEL_01 _j1
+#else
+#ifdef __GLIBC__
+#define BESSEL_01 __builtin_j1
+#else
+#define BESSEL_01 j1
+#endif
+#endif
+
+
 #include "fastscaling_private.h"
 
 #include <stdlib.h>
@@ -89,6 +100,53 @@ static double filter_sinc_windowed(const InterpolationDetails * d, double t)
     }
     return d->window * sin(IR_PI * x / d->window) * sin(x * IR_PI) / (IR_PI * IR_PI * x * x);
 }
+
+
+
+
+static double filter_jinc (const InterpolationDetails * d, double t) {
+    const double x = fabs (t) / d->blur;
+    if (x == 0.0)
+        return(0.5*IR_PI);
+    return(BESSEL_01 (IR_PI*x) / x);
+    ////x crossing #1 1.2196698912665045
+}
+
+
+/*
+
+static inline double window_jinc (double x) {
+    double x_a = x * 1.2196698912665045;
+    if (x == 0.0)
+        return 1;
+    return (BesselOrderOne (IR_PI*x_a) / (x_a * IR_PI * 0.5));
+    ////x crossing #1 1.2196698912665045
+}
+
+static double filter_window_jinc (const InterpolationDetails * d, double t) {
+    return window_jinc (t / (d->blur * d->window));
+}
+*/
+
+static double filter_ginseng (const InterpolationDetails * d, double t)
+{
+    //Sinc windowed by jinc
+    const double abs_t = (double)fabs (t) / d->blur;
+    const double t_pi = abs_t * IR_PI;
+
+    if (abs_t == 0) {
+        return 1;    //Avoid division by zero
+    }
+    if (abs_t > 3) {
+        return 0;
+    }
+    const double jinc_input = 1.2196698912665045 * t_pi / d->window;
+    const double jinc_output = BESSEL_01 (jinc_input) / (jinc_input * 0.5);
+
+    return jinc_output * sin (t_pi) / (t_pi);
+
+}
+
 
 #define TONY 0.00001
 
@@ -215,6 +273,12 @@ InterpolationDetails * InterpolationDetails_create_from(Context * context, Inter
         return InterpolationDetails_create_bicubic_custom(context, 1, 1, 0, 0);
     case Filter_Box:
         return InterpolationDetails_create_custom(context, 0.5, 1, filter_box);
+
+    case Filter_Ginseng:
+        return InterpolationDetails_create_custom (context, 3, 1, filter_ginseng);
+
+    case Filter_Jinc:
+        return InterpolationDetails_create_custom (context, 3, 1.0 / 1.2196698912665045, filter_jinc);
 
     }
     CONTEXT_error(context, Invalid_interpolation_filter);
