@@ -152,7 +152,7 @@ namespace ImageResizer{
                             ManagedRenderer^ renderer;
                             try{
                                 renderer = gcnew ManagedRenderer (context, a, b, opts, s->Job->Profiler);
-                            if (space != Workingspace::Floatspace_srgb_to_linear){
+                            if (space != Workingspace::Floatspace_linear){
                                 context->UseFloatspace (space, space_param_a, space_param_b, space_param_c);
                             }
                             	renderer->Render ();

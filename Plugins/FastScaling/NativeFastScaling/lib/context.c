@@ -132,7 +132,7 @@ void Context_initialize(Context * context)
     //memset(context->error.callstack, 0, sizeof context->error.callstack);
     context->error.reason = No_Error;
     DefaultHeapManager_initialize(&context->heap);
-    Context_set_floatspace (context, Floatspace_srgb_to_linear, 0.0f, 0.0f, 0.0f);
+    Context_set_floatspace (context, Floatspace_linear, 0.0f, 0.0f, 0.0f);
 }
 
 Context * Context_create(void)

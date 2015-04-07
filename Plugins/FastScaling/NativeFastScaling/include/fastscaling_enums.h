@@ -92,22 +92,23 @@ ENUM_END (BitmapCompositingMode)
 [ImageResizer::ExtensionMethods::EnumRemovePrefixAttribute ("Floatspace_")]
 #endif
 ENUM_START (FLOATSSPACE_NAME, _WorkingFloatspace)
-Floatspace_auto = -1,
+    Floatspace_srgb = 0,
     Floatspace_as_is = 0,
-    Floatspace_srgb_to_linear = 1,
+    Floatspace_linear = 1,
+    Floatspace_gamma = 2,
 
-    Floatspace_sigmoid = 2,
-    Floatspace_srgb_to_sigmoid = 3,
 
-    Floatspace_sigmoid_2 = 6,//2 | 4,
-    Floatspace_srgb_to_sigmoid_2 = 7,//1 | 2 | 4,
+    Floatspace_sigmoid = 4,
+    Floatspace_gamma_sigmoid = 6,//2 | 4,
 
-    Floatspace_sigmoid_3 = 10,//2 | 8,
-    Floatspace_srgb_to_sigmoid_3 = 11,//1 | 2 | 8,
+    Floatspace_sigmoid_2 = 12,//4 | 8,
+    Floatspace_gamma_sigmoid_2 = 14,//4 | 8 | 2,
 
-    Floatspace_gamma = 32
+    Floatspace_sigmoid_3 = 20,//4 | 16,
+    Floatspace_gamma_sigmoid_3 = 22,//4 | 16 | 2,
 
-    ENUM_END (FLOATSSPACE_NAME)
+ENUM_END (FLOATSSPACE_NAME)
 
 #undef ENUM_START
 #undef ENUM_END
+#undef query_alias

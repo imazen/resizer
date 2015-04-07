@@ -22,8 +22,8 @@ namespace ImageResizer.Plugins.FastScaling.Tests
         }
 
         [Theory]
-        [InlineData("as_is", Workingspace.Floatspace_as_is)]
-        [InlineData("srgb_to_linear", Workingspace.Floatspace_srgb_to_linear)]
+        [InlineData("linear", Workingspace.Floatspace_linear)]
+        [InlineData("srgb", Workingspace.Floatspace_srgb)]
         public void TestColorspaceEnumParsing(string name, Workingspace value)
         {
             Assert.Equal(ImageResizer.ExtensionMethods.EnumExtensions.Parse<Workingspace>(name), value);

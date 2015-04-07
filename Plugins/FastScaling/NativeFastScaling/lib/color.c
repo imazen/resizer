@@ -236,7 +236,7 @@ bool BitmapBgra_populate_histogram (Context * context, BitmapBgra * bmp, uint64_
      context->colorspace.floatspace = space;
 
 
-     context->colorspace.apply_srgb = (space & Floatspace_srgb_to_linear) > 0;
+     context->colorspace.apply_srgb = (space & Floatspace_linear) > 0;
      context->colorspace.apply_sigmoid = (space & Floatspace_sigmoid) > 0;
      context->colorspace.apply_gamma = (space & Floatspace_gamma) > 0;
 
