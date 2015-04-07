@@ -78,16 +78,13 @@
     <EmbeddedResource Include="Page2.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\packages\pdfiumviewer.1.6.0.0\content\x64\pdfium.dll">
-      <Link>x64\pdfium.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\packages\pdfiumviewer.1.6.0.0\content\x86\pdfium.dll">
-      <Link>x86\pdfium.dll</Link>
+    <Content Include="..\..\..\Packages\PdfiumViewer.1.6.0.0\content\x86\pdfium.dll">
+      <Link>pdfium.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="TransparencyPage1.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
