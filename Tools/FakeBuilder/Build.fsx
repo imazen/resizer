@@ -173,14 +173,14 @@ Target "test" (fun _ ->
       
     !! (rootDir + "Tests/binaries/release/*Tests.dll")
         //++ (rootDir + "Tests/binaries/release/x64/*Tests.dll")
-        ++ (rootDir + "Tests/binaries/release/x64/*Tests.Cpp.dll")
+        ++ (rootDir + "Tests/binaries/release/x64/ImageResizer.Plugins.FastScaling.Tests.dll")
         -- (rootDir + "**/ImageResizer.Plugins.LicenseVerifier.Tests.dll")
         -- (rootDir + "**/ImageResizer.CoreFSharp.Tests.dll")
             |> xUnit (fun p -> {p with ToolPath = xunit})
-    
+            
     !! (rootDir + "Tests/binaries/release/*Tests.dll")
         //++ (rootDir + "Tests/binaries/release/x86/*Tests.dll")
-        ++ (rootDir + "Tests/binaries/release/x86/*Tests.Cpp.dll")
+        ++ (rootDir + "Tests/binaries/release/x86/ImageResizer.Plugins.FastScaling.Tests.dll")
         -- (rootDir + "**/ImageResizer.Plugins.LicenseVerifier.Tests.dll")
         -- (rootDir + "**/ImageResizer.CoreFSharp.Tests.dll")
         -- (rootDir + "**/ImageResizer.AllPlugins.Tests.dll")
