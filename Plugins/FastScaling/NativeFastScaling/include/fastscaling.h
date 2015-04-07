@@ -170,7 +170,8 @@ typedef enum _InterpolationFilter {
     Filter_Lanczos2Windowed,
     Filter_Lanczos2SharpWindowed,
     Filter_CatmullRomFast,
-    Filter_CatmullRomFastSharp
+    Filter_CatmullRomFastSharp,
+    Filter_MitchellFast
 } InterpolationFilter;
 
 struct InterpolationDetailsStruct;

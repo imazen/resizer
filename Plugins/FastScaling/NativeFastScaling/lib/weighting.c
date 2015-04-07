@@ -201,6 +201,10 @@ InterpolationDetails * InterpolationDetails_create_from(Context * context, Inter
         return InterpolationDetails_create_bicubic_custom(context, 1, 13.0 / 16.0, 0, 0.5);
     case Filter_Mitchell:
         return InterpolationDetails_create_bicubic_custom(context, 2, 7.0 / 8.0, 1.0 / 3.0, 1.0 / 3.0);
+    case Filter_MitchellFast:
+        return InterpolationDetails_create_bicubic_custom (context, 1, 7.0 / 8.0, 1.0 / 3.0, 1.0 / 3.0);
+
+
     case Filter_Robidoux:
         return InterpolationDetails_create_bicubic_custom(context, 2, 1. / 1.1685777620836932,
                 0.37821575509399867, 0.31089212245300067);
