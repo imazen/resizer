@@ -8,6 +8,7 @@ using System.Text;
 using ImageResizer.Collections;
 using System.Reflection;
 using System.Globalization;
+using System.Linq;
 
 namespace ImageResizer.ExtensionMethods {
 
@@ -24,6 +25,23 @@ namespace ImageResizer.ExtensionMethods {
 
         public EnumStringAttribute(string name) : this(name, false) { }
     }
+
+    [AttributeUsage(AttributeTargets.Enum | AttributeTargets.Field, AllowMultiple = true)]
+    public sealed class EnumRemovePrefixAttribute : Attribute
+    {
+        public string Name { get; set; }
+        public bool Default { get; set; }
+
+        public EnumRemovePrefixAttribute(string name, bool defaultForSerialization)
+            : base()
+        {
+            Name = name;
+            Default = defaultForSerialization;
+        }
+
+        public EnumRemovePrefixAttribute(string name) : this(name, false) { }
+    }
+
 
     /// <summary>
     /// Extends enumerations by allowing them to define alternate strings with the [EnumString("Alternate Name",true)]  attribute, and support it through TryParse and ToPreferredString
@@ -47,6 +65,10 @@ namespace ImageResizer.ExtensionMethods {
             //Get the enumeration fields
             FieldInfo[] fields = t.GetFields(BindingFlags.Static | BindingFlags.GetField | BindingFlags.Public);
 
+            //Prefixes
+            var prefixes = t.GetCustomAttributes(typeof(EnumRemovePrefixAttribute), false).Where(attr => attr is EnumRemovePrefixAttribute).Select(attr => ((EnumRemovePrefixAttribute)attr).Name);
+            
+
             //Create modifiable dictionaries
             var ev = new Dictionary<string, Enum>(fields.Length * 2, StringComparer.OrdinalIgnoreCase);
             var ep = new Dictionary<Enum, string>(fields.Length);
@@ -65,6 +87,11 @@ namespace ImageResizer.ExtensionMethods {
                     if (a.Default) defaultName = a.Name;
                     ev[a.Name] = value;
                 }
+
+               foreach (String unprefixed in prefixes.Where(prefix => name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).Select(prefix => name.Remove(0,prefix.Length))){
+                   ev[unprefixed] = value;
+               }
+
                 //Add the preferred name
                 if (!ep.ContainsKey(value)) ep[value] = defaultName;
 
