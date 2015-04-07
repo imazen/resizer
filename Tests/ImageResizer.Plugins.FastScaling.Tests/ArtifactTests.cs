@@ -144,22 +144,37 @@ namespace ImageResizer.Plugins.FastScaling.Tests
             }
         }
 
-        [Fact]
-        public void CompareToGDI()
+        [Theory]
+        [InlineData("0", "0.5", "rings2.png", 500, 40,40,40, 1)]
+        [InlineData("0", "2", "rings2.png", 500, 40, 40, 40, 1)]
+        public void CompareToGDI(string filter, string window, string image, int width, double threshold_r,  double threshold_g,  double threshold_b,  double threshold_a  )
         {
-            String source = "..\\..\\..\\..\\Samples\\Images\\rings2.png";
-            int cmp_size = 3;
+            String source = "..\\..\\..\\..\\Samples\\Images\\" + image;
+           
+            int block_width = 16;
+            int block_height = 16;
+            int blocks_x = Math.Min(5, Math.Max(2, width / block_width));
+            int blocks_y = Math.Min(5, Math.Max(2, width / block_height));
+            
+            int block_width_padded = width / blocks_x;
+            int block_height_padded = width / blocks_y;
+
+            //R, G, B, A error threshold
+            var threshold = new Tuple<double, double, double, double>(threshold_r, threshold_g, threshold_b, threshold_a);//on a scale of 0..255;
 
             var c = new Config();
             var i1 = new Instructions();
             new FastScalingPlugin().Install(c);
 
-            i1["width"] = "500";
-            i1["window"] = "0.5";
-            i1["f"] = "0";
+            i1["width"] = width.ToString();
+            i1["fastscaling"] = "false";
+
 
             var i2 = new Instructions(i1);
             i2["fastscale"] = "true";
+
+            i2["f.window"] = window;
+            i2["f"] = filter;
             
             var job1 = new ImageJob(source, typeof(Bitmap), i1);
             c.Build(job1);
@@ -170,14 +185,46 @@ namespace ImageResizer.Plugins.FastScaling.Tests
             Bitmap b1 = (job1.Result as Bitmap);
             Bitmap b2 = (job2.Result as Bitmap);
 
-            for (int x = 0; x < cmp_size; x++ )
-            for (int y = 0; y < cmp_size; y++ )
+
+            for (int x = 0; x < blocks_x; x++ )
+            for (int y = 0; y < blocks_y; y++ )
             {
-                Assert.True((b1.GetPixel(x, y) == b2.GetPixel(x, y)),
-                            "Mismatch at px " + x.ToString() + ";" + y.ToString() +
-                            " got " + b2.GetPixel(x, y).ToString() +
-                            " expected " + b1.GetPixel(x, y).ToString());
+                var x1 = x * block_width_padded;
+                var y1 = y * block_height_padded;
+                var x2 = x1 + block_width;
+                var y2 = y1 + block_height;
+                if (x2 >= b1.Width || y2 >= b1.Height) continue;
+
+                var error = RMS(b1, b2, x1, y1, x2, y2);
+
+                Assert.True(error.Item1 < threshold.Item1 &&
+                            error.Item2 < threshold.Item2 &&
+                            error.Item3 < threshold.Item3 &&
+                            error.Item4 < threshold.Item4,
+                            String.Format("Mismatch within region ({0},{1}) ({2},{3}). Root mean squared error ({4}) excceeds threshold {5}", x1, y1, x2, y2, error, threshold));
             }
+        }
+
+
+
+        private Tuple<double,double,double,double> RMS(Bitmap a, Bitmap b, int x1, int y1, int x2, int y2)
+        {
+            double err_r = 0, err_g = 0, err_b = 0, err_a = 0;
+            long n = 0;
+            for (int y = y1; y < y2; y++ )
+                for (int x = x1; x < x2; x++)
+                {
+                    var pixa = a.GetPixel(x, y);
+                    var pixb = b.GetPixel(x, y);
+                    err_r += (pixb.R - pixa.R) * (pixb.R - pixa.R);
+                    err_g += (pixb.G - pixa.G) * (pixb.G - pixa.G);
+                    err_b += (pixb.B - pixa.B) * (pixb.B - pixa.B);
+                    err_a += (pixb.A - pixa.A) * (pixb.A - pixa.A);
+                    n++;
+                }
+
+            return new Tuple<double, double, double, double>(Math.Sqrt(err_r / n), Math.Sqrt(err_g / n), Math.Sqrt(err_b / n), Math.Sqrt(err_a / n));
+
         }
 
 
