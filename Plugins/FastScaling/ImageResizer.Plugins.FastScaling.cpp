@@ -97,38 +97,62 @@ namespace ImageResizer{
 						return RequestedAction::None;
                     }
 
+                    bool sourceFormatInvalid = (source->PixelFormat != PixelFormat::Format32bppArgb &&
+                        source->PixelFormat != PixelFormat::Format24bppRgb &&
+                        source->PixelFormat != PixelFormat::Format32bppRgb);
 
-                    BitmapOptions^ a = gcnew BitmapOptions();
-                    a->AllowSpaceReuse = false;
-                    a->AlphaMeaningful = true;
-                    a->Crop = Util::PolygonMath::ToRectangle(sourceArea);
-                    a->Bitmap = source;
-
-
-                    BitmapOptions^ b = gcnew BitmapOptions();
-                    b->AllowSpaceReuse = false;
-                    b->AlphaMeaningful = true;
-                    b->Crop = Util::PolygonMath::ToRectangle(targetBox);
-                    b->Bitmap = dest;
-                    b->Compositing = ImageResizer::Plugins::FastScaling::internal_use_only::BitmapCompositingMode::Blend_with_self;
-
-                    opts->ColorMatrix = colorMatrix;
-
-                    ExecutionContext^ context = gcnew ExecutionContext ();
+                    Bitmap^ copy = nullptr;
+                    Graphics^ copyGraphics = nullptr;
                     try{
-                        SetupConvolutions (context, query, opts);
 
+                        BitmapOptions^ a = gcnew BitmapOptions ();
+                        a->AlphaMeaningful = true;
+                        a->Crop = Util::PolygonMath::ToRectangle (sourceArea);
 
-                        ManagedRenderer^ renderer;
+                        if (!sourceFormatInvalid){
+                            a->AllowSpaceReuse = false;
+                            a->Bitmap = source;
+                        }
+                        else{
+                            copy = gcnew Bitmap (source->Width, source->Height, PixelFormat::Format32bppArgb);
+                            copyGraphics = System::Drawing::Graphics::FromImage (copy);
+                            copyGraphics->CompositingMode = Drawing2D::CompositingMode::SourceCopy;
+                            copyGraphics->DrawImageUnscaled (source, 0, 0);
+                            delete copyGraphics;
+                            copyGraphics = nullptr;
+                            a->Bitmap = copy;
+                            a->AllowSpaceReuse = true;
+                            a->Readonly = false;
+                        }
+
+                        BitmapOptions^ b = gcnew BitmapOptions ();
+                        b->AllowSpaceReuse = false;
+                        b->AlphaMeaningful = true;
+                        b->Crop = Util::PolygonMath::ToRectangle (targetBox);
+                        b->Bitmap = dest;
+                        b->Compositing = ImageResizer::Plugins::FastScaling::internal_use_only::BitmapCompositingMode::Blend_with_self;
+
+                        opts->ColorMatrix = colorMatrix;
+
+                        ExecutionContext^ context = gcnew ExecutionContext ();
                         try{
-                            renderer = gcnew ManagedRenderer (context, a, b, opts, s->Job->Profiler);
-                            renderer->Render ();
+                            SetupConvolutions (context, query, opts);
+                            ManagedRenderer^ renderer;
+                            try{
+                                renderer = gcnew ManagedRenderer (context, a, b, opts, s->Job->Profiler);
+                                renderer->Render ();
+                            }
+                            finally{
+                                delete renderer;
+                            }
                         }
                         finally{
-                            delete renderer;
+                            delete context;
                         }
-                    }finally{
-                        delete context;
+                    }
+                    finally{
+                        if (copyGraphics != nullptr) delete copyGraphics;
+                        if (copy != nullptr) delete copy;
                     }
                     return RequestedAction::Cancel;
 
