@@ -140,7 +140,7 @@ namespace ImageResizer.Plugins.FastScaling.Tests
                 if ( y >= 0 && y < b.Height) b.SetPixel(j, y, Color.Black);
               }
 
-              b.Save(String.Format(root + "Tests\\ImageResizer.Plugins.FastScaling.Tests\\PlotFilter{0}.png", i));
+              b.Save(String.Format(root + "Tests\\ImageResizer.Plugins.FastScaling.Tests\\Plot_{0}.png", (InterpolationFilter)i));
               
             }
 

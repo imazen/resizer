@@ -9,54 +9,36 @@
 #include "Stdafx.h"
 #include "fastscaling.h"
 
+
+#pragma managed
 using System::FlagsAttribute;
 
 namespace ImageResizer{
     namespace Plugins {
         namespace FastScaling{
 
-#define STATUS_CODE_NAME
-#define STATUS_CODE_ENUM_NAME public enum class FastScalingResult
+            namespace internal_use_only{
+
+#undef FASTSCALING_ENUMS_MANAGED
+#undef STATUS_CODE_NAME
+#undef FLOATSSPACE_NAME
+
+#define FASTSCALING_ENUMS_MANAGED
+#define STATUS_CODE_NAME FastScalingResult
+#define FLOATSSPACE_NAME Workingspace
 
 #include "status_code.h"
 
-            namespace internal_use_only{
+#undef FASTSCALING_ENUMS_MANAGED
+#undef STATUS_CODE_NAME
+#undef FLOATSSPACE_NAME
+
                 public enum struct  Rotate{
                     RotateNone = 0,
                     Rotate90 = 1,
                     Rotate180 = 2,
                     Rotate270 = 3
                 };
-
-                public enum struct BitmapPixelFormat {
-                    Bgr24 = 3,
-                    Bgra32 = 4,
-                    Gray8 = 1
-                };
-
-
-                public enum struct BitmapCompositingMode {
-                    Replace_self = 0,
-                    Blend_with_self = 1,
-                    Blend_with_matte = 2
-                };
-
-                [Flags]
-                public enum struct Workingspace: System::Int32 {
-                    Floatspace_auto = -1,
-                    Floatspace_as_is = 0,
-                    Floatspace_srgb_to_linear = 1,
-                    Floatspace_sigmoid = 2,
-                    Floatspace_srgb_to_sigmoid = 2 | 1,
-
-                    Floatspace_sigmoid_2 = 2 | 4,
-                    Floatspace_srgb_to_sigmoid_2 = 1 | 2 | 4,
-
-                    Floatspace_sigmoid_3 = 2 | 8,
-                    Floatspace_srgb_to_sigmoid_3 = 1 | 2 | 8
-
-                };
-
 
                 public ref class ExecutionContext{
                 public:

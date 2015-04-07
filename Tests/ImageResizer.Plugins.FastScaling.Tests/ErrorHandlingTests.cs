@@ -14,6 +14,21 @@ namespace ImageResizer.Plugins.FastScaling.Tests
     public class ErrorHandlingTests
     {
 
+        [Theory]
+        [InlineData("lanczos3windowed", InterpolationFilter.Filter_Lanczos3Windowed)]
+        [InlineData("cubicfast", InterpolationFilter.Filter_CubicFast)]
+        public void TestEnumParsing(string name, InterpolationFilter value){
+            Assert.Equal(ImageResizer.ExtensionMethods.EnumExtensions.Parse<InterpolationFilter>(name), value);
+        }
+
+        [Theory]
+        [InlineData("as_is", Workingspace.Floatspace_as_is)]
+        [InlineData("srgb_to_linear", Workingspace.Floatspace_srgb_to_linear)]
+        public void TestColorspaceEnumParsing(string name, Workingspace value)
+        {
+            Assert.Equal(ImageResizer.ExtensionMethods.EnumExtensions.Parse<Workingspace>(name), value);
+        }
+
         [Fact]
         public void TestManagedRenderer(){
             using (var context = new ExecutionContext())

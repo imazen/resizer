@@ -34,16 +34,6 @@ typedef struct ContextStruct Context;
 
 /** Context: ProfilingLog **/
 
-
-typedef enum _ProfilingEntryFlags {
-    Profiling_start = 2,
-    Profiling_start_allow_recursion = 2 | 4,
-    Profiling_stop = 8,
-    Profiling_stop_assert_started = 8 | 16,
-    Profiling_stop_children = 8 | 16 | 32,
-
-} ProfilingEntryFlags;
-
 typedef struct {
     int64_t time;
     const char * name;
@@ -72,20 +62,6 @@ int  Context_error_reason(Context * context);
 
 void Context_free_static_caches(void);
 
-
-//Compact format for bitmaps. sRGB or gamma adjusted - *NOT* linear
-typedef enum _BitmapPixelFormat {
-    Bgr24 = 3,
-    Bgra32 = 4,
-    Gray8 = 1
-} BitmapPixelFormat;
-
-
-typedef enum _BitmapCompositingMode {
-    Replace_self = 0,
-    Blend_with_self = 1,
-    Blend_with_matte = 2
-} BitmapCompositingMode;
 
 //non-indexed bitmap
 typedef struct BitmapBgraStruct {
@@ -127,52 +103,14 @@ uint8_t Context_floatspace_to_byte (Context * c, float space_value);
 
 
 
-typedef enum _WorkingFloatspace {
-    Floatspace_as_is = 0,
-    Floatspace_srgb_to_linear = 1,
 
-    Floatspace_sigmoid = 2,
-    Floatspace_srgb_to_sigmoid = 3,
-
-    Floatspace_sigmoid_2 = 2 | 4,
-    Floatspace_srgb_to_sigmoid_2 = 1 | 2 | 4,
-
-    Floatspace_sigmoid_3 = 2 | 8,
-    Floatspace_srgb_to_sigmoid_3 = 1 | 2 | 8,
-
-    Floatspace_gamma = 32,
-
-} WorkingFloatspace;
 
 
 void Context_set_floatspace (Context * context,  WorkingFloatspace space, float a, float b, float c);
 
 typedef struct RendererStruct Renderer;
 
-typedef enum _InterpolationFilter {
-    Filter_CubicFast,
-    Filter_Cubic,
-    Filter_CatmullRom,
-    Filter_Mitchell,
-    Filter_Robidoux,
-    Filter_RobidouxSharp,
-    Filter_Hermite,
-    Filter_Lanczos3,
-    Filter_Lanczos3Sharp,
-    Filter_Lanczos2,
-    Filter_Lanczos2Sharp,
-    Filter_Triangle,
-    Filter_Linear,
-    Filter_Box,
-    Filter_CubicBSpline,
-    Filter_Lanczos3Windowed,
-    Filter_Lanczos3SharpWindowed,
-    Filter_Lanczos2Windowed,
-    Filter_Lanczos2SharpWindowed,
-    Filter_CatmullRomFast,
-    Filter_CatmullRomFastSharp,
-    Filter_MitchellFast
-} InterpolationFilter;
+
 
 struct InterpolationDetailsStruct;
 typedef double (*detailed_interpolation_method)(const struct InterpolationDetailsStruct *, double);
