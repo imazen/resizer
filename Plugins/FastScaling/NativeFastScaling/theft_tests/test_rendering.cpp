@@ -181,7 +181,6 @@ TEST_CASE("TestRender", "[fastscaling][thief]") {
     theft_free(t);
     printf("\n");
     REQUIRE(THEFT_RUN_PASS == res);
-    free_lookup_tables();
     destroy_context();
 }
 

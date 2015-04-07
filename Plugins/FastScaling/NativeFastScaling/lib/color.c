@@ -53,45 +53,6 @@ bool BitmapFloat_luv_to_linear_rows(Context * context, BitmapFloat * bit, const 
 }
 
 
-static LookupTables * table = NULL;
-
-void free_lookup_tables()
-{
-    LookupTables * temp =  table;
-    table = NULL;
-    free(temp);
-}
-
-LookupTables * get_lookup_tables(void)
-{
-    if (table == NULL) {
-        LookupTables * temp = (LookupTables*)malloc(sizeof(LookupTables));
-        if (temp == NULL) return NULL;
-        // Gamma correction
-        // http://www.4p8.com/eric.brasseur/gamma.html#formulas
-
-        // Store gamma adjusted in 256-511, linear in 0-255
-
-        float *lin = temp->linear;
-        float *to_lin = temp->srgb_to_linear;
-
-        for (uint32_t n = 0; n < 256; n++) {
-            float s = ((float)n) / 255.0f;
-            lin[n] = s;
-            to_lin[n] = srgb_to_linear(s);
-        }
-
-        if (table == NULL) {
-            //A race condition could cause a 3KB, one-time memory leak between these two lines.
-            //we're OK with that. Better than locking during an inner loop
-            table = temp;
-        } else {
-            free(temp);
-        }
-    }
-    return table;
-}
-
 
 bool BitmapBgra_apply_color_matrix(Context * context, BitmapBgra * bmp, const uint32_t row, const uint32_t count, float* const __restrict  m[5])
 {
@@ -188,4 +149,126 @@ bool BitmapFloat_apply_color_matrix(Context * context, BitmapFloat * bmp, const 
         return false;
     }
     }
+}
+
+
+
+bool BitmapBgra_populate_histogram (Context * context, BitmapBgra * bmp, uint64_t * histograms, const uint32_t histogram_size_per_channel, const uint32_t histogram_count, uint64_t * pixels_sampled)
+{
+    const uint32_t row = 0;
+    const uint32_t count = bmp->h;
+    const uint32_t stride = bmp->stride;
+    const uint32_t ch = BitmapPixelFormat_bytes_per_pixel (bmp->fmt);
+    const uint32_t w = bmp->w;
+    const uint32_t h = umin (row + count, bmp->h);
+
+    const int shift = 8 - intlog2 (histogram_size_per_channel);
+
+    if (ch == 4 || ch == 3) {
+
+        if (histogram_count == 1){
+
+            for (uint32_t y = row; y < h; y++){
+                for (uint32_t x = 0; x < w; x++) {
+                    uint8_t* const __restrict data = bmp->pixels + stride * y + x * ch;
+
+                    histograms[(306 * data[2] + 601 * data[1] + 117 * data[0]) >> shift]++;
+                }
+            }
+        } else if (histogram_count == 3){
+            for (uint32_t y = row; y < h; y++){
+                for (uint32_t x = 0; x < w; x++) {
+                    uint8_t* const __restrict data = bmp->pixels + stride * y + x * ch;
+                    histograms[data[2] >> shift]++;
+                    histograms[(data[1] >> shift) + histogram_size_per_channel]++;
+                    histograms[(data[0] >> shift) + 2 * histogram_size_per_channel]++;
+                }
+            }
+        }
+        else if (histogram_count == 2){
+            for (uint32_t y = row; y < h; y++){
+                for (uint32_t x = 0; x < w; x++) {
+                    uint8_t* const __restrict data = bmp->pixels + stride * y + x * ch;
+                    //Calculate luminosity and saturation
+                    histograms[(306 * data[2] + 601 * data[1] + 117 * data[0]) >> shift]++;
+                    histograms[histogram_size_per_channel + (max(255,max(abs ((int)data[2] - (int)data[1]),abs ((int)data[1] - (int)data[0]))) >> shift)]++;
+                }
+            }
+        }
+        else{
+            CONTEXT_error (context, Invalid_internal_state);
+            return false;
+        }
+
+        *(pixels_sampled) = (h - row) * w;
+    }
+    else {
+        CONTEXT_error (context, Unsupported_pixel_format);
+        return false;
+    }
+    return true;
+}
+
+
+
+ // Gamma correction  http://www.4p8.com/eric.brasseur/gamma.html#formulas
+
+ static void Context_sigmoid_internal (Context * c, float x_coefficent, float x_offset, float constant){
+     c->colorspace.sigmoid.constant = constant; //1
+     c->colorspace.sigmoid.x_coeff = x_coefficent; //2
+     c->colorspace.sigmoid.x_offset = x_offset; //-1
+     c->colorspace.sigmoid.y_offset = 0;
+     c->colorspace.sigmoid.y_coeff = 1;
+
+     c->colorspace.sigmoid.y_coeff = 1 / (sigmoid (&c->colorspace.sigmoid, 1.0) - sigmoid (&c->colorspace.sigmoid, 0));
+     c->colorspace.sigmoid.y_offset = -1 * sigmoid (&c->colorspace.sigmoid, 0);
+
+ }
+
+
+
+ static float derive_constant (float x, float slope, float sign){
+    return (float)((-2.0f * slope * fabs (x) + sign * sqrtf ((float)(1.0f - 4.0f * slope * fabs (x))) + 1.0f) / 2.0f * slope);
+ }
+
+
+ void Context_set_floatspace (Context * context,  WorkingFloatspace space, float a, float b, float c){
+     context->colorspace.floatspace = space;
+
+
+     context->colorspace.apply_srgb = (space & Floatspace_srgb_to_linear) > 0;
+     context->colorspace.apply_sigmoid = (space & Floatspace_sigmoid) > 0;
+     context->colorspace.apply_gamma = (space & Floatspace_gamma) > 0;
+
+     if ((space & Floatspace_sigmoid_3) > 0){
+         Context_sigmoid_internal (context, -2, a, derive_constant (a + b * -2, c, 1));
+     }
+     else if ((space & Floatspace_sigmoid_2) > 0){
+         Context_sigmoid_internal (context, -b, (1 + c) * b, -1 * (b + a));
+     }
+     else if ((space & Floatspace_sigmoid) > 0){
+         Context_sigmoid_internal (context, a, b, c);
+     }
+
+     if (context->colorspace.apply_gamma){
+         context->colorspace.gamma = a;
+         context->colorspace.gamma_inverse = (float)(1.0 / ((double)a));
+     }
+
+     for (uint32_t n = 0; n < 256; n++) {
+         context->colorspace.byte_to_float[n] = Context_srgb_to_floatspace_uncached (context, n);
+     }
+ }
+
+
+
+
+
+
+float Context_byte_to_floatspace (Context * c, uint8_t srgb_value){
+    return Context_srgb_to_floatspace (c, srgb_value);
+}
+
+ uint8_t Context_floatspace_to_byte (Context * c, float space_value){
+    return Context_floatspace_to_srgb (c, space_value);
 }

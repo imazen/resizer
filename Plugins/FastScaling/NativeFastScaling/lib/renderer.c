@@ -15,6 +15,7 @@
 
 #include "fastscaling_private.h"
 #include <stdio.h>
+#include <string.h>
 
 typedef struct RendererStruct {
     RenderDetails * details;

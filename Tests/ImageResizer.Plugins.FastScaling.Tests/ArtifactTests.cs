@@ -145,9 +145,11 @@ namespace ImageResizer.Plugins.FastScaling.Tests
         }
 
         [Theory]
-        [InlineData("0", "0.5", "rings2.png", 500, 40,40,40, 1)]
-        [InlineData("0", "2", "rings2.png", 500, 40, 40, 40, 1)]
-        public void CompareToGDI(string filter, string window, string image, int width, double threshold_r,  double threshold_g,  double threshold_b,  double threshold_a  )
+        [InlineData("0", "0.5", "0","rings2.png", 500, 40,40,40, 1)]
+        [InlineData("0", "2","0", "rings2.png", 500, 40, 40, 40, 1)]
+
+        [InlineData("15", null, "0", "rings2.png", 400, 15,15,15,1)] //lanczos3 windowed, in srgb colorspace, is very close to GDI
+        public void CompareToGDI(string filter, string window, string colorspace, string image, int width, double threshold_r,  double threshold_g,  double threshold_b,  double threshold_a  )
         {
             String source = "..\\..\\..\\..\\Samples\\Images\\" + image;
            
@@ -172,6 +174,7 @@ namespace ImageResizer.Plugins.FastScaling.Tests
 
             var i2 = new Instructions(i1);
             i2["fastscale"] = "true";
+            i2["f.space"] = colorspace;
 
             i2["f.window"] = window;
             i2["f"] = filter;

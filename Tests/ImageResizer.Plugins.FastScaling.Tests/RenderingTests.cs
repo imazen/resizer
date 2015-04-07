@@ -12,30 +12,46 @@ using ImageResizer.Plugins.FastScaling.internal_use_only;
 
 namespace ImageResizer.Plugins.FastScaling.Tests
 {
-    class RenderingTests
+    public class RenderingTests
     {
 
-           static Bitmap BuildFast(Bitmap source, String i)
-    {
-        Config c = new Config();
+        static string root
+        {
+            get
+            {
+                return "..\\..\\..\\..\\";
+            }
+        }
 
-        FastScalingPlugin fs = new FastScalingPlugin();
-        fs.Install(c);
+        static Bitmap BuildFast(Bitmap source, String i)
+        {
+            Config c = new Config();
 
-        Stream dest = new MemoryStream();
-        ImageJob j = new ImageJob();
-        j.InstructionsAsString = i;
-        j.Source = source;
-        j.Dest = typeof(Bitmap);
+            FastScalingPlugin fs = new FastScalingPlugin();
+            fs.Install(c);
 
-        c.Build(j);
-        return (Bitmap)j.Result;
-    }
+            Stream dest = new MemoryStream();
+            ImageJob j = new ImageJob();
+            j.InstructionsAsString = i;
+            j.Source = source;
+            j.Dest = typeof(Bitmap);
 
-           [Fact]
+            c.Build(j);
+            return (Bitmap)j.Result;
+        }
+
+        [Fact]
+        void DirectoryExists()
+        {
+            Assert.True(Directory.Exists(root + "Samples\\Images"));
+        }
+
+
+
+        [Fact]
         void CompositingTest()
         {
-            String imgdir = "..\\..\\..\\..\\Samples\\Images\\";
+            String imgdir = root + "Samples\\Images\\";
             Bitmap input = new Bitmap(imgdir + "premult-test.png");
             Bitmap output = BuildFast(input, "fastscale=true&width=256&bgcolor=blue");
 
@@ -51,7 +67,7 @@ namespace ImageResizer.Plugins.FastScaling.Tests
         [Fact]
         void AlphaMultTest()
         {
-            String imgdir = "..\\..\\..\\..\\Samples\\Images\\";
+            String imgdir = root + "Samples\\Images\\";
             Bitmap input = new Bitmap(imgdir + "premult-test.png");
             Bitmap output = BuildFast(input, "fastscale=true&width=256&");
 
@@ -64,8 +80,8 @@ namespace ImageResizer.Plugins.FastScaling.Tests
         [Fact]
         void GammaTest()
         {
-            String imgdir = "..\\..\\..\\..\\Samples\\Images\\";
-            Bitmap input = new Bitmap(imgdir + "gamma-test.png");
+            String imgdir = root + "Samples\\Images\\";
+            Bitmap input = new Bitmap(imgdir + "gamma-test.jpg");
             Bitmap output = BuildFast(input, "fastscale=true&width=256");
 
              Color px = output.GetPixel(90,70);
@@ -124,11 +140,106 @@ namespace ImageResizer.Plugins.FastScaling.Tests
                 b.SetPixel(j, y, Color.Black);
               }
 
-              b.Save(String.Format("..\\..\\..\\..\\Tests\\ImageResizer.Plugins.FastScaling.Tests.Cpp\\PlotFilter{0}.png", i));
+              b.Save(String.Format(root + "Tests\\ImageResizer.Plugins.FastScaling.Tests\\PlotFilter{0}.png", i));
               
             }
 
         }
+
+
+        [Theory]
+        /*
+        [InlineData(0, 0, 0)]
+        [InlineData(2,0,1)]
+
+        [InlineData(-2, 1, -1.2)]
+
+        [InlineData(-2, 1, -1.5)]
+
+
+        [InlineData(2, -1, 1)]
+
+
+
+
+        [InlineData(-4, 1, -4)]
+        [InlineData(-3, 1, -3)]
+
+        [InlineData(20, 0, 1)]
+
+        [InlineData(-3, 1, -1.2)]
+
+        */
+        [InlineData(1,0,0,0)]
+        [InlineData(2,2,1,1)]
+        [InlineData(2,-2,1,-1.2)]
+        [InlineData(2,-2,1,-1.5)]
+
+
+        [InlineData(3, -2, 1, -1.5)]
+
+
+
+        [InlineData(2, -2, 1, -3)]
+
+        [InlineData(2, -3, 1.5, -3)]
+
+        [InlineData(2, -3, 1.2, -3)]
+        [InlineData(2, -3, .9, -3)]
+
+        [InlineData(2, -3, 1.9, -3)]
+
+        [InlineData(2, 3, -2.3, 3)]
+
+
+        [InlineData(2, -3, 2.1, -3)]
+
+
+
+        [InlineData(2, 3, 0.9, 3)]
+
+        [InlineData(2, 3, 0.9, 4)]
+
+
+        [InlineData(2,-3,1,-3)]
+
+        [InlineData(6, 1,3,0)]
+        [InlineData(6, 1,3,0.5)]
+
+        [InlineData(10, 0,0.5,0.6)]
+        [InlineData(10, 0.5,0.5,0.6)]
+        [InlineData(10, 1,0.5,0.6)]
+
+        void PlotColorspaces(Workingspace mode, float a, float b, float z)
+        {
+
+            var c = new ExecutionContext();
+
+            c.UseFloatspace(mode, a, b, z);
+
+            int width = 300;
+            int height = 300;
+            using (c) 
+            using(Bitmap bmp = new Bitmap(width, height))
+            using(Graphics g = Graphics.FromImage(bmp)){
+
+                int x_axis = 280;
+                int y_axis = 20;
+            
+                for (int i = 0; i < 256; i++)
+                {
+                    byte srgb = (byte)Math.Min(255,Math.Max(0,i));
+                    float floatspace = (((float)i) / 255.0f);
+
+                    bmp.SetPixel(y_axis + i, x_axis - c.FloatspaceToByte(floatspace), Color.Blue);
+                    bmp.SetPixel(y_axis + i, x_axis - Math.Min(255, Math.Max(0, (int)(255.0f * c.ByteToFloatspace(srgb)))), Color.Red);
+                }
+                g.DrawLine(Pens.Gray, y_axis, x_axis, y_axis + 255, x_axis - 255);
+                bmp.Save(String.Format(root + "Tests\\ImageResizer.Plugins.FastScaling.Tests\\PlotColorSpace{0}, {1}, {2}, {3}.png", mode, a, b, z));
+            }
+
+        }
+
 
     }
 }

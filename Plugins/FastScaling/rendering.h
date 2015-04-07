@@ -126,6 +126,9 @@ namespace ImageResizer{
 
                 public:
 
+                    BitmapBgra * source_bgra (){
+                        return wbSource->bgra;
+                    }
 
                     ManagedRenderer (ExecutionContext^ c, BitmapOptions^ editInPlace, RenderOptions^ opts, IProfiler^ p){
                         this->p = p;

@@ -89,6 +89,9 @@ namespace ImageResizer{
 
                     opts->InterpolateLastPercent = opts->InterpolateLastPercent < 1 ? -1 : opts->InterpolateLastPercent;
 
+                    Workingspace space = (Workingspace)(int)fmax (-1, fmin (200, GetDouble (query, "f.space", 1)));
+
+
                     //TODO: permit it to work with increments of 90 rotation
                     //Write polygon math method to determin the angle of the target area.
 
@@ -140,7 +143,10 @@ namespace ImageResizer{
                             ManagedRenderer^ renderer;
                             try{
                                 renderer = gcnew ManagedRenderer (context, a, b, opts, s->Job->Profiler);
-                                renderer->Render ();
+                                if (space != Workingspace::Floatspace_srgb_to_linear){
+                                	context->UseFloatspace (space, GetDouble (query, "f.a", 0), GetDouble (query, "f.b", 0), GetDouble (query, "f.c", 0));
+                            	}
+                            	renderer->Render ();
                             }
                             finally{
                                 delete renderer;

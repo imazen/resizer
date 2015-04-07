@@ -33,7 +33,6 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
     BitmapBgra_destroy(&context, source);
     BitmapBgra_destroy(&context, canvas);
 
-    free_lookup_tables();
     Context_terminate(&context);
     return true;
 }
@@ -62,8 +61,6 @@ bool test_in_place (int sx, int sy, BitmapPixelFormat sbpp, bool flipx, bool fli
     RenderDetails_destroy(&context, details);
 
     BitmapBgra_destroy(&context,source);
-
-    free_lookup_tables();
 
     Context_terminate(&context);
     return true;
@@ -376,7 +373,6 @@ SCENARIO("sRGB roundtrip", "[fastscaling]")
         }
         BitmapBgra_destroy(&context, final);
         BitmapBgra_destroy(&context, bit);
-        free_lookup_tables();
         Context_terminate(&context);
     }
 }
