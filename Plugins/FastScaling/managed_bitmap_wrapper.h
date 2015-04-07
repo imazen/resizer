@@ -122,7 +122,7 @@ namespace ImageResizer{
 
                     WeightingFilter (int f){
                         c = Context_create ();
-                        details = InterpolationDetails_create_from (c, (InterpolationFilter)f);
+                        details = InterpolationDetails_create_from (c, (::InterpolationFilter)f);
                         window = details->window;
                         if (details == nullptr) throw gcnew ArgumentOutOfRangeException ("f");
                     }
@@ -146,7 +146,7 @@ namespace ImageResizer{
 
                 WeightingFilter^ WeightingFilter::CreateIfValid (int filter){
                     Context * c = Context_create ();
-                    InterpolationDetails* d = InterpolationDetails_create_from (c, (InterpolationFilter)filter);
+                    InterpolationDetails* d = InterpolationDetails_create_from (c, (::InterpolationFilter)filter);
                     if (d == nullptr) {
 
                         Context_destroy (c);

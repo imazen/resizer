@@ -135,9 +135,9 @@ namespace ImageResizer.Plugins.FastScaling.Tests
               for (int j = 0; j < width; j++){
                 int y = (int)Math.Round(buffer[j] * vscale) + x_axis_y;
                 if (Double.IsNaN(buffer[j]) || buffer[j] > buffer[width / 2]){
-                  throw new ArgumentOutOfRangeException("filter", "filter produced an invalid value, either NaN, or a peak other than x=0");
+                  throw new ArgumentOutOfRangeException("filter", "filter produced an invalid value (" + buffer[j].ToString() + "), either NaN, or a peak other than x=0");
                 }
-                b.SetPixel(j, y, Color.Black);
+                if ( y >= 0 && y < b.Height) b.SetPixel(j, y, Color.Black);
               }
 
               b.Save(String.Format(root + "Tests\\ImageResizer.Plugins.FastScaling.Tests\\PlotFilter{0}.png", i));

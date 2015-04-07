@@ -30,13 +30,9 @@ namespace ImageResizer{
 			public ref class FastScalingPlugin : public ImageResizer::Resizing::BuilderExtension, IPlugin, IQuerystringPlugin
 			{
                 void SetupConvolutions(ExecutionContext^ c, NameValueCollection ^query, RenderOptions^ addTo){
-                    double kernel_radius = System::String::IsNullOrEmpty(query->Get("f.unsharp.radius")) ? 0 :
-                        System::Double::Parse(query->Get("f.unsharp.radius"), System::Globalization::NumberFormatInfo::InvariantInfo);
-                    double unsharp_sigma = System::String::IsNullOrEmpty(query->Get("f.unsharp.sigma")) ? 1.4 :
-                        System::Double::Parse(query->Get("f.unsharp.sigma"), System::Globalization::NumberFormatInfo::InvariantInfo);
-
-                    double threshold = System::String::IsNullOrEmpty(query->Get("f.unsharp.threshold")) ? 0 :
-                        System::Double::Parse(query->Get("f.unsharp.threshold"), System::Globalization::NumberFormatInfo::InvariantInfo);
+                    int kernel_radius = (int)GetDouble(query, "f.unsharp.radius", 0);
+                    double unsharp_sigma = GetDouble (query, "f.unsharp.sigma", 1.4);
+                    double threshold = GetDouble (query, "f.unsharp.threshold", 0);
 
                     if (kernel_radius > 0){
 
@@ -78,10 +74,10 @@ namespace ImageResizer{
 
                     opts->SamplingWindowOverride = (float)GetDouble (query, "f.window", 0);
 
-                    opts->Filter = (InterpolationFilter)(uint32_t)(float)GetDouble (query, "f", 0);
+                    opts->Filter = (::InterpolationFilter)(uint32_t)(float)GetDouble (query, "f", 0);
 
 
-                    opts->SharpeningPercentGoal = (float)GetDouble (query, "f.sharpen", 0) / 200.0;
+                    opts->SharpeningPercentGoal = (float)(GetDouble (query, "f.sharpen", 0) / 200.0);
 
                     opts->SharpeningPercentGoal = fminf(fmaxf(0.0f, opts->SharpeningPercentGoal), 0.5f);
 
@@ -143,9 +139,9 @@ namespace ImageResizer{
                             ManagedRenderer^ renderer;
                             try{
                                 renderer = gcnew ManagedRenderer (context, a, b, opts, s->Job->Profiler);
-                                if (space != Workingspace::Floatspace_srgb_to_linear){
-                                	context->UseFloatspace (space, GetDouble (query, "f.a", 0), GetDouble (query, "f.b", 0), GetDouble (query, "f.c", 0));
-                            	}
+                            if (space != Workingspace::Floatspace_srgb_to_linear){
+                                context->UseFloatspace (space, (float)GetDouble (query, "f.a", 0), (float)GetDouble (query, "f.b", 0), (float)GetDouble (query, "f.c", 0));
+                            }
                             	renderer->Render ();
                             }
                             finally{

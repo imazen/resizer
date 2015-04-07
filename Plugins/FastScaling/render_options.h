@@ -39,7 +39,7 @@ namespace ImageResizer{
                 public ref class RenderOptions{
                 public:
                     RenderOptions (){
-                        this->Filter = InterpolationFilter::Filter_CubicFast;
+                        this->Filter = ::InterpolationFilter::Filter_CubicFast;
                         SamplingWindowOverride = 0;
                         SamplingBlurFactor = 1;
                         SharpeningPercentGoal = 0;

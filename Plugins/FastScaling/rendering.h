@@ -50,7 +50,7 @@ namespace ImageResizer{
                         k->threshold_min_change = from->MinChangeThreshold;
 
 
-                        for (int i = 0; i < Math::Min ((uint32_t)from->Kernel->Length, k->width); i++)
+                        for (uint32_t i = 0; i < Math::Min ((uint32_t)from->Kernel->Length, k->width); i++)
                             k->kernel[i] = (float)from->Kernel[i];
                         return k;
                     }
@@ -77,7 +77,7 @@ namespace ImageResizer{
                         to->kernel_b = from->KernelB_Struct != nullptr ? from->KernelB_Struct :
                             from->KernelB != nullptr ? CopyKernel (from->KernelB) : nullptr;
 
-                        to->interpolate_last_percent = from->InterpolateLastPercent;
+                        to->interpolate_last_percent = (float)from->InterpolateLastPercent;
 
 
                         if (to->interpolation != nullptr){
@@ -85,7 +85,7 @@ namespace ImageResizer{
                             to->interpolation = nullptr;
                         }
 
-                        to->interpolation = InterpolationDetails_create_from (c->GetContext (), (InterpolationFilter)from->Filter);
+                        to->interpolation = InterpolationDetails_create_from (c->GetContext (), (::InterpolationFilter)from->Filter);
                         if (to->interpolation == nullptr) {
                             throw gcnew FastScalingException (c);
                         }
@@ -194,13 +194,13 @@ namespace ImageResizer{
                         ProfilingLog * log = Context_get_profiler_log (c->GetContext ());
                         if (log == nullptr || log->capacity == 0) return;
                         if (log->count >= log->capacity) throw gcnew FastScalingException ("Profiling log was not large enough to contain all messages");
-                        for (int i = 0; i < log->count; i++){
+                        for (uint32_t i = 0; i < log->count; i++){
                             ProfilingEntry entry = log->log[i];
-                            bool start = (entry.flags & ProfilingEntryFlags::Profiling_start) > 0;
-                            bool allowRecursion = (entry.flags & ProfilingEntryFlags::Profiling_start_allow_recursion) > 0;
-                            bool stop = (entry.flags & ProfilingEntryFlags::Profiling_stop) > 0;
-                            bool assert_started = (entry.flags & ProfilingEntryFlags::Profiling_stop_assert_started) > 0;
-                            bool stop_children = (entry.flags & ProfilingEntryFlags::Profiling_stop_children) > 0;
+                            bool start = (entry.flags & ::ProfilingEntryFlags::Profiling_start) > 0;
+                            bool allowRecursion = (entry.flags & ::ProfilingEntryFlags::Profiling_start_allow_recursion) > 0;
+                            bool stop = (entry.flags & ::ProfilingEntryFlags::Profiling_stop) > 0;
+                            bool assert_started = (entry.flags & ::ProfilingEntryFlags::Profiling_stop_assert_started) > 0;
+                            bool stop_children = (entry.flags & ::ProfilingEntryFlags::Profiling_stop_children) > 0;
 
                             if (start){
                                 p->LogStart (entry.time, gcnew String (entry.name), allowRecursion);
