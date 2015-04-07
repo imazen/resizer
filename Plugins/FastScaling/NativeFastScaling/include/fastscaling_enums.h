@@ -61,7 +61,8 @@ ENUM_START (InterpolationFilter, _InterpolationFilter)
     Filter_CatmullRomFastSharp,
     Filter_MitchellFast,
     Filter_Ginseng,
-    Filter_Jinc
+    Filter_Jinc,
+    Filter_RobidouxFast
 ENUM_END (InterpolationFilter)
 
 ENUM_START (ProfilingEntryFlags, _ProfilingEntryFlags)

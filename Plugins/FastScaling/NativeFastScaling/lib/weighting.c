@@ -266,6 +266,11 @@ InterpolationDetails * InterpolationDetails_create_from(Context * context, Inter
     case Filter_Robidoux:
         return InterpolationDetails_create_bicubic_custom(context, 2, 1. / 1.1685777620836932,
                 0.37821575509399867, 0.31089212245300067);
+
+
+    case Filter_RobidouxFast:
+        return InterpolationDetails_create_bicubic_custom (context, 1.05, 1. / 1.1685777620836932,
+            0.37821575509399867, 0.31089212245300067);
     case Filter_RobidouxSharp:
         return InterpolationDetails_create_bicubic_custom(context, 2, 1. / 1.105822933719019,
                 0.2620145123990142, 0.3689927438004929);
