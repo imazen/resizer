@@ -27,7 +27,7 @@ namespace ImageResizer{
 #define STATUS_CODE_NAME FastScalingResult
 #define FLOATSSPACE_NAME Workingspace
 
-#include "status_code.h"
+#include "fastscaling_enums.h"
 
 #undef FASTSCALING_ENUMS_MANAGED
 #undef STATUS_CODE_NAME

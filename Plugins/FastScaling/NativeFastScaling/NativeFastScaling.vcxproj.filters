@@ -18,9 +18,6 @@
     <ClInclude Include="include\fastscaling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\status_code.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="lib\color.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -35,6 +32,9 @@
     </ClInclude>
     <ClInclude Include="lib\trim_whitespace.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fastscaling_enums.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -19,7 +19,7 @@
 
 */
 
-#include "status_code.h"
+#include "fastscaling_enums.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
