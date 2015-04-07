@@ -502,4 +502,16 @@ Target "do_all" (fun _ ->
     Run "print_stats"
 )
 
+Target "do_anonymous" (fun _ ->
+    "clean"
+    ==> "patch_info"
+    ==> "build"
+    ==> "test"
+    ==> "unmess"
+    ==> "pack"
+    ==> "print_stats"
+    Run "print_stats"
+)
+
+
 RunTargetOrDefault "do_all"
