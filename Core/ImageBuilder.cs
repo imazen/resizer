@@ -1207,15 +1207,15 @@ namespace ImageResizer
         public virtual IEnumerable<string> GetSupportedFileExtensions() {
             return _supportedFileExtensions;
         }
-       
+        
         private readonly string[] _supportedQuerystringKeys = new string[]{
                     "format", "thumbnail", "maxwidth", "maxheight",
                 "width", "height","w","h",
-                "scale", "stretch", "crop", "cropxunits", "cropyunits", "page", "bgcolor",
+                "crop", "page", "bgcolor",
                 "rotate", "flip", "sourceFlip", "sFlip", "sRotate", "borderWidth",
                 "borderColor", "paddingWidth", "paddingColor",
                 "ignoreicc", "frame", "useresizingpipeline", 
-                "cache", "process", "margin", "anchor","dpi","mode", "zoom"};
+                "cache", "process", "margin", "anchor","dpi", "zoom"};
 
         /// <summary>
         /// Returns a list of the querystring commands ImageBuilder can parse by default. Plugins can implement IQuerystringPlugin to add new ones.
