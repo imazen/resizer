@@ -92,7 +92,7 @@ namespace ImageResizer.Plugins.Basic {
             }
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("Image resizer diagnostic sheet\t\t" + DateTime.UtcNow.ToString(NumberFormatInfo.InvariantInfo) + "\n");
+            sb.AppendLine("Image resizer diagnostic sheet\t\t" +  ((System.Web.HttpContext.Current != null) ? System.Web.HttpContext.Current.Request.Url.DnsSafeHost : "") + "\t" + DateTime.UtcNow.ToString(NumberFormatInfo.InvariantInfo) + "\n");
             sb.AppendLine(issues.Count + " Issues detected:\n");
             foreach (IIssue i in issues)
                 sb.AppendLine(i.Source + "(" + i.Severity.ToString() + "):\t" + i.Summary  +

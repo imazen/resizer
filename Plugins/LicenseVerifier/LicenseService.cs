@@ -242,7 +242,7 @@ namespace ImageResizer.Plugins.LicenseVerifier {
 
             //if (invalidated_count == 1) LogLicenseConfiguration(c);
 
-            var domain = System.Web.HttpContext.Current.Request.UserHostName;
+            var domain = System.Web.HttpContext.Current.Request.Url.DnsSafeHost;
             
             //Handles remapping
             if (_mappings.ContainsKey(domain))
