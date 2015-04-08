@@ -186,7 +186,7 @@ namespace ImageResizer.Plugins.FastScaling.Tests
 
             i2["down.window"] = window;
             i2["down.filter"] = filter;
-            i2["down.interpolate_at_least"] = "-1";
+            i2["down.speed"] = "-2";
             
             var job1 = new ImageJob(source, typeof(Bitmap), i1);
             c.Build(job1);

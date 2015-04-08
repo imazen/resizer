@@ -68,16 +68,51 @@ namespace ImageResizer{
 
                     opts->SamplingWindowOverride = (float)GetDouble (query, prefix +  "window", 0);
 
-                    opts->InterpolateLastPercent = GetDouble (query, prefix + "interpolate_at_least", opts->InterpolateLastPercent);
 
-                    opts->InterpolateLastPercent = GetDouble (query, "f.interpolate_at_least", opts->InterpolateLastPercent);
-
-                    opts->InterpolateLastPercent = opts->InterpolateLastPercent < 1 ? -1 : opts->InterpolateLastPercent;
-
-                    internal_use_only::InterpolationFilter defaultFilter = downscaling ? internal_use_only::InterpolationFilter::Filter_Robidoux : internal_use_only::InterpolationFilter::Filter_Ginseng;
+                    int speed = (int)Math::Round (GetDouble (query, prefix + "speed", 0));
 
 
-                    opts->Filter = (::InterpolationFilter) NameValueCollectionExtensions::Get<internal_use_only::InterpolationFilter> (query, prefix + "filter", defaultFilter);
+                    if (!downscaling){
+
+                        speed = Math::Min (2, Math::Max (0, speed));
+
+                        opts->HalvingAcceptablePixelLoss = 0; //Not relevant for upscaling
+                        opts->InterpolateLastPercent = -1; //Not relevant for upscaling
+
+                        //If we increase the speed, use a filter with a smaller lobe size.
+                        opts->Filter = (uint32_t)(speed == 0 ? ::Filter_Ginseng : (speed == 1) ? ::Filter_Robidoux : ::Filter_RobidouxFast);
+
+
+                    }
+                    else{
+                        float settings[][3] =
+                        {
+                            {::Filter_Robidoux, -1, 0},
+                            {::Filter_Robidoux, 3.1f, 0},
+                            {::Filter_Robidoux, 2.1f, 0.26f},
+                            {::Filter_Robidoux, 2.1f, 0.51f},
+                            {::Filter_Fastest, 2.1f, 0.51f},
+                            {::Filter_Fastest, 1.0f, 0.99f },
+                            {::Filter_Box, 1.0f, 16.0f}
+
+                        };
+
+                        int index_zero = 2;
+                        int configuration_count = 7;
+
+
+                        speed = Math::Min (configuration_count - 1 - index_zero, Math::Max(-1 * index_zero, speed));
+
+                        float * selection = settings[speed + index_zero];
+
+                        opts->Filter = (uint32_t)selection[0];
+                        opts->InterpolateLastPercent = (double)selection[1];
+                        opts->HalvingAcceptablePixelLoss = selection[2];
+
+                    }
+
+
+                    opts->Filter = (::InterpolationFilter) NameValueCollectionExtensions::Get<internal_use_only::InterpolationFilter> (query, prefix + "filter", (internal_use_only::InterpolationFilter)opts->Filter);
 
                     opts->ScalingColorspace = NameValueCollectionExtensions::Get<Workingspace> (query, prefix + "colorspace", Workingspace::Floatspace_as_is);
                     opts->ColorspaceParamA = (float)GetDouble (query, prefix + "colorspace.a", 0);
