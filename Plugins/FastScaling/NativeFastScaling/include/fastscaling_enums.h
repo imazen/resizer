@@ -68,6 +68,8 @@ Filter_Box,
 Filter_CatmullRomFast,
 Filter_CatmullRomFastSharp,
 
+Filter_Fastest,
+
 Filter_MitchellFast
 ENUM_END (InterpolationFilter)
 

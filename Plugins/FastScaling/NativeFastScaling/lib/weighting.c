@@ -271,6 +271,9 @@ static InterpolationDetails * InterpolationDetails_create_from_internal(Context 
     case Filter_Robidoux:
         return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 1. / 1.1685777620836932,
                 0.37821575509399867, 0.31089212245300067);
+    case Filter_Fastest:
+        return ex ? truePtr : InterpolationDetails_create_bicubic_custom (context,0.74, 0.74,
+            0.37821575509399867, 0.31089212245300067);
 
 
     case Filter_RobidouxFast:
