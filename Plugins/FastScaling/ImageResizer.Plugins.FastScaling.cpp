@@ -168,6 +168,8 @@ namespace ImageResizer{
 
                     opts->SharpeningPercentGoal = (float)(GetDouble (query, "f.sharpen", 0) / 200.0);
 
+                    bool ignorealpha = ImageResizer::ExtensionMethods::NameValueCollectionExtensions::Get<bool> (query, "f.ignorealpha", false);
+
                     bool sourceFormatInvalid = (source->PixelFormat != PixelFormat::Format32bppArgb &&
                         source->PixelFormat != PixelFormat::Format24bppRgb &&
                         source->PixelFormat != PixelFormat::Format32bppRgb);
@@ -177,7 +179,7 @@ namespace ImageResizer{
                     try{
 
                         BitmapOptions^ a = gcnew BitmapOptions ();
-                        a->AlphaMeaningful = true;
+                        a->AlphaMeaningful = !ignorealpha;
                         a->Crop = Util::PolygonMath::ToRectangle (sourceArea);
 
                         if (!sourceFormatInvalid){
@@ -185,7 +187,7 @@ namespace ImageResizer{
                             a->Bitmap = source;
                         }
                         else{
-                            copy = gcnew Bitmap (source->Width,source->Height, PixelFormat::Format32bppArgb);
+                            copy = gcnew Bitmap (source->Width, source->Height, ignorealpha ? PixelFormat::Format24bppRgb : PixelFormat::Format32bppArgb);
                             copyGraphics = System::Drawing::Graphics::FromImage (copy);
                             copyGraphics->CompositingMode = Drawing2D::CompositingMode::SourceCopy;
                             copyGraphics->DrawImageUnscaled (source, 0, 0);
@@ -198,10 +200,10 @@ namespace ImageResizer{
 
                         BitmapOptions^ b = gcnew BitmapOptions ();
                         b->AllowSpaceReuse = false;
-                        b->AlphaMeaningful = true;
+                        b->AlphaMeaningful = !ignorealpha;
                         b->Crop = Util::PolygonMath::ToRectangle (targetBox);
                         b->Bitmap = dest;
-                        b->Compositing = ImageResizer::Plugins::FastScaling::internal_use_only::BitmapCompositingMode::Blend_with_self;
+                        b->Compositing = ignorealpha ? internal_use_only::BitmapCompositingMode::Replace_self : internal_use_only::BitmapCompositingMode::Blend_with_self;
 
                         opts->ColorMatrix = colorMatrix;
 
