@@ -21,6 +21,7 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.Threading.Tasks;
 using System.Linq;
+using ImageResizer.ExtensionMethods;
 using System.IO;
 
 namespace ImageResizer.Configuration {
@@ -31,7 +32,27 @@ namespace ImageResizer.Configuration {
             this.c = c;
 
             c.Plugins.QuerystringPlugins.Changed += new SafeList<IQuerystringPlugin>.ChangedHandler(urlModifyingPlugins_Changed);
-            
+
+            new List<string>(c.get("pipeline.fakeExtensions", ".ashx").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
+
+            pipelineDefaults = new Instructions(c.get("pipeline.defaultCommands", ""));
+
+            var pipelineNode =  c.getNode("pipeline");
+
+            if (this.HasPipelineDirective(pipelineDefaults))
+            {
+                var intersection = String.Join(", ", PipelineDirectivesPresent(pipelineDefaults));
+                c.configurationSectionIssues.AcceptIssue(new Issue("You have specified default commands (" + intersection + ") that will cause all image requests to be proccessed; even those that do not need ImageResizer.", pipelineNode != null ? pipelineNode.ToString() : "", IssueSeverity.ConfigurationError));
+            }
+            if (pipelineDefaults.Count > 0)
+            {
+                this.RewriteDefaults += PipelineConfig_RewriteDefaults;
+            }
+        }
+        private NameValueCollection pipelineDefaults;
+        void PipelineConfig_RewriteDefaults(IHttpModule sender, HttpContext context, IUrlEventArgs e)
+        {
+            e.QueryString = e.QueryString.MergeDefaults(pipelineDefaults);
         }
 
         protected void urlModifyingPlugins_Changed(SafeList<IQuerystringPlugin> sender) {
@@ -156,6 +177,20 @@ namespace ImageResizer.Configuration {
             }
             return false;
         }
+
+        private IEnumerable<string> PipelineDirectivesPresent(System.Collections.Specialized.NameValueCollection q)
+        {
+            //Did you know that ASP.NET puts null keys into the QueryString?
+            Dictionary<string, bool> dirs = getCachedDirectives();
+            List<string> intersection = new List<string>();
+            //The querystring always has fewer items than the cachedDirectives, so loop it instead.
+            foreach (string key in q.Keys)
+            {
+                if (key != null && dirs.ContainsKey(key)) intersection.Add(key); //Binary search, hashtable impl
+            }
+            return intersection;
+        }
+
 
         [CLSCompliant(false)]
         protected volatile IList<string> _fakeExtensions = null;
