@@ -133,9 +133,9 @@ bool BitmapFloat_apply_color_matrix(Context * context, BitmapFloat * bmp, const 
 
                 float* const __restrict data = bmp->pixels + stride * y + x * ch;
 
-                const float  r = data[2] = (m[0][0] * data[2] + m[1][0] * data[1] + m[2][0] * data[0] + m[4][0]);
-                const float g = data[1] = (m[0][1] * data[2] + m[1][1] * data[1] + m[2][1] * data[0] + m[4][1]);
-                const float b = data[0] = (m[0][2] * data[2] + m[1][2] * data[1] + m[2][2] * data[0] + m[4][2]);
+                const float  r =  (m[0][0] * data[2] + m[1][0] * data[1] + m[2][0] * data[0] + m[4][0]);
+                const float g =  (m[0][1] * data[2] + m[1][1] * data[1] + m[2][1] * data[0] + m[4][1]);
+                const float b = (m[0][2] * data[2] + m[1][2] * data[1] + m[2][2] * data[0] + m[4][2]);
 
                 float * newdata = bmp->pixels + stride * y + x * ch;
                 newdata[0] = b;
@@ -226,13 +226,15 @@ bool BitmapBgra_populate_histogram (Context * context, BitmapBgra * bmp, uint64_
      c->colorspace.sigmoid.y_offset = -1 * sigmoid (&c->colorspace.sigmoid, 0);
 
  }
+
+ static float derive_constant (float x, float slope, float sign){
+     return (float)((-2.0f * slope * fabs (x) + sign * sqrtf ((float)(1.0f - 4.0f * slope * fabs (x))) + 1.0f) / 2.0f * slope);
+ }
+
 #endif
 
 
 
- static float derive_constant (float x, float slope, float sign){
-    return (float)((-2.0f * slope * fabs (x) + sign * sqrtf ((float)(1.0f - 4.0f * slope * fabs (x))) + 1.0f) / 2.0f * slope);
- }
 
 
  void Context_set_floatspace (Context * context,  WorkingFloatspace space, float a, float b, float c){
