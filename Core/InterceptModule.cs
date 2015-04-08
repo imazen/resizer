@@ -144,6 +144,9 @@ namespace ImageResizer {
                             HandleRequest(app.Context, virtualPath, q, vf);
                             //Catch not found exceptions
                         } catch (System.IO.FileNotFoundException notFound) { //Some VPPs are optimisitic , or could be a race condition
+                            if (notFound.Message.Contains(" assembly ")) throw; //If an assembly is missing, it should be a 500, not a 404
+
+
                             FileMissing(app.Context, virtualPath, q);
                             throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
                         } catch (System.IO.DirectoryNotFoundException notFound) {
@@ -280,9 +283,12 @@ namespace ImageResizer {
 
                     //Catch not found exceptions
                 } catch (System.IO.FileNotFoundException notFound) {
+                    if (notFound.Message.Contains(" assembly ")) throw; //If an assembly is missing, it should be a 500, not a 404
+                    
                     //This will be called later, if at all. 
                     FileMissing(context, virtualPath, queryString);
-                    throw new ImageMissingException("The specified resource could not be located","File not found", notFound);
+                    throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
+                    
                 } catch (System.IO.DirectoryNotFoundException notFound) {
                     FileMissing(context, virtualPath, queryString);
                     throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
