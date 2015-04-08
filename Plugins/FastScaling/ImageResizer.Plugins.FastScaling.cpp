@@ -30,7 +30,8 @@ namespace ImageResizer{
 			public ref class FastScalingPlugin : public ImageResizer::Resizing::BuilderExtension, IPlugin, IQuerystringPlugin
 			{
                 void SetupConvolutions(ExecutionContext^ c, NameValueCollection ^query, RenderOptions^ addTo){
-                    int kernel_radius = (int)GetDouble(query, "f.unsharp.radius", 0);
+                    //No unsharp mask support until it is higher quality
+          /*          int kernel_radius = (int)GetDouble(query, "f.unsharp.radius", 0);
                     double unsharp_sigma = GetDouble (query, "f.unsharp.sigma", 1.4);
                     double threshold = GetDouble (query, "f.unsharp.threshold", 0);
 
@@ -38,7 +39,7 @@ namespace ImageResizer{
 
                         addTo->KernelA_Struct = ConvolutionKernel_create_guassian_sharpen (c->GetContext (), unsharp_sigma, kernel_radius);
 
-                    }
+                    }*/
 
                 }
 			protected:
