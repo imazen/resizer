@@ -22,7 +22,7 @@ For more informaiton, [check out our website](http://www.imageresizing.net). To 
 
 #### License
 
-See [license.txt]( https://github.com/imazen/resizer/blob/support/v3/license.txt).
+See [license.txt](license.txt).
 
 # Table of Contents
 2. [Getting Started](#getting_started)
