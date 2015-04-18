@@ -69,7 +69,7 @@ namespace ImageResizer{
                         to->post_transpose = from->RequiresTransposeStep;
                         to->post_flip_x = from->RequiresHorizontalFlipStep;
                         to->post_flip_y = from->RequiresVerticalFlipStep;
-                        to->halve_only_when_common_factor = from->HalveOnlyWhenPerfect;
+                        to->havling_acceptable_pixel_loss = from->HalvingAcceptablePixelLoss;
                         to->sharpen_percent_goal = from->SharpeningPercentGoal;
 
                         to->kernel_a = from->KernelA_Struct != nullptr ? from->KernelA_Struct :

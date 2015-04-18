@@ -152,8 +152,8 @@ typedef struct RenderDetailsStruct {
     // If possible to do correctly, halve the image until it is [interpolate_last_percent] times larger than needed. 3 or greater reccomended. Specify -1 to disable halving.
     float interpolate_last_percent;
 
-    //If true, only halve when both dimensions are multiples of the halving factor
-    bool halve_only_when_common_factor;
+    //The number of pixels (in target canvas coordinates) that it is acceptable to discard for better halving performance
+    float havling_acceptable_pixel_loss;
 
     //The actual halving factor to use.
     uint32_t halving_divisor;
