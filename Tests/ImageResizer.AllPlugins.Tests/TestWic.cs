@@ -10,7 +10,8 @@ namespace ImageResizer.AllPlugins.Tests
 {
     public class TestWic
     {
-        [Fact(Skip="Windows WIC is broken")]
+        //[Fact(Skip="Windows WIC is broken")]
+        [Fact]
         public void TestWicBasic()
         {
             var c = new Config();
