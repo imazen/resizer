@@ -57,7 +57,7 @@ static inline float apply_gamma (Context * context, float value)
     return (float)pow (value, context->colorspace.gamma_inverse);
 }
 
-
+#ifdef EXPOSE_SIGMOID
 
 //y = -(x * 2 - 1) / (abs(x * 2 - 1) - 1.2)
 static inline float sigmoid (const SigmoidInfo * info, float x){
@@ -81,12 +81,15 @@ static inline float sigmoid_inverse (const SigmoidInfo * info, float y){
     return ((k * info->constant / (1 + signed_k)) - info->x_offset) / info->x_coeff;
 }
 
+#endif
 
 static inline float Context_srgb_to_floatspace_uncached (Context * context, uint8_t value){
     float v = ((float)value) * (float)(1.0f / 255.0f);
     if (context->colorspace.apply_srgb) v = srgb_to_linear (v);
-    if (context->colorspace.apply_gamma) v = remove_gamma (context, v);
+    else if (context->colorspace.apply_gamma) v = remove_gamma (context, v);
+#ifdef EXPOSE_SIGMOID
     if (context->colorspace.apply_sigmoid) v = sigmoid (&context->colorspace.sigmoid, v);
+#endif
     return v;
 }
 
@@ -97,9 +100,14 @@ static inline float Context_srgb_to_floatspace (Context * context, uint8_t value
 }
 
 static inline uint8_t Context_floatspace_to_srgb (Context * context, float space_value){
-    float v = context->colorspace.apply_sigmoid ? sigmoid_inverse (&context->colorspace.sigmoid, space_value) : space_value;
-    v = context->colorspace.apply_gamma ? apply_gamma (context, v) : v;
-    return uchar_clamp_ff (context->colorspace.apply_srgb ? linear_to_srgb (v) : 255.0f * v);
+    float v = space_value;
+#ifdef EXPOSE_SIGMOID
+    v = context->colorspace.apply_sigmoid ? sigmoid_inverse (&context->colorspace.sigmoid, v) : v;
+#endif
+
+    if (context->colorspace.apply_gamma) return uchar_clamp_ff(apply_gamma (context, v) * 255.0f);
+    if (context->colorspace.apply_srgb) return uchar_clamp_ff (linear_to_srgb (v));
+    return uchar_clamp_ff(255.0f * v);
 }
 
 

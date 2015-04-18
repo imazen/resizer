@@ -213,6 +213,8 @@ bool BitmapBgra_populate_histogram (Context * context, BitmapBgra * bmp, uint64_
 
  // Gamma correction  http://www.4p8.com/eric.brasseur/gamma.html#formulas
 
+#ifdef EXPOSE_SIGMOID
+
  static void Context_sigmoid_internal (Context * c, float x_coefficent, float x_offset, float constant){
      c->colorspace.sigmoid.constant = constant; //1
      c->colorspace.sigmoid.x_coeff = x_coefficent; //2
@@ -224,6 +226,7 @@ bool BitmapBgra_populate_histogram (Context * context, BitmapBgra * bmp, uint64_
      c->colorspace.sigmoid.y_offset = -1 * sigmoid (&c->colorspace.sigmoid, 0);
 
  }
+#endif
 
 
 
@@ -237,9 +240,10 @@ bool BitmapBgra_populate_histogram (Context * context, BitmapBgra * bmp, uint64_
 
 
      context->colorspace.apply_srgb = (space & Floatspace_linear) > 0;
-     context->colorspace.apply_sigmoid = (space & Floatspace_sigmoid) > 0;
      context->colorspace.apply_gamma = (space & Floatspace_gamma) > 0;
 
+#ifdef EXPOSE_SIGMOID
+     context->colorspace.apply_sigmoid = (space & Floatspace_sigmoid) > 0;
      if ((space & Floatspace_sigmoid_3) > 0){
          Context_sigmoid_internal (context, -2, a, derive_constant (a + b * -2, c, 1));
      }
@@ -249,7 +253,7 @@ bool BitmapBgra_populate_histogram (Context * context, BitmapBgra * bmp, uint64_
      else if ((space & Floatspace_sigmoid) > 0){
          Context_sigmoid_internal (context, a, b, c);
      }
-
+#endif
      if (context->colorspace.apply_gamma){
          context->colorspace.gamma = a;
          context->colorspace.gamma_inverse = (float)(1.0 / ((double)a));

@@ -78,7 +78,7 @@ typedef struct _ErrorInfo {
     int callstack_capacity;
 } ErrorInfo;
 
-
+#ifdef EXPOSE_SIGMOID
 /** Context: Colorspace */
 typedef struct _SigmoidInfo {
     float constant;
@@ -88,16 +88,19 @@ typedef struct _SigmoidInfo {
     float y_coeff;
 } SigmoidInfo;
 
+#endif
 
 typedef struct _ColorspaceInfo {
     float byte_to_float[256]; //Converts 0..255 -> 0..1, but knowing that 0.255 has sRGB gamma.
     WorkingFloatspace floatspace;
-    SigmoidInfo sigmoid;
-    bool apply_sigmoid;
     bool apply_srgb;
     bool apply_gamma;
     float gamma;
     float gamma_inverse;
+#ifdef EXPOSE_SIGMOID
+    SigmoidInfo sigmoid;
+    bool apply_sigmoid;
+#endif
 
 } ColorspaceInfo;
 

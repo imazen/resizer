@@ -95,10 +95,10 @@ ENUM_START (FLOATSSPACE_NAME, _WorkingFloatspace)
     Floatspace_srgb = 0,
     Floatspace_as_is = 0,
     Floatspace_linear = 1,
-    Floatspace_gamma = 2,
+    Floatspace_gamma = 2
+#ifdef EXPOSE_SIGMOID
 
-
-    Floatspace_sigmoid = 4,
+    ,Floatspace_sigmoid = 4,
     Floatspace_gamma_sigmoid = 6,//2 | 4,
 
     Floatspace_sigmoid_2 = 12,//4 | 8,
@@ -106,6 +106,7 @@ ENUM_START (FLOATSSPACE_NAME, _WorkingFloatspace)
 
     Floatspace_sigmoid_3 = 20,//4 | 16,
     Floatspace_gamma_sigmoid_3 = 22,//4 | 16 | 2,
+#endif
 
 ENUM_END (FLOATSSPACE_NAME)
 
