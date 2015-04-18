@@ -69,7 +69,7 @@ Rect detect_content(Context * context, BitmapBgra * b, uint8_t threshold)
     //We should now have a good idea of where boundaries lie. However... if it seems that more than 25% is whitespace, we should do a different type of scan.
     long area_to_scan_separately = info.min_x * info.h + info.min_y * info.w + (info.w - info.max_x) * info.h + (info.h - info.max_y) * info.h;
 
-    if (area_to_scan_separately > info.h * info.w) {
+    if (area_to_scan_separately > (long)(info.h * info.w)) {
         //Just scan it all at once, non-directionally
         if (!check_region (context, 0, 0, 1, 0, 1, &info)) { CONTEXT_add_to_callstack (context); return RectFailure; }
     } else {

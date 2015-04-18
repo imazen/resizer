@@ -96,7 +96,7 @@ void Context_free(Context * context, void * pointer, const char * file, int line
 
 void Context_free_static_caches(void)
 {
-    free_lookup_tables();
+
 }
 
 static void * DefaultHeapManager_calloc(struct ContextStruct * context, size_t count, size_t element_size, const char * file, int line)
@@ -132,6 +132,7 @@ void Context_initialize(Context * context)
     //memset(context->error.callstack, 0, sizeof context->error.callstack);
     context->error.reason = No_Error;
     DefaultHeapManager_initialize(&context->heap);
+    Context_set_floatspace (context, Floatspace_as_is, 0.0f, 0.0f, 0.0f);
 }
 
 Context * Context_create(void)
@@ -174,6 +175,7 @@ bool Context_enable_profiling(Context * context, uint32_t default_capacity)
 
     } else {
         //TODO: grow and copy array
+        CONTEXT_error (context, Invalid_internal_state);
         return false;
     }
     return true;

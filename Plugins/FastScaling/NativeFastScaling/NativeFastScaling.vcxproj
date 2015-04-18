@@ -160,7 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\fastscaling.h" />
-    <ClInclude Include="include\status_code.h" />
+    <ClInclude Include="include\fastscaling_enums.h" />
     <ClInclude Include="lib\color.h" />
     <ClInclude Include="lib\fastapprox.h" />
     <ClInclude Include="lib\fastscaling_private.h" />

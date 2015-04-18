@@ -12,8 +12,6 @@
 
 #include "fastscaling.h"
 #include "math_functions.h"
-#include "color.h"
-
 
 
 
@@ -80,6 +78,33 @@ typedef struct _ErrorInfo {
     int callstack_capacity;
 } ErrorInfo;
 
+#ifdef EXPOSE_SIGMOID
+/** Context: Colorspace */
+typedef struct _SigmoidInfo {
+    float constant;
+    float x_coeff;
+    float x_offset;
+    float y_offset;
+    float y_coeff;
+} SigmoidInfo;
+
+#endif
+
+typedef struct _ColorspaceInfo {
+    float byte_to_float[256]; //Converts 0..255 -> 0..1, but knowing that 0.255 has sRGB gamma.
+    WorkingFloatspace floatspace;
+    bool apply_srgb;
+    bool apply_gamma;
+    float gamma;
+    float gamma_inverse;
+#ifdef EXPOSE_SIGMOID
+    SigmoidInfo sigmoid;
+    bool apply_sigmoid;
+#endif
+
+} ColorspaceInfo;
+
+
 
 /** Context: main structure **/
 
@@ -87,8 +112,11 @@ typedef struct ContextStruct {
     ErrorInfo error;
     HeapManager heap;
     ProfilingLog log;
+    ColorspaceInfo colorspace;
 } Context;
 
+
+#include "color.h"
 
 
 void Context_initialize(Context * context);
@@ -129,19 +157,6 @@ void Context_add_to_callstack(Context * context, const char * file, int line);
 
 void Context_profiler_start(Context * context, const char * name, bool allow_recursion);
 void Context_profiler_stop(Context * context, const char * name, bool assert_started, bool stop_children);
-
-
-typedef struct LookupTablesStruct *LookupTablesPtr;
-
-typedef struct LookupTablesStruct {
-    float srgb_to_linear[256]; //Converts 0..255 -> 0..1, but knowing that 0.255 has sRGB gamma.
-    float linear[256]; //Converts 0..255 -> 0..1, linear mapping
-} LookupTables;
-
-
-// do these need to be public??
-void free_lookup_tables(void);
-LookupTables * get_lookup_tables(void);
 
 
 
@@ -280,7 +295,9 @@ static inline int64_t get_profiler_ticks_per_second(void)
 #include <stdio.h>
 #include <stdarg.h>
 
+#ifndef snprintf
 #define snprintf c99_snprintf
+#endif
 
 
 

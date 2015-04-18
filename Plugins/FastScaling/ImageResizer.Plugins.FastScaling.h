@@ -9,42 +9,57 @@
 #include "Stdafx.h"
 #include "fastscaling.h"
 
+
+#pragma managed
+using System::FlagsAttribute;
+
 namespace ImageResizer{
     namespace Plugins {
         namespace FastScaling{
 
-#define STATUS_CODE_NAME
-#define STATUS_CODE_ENUM_NAME public enum class FastScalingResult
-
-#include "status_code.h"
-
             namespace internal_use_only{
-                public enum class  Rotate{
+
+#undef FASTSCALING_ENUMS_MANAGED
+#undef STATUS_CODE_NAME
+#undef FLOATSSPACE_NAME
+
+#define FASTSCALING_ENUMS_MANAGED
+#define STATUS_CODE_NAME FastScalingResult
+#define FLOATSSPACE_NAME Workingspace
+
+#include "fastscaling_enums.h"
+
+#undef FASTSCALING_ENUMS_MANAGED
+#undef STATUS_CODE_NAME
+#undef FLOATSSPACE_NAME
+
+                public enum struct  Rotate{
                     RotateNone = 0,
                     Rotate90 = 1,
                     Rotate180 = 2,
                     Rotate270 = 3
                 };
 
-                public enum class BitmapPixelFormat {
-                    Bgr24 = 3,
-                    Bgra32 = 4,
-                    Gray8 = 1
-                };
-
-
-                public enum class BitmapCompositingMode {
-                    Replace_self = 0,
-                    Blend_with_self = 1,
-                    Blend_with_matte = 2
-                };
-
-
                 public ref class ExecutionContext{
                 public:
                     ExecutionContext (){
                         c = Context_create ();
                     }
+
+                    float ByteToFloatspace (uint8_t value){
+                        return Context_byte_to_floatspace (c,value);
+                    }
+                    uint8_t FloatspaceToByte (float value){
+                        return Context_floatspace_to_byte (c, value);
+                    }
+
+                    void UseFloatspace (Workingspace space, float param_a, float param_b, float param_c){
+                        Context_set_floatspace (this->c, (::WorkingFloatspace)(int)space, param_a, param_b, param_c);
+                    }
+
+
+
+
                     ~ExecutionContext (){
                         if (c != nullptr){
                             Context_destroy (c);

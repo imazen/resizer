@@ -19,7 +19,7 @@
 
 */
 
-#include "status_code.h"
+#include "fastscaling_enums.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -33,16 +33,6 @@ extern "C" {
 typedef struct ContextStruct Context;
 
 /** Context: ProfilingLog **/
-
-
-typedef enum _ProfilingEntryFlags {
-    Profiling_start = 2,
-    Profiling_start_allow_recursion = 2 | 4,
-    Profiling_stop = 8,
-    Profiling_stop_assert_started = 8 | 16,
-    Profiling_stop_children = 8 | 16 | 32,
-
-} ProfilingEntryFlags;
 
 typedef struct {
     int64_t time;
@@ -72,20 +62,6 @@ int  Context_error_reason(Context * context);
 
 void Context_free_static_caches(void);
 
-
-//Compact format for bitmaps. sRGB or gamma adjusted - *NOT* linear
-typedef enum _BitmapPixelFormat {
-    Bgr24 = 3,
-    Bgra32 = 4,
-    Gray8 = 1
-} BitmapPixelFormat;
-
-
-typedef enum _BitmapCompositingMode {
-    Replace_self = 0,
-    Blend_with_self = 1,
-    Blend_with_matte = 2
-} BitmapCompositingMode;
 
 //non-indexed bitmap
 typedef struct BitmapBgraStruct {
@@ -122,31 +98,19 @@ typedef struct BitmapBgraStruct {
 
 
 
+float Context_byte_to_floatspace (Context * c, uint8_t srgb_value);
+uint8_t Context_floatspace_to_byte (Context * c, float space_value);
+
+
+
+
+
+
+void Context_set_floatspace (Context * context,  WorkingFloatspace space, float a, float b, float c);
+
 typedef struct RendererStruct Renderer;
 
-typedef enum _InterpolationFilter {
-    Filter_CubicFast,
-    Filter_Cubic,
-    Filter_CatmullRom,
-    Filter_Mitchell,
-    Filter_Robidoux,
-    Filter_RobidouxSharp,
-    Filter_Hermite,
-    Filter_Lanczos3,
-    Filter_Lanczos3Sharp,
-    Filter_Lanczos2,
-    Filter_Lanczos2Sharp,
-    Filter_Triangle,
-    Filter_Linear,
-    Filter_Box,
-    Filter_CubicBSpline,
-    Filter_Lanczos3Windowed,
-    Filter_Lanczos3SharpWindowed,
-    Filter_Lanczos2Windowed,
-    Filter_Lanczos2SharpWindowed,
-    Filter_CatmullRomFast,
-    Filter_CatmullRomFastSharp
-} InterpolationFilter;
+
 
 struct InterpolationDetailsStruct;
 typedef double (*detailed_interpolation_method)(const struct InterpolationDetailsStruct *, double);
@@ -188,8 +152,8 @@ typedef struct RenderDetailsStruct {
     // If possible to do correctly, halve the image until it is [interpolate_last_percent] times larger than needed. 3 or greater reccomended. Specify -1 to disable halving.
     float interpolate_last_percent;
 
-    //If true, only halve when both dimensions are multiples of the halving factor
-    bool halve_only_when_common_factor;
+    //The number of pixels (in target canvas coordinates) that it is acceptable to discard for better halving performance
+    float havling_acceptable_pixel_loss;
 
     //The actual halving factor to use.
     uint32_t halving_divisor;
@@ -232,7 +196,7 @@ bool RenderDetails_render(Context * context, RenderDetails * details, BitmapBgra
 bool RenderDetails_render_in_place(Context * context, RenderDetails * details, BitmapBgra * edit_in_place);
 void RenderDetails_destroy(Context * context, RenderDetails * d);
 
-
+bool InterpolationDetails_interpolation_filter_exists(InterpolationFilter filter);
 InterpolationDetails * InterpolationDetails_create(Context * context);
 InterpolationDetails * InterpolationDetails_create_bicubic_custom(Context * context,double window, double blur, double B, double C);
 InterpolationDetails * InterpolationDetails_create_custom(Context * context,double window, double blur, detailed_interpolation_method filter);
@@ -270,6 +234,7 @@ ConvolutionKernel* ConvolutionKernel_create_guassian_normalized(Context * contex
 ConvolutionKernel* ConvolutionKernel_create_guassian_sharpen(Context * context, double stdDev, uint32_t radius);
 
 
+bool BitmapBgra_populate_histogram (Context * context, BitmapBgra * bmp, uint64_t * histograms, uint32_t histogram_size_per_channel, uint32_t histogram_count, uint64_t * pixels_sampled);
 
 
 #ifdef __cplusplus

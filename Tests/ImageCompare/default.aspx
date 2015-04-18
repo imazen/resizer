@@ -25,7 +25,7 @@
 
     <input id="newx" value="500" style="width: 30px" onchange="regen();" />px<br /><br />
 
-    <input id="set1" value="f=8&f.sharpen=30" style="width: 250px" onchange="regen();" /> vs 
+    <input id="set1" value="fastscale=true&down.filter=lanczos" style="width: 250px" onchange="regen();" /> vs 
     <input id="set2" value="" style="width: 250px" onchange="regen();" />
 
     <hr />

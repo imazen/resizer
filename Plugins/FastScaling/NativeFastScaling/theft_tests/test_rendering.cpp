@@ -34,10 +34,16 @@ static theft_trial_res render_should_succeed(RenderDetails * details, BitmapBgra
 
 
 void * renderdetails_random(theft * theft, theft_seed seed, void * input) {
-    int filter = theft_random(theft) % 20;
+    int filter = 0;
+
+    do {
+        filter = theft_random(theft) % 30;
+    }while (!InterpolationDetails_interpolation_filter_exists((InterpolationFilter)filter));
 
 
     RenderDetails * details = RenderDetails_create_with(c, (InterpolationFilter)filter);
+
+    if (details == NULL) return NULL;
 
     details->post_flip_x = theft_random(theft) % 2;
     details->post_flip_y = theft_random(theft) % 2;
@@ -72,7 +78,7 @@ void * BitmapBgra_random_zeroed_source(theft * theft, theft_seed seed, void * in
     BitmapPixelFormat fmt = (BitmapPixelFormat)(3 + theft_random(theft) % 2);
     int w = 1 + (theft_random(theft) % 2048);
     int h = 1 + (theft_random(theft) % 2048);
-    
+
     BitmapBgra * b = BitmapBgra_create(c, w, h, true, fmt);
     if (!b) {
         char buffer[1024];
@@ -181,7 +187,6 @@ TEST_CASE("TestRender", "[fastscaling][thief]") {
     theft_free(t);
     printf("\n");
     REQUIRE(THEFT_RUN_PASS == res);
-    free_lookup_tables();
     destroy_context();
 }
 

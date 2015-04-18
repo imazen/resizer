@@ -24,11 +24,7 @@ bool BitmapBgra_convert_srgb_to_linear(Context * context, BitmapBgra * src, uint
         CONTEXT_error(context, Invalid_internal_state);
         return false;
     }
-    const LookupTables*  t = get_lookup_tables();
-    if (t == NULL) {
-        CONTEXT_error(context, Out_of_memory);
-        return false;
-    }
+
 
     const uint32_t w = src->w;
     const uint32_t units = w * BitmapPixelFormat_bytes_per_pixel(src->fmt);
@@ -42,18 +38,18 @@ bool BitmapBgra_convert_srgb_to_linear(Context * context, BitmapBgra * src, uint
         float* buf = dest->pixels + (dest->float_stride * (row + dest_row));
         if (copy_step == 3) {
             for (uint32_t to_x = 0, bix = 0; bix < units; to_x += to_step, bix += from_step) {
-                buf[to_x] =     t->srgb_to_linear[src_start[bix]];
-                buf[to_x + 1] = t->srgb_to_linear[src_start[bix + 1]];
-                buf[to_x + 2] = t->srgb_to_linear[src_start[bix + 2]];
+                buf[to_x] =     Context_srgb_to_floatspace(context, src_start[bix]);
+                buf[to_x + 1] = Context_srgb_to_floatspace (context, src_start[bix + 1]);
+                buf[to_x + 2] = Context_srgb_to_floatspace (context, src_start[bix + 2]);
             }
             //We're only working on a portion... dest->alpha_premultiplied = false;
         } else if (copy_step == 4) {
             for (uint32_t to_x = 0, bix = 0; bix < units; to_x += to_step, bix += from_step) {
                 {
-                    const float alpha = t->linear[src_start[bix + 3]];
-                    buf[to_x] =     alpha * t->srgb_to_linear[src_start[bix]];
-                    buf[to_x + 1] = alpha * t->srgb_to_linear[src_start[bix + 1]];
-                    buf[to_x + 2] = alpha * t->srgb_to_linear[src_start[bix + 2]];
+                    const float alpha = ((float)src_start[bix + 3]) / 255.0f;
+                    buf[to_x] = alpha * Context_srgb_to_floatspace (context, src_start[bix]);
+                    buf[to_x + 1] = alpha * Context_srgb_to_floatspace (context, src_start[bix + 1]);
+                    buf[to_x + 2] = alpha * Context_srgb_to_floatspace (context, src_start[bix + 2]);
                     buf[to_x + 3] = alpha;
                 }
             }
@@ -128,16 +124,10 @@ static bool BitmapFloat_blend_matte(Context * context, BitmapFloat * src, const 
 {
     //We assume that matte is BGRA, regardless.
 
-    const LookupTables*  t = get_lookup_tables();
-    if (t == NULL) {
-        CONTEXT_error(context, Out_of_memory);
-        return false;
-    }
-
-    const float matte_a = t->linear[matte[3]];
-    const float b = t->srgb_to_linear[matte[0]];
-    const float g = t->srgb_to_linear[matte[1]];
-    const float r = t->srgb_to_linear[matte[2]];
+    const float matte_a = ((float)matte[3]) / 255.0f;
+    const float b = Context_srgb_to_floatspace (context, matte[0]);
+    const float g = Context_srgb_to_floatspace (context, matte[1]);
+    const float r = Context_srgb_to_floatspace (context, matte[2]);
 
 
 
@@ -195,17 +185,16 @@ bool BitmapFloat_copy_linear_over_srgb(Context * context, BitmapFloat * src, con
     const bool clean_alpha = !copy_alpha && dest->fmt == Bgra32;
 
     for (uint32_t row = 0; row < row_count; row++) {
-        //const float * const __restrict src_row = src->pixels + (row + from_row) * src->float_stride;
         float * src_row = src->pixels + (row + from_row) * src->float_stride;
 
         uint8_t * dest_row_bytes = dest->pixels + (dest_row + row) * dest_row_stride + (from_col * dest_pixel_stride);
 
         for (uint32_t ix = from_col * ch; ix < srcitems; ix += ch) {
-            dest_row_bytes[0] = uchar_clamp_ff(linear_to_srgb(src_row[ix]));
-            dest_row_bytes[1] = uchar_clamp_ff(linear_to_srgb(src_row[ix + 1]));
-            dest_row_bytes[2] = uchar_clamp_ff(linear_to_srgb(src_row[ix + 2]));
+            dest_row_bytes[0] = Context_floatspace_to_srgb (context, src_row[ix]);
+            dest_row_bytes[1] = Context_floatspace_to_srgb (context, src_row[ix + 1]);
+            dest_row_bytes[2] = Context_floatspace_to_srgb (context, src_row[ix + 2]);
             if (copy_alpha) {
-                dest_row_bytes[3] = uchar_clamp_ff(src_row[ix + 3] * 255.0f);
+                dest_row_bytes[3] = uchar_clamp_ff (src_row[ix + 3] * 255.0f);
 
             }
             if (clean_alpha) {
@@ -221,11 +210,6 @@ bool BitmapFloat_copy_linear_over_srgb(Context * context, BitmapFloat * src, con
 static bool BitmapFloat_compose_linear_over_srgb(Context * context, BitmapFloat * src, const uint32_t from_row, BitmapBgra * dest, const uint32_t dest_row, const uint32_t row_count, const uint32_t from_col, const uint32_t col_count, const bool transpose)
 {
 
-    const LookupTables*  t = get_lookup_tables();
-    if (t == NULL) {
-        CONTEXT_error(context, Out_of_memory);
-        return false;
-    }
     const uint32_t dest_bytes_pp = BitmapPixelFormat_bytes_per_pixel (dest->fmt);
     const uint32_t dest_row_stride = transpose ? dest_bytes_pp : dest->stride;
     const uint32_t dest_pixel_stride = transpose ? dest->stride : dest_bytes_pp;
@@ -256,15 +240,15 @@ static bool BitmapFloat_compose_linear_over_srgb(Context * context, BitmapFloat 
             const float src_a = src_row[ix + 3];
             const float a = (1.0f - src_a) * (dest_alpha_to_float_coeff * dest_a + dest_alpha_to_float_offset);
 
-            const float b = t->srgb_to_linear[dest_b] * a + src_b;
-            const float g = t->srgb_to_linear[dest_g] * a + src_g;
-            const float r = t->srgb_to_linear[dest_r] * a + src_r;
+            const float b = Context_srgb_to_floatspace (context, dest_b) * a + src_b;
+            const float g = Context_srgb_to_floatspace (context, dest_g) * a + src_g;
+            const float r = Context_srgb_to_floatspace (context, dest_r) * a + src_r;
 
             const float final_alpha = src_a + a;
 
-            dest_row_bytes[0] = uchar_clamp_ff(linear_to_srgb(b / final_alpha));
-            dest_row_bytes[1] = uchar_clamp_ff(linear_to_srgb(g / final_alpha));
-            dest_row_bytes[2] = uchar_clamp_ff(linear_to_srgb(r / final_alpha));
+            dest_row_bytes[0] = Context_floatspace_to_srgb (context, b / final_alpha);
+            dest_row_bytes[1] = Context_floatspace_to_srgb (context,g / final_alpha);
+            dest_row_bytes[2] = Context_floatspace_to_srgb (context,r / final_alpha);
             if (dest_alpha) {
                 dest_row_bytes[3] =  uchar_clamp_ff(final_alpha * 255);
             }

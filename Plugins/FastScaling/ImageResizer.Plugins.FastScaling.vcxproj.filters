@@ -26,10 +26,10 @@
     <ClInclude Include="render_options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NativeFastScaling\include\status_code.h">
+    <ClInclude Include="error_translation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="error_translation.h">
+    <ClInclude Include="NativeFastScaling\include\fastscaling_enums.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

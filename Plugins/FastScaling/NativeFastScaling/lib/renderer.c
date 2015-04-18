@@ -15,6 +15,7 @@
 
 #include "fastscaling_private.h"
 #include <stdio.h>
+#include <string.h>
 
 typedef struct RendererStruct {
     RenderDetails * details;
@@ -45,7 +46,7 @@ RenderDetails * RenderDetails_create(Context * context)
     d->enable_profiling=false;
     d->halving_divisor = 0;
     d->interpolate_last_percent = 3;
-    d->halve_only_when_common_factor = true;
+    d->havling_acceptable_pixel_loss = 0;
     d->minimum_sample_window_to_interposharpen = 1.5;
     d->apply_color_matrix = false;
     return d;
@@ -127,6 +128,13 @@ bool RenderDetails_render_in_place(
     return result;
 }
 
+static float Renderer_percent_loss (int from_width, int to_width, int from_height, int to_height, int divisor){
+    int lost_columns = from_width % divisor;
+    int lost_rows = from_height % divisor;
+    float scale_factor_x = (float)to_width / (float)from_width;
+    float scale_factor_y = (float)to_width / (float)from_width;
+    return (float)fmax (lost_rows * scale_factor_y, lost_columns * scale_factor_x);
+}
 
 static int Renderer_determine_divisor(Renderer * r)
 {
@@ -142,10 +150,8 @@ static int Renderer_determine_divisor(Renderer * r)
     divisor_max = divisor_max / r->details->interpolate_last_percent;
 
     int divisor = (int)floor(divisor_max);
-    if (r->details->halve_only_when_common_factor) {
-        while (divisor > 0 && ((r->source->h % divisor != 0) || (r->source->w % divisor != 0))) {
-            divisor--;
-        }
+    while (divisor > 0 && Renderer_percent_loss (r->source->w, width, r->source->h, height, divisor) > r->details->havling_acceptable_pixel_loss) {
+        divisor--;
     }
     return max(1, divisor);
 }

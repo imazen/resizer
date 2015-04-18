@@ -13,10 +13,8 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
     BitmapBgra * source = BitmapBgra_create(&context, sx, sy, true, sbpp);
     BitmapBgra * canvas = BitmapBgra_create(&context, cx, cy, true, cbpp);
 
-    RenderDetails * details = RenderDetails_create(&context);
-
-    details->interpolation = InterpolationDetails_create_from(&context,filter);
-
+    RenderDetails * details = RenderDetails_create_with(&context, filter);
+    if (details == NULL) return false;
     details->sharpen_percent_goal = 50;
     details->post_flip_x = flipx;
     details->post_flip_y = flipy;
@@ -33,7 +31,6 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
     BitmapBgra_destroy(&context, source);
     BitmapBgra_destroy(&context, canvas);
 
-    free_lookup_tables();
     Context_terminate(&context);
     return true;
 }
@@ -63,36 +60,35 @@ bool test_in_place (int sx, int sy, BitmapPixelFormat sbpp, bool flipx, bool fli
 
     BitmapBgra_destroy(&context,source);
 
-    free_lookup_tables();
-
     Context_terminate(&context);
     return true;
 }
 
+const InterpolationFilter DEFAULT_FILTER = Filter_Robidoux;
 
 TEST_CASE( "Render without crashing", "[fastscaling]")
 {
-    REQUIRE (test (400, 300, Bgra32, 200, 40, Bgra32, false, false, false, false, (InterpolationFilter)0));
+    REQUIRE (test (400, 300, Bgra32, 200, 40, Bgra32, false, false, false, false, DEFAULT_FILTER));
 }
 
 TEST_CASE( "Render - upscale", "[fastscaling]")
 {
-    REQUIRE (test (200, 40, Bgra32, 500, 300, Bgra32, false, false, false, false, (InterpolationFilter)0));
+    REQUIRE (test (200, 40, Bgra32, 500, 300, Bgra32, false, false, false, false, DEFAULT_FILTER));
 }
 
 TEST_CASE("Render - downscale 24->32", "[fastscaling]")
 {
-    REQUIRE (test (400, 200, Bgr24, 200, 100, Bgra32, false, false, false, false, (InterpolationFilter)0));
+    REQUIRE (test (400, 200, Bgr24, 200, 100, Bgra32, false, false, false, false, DEFAULT_FILTER));
 }
 
 TEST_CASE("Render and rotate", "[fastscaling]")
 {
-    REQUIRE (test (200, 40, Bgra32, 500, 300, Bgra32, true, true, true, false, (InterpolationFilter)0));
+    REQUIRE (test (200, 40, Bgra32, 500, 300, Bgra32, true, true, true, false, DEFAULT_FILTER));
 }
 
 TEST_CASE("Render and rotate with profiling", "[fastscaling]")
 {
-    REQUIRE (test (200, 40, Bgra32, 500, 300, Bgra32, true, true, true, true, (InterpolationFilter)0));
+    REQUIRE (test (200, 40, Bgra32, 500, 300, Bgra32, true, true, true, true, DEFAULT_FILTER));
 }
 
 TEST_CASE ("Flip in place", "[fastscaling]")
@@ -215,25 +211,25 @@ TEST_CASE("Test Weighting", "[fastscaling]")
 
 
     //Sinc filters. These have second crossings.
+    CHECK (test_filter (&context, InterpolationFilter::Filter_RawLanczos2, msg, 1, 2, 1, 0.08, 2) == nullptr);
+    CHECK (test_filter (&context, InterpolationFilter::Filter_RawLanczos2Sharp, msg, 0.954, 1.86, 1, 0.08, 2) == nullptr);
+
+    //These should be negative between x=1 and x=2, positive between 2 and 3, but should end at 3
+
+    CHECK(test_filter(&context, InterpolationFilter::Filter_RawLanczos3, msg, 1, 2, 1, 0.1, 3) == nullptr);
+    CHECK (test_filter (&context, InterpolationFilter::Filter_RawLanczos3Sharp, msg, 0.98, 1.9625, 1, 0.1, 3) == nullptr);
+
+    ///
     CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos2, msg, 1, 2, 1, 0.08, 2) == nullptr);
+
     CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos2Sharp, msg, 0.954, 1.86, 1, 0.08, 2) == nullptr);
 
     //These should be negative between x=1 and x=2, positive between 2 and 3, but should end at 3
 
-    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos3, msg, 1, 2, 1, 0.1, 3) == nullptr);
-    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos3Sharp, msg, 0.98, 1.9625, 1, 0.1, 2.943) == nullptr);
-
-    ///
-    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos2Windowed, msg, 1, 2, 1, 0.08, 2) == nullptr);
-
-    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos2SharpWindowed, msg, 0.954, 1.86, 1, 0.08, 2) == nullptr);
-
-    //These should be negative between x=1 and x=2, positive between 2 and 3, but should end at 3
-
-    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos3Windowed, msg, 1, 2, 1, 0.1, 3) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos, msg, 1, 2, 1, 0.1, 3) == nullptr);
 
 
-    CHECK(test_filter(&context, InterpolationFilter::Filter_Lanczos3SharpWindowed, msg, 0.98, 1.9625, 1, 0.1, 2.943) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_LanczosSharp, msg, 0.98, 1.9625, 1, 0.1, 2.943) == nullptr);
 
     Context_terminate(&context);
 }
@@ -376,7 +372,6 @@ SCENARIO("sRGB roundtrip", "[fastscaling]")
         }
         BitmapBgra_destroy(&context, final);
         BitmapBgra_destroy(&context, bit);
-        free_lookup_tables();
         Context_terminate(&context);
     }
 }

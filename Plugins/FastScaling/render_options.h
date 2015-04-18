@@ -39,16 +39,21 @@ namespace ImageResizer{
                 public ref class RenderOptions{
                 public:
                     RenderOptions (){
-                        this->Filter = InterpolationFilter::Filter_CubicFast;
+                        this->Filter = ::InterpolationFilter::Filter_CubicFast;
                         SamplingWindowOverride = 0;
                         SamplingBlurFactor = 1;
                         SharpeningPercentGoal = 0;
                         MinSamplingWindowToIntegrateSharpening = 1.5;
 
                         InterpolateLastPercent = 3;
-                        HalveOnlyWhenPerfect = true;
+                        HalvingAcceptablePixelLoss = 0;
                     }
 
+
+                    property Workingspace ScalingColorspace;
+                    property float ColorspaceParamA;
+                    property float ColorspaceParamB;
+                    property float ColorspaceParamC;
 
 
                     property uint32_t Filter;
@@ -64,8 +69,7 @@ namespace ImageResizer{
                     // If possible to do correctly, halve the image until it is [halve_until] times larger than needed. 3 or greater reccomended. Specify -1 to disable halving.
                     property double InterpolateLastPercent;
 
-                    //If true, only halve when both dimensions are multiples of the halving factor
-                    property bool HalveOnlyWhenPerfect;
+                     property float HalvingAcceptablePixelLoss;
 
                     property ConvKernel^ KernelA;
                     property ConvolutionKernel* KernelA_Struct;

@@ -51,6 +51,7 @@ let coreDir = rootDir + "Core/"
 let mainSolution = rootDir + "AppVeyor.sln"
 let fastScaleSln = rootDir + "Plugins/FastScaling/ImageResizer.Plugins.FastScaling.sln"
 let assemblyInfoFile = coreDir + "SharedAssemblyInfo.cs"
+let assemblyInfoCppFile = rootDir + "Plugins/FastScaling/AssemblyInfo.cpp"
 
 let isAutoBuild =
     if isNotNullOrEmpty (environVar "APPVEYOR") then true
@@ -138,6 +139,7 @@ Target "patch_commit" (fun _ ->
     let commit = Git.Information.getCurrentSHA1 ".."
     if commit <> null then
         AssemblyPatcher.setInfo assemblyInfoFile ["Commit", commit]
+        AssemblyPatcher.setInfo assemblyInfoCppFile ["CommitAttribute", commit]
 )
 
 Target "patch_ver" (fun _ ->
@@ -160,6 +162,12 @@ Target "patch_ver" (fun _ ->
         "AssemblyFileVersion", fileVer.ToString()+"."+buildNo;
         "AssemblyInformationalVersion", version.ToString();
         "NugetVersion", nugetVer.ToString()]
+
+    AssemblyPatcher.setInfo assemblyInfoCppFile [
+        "AssemblyVersionAttribute", asmVer.ToString()+".0";
+        "AssemblyFileVersionAttribute", fileVer.ToString()+"."+buildNo;
+        "AssemblyInformationalVersionAttribute", version.ToString();
+        "NugetVersionAttribute", nugetVer.ToString()]
 )
 
 Target "patch_info" (fun _ ->

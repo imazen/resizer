@@ -22,6 +22,7 @@ using namespace System::Diagnostics;
 using namespace System::Collections::Specialized;
 using namespace System::Runtime::InteropServices;
 using namespace ImageResizer::Plugins::FastScaling::internal_use_only;
+using namespace ImageResizer::ExtensionMethods;
 
 namespace ImageResizer{
 	namespace Plugins{
@@ -30,19 +31,16 @@ namespace ImageResizer{
 			public ref class FastScalingPlugin : public ImageResizer::Resizing::BuilderExtension, IPlugin, IQuerystringPlugin
 			{
                 void SetupConvolutions(ExecutionContext^ c, NameValueCollection ^query, RenderOptions^ addTo){
-                    double kernel_radius = System::String::IsNullOrEmpty(query->Get("f.unsharp.radius")) ? 0 :
-                        System::Double::Parse(query->Get("f.unsharp.radius"), System::Globalization::NumberFormatInfo::InvariantInfo);
-                    double unsharp_sigma = System::String::IsNullOrEmpty(query->Get("f.unsharp.sigma")) ? 1.4 :
-                        System::Double::Parse(query->Get("f.unsharp.sigma"), System::Globalization::NumberFormatInfo::InvariantInfo);
-
-                    double threshold = System::String::IsNullOrEmpty(query->Get("f.unsharp.threshold")) ? 0 :
-                        System::Double::Parse(query->Get("f.unsharp.threshold"), System::Globalization::NumberFormatInfo::InvariantInfo);
+                    //No unsharp mask support until it is higher quality
+          /*          int kernel_radius = (int)GetDouble(query, "f.unsharp.radius", 0);
+                    double unsharp_sigma = GetDouble (query, "f.unsharp.sigma", 1.4);
+                    double threshold = GetDouble (query, "f.unsharp.threshold", 0);
 
                     if (kernel_radius > 0){
 
                         addTo->KernelA_Struct = ConvolutionKernel_create_guassian_sharpen (c->GetContext (), unsharp_sigma, kernel_radius);
 
-                    }
+                    }*/
 
                 }
 			protected:
@@ -59,6 +57,86 @@ namespace ImageResizer{
                     }
                 }
 
+                RenderOptions^ ParseOptions (NameValueCollection^ query, bool downscaling, bool colorMatrixPresent){
+
+                    String^ prefix = downscaling ? "down." : "up.";
+
+                    RenderOptions^ opts = gcnew RenderOptions ();
+
+
+                    opts->SamplingBlurFactor = (float)GetDouble (query, prefix + "blur", 1.0);
+
+                    opts->SamplingWindowOverride = (float)GetDouble (query, prefix +  "window", 0);
+
+
+                    int speed = (int)Math::Round (GetDouble (query, prefix + "speed", 0));
+
+
+                    if (!downscaling){
+
+                        speed = Math::Min (2, Math::Max (0, speed));
+
+                        opts->HalvingAcceptablePixelLoss = 0; //Not relevant for upscaling
+                        opts->InterpolateLastPercent = -1; //Not relevant for upscaling
+
+                        //If we increase the speed, use a filter with a smaller lobe size.
+                        opts->Filter = (uint32_t)(speed == 0 ? ::Filter_Ginseng : (speed == 1) ? ::Filter_Robidoux : ::Filter_RobidouxFast);
+
+
+                    }
+                    else{
+                        float settings[][3] =
+                        {
+                            {::Filter_Robidoux, -1, 0},
+                            {::Filter_Robidoux, 3.1f, 0},
+                            {::Filter_Robidoux, 2.1f, 0.26f},
+                            {::Filter_Robidoux, 2.1f, 0.51f},
+                            {::Filter_Fastest, 2.1f, 0.51f},
+                            {::Filter_Fastest, 1.0f, 0.99f },
+                            {::Filter_Box, 1.0f, 16.0f}
+
+                        };
+
+                        int index_zero = 2;
+                        int configuration_count = 7;
+
+
+                        speed = Math::Min (configuration_count - 1 - index_zero, Math::Max(-1 * index_zero, speed));
+
+                        float * selection = settings[speed + index_zero];
+
+                        opts->Filter = (uint32_t)selection[0];
+                        opts->InterpolateLastPercent = (double)selection[1];
+                        opts->HalvingAcceptablePixelLoss = selection[2];
+
+                    }
+
+
+                    opts->Filter = (::InterpolationFilter) NameValueCollectionExtensions::Get<internal_use_only::InterpolationFilter> (query, prefix + "filter", (internal_use_only::InterpolationFilter)opts->Filter);
+
+                    opts->ScalingColorspace = NameValueCollectionExtensions::Get<Workingspace> (query, prefix + "colorspace", Workingspace::Floatspace_as_is);
+                    opts->ColorspaceParamA = (float)GetDouble (query, prefix + "colorspace.a", 0);
+                    opts->ColorspaceParamB = (float)GetDouble (query, prefix + "colorspace.b", 0);
+                    opts->ColorspaceParamC = (float)GetDouble (query, prefix + "colorspace.c", 0);
+
+                    if (colorMatrixPresent){
+                        opts->ScalingColorspace = Workingspace::Floatspace_as_is;
+                    }
+
+                    double preserve_which = GetDouble (query, prefix + "preserve", -1000.0);
+                    if (preserve_which > -999){
+                        preserve_which = fmax (-9.999, fmin (9.999, preserve_which));
+                        opts->ScalingColorspace = Workingspace::Floatspace_gamma;
+                        double multiplier = Math::Pow (0.7 * (preserve_which / 10.0) + 1, 1.4);
+                        opts->ColorspaceParamA = (float)( 2.2 * multiplier);
+                    }
+
+                    //Without gamma correction is equal to setting f.preserve=-6.1515
+
+                    return opts;
+                }
+
+
                 virtual RequestedAction InternalGraphicsDrawImage(ImageState^ s, Bitmap^ dest, Bitmap^ source, array<PointF>^ targetArea, RectangleF sourceArea, array<array<float, 1>^, 1>^ colorMatrix) override{
 
                     NameValueCollection ^query = s->settingsAsCollection();
@@ -66,36 +144,31 @@ namespace ImageResizer{
                     String^ fastScale = query->Get("fastscale");
 					String^ sTrue = "true";
 
+                    if (!System::String::IsNullOrEmpty (query->Get ("f"))){
+                        throw gcnew Exception ("&f is deprecated. Used &down.filter instead.");
+                    }
 
-                    if (System::String::IsNullOrEmpty (query->Get ("f")) && (fastScale == nullptr || fastScale->ToLowerInvariant () != sTrue)){
+                    if (System::String::IsNullOrEmpty (query->Get ("f.sharpen")) && (fastScale == nullptr || fastScale->ToLowerInvariant () != sTrue)){
 						return RequestedAction::None;
 					}
 
-                    RenderOptions^ opts = gcnew RenderOptions();
-
-
-                    opts->SamplingBlurFactor = (float)GetDouble (query, "f.blur", 1.0);
-
-                    opts->SamplingWindowOverride = (float)GetDouble (query, "f.window", 0);
-
-                    opts->Filter = (InterpolationFilter)(uint32_t)(float)GetDouble (query, "f", 0);
-
-
-                    opts->SharpeningPercentGoal = (float)GetDouble (query, "f.sharpen", 0) / 200.0;
-
-                    opts->SharpeningPercentGoal = fminf(fmaxf(0.0f, opts->SharpeningPercentGoal), 0.5f);
-
-                    opts->InterpolateLastPercent = GetDouble (query, "f.interpolate_at_least", opts->InterpolateLastPercent);
-
-                    opts->InterpolateLastPercent = opts->InterpolateLastPercent < 1 ? -1 : opts->InterpolateLastPercent;
-
                     //TODO: permit it to work with increments of 90 rotation
                     //Write polygon math method to determin the angle of the target area.
-
-					RectangleF targetBox = ImageResizer::Util::PolygonMath::GetBoundingBox(targetArea);
+                    RectangleF targetBox = ImageResizer::Util::PolygonMath::GetBoundingBox (targetArea);
                     if (targetBox.Location != targetArea[0] || targetArea[1].Y != targetArea[0].Y || targetArea[2].X != targetArea[0].X){
-						return RequestedAction::None;
+                        return RequestedAction::None;
                     }
+
+
+                    bool downscaling = (targetBox.Width < sourceArea.Width && targetBox.Height < sourceArea.Height);
+
+
+                    RenderOptions^ opts = ParseOptions (query, downscaling, colorMatrix != nullptr);
+
+
+                    opts->SharpeningPercentGoal = (float)(GetDouble (query, "f.sharpen", 0) / 200.0);
+
+                    bool ignorealpha = ImageResizer::ExtensionMethods::NameValueCollectionExtensions::Get<bool> (query, "f.ignorealpha", false);
 
                     bool sourceFormatInvalid = (source->PixelFormat != PixelFormat::Format32bppArgb &&
                         source->PixelFormat != PixelFormat::Format24bppRgb &&
@@ -106,7 +179,7 @@ namespace ImageResizer{
                     try{
 
                         BitmapOptions^ a = gcnew BitmapOptions ();
-                        a->AlphaMeaningful = true;
+                        a->AlphaMeaningful = !ignorealpha;
                         a->Crop = Util::PolygonMath::ToRectangle (sourceArea);
 
                         if (!sourceFormatInvalid){
@@ -114,7 +187,7 @@ namespace ImageResizer{
                             a->Bitmap = source;
                         }
                         else{
-                            copy = gcnew Bitmap (source->Width, source->Height, PixelFormat::Format32bppArgb);
+                            copy = gcnew Bitmap (source->Width, source->Height, ignorealpha ? PixelFormat::Format24bppRgb : PixelFormat::Format32bppArgb);
                             copyGraphics = System::Drawing::Graphics::FromImage (copy);
                             copyGraphics->CompositingMode = Drawing2D::CompositingMode::SourceCopy;
                             copyGraphics->DrawImageUnscaled (source, 0, 0);
@@ -127,10 +200,10 @@ namespace ImageResizer{
 
                         BitmapOptions^ b = gcnew BitmapOptions ();
                         b->AllowSpaceReuse = false;
-                        b->AlphaMeaningful = true;
+                        b->AlphaMeaningful = !ignorealpha;
                         b->Crop = Util::PolygonMath::ToRectangle (targetBox);
                         b->Bitmap = dest;
-                        b->Compositing = ImageResizer::Plugins::FastScaling::internal_use_only::BitmapCompositingMode::Blend_with_self;
+                        b->Compositing = ignorealpha ? internal_use_only::BitmapCompositingMode::Replace_self : internal_use_only::BitmapCompositingMode::Blend_with_self;
 
                         opts->ColorMatrix = colorMatrix;
 
@@ -168,7 +241,7 @@ namespace ImageResizer{
 				}
 
                 virtual System::Collections::Generic::IEnumerable<System::String^>^ GetSupportedQuerystringKeys (){
-                    return gcnew array < String^, 1 > {"f.sharpen", "f.unsharp.radius"};
+                    return gcnew array < String^, 1 > {"f.sharpen"}; //Only list the keys that would activate image processing by themselves, in the absence of any other commands
                 }
 
 			};

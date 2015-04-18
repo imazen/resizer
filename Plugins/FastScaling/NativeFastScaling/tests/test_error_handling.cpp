@@ -137,7 +137,6 @@ TEST_CASE_METHOD(Fixture, "Perform Rendering", "[error_handling]") {
     BitmapBgra_destroy(&context,source);
     BitmapBgra_destroy(&context,canvas);
     Context_terminate(&context);
-    free_lookup_tables();
 }
 
 TEST_CASE_METHOD(Fixture, "Test allocation failure handling", "[error_handling]")
@@ -193,7 +192,6 @@ TEST_CASE_METHOD(Fixture, "Test allocation failure handling", "[error_handling]"
     RenderDetails_destroy(&context,details);
     BitmapBgra_destroy(&context, source);
     BitmapBgra_destroy(&context, canvas);
-    free_lookup_tables();
     Context_terminate (&context);
 }
 

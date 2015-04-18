@@ -9,6 +9,17 @@
 #pragma unmanaged
 #endif
 
+#ifdef _MSC_VER
+#define BESSEL_01 _j1
+#else
+#ifdef __GLIBC__
+#define BESSEL_01 __builtin_j1
+#else
+#define BESSEL_01 j1
+#endif
+#endif
+
+
 #include "fastscaling_private.h"
 
 #include <stdlib.h>
@@ -48,13 +59,13 @@ static double filter_bicubic_fast(const InterpolationDetails * d, double t)
 }
 
 
-static double filter_sinc_2(const InterpolationDetails * d, double t)
+static double filter_sinc(const InterpolationDetails * d, double t)
 {
     const double abs_t = (double)fabs(t) / d->blur;
     if (abs_t == 0) {
         return 1;    //Avoid division by zero
     }
-    if (abs_t > 2) {
+    if (abs_t > d->window) {
         return 0;
     }
     const double a = abs_t * IR_PI;
@@ -89,6 +100,53 @@ static double filter_sinc_windowed(const InterpolationDetails * d, double t)
     }
     return d->window * sin(IR_PI * x / d->window) * sin(x * IR_PI) / (IR_PI * IR_PI * x * x);
 }
+
+
+
+
+static double filter_jinc (const InterpolationDetails * d, double t) {
+    const double x = fabs (t) / d->blur;
+    if (x == 0.0)
+        return(0.5*IR_PI);
+    return(BESSEL_01 (IR_PI*x) / x);
+    ////x crossing #1 1.2196698912665045
+}
+
+
+/*
+
+static inline double window_jinc (double x) {
+    double x_a = x * 1.2196698912665045;
+    if (x == 0.0)
+        return 1;
+    return (BesselOrderOne (IR_PI*x_a) / (x_a * IR_PI * 0.5));
+    ////x crossing #1 1.2196698912665045
+}
+
+static double filter_window_jinc (const InterpolationDetails * d, double t) {
+    return window_jinc (t / (d->blur * d->window));
+}
+*/
+
+static double filter_ginseng (const InterpolationDetails * d, double t)
+{
+    //Sinc windowed by jinc
+    const double abs_t = (double)fabs (t) / d->blur;
+    const double t_pi = abs_t * IR_PI;
+
+    if (abs_t == 0) {
+        return 1;    //Avoid division by zero
+    }
+    if (abs_t > 3) {
+        return 0;
+    }
+    const double jinc_input = 1.2196698912665045 * t_pi / d->window;
+    const double jinc_output = BESSEL_01 (jinc_input) / (jinc_input * 0.5);
+
+    return jinc_output * sin (t_pi) / (t_pi);
+
+}
+
 
 #define TONY 0.00001
 
@@ -160,64 +218,101 @@ void InterpolationDetails_destroy(Context * context, InterpolationDetails * deta
     CONTEXT_free(context, details);
 }
 
-InterpolationDetails * InterpolationDetails_create_from(Context * context, InterpolationFilter filter)
+static InterpolationDetails * InterpolationDetails_create_from_internal(Context * context, InterpolationFilter filter, bool checkExistenceOnly)
 {
+    bool ex = checkExistenceOnly;
+    InterpolationDetails * truePtr = (InterpolationDetails *)-1;
     switch (filter) {
     case Filter_Linear:
     case Filter_Triangle:
-        return InterpolationDetails_create_custom(context, 1, 1, filter_triangle);
-    case Filter_Lanczos2:
-        return InterpolationDetails_create_custom(context, 2, 1, filter_sinc_2);
-    case Filter_Lanczos3: //Note - not a 3 lobed function - truncated to 2
-        return InterpolationDetails_create_custom(context, 3, 1, filter_sinc_2);
-    case Filter_Lanczos2Sharp:
-        return InterpolationDetails_create_custom(context, 2, 0.9549963639785485, filter_sinc_2);
-    case Filter_Lanczos3Sharp://Note - not a 3 lobed function - truncated to 2
-        return InterpolationDetails_create_custom(context, 3, 0.9812505644269356, filter_sinc_2);
+        return ex ? truePtr : InterpolationDetails_create_custom(context, 1, 1, filter_triangle);
+
+    case Filter_RawLanczos2:
+        return ex ? truePtr : InterpolationDetails_create_custom(context, 2, 1, filter_sinc);
+    case Filter_RawLanczos3:
+        return ex ? truePtr : InterpolationDetails_create_custom(context, 3, 1, filter_sinc);
+    case Filter_RawLanczos2Sharp:
+        return ex ? truePtr : InterpolationDetails_create_custom(context, 2, 0.9549963639785485, filter_sinc);
+    case Filter_RawLanczos3Sharp:
+        return ex ? truePtr : InterpolationDetails_create_custom(context, 3, 0.9812505644269356, filter_sinc);
 
     //Hermite and BSpline no negative weights
     case Filter_CubicBSpline:
-        return InterpolationDetails_create_bicubic_custom(context, 2, 1, 1, 0);
+        return ex ? truePtr : InterpolationDetails_create_bicubic_custom(context, 2, 1, 1, 0);
 
-    case Filter_Lanczos2Windowed:
-        return InterpolationDetails_create_custom(context, 2, 1, filter_sinc_windowed);
-    case Filter_Lanczos3Windowed:
-        return InterpolationDetails_create_custom(context, 3, 1, filter_sinc_windowed);
-    case Filter_Lanczos2SharpWindowed:
-        return InterpolationDetails_create_custom(context, 2, 0.9549963639785485, filter_sinc_windowed);
-    case Filter_Lanczos3SharpWindowed:
-        return InterpolationDetails_create_custom(context, 3, 0.9812505644269356, filter_sinc_windowed);
+    case Filter_Lanczos2:
+        return ex ? truePtr : InterpolationDetails_create_custom(context, 2, 1, filter_sinc_windowed);
+    case Filter_Lanczos:
+        return ex ? truePtr : InterpolationDetails_create_custom(context, 3, 1, filter_sinc_windowed);
+    case Filter_Lanczos2Sharp:
+        return ex ? truePtr :  InterpolationDetails_create_custom(context, 2, 0.9549963639785485, filter_sinc_windowed);
+    case Filter_LanczosSharp:
+        return ex ? truePtr : InterpolationDetails_create_custom(context, 3, 0.9812505644269356, filter_sinc_windowed);
 
 
     case Filter_CubicFast:
-        return InterpolationDetails_create_custom(context, 1, 1, filter_bicubic_fast);
+        return ex ? truePtr : InterpolationDetails_create_custom(context, 1, 1, filter_bicubic_fast);
     case Filter_Cubic:
-        return InterpolationDetails_create_bicubic_custom(context, 2, 1, 0,1);
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 1, 0,1);
+    case Filter_CubicSharp:
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom (context, 2, 0.9549963639785485, 0, 1);
     case Filter_CatmullRom:
-        return InterpolationDetails_create_bicubic_custom(context, 2, 1, 0, 0.5);
+        return ex ? truePtr : InterpolationDetails_create_bicubic_custom(context, 2, 1, 0, 0.5);
     case Filter_CatmullRomFast:
-        return InterpolationDetails_create_bicubic_custom(context, 1, 1, 0, 0.5);
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 1, 1, 0, 0.5);
     case Filter_CatmullRomFastSharp:
-        return InterpolationDetails_create_bicubic_custom(context, 1, 13.0 / 16.0, 0, 0.5);
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 1, 13.0 / 16.0, 0, 0.5);
     case Filter_Mitchell:
-        return InterpolationDetails_create_bicubic_custom(context, 2, 7.0 / 8.0, 1.0 / 3.0, 1.0 / 3.0);
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 7.0 / 8.0, 1.0 / 3.0, 1.0 / 3.0);
+    case Filter_MitchellFast:
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom (context, 1, 7.0 / 8.0, 1.0 / 3.0, 1.0 / 3.0);
+
+
     case Filter_Robidoux:
-        return InterpolationDetails_create_bicubic_custom(context, 2, 1. / 1.1685777620836932,
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 1. / 1.1685777620836932,
                 0.37821575509399867, 0.31089212245300067);
+    case Filter_Fastest:
+        return ex ? truePtr : InterpolationDetails_create_bicubic_custom (context,0.74, 0.74,
+            0.37821575509399867, 0.31089212245300067);
+
+
+    case Filter_RobidouxFast:
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom (context, 1.05, 1. / 1.1685777620836932,
+            0.37821575509399867, 0.31089212245300067);
     case Filter_RobidouxSharp:
-        return InterpolationDetails_create_bicubic_custom(context, 2, 1. / 1.105822933719019,
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 1. / 1.105822933719019,
                 0.2620145123990142, 0.3689927438004929);
     case Filter_Hermite:
-        return InterpolationDetails_create_bicubic_custom(context, 1, 1, 0, 0);
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 1, 1, 0, 0);
     case Filter_Box:
-        return InterpolationDetails_create_custom(context, 0.5, 1, filter_box);
+        return ex ? truePtr :  InterpolationDetails_create_custom(context, 0.5, 1, filter_box);
+
+    case Filter_Ginseng:
+        return ex ? truePtr :  InterpolationDetails_create_custom (context, 3, 1, filter_ginseng);
+
+    case Filter_GinsengSharp:
+        return ex ? truePtr : InterpolationDetails_create_custom (context, 3, 0.9812505644269356, filter_ginseng);
+
+
+
+    case Filter_Jinc:
+        return ex ? truePtr :  InterpolationDetails_create_custom (context, 3, 1.0 / 1.2196698912665045, filter_jinc);
 
     }
-    CONTEXT_error(context, Invalid_interpolation_filter);
+    if (!checkExistenceOnly){
+        CONTEXT_error(context, Invalid_interpolation_filter);
+    }
     return NULL;
 }
 
+InterpolationDetails * InterpolationDetails_create_from(Context * context, InterpolationFilter filter)
+{
+    return InterpolationDetails_create_from_internal(context, filter, false);
+}
 
+bool InterpolationDetails_interpolation_filter_exists(InterpolationFilter filter){
+    return (InterpolationDetails_create_from_internal(NULL, filter, true) != NULL);
+}
 
 static LineContributions * LineContributions_alloc(Context * context, const uint32_t line_length, const uint32_t windows_size)
 {

@@ -73,6 +73,9 @@ namespace ImageResizer.Plugins.FastScaling.Tests
         {
             var i = new Instructions(instructions);
             i["fastscale"] = "true";
+            if (i["down.filter"] == null) i["down.filter"] = "cubicfast";
+            if (i["down.colorspace"] == null) i["down.colorspace"] = "linear";
+
             var c = new Config();
             new FastScalingPlugin().Install(c);
 
@@ -121,21 +124,23 @@ namespace ImageResizer.Plugins.FastScaling.Tests
         }
 
         [Theory]
-        [InlineData("window=0.2", Side.Right | Side.Bottom)]
-        [InlineData("window=0.2", Side.Left | Side.Top)]
-        [InlineData("window=0.6", Side.Right | Side.Bottom)]
-        [InlineData("window=0.6", Side.Left | Side.Top)]
-        [InlineData("window=1", Side.Right | Side.Bottom)]
-        [InlineData("window=1", Side.Left | Side.Top)]
-        [InlineData("window=2", Side.Right | Side.Bottom)]
-        [InlineData("window=2", Side.Left | Side.Top)]
+        [InlineData("down.window=0.2", Side.Right | Side.Bottom)]
+        [InlineData("down.window=0.2", Side.Left | Side.Top)]
+        [InlineData("down.window=0.6", Side.Right | Side.Bottom)]
+        [InlineData("down.window=0.6", Side.Left | Side.Top)]
+        [InlineData("down.window=1", Side.Right | Side.Bottom)]
+        [InlineData("down.window=1", Side.Left | Side.Top)]
+        [InlineData("down.window=2", Side.Right | Side.Bottom)]
+        [InlineData("down.window=2", Side.Left | Side.Top)]
         public void CheckForLostBorder(string instructions, Side toCheck)
         {
             var background = Color.FromArgb(255, 255, 0, 0);
             var border = Color.FromArgb(255, 0,255,0);
-            var b = CreateRingedBitmap(200, 86, border, background, 2);
+            var b = CreateRingedBitmap(200, 86, border, background, 3);
 
             var i = new Instructions(instructions);
+            i["down.filter"] = "cubic";
+            i["down.colorspace"] = "srgb";
             i.Width = 100;
             using (var result = BuildWithFastScaling(b, i))
             {
@@ -145,9 +150,14 @@ namespace ImageResizer.Plugins.FastScaling.Tests
         }
 
         [Theory]
-        [InlineData("0", "0.5", "rings2.png", 500, 40,40,40, 1)]
-        [InlineData("0", "2", "rings2.png", 500, 40, 40, 40, 1)]
-        public void CompareToGDI(string filter, string window, string image, int width, double threshold_r,  double threshold_g,  double threshold_b,  double threshold_a  )
+        [InlineData("cubicfast", "0.5", "srgb","rings2.png", 500, 40,40,40, 1)]
+        [InlineData("cubicfast", "2","srgb", "rings2.png", 500, 40, 40, 40, 1)]
+
+        [InlineData("lanczos", null, "srgb", "rings2.png", 400, 15,15,30,1)] //lanczos3 windowed, in srgb colorspace, is very close to GDI
+        //down.cs=srgb&down.f=lanczos
+
+
+        public void CompareToGDI(string filter, string window, string colorspace, string image, int width, double threshold_r,  double threshold_g,  double threshold_b,  double threshold_a  )
         {
             String source = "..\\..\\..\\..\\Samples\\Images\\" + image;
            
@@ -167,14 +177,16 @@ namespace ImageResizer.Plugins.FastScaling.Tests
             new FastScalingPlugin().Install(c);
 
             i1["width"] = width.ToString();
-            i1["fastscaling"] = "false";
+            i1["fastscale"] = "false";
 
 
             var i2 = new Instructions(i1);
             i2["fastscale"] = "true";
+            i2["down.colorspace"] = colorspace;
 
-            i2["f.window"] = window;
-            i2["f"] = filter;
+            i2["down.window"] = window;
+            i2["down.filter"] = filter;
+            i2["down.speed"] = "-2";
             
             var job1 = new ImageJob(source, typeof(Bitmap), i1);
             c.Build(job1);
