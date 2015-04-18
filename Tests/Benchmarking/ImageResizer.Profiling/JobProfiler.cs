@@ -46,14 +46,14 @@ namespace Bench
         private static ConcurrentDictionary<string, Barrier> stopBarriers = new ConcurrentDictionary<string, Barrier>(8, 128, StringComparer.Ordinal);
         private void WaitStart(string key, int threads)
         {
-            if (threads == 1) return;
+            if (threads < 2) return;
             var b = startBarriers.GetOrAdd(key, s => new Barrier(threads));
             b.SignalAndWait();
         }
 
         private void WaitStop(string key, int threads)
         {
-            if (threads == 1) return;
+            if (threads < 2) return;
             var b = stopBarriers.GetOrAdd(key, s => new Barrier(threads));
             b.SignalAndWait();
         }
