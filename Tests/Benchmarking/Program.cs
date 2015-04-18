@@ -408,7 +408,7 @@ namespace Bench
             var imageSrc = new ImageProvider().AddBlankImages(new Tuple<int, int, string>[] { new Tuple<int, int, string>(4000, 4000, "jpg") });
             imageSrc.PrepareImagesAsync().Wait();
             var runner = Benchmark.BenchmarkInMemory(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"), imageSrc.GetImages().First(),
-                new Instructions("f=7"), false, false);
+                new Instructions("down.filter=lanczos"), false, false);
             runner.Label = "FastScaling";
             CheckMemoryUse(runner, 2);
         }
@@ -446,8 +446,9 @@ namespace Bench
             //settings.ParallelThreads = 2;
             var configs = new Tuple<Config, Instructions, string>[]{
                     new Tuple<Config, Instructions, string>(ConfigWithPlugins(),null,"System.Drawing"),
-                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true;f=0"),"FastCubic"),
-                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true;f=2"),"CatmullRom")};
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true&down.filter=fastcubic"),"FastCubic"),
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true&down.filter=robidoux"),"Robidoux"),
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true&down.filter=ginseng&down.interpolate_at_least=-1"),"Ginseng with no halving")};
 
             Compare(settings, configs.Reverse());
 
@@ -455,21 +456,6 @@ namespace Bench
         }
 
 
-
-        public static void CompareFastScaling(string segment = "op")
-        {
-            var settings = ScalingComparisonDefault();
-            settings.SegmentNameFilter = segment;
-            var c = ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling");
-            var configs = new Tuple<Config, Instructions, string>[]{
-                    new Tuple<Config, Instructions, string>(new Config(),null,"System.Drawing"),
-                    new Tuple<Config, Instructions, string>(c,new Instructions("&fastscale=true"),"FastScaling Bicubic - no skipped source pixels"),
-                    new Tuple<Config, Instructions, string>(c,new Instructions("&fastscale=true&window=1.4"),"FastScaling Bicubic w/ 6x window size (GDI HQ Bicubic prefilter equivalent)"),
-                    new Tuple<Config, Instructions, string>(c,new Instructions("&fastscale=true&turbo=true"),"FastScaling+Halving"),
-                    new Tuple<Config, Instructions, string>(c,new Instructions("&fastscale=true&f=7&window=1.4"),"FastScaling6X Lanczos")};
-
-            Compare(settings, configs.Reverse());
-        }
 
         public static void CompareFastScalingWindows(string segment = "op")
         {
@@ -477,8 +463,8 @@ namespace Bench
             settings.SegmentNameFilter = segment;
             var c = ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling");
             var configs = new Tuple<Config, Instructions, string>[]{
-                    new Tuple<Config, Instructions, string>(c,new Instructions("&fastscale=true&window=1.3"),"FastScaling with large window (1.3)"),
-                    new Tuple<Config, Instructions, string>(c,new Instructions("&fastscale=true&window=0.5"),"FastScaling with standard window (0.5)")};
+                    new Tuple<Config, Instructions, string>(c,new Instructions("&fastscale=true&dpwn.window=1.3"),"FastScaling with large window (1.3)"),
+                    new Tuple<Config, Instructions, string>(c,new Instructions("&fastscale=true&down.window=0.5"),"FastScaling with standard window (0.5)")};
 
             Compare(settings, configs);
         }

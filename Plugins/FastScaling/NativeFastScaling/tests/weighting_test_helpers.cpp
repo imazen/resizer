@@ -138,54 +138,6 @@ char * test_filter(Context * context, InterpolationFilter filter, char *msg, dou
     else return nullptr;
 }
 
-bool test_weight_distrib(Context * context, char *msg)
-{
-    //These have window = 1, and shouldnt' have negative values. They should also end at 1
-    if (!test_filter(context, InterpolationFilter::Filter_Hermite, msg, 0, 0, 0.99, 0.08, 1)) return false;
-    //Also called a linear filter
-    if (!test_filter(context, InterpolationFilter::Filter_Triangle, msg, 0, 0, 0.99, 0.08, 1)) return false;
-    //Box should only return a value from -0.5..0.5
-    if (!test_filter(context, InterpolationFilter::Filter_Box, msg, 0, 0, 0.51, 0.001, 0.51)) return false;
-
-
-
-    //These should go negative between x=1 and x=2, but should end at x=2
-    if (!test_filter(context, InterpolationFilter::Filter_CatmullRom, msg, 1, 2, 1, 0.08, 2)) return false;
-    if (!test_filter(context, InterpolationFilter::Filter_CubicFast, msg, 1, 2, 1, 0.08, 2)) return false;
-    if (!test_filter(context, InterpolationFilter::Filter_Cubic, msg, 1, 2, 1, 0.08, 2)) return false;
-
-    //BSpline is a smoothing filter, always positive
-    if (!test_filter(context, InterpolationFilter::Filter_CubicBSpline, msg, 0, 0, 1.75, 0.08, 2)) return false;
-
-
-    // if (!test_filter(InterpolationFilter::Filter_Mitchell, msg, 1, 1.74, 1, 0.08, 1.75)) return false;
-    // if (!test_filter(InterpolationFilter::Filter_Robidoux, msg, 1, 1.6, 1, 0.08, 1.75)) return false;
-    // if (!test_filter(InterpolationFilter::Filter_RobidouxSharp, msg, 1, 1.8, 1, 0.08, 1.8)) return false;
-
-
-    //Sinc filters. These have second crossings.
-    if (!test_filter(context, InterpolationFilter::Filter_Lanczos2, msg, 1, 2, 1, 0.08, 2)) return false;
-    //if (!test_filter(InterpolationFilter::Filter_Lanczos2Sharp, msg, 0.954, 1.86, 1, 0.08, 2)) return false;
-
-    //These should be negative between x=1 and x=2, positive between 2 and 3, but should end at 3
-
-    if (!test_filter(context, InterpolationFilter::Filter_Lanczos3, msg, 1, 2, 1, 0.1, 3)) return false;
-    if (!test_filter(context, InterpolationFilter::Filter_Lanczos3Sharp, msg, 0.98, 1.9625, 1, 0.1, 2.943)) return false;
-
-    ///
-    if (!test_filter(context, InterpolationFilter::Filter_Lanczos2Windowed, msg, 1, 2, 1, 0.08, 2)) return false;
-
-    if (!test_filter(context, InterpolationFilter::Filter_Lanczos2SharpWindowed, msg, 0.954, 1.86, 1, 0.08, 2)) return false;
-
-    //These should be negative between x=1 and x=2, positive between 2 and 3, but should end at 3
-
-    if (!test_filter(context, InterpolationFilter::Filter_Lanczos3Windowed, msg, 1, 2, 1, 0.1, 3)) return false;
-
-
-    if (!test_filter(context, InterpolationFilter::Filter_Lanczos3SharpWindowed, msg, 0.98, 1.9625, 1, 0.1, 2.943)) return false;
-    return true;
-}
-
 InterpolationDetails*  sample_filter(Context * context, InterpolationFilter filter, double x_from, double x_to, double *buffer, int samples)
 {
     InterpolationDetails* details = InterpolationDetails_create_from(context, filter);

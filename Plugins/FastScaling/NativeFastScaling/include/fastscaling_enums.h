@@ -38,31 +38,37 @@ ENUM_END (STATUS_CODE_NAME)
 [ImageResizer::ExtensionMethods::EnumRemovePrefixAttribute ("Filter_")]
 #endif
 ENUM_START (InterpolationFilter, _InterpolationFilter)
-    Filter_CubicFast,
-    Filter_Cubic,
-    Filter_CatmullRom,
-    Filter_Mitchell,
-    Filter_Robidoux,
-    Filter_RobidouxSharp,
-    Filter_Hermite,
-    Filter_Lanczos3,
-    Filter_Lanczos3Sharp,
-    Filter_Lanczos2,
-    Filter_Lanczos2Sharp,
-    Filter_Triangle,
-    Filter_Linear,
-    Filter_Box,
-    Filter_CubicBSpline,
-    Filter_Lanczos3Windowed,
-    Filter_Lanczos3SharpWindowed,
-    Filter_Lanczos2Windowed,
-    Filter_Lanczos2SharpWindowed,
-    Filter_CatmullRomFast,
-    Filter_CatmullRomFastSharp,
-    Filter_MitchellFast,
-    Filter_Ginseng,
-    Filter_Jinc,
-    Filter_RobidouxFast
+
+Filter_RobidouxFast = 1,
+Filter_Robidoux = 2,
+Filter_RobidouxSharp = 3,
+Filter_Ginseng,
+Filter_GinsengSharp,
+Filter_Lanczos,
+Filter_LanczosSharp,
+Filter_Lanczos2,
+Filter_Lanczos2Sharp,
+Filter_CubicFast,
+Filter_Cubic,
+Filter_CubicSharp,
+Filter_CatmullRom,
+Filter_Mitchell,
+
+
+Filter_CubicBSpline,
+Filter_Hermite,
+Filter_Jinc,
+Filter_RawLanczos3,
+Filter_RawLanczos3Sharp,
+Filter_RawLanczos2,
+Filter_RawLanczos2Sharp,
+Filter_Triangle,
+Filter_Linear,
+Filter_Box,
+Filter_CatmullRomFast,
+Filter_CatmullRomFastSharp,
+
+Filter_MitchellFast
 ENUM_END (InterpolationFilter)
 
 ENUM_START (ProfilingEntryFlags, _ProfilingEntryFlags)

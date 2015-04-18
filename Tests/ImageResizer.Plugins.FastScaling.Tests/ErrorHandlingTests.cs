@@ -15,7 +15,7 @@ namespace ImageResizer.Plugins.FastScaling.Tests
     {
 
         [Theory]
-        [InlineData("lanczos3windowed", InterpolationFilter.Filter_Lanczos3Windowed)]
+        [InlineData("lanczos", InterpolationFilter.Filter_Lanczos)]
         [InlineData("cubicfast", InterpolationFilter.Filter_CubicFast)]
         public void TestEnumParsing(string name, InterpolationFilter value){
             Assert.Equal(ImageResizer.ExtensionMethods.EnumExtensions.Parse<InterpolationFilter>(name), value);

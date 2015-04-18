@@ -168,9 +168,16 @@ namespace ImageResizer{
 
                     }
 
-
+                    // May adjust the colorspace of the context
                     void Render (){
+
                         if (p != nullptr) p->Start ("managed_perform_render", false);
+                        if (p != nullptr) p->Start ("set_colorspace", false);
+
+                        c->UseFloatspace (originalOptions->ScalingColorspace, originalOptions->ColorspaceParamA, originalOptions->ColorspaceParamB, originalOptions->ColorspaceParamC);
+
+
+                        if (p != nullptr) p->Stop ("set_colorspace", true, true);
 
                         bool result = false;
                         if (wbCanvas == nullptr){

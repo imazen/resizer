@@ -53,7 +53,7 @@ namespace ImageResizer.Plugins.FastScaling.Tests
         {
             String imgdir = root + "Samples\\Images\\";
             Bitmap input = new Bitmap(imgdir + "premult-test.png");
-            Bitmap output = BuildFast(input, "fastscale=true&width=256&bgcolor=blue");
+            Bitmap output = BuildFast(input, "fastscale=true&width=256&bgcolor=blue&down.colorspace=linear&down.filter=cubicfast");
 
             Color px = output.GetPixel(5, 5);
             Color tst = Color.FromArgb(255, 0, 188, 187);
@@ -69,7 +69,7 @@ namespace ImageResizer.Plugins.FastScaling.Tests
         {
             String imgdir = root + "Samples\\Images\\";
             Bitmap input = new Bitmap(imgdir + "premult-test.png");
-            Bitmap output = BuildFast(input, "fastscale=true&width=256&");
+            Bitmap output = BuildFast(input, "fastscale=true&width=256&down.filter=cubicfast");
 
              Color px = output.GetPixel(5, 5);
             Color tst = Color.FromArgb(128, 0, 255, 0);
@@ -82,7 +82,7 @@ namespace ImageResizer.Plugins.FastScaling.Tests
         {
             String imgdir = root + "Samples\\Images\\";
             Bitmap input = new Bitmap(imgdir + "gamma-test.jpg");
-            Bitmap output = BuildFast(input, "fastscale=true&width=256");
+            Bitmap output = BuildFast(input, "fastscale=true&width=256&down.colorspace=linear&down.filter=cubicfast");
 
              Color px = output.GetPixel(90,70);
             Color tst = Color.FromArgb(255, 188, 188, 188);

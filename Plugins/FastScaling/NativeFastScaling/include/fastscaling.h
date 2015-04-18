@@ -196,7 +196,7 @@ bool RenderDetails_render(Context * context, RenderDetails * details, BitmapBgra
 bool RenderDetails_render_in_place(Context * context, RenderDetails * details, BitmapBgra * edit_in_place);
 void RenderDetails_destroy(Context * context, RenderDetails * d);
 
-
+bool InterpolationDetails_interpolation_filter_exists(InterpolationFilter filter);
 InterpolationDetails * InterpolationDetails_create(Context * context);
 InterpolationDetails * InterpolationDetails_create_bicubic_custom(Context * context,double window, double blur, double B, double C);
 InterpolationDetails * InterpolationDetails_create_custom(Context * context,double window, double blur, detailed_interpolation_method filter);

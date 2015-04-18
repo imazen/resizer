@@ -50,6 +50,11 @@ namespace ImageResizer{
                     }
 
 
+                    property Workingspace ScalingColorspace;
+                    property float ColorspaceParamA;
+                    property float ColorspaceParamB;
+                    property float ColorspaceParamC;
+
 
                     property uint32_t Filter;
                     property float SamplingWindowOverride;

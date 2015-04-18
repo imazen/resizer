@@ -295,7 +295,9 @@ static inline int64_t get_profiler_ticks_per_second(void)
 #include <stdio.h>
 #include <stdarg.h>
 
+#ifndef snprintf
 #define snprintf c99_snprintf
+#endif
 
 
 

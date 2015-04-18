@@ -18,10 +18,28 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
 bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFormat cbpp, bool transpose, bool flipx, bool flipy, InterpolationFilter filter)
 {
     Context * context = Context_create();
+    if (context == NULL){
+        return false;
+    }
     BitmapBgra * source = BitmapBgra_create(context, sx, sy, true, sbpp);
+    if (source == NULL){
+        Context_destroy(context);
+        return false;
+    }
     BitmapBgra * canvas = BitmapBgra_create(context, cx, cy, true, cbpp);
+    if (canvas == NULL){
+        BitmapBgra_destroy(context, source);
+        Context_destroy(context);
+        return false;
+    }
 
     RenderDetails * details = RenderDetails_create_with(context, filter);
+    if (details == NULL){
+        BitmapBgra_destroy(context, source);
+        BitmapBgra_destroy(context, canvas);
+        Context_destroy(context);
+        return false;
+    }
     details->sharpen_percent_goal = 50;
     details->post_flip_x = flipx;
     details->post_flip_y = flipy;
@@ -55,10 +73,14 @@ bool test (int sx, int sy, BitmapPixelFormat sbpp, int cx, int cy, BitmapPixelFo
 
 int main(void)
 {
-    for (int i =0; i < 10; i++) {
-        test (4000, 3000, Bgr24, 800, 600, Bgra32, true, true, false, (InterpolationFilter)0);
-        test (4000, 3000, Bgr24, 1600, 1200, Bgra32, false, true, true, (InterpolationFilter)0);
-        test (1200, 800, Bgra32, 200, 150, Bgra32, false, false, false, (InterpolationFilter)0);
+
+    printf( "Running 3 x 20 operations\n" );
+    for (int i =0; i < 20; i++) {
+        if (InterpolationDetails_interpolation_filter_exists((InterpolationFilter)i)){
+            test (1200, 100, Bgr24, 400, 223, Bgra32, true, true, false, (InterpolationFilter)i);
+            test (44, 33, Bgr24, 800, 600, Bgra32, false, true, true, (InterpolationFilter)i);
+            test (1200, 800, Bgra32, 200, 150, Bgra32, false, false, false, (InterpolationFilter)i);
+        }
     }
     return 0;
 
