@@ -18,7 +18,7 @@ using System.Reflection;
 #endif
 
 [assembly: AssemblyCompany("Imazen LLC")]
-[assembly: AssemblyCopyright("Copyright © 2014 Imazen LLC")]
+[assembly: AssemblyCopyright("Copyright © 2015 Imazen LLC")]
 
 // Version information for an assembly consists of the following four values:
 //
