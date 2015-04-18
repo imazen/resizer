@@ -1,12 +1,10 @@
 ﻿/* Copyright (c) 2011 Wouter A. Alberts and Nathanael D. Jones. See license.txt for your rights. */
 using System;
-using System.Security.Permissions;
-using System.Web;
 using System.Web.Hosting;
-using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using ImageResizer.Util;
+using Microsoft.Azure;
 
 namespace ImageResizer.Plugins.AzureReader2 {
 
