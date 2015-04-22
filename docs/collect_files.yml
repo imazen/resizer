@@ -9,107 +9,155 @@ files:
 #Plugins Readmes -> Plugins Pages
 - from: Plugins/AdvancedFilters/readme.slim #slim
   to: plugins/advancedfilters.slim
+  append: edition_info
+
 - from: Plugins/AnimatedGifs/readme.slim #slim
   to: plugins/animatedgifs.slim
+  append: edition_info
 - from: Plugins/AzureReader/readme.md
   to: plugins/azurereader.md
+  append: edition_info
 - from: Plugins/AzureReader2/readme.md
   to: plugins/AzureReader2.md
+  append: edition_info
 - from: Plugins/BatchZipper/readme.md
   to: plugins/batchzipper.md
+  append: edition_info
 - from: Plugins/CloudFront/readme.md
   to: plugins/cloudfront.md
+  append: edition_info
 - from: Plugins/CopyMetadata/readme.md
   to: plugins/copymetadata.md
+  append: edition_info
 - from: Plugins/DiskCache/readme.md
   to: plugins/diskcache/index.md #for some reason this one lives in its own folder
+  append: edition_info
 - from: Plugins/Faces/readme.md
   to: plugins/faces.md
+  append: edition_info
 - from: Plugins/FFmpeg/readme.md
   to: plugins/ffmpeg.md
+  append: edition_info
 - from: Plugins/FreeImage/readme.md
   to: plugins/freeimage.md
+  append: edition_info
 - from: Plugins/Logging/readme.md
   to: plugins/logging.md
+  append: edition_info
 - from: Plugins/MongoReader/readme.md
   to: plugins/mongoreader.md
+  append: edition_info
 - from: Plugins/PrettyGifs/readme.slim #slim
   to: plugins/prettygifs.slim
+  append: edition_info
 - from: Plugins/PsdComposer/readme.md
   to: plugins/psdcomposer.md
+  append: edition_info
 - from: Plugins/PsdReader/readme.md
   to: plugins/psdreader.md
+  append: edition_info
 - from: Plugins/RedEye/readme.md
   to: plugins/redeye.md
+  append: edition_info
 - from: Plugins/RemoteReader/readme.md
   to: plugins/remotereader.md
+  append: edition_info
 - from: Plugins/S3Reader/readme.md
   to: plugins/s3reader.md
+  append: edition_info
 - from: Plugins/S3Reader2/readme.md
   to: plugins/s3reader2.md
+  append: edition_info
 - from: Plugins/SeamCarving/readme.md
   to: plugins/seamcarving.md
+  append: edition_info
 - from: Plugins/SimpleFilters/readme.slim #slim
   to: plugins/simplefilters.slim
+  append: edition_info
 - from: Plugins/SqlReader/readme.md
   to: plugins/sqlreader.md
+  append: edition_info
 - from: Plugins/Watermark/readme.md
   to: plugins/watermark.md
+  append: edition_info
 - from: Plugins/WebP/readme.md
   to: plugins/webp.md
+  append: edition_info
 - from: Plugins/WhitespaceTrimmer/readme.slim #slim
   to: plugins/whitespacetrimmer.slim
+  append: edition_info
 - from: Plugins/Wic/readme.md
   to: plugins/wic.md
+  append: edition_info
 - from: Plugins/DiagnosticJson/readme.md
   to: plugins/diagnosticjson.md
+  append: edition_info
 - from: Plugins/Faces/croparound_readme.md
   to: plugins/croparound.md
+  append: edition_info
 
 #Plugin documentation from plugins in other folders
 
 - from: Contrib/PdfRenderer/pdfrenderer_readme.md
   to: plugins/pdfrenderer.md
+  append: edition_info
 
 - from: Samples/CustomOverlayPlugin/readme.md
   to: plugins/customoverlay.md
+  append: edition_info
 
 
 #Core plugin documentation -> plugins pages
 - from: Core/Plugins/Basic/autorotate_readme.md
   to: plugins/autorotate.md
+  append: edition_info
 - from: Core/Plugins/Basic/clientcache_readme.md
   to: plugins/clientcache.md
+  append: edition_info
 - from: Core/Plugins/Basic/defaultencoder_readme.md
   to: plugins/defaultencoder.md
+  append: edition_info
 - from: Core/Plugins/Basic/defaultsettings_readme.md
   to: plugins/defaultsettings.md
+  append: edition_info
 - from: Core/Plugins/Basic/diagnostics_readme.md
   to: plugins/diagnostics.md
+  append: edition_info
 - from: Core/Plugins/Basic/dropshadow_readme.md
   to: plugins/dropshadow.md
+  append: edition_info
 - from: Core/Plugins/Basic/folderresizesyntax_readme.md
   to: plugins/folderresizesyntax.md
+  append: edition_info
 - from: Core/Plugins/Basic/gradient_readme.md
   to: plugins/gradient.md
+  append: edition_info
 - from: Core/Plugins/Basic/iepngfix_readme.md
   to: plugins/iepngfix.md
+  append: edition_info
 - from: Core/Plugins/Basic/image404_readme.md
   to: plugins/image404.md
+  append: edition_info
 - from: Core/Plugins/Basic/imagehandlersyntax_readme.md
   to: plugins/imagehandlersyntax.md
+  append: edition_info
 - from: Core/Plugins/Basic/presets_readme.md
   to: plugins/presets.md
+  append: edition_info
 - from: Core/Plugins/Basic/sizelimiting_readme.md
   to: plugins/sizelimiting.md
+  append: edition_info
 - from: Core/Plugins/Basic/speedorquality_readme.md
   to: plugins/speedorquality.md
+  append: edition_info
 - from: Core/Plugins/Basic/virtualfolder_readme.md
   to: plugins/virtualfolder.md
+  append: edition_info
 
 # This was in Core.Mvc, but moves to Core in v4.
 - from: Core/Plugins/Basic/mvcroutingshim_readme.md
   to: plugins/mvcroutingshim.md
+  append: edition_info
 
 
 - from: docs/intro.md
@@ -121,6 +169,9 @@ files:
   to: nav.yml
   verbatim: true
 
+- from: docs/edition_info.slim
+  to: plugins/edition_info.slim
+  verbatim: true
 
 
 #Documentation from versioned readme file
