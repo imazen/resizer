@@ -1,0 +1,95 @@
+Aliases: /plugins/install /docs/install /docs/nuget /docs/install/nuget /docs/install/aspnet
+
+h1 Install ImageResizer
+
+markdown: 
+    First, some questions.
+
+    1. Are you using the URL API? 
+    2. Are you using the managed or COM API? 
+
+    &nbsp;
+
+    If you answered "no" to #1 and "yes" to #2, [see our non-web installation guide](/docs/v3/install/non-web). Console, WPF, WCF, WinForms, and Classic ASP users sometimes choose to only use the Managed API. 
+
+    If you answered "yes" to #1, and "no" to #2, you might consider [using ImageResizer as a standalone image server](/docs/v3/install/standalone). PHP, Ruby, and Python users might consider this, as well as users with dozens of terabytes of images.
+
+    Note: If you want to modify Web.config yourself, substitute `ImageResizer.Mvc` for `ImageResizer.MvcWebConfig` below. MvcWebConfig will only add - never delete - elements in Web.config. 
+
+    ### via the NuGet Package Manager Console (option 1)
+
+    Open the nuget console from Visual Studio via `Tools` > `Library Package Manager` > `Package Manager Console`.
+
+
+pre: code 
+  | PM> Install-Package ImageResizer.MvcWebConfig
+    PM> Install-Package ImageResizer.Plugins.DiskCache
+    PM> Install-Package ImageResizer.Plugins.PrettyGifs
+    PM> Install-Package ImageResizer.Plugins.SimpleFilters
+
+h3 via the NuGet GUI (Visual Studio) (option 2)
+ol
+  li Right-click on your project and click "Manage NuGet Packages". 
+  li Select "NuGet Offical Package Source"
+  li Search for "Imazen", using the search bar at the top right
+  li Select "ImageResizer Web.config Installation (with MVC support)" and choose Install
+  li Repeat for each desired plugin. All plugins can be safely combined
+  li Check the documentation for each plugin to see if additional steps are required to activate the plugin. Only some NuGet packages auto-activate the included plugin(s).
+p: a href="http://nuget.org/packages?q=Imazen" View available packages on NuGet
+
+h2 Manual Installation (option 3)
+
+markdown:
+    1. [Download and unzip the package](/download). Add `ImageResizer.dll`, `ImageResizer.Mvc.dll`, `ImageResizer.Plugins.DiskCache.dll`, and any other plugin dlls you wish to use to the `/bin` folder of the website. If you're using Visual Studio, right click your project and choose "Add Reference" for each of these files instead.
+
+    2. Modify or create the /Web.Config file for your site. Make sure all these elements are added correctly (You may wish to make a backup of Web.config first).
+
+            <?xml version="1.0" encoding="utf-8" ?>
+            <configuration>
+              <configSections>
+                <section name="resizer" type="ImageResizer.ResizerSection,ImageResizer"  requirePermission="false"  />
+              </configSections>
+
+              <resizer>
+                <!-- Unless you (a) use Integrated mode, or (b) map all reqeusts to ASP.NET, 
+                     you'll need to add .ashx to your image URLs: image.jpg.ashx?width=200&height=20 -->
+                <pipeline fakeExtensions=".ashx" />
+
+                <plugins>
+                  <add name="MvcRoutingShim" />
+                  <add name="DiskCache" />
+                  <!-- <add name="PrettyGifs" /> -->
+                  <!-- <add name="SimpleFilters" /> -->
+                  <!-- <add name="S3Reader" /> -->
+                </plugins>  
+              </resizer>
+
+              <system.web>
+                <httpModules>
+                  <!-- This is for IIS5, IIS6, and IIS7 Classic, and Cassini/VS Web Server-->
+                  <add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
+                </httpModules>
+              </system.web>
+
+              <system.webServer>
+                <validation validateIntegratedModeConfiguration="false"/>
+                <modules>
+                  <!-- This is for IIS7+ Integrated mode -->
+                  <add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
+                </modules>
+              </system.webServer>
+            </configuration>
+      
+    3. Start your web site, then visit [/resizer.debug.ashx](/plugins/diagnostics) to verify you've done everything correctly. If you ever encounter issues, simply revisit that page to access the self-diagnostics. If you need help, [just ask](/support)!
+
+
+h2 Ready to go live?
+
+markdown:
+    1. Review the [Best Practices Guide](/docs/best-practices) and [our licence options](/licenses).
+
+    2. Get the [Performance Edition](/plugins/editions/performance) or [a support contract](/support/contracts), which includes [disk caching](/plugins/diskcache) and dozens of other valuable plugins. Can't afford mistakes? We can review your media architecture and verify scalability as part of any support contract.
+
+    3. Take a look at client-side components like [Slimmage.js](https://github.com/imazen/slimmage), which can make responsive images painless. There [are many third-party libraries that can make integration easier](/docs/community).
+
+    4. Join the community [on Github](https://github.com/imazen/resizer) or [on UserVoice](http://resizer.uservoice.com/forums/108373-image-resizer)

@@ -1,0 +1,3 @@
+branches:
+- branch: master
+  subfolder: docs/v3

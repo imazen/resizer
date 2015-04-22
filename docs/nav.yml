@@ -1,0 +1,114 @@
+title: ImageResizer v3 Docs
+items:
+- title: "Getting Started"
+  items: 
+  - title: Download
+    path: download
+  - title: Released Versions
+    path: releases
+
+  - title: Basic Usage
+    path: docs/basics
+    #install_plugin" Manual Installation
+    #installation" Nuget Installation
+    #install_plugin" Installing a Plugin Manually
+  - path: troubleshoot
+    title: Troubleshooting common errors
+  - path: geterror
+    title: Accessing error details and self-diagnostics
+  - path: faq
+    title: Frequently Asked Questions
+- title: "Advanced Installation"
+  items: 
+  - title: Installing ImageResizer
+    path: install
+  - title: ImageResizer for IIS Administrators
+    path: install/administrators
+  - title: ImageResizer in Classic Mode
+    path: install/classicmode
+  - title: ImageResizer via COM
+    path: install/com
+  - title: As a standalone image server
+    path: install/standalone
+  - title: ImageResizer without ASP.NET
+    path: install/non-web
+  - title: Editing Web.config
+    path: install/web-config
+- title: "Common Tasks"
+  items:
+  - path: reference
+    title: Full Command Reference
+  - path: managed
+    title: Managed API Examples
+  - path: configuration
+    title: Configuration Reference
+  - title: Watermark images based on folder name or display size
+    path: howto/watermark-by-folder-or-size
+  - title: Convert and resize images as they are uploaded
+    path:  howto/upload-and-resize
+  - title: Generate thumbnails and multiple sizes to disk
+    path: howto/generate-versions
+
+- title: "Concepts & Best Practices"
+  items:
+  - title: Best Practices
+    path: docs/best-practices
+  - title: Cloud Archiecture Guide
+    path: docs/cloud
+  - title: Understanding processing and caching
+    path: process-and-cache
+  - title: ImageResizer over SMB
+    path: /docs/v3/docs/fcnmode
+- title: "Requirements & Compatibility"
+  items:
+
+  - title: CMS Compatibility Reference
+    path: cms_compatibility
+  - title: System Requirements
+    path: system_requirements
+
+- title: Extending the pipeline
+  items: 
+  - title: Making a simple plugin
+    path: extend/basics
+  - title: Making your own source file provider
+    path: extend/virtualimageprovider
+  - title: Extension points
+    path: extend/extending
+  - title: Events
+    path: extend/events
+  - title: Multi-tenanting
+    path: extend/multi-tenanting
+  - title: Understanding InterceptModule
+    path: extend/interceptmodule
+  - title: Understanding ImageBuilder
+    path: extend/imagebuilder
+  - title: Extending ImageBuilder
+    path: extend/extending-imagebuilder
+  - title: Extending ImageBuilder
+    path: extend/extending-imagebuilder
+  - title: DiskCaching non-image files
+    path: howto/cache-non-images
+
+- title: External resources
+  items:
+  - title: "Github"
+    path: "https://github.com/imazen/resizer"
+  - title: "Community Plugins, Articles, and Feedback"
+    path: community
+  - path: http://nathanaeljones.com/573/combining-jcrop-and-server-side-image-resizing/
+    title: Use jCrop to create a cropping UI in 11 lines
+  - path: /blog/2013/swipebox
+    title: "Responsive, Touch-Friendly Lightboxes"
+
+
+  # #self_diagnostics" Accessing Self-Diagnostics
+  # a href="http://documentation.imageresizing.net/doxygen/namespaces.html" Full generated documentation for the core and all plugins, with graphs
+  # a href="http://documentation.imageresizing.net/docu/" Simple generated documentation for the ImageResizer core
+
+- title: Plugins
+  generate: plugins
+  generate_arg_1: v3
+
+
+ 

@@ -1,0 +1,70 @@
+Tags: plugin
+Edition: creative
+Tagline: Automatically trims whitespace off an image using smart edge detection
+Libs: twentytwenty
+Icon: cogs
+Aliases: /plugins/whitespacetrimmer
+
+
+
+h1 WhitespaceTrimmer plugin
+p 
+  | Trims whitespace (even smooth gradients) from around images automatically using edge detection filters. Requires Full Trust, uses unmanaged code.
+
+- image_width = 600
+- image_thumb_width = 100
+- example_images = ['017','019','022','023','028','030-alt']
+
+.row-fluid
+  .span8.well
+    div style="position:relative; text-align:center; width:100%;"
+      span style="position:absolute; left:0"
+        | Original
+      span style="position:absolute; right:0"
+        | WhitespaceTrimmer
+    br
+    p
+      .twentytwenty-container
+        img src="http://z.zr.io/rw/pluginexamples/example-017-whitespace.jpg?width=#{image_width}" id="plugin-example-before"
+        img src="http://z.zr.io/rw/pluginexamples/example-017-whitespace.jpg?width=#{image_width}&trim.threshold=80&trim.percentpadding=0.5" id="plugin-example-after"
+
+    .row-fluid.hidden-phone
+      - example_images.each do | img |
+        .span2
+          p 
+            a.plugin-example-button data-image-before="http://z.zr.io/rw/pluginexamples/example-#{img}-whitespace.jpg?width=#{image_width}" data-image-after="http://z.zr.io/rw/pluginexamples/example-#{img}-whitespace.jpg?width=#{image_width}&trim.threshold=80&trim.percentpadding=0.5"
+              img src="http://z.zr.io/rw/pluginexamples/example-#{img}-whitespace.jpg?width=#{image_thumb_width}"
+    .visible-phone
+      - example_images.each do | img |
+        a.plugin-example-button data-image-before="http://z.zr.io/rw/pluginexamples/example-#{img}-whitespace.jpg?width=#{image_width}" data-image-after="http://z.zr.io/rw/pluginexamples/example-#{img}-whitespace.jpg?width=#{image_width}&trim.threshold=80&trim.percentpadding=0.5"
+          img src="http://z.zr.io/rw/pluginexamples/example-#{img}-whitespace.jpg?width=#{image_thumb_width}" width="55" height="55"
+        | &nbsp;
+    p 
+      | Settings: &amp;trim.threshold = 80 ,  &amp;trim.percentpadding = 0.5
+
+- example_images.each do | img |
+  img style="display:none;" src="http://z.zr.io/rw/pluginexamples/example-#{img}-whitespace.jpg?width=#{image_width}&trim.threshold=80&trim.percentpadding=0.5"
+
+
+
+h2#usage Usage
+p
+  | Add
+  code &amp;trim.threshold=80
+  | to an image URL. You'll probably also want to restore a bit of padding with
+  code &amp;trim.percentpadding=0.5
+  | since it's ugly to trim completely to the edge of the object.
+p The threshold value can usually go all the way up to 255 without cutting off any part of the image. The percentpadding value can be anywhere between 0 and 50, but 0.5-2 is usually the best.
+h2#installation Installation
+p
+  | Either run
+  code Install-Package ImageResizer.Plugins.WhitespaceTrimmer
+  | in the NuGet package manager, or:
+ul
+  li Add ImageResizer.Plugins.WhitespaceTrimmer.dll to your project. Make sure AForge.dll, AForge.Math.dll, and AForge.Imaging.dll are copied also, although they do not need to be referenced directly.
+  li
+    | Add
+    code &lt;add name="WhitespaceTrimmer" /&gt;
+    | inside
+    code &lt;plugins&gt;&lt;/plugins&gt;
+    | in Web.config.
