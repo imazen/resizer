@@ -63,9 +63,10 @@ We use submodules - clone with `git clone -b develop --recursive https://github.
 
 #### Install from NuGet
 
-Nearly all [ImageResizer plugins are on NuGet (33+)](https://www.nuget.org/packages?q=nathanaeljones).
+Nearly all [ImageResizer plugins are on NuGet (33+)](https://www.nuget.org/packages?q=nathanaeljones). [You can enable source symbols from symbolsource.org](http://www.symbolsource.org/Public/Home/VisualStudio) for an enhanced debugging experience.
 
 Get the basics:
+
 ```
 PM> Install-Package ImageResizer.WebConfig
 PM> Install-Package ImageResizer.Plugins.DiskCache
@@ -582,30 +583,6 @@ The following sample code generates a GUID filename for each upload, determines 
 
 # Troubleshooting
 
-<a name="self_diagnostics"></a>
-
-## Accessing Self-Diagnostics
-
-Most configuration and plugin installation issues can be resolved by checking ImageResizer’s self-diagnostics page. If your local website is running at `http://localhost:5000/`, then you can visit it at `http://localhost:5000/resizer.debug.ashx`.
-
-If you’re not using ImageResizer from a web app, you can access the page as a string via `ImageResizer.Configuration.Config.Current.GetDiagnosticsPage()` or write it to disk with `ImageResizer.Configuration.Config.Current.WriteDiagnosticsTo(string path)`. 
-
-#### Diagnostics Page Not Working?
-
-By default, the Diagnostics plugin uses the same setting as [customErrors](http://msdn.microsoft.com/en-us/library/h0hfz6fc%28v=vs.100%29.aspx) (which defaults to Localhost). Thus, if you can see ASP.NET error messages, you will also be able to get the diagnostics page. This ensures that the diagnostics page never exposes data to a host that doesn't already have access to detailed error messages. 
-
-To override, add one of the following to the &lt;resizer&gt; section.
-```xml
-	<diagnostics enableFor="AllHosts" />
-	<diagnostics enableFor="Localhost" />
-	<diagnostics enableFor="None" />
-
-```
-
-#### ASP.NET MVC Notes
-
-If you can't access the diagnostics page, make sure the [MvcRoutingShim plugin](http://www.imageresizing.net/plugins/mvcroutingshim) is installed.
-
 <a name="error_messages"></a>
 
 ## Getting Detailed Error Messages
@@ -632,11 +609,35 @@ You may also have to **temporarily** change &lt;deployment retail to "False" for
 
 The customErrors setting is case-sensitive; use "Off", "On", and "RemoteOnly".
 
-<a home="troubleshooting_guide"></a>
+<a name="self_diagnostics"></a>
+
+## Accessing Self-Diagnostics
+
+Most configuration and plugin installation issues can be resolved by checking ImageResizer’s self-diagnostics page. If your local website is running at `http://localhost:5000/`, then you can visit it at `http://localhost:5000/resizer.debug.ashx`.
+
+If you’re not using ImageResizer from a web app, you can access the page as a string via `ImageResizer.Configuration.Config.Current.GetDiagnosticsPage()` or write it to disk with `ImageResizer.Configuration.Config.Current.WriteDiagnosticsTo(string path)`. 
+
+#### Diagnostics Page Not Working?
+
+By default, the Diagnostics plugin uses the same setting as [customErrors](http://msdn.microsoft.com/en-us/library/h0hfz6fc%28v=vs.100%29.aspx) (which defaults to Localhost). Thus, if you can see ASP.NET error messages, you will also be able to get the diagnostics page. This ensures that the diagnostics page never exposes data to a host that doesn't already have access to detailed error messages. 
+
+To override, add one of the following to the &lt;resizer&gt; section.
+```xml
+  <diagnostics enableFor="AllHosts" />
+  <diagnostics enableFor="Localhost" />
+  <diagnostics enableFor="None" />
+
+```
+
+#### ASP.NET MVC Notes
+
+If you can't access the diagnostics page, make sure the [MvcRoutingShim plugin](http://www.imageresizing.net/plugins/mvcroutingshim) is installed.
+
+<a name="troubleshooting_list"></a>
 
 ## What Might Be Wrong
 
-To get support or use this guide, [make sure you get the detailed error message from visiting the image URL directly](#error_messages). This guide cannot offer a solution to a generic 500 error, 404 error, or a "broken image icon", as those symptoms are far to generic to be useful. 
+To get support or use this guide, make sure you get the detailed error message from visiting the image URL directly. This guide cannot offer a solution to a generic 500 error, 404 error, or a "broken image icon", as those symptoms are far to generic to be useful. 
 
 If this page doesn't resolve your issue, [visit the Support page](http://www.imageresizing.net/support) for information about the bug bounty and free support requirements.
 
