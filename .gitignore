@@ -3,7 +3,6 @@ obj/
 Debug/
 imagecache/
 dlls/
-/docs/*/
 Tests/*/Results
 .DS_Store
 ._*
