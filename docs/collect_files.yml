@@ -1,0 +1,191 @@
+folders:
+  - from: /docs
+    to: 
+    glob:
+      - "**.slim"
+      - "**.md"
+
+files:
+#Plugins Readmes -> Plugins Pages
+- from: Plugins/AdvancedFilters/readme.slim #slim
+  to: plugins/advancedfilters.slim
+- from: Plugins/AnimatedGifs/readme.slim #slim
+  to: plugins/animatedgifs.slim
+- from: Plugins/AzureReader/readme.md
+  to: plugins/azurereader.md
+- from: Plugins/AzureReader2/readme.md
+  to: plugins/AzureReader2.md
+- from: Plugins/BatchZipper/readme.md
+  to: plugins/batchzipper.md
+- from: Plugins/CloudFront/readme.md
+  to: plugins/cloudfront.md
+- from: Plugins/CopyMetadata/readme.md
+  to: plugins/copymetadata.md
+- from: Plugins/DiskCache/readme.md
+  to: plugins/diskcache/index.md #for some reason this one lives in its own folder
+- from: Plugins/Faces/readme.md
+  to: plugins/faces.md
+- from: Plugins/FFmpeg/readme.md
+  to: plugins/ffmpeg.md
+- from: Plugins/FreeImage/readme.md
+  to: plugins/freeimage.md
+- from: Plugins/Logging/readme.md
+  to: plugins/logging.md
+- from: Plugins/MongoReader/readme.md
+  to: plugins/mongoreader.md
+- from: Plugins/PrettyGifs/readme.slim #slim
+  to: plugins/prettygifs.slim
+- from: Plugins/PsdComposer/readme.md
+  to: plugins/psdcomposer.md
+- from: Plugins/PsdReader/readme.md
+  to: plugins/psdreader.md
+- from: Plugins/RedEye/readme.md
+  to: plugins/redeye.md
+- from: Plugins/RemoteReader/readme.md
+  to: plugins/remotereader.md
+- from: Plugins/S3Reader/readme.md
+  to: plugins/s3reader.md
+- from: Plugins/S3Reader2/readme.md
+  to: plugins/s3reader2.md
+- from: Plugins/SeamCarving/readme.md
+  to: plugins/seamcarving.md
+- from: Plugins/SimpleFilters/readme.slim #slim
+  to: plugins/simplefilters.slim
+- from: Plugins/SqlReader/readme.md
+  to: plugins/sqlreader.md
+- from: Plugins/Watermark/readme.md
+  to: plugins/watermark.md
+- from: Plugins/WebP/readme.md
+  to: plugins/webp.md
+- from: Plugins/WhitespaceTrimmer/readme.slim #slim
+  to: plugins/whitespacetrimmer.slim
+- from: Plugins/Wic/readme.md
+  to: plugins/wic.md
+- from: Plugins/DiagnosticJson/readme.md
+  to: plugins/diagnosticjson.md
+- from: Plugins/Faces/croparound_readme.md
+  to: plugins/croparound.md
+
+#Plugin documentation from plugins in other folders
+
+- from: Contrib/PdfRenderer/pdfrenderer_readme.md
+  to: plugins/pdfrenderer.md
+
+- from: Samples/CustomOverlayPlugin/readme.md
+  to: plugins/customoverlay.md
+
+
+#Core plugin documentation -> plugins pages
+- from: Core/Plugins/Basic/autorotate_readme.md
+  to: plugins/autorotate.md
+- from: Core/Plugins/Basic/clientcache_readme.md
+  to: plugins/clientcache.md
+- from: Core/Plugins/Basic/defaultencoder_readme.md
+  to: plugins/defaultencoder.md
+- from: Core/Plugins/Basic/defaultsettings_readme.md
+  to: plugins/defaultsettings.md
+- from: Core/Plugins/Basic/diagnostics_readme.md
+  to: plugins/diagnostics.md
+- from: Core/Plugins/Basic/dropshadow_readme.md
+  to: plugins/dropshadow.md
+- from: Core/Plugins/Basic/folderresizesyntax_readme.md
+  to: plugins/folderresizesyntax.md
+- from: Core/Plugins/Basic/gradient_readme.md
+  to: plugins/gradient.md
+- from: Core/Plugins/Basic/iepngfix_readme.md
+  to: plugins/iepngfix.md
+- from: Core/Plugins/Basic/image404_readme.md
+  to: plugins/image404.md
+- from: Core/Plugins/Basic/imagehandlersyntax_readme.md
+  to: plugins/imagehandlersyntax.md
+- from: Core/Plugins/Basic/presets_readme.md
+  to: plugins/presets.md
+- from: Core/Plugins/Basic/sizelimiting_readme.md
+  to: plugins/sizelimiting.md
+- from: Core/Plugins/Basic/speedorquality_readme.md
+  to: plugins/speedorquality.md
+- from: Core/Plugins/Basic/virtualfolder_readme.md
+  to: plugins/virtualfolder.md
+
+# This was in Core.Mvc, but moves to Core in v4.
+- from: Core/Plugins/Basic/mvcroutingshim_readme.md
+  to: plugins/mvcroutingshim.md
+
+
+- from: docs/intro.md
+  to: index.md
+  aliases: /docs /docs/git
+
+#Navigation structure
+- from: docs/nav.yml
+  to: nav.yml
+  verbatim: true
+
+
+
+#Documentation from versioned readme file
+- from: readme.md
+  render_and_split:
+    - to: "install_manually.htmf"  #NOTE: This doesn't exist on resizer-web yet
+      start_at: "a[name='install_plugin']"
+      stop_before: "a[name='reference']"
+      heading: Installing A Plugin Manually
+
+    - heading: Full Command Reference
+      start_at: "a[name='full_command']"
+      stop_before: "a[name='managed_api']"
+      to: "reference.htmf"
+      aliases: /docs/reference
+
+    - heading: Managed API
+      start_at: "a[name='managed_api']"
+      stop_before: "a[name='config_reference']"
+      to: managed.htmf
+      aliases: /docs/managed
+
+    - heading: Configuration Reference
+      to: configuration.htmf
+      start_at: "a[name='config_reference']"
+      stop_before: "a[name='tricks']"
+      aliases: /docs/configuration
+
+    - to: howto/watermark-by-folder-or-size.htmf
+      start_at: "a[name='watermark']"
+      stop_before: "a[name='thumbnails']"
+      heading: Watermark Images Based on Folder Name or Display Size
+      aliases: /docs/howto/watermark-by-folder-or-size
+
+    - to: howto/generate-versions.htmf
+      start_at: "a[name='thumbnails']"
+      stop_before: "a[name='resize_upload']"
+      heading: Generate Thumbnails and Multiple Sizes to Disk
+      aliases: /docs/howto/generate-versions
+
+    - to: howto/upload-and-resize.htmf
+      start_at: "a[name='resize_upload']"
+      stop_before: "a[name='troubleshooting_guide']"
+      heading: Convert and Resize Images as They Are Uploaded
+      aliases: /docs/howto/upload-and-resize
+  
+    - to: geterror.htmf
+      start_at: "a[name='error_messages']"
+      stop_before: "a[name='troubleshooting_list']"
+      aliases: /docs/geterror
+    
+
+    - to: troubleshoot.htmf
+      start_at: "a[name='troubleshooting_list']"
+      stop_before: "a[name='everything_else']"
+      heading: Troubleshooting
+      aliases: /docs/troubleshoot
+      textclass: t troubleshooting
+
+
+
+
+
+
+
+
+
+

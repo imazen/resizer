@@ -1,0 +1,93 @@
+Tags: plugin
+Edition: performance
+Tagline: Get rid of ugly .NET GIFs, and get photoshop-like results for GIFs and 8-bit PNG images. Uses tuned octree quantization and smart, adjustable dithering.
+Libs: twentytwenty
+Icon: cogs
+Aliases: /plugins/prettygifs
+
+
+h1 PrettyGifs plugin
+p Replaces .NET's disgusting default GIF encoding algorithm with Octree quantization and dithering, and allows 8-bit PNG creation. Compatible with all plugins.
+
+
+- image_width = 600
+- image_thumb_width = 100
+- image_scale = '&scale=both'
+- cache_buster = 25
+- example_images = ['017','019','022','023','028','030']
+
+
+/ .row-fluid
+  .span8.well
+    div style="position:relative; text-align:center; width:100%;"
+      span style="position:absolute; left:0"
+        | Default GIF
+        sup 
+          a href="#note1"
+            | 1
+      span style="position:absolute; right:0"
+        | PrettyGifs
+        sup 
+          a href="#note2"
+            | 2
+    br
+    p
+      .twentytwenty-container
+        img src="http://z.zr.io/rw/pluginexamples/example-017-websafe.gif?format=gif#{image_scale}&width=#{image_width}" id="plugin-example-before"
+        img src="http://z.zr.io/rw/pluginexamples/example-017.jpg?format=gif#{image_scale}&width=#{image_width}&colors=216&dither=4pass&preservePalette=false" id="plugin-example-after"
+ 
+    .row-fluid.hidden-phone
+      - example_images.each do | img |
+        .span2
+          p 
+            a.plugin-example-button data-image-before="http://z.zr.io/rw/pluginexamples/example-#{img}-websafe.gif?width=#{image_width}#{image_scale}&random=#{cache_buster}" data-image-after="http://z.zr.io/rw/pluginexamples/example-#{img}.jpg?width=#{image_width}#{image_scale}&colors=216&dither=4pass&preservePalette=false&random=#{cache_buster}"
+              img src="http://z.zr.io/rw/pluginexamples/example-#{img}.jpg?width=#{image_thumb_width}&random=#{cache_buster}"
+    .visible-phone
+      - example_images.each do | img |
+        a.plugin-example-button data-image-before="http://z.zr.io/rw/pluginexamples/example-#{img}-websafe.gif?width=#{image_width}#{image_scale}&random=#{cache_buster}" data-image-after="http://z.zr.io/rw/pluginexamples/example-#{img}.jpg?width=#{image_width}#{image_scale}&colors=216&dither=4pass&preservePalette=false&random=#{cache_buster}"
+          img src="http://z.zr.io/rw/pluginexamples/example-#{img}.jpg?width=#{image_thumb_width}&random=#{cache_buster}" width="55" height="55"
+        | &nbsp;
+
+
+h2 Installation
+p
+  | Either run
+  code Install-Package ImageResizer.Plugins.PrettyGifs
+  | in the NuGet package manager, or:
+ol
+  li Add ImageResizer.Plugins.PrettyGifs to your project
+  li
+    | Add
+    code &lt;add name=&quot;PrettyGifs&quot; /&gt;
+    | inside
+    code &lt;resizer&gt;&lt;plugins&gt;&lt;/plugins&gt;&lt;/resizer&gt;
+    | in Web.config.
+h2 Supported querystring commands
+ul
+  li 
+    | colors=2-256
+  li
+    | dither=true|4pass
+  li
+    | preservePalette=true|false - If true, will attempt to use the original palette if present instead of recalculating it.
+h2
+  | Why not 
+  a href="http://nquant.codeplex.com" nQuant
+    
+p A) On an informal test, it was 10x slower than the Octree algorithm on a 256x256 PNG. I.e, 1900ms vs 195ms. It also took 80MB of ram, while Octree took kilobytes.
+p
+  | B) It intrinsically requires 50MB ((32^4)x(6x8)=50,331,648 bytes) of ram per encode *just to store the histogram information for any size file*. This is an intrinsic limitation of
+  a href="http://www.ece.mcmaster.ca/~xwu/cq.c" Versus kilobytes for the Octree algorithm.
+p C) Only works for PNG files, it's designed for a multi-bit alpha channel. I could fix that, though.
+p D) The nQuant implementation also makes excessive copies of the image, making it scale poorly. For example, on a 1300x840 PNG, nuQuant took 18.8 seconds and 110-130MB of ram, while Octree took 0.3 seconds and 4-8MB of RAM. This is also fixable, I believe.
+a href="http://pngnq.sourceforge.net/index.html"
+a href="http://members.ozemail.com.au/~dekker/NEUQUANT.HTML"
+
+p
+  a id="note1"
+    | [1]
+  | : Default GIF: .NET Default GIF behaviour simulated with the 216 color web pallette in Adobe Photoshop. Results may differ depending upon your operating system. Pre-2009 versions of windows use a fixed pallette, while WS2008R2 and later use a different (although still poor) quantization system. 
+p
+  a id="note2"
+    | [2]
+  | : PrettyGif settings: &nbsp; format = gif, colors = 216, dither = 4pass, preservePalette = false
