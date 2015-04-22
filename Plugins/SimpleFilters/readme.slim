@@ -71,9 +71,11 @@ ol
   li Add ImageResizer.Plugins.SimpleFilters.dll to your project
   li
     | Add
-    code &lt;add name="SimpleFilters" /&gt;
+    code 
+      |  &lt;add name="SimpleFilters" /&gt;
     | inside
-    code &lt;resizer&gt;&lt;plugins&gt;&lt;/plugins&gt;&lt;/resizer&gt;
+    code 
+       |  &lt;resizer&gt;&lt;plugins&gt;&lt;/plugins&gt;&lt;/resizer&gt;
     | in Web.config.
 h2#usage-v31 Usage (v3.1+)
 p
@@ -107,19 +109,23 @@ p
   img alt="Original image" src="http://img.imageresizing.net/utah2.jpg;width=200"
 h3#evenly-rounded Evenly rounded
 p
-  code s.roundcorners=30
+  code 
+    |  s.roundcorners=30
 p
   img alt="s.roundcorners=30" src="http://img.imageresizing.net/utah2.jpg;width=200;s.roundcorners=30"
 h3#specify-individual-radii Specify individual radii
 p
-  code s.roundcorners=45,0,45,0
+  code 
+    |  s.roundcorners=45,0,45,0
 p
   img alt="s.roundcorners=45,0,45,0" src="http://img.imageresizing.net/utah2.jpg;width=200;s.roundcorners=45,0,45,0"
 h3#4-ways-to-grayscale 4 ways to grayscale
 p
-  code> s.grayscale
+  code> 
+    |  s.grayscale
   | \=
-  code true|y|ry|ntsc|bt709|flat
+  code 
+    |  true|y|ry|ntsc|bt709|flat
   | (true, ntsc, and y produce identical results)
 p The following examples use NTSC/Y/True, RY, BT709, and Flat respectively
 p
@@ -129,17 +135,20 @@ p
   img alt="s.grayscale=flat" src="http://img.imageresizing.net/utah2.jpg;width=200;s.grayscale=flat"
 h3#1-way-to-sepia 1 way to sepia
 p
-  code s.sepia=true
+  code
+    | s.sepia=true
 p
   img alt="s.sepia=true" src="http://img.imageresizing.net/utah2.jpg;width=200;s.sepia=true"
 h3#inversion Inversion
 p
-  code s.invert=true
+  code
+    | s.invert=true
 p
   img alt="s.invert=true" src="http://img.imageresizing.net/utah2.jpg;width=200;s.invert=true"
 h3#adjust-opacityalpha Adjust opacity/alpha
 p
-  code> s.alpha
+  code 
+    | s.alpha
   | \=
   code 0..1
 p
@@ -156,9 +165,11 @@ p
   img alt="s.alpha=1" src="http://img.imageresizing.net/utah.jpg;width=200;s.alpha=1"
 h3#adjust-contrast Adjust contrast
 p
-  code> s.contrast
+  code
+    | s.contrast
   | \=
-  code -1..1
+  code 
+    |  -1..1
 p
   img alt="s.contrast=-0.80" src="http://img.imageresizing.net/utah.jpg;width=200;s.contrast=-0.99"
   img alt="s.contrast=-0.80" src="http://img.imageresizing.net/utah.jpg;width=200;s.contrast=-0.80"
@@ -173,7 +184,8 @@ p
   img alt="s.contrast=0.99" src="http://img.imageresizing.net/utah.jpg;width=200;s.contrast=0.99"
 h3#adjust-brightness Adjust brightness
 p
-  code> s.brightness
+  code>
+    | s.brightness
   | \=
   code -1..1
 p
@@ -188,7 +200,8 @@ p
   img alt="" src="http://img.imageresizing.net/red-leaf.jpg;width=100;s.brightness=1"
 h3#adjust-saturation Adjust saturation
 p
-  code> s.saturation
+  code>
+    | s.saturation
   | \=
   code -1..1
 p
@@ -203,7 +216,11 @@ p
   img alt="" src="http://img.imageresizing.net/red-leaf.jpg;width=100;s.saturation=1"
 h3#legacy-syntax-before-v31 Legacy syntax (Before v3.1)
 ul
-  li &amp;filter=grayscale
-  li &amp;filter=sepia (didn't work)
-  li &amp;filter=brightness(.1) (-1..1) (Change .1 to the brightness offset you want)
-  li &amp;filter=alpha(.5)   (Change .5 to the alpha multiplier you want)
+  li 
+    | &amp;filter=grayscale
+  li 
+    |  &amp;filter=sepia (didn't work)
+  li 
+    |  &amp;filter=brightness(.1) (-1..1) (Change .1 to the brightness offset you want)
+  li 
+    |  &amp;filter=alpha(.5)   (Change .5 to the alpha multiplier you want)

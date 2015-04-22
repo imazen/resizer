@@ -30,7 +30,7 @@ files:
   to: plugins/copymetadata.md
   append: edition_info
 - from: Plugins/DiskCache/readme.md
-  to: plugins/diskcache/index.md #for some reason this one lives in its own folder
+  to: plugins/diskcache.md
   append: edition_info
 - from: Plugins/Faces/readme.md
   to: plugins/faces.md
