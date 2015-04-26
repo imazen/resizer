@@ -78,7 +78,7 @@
     <EmbeddedResource Include="Page2.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\Packages\PdfiumViewer.1.6.0.0\content\x86\pdfium.dll">
+    <Content Include="..\..\..\Packages\PdfiumViewer.2.0.0.0\content\x86\pdfium.dll">
       <Link>pdfium.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
