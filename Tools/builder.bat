@@ -1,7 +1,7 @@
 @echo off
 pushd %~dp0
 
-set fake=..\Packages\FAKE.3.11.0\tools\Fake
+set fake=..\Packages\FAKE.3.26.1\tools\Fake
 set fsx=FakeBuilder\Build.fsx
 
 
