@@ -29,7 +29,7 @@ Both image and text layers have a very flexible positioning system. You can use 
 
 Image layers can pre-process the watermark itself using the `imageQuery` attribute.
 
-Text layers can print values passed in from the querystring if you use the #{key} notation in the `text` attribute, where `key` as a querystring key.
+Text layers can print values passed in from the querystring if you use the #{key} notation in the `text` attribute, where `key` is a querystring key.
 
 Example configuration:
 
@@ -71,14 +71,14 @@ Like the old version, you can also specify watermark images by name, which will 
   
 ## Layer attribute reference
 
-* **name** - The key to use in the URL to invoke the application of the layer or group
+* **name** - The key to use in the URL to invoke the application of the layer or group.
 * **align** - How to align the layer content within its bounds when there is an ambiguity [List of possible values](http://msdn.microsoft.com/en-us/library/system.drawing.contentalignment.aspx).
 * **Left** - Pixel or percent value relative to the left of the container. Ex. 10px, 3%. Percentages relative to container width.
 * **Top** - Pixel or percent value relative to the left of the container. Ex. 10px, 3%. Percentages relative to container height.
 * **Right** - Pixel or percent value relative to the right of the container. "10px" would be 10 pixels leftwards from the right side of the container. Percentages relative to container width.
 * **Bottom** - Pixel or percent value relative to the bottom of the container. "10px" would be 10 pixels upwards from the bottom side of the container. 3%. Percentages relative to container height.
-* **Width** - Pixel or percent value for the width of the layer
-* **Height** - Pixel or percent value for the width of the layer.
+* **Width** - Pixel or percent value for the width of the layer.
+* **Height** - Pixel or percent value for the height of the layer.
 * **relativeTo** - Name of the container, such as 'image', 'imageArea', or 'canvas'. `image` is the photo itself, `imageArea` includes padding added to the image to keep aspect ratio, and `canvas` is the final dimensions of the file, including any borders, padding, or margins. 
 * **fill** - True/false (defaults to false). If true, the contents of the layer will attempt to fill the layer, even if they are normally smaller. Maintains aspect ratio, but may upscale text and images, potentially causing blurriness. If no width/height values are specified, this will also make the layer attempt to fill the container bounds.
 * **drawAs** - 'background' or 'overlay'. If 'background', the layer will be rendered over the background color, but underneath everything else. Combine with padding, alpha adjustment, or transparency on the original image to let it show through.
@@ -91,8 +91,8 @@ Like the old version, you can also specify watermark images by name, which will 
 
 ## TextLayer specific attributes
 
-* **text** - The text to display. May contain querystring-specified values, referenced like this: "Hello #{name}" - image.jpg?watermark=hi&name=Nathanae
-* **vertical** - True to display the text vertically. May also be achieved with Angle, but rendering may be slightly better
+* **text** - The text to display. May contain querystring-specified values, referenced like this: "Hello #{name}" - `image.jpg?watermark=hi&name=Nathanael`.
+* **vertical** - True to display the text vertically. May also be achieved with Angle, but rendering may be slightly better.
 * **color** - A 3, 6, or 8-digit hex color reference, or a named color.
 * **font** - like "Verdana". The font family.
 * **style** - like "Regular", "Bold", "Italic", "Underline", "Strikeout", or comma-delimited combinations like "Bold,Italic". The default is "Bold".
@@ -100,9 +100,9 @@ Like the old version, you can also specify watermark images by name, which will 
 * **fontSize** the height in pixels of the text. May not be very accurate, GDI isn't great at font heights. Will definitely vary with your font choice.
 * **outlineColor** - The color for the outline of the text. Only rendered if outlineWidth >0
 * **outlineWidth** - How many pixels wide to draw the outline. As the outline is under the text, start with 3 for a 1px outline, and increase by adding 2.
-* **glowColor** - The color for the glow effect
+* **glowColor** - The color for the glow effect.
 * **glowWidth** - The width of the glow effect.  As the glow is under the text, start with 3 for a 1px outline, and increase by adding 2.
-* **rendering** - (3.1.5+) The rendering algorithm for the text. Valid values are SystemDefault, SingleBitPerPixelGridFit, SingleBitPerPixel, AntiAliasGridFit, AntiAlias, and ClearTypeGridFit. The default before 3.1.5 was ClearTypeGridFit, afterwards the default was AntiAliasGridFit.
+* **rendering** - (3.1.5+) The rendering algorithm for the text. Valid values are SystemDefault, SingleBitPerPixelGridFit, SingleBitPerPixel, AntiAliasGridFit, AntiAlias, and ClearTypeGridFit. The default before 3.1.5 was ClearTypeGridFit. Afterwards, the default was AntiAliasGridFit.
 
 ## Managed API
 

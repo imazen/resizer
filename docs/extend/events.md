@@ -34,7 +34,7 @@ Executes for every request to the website. Use only as a last resort. Other even
 ### Pipeline.RewriteDefaults(IHttpModule sender, HttpContext context, IUrlEventArgs e);
 
 Fired during PostAuthorizeRequest, after Rewrite.
-Any changes made here (which conflict) will be overwritten by the the current query string values. I.e, this is a good place to specify default settings.
+Any changes made here (which conflict) will be overwritten by the current query string values. I.e, this is a good place to specify default settings.
 Only fired on accepted image types. Plugins can specify additional image extensions to intercept. Rewrite rules can be used to change extensions.
 
 ### Pipeline.PostRewrite(IHttpModule sender, HttpContext context, IUrlEventArgs e);

@@ -13,7 +13,7 @@ OpenCV is required for face detection. Requires V3.2 or higher.
 
 A NuGet package for this plugin is not available, due to the vast number of dependencies. 
 
-OpenCV does not support being used from multiple app domains. If you get a "Type Initializer Exception", restart the application pool, verify that it only contains 1 application, and that overlapped recycle is disabled.
+OpenCV does not support being used from multiple app domains. If you get a "Type Initializer Exception", restart the application pool and verify that it only contains 1 application, and that overlapped recycle is disabled.
 
 You **must** disable overlapped recycling on the application pool running this plugin. OpenCV cannot handle multiple instances per plugin.
 
@@ -48,10 +48,10 @@ All tuning parameters are identical between the URL and Managed API.
 
 ## Tuning
 
-* f.minsize=0..100 (defaults to 3). The smallest face to detect, as a percentage of the image size.
-* f.faces=min-count,maxcount Defaults to 1,8. The minimum and maximum number of faces to detect in the image. 
-* f.expand=percent|xpercent,ypercent Defaults to 0,0. The percent (0..100) to expand the face rectangles in each orientation. If ypercent is omitted, the value from xpercent will be used.
-* f.threshold=value|minvalue,value The confidence threshold required to consider a face detected. Defaults to 1,2. 'minvalue' is used if we have not reached the quote specified in `f.faces`.
+* `f.minsize=0..100` (defaults to 3). The smallest face to detect, as a percentage of the image size.
+* `f.faces=min-count,maxcount` Defaults to 1,8. The minimum and maximum number of faces to detect in the image. 
+* `f.expand=percent|xpercent,ypercent` Defaults to 0,0. The percent (0..100) to expand the face rectangles in each orientation. If ypercent is omitted, the value from xpercent will be used.
+* `f.threshold=value|minvalue,value` The confidence threshold required to consider a face detected. Defaults to 1,2. 'minvalue' is used if we have not reached the quote specified in `f.faces`.
 
 
 ## Installation. 
@@ -116,7 +116,7 @@ For RedEye results, only rectanges where Feature=0 are eyes. Feature=1 means Eye
 
 ## Feature classification files
 
-[You can download all the XML files](http://downloads.imageresizing.net/OpenCV-2.3.1-all-cascades.zip) in a single .ZIP file. You only need to copy the following into the /bin folder, although copying them all won't hurt anything. 
+[You can download all the XML files](http://downloads.imageresizing.net/OpenCV-2.3.1-all-cascades.zip) in a single .ZIP file. You only need to copy the following into the /bin folder.
 
 * haarcascade\_frontalface\_default.xml
 
