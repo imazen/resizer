@@ -1,6 +1,6 @@
 Tags: plugin
 Edition: performance
-Tagline: Allows blobstore images to be resized and served. (Azure 2.0 compatible)
+Tagline: Allows blobstore images to be resized and served. (Azure 2.0 compatible).
 Aliases: /plugins/azurereader2
 
 
