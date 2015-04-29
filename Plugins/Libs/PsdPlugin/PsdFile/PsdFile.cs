@@ -575,7 +575,7 @@ namespace PhotoshopFile
     #region ImageData
 
     /// <summary>
-    /// The raw image data from the file, seperated by the channels.
+    /// The raw image data from the file, separated by the channels.
     /// </summary>
     public byte[][] m_imageData;
 

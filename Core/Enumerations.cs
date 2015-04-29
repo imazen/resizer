@@ -255,7 +255,7 @@ namespace ImageResizer {
         [EnumString("false")]
         None = 0,
         /// <summary>
-        /// The reccomended value. Y and NTSC are identical.
+        /// The recommended value. Y and NTSC are identical.
         /// </summary>
         [EnumString("true")]
         Y = 1,

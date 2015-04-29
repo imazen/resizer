@@ -207,7 +207,7 @@ namespace Sample08
 			return true;
 		}
 
-		// Return a list of supported file extensions (comma seperated)
+		// Return a list of supported file extensions (comma separated)
 		protected override string ExtensionListProc()
 		{
 			return "ser";

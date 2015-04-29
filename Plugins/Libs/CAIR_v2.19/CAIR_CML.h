@@ -263,7 +263,7 @@ public:
 private:
 	//=========================================================================================================//
 	//Simple row-major 2D allocation algorithm.
-	//The size variables must be assigned seperately.
+	//The size variables must be assigned separately.
 	void Allocate_Matrix( int x, int y )
 	{
 		matrix = new T*[y];

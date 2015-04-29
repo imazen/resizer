@@ -3037,7 +3037,7 @@ namespace FreeImageAPI.Plugins
 		public DescriptionProc descriptionProc;
 
 		/// <summary>
-		/// Delegate to a function that returns a comma seperated list
+		/// Delegate to a function that returns a comma separated list
 		/// of file extensions the plugin can read or write.
 		/// </summary>
 		public ExtensionListProc extensionListProc;
@@ -4090,7 +4090,7 @@ namespace FreeImageAPI.Plugins
 	public delegate string DescriptionProc();
 
 	/// <summary>
-	/// Delegate to a function that returns a comma seperated list
+	/// Delegate to a function that returns a comma separated list
 	/// of file extensions the plugin can read or write.
 	/// </summary>
 	public delegate string ExtensionListProc();

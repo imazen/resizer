@@ -960,7 +960,7 @@ October 17th 2000 - 1.4.1
 ! rebuilt the entire directory structure
 ! improved handling of BMP
 ! renamed FreeImage_MaskedCombine to FreeImage_MaskedCombine32
-+ [Alexander Dymerets] added 24-bit masked alpha blending with a seperate alpha mask
++ [Alexander Dymerets] added 24-bit masked alpha blending with a separate alpha mask
 + added FreeImage_Rotate (known bug in degrees 76 to 106)
 + added 4-bit bitmap support to FreeImage_ConvertTo16Bits
 + added 8-bit bitmap support to FreeImage_ConvertTo16Bits
