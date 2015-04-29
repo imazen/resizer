@@ -1,6 +1,6 @@
 Tags: plugin
 Edition: creative
-Tagline: Content-aware image resizing (Fast C++ exe, requires Full Trust)
+Tagline: Content-aware image resizing.
 Aliases: /plugins/seamcarving
 
 

@@ -4,11 +4,11 @@ Tagline: Render multiple image & text overlays and background layers with incred
 Aliases: /plugins/watermark
 
 
-# New Watermark plugin (v3.1+)
+# Watermark plugin
 
-The new watermark plugin is fully XML configurable, and supports named watermark configurations, multiple image and text layers, layer groups, and background (as well as overlay) layers. The positioning system is per-layer, permits flexible pixel and percent layout, anchoring, and container selection.
+The Watermark plugin in  v3.1+ is fully XML configurable, and supports named watermark configurations, multiple image and text layers, layer groups, and background (as well as overlay) layers. The positioning system is per-layer, permits flexible pixel and percent layout, anchoring, and container selection.
 
-It is also binary compatible with the old plugin, so you can transition slowly (although the embarrassing legacy code will eventually be removed).
+It is also binary compatible with the old (pre v3.1) plugin, so you can transition slowly.
 
 ## Installation
 
@@ -33,6 +33,7 @@ Text layers can print values passed in from the querystring if you use the #{key
 
 Example configuration:
 
+```xml
   <resizer>
     ...
     <watermarks>
@@ -45,6 +46,7 @@ Example configuration:
       </group>
     </watermarks>
   </resizer>
+```
 
 Like the original plugin, it is possible to specify the watermark filename (but not path) in the querystring. When used in this way, it will first look for the `<otherimages />` element to determine the watermarks directory (from the 'path' attribute), and if `<otherimages path="">` is not present, it will fall back to the legacy configuration values and layout system for compatibility.
 
@@ -53,12 +55,16 @@ Like the original plugin, it is possible to specify the watermark filename (but 
 
 You can specify multiple watermark layers and groups at the same time:
 
+```
   image.jpg?watermark=test1,test2,storyBG
+```
 
 Like the old version, you can also specify watermark images by name, which will all use the configuration specified in the `<otherimages/>` element.
 
+```
   image.jpg?watermark=image.png
-  
+```
+
 ## Common errors
 
 * Make sure that the production server has all the fonts you are using installed. Servers, by default, don't have very many fonts installed.
@@ -102,11 +108,14 @@ Like the old version, you can also specify watermark images by name, which will 
 
 Referencing a watermark already configured in XML is easy: 
 
+```
   ImageBuilder.Current.Build(source,dest,new ResizeSettings("watermark=name"));
+```
 
 If you want to build a custom watermark from code, that's also easy, but needs to happen during Application\_Start if you're modifying Config.Current. 
 Installing plugins on a shared Config instance on different threads can result in warnings on /resizer.debug, although the threading is handled correctly.
 
+```
   //You can have multiple configurations. Config.Current contains web.config settings, but you can use new Config(); to get a clean slate.
   Config c = Config.Current; 
   
@@ -133,7 +142,7 @@ Installing plugins on a shared Config instance on different threads can result i
   
   //Let's build an image
   c.CurrentImageBuilder.Build(source,dest,new ResizeSettings("watermark=text,img;name=John Doe"));
-  
+```
 
 # Original watermark plugin (Versions 3.0.13 and older)
 
@@ -144,6 +153,7 @@ To install and configure the plugin, you must place some code in the Application
 
 Here is an example Global.asax.cs file
 
+``` 
   using System;
   using System.Collections.Generic;
   using System.Web;
@@ -172,3 +182,4 @@ Here is an example Global.asax.cs file
     }
   }
 
+```

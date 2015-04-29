@@ -53,7 +53,7 @@ items:
   items:
   - title: Best Practices
     path: docs/best-practices
-  - title: Cloud Archiecture Guide
+  - title: Cloud Architecture Guide
     path: docs/cloud
   - title: Understanding processing and caching
     path: process-and-cache

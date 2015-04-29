@@ -1,7 +1,7 @@
 Tags: plugin
 Edition: free
 Bundle: free
-Tagline: Allows you to configure the default setting values when commands (like `scale`) are omitted
+Tagline: Allows you to configure the default setting values when commands (like `scale`) are omitted.
 Aliases: /plugins/defaultsettings
 
 # DefaultSettings plugin (V3.1+)

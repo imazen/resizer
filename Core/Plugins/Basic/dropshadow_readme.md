@@ -1,7 +1,7 @@
 Tags: plugin
 Edition: free
 Bundle: free
-Tagline: Adds drop-shadow feature (shadowOffset, shadowWidth, shadowColor)
+Tagline: Adds drop-shadow feature (shadowOffset, shadowWidth, shadowColor).
 Aliases: /plugins/dropshadow
 
 # Drop Shadow plugin

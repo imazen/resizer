@@ -26,4 +26,4 @@ Requires `mode=crop` and `width` and `height` to be specified to activate.
 
 ## Special ability when installed alongside the Faces plugin
 
-* c.focus=faces - Perfoms on-the-fly face detection and uses those coordinates. Can be resource intensive, so disk caching is reccommended.
+* c.focus=faces - Perfoms on-the-fly face detection and uses those coordinates. Can be resource intensive, so disk caching is recommended.

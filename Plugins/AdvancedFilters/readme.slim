@@ -7,10 +7,12 @@ Textclass: none
 
 
 h1 AdvancedFilters plugin 
-p
-  | Apply advanced effects to your images. Requires Full Trust. 
-p
-  | The plugin currently applies effects to the image along with any background color, padding, or drop shadow that may be present. Future versions may simply apply the effect to the image, not the surrounding area. Note: does not affect borders or watermarks.
+
+
+markdown:
+  Apply advanced effects to your images. Requires Full Trust. 
+
+  The plugin currently applies effects to the image along with any background color, padding, or drop shadow that may be present. Future versions may simply apply the effect to the image, not the surrounding area. Note: does not affect borders or watermarks.
 
 - image_width = 400 
 - cache_buster = "000006"
@@ -63,123 +65,88 @@ p
     br
     p
       | Refresh for another image.
+.t
+  markdown:
+    ## Installation
 
-h2#installation Installation
-p
-  | Either run
-  code Install-Package ImageResizer.Plugins.AdvancedFilters
-  | in the NuGet package manager, or:
-ol
-  li
-    markdown:
-      Add `ImageResizer.Plugins.AdvancedFilters.dll` to your project. Make sure `AForge.dll`, `AForge.Math.dll`, and `AForge.Imaging.dll` are copied also, although they do not need to be referenced directly.
-  li
-    | Add
-    code
-      |  &lt;add name="AdvancedFilters" /&gt;
-    | inside
-    code 
-      | &lt;plugins&gt;&lt;/plugins&gt;
-    | in Web.config.
-h2#usage Usage
-p
-  | If you want more effects,
-  a href="http://resizer.uservoice.com"
-    | vote for them on UserVoice.
-ul
-  li Gaussian blur with adjustable radius: &amp;blur=radius
-  li Gaussian sharpen with adjustable radius: &amp;sharpen=radius
-h2#alpha-effects-may-change-or-disappear-without-notice Alpha effects (may change or disappear without notice)
-p
-  strong 
-    | Please note the following effects are only preset for evaluation. If you like one and find a practical use for it, please let me know! Otherwise it might disappear to reduce the code surface area.
-p
-  strong
-    | Also, note the order in which effects are applied
-    em WILL CHANGE
-    | in future releases
-  | Don't combine them if you want repeatable results.
-p
-  strong The names for these will probably also change in future releases
-h3#contrast-saturation-and-brightness-adjustment Contrast, saturation, and brightness adjustment
-p Hint: Start with values between -0.1 and 0.1. Values have a big effect.
-ul
-  li
-    |  &amp;a.contrast=-1..1
-  li
-    |  &amp;a.saturation=-1..1
-  li
-    |  &amp;a.brightness=-1..1
-h3#automatic-white-balance-alpha-feature-of-330
-  |  Automatic white balance (alpha feature of 3.3.0)
-p Automatically corrects the white balance of the photo with 1 of 3 algorithms.
-ul
-  li
-    code
-      |  area
-    | \- Threshold is applied based on cumulative area at the lower and upper ends of the histogram. Much larger thresholds are required for this than SimpleThreshold.
-  li
-    code
-      | simple
-    | \- Simple upper and lower usage thresholds are applied to the values in each channel's histogram to determine the input start/stop points for each individual channel. The start/stop points are used to calculate the scale factor and offset for the channel.
-  li
-    code
-      | gimp
-    | \- Threshold is applied based on strangely skewed cumulative area, identical to the process used by GIMP.
-p The default (and reccommended) algorithm is 'area'.
-ul
-  li
-    |  &amp;a.balancewhite=true|area|simple|gimp
-  li
-    |  &amp;a.balancethreshold=0.6|0.06 (simple white balance requires a smaller threshold.)
-p
-  | For the
-  code area
-  | and
-  code gimp
-  | algorithms, the default threshold is 0.6. For
-  code simple
-  | 0.06 is used (as it is not compared against cumulative area, but an individual value's usage)
-h3#automatic-histogram-adjustment-good-for-daylight-photos Automatic histogram adjustment (Good for daylight photos)
-p
-  |  Adjusts contrast, saturation, and brightness with curves based on the histogram. Good for adjusting slightly foggy or dark daytime photos.
-ul
-  li
-    | &amp;a.equalize=true
-h3#sepia Sepia
-p Sepia effect, slightly different from the one in SimpleFilters... going to evaluate which is best.
-ul
-  li
-    | &amp;a.sepia=true
-h3#oil-painting-effect Oil Painting effect
-p
-  | Try
-  code 1
-  | for impressionist,
-  code 100
-  | for modern art ;)
-ul
-  li
-    | &amp;a.oilpainting=1..100
-h3#noise-removal Noise removal
-p Not a blur effect - designed to remove color noise, 'pepper noise'. Very conservative, doesn't affect edges.
-ul
-  li
-    | &amp;a.removenoise=1-100
-h3#sobel-energy-filter Sobel energy filter
-p
-  | Useful only for debugging why 
-  a href="/plugins/whitespacetrimmer" whitespace trimmer 
-  | isn't working on an image.
-ul
-  li
-    |  &amp;a.sobel=true
-p
-  |  Note - you can also threshold the sobel filter into black and white with &amp;a.threshold=0-255
-h3#canny-edge-detector
-  | Canny Edge Detector
-p
-  | Displays edges as lines. Aggressive.
-ul
-  li
-    | &amp;a.canny=true
+    Either run `Install-Package ImageResizer.Plugins.AdvancedFilters` in the NuGet package manager, or:
+
+    1. Add `ImageResizer.Plugins.AdvancedFilters.dll` to your project. Make sure `AForge.dll`, `AForge.Math.dll`, and `AForge.Imaging.dll` are copied also, although they do not need to be referenced directly.
+    2. Add `<add name="AdvancedFilters" />` inside `<resizer><plugins></plugins></resizer>` in Web.config.
+
+    ## Usage
+
+    * Gaussian blur with adjustable radius: `&a.blur=radius`
+    * Gaussian sharpen with adjustable radius: `&a.sharpen=radius`
+
+
+    ## Alpha effects (may change or disappear without notice)
+
+    **Please note the following effects are only preset for evaluation. If you like one and find a practical use for it, please let me know! Otherwise it might disappear to reduce the code surface area.**
+
+    **Also, note the order in which effects are applied *WILL CHANGE* in future releases.** Don't combine them if you want repeatable results.
+
+    **The names for these will probably also change in future releases.**
+
+    ### Contrast, saturation, and brightness adjustment
+
+    Hint: Start with values between -0.1 and 0.1. Values have a big effect.
+
+    * `a.contrast=-1..1`
+    * `a.saturation=-1..1`
+    * `a.brightness=-1..1`
+
+    ### Automatic white balance (alpha feature of v3.3.0+)
+
+    Automatically corrects the white balance of the photo with 1 of 3 algorithms.
+
+    * `area` - Threshold is applied based on cumulative area at the lower and upper ends of the histogram. Much larger thresholds are required for this than SimpleThreshold.
+    * `simple` - Simple upper and lower usage thresholds are applied to the values in each channel's histogram to determine the input start/stop points for each individual channel. The start/stop points are used to calculate the scale factor and offset for the channel.
+    * `gimp` - Threshold is applied based on strangely skewed cumulative area, identical to the process used by GIMP.
+
+    The default (and recommended) algorithm is 'area'.
+
+    * `&a.balancewhite=true|area|simple|gimp`
+    * `&a.balancethreshold=0.6|0.06` (simple white balance requires a smaller threshold.)
+
+    For the `area` and `gimp` algorithms, the default threshold is 0.6. For `simple` 0.06 is used (as it is not compared against cumulative area, but an individual value's usage)
+
+
+    ### Automatic histogram adjustment (Good for daylight photos)
+
+    Adjusts contrast, saturation, and brightness with curves based on the histogram. Good for adjusting slightly foggy or dark daytime photos.
+
+    * `a.equalize=true`
+
+    ### Sepia
+
+    Sepia effect, slightly different from the one in SimpleFilters... going to evaluate which is best.
+
+    * `a.sepia=true`
+
+    ### Oil Painting effect
+
+    Try `1` for impressionist, `100` for modern art ;)
+
+    * `a.oilpainting=1..100`
+
+    ## Noise removal
+
+    Not a blur effect - designed to remove color noise, 'pepper noise'. Very conservative, doesn't affect edges.
+
+    * `a.removenoise=1-100`
+
+
+    ### Sobel energy filter
+
+    Useful only for debugging why [whitespace trimmer](/plugins/whitespacetrimmer) isn't working on an image.
+
+    * `a.sobel=true`
+
+    Note - you can also threshold the sobel filter into black and white with &amp;a.threshold=0-255
+
+    ### Canny Edge Detector
+
+    Displays edges as lines. Aggressive.
+
+    * `a.canny=true`
