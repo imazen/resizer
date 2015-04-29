@@ -86,7 +86,7 @@ PM> Install-Package ImageResizer.MvcWebConfig
 ```c#
   new PluginName().Install(ImageResizer.Configuration.Config.Current);
 ```
-You will need need to add the appopriate namespace reference to access the plugin.
+You will need to add the appropriate namespace reference to access the plugin.
 
 Most configuration and plugin installation issues can be resolved by checking ImageResizer’s self-diagnostics page. If your local website is running at `http://localhost:5000/`, then you should browse to `http://localhost:5000/resizer.debug.ashx` to access it. See [the Troubleshooting](#troubleshooting section) for more details. 
 
@@ -183,8 +183,8 @@ The following is a list of all plugins currently available on ImageResizer, and 
 #### Manual cropping
 
 * **crop=(x1,y1,x2,y2)** – Crop the image to the specified rectangle on the source image. You can use negative coordinates to specify bottom-right relative locations.
-* **cropxunits** The width the x1 and x2 coordinates are relative, e.g., use '100' to make x1 and x2 percentages. Useful when you don't know the original image size.
-* **cropyunits** The height the y1 and y2 coordinates are relative, e.g., use '100' to make y1 and y2 percentages. Useful when you don't know the original image size.
+* **cropxunits** The width which the x1 and x2 coordinates are relative to, e.g., use '100' to make x1 and x2 percentages. Useful when you don't know the original image size.
+* **cropyunits** The height which the y1 and y2 coordinates are relative to, e.g., use '100' to make y1 and y2 percentages. Useful when you don't know the original image size.
 
 
 #### Sizing (and padding, autocropping, carving and stretching)
@@ -208,7 +208,7 @@ The following is a list of all plugins currently available on ImageResizer, and 
 #### Output format
 
 * **format=jpg\|png\|gif** - The output format to use.
-* **quality** - Jpeg compression: 0-100 100=best, 90=very good balance, 0=ugly .
+* **quality** - Jpeg compression: 0-100 100=best, 90=very good balance, 0=ugly.
 * **colors=2-255** – Control the palette size of PNG and GIF images. If omitted, PNGs will be 24-bit ([PrettyGifs plugin](http://www.imageresizing.net/plugins/prettygifs) required).
 
 #### Misc
@@ -510,34 +510,37 @@ For example,
 	GenerateVersions("~/images/image.jpg")
 ```
 Will generate
+
+```
 	/images/image\_thumb.jpg
 	/images/image\_medium.jpg
 	/images/image\_large.jpg
+```
 
 And will return a list of those paths.
 
 ```c#
-	public IList<string> GenerateVersions(string original) {
-			Dictionary<string, string> versions = new Dictionary<string, string>();
-			//Define the versions to generate and their filename suffixes.
-			versions.Add("_thumb", "width=100&height=100&crop=auto&format=jpg"); //Crop to square thumbnail
-			versions.Add("_medium", "maxwidth=400&maxheight=400format=jpg"); //Fit inside 400x400 area, jpeg
-			versions.Add("_large", "maxwidth=1900&maxheight=1900&format=jpg"); //Fit inside 1900x1200 area
+  public IList<string> GenerateVersions(string original) {
+      Dictionary<string, string> versions = new Dictionary<string, string>();
+      //Define the versions to generate and their filename suffixes.
+      versions.Add("_thumb", "width=100&height=100&crop=auto&format=jpg"); //Crop to square 
+      versions.Add("_medium", "maxwidth=400&maxheight=400format=jpg"); //Fit inside 400x400
+      versions.Add("_large", "maxwidth=1900&maxheight=1900&format=jpg"); //Fit inside 1900x1200
 
 
-			string basePath = ImageResizer.Util.PathUtils.RemoveExtension(original);
+      string basePath = ImageResizer.Util.PathUtils.RemoveExtension(original);
 
-			//To store the list of generated paths
-			List<string> generatedFiles = new List<string>();
+      //To store the list of generated paths
+      List<string> generatedFiles = new List<string>();
 
-			//Generate each version
-			foreach (string suffix in versions.Keys)
-					//Let the image builder add the correct extension based on the output file type
-					generatedFiles.Add(ImageBuilder.Current.Build(original, basePath + suffix, 
-						new ResizeSettings(versions[suffix]), false, true));
+      //Generate each version
+      foreach (string suffix in versions.Keys)
+          //Let the image builder add the correct extension based on the output file type
+          generatedFiles.Add(ImageBuilder.Current.Build(original, basePath + suffix, 
+            new ResizeSettings(versions[suffix]), false, true));
 
-			return generatedFiles;	 
-	}
+      return generatedFiles;   
+  }
 ```
 <a name="resize_upload"></a>
 
@@ -637,7 +640,7 @@ If you can't access the diagnostics page, make sure the [MvcRoutingShim plugin](
 
 ## What Might Be Wrong
 
-To get support or use this guide, make sure you get the detailed error message from visiting the image URL directly. This guide cannot offer a solution to a generic 500 error, 404 error, or a "broken image icon", as those symptoms are far to generic to be useful. 
+To get support or use this guide, make sure you get the detailed error message from visiting the image URL directly. This guide cannot offer a solution to a generic 500 error, 404 error, or a "broken image icon", as those symptoms are far too generic to be useful. 
 
 If this page doesn't resolve your issue, [visit the Support page](http://www.imageresizing.net/support) for information about the bug bounty and free support requirements.
 
@@ -727,7 +730,7 @@ This generic error message often hides a more descriptive message, but that mess
 	Exception Details: System.MissingMethodException: Method not found: 'Void 
 	System.Web.HttpContext.RemapHandler(System.Web.IHttpHandler)'.
 	
-This error occurs when you do not have .NET 2.0 Service Pack 2 applied. No other conditions cause this error. The RemapHanlder method was added in .NET 2.0 SP2, and is required by this product.
+This error occurs when you do not have .NET 2.0 Service Pack 2 applied. No other conditions cause this error. The RemapHandler method was added in .NET 2.0 SP2, and is required by this product.
 Yes, it is possible to have .NET 3, 3.5, and .NET 4 installed (and up-to-date), yet not have .NET SP2 installed. This peculiar circumstance has been verified on over 5 machines.
 
 #### Server object error 'ASP 0178 : 80070005'
