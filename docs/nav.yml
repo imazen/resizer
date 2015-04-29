@@ -1,4 +1,4 @@
-title: ImageResizer v3 Docs
+title: ImageResizer v4 Docs
 items:
 - title: "Getting Started"
   items: 
@@ -108,7 +108,6 @@ items:
 
 - title: Plugins
   generate: plugins
-  generate_arg_1: v3
 
 
  
