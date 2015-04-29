@@ -209,7 +209,7 @@ namespace ImageResizer.ExtensionMethods {
         /// <summary>
         /// Normalizes a command that has two possible names. 
         /// If either of the commands has a null or empty value, those keys are removed. 
-        /// If both the the primary and secondary are present, the secondary is removed. 
+        /// If both the primary and secondary are present, the secondary is removed. 
         /// Otherwise, the secondary is renamed to the primary name.
         /// </summary>
         /// <param name="primary"></param>

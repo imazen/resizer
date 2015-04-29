@@ -69,7 +69,7 @@ If you have configured a CNAME mask for your CloudFront distribution, and would 
 
 To remove the requirement of an extra request, yet keep the developer/webmaster load to a minimum, it is necessary to process all outgoing HTML and translate those URLs to cloudfront URLs dynamically. 
 
-This kind of behavior could be useful outside the scope of the image resizer, as it could be used to edge-cache a variety of files (such as javascript, css, audio files, etc.) without having to manually modify the content. However, image URLs are the most easily changed without adverse affects.
+This kind of behavior could be useful outside the scope of the image resizer, as it could be used to edge-cache a variety of files (such as javascript, css, audio files, etc.) without having to manually modify the content. However, image URLs are the ones most easily changed without adverse affects.
 
 Two possible options for modifying image URLs in HTML output are Control Adapters and Html filters. 
 

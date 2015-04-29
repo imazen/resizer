@@ -25,7 +25,7 @@ namespace FreeImageAPI.Metadata
 		Background,
 
 		/// <summary>
-		/// Restores the the area of the image to the state it was before it
+		/// Restores the area of the image to the state it was before it
 		/// has been dawn.
 		/// </summary>
 		Previous,

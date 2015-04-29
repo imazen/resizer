@@ -142,7 +142,7 @@ namespace ImageResizer.Plugins.DiskCache {
         private TimeSpan avoidRemovalIfUsedWithin = new TimeSpan(96,0,0); //4 days
         /// <summary>
         /// Please note "LastUsed" values are (initially) only accurate to about a hour, due to delayed write. 
-        /// If a file has been used after the app started running, the the last used date is accurate.
+        /// If a file has been used after the app started running, the last used date is accurate.
         /// </summary>
         public TimeSpan AvoidRemovalIfUsedWithin {
             get { return avoidRemovalIfUsedWithin; }
@@ -159,7 +159,7 @@ namespace ImageResizer.Plugins.DiskCache {
         private TimeSpan prohibitRemovalIfUsedWithin = new TimeSpan(0,5,0); //5 minutes
         /// <summary>
         /// Please note "LastUsed" values are (initially) only accurate to about a hour, due to delayed write. 
-        /// If a file has been used after the app started running, the the last used date is accurate.
+        /// If a file has been used after the app started running, the last used date is accurate.
         /// </summary>
         public TimeSpan ProhibitRemovalIfUsedWithin {
             get { return prohibitRemovalIfUsedWithin; }
