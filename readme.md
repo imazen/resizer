@@ -300,12 +300,12 @@ In addition to jpeg quality and gif/png colors, you can configure the jpeg subsa
 
 Most tasks with the managed API only require one line:
 ```c#
-	ImageResizer.ImageBuilder.Current.Build(object source, object dest, ResizeSettings settings)
-	
-	or
-	
-	Bitmap b = ImageResizer.ImageBuilder.Current.Build(object source, ResizeSettings settings)
-	
+  ImageResizer.ImageBuilder.Current.Build(object source, object dest, ResizeSettings settings)
+  
+  or
+  
+  Bitmap b = ImageResizer.ImageBuilder.Current.Build(object source, ResizeSettings settings)
+  
 ```
 
 #### Object Source
@@ -323,32 +323,32 @@ ResizeSettings is a friendly wrapper for a query string which provides named pro
 You can create one like so:
 ```c#
 
-	new ResizeSettings("maxwidth=200&maxheight=200")
-	
-	//or
-	new ResizeSettings(Request.QueryString)
-	
-	//or
-	var r = new ResizeSettings();
-	r.MaxWidth = 200;
-	r.MaxHeight = 300;
-	
+  new ResizeSettings("maxwidth=200&maxheight=200")
+  
+  //or
+  new ResizeSettings(Request.QueryString)
+  
+  //or
+  var r = new ResizeSettings();
+  r.MaxWidth = 200;
+  r.MaxHeight = 300;
+  
 ```
 
 #### Examples
 
 ```c#
-	using ImageResizer;
-	
-	//Converts a jpeg into a png
-	
-	ImageBuilder.Current.Build("~/images/photo.jpg","~/images/photo.png", 
-														 new ResizeSettings("format=png"));
-	
-	//Crops to a square (in place)
-	ImageBuilder.Current.Build("~/images/photo.jpg","~/images/photo.jpg", 
-														 new ResizeSettings("width=100&height=200&crop=auto"));
-```	
+  using ImageResizer;
+  
+  //Converts a jpeg into a png
+  
+  ImageBuilder.Current.Build("~/images/photo.jpg","~/images/photo.png", 
+                             new ResizeSettings("format=png"));
+  
+  //Crops to a square (in place)
+  ImageBuilder.Current.Build("~/images/photo.jpg","~/images/photo.jpg", 
+                             new ResizeSettings("width=100&height=200&crop=auto"));
+``` 
 
 #### Using Variables in the Destination Path (3.1.3+)
 
@@ -374,39 +374,39 @@ You can also filter values. `<filename:A-Za-z0-9>` keeps only the alphanumeric c
 The following is a basic, typical configuration, V3+. [Click here](http://www.imageresizing.net/docs/2to3/configuration) to see a configuration example that mimics the V2 defaults.
 
 ```xml
-	<?xml version="1.0" encoding="utf-8" ?>
-	<configuration>
-	  <configSections>
-	    <section name="resizer" type="ImageResizer.ResizerSection,ImageResizer"  requirePermission="false" />
-	  </configSections>
+  <?xml version="1.0" encoding="utf-8" ?>
+  <configuration>
+    <configSections>
+      <section name="resizer" type="ImageResizer.ResizerSection,ImageResizer"  requirePermission="false" />
+    </configSections>
 
-	  <resizer>
-	    <!-- Unless you (a) use Integrated mode, or (b) map all reqeusts to ASP.NET, 
-	         you'll need to add .ashx to your image URLs: image.jpg.ashx?width=200&height=20 
-	         Optional - this is the default setting -->
-	    <pipeline fakeExtensions=".ashx" />
+    <resizer>
+      <!-- Unless you (a) use Integrated mode, or (b) map all reqeusts to ASP.NET, 
+           you'll need to add .ashx to your image URLs: image.jpg.ashx?width=200&height=20 
+           Optional - this is the default setting -->
+      <pipeline fakeExtensions=".ashx" />
 
-	    <plugins>
-	      <add name="DiskCache" />
-	      <add name="PrettyGifs" />
-	    </plugins>	
-	  </resizer>
+      <plugins>
+        <add name="DiskCache" />
+        <add name="PrettyGifs" />
+      </plugins>  
+    </resizer>
 
-	  <system.web>
-	    <httpModules>
-	      <!-- This is for IIS5, IIS6, and IIS7 Classic, and Cassini/VS Web Server-->
-	      <add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
-	    </httpModules>
-	  </system.web>
+    <system.web>
+      <httpModules>
+        <!-- This is for IIS5, IIS6, and IIS7 Classic, and Cassini/VS Web Server-->
+        <add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
+      </httpModules>
+    </system.web>
 
-	  <system.webServer>
-	    <validation validateIntegratedModeConfiguration="false"/>
-	    <modules>
-	      <!-- This is for IIS7+ Integrated mode -->
-	      <add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
-	    </modules>
-	  </system.webServer>
-	</configuration>
+    <system.webServer>
+      <validation validateIntegratedModeConfiguration="false"/>
+      <modules>
+        <!-- This is for IIS7+ Integrated mode -->
+        <add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
+      </modules>
+    </system.webServer>
+  </configuration>
 ```
 <a name="tricks"></a>
 
@@ -424,19 +424,19 @@ The following sample code applies a watermark to all images inside 'folder' that
 
 So, with this code, you can only know that *one* of the dimensions will be less than 100px - you can't know that both will be.
 ```c#
-	Config.Current.Pipeline.PostRewrite += delegate(IHttpModule sender, HttpContext context, IUrlEventArgs ev) {
-	    //Check folder
-	    string folder = VirtualPathUtility.ToAbsolute("~/folder");
-	    if (ev.VirtualPath.StartsWith(folder, StringComparison.OrdinalIgnoreCase)) {
-	        //Estimate final image size, based on the original image being 600x600. 
-	        Size estimatedSize = ImageBuilder.Current.GetFinalSize(new System.Drawing.Size(600,600),
-							new ResizeSettings(ev.QueryString));
-	        if (estimatedSize.Width > 100 || estimatedSize.Height > 100){
-	            //It's over 100px, apply watermark
-	            ev.QueryString["watermark"] = "Sun_256.png";
-	        }
-	    }
-	};
+  Config.Current.Pipeline.PostRewrite += delegate(IHttpModule sender, HttpContext context, IUrlEventArgs ev) {
+      //Check folder
+      string folder = VirtualPathUtility.ToAbsolute("~/folder");
+      if (ev.VirtualPath.StartsWith(folder, StringComparison.OrdinalIgnoreCase)) {
+          //Estimate final image size, based on the original image being 600x600. 
+          Size estimatedSize = ImageBuilder.Current.GetFinalSize(new System.Drawing.Size(600,600),
+              new ResizeSettings(ev.QueryString));
+          if (estimatedSize.Width > 100 || estimatedSize.Height > 100){
+              //It's over 100px, apply watermark
+              ev.QueryString["watermark"] = "Sun_256.png";
+          }
+      }
+  };
 ```
 
 #### Important note
@@ -445,22 +445,22 @@ While the above enforces watermarking on all processed images, the `process=no` 
 
 To prevent this, you should add some more code inside PostRewrite
 ```c#
-	Config.Current.Pipeline.PostRewrite += delegate(IHttpModule sender, HttpContext context, IUrlEventArgs ev) {
-			//Check folder
-			string folder = VirtualPathUtility.ToAbsolute("~/folder");
-			if (ev.VirtualPath.StartsWith(folder, StringComparison.OrdinalIgnoreCase)) {
-					//Estimate final image size, based on the original image being 600x600.
-					Size estimatedSize = ImageBuilder.Current.GetFinalSize(new System.Drawing.Size(600,600),
-													new ResizeSettings(ev.QueryString));
-					if (estimatedSize.Width > 100 || estimatedSize.Height > 100){
-							//It's over 100px, apply watermark
-							ev.QueryString["watermark"] = "Sun_256.png";
-							//Force processing if it's an image
-							if (Config.Current.Pipeline.IsAcceptedImageType(ev.VirtualPath))
-								ev.QueryString["process"] = "Always";
-					}
-			}
-	};
+  Config.Current.Pipeline.PostRewrite += delegate(IHttpModule sender, HttpContext context, IUrlEventArgs ev) {
+      //Check folder
+      string folder = VirtualPathUtility.ToAbsolute("~/folder");
+      if (ev.VirtualPath.StartsWith(folder, StringComparison.OrdinalIgnoreCase)) {
+          //Estimate final image size, based on the original image being 600x600.
+          Size estimatedSize = ImageBuilder.Current.GetFinalSize(new System.Drawing.Size(600,600),
+                          new ResizeSettings(ev.QueryString));
+          if (estimatedSize.Width > 100 || estimatedSize.Height > 100){
+              //It's over 100px, apply watermark
+              ev.QueryString["watermark"] = "Sun_256.png";
+              //Force processing if it's an image
+              if (Config.Current.Pipeline.IsAcceptedImageType(ev.VirtualPath))
+                ev.QueryString["process"] = "Always";
+          }
+      }
+  };
 ```
 
 <a name="thumbnails"></a>
@@ -473,31 +473,31 @@ While the ImageResizer shines at on-the-fly image processing, you can also use i
 
 This method generates 3 versions of an image as it is uploaded, adding a \_thumb, \_medium, and \_large suffix to each filename. Uploaded files are named using a generated GUID, as uploaded file names are never safe for use as-is. Even with proper sanitization (alphanumeric filtering AND length limiting), you will encounter duplicates using uploaded filenames on your server.
 ```c#
-	Dictionary<string, string> versions = new Dictionary<string, string>();
-	//Define the versions to generate
-	versions.Add("_thumb", "width=100&height=100&crop=auto&format=jpg"); //Crop to square thumbnail
-	versions.Add("_medium", "maxwidth=400&maxheight=400&format=jpg"); //Fit inside 400x400 area, jpeg
-	versions.Add("_large", "maxwidth=1900&maxheight=1900&format=jpg"); //Fit inside 1900x1200 area
-	
-	//Loop through each uploaded file
-	foreach (string fileKey in HttpContext.Current.Request.Files.Keys) {
-	    HttpPostedFile file = HttpContext.Current.Request.Files[fileKey];
-	    if (file.ContentLength <= 0) continue; //Skip unused file controls.
-			
-	    //Get the physical path for the uploads folder and make sure it exists
-	    string uploadFolder = MapPath("~/uploads");
-	    if (!Directory.Exists(uploadFolder)) Directory.CreateDirectory(uploadFolder);
-			
-	    //Generate each version
-	    foreach (string suffix in versions.Keys) {
-	        //Generate a filename (GUIDs are best).
-	        string fileName = Path.Combine(uploadFolder, System.Guid.NewGuid().ToString() + suffix);
+  Dictionary<string, string> versions = new Dictionary<string, string>();
+  //Define the versions to generate
+  versions.Add("_thumb", "width=100&height=100&crop=auto&format=jpg"); //Crop to square thumbnail
+  versions.Add("_medium", "maxwidth=400&maxheight=400&format=jpg"); //Fit inside 400x400 area, jpeg
+  versions.Add("_large", "maxwidth=1900&maxheight=1900&format=jpg"); //Fit inside 1900x1200 area
+  
+  //Loop through each uploaded file
+  foreach (string fileKey in HttpContext.Current.Request.Files.Keys) {
+      HttpPostedFile file = HttpContext.Current.Request.Files[fileKey];
+      if (file.ContentLength <= 0) continue; //Skip unused file controls.
+      
+      //Get the physical path for the uploads folder and make sure it exists
+      string uploadFolder = MapPath("~/uploads");
+      if (!Directory.Exists(uploadFolder)) Directory.CreateDirectory(uploadFolder);
+      
+      //Generate each version
+      foreach (string suffix in versions.Keys) {
+          //Generate a filename (GUIDs are best).
+          string fileName = Path.Combine(uploadFolder, System.Guid.NewGuid().ToString() + suffix);
 
-	        //Let the image builder add the correct extension based on the output file type
-	        fileName = ImageBuilder.Current.Build(file, fileName, new ResizeSettings(versions[suffix]), false, true);
-	    }
-			
-	}
+          //Let the image builder add the correct extension based on the output file type
+          fileName = ImageBuilder.Current.Build(file, fileName, new ResizeSettings(versions[suffix]), false, true);
+      }
+      
+  }
 
 ```
 
@@ -507,14 +507,14 @@ This example method generates 3 versions of the specified file, and returns a li
 
 For example,
 ```c#
-	GenerateVersions("~/images/image.jpg")
+  GenerateVersions("~/images/image.jpg")
 ```
 Will generate
 
 ```
-	/images/image\_thumb.jpg
-	/images/image\_medium.jpg
-	/images/image\_large.jpg
+/images/image\_thumb.jpg
+/images/image\_medium.jpg
+/images/image\_large.jpg
 ```
 
 And will return a list of those paths.
@@ -550,37 +550,37 @@ Resizing and processing images as they are uploaded is very straightforward. Mos
 
 The following sample code generates a GUID filename for each upload, determines the appropriate file extension that is needed, then resizes/crops/formats the image according to the specified ResizeSettings.
 ```c#
-	//Loop through each uploaded file
-	foreach (string fileKey in HttpContext.Current.Request.Files.Keys) 
-	{
-		HttpPostedFile file = HttpContext.Current.Request.Files[fileKey];
-		if (file.ContentLength <= 0) continue; //Skip unused file controls.
-		
-		//The resizing settings can specify any of 30 commands.. See http://imageresizing.net for details.
-		//Destination paths can have variables like <guid> and <ext>, or 
-		//even a santizied version of the original filename, like <filename:A-Za-z0-9>
-		ImageResizer.ImageJob i = new ImageResizer.ImageJob(file, "~/uploads/<guid>.<ext>", new ImageResizer.ResizeSettings( 
-								"width=2000;height=2000;format=jpg;mode=max"));
-		i.CreateParentDirectory = true; //Auto-create the uploads directory.
-		i.Build();
-	}
+  //Loop through each uploaded file
+  foreach (string fileKey in HttpContext.Current.Request.Files.Keys) 
+  {
+    HttpPostedFile file = HttpContext.Current.Request.Files[fileKey];
+    if (file.ContentLength <= 0) continue; //Skip unused file controls.
+    
+    //The resizing settings can specify any of 30 commands.. See http://imageresizing.net for details.
+    //Destination paths can have variables like <guid> and <ext>, or 
+    //even a santizied version of the original filename, like <filename:A-Za-z0-9>
+    ImageResizer.ImageJob i = new ImageResizer.ImageJob(file, "~/uploads/<guid>.<ext>", new ImageResizer.ResizeSettings( 
+                "width=2000;height=2000;format=jpg;mode=max"));
+    i.CreateParentDirectory = true; //Auto-create the uploads directory.
+    i.Build();
+  }
 ```
 
 #### For VB.NET Users
 
 ```vbnet
-	'Loop through each uploaded file
-	For Each fileKey As String In HttpContext.Current.Request.Files.Keys
-			Dim file As HttpPostedFile = HttpContext.Current.Request.Files(fileKey)
-			If (file.ContentLength > 0) Then 'Skip unused file controls.
-				'The resizing settings can specify any of 30 commands.. See http://imageresizing.net for details.
-				'Destination paths can have variables like <guid> and <ext>, or 
-				'even a santizied version of the original filename, like <filename:A-Za-z0-9>
-				Dim i As ImageResizer.ImageJob = New ImageResizer.ImageJob(file, "~/uploads/<guid>.<ext>", New ImageResizer.ResizeSettings("width=2000;height=2000;format=jpg;mode=max"))
-				i.CreateParentDirectory = True 'Auto-create the uploads directory.
-				i.Build()
-			End If
-	Next
+  'Loop through each uploaded file
+  For Each fileKey As String In HttpContext.Current.Request.Files.Keys
+      Dim file As HttpPostedFile = HttpContext.Current.Request.Files(fileKey)
+      If (file.ContentLength > 0) Then 'Skip unused file controls.
+        'The resizing settings can specify any of 30 commands.. See http://imageresizing.net for details.
+        'Destination paths can have variables like <guid> and <ext>, or 
+        'even a santizied version of the original filename, like <filename:A-Za-z0-9>
+        Dim i As ImageResizer.ImageJob = New ImageResizer.ImageJob(file, "~/uploads/<guid>.<ext>", New ImageResizer.ResizeSettings("width=2000;height=2000;format=jpg;mode=max"))
+        i.CreateParentDirectory = True 'Auto-create the uploads directory.
+        i.Build()
+      End If
+  Next
 ```
 <a name="troubleshooting_guide"></a>
 
@@ -711,7 +711,7 @@ Possible causes
 
 #### This type of page is not served. (HTTP 403 error)
 
-	Description: The type of page you have requested is not served because it has been explicitly forbidden.  The extension '.jpg' may be incorrect.   Please review the URL below and make sure that it is spelled correctly. 
+  Description: The type of page you have requested is not served because it has been explicitly forbidden.  The extension '.jpg' may be incorrect.   Please review the URL below and make sure that it is spelled correctly. 
 
 Possible causes
 
@@ -724,21 +724,21 @@ This generic error message often hides a more descriptive message, but that mess
 
 #### Method Not Found (System.MissingMethodException)
 
-	Server Error in '/' Application. 
-	------------------------------ 
-	Method not found: 'Void System.Web.HttpContext.RemapHandler(System.Web.IHttpHandler)'.
-	Exception Details: System.MissingMethodException: Method not found: 'Void 
-	System.Web.HttpContext.RemapHandler(System.Web.IHttpHandler)'.
-	
+  Server Error in '/' Application. 
+  ------------------------------ 
+  Method not found: 'Void System.Web.HttpContext.RemapHandler(System.Web.IHttpHandler)'.
+  Exception Details: System.MissingMethodException: Method not found: 'Void 
+  System.Web.HttpContext.RemapHandler(System.Web.IHttpHandler)'.
+  
 This error occurs when you do not have .NET 2.0 Service Pack 2 applied. No other conditions cause this error. The RemapHandler method was added in .NET 2.0 SP2, and is required by this product.
 Yes, it is possible to have .NET 3, 3.5, and .NET 4 installed (and up-to-date), yet not have .NET SP2 installed. This peculiar circumstance has been verified on over 5 machines.
 
 #### Server object error 'ASP 0178 : 80070005'
 
-	Server object error 'ASP 0178 : 80070005'
-	Server.CreateObject Access Error
-	The call to Server.CreateObject failed while checking permissions. 
-	Access is denied to this object.
+  Server object error 'ASP 0178 : 80070005'
+  Server.CreateObject Access Error
+  The call to Server.CreateObject failed while checking permissions. 
+  Access is denied to this object.
 
 This error usually means that the user that the ASP website is running under does not have NTFS permissions to the ImageResizer dlls. 
 Right click the `C:\Program Files\ImageResizingNet\v3` folder and choose Properties, Security, hit Edit, then click Add, type in the user name your website is running under, hit OK, then check Read & Execute, and hit OK, then Apply.
@@ -751,27 +751,27 @@ If you still encounter issues, perform a reinstall with COMInstaller.exe, and sa
 
 #### System.Security.SecurityException
 
-	System.Security.SecurityException: Request for the 
-	permission of type 'System.Configuration.ConfigurationPermission, 
-	System.Configuration, Version=2.0.0.0, Culture=neutral, 
-	PublicKeyToken=b03f5f7f11d50a3a' failed
+  System.Security.SecurityException: Request for the 
+  permission of type 'System.Configuration.ConfigurationPermission, 
+  System.Configuration, Version=2.0.0.0, Culture=neutral, 
+  PublicKeyToken=b03f5f7f11d50a3a' failed
 
 This can occur in certain medium or low trust environments. To correct, set `requirePermission="false"` on the resizer section declaration in Web.config.
 ```xml
-	<?xml version="1.0" encoding="utf-8" ?>
-	<configuration>
-		<configSections>
-			<section name="resizer" type="ImageResizer.ResizerSection,ImageResizer" requirePermission="false" />
-		</configSections>
-		...
+  <?xml version="1.0" encoding="utf-8" ?>
+  <configuration>
+    <configSections>
+      <section name="resizer" type="ImageResizer.ResizerSection,ImageResizer" requirePermission="false" />
+    </configSections>
+    ...
 ```
 
 #### Error parsing Web.Config
 
 If you are using NuGet and recently upgraded from an older release, there may be duplicate XML elements in Web.Config. Delete the one lacking the requirePermission="false" attribute.
 ```xml
-	<section name="resizer" type="ImageResizer.ResizerSection"/>
-	<section name="resizer" type="ImageResizer.ResizerSection" requirePermission="false"/>
+  <section name="resizer" type="ImageResizer.ResizerSection"/>
+  <section name="resizer" type="ImageResizer.ResizerSection" requirePermission="false"/>
 ```
 
 #### Quality loss when resizing 8-bit Grayscale Jpeg images
