@@ -18,7 +18,7 @@ The primary method. Accepts VirtualFiles, physical paths, Bitmap objects, etc. E
 
 1. Calls LoadImage(source) to acquire a source bitmap
 2. Calls PreAcquireStream
-3. If destination is a string, stream, acquires an output stream from `dest`
+3. If destination is a string or stream, acquires an output stream from `dest`
 4. If dest is a stream, calls buildToStream. Otherwise, calls buildToBitmap.
 
 Convenience method for getting a Bitmap result (Wraps above method):
@@ -26,6 +26,7 @@ Convenience method for getting a Bitmap result (Wraps above method):
 
 
 `Bitmap LoadImage(object source, bool useICM);`
+
 1. Calls PreLoadImage(ref object source, ref bool useICM)
 2. Turns a string, VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream into a Bitmap and returns it. Attaches any path (if present) to Bitmap.Tag
 

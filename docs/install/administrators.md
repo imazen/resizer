@@ -23,7 +23,7 @@ If `Web.config` already exists in the target website or application, go to the n
 
 The Image Resizer allows you to resize an image by just modifying the URL a little.
 
-So given 'http://localhost/image.jpg', you could resize the image to 40px wide by using 'http://localhost/image.jpg?width=40'. You can do this from your browser's address bar, and HTML page, or anything. No more Photoshop just to do basic image changes.
+So given 'http://localhost/image.jpg', you could resize the image to 40px wide by using 'http://localhost/image.jpg?width=40'. You can do this from your browser's address bar, HTML page, or anywhere else. No more Photoshop just to do basic image changes.
 
 [View more usage examples](/docs/examples)
 

@@ -48,10 +48,13 @@ All tuning parameters are identical between the URL and Managed API.
 
 ## Tuning
 
-* `f.minsize=0..100` (defaults to 3). The smallest face to detect, as a percentage of the image size.
-* `f.faces=min-count,maxcount` Defaults to 1,8. The minimum and maximum number of faces to detect in the image. 
-* `f.expand=percent|xpercent,ypercent` Defaults to 0,0. The percent (0..100) to expand the face rectangles in each orientation. If ypercent is omitted, the value from xpercent will be used.
-* `f.threshold=value|minvalue,value` The confidence threshold required to consider a face detected. Defaults to 1,2. 'minvalue' is used if we have not reached the quote specified in `f.faces`.
+`f.minsize=0..100` (defaults to 3). The smallest face to detect, as a percentage of the image size.
+
+`f.faces=min-count,maxcount` Defaults to 1,8. The minimum and maximum number of faces to detect in the image. 
+
+`f.expand=percent|xpercent,ypercent` Defaults to 0,0. The percent (0..100) to expand the face rectangles in each orientation. If ypercent is omitted, the value from xpercent will be used.
+
+`f.threshold=value|minvalue,value` The confidence threshold required to consider a face detected. Defaults to 1,2. 'minvalue' is used if we have not reached the quote specified in `f.faces`.
 
 
 ## Installation. 

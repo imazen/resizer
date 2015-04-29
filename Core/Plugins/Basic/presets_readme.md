@@ -40,7 +40,7 @@ onlyAllowPresets does not apply to the managed API, only to the URL API.
 
 ## Usage syntax
 
-Use a default settings group, then overriding the width:
+Use a default settings group, then override the width:
 
   image.jpg?preset=thumb-defs&width=120
 

@@ -40,7 +40,7 @@ Provides an alternate resizing pipeline that never touches GDI. Only supports wi
 
 Install by adding `<add name="FreeImageBuilder" />` to the plugins section of Web.config. And make sure you've added the 3 required dlls.
 
-Not always faster, as FreeImage is slower at scaling images than GDI, even it if has faster encoding/decoding.
+Not always faster, as FreeImage is slower at scaling images than GDI, even if it has faster encoding/decoding.
 
 Defaults to box scaling
 

@@ -34,11 +34,11 @@ For example, an attacker could request a very large image to use a lot of CPU an
 
 With disk caching enabled, users may not even notice a DOS attack, since GDI calls would fail first, leaving plenty of fragmented RAM around for ASPX/HTML/CSS/Javascript files and cached images to be served, since their contiguous memory requirements are minimal.
 
-totalWidth and totalHeight restrict the final output size of an image. They do not 'shrink' the image as `imageWidth` and `imageHeight` do, they simply cancel requests that exceed the permitted size. This prevents the memory from even being allocated for invalid requests.
+totalWidth and totalHeight restrict the final output size of an image. They do not 'shrink' the image as `imageWidth` and `imageHeight` do. They simply cancel requests that exceed the permitted size. This prevents the memory from even being allocated for invalid requests.
 
 **To disable these limits, set `totalBehavior="ignorelimits"`.**
 
-When a request is cancelled, a `SizeLimitException` is thrown with status code 500.
+When a request is canceled, a `SizeLimitException` is thrown with status code 500.
 
 ## imageWidth & imageHeight
 

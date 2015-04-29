@@ -37,7 +37,7 @@ How do I auto-crop a certain distance or percentage away from an edge, instead o
 : Manual cropping is applied before automatic cropping, so you can use that to crop the image before auto-cropping takes effect. To auto-crop against 10% away from the top of the image, use this: `crop=0,10,0,0&cropxunits=100&cropyunits=100&mode=crop&width=570&height=1500&anchor=topcenter`.
 
 Can I resize the same image to different sizes?
-: Yes - there is no limit on how many sizes of an image can be created.
+: Yes, there is no limit on how many sizes of an image can be created.
 
 Is it possible to specify the width and height, and have your image resized and cropped to fit the aspect ratio, losing as little image area as possible?
 : Yes, and it is easy. Use ?width=x&amp;height=y&amp;mode=crop.
@@ -45,8 +45,8 @@ Is it possible to specify the width and height, and have your image resized and 
 If I resize a photo to its original size, will a new photo be returned, or the original?
 : All photos are re-compressed, even if the original photo is the same size. This allows ICC correction, file size improvement, and metadata removal.
 
-Can the resizer both crop, then resize at the same time? 
-: Yes, you can specify a crop rectangle with ?crop=(x1,y1,x2,y2) or ?mode=crop, and add &amp;width=x or any of the resizing commands to resizing the resulting crop. All commands can be combined.
+Can the resizer crop, then resize at the same time? 
+: Yes, you can specify a crop rectangle with ?crop=(x1,y1,x2,y2) or ?mode=crop, and add &amp;width=x or any of the resizing commands to resize the resulting crop. All commands can be combined.
 
 When I resize a small image to larger dimensions, it stays at the original size. 
 : This is by design - add &amp;scale=both to allow images to be upscaled. You might want to consider up-scaling client-side to save bandwidth. Just set both width and height on the &lt;img&gt; tag. If you just want padding, use &amp;scale=canvas
@@ -60,7 +60,7 @@ Can I use this with images stored in a database?
 : Sure, with the SqlReader plugin. 
 
 Can I use this to resize images as users upload them? 
-: Sure! I suggest keeping the original images around, and using the resizer normally (in case you later want larger images).
+: Sure! I suggest keeping the original images around and using the resizer normally (in case you later want larger images).
 However, it's easy to [resize during upload](/docs/howto/upload-and-resize).
 
 

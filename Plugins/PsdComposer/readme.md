@@ -13,7 +13,7 @@ Allows you to edit PSD files (hide/show layers, change text layer contents, appl
 Great for
 
 * Dynamically generating clickable maps based on search results
-* Generating customized product simulations where users can change multiple product variables independently, or enter text for engraving.
+* Generating customized product simulations where users can change multiple product variables independently, or enter text for engraving
 
 
 High performance - under 400ms for test psds with 40+ layers.
@@ -25,7 +25,7 @@ More documentation coming soon - in the meantime, please contact support@imagere
 
 Either run `Install-Package ImageResizer.Plugins.PsdComposer` in the NuGet package manager, or:
 
-1. Add ImageResizer.Plugins.PsdComposer.dll to your project
+1. Add ImageResizer.Plugins.PsdComposer.dll to your project.
 2. Add `<add name="PsdComposer" />` inside `<resizer><plugins></plugins></resizer>` in Web.config.
 
 ## Usage

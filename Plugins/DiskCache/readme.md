@@ -10,7 +10,7 @@ Writes resized images directly to disk, then lets IIS serve them as normal image
 
 With this plugin, a server can usually process as many concurrent 'dynamic' image requests as 'static' image requests, since there is only a 1-time hit (and it's small to begin with) for resizing an image.
 
-Suggested for all live sites. Works well in combination with the CloudFront plugin, which adds edge-caching. Also works great with the PsdReader, SqlReader, S3Reader, and AnimatedGifs plugin (these benefit greatly from caching due to their slightly higher resource cost).
+Suggested for all live sites. Works well in combination with the CloudFront plugin, which adds edge-caching. Also works great with the PsdReader, SqlReader, S3Reader, and AnimatedGifs plugin; these benefit greatly from caching due to their slightly higher resource cost.
 
 Compatible with *all* plugins.
 
@@ -30,7 +30,7 @@ You're done. If you want to configure the cache directory, you can set `<diskcac
 
 # Other plugins included with DiskCache
 
-The DiskCache assembly includes 3 additonal caching plugins
+The DiskCache assembly includes 3 additional caching plugins
 
 ## SourceMemCache (beta)
 
@@ -61,7 +61,7 @@ Like DiskCache, but for source files. Not advisable if your source image collect
 
 Install by adding `<add name="SourceDiskCache" />`.
 
-Default cache folder is `~/cache/sourceimages`. No configuration options avaiable through XML installation - only through code installation.
+Default cache folder is `~/cache/sourceimages`. No configuration options available through XML installation - only through code installation.
 
 ## DiskCache Configuration
 
@@ -82,7 +82,7 @@ The following is what the default settings look like. Only specify what you need
 
 ### dir
 
-Where to store the images. This can specify an IIS virtual directory, if you want to cache images outside the site folder.
+Where to store the images. This can specify an IIS virtual directory if you want to cache images outside the site folder.
 
 Should be in virtual path form, like /vdir/cache or ~/imagecache.
 
@@ -120,12 +120,12 @@ Defaults to 15 seconds. How long to wait for a file lock to become available bef
 
 ### asyncWrites (new in v3.1)
 
-When true, writes to the disk cache will occur on separate threads, permitting the request to complete faster in the case of a cache miss. 
+When true, writing to the disk cache will occur on separate threads, permitting the request to complete faster in the case of a cache miss. 
 This adds a bit more overhead on the server, but makes the client experience more responsive. Very helpful on slow or overwhelmed I/O systems.
 
 ### asyncBufferSize (new in v3.1)
 
-The number of bytes to allow used for the async write queue. Defaults to 10MB (10485760). This is the maximum amount of RAM that will be used for the write cache. 
+The number of bytes to allowed to be used for the async write queue. Defaults to 10MB (10485760). This is the maximum amount of RAM that will be used for the write cache. 
 If this value would be exceeded, the disk cache switches to synchronous mode until the queue has emptied enough to permit another job to be added without exceeding the maximum.
 
 

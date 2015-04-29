@@ -6,7 +6,7 @@ Aliases: /plugins/clientcache
 
 # ClientCache plugin
 
-Installed by default. Sets cache-control, expires (if configured), and last-modified HTTP headers.
+If an expiration duration is specified, ClientCache sends "Cache-control" and "Expires" HTTP headers to the client.  Installed by default.
 
 IIS-level configuration (even in Web.config) can override the values set by ClientCache. Keep this in mind when troubleshooting issues.
 
@@ -18,7 +18,7 @@ IIS-level configuration (even in Web.config) can override the values set by Clie
 
 `Cache-control: public` is sent for all anonymous requests.
 `Cache-control: private` is sent for all authenticated requests.
-'Last-modified:` is sent based on the modified date of the source file.
+`Last-modified:` is sent based on the modified date of the source file.
 `Expires` is sent only if 'minutes' is configured in web.config. For 24-hour expiration, use 1440 (suggested value).
 
 

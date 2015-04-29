@@ -23,8 +23,8 @@ See Samples/SqlReaderSample/ in the download for a comprehensive sample project,
 
 * Can serve non-image data if desired
 * Compatible with CloudFront and DiskCache
-* Supports modified-date comparison between SQL and the filesystem so updated versions of cached files are detected.
-* Easy to configure.
+* Supports modified-date comparison between SQL and the filesystem so updated versions of cached files are detected
+* Easy to configure
 
 
 ## Installation
