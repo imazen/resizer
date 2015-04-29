@@ -17,7 +17,7 @@ ImageResizer has a very simple (and powerful) URL API.
 
 For more informaiton, [check out our website](http://www.imageresizing.net). To contribute, see [CONTRIBUTING](https://github.com/imazen/resizer/blob/develop/CONTRIBUTING.md).
 
-####Ch-ch-ch-changes
+#### Changes
 
 We've made some major changesin V.4. Check out our [changelog](https://github.com/imazen/resizer/blob/develop/CHANGES.md) for more details.
 
@@ -25,7 +25,7 @@ We've made some major changesin V.4. Check out our [changelog](https://github.co
 Over half of ImageResizer's plugins are available under the Apache 2.0 license. See [license.txt for details]( https://github.com/imazen/resizer/blob/develop/license.txt).
 
 
-#Table of Contents
+# Table of Contents
 2. [Getting Started](#getting_started)
   1. [Basic Installation Guide](#installation)
   2. [Installing a Plugin Manually](#install_plugin)
@@ -48,7 +48,7 @@ Over half of ImageResizer's plugins are available under the Apache 2.0 license. 
 
 <a name="getting_started"></a>
 
-#Getting Started
+# Getting Started
 
 Below is a basic installation guide, although a more comprehensive one can be found [on our website](http://www.imageresizing.net/docs/install).
 
@@ -58,13 +58,14 @@ We use submodules - clone with `git clone -b develop --recursive https://github.
 
 <a name="installation"></a>
 
-##Basic Installation Guide
+## Basic Installation Guide
 
-####Install from NuGet
+#### Install from NuGet
 
-Nearly all [ImageResizer plugins are on NuGet (33+)](https://www.nuget.org/packages?q=nathanaeljones).
+Nearly all [ImageResizer plugins are on NuGet (33+)](https://www.nuget.org/packages?q=nathanaeljones). [You can enable source symbols from symbolsource.org](http://www.symbolsource.org/Public/Home/VisualStudio) for an enhanced debugging experience.
 
 Get the basics:
+
 ```
 PM> Install-Package ImageResizer.WebConfig
 PM> Install-Package ImageResizer.Plugins.DiskCache
@@ -89,7 +90,7 @@ Most configuration and plugin installation issues can be resolved by checking Im
 
 <a name="reference"></a>
 
-#Reference
+# Reference
 
 <a name="plugins_list"></a>
 
@@ -97,7 +98,7 @@ Most configuration and plugin installation issues can be resolved by checking Im
 
 The following is a list of all plugins currently available on ImageResizer, and links to their more detailed documentation on our website. They are grouped according to the license necessary to access them. **Higher level licenses include all plugins from lower level licenses.** Their order, from lowest to highest, is Essential, Performance, Creative, Elite. If you have any further questions about ImageResizer licenses, we encourage you to look at our [licenses page](http://www.imageresizing.net/licenses).
 
-####Elite License Plugins
+#### Elite License Plugins
 
 * [CropAround plugin](http://www.imageresizing.net/plugins/croparound) - Automatic cropping based on a set of areas to preserve specified areas.
 * [BatchZipper plugin](http://www.imageresizing.net/plugins/batchzipper) - Asynchronously generated .zip archives of files and resized images. Great for providing customized downloads to customers.
@@ -108,7 +109,7 @@ The following is a list of all plugins currently available on ImageResizer, and 
 * [RedEye plugin](http://www.imageresizing.net/plugins/redeye) - Provides sophisticated eye detection and red eye correction.
 * [WebP plugins](http://www.imageresizing.net/plugins/webp) - Decode and encode .webp images.
 
-####Creative License Plugins
+#### Creative License Plugins
 
 * [AdvancedFilters plugin](http://www.imageresizing.net/plugins/advancedfilters) - Blur, sharpen, remove noise, and perform automatic histogram adjustment, plus several other cool effects.
 * [CopyMetadata plugin](http://www.imageresizing.net/plugins/copymetadata) - Preserve metadata during image processing.
@@ -131,7 +132,7 @@ The following is a list of all plugins currently available on ImageResizer, and 
 * [PrettyGifs plugin](http://www.imageresizing.net/plugins/prettygifs) - Get rid of ugly .NET GIFs, and get photoshop-like results for GIFs and 8-bit PNG images. Uses tuned octree quantization and smart, adjustable dithering.
 * [RemoteReader plugin](http://www.imageresizing.net/plugins/remotereader) - Allows images located on external servers to be securely resized and processed as if they existed locally.
 
-####Essential License Plugin
+#### Essential License Plugin
 
 * [AutoRotate plugin](http://www.imageresizing.net/plugins/autorotate) (v3.1+) - Use the EXIF rotation data from the camera to auto-rotate your images.
 * [ClientCache plugin](http://www.imageresizing.net/plugins/clientcache) - (default) - Sets Cache-control, Expires, and Last-modified headers for optimum performance.
@@ -153,14 +154,15 @@ The following is a list of all plugins currently available on ImageResizer, and 
 * [SpeedOrQuality](http://www.imageresizing.net/plugins/speedorquality) (v3.1+) - Gain a 15-30% speed boost by sacrificing rendering quality.
 * [VirtualFolder plugin](http://www.imageresizing.net/plugins/virtualfolder) - Create an IIS-like virtual folder that works in Cassini as well as IIS, and doesn't require IIS configuration.
 
-####Deprecated Plugins
+#### Deprecated Plugins
+
 * [AzureReader plugin](http://www.imageresizing.net/plugins/azurereader) - Allows blobstore images to be resized and served. (Azure 1.X compatible) *Deprecated in favore of AzureReader2.* Available at the Performance level.
 * [S3Reader plugin](http://www.imageresizing.net/plugins/s3reader) - Process and resize images located on a remote Amazon S3 bucket. A VirtualPathProvider. Works best when combined with DiskCache. *Deprecated in favor of S3Reader2.* Available at the Performance level.
 * [PsdReader plugin](http://www.imageresizing.net/plugins/psdreader) - Adds support for PSD source files. *Deprecated in favor of FreeImageDecoder and PsdComposer.* Available at the Elite level.
 
 <a name="full_command"></a>
 
-##Full Command Reference
+## Full Command Reference
 
 #### Selecting a frame or page
 
@@ -201,6 +203,7 @@ The following is a list of all plugins currently available on ImageResizer, and 
 * **margin=3 or margin=5,5,10,10** Specify a universal margin or left,top,right,bottom widths (new in V3.1.
 
 #### Output format
+
 * **format=jpg\|png\|gif** - The output format to use.
 * **quality** - Jpeg compression: 0-100 100=best, 90=very good balance, 0=ugly .
 * **colors=2-255** – Control the palette size of PNG and GIF images. If omitted, PNGs will be 24-bit ([PrettyGifs plugin](http://www.imageresizing.net/plugins/prettygifs) required).
@@ -290,7 +293,7 @@ In addition to jpeg quality and gif/png colors, you can configure the jpeg subsa
 
 <a name="managed_api"></a>
 
-##Managed API examples
+## Managed API examples
 
 Most tasks with the managed API only require one line:
 ```c#
@@ -302,7 +305,7 @@ Most tasks with the managed API only require one line:
 	
 ```
 
-####Object Source
+#### Object Source
 
 May be a physical path (C:\..), an app-relative virtual path (~/folder/image.jpg), an Image, Bitmap, Stream, VirtualFile, or HttpPostedFile instance. 
 
@@ -310,7 +313,7 @@ May be a physical path (C:\..), an app-relative virtual path (~/folder/image.jpg
 
 May be a Stream instance, a physical path, or an app-relative virtual path.
 
-####ResizeSetting Settings
+#### ResizeSetting Settings
 
 ResizeSettings is a friendly wrapper for a query string which provides named properties as well as the regular NameValueCollection interface.
 
@@ -363,7 +366,7 @@ You can also filter values. `<filename:A-Za-z0-9>` keeps only the alphanumeric c
 
 <a name="config_reference"></a>
 
-##Configuration Reference
+## Configuration Reference
 
 The following is a basic, typical configuration, V3+. [Click here](http://www.imageresizing.net/docs/2to3/configuration) to see a configuration example that mimics the V2 defaults.
 
@@ -404,11 +407,11 @@ The following is a basic, typical configuration, V3+. [Click here](http://www.im
 ```
 <a name="tricks"></a>
 
-#Nifty Tricks
+# Nifty Tricks
 
 <a name="watermark"></a>
 
-##Watermark Images Based on Folder Name or Display Size
+## Watermark Images Based on Folder Name or Display Size
 
 The *PostRewrite* event is the last of the URL rewriting events, and can be used to enforce certain settings.
 
@@ -459,7 +462,7 @@ To prevent this, you should add some more code inside PostRewrite
 
 <a name="thumbnails"></a>
 
-##Generate Thumbnails and Multiple Sizes to Disk
+## Generate Thumbnails and Multiple Sizes to Disk
 
 While the ImageResizer shines at on-the-fly image processing, you can also use it to drastically simplify pre-processing and ahead-of-time resizing as well. **We strongly recommend using the dynamic method instead of pre-generating your images, as pre-generating versions reduces agility and flexibility.** In the examples below, only one line is required to perform all the image decoding, format conversion, processing, resizing, and re-encoding. The rest is path/filename logic. Two different solutions are presented - 1 for processing images as they are uploaded, and another for processing images that are already saved to disk.
 
@@ -535,7 +538,7 @@ And will return a list of those paths.
 ```
 <a name="resize_upload"></a>
 
-##Convert and Resize Images as They Are Uploaded
+## Convert and Resize Images as They Are Uploaded
 
 Resizing and processing images as they are uploaded is very straightforward. Most of the required code is about paths and directories.
 
@@ -558,6 +561,7 @@ The following sample code generates a GUID filename for each upload, determines 
 ```
 
 #### For VB.NET Users
+
 ```vbnet
 	'Loop through each uploaded file
 	For Each fileKey As String In HttpContext.Current.Request.Files.Keys
@@ -576,31 +580,9 @@ The following sample code generates a GUID filename for each upload, determines 
 
 #Troubleshooting
 
-<a name="self_diagnostics"></a>
-
-##Accessing Self-Diagnostics
-
-Most configuration and plugin installation issues can be resolved by checking ImageResizer’s self-diagnostics page. If your local website is running at `http://localhost:5000/`, then you can visit it at `http://localhost:5000/resizer.debug.ashx`.
-
-If you’re not using ImageResizer from a web app, you can access the page as a string via `ImageResizer.Configuration.Config.Current.GetDiagnosticsPage()` or write it to disk with `ImageResizer.Configuration.Config.Current.WriteDiagnosticsTo(string path)`. 
-
-#### Diagnostics Page Not Working?
-
-By default, the Diagnostics plugin uses the same setting as [customErrors](http://msdn.microsoft.com/en-us/library/h0hfz6fc%28v=vs.100%29.aspx) (which defaults to Localhost). Thus, if you can see ASP.NET error messages, you will also be able to get the diagnostics page. This ensures that the diagnostics page never exposes data to a host that doesn't already have access to detailed error messages. 
-
-To override, add one of the following to the &lt;resizer&gt; section.
-```xml
-	<diagnostics enableFor="AllHosts" />
-	<diagnostics enableFor="Localhost" />
-	<diagnostics enableFor="None" />
-
-```
-
-#### ASP.NET MVC Notes
-
 <a name="error_messages"></a>
 
-##Getting Detailed Error Messages
+## Getting Detailed Error Messages
 
 If some images are not displaying correctly, you *must* visit the image url directly to get the exact error message.
 
@@ -624,15 +606,36 @@ You may also have to **temporarily** change &lt;deployment retail to "False" for
 
 The customErrors setting is case-sensitive; use "Off", "On", and "RemoteOnly".
 
-<a name="troubleshooting_guide"></a>
 
-##What Might Be Wrong
+<a name="self_diagnostics"></a>
 
-To get support or use this guide, [make sure you get the detailed error message from visiting the image URL directly](#error_messages). This guide cannot offer a solution to a generic 500 error, 404 error, or a "broken image icon", as those symptoms are far to generic to be useful. 
+## Accessing Self-Diagnostics
+
+Most configuration and plugin installation issues can be resolved by checking ImageResizer’s self-diagnostics page. If your local website is running at `http://localhost:5000/`, then you can visit it at `http://localhost:5000/resizer.debug.ashx`.
+
+If you’re not using ImageResizer from a web app, you can access the page as a string via `ImageResizer.Configuration.Config.Current.GetDiagnosticsPage()` or write it to disk with `ImageResizer.Configuration.Config.Current.WriteDiagnosticsTo(string path)`. 
+
+#### Diagnostics Page Not Working?
+
+By default, the Diagnostics plugin uses the same setting as [customErrors](http://msdn.microsoft.com/en-us/library/h0hfz6fc%28v=vs.100%29.aspx) (which defaults to Localhost). Thus, if you can see ASP.NET error messages, you will also be able to get the diagnostics page. This ensures that the diagnostics page never exposes data to a host that doesn't already have access to detailed error messages. 
+
+To override, add one of the following to the &lt;resizer&gt; section.
+```xml
+  <diagnostics enableFor="AllHosts" />
+  <diagnostics enableFor="Localhost" />
+  <diagnostics enableFor="None" />
+
+```
+
+<a name="troubleshooting_list"></a>
+
+## What Might Be Wrong
+
+To get support or use this guide, make sure you get the detailed error message from visiting the image URL directly. This guide cannot offer a solution to a generic 500 error, 404 error, or a "broken image icon", as those symptoms are far to generic to be useful. 
 
 If this page doesn't resolve your issue, [visit the Support page](http://www.imageresizing.net/support) for information about the bug bounty and free support requirements.
 
-####Server Error in '/' Application. Out of memory.
+#### Server Error in '/' Application. Out of memory.
 
 You might be trying to resize certain large images for the first time. Even a 15MB jpg, however, uncompresses to about 80MB in bitmap form (depending on the compression level). If you are resizing to a 2MB jpg (15MB BMP), memory requirements for the operation are roughly 110MB (15 + 80 + 15). If you plan on using ImageResizer for very high-resolution photos (above 8MP), we suggest making sure you have ample amounts of RAM. 400MB to 1GB is usually plenty for the average web site with disk caching enabled.
 
@@ -797,23 +800,24 @@ You need at minimum the following IIS modules installed for correct operation:
 
 <a name="everything_else"></a>
 
-#Everything Else
+# Everything Else
 
 <a name="licensing_and_contract_info"></a>
 
-##Licensing and Support Contract Information
+## Licensing and Support Contract Information
 
-##Licenses
+## Licenses
 
 The short version: ImageResizer has several license packages that have different tiers of access to our plugins, including free packages in our [essential](http://imageresizing.net/plugins/editions/free) and [trial](http://imageresizing.net/licenses/trial) packages. To find out about our license packages, [visit our website](http://imageresizing.net/licenses).
 
-##Support Contracts
+## Support Contracts
+
 For those times when (not if) everything breaks all at once, it's good to have us in your corner. Our support contracts come with architecture planning, hot-fixes, guaranteed rapid-response, emergency telephone numbers, and lots of other cool stuff. Furthermore, you can customize your plan to get just the right amount of support that you need. Remember: contracts can *save money* in the long-term, and we do our best to make sure our support contract customers get maximum bang for minimal buck.
 
 All ImageResizer support contracts come with a non-expiring Elite license, and free major upgrades for the duration of the contract. To see the different options available, check out [our support contracts page](http://www.imageresizing.net/support/contracts).
 
 <a name="contact"></a>
 
-##Contact Us
+## Contact Us
 
 We can be reached at support@imageresizing.net. We usually respond within 2 or 3 business days. Of course, you could also leave comments on our [website](http://www.imageresizing.net), tag issues, or send smoke signals (Note: We do not actually advise sending smoke signals. Terrible waste of firewood, and bad for asthmatics to boot).
