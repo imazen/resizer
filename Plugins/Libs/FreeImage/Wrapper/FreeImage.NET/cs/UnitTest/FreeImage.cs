@@ -17625,7 +17625,7 @@ namespace FreeImageAPI.Metadata
         }
 
         /// <summary>
-        /// Gets or sets the the ISO Speed and ISO Latitude of the camera or input device as
+        /// Gets or sets the ISO Speed and ISO Latitude of the camera or input device as
         /// specified in ISO 12232.
         /// </summary>
         /// <remarks>

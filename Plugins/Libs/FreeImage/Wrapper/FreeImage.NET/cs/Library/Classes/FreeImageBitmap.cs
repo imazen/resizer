@@ -3278,7 +3278,7 @@ namespace FreeImageAPI
         }
 
         /// <summary>
-        /// Perfoms an histogram transformation on a 8-, 24- or 32-bit image.
+		/// Performs an histogram transformation on a 8-, 24- or 32-bit image.
         /// </summary>
         /// <param name="lookUpTable">The lookup table (LUT).
         /// It's size is assumed to be 256 in length.</param>

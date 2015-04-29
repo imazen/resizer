@@ -1096,7 +1096,7 @@ namespace FreeImageAPI.Metadata
         }
 
         /// <summary>
-        /// Gets or sets the the ISO Speed and ISO Latitude of the camera or input device as
+        /// Gets or sets the ISO Speed and ISO Latitude of the camera or input device as
         /// specified in ISO 12232.
         /// </summary>
         /// <remarks>
@@ -1220,7 +1220,7 @@ namespace FreeImageAPI.Metadata
 
         /// <summary>
         /// Gets or sets the exposure bias. The unit is the APEX value.
-        /// Ordinarily it is given in the range of –99.99 to 99.99.
+        /// Ordinarily it is given in the range of ï¿½99.99 to 99.99.
         /// </summary>
         /// <remarks>
         /// <b>Handling of null values</b><para/>

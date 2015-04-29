@@ -445,7 +445,7 @@ namespace ImageResizer.Configuration {
         public event UrlRewritingEventHandler Rewrite;
         /// <summary>
         /// Fired during PostAuthorizeRequest, after Rewrite.
-        /// Any changes made here (which conflict) will be overwritten by the the current querystring values. I.e, this is a good place to specify default settings.
+        /// Any changes made here (which conflict) will be overwritten by the current querystring values. I.e, this is a good place to specify default settings.
         /// <para>Only fired on accepted image types. (see Rewrite)</para>
         /// </summary>
         public event UrlRewritingEventHandler RewriteDefaults;
