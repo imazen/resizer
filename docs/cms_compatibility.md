@@ -66,7 +66,7 @@ Dave Gardner [wrote a fantastic 7-part article on how to make a gallery module f
 
 Strangely, Orchard disables the serving of static files at the site root level by removing all httpHandlers. For Disk Caching to work, you will need to customize the imagecache/Web.config file. 
 
-Restoring the StaticFileHandler mappings should re-enabled efficient disk caching. 
+Restoring the StaticFileHandler mappings should re-enable efficient disk caching. 
 
   <?xml version="1.0"?>
   <configuration>

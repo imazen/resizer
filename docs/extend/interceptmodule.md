@@ -38,7 +38,7 @@ This is where most of the work takes place.
 3. If we're doing neither, we step away from the request without having changed anything.
 4. Otherwise, we set two keys in context.Items[] to let other plugins know we're handling things. (This allows the MvcRoutingShim to stop conflicting routes).
 5. We create a ResponseArgs object and start populating it
-6. We get the modified date from the source file (if present)
+6. We get the last modified date from the source file (if present)
 7. We calculate the final mime-type and suggested file extension
 8. We build a caching key and save the final querystring and path to the ResponseArgs instance
 9. We define an anonymous method that writes the resized image to a given stream, and store it in ResponseArgs.

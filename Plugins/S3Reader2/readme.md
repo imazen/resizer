@@ -21,18 +21,18 @@ See Samples/S3ReaderSample/ in the download for a sample project.
 
 ### Features
 
-* Fast - no unnecessary http requests.
+* Fast - no unnecessary http requests
 * Offers mode for checking for newer files on a configured interval (useful when combined with disk caching)
 * Works great with the DiskCache and CloudFront caching plugins
 * Has an optional ssl mode
-* Can be configured to access private bucket files with an access key.
+* Can be configured to access private bucket files with an access key
 
 
 ## Installation
 
 Either run `Install-Package ImageResizer.Plugins.S3Reader2` in the NuGet package manager, or:
 
-1. Add ImageResizer.Plugins.S3Reader2.dll to your project
+1. Add ImageResizer.Plugins.S3Reader2.dll to your project.
 2. Add `<add name="S3Reader2" buckets="my-bucket-1,my-bucket-2,my-bucket-3" />` inside `<plugins></plugins>` in Web.config.
 
 
@@ -47,7 +47,7 @@ If you want to access non-public bucket items, you will need to specify an acces
 
 * buckets (required) - Comma-delimited list of permitted bucket names that can be accessed.
 * prefix - the virtual folder that all buckets can be accessed under. Defaults to ~/s3/
-* checkForModifiedFiles - If true, S3Reader which check for updated source files on S3 when a cached file is requested. The metadata is cached for an hour after it is last accessed (configurable by code).
+* checkForModifiedFiles - If true, S3Reader will check for updated source files on S3 when a cached file is requested. The metadata is cached for an hour after it is last accessed (configurable by code).
   If false, S3 will never be checked for newer versions of cached files, reducing latency costs by 50%. Defaults to false.
 * useSsl - Defaults to false. Set to true to transfer the image data over an encrypted connection. Slows things down significantly.
 * accessKeyId, secretAccessKey - Use these if you need to access non-public files in your amazon buckets.

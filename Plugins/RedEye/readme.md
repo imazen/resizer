@@ -12,7 +12,7 @@ Provides automatic and manual red-eye detection and correction. For automatic fa
 
 A NuGet package for this plugin is not available, due to the vast number of dependencies. 
 
-OpenCV does not support being used from multiple app domains. If you get a "Type Initializer Exception", restart the application pool, verify that it only contains 1 application, and that overlapped recycle is disabled.
+OpenCV does not support being used from multiple app domains. If you get a "Type Initializer Exception", restart the application pool and verify that it only contains 1 application, and that overlapped recycle is disabled.
 
 You **must** disable overlapped recycling on the application pool running this plugin. OpenCV cannot handle multiple instances per plugin.
 
@@ -49,7 +49,7 @@ You **must** disable overlapped recycling on the application pool running this p
 
 ## Feature classification files
 
-[You can download all the XML files](http://downloads.imageresizing.net/OpenCV-2.3.1-all-cascades.zip) in a single .ZIP file. You only need to copy the following into the /bin folder, although copying them all won't hurt anything. 
+[You can download all the XML files](http://downloads.imageresizing.net/OpenCV-2.3.1-all-cascades.zip) in a single .ZIP file. You only need to copy the following into the /bin folder.
 
 * haarcascade\_frontalface\_default.xml
 * haarcascade\_mcs\_lefteye.xml

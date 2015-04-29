@@ -38,9 +38,9 @@ PM> Install-Package ImageResizer.MvcWebConfig
   new PluginName().Install(ImageResizer.Configuration.Config.Current);
 ```
 
-You will need need to add the appopriate namespace reference to access the plugin.
+You will need to add the appropriate namespace reference to access the plugin.
 
-Most configuration and plugin installation issues can be resolved by checking ImageResizer’s self-diagnostics page. If your local website is running at `http://localhost:5000/`, then you should browse to `http://localhost:5000/resizer.debug.ashx` to access it. See [the Troubleshooting](#troubleshooting section) for more details. 
+Most configuration and plugin installation issues can be resolved by checking ImageResizer’s self-diagnostics page. If your local website is running at `http://localhost:5000/`, then you should browse to `http://localhost:5000/resizer.debug.ashx` to access it. See [the Troubleshooting page](#troubleshooting section) for more details. 
 <a name="reference"></a>
 
 

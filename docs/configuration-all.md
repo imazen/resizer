@@ -182,8 +182,8 @@ This is a full reference showing how to use each setting. You should *never* cop
 				<add name="Logging" />
 
 				<!-- Add ImageHandlerSyntax plugin -->
-				<!-- Adds support for the syntaxes used by 4 image resizing handlers. This plugin allows painless,  -->
-				<!-- gradual migration from them by supporting their URL syntax. -->
+				<!-- Adds support for the syntaxes used by 4 image resizing handlers. This plugin allows  -->
+				<!-- painless, gradual migration from them by supporting their URL syntax. -->
 				<!-- http://www.imageresizing.net/plugins/imagehandlersyntax -->
 				<add name="ImageHandlerSyntax" />
 
@@ -330,8 +330,8 @@ This is a full reference showing how to use each setting. You should *never* cop
 
 				<!-- WIC Plugins (V3.1+) -->
 				<!-- ImageResizer.Plugins.Wic.dll contains 3 plugins: WicImageDecoder, WicImageEncoder, and -->
-				<!-- WicImageBuilder. These plugins require Windows 7 or Windows Server 2008 R2 for best performance -->
-				<!-- and correct behavior. Vista or Windows Server 2008 with the Platform Update applied should also -->
+				<!-- WicImageBuilder. These plugins require Windows 7 or Windows Server 2008 R2 for best -->
+				<!-- performance and correct behavior. Vista or Windows Server 2008 with the Platform Update applied should also -->
 				work.
 				<!-- http://www.imageresizing.net/plugins/wic -->
 				<add name="WicDecoder" />
@@ -374,7 +374,7 @@ This is a full reference showing how to use each setting. You should *never* cop
 				bspline, box, bicubic, and bilinear filters. -->
 				<add name="FreeImageResizer" />
 
-				<!-- AdvancedFupdateilters plugin -->
+				<!-- AdvancedFilters plugin -->
 				<!-- Apply advanced effects to your images. Requires Full Trust. -->
 				<!-- The plugin currently applies effects to the image along with any background color, padding, -->
 				<!-- or drop shadow that may be present. Future versions may simply apply the effect to the image, -->

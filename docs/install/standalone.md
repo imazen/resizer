@@ -12,7 +12,7 @@ ImageResizer.dll offers both Client and Server APIs. The server APIs are only en
 
 ImageResizer requires a .NET capable webserver like Windows+IIS, \*nix+apache+mono, or \*nix+ngix+mono. Image quality is poorer on *nix platforms due to Mono, so we suggest a separate Windows server instead. 
 
-If you're already using Windows, you can just set up a separate Application and Application Pool in IIS. We suggest using a subdomain, so that you can re-assign the subdomain to a cluster or CDN as your needs grow. 
+If you're already using Windows, you can just set up a separate Application and Application Pool in IIS. We suggest using a subdomain, so you can reassign the subdomain to a cluster or CDN as your needs grow. 
 
 Any installation method can be used to set up a standalone server; this is the simplest installation scenario. 
 
