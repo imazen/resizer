@@ -130,7 +130,7 @@ namespace ImageResizer.Plugins.SeamCarving {
             try {
                 try {
 
-                    //Create a temporary bitmap that is 'halfway resized', so we can efficiently perfom seam carving.
+                    //Create a temporary bitmap that is 'halfway resized', so we can efficiently perform seam carving.
 
                     //Unless it's already been done for us by FreeImageResize or something
                     if (s.preRenderBitmap != null && (tempWidth - s.preRenderBitmap.Width < 50 && tempHeight - s.preRenderBitmap.Height < 50)) {
