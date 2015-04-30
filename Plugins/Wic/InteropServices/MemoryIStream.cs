@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.InteropServices;
@@ -14,12 +14,12 @@ namespace ImageResizer.Plugins.Wic.InteropServices {
         public MemoryIStream(byte[] buffer, int index, int count, bool writable, bool publiclyVisible) : base(buffer, index, count, writable, publiclyVisible) { }
 
         void IStream.Read(byte[] pv, int cb, IntPtr pcbRead) {
-            Marshal.WriteInt64(pcbRead, Read(pv, 0, cb));
+            Marshal.WriteInt32(pcbRead, Read(pv, 0, cb));
         }
 
         void IStream.Write(byte[] pv, int cb, IntPtr pcbWritten) {
             Write(pv, 0, cb);
-            Marshal.WriteInt64(pcbWritten, cb);
+            Marshal.WriteInt32(pcbWritten, cb); //NOTE: All these writes should be unsigned integers. 
         }
 
         void IStream.Seek(long dlibMove, int dwOrigin, IntPtr plibNewPosition) {
