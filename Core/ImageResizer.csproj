@@ -171,6 +171,7 @@
     <Compile Include="Plugins\IVirtualFile.cs" />
     <Compile Include="Plugins\IVirtualImageProvider.cs" />
     <Compile Include="Plugins\WebConfigLicenseReader.cs" />
+    <Compile Include="HttpModuleRequestAssistant.cs" />
     <Compile Include="Resizing\AbstractImageProcessor.cs" />
     <Compile Include="Resizing\BoxPadding.cs" />
     <Compile Include="Enumerations.cs" />
