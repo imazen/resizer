@@ -4,7 +4,7 @@ Bundle: free
 Tagline: (default) - Whenever you have an issue, go to localhost/resizer.debug and you'll probably be told what is wrong.
 Aliases: /plugins/diagnostics /plugins/diagnostic
 
-#Diagnostics plugin
+# Diagnostics plugin
 
 The `/resizer.debug` page is provided by this plugin (which is installed by default)
 

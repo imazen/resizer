@@ -6,7 +6,7 @@ Aliases: /plugins/image404 /plugins/404image
 
 # Image404 plugin
 
-##Installation
+## Installation
 
 1. Add `<add name="Image404" />` to the `<plugins>` section.
 2. (optional) Add `<image404 baseDir="~/images/404pics/" />` to the `<resizer>` section to specify a default directory for fallback images.
