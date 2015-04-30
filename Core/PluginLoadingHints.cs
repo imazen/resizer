@@ -55,7 +55,7 @@ namespace ImageResizer.Configuration
             
             //Plugins that use the Plugin suffix in the class name.
             foreach (string normalWithSuffix in new[] { "AzureReader2", "CloudFront", "CopyMetadata","CustomOverlay", "DiagnosticJson",
-                "Faces", "FFmpeg", "Logging", "MongoReader", "PdfRenderer", "PsdComposer", "RedEye","RemoteReader", "SeamCarving",
+                "Faces", "FFmpeg", "Logging", "MongoReader", "PdfRenderer", "PdfiumRenderer", "PsdComposer", "RedEye","RemoteReader", "SeamCarving",
                 "SqlReader", "TinyCache", "Watermark", "WhitespaceTrimmer", "FastScaling"})
                 AddHint(normalWithSuffix, "ImageResizer.Plugins." + normalWithSuffix + "." + normalWithSuffix + "Plugin, ImageResizer.Plugins." + normalWithSuffix);
 

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer", "ImageResizer.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
 EndProject
@@ -72,6 +72,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PdfRenderer", "..\Contrib\PdfRenderer\PdfRenderer\ImageResizer.Plugins.PdfRenderer.csproj", "{7C8A13F7-5C00-4074-B16E-45D0E231B70D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Storage", "..\Plugins\ImageResizer.Storage\ImageResizer.Storage.csproj", "{80BB303C-8F55-410C-BA91-342ECC435101}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PdfiumRenderer", "..\Contrib\PdfiumRenderer\PdfiumRenderer\ImageResizer.Plugins.PdfiumRenderer.csproj", "{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -770,6 +772,24 @@ Global
 		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
 		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|x64.ActiveCfg = Release|Any CPU
 		{80BB303C-8F55-410C-BA91-342ECC435101}.Trial|x86.ActiveCfg = Release|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Release|x64.ActiveCfg = Release|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Release|x86.ActiveCfg = Release|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Trial|Any CPU.ActiveCfg = Release|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Trial|Any CPU.Build.0 = Release|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Trial|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Trial|Mixed Platforms.Build.0 = Release|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Trial|x64.ActiveCfg = Release|Any CPU
+		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Trial|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

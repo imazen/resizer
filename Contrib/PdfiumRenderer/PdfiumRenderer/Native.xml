@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<files>
+  <file url="https://github.com/pvginkel/PdfiumViewer/raw/master/Libraries/Pdfium/x86/pdfium.dll" name="x86/pdfium.dll" bitness="32" fileBytes="9,252,864" />
+  <file url="https://github.com/pvginkel/PdfiumViewer/raw/master/Libraries/Pdfium/x64/pdfium.dll" name="x64/pdfium.dll"  bitness="64" fileBytes="11,092,992" />
+</files>
