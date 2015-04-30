@@ -255,6 +255,15 @@ namespace ImageResizer.ExtensionMethods {
             return c;
         }
 
+        public static NameValueCollection Exclude(this NameValueCollection q, params string[] keysToRemove)
+        {
+            NameValueCollection c = new NameValueCollection(q);
+            foreach (string s in keysToRemove)
+                c.Remove(s);
+            return c;
+        }
+
+
         /// <summary>
         /// Creates and returns a new NameValueCollection instance that contains all of the
         /// keys/values from 'q', and any keys/values from 'defaults' that 'q' does not already
