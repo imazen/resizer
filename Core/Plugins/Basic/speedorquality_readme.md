@@ -9,7 +9,7 @@ Aliases: /plugins/speedorquality
 Gain a 15-30% speed boost by sacrificing rendering quality.
 
 
-##Installation
+## Installation
 
 1. Add `<add name="SpeedOrQuality" />` to the `<plugins>` section.
 

@@ -38,7 +38,7 @@ Unless you set up a CNAME to mask it, your URL will look like this:
 
 Feel free to play around with my URLs and experiment. 
 
-##Caching duration notes
+## Caching duration notes
 
 By default, CloudFront caches all requests for a minimum of 24 hours (1440 minutes), but you can now configure this limit when you create a new distribution.
 

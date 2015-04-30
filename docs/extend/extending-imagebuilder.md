@@ -1,6 +1,6 @@
 Aliases: /docs/extending-imagebuilder /docs/plugins/extending-imagebuilder /docs/extend/extending-imagebuilder 
 
-#Extending ImageBuilder
+# Extending ImageBuilder
 
 
 ImageBuilder can be extended in two ways.

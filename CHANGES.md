@@ -1,4 +1,4 @@
-#v4-0-0
+# v4-0-0
 
 ###.NET 4.5 is now required by the core and all plugins. What does this mean?
 
@@ -87,7 +87,7 @@ Fixed: WIC builder no longer throws a NullReferenceException when provided a nul
 
 Fix incorrect status code when any IVirtualFileCache is installed and an 404 occurs. Source(Mem/Disk)Cache call .Open and .Read during the GetFile() stage (callers expect only a null result on not found failure). PipelineConfig.GetFile must absorb FileNotFound exceptions to prevent the behavior contract from being violated.
 
-#Changes in plugins
+# Changes in plugins
 
 DiskCache no longer supports HashModifiedDate (it's always true). 
 
@@ -110,7 +110,7 @@ Drop misspelled, obsolete, duplicate CropRectange property from Instructions cla
 
 Catch DirectoryNotFoundException as well as FileNotFoundException -> 404
 
-#v3-4-3
+# v3-4-3
 Date: May 8 2014
 
 FullFile: http://downloads.imageresizing.net/Resizer3-4-3-full-May-8-2014.zip
@@ -140,7 +140,7 @@ This release introduces [the CopyMetadata plugin](/plugins/copymetadata), and th
 
 ## No known remaining bugs
 
-#v3-4-2
+# v3-4-2
 Date: Nov 26 2013
 
 FullFile: http://downloads.imageresizing.net/Resizer3-4-2-full-Nov-26-2013.zip
@@ -162,7 +162,7 @@ This release introduces [the new S3Reader2 plugin](/plugins/s3reader2), which in
 * When using auto-cropping (mode=crop), scale=down may sometimes be ignored, acting as if scale=both was set.
 
 
-#v3-4-1
+# v3-4-1
 Date: Oct 30 2013
 
 FullFile: http://downloads.imageresizing.net/Resizer3-4-1-full-Oct-31-2013.zip
@@ -183,7 +183,7 @@ This release fixes a small but troublesome bug in ImageJob.
 * AzureReader2 and 404plugin are incompatible
 * When using auto-cropping (mode=crop), scale=down may sometimes be ignored, acting as if scale=both was set.
 
-#v3-4-0
+# v3-4-0
 Date: Oct 17 2013
 
 FullFile: http://downloads.imageresizing.net/Resizer3-4-0-full-Oct-17-2013.zip
@@ -254,7 +254,7 @@ FullFile: http://downloads.imageresizing.net/Resizer3-4-0-full-Oct-17-2013.zip
 
 * Fixed bug in RemoteReader - extension correction was still failing to work (causing PNG images to be rencoded as jpegs when no format was explicitly specified).
 
-#v3-3-3
+# v3-3-3
 Date: March 2 2013
 
 FullFile: http://downloads.imageresizing.net/Resizer3-3-3-full-Mar-2-2013.zip
@@ -280,7 +280,7 @@ Are you using the FreeImage, WebP, Faces, or RedEye plugins with downloadNativeD
 Not yet fixed: When using auto-cropping (mode=crop), scale=down may sometimes be ignored, acting as if scale=both was set.
 
 
-#v3-3-2
+# v3-3-2
 Date: Jan 24 2013
 
 FullFile: http://downloads.imageresizing.net/Resizer3-3-2-full-Jan-24-2013.zip
@@ -300,7 +300,7 @@ Not yet fixed: When using auto-cropping (mode=crop), scale=down may sometimes be
 * Fixed: Improved error messages for image decoding issues
 
 
-#v3-3-1
+# v3-3-1
 Date: December 19 2012
 
 FullFile: http://downloads.imageresizing.net/Resizer3-3-1-full-Dec-20-2012.zip
@@ -330,7 +330,7 @@ To ensure all dependencies get downloaded before ASP.NET starts locking them, ca
 * S3Reader has been rebuilt against the latest version of AWSSDK.dll.
 
 
-#v3-3-0
+# v3-3-0
 Date: December 3 2012
 
 FullFile: http://downloads.imageresizing.net/Resizer3-3-0-full-Dec-4-2012.zip
@@ -397,7 +397,7 @@ The solution going forwards will be to release AzureReader2, and gradually phase
 * Removed ComplexWebApplication, replaced it with _PluginTests
 * CustomOverlayPlugin: Now invalidates when overlay files have a modification date change - but only for physically present files (virtual files not supported).
 
-#v3-2-4
+# v3-2-4
 Date: August 6 2012
 
 FullFile: http://downloads.imageresizing.net/Resizer3-2-4-full-Aug-6-2012.zip
@@ -433,7 +433,7 @@ FullFile: http://downloads.imageresizing.net/Resizer3-2-4-full-Aug-6-2012.zip
 * S3VirtualPathProvider.Service is now S3Client, and an instance of AmazonS3Client instead of S3Service.
 * The useSubdomains setting is no longer used (or relevant). 
 
-#v3-2-beta-3
+# v3-2-beta-3
 Date: June 30 2012
 
 FullFile: http://downloads.imageresizing.net/Resizer3-2-beta-3-full-Jun-30-2012.zip
@@ -458,7 +458,7 @@ Be the first to report a given bug to support@imageresizing.net and claim the bo
 * Added support for VirtualPathProviders that return IVirtualFile compliant VirtualFile instances, but do not implement IVirtualImageProvider
 * [Ben Foster](http://ben.onfabrik.com/) contributed a small plugin that makes it easier to configure which file extensions ImageResizer intercepts. This can be useful if you're not using standard image extensions, or need .ico support, etc. You can find the plugin in Contrib\AdditionalFileExtensionsPlugin
 
-#v3-2-beta-2
+# v3-2-beta-2
 Date: June 20 2012
 
 FullFile: http://downloads.imageresizing.net/Resizer3-2-beta-2-full-Jun-20-2012.zip
@@ -486,7 +486,7 @@ Be the first to report a given bug to support@imageresizing.net and claim the bo
 * If you are already using the extension methods introduced in 3.2.0, you will need to reference them as static methods instead (I.E. `StreamExtensions.CopyStream(s)`, etc).
 * The most commonly used extension methods (.Get<> and .Set<>) will continue working, as they were implemented in a base class.
 
-#v3-2-alpha-1
+# v3-2-alpha-1
 Date: June 4 2012
 
 FullFile: http://downloads.imageresizing.net/Resizer3-2-alpha-1-full-Jun-4-2012.zip
@@ -509,7 +509,7 @@ If you still experience any ExtensionAttribute-related problems, see [ my StackO
 
 If that doesn't resolve the problem, please e-mail a .zip file of the project to `support@imageresizing.net`, and include your VisualStudio/.NET version numbers (Go to Visual Studio, Help, About, and click `Copy Info`, then paste it into the e-mail). 
 
-#v3-2-alpha-0
+# v3-2-alpha-0
 Date: June 3 2012
 
 Fullfile: http://downloads.imageresizing.net/Resizer3-2-alpha-0-full-Jun-3-2012.zip
@@ -675,7 +675,7 @@ These plugins are not yet alpha, and will be changing before their final release
 
 * Now supports downloadNativeDependencies="true" auto-install!
 
-#v3-1-5
+# v3-1-5
 Date: February 22 2012
 
 FullFile: http://downloads.imageresizing.net/Resizer3-1-5-full-Feb-22-2012.zip
@@ -770,7 +770,7 @@ These bugs were discovered several weeks after release. Please contact support@i
 
 * Now normalizes both the original querystring and the 404 image's querystring before merging them to prevent duplicates like ?width=200&w=400.
 
-#v3-1-4
+# v3-1-4
 Date: January 22 2012
 
 FullFile: http://downloads.imageresizing.net/Resizer3-1-4-full-Jan-22-2012.zip
@@ -795,7 +795,7 @@ This release adds minor new features and fixes some minor bugs.
 * Better error messages for empty or read-to-end streams from a (I)VirtualFile or HttpPostedFile source value.
 * ImageBuilder.Build, LoadImage, and GetStreamFromSource now throw an ArgumentNullException if parameter 'source' is null.
 
-#v3-1-3
+# v3-1-3
 Date: January 14 2012
 
 FullFile: http://downloads.imageresizing.net/Resizer3-1-3-full-Jan-14-2012.zip
@@ -869,7 +869,7 @@ This can be useful, as uploaded filenames are usually unacceptable for use on th
 
 * ImageJob.DisposeSourceStream was renamed to DisposeSourceObject as the previous name was incorrect; both Bitmaps and Streams are disposed by it. It's unlikely many people use this property already as it was only recently introduced.
 
-#v3-1-alpha-2
+# v3-1-alpha-2
 Date: Dec 7 2011
 
 FullFile: http://downloads.imageresizing.net/Resizer3-1-alpha-2-full-Dec-7-2011.zip
@@ -994,13 +994,13 @@ Oh, and guess what - it's fully backwards compatible. You can take advantage of 
 
 ## [FreeImage](/plugins/freeimage)
 
-###Breaking changes
+### Breaking changes
 
 * FreeImageEncoder no longer acts as the default encoder. To enable, use `encoder=freeimage` in the request URL.
 * FreeImageBuilder is no longer activated via &freeimage=true. To activate, use `builder=freeimage`.
 * FreeImageDecoder can be requested as the primary decoder with `decoder=freeimage` instead of `freeimage=true`. As always, it is a default fallback decoder if the other decoders can't handle the stream.
 
-###The good news
+### The good news
 
 * Got a customized version of FreeImage based on libjpeg-turbo. 2-4x faster jpeg encoding and decoding!
 * Improved overall performance of non freeimage-related requests when a FreeImage plugin was installed by reordering some statements.
@@ -1102,7 +1102,7 @@ Also added complete XML configurability.
 
 * ImageResizer.StretchMode and ImageResizer.CropMode are deprecated, and have been replaced by ImageResizer.FitMode
 
-#v3-0-13
+# v3-0-13
 Date: October 12 2011
 
 FullFile: http://downloads.imageresizing.net/Resizer3-0-13-full-Oct-12-2011.zip
@@ -1128,7 +1128,7 @@ Version 3.0.13 does not include `ImageResizer.Plugins.FriendlyUrls.dll`! The Fri
 * Fixed: Watermark plugin would display decreasingly smaller watermarks.
 * Fixed in ClientCache plugin: On a web server serving images from another file server, when the servers' clocks are not synchronized, and images are served within the time offset (between the servers) from when they are created. Symptoms: ArgumentOutOfRangeException. Fault: Overzealous ASP.NET framework code. Extremely rare.
 
-#v3-0-12
+# v3-0-12
 Date: August 15 2011
 
 FullFile: http://downloads.imageresizing.net/Resizer3-0-12-full-Aug-15-2011.zip
@@ -1179,7 +1179,7 @@ The bugs that nobody has probably ever encountered, but were turned up by compre
 * AdvancedFilters: Fixed NullReferenceException when ImageBuilder.GetFinalSize() is called and &blur or &sharpen is specified
 
 
-#v3-0-11
+# v3-0-11
 Date: July 29 2011
 
 FullFile: http://downloads.imageresizing.net/Resizer3-0-11-full-Jul-28-2011.zip
@@ -1213,7 +1213,7 @@ FullFile: http://downloads.imageresizing.net/Resizer3-0-11-full-Jul-28-2011.zip
 * Modified BuilderExtension.PreLoadImage to include path and disposeStream parameters. If you are overriding this method, you will need to change your code.
 * LoadImage now supports byte[] arrays.
 
-#v3-alpha-10
+# v3-alpha-10
 Date: June 16 2011
 
 FullFile: http://downloads.imageresizing.net/Resizer3-alpha-10-full-Jun-16-2011.zip
@@ -1243,7 +1243,7 @@ FullFile: http://downloads.imageresizing.net/Resizer3-alpha-10-full-Jun-16-2011.
 
 There are now [NuGet](http://nuget.org) packages for 8 of the 12 paid plugins, as well as 2 packages for the core and 1 sample project.
 
-#v3-alpha-9
+# v3-alpha-9
 Date: June 8 2011
 
 FullFile: http://downloads.imageresizing.net/Resizer3-alpha-9-full-Jun-8-2011.zip
@@ -1292,7 +1292,7 @@ The bug fixes of this release were primarily driven by unit test discoveries. Co
 
 None. Isn't this when most people mark a product as stable?
 
-#v3-alpha-8
+# v3-alpha-8
 Date: June 2 2011
 
 FullFile: http://downloads.imageresizing.net/Resizer3-alpha-8-full-Jun-02-2011.zip
@@ -1343,7 +1343,7 @@ FullFile: http://downloads.imageresizing.net/Resizer3-alpha-8-full-Jun-02-2011.z
 
 * Added DiskCacheWebTest for real-world testing of the DiskCache cleanup worker
 
-#v3-alpha-7
+# v3-alpha-7
 Date: May 26 2011
 
 FullFile: http://downloads.imageresizing.net/Resizer3-alpha-7-full-May-26-2011.zip
@@ -1402,7 +1402,7 @@ Bitmaps are now Tagged with a BitmapTag instance that references the underlying 
 * Removed many unneeded dependencies from PsdReader and PrettyGifs plugins
 * LoadImage no longer disposes the stream if a stream was passed directly to it.
 
-#v3-alpha-5
+# v3-alpha-5
 Date: May 15 2011
 
 FullFile: http://downloads.imageresizing.net/Resizer3-alpha-5-full-May-15-2011.zip
@@ -1440,17 +1440,17 @@ If required permissions do not exist, (a) an issue will be logged, and (b) url a
 * Watermark plugin now supports overlays that are virtual files (such as 'gradient.png')
 * Added support for modifying the path during PostAuthorizeRequest, using context.Items\[Config.Current.Pipeline.ModifiedPathKey\] (Enabling feature for CloudFront plugin)
 
-#v3-alpha-3
+# v3-alpha-3
 Date: May 2 2011
 
 FullFile: http://downloads.imageresizing.net/Resizer3-alpha-3-full-May-02-2011.zip
 
-#v3-alpha-2
+# v3-alpha-2
 Date: Apr 24 2011
 
 FullFile: http://downloads.imageresizing.net/ImageResizer3-full-alpha2_apr-24-2011.zip
 
-#v2-8 
+# v2-8 
 Date: May 27, 2011 Upgrade notes from V2.6 to v2.8
 * **Update (Jan 15, 2012): This version has an unpatched memory leak in the GIF and PNG quantization system (Quantizer.cs). The issue has been patched in V3, but V2 has been deprecated for 1 year now. [Upgrading is a simple process](/docs/2to3/), and there are currently no plans to make another maintenance release of V2.**
 
@@ -1480,7 +1480,7 @@ Existing users can upgrade before June 15 for only $40 using the discount code 6
   * Fixed potential bug: **Extremely** rare Access Denied message occurring on one of 2 simultaneous requests for a newly added source image. No reported occurrences.
   * Removed System.Data and System.Xml dependencies. 
   * 
-#v2-6
+# v2-6
 Date: Nov 11, 2010
 
 (<a href="http://nathanaeljones.com/489">Upgrade notes from 2.1b to 2.6</a>)
@@ -1505,7 +1505,7 @@ Date: Nov 11, 2010
   * Added TranslatePoint methods to allow simulation of a resize (useful for image map generation).
   * Added Size GetFinalSize() methods to ImageManager.cs for determining the resulting size of an image.
   * Performance boost: modified DiskUtil.UpdateCachedVersionIfNeeded to use 'cachedFile' instead of 'sourceFile' as lock/sync key.
-#v2-1b
+# v2-1b
 Date: Nov. 13, 2009
 (<a href="http://nathanaeljones.com/438/version-2-1b-released/">Upgrade notes from 2.0 to 2.1b</a>)
   * Fixed: Fixed elusive performance bug in DiskCache that caused directory listings to run every image request.
@@ -1516,7 +1516,7 @@ Date: Nov. 13, 2009
   * Added: PerfTests project to run benchmarks on the image resizing and encoding code.
   * Added: ImageManager.BuildImage now accepts an HttpPostedFile instance for resizing, making upload and resize simple. Sample project included.
   * 
-#v2-0rc2 
+# v2-0rc2 
 Date: Jun 3, 2009
 
 (<a href="http://nathanaeljones.com/11181_Image_Resizer_2_0_Upgrade_notes">Upgrade notes from 1.2 to 2.0</a>)
@@ -1526,7 +1526,7 @@ Date: Jun 3, 2009
   * Fixed: Typo (missing else) in SaveToNonSeekableStream. This method is for extensibility, and is not used by the Resizer directly.
     This method is now tested and part of the Regression tests (HandlerTest.ashx).
 
-#v2.0rc1
+# v2.0rc1
 Date: May 21, 2009
 
 (<a href="http://nathanaeljones.com/11181_Image_Resizer_2_0_Upgrade_notes">Upgrade notes from 1.2 to 2.0</a>)
@@ -1538,7 +1538,7 @@ Date: May 21, 2009
   * Hashes are now SHA-256 instead of .NET 32-bit. They are base-16 encoded. This results in longer file names, but astronomically low chances of hash collisions.
   * Fixed upgrade notes link in upgrade notes.txt
 
-#v2.0b 
+# v2.0b 
 Date: May 16, 2009 
 
 (<a href="http://nathanaeljones.com/11181_Image_Resizer_2_0_Upgrade_notes">Upgrade notes from 1.2 to 2.0</a>)
@@ -1547,7 +1547,7 @@ Date: May 16, 2009
   * Added DisableCacheCleanup command, and made MaxCachedImages < 0 behave the same as DisableCacheCleanup=true
   * Fixed: rounding error that could cause a pixel line on the right and/or bottom sides of the image. Rare floating point rounding error in GDI native code. Added code to force rounding to be consistent.
 
-#v2.0a
+# v2.0a
 Date: Mar 4, 2009 (E-mail distribution)
   * Fixed: Cleanup routine can cause bottleneck on GetFiles() - fix so that Directory.GetFiles() only happens at startup and when items are added. Only affects sites with slow filesystems (or without filesystem caching), and with thousands of images.
   * Fixed: imagecache/ is not protected when AllowURLRewriting is enabled
@@ -1559,18 +1559,18 @@ bypasses it.  Added protection in the HttpModule.
   * Changed flip to be after all operations, and added sourceFlip to replace its behavior.
   * Added -ignoreicc parameter and made ICC reading the default. ICC profiles are not written out - browser does not support them.
 
-#v1-2
+# v1-2
 Date: 17 May 2008
 
 [Original download source](http://www.nathanaeljones.com/blog/2008/server-side-image-resizing-module-for-asp-net-asp-phpiis-2)
 
-##Upgrade Notes
+## Upgrade Notes
 Version 1.2 includes several new features, a simplified URL syntax, and easier installation. It now supports (and takes advantage of) IIS7 Integrated mode, as well as IIS5, IIS6, and IIS7 classic. The new version is now available for download. If you are an existing customer, you should already have received an e-mail containing a free upgrade. Query string syntax has changed (old links will still work, though). thumbnail has been renamed to format, and is no longer needed to force resizing. You can now simply use image.jpg?width=200 instead of image.jpg?thumbnail=jpg&width=200. I've also added a quality setting to adjust jpeg compression.
 
-##Upgrade instructions
+## Upgrade instructions
 
 The resizer is now implemented as an HttpModule instead of an HttpHandler. Because of this, you will need to undo these changes to web.config and make these much simpler changes instead. There are also 2 new settings you can take advantage of. Using ImageResizerClientCacheMinutes, you can now control how long an image will sit in the browser cache before being updated. If you don't use ASP.NET's URL authorization system to protect your images, you may want to enable AllowFolderResizeNotation. You will then be able to /resize(40,40)/image.jpg instead of image.jpg?maxwidth=40&maxheight=40. Last, delete the /imagecache folder. It will automatically be re-created and populated as images are requested.
 
-##Additional changes
+## Additional changes
 
 The code has been refactored quite a bit - You'll notice there are now 5 code files. Image manipulation has been factored out into its own class ImageManager so you can use it directly from your code. Disk caching has similarly been abstracted into DiskCache.cs, so you can leverage that independently also. You can inherit from InterceptModule to easily build your own image processing pipelines (overriding CheckRequest and MakeResizedImage). Last but not least, you can modify CustomFolders.cs to force the resizing of all images in certain folders or matching certain patterns. The?download=true feature has been removed for cleanliness. If you want this feature back, leave feedback below.

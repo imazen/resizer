@@ -37,14 +37,14 @@ Please share any suggestions, corrections, or bugs with us at support@imageresiz
 
 As I don't personally use Azure, I don't claim to understand why Azure makes the following code needed just to lookup connection strings.
 
-###In Global.asax.cs, Application_Start:
+### In Global.asax.cs, Application_Start:
 
   CloudStorageAccount.SetConfigurationSettingPublisher((configName, configSettingPublisher) => {
       var connectionString = RoleEnvironment.GetConfigurationSettingValue(configName);
       configSettingPublisher(connectionString);
   });
 
-###In Webrole.cs
+### In Webrole.cs
 
 public class WebRole : RoleEntryPoint {
 

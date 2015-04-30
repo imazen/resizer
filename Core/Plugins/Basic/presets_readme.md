@@ -4,7 +4,7 @@ Edition: free
 Tagline:  Created named settings groups and reference them with ?preset=name instead of specifying them all in the URL.
 Aliases: /plugins/presets
 
-#Presets plugin (v3.1+)
+# Presets plugin (v3.1+)
 
 Allows you to define sets of settings in Web.config and reference them by name.
 

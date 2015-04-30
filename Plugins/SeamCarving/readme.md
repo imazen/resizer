@@ -23,7 +23,7 @@ For live examples, [see this page](http://nathanaeljones.com/596/dynamic-seam-ca
 * carve=sobel
 * carve=laplacian
 
-##Example use:
+## Example use:
 
   image.jpg?width=300&height=300&carve=true
 

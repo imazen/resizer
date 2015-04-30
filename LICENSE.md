@@ -295,7 +295,7 @@ For commercial licenses, see http://imageresizing.net/licenses
 
 -------------------------------------------------------------------------------
 
-##MIT License
+## MIT License
 
 MIT License
 
@@ -308,9 +308,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 -------------------------------------------------------------------------------
 
-##Resizer Freedom license
+## Resizer Freedom license
 
-###License summary:
+### License summary:
 
 No restrictions, except you can't use my own code to compete with my own products.
 
@@ -326,7 +326,7 @@ An exact copy of the [MIT license](http://www.opensource.org/licenses/mit-licens
 
 If you purchased an [Enterprise](/licenses/enterprise) license read those terms instead. If you comply with them, you're automatically complying with this license.
 
-###License Terms
+### License Terms
 
 Copyright (c) 2012 Imazen
 
@@ -367,10 +367,10 @@ THE SOFTWARE.
 
 -------------------------------------------------------------------------------
 
-##Resizer Trial License
+## Resizer Trial License
 
 
-###License summary
+### License summary
 
 Permits use only for development and testing purposes.
 
@@ -380,7 +380,7 @@ Permits use only for development and testing purposes.
 * No use on production servers
 
 
-###License Terms
+### License Terms
 
 Copyright (c) 2012 Imazen
 

@@ -12,7 +12,7 @@ For preventing abuse and limiting photo resolution. Prevents request that would 
 
 You can also limit photo resolution with `imageWidth/imageHeight`. Originals will still be accessible unless you add a rewrite handler.
 
-##Configuration
+## Configuration
 
 Example configuration with defaults: 
 

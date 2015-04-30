@@ -4,8 +4,7 @@ Tagline: "FastScaling offers the highest-quality image scaling and sharpening av
 Aliases: /plugins/fastscaling
 
 
-
-# FastScaling
+# FastScaling plugin
 
 Unlike the FreeImage and WIC pipelines, FastScaling integrates with the default GDI+ pipeline, replacing Graphics.DrawImage() with its own algorithms. 
 This [bypasses the severe performance and moderate quality issues of Graphics.DrawImage](#drawimage), while allowing existing plugins and System.Drawing-dependent code to function as-is.

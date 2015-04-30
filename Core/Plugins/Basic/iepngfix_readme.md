@@ -31,7 +31,7 @@ If redirect="true" (the default), the requests from IE will be HTTP redirected t
 If false, the GIF will be silently served instead of the PNG, without any redirection.
 A CDN or caching proxy will mess things up regardless, but using redirection ensures that the CDN/proxy never caches the GIF version instead of the PNG.
 
-##Syntax
+## Syntax
 
 * When `catchAll=false`, the behavior is opt-in. You must add `&iefix=true` to enable the browser detection and redirection behavior for the URL.
 * When `catchAll=true`, the behavior is opt-out. You must add `&iefix=false` to disable the browser detection and redirection behavior for the URL.

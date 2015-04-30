@@ -4,7 +4,7 @@ Bundle: free
 Tagline: (default) Adjustable jpeg compression, 24-bit PNG with transparency support, and standard (poor) .NET GIF encoding.
 Aliases: /plugins/defaultencoder
 
-#DefaultEncoder
+# DefaultEncoder
 
 Installed by default. 
 

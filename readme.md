@@ -5,7 +5,7 @@
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/imazen/resizer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) ![ImageResizer core downloads](http://img.shields.io/nuget/dt/ImageResizer.svg) ![Latest NuGet version](http://img.shields.io/nuget/vpre/ImageResizer.svg) ![Issue Count](http://img.shields.io/github/issues/imazen/resizer.svg) [![Issues ready for work](https://badge.waffle.io/imazen/resizer.png?label=ready&title=up for grabs&svg=true)](https://waffle.io/imazen/resizer)
 
-#What is it?
+# What is it?
 
 * An IIS/ASP.NET HttpModule & image server. On-demand image manipulation, delivery, and optimization &mdash; with low latency &mdash; makes responsive images easy
 * An image processing library optimized and secured for server-side use
@@ -581,7 +581,7 @@ The following sample code generates a GUID filename for each upload, determines 
 ```
 <a name="troubleshooting_guide"></a>
 
-#Troubleshooting
+# Troubleshooting
 
 <a name="error_messages"></a>
 
