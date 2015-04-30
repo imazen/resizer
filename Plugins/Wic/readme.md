@@ -7,7 +7,7 @@ Aliases: /plugins/wic
 # WIC Plugins
 
 
-### Windows Imaging Components is an operating system component maintained by Microsoft. WicBuilder is a wrapper around the underlying operating system API. **We have deprecated WIC in favor of the FastScaling plugin, which offers superior quality and is under our control.**
+### Windows Imaging Components is an operating system component maintained by Microsoft. WicBuilder is a wrapper around the underlying operating system API. **We have deprecated WIC in favor of the [FastScaling plugin](/plugins/fastscaling), which offers superior quality and is under our control.**
 
 ImageResizer.Plugins.Wic.dll contains 3 plugins: WicImageDecoder, WicImageEncoder, and WicImageBuilder.
 

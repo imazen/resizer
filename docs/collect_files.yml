@@ -95,7 +95,10 @@ files:
 - from: Plugins/Faces/croparound_readme.md
   to: plugins/croparound.md
   append: edition_info
-
+- from: Plugins/FastScaling/readme.md
+  to: plugins/fastscaling.md
+  append: edition_info
+  
 #Plugin documentation from plugins in other folders
 
 - from: Contrib/PdfRenderer/pdfrenderer_readme.md

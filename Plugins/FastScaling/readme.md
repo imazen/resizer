@@ -5,7 +5,7 @@ Aliases: /plugins/fastscaling
 
 
 
-# FastScaling 
+# FastScaling
 
 Unlike the FreeImage and WIC pipelines, FastScaling integrates with the default GDI+ pipeline, replacing Graphics.DrawImage() with its own algorithms. 
 This [bypasses the severe performance and moderate quality issues of Graphics.DrawImage](#drawimage), while allowing existing plugins and System.Drawing-dependent code to function as-is.
@@ -28,10 +28,30 @@ Including the jpeg encoding and decoding cost (which FastScaling does not addres
 
 Upscaling and downscaling may utilize the same algorithm, but should be tuned quite differently. Fastscaling's command structure reflects this. All &down.* commands have a &up. equivalent. 
 
-* `&down.filter= Robidoux | RobidouxSharp | RobidouxFast |Ginseng | GinsengSharp | Lanczos | LanczosSharp | Lanczos2 | Lanczos2Sharp | CubicFast | Cubic | CubicSharp | CatmullRom | Mitchell | Fastest
-* `&up.filter   =Robidoux | RobidouxSharp | RobidouxFast | Ginseng | GinsengSharp | Lanczos | LanczosSharp | Lanczos2 | Lanczos2Sharp | CubicFast | Cubic | CubicSharp | CatmullRom | Mitchell | Fastest
+* `&down.filter=Robidoux`
+* `&up.filter=Ginseng`
 
-The default downscaling filter is Robidoux, and the default upscaling filter is Genseng. To mimic DrawImage precisely, use Cubic
+The default downscaling filter is Robidoux, and the default upscaling filter is Ginseng. To mimic DrawImage precisely, use Cubic
+
+### Resampling filters
+
+Filters may be removed or renamed prior to release. You are reminded that FastScaling is still alphaware.
+
+* Robidoux
+* RobidouxSharp
+* RobidouxFast
+* Ginseng
+* GinsengSharp
+* Lanczos
+* LanczosSharp
+* Lanczos2
+* Lanczos2Sharp
+* CubicFast
+* Cubic
+* CubicSharp
+* CatmullRom
+* Mitchell
+* Fastest
 
 ### Sharpening
 
@@ -57,7 +77,7 @@ Fast
 * `&down.colorspace=srgb (as-is, default) | linear| gamma`  `srgb` is equivalent to `&down.preserve=-6.1515`, and mirrors DrawImage behavior. `linear` is equivalent to `&down.preserve=0`
 * `&down.colorspace.a=1..2.2` lets you set a (temporary) gamma adjustment directly. Use with `&down.colorspace=gamma`.
 
-As you can tell, scaling in a linear light preserves more of the snowflakes than scaling in sRGB
+As you can tell, scaling in a linear light (left) preserves more of the snowflakes than scaling in sRGB (right).
 ![Scaling in linear](https://s3.amazonaws.com/resizer-web/pluginexamples/snowing_300_linear.jpg)
 ![Scaling in sRGB](https://s3.amazonaws.com/resizer-web/pluginexamples/snowing_300_srgb.jpg)
 
@@ -98,6 +118,7 @@ up.blur, down.blur, up.window, and down.window may be disabled in future version
 ## Caveats to Fastscaling as a DrawImage replacement
 
 There are certain features of DrawImage that FastScaling does not replace. You are advised to fall back to DrawImage usage if you:
+
 * Need to rotate or skew the image by an arbitrary number of degrees. FastScaling only supports 90-degree interval rotation and flipping. Arbitrary cropping, scaling and compositing is supported.
 * Want to apply ImageAttributes other than colorMatrix or SetWrapMode - FastScaling does the right thing with border pixels automatically.
 
