@@ -33,9 +33,9 @@
     <DocumentationFile>..\..\dlls\release\ImageResizer.Storage.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Trial|AnyCPU'">
-    <OutputPath>..\..\dlls\trial\</OutputPath>
+    <OutputPath>..\..\dlls\release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
-    <DocumentationFile>..\..\dlls\trial\ImageResizer.Storage.XML</DocumentationFile>
+    <DocumentationFile>..\..\dlls\release\ImageResizer.Storage.XML</DocumentationFile>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>

@@ -112,7 +112,6 @@ MSBuildDefaults <- setParams MSBuildDefaults
 Target "clean" (fun _ ->
     MSBuild "" "Clean" ["Configuration","Release"] [mainSolution] |> ignore
     MSBuild "" "Clean" ["Configuration","Debug"] [mainSolution] |> ignore
-    MSBuild "" "Clean" ["Configuration","Trial"] [mainSolution] |> ignore
     
     MSBuild "" "Clean" ["Configuration","Release"; "Platform","Win32"] [fastScaleSln] |> ignore
     MSBuild "" "Clean" ["Configuration","Debug"; "Platform","Win32"] [fastScaleSln] |> ignore
@@ -121,13 +120,11 @@ Target "clean" (fun _ ->
     
     CleanDirs [rootDir + "dlls/release"]
     CleanDirs [rootDir + "dlls/debug"]
-    CleanDirs [rootDir + "dlls/trial"]
 )
 
 Target "build" (fun _ ->
     MSBuild "" "Build" ["Configuration","Release"] [mainSolution] |> ignore
     MSBuild "" "Build" ["Configuration","Debug"] [mainSolution] |> ignore
-    MSBuild "" "Build" ["Configuration","Trial"] [mainSolution] |> ignore
     
     MSBuild "" "Build" ["Configuration","Release"; "Platform","Win32"] [fastScaleSln] |> ignore
     MSBuild "" "Build" ["Configuration","Debug"; "Platform","Win32"] [fastScaleSln] |> ignore
