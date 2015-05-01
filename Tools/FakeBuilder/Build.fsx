@@ -284,15 +284,15 @@ Target "pack_zips" (fun _ ->
     
     
     // packmin
-    let minfiles = toZipEntries query ["^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$";
-        "^/Core/license.txt$"; "^/readme.txt$"; "^/Web.config$"] "" "" true
-    CreateZip rootDir (makeName "min") "" 5 false minfiles
+    //let minfiles = toZipEntries query ["^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$";
+    //    "^/Core/license.txt$"; "^/readme.txt$"; "^/Web.config$"] "" "" true
+    //CreateZip rootDir (makeName "min") "" 5 false minfiles
     
     
     // packbin
-    let mutable binfiles = toZipEntries query ["^/[^/]+.txt$"] "" "" true
-    binfiles <- List.append binfiles (toZipEntries query ["^/dlls/release/*.(dll|pdb)$"] (rootDir+"dlls\\release\\") "" false)
-    CreateZip rootDir (makeName "allbinaries") "" 5 false binfiles
+    //let mutable binfiles = toZipEntries query ["^/[^/]+.txt$"] "" "" true
+    //binfiles <- List.append binfiles (toZipEntries query ["^/dlls/release/*.(dll|pdb)$"] (rootDir+"dlls\\release\\") "" false)
+    //CreateZip rootDir (makeName "allbinaries") "" 5 false binfiles
     
     
     // packfull
@@ -305,13 +305,13 @@ Target "pack_zips" (fun _ ->
     
     
     // packstandard
-    query <- query.exclude("^/Core/[^/]+.sln")
-    let mutable standard = toZipEntries query ["^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"] "" "" true
-    standard <- List.append standard (toZipEntries query ["^/dlls/(debug|release)/"; "^/(core|samples)/";
-        "^/[^/]+.txt$"; "^/Web.config$"] rootDir "" false)
-    standard <- List.append standard (toZipEntries query ["^/submodules/studiojs"] (rootDir+"submodules\\studiojs") "StudioJS" false)
-    CreateZip rootDir (makeName "standard") "" 5 false standard
-    
+    // query <- query.exclude("^/Core/[^/]+.sln")
+    //let mutable standard = toZipEntries query ["^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"] "" "" true
+    // standard <- List.append standard (toZipEntries query ["^/dlls/(debug|release)/"; "^/(core|samples)/";
+    //"^/[^/]+.txt$"; "^/Web.config$"] rootDir "" false)
+    // standard <- List.append standard (toZipEntries query ["^/submodules/studiojs"] (rootDir+"submodules\\studiojs") "StudioJS" false)
+    //CreateZip rootDir (makeName "standard") "" 5 false standard
+
     ()
 )
 
