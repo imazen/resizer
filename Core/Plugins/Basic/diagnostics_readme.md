@@ -24,7 +24,3 @@ To override, add one of the following to the &lt;resizer&gt; section.
 
 I think they are pretty obvious.
 
-
-### ASP.NET MVC notes
-
-If you can't access the diagnostics page, make sure the [MvcRoutingShim plugin](/plugins/mvcroutingshim) is installed.

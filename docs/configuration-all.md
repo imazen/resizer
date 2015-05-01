@@ -131,10 +131,6 @@ This is a full reference showing how to use each setting. You should *never* cop
 				<!-- http://www.imageresizing.net/plugins/folderresizesyntax -->
 				<add name="FolderResizeSyntax" />
 
-				<!-- Adds the MvcRoutingShim -->
-				<!-- http://www.imageresizing.net/plugins/mvcroutingshim -->
-				<add name="MvcRoutingShim" />
-
 				<!-- Adds the PdfRender -->
 				<!-- If you set downloadNativeDependencies="false" or you're running < V3.2, place gsdll32.dll and  -->
 				<!-- gsdll64.dll in the /bin directory -->
