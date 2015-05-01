@@ -22,6 +22,8 @@ items:
   items: 
   - title: Installing ImageResizer
     path: install
+  - title: Adding a license key
+    path: install/license_keys
   - title: ImageResizer for IIS Administrators
     path: install/administrators
   - title: ImageResizer in Classic Mode
