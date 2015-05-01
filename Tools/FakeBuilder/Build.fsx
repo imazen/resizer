@@ -223,16 +223,9 @@ Target "pack_nuget" (fun _ ->
     for nuSpec in Directory.GetFiles(rootDir + "nuget", "*.nuspec") do
         Nuget.fillVariables nuSpec (rootDir+"tmp/"+Path.GetFileName(nuSpec)) nvc
     
-    // process symbol packages first (as they need to be renamed)
-    for nuSpec in Directory.GetFiles(rootDir + "tmp", "*.symbols.nuspec") do
-        Nuget.pack nuSpec ver (rootDir + "Releases/nuget-packages")
-        let baseName = rootDir + "Releases/nuget-packages/" + Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(nuSpec)) + "." + ver
-        File.Move(baseName + ".nupkg", baseName + ".symbols.nupkg")
-    
     // process regular packages
     for nuSpec in Directory.GetFiles(rootDir + "tmp", "*.nuspec") do
-        if not (nuSpec.Contains(".symbols.nuspec")) then
-            Nuget.pack nuSpec ver (rootDir + "Releases/nuget-packages")
+        Nuget.pack nuSpec ver (rootDir + "Releases/nuget-packages")
     
     // remove any mess
     DeleteDir (rootDir + "tmp")
@@ -333,16 +326,12 @@ Target "push_nuget" (fun _ ->
     if isNullOrEmpty nuget_key then
         printf "No nuget information present, skipping push\n"
     else
-        
-        let symbolServ =
-            if nuget_url.Contains("myget.org") then "http://nuget.gw.SymbolSource.org/MyGet/"
-            else ""
-        
-        for nuPkg in Directory.GetFiles(rootDir + "Releases/nuget-packages", "*.nupkg") do
-            if not (nuPkg.Contains(".symbols.nupkg")) then
-                Nuget.push nuPkg nuget_url nuget_key
-            elif symbolServ <> "" then
-                Nuget.push nuPkg symbolServ nuget_key
+        Paket.Push (fun p -> 
+            { p with 
+                ToolPath = "../.paket/paket.exe" 
+                PublishUrl = nuget_url 
+                WorkingDir = rootDir + "Releases/nuget-packages" 
+                ApiKey = nuget_key}) 
 )
 
 Target "push_zips" (fun _ ->
