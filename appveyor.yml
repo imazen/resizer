@@ -93,7 +93,6 @@ build_script:
   - cd ..
 
 after_build:
-  - ps: Get-ChildItem .\Releases\nuget-packages\*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
   - ps: Get-ChildItem .\Releases\*.zip | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
 
 test: off
