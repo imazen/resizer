@@ -123,14 +123,15 @@ Target "clean" (fun _ ->
 )
 
 Target "build" (fun _ ->
+    //MSBuild "" "Build" ["Configuration","Debug"] [mainSolution] |> ignore
+    //MSBuild "" "Build" ["Configuration","Debug"; "Platform","Win32"] [fastScaleSln] |> ignore
+    //MSBuild "" "Build" ["Configuration","Debug"; "Platform","x64"] [fastScaleSln] |> ignore
+
+
     MSBuild "" "Build" ["Configuration","Release"] [mainSolution] |> ignore
-    MSBuild "" "Build" ["Configuration","Debug"] [mainSolution] |> ignore
-    
     MSBuild "" "Build" ["Configuration","Release"; "Platform","Win32"] [fastScaleSln] |> ignore
-    MSBuild "" "Build" ["Configuration","Debug"; "Platform","Win32"] [fastScaleSln] |> ignore
     MSBuild "" "Build" ["Configuration","Release"; "Platform","x64"] [fastScaleSln] |> ignore
-    MSBuild "" "Build" ["Configuration","Debug"; "Platform","x64"] [fastScaleSln] |> ignore
-)
+    )
 
 Target "patch_commit" (fun _ ->
     let commit = Git.Information.getCurrentSHA1 ".."
