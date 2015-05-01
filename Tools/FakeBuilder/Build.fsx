@@ -34,7 +34,7 @@ open System.IO
 open System.Text
 open System.Text.RegularExpressions
 
-
+printfn "Build.fsx starting"
 // Settings
 
 let variableList = ["fb_nuget_url"; "fb_nuget_key";
@@ -240,13 +240,14 @@ Target "pack_zips" (fun _ ->
         ".(DS_Store|pch|opensdf|sdf|sbr|unsuccessfulbuild|coverage|tlog|metagen|lastbuildstate|res|log|ilk|Cache|cache|bak|tlh|tlb|suo|ncb|vspscc|vssscc|aps|user|obj|coverage|user|userprefs)$"]))
     
     query <- query.exclude(["/(Newtonsoft.Json|DotNetZip|Aforge|LitS3|Ionic|NLog|MongoDB|Microsoft.|AWSSDK)*.(xml|pdb)$";
-        "/(OpenCvSharp|FreeImageNet)*.xml$"; "/(FreeImage|gsdll32|gsdll64).dll$";
+        "/(OpenCvSharp|FreeImageNet)*.xml$"; "/(FreeImage|gsdll32|gsdll64|pdfium).dll$";
         "/ImageResizerGUI.exe$";
         "_ReSharper";
         "^/Contrib/*/(bin|obj|imagecache|uploads|results)/*";
         "^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|hidden|results)/";
         "^/Core(.Mvc)?/obj/";
         "^/Tests/binaries";
+        "^/Plugins/FastScaling/*.(lib|dll|xml|pdb|exe).?*";
         "^/Tests/LibDevCassini";
         "^/Tests/ComparisonBenchmark/Images";
         "^/Samples/SqlReaderSampleVarChar";
@@ -445,7 +446,7 @@ Target "unmess" (fun _ ->
 
 Target "print_stats" (fun _ ->
     for zipPkg in Directory.GetFiles(rootDir + "Releases", "*.zip") do
-        printf "\nLarge files in %s:\n" (Path.GetFileName(zipPkg))
+        printf "\nLarge files in %s %dk:\n" (Path.GetFileName(zipPkg)) (FileInfo(zipPkg).Length / 1024L)
         let zip = new ZipInputStream(File.OpenRead(zipPkg))
         let mutable entry = zip.GetNextEntry()
         while entry <> null do
