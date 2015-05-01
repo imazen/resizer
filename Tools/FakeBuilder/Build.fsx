@@ -418,8 +418,8 @@ Target "update_imageserv" (fun _ ->
                         WriteToFile true "paket.dependencies" ["nuget " + pkg + " " + ver]
                         WriteToFile true "paket.references" [pkg]
         
-        Shell.Exec (".paket\\paket.bootstrapper.exe")
-        Shell.Exec (".paket\\paket.exe", "update --redirects --force")
+        Shell.Exec (".paket\\paket.bootstrapper.exe") |> ignore
+        Shell.Exec (".paket\\paket.exe", "update --redirects --force") |> ignore
         
         gitCommand "." ("add .")
         gitCommand "." ("commit -m \"AutoCommit: CI build "+ver+"\"")
@@ -478,22 +478,25 @@ Target "custom" (fun _ ->
     let targets = getBuildParamOrDefault "targets" ""
     let cliVersionString = ref ""
     
-    let targetList = List.map (fun x -> (
-                        let parts = (split ' ' x)
-                        if parts.[0] = "release" then
-                            cliVersionString := parts.[1]
-                        parts.[0])) (split ';' targets)
-    
-    if (targets.Contains("push") || targets.Contains("do_all")) && isRelease && not isAutoBuild && releaseVersionString <> !cliVersionString then
+    let filterList = 
+      fun x -> 
+          let parts = (split ' ' x)
+          if parts.[0] = "release" then
+              cliVersionString := parts.[1]
+          parts.[0]
+
+    let targetList = List.map(filterList)  (split ';' targets)
+
+    let user_is_pushing = targets.Contains "push" || targets.Contains "do_all"
+
+    if user_is_pushing && isRelease && (not isAutoBuild) && releaseVersionString <> !cliVersionString then
         if !cliVersionString = "" then
             failwith "Error: pushing of releases disabled from cli. To continue add 'release <semver>' to the target list that matches git tag."
         else
             failwith (sprintf "Error: git tag doesn't match cli release input (git: %s, cli: %s)" releaseVersionString !cliVersionString)
     
-    elif targetList.Length > 0 then
-        for i=0 to targetList.Length-1 do
-            if targetList.[i] <> "release" then
-                Run targetList.[i]
+    for target in List.filter(fun name -> name <> "release") targetList do
+        Run target
 )
 
 Target "do_all" (fun _ ->
