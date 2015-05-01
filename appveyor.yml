@@ -6,43 +6,62 @@ version: 4.0.0.{build}
 services:
   - mssql2012sp1
 
+matrix:
+  fast_finish: true
+
+
 environment:
   resizer_test_mongo_db: mongodb://localhost:27017/resizer2
-  
-  fb_nuget_url: https://www.myget.org/F/imazen-nightlies/
-  fb_nuget_key:
-    secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
-  
-#  fb_s3_bucket: resizer-nightlies
-#  fb_s3_id:
-#    secure: mx+xpHdJQkR3uu0BiLt2QV8xF5hUuZUdC5eiUrHMnjI=
-#  fb_s3_key:
-#    secure: zDprokKssnwwiYb2wL6jaUavU4KklFiJN2cHy1Uwo5dTWiq6b3e9vigy3dsKhiwj
-  
-  # a nuget url should go here eventually
-  fb_nuget_rel_url: https://www.myget.org/F/resizer-rel-test/
-  fb_nuget_rel_key:
-    secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
-  
-  fb_s3_rel_bucket: imazen-test-rel
-  fb_s3_rel_id:
-    secure: Qi7mSLHr94NfJaH0CzQSVPEl1peaOoJADyfHwiVtJzo=
-  fb_s3_rel_key:
-    secure: RP9hZqS0Pt2SLeias0iZpt2E9OltVX8OPfhWnGET6fQKZ05Fy6y0z1JcWWvONhF0
-  
-  fb_pub_url: https://s3.amazonaws.com/imazen-test
-  
-  fb_imageserver_repo: github.com/imazen/resizer-images.git
-  fb_imageserver_path: resizer-images
-  fb_imageserver_branch: develop
-  # should be set to master when resizer-images is updated
-  fb_imageserver_rel_branch: develop
-  
-  imageserver_user: resizer-bot
-  imageserver_mail:
-    secure: Ki6EM9c3O3ioPTfrbWZMtQ==
-  imageserver_token:
-    secure: ShmRBY5OrRHdAfze81bt2iqFr+6JHh0FAnApuB4d+bGgksdicVa/BJinCQyS/92B
+  matrix: 
+
+  #This build has no license key enforcement. For verified AGPL and paid customers.
+  - license_keys: false
+    #Nuget target feed for nightlies
+    fb_nuget_url: 
+      secure: N/C7Edcuu/hVDDGZnp7lhJLYNUvT2HCrUA0l6axJZWmTV/v1V9xePzIpgDGQ3T78d1g3MDpvbRJ/ioMxFCy4XA==
+    fb_nuget_key:
+      secure: bd9FjQP6MRkmDIkwOW1uPwlg/baX8ug67VbBLP55B158zorSJqpHAFrENVuVhw3/
+    #Nuget target feed for releases
+    fb_nuget_rel_url:
+      secure: N/C7Edcuu/hVDDGZnp7lhIG0giibMSvdxTrHwmgfi0Ro9cuoOGWXOkjgkMaFq+uSiQojoQtDqNDGfoVRwqZ0Lw==
+    fb_nuget_rel_key:
+      secure: bd9FjQP6MRkmDIkwOW1uPwlg/baX8ug67VbBLP55B158zorSJqpHAFrENVuVhw3/
+
+  #This build may have license key enforcemenet on certain plugins
+  - license_keys: true
+    #Nuget target feed for nightlies
+    fb_nuget_url: https://www.myget.org/F/imazen-nightlies/
+    fb_nuget_key:
+      secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
+    #  fb_s3_bucket: resizer-nightlies
+    #  fb_s3_id:
+    #    secure: mx+xpHdJQkR3uu0BiLt2QV8xF5hUuZUdC5eiUrHMnjI=
+    #  fb_s3_key:
+    #    secure: zDprokKssnwwiYb2wL6jaUavU4KklFiJN2cHy1Uwo5dTWiq6b3e9vigy3dsKhiwj
+    # a nuget url should go here eventually
+    fb_nuget_rel_url: https://www.myget.org/F/resizer-rel-test/
+    fb_nuget_rel_key:
+      secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
+
+    fb_s3_rel_bucket: imazen-test-rel
+    fb_s3_rel_id:
+      secure: Qi7mSLHr94NfJaH0CzQSVPEl1peaOoJADyfHwiVtJzo=
+    fb_s3_rel_key:
+      secure: RP9hZqS0Pt2SLeias0iZpt2E9OltVX8OPfhWnGET6fQKZ05Fy6y0z1JcWWvONhF0
+
+    fb_pub_url: https://s3.amazonaws.com/imazen-test
+
+    fb_imageserver_repo: github.com/imazen/resizer-images.git
+    fb_imageserver_path: resizer-images
+    fb_imageserver_branch: develop
+    # should be set to master when resizer-images is updated
+    fb_imageserver_rel_branch: develop
+    
+    imageserver_user: resizer-bot
+    imageserver_mail:
+      secure: Ki6EM9c3O3ioPTfrbWZMtQ==
+    imageserver_token:
+      secure: ShmRBY5OrRHdAfze81bt2iqFr+6JHh0FAnApuB4d+bGgksdicVa/BJinCQyS/92B
 
 before_build:
   
