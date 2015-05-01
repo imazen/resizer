@@ -12,6 +12,9 @@ matrix:
 
 environment:
   resizer_test_mongo_db: mongodb://localhost:27017/resizer2
+
+  can_acceess_secure_vars: 
+    secure: VeSU4qx0Ux6Wu4ZM9f+TTg==
   matrix: 
 
   #This build has no license key enforcement. For verified AGPL and paid customers.
@@ -85,8 +88,8 @@ before_build:
 build_script:
   - cd Tools
   - builder update
-  - if /I NOT "%imageserver_token%"=="" builder do_all
-  - if /I "%imageserver_token%"=="" builder do_anonymous
+  - if /I NOT "%can_acceess_secure_vars%"=="" builder do_all
+  - if /I "%can_acceess_secure_vars%"=="" builder do_anonymous
   - cd ..
 
 after_build:
