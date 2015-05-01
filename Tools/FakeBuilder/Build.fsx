@@ -204,7 +204,7 @@ Target "pack_nuget" (fun _ ->
     
     let nvc = ["author", "Nathanael Jones, Imazen";
            "owners", "nathanaeljones, imazen";
-           "pluginsdlldir", (rootDir+"dlls/trial");
+           "pluginsdlldir", (rootDir+"dlls/release");
            "coredlldir", (rootDir+"dlls/release");
            "iconurl", "http://imageresizing.net/images/logos/ImageIconPSD100.png";
            "plugins", "## 30+ plugins available\n\n" + 
