@@ -2,9 +2,9 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-#r @"..\..\packages\FAKE.3.26.1\tools\FakeLib.dll"
-#r @"..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll"
-#r @"..\..\packages\AWSSDK.2.2.4.0\lib\net45\AWSSDK.dll"
+#r @".\packages\FAKE\tools\FakeLib.dll"
+#r @".\packages\SharpZipLib\lib\20\ICSharpCode.SharpZipLib.dll"
+#r @".\packages\AWSSDK\lib\net45\AWSSDK.dll"
 
 #load "AssemblyPatcher.fs"
 #load "FsQuery.fs"

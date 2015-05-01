@@ -87,7 +87,7 @@ before_build:
 
 build_script:
   - cd Tools
-  - builder update
+  - builder prepare
   - if /I NOT "%can_acceess_secure_vars%"=="" builder do_all
   - if /I "%can_acceess_secure_vars%"=="" builder do_anonymous
   - cd ..
