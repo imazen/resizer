@@ -7,7 +7,7 @@ services:
   - mssql2012sp1
 
 cache:
-  - packages -> **\packages.config
+  - packages
 
 matrix:
   fast_finish: true
