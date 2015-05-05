@@ -19,7 +19,7 @@ We [have a guide for using Slimmage and ImageResizer together](http://imageresiz
 
 Simply reference a .webp file as you would a .jpg
 
-  image.webp?width=100&format=jpg
+    image.webp?width=100&format=jpg
 
 A 100px wide jpeg will be returned. 
 

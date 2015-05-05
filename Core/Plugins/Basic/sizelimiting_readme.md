@@ -16,11 +16,11 @@ You can also limit photo resolution with `imageWidth/imageHeight`. Originals wil
 
 Example configuration with defaults: 
 
-  <resizer>
-    <sizelimits imageWidth="0" imageHeight="0" totalWidth="3200"
-                totalHeight="3200" totalBehavior="throwexception" />
-    ...
-  </resizer>
+    <resizer>
+      <sizelimits imageWidth="0" imageHeight="0" totalWidth="3200"
+                  totalHeight="3200" totalBehavior="throwexception" />
+      ...
+    </resizer>
 
 
 
@@ -63,25 +63,25 @@ They affect the output in a similar manner as changing maxwidth and maxheight wo
 
 In rare cases, it may make sense to completely remove the plugin. This can be done through code or via Web.config.
 
-  protected void Application_Start(object sender, EventArgs e) {
-    Config.Current.Plugins.LoadPlugins();
-    Config.Current.Plugins.Get<SizeLimiting>().Uninstall(Config.Current) 
-  }
+    protected void Application_Start(object sender, EventArgs e) {
+      Config.Current.Plugins.LoadPlugins();
+      Config.Current.Plugins.Get<SizeLimiting>().Uninstall(Config.Current) 
+    }
 
 Web.config: 
 
-  <?xml version="1.0" encoding="utf-8" ?>
-  <configuration>
-    <configSections>
-      <section name="resizer" type="ImageResizer.ResizerSection,ImageResizer"  requirePermission="false"  />
-    </configSections>
+    <?xml version="1.0" encoding="utf-8" ?>
+    <configuration>
+      <configSections>
+        <section name="resizer" type="ImageResizer.ResizerSection,ImageResizer"  requirePermission="false"  />
+      </configSections>
 
-    <resizer>
-      <plugins>
-        <remove name="SizeLimiting" />
-      </plugins>
-    </resizer>
-  </configuration>
+      <resizer>
+        <plugins>
+          <remove name="SizeLimiting" />
+        </plugins>
+      </resizer>
+    </configuration>
 
 
 

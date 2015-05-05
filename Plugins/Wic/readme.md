@@ -38,8 +38,8 @@ Vs. PrettyGifs: 3-8x faster for encoding 8-bit PNG images. 2-5x faster for GIF i
 Activate with `&encoder=wic`
 
 * quality = 0..100
-* subsampling=444|422|420
-* dither=false|true (default is true, unlike PrettyGifs)
+* subsampling=444&#124;422&#124;420
+* dither=false&#124;true (default is true, unlike PrettyGifs)
 * colors=2..256
 
 
@@ -59,7 +59,7 @@ Select the resizing filter with `w.filter=fant|bicubic|linear|nearest`
 * frame=1..?
 * width
 * height
-* mode=max|pad|crop
+* mode=max&#124;pad&#124;crop
 * scale
 * maxwidth
 * maxheight

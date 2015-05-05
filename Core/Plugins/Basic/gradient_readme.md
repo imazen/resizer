@@ -37,53 +37,53 @@ Generates gradients on the fly. Very useful for rapid prototyping and design - b
 
 The Gradient plugin is an example of a simple yet very useful plugin. It implements IQuerystringPlugin to inform the ImageResizer to 'look' for image URLs with specific querystring keys for processing, and implements IVirtualImageProvider so it can provide gradient images to the ImageResizer as if they existed on disk. This allows those gradients to be post-processed like any image, even included as a watermark over another image. 
 
-  using System;
-  using System.Collections.Generic;
-  using System.Text;
-  using System.Collections.Specialized;
-  using System.Drawing;
-  using System.Drawing.Drawing2D;
-  using ImageResizer.Util;
-  using System.IO;
-  using System.Drawing.Imaging;
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using System.Collections.Specialized;
+    using System.Drawing;
+    using System.Drawing.Drawing2D;
+    using ImageResizer.Util;
+    using System.IO;
+    using System.Drawing.Imaging;
 
-  namespace ImageResizer.Plugins.Basic {
-      /// <summary>
-      /// Allows gradients to be dynamically generated like so:
-    /// /gradient.png?color1=white&amp;color2=black&amp;angle=40&amp;width=20&amp;height=100
-      /// </summary>
-      public class Gradient: IPlugin, IQuerystringPlugin, IVirtualImageProvider {
-        
-          public bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
-              return (virtualPath.EndsWith("/gradient.png", StringComparison.OrdinalIgnoreCase));
-          }
+    namespace ImageResizer.Plugins.Basic {
+        /// <summary>
+        /// Allows gradients to be dynamically generated like so:
+      /// /gradient.png?color1=white&amp;color2=black&amp;angle=40&amp;width=20&amp;height=100
+        /// </summary>
+        public class Gradient: IPlugin, IQuerystringPlugin, IVirtualImageProvider {
+          
+            public bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
+                return (virtualPath.EndsWith("/gradient.png", StringComparison.OrdinalIgnoreCase));
+            }
 
-          public IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
-              return new GradientVirtualFile(queryString);
-          }
+            public IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
+                return new GradientVirtualFile(queryString);
+            }
 
-          public IEnumerable<string> GetSupportedQuerystringKeys() {
-              return new string[] {"color1","color2", "angle", "width", "height" };
-          }
+            public IEnumerable<string> GetSupportedQuerystringKeys() {
+                return new string[] {"color1","color2", "angle", "width", "height" };
+            }
 
-          public IPlugin Install(Configuration.Config c) {
-              c.Plugins.add_plugin(this);
-              return this;
-          }
+            public IPlugin Install(Configuration.Config c) {
+                c.Plugins.add_plugin(this);
+                return this;
+            }
 
-          public bool Uninstall(Configuration.Config c) {
-              c.Plugins.remove_plugin(this);
-              return true;
-          }
+            public bool Uninstall(Configuration.Config c) {
+                c.Plugins.remove_plugin(this);
+                return true;
+            }
 
 
-          public class GradientVirtualFile : IVirtualFile, IVirtualBitmapFile {
-              public GradientVirtualFile(NameValueCollection query) { this.query = new ResizeSettings(query); }
-              public string VirtualPath {
-                  get { return "gradient.png"; }
-              }
+            public class GradientVirtualFile : IVirtualFile, IVirtualBitmapFile {
+                public GradientVirtualFile(NameValueCollection query) { this.query = new ResizeSettings(query); }
+                public string VirtualPath {
+                    get { return "gradient.png"; }
+                }
 
-              protected ResizeSettings query;
+                protected ResizeSettings query;
 
               public System.IO.Stream Open() {
                   MemoryStream ms = new MemoryStream();

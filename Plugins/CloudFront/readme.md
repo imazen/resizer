@@ -20,21 +20,21 @@ Either run `Install-Package ImageResizer.Plugins.CloudFront` in the NuGet packag
 
 Many CDNs strip off all querystring data before passing the request on to the origin server (the Image Resizer). To avoid this limitation, we've devised an alternate syntax using semicolons.
 
-  image.jpg;width=100;height=100;crop=auto
+    image.jpg;width=100;height=100;crop=auto
 
 This allows us to reference a CDN server, but still dynamically process and edge-cache images.
 
 Here's a URL directly to my origin server
 
-  http://images.imageresizing.net/red-leaf.jpg;width=100
+   http://images.imageresizing.net/red-leaf.jpg;width=100
 
 Here's a URL pointing to the CDN (I've set up a CNAME to mask the distribution name). The CDN sends the request on to the origin server, caches the response, and sends it back to the current (and any future) clients.
 
-  http://img.imageresizing.net/red-leaf.jpg;width=100
+   http://img.imageresizing.net/red-leaf.jpg;width=100
 
 Unless you set up a CNAME to mask it, your URL will look like this: 
 
-  http://d3urjqacv88oxz.cloudfront.net/red-leaf.jpg;width=100
+    http://d3urjqacv88oxz.cloudfront.net/red-leaf.jpg;width=100
 
 Feel free to play around with my URLs and experiment. 
 

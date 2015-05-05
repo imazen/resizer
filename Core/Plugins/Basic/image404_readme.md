@@ -49,13 +49,13 @@ URL: `/missingimage.jpg?width=200&height=200&404=default`
 This can be accomplished by adding a URL rewriting handler during App_Start. 
 The following sample affects all paths containing '/propertyimages/'
 
-  ImageResizer.Configuration.Config.Current.Pipeline.RewriteDefaults += 
-  
-    delegate(IHttpModule m, HttpContext c, ImageResizer.Configuration.IUrlEventArgs args) {
-      
-      if (args.VirtualPath.IndexOf("/propertyimages/", StringComparison.OrdinalIgnoreCase) > -1)
-        args.QueryString["404"] = "~/images/404.png";
+    ImageResizer.Configuration.Config.Current.Pipeline.RewriteDefaults += 
+    
+      delegate(IHttpModule m, HttpContext c, ImageResizer.Configuration.IUrlEventArgs args) {
         
-    };
+        if (args.VirtualPath.IndexOf("/propertyimages/", StringComparison.OrdinalIgnoreCase) > -1)
+          args.QueryString["404"] = "~/images/404.png";
+          
+      };
 
 
