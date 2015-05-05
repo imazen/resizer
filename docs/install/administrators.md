@@ -15,7 +15,7 @@ If `Web.config` already exists in the target website or application, go to the n
 
 ## Installing the HttpModule into an existing web site
 
-1. Copy `ImageResizer.dll`, `ImageResizer.Mvc.dll`, and `ImageResizer.pdb` [from the .zip download](/download) into the 'bin' folder of the website, creating it if it doesn't exist.
+1. Copy `ImageResizer.dll` and `ImageResizer.pdb` [from the .zip download](/download) into the 'bin' folder of the website, creating it if it doesn't exist.
 3. Save [this file](/attachments/Web.config.txt) into the root of the website and rename it to "Web.config". If a Web.config fie already exists, [you will need to edit it](/docs/install/web-config).
 4. Browse to the web site and type '/resizer.debug.ashx' directly after the domain or IP address. You should get a page of diagnostic information if everything is working. If you need help, [just ask](/support)!
 
