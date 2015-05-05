@@ -1,29 +1,29 @@
 Flags: hidden
 layout: false
 
+div.markdown-body
+  - if page.meta.edition and not page.flag?('edition')
+    p 
+      | This plugin (#{page.heading}) is part of the 
+      a href=page.edition.path =page.edition.heading
+    p 
+      a href="/licenses"
+        =page.edition.meta.cost
 
-- if page.meta.edition and not page.flag?('edition')
-  p 
-    | This plugin (#{page.heading}) is part of the 
-    a href=page.edition.path =page.edition.heading
-  p 
-    a href="/licenses"
-      =page.edition.meta.cost
 
+  markdown:
+    **Where is the plugins section?**
+    
+    The `<plugins>` section is located in Web.config, and is nested inside the `<resizer>` element, which is nested inside `<configuration>`. For examples, see [this sample Web.config file](/docs/configuration).
+    
+    **Where can I find the dll?**
 
-markdown:
-  **Where is the plugins section?**
-  
-  The `<plugins>` section is located in Web.config, and is nested inside the `<resizer>` element, which is nested inside `<configuration>`. For examples, see [this sample Web.config file](/docs/configuration).
-  
-  **Where can I find the dll?**
+    We prefer that you install via NuGet, but you can also find the plugin DLL files in the /dlls/release folder of [your download](/download). 
 
-  We prefer that you install via NuGet, but you can also find the plugin DLL files in the /dlls/release folder of [your download](/download). 
+    **How do I typically install a plugin via Web.Config?**
 
-  **How do I typically install a plugin via Web.Config?**
+    1. In Visual Studio, right click on your project and choose "Add reference". Browse to the plugin DLL and click "OK". 
+    2. In the [&lt;plugins> section](/docs/configuration) of Web.config, insert &lt;add name="PluginName" />
+    3. Look at the plugin documentation to see what configuration options (if any) are available.
 
-  1. In Visual Studio, right click on your project and choose "Add reference". Browse to the plugin DLL and click "OK". 
-  2. In the [&lt;plugins> section](/docs/configuration) of Web.config, insert &lt;add name="PluginName" />
-  3. Look at the plugin documentation to see what configuration options (if any) are available.
-
-  **[How do I typically install a plugin via code](/docs/v3/install/non-web)?**
+    **[How do I typically install a plugin via code](/docs/v3/install/non-web)?**

@@ -19,13 +19,13 @@ You **must** disable overlapped recycling on the application pool running this p
 
 ## URL Usage
 
-* f.detect=true - Causes a JSON response to be returned in the following format:
+* `f.detect=true` - Causes a JSON response to be returned in the following format:
 
-  {"dx":0.0,"dy":0.0,"dw":604.0,"dh":453.0,"ow":604.0,"oh":453.0,"cropx":0.0,"cropy":0.0,"cropw":604.0,"croph":453.0,
-  "features":[{"X":344.0,"Y":73.0,"X2":388.0,"Y2":117.0,"Accuracy":87.0},{"X":159.0,"Y":55.0,"X2":206.0,"Y2":102.0,"Accuracy":82.0},{"X":416.0,"Y":52.0,"X2":459.0,"Y2":95.0,"Accuracy":72.0},{"X":96.0,"Y":54.0,"X2":147.0,"Y2":105.0,"Accuracy":44.0},{"X":467.0,"Y":50.0,"X2":508.0,"Y2":91.0,"Accuracy":30.0},{"X":270.0,"Y":59.0,"X2":311.0,"Y2":100.0,"Accuracy":8.0},{"X":368.0,"Y":270.0,"X2":396.0,"Y2":298.0,"Accuracy":6.0},{"X":238.0,"Y":84.0,"X2":264.0,"Y2":110.0,"Accuracy":5.0}],"message":null}
+    {"dx":0.0,"dy":0.0,"dw":604.0,"dh":453.0,"ow":604.0,"oh":453.0,"cropx":0.0,"cropy":0.0,"cropw":604.0,"croph":453.0,
+    "features":[{"X":344.0,"Y":73.0,"X2":388.0,"Y2":117.0,"Accuracy":87.0},{"X":159.0,"Y":55.0,"X2":206.0,"Y2":102.0,"Accuracy":82.0},{"X":416.0,"Y":52.0,"X2":459.0,"Y2":95.0,"Accuracy":72.0},{"X":96.0,"Y":54.0,"X2":147.0,"Y2":105.0,"Accuracy":44.0},{"X":467.0,"Y":50.0,"X2":508.0,"Y2":91.0,"Accuracy":30.0},{"X":270.0,"Y":59.0,"X2":311.0,"Y2":100.0,"Accuracy":8.0},{"X":368.0,"Y":270.0,"X2":396.0,"Y2":298.0,"Accuracy":6.0},{"X":238.0,"Y":84.0,"X2":264.0,"Y2":110.0,"Accuracy":5.0}],"message":null}
 
-* f.getlayout=true - JSON response is returned with layout data, but no face detection is performed.
-* f.show=true - Draws green rectangles around all the detected faces in the image
+* `f.getlayout=true` - JSON response is returned with layout data, but no face detection is performed.
+* `f.show=true` - Draws green rectangles around all the detected faces in the image
 
 ## Managed API Usage
 
@@ -35,13 +35,13 @@ Returns a list of face objects for the given image (path, stream, Bitmap, etc).
 Note that the face coordinates are relative to the unrotated, unflipped source image.
 ImageResizer.js can *keep* these coordinates synced during rotations/flipping if they are stored in the 'f.rects' querystring key before the 'srotate' or 'sflip' commands are applied.
 
-  Config.Current.Plugins.Get<FacesPlugin>().GetFacesFromImage(object image,NameValueCollection settings); //Returns List<Face>
+    Config.Current.Plugins.Get<FacesPlugin>().GetFacesFromImage(object image,NameValueCollection settings); //Returns List<Face>
 
 Returns a comma-delimited list of face coordinates (x,y,x2,y2,accuracy) for the given image (path, stream, Bitmap, etc).
 Note that the face coordinates are relative to the unrotated, unflipped source image.
 ImageResizer.js can *keep* these coordinates synced during rotations/flipping if they are stored in the 'f.rects' querystring key before the 'srotate' or 'sflip' commands are applied.
 
-  Config.Current.Plugins.Get<FacesPlugin>().GetFacesFromImageAsString(object image,NameValueCollection settings); //Returns string
+    Config.Current.Plugins.Get<FacesPlugin>().GetFacesFromImageAsString(object image,NameValueCollection settings); //Returns string
 
 
 All tuning parameters are identical between the URL and Managed API.

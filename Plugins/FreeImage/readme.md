@@ -30,7 +30,7 @@ FreeImageEncoder can encode jpegs 2-3x as fast as GDI can, and offers more encod
 
 Install by adding `<add name="FreeImageEncoder" />` to the plugins section of Web.config. And make sure you've added the 3 required dlls.
   
-Use by adding &encoder=freeimage to the URL.
+Use by adding `&encoder=freeimage` to the URL.
 
 No support for transparency - so only use it on PNG and GIF files that don't need it.
 
@@ -50,7 +50,7 @@ Adds support for FreeImage resizing algorithms, which include CatmullRom, Lanczo
 
 Installed by adding `<add name="FreeImageResizer" />`
   
-Activated by adding &fi.scale=bicubic|bilinear|box|bspline|catmullrom|lanczos command
+Activated by adding &fi.scale=bicubic&#124;bilinear&#124;box&#124;bspline&#124;catmullrom&#124;lanczos command
 
 
 ## License

@@ -20,11 +20,11 @@ Either run `Install-Package ImageResizer.Plugins.PsdReader` in the NuGet package
 
 Simply reference a .psd file as you would a .jpg
 
-  image.psd?width=100
+    image.psd?width=100
 
 A 100px wide jpeg will be returned. 
 
 You can also simply convert the image to another format.
 
-  image.psd?format=png
-  image.psd?format=jpg
+    image.psd?format=png
+    image.psd?format=jpg

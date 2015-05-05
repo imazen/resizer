@@ -15,12 +15,12 @@ Allows you to specify the default settings to use when certain settings are omit
 
 ## Configuration Syntax
 
-  <resizer>
-  ...
-    <defaultsettings explicitSizeScaleMode="DownscaleOnly" 
-                     maxSizeScaleMode="DownscaleOnly" />
-  ...
-  </resizer>
+    <resizer>
+    ...
+      <defaultsettings explicitSizeScaleMode="DownscaleOnly" 
+                       maxSizeScaleMode="DownscaleOnly" />
+    ...
+    </resizer>
 
 ## Configuration reference
 
@@ -53,15 +53,15 @@ So, nothing has changed. The defaults are the same as in V3, V2, and V1. But, we
 
 If you voted for 'Only for width/height', use
 
-  <defaultsettings explicitSizeScaleMode="Both" />
+    <defaultsettings explicitSizeScaleMode="Both" />
 
 If you voted "Yes!", use
 
-  <defaultsettings explicitSizeScaleMode="Both" maxSizeScaleMode="Both" />
+   <defaultsettings explicitSizeScaleMode="Both" maxSizeScaleMode="Both" />
 
 If you voted for upscaling the canvas, use
 
-  <defaultsettings explicitSizeScaleMode="UpscaleCanvas" maxSizeScaleMode="UpscaleCanvas" />
+   <defaultsettings explicitSizeScaleMode="UpscaleCanvas" maxSizeScaleMode="UpscaleCanvas" />
   
 
 Hopefully this will help make everyone happy - feel free to contact me at support@imageresizing.net or [create an idea](http://resizer.uservoice.com) if you have ideas or suggestions, I'm always willing and eager to make the Image Resizer easier to understand and use.

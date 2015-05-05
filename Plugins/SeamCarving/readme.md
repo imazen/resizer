@@ -25,7 +25,7 @@ For live examples, [see this page](http://nathanaeljones.com/596/dynamic-seam-ca
 
 ## Example use:
 
-  image.jpg?width=300&height=300&carve=true
+    image.jpg?width=300&height=300&carve=true
 
 ## Installation
 

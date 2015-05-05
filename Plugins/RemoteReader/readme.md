@@ -62,27 +62,27 @@ All other exceptions are WebExceptions
 
 ## Example event handler for whitelisting part of a website for relay
 
-  using ImageResizer.Plugins.RemoteReader;
-  
-  protected void Application_Start(object sender, EventArgs e) {
-    RemoteReaderPlugin.Current.AllowRemoteRequest += Current_AllowRemoteRequest;
-  }
+    using ImageResizer.Plugins.RemoteReader;
+    
+    protected void Application_Start(object sender, EventArgs e) {
+      RemoteReaderPlugin.Current.AllowRemoteRequest += Current_AllowRemoteRequest;
+    }
 
-  static void Current_AllowRemoteRequest(object sender, RemoteRequestEventArgs args) {
-    if (args.RemoteUrl.StartsWith("http://atrustedwebsite.com/photos/", StringComparison.OrdinalIgnoreCase))
-      args.DenyRequest = false;
-  }
+    static void Current_AllowRemoteRequest(object sender, RemoteRequestEventArgs args) {
+      if (args.RemoteUrl.StartsWith("http://atrustedwebsite.com/photos/", StringComparison.OrdinalIgnoreCase))
+        args.DenyRequest = false;
+    }
   
   
 ## Example code for generating a signed URL
 
-  using ImageResizer.Plugins.RemoteReader;
-  
-  img1.ImageUrl = RemoteReaderPlugin.Current.CreateSignedUrl("http://atrustedwebsite.com/photos/leaf.jpg", 
-                                        new ResizeSettings("width=200&height=100"));
-  //For the following to work, allowAllSignedRequests must be true
-  img2.ImageUrl = RemoteReaderPlugin.Current.CreateSignedUrl("http://arandomwebsite.com/photos/leaf.jpg", 
-                                        new ResizeSettings("width=200&height=100"));
+    using ImageResizer.Plugins.RemoteReader;
+    
+    img1.ImageUrl = RemoteReaderPlugin.Current.CreateSignedUrl("http://atrustedwebsite.com/photos/leaf.jpg", 
+                                          new ResizeSettings("width=200&height=100"));
+    //For the following to work, allowAllSignedRequests must be true
+    img2.ImageUrl = RemoteReaderPlugin.Current.CreateSignedUrl("http://arandomwebsite.com/photos/leaf.jpg", 
+                                          new ResizeSettings("width=200&height=100"));
 
 ## Limitations of human-friendly syntax
 
@@ -90,22 +90,22 @@ The human-friendly syntax has to go through the IIS and ASP.NET request filterin
 
 In 3.1.5 and higher, spaces are supported in URLs, but to support '+' characters in remote URLs, you have to [make a change in Web.config](http://stackoverflow.com/questions/1453218/is-enabling-double-escaping-dangerous), as IIS considers '+' dangerous by default. IIS needs Prozac.
 
-  <system.webServer>
-      <security>
-          <requestFiltering allowDoubleEscaping="True"/>
-      </security>
-  </system.webServer>
+    <system.webServer>
+        <security>
+            <requestFiltering allowDoubleEscaping="True"/>
+        </security>
+    </system.webServer>
 
 ## Proxy auto-detection
 
 .NET automatically attempts to detect the proxy configuration each time the application starts. To prevent this (often) unnecessary 2-10 second delay, you can disable proxy detection in web.config (below).
 
-  <configuration>
-    <system.net>
-      <defaultProxy enabled="false">
-      </defaultProxy>
-    </system.net>
-  </configuration>
+    <configuration>
+      <system.net>
+        <defaultProxy enabled="false">
+        </defaultProxy>
+      </system.net>
+    </configuration>
 
 ## Non-ascii URLs
 
