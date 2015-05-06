@@ -98,6 +98,14 @@
   <ItemGroup>
     <EmbeddedResource Include="pthreadVSE2.dll" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="readme.md" />
+    <None Include="Web.config.transform" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="GPL.txt" />
+    <Content Include="ReadMe.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

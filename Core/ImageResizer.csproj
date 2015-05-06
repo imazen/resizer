@@ -233,6 +233,24 @@
     <Content Include="plugin-notes.txt" />
     <Content Include="totest.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Plugins\Basic\autorotate_readme.md" />
+    <None Include="Plugins\Basic\clientcache_readme.md" />
+    <None Include="Plugins\Basic\defaultencoder_readme.md" />
+    <None Include="Plugins\Basic\defaultsettings_readme.md" />
+    <None Include="Plugins\Basic\diagnostics_readme.md" />
+    <None Include="Plugins\Basic\dropshadow_readme.md" />
+    <None Include="Plugins\Basic\folderresizesyntax_readme.md" />
+    <None Include="Plugins\Basic\gradient_readme.md" />
+    <None Include="Plugins\Basic\iepngfix_readme.md" />
+    <None Include="Plugins\Basic\image404_readme.md" />
+    <None Include="Plugins\Basic\imagehandlersyntax_readme.md" />
+    <None Include="Plugins\Basic\mvcroutingshim_readme.md" />
+    <None Include="Plugins\Basic\presets_readme.md" />
+    <None Include="Plugins\Basic\sizelimiting_readme.md" />
+    <None Include="Plugins\Basic\speedorquality_readme.md" />
+    <None Include="Plugins\Basic\virtualfolder_readme.md" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

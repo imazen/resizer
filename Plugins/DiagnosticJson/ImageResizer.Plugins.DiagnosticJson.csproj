@@ -75,6 +75,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="readme.md" />
+    <None Include="Web.config.transform" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="COPYRIGHT.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
