@@ -8,6 +8,7 @@ using System.IO;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
+using System.Linq;
 
 namespace ImageResizer.ProviderTests {
     public static class CloudStorageEmulatorShepherd {
@@ -27,11 +28,14 @@ namespace ImageResizer.ProviderTests {
                     });
             }
             catch (Microsoft.WindowsAzure.Storage.StorageException) {
-                string executable = "WAStorageEmulator.exe";
+                
                 string path = @"C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator";
+                var filenames = new string[] { "AzureStorageEmulator", "WAStorageEmulator.exe" }.Select(name => Path.Combine(path, name));
+
+                string filename = filenames.First(n => File.Exists(n));
 
                 ProcessStartInfo processStartInfo = new ProcessStartInfo() {
-                    FileName = Path.Combine(path, executable),
+                    FileName = filename,
                     Arguments = @"start",
                 };
 
