@@ -30,7 +30,7 @@ namespace ImageResizer.ProviderTests {
             catch (Microsoft.WindowsAzure.Storage.StorageException) {
                 
                 string path = @"C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator";
-                var filenames = new string[] { "AzureStorageEmulator", "WAStorageEmulator.exe" }.Select(name => Path.Combine(path, name));
+                var filenames = new string[] { "AzureStorageEmulator.exe", "WAStorageEmulator.exe" }.Select(name => Path.Combine(path, name));
 
                 string filename = filenames.First(n => File.Exists(n));
 
