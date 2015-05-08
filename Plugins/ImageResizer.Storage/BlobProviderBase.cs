@@ -274,8 +274,25 @@ namespace ImageResizer.Storage
             c.Pipeline.RewriteDefaults +=Pipeline_RewriteDefaults;
             c.Pipeline.PostRewrite +=Pipeline_PostRewrite;
             c.Plugins.GetOrInstall<ImageResizer.Plugins.LicenseVerifier.LicenseEnforcer<BlobProviderBase>>();
+
+            EnsureShimRegistered(c); //TODO; we should only install the shim for the singleton, but instead we are installing for every config. We can't access Config.Current here without creating recursion
             return this;
         }
+
+        private static object lockShim = new object();
+        private static VirtualPathProviderShim shim = null;
+        private static void EnsureShimRegistered(Configuration.Config c)
+        {
+            lock (lockShim)
+            {
+                if (shim == null)
+                {
+                    var s = new VirtualPathProviderShim(c);
+                    HostingEnvironment.RegisterVirtualPathProvider(s);
+                    shim = s;
+                }
+            }
+        } 
 
         void Pipeline_PostRewrite(System.Web.IHttpModule sender, System.Web.HttpContext context, Configuration.IUrlEventArgs e)
         {
