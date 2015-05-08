@@ -275,7 +275,8 @@ namespace ImageResizer.Storage
             c.Pipeline.PostRewrite +=Pipeline_PostRewrite;
             c.Plugins.GetOrInstall<ImageResizer.Plugins.LicenseVerifier.LicenseEnforcer<BlobProviderBase>>();
 
-            EnsureShimRegistered(c); //TODO; we should only install the shim for the singleton, but instead we are installing for every config. We can't access Config.Current here without creating recursion
+
+            if (HostingEnvironment.IsHosted)  EnsureShimRegistered(c); //TODO; we should only install the shim for the singleton, but instead we are installing for every config. We can't access Config.Current here without creating recursion
             return this;
         }
 
