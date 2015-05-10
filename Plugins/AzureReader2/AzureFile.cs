@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using System.Web.Hosting;
-using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
