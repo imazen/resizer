@@ -1,52 +1,48 @@
 ﻿/* Copyright (c) 2011 Wouter A. Alberts and Nathanael D. Jones. See license.txt for your rights. */
 using System;
 using System.IO;
+using System.Net;
 using System.Web.Hosting;
-using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
-namespace ImageResizer.Plugins.AzureReader2 {
+namespace ImageResizer.Plugins.AzureReader2
+{
 
-    public class AzureFile : VirtualFile, IVirtualFile {
+    /// <summary>
+    /// Represents a virtual file that reads the file from Microsoft Azure Blob Storage.
+    /// </summary>
+    public class AzureFile : VirtualFile, IVirtualFile
+    {
+        private readonly AzureVirtualPathProvider parent;
 
-        protected readonly AzureVirtualPathProvider parent;
-
-        public AzureFile(string blobName, AzureVirtualPathProvider parentProvider) : base(blobName) {
+        public AzureFile(string blobName, AzureVirtualPathProvider parentProvider)
+            : base(blobName)
+        {
             parent = parentProvider;
         }
         /// <summary>
-        /// Attempts to download the blob into a MemoryStream instance and return it. Throws a FileNotFoundException if the blob doesn't exist.
+        /// Attempts to download the blob into a MemoryStream instance and return it. Throws a FileNotFoundException if the blob or container doesn't exist.
+        /// Can also throw other exceptions from the StorageClient
         /// </summary>
-        /// <returns></returns>
-        public override System.IO.Stream Open() {
-            // Prefix already stripped from virtual path
-
+        public override Stream Open()
+        {
             MemoryStream ms = new MemoryStream(4096); // 4kb is a good starting point.
 
-            // Synchronously download
-            try {
-                // Get a reference to the blob
-                // mb: 12/8/2012 - the path needs to be a uri now, so combining blobclient baseuri with the virtualpath
+            try
+            {
                 Uri blobUri = new Uri(string.Format("{0}/{1}", parent.CloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\'), VirtualPath));
                 ICloudBlob cloudBlob = parent.CloudBlobClient.GetBlobReferenceFromServer(blobUri);
 
                 cloudBlob.DownloadToStream(ms);
             }
-            catch (StorageException e) {
-                // mb: 12/8/2012 - not sure of the correctness of these following lines
-                // in other areas we just check e.RequestInformation.HttpStatusCode == 404 for a Not Found error
-                // don't know what the errorcodes that will be returned
-                if (e.RequestInformation.ExtendedErrorInformation.ErrorCode == "BlobNotFound") {
-                    throw new FileNotFoundException("Azure blob file not found", e);
-                }
-                else if (e.RequestInformation.ExtendedErrorInformation.ErrorCode == "ContainerNotFound")
+            catch (StorageException e)
+            {
+                if (e.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
                 {
-                    throw new FileNotFoundException("Azure blob container not found", e);
+                    throw new FileNotFoundException("Azure error: " + e.RequestInformation.HttpStatusMessage, e);
                 }
-                else {
-                    throw;
-                }
+                throw;
             }
 
             ms.Seek(0, SeekOrigin.Begin); // Reset to beginning
