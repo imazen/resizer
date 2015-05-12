@@ -78,7 +78,7 @@ namespace ImageResizer
                 throw new ImageProcessingException(403, "Access denied", "Access denied");
             }
 
-            if (result == HttpModuleRequestAssistant.PostAuthorizeResult.Complete && ra.RewrittenQueryHasDirective)
+            if (result == HttpModuleRequestAssistant.PostAuthorizeResult.Complete)
             {
 
                 //Does the file exist physically? (false if VppUsage=always or file is missing)
@@ -101,7 +101,7 @@ namespace ImageResizer
                     ra.FireMissing();
                     return;
                 }
-                
+
                 try
                 {
                     await HandleRequest(app.Context, ra, vf);
@@ -137,8 +137,11 @@ namespace ImageResizer
 
             if (!ra.CachingIndicated && !ra.ProcessingIndicated)
             {
-
-                //TODO: Pass on to static file handler!
+                ra.ApplyRewrittenPath(); //This is needed for both physical and virtual files; only makes changes if needed.
+                if (vf != null)
+                {
+                    ra.AssignSFH(); //Virtual files are not served in .NET 4.
+                }
                 return;
             }
 

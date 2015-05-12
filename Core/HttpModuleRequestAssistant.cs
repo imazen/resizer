@@ -11,6 +11,7 @@ using ImageResizer.ExtensionMethods;
 using ImageResizer.Encoding;
 using ImageResizer.Plugins.Basic;
 using System.Globalization;
+using System.Reflection;
 
 namespace ImageResizer.Configuration
 {
@@ -172,6 +173,24 @@ namespace ImageResizer.Configuration
             context.Items[conf.ResponseArgsKey] = null;
         }
 
+        private  IHttpHandler CreateSFH(){
+            Type type = typeof(HttpApplication).Assembly.GetType("System.Web.StaticFileHandler", true);
+            return (IHttpHandler)Activator.CreateInstance(type, true);
+        }
+
+        public void ApplyRewrittenPath()
+        {
+            var currentPath = context.Request.FilePath + context.Request.PathInfo;
+            if (this.RewrittenVirtualPath != currentPath)
+            {
+                context.RewritePath(this.RewrittenVirtualPath + PathUtils.BuildQueryString(this.RewrittenQuery)); //Apply the new querystring also, or it would be lost
+            }
+        }
+        public void AssignSFH()
+        {
+            
+            context.RemapHandler(CreateSFH());
+        }
     }
 }
     
