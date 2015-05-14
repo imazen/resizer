@@ -139,6 +139,8 @@ bool BitmapFloat_convolve_rows(Context * context, BitmapFloat * buf,  Convolutio
 
     const float  * __restrict kern = kernel->kernel;
 
+    const int  wrap_mode = 0;
+
     for (uint32_t row = from_row; row < until_row; row++) {
 
         float* __restrict source_buffer = &buf->pixels[row * buf->float_stride];
@@ -158,12 +160,30 @@ bool BitmapFloat_convolve_rows(Context * context, BitmapFloat * buf,  Convolutio
                 memset(avg, 0, sizeof(float) * ch_used);
 
                 if (left < 0 || right >= (int32_t)w) {
-                    /* Accumulate each channel */
-                    for (i = left; i <= right; i++) {
-                        const float weight = kern[i - left];
-                        const uint32_t ix = EVIL_CLAMP(i, 0, int_w - 1);
+                    if (wrap_mode == 0){
+                        //Only sample what's present, and fix the average later.
+                        float total_weight = 0;
+                        /* Accumulate each channel */
+                        for (i = left; i <= right; i++) {
+                            if (i > 0 && i < int_w){
+                                const float weight = kern[i - left];
+                                total_weight += weight;
+                                for (uint32_t j = 0; j < ch_used; j++)
+                                    avg[j] += weight * source_buffer[i * step + j];
+                            }
+                        }
                         for (uint32_t j = 0; j < ch_used; j++)
-                            avg[j] += weight * source_buffer[ix * step + j];
+                            avg[j] = avg[j] / total_weight;
+                    }
+                    else if (wrap_mode == 1){
+                        //Extend last pixel to be used for all missing inputs
+                        /* Accumulate each channel */
+                        for (i = left; i <= right; i++) {
+                            const float weight = kern[i - left];
+                            const uint32_t ix = EVIL_CLAMP (i, 0, int_w - 1);
+                            for (uint32_t j = 0; j < ch_used; j++)
+                                avg[j] += weight * source_buffer[ix * step + j];
+                        }
                     }
                 } else {
                     /* Accumulate each channel */
