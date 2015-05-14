@@ -161,7 +161,7 @@ bool BitmapFloat_convolve_rows(Context * context, BitmapFloat * buf,  Convolutio
                     /* Accumulate each channel */
                     for (i = left; i <= right; i++) {
                         const float weight = kern[i - left];
-                        const uint32_t ix = EVIL_CLAMP(i, 0, int_w);
+                        const uint32_t ix = EVIL_CLAMP(i, 0, int_w - 1);
                         for (uint32_t j = 0; j < ch_used; j++)
                             avg[j] += weight * source_buffer[ix * step + j];
                     }
