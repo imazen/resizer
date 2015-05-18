@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>ImageResizer.Plugins.TinyCache</id>
+		<title>ImageResizer.Plugins.TinyCache - Disk caching for tiny sites</title>
+		<version>$version$</version>
+		<authors>$author$</authors>
+		<owners>$owners$</owners>
+		<licenseUrl>http://imageresizing.net/licenses/apache</licenseUrl>
+		<projectUrl>http://imageresizing.net</projectUrl>
+		<iconUrl>$iconurl$</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+<description>
+	TinyCache provides a fixed-size (30MB) disk cache. TinyCache is not compatible with the AsyncInterceptModule, only with InterceptModule. It is not as fast as the full DiskCache implementation, but does have the advantage of only using a fixed amount of disk space instead of a loose file count limit.
+
+
+$plugins$
+</description>
+		<tags>ImageResizer TinyCache</tags>
+		<dependencies>
+		  <dependency id="ImageResizer" version="[$version$,)" />
+		</dependencies>
+	</metadata>
+  	<files>
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.TinyCache.dll" target="lib\net45" />
+		<file src="$pluginsdlldir$\ImageResizer.Plugins.TinyCache.xml" target="lib\net45" />
+	</files>
+</package>
