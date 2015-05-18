@@ -55,7 +55,7 @@ Filters may be removed or renamed prior to release. You are reminded that FastSc
 ### Sharpening
 
 FastScaling can typically perform sharpening at zero extra cost, as the sharpening percentage is composed into the weighting function used for resampling.
- For no-op scaling or certain (small) 'Fast' filters, this adds a tiny amount of overhead. 
+ For no-op scaling or certain (small) 'Fast' filters, this adds a tiny amount of overhead. FastScaling sharpening is roughly 20x faster than the sharpening provided by AdvancedFilters.
 
 * `&f.sharpen=0..100`
 

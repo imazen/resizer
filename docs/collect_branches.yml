@@ -1,3 +1,5 @@
 branches:
-- branch: master
+- branch: support/v3
   subfolder: docs/v3
+- branch: develop
+  subfolder: docs/v4
