@@ -1,4 +1,5 @@
 Aliases: /docs/configuration-all
+Flags: hidden
 
 # Configuration Reference
 
