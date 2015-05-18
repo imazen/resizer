@@ -330,11 +330,13 @@ namespace ImageResizer.Configuration {
             IVirtualFileAsync f = null;
             foreach (IVirtualImageProviderAsync p in c.Plugins.GetAll<IVirtualImageProviderAsync>())
             {
-                if (await p.FileExistsAsync(virtualPath, queryString)){
+                if (await p.FileExistsAsync(virtualPath, queryString))
+                {
                     f = await p.GetFileAsync(virtualPath, queryString);
                     break;
                 }
             }
+            if (f == null) return null;
             try
             {
                 //Now we have a reference to the real virtual file, let's see if it is source-cached.
