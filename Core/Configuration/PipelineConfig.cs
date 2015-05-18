@@ -626,7 +626,7 @@ namespace ImageResizer.Configuration {
             get
             {
                 if (_authorizeAllImages == null) {
-                    _authorizeAllImages = c.get("pipeline.authorizeAllImages", false);
+                    _authorizeAllImages = c.get("pipeline.authorizeAllImages", true);
                 }
                 return _authorizeAllImages.Value;
             }
