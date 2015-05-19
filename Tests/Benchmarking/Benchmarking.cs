@@ -87,6 +87,7 @@ namespace Bench
                 {
                     ((IDisposable)j.Result).Dispose();
                 }
+                JobProfiler.ResetBarriers();
             };
             return b;
         }
