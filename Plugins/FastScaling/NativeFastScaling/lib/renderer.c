@@ -9,7 +9,9 @@
 #ifdef _MSC_VER
 #pragma unmanaged
 #pragma warning(disable : 4996)
+#if _MSC_VER < 1900 
 #define snprintf _snprintf
+#endif
 #endif
 
 
