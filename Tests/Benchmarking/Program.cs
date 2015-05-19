@@ -59,11 +59,16 @@ namespace Bench
             //CompareGdToDefault("encode");
 
             //CompareFastScaling("bit");
-
-           // CompareFastScalingToDefaultHQ("bit");
+            
+            //CompareFastScalingToDefaultHQ("bit");
 
             //CompareFastScalingSpeeds("bit");
-            CompareFastScalingToDefault("bit");
+            //CompareFastScalingToDefault("bit");
+
+            Console.WriteLine("Just rendering");
+            CompareFastScalingByThreading("bit");
+            Console.WriteLine("Including decoding and encoding");
+            CompareFastScalingByThreading("op");
 
             Console.Write("Done\n");
             Console.ReadKey();
@@ -265,12 +270,74 @@ namespace Bench
                                                         i + 1, r.Item1, r.Item2.GetStats().ParallelRealMs, 
                                 r.Item2.ParallelRealMs() / comparableResults.Min(c => c.Item2.ParallelRealMs()), r.Item2.GetStats().ParallelConcurrencyPercent));
 
-                    Console.WriteLine("Paralell: \n" + string.Join("\n", parList));
+                    Console.WriteLine("Parallel: \n" + string.Join("\n", parList));
                     Console.WriteLine("\n");
 
                 }
             }
         }
+
+
+
+        public static void PlotByThreads(BenchmarkingSettings settings,
+           IEnumerable<Tuple<Config, Instructions, string>> configsAndLabels)
+        {
+            settings.Images.PrepareImagesAsync().Wait();
+
+           Console.WriteLine();
+           String isolation = (settings.SegmentNameFilter != "op" && !settings.UseBarrierAroundSegment) ?
+                                "Measuring '" + settings.SegmentNameFilter + "' without memory barrier; multi-threaded results invalid."
+                                : (settings.UseBarrierAroundSegment ? "Segment '" + settings.SegmentNameFilter + "' w/ mem barrier."
+                                : "Segment '" + settings.SegmentNameFilter + "'.") + (Environment.Is64BitProcess ? " 64-bit" : " 32-bit");
+           Console.WriteLine(isolation);
+
+            var combinations = settings.Images.GetImagesAndDescriptions().Combine(settings.SharedInstructions).Combine(configsAndLabels).Select(a => new Tuple<Tuple<string,string>, Instructions, Config, Instructions, string>(a.Item1.Item1, a.Item1.Item2, a.Item2.Item1, a.Item2.Item2, a.Item2.Item3));
+            foreach (var c in combinations)
+            {
+                var combined = c.Item4 == null ? c.Item2 : new Instructions(c.Item4.MergeDefaults(c.Item2));
+                var runner = Benchmark.BenchmarkInMemory(c.Item3,c.Item1.Item1, combined, settings.ExcludeDecoding, settings.ExcludeEncoding);
+                runner.Label = c.Item5;
+
+                if (settings.UseBarrierAroundSegment)
+                    runner.ProfilerProvider = (s, t) => new JobProfiler(s).JoinThreadsAroundSegment(settings.SegmentNameFilter, t);
+                else
+                    runner.ProfilerProvider = (s, t) => new JobProfiler(s);
+
+                Console.Write(runner.Label);
+                for (var threads = 1; threads <= Environment.ProcessorCount; threads++){
+
+
+                    if (threads > 1)
+                    {
+                        runner.SequentialRuns = 0;
+                        runner.ParallelRuns = settings.ParallelRuns;
+                        runner.ParallelThreads = threads;
+                    }
+                    else
+                    {
+                        runner.SequentialRuns = settings.SequentialRuns;
+                        runner.ParallelRuns = 0;
+                    }
+
+                    runner.ThrowawayThreads = threads;
+                    runner.ThrowawayRuns = settings.ThrowawayRuns;
+                    
+
+                    var results = runner.Benchmark();
+
+                    var set = results.FindSet(settings.SegmentNameFilter);
+                   
+
+                    var time = threads == 1 ? set.GetStats().SequentialMs.Avg : set.ParallelRealMs();
+
+                    Console.Write(',');
+                    Console.Write(time.ToString("f0"));
+                }
+                Console.WriteLine();
+            }
+        }
+
+
 
         public static string[] GetStats(string label, SegmentStats stats){
             return new string[]{
@@ -436,6 +503,35 @@ namespace Bench
 
 
         }
+
+
+
+
+
+        public static void CompareFastScalingByThreading(string segment = "op")
+        {
+   
+            var settings = BenchmarkingDefaults();
+            settings.Images.AddBlankImages(
+                new Tuple<int, int, string>[] { new Tuple<int, int, string>(4000, 4000, "jpg")});
+            settings.SharedInstructions = new Instructions[]{new Instructions(
+                "width=800&scale=both") };
+
+            settings.ThrowawayRuns = 2;
+            settings.SequentialRuns = 4;
+            settings.ParallelRuns = 2;
+            settings.SegmentNameFilter = segment;
+            settings.ExclusiveTimeSignificantMs = 1;
+            var configs = new Tuple<Config, Instructions, string>[]{
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins(),null,"System.Drawing"),
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true;&down.speed=5&f.ignorealpha=true"),"FastScaling speed prioritized"),
+                    new Tuple<Config, Instructions, string>(ConfigWithPlugins("ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),new Instructions("fastscale=true"),"FastScaling quality optimized")};
+
+            PlotByThreads(settings, configs);
+            
+        }
+
+
 
         public static void CompareFastScalingToWic(string segment = "op")
         {

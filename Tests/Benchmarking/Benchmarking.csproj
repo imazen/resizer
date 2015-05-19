@@ -42,7 +42,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\dlls\release\x86\</OutputPath>
@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Benchmarking.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="ImageProvider.cs" />
     <Compile Include="ImageResizer.Profiling\JobProfiler.cs" />
     <Content Include="OldBenchmarkingObserver.cs.txt" />
@@ -115,6 +116,10 @@
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\FastScaling\ImageResizer.Plugins.FastScaling.vcxproj">
+      <Project>{9b97d952-2969-4f46-9758-9e712cdf3f72}</Project>
+      <Name>ImageResizer.Plugins.FastScaling</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Imazen.Profiling\Imazen.Profiling.csproj">
       <Project>{35c46578-8bd7-410d-94e9-2afb11629083}</Project>
