@@ -37,15 +37,16 @@ environment:
     fb_nuget_url: https://www.myget.org/F/imazen-nightlies/
     fb_nuget_key:
       secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
-    #  fb_s3_bucket: resizer-nightlies
-    #  fb_s3_id:
-    #    secure: mx+xpHdJQkR3uu0BiLt2QV8xF5hUuZUdC5eiUrHMnjI=
-    #  fb_s3_key:
-    #    secure: zDprokKssnwwiYb2wL6jaUavU4KklFiJN2cHy1Uwo5dTWiq6b3e9vigy3dsKhiwj
-    # a nuget url should go here eventually
-    fb_nuget_rel_url: https://www.myget.org/F/resizer-rel-test/
+    fb_s3_bucket: "resizer-nightlies"
+    fb_s3_id:
+      secure: FTa/u2Pi/dXMCfgDw5iC5pIUTtTjLdhvg8PA8nRyPJw=
+    fb_s3_key:
+      secure: 7JfttWZLof6WQc0DwIlvF3Bh2HaF7v56vYgmz82YcWJrcsCENHIxAxnI/nL+zwO9
+
+    #nuget.org for releases
+    fb_nuget_rel_url: https://nuget.org/api/v2/package
     fb_nuget_rel_key:
-      secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
+      secure: xFnWCh3CKpo6o4Q6lvO9obenkhTfUSPYoPX6kdu/pJcr36mssQw5jvaUK2CDGQRT
 
     fb_s3_rel_bucket: imazen-test-rel
     fb_s3_rel_id:
@@ -53,7 +54,7 @@ environment:
     fb_s3_rel_key:
       secure: RP9hZqS0Pt2SLeias0iZpt2E9OltVX8OPfhWnGET6fQKZ05Fy6y0z1JcWWvONhF0
 
-    fb_pub_url: https://s3.amazonaws.com/imazen-test
+    fb_pub_url: https://s3.amazonaws.com/imazen-nightlies
 
     fb_imageserver_repo: github.com/imazen/resizer-images.git
     fb_imageserver_path: resizer-images
