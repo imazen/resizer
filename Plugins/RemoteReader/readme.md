@@ -28,9 +28,7 @@ It is possible to set 'allowAllSignedRequests=true', but you must handle the Rem
 
 ## Installation
 
-Either run `Install-Package ImageResizer.Plugins.RemoteReader` in the NuGet package manager, then follow the 3rd step below, or:
-
-1. Add ImageResizer.Plugins.RemoteReader.dll to your project
+1. Add ImageResizer.Plugins.RemoteReader.dll to your project or run `Install-Package ImageResizer.Plugins.RemoteReader`.
 2. Add `<add name="RemoteReader" />` inside `<resizer><plugins></plugins></resizer>` in Web.config.
 3. Add `<remotereader signingKey="put a long and very secure key here"></remotereader>` inside `<resizer></resizer>`. Make sure the key is kept safe, and is the same across all servers in the web farm (if you're using one). This key can contain any xml-safe characters, and should be as long as possible. URLs generated with one key will not work with another.
 
