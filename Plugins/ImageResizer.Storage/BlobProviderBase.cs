@@ -44,7 +44,7 @@ namespace ImageResizer.Storage
             this.RequireImageExtension = true;
             this.LazyExistenceCheck = true;
             this.CacheUnmodifiedFiles = false;
-            this.ExposeAsVpp = false;
+            this.ExposeAsVpp = true;
             this.CheckForModifiedFiles = false;
             this.CacheMetadata = true;
             MetadataCache = new StandardMetadataCache();
