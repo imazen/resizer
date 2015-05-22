@@ -1,8 +1,8 @@
 ﻿# PdfiumRenderer licensing
 
 The PdfiumRenderer plugin depends on the [PdfiumViewer](https://github.com/pvginkel/PdfiumViewer) project
-which is licensed under the LGPL v3](http://www.gnu.org/licenses/lgpl-3.0.txt) license. This project
-in trun depends on the [pdfium](https://code.google.com/p/pdfium/) project which. The pdfium project
+which is licensed under the Apache 2 license. This project
+in turn depends on the [pdfium](https://code.google.com/p/pdfium/) project which is licensed under various BSD/MIT-style licenses. The pdfium project
 is actually composed out of a few different projects, each with their own license. See
 [PDFium license](https://github.com/pvginkel/PdfiumViewer/tree/master/PDFium%20License) for the full
 details of this.
