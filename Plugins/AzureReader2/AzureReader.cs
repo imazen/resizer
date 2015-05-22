@@ -31,13 +31,14 @@ namespace ImageResizer.Plugins.AzureReader2 {
         public AzureReader2Plugin()
             : base()
         {
+            this.VirtualFilesystemPrefix = "~/azure";
 
         }
-        public AzureReader2Plugin(NameValueCollection args):base() {
+        public AzureReader2Plugin(NameValueCollection args):this() {
             LoadConfiguration(args);
             blobStorageConnection = args["connectionstring"];
             blobStorageEndpoint = args.GetAsString("blobstorageendpoint", args.GetAsString("endpoint",null));
-            RedirectToBlobIfUnmodified = args.Get<bool>("redirectToBlobIfUnmodified", false);
+            RedirectToBlobIfUnmodified = args.Get<bool>("redirectToBlobIfUnmodified", true);
 
         }
 
