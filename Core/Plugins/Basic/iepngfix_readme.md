@@ -4,7 +4,7 @@ Edition: free
 Tagline: Automatically serve GIF versions of PNG files to IE6 and below clients. Opt-in or opt-out, very configurable.
 Aliases: /plugins/iepngfix
 
-# IEPngFix plugin (New in V3.1.3)
+# IEPngFix plugin
 
 This plugin automatically redirects PNG file requests from Internet Explorer 6 and below to GIF versions of the images. For best results, use with the PrettyGifs plugin, as the default .NET GIF encoding is very poor.
 

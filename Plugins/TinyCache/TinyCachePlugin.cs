@@ -59,7 +59,7 @@ namespace ImageResizer.Plugins.TinyCache {
         }
 
         /// <summary>
-        /// 30MB is the maxmimum size of the cache. Writing more than that do disk during an image request would cause a timeout for sure.
+        /// 30MB is the maxmimum size of the cache. Writing more than that to disk during an image request would cause a timeout for sure.
         /// </summary>
         public int MaxBytes { get { return 30 * 1024 * 1024; } }
 

@@ -4,7 +4,7 @@ Bundle: free
 Tagline: Allows you to configure the default setting values when commands (like `scale`) are omitted.
 Aliases: /plugins/defaultsettings
 
-# DefaultSettings plugin (V3.1+)
+# DefaultSettings plugin
 
 Allows you to specify the default settings to use when certain settings are omitted. Currently supports ScaleMode defaults. May be extended to allow defaults for other settings in the future - please [create an idea](http://resizer.uservoice.com) for additional features you'd like to see.
 

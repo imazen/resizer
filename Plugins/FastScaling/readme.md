@@ -1,8 +1,7 @@
 Tags: plugin
 Edition: performance
-Tagline: "FastScaling offers the highest-quality image scaling and sharpening available. It can also be up to 30x faster than GDI+ DrawImage."
+Tagline: "FastScaling offers the highest-quality image scaling and sharpening available. It can also be up to 43x faster than Graphics.DrawImage, the default."
 Aliases: /plugins/fastscaling
-
 
 # FastScaling plugin
 
@@ -12,14 +11,28 @@ This [bypasses the severe performance and moderate quality issues of Graphics.Dr
 
 FastScaling uses best-in-class resampling algorithms, and can perform them in the right 'working' color space (or in a color space customized for the shadow/highlight preservation needs of your image).
 
-Unlike DrawImage, it uses orthogonal/separable resampling, and requires less of the CPU cache. On a 4-core laptop, **this can translate into a 16-30X increase in throughput** when benchmarked against DrawImage for photos from your average 16MP pocket camera. Even when executed on a single-thread, this can mean a 5-12X performance advantage.
+Unlike DrawImage, it uses orthogonal/separable resampling, and requires less of the CPU cache. On a 4-core laptop, **this can translate into a 16-30X increase in throughput** when benchmarked against DrawImage for photos from your average 16MP pocket camera. Even when executed on a single-thread, this can mean a 5-12X performance advantage. On a Azure D14 instance, FastScaling has been measured to be 43x faster).
 
 Will you always see benefits this drastic? No. For tiny images that can fit - in their entirety - on your CPU cache (say 300x300), the gain is small - 25% on a single thread, or 0.8 x core count for a throughput increase.
 
 If you have a large number of cores, you might see much *larger* increases in throughput.
 
-Including the jpeg encoding and decoding cost (which FastScaling does not address), enabling FastScaling will translate into roughly a 3-5X increase in overall performance for 16MP images.
-  
+Including the jpeg encoding and decoding cost (which FastScaling does not address), enabling FastScaling will translate into roughly a 4.5-9.6X increase in overall performance for 16MP images.
+
+
+## Benchmarks
+
+The following benchmarks were created by opening the FastScaling solution on [commit de24b168](https://github.com/imazen/resizer/commit/de24b168457279da74202676e4be4eccad1b6b53) and running the Benchmark program in 64-bit Release mode, using an Azure D14 instance with Visual Studio 2015 RC installed. Source images are 4,000 x 4,000 jpeg images, and destination images are 800x800 jpegs.
+
+This benchmark measures only rendering performance (it excludes jpeg encoding/decoding, which is not affected by FastScaling). Relative performance peaks at 43.5x faster (on 15 threads).
+
+![FastScaling vs DrawImage (Azure D14 instance)](http://z.zr.io/rw/scaling-benchmark.png?crop=30,40,-1,-1&width=700)
+
+This benchmark measures end-to-end image decoding, rendering, and re-encoding. It excludes I/O. Relative performance peaks at 9.6x faster (on 8 threads).
+
+![FastScaling vs DrawImage (including decode and encode) (Azure D14 instance)](http://z.zr.io/rw/decode-scale-encode.png?crop=30,0,-1,-1&width=700)
+
+The raw [CSV results are here](https://github.com/imazen/Graphics-vNext/blob/master/fastscaling-benchmark-azure-d14.csv), and include a performance delta row. 
 
 ## Usage (From InternalDrawImage, BuildJob, or the URL API )
 
@@ -95,7 +108,7 @@ If you know that transparency information can be discarded, specify `&f.ignoreal
 
 <a name="drawimage"></a>
 
-## Perforamance problems with DrawImage
+## Performance problems with DrawImage
 
 [Graphics.DrawImage()](https://msdn.microsoft.com/en-us/library/system.drawing.graphics.drawimage%28v=vs.110%29.aspx) holds a process-wide lock, and is a very severe bottleneck for any imaging work on the GDI+/.NET platform. 
 This is unfortunate, as WIC and WPF do not offer any high-quality resampling filters, and DirectX is 10-20X slower than DrawImage. 

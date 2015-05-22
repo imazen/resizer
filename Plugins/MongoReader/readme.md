@@ -9,12 +9,6 @@ Aliases: /plugins/mongoreader
 
 Allows files stored on MongoDB GridFS to be resized and processed as if they were local.
 
-Requires .NET 3.5. 
-
-In version 3.1.5, you will need to build ImageResizer.Plugins.MongoReader.csproj yourself, as precompiled binaries and nuget packages won't be included until V3.2
-
-This plugin is alpha, but supported.
-
 ### Example URLs
 
 You can access files by their ID (best) or their filename (if it is URL-safe).
@@ -35,7 +29,6 @@ Either run `Install-Package ImageResizer.Plugins.MongoReader` in the NuGet packa
 
 You must specify a [valid connection string that includes both the database name and credentials](http://www.mongodb.org/display/DOCS/Connections).
 
-  <add name="MongoReader" prefix="gridfs" connectionString="mongodb://user:password@servername/database" />
+  <add name="MongoReader" prefix="~/gridfs" connectionString="mongodb://user:password@servername/database" />
 
-* prefix - the virtual folder mapped to the specified database. Defaults to 'gridfs'
 * connectionString - A [valid MongoDB connection string](http://www.mongodb.org/display/DOCS/Connections).

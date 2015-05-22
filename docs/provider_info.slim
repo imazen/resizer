@@ -1,0 +1,18 @@
+Flags: hidden
+layout: false
+
+div.markdown-body
+  markdown:
+    * `bool .CheckForModifiedFiles` (XML: `checkForModifiedFiles="false"`) - Causes the modified date of the source file to be retreived. If the modified date has changed, the image will be re-downloaded and re-processed. Affects performance, as it causes a roundtrip to occur even when an image is cached. Metadata caching can minimize the request count. 
+    * `bool .LazyExistenceCheck` (XML: `lazyExistenceCheck="true`") - If false (the default), does not check for the existence of a file until .Open() is called. Reduces network roundtrips.
+    * `bool .CacheMetadata` (XML: `cacheMetadata="true"`) - Enables metadata caching to minimize roundtrips (defaults to true).
+    * `IMetadataCache .MetadataCache` - The metadata cache to use. Defaults to StandardMetadataCache, which caches metadata for up to an hour after it was last accessed or used (sliding expiration). 
+    * `bool .ExposeAsVpp` (XML: `vpp="true"`) - Exposes the blobs via a VirtualPathProvider, so that they can be served (when unmodified) by StaticFileHandler. Otherwise, unmodified blobs may be inaccessible.
+    * `string .VirtualFilesystemPrefix` (XML: `prefix="~/vpp") - The virtual subfolder within which the blobs will be accessible. 
+    * `bool .RequireImageExtension` (XML: `requireImageExtension="true"`) - If false, the blob provider will cause non-image requests to be processed by ImageResizer. Always use a file extension if possible, as otherwise the wrong content-type may served by IIS.  If true, `prefix` may NOT overlap with any other routes or locations, as ImageResizer will be intercepting *all* requests within the specified virtual path. 
+    * `bool .UntrustedData` (XML: `untrustedData="false"`) - If true, all images will be re-encoded before being served to the client. Invalid or malicious images will fail with an error if they cannot be read as images. This should prevent malicious files from being served to the client.
+    * `bool .CacheUnmodifiedFiles` (XML: `cacheUnmodifiedFiles="false"` ) - If true, unmodified requests will be cached by ImageResizer (if DiskCache is installed). This can be useful if unmodified files are relatively small and the backend storage is latent.
+      
+    This plugin inherits most of its functionality  from [BlobProviderBase](/plugins/blobproviderbase), which you can use to create your own provider.
+
+== partial :edition_info

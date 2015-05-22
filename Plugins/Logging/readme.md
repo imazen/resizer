@@ -1,11 +1,10 @@
 Tags: plugin
 Bundle: free
-Edition: free
 Tagline: Allows logging through NLog
 Aliases: /plugins/logging
 
 
-# Logging plugin (v3.1+)
+# Logging plugin
 
 The Logging plugin allows the Image Resizer to perform logging (to disk, SQL, e-mail, whatever you configure).
 
