@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>ImageResizer.WebConfigAsync</id>
+  <title>ImageResizer Async Web.Config Installation</title>
+    <version>$version$</version>
+    <authors>$author$</authors>
+    <owners>$owners$</owners>
+    <licenseUrl>http://imageresizing.net/licenses/</licenseUrl>
+    <projectUrl>http://imageresizing.net</projectUrl>
+    <iconUrl>$iconurl$</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+  <description>
+
+Installs ImageResizer module by (carefully) modifying Web.Config. 
+
+Docs: http://imageresizing.net/
+
+Support: http://imageresizing.net/support
+
+$plugins$
+</description>
+    <tags>ImageResizer Imazen Resizer Web.Config imaging</tags>
+  <dependencies>
+    <dependency id="ImageResizer" version="[$version$,)" />
+  </dependencies>
+  </metadata>
+    <files>
+    <file src="..\Core\nuget\async\Web.config.transform" target="content" />
+  </files>
+
+</package>
