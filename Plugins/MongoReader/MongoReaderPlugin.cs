@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Specialized;
+using System.Configuration;
 using System.IO;
 using ImageResizer.Configuration;
 using ImageResizer.Configuration.Xml;
@@ -49,7 +50,8 @@ namespace ImageResizer.Plugins.MongoReader
         {
             VirtualFilesystemPrefix = string.IsNullOrEmpty(args["prefix"]) ? "~/gridfs/" : args["prefix"];
 
-            var mongoUrl = new MongoUrl(args["connectionString"]);
+            var connectionString = GetConnectionString(args);
+            var mongoUrl = new MongoUrl(connectionString);
 
             // Using new client, server database initialization. Wordy but recommended.
             var mongoClient = new MongoClient(mongoUrl);
@@ -57,6 +59,43 @@ namespace ImageResizer.Plugins.MongoReader
             _db = mongoServer.GetDatabase(mongoUrl.DatabaseName);
             _gridSettings = new MongoGridFSSettings();
             _grid = _db.GetGridFS(_gridSettings);
+        }
+
+        /// <summary>
+        /// Gets the connection string from the arguments on the plugin.
+        /// </summary>
+        /// <param name="args">NameValueCollection including the connection string.</param>
+        /// <returns>The MongoDB connection string specified.</returns>
+        /// <exception cref="ApplicationException">When connection string not found.</exception>
+        public static string GetConnectionString(NameValueCollection args)
+        {
+            var connectionString = args["connectionString"];
+            if (!string.IsNullOrEmpty(connectionString))
+                return connectionString;
+
+            var connectionStringName = args["connectionStringName"];
+            if (!string.IsNullOrEmpty(connectionStringName))
+            {
+                var setting = ConfigurationManager.ConnectionStrings[connectionStringName];
+
+                if (setting == null || string.IsNullOrEmpty(setting.ConnectionString))
+                    throw new ApplicationException(string.Format("A connection string named \"{0}\" does not exist.", connectionStringName));
+
+                return setting.ConnectionString;
+            }
+
+            var appSettingKey = args["connectionStringAppKey"];
+            if (!string.IsNullOrEmpty(appSettingKey))
+            {
+                var appSetting = ConfigurationManager.AppSettings[appSettingKey];
+
+                if (string.IsNullOrEmpty(appSetting))
+                    throw new ApplicationException(string.Format("An app setting with key \"{0}\" does not exist.", appSettingKey));
+
+                return appSetting;
+            }
+
+            throw new ApplicationException("A MongoDB connection string must be specified.");
         }
 
         /// <summary>
