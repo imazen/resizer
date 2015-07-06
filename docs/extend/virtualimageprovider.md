@@ -4,6 +4,8 @@ Aliases: /docs/plugins/virtualimageprovider /docs/extend/virtualimageprovider
 
 If your images aren't stored on disk, you need a plugin. Read [plugin basics first, if you haven't already](/docs/plugins/basics) - it's very simple.
 
+If you're using V4 or later, subclassing `BlobProviderBase` is an easier path.
+
 Don't be intimidated. [Look at the Gradient plugin documentation and source code](/plugins/gradient). It's 1 page of source code and 7 lines of boilerplate code - all the rest is rubber on the road. Many of the other plugins (like S3Reader, SqlReader, etc) are more complicated than they need to be because they are also implementing `VirtualPathProvider`: a poorly designed abstract class courtesy of ASP.NET 2.0. If possible, avoid `VirtualPathProvider` and implement only `IVirtualImageProvider`. It's 1/10th the boilerplate, simpler to understand, and free of the framework-level bugs.
 
 ## Implementing IVirtualImageProvider
