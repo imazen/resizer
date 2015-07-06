@@ -76,15 +76,33 @@ version <-
 let mutable isRelease = false
 let mutable releaseVersionString = ""
 
-let ok,msg,errors = runGitCommand "" "describe --tags --exact-match --abbrev=0"
-if ok && msg.Count > 0 then
-    if isValidSemVer msg.[0] then
-        releaseVersionString <- msg.[0]
-        version <- parse releaseVersionString
-        isRelease <- true
-    else
-        printf "Warning: git tag is not a valid semver; not processing as a release\n"
+type System.String with
+    member s1.icompare(s2: string) =
+      System.String.Equals(s1, s2, System.StringComparison.CurrentCultureIgnoreCase);;
 
+let trimV (s) = 
+    Regex("^v").Replace(s, "")
+    
+let git_tag = 
+  if isAutoBuild && "True".icompare(environVar "APPVEYOR_REPO_TAG") then 
+    Some(environVar "APPVEYOR_REPO_TAG_NAME")
+  else 
+    let ok,msg,errors = runGitCommand "" "describe --tags --exact-match --abbrev=0"
+    if ok && msg.Count > 0 then
+      Some(msg.[0])
+    else
+      None
+
+match git_tag with
+| Some(s) when isValidSemVer(trimV s) -> 
+  isRelease <- true
+  releaseVersionString <- trimV s
+  version <- parse(trimV(s))
+  printf "Using git tag %s as the release version\n" s
+| Some(s) -> printf "Warning: git tag '%s' is not a valid semver; not processing as a release\n" s
+| None -> printf "No git tag found on this commit.\n"
+
+ 
 let nugetVer = { version with Build = "" }
 
 
@@ -123,10 +141,6 @@ Target "clean" (fun _ ->
 )
 
 Target "build" (fun _ ->
-    //MSBuild "" "Build" ["Configuration","Debug"] [mainSolution] |> ignore
-    //MSBuild "" "Build" ["Configuration","Debug"; "Platform","Win32"] [fastScaleSln] |> ignore
-    //MSBuild "" "Build" ["Configuration","Debug"; "Platform","x64"] [fastScaleSln] |> ignore
-
 
     MSBuild "" "Build" ["Configuration","Release"] [mainSolution] |> ignore
     MSBuild "" "Build" ["Configuration","Release"; "Platform","Win32"] [fastScaleSln] |> ignore
@@ -158,14 +172,12 @@ Target "patch_ver" (fun _ ->
     AssemblyPatcher.setInfo assemblyInfoFile [
         "AssemblyVersion", asmVer.ToString()+".0";
         "AssemblyFileVersion", fileVer.ToString()+"."+buildNo;
-        "AssemblyInformationalVersion", version.ToString();
-        "NugetVersion", nugetVer.ToString()]
+        "AssemblyInformationalVersion", version.ToString()]
 
     AssemblyPatcher.setInfo assemblyInfoCppFile [
         "AssemblyVersionAttribute", asmVer.ToString()+".0";
         "AssemblyFileVersionAttribute", fileVer.ToString()+"."+buildNo;
-        "AssemblyInformationalVersionAttribute", version.ToString();
-        "NugetVersionAttribute", nugetVer.ToString()]
+        "AssemblyInformationalVersionAttribute", version.ToString()]
 )
 
 Target "patch_info" (fun _ ->
