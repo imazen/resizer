@@ -1,5 +1,12 @@
 # v4-0-0
 
+## Image scaling and image sharpening are up to 30x faster than in v3 - and have higher quality output.  
+## New: GPL-only PdfRenderer has been replaced by apache-licensed [PdfiumRenderer](http://imageresizing.net/plugins/pdfiumrenderer).
+## New: Free disk caching via TinyCache. 
+## New: Async HttpModule
+## Fast, consistent, async blob providers based on new `ImageResizer.Storage.BlobProviderBase`
+## Everything either Apache 2 or AGPL v3 licensed *in addition* to commercial licenses.
+
 ###.NET 4.5 is now required by the core and all plugins. What does this mean?
 
 - We no longer support Windows XP or Windows Server 2003. You'll also want Visual Studio 2012 or newer.
@@ -8,7 +15,25 @@
 - We can access APIs for better filesystem consistency.
 - We can go async!
 
-### We offer an asynchronous pipeline
+### Changes in the pipeline
+
+Core: Refactor InterceptModule & AsyncInterceptModule to use HttpModuleRequestAssistant, to deduplicate code.
+
+Commands "ignoreicc" and "anchor" should not trigger processing alone. Autorotate should, as that has been legacy behavior.
+
+Core:  "scale", "stretch", "cropxunits", "cropyunits","mode" should not trigger image processing, as they are only modifier commands, and do nothing if used alone.
+
+
+Core: Add <pipeline defaultCommands"" /> XML setting; provides default commands
+
+---
+Delete certain querystring keys before they reach ImageResizer. Useful for removing a cache buster - so that a CDN cache can be busted without busting ImageResizer's disk cache at the same time.
+
+<pipeline dropQuerystringKeys="" />
+
+the dropQuerystringKeys attribute accepts a comma-delimited list of key names
+----
+
 
 Replace  `InterceptModule` with `AsyncInterceptModule` in Web.Config, and you'll be using our asynchronous pipeline.
 
@@ -38,6 +63,14 @@ These include: ImageResizer.Mvc, AzureReader, S3Reader, Controls, StreamUtils, U
 
 # Smaller improvements
 
+* Autorotate is now built-in - no longer a plugin you must install.
+* 
+
+Major core changes: Assign StaticFileHandler for all VPP-only requests (Fixes #140). Apply .Rewrite changes to all (existing) image requests (fixes fake extension issue #8 and #113). Call ImageMissing for *all* image 404, not just those processed.
+
+
+Fixes #139, VirtualPathProviderShim was not installed. Caused 404s for as-is files from AzureReader2 and S3Reader2.
+
 Add ImageJob.FinalWidth and ImageJob.FinalHeight (all pipelines). Closes #10. Needs unit tests.
 NuGet restore, .NET 4.5 compatibility
 
@@ -63,52 +96,48 @@ Add ImageResizer.Util.AsyncUtils class and CopyToMemoryStreamAsync extension met
 
 ## Bug fixes:
 
-Catch DirectoryNotFoundException as well as FileNotFoundException -> 404
-
-Fix Core Bug: EndProcess is never called for BuilderExtension plugins.
-
-Core: NoCache will buffer data to memorystream before writing to output stream. InvalidOperationException when accessing stream.Position within Bitmap.save - despite buffer = true. )(<- todo, this buffering should be conditional)
-
-Fixes #44. Switch from FileStream.Flush() to FileStream.Flush(true) to ensure files are written to disk before the method completes.
-
-Fixes #74. Delete unfinished image output file in case of an exception. Doesn't handle situation where source and dest path are the same; file will be deleted.
-
-Fixes #77; Ensure diagnostics page redaction code can handle a null node.
-
-Fixes issue #54, InvalidOperationException in TinyCache when there are 0 recent reads.  Supersedes pull request #105. Regression tests added.
-
-PathUtils.AddQueryString("/path?","key=value") should now produce "/path?key=value" instead of "/path?&key=value"
-
-Don't nullref when passed a ~/aspnet path outside of ASP.NET. Drop the tilde and pass to the virtual path providers.
-
-Prevent nullref when VirtualFolder is used outside of an ASP.NET application.
-
-Fixed: WIC builder no longer throws a NullReferenceException when provided a null stream. (This was preventing the correct error message)
+* Fixes #135 - Fix WIC bug causing stack overrun. COM IStream mixes use of 32 and 64 bit pointers. We were using the Microsoft-supplied MemoryIStream class, and failed to comprehensively audit the interfaces as we do with our own code.
+* Fixed: WIC builder no longer throws a NullReferenceException when provided a null stream. (This was preventing the correct error message)
+* Fix #117 - AdvancedFilters applies effects only the the image portion of the canvas. Does not work if the image has been rotated arbitrary angles. Region boundary rounding may effect equalization or white balance calculation. Add LayoutBuilder.GetRingAsRectF(name) function.
+* Fixes #77; Ensure diagnostics page redaction code can handle a null node.
+* Fix Core Bug: EndProcess is never called for BuilderExtension plugins.
+* PathUtils.AddQueryString("/path?","key=value") should now produce "/path?key=value" instead of "/path?&key=value"
+* Don't nullref when passed a ~/aspnet path outside of ASP.NET. Drop the tilde and pass to the virtual path providers.
+* Fixes issue #54, InvalidOperationException in TinyCache when there are 0 recent reads.  Supersedes pull request #105. Regression tests added.
+* Prevent nullref when VirtualFolder is used outside of an ASP.NET application.
+* Fixes #74. Delete unfinished image output file in case of an exception. Doesn't handle situation where source and dest path are the same; file will be deleted.
+* Fixes #44. Switch from FileStream.Flush() to FileStream.Flush(true) to ensure files are written to disk before the method completes.
+* Core: NoCache will buffer data to memorystream before writing to output stream. InvalidOperationException when accessing stream.Position within Bitmap.save - despite buffer = true. )
 
 Fix incorrect status code when any IVirtualFileCache is installed and an 404 occurs. Source(Mem/Disk)Cache call .Open and .Read during the GetFile() stage (callers expect only a null result on not found failure). PipelineConfig.GetFile must absorb FileNotFound exceptions to prevent the behavior contract from being violated.
 
-# Changes in plugins
+Catch DirectoryNotFoundException as well as FileNotFoundException, and cause a 404
 
-DiskCache no longer supports HashModifiedDate (it's always true). 
+
+## Changes in plugins
+
+* DiskCache no longer supports HashModifiedDate (it's always true). 
+
 
 ## Breaking changes for custom plugins:
 
-[breaking plugin api change]: Replace AbstractImageProcessor.buildToStream and AbstractImageProcessor.buildToBitmap with AbstractImageProcessor.BuildJobBitmapToStream and ImageBuilder.BuildJobBitmapToBitmap.
-
-InterceptModule now combines the date into the RequestKey, so no more conditional logic in plugins. ResponseArgs.HasModifiedDate and ResponseArgs.GetModifiedDateUtc are now obsolete.
+* [breaking plugin api change]: Replace AbstractImageProcessor.buildToStream and AbstractImageProcessor.buildToBitmap with AbstractImageProcessor.BuildJobBitmapToStream and ImageBuilder.BuildJobBitmapToBitmap.
+* [breaking plugin api change]: Replace ImageState.imageAttributes with float[][] ImageState.colorMatrix - permits InternalDrawImage to be implemented. ImageAttributes is write-only, cannot be read from.
+* InterceptModule now combines the date into the RequestKey, so no more conditional logic in plugins. ResponseArgs.HasModifiedDate and ResponseArgs.GetModifiedDateUtc are now obsolete.
+* Core: Replace ILicenseStore/ILicenseService with ILicenseProvider and ILicensedPlugin. Add WebConfigLicenseReader to plugins collection by default on asp.net. Replace LicenseVerifier project with offline-only implementation.
 
 Deprecated functionality now removed:
 
-Drop deprecated ImageResizer.Mvc AzureReader, S3Reader and Controls plugins.
+* Drop deprecated ImageResizer.Mvc AzureReader, S3Reader and Controls plugins.
+* Drop long-time deprecated StreamUtils class.
+* Drop long-time deprecated UrlHasher class.
+* Delete stub WPF plugin. WPF support is a sub-par goal considering it's poor image quality and other options available.
+* Drop misspelled, obsolete, duplicate CropRectange property from Instructions class.
+* Drop ImageResizer.Collections.ReadOnlyDictionary (unused)
+* Drop Builder and BuildTools; we now use FAKE and FakeBuilder instead
+* Delete WicCop; we never used it.
+* Drop all symbols-only nuget packages, makes build times 2x faster
 
-Drop long-time deprecated StreamUtils class.
-
-Drop long-time deprecated UrlHasher class.
-
-Delete stub WPF plugin. WPF support is a sub-par goal considering it's poor image quality and other options available.
-Drop misspelled, obsolete, duplicate CropRectange property from Instructions class.
-
-Catch DirectoryNotFoundException as well as FileNotFoundException -> 404
 
 # v3-4-3
 Date: May 8 2014
