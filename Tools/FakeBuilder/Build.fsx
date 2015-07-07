@@ -138,8 +138,8 @@ Target "clean" (fun _ ->
     MSBuild "" "Clean" ["Configuration","Release"; "Platform","x64"] [fastScaleSln] |> ignore
     MSBuild "" "Clean" ["Configuration","Debug"; "Platform","x64"] [fastScaleSln] |> ignore
     
-    CleanDirs [rootDir + "dlls/release"]
-    CleanDirs [rootDir + "dlls/debug"]
+    CleanDirs [rootDir + fixSlashes("dlls/release")]
+    CleanDirs [rootDir + fixSlashes("dlls/debug")]
 )
 
 Target "build" (fun _ ->
@@ -196,7 +196,7 @@ Target "test" (fun _ ->
         ++ (rootDir + "Tests/binaries/release/x64/ImageResizer.Plugins.FastScaling.Tests.dll")
         -- (rootDir + "**/ImageResizer.Plugins.LicenseVerifier.Tests.dll")
         -- (rootDir + "**/ImageResizer.CoreFSharp.Tests.dll")
-            |> xUnit (fun p -> {p with ToolPath = xunit})
+            |> xUnit2 (fun p -> {p with ToolPath = xunit; ExcludeTraits = Some("requiresmongo","true")})
             
     !! (rootDir + "Tests/binaries/release/*Tests.dll")
         //++ (rootDir + "Tests/binaries/release/x86/*Tests.dll")
@@ -206,7 +206,7 @@ Target "test" (fun _ ->
         -- (rootDir + "**/ImageResizer.AllPlugins.Tests.dll")
         -- (rootDir + "**/ImageResizer.CopyMetadata.Tests.dll")
         -- (rootDir + "**/ImageResizer.Plugins.TinyCache.Tests.dll")
-            |> xUnit (fun p -> {p with ToolPath = xunit32})
+            |> xUnit2 (fun p -> {p with ToolPath = xunit32; ExcludeTraits = Some("requiresmongo","true")})
 )
 
 Target "pack_nuget" (fun _ ->
@@ -420,8 +420,8 @@ Target "update_imageserv" (fun _ ->
                         WriteToFile true "paket.dependencies" ["nuget " + pkg + " " + ver]
                         WriteToFile true "paket.references" [pkg]
         
-        Shell.Exec (".paket\\paket.bootstrapper.exe") |> ignore
-        Shell.Exec (".paket\\paket.exe", "update --redirects --force") |> ignore
+        Shell.Exec (fixSlashes(".paket\\paket.bootstrapper.exe")) |> ignore
+        Shell.Exec (fixSlashes(".paket\\paket.exe"), "update --redirects --force") |> ignore
         
         gitCommand "." ("add .")
         gitCommand "." ("commit -m \"AutoCommit: CI build "+ver+"\"")
