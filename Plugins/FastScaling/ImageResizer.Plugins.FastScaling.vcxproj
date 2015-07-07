@@ -133,6 +133,7 @@
       <CompileAsManaged>true</CompileAsManaged>
       <AdditionalOptions>/Qvec-report:2 /d2Zi+ %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>$(ProjectDir)\NativeFastScaling\include</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
