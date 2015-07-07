@@ -2,9 +2,9 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-#r @".\packages\FAKE\tools\FakeLib.dll"
-#r @".\packages\SharpZipLib\lib\20\ICSharpCode.SharpZipLib.dll"
-#r @".\packages\AWSSDK\lib\net45\AWSSDK.dll"
+#r @"packages/FAKE/tools/FakeLib.dll"
+#r @"packages/SharpZipLib/lib/20/ICSharpCode.SharpZipLib.dll"
+#r @"packages/AWSSDK/lib/net45/AWSSDK.dll"
 
 #load "AssemblyPatcher.fs"
 #load "FsQuery.fs"
@@ -45,13 +45,15 @@ let variableList = ["fb_nuget_url"; "fb_nuget_key";
 
 let mutable settings = seq {for x in variableList -> x, (environVar x)} |> Map.ofSeq
 
+let fixSlashes (s) = 
+  Regex("[\\\\/]").Replace(s, System.IO.Path.DirectorySeparatorChar.ToString())
 
-let rootDir = Path.GetFullPath(__SOURCE_DIRECTORY__ + "/../..") + "\\"
-let coreDir = rootDir + "Core/"
+let rootDir = fixSlashes(Path.GetFullPath(__SOURCE_DIRECTORY__ + "/../..") + "\\")
+let coreDir = fixSlashes(rootDir + "Core/")
 let mainSolution = rootDir + "AppVeyor.sln"
-let fastScaleSln = rootDir + "Plugins/FastScaling/ImageResizer.Plugins.FastScaling.sln"
+let fastScaleSln = rootDir + fixSlashes("Plugins/FastScaling/ImageResizer.Plugins.FastScaling.sln")
 let assemblyInfoFile = coreDir + "SharedAssemblyInfo.cs"
-let assemblyInfoCppFile = rootDir + "Plugins/FastScaling/AssemblyInfo.cpp"
+let assemblyInfoCppFile = rootDir + fixSlashes("Plugins/FastScaling/AssemblyInfo.cpp")
 
 let isAutoBuild =
     if isNotNullOrEmpty (environVar "APPVEYOR") then true
