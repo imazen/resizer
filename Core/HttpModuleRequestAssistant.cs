@@ -84,6 +84,7 @@ namespace ImageResizer.Configuration
 
             RewrittenVirtualPathIsAcceptedImageType = conf.IsAcceptedImageType(RewrittenVirtualPath);
             RewrittenQueryHasDirective = conf.HasPipelineDirective(RewrittenQuery);
+            RewrittenMappedPath = HostingEnvironment.MapPath(RewrittenVirtualPath);
 
             ProcessingIndicated = false;
             CachingIndicated = false;
@@ -103,7 +104,7 @@ namespace ImageResizer.Configuration
                 if (!CachingIndicated) RewrittenInstructions.Cache = ServerCacheMode.No;
 
 
-                RewrittenMappedPath = HostingEnvironment.MapPath(RewrittenVirtualPath);
+                
             }
 
 
