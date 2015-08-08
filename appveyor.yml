@@ -3,13 +3,14 @@ version: 4.0.0.{build}
 
 services:
   - mssql2012sp1
+  - mongodb 
 
 matrix:
   fast_finish: true
 
 
 environment:
-  #resizer_test_mongo_db: mongodb://localhost:27017/resizer2
+  resizer_test_mongo_db: mongodb://localhost:27017/resizer2
 
   can_access_secure_vars: 
     secure: VeSU4qx0Ux6Wu4ZM9f+TTg==
