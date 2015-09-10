@@ -36,11 +36,11 @@ environment:
     fb_nuget_url: https://www.myget.org/F/imazen-nightlies/
     fb_nuget_key:
       secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
-   fb_s3_bucket: "resizer-nightlies"
-   fb_s3_id:
-     secure: FTa/u2Pi/dXMCfgDw5iC5pIUTtTjLdhvg8PA8nRyPJw=
+    fb_s3_bucket: "resizer-nightlies"
+    fb_s3_id:
+      secure: FTa/u2Pi/dXMCfgDw5iC5pIUTtTjLdhvg8PA8nRyPJw=
     fb_s3_key:
-     secure: 7JfttWZLof6WQc0DwIlvF3Bh2HaF7v56vYgmz82YcWJrcsCENHIxAxnI/nL+zwO9
+      secure: 7JfttWZLof6WQc0DwIlvF3Bh2HaF7v56vYgmz82YcWJrcsCENHIxAxnI/nL+zwO9
 
     #nuget.org for releases
     fb_nuget_rel_url: https://nuget.org/api/v2/package
