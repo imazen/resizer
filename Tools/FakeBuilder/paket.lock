@@ -1,10 +1,10 @@
 NUGET
   remote: https://nuget.org/api/v2
   specs:
-    AWSSDK (2.3.34.0)
+    AWSSDK (2.3.51)
       Microsoft.Net.Http (>= 2.1.10) - framework: wpv8.0
-    FAKE (3.30.2)
-    FSharp.Compiler.Service (0.0.89)
+    FAKE (4.3.7)
+    FSharp.Compiler.Service (1.4.0.5)
     FSharp.Formatting (2.8.0)
       FSharp.Compiler.Service (>= 0.0.86)
       FSharpVSPowerTools.Core (>= 1.7.0)
@@ -16,12 +16,12 @@ NUGET
     Microsoft.Net.Http (2.2.29) - framework: wpv8.0
       Microsoft.Bcl (>= 1.1.10)
       Microsoft.Bcl.Build (>= 1.0.14)
-    Octokit (0.10.0)
+    Octokit (0.15.0)
       Microsoft.Net.Http
     SharpZipLib (0.86.0)
-    SourceLink.Fake (0.5.0)
+    SourceLink.Fake (1.1.0)
 GITHUB
   remote: fsharp/FAKE
   specs:
-    modules/Octokit/Octokit.fsx (aeca22431512eabfbe2f4b0f3dcfd2790f0aaf1d)
+    modules/Octokit/Octokit.fsx (7d9f555b03d2d73dc615841ad3e49bd6cda07a81)
       Octokit
