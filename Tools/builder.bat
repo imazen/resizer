@@ -26,8 +26,6 @@ goto exit
   git submodule update
   echo - Running Restore...
   nuget restore ..\AppVeyor.sln
-  echo - Fetching extra packaeges...
-  nuget restore FakeBuilder\packages.config
   echo - Fetching packages for build
 
   ..\.paket\paket.bootstrapper.exe prerelease
