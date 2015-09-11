@@ -3,7 +3,7 @@ source https://nuget.org/api/v2
 nuget FSharp.Formatting 2.8.0
 nuget FSharpVSPowerTools.Core 1.7.0
 nuget SharpZipLib
-nuget AWSSDK
+nuget AWSSDK.S3
 nuget FAKE
 nuget SourceLink.Fake
 

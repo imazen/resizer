@@ -4,7 +4,9 @@
 // Licensed under the Apache License, Version 2.0.
 #r @"packages/FAKE/tools/FakeLib.dll"
 #r @"packages/SharpZipLib/lib/20/ICSharpCode.SharpZipLib.dll"
-#r @"packages/AWSSDK/lib/net45/AWSSDK.dll"
+// #r @"packages/AWSSDK.S3/lib/net45/AWSSDK.dll"
+#r @"packages/AWSSDK.Core/lib/net45/AWSSDK.Core.dll"
+#r @"packages/AWSSDK.S3/lib/net45/AWSSDK.S3.dll"
 
 #load "AssemblyPatcher.fs"
 #load "FsQuery.fs"
