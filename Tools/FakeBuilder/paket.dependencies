@@ -6,5 +6,6 @@ nuget SharpZipLib
 nuget AWSSDK.S3
 nuget FAKE
 nuget SourceLink.Fake
+nuget xunit.runner.console
 
 github fsharp/FAKE modules/Octokit/Octokit.fsx
