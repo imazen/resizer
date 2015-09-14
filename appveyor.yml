@@ -30,6 +30,19 @@ environment:
     fb_nuget_rel_key:
       secure: bd9FjQP6MRkmDIkwOW1uPwlg/baX8ug67VbBLP55B158zorSJqpHAFrENVuVhw3/
 
+    fb_s3_bucket: "resizer-nightlies"
+    fb_s3_id:
+      secure: FTa/u2Pi/dXMCfgDw5iC5pIUTtTjLdhvg8PA8nRyPJw=
+    fb_s3_key:
+      secure: 7JfttWZLof6WQc0DwIlvF3Bh2HaF7v56vYgmz82YcWJrcsCENHIxAxnI/nL+zwO9
+
+    fb_s3_rel_bucket: imazen-test-rel
+    fb_s3_rel_id:
+      secure: Qi7mSLHr94NfJaH0CzQSVPEl1peaOoJADyfHwiVtJzo=
+    fb_s3_rel_key:
+      secure: RP9hZqS0Pt2SLeias0iZpt2E9OltVX8OPfhWnGET6fQKZ05Fy6y0z1JcWWvONhF0
+      
+
   #This build may have license key enforcemenet on certain plugins
   - license_keys: true
     #Nuget target feed for nightlies
