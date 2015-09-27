@@ -109,7 +109,7 @@ namespace ImageResizer.Plugins.Basic {
                 }
             }
 
-            string edition = editionsUsed.Values.First(s => new string[] { "R4Elite", "R4Creative", "R4Performance" }.Contains(s));
+            string edition = editionsUsed.Values.FirstOrDefault(s => new string[] { "R4Elite", "R4Creative", "R4Performance" }.Contains(s));
 
             
             if (new List<string>(editionsUsed.Values).Intersect(new string[] { "R3Elite", "R3Creative", "R3Performance" }).Count() > 0){
