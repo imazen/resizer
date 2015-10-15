@@ -91,6 +91,7 @@
     <Compile Include="Plugins\IVirtualImageProviderAsync.cs" />
     <Compile Include="Plugins\IVirtualImageProviderVpp.cs" />
     <Compile Include="Plugins\IVirtualImageProviderVppCaching.cs" />
+    <Compile Include="Plugins\StaticLicenseProvider.cs" />
     <Compile Include="Plugins\VirtualFileShim.cs" />
     <Compile Include="Plugins\VirtualPathProvderShim.cs" />
     <Compile Include="Plugins\FileSignature.cs" />
