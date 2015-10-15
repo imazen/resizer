@@ -148,7 +148,7 @@ namespace ImageResizer.Plugins.Watermark {
 
                 if (img == null) img = GetMemCachedBitmap(Path, opts); //Delayed creation allows the maxwidth/maxheight to be used in gradient plugin
                 lock (img) {
-                    return ImageBuilder.Current.GetFinalSize(img.Size, opts);
+                    return c.CurrentImageBuilder.GetFinalSize(img.Size, opts);
                 }
             }, true);
 
@@ -164,7 +164,7 @@ namespace ImageResizer.Plugins.Watermark {
                     settings.MaxWidth = (int)Math.Floor(imgBounds.Width);
                     settings.MaxHeight = (int)Math.Floor(imgBounds.Height);
 
-                    using (Bitmap final = ImageBuilder.Current.Build(img, settings,false)) {
+                    using (Bitmap final = c.CurrentImageBuilder.Build(img, settings,false)) {
                         s.destGraphics.DrawImage(final, PolygonMath.ToRectangle(PolygonMath.CenterInside(PolygonMath.DownScaleInside(final.Size,imgBounds.Size), imgBounds)));
                     }
                 } else {
