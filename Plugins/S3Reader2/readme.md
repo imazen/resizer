@@ -6,7 +6,7 @@ Aliases: /plugins/s3reader2
 
 # S3Reader2 plugin
 
-Compatible with AWSSDK 2.0+
+Compatible with AWSSDK 3.1+
 
 Allows images located on Amazon S3 to be processed and resized as if they were located locally on the disk. 
 

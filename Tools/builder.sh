@@ -32,5 +32,5 @@ else
   if [ $exit_code -ne 0 ]; then
     exit $exit_code
   fi
-  mono ./FakeBuilder/packages/FAKE/tools/FAKE.exe $@ --fsiargs -d:MONO ./FakeBuilder/build.fsx 
+  mono ./FakeBuilder/packages/FAKE/tools/FAKE.exe $@ --fsiargs -d:MONO ./FakeBuilder/Build.fsx 
 fi
