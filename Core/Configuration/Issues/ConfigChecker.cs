@@ -33,7 +33,7 @@ namespace ImageResizer.Configuration.Issues {
 
             bool canCheckUrls = c.Pipeline.IsAppDomainUnrestricted();
 
-            if (canCheckUrls) {
+            if (canCheckUrls && HostingEnvironment.ApplicationVirtualPath != null) {
                 try {
                     IPrincipal user = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), new string[0]);
                     UrlAuthorizationModule.CheckUrlAccessForPrincipal(HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/', user, "GET");
@@ -50,7 +50,7 @@ namespace ImageResizer.Configuration.Issues {
                     "You may also re-implement your security rules by handling the Config.Current.Pipeline.AuthorizeImage event.", IssueSeverity.Critical));
 
 
-            if (File.Exists(Path.Combine(HostingEnvironment.ApplicationPhysicalPath, "PrecompiledApp.config")))
+            if (HostingEnvironment.ApplicationPhysicalPath != null && File.Exists(Path.Combine(HostingEnvironment.ApplicationPhysicalPath, "PrecompiledApp.config")))
                 issues.Add(new Issue("Precompilation is enabled. Image providers may not work as expected."));
             
             string assembliesRunningHotfix = "";
