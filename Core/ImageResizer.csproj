@@ -179,6 +179,7 @@
     <Compile Include="InterceptModule.cs" />
     <Compile Include="Caching\IResponseArgs.cs" />
     <Compile Include="ImageProcessingException.cs" />
+    <Compile Include="Resizing\ImageLayoutEngine.cs" />
     <Compile Include="Resizing\ImageState.cs" />
     <Compile Include="Plugins\IVirtualBitmapFile.cs" />
     <Compile Include="Resizing\BuilderExtension.cs" />

@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="ImageBuilderTest.cs" />
     <Compile Include="ImageJobTests.cs" />
+    <Compile Include="ImageLayoutEngineTests.cs" />
     <Compile Include="PluginConfigTests.cs" />
     <Compile Include="PresetPluginTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
