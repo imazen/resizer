@@ -13,7 +13,7 @@ namespace ImageResizer.Core.Tests
     {
 
         [Theory]
-        //[InlineData(1600, 1200, "w=90;h=45;mode=crop;scale=canvas", 90,45,  90,45, 0,0,1600,1200 )]
+        [InlineData(1600, 1200, "w=90;h=45;mode=crop;scale=canvas", 90,45,  90,45, 0,200,1600,800 )]
         [InlineData(1600, 1200, "w=10;h=10;mode=crop",10,10,10,10, 200, 0, 1400, 1200)]
         [InlineData(1600, 1200, "w=10;h=10;mode=max", 10, 8, 10, 8, 0, 0, 1600, 1200)]
         public void LayoutImageSize(int width, int height, string query, float expectedWidth, float expectedHeight, float expectedCanvasWidth, float expectedCanvasHeight, float cropX, float cropY, float cropX2, float cropY2 )

@@ -149,12 +149,15 @@ namespace ImageResizer.Resizing
                     bool cropWidthSmaller = manualCropSize.Width <= (float)width;
                     bool cropHeightSmaller = manualCropSize.Height <= (float)height;
 
+                    //TODO: consider mode=crop;fit=upscale
+
                     // With both DownscaleOnly (where only one dimension is smaller than
                     // requested) and UpscaleCanvas, we will have a targetSize based on the
                     // minWidth & minHeight.
                     // TODO: what happens if mode=crop;scale=down but the target is larger than the source?
+                  
                     if ((scale == ScaleMode.DownscaleOnly && (cropWidthSmaller != cropHeightSmaller)) ||
-                        (scale == ScaleMode.UpscaleCanvas))
+                          (scale == ScaleMode.UpscaleCanvas && (cropHeightSmaller || cropWidthSmaller)))
                     {
                         var minWidth = Math.Min(manualCropSize.Width, (float)width);
                         var minHeight = Math.Min(manualCropSize.Height, (float)height);
@@ -176,6 +179,7 @@ namespace ImageResizer.Resizing
                         //Center the portion we are copying within the manualCropSize
                         copyRect = new RectangleF(0, 0, sourceSize.Width, sourceSize.Height);
                     }
+                
 
                     // Align the actual source-copy rectangle inside the available
                     // space based on the anchor.
