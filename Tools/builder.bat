@@ -21,9 +21,7 @@ goto exit
 
 
 :prepare
-  echo - Fetching Submodules...
-  git submodule init
-  git submodule update
+
   echo - Running Restore...
   nuget restore ..\AppVeyor.sln
 
@@ -58,7 +56,7 @@ goto exit
   echo.
   echo Commands:
   echo.
-  echo prepare              - fetches git submodules, nuget packages, fake
+  echo prepare              - fetches  nuget packages, fake
   echo help                - shows this message
   echo clean
   echo build
