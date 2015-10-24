@@ -32,8 +32,8 @@
     <DocumentationFile>..\..\..\dlls\release\ImageResizer.Plugins.PdfiumRenderer.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PdfiumViewer, Version=2.0.0.0, Culture=neutral, PublicKeyToken=91e4789cfb0609e0, processorArchitecture=MSIL">
-      <HintPath>..\..\..\Packages\PdfiumViewer.2.0.0.0\lib\net20\PdfiumViewer.dll</HintPath>
+    <Reference Include="PdfiumViewer, Version=2.7.0.0, Culture=neutral, PublicKeyToken=91e4789cfb0609e0, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Packages\PdfiumViewer.2.7.0.0\lib\net20\PdfiumViewer.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -71,6 +71,9 @@
     <Content Include="license.txt" />
     <Content Include="readme.txt" />
     <EmbeddedResource Include="Native.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
