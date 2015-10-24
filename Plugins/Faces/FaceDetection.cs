@@ -121,7 +121,7 @@ namespace ImageResizer.Plugins.Faces {
             
             //Detect faces (frontal). TODO: side
             Stopwatch watch = Stopwatch.StartNew();
-            CvAvgComp[] faces = Cv.HaarDetectObjects(img, Cascades["FaceCascade"], storage, 1.0850, MinConfidenceLevel, 0, new CvSize(minSize, minSize)).ToArrayAndDispose();
+            CvAvgComp[] faces = Cv.HaarDetectObjects(img, Cascades["FaceCascade"], storage, 1.0850, MinConfidenceLevel, 0, new CvSize(minSize, minSize), new CvSize(0,0)).ToArrayAndDispose();
             watch.Stop();
             Debug.WriteLine("Face detection time = " + watch.ElapsedMilliseconds);
 
