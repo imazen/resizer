@@ -24,7 +24,7 @@ $plugins$</description>
 		<dependencies>
 		  <dependency id="ImageResizer" version="[$version$,)" />
 		  <dependency id="ImageResizer.Plugins.Faces" version="[$version$,)" />
-		  <dependency id="OpenCvSharp-WithoutDll" version="[2.4.10.20150309,)" />
+		  <dependency id="OpenCvSharp-WithoutDll" version="[2.4.10.20150820,)" />
 		  
 		  <dependency id="AForge" version="[2.2.5,)" />
 		  <dependency id="AForge.Math" version="[2.2.5,)" />

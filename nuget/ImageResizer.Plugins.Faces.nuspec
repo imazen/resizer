@@ -24,7 +24,7 @@ $plugins$</description>
 		<dependencies>
 		  <dependency id="ImageResizer" version="[$version$,)" />
 		  <dependency id="Newtonsoft.Json" version="[7.0.1,)" />
-		  <dependency id="OpenCvSharp-WithoutDll" version="[2.4.10.20150309,)" />
+		  <dependency id="OpenCvSharp-WithoutDll" version="[2.4.10.20150820,)" />
 		</dependencies>
 	</metadata>
   	<files>
