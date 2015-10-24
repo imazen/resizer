@@ -26,7 +26,7 @@ $plugins$
 		<dependencies>
 		  <dependency id="ImageResizer" version="[$version$,)" />
 		  <dependency id="ImageResizer.Storage" version="[$version$,)" />
-		  <dependency id="mongocsharpdriver"/>
+		  <dependency id="mongocsharpdriver" version="[1.10.0,)"/>
 		</dependencies>
 	</metadata>
   	<files>
