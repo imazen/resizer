@@ -48,7 +48,7 @@ environment:
     #Nuget target feed for nightlies
     fb_nuget_url: https://www.myget.org/F/imazen-nightlies/
     fb_nuget_key:
-      secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
+      secure:  bd9FjQP6MRkmDIkwOW1uPwlg/baX8ug67VbBLP55B158zorSJqpHAFrENVuVhw3/
     
    
     #nuget.org for releases
