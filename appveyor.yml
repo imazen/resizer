@@ -63,7 +63,7 @@ environment:
     fb_imageserver_path: resizer-images
     fb_imageserver_branch: develop
     # should be set to master when resizer-images is updated
-    fb_imageserver_rel_branch: develop
+    fb_imageserver_rel_branch: master
     
     imageserver_user: resizer-bot
     imageserver_mail:
