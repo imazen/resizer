@@ -378,7 +378,7 @@ Target "push_zips" (fun _ ->
             request.CannedACL <- if drm_free then  Amazon.S3.S3CannedACL.Private else Amazon.S3.S3CannedACL.PublicRead
             request.BucketName <- s3_bucket
             request.ContentType <- "application/zip"
-            request.Key <- Path.GetFileName(zipPkg).Replace(".zip", "-drm-free.zip")
+            request.Key <- Path.GetFileName(zipPkg).Replace(".zip", if drm_free then "-drm-free.zip" else ".zip")
             request.FilePath <- zipPkg
             
             while tries > 0 do
