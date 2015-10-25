@@ -27,22 +27,6 @@ environment:
     secure: r5+d1DGmuXmorxDTfzh1EQu3ocWIlgXcw0MIZ+dDQiQewaHewV6GRfqPlgYxRtG2
 
   matrix: 
-
-  #This build has no license key enforcement. For verified AGPL and paid customers.
-  - license_keys: false
-    #Nuget target feed for nightlies
-    fb_nuget_url: 
-      secure: N/C7Edcuu/hVDDGZnp7lhJLYNUvT2HCrUA0l6axJZWmTV/v1V9xePzIpgDGQ3T78d1g3MDpvbRJ/ioMxFCy4XA==
-    fb_nuget_key:
-      secure: bd9FjQP6MRkmDIkwOW1uPwlg/baX8ug67VbBLP55B158zorSJqpHAFrENVuVhw3/
-    #Nuget target feed for releases
-    fb_nuget_rel_url:
-      secure: N/C7Edcuu/hVDDGZnp7lhIG0giibMSvdxTrHwmgfi0Ro9cuoOGWXOkjgkMaFq+uSiQojoQtDqNDGfoVRwqZ0Lw==
-    fb_nuget_rel_key:
-      secure: bd9FjQP6MRkmDIkwOW1uPwlg/baX8ug67VbBLP55B158zorSJqpHAFrENVuVhw3/
-
-    fb_pub_url: https://s3.amazonaws.com/imazen-nightlies
-
   #This build may have license key enforcemenet on certain plugins
   - license_keys: true
     #Nuget target feed for nightlies
@@ -68,6 +52,22 @@ environment:
       secure: Ki6EM9c3O3ioPTfrbWZMtQ==
     imageserver_token:
       secure: ShmRBY5OrRHdAfze81bt2iqFr+6JHh0FAnApuB4d+bGgksdicVa/BJinCQyS/92B
+
+  #This build has no license key enforcement. For verified AGPL and paid customers.
+  - license_keys: false
+    #Nuget target feed for nightlies
+    fb_nuget_url: 
+      secure: N/C7Edcuu/hVDDGZnp7lhJLYNUvT2HCrUA0l6axJZWmTV/v1V9xePzIpgDGQ3T78d1g3MDpvbRJ/ioMxFCy4XA==
+    fb_nuget_key:
+      secure: bd9FjQP6MRkmDIkwOW1uPwlg/baX8ug67VbBLP55B158zorSJqpHAFrENVuVhw3/
+    #Nuget target feed for releases
+    fb_nuget_rel_url:
+      secure: N/C7Edcuu/hVDDGZnp7lhIG0giibMSvdxTrHwmgfi0Ro9cuoOGWXOkjgkMaFq+uSiQojoQtDqNDGfoVRwqZ0Lw==
+    fb_nuget_rel_key:
+      secure: bd9FjQP6MRkmDIkwOW1uPwlg/baX8ug67VbBLP55B158zorSJqpHAFrENVuVhw3/
+
+    fb_pub_url: https://s3.amazonaws.com/imazen-nightlies
+
 
 before_build:
 
