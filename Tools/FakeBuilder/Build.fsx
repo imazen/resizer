@@ -36,7 +36,7 @@ open System.IO
 open System.Text
 open System.Text.RegularExpressions
 
-printfn "Build.fsx starting"
+printfn "Build.fsx starting.."
 // Settings
 
 let variableList = ["fb_nuget_url"; "fb_nuget_key";
@@ -46,6 +46,13 @@ let variableList = ["fb_nuget_url"; "fb_nuget_key";
                     "fb_imageserver_repo"; "fb_imageserver_branch"; "fb_imageserver_rel_branch"; "fb_imageserver_path";]
 
 let mutable settings = seq {for x in variableList -> x, (environVar x)} |> Map.ofSeq
+
+
+printfn "Values present for configuration keys %A\n"   (variableList |>  Seq.filter(fun x -> x |> environVar |> isNullOrEmpty |> not))
+
+printfn "Missing or emtpy value for keys %A\n" (variableList |>  Seq.filter(fun x -> x |> environVar |> isNullOrEmpty))
+
+
 
 let fixSlashes (s) = 
   Regex("[\\\\/]").Replace(s, System.IO.Path.DirectorySeparatorChar.ToString())

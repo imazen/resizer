@@ -20,13 +20,11 @@ environment:
     secure: FTa/u2Pi/dXMCfgDw5iC5pIUTtTjLdhvg8PA8nRyPJw=
   fb_s3_key:
     secure: 7JfttWZLof6WQc0DwIlvF3Bh2HaF7v56vYgmz82YcWJrcsCENHIxAxnI/nL+zwO9
-  
   fb_s3_rel_bucket: "resizer-releases"
   fb_s3_rel_id:
     secure: CIv67AzKiGLOQsp4B9wmwALKFA3tb3N2prI5rzw/gh8=
   fb_s3_rel_key:
     secure: RP9hZHyW0nKmfM4XNg5kbTMNODeFNjW0LtyFpF4Nr8gSGBswITcYKdIZAFs3D/Yzp4twN
-    
 
   matrix: 
 
@@ -49,8 +47,6 @@ environment:
     fb_nuget_url: https://www.myget.org/F/imazen-nightlies/
     fb_nuget_key:
       secure:  bd9FjQP6MRkmDIkwOW1uPwlg/baX8ug67VbBLP55B158zorSJqpHAFrENVuVhw3/
-    
-   
     #nuget.org for releases
     fb_nuget_rel_url: https://nuget.org/api/v2/package
     fb_nuget_rel_key:
@@ -64,7 +60,7 @@ environment:
     fb_imageserver_branch: develop
     # should be set to master when resizer-images is updated
     fb_imageserver_rel_branch: master
-    
+
     imageserver_user: resizer-bot
     imageserver_mail:
       secure: Ki6EM9c3O3ioPTfrbWZMtQ==
@@ -72,14 +68,14 @@ environment:
       secure: ShmRBY5OrRHdAfze81bt2iqFr+6JHh0FAnApuB4d+bGgksdicVa/BJinCQyS/92B
 
 before_build:
-  
+
   # add imageserver key
   - git config --global push.default simple
   - git config --global credential.helper wincred
   - git config --global user.name "%imageserver_user%"
   - git config --global user.email "%imageserver_mail%"
   - if /I NOT "%imageserver_token%"=="" git clone --depth 1 --branch %fb_imageserver_branch% https://%imageserver_user%:%imageserver_token%@%fb_imageserver_repo% Tools\%fb_imageserver_path%
-  
+
 
   - if "%license_keys%"=="false" copy  /Y Plugins\LicenseVerifier\LicenseServiceFree.cs Plugins\LicenseVerifier\LicenseService.cs
 
