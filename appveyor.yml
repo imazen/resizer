@@ -22,9 +22,9 @@ environment:
     secure: 7JfttWZLof6WQc0DwIlvF3Bh2HaF7v56vYgmz82YcWJrcsCENHIxAxnI/nL+zwO9
   fb_s3_rel_bucket: "resizer-releases"
   fb_s3_rel_id:
-    secure: CIv67AzKiGLOQsp4B9wmwALKFA3tb3N2prI5rzw/gh8=
+    secure: zjU5gXrbdMergGCt2cE019dyeBfWhiwZkLY14PxPxDM=
   fb_s3_rel_key:
-    secure: RP9hZHyW0nKmfM4XNg5kbTMNODeFNjW0LtyFpF4Nr8gSGBswITcYKdIZAFs3D/Yzp4twN
+    secure: r5+d1DGmuXmorxDTfzh1EQu3ocWIlgXcw0MIZ+dDQiQewaHewV6GRfqPlgYxRtG2
 
   matrix: 
 
@@ -40,6 +40,8 @@ environment:
       secure: N/C7Edcuu/hVDDGZnp7lhIG0giibMSvdxTrHwmgfi0Ro9cuoOGWXOkjgkMaFq+uSiQojoQtDqNDGfoVRwqZ0Lw==
     fb_nuget_rel_key:
       secure: bd9FjQP6MRkmDIkwOW1uPwlg/baX8ug67VbBLP55B158zorSJqpHAFrENVuVhw3/
+
+    fb_pub_url: https://s3.amazonaws.com/imazen-nightlies
 
   #This build may have license key enforcemenet on certain plugins
   - license_keys: true
