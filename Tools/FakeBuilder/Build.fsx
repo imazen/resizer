@@ -42,7 +42,7 @@ printfn "Build.fsx starting"
 let variableList = ["fb_nuget_url"; "fb_nuget_key";
                     "fb_s3_bucket"; "fb_s3_id"; "fb_s3_key"; "fb_pub_url";
                     "fb_nuget_rel_url"; "fb_nuget_rel_key";
-                    "fb_s3_rel_bucket"; "fb_s3_rel_id"; "fb_s3_rel_key"; "license_keys"
+                    "fb_s3_rel_bucket"; "fb_s3_rel_id"; "fb_s3_rel_key"; "license_keys";
                     "fb_imageserver_repo"; "fb_imageserver_branch"; "fb_imageserver_rel_branch"; "fb_imageserver_path";]
 
 let mutable settings = seq {for x in variableList -> x, (environVar x)} |> Map.ofSeq
