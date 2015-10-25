@@ -23,9 +23,9 @@ environment:
   
   fb_s3_rel_bucket: "resizer-releases"
   fb_s3_rel_id:
-    secure: Qi7mSLHr94NfJaH0CzQSVPEl1peaOoJADyfHwiVtJzo=
+    secure: CIv67AzKiGLOQsp4B9wmwALKFA3tb3N2prI5rzw/gh8=
   fb_s3_rel_key:
-    secure: RP9hZqS0Pt2SLeias0iZpt2E9OltVX8OPfhWnGET6fQKZ05Fy6y0z1JcWWvONhF0
+    secure: RP9hZHyW0nKmfM4XNg5kbTMNODeFNjW0LtyFpF4Nr8gSGBswITcYKdIZAFs3D/Yzp4twN
     
 
   matrix: 
