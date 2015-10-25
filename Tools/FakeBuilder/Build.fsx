@@ -29,7 +29,7 @@ open ProcessHelper
 open SemVerHelper
 open SemVerHelper2
 open StringHelper
-open Fake.Testing
+open XUnit2Helper
 
 open System
 open System.IO
