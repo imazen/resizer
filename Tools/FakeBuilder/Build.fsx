@@ -29,7 +29,7 @@ open ProcessHelper
 open SemVerHelper
 open SemVerHelper2
 open StringHelper
-open XUnit2Helper
+open Fake.Testing
 
 open System
 open System.IO
@@ -371,7 +371,7 @@ Target "push_zips" (fun _ ->
             request.CannedACL <- if drm_free then  Amazon.S3.S3CannedACL.Private else Amazon.S3.S3CannedACL.PublicRead
             request.BucketName <- s3_bucket
             request.ContentType <- "application/zip"
-            request.Key <- Path.GetFileName(zipPkg).Repalce(".zip", "-drm-free.zip")
+            request.Key <- Path.GetFileName(zipPkg).Replace(".zip", "-drm-free.zip")
             request.FilePath <- zipPkg
             
             while tries > 0 do
