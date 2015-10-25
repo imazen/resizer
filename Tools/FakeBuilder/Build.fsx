@@ -368,7 +368,7 @@ Target "push_zips" (fun _ ->
             let mutable tries = 3
             let drm_free = (settings.["license_keys"] = "false")
             let request = new TransferUtilityUploadRequest()
-            request.CannedACL <- drm_free ?  Amazon.S3.S3CannedACL.Private : Amazon.S3.S3CannedACL.PublicRead
+            request.CannedACL <- if drm_free then  Amazon.S3.S3CannedACL.Private else Amazon.S3.S3CannedACL.PublicRead
             request.BucketName <- s3_bucket
             request.ContentType <- "application/zip"
             request.Key <- Path.GetFileName(zipPkg).Repalce(".zip", "-drm-free.zip")
