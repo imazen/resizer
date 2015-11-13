@@ -349,7 +349,9 @@ namespace ImageResizer.ProviderTests
 
             File.Delete(target.PhysicalCacheFile);
             target.VirtualCacheFile = "folder/ImFlushed.txt";
-            Directory.Delete(Path.GetDirectoryName(target.PhysicalCacheFile), true);
+            if (Directory.Exists(Path.GetDirectoryName(target.PhysicalCacheFile))){
+                Directory.Delete(Path.GetDirectoryName(target.PhysicalCacheFile), true);
+            }
 
             // Act
             for (int i = 0; i < expected; i++)

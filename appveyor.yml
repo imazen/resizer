@@ -15,7 +15,43 @@ environment:
   can_access_secure_vars: 
     secure: VeSU4qx0Ux6Wu4ZM9f+TTg==
 
+  fb_s3_bucket: "resizer-nightlies"
+  fb_s3_id:
+    secure: FTa/u2Pi/dXMCfgDw5iC5pIUTtTjLdhvg8PA8nRyPJw=
+  fb_s3_key:
+    secure: 7JfttWZLof6WQc0DwIlvF3Bh2HaF7v56vYgmz82YcWJrcsCENHIxAxnI/nL+zwO9
+  fb_s3_rel_bucket: "resizer-releases"
+  fb_s3_rel_id:
+    secure: zjU5gXrbdMergGCt2cE019dyeBfWhiwZkLY14PxPxDM=
+  fb_s3_rel_key:
+    secure: r5+d1DGmuXmorxDTfzh1EQu3ocWIlgXcw0MIZ+dDQiQewaHewV6GRfqPlgYxRtG2
+
   matrix: 
+  #This build may have license key enforcemenet on certain plugins
+  - license_keys: true
+    #Nuget target feed for nightlies
+    fb_nuget_url: https://www.myget.org/F/imazen-nightlies/
+    fb_nuget_key:
+      secure:  bd9FjQP6MRkmDIkwOW1uPwlg/baX8ug67VbBLP55B158zorSJqpHAFrENVuVhw3/
+    #nuget.org for releases
+    fb_nuget_rel_url: https://nuget.org/api/v2/package
+    fb_nuget_rel_key:
+      secure: G164XNiqMhyX+Y/174fE4iWP0ZboBfg2SQp5V8h19pP08hcVQp0dHK8fQg+qqNaX
+
+
+    fb_pub_url: https://s3.amazonaws.com/imazen-nightlies
+
+    fb_imageserver_repo: github.com/imazen/resizer-images.git
+    fb_imageserver_path: resizer-images
+    fb_imageserver_branch: develop
+    # should be set to master when resizer-images is updated
+    fb_imageserver_rel_branch: master
+
+    imageserver_user: resizer-bot
+    imageserver_mail:
+      secure: Ki6EM9c3O3ioPTfrbWZMtQ==
+    imageserver_token:
+      secure: ShmRBY5OrRHdAfze81bt2iqFr+6JHh0FAnApuB4d+bGgksdicVa/BJinCQyS/92B
 
   #This build has no license key enforcement. For verified AGPL and paid customers.
   - license_keys: false
@@ -30,74 +66,20 @@ environment:
     fb_nuget_rel_key:
       secure: bd9FjQP6MRkmDIkwOW1uPwlg/baX8ug67VbBLP55B158zorSJqpHAFrENVuVhw3/
 
-    fb_s3_bucket: "resizer-nightlies"
-    fb_s3_id:
-      secure: FTa/u2Pi/dXMCfgDw5iC5pIUTtTjLdhvg8PA8nRyPJw=
-    fb_s3_key:
-      secure: 7JfttWZLof6WQc0DwIlvF3Bh2HaF7v56vYgmz82YcWJrcsCENHIxAxnI/nL+zwO9
-
-    fb_s3_rel_bucket: imazen-test-rel
-    fb_s3_rel_id:
-      secure: Qi7mSLHr94NfJaH0CzQSVPEl1peaOoJADyfHwiVtJzo=
-    fb_s3_rel_key:
-      secure: RP9hZqS0Pt2SLeias0iZpt2E9OltVX8OPfhWnGET6fQKZ05Fy6y0z1JcWWvONhF0
-      
-
-  #This build may have license key enforcemenet on certain plugins
-  - license_keys: true
-    #Nuget target feed for nightlies
-    fb_nuget_url: https://www.myget.org/F/imazen-nightlies/
-    fb_nuget_key:
-      secure: GmqIvIvIOiwNxjW+z+vL9tbVD9vqUdB+0HsdDhnhR3km4WLZwpLcQT41D7xlhgFX
-    fb_s3_bucket: "resizer-nightlies"
-    fb_s3_id:
-      secure: FTa/u2Pi/dXMCfgDw5iC5pIUTtTjLdhvg8PA8nRyPJw=
-    fb_s3_key:
-      secure: 7JfttWZLof6WQc0DwIlvF3Bh2HaF7v56vYgmz82YcWJrcsCENHIxAxnI/nL+zwO9
-
-    #nuget.org for releases
-    fb_nuget_rel_url: https://nuget.org/api/v2/package
-    fb_nuget_rel_key:
-      secure: xFnWCh3CKpo6o4Q6lvO9obenkhTfUSPYoPX6kdu/pJcr36mssQw5jvaUK2CDGQRT
-
-    fb_s3_rel_bucket: imazen-test-rel
-    fb_s3_rel_id:
-      secure: Qi7mSLHr94NfJaH0CzQSVPEl1peaOoJADyfHwiVtJzo=
-    fb_s3_rel_key:
-      secure: RP9hZqS0Pt2SLeias0iZpt2E9OltVX8OPfhWnGET6fQKZ05Fy6y0z1JcWWvONhF0
-
     fb_pub_url: https://s3.amazonaws.com/imazen-nightlies
 
-    fb_imageserver_repo: github.com/imazen/resizer-images.git
-    fb_imageserver_path: resizer-images
-    fb_imageserver_branch: develop
-    # should be set to master when resizer-images is updated
-    fb_imageserver_rel_branch: develop
-    
-    imageserver_user: resizer-bot
-    imageserver_mail:
-      secure: Ki6EM9c3O3ioPTfrbWZMtQ==
-    imageserver_token:
-      secure: ShmRBY5OrRHdAfze81bt2iqFr+6JHh0FAnApuB4d+bGgksdicVa/BJinCQyS/92B
 
 before_build:
-  
+
   # add imageserver key
   - git config --global push.default simple
   - git config --global credential.helper wincred
   - git config --global user.name "%imageserver_user%"
   - git config --global user.email "%imageserver_mail%"
   - if /I NOT "%imageserver_token%"=="" git clone --depth 1 --branch %fb_imageserver_branch% https://%imageserver_user%:%imageserver_token%@%fb_imageserver_repo% Tools\%fb_imageserver_path%
-  
-  # set up mongodb - skipping as it now returns error 20 - failed to start NT service. 
-  #- ps: md $env:temp\mongo\data
-  #- ps: Push-Location $env:temp\mongo
-  #- ps: Invoke-WebRequest https://s3.amazonaws.com/public-unit-test-resources/mongodb/mongod.exe.zip -OutFile mongodb.zip
-  #- 7z x -o.\ mongodb.zip
-  #- mongod.exe --logpath=mongo.log --dbpath=. --smallfiles --install
-  #- ps: Start-Sleep -Seconds 5
-  #- ps: net start mongodb
-  #- ps: Pop-Location
+
+
+  - if "%license_keys%"=="false" copy  /Y Plugins\LicenseVerifier\LicenseServiceFree.cs Plugins\LicenseVerifier\LicenseService.cs
 
 build_script:
   - cd Tools

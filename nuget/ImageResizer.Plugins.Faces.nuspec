@@ -23,7 +23,8 @@ $plugins$</description>
 		<tags>ImageResizer Faces face detection Imazen Resizer imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer" version="[$version$,)" />
-		  <dependency id="OpenCvSharp-WithoutDll" version="[2.4.10.20141111,)" />
+		  <dependency id="Newtonsoft.Json" version="[7.0.1,)" />
+		  <dependency id="OpenCvSharp-WithoutDll" version="[2.4.10.20150820,)" />
 		</dependencies>
 	</metadata>
   	<files>

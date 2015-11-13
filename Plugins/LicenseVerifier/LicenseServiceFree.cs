@@ -194,6 +194,8 @@ namespace ImageResizer.Plugins.LicenseVerifier {
             var features = _installed_features ?? c.Plugins.GetAll<ILicensedPlugin>().Select(p => p.LicenseFeatureCodes).ToList();
 
             sb.AppendLine("\n----------------\n");
+            sb.AppendLine("\nThis DRM-free assembly will not enforce license keys, although we show validation information. \n");
+            sb.AppendLine("\n----------------\n");
             sb.AppendLine("License keys");
             if (mappings.Count > 0)
             {
@@ -223,56 +225,7 @@ namespace ImageResizer.Plugins.LicenseVerifier {
         LicenseService _service = null;
         IEnumerable<IEnumerable<string>> _installed_features;
         Dictionary<string, string> _mappings;
-        private bool ShouldDisplayDot(Configuration.Config c, ImageState s)
-        {
-            if (c == null || c.configurationSectionIssues == null || System.Web.HttpContext.Current == null) return false;
-
-            //We want to invalidate the caches after 5 and 30 seconds.
-            if (first_request == DateTime.MinValue) first_request = DateTime.UtcNow;
-            bool invalidate = invalidated_count == 0 && DateTime.UtcNow - first_request > TimeSpan.FromSeconds(5) ||
-                invalidated_count == 1 && DateTime.UtcNow - first_request > TimeSpan.FromSeconds(30);
-
-
-            if (invalidate) invalidated_count++;
-
-            //Cache a LicenseService and nested enumeration of installed feature codes
-            if (_service == null || invalidate) _service = GetService(c);
-            if (_installed_features == null|| invalidate) _installed_features = c.Plugins.GetAll<ILicensedPlugin>().Select(p => p.LicenseFeatureCodes).ToList();
-            if (_mappings == null|| invalidate) _mappings = GetDomainMappings(c);
-
-            //if (invalidated_count == 1) LogLicenseConfiguration(c);
-
-            var domain = System.Web.HttpContext.Current.Request.Url.DnsSafeHost;
-            
-            //Handles remapping
-            if (_mappings.ContainsKey(domain))
-            {
-                domain = _mappings[domain];
-            }
-
-            return !_service.CheckFeaturesLicensed(domain, _installed_features, false); //show an error if there are any issues parsing a lc
-
-        }
-
-
-        protected override RequestedAction PreFlushChanges(ImageState s)
-        {
-            
-            if (s.destBitmap != null && ShouldDisplayDot(c, s))
-            {
-                int w = s.destBitmap.Width;
-                int h = s.destBitmap.Height;
-                int dot_w = 3;
-                int dot_h = 3;
-                if (w > dot_w && h > dot_h)
-                {
-                    for (int y = 0; y < dot_h; y++)
-                        for (int x = 0; x < dot_w; x++ )
-                            s.destBitmap.SetPixel(w - 1 - x, h - 1 - y, Color.Red);
-                }
-            }
-            return RequestedAction.None;
-        }
+      
 
         public IPlugin Install(Configuration.Config c)
         {

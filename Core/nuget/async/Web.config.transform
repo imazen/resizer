@@ -5,7 +5,7 @@
   </configSections>
   <system.web>
     <httpModules>
-      <add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
+      <add name="ImageResizingModule" type="ImageResizer.AsyncInterceptModule"/>
     </httpModules>
   </system.web>
   <system.webServer>

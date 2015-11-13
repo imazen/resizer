@@ -36,16 +36,23 @@ open System.IO
 open System.Text
 open System.Text.RegularExpressions
 
-printfn "Build.fsx starting"
+printfn "Build.fsx starting.."
 // Settings
 
 let variableList = ["fb_nuget_url"; "fb_nuget_key";
                     "fb_s3_bucket"; "fb_s3_id"; "fb_s3_key"; "fb_pub_url";
                     "fb_nuget_rel_url"; "fb_nuget_rel_key";
-                    "fb_s3_rel_bucket"; "fb_s3_rel_id"; "fb_s3_rel_key";
+                    "fb_s3_rel_bucket"; "fb_s3_rel_id"; "fb_s3_rel_key"; "license_keys";
                     "fb_imageserver_repo"; "fb_imageserver_branch"; "fb_imageserver_rel_branch"; "fb_imageserver_path";]
 
 let mutable settings = seq {for x in variableList -> x, (environVar x)} |> Map.ofSeq
+
+
+printfn "Values present for configuration keys %A\n"   (variableList |>  Seq.filter(fun x -> x |> environVar |> isNullOrEmpty |> not))
+
+printfn "Missing or emtpy value for keys %A\n" (variableList |>  Seq.filter(fun x -> x |> environVar |> isNullOrEmpty))
+
+
 
 let fixSlashes (s) = 
   Regex("[\\\\/]").Replace(s, System.IO.Path.DirectorySeparatorChar.ToString())
@@ -366,16 +373,17 @@ Target "push_zips" (fun _ ->
         
         for zipPkg in Directory.GetFiles(rootDir + "Releases", "*.zip") do
             let mutable tries = 3
+            let drm_free = (settings.["license_keys"] = "false")
             let request = new TransferUtilityUploadRequest()
-            request.CannedACL <- Amazon.S3.S3CannedACL.PublicRead
+            request.CannedACL <- if drm_free then  Amazon.S3.S3CannedACL.Private else Amazon.S3.S3CannedACL.PublicRead
             request.BucketName <- s3_bucket
             request.ContentType <- "application/zip"
-            request.Key <- Path.GetFileName(zipPkg)
+            request.Key <- Path.GetFileName(zipPkg).Replace(".zip", if drm_free then "-drm-free.zip" else ".zip")
             request.FilePath <- zipPkg
             
             while tries > 0 do
                 try
-                    printf "Uploading %s to S3/%s...\n" (Path.GetFileName(zipPkg)) s3_bucket
+                    printf "Uploading %s to S3/%s...\n" (request.Key) s3_bucket
                     s3.Upload(request)
                     tries <- 0
                 with exn ->

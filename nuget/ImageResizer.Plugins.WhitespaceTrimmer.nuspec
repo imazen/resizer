@@ -27,7 +27,7 @@ $plugins$
 		<tags>ImageResizer whitespacetrimmer trim whitespace product images Imazen resizer imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer" version="[$version$,)" />
-		  <dependency id="AForge.Imaging"/>
+		  <dependency id="AForge.Imaging" version="[2.2.5,)"/>
 		</dependencies>
 	</metadata>
   	<files>

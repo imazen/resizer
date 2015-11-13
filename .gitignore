@@ -3,6 +3,7 @@
 /docs/doxygen
 Tests/*/Results
 Packages/
+Tools/FakeBuilder/paket-files/
 
 #Folders for binaries and caches
 bin/

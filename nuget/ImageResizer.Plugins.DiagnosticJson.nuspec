@@ -28,6 +28,7 @@ $plugins$
 		<tags>ImageResizer Imazen Resizer DiagnosticJson diagnostic json metadata imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer" version="[$version$,)" />
+		  <dependency id="Newtonsoft.Json" version="[7.0.1,)"/>
 		</dependencies>
 	</metadata>
   	<files>

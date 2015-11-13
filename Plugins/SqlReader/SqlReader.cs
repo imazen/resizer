@@ -155,7 +155,7 @@ namespace ImageResizer.Plugins.SqlReader
                 SqlDataReader sdr = await sc.ExecuteReaderAsync();
                 using (sdr)
                 {
-                    if (!await sdr.ReadAsync()) throw new FileNotFoundException("Failed to find the specified image " + id + " in the database"); //0 rows
+                    if ((!await sdr.ReadAsync()) || sdr.IsDBNull(0)) throw new FileNotFoundException("Failed to find the specified image " + id + " in the database"); //0 rows
 
                     return sdr.GetSqlBytes(0).Stream; //No connection required for the stream, all cloned in memory.
                 }
