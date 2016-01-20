@@ -188,6 +188,7 @@ namespace ImageResizer{
                         }
                         else{
                             copy = gcnew Bitmap (source->Width, source->Height, ignorealpha ? PixelFormat::Format24bppRgb : PixelFormat::Format32bppArgb);
+                            source->SetResolution(96, 96);
                             copyGraphics = System::Drawing::Graphics::FromImage (copy);
                             copyGraphics->CompositingMode = Drawing2D::CompositingMode::SourceCopy;
                             copyGraphics->DrawImageUnscaled (source, 0, 0);
