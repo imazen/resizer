@@ -19,7 +19,7 @@ For more informaiton, [check out our website](http://www.imageresizing.net). To 
 
 #### Changes
 
-We've made some major changesin V.4. Check out our [changelog](https://github.com/imazen/resizer/blob/develop/CHANGES.md) for more details.
+We've made some major changes in V.4. Check out our [changelog](https://github.com/imazen/resizer/blob/develop/CHANGES.md) for more details.
 
 #### License
 Over half of ImageResizer's plugins are available under the Apache 2.0 license. See [license.txt for details]( https://github.com/imazen/resizer/blob/develop/license.txt).
