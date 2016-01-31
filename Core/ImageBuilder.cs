@@ -1038,7 +1038,7 @@ namespace ImageResizer
             var ile = new ImageLayoutEngine(s.originalSize, s.copyRect);
             ile.ApplySettings(s.settings);
             s.copyRect = ile.CopyFrom;
-            
+            s.ValidateCropping();
 
             //Translate and scale all existing rings
             s.layout.Shift(s.copyRect, new RectangleF(new Point(0, 0), ile.CopyToSize));

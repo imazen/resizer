@@ -122,6 +122,19 @@ namespace ImageResizer.Resizing {
             }
 
         }
+
+        public void ValidateCropping()
+        {
+            Size bitmapSize = originalSize;
+            var latest = preRenderBitmap ?? sourceBitmap;
+            if (latest != null) bitmapSize = latest.Size;
+
+            if (copyRect.Bottom > bitmapSize.Height || copyRect.Right > bitmapSize.Width ||
+                copyRect.Left < 0 || copyRect.Right < 0)
+            {
+                throw new ArgumentOutOfRangeException("cropRect", "Crop rectangle is outside the bounds of the image");
+            }
+        }
         /// <summary>
         /// Ensures that the working bitmap is in 32bpp RGBA format - otherwise it is converted.
         /// </summary>
