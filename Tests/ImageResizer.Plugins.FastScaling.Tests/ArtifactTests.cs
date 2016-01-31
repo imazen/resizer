@@ -149,6 +149,30 @@ namespace ImageResizer.Plugins.FastScaling.Tests
             }
         }
 
+
+        [Fact]
+        public void CheckForRoundingErrorsSimple()
+        {
+
+            var b = new Bitmap(200, 200);
+            var i = new Instructions("?maxwidth=100");
+            using (var result = BuildWithFastScaling(b, i))
+            {
+
+            }
+        }
+        [Fact]
+        public void CheckForRoundingErrors()
+        {
+
+            var b = new Bitmap(1310, 1041);
+            var i = new Instructions("?maxwidth=1200&maxheight=1200&crop=80,77.33333,488.480,464&cropxunits=584&cropyunits=464");
+            using (var result = BuildWithFastScaling(b, i))
+            {
+                
+            }
+        }
+
         [Theory]
         [InlineData("cubicfast", "0.5", "srgb","rings2.png", 500, 40,40,40, 1)]
         [InlineData("cubicfast", "2","srgb", "rings2.png", 500, 40, 40, 40, 1)]
