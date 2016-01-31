@@ -584,8 +584,8 @@ namespace ImageResizer.Util
         /// <returns></returns>
         public static Rectangle ToRectangle(RectangleF r)
         {
-            return new Rectangle((int)Math.Round(r.X), (int)Math.Round(r.Y), (int)Math.Round(r.Width), (int)Math.Round(r.Height));
-
+            //As of 2016-01-31: Avoids turning (0.5,0.5,2.5,2.5) into (1,1,4,4) 
+            return new Rectangle((int)Math.Round(r.X), (int)Math.Round(r.Y), (int)Math.Round(r.Right) - (int)Math.Round(r.X), (int)Math.Round(r.Bottom) - (int)Math.Round(r.Y));
 
         }
 
