@@ -44,6 +44,10 @@ namespace ImageResizer.Resizing
                 if (settings.GetList<double>("crop", 0, 4) != null)
                 {
                     cropWindow = PolygonMath.ToRectangle(settings.getCustomCropSourceRect(originalSize)); //Round the custom crop rectangle coordinates
+                    //Ensure right/bottom bounded after rounding completes
+                    cropWindow.Width = Math.Min(originalSize.Width - cropWindow.Left, cropWindow.Width);
+                    cropWindow.Height = Math.Min(originalSize.Height - cropWindow.Top, cropWindow.Height);
+
                     if (cropWindow.Size.IsEmpty) throw new Exception("You must specify a custom crop rectange if crop=custom");
                 }
             }
