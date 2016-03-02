@@ -33,11 +33,9 @@ The pdfium DLLs can be downloaded from:
 https://github.com/pvginkel/PdfiumViewer/raw/master/Libraries/Pdfium/x86/pdfium.dll (32-bit)
 https://github.com/pvginkel/PdfiumViewer/raw/master/Libraries/Pdfium/x64/pdfium.dll (64-bit)
 
-The PdfiumViewer DLL cannot be downloaded. You can compile it from PdfiumViewer source code at:
+The PdfiumViewer DLL can be downloaded as part of the ImageResizer suite at:
 
-https://github.com/pvginkel/PdfiumViewer
-
-**NOTE:** `ImageResizer.Plugins.PdfiumRenderer` will have a dependency on a particular version of `PdfiumViewer`, so you cannot simply retrieve the latest. One way to check what version of `PdfiumViewer` is required is to view the contents of PdfiumRenderer's packages.config at https://github.com/imazen/resizer/blob/develop/Contrib/PdfiumRenderer/PdfiumRenderer/packages.config and look for `<package id="PdfiumViewer" version="X.Y.Z" targetFramework="netXX" />`.
+http://imageresizing.net/download
 
 ## Parameters
 
