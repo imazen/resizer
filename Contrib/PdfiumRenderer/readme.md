@@ -5,31 +5,37 @@ Aliases: /plugins/pdfiumrenderer
 
 # PdfiumRenderer plugin
 
-## Installation
+## Install manually
 
-1. Add ImageResizer.Plugins.PdfiumRenderer.dll to the project or /bin.
-3. In the `<plugins />` section, insert `<add name="PdfiumRenderer" downloadNativeDependencies="true"/>`
+1. Add `ImageResizer.Plugins.PdfiumRenderer.dll` as a reference to the project, or put a copy of it in the /bin folder.
+2. Add `PdfiumViewer.dll` as a reference to the project, or put a copy of it in the /bin folder.
+3. In the ImageResizer `<plugins />` section of web.config, insert `<add name="PdfiumRenderer" downloadNativeDependencies="true"/>`. This setting tells the project to attempt to download the pdfium.dll dependency automatically.
+4. Alternatively, in the ImageResizer `<plugins />` section in web.config or app.config, insert `<add name="PdfiumRenderer" downloadNativeDependencies="false"/>`. Download the 32-bit and/or 64-bit version of the pdfium.dll yourself, and either
+  * Put the 32-bit or 64-bit version of `pdfium.dll` in the /bin folder, or
+  * Create `/bin/x86` and `/bin/x64`, putting the 32-bit copy of `pdfium.dll` in the "x86" folder and the 64-bit copy of `pdfium.dll` in the "x64" folder. The correct bitness is then chosen automatically at runtime.
+5. In an IIS web application scenario, ensure the relevant application pool identity has read+exec permissions on `/bin/x86` and `/bin/x64`.
 
-## Via nuget
+## Install via nuget
 
-1. `Install-Package ImageResizer.Plugins.PdfiumRenderer`
-3. In the `<plugins />` section of Web.config, insert `<add name="PdfiumRenderer" downloadNativeDependencies="true"/>`
+1. `Install-Package ImageResizer.Plugins.PdfiumRenderer`. Be sure to install with the `PdfiumViewer` dependency.
+2. In the ImageResizer `<plugins />` section of web.config, insert `<add name="PdfiumRenderer" downloadNativeDependencies="true"/>`.
+3. Alternatively, in the ImageResizer `<plugins />` section of web.config, insert `<add name="PdfiumRenderer" downloadNativeDependencies="false"/>`. Download the 32-bit and/or 64-bit version of the pdfium.dll yourself, and either
+  * Put the 32-bit or 64-bit version of the pdfium.dll in the /bin folder, or
+  * Create `/bin/x86` and `/bin/x64`, putting the 32-bit copy of pdfium.dll in the `x86` folder and the 64-bit copy of pdfium.dll in the `x64` folder. The correct bitness is then chosen automatically at runtime.
+4. In an IIS web application scenario, ensure the relevant application pool identity has read+exec permissions on /bin/x86 and /bin/x64.
 
+## Dependencies
 
-This plugin requires `pdfium.dll` to be present. Both 32-bit and 64-bit variants are supported.
-
-There are two options to include these native Dlls:
-
-* Put either the 32-bit or 64-bit version of the pdfium DLL in the same directory as where the plugin is located;
-* In the same directory as where the plugin is located, create an "x86" directory with the 32-bit DLL and an
-  "x64" directory with the 64-bit DLL. The PdfiumViewer library will then automatically pick the correct
-  one.
-* Specify `downloadNativeDependencies=true` during installation.
+This plugin requires `pdfium.dll` to be present, and `PdfiumViewer.dll`. Both 32-bit and 64-bit variants of pdfium.dll are supported.
 
 The pdfium DLLs can be downloaded from:
 
 https://github.com/pvginkel/PdfiumViewer/raw/master/Libraries/Pdfium/x86/pdfium.dll (32-bit)
 https://github.com/pvginkel/PdfiumViewer/raw/master/Libraries/Pdfium/x64/pdfium.dll (64-bit)
+
+The PdfiumViewer DLL can be downloaded as part of the ImageResizer suite at:
+
+http://imageresizing.net/download
 
 ## Parameters
 
