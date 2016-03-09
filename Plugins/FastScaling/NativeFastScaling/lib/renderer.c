@@ -155,7 +155,7 @@ static int Renderer_determine_divisor(Renderer * r)
     while (divisor > 0 && Renderer_percent_loss (r->source->w, width, r->source->h, height, divisor) > r->details->havling_acceptable_pixel_loss) {
         divisor--;
     }
-    return max(1, divisor);
+    return min(16, max(1, divisor));
 }
 
 void Renderer_destroy(Context * context, Renderer * r)
@@ -243,6 +243,10 @@ static void SimpleRenderInPlace(void)
 // TODO: find better name
 static bool HalveInTempImage(Context * context, Renderer * r, int divisor)
 {
+    if (divisor > 16) {
+        CONTEXT_error(context, Invalid_argument);
+        return false;
+    }
     bool result = true;
     prof_start(context,"create temp image for halving", false);
     int halved_width = (int)(r->source->w / divisor);
