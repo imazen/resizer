@@ -3,7 +3,11 @@
 ## [ImageResizer](http://imageresizing.net) - The Flexible Image Server
 [![Build status - develop](https://ci.appveyor.com/api/projects/status/77a52n4hd0y36ybs/branch/develop?svg=true&passingText=develop%20-%20passing&failingText=develop%20-%20failed)](https://ci.appveyor.com/project/imazen/resizer/branch/develop) [![valgrind-develop](https://img.shields.io/travis/imazen/resizer/develop.svg?label=valgrind%20-%20develop)](https://travis-ci.org/imazen/resizer/builds) &nbsp; View ReadMe for [latest (develop)](https://github.com/imazen/resizer/tree/develop#top), [stable (master)](https://github.com/imazen/resizer/tree/master#top), [v2](https://github.com/imazen/resizer/tree/support/v2#top), [v3]( https://github.com/imazen/resizer/tree/support/v3#top) and [v4](https://github.com/imazen/resizer/tree/support/v4#top).
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/imazen/resizer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) ![ImageResizer core downloads](http://img.shields.io/nuget/dt/ImageResizer.svg) ![Latest NuGet version](http://img.shields.io/nuget/vpre/ImageResizer.svg) ![Issue Count](http://img.shields.io/github/issues/imazen/resizer.svg) [![Issues ready for work](https://badge.waffle.io/imazen/resizer.png?label=ready&title=up for grabs&svg=true)](https://waffle.io/imazen/resizer)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/imazen/resizer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)  ![Latest NuGet version](http://img.shields.io/nuget/vpre/ImageResizer.svg) ![Issue Count](http://img.shields.io/github/issues/imazen/resizer.svg) [![Issues ready for work](https://badge.waffle.io/imazen/resizer.png?label=ready&title=up for grabs&svg=true)](https://waffle.io/imazen/resizer)
+
+https://github.com/imazen/resizer
+
+Not on Windows? [Check out Imageflow, our new cross-platform solution](https://github.com/imazen/imageflow). We need your help to build support for Imageflow's June 1st Kickstarter; [please leave us your e-mail on www.imageflow.io](https://www.imageflow.io) for early access. 
 
 # What is it?
 
