@@ -7,7 +7,9 @@
 
 https://github.com/imazen/resizer
 
-Not on Windows? [Check out Imageflow, our new cross-platform solution](https://github.com/imazen/imageflow). We need your help to build support for Imageflow's June 1st Kickstarter; [please leave us your e-mail on www.imageflow.io](https://www.imageflow.io) for early access. 
+## We need your help to make ImageResizer 5 possible! 
+
+**[Pledge to support the Imageflow Kickstarter today](https://www.kickstarter.com/projects/njones/imageflow-respect-the-pixels-a-secure-alt-to-image)!** More [information on ImageResizer 5 here](https://www.imageflow.io/imageresizer/).
 
 # What is it?
 
