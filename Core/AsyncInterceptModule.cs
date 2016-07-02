@@ -22,6 +22,7 @@ using System.Web.Hosting;
 using System.Web.Security;
 using ImageResizer.ExtensionMethods;
 using System.Globalization;
+﻿using System.Threading;
 
 namespace ImageResizer
 {
@@ -216,8 +217,10 @@ namespace ImageResizer
 
                         j.Source = inBuffer;
                         
-
-                        await Task.Run(delegate() { conf.GetImageBuilder().Build(j); });
+                        await Task.Factory.StartNew(() => conf.GetImageBuilder().Build(j), 
+                                                    CancellationToken.None,
+                                                    TaskCreationOptions.None,
+                                                    TaskScheduler.FromCurrentSynchronizationContext());
                         outBuffer.Seek(0, SeekOrigin.Begin);
                         await outBuffer.CopyToAsync(stream);
                     }
