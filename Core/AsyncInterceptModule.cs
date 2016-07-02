@@ -217,7 +217,7 @@ namespace ImageResizer
                         j.Source = inBuffer;
                         
 
-                        await Task.Run(delegate() { conf.GetImageBuilder().Build(j); });
+                        conf.GetImageBuilder().Build(j);
                         outBuffer.Seek(0, SeekOrigin.Begin);
                         await outBuffer.CopyToAsync(stream);
                     }
