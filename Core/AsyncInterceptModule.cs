@@ -250,7 +250,7 @@ namespace ImageResizer
             context.Items[conf.ResponseArgsKey] = e; //store in context items
 
             //Fire events (for client-side caching plugins)
-            //conf.FirePreHandleImage(this, context, e);
+            conf.FirePreHandleImageAsync(this, context, e);
 
             //Pass the rest of the work off to the caching module. It will handle rewriting/redirecting and everything. 
             //We handle request headers based on what is found in context.Items

@@ -471,10 +471,16 @@ namespace ImageResizer.Configuration {
         public event UrlEventHandler ImageMissing;
 
         /// <summary>
-        /// Fired immediately before the image request is sent off to the caching system for proccessing.
+        /// (Sync Intercept Module only) Fired immediately before the image request is sent off to the caching system for proccessing.
         /// Allows modification of response headers, caching arguments, and callbacks.
         /// </summary>
         public event PreHandleImageEventHandler PreHandleImage;
+
+        /// <summary>
+        /// (ASYNC Intercept Module only) Fired immediately before the image request is sent off to the caching system for proccessing.
+        /// Allows modification of response headers, caching arguments, and callbacks.
+        /// </summary>
+        public event PreHandleImageAsyncEventHandler PreHandleImageAsync;
 
         public event CacheSelectionHandler SelectCachingSystem;
 
@@ -528,6 +534,12 @@ namespace ImageResizer.Configuration {
 
         public void FireAuthorizeImage(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlAuthorizationEventArgs e) {
             if (AuthorizeImage != null) AuthorizeImage(sender, context, e);
+        }
+
+        public void FirePreHandleImageAsync(IHttpModule sender, HttpContext context, IAsyncResponsePlan e)
+        {
+            System.Threading.Interlocked.Increment(ref processedCount);
+            if (PreHandleImageAsync != null) PreHandleImageAsync(sender, context, e);
         }
 
         public void FireImageMissing(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
