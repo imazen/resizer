@@ -39,7 +39,12 @@ namespace ImageResizer.Plugins.S3Reader2 {
 
             if (!string.IsNullOrEmpty(args["accessKeyId"]) && !string.IsNullOrEmpty(args["secretAccessKey"])) {
                 S3Client = new AmazonS3Client(args["accessKeyId"], args["secretAccessKey"], s3config);
-            } else {
+            } else if (!string.IsNullOrEmpty(args["useProfile"]) && args["useProfile"] == "true")
+            {
+                S3Client = new AmazonS3Client(s3config);
+            }
+            else
+            {
                 S3Client = new AmazonS3Client(null, s3config);
             }
         }
