@@ -331,6 +331,7 @@ namespace ImageResizer.Plugins.RemoteReader {
             try {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
                 request.Timeout = 15000; //Default to 15 seconds. Browser timeout is usually 30.
+                request.UserAgent = "ImageResizer";
                 
                 //This is IDisposable, but only disposes the stream we are returning. So we can't dispose it, and don't need to
                 response = request.GetResponse() as HttpWebResponse;
