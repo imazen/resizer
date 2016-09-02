@@ -7,9 +7,7 @@
 
 https://github.com/imazen/resizer
 
-## We need your help to make ImageResizer 5 possible! 
-
-**[Pledge to support the Imageflow Kickstarter today](https://www.kickstarter.com/projects/njones/imageflow-respect-the-pixels-a-secure-alt-to-image)!** More [information on ImageResizer 5 here](https://www.imageflow.io/imageresizer/).
+ImageResizer is in maintenance-only mode for the next 10 months as we focus on [Imageflow](https://www.imageflow.io/imageresizer/), which will serve as the new underlying engine for future ImageResizer releases. Imageflow includes both a DLL (which ImageResizer will use) and a standalone image server and command-line tool.
 
 # What is it?
 
