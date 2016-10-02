@@ -118,6 +118,11 @@ namespace ImageResizer.Plugins.PdfRenderer.Ghostscript
                 // If Ghostscript has been initialised, you must call gsapi_exit before gsapi_delete_instance.
                 GhostscriptNativeMethods.DeleteInstance(instance);
             }
+            
+            //Prevent the GC from collecting objects during Ghostscript execution
+            GC.KeepAlive(outputHandler);
+            GC.KeepAlive(errorHandler);
+            GC.KeepAlive(inputHandler);
 
             // Check for errors. Zero and e_Quit(-101) are not errors.
             string output = outputBuilder.ToString();
