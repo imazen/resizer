@@ -298,6 +298,13 @@ static InterpolationDetails * InterpolationDetails_create_from_internal(Context 
     case Filter_Jinc:
         return ex ? truePtr :  InterpolationDetails_create_custom (context, 3, 1.0 / 1.2196698912665045, filter_jinc);
 
+    case Filter_NCubic:
+        return ex ? truePtr : InterpolationDetails_create_bicubic_custom(
+            context, 2.5, 1. / 1.1685777620836932, 0.37821575509399867, 0.31089212245300067);
+    case Filter_NCubicSharp:
+        return ex ? truePtr : InterpolationDetails_create_bicubic_custom(
+            context, 2.5, 1. / 1.105822933719019, 0.2620145123990142, 0.3689927438004929);
+
     }
     if (!checkExistenceOnly){
         CONTEXT_error(context, Invalid_interpolation_filter);
@@ -388,7 +395,7 @@ LineContributions *LineContributions_create(Context * context,  const uint32_t o
         const int right_edge = (int)floor(center_src_pixel + half_source_window + 0.5 - TONY);
 
         const uint32_t left_src_pixel = (uint32_t)max(0, left_edge);
-        const uint32_t right_src_pixel = (uint32_t)min(right_edge, (int)input_line_size - 1);
+        const uint32_t right_src_pixel = (uint32_t)int_min(right_edge, (int)input_line_size - 1);
 
         double total_weight = 0.0;
 
@@ -410,7 +417,7 @@ LineContributions *LineContributions_create(Context * context,  const uint32_t o
         //for (ix = left_edge; ix <= right_edge; ix++) {
         for (ix = left_src_pixel; ix <= right_src_pixel; ix++) {
             int tx = ix - left_src_pixel;
-            //int tx = min(max(ix, left_src_pixel), right_src_pixel) - left_src_pixel;
+            //int tx = int_min(int_max(ix, left_src_pixel), right_src_pixel) - left_src_pixel;
             double add = (*details->filter)(details, downscale_factor * ((double)ix - center_src_pixel));
             if (add < 0 && extra_negative_weight != 0) {
                 add *= extra_negative_weight;

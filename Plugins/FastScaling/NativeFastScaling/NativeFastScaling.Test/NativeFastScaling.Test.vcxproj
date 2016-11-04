@@ -170,12 +170,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\tests\weighting_test_helpers.h" />
+    <ClInclude Include="helpers.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tests\test.cpp" />
     <ClCompile Include="..\tests\test_error_handling.cpp" />
     <ClCompile Include="..\tests\test_program.cpp" />
     <ClCompile Include="..\tests\weighting_test_helpers.cpp" />
+    <ClCompile Include="helpers.c" />
+    <ClCompile Include="test_weighting.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
