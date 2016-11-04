@@ -72,7 +72,7 @@ Filter_Fastest = 27,
 
 Filter_MitchellFast = 28,
 Filter_NCubic = 29,
-Filter_NCubicSharp = 30,
+Filter_NCubicSharp = 30
 
 ENUM_END (InterpolationFilter)
 

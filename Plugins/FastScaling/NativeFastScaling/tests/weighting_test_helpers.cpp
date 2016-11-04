@@ -17,11 +17,11 @@ bool test_contrib_windows(Context * context, char *msg)
 
     // assumes included edge cases
 
-    InterpolationDetails* cubicFast = InterpolationDetails_create_from(context, InterpolationFilter::Filter_CubicFast);
+    InterpolationDetails* cubicFast = InterpolationDetails_create_from(context, InterpolationFilter::Filter_Triangle);
 
     unsigned int from_w = 6;
     unsigned int to_w = 3;
-    unsigned int corr36[3][2] = { { 0, 1 }, { 2, 3 }, { 4, 5 } };
+    unsigned int corr36[3][2] = { { 0, 2 },{ 1, 4 },{ 3, 5 } };
     lct = LineContributions_create(context, to_w, from_w, cubicFast);
 
     for (uint32_t i = 0; i < lct->LineLength; i++)
@@ -45,7 +45,7 @@ bool test_contrib_windows(Context * context, char *msg)
 
     from_w = 6;
     to_w = 4;
-    unsigned int corr46[4][2] = { { 0, 1 }, { 1, 2 }, { 3, 4 }, { 4, 5 } };
+    unsigned int corr46[4][2] = { { 0, 1 },{ 1, 3 },{ 2, 4 },{ 4, 5 } };
     lct = LineContributions_create(context, to_w, from_w, cubicFast);
     InterpolationDetails_destroy(context, cubicFast);
 
