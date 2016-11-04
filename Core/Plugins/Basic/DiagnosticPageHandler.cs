@@ -109,7 +109,16 @@ namespace ImageResizer.Plugins.Basic {
                 }
             }
 
-            string edition = editionsUsed.Values.FirstOrDefault(s => new string[] { "R4Elite", "R4Creative", "R4Performance" }.Contains(s));
+
+            var editionsUsedList = new List<string>(editionsUsed.Values);
+            foreach (ILicensedPlugin p in c.Plugins.GetAll<ILicensedPlugin>())
+            {
+                foreach (var name in p.LicenseFeatureCodes) {
+                    editionsUsedList.Add(name);
+                }
+            }
+
+            string edition = editionsUsedList.FirstOrDefault(s => new string[] { "R4Elite", "R4Creative", "R4Performance" }.Contains(s, StringComparer.OrdinalIgnoreCase));
 
             
             if (new List<string>(editionsUsed.Values).Intersect(new string[] { "R3Elite", "R3Creative", "R3Performance" }).Count() > 0){
