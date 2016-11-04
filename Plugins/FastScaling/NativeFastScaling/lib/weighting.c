@@ -251,7 +251,7 @@ static InterpolationDetails * InterpolationDetails_create_from_internal(Context 
 
 
     case Filter_CubicFast:
-        return ex ? truePtr : InterpolationDetails_create_custom(context, 1, 1, filter_bicubic_fast);
+        return ex ? truePtr : InterpolationDetails_create_custom(context, 2, 1, filter_bicubic_fast);
     case Filter_Cubic:
         return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 1, 0,1);
     case Filter_CubicSharp:
@@ -263,13 +263,13 @@ static InterpolationDetails * InterpolationDetails_create_from_internal(Context 
     case Filter_CatmullRomFastSharp:
         return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 1, 13.0 / 16.0, 0, 0.5);
     case Filter_Mitchell:
-        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 7.0 / 8.0, 1.0 / 3.0, 1.0 / 3.0);
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 1., 1.0 / 3.0, 1.0 / 3.0);
     case Filter_MitchellFast:
-        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom (context, 1, 7.0 / 8.0, 1.0 / 3.0, 1.0 / 3.0);
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom (context, 1, 1., 1.0 / 3.0, 1.0 / 3.0);
 
 
     case Filter_Robidoux:
-        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 1. / 1.1685777620836932,
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 1.,
                 0.37821575509399867, 0.31089212245300067);
     case Filter_Fastest:
         return ex ? truePtr : InterpolationDetails_create_bicubic_custom (context,0.74, 0.74,
@@ -277,10 +277,10 @@ static InterpolationDetails * InterpolationDetails_create_from_internal(Context 
 
 
     case Filter_RobidouxFast:
-        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom (context, 1.05, 1. / 1.1685777620836932,
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom (context, 1.05, 1.,
             0.37821575509399867, 0.31089212245300067);
     case Filter_RobidouxSharp:
-        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 1. / 1.105822933719019,
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 1.,
                 0.2620145123990142, 0.3689927438004929);
     case Filter_Hermite:
         return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 1, 1, 0, 0);
@@ -296,7 +296,7 @@ static InterpolationDetails * InterpolationDetails_create_from_internal(Context 
 
 
     case Filter_Jinc:
-        return ex ? truePtr :  InterpolationDetails_create_custom (context, 3, 1.0 / 1.2196698912665045, filter_jinc);
+        return ex ? truePtr :  InterpolationDetails_create_custom (context, 6, 1., filter_jinc);
 
     case Filter_NCubic:
         return ex ? truePtr : InterpolationDetails_create_bicubic_custom(
@@ -376,8 +376,8 @@ LineContributions *LineContributions_create(Context * context,  const uint32_t o
 
     const double scale_factor = (double)output_line_size / (double)input_line_size;
     const double downscale_factor = fmin(1.0, scale_factor);
-    const double half_source_window = details->window * 0.5 / downscale_factor;
-
+    const double half_source_window = (details->window + 0.5) / downscale_factor;
+   
     const uint32_t allocated_window_size = (int)ceil(2 * (half_source_window - TONY)) + 1;
     uint32_t u, ix;
     LineContributions *res = LineContributions_alloc(context, output_line_size, allocated_window_size);
@@ -426,11 +426,12 @@ LineContributions *LineContributions_create(Context * context,  const uint32_t o
             total_weight += add;
         }
 
-        if (total_weight <= TONY) {
+        //Total_weight could be negative, 's okay We fix it (although we could fix it better)
+        /*if (total_weight <= TONY) {
             LineContributions_destroy(context, res);
             CONTEXT_error (context, Invalid_internal_state);
             return NULL;
-        }
+        }*/
 
 
         const float total_factor = (float)(1.0f / total_weight);
