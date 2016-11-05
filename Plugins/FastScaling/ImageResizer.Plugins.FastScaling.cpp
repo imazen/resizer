@@ -168,7 +168,11 @@ namespace ImageResizer{
 
                     opts->SharpeningPercentGoal = (float)(GetDouble (query, "f.sharpen", 0) / 200.0);
 
-                    bool ignorealpha = ImageResizer::ExtensionMethods::NameValueCollectionExtensions::Get<bool> (query, "f.ignorealpha", false);
+
+                    bool mayIgnoreAlpha = colorMatrix == nullptr && source->PixelFormat == PixelFormat::Format24bppRgb;
+
+
+                    bool ignorealpha = ImageResizer::ExtensionMethods::NameValueCollectionExtensions::Get<bool> (query, "f.ignorealpha", mayIgnoreAlpha);
 
                     bool sourceFormatInvalid = (source->PixelFormat != PixelFormat::Format32bppArgb &&
                         source->PixelFormat != PixelFormat::Format24bppRgb &&
