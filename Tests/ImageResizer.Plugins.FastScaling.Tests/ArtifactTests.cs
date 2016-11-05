@@ -88,12 +88,13 @@ namespace ImageResizer.Plugins.FastScaling.Tests
         [Fact]
         public void CheckForBlurredEdges()
         {
-            var  background = Color.FromArgb(255, 0, 5, 0);
+            var  background = Color.FromArgb(255, 0, 5, 40);
             var inner = Color.FromArgb(255, 240, 189, 35);
 
-            var b = CreateRingedBitmap(200, 86, background, inner, 6);
-
-            using (var result = BuildWithFastScaling(b, new Instructions() { Width = 50 }))
+            var b = CreateRingedBitmap(200, 86, background, inner, 12);
+            var i = new Instructions() { Width = 50 };
+            i["down.filter"] = "catrom";
+            using (var result = BuildWithFastScaling(b,i))
             {
                 AssertBorderColor(background, result);
             }
