@@ -134,10 +134,11 @@ namespace ImageResizer.Resizing {
             {
                 throw new ArgumentOutOfRangeException("cropRect", "Crop rectangle is outside the bounds of the image");
             }
-            if (copyRect.Width < 1 || copyRect.Height < 1)
-            {
-                throw new ArgumentOutOfRangeException("cropRect", string.Format("Crop rectangle includes zero pixels: {0},{1},{2},{3}", copyRect.X,copyRect.Y,copyRect.Right,copyRect.Bottom));
-            }
+            // Actually, throwing an error is worse
+            //if (copyRect.Width < 1 || copyRect.Height < 1)
+            //{
+            //    throw new ArgumentOutOfRangeException("cropRect", string.Format("Crop rectangle includes zero pixels: {0},{1},{2},{3}", copyRect.X,copyRect.Y,copyRect.Right,copyRect.Bottom));
+            //}
         }
         /// <summary>
         /// Ensures that the working bitmap is in 32bpp RGBA format - otherwise it is converted.
