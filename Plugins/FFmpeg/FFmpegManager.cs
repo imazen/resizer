@@ -24,7 +24,7 @@ using System.Linq;
 
 namespace ImageResizer.Plugins.FFmpeg
 {
-    class FFmpegManager
+    public class FFmpegManager
     {
 
         public FFmpegManager()
@@ -229,6 +229,7 @@ namespace ImageResizer.Plugins.FFmpeg
         {
             var job = new FFmpegJob(queryString);
 
+            
             bool bufferToTemp = !File.Exists(HostingEnvironment.MapPath(virtualPath));
 
             job.SourcePath = !bufferToTemp ? HostingEnvironment.MapPath(virtualPath) : Path.GetTempFileName();
