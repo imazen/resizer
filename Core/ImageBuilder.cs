@@ -811,6 +811,7 @@ namespace ImageResizer
             //Create graphics handle
             Graphics g = s.destGraphics = Graphics.FromImage(s.destBitmap);
 
+            //Use the highest quality downsampling filter GDI+ offers. It's like cubic b=0, c=1
             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
             //Vector quality
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
