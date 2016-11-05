@@ -811,11 +811,14 @@ namespace ImageResizer
             //Create graphics handle
             Graphics g = s.destGraphics = Graphics.FromImage(s.destBitmap);
 
-            //High quality everthing
             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+            //Vector quality
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
-            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+            //Do math to the center of pixels to reduce edge errors
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+            //Blend alpha with gamma awareness
+            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.GammaCorrected;
+            //Composite instead of copy
             g.CompositingMode = CompositingMode.SourceOver;
             return RequestedAction.None;
         }
@@ -912,8 +915,21 @@ namespace ImageResizer
                 ia.SetWrapMode(WrapMode.TileFlipXY);
             
                 if (colorMatrix != null) ia.SetColorMatrix(new ColorMatrix(colorMatrix));
+
+                bool parallel_to_canvas = targetArea[0].X == targetArea[1].X || targetArea[0].Y == targetArea[1].Y;
+
+                if (source.PixelFormat == PixelFormat.Format24bppRgb &&
+                    parallel_to_canvas && colorMatrix==null)
+                {
+                    //If it starts out 24-bit, doesn't have a color matrix, and only has parallel edges
+                    //... then compositing isn't in play.
+                    state.destGraphics.CompositingQuality = CompositingQuality.AssumeLinear;
+                    state.destGraphics.CompositingMode = CompositingMode.SourceCopy;
+                }
                 state.destGraphics.DrawImage(source, targetArea, sourceArea, GraphicsUnit.Pixel, ia);
-            
+                state.destGraphics.CompositingQuality = CompositingQuality.GammaCorrected;
+                state.destGraphics.CompositingMode = CompositingMode.SourceOver;
+
             }
             return RequestedAction.Cancel;
         }
