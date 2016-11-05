@@ -16,7 +16,11 @@ TEST_CASE("Test output weights", "[fastscaling]")
     }
 
     FILE * output;
+#ifdef _MSC_VER
     if (fopen_s(&output, filename, "w") != 0) {
+#else
+    if ((output = fopen(filename, "w") == NULL) {
+#endif
         CAPTURE(filename);
         FLOW_error(c, Invalid_internal_state);
         REQUIRE_FALSE(true);

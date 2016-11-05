@@ -95,15 +95,21 @@ bool flow_compare_file_contents(flow_c * c, const char * filename1, const char *
     char * difference_message_buffer, size_t buffer_size, bool * are_equal)
 {
     FILE * fp1, *fp2;
-
+#ifdef _MSC_VER
     if (fopen_s(&fp1, filename1, "r") != 0) {
+#else
+    if ((fp1 = fopen(filename1, "r") == NULL) {
+#endif
         if (difference_message_buffer != NULL)
             flow_snprintf(difference_message_buffer, buffer_size, "Unable to open file A (%s)", filename1);
         *are_equal = false;
         return true;
     }
-
+#ifdef _MSC_VER
     if (fopen_s(&fp2, filename2, "r") != 0) {
+#else
+    if ((fp2 = fopen(filename2, "r") == NULL) {
+#endif
         if (difference_message_buffer != NULL)
             flow_snprintf(difference_message_buffer, buffer_size, "Unable to open file B (%s)", filename2);
         *are_equal = false;
