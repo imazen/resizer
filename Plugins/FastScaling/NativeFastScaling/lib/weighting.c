@@ -369,11 +369,6 @@ LineContributions *LineContributions_create(Context * context,  const uint32_t o
 {
     const double sharpen_ratio =  InterpolationDetails_percent_negative_weight(details);
     const double desired_sharpen_ratio = details->sharpen_percent_goal / 100.0;
-    const double extra_negative_weight = sharpen_ratio > 0 && desired_sharpen_ratio > 0 ?
-                                         (desired_sharpen_ratio + sharpen_ratio) / sharpen_ratio :
-                                         0;
-
-
     const double scale_factor = (double)output_line_size / (double)input_line_size;
     const double downscale_factor = fmin(1.0, scale_factor);
     const double half_source_window = (details->window + 0.5) / downscale_factor;
@@ -385,6 +380,8 @@ LineContributions *LineContributions_create(Context * context,  const uint32_t o
         CONTEXT_add_to_callstack (context);
         return NULL;
     }
+
+    
     double negative_area = 0;
     double positive_area = 0;
 
