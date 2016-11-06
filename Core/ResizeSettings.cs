@@ -264,7 +264,7 @@ namespace ImageResizer {
         }
 
         /// <summary>
-        /// ["crop"]=([x1],[y1],x2,y2). Sets x1 and y21, the top-right corner of the crop rectangle. If 0 or greater, the coordinate is relative to the top-left corner of the image.
+        /// ["crop"]=([x1],[y1],x2,y2). Sets x1 and y21, the top-left corner of the crop rectangle. If 0 or greater, the coordinate is relative to the top-left corner of the image.
         /// If less than 0, the value is relative to the bottom-right corner. This allows for easy trimming: crop=(10,10,-10,-10).
         /// Set ["cropxunits"] and ["cropyunits"] to the width/height of the rectangle your coordinates are relative to, if different from the original image size.
         /// </summary>
