@@ -67,8 +67,13 @@ namespace ImageResizer.Plugins.Basic {
             //Verify we're using the same general version of all ImageResizer assemblies.
             Dictionary<string, List<string>> versions = new Dictionary<string, List<string>>();
             foreach (Assembly a in asms) {
-                
-                var copyright = a.GetCustomAttribute<AssemblyCopyrightAttribute>();
+
+                AssemblyCopyrightAttribute copyright = null;
+                try
+                {
+                    copyright = a.GetCustomAttribute<AssemblyCopyrightAttribute>();
+                }
+                catch { }
                 var is_imazen_assembly = copyright != null && copyright.Copyright.Contains("Imazen");
 
                 AssemblyName an = new AssemblyName(a.FullName);
@@ -239,16 +244,22 @@ namespace ImageResizer.Plugins.Basic {
 
                
                 object[] attrs;
-                
-                attrs = a.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
-                if (attrs != null && attrs.Length > 0) asb.Append(" File: " + ((AssemblyFileVersionAttribute)attrs[0]).Version.PadRight(15));
+                try
+                {
 
-                attrs = a.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
-                if (attrs != null && attrs.Length > 0) asb.Append(" Info: " + ((AssemblyInformationalVersionAttribute)attrs[0]).InformationalVersion);
+                    attrs = a.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
+                    if (attrs != null && attrs.Length > 0) asb.Append(" File: " + ((AssemblyFileVersionAttribute)attrs[0]).Version.PadRight(15));
 
-                attrs = a.GetCustomAttributes(typeof(CommitAttribute), false);
-                if (attrs != null && attrs.Length > 0) asb.Append("  Commit: " + ((CommitAttribute)attrs[0]).Value);
+                    attrs = a.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
+                    if (attrs != null && attrs.Length > 0) asb.Append(" Info: " + ((AssemblyInformationalVersionAttribute)attrs[0]).InformationalVersion);
 
+                    attrs = a.GetCustomAttributes(typeof(CommitAttribute), false);
+                    if (attrs != null && attrs.Length > 0) asb.Append("  Commit: " + ((CommitAttribute)attrs[0]).Value);
+                }catch (Exception e)
+                {
+                    asb.Append("Failed to read assembly attributes for: ");
+                    asb.Append(e.Message);
+                }
                 asb.AppendLine();
 
                 
