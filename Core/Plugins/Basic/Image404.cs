@@ -267,7 +267,7 @@ namespace ImageResizer.Plugins.Basic {
             }
             //4 Otherwise, join with image404.basedir or the application root
             string baseDir = c.get("image404.basedir","~/");
-            path = baseDir.TrimEnd('/') + '/' + path.TrimStart('/');
+            path = baseDir.TrimEnd(ParseUtils.ForwardSlash) + '/' + path.TrimStart(ParseUtils.ForwardSlash);
             return path;
         }
 
@@ -294,7 +294,7 @@ namespace ImageResizer.Plugins.Basic {
                     return MatcherCollection.Empty;
                 }
 
-                var commands = commandList.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                var commands = commandList.Split(ParseUtils.Comma, StringSplitOptions.RemoveEmptyEntries);
                 var matchers = new Matcher[commands.Length];
 
                 for (var i = 0; i < commands.Length; i++)

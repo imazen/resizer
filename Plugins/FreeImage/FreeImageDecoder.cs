@@ -9,6 +9,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Globalization;
 using ImageResizer.ExtensionMethods;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.FreeImageDecoder {
 
@@ -37,7 +38,7 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
             List<string> extensions = new List<string>();
             foreach (FREE_IMAGE_FORMAT format in formats)
                 if (format != FREE_IMAGE_FORMAT.FIF_UNKNOWN)
-                    extensions.AddRange(FreeImage.GetFIFExtensionList(format).Split(','));
+                    extensions.AddRange(FreeImage.GetFIFExtensionList(format).Split(ParseUtils.Comma));
             return extensions;
 
         }
@@ -48,7 +49,7 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
         }
 
         public IEnumerable<string> GetSupportedFileExtensions() {
-            if (supportedExts == null) return new string[] { };
+            if (supportedExts == null) return ParseUtils.EmptyStringArray;
             else return supportedExts;
         }
 

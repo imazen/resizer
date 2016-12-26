@@ -67,12 +67,12 @@ namespace ImageResizer.Plugins.FFmpeg
                 {
                     if (ffmpegPath == null)
                     {
-                        string m = basePath.TrimEnd('\\') + '\\' + "ffmpeg.exe";
+                        string m = basePath.TrimEnd(ParseUtils.BackSlash) + '\\' + "ffmpeg.exe";
                         if (File.Exists(Path.GetFullPath(m))) ffmpegPath = Path.GetFullPath(m);
                     }
                     if (ffprobePath == null)
                     {
-                        string p = basePath.TrimEnd('\\') + '\\' + "ffprobe.exe";
+                        string p = basePath.TrimEnd(ParseUtils.BackSlash) + '\\' + "ffprobe.exe";
                         if (File.Exists(Path.GetFullPath(p))) ffprobePath = Path.GetFullPath(p);
                     }
 

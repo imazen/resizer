@@ -209,7 +209,7 @@ namespace ImageResizer.Plugins.RemoteReader {
                 }
                 args.RemoteUrl = PathUtils.FromBase64UToString(data);
             } else {
-                args.RemoteUrl = "http://" + ReplaceInLeadingSegment(virtualPath.Substring(remotePrefix.Length).TrimStart('/', '\\'), "_", ".");
+                args.RemoteUrl = "http://" + ReplaceInLeadingSegment(virtualPath.Substring(remotePrefix.Length).TrimStart(ParseUtils.Slashes), "_", ".");
                 args.RemoteUrl = Uri.EscapeUriString(args.RemoteUrl);
             }
             if (!Uri.IsWellFormedUriString(args.RemoteUrl, UriKind.Absolute))

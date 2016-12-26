@@ -6,6 +6,7 @@ using ImageResizer.Configuration;
 using ImageResizer.Configuration.Issues;
 using System.Collections.Specialized;
 using ImageResizer.ExtensionMethods;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.Basic {
     public class Presets:IPlugin,IQuerystringPlugin, IIssueProvider, ISettingsModifier {
@@ -69,7 +70,7 @@ namespace ImageResizer.Plugins.Basic {
 
         void ApplyPreset(IUrlEventArgs e, Dictionary<string, ResizeSettings> dict) {
             if (!string.IsNullOrEmpty(e.QueryString["preset"])) {
-                string[] presets = e.QueryString["preset"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] presets = e.QueryString["preset"].Split(ParseUtils.Comma, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string p in presets) {
                     if (!dict.ContainsKey(p)) continue;
                     ResizeSettings query = dict[p];
@@ -82,7 +83,7 @@ namespace ImageResizer.Plugins.Basic {
 
         public ResizeSettings Modify(ResizeSettings s) {
             if (!string.IsNullOrEmpty(s["preset"])) {
-                string[] presets = s["preset"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] presets = s["preset"].Split(ParseUtils.Comma, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string p in presets) {
                     //Apply defaults
                     if (defaults.ContainsKey(p)) {

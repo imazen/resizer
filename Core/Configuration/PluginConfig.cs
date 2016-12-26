@@ -16,6 +16,7 @@ using ImageResizer.Collections;
 using ImageResizer.Configuration.Logging;
 using System.Web.Compilation;
 using ImageResizer.Configuration.Plugins;
+using ImageResizer.Util;
 
 namespace ImageResizer.Configuration {
     /// <summary>
@@ -397,19 +398,21 @@ namespace ImageResizer.Configuration {
             //ImageResizer.Plugins.Basic.DefaultEncoder
             if (hasDot) alternateNames.Add(name);
             //DefaultEncoder, NoCache, etc.
-            alternateNames.Add("ImageResizer.Plugins.Basic." + name.TrimStart('.'));
-            //Apr4-2012 - Deleted, never used: alternateNames.Add("ImageResizer.Plugins.Pro." + name.TrimStart('.'));
+            alternateNames.Add("ImageResizer.Plugins.Basic." + name.TrimStart(ParseUtils.Period));
+            //Apr4-2012 - Deleted, never used: alternateNames.Add("ImageResizer.Plugins.Pro." + name.TrimStart(ParseUtils.Period));
             //AnimatedGifs
-            if (!hasDot) alternateNames.Add("ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.') + "Plugin");
+            if (!hasDot)
+                alternateNames.Add("ImageResizer.Plugins." + name.Trim(ParseUtils.Period) + "." + name.Trim(ParseUtils.Period) + "Plugin");
             //AnimatedGifsPlugin
             if (!hasDot && name.EndsWith("Plugin"))
-                alternateNames.Add("ImageResizer.Plugins." + name.Substring(0, name.Length - 6).Trim('.') + "." + name.Trim('.'));
+                alternateNames.Add("ImageResizer.Plugins." + name.Substring(0, name.Length - 6).Trim(ParseUtils.Period) + "." + name.Trim(ParseUtils.Period));
             //Apr4-2012 - Deleted, never used: //Basic.DefaultEncoder
-            //Apr4-2012 - Deleted, never used: alternateNames.Add("ImageResizer.Plugins." + name.TrimStart('.'));
+            //Apr4-2012 - Deleted, never used: alternateNames.Add("ImageResizer.Plugins." + name.TrimStart(ParseUtils.Period));
             //For the deprecated convention of naming the plugin namespace and class the same.
-            if (!hasDot) alternateNames.Add("ImageResizer.Plugins." + name.Trim('.') + "." + name.Trim('.'));
+            if (!hasDot)
+                alternateNames.Add("ImageResizer.Plugins." + name.Trim(ParseUtils.Period) + "." + name.Trim(ParseUtils.Period));
             //Apr4-2012 - Deleted, never used: //Plugins.Basic.DefaultEncoder
-            //Apr4-2012 - Deleted, never used: alternateNames.Add("ImageResizer." + name.TrimStart('.'));
+            //Apr4-2012 - Deleted, never used: alternateNames.Add("ImageResizer." + name.TrimStart(ParseUtils.Period));
             //PluginWithNoNamespace
             if (!hasDot) alternateNames.Add(name);
 

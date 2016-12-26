@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections.Specialized;
 using System.Drawing;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.CustomOverlay {
     /// <summary>
@@ -32,7 +33,7 @@ namespace ImageResizer.Plugins.CustomOverlay {
 
             
 
-            string[] coords = poly.Split(',');
+            string[] coords = poly.Split(ParseUtils.Comma);
             
             if (coords.Length != 8 && coords.Length != 4) return null; //Not valid coords
 
@@ -55,7 +56,7 @@ namespace ImageResizer.Plugins.CustomOverlay {
 
 
             //Build path
-            o.OverlayPath = OverlayFolder.TrimEnd('/') + '/' + Util.PathUtils.RemoveNonMatchingChars(image, ValidImageChars);
+            o.OverlayPath = OverlayFolder.TrimEnd(ParseUtils.ForwardSlash) + '/' + Util.PathUtils.RemoveNonMatchingChars(image, ValidImageChars);
 
             return new Overlay[] { o };
         }

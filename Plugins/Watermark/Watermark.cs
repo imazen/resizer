@@ -192,7 +192,7 @@ namespace ImageResizer.Plugins.Watermark
         private ImageLayer CreateLayerFromOtherImages(string watermarkPath)
         {
             if (watermarkPath.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) > -1 ||
-                watermarkPath.IndexOfAny(new char[] { '\\', '/' }) > -1) {
+                watermarkPath.IndexOfAny(ParseUtils.Slashes) > -1) {
                 throw new ArgumentException("Watermark value contained invalid file name characters: " + watermarkPath);
             }
 
@@ -285,7 +285,7 @@ namespace ImageResizer.Plugins.Watermark
             watermark = nvc["watermark"];
             if (string.IsNullOrEmpty(watermark)) return null;
 
-            string[] parts = watermark.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = watermark.Split(ParseUtils.Comma, StringSplitOptions.RemoveEmptyEntries);
             return parts;
         }
     }

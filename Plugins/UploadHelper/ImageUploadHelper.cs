@@ -29,7 +29,7 @@ namespace ImageResizer
         /// <returns></returns>
         public string GetExtension(string path)
         {
-            int lastDot = path.LastIndexOfAny(new char[] { '.', '/', ' ', '\\', '?', '&', ':' });
+            int lastDot = path.LastIndexOfAny(ParseUtils.PathParts);
             if (lastDot > -1 && path[lastDot] == '.') return path.Substring(lastDot + 1);
             else return null;
         }

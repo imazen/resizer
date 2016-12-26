@@ -48,7 +48,7 @@ namespace ImageResizer.Plugins.SeamCarving {
 
             //Parse carve data bitmap
             if (!string.IsNullOrEmpty(s.settings["carve.data"])) {
-                string[] parts = s.settings["carve.data"].Split('|');
+                string[] parts = s.settings["carve.data"].Split(ParseUtils.VBar);
                 //Parse block count and string
                 var block_count = int.Parse(parts[0]);
                 var carveString = new LzwDecoder("012").Decode(PathUtils.FromBase64UToBytes(parts[1]));

@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using System.Xml;
 using ImageResizer.Configuration.Issues;
 using System.Collections.ObjectModel;
+using ImageResizer.Util;
 
 namespace ImageResizer.Configuration.Xml {
     /// <summary>
@@ -122,7 +123,7 @@ namespace ImageResizer.Configuration.Xml {
         }
 
         protected KeyValuePair<string, string> parseAttributeName(string selector) {
-            selector = selector.Trim('.');
+            selector = selector.Trim(ParseUtils.Period);
             int lastDot = selector.LastIndexOf('.');
             if (lastDot < 0) throw new ArgumentException("Selector must include an attribute name, like element.attrname. Was given '" + selector + "'");
             string nodeSelector = selector.Substring(0, lastDot);
@@ -209,7 +210,7 @@ namespace ImageResizer.Configuration.Xml {
         public ICollection<Node> queryUncached(string selector) {
             if (children == null || children.Count == 0) return null;
 
-            selector = selector.Trim('.'); //Trim leading and trailing dots
+            selector = selector.Trim(ParseUtils.Period); //Trim leading and trailing dots
             
             int nextDot = selector.IndexOf('.');
             //Get the first item

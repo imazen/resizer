@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -8,7 +9,6 @@ using System.Text;
 using System.IO;
 using System.Web.Hosting;
 using ImageResizer.Util;
-using System.Collections.Specialized;
 
 namespace ImageStudio {
     public partial class _Default : System.Web.UI.Page {
@@ -18,7 +18,7 @@ namespace ImageStudio {
             physicalBasePath = Path.Combine(HostingEnvironment.ApplicationPhysicalPath,physicalBasePath);
             string[] exts = extensions.Split(new char[]{'|',';',','}, StringSplitOptions.RemoveEmptyEntries);
             foreach (string dir in subdirs) {
-                var sdir = dir.Trim('/','\\');
+                var sdir = dir.Trim(ParseUtils.Slashes);
                 string full = Path.GetFullPath(Path.Combine(physicalBasePath, sdir.Replace('/', '\\')));
                 if (System.IO.Directory.Exists(full)) {
                     foreach(string e in exts){
@@ -26,7 +26,7 @@ namespace ImageStudio {
                         foreach(string physicalFile in physicals){
                             string name = System.IO.Path.GetFileName(physicalFile);
                             if (name.StartsWith(".")) continue;
-                            string url = ResolveUrl(basePath.TrimEnd('/') + '/' + sdir + '/' + System.IO.Path.GetFileName(name));
+                            string url = ResolveUrl(basePath.TrimEnd(ParseUtils.ForwardSlash) + '/' + sdir + '/' + System.IO.Path.GetFileName(name));
                             paths.Add(url);
                         }
                     }

@@ -14,7 +14,6 @@ using ImageResizer.ExtensionMethods;
 namespace ImageResizer.Util {
     [Obsolete("All methods of this class have been deprecated. Use ParseUtils or ImageResizer.ExtensionMethods instead.  Will be removed in V3.5 or V4.")]
     public class Utils {
-        
   
         public static Color parseColor(string value, Color defaultValue) {
             return ParseUtils.ParseColor(value, defaultValue);
@@ -30,8 +29,8 @@ namespace ImageResizer.Util {
         /// <param name="defaultValue"></param>
         /// <returns></returns>
         public static double[] parseList(string text, double defaultValue) {
-            text = text.Trim(' ', '(', ')');
-            string[] parts = text.Split(new char[] { ',' }, StringSplitOptions.None);
+            text = text.Trim(ParseUtils.ListNoise);
+            string[] parts = text.Split(ParseUtils.Comma, StringSplitOptions.None);
             double[] vals = new double[parts.Length];
             for (int i = 0; i < parts.Length; i++) {
                 if (!double.TryParse(parts[i], floatingPointStyle, NumberFormatInfo.InvariantInfo, out vals[i]))
@@ -202,10 +201,13 @@ namespace ImageResizer.Util {
             if (mode == CropMode.Auto) return "auto";
             if (mode == CropMode.None) return "none";
             if (mode == CropMode.Custom) {
-                string c = "(";
+                var sb = new StringBuilder();
+                sb.Append('(');
                 foreach (double d in coords)
-                    c += d.ToString(NumberFormatInfo.InvariantInfo) + ",";
-                return c.TrimEnd(',') + ")";
+                    sb.Append(d.ToString(NumberFormatInfo.InvariantInfo)).Append(',');
+                if (sb.Length > 1) sb.Length--; // trim trailing comma
+                sb.Append(')');
+                return sb.ToString();
             }
             throw new NotImplementedException("Unrecognized CropMode value: " + mode.ToString());
         }

@@ -33,7 +33,7 @@ namespace ImageResizer.Plugins.WicDecoder {
             return true;
         }
         public IEnumerable<string> GetSupportedFileExtensions() {
-            return new string[] { }; //Same as default
+            return ParseUtils.EmptyStringArray; //Same as default
         }
 
         public override System.Drawing.Bitmap DecodeStream(System.IO.Stream s, ResizeSettings settings, string optionalPath) {

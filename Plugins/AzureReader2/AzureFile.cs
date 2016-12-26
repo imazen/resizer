@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Web.Hosting;
+using ImageResizer.Util;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -28,7 +29,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
             try {
                 // Get a reference to the blob
                 // mb: 12/8/2012 - the path needs to be a uri now, so combining blobclient baseuri with the virtualpath
-                Uri blobUri = new Uri(string.Format("{0}/{1}", parent.CloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\'), VirtualPath));
+                Uri blobUri = new Uri(string.Format("{0}/{1}", parent.CloudBlobClient.BaseUri.OriginalString.TrimEnd(ParseUtils.Slashes), VirtualPath));
                 ICloudBlob cloudBlob = parent.CloudBlobClient.GetBlobReferenceFromServer(blobUri);
 
                 cloudBlob.DownloadToStream(ms);

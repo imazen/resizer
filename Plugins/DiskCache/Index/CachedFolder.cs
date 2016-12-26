@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.DiskCache {
     public delegate void FileDisappearedHandler(string relativePath, string physicalPath);
@@ -311,7 +312,7 @@ namespace ImageResizer.Plugins.DiskCache {
             try {
                  dirs = System.IO.Directory.GetDirectories(physicalPath);
             } catch (DirectoryNotFoundException) {
-                dirs = new string[]{}; //Pretend it's empty. We don't care, the next recursive will get rid of it.
+                dirs = ParseUtils.EmptyStringArray; //Pretend it's empty. We don't care, the next recursive will get rid of it.
             }
             lock (_sync) {
                 CachedFolder f = getOrCreateFolder(relativePath, true);
@@ -338,7 +339,7 @@ namespace ImageResizer.Plugins.DiskCache {
             try {
                 physicalFiles = System.IO.Directory.GetFiles(physicalPath);
             } catch (DirectoryNotFoundException) {
-                physicalFiles = new string[] { }; //Pretend it's empty. We don't care, the next recursive will get rid of it.
+                physicalFiles = ParseUtils.EmptyStringArray; //Pretend it's empty. We don't care, the next recursive will get rid of it.
             }
             Dictionary<string, CachedFileInfo> newFiles = new Dictionary<string, CachedFileInfo>(physicalFiles.Length, KeyComparer);
 

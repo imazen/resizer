@@ -21,7 +21,7 @@ namespace ImageResizer.Plugins.TinyCache {
         }
 
 
-        protected string virtualCacheFile = HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/App_Data/tiny_cache.cache";
+        protected string virtualCacheFile = HostingEnvironment.ApplicationVirtualPath.TrimEnd(ParseUtils.ForwardSlash) + "/App_Data/tiny_cache.cache";
         /// <summary>
         /// Sets the location of the cache file
         /// </summary>

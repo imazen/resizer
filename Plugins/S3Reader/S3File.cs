@@ -13,6 +13,7 @@ using ImageResizer.Resizing;
 using Amazon.S3.Model;
 using ImageResizer.ExtensionMethods;
 using Amazon.S3;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.S3Reader {
 
@@ -83,13 +84,13 @@ namespace ImageResizer.Plugins.S3Reader {
             String path = VirtualPath.Substring(provider.VirtualFilesystemPrefix.Length);
 
             //strip leading slashes
-            path = path.TrimStart(new char[] { '/', '\\' });
+            path = path.TrimStart(ParseUtils.Slashes);
 
             //Now execute filter!
             path = provider.FilterPath(path);
 
             //strip leading slashes again
-            path = path.TrimStart(new char[] { '/', '\\' });
+            path = path.TrimStart(ParseUtils.Slashes);
 
 
             int keyStartsAt = path.IndexOf('/');
@@ -97,7 +98,7 @@ namespace ImageResizer.Plugins.S3Reader {
             //Get bucket
             bucket = path.Substring(0, keyStartsAt);
             //Get key
-            key = path.Substring(keyStartsAt + 1).TrimStart(new char[] { '/', '\\' });
+            key = path.Substring(keyStartsAt + 1).TrimStart(ParseUtils.Slashes);
         }
 
 
@@ -115,7 +116,6 @@ namespace ImageResizer.Plugins.S3Reader {
                 else if ( se.StatusCode == System.Net.HttpStatusCode.Forbidden || "AccessDenied".Equals(se.ErrorCode, StringComparison.OrdinalIgnoreCase)) throw new FileNotFoundException("Amazon S3 access denied - file may not exist", se);
                 else throw;
             }
-            return null;
         }
 
         public DateTime ModifiedDateUTC {

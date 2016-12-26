@@ -205,7 +205,7 @@ namespace ImageResizer.Plugins.WpfBuilder
 
         public IEnumerable<string> GetSupportedFileExtensions()
         {
-            return new string[] { };
+            return ParseUtils.EmptyStringArray;
         }
 
         #endregion

@@ -92,7 +92,7 @@ using ImageResizer.ExtensionMethods;
 //                //Who's the user
 //                IPrincipal user = app.Context.User as IPrincipal;
 //                // no user (must be anonymous...).. Or authentication doesn't work for this suffix. Whatever, just avoid a nullref in the UrlAuthorizationModule
-//                if (user == null)  user = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), new string[0]);
+//                if (user == null)  user = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), ParseUtils.EmptyStringArray);
 //                //Do we have permission to call UrlAuthorizationModule.CheckUrlAccessForPrincipal?
 //                bool canCheckUrl = System.Security.SecurityManager.IsGranted(new System.Security.Permissions.SecurityPermission(System.Security.Permissions.PermissionState.Unrestricted));
 //                //Run the rewritten path past the auth system again, using the result as the default "AllowAccess" value
@@ -191,7 +191,7 @@ using ImageResizer.ExtensionMethods;
 //            //Determine the file extenson for the caching system to use if we aren't processing the image
 //            //Use the exsiting one if is an image extension. If not, use "unknown". 
 //            // We don't want to suggest writing .exe or .aspx files to the cache! 
-//            string fallbackExtension = PathUtils.GetFullExtension(virtualPath).TrimStart('.'); 
+//            string fallbackExtension = PathUtils.GetFullExtension(virtualPath).TrimStart(ParseUtils.Period); 
 //            if (!conf.IsAcceptedImageType(virtualPath)) fallbackExtension = "unknown";
 
 //            //Determine the mime-type if we aren't processing the image.

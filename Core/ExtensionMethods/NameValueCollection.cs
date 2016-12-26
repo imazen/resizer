@@ -148,10 +148,10 @@ namespace ImageResizer.ExtensionMethods {
         /// <returns></returns>
         public static T[] ParseList<T>(string text, T? fallbackValue, params int[] allowedSizes) where T : struct, IConvertible {
             if (text == null) return null;
-            text = text.Trim(' ', '(', ')', ','); //Trim parenthesis, commas, and spaces
+            text = text.Trim(ParseUtils.ListParts); //Trim parenthesis, commas, and spaces
             if (text.Length == 0) return null;
 
-            string[] parts = text.Split(new char[] { ',' }, StringSplitOptions.None);
+            string[] parts = text.Split(ParseUtils.Comma, StringSplitOptions.None);
 
             //Verify the array is of an accepted size if any are specified
             bool foundCount = allowedSizes.Length == 0;

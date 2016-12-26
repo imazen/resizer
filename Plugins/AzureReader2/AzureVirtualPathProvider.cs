@@ -117,7 +117,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
                 try {
                     // Strip prefix from virtual path; keep container and blob
                     // mb:12/8/2012 - need to prepend the blob client base uri to the url
-                    string relativeBlobURL = string.Format("{0}/{1}", CloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\'), virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim('/', '\\'));
+                    string relativeBlobURL = string.Format("{0}/{1}", CloudBlobClient.BaseUri.OriginalString.TrimEnd(ParseUtils.Slashes), virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim(ParseUtils.Slashes));
 
                     // Get a reference to the blob
                     // mb:12/8/2012 - this call now must be a uri
@@ -139,14 +139,14 @@ namespace ImageResizer.Plugins.AzureReader2 {
         public IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
             if (IsPathVirtual(virtualPath)) {
                 // Strip prefix from virtual path; keep container and blob
-                string relativeBlobURL = virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim('/', '\\');
+                string relativeBlobURL = virtualPath.Substring(VirtualFilesystemPrefix.Length).Trim(ParseUtils.Slashes);
 
 
                 try {
                     if (!LazyExistenceCheck) {
                         // Get a reference to the blob
                         // mb: 12/8/2012 - creating uri here to keep the above relativeBlobURL as is to create & return an AzureFile
-                        Uri relativeBlobUri = new Uri(string.Format("{0}/{1}", CloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\'), relativeBlobURL));
+                        Uri relativeBlobUri = new Uri(string.Format("{0}/{1}", CloudBlobClient.BaseUri.OriginalString.TrimEnd(ParseUtils.Slashes), relativeBlobURL));
                         ICloudBlob cloudBlob = CloudBlobClient.GetBlobReferenceFromServer(relativeBlobUri);
                         cloudBlob.FetchAttributes();
                     }

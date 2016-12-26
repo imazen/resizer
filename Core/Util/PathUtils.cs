@@ -33,8 +33,6 @@ namespace ImageResizer.Util {
             }
         }
 
-        private static readonly char[] QueryOrFragment = new char[] { '?', '#' };
-        private static readonly char[] SpaceOrSlash = new char[] { ' ', '/', '\\' };
         /// <summary>
         /// Should be called SetFullExtension.
         /// Sets the file extension of the specified path to the specified value, returning the result.
@@ -46,14 +44,14 @@ namespace ImageResizer.Util {
         /// <param name="newExtension"></param>
         /// <returns></returns>
         public static string SetExtension(string path, string newExtension) {
-            int query = path.IndexOfAny(QueryOrFragment);
+            int query = path.IndexOfAny(ParseUtils.QueryOrFragment);
             if (query < 0) query = path.Length;
             //Finds the first character that could possibly be part of the extension (before the query)
-            int firstPossibleExtensionChar = path.LastIndexOfAny(SpaceOrSlash, query - 1) + 1;
+            int firstPossibleExtensionChar = path.LastIndexOfAny(ParseUtils.SpaceOrSlashes, query - 1) + 1;
             int extensionStarts = path.IndexOf('.', firstPossibleExtensionChar, query - firstPossibleExtensionChar);
             if (extensionStarts < 0) extensionStarts = query;
 
-            return path.Substring(0, extensionStarts) + (!string.IsNullOrEmpty(newExtension) ? "." + newExtension.TrimStart('.') : "") + path.Substring(query);
+            return path.Substring(0, extensionStarts) + (!string.IsNullOrEmpty(newExtension) ? "." + newExtension.TrimStart(ParseUtils.Period) : "") + path.Substring(query);
 
         }
 
@@ -64,10 +62,10 @@ namespace ImageResizer.Util {
         /// <param name="path"></param>
         /// <returns></returns>
         public static string RemoveFullExtension(string path) {
-            int query = path.IndexOfAny(QueryOrFragment);
+            int query = path.IndexOfAny(ParseUtils.QueryOrFragment);
             if (query < 0) query = path.Length;
             //Finds the first character that could possibly be part of the extension (before the query)
-            int firstPossibleExtensionChar = path.LastIndexOfAny(SpaceOrSlash, query - 1) + 1;
+            int firstPossibleExtensionChar = path.LastIndexOfAny(ParseUtils.SpaceOrSlashes, query - 1) + 1;
             int extensionStarts = path.IndexOf('.', firstPossibleExtensionChar, query - firstPossibleExtensionChar);
             if (extensionStarts < 0) extensionStarts = query;
 
@@ -83,10 +81,10 @@ namespace ImageResizer.Util {
         /// <param name="path"></param>
         /// <returns></returns>
         public static string RemoveExtension(string path) {
-            int query = path.IndexOfAny(QueryOrFragment);
+            int query = path.IndexOfAny(ParseUtils.QueryOrFragment);
             if (query < 0) query = path.Length;
             //Finds the first character that could possibly be part of the extension (before the query)
-            int firstPossibleExtensionChar = path.LastIndexOfAny(SpaceOrSlash, query - 1) + 1;
+            int firstPossibleExtensionChar = path.LastIndexOfAny(ParseUtils.SpaceOrSlashes, query - 1) + 1;
             int extensionStarts = path.LastIndexOf('.', query - 1, query - firstPossibleExtensionChar);
             if (extensionStarts < 0) extensionStarts = query;
 
@@ -102,9 +100,9 @@ namespace ImageResizer.Util {
         /// <param name="newExtension"></param>
         /// <returns></returns>
         public static string AddExtension(string path, string newExtension) {
-            int query = path.IndexOfAny(QueryOrFragment);
+            int query = path.IndexOfAny(ParseUtils.QueryOrFragment);
             if (query < 0) query = path.Length;
-            return path.Substring(0, query) + "." + newExtension.TrimStart('.') + path.Substring(query);
+            return path.Substring(0, query) + "." + newExtension.TrimStart(ParseUtils.Period) + path.Substring(query);
         }
         /// <summary>
         /// Will return the full extension, like ".jpg.ashx", not just the last bit. 
@@ -114,10 +112,10 @@ namespace ImageResizer.Util {
         /// <param name="path"></param>
         /// <returns></returns>
         public static string GetFullExtension(string path) {
-            int query = path.IndexOfAny(QueryOrFragment);
+            int query = path.IndexOfAny(ParseUtils.QueryOrFragment);
             if (query < 0) query = path.Length;
             //Finds the first character that could possibly be part of the extension (before the query)
-            int firstPossibleExtensionChar = path.LastIndexOfAny(SpaceOrSlash, query - 1) + 1;
+            int firstPossibleExtensionChar = path.LastIndexOfAny(ParseUtils.SpaceOrSlashes, query - 1) + 1;
             int extensionStarts = path.IndexOf('.', firstPossibleExtensionChar, query - firstPossibleExtensionChar);
             if (extensionStarts < 0) extensionStarts = query;
 
@@ -132,10 +130,10 @@ namespace ImageResizer.Util {
         /// <param name="path"></param>
         /// <returns></returns>
         public static string GetExtension(string path) {
-            int query = path.IndexOfAny(QueryOrFragment);
+            int query = path.IndexOfAny(ParseUtils.QueryOrFragment);
             if (query < 0) query = path.Length;
             //Finds the first character that could possibly be part of the extension (before the query)
-            int firstPossibleExtensionChar = path.LastIndexOfAny(SpaceOrSlash, query - 1) + 1;
+            int firstPossibleExtensionChar = path.LastIndexOfAny(ParseUtils.SpaceOrSlashes, query - 1) + 1;
             int extensionStarts = path.LastIndexOf('.', query -1, query - firstPossibleExtensionChar );
             if (extensionStarts < 0) extensionStarts = query;
 
@@ -149,7 +147,7 @@ namespace ImageResizer.Util {
         /// <returns></returns>
         public static string ResolveAppRelative(string virtualPath) {
             //resolve tilde
-            if (virtualPath.StartsWith("~", StringComparison.OrdinalIgnoreCase)) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/' + virtualPath.TrimStart('~', '/');
+            if (virtualPath.StartsWith("~", StringComparison.OrdinalIgnoreCase)) return HostingEnvironment.ApplicationVirtualPath.TrimEnd(ParseUtils.ForwardSlash) + '/' + virtualPath.TrimStart(ParseUtils.ForwardSlashOrTilde);
             return virtualPath;
         }
 
@@ -161,8 +159,8 @@ namespace ImageResizer.Util {
         /// <returns></returns>
         public static string ResolveAppRelativeAssumeAppRelative(string virtualPath) {
 
-            if (virtualPath.StartsWith("~")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/" + virtualPath.TrimStart('~', '/');
-            if (!virtualPath.StartsWith("/")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/" + virtualPath;
+            if (virtualPath.StartsWith("~")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd(ParseUtils.ForwardSlash) + "/" + virtualPath.TrimStart(ParseUtils.ForwardSlashOrTilde);
+            if (!virtualPath.StartsWith("/")) return HostingEnvironment.ApplicationVirtualPath.TrimEnd(ParseUtils.ForwardSlash) + "/" + virtualPath;
             return virtualPath;
         }
 
@@ -185,10 +183,10 @@ namespace ImageResizer.Util {
                 virtualPath = virtualPath.Substring(0, fragment);
             }
 
-            if (virtualPath.IndexOf('?') > -1) virtualPath = virtualPath.TrimEnd('&') + '&';
+            if (virtualPath.IndexOf('?') > -1) virtualPath = virtualPath.TrimEnd(ParseUtils.Ampersand) + '&';
             else virtualPath += '?';
 
-            return virtualPath + querystring.TrimStart('&', '?') + suffix;
+            return virtualPath + querystring.TrimStart(ParseUtils.QueryParts) + suffix;
         }
 
         /// <summary>
@@ -374,7 +372,7 @@ namespace ImageResizer.Util {
         public static NameValueCollection ParseQueryString(string path, bool allowSemicolons, out string beforeQuery, out string fragment) {
             //Separate the fragment if it's present, and restore it later
             int frag = path.IndexOf('#');
-            if (frag < 0) fragment = "";
+            if (frag < 0) fragment = String.Empty;
             else {
                 fragment = path.Substring(frag);
                 path = path.Substring(0, frag);
@@ -406,13 +404,13 @@ namespace ImageResizer.Util {
         /// <param name="urlDecode"></param>
         /// <returns></returns>
         public static NameValueCollection ParseQueryOnly(string query, bool allowSemicolons = true, bool urlDecode = true) {
-            string[] pairs = query.Split(allowSemicolons ? new char[] { '?', '&', ';' } : new char[] { '?', '&' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] pairs = query.Split(allowSemicolons ? ParseUtils.QueryPartsWithSemi : ParseUtils.QueryParts, StringSplitOptions.RemoveEmptyEntries);
             NameValueCollection c = new NameValueCollection();
             foreach (string s in pairs) {
-                string[] namevalue = s.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] namevalue = s.Split(ParseUtils.EqualSign, StringSplitOptions.RemoveEmptyEntries);
                 if (namevalue.Length > 2) {
                     //Handle &key=value=value and &key===value=value -> key : "value=value"
-                    string value = s.Substring(s.IndexOf('=')).TrimStart('=');
+                    string value = s.Substring(s.IndexOf('=')).TrimStart(ParseUtils.EqualSign);
                     c[urlDecode ? HttpUtility.UrlDecode(namevalue[0]) : namevalue[0]] =
                         urlDecode ? HttpUtility.UrlDecode(value) : value;
                 } else if (namevalue.Length == 2) {
@@ -503,7 +501,7 @@ namespace ImageResizer.Util {
             //If it's a match, strip it and convert it to a virtual path.
             if (path.StartsWith(appPath, StringComparison.OrdinalIgnoreCase)) {
                 //Convert to app-relative path missing the ~/
-                path = path.Remove(0, appPath.Length).TrimStart(new char[] { '/', '\\', '~' }).Replace('\\', '/');
+                path = path.Remove(0, appPath.Length).TrimStart(ParseUtils.VirtualPathParts).Replace('\\', '/');
                 return PathUtils.ResolveAppRelativeAssumeAppRelative(path);
                 
             }

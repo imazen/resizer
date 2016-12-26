@@ -4,6 +4,7 @@ using System.Text;
 using ImageResizer.Configuration;
 using ImageResizer.Caching;
 using System.Web;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.Etags {
     public class EtagsPlugin:IPlugin, ICache {
@@ -48,7 +49,7 @@ namespace ImageResizer.Plugins.Etags {
             string ifNoneMatch = current.Request.Headers["If-None-Match"];
             if (string.IsNullOrEmpty(ifNoneMatch)) return null;
             if (ifNoneMatch.StartsWith("W/"))ifNoneMatch = ifNoneMatch.Substring(2);
-            ifNoneMatch = ifNoneMatch.Trim('"');
+            ifNoneMatch = ifNoneMatch.Trim(ParseUtils.DoubleQuote);
             return string.IsNullOrEmpty(ifNoneMatch) ? null : ifNoneMatch;
         }
 

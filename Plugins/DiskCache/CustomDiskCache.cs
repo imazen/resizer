@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Threading;
 using ImageResizer.Plugins.DiskCache.Async;
 using System.Globalization;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.DiskCache {
     public delegate void CacheResultHandler(CustomDiskCache sender, CacheResult r);
@@ -119,7 +120,7 @@ namespace ImageResizer.Plugins.DiskCache {
             string relativePath = new UrlHasher().hash(keyBasis, subfolders, "/") + '.' + extension;
 
             //Physical path
-            string physicalPath = PhysicalCachePath.TrimEnd('\\', '/') + System.IO.Path.DirectorySeparatorChar +
+            string physicalPath = PhysicalCachePath.TrimEnd(ParseUtils.Slashes) + System.IO.Path.DirectorySeparatorChar +
                     relativePath.Replace('/', System.IO.Path.DirectorySeparatorChar);
 
 

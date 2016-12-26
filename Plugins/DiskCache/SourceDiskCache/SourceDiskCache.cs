@@ -18,7 +18,7 @@ namespace ImageResizer.Plugins.SourceDiskCache
     {
         public SourceDiskCachePlugin() { }
 
-        protected string virtualDir = HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + "/cache/sourceimages";
+        protected string virtualDir = HostingEnvironment.ApplicationVirtualPath.TrimEnd(ParseUtils.ForwardSlash) + "/cache/sourceimages";
         /// <summary>
         /// Sets the location of the cache directory. 
         /// Can be a virtual path (like /App/imagecache) or an application-relative path (like ~/imagecache, the default).

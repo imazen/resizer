@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.LicenseVerifier {
     public class DomainLicense {
@@ -39,7 +40,7 @@ namespace ImageResizer.Plugins.LicenseVerifier {
                     case "expires": Expires = DateTime.Parse(value); break;
                     case "features":
                         var ids = new List<Guid>();
-                        string[] parts = value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] parts = value.Split(ParseUtils.Comma, StringSplitOptions.RemoveEmptyEntries);
                         foreach (string p in parts) {
                             ids.Add(new Guid(p));
                         }
@@ -81,8 +82,9 @@ namespace ImageResizer.Plugins.LicenseVerifier {
         private string Join(ICollection<Guid> items) {
             var sb = new StringBuilder();
             foreach (Guid g in items)
-                sb.Append(g.ToString() + ",");
-            return sb.ToString().TrimEnd(',');
+                sb.Append(g.ToString()).Append(',');
+            if (sb.Length > 0) sb.Length--; // discard trailing comma
+            return sb.ToString();
         }
 
         private string Decrypt(byte[] encrypted) {
