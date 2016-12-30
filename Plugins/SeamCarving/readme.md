@@ -1,10 +1,18 @@
 Tags: plugin
 Edition: creative
-Tagline: Content-aware image resizing.
+Tagline: (deprecated) Content-aware image resizing.
 Aliases: /plugins/seamcarving
 
 
 # SeamCarving plugin
+
+*PLEASE NOTE*
+* **This plugin is has been deprecated, and will be removed in a future release.**
+* **Photoshop now has this functionality, and your image editor is a more appropriate place for this kind of operation.**
+* **Seam carving is very CPU intensive, and can take over 30 seconds for moderate image sizes.**
+* **Do not use for on-demand processing. We do not offer support for this plugin.** 
+
+
 
 Provides content-aware image resizing and 5 different algorithms.
 

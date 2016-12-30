@@ -6,7 +6,8 @@ Aliases: /plugins/copymetadata
 
 # CopyMetadata plugin
 
-**Warning. This plugin can only *copy* metadata, not read, or return it. It will be replaced in V4 with a more capable plugin.** 
+* **This plugin can only *copy* metadata, not read, or return it.** 
+* **Future ImageResizer and Imageflow releases may not support this command. Avoid using `&copymetadata=true` for maximum forwards-compatibility.**
 
 Copies all metadata from the source image to the destination image. 
 
@@ -21,10 +22,10 @@ Install `ImageResizer.Plugins.CopyMetadata`, *or*...
 
 ## Syntax
 
-* `copymetadata=true`
+* `&copymetadata=true`
 
 
 ### Resources
 
-http://stackoverflow.com/a/25162782/166893
-https://msdn.microsoft.com/en-us/library/system.drawing.imaging.propertyitem.id.aspx
+* http://stackoverflow.com/a/25162782/166893
+* https://msdn.microsoft.com/en-us/library/system.drawing.imaging.propertyitem.id.aspx

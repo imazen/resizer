@@ -5,17 +5,21 @@ Aliases: /plugins/faces
 
 # Faces plugin
 
+*PLEASE NOTE*
+* **This plugin is not forwards-compatible. Avoid these URL commands for maximum compatibility with Imageflow and future major ImageResizer releases.**
+* **Do not use with untrusted image data. This plugin relies on third-party C and C++ code which we have not audited (OpenCV).**
+* **While we provide a baseline version of OpenCV, we suggest that you check for the latest compatible release, at it may include security fixes.**
+
+
 You can find a sample project for this plugin in `\Samples\ImageStudio` within the full download 
 
 Human face detection plugin. Provides automatic face detection, as well as the CropAround plugin, which can even be combined in a single request (using &c.focus=faces) to provide face-focused/face-preserving cropping.
 
-OpenCV is required for face detection. Requires V3.2 or higher.
-
-A NuGet package for this plugin is not available, due to the vast number of dependencies. 
+OpenCV is required for face detection. 
+You **must** disable overlapped recycling on the application pool running this plugin. OpenCV cannot handle multiple instances per plugin.
 
 OpenCV does not support being used from multiple app domains. If you get a "Type Initializer Exception", restart the application pool and verify that it only contains 1 application, and that overlapped recycle is disabled.
 
-You **must** disable overlapped recycling on the application pool running this plugin. OpenCV cannot handle multiple instances per plugin.
 
 ## URL Usage
 

@@ -7,8 +7,13 @@ Aliases: /plugins/prettygifs
 
 
 h1 PrettyGifs plugin
+
 p Replaces .NET's disgusting default GIF encoding algorithm with Octree quantization and dithering, and allows 8-bit PNG creation. Compatible with all plugins.
 
+markdown: 
+  	**The `colors`, `dither`, and `preservePalette` querystring commands supported by this plugin are unlikely to be supported in Imageflow and future major ImageResizer releases.**
+	
+	We reserve the right to replace the quantization algorithm used here; **do not expect pixel-identical results between versions or products**. If you're not using this plugin, different versions of Windows will produce different results.
 
 - image_width = 600
 - image_thumb_width = 100

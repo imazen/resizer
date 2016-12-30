@@ -1,9 +1,13 @@
 Tags: plugin
 Aliases: /plugins/psd /plugins/psdr.. /plugins/psdreader
 Edition: elite
-Tagline: Adds support for PSD source files.
+Tagline: Adds support for PSD source files (reads embedded preview).
 
 # PsdReader plugin
+
+*PLEASE NOTE*
+* **Do not use with untrusted PSD files. This plugin has not undergone security testing.**
+
 
 Adds support for .PSD source files. No configuration required.
 

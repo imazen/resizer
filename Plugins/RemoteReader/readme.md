@@ -47,9 +47,9 @@ It is possible to set 'allowAllSignedRequests=true', but you must handle the Rem
     </resizer>
   </configuration>
 
-### AllowRedirects (V3.1.5+)
+### AllowRedirects
 
-In V3.1.5 and higher, redirects are supported, but the default is to throw a 500 error if more than 5 are used. You can configure the number of followed redirects with the allowRedirects setting, or set it to 0 to disable following redirects.
+Redirects are supported, but default behavior is to throw a 500 error if more than 5 are used. You can configure the number of followed redirects with the allowRedirects setting, or set it to 0 to disable following redirects.
 
 ## Exceptions
 

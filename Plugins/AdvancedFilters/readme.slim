@@ -10,9 +10,13 @@ h1 AdvancedFilters plugin
 
 .markdown-body
   markdown:
-    Apply advanced effects to your images. Requires Full Trust. 
+    Apply advanced effects to your images. These are implemented in C#. Those which touch each pixel hundreds of times (like sharpen, blur, remove noise, and oilpainting) can perform poorly on large images.
 
-    The plugin currently applies effects to the image along with any background color, padding, or drop shadow that may be present. Future versions may simply apply the effect to the image, not the surrounding area. Note: does not affect borders or watermarks.
+    If you just want sharpening, use the Fastscaling plugin and `&f.sharpen` instead. `f.sharpen` adds no performance overhead, and produces better results (it is integrated with the resampling phase). `f.sharpen` is also supported by Imageflow.
+
+	**This plugin is not forwards-compatible. Avoid these URL commands for maximum compatibility with Imageflow and future major ImageResizer releases.**
+
+
 
 - image_width = 400 
 - cache_buster = "000006"

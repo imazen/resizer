@@ -61,8 +61,6 @@ When creating a bucket, you should avoid certain characters to ensure that DNS w
 * Bucket names cannot contain dashes next to periods (e.g., "my-.bucket.com" and "my.-bucket" are invalid)
 * Bucket names cannot contain periods - Amazon states this is not supported for SSL-secured access, due to DNS complications. Your mileage may vary.
 
-
-
 ## Configuration
 
 You must specify a comma-delimited list of permitted bucket names that can be accessed.

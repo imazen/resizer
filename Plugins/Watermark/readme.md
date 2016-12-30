@@ -6,9 +6,11 @@ Aliases: /plugins/watermark
 
 # Watermark plugin
 
-The Watermark plugin in  v3.1+ is fully XML configurable, and supports named watermark configurations, multiple image and text layers, layer groups, and background (as well as overlay) layers. The positioning system is per-layer, permits flexible pixel and percent layout, anchoring, and container selection.
+The Watermark plugin in is fully XML configurable, and supports named watermark configurations, 
+multiple image and text layers, layer groups, and background (as well as overlay) layers. 
+The positioning system is per-layer, permits flexible pixel and percent layout, anchoring, and container selection.
 
-It is also binary compatible with the old (pre v3.1) plugin, so you can transition slowly.
+*Imageflow and future versions of ImageResizer are unlikely to support text layers. For best forwards compatibility, stick to image layers.*
 
 ## Installation
 
@@ -90,6 +92,8 @@ Like the old version, you can also specify watermark images by name, which will 
 * **imageQuery** - Allows pre-processing of the image. For example, use "stretch=fill" to distort the watermark to fit the aspect ratio of the layer. Multiple commands can be separated with ;
 
 ## TextLayer specific attributes
+
+**Imageflow and future versions of ImageResizer are unlikely to support text layers. For best forwards compatibility, avoid their use.**
 
 * **text** - The text to display. May contain querystring-specified values, referenced like this: "Hello #{name}" - `image.jpg?watermark=hi&name=Nathanael`.
 * **vertical** - True to display the text vertically. May also be achieved with Angle, but rendering may be slightly better.

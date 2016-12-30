@@ -5,6 +5,13 @@ Aliases: /plugins/pdfiumrenderer
 
 # PdfiumRenderer plugin
 
+*PLEASE NOTE*
+* **This plugin is not forwards-compatible. Avoid usage for maximum compatibility with Imageflow and future major ImageResizer releases.**
+* **Do NOT use with untrusted data. This plugin passes source files to Pdfium, which (like all software with embedded codecs), has a history of vulnerabilities.**
+* **Using this plugin with malicious PDFs could result in a remote code execution vulnerability.**
+* **We only provide a the version of pdfium.dll we used for development. You should locate and use the latest release of pdfium for optimal security.**
+* You can view [recent PDFium vulnerabilities here](https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=pdfium) and [here](https://web.nvd.nist.gov/view/vuln/search-results?query=pdfium&search_type=all&cves=on)
+
 ## Install manually
 
 1. Add `ImageResizer.Plugins.PdfiumRenderer.dll` as a reference to the project, or put a copy of it in the /bin folder.
