@@ -6,6 +6,10 @@ Tagline: Migrate websites from other image resizing handlers without breaking an
 
 # ImageHandlerSyntax plugin
 
+*PLEASE NOTE*
+* **This plugin will be removed in a future major release, as there are no known users.**
+* **For forwards-compatibility with ImageResizer and Imageflow, avoid use.**
+
 Adds support for the syntaxes used by 4 image resizing handlers. This plugin allows painless, gradual migration from them by supporting their URL syntax.
 
 ## Supported projects

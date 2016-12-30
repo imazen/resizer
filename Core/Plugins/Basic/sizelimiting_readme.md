@@ -6,9 +6,7 @@ Aliases: /plugins/sizelimiting
 
 # SizeLimiting plugin
 
-(Installed by default in 3.0.5+)
-.
-For preventing abuse and limiting photo resolution. Prevents request that would result in an image over 3200x3200 (configure with `totalWidth/totalHeight`).
+Installed by default. Prevents request that would result in an image over 3200x3200 (configure with `totalWidth/totalHeight`).
 
 You can also limit photo resolution with `imageWidth/imageHeight`. Originals will still be accessible unless you add a rewrite handler.
 
@@ -61,7 +59,7 @@ They affect the output in a similar manner as changing maxwidth and maxheight wo
 
 ## Removing the plugin
 
-In rare cases, it may make sense to completely remove the plugin. This can be done through code or via Web.config.
+You can remove this plugin (and its limits) through code or via Web.config.
 
     protected void Application_Start(object sender, EventArgs e) {
       Config.Current.Plugins.LoadPlugins();

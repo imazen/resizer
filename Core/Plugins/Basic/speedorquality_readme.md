@@ -6,6 +6,11 @@ Aliases: /plugins/speedorquality
 
 # SpeedOrQuality
 
+*PLEASE NOTE*
+* **This plugin will be removed in a future major release.**
+* **For forwards-compatibility with ImageResizer and Imageflow, avoid use.**
+
+
 Gain a 15-30% speed boost by sacrificing rendering quality.
 
 

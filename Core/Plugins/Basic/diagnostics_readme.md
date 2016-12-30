@@ -1,26 +1,32 @@
 Tags: plugin
 Edition: free
 Bundle: free
-Tagline: (default) - Whenever you have an issue, go to localhost/resizer.debug and you'll probably be told what is wrong.
+Tagline: Whenever you have an issue, visit localhost/resizer.debug
 Aliases: /plugins/diagnostics /plugins/diagnostic
 
-# Diagnostics plugin
+# Self-diagnostics at /resizer.debug
 
-The `/resizer.debug` page is provided by this plugin (which is installed by default)
+ImageResizer offers extensive self-diagnostics. With the application running, visit `/resizer.debug` from your browser. 
 
-If you're not using IIS Integrated mode, you will need to access it via /resizer.debug.ashx
+To view the report, you may need to [adjust customErrors in Web.config](http://msdn.microsoft.com/en-us/library/h0hfz6fc%28v=vs.100%29.aspx). This setting defaults to RemoteOnly, and is case-sensitive. 
 
-## Diagnostics page not working?
+If you're accessing the application directly from the server, `RemoteOnly` is best. If you need to troubleshoot remotely, use `Off`, but keep in mind that stack traces can sometimes leak information to attackers.
 
-By default, the Diagnostics plugin uses the same setting as [customErrors](http://msdn.microsoft.com/en-us/library/h0hfz6fc%28v=vs.100%29.aspx) (which defaults to Localhost). Thus, if you can see ASP.NET error messages, you will also be able to get the diagnostics page. This ensures that the diagnostics page never exposes data to a host that doesn't already have access to detailed error messages. 
+Setting `customErrors="Off"` will also let you see detailed error messages. We are unable to help you troubleshoot failing requests without the error message and stacktrace.
 
-To override, add one of the following to the &lt;resizer&gt; section.
+If an image is failing to display on a web page, you *must* request it directly to get more information. In Chrome, you can "Open Image In New Tab" via the right-click menu (or, better yet, use Dev Tools > Network to locate the failed request details).
 
-  <diagnostics enableFor="AllHosts" />
-  <diagnostics enableFor="Localhost" />
-  <diagnostics enableFor="None" />
+Once you have a detailed error message, consult the Troubleshooting page and FAQ. Also note that error messages thrown by ImageResizer typically mean exactly what they say.
+
+### FAQ
+
+* If you're not using IIS Integrated mode, you will need to access diagnostics via `/resizer.debug.ashx`
+* You can override diagnostics page visibility without changing customErrors. 
+  To override, add one of the following to the &lt;resizer&gt; section.
+
+	  <diagnostics enableFor="AllHosts" />
+	  <diagnostics enableFor="Localhost" />
+	  <diagnostics enableFor="None" />
   
 
-
-I think they are pretty obvious.
 

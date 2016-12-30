@@ -6,6 +6,11 @@ Aliases: /plugins/dropshadow
 
 # Drop Shadow plugin
 
+*PLEASE NOTE*
+* **This plugin may be removed in a future major release.**
+* **For forwards-compatibility with ImageResizer and Imageflow, avoid use.**
+
+
 The Drop Shadow plugin in included in ImageResizer.dll
 
 ## Installation
