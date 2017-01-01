@@ -35,7 +35,7 @@ Generates gradients on the fly. Very useful for rapid prototyping and design - b
 
 * `/gradient.png?width=200&height=10&color1=0066a1&color2=black`: ![gradient](http://img.imageresizing.net/gradient.png;width=200;height=10;color1=0066a1;color2=black)
 
-* `/gradient.png?width=200&height=10&color1=0066a122&color2=00000044&angle=90`: ![gradient](http://img.imageresizing.net/gradient.png;width=100;height=10;color1=0066a122;color2=00000044;angle=10)
+* `/gradient.png?width=200&height=10&color1=0066a122&color2=00000044&angle=10`: ![gradient](http://img.imageresizing.net/gradient.png;width=100;height=10;color1=0066a122;color2=00000044;angle=10)
 
 
 ## Source code to plugin

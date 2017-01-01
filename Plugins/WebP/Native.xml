@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <files>
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/webp/0.4.0/x86/libwebp.dll" name="libwebp.dll" bitness="32" fileBytes="293,888" />
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/webp/0.4.0/x64/libwebp.dll" name="libwebp.dll"  bitness="64" fileBytes="342,016" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/webp/0.5.2/x86/libwebp.dll?r-2" name="libwebp.dll" bitness="32" fileBytes="378880" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/webp/0.5.2/x86_64/libwebp.dll?r-2" name="libwebp.dll"  bitness="64" fileBytes="457728" />
 
-  <!-- https://code.google.com/p/webp/downloads/detail?name=libwebp-0.4.0-mac-10.8.tar.gz&can=2&q= libwebp.a-->
 </files>
