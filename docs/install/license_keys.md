@@ -62,7 +62,7 @@ All functionality will continue to work, but newly generated images will have a 
       <license>
         domain.com(R4Performance includes R4Performance):RG9tYWluOiByZXNpemVyLmFwcGhiLmNvbQpPd25lcjogTmF0aGFuYWVsIEpvbmVzCklzc3VlZDogMjAxNS0wNS0wMVQxNTowNzo1NloKRmVhdHVyZXM6IFI0UGVyZm9ybWFuY2U=:oWv2YlAkzTEWcaJ6fPMEsweTNh9Bt5evhjWVNHuXtiRNl22sSS3OB/XE69NsSx8kEs1ExSwzvjwPx95paQyxGsTDigdh/UCkh7TCUyIECX7pI2JtA5f3KkFzfwmISIE8d14Kyf3ijO6s2HI1A1obbH5IucyaDJLQBCSrykxJK6JM4NOM82UbAUfwXRCnjWw2frwtBDp9rezJ46iQ80BXxTJ1LXlSqBry5z7bdSZtcP2k8L+Zp3t+9Blfl2k6z0um06kDa7RkPnmfwKCYTU+HbPQ2qDfGvcNaRC6XEa17ztTn52T6hErS7AJKIZ4OKxvw3olLmmVjEg+LiuKo7NVmmQ==
       </license>
-    </license>
+    </licenses>
   </resizer>
 
   <system.web>
