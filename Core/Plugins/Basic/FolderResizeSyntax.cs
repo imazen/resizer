@@ -11,7 +11,7 @@ using System.Globalization;
 
 namespace ImageResizer.Plugins.Basic {
     public class FolderResizeSyntax : IPlugin {
-
+        
         public FolderResizeSyntax() {
         }
 
@@ -22,7 +22,7 @@ namespace ImageResizer.Plugins.Basic {
         }
 
         void Pipeline_RewriteDefaults(System.Web.IHttpModule sender, System.Web.HttpContext context, Configuration.IUrlEventArgs e) {
-            //Handles /resize(width,height,format)/ and /resize(width,height)/ syntaxes.
+            //Handles /resize(width,height,mode,anchor,format)/ and /resize(width,height)/ syntaxes.
             e.VirtualPath = parseResizeFolderSyntax(e.VirtualPath, e.QueryString);
 
         }
@@ -32,18 +32,28 @@ namespace ImageResizer.Plugins.Basic {
             c.Pipeline.RewriteDefaults -= Pipeline_RewriteDefaults;
             return true;
         }
-
-
+        
+         private readonly Dictionary<string, string> anchors = new Dictionary<string, string>()
+        {
+            {"tl", "topleft" },
+            {"tc", "topcenter" },
+            {"tr", "topright" },
+            {"ml", "middleleft" },
+            {"mc", "middlecenter" },
+            {"mr", "middleright" },
+            {"bl", "bottomleft" },
+            {"bc", "bottomcenter" },
+            {"br", "bottomright" }
+        };
         /// <summary>
-        /// Matches /resize(x,y,f)/ syntax
+        /// Matches /resize(x,y,m,a,f)/ syntax
         /// Fixed Bug - will replace both slashes.. make first a lookbehind
         /// </summary>
-        protected Regex resizeFolder = new Regex(@"(?<=^|\/)resize\(\s*(?<maxwidth>\d+)\s*,\s*(?<maxheight>\d+)\s*(?:,\s*(?<format>jpg|png|gif)\s*)?\)\/", RegexOptions.Compiled
+       protected Regex resizeFolder = new Regex(@"(?<=^|\/)resize\(\s*(?<maxwidth>\d+)\s*,\s*(?<maxheight>\d+)\s*(?:,\s*(?<mode>max|pad|crop|carve|stretch)\s*(?:,\s*(?<anchor>tl|tc|tr|ml|mc|mr|bl|bc|br)\s*(?:,\s*(?<format>jpg|png|gif)\s*)?)?)?\)\/", RegexOptions.Compiled
            | RegexOptions.IgnoreCase);
 
-
         /// <summary>
-        /// Parses and removes the resize folder syntax "resize(x,y,f)/" from the specified file path. 
+        /// Parses and removes the resize folder syntax "resize(x,y,m,a,f)/" from the specified file path. 
         /// Places settings into the referenced querystring
         /// </summary>
         /// <param name="path"></param>
@@ -55,6 +65,8 @@ namespace ImageResizer.Plugins.Basic {
                 //Parse capture groups
                 int maxwidth = -1; if (!int.TryParse(m.Groups["maxwidth"].Value, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out maxwidth)) maxwidth = -1;
                 int maxheight = -1; if (!int.TryParse(m.Groups["maxheight"].Value, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out maxheight)) maxheight = -1;
+                string mode = (m.Groups["mode"].Captures.Count > 0) ? mode = m.Groups["mode"].Captures[0].Value : null;
+                string anchor = (m.Groups["anchor"].Captures.Count > 0) ? anchor = m.Groups["anchor"].Captures[0].Value : null;
                 string format = (m.Groups["format"].Captures.Count > 0) ? format = m.Groups["format"].Captures[0].Value : null;
 
                 //Remove first resize folder from URL
@@ -64,8 +76,11 @@ namespace ImageResizer.Plugins.Basic {
                 if (maxwidth > 0) q["maxwidth"] = maxwidth.ToString(NumberFormatInfo.InvariantInfo);
                 if (maxheight > 0) q["maxheight"] = maxheight.ToString(NumberFormatInfo.InvariantInfo);
                 if (format != null) q["format"] = format;
+                if (mode != null) q["mode"] = mode;
+                if(anchor != null)
+                    q["anchor"] = anchors[anchor];
 
-                //Call recursive - this handles multiple /resize(w,h)/resize(w,h)/ occurrences
+                //Call recursive - this handles multiple /size(w,h)/size(w,h)/ occurrences
                 return parseResizeFolderSyntax(path, q);
             }
 
