@@ -168,6 +168,11 @@ namespace ImageResizer.Plugins.WicBuilder {
                 frame.GetSize(out origWidth,out origHeight);
                 Size orig = new Size((int)origWidth,(int)origHeight);
 
+            
+                job.ResultInfo["source.width"] = (int)origWidth;
+                job.ResultInfo["source.height"] = (int)origHeight;
+                
+
                 Guid pixelFormat;
                 frame.GetPixelFormat(out pixelFormat);
                 //Calculate the new size of the image and the canvas.
@@ -249,6 +254,8 @@ namespace ImageResizer.Plugins.WicBuilder {
             //Create the IStream/MemoryStream
             var outputStream = new MemoryIStream();
 
+            job.ResultInfo["final.width"] = imageSize.Width;
+            job.ResultInfo["final.height"] = imageSize.Height;
 
             encoder.EncodeToStream(factory, data, imageSize, outputStream);
 
