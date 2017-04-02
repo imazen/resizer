@@ -404,7 +404,7 @@ namespace ImageResizer
         /// <returns></returns>
         public virtual ImageJob Build(ImageJob job) {
             if (job == null) throw new ArgumentNullException("job", "ImageJob parameter null. Cannot Build a null ImageJob instance");
-
+            Stopwatch totalTicks = Stopwatch.StartNew();
             //Clone and filter settings FIRST, before calling plugins.
             ResizeSettings s = job.Settings == null ? new ResizeSettings() : new ResizeSettings(job.Settings);
             if (SettingsModifier != null) s = SettingsModifier.Modify(s);
@@ -414,6 +414,9 @@ namespace ImageResizer
                 //Allow everything else to be overriden
                 if (BuildJob(job) != RequestedAction.Cancel) throw new ImageProcessingException("Nobody did the job");
                 EndBuildJob(job);
+                totalTicks.Stop();
+                job.TotalTicks = totalTicks.ElapsedTicks;
+                //Configuration.Performance.GlobalPerf.JobComplete(job);
                 return job;
             } finally {
                 //Follow the dispose requests
@@ -432,7 +435,10 @@ namespace ImageResizer
                 ResizeSettings s = job.Settings;
 
                 //Load image
+                var decodeTime = Stopwatch.StartNew();
                 b = LoadImage(job.Source, s, job.ResetSourceStream);
+                decodeTime.Stop();
+                job.DecodeTicks = decodeTime.ElapsedTicks;
 
                 //Save source path info
                 job.SourcePathData = (b != null && b.Tag != null && b.Tag is BitmapTag) ? ((BitmapTag)b.Tag).Path : job.SourcePathData;
@@ -538,7 +544,10 @@ namespace ImageResizer
             {//Determines output format, includes code for saving in a variety of formats.
                 //Save to stream
                 BeforeEncode(job);
+                var s = Stopwatch.StartNew();
                 e.Write(b, dest);
+                s.Stop();
+                job.EncodeTicks = s.ElapsedTicks;
             }
             return RequestedAction.None;
         }
