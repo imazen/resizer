@@ -56,7 +56,7 @@ namespace ImageResizer.Configuration
         public PostAuthorizeResult PostAuthorize(){
             conf.FirePostAuthorizeRequest(sender as IHttpModule, context);
 
-            //Allow handlers of the above event to change filePath/pathinfo so we can successfull test the extension
+            //Allow handlers of the above event to change filePath/pathinfo so we can successfully test the extension
             string originalPath = conf.PreRewritePath;
            
             //Trim fake extensions so IsAcceptedImageType will work properly
