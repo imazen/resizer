@@ -223,7 +223,7 @@ namespace ImageResizer.Plugins.LicenseVerifier {
         LicenseService _service = null;
         IEnumerable<IEnumerable<string>> _installed_features;
         Dictionary<string, string> _mappings;
-        private bool ShouldDisplayDot(Configuration.Config c, ImageState s)
+        private bool ShouldDisplayDot(Config c, ImageState s)
         {
             if (c == null || c.configurationSectionIssues == null || System.Web.HttpContext.Current == null) return false;
 
@@ -278,9 +278,18 @@ namespace ImageResizer.Plugins.LicenseVerifier {
         {
             this.c = c;
             c.Plugins.add_plugin(this);
+            c.Pipeline.PostRewrite += Pipeline_PostRewrite;
             return this;
         }
 
+        private void Pipeline_PostRewrite(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e)
+        {
+
+            if (ShouldDisplayDot(this.c, null))
+            {
+                e.QueryString["red_dot_cachebreaker"] = "1";
+            }
+        }
         public bool Uninstall(Configuration.Config c)
         {
             c.Plugins.remove_plugin(this);
