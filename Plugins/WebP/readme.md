@@ -14,7 +14,7 @@ We [have a guide for using Slimmage and ImageResizer together](http://imageresiz
 
 * Do NOT use this plugin with untrusted data. This plugin is a thin wrapper over `libwebp`, which is written in C, and has not yet reached version 1.0.
 * Specificially, it is a thin wrapper over this set of bindings:  https://github.com/imazen/libwebp-net
-* **You are responsible for locating and using the latest version of `libwebp.dll`. The included copy is most likely out of date, and may not contain the latest security fixes.** ImageResizer 4.1.0 uses libwebp 0.5.2.
+* **You are responsible for locating and using the latest version of `libwebp.dll`. The included copy is most likely out of date, and may not contain the latest security fixes.** ImageResizer 4.1.0 uses libwebp 0.6.0.
 * You can [monitor libwebp releases are here](https://github.com/webmproject/libwebp/releases) and [search CVEs for the keyword webp](https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=webp).
 
 ## Installation
