@@ -13,7 +13,7 @@ namespace ImageResizer.Plugins.Basic
             return licenses;
         }
 
-        private IList<string> licenses = new List<string>();
+        private IList<string> licenses = new List<string>(1);
         public IPlugin Install(Configuration.Config c)
         {   
             var node = c.getNode("licenses");
@@ -23,7 +23,7 @@ namespace ImageResizer.Plugins.Basic
                 {
                     if (child.TextContents != null)
                     {
-                        licenses.Add(child.TextContents.Trim().Replace(" ", "").Replace("\t", "").Replace("\n", "").Replace("\r", ""));
+                        licenses.Add(StaticLicenseProvider.CleanupLicenseString(child.TextContents));
                     }
                 }
             }
