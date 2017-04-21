@@ -38,63 +38,90 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
     }
 
-    internal class LicenseDetails
-    {
 
-        public string Domain { get; private set; }
-        public string OwnerName { get; private set; }
-        public DateTime Issued { get; private set; }
-        public DateTime Expires { get; private set; }
-        public IList<string> Features { get; private set; }
+    internal class LicenseDetails : ILicenseDetails
+    {
+        public IEnumerable<string> GetFeatures()
+        {
+            return features;
+        }
+        public DateTime? Issued { get; private set; }
+        public DateTime? Expires { get; private set; }
+        public DateTime? NoReleasesAfter { get; private set; }
+        public IReadOnlyDictionary<string, string> GetPairs()
+        {
+            return pairs;
+        }
+
+        private Dictionary<string, string> pairs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private List<string> features;
 
         public LicenseDetails(string plaintext)
         {
-            Expires = DateTime.MaxValue;
-            Issued = DateTime.MinValue;
             string[] lines = plaintext.Split('\n');
             foreach (string l in lines)
             {
                 int colon = l.IndexOf(':');
                 if (colon < 1) continue;
-                string key = l.Substring(0, colon).Trim().ToLowerInvariant();
+                string key = l.Substring(0, colon).Trim();
                 string value = l.Substring(colon + 1).Trim();
 
-                switch (key)
+                if (String.Equals(key, "issued", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    case "domain": Domain = value.Trim().ToLowerInvariant(); break;
-                    case "owner": OwnerName = value; break;
-                    case "issued": Issued = DateTime.Parse(value); break;
-                    case "expires": Expires = DateTime.Parse(value); break;
-                    case "features":
-                        Features = value.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
-                        break;
+                    Issued = DateTime.Parse(value);
                 }
-            }
-            if (Domain == null || OwnerName == null || Features == null || Features.Count == 0)
-            {
-                throw new ArgumentOutOfRangeException("plaintext", "Invalid license; missing one or more of Domain, OwnerName, Features");
+                else if (String.Equals(key, "expires", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    Expires = DateTime.Parse(value);
+                }
+                else if (String.Equals(key, "no releases after", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    NoReleasesAfter = DateTime.Parse(value);
+                }
+                else if (String.Equals(key, "features", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    features = value.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
+                }
+                pairs.Add(key, value);
             }
         }
 
         public override string ToString()
         {
-            return String.Format(
-                "Domain: {0}\nOwnerName: {1}\nIssued: {2}\nExpires: {3} \nFeatures: {4} \n",
-                Domain.Replace('\n', ' '), OwnerName.Replace('\n', ' '), Issued.ToString(), Expires.ToString(), String.Join(" ", Features));
-
+            var sb = new StringBuilder();
+            foreach (var pair in pairs)
+            {
+                sb.AppendFormat("{0}: {1}\n", pair.Key, pair.Value);
+            }
+            return sb.ToString();
         }
 
+
+        public string Get(string key)
+        {
+            string s;
+            if (pairs.TryGetValue(key, out s))
+            {
+                return s;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 
-    internal class LicenseBlob
+    internal class LicenseBlob : ILicenseBlob
     {
-        public byte[] InfoUTF8 { get; set; }
-        public string Info { get; set; }
+        private byte[] InfoUTF8 { get; set; }
+        private string Info { get; set; }
 
-        public LicenseDetails Details { get; private set; }
-        public byte[] Signature { get; set; }
+        private LicenseDetails Details { get; set; }
+        private byte[] Signature { get; set; }
 
-        public IEnumerable<string> Comments { get; set; }
+        private IEnumerable<string> Comments { get; set; }
+
+        public string Original { get; private set; }
 
         public static LicenseBlob Deserialize(string license)
         {
@@ -102,30 +129,52 @@ namespace ImageResizer.Plugins.LicenseVerifier
             if (parts.Count < 2) throw new ArgumentException("Not enough segments in license key; failed to deserialize: \"" + license + "\"", "license");
 
             var b = new LicenseBlob();
+            b.Original = license;
             b.Signature = Convert.FromBase64String(parts[parts.Count - 1]);
             b.InfoUTF8 = Convert.FromBase64String(parts[parts.Count - 2]);
-            b.Info = UTF8Encoding.UTF8.GetString(b.InfoUTF8);
+            b.Info = System.Text.Encoding.UTF8.GetString(b.InfoUTF8);
             b.Comments = parts.Take(parts.Count - 2);
             b.Details = new LicenseDetails(b.Info);
             return b;
         }
+        public override string ToString()
+        {
+            return Original;
+        }
+
+        public byte[] GetSignature()
+        {
+            return Signature;
+        }
+
+        public byte[] GetDataUTF8()
+        {
+            return InfoUTF8;
+        }
+
+        public ILicenseDetails GetParsed()
+        {
+            return Details;
+        }
     }
+
 
     internal class LicenseValidator
     {
 
 
-        public bool Validate(LicenseBlob b, RSADecryptPublic p, StringBuilder log)
+        public bool Validate(ILicenseBlob b, RSADecryptPublic p, StringBuilder log)
         {
-            var hash = new SHA512Managed().ComputeHash(b.InfoUTF8);
-            var decrypted_bytes = p.DecryptPublic(b.Signature);
+            var signature = b.GetSignature();
+            var hash = new SHA512Managed().ComputeHash(b.GetDataUTF8());
+            var decrypted_bytes = p.DecryptPublic(signature);
             var valid = hash.SequenceEqual(decrypted_bytes);
 
             if (log != null)
             {
                 log.AppendLine("Using public modulus: " + p.Modulus.ToString());
                 log.AppendLine("Using public exponent: " + p.Exponent.ToString());
-                log.AppendLine("Encrypted bytes: " + BitConverter.ToString(b.Signature).ToLower().Replace("-", ""));
+                log.AppendLine("Encrypted bytes: " + BitConverter.ToString(signature).ToLower().Replace("-", ""));
                 log.AppendLine("Decrypted sha512: " + BitConverter.ToString(decrypted_bytes).ToLower().Replace("-", ""));
                 log.AppendLine("Expected sha512: " + BitConverter.ToString(hash).ToLower().Replace("-", ""));
             }
@@ -146,8 +195,8 @@ namespace ImageResizer.Plugins.LicenseVerifier
         {
             var blob = LicenseBlob.Deserialize(license_str);
             if (log != null) log.AppendLine("---------------------------------------------");
-            if (log != null) log.AppendLine("Parsed info: " + blob.Info);
-            if (log != null) log.AppendLine("Plaintext hash: " + BitConverter.ToString(new SHA512Managed().ComputeHash(blob.InfoUTF8)).ToLower().Replace("-", ""));
+            if (log != null) log.AppendLine("Parsed info: " + blob.GetParsed().ToString());
+            if (log != null) log.AppendLine("Plaintext hash: " + BitConverter.ToString(new SHA512Managed().ComputeHash(blob.GetDataUTF8())).ToLower().Replace("-", ""));
 
 
             var decryptor = new RSADecryptPublic(mod, exp);
