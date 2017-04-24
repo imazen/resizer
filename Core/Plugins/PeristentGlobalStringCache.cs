@@ -88,7 +88,7 @@ namespace ImageResizer.Plugins
 
         string FilenameKeyFor(string key)
         {
-            if (key.Any(c => !Char.IsLetterOrDigit(c)))
+            if (key.Any(c => !Char.IsLetterOrDigit(c) && c != '_') && key.Length  + prefix.Length < 200)
             {
                 return this.prefix + hashToBase16(key) + ".txt";
             }
