@@ -13,9 +13,7 @@ namespace ImageResizer.Collections {
 
     /// <summary>
     /// SafeList is mutable, but it uses immutable data structures to minimize the need for locking.
-    /// The provided manipulation 
-    /// Exposes a immutable list. Changes are made by copying the lists.
-    /// SafeList is 
+    /// The provided manipulation exposes an immutable list. Changes are made by copying the lists.
     /// Never perform logic on SafeList directly, always use GetList() or GetCollection() first, followed by SetList().
     /// If you need involved list-fu, use ModifyList and specify a callback. It will execute inside a lock, preventing changes on other threads from overwriting each other.
     /// </summary>
