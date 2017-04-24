@@ -48,9 +48,11 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         {
             var ex = new HttpRequestException("Mock failure", new WebException("Mock failure", status));
             var handler = new Mock<HttpMessageHandler>();
-            handler.Protected()
+            var method = handler.Protected()
                 .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
-                .ThrowsAsync(ex).Verifiable("SendAsync must be called");
+                .ThrowsAsync(ex);
+
+            method.Verifiable("SendAsync must be called");
 
             mgr.SetHttpMessageHandler(handler.Object, true);
             return handler;
@@ -58,9 +60,9 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
 
         [Fact]
-        public void Test_License_Success()
+        public void Test_Remote_License_Success()
         {
-            var mgr = new LicenseManagerSingleton()
+            var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test)
             {
                 Cache = new StringCacheMem()
             };
@@ -84,9 +86,10 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
             mgr.Heartbeat();
             Mock.Verify(httpHandler);
-            var result = new LicenseComputation(conf, PublicKeys.Test, sink, mgr);
+            var result = new LicenseComputation(conf, ImazenPublicKeys.Test, sink, mgr);
 
-            Assert.Equal(new Uri("https://s3-us-west-2.amazonaws.com/imazen-licenses/v1/licenses/latest/1qggq12t2qwgwg4c2d2dqwfweqfw.txt"), invokedUri);
+            Assert.StartsWith("https://s3-us-west-2.amazonaws.com/imazen-licenses/v1/licenses/latest/1qggq12t2qwgwg4c2d2dqwfweqfw.txt?id=115153162&", invokedUri.ToString());
+
 
             Assert.NotNull(mgr.GetAllLicenses().First().GetFreshRemoteLicense());
 
@@ -95,7 +98,10 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             tasks = mgr.GetAsyncTasksSnapshot().ToArray();
             Assert.Equal(0, tasks.Count());
             Task.WaitAll(tasks);
-            
+
+            Assert.Empty(sink.GetIssues());
+            Assert.Empty(mgr.GetIssues());
+
         }
         [Fact]
         public void Test_Caching_With_Timeout()
@@ -104,7 +110,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
             // Populate cache
             {
-                var mgr = new LicenseManagerSingleton()
+                var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test)
                 {
                     Cache = cache
                 };
@@ -120,17 +126,20 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 mgr.Heartbeat();
 
                 var sink = new IssueSink("LicenseManagerTest");
-                var result = new LicenseComputation(conf, PublicKeys.Test, sink, mgr);
+                var result = new LicenseComputation(conf, ImazenPublicKeys.Test, sink, mgr);
                 Assert.True(result.LicensedForHost("any"));
+
+                Assert.Empty(sink.GetIssues());
+                Assert.Empty(mgr.GetIssues());
             }
 
             // Use cache
             {
-                var mgr = new LicenseManagerSingleton()
+                var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test)
                 {
                     Cache = cache
                 };
-                var httpHandler = MockRemoteLicense(mgr, HttpStatusCode.RequestTimeout, "", null);
+                var httpHandler = MockRemoteLicenseException(mgr, WebExceptionStatus.NameResolutionFailure);
 
                 Config conf = new Config();
                 conf.Plugins.LicenseScope = LicenseAccess.Local;
@@ -142,8 +151,10 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 mgr.Heartbeat();
 
                 var sink = new IssueSink("LicenseManagerTest");
-                var result = new LicenseComputation(conf, PublicKeys.Test, sink, mgr);
+                var result = new LicenseComputation(conf, ImazenPublicKeys.Test, sink, mgr);
                 Assert.True(result.LicensedForHost("any"));
+
+                Assert.NotEmpty(mgr.GetIssues());
             }
 
         }
@@ -168,6 +179,13 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             Assert.Equal(null, c.Get("404"));
             Assert.Equal(StringCachePutResult.WriteComplete, c.TryPut("a", null));
         }
+
+        //Test network grace period
+
+        // Test invalid content
+        // test mixed
+
+
             //[Fact]
             //public void Test_Uncached_403()
             //{

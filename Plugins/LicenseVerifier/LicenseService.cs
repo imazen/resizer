@@ -29,7 +29,7 @@ namespace ImageResizer.Plugins.LicenseVerifier {
         ConcurrentDictionary<string, string> normalized_domains = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         IEnumerable<string> licensedDomains;
         Dictionary<string, string> mappings;
-
+        internal Dictionary<string, string> DomainMappings { get { return mappings; } }
         public DomainNormalizer(Config c, IIssueReceiver sink, IEnumerable<string> licensedDomains)
         {
             this.licensedDomains = licensedDomains;
@@ -109,7 +109,7 @@ namespace ImageResizer.Plugins.LicenseVerifier {
     {
         //Input
         Config c;
-        RSADecryptPublic rsa;
+        IEnumerable<RSADecryptPublic> trustedKeys;
         IIssueReceiver sink;
 
         //Cached computations
@@ -119,13 +119,14 @@ namespace ImageResizer.Plugins.LicenseVerifier {
         /// </summary>
         IEnumerable<IEnumerable<string>> _installed_features;
         IList<ILicenseChain> chains;
+        ILicenseManager mgr;
         IDictionary<string, ISet<string>> _licensedFeaturesByDomain;
 
-
-        public LicenseComputation(Config c, RSADecryptPublic rsa, IIssueReceiver sink, ILicenseManager mgr)
+        // TODO: distinguish betwen resolvable errors (perhaps missing license goes away?) and one-time 
+        public LicenseComputation(Config c, IEnumerable<RSADecryptPublic> trustedKeys, IIssueReceiver sink, ILicenseManager mgr)
         {
             this.c = c;
-            this.rsa = rsa;
+            this.trustedKeys = trustedKeys;
             this.sink = sink;
             
 
@@ -137,7 +138,7 @@ namespace ImageResizer.Plugins.LicenseVerifier {
 
             // Create or fetch all relevant license chains; ignore the empty/invalid ones, they're logged to the manager instance
             chains = c.Plugins.GetAll<ILicenseProvider>().SelectMany(p => p.GetLicenses()).Select((str) => mgr.Add(str, c.Plugins.LicenseScope)).Where((x) => x != null).Concat(shared).ToList();
-
+            this.mgr = mgr;
 
             var licensedDomains = chains.SelectMany((x) => x.Licenses().Select((b) => b.GetParsed().Get("Domain"))).Where((s) => !string.IsNullOrWhiteSpace(s)).Select((s) => DomainNormalizer.NormalizeLicenseDomain(s)).ToList();
             this.domains = new DomainNormalizer(c, sink, licensedDomains);
@@ -149,20 +150,22 @@ namespace ImageResizer.Plugins.LicenseVerifier {
                 var dict = _licensedFeaturesByDomain;
                 var details = blob.GetParsed();
                 var domain = string.IsNullOrEmpty(details.Get("Domain")) ? "*" : DomainNormalizer.NormalizeLicenseDomain(details.Get("Domain"));
-                var features = details.GetFeatures();
+                var features = details.Get("Features")?.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
+                // Merge with existing features associated with domain
                 if (features != null)
                 {
-                    dict[domain] = new HashSet<string>(Enumerable.Concat(details.GetFeatures(), dict.ContainsKey(domain) ? dict[domain] : Enumerable.Empty<string>()));
+                    dict[domain] = new HashSet<string>(Enumerable.Concat(features, dict.ContainsKey(domain) ? dict[domain] : Enumerable.Empty<string>()));
                 }
             }
         }
 
         private bool IsValid(ILicenseBlob blob, IIssueReceiver sink)
         {
+
             //kind: id (expiry based on 
             
             StringBuilder log = sink != null ? new StringBuilder() : null;
-            bool valid_signature = new LicenseValidator().Validate(blob, rsa, log);
+            bool valid_signature = new LicenseValidator().Validate(blob, trustedKeys, log);
             var details = blob.GetParsed(); ///TODO: reparse if 
 
             bool expired = details.Expires < DateTime.UtcNow;
@@ -193,6 +196,8 @@ namespace ImageResizer.Plugins.LicenseVerifier {
 
             // Replace 'secret' key with fetched key, unless fetched key is expired? 
 
+            //TODO: Validate build date
+            //TODO: Validate grace period against first heartbeat
 
             var first = c.Licenses().Where((b) => IsValid(b, sink)).FirstOrDefault();
             return first;
@@ -242,29 +247,48 @@ namespace ImageResizer.Plugins.LicenseVerifier {
         {
             StringBuilder sb = new StringBuilder();
 
-            //var mappings = _mappings ?? domains.GetDomainMappings(c, this.Sink);
-            //var features = _installed_features ?? c.Plugins.GetAll<ILicensedPlugin>().Select(p => p.LicenseFeatureCodes).ToList();
 
-            //sb.AppendLine("\n----------------\n");
-            //sb.AppendLine("License keys");
-            //if (mappings.Count > 0)
-            //{
-            //    sb.AppendLine("For licensing, you have mapped the following local (non-public) domains or addresses as follows:\n" +
-            //        String.Join(", ", mappings.Select(pair => string.Format("{0} => {1}", pair.Key, pair.Value))));
-            //}
 
-            //var licenses = service.GetLicensedFeaturesDescription();
-            //sb.AppendLine();
-            //if (licenses.Length > 0)
-            //{
-            //    sb.AppendLine("List of installed domain licenses:\n" + licenses);
-            //}
-            //else
-            //{
-            //    sb.AppendLine("You do not have any license keys installed.");
+            var mappings = domains.DomainMappings;
+            
+            sb.AppendLine("\n----------------\n");
+            sb.AppendLine("Licenses");
+            if (mappings.Count > 0)
+            {
+                sb.AppendLine("For domain licensing, you have mapped the following local (non-public) domains or addresses as follows:\n" +
+                    String.Join(", ", mappings.Select(pair => string.Format("{0} => {1}", pair.Key, pair.Value))));
+            }
 
-            //}
-            //sb.AppendLine("\n----------------\n");
+            var licenses = GetLicensedFeaturesDescription();
+            sb.AppendLine();
+            if (licenses.Length > 0)
+            {
+                sb.AppendLine("List of licensed features by domain:\n" + licenses);
+            }
+            else
+            {
+                sb.AppendLine("You do not have any active license keys installed.");
+
+            }
+
+            if (chains.Count > 0)
+            {
+                sb.AppendLine("List of licenses for this Config instance:\n" + licenses);
+                sb.AppendLine(string.Join("\n", chains.Select(c => c.ToString())));
+            }
+            var others = mgr.GetAllLicenses().Except(chains);
+            if (others.Count() > 0)
+            {
+                sb.AppendLine("Licenses only used by other Config instances in this procces:\n" + licenses);
+                sb.AppendLine(string.Join("\n", chains.Select(c => c.ToString())));
+            }
+
+            var mgrs = mgr as LicenseManagerSingleton;
+            if (mgrs != null)
+            {
+                sb.AppendFormat("{0} heartbeat events. First {1} ago.\n", mgrs.HeartbeatCount, mgrs.FirstHeartbeat == null ? "(never)" : DateTime.UtcNow.Subtract(mgrs.FirstHeartbeat.Value).ToString());
+            }
+            sb.AppendLine("\n----------------\n");
             return sb.ToString();
         }
     }
@@ -277,12 +301,7 @@ namespace ImageResizer.Plugins.LicenseVerifier {
         public LicenseEnforcer() { mgr = LicenseManagerSingleton.Singleton; }
         public LicenseEnforcer(ILicenseManager mgr){ this.mgr = mgr; }
 
-        private string pubkey_exponent = "65537";
-        private string pubkey_modulus = "23949488589991837273662465276682907968730706102086698017736172318753209677546629836371834786541857453052840819693021342491826827766290334135101781149845778026274346770115575977554682930349121443920608458091578262535319494351868006252977941758848154879863365934717437651379551758086088085154566157115250553458305198857498335213985131201841998493838963767334138323078497945594454883498534678422546267572587992510807296283688571798124078989780633040004809178041347751023931122344529856055566400640640925760832450260419468881471181281199910469396775343083815780600723550633987799763107821157001135810564362648091574582493";
-        private RSADecryptPublic Crypto()
-        {
-            return new RSADecryptPublic(BigInteger.Parse(pubkey_modulus), BigInteger.Parse(pubkey_exponent));
-        }
+
 
         private Config c;
         private IIssueReceiver Sink { get { return c.configurationSectionIssues;  } }
@@ -338,7 +357,8 @@ namespace ImageResizer.Plugins.LicenseVerifier {
 
         private void Invalidate()
         {
-            cache = new LicenseComputation(this.c, this.Crypto(), this.Sink, this.mgr);
+            //TODO: !! change to production
+            cache = new LicenseComputation(this.c, ImazenPublicKeys.Test, this.Sink, this.mgr);
         }
 
         public IPlugin Install(Config c)
@@ -347,8 +367,14 @@ namespace ImageResizer.Plugins.LicenseVerifier {
             Invalidate();
             c.Plugins.add_plugin(this);
             c.Pipeline.PostRewrite += Pipeline_PostRewrite;
+            c.Pipeline.Heartbeat += Pipeline_Heartbeat;
             c.Plugins.LicensingChange += Plugins_LicensingChange;
             return this;
+        }
+
+        private void Pipeline_Heartbeat(IPipelineConfig sender, Config c)
+        {
+            mgr.Heartbeat();
         }
 
         private void Plugins_LicensingChange(object sender, Config forConfig)
@@ -358,8 +384,6 @@ namespace ImageResizer.Plugins.LicenseVerifier {
 
         private void Pipeline_PostRewrite(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e)
         {
-            mgr.Heartbeat();
-
             if (ShouldDisplayDot(this.c, null))
             {
                 e.QueryString[settings_key] = settings_value;

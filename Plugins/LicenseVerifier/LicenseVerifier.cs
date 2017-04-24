@@ -24,13 +24,13 @@ namespace ImageResizer.Plugins.LicenseVerifier
         {
             if (input_bytes.Length > BlockSize)
             {
-                throw new ArgumentOutOfRangeException("input", "input too large for RSA cipher.");
+                throw new ArgumentOutOfRangeException("input", "input too large for RSA cipher block size.");
             }
             var input = new BigInteger(input_bytes.Reverse().Concat(Enumerable.Repeat<byte>(0, 1)).ToArray()); //Add a zero to prevent interpretation as twos-complement
 
             if (input.CompareTo(Modulus) >= 0)
             {
-                throw new ArgumentOutOfRangeException("input", "input too large for RSA cipher.");
+                throw new ArgumentOutOfRangeException("input", "input too large for RSA modulus.");
             }
             int signature_padding = 0; //1
             return BigInteger.ModPow(input, Exponent, Modulus).ToByteArray().Skip(signature_padding).Reverse().SkipWhile(v => v != 0).Skip(1 + signature_padding).ToArray();
@@ -41,10 +41,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
     internal class LicenseDetails : ILicenseDetails
     {
-        public IEnumerable<string> GetFeatures()
-        {
-            return features;
-        }
+
         public DateTime? Issued { get; private set; }
         public DateTime? Expires { get; private set; }
         public DateTime? NoReleasesAfter { get; private set; }
@@ -54,7 +51,6 @@ namespace ImageResizer.Plugins.LicenseVerifier
         }
 
         private Dictionary<string, string> pairs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        private List<string> features;
 
         public LicenseDetails(string plaintext)
         {
@@ -74,13 +70,9 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 {
                     Expires = DateTime.Parse(value);
                 }
-                else if (String.Equals(key, "no releases after", StringComparison.InvariantCultureIgnoreCase))
+                else if (String.Equals(key, "subscriptionexpirationdate", StringComparison.InvariantCultureIgnoreCase))
                 {
                     NoReleasesAfter = DateTime.Parse(value);
-                }
-                else if (String.Equals(key, "features", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    features = value.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
                 }
                 pairs.Add(key, value);
             }
@@ -159,26 +151,54 @@ namespace ImageResizer.Plugins.LicenseVerifier
     }
 
 
+
+    internal class ImazenPublicKeys
+    {
+        static ImazenPublicKeys()
+        {
+            {
+                var pubkey_modulus = "21403964489040138713896545869406851734432500305180577929806228393671667423170541918856531956008546071841016201645150244452266439995041173092354230946610429300967887006960186647111152810965360763586210200652502467947786453111507369142658284220331513416234497960844309808252643534631142917589553418044306073242485021092396181183125381004682521853943025560860753079004948017667604884278401445729443478586697229583656851019218046599746243419376456426788044497274378001221965538712352348475726349124652450874653832672820100829574087311416068166524423905971193163418806721436095962165082262760557869093554827824418663362349";
+                var pubkey_exponent = "65537";
+                Test = new[] { new RSADecryptPublic(BigInteger.Parse(pubkey_modulus), BigInteger.Parse(pubkey_exponent)) };
+            }
+            {
+                var pubkey_modulus = "23949488589991837273662465276682907968730706102086698017736172318753209677546629836371834786541857453052840819693021342491826827766290334135101781149845778026274346770115575977554682930349121443920608458091578262535319494351868006252977941758848154879863365934717437651379551758086088085154566157115250553458305198857498335213985131201841998493838963767334138323078497945594454883498534678422546267572587992510807296283688571798124078989780633040004809178041347751023931122344529856055566400640640925760832450260419468881471181281199910469396775343083815780600723550633987799763107821157001135810564362648091574582493";
+                var pubkey_exponent = "65537";
+                Production = new[] { new RSADecryptPublic(BigInteger.Parse(pubkey_modulus), BigInteger.Parse(pubkey_exponent)) };
+            }
+            All = Production.Concat(Test).ToArray();
+        }
+
+        public static IEnumerable<RSADecryptPublic> Test { get; private set; }
+        
+        public static IEnumerable<RSADecryptPublic> Production { get; private set; }
+
+        public static IEnumerable<RSADecryptPublic> All { get; private set; }
+    }
+
     internal class LicenseValidator
     {
 
 
-        public bool Validate(ILicenseBlob b, RSADecryptPublic p, StringBuilder log)
+        public bool Validate(ILicenseBlob b, IEnumerable<RSADecryptPublic> trustedKeys, StringBuilder log)
         {
-            var signature = b.GetSignature();
-            var hash = new SHA512Managed().ComputeHash(b.GetDataUTF8());
-            var decrypted_bytes = p.DecryptPublic(signature);
-            var valid = hash.SequenceEqual(decrypted_bytes);
-
-            if (log != null)
+            return trustedKeys.Any(p =>
             {
-                log.AppendLine("Using public modulus: " + p.Modulus.ToString());
-                log.AppendLine("Using public exponent: " + p.Exponent.ToString());
-                log.AppendLine("Encrypted bytes: " + BitConverter.ToString(signature).ToLower().Replace("-", ""));
-                log.AppendLine("Decrypted sha512: " + BitConverter.ToString(decrypted_bytes).ToLower().Replace("-", ""));
-                log.AppendLine("Expected sha512: " + BitConverter.ToString(hash).ToLower().Replace("-", ""));
-            }
-            return valid;
+                var signature = b.GetSignature();
+                var hash = new SHA512Managed().ComputeHash(b.GetDataUTF8());
+                var decrypted_bytes = p.DecryptPublic(signature);
+                var valid = hash.SequenceEqual(decrypted_bytes);
+
+                if (log != null)
+                {
+                    log.AppendLine("Using public exponent " + p.Exponent.ToString() + " and modulus " + p.Modulus.ToString());
+                    log.AppendLine("Encrypted bytes: " + BitConverter.ToString(signature).ToLower().Replace("-", ""));
+                    log.AppendLine("Decrypted sha512: " + BitConverter.ToString(decrypted_bytes).ToLower().Replace("-", ""));
+                    log.AppendLine("Expected sha512: " + BitConverter.ToString(hash).ToLower().Replace("-", ""));
+                    log.AppendLine(valid ? "Success!" : "Not a match.");
+                }
+                return valid;
+            });
         }
 
         static bool Test_Generic(StringBuilder log)
@@ -199,7 +219,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             if (log != null) log.AppendLine("Plaintext hash: " + BitConverter.ToString(new SHA512Managed().ComputeHash(blob.GetDataUTF8())).ToLower().Replace("-", ""));
 
 
-            var decryptor = new RSADecryptPublic(mod, exp);
+            var decryptor = new[] { new RSADecryptPublic(mod, exp) };
 
             return new LicenseValidator().Validate(blob, decryptor, log);
         }
