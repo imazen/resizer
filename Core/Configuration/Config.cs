@@ -84,6 +84,8 @@ namespace ImageResizer.Configuration {
 
             //Load plugins immediately. Lazy plugin loading causes problems.
             plugins.LoadPlugins();
+
+            pipeline.FireHeartbeat();
         }
 
         
