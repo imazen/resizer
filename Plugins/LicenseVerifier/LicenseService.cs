@@ -98,30 +98,47 @@ namespace ImageResizer.Plugins.LicenseVerifier
             ComputeStatus(pluginFeaturesUsed);
         }
 
+        bool IsLicenseExpired(ILicenseDetails details, IClock clock){
+            return details.Expires != null && details.Expires < clock.GetUtcNow();
+        }
+        bool HasLicenseBegun(ILicenseDetails details, IClock clock){
+            return details.Issued != null && details.Issued > clock.GetUtcNow();
+        }
+        bool IsLicenseRevoked(ILicenseDetails details){
+            return "false".Equals(details.Get("Valid"), StringComparison.OrdinalIgnoreCase);
+        }
+        public DateTimeOffset? GetBuildDate(){
+            return clock.GetBuildDate() ?? clock.GetAssemblyWriteDate();
+        }
+        public bool IsBuildDateNewer(DateTimeOffset? value)
+        {
+            var buildDate = GetBuildDate();
+            return buildDate != null &&
+                   value != null &&
+                buildDate > value;
+        }
+
         bool IsLicenseValid(ILicenseBlob b)
         {
             var details = b.Fields();
-            bool expired = details.Expires != null && details.Expires < clock.GetUtcNow();
-            bool invalid_time = details.Issued != null && details.Issued > clock.GetUtcNow();
-            if (expired || invalid_time)
-            {
-                permanentIssues.AcceptIssue(new Issue("License " + details.Id + (expired ? "has expired: " : "was issued in the future; check system clock: ") + b.ToRedactedString(), IssueSeverity.Warning));
+            if (IsLicenseExpired(details, clock)){
+                permanentIssues.AcceptIssue(new Issue("License " + details.Id +  " has expired.",  b.ToRedactedString(), IssueSeverity.Warning));
                 return false;
             }
 
-            if (details.SubscriptionExpirationDate != null)
-            {
-                var buildDate = clock.GetBuildDate() ?? clock.GetAssemblyWriteDate();
-                if (buildDate != null && details.SubscriptionExpirationDate < buildDate)
-                {
-                    permanentIssues.AcceptIssue(new Issue("License " + details.Id +
-                        " covers ImageResizer versions prior to " + details.SubscriptionExpirationDate.Value.ToString("D") +
-                        ", but you are using a build dated " + buildDate.Value.ToString("D"), b.ToRedactedString(), IssueSeverity.Warning));
-                    return false;
-                }
+            if (HasLicenseBegun(details, clock)){
+                permanentIssues.AcceptIssue(new Issue("License " + details.Id +  " was issued in the future; check system clock ",  b.ToRedactedString(), IssueSeverity.Warning));
+                return false;
             }
-            bool revoked = "false".Equals(details.Get("Valid"), StringComparison.OrdinalIgnoreCase);
-            if (revoked)
+
+            if (IsBuildDateNewer(details.SubscriptionExpirationDate)
+            {
+                permanentIssues.AcceptIssue(new Issue("License " + details.Id +
+                        " covers ImageResizer versions prior to " + details.SubscriptionExpirationDate.Value.ToString("D") +
+                                                      ", but you are using a build dated " + GetBuildDate().Value.ToString("D"), b.ToRedactedString(), IssueSeverity.Warning));
+                return false;
+            }
+            if (IsLicenseRevoked(details))
             {
                 permanentIssues.AcceptIssue(new Issue("License " + details.Id + " is no longer active", b.ToRedactedString(), IssueSeverity.Warning));
             }
