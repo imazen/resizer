@@ -61,7 +61,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             this.mgr = mgr;
             if (mgr.FirstHeartbeat == null)
             {
-                throw new ArgumentException("ILicenseManager.Heartbeat() must be called before LicenseCompuation.new");
+                throw new ArgumentException("ILicenseManager.Heartbeat() must be called before LicenseComputation.new");
             }
 
             // What features are installed on this instance?
