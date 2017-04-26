@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageResizer.Configuration.Xml;
 
 namespace ImageResizer.Plugins.Basic
 {
-    public class WebConfigLicenseReader: ILicenseProvider, IPlugin
+    public class WebConfigLicenseReader : ILicenseProvider, IPlugin, IRedactDiagnostics
     {
         public ICollection<string> GetLicenses()
         {
@@ -14,19 +15,18 @@ namespace ImageResizer.Plugins.Basic
         }
 
         private IList<string> licenses = new List<string>(1);
+
         public IPlugin Install(Configuration.Config c)
-        {   
-            var node = c.getNode("licenses");
-            if (node != null)
+        {
+
+            foreach (var child in c.getNode("licenses")?
+                .childrenByName("license")
+                .Where(n => !string.IsNullOrWhiteSpace(n.TextContents)) ?? Enumerable.Empty<Node>())
             {
-                foreach (var child in node.childrenByName("license"))
-                {
-                    if (child.TextContents != null)
-                    {
-                        licenses.Add(StaticLicenseProvider.CleanupLicenseString(child.TextContents));
-                    }
-                }
+                licenses.Add(StaticLicenseProvider.CleanupLicenseString(child.TextContents));
+
             }
+
             c.Plugins.add_plugin(this);
             return this;
         }
@@ -35,6 +35,20 @@ namespace ImageResizer.Plugins.Basic
         {
             c.Plugins.remove_plugin(this);
             return true;
+        }
+
+        public Node RedactFrom(Node resizer)
+        {
+            foreach (Node n in resizer.queryUncached("licenses.license").Where(n => !string.IsNullOrWhiteSpace(n.TextContents)))
+            {
+                var segments = n.TextContents.Split(':');
+                if (segments.Count() > 1)
+                {
+                    n.TextContents = string.Join(":",
+                        segments.Take(segments.Count() - 2).Concat(new[] { "****redacted****", segments.Last() }));
+                }
+            }
+            return resizer;
         }
     }
 }
