@@ -643,7 +643,7 @@ namespace ImageResizer.Configuration {
             if (plugin is ISettingsModifier) SettingsModifierPlugins.Remove(plugin as ISettingsModifier);
             if (plugin is ICurrentConfigProvider) ConfigProviders.Remove(plugin as ICurrentConfigProvider);
             if (plugin is ILogManager && LogManager == plugin) LogManager = null;
-            if (plugin is ILicensedPlugin || plugin is ILicenseProvider) FireLicensingChange();
+            if (plugin is ILicensedPlugin || plugin is ILicenseProvider) FireLicensePluginsChange();
         }
 
         /// <summary>
@@ -671,7 +671,7 @@ namespace ImageResizer.Configuration {
             if (plugin is ISettingsModifier) SettingsModifierPlugins.Add(plugin as ISettingsModifier);
             if (plugin is ICurrentConfigProvider) ConfigProviders.Add(plugin as ICurrentConfigProvider);
             if (plugin is ILogManager) LogManager = plugin as ILogManager;
-            if (plugin is ILicensedPlugin || plugin is ILicenseProvider) FireLicensingChange();
+            if (plugin is ILicensedPlugin || plugin is ILicenseProvider) FireLicensePluginsChange();
         }
 
         /// <summary>
@@ -731,14 +731,14 @@ namespace ImageResizer.Configuration {
         /// <summary>
         /// There has been a change in licensed or licensing plugins
         /// </summary>
-        public event LicensingChangeEvent LicensingChange;
+        public event LicensingChangeEvent LicensePluginsChange;
 
         /// <summary>
         /// Fires the LicensingChange event
         /// </summary>
-        public void FireLicensingChange()
+        public void FireLicensePluginsChange()
         {
-            LicensingChange?.Invoke(this, this.c);
+            LicensePluginsChange?.Invoke(this, this.c);
         }
 
         /// <summary>
@@ -748,7 +748,7 @@ namespace ImageResizer.Configuration {
         public void AddLicense(string license)
         {
             ImageResizer.Plugins.Basic.StaticLicenseProvider.One(license).Install(this.c);
-            FireLicensingChange();
+            FireLicensePluginsChange();
         }
 
         private LicenseAccess _licenseScope = LicenseAccess.Process;
@@ -756,7 +756,7 @@ namespace ImageResizer.Configuration {
         /// <summary>
         /// If this Config should inherit and/or share licenses process-wide, or only use licenses specifically registered.
         /// </summary>
-        public LicenseAccess LicenseScope { get { return _licenseScope; } set { _licenseScope = value; FireLicensingChange();  }  } 
+        public LicenseAccess LicenseScope { get { return _licenseScope; } set { _licenseScope = value; FireLicensePluginsChange();  }  } 
 
     }
 
