@@ -38,7 +38,7 @@ using namespace ImageResizer::Util;
 #endif
 
 [assembly:AssemblyCompanyAttribute ("Imazen LLC")];
-[assembly:AssemblyCopyrightAttribute (L"Copyright © 2015 Imazen LLC")];
+[assembly:AssemblyCopyrightAttribute (L"Copyright © 2017 Imazen LLC")];
 
 // Version information for an assembly consists of the following four values:
 //
@@ -55,6 +55,7 @@ using namespace ImageResizer::Util;
 
 [assembly: CommitAttribute("2cc09f42cda96fd4268c688e2b8bbca7848be4b0")];
 
+[assembly:BuildDateAttribute("")];
 
 // These commented out settings are for the build script to access
 // [assembly: PackageName("Resizer")]

@@ -165,6 +165,12 @@ Target "patch_commit" (fun _ ->
         AssemblyPatcher.setInfo assemblyInfoCppFile ["CommitAttribute", commit]
 )
 
+Target "patch_date" (fun _ ->
+    let date = DateTimeOffset.UtcNow.ToString("o")
+    AssemblyPatcher.setInfo assemblyInfoFile ["BuildDate", date]
+    AssemblyPatcher.setInfo assemblyInfoCppFile ["BuildDateAttribute", date]
+)
+
 Target "patch_ver" (fun _ ->
     let asmVer =
         { version with
@@ -194,6 +200,7 @@ Target "patch_ver" (fun _ ->
 Target "patch_info" (fun _ ->
     Run "patch_commit"
     Run "patch_ver"
+    Run "patch_date"
 )
 
 Target "test" (fun _ ->
@@ -521,6 +528,7 @@ Target "do_all" (fun _ ->
     ==> "push"
     ==> "update_imageserv"
     ==> "print_stats"
+    
     
     Run "print_stats"
 )
