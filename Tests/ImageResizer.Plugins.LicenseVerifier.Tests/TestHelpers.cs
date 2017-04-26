@@ -1,4 +1,5 @@
 ﻿using ImageResizer.Configuration;
+using ImageResizer.Configuration.Issues;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -58,11 +59,29 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
     internal class LicensedPlugin : ILicensedPlugin, IPlugin
     {
         string[] codes;
+
         ILicenseManager mgr;
-        public LicensedPlugin(ILicenseManager mgr, params string[] codes)
+        Config c = null;
+        LicenseComputation cache = null;
+        IClock Clock { get; set; } = new RealClock();
+
+        private LicenseComputation Result
+        {
+            get
+            {
+                if (cache?.ComputationExpires != null && cache.ComputationExpires.Value < Clock.GetUtcNow())
+                {
+                    cache = null;
+                }
+                return cache = cache ?? new LicenseComputation(this.c, ImazenPublicKeys.All, c.configurationSectionIssues, this.mgr, Clock);
+            }
+        }
+
+        public LicensedPlugin(ILicenseManager mgr, IClock clock, params string[] codes)
         {
             this.codes = codes;
             this.mgr = mgr;
+            this.Clock = clock ?? this.Clock;
         }
         public IEnumerable<string> LicenseFeatureCodes
         {
@@ -74,8 +93,19 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
         public IPlugin Install(Config c)
         {
+            this.c = c;
+
+            mgr.MonitorLicenses(c);
+            mgr.MonitorHeartbeat(c);
+
+            // Ensure our cache is appropriately invalidated
+            cache = null;
+            mgr.AddLicenseChangeHandler(this, (me, manager) => me.cache = null);
+
+            // And repopulated, so that errors show up.
+            if (Result == null) throw new ApplicationException("Failed to populate license result");
+
             c.Plugins.add_plugin(this);
-            mgr.Monitor(c);
             return this;
         }
 
@@ -83,6 +113,12 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         {
             c.Plugins.remove_plugin(this);
             return true;
+        }
+
+        public IEnumerable<IIssue> GetIssues()
+        {
+            var cache = Result;
+            return cache == null ? mgr.GetIssues() : mgr.GetIssues().Concat(cache.GetIssues());
         }
     }
 

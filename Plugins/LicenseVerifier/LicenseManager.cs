@@ -1,28 +1,27 @@
 ﻿using ImageResizer.Configuration;
 using ImageResizer.Configuration.Issues;
+using ImageResizer.Configuration.Performance;
 using ImageResizer.Util;
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ImageResizer.Configuration.Performance
-{
-    public class GlobalPerf
-    {
-        public static GlobalPerf Singleton { get; } = new GlobalPerf();
-    }
-    public string GetQuerystring() { return "";  }
-}
+//namespace ImageResizer.Configuration.Performance
+//{
+//    public class GlobalPerf
+//    {
+//        public static GlobalPerf Singleton { get; } = new GlobalPerf();
+//    }
+//    public string GetQuerystring() { return "";  }
+//}
 
 namespace ImageResizer.Plugins.LicenseVerifier
 {
@@ -45,16 +44,27 @@ namespace ImageResizer.Plugins.LicenseVerifier
         void Heartbeat();
 
         /// <summary>
-        /// The license manager will add a handler to notice license changes on the config. It will also process current licenses on the config.
+        /// When Heartbeat() was first called (i.e, first chance to process licenses)
+        /// </summary>
+        DateTimeOffset? FirstHeartbeat { get; }
+
+        /// <summary>
+        /// The license manager will add a handler to notice license changes on this config. It will also process current licenses on the config.
         /// </summary>
         /// <param name="c"></param>
-        void Monitor(Config c);
+        void MonitorLicenses(Config c);
+
+        /// <summary>
+        /// Subscribes itself to heartbeat events on the config
+        /// </summary>
+        /// <param name="c"></param>
+        void MonitorHeartbeat(Config c);
 
         /// <summary>
         /// Register a license key (if it isn't already), and return the inital chain (or null, if the license is invalid)
         /// </summary>
         /// <param name="license"></param>
-        ILicenseChain Add(string license, LicenseAccess access);
+        ILicenseChain GetOrAdd(string license, LicenseAccess access);
 
         /// <summary>
         /// Returns all shared license chains (a chain is shared if any relevant license is marked shared)
@@ -69,9 +79,20 @@ namespace ImageResizer.Plugins.LicenseVerifier
         IEnumerable<ILicenseChain> GetAllLicenses();
 
         /// <summary>
-        /// Fired when a license has been updated or added.
+        /// Adds a weak-referenced handler to the LicenseChange event.
         /// </summary>
-        event LicenseManagerEvent LicenseChange;
+        /// <typeparam name="TTarget"></typeparam>
+        /// <param name="target"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        LicenseManagerEvent AddLicenseChangeHandler<TTarget>(TTarget target, Action<TTarget, ILicenseManager> action);
+
+        /// <summary>
+        /// Removes the event handler created by AddLicenseChangeHandler
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <returns></returns>
+        void RemoveLicenseChangeHandler(LicenseManagerEvent handler);
     }
 
     public interface ILicenseChain
@@ -87,6 +108,11 @@ namespace ImageResizer.Plugins.LicenseVerifier
         bool Shared { get; }
 
         /// <summary>
+        /// If the license chain is updated over the internet
+        /// </summary>
+        bool IsRemote { get; }
+
+        /// <summary>
         /// Can return fresh, cached, and inline licenes
         /// </summary>
         /// <returns></returns>
@@ -96,13 +122,13 @@ namespace ImageResizer.Plugins.LicenseVerifier
         /// Returns null until a fresh license has been fetched (within process lifetime) 
         /// </summary>
         /// <returns></returns>
-        ILicenseBlob GetFreshRemoteLicense();
+        ILicenseBlob FetchedLicense();
 
         ///// <summary>
-        ///// Returns null until a fresh license has been fetched (within process lifetime) 
+        ///// Returns the (presumably) disk cached license
         ///// </summary>
         ///// <returns></returns>
-        //ILicenseBlob GetCachedLicense();
+        ILicenseBlob CachedLicense();
     }
 
     /// <summary>
@@ -110,18 +136,30 @@ namespace ImageResizer.Plugins.LicenseVerifier
     /// </summary>
     public interface ILicenseBlob
     {
-        byte[] GetSignature();
-        byte[] GetDataUTF8();
+        byte[] Signature();
+        byte[] Data();
         string Original { get; }
-        ILicenseDetails GetParsed();
+        ILicenseDetails Fields();
     }
 
     public interface ILicenseDetails
     {
-        IReadOnlyDictionary<string, string> GetPairs();
+        string Id { get; }
+        IReadOnlyDictionary<string, string> Pairs();
         string Get(string key);
-        DateTime? Issued { get; }
-        DateTime? Expires { get; }
+        DateTimeOffset? Issued { get; }
+        DateTimeOffset? Expires { get; }
+        DateTimeOffset? SubscriptionExpirationDate { get; }
+    }
+
+    interface IClock
+    {
+        DateTimeOffset GetUtcNow();
+        long GetTimestampTicks();
+        long TicksPerSecond { get; }
+
+        DateTimeOffset? GetBuildDate();
+        DateTimeOffset? GetAssemblyWriteDate();
     }
 
 
@@ -134,7 +172,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         ConcurrentDictionary<string, LicenseChain> aliases = new ConcurrentDictionary<string, LicenseChain>(StringComparer.Ordinal);
 
         /// <summary>
-        /// By license id/domain, lowercaseinvariant
+        /// By license id/domain, lowercaseinvariant. 
         /// </summary>
         ConcurrentDictionary<string, LicenseChain> chains = new ConcurrentDictionary<string, LicenseChain>(StringComparer.OrdinalIgnoreCase);
 
@@ -146,43 +184,99 @@ namespace ImageResizer.Plugins.LicenseVerifier
         /// <summary>
         /// When there is a material change or addition to a license chain (whether private or shared)
         /// </summary>
-        public event LicenseManagerEvent LicenseChange;
+        private event LicenseManagerEvent LicenseChange;
 
-        HttpClient hc;
+
+        /// <summary>
+        /// The backing sink 
+        /// </summary>
         IssueSink sink = new IssueSink("LicenseManager");
 
 
+        /// <summary>
+        /// The persistent cache for licenses 
+        /// </summary>
         public IPersistentStringCache Cache { get; set; } = new PeristentGlobalStringCache();
 
+        /// <summary>
+        /// The HttpClient all fetchers use
+        /// </summary>
+        public HttpClient HttpClient { get; private set; }
+
+        /// <summary>
+        /// Source for timestamp information
+        /// </summary>
+        public IClock Clock { get; private set; }
+
+        public DateTimeOffset? FirstHeartbeat { get; private set; }
+
+
+        public long HeartbeatCount { get; private set; }
+        public Guid? ManagerGuid { get; private set; }
+
+        /// <summary>
+        /// Trusted public keys
+        /// </summary>
+        public IEnumerable<RSADecryptPublic> TrustedKeys { get; private set; }
+
+
+        internal LicenseManagerSingleton(IEnumerable<RSADecryptPublic> trustedKeys, IClock clock)
+        {
+            TrustedKeys = trustedKeys;
+            Clock = clock;
+            SetHttpMessageHandler(null, true);
+        }
 
         public static ILicenseManager Singleton
         {
             get
             {
-                return (ILicenseManager)CommonStaticStorage.GetOrAdd("licenseManager", (k) => new LicenseManagerSingleton(ImazenPublicKeys.Production));
+                return (ILicenseManager)CommonStaticStorage.GetOrAdd("licenseManager", (k) => new LicenseManagerSingleton(ImazenPublicKeys.All, new RealClock()));
             }
         }
 
-        public void Monitor(Config c)
+        public void Heartbeat()
         {
-            c.Plugins.LicensingChange -= Plugins_LicensingChange;
-            c.Plugins.LicensingChange += Plugins_LicensingChange;
-            ScanConfig(c);
-            Heartbeat();
-        }
-
-        private void Plugins_LicensingChange(object sender, Config forConfig)
-        {
-            ScanConfig(forConfig);
-            Heartbeat();
-        }
-
-        private void ScanConfig(Config c)
-        {
-            foreach (string l in c.Plugins.GetAll<ILicenseProvider>().SelectMany(p => p.GetLicenses()))
+            if (FirstHeartbeat == null) FirstHeartbeat = Clock.GetUtcNow();
+            if (ManagerGuid == null) ManagerGuid = Guid.NewGuid();
+            HeartbeatCount++;
+            foreach (var chain in chains.Values)
             {
-                Add(l, c.Plugins.LicenseScope);
+                chain.Heartbeat();
             }
+        }
+
+        public void AcceptIssue(IIssue i)
+        {
+            ((IIssueReceiver)sink).AcceptIssue(i);
+        }
+
+        public void MonitorHeartbeat(Config c)
+        {
+            c.Pipeline.Heartbeat -= Pipeline_Heartbeat;
+            c.Pipeline.Heartbeat += Pipeline_Heartbeat;
+            Pipeline_Heartbeat(c.Pipeline, c);
+        }
+
+        private void Pipeline_Heartbeat(IPipelineConfig sender, Config c)
+        {
+            Heartbeat();
+        }
+
+        public void MonitorLicenses(Config c)
+        {
+            c.Plugins.LicensePluginsChange -= Plugins_LicensePluginsChange;
+            c.Plugins.LicensePluginsChange += Plugins_LicensePluginsChange;
+            Plugins_LicensePluginsChange(null, c);
+        }
+
+        private void Plugins_LicensePluginsChange(object sender, Config c)
+        {
+            foreach (string licenseString in c.Plugins.GetAll<ILicenseProvider>().SelectMany(p => p.GetLicenses()))
+            {
+                GetOrAdd(licenseString, c.Plugins.LicenseScope);
+            }
+            Heartbeat();
         }
 
         /// <summary>
@@ -190,43 +284,30 @@ namespace ImageResizer.Plugins.LicenseVerifier
         /// </summary>
         /// <param name="license"></param>
         /// <param name="access"></param>
-        public ILicenseChain Add(string license, LicenseAccess access)
+        public ILicenseChain GetOrAdd(string license, LicenseAccess access)
         {
             var chain = aliases.GetOrAdd(license, (s) => GetChainFor(s));
             if (chain != null && (access.HasFlag(LicenseAccess.ProcessShareonly)) && !chain.Shared)
             {
                 chain.Shared = true;
-                OnLicenseChange();
+                FireLicenseChange();
             }
             return chain;
         }
 
         LicenseChain GetChainFor(string license)
         {
-            var blob = TryDeserialize(license, "Failed to parse license:");
+            var blob = TryDeserialize(license, "configuration");
             if (blob == null) return null;
 
-            var parsed = blob.GetParsed();
-
-            var id = parsed.Get("Id") ?? parsed.Get("Domain");
-
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                //Bad licenses are logged to the app-wide sink
-                sink.AcceptIssue(new Issue("The provided license is invalid because it has no ID or Domain.", license, IssueSeverity.ConfigurationError));
-                return null;
-            }
-
-            var key = id.Trim().ToLowerInvariant();
-
-            var chain = chains.GetOrAdd(key, (k) => new LicenseChain(this, k));
+            var chain = chains.GetOrAdd(blob.Fields().Id, (k) => new LicenseChain(this, k));
             chain.Add(blob);
 
-            OnLicenseChange(); //Can only be triggered for new aliases anyway; we don't really need to debounce on signature
+            FireLicenseChange(); //Can only be triggered for new aliases anyway; we don't really need to debounce on signature
             return chain;
         }
 
-        private void OnLicenseChange()
+        public void FireLicenseChange()
         {
             sharedCache = chains.Values.Where((c) => c.Shared).Cast<ILicenseChain>().ToList();
             LicenseChange?.Invoke(this);
@@ -244,89 +325,28 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         public IEnumerable<IIssue> GetIssues()
         {
-            var cache = Cache as PeristentGlobalStringCache;
-
-            if (cache == null)
-            {
-                return sink.GetIssues();
-            }else
-            {
-                return sink.GetIssues().Concat(cache.GetIssues());
-            }
+            var cache = Cache as IIssueProvider;
+            return cache == null ? sink.GetIssues() : sink.GetIssues().Concat(cache.GetIssues());
         }
 
-        private string GetUserAgent()
-        {
-            var a = System.Reflection.Assembly.GetExecutingAssembly();
-            var asb = new StringBuilder();
-            object[] attrs;
-            try
-            {
-                AssemblyName assemblyName = new AssemblyName(a.FullName);
-                asb.Append(assemblyName.Name);
 
-                attrs = a.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
-                if (attrs != null && attrs.Length > 0) asb.Append(" File: " + ((AssemblyFileVersionAttribute)attrs[0]).Version);
-
-                asb.Append(" Assembly: " + assemblyName.Version.ToString().PadRight(15));
-
-                attrs = a.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
-                if (attrs != null && attrs.Length > 0) asb.Append(" Info: " + ((AssemblyInformationalVersionAttribute)attrs[0]).InformationalVersion);
-
-                attrs = a.GetCustomAttributes(typeof(CommitAttribute), false);
-                if (attrs != null && attrs.Length > 0) asb.Append("  Commit: " + ((CommitAttribute)attrs[0]).Value);
-            }
-            catch (Exception)
-            {
-                asb.Append("(failed to read assembly attributes)");
-            }
-            return asb.ToString();
-
-        }
         public void SetHttpMessageHandler(HttpMessageHandler handler, bool disposeHandler)
         {
             HttpClient newClient;
             if (handler == null)
             {
                 newClient = new HttpClient();
-            }else { 
-
+            }
+            else
+            {
                 newClient = new HttpClient(handler, disposeHandler);
             }
-            newClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", GetUserAgent());
+            newClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", 
+                GlobalPerf.Singleton.GetUserAgent(Assembly.GetAssembly(this.GetType())));
 
-            hc = newClient;
-            //TODO: set any timeout values, etc.
+            HttpClient = newClient;
         }
-        public HttpClient Client { get { return hc; } }
-
-        public DateTime? FirstHeartbeat { get; private set; }
-        public long HeartbeatCount { get; private set; }
-        public Guid? ManagerGuid { get; private set; }
-
-        public void Heartbeat()
-        {
-            if (FirstHeartbeat == null) FirstHeartbeat = DateTime.UtcNow;
-            if (ManagerGuid == null) ManagerGuid = Guid.NewGuid();
-            HeartbeatCount++;
-            foreach (var chain in chains.Values)
-            {
-                chain.Heartbeat();
-            }
-        }
-
-        public void AcceptIssue(IIssue i)
-        {
-            ((IIssueReceiver)sink).AcceptIssue(i);
-        }
-
-        public IEnumerable<RSADecryptPublic> TrustedKeys { get; private set;  }
-
-        internal LicenseManagerSingleton(IEnumerable<RSADecryptPublic> trustedKeys)
-        {
-            TrustedKeys = trustedKeys;
-            SetHttpMessageHandler(null, true);
-        }
+   
 
         /// <summary>
         /// Returns a snapshot of 
@@ -337,30 +357,69 @@ namespace ImageResizer.Plugins.LicenseVerifier
             return chains.Values.SelectMany((chain) => chain.GetAsyncTasksSnapshot());
         }
 
-        public void WaitForTasks()
+        /// <summary>
+        /// Returns the number of tasks that were waited for. Does not wait for new tasks that are scheduled during execution.
+        /// </summary>
+        /// <returns></returns>
+        public int WaitForTasks()
         {
-            Task.WaitAll(this.GetAsyncTasksSnapshot().ToArray());
+            var tasks = GetAsyncTasksSnapshot().ToArray();
+            Task.WaitAll(tasks);
+            return tasks.Length;
         }
 
-        // Let config instances decide whether to connect to the app-domain-wide license manager (default), or if they want to only use licenses they expose. 
-        // Either way, the singleton will allow lookup by user string. 
-
-        // When a new user string is made available, it will be immediately queued for fetching via FireOnce
-
-
-        //Config instances will have individual validation, but most will be precomputed. 
-
-        public LicenseBlob TryDeserialize(string s, string errorSubject)
+        public LicenseBlob TryDeserialize(string license, string licenseSource)
         {
+            LicenseBlob blob;
             try
             {
-                return LicenseBlob.Deserialize(s);
+                blob = LicenseBlob.Deserialize(license);
             }
             catch (Exception ex)
             {
-                AcceptIssue(new Issue(errorSubject, s + "\n" + ex.ToString(), IssueSeverity.Error));
+                AcceptIssue(new Issue("Failed to parse license (from " + licenseSource + "):", license + "\n" + ex.ToString(), IssueSeverity.Error));
+                return null;
             }
-            return null;
+            if (!blob.VerifySignature(this.TrustedKeys, null))
+            {
+                sink.AcceptIssue(new Issue("License " + blob.Fields().Id + " (from " + licenseSource + ") has been corrupted or has not been signed with a matching private key.", IssueSeverity.Error));
+                return null;
+            }
+            return blob;
+        }
+
+        /// <summary>
+        /// Adds a weak-referenced handler to the LicenseChange event. Since this is (essentially) a static event,
+        /// weak references are important to allow listeners (and Config instances) to be garbage collected.
+        /// </summary>
+        /// <typeparam name="TTarget"></typeparam>
+        /// <param name="target"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public LicenseManagerEvent AddLicenseChangeHandler<TTarget>(TTarget target, Action<TTarget, ILicenseManager> action)
+        {
+            WeakReference weakTarget = new WeakReference(target, false);
+            LicenseManagerEvent handler = null;
+            handler = (mgr) =>
+            {
+                TTarget t = (TTarget)weakTarget.Target;
+                if (t != null)
+                    action(t, this);
+                else
+                    LicenseChange -= handler;
+            };
+            LicenseChange += handler;
+            return handler;
+        }
+
+        /// <summary>
+        /// Removes the event handler created by AddLicenseChangeHandler
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <returns></returns>
+        public void RemoveLicenseChangeHandler(LicenseManagerEvent handler)
+        {
+            LicenseChange -= handler;
         }
 
     }
@@ -372,11 +431,11 @@ namespace ImageResizer.Plugins.LicenseVerifier
         /// <summary>
         /// The last time when we got the http response.
         /// </summary>
-        public DateTime? Last200 { get; private set; }
-        public DateTime? LastSuccess { get; private set; }
-        public DateTime? Last404 { get; private set; }
-        public DateTime? LastException { get; private set; }
-        public DateTime? LastTimeout { get; private set; }
+        public DateTimeOffset? Last200 { get; private set; }
+        public DateTimeOffset? LastSuccess { get; private set; }
+        public DateTimeOffset? Last404 { get; private set; }
+        public DateTimeOffset? LastException { get; private set; }
+        public DateTimeOffset? LastTimeout { get; private set; }
 
         /// <summary>
         /// Key is a hash of the license signature
@@ -397,14 +456,14 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         public string Id { get; private set; }
         private string Secret { get; set; } = null;
-        private bool IsRemote { get; set; } = false;
+        public bool IsRemote { get; set; } = false;
 
         public bool Shared { get; set; }
 
         /// <summary>
         /// Cache for .Licenses()
         /// </summary>
-        private List<LicenseBlob> cache;
+        private List<ILicenseBlob> cache;
 
         private string licenseServersValue = null;
         private string[] licenseServers = null;
@@ -423,25 +482,24 @@ namespace ImageResizer.Plugins.LicenseVerifier
         {
             if (body != null)
             {
-                Last200 = DateTime.UtcNow;
-                var parsed = parent.TryDeserialize(body, "Failed to parse remote license:");
-                if (parsed != null)
+                Last200 = parent.Clock.GetUtcNow();
+                var license = parent.TryDeserialize(body, "remote server");
+                if (license != null)
                 {
-                    var newId = parsed.GetParsed().Get("Id")?.Trim()?.ToLowerInvariant();
-
+                    var newId = license.Fields().Id;
                     if (newId == this.Id)
                     {
-                        remoteLicense = parsed;
+                        remoteLicense = license;
                         // Victory! (we're ignoring failed writes/duplicates)
                         parent.Cache.TryPut(fetcher.CacheKey, body);
 
-                        LastSuccess = DateTime.UtcNow;
+                        LastSuccess = parent.Clock.GetUtcNow();
 
                         lastWorkingUri = results.Last().FullUrl;
-                        ConsiderUrlUpdate(parsed);
-                    }else
+                    }
+                    else
                     {
-                        parent.AcceptIssue(new Issue("Remote license file does not match. Please contact ImageResizer support.","Local: " + this.Id + "  Remote: " + newId, IssueSeverity.Error));
+                        parent.AcceptIssue(new Issue("Remote license file does not match. Please contact support@imageresizing.net", "Local: " + this.Id + "  Remote: " + newId, IssueSeverity.Error));
 
                     }
                 }
@@ -454,30 +512,26 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
                 if (results.All(r => r.HttpCode == 404 || r.HttpCode == 403))
                 {
+                    parent.AcceptIssue(new Issue("No such license (404/403): " + licenseName, String.Join("\n", results.Select(r => "HTTP 404/403 fetching " + r.ShortUrl)), IssueSeverity.Error));
                     // No such subscription key.. but don't downgrade it if exists.
-                    var old = parent.Cache.Get(fetcher.CacheKey);
-                    int a;
-                    if (old != null && int.TryParse(old, out a))
-                    {
-                        parent.AcceptIssue(new Issue("Remote license file missing: " + licenseName, String.Join("\n", results.Select(r => "HTTP 404/403 fetching " + r.ShortUrl)), IssueSeverity.Error));
-                    }
-                    else
+                    var cachedString = parent.Cache.Get(fetcher.CacheKey);
+                    int temp;
+                    if (cachedString == null || !int.TryParse(cachedString, out temp))
                     {
                         parent.Cache.TryPut(fetcher.CacheKey, results.First().HttpCode.ToString());
-                        parent.AcceptIssue(new Issue("No such license exists: " + licenseName, String.Join("\n", results.Select(r => "HTTP 404/403 fetching " + r.ShortUrl)), IssueSeverity.Error));
                     }
-                    Last404 = DateTime.UtcNow;
+                    Last404 = parent.Clock.GetUtcNow();
                 }
                 else if (results.All(r => r.LikelyNetworkFailure))
                 {
                     // Network failure. Make sure the server can access the remote server
                     parent.AcceptIssue(fetcher.FirewallIssue(licenseName));
-                    LastTimeout = DateTime.UtcNow;
+                    LastTimeout = parent.Clock.GetUtcNow();
                 }
                 else
                 {
                     parent.AcceptIssue(new Issue("Exception(s) occured fetching license " + licenseName, String.Join("\n", results.Select(r => String.Format("{0} {1}  LikelyTimeout: {2} Error: {3}", r.HttpCode, r.FullUrl, r.LikelyNetworkFailure, r.FetchError?.ToString()))), IssueSeverity.Error));
-                    LastException = DateTime.UtcNow;
+                    LastException = parent.Clock.GetUtcNow();
                 }
             }
             LocalLicenseChange();
@@ -487,9 +541,15 @@ namespace ImageResizer.Plugins.LicenseVerifier
      
         private void RecreateFetcher()
         {
-            if (this.IsRemote && this.Secret != null)
+            if (IsRemote)
             {
-                fetcher = new LicenseFetcher(() => parent.Cache, () => parent.Client, OnFetchResult, () => this.GetQuery(), parent, this.Id, this.Secret, this.licenseServers);
+                fetcher = new LicenseFetcher(
+                    parent.Clock, 
+                    () => parent.Cache, 
+                    () => parent.HttpClient, 
+                    OnFetchResult, 
+                    () => this.GetQuery(), 
+                    parent, this.Id, this.Secret, this.licenseServers);
                 fetcher.Heartbeat();
             }
         }
@@ -497,46 +557,39 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         private void ConsiderUrlUpdate(ILicenseBlob blob)
         {
-            var newValue = blob.GetParsed().Get("LicenseServers");
-            // Dedupe
+            // Do nothing unless this data is different
+            var newValue = blob.Fields().Get("LicenseServers");
             if (newValue != null & newValue != this.licenseServersValue)
             {
-                // Cryptographically verififed?
-                if (new LicenseValidator().Validate(blob, parent.TrustedKeys, null))
+                // Filter to valid HTTPS urls
+                var filteredNewList = newValue.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Where((s) =>
                 {
-                    var filteredNewList = newValue.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Where((s) =>
-                    {
-                        Uri t;
-                        return Uri.TryCreate(s, UriKind.Absolute, out t) && t.Scheme == "https";
-                    }).ToArray();
+                    Uri t;
+                    return Uri.TryCreate(s, UriKind.Absolute, out t) && t.Scheme == "https";
+                }).ToArray();
 
-                    if (filteredNewList.Length > 0)
-                    {
-                        this.licenseServersValue = newValue;
-                        this.licenseServers = filteredNewList;
-                        RecreateFetcher();
-                    }
+                if (filteredNewList.Length > 0)
+                {
+                    this.licenseServersValue = newValue;
+                    this.licenseServers = filteredNewList;
+                    RecreateFetcher();
                 }
             }
         }
         
         /// <summary>
-        /// We have a layer of caching by string, this does not need to be fast. 
-        /// 
+        /// We have a layer of caching by string. This does not need to be fast. 
         /// </summary>
         /// <param name="b"></param>
         public void Add(LicenseBlob b)
         {
-            // Prevent duplicates
-            var key = BitConverter.ToString(b.GetSignature());
-            if (dict.TryAdd(key, b))
+            // Prevent duplicate signatures
+            if (dict.TryAdd(BitConverter.ToString(b.Signature()), b))
             {
                 //New/unique - ensure fetcher is created
-                var secret = b.GetParsed().Get("Secret");
-                var kind = b.GetParsed().Get("Kind");
-                if (secret != null && "id".Equals(kind, StringComparison.OrdinalIgnoreCase))
+                if (b.Fields().IsRemotePlaceholder())
                 {
-                    this.Secret = secret;
+                    this.Secret = b.Fields().GetSecret();
                     this.IsRemote = true;
                     ConsiderUrlUpdate(b);
                     if (fetcher == null)
@@ -552,32 +605,30 @@ namespace ImageResizer.Plugins.LicenseVerifier
         /// Returns null until a fresh license has been fetched (within process lifetime) 
         /// </summary>
         /// <returns></returns>
-        public ILicenseBlob GetFreshRemoteLicense()
+        public ILicenseBlob FetchedLicense()
         {
             return remoteLicense;
         }
 
-        private List<LicenseBlob> CollectLicenses()
+        public ILicenseBlob CachedLicense()
         {
-            //Aggregate from cache, dict, and  .remoteLicense
-            var list = new List<LicenseBlob>(2 + dict.Count);
             if (fetcher != null)
             {
                 var cached = this.parent.Cache.Get(fetcher.CacheKey);
-                if (remoteLicense != null)
+                if (cached != null && cached.TryParseInt() == null)
                 {
-                    list.Add(remoteLicense);
-                }
-                if (cached != remoteLicense?.Original)
-                {
-                    int r;
-                    if (!int.TryParse(cached, out r))
-                    {
-                        var blob = parent.TryDeserialize(cached, "Failed to parse cached license:");
-                        if (blob != null) list.Add(blob);
-                    }
+                    return parent.TryDeserialize(cached, "disk cache");
                 }
             }
+            return null;
+        }
+
+
+        private List<ILicenseBlob> CollectLicenses()
+        {
+            var remote = FetchedLicense() ?? CachedLicense();
+            var list = new List<ILicenseBlob>(dict.Count + 1);
+            if (remote != null) list.Add(remote);
             list.AddRange(dict.Values);
             return list;
         }
@@ -592,6 +643,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         private void LocalLicenseChange()
         {
             cache = CollectLicenses();
+            parent.FireLicenseChange();
         }
 
         public IEnumerable<ILicenseBlob> Licenses()
@@ -609,7 +661,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
 
         private long lastBeatCount = 0;
-        private string GetQuery()
+        private NameValueCollection GetQuery()
         {
             if (!parent.ManagerGuid.HasValue)
             {
@@ -620,11 +672,15 @@ namespace ImageResizer.Plugins.LicenseVerifier
             var netBeats = beatCount - lastBeatCount;
             lastBeatCount = beatCount;
 
-            var firstHearbeat = (long)(TimeZoneInfo.ConvertTimeToUtc(parent.FirstHeartbeat.Value) -
-                    new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc)).TotalSeconds;
-            return "mgr_id=" + this.parent.ManagerGuid.Value.ToString("D") + "&beats_total=" + beatCount + "&beats=" + netBeats +
-                "&first_beat=" + firstHearbeat + "&"  + Configuration.Performance.GlobalPerf.Singleton.GetQuerystring();
-            
+            var firstHearbeat = (long)(parent.FirstHeartbeat.Value -
+                    new DateTimeOffset(1970, 1, 1, 0, 0, 0, 0,TimeSpan.Zero)).TotalSeconds;
+
+            var q = Configuration.Performance.GlobalPerf.Singleton.GetQuerystring();
+            q["mgr_id"] = this.parent.ManagerGuid.Value.ToString("D");
+            q["total_beats"] = beatCount.ToString();
+            q["new_beats"] = netBeats.ToString();
+            q["first_beat"] = firstHearbeat.ToString();
+            return q;
         }
  
 
@@ -641,138 +697,46 @@ namespace ImageResizer.Plugins.LicenseVerifier
         }
     }
 
-    internal static class LicenseBlobExtensions
+    class ImperfectDebounce
     {
-        internal static string ToRedactedString(this ILicenseBlob b)
-        {
-            return string.Join("\n", b.GetParsed().GetPairs().Select(pair => "secret".Equals(pair.Key, StringComparison.OrdinalIgnoreCase) ? string.Format("{0}: ****redacted****", pair.Key) : string.Format("{0}: {1}", pair.Key, pair.Value)));
-        }
-    }
-
-    class Debounce
-    {
-        public Debounce(Action a, long intervalSeconds)
-        {
-            this.a = a;
-            SetIntervalSeconds(intervalSeconds);
-        }
-        Action a;
-
-        public void SetIntervalSeconds(long seconds)
-        {
-            IntervalTicks = Stopwatch.Frequency * seconds;
-        }
-
+        Action callback;
+        IClock clock;
         public long IntervalTicks { get; set; }
 
         long lastBegun = 0;
-
         object fireLock = new object[] { };
+
+        public ImperfectDebounce(Action callback, long intervalSeconds, IClock clock)
+        {
+            this.callback = callback;
+            this.clock = clock;
+            IntervalTicks = clock.TicksPerSecond  * intervalSeconds;
+        }
+        
         public void Heartbeat()
         {
             if (IntervalTicks > 0)
             {
-                var now = Stopwatch.GetTimestamp();
+                var now = clock.GetTimestampTicks();
                 if (now - lastBegun >= IntervalTicks)
                 {
+                    bool toFire = false;
                     lock (fireLock)
                     {
                         if (now - lastBegun >= IntervalTicks)
                         {
                             lastBegun = now;
-                            a.Invoke();
+                            toFire = true;
                         }
                     }
+                    if (toFire) callback.Invoke();
                 }
             }
         }
     }
 
-
     class LicenseFetcher
     {
-        string id;
-        string secret;
-
-        Func<string> getQuerystring;
-        Func<IPersistentStringCache> getCurrentCache;
-        Func<HttpClient> getClient;
-        Action<string, IEnumerable<FetchResult>> licenseResult;
-
-        Debounce regular;
-        Debounce error;
-
-        IIssueReceiver sink;
-
-        const long regularInterval = 60 * 60;
-        const long initialErrorInterval = 2;
-        const long errorMultiplier = 3;
-        string[] baseUrls;
-
-       
-        public LicenseFetcher(Func<IPersistentStringCache> getCurrentCache, Func<HttpClient> getClient, Action<string, IEnumerable<FetchResult>> licenseResult, Func<string> getQuerystring, IIssueReceiver sink, string licenseId, string licenseSecret, string[] baseUrls)
-        {
-            regular = new Debounce(() => QueueLicenseFetch(false), regularInterval);
-            error = new Debounce(() => QueueLicenseFetch(true), 0);
-            this.getCurrentCache = getCurrentCache;
-            this.getClient = getClient;
-            this.getQuerystring = getQuerystring;
-            this.licenseResult = licenseResult;
-            this.baseUrls = baseUrls ?? DefaultBaseURLs;
-            id = licenseId;
-            secret = licenseSecret;
-            this.sink = sink;
-        }
-
-        private string LicenseFetchPath
-        {
-            get { return secret; }
-
-        }
-
-        public string CacheKey
-        {
-            get
-            {
-                return id + "_" + Fnv1a32.HashToInt(secret).ToString("x");
-            }
-        }
-
-        public void Heartbeat()
-        {
-            regular.Heartbeat();
-            error.Heartbeat();
-        }
-
-        void EnsureErrorDebounce()
-        {
-            if (error.IntervalTicks == 0)
-            {
-                error.IntervalTicks = initialErrorInterval * Stopwatch.Frequency;
-            }
-        }
-
-        void AdjustErrorDebounce()
-        {
-            if (error.IntervalTicks > 0)
-            {
-                error.IntervalTicks *= errorMultiplier;
-                error.IntervalTicks += (long)Math.Round(new Random().NextDouble() * (double)Stopwatch.Frequency / 2.0);
-            }
-            if (error.IntervalTicks > regularInterval * Stopwatch.Frequency)
-            {
-                error.IntervalTicks = initialErrorInterval * Stopwatch.Frequency;
-            }
-        }
-
-        void ClearErrorDebounce()
-        {
-            error.IntervalTicks = 0;
-        }
-
-        static string[] DefaultBaseURLs = new string[] { "https://s3-us-west-2.amazonaws.com/imazen-licenses/v1/licenses/latest/" };
-
-
         internal class FetchResult
         {
             public int? HttpCode { get; set; }
@@ -784,9 +748,51 @@ namespace ImageResizer.Plugins.LicenseVerifier
             public WebExceptionStatus? FailureKind { get; set; }
         }
 
+        string id;
+        string secret;
+
+        Func<NameValueCollection> getQuerystring;
+        Func<IPersistentStringCache> getCurrentCache;
+        Func<HttpClient> getClient;
+        Action<string, IEnumerable<FetchResult>> licenseResult;
+
+        ImperfectDebounce regular;
+        ImperfectDebounce error;
+
+        IIssueReceiver sink;
+
+        const long licenseFetchIntervalSeconds = 60 * 60;
+        const long initialErrorIntervalSeconds = 2;
+        const long errorMultiplier = 3;
+        string[] baseUrls;
+
+        static string[] DefaultBaseURLs = new string[] { "https://s3-us-west-2.amazonaws.com/imazen-licenses/v1/licenses/latest/" };
         static WebExceptionStatus[] networkFailures = new[] { WebExceptionStatus.ConnectFailure, WebExceptionStatus.KeepAliveFailure, WebExceptionStatus.NameResolutionFailure, WebExceptionStatus.PipelineFailure, WebExceptionStatus.ProxyNameResolutionFailure, WebExceptionStatus.ReceiveFailure, WebExceptionStatus.RequestProhibitedByProxy, WebExceptionStatus.SecureChannelFailure, WebExceptionStatus.SendFailure, WebExceptionStatus.ServerProtocolViolation, WebExceptionStatus.Timeout, WebExceptionStatus.TrustFailure };
 
         ConcurrentDictionary<object, Task> activeTasks = new ConcurrentDictionary<object, Task>();
+
+        IClock clock;
+
+        public LicenseFetcher(IClock clock, Func<IPersistentStringCache> getCurrentCache, Func<HttpClient> getClient, Action<string, IEnumerable<FetchResult>> licenseResult, Func<NameValueCollection> getQuerystring, IIssueReceiver sink, string licenseId, string licenseSecret, string[] baseUrls)
+        {
+            this.clock = clock;
+            regular = new ImperfectDebounce(() => QueueLicenseFetch(false), licenseFetchIntervalSeconds, clock);
+            error = new ImperfectDebounce(() => QueueLicenseFetch(true), 0, clock);
+            this.getCurrentCache = getCurrentCache;
+            this.getClient = getClient;
+            this.getQuerystring = getQuerystring;
+            this.licenseResult = licenseResult;
+            this.baseUrls = baseUrls ?? DefaultBaseURLs;
+            id = licenseId;
+            secret = licenseSecret;
+            this.sink = sink;
+        }
+
+        public void Heartbeat()
+        {
+            regular.Heartbeat();
+            error.Heartbeat();
+        }
 
         void QueueLicenseFetch(bool fromErrorSchedule)
         {
@@ -805,7 +811,6 @@ namespace ImageResizer.Plugins.LicenseVerifier
                         {
                             activeTasks.TryRemove(pair.Key, out temp);
                         }
-
                     }
                 }
                 catch (Exception ex)
@@ -817,20 +822,13 @@ namespace ImageResizer.Plugins.LicenseVerifier
             activeTasks.TryAdd(key, task);
         }
 
-        public IEnumerable<Task> GetAsyncTasksSnapshot()
-        {
-            return activeTasks.Values;
-        }
-
         async Task FetchLicense(CancellationToken? cancellationToken, bool fromErrorSchedule)
         {
             var results = new List<FetchResult>();
+            var queryString = ConstructQuerystring();
 
-            
-            var query = "?id=" + this.id + "&" + getQuerystring();
             foreach (string prefix in this.baseUrls)
             {
-
                 var baseUrl = prefix + LicenseFetchPath + ".txt";
                 Uri url = null;
                 using (var tokenSource = new CancellationTokenSource())
@@ -838,34 +836,33 @@ namespace ImageResizer.Plugins.LicenseVerifier
                     var token = cancellationToken ?? tokenSource.Token;
                     try
                     {
-                        url = new Uri(baseUrl + query, UriKind.Absolute);
+                        url = new Uri(baseUrl + queryString, UriKind.Absolute);
                         
-                        var response = await this.getClient().GetAsync(url, token);
-                        int code = ((int)response.StatusCode);
-                        if (response.IsSuccessStatusCode)
+                        var httpResponse = await this.getClient().GetAsync(url, token);
+                        
+                        var fetchResult = new FetchResult { HttpCode = ((int)httpResponse.StatusCode), FullUrl = url, ShortUrl = baseUrl };
+
+                        if (httpResponse.IsSuccessStatusCode)
                         {
-                            var bytes = await response.Content.ReadAsByteArrayAsync();
-                            if (token.IsCancellationRequested)
+                            var bodyBytes = await httpResponse.Content.ReadAsByteArrayAsync();
+                            var bodyStr = System.Text.Encoding.UTF8.GetString(bodyBytes);
+
+                            // Exit task early if canceled (process shutdown?)
+                            if (token.IsCancellationRequested) return;
+                            
+                            //Invoke the callback with *only* the successful result
+                            if (InvokeResultCallback(bodyStr, new[] { fetchResult }))
                             {
-                                return; // Process is shutting down (most likely)
-                            }
-                            var bodyStr = System.Text.Encoding.UTF8.GetString(bytes);
-                            try
-                            {
-                                licenseResult(bodyStr, new[] { new FetchResult { HttpCode = code, FullUrl = url, ShortUrl = baseUrl } });
                                 ClearErrorDebounce();
-                            }
-                            catch (Exception ex)
-                            {
-                                sink.AcceptIssue(new Issue("LicenseManager", "Exception thrown in callback for FetchLicense", ex.ToString(), IssueSeverity.Error));
+                            }else {
+                                // We add the error schedule even for callback failures
                                 EnsureErrorDebounce();
                             }
-
-                            return; // DONE, http worked - processing may not have
+                            return; // Network task succeeded
                         }
                         else
                         {
-                            results.Add(new FetchResult { HttpCode = code, FullUrl = url, ShortUrl = baseUrl });
+                            results.Add(fetchResult);
                         }
                     }
                     catch (HttpRequestException rex)
@@ -898,14 +895,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 EnsureErrorDebounce();
             }
 
-            try
-            {
-                licenseResult(null, results);
-            }
-            catch (Exception ex)
-            {
-                sink.AcceptIssue(new Issue("LicenseManager", "Exception thrown in callback for FetchLicense", ex.ToString(), IssueSeverity.Error));
-            }
+            InvokeResultCallback(null, results);
         }
 
         public IIssue FirewallIssue(string licenseName)
@@ -913,10 +903,85 @@ namespace ImageResizer.Plugins.LicenseVerifier
             return new Issue("Check firewall; cannot reach Amazon S3 to validate license " + licenseName, "Check https://status.aws.amazon.com, and ensure the following URLs can be reached from this server: " + String.Join("\n", this.baseUrls.Select(s => s + "*")), IssueSeverity.Error);
         }
 
-    }
-    public sealed class Fnv1a32 : HashAlgorithm
-    {
+        private string LicenseFetchPath
+        {
+            get { return secret; }
 
+        }
+
+        public string CacheKey
+        {
+            get
+            {
+                return id + "_" + Fnv1a32.HashToInt(secret).ToString("x");
+            }
+        }
+
+        void EnsureErrorDebounce()
+        {
+            if (error.IntervalTicks == 0)
+            {
+                error.IntervalTicks = initialErrorIntervalSeconds * clock.TicksPerSecond;
+            }
+        }
+
+        void AdjustErrorDebounce()
+        {
+            if (error.IntervalTicks > 0)
+            {
+                error.IntervalTicks *= errorMultiplier;
+                error.IntervalTicks += (long)Math.Round(new Random().NextDouble() * (double)clock.TicksPerSecond / 2.0);
+            }
+            if (error.IntervalTicks > licenseFetchIntervalSeconds * clock.TicksPerSecond)
+            {
+                error.IntervalTicks = initialErrorIntervalSeconds * clock.TicksPerSecond;
+            }
+        }
+
+        void ClearErrorDebounce()
+        {
+            error.IntervalTicks = 0;
+        }
+
+        public IEnumerable<Task> GetAsyncTasksSnapshot()
+        {
+            return activeTasks.Values;
+        }
+
+        string ConstructQuerystring()
+        {
+            NameValueCollection query;
+            try
+            {
+                query = getQuerystring();
+            }
+            catch (Exception ex)
+            {
+                sink.AcceptIssue(new Issue("LicenseManager", "Failed to collect querystring for license request", ex.ToString(), IssueSeverity.Warning));
+                query = new NameValueCollection();
+            }
+            query["license_id"] = this.id;
+
+            return PathUtils.BuildQueryString(query, true);
+        }
+
+        bool InvokeResultCallback(string body, IEnumerable<FetchResult> results)
+        {
+            try
+            {
+                licenseResult(body, results);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                sink.AcceptIssue(new Issue("LicenseManager", "Exception thrown in callback for FetchLicense", ex.ToString(), IssueSeverity.Error));
+                return false;
+            }
+        }
+
+    }
+    internal class Fnv1a32
+    {
         public static uint HashToInt(string s)
         {
             return HashToInt(System.Text.Encoding.UTF8.GetBytes(s));
@@ -935,41 +1000,50 @@ namespace ImageResizer.Plugins.LicenseVerifier
             return h;
         }
         private const uint FnvPrime = unchecked(16777619);
-
         private const uint FnvOffsetBasis = unchecked(2166136261);
-
-        private uint hash;
-
-        public Fnv1a32()
+    }
+    static class IntTryParseExtensions
+    {
+        public static int? TryParseInt(this string s)
         {
-            this.Reset();
+            int temp;
+            return string.IsNullOrWhiteSpace(s) ? null : (int.TryParse(s, out temp) ? (int?)temp : null);
         }
+    }
 
-        public override void Initialize()
+    class RealClock : IClock
+    {
+        public long TicksPerSecond { get; } = Stopwatch.Frequency;
+        public long GetTimestampTicks()
         {
-            this.Reset();
+            return Stopwatch.GetTimestamp();
         }
-
-        protected override void HashCore(byte[] array, int ibStart, int cbSize)
+        public DateTimeOffset GetUtcNow()
         {
-            for (var i = ibStart; i < cbSize; i++)
+            return DateTimeOffset.UtcNow;
+        }
+        public DateTimeOffset? GetBuildDate()
+        {
+            try
             {
-                unchecked
-                {
-                    this.hash ^= array[i];
-                    this.hash *= FnvPrime;
-                }
+                return this.GetType().Assembly.GetCustomAttributes(typeof(BuildDateAttribute), false)?.Select(a => ((BuildDateAttribute)a).ValueDate).FirstOrDefault();
+            }
+            catch
+            {
+                return null;
             }
         }
-
-        protected override byte[] HashFinal()
+        public DateTimeOffset? GetAssemblyWriteDate()
         {
-            return BitConverter.GetBytes(this.hash);
-        }
-
-        private void Reset()
-        {
-            this.hash = FnvOffsetBasis;
+            var path = this.GetType().Assembly.Location;
+            try
+            {
+                return System.IO.File.Exists(path) ? new DateTimeOffset?(System.IO.File.GetLastWriteTimeUtc(this.GetType().Assembly.Location)) : null;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 

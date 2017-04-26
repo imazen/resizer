@@ -24,17 +24,11 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         Mock<HttpMessageHandler> MockRemoteLicense(LicenseManagerSingleton mgr, HttpStatusCode code, string value, Action<HttpRequestMessage, CancellationToken> callback)
         {
             var handler = new Mock<HttpMessageHandler>();
-
-            var remoteLicenseResponse = new HttpResponseMessage(code)
-            {
-                Content = new StringContent(value, UTF8Encoding.UTF8)
-            };
-
-
             var method = handler.Protected()
                 .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
-                 .Returns(Task.Run(() => { return remoteLicenseResponse; }));
-            //.Returns(Task<HttpResponseMessage>.FromResult(remoteLicenseResponse))
+                 .Returns(Task.Run(() => new HttpResponseMessage(code) {
+                     Content = new StringContent(value, UTF8Encoding.UTF8)
+                 }));
 
             if (callback != null) method.Callback(callback);
 
@@ -62,7 +56,8 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         [Fact]
         public void Test_Remote_License_Success()
         {
-            var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test)
+            var clock = new RealClock();
+            var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test, clock)
             {
                 Cache = new StringCacheMem()
             };
@@ -74,43 +69,34 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
            
             Config conf = new Config();
             conf.Plugins.LicenseScope = LicenseAccess.Local;
-            conf.Plugins.Install(new LicensedPlugin(mgr, "R4Elite"));
+            conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R4Elite"));
             conf.Plugins.AddLicense(LicenseStrings.EliteSubscriptionPlaceholder);
 
-            var sink = new IssueSink("LicenseManagerTest");
-            
-        
-            var tasks = mgr.GetAsyncTasksSnapshot().ToArray();
-            Assert.Equal(1, tasks.Count());
-            Task.WaitAll(tasks);
+            Assert.Equal(1, mgr.WaitForTasks());
+            Assert.Empty(mgr.GetIssues());
 
-            mgr.Heartbeat();
             Mock.Verify(httpHandler);
-            var result = new LicenseComputation(conf, ImazenPublicKeys.Test, sink, mgr);
-
-            Assert.StartsWith("https://s3-us-west-2.amazonaws.com/imazen-licenses/v1/licenses/latest/1qggq12t2qwgwg4c2d2dqwfweqfw.txt?id=115153162&", invokedUri.ToString());
+            Assert.StartsWith("https://s3-us-west-2.amazonaws.com/imazen-licenses/v1/licenses/latest/1qggq12t2qwgwg4c2d2dqwfweqfw.txt?", invokedUri.ToString());
 
 
-            Assert.NotNull(mgr.GetAllLicenses().First().GetFreshRemoteLicense());
+            Assert.NotNull(mgr.GetAllLicenses().First().FetchedLicense());
 
-            Assert.True(result.LicensedForHost("any"));
+            var result = new LicenseComputation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
 
-            tasks = mgr.GetAsyncTasksSnapshot().ToArray();
-            Assert.Equal(0, tasks.Count());
-            Task.WaitAll(tasks);
-
-            Assert.Empty(sink.GetIssues());
+            Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
+            Assert.Equal(0, mgr.WaitForTasks());
             Assert.Empty(mgr.GetIssues());
 
         }
         [Fact]
         public void Test_Caching_With_Timeout()
         {
+            var clock = new RealClock();
             var cache = new StringCacheMem();
 
             // Populate cache
             {
-                var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test)
+                var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test, clock)
                 {
                     Cache = cache
                 };
@@ -118,24 +104,20 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
                 Config conf = new Config();
                 conf.Plugins.LicenseScope = LicenseAccess.Local;
-                conf.Plugins.Install(new LicensedPlugin(mgr, "R4Elite"));
+                conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R4Elite"));
                 conf.Plugins.AddLicense(LicenseStrings.EliteSubscriptionPlaceholder);
 
                 mgr.WaitForTasks();
 
-                mgr.Heartbeat();
+                var result = new LicenseComputation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+                Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
 
-                var sink = new IssueSink("LicenseManagerTest");
-                var result = new LicenseComputation(conf, ImazenPublicKeys.Test, sink, mgr);
-                Assert.True(result.LicensedForHost("any"));
-
-                Assert.Empty(sink.GetIssues());
                 Assert.Empty(mgr.GetIssues());
             }
 
             // Use cache
             {
-                var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test)
+                var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test, clock)
                 {
                     Cache = cache
                 };
@@ -143,17 +125,13 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
                 Config conf = new Config();
                 conf.Plugins.LicenseScope = LicenseAccess.Local;
-                conf.Plugins.Install(new LicensedPlugin(mgr, "R4Elite"));
+                conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R4Elite"));
                 conf.Plugins.AddLicense(LicenseStrings.EliteSubscriptionPlaceholder);
 
                 mgr.WaitForTasks();
 
-                mgr.Heartbeat();
-
-                var sink = new IssueSink("LicenseManagerTest");
-                var result = new LicenseComputation(conf, ImazenPublicKeys.Test, sink, mgr);
-                Assert.True(result.LicensedForHost("any"));
-
+                var result = new LicenseComputation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+                Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
                 Assert.NotEmpty(mgr.GetIssues());
             }
 
