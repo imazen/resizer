@@ -76,7 +76,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             Assert.Empty(mgr.GetIssues());
 
             Mock.Verify(httpHandler);
-            Assert.StartsWith("https://s3-us-west-2.amazonaws.com/imazen-licenses/v1/licenses/latest/1qggq12t2qwgwg4c2d2dqwfweqfw.txt?", invokedUri.ToString());
+            Assert.StartsWith("https://s3-us-west-2.amazonaws.com/licenses.imazen.net/v1/licenses/latest/1qggq12t2qwgwg4c2d2dqwfweqfw.txt?", invokedUri.ToString());
 
 
             Assert.NotNull(mgr.GetAllLicenses().First().FetchedLicense());

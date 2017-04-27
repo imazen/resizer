@@ -123,6 +123,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         public static bool IsRemotePlaceholder(this ILicenseDetails details) {
             return "id".Equals(details.Get("Kind"), StringComparison.OrdinalIgnoreCase);
         }
+
         public static string GetSecret(this ILicenseDetails details)
         {
             return details.Get("Secret");
@@ -155,7 +156,22 @@ namespace ImageResizer.Plugins.LicenseVerifier
             return list.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim().ToLowerInvariant());
         }
 
-
+        /// <summary>
+        /// Returns all valid license servers from the LicenseServers field
+        /// </summary>
+        /// <param name="details"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetValidLicenseServers(this ILicenseDetails details)
+        {
+            return details.Get("LicenseServers")?
+                .Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(s =>
+                {
+                    Uri t;
+                    return Uri.TryCreate(s, UriKind.Absolute, out t) && t.Scheme == "https";
+                })
+                .Select(s => s.Trim()) ?? Enumerable.Empty<string>();
+        }
 
         public static bool DataMatches(this ILicenseDetails me, ILicenseDetails other)
         {

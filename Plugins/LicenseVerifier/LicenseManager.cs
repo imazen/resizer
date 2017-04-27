@@ -465,14 +465,23 @@ namespace ImageResizer.Plugins.LicenseVerifier
         /// </summary>
         private List<ILicenseBlob> cache;
 
-        private string licenseServersValue = null;
-        private string[] licenseServers = null;
+        static string[] DefaultLicenseServers = new string[] {
+            "https://s3-us-west-2.amazonaws.com/licenses.imazen.net/",
+            "https://licenses-redirect.imazen.net/",
+            "https://licenses.imazen.net/",
+            "https://licenses2.imazen.net"
+        };
+
+        /// <summary>
+        /// License Servers
+        /// </summary>
+        private string[] licenseServerStack = DefaultLicenseServers;
 
         // Actually needs an issue reciever? (or should *it* track?) And an HttpClient and Cache
-        public LicenseChain(LicenseManagerSingleton parent, string id)
+        public LicenseChain(LicenseManagerSingleton parent, string license_id)
         {
             this.parent = parent;
-            this.Id = id;
+            this.Id = license_id;
             LocalLicenseChange();
         }
 
@@ -549,32 +558,29 @@ namespace ImageResizer.Plugins.LicenseVerifier
                     () => parent.HttpClient, 
                     OnFetchResult, 
                     () => this.GetQuery(), 
-                    parent, this.Id, this.Secret, this.licenseServers);
+                    parent, 
+                    this.Id, 
+                    this.Secret, 
+                    this.licenseServerStack);
                 fetcher.Heartbeat();
             }
         }
 
 
-        private void ConsiderUrlUpdate(ILicenseBlob blob)
+        /// <summary>
+        /// Returns false if the blob is null, 
+        /// if there were no license servers in the blob, 
+        /// or if the servers were identical to what we already have.
+        /// </summary>
+        /// <param name="blob"></param>
+        /// <returns></returns>
+        private bool TryUpdateLicenseServers(ILicenseBlob blob)
         {
-            // Do nothing unless this data is different
-            var newValue = blob.Fields().Get("LicenseServers");
-            if (newValue != null & newValue != this.licenseServersValue)
-            {
-                // Filter to valid HTTPS urls
-                var filteredNewList = newValue.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Where((s) =>
-                {
-                    Uri t;
-                    return Uri.TryCreate(s, UriKind.Absolute, out t) && t.Scheme == "https";
-                }).ToArray();
-
-                if (filteredNewList.Length > 0)
-                {
-                    this.licenseServersValue = newValue;
-                    this.licenseServers = filteredNewList;
-                    RecreateFetcher();
-                }
-            }
+            if (blob == null) return false;
+            var oldStack = licenseServerStack ?? Enumerable.Empty<string>();
+            var newList = blob.Fields().GetValidLicenseServers().ToArray();
+            var newStack = newList.Concat(oldStack.Except(newList)).Take(10).ToArray();
+            return !newStack.SequenceEqual(oldStack);
         }
         
         /// <summary>
@@ -591,8 +597,10 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 {
                     this.Secret = b.Fields().GetSecret();
                     this.IsRemote = true;
-                    ConsiderUrlUpdate(b);
-                    if (fetcher == null)
+
+                    TryUpdateLicenseServers(b);
+                    RecreateFetcher();
+                    if (TryUpdateLicenseServers(CachedLicense()))
                     {
                         RecreateFetcher();
                     }
@@ -626,11 +634,8 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         private List<ILicenseBlob> CollectLicenses()
         {
-            var remote = FetchedLicense() ?? CachedLicense();
-            var list = new List<ILicenseBlob>(dict.Count + 1);
-            if (remote != null) list.Add(remote);
-            list.AddRange(dict.Values);
-            return list;
+            return Enumerable.Repeat(FetchedLicense() ?? CachedLicense(), 1)
+                .Concat(dict.Values).Where(b => b != null).ToList();
         }
 
 
@@ -766,7 +771,6 @@ namespace ImageResizer.Plugins.LicenseVerifier
         const long errorMultiplier = 3;
         string[] baseUrls;
 
-        static string[] DefaultBaseURLs = new string[] { "https://s3-us-west-2.amazonaws.com/imazen-licenses/v1/licenses/latest/" };
         static WebExceptionStatus[] networkFailures = new[] { WebExceptionStatus.ConnectFailure, WebExceptionStatus.KeepAliveFailure, WebExceptionStatus.NameResolutionFailure, WebExceptionStatus.PipelineFailure, WebExceptionStatus.ProxyNameResolutionFailure, WebExceptionStatus.ReceiveFailure, WebExceptionStatus.RequestProhibitedByProxy, WebExceptionStatus.SecureChannelFailure, WebExceptionStatus.SendFailure, WebExceptionStatus.ServerProtocolViolation, WebExceptionStatus.Timeout, WebExceptionStatus.TrustFailure };
 
         ConcurrentDictionary<object, Task> activeTasks = new ConcurrentDictionary<object, Task>();
@@ -782,7 +786,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             this.getClient = getClient;
             this.getQuerystring = getQuerystring;
             this.licenseResult = licenseResult;
-            this.baseUrls = baseUrls ?? DefaultBaseURLs;
+            this.baseUrls = baseUrls;
             id = licenseId;
             secret = licenseSecret;
             this.sink = sink;
@@ -905,7 +909,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         private string LicenseFetchPath
         {
-            get { return secret; }
+            get { return "v1/licenses/latest/" + secret; }
 
         }
 
