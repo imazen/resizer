@@ -1,6 +1,7 @@
 ﻿using ImageResizer.Configuration;
 using ImageResizer.Configuration.Issues;
 using ImageResizer.Configuration.Performance;
+using ImageResizer.Plugins.Basic;
 using ImageResizer.Util;
 using System;
 using System.Collections.Concurrent;
@@ -297,7 +298,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         LicenseChain GetChainFor(string license)
         {
-            var blob = TryDeserialize(license, "configuration");
+            var blob = TryDeserialize(license, "configuration", true);
             if (blob == null) return null;
 
             var chain = chains.GetOrAdd(blob.Fields().Id, (k) => new LicenseChain(this, k));
@@ -368,7 +369,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             return tasks.Length;
         }
 
-        public LicenseBlob TryDeserialize(string license, string licenseSource)
+        public LicenseBlob TryDeserialize(string license, string licenseSource, bool locallySourced)
         {
             LicenseBlob blob;
             try
@@ -377,12 +378,19 @@ namespace ImageResizer.Plugins.LicenseVerifier
             }
             catch (Exception ex)
             {
-                AcceptIssue(new Issue("Failed to parse license (from " + licenseSource + "):", license + "\n" + ex.ToString(), IssueSeverity.Error));
+                AcceptIssue(new Issue("Failed to parse license (from " + licenseSource + "):", 
+                    WebConfigLicenseReader.TryRedact(license) + "\n" + ex.ToString(), IssueSeverity.Error));
                 return null;
             }
             if (!blob.VerifySignature(this.TrustedKeys, null))
             {
                 sink.AcceptIssue(new Issue("License " + blob.Fields().Id + " (from " + licenseSource + ") has been corrupted or has not been signed with a matching private key.", IssueSeverity.Error));
+                return null;
+            }
+            if (locallySourced && blob.Fields().MustBeFetched())
+            {
+                sink.AcceptIssue(new Issue("This license cannot be installed directly; it must be fetched from a license server", 
+                    WebConfigLicenseReader.TryRedact(license), IssueSeverity.Error));
                 return null;
             }
             return blob;
@@ -492,7 +500,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             if (body != null)
             {
                 Last200 = parent.Clock.GetUtcNow();
-                var license = parent.TryDeserialize(body, "remote server");
+                var license = parent.TryDeserialize(body, "remote server", false);
                 if (license != null)
                 {
                     var newId = license.Fields().Id;
@@ -625,7 +633,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 var cached = this.parent.Cache.Get(fetcher.CacheKey);
                 if (cached != null && cached.TryParseInt() == null)
                 {
-                    return parent.TryDeserialize(cached, "disk cache");
+                    return parent.TryDeserialize(cached, "disk cache", false);
                 }
             }
             return null;
@@ -1006,14 +1014,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         private const uint FnvPrime = unchecked(16777619);
         private const uint FnvOffsetBasis = unchecked(2166136261);
     }
-    static class IntTryParseExtensions
-    {
-        public static int? TryParseInt(this string s)
-        {
-            int temp;
-            return string.IsNullOrWhiteSpace(s) ? null : (int.TryParse(s, out temp) ? (int?)temp : null);
-        }
-    }
+
 
     class RealClock : IClock
     {

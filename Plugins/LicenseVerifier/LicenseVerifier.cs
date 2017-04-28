@@ -118,10 +118,34 @@ namespace ImageResizer.Plugins.LicenseVerifier
             return pairs.TryGetValue(key, out s) ? s : null;
         }
     }
+    static class StringIntParseExtensions
+    {
+        public static int? TryParseInt(this string s)
+        {
+            int temp;
+            return string.IsNullOrWhiteSpace(s) ? null : (int.TryParse(s, out temp) ? (int?)temp : null);
+        }
+    }
+
+
     static class ILicenseDetailsExtensions
     {
         public static bool IsRemotePlaceholder(this ILicenseDetails details) {
             return "id".Equals(details.Get("Kind"), StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool IsRevoked(this ILicenseDetails details)
+        {
+            return "false".Equals(details.Get("Valid"), StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool MustBeFetched(this ILicenseDetails details)
+        {
+            return "true".Equals(details.Get("MustBeFetched"), StringComparison.OrdinalIgnoreCase);
+        }
+        public static int? NetworkGraceMinutes(this ILicenseDetails details)
+        {
+            return details.Get("NetworkGraceMinutes").TryParseInt();
         }
 
         public static string GetSecret(this ILicenseDetails details)

@@ -120,8 +120,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
                     return false;
                 }
             }
-            bool revoked = "false".Equals(details.Get("Valid"), StringComparison.OrdinalIgnoreCase);
-            if (revoked)
+            if (details.IsRevoked())
             {
                 permanentIssues.AcceptIssue(new Issue("License " + details.Id + " is no longer active", b.ToRedactedString(), IssueSeverity.Warning));
             }
@@ -142,7 +141,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             }
 
             int? graceMinutes = chain.Licenses().Where(b => IsLicenseValid(b))
-                                           .Select(b => b.Fields().Get("NetworkGraceMinutes").TryParseInt())
+                                           .Select(b => b.Fields().NetworkGraceMinutes())
                                            .OrderByDescending(v => v).FirstOrDefault() ?? DefaultNetworkGraceMinutes;
 
 
