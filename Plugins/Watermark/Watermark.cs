@@ -309,7 +309,7 @@ namespace ImageResizer.Plugins.Watermark
         /// </summary>
         public IEnumerable<string> LicenseFeatureCodes
         {
-            get { yield return "R4Creative"; yield return "R4Watermark"; }
+            get { yield return "R_Creative"; yield return "R4Creative"; yield return "R4Watermark"; }
         }
     }
 }

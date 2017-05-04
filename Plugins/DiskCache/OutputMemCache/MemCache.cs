@@ -22,7 +22,7 @@ namespace ImageResizer.Plugins.MemCache {
         /// </summary>
         public IEnumerable<string> LicenseFeatureCodes
         {
-            get { yield return "R4Performance"; yield return "R4MemCache"; }
+            get { yield return "R_Performance"; yield return "R4Performance"; yield return "R4MemCache"; }
         }
         
         /// <summary>

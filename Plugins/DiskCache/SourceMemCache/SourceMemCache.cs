@@ -104,7 +104,7 @@ namespace ImageResizer.Plugins.SourceMemCache {
         /// </summary>
         public IEnumerable<string> LicenseFeatureCodes
         {
-            get { yield return "R4Performance"; yield return "R4SourceMemCache"; }
+            get { yield return "R_Performance"; yield return "R4Performance"; yield return "R4SourceMemCache"; }
         }
 
     }
