@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using System.Net.Http;
+using ImageResizer.Plugins.Licensing;
 
 namespace ImageResizer.Plugins.LicenseVerifier
 {
@@ -35,7 +36,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         Config c;
         ILicenseManager mgr;
-        IClock clock;
+        ILicenseClock clock;
         IEnumerable<RSADecryptPublic> trustedKeys;
         IIssueReceiver permanentIssues;
 
@@ -52,7 +53,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         public DateTimeOffset? ComputationExpires { get; private set; }
 
-        public LicenseComputation(Config c, IEnumerable<RSADecryptPublic> trustedKeys, IIssueReceiver permanentIssueSink, ILicenseManager mgr, IClock clock): base("LicenseComputation")
+        public LicenseComputation(Config c, IEnumerable<RSADecryptPublic> trustedKeys, IIssueReceiver permanentIssueSink, ILicenseManager mgr, ILicenseClock clock): base("LicenseComputation")
         {
             this.c = c;
             this.trustedKeys = trustedKeys;
@@ -98,10 +99,10 @@ namespace ImageResizer.Plugins.LicenseVerifier
             ComputeStatus(pluginFeaturesUsed);
         }
 
-        bool IsLicenseExpired(ILicenseDetails details, IClock clock){
+        bool IsLicenseExpired(ILicenseDetails details, ILicenseClock clock){
             return details.Expires != null && details.Expires < clock.GetUtcNow();
         }
-        bool HasLicenseBegun(ILicenseDetails details, IClock clock){
+        bool HasLicenseBegun(ILicenseDetails details, ILicenseClock clock){
             return details.Issued != null && details.Issued > clock.GetUtcNow();
         }
         public DateTimeOffset? GetBuildDate(){
@@ -291,14 +292,51 @@ namespace ImageResizer.Plugins.LicenseVerifier
             sb.AppendLine("\n----------------\n");
             return sb.ToString();
         }
+
+        public string ProvidePublicDiagnostics()
+        {
+            var sb = new StringBuilder();
+            sb.Append("License status for active features: ");
+            if (EverythingDenied)
+            {
+                sb.AppendLine("contact support");
+            }
+            else if (AllDomainsLicensed)
+            {
+                sb.AppendLine("Valid for all domains");
+            }
+            else if (knownDomainStatus.Count > 0)
+            {
+                sb.AppendFormat("Valid for {0} domains, invalid for {1} domains, not covered for {3} domains:\n",
+                    knownDomainStatus.Count(pair => pair.Value),
+                    knownDomainStatus.Count(pair => !pair.Value),
+                    unknownDomains.Count);
+            }
+            else
+            {
+                sb.AppendLine("No valid licenses");
+            }
+            if (chains.Count > 0)
+            {
+                sb.AppendLine("Licenses for this Config instance:\n");
+                sb.AppendLine(string.Join("\n", chains.Select(c => c.ToPublicString())));
+            }
+            var others = mgr.GetAllLicenses().Except(chains);
+            if (others.Count() > 0)
+            {
+                sb.AppendLine("Licenses only used by other Config instances in this procces:\n");
+                sb.AppendLine(string.Join("\n", others.Select(c => c.ToPublicString())));
+            }
+            return sb.ToString();
+        }
     }
 
-    class LicenseEnforcer<T> : BuilderExtension, IPlugin, IDiagnosticsProvider, IIssueProvider
+    class LicenseEnforcer<T> : BuilderExtension, IPlugin, IDiagnosticsProvider, IIssueProvider, ILicenseDiagnosticsProvider
     {
         private ILicenseManager mgr;
         private Config c = null;
         private LicenseComputation cache = null;
-        IClock Clock { get; set;  } = new RealClock();
+        ILicenseClock Clock { get; set;  } = new RealClock();
 
         public LicenseEnforcer() : this(LicenseManagerSingleton.Singleton) { }
         public LicenseEnforcer(ILicenseManager mgr) { this.mgr = mgr; }
@@ -384,6 +422,10 @@ namespace ImageResizer.Plugins.LicenseVerifier
         public string ProvideDiagnostics()
         {
             return Result.ProvideDiagnostics();
+        }
+        public string ProvidePublicText()
+        {
+            return Result.ProvidePublicDiagnostics();
         }
 
         public IEnumerable<IIssue> GetIssues()

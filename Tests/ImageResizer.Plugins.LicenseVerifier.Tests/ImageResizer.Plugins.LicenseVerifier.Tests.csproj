@@ -87,6 +87,36 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\Core\Configuration\Performance\Support\CircularTimeBuffer.cs">
+      <Link>CircularTimeBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\Configuration\Performance\Support\CountMinSketch.cs">
+      <Link>CountMinSketch.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\Configuration\Performance\Support\DictionaryCounter.cs">
+      <Link>DictionaryCounter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\Configuration\Performance\Support\MultiIntervalStats.cs">
+      <Link>MultiIntervalStats.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\Configuration\Performance\Support\PercentileStream.cs">
+      <Link>PercentileStream.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\Configuration\Performance\Support\PerIntervalSampling.cs">
+      <Link>PerIntervalSampling.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\Configuration\Performance\Support\PrecisionClamping.cs">
+      <Link>PrecisionClamping.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\Configuration\Performance\Support\ResolutionsSink.cs">
+      <Link>ResolutionsSink.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\Configuration\Performance\Support\TimingsSink.cs">
+      <Link>TimingsSink.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Core\Configuration\Performance\Support\Utilities.cs">
+      <Link>Utilities.cs</Link>
+    </Compile>
     <Compile Include="..\..\Plugins\LicenseVerifier\LicenseManager.cs">
       <Link>LicenseManager.cs</Link>
     </Compile>
@@ -96,7 +126,7 @@
     <Compile Include="..\..\Plugins\LicenseVerifier\LicenseVerifier.cs">
       <Link>LicenseVerifier.cs</Link>
     </Compile>
-    <Compile Include="BigIntTests.cs" />
+    <Compile Include="DataStructureTests.cs" />
     <Compile Include="LicenseManagerTests.cs" />
     <Compile Include="LicenseVerifierTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

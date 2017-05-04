@@ -177,6 +177,8 @@ namespace ImageResizer.Configuration
 
             //Remove the image from context items so we don't try to write response headers.
             context.Items[conf.ResponseArgsKey] = null;
+            Performance.GlobalPerf.Singleton.IncrementCounter("postauth_404_");
+
         }
 
         private  IHttpHandler CreateSFH(){

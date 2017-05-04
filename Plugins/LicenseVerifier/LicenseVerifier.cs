@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Numerics;
+using ImageResizer.Plugins.Licensing;
 
 namespace ImageResizer.Plugins.LicenseVerifier
 {
@@ -138,6 +139,12 @@ namespace ImageResizer.Plugins.LicenseVerifier
         {
             return "false".Equals(details.Get("Valid"), StringComparison.OrdinalIgnoreCase);
         }
+
+        public static bool IsPublic(this ILicenseDetails details)
+        {
+            return "true".Equals(details.Get("IsPublic"), StringComparison.OrdinalIgnoreCase);
+        }
+
 
         public static bool MustBeFetched(this ILicenseDetails details)
         {

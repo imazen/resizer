@@ -35,7 +35,7 @@ namespace ImageResizer.Plugins.DiskCache
     /// <summary>
     /// Provides methods for creating, maintaining, and securing the disk cache. 
     /// </summary>
-    public class DiskCache: IAsyncTyrantCache, ICache, IPlugin, IIssueProvider, ILoggerProvider, ILicensedPlugin
+    public class DiskCache: IAsyncTyrantCache, ICache, IPlugin, IIssueProvider, ILoggerProvider, ILicensedPlugin, IPluginInfo
     {
 
         private int subfolders = 8192;
@@ -476,7 +476,19 @@ namespace ImageResizer.Plugins.DiskCache
             return issues;
         }
 
-
+        public IEnumerable<KeyValuePair<string, string>> GetInfoPairs()
+        {
+            var list = new List<KeyValuePair<string, string>>();
+            list.Add(new KeyValuePair<string, string>("diskcache_autoclean", AutoClean ? "1" : "0"));
+            list.Add(new KeyValuePair<string, string>("diskcache_asyncwrites", AsyncWrites ? "1" : "0"));
+            list.Add(new KeyValuePair<string, string>("diskcache_subfolders", Subfolders.ToString()));
+            list.Add(new KeyValuePair<string, string>("diskcache_network_drive", CacheDriveOnNetwork() ? "1" : "0"));
+            list.Add(new KeyValuePair<string, string>("diskcache_filesystem", GetCacheDrive()?.DriveFormat ?? ""));
+            list.Add(new KeyValuePair<string, string>("diskcache_drive_avail", GetCacheDrive()?.AvailableFreeSpace.ToString() ?? ""));
+            list.Add(new KeyValuePair<string, string>("diskcache_drive_total", GetCacheDrive()?.TotalSize.ToString() ?? ""));
+            list.Add(new KeyValuePair<string, string>("diskcache_virtualpath", VirtualCacheDir));
+            return list;
+        }
 
         /// <summary>
         /// Returns the license key feature codes that are able to activate this plugins.

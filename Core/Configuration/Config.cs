@@ -80,6 +80,7 @@ namespace ImageResizer.Configuration {
                 new ImageResizer.Plugins.Basic.WebConfigLicenseReader().Install(this);
                 new ImageResizer.Plugins.Basic.SizeLimiting().Install(this);
                 new ImageResizer.Plugins.Basic.MvcRoutingShimPlugin().Install(this);
+                new ImageResizer.Plugins.Basic.LicenseDisplay().Install(this);
             }
 
             //Load plugins immediately. Lazy plugin loading causes problems.

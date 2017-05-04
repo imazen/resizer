@@ -1,5 +1,6 @@
 ﻿using ImageResizer.Configuration;
 using ImageResizer.Configuration.Issues;
+using ImageResizer.Plugins.Licensing;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -63,7 +64,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         ILicenseManager mgr;
         Config c = null;
         LicenseComputation cache = null;
-        IClock Clock { get; set; } = new RealClock();
+        ILicenseClock Clock { get; set; } = new RealClock();
 
         private LicenseComputation Result
         {
@@ -77,7 +78,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             }
         }
 
-        public LicensedPlugin(ILicenseManager mgr, IClock clock, params string[] codes)
+        public LicensedPlugin(ILicenseManager mgr, ILicenseClock clock, params string[] codes)
         {
             this.codes = codes;
             this.mgr = mgr;
