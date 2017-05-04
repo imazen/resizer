@@ -26,55 +26,28 @@ namespace ImageResizer.Plugins
         string sinkSource = "LicenseCache";
         string dataKind = "license";
 
+        
+        IIssueReceiver sink;
+        MultiFolderStorage store;
+        ConcurrentDictionary<string, string> cache = new ConcurrentDictionary<string, string>();
 
         internal WriteThroughCache() : this(null) { }
 
         internal WriteThroughCache(string keyPrefix)
         {
-            this.prefix = prefix ?? "resizer_key_";
+            this.prefix = keyPrefix ?? prefix;
+
+
             sink = new IssueSink(sinkSource);
+
+            var appPath = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
+            var candidates = ((appPath != null) ? 
+                new string[] { Path.Combine(appPath, "imagecache"),
+                    Path.Combine(appPath, "App_Data"), Path.GetTempPath() } 
+                : new string[] { Path.GetTempPath() }).ToArray();
+
+            store = new MultiFolderStorage(sinkSource, dataKind, sink, candidates, FolderOptions.Default);
         }
-
-        // Potentially good folders to cache keys in
-        string[] potentialLocations;
-        // Folders that writes or reads have failed. 
-        ConcurrentBag<string> badLocations;
-        IIssueReceiver sink;
-        ReaderWriterLockSlim filesystem = new ReaderWriterLockSlim();
-
-        ConcurrentDictionary<string, string> cache = new ConcurrentDictionary<string, string>();
-
-
-        void AddBadLocation(string path, IIssue i)
-        {
-            if (badLocations == null) badLocations = new ConcurrentBag<string>();
-            badLocations.Add(path);
-            sink.AcceptIssue(i);
-        }
-        string[] Locations()
-        {
-            if (potentialLocations == null)
-            {
-
-                var appPath = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
-
-                potentialLocations = ((appPath != null) ? new string[] { Path.Combine(appPath, "imagecache"), Path.Combine(appPath, "App_Data"), Path.GetTempPath() } : new string[] { Path.GetTempPath() })
-                        .Where(p =>
-                        {
-                            try { return Directory.Exists(p); } catch { return false; }
-                        }).ToArray();
-
-            }
-            if (badLocations == null)
-            {
-                return potentialLocations;
-            }
-            else
-            {
-                return potentialLocations.Except(badLocations).ToArray();
-            }
-        }
-
         
         string hashToBase16(string data)
         {
@@ -88,7 +61,7 @@ namespace ImageResizer.Plugins
 
         string FilenameKeyFor(string key)
         {
-            if (key.Any(c => !Char.IsLetterOrDigit(c) && c != '_') && key.Length  + prefix.Length < 200)
+            if (key.Any(c => !Char.IsLetterOrDigit(c) && c != '_') || key.Length + prefix.Length > 200)
             {
                 return this.prefix + hashToBase16(key) + ".txt";
             }
@@ -98,104 +71,7 @@ namespace ImageResizer.Plugins
             }
         }
 
-        bool TryDelete(string key)
-        {
-            bool failedAtSomething = false;
-            try
-            {
-                filesystem.EnterWriteLock();
-                foreach (var dest in Locations())
-                {
-                    var path = Path.Combine(dest, FilenameKeyFor(key));
-                    try
-                    {
-                        if (File.Exists(path)) File.Delete(path);
-                    }
-                    catch (Exception e)
-                    {
-                        AddBadLocation(dest, new Issue("Failed to delete " + dataKind + " at location " + path, e.ToString(), IssueSeverity.Warning));
-                        failedAtSomething = true;
-                    }
-                }
-                return !failedAtSomething;
-            }
-            finally
-            {
-                filesystem.ExitWriteLock();
-            }
-        }
-
-        bool TryDiskWrite(string key, string value)
-        {
-            if (value == null)
-            {
-                return TryDelete(key);
-            }
-            else
-            {
-                try
-                {
-                    filesystem.EnterWriteLock();
-
-                    foreach (var dest in Locations())
-                    {
-                        var path = Path.Combine(dest, FilenameKeyFor(key));
-                        try
-                        {
-
-                            File.WriteAllText(path, value, UTF8Encoding.UTF8);
-                            return true;
-                        }
-                        catch (Exception e)
-                        {
-                            AddBadLocation(dest, new Issue("Failed to write " + dataKind + " to location " + path, e.ToString(), IssueSeverity.Warning));
-                        }
-                    }
-
-                }
-                finally
-                {
-                    filesystem.ExitWriteLock();
-                }
-                sink.AcceptIssue(new Issue("Unable to cache " + dataKind + " to disk in any location.", IssueSeverity.Error));
-                return false;
-            }
-        }
-
-        string TryDiskRead(string key)
-        {
-            bool readFailed = false; //To tell non-existent files apart from I/O errors
-            try
-            {
-                filesystem.EnterReadLock();
-                foreach (var dest in Locations())
-                {
-                    var path = Path.Combine(dest, FilenameKeyFor(key));
-                    if (File.Exists(path))
-                    {
-                        try
-                        {
-                            return File.ReadAllText(path, UTF8Encoding.UTF8);
-                        }
-                        catch (Exception e)
-                        {
-                            readFailed = true;
-                            AddBadLocation(dest, new Issue("Failed to read " + dataKind + " from location " + path, e.ToString(), IssueSeverity.Warning));
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                filesystem.ExitReadLock();
-            }
-            if (readFailed)
-            {
-                sink.AcceptIssue(new Issue("Unable to read " + dataKind + " from disk despite its existence.", IssueSeverity.Error));
-            }
-            return null;
-        }
-
+        
         /// <summary>
         /// Write-through mem cache
         /// </summary>
@@ -210,7 +86,7 @@ namespace ImageResizer.Plugins
                 return StringCachePutResult.Duplicate;
             }
             cache[key] = value;
-            return TryDiskWrite(key, value) ? StringCachePutResult.WriteComplete : StringCachePutResult.WriteFailed;
+            return store.TryDiskWrite(FilenameKeyFor(key), value) ? StringCachePutResult.WriteComplete : StringCachePutResult.WriteFailed;
         }
 
         /// <summary>
@@ -226,7 +102,7 @@ namespace ImageResizer.Plugins
                 return current;
             }else
             {
-                var disk = TryDiskRead(key);
+                var disk = store.TryDiskRead(FilenameKeyFor(key));
                 if (disk != null)
                 {
                     cache[key] = disk;
