@@ -177,6 +177,18 @@ namespace ImageResizer {
         public string ResultMimeType { get { return ResultInfo.Get<string>("result.mime", null); } }
 
 
+        /// <summary>
+        /// Ticks elapsed during Job processing. Divide by Stopwatch.Frequency to get seconds.
+        /// </summary>
+        public long TotalTicks { get; set; }
+        /// <summary>
+        /// Ticks elapsed during read and decode (not all engines populate this). Divide by Stopwatch.Frequency to get seconds.
+        /// </summary>
+        public long DecodeTicks { get; set; }
+        /// <summary>
+        /// Ticks elapsed during encode and write (not all engines populate this). Divide by Stopwatch.Frequency to get seconds.
+        /// </summary>
+        public long EncodeTicks { get; set; }
 
         /// <summary>
         /// The image processing settings

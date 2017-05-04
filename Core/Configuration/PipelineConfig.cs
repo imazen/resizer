@@ -484,6 +484,11 @@ namespace ImageResizer.Configuration {
 
         public event CacheSelectionHandler SelectCachingSystem;
 
+        /// <summary>
+        /// An event that fires for most image requests, but does not guarantee an httpcontext.
+        /// </summary>
+        public event HeartbeatHandler Heartbeat;
+
         [CLSCompliant(false)]
         protected volatile bool firedFirstRequest = false;
 
@@ -530,6 +535,11 @@ namespace ImageResizer.Configuration {
             
             //Fire final event
             if (PostRewrite != null) PostRewrite(sender,context, e);
+        }
+
+        public void FireHeartbeat()
+        {
+            Heartbeat?.Invoke(this, c);
         }
 
         public void FireAuthorizeImage(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlAuthorizationEventArgs e) {

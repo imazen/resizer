@@ -73,17 +73,20 @@ namespace ImageResizer.Configuration {
             new ImageResizer.Plugins.Basic.DefaultEncoder().Install(this);
             new ImageResizer.Plugins.Basic.NoCache().Install(this);
             new ImageResizer.Plugins.Basic.ClientCache().Install(this);
-            new ImageResizer.Plugins.Basic.Diagnostic().Install(this);
             
             if (isAspNet)
             {
+                new ImageResizer.Plugins.Basic.Diagnostic().Install(this); //2017-04-04 - this plugin only sets the http handler; adds no other functionality.
                 new ImageResizer.Plugins.Basic.WebConfigLicenseReader().Install(this);
                 new ImageResizer.Plugins.Basic.SizeLimiting().Install(this);
                 new ImageResizer.Plugins.Basic.MvcRoutingShimPlugin().Install(this);
+                new ImageResizer.Plugins.Basic.LicenseDisplay().Install(this);
             }
 
             //Load plugins immediately. Lazy plugin loading causes problems.
             plugins.LoadPlugins();
+
+            pipeline.FireHeartbeat();
         }
 
         

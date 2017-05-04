@@ -28,14 +28,14 @@ namespace ImageResizer.Storage
         public bool? Exists { get; set; }
         public DateTime? LastModifiedDateUtc { get; set; } 
     }
-    public abstract class BlobProviderBase : IPlugin,IVirtualImageProviderAsync, IVirtualImageProvider, IVirtualImageProviderVpp, IRedactDiagnostics, ILicensedPlugin
+    public abstract class BlobProviderBase : IPlugin,IVirtualImageProviderAsync, IVirtualImageProvider, IVirtualImageProviderVpp, IRedactDiagnostics, ILicensedPlugin, IPluginInfo
     {
         /// <summary>
         /// Returns the license key feature codes that are able to activate this plugins.
         /// </summary>
         public IEnumerable<string> LicenseFeatureCodes
         {
-            get { yield return "R4Performance"; yield return "R4BlobProviders"; }
+            get { yield return "R_Performance"; yield return "R4Performance"; yield return "R4BlobProviders"; }
         }
 
         public BlobProviderBase()
@@ -334,5 +334,20 @@ namespace ImageResizer.Storage
             return true;
         }
 
+        protected void ReportReadTicks(long ticks, long bytes)
+        {
+            Configuration.Performance.GlobalPerf.BlobRead(this.c, ticks,  bytes);
+        }
+
+        public IEnumerable<KeyValuePair<string, string>> GetInfoPairs()
+        {
+            return new KeyValuePair<string, string>[]
+            {
+                new KeyValuePair<string, string>("provider_prefix", VirtualFilesystemPrefix),
+                new KeyValuePair<string, string>("provider_flags", 
+                  string.Join(",", new [] {ExposeAsVpp, CacheUnmodifiedFiles, UntrustedData, CheckForModifiedFiles, RequireImageExtension, LazyExistenceCheck, CacheMetadata}
+                  .Select(b => b ? "1" : "0")))
+            };
+        }
     }
 }

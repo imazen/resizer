@@ -17,7 +17,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Azure;
 using System.Configuration;
-
+using System.Diagnostics;
 
 namespace ImageResizer.Plugins.AzureReader2 {
 
@@ -84,7 +84,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
 
         public override async Task<Stream> OpenAsync(string virtualPath, NameValueCollection queryString)
         {
-
+            var time = Stopwatch.StartNew();
             MemoryStream ms = new MemoryStream(4096); // 4kb is a good starting point.
 
             // Synchronously download
@@ -104,6 +104,8 @@ namespace ImageResizer.Plugins.AzureReader2 {
             }
 
             ms.Seek(0, SeekOrigin.Begin); // Reset to beginning
+            time.Stop();
+            this.ReportReadTicks(time.ElapsedTicks, ms.Length);
             return ms;
         }
 

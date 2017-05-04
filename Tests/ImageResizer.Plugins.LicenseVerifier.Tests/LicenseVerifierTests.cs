@@ -18,7 +18,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
             StringBuilder sb = new StringBuilder();
             var blob = LicenseBlob.Deserialize("localhost:RG9tYWluOiBsb2NhbGhvc3QKT3duZXI6IEV2ZXJ5b25lCklzc3VlZDogMjAxNS0wMy0yOFQwMDoyNzozMloKRmVhdHVyZXM6IFI0RWxpdGUgUjRDcmVhdGl2ZSBSNFBlcmZvcm1hbmNlCg==:3mA7/keJLfchZz1AEUHeH18nAvNsHbX7D6RCRbnMDsJpDGPfR0mS70nZmbOyjpCvTVWhT00rDRcyEvUfktbjZl9IEFW8h6vMhee/N+iDnLTR+jGRKPHUyZHfiSlEGzfy5MpVPNJIj5p8pyITZxtxNGC2FTA7NYWJXrUDR6A2WzWvLk7GTmtBlh6UnDUKRsi/1VgzKIJgX3MX/e6CO97yOwW/fk65UAVypoWGZObscT29I3yR7Q6UU1SHX3Zi8dT6PTXVj1p0Tm68N7pCX4iof42xJ1FrV+HdsTHsbQVpuFSZUptWtgy1U9ieHENmgBcZdUnmJyoKvx6hX3MUepk12A==");
-            var valid = new LicenseValidator().Validate(blob, new RSADecryptPublic(mod,exp), sb);
+            var valid = blob.VerifySignature( new[] { new RSADecryptPublic(mod, exp) }, sb);
 
             Assert.True(valid, sb.ToString());
         }

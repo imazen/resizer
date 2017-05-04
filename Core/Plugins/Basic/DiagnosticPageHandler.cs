@@ -285,6 +285,20 @@ namespace ImageResizer.Plugins.Basic {
                     "The PdfRenderer plugin depends on gsdll32.dll or gdsll32.dll\n" + 
                     "The RedEye plugin depends on several dozen files... see the plugin docs.\n");
             }
+            sb.AppendLine("\n\nWhen fetching a remote license file, the following information is sent via the querystring.");
+
+            var info = Configuration.Performance.GlobalPerf.Singleton.GetReportPairs();
+            info.AddString("license_id", "[integer]");
+            info.AddString("manager_id", "[guid]");
+            info.AddString("total_heartbeats", "[integer]");
+            info.AddString("new_heartbeats", "[integer]");
+            info.AddString("first_heartbeat", "[integer]");
+
+            foreach (var pair in info.GetInfo())
+            {
+                sb.AppendFormat("   {0,32} {1}\n", pair.Key, pair.Value);
+            }
+
             return sb.ToString();
 
         }

@@ -39,6 +39,8 @@ namespace ImageResizer.Plugins.Basic {
     public class Diagnostic :IPlugin{
         Config c;
         public IPlugin Install(Configuration.Config c) {
+            // Only Config.Current ever receives PostAuthorizeRequestStart. 
+            // No need for deduplication here
             c.Pipeline.PostAuthorizeRequestStart += Pipeline_PostAuthorizeRequestStart;
             c.Plugins.add_plugin(this);
             this.c = c;

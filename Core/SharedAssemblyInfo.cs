@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: AssemblyProduct("Image Resizer")]
 
 [assembly: AssemblyCompany("Imazen LLC")]
-[assembly: AssemblyCopyright("Copyright © 2015 Imazen LLC")]
+[assembly: AssemblyCopyright("Copyright © 2017 Imazen LLC")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -30,3 +30,6 @@ using System.Reflection;
 [assembly: AssemblyInformationalVersion("4.0.0-prerelease.591")]
 
 [assembly: Commit("331d72ae9881981a0cce986083afee8b934f6eae")]
+
+
+[assembly: BuildDate("")]
