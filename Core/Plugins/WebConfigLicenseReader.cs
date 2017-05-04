@@ -41,14 +41,15 @@ namespace ImageResizer.Plugins.Basic
         {
             foreach (Node n in resizer.queryUncached("licenses.license").Where(n => !string.IsNullOrWhiteSpace(n.TextContents)))
             {
-                var segments = n.TextContents.Split(':');
-                if (segments.Count() > 1)
-                {
-                    n.TextContents = string.Join(":",
-                        segments.Take(segments.Count() - 2).Concat(new[] { "****redacted****", segments.Last() }));
-                }
+                n.TextContents = TryRedact(n.TextContents);
             }
             return resizer;
+        }
+        public static string TryRedact(string license)
+        {
+            var segments = license.Split(':');
+            return segments.Count() > 1 ? string.Join(":",
+                    segments.Take(segments.Count() - 2).Concat(new[] { "****redacted****", segments.Last() })) : license;
         }
     }
 }
