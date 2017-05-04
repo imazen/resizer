@@ -182,7 +182,7 @@ namespace ImageResizer.Configuration.Performance
 
             PostJobQuery(job.Instructions);
 
-            if (System.Web.HttpContext.Current.Request != null)
+            if (System.Web.HttpContext.Current?.Request != null)
             {
                 NoticeDomains(System.Web.HttpContext.Current.Request);
             }
