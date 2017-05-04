@@ -72,6 +72,8 @@ namespace ImageResizer.Configuration
             //Copy the querystring so we can mod it to death without messing up other stuff.
             NameValueCollection queryCopy = new NameValueCollection(conf.ModifiedQueryString);
 
+            Performance.GlobalPerf.Singleton.PreRewriteQuery(queryCopy);
+
             //Call URL rewriting events
             UrlEventArgs ue = new UrlEventArgs(filePath, queryCopy);
             conf.FireRewritingEvents(sender, context, ue);
@@ -105,8 +107,7 @@ namespace ImageResizer.Configuration
                 //Resolve the 'cache' setting to 'no' unless we want it cache. TODO: Understand this better
                 if (!CachingIndicated) RewrittenInstructions.Cache = ServerCacheMode.No;
 
-
-                
+                Performance.GlobalPerf.Singleton.QueryRewrittenWithDirective(RewrittenVirtualPath);
             }
 
 
@@ -165,6 +166,8 @@ namespace ImageResizer.Configuration
 
             EstimatedContentType = ProcessingIndicated ? guessedEncoder.MimeType : fallbackContentType;
             EstimatedFileExtension = ProcessingIndicated ? guessedEncoder.Extension : fallbackExtension;
+
+            Performance.GlobalPerf.Singleton.IncrementCounter("module_response_ext_" + EstimatedFileExtension);
         }
 
         public void FireMissing()
@@ -189,10 +192,40 @@ namespace ImageResizer.Configuration
                 context.RewritePath(this.RewrittenVirtualPath + PathUtils.BuildQueryString(this.RewrittenQuery)); //Apply the new querystring also, or it would be lost
             }
         }
+
         public void AssignSFH()
         {
-            
+
             context.RemapHandler(CreateSFH());
+        }
+
+        internal void FireAccessDenied()
+        {
+            Performance.GlobalPerf.Singleton.IncrementCounter("postauthjob_403");
+        }
+
+        internal void FireJobSuccess()
+        {
+            Performance.GlobalPerf.Singleton.IncrementCounter("postauthjob_ok");
+        }
+
+        internal void FirePostAuthorizeSuccess()
+        {
+            Performance.GlobalPerf.Singleton.IncrementCounter("postauth_ok");
+        }
+
+
+
+        internal void FirePostAuthorizeRequestException(Exception ex)
+        {
+            Performance.GlobalPerf.Singleton.IncrementCounter("postauth_errors_" + ex.GetType().Name);
+            Performance.GlobalPerf.Singleton.IncrementCounter("postauth_errors");
+        }
+
+        internal void FireJobException(Exception ex)
+        {
+            Performance.GlobalPerf.Singleton.IncrementCounter("postauthjob_errors_" + ex.GetType().Name);
+            Performance.GlobalPerf.Singleton.IncrementCounter("postauthjob_errors");
         }
     }
 }

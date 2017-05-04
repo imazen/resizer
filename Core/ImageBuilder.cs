@@ -417,7 +417,7 @@ namespace ImageResizer
                 totalTicks.Stop();
                 job.TotalTicks = totalTicks.ElapsedTicks;
                 (SettingsModifier as IPipelineConfig)?.FireHeartbeat();
-                //Configuration.Performance.GlobalPerf.JobComplete(this, job);
+                Configuration.Performance.GlobalPerf.Singleton.JobComplete(this, job);
                 return job;
             } finally {
                 //Follow the dispose requests

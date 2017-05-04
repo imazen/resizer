@@ -16,6 +16,7 @@ using System.Security.Permissions;
 using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
+using ImageResizer.Configuration.Performance;
 
 namespace ImageResizer.Plugins.DiskCache
 {
@@ -365,12 +366,18 @@ namespace ImageResizer.Plugins.DiskCache
                 await e.CreateAndWriteResultAsync(outStream, e);
             }, CacheAccessTimeout, AsyncWrites);
 
+
             //Fail
             if (r.Result == CacheQueryResult.Failed)
+            {
+                GlobalPerf.Singleton.IncrementCounter("diskcache_timeout");
                 throw new ImageResizer.ImageProcessingException("Failed to acquire a lock on file \"" + r.PhysicalPath + "\" within " + CacheAccessTimeout + "ms. Caching failed.");
+            }
 
             if (r.Result == CacheQueryResult.Hit && cleaner != null)
                 cleaner.UsedFile(r.RelativePath, r.PhysicalPath);
+
+            GlobalPerf.Singleton.IncrementCounter((r.Result == CacheQueryResult.Hit) ? "diskcache_hit" : "diskcache_miss");
 
             return r;
         }
@@ -385,10 +392,16 @@ namespace ImageResizer.Plugins.DiskCache
 
             //Fail
             if (r.Result == CacheQueryResult.Failed)
+            {
+                GlobalPerf.Singleton.IncrementCounter("diskcache_timeout");
                 throw new ImageResizer.ImageProcessingException("Failed to acquire a lock on file \"" + r.PhysicalPath + "\" within " + CacheAccessTimeout + "ms. Caching failed.");
+            }
 
             if (r.Result == CacheQueryResult.Hit && cleaner != null)
                 cleaner.UsedFile(r.RelativePath, r.PhysicalPath);
+
+            GlobalPerf.Singleton.IncrementCounter((r.Result == CacheQueryResult.Hit) ? "diskcache_hit" : "diskcache_miss");
+
 
             return r;
         }
@@ -413,6 +426,26 @@ namespace ImageResizer.Plugins.DiskCache
             }
         }
 
+        bool CacheDriveOnNetwork()
+        {
+            string physicalCache = PhysicalCacheDir;
+            if (!string.IsNullOrEmpty(physicalCache))
+            {
+                return physicalCache.StartsWith("\\\\") || GetCacheDrive().DriveType == DriveType.Network;
+            }
+            return false;
+        }
+
+        DriveInfo GetCacheDrive()
+        {
+            try
+            {
+                var drive = string.IsNullOrEmpty(PhysicalCacheDir) ? null : new DriveInfo(Path.GetPathRoot(PhysicalCacheDir));
+                return (drive?.IsReady == true) ? drive : null;
+            }
+            catch { return null; }
+        }
+
         public IEnumerable<IIssue> GetIssues() {
             List<IIssue> issues = new List<IIssue>();
             if (cleaner != null) issues.AddRange(cleaner.GetIssues());
@@ -434,24 +467,12 @@ namespace ImageResizer.Plugins.DiskCache
                 issues.Add(new Issue("DiskCache", "The asyncBufferSize should not be set below 2 megabytes (2097152). Found in the <diskcache /> element in Web.config.",
                     "A buffer that is too small will cause requests to be processed synchronously. Remember to set the value to at least 4x the maximum size of an output image.", IssueSeverity.ConfigurationError));
 
-            string physicalCache = PhysicalCacheDir;
-            if (!string.IsNullOrEmpty(physicalCache)) {
-                bool isNetwork = false;
-                if (physicalCache.StartsWith("\\\\")) 
-                    isNetwork = true;
-                else{
-                    try {
-                        DriveInfo dri = new DriveInfo(Path.GetPathRoot(physicalCache));
-                        if (dri.DriveType == DriveType.Network) isNetwork = true;
-                    } catch { }
-                }
-                if (isNetwork)
-                    issues.Add(new Issue("DiskCache", "It appears that the cache directory is located on a network drive.",
-                        "Both IIS and ASP.NET have trouble hosting websites with large numbers of folders over a network drive, such as a SAN. The cache will create " +
-                        Subfolders.ToString() + " subfolders. If the total number of network-hosted folders exceeds 100, you should contact support@imageresizing.net and consult the documentation for details on configuring IIS and ASP.NET for this situation.", IssueSeverity.Warning));
-                    
-            }
 
+            if (CacheDriveOnNetwork())
+                issues.Add(new Issue("DiskCache", "It appears that the cache directory is located on a network drive.",
+                    "Both IIS and ASP.NET have trouble hosting websites with large numbers of folders over a network drive, such as a SAN. The cache will create " +
+                    Subfolders.ToString() + " subfolders. If the total number of network-hosted folders exceeds 100, you should contact support@imageresizing.net and consult the documentation for details on configuring IIS and ASP.NET for this situation.", IssueSeverity.Warning));
+                    
             return issues;
         }
 

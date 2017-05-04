@@ -16,6 +16,7 @@ using ImageResizer.Storage;
 using Amazon.S3.Model;
 using System.IO;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace ImageResizer.Plugins.S3Reader2 {
     public class S3Reader2 : BlobProviderBase, IMultiInstancePlugin, IRedactDiagnostics {
@@ -144,17 +145,29 @@ namespace ImageResizer.Plugins.S3Reader2 {
         public override async Task<Stream> OpenAsync(string virtualPath, NameValueCollection queryString)
         {
             var path = ParseAndFilterPath(virtualPath);
+            var time = Stopwatch.StartNew();
+            long bytesFetched = 0;
             //Synchronously download to memory stream
             try {
                 var req = new Amazon.S3.Model.GetObjectRequest() { BucketName = path.Bucket, Key = path.Key };
 
                 using (var s = await S3Client.GetObjectAsync(req)){
-                    return (Stream) await s.ResponseStream.CopyToMemoryStreamAsync();
+                    using (var stream = s.ResponseStream)
+                    {
+                        var copy = (Stream)await stream.CopyToMemoryStreamAsync();
+                        bytesFetched = copy.Length;
+                        return copy;
+                    }
                 }
             } catch (AmazonS3Exception se) {
                 if (se.StatusCode == System.Net.HttpStatusCode.NotFound || "NoSuchKey".Equals(se.ErrorCode, StringComparison.OrdinalIgnoreCase)) throw new FileNotFoundException("Amazon S3 file not found", se);
                 else if ( se.StatusCode == System.Net.HttpStatusCode.Forbidden || "AccessDenied".Equals(se.ErrorCode, StringComparison.OrdinalIgnoreCase)) throw new FileNotFoundException("Amazon S3 access denied - file may not exist", se);
                 else throw;
+            }
+            finally
+            {
+                time.Stop();
+                this.ReportReadTicks(time.ElapsedTicks, bytesFetched);
             }
         }
 
