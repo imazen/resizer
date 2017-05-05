@@ -70,3 +70,4 @@ ipch/
 *.lastbuildstate
 *.res
 .vs/
+/Samples/PluginTestingApp/App_Data
