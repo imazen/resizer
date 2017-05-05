@@ -258,7 +258,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             }
             else if (knownDomainStatus.Count > 0)
             {
-                sb.AppendFormat("Valid for {0} domains, invalid for {1} domains, not covered for {3} domains:\n", 
+                sb.AppendFormat("Valid for {0} domains, invalid for {1} domains, not covered for {2} domains:\n", 
                     knownDomainStatus.Count(pair => pair.Value),
                     knownDomainStatus.Count(pair => !pair.Value),
                     unknownDomains.Count);
@@ -307,7 +307,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             }
             else if (knownDomainStatus.Count > 0)
             {
-                sb.AppendFormat("Valid for {0} domains, invalid for {1} domains, not covered for {3} domains:\n",
+                sb.AppendFormat("Valid for {0} domains, invalid for {1} domains, not covered for {2} domains:\n",
                     knownDomainStatus.Count(pair => pair.Value),
                     knownDomainStatus.Count(pair => !pair.Value),
                     unknownDomains.Count);

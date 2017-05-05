@@ -411,7 +411,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         private string RedactSecret(string s)
         {
-            return s.Replace(this.Secret, "[redacted secret]");
+            return this.Secret != null ? s.Replace(this.Secret, "[redacted secret]") : s;
         }
 
         private void RecreateFetcher()
