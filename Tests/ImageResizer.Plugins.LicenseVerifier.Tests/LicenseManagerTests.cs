@@ -87,7 +87,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             Assert.Equal(0, mgr.WaitForTasks());
             Assert.Empty(mgr.GetIssues());
             Assert.NotNull(conf.GetDiagnosticsPage());
-
+            Assert.NotNull(conf.GetLicensesPage());
         }
 
 
@@ -100,10 +100,14 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             {
                 Cache = new StringCacheMem()
             };
-            Config conf = new Config();
+            Config conf = new Config(new ResizerSection(
+                @"<resizer><licenses>
+      <maphost from='localhost' to='acme.com' />
+      <license>" + LicenseStrings.Offlinev4DomainAcmeComCreative + "</license></licenses></resizer>"));
+
             conf.Plugins.LicenseScope = LicenseAccess.Local;
             conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R4Creative"));
-            conf.Plugins.AddLicense(LicenseStrings.Offlinev4DomainAcmeComCreative);
+            //conf.Plugins.AddLicense(LicenseStrings.Offlinev4DomainAcmeComCreative);
 
             Assert.Equal(0, mgr.WaitForTasks());
             Assert.Empty(mgr.GetIssues());
@@ -113,11 +117,46 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             var result = new LicenseComputation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
 
             Assert.True(result.LicensedForRequestUrl(new Uri("http://acme.com")));
+            Assert.True(result.LicensedForRequestUrl(new Uri("http://localhost")));
             Assert.Equal(0, mgr.WaitForTasks());
             Assert.Empty(mgr.GetIssues());
             Assert.NotNull(conf.GetDiagnosticsPage());
+            Assert.NotNull(conf.GetLicensesPage());
 
         }
+
+
+        [Fact]
+        public void Test_Offline_License_Failure()
+        {
+            var clock = new RealClock();
+            var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test, clock)
+            {
+                Cache = new StringCacheMem()
+            };
+            Config conf = new Config();
+
+            conf.Plugins.LicenseScope = LicenseAccess.Local;
+            conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R4Creative"));
+            
+            Assert.Empty(mgr.GetIssues());
+            Assert.Null(mgr.GetAllLicenses().FirstOrDefault());
+
+            var result = new LicenseComputation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+
+            Assert.False(result.LicensedForRequestUrl(new Uri("http://acme.com")));
+            conf.Plugins.AddLicense(LicenseStrings.Offlinev4DomainAcmeComCreative);
+
+            Assert.NotNull(mgr.GetAllLicenses().First());
+
+            result = new LicenseComputation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+            Assert.True(result.LicensedForRequestUrl(new Uri("http://acme.com")));
+
+            Assert.Empty(mgr.GetIssues());
+            Assert.NotNull(conf.GetDiagnosticsPage());
+            Assert.NotNull(conf.GetLicensesPage());
+        }
+
         [Fact]
         public void Test_Caching_With_Timeout()
         {
@@ -143,6 +182,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
 
                 Assert.Empty(mgr.GetIssues());
+                Assert.NotNull(conf.GetLicensesPage());
             }
 
             // Use cache
@@ -164,6 +204,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
                 Assert.NotEmpty(mgr.GetIssues());
                 Assert.NotNull(conf.GetDiagnosticsPage());
+                Assert.NotNull(conf.GetLicensesPage());
             }
 
         }
@@ -188,6 +229,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             Assert.Equal(null, c.Get("404"));
             Assert.Equal(StringCachePutResult.WriteComplete, c.TryPut("a", null));
             Assert.NotNull(Config.Current.GetDiagnosticsPage());
+            Assert.NotNull(Config.Current.GetLicensesPage());
         }
 
         //Test network grace period

@@ -39,7 +39,7 @@ namespace ImageResizer.Plugins.Basic
 
         public Node RedactFrom(Node resizer)
         {
-            foreach (Node n in resizer.queryUncached("licenses.license").Where(n => !string.IsNullOrWhiteSpace(n.TextContents)))
+            foreach (Node n in resizer.queryUncached("licenses.license")?.Where(n => !string.IsNullOrWhiteSpace(n.TextContents)) ?? Enumerable.Empty<Node>())
             {
                 n.TextContents = TryRedact(n.TextContents);
             }

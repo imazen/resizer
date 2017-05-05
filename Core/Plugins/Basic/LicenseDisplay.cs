@@ -24,6 +24,14 @@ namespace ImageResizer.Plugins.Basic
             return this;
         }
 
+        public static string GetPageText(Config c)
+        {
+            return string.Join("\n\n",
+                c.Plugins.GetAll<ILicenseDiagnosticsProvider>()
+                .Select(p => p.ProvidePublicText())
+                .Distinct());
+        }
+
         void Pipeline_PostAuthorizeRequestStart(System.Web.IHttpModule sender, System.Web.HttpContext context)
         {
 
@@ -69,10 +77,7 @@ namespace ImageResizer.Plugins.Basic
 
             public string GenerateOutput(HttpContext context, Config c)
             {
-                return string.Join("\n\n",
-                    c.Plugins.GetAll<ILicenseDiagnosticsProvider>()
-                    .Select(p => p.ProvidePublicText())
-                    .Distinct());
+                return LicenseDisplay.GetPageText(c);
             }
         }
     }
