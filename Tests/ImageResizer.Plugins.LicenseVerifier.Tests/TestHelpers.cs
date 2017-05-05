@@ -1,5 +1,6 @@
 ﻿using ImageResizer.Configuration;
 using ImageResizer.Configuration.Issues;
+using ImageResizer.Plugins.Basic;
 using ImageResizer.Plugins.Licensing;
 using System;
 using System.Collections.Concurrent;
@@ -53,11 +54,13 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
     class LicenseStrings
     {
+        public static readonly string Offlinev4DomainAcmeComCreative = "acme.com(R4Creative includes R4Creative R4Performance):S2luZDogdjQtZG9tYWluLW9mZmxpbmUKU2t1OiBSNENyZWF0aXZlCkRvbWFpbjogYWNtZS5jb20KT3duZXI6IEFjbWUgQ29ycApJc3N1ZWQ6IDIwMTctMDQtMjFUMDA6MDA6MDArMDA6MDAKRmVhdHVyZXM6IFI0Q3JlYXRpdmUgUjRQZXJmb3JtYW5jZQ==:eFLsTwUCEdQiEt34zdnzzxKFeEoAOrZoheE85LLYB9Pgx5wypsYpcG+58GlXUtgldbPyq+9e+m/ZeDhyqXPUkd6wk43EqUu07//20RE3XEWeKEGK1LBTNUJ6gfL9iPsA9qnSLpJNV7QLp9JxWI2VztvPUol9W5dORtUWtfzna+hujSQ5lym9vjVBaxsbsyRBS9x27lzGKUL+RoonHDYpeIolAnNu28WuBmFGQ3S3ALcNZ4dSjoapyAXQyEH07A5pQ/p18Vv5FqD24p7dh45BGMqJXLVuZli13kvdh812UQvKwyL223k9cEYiyV7F+YN6YHPL5/Ebrh1nYDC00/1b7A==";
+
         public static readonly string EliteSubscriptionPlaceholder = ":S2luZDogaWQKSWQ6IDExNTE1MzE2MgpTZWNyZXQ6IDFxZ2dxMTJ0MnF3Z3dnNGMyZDJkcXdmd2VxZncKSXNQdWJsaWM6IGZhbHNlCk1heFVuY2FjaGVkR3JhY2VNaW51dGVzOiA0ODA=:iJMbZFTUtC0PFl4mooTaLR1gXHLY7aFEXQvGUFbdHmwsA0M/NLq2CBIhujNgSvdQy5jWP5ylIBZCppIHDgiewfo1SZxLbQ424i8QLvrskUXPlau/1sQdmhOmjELDbcYslSujkbRIqzgIWJtw6IMxQwM+O/R+mdG4J+G1E81ERkpR4G/1Eu0DIxrNg0yn8Z13Qe5qjLwvBhdv9coSPXFEdlg7QhVWw4QuUl1GkxUC+qBTxVI2yYyQJtqFokLJOXlzRJUL21PZOw5BeBrzGkesq4XHcKrqGKGbuBQver6TjTL9jougNUY2HfKBuORfJwttwSip/Fr4A7CnYNGDajm0Fw==";
         public static readonly string EliteSubscriptionRemote = "ImageResizer Elite Subscription:SWQ6IDExNTE1MzE2MgpLaW5kOiBzdWJzY3JpcHRpb24KT3duZXI6IEFjbWUgQ29ycApJc3N1ZWQ6IDIwMTctMDQtMTlUMDM6MTE6NDJaCkV4cGlyZXM6IDIwMTctMTAtMTdUMDM6MTE6NDJaCklzUHVibGljOiB0cnVlClByb2R1Y3Q6IEltYWdlUmVzaXplciBFbGl0ZSBTdWJzY3JpcHRpb24KRmVhdHVyZXM6IFI0RWxpdGUgUjRDcmVhdGl2ZSBSNFBlcmZvcm1hbmNlClJlc3RyaWN0aW9uczogT25seSBmb3IgdGVzdGluZzsgbm90IGxlZ2FsIGZvciBwcm9kdWN0aW9uIHVzZS4=:P1m3QpHFHQvEgkozPCMzQjba8phkW3vgKp/Zrzk5auHTfwd02c8gf/4HPglquk0wMr7TEUm69AyjhWElZsx2lBfcYPHk+N6IM2K202Wvic+2WFwBpHvD6Mf7ZDEk2J+MKcY6awowJ0KuyQoRmec4CIzLUuER8OrucvZ/plZqBOehIybPLafbsk109kXCLQT8AIbcpP0hs/7H+CoYV9mir0tdz+rA1y0IBzWPStP1FMeGnT2JPdyjKwbi+N0Blsy/z832qil0Jhbscbk5o9rfKJpaQLihgnjiCTE3WIH7ZWZ2jguHaFtIkkw7+A+byx6kZhEfUz+pKZcqF4x1fpwfoA==";
     }
 
-    internal class LicensedPlugin : ILicensedPlugin, IPlugin
+    internal class LicensedPlugin : ILicensedPlugin, IPlugin, ILicenseDiagnosticsProvider, IDiagnosticsProvider
     {
         string[] codes;
 
@@ -120,6 +123,15 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         {
             var cache = Result;
             return cache == null ? mgr.GetIssues() : mgr.GetIssues().Concat(cache.GetIssues());
+        }
+
+        public string ProvideDiagnostics()
+        {
+            return Result.ProvideDiagnostics();
+        }
+        public string ProvidePublicText()
+        {
+            return Result.ProvidePublicDiagnostics();
         }
     }
 

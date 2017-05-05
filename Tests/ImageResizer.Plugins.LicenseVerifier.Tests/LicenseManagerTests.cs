@@ -86,6 +86,36 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
             Assert.Equal(0, mgr.WaitForTasks());
             Assert.Empty(mgr.GetIssues());
+            Assert.NotNull(conf.GetDiagnosticsPage());
+
+        }
+
+
+
+        [Fact]
+        public void Test_Offline_License_Success()
+        {
+            var clock = new RealClock();
+            var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test, clock)
+            {
+                Cache = new StringCacheMem()
+            };
+            Config conf = new Config();
+            conf.Plugins.LicenseScope = LicenseAccess.Local;
+            conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R4Creative"));
+            conf.Plugins.AddLicense(LicenseStrings.Offlinev4DomainAcmeComCreative);
+
+            Assert.Equal(0, mgr.WaitForTasks());
+            Assert.Empty(mgr.GetIssues());
+
+            Assert.NotNull(mgr.GetAllLicenses().First());
+
+            var result = new LicenseComputation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+
+            Assert.True(result.LicensedForRequestUrl(new Uri("http://acme.com")));
+            Assert.Equal(0, mgr.WaitForTasks());
+            Assert.Empty(mgr.GetIssues());
+            Assert.NotNull(conf.GetDiagnosticsPage());
 
         }
         [Fact]
@@ -133,6 +163,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 var result = new LicenseComputation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
                 Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
                 Assert.NotEmpty(mgr.GetIssues());
+                Assert.NotNull(conf.GetDiagnosticsPage());
             }
 
         }
@@ -156,6 +187,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             Assert.Equal("b", c.Get("a"));
             Assert.Equal(null, c.Get("404"));
             Assert.Equal(StringCachePutResult.WriteComplete, c.TryPut("a", null));
+            Assert.NotNull(Config.Current.GetDiagnosticsPage());
         }
 
         //Test network grace period
