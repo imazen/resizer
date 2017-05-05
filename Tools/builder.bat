@@ -29,7 +29,7 @@ goto exit
   nuget restore FakeBuilder\packages.config
 
   echo - Fetching packages for build
-  ..\.paket\paket.bootstrapper.exe prerelease
+  ..\.paket\paket.bootstrapper.exe
   if errorlevel 1 (
     exit /b %errorlevel%
   )
