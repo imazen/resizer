@@ -87,7 +87,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         {
             get
             {
-                return (ILicenseManager)CommonStaticStorage.GetOrAdd("licenseManager", (k) => new LicenseManagerSingleton(ImazenPublicKeys.All, new RealClock()));
+                return (ILicenseManager)CommonStaticStorage.GetOrAdd("licenseManager", (k) => new LicenseManagerSingleton(ImazenPublicKeys.Production, new RealClock()));
             }
         }
 

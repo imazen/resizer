@@ -349,7 +349,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 {
                     cache = null;
                 }
-                return cache = cache ?? new LicenseComputation(this.c, ImazenPublicKeys.All, c.configurationSectionIssues, this.mgr, Clock);
+                return cache = cache ?? new LicenseComputation(this.c, ImazenPublicKeys.Production, c.configurationSectionIssues, this.mgr, Clock);
             }
         }
 
