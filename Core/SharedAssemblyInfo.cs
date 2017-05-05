@@ -26,10 +26,10 @@ using System.Reflection;
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:/*
 [assembly: AssemblyVersion("4.0.0.0")]
-[assembly: AssemblyFileVersion("4.0.0.591")]
-[assembly: AssemblyInformationalVersion("4.0.0-prerelease.591")]
+[assembly: AssemblyFileVersion("4.1.3.745")]
+[assembly: AssemblyInformationalVersion("4.1.3-prerelease.745")]
 
-[assembly: Commit("331d72ae9881981a0cce986083afee8b934f6eae")]
+[assembly: Commit("2c64c3100e64c944222e04388a6d44b2909d4115")]
 
 
-[assembly: BuildDate("")]
+[assembly: BuildDate("2017-05-05T12:13:13.1434691+00:00")]
