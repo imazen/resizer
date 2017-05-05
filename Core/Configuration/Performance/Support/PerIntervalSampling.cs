@@ -48,19 +48,10 @@ namespace ImageResizer.Configuration.Performance
         {
             for (var ix = 0; ix < ringCount; ix++)
             {
-                TimeSlotResult result;
-                do
+                foreach(var result in rings[ix].DequeueValues())
                 {
-                    result = rings[ix].DequeueResult();
-                    if (result.IsEmpty)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        resultCallback(result.Value.Value);
-                    }
-                } while (true);
+                    resultCallback(result);
+                }
             }
         }
 

@@ -31,23 +31,27 @@ namespace ImageResizer.Configuration.Performance
             return PathUtils.ToBase64U(hash.Take(bytes).ToArray());
         }
 
-        public static void InterlockedMax(ref long location1, long other)
+        public static long InterlockedMax(ref long location1, long other)
         {
             long copy;
-            long max;
+            long finalOriginal;
             {
                 copy = Interlocked.Read(ref location1);
-                max = Math.Max(other, copy);
-            } while (max > copy && Interlocked.CompareExchange(ref location1, max, copy) != copy) ;
+                if (copy >= other) return copy;
+                finalOriginal = Interlocked.CompareExchange(ref location1, other, copy);
+            } while (finalOriginal != copy);
+            return finalOriginal;
         }
-        public static void InterlockedMin(ref long location1, long other)
+        public static long InterlockedMin(ref long location1, long other)
         {
             long copy;
-            long min;
+            long finalOriginal;
             {
                 copy = Interlocked.Read(ref location1);
-                min = Math.Min(other, copy);
-            } while (min < copy && Interlocked.CompareExchange(ref location1, min, copy) != copy) ;
+                if (copy <= other) return copy;
+                finalOriginal = Interlocked.CompareExchange(ref location1, other, copy);
+            } while (finalOriginal != copy) ;
+            return finalOriginal;
         }
 
     }

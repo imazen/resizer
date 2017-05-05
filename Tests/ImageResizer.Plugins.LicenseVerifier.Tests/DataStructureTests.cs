@@ -187,52 +187,54 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         [Fact]
         public void CircularBufferTest()
         {
+            // This buffer stores 3 +1 buckets at a time, allowing simultaneous writes to 3 buckets
+            // The unwritable 4th is flushed when a new bucket is entered. 
             var b = new CircularTimeBuffer(10, 3);
+
+            // Bucket 11
             Assert.True(b.Record(111, 1));
+            // Bucket 12
             Assert.True(b.Record(121, 1));
             Assert.True(b.Record(122, 1));
-
+            // Bucket 13
             Assert.True(b.Record(131, 1));
             Assert.True(b.Record(139, 2));
-
+            // Bucket 14
             Assert.True(b.Record(141, 3));
             Assert.True(b.Record(141, 1));
-
+            // Bucket 16
             Assert.True(b.Record(151, 5));
+            // Bucket 16
             Assert.True(b.Record(161, 0));
+            // Bucket 17, 18, 19 (skipped, zero)
+            // Bucket 20 - This causes Buckets 11-16 to dequeue, leaving 17 pending and 18, 19, 20 active.
             Assert.True(b.Record(201, 0));
 
             // Skipped buckets (zeroes) are always the last to dequeue, 
             // but we need to record a value that is 4 intervals after the last to cause all to dequeue 
-            Assert.Equal(1, b.DequeueResult().Value);
-            Assert.Equal(2, b.DequeueResult().Value);
-            Assert.Equal(3, b.DequeueResult().Value);
-            Assert.Equal(4, b.DequeueResult().Value);
-            Assert.Equal(5, b.DequeueResult().Value);
-            Assert.Equal(0, b.DequeueResult().Value);
-            Assert.True(b.DequeueResult().IsEmpty);
+            Assert.Equal(new [] { 1L, 2, 3, 4, 5, 0 }, b.DequeueValues());
 
+            // Bucekts 21..30 are skipped
 
+            // Buckets 31,32,33
             Assert.True(b.Record(311, 1));
             Assert.True(b.Record(321, 2));
             Assert.True(b.Record(331, 3));
 
-            var nonEmpty = Enumerable.Range(0, 30).Select(ix => b.DequeueResult()).Where(r => !r.IsEmpty).ToArray();
-            Assert.Equal(6, nonEmpty.Length); //TODO: fix, should be 13
-            //They shouldn't have a value, though
-            Assert.True(nonEmpty.All(e => e.Value.Value == 0));
+            var zeroes = b.DequeueValues();
+            Assert.Equal(13, zeroes.Count());
+            Assert.True(zeroes.All(v => v == 0));
 
-     
+            //We should have nothing to dequeue, with 30..33 in the buffer
+            Assert.True(b.DequeueResult().IsEmpty);
             Assert.True(b.DequeueResult().IsEmpty);
 
+            // Skip buckets 34..55, dequeuing 30..52
             Assert.True(b.Record(561, 3));
 
-            Assert.Equal(0, b.DequeueResult().Value);
-            Assert.Equal(1, b.DequeueResult().Value);
-            Assert.Equal(2, b.DequeueResult().Value);
-            Assert.Equal(3, b.DequeueResult().Value);
-
-           
+            var results = b.DequeueValues();
+            Assert.Equal(23, results.Count());
+            Assert.Equal(new[] { 0L, 1, 2, 3 }, results.Take(4));
         }
     }
 }

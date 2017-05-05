@@ -29,7 +29,15 @@ namespace ImageResizer.Configuration.Performance
 
         public bool IsEmpty { get { return SlotBeginTicks == 0; } }
 
+        /// <summary>
+        /// Empty does not denote a result of any kind; this is like null. 
+        /// </summary>
         public static readonly TimeSlotResult Empty = new TimeSlotResult();
+        
+        /// <summary>
+        /// A zero result is a value of zero, not to be confused with Empty
+        /// </summary>
+        public static readonly TimeSlotResult ResultZero = new TimeSlotResult(0,1);
 
         public override string ToString()
         {
@@ -107,21 +115,53 @@ namespace ImageResizer.Configuration.Performance
                 }
             }
         }
-        public TimeSlotResult DequeueResult()
-        {
-            for (var retry = 0; retry < 3; retry++)
-            {
-                if (results.Count > 0)
-                    lock (dequeueLock)
-                        if (results.Count > 0)
-                            return results.Dequeue();
+        /// <summary>
+        /// Better to call DequeueResults()
+        /// </summary>
+        /// <returns></returns>
+        //public TimeSlotResult DequeueResult()
+        //{
+        //    for (var retry = 0; retry < 3; retry++)
+        //    {
+        //        if (results.Count > 0)
+        //            lock (dequeueLock)
+        //                if (results.Count > 0)
+        //                    return results.Dequeue();
 
-                if (skippedResults > 0 && Interlocked.Decrement(ref skippedResults) > -1)
+        //        if (skippedResults > 0 && Interlocked.Decrement(ref skippedResults) > -1)
+        //        {
+        //            return TimeSlotResult.Empty;
+        //        }
+        //    }
+        //    return TimeSlotResult.Empty;
+        //}
+
+        public IEnumerable<TimeSlotResult> DequeueResults()
+        {
+            // Don't allocate unless there are actually results
+            var toSkip = Utilities.InterlockedMin(ref skippedResults, 0);
+            var dequeued = Enumerable.Empty<TimeSlotResult>();
+
+            if (results.Count > 0) {
+                lock (dequeueLock)
                 {
-                    return TimeSlotResult.Empty;
+                    if (results.Count > 0)
+                    {
+                        dequeued = results.ToArray();
+                        results.Clear();
+                    }
                 }
             }
-            return TimeSlotResult.Empty;
+            if (toSkip > 0)
+            {
+                dequeued = dequeued.Concat(Enumerable.Repeat(TimeSlotResult.ResultZero, (int)toSkip));
+            }
+            return dequeued;
+        }
+        public IEnumerable<long> DequeueValues()
+        {
+            var results = DequeueResults();
+            return results == Enumerable.Empty<TimeSlotResult>() ? Enumerable.Empty<long>() : results.Select(r => r.Value.Value);
         }
 
         public override string ToString()
