@@ -61,11 +61,18 @@ namespace ImageResizer.Configuration.Issues {
                 if (assemblyName.Name.IndexOf("ImageResizer",  StringComparison.OrdinalIgnoreCase) < 0) continue;
                 
                 object[] attrs;
-                
-                attrs = a.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
-                if (attrs != null && attrs.Length > 0) 
-                    if (((AssemblyInformationalVersionAttribute)attrs[0]).InformationalVersion.IndexOf("hotfix",StringComparison.OrdinalIgnoreCase) > -1)
-                        assembliesRunningHotfix += assemblyName.Name + ", ";
+                try
+                {
+                    attrs = a.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
+                    if (attrs != null && attrs.Length > 0)
+                        if (((AssemblyInformationalVersionAttribute)attrs[0]).InformationalVersion.IndexOf("hotfix", StringComparison.OrdinalIgnoreCase) > -1)
+                            assembliesRunningHotfix += assemblyName.Name + ", ";
+                }
+                catch (FileNotFoundException)
+                {
+                    //Missing dependencies
+                }
+
             }
             assembliesRunningHotfix = assembliesRunningHotfix.TrimEnd(',',' ');
 

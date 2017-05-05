@@ -2,7 +2,7 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,6 +17,7 @@ using ImageResizer.Configuration.Xml;
 using System.Globalization;
 using System.Linq;
 using System.Security;
+using System.IO;
 
 namespace ImageResizer.Plugins.Basic {
     public class DiagnosticPageHandler : IHttpHandler {
@@ -68,6 +69,7 @@ namespace ImageResizer.Plugins.Basic {
             Dictionary<string, List<string>> versions = new Dictionary<string, List<string>>();
             foreach (Assembly a in asms) {
 
+
                 AssemblyCopyrightAttribute copyright = null;
                 try
                 {
@@ -107,10 +109,16 @@ namespace ImageResizer.Plugins.Basic {
             var editionsUsed = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             
             foreach (IPlugin p in c.Plugins.AllPlugins) {
-                object[] attrs = p.GetType().Assembly.GetCustomAttributes(typeof(Util.EditionAttribute), true);
-                if (attrs.Length > 0 && attrs[0] is EditionAttribute)
+                try { 
+                    object[] attrs = p.GetType().Assembly.GetCustomAttributes(typeof(Util.EditionAttribute), true);
+                    if (attrs.Length > 0 && attrs[0] is EditionAttribute)
+                    {
+                        editionsUsed[p.GetType().Name] = ((EditionAttribute)attrs[0]).Value;
+                    }
+                }
+                catch (FileNotFoundException)
                 {
-                    editionsUsed[p.GetType().Name] = ((EditionAttribute)attrs[0]).Value;
+                    //Missing dependencies
                 }
             }
 
