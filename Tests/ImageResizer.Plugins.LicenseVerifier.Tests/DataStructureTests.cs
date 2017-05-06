@@ -226,8 +226,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             Assert.True(zeroes.All(v => v == 0));
 
             //We should have nothing to dequeue, with 30..33 in the buffer
-            Assert.True(b.DequeueResult().IsEmpty);
-            Assert.True(b.DequeueResult().IsEmpty);
+            Assert.Equal(0, b.DequeueValues().Count());
 
             // Skip buckets 34..55, dequeuing 30..52
             Assert.True(b.Record(561, 3));
