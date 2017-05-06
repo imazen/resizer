@@ -88,34 +88,34 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\Core\Configuration\Performance\Support\CircularTimeBuffer.cs">
-      <Link>CircularTimeBuffer.cs</Link>
+      <Link>UnderTest\CircularTimeBuffer.cs</Link>
     </Compile>
     <Compile Include="..\..\Core\Configuration\Performance\Support\CountMinSketch.cs">
-      <Link>CountMinSketch.cs</Link>
+      <Link>UnderTest\CountMinSketch.cs</Link>
     </Compile>
     <Compile Include="..\..\Core\Configuration\Performance\Support\DictionaryCounter.cs">
-      <Link>DictionaryCounter.cs</Link>
+      <Link>UnderTest\DictionaryCounter.cs</Link>
     </Compile>
     <Compile Include="..\..\Core\Configuration\Performance\Support\MultiIntervalStats.cs">
-      <Link>MultiIntervalStats.cs</Link>
+      <Link>UnderTest\MultiIntervalStats.cs</Link>
     </Compile>
     <Compile Include="..\..\Core\Configuration\Performance\Support\PercentileStream.cs">
-      <Link>PercentileStream.cs</Link>
+      <Link>UnderTest\PercentileStream.cs</Link>
     </Compile>
     <Compile Include="..\..\Core\Configuration\Performance\Support\PerIntervalSampling.cs">
-      <Link>PerIntervalSampling.cs</Link>
+      <Link>UnderTest\PerIntervalSampling.cs</Link>
     </Compile>
     <Compile Include="..\..\Core\Configuration\Performance\Support\PrecisionClamping.cs">
-      <Link>PrecisionClamping.cs</Link>
+      <Link>UnderTest\PrecisionClamping.cs</Link>
     </Compile>
     <Compile Include="..\..\Core\Configuration\Performance\Support\ResolutionsSink.cs">
-      <Link>ResolutionsSink.cs</Link>
+      <Link>UnderTest\ResolutionsSink.cs</Link>
     </Compile>
     <Compile Include="..\..\Core\Configuration\Performance\Support\TimingsSink.cs">
-      <Link>TimingsSink.cs</Link>
+      <Link>UnderTest\TimingsSink.cs</Link>
     </Compile>
     <Compile Include="..\..\Core\Configuration\Performance\Support\Utilities.cs">
-      <Link>Utilities.cs</Link>
+      <Link>UnderTest\Utilities.cs</Link>
     </Compile>
     <Compile Include="..\..\Plugins\LicenseVerifier\LicenseManager.cs">
       <Link>LicenseManager.cs</Link>
