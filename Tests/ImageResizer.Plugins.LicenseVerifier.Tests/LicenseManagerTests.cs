@@ -80,6 +80,10 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R4Elite"));
                 conf.Plugins.AddLicense(LicenseStrings.EliteSubscriptionPlaceholder);
 
+                Assert.Equal(1, mgr.GetAllLicenses().Count());
+                Assert.True(mgr.GetAllLicenses().First().IsRemote);
+                mgr.Heartbeat();
+
                 mgr.WaitForTasks();
                 Assert.Empty(mgr.GetIssues());
 
