@@ -62,6 +62,10 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         [Fact]
         public void Test_Remote_License_Success()
         {
+            if (Environment.GetEnvironmentVariable("APPVEYOR") == "True")
+            {
+                return;
+            }
             var clock = new RealClock();
             var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test, clock)
             {
@@ -177,6 +181,11 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         [Fact]
         public void Test_Caching_With_Timeout()
         {
+            if (Environment.GetEnvironmentVariable("APPVEYOR") == "True")
+            {
+                return;
+            }
+
             var clock = new RealClock();
             var cache = new StringCacheMem();
 
