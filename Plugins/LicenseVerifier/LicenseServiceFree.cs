@@ -276,7 +276,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             }
             else if (knownDomainStatus.Count > 0)
             {
-                sb.AppendFormat("Valid for {0} domains, invalid for {1} domains, not covered for {3} domains:\n",
+                sb.AppendFormat("Valid for {0} domains, invalid for {1} domains, not covered for {2} domains:\n",
                     knownDomainStatus.Count(pair => pair.Value),
                     knownDomainStatus.Count(pair => !pair.Value),
                     unknownDomains.Count);
@@ -326,7 +326,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             }
             else if (knownDomainStatus.Count > 0)
             {
-                sb.AppendFormat("Valid for {0} domains, invalid for {1} domains, not covered for {3} domains:\n",
+                sb.AppendFormat("Valid for {0} domains, invalid for {1} domains, not covered for {2} domains:\n",
                     knownDomainStatus.Count(pair => pair.Value),
                     knownDomainStatus.Count(pair => !pair.Value),
                     unknownDomains.Count);
@@ -368,7 +368,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 {
                     cache = null;
                 }
-                return cache = cache ?? new LicenseComputation(this.c, ImazenPublicKeys.All, c.configurationSectionIssues, this.mgr, Clock);
+                return cache = cache ?? new LicenseComputation(this.c, ImazenPublicKeys.Production, c.configurationSectionIssues, this.mgr, Clock);
             }
         }
 
@@ -394,7 +394,6 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         private bool ShouldDisplayDot(Config c, ImageState s)
         {
-            // For now, we only add dots during an active HTTP request. 
             return false;
         }
 
