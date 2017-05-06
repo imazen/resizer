@@ -72,7 +72,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R4Elite"));
             conf.Plugins.AddLicense(LicenseStrings.EliteSubscriptionPlaceholder);
 
-            Assert.Equal(1, mgr.WaitForTasks());
+            mgr.WaitForTasks();
             Assert.Empty(mgr.GetIssues());
 
             Mock.Verify(httpHandler);
@@ -198,13 +198,18 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R4Elite"));
                 conf.Plugins.AddLicense(LicenseStrings.EliteSubscriptionPlaceholder);
 
+                mgr.Heartbeat();
                 mgr.WaitForTasks();
 
                 var result = new LicenseComputation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
                 Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
-                Assert.NotEmpty(mgr.GetIssues());
+
+
                 Assert.NotNull(conf.GetDiagnosticsPage());
                 Assert.NotNull(conf.GetLicensesPage());
+
+                Assert.Equal(1, mgr.GetIssues().Count());
+
             }
 
         }

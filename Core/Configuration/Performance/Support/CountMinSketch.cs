@@ -147,70 +147,13 @@ namespace ImageResizer.Configuration.Performance
 
         public long GetPercentile(float percentile, SegmentClamping clamp)
         {
-            return GetPercentiles(new[] { percentile }, clamp)[0];
+            return GetAllValues(clamp).GetPercentile(percentile);
         }
         public long[] GetPercentiles(IEnumerable<float> percentiles, SegmentClamping clamp)
         {
-            var distinctValues = clamp.PossibleValues()
-                                .SelectMany(v => Enumerable.Repeat(v, (int)Estimate((uint)v)))
-                                .OrderBy(n => n).ToArray();
-            if (distinctValues.Length == 0)
-            {
-                return Enumerable.Repeat(0L, percentiles.Count()).ToArray();
-            }
-
-            return percentiles.Select(percentile =>
-            {
-
-                float index = Math.Max(0, percentile * distinctValues.Length + 0.5f);
-
-                return (distinctValues[(int)Math.Max(0,Math.Ceiling(index - 1.5))] +
-                        distinctValues[(int)Math.Min(Math.Ceiling(index - 0.5), distinctValues.Length - 1)]) / 2;
-               
-
-                //if (Math.Round(index) == index && (int)index != distinctValues.Length - 1)
-                //{
-                //    return (distinctValues[(int)index] + distinctValues[(int)index + 1]) / 2;
-                //}
-                //else
-                //{
-                //    return distinctValues[(int)Math.Ceiling(index)];
-                //}
-            }).ToArray();
-
-            //var total = clamp.PossibleValues().Sum(v => Estimate((uint)v));
-            //var threshold = Math.Min(total, (long)Math.Round(percentile * total));
-            //long cumulative = 0;
-            //foreach (long value in clamp.PossibleValues())
-            //{
-            //    long prev = cumulative;
-            //    cumulative += Estimate((uint)value);
-            //    if (cumulative >= threshold)
-            //    {
-            //        return prev;
-            //    }
-            //}
-            //// Error!
-            //Debug.Assert(false);
-            //return total;
+            var set = GetAllValues(clamp);
+            return percentiles.Select(p => set.GetPercentile(p)).ToArray();
         }
     }
 
-    //public class FixedTable
-    //{
-    //    SegmentClamping clamp;
-    //    long count;
-    //    long[] table;
-    //    public FixedTable(SegmentClamping clamp)
-    //    {
-    //        this.clamp = clamp;
-    //        count = clamp.PossibleValues().Count();
-    //        table = new long[count];
-    //    }
-    //    public void Add(uint value, int count)
-    //    {
-
-    //        Interlocked.Add(ref table[])
-    //    }
-    //}
 }

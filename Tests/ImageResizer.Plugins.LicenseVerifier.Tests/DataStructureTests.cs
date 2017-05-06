@@ -118,9 +118,33 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             Assert.Equal(600, d.Clamp(600));
             Assert.Equal(48000, d.Clamp(48000));
         }
-        //test segment clamping
-        // test percentiles for aspect ratiosd
-        // test per second/minute stuff
+    
+        [Fact]
+        public void TestPercentileCalculations()
+        {
+            var values = new[] { 0L, 1L, 2L, 3L, 4L, 5L };
+            Assert.Equal(0, values.GetPercentile(0));
+            Assert.Equal(5, values.GetPercentile(1));
+            Assert.Equal(2, values.GetPercentile(0.5f));
+
+            Assert.Equal(0, values.GetPercentile(0.1f));
+            Assert.Equal(1, values.GetPercentile(0.25f));
+            Assert.Equal(1, values.GetPercentile(0.33f));
+            Assert.Equal(2, values.GetPercentile(0.4f));
+            Assert.Equal(3, values.GetPercentile(0.6f));
+            Assert.Equal(4, values.GetPercentile(0.75f));
+            Assert.Equal(5, values.GetPercentile(0.85f));
+            Assert.Equal(5, values.GetPercentile(0.95f));
+        }
+
+        //[Fact]
+        //public void TestPercentile2Calculations()
+        //{
+        //    var values = new[] { 0L, 1L, 2L, 3L, 4L, 5L };
+        //    Assert.Equal(0, values.GetPercentile2(0));
+        //    Assert.Equal(5, values.GetPercentile2(1));
+        //    Assert.Equal(2, values.GetPercentile2(0.5f));
+        //}
 
         [Fact]
         public void TestTimeSink()
@@ -130,6 +154,8 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             s.Report(110);
             s.Report(1000);
             s.Report(1100);
+            Assert.Equal(new[] { 100L, 200L, 1000L, 1100L },  s.GetAllValues());
+            
             Assert.Equal(1100, s.GetPercentile(1.0f));
             Assert.Equal(1100, s.GetPercentile(0.76f));
             Assert.Equal(1050, s.GetPercentile(0.75f));
