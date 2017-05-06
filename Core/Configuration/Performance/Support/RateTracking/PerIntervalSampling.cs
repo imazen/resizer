@@ -3,12 +3,6 @@ using System.Diagnostics;
 
 namespace ImageResizer.Configuration.Performance
 {
-    struct NamedInterval
-    {
-        public string Name { get; set; }
-        public string Unit { get; set; }
-        public long TicksDuration { get; set; }
-    }
 
     /// <summary>
     /// 4 overlapping windows are used

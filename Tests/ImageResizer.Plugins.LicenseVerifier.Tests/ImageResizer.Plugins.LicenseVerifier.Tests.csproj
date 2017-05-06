@@ -87,36 +87,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\Core\Configuration\Performance\Support\CircularTimeBuffer.cs">
-      <Link>UnderTest\CircularTimeBuffer.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Core\Configuration\Performance\Support\CountMinSketch.cs">
-      <Link>UnderTest\CountMinSketch.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Core\Configuration\Performance\Support\DictionaryCounter.cs">
-      <Link>UnderTest\DictionaryCounter.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Core\Configuration\Performance\Support\MultiIntervalStats.cs">
-      <Link>UnderTest\MultiIntervalStats.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Core\Configuration\Performance\Support\PercentileStream.cs">
-      <Link>UnderTest\PercentileStream.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Core\Configuration\Performance\Support\PerIntervalSampling.cs">
-      <Link>UnderTest\PerIntervalSampling.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Core\Configuration\Performance\Support\PrecisionClamping.cs">
-      <Link>UnderTest\PrecisionClamping.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Core\Configuration\Performance\Support\ResolutionsSink.cs">
-      <Link>UnderTest\ResolutionsSink.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Core\Configuration\Performance\Support\TimingsSink.cs">
-      <Link>UnderTest\TimingsSink.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Core\Configuration\Performance\Support\Utilities.cs">
-      <Link>UnderTest\Utilities.cs</Link>
-    </Compile>
     <Compile Include="..\..\Plugins\LicenseVerifier\LicenseManager.cs">
       <Link>LicenseManager.cs</Link>
     </Compile>

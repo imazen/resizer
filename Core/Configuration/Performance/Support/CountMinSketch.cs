@@ -6,45 +6,6 @@ using System.Threading;
 
 namespace ImageResizer.Configuration.Performance
 {
-    interface IHash
-    {
-        uint ComputeHash(uint value);
-        IHash GetNext();
-    }
-
-    struct AddMulModHash: IHash
-    {
-        static ulong prime = (ulong)(Math.Pow(2, 32) - 5.0);//(ulong)(Math.Pow(2,33) - 355.0);
-
-        /// <summary>
-        /// Seed the random number generator with a good prime, or you'll get poor distribution
-        /// </summary>
-        /// <param name="r"></param>
-        public AddMulModHash(Random r)
-        {
-            this.r = r;
-            this.a = (ulong)(r.NextDouble() * (prime - 2)) + 1;
-            this.b = (ulong)(r.NextDouble() * (prime - 2)) + 1;
-        }
-        ulong a;
-        ulong b;
-        Random r;
-        public uint ComputeHash(uint value)
-        {
-            return (uint)((a * value + b) % prime);
-        }
-        
-        public IHash GetNext()
-        {
-            return new AddMulModHash(r);
-        }
-
-        public static AddMulModHash DeterministicDefault()
-        {
-            return new AddMulModHash(new Random(1499840347));
-        }
-    }
-
     class CountMinSketch<T> where T: struct, IHash
     {
         int[,] table;

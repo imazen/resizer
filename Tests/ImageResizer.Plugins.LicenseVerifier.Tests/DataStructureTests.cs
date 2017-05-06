@@ -17,7 +17,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         [Fact]
         public void TestAddMulModHash()
         {
-            var h = new AddMulModHash(new Random(1215125));
+            var h = new AddMulModHash(new MersenneTwister(1215125));
 
             var list = Enumerable.Range(0, 80000).Select(i => h.ComputeHash((uint)i)).ToList();
             var set = new HashSet<uint>(list);
@@ -27,7 +27,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         [Fact]
         public void TestAddMulModHashBucketCollisions()
         {
-            var h = new AddMulModHash(new Random(1215125));
+            var h = new AddMulModHash(new MersenneTwister(1215125));
 
             var maxCollisions = Enumerable.Range(0, 80000)
                 .Select(i => h.ComputeHash((uint)i) % 1000)
@@ -39,13 +39,13 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         [Fact]
         public void TestMinSketch()
         {
-            var rand = new Random(1095807143);
+            var rand = new MersenneTwister(1095807143);
             uint slots = 5113;
             uint algs = 5;
             //uint slots = 1279;
             //uint algs = 3;
 
-            var inputs = Enumerable.Range(0, (int)slots).Select(ix => (uint)rand.Next()).Distinct().ToList();
+            var inputs = Enumerable.Range(0, (int)slots).Select(ix => (uint)rand.NextUint32()).Distinct().ToList();
 
             var uniqueInputs = inputs.Count();
 
@@ -69,7 +69,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                     errors.Add(new KeyValuePair<uint, long>(i, found));
                 }
             }
-            Assert.Equal(errors.Count(), 10);
+            Assert.Equal(9, errors.Count());
         }
 
         [Fact]

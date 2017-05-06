@@ -39,7 +39,7 @@ namespace ImageResizer.Configuration.Performance
                 copy = Interlocked.Read(ref location1);
                 if (copy >= other) return copy;
                 finalOriginal = Interlocked.CompareExchange(ref location1, other, copy);
-            } while (finalOriginal != copy);
+            } while (finalOriginal != copy) ;
             return finalOriginal;
         }
         public static long InterlockedMin(ref long location1, long other)
@@ -114,54 +114,24 @@ namespace ImageResizer.Configuration.Performance
             return GetFirstAttribute<AssemblyFileVersionAttribute>(a)?.Version;
         }
     }
-        /// <summary>
-        /// Wraps a value factory, and ensures that subsequent values are never smaller than previous values. 
-        /// </summary>
-        struct OnlyIncreasingValue
+
+
+    static class PercentileExtensions
     {
-        long value;
-        public long GetLargerValue(Func<long> candidateValueFactory)
+        public static long GetPercentile(this long[] data, float percentile)
         {
-            long initialValue;
-            long computedValue;
-            do
+            if (data.Length == 0)
             {
-                var candidateValue = candidateValueFactory();
-                initialValue = value;
-                computedValue = Math.Max(initialValue, candidateValue);
-            } while (initialValue != Interlocked.CompareExchange(ref value, computedValue, initialValue));
-            return computedValue;
+                return 0;
+            }
+            float index = Math.Max(0, percentile * data.Length + 0.5f);
+
+            return (data[(int)Math.Max(0, Math.Ceiling(index - 1.5))] +
+                    data[(int)Math.Min(Math.Ceiling(index - 0.5), data.Length - 1)]) / 2;
+
+
         }
+
     }
 
-
-    ///// <summary>
-    ///// What value are X percentage of values under? Returns null if the percentage does not include at least minSamples. Returns MaxValue if there are not enough in sampling range.
-    ///// </summary>
-    ///// <param name="percentile"></param>
-    ///// <returns></returns>
-    //public long? PercentileUnder(double percentile, long minSamples)
-    //{
-    //    lock (this.setLock)
-    //    {
-    //        long collectCount = (long)(percentile * (double)totalCount);
-    //        if (collectCount < minSamples) return null;
-
-    //        long collected = this.underCount;
-    //        long upperBound = this.minValue;
-    //        int bucketIndex = 0;
-    //        while (collected < collectCount)
-    //        {
-    //            if (bucketIndex >= buckets.Length)
-    //            {
-    //                return long.MaxValue;
-    //            }
-    //            collected += buckets[bucketIndex];
-    //            upperBound += bucketSize;
-    //            bucketIndex++;
-    //        }
-    //        return upperBound;
-    //    }
-
-    //}
 }
