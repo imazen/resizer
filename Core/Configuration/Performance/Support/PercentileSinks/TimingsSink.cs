@@ -17,7 +17,12 @@ namespace ImageResizer.Configuration.Performance
 
         public void Report(long ticks)
         {
-            table.InterlockedAdd((uint)clamp.ClampStopwatchTicks(ticks), 1);
+            table.InterlockedAdd((uint)clamp.ClampStopwatchTicksToMicroseconds(ticks), 1);
+        }
+
+        public void ReportMicroseconds(long microseconds)
+        {
+            table.InterlockedAdd((uint)clamp.ClampMicroseconds(microseconds), 1);
         }
 
         public long[] GetPercentiles(IEnumerable<float> percentiles)

@@ -12,7 +12,6 @@ namespace ImageResizer.Configuration.Performance
     /// </summary>
     class DurationClamping : SegmentClamping
     {
-        public static long TicksPerMicrosecond { get; } = Stopwatch.Frequency / 1000000;
 
         public DurationClamping()
         {
@@ -46,10 +45,11 @@ namespace ImageResizer.Configuration.Performance
             return this.Clamp(microseconds);
         }
 
-        public long ClampStopwatchTicks(long ticks)
+        public long ClampStopwatchTicksToMicroseconds(long ticks)
         {
-            return ClampMicroseconds((ticks + TicksPerMicrosecond - 1) / TicksPerMicrosecond);
+            return ClampMicroseconds(ticks * 1000000  / Stopwatch.Frequency);
         }
+
     }
     
 }

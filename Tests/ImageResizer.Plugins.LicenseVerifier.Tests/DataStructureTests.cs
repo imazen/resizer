@@ -4,16 +4,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace ImageResizer.Plugins.LicenseVerifier.Tests
 {
     public class DataStructureTests
     {
-        [Fact]
-        public void TestPercentileStream()
+        ITestOutputHelper output;
+        public DataStructureTests(ITestOutputHelper output)
         {
-
+            this.output = output;
         }
+
         [Fact]
         public void TestAddMulModHash()
         {
@@ -137,23 +139,24 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             Assert.Equal(5, values.GetPercentile(0.95f));
         }
 
-        //[Fact]
-        //public void TestPercentile2Calculations()
-        //{
-        //    var values = new[] { 0L, 1L, 2L, 3L, 4L, 5L };
-        //    Assert.Equal(0, values.GetPercentile2(0));
-        //    Assert.Equal(5, values.GetPercentile2(1));
-        //    Assert.Equal(2, values.GetPercentile2(0.5f));
-        //}
+        [Fact]
+        public void TestClampDuration()
+        {
+            var clamp = DurationClamping.Default600Seconds();
+            Assert.Equal(100, clamp.ClampMicroseconds(100));
+            Assert.Equal(200, clamp.ClampMicroseconds(110));
+            Assert.Equal(1000, clamp.ClampMicroseconds(1000));
+            Assert.Equal(1100, clamp.ClampMicroseconds(1100));
+        }
 
         [Fact]
         public void TestTimeSink()
         {
             var s = new TimingsSink();
-            s.Report(100);
-            s.Report(110);
-            s.Report(1000);
-            s.Report(1100);
+            s.ReportMicroseconds(100);
+            s.ReportMicroseconds(110);
+            s.ReportMicroseconds(1000);
+            s.ReportMicroseconds(1100);
             Assert.Equal(new[] { 100L, 200L, 1000L, 1100L },  s.GetAllValues());
             
             Assert.Equal(1100, s.GetPercentile(1.0f));
