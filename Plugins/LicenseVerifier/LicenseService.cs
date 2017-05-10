@@ -378,7 +378,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             // For now, we only add dots during an active HTTP request. 
             if (c == null || c.configurationSectionIssues == null || System.Web.HttpContext.Current == null) return false;
 
-            return Result.LicensedForRequestUrl(System.Web.HttpContext.Current?.Request?.Url);
+            return !Result.LicensedForRequestUrl(System.Web.HttpContext.Current?.Request?.Url);
         }
 
         public IPlugin Install(Config c)
