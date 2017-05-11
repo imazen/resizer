@@ -66,10 +66,10 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
         ILicenseManager mgr;
         Config c = null;
-        LicenseComputation cache = null;
+        Computation cache = null;
         ILicenseClock Clock { get; set; } = new RealClock();
 
-        private LicenseComputation Result
+        private Computation Result
         {
             get
             {
@@ -77,7 +77,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 {
                     cache = null;
                 }
-                return cache = cache ?? new LicenseComputation(this.c, ImazenPublicKeys.All, c.configurationSectionIssues, this.mgr, Clock);
+                return cache = cache ?? new Computation(this.c, ImazenPublicKeys.All, c.configurationSectionIssues, this.mgr, Clock);
             }
         }
 

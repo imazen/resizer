@@ -1,4 +1,4 @@
-// Copyright (c) Imazen LLC.
+﻿// Copyright (c) Imazen LLC.
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the GNU Affero General Public License, Version 3.0.
@@ -9,25 +9,17 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Threading;
-using System.Numerics;
 using ImageResizer.Configuration.Issues;
-using ImageResizer.Resizing;
-using System.Drawing;
 using ImageResizer.Plugins.Basic;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Net;
-using System.Net.Sockets;
-using System.Net.Http;
 using ImageResizer.Plugins.Licensing;
 
 namespace ImageResizer.Plugins.LicenseVerifier
 {
     /// <summary>
-    /// Transient issues are stored within the class; permanent issues are stored in the ctor provided sink
+    /// Computes an (expiring) boolean result for whether the software is licensed for the functionality installed on the Config, and the license data instantly available
+    /// Transient issues are stored within the class; permanent issues are stored in the  provided sink
     /// </summary>
-    class LicenseComputation : IssueSink, IDiagnosticsProvider
+    class Computation : IssueSink, IDiagnosticsProvider
     {
         /// <summary>
         /// If a placeholder license doesn't specify NetworkGraceMinutes, we use this value.
@@ -53,7 +45,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         public DateTimeOffset? ComputationExpires { get; private set; }
 
-        public LicenseComputation(Config c, IEnumerable<RSADecryptPublic> trustedKeys, IIssueReceiver permanentIssueSink, ILicenseManager mgr, ILicenseClock clock) : base("LicenseComputation")
+        public Computation(Config c, IEnumerable<RSADecryptPublic> trustedKeys, IIssueReceiver permanentIssueSink, ILicenseManager mgr, ILicenseClock clock) : base("Computation")
         {
             this.c = c;
             this.trustedKeys = trustedKeys;
@@ -62,7 +54,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             this.mgr = mgr;
             if (mgr.FirstHeartbeat == null)
             {
-                throw new ArgumentException("ILicenseManager.Heartbeat() must be called before LicenseComputation.new");
+                throw new ArgumentException("ILicenseManager.Heartbeat() must be called before Computation.new");
             }
 
             // What features are installed on this instance?
@@ -268,8 +260,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         public string ProvideDiagnostics()
         {
             var sb = new StringBuilder();
-            sb.Append("\n----------------\nDRM-FREE\n-----------------\n: ");
-            sb.Append("\n----------------\nLicense status for active features: ");
+            sb.Append("\nLicense status for active features: ");
             if (EverythingDenied)
             {
                 sb.AppendLine("contact support");
@@ -307,11 +298,6 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 sb.AppendLine(string.Join("\n", others.Select(c => c.ToString())));
             }
 
-            var mgrs = mgr as LicenseManagerSingleton;
-            if (mgrs != null)
-            {
-                sb.AppendFormat("{0} heartbeat events. First {1} ago.\n", mgrs.HeartbeatCount, mgrs.FirstHeartbeat == null ? "(never)" : clock.GetUtcNow().Subtract(mgrs.FirstHeartbeat.Value).ToString());
-            }
             sb.AppendLine("\n----------------\n");
             return sb.ToString();
         }
@@ -354,249 +340,4 @@ namespace ImageResizer.Plugins.LicenseVerifier
         }
     }
 
-    class LicenseEnforcer<T> : BuilderExtension, IPlugin, IDiagnosticsProvider, IIssueProvider, ILicenseDiagnosticsProvider
-    {
-        private ILicenseManager mgr;
-        private Config c = null;
-        private LicenseComputation cache = null;
-        ILicenseClock Clock { get; set; } = new RealClock();
-
-        public LicenseEnforcer() : this(LicenseManagerSingleton.Singleton) { }
-        public LicenseEnforcer(ILicenseManager mgr) { this.mgr = mgr; }
-
-        private LicenseComputation Result
-        {
-            get
-            {
-                if (cache?.ComputationExpires != null && cache.ComputationExpires.Value < Clock.GetUtcNow())
-                {
-                    cache = null;
-                }
-                return cache = cache ?? new LicenseComputation(this.c, ImazenPublicKeys.Production, c.configurationSectionIssues, this.mgr, Clock);
-            }
-        }
-
-        protected override RequestedAction PreFlushChanges(ImageState s)
-        {
-            if (s.destBitmap != null && ShouldDisplayDot(c, s))
-            {
-                int w = s.destBitmap.Width, dot_w = 3, h = s.destBitmap.Height, dot_h = 3;
-                //Don't duplicate writes.
-                if (s.destBitmap.GetPixel(w - 1, h - 1) != Color.Red)
-                {
-                    if (w > dot_w && h > dot_h)
-                    {
-                        for (int y = 0; y < dot_h; y++)
-                            for (int x = 0; x < dot_w; x++)
-                                s.destBitmap.SetPixel(w - 1 - x, h - 1 - y, Color.Red);
-                    }
-                }
-            }
-            return RequestedAction.None;
-        }
-
-
-        private bool ShouldDisplayDot(Config c, ImageState s)
-        {
-            return false;
-        }
-
-        public IPlugin Install(Config c)
-        {
-            this.c = c;
-
-            // Ensure the LicenseManager can respond to heartbeats and license/licensee plugin additions
-            mgr.MonitorLicenses(c);
-            mgr.MonitorHeartbeat(c);
-
-            // Ensure our cache is appropriately invalidated
-            cache = null;
-            mgr.AddLicenseChangeHandler(this, (me, manager) => me.cache = null);
-
-            // And repopulated, so that errors show up.
-            if (Result == null) throw new ApplicationException("Failed to populate license result");
-
-            c.Plugins.add_plugin(this);
-
-            // And don't forget a cache-breaker
-            c.Pipeline.PostRewrite += Pipeline_PostRewrite;
-
-            return this;
-        }
-
-        private void Pipeline_PostRewrite(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e)
-        {
-            // Cachebreaker
-            if (e.QueryString["red_dot"] != "true" && ShouldDisplayDot(this.c, null))
-            {
-                e.QueryString["red_dot"] = "true";
-            }
-        }
-        public bool Uninstall(Configuration.Config c)
-        {
-            c.Plugins.remove_plugin(this);
-            c.Pipeline.PostRewrite -= Pipeline_PostRewrite;
-            return true;
-        }
-
-        public string ProvideDiagnostics()
-        {
-            return Result.ProvideDiagnostics();
-        }
-        public string ProvidePublicText()
-        {
-            return Result.ProvidePublicDiagnostics();
-        }
-
-        public IEnumerable<IIssue> GetIssues()
-        {
-            var cache = Result;
-            return cache == null ? mgr.GetIssues() : mgr.GetIssues().Concat(cache.GetIssues());
-        }
-    }
-
-    class DomainLookup
-    {
-        // For runtime use
-        ConcurrentDictionary<string, string> lookupTable;
-        long lookupTableSize = 0;
-        const long lookupTableLimit = 8000;
-        List<KeyValuePair<string, string>> suffixSearchList;
-        public int KnownDomainCount { get { return suffixSearchList.Count; } }
-
-        // For diagnostic use
-        Dictionary<string, string> customMappings;
-        Dictionary<string, IEnumerable<ILicenseChain>> chainsByDomain;
-        public long LookupTableSize { get { return lookupTableSize; } }
-
-        public DomainLookup(Config c, IIssueReceiver sink, IEnumerable<ILicenseChain> licenseChains)
-        {
-            // What domains are mentioned in which licenses?
-            chainsByDomain = GetChainsByDomain(licenseChains);
-
-            var knownDomains = chainsByDomain.Keys;
-
-            // What custom mappings has the user set up?
-            customMappings = GetDomainMappings(c, sink, knownDomains);
-
-            // Start with identity mappings and the mappings for the normalized domains.
-            lookupTable = new ConcurrentDictionary<string, string>(
-                customMappings.Concat(
-                    knownDomains.Select(v => new KeyValuePair<string, string>(v, v)))
-                    , StringComparer.Ordinal);
-
-            lookupTableSize = lookupTable.Count;
-
-            // Set up a list for suffix searching
-            suffixSearchList = knownDomains.Select(known =>
-            {
-                var d = known.TrimStart('.');
-                d = d.StartsWith("www.") ? d.Substring(4) : d;
-                return new KeyValuePair<string, string>("." + d, known);
-            }).ToList();
-        }
-
-        Dictionary<string, IEnumerable<ILicenseChain>> GetChainsByDomain(IEnumerable<ILicenseChain> chains)
-        {
-            return chains.SelectMany(chain =>
-                    chain.Licenses().SelectMany(b => b.Fields().GetAllDomains())
-                    .Select(domain => new KeyValuePair<string, ILicenseChain>(domain, chain)))
-                    .GroupBy(pair => pair.Key, pair => pair.Value, (k, v) => new KeyValuePair<string, IEnumerable<ILicenseChain>>(k, v))
-                    .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal);
-
-        }
-
-
-        Dictionary<string, string> GetDomainMappings(Config c, IIssueReceiver sink, IEnumerable<string> knownDomains) //c.configurationSectionIssue
-        {
-            Dictionary<string, string> mappings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            var n = c.getNode("licenses");
-            if (n == null) return mappings;
-            foreach (var map in n.childrenByName("maphost"))
-            {
-                var from = map.Attrs["from"]?.Trim().ToLowerInvariant();
-                var to = map.Attrs["to"]?.Trim().ToLowerInvariant();
-                if (string.IsNullOrEmpty(from) || string.IsNullOrEmpty(to))
-                {
-                    sink.AcceptIssue(new Issue("Both from= and to= attributes are required on maphost: " + map.ToString(), IssueSeverity.ConfigurationError));
-                }
-                else if (from.Replace(".local", "").IndexOf('.') > -1)
-                {
-                    sink.AcceptIssue(new Issue("You can only map non-public hostnames to arbitrary licenses. Skipping " + from, IssueSeverity.ConfigurationError));
-                }
-                else if (!knownDomains.Contains(to))
-                {
-                    sink.AcceptIssue(new Issue(string.Format("You have mapped {0} to {1}. {1} is not one of the known domains: {2}",
-                        from, to, string.Join(" ", knownDomains.OrderBy(s => s))), IssueSeverity.ConfigurationError));
-
-                }
-                else
-                {
-                    mappings[from] = to;
-                }
-            }
-            return mappings;
-        }
-
-        public string ExplainDomainMappings()
-        {
-            return (customMappings.Count > 0) ?
-                "For domain licensing, you have mapped the following local (non-public) domains or addresses as follows:\n" +
-                    string.Join(", ", customMappings.Select(pair => string.Format("{0} => {1}", pair.Key, pair.Value))) + "\n"
-                    : "";
-        }
-
-        public string ExplainNormalizations()
-        {
-            //Where(pair => pair.Value != null && pair.Key != pair.Value)
-            return (LookupTableSize > 0) ?
-                "The domain lookup table has {0} elements. Displaying subset:\n" +
-                    string.Join(", ", lookupTable.OrderByDescending(p => p.Value).Take(200)
-                                .Select(pair => string.Format("{0} => {1}", pair.Key, pair.Value))) + "\n" : "";
-        }
-
-        public IEnumerable<string> KnownDomains { get { return chainsByDomain.Keys; } }
-
-        public IEnumerable<ILicenseChain> GetChainsForDomain(string domain)
-        {
-            IEnumerable<ILicenseChain> result;
-            return chainsByDomain.TryGetValue(domain, out result) ? result : Enumerable.Empty<ILicenseChain>();
-        }
-
-        /// <summary>
-        /// Returns null if there is no match or higher-level known domain. 
-        /// </summary>
-        /// <param name="similarDomain"></param>
-        /// <returns></returns>
-        public string FindKnownDomain(string similarDomain)
-        {
-            // Bound ConcurrentDictionary growth; fail instead
-            if (lookupTableSize > lookupTableLimit)
-            {
-                string result;
-                return lookupTable.TryGetValue(TrimLowerInvariant(similarDomain), out result) ? result : null;
-            }
-            else
-            {
-                return lookupTable.GetOrAdd(TrimLowerInvariant(similarDomain),
-                                query =>
-                                {
-                                    Interlocked.Increment(ref lookupTableSize);
-                                    return suffixSearchList.FirstOrDefault(
-                                        pair => query.EndsWith(pair.Key, StringComparison.Ordinal)).Value;
-                                });
-            }
-        }
-
-        /// <summary>
-        /// Only cleans up string if require; otherwise an identity function
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public string TrimLowerInvariant(string s)
-        {
-            // Cleanup only if required
-            return (s.Any(c => char.IsUpper(c) || char.IsWhiteSpace(c))) ? s.Trim().ToLowerInvariant() : s;
-        }
-    }
 }

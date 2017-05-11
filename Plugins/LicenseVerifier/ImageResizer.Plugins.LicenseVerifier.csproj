@@ -47,9 +47,15 @@
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="LicenseChain.cs" />
+    <Compile Include="Computation.cs" />
+    <Compile Include="DomainLookup.cs" />
+    <Compile Include="LicensingSupport.cs" />
+    <Compile Include="LicenseEnforcerPlugin.cs" />
+    <Compile Include="LicenseFetcher.cs" />
     <Compile Include="LicenseManager.cs" />
-    <Compile Include="LicenseVerifier.cs" />
-    <Compile Include="LicenseService.cs" />
+    <Compile Include="LicenseParsing.cs" />
+    <Compile Include="LicensingOn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -57,9 +63,6 @@
       <Project>{fa5ef673-a6a4-498d-aa24-c025cc5267af}</Project>
       <Name>ImageResizer</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scraps.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -87,15 +87,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\Plugins\LicenseVerifier\LicenseManager.cs">
-      <Link>LicenseManager.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Plugins\LicenseVerifier\LicenseService.cs">
-      <Link>LicenseService.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Plugins\LicenseVerifier\LicenseVerifier.cs">
-      <Link>LicenseVerifier.cs</Link>
-    </Compile>
     <Compile Include="DataStructureTests.cs" />
     <Compile Include="LicenseManagerTests.cs" />
     <Compile Include="LicenseVerifierTests.cs" />
@@ -106,6 +97,10 @@
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{fa5ef673-a6a4-498d-aa24-c025cc5267af}</Project>
       <Name>ImageResizer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\LicenseVerifier\ImageResizer.Plugins.LicenseVerifier.csproj">
+      <Project>{8e9ff7e1-d94b-4f94-86df-71f16c58615f}</Project>
+      <Name>ImageResizer.Plugins.LicenseVerifier</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +118,14 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\Packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\Packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

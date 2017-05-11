@@ -97,7 +97,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
                 Assert.NotNull(mgr.GetAllLicenses().First().FetchedLicense());
 
-                var result = new LicenseComputation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+                var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
 
                 Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
                 Assert.Equal(0, mgr.WaitForTasks());
@@ -134,7 +134,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
             Assert.NotNull(mgr.GetAllLicenses().First());
 
-            var result = new LicenseComputation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+            var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
 
             Assert.True(result.LicensedForRequestUrl(new Uri("http://acme.com")));
             Assert.True(result.LicensedForRequestUrl(new Uri("http://subdomain.acme.com")));
@@ -164,14 +164,14 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             Assert.Empty(mgr.GetIssues());
             Assert.Null(mgr.GetAllLicenses().FirstOrDefault());
 
-            var result = new LicenseComputation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+            var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
 
             Assert.False(result.LicensedForRequestUrl(new Uri("http://acme.com")));
             conf.Plugins.AddLicense(LicenseStrings.Offlinev4DomainAcmeComCreative);
 
             Assert.NotNull(mgr.GetAllLicenses().First());
 
-            result = new LicenseComputation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+            result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
             Assert.True(result.LicensedForRequestUrl(new Uri("http://acme.com")));
 
             Assert.Empty(mgr.GetIssues());
@@ -205,7 +205,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
                 mgr.WaitForTasks();
 
-                var result = new LicenseComputation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+                var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
                 Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
 
                 Assert.Empty(mgr.GetIssues());
@@ -230,7 +230,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                     mgr.Heartbeat();
                     mgr.WaitForTasks();
 
-                    var result = new LicenseComputation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+                    var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
                     Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
 
 
@@ -301,7 +301,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             //    Mock.Verify(httpHandler);
 
             //    var sink = new IssueSink("LicenseManagerTest");
-            //    var result = new LicenseComputation(conf, PublicKeys.Test, sink, mgr);
+            //    var result = new Computation(conf, PublicKeys.Test, sink, mgr);
 
 
             //    //Assert.NotNull(mgr.GetAllLicenses().First().GetFreshRemoteLicense());

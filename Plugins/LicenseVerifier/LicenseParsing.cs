@@ -10,7 +10,7 @@ using ImageResizer.Plugins.Licensing;
 
 namespace ImageResizer.Plugins.LicenseVerifier
 {
-    internal class LicenseBlob : ILicenseBlob
+    class LicenseBlob : ILicenseBlob
     {
         private byte[] InfoUTF8 { get; set; }
         private string Info { get; set; }
@@ -56,7 +56,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         }
     }
 
-    internal class LicenseDetails : ILicenseDetails
+    class LicenseDetails : ILicenseDetails
     {
         public string Id { get; private set; }
         public DateTimeOffset? Issued { get; private set; }
