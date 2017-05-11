@@ -242,22 +242,26 @@ namespace ImageResizer.Plugins.LicenseVerifier
             {
                 return true;
             }
-            else if (domainLookup.KnownDomainCount > 0)
+            else
             {
-                var host = url.DnsSafeHost;
-                var knownDomain = domainLookup.FindKnownDomain(host);
-                if (knownDomain != null)
+                var host = url?.DnsSafeHost;
+                if (domainLookup.KnownDomainCount > 0 && host != null)
                 {
-                    return knownDomainStatus[knownDomain];
+                    var knownDomain = domainLookup.FindKnownDomain(host);
+                    if (knownDomain != null)
+                    {
+                        return knownDomainStatus[knownDomain];
+                    }
+                    else
+                    {
+                        unknownDomains.TryAdd(domainLookup.TrimLowerInvariant(host), false);
+                        return false;
+                    }
                 }
                 else
                 {
-                    return unknownDomains.TryAdd(domainLookup.TrimLowerInvariant(host), false);
+                    return false;
                 }
-            }
-            else
-            {
-                return false;
             }
         }
 
