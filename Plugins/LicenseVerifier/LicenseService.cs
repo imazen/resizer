@@ -225,23 +225,34 @@ namespace ImageResizer.Plugins.LicenseVerifier
         }
         public bool LicensedForRequestUrl(Uri url)
         {
-            if (EverythingDenied) {
+            if (EverythingDenied)
+            {
                 return false;
-            } else if (AllDomainsLicensed) {
+            }
+            else if (AllDomainsLicensed)
+            {
                 return true;
-            } else if (domainLookup.KnownDomainCount > 0) {
-                var host = url.DnsSafeHost;
-                var knownDomain = domainLookup.FindKnownDomain(host);
-                if (knownDomain != null)
+            }
+            else
+            {
+                var host = url?.DnsSafeHost;
+                if (domainLookup.KnownDomainCount > 0 && host != null)
                 {
-                    return knownDomainStatus[knownDomain];
+                    var knownDomain = domainLookup.FindKnownDomain(host);
+                    if (knownDomain != null)
+                    {
+                        return knownDomainStatus[knownDomain];
+                    }
+                    else
+                    {
+                        unknownDomains.TryAdd(domainLookup.TrimLowerInvariant(host), false);
+                        return false;
+                    }
                 }
                 else
                 {
-                    return unknownDomains.TryAdd(domainLookup.TrimLowerInvariant(host), false);
+                    return false;
                 }
-            } else {
-                return false;
             }
         }
 

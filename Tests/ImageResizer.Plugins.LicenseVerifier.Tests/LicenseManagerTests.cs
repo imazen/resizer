@@ -128,8 +128,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
             conf.Plugins.LicenseScope = LicenseAccess.Local;
             conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R4Creative"));
-            //conf.Plugins.AddLicense(LicenseStrings.Offlinev4DomainAcmeComCreative);
-
+          
             Assert.Equal(0, mgr.WaitForTasks());
             Assert.Empty(mgr.GetIssues());
 
@@ -138,7 +137,9 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             var result = new LicenseComputation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
 
             Assert.True(result.LicensedForRequestUrl(new Uri("http://acme.com")));
+            Assert.True(result.LicensedForRequestUrl(new Uri("http://subdomain.acme.com")));
             Assert.True(result.LicensedForRequestUrl(new Uri("http://localhost")));
+            Assert.False(result.LicensedForRequestUrl(new Uri("http://other.com")));
             Assert.Equal(0, mgr.WaitForTasks());
             Assert.Empty(mgr.GetIssues());
             Assert.NotNull(conf.GetDiagnosticsPage());
