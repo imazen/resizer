@@ -84,7 +84,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 var license = parent.TryDeserialize(body, "remote server", false);
                 if (license != null)
                 {
-                    var newId = license.Fields().Id;
+                    var newId = license.Fields.Id;
                     if (newId == this.Id)
                     {
                         remoteLicense = license;
@@ -170,7 +170,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         {
             if (blob == null) return false;
             var oldStack = licenseServerStack ?? Enumerable.Empty<string>();
-            var newList = blob.Fields().GetValidLicenseServers().ToArray();
+            var newList = blob.Fields.GetValidLicenseServers().ToArray();
             var newStack = newList.Concat(oldStack.Except(newList)).Take(10).ToArray();
             return !newStack.SequenceEqual(oldStack);
         }
@@ -182,12 +182,12 @@ namespace ImageResizer.Plugins.LicenseVerifier
         public void Add(LicenseBlob b)
         {
             // Prevent duplicate signatures
-            if (dict.TryAdd(BitConverter.ToString(b.Signature()), b))
+            if (dict.TryAdd(BitConverter.ToString(b.Signature), b))
             {
                 //New/unique - ensure fetcher is created
-                if (b.Fields().IsRemotePlaceholder())
+                if (b.Fields.IsRemotePlaceholder())
                 {
-                    this.Secret = b.Fields().GetSecret();
+                    this.Secret = b.Fields.GetSecret();
                     this.IsRemote = true;
 
                     TryUpdateLicenseServers(b);
@@ -292,7 +292,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         public string ToPublicString()
         {
-            if (Licenses().All(b => !b.Fields().IsPublic()))
+            if (Licenses().All(b => !b.Fields.IsPublic()))
             {
                 return "(license hidden)\n"; // None of these are public
             }
@@ -301,7 +301,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
             return RedactSecret(string.Format("License {0}{1}\n{2}\n", this.Id,
                 this.IsRemote ? " (remote)" : "",
-                string.Join("\n\n", Licenses().Where(b => b.Fields().IsPublic()).Select(b => freshness(b) + b.ToRedactedString()))));
+                string.Join("\n\n", Licenses().Where(b => b.Fields.IsPublic()).Select(b => freshness(b) + b.ToRedactedString()))));
         }
 
         internal void Heartbeat()

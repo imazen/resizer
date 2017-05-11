@@ -54,7 +54,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         Dictionary<string, IEnumerable<ILicenseChain>> GetChainsByDomain(IEnumerable<ILicenseChain> chains)
         {
             return chains.SelectMany(chain =>
-                    chain.Licenses().SelectMany(b => b.Fields().GetAllDomains())
+                    chain.Licenses().SelectMany(b => b.Fields.GetAllDomains())
                     .Select(domain => new KeyValuePair<string, ILicenseChain>(domain, chain)))
                     .GroupBy(pair => pair.Key, pair => pair.Value, (k, v) => new KeyValuePair<string, IEnumerable<ILicenseChain>>(k, v))
                     .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal);

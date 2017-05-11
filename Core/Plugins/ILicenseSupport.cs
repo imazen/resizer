@@ -126,16 +126,17 @@ namespace ImageResizer.Plugins.Licensing
     /// </summary>
     public interface ILicenseBlob
     {
-        byte[] Signature();
-        byte[] Data();
+        byte[] Signature { get; }
+        byte[] Data { get; }
         string Original { get; }
-        ILicenseDetails Fields();
+        ILicenseDetails Fields { get; }
     }
 
     public interface ILicenseDetails
     {
         string Id { get; }
-        IReadOnlyDictionary<string, string> Pairs();
+        IReadOnlyDictionary<string, string> Pairs { get; }
+
         string Get(string key);
         DateTimeOffset? Issued { get; }
         DateTimeOffset? Expires { get; }

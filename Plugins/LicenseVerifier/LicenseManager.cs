@@ -158,7 +158,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             var blob = TryDeserialize(license, "configuration", true);
             if (blob == null) return null;
 
-            var chain = chains.GetOrAdd(blob.Fields().Id, (k) => new LicenseChain(this, k));
+            var chain = chains.GetOrAdd(blob.Fields.Id, (k) => new LicenseChain(this, k));
             chain.Add(blob);
 
             FireLicenseChange(); //Can only be triggered for new aliases anyway; we don't really need to debounce on signature
@@ -237,10 +237,10 @@ namespace ImageResizer.Plugins.LicenseVerifier
             }
             if (!blob.VerifySignature(this.TrustedKeys, null))
             {
-                sink.AcceptIssue(new Issue("License " + blob.Fields().Id + " (from " + licenseSource + ") has been corrupted or has not been signed with a matching private key.", IssueSeverity.Error));
+                sink.AcceptIssue(new Issue("License " + blob.Fields.Id + " (from " + licenseSource + ") has been corrupted or has not been signed with a matching private key.", IssueSeverity.Error));
                 return null;
             }
-            if (locallySourced && blob.Fields().MustBeFetched())
+            if (locallySourced && blob.Fields.MustBeFetched())
             {
                 sink.AcceptIssue(new Issue("This license cannot be installed directly; it must be fetched from a license server", 
                     WebConfigLicenseReader.TryRedact(license), IssueSeverity.Error));

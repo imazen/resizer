@@ -1,81 +1,67 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Numerics;
 using ImageResizer.Plugins.Licensing;
+using static System.String;
 
 namespace ImageResizer.Plugins.LicenseVerifier
 {
     class LicenseBlob : ILicenseBlob
     {
-        private byte[] InfoUTF8 { get; set; }
-        private string Info { get; set; }
-        private LicenseDetails Details { get; set; }
-        private byte[] signature;
-        private IEnumerable<string> Comments { get; set; }
+        public string Original { get; private set; }
+        public byte[] Signature { get; private set; }
+        public byte[] Data { get; private set; }
+        public ILicenseDetails Fields { get; private set; }
 
         public static LicenseBlob Deserialize(string license)
         {
             var parts = license.Split(':').Select(s => s.Trim()).ToList();
-            if (parts.Count < 2) throw new ArgumentException("Not enough ':' delimited segments in license key; failed to deserialize: \"" + license + "\"", "license");
+            if (parts.Count < 2)
+                throw new ArgumentException(
+                    "Not enough ':' delimited segments in license key; failed to deserialize: \"" + license + "\"",
+                    nameof(license));
 
-            var b = new LicenseBlob();
-            b.Original = license;
-            b.signature = Convert.FromBase64String(parts[parts.Count - 1]);
-            b.InfoUTF8 = Convert.FromBase64String(parts[parts.Count - 2]);
-            b.Info = System.Text.Encoding.UTF8.GetString(b.InfoUTF8);
-            b.Comments = parts.Take(parts.Count - 2);
-            b.Details = new LicenseDetails(b.Info);
+            var dataBytes = Convert.FromBase64String(parts[parts.Count - 2]);
+            var b = new LicenseBlob
+            {
+                Original = license,
+                Signature = Convert.FromBase64String(parts[parts.Count - 1]),
+                Data = dataBytes,
+                Fields = new LicenseDetails(System.Text.Encoding.UTF8.GetString(dataBytes))
+            };
+            // b.Info = System.Text.Encoding.UTF8.GetString(b.Data);
+            // b.Comments = parts.Take(parts.Count - 2);
             return b;
         }
-
-        public string Original { get; private set; }
 
         public override string ToString()
         {
             return Original;
         }
-
-        public byte[] Signature()
-        {
-            return signature;
-        }
-
-        public byte[] Data()
-        {
-            return InfoUTF8;
-        }
-
-        public ILicenseDetails Fields()
-        {
-            return Details;
-        }
     }
 
     class LicenseDetails : ILicenseDetails
     {
-        public string Id { get; private set; }
-        public DateTimeOffset? Issued { get; private set; }
-        public DateTimeOffset? Expires { get; private set; }
-        public DateTimeOffset? SubscriptionExpirationDate { get; private set; }
-        public IReadOnlyDictionary<string, string> Pairs()
-        {
-            return pairs;
-        }
-        private Dictionary<string, string> pairs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public string Id { get; }
+        public DateTimeOffset? Issued { get; }
+        public DateTimeOffset? Expires { get; }
+        public DateTimeOffset? SubscriptionExpirationDate { get; }
+        public IReadOnlyDictionary<string, string> Pairs { get; }
 
         public LicenseDetails(string plaintext)
         {
-            foreach (string line in plaintext.Split('\n'))
+            var pairs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var line in plaintext.Split('\n'))
             {
                 int colon = line.IndexOf(':');
                 if (colon < 1) continue; //Skip lines without a colon
-                string key = line.Substring(0, colon).Trim();
-                string value = line.Substring(colon + 1).Trim();
+                var key = line.Substring(0, colon).Trim();
+                var value = line.Substring(colon + 1).Trim();
 
                 if (string.Equals(key, "issued", StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -91,13 +77,15 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 }
                 pairs.Add(key, value);
             }
+            Pairs = pairs;
+
 
             Id = (Get("Id") ?? Get("Domain"))?.Trim().ToLowerInvariant();
-            if (string.IsNullOrEmpty(Id))
+            if (IsNullOrEmpty(Id))
             {
-                throw new ArgumentException("No Id or Domain field found! At least one is required");
+                throw new ArgumentException("No 'Id' or 'Domain' fields found! At least one of the two is required");
             }
-            if (string.IsNullOrEmpty(Get("Secret")) && this.IsRemotePlaceholder())
+            if (IsNullOrEmpty(this.GetSecret()) && this.IsRemotePlaceholder())
             {
                 throw new ArgumentException("Licenses of 'Kind: id' must contain 'Secret: somesecretkey'");
             }
@@ -106,7 +94,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         public override string ToString()
         {
             var sb = new StringBuilder();
-            foreach (var pair in pairs)
+            foreach (var pair in Pairs)
             {
                 sb.AppendFormat("{0}: {1}\n", pair.Key, pair.Value);
             }
@@ -116,7 +104,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         public string Get(string key)
         {
             string s;
-            return pairs.TryGetValue(key, out s) ? s : null;
+            return Pairs.TryGetValue(key, out s) ? s : null;
         }
     }
     static class StringIntParseExtensions
@@ -124,51 +112,39 @@ namespace ImageResizer.Plugins.LicenseVerifier
         public static int? TryParseInt(this string s)
         {
             int temp;
-            return string.IsNullOrWhiteSpace(s) ? null : (int.TryParse(s, out temp) ? (int?)temp : null);
+            return IsNullOrWhiteSpace(s) ? null : (int.TryParse(s, out temp) ? (int?)temp : null);
         }
     }
 
 
-    static class ILicenseDetailsExtensions
+    static class LicenseDetailsExtensions
     {
-        public static bool IsRemotePlaceholder(this ILicenseDetails details) {
-            return "id".Equals(details.Get("Kind"), StringComparison.OrdinalIgnoreCase);
-        }
+        public static bool IsRemotePlaceholder(this ILicenseDetails details) 
+            => "id".Equals(details?.Get("Kind"), StringComparison.OrdinalIgnoreCase);
 
-        public static bool IsRevoked(this ILicenseDetails details)
-        {
-            return "false".Equals(details.Get("Valid"), StringComparison.OrdinalIgnoreCase);
-        }
+        public static bool IsRevoked(this ILicenseDetails details) 
+            => "false".Equals(details?.Get("Valid"), StringComparison.OrdinalIgnoreCase);
 
         public static bool IsPublic(this ILicenseDetails details)
-        {
-            return "true".Equals(details.Get("IsPublic"), StringComparison.OrdinalIgnoreCase);
-        }
+            => "true".Equals(details?.Get("IsPublic"), StringComparison.OrdinalIgnoreCase);
 
+        public static bool MustBeFetched(this ILicenseDetails details) 
+            => "true".Equals(details?.Get("MustBeFetched"), StringComparison.OrdinalIgnoreCase);
 
-        public static bool MustBeFetched(this ILicenseDetails details)
-        {
-            return "true".Equals(details.Get("MustBeFetched"), StringComparison.OrdinalIgnoreCase);
-        }
-        public static int? NetworkGraceMinutes(this ILicenseDetails details)
-        {
-            return details.Get("NetworkGraceMinutes").TryParseInt();
-        }
+        public static int? NetworkGraceMinutes(this ILicenseDetails details) 
+            => details?.Get("NetworkGraceMinutes").TryParseInt();
 
-        public static string GetSecret(this ILicenseDetails details)
-        {
-            return details.Get("Secret");
-        }
+        public static string GetSecret(this ILicenseDetails details) 
+            => details?.Get("Secret");
 
         /// <summary>
         /// Enumerates the feature code list. No case changes are performed
         /// </summary>
-        /// <param name="b"></param>
+        /// <param name="details"></param>
         /// <returns></returns>
         public static IEnumerable<string> GetFeatures(this ILicenseDetails details)
-        {
-            return details.Get("Features")?.Split(new char[] { ' ', '\t', ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList() ?? Enumerable.Empty<string>();
-        }
+            => details?.Get("Features")?.Split(new[] {' ', '\t', ','}, StringSplitOptions.RemoveEmptyEntries)
+                  .Select(s => s.Trim()).ToList() ?? Enumerable.Empty<string>();
 
         /// <summary>
         /// Enumerates any/all values from "Domain" and "Domains" field, trimming and lowercasing all values. 
@@ -184,7 +160,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             var list = new List<string>(1);
             if (domains != null) list.AddRange(domains);
             if (domain != null) list.Add(domain);
-            return list.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim().ToLowerInvariant());
+            return list.Where(s => !IsNullOrWhiteSpace(s)).Select(s => s.Trim().ToLowerInvariant());
         }
 
         /// <summary>
@@ -208,32 +184,32 @@ namespace ImageResizer.Plugins.LicenseVerifier
         {
             return me != null && other != null && me.Id == other.Id && me.Issued == other.Issued && me.Expires == other.Expires
                 && me.SubscriptionExpirationDate == other.SubscriptionExpirationDate &&
-                    me.Pairs().All(pair => other.Get(pair.Key) == pair.Value);
+                    me.Pairs.All(pair => other.Get(pair.Key) == pair.Value);
         }
     }
 
-    static class ILicenseBlobExtensions
+    static class LicenseBlobExtensions
     {
         public static bool Revalidate(this ILicenseBlob b, IEnumerable<RSADecryptPublic> trustedKeys)
         {
             var ourCopy = LicenseBlob.Deserialize(b.Original);
-            return ourCopy.VerifySignature(trustedKeys, null) && ourCopy.Fields().DataMatches(b.Fields());
+            return ourCopy.VerifySignature(trustedKeys, null) && ourCopy.Fields.DataMatches(b.Fields);
         }
 
         public static bool VerifySignature(this ILicenseBlob b, IEnumerable<RSADecryptPublic> trustedKeys, StringBuilder log)
         {
             return trustedKeys.Any(p =>
             {
-                var signature = b.Signature();
-                var hash = new SHA512Managed().ComputeHash(b.Data());
-                var decrypted_bytes = p.DecryptPublic(signature);
-                var valid = hash.SequenceEqual(decrypted_bytes);
+                var signature = b.Signature;
+                var hash = new SHA512Managed().ComputeHash(b.Data);
+                var decryptedBytes = p.DecryptPublic(signature);
+                var valid = hash.SequenceEqual(decryptedBytes);
 
                 if (log != null)
                 {
                     log.AppendLine("Using public exponent " + p.Exponent.ToString() + " and modulus " + p.Modulus.ToString());
                     log.AppendLine("Encrypted bytes: " + BitConverter.ToString(signature).ToLower().Replace("-", ""));
-                    log.AppendLine("Decrypted sha512: " + BitConverter.ToString(decrypted_bytes).ToLower().Replace("-", ""));
+                    log.AppendLine("Decrypted sha512: " + BitConverter.ToString(decryptedBytes).ToLower().Replace("-", ""));
                     log.AppendLine("Expected sha512: " + BitConverter.ToString(hash).ToLower().Replace("-", ""));
                     log.AppendLine(valid ? "Success!" : "Not a match.");
                 }
@@ -247,10 +223,12 @@ namespace ImageResizer.Plugins.LicenseVerifier
         /// <returns></returns>
         public static string ToRedactedString(this ILicenseBlob b)
         {
-            return string.Join("\n", b.Fields().Pairs().Select(pair => "secret".Equals(pair.Key, StringComparison.OrdinalIgnoreCase) ? string.Format("{0}: ****redacted****", pair.Key) : string.Format("{0}: {1}", pair.Key, pair.Value)));
+            return Join("\n", b.Fields.Pairs.Select(pair => "secret".Equals(pair.Key, StringComparison.OrdinalIgnoreCase) ? $"{pair.Key}: ****redacted****"
+                : $"{pair.Key}: {pair.Value}"));
         }
     }
 
+    // ReSharper disable once InconsistentNaming
     class RSADecryptPublic
     {
         public RSADecryptPublic(BigInteger modulus, BigInteger exponent)
@@ -259,23 +237,23 @@ namespace ImageResizer.Plugins.LicenseVerifier
             Exponent = exponent;
             BlockSize = Modulus.ToByteArray().Length;
         }
-        public BigInteger Modulus { get; private set; }
-        public BigInteger Exponent { get; private set; }
-        public int BlockSize { get; private set; }
-        public byte[] DecryptPublic(byte[] input_bytes)
+        public BigInteger Modulus { get; }
+        public BigInteger Exponent { get; }
+        public int BlockSize { get; }
+        public byte[] DecryptPublic(byte[] inputBytes)
         {
-            if (input_bytes.Length > BlockSize)
+            if (inputBytes.Length > BlockSize)
             {
-                throw new ArgumentOutOfRangeException("input", "input too large for RSA cipher block size.");
+                throw new ArgumentOutOfRangeException(nameof(inputBytes), "input too long for RSA cipher block size.");
             }
-            var input = new BigInteger(input_bytes.Reverse().Concat(Enumerable.Repeat<byte>(0, 1)).ToArray()); //Add a zero to prevent interpretation as twos-complement
+            var input = new BigInteger(inputBytes.Reverse().Concat(Enumerable.Repeat<byte>(0, 1)).ToArray()); //Add a zero to prevent interpretation as twos-complement
 
             if (input.CompareTo(Modulus) >= 0)
             {
-                throw new ArgumentOutOfRangeException("input", "input too large for RSA modulus.");
+                throw new ArgumentOutOfRangeException(nameof(inputBytes), "input too large for RSA modulus.");
             }
-            int signature_padding = 0; //1
-            return BigInteger.ModPow(input, Exponent, Modulus).ToByteArray().Skip(signature_padding).Reverse().SkipWhile(v => v != 0).Skip(1 + signature_padding).ToArray();
+            const int signaturePadding = 0; //1
+            return BigInteger.ModPow(input, Exponent, Modulus).ToByteArray().Skip(signaturePadding).Reverse().SkipWhile(v => v != 0).Skip(1 + signaturePadding).ToArray();
         }
     }
 
@@ -307,16 +285,16 @@ namespace ImageResizer.Plugins.LicenseVerifier
             log?.AppendLine("Generic license decryption self-test");
             var exp = BigInteger.Parse("65537");
             var mod = BigInteger.Parse("28178177427582259905122756905913963624440517746414712044433894631438407111916149031583287058323879921298234454158166031934230083094710974550125942791690254427377300877691173542319534371793100994953897137837772694304619234054383162641475011138179669415510521009673718000682851222831185756777382795378538121010194881849505437499638792289283538921706236004391184253166867653735050981736002298838523242717690667046044130539971131293603078008447972889271580670305162199959939004819206804246872436611558871928921860176200657026263241409488257640191893499783065332541392967986495144643652353104461436623253327708136399114561");
-            var license_str = "localhost:RG9tYWluOiBsb2NhbGhvc3QKT3duZXI6IEV2ZXJ5b25lCklzc3VlZDogMjAxNS0wMy0yOFQwOTozNjo1OVoKRmVhdHVyZXM6IFI0RWxpdGUgUjRDcmVhdGl2ZSBSNFBlcmZvcm1hbmNlCg==:h6D+kIXbF3qmvmW2gDpb+b4gdxBjnrkZLvSzXmEnqKAywNJNpTdFekpTOB4SwU14WbTeVyWwvFngHax7WuHBV+0WkQ5lDqKFaRW32vj8CJQeG8Wvnyj9PaNGaS/FpKhNjZbDEmh3qqirBp2NR0bpN4QbhP9NMy7+rOMo0nynAruwWvJKCnuf7mWWdb9a5uTZO9OUcSeS/tY8QaNeIhaCnhPe0Yx9qvOXe5nMnl10CR9ur+EtS54d1qzBGHqN/3oFhiB+xlqNELwz23qR4c8HxbTEyNarkG4CZx8CbbgJfHmPxAYGJTTBTPJ+cdah8MJR16Ta36cRZ2Buy8XYo/nf1g==";
-            return Validate(license_str, mod, exp, log);
+            const string licenseStr = "localhost:RG9tYWluOiBsb2NhbGhvc3QKT3duZXI6IEV2ZXJ5b25lCklzc3VlZDogMjAxNS0wMy0yOFQwOTozNjo1OVoKRmVhdHVyZXM6IFI0RWxpdGUgUjRDcmVhdGl2ZSBSNFBlcmZvcm1hbmNlCg==:h6D+kIXbF3qmvmW2gDpb+b4gdxBjnrkZLvSzXmEnqKAywNJNpTdFekpTOB4SwU14WbTeVyWwvFngHax7WuHBV+0WkQ5lDqKFaRW32vj8CJQeG8Wvnyj9PaNGaS/FpKhNjZbDEmh3qqirBp2NR0bpN4QbhP9NMy7+rOMo0nynAruwWvJKCnuf7mWWdb9a5uTZO9OUcSeS/tY8QaNeIhaCnhPe0Yx9qvOXe5nMnl10CR9ur+EtS54d1qzBGHqN/3oFhiB+xlqNELwz23qR4c8HxbTEyNarkG4CZx8CbbgJfHmPxAYGJTTBTPJ+cdah8MJR16Ta36cRZ2Buy8XYo/nf1g==";
+            return Validate(licenseStr, mod, exp, log);
         }
 
-        static bool Validate(string license_str, BigInteger mod, BigInteger exp, StringBuilder log)
+        static bool Validate(string licenseStr, BigInteger mod, BigInteger exp, StringBuilder log)
         {
-            var blob = LicenseBlob.Deserialize(license_str);
+            var blob = LicenseBlob.Deserialize(licenseStr);
             log?.AppendLine("---------------------------------------------");
-            log?.AppendLine("Parsed info: " + blob.Fields().ToString());
-            log?.AppendLine("Plaintext hash: " + BitConverter.ToString(new SHA512Managed().ComputeHash(blob.Data())).ToLower().Replace("-", ""));
+            log?.AppendLine("Parsed info: " + blob.Fields.ToString());
+            log?.AppendLine("Plaintext hash: " + BitConverter.ToString(new SHA512Managed().ComputeHash(blob.Data)).ToLower().Replace("-", ""));
             return blob.VerifySignature(new[] { new RSADecryptPublic(mod, exp) }, log);
         }
 
@@ -329,30 +307,30 @@ namespace ImageResizer.Plugins.LicenseVerifier
             }
         }
 
-        static int Main(string[] args)
+        static int Main(IReadOnlyList<string> args)
         {
-            var mod = BigInteger.Parse(UTF8Encoding.UTF8.GetString(Convert.FromBase64String(args[0])));
-            var exp = BigInteger.Parse(UTF8Encoding.UTF8.GetString(Convert.FromBase64String(args[1])));
+            var mod = BigInteger.Parse(System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(args[0])));
+            var exp = BigInteger.Parse(System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(args[1])));
 
-            string license_str = ReadStdin();
-            bool debug = args.ElementAtOrDefault(2) == "-d";
-            int exit_code;
+            var licenseStr = ReadStdin();
+            var debug = args.ElementAtOrDefault(2) == "-d";
+            int exitCode;
 
             if (debug)
             {
                 var log = new StringBuilder();
-                exit_code = Test_Generic(log) ? 0 : 4;
+                exitCode = Test_Generic(log) ? 0 : 4;
 
-                if (!Validate(license_str, mod, exp, log))
+                if (!Validate(licenseStr, mod, exp, log))
                 {
-                    exit_code = 2 ^ exit_code;
+                    exitCode = 2 ^ exitCode;
                 }
-                if (exit_code != 0) Console.WriteLine(log.ToString());
+                if (exitCode != 0) Console.WriteLine(log.ToString());
             }else
             {
-                exit_code = Validate(license_str, mod, exp, null) ? 0 : 1;
+                exitCode = Validate(licenseStr, mod, exp, null) ? 0 : 1;
             }
-            return exit_code;
+            return exitCode;
         }
     }
 }

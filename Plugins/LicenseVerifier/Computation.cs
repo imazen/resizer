@@ -73,7 +73,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             // This computation (at minimum) expires when we cross an expires or issued date
             // We'll update for grace periods separately
             ComputationExpires = chains.SelectMany(chain => chain.Licenses())
-                .SelectMany(b => new[] { b.Fields().Expires, b.Fields().Issued })
+                .SelectMany(b => new[] { b.Fields.Expires, b.Fields.Issued })
                 .Where(date => date != null).OrderBy(d => d).FirstOrDefault(d => d > clock.GetUtcNow());
 
             // Set up our domain map/normalize/search manager
@@ -113,7 +113,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         bool IsLicenseValid(ILicenseBlob b)
         {
-            var details = b.Fields();
+            var details = b.Fields;
             if (IsLicenseExpired(details, clock))
             {
                 permanentIssues.AcceptIssue(new Issue("License " + details.Id + " has expired.", b.ToRedactedString(), IssueSeverity.Warning));
@@ -142,7 +142,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         bool IsPendingLicense(ILicenseChain chain)
         {
-            return chain.IsRemote && chain.Licenses().All(b => b.Fields().IsRemotePlaceholder());
+            return chain.IsRemote && chain.Licenses().All(b => b.Fields.IsRemotePlaceholder());
         }
 
         void ProcessPendingLicense(ILicenseChain chain)
@@ -154,7 +154,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             }
 
             int? graceMinutes = chain.Licenses().Where(b => IsLicenseValid(b))
-                                           .Select(b => b.Fields().NetworkGraceMinutes())
+                                           .Select(b => b.Fields.NetworkGraceMinutes())
                                            .OrderByDescending(v => v).FirstOrDefault() ?? DefaultNetworkGraceMinutes;
 
 
@@ -200,11 +200,11 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 .SelectMany(chain => chain.Licenses())
                 .Where(b => IsLicenseValid(b));
 
-            AllDomainsLicensed = AllDomainsLicensed || validLicenses.Any(b => b.Fields().GetAllDomains().Count() == 0);
+            AllDomainsLicensed = AllDomainsLicensed || validLicenses.Any(b => b.Fields.GetAllDomains().Count() == 0);
 
             knownDomainStatus = validLicenses.SelectMany(
-                b => b.Fields().GetAllDomains()
-                        .SelectMany(domain => b.Fields().GetFeatures()
+                b => b.Fields.GetAllDomains()
+                        .SelectMany(domain => b.Fields.GetFeatures()
                                 .Select(feature => new KeyValuePair<string, string>(domain, feature))))
                     .GroupBy(pair => pair.Key, pair => pair.Value, (k, v) => new KeyValuePair<string, IEnumerable<string>>(k, v))
                     .Select(pair => new KeyValuePair<string, bool>(pair.Key, requireOneFromEach.All(set => set.Intersect(pair.Value, StringComparer.OrdinalIgnoreCase).Count() > 0)))
