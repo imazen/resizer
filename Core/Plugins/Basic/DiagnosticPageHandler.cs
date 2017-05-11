@@ -131,16 +131,16 @@ namespace ImageResizer.Plugins.Basic {
                 }
             }
 
-            string edition = editionsUsedList.FirstOrDefault(s => new string[] { "R4Elite", "R4Creative", "R4Performance" }.Contains(s, StringComparer.OrdinalIgnoreCase));
+            string edition = editionsUsedList.FirstOrDefault(s => new string[] { "R_Elite",  "R4Elite", "R_Creative",  "R4Creative", "R_Performance", "R4Performance" }.Contains(s, StringComparer.OrdinalIgnoreCase));
 
             
-            if (new List<string>(editionsUsed.Values).Intersect(new string[] { "R3Elite", "R3Creative", "R3Performance" }).Count() > 0){
-                sb.AppendLine("You are mixing V3 and V4 plugins; this is a very bad idea.");
-            }
             Dictionary<string, string> friendlyNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            friendlyNames.Add("R4Elite", "V4 Elite Edition or a support contract");
-            friendlyNames.Add("R4Creative", "V4 Creative Edition");
-            friendlyNames.Add("R4Performance", "V4 Performance Edition");
+            friendlyNames.Add("R4Elite", "Elite Edition");
+            friendlyNames.Add("R4Creative", "Creative Edition");
+            friendlyNames.Add("R4Performance", "Performance Edition");
+            friendlyNames.Add("R_Elite", "Elite Edition");
+            friendlyNames.Add("R_Creative", "Creative Edition");
+            friendlyNames.Add("R_Performance", "Performance Edition");
 
             sb.AppendLine("Assembly use report: \n");
 
@@ -153,16 +153,11 @@ namespace ImageResizer.Plugins.Basic {
                 sb.AppendLine("You do not seem to be using any plugins from (commerical/AGPL) editions.");
             else {
                 sb.AppendLine("\nYou are using plugins and assemblies from the " + friendlyNames[edition] + ".");
-                //foreach (string s in editionsUsed.Keys) {
-                //    sb.Append(s + " (" + (friendlyNames.ContainsKey(editionsUsed[s]) ? friendlyNames[editionsUsed[s]] : "Unrecognized SKU")+ "), ");
-                //}
-                //sb.Remove(sb.Length - 2, 2);
-                //sb.AppendLine();
             }
 
             sb.AppendLine();
 
-            sb.AppendLine(String.Join("\n",c.Plugins.GetAll<IDiagnosticsProvider>().Select(p => p.ProvideDiagnostics()).Distinct()));
+            sb.AppendLine(string.Join("\n",c.Plugins.GetAll<IDiagnosticsProvider>().Select(p => p.ProvideDiagnostics()).Distinct()));
 
 
             sb.AppendLine("\nRegistered plugins:\n");
@@ -296,6 +291,8 @@ namespace ImageResizer.Plugins.Basic {
             sb.AppendLine("\n\nWhen fetching a remote license file, the following information is sent via the querystring.");
 
             var info = Configuration.Performance.GlobalPerf.Singleton.GetReportPairs();
+
+
             info.AddString("license_id", "[integer]");
             info.AddString("manager_id", "[guid]");
             info.AddString("total_heartbeats", "[integer]");
