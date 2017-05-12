@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using ImageResizer.Configuration;
@@ -26,33 +27,29 @@ namespace ImageResizer.Plugins.LicenseVerifier
         /// <summary>
         ///     If a placeholder license doesn't specify NetworkGraceMinutes, we use this value.
         /// </summary>
-        const int DefaultNetworkGraceMinutes = 3;
+        const int DefaultNetworkGraceMinutes = 6;
+
+        const int UnknownDomainsLimit = 200;
 
         readonly IList<ILicenseChain> chains;
         readonly ILicenseClock clock;
-
         readonly DomainLookup domainLookup;
 
-        readonly bool EverythingDenied;
         readonly ILicenseManager mgr;
         readonly IIssueReceiver permanentIssues;
 
+        // This is mutated to track unknown domains
         readonly ConcurrentDictionary<string, bool> unknownDomains = new ConcurrentDictionary<string, bool>();
 
-        bool AllDomainsLicensed;
+        bool EverythingDenied { get; }
+        bool AllDomainsLicensed { get; }
+        IDictionary<string, bool> KnownDomainStatus { get; }
+        public DateTimeOffset? ComputationExpires { get; }
 
-        Config c;
-
-        IDictionary<string, bool> knownDomainStatus;
-        IEnumerable<RSADecryptPublic> trustedKeys;
-
-        public DateTimeOffset? ComputationExpires { get; private set; }
-
-        public Computation(Config c, IEnumerable<RSADecryptPublic> trustedKeys, IIssueReceiver permanentIssueSink,
+        public Computation(Config c, IReadOnlyCollection<RSADecryptPublic> trustedKeys,
+                           IIssueReceiver permanentIssueSink,
                            ILicenseManager mgr, ILicenseClock clock) : base("Computation")
         {
-            this.c = c;
-            this.trustedKeys = trustedKeys;
             permanentIssues = permanentIssueSink;
             this.clock = clock;
             this.mgr = mgr;
@@ -69,20 +66,13 @@ namespace ImageResizer.Plugins.LicenseVerifier
             chains = c.Plugins.GetAll<ILicenseProvider>()
                       .SelectMany(p => p.GetLicenses())
                       .Select(str => mgr.GetOrAdd(str, c.Plugins.LicenseScope))
-                      .Where(x => x != null && x.Licenses().Count() > 0)
+                      .Where(x => x != null && x.Licenses().Any())
                       .Concat(c.Plugins.LicenseScope.HasFlag(LicenseAccess.ProcessReadonly)
                           ? mgr.GetSharedLicenses()
                           : Enumerable.Empty<ILicenseChain>())
                       .Distinct()
                       .ToList();
 
-            // This computation (at minimum) expires when we cross an expires or issued date
-            // We'll update for grace periods separately
-            ComputationExpires = chains.SelectMany(chain => chain.Licenses())
-                                       .SelectMany(b => new[] {b.Fields.Expires, b.Fields.Issued})
-                                       .Where(date => date != null)
-                                       .OrderBy(d => d)
-                                       .FirstOrDefault(d => d > clock.GetUtcNow());
 
             // Set up our domain map/normalize/search manager
             domainLookup = new DomainLookup(c, permanentIssueSink, chains);
@@ -95,51 +85,69 @@ namespace ImageResizer.Plugins.LicenseVerifier
                     "Licenses failed to revalidate; please contact support@imageresizing.net", IssueSeverity.Error));
             }
 
-            // Perform the final computations
-            ComputeStatus(pluginFeaturesUsed);
+            // Look for grace periods
+            var gracePeriods = chains.Where(IsPendingLicense).Select(GetGracePeriodFor).ToList();
+
+            // Look for fetched and valid licenses
+            var validLicenses = chains.Where(chain => !IsPendingLicense(chain))
+                                      .SelectMany(chain => chain.Licenses())
+                                      .Where(IsLicenseValid)
+                                      .ToList();
+
+            // This computation expires when we cross an expires, issued date, or NetworkGracePeriod expiration
+            ComputationExpires = chains.SelectMany(chain => chain.Licenses())
+                                       .SelectMany(b => new[] {b.Fields.Expires, b.Fields.Issued})
+                                       .Concat(gracePeriods)
+                                       .Where(date => date != null)
+                                       .OrderBy(d => d)
+                                       .FirstOrDefault(d => d > clock.GetUtcNow());
+
+
+            AllDomainsLicensed = gracePeriods.Any(t => t != null) ||
+                                 validLicenses.Any(b => !b.Fields.GetAllDomains().Any());
+
+            KnownDomainStatus = validLicenses.SelectMany(
+                                                 b => b.Fields.GetAllDomains()
+                                                       .SelectMany(domain => b.Fields.GetFeatures()
+                                                                              .Select(
+                                                                                  feature => new
+                                                                                      KeyValuePair<string, string>(
+                                                                                          domain, feature))))
+                                             .GroupBy(pair => pair.Key, pair => pair.Value,
+                                                 (k, v) => new KeyValuePair<string, IEnumerable<string>>(k, v))
+                                             .Select(pair => new KeyValuePair<string, bool>(pair.Key,
+                                                 pluginFeaturesUsed.All(
+                                                     set => set.Intersect(pair.Value, StringComparer.OrdinalIgnoreCase)
+                                                               .Any())))
+                                             .ToDictionary(pair => pair.Key, pair => pair.Value,
+                                                 StringComparer.Ordinal);
         }
 
         public string ProvideDiagnostics()
         {
-            var sb = new StringBuilder();
-            sb.Append("\nLicense status for active features: ");
-            if (EverythingDenied) {
-                sb.AppendLine("contact support");
-            } else if (AllDomainsLicensed) {
-                sb.AppendLine("Valid for all domains");
-            } else if (knownDomainStatus.Count > 0) {
-                sb.AppendFormat("Valid for {0} domains, invalid for {1} domains, not covered for {2} domains:\n",
-                    knownDomainStatus.Count(pair => pair.Value),
-                    knownDomainStatus.Count(pair => !pair.Value),
-                    unknownDomains.Count);
-                sb.AppendFormat("Valid: {0}\nInvalid: {1}\nNot covered: {2}\n",
-                    string.Join(", ", knownDomainStatus.Where(pair => pair.Value).Select(pair => pair.Key)),
-                    string.Join(", ", knownDomainStatus.Where(pair => !pair.Value).Select(pair => pair.Key)),
-                    string.Join(", ", unknownDomains.Select(pair => pair.Key)));
-            } else {
-                sb.AppendLine("No valid licenses");
-            }
+            var sb = GetLicenseStatus();
             sb.AppendLine();
             sb.Append(domainLookup.ExplainNormalizations());
             if (chains.Count > 0) {
                 sb.AppendLine("Licenses for this Config instance:\n");
                 sb.AppendLine(string.Join("\n", chains.Select(c => c.ToString())));
             }
-            var others = mgr.GetAllLicenses().Except(chains);
-            if (others.Count() > 0) {
+            var others = mgr.GetAllLicenses().Except(chains).Select(c => c.ToString()).ToList();
+            if (others.Any()) {
                 sb.AppendLine("Licenses only used by other Config instances in this procces:\n");
-                sb.AppendLine(string.Join("\n", others.Select(c => c.ToString())));
+                sb.AppendLine(string.Join("\n", others));
             }
 
             sb.AppendLine("\n----------------\n");
             return sb.ToString();
         }
 
-        bool IsLicenseExpired(ILicenseDetails details, ILicenseClock clock) => details.Expires != null &&
-                                                                               details.Expires < clock.GetUtcNow();
 
-        bool HasLicenseBegun(ILicenseDetails details, ILicenseClock clock) => details.Issued != null &&
-                                                                              details.Issued > clock.GetUtcNow();
+        bool IsLicenseExpired(ILicenseDetails details) => details.Expires != null &&
+                                                          details.Expires < clock.GetUtcNow();
+
+        bool HasLicenseBegun(ILicenseDetails details) => details.Issued != null &&
+                                                         details.Issued > clock.GetUtcNow();
 
         public DateTimeOffset? GetBuildDate() => clock.GetBuildDate() ?? clock.GetAssemblyWriteDate();
 
@@ -154,13 +162,13 @@ namespace ImageResizer.Plugins.LicenseVerifier
         bool IsLicenseValid(ILicenseBlob b)
         {
             var details = b.Fields;
-            if (IsLicenseExpired(details, clock)) {
+            if (IsLicenseExpired(details)) {
                 permanentIssues.AcceptIssue(new Issue("License " + details.Id + " has expired.", b.ToRedactedString(),
                     IssueSeverity.Warning));
                 return false;
             }
 
-            if (HasLicenseBegun(details, clock)) {
+            if (HasLicenseBegun(details)) {
                 permanentIssues.AcceptIssue(new Issue(
                     "License " + details.Id + " was issued in the future; check system clock ", b.ToRedactedString(),
                     IssueSeverity.Warning));
@@ -168,11 +176,9 @@ namespace ImageResizer.Plugins.LicenseVerifier
             }
 
             if (IsBuildDateNewer(details.SubscriptionExpirationDate)) {
-                permanentIssues.AcceptIssue(new Issue("License " + details.Id +
-                                                      " covers ImageResizer versions prior to " +
-                                                      details.SubscriptionExpirationDate.Value.ToString("D") +
-                                                      ", but you are using a build dated " +
-                                                      GetBuildDate().Value.ToString("D"), b.ToRedactedString(),
+                permanentIssues.AcceptIssue(new Issue(
+                    $"License {details.Id} covers ImageResizer versions prior to {details.SubscriptionExpirationDate?.ToString("D")}, but you are using a build dated {GetBuildDate()?.ToString("D")}",
+                    b.ToRedactedString(),
                     IssueSeverity.Warning));
                 return false;
             }
@@ -188,87 +194,56 @@ namespace ImageResizer.Plugins.LicenseVerifier
             return chain.IsRemote && chain.Licenses().All(b => b.Fields.IsRemotePlaceholder());
         }
 
-        void ProcessPendingLicense(ILicenseChain chain)
+        /// <summary>
+        ///     Pending licenses can offer grace periods. Logs a local issue; trusts the instance (and issue) will be cleared
+        ///     when the returned datetime passes. May subdivide a grace period for more granular issue text.
+        /// </summary>
+        /// <param name="chain"></param>
+        /// <returns></returns>
+        DateTimeOffset? GetGracePeriodFor(ILicenseChain chain)
         {
             // If the placeholder license fails its own constraints, don't add a grace period
             if (chain.Licenses().All(b => !IsLicenseValid(b))) {
-                return;
+                return null;
             }
 
-            int? graceMinutes = chain.Licenses()
-                                     .Where(b => IsLicenseValid(b))
-                                     .Select(b => b.Fields.NetworkGraceMinutes())
-                                     .OrderByDescending(v => v)
-                                     .FirstOrDefault() ?? DefaultNetworkGraceMinutes;
-
+            var graceMinutes = chain.Licenses()
+                                    .Where(IsLicenseValid)
+                                    .Select(b => b.Fields.NetworkGraceMinutes())
+                                    .OrderByDescending(v => v)
+                                    .FirstOrDefault() ?? DefaultNetworkGraceMinutes;
 
             // Success will automatically replace this instance. Warn immediately.
-            var expires = mgr.FirstHeartbeat.Value.AddMinutes(graceMinutes.Value);
-            var thirtySeconds = mgr.FirstHeartbeat.Value.AddSeconds(30);
+            Debug.Assert(mgr.FirstHeartbeat != null, "mgr.FirstHeartbeat != null");
+
+            // NetworkGraceMinutes Expired?
+            var expires = mgr.FirstHeartbeat.Value.AddMinutes(graceMinutes);
             if (expires < clock.GetUtcNow()) {
-                AcceptIssue(new Issue("Grace period of " + graceMinutes.Value + "m expired for license " + chain.Id,
-                    string.Format(
-                        "License {0} was not found in the disk cache and could not be retrieved from the remote server within {1} minutes.",
-                        chain.Id, graceMinutes.Value), IssueSeverity.Error));
-            } else if (thirtySeconds < clock.GetUtcNow()) {
-                AllDomainsLicensed = true;
-                ComputationExpires = expires;
-
-                AcceptIssue(new Issue(
-                    "Grace period of " + graceMinutes.Value + "m will expire for license " + chain.Id + " at " +
-                    expires.ToString("HH:mm") + " on " + expires.ToString("D"),
-                    string.Format(
-                        "License {0} was not found in the disk cache and could not be retrieved from the remote server.",
-                        chain.Id, graceMinutes.Value), IssueSeverity.Error));
-            } else {
-                AllDomainsLicensed = true;
-                ComputationExpires = thirtySeconds;
-
-                AcceptIssue(new Issue("Fetching license " + chain.Id + " (not found in disk cache).",
-                    "Network grace period expires in " + graceMinutes.Value + " minutes", IssueSeverity.Warning));
+                AcceptIssue(new Issue($"Grace period of {graceMinutes}m expired for license {chain.Id}",
+                    $"License {chain.Id} was not found in the disk cache and could not be retrieved from the remote server within {graceMinutes} minutes.",
+                    IssueSeverity.Error));
+                return null;
             }
+
+            // Less than 30 seconds since boot time?
+            var thirtySeconds = mgr.FirstHeartbeat.Value.AddSeconds(30);
+            if (thirtySeconds > clock.GetUtcNow()) {
+                AcceptIssue(new Issue($"Fetching license {chain.Id} (not found in disk cache).",
+                    $"Network grace period expires in {graceMinutes} minutes", IssueSeverity.Warning));
+                return thirtySeconds;
+            }
+
+            // Otherwise in grace period
+            AcceptIssue(new Issue(
+                $"Grace period of {graceMinutes}m will expire for license {chain.Id} at {expires:HH:mm} on {expires:D}",
+                $"License {chain.Id} was not found in the disk cache and could not be retrieved from the remote server.",
+                IssueSeverity.Error));
+
+            return expires;
         }
 
 
-        void ComputeStatus(IEnumerable<IEnumerable<string>> requireOneFromEach)
-        {
-            AllDomainsLicensed = false;
-
-            foreach (var chain in chains.Where(chain => IsPendingLicense(chain))) {
-                ProcessPendingLicense(chain);
-            }
-
-            var validLicenses = chains.Where(chain => !IsPendingLicense(chain))
-                                      .SelectMany(chain => chain.Licenses())
-                                      .Where(b => IsLicenseValid(b));
-
-            AllDomainsLicensed = AllDomainsLicensed || validLicenses.Any(b => b.Fields.GetAllDomains().Count() == 0);
-
-            knownDomainStatus = validLicenses.SelectMany(
-                                                 b => b.Fields.GetAllDomains()
-                                                       .SelectMany(domain => b.Fields.GetFeatures()
-                                                                              .Select(
-                                                                                  feature => new
-                                                                                      KeyValuePair<string, string>(
-                                                                                          domain, feature))))
-                                             .GroupBy(pair => pair.Key, pair => pair.Value,
-                                                 (k, v) => new KeyValuePair<string, IEnumerable<string>>(k, v))
-                                             .Select(pair => new KeyValuePair<string, bool>(pair.Key,
-                                                 requireOneFromEach.All(
-                                                     set => set.Intersect(pair.Value, StringComparer.OrdinalIgnoreCase)
-                                                               .Count() > 0)))
-                                             .ToDictionary(pair => pair.Key, pair => pair.Value,
-                                                 StringComparer.Ordinal);
-        }
-
-
-        public bool LicensedForAll()
-        {
-            if (EverythingDenied) {
-                return false;
-            }
-            return AllDomainsLicensed;
-        }
+        public bool LicensedForAll() => !EverythingDenied && AllDomainsLicensed;
 
         public bool LicensedForRequestUrl(Uri url)
         {
@@ -282,38 +257,51 @@ namespace ImageResizer.Plugins.LicenseVerifier
             if (domainLookup.KnownDomainCount > 0 && host != null) {
                 var knownDomain = domainLookup.FindKnownDomain(host);
                 if (knownDomain != null) {
-                    return knownDomainStatus[knownDomain];
+                    return KnownDomainStatus[knownDomain];
                 }
-                unknownDomains.TryAdd(domainLookup.TrimLowerInvariant(host), false);
+                if (unknownDomains.Count < UnknownDomainsLimit) {
+                    unknownDomains.TryAdd(domainLookup.TrimLowerInvariant(host), false);
+                }
                 return false;
             }
             return false;
         }
 
-        public string ProvidePublicDiagnostics()
+        StringBuilder GetLicenseStatus()
         {
             var sb = new StringBuilder();
-            sb.Append("License status for active features: ");
+            sb.Append("\nLicense status for active features: ");
             if (EverythingDenied) {
-                sb.AppendLine("contact support");
+                sb.AppendLine("License error. Contact support@imageresizing.net");
             } else if (AllDomainsLicensed) {
                 sb.AppendLine("Valid for all domains");
-            } else if (knownDomainStatus.Count > 0) {
+            } else if (KnownDomainStatus.Any()) {
                 sb.AppendFormat("Valid for {0} domains, invalid for {1} domains, not covered for {2} domains:\n",
-                    knownDomainStatus.Count(pair => pair.Value),
-                    knownDomainStatus.Count(pair => !pair.Value),
+                    KnownDomainStatus.Count(pair => pair.Value),
+                    KnownDomainStatus.Count(pair => !pair.Value),
                     unknownDomains.Count);
+                sb.AppendFormat("Valid: {0}\nInvalid: {1}\nNot covered: {2}\n",
+                    string.Join(", ", KnownDomainStatus.Where(pair => pair.Value).Select(pair => pair.Key)),
+                    string.Join(", ", KnownDomainStatus.Where(pair => !pair.Value).Select(pair => pair.Key)),
+                    string.Join(", ", unknownDomains.Select(pair => pair.Key)));
             } else {
                 sb.AppendLine("No valid licenses");
             }
+            sb.AppendLine();
+            return sb;
+        }
+
+        public string ProvidePublicDiagnostics()
+        {
+            var sb = GetLicenseStatus();
             if (chains.Count > 0) {
                 sb.AppendLine("Licenses for this Config instance:\n");
                 sb.AppendLine(string.Join("\n", chains.Select(c => c.ToPublicString())));
             }
-            var others = mgr.GetAllLicenses().Except(chains);
-            if (others.Count() > 0) {
+            var others = mgr.GetAllLicenses().Except(chains).Select(c => c.ToPublicString()).ToList();
+            if (others.Any()) {
                 sb.AppendLine("Licenses only used by other Config instances in this procces:\n");
-                sb.AppendLine(string.Join("\n", others.Select(c => c.ToPublicString())));
+                sb.AppendLine(string.Join("\n", others));
             }
             return sb.ToString();
         }

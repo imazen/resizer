@@ -28,16 +28,21 @@ namespace ImageResizer.Plugins.LicenseVerifier
         readonly ConcurrentDictionary<string, LicenseChain> chains =
             new ConcurrentDictionary<string, LicenseChain>(StringComparer.OrdinalIgnoreCase);
 
-        /// <summary>
-        ///     The set of shared chains
-        /// </summary>
-        List<ILicenseChain> sharedCache = new List<ILicenseChain>();
-
 
         /// <summary>
         ///     The backing sink
         /// </summary>
         readonly IssueSink sink = new IssueSink("LicenseManager");
+
+        /// <summary>
+        ///     The set of all chains
+        /// </summary>
+        List<ILicenseChain> allCache = new List<ILicenseChain>();
+
+        /// <summary>
+        ///     The set of shared chains
+        /// </summary>
+        List<ILicenseChain> sharedCache = new List<ILicenseChain>();
 
         /// <summary>
         ///     The HttpClient all fetchers use
@@ -120,7 +125,8 @@ namespace ImageResizer.Plugins.LicenseVerifier
         /// <param name="access"></param>
         public ILicenseChain GetOrAdd(string license, LicenseAccess access)
         {
-            var chain = aliases.GetOrAdd(license, s => GetChainFor(s));
+            var chain = aliases.GetOrAdd(license, GetChainFor);
+            // We may want to share a previously unshared license
             if (chain != null && access.HasFlag(LicenseAccess.ProcessShareonly) && !chain.Shared) {
                 chain.Shared = true;
                 FireLicenseChange();
@@ -128,9 +134,9 @@ namespace ImageResizer.Plugins.LicenseVerifier
             return chain;
         }
 
-        public IEnumerable<ILicenseChain> GetSharedLicenses() => sharedCache;
+        public IReadOnlyCollection<ILicenseChain> GetSharedLicenses() => sharedCache;
 
-        public IEnumerable<ILicenseChain> GetAllLicenses() => chains.Values.Cast<ILicenseChain>();
+        public IReadOnlyCollection<ILicenseChain> GetAllLicenses() => allCache;
 
         public IEnumerable<IIssue> GetIssues()
         {
@@ -205,18 +211,15 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         public void FireLicenseChange()
         {
-            sharedCache = chains.Values.Where(c => c.Shared).Cast<ILicenseChain>().ToList();
+            allCache = chains.Values.Cast<ILicenseChain>().ToList();
+            sharedCache = allCache.Where(c => c.Shared).ToList();
+
             LicenseChange?.Invoke(this);
         }
 
         public void SetHttpMessageHandler(HttpMessageHandler handler, bool disposeHandler)
         {
-            HttpClient newClient;
-            if (handler == null) {
-                newClient = new HttpClient();
-            } else {
-                newClient = new HttpClient(handler, disposeHandler);
-            }
+            var newClient = handler == null ? new HttpClient() : new HttpClient(handler, disposeHandler);
             HttpClient = newClient;
         }
 

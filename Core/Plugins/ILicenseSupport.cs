@@ -53,13 +53,13 @@ namespace ImageResizer.Plugins.Licensing
         /// Returns all shared license chains (a chain is shared if any relevant license is marked shared)
         /// </summary>
         /// <returns></returns>
-        IEnumerable<ILicenseChain> GetSharedLicenses();
+        IReadOnlyCollection<ILicenseChain> GetSharedLicenses();
 
         /// <summary>
         /// Returns all license chains, both shared and private (for diagnostics/reporting)
         /// </summary>
         /// <returns></returns>
-        IEnumerable<ILicenseChain> GetAllLicenses();
+        IReadOnlyCollection<ILicenseChain> GetAllLicenses();
 
         /// <summary>
         /// Adds a weak-referenced handler to the LicenseChange event.

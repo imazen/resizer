@@ -4,14 +4,9 @@
 // Licensed under the GNU Affero General Public License, Version 3.0.
 // Commercial licenses available at http://imageresizing.net/
 
-using ImageResizer.Configuration.Issues;
-using ImageResizer.Plugins.Basic;
-using ImageResizer.Resizing;
-
 namespace ImageResizer.Plugins.LicenseVerifier
 {
-    partial class LicenseEnforcer<T> : BuilderExtension, IPlugin, IDiagnosticsProvider, IIssueProvider,
-        ILicenseDiagnosticsProvider
+    partial class LicenseEnforcer<T>
     {
         const bool EnforcementEnabled = true;
 

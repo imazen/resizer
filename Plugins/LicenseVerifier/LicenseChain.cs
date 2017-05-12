@@ -24,14 +24,21 @@ namespace ImageResizer.Plugins.LicenseVerifier
         };
 
         /// <summary>
-        ///     Cache for .Licenses()
-        /// </summary>
-        List<ILicenseBlob> cache;
-
-        /// <summary>
         ///     Key is a hash of the license signature
         /// </summary>
         readonly ConcurrentDictionary<string, LicenseBlob> dict = new ConcurrentDictionary<string, LicenseBlob>();
+
+        /// <summary>
+        ///     License Servers
+        /// </summary>
+        readonly string[] licenseServerStack = DefaultLicenseServers;
+
+        readonly LicenseManagerSingleton parent;
+
+        /// <summary>
+        ///     Cache for .Licenses()
+        /// </summary>
+        List<ILicenseBlob> cache;
 
         /// <summary>
         ///     The current fetcher. Invalidated when urls are changed
@@ -51,13 +58,6 @@ namespace ImageResizer.Plugins.LicenseVerifier
         Uri lastWorkingUri;
 
         /// <summary>
-        ///     License Servers
-        /// </summary>
-        readonly string[] licenseServerStack = DefaultLicenseServers;
-
-        readonly LicenseManagerSingleton parent;
-
-        /// <summary>
         ///     The fresh/local (not from cache) remote license
         /// </summary>
         LicenseBlob remoteLicense;
@@ -74,10 +74,10 @@ namespace ImageResizer.Plugins.LicenseVerifier
         string Secret { get; set; }
 
         // Actually needs an issue reciever? (or should *it* track?) And an HttpClient and Cache
-        public LicenseChain(LicenseManagerSingleton parent, string license_id)
+        public LicenseChain(LicenseManagerSingleton parent, string licenseId)
         {
             this.parent = parent;
-            Id = license_id;
+            Id = licenseId;
             LocalLicenseChange();
         }
 
@@ -94,11 +94,12 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         public ILicenseBlob CachedLicense()
         {
-            if (fetcher != null) {
-                var cached = parent.Cache.Get(fetcher.CacheKey);
-                if (cached != null && cached.TryParseInt() == null) {
-                    return parent.TryDeserialize(cached, "disk cache", false);
-                }
+            if (fetcher == null) {
+                return null;
+            }
+            var cached = parent.Cache.Get(fetcher.CacheKey);
+            if (cached != null && cached.TryParseInt() == null) {
+                return parent.TryDeserialize(cached, "disk cache", false);
             }
             return null;
         }
@@ -123,13 +124,11 @@ namespace ImageResizer.Plugins.LicenseVerifier
                     ? "(from cache)\n"
                     : "";
 
-            return RedactSecret(string.Format("License {0}{1}\n{2}\n", Id,
-                IsRemote ? " (remote)" : "",
-                string.Join("\n\n",
-                    Licenses().Where(b => b.Fields.IsPublic()).Select(b => freshness(b) + b.ToRedactedString()))));
+            return RedactSecret(
+                $"License {Id}{(IsRemote ? " (remote)" : "")}\n{string.Join("\n\n", Licenses().Where(b => b.Fields.IsPublic()).Select(b => freshness(b) + b.ToRedactedString()))}\n");
         }
 
-        void OnFetchResult(string body, IEnumerable<LicenseFetcher.FetchResult> results)
+        void OnFetchResult(string body, IReadOnlyCollection<LicenseFetcher.FetchResult> results)
         {
             if (body != null) {
                 Last200 = parent.Clock.GetUtcNow();
@@ -152,7 +151,6 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 }
                 // TODO: consider logging a failed deserialization remotely
             } else {
-                var key = fetcher.CacheKey;
                 var licenseName = Id;
 
                 if (results.All(r => r.HttpCode == 404 || r.HttpCode == 403)) {
@@ -173,8 +171,9 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 } else {
                     parent.AcceptIssue(new Issue("Exception(s) occured fetching license " + licenseName,
                         RedactSecret(string.Join("\n",
-                            results.Select(r => string.Format("{0} {1}  LikelyTimeout: {2} Error: {3}", r.HttpCode,
-                                r.FullUrl, r.LikelyNetworkFailure, r.FetchError?.ToString())))), IssueSeverity.Error));
+                            results.Select(r =>
+                                $"{r.HttpCode} {r.FullUrl}  LikelyTimeout: {r.LikelyNetworkFailure} Error: {r.FetchError?.ToString()}"))),
+                        IssueSeverity.Error));
                     LastException = parent.Clock.GetUtcNow();
                 }
             }
@@ -185,19 +184,19 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         void RecreateFetcher()
         {
-            if (IsRemote) {
-                fetcher = new LicenseFetcher(
-                    parent.Clock,
-                    () => parent.Cache,
-                    () => parent.HttpClient,
-                    OnFetchResult,
-                    () => GetReportPairs(),
-                    parent,
-                    Id,
-                    Secret,
-                    licenseServerStack);
-                fetcher.Heartbeat();
+            if (!IsRemote) {
+                return;
             }
+            fetcher = new LicenseFetcher(
+                parent.Clock,
+                () => parent.HttpClient,
+                OnFetchResult,
+                GetReportPairs,
+                parent,
+                Id,
+                Secret,
+                licenseServerStack);
+            fetcher.Heartbeat();
         }
 
 
@@ -213,7 +212,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             if (blob == null) {
                 return false;
             }
-            var oldStack = licenseServerStack ?? Enumerable.Empty<string>();
+            var oldStack = licenseServerStack ?? new string[0];
             var newList = blob.Fields.GetValidLicenseServers().ToArray();
             var newStack = newList.Concat(oldStack.Except(newList)).Take(10).ToArray();
             return !newStack.SequenceEqual(oldStack);
@@ -272,7 +271,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             var netBeats = beatCount - lastBeatCount;
             lastBeatCount = beatCount;
 
-            var firstHearbeat = (long) (parent.FirstHeartbeat.Value -
+            var firstHearbeat = (long) (parent.FirstHeartbeat.GetValueOrDefault() -
                                         new DateTimeOffset(1970, 1, 1, 0, 0, 0, 0, TimeSpan.Zero)).TotalSeconds;
 
             var q = GlobalPerf.Singleton.GetReportPairs();
@@ -280,7 +279,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             prepending.Add("total_heartbeats", beatCount.ToString());
             prepending.Add("new_heartbeats", netBeats.ToString());
             prepending.Add("first_heartbeat", firstHearbeat.ToString());
-            prepending.Add("manager_id", parent.ManagerGuid.Value.ToString("D"));
+            prepending.Add("manager_id", parent.ManagerGuid?.ToString("D"));
             return q;
         }
 
@@ -294,9 +293,8 @@ namespace ImageResizer.Plugins.LicenseVerifier
                     ? "(from cache)\n"
                     : "";
             // TODO: this.Last200, this.Last404, this.LastException, this.LastSuccess, this.LastTimeout
-            return RedactSecret(string.Format("License {0} (remote={1})\n    {2}\n", Id, IsRemote,
-                string.Join("\n\n", Licenses().Select(b => freshness(b) + b.ToRedactedString()))
-                      .Replace("\n", "\n    ")));
+            return RedactSecret(
+                $"License {Id} (remote={IsRemote})\n    {string.Join("\n\n", Licenses().Select(b => freshness(b) + b.ToRedactedString())).Replace("\n", "\n    ")}\n");
         }
 
         internal void Heartbeat() { fetcher?.Heartbeat(); }

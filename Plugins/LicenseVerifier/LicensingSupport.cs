@@ -20,7 +20,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             try {
                 return GetType()
                     .Assembly.GetCustomAttributes(typeof(BuildDateAttribute), false)
-                    ?.Select(a => ((BuildDateAttribute) a).ValueDate)
+                    .Select(a => ((BuildDateAttribute) a).ValueDate)
                     .FirstOrDefault();
             } catch {
                 return null;
@@ -31,8 +31,8 @@ namespace ImageResizer.Plugins.LicenseVerifier
         {
             var path = GetType().Assembly.Location;
             try {
-                return File.Exists(path)
-                    ? new DateTimeOffset?(File.GetLastWriteTimeUtc(GetType().Assembly.Location))
+                return path != null && File.Exists(path)
+                    ? new DateTimeOffset?(File.GetLastWriteTimeUtc(path))
                     : null;
             } catch {
                 return null;

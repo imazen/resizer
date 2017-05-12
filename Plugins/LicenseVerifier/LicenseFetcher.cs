@@ -14,11 +14,11 @@ namespace ImageResizer.Plugins.LicenseVerifier
 {
     class LicenseFetcher
     {
-        const long licenseFetchIntervalSeconds = 60 * 60;
-        const long initialErrorIntervalSeconds = 2;
-        const long errorMultiplier = 3;
+        const long LicenseFetchIntervalSeconds = 60 * 60;
+        const long InitialErrorIntervalSeconds = 2;
+        const long ErrorMultiplier = 3;
 
-        static readonly WebExceptionStatus[] networkFailures = {
+        static readonly WebExceptionStatus[] NetworkFailures = {
             WebExceptionStatus.ConnectFailure, WebExceptionStatus.KeepAliveFailure,
             WebExceptionStatus.NameResolutionFailure, WebExceptionStatus.PipelineFailure,
             WebExceptionStatus.ProxyNameResolutionFailure, WebExceptionStatus.ReceiveFailure,
@@ -33,12 +33,11 @@ namespace ImageResizer.Plugins.LicenseVerifier
         readonly ILicenseClock clock;
         readonly ImperfectDebounce error;
         readonly Func<HttpClient> getClient;
-        Func<IPersistentStringCache> getCurrentCache;
 
-        readonly Func<IInfoAccumulator> getQuerystring;
+        readonly Func<IInfoAccumulator> getInfo;
 
         readonly string id;
-        readonly Action<string, IEnumerable<FetchResult>> licenseResult;
+        readonly Action<string, IReadOnlyCollection<FetchResult>> licenseResult;
 
         readonly ImperfectDebounce regular;
         readonly string secret;
@@ -49,17 +48,16 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         public string CacheKey => id + "_" + Fnv1a32.HashToInt(secret).ToString("x");
 
-        public LicenseFetcher(ILicenseClock clock, Func<IPersistentStringCache> getCurrentCache,
-                              Func<HttpClient> getClient, Action<string, IEnumerable<FetchResult>> licenseResult,
-                              Func<IInfoAccumulator> getQuerystring, IIssueReceiver sink, string licenseId,
+        public LicenseFetcher(ILicenseClock clock, Func<HttpClient> getClient,
+                              Action<string, IReadOnlyCollection<FetchResult>> licenseResult,
+                              Func<IInfoAccumulator> getInfo, IIssueReceiver sink, string licenseId,
                               string licenseSecret, string[] baseUrls)
         {
             this.clock = clock;
-            regular = new ImperfectDebounce(() => QueueLicenseFetch(false), licenseFetchIntervalSeconds, clock);
+            regular = new ImperfectDebounce(() => QueueLicenseFetch(false), LicenseFetchIntervalSeconds, clock);
             error = new ImperfectDebounce(() => QueueLicenseFetch(true), 0, clock);
-            this.getCurrentCache = getCurrentCache;
             this.getClient = getClient;
-            this.getQuerystring = getQuerystring;
+            this.getInfo = getInfo;
             this.licenseResult = licenseResult;
             this.baseUrls = baseUrls;
             id = licenseId;
@@ -143,7 +141,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
                         var web = rex.InnerException as WebException;
                         var status = web?.Status;
 
-                        var networkFailure = networkFailures.Any(s => s == status);
+                        var networkFailure = NetworkFailures.Any(s => s == status);
                         results.Add(new FetchResult {
                             FetchError = (Exception) web ?? rex,
                             FullUrl = url,
@@ -183,18 +181,18 @@ namespace ImageResizer.Plugins.LicenseVerifier
         void EnsureErrorDebounce()
         {
             if (error.IntervalTicks == 0) {
-                error.IntervalTicks = initialErrorIntervalSeconds * clock.TicksPerSecond;
+                error.IntervalTicks = InitialErrorIntervalSeconds * clock.TicksPerSecond;
             }
         }
 
         void AdjustErrorDebounce()
         {
             if (error.IntervalTicks > 0) {
-                error.IntervalTicks *= errorMultiplier;
+                error.IntervalTicks *= ErrorMultiplier;
                 error.IntervalTicks += (long) Math.Round(new Random().NextDouble() * clock.TicksPerSecond / 2.0);
             }
-            if (error.IntervalTicks > licenseFetchIntervalSeconds * clock.TicksPerSecond) {
-                error.IntervalTicks = initialErrorIntervalSeconds * clock.TicksPerSecond;
+            if (error.IntervalTicks > LicenseFetchIntervalSeconds * clock.TicksPerSecond) {
+                error.IntervalTicks = InitialErrorIntervalSeconds * clock.TicksPerSecond;
             }
         }
 
@@ -204,9 +202,8 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         string ConstructQuerystring()
         {
-            IInfoAccumulator query;
             try {
-                query = getQuerystring();
+                var query = getInfo();
                 query.WithPrepend(true).Add("license_id", id);
                 return query.ToQueryString(3000);
             } catch (Exception ex) {
@@ -214,10 +211,10 @@ namespace ImageResizer.Plugins.LicenseVerifier
                     ex.ToString(), IssueSeverity.Warning));
             }
 
-            return string.Format("?license_id={0}", id);
+            return $"?license_id={id}";
         }
 
-        bool InvokeResultCallback(string body, IEnumerable<FetchResult> results)
+        bool InvokeResultCallback(string body, IReadOnlyCollection<FetchResult> results)
         {
             try {
                 licenseResult(body, results);
@@ -241,6 +238,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         }
 
 
+        // ReSharper disable once InconsistentNaming
         internal class Fnv1a32
         {
             const uint FnvPrime = 16777619;
@@ -251,6 +249,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             public static uint HashToInt(byte[] array)
             {
                 var h = FnvOffsetBasis;
+                // ReSharper disable once ForCanBeConvertedToForeach
                 for (var i = 0; i < array.Length; i++) {
                     unchecked {
                         h ^= array[i];
@@ -279,19 +278,20 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
             public void Heartbeat()
             {
-                if (IntervalTicks > 0) {
-                    var now = clock.GetTimestampTicks();
-                    if (now - lastBegun >= IntervalTicks) {
-                        var toFire = false;
-                        lock (fireLock) {
-                            if (now - lastBegun >= IntervalTicks) {
-                                lastBegun = now;
-                                toFire = true;
-                            }
+                if (IntervalTicks <= 0) {
+                    return;
+                }
+                var now = clock.GetTimestampTicks();
+                if (now - lastBegun >= IntervalTicks) {
+                    var toFire = false;
+                    lock (fireLock) {
+                        if (now - lastBegun >= IntervalTicks) {
+                            lastBegun = now;
+                            toFire = true;
                         }
-                        if (toFire) {
-                            callback.Invoke();
-                        }
+                    }
+                    if (toFire) {
+                        callback.Invoke();
                     }
                 }
             }

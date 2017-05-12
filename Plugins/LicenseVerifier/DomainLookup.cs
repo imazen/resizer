@@ -11,28 +11,38 @@ namespace ImageResizer.Plugins.LicenseVerifier
 {
     class DomainLookup
     {
-        const long lookupTableLimit = 8000;
-        readonly Dictionary<string, IEnumerable<ILicenseChain>> chainsByDomain;
+        /// <summary>
+        ///     Limit the growth of the lookup table cache
+        /// </summary>
+        const long LookupTableLimit = 8000;
 
-        // For diagnostic use
+        /// <summary>
+        ///     Retained for diagnostics purposes; this data is also in LookupTable
+        /// </summary>
         readonly Dictionary<string, string> customMappings;
 
         // For runtime use
         readonly ConcurrentDictionary<string, string> lookupTable;
 
-        long lookupTableSize;
+        /// <summary>
+        ///     Used to locate a domain when it's not cached in lookupTable
+        /// </summary>
         readonly List<KeyValuePair<string, string>> suffixSearchList;
-        public int KnownDomainCount => suffixSearchList.Count;
+
+        // Track and limit runtime table lookup growth
+        long lookupTableSize;
+
+
         public long LookupTableSize => lookupTableSize;
 
-        public IEnumerable<string> KnownDomains => chainsByDomain.Keys;
+        public int KnownDomainCount => suffixSearchList.Count;
 
         public DomainLookup(Config c, IIssueReceiver sink, IEnumerable<ILicenseChain> licenseChains)
         {
             // What domains are mentioned in which licenses?
-            chainsByDomain = GetChainsByDomain(licenseChains);
+            var chainsByDomain = GetChainsByDomain(licenseChains);
 
-            var knownDomains = chainsByDomain.Keys;
+            var knownDomains = chainsByDomain.Keys.ToList();
 
             // What custom mappings has the user set up?
             customMappings = GetDomainMappings(c, sink, knownDomains);
@@ -69,7 +79,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         Dictionary<string, string>
             GetDomainMappings(Config c, IIssueReceiver sink,
-                              IEnumerable<string> knownDomains) //c.configurationSectionIssue
+                              IReadOnlyCollection<string> knownDomains) //c.configurationSectionIssue
         {
             var mappings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             var n = c.getNode("licenses");
@@ -80,16 +90,15 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 var from = map.Attrs["from"]?.Trim().ToLowerInvariant();
                 var to = map.Attrs["to"]?.Trim().ToLowerInvariant();
                 if (string.IsNullOrEmpty(from) || string.IsNullOrEmpty(to)) {
-                    sink.AcceptIssue(new Issue("Both from= and to= attributes are required on maphost: " + map,
+                    sink.AcceptIssue(new Issue($"Both from= and to= attributes are required on maphost: {map}",
                         IssueSeverity.ConfigurationError));
                 } else if (from.Replace(".local", "").IndexOf('.') > -1) {
                     sink.AcceptIssue(new Issue(
-                        "You can only map non-public hostnames to arbitrary licenses. Skipping " + from,
+                        $"You can only map non-public hostnames to arbitrary licenses. Skipping {from}",
                         IssueSeverity.ConfigurationError));
                 } else if (!knownDomains.Contains(to)) {
                     sink.AcceptIssue(new Issue(
-                        string.Format("You have mapped {0} to {1}. {1} is not one of the known domains: {2}",
-                            from, to, string.Join(" ", knownDomains.OrderBy(s => s))),
+                        $"You have mapped {from} to {to}. {to} is not one of the known domains: {string.Join(" ", knownDomains.OrderBy(s => s))}",
                         IssueSeverity.ConfigurationError));
                 } else {
                     mappings[from] = to;
@@ -102,7 +111,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         {
             return customMappings.Count > 0
                 ? "For domain licensing, you have mapped the following local (non-public) domains or addresses as follows:\n" +
-                  string.Join(", ", customMappings.Select(pair => string.Format("{0} => {1}", pair.Key, pair.Value))) +
+                  string.Join(", ", customMappings.Select(pair => $"{pair.Key} => {pair.Value}")) +
                   "\n"
                 : "";
         }
@@ -114,15 +123,9 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 ? "The domain lookup table has {0} elements. Displaying subset:\n" +
                   string.Join(", ", lookupTable.OrderByDescending(p => p.Value)
                                                .Take(200)
-                                               .Select(pair => string.Format("{0} => {1}", pair.Key, pair.Value))) +
+                                               .Select(pair => $"{pair.Key} => {pair.Value}")) +
                   "\n"
                 : "";
-        }
-
-        public IEnumerable<ILicenseChain> GetChainsForDomain(string domain)
-        {
-            IEnumerable<ILicenseChain> result;
-            return chainsByDomain.TryGetValue(domain, out result) ? result : Enumerable.Empty<ILicenseChain>();
         }
 
         /// <summary>
@@ -132,19 +135,19 @@ namespace ImageResizer.Plugins.LicenseVerifier
         /// <returns></returns>
         public string FindKnownDomain(string similarDomain)
         {
-            // Bound ConcurrentDictionary growth; fail instead
-            if (lookupTableSize > lookupTableLimit) {
-                string result;
-                return lookupTable.TryGetValue(TrimLowerInvariant(similarDomain), out result) ? result : null;
+            // Bound ConcurrentDictionary growth; fail on new domains instead
+            if (lookupTableSize <= LookupTableLimit) {
+                return lookupTable.GetOrAdd(TrimLowerInvariant(similarDomain),
+                    query =>
+                    {
+                        Interlocked.Increment(ref lookupTableSize);
+                        return suffixSearchList.FirstOrDefault(
+                                                   pair => query.EndsWith(pair.Key, StringComparison.Ordinal))
+                                               .Value;
+                    });
             }
-            return lookupTable.GetOrAdd(TrimLowerInvariant(similarDomain),
-                query =>
-                {
-                    Interlocked.Increment(ref lookupTableSize);
-                    return suffixSearchList.FirstOrDefault(
-                                               pair => query.EndsWith(pair.Key, StringComparison.Ordinal))
-                                           .Value;
-                });
+            string result;
+            return lookupTable.TryGetValue(TrimLowerInvariant(similarDomain), out result) ? result : null;
         }
 
         /// <summary>

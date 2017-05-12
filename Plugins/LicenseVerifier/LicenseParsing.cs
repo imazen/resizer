@@ -207,15 +207,14 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 var decryptedBytes = p.DecryptPublic(signature);
                 var valid = hash.SequenceEqual(decryptedBytes);
 
-                if (log != null) {
-                    log.AppendLine("Using public exponent " + p.Exponent.ToString() + " and modulus " +
-                                   p.Modulus.ToString());
-                    log.AppendLine("Encrypted bytes: " + BitConverter.ToString(signature).ToLower().Replace("-", ""));
-                    log.AppendLine("Decrypted sha512: " +
-                                   BitConverter.ToString(decryptedBytes).ToLower().Replace("-", ""));
-                    log.AppendLine("Expected sha512: " + BitConverter.ToString(hash).ToLower().Replace("-", ""));
-                    log.AppendLine(valid ? "Success!" : "Not a match.");
-                }
+                log?.AppendLine("Using public exponent " + p.Exponent.ToString() + " and modulus " +
+                                p.Modulus.ToString());
+                log?.AppendLine("Encrypted bytes: " + BitConverter.ToString(signature).ToLower().Replace("-", ""));
+                log?.AppendLine("Decrypted sha512: " +
+                                BitConverter.ToString(decryptedBytes).ToLower().Replace("-", ""));
+                log?.AppendLine("Expected sha512: " + BitConverter.ToString(hash).ToLower().Replace("-", ""));
+                log?.AppendLine(valid ? "Success!" : "Not a match.");
+
                 return valid;
             });
         }
@@ -274,26 +273,24 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
     class ImazenPublicKeys
     {
-        public static IEnumerable<RSADecryptPublic> Test { get; }
-        public static IEnumerable<RSADecryptPublic> Production { get; }
-        public static IEnumerable<RSADecryptPublic> All { get; }
+        public static IReadOnlyCollection<RSADecryptPublic> Test { get; }
+        public static IReadOnlyCollection<RSADecryptPublic> Production { get; }
+        public static IReadOnlyCollection<RSADecryptPublic> All { get; }
 
         static ImazenPublicKeys()
         {
-            {
-                var pubkey_modulus =
-                    "21403964489040138713896545869406851734432500305180577929806228393671667423170541918856531956008546071841016201645150244452266439995041173092354230946610429300967887006960186647111152810965360763586210200652502467947786453111507369142658284220331513416234497960844309808252643534631142917589553418044306073242485021092396181183125381004682521853943025560860753079004948017667604884278401445729443478586697229583656851019218046599746243419376456426788044497274378001221965538712352348475726349124652450874653832672820100829574087311416068166524423905971193163418806721436095962165082262760557869093554827824418663362349";
-                var pubkey_exponent = "65537";
-                Test = new[]
-                    {new RSADecryptPublic(BigInteger.Parse(pubkey_modulus), BigInteger.Parse(pubkey_exponent))};
-            }
-            {
-                var pubkey_modulus =
-                    "23949488589991837273662465276682907968730706102086698017736172318753209677546629836371834786541857453052840819693021342491826827766290334135101781149845778026274346770115575977554682930349121443920608458091578262535319494351868006252977941758848154879863365934717437651379551758086088085154566157115250553458305198857498335213985131201841998493838963767334138323078497945594454883498534678422546267572587992510807296283688571798124078989780633040004809178041347751023931122344529856055566400640640925760832450260419468881471181281199910469396775343083815780600723550633987799763107821157001135810564362648091574582493";
-                var pubkey_exponent = "65537";
-                Production = new[]
-                    {new RSADecryptPublic(BigInteger.Parse(pubkey_modulus), BigInteger.Parse(pubkey_exponent))};
-            }
+            Test = new[] {
+                new RSADecryptPublic(
+                    BigInteger.Parse(
+                        "21403964489040138713896545869406851734432500305180577929806228393671667423170541918856531956008546071841016201645150244452266439995041173092354230946610429300967887006960186647111152810965360763586210200652502467947786453111507369142658284220331513416234497960844309808252643534631142917589553418044306073242485021092396181183125381004682521853943025560860753079004948017667604884278401445729443478586697229583656851019218046599746243419376456426788044497274378001221965538712352348475726349124652450874653832672820100829574087311416068166524423905971193163418806721436095962165082262760557869093554827824418663362349"),
+                    BigInteger.Parse("65537"))
+            };
+            Production = new[] {
+                new RSADecryptPublic(
+                    BigInteger.Parse(
+                        "23949488589991837273662465276682907968730706102086698017736172318753209677546629836371834786541857453052840819693021342491826827766290334135101781149845778026274346770115575977554682930349121443920608458091578262535319494351868006252977941758848154879863365934717437651379551758086088085154566157115250553458305198857498335213985131201841998493838963767334138323078497945594454883498534678422546267572587992510807296283688571798124078989780633040004809178041347751023931122344529856055566400640640925760832450260419468881471181281199910469396775343083815780600723550633987799763107821157001135810564362648091574582493"),
+                    BigInteger.Parse("65537"))
+            };
             All = Production.Concat(Test).ToArray();
         }
     }
@@ -331,6 +328,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             }
         }
 
+        // ReSharper disable once UnusedMember.Local
         static int Main(IReadOnlyList<string> args)
         {
             var mod = BigInteger.Parse(System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(args[0])));
