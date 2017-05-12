@@ -1,45 +1,40 @@
-﻿using ImageResizer.Plugins.Licensing;
-using ImageResizer.Util;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ImageResizer.Plugins.Licensing;
+using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.LicenseVerifier
 {
     class RealClock : ILicenseClock
     {
         public long TicksPerSecond { get; } = Stopwatch.Frequency;
-        public long GetTimestampTicks()
-        {
-            return Stopwatch.GetTimestamp();
-        }
-        public DateTimeOffset GetUtcNow()
-        {
-            return DateTimeOffset.UtcNow;
-        }
+
+        public long GetTimestampTicks() => Stopwatch.GetTimestamp();
+
+        public DateTimeOffset GetUtcNow() => DateTimeOffset.UtcNow;
+
         public DateTimeOffset? GetBuildDate()
         {
-            try
-            {
-                return this.GetType().Assembly.GetCustomAttributes(typeof(BuildDateAttribute), false)?.Select(a => ((BuildDateAttribute)a).ValueDate).FirstOrDefault();
-            }
-            catch
-            {
+            try {
+                return GetType()
+                    .Assembly.GetCustomAttributes(typeof(BuildDateAttribute), false)
+                    ?.Select(a => ((BuildDateAttribute) a).ValueDate)
+                    .FirstOrDefault();
+            } catch {
                 return null;
             }
         }
+
         public DateTimeOffset? GetAssemblyWriteDate()
         {
-            var path = this.GetType().Assembly.Location;
-            try
-            {
-                return System.IO.File.Exists(path) ? new DateTimeOffset?(System.IO.File.GetLastWriteTimeUtc(this.GetType().Assembly.Location)) : null;
-            }
-            catch
-            {
+            var path = GetType().Assembly.Location;
+            try {
+                return File.Exists(path)
+                    ? new DateTimeOffset?(File.GetLastWriteTimeUtc(GetType().Assembly.Location))
+                    : null;
+            } catch {
                 return null;
             }
         }
