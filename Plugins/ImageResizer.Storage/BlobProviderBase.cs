@@ -65,7 +65,7 @@ namespace ImageResizer.Storage
         }
 
         /// <summary>
-        /// Redacts any connectionString attribute from the diaglostics page.
+        /// Redacts any connectionString attribute from the diagnostics page.
         /// </summary>
         /// <param name="resizer"></param>
         /// <returns></returns>

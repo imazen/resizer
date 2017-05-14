@@ -6,7 +6,7 @@ using ImageResizer.Configuration.Logging;
 
 namespace ImageResizer.Plugins.DiskCache {
     /// <summary>
-    /// Handles writing a Web.Config to disk that uses Url Authorization to prevent visitors 
+    /// Handles writing a Web.Config to disk that uses URL authorization to prevent visitors
     /// from accessing the files directly. Alternative Web.config content can be specified, this is a general-purpose implementation. Uses UTF-8 encoding.
     /// Also provides methods for efficient verification that the file still exists.
     /// Thread-safe.

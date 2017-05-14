@@ -12,7 +12,7 @@ To view the report, you may need to [adjust customErrors in Web.config](http://m
 
 If you're accessing the application directly from the server, `RemoteOnly` is best. If you need to troubleshoot remotely, use `Off`, but keep in mind that stack traces can sometimes leak information to attackers.
 
-Setting `customErrors="Off"` will also let you see detailed error messages. We are unable to help you troubleshoot failing requests without the error message and stacktrace.
+Setting `customErrors="Off"` will also let you see detailed error messages. We are unable to help you troubleshoot failing requests without the error message and stack trace.
 
 If an image is failing to display on a web page, you *must* request it directly to get more information. In Chrome, you can "Open Image In New Tab" via the right-click menu (or, better yet, use Dev Tools > Network to locate the failed request details).
 

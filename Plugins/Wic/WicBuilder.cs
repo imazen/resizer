@@ -81,7 +81,7 @@ namespace ImageResizer.Plugins.WicBuilder {
                 if (job.ResetSourceStream) restoreStreamPosition = true;
                 job.SourcePathData = path;
 
-                //Save the original stream positione
+                //Save the original stream position
                 originalPosition = (restoreStreamPosition) ? s.Position : -1;
 
                 data = s.CopyOrReturnBuffer( out lData,false, 0x1000);
@@ -103,7 +103,7 @@ namespace ImageResizer.Plugins.WicBuilder {
         }
 
         /// <summary>
-        /// Decodes the image in byte[] data, performs the image proccessing, and encodes it to job.Dest
+        /// Decodes the image in byte[] data, performs the image processing, and encodes it to job.Dest
         /// </summary>
         /// <param name="data">The buffer containing the encoded image file</param>
         /// <param name="lData">The number of bytes to read</param>

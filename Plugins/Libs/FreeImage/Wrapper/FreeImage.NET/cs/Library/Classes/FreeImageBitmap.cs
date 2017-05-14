@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -68,7 +68,7 @@ namespace FreeImageAPI
         private object tag;
 
         /// <summary>
-        /// Object used to syncronize lock methods.
+        /// Object used to synchronize lock methods.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private object lockObject = new object();
@@ -94,7 +94,7 @@ namespace FreeImageAPI
         private bool disposeStream;
 
         /// <summary>
-        /// The number of frames contained by a mutlipage bitmap.
+        /// The number of frames contained by a multipage bitmap.
         /// Default value is 1 and only changed if needed.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -935,7 +935,7 @@ namespace FreeImageAPI
         }
 
         /// <summary>
-        /// Frees all managed and unmanaged ressources.
+        /// Frees all managed and unmanaged resources.
         /// </summary>
         ~FreeImageBitmap()
         {
@@ -1047,7 +1047,7 @@ namespace FreeImageAPI
 
         /// <summary>
         /// The number of unique colors actually used by the bitmap. This might be different from
-        /// what ColorsUsed returns, which actually returns the palette size for palletised images.
+        /// what ColorsUsed returns, which actually returns the palette size for palletized images.
         /// Works for FIT_BITMAP type bitmaps only.
         /// </summary>
         public int UniqueColors
@@ -1268,7 +1268,7 @@ namespace FreeImageAPI
         }
 
         /// <summary>
-        /// Number of transparent colors in a palletised <see cref="FreeImageBitmap"/>.
+        /// Number of transparent colors in a palletized <see cref="FreeImageBitmap"/>.
         /// </summary>
         public int TransparencyCount
         {
@@ -1787,7 +1787,7 @@ namespace FreeImageAPI
         /// of the thumbnail.
         /// </summary>
         /// <param name="maxPixelSize">Thumbnail square size.</param>
-        /// <param name="convert">When true HDR images are transperantly
+        /// <param name="convert">When true HDR images are transparently
         /// converted to standard images.</param>
         /// <returns>The thumbnail in a new instance.</returns>
         public FreeImageBitmap GetThumbnailImage(int maxPixelSize, bool convert)
@@ -1815,7 +1815,7 @@ namespace FreeImageAPI
         /// <summary>
         /// Returns an instance of <see cref="Scanline&lt;T&gt;"/>, representing the scanline
         /// specified by <paramref name="scanline"/> of this <see cref="FreeImageBitmap"/>.
-        /// Since FreeImage bitmaps are always bottum up aligned, keep in mind that scanline 0 is the
+        /// Since FreeImage bitmaps are always bottom up aligned, keep in mind that scanline 0 is the
         /// bottom-most line of the image.
         /// </summary>
         /// <param name="scanline">Number of the scanline to retrieve.</param>
@@ -1874,7 +1874,7 @@ namespace FreeImageAPI
         /// <summary>
         /// Returns an instance of <see cref="Scanline&lt;T&gt;"/>, representing the scanline
         /// specified by <paramref name="scanline"/> of this <see cref="FreeImageBitmap"/>.
-        /// Since FreeImage bitmaps are always bottum up aligned, keep in mind that scanline 0 is the
+        /// Since FreeImage bitmaps are always bottom up aligned, keep in mind that scanline 0 is the
         /// bottom-most line of the image.
         /// </summary>
         /// <param name="scanline">Number of the scanline to retrieve.</param>
@@ -1983,7 +1983,7 @@ namespace FreeImageAPI
 
         /// <summary>
         /// Returns a pointer to the specified scanline.
-        /// Due to FreeImage bitmaps are bottum up,
+        /// Due to FreeImage bitmaps are bottom up,
         /// scanline 0 is the most bottom line of the image.
         /// </summary>
         /// <param name="scanline">Number of the scanline.</param>
@@ -1996,7 +1996,7 @@ namespace FreeImageAPI
 
         /// <summary>
         /// Returns a list of structures, representing the scanlines of this <see cref="FreeImageBitmap"/>.
-        /// Due to FreeImage bitmaps are bottum up, scanline 0 is the
+        /// Due to FreeImage bitmaps are bottom up, scanline 0 is the
         /// bottom-most line of the image.
         /// Each color depth has a different representing structure due to different memory layouts.
         /// </summary>
@@ -2720,7 +2720,7 @@ namespace FreeImageAPI
         /// The parameter <paramref name="bpp"/> specifies color depth, greyscale conversion
         /// and palette reorder.
         /// <para>Adding the <see cref="FREE_IMAGE_COLOR_DEPTH.FICD_FORCE_GREYSCALE"/> flag
-        /// will first perform a convesion to greyscale. This can be done with any target
+        /// will first perform a conversion to greyscale. This can be done with any target
         /// color depth.</para>
         /// <para>Adding the <see cref="FREE_IMAGE_COLOR_DEPTH.FICD_REORDER_PALETTE"/> flag
         /// will allow the algorithm to reorder the palette. This operation will not be performed to
@@ -2739,7 +2739,7 @@ namespace FreeImageAPI
         /// Converts this <see cref="FreeImageBitmap"/> <see cref="FREE_IMAGE_TYPE"/> to
         /// <paramref name="type"/> initializing a new instance.
         /// In case source and destination type are the same, the operation fails.
-        /// An error message can be catched using the 'Message' event.
+        /// An error message can be caught using the 'Message' event.
         /// </summary>
         /// <param name="type">Destination type.</param>
         /// <param name="scaleLinear">True to scale linear, else false.</param>
@@ -2753,7 +2753,7 @@ namespace FreeImageAPI
         /// <summary>
         /// Converts this <see cref="FreeImageBitmap"/> <see cref="FreeImageBitmap"/> to <paramref name="type"/>.
         /// In case source and destination type are the same, the operation fails.
-        /// An error message can be catched using the 'Message' event.
+        /// An error message can be caught using the 'Message' event.
         /// </summary>
         /// <param name="type">Destination type.</param>
         /// <param name="scaleLinear">True to scale linear, else false.</param>
@@ -2779,7 +2779,7 @@ namespace FreeImageAPI
         /// The parameter <paramref name="bpp"/> specifies color depth, greyscale conversion
         /// and palette reorder.
         /// <para>Adding the <see cref="FREE_IMAGE_COLOR_DEPTH.FICD_FORCE_GREYSCALE"/> flag will
-        /// first perform a convesion to greyscale. This can be done with any target color depth.</para>
+        /// first perform a conversion to greyscale. This can be done with any target color depth.</para>
         /// <para>Adding the <see cref="FREE_IMAGE_COLOR_DEPTH.FICD_REORDER_PALETTE"/> flag will
         /// allow the algorithm to reorder the palette. This operation will not be performed to
         /// non-greyscale images to prevent data loss by mistake.</para>
@@ -3122,7 +3122,7 @@ namespace FreeImageAPI
         /// Apply the Gradient Domain High Dynamic Range Compression to a RGBF image and convert to 24-bit RGB.
         /// </summary>
         /// <param name="color_saturation">Color saturation (s parameter in the paper) in [0.4..0.6]</param>
-        /// <param name="attenuation">Atenuation factor (beta parameter in the paper) in [0.8..0.9]</param>
+        /// <param name="attenuation">Attenuation factor (beta parameter in the paper) in [0.8..0.9]</param>
         /// <returns>Returns true on success, false on failure.</returns>
         public bool TmoFattal02(double color_saturation, double attenuation)
         {
@@ -3159,7 +3159,7 @@ namespace FreeImageAPI
         /// </summary>
         /// <typeparam name="T">The type of the color to use as background.</typeparam>
         /// <param name="angle">The angle of rotation.</param>
-        /// <param name="backgroundColor">The color used used to fill the bitmap's background.</param>
+        /// <param name="backgroundColor">The color used to fill the bitmap's background.</param>
         /// <returns>Returns true on success, false on failure.</returns>
         public bool Rotate<T>(double angle, T? backgroundColor) where T : struct
         {
@@ -3183,7 +3183,7 @@ namespace FreeImageAPI
         /// </summary>
         /// <typeparam name="T">The type of the color to use as background.</typeparam>
         /// <param name="angle">The angle of rotation.</param>
-        /// <param name="backgroundColor">The color used used to fill the bitmap's background.</param>
+        /// <param name="backgroundColor">The color used to fill the bitmap's background.</param>
         /// <returns>The rotated instance.</returns>
         public FreeImageBitmap GetRotatedInstance<T>(double angle, T? backgroundColor) where T : struct
         {
@@ -3461,7 +3461,7 @@ namespace FreeImageAPI
         }
 
         /// <summary>
-        /// Alpha blend or combine a sub part image with tthis <see cref="FreeImageBitmap"/>.
+        /// Alpha blend or combine a sub part image with this <see cref="FreeImageBitmap"/>.
         /// The bit depth of <paramref name="bitmap"/> must be greater than or equal to the bit depth this instance.
         /// </summary>
         /// <param name="bitmap">The <see cref="FreeImageBitmap"/> to paste into this instance.</param>
@@ -3485,7 +3485,7 @@ namespace FreeImageAPI
         /// </summary>
         /// <param name="useBitmapBackground">When true the background of this instance is used
         /// if it contains one.</param>
-        /// <param name="applicationBackground">Backgroundcolor used in case <paramref name="useBitmapBackground"/> is false
+        /// <param name="applicationBackground">Background color used in case <paramref name="useBitmapBackground"/> is false
         /// and <paramref name="applicationBackground"/> is not null.</param>
         /// <param name="bitmapBackGround">Background used in case <paramref name="useBitmapBackground"/>
         /// is false and <paramref name="applicationBackground"/> is a null reference.</param>
@@ -3505,7 +3505,7 @@ namespace FreeImageAPI
 
         /// <summary>
         /// Applies the alpha value of each pixel to its color components.
-        /// The aplha value stays unchanged.
+        /// The alpha value stays unchanged.
         /// Only works with 32-bits color depth.
         /// </summary>
         /// <returns>Returns true on success, false on failure.</returns>
@@ -4157,7 +4157,7 @@ namespace FreeImageAPI
         /// Returns a new instance of the <see cref="PropertyItem"/> class which
         /// has no public accessible constructor.
         /// </summary>
-        /// <returns>A new instace of <see cref="PropertyItem"/>.</returns>
+        /// <returns>A new instance of <see cref="PropertyItem"/>.</returns>
         public static PropertyItem CreateNewPropertyItem()
         {
             return FreeImage.CreatePropertyItem();
@@ -4220,7 +4220,7 @@ namespace FreeImageAPI
         }
 
         /// <summary>
-        /// Informs the runtime about unmanaged allocoted memory.
+        /// Informs the runtime about unmanaged allocated memory.
         /// </summary>
         private void AddMemoryPressure()
         {
@@ -4316,7 +4316,7 @@ namespace FreeImageAPI
         /// Performs application-defined tasks associated with freeing,
         /// releasing, or resetting unmanaged resources.
         /// </summary>
-        /// <param name="disposing">If true managed ressources are released.</param>
+        /// <param name="disposing">If true managed resources are released.</param>
         protected virtual void Dispose(bool disposing)
         {
             // Only clean up once

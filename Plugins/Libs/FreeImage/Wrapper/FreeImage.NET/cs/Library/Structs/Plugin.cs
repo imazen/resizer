@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -40,7 +40,7 @@ using FreeImageAPI.Plugins;
 namespace FreeImageAPI.Plugins
 {
     /// <summary>
-    /// The structure contains functionpointers that make up a FreeImage plugin.
+    /// The structure contains function pointers that make up a FreeImage plugin.
     /// </summary>
     [Serializable, StructLayout(LayoutKind.Sequential)]
     public struct Plugin
@@ -58,14 +58,14 @@ namespace FreeImageAPI.Plugins
         public DescriptionProc descriptionProc;
 
         /// <summary>
-        /// Delegate to a function that returns a comma seperated list
+        /// Delegate to a function that returns a comma separated list
         /// of file extensions the plugin can read or write.
         /// </summary>
         public ExtensionListProc extensionListProc;
 
         /// <summary>
         /// Delegate to a function that returns a regular expression that
-        /// can be used to idientify whether a file can be handled by the plugin.
+        /// can be used to identify whether a file can be handled by the plugin.
         /// </summary>
         public RegExprProc regExprProc;
 
@@ -75,7 +75,7 @@ namespace FreeImageAPI.Plugins
         public OpenProc openProc;
 
         /// <summary>
-        /// Delegate to a function that closes a previosly opened file.
+        /// Delegate to a function that closes a previously opened file.
         /// </summary>
         public CloseProc closeProc;
 

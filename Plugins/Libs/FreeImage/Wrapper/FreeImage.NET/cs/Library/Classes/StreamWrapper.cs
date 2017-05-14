@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -45,11 +45,11 @@ namespace FreeImageAPI.IO
     /// </summary>
     /// <remarks>
     /// FreeImage can load bitmaps from arbitrary sources.
-    /// .NET works with different streams like File- or NetConnection-strams.
+    /// .NET works with different streams like File- or NetConnection-streams.
     /// NetConnection streams, which are used to load files from web servers,
     /// for example cannot seek.
     /// But FreeImage frequently uses the seek operation when loading bitmaps.
-    /// <b>StreamWrapper</b> wrapps a stream and makes it seekable by caching all read
+    /// <b>StreamWrapper</b> wraps a stream and makes it seekable by caching all read
     /// data into an internal MemoryStream to jump back- and forward.
     /// StreamWapper is for internal use and only for loading from streams.
     /// </remarks>
@@ -215,7 +215,7 @@ namespace FreeImageAPI.IO
                     newPosition = memoryStream.Position + offset;
                     break;
                 case SeekOrigin.End:
-                    // to seek from the end have have to read to the end first
+                    // to seek from the end have to read to the end first
                     if (!eos)
                     {
                         Fill();

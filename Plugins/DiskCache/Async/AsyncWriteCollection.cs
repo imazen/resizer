@@ -21,7 +21,7 @@ namespace ImageResizer.Plugins.DiskCache.Async {
         private Dictionary<string, AsyncWrite> c = new Dictionary<string, AsyncWrite>();
 
         /// <summary>
-        /// How many bytes of buffered file data to hold in memory before refusing futher queue requests and forcing them to be executed synchronously.
+        /// How many bytes of buffered file data to hold in memory before refusing further queue requests and forcing them to be executed synchronously.
         /// </summary>
         public long MaxQueueBytes { get; set; }
 

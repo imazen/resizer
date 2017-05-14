@@ -35,7 +35,7 @@ namespace ImageResizer.Plugins.SourceDiskCache
         /// <summary>
         /// Sets the location of the cache directory. 
         /// Can be a virtual path (like /App/imagecache) or an application-relative path (like ~/imagecache, the default).
-        /// Relative paths are assummed to be relative to the application root.
+        /// Relative paths are assumed to be relative to the application root.
         /// All values are converted to virtual path format upon assignment (/App/imagecache)
         /// Will throw an InvalidOperationException if changed after the plugin is installed.
         /// </summary>
@@ -204,7 +204,7 @@ namespace ImageResizer.Plugins.SourceDiskCache
 
         /// <summary>
         /// Loads the settings from 'c', starts the cache, and registers the plugin.
-        /// Will throw an invalidoperationexception if already started.
+        /// Will throw an InvalidOperationException if already started.
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
@@ -267,7 +267,7 @@ namespace ImageResizer.Plugins.SourceDiskCache
         public bool AsyncModuleMode { get; private set; }
 
         /// <summary>
-        /// Attempts to start the DiskCache using the current settings. Returns true if succesful or if already started. Returns false on a configuration error.
+        /// Attempts to start the DiskCache using the current settings. Returns true if successful or if already started. Returns false on a configuration error.
         /// Called by Install()
         /// </summary>
         public bool Start()
@@ -299,7 +299,7 @@ namespace ImageResizer.Plugins.SourceDiskCache
             }
         }
         /// <summary>
-        /// Returns true if stopped succesfully. Cannot be restarted
+        /// Returns true if stopped successfully. Cannot be restarted
         /// </summary>
         /// <returns></returns>
         public bool Stop()

@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -41,7 +41,7 @@ namespace FreeImageAPI
     public enum FREE_IMAGE_METADATA_COPY
     {
         /// <summary>
-        /// Exisiting metadata will remain unchanged.
+        /// Existing metadata will remain unchanged.
         /// </summary>
         KEEP_EXISITNG = 0x0,
         /// <summary>

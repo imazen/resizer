@@ -18,7 +18,7 @@ Provides content-aware image resizing and 5 different algorithms.
 
 Based on the [CAIR (v2.19)](https://sites.google.com/site/brainrecall/cair) library.
 
-This plugin requires full trust to work. On 32-bit PNG images, the alpha channel is reduced to a single bit. Works best with jpeg and gif images.
+This plugin requires full trust to work. On 32-bit PNG images, the alpha channel is reduced to a single bit. Works best with JPEG and GIF images.
 
 For live examples, [see this page](http://nathanaeljones.com/596/dynamic-seam-carving-with-imageresizing-net/).
 

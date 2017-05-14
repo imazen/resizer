@@ -41,7 +41,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         List<ILicenseBlob> cache;
 
         /// <summary>
-        ///     The current fetcher. Invalidated when urls are changed
+        ///     The current fetcher. Invalidated when URLs are changed
         /// </summary>
         LicenseFetcher fetcher;
 
@@ -63,7 +63,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         LicenseBlob remoteLicense;
 
         /// <summary>
-        ///     The last time when we got the http response.
+        ///     The last time when we got the HTTP response.
         /// </summary>
         public DateTimeOffset? Last200 { get; private set; }
 
@@ -73,7 +73,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         public DateTimeOffset? LastTimeout { get; private set; }
         string Secret { get; set; }
 
-        // Actually needs an issue reciever? (or should *it* track?) And an HttpClient and Cache
+        // Actually needs an issue receiver? (or should *it* track?) And an HttpClient and Cache
         public LicenseChain(LicenseManagerSingleton parent, string licenseId)
         {
             this.parent = parent;
@@ -169,7 +169,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
                     parent.AcceptIssue(fetcher.FirewallIssue(licenseName));
                     LastTimeout = parent.Clock.GetUtcNow();
                 } else {
-                    parent.AcceptIssue(new Issue("Exception(s) occured fetching license " + licenseName,
+                    parent.AcceptIssue(new Issue("Exception(s) occurred fetching license " + licenseName,
                         RedactSecret(string.Join("\n",
                             results.Select(r =>
                                 $"{r.HttpCode} {r.FullUrl}  LikelyTimeout: {r.LikelyNetworkFailure} Error: {r.FetchError?.ToString()}"))),

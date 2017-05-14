@@ -36,7 +36,7 @@ using System.Text;
 namespace PhotoshopFile
 {
   /// <summary>
-  /// Reads primitive data types as binary values in in big-endian format
+  /// Reads primitive data types as binary values in big-endian format
   /// </summary>
   public class BinaryReverseReader : BinaryReader
   {
@@ -243,7 +243,7 @@ namespace PhotoshopFile
   //////////////////////////////////////////////////////////////////
 
   /// <summary>
-  /// Writes primitive data types as binary values in in big-endian format
+  /// Writes primitive data types as binary values in big-endian format
   /// </summary>
   public class BinaryReverseWriter : BinaryWriter
   {

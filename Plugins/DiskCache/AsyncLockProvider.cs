@@ -68,7 +68,7 @@ namespace ImageResizer.Plugins.DiskCache {
             try {
                 //We have to loop until we get a valid lock and it stays valid until we lock it.
                 do {
-                    // 1) Creation/aquire phase
+                    // 1) Creation/acquire phase
                     lock (createLock) {
                         // We have to lock on dictionary writes, since otherwise 
                         // two locks for the same file could be created and assigned
@@ -87,7 +87,7 @@ namespace ImageResizer.Plugins.DiskCache {
                         try {
                             // May take minutes to acquire this lock. 
 
-                            // Trying to detect an occurence of loophole above
+                            // Trying to detect an occurrence of loophole above
                             // Check that itemLock still exists and matches the dictionary
                             lock (createLock) {
                                 SemaphoreSlim newLock = null;

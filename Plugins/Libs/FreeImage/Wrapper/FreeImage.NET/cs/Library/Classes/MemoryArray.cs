@@ -19,7 +19,7 @@ namespace FreeImageAPI
     public unsafe class MemoryArray<T> : IDisposable, ICloneable, ICollection, IEnumerable<T>, IEquatable<MemoryArray<T>> where T : struct
     {
         /// <summary>
-        /// Baseaddress of the wrapped memory.
+        /// Base address of the wrapped memory.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         protected byte* baseAddress;
@@ -62,7 +62,7 @@ namespace FreeImageAPI
         protected readonly bool isOneBit;
 
         /// <summary>
-        /// Indicates whther the wrapped memory is handles like 4-bit blocks.
+        /// Indicates whether the wrapped memory is handled like 4-bit blocks.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         protected readonly bool isFourBit;
@@ -157,9 +157,9 @@ namespace FreeImageAPI
                 // The array is pinned immediately to prevent the GC from
                 // moving it to a different position in memory.
                 this.handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-                // The array and its content have beed pinned, so that its address
+                // The array and its content have been pinned, so that its address
                 // can be safely requested and stored for the whole lifetime
-                // of the instace.
+                // of the instance.
                 this.ptr = (byte*)handle.AddrOfPinnedObject();
             }
         }
@@ -703,7 +703,7 @@ namespace FreeImageAPI
         }
 
         /// <summary>
-        /// Releases all ressources.
+        /// Releases all resources.
         /// </summary>
         public void Dispose()
         {

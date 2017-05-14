@@ -55,7 +55,7 @@ namespace ImageResizer.Plugins.SourceMemCache {
         public void PingCleanup() { usage.PingCleanup(); }
 
         void usage_CounterRemoved(EventCountingDictionary<K> sender, K key, int value) {
-            //May be exected inside usage.lockSync AND lockSync
+            //May be expected inside usage.lockSync AND lockSync
             lock (lockSync) {
                 data.Remove(key);
             }

@@ -60,7 +60,7 @@ namespace ImageResizer.Plugins.Wic {
                     if (fi.FieldType != typeof(Guid)) continue;
                     Guid key = (Guid)fi.GetValue(null);
 
-                    //Parse the member name - look for 'bpp', then use whatever number is preceeding it.
+                    //Parse the member name - look for 'bpp', then use whatever number is preceding it.
                     string name = (string)fi.Name;
                     int b = name.IndexOf("bpp", 0, StringComparison.OrdinalIgnoreCase);
                     if (b < 1) continue;

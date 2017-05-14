@@ -233,7 +233,7 @@ Q = 0.212 * R - 0.523 * G + 0.311 * B
 //Warming Filter (85) #EC8A00
 //Warming Filter (LBA) #FA9600
 //Warming Filter (81) #EBB113
-//Coolling Filter (80) #006DFF
+//Cooling Filter (80) #006DFF
 //Cooling Filter (LBB) #005DFF
 //Cooling Filter (82) #00B5FF
 //Red #EA1A1A

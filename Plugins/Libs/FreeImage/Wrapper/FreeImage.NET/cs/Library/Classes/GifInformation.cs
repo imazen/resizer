@@ -52,7 +52,7 @@ namespace FreeImageAPI.Metadata
         }
 
         /// <summary>
-        /// Creates a global palette for the GIF image, intialized with all entries of the
+        /// Creates a global palette for the GIF image, initialized with all entries of the
         /// current local palette.
         /// The property <see cref="UseGlobalPalette"/> will be set to <b>true</b> when
         /// invoking this method. This effectively enables the newly created global palette.
@@ -66,7 +66,7 @@ namespace FreeImageAPI.Metadata
         }
 
         /// <summary>
-        /// Creates a global palette for the GIF image with the specified size, intialized
+        /// Creates a global palette for the GIF image with the specified size, initialized
         /// with the first <paramref name="size"/> entries of the current local palette.
         /// The property <see cref="UseGlobalPalette"/> will be set to <b>true</b> when
         /// invoking this method. This effectively enables the newly created global palette.
@@ -80,7 +80,7 @@ namespace FreeImageAPI.Metadata
         }
 
         /// <summary>
-        /// Creates a global palette for the GIF image, intialized with the entries
+        /// Creates a global palette for the GIF image, initialized with the entries
         /// of the specified palette.
         /// The property <see cref="UseGlobalPalette"/> will be set to <b>true</b> when
         /// invoking this method. This effectively enables the newly created global palette.
@@ -101,7 +101,7 @@ namespace FreeImageAPI.Metadata
         }
 
         /// <summary>
-        /// Creates a global palette for the GIF image with the specified size, intialized
+        /// Creates a global palette for the GIF image with the specified size, initialized
         /// with the first <paramref name="size"/> entries of the specified palette.
         /// The property <see cref="UseGlobalPalette"/> will be set to <b>true</b> when
         /// invoking this method. This effectively enables the newly created global palette.

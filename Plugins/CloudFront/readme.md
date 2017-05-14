@@ -46,7 +46,7 @@ By default, CloudFront caches all requests for a minimum of 24 hours (1440 minut
 
 To set the caching time at the server instead of at CloudFront, set `<clientcache minutes="1441" />` in the `<resizer>` section of Web.config. 
 
-If you need to invalidate a cached file sooner than 24 hours, you must change the url (ex. by adding ";invalidate=1" to it), or by using [Amazon's invalidation request feature](http://docs.amazonwebservices.com/AmazonCloudFront/latest/DeveloperGuide/index.html?Invalidation.html).
+If you need to invalidate a cached file sooner than 24 hours, you must change the URL (ex. by adding ";invalidate=1" to it), or by using [Amazon's invalidation request feature](http://docs.amazonwebservices.com/AmazonCloudFront/latest/DeveloperGuide/index.html?Invalidation.html).
 
 
 ## Automatic redirection of standard (`image.jpg?width=..`) URLs back to the CDN.
@@ -61,9 +61,9 @@ We don't suggest this except to reduce server load in an emergency. Redirects ma
 1. In the `<resizer>` section, just add `<cloudfront redirectThrough="http://d3urjqacv88oxz.cloudfront.net" redirectPermanent="false" />`. 
 2. Change d3urjqacv88oxz.cloudfront.net to match the distribution name you created in the AWS console. 
 
-The redirectThrough setting tells the CloudFront plugin to redirect any standard URLs back through the CloudFront distribution, automatically rewriting them to the semicolon syntax so everything will work properly. This feature, when configured, allows you to use normal `image.jpg?width=100&height=200` urls, without specifying either the distribution name, full path, or using the semicolon syntax in the anchor link. 
+The redirectThrough setting tells the CloudFront plugin to redirect any standard URLs back through the CloudFront distribution, automatically rewriting them to the semicolon syntax so everything will work properly. This feature, when configured, allows you to use normal `image.jpg?width=100&height=200` URLs, without specifying either the distribution name, full path, or using the semicolon syntax in the anchor link.
 
 As automatic redirection requires the browser to make an additional HTTP request, latency may be increased, but overall request time may be slightly lower for large images, due to the faster connection available between the CloudFront server and the client. The primary advantages of automatic redirection are (a) increased scalability of the origin server, and (b) low developer cost - no extra work required.
 
-If you have configured a CNAME mask for your CloudFront distribution, and would like to transfer the 'SEO weight' from the old URLs to the new CNAME-based urls, set redirectPermanent=true. 
+If you have configured a CNAME mask for your CloudFront distribution, and would like to transfer the 'SEO weight' from the old URLs to the new CNAME-based URLs, set redirectPermanent=true.
 

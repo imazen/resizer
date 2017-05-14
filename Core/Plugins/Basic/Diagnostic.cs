@@ -33,7 +33,7 @@ namespace ImageResizer.Plugins.Basic {
     /// Provides the incredibly helpful /resizer.debug page we all love.
     /// 
     /// Mimics the behavior of customErrors by default. Not available if CustomErrors=true or retail=true. Available only to localhost if customErrors=RemoteOnly.
-    /// Can be overriden by adding in the &lt;resizer&gt; section &lt;diagnostics enableFor="None|AllHosts|LocalHost" /&gt;
+    /// Can be overridden by adding in the &lt;resizer&gt; section &lt;diagnostics enableFor="None|AllHosts|LocalHost" /&gt;
     /// 
     /// </summary>
     public class Diagnostic :IPlugin{

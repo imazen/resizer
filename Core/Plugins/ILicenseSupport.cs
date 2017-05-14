@@ -43,7 +43,7 @@ namespace ImageResizer.Plugins.Licensing
         void MonitorHeartbeat(Config c);
 
         /// <summary>
-        /// Register a license key (if it isn't already), and return the inital chain (or null, if the license is invalid)
+        /// Register a license key (if it isn't already), and return the initial chain (or null, if the license is invalid)
         /// </summary>
         /// <param name="license"></param>
         /// <param name="access"></param>
@@ -91,12 +91,12 @@ namespace ImageResizer.Plugins.Licensing
         bool Shared { get; }
 
         /// <summary>
-        /// If the license chain is updated over the internet
+        /// If the license chain is updated over the Internet
         /// </summary>
         bool IsRemote { get; }
 
         /// <summary>
-        /// Can return fresh, cached, and inline licenes
+        /// Can return fresh, cached, and inline licenses
         /// </summary>
         /// <returns></returns>
         IEnumerable<ILicenseBlob> Licenses();

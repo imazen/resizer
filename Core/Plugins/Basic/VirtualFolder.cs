@@ -118,7 +118,7 @@ namespace ImageResizer.Plugins.Basic {
             return path;
         }
         /// <summary>
-        /// Attempts to convert a phyiscal path into a collapsed rooted physical path.
+        /// Attempts to convert a physical path into a collapsed rooted physical path.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -343,7 +343,7 @@ namespace ImageResizer.Plugins.Basic {
             List<IIssue> issues = new List<IIssue>();
 
             if (NoIOPermission) issues.Add(new Issue("The VirtualFolder plugin cannot serve files from \"" +  PhysicalPath + "\" until you increase the trust level or modify the trust configuration to permit read access to the directory.", IssueSeverity.Error));
-            if (FailedToRegisterVpp) issues.Add(new Issue("The VirtualFolder plugin failed to register itself as an app-wide VirtualPathProvider. It will only work for images proccessed by the image resizer.", IssueSeverity.Error));
+            if (FailedToRegisterVpp) issues.Add(new Issue("The VirtualFolder plugin failed to register itself as an app-wide VirtualPathProvider. It will only work for images processed by the image resizer.", IssueSeverity.Error));
 
 
             return issues;

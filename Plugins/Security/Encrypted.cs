@@ -35,7 +35,7 @@ namespace ImageResizer.Plugins.Encrypted {
 
         private string _virtualPrefix = "~/images/enc/";
         /// <summary>
-        /// Requests starting with this path will be decrypted. Should be in app-relative form: "~/s3/". Will be converted to root-relative form upon assigment. Trailing slash required, auto-added.
+        /// Requests starting with this path will be decrypted. Should be in app-relative form: "~/s3/". Will be converted to root-relative form upon assignment. Trailing slash required, auto-added.
         /// </summary>
         public string VirtualPrefix {
             get { return _virtualPrefix; }

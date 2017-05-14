@@ -150,7 +150,7 @@ namespace ImageResizer.Plugins.Basic {
             }
 
             if (edition == null) 
-                sb.AppendLine("You do not seem to be using any plugins from (commerical/AGPL) editions.");
+                sb.AppendLine("You do not seem to be using any plugins from (commercial/AGPL) editions.");
             else {
                 sb.AppendLine("\nYou are using plugins and assemblies from the " + friendlyNames[edition] + ".");
             }
@@ -190,7 +190,7 @@ namespace ImageResizer.Plugins.Basic {
             sb.AppendLine();
 
 
-            //Echo server assembly, iis version, OS version, and CLR version.
+            //Echo server assembly, IIS version, OS version, and CLR version.
             sb.AppendLine("\nEnvironment information:\n");
             string iis = context != null ? context.Request.ServerVariables["SERVER_SOFTWARE"] : "NOT ASP.NET";
             if (!string.IsNullOrEmpty(iis)) iis += " on ";
@@ -278,7 +278,7 @@ namespace ImageResizer.Plugins.Basic {
                     "You should remove them (and especially their dependencies (unless used elsewhere)) from the /bin folder to improve application load times:\n");
                 sb.Append(unusedPlugins.ToString());
 
-                sb.AppendLine("\nReference list of plugin dependencies - so you know what additional dlls to remove when removing a plugin. (may not be up-to-date, see plugin docs):\n");
+                sb.AppendLine("\nReference list of plugin dependencies - so you know what additional DLLs to remove when removing a plugin. (may not be up-to-date, see plugin docs):\n");
                 sb.AppendLine("The FreeImage plugin has the following dependencies: FreeImage.dll and FreeImageNET.dll\n" +
                     "The Logging plugin depends on: NLog.dll\n" +
                     "The AdvancedFilters, RedEye, and WhitespaceTrimmer plugins depend on: AForge.dll, AForge.Math.dll, and AForge.Imaging.dll\n" +

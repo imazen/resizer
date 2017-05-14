@@ -176,7 +176,7 @@ Here is an example Global.asax.cs file
         w.hideIfTooSmall = true;
         w.keepAspectRatio = true; //Maintains the aspect ratio of the watermark itself.
         w.valuesPercentages = false; //When true .bottomRightPadding, .topLeftPadding, and .watermarkSize are all percentages of the primary image size. Percentages are 0..1, not 0..100.
-        w.watermarkDir = "~/watermarks/"; //Where the watermark plugin looks for the image specifed in the querystring ?watermark=file.png
+        w.watermarkDir = "~/watermarks/"; //Where the watermark plugin looks for the image specified in the querystring ?watermark=file.png
         w.bottomRightPadding = new System.Drawing.SizeF(20, 20); //Padding between the bottom and right edges of the watermark and the primary image
         w.topLeftPadding = new System.Drawing.SizeF(20, 20); //Padding between the top  and left edges of the watermark and the primary image
         w.watermarkSize = new System.Drawing.SizeF(30, 30); //The desired size of the watermark, maximum dimensions (aspect ratio maintained if keepAspectRatio = true)

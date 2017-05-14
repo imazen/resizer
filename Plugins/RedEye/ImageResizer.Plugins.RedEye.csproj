@@ -159,7 +159,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="alogorithm.txt" />
+    <Content Include="algorithm.txt" />
     <Content Include="manual-algorithm.txt" />
     <EmbeddedResource Include="Native.xml">
       <SubType>Designer</SubType>

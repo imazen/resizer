@@ -45,7 +45,7 @@ namespace ImageResizer.Util {
         /// Should be called SetFullExtension.
         /// Sets the file extension of the specified path to the specified value, returning the result.
         /// If an extension has multiple parts, it will replace all of them.
-        /// Leading dots will be stripped from 'newExtension' and re-addd as required.
+        /// Leading dots will be stripped from 'newExtension' and re-add as required.
         /// The querystring and fragment is maintained as-is. Semicolon syntax not supported.
         /// </summary>
         /// <param name="path"></param>
@@ -201,7 +201,7 @@ namespace ImageResizer.Util {
         }
 
         /// <summary>
-        /// Removes the query string from the specifed path. If the path is only a querystring, an empty string is returned. Does not support the semicolon syntax.  Fragment is maintained as-is.
+        /// Removes the query string from the specified path. If the path is only a querystring, an empty string is returned. Does not support the semicolon syntax. Fragment is maintained as-is.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -221,7 +221,7 @@ namespace ImageResizer.Util {
 
 
         /// <summary>
-        /// Overwrites exisisting querystring values in 'path' with the values in 'newQuerystring'. Does not support the semicolon syntax. 
+        /// Overwrites existing querystring values in 'path' with the values in 'newQuerystring'. Does not support the semicolon syntax.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="newQuerystring"></param>
@@ -430,9 +430,9 @@ namespace ImageResizer.Util {
                     c[urlDecode ? HttpUtility.UrlDecode(namevalue[0]) : namevalue[0]] =
                         urlDecode ? HttpUtility.UrlDecode(namevalue[1]) : namevalue[1];
                 } else if (namevalue.Length == 1){
-                    //Hanlde &key=&key2= or &key&key2 -> key: "", key2: ""
+                    //Handle &key=&key2= or &key&key2 -> key: "", key2: ""
                     //Setting a null value would be confusing, as that is how we determine
-                    //whether a certain paramater exists
+                    //whether a certain parameter exists
                     c[urlDecode ? HttpUtility.UrlDecode(namevalue[0]) : namevalue[0]] = "";
                 }
             }
@@ -440,7 +440,7 @@ namespace ImageResizer.Util {
         }
 
         /// <summary>
-        /// Converts aribtrary bytes to a URL-safe version of base64 (no = padding, with - instead of + and _ instead of /)
+        /// Converts arbitrary bytes to a URL-safe version of base64 (no = padding, with - instead of + and _ instead of /)
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
@@ -453,11 +453,11 @@ namespace ImageResizer.Util {
         /// <param name="data"></param>
         /// <returns></returns>
         public static byte[] FromBase64UToBytes(string data) {
-            data = data.PadRight(data.Length + ((4 - data.Length % 4) % 4), '='); //if there is 1 leftover octet, add ==, if 2, add =. 3 octects = 4 chars. 
+            data = data.PadRight(data.Length + ((4 - data.Length % 4) % 4), '='); //if there is 1 leftover octet, add ==, if 2, add =. 3 octets = 4 chars.
             return Convert.FromBase64String(data.Replace('-', '+').Replace('_', '/'));
         }
         /// <summary>
-        /// Converts aribtrary strings to a URL-safe version of base64 (no = padding, with - instead of + and _ instead of /)
+        /// Converts arbitrary strings to a URL-safe version of base64 (no = padding, with - instead of + and _ instead of /)
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
@@ -473,7 +473,7 @@ namespace ImageResizer.Util {
             return UTF8Encoding.UTF8.GetString(FromBase64UToBytes(data));
         }
         /// <summary>
-        /// Returns the physcial mapped path for the specified virtual path if it starts with ~, otherwise retuns the original path.
+        /// Returns the physical mapped path for the specified virtual path if it starts with ~, otherwise returns the original path.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -483,7 +483,7 @@ namespace ImageResizer.Util {
 
 
         /// <summary>
-        /// Generates a resized image url for the specified physical or virtual path. 
+        /// Generates a resized image URL for the specified physical or virtual path.
         /// Not CloudFront compatible. Does not support remote URLs, use RemoteReader for that.
         /// If you're running in IIS classic, add ".ashx" to the 'path' parameter. 
         /// </summary>
@@ -495,7 +495,7 @@ namespace ImageResizer.Util {
         }
 
         /// <summary>
-        /// Attempts to guess the virtual path from physical path. Will be thrwarted if the path is mapped as a virtual folder inside the application.
+        /// Attempts to guess the virtual path from physical path. Will be thwarted if the path is mapped as a virtual folder inside the application.
         /// If the path is a non-physical path, it will be returned as is.
         /// Returns null if the physical path isn't a subfolder of the application's physical path.
         /// </summary>
@@ -553,7 +553,7 @@ namespace ImageResizer.Util {
                     result = RemoveNonMatchingChars(result, filter);
                 }
                 if (result == null)
-                    throw new ImageProcessingException("Invalid variable name \"" + varName + "\" in templated path \"" + pathWithVars + "\". The variable name may be mispelled, or the variable may not be available with the pipeline you are using.");
+                    throw new ImageProcessingException("Invalid variable name \"" + varName + "\" in templated path \"" + pathWithVars + "\". The variable name may be misspelled, or the variable may not be available with the pipeline you are using.");
                 p = p.Substring(0,start) + result + p.Substring(stop + 1);
             }
             if (p.IndexOf('>') > -1) throw new ImageProcessingException("Orphaned '>' in template path \"" + pathWithVars + "\".");

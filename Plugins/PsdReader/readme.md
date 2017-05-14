@@ -26,7 +26,7 @@ Simply reference a .psd file as you would a .jpg
 
     image.psd?width=100
 
-A 100px wide jpeg will be returned. 
+A 100px wide JPEG will be returned.
 
 You can also simply convert the image to another format.
 

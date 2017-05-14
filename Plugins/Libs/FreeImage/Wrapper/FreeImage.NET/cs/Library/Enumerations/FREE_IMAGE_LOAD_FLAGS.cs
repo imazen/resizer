@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -46,7 +46,7 @@ namespace FreeImageAPI
         /// </summary>
         DEFAULT = 0,
         /// <summary>
-        /// Load the image as a 256 color image with ununsed palette entries, if it's 16 or 2 color.
+        /// Load the image as a 256 color image with unused palette entries, if it's 16 or 2 color.
         /// </summary>
         GIF_LOAD256 = 1,
         /// <summary>
@@ -99,7 +99,7 @@ namespace FreeImageAPI
         TIFF_CMYK = 0x0001,
         /// <summary>
         /// Tries to load the JPEG preview image, embedded in
-        /// Exif Metadata or load the image as RGB 24-bit if no 
+        /// Exif metadata or load the image as RGB 24-bit if no
         /// preview image is available.
         /// </summary>
         RAW_PREVIEW = 0x1,

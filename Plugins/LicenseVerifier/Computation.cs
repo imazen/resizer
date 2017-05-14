@@ -134,7 +134,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             }
             var others = mgr.GetAllLicenses().Except(chains).Select(c => c.ToString()).ToList();
             if (others.Any()) {
-                sb.AppendLine("Licenses only used by other Config instances in this procces:\n");
+                sb.AppendLine("Licenses only used by other Config instances in this process:\n");
                 sb.AppendLine(string.Join("\n", others));
             }
 
@@ -196,7 +196,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         /// <summary>
         ///     Pending licenses can offer grace periods. Logs a local issue; trusts the instance (and issue) will be cleared
-        ///     when the returned datetime passes. May subdivide a grace period for more granular issue text.
+        ///     when the returned DateTime passes. May subdivide a grace period for more granular issue text.
         /// </summary>
         /// <param name="chain"></param>
         /// <returns></returns>
@@ -300,7 +300,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             }
             var others = mgr.GetAllLicenses().Except(chains).Select(c => c.ToPublicString()).ToList();
             if (others.Any()) {
-                sb.AppendLine("Licenses only used by other Config instances in this procces:\n");
+                sb.AppendLine("Licenses only used by other Config instances in this process:\n");
                 sb.AppendLine(string.Join("\n", others));
             }
             return sb.ToString();

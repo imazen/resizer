@@ -63,7 +63,7 @@ namespace ImageResizer.Plugins.Watermark {
         private DistanceUnit _top = null;
         /// <summary>
         /// The offset from the top of the container. Percentages are relative to the container height. Defines the upper boundary for the layer. 
-        /// If null, Bottom will be used to calcuate the value based on the height. If Bottom is not specified, defaults to 0.
+        /// If null, Bottom will be used to calculate the value based on the height. If Bottom is not specified, defaults to 0.
         /// Positive values are inside the container, negative values outside it.
         /// </summary>
         public DistanceUnit Top {
@@ -74,7 +74,7 @@ namespace ImageResizer.Plugins.Watermark {
         private DistanceUnit _left = null;
         /// <summary>
         /// The offset from the left of the container. Percentages are relative to the container width. Defines the leftmost boundary for the layer. 
-        /// If null, Right will be used to calcuate the value based on the width. If Right is not specified, defaults to 0.
+        /// If null, Right will be used to calculate the value based on the width. If Right is not specified, defaults to 0.
         /// Positive values are inside the container, negative values outside it.
         /// </summary>
         public DistanceUnit Left {
@@ -86,7 +86,7 @@ namespace ImageResizer.Plugins.Watermark {
 
         /// <summary>
         /// The offset relative to the right side of the container. Percentages are relative to the container width. Defines the rightmost boundary for the layer.
-        /// If null, Top will be used to calcuate the value based on the height. If Top is not specified, defaults to 0.
+        /// If null, Top will be used to calculate the value based on the height. If Top is not specified, defaults to 0.
         /// Positive values are inside the container, negative values outside it.
         /// </summary>
         public DistanceUnit Right {
@@ -96,7 +96,7 @@ namespace ImageResizer.Plugins.Watermark {
         private DistanceUnit _bottom = null;
         /// <summary>
         /// The offset relative to the bottom of the container. Percentages are relative to the container height. Defines the bottom-most boundary for the layer.
-        /// If null, Top will be used to calcuate the value based on the height. If Top is not specified, defaults to 0.
+        /// If null, Top will be used to calculate the value based on the height. If Top is not specified, defaults to 0.
         /// Positive values are inside the container, negative values outside it.
         /// </summary>
         public DistanceUnit Bottom {
@@ -106,7 +106,7 @@ namespace ImageResizer.Plugins.Watermark {
         private DistanceUnit _width = null;
         /// <summary>
         /// The width of the layer. If used with both Left and Right, the smaller result wins. I.e, with a 100px container, width=50, left=30, right=30, the resulting width will be 40.
-        /// If null, Left and Right will be used to calcuate the value. If both Left and Right are not specified, the natural width of the layer's contents will be used.
+        /// If null, Left and Right will be used to calculate the value. If both Left and Right are not specified, the natural width of the layer's contents will be used.
         /// Percentages are relative to the container width. 
         /// </summary>
         public DistanceUnit Width {
@@ -117,7 +117,7 @@ namespace ImageResizer.Plugins.Watermark {
 
         /// <summary>
         /// The height of the layer. If used with both Top and Bottom, the smaller result wins. I.e, with a 100px container, height=50, top=30, top=30, the resulting height will be 40.
-        /// If null, Top and Bottom will be used to calcuate the value. If both Top and Bottom are not specified, the natural height of the layer's contents will be used.
+        /// If null, Top and Bottom will be used to calculate the value. If both Top and Bottom are not specified, the natural height of the layer's contents will be used.
         /// Percentages are relative to the container height. 
         /// </summary>
         public DistanceUnit Height {
@@ -157,8 +157,8 @@ namespace ImageResizer.Plugins.Watermark {
         private bool _fill = false;
         /// <summary>
         /// (defaults false). When true, the image or text will attempt to fill 1 of the layer's bounds, even if upscaling is required. 
-        /// When Width is not specified, and both left and right are not specififed, this causes the image to fill the container width (if possible).
-        /// When Height is not specified, and both top and bottom are not specififed, this causes the image to fill the container height (if possible).
+        /// When Width is not specified, and both left and right are not specified, this causes the image to fill the container width (if possible).
+        /// When Height is not specified, and both top and bottom are not specified, this causes the image to fill the container height (if possible).
         /// This causes &amp;scale=both to be used on images unless another setting is specified in imageQuery.
         /// </summary>
         public bool Fill {
@@ -170,7 +170,7 @@ namespace ImageResizer.Plugins.Watermark {
 
         private LayerPlacement _drawAs = LayerPlacement.Overlay;
         /// <summary>
-        /// The z-order at which to draw the layer. Curret options are Overlay (over everything) and Background (over the background color).
+        /// The z-order at which to draw the layer. Current options are Overlay (over everything) and Background (over the background color).
         /// </summary>
         public LayerPlacement DrawAs {
             get { return _drawAs; }
@@ -181,7 +181,7 @@ namespace ImageResizer.Plugins.Watermark {
         public delegate Size CalculateLayerContentSize(double maxwidth, double maxheight);
         /// <summary>
         /// Returns a rectangle with canvas-relative coordinates. A callback is required to calculate the actual size of the content based on the specified bounds. 
-        /// The callback may be passed double.NaN for one or more paramters to indicate that they are not specified.
+        /// The callback may be passed double.NaN for one or more parameters to indicate that they are not specified.
         /// 
         /// </summary>
         /// <param name="s"></param>

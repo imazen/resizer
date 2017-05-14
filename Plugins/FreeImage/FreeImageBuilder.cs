@@ -85,7 +85,7 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
             if (job.ResetSourceStream) restoreStreamPosition = true;
             job.SourcePathData = path;
 
-            //Save the original stream positione
+            //Save the original stream position
             originalPosition = (restoreStreamPosition) ? s.Position : -1;
             try {
                 //What is our destination format

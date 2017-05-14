@@ -152,7 +152,7 @@ namespace ImageResizer {
             return this.IsOneSpecified(keys);
         }
         /// <summary>
-        /// ["rotate"] The degress to rotate the image clockwise. -360 to 360.
+        /// ["rotate"] The degrees to rotate the image clockwise. -360 to 360.
         /// </summary>
         public double Rotate                        { get { 
             return get("rotate", 0.0d);               } set {   
@@ -349,9 +349,9 @@ namespace ImageResizer {
 
         /// <summary>
         /// Like this["format"]. 
-        /// Gets or sets the output file format to use. "png", "jpg", and "gif" are valid values.
-        /// Returns null if unspecified. When format is not specified, the original format of the image is used (unless it is not a web safe format  - jpeg is the fallback in that scenario).
-        /// <remarks>Also checks the 'thumbnail' value for V2 compatibility. When set, 'thumnail' is removed and only 'format' is used.
+        /// Gets or sets the output file format to use. 'png', 'jpg', and 'gif' are valid values.
+        /// Returns null if unspecified. When format is not specified, the original format of the image is used (unless it is not a web safe format  - JPEG is the fallback in that scenario).
+        /// <remarks>Also checks the 'thumbnail' value for V2 compatibility. When set, 'thumbnail' is removed and only 'format' is used.
         /// </remarks>
         /// </summary>
         public string Format {

@@ -78,7 +78,7 @@ namespace SevenZipReduced
   */
 
     /// <summary>
-    /// Provides the fields that represent properties idenitifiers for compressing.
+    /// Provides the fields that represent properties identifiers for compressing.
     /// </summary>
     public enum CoderPropID
     {
@@ -103,7 +103,7 @@ namespace SevenZipReduced
         /// </summary>
         BlockSize,
         /// <summary>
-        /// Specifies number of postion state bits for LZMA (0 &lt;= x &lt;= 4).
+        /// Specifies number of position state bits for LZMA (0 &lt;= x &lt;= 4).
         /// </summary>
         PosStateBits,
         /// <summary>
@@ -123,7 +123,7 @@ namespace SevenZipReduced
         /// </summary>
         MatchFinder,
         /// <summary>
-        /// Specifies the number of match finder cyckes.
+        /// Specifies the number of match finder cycles.
         /// </summary>
         MatchFinderCycles,
         /// <summary>

@@ -24,7 +24,7 @@ namespace ImageResizer.Plugins.Watermark {
         public Boolean valuesPercentages = true;
         
         public Boolean keepAspectRatio = true;
-        [Obsolete("Use .OtherImages.Top/Left or an xml preset instead. ")]
+        [Obsolete("Use .OtherImages.Top/Left or an xml preset instead.")]
         public SizeF topLeftPadding = new SizeF(0, 0);
         [Obsolete("Use .OtherImages.Bottom/Right or an xml preset instead.")]
         public SizeF bottomRightPadding = new SizeF(0, 0);
@@ -137,7 +137,7 @@ namespace ImageResizer.Plugins.Watermark {
                 bottomRightPadding = new SizeF((float)Math.Floor(bottomRightPadding.Width), (float)Math.Floor(bottomRightPadding.Height));
 
 
-                //Check boundingbox
+                //Check bounding box
                 SizeF watermarkBoundingBox = new SizeF(watermarkSize.Width + topLeftPadding.Width + bottomRightPadding.Width,
                     watermarkSize.Height + topLeftPadding.Height + bottomRightPadding.Height);
 

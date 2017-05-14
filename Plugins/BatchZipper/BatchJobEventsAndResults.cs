@@ -72,7 +72,7 @@ namespace ImageResizer.Plugins.BatchZipper
     }
 
     /// <summary>
-    /// Not always the execption you'll see in the JobEvent handler when you cancel a job.
+    /// Not always the exception you'll see in the JobEvent handler when you cancel a job.
     /// </summary>
     [Serializable()]
     public class JobCancelledException : System.ApplicationException
@@ -107,7 +107,7 @@ namespace ImageResizer.Plugins.BatchZipper
         public bool Successful { get { return successful; } }
         public BatchResizeItem Item { get { return item; } }
         /// <summary>
-        /// The exception that occured when resizing, opening, copying, or compressing the file.
+        /// The exception that occurred when resizing, opening, copying, or compressing the file.
         /// </summary>
         public Exception ItemError { get { return itemError; } }
 
@@ -144,7 +144,7 @@ namespace ImageResizer.Plugins.BatchZipper
 
         private Exception jobError;
         /// <summary>
-        /// The exception that occured while processing the job. 
+        /// The exception that occurred while processing the job.
         /// </summary>
         public Exception JobError { get { return jobError; } }
         private JobStats jobStats;

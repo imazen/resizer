@@ -100,7 +100,7 @@ namespace PhotoshopFile.Text
             return n;
         }
         /// <summary>
-        /// Deeop copies trees. Supports byte[], int, string, double, bool, dict(str,obj),list(obj)
+        /// Deep copies trees. Supports byte[], int, string, double, bool, dict(str,obj),list(obj)
         /// </summary>
         /// <param name="o"></param>
         /// <returns></returns>
@@ -169,7 +169,7 @@ namespace PhotoshopFile.Text
             throw new TdTaParseException("Unexpected token " + t);
         }
         /// <summary>
-        /// Parses a list of objects from the stream. Assumes opening token was alread read.
+        /// Parses a list of objects from the stream. Assumes opening token was already read.
         /// </summary>
         /// <returns></returns>
         protected List<object> parseList()
@@ -194,7 +194,7 @@ namespace PhotoshopFile.Text
             }
         }
         /// <summary>
-        /// Parses a dictionary (map,object) from the stream. Assumes opening token was alread read.
+        /// Parses a dictionary (map,object) from the stream. Assumes opening token was already read.
         /// </summary>
         /// <returns></returns>
         protected Dictionary<string,object> parseDict()

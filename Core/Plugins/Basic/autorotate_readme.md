@@ -1,12 +1,12 @@
 Tags: plugin
 Bundle: free
 Edition: free
-Tagline: Use the EXIF rotation data from the camera to auto-rotate your images.
+Tagline: Use the Exif rotation data from the camera to auto-rotate your images.
 Aliases: /plugins/autorotate
 
-# Rotate images by EXIF data
+# Rotate images by Exif data
 
-Automatically rotate images based on the EXIF Orientation flag embedded by the camera. 
+Automatically rotate images based on the Exif Orientation flag embedded by the camera.
 
 ## Enable autorotation for all images by default via Web.config
 

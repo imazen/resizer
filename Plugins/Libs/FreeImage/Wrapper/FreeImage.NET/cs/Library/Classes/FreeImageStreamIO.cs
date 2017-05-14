@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -41,7 +41,7 @@ using System.Diagnostics;
 namespace FreeImageAPI.IO
 {
     /// <summary>
-    /// Internal class wrapping stream io functions.
+    /// Internal class wrapping stream I/O functions.
     /// </summary>
     /// <remarks>
     /// FreeImage can read files from a disk or a network drive but also allows the user to
@@ -49,8 +49,8 @@ namespace FreeImageAPI.IO
     /// server for example.
     /// <para/>
     /// In .NET streams are a common way to handle data. The <b>FreeImageStreamIO</b> class handles
-    /// the loading and saving from and to streams. It implements the funtions FreeImage needs
-    /// to load data from an an arbitrary source.
+    /// the loading and saving from and to streams. It implements the functions FreeImage needs
+    /// to load data from an arbitrary source.
     /// <para/>
     /// The class is for internal use only.
     /// </remarks>

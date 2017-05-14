@@ -289,7 +289,7 @@ namespace ImageResizer.Util
 
         /// <summary>
         /// Moves element 4 to spot 3 and truncates to 3 elements.
-        /// For compatiblity with Graphics.DrawImage
+        /// For compatibility with Graphics.DrawImage
         /// </summary>
         /// <param name="quad"></param>
         /// <returns></returns>
@@ -303,7 +303,7 @@ namespace ImageResizer.Util
         }
 
         /// <summary>
-        /// Determines the width and height of the paralellogram.
+        /// Determines the width and height of the parallelogram.
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
@@ -328,7 +328,7 @@ namespace ImageResizer.Util
             return sub;
         }
         /// <summary>
-        /// Approximates a radial brush using a high-rez PathGradientBrush.
+        /// Approximates a radial brush using a high-res PathGradientBrush.
         /// </summary>
         /// <param name="inner"></param>
         /// <param name="outer"></param>
@@ -428,7 +428,7 @@ namespace ImageResizer.Util
             return true;
         }
         /// <summary>
-        /// Returns an array of parallelograms. These parallelgrams are the 'corners' outside each vertex in 'poly'.
+        /// Returns an array of parallelograms. These parallelograms are the 'corners' outside each vertex in 'poly'.
         /// The adjacent edges are perpendicular to 'poly'. Point 1 of each parallelogram will match the respective point in 'poly'
         /// Points are clockwise.
         ///
@@ -446,12 +446,12 @@ namespace ImageResizer.Util
             return GetCorners(poly,widths);
         }
         /// <summary>
-        /// Returns an array of parallelograms. These parallelgrams are the 'corners' outside each vertex in 'poly'.
+        /// Returns an array of parallelograms. These parallelograms are the 'corners' outside each vertex in 'poly'.
         /// The adjacent edges are perpendicular to 'poly'. Point 1 of each parallelogram will match the respective point in 'poly'
         /// Points are clockwise.
         /// 
         /// Each float in widths[] corresponds to the point in poly[]. This is the distance to go perpendicularly from 
-        /// the line beween poly[i] and poly[i +1].
+        /// the line between poly[i] and poly[i +1].
         /// 
         /// </summary>
         /// <param name="poly"></param>
@@ -495,7 +495,7 @@ namespace ImageResizer.Util
             return corners;
         }
         /// <summary>
-        /// Returns an array of parallelograms. These parallelgrams are the 'sides' bounding the polygon.
+        /// Returns an array of parallelograms. These parallelograms are the 'sides' bounding the polygon.
         /// Points are clockwise. Point 1 is the top-left outer point, point 2 the top-right, point 3 the bottom-right, and point 4 the bottom-left.
         /// </summary>
         /// <param name="poly"></param>
@@ -590,7 +590,7 @@ namespace ImageResizer.Util
         }
 
         /// <summary>
-        /// Round a floating-point rectangle by apply ceil to x/y and floor to width/height
+        /// Round a floating-point rectangle by applying ceil to x/y and floor to width/height
         /// </summary>
         /// <param name="r"></param>
         /// <returns></returns>
@@ -642,7 +642,7 @@ namespace ImageResizer.Util
         }
 
         /// <summary>
-        /// Returns a point equidistant beweteen A and B
+        /// Returns a point equidistant between A and B
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>

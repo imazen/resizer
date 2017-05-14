@@ -76,7 +76,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
 
             // color image
             byte* ptr = (byte*)image.ImageData.ToPointer();
-            // allign pointer to the first pixel to process
+            // align pointer to the first pixel to process
             ptr += (startY * stride + startX * pixelSize);
 
 

@@ -35,7 +35,7 @@ namespace ImageResizer.Configuration.Performance
             var count = SegmentsPossibleValuesCountInternal().Sum();
             if (count > MaxPossibleValues)
             {
-                throw new ArgumentException("This clamping function produces over " + count + " unique values, which exceeds your configured MaxPossibleValues limt");
+                throw new ArgumentException("This clamping function produces over " + count + " unique values, which exceeds your configured MaxPossibleValues limit");
             }
             hasValidated = true;
         }

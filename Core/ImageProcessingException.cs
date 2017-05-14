@@ -9,7 +9,7 @@ using System.Web;
 
 namespace ImageResizer {
     /// <summary>
-    /// Represents an non-recoverable exception that occured while processing the image. 
+    /// Represents a non-recoverable exception that occurred while processing the image.
     /// Possible causes are: a corrupted source file, cache resource timeout (such as a locked file in imagecache),
     /// unusable configuration (for example, no registered encoders or caches), invalid syntax, or a size limit was exceeded and the request was stopped by the SizeLimiting extension.
     /// May also be caused by a missing source file/resource, in the form of the ImageMissingException subclass.
