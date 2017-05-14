@@ -262,7 +262,7 @@ namespace ImageResizer {
 
         private string _sourcePathData = null;
         /// <summary>
-        /// If 'source' contains any path-related data, it is copied into this member for use by format detetction code, so decoding can be optimized.
+        /// If 'source' contains any path-related data, it is copied into this member for use by format detection code, so decoding can be optimized.
         /// May be a physical or virtual path, or just a file name.
         /// </summary>
         public string SourcePathData {
@@ -308,7 +308,7 @@ namespace ImageResizer {
         }
         /// <summary>
         /// Internal use only.
-        /// Resolves the specified (potenetially templated) path into a physical path. 
+        /// Resolves the specified (potentially templated) path into a physical path.
         /// Applies the AddFileExtension setting using the 'ext' variable.
         /// Supplies the guid, settings.*, filename, path, and originalExt variables. 
         /// The resolver method should supply 'ext', 'width', and 'height' (all of which refer to the final image).

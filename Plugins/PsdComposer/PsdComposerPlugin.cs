@@ -26,7 +26,7 @@ using System.Globalization;
 namespace ImageResizer.Plugins.PsdComposer
 {
     /// <summary>
-    /// Allows you to edit PSD files (hide/show layers, change text layer contents, apply certain effects), and render them to jpeg, gif, or png dynamically. Works as an IVirtualImageProvider, so you can post-process the composed result with any of the other plugins or commands.
+    /// Allows you to edit PSD files (hide/show layers, change text layer contents, apply certain effects), and render them to JPEG, GIF, or PNG dynamically. Works as an IVirtualImageProvider, so you can post-process the composed result with any of the other plugins or commands.
     /// </summary>
     public class PsdComposerPlugin : IPlugin, IVirtualImageProvider, IQuerystringPlugin, IFileExtensionPlugin
     {
@@ -68,7 +68,7 @@ namespace ImageResizer.Plugins.PsdComposer
         }
         
         /// <summary>
-        /// Returns a virtual file instance for the specified specified file and querystring, if they indicate a PSD composition request. 
+        /// Returns a virtual file instance for the specified file and querystring, if they indicate a PSD composition request.
         /// Otherwise, null is returned.
         /// </summary>
         /// <param name="virtualPath"></param>
@@ -108,7 +108,7 @@ namespace ImageResizer.Plugins.PsdComposer
         /// <returns></returns>
         protected IPsdRenderer GetSelectedRenderer(NameValueCollection queryString)
         {
-            return new PsdPluginRenderer(); //There is only ONE renderer now - The Agurigma one was horrible
+            return new PsdPluginRenderer(); //There is only ONE renderer now - The Aurigma one was horrible
         }
 
  
@@ -476,7 +476,7 @@ namespace ImageResizer.Plugins.PsdComposer
         /// <returns></returns>
         public  Stream Open() { return provider.ComposeStream(this.VirtualPath, this.Query); }
         /// <summary>
-        /// Returns a composed bitmap of the file using request querystring paramaters.
+        /// Returns a composed bitmap of the file using request querystring parameters.
         /// </summary>
         /// <returns></returns>
         public System.Drawing.Bitmap GetBitmap() { return provider.ComposeBitmap(this.VirtualPath, this.Query); }

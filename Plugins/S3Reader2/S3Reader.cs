@@ -94,7 +94,7 @@ namespace ImageResizer.Plugins.S3Reader2 {
         public event RewriteBucketAndKeyPath PreS3RequestFilter;
 
         /// <summary>
-        /// Execites the PreS3RequestFilter event and returns the result.
+        /// Executes the PreS3RequestFilter event and returns the result.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>

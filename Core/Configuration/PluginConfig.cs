@@ -159,7 +159,7 @@ namespace ImageResizer.Configuration {
 
 
         /// <summary>
-        /// Returns the first registerd instance of the specified plugin. For IMultiInstancePlugins, use GetAll()
+        /// Returns the first registered instance of the specified plugin. For IMultiInstancePlugins, use GetAll()
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
@@ -257,7 +257,7 @@ namespace ImageResizer.Configuration {
 
         protected SafeList<IFileExtensionPlugin> fileExtensionPlugins = null;
         /// <summary>
-        /// Plugins which accept new file extensions (in the url) are registered here.
+        /// Plugins which accept new file extensions (in the URL) are registered here.
         /// </summary>
         public SafeList<IFileExtensionPlugin> FileExtensionPlugins { get { return fileExtensionPlugins; } }
 
@@ -369,7 +369,7 @@ namespace ImageResizer.Configuration {
         }
 
         /// <summary>
-        /// This is called to get a sorted list of plugins based on their likelyhood of having the plugin.
+        /// This is called to get a sorted list of plugins based on their likelihood of having the plugin.
         /// </summary>
         /// <param name="assemblyName"></param>
         /// <param name="pluginName"></param>
@@ -522,7 +522,7 @@ namespace ImageResizer.Configuration {
                         alternateNames.Add(name);
                     }
 
-                    //Get a list of assemblies, sorted by likelyhood of a match
+                    //Get a list of assemblies, sorted by likelihood of a match
                     List<string> assemblies = GetOptimizedAssemblyList(searchName.Item2, name);
                     //Now multiply - For each assembly, try each namespace-qualified class name.
                     foreach (string assemblyName in assemblies)
@@ -605,7 +605,7 @@ namespace ImageResizer.Configuration {
                     this.AcceptIssue(new Issue("Plugins", "The plugin " + t.ToString() + " requires arguments in the <add> element. Refer to the plugin documentation for details.",
                     null, IssueSeverity.ConfigurationError));
                 else {
-                    this.AcceptIssue(new Issue("Plugins", "The plugin " + t.ToString() + " does not have a constuctor   Constructor() or Constructor(NameValueCollection args)."
+                    this.AcceptIssue(new Issue("Plugins", "The plugin " + t.ToString() + " does not have a constructor Constructor() or Constructor(NameValueCollection args)."
                     , "To be compatible with the <plugins> section, a plugin must implement IPlugin and define one or more of the above constructors publicly.",
                      IssueSeverity.Critical));
                     hasConstructor = false;
@@ -655,7 +655,7 @@ namespace ImageResizer.Configuration {
         /// Adds the specified plugin to AllPlugins, QuerystringPlugins, CachingSystems, ImageEncoders, and ImageBuiderExtensions, based
         /// on which interfaces the instance implements. For ICache and IEncoder, the plugin is inserted at the beginning of CachingSystems and ImageEncoders respectively.
         /// To reiterate, plugins may register event handlers and modify settings - thus you should use the plugin's method to uninstall them vs. using this method.
-        /// Will not register a plugin that is already installed, unless it implementes IMultiInstancePlugin.
+        /// Will not register a plugin that is already installed, unless it implements IMultiInstancePlugin.
         /// </summary>
         /// <param name="plugin"></param>
         public void add_plugin(IPlugin plugin) {

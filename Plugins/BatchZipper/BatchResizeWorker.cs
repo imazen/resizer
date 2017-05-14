@@ -53,14 +53,14 @@ namespace ImageResizer.Plugins.BatchZipper
         /// <summary>
         /// Executes the job, and returns when it is complete or has failed.
         /// Exceptions are delivered by events registered in the BatchResizeSetting instance - 
-        /// throws no execptions, unless you throw an execption inside a job event handler.
+        /// throws no exceptions, unless you throw an exception inside a job event handler.
         /// </summary>
         public void Work(){
             Work(s);
         }
 
         /// <summary>
-        /// Not for external use. Assumes 'state' is a BatchResizeSettings instance, and stores in in a class member.
+        /// Not for external use. Assumes 'state' is a BatchResizeSettings instance, and stores it in a class member.
         /// Next, it completes (or fails at) the job. Throws exceptions only if (a) state is not a BatchResizeSettings instance, or (b) an exception is thrown by and handler of the JobEvent (Failed) event.
         /// </summary>
         /// <param name="state"></param>
@@ -109,13 +109,13 @@ namespace ImageResizer.Plugins.BatchZipper
                                 //ze.SetEntryTimes(System.IO.File.GetLastWriteTimeUtc(i.PhysicalPath),
                                 //    System.IO.File.GetLastAccessTimeUtc(i.PhysicalPath),
                                 //    System.IO.File.GetCreationTimeUtc(i.PhysicalPath));
-                                //Nevermind, not desired behavior.
+                                //Never mind, not desired behavior.
                             }
                         }catch (Exception ex){
                             ItemFailed(i,ex);
                         }
                     }
-                    //7) Begin proccessing the queue.
+                    //7) Begin processing the queue.
                     //As each file is written to the archive, a callback is invoked which actually provides the resized stream. 
                     z.Save();
                     
@@ -167,7 +167,7 @@ namespace ImageResizer.Plugins.BatchZipper
             }
 
 
-            //For non-resizeable items, Just copy the stream.
+            //For non-resizable items, just copy the stream.
             using (System.IO.FileStream s = System.IO.File.OpenRead(i.PhysicalPath)) CopyStreamTo(s, stream);
         }
         /// <summary>
@@ -180,7 +180,7 @@ namespace ImageResizer.Plugins.BatchZipper
             StreamExtensions.CopyToStream(src, dest);
         }
         /// <summary>
-        /// Stores the results of the Zip file saving betweent he time Saving_Completed fires, and we close the ZipFile instance and fire our own event
+        /// Stores the results of the ZIP file saving between the time Saving_Completed fires, and we close the ZipFile instance and fire our own event.
         /// </summary>
         protected SaveProgressEventArgs savingCompletedEventArgs = null;
 
@@ -191,7 +191,7 @@ namespace ImageResizer.Plugins.BatchZipper
         }
         protected void z_ZipError(object sender, ZipErrorEventArgs e)
         {
-            //We can only deal with item errors here. We ignore job errors, they will throw an execption that bubbles up through Save()
+            //We can only deal with item errors here. We ignore job errors, they will throw an exception that bubbles up through Save()
             if (e.CurrentEntry != null) ItemFailed(e);
         }
 
@@ -244,7 +244,7 @@ namespace ImageResizer.Plugins.BatchZipper
         }
 
         /// <summary>
-        /// Called when an error occurs during Save() (Whitch executes WriteItemCallback)
+        /// Called when an error occurs during Save() (which executes WriteItemCallback)
         /// </summary>
         /// <param name="e"></param>
         private void ItemFailed(ZipErrorEventArgs e)
@@ -281,7 +281,7 @@ namespace ImageResizer.Plugins.BatchZipper
             //Store for later
             results.Add(args.Result);
 
-            //If a cancel is requested, fire an execption for Work to catch.
+            //If a cancel is requested, fire an exception for Work to catch.
             throw new JobCancelledException("An event handler requested that the job be cancelled. The event handler was sent notification " +
                 "that an item (\"" + i.TargetFilename +"\") could not be added to the zip file.",ex);
         }

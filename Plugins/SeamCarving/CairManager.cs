@@ -27,7 +27,7 @@ namespace ImageResizer.Plugins.SeamCarving {
         /// The maximum number of CAIR.exe instances to allow at the same time. After this limit is reached, 
         /// requests will wait until requests will MaxConcurrentWaitingThreads is reached, at which point 
         /// requests will be denied so the thread pool doesn't become exhausted.
-        /// Set this value to at least CPU cores * 2, as the proccess is also I/O bound. Set to 0 for no limit (default).
+        /// Set this value to at least CPU cores * 2, as the process is also I/O bound. Set to 0 for no limit (default).
         /// </summary>
         public int MaxConcurrentExecutions {
             get { return _maxConcurrentExecutions; }

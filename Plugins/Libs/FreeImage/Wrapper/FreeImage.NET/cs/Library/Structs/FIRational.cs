@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -49,7 +49,7 @@ namespace FreeImageAPI
     /// when creating a new instance by using a better algorithm than FreeImage does.
     /// <para/>
     /// The structure implements the following operators:
-    /// +, -, ++, --, ==, != , >, >==, &lt;, &lt;== and ~ (which switches nominator and denomiator).
+    /// +, -, ++, --, ==, != , >, >==, &lt;, &lt;== and ~ (which switches nominator and denominator).
     /// <para/>
     /// The structure can be converted into all .NET standard types either implicit or
     /// explicit.

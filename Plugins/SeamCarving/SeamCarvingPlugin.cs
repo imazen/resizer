@@ -162,7 +162,7 @@ namespace ImageResizer.Plugins.SeamCarving {
                         using (Bitmap temp = new Bitmap(tempWidth, tempHeight, PixelFormat.Format32bppArgb))
                         using (Graphics g = Graphics.FromImage(temp))
                         using (ImageAttributes ia = new ImageAttributes()) {
-                            //High quality everthing
+                            //High quality everything
                             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
                             g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;

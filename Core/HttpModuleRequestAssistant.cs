@@ -115,7 +115,7 @@ namespace ImageResizer.Configuration
             {
                 var authEvent = new UrlAuthorizationEventArgs(RewrittenVirtualPath, new NameValueCollection(RewrittenQuery), true);
 
-                //Allow user code to deny access, but not modify the url or querystring.
+                //Allow user code to deny access, but not modify the URL or querystring.
                 conf.FireAuthorizeImage(sender, context, authEvent);
 
                 if (!authEvent.AllowAccess) {
@@ -150,15 +150,15 @@ namespace ImageResizer.Configuration
                 if (guessedEncoder == null) throw new ImageProcessingException("Image Resizer: No image encoder was found for the request.");
             }
 
-            //Determine the file extenson for the caching system to use if we aren't processing the image
-            //Use the exsiting one if is an image extension. If not, use "unknown". 
+            //Determine the file extension for the caching system to use if we aren't processing the image
+            //Use the existing one if is an image extension. If not, use "unknown".
             // We don't want to suggest writing .exe or .aspx files to the cache! 
             string fallbackExtension = PathUtils.GetFullExtension(RewrittenVirtualPath).TrimStart('.');
             if (!conf.IsAcceptedImageType(RewrittenVirtualPath)) fallbackExtension = "unknown";
 
             //Determine the mime-type if we aren't processing the image.
             string fallbackContentType = "application/octet-stream";
-            //Support jpeg, png, gif, bmp, tiff mime-types. Otherwise use "application/octet-stream". 
+            //Support JPEG, PNG, GIF, BMP, TIFF mime-types. Otherwise use "application/octet-stream".
             //We can't set it to null - it will default to text/html
             System.Drawing.Imaging.ImageFormat recognizedExtension = DefaultEncoder.GetImageFormatFromExtension(fallbackExtension);
             if (recognizedExtension != null) fallbackContentType = DefaultEncoder.GetContentTypeFromImageFormat(recognizedExtension);

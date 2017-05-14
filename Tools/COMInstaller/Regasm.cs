@@ -39,7 +39,7 @@ namespace COMInstaller {
         /// </summary>
         /// <param name="path">The full path to the DLL</param>
         /// <param name="codebase">True to embed the path of the DLL in the registry.</param>
-        /// <param name="unregister">True to unregister the dll</param>
+        /// <param name="unregister">True to unregister the DLL</param>
         /// <returns></returns>
         public string Register(string path, bool codebase, bool unregister) {
             string args = "\"" + path + "\" /nologo" + (codebase ? " /codebase" : "") + (unregister ? " /u" : "");

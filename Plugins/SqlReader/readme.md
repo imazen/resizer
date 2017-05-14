@@ -11,7 +11,7 @@ Allows you to access binary blobs in a SQL database using a URL. Accepts integer
 
 Can serve non-image files from SQL, or can be configured in 'untrusted data mode' where all SQL blobs are decoded and re-encoded to prevent any kind of attack.
 
-### Example Urls
+### Example URLs
 
 * http://mysite.com/databaseimages/38.jpg
 * http://mysite.com/databaseimages/21EC2020-3AEA-1069-A2DD-08002B30309D.jpg
@@ -23,7 +23,7 @@ See Samples/SqlReaderSample/ in the download for a comprehensive sample project,
 
 * Can serve non-image data if desired
 * Compatible with CloudFront and DiskCache
-* Supports modified-date comparison between SQL and the filesystem so updated versions of cached files are detected
+* Supports modified-date comparison between SQL and the file system so updated versions of cached files are detected
 * Easy to configure
 
 

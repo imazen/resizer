@@ -140,8 +140,8 @@ namespace ImageResizer.Plugins.DiskCache {
                         {
 
                             result.Result = CacheQueryResult.Miss;
-                            //Still a miss, we even rechecked the filesystem. Write to memory.
-                            MemoryStream ms = new MemoryStream(4096);  //4K initial capacity is minimal, but this array will get copied around alot, better to underestimate.
+                            //Still a miss, we even rechecked the file system. Write to memory.
+                            MemoryStream ms = new MemoryStream(4096);  //4K initial capacity is minimal, but this array will get copied around a lot, better to underestimate.
                             //Read, resize, process, and encode the image. Lots of exceptions thrown here.
                             writeCallback(ms);
                             ms.Position = 0;

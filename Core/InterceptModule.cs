@@ -104,7 +104,7 @@ namespace ImageResizer {
                     HandleRequest(app.Context,ra,  vf);
                     ra.FirePostAuthorizeSuccess();
                     //Catch not found exceptions
-                } catch (System.IO.FileNotFoundException notFound) { //Some VPPs are optimisitic , or could be a race condition
+                } catch (System.IO.FileNotFoundException notFound) { //Some VPPs are optimistic, or could be a race condition
                     if (notFound.Message.Contains(" assembly ")) throw; //If an assembly is missing, it should be a 500, not a 404
                     ra.FireMissing();
                     throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);

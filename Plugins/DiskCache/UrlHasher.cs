@@ -33,7 +33,7 @@ namespace ImageResizer.Plugins.DiskCache {
                 subfolder = getSubfolder(hash, subfolders) + dirSeparator;
             }
             
-            //Can't use base64 hash... filesystem has case-insensitive lookup.
+            //Can't use base64 hash... file system has case-insensitive lookup.
             //Would use base32, but too much code to bloat the resizer. Simple base16 encoding is fine
             return subfolder + Base16Encode(hash);
         }

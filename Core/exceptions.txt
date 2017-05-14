@@ -6,9 +6,9 @@ InterceptModule
 
 - ImageProcessingException (500)  - No caches configured
 - ImageProcessingException - no image encoders found
-- ImageProcessingException  - cache file locked, timeout occured.
+- ImageProcessingException  - cache file locked, timeout occurred.
 - ImageCorruptedException (wrapping an ArgumentException, ExternalException) - Source file corrupted
-- ImageMissingException (404) - source file/resource missing (Can occur and different points, for example in watermarking, or in http-based VPP.
+- ImageMissingException (404) - source file/resource missing. (Can occur at different points, for example in watermarking, or in HTTP-based VPP.)
 - Intercept module converts FileNotFoundExceptions to 404 ImageMissingExceptions
 
 (ImageBuilder) Exceptions

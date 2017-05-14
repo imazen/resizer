@@ -43,7 +43,7 @@ namespace ImageResizer.Plugins.DiskCache {
             }
         }
         /// <summary>
-        /// Restores the default property valies
+        /// Restores the default property values
         /// </summary>
         private void RestoreDefaults() {
             Type t = this.GetType();
@@ -104,7 +104,7 @@ namespace ImageResizer.Plugins.DiskCache {
         }
         private TimeSpan maxDelay = new TimeSpan(0, 5, 0); //5 minutes
         /// <summary>
-        /// The maximum amount of time to wait between work segements
+        /// The maximum amount of time to wait between work segments
         /// </summary>
         public TimeSpan MaxDelay {
             get { return maxDelay; }
@@ -123,7 +123,7 @@ namespace ImageResizer.Plugins.DiskCache {
 
         private int targetItemsPerFolder = 400;
         /// <summary>
-        /// The ideal number of cached files per folder. (defaults to 400) Only reached if it can be achieved without volating the AvoidRemoval... limits
+        /// The ideal number of cached files per folder. (defaults to 400) Only reached if it can be achieved without violating the AvoidRemoval... limits
         /// </summary>
         public int TargetItemsPerFolder {
             get { return targetItemsPerFolder; }

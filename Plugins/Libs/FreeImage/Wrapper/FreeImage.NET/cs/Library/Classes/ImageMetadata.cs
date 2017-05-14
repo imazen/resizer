@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -62,7 +62,7 @@ namespace FreeImageAPI.Metadata
 
         /// <summary>
         /// Initializes a new instance based on the specified <see cref="FIBITMAP"/>,
-        /// showing or hiding empry models.
+        /// showing or hiding empty models.
         /// </summary>
         /// <param name="dib">Handle to a FreeImage bitmap.</param>
         /// <param name="hideEmptyModels">When <b>true</b>, empty metadata models

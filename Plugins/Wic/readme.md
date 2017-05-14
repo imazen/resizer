@@ -32,7 +32,7 @@ Activate with `&decoder=wic`.
 
 ## WicEncoder
 
-Encode jpeg, gif, and png images through WIC for better performance and more control. Adjust jpeg quality, subsampling, gif dithering, and palette size.
+Encode JPEG, GIF, and PNG images through WIC for better performance and more control. Adjust JPEG quality, subsampling, GIF dithering, and palette size.
 
 Vs. PrettyGifs: 3-8x faster for encoding 8-bit PNG images. 2-5x faster for GIF images. 
 

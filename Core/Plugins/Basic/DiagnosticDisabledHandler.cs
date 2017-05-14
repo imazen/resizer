@@ -37,7 +37,7 @@ namespace ImageResizer.Plugins.Basic {
             CustomErrorsMode mode = (section != null) ? section.Mode : CustomErrorsMode.RemoteOnly;
             //What is diagnostics enableFor set to?
             DiagnosticMode dmode = c.get<DiagnosticMode>("diagnostics.enableFor", DiagnosticMode.None);
-            //Is it set all all?
+            //Is it set at all?
             bool diagDefined = (c.get("diagnostics.enableFor",null) != null);
             //Is it available from localhost.
             bool availLocally = (!diagDefined && mode == CustomErrorsMode.RemoteOnly) || (dmode == DiagnosticMode.Localhost);
@@ -49,7 +49,7 @@ namespace ImageResizer.Plugins.Basic {
             sb.AppendLine();
             sb.AppendLine("To override for localhost access, add <diagnostics enableFor=\"localhost\" /> in the <resizer> section of Web.config.");
             sb.AppendLine();
-            sb.AppendLine("To ovveride for remote access, add <diagnostics enableFor=\"allhosts\" /> in the <resizer> section of Web.config.");
+            sb.AppendLine("To override for remote access, add <diagnostics enableFor=\"allhosts\" /> in the <resizer> section of Web.config.");
             sb.AppendLine();
             return sb.ToString();
         }

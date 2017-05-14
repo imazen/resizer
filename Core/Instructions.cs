@@ -13,8 +13,8 @@ using ImageResizer.Collections;
 
 namespace ImageResizer {
     /// <summary>
-    /// A name/value collection of image processsing instructions. The successor to ResizeSettings.
-    /// Just because a key doesn't have a property wrapper doesn't mean you can't use it. i["key"] = value; isnt' that scary.
+    /// A name/value collection of image processing instructions. The successor to ResizeSettings.
+    /// Just because a key doesn't have a property wrapper doesn't mean you can't use it. i["key"] = value; isn't that scary.
     /// </summary>
     public class Instructions: QuerystringBase<Instructions> {
 
@@ -124,7 +124,7 @@ namespace ImageResizer {
         public int? Page { get { return this.Get<int>("page"); } set { this.Set<int>("page", value); } }
 
         /// <summary>
-        /// Determines Jpeg encoding quality. Maps to 'quality' setting. 
+        /// Determines JPEG encoding quality. Maps to 'quality' setting.
         /// </summary>
         public int? JpegQuality { get { return this.Get<int>("quality"); } set { this.Set<int>("quality", value); } }
         /// <summary>
@@ -135,7 +135,7 @@ namespace ImageResizer {
 
 
         /// <summary>
-        /// Maps to 'colors'. Sets the palette size for the final png or gif image (not relevant for jpegs). 
+        /// Maps to 'colors'. Sets the palette size for the final PNG or GIF image (not relevant for JPEGs).
         /// Set to 'null' to use the largest palette size available in the format.
         /// Requires the PrettyGifs or WicEncoder plugin. 
         /// </summary>
@@ -186,7 +186,7 @@ namespace ImageResizer {
         public OutputFormat? OutputFormat { get { return this.Get<OutputFormat>("format", this.Get<OutputFormat>("thumbnail")); } set { this.Set<OutputFormat>("format", value); this.Remove("thumbnail"); } }
 
         /// <summary>
-        /// If true, the ICC profile will be discared instead of being evaluated server side (which typically causes inconsistent and unexpected effects). 
+        /// If true, the ICC profile will be discarded instead of being evaluated server side (which typically causes inconsistent and unexpected effects).
         /// </summary>
         public bool? IgnoreICC { get { return this.Get<bool>("ignoreicc"); } set { this.Set<bool>("ignoreicc", value); } }
 
@@ -197,7 +197,7 @@ namespace ImageResizer {
         public string FallbackImage { get { return this["404"]; } set { this["404"] = value; } }
  
         /// <summary>
-        /// The color of margin and padding regions. Defaults to Transparent, or White (when jpeg is the selected output color). 
+        /// The color of margin and padding regions. Defaults to Transparent, or White (when JPEG is the selected output format).
         /// </summary>
         public string BackgroundColor { get { return this["bgcolor"]; } set { this["bgcolor"] = value; } }
         /// <summary>
@@ -268,7 +268,7 @@ namespace ImageResizer {
         public double? TrimPadding { get { return this.Get<double>("trim.percentpadding"); } set { this.Set<double>("trim.percentpadding", value); } }
 
         /// <summary>
-        /// Guassian Blur. Requires the AdvancedFilters plugin.
+        /// Gaussian Blur. Requires the AdvancedFilters plugin.
         /// </summary>
         public double? Blur { get { return this.Get<double>("a.blur"); } set { this.Set<double>("a.blur", value); } }
 
@@ -303,12 +303,12 @@ namespace ImageResizer {
         /// <summary>
         /// Specify the image processing pipeline to use. Defaults to 'gdi'. If FreeImageBuilder or WicBuilder is installed, you can specify 'freeimage' or 'wic' to use that pipeline instead. 
         /// The WIC pipeline offers a 2-8X performance increase of GDI, at the expense of slightly reduced image quality, the full trust requirement, and support for only basic resize and crop commands. 
-        /// FreeImage offers *nix-level image support, and handles many images that gdi and wic can't deal with. It is also restricted to a subset of the full command series.
+        /// FreeImage offers *nix-level image support, and handles many images that GDI and WIC can't deal with. It is also restricted to a subset of the full command series.
         /// </summary>
         public string Builder { get { return this["builder"]; } set { this["builder"] = value; } }
 
         /// <summary>
-        /// Gets or sets a 1 or 4-element array defining cornder radii. If the array is 1 element, it applies to all corners. If it is 4 elements, each corner gets an individual radius. Values are percentages of the image width or height, whichever is smaller.
+        /// Gets or sets a 1 or 4-element array defining corner radii. If the array is 1 element, it applies to all corners. If it is 4 elements, each corner gets an individual radius. Values are percentages of the image width or height, whichever is smaller.
         /// Requires the SimpleFilters plugin.
         /// </summary>
         public double[] RoundCorners { get { return this.GetList<double>( "s.roundcorners", 0, 4, 1); } set { this.SetList("s.roundcorners", value, true, 4, 1); } }

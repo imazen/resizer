@@ -42,7 +42,7 @@ namespace ImageResizer.Configuration {
             if (this.HasPipelineDirective(pipelineDefaults))
             {
                 var intersection = String.Join(", ", PipelineDirectivesPresent(pipelineDefaults));
-                c.configurationSectionIssues.AcceptIssue(new Issue("You have specified default commands (" + intersection + ") that will cause all image requests to be proccessed; even those that do not need ImageResizer.", pipelineNode != null ? pipelineNode.ToString() : "", IssueSeverity.ConfigurationError));
+                c.configurationSectionIssues.AcceptIssue(new Issue("You have specified default commands (" + intersection + ") that will cause all image requests to be processed; even those that do not need ImageResizer.", pipelineNode != null ? pipelineNode.ToString() : "", IssueSeverity.ConfigurationError));
             }
             if (pipelineDefaults.Count > 0)
             {
@@ -127,7 +127,7 @@ namespace ImageResizer.Configuration {
             }
         }
         /// <summary>
-        /// Returns a unqiue copy of the image extensions supported by the pipeline. Performs a cached query to all registered IQuerystringPlugin instances.
+        /// Returns a unique copy of the image extensions supported by the pipeline. Performs a cached query to all registered IQuerystringPlugin instances.
         /// Use IsAcceptedImageType for better performance.
         /// </summary>
         public ICollection<string> AcceptedImageExtensions {
@@ -136,7 +136,7 @@ namespace ImageResizer.Configuration {
             }
         }
         /// <summary>
-        /// Returns a unqiue copy of all querystring keys supported by the pipeline. Performs a cached query to all registered IQuerystringPlugin instances.
+        /// Returns a unique copy of all querystring keys supported by the pipeline. Performs a cached query to all registered IQuerystringPlugin instances.
         /// Use HasPipelineDirective for better performance. (binary search)
         /// </summary>
         public ICollection<string> SupportedQuerystringKeys {
@@ -211,7 +211,7 @@ namespace ImageResizer.Configuration {
             }
         }
         /// <summary>
-        /// Removes the first fake extensionm detected at the end of 'path'
+        /// Removes the first fake extension detected at the end of 'path'
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -441,7 +441,7 @@ namespace ImageResizer.Configuration {
         /// Fired during PostAuthorizeRequest, after ResizeExtension has been removed.
         /// On fired on requests with extensions that match supported image types.
         /// <para> 
-        /// You can add additonal supported image extentions by registering a plugin that implementes IQuerystringPlugin, or you can add an 
+        /// You can add additional supported image extensions by registering a plugin that implements IQuerystringPlugin, or you can add an
         /// extra extension in the URL and remove it here. Example: .psd.jpg</para>
         /// </summary>
         public event UrlRewritingEventHandler Rewrite;
@@ -459,7 +459,7 @@ namespace ImageResizer.Configuration {
         /// <summary>
         /// Fired after all rewriting is finished.
         /// e.AllowAccess defaults to the result of the UrlAuthorization module's verdict. It can be changed. 
-        /// Set e.AllowAccess to true to cause and 403 Access Dened result.
+        /// Set e.AllowAccess to true to cause and 403 Access Denied result.
         /// </summary>
         public event UrlAuthorizationEventHandler AuthorizeImage;
 
@@ -471,13 +471,13 @@ namespace ImageResizer.Configuration {
         public event UrlEventHandler ImageMissing;
 
         /// <summary>
-        /// (Sync Intercept Module only) Fired immediately before the image request is sent off to the caching system for proccessing.
+        /// (Sync Intercept Module only) Fired immediately before the image request is sent off to the caching system for processing.
         /// Allows modification of response headers, caching arguments, and callbacks.
         /// </summary>
         public event PreHandleImageEventHandler PreHandleImage;
 
         /// <summary>
-        /// (ASYNC Intercept Module only) Fired immediately before the image request is sent off to the caching system for proccessing.
+        /// (ASYNC Intercept Module only) Fired immediately before the image request is sent off to the caching system for processing.
         /// Allows modification of response headers, caching arguments, and callbacks.
         /// </summary>
         public event PreHandleImageAsyncEventHandler PreHandleImageAsync;

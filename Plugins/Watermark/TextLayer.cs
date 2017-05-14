@@ -91,7 +91,7 @@ namespace ImageResizer.Plugins.Watermark {
 
         private int _outlineWidth = 0;
         /// <summary>
-        /// The width of the text ouline (OutlineColor)
+        /// The width of the text outline (OutlineColor)
         /// </summary>
         public int OutlineWidth {
             get { return _outlineWidth; }

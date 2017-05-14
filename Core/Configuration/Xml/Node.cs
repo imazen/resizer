@@ -113,7 +113,7 @@ namespace ImageResizer.Configuration.Xml {
         }
 
         /// <summary>
-        /// Queryies the subtree for the specified attribute on the specified element. Example selector: element.element.attrname
+        /// Queries the subtree for the specified attribute on the specified element. Example selector: element.element.attrname
         /// Assumes that the last segment of the selector is an attribute name. 
         /// Throws an ArgumentException if there is only one segment ( element ).
         /// Uses the cache.
@@ -242,7 +242,7 @@ namespace ImageResizer.Configuration.Xml {
             return results; 
         }
         /// <summary>
-        /// Makes a recusive copy of the subtree, keeping no duplicate references to mutable types.
+        /// Makes a recursive copy of the subtree, keeping no duplicate references to mutable types.
         /// </summary>
         /// <returns></returns>
         public Node deepCopy() {
@@ -282,7 +282,7 @@ namespace ImageResizer.Configuration.Xml {
                     a.Value = this[key];
                     e.Attributes.Append(a);
                 }
-            //Copy childen.
+            //Copy children.
             if (children != null)
                 foreach (Node c in children) 
                     e.AppendChild(c.ToXmlElement(doc));

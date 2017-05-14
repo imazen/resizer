@@ -14,7 +14,7 @@ Aliases: /plugins/psdcomposer
 * **Do not use with untrusted PSD files. This plugin has not undergone security testing.**
 
 
-Allows you to edit PSD files (hide/show layers, change text layer contents, apply certain effects), and render them to jpeg, gif, or png dynamically. Works as an IVirtualImageProvider, so you can post-process the composed result with any of the other plugins or commands.
+Allows you to edit PSD files (hide/show layers, change text layer contents, apply certain effects), and render them to JPEG, GIF, or PNG dynamically. Works as an IVirtualImageProvider, so you can post-process the composed result with any of the other plugins or commands.
 
 Great for
 
@@ -22,7 +22,7 @@ Great for
 * Generating customized product simulations where users can change multiple product variables independently, or enter text for engraving
 
 
-High performance - under 400ms for test psds with 40+ layers.
+High performance - under 400ms for test PSDs with 40+ layers.
 
 ## Installation
 

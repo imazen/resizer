@@ -31,13 +31,13 @@ namespace ImageResizer.Plugins.WicEncoder {
             return guidEncoder;
         }
         /// <summary>
-        /// The Jpeg subsampling. Supported values for WIC are 420, 422, and 444. FreeImage supports 411 in addition to the aforementioned values.
+        /// The JPEG subsampling. Supported values for WIC are 420, 422, and 444. FreeImage supports 411 in addition to the aforementioned values.
         /// </summary>
         public string Subsampling { get; set; }
 
 
         /// <summary>
-        /// The number of colors to use. Only applicable for png, gif, and bmp photos where palletes can be used.
+        /// The number of colors to use. Only applicable for PNG, GIF, and BMP photos where palettes can be used.
         /// The default is -1, which means "as much color fidelity as possible". 
         /// </summary>
         public int Colors { get; set; }
@@ -168,9 +168,9 @@ namespace ImageResizer.Plugins.WicEncoder {
                 var propBag = propertyBagArray[0];
                 com.Add(propBag);
 
-                //Adjust encoder settings if it's a jpegs
+                //Adjust encoder settings if it's a JPEG
                 if (guidEncoder.Equals(Consts.GUID_ContainerFormatJpeg)) {
-                    //Jpeg
+                    //JPEG
                     //ImageQuality 0..1
                     //"JpegYCrCbSubsampling"  WICJpegYCrCbSubsamplingOption.
 
@@ -208,8 +208,8 @@ namespace ImageResizer.Plugins.WicEncoder {
 
                 //Convert the bitmap to the correct pixel format for encoding.
 
-                //Jpeg: encodes as GUID_WICPixelFormat24bppBGR or GUID_WICPixelFormat8bppGray.
-                //If the original pixel format has an alpha chanel, we need to specify a matte color.
+                //JPEG: encodes as GUID_WICPixelFormat24bppBGR or GUID_WICPixelFormat8bppGray.
+                //If the original pixel format has an alpha channel, we need to specify a matte color.
                 //UPDATE - IWICFormatConverter doesn't let you specify a matte color. Disabling code
                 if (false && guidEncoder.Equals(Consts.GUID_ContainerFormatJpeg)) {
                     ConversionUtils.HasAlphaAbility(pFormat);
@@ -229,7 +229,7 @@ namespace ImageResizer.Plugins.WicEncoder {
                 //GIF encodes as GUID_WICPixelFormat8bppIndexed
                 //If the current format is > 8bpp, quantization may be required, and we may need to manually build the palette with Median Cut.
 
-                //PNG encodeds as EVERYTHING! Way too many formats supported.
+                //PNG encodes as EVERYTHING! Way too many formats supported.
                 // If the user is specifying a colors setting, we need to
                 // convert to GUID_WICPixelFormat8bppIndexed, GUID_WICPixelFormat4bppIndexed, GUID_WICPixelFormat2bppIndexed, or GUID_WICPixelFormat1bppIndexed
 

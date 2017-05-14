@@ -56,7 +56,7 @@ namespace ImageResizer.Resizing {
         /// </summary>
         public Size destSize;
         /// <summary>
-        /// The dimensions of the bitmap afer all operations have been applied to it (Calling FlipRotate can change the bitmap dimensions).
+        /// The dimensions of the bitmap after all operations have been applied to it (Calling FlipRotate can change the bitmap dimensions).
         /// </summary>
         public Size finalSize;
 

@@ -49,7 +49,7 @@ namespace ImageResizer.Plugins.RedEye {
                         g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
                         ia.SetWrapMode(System.Drawing.Drawing2D.WrapMode.TileFlipXY);
                         g.DrawImage(img.ToManagedImage(false), new Rectangle(0, 0, width, height), 0, 0, img.Width, img.Height, GraphicsUnit.Pixel, ia);
-                        //TODO: Not sure if ToManagedImage will stick around after the underying image is disposed. I know that the bitmap data will be gone, guess that's most of it.
+                        //TODO: Not sure if ToManagedImage will stick around after the underlying image is disposed. I know that the bitmap data will be gone, guess that's most of it.
                         using (UnmanagedImage rui = UnmanagedImage.FromManagedImage(reduced)) {
                             lowRed = new RedEyeFilter(2).Apply(rui); // Make an copy using the red eye filter
                         }

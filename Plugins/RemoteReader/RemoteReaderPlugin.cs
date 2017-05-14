@@ -183,13 +183,13 @@ namespace ImageResizer.Plugins.RemoteReader {
 
             HMACSHA256 hmac = new HMACSHA256(UTF8Encoding.UTF8.GetBytes(key));
             byte[] hash = hmac.ComputeHash(UTF8Encoding.UTF8.GetBytes(data));
-            //32-byte hash is a bit overkill. Truncation doesn't weaking the integrity of the algorithm.
+            //32-byte hash is a bit overkill. Truncation doesn't weaken the integrity of the algorithm.
             byte[] shorterHash = new byte[8];
             Array.Copy(hash, shorterHash, 8);
             return PathUtils.ToBase64U(shorterHash);
         }
         /// <summary>
-        /// Parses the specified path and querystring. Verifies the hmac signature for querystring specified paths, parses the
+        /// Parses the specified path and querystring. Verifies the HMAC signature for querystring specified paths, parses the
         /// human-friendly syntax for that syntax. Verifies the URL is properly formed. Returns an object containing the remote URL,
         /// querystring remainder, and a flag stating whether the request was signed or not. Incorrectly signed requests immediately throw an exception.
         /// </summary>

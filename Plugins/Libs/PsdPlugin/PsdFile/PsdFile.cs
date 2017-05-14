@@ -575,7 +575,7 @@ namespace PhotoshopFile
     #region ImageData
 
     /// <summary>
-    /// The raw image data from the file, seperated by the channels.
+    /// The raw image data from the file, separated by the channels.
     /// </summary>
     public byte[][] m_imageData;
 
@@ -756,7 +756,7 @@ namespace PhotoshopFile
     /// <summary>
     /// ZIP without prediction.
     /// <remarks>
-    /// This is currently not supported since it is ot documented.
+    /// This is currently not supported since it is not documented.
     /// Loading will result in an image where all channels are set to zero.
     /// </remarks>
     /// </summary>
@@ -764,7 +764,7 @@ namespace PhotoshopFile
     /// <summary>
     /// ZIP with prediction.
     /// <remarks>
-    /// This is currently not supported since it is ot documented. 
+    /// This is currently not supported since it is not documented.
     /// Loading will result in an image where all channels are set to zero.
     /// </remarks>
     /// </summary>

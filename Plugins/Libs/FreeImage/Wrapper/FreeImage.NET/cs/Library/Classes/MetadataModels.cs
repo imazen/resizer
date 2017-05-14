@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -135,7 +135,7 @@ namespace FreeImageAPI.Metadata
 
         /// <summary>
         /// Gets or sets the number of replays for the animation.
-        /// Use 0 (zero) to specify an infinte number of replays.
+        /// Use 0 (zero) to specify an infinite number of replays.
         /// </summary>
         /// <remarks>
         /// <b>Handling of null values</b><para/>
@@ -207,7 +207,7 @@ namespace FreeImageAPI.Metadata
         }
 
         /// <summary>
-        /// Gets or sets a flag to supress saving the dib's attached palette
+        /// Gets or sets a flag to suppress saving the dib's attached palette
         /// (making it use the global palette). The local palette is the palette used by a page.
         /// </summary>
         /// <remarks>
@@ -268,7 +268,7 @@ namespace FreeImageAPI.Metadata
         }
 
         /// <summary>
-        /// Gets or sets the amout of time in milliseconds this frame is to be displayed.
+        /// Gets or sets the amount of time in milliseconds this frame is to be displayed.
         /// </summary>
         /// <remarks>
         /// <b>Handling of null values</b><para/>
@@ -1408,7 +1408,7 @@ namespace FreeImageAPI.Metadata
         ///		</item>
         ///		<item>
         ///			<term>12</term>
-        ///			<description>daylight fluorecent (D 5700 - 7100K)</description>
+        ///			<description>daylight fluorescent (D 5700 - 7100K)</description>
         ///		</item>
         ///		<item>
         ///			<term>13</term>
@@ -1886,7 +1886,7 @@ namespace FreeImageAPI.Metadata
         /// further processing. See remarks for further information.
         /// </summary>
         /// <remarks>
-        /// The following values are definied:<para/>
+        /// The following values are defined:<para/>
         /// <list type="table">
         ///		<listheader>
         ///			<term>ID</term>
@@ -1932,7 +1932,7 @@ namespace FreeImageAPI.Metadata
         /// at different exposure settings. See remarks for further information.
         /// </summary>
         /// <remarks>
-        /// The following values are definied:<para/>
+        /// The following values are defined:<para/>
         /// <list type="table">
         ///		<listheader>
         ///			<term>ID</term>
@@ -1981,7 +1981,7 @@ namespace FreeImageAPI.Metadata
         /// See remarks for further information.
         /// </summary>
         /// <remarks>
-        /// The following values are definied:<para/>
+        /// The following values are defined:<para/>
         /// <list type="table">
         ///		<listheader>
         ///			<term>ID</term>
@@ -2078,7 +2078,7 @@ namespace FreeImageAPI.Metadata
         /// See remarks for further information.
         /// </summary>
         /// <remarks>
-        /// The following values are definied:<para/>
+        /// The following values are defined:<para/>
         /// <list type="table">
         ///		<listheader>
         ///			<term>ID</term>
@@ -2131,7 +2131,7 @@ namespace FreeImageAPI.Metadata
         /// See remarks for further information.
         /// </summary>
         /// <remarks>
-        /// The following values are definied:<para/>
+        /// The following values are defined:<para/>
         /// <list type="table">
         ///		<listheader>
         ///			<term>ID</term>
@@ -2189,7 +2189,7 @@ namespace FreeImageAPI.Metadata
         /// See remarks for further information.
         /// </summary>
         /// <remarks>
-        /// The following values are definied:<para/>
+        /// The following values are defined:<para/>
         /// <list type="table">
         ///		<listheader>
         ///			<term>ID</term>
@@ -2239,7 +2239,7 @@ namespace FreeImageAPI.Metadata
         /// See remarks for further information.
         /// </summary>
         /// <remarks>
-        /// The following values are definied:<para/>
+        /// The following values are defined:<para/>
         /// <list type="table">
         ///		<listheader>
         ///			<term>ID</term>
@@ -2289,7 +2289,7 @@ namespace FreeImageAPI.Metadata
         /// See remarks for further information.
         /// </summary>
         /// <remarks>
-        /// The following values are definied:<para/>
+        /// The following values are defined:<para/>
         /// <list type="table">
         ///		<listheader>
         ///			<term>ID</term>
@@ -2363,7 +2363,7 @@ namespace FreeImageAPI.Metadata
         /// See remarks for further information.
         /// </summary>
         /// <remarks>
-        /// The following values are definied:<para/>
+        /// The following values are defined:<para/>
         /// <list type="table">
         ///		<listheader>
         ///			<term>ID</term>
@@ -3669,7 +3669,7 @@ namespace FreeImageAPI.Metadata
         /// used instead of this tag. See remarks for further information.
         /// </summary>
         /// <remarks>
-        /// The following values are definied:<para/>
+        /// The following values are defined:<para/>
         /// <list type="table">
         ///		<listheader>
         ///			<term>ID</term>
@@ -3766,7 +3766,7 @@ namespace FreeImageAPI.Metadata
         /// See remarks for further information.
         /// </summary>
         /// <remarks>
-        /// The following values are definied:<para/>
+        /// The following values are defined:<para/>
         /// <list type="table">
         ///		<listheader>
         ///			<term>ID</term>
@@ -3808,12 +3808,12 @@ namespace FreeImageAPI.Metadata
 
         /// <summary>
         /// Gets or sets the sampling ratio of chrominance components in relation to
-        /// the luminance component. In JPEG compressed dat a JPEG marker is used
+        /// the luminance component. In JPEG compressed data a JPEG marker is used
         /// instead of this tag.
         /// See remarks for further information.
         /// </summary>
         /// <remarks>
-        /// The following values are definied:<para/>
+        /// The following values are defined:<para/>
         /// <list type="table">
         ///		<listheader>
         ///			<term>ID</term>
@@ -3870,7 +3870,7 @@ namespace FreeImageAPI.Metadata
         /// it shall follow the TIFF default regardless of the value in this field.
         /// It is preferable that readers be able to support both centered and co-sited positioning.
         /// <para/>
-        /// The following values are definied:<para/>
+        /// The following values are defined:<para/>
         /// <list type="table">
         ///		<listheader>
         ///			<term>ID</term>
@@ -3969,7 +3969,7 @@ namespace FreeImageAPI.Metadata
         /// See remarks for further information.
         /// </summary>
         /// <remarks>
-        /// The following values are definied:<para/>
+        /// The following values are defined:<para/>
         /// <list type="table">
         ///		<listheader>
         ///			<term>ID</term>
@@ -4780,7 +4780,7 @@ namespace FreeImageAPI.Metadata
         /// However, simple reversals of orientation between raster and model space
         /// (e.g. horizontal or vertical flips) may be indicated by reversal of sign in the
         /// corresponding component of the ModelPixelScaleTag. GeoTIFF compliant readers must
-        /// honor this signreversal convention.
+        /// honor this sign reversal convention.
         /// <para/>
         /// This tag must not be used if the raster image requires rotation or shearing to place
         /// it into the standard model space. In such cases the transformation shall be defined

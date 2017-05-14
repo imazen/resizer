@@ -80,7 +80,7 @@ namespace ImageResizer.Plugins.PrettyGifs {
         }
 
         /// <summary>
-        /// The number of colors to use. Only applicable for png, gif, and bmp photos where palletes can be used.
+        /// The number of colors to use. Only applicable for PNG, GIF, and BMP photos where palettes can be used.
         /// The default is -1, which means "as much color fidelity as possible". 
         /// </summary>
         public int Colors = -1;
@@ -102,7 +102,7 @@ namespace ImageResizer.Plugins.PrettyGifs {
 
         private ImageFormat _outputFormat = ImageFormat.Gif;
         /// <summary>
-        /// If you set this to anything other than Gif or Png, it will throw an exception. Defaults to GIF.
+        /// If you set this to anything other than 'Gif' or 'Png', it will throw an exception. Defaults to 'Gif'.
         /// </summary>
         public ImageFormat OutputFormat {
             get { return _outputFormat; }
@@ -113,7 +113,7 @@ namespace ImageResizer.Plugins.PrettyGifs {
         }
 
         /// <summary>
-        /// Returns an encoder instance if a Gif or 8-bit png is requested.
+        /// Returns an encoder instance if a GIF or 8-bit PNG is requested.
         /// </summary>
         /// <param name="original"></param>
         /// <param name="settings"></param>
@@ -236,7 +236,7 @@ namespace ImageResizer.Plugins.PrettyGifs {
         private static bool _hasFullTrust = false;
         private static bool _hasFullTrustSet = false;
         /// <summary>
-        /// Returns true if the assembly can call unmanged code (i.e, has full trust)
+        /// Returns true if the assembly can call unmanaged code (i.e, has full trust)
         /// </summary>
         public static bool HasFullTrust {
             get {

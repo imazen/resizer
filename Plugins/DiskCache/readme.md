@@ -16,7 +16,7 @@ This plugin only applies to the URL API, not the managed API. It currently integ
 
 When disabling DiskCache on a site that hosts non-public images, it is best to use `<diskcache enabled="false" />` instead of removing `<add name="DiskCache" />`. The existing `/imagecache/` folder will otherwise become publicly accessible when the plugin is removed. Keep this in mind with sub-applications as well.
 
-All images are cached by default. Specify `&cache=no` to prevent caching of a result. The disk cache can be (roughly) constrained by image count using `subfolders=x` and `autoClean=true`. Evicting items from disk is expensive, so we don't enable this by default, nor suggest it unless monitoring proves it neccessary.
+All images are cached by default. Specify `&cache=no` to prevent caching of a result. The disk cache can be (roughly) constrained by image count using `subfolders=x` and `autoClean=true`. Evicting items from disk is expensive, so we don't enable this by default, nor suggest it unless monitoring proves it necessary.
 
 ## Installation
 

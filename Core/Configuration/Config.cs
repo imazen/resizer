@@ -77,7 +77,7 @@ namespace ImageResizer.Configuration {
 
             if (isAspNet)
             {
-                new ImageResizer.Plugins.Basic.Diagnostic().Install(this); //2017-04-04 - this plugin only sets the http handler; adds no other functionality.
+                new ImageResizer.Plugins.Basic.Diagnostic().Install(this); //2017-04-04 - this plugin only sets the HTTP handler; adds no other functionality.
                 new ImageResizer.Plugins.Basic.SizeLimiting().Install(this);
                 new ImageResizer.Plugins.Basic.MvcRoutingShimPlugin().Install(this);
                 new ImageResizer.Plugins.Basic.LicenseDisplay().Install(this);
@@ -101,7 +101,7 @@ namespace ImageResizer.Configuration {
 
         private PipelineConfig pipeline = null;
         /// <summary>
-        /// Access and modify settings related to the HttpModule pipline. Register URL rewriting hooks, etc.
+        /// Access and modify settings related to the HttpModule pipeline. Register URL rewriting hooks, etc.
         /// </summary>
         public PipelineConfig Pipeline {
             get { return pipeline; }
@@ -142,7 +142,7 @@ namespace ImageResizer.Configuration {
         }
 
         /// <summary>
-        /// Shortuct to CurrentImageBuilder.Build (Useful for COM clients). Also creates a destination folder if needed, unlike the normal .Build() call.
+        /// Shortcut to CurrentImageBuilder.Build (Useful for COM clients). Also creates a destination folder if needed, unlike the normal .Build() call.
         /// 
         /// </summary>
         /// <param name="source"></param>

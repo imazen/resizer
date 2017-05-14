@@ -79,6 +79,6 @@ Please refer to the excellent XML documentation for further details - it is very
             Response.Write("\n" + Math.Round(percentComplete) + "% complete");
             //Note, however, on a live server, that opening a file for writing may take much longer than reading, thus
             //even 90% of elapsed time could occur before the first item is resized. This is very much an I/O bound process, and 
-            //calculting a percentage complete is nearly worthless on a live server.
+            //calculating a percentage complete is nearly worthless on a live server.
         }
     }

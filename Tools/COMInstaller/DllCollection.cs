@@ -10,7 +10,7 @@ using System.IO;
 namespace COMInstaller {
     public class DllCollection:Dictionary<string,Dll>{
         /// <summary>
-        /// Builds a dictionary of dll names to Dll references. Searches the specified directories in order - elements are not overwritten.
+        /// Builds a dictionary of DLL names to DLL references. Searches the specified directories in order - elements are not overwritten.
         /// </summary>
         /// <param name="dirs"></param>
         public DllCollection(string[] dirs):base(StringComparer.OrdinalIgnoreCase) {

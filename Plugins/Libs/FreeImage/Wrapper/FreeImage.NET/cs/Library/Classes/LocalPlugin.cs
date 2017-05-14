@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -45,14 +45,14 @@ namespace FreeImageAPI.Plugins
     /// Class representing own FreeImage-Plugins.
     /// </summary>
     /// <remarks>
-    /// FreeImages itself is plugin based. Each supported format is integrated by a seperat plugin,
-    /// that handles loading, saving, descriptions, identifing ect.
+    /// FreeImages itself is plugin based. Each supported format is integrated by a separate plugin,
+    /// that handles loading, saving, descriptions, identifying etc.
     /// And of course the user can create own plugins and use them in FreeImage.
-    /// To do that the above mentioned predefined methodes need to be implemented.
+    /// To do that the above mentioned predefined methods need to be implemented.
     /// <para/>
     /// The class below handles the creation of such a plugin. The class itself is abstract
     /// as well as some core functions that need to be implemented.
-    /// The class can be used to enable or disable the plugin in FreeImage after regististration or
+    /// The class can be used to enable or disable the plugin in FreeImage after registration or
     /// retrieve the formatid, assigned by FreeImage.
     /// The class handles the callback functions, garbage collector and pointer operation to make
     /// the implementation as user friendly as possible.
@@ -96,7 +96,7 @@ namespace FreeImageAPI.Plugins
         private InitProc initProc;
 
         /// <summary>
-        /// The format id assiged to the plugin.
+        /// The format id assigned to the plugin.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         protected FREE_IMAGE_FORMAT format = FREE_IMAGE_FORMAT.FIF_UNKNOWN;
@@ -121,7 +121,7 @@ namespace FreeImageAPI.Plugins
         protected enum MethodFlags
         {
             /// <summary>
-            /// No mothods implemented.
+            /// No methods implemented.
             /// </summary>
             None = 0x0,
 
@@ -271,10 +271,10 @@ namespace FreeImageAPI.Plugins
         protected virtual bool SupportsICCProfilesProc() { return false; }
 
         /// <summary>
-        /// The constructor automatically registeres the plugin in FreeImage.
+        /// The constructor automatically registers the plugin in FreeImage.
         /// To do this it prepares a FreeImage defined structure with function pointers
         /// to the implemented functions or null if not implemented.
-        /// Before registing the functions they are pinned in memory so the garbage collector
+        /// Before registering the functions they are pinned in memory so the garbage collector
         /// can't move them around in memory after we passed there addresses to FreeImage.
         /// </summary>
         public LocalPlugin()

@@ -40,7 +40,7 @@ namespace ImageResizer.Plugins.SeamCarving {
                     currCode |= (int)data[i + 1]; //Combine with LSB.
                     i++; //Skip forward so we don't read duplicate.
                 }
-                currCode--; //Since we offset everthing +1 to avoid char 0
+                currCode--; //Since we offset everything +1 to avoid char 0
 
                 if (currCode < asis) {
                     phrase = Char.ConvertFromUtf32(alphabet != null ? alphabet[currCode] : currCode);

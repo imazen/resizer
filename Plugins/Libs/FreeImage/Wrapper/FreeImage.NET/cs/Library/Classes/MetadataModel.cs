@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -391,11 +391,11 @@ namespace FreeImageAPI.Metadata
         }
 
         /// <summary>
-        /// Returns an array containg the data of the specified tag
+        /// Returns an array containing the data of the specified tag
         /// as unsigned 32bit integer.
         /// </summary>
         /// <param name="key">The key of the tag.</param>
-        /// <returns>An array containg the data of the specified tag
+        /// <returns>An array containing the data of the specified tag
         /// as unsigned 32bit integer.</returns>
         protected uint[] GetUInt32Array(string key)
         {
@@ -786,7 +786,7 @@ namespace FreeImageAPI.Metadata
             TrueDirection,
 
             /// <summary>
-            /// Magnatic direction.
+            /// Magnetic direction.
             /// </summary>
             MagneticDirection,
         }
@@ -884,7 +884,7 @@ namespace FreeImageAPI.Metadata
         public enum ExifImageOrientation : ushort
         {
             /// <summary>
-            /// Undefinied orientation.
+            /// Undefined orientation.
             /// </summary>
             Undefined,
 

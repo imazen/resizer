@@ -1,6 +1,6 @@
 Tags: plugin
 Edition: creative
-Tagline: "Includes 4 plugins: FreeImageDecoder adds support for RAW & HDR source images - over 20 formats supported. FreeImageEcoder provides 2-4x Faster jpeg encoding. FreeImageResizer adds support for Lanczos3 and CatmullRom scaling. FreeImageBuilder provides an alternate imaging pipeline."
+Tagline: "Includes 4 plugins: FreeImageDecoder adds support for RAW & HDR source images - over 20 formats supported. FreeImageEcoder provides 2-4x Faster JPEG encoding. FreeImageResizer adds support for Lanczos3 and CatmullRom scaling. FreeImageBuilder provides an alternate imaging pipeline."
 Aliases: /plugins/freeimage
 
 
@@ -21,14 +21,14 @@ Aliases: /plugins/freeimage
   , [libraw CVEs](https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=libraw)
   , [libtiff CVEs](https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=libtiff)
   , [libwebp CVEs](https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=webp), and any other libraries it has been compiled against. 
-* Imazen uses [this version of FreeImage](https://github.com/imazen/freeimage), which links to fewer codecs (libjpeg-turbo, libpng, zlib, libraw, libtiff, libwebp, and openjpeg). It is not neccessarily less likely to contain a vulnerable version of a codec than the [official binaries](http://freeimage.sourceforge.net/download.html). Just assume FreeImage has perpetual remote code exeuction vulnerabilites, OK? Only use it with files you trust. 
+* Imazen uses [this version of FreeImage](https://github.com/imazen/freeimage), which links to fewer codecs (libjpeg-turbo, libpng, zlib, libraw, libtiff, libwebp, and openjpeg). It is not necessarily less likely to contain a vulnerable version of a codec than the [official binaries](http://freeimage.sourceforge.net/download.html). Just assume FreeImage has perpetual remote code execution vulnerabilities, OK? Only use it with files you trust.
 
 
 `ImageResizer.Plugins.FreeImage.dll` contains several plugins, all based around the abilities offered by the C/C++ FreeImage library. These plugins are alpha-level. 
 
 ## Required files
 
-3 dlls must be placed in the /bin folder of the application for the plugins to work. 
+3 DLLs must be placed in the /bin folder of the application for the plugins to work.
 
 * `ImageResizer.Plugins.FreeImage.dll` (dlls\release)
 * `FreeImageNET.dll` (dlls\release)
@@ -38,15 +38,15 @@ Aliases: /plugins/freeimage
 
 Introduces support for RAW & HDR image formats, such as CRW/CR2, NEF, RAF, DNG, MOS, KDC, DCR, etc. Also introduced support for XBM, XPM, TARGA, SGI, Sun RAS, PSD, PICT, PNG, PFM, PBM, PGM, PPM, PCX, MNG, Kodak PhotoCD, KOALA, JPEG-2000, JIF, JNG, IFF, ICO, Raw Fax G3, EXR, DDS, and Dr. Halo CUT files.
 
-Install by adding `<add name="FreeImageDecoder" />` to the plugins section of Web.config. And make sure you've added the 3 required dlls.
+Install by adding `<add name="FreeImageDecoder" />` to the plugins section of Web.config. And make sure you've added the 3 required DLLs.
   
 FreeImageDecoder shows a 50%-400% increase in performance over GDI when loading TIFF files. By default, FreeImageDecoder is a fallback, so if you want it to load TIFF files, add &decoder=freeimage to the querystring. It does not support &page= at the moment.
   
 ## FreeImageEncoder
 
-FreeImageEncoder can encode jpegs 2-3x as fast as GDI can, and offers more encoding options. 
+FreeImageEncoder can encode JPEGs 2-3x as fast as GDI can, and offers more encoding options.
 
-Install by adding `<add name="FreeImageEncoder" />` to the plugins section of Web.config. And make sure you've added the 3 required dlls.
+Install by adding `<add name="FreeImageEncoder" />` to the plugins section of Web.config. And make sure you've added the 3 required DLLs.
   
 Use by adding `&encoder=freeimage` to the URL.
 
@@ -56,7 +56,7 @@ No support for transparency - so only use it on PNG and GIF files that don't nee
 
 Provides an alternate resizing pipeline that never touches GDI. Only supports width/maxwidth/height/maxheight/scale/marginWidth/paddingWidth/fi.scale settings. Only operates on requests specifying `builder=freeimage`
 
-Install by adding `<add name="FreeImageBuilder" />` to the plugins section of Web.config. And make sure you've added the 3 required dlls.
+Install by adding `<add name="FreeImageBuilder" />` to the plugins section of Web.config. And make sure you've added the 3 required DLLs.
 
 Not always faster, as FreeImage is slower at scaling images than GDI, even if it has faster encoding/decoding.
 
@@ -73,4 +73,4 @@ Activated by adding &fi.scale=bicubic&#124;bilinear&#124;box&#124;bspline&#124;c
 
 ## License
 
-This set of plugins is part of the [Design](/plugins) bundle, and licensed accordingly. The underlying [native FreeImage dlls are licensed under the FreeImage License](http://freeimage.sourceforge.net/freeimage-license.txt).
+This set of plugins is part of the [Design](/plugins) bundle, and licensed accordingly. The underlying [native FreeImage DLLs are licensed under the FreeImage License](http://freeimage.sourceforge.net/freeimage-license.txt).

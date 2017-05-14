@@ -172,7 +172,7 @@ Functions:
 -- conv: The edge detection kernel.
 -- ener: The energy algorithm.
 -- Dest: The grayscale equivalent of the energy map of the source image. All values
-   are scaled down realtive to the largest value. Weights are assumed all zero,
+   are scaled down relative to the largest value. Weights are assumed all zero,
    since when they are not they dominate the image and produce uninteresting results.
 
 - bool CAIR_Removal( CML_color * Source,
@@ -189,12 +189,12 @@ Functions:
 -- choice: How the algorithm will remove the seams. In AUTO mode, it will count the
    negative rows (for horizontal removal) and the negative columns (for vertical removal)
    and then removes the least amount in that direction. Other settings will cause it to 
-   remove in thier respective directions. After the removal, it is expanded back out to
-   its origional dimensions.
+   remove in their respective directions. After the removal, it is expanded back out to
+   its original dimensions.
 -- max_attempts: The number of retries the algorithm will do to remove remaining negative
    weights. Sometimes the algorithm may not remove everything in one pass, and this attempts
    to give the algorithm another chance at it. There are situations, however, where the
-   algorithm will not be able to remove the requested portions due to other areas makred
+   algorithm will not be able to remove the requested portions due to other areas marked
    for protection with a high weight.
 -- conv: The edge detection kernel.
 -- ener: The energy algorithm.
@@ -212,8 +212,8 @@ Functions:
                 CML_int * D_Weights,
                 CML_color * Dest,
                 bool (*CAIR_callback)(float) )
--- See CAIR() for the same paramaters.
--- CAIR_HD() is designed for quality, not speed. At each itteration, CAIR_HD()
+-- See CAIR() for the same parameters.
+-- CAIR_HD() is designed for quality, not speed. At each iteration, CAIR_HD()
    determines which direction produces the least energy path for removal. It then
    removes that path. CAIR_HD() can enlarge, but currently employs standard CAIR()
    to perform it.
@@ -248,7 +248,7 @@ allows an object in the image to appear larger. Do this as following:
 1) Enlarge an image using a standard linear technique by about 10% or so (more
    than 25% might cause some artifacts).
 2) Optional: Set a large weight for the desired object.
-3) Seam carve the enlarged image back down to the origional size.
+3) Seam carve the enlarged image back down to the original size.
 
 +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 
@@ -263,7 +263,7 @@ http://www.faculty.idc.ac.il/arik/papers/vidRet.pdf
 
 Special Thanks:
 Ariel Shamir
-Shai  Avidan
+Shai Avidan
 Michael Rubinstein
 Ramin Sabet
 Brett Taylor

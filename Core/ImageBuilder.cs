@@ -36,7 +36,7 @@ namespace ImageResizer
         protected ImageBuilder() { }
         protected IEncoderProvider _encoderProvider = null;
         /// <summary>
-        /// Handles the encoder selection and provision proccess.
+        /// Handles the encoder selection and provision process.
         /// </summary>
         public IEncoderProvider EncoderProvider { get { return _encoderProvider; } }
 
@@ -98,7 +98,7 @@ namespace ImageResizer
 
 
         /// <summary>
-        /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag in a BitmapTag instance. The Bitmap.Tag.Path value may be a virtual, relative, UNC, windows, or unix path. 
+        /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag in a BitmapTag instance. The Bitmap.Tag.Path value may be a virtual, relative, UNC, Windows, or UNIX path.
         /// Does not dispose 'source' if it is a Stream or Image instance - that's the responsibility of the calling code.
         /// </summary>
         /// <param name="source">May  be an instance of string, VirtualFile, IVirtualFile IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.  If passed an Image instance, the image will be cloned, which will cause metadata, indexed state, and any additional frames to be lost. Accepts physical paths and application relative paths. (C:\... and ~/path) </param>
@@ -120,7 +120,7 @@ namespace ImageResizer
         }
 
         /// <summary>
-        /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag in a BitmapTag instance. The Bitmap.Tag.Path value may be a virtual, relative, UNC, windows, or unix path. 
+        /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag in a BitmapTag instance. The Bitmap.Tag.Path value may be a virtual, relative, UNC, Windows, or UNIX path.
         /// Does not dispose 'source' if it is a Stream or Image instance - that's the responsibility of the calling code.
         /// </summary>
         /// <param name="source">May  be an instance of string, VirtualFile, IVirtualFile IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.  If passed an Image instance, the image will be cloned, which will cause metadata, indexed state, and any additional frames to be lost. Accepts physical paths and application relative paths. (C:\... and ~/path) </param>
@@ -165,7 +165,7 @@ namespace ImageResizer
                 try {
                     //First try DecodeStream
                     b = this.DecodeStream(s, settings, path);
-                    //Let the fallbacks work. (Only happens when a plugin overrides DecodeStream and retuns null)
+                    //Let the fallbacks work. (Only happens when a plugin overrides DecodeStream and returns null)
                     if (b == null) throw new ImageCorruptedException("Failed to decode image. Plugin made DecodeStream return null.", null);
                 } catch (Exception e) {
                     //if (Debugger.IsAttached) throw e;
@@ -228,7 +228,7 @@ namespace ImageResizer
         /// <summary>
         /// For plugin use only. 
         /// Returns a stream instance from the specified source object and settings object. 
-        /// To exend this method, override GetStream.
+        /// To extend this method, override GetStream.
         /// </summary>
         /// <param name="source">The physical or app-relative path, or a VirtualFile, IVirtualFile, Stream, HttpPostedFile, or HttpPostedFileBase instance.</param>
         /// <param name="settings">Querystring settings to pass to the VirtualFileProvider</param>
@@ -315,12 +315,12 @@ namespace ImageResizer
         /// Resizes and processes the specified source image and returns a bitmap of the result.
         /// Note! 
         /// This method assumes that transparency will be supported in the final output format, and therefore does not apply a matte color. Use &amp;bgcolor to specify a background color
-        /// if you use this method with a non-transparent format such as Jpeg.
+        /// if you use this method with a non-transparent format such as JPEG.
         /// If passed a source Stream, Bitmap, or Image instance, it will be disposed after use. Use disposeSource=False to disable that behavior. 
         /// </summary>
         /// <param name="source">May be an instance of string (a physical path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.</param>
         /// <param name="settings">Resizing and processing command to apply to the.</param>
-        [Obsolete("Use ImageJob with dest=typeof(Bitmap) instead - but only as a last resort. This method returns an umanaged, un-garbage collected object that can kill your server. Use Build(source,dest, instructions) instead of handing the Bitmap instance yourself.")]
+        [Obsolete("Use ImageJob with dest=typeof(Bitmap) instead - but only as a last resort. This method returns an unmanaged, non-garbage collected object that can kill your server. Use Build(source, dest, instructions) instead of handling the Bitmap instance yourself.")]
         public virtual Bitmap Build(object source, ResizeSettings settings) {
             return Build(source, settings, true);
         }
@@ -328,14 +328,14 @@ namespace ImageResizer
         /// Resizes and processes the specified source image and returns a bitmap of the result.
         /// Note! 
         /// This method assumes that transparency will be supported in the final output format, and therefore does not apply a matte color. Use &amp;bgcolor to specify a background color
-        /// if you use this method with a non-transparent format such as Jpeg.
+        /// if you use this method with a non-transparent format such as JPEG.
         /// 
         /// If passed a source Stream, Bitmap, or Image instance, it will not be disposed unless disposeSource=true.
         /// </summary>
         /// <param name="source">May be an instance of string (a physical path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.</param>
         /// <param name="settings">Resizing and processing command to apply to the.</param>
         /// <param name="disposeSource">If false, 'source' will not be disposed. </param>
-        [Obsolete("Use ImageJob with dest=typeof(Bitmap) instead - but only as a last resort. This method returns an umanaged, un-garbage collected object that can kill your server. Use Build(source,dest) instead of handing the Bitmap instance yourself.")]
+        [Obsolete("Use ImageJob with dest=typeof(Bitmap) instead - but only as a last resort. This method returns an unmanaged, non-garbage collected object that can kill your server. Use Build(source, dest) instead of handling the Bitmap instance yourself.")]
         public virtual Bitmap Build(object source, ResizeSettings settings, bool disposeSource) {
             ImageJob j = new ImageJob(source, typeof(Bitmap), settings, disposeSource, false);
             Build(j);
@@ -411,7 +411,7 @@ namespace ImageResizer
             job.Settings = s;
 
             try {
-                //Allow everything else to be overriden
+                //Allow everything else to be overridden
                 if (BuildJob(job) != RequestedAction.Cancel) throw new ImageProcessingException("Nobody did the job");
                 EndBuildJob(job);
                 totalTicks.Stop();
@@ -447,7 +447,7 @@ namespace ImageResizer
                 job.ResultInfo["source.width"] = b.Width;
                 job.ResultInfo["source.height"] = b.Height;
 
-                //Calucalte the appropriate file extension and mime type
+                //Calculate the appropriate file extension and mime type
                 if (job.Dest != typeof(Bitmap)){
                     IEncoder e = this.EncoderProvider.GetEncoder(s, b);
                     if (e != null)
@@ -516,10 +516,10 @@ namespace ImageResizer
                 Stream underlyingStream = null;
                 if (b != null && b.Tag != null && b.Tag is BitmapTag) underlyingStream = ((BitmapTag)b.Tag).Source;
 
-                //Close the source bitamp's underlying stream unless it is the same stream (EDIT: or bitmap) we were passed.
+                //Close the source bitmap's underlying stream unless it is the same stream (EDIT: or bitmap) we were passed.
                 var closeUnderlyingStream = (b != job.Source && underlyingStream != job.Source && underlyingStream != null);
 
-                //Dispose the bitmap unless we were passed it. We check for 'null' in case an ImageCorruptedException occured. 
+                //Dispose the bitmap unless we were passed it. We check for 'null' in case an ImageCorruptedException occurred.
                 if (b != null && b != job.Source) b.Dispose();
 
                 //Dispose the underlying stream after disposing the bitmap
@@ -582,7 +582,7 @@ namespace ImageResizer
 
         /// <summary>
         /// Processes an ImageState instance. Used by Build, GetFinalSize, and TranslatePoint. 
-        /// Can be overriden by a plugin with the OnProcess method
+        /// Can be overridden by a plugin with the OnProcess method
         /// </summary>
         /// <param name="s"></param>
         public virtual void Process(ImageState s){
@@ -805,7 +805,7 @@ namespace ImageResizer
         }
 
         /// <summary>
-        /// Creates a bitmap of s.destSize dimensions, intializes a graphics object for it, and configures all the default settings.
+        /// Creates a bitmap of s.destSize dimensions, initializes a graphics object for it, and configures all the default settings.
         /// </summary>
         /// <param name="s"></param>
         protected override RequestedAction  PrepareDestinationBitmap(ImageState s)

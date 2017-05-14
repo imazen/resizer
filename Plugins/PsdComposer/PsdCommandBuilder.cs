@@ -14,7 +14,7 @@ using System.Globalization;
 namespace ImageResizer.Plugins.PsdComposer
 {
     /// <summary>
-    /// Layer names are case-insensitive. Asterisks can be used as wildcards to specify suffixes, prefixs, and search terms.
+    /// Layer names are case-insensitive. Asterisks can be used as wildcards to specify suffixes, prefixes, and search terms.
     /// </summary>
     public class PsdCommandBuilder 
     {

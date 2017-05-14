@@ -117,7 +117,7 @@ namespace ImageResizer.Plugins.DiskCache
         /// <summary>
         /// Sets the location of the cache directory. 
         /// Can be a virtual path (like /App/imagecache) or an application-relative path (like ~/imagecache, the default).
-        /// Relative paths are assummed to be relative to the application root.
+        /// Relative paths are assumed to be relative to the application root.
         /// All values are converted to virtual path format upon assignment (/App/imagecache)
         /// Will throw an InvalidOperationException if changed after the plugin is installed.
         /// </summary>
@@ -185,7 +185,7 @@ namespace ImageResizer.Plugins.DiskCache
         private Config c;
         /// <summary>
         /// Loads the settings from 'c', starts the cache, and registers the plugin.
-        /// Will throw an invalidoperationexception if already started.
+        /// Will throw an InvalidOperationException if already started.
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
@@ -256,7 +256,7 @@ namespace ImageResizer.Plugins.DiskCache
         /// </summary>
         public bool Started { get { return _started; } }
         /// <summary>
-        /// Attempts to start the DiskCache using the current settings. Returns true if succesful or if already started. Returns false on a configuration error.
+        /// Attempts to start the DiskCache using the current settings. Returns true if successful or if already started. Returns false on a configuration error.
         /// Called by Install()
         /// </summary>
         public bool Start() {
@@ -286,7 +286,7 @@ namespace ImageResizer.Plugins.DiskCache
             }
         }
         /// <summary>
-        /// Returns true if stopped succesfully. Cannot be restarted
+        /// Returns true if stopped successfully. Cannot be restarted
         /// </summary>
         /// <returns></returns>
         public bool Stop() {
@@ -458,7 +458,7 @@ namespace ImageResizer.Plugins.DiskCache
             
             if (!HasNTFSPermission()) 
                 issues.Add(new Issue("DiskCache", "Not working: Your NTFS Security permissions are preventing the application from writing to the disk cache",
-    "Please give user " + GetExecutingUser() + " read and write access to directory \"" + PhysicalCacheDir + "\" to correct the problem. You can access NTFS security settings by right-clicking the aformentioned folder and choosing Properties, then Security.", IssueSeverity.ConfigurationError));
+    "Please give user " + GetExecutingUser() + " read and write access to directory \"" + PhysicalCacheDir + "\" to correct the problem. You can access NTFS security settings by right-clicking the aforementioned folder and choosing Properties, then Security.", IssueSeverity.ConfigurationError));
 
             if (!Started && !Enabled) issues.Add(new Issue("DiskCache", "DiskCache is disabled in Web.config. Set enabled=true on the <diskcache /> element to fix.", null, IssueSeverity.ConfigurationError));
 

@@ -111,7 +111,7 @@ namespace ImageResizer.Plugins.Faces {
         public List<T> DetectFeatures(Bitmap b) {
             LoadFiles();
             List<T> features;
-            //Type Intializer Exception occurs if you reuse an appdomain. Always restart the server.
+            //Type Initializer Exception occurs if you reuse an appdomain. Always restart the server.
             using (IplImage orig = OpenCvSharp.Extensions.BitmapConverter.ToIplImage(b))
             using (IplImage gray = new IplImage(orig.Size, BitDepth.U8, 1)) {
 

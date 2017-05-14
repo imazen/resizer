@@ -30,7 +30,7 @@ These settings can be used to prevent misuse of the image resizer.
 
 For example, an attacker could request a very large image to use a lot of CPU and RAM in a single request. Practically, it's insanely difficult to [DOS attack](http://en.wikipedia.org/wiki/Denial-of-service_attack) or DDOS attack the image resizer, due to GDI's memory allocation algorithm. GDI doesn't allow paging to disk, and requires consecutive chunks of memory. Under attack, memory gets fragmented, so image resizing requests get denied by GDI until the attack (or extremely high load) is over, and memory can be defragmented. 
 
-With disk caching enabled, users may not even notice a DOS attack, since GDI calls would fail first, leaving plenty of fragmented RAM around for ASPX/HTML/CSS/Javascript files and cached images to be served, since their contiguous memory requirements are minimal.
+With disk caching enabled, users may not even notice a DOS attack, since GDI calls would fail first, leaving plenty of fragmented RAM around for ASPX/HTML/CSS/JavaScript files and cached images to be served, since their contiguous memory requirements are minimal.
 
 totalWidth and totalHeight restrict the final output size of an image. They do not 'shrink' the image as `imageWidth` and `imageHeight` do. They simply cancel requests that exceed the permitted size. This prevents the memory from even being allocated for invalid requests.
 
@@ -51,7 +51,7 @@ These settings are *only* for limiting photo resolution, not preventing misuse. 
 They affect the output in a similar manner as changing maxwidth and maxheight would have on an image larger than the specified dimensions. I.e, 
 
 * Configuration: `<sizelimits imageWidth="800" imageHeight="600" />`
-* Url: 'image.jpg?width=1000&height=800&paddingWidth=100
+* URL: 'image.jpg?width=1000&height=800&paddingWidth=100
 * Source image size: 1600x1200
 * Result output size: 900x700
 * Size of photo inside padding: 800x600

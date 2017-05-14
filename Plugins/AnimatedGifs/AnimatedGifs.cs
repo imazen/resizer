@@ -14,7 +14,7 @@ using ImageResizer.Plugins.Basic;
 namespace ImageResizer.Plugins.AnimatedGifs
 {
     /// <summary>
-    /// Adds support for resizing animated gifs. Once added, animated gifs will be resized while maintaining all animated frames. By default, .NET only saves the first frame of the GIF image.
+    /// Adds support for resizing animated GIFs. Once added, animated GIFs will be resized while maintaining all animated frames. By default, .NET only saves the first frame of the GIF image.
     /// </summary>
     public class AnimatedGifs : BuilderExtension, IPlugin
     {
@@ -97,7 +97,7 @@ namespace ImageResizer.Plugins.AnimatedGifs
                     //src.MakeTransparent(); This call makes some GIFs replicate the first image on all frames.. i.e. SelectActiveFrame doesn't work.
                     
                     using (Bitmap b = c.CurrentImageBuilder.Build(src,queryString,false)){
-                        //Useful to check if animation is occuring - sometimes the problem isn't the output file, but the input frames are 
+                        //Useful to check if animation is occurring - sometimes the problem isn't the output file, but the input frames are
                         //all the same.
                         //for (var i = 0; i < b.Height; i++) b.SetPixel(frame * 10, i, Color.Green);
                         // b.Save(memoryStream, ImageFormat.Gif);
@@ -110,7 +110,7 @@ namespace ImageResizer.Plugins.AnimatedGifs
                     {
                         //Only one screen descriptor per file. Steal from the first image
                         writer.Write(gif.m_ScreenDescriptor.ToArray());
-                        //How many times to loop the image (unless it is 1) IE and FF3 loop endlessley if loop=1
+                        //How many times to loop the image (unless it is 1) IE and FF3 loop endlessly if loop=1
                         if (loops != 1) 
                             writer.Write(GifCreator.CreateLoopBlock(loops));
                     }
