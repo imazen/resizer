@@ -63,11 +63,11 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\packages\pdfiumviewer.2.0.0.0\content\x64\pdfium.dll">
+    <Content Include="..\..\..\packages\pdfiumviewer.2.12.0.0\content\x64\pdfium.dll">
       <Link>x64\pdfium.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\packages\pdfiumviewer.2.0.0.0\content\x86\pdfium.dll">
+    <Content Include="..\..\..\packages\pdfiumviewer.2.12.0.0\content\x86\pdfium.dll">
       <Link>x86\pdfium.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -32,8 +32,8 @@
     <DocumentationFile>..\..\..\dlls\release\ImageResizer.Plugins.PdfiumRenderer.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PdfiumViewer, Version=2.7.0.0, Culture=neutral, PublicKeyToken=91e4789cfb0609e0, processorArchitecture=MSIL">
-      <HintPath>..\..\..\Packages\PdfiumViewer.2.7.0.0\lib\net20\PdfiumViewer.dll</HintPath>
+    <Reference Include="PdfiumViewer, Version=2.12.0.0, Culture=neutral, PublicKeyToken=91e4789cfb0609e0, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Packages\PdfiumViewer.2.12.0.0\lib\net20\PdfiumViewer.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -60,17 +60,19 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\Packages\PdfiumViewer.2.7.0.0\content\x64\pdfium.dll">
+    <Content Include="..\..\..\Packages\PdfiumViewer.2.12.0.0\content\x64\pdfium.dll">
       <Link>x64\pdfium.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\Packages\PdfiumViewer.2.7.0.0\content\x86\pdfium.dll">
+    <Content Include="..\..\..\Packages\PdfiumViewer.2.12.0.0\content\x86\pdfium.dll">
       <Link>x86\pdfium.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="license.txt" />
     <Content Include="readme.txt" />
-    <EmbeddedResource Include="Native.xml" />
+    <EmbeddedResource Include="Native.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
