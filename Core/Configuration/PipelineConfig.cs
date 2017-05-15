@@ -542,6 +542,22 @@ namespace ImageResizer.Configuration {
             Heartbeat?.Invoke(this, c);
         }
 
+        public void FireHeartbeatViaAspNetCache(int intervalSeconds)
+        {
+            HttpRuntime.Cache.Insert("FireHeartbeat_for_PipelineConfig_" + GetHashCode(), intervalSeconds, null,
+                DateTime.Now.AddSeconds(intervalSeconds), System.Web.Caching.Cache.NoSlidingExpiration,
+                System.Web.Caching.CacheItemPriority.NotRemovable, (k, v, r) =>
+                {
+                    var seconds = Convert.ToInt32(v);
+                    if (seconds <= 0) {
+                        return;
+                    }
+                    FireHeartbeat();
+                    FireHeartbeatViaAspNetCache(seconds);
+                });
+        }
+
+
         public void FireAuthorizeImage(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlAuthorizationEventArgs e) {
             if (AuthorizeImage != null) AuthorizeImage(sender, context, e);
         }
