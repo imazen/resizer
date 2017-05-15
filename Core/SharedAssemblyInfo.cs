@@ -1,10 +1,8 @@
 ﻿// This file is licensed CC0, and can be considered 'insignificant'
 // Apply whichever license you like
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System;
-using ImageResizer.Util;
+
 using System.Reflection;
+using ImageResizer.Util;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information

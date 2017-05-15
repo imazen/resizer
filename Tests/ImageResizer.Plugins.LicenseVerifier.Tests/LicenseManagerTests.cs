@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -70,14 +71,14 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test, clock) {
                     Cache = cache
                 };
-                var httpHandler = MockRemoteLicense(mgr, HttpStatusCode.OK, LicenseStrings.EliteSubscriptionRemote,
+                MockRemoteLicense(mgr, HttpStatusCode.OK, LicenseStrings.EliteSubscriptionRemote,
                     null);
 
                 var conf = new Config();
                 conf.Plugins.LicenseScope = LicenseAccess.Local;
                 conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R4Elite"));
                 conf.Plugins.AddLicense(LicenseStrings.EliteSubscriptionPlaceholder);
-
+                
                 mgr.WaitForTasks();
 
                 var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
@@ -92,7 +93,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test, clock) {
                     Cache = cache
                 };
-                var httpHandler = MockRemoteLicenseException(mgr, WebExceptionStatus.NameResolutionFailure);
+                MockRemoteLicenseException(mgr, WebExceptionStatus.NameResolutionFailure);
 
                 var conf = new Config();
                 try {
@@ -125,15 +126,17 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
             var unique_prefix = "test_cache_" + Guid.NewGuid() + "__";
             var cacheType = Type.GetType("ImageResizer.Plugins.WriteThroughCache, ImageResizer");
+            Debug.Assert(cacheType != null, "cacheType != null");
             var cacheCtor = cacheType.GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null,
                 new[] {typeof(string)}, null);
-            var cacheInstance = cacheCtor.Invoke(new[] {unique_prefix});
+            var cacheInstance = cacheCtor.Invoke(new object[] {unique_prefix});
 
 
             var c = new PeristentGlobalStringCache();
-            typeof(PeristentGlobalStringCache)
-                .GetField("cache", BindingFlags.NonPublic | BindingFlags.Instance)
-                .SetValue(c, cacheInstance);
+            var cacheField = typeof(PeristentGlobalStringCache)
+                .GetField("cache", BindingFlags.NonPublic | BindingFlags.Instance);
+            Debug.Assert(cacheField != null, "cacheField != null");
+            cacheField.SetValue(c, cacheInstance);
 
             Assert.Equal(StringCachePutResult.WriteComplete, c.TryPut("a", "b"));
             Assert.Equal(StringCachePutResult.Duplicate, c.TryPut("a", "b"));
