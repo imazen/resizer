@@ -45,13 +45,14 @@ namespace ImageResizer.Plugins.LicenseVerifier
         bool AllDomainsLicensed { get; }
         IDictionary<string, bool> KnownDomainStatus { get; }
         public DateTimeOffset? ComputationExpires { get; }
-
+        LicenseAccess Scope { get; }
         public Computation(Config c, IReadOnlyCollection<RSADecryptPublic> trustedKeys,
                            IIssueReceiver permanentIssueSink,
                            ILicenseManager mgr, ILicenseClock clock) : base("Computation")
         {
             permanentIssues = permanentIssueSink;
             this.clock = clock;
+            Scope = c.Plugins.LicenseScope;
             this.mgr = mgr;
             if (mgr.FirstHeartbeat == null) {
                 throw new ArgumentException("ILicenseManager.Heartbeat() must be called before Computation.new");
@@ -67,7 +68,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
                       .SelectMany(p => p.GetLicenses())
                       .Select(str => mgr.GetOrAdd(str, c.Plugins.LicenseScope))
                       .Where(x => x != null && x.Licenses().Any())
-                      .Concat(c.Plugins.LicenseScope.HasFlag(LicenseAccess.ProcessReadonly)
+                      .Concat(Scope.HasFlag(LicenseAccess.ProcessReadonly)
                           ? mgr.GetSharedLicenses()
                           : Enumerable.Empty<ILicenseChain>())
                       .Distinct()
@@ -278,7 +279,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         StringBuilder GetLicenseStatus()
         {
             var sb = new StringBuilder();
-            sb.Append("\nLicense status for active features: ");
+            sb.Append($"\nLicense status for active features (for {Scope})");
             if (EverythingDenied) {
                 sb.AppendLine("License error. Contact support@imageresizing.net");
             } else if (AllDomainsLicensed) {
