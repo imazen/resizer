@@ -82,15 +82,18 @@ namespace ImageResizer.Plugins.LicenseVerifier
                               IReadOnlyCollection<string> knownDomains) //c.configurationSectionIssue
         {
             var mappings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            var n = c.getNode("licenses");
-            if (n == null) {
-                return mappings;
-            }
-            foreach (var map in n.childrenByName("maphost")) {
-                var from = map.Attrs["from"]?.Trim().ToLowerInvariant();
-                var to = map.Attrs["to"]?.Trim().ToLowerInvariant();
+            var fromWebConfig = c.getNode("licenses")?.childrenByName("maphost")
+                .Select(n => new KeyValuePair<string, string>(
+                    n.Attrs["from"]?.Trim().ToLowerInvariant(), 
+                    n.Attrs["to"]?.Trim().ToLowerInvariant()))
+                ?? Enumerable.Empty<KeyValuePair<string, string>>();
+            var fromPluginsConfig = c.Plugins.GetLicensedDomainMappings();
+
+            foreach (var pair in fromWebConfig.Concat(fromPluginsConfig)) {
+                var from = pair.Key;
+                var to = pair.Value;
                 if (string.IsNullOrEmpty(from) || string.IsNullOrEmpty(to)) {
-                    sink.AcceptIssue(new Issue($"Both from= and to= attributes are required on maphost: {map}",
+                    sink.AcceptIssue(new Issue($"Both from= and to= attributes are required on maphost, found {from} and {to}",
                         IssueSeverity.ConfigurationError));
                 } else if (from.Replace(".local", "").IndexOf('.') > -1) {
                     sink.AcceptIssue(new Issue(
