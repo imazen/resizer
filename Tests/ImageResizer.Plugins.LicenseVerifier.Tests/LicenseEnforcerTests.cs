@@ -75,7 +75,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
       <license>" + LicenseStrings.Offlinev4DomainAcmeComCreative + "</license></licenses>" +
                 "<plugins><add name='Gradient'/></plugins></resizer>"));
 
-            conf.Plugins.Install(new EmptyLicenseEnforcedPlugin(new LicenseEnforcer<EmptyLicenseEnforcedPlugin>(mgr, mgr, request.Get), "R4Creative"));
+            conf.Plugins.Install(new EmptyLicenseEnforcedPlugin(new LicenseEnforcer<EmptyLicenseEnforcedPlugin>(mgr, mgr, request.Get).EnableEnforcement(), "R4Creative"));
 
             request.Url = null;
             Assert.False(IsWatermarking(conf, mgr));
@@ -108,7 +108,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             conf.Plugins.LicenseError = LicenseErrorAction.Exception;
             conf.Plugins.AddLicensedDomainMapping("localhost", "acme.com");
             conf.Plugins.Install(new Gradient());
-            conf.Plugins.Install(new EmptyLicenseEnforcedPlugin(new LicenseEnforcer<EmptyLicenseEnforcedPlugin>(mgr, mgr, request.Get), "R4Creative"));
+            conf.Plugins.Install(new EmptyLicenseEnforcedPlugin(new LicenseEnforcer<EmptyLicenseEnforcedPlugin>(mgr, mgr, request.Get).EnableEnforcement(), "R4Creative"));
 
             request.Url = null;
             Assert.False(IsWatermarking(conf, mgr));
@@ -140,7 +140,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             conf.Plugins.LicenseError = LicenseErrorAction.Watermark;
             conf.Plugins.AddLicensedDomainMapping("localhost", "acme.com");
             conf.Plugins.Install(new Gradient());
-            conf.Plugins.Install(new EmptyLicenseEnforcedPlugin(new LicenseEnforcer<EmptyLicenseEnforcedPlugin>(mgr, mgr, request.Get), "R4Creative"));
+            conf.Plugins.Install(new EmptyLicenseEnforcedPlugin(new LicenseEnforcer<EmptyLicenseEnforcedPlugin>(mgr, mgr, request.Get).EnableEnforcement(), "R4Creative"));
 
             request.Url = null;
             Assert.False(IsWatermarking(conf, mgr));
@@ -172,7 +172,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             var conf = new Config();
             conf.Plugins.LicenseScope = LicenseAccess.Local;
             conf.Plugins.Install(new Gradient());
-            conf.Plugins.Install(new EmptyLicenseEnforcedPlugin(new LicenseEnforcer<EmptyLicenseEnforcedPlugin>(mgr, mgr, request.Get), "R4Creative"));
+            conf.Plugins.Install(new EmptyLicenseEnforcedPlugin(new LicenseEnforcer<EmptyLicenseEnforcedPlugin>(mgr, mgr, request.Get).EnableEnforcement(), "R4Creative"));
 
             // We don't watermark outside of http requests (even if there are no valid licenses)
             request.Url = null;
@@ -205,7 +205,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 conf.Plugins.AddLicense(set.Placeholder);
                 conf.Plugins.LicenseError = LicenseErrorAction.Watermark;
                 conf.Plugins.Install(new Gradient());
-                conf.Plugins.Install(new EmptyLicenseEnforcedPlugin(new LicenseEnforcer<EmptyLicenseEnforcedPlugin>(mgr, mgr, request.Get), "R4Creative"));
+                conf.Plugins.Install(new EmptyLicenseEnforcedPlugin(new LicenseEnforcer<EmptyLicenseEnforcedPlugin>(mgr, mgr, request.Get).EnableEnforcement(), "R4Creative"));
                 Assert.Equal(1, mgr.WaitForTasks());
 
                 request.Url = null;
@@ -244,7 +244,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 conf.Plugins.AddLicense(set.Placeholder);
                 conf.Plugins.LicenseError = LicenseErrorAction.Exception;
                 conf.Plugins.Install(new Gradient());
-                conf.Plugins.Install(new EmptyLicenseEnforcedPlugin(new LicenseEnforcer<EmptyLicenseEnforcedPlugin>(mgr, mgr, request.Get), "R_Performance"));
+                conf.Plugins.Install(new EmptyLicenseEnforcedPlugin(new LicenseEnforcer<EmptyLicenseEnforcedPlugin>(mgr, mgr, request.Get).EnableEnforcement(), "R_Performance"));
 
                 Assert.Equal(1, mgr.WaitForTasks());
                 // We don't raise exceptions without a request url, unless there are absolutely no valid licenses

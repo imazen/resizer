@@ -118,19 +118,15 @@ namespace ImageResizer.Plugins.LicenseVerifier
             return true;
         }
 
-        bool EnforcementEnabled()
+        bool enforcementEnabled = false;
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+        bool EnforcementEnabled() => Enforce || enforcementEnabled;
+
+
+        public LicenseEnforcer<T> EnableEnforcement()
         {
-#pragma warning disable 0162
-            // Only unreachable when compiled in DRM mode. 
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            // ReSharper disable once HeuristicUnreachableCode
-            if (Enforce) {
-                // ReSharper disable once HeuristicUnreachableCode
-                return true;
-            } 
-            // ReSharper disable once HeuristicUnreachableCode
-            return false;
-#pragma warning restore 0162
+            enforcementEnabled = true;
+            return this;
         }
 
         /// <summary>
