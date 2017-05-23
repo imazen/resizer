@@ -2,7 +2,7 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,6 +21,8 @@ using ImageResizer.Configuration.Logging;
 using System.Web.Compilation;
 using ImageResizer.Configuration.Plugins;
 using System.Linq;
+using ImageResizer.ExtensionMethods;
+using System.Collections.Concurrent;
 
 namespace ImageResizer.Configuration {
     /// <summary>
@@ -48,6 +50,8 @@ namespace ImageResizer.Configuration {
             virtualProviderPlugins = new SafeList<IVirtualImageProvider>();
             settingsModifierPlugins = new SafeList<ISettingsModifier>();
             configProviders = new SafeList<ICurrentConfigProvider>();
+            LicenseError = c.getNode("licenses")?.Attrs?.Get<LicenseErrorAction>("licenseError") ?? LicenseError;
+            LicenseScope = c.getNode("licenses")?.Attrs?.Get<LicenseAccess>("licenseScope") ?? LicenseScope;
         }
         internal PluginLoadingHints hints = new PluginLoadingHints();
 
@@ -756,8 +760,37 @@ namespace ImageResizer.Configuration {
         /// <summary>
         /// If this Config should inherit and/or share licenses process-wide, or only use licenses specifically registered.
         /// </summary>
-        public LicenseAccess LicenseScope { get { return _licenseScope; } set { _licenseScope = value; FireLicensePluginsChange();  }  } 
+        public LicenseAccess LicenseScope { get { return _licenseScope; } set { _licenseScope = value; FireLicensePluginsChange();  }  }
 
+        /// <summary>
+        /// Should image requests fail or be watermarked when license validation fails?
+        /// </summary>
+        public LicenseErrorAction LicenseError { get; set; } = LicenseErrorAction.Watermark;
+
+        ConcurrentDictionary<string, string> mappedDomains;
+
+        /// <summary>
+        /// This allows you to map certain local hostnames (such as those without domains: 'localhost', 'localserver') and *.local domains like 'webserver.local'.
+        /// Request with these host headers will appear as the licensed domain instead.
+        /// </summary>
+        /// <param name="localHostname"></param>
+        /// <param name="licensedDomain"></param>
+        public void AddLicensedDomainMapping(string localHostname, string licensedDomain)
+        {
+            if (mappedDomains == null) mappedDomains = new ConcurrentDictionary<string, string>();
+            var from = localHostname?.Trim().ToLowerInvariant();
+            var to = licensedDomain?.Trim().ToLowerInvariant();
+            if (string.IsNullOrEmpty(from) || string.IsNullOrEmpty(to))
+            {
+                throw new ArgumentException("Both localHostname and licensedDomain must be non-null and non-empty.");
+            }
+            mappedDomains[from] = to;
+        }
+
+        public IEnumerable<KeyValuePair<string, string>> GetLicensedDomainMappings() => mappedDomains ??
+                                                                                        Enumerable
+                                                                                            .Empty<KeyValuePair<string,
+                                                                                                string>>();
     }
 
     /// <summary>
@@ -782,5 +815,21 @@ namespace ImageResizer.Configuration {
         /// Share and reuse licenses process-wide
         /// </summary>
         Process = 3,
+    }
+
+    /// <summary>
+    /// How to notify the user that license validation has failed
+    /// </summary>
+    [Flags()]
+    public enum LicenseErrorAction
+    {
+        /// <summary>
+        /// Adds a red dot to the bottom-right corner
+        /// </summary>
+        Watermark = 0,
+        /// <summary
+        /// Raises an exception with http status code 402
+        /// </summary>
+        Exception = 1,
     }
 }
