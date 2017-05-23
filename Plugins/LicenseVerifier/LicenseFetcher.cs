@@ -14,7 +14,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 {
     class LicenseFetcher
     {
-        const long LicenseFetchIntervalSeconds = 60 * 60;
+        long LicenseFetchIntervalSeconds { get; } = 60 * 60;
         const long InitialErrorIntervalSeconds = 2;
         const long ErrorMultiplier = 3;
 
@@ -51,9 +51,10 @@ namespace ImageResizer.Plugins.LicenseVerifier
         public LicenseFetcher(ILicenseClock clock, Func<HttpClient> getClient,
                               Action<string, IReadOnlyCollection<FetchResult>> licenseResult,
                               Func<IInfoAccumulator> getInfo, IIssueReceiver sink, string licenseId,
-                              string licenseSecret, string[] baseUrls)
+                              string licenseSecret, string[] baseUrls, long? licenseFetchIntervalSeconds)
         {
             this.clock = clock;
+            LicenseFetchIntervalSeconds = licenseFetchIntervalSeconds ?? LicenseFetchIntervalSeconds;
             regular = new ImperfectDebounce(() => QueueLicenseFetch(false), LicenseFetchIntervalSeconds, clock);
             error = new ImperfectDebounce(() => QueueLicenseFetch(true), 0, clock);
             this.getClient = getClient;

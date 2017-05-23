@@ -125,6 +125,10 @@ namespace ImageResizer.Plugins.LicenseVerifier
         public static int? NetworkGraceMinutes(this ILicenseDetails details)
             => details?.Get("NetworkGraceMinutes").TryParseInt();
 
+        public static int? CheckLicenseIntervalMinutes(this ILicenseDetails details)
+            => details?.Get("CheckLicenseIntervalMinutes").TryParseInt();
+
+
         public static string GetSecret(this ILicenseDetails details)
             => details?.Get("Secret");
 

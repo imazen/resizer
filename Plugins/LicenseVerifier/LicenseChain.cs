@@ -31,7 +31,9 @@ namespace ImageResizer.Plugins.LicenseVerifier
         /// <summary>
         ///     License Servers
         /// </summary>
-        readonly string[] licenseServerStack = DefaultLicenseServers;
+        string[] licenseServerStack = DefaultLicenseServers;
+
+        int licenseIntervalMinutes = 60 * 60;
 
         readonly LicenseManagerSingleton parent;
 
@@ -195,10 +197,18 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 parent,
                 Id,
                 Secret,
-                licenseServerStack);
+                licenseServerStack,
+                (long?)licenseIntervalMinutes);
             fetcher.Heartbeat();
         }
 
+
+        string[] GetLicenseServers(ILicenseBlob blob)
+        {
+            var oldStack = licenseServerStack ?? new string[0];
+            var newList = blob.Fields.GetValidLicenseServers().ToArray();
+            return newList.Concat(oldStack.Except(newList)).Take(10).ToArray();
+        }
 
         /// <summary>
         ///     Returns false if the blob is null,
@@ -207,15 +217,27 @@ namespace ImageResizer.Plugins.LicenseVerifier
         /// </summary>
         /// <param name="blob"></param>
         /// <returns></returns>
-        bool TryUpdateLicenseServers(ILicenseBlob blob)
+        bool TryUpdateLicenseServersInfo(ILicenseBlob blob)
         {
             if (blob == null) {
                 return false;
             }
+            var interval = blob.Fields.CheckLicenseIntervalMinutes();
+            var intervalChanged = interval != null && interval != licenseIntervalMinutes;
+            
             var oldStack = licenseServerStack ?? new string[0];
-            var newList = blob.Fields.GetValidLicenseServers().ToArray();
-            var newStack = newList.Concat(oldStack.Except(newList)).Take(10).ToArray();
-            return !newStack.SequenceEqual(oldStack);
+            var newStack = GetLicenseServers(blob);
+            var stackChanged = !newStack.SequenceEqual(oldStack);
+
+
+            if (stackChanged) {
+                licenseServerStack = newStack;
+            }
+            if (intervalChanged)
+            {
+                licenseIntervalMinutes = interval.Value;
+            }
+            return stackChanged || intervalChanged;
         }
 
         /// <summary>
@@ -231,11 +253,8 @@ namespace ImageResizer.Plugins.LicenseVerifier
                     Secret = b.Fields.GetSecret();
                     IsRemote = true;
 
-                    TryUpdateLicenseServers(b);
+                    TryUpdateLicenseServersInfo(b);
                     RecreateFetcher();
-                    if (TryUpdateLicenseServers(CachedLicense())) {
-                        RecreateFetcher();
-                    }
                 }
                 LocalLicenseChange();
             }
@@ -257,6 +276,10 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         void LocalLicenseChange()
         {
+            if (TryUpdateLicenseServersInfo(FetchedLicense() ?? CachedLicense()))
+            {
+                RecreateFetcher();
+            }
             cache = CollectLicenses();
             parent.FireLicenseChange();
         }
