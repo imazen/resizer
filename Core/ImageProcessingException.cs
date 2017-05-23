@@ -27,20 +27,16 @@ namespace ImageResizer {
         }
         public ImageProcessingException(int httpCode, string message, string safeMessage)
             : base(httpCode, message) {
-                this.publicSafeMessage = safeMessage;
+            PublicSafeMessage = safeMessage;
         }
         public ImageProcessingException(int httpCode, string message, string safeMessage, Exception innerException)
             : base(httpCode, message,innerException) {
-                this.publicSafeMessage = safeMessage;
+            PublicSafeMessage = safeMessage;
         }
-        private string publicSafeMessage = null;
         /// <summary>
         /// This error message is safe to display to the public (should not contain any sensitive information)
         /// </summary>
-        protected string PublicSafeMessage {
-            get { return publicSafeMessage; }
-            set { publicSafeMessage = value; }
-        }
+        protected string PublicSafeMessage { get; set; }
     }
 
     /// <summary>
@@ -64,4 +60,14 @@ namespace ImageResizer {
             : base(404, message, safeMessage, innerException) {
         }
     }
+
+    /// <summary>
+    /// A source file was corrupted
+    /// </summary>
+    public class LicenseException : ImageProcessingException
+    {
+        public LicenseException(string message) : base(402, message, message) { }
+        public LicenseException(string message, Exception innerException) : base(402, message, message, innerException) { }
+    }
+
 }

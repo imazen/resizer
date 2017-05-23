@@ -1,14 +1,45 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using ImageResizer.Configuration;
+using Moq;
+using Moq.Protected;
+using Xunit;
+using Xunit.Abstractions;
 using ImageResizer.Configuration;
 using ImageResizer.Configuration.Issues;
 using ImageResizer.Plugins.Basic;
 using ImageResizer.Plugins.Licensing;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace ImageResizer.Plugins.LicenseVerifier.Tests
 {
+
+
+    class FakeClock : ILicenseClock
+    {
+        DateTimeOffset now;
+        readonly DateTimeOffset built;
+
+        public FakeClock(string date, string buildDate)
+        {
+            now = DateTimeOffset.Parse(date);
+            built = DateTimeOffset.Parse(buildDate);
+        }
+
+        public void AdvanceSeconds(long seconds) { now = now.AddSeconds(seconds); }
+        public DateTimeOffset GetUtcNow() => now;
+        public long GetTimestampTicks() => now.Ticks;
+        public long TicksPerSecond { get; } = Stopwatch.Frequency;
+        public DateTimeOffset? GetBuildDate() => built;
+        public DateTimeOffset? GetAssemblyWriteDate() => built;
+    }
     class StringCacheEmpty : IPersistentStringCache
     {
         public string Get(string key) => null;
@@ -40,31 +71,6 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         }
     }
 
-
-    class LicenseStrings
-    {
-        public static readonly string Offlinev4DomainAcmeComCreative =
-                "acme.com(R4Creative includes R4Creative R4Performance):S2luZDogdjQtZG9tYWluLW9mZmxpbmUKU2t1OiBSNENyZWF0aXZlCkRvbWFpbjogYWNtZS5jb20KT3duZXI6IEFjbWUgQ29ycApJc3N1ZWQ6IDIwMTctMDQtMjFUMDA6MDA6MDArMDA6MDAKRmVhdHVyZXM6IFI0Q3JlYXRpdmUgUjRQZXJmb3JtYW5jZQ==:eFLsTwUCEdQiEt34zdnzzxKFeEoAOrZoheE85LLYB9Pgx5wypsYpcG+58GlXUtgldbPyq+9e+m/ZeDhyqXPUkd6wk43EqUu07//20RE3XEWeKEGK1LBTNUJ6gfL9iPsA9qnSLpJNV7QLp9JxWI2VztvPUol9W5dORtUWtfzna+hujSQ5lym9vjVBaxsbsyRBS9x27lzGKUL+RoonHDYpeIolAnNu28WuBmFGQ3S3ALcNZ4dSjoapyAXQyEH07A5pQ/p18Vv5FqD24p7dh45BGMqJXLVuZli13kvdh812UQvKwyL223k9cEYiyV7F+YN6YHPL5/Ebrh1nYDC00/1b7A=="
-            ;
-
-        public static readonly string EliteSubscriptionPlaceholder =
-                ":S2luZDogaWQKSWQ6IDExNTE1MzE2MgpTZWNyZXQ6IDFxZ2dxMTJ0MnF3Z3dnNGMyZDJkcXdmd2VxZncKSXNQdWJsaWM6IGZhbHNlCk1heFVuY2FjaGVkR3JhY2VNaW51dGVzOiA0ODA=:iJMbZFTUtC0PFl4mooTaLR1gXHLY7aFEXQvGUFbdHmwsA0M/NLq2CBIhujNgSvdQy5jWP5ylIBZCppIHDgiewfo1SZxLbQ424i8QLvrskUXPlau/1sQdmhOmjELDbcYslSujkbRIqzgIWJtw6IMxQwM+O/R+mdG4J+G1E81ERkpR4G/1Eu0DIxrNg0yn8Z13Qe5qjLwvBhdv9coSPXFEdlg7QhVWw4QuUl1GkxUC+qBTxVI2yYyQJtqFokLJOXlzRJUL21PZOw5BeBrzGkesq4XHcKrqGKGbuBQver6TjTL9jougNUY2HfKBuORfJwttwSip/Fr4A7CnYNGDajm0Fw=="
-            ;
-
-        public static readonly string EliteSubscriptionRemote =
-                "ImageResizer Elite Subscription:SWQ6IDExNTE1MzE2MgpLaW5kOiBzdWJzY3JpcHRpb24KT3duZXI6IEFjbWUgQ29ycApJc3N1ZWQ6IDIwMTctMDQtMTlUMDM6MTE6NDJaCkV4cGlyZXM6IDIwMTctMTAtMTdUMDM6MTE6NDJaCklzUHVibGljOiB0cnVlClByb2R1Y3Q6IEltYWdlUmVzaXplciBFbGl0ZSBTdWJzY3JpcHRpb24KRmVhdHVyZXM6IFI0RWxpdGUgUjRDcmVhdGl2ZSBSNFBlcmZvcm1hbmNlClJlc3RyaWN0aW9uczogT25seSBmb3IgdGVzdGluZzsgbm90IGxlZ2FsIGZvciBwcm9kdWN0aW9uIHVzZS4=:P1m3QpHFHQvEgkozPCMzQjba8phkW3vgKp/Zrzk5auHTfwd02c8gf/4HPglquk0wMr7TEUm69AyjhWElZsx2lBfcYPHk+N6IM2K202Wvic+2WFwBpHvD6Mf7ZDEk2J+MKcY6awowJ0KuyQoRmec4CIzLUuER8OrucvZ/plZqBOehIybPLafbsk109kXCLQT8AIbcpP0hs/7H+CoYV9mir0tdz+rA1y0IBzWPStP1FMeGnT2JPdyjKwbi+N0Blsy/z832qil0Jhbscbk5o9rfKJpaQLihgnjiCTE3WIH7ZWZ2jguHaFtIkkw7+A+byx6kZhEfUz+pKZcqF4x1fpwfoA=="
-            ;
-
-        public static readonly string V4ElitePerpetualPlaceholder =
-                "License 4271246357 for Acme Corp :S2luZDogaWQKSWQ6IDQyNzEyNDYzNTcKU2VjcmV0OiB0ZXN0MTUwYzk2ZmVlMzNiYTFjYzY1OWU5ZDYxNzA4MDFlZDEyN2JkMTE0ZjU2OTRlNzhjMzE0ODNiMzc0YTAzNjU0MgpPd25lcjogQWNtZSBDb3JwCklzc3VlZDogMjAxNy0wNC0yMVQwMDowMDowMCswMDowMApOZXR3b3JrR3JhY2VNaW51dGVzOiA0ODAKSXNQdWJsaWM6IGZhbHNl:IfPITv4m0XcvBBrqdgzkEhohvlt/yeblofnu8G9vDOuNjKKhndrCn2/DKDLb8/kJ7+4Ckjt6fPdMOMZVXhIP+UFichdIaBxPruvf2V+wmn7yQtJ9TgUDjeSquz3rZdd1MkQqTo971bYkMMLfvuOcTcj5e4NLzvBH/pfKdMewLf0XO/nEYJWdMvrjxyjOToLVubyZ3KkzT/28coPR2902iUIsj8pLHsYNAPopceYpKRQ1QhTFeVzF5ed2ErFofZxuPwOiQirKrl89N3qMcbY1Ie0N0P5sBgNXF5hxckdLjYaajfvRZFunUyJVZh7ckr/GPZE6jjHWnA09bwy3ZHen4w=="
-            ;
-            
-
-        public static readonly string V4ElitePerpetualRemote =
-                "License 4271246357 for Acme Corp:SWQ6IDQyNzEyNDYzNTcKT3duZXI6IEFjbWUgQ29ycApGZWF0dXJlczogUjRFbGl0ZSBSNENyZWF0aXZlIFI0UGVyZm9ybWFuY2UKS2luZDogdjQtZWxpdGUKSXNzdWVkOiAyMDE3LTA0LTIxVDAwOjAwOjAwKzAwOjAwCklzUHVibGljOiB0cnVlCk11c3RCZUZldGNoZWQ6IHRydWU=:GwFW2I/5zJTSNPO/doHFZAeHFu0alPznCZs6s/tlYQArH5RsGrTNbz19NwJaBgQUCEBetZkuPJpIvZQQxmTadXwKO9/TOSR/ntLxJ39axP6MAH0560jXfXXhp4bMhMMxcZeOgSZe2iIaJ/BkbiVxCJC1MMktLDqY6LV9lhvxiaqxBQnBK5eHJ4YjWCL+gX1nVBp+5fAPb8h7GurOzkd7ZOFaoCIJNxwZY766R9EGY4N3bgQY1gDkFTF0gu1AmVB3CWvl2gF/tIGjqXw5qXhIwChnQgoboEnCegQ3KMsT+uIUlKcBBsCdeazT0QjYzrfiHOObMEJoRWNSrEP2WPOKZA==";
-            
-
-    }
 
     class LicensedPlugin : ILicensedPlugin, IPlugin, ILicenseDiagnosticsProvider, IDiagnosticsProvider
     {
@@ -129,6 +135,80 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         {
             var cache = Result;
             return cache == null ? mgr.GetIssues() : mgr.GetIssues().Concat(cache.GetIssues());
+        }
+    }
+    class RequestUrlProvider
+    {
+        public Uri Url { get; set; } = null;
+        public Uri Get() => Url;
+    }
+
+    class EmptyLicenseEnforcedPlugin : ILicensedPlugin, IPlugin
+    {
+        readonly string[] codes;
+
+        public IEnumerable<string> LicenseFeatureCodes => codes;
+        
+        public LicenseEnforcer<EmptyLicenseEnforcedPlugin> EnforcerPlugin { get; private set; }
+
+        public EmptyLicenseEnforcedPlugin(LicenseEnforcer<EmptyLicenseEnforcedPlugin> enforcer, params string[] codes)
+        {
+            EnforcerPlugin = enforcer;
+            this.codes = codes;
+        }
+        
+        public IPlugin Install(Config c)
+        {
+            c.Plugins.add_plugin(this);
+            EnforcerPlugin = c.Plugins.GetOrInstall(EnforcerPlugin);
+            return this;
+        }
+
+        public bool Uninstall(Config c)
+        {
+            c.Plugins.remove_plugin(this);
+            return true;
+        }
+    }
+
+    static class MockHttpHelpers
+    {
+        public static Mock<HttpMessageHandler> MockRemoteLicense(LicenseManagerSingleton mgr, HttpStatusCode code, string value,
+                                                   Action<HttpRequestMessage, CancellationToken> callback)
+        {
+            var handler = new Mock<HttpMessageHandler>();
+            var method = handler.Protected()
+                                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+                                    ItExpr.IsAny<CancellationToken>())
+                                .Returns(Task.Run(() => new HttpResponseMessage(code)
+                                {
+                                    Content = new StringContent(value, System.Text.Encoding.UTF8)
+                                }));
+
+            if (callback != null)
+            {
+                method.Callback(callback);
+            }
+
+            method.Verifiable("SendAsync must be called");
+
+            mgr.SetHttpMessageHandler(handler.Object, true);
+            return handler;
+        }
+
+        public static Mock<HttpMessageHandler> MockRemoteLicenseException(LicenseManagerSingleton mgr, WebExceptionStatus status)
+        {
+            var ex = new HttpRequestException("Mock failure", new WebException("Mock failure", status));
+            var handler = new Mock<HttpMessageHandler>();
+            var method = handler.Protected()
+                                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+                                    ItExpr.IsAny<CancellationToken>())
+                                .ThrowsAsync(ex);
+
+            method.Verifiable("SendAsync must be called");
+
+            mgr.SetHttpMessageHandler(handler.Object, true);
+            return handler;
         }
     }
 }

@@ -20,41 +20,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
         readonly ITestOutputHelper output;
 
-        Mock<HttpMessageHandler> MockRemoteLicense(LicenseManagerSingleton mgr, HttpStatusCode code, string value,
-                                                   Action<HttpRequestMessage, CancellationToken> callback)
-        {
-            var handler = new Mock<HttpMessageHandler>();
-            var method = handler.Protected()
-                                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
-                                    ItExpr.IsAny<CancellationToken>())
-                                .Returns(Task.Run(() => new HttpResponseMessage(code) {
-                                    Content = new StringContent(value, System.Text.Encoding.UTF8)
-                                }));
 
-            if (callback != null) {
-                method.Callback(callback);
-            }
-
-            method.Verifiable("SendAsync must be called");
-
-            mgr.SetHttpMessageHandler(handler.Object, true);
-            return handler;
-        }
-
-        Mock<HttpMessageHandler> MockRemoteLicenseException(LicenseManagerSingleton mgr, WebExceptionStatus status)
-        {
-            var ex = new HttpRequestException("Mock failure", new WebException("Mock failure", status));
-            var handler = new Mock<HttpMessageHandler>();
-            var method = handler.Protected()
-                                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
-                                    ItExpr.IsAny<CancellationToken>())
-                                .ThrowsAsync(ex);
-
-            method.Verifiable("SendAsync must be called");
-
-            mgr.SetHttpMessageHandler(handler.Object, true);
-            return handler;
-        }
 
         [Fact]
         public void Test_Caching_With_Timeout()
@@ -71,7 +37,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test, clock) {
                     Cache = cache
                 };
-                MockRemoteLicense(mgr, HttpStatusCode.OK, LicenseStrings.EliteSubscriptionRemote,
+                MockHttpHelpers.MockRemoteLicense(mgr, HttpStatusCode.OK, LicenseStrings.EliteSubscriptionRemote,
                     null);
 
                 var conf = new Config();
@@ -93,7 +59,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test, clock) {
                     Cache = cache
                 };
-                MockRemoteLicenseException(mgr, WebExceptionStatus.NameResolutionFailure);
+                MockHttpHelpers.MockRemoteLicenseException(mgr, WebExceptionStatus.NameResolutionFailure);
 
                 var conf = new Config();
                 try {
@@ -223,7 +189,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 Cache = new StringCacheMem()
             };
             Uri invokedUri = null;
-            var httpHandler = MockRemoteLicense(mgr, HttpStatusCode.OK, LicenseStrings.EliteSubscriptionRemote,
+            var httpHandler = MockHttpHelpers.MockRemoteLicense(mgr, HttpStatusCode.OK, LicenseStrings.EliteSubscriptionRemote,
                 (r, c) => { invokedUri = r.RequestUri; });
             var conf = new Config();
             try {
@@ -240,7 +206,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
                 Mock.Verify(httpHandler);
                 Assert.StartsWith(
-                    "https://s3-us-west-2.amazonaws.com/licenses.imazen.net/v1/licenses/latest/1qggq12t2qwgwg4c2d2dqwfweqfw.txt?",
+                    "https://s3-us-west-2.amazonaws.com/licenses.imazen.net/v1/licenses/latest/",
                     invokedUri.ToString());
 
 

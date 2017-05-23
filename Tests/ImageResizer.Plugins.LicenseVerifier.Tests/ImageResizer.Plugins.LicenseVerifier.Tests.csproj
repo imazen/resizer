@@ -88,7 +88,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataStructureTests.cs" />
+    <Compile Include="LicenseEnforcerTests.cs" />
     <Compile Include="LicenseManagerTests.cs" />
+    <Compile Include="LicenseStrings.cs" />
     <Compile Include="LicenseVerifierTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestHelpers.cs" />

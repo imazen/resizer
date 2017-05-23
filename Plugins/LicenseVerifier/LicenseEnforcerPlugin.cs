@@ -27,9 +27,15 @@ namespace ImageResizer.Plugins.LicenseVerifier
     {
         readonly ILicenseManager mgr;
         readonly WatermarkRenderer watermark = new WatermarkRenderer();
+        readonly IReadOnlyCollection<RSADecryptPublic> trustedKeys = ImazenPublicKeys.Production;
         Config c;
         Computation cachedResult;
         ILicenseClock Clock { get; } = new RealClock();
+        /// <summary>
+        /// If null, c.configurationSectionIssues is used
+        /// </summary>
+        IIssueReceiver PermanentIssueSink { get; set; }
+        public Func<Uri> GetCurrentRequestUrl { get; } = () => HttpContext.Current?.Request.Url;
 
         Computation Result
         {
@@ -39,13 +45,34 @@ namespace ImageResizer.Plugins.LicenseVerifier
                     cachedResult = null;
                 }
                 return cachedResult = cachedResult ??
-                                      new Computation(c, ImazenPublicKeys.Production, c.configurationSectionIssues, mgr,
+                                      new Computation(c, trustedKeys, PermanentIssueSink ?? c.configurationSectionIssues, mgr,
                                           Clock);
             }
         }
 
         public LicenseEnforcer() : this(LicenseManagerSingleton.Singleton) { }
-        public LicenseEnforcer(ILicenseManager mgr) { this.mgr = mgr; }
+
+        internal LicenseEnforcer(ILicenseManager mgr)
+        {
+            this.mgr = mgr;
+
+        }
+        
+        internal LicenseEnforcer(LicenseManagerSingleton mgr, IIssueReceiver permanentIssueSink, Func<Uri> getCurrentRequestUrl)
+        {
+            this.mgr = mgr;
+            this.GetCurrentRequestUrl = getCurrentRequestUrl;
+            Clock = mgr.Clock;
+            PermanentIssueSink = permanentIssueSink;
+            trustedKeys = mgr.TrustedKeys;
+
+        }
+        internal LicenseEnforcer(ILicenseManager mgr, Func<Uri> getCurrentRequestUrl, ILicenseClock clock, IReadOnlyCollection<RSADecryptPublic> trusted ) {
+            this.mgr = mgr;
+            this.Clock = clock;
+            this.GetCurrentRequestUrl = getCurrentRequestUrl;
+            trustedKeys = trusted;
+        }
 
         public string ProvideDiagnostics() => LicenseDiagnosticsBanner + Result.ProvideDiagnostics();
 
@@ -56,7 +83,6 @@ namespace ImageResizer.Plugins.LicenseVerifier
         public IPlugin Install(Config config)
         {
             c = config;
-
             // Ensure the LicenseManager can respond to heartbeats and license/licensee plugin additions for the config
             mgr.MonitorLicenses(c);
             mgr.MonitorHeartbeat(c);
@@ -85,6 +111,10 @@ namespace ImageResizer.Plugins.LicenseVerifier
             return true;
         }
 
+        /// <summary>
+        /// Raises an exception if LicenseError == LicenseErrorAction.FailRequest
+        /// </summary>
+        /// <returns></returns>
         bool ShouldWatermark()
         {
 #pragma warning disable 0162
@@ -97,12 +127,29 @@ namespace ImageResizer.Plugins.LicenseVerifier
             }
 #pragma warning restore 0162
 
-            // For now, we only add dots during an active HTTP request, and when configurationSectionIssues != null
-            if (c?.configurationSectionIssues == null || HttpContext.Current == null) {
+
+            // Skip when configurationSectionIssues != null
+            if (c?.configurationSectionIssues == null) {
+                return false;
+            }
+            var requestUrl = GetCurrentRequestUrl();
+
+            var isLicensed = Result.LicensedForRequestUrl(requestUrl);
+            if (isLicensed) {
                 return false;
             }
 
-            return !Result.LicensedForRequestUrl(HttpContext.Current?.Request.Url);
+            if (c.Plugins.LicenseError == LicenseErrorAction.Exception) {
+
+                if (requestUrl == null && Result.LicensedForSomething()) {
+                    return false;
+                }
+                throw new LicenseException(
+                    "ImageResizer cannot validate your license; visit /resizer.debug to troubleshoot.");
+            }
+
+            // We only add dots during an active HTTP request (but we'll raise an exception anywhere)
+            return requestUrl != null;
         }
 
         void Pipeline_PostRewrite(IHttpModule sender, HttpContext context, IUrlEventArgs e)
@@ -113,9 +160,23 @@ namespace ImageResizer.Plugins.LicenseVerifier
             }
         }
 
-        protected override RequestedAction PreFlushChanges(ImageState s)
+
+        protected override void PreLoadImage(ref object source, ref string path, ref bool disposeSource,
+                                             ref ResizeSettings settings)
         {
-            if (s.destBitmap == null || !ShouldWatermark()) {
+            if (c.Plugins.LicenseError == LicenseErrorAction.Exception) {
+                ShouldWatermark(); // Fail early
+            }
+        }
+
+        /// <summary>
+        /// Process.5(Render).18: Changes have been flushed to the bitmap, but the final bitmap has not been flipped yet.
+        /// </summary>
+        /// <param name="s"></param>
+        protected override RequestedAction PostFlushChanges(ImageState s)
+        {
+            if (s.destBitmap == null || !ShouldWatermark())
+            {
                 return RequestedAction.None;
             }
             watermark.EnsureDrawn(s.destBitmap);
