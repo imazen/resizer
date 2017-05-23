@@ -222,7 +222,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             // NetworkGraceMinutes Expired?
             var expires = mgr.FirstHeartbeat.Value.AddMinutes(graceMinutes);
             if (expires < clock.GetUtcNow()) {
-                AcceptIssue(new Issue($"Grace period of {graceMinutes}m expired for license {chain.Id}",
+                permanentIssues.AcceptIssue(new Issue($"Grace period of {graceMinutes}m expired for license {chain.Id}",
                     $"License {chain.Id} was not found in the disk cache and could not be retrieved from the remote server within {graceMinutes} minutes.",
                     IssueSeverity.Error));
                 return null;
@@ -238,7 +238,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
             // Otherwise in grace period
             AcceptIssue(new Issue(
-                $"Grace period of {graceMinutes}m will expire for license {chain.Id} at {expires:HH:mm} on {expires:D}",
+                $"Grace period of {graceMinutes}m will expire for license {chain.Id} at UTC {expires:HH:mm} on {expires:D}",
                 $"License {chain.Id} was not found in the disk cache and could not be retrieved from the remote server.",
                 IssueSeverity.Error));
 
