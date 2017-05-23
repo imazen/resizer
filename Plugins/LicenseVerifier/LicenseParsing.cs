@@ -128,6 +128,9 @@ namespace ImageResizer.Plugins.LicenseVerifier
         public static string GetSecret(this ILicenseDetails details)
             => details?.Get("Secret");
 
+        public static string GetMessage(this ILicenseDetails details)
+            => details?.Get("Message");
+          
         /// <summary>
         ///     Enumerates the feature code list. No case changes are performed
         /// </summary>

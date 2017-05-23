@@ -91,7 +91,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             // Look for fetched and valid licenses
             var validLicenses = chains.Where(chain => !IsPendingLicense(chain))
                                       .SelectMany(chain => chain.Licenses())
-                                      .Where(IsLicenseValid)
+                                      .Where(b => !b.Fields.IsRemotePlaceholder() && IsLicenseValid(b))
                                       .ToList();
 
             // This computation expires when we cross an expires, issued date, or NetworkGracePeriod expiration
@@ -183,8 +183,10 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 return false;
             }
             if (details.IsRevoked()) {
-                permanentIssues.AcceptIssue(new Issue("License " + details.Id + " is no longer active",
+                var message = b.Fields.GetMessage();
+                permanentIssues.AcceptIssue(new Issue($"License {details.Id}" + (message != null ? $": {message}" : " is no longer valid"),
                     b.ToRedactedString(), IssueSeverity.Warning));
+                return false;
             }
             return true;
         }
@@ -244,6 +246,12 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
 
         public bool LicensedForAll() => !EverythingDenied && AllDomainsLicensed;
+
+        public bool LicensedForSomething()
+        {
+            return !EverythingDenied &&
+                   (AllDomainsLicensed || (domainLookup.KnownDomainCount > 0));
+        }
 
         public bool LicensedForRequestUrl(Uri url)
         {
