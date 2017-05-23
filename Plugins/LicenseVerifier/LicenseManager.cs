@@ -61,7 +61,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         /// <summary>
         ///     Trusted public keys
         /// </summary>
-        public IEnumerable<RSADecryptPublic> TrustedKeys { get; }
+        public IReadOnlyCollection<RSADecryptPublic> TrustedKeys { get; }
 
         public static ILicenseManager Singleton
         {
@@ -72,12 +72,15 @@ namespace ImageResizer.Plugins.LicenseVerifier
         }
 
 
-        internal LicenseManagerSingleton(IEnumerable<RSADecryptPublic> trustedKeys, ILicenseClock clock)
+        internal LicenseManagerSingleton(IReadOnlyCollection<RSADecryptPublic> trustedKeys, ILicenseClock clock): this(trustedKeys,clock, new PeristentGlobalStringCache()) { }
+        internal LicenseManagerSingleton(IReadOnlyCollection<RSADecryptPublic> trustedKeys, ILicenseClock clock, IPersistentStringCache cache)
         {
             TrustedKeys = trustedKeys;
             Clock = clock;
             SetHttpMessageHandler(null, true);
+            Cache = cache;
         }
+
 
         public void AcceptIssue(IIssue i) { ((IIssueReceiver) sink).AcceptIssue(i); }
 
@@ -85,7 +88,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         /// <summary>
         ///     The persistent cache for licenses
         /// </summary>
-        public IPersistentStringCache Cache { get; set; } = new PeristentGlobalStringCache();
+        public IPersistentStringCache Cache { get; set; } 
 
         public DateTimeOffset? FirstHeartbeat { get; private set; }
 
