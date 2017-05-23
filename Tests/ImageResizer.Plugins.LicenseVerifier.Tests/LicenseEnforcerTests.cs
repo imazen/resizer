@@ -13,6 +13,7 @@ using Moq.Protected;
 using Xunit;
 using Xunit.Abstractions;
 using System.Drawing;
+using System.Text;
 
 namespace ImageResizer.Plugins.LicenseVerifier.Tests
 {
@@ -22,9 +23,34 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
         readonly ITestOutputHelper output;
 
-
-        bool IsWatermarking(Config c)
+        string GetInfo(Config c, LicenseManagerSingleton mgr)
         {
+            var result = new Computation(c, mgr.TrustedKeys, mgr, mgr,
+                mgr.Clock);
+            var sb = new StringBuilder();
+            
+            sb.AppendLine($"Plugins.LicenseError = {c.Plugins.LicenseError}");
+            sb.AppendLine($"Plugins.LicenseScope = {c.Plugins.LicenseScope}");
+            sb.AppendLine($"Computation.");
+            sb.AppendLine($"LicensedForAll() => {result.LicensedForAll()}");
+            sb.AppendLine($"LicensedForSomething() => {result.LicensedForSomething()}");
+            sb.AppendLine($"LicensedForRequestUrl(null) => {result.LicensedForRequestUrl(null)}");
+            sb.AppendLine($"LicensedForRequestUrl(new Uri(\"http://other.com\")) => {result.LicensedForRequestUrl(new Uri("http://other.com"))}");
+            sb.AppendLine($"LicensedForRequestUrl(new Uri(\"http://acme.com\")) => {result.LicensedForRequestUrl(new Uri("http://acme.com"))}");
+            sb.AppendLine($"GetBuildDate() => {result.GetBuildDate()}");
+            sb.AppendLine($"ProvideDiagnostics() => {result.ProvideDiagnostics()}");
+
+            return sb.ToString();
+        }
+
+        string lastInfo;
+        bool IsWatermarking(Config c, LicenseManagerSingleton mgr)
+        {
+            var newInfo = GetInfo(c, mgr);
+            if (lastInfo != newInfo) {
+                lastInfo = newInfo;
+                output.WriteLine(newInfo);
+            }
             var j = new ImageJob("~/gradient.png", typeof(Bitmap), new Instructions("format=png&width=10"));
             c.Build(j);
             using (var b = j.Result as Bitmap) {
@@ -52,16 +78,16 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             conf.Plugins.Install(new EmptyLicenseEnforcedPlugin(new LicenseEnforcer<EmptyLicenseEnforcedPlugin>(mgr, mgr, request.Get), "R4Creative"));
 
             request.Url = null;
-            Assert.False(IsWatermarking(conf));
+            Assert.False(IsWatermarking(conf, mgr));
             request.Url = new Uri("http://acme.com");
-            Assert.False(IsWatermarking(conf));
+            Assert.False(IsWatermarking(conf, mgr));
             request.Url = new Uri("http://subdomain.acme.com");
-            Assert.False(IsWatermarking(conf));
+            Assert.False(IsWatermarking(conf, mgr));
             request.Url = new Uri("http://localhost");
-            Assert.False(IsWatermarking(conf));
+            Assert.False(IsWatermarking(conf, mgr));
 
             request.Url = new Uri("http://other.co");
-            var e = Record.Exception(() => IsWatermarking(conf));
+            var e = Record.Exception(() => IsWatermarking(conf, mgr));
             Assert.NotNull(e);
             Assert.IsType<LicenseException>(e);
             
@@ -85,16 +111,16 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             conf.Plugins.Install(new EmptyLicenseEnforcedPlugin(new LicenseEnforcer<EmptyLicenseEnforcedPlugin>(mgr, mgr, request.Get), "R4Creative"));
 
             request.Url = null;
-            Assert.False(IsWatermarking(conf));
+            Assert.False(IsWatermarking(conf, mgr));
             request.Url = new Uri("http://acme.com");
-            Assert.False(IsWatermarking(conf));
+            Assert.False(IsWatermarking(conf, mgr));
             request.Url = new Uri("http://subdomain.acme.com");
-            Assert.False(IsWatermarking(conf));
+            Assert.False(IsWatermarking(conf, mgr));
             request.Url = new Uri("http://localhost");
-            Assert.False(IsWatermarking(conf));
+            Assert.False(IsWatermarking(conf, mgr));
 
             request.Url = new Uri("http://other.co");
-            var e = Record.Exception(() => IsWatermarking(conf));
+            var e = Record.Exception(() => IsWatermarking(conf, mgr));
             Assert.NotNull(e);
             Assert.IsType<LicenseException>(e);
 
@@ -117,21 +143,21 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             conf.Plugins.Install(new EmptyLicenseEnforcedPlugin(new LicenseEnforcer<EmptyLicenseEnforcedPlugin>(mgr, mgr, request.Get), "R4Creative"));
 
             request.Url = null;
-            Assert.False(IsWatermarking(conf));
+            Assert.False(IsWatermarking(conf, mgr));
 
             request.Url = new Uri("http://acme.com");
-            Assert.False(IsWatermarking(conf));
+            Assert.False(IsWatermarking(conf, mgr));
 
             request.Url = new Uri("http://subdomain.acme.com");
-            Assert.False(IsWatermarking(conf));
+            Assert.False(IsWatermarking(conf, mgr));
 
             request.Url = new Uri("http://localhost");
-            Assert.False(IsWatermarking(conf));
+            Assert.False(IsWatermarking(conf, mgr));
 
             // We should watermark unlicensed domains
             request.Url = new Uri("http://other.co");
-            Assert.True(IsWatermarking(conf));
-            Assert.True(IsWatermarking(conf));
+            Assert.True(IsWatermarking(conf, mgr));
+            Assert.True(IsWatermarking(conf, mgr));
 
             Assert.Empty(mgr.GetIssues());
         }
@@ -150,11 +176,11 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
             // We don't watermark outside of http requests (even if there are no valid licenses)
             request.Url = null;
-            Assert.False(IsWatermarking(conf));
+            Assert.False(IsWatermarking(conf, mgr));
 
             // But we certainly should be, here
             request.Url = new Uri("http://other.co");
-            Assert.True(IsWatermarking(conf));
+            Assert.True(IsWatermarking(conf, mgr));
 
             Assert.Empty(mgr.GetIssues());
         }
@@ -183,18 +209,18 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 Assert.Equal(1, mgr.WaitForTasks());
 
                 request.Url = null;
-                Assert.False(IsWatermarking(conf));
+                Assert.False(IsWatermarking(conf, mgr));
 
 
                 // We don't raise exceptions outside of http requests, unless there are absolutely no valid licenses
                 conf.Plugins.LicenseError = LicenseErrorAction.Exception;
                 // There are no valid licences
                 request.Url = null;
-                Assert.Throws<LicenseException>(() => IsWatermarking(conf));
+                Assert.Throws<LicenseException>(() => IsWatermarking(conf, mgr));
 
                 // But we certainly should be, here
                 request.Url = new Uri("http://other.co");
-                Assert.Throws<LicenseException>(() => IsWatermarking(conf));
+                Assert.Throws<LicenseException>(() => IsWatermarking(conf, mgr));
 
                 Assert.NotEmpty(mgr.GetIssues());
             }
@@ -223,23 +249,23 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 Assert.Equal(1, mgr.WaitForTasks());
                 // We don't raise exceptions without a request url, unless there are absolutely no valid licenses
                 request.Url = null;
-                Assert.False(IsWatermarking(conf));
+                Assert.False(IsWatermarking(conf, mgr));
 
                 // We never watermark outside of http requests
                 conf.Plugins.LicenseError = LicenseErrorAction.Watermark;
-                Assert.False(IsWatermarking(conf));
+                Assert.False(IsWatermarking(conf, mgr));
 
                 conf.Plugins.LicenseError = LicenseErrorAction.Exception;
 
                 //We should not raise an exception on our domains
                 request.Url = new Uri("http://acme.com");
-                Assert.False(IsWatermarking(conf));
+                Assert.False(IsWatermarking(conf, mgr));
                 request.Url = new Uri("http://acmestaging.com");
-                Assert.False(IsWatermarking(conf));
+                Assert.False(IsWatermarking(conf, mgr));
 
                 // We should raise an exception on other domains
                 request.Url = new Uri("http://other.co");
-                Assert.Throws<LicenseException>(() => IsWatermarking(conf));
+                Assert.Throws<LicenseException>(() => IsWatermarking(conf, mgr));
 
 
                 Assert.Empty(mgr.GetIssues());
