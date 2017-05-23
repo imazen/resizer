@@ -8,15 +8,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
 {
     partial class LicenseEnforcer<T> 
     {
-        private const bool EnforcementEnabled = false;
-
-        private static string LicenseDiagnosticsBanner
-        {
-            get
-            {
-                return "\n----------------\nDRM-free: License enforcement is off\n----------------\n";
-            }
-        }
+        const bool Enforce = false;
     }
 }
 

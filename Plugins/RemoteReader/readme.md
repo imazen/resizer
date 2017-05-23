@@ -86,7 +86,7 @@ All other exceptions are WebExceptions
 
 The human-friendly syntax has to go through the IIS and ASP.NET request filtering/normalization system, which may cause issues if your URLs have special characters or spaces.
 
-In 3.1.5 and higher, spaces are supported in URLs, but to support '+' characters in remote URLs, you have to [make a change in Web.config](http://stackoverflow.com/questions/1453218/is-enabling-double-escaping-dangerous), as IIS considers '+' dangerous by default. IIS needs Prozac.
+In 3.1.5 and higher, spaces are supported in URLs, but to support '+' characters in remote URLs, you have to [make a change in Web.config](http://stackoverflow.com/questions/1453218/is-enabling-double-escaping-dangerous), as IIS considers '+' dangerous by default ... for unknown reasons.
 
     <system.webServer>
         <security>

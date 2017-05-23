@@ -8,9 +8,6 @@ namespace ImageResizer.Plugins.LicenseVerifier
 {
     partial class LicenseEnforcer<T>
     {
-        const bool EnforcementEnabled = true;
-
-        static string LicenseDiagnosticsBanner =>
-            "\n----------------\nLicense enforcement is active\n----------------\n";
+        const bool Enforce = true;
     }
 }

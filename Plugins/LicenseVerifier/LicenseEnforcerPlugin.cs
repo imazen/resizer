@@ -74,11 +74,18 @@ namespace ImageResizer.Plugins.LicenseVerifier
             trustedKeys = trusted;
         }
 
-        public string ProvideDiagnostics() => LicenseDiagnosticsBanner + Result.ProvideDiagnostics();
+        string GetBanner()
+        {
+            return EnforcementEnabled() 
+                ? $"\n----------------\nLicense enforcement is active (warn via {c.Plugins.LicenseError})\n----------------\n" 
+                : "\n----------------\nDRM-free: License enforcement is off\n----------------\n";
+        }
+
+        public string ProvideDiagnostics() => GetBanner() + Result.ProvideDiagnostics();
 
         public IEnumerable<IIssue> GetIssues() => mgr.GetIssues().Concat(Result.GetIssues());
 
-        public string ProvidePublicText() => LicenseDiagnosticsBanner + Result.ProvidePublicDiagnostics();
+        public string ProvidePublicText() => GetBanner() + Result.ProvidePublicDiagnostics();
 
         public IPlugin Install(Config config)
         {
@@ -111,22 +118,30 @@ namespace ImageResizer.Plugins.LicenseVerifier
             return true;
         }
 
+        bool EnforcementEnabled()
+        {
+#pragma warning disable 0162
+            // Only unreachable when compiled in DRM mode. 
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            // ReSharper disable once HeuristicUnreachableCode
+            if (Enforce) {
+                // ReSharper disable once HeuristicUnreachableCode
+                return true;
+            } 
+            // ReSharper disable once HeuristicUnreachableCode
+            return false;
+#pragma warning restore 0162
+        }
+
         /// <summary>
         /// Raises an exception if LicenseError == LicenseErrorAction.FailRequest
         /// </summary>
         /// <returns></returns>
         bool ShouldWatermark()
         {
-#pragma warning disable 0162
-            // Only unreachable when compiled in DRM mode. 
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            // ReSharper disable once HeuristicUnreachableCode
-            if (!EnforcementEnabled) {
-                // ReSharper disable once HeuristicUnreachableCode
+            if (!EnforcementEnabled()) {
                 return false;
             }
-#pragma warning restore 0162
-
 
             // Skip when configurationSectionIssues != null
             if (c?.configurationSectionIssues == null) {
