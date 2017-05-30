@@ -39,21 +39,21 @@ namespace ImageResizer.Configuration.Performance
         }
         public static string ToQueryString(this IInfoAccumulator a, int characterLimit)
         {
+            const string truncated = "truncated=true";
+            var limit = characterLimit - truncated.Length;
             var pairs = a.GetInfo().Where(pair => pair.Value != null && pair.Key != null)
                      .Select(pair => Uri.EscapeDataString(pair.Key) + "=" + Uri.EscapeDataString(pair.Value));
             var sb = new StringBuilder(1000);
             sb.Append("?");
             foreach (var s in pairs)
             {
-                if (sb.Length + s.Length + 1 > characterLimit)
-                {
+                if (sb[sb.Length - 1] != '?') sb.Append("&");
+
+                if (sb.Length + s.Length > limit) {
+                    sb.Append(truncated);
                     return sb.ToString();
                 }
-                else
-                {
-                    if (sb[sb.Length - 1] != '?') sb.Append("&");
-                    sb.Append(s);
-                }
+                sb.Append(s);
             }
             return sb.ToString();
         }
