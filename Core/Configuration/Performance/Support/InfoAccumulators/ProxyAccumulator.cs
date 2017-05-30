@@ -23,11 +23,11 @@ namespace ImageResizer.Configuration.Performance
         {
             if (use_prepend)
             {
-                add(key, value);
+                prepend(key, value);
             }
             else
             {
-                prepend(key, value);
+                add(key, value);
             }
         }
 
