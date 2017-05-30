@@ -18,10 +18,11 @@ namespace ImageResizer.Configuration.Performance
                 new MultiFolderStorage("MachineStorage", "file", sink,
                 GetMachineWideFolders().ToArray(), FolderOptions.CreateIfMissing));
         }
-        IssueSink sink;
-        Lazy<MultiFolderStorage> store;
 
-        public MultiFolderStorage Store { get { return store.Value;  } }
+        readonly IssueSink sink;
+        readonly Lazy<MultiFolderStorage> store;
+
+        public MultiFolderStorage Store => store.Value;
 
         static IEnumerable<string> GetMachineWideStorageLocations()
         {

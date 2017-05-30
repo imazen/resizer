@@ -16,52 +16,54 @@ namespace ImageResizer.Configuration.Performance
     // https://github.com/maiwald/lz-string-ruby
     public class GlobalPerf
     {
+        readonly IssueSink sink = new IssueSink("GlobalPerf");
+
         public static GlobalPerf Singleton { get; } = new GlobalPerf();
-        Lazy<ProcessInfo> Process = new Lazy<ProcessInfo>();
-        IssueSink sink = new IssueSink("GlobalPerf");
-        Lazy<HardwareInfo> Hardware;
-        Lazy<PluginInfo> Plugins = new Lazy<PluginInfo>();
 
-        System.Web.HttpModuleCollection httpModules = null;
+        Lazy<ProcessInfo> Process { get; } = new Lazy<ProcessInfo>();
+        Lazy<HardwareInfo> Hardware { get; }
+        Lazy<PluginInfo> Plugins { get; } = new Lazy<PluginInfo>();
 
-        NamedInterval[] Intervals = new[] {
+        System.Web.HttpModuleCollection httpModules;
+
+        NamedInterval[] Intervals { get; } = {
             new NamedInterval { Unit="second", Name="Per Second", TicksDuration =  Stopwatch.Frequency},
             new NamedInterval { Unit="minute", Name="Per Minute", TicksDuration =  Stopwatch.Frequency * 60},
             new NamedInterval { Unit="15_mins", Name="Per 15 Minutes", TicksDuration =  Stopwatch.Frequency * 60 * 15},
             new NamedInterval { Unit="hour", Name="Per Hour", TicksDuration =  Stopwatch.Frequency * 60 * 60},
         };
 
-        ConcurrentDictionary<string, MultiIntervalStats> rates = new ConcurrentDictionary<string, MultiIntervalStats>();
+        readonly ConcurrentDictionary<string, MultiIntervalStats> rates = new ConcurrentDictionary<string, MultiIntervalStats>();
 
-        MultiIntervalStats blobReadEvents;
-        MultiIntervalStats blobReadBytes;
-        MultiIntervalStats jobs;
-        MultiIntervalStats decodedPixels;
-        MultiIntervalStats encodedPixels;
+        readonly MultiIntervalStats blobReadEvents;
+        readonly MultiIntervalStats blobReadBytes;
+        readonly MultiIntervalStats jobs;
+        readonly MultiIntervalStats decodedPixels;
+        readonly MultiIntervalStats encodedPixels;
 
-        ConcurrentDictionary<string, IPercentileProviderSink> percentiles = new ConcurrentDictionary<string, IPercentileProviderSink>();
+        readonly ConcurrentDictionary<string, IPercentileProviderSink> percentiles = new ConcurrentDictionary<string, IPercentileProviderSink>();
 
-        IPercentileProviderSink job_times;
-        IPercentileProviderSink decode_times;
-        IPercentileProviderSink encode_times;
-        IPercentileProviderSink job_other_time;
-        IPercentileProviderSink blob_read_times;
-        IPercentileProviderSink collect_info_times;
+        readonly IPercentileProviderSink job_times;
+        readonly IPercentileProviderSink decode_times;
+        readonly IPercentileProviderSink encode_times;
+        readonly IPercentileProviderSink job_other_time;
+        readonly IPercentileProviderSink blob_read_times;
+        readonly IPercentileProviderSink collect_info_times;
 
-        DictionaryCounter<string> counters = new DictionaryCounter<string>("counter_update_failed");
+        readonly DictionaryCounter<string> counters = new DictionaryCounter<string>("counter_update_failed");
 
-        int[] Percentiles = new[] { 5, 25, 50, 75, 95, 100 };
+        IEnumerable<int> Percentiles { get; }  = new[] { 5, 25, 50, 75, 95, 100 };
 
 
-        IPercentileProviderSink sourceWidths;
-        IPercentileProviderSink sourceHeights;
-        IPercentileProviderSink outputWidths;
-        IPercentileProviderSink outputHeights;
-        IPercentileProviderSink sourceMegapixels;
-        IPercentileProviderSink outputMegapixels;
-        IPercentileProviderSink scalingRatios;
-        IPercentileProviderSink sourceAspectRatios;
-        IPercentileProviderSink outputAspectRatios;
+        readonly IPercentileProviderSink sourceWidths;
+        readonly IPercentileProviderSink sourceHeights;
+        readonly IPercentileProviderSink outputWidths;
+        readonly IPercentileProviderSink outputHeights;
+        readonly IPercentileProviderSink sourceMegapixels;
+        readonly IPercentileProviderSink outputMegapixels;
+        readonly IPercentileProviderSink scalingRatios;
+        readonly IPercentileProviderSink sourceAspectRatios;
+        readonly IPercentileProviderSink outputAspectRatios;
 
         GlobalPerf()
         {
@@ -193,13 +195,13 @@ namespace ImageResizer.Configuration.Performance
         }
 
 
-        ConcurrentDictionary<string, DictionaryCounter<string>> uniques 
+        readonly ConcurrentDictionary<string, DictionaryCounter<string>> uniques 
             = new ConcurrentDictionary<string, DictionaryCounter<string>>(StringComparer.Ordinal);
         private long CountLimitedUniqueValuesIgnoreCase(string category, string value, int limit, string otherBucketValue)
         {
             return uniques.GetOrAdd(category, (k) =>
                 new DictionaryCounter<string>(limit, otherBucketValue, StringComparer.OrdinalIgnoreCase))
-                .Increment(value == null ? "null" : value);
+                .Increment(value ?? "null");
 
         }
         private IEnumerable<string> GetPopularUniqueValues(string category, int limit)
@@ -325,9 +327,9 @@ namespace ImageResizer.Configuration.Performance
             return q;
         }
 
-        public void TrackRate(string event_category_key, long count)
+        public void TrackRate(string eventCategoryKey, long count)
         {
-            rates.GetOrAdd(event_category_key, (k) => new MultiIntervalStats(Intervals)).Record(Stopwatch.GetTimestamp(), count);
+            rates.GetOrAdd(eventCategoryKey, (k) => new MultiIntervalStats(Intervals)).Record(Stopwatch.GetTimestamp(), count);
         }
 
         public void IncrementCounter(string key)

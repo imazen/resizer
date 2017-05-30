@@ -9,14 +9,14 @@ namespace ImageResizer.Configuration.Performance
     /// </summary>
     class PerIntervalSampling
     {
-        CircularTimeBuffer[] rings;
-        long[] offsets;
-        const int ringCount = 4;
-        Action<long> resultCallback;
-        Func<long> getTimestampNow;
+        readonly CircularTimeBuffer[] rings;
+        readonly long[] offsets;
+        const int RingCount = 4;
+        readonly Action<long> resultCallback;
+        readonly Func<long> getTimestampNow;
 
-        public NamedInterval Interval { get; private set; }
-        long intervalTicks = 0;
+        public NamedInterval Interval { get; }
+        readonly long intervalTicks;
 
         public PerIntervalSampling(NamedInterval interval, Action<long> resultCallback, Func<long> getTimestampNow)
         {
@@ -24,13 +24,13 @@ namespace ImageResizer.Configuration.Performance
             this.intervalTicks = interval.TicksDuration;
             this.getTimestampNow = getTimestampNow;
 
-            offsets = new long[ringCount];
-            rings = new CircularTimeBuffer[ringCount];
+            offsets = new long[RingCount];
+            rings = new CircularTimeBuffer[RingCount];
 
             this.resultCallback = resultCallback;
             // 3 seconds minimum to permit delayed reporting
             var buckets = (int)Math.Max(2, Stopwatch.Frequency * 3 / intervalTicks);
-            for (var ix = 0; ix < ringCount; ix++)
+            for (var ix = 0; ix < RingCount; ix++)
             {
                 var offset = (long)Math.Round(ix * 0.1 * intervalTicks);
                 offsets[ix] = offset;
@@ -40,7 +40,7 @@ namespace ImageResizer.Configuration.Performance
 
         public void FireCallbackEvents()
         {
-            for (var ix = 0; ix < ringCount; ix++)
+            for (var ix = 0; ix < RingCount; ix++)
             {
                 foreach(var result in rings[ix].DequeueValues())
                 {
@@ -56,8 +56,8 @@ namespace ImageResizer.Configuration.Performance
                 return false; //Too far future, would break current values 
             }
 
-            bool success = true;
-            for (var ix = 0; ix < ringCount; ix++)
+            var success = true;
+            for (var ix = 0; ix < RingCount; ix++)
             {
                 if (!rings[ix].Record(timestamp + offsets[ix], count))
                 {

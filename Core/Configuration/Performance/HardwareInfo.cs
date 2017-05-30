@@ -24,23 +24,23 @@ namespace ImageResizer.Configuration.Performance
             public long AvailableBytes;
             public string Filesytem;
         }
-        public string MachineDigest { get; private set; }
+        public string MachineDigest { get; }
         // Excludes other processor groups that aren't available to the CLR
-        public int LogicalCores { get; private set;  }
-        public bool OperatingSystem64Bit { get; private set;  }
+        public int LogicalCores { get; }
+        public bool OperatingSystem64Bit { get; }
 
-        public int NetworkDrives { get; private set; } = 0;
-        public int OtherDrives { get; private set; } = 0;
-        public IEnumerable<FixedDriveInfo> FixedDrives { get; private set; } = new FixedDriveInfo[] { };
+        public int NetworkDrives { get; }
+        public int OtherDrives { get; }
+        public IEnumerable<FixedDriveInfo> FixedDrives { get; }
 
         public HardwareInfo(IIssueReceiver sink)
         {
             try
             {
-                var SortedMacAddresses = NetworkInterface.GetAllNetworkInterfaces()
+                var sortedMacAddresses = NetworkInterface.GetAllNetworkInterfaces()
                         .Select(nic => nic.GetPhysicalAddress().ToString().ToLowerInvariant())
                         .OrderBy(s => s).ToArray();
-                MachineDigest = Utilities.Sha256TruncatedBase64(string.Join("|", SortedMacAddresses), 16);
+                MachineDigest = Utilities.Sha256TruncatedBase64(string.Join("|", sortedMacAddresses), 16);
             }
             catch (NetworkInformationException e)
             {
@@ -76,9 +76,8 @@ namespace ImageResizer.Configuration.Performance
             foreach (var drive in FixedDrives)
             {
 
-                q.Add("fixed_drive", string.Format("{0},{1},{2}", drive.Filesytem,
-                    drive.AvailableBytes / 1000000000,
-                    drive.TotalBytes / 1000000000));
+                q.Add("fixed_drive",
+                    $"{drive.Filesytem},{drive.AvailableBytes / 1000000000},{drive.TotalBytes / 1000000000}");
             }
         }
     }

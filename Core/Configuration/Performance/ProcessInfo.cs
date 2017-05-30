@@ -19,7 +19,7 @@ namespace ImageResizer.Configuration.Performance
 
         public string DotNetVersionInstalled { get; } = Get45PlusFromRegistry();
 
-        string IISVer { get; } = GetIISVerStringFromRegistry();
+        string IisVer { get; } = GetIisVerStringFromRegistry();
 
         bool IntegratedPipeline { get; } = HttpRuntime.UsingIntegratedPipeline;
 
@@ -37,7 +37,7 @@ namespace ImageResizer.Configuration.Performance
             q.Add("64", Process64Bit);
             q.Add("guid", ProcessGuid);
             q.Add("sys_dotnet", DotNetVersionInstalled);
-            q.Add("iis", IISVer);
+            q.Add("iis", IisVer);
             q.Add("integrated_pipeline", IntegratedPipeline);
 
             q.Add("asyncmodule", Config.Current.Pipeline.UsingAsyncMode);
@@ -67,12 +67,12 @@ namespace ImageResizer.Configuration.Performance
             // TODO: check for mismatched assemblies?
         }
 
-        static Tuple<int?, int?> GetIISVerFromRegistry()
+        static Tuple<int?, int?> GetIisVerFromRegistry()
         {
             try
             {
                 const string subkey = @"SOFTWARE\Microsoft\InetStp\";
-                using (RegistryKey ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default)
+                using (var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default)
                     .OpenSubKey(subkey))
                 { 
                     //SetupString
@@ -83,12 +83,12 @@ namespace ImageResizer.Configuration.Performance
             return null;
         }
 
-        static string GetIISVerStringFromRegistry()
+        static string GetIisVerStringFromRegistry()
         {
-            var pair = GetIISVerFromRegistry();
-            if (pair != null && pair.Item1 != null && pair.Item2 != null)
+            var pair = GetIisVerFromRegistry();
+            if (pair?.Item1 != null && pair.Item2 != null)
             {
-                return string.Format("{0}.{1}", pair.Item1, pair.Item2);
+                return $"{pair.Item1}.{pair.Item2}";
             }
             return null;
         }
@@ -98,10 +98,10 @@ namespace ImageResizer.Configuration.Performance
             try
             {
                 const string subkey = @"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\";
-                using (RegistryKey ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(subkey))
+                using (var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(subkey))
                 {
                     // Version
-                    if (ndpKey != null && ndpKey.GetValue("Release") != null)
+                    if (ndpKey?.GetValue("Release") != null)
                     {
                         return CheckFor45PlusVersion((int)ndpKey.GetValue("Release"));
                     }
@@ -112,7 +112,7 @@ namespace ImageResizer.Configuration.Performance
         }
 
         // Checking the version using >= will enable forward compatibility.
-        private static string CheckFor45PlusVersion(int releaseKey)
+        static string CheckFor45PlusVersion(int releaseKey)
         {
             if (releaseKey >= 460798)
             {
@@ -147,9 +147,8 @@ namespace ImageResizer.Configuration.Performance
             return "No 4.5 or later version detected";
         }
 
-        private static IEnumerable<string> GetHttpModules(HttpModuleCollection modules)
+        static IEnumerable<string> GetHttpModules(HttpModuleCollection modules)
         {
-            var sb = new StringBuilder();
             if (modules != null)
             {
                 return modules.AllKeys.Select(key => 

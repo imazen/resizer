@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+// ReSharper disable LoopVariableIsNeverChangedInsideLoop
 
 namespace ImageResizer.Configuration.Performance
 {
@@ -15,19 +16,19 @@ namespace ImageResizer.Configuration.Performance
     {
         public static string Sha256hex(string input)
         {
-            var hash = System.Security.Cryptography.SHA256.Create().ComputeHash(UTF8Encoding.UTF8.GetBytes(input));
+            var hash = System.Security.Cryptography.SHA256.Create().ComputeHash(System.Text.Encoding.UTF8.GetBytes(input));
             return BitConverter.ToString(hash, 0, 4).Replace("-", "").ToLowerInvariant();
         }
 
         public static string Sha256Base64(string input)
         {
-            var hash = System.Security.Cryptography.SHA256.Create().ComputeHash(UTF8Encoding.UTF8.GetBytes(input));
+            var hash = System.Security.Cryptography.SHA256.Create().ComputeHash(System.Text.Encoding.UTF8.GetBytes(input));
             return PathUtils.ToBase64U(hash);
         }
 
         public static string Sha256TruncatedBase64(string input, int bytes)
         {
-            var hash = System.Security.Cryptography.SHA256.Create().ComputeHash(UTF8Encoding.UTF8.GetBytes(input));
+            var hash = System.Security.Cryptography.SHA256.Create().ComputeHash(System.Text.Encoding.UTF8.GetBytes(input));
             return PathUtils.ToBase64U(hash.Take(bytes).ToArray());
         }
 
@@ -56,7 +57,7 @@ namespace ImageResizer.Configuration.Performance
 
     }
 
-    internal static class BoolExtensions
+    static class BoolExtensions
     {
         public static string ToShortString(this bool b)
         {
@@ -64,7 +65,7 @@ namespace ImageResizer.Configuration.Performance
         }
 
     }
-    internal static class StringExtensions
+    static class StringExtensions
     {
         /// <summary>
         /// Only lowercases A..Z -> a..z, and only if req.d.
@@ -87,24 +88,25 @@ namespace ImageResizer.Configuration.Performance
         }
     }
 
-    internal static class AssemblyExtensions
+    static class AssemblyExtensions
     {
+        public static string IntoString(this IEnumerable<char> c) => string.Concat(c);
+
         public static T GetFirstAttribute<T>(this Assembly a)
         {
             try
             {
-                object[] attrs = a.GetCustomAttributes(typeof(T), false);
-                if (attrs != null && attrs.Length > 0) return (T)attrs[0];
+                var attrs = a.GetCustomAttributes(typeof(T), false);
+                if (attrs.Length > 0) return (T)attrs[0];
             }
-            catch { }
+            catch (Exception) { }
             return default(T);
         }
 
-        public static string GetShortCommit(this Assembly a)
-        {
-            return string.Concat(GetFirstAttribute<CommitAttribute>(a)?.Value.Take(7));
+        public static string GetShortCommit(this Assembly a) =>
+            GetFirstAttribute<CommitAttribute>(a)?.Value.Take(7).IntoString();
 
-        }
+        
         public static string GetInformationalVersion(this Assembly a)
         {
             return GetFirstAttribute<AssemblyInformationalVersionAttribute>(a)?.InformationalVersion;
@@ -124,7 +126,7 @@ namespace ImageResizer.Configuration.Performance
             {
                 return 0;
             }
-            float index = Math.Max(0, percentile * data.Length + 0.5f);
+            var index = Math.Max(0, percentile * data.Length + 0.5f);
 
             return (data[(int)Math.Max(0, Math.Ceiling(index - 1.5))] +
                     data[(int)Math.Min(Math.Ceiling(index - 0.5), data.Length - 1)]) / 2;

@@ -11,31 +11,27 @@ namespace ImageResizer.Configuration.Performance
 
     class MultiIntervalStats
     {
-        PerIntervalSampling[] set;
-        NamedInterval[] intervals;
-        long[] max;
-        long[] min;
-        long[] total;
-        long[] callbackCount;
+        readonly PerIntervalSampling[] set;
+        readonly long[] max;
+        readonly long[] min;
+        readonly long[] total;
+        readonly long[] callbackCount;
 
-        long recordedTotal = 0;
+        long recordedTotal;
 
-        Func<long> getTimestampNow = Stopwatch.GetTimestamp;
-        public MultiIntervalStats(NamedInterval[] intervals): this(intervals, Stopwatch.GetTimestamp) { }
+        public MultiIntervalStats(IReadOnlyList<NamedInterval> intervals): this(intervals, Stopwatch.GetTimestamp) { }
 
-        public MultiIntervalStats(NamedInterval[] intervals, Func<long> getTimestampNow)
+        public MultiIntervalStats(IReadOnlyList<NamedInterval> intervals, Func<long> getTimestampNow)
         {
-            this.getTimestampNow = getTimestampNow;
-            this.intervals = intervals;
-            set = new PerIntervalSampling[intervals.Length];
-            max = new long[intervals.Length];
-            min = new long[intervals.Length];
-            total = new long[intervals.Length];
-            callbackCount = new long[intervals.Length];
-            for (var i = 0; i < intervals.Length; i++)
+            set = new PerIntervalSampling[intervals.Count];
+            max = new long[intervals.Count];
+            min = new long[intervals.Count];
+            total = new long[intervals.Count];
+            callbackCount = new long[intervals.Count];
+            for (var i = 0; i < intervals.Count; i++)
             {
                 var index = i;
-                set[index] = new PerIntervalSampling(intervals[index], (count) => OnResult(index, count), getTimestampNow);
+                set[index] = new PerIntervalSampling(intervals[index], count => OnResult(index, count), getTimestampNow);
             }
         }
         void OnResult(int intervalIndex, long count)
@@ -49,7 +45,8 @@ namespace ImageResizer.Configuration.Performance
         public bool Record(long timestamp, long count)
         {
             Interlocked.Add(ref recordedTotal, count);
-            bool success = true;
+            var success = true;
+            // ReSharper disable once ForCanBeConvertedToForeach
             for (var i = 0; i < set.Length; i++)
             {
                 if (!set[i].Record(timestamp, count))
@@ -62,23 +59,14 @@ namespace ImageResizer.Configuration.Performance
 
         public IEnumerable<IntervalStat> GetStats()
         {
-            for (var i = 0; i < set.Length; i++)
+            return set.Select((t, i) => new IntervalStat()
             {
-                yield return new IntervalStat()
-                {
-                    Interval = set[i].Interval,
-                    Min = min[i],
-                    Max = max[i],
-                    Avg = callbackCount[i] > 0 ? total[i] / callbackCount[i] : 0
-                };
-            }
+                Interval = t.Interval,
+                Min = min[i],
+                Max = max[i],
+                Avg = callbackCount[i] > 0 ? total[i] / callbackCount[i] : 0
+            });
         }
-        public long RecordedTotal
-        {
-            get
-            {
-                return Interlocked.Read(ref recordedTotal);
-            }
-        }
+        public long RecordedTotal => Interlocked.Read(ref recordedTotal);
     }
 }
