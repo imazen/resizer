@@ -27,7 +27,7 @@ namespace ImageResizer.Configuration.Performance
         {
             return Interlocked.CompareExchange(ref v, comparisonValue + 1, comparisonValue) == comparisonValue;
         }
-        public long Value { get { return Interlocked.Read(ref v); } }
+        public long Value => Interlocked.Read(ref v);
     }
    
 }

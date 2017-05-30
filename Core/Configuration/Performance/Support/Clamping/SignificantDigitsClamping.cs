@@ -13,10 +13,6 @@ namespace ImageResizer.Configuration.Performance
         public long MaxValue { get; set; } = long.MaxValue;
 
         public int SignificantDigits { get; set; } = 2;
-        public SignificantDigitsClamping()
-        {
-
-        }
 
         public double RoundPositiveValueToDigits(double n, int count)
         {
@@ -37,10 +33,6 @@ namespace ImageResizer.Configuration.Performance
         public float MaxValue { get; set; } = float.MaxValue;
 
         public int SignificantDigits { get; set; } = 2;
-        public SignificantDigitsClampingFloat()
-        {
-
-        }
 
         public double RoundPositiveValueToDigits(double n, int count)
         {

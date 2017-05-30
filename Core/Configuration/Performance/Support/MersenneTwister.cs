@@ -49,8 +49,8 @@ namespace ImageResizer.Configuration.Performance {
         const ulong MATRIX_A = 0x9908b0dfUL;    // constant vector a
         const ulong UPPER_MASK = 0x80000000UL;  // most significant w-r bits
         const ulong LOWER_MASK = 0x7fffffffUL;  // least significant r bits
-        private ulong[] mt = new ulong[N];  // the array for the state vector
-        private int mti = N + 1;            // mti==N+1 means mt[N] is not initialized
+        readonly ulong[] mt = new ulong[N];  // the array for the state vector
+        int mti = N + 1;            // mti==N+1 means mt[N] is not initialized
         public MersenneTwister() { init_by_array(new ulong[] { 0x123, 0x234, 0x345, 0x456 }); } // set default seeds
         public MersenneTwister(ulong s) { init_genrand(s); }
         public MersenneTwister(ulong[] init_key) { init_by_array(init_key); }

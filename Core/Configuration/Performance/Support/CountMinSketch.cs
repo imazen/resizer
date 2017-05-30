@@ -8,10 +8,10 @@ namespace ImageResizer.Configuration.Performance
 {
     class CountMinSketch<T> where T: struct, IHash
     {
-        int[,] table;
-        uint bucketCount;
-        uint hashAlgCount;
-        T[] hashes;
+        readonly int[,] table;
+        readonly uint bucketCount;
+        readonly uint hashAlgCount;
+        readonly T[] hashes;
 
         public CountMinSketch(uint bucketCount, uint hashAlgCount, T hasher)
         {

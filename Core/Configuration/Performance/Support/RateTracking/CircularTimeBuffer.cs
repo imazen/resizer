@@ -10,13 +10,13 @@ namespace ImageResizer.Configuration.Performance
 {
     class CircularTimeBuffer
     {
-        long[] buffer;
-        Queue<TimeSlotResult> results;
+        readonly long[] buffer;
+        readonly Queue<TimeSlotResult> results;
         long skippedResults = 0;
-        int maxResultQueueLength;
-        long ticksPerBucket;
-        int buckets;
-        int activeDistance;
+        readonly int maxResultQueueLength;
+        readonly long ticksPerBucket;
+        readonly int buckets;
+        readonly int activeDistance;
 
         public CircularTimeBuffer(long ticksPerBucket, int activeBuckets)
         {
@@ -36,17 +36,17 @@ namespace ImageResizer.Configuration.Performance
         long initialTail = int.MaxValue;
 
 
-        object dequeueLock = new object { };
+        readonly object dequeueLock = new object();
 
-        private void DequeueBuckets(long newHead)
+        void DequeueBuckets(long newHead)
         {
             Utilities.InterlockedMax(ref pendingHead, newHead);
             lock (dequeueLock)
             {
-                if (currentHead >= newHead)
-                {
+                if (currentHead >= newHead) {
                     return; //it's been handled by another thread that was holding the lock.
-                }else if (currentHead == 0)
+                }
+                if (currentHead == 0)
                 {
                     currentHead = newHead;
                     return; //First init
@@ -78,26 +78,6 @@ namespace ImageResizer.Configuration.Performance
                 }
             }
         }
-        /// <summary>
-        /// Better to call DequeueResults()
-        /// </summary>
-        /// <returns></returns>
-        //public TimeSlotResult DequeueResult()
-        //{
-        //    for (var retry = 0; retry < 3; retry++)
-        //    {
-        //        if (results.Count > 0)
-        //            lock (dequeueLock)
-        //                if (results.Count > 0)
-        //                    return results.Dequeue();
-
-        //        if (skippedResults > 0 && Interlocked.Decrement(ref skippedResults) > -1)
-        //        {
-        //            return TimeSlotResult.Empty;
-        //        }
-        //    }
-        //    return TimeSlotResult.Empty;
-        //}
 
         public IEnumerable<TimeSlotResult> DequeueResults()
         {
@@ -123,13 +103,15 @@ namespace ImageResizer.Configuration.Performance
         }
         public IEnumerable<long> DequeueValues()
         {
-            var results = DequeueResults();
-            return results == Enumerable.Empty<TimeSlotResult>() ? Enumerable.Empty<long>() : results.Select(r => r.Value.Value);
+            var enumerableResults = DequeueResults();
+            // ReSharper disable once PossibleUnintendedReferenceComparison
+            return enumerableResults == Enumerable.Empty<TimeSlotResult>() ? Enumerable.Empty<long>() : enumerableResults.Select(r => r.Value.Value);
         }
 
         public override string ToString()
         {
-            return string.Format("{0} queued, {1} skipped, top: {2}", results.Count, skippedResults, results.Count > 0 ? results.Peek().ToString() : "(empty)");
+            return
+                $"{results.Count} queued, {skippedResults} skipped, top: {(results.Count > 0 ? results.Peek().ToString() : "(empty)")}";
         }
 
         public bool Record(long ticks, long count)
@@ -145,16 +127,11 @@ namespace ImageResizer.Configuration.Performance
             }
 
             // Is it too old to record?
-            if (newIndex >= currentHead - activeDistance &&
-                newIndex >= pendingHead - activeDistance)
-            {
-                Interlocked.Add(ref buffer[newIndex % buckets], count);
-                return true;
-            }
-            else
-            {
+            if (newIndex < currentHead - activeDistance || newIndex < pendingHead - activeDistance) {
                 return false;
             }
+            Interlocked.Add(ref buffer[newIndex % buckets], count);
+            return true;
         }
     }
 }

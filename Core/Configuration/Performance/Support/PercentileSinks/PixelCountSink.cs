@@ -11,7 +11,7 @@ namespace ImageResizer.Configuration.Performance
             {
                 MinValue = 0,
                 MaxValue = 1000000 * 400, //400 megapixels
-                Segments = new SegmentPrecision[] {
+                Segments = new [] {
                     new SegmentPrecision { Above = 0, Loss = 100000 }, // 0.1mp up to 8mp (80)
                     new SegmentPrecision { Above = 8000000, Loss = 500000 }, // 0.5mp up to 40mp (64)
                     new SegmentPrecision { Above = 40000000, Loss = 5000000 } //5mp (~100)
@@ -20,8 +20,9 @@ namespace ImageResizer.Configuration.Performance
             clamp.Sort();
             clamp.Validate();
         }
-        SegmentClamping clamp;
-        CountMinSketch<AddMulModHash> table = new CountMinSketch<AddMulModHash>(379, 3, AddMulModHash.DeterministicDefault());
+
+        readonly SegmentClamping clamp;
+        readonly CountMinSketch<AddMulModHash> table = new CountMinSketch<AddMulModHash>(379, 3, AddMulModHash.DeterministicDefault());
 
         public void Report(long value)
         {

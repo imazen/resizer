@@ -4,21 +4,22 @@ namespace ImageResizer.Configuration.Performance
 {
     class FlatSink : IPercentileProviderSink
     {
-        public FlatSink(long MaxValue)
+        public FlatSink(long maxValue)
         {
 
             clamp = new SegmentClamping()
             {
                 MinValue = 0,
-                MaxValue = MaxValue, //400 megapixels
-                Segments = new SegmentPrecision[] {
+                MaxValue = maxValue, //400 megapixels
+                Segments = new [] {
                     new SegmentPrecision { Above = 0, Loss = 1 }
                 }
             };
             clamp.Validate();
         }
-        SegmentClamping clamp;
-        CountMinSketch<AddMulModHash> table = new CountMinSketch<AddMulModHash>(1279, 4, AddMulModHash.DeterministicDefault());
+
+        readonly SegmentClamping clamp;
+        readonly CountMinSketch<AddMulModHash> table = new CountMinSketch<AddMulModHash>(1279, 4, AddMulModHash.DeterministicDefault());
 
         public void Report(long value)
         {

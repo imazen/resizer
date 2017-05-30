@@ -8,9 +8,9 @@ namespace ImageResizer.Configuration.Performance
 {
     class QueryAccumulator
     {
-        List<KeyValuePair<string, string>> pairs = new List<KeyValuePair<string, string>>();
+        readonly List<KeyValuePair<string, string>> pairs = new List<KeyValuePair<string, string>>();
 
-        public IInfoAccumulator Object { get; private set; }
+        public IInfoAccumulator Object { get; }
         public QueryAccumulator()
         {
             Object = new ProxyAccumulator(false,

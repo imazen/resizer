@@ -10,12 +10,12 @@ namespace ImageResizer.Configuration.Performance
 {
     class DictionaryCounter<T>
     {
-        ConcurrentDictionary<T, Counter> dict;
-        Counter count;
-        Counter otherCount;
+        readonly ConcurrentDictionary<T, Counter> dict;
+        readonly Counter count;
+        readonly Counter otherCount;
 
-        public int MaxKeyCount { get; private set; }
-        public T LimitExceededKey { get; private set; }
+        public int MaxKeyCount { get; }
+        public T LimitExceededKey { get; }
 
         public DictionaryCounter(T updateFailedKey) : this(int.MaxValue, updateFailedKey, EqualityComparer<T>.Default)
         { }
@@ -60,7 +60,7 @@ namespace ImageResizer.Configuration.Performance
             return dict.ContainsKey(key);
         }
 
-        private Counter GetOrAddInternal(T key, long initialValue, bool applyLimitSwap)
+        Counter GetOrAddInternal(T key, long initialValue, bool applyLimitSwap)
         {
             for (var retryCount = 0; retryCount < 10; retryCount++) { 
                 Counter result;

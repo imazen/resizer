@@ -16,7 +16,7 @@ namespace ImageResizer.Configuration.Performance
 
         public void Sort()
         {
-            if (this.Segments == null) throw new ArgumentNullException(".Segments field is null. Finish configuration!");
+            if (this.Segments == null) throw new ArgumentNullException("Segments","Segments field is null. Finish configuration!");
 
             Segments = Segments.OrderByDescending(p => p.Above).ToArray();
         }

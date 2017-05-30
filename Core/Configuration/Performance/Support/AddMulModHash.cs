@@ -8,7 +8,7 @@ namespace ImageResizer.Configuration.Performance
 {
     struct AddMulModHash : IHash
     {
-        static ulong prime = (ulong)(Math.Pow(2, 32) - 5.0);//(ulong)(Math.Pow(2,33) - 355.0);
+        static readonly ulong prime = (ulong)(Math.Pow(2, 32) - 5.0);//(ulong)(Math.Pow(2,33) - 355.0);
 
         /// <summary>
         /// Seed the random number generator with a good prime, or you'll get poor distribution
@@ -20,9 +20,10 @@ namespace ImageResizer.Configuration.Performance
             this.a = (ulong)(r.NextDouble() * (prime - 2)) + 1;
             this.b = (ulong)(r.NextDouble() * (prime - 2)) + 1;
         }
-        ulong a;
-        ulong b;
-        IRandomDoubleGenerator r;
+
+        readonly ulong a;
+        readonly ulong b;
+        readonly IRandomDoubleGenerator r;
         public uint ComputeHash(uint value)
         {
             return (uint)((a * value + b) % prime);

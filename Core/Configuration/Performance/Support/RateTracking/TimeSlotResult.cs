@@ -16,18 +16,12 @@ namespace ImageResizer.Configuration.Performance
             this.SlotBeginTicks = slotBeginTicks;
         }
 
-        public long SlotBeginTicks { get; private set; }
+        public long SlotBeginTicks { get; }
 
-        long value;
-        public long? Value
-        {
-            get
-            {
-                return SlotBeginTicks > 0 ? value : (long?)null;
-            }
-        }
+        readonly long value;
+        public long? Value => SlotBeginTicks > 0 ? value : (long?)null;
 
-        public bool IsEmpty { get { return SlotBeginTicks == 0; } }
+        public bool IsEmpty => SlotBeginTicks == 0;
 
         /// <summary>
         /// Empty does not denote a result of any kind; this is like null. 
@@ -41,7 +35,7 @@ namespace ImageResizer.Configuration.Performance
 
         public override string ToString()
         {
-            return IsEmpty ? "(empty)" : string.Format("[{0}] at {1}", value, SlotBeginTicks);
+            return IsEmpty ? "(empty)" : $"[{value}] at {SlotBeginTicks}";
         }
     }
 }

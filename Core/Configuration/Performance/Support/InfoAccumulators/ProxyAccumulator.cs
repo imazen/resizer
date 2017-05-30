@@ -8,13 +8,13 @@ namespace ImageResizer.Configuration.Performance
 {
     class ProxyAccumulator : IInfoAccumulator
     {
-        Action<string, string> add;
-        Action<string, string> prepend;
-        bool use_prepend = false;
-        Func<IEnumerable<KeyValuePair<string, string>>> fetch;
-        public ProxyAccumulator(bool use_prepend, Action<string, string> add, Action<string, string> prepend, Func<IEnumerable<KeyValuePair<string, string>>> fetch)
+        readonly Action<string, string> add;
+        readonly Action<string, string> prepend;
+        readonly bool use_prepend = false;
+        readonly Func<IEnumerable<KeyValuePair<string, string>>> fetch;
+        public ProxyAccumulator(bool usePrepend, Action<string, string> add, Action<string, string> prepend, Func<IEnumerable<KeyValuePair<string, string>>> fetch)
         {
-            this.use_prepend = use_prepend;
+            this.use_prepend = usePrepend;
             this.add = add;
             this.prepend = prepend;
             this.fetch = fetch;

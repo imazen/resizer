@@ -23,8 +23,9 @@ namespace ImageResizer.Configuration.Performance
             clamp.Sort();
             clamp.Validate();
         }
-        SegmentClamping clamp;
-        CountMinSketch<AddMulModHash> table = new CountMinSketch<AddMulModHash>(379, 2, AddMulModHash.DeterministicDefault());
+
+        readonly SegmentClamping clamp;
+        readonly CountMinSketch<AddMulModHash> table = new CountMinSketch<AddMulModHash>(379, 2, AddMulModHash.DeterministicDefault());
 
         public void Report(long value)
         {

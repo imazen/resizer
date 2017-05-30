@@ -12,8 +12,8 @@ namespace ImageResizer.Configuration.Performance
     /// </summary>
     class TimingsSink : IPercentileProviderSink
     {
-        DurationClamping clamp = DurationClamping.Default600Seconds();
-        CountMinSketch<AddMulModHash> table = new CountMinSketch<AddMulModHash>(1279, 4, AddMulModHash.DeterministicDefault());
+        readonly DurationClamping clamp = DurationClamping.Default600Seconds();
+        readonly CountMinSketch<AddMulModHash> table = new CountMinSketch<AddMulModHash>(1279, 4, AddMulModHash.DeterministicDefault());
 
         public void Report(long ticks)
         {
