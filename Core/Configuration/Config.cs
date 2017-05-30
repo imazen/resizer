@@ -18,6 +18,7 @@ using System.Web;
 using ImageResizer.Collections;
 using System.IO;
 using System.Globalization;
+using ImageResizer.Configuration.Performance;
 
 
 namespace ImageResizer.Configuration {
@@ -284,7 +285,7 @@ namespace ImageResizer.Configuration {
         /// </summary>
         /// <returns></returns>
         public string GetDiagnosticsPage() {
-            return new ImageResizer.Plugins.Basic.DiagnosticPageHandler(this).GenerateOutput(HttpContext.Current, this);
+            return new DiagnosticsReport(this, HttpContext.Current?.Request.ServerVariables).Generate();
         }
         /// <summary>
         /// Returns a string of the public licenses page

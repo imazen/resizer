@@ -76,6 +76,7 @@
     <Compile Include="AsyncInterceptModule.cs" />
     <Compile Include="BoxEdges.cs" />
     <Compile Include="Collections\QuerystringBase.cs" />
+    <Compile Include="Configuration\Performance\DiagnosticsReport.cs" />
     <Compile Include="Configuration\Performance\Support\AddMulModHash.cs" />
     <Compile Include="Configuration\Performance\Support\InfoAccumulators\IInfoAccumulatorExtensions.cs" />
     <Compile Include="Configuration\Performance\Support\InfoAccumulators\ProxyAccumulator.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="Configuration\Performance\Support\Utilities.cs" />
     <Compile Include="ExtensionMethods\Dictionary.cs" />
     <Compile Include="PluginLoadingHints.cs" />
+    <Compile Include="Plugins\Basic\EndpointPlugin.cs" />
     <Compile Include="Plugins\Basic\IDiagnosticsProvider.cs" />
     <Compile Include="Plugins\Basic\ILicenseDiagnosticsProvider.cs" />
     <Compile Include="Plugins\Basic\LicenseDisplay.cs" />
@@ -158,7 +160,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Plugins\Basic\ClientCache.cs" />
-    <Compile Include="Plugins\Basic\DiagnosticDisabledHandler.cs" />
     <Compile Include="Plugins\Basic\Gradient.cs" />
     <Compile Include="Plugins\Basic\Image404.cs" />
     <Compile Include="Plugins\Basic\ImageInfoAPI.cs" />
@@ -197,7 +198,6 @@
     <Compile Include="Plugins\IFileExtensionPlugin.cs" />
     <Compile Include="Plugins\Basic\Trial.cs" />
     <Compile Include="Plugins\Basic\Diagnostic.cs" />
-    <Compile Include="Plugins\Basic\DiagnosticPageHandler.cs" />
     <Compile Include="Plugins\IMultiInstancePlugin.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Plugins\ISettingsModifier.cs" />
