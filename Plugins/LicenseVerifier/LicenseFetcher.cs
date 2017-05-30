@@ -206,7 +206,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             try {
                 var query = getInfo();
                 query.WithPrepend(true).Add("license_id", id);
-                return query.ToQueryString(3000);
+                return query.ToQueryString(7000);
             } catch (Exception ex) {
                 sink.AcceptIssue(new Issue("LicenseManager", "Failed to collect querystring for license request",
                     ex.ToString(), IssueSeverity.Warning));
