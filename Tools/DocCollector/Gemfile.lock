@@ -9,8 +9,9 @@ GIT
       sinatra (>= 1.3.3)
       tilt (>= 2.0.1)
 
-PATH
-  remote: /Users/mjc/src/doc_collector
+GIT
+  remote: https://github.com/imazen/doc_collector.git
+  revision: a6cd7b4b0d2b04765b70468b2c659dd7f2f787a6
   specs:
     doc_collector (0.0.1)
       erubis
