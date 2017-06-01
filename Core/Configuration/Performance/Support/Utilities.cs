@@ -1,12 +1,11 @@
 ﻿using ImageResizer.Util;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Web;
 // ReSharper disable LoopVariableIsNeverChangedInsideLoop
 
 namespace ImageResizer.Configuration.Performance
@@ -99,14 +98,30 @@ namespace ImageResizer.Configuration.Performance
                 var attrs = a.GetCustomAttributes(typeof(T), false);
                 if (attrs.Length > 0) return (T)attrs[0];
             }
+            catch(FileNotFoundException) {
+                //Missing dependencies
+            }
             catch (Exception) { }
             return default(T);
         }
 
-        public static string GetShortCommit(this Assembly a) =>
-            GetFirstAttribute<CommitAttribute>(a)?.Value.Take(7).IntoString();
+        public static Exception GetExceptionForReading<T>(this Assembly a)
+        {
+            try {
+                var nah = a.GetCustomAttributes(typeof(T), false);
+            } catch (Exception e) {
+                return e;
+            }
+            return null;
+        }
 
-        
+
+        public static string GetShortCommit(this Assembly a) =>
+            GetFirstAttribute<CommitAttribute>(a)?.Value.Take(8).IntoString();
+
+        public static string GetEditionCode(this Assembly a) =>
+            GetFirstAttribute<EditionAttribute>(a)?.Value;
+
         public static string GetInformationalVersion(this Assembly a)
         {
             return GetFirstAttribute<AssemblyInformationalVersionAttribute>(a)?.InformationalVersion;
