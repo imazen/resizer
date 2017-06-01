@@ -1,24 +1,45 @@
 language:
-  - cpp
-
+- cpp
 compiler:
-  - clang
-  - gcc
-
+- clang
+- gcc
 before_install:
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-  - sudo apt-get update -qq
-  - sudo apt-get install libc6-dbg
-  - if [ "$CXX" = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev; fi
-  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; alias g++="g++-4.8"; alias gcc="gcc-4.8"; fi
-  - wget https://s3.amazonaws.com/public-unit-test-resources/valgrind-3.10.1.tar.bz2 && tar xjvf valgrind-3.10.1.tar.bz2
-  - cd valgrind-3.10.1 && ./configure && make
-  - sudo make install
-  
+- sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+- sudo apt-get update -qq
+- sudo apt-get install libc6-dbg
+- if [ "$CXX" = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev; fi
+- if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
+- if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; alias g++="g++-4.8";
+  alias gcc="gcc-4.8"; fi
+- wget https://s3.amazonaws.com/public-unit-test-resources/valgrind-3.10.1.tar.bz2
+  && tar xjvf valgrind-3.10.1.tar.bz2
+- cd valgrind-3.10.1 && ./configure && make
+- sudo make install
 script:
-  - cd $TRAVIS_BUILD_DIR/Plugins/FastScaling/NativeFastScaling
-  - rake test
-  - rake clean
-  - rake valgrind
-  - rake test_with_valgrind
+- pushd $TRAVIS_BUILD_DIR/Plugins/FastScaling/NativeFastScaling
+- rake test
+- rake clean
+- rake valgrind
+- rake test_with_valgrind
+- popd
+- pushd $TRAVIS_BUILD_DIR/Tools/DocCollector
+- git clone git@github.com:imazen/resizer-web.git
+- git remote add pr git@github.com:imazen-bot/resizer-web.git
+- pushd $TRAVIS_BUILD_DIR/Tools/DocCollector/resizer-web
+- git checkout -f
+- git pull
+- popd
+- bundle -j4
+- bundle exec rake resizer
+- pushd $TRAVIS_BUILD_DIR/Tools/DocCollector/resizer-web
+- git checkout -b "${TRAVIS_BRANCH}_docs_${TRAVIS_BUILD_NUMBER}"
+- git add .
+- git commit -m "DocCollector Update for ${TRAVIS_PULL_REQUEST}"
+- git push imazen-bot/"${TRAVIS_BRANCH}_docs_${TRAVIS_BUILD_NUMBER}"
+- bundle -j8
+- bundle exec hub pull-request -m "DocCollector Update for ${TRAVIS_PULL_REQUEST}" -b "imazen/resizer-web:production"
+- popd
+- popd
+env:
+  global:
+    secure: PFqvUe6tt5WTCzOfq4/9F2Pt5Kvy2DYWSVQlkDP4THPEtGvtJCBHjE2jt3QuTGQrmWsARhOG8MZRY6i4i+zvEnPhZOM938ghAEV+d3REv4Up1Bj4lG2kIyjAQh2lZomecUaY0IBC+PfzhQOvmvNazNYKncEgziz0/QKXCrPkN/U=
