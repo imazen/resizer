@@ -71,14 +71,7 @@ namespace ImageResizer.Storage
         /// <returns></returns>
         public Configuration.Xml.Node RedactFrom(Node resizer)
         {
-            if (resizer == null) return null;
-            var nodes = resizer.queryUncached("plugins.add");
-            if (nodes == null) return resizer;
-            foreach (Node n in nodes)
-            {
-                if (n.Attrs["connectionString"] != null) n.Attrs.Set("connectionString", "[redacted]");
-            }
-            return resizer;
+            return resizer?.RedactAttributes("plugins.add", new [] { "connectionString"});
         }
 
         /// <summary>

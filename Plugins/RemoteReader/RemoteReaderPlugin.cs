@@ -26,9 +26,7 @@ namespace ImageResizer.Plugins.RemoteReader {
     {
 
         public Configuration.Xml.Node RedactFrom(Node resizer) {
-            if (resizer != null && resizer.queryFirst("remoteReader") != null) resizer.setAttr("remoteReader.signingKey", "[redacted]");
-
-            return resizer;
+            return resizer?.RedactAttributes("remoteReader", new[] { "signingKey" });
         }
 
         private static string base64UrlKey = "urlb64";

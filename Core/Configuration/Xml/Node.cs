@@ -10,6 +10,7 @@ using System.Collections.Specialized;
 using System.Xml;
 using ImageResizer.Configuration.Issues;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace ImageResizer.Configuration.Xml {
     /// <summary>
@@ -208,6 +209,24 @@ namespace ImageResizer.Configuration.Xml {
         }
         public void clearQueryCache() {
             _cachedResults = new Dictionary<string, ICollection<Node>>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Mutates this tree to redact all the matching attributes
+        /// </summary>
+        /// <param name="elementSelector"></param>
+        /// <param name="attributeNames"></param>
+        /// <param name="replaceWith"></param>
+        /// <returns></returns>
+        public Node RedactAttributes(string elementSelector, string[] attributeNames, string replaceWith = "[redacted]")
+        {
+            foreach (var n in queryUncached(elementSelector) ?? Enumerable.Empty<Node>())
+            {
+                foreach (var attrName in attributeNames) {
+                    if (n.Attrs[attrName] != null) n.Attrs.Set(attrName, replaceWith);
+                }
+            }
+            return this;
         }
 
         public ICollection<Node> queryUncached(string selector) {

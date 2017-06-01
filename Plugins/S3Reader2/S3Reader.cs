@@ -60,15 +60,11 @@ namespace ImageResizer.Plugins.S3Reader2 {
         /// </summary>
         /// <param name="resizer"></param>
         /// <returns></returns>
-        public Configuration.Xml.Node RedactFrom(Node resizer) {
-            resizer = base.RedactFrom(resizer);
-            foreach (Node n in resizer.queryUncached("plugins.add") ?? Enumerable.Empty<Node>()) {
-                if (n.Attrs["accessKeyId"] != null) n.Attrs.Set("accessKeyId", "[redacted]");
-                if (n.Attrs["secretAccessKey"] != null) n.Attrs.Set("secretAccessKey", "[redacted]");
-            }
-            return resizer;
+        public new Configuration.Xml.Node RedactFrom(Node resizer)
+        {
+            return base.RedactFrom(resizer)?.RedactAttributes("plugins.add", new[] { "accessKeyId", "secretAccessKey" });
         }
-    
+
         /// <summary>
         /// Configure AWS access keys
         /// </summary>
