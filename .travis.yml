@@ -23,6 +23,8 @@ script:
 - popd
 - pushd $TRAVIS_BUILD_DIR/Tools/DocCollector
 - git clone git@github.com:imazen/resizer-web.git
+- git config user.name="Imazen Bot"
+- git config user.email="codebot@imazen.io"
 - git remote add pr git@github.com:imazen-bot/resizer-web.git
 - pushd $TRAVIS_BUILD_DIR/Tools/DocCollector/resizer-web
 - git checkout -f
