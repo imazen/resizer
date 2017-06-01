@@ -285,7 +285,7 @@ namespace ImageResizer.Configuration {
         /// </summary>
         /// <returns></returns>
         public string GetDiagnosticsPage() {
-            return new DiagnosticsReport(this, HttpContext.Current?.Request.ServerVariables).Generate();
+            return new DiagnosticsReport(this, HttpContext.Current).Generate();
         }
         /// <summary>
         /// Returns a string of the public licenses page

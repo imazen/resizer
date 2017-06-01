@@ -72,7 +72,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
     }
 
 
-    class LicensedPlugin : ILicensedPlugin, IPlugin, ILicenseDiagnosticsProvider, IDiagnosticsProvider
+    class LicensedPlugin : ILicensedPlugin, IPlugin, IDiagnosticsProviderFactory, IIssueProvider
     {
         Config c;
         Computation cache;
@@ -88,7 +88,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                     cache = null;
                 }
                 return cache = cache ?? new Computation(c, ImazenPublicKeys.All, c.configurationSectionIssues, mgr,
-                                   Clock);
+                                   Clock, true);
             }
         }
 
@@ -99,9 +99,6 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             Clock = clock ?? Clock;
         }
 
-        public string ProvideDiagnostics() => Result.ProvideDiagnostics();
-
-        public string ProvidePublicText() => Result.ProvidePublicDiagnostics();
 
         public IEnumerable<string> LicenseFeatureCodes => codes;
 
@@ -131,11 +128,9 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             return true;
         }
 
-        public IEnumerable<IIssue> GetIssues()
-        {
-            var cache = Result;
-            return cache == null ? mgr.GetIssues() : mgr.GetIssues().Concat(cache.GetIssues());
-        }
+        public IEnumerable<IIssue> GetIssues() => mgr.GetIssues().Concat(Result?.GetIssues() ?? Enumerable.Empty<IIssue>());
+
+        public object GetDiagnosticsProvider() => Result;
     }
     class RequestUrlProvider
     {

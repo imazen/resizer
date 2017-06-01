@@ -25,6 +25,8 @@ namespace ImageResizer.Plugins.Basic
         {
             return string.Join("\n\n",
                 c.Plugins.GetAll<ILicenseDiagnosticsProvider>()
+                .Concat(c.Plugins.GetAll<IDiagnosticsProviderFactory>().Select(f => f.GetDiagnosticsProvider() as ILicenseDiagnosticsProvider))
+                .Where(p => p != null)
                 .Select(p => p.ProvidePublicText())
                 .Distinct());
         }

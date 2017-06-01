@@ -26,7 +26,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         string GetInfo(Config c, LicenseManagerSingleton mgr)
         {
             var result = new Computation(c, mgr.TrustedKeys, mgr, mgr,
-                mgr.Clock);
+                mgr.Clock, true);
             var sb = new StringBuilder();
             
             sb.AppendLine($"Plugins.LicenseError = {c.Plugins.LicenseError}");

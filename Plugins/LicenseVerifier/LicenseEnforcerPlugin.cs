@@ -22,8 +22,8 @@ namespace ImageResizer.Plugins.LicenseVerifier
     /// </summary>
     /// <typeparam name="T"></typeparam>
     // ReSharper disable once UnusedTypeParameter
-    partial class LicenseEnforcer<T> : BuilderExtension, IPlugin, IDiagnosticsProvider, IIssueProvider,
-        ILicenseDiagnosticsProvider
+    partial class LicenseEnforcer<T> : BuilderExtension, IPlugin, IIssueProvider,
+        IDiagnosticsProviderFactory
     {
         readonly ILicenseManager mgr;
         readonly WatermarkRenderer watermark = new WatermarkRenderer();
@@ -46,7 +46,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 }
                 return cachedResult = cachedResult ??
                                       new Computation(c, trustedKeys, PermanentIssueSink ?? c.configurationSectionIssues, mgr,
-                                          Clock);
+                                          Clock, EnforcementEnabled());
             }
         }
 
@@ -74,18 +74,8 @@ namespace ImageResizer.Plugins.LicenseVerifier
             trustedKeys = trusted;
         }
 
-        string GetBanner()
-        {
-            return EnforcementEnabled() 
-                ? $"\n----------------\nLicense enforcement is active (warn via {c.Plugins.LicenseError})\n----------------\n" 
-                : "\n----------------\nDRM-free: License enforcement is off\n----------------\n";
-        }
-
-        public string ProvideDiagnostics() => GetBanner() + Result.ProvideDiagnostics();
-
         public IEnumerable<IIssue> GetIssues() => mgr.GetIssues().Concat(Result.GetIssues());
 
-        public string ProvidePublicText() => GetBanner() + Result.ProvidePublicDiagnostics();
 
         public IPlugin Install(Config config)
         {
@@ -119,9 +109,9 @@ namespace ImageResizer.Plugins.LicenseVerifier
         }
 
         bool enforcementEnabled = false;
+       
         // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-        bool EnforcementEnabled() => Enforce || enforcementEnabled;
-
+        public bool EnforcementEnabled() => Enforce || enforcementEnabled;
 
         public LicenseEnforcer<T> EnableEnforcement()
         {
@@ -193,6 +183,8 @@ namespace ImageResizer.Plugins.LicenseVerifier
             watermark.EnsureDrawn(s.destBitmap);
             return RequestedAction.None;
         }
+
+        public object GetDiagnosticsProvider() => Result;
     }
 
     class WatermarkRenderer

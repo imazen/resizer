@@ -182,7 +182,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             LocalLicenseChange();
         }
 
-        string RedactSecret(string s) => Secret != null ? s.Replace(Secret, "[redacted secret]") : s;
+        string RedactSecret(string s) => Secret != null ? s?.Replace(Secret, "[redacted secret]") : s;
 
         void RecreateFetcher()
         {
@@ -311,7 +311,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         {
             var cached = fetcher != null ? parent.Cache.Get(fetcher.CacheKey) : null;
             Func<ILicenseBlob, string> freshness = b => b == remoteLicense
-                ? "(fresh from license server)\n" + lastWorkingUri + "\n"
+                ? "(fresh from license server)\n"
                 : b.Original == cached
                     ? "(from cache)\n"
                     : "";
@@ -320,6 +320,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 $"License {Id} (remote={IsRemote})\n    {string.Join("\n\n", Licenses().Select(b => freshness(b) + b.ToRedactedString())).Replace("\n", "\n    ")}\n");
         }
 
+        public string LastFetchUrl() { return RedactSecret(lastWorkingUri?.ToString()); }
         internal void Heartbeat() { fetcher?.Heartbeat(); }
     }
 }

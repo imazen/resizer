@@ -115,7 +115,6 @@
     <Compile Include="PluginLoadingHints.cs" />
     <Compile Include="Plugins\Basic\EndpointPlugin.cs" />
     <Compile Include="Plugins\Basic\IDiagnosticsProvider.cs" />
-    <Compile Include="Plugins\Basic\ILicenseDiagnosticsProvider.cs" />
     <Compile Include="Plugins\Basic\LicenseDisplay.cs" />
     <Compile Include="Plugins\Basic\MvcRoutingShimPlugin.cs" />
     <Compile Include="Plugins\Basic\NoCacheAsyncHandler.cs" />

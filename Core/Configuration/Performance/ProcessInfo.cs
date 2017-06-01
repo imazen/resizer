@@ -1,6 +1,7 @@
 ﻿using ImageResizer.Util;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using System.Web.Hosting;
 using Microsoft.Win32;
 using System.Web;
 using System.Reflection;
+using System.Security;
 
 namespace ImageResizer.Configuration.Performance
 {
@@ -157,6 +159,59 @@ namespace ImageResizer.Configuration.Performance
                 .ToArray();
             }
             return Enumerable.Empty<string>();
+        }
+
+        /// <summary>
+        /// Returns the ASP.NET trust level
+        /// </summary>
+        /// <returns></returns>
+        public static AspNetHostingPermissionLevel GetCurrentTrustLevel()
+        {
+            foreach (AspNetHostingPermissionLevel trustLevel in
+                new[] {
+                    AspNetHostingPermissionLevel.Unrestricted,
+                    AspNetHostingPermissionLevel.High,
+                    AspNetHostingPermissionLevel.Medium,
+                    AspNetHostingPermissionLevel.Low,
+                    AspNetHostingPermissionLevel.Minimal
+                })
+            {
+                try
+                {
+                    new AspNetHostingPermission(trustLevel).Demand();
+                }
+                catch (SecurityException)
+                {
+                    continue;
+                }
+
+                return trustLevel;
+            }
+
+            return AspNetHostingPermissionLevel.None;
+        }
+
+        public static string MainModuleFileName()
+        {
+            try
+            {
+                return System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+            }
+            catch (Win32Exception)
+            {
+                return "(process filename cannot be determined, access denied)";
+            }
+        }
+
+        public static bool HasFullTrust()
+        {
+            try
+            {
+                new AspNetHostingPermission(AspNetHostingPermissionLevel.Unrestricted).Demand();
+                return true;
+            }
+            catch (SecurityException) { }
+            return false;
         }
     }
 }

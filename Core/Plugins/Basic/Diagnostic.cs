@@ -67,7 +67,7 @@ namespace ImageResizer.Plugins.Basic {
                                 (dmode == DiagnosticMode.Localhost);
 
 
-            sb.Append("The Resizer diagnostics page is " +
+            sb.Append("The ImageResizer diagnostics page is " +
                           (availLocally ? "only available from localhost." : "disabled."));
             sb.Append("\n\nThis is because ");
             sb.Append(diagDefined
@@ -82,7 +82,7 @@ namespace ImageResizer.Plugins.Basic {
 
         protected override string GenerateOutput(HttpContext context, Config c)
         {
-            return AllowResponse(context, c) ? new DiagnosticsReport(c, context?.Request.ServerVariables).Generate() : DisabledNotice(c);
+            return AllowResponse(context, c) ? new DiagnosticsReport(c, context).Generate() : DisabledNotice(c);
         }
 
 
@@ -96,7 +96,7 @@ namespace ImageResizer.Plugins.Basic {
         /// <param name="context"></param>
         /// <returns></returns>
         public bool AllowResponse(HttpContext context, Config c) {
-            switch (c.get("diagnostics.enableFor", context.IsCustomErrorEnabled ? DiagnosticMode.AllHosts : DiagnosticMode.None)) {
+            switch (c.get("diagnostics.enableFor", context.IsCustomErrorEnabled ? DiagnosticMode.None : DiagnosticMode.AllHosts)) {
                 case DiagnosticMode.AllHosts:
                     return true;
 

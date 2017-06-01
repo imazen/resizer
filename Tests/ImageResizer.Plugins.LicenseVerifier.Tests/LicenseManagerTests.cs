@@ -42,12 +42,12 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
                 var conf = new Config();
                 conf.Plugins.LicenseScope = LicenseAccess.Local;
-                conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R4Elite"));
+                conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R_Elite", "R4Elite"));
                 conf.Plugins.AddLicense(LicenseStrings.EliteSubscriptionPlaceholder);
                 
                 mgr.WaitForTasks();
 
-                var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+                var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock, true);
                 Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
 
                 Assert.Empty(mgr.GetIssues());
@@ -64,13 +64,13 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 var conf = new Config();
                 try {
                     conf.Plugins.LicenseScope = LicenseAccess.Local;
-                    conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R4Elite"));
+                    conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R_Elite", "R4Elite"));
                     conf.Plugins.AddLicense(LicenseStrings.EliteSubscriptionPlaceholder);
 
                     mgr.Heartbeat();
                     mgr.WaitForTasks();
 
-                    var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+                    var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock, true);
                     Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
 
 
@@ -129,14 +129,14 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             Assert.Empty(mgr.GetIssues());
             Assert.Null(mgr.GetAllLicenses().FirstOrDefault());
 
-            var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+            var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock, true);
 
             Assert.False(result.LicensedForRequestUrl(new Uri("http://acme.com")));
             conf.Plugins.AddLicense(LicenseStrings.Offlinev4DomainAcmeComCreative);
 
             Assert.NotNull(mgr.GetAllLicenses().First());
 
-            result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+            result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock, true);
             Assert.True(result.LicensedForRequestUrl(new Uri("http://acme.com")));
 
             Assert.Empty(mgr.GetIssues());
@@ -165,7 +165,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
             Assert.NotNull(mgr.GetAllLicenses().First());
 
-            var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+            var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock, true);
 
             Assert.True(result.LicensedForRequestUrl(new Uri("http://acme.com")));
             Assert.True(result.LicensedForRequestUrl(new Uri("http://subdomain.acme.com")));
@@ -194,7 +194,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             var conf = new Config();
             try {
                 conf.Plugins.LicenseScope = LicenseAccess.Local;
-                conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R4Elite"));
+                conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R_Elite"));
                 conf.Plugins.AddLicense(LicenseStrings.EliteSubscriptionPlaceholder);
 
                 Assert.Equal(1, mgr.GetAllLicenses().Count());
@@ -212,7 +212,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
 
                 Assert.NotNull(mgr.GetAllLicenses().First().FetchedLicense());
 
-                var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock);
+                var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock, true);
 
                 Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
                 Assert.Equal(0, mgr.WaitForTasks());

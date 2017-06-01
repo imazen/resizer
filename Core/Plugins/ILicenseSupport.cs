@@ -119,6 +119,8 @@ namespace ImageResizer.Plugins.Licensing
         /// </summary>
         /// <returns></returns>
         string ToPublicString();
+
+        string LastFetchUrl();
     }
 
     /// <summary>

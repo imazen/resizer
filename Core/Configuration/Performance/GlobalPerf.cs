@@ -311,16 +311,16 @@ namespace ImageResizer.Configuration.Performance
 
 
             q.Add("image_domains",
-               string.Join(", ", GetPopularUniqueValues("image_domains", 8)));
+               string.Join(",", GetPopularUniqueValues("image_domains", 8)));
             q.Add("page_domains",
-                string.Join(", ", GetPopularUniqueValues("page_domains", 8)));
+                string.Join(",", GetPopularUniqueValues("page_domains", 8)));
 
             var originalKeys = GetPopularUniqueValues("original_query_keys", 40).ToArray();
 
             q.Add("query_keys",
-                string.Join(", ", originalKeys));
+                string.Join(",", originalKeys));
             q.Add("extra_job_query_keys",
-                string.Join(", ", GetPopularUniqueValues("job_query_keys", 40).Except(originalKeys).Take(2)));
+                string.Join(",", GetPopularUniqueValues("job_query_keys", 40).Except(originalKeys).Take(2)));
 
             timeThis.Stop();
             collect_info_times.Report(timeThis.ElapsedTicks);
