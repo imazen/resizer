@@ -22,10 +22,10 @@ script:
 # - rake test_with_valgrind
 # - popd
 - pushd $TRAVIS_BUILD_DIR/Tools/DocCollector
-- git clone git@github.com:imazen/resizer-web.git
+- git clone https://github.com:imazen/resizer-web.git
 - git config user.name "Imazen Bot"
 - git config user.email "codebot@imazen.io"
-- git remote add pr git@github.com:imazen-bot/resizer-web.git
+- git remote add pr https://github.com:imazen-bot/resizer-web.git
 - pushd $TRAVIS_BUILD_DIR/Tools/DocCollector/resizer-web
 - git checkout -f
 - git pull
