@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using ImageResizer.Configuration;
 using ImageResizer.Configuration.Issues;
+using ImageResizer.ExtensionMethods;
 using ImageResizer.Plugins.Licensing;
 
 namespace ImageResizer.Plugins.LicenseVerifier
@@ -110,23 +111,14 @@ namespace ImageResizer.Plugins.LicenseVerifier
             return mappings;
         }
 
-        public string ExplainDomainMappings()
-        {
-            return customMappings.Count > 0
-                ? "For domain licensing, you have mapped the following local (non-public) domains or addresses as follows:\n" +
-                  string.Join(", ", customMappings.Select(pair => $"{pair.Key} => {pair.Value}")) +
-                  "\n"
-                : "";
-        }
-
         public string ExplainNormalizations()
         {
             //Where(pair => pair.Value != null && pair.Key != pair.Value)
             return LookupTableSize > 0
-                ? "The domain lookup table has {0} elements. Displaying subset:\n" +
-                  string.Join(", ", lookupTable.OrderByDescending(p => p.Value)
+                ? $"The domain lookup table has {LookupTableSize} elements. Displaying {Math.Min(200, LookupTableSize)}:\n" +
+                   lookupTable.OrderByDescending(p => p.Value)
                                                .Take(200)
-                                               .Select(pair => $"{pair.Key} => {pair.Value}")) +
+                                               .Select(pair => pair.Key == pair.Value ? pair.Key : $"{pair.Key} => {pair.Value}").Delimited(", ") +
                   "\n"
                 : "";
         }
