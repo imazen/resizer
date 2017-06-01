@@ -111,6 +111,7 @@
     <Compile Include="Configuration\Performance\Support\PercentileSinks\TimingsSink.cs" />
     <Compile Include="Configuration\Performance\Support\Utilities.cs" />
     <Compile Include="ExtensionMethods\Dictionary.cs" />
+    <Compile Include="ExtensionMethods\GenericExtensions.cs" />
     <Compile Include="PluginLoadingHints.cs" />
     <Compile Include="Plugins\Basic\EndpointPlugin.cs" />
     <Compile Include="Plugins\Basic\IDiagnosticsProvider.cs" />
