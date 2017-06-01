@@ -25,6 +25,8 @@ goto exit
   echo - Running Restore...
   nuget restore ..\AppVeyor.sln
 
+  nuget restore ..\Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln
+
   echo - Fetching extra packaeges...
   nuget restore FakeBuilder\packages.config
 
