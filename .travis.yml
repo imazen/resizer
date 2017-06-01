@@ -28,6 +28,7 @@ script:
 - git checkout -f
 - git pull
 - popd
+- pushd $TRAVIS_BUILD_DIR/Tools/DocCollector
 - bundle -j4
 - bundle exec rake resizer
 - pushd $TRAVIS_BUILD_DIR/Tools/DocCollector/resizer-web
