@@ -378,7 +378,7 @@ A universal license key would fix that. See if your purchase is eligible for a f
         {
 
             var summary = includeScope
-                ? $"\nLicense status for active features (for {Scope}):\r\n{LicenseStatusSummary()}"
+                ? $"License status for active features (for {Scope}):\r\n{LicenseStatusSummary()}"
                 : LicenseStatusSummary();
             var restrictionsAndMessages = RestrictionsAndMessages();
 
