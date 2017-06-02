@@ -54,6 +54,7 @@ namespace ImageResizer.Plugins.Basic
             context.Response.StatusCode = 200;
             context.Response.ContentType = "text/plain";
             context.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            context.Response.Headers.Add("X-Robots-Tag", "none");
             context.Response.Write(GenerateOutput(context, c));
         }
 
