@@ -95,12 +95,19 @@ namespace ImageResizer.Plugins.AnimatedGifs
       
                     // http://radio.weblogs.com/0122832/2005/10/20.html
                     //src.MakeTransparent(); This call makes some GIFs replicate the first image on all frames.. i.e. SelectActiveFrame doesn't work.
-                    
+
+                    bool transparent = ios.SupportsTransparency;
+
                     using (Bitmap b = c.CurrentImageBuilder.Build(src,queryString,false)){
                         //Useful to check if animation is occurring - sometimes the problem isn't the output file, but the input frames are
                         //all the same.
                         //for (var i = 0; i < b.Height; i++) b.SetPixel(frame * 10, i, Color.Green);
                         // b.Save(memoryStream, ImageFormat.Gif);
+                        if (ios is DefaultEncoder) {
+                            //For both WIC Builder and DefaultBuilder
+                            //We assume no transparency
+                            transparent = false;
+                        }
                         ios.Write(b, memoryStream); //Allows quantization and dithering
                     }
                     
@@ -117,7 +124,7 @@ namespace ImageResizer.Plugins.AnimatedGifs
                     //Restore frame delay
                     int delay = 0;
                     if (delays != null && delays.Length > frame) delay = delays[frame];
-                    writer.Write(GifCreator.CreateGraphicControlExtensionBlock(delay)); //The delay/transparent color block
+                    writer.Write(GifCreator.CreateGraphicControlExtensionBlock(delay, 0, transparent)); //The delay/transparent color block
                     writer.Write(gif.m_ImageDescriptor.ToArray()); //The image desc
                     writer.Write(gif.m_ColorTable.ToArray()); //The palette
                     writer.Write(gif.m_ImageData.ToArray()); //Image data
