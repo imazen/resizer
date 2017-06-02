@@ -16,9 +16,10 @@
         <option value="rose-leaf.jpg">rose-leaf.jpg</option>
         <option value="Sun_256.png">Sun_256.png</option>
         <option value="rings.png">rings.png</option>
+        <option value="2_computers.gif">2_computers.gif</option>
         
         <option value="rings2.png">rings2.png</option>
-        <%= String.Join("\n",System.IO.Directory.GetFiles(System.IO.Path.Combine(MapPath("~/"),@"..\..\Samples\Images\private"), "*.jpg").Select(path => "private/" + System.IO.Path.GetFileName(path)).Select(p => "<option value=\"" + p + "\">" + p + "</option>")) %>
+        <%= String.Join("\n",new [] {"*.jpg", "*.png", "*.gif"}.SelectMany(ext => System.IO.Directory.GetFiles(System.IO.Path.Combine(MapPath("~/"),@"..\..\Samples\Images\private"), ext)).Select(path => "private/" + System.IO.Path.GetFileName(path)).Select(p => "<option value=\"" + p + "\">" + p + "</option>")) %>
         
     
     </select>
