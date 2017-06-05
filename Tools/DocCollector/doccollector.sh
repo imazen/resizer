@@ -36,6 +36,7 @@ cd "${TRAVIS_BUILD_DIR}/Tools/DocCollector/resizer-web" || exit
 git branch -D "${TRAVIS_BRANCH}_docs"
 git checkout -b "${TRAVIS_BRANCH}_docs"
 git add .
+git status
 git commit -m "DocCollector Update for imazen/resizer#${TRAVIS_PULL_REQUEST}"
 # delete previous branch
 git push pr :"${TRAVIS_BRANCH}_docs"
