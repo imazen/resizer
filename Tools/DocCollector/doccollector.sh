@@ -21,7 +21,7 @@ if [ ! "${TRAVIS_PULL_REQUEST}" = "" ]; then
   exit 4
 fi
 
-if [ $(git config --global user.email) = "" ]; then
+if [ "$(git config user.email)" = "" ]; then
   git config --global user.name "Imazen Bot"
   git config --global user.email "codebot@imazen.io"
 fi
