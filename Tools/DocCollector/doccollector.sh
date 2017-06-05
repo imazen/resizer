@@ -1,4 +1,26 @@
 #!/bin/sh
+
+# this should be set to the travis build dir
+if [ "${TRAVIS_BUILD_DIR}" = "" ]; then
+  exit 1
+fi
+
+# this should come from encrypted travis stuff
+if [ "${GITHUB_TOKEN}" = "" ]; then
+  exit 2
+fi
+
+
+# this should be set to the branch name
+if [ "${TRAVIS_BRANCH}" = "" ]; then
+  exit 3
+fi
+
+# TRAVIS_PULL_REQUEST should be unset
+if [ ! "${TRAVIS_PULL_REQUEST}" = "" ]; then
+  exit 4
+fi
+
 cd "${TRAVIS_BUILD_DIR}/Tools/DocCollector" || exit
 git clone "https://${GITHUB_TOKEN}@github.com/imazen/resizer-web.git"
 git config user.name "Imazen Bot"
