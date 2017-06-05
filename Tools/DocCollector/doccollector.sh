@@ -45,4 +45,4 @@ git push -u pr "${TRAVIS_BRANCH}_docs"
 base="imazen/resizer-web:production"
 head="imazen-bot/resizer-web:${TRAVIS_BRANCH}_docs_${TRAVIS_BUILD_NUMBER}"
 hub="${TRAVIS_BUILD_DIR}/Tools/DocCollector/hub/hub-$(uname -s)-$(uname -m)-2.2.9"
-$hub pull-request -m "DocCollector Update" -b $base -h $head
+$hub pull-request -m "DocCollector Update" -b "$base" -h "$head"
