@@ -33,10 +33,15 @@ cd "${TRAVIS_BUILD_DIR}/Tools/DocCollector" || exit
 bundle -j4
 bundle exec rake resizer
 cd "${TRAVIS_BUILD_DIR}/Tools/DocCollector/resizer-web" || exit
-git checkout -b "${TRAVIS_BRANCH}_docs_${TRAVIS_BUILD_NUMBER}"
+git branch -D "${TRAVIS_BRANCH}_docs"
+git checkout -b "${TRAVIS_BRANCH}_docs"
 git add .
 git commit -m "DocCollector Update for imazen/resizer#${TRAVIS_PULL_REQUEST}"
-git push imazen-bot/resizer-web "${TRAVIS_BRANCH}_docs_${TRAVIS_BUILD_NUMBER}"
-# resizer-web requires ruby 2.4 and cpp travis uses 2.2.6
-#gem install hub
-#hub pull-request -m "DocCollector Update for ${TRAVIS_PULL_REQUEST}" -b "imazen/resizer-web:production"
+# delete previous branch
+git push pr :"${TRAVIS_BRANCH}_docs"
+git push -u pr "${TRAVIS_BRANCH}_docs"
+
+base="imazen/resizer-web:production"
+head="imazen-bot/resizer-web:${TRAVIS_BRANCH}_docs_${TRAVIS_BUILD_NUMBER}"
+hub="${TRAVIS_BUILD_DIR}/Tools/DocCollector/hub/hub-$(uname -s)-$(uname -m)-2.2.9"
+$hub pull-request -m "DocCollector Update" -b $base -h $head
