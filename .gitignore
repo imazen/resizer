@@ -71,3 +71,5 @@ ipch/
 *.res
 .vs/
 /Samples/PluginTestingApp/App_Data
+*.opendb
+*.db
