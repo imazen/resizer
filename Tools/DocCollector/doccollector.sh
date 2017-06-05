@@ -21,10 +21,13 @@ if [ ! "${TRAVIS_PULL_REQUEST}" = "" ]; then
   exit 4
 fi
 
+if [ $(git config --global user.email) = "" ]; then
+  git config --global user.name "Imazen Bot"
+  git config --global user.email "codebot@imazen.io"
+fi
+
 cd "${TRAVIS_BUILD_DIR}/Tools/DocCollector" || exit
 git clone "https://${GITHUB_TOKEN}@github.com/imazen/resizer-web.git"
-git config --global user.name "Imazen Bot"
-git config --global user.email "codebot@imazen.io"
 cd "${TRAVIS_BUILD_DIR}/Tools/DocCollector/resizer-web" || exit
 git remote add pr "https://${GITHUB_TOKEN}@github.com/imazen-bot/resizer-web.git"
 git checkout -f production
