@@ -37,14 +37,14 @@ bundle -j4
 git fetch --all
 bundle exec rake "resizer[${TRAVIS_BUILD_DIR}]"
 cd "${TRAVIS_BUILD_DIR}/Tools/DocCollector/resizer-web" || exit
-git branch -D "${TRAVIS_BRANCH}_docs"
-git checkout -b "${TRAVIS_BRANCH}_docs"
+git branch -D "${TRAVIS_BRANCH}_docs_${TRAVIS_BUILD_NUMBER}"
+git checkout -b "${TRAVIS_BRANCH}_docs_${TRAVIS_BUILD_NUMBER}"
 git add .
 git status
 git commit -m "DocCollector Update for imazen/resizer#${TRAVIS_PULL_REQUEST}"
 # delete previous branch
-git push pr :"${TRAVIS_BRANCH}_docs"
-git push -u pr "${TRAVIS_BRANCH}_docs"
+git push pr :"${TRAVIS_BRANCH}_docs_${TRAVIS_BUILD_NUMBER}"
+git push -u pr "${TRAVIS_BRANCH}_docs_${TRAVIS_BUILD_NUMBER}"
 
 base="imazen/resizer-web:production"
 head="imazen-bot/resizer-web:${TRAVIS_BRANCH}_docs_${TRAVIS_BUILD_NUMBER}"
