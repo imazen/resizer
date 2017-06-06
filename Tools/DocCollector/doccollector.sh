@@ -34,6 +34,7 @@ git checkout -f production
 git pull
 cd "${TRAVIS_BUILD_DIR}/Tools/DocCollector" || exit
 bundle -j4
+git branch
 bundle exec rake "resizer[${TRAVIS_BUILD_DIR}]"
 cd "${TRAVIS_BUILD_DIR}/Tools/DocCollector/resizer-web" || exit
 git branch -D "${TRAVIS_BRANCH}_docs"
