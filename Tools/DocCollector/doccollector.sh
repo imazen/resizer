@@ -18,7 +18,8 @@ fi
 
 # TRAVIS_PULL_REQUEST should be unset
 if [ ! "${TRAVIS_PULL_REQUEST}" = "" ]; then
-  exit 4
+  echo "This won't run on PRs"
+  exit 0
 fi
 
 if [ "$(git config user.email)" = "" ]; then
