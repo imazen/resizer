@@ -226,7 +226,7 @@ namespace ImageResizer.Configuration.Performance
         Dictionary<string, List<string>> GetImageResizerVersions(Assembly[] assemblies)
         {
 
-            //Verify we're using the same general version of all ImageResizer assemblies.
+            //Verify we're using the same file version of all ImageResizer assemblies.
             var versions = new Dictionary<string, List<string>>();
             foreach (var a in assemblies) {
                 var is_imazen_assembly = a.GetFirstAttribute<AssemblyCopyrightAttribute>()?.Copyright?.Contains("Imazen") == true;
@@ -235,7 +235,7 @@ namespace ImageResizer.Configuration.Performance
                 if (!an.Name.StartsWith("ImageResizer", StringComparison.OrdinalIgnoreCase) || !is_imazen_assembly) {
                     continue;
                 }
-                var key = an.Version.Major + "." + an.Version.Minor + "." + an.Version.Build;
+                var key = a.GetFileVersion() ?? an.Version.Major + "." + an.Version.Minor + "." + an.Version.Build;
                 if (!versions.ContainsKey(key)) versions[key] = new List<string>();
                 versions[key].Add(an.Name);
             }
