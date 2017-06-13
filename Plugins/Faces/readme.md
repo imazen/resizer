@@ -106,21 +106,6 @@ Each item in the 'features' array contains the following members
 
 For RedEye results, only rectangles where Feature=0 are eyes. Feature=1 means Eye Pair, Feature = 2 means face.
 
-
-
-
-## Managed Dependencies
-
-* ImageResizer.dll
-* AForge.dll
-* AForge.Math.dll
-* AForge.Imaging.dll
-* AForge.Imaging.Formats.dll 
-* OpenCvSharp.dll
-* OpenCvSharp.dll.config
-* Newtonsoft.Json.dll
-
-
 ## Feature classification files
 
 [You can download all the XML files](http://downloads.imageresizing.net/OpenCV-2.3.1-all-cascades.zip) in a single .ZIP file. You only need to copy the following into the /bin folder.
