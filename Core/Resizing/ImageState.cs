@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 
 namespace ImageResizer.Resizing {
@@ -88,7 +89,10 @@ namespace ImageResizer.Resizing {
                 //For CMYK images, we must use DrawImage instead.
                 preRenderBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height, PixelFormat.Format24bppRgb);
                 using (var g = Graphics.FromImage(preRenderBitmap)) {
-                    g.DrawImageUnscaled(sourceBitmap, 0, 0);
+                    g.CompositingMode = CompositingMode.SourceCopy;
+                    g.CompositingQuality= CompositingQuality.HighSpeed;
+                    g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                    g.DrawImage(sourceBitmap, 0, 0, sourceBitmap.Width, sourceBitmap.Height);
                 }
              }
         }
