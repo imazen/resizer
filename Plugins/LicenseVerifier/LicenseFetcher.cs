@@ -275,6 +275,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 this.callback = callback;
                 this.clock = clock;
                 IntervalTicks = clock.TicksPerSecond * intervalSeconds;
+                lastBegun = -IntervalTicks;
             }
 
             public void Heartbeat()
