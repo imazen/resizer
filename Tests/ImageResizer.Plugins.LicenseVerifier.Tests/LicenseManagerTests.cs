@@ -29,7 +29,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 return;
             }
 
-            var clock = new RealClock();
+            var clock = new OffsetClock("2017-04-25", "2017-04-25");
             var cache = new StringCacheMem();
 
             // Populate cache
@@ -117,7 +117,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         [Fact]
         public void Test_Offline_License_Failure()
         {
-            var clock = new RealClock();
+            var clock = new OffsetClock("2017-04-25", "2017-04-25");
             var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test, clock) {
                 Cache = new StringCacheMem()
             };
@@ -148,7 +148,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         [Fact]
         public void Test_Offline_License_Success()
         {
-            var clock = new RealClock();
+            var clock = new OffsetClock("2017-04-25", "2017-04-25");
             var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test, clock) {
                 Cache = new StringCacheMem()
             };
@@ -184,7 +184,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
                 return;
             }
-            var clock = new RealClock();
+            var clock = new OffsetClock("2017-04-25", "2017-04-25");
             var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test, clock) {
                 Cache = new StringCacheMem()
             };
