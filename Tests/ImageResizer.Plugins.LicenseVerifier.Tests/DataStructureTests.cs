@@ -5,6 +5,8 @@ using System.Linq;
 using ImageResizer.Configuration.Performance;
 using Xunit;
 using Xunit.Abstractions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins.LicenseVerifier.Tests
 {
@@ -259,6 +261,51 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             Assert.Equal(150, s.GetPercentile(0.11f));
 
             Assert.Equal(100, s.GetPercentile(0.0f));
+        }
+
+
+        [Fact]
+        public void TestInterlocked()
+        {
+            long v = 1;
+            Assert.Equal(1, Interlocked.CompareExchange(ref v, 3, 0));
+            Assert.Equal(1, Interlocked.CompareExchange(ref v, 0, 0));
+            Assert.Equal(1, Interlocked.CompareExchange(ref v, 0, 1));
+
+            Assert.Equal(0, Interlocked.CompareExchange(ref v, 0, 0));
+
+            Assert.Equal(0, Interlocked.CompareExchange(ref v, 4, 0));
+
+            Assert.Equal(4, Interlocked.CompareExchange(ref v, 0, 4));
+        }
+        [Fact]
+        public void TestInterlockedMax()
+        {
+            long v = 0;
+            var tasks = Enumerable.Repeat(0, 30).Select((j) => Task.Run(() =>
+             {
+                 for (var i = 0; i < 100000; i++)
+                 {
+                     Utilities.InterlockedMax(ref v, v + 1);
+                 }
+             })).ToArray();
+
+            Task.WaitAll(tasks);
+        }
+
+        [Fact]
+        public void TestInterlockedMin()
+        {
+            long v = 0;
+            var tasks = Enumerable.Repeat(0, 30).Select((j) => Task.Run(() =>
+            {
+                for (var i = 0; i < 100000; i++)
+                {
+                    Utilities.InterlockedMin(ref v, v - 1);
+                }
+            })).ToArray();
+
+            Task.WaitAll(tasks);
         }
     }
 }
