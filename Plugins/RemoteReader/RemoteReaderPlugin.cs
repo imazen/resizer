@@ -45,12 +45,16 @@ namespace ImageResizer.Plugins.RemoteReader {
         /// </summary>
         public int AllowedRedirects { get; set; }
 
-        public bool SkipUriValidation { get; set; } = false;
+        /// <summary>
+        /// Optionally skip validation using Uri.IsWellFormedUriString() to prevent errors with some non-standard URLs in use
+        /// </summary>
+        public bool SkipUriValidation { get; set; }
 
         protected string remotePrefix = "~/remote";
         Config c;
         public RemoteReaderPlugin() {
             AllowedRedirects = 5;
+            SkipUriValidation = false;
             try {
                 remotePrefix = Util.PathUtils.ResolveAppRelativeAssumeAppRelative(remotePrefix);
                 //Remote prefix must never end in a slash - remote.jpg syntax...
