@@ -45,6 +45,8 @@ namespace ImageResizer.Plugins.RemoteReader {
         /// </summary>
         public int AllowedRedirects { get; set; }
 
+        public bool SkipUriValidation { get; set; } = false;
+
         protected string remotePrefix = "~/remote";
         Config c;
         public RemoteReaderPlugin() {
@@ -67,6 +69,7 @@ namespace ImageResizer.Plugins.RemoteReader {
             c.Pipeline.RewriteDefaults += Pipeline_RewriteDefaults;
             c.Pipeline.PostRewrite += Pipeline_PostRewrite;
             AllowedRedirects = c.get("remoteReader.allowedRedirects",AllowedRedirects);
+            SkipUriValidation = c.get("remoteReader.skipUriValidation", SkipUriValidation);
 
             return this;
         }
@@ -225,7 +228,7 @@ namespace ImageResizer.Plugins.RemoteReader {
                 args.RemoteUrl = "http://" + ReplaceInLeadingSegment(virtualPath.Substring(remotePrefix.Length).TrimStart('/', '\\'), "_", ".");
                 args.RemoteUrl = Uri.EscapeUriString(args.RemoteUrl);
             }
-            if (!Uri.IsWellFormedUriString(args.RemoteUrl, UriKind.Absolute))
+            if (!SkipUriValidation && !Uri.IsWellFormedUriString(args.RemoteUrl, UriKind.Absolute))
                 throw new ImageProcessingException("Invalid request! The specified Uri is invalid: " + args.RemoteUrl);
             return args;
         }
