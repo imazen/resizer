@@ -38,7 +38,7 @@ namespace ImageResizer.Plugins.AnimatedGifs
             
             if (!AnalyzeGifSignature(dataList))
             {
-                throw (new Exception("File is not a gif!"));
+                throw (new Exception("File is not a GIF!"));
             }
             AnalyzeScreenDescriptor(dataList);
             GIFBlockType blockType = GetTypeOfNextBlock(dataList);

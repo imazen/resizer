@@ -93,7 +93,7 @@ namespace ImageResizer.Plugins.Basic {
 
             PointF[,] corners = PolygonMath.GetCorners(poly, width);
             PointF[,] sides = PolygonMath.GetSides(poly, width);
-            //Overlapping these causes darker areas... Dont use InflatePoly
+            //Overlapping these causes darker areas... Don't use InflatePoly
 
             //Paint corners
             for (int i = 0; i <= corners.GetUpperBound(0); i++) {

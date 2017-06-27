@@ -17,7 +17,7 @@ namespace FreeImageAPI
 
         static FreeImageEngine()
         {
-            // Check if FreeImage.dll is present and cancel setting the callbackfuntion if not
+            // Check if FreeImage.dll is present and cancel setting the callback function if not
             if (!IsAvailable)
             {
                 return;
@@ -38,7 +38,7 @@ namespace FreeImageAPI
 
             // Check the local copy instead of the static instance
             // to prevent a second thread from setting the delegate
-            // to null, which would cause a nullreference exception
+            // to null, which would cause a null reference exception
             if (m != null)
             {
                 // Invoke the multicast-delegate

@@ -154,7 +154,7 @@ namespace ImageResizer.Plugins.RedEye {
         public bool[,] filledArray;
 
         /// <summary>
-        /// A queue of points which have been filled, but their neighbors not yet evalutated.
+        /// A queue of points which have been filled, but their neighbors not yet evaluated.
         /// </summary>
         Queue<System.Drawing.Point> q;
         /// <summary>
@@ -267,7 +267,7 @@ namespace ImageResizer.Plugins.RedEye {
 
             //Prevent out-of-radius
             double distance = Math.Sqrt((n.X - StartAt.X) * (n.X - StartAt.X) + (n.Y - StartAt.Y) * (n.Y - StartAt.Y));
-            if (distance > MaxRadius) return; //This can be easily optimized by calculating once for the parent, and only doing exact measurments if within 2px. 
+            if (distance > MaxRadius) return; //This can be easily optimized by calculating once for the parent, and only doing exact measurements if within 2px.
 
             //Get value
             byte val = red.Collect8bppPixelValues(new List<AForge.IntPoint>(new AForge.IntPoint[] { new AForge.IntPoint(n.X, n.Y) }))[0];
@@ -315,7 +315,7 @@ namespace ImageResizer.Plugins.RedEye {
             ////double factor = 1 - Math.Min(1, (mdist + cdist) / 2); //Using linear scaling, translating to 0-1 multiplier
 
 
-            ////If we're going out-of-bounds, we need to evalutate total as well as local thresholding.
+            ////If we're going out-of-bounds, we need to evaluate total as well as local thresholding.
             //double total = (double)(val - MinValue) / (double)(MaxValue - MinValue) * 0.25; // 0 to ~1
             //double diff = (double)(val - parentValue) / (double)(MaxValue - MinValue); //~-1 to ~1.
             ////Compare average distance factors to average value factors
@@ -363,7 +363,7 @@ namespace ImageResizer.Plugins.RedEye {
 
         }
         /// <summary>
-        /// Bulrs edges of filled red-eye.
+        /// Blurs edges of filled red-eye.
         /// </summary>
         /// <returns></returns>
         public UnmanagedImage GetBlurredMask() {

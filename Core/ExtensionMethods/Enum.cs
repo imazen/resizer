@@ -180,7 +180,7 @@ namespace ImageResizer.ExtensionMethods {
         }
 
         /// <summary>
-        /// Retuns the string representation for the given enumeration
+        /// Returns the string representation for the given enumeration
         /// </summary>
         /// <param name="en"></param>
         /// <param name="lowerCase"></param>

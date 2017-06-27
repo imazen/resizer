@@ -43,7 +43,7 @@ namespace ImageResizer.Plugins.Basic {
                     if (httpContext.Items[_contextItemsFlag] != null)
                         return new RouteData(this, new StopRoutingHandler());
                 }
-                catch (NotImplementedException) { } //For compatibility with Kendo UI and unit test/mocks which dont' implement .Items
+                catch (NotImplementedException) { } //For compatibility with Kendo UI and unit test/mocks which don't implement .Items
 
                 return null;
             }

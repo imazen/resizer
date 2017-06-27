@@ -79,7 +79,7 @@ namespace ImageResizer.Plugins.DiagnosticJson
 
         /// <summary>
         /// This is where we hijack the resizing process, interrupt it, and send
-        /// back the json data we created.
+        /// back the JSON data we created.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="context"></param>

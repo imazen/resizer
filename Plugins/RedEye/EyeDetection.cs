@@ -117,7 +117,7 @@ namespace ImageResizer.Plugins.RedEye {
                     //TODO!!! Uncomment and test now that CompareByNeighbors sorts correctly
                     //Array.Sort<CvAvgComp>(pairs, CompareByNeighbors); 
                     //Take the 1st most likely that actually contains eyes. We don't want to evaluate multiple eye pairs when there are no faces.
-                    //If there are pairs, evalutate them all. Finding eyes within multiple pairs is unlikely
+                    //If there are pairs, evaluate them all. Finding eyes within multiple pairs is unlikely
                     foreach (CvAvgComp pair in pairs) {
                         var results = DetectFeaturesInPair(img, storage, pair);
                         eyes.AddRange(results);
@@ -158,7 +158,7 @@ namespace ImageResizer.Plugins.RedEye {
 
                 eyes.AddRange(DetectEyesInRegion(img, storage, r));
             }
-            //If there are pairs, evalutate them all. Finding eyes within multiple pairs is unlikely
+            //If there are pairs, evaluate them all. Finding eyes within multiple pairs is unlikely
             for (var i = 0; i < pairs.Length; i++) {
                 CvAvgComp pair = pairs[i]; //Adjust for ROI
                 pair.Rect.X += r.X;

@@ -5,17 +5,21 @@ Aliases: /plugins/faces
 
 # Faces plugin
 
+*PLEASE NOTE*
+* **This plugin is not forwards-compatible. Avoid these URL commands for maximum compatibility with Imageflow and future major ImageResizer releases.**
+* **Do not use with untrusted image data. This plugin relies on third-party C and C++ code which we have not audited (OpenCV).**
+* **While we provide a baseline version of OpenCV, we suggest that you check for the latest compatible release, at it may include security fixes.**
+
+
 You can find a sample project for this plugin in `\Samples\ImageStudio` within the full download 
 
 Human face detection plugin. Provides automatic face detection, as well as the CropAround plugin, which can even be combined in a single request (using &c.focus=faces) to provide face-focused/face-preserving cropping.
 
-OpenCV is required for face detection. Requires V3.2 or higher.
-
-A NuGet package for this plugin is not available, due to the vast number of dependencies. 
+OpenCV is required for face detection. 
+You **must** disable overlapped recycling on the application pool running this plugin. OpenCV cannot handle multiple instances per plugin.
 
 OpenCV does not support being used from multiple app domains. If you get a "Type Initializer Exception", restart the application pool and verify that it only contains 1 application, and that overlapped recycle is disabled.
 
-You **must** disable overlapped recycling on the application pool running this plugin. OpenCV cannot handle multiple instances per plugin.
 
 ## URL Usage
 
@@ -63,7 +67,7 @@ All tuning parameters are identical between the URL and Managed API.
 2. Add `<add name="Faces" downloadNativeDependencies="true" />` inside `<resizer><plugins></plugins></resizer>` in Web.config.
 3. If you're not comfortable allowing the plugin to automatically download the correct bitness versions of the unmanaged dependencies, then set downloadNativeDependencies="false" and keep reading.
 3. Manually copy the required xml files to the /bin folder of your application (see *Feature classification files*)
-4. Manually copy all required dlls to the /bin folder of your application. (see *Using the 2.3.1 pre-compiled binaries*)
+4. Manually copy all required DLLs to the /bin folder of your application. (see *Using the 2.3.1 pre-compiled binaries*)
 
 
 
@@ -85,7 +89,7 @@ The JSON response contains image layout information so StudioJS or ImageResizer.
 
 * ow/oh - original image width/height
 * cropx/cropy/cropw/croph - Source rectangle on original image that has been cropped/copied to the result image
-* dx/dy/dw/dh - Destination rectangle on result image that contains the imagery from cropx/cropy/cropw/cropg. If rotation is used, this will be the bounding box.
+* dx/dy/dw/dh - Destination rectangle on result image that contains the imagery from cropx/cropy/cropw/croph. If rotation is used, this will be the bounding box.
 * message - String containing error message() if any
 * features - array of rects describing features. Rect = {X,Y,X2,Y2,Accuracy, (Feature)} 
 
@@ -100,22 +104,7 @@ Each item in the 'features' array contains the following members
 * Accuracy
 * Feature (only for RedEye)
 
-For RedEye results, only rectanges where Feature=0 are eyes. Feature=1 means Eye Pair, Feature = 2 means face.
-
-
-
-
-## Managed Dependencies
-
-* ImageResizer.dll
-* AForge.dll
-* AForge.Math.dll
-* AForge.Imaging.dll
-* AForge.Imaging.Formats.dll 
-* OpenCvSharp.dll
-* OpenCvSharp.dll.config
-* Newtonsoft.Json.dll
-
+For RedEye results, only rectangles where Feature=0 are eyes. Feature=1 means Eye Pair, Feature = 2 means face.
 
 ## Feature classification files
 
@@ -125,7 +114,7 @@ For RedEye results, only rectanges where Feature=0 are eyes. Feature=1 means Eye
 
 ## Using the 2.3.1 pre-compiled binaries
 
-All dlls must match in bitness. All dlls are bitness specific. You can't run OpenCV x86 on an x64 app pool or vice versa. 
+All DLLs must match in bitness. All DLLs are bitness specific. You can't run OpenCV x86 on an x64 app pool or vice versa.
 
 * [Download 32-bit DLLs](http://downloads.imageresizing.net/OpenCv-min-2.3.1-x86.zip).
 * [Download 64-bit DLLs](http://downloads.imageresizing.net/OpenCv-min-2.3.1-x64.zip).

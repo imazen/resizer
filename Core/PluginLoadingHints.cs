@@ -37,14 +37,32 @@ namespace ImageResizer.Configuration
             else return null;
         }
 
+        public IDictionary<string, string> GetReverseHints()
+        {
+            var dict = new Dictionary<string, string>();
+            foreach(var pair in hints.SelectMany(p => p.Value.Select(v => new KeyValuePair<string,string>(v, p.Key))))
+            {
+                var key = pair.Key;
+                //Truncate the assembly name
+                var comma = key.IndexOf(',');
+                if (comma > -1) key = key.Substring(0, comma);
+                if (!dict.ContainsKey(key))
+                {
+                    dict[key] = pair.Value;
+                }
+            }
+            return dict;
+        }
+
         private void LoadHints(){
             
 
             //All plugins found in ImageResizer.dll under the ImageResizer.Plugins.Basic namespace
-            foreach (string basic in new []{"AutoRotate", "ClientCache", "DefaultEncoder", "DefaultSettings", "Diagnostic", "DropShadow",
+            foreach (string basic in new []{"AutoRotate", "LicenseDisplay", "ClientCache", "DefaultEncoder", "DefaultSettings", "Diagnostic", "DropShadow",
                             "FolderResizeSyntax", "Gradient", "IEPngFix", "Image404", "ImageHandlerSyntax", "ImageInfoAPI", 
-                             "NoCache", "Presets", "SizeLimiting", "SpeedOrQuality", "Trial", "VirtualFolder"})
+                             "NoCache", "Presets", "SizeLimiting", "SpeedOrQuality", "Trial", "VirtualFolder", "WebConfigLicenseReader"})
                 AddHint(basic, "ImageResizer.Plugins.Basic." + basic + ", ImageResizer");
+            
 
             //Except this one
             AddHint("MvcRoutingShim", "ImageResizer.Plugins.Basic.MvcRoutingShimPlugin, ImageResizer");
@@ -70,7 +88,7 @@ namespace ImageResizer.Configuration
             AddHint("CropAround", "ImageResizer.Plugins.CropAround.CropAroundPlugin, ImageResizer.Plugins.Faces");
 
             //Add 5 plugins inside FreeImage
-            foreach (string s in new[] { "FreeImageBuilder", "FreeImageDecoder","FreeImageEncoder","FreeImageScaler","FreeImageResizer"})
+            foreach (string s in new[] { "FreeImageBuilder", "FreeImageDecoder","FreeImageEncoder","FreeImageScaler", "FreeImageScaling", "FreeImageResizer" })
                 AddHint(s, "ImageResizer.Plugins." + s + "." + s + "Plugin, ImageResizer.Plugins.FreeImage");
 
             //Add 2 plugins inside WebP

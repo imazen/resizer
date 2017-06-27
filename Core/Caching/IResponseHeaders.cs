@@ -52,7 +52,7 @@ namespace ImageResizer.Caching {
         /// </summary>
         NameValueCollection DefaultHeaders { get; set; }
         /// <summary>
-        /// These headers are applied after applying all of the other settings. (and they will overwrite exisiting values).
+        /// These headers are applied after applying all of the other settings (and they will overwrite existing values).
         /// </summary>
         NameValueCollection Headers { get; set; }
 

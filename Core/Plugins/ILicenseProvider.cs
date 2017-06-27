@@ -8,7 +8,7 @@ using System.Text;
 
 namespace ImageResizer.Plugins {
     /// <summary>
-    /// Provides a place to cache/store licenses. Only responsible for licenses used by plugins attached to the current Config instance.
+    /// Provides user-provided license blobs or subscription keys
     /// </summary>
     public interface ILicenseProvider:IPlugin {
         /// <summary>
@@ -17,4 +17,5 @@ namespace ImageResizer.Plugins {
         /// <returns></returns>
         ICollection<string> GetLicenses();
     }
+    
 }

@@ -92,7 +92,7 @@ namespace ImageResizer.Configuration.Plugins {
             if (TargetFolder == null)
             {
                 this.AcceptIssue(
-                    new Issue("Applicaiton does not have IOPermission; Native dependencies for " + assemblyName +
+                    new Issue("Application does not have IOPermission; Native dependencies for " + assemblyName +
                               " will not be downloaded if missing"));
                 return;
             }
@@ -113,7 +113,7 @@ namespace ImageResizer.Configuration.Plugins {
                     if (c.Attrs["fileBytes"] != null && !int.TryParse(c.Attrs["fileBytes"], System.Globalization.NumberStyles.Number, NumberFormatInfo.InvariantInfo, out fileBytes))
                         this.AcceptIssue(new Issues.Issue("Failed to parse fileBytes value " + c.Attrs["fileBytes"] + " in native dependency manifest for " + assemblyName, Issues.IssueSeverity.Warning));
 
-                    //Download url?
+                    //Download URL?
                     string url = c.Attrs["url"];
 
 
@@ -142,7 +142,7 @@ namespace ImageResizer.Configuration.Plugins {
                 sw.Stop();
                 if (sw.ElapsedMilliseconds > 100 && q.Count < 1) this.AcceptIssue(new Issues.Issue("Verifying native dependencies for " + assemblyName + " took " + sw.ElapsedMilliseconds + "ms.", Issues.IssueSeverity.Warning));
 
-                ServicePointManager.DefaultConnectionLimit = 1000; //Allow more than 2 simultaneous http requests.
+                ServicePointManager.DefaultConnectionLimit = 1000; //Allow more than 2 simultaneous HTTP requests.
                 StringBuilder message = new StringBuilder();
                 if (q.Count > 0) {
                     Stopwatch dsw = new Stopwatch();

@@ -10,6 +10,8 @@ The Logging plugin allows the Image Resizer to perform logging (to disk, SQL, e-
 
 It is a wrapper for NLog, and as such, requires NLog.dll
 
+This plugin is not officially supported, as it relies on the process-wide NLog singleton, and very few of our users have been able to get NLog to work.
+
 ## Installation
 
 1. Add ImageResizer.Plugins.Logging.dll to your project or run `Install-Package ImageResizer.Plugins.Logging`. NLog.dll is also needed, but doesn't have to be referenced directly - it should be automatically copied if you are using Visual Studio. If not, copy it to the /bin folder as well

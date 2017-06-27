@@ -2,11 +2,20 @@ Aliases: /plugins/pdfrenderer
 Tags: Plugin
 Bundle: free
 Edition: free
-Tagline: Render PDFs to images dynamically, then crop or process them as an image.
+Tagline: Obsolete. See PdfiumRenderer. 
 
-# PdfRenderer (New in V3.1.3)
+# PdfRenderer
 
-Note: The PdfRenderer plugin uses the Ghostscript library, **which is under the GPLv3**. As such, any binaries using that library **are also under the GPL v3**. [Click here for the full licensing details on this](/licenses/pdfrenderer). The PdfRenderer plugin was written by Jason Morse. I have reviewed, vetted, and tested his code.
+*PLEASE NOTE*
+* **This plugin has been deprecated in favor of PdfiumRenderer**
+* **This plugin uses the Ghostscript library, which is under the GPLv3. As such, any binaries using that library are also under the GPL v3. [Click here for the full licensing details on this](/licenses/pdfrenderer).**
+* **This plugin is not forwards-compatible. Avoid usage for maximum compatibility with Imageflow and future major ImageResizer releases.**
+* **Do NOT use with untrusted data. This plugin passes source files to potentially vulnerable software (Ghostscript).**
+* **Using this plugin with malicious PDFs could result in a remote code execution vulnerability.**
+* You can find [recent Ghostscript vulnerabilities here](https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=ghostscript)
+
+
+Jason Morse is the original author of this plugin. 
 
 The PdfRenderer plugin renders PDF files to the dimensions specified by the `width` and `height` commands. You may use the `mode` command to pad, crop, stretch, or seam carve the result to match your desired aspect ratio. All resizer commands can be used in combination with the plugin.
 
@@ -18,7 +27,6 @@ Ex. `/docs.pdf?format=png&width=400`.
 
 ### Requirements
 
-* .NET 3.5 or higher
 * gsdll32.dll or gsdll64.dll in the /bin directory, depending on application bitness. Including both is a good idea, in case you need to change the bitness unexpectedly.
 
 ### Configuration

@@ -9,8 +9,12 @@ Textclass: none
 h1 SimpleFilters plugin
 
 .markdown-body
-  p This plugin provides grayscale, sepia, brightness, saturation, contrast, inversion, and alpha filtering options. It also includes beta support for rounded corners.
-  p These filters are implemented as adjustment matrices and are processed by native code for very high performance.
+	markdown: 
+		This plugin provides grayscale, sepia, brightness, saturation, contrast, inversion, and alpha filtering options. It also includes beta support for rounded corners, although we suggest [CSS border-radius](http://caniuse.com/#search=border-radius) instead.  
+		
+		These filters are implemented as adjustment matrices and are processed by native code for very high performance.
+		
+		No forwards-compatibility is guaranteed for any SimpleFilters commands, but `s.roundcorners` is the least likely to be present in a future major release.
 
 
 - image_width = 400
@@ -70,7 +74,7 @@ div.markdown-body
     1. Add `ImageResizer.Plugins.SimpleFilters.dll` to your project
     2. Add `<add name="SimpleFilters" />` inside `<resizer><plugins></plugins></resizer>` in Web.config.
     
-    ## Usage (v3.1+)
+    ## Usage
 
     **Note the order in which effects are applied *MAY CHANGE* in future releases.**
 

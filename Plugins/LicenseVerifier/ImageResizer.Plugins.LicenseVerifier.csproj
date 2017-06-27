@@ -38,6 +38,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
@@ -46,8 +47,15 @@
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="LicenseVerifier.cs" />
-    <Compile Include="LicenseService.cs" />
+    <Compile Include="LicenseChain.cs" />
+    <Compile Include="Computation.cs" />
+    <Compile Include="DomainLookup.cs" />
+    <Compile Include="LicensingSupport.cs" />
+    <Compile Include="LicenseEnforcerPlugin.cs" />
+    <Compile Include="LicenseFetcher.cs" />
+    <Compile Include="LicenseManager.cs" />
+    <Compile Include="LicenseParsing.cs" />
+    <Compile Include="LicensingOn.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

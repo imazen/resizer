@@ -3,7 +3,7 @@
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the GNU Affero General Public License, Version 3.0.
 // Commercial licenses available at http://imageresizing.net/
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Resizing;
@@ -19,6 +19,7 @@ using ImageResizer.Plugins.FreeImageEncoder;
 using ImageResizer.Plugins.FreeImageScaling;
 using ImageResizer.Configuration;
 using System.Web.Hosting;
+using System.Diagnostics;
 
 namespace ImageResizer.Plugins.FreeImageBuilder {
     /// <summary>
@@ -84,7 +85,7 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
             if (job.ResetSourceStream) restoreStreamPosition = true;
             job.SourcePathData = path;
 
-            //Save the original stream positione
+            //Save the original stream position
             originalPosition = (restoreStreamPosition) ? s.Position : -1;
             try {
                 //What is our destination format
@@ -94,8 +95,17 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
 
                 bool supportsTransparency = managedEncoder.SupportsTransparency;
 
-
+                var decodeTime = Stopwatch.StartNew();
                 return (RequestedAction)FreeImageDecoder.FreeImageDecoderPlugin.DecodeAndCall(s, job.Settings, delegate(ref FIBITMAP original, bool mayUnloadOriginal) {
+                    decodeTime.Stop();
+                    job.DecodeTicks = decodeTime.ElapsedTicks;
+
+                    if (!original.IsNull)
+                    {
+                        job.ResultInfo["source.width"] = (int)FreeImage.GetWidth(original);
+                        job.ResultInfo["source.height"] = (int)FreeImage.GetHeight(original);
+                    }
+
                     FIBITMAP b = FIBITMAP.Zero;
                     try {
                         //Do all the bitmap stuff in another method
@@ -119,9 +129,15 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
                                     string dirName = Path.GetDirectoryName(job.FinalPath);
                                     if (!Directory.Exists(dirName)) Directory.CreateDirectory(dirName);
                                 }
+                                var encodeTime = Stopwatch.StartNew();
                                 if (!FreeImage.Save(e.Format, b, job.FinalPath, e.EncodingOptions)) return RequestedAction.None;
+                                encodeTime.Stop();
+                                job.EncodeTicks = encodeTime.ElapsedTicks;
                             } else if (job.Dest is Stream) {
+                                var encodeTime = Stopwatch.StartNew();
                                 if (!FreeImage.SaveToStream(b, (Stream)job.Dest, e.Format, e.EncodingOptions)) return RequestedAction.None;
+                                encodeTime.Stop();
+                                job.EncodeTicks = encodeTime.ElapsedTicks;
                             }
                         } else if (job.Dest == typeof(Bitmap)) {
                             job.Result = FreeImage.GetBitmap(b);
@@ -138,7 +154,7 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
             }
 
         }
-   
+
 
         /// <summary>
         /// Builds an FIBitmap from the stream and job.Settings 
@@ -199,6 +215,12 @@ namespace ImageResizer.Plugins.FreeImageBuilder {
                 if (final.IsNull) return FIBITMAP.Zero;
             }
 
+            if (!final.IsNull)
+            {
+                job.ResultInfo["final.width"] = (int)FreeImage.GetWidth(final);
+                job.ResultInfo["final.height"] = (int)FreeImage.GetHeight(final);
+            }
+            
             return final;
 
         }

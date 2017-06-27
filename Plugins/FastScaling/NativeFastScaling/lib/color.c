@@ -191,7 +191,7 @@ bool BitmapBgra_populate_histogram (Context * context, BitmapBgra * bmp, uint64_
                     uint8_t* const __restrict data = bmp->pixels + stride * y + x * ch;
                     //Calculate luminosity and saturation
                     histograms[(306 * data[2] + 601 * data[1] + 117 * data[0]) >> shift]++;
-                    histograms[histogram_size_per_channel + (max(255,max(abs ((int)data[2] - (int)data[1]),abs ((int)data[1] - (int)data[0]))) >> shift)]++;
+                    histograms[histogram_size_per_channel + (int_max(255,int_max(abs ((int)data[2] - (int)data[1]),abs ((int)data[1] - (int)data[0]))) >> shift)]++;
                 }
             }
         }

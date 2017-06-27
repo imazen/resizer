@@ -6,15 +6,19 @@ Aliases: /plugins/redeye
 
 # RedEye plugin
 
+*PLEASE NOTE*
+* **This plugin is not forwards-compatible. Avoid these URL commands for maximum compatibility with Imageflow and future major ImageResizer releases.**
+* **Do not use with untrusted image data. This plugin relies on third-party C and C++ code which we have not audited (OpenCV).**
+* **While we provide a baseline version of OpenCV, we suggest that you check for the latest compatible release, at it may include security fixes.**
+
 You can find a sample project for this plugin in `\Samples\ImageStudio` within the full download 
 
-Provides automatic and manual red-eye detection and correction. For automatic face and eye detection, OpenCV is required. Requires V3.2 or higher.
-
-A NuGet package for this plugin is not available, due to the vast number of dependencies. 
+Provides automatic and manual red-eye detection and correction. For automatic face and eye detection, OpenCV is required.
 
 OpenCV does not support being used from multiple app domains. If you get a "Type Initializer Exception", restart the application pool and verify that it only contains 1 application, and that overlapped recycle is disabled.
 
 You **must** disable overlapped recycling on the application pool running this plugin. OpenCV cannot handle multiple instances per plugin.
+
 
 ## Usage
 
@@ -24,13 +28,13 @@ You **must** disable overlapped recycling on the application pool running this p
 * r.detecteyes=true - Responds with a JSON result. See [the Faces plugin documentation for details](/plugins/faces).
 * r.getlayout=true - Responds with image layout info in JSON. See [the Faces plugin documentation for details](/plugins/faces).
 
-## Installation. 
+## Installation
 
 1. Add ImageResizer.Plugins.RedEye.dll to your project using Visual Studio. If you copy & paste to /bin, you'll need to also copy the files listed under Managed Dependencies.
 2. Add `<add name="RedEye" downloadNativeDependencies="true" />` inside `<resizer><plugins></plugins></resizer>` in Web.config.
 3. If you're not comfortable allowing the plugin to automatically download the correct bitness versions of the unmanaged dependencies, then set downloadNativeDependencies="false" and keep reading.
-3. Manually copy the required xml files to the /bin folder of your application (see *Feature classification files*)
-4. Manually copy all required dlls to the /bin folder of your application. (see *Using the 2.3.1 pre-compiled binaries*)
+3. Manually copy the required XML files to the /bin folder of your application (see *Feature classification files*)
+4. Manually copy all required DLLs to the /bin folder of your application. (see *Using the 2.3.1 pre-compiled binaries*)
 
 
 
@@ -59,7 +63,7 @@ You **must** disable overlapped recycling on the application pool running this p
 
 ## Using the 2.3.1 pre-compiled binaries
 
-All dlls must match in bitness. All dlls are bitness specific. You can't run OpenCV x86 on an x64 app pool or vice versa. 
+All DLLs must match in bitness. All DLLs are bitness specific. You can't run OpenCV x86 on an x64 app pool or vice versa.
 
 * [Download 32-bit DLLs](http://downloads.imageresizing.net/OpenCv-min-2.3.1-x86.zip).
 * [Download 64-bit DLLs](http://downloads.imageresizing.net/OpenCv-min-2.3.1-x64.zip).

@@ -56,7 +56,9 @@ namespace ImageResizer.Configuration
         public PostAuthorizeResult PostAuthorize(){
             conf.FirePostAuthorizeRequest(sender as IHttpModule, context);
 
-            //Allow handlers of the above event to change filePath/pathinfo so we can successfull test the extension
+            conf.FireHeartbeat();
+
+            //Allow handlers of the above event to change filePath/pathinfo so we can successfully test the extension
             string originalPath = conf.PreRewritePath;
            
             //Trim fake extensions so IsAcceptedImageType will work properly
@@ -69,6 +71,8 @@ namespace ImageResizer.Configuration
 
             //Copy the querystring so we can mod it to death without messing up other stuff.
             NameValueCollection queryCopy = new NameValueCollection(conf.ModifiedQueryString);
+
+            Performance.GlobalPerf.Singleton.PreRewriteQuery(queryCopy);
 
             //Call URL rewriting events
             UrlEventArgs ue = new UrlEventArgs(filePath, queryCopy);
@@ -103,8 +107,7 @@ namespace ImageResizer.Configuration
                 //Resolve the 'cache' setting to 'no' unless we want it cache. TODO: Understand this better
                 if (!CachingIndicated) RewrittenInstructions.Cache = ServerCacheMode.No;
 
-
-                
+                Performance.GlobalPerf.Singleton.QueryRewrittenWithDirective(RewrittenVirtualPath);
             }
 
 
@@ -112,7 +115,7 @@ namespace ImageResizer.Configuration
             {
                 var authEvent = new UrlAuthorizationEventArgs(RewrittenVirtualPath, new NameValueCollection(RewrittenQuery), true);
 
-                //Allow user code to deny access, but not modify the url or querystring.
+                //Allow user code to deny access, but not modify the URL or querystring.
                 conf.FireAuthorizeImage(sender, context, authEvent);
 
                 if (!authEvent.AllowAccess) {
@@ -147,15 +150,15 @@ namespace ImageResizer.Configuration
                 if (guessedEncoder == null) throw new ImageProcessingException("Image Resizer: No image encoder was found for the request.");
             }
 
-            //Determine the file extenson for the caching system to use if we aren't processing the image
-            //Use the exsiting one if is an image extension. If not, use "unknown". 
+            //Determine the file extension for the caching system to use if we aren't processing the image
+            //Use the existing one if is an image extension. If not, use "unknown".
             // We don't want to suggest writing .exe or .aspx files to the cache! 
             string fallbackExtension = PathUtils.GetFullExtension(RewrittenVirtualPath).TrimStart('.');
             if (!conf.IsAcceptedImageType(RewrittenVirtualPath)) fallbackExtension = "unknown";
 
             //Determine the mime-type if we aren't processing the image.
             string fallbackContentType = "application/octet-stream";
-            //Support jpeg, png, gif, bmp, tiff mime-types. Otherwise use "application/octet-stream". 
+            //Support JPEG, PNG, GIF, BMP, TIFF mime-types. Otherwise use "application/octet-stream".
             //We can't set it to null - it will default to text/html
             System.Drawing.Imaging.ImageFormat recognizedExtension = DefaultEncoder.GetImageFormatFromExtension(fallbackExtension);
             if (recognizedExtension != null) fallbackContentType = DefaultEncoder.GetContentTypeFromImageFormat(recognizedExtension);
@@ -163,6 +166,8 @@ namespace ImageResizer.Configuration
 
             EstimatedContentType = ProcessingIndicated ? guessedEncoder.MimeType : fallbackContentType;
             EstimatedFileExtension = ProcessingIndicated ? guessedEncoder.Extension : fallbackExtension;
+
+            Performance.GlobalPerf.Singleton.IncrementCounter("module_response_ext_" + EstimatedFileExtension);
         }
 
         public void FireMissing()
@@ -172,6 +177,8 @@ namespace ImageResizer.Configuration
 
             //Remove the image from context items so we don't try to write response headers.
             context.Items[conf.ResponseArgsKey] = null;
+            Performance.GlobalPerf.Singleton.IncrementCounter("postauth_404_");
+
         }
 
         private  IHttpHandler CreateSFH(){
@@ -187,10 +194,40 @@ namespace ImageResizer.Configuration
                 context.RewritePath(this.RewrittenVirtualPath + PathUtils.BuildQueryString(this.RewrittenQuery)); //Apply the new querystring also, or it would be lost
             }
         }
+
         public void AssignSFH()
         {
-            
+
             context.RemapHandler(CreateSFH());
+        }
+
+        internal void FireAccessDenied()
+        {
+            Performance.GlobalPerf.Singleton.IncrementCounter("postauthjob_403");
+        }
+
+        internal void FireJobSuccess()
+        {
+            Performance.GlobalPerf.Singleton.IncrementCounter("postauthjob_ok");
+        }
+
+        internal void FirePostAuthorizeSuccess()
+        {
+            Performance.GlobalPerf.Singleton.IncrementCounter("postauth_ok");
+        }
+
+
+
+        internal void FirePostAuthorizeRequestException(Exception ex)
+        {
+            Performance.GlobalPerf.Singleton.IncrementCounter("postauth_errors_" + ex.GetType().Name);
+            Performance.GlobalPerf.Singleton.IncrementCounter("postauth_errors");
+        }
+
+        internal void FireJobException(Exception ex)
+        {
+            Performance.GlobalPerf.Singleton.IncrementCounter("postauthjob_errors_" + ex.GetType().Name);
+            Performance.GlobalPerf.Singleton.IncrementCounter("postauthjob_errors");
         }
     }
 }

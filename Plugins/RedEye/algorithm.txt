@@ -2,14 +2,14 @@
 
 This algorithm seems the most effective, on average. Other algorithms fare better on certain images, but not on average. Assumes 8-bit RGB values.
 
-	Psuedo: `V = R == 0 ? : 0 : Min(255,Max(0, (R - Max(G,B)) * 255 / R))`
+	Pseudo: `V = R == 0 ? : 0 : Min(255,Max(0, (R - Max(G,B)) * 255 / R))`
 	C#: `byte V =  R == 0 ? (byte)0 : (byte)Math.Min(255,Math.Max(0,((float)(R - Math.Max(G, B)) * 255.0F / (float)R)));`
 
 # Search algorithms
 
 Search algorithms need to function in two scenarios. 
 
-1. When provided a facial rectangle by face/eye detection. A likely eye position point and weight may also be proviuded.
+1. When provided a facial rectangle by face/eye detection. A likely eye position point and weight may also be provided.
 2. When provided a pixel by the user in manual mode. Search rect must be guessed. Eyes wider than 5% of image are extremely rare, so a radius of 3% of width would be a good max. 
 
 Resolution independence is very important. The easiest solution is to provide a web service that provides the crop rectangle in both source coordinates and final coordinates. Thus red-eye and object data could be specified in source coordinates.
@@ -28,7 +28,7 @@ Using the selected area and the second-most selected area, it should be possible
 
 #### Weaknesses
 
-1. No likelyhood index for eye size, RMS favors large skin regions over small eyes. 
+1. No likelihood index for eye size, RMS favors large skin regions over small eyes.
 2. Local contrast isn't calculated, so skin patches with high redness value get captured a lot.
 
 

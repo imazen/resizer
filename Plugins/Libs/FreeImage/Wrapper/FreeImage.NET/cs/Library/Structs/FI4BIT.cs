@@ -7,7 +7,7 @@ namespace FreeImageAPI
 {
     /// <summary>
     /// The <b>FI4BIT</b> structure represents the half of a <see cref="Byte"/>.
-    /// It's valuerange is between <i>0</i> and <i>15</i>.
+    /// Its value range is between <i>0</i> and <i>15</i>.
     /// </summary>
     [DebuggerDisplay("{value}"),
     Serializable]

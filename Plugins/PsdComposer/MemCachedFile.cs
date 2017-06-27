@@ -89,7 +89,7 @@ namespace ImageResizer.Plugins.PsdComposer
         private string path = null;
         private byte[] data = null;
         /// <summary>
-        /// Used only when there is not http session.
+        /// Used only when there is not HTTP session.
         /// </summary>
         private static Dictionary<string, MemCachedFile> _fallbackCache = new Dictionary<string, MemCachedFile>();
 
@@ -116,7 +116,7 @@ namespace ImageResizer.Plugins.PsdComposer
             }
             else
             {
-                //Has no invalidation, but this is only used for benchmarks. Only runs when there is no http session.
+                //Has no invalidation, but this is only used for benchmarks. Only runs when there is no HTTP session.
                 lock(_fallbackCache){
                     if (_fallbackCache.ContainsKey(key)) file = _fallbackCache[key];
                     else

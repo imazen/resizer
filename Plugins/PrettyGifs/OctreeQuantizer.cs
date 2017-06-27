@@ -22,7 +22,7 @@ using System.Drawing.Imaging;
 namespace ImageResizer.Plugins.PrettyGifs
 {
     /// <summary>
-    /// Quantize using an Octree
+    /// Quantize using an octree
     /// </summary>
     public class OctreeQuantizer : Quantizer
     {
@@ -30,7 +30,7 @@ namespace ImageResizer.Plugins.PrettyGifs
         /// Construct the octree quantizer
         /// </summary>
         /// <remarks>
-        /// The Octree quantizer is a two pass algorithm. The initial pass sets up the octree,
+        /// The octree quantizer is a two pass algorithm. The initial pass sets up the octree,
         /// the second pass quantizes a color based on the nodes in the tree
         /// </remarks>
         /// <param name="maxColors">The maximum number of colors to return</param>
@@ -113,7 +113,7 @@ namespace ImageResizer.Plugins.PrettyGifs
         {
             byte	paletteIndex;	// The color at [_maxColors] is set to transparent
             
-            //TODO: Other sources claim only the first pallete color can be transparent
+            //TODO: Other sources claim only the first palette color can be transparent
             //Quote: Second, I've found a solution for preserving GIF transparency when invoking Image::Save(...). The .NET (tested on v2.0) 
             //GIF encoder considers transparent the first color found in the palette, so I've changed some methods (replace them with the supplied ones):
 
@@ -170,7 +170,7 @@ namespace ImageResizer.Plugins.PrettyGifs
         /// <summary>
         /// Retrieve the palette for the quantized image
         /// </summary>
-        /// <param name="original">Any old palette, this is overrwritten</param>
+        /// <param name="original">Any old palette, this is overwritten</param>
         /// <returns>The new color palette</returns>
         protected override ColorPalette GetPalette ( ColorPalette original )
         {
@@ -230,7 +230,7 @@ namespace ImageResizer.Plugins.PrettyGifs
                 // Check if this request is for the same color as the last
                 if ( _previousColor == pixel.ARGB )
                 {
-                    // If so, check if I have a previous node setup. This will only ocurr if the first color in the image
+                    // If so, check if I have a previous node setup. This will only occur if the first color in the image
                     // happens to be black, with an alpha component of zero.
                     if ( null == _previousNode )
                     {
@@ -301,7 +301,7 @@ namespace ImageResizer.Plugins.PrettyGifs
             /// Convert the nodes in the octree to a palette with a maximum of colorCount colors
             /// </summary>
             /// <param name="colorCount">The maximum number of colors</param>
-            /// <returns>An arraylist with the palettized colors</returns>
+            /// <returns>An ArrayList with the palletized colors</returns>
             public ArrayList Palletize ( int colorCount )
             {
                 while ( Leaves > colorCount )
@@ -526,7 +526,7 @@ namespace ImageResizer.Plugins.PrettyGifs
                             paletteIndex = _children[index].GetPaletteIndex(pixel, level + 1);
                         else
                         {
-                            //NDJ May-18-09: Occurrs when dithering is enabled, since dithering causes new colors to appear in the image
+                            //NDJ May-18-09: Occurs when dithering is enabled, since dithering causes new colors to appear in the image
                             //throw new Exception("Didn't expect this!");
                             //Find closest one nearby
                             OctreeNode n = FindClosestMatch(pixel);

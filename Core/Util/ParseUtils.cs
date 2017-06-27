@@ -11,12 +11,12 @@ using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Util {
     /// <summary>
-    /// Provides invariant parsing &amp; serialization of primitive types, like Enums, integers, floats, and booleans.
+    /// Provides invariant parsing &amp; serialization of primitive types, like enums, integers, floats, and booleans.
     /// </summary>
     public class ParseUtils {
 
         /// <summary>
-        /// Defines a parsing style that permits leading/trailing whitespace, a leading negitve/postiive sign, decimal points, exponential notation, and a thousands separator
+        /// Defines a parsing style that permits leading/trailing whitespace, a leading negative/positive sign, decimal points, exponential notation, and a thousands separator
         /// </summary>
         public const NumberStyles FloatingPointStyle = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite |
             NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands | NumberStyles.AllowExponent;

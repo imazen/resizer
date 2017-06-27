@@ -155,7 +155,7 @@ static int Renderer_determine_divisor(Renderer * r)
     while (divisor > 0 && Renderer_percent_loss (r->source->w, width, r->source->h, height, divisor) > r->details->havling_acceptable_pixel_loss) {
         divisor--;
     }
-    return min(16, max(1, divisor));
+    return int_min(16, int_max(1, divisor));
 }
 
 void Renderer_destroy(Context * context, Renderer * r)

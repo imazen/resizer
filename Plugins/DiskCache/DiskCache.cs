@@ -16,6 +16,7 @@ using System.Security.Permissions;
 using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
+using ImageResizer.Configuration.Performance;
 
 namespace ImageResizer.Plugins.DiskCache
 {
@@ -34,7 +35,7 @@ namespace ImageResizer.Plugins.DiskCache
     /// <summary>
     /// Provides methods for creating, maintaining, and securing the disk cache. 
     /// </summary>
-    public class DiskCache: IAsyncTyrantCache, ICache, IPlugin, IIssueProvider, ILoggerProvider, ILicensedPlugin
+    public class DiskCache: IAsyncTyrantCache, ICache, IPlugin, IIssueProvider, ILoggerProvider, ILicensedPlugin, IPluginInfo
     {
 
         private int subfolders = 8192;
@@ -116,7 +117,7 @@ namespace ImageResizer.Plugins.DiskCache
         /// <summary>
         /// Sets the location of the cache directory. 
         /// Can be a virtual path (like /App/imagecache) or an application-relative path (like ~/imagecache, the default).
-        /// Relative paths are assummed to be relative to the application root.
+        /// Relative paths are assumed to be relative to the application root.
         /// All values are converted to virtual path format upon assignment (/App/imagecache)
         /// Will throw an InvalidOperationException if changed after the plugin is installed.
         /// </summary>
@@ -184,7 +185,7 @@ namespace ImageResizer.Plugins.DiskCache
         private Config c;
         /// <summary>
         /// Loads the settings from 'c', starts the cache, and registers the plugin.
-        /// Will throw an invalidoperationexception if already started.
+        /// Will throw an InvalidOperationException if already started.
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
@@ -255,7 +256,7 @@ namespace ImageResizer.Plugins.DiskCache
         /// </summary>
         public bool Started { get { return _started; } }
         /// <summary>
-        /// Attempts to start the DiskCache using the current settings. Returns true if succesful or if already started. Returns false on a configuration error.
+        /// Attempts to start the DiskCache using the current settings. Returns true if successful or if already started. Returns false on a configuration error.
         /// Called by Install()
         /// </summary>
         public bool Start() {
@@ -285,7 +286,7 @@ namespace ImageResizer.Plugins.DiskCache
             }
         }
         /// <summary>
-        /// Returns true if stopped succesfully. Cannot be restarted
+        /// Returns true if stopped successfully. Cannot be restarted
         /// </summary>
         /// <returns></returns>
         public bool Stop() {
@@ -365,12 +366,18 @@ namespace ImageResizer.Plugins.DiskCache
                 await e.CreateAndWriteResultAsync(outStream, e);
             }, CacheAccessTimeout, AsyncWrites);
 
+
             //Fail
             if (r.Result == CacheQueryResult.Failed)
+            {
+                GlobalPerf.Singleton.IncrementCounter("diskcache_timeout");
                 throw new ImageResizer.ImageProcessingException("Failed to acquire a lock on file \"" + r.PhysicalPath + "\" within " + CacheAccessTimeout + "ms. Caching failed.");
+            }
 
             if (r.Result == CacheQueryResult.Hit && cleaner != null)
                 cleaner.UsedFile(r.RelativePath, r.PhysicalPath);
+
+            GlobalPerf.Singleton.IncrementCounter((r.Result == CacheQueryResult.Hit) ? "diskcache_hit" : "diskcache_miss");
 
             return r;
         }
@@ -385,10 +392,16 @@ namespace ImageResizer.Plugins.DiskCache
 
             //Fail
             if (r.Result == CacheQueryResult.Failed)
+            {
+                GlobalPerf.Singleton.IncrementCounter("diskcache_timeout");
                 throw new ImageResizer.ImageProcessingException("Failed to acquire a lock on file \"" + r.PhysicalPath + "\" within " + CacheAccessTimeout + "ms. Caching failed.");
+            }
 
             if (r.Result == CacheQueryResult.Hit && cleaner != null)
                 cleaner.UsedFile(r.RelativePath, r.PhysicalPath);
+
+            GlobalPerf.Singleton.IncrementCounter((r.Result == CacheQueryResult.Hit) ? "diskcache_hit" : "diskcache_miss");
+
 
             return r;
         }
@@ -413,6 +426,26 @@ namespace ImageResizer.Plugins.DiskCache
             }
         }
 
+        bool CacheDriveOnNetwork()
+        {
+            string physicalCache = PhysicalCacheDir;
+            if (!string.IsNullOrEmpty(physicalCache))
+            {
+                return physicalCache.StartsWith("\\\\") || GetCacheDrive().DriveType == DriveType.Network;
+            }
+            return false;
+        }
+
+        DriveInfo GetCacheDrive()
+        {
+            try
+            {
+                var drive = string.IsNullOrEmpty(PhysicalCacheDir) ? null : new DriveInfo(Path.GetPathRoot(PhysicalCacheDir));
+                return (drive?.IsReady == true) ? drive : null;
+            }
+            catch { return null; }
+        }
+
         public IEnumerable<IIssue> GetIssues() {
             List<IIssue> issues = new List<IIssue>();
             if (cleaner != null) issues.AddRange(cleaner.GetIssues());
@@ -425,7 +458,7 @@ namespace ImageResizer.Plugins.DiskCache
             
             if (!HasNTFSPermission()) 
                 issues.Add(new Issue("DiskCache", "Not working: Your NTFS Security permissions are preventing the application from writing to the disk cache",
-    "Please give user " + GetExecutingUser() + " read and write access to directory \"" + PhysicalCacheDir + "\" to correct the problem. You can access NTFS security settings by right-clicking the aformentioned folder and choosing Properties, then Security.", IssueSeverity.ConfigurationError));
+    "Please give user " + GetExecutingUser() + " read and write access to directory \"" + PhysicalCacheDir + "\" to correct the problem. You can access NTFS security settings by right-clicking the aforementioned folder and choosing Properties, then Security.", IssueSeverity.ConfigurationError));
 
             if (!Started && !Enabled) issues.Add(new Issue("DiskCache", "DiskCache is disabled in Web.config. Set enabled=true on the <diskcache /> element to fix.", null, IssueSeverity.ConfigurationError));
 
@@ -434,35 +467,35 @@ namespace ImageResizer.Plugins.DiskCache
                 issues.Add(new Issue("DiskCache", "The asyncBufferSize should not be set below 2 megabytes (2097152). Found in the <diskcache /> element in Web.config.",
                     "A buffer that is too small will cause requests to be processed synchronously. Remember to set the value to at least 4x the maximum size of an output image.", IssueSeverity.ConfigurationError));
 
-            string physicalCache = PhysicalCacheDir;
-            if (!string.IsNullOrEmpty(physicalCache)) {
-                bool isNetwork = false;
-                if (physicalCache.StartsWith("\\\\")) 
-                    isNetwork = true;
-                else{
-                    try {
-                        DriveInfo dri = new DriveInfo(Path.GetPathRoot(physicalCache));
-                        if (dri.DriveType == DriveType.Network) isNetwork = true;
-                    } catch { }
-                }
-                if (isNetwork)
-                    issues.Add(new Issue("DiskCache", "It appears that the cache directory is located on a network drive.",
-                        "Both IIS and ASP.NET have trouble hosting websites with large numbers of folders over a network drive, such as a SAN. The cache will create " +
-                        Subfolders.ToString() + " subfolders. If the total number of network-hosted folders exceeds 100, you should contact support@imageresizing.net and consult the documentation for details on configuring IIS and ASP.NET for this situation.", IssueSeverity.Warning));
-                    
-            }
 
+            if (CacheDriveOnNetwork())
+                issues.Add(new Issue("DiskCache", "It appears that the cache directory is located on a network drive.",
+                    "Both IIS and ASP.NET have trouble hosting websites with large numbers of folders over a network drive, such as a SAN. The cache will create " +
+                    Subfolders.ToString() + " subfolders. If the total number of network-hosted folders exceeds 100, you should contact support@imageresizing.net and consult the documentation for details on configuring IIS and ASP.NET for this situation.", IssueSeverity.Warning));
+                    
             return issues;
         }
 
-
+        public IEnumerable<KeyValuePair<string, string>> GetInfoPairs()
+        {
+            var list = new List<KeyValuePair<string, string>>();
+            list.Add(new KeyValuePair<string, string>("diskcache_autoclean", AutoClean ? "1" : "0"));
+            list.Add(new KeyValuePair<string, string>("diskcache_asyncwrites", AsyncWrites ? "1" : "0"));
+            list.Add(new KeyValuePair<string, string>("diskcache_subfolders", Subfolders.ToString()));
+            list.Add(new KeyValuePair<string, string>("diskcache_network_drive", CacheDriveOnNetwork() ? "1" : "0"));
+            list.Add(new KeyValuePair<string, string>("diskcache_filesystem", GetCacheDrive()?.DriveFormat ?? ""));
+            list.Add(new KeyValuePair<string, string>("diskcache_drive_avail", GetCacheDrive()?.AvailableFreeSpace.ToString() ?? ""));
+            list.Add(new KeyValuePair<string, string>("diskcache_drive_total", GetCacheDrive()?.TotalSize.ToString() ?? ""));
+            list.Add(new KeyValuePair<string, string>("diskcache_virtualpath", VirtualCacheDir));
+            return list;
+        }
 
         /// <summary>
         /// Returns the license key feature codes that are able to activate this plugins.
         /// </summary>
         public IEnumerable<string> LicenseFeatureCodes
         {
-            get { yield return "R4Performance"; yield return "R4DiskCache"; }
+            get { yield return "R_Performance"; yield return "R4Performance"; yield return "R4DiskCache"; }
         }
     }
 }

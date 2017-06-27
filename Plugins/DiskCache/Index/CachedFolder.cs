@@ -18,8 +18,8 @@ namespace ImageResizer.Plugins.DiskCache {
 
         private volatile bool isValid = false;
         /// <summary>
-        /// Defaults to false. Set to true immediately after being refreshed from the filesystem.
-        /// Set to false if a file disappears from the filesystem cache without the cache index being notified first.
+        /// Defaults to false. Set to true immediately after being refreshed from the file system.
+        /// Set to false if a file disappears from the file system cache without the cache index being notified first.
         /// Used by the cleanup system - not of importance to the cache write system.
         /// </summary>
         public bool IsValid {
@@ -52,7 +52,7 @@ namespace ImageResizer.Plugins.DiskCache {
         }
 
         /// <summary>
-        /// Returns null if (a) the file doesn't exist, or (b) the file isn't populated. Calling code should always fall back to filesystem calls on a null result.
+        /// Returns null if (a) the file doesn't exist, or (b) the file isn't populated. Calling code should always fall back to file system calls on a null result.
         /// </summary>
         /// <param name="relativePath"></param>
         /// <returns></returns>
@@ -107,7 +107,7 @@ namespace ImageResizer.Plugins.DiskCache {
             }
         }
         /// <summary>
-        /// Tries to set the AccessedUtc of the specified file to the current date (just in memory, not on the filesystem).
+        /// Tries to set the AccessedUtc of the specified file to the current date (just in memory, not on the file system).
         /// </summary>
         /// <param name="relativePath"></param>
         /// <returns></returns>
@@ -134,7 +134,7 @@ namespace ImageResizer.Plugins.DiskCache {
         }
 
         /// <summary>
-        /// Gets a CachedFileInfo object for the file even if it isn't in the cache (falls back to the filesystem)
+        /// Gets a CachedFileInfo object for the file even if it isn't in the cache (falls back to the file system)
         /// </summary>
         /// <param name="relativePath"></param>
         /// <param name="physicalPath"></param>
@@ -320,11 +320,11 @@ namespace ImageResizer.Plugins.DiskCache {
                     string local = s.Substring(s.LastIndexOf(System.IO.Path.DirectorySeparatorChar) + 1);
                     if (local.StartsWith(".")) continue; //Skip folders that start with a period.
                     if (f.folders.ContainsKey(local)) 
-                        newFolders[local] = f.folders[local]; //What if the value is null? does containskey work?
+                        newFolders[local] = f.folders[local]; //What if the value is null? Does ContainsKey work?
                     else 
                         newFolders[local] = new CachedFolder();
                 }
-                f.folders = newFolders; //Question - why didn't the folders ge tlisted?
+                f.folders = newFolders; //Question - why didn't the folders get listed?
             }
         }
         /// <summary>

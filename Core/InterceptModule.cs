@@ -81,6 +81,7 @@ namespace ImageResizer {
             }
 
             if (result == HttpModuleRequestAssistant.PostAuthorizeResult.AccessDenied403){
+                ra.FireAccessDenied();
                 throw new ImageProcessingException(403, "Access denied", "Access denied");
             }
 
@@ -98,19 +99,24 @@ namespace ImageResizer {
                     ra.FireMissing();
                     return;
                 }
-
-                try{
+                try
+                {
                     HandleRequest(app.Context,ra,  vf);
+                    ra.FirePostAuthorizeSuccess();
                     //Catch not found exceptions
-                } catch (System.IO.FileNotFoundException notFound) { //Some VPPs are optimisitic , or could be a race condition
+                } catch (System.IO.FileNotFoundException notFound) { //Some VPPs are optimistic, or could be a race condition
                     if (notFound.Message.Contains(" assembly ")) throw; //If an assembly is missing, it should be a 500, not a 404
                     ra.FireMissing();
                     throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
                 } catch (System.IO.DirectoryNotFoundException notFound) {
                     ra.FireMissing();
                     throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
+                } catch (Exception ex)
+                {
+                    ra.FirePostAuthorizeRequestException(ex);
+                    throw;
                 }
-             
+
             }
 
         }
@@ -180,13 +186,16 @@ namespace ImageResizer {
                             source.CopyToStream(stream); //4KiB buffer
                         
                     } else {
+                        ImageJob j;
                         //Process the image
                         if (vf != null)
-                            conf.GetImageBuilder().Build(vf, stream, settings);
+                            j = new ImageJob(vf,stream, settings);
                         else
-                            conf.GetImageBuilder().Build(ra.RewrittenMappedPath, stream, settings); //Use a physical path to bypass virtual file system
-                    }
+                            j = new ImageJob(ra.RewrittenMappedPath, stream, settings); //Use a physical path to bypass virtual file system
 
+                        conf.GetImageBuilder().Build(j);
+                    }
+                    ra.FireJobSuccess();
                     //Catch not found exceptions
                 } catch (System.IO.FileNotFoundException notFound) {
                     if (notFound.Message.Contains(" assembly ")) throw; //If an assembly is missing, it should be a 500, not a 404
@@ -198,6 +207,10 @@ namespace ImageResizer {
                 } catch (System.IO.DirectoryNotFoundException notFound) {
                     ra.FireMissing();
                     throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
+                } catch (Exception ex)
+                {
+                    ra.FireJobException(ex);
+                    throw;
                 }
             });
 

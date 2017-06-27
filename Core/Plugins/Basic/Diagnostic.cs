@@ -5,10 +5,13 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins;
 using System.Web;
+using System.Web.Configuration;
+using ImageResizer.Configuration.Performance;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
@@ -33,33 +36,55 @@ namespace ImageResizer.Plugins.Basic {
     /// Provides the incredibly helpful /resizer.debug page we all love.
     /// 
     /// Mimics the behavior of customErrors by default. Not available if CustomErrors=true or retail=true. Available only to localhost if customErrors=RemoteOnly.
-    /// Can be overriden by adding in the &lt;resizer&gt; section &lt;diagnostics enableFor="None|AllHosts|LocalHost" /&gt;
+    /// Can be overridden by adding in the &lt;resizer&gt; section &lt;diagnostics enableFor="None|AllHosts|LocalHost" /&gt;
     /// 
     /// </summary>
-    public class Diagnostic :IPlugin{
-        Config c;
-        public IPlugin Install(Configuration.Config c) {
-            c.Pipeline.PostAuthorizeRequestStart += Pipeline_PostAuthorizeRequestStart;
-            c.Plugins.add_plugin(this);
-            this.c = c;
-            return this;
+    public class Diagnostic : EndpointPlugin{
+
+        public Diagnostic()
+        {
+            this.EndpointMatchMethod = EndpointMatching.FilePathEndsWithOrdinalIgnoreCase;
+            this.Endpoints = new[] {"/resizer.debug", "/resizer.debug.ashx"};
         }
 
-        void Pipeline_PostAuthorizeRequestStart(System.Web.IHttpModule sender, System.Web.HttpContext context) {
-            
-            if ((context.Request.FilePath.EndsWith("/resizer.debug", StringComparison.OrdinalIgnoreCase) ||
-                context.Request.FilePath.EndsWith("/resizer.debug.ashx", StringComparison.OrdinalIgnoreCase))) {
 
-                //Communicate to the MVC plugin this request should not be affected by the UrlRoutingModule.
-                context.Items[c.Pipeline.StopRoutingKey] = true;
-                //Provide the request handler
-                IHttpHandler handler =AllowResponse(context) ? (IHttpHandler)new DiagnosticPageHandler(c) : (IHttpHandler)new DiagnosticDisabledHandler(c);
-                context.RemapHandler(handler); 
-                // The following line of code does nothing. I don't think there is any way to make this work before .NET 2.0 SP2
-                //context.Handler = handler; 
+        string DisabledNotice(Config c)
+        {
+            var sb = new StringBuilder();
 
-            } 
+            //Figure out CustomErrorsMode
+            var mode =
+            (WebConfigurationManager
+                .OpenWebConfiguration(null)
+                .GetSection("system.web/customErrors") as CustomErrorsSection)?.Mode ?? CustomErrorsMode.RemoteOnly;
+
+            //What is diagnostics enableFor set to?
+            var dmode = c.get("diagnostics.enableFor", DiagnosticMode.None);
+            //Is it set at all?
+            var diagDefined = c.get("diagnostics.enableFor", null) != null;
+            //Is it available from localhost.
+            var availLocally = (!diagDefined && mode == CustomErrorsMode.RemoteOnly) ||
+                                (dmode == DiagnosticMode.Localhost);
+
+
+            sb.Append("The ImageResizer diagnostics page is " +
+                          (availLocally ? "only available from localhost." : "disabled."));
+            sb.Append("\n\nThis is because ");
+            sb.Append(diagDefined
+                ? $"<diagnostics enableFor=\"{dmode}\" />.\n"
+                : $"<customErrors mode=\"{mode}\" />.\n");
+            sb.Append(
+                "\n\nTo override for localhost access, add <diagnostics enableFor=\"localhost\" /> in the <resizer> section of Web.config.\n\n" +
+                "To override for remote access, add <diagnostics enableFor=\"allhosts\" /> in the <resizer> section of Web.config.\n\n");
+            return sb.ToString();
+
         }
+
+        protected override string GenerateOutput(HttpContext context, Config c)
+        {
+            return AllowResponse(context, c) ? new DiagnosticsReport(c, context).Generate() : DisabledNotice(c);
+        }
+
 
         /// <summary>
         /// True if diagnostics can be displayed to the current user.
@@ -70,22 +95,17 @@ namespace ImageResizer.Plugins.Basic {
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public bool AllowResponse(HttpContext context) {
-            
-            bool detailedErrors = !context.IsCustomErrorEnabled;
-            DiagnosticMode def = (detailedErrors) ? DiagnosticMode.AllHosts : DiagnosticMode.None;
+        public bool AllowResponse(HttpContext context, Config c) {
+            switch (c.get("diagnostics.enableFor", context.IsCustomErrorEnabled ? DiagnosticMode.None : DiagnosticMode.AllHosts)) {
+                case DiagnosticMode.AllHosts:
+                    return true;
 
-            DiagnosticMode mode = c.get<DiagnosticMode>("diagnostics.enableFor", def);
-            if (mode == DiagnosticMode.None) return false;
-            if (mode == DiagnosticMode.AllHosts) return true;
-            return context.Request.IsLocal;
-            
-        }
+                case DiagnosticMode.Localhost:
+                    return context.Request.IsLocal;
 
-        public bool Uninstall(Configuration.Config c) {
-            c.Plugins.remove_plugin(this);
-            c.Pipeline.PostAuthorizeRequestStart -= Pipeline_PostAuthorizeRequestStart;
-            return true;
+                default:
+                    return false;
+            }
         }
     }
 }

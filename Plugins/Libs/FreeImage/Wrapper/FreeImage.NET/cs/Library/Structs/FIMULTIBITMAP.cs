@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -39,7 +39,7 @@ using System.Runtime.InteropServices;
 namespace FreeImageAPI
 {
     /// <summary>
-    /// The <b>FIMULTIBITMAP</b> structure is a handle to a FreeImage multipaged bimtap.
+    /// The <b>FIMULTIBITMAP</b> structure is a handle to a FreeImage multipaged bitmap.
     /// </summary>
     [Serializable, StructLayout(LayoutKind.Sequential)]
     public struct FIMULTIBITMAP : IComparable, IComparable<FIMULTIBITMAP>, IEquatable<FIMULTIBITMAP>

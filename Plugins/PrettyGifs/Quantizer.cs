@@ -524,7 +524,7 @@ namespace ImageResizer.Plugins.PrettyGifs
         /// <summary>
         /// Retrieve the palette for the quantized image
         /// </summary>
-        /// <param name="original">Any old palette, this is overrwritten</param>
+        /// <param name="original">Any old palette, this is overwritten</param>
         /// <returns>The new color palette</returns>
         protected abstract ColorPalette GetPalette(ColorPalette original);
 
@@ -538,7 +538,7 @@ namespace ImageResizer.Plugins.PrettyGifs
         /// <remarks>
         /// This struct is used to read data from a 32 bits per pixel image
         /// in memory, and is ordered in this manner as this is the way that
-        /// the data is layed out in memory
+        /// the data is laid out in memory
         /// </remarks>
         [StructLayout(LayoutKind.Explicit)]
         public struct Color32

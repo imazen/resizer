@@ -36,7 +36,7 @@ namespace ImageResizer.ExtensionMethods {
         /// Copies the current stream into a new MemoryStream instance.
         /// </summary>
         /// <param name="s"></param>
-        /// <param name="entireStream">True to copy entire stream if seeakable, false to only copy remaining data</param>
+        /// <param name="entireStream">True to copy entire stream if seekable, false to only copy remaining data</param>
         /// <returns></returns>
         public static MemoryStream CopyToMemoryStream(this Stream s, bool entireStream) {
             return CopyToMemoryStream(s, entireStream,0x1000);
@@ -46,7 +46,7 @@ namespace ImageResizer.ExtensionMethods {
         /// Copies the current stream into a new MemoryStream instance.
         /// </summary>
         /// <param name="s"></param>
-        /// <param name="entireStream">True to copy entire stream if seeakable, false to only copy remaining data</param>
+        /// <param name="entireStream">True to copy entire stream if seekable, false to only copy remaining data</param>
         /// <param name="chunkSize">The buffer size to use (in bytes) if a buffer is required. Default: 4KiB</param>
         /// <returns></returns>
         public static MemoryStream CopyToMemoryStream(this Stream s, bool entireStream, int chunkSize) {
@@ -68,7 +68,7 @@ namespace ImageResizer.ExtensionMethods {
         /// Copies the current stream into a byte[] array of exact size.
         /// </summary>
         /// <param name="s"></param>
-        /// <param name="entireStream">True to copy entire stream if seeakable, false to only copy remaining data</param>
+        /// <param name="entireStream">True to copy entire stream if seekable, false to only copy remaining data</param>
         /// <returns></returns>
         public static byte[] CopyToBytes(this Stream s, bool entireStream) {
             return CopyToBytes(s, entireStream, 0x1000);
@@ -86,7 +86,7 @@ namespace ImageResizer.ExtensionMethods {
         /// </summary>
         /// <param name="s"></param>
         /// <param name="other">The stream to write to</param>
-        /// <param name="entireStream">True to copy entire stream if seeakable, false to only copy remaining data</param>
+        /// <param name="entireStream">True to copy entire stream if seekable, false to only copy remaining data</param>
         public static void CopyToStream(this Stream s, Stream other, bool entireStream) {
             CopyToStream(s, other, entireStream, 0x1000);
         }
@@ -100,8 +100,8 @@ namespace ImageResizer.ExtensionMethods {
         /// </summary>
         /// <param name="src"></param>
         /// <param name="dest">The stream to write to</param>
-        /// <param name="entireStream">True to copy entire stream if seeakable, false to only copy remaining data</param>
-        /// <param name="chunkSize">True to copy entire stream if seeakable, false to only copy remaining data</param>
+        /// <param name="entireStream">True to copy entire stream if seekable, false to only copy remaining data</param>
+        /// <param name="chunkSize">True to copy entire stream if seekable, false to only copy remaining data</param>
         public static void CopyToStream(this Stream src, Stream dest, bool entireStream, int chunkSize) {
             if (entireStream && src.CanSeek) src.Seek(0, SeekOrigin.Begin);
 
@@ -170,7 +170,7 @@ namespace ImageResizer.ExtensionMethods {
         /// Copies the current stream into a byte[] array of exact size
         /// </summary>
         /// <param name="src"></param>
-        /// <param name="entireStream">True to copy entire stream if seeakable, false to only copy remaining data.</param>
+        /// <param name="entireStream">True to copy entire stream if seekable, false to only copy remaining data.</param>
         /// <param name="chunkSize">The buffer size to use (in bytes) if a buffer is required. Default: 4KiB</param>
         /// <returns></returns>
         public static byte[] CopyToBytes(this Stream src, bool entireStream, int chunkSize) {
@@ -211,7 +211,7 @@ namespace ImageResizer.ExtensionMethods {
         /// Copies the current stream into a byte[] array of exact size
         /// </summary>
         /// <param name="src"></param>
-        /// <param name="entireStream">True to copy entire stream if seeakable, false to only copy remaining data.</param>
+        /// <param name="entireStream">True to copy entire stream if seekable, false to only copy remaining data.</param>
         /// <param name="chunkSize">The buffer size to use (in bytes) if a buffer is required. Default: 4KiB</param>
         /// <returns></returns>
         public static async Task<byte[]> CopyToBytesAsync(this Stream src, bool entireStream, int chunkSize)

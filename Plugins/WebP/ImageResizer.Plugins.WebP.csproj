@@ -48,8 +48,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Imazen.WebP, Version=9.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\Packages\Imazen.WebP.9.0.1\lib\net45\Imazen.WebP.dll</HintPath>
+    <Reference Include="Imazen.WebP, Version=10.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\Packages\Imazen.WebP.10.0.1\lib\net45\Imazen.WebP.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

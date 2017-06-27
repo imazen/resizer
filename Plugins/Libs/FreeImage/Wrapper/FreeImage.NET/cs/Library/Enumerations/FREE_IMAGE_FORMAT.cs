@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -117,7 +117,7 @@ namespace FreeImageAPI
         /// </summary>
         FIF_RAS = 16,
         /// <summary>
-        /// truevision Targa files (*.TGA, *.TARGA)
+        /// TrueVision Targa files (*.TGA, *.TARGA)
         /// </summary>
         FIF_TARGA = 17,
         /// <summary>

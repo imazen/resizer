@@ -40,6 +40,7 @@ NuGet.exe
 !NuGet.targets
 *.coverage
 /tmp/
+.fake/
 
 #Visual Studio files
 *.[Oo]bj
@@ -68,3 +69,7 @@ ipch/
 *.metagen
 *.lastbuildstate
 *.res
+.vs/
+/Samples/PluginTestingApp/App_Data
+*.opendb
+*.db

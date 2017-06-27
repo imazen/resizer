@@ -1,22 +1,22 @@
 Tags: plugin
 Edition: performance
-Tagline: Makes dynamic image processing as responsive and scalable as static images - because they are! Suggested, nay, required for websites with significant traffic. Medium-trust compatible.
+Tagline: Disk cache output images. Makes dynamic image processing as responsive and scalable as static images. Required for websites with significant traffic.
 Aliases: /plugins/diskcache
 
 
 # DiskCache plugin
 
-Writes resized images directly to disk, then lets IIS serve them as normal images. Uses URL rewriting, not URL redirects - this maintains the filename for SEO and reduces latency.
+Output caching for output images. Each result is stored on disk as a single file, and can be served as a static file for cache hits. Does not affect SEO.
 
-With this plugin, a server can usually process as many concurrent 'dynamic' image requests as 'static' image requests, since there is only a 1-time hit (and it's small to begin with) for resizing an image.
+Improves latency and scalability. Suggested for all production sites. Used by nearly all ImageResizer users. 
 
-Suggested for all live sites. Works well in combination with the CloudFront plugin, which adds edge-caching. Also works great with the PsdReader, SqlReader, S3Reader, and AnimatedGifs plugin; these benefit greatly from caching due to their slightly higher resource cost.
+Works well with *all* plugins.
 
-Compatible with *all* plugins.
+This plugin only applies to the URL API, not the managed API. It currently integrates with native ASP.NET and IIS static file serving to provide optimal performance.
 
-This plugin only applies to the URL API, not the managed API. It integrates deeply with ASP.NET and IIS to provide ideal performance. In the future, it may offer an API for use from MVC actions or HttpHandlers, but it will be an API with reduced performance, as MVC actions and HttpHandlers are executed too late for IIS to handle the serving of the file. 
+When disabling DiskCache on a site that hosts non-public images, it is best to use `<diskcache enabled="false" />` instead of removing `<add name="DiskCache" />`. The existing `/imagecache/` folder will otherwise become publicly accessible when the plugin is removed. Keep this in mind with sub-applications as well.
 
-When disabling DiskCache on a site that hosts protected images, it is best to use `<diskcache enabled="false" />` instead of removing `<add name="DiskCache" />`. The existing `/imagecache/` folder will otherwise become publicly accessible when the plugin is removed. Keep this in mind with sub-applications as well.
+All images are cached by default. Specify `&cache=no` to prevent caching of a result. The disk cache can be (roughly) constrained by image count using `subfolders=x` and `autoClean=true`. Evicting items from disk is expensive, so we don't enable this by default, nor suggest it unless monitoring proves it necessary.
 
 ## Installation
 
@@ -69,8 +69,8 @@ The defaults are good - you don't actually need to specify any configuration.
 
 The following is what the default settings look like. Only specify what you need to change.
 
-  <diskCache dir="~/imagecache" autoClean="false" hashModifiedDate="true" enabled="true"
-   subfolders="32" cacheAccessTimeout="15000" asyncWrites="false" asyncBufferSize="10485760" />
+  <diskCache dir="~/imagecache" autoClean="false" enabled="true"
+   subfolders="8192" cacheAccessTimeout="15000" asyncWrites="false" asyncBufferSize="10485760" />
   
   <cleanupStrategy startupDelay="00:05" minDelay="00:00:20" maxDelay="00:05" 
     optimalWorkSegmentLength="00:00:04" 
@@ -78,7 +78,6 @@ The following is what the default settings look like. Only specify what you need
     avoidRemovalIfCreatedWithin="24:00" avoidRemovalIfUsedWithin="4.00:00" 
     prohibitRemovalIfUsedWithin="00:05" prohibitRemovalIfCreatedWithin="00:10" />
   
-
 
 ### dir
 
@@ -91,26 +90,17 @@ Should be in virtual path form, like /vdir/cache or ~/imagecache.
 When true, will keep a background thread running to 'clean' unused items from the disk cache. This background thread uses smart 'activity sensing' to avoid doing cleanup work when the site is busy. 
 Defaults to false, since the cleanup system is still in beta.
 
-### hashModifiedDate
-
-If true, when a source file is changed, a new file will be created instead of overwriting the old cached file.
-This helps prevent file lock contention on high-traffic servers. Defaults to true. 
-Changes the hash function, so you should delete the cache folder whenever this setting is modified.
-
-Never use 'False' in a Web Garden scenario - it will cause random failed requests. False may also cause rare failed requests during an overlapped recycle (which is the default for IIS). False may also cause failed requests if a source image is updated while the older version is still being streamed to clients, and those requests take over 'cacheAccessTimeout' seconds. 
-False has the benefit of creating less 'cache trash', since extra files are not left around for a while; however, the benefits rarely outweigh the disadvantages.
-
 ### enabled
 
-true by default. False disables the plugin completely.
+true by default. False disables the plugin completely, but prevents public access to `~/imagecache`, which would become possible if you simply uninstalled the plugin.
 
 ### subfolders
 
-Controls how many subfolders to use for disk caching. Rounded to the next power of two. (1->2, 3->4, 5->8, 9->16, 17->32, 33->64, 65->128,129->256,etc.)
+Controls how many subfolders to use for disk caching. Rounded to the next power of two. 
 
 NTFS does not handle more than 8,000 files per folder well. Larger folders also make cleanup more resource-intensive.
 
-Defaults to 32, which combined with the default setting of 400 images per folder, allows for scalability to 12,800 actively used image versions. 
+Defaults to 8192, which combined with the default setting of 400 images per folder, allows for scalability to ~1 million actively used image versions. 
 
 For example, given a desired cache size of 100,000 items, this should be set to 256.
 
@@ -118,12 +108,12 @@ For example, given a desired cache size of 100,000 items, this should be set to 
 
 Defaults to 15 seconds. How long to wait for a file lock to become available before giving up on the request.
 
-### asyncWrites (new in v3.1)
+### asyncWrites
 
 When true, writing to the disk cache will occur on separate threads, permitting the request to complete faster in the case of a cache miss. 
 This adds a bit more overhead on the server, but makes the client experience more responsive. Very helpful on slow or overwhelmed I/O systems.
 
-### asyncBufferSize (new in v3.1)
+### asyncBufferSize
 
 The number of bytes to allowed to be used for the async write queue. Defaults to 10MB (10485760). This is the maximum amount of RAM that will be used for the write cache. 
 If this value would be exceeded, the disk cache switches to synchronous mode until the queue has emptied enough to permit another job to be added without exceeding the maximum.

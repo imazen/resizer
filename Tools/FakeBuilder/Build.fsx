@@ -165,6 +165,12 @@ Target "patch_commit" (fun _ ->
         AssemblyPatcher.setInfo assemblyInfoCppFile ["CommitAttribute", commit]
 )
 
+Target "patch_date" (fun _ ->
+    let date = DateTimeOffset.UtcNow.ToString("o")
+    AssemblyPatcher.setInfo assemblyInfoFile ["BuildDate", date]
+    AssemblyPatcher.setInfo assemblyInfoCppFile ["BuildDateAttribute", date]
+)
+
 Target "patch_ver" (fun _ ->
     let asmVer =
         { version with
@@ -194,6 +200,7 @@ Target "patch_ver" (fun _ ->
 Target "patch_info" (fun _ ->
     Run "patch_commit"
     Run "patch_ver"
+    Run "patch_date"
 )
 
 Target "test" (fun _ ->
@@ -203,14 +210,12 @@ Target "test" (fun _ ->
     !! (rootDir + "Tests/binaries/release/*Tests.dll")
         //++ (rootDir + "Tests/binaries/release/x64/*Tests.dll")
         ++ (rootDir + "Tests/binaries/release/x64/ImageResizer.Plugins.FastScaling.Tests.dll")
-        -- (rootDir + "**/ImageResizer.Plugins.LicenseVerifier.Tests.dll")
         -- (rootDir + "**/ImageResizer.CoreFSharp.Tests.dll")
             |> xUnit2 (fun p -> {p with ToolPath = xunit; ExcludeTraits = Some("requiresmongo","true")})
             
     !! (rootDir + "Tests/binaries/release/*Tests.dll")
         //++ (rootDir + "Tests/binaries/release/x86/*Tests.dll")
         ++ (rootDir + "Tests/binaries/release/x86/ImageResizer.Plugins.FastScaling.Tests.dll")
-        -- (rootDir + "**/ImageResizer.Plugins.LicenseVerifier.Tests.dll")
         -- (rootDir + "**/ImageResizer.CoreFSharp.Tests.dll")
         -- (rootDir + "**/ImageResizer.AllPlugins.Tests.dll")
         -- (rootDir + "**/ImageResizer.CopyMetadata.Tests.dll")
@@ -521,6 +526,7 @@ Target "do_all" (fun _ ->
     ==> "push"
     ==> "update_imageserv"
     ==> "print_stats"
+    
     
     Run "print_stats"
 )

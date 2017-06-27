@@ -5,8 +5,6 @@ Bundle: free
 
 # Custom Overlay plugin
 
-New in V3.2
-
 This is an example plugin. It is useful as a starting point, but is not subject to the same standards of maintenance and backwards-compatibility that normal plugins are. It does not have a NuGet package or precompiled binaries.
 
 This plugin is for drawing image overlays using pre-determined x1,y1,x2,y2,x3,y3,x4,y4 coordinates that are relative to the base file's width and height. It supports any parallelogram, and can use any virtual path for loading the overlay image. 

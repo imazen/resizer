@@ -203,11 +203,12 @@ TEST_CASE("Test Weighting", "[fastscaling]")
     //BSpline is a smoothing filter, always positive
     CHECK(test_filter(&context, InterpolationFilter::Filter_CubicBSpline, msg, 0, 0, 1.75, 0.08, 2) == nullptr);
 
-    CHECK(test_filter(&context, InterpolationFilter::Filter_Mitchell, msg, 1.0f, 1.75f, 1, 0.08, 1.75) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Mitchell, msg, 8.0 / 7.0, 2.0, 1,
+        0.08, 2.0) == nullptr);
 
 
-    CHECK(test_filter(&context, InterpolationFilter::Filter_Robidoux, msg, 1, 1.65, 1, 0.08, 1.75) == nullptr);
-    CHECK(test_filter(&context, InterpolationFilter::Filter_RobidouxSharp, msg, 1, 1.8, 1, 0.08, 1.8) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_Robidoux, msg, 1.1685777620836932, 2, 1, 0.08, 2) == nullptr);
+    CHECK(test_filter(&context, InterpolationFilter::Filter_RobidouxSharp, msg, 1.105822933719019, 2, 1, 0.08, 2) == nullptr);
 
 
     //Sinc filters. These have second crossings.

@@ -22,7 +22,7 @@ namespace ImageResizer.Plugins.BatchZipper
         /// <summary>
         /// Represents a file to resize/re-encode, the resize/encoding settings
         /// </summary>
-        /// <param name="physicalPath">Filesystem path, such as C:\Web\Project\Image\file.jpg</param>
+        /// <param name="physicalPath">File system path, such as C:\Web\Project\Image\file.jpg</param>
         /// <param name="targetFilename">The target filename to use in the compressed folder. If left null, the filename of physicalPath will be used.
         /// Should not include the file extension, that will be assigned based on resizeQuerystring and the original extension.</param>
         /// <param name="resizeQuerystring">The resize/crop settings applied to the file, ex. ?width=100&amp;height=100&amp;crop=auto&amp;format=png</param>
@@ -35,7 +35,7 @@ namespace ImageResizer.Plugins.BatchZipper
         /// <summary>
         /// Represents a file to resize/re-encode, the resize/encoding settings
         /// </summary>
-        /// <param name="physicalPath">Filesystem path, such as C:\Web\Project\Image\file.jpg</param>
+        /// <param name="physicalPath">File system path, such as C:\Web\Project\Image\file.jpg</param>
         /// <param name="targetFilename">The target filename to use in the compressed folder. If left null, the filename of physicalPath will be used.
         /// Should not include the file extension, that will be assigned based on resizeQuerystring and the original extension.</param>
         /// <param name="resizeQuerystring">The resize/crop settings applied to the file, ex. ?width=100&amp;height=100&amp;crop=auto&amp;format=png</param>
@@ -50,7 +50,7 @@ namespace ImageResizer.Plugins.BatchZipper
 
         private string physicalPath;
         /// <summary>
-        /// Filesystem path, such as C:\Web\Project\Image\file.jpg. Throws an InvalidOperationException if you attempt to modify an immutable instance. 
+        /// File system path, such as C:\Web\Project\Image\file.jpg. Throws an InvalidOperationException if you attempt to modify an immutable instance.
         /// </summary>
         public string PhysicalPath
         {
@@ -124,7 +124,7 @@ namespace ImageResizer.Plugins.BatchZipper
         /// </summary>
         /// <param name="jobId">The job ID, can be generated with Guid.NewGuid() </param>
         /// <param name="destinationFile">The physical path to the destination archive</param>
-        /// <param name="files">A List of items to to resize and place in the folder.</param>
+        /// <param name="files">A List of items to resize and place in the folder.</param>
         public BatchResizeSettings(string destinationFile, Guid jobId, IList<BatchResizeItem> files)
         {
             this.jobId = jobId;
@@ -141,15 +141,15 @@ namespace ImageResizer.Plugins.BatchZipper
 
         //Progress/failure callbacks
         /// <summary>
-        /// Fired when a file is successfully written to the zip file, or if an item fails to be added to the zip file.
-        /// Will execute on a thread pool thread. Catch all your exeptions, or they will cause the jobe to fail.
+        /// Fired when a file is successfully written to the ZIP file, or if an item fails to be added to the ZIP file.
+        /// Will execute on a thread pool thread. Catch all your exceptions, or they will cause the job to fail.
         /// Set e.Cancel to cancel the job. 
         /// Uses the same thread the job is processing on - I/O bound tasks in handlers should be async if possible.
         /// </summary>
-        public event ItemCallback ItemEvent; //Called when a item is sucessfully written to the zip file, or when it fails
+        public event ItemCallback ItemEvent; //Called when a item is successfully written to the ZIP file, or when it fails
         /// <summary>
-        /// Fires when the Zip file has successfully been written to disk, when the job fails.
-        /// Will execute on a thread pool thread. Catch all your exeptions, or they will cause the asp.net proccess to restart!
+        /// Fires when the ZIP file has successfully been written to disk, when the job fails.
+        /// Will execute on a thread pool thread. Catch all your exceptions, or they will cause the ASP.NET process to restart!
         /// </summary>
         public event JobCallback JobEvent;
 
@@ -166,7 +166,7 @@ namespace ImageResizer.Plugins.BatchZipper
         /// Loops through all files, assigning targetFilenames if they are null,
         /// and eliminating duplicate names by adding _1, _2, etc.
         /// Also normalizes filenames for use in zip folder.
-        /// Used internally. May be used externally also if calling code wishes to to know the final file names.
+        /// Used internally. May be used externally also if calling code wishes to know the final file names.
         /// </summary>
         public void FixDuplicateFilenames(string prefix = "_")
         {
@@ -199,8 +199,8 @@ namespace ImageResizer.Plugins.BatchZipper
             }
         }
         /// <summary>
-        /// Utility routine for transforming path names from filesystem format (on Windows that means backslashes) to
-        /// a format suitable for use within zipfiles. This means trimming the volume letter and colon (if any) And
+        /// Utility routine for transforming path names from file system format (on Windows that means backslashes) to
+        /// a format suitable for use within ZIP files. This means trimming the volume letter and colon (if any) And
         /// swapping backslashes for forward slashes.
         /// </summary>
         /// <param name="pathName">source path.</param>

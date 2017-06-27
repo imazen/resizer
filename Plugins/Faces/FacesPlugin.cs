@@ -201,10 +201,10 @@ namespace ImageResizer.Plugins.Faces {
             //Parse min size percent
             f.MinSizePercent = s.Get<float>("f.minsize",f.MinSizePercent);
 
-            //Parse expandsion rules
+            //Parse expansion rules
             double[] expand = s.GetList<double>("f.expand", null, 1, 2);
 
-            //Exapnd bounding box by requested percentage
+            //Expand bounding box by requested percentage
             if (expand != null) {
                 f.ExpandX = expand[0];
                 f.ExpandY = expand.Length > 1 ? expand[1] : expand[0];

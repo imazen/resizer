@@ -16,6 +16,8 @@ using ImageResizer.ExtensionMethods;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Azure;
+using System.Configuration;
+using System.Diagnostics;
 
 namespace ImageResizer.Plugins.AzureReader2 {
 
@@ -82,7 +84,7 @@ namespace ImageResizer.Plugins.AzureReader2 {
 
         public override async Task<Stream> OpenAsync(string virtualPath, NameValueCollection queryString)
         {
-
+            var time = Stopwatch.StartNew();
             MemoryStream ms = new MemoryStream(4096); // 4kb is a good starting point.
 
             // Synchronously download
@@ -102,6 +104,8 @@ namespace ImageResizer.Plugins.AzureReader2 {
             }
 
             ms.Seek(0, SeekOrigin.Begin); // Reset to beginning
+            time.Stop();
+            this.ReportReadTicks(time.ElapsedTicks, ms.Length);
             return ms;
         }
 
@@ -110,8 +114,13 @@ namespace ImageResizer.Plugins.AzureReader2 {
                 throw new InvalidOperationException("AzureReader2 requires a named connection string or a connection string to be specified with the 'connectionString' attribute.");
 
             // Setup the connection to Windows Azure Storage
-            //Lookup named connection string first, then fall back.
+            // for compatibility, look up the appSetting first.
             var connectionString = CloudConfigurationManager.GetSetting(blobStorageConnection);
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                connectionString = ConfigurationManager.ConnectionStrings[blobStorageConnection]?.ConnectionString;
+            }
+
             if (string.IsNullOrEmpty(connectionString)) { connectionString = blobStorageConnection; }
             
 

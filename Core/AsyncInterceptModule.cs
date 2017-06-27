@@ -76,6 +76,7 @@ namespace ImageResizer
 
             if (result == HttpModuleRequestAssistant.PostAuthorizeResult.AccessDenied403)
             {
+                ra.FireAccessDenied();
                 throw new ImageProcessingException(403, "Access denied", "Access denied");
             }
 
@@ -107,9 +108,10 @@ namespace ImageResizer
                 {
                     await HandleRequest(app.Context, ra, vf);
                     //Catch not found exceptions
+                    ra.FirePostAuthorizeSuccess();
                 }
                 catch (System.IO.FileNotFoundException notFound)
-                { //Some VPPs are optimisitic , or could be a race condition
+                { //Some VPPs are optimistic, or could be a race condition
                     if (notFound.Message.Contains(" assembly ")) throw; //If an assembly is missing, it should be a 500, not a 404
                     ra.FireMissing();
                     throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
@@ -119,7 +121,12 @@ namespace ImageResizer
                     ra.FireMissing();
                     throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
                 }
-          
+                catch (Exception ex)
+                {
+                    ra.FirePostAuthorizeRequestException(ex);
+                    throw;
+                }
+
 
             }
         }
@@ -224,6 +231,7 @@ namespace ImageResizer
                         outBuffer.Seek(0, SeekOrigin.Begin);
                         await outBuffer.CopyToAsync(stream);
                     }
+                    ra.FireJobSuccess();
                     //Catch not found exceptions
                 }
                 catch (System.IO.FileNotFoundException notFound)
@@ -239,6 +247,11 @@ namespace ImageResizer
                 {
                     ra.FireMissing();
                     throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
+                }
+                catch (Exception ex)
+                {
+                    ra.FireJobException(ex);
+                    throw;
                 }
             };
 

@@ -15,6 +15,8 @@ Ben Foster has [written a great walkthrough](http://benfoster.io/blog/high-perfo
 2. Add ImageResizer.Plugins.AzureReader2.dll to the project or /bin. Or, `Install-Package ImageResizer.Plugins.AzureReader2`
 3. In the `<plugins />` section, insert one of the following, depending on your scenario.
 
+Prior to V4.1, only appSettings was consulted for locating a connectionString by name - connectionStrings were not checked. For backwards compatibility, a match in appSettings is used before a match in connectionStrings.
+
 ```
 <add name="AzureReader2" prefix="~/azure" connectionString="NamedConnectionString" />
 

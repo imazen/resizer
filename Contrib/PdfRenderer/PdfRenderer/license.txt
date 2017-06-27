@@ -9,7 +9,7 @@ Therefore, this plugin (PdfRenderer) is also made available under the GPL v3,
 as the current version links dynamically to the Ghostscript library. 
 
 While the GPL v3 does not allow us to license the binaries under the MIT license 
-(since they are derivative works when used with the ghostscript dlls), 
+(since they are derivative works when used with the Ghostscript DLLs),
 we can license the source under the MIT license. 
 
 This allows any future user to take the source code and modify it to either 

@@ -16,7 +16,7 @@ namespace ImageResizer.Plugins.Basic {
     /// http://imagehandler.codeplex.com/, 
     /// http://bbimagehandler.codeplex.com/, 
     /// DAMP: http://our.umbraco.org/projects/backoffice-extensions/digibiz-advanced-media-picker,
-    /// Support for http://bip.codeplex.com/ and http://dynamicimageprocess.codeplex.com/ urls is default since w/h are supported.
+    /// Support for http://bip.codeplex.com/ and http://dynamicimageprocess.codeplex.com/ URLs is default since w/h are supported.
     /// </summary>
     public class ImageHandlerSyntax:IPlugin {
 
@@ -36,7 +36,7 @@ namespace ImageResizer.Plugins.Basic {
                 !string.IsNullOrEmpty(context.Request.QueryString["src"])) {
                 //WebImageResizer: http://webimageresizer.codeplex.com/
 
-                /*src: Key to an image, can be a relative url, guid or whatever you want
+                /*src: Key to an image, can be a relative URL, GUID or whatever you want
                 width: Width in pixels without any unit specification
                 height: Height in pixels without any unit specification
                 format: Formats to output to one of the image formats: png, gif, jpg, tif

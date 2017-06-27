@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -73,7 +73,7 @@ namespace FreeImageAPI
         /// </summary>
         FIMD_IPTC = 6,
         /// <summary>
-        /// Abobe XMP metadata
+        /// Adobe XMP metadata
         /// </summary>
         FIMD_XMP = 7,
         /// <summary>

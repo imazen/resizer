@@ -243,7 +243,7 @@ namespace ImageResizer.Plugins.Watermark
         //
         //   3. If we have a MemoryStream of overlay images before the primary
         //      image is even decoded, we theoretically limit the render phase
-        //      time to 20% overhead (overlay jpeg decoding). Locking on a cached
+        //      time to 20% overhead (overlay JPEG decoding). Locking on a cached
         //      Bitmap instance is OK, as all DrawImage calls are serialized
         //      anyway. It doesn't address initial latency problems though, which
         //      can be bad during startup for concurrent similar requests.
@@ -309,7 +309,7 @@ namespace ImageResizer.Plugins.Watermark
         /// </summary>
         public IEnumerable<string> LicenseFeatureCodes
         {
-            get { yield return "R4Creative"; yield return "R4Watermark"; }
+            get { yield return "R_Creative"; yield return "R4Creative"; yield return "R4Watermark"; }
         }
     }
 }

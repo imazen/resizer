@@ -357,7 +357,7 @@ namespace FreeImageAPI.Plugins
         public static FreeImagePlugin RAS { get { return plugins[16]; } }
 
         /// <summary>
-        /// truevision Targa files (*.TGA, *.TARGA)
+        /// TrueVision Targa files (*.TGA, *.TARGA)
         /// </summary>
         public static FreeImagePlugin TARGA { get { return plugins[17]; } }
 

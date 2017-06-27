@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //

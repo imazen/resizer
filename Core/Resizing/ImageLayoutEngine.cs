@@ -48,7 +48,7 @@ namespace ImageResizer.Resizing
                     cropWindow.Width = Math.Min(originalSize.Width - cropWindow.Left, cropWindow.Width);
                     cropWindow.Height = Math.Min(originalSize.Height - cropWindow.Top, cropWindow.Height);
 
-                    if (cropWindow.Size.IsEmpty) throw new Exception("You must specify a custom crop rectange if crop=custom");
+                    if (cropWindow.Size.IsEmpty) throw new Exception("You must specify a custom crop rectangle if crop=custom");
                 }
             }
             return cropWindow;
@@ -225,7 +225,7 @@ namespace ImageResizer.Resizing
             {
                 if (!PolygonMath.FitsInside(manualCropSize, targetSize))
                 {
-                    //The image is larger than its target. Use original image coordintes instead
+                    //The image is larger than its target. Use original image coordinates instead
                     areaSize = targetSize = manualCropSize;
                     copyRect = manualCropRect;
                 }

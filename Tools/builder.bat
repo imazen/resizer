@@ -25,11 +25,13 @@ goto exit
   echo - Running Restore...
   nuget restore ..\AppVeyor.sln
 
+  nuget restore ..\Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln
+
   echo - Fetching extra packaeges...
   nuget restore FakeBuilder\packages.config
 
   echo - Fetching packages for build
-  ..\.paket\paket.bootstrapper.exe prerelease
+  ..\.paket\paket.bootstrapper.exe
   if errorlevel 1 (
     exit /b %errorlevel%
   )

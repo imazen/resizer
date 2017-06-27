@@ -2,7 +2,7 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,6 +21,8 @@ using ImageResizer.Configuration.Logging;
 using System.Web.Compilation;
 using ImageResizer.Configuration.Plugins;
 using System.Linq;
+using ImageResizer.ExtensionMethods;
+using System.Collections.Concurrent;
 
 namespace ImageResizer.Configuration {
     /// <summary>
@@ -48,6 +50,8 @@ namespace ImageResizer.Configuration {
             virtualProviderPlugins = new SafeList<IVirtualImageProvider>();
             settingsModifierPlugins = new SafeList<ISettingsModifier>();
             configProviders = new SafeList<ICurrentConfigProvider>();
+            LicenseError = c.getNode("licenses")?.Attrs?.Get<LicenseErrorAction>("licenseError") ?? LicenseError;
+            LicenseScope = c.getNode("licenses")?.Attrs?.Get<LicenseAccess>("licenseScope") ?? LicenseScope;
         }
         internal PluginLoadingHints hints = new PluginLoadingHints();
 
@@ -155,7 +159,7 @@ namespace ImageResizer.Configuration {
 
 
         /// <summary>
-        /// Returns the first registerd instance of the specified plugin. For IMultiInstancePlugins, use GetAll()
+        /// Returns the first registered instance of the specified plugin. For IMultiInstancePlugins, use GetAll()
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
@@ -253,7 +257,7 @@ namespace ImageResizer.Configuration {
 
         protected SafeList<IFileExtensionPlugin> fileExtensionPlugins = null;
         /// <summary>
-        /// Plugins which accept new file extensions (in the url) are registered here.
+        /// Plugins which accept new file extensions (in the URL) are registered here.
         /// </summary>
         public SafeList<IFileExtensionPlugin> FileExtensionPlugins { get { return fileExtensionPlugins; } }
 
@@ -286,8 +290,8 @@ namespace ImageResizer.Configuration {
         /// </summary>
         public ILogManager LogManager { get { return _logManager; } set { _logManager = value; if (LoggingAvailable != null && value != null) LoggingAvailable(value); } }
 
-
         public delegate void LoggingAvaialableEvent(ILogManager logger);
+
         public LoggingAvaialableEvent LoggingAvailable;
 
         /// <summary>
@@ -365,7 +369,7 @@ namespace ImageResizer.Configuration {
         }
 
         /// <summary>
-        /// This is called to get a sorted list of plugins based on their likelyhood of having the plugin.
+        /// This is called to get a sorted list of plugins based on their likelihood of having the plugin.
         /// </summary>
         /// <param name="assemblyName"></param>
         /// <param name="pluginName"></param>
@@ -518,7 +522,7 @@ namespace ImageResizer.Configuration {
                         alternateNames.Add(name);
                     }
 
-                    //Get a list of assemblies, sorted by likelyhood of a match
+                    //Get a list of assemblies, sorted by likelihood of a match
                     List<string> assemblies = GetOptimizedAssemblyList(searchName.Item2, name);
                     //Now multiply - For each assembly, try each namespace-qualified class name.
                     foreach (string assemblyName in assemblies)
@@ -601,7 +605,7 @@ namespace ImageResizer.Configuration {
                     this.AcceptIssue(new Issue("Plugins", "The plugin " + t.ToString() + " requires arguments in the <add> element. Refer to the plugin documentation for details.",
                     null, IssueSeverity.ConfigurationError));
                 else {
-                    this.AcceptIssue(new Issue("Plugins", "The plugin " + t.ToString() + " does not have a constuctor   Constructor() or Constructor(NameValueCollection args)."
+                    this.AcceptIssue(new Issue("Plugins", "The plugin " + t.ToString() + " does not have a constructor Constructor() or Constructor(NameValueCollection args)."
                     , "To be compatible with the <plugins> section, a plugin must implement IPlugin and define one or more of the above constructors publicly.",
                      IssueSeverity.Critical));
                     hasConstructor = false;
@@ -643,6 +647,7 @@ namespace ImageResizer.Configuration {
             if (plugin is ISettingsModifier) SettingsModifierPlugins.Remove(plugin as ISettingsModifier);
             if (plugin is ICurrentConfigProvider) ConfigProviders.Remove(plugin as ICurrentConfigProvider);
             if (plugin is ILogManager && LogManager == plugin) LogManager = null;
+            if (plugin is ILicensedPlugin || plugin is ILicenseProvider) FireLicensePluginsChange();
         }
 
         /// <summary>
@@ -650,7 +655,7 @@ namespace ImageResizer.Configuration {
         /// Adds the specified plugin to AllPlugins, QuerystringPlugins, CachingSystems, ImageEncoders, and ImageBuiderExtensions, based
         /// on which interfaces the instance implements. For ICache and IEncoder, the plugin is inserted at the beginning of CachingSystems and ImageEncoders respectively.
         /// To reiterate, plugins may register event handlers and modify settings - thus you should use the plugin's method to uninstall them vs. using this method.
-        /// Will not register a plugin that is already installed, unless it implementes IMultiInstancePlugin.
+        /// Will not register a plugin that is already installed, unless it implements IMultiInstancePlugin.
         /// </summary>
         /// <param name="plugin"></param>
         public void add_plugin(IPlugin plugin) {
@@ -670,10 +675,8 @@ namespace ImageResizer.Configuration {
             if (plugin is ISettingsModifier) SettingsModifierPlugins.Add(plugin as ISettingsModifier);
             if (plugin is ICurrentConfigProvider) ConfigProviders.Add(plugin as ICurrentConfigProvider);
             if (plugin is ILogManager) LogManager = plugin as ILogManager;
+            if (plugin is ILicensedPlugin || plugin is ILicenseProvider) FireLicensePluginsChange();
         }
-
-
-
 
         /// <summary>
         /// Removes all plugins, of every kind. Logs any errors encountered. (Not all plugins support uninstallation)
@@ -724,5 +727,109 @@ namespace ImageResizer.Configuration {
 
             return issues;
         }
+
+
+
+        public delegate void LicensingChangeEvent(object sender, Config forConfig);
+
+        /// <summary>
+        /// There has been a change in licensed or licensing plugins
+        /// </summary>
+        public event LicensingChangeEvent LicensePluginsChange;
+
+        /// <summary>
+        /// Fires the LicensingChange event
+        /// </summary>
+        public void FireLicensePluginsChange()
+        {
+            LicensePluginsChange?.Invoke(this, this.c);
+        }
+
+        /// <summary>
+        /// Register the provided license. Will apply the Plugins.LicenseScope value.
+        /// </summary>
+        /// <param name="license"></param>
+        public void AddLicense(string license)
+        {
+            ImageResizer.Plugins.Basic.StaticLicenseProvider.One(license).Install(this.c);
+            FireLicensePluginsChange();
+        }
+
+        private LicenseAccess _licenseScope = LicenseAccess.Process;
+      
+        /// <summary>
+        /// If this Config should inherit and/or share licenses process-wide, or only use licenses specifically registered.
+        /// </summary>
+        public LicenseAccess LicenseScope { get { return _licenseScope; } set { _licenseScope = value; FireLicensePluginsChange();  }  }
+
+        /// <summary>
+        /// Should image requests fail or be watermarked when license validation fails?
+        /// </summary>
+        public LicenseErrorAction LicenseError { get; set; } = LicenseErrorAction.Watermark;
+
+        ConcurrentDictionary<string, string> mappedDomains;
+
+        /// <summary>
+        /// This allows you to map certain local hostnames (such as those without domains: 'localhost', 'localserver') and *.local domains like 'webserver.local'.
+        /// Request with these host headers will appear as the licensed domain instead.
+        /// </summary>
+        /// <param name="localHostname"></param>
+        /// <param name="licensedDomain"></param>
+        public void AddLicensedDomainMapping(string localHostname, string licensedDomain)
+        {
+            if (mappedDomains == null) mappedDomains = new ConcurrentDictionary<string, string>();
+            var from = localHostname?.Trim().ToLowerInvariant();
+            var to = licensedDomain?.Trim().ToLowerInvariant();
+            if (string.IsNullOrEmpty(from) || string.IsNullOrEmpty(to))
+            {
+                throw new ArgumentException("Both localHostname and licensedDomain must be non-null and non-empty.");
+            }
+            mappedDomains[from] = to;
+        }
+
+        public IEnumerable<KeyValuePair<string, string>> GetLicensedDomainMappings() => mappedDomains ??
+                                                                                        Enumerable
+                                                                                            .Empty<KeyValuePair<string,
+                                                                                                string>>();
+    }
+
+    /// <summary>
+    /// Sharing of license keys.
+    /// </summary>
+    [Flags()]
+    public enum LicenseAccess
+    {
+        /// <summary>
+        /// Only use licenses added to the instance.
+        /// </summary>
+        Local = 0,
+        /// <summary>
+        /// Reuse but don't share.
+        /// </summary>
+        ProcessReadonly = 1,
+        /// <summary>
+        /// Share but don't reuse
+        /// </summary>
+        ProcessShareonly = 2,
+        /// <summary>
+        /// Share and reuse licenses process-wide
+        /// </summary>
+        Process = 3,
+    }
+
+    /// <summary>
+    /// How to notify the user that license validation has failed
+    /// </summary>
+    [Flags()]
+    public enum LicenseErrorAction
+    {
+        /// <summary>
+        /// Adds a red dot to the bottom-right corner
+        /// </summary>
+        Watermark = 0,
+        /// <summary
+        /// Raises an exception with http status code 402
+        /// </summary>
+        Exception = 1,
     }
 }

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 
 namespace ImageResizer.Resizing {
@@ -56,7 +57,7 @@ namespace ImageResizer.Resizing {
         /// </summary>
         public Size destSize;
         /// <summary>
-        /// The dimensions of the bitmap afer all operations have been applied to it (Calling FlipRotate can change the bitmap dimensions).
+        /// The dimensions of the bitmap after all operations have been applied to it (Calling FlipRotate can change the bitmap dimensions).
         /// </summary>
         public Size finalSize;
 
@@ -88,7 +89,10 @@ namespace ImageResizer.Resizing {
                 //For CMYK images, we must use DrawImage instead.
                 preRenderBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height, PixelFormat.Format24bppRgb);
                 using (var g = Graphics.FromImage(preRenderBitmap)) {
-                    g.DrawImageUnscaled(sourceBitmap, 0, 0);
+                    g.CompositingMode = CompositingMode.SourceCopy;
+                    g.CompositingQuality= CompositingQuality.HighSpeed;
+                    g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                    g.DrawImage(sourceBitmap, 0, 0, sourceBitmap.Width, sourceBitmap.Height);
                 }
              }
         }
@@ -134,6 +138,11 @@ namespace ImageResizer.Resizing {
             {
                 throw new ArgumentOutOfRangeException("cropRect", "Crop rectangle is outside the bounds of the image");
             }
+            // Actually, throwing an error is worse
+            //if (copyRect.Width < 1 || copyRect.Height < 1)
+            //{
+            //    throw new ArgumentOutOfRangeException("cropRect", string.Format("Crop rectangle includes zero pixels: {0},{1},{2},{3}", copyRect.X,copyRect.Y,copyRect.Right,copyRect.Bottom));
+            //}
         }
         /// <summary>
         /// Ensures that the working bitmap is in 32bpp RGBA format - otherwise it is converted.

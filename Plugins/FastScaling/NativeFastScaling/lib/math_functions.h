@@ -10,14 +10,22 @@
 #define inline __inline
 #endif
 
+
+
 #include <stdint.h>
 #include <math.h>
 #include <limits.h>
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define IR_PI  3.1415926535897932384626433832795
 
+static inline int int_min(int a, int b) { return a <= b ? a : b; }
+static inline int int_max(int a, int b) { return a >= b ? a : b; }
+
+/*
 static inline int min(int a, int b)
 {
     return a <= b ? a : b;
@@ -26,6 +34,7 @@ static inline int max(int a, int b)
 {
     return a >= b ? a : b;
 }
+*/
 
 static inline unsigned int umin(unsigned int a, unsigned int b)
 {
@@ -86,3 +95,6 @@ static inline int isPowerOfTwo(unsigned int x)
 {
     return ((x != 0) && !(x & (x - 1)));
 }
+#ifdef __cplusplus
+}
+#endif

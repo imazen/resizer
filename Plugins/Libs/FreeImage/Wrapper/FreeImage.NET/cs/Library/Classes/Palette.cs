@@ -102,9 +102,9 @@ namespace FreeImageAPI
                 // The array is pinned immediately to prevent the GC from
                 // moving it to a different position in memory.
                 base.handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-                // The array and its content have beed pinned, so that its address
+                // The array and its content have been pinned, so that its address
                 // can be safely requested and stored for the whole lifetime
-                // of the instace.
+                // of the instance.
                 base.ptr = (byte*)base.handle.AddrOfPinnedObject();
             }
         }

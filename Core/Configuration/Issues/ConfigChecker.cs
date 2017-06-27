@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Security.Principal;
 using System.Web.Security;
 using System.Web.Hosting;
+using ImageResizer.Configuration.Performance;
 
 namespace ImageResizer.Configuration.Issues {
     public class ConfigChecker:IIssueProvider {
@@ -20,7 +21,7 @@ namespace ImageResizer.Configuration.Issues {
             this.c = c;
         }
         public IEnumerable<IIssue> GetIssues() {
-            List<IIssue> issues = new List<IIssue>();
+            var issues = new List<IIssue>();
             //If a plugin has a configuration section, but is not installed, log an issue.
             if (c.getNode("sizelimiting") != null) issues.Add(new Issue("Use <sizelimits>, not <sizelimiting> to configure the SizeLimiting plugin", IssueSeverity.ConfigurationError));
             if (c.getNode("sizelimits") != null && 
@@ -31,7 +32,7 @@ namespace ImageResizer.Configuration.Issues {
             if (c.Pipeline.ProcessedCount < 1)
                 issues.Add(new Issue("To potentially see additional errors here, perform an image resize request.", IssueSeverity.Warning));
 
-            bool canCheckUrls = c.Pipeline.IsAppDomainUnrestricted();
+            var canCheckUrls = c.Pipeline.IsAppDomainUnrestricted();
 
             if (canCheckUrls && HostingEnvironment.ApplicationVirtualPath != null) {
                 try {
@@ -51,21 +52,18 @@ namespace ImageResizer.Configuration.Issues {
 
 
             if (HostingEnvironment.ApplicationPhysicalPath != null && File.Exists(Path.Combine(HostingEnvironment.ApplicationPhysicalPath, "PrecompiledApp.config")))
-                issues.Add(new Issue("Precompilation is enabled. Image providers may not work as expected."));
+                issues.Add(new Issue("Precompilation is enabled. Image providers may not work without a querystring present."));
             
-            string assembliesRunningHotfix = "";
-            Assembly[] asms = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (Assembly a in asms) {
+            var assembliesRunningHotfix = "";
+            var asms = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var a in asms) {
                 //Only check DLLs with ImageResizer in their name
-                AssemblyName assemblyName = new AssemblyName(a.FullName);
+                var assemblyName = new AssemblyName(a.FullName);
                 if (assemblyName.Name.IndexOf("ImageResizer",  StringComparison.OrdinalIgnoreCase) < 0) continue;
                 
-                object[] attrs;
-                
-                attrs = a.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
-                if (attrs != null && attrs.Length > 0) 
-                    if (((AssemblyInformationalVersionAttribute)attrs[0]).InformationalVersion.IndexOf("hotfix",StringComparison.OrdinalIgnoreCase) > -1)
-                        assembliesRunningHotfix += assemblyName.Name + ", ";
+                if (a.GetInformationalVersion()?.IndexOf("hotfix") > -1)
+                    assembliesRunningHotfix += assemblyName.Name + ", ";
+
             }
             assembliesRunningHotfix = assembliesRunningHotfix.TrimEnd(',',' ');
 

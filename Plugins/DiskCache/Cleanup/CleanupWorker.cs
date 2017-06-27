@@ -82,8 +82,8 @@ namespace ImageResizer.Plugins.DiskCache {
                 mainInner();
             } catch (Exception ex) {
                 if (Debugger.IsAttached) throw;
-                if (lp.Logger != null) lp.Logger.Error("Contact support! A critical (and unexpected) exception occured in the disk cache cleanup worker thread. This needs to be investigated. {0}", ex.Message + ex.StackTrace);
-                this.AcceptIssue(new Issue("Contact support! A critical (and unexpected) exception occured in the disk cache cleanup worker thread. This needs to be investigated. ", ex.Message + ex.StackTrace, IssueSeverity.Critical));
+                if (lp.Logger != null) lp.Logger.Error("Contact support! A critical (and unexpected) exception occurred in the disk cache cleanup worker thread. This needs to be investigated. {0}", ex.Message + ex.StackTrace);
+                this.AcceptIssue(new Issue("Contact support! A critical (and unexpected) exception occurred in the disk cache cleanup worker thread. This needs to be investigated. ", ex.Message + ex.StackTrace, IssueSeverity.Critical));
             }
         }
         /// <summary>
@@ -166,7 +166,7 @@ namespace ImageResizer.Plugins.DiskCache {
                         _queueWait.WaitOne();
                     else if (notBusy)
                         //Don't flood the system even when it's not busy. 50% usage here. Wait for the length of time worked or the optimal work time, whichever is longer.
-                        //A directory listing can take 30 seconds sometimes and kill the cpu.
+                        //A directory listing can take 30 seconds sometimes and kill the CPU.
                         _quitWait.WaitOne((int)Math.Max(cs.OptimalWorkSegmentLength.TotalMilliseconds, workedForTime.ElapsedMilliseconds));
 
                     else {
@@ -212,7 +212,7 @@ namespace ImageResizer.Plugins.DiskCache {
             if (queue.IsEmpty) return false;
 
             DateTime startedAt = DateTime.UtcNow;
-            //Proccess as many items from the queue as possible
+            //Process as many items from the queue as possible
             while (DateTime.UtcNow.Subtract(startedAt) < length && !queue.IsEmpty) {
                 //Check for shutdown
                 if (shuttingDown) return true;
@@ -260,7 +260,7 @@ namespace ImageResizer.Plugins.DiskCache {
         }
 
         protected string addSlash(string s, bool physical) {
-            if (string.IsNullOrEmpty(s)) return s; //On empty or null, dont' add aslash.
+            if (string.IsNullOrEmpty(s)) return s; //On empty or null, don't add a slash.
             if (physical) return s.TrimEnd(System.IO.Path.DirectorySeparatorChar) + System.IO.Path.DirectorySeparatorChar;
             else return s.TrimEnd('/') + '/';
         }
@@ -273,7 +273,7 @@ namespace ImageResizer.Plugins.DiskCache {
                     sw.Start();
                     cache.Index.populate(item.RelativePath, item.PhysicalPath);
                     sw.Stop();
-                    lp.Logger.Trace("{0}ms: Querying filesystem about {1}", sw.ElapsedMilliseconds.ToString(NumberFormatInfo.InvariantInfo).PadLeft(4), item.RelativePath);
+                    lp.Logger.Trace("{0}ms: Querying file system about {1}", sw.ElapsedMilliseconds.ToString(NumberFormatInfo.InvariantInfo).PadLeft(4), item.RelativePath);
                 } else 
                     cache.Index.populate(item.RelativePath, item.PhysicalPath);
             }
@@ -299,7 +299,7 @@ namespace ImageResizer.Plugins.DiskCache {
 
             cache.Locks.TryExecute(item.RelativePath, 10, delegate() {
 
-                //If the file is already gone, consider the mission a succes.
+                //If the file is already gone, consider the mission a success.
                 if (!System.IO.File.Exists(item.PhysicalPath)) {
                     cache.Index.setCachedFileInfo(item.RelativePath, null);
                     removedFile = true;

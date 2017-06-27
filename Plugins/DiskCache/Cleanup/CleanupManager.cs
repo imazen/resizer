@@ -29,7 +29,7 @@ namespace ImageResizer.Plugins.DiskCache {
                 else
                     this.BeLazy();
             };
-            //Called when the filesystem changes unexpectedly.
+            //Called when the file system changes unexpectedly.
             cache.Index.FileDisappeared += delegate(string relativePath, string physicalPath) {
                 if (lp.Logger != null) lp.Logger.Warn("File disappeared from the cache unexpectedly - reindexing entire cache. File name: {0}", relativePath);
                 //Stop everything ASAP and start a brand new cleaning run.
