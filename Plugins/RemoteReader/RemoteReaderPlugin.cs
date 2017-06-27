@@ -52,6 +52,7 @@ namespace ImageResizer.Plugins.RemoteReader {
 
         protected string remotePrefix = "~/remote";
         Config c;
+
         public RemoteReaderPlugin() {
             AllowedRedirects = 5;
             SkipUriValidation = false;
