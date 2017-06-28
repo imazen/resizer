@@ -45,10 +45,17 @@ namespace ImageResizer.Plugins.RemoteReader {
         /// </summary>
         public int AllowedRedirects { get; set; }
 
+        /// <summary>
+        /// Optionally skip validation using Uri.IsWellFormedUriString() to prevent errors with some non-standard URLs in use
+        /// </summary>
+        public bool SkipUriValidation { get; set; }
+
         protected string remotePrefix = "~/remote";
         Config c;
+
         public RemoteReaderPlugin() {
             AllowedRedirects = 5;
+            SkipUriValidation = false;
             try {
                 remotePrefix = Util.PathUtils.ResolveAppRelativeAssumeAppRelative(remotePrefix);
                 //Remote prefix must never end in a slash - remote.jpg syntax...
@@ -67,6 +74,7 @@ namespace ImageResizer.Plugins.RemoteReader {
             c.Pipeline.RewriteDefaults += Pipeline_RewriteDefaults;
             c.Pipeline.PostRewrite += Pipeline_PostRewrite;
             AllowedRedirects = c.get("remoteReader.allowedRedirects",AllowedRedirects);
+            SkipUriValidation = c.get("remoteReader.skipUriValidation", SkipUriValidation);
 
             return this;
         }
@@ -225,7 +233,7 @@ namespace ImageResizer.Plugins.RemoteReader {
                 args.RemoteUrl = "http://" + ReplaceInLeadingSegment(virtualPath.Substring(remotePrefix.Length).TrimStart('/', '\\'), "_", ".");
                 args.RemoteUrl = Uri.EscapeUriString(args.RemoteUrl);
             }
-            if (!Uri.IsWellFormedUriString(args.RemoteUrl, UriKind.Absolute))
+            if (!SkipUriValidation && !Uri.IsWellFormedUriString(args.RemoteUrl, UriKind.Absolute))
                 throw new ImageProcessingException("Invalid request! The specified Uri is invalid: " + args.RemoteUrl);
             return args;
         }
