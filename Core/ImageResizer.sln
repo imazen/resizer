@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer", "ImageResizer.csproj", "{FA5EF673-A6A4-498D-AA24-C025CC5267AF}"
 EndProject
@@ -26,8 +26,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.CloudFront", "..\Plugins\CloudFront\ImageResizer.Plugins.CloudFront.csproj", "{9BFCA7FB-EAFB-4E89-B388-774CEA6CD466}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication", "..\Samples\ConsoleApplication\ConsoleApplication.csproj", "{51E37FA2-4CD1-476D-8B29-BD51C5F02B78}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.SeamCarving", "..\Plugins\SeamCarving\ImageResizer.Plugins.SeamCarving.csproj", "{7AEFB877-A720-4929-880C-1090A71C83EB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.RemoteReader", "..\Plugins\RemoteReader\ImageResizer.Plugins.RemoteReader.csproj", "{0E6BE1A7-C754-4E33-A8AC-75A8549FC68B}"
 EndProject
@@ -67,11 +65,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.CopyMe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.DiagnosticJson", "..\Plugins\DiagnosticJson\ImageResizer.Plugins.DiagnosticJson.csproj", "{DF78DF74-D71E-470D-8BE2-D827498E8AF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PdfRenderer", "..\Contrib\PdfRenderer\PdfRenderer\ImageResizer.Plugins.PdfRenderer.csproj", "{7C8A13F7-5C00-4074-B16E-45D0E231B70D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Storage", "..\Plugins\ImageResizer.Storage\ImageResizer.Storage.csproj", "{80BB303C-8F55-410C-BA91-342ECC435101}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.PdfiumRenderer", "..\Contrib\PdfiumRenderer\PdfiumRenderer\ImageResizer.Plugins.PdfiumRenderer.csproj", "{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Std", "..\ImageResizer.Std\ImageResizer.Std.csproj", "{D34860FF-CACF-4C48-B951-15322AAB0C4A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -127,10 +125,6 @@ Global
 		{51E37FA2-4CD1-476D-8B29-BD51C5F02B78}.Debug|Any CPU.Build.0 = Debug|x86
 		{51E37FA2-4CD1-476D-8B29-BD51C5F02B78}.Release|Any CPU.ActiveCfg = Release|x86
 		{51E37FA2-4CD1-476D-8B29-BD51C5F02B78}.Release|Any CPU.Build.0 = Release|x86
-		{7AEFB877-A720-4929-880C-1090A71C83EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7AEFB877-A720-4929-880C-1090A71C83EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7AEFB877-A720-4929-880C-1090A71C83EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7AEFB877-A720-4929-880C-1090A71C83EB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0E6BE1A7-C754-4E33-A8AC-75A8549FC68B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0E6BE1A7-C754-4E33-A8AC-75A8549FC68B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E6BE1A7-C754-4E33-A8AC-75A8549FC68B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -207,10 +201,6 @@ Global
 		{DF78DF74-D71E-470D-8BE2-D827498E8AF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF78DF74-D71E-470D-8BE2-D827498E8AF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF78DF74-D71E-470D-8BE2-D827498E8AF8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7C8A13F7-5C00-4074-B16E-45D0E231B70D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{80BB303C-8F55-410C-BA91-342ECC435101}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{80BB303C-8F55-410C-BA91-342ECC435101}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80BB303C-8F55-410C-BA91-342ECC435101}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -219,8 +209,15 @@ Global
 		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D50A6B07-FE0E-47A8-9F58-2CA4BCBA5F6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D34860FF-CACF-4C48-B951-15322AAB0C4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D34860FF-CACF-4C48-B951-15322AAB0C4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D34860FF-CACF-4C48-B951-15322AAB0C4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D34860FF-CACF-4C48-B951-15322AAB0C4A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4F0AC0C5-CFC0-4513-B057-623028D713AD}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="bugs.txt" />
+    <Content Include="Configuration\Performance\why.txt" />
+    <Content Include="COPYRIGHT.txt" />
+    <Content Include="exceptions.txt" />
+    <Content Include="gdi-bugs.txt" />
+    <Content Include="plugin-notes.txt" />
+    <Content Include="Resizing\UnitR.cs.txt" />
+    <Content Include="totest.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Plugins\Basic\ImageHandlerSyntax.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+</Project>
