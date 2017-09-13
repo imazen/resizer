@@ -74,6 +74,22 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             Assert.Equal(23, results.Count());
             Assert.Equal(new[] {0L, 1, 2, 3}, results.Take(4));
         }
+        
+        [Fact]
+        public void MultiIntervalTest()
+        {
+            NamedInterval[] Intervals  = {
+                new NamedInterval { Unit = "second", Name = "Per Second", TicksDuration = Stopwatch.Frequency },
+                    new NamedInterval { Unit = "minute", Name = "Per Minute", TicksDuration = Stopwatch.Frequency * 60 },
+                    new NamedInterval { Unit = "15_mins", Name = "Per 15 Minutes", TicksDuration = Stopwatch.Frequency * 60 * 15 },
+                    new NamedInterval { Unit = "hour", Name = "Per Hour", TicksDuration = Stopwatch.Frequency * 60 * 60 },
+                };
+            var s = new MultiIntervalStats(Intervals);
+            for (long i = Stopwatch.Frequency * -1000; i < Stopwatch.Frequency * 5000; i += Stopwatch.Frequency / 2)
+            {
+                s.Record(i, 1);
+            }
+        }
 
         [Fact]
         public void TestAddMulModHash()
