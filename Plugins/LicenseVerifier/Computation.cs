@@ -142,7 +142,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
                                                           details.Expires < clock.GetUtcNow();
 
         bool HasLicenseBegun(ILicenseDetails details) => details.Issued != null &&
-                                                         details.Issued > clock.GetUtcNow();
+                                                         details.Issued < clock.GetUtcNow();
 
 
         public IEnumerable<string> GetMessages(ILicenseDetails d) => new[] {
@@ -174,7 +174,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
             if (!success && logIssues) {
                 permanentIssues.AcceptIssue(new Issue(
                     $"License {b.Fields.Id} needs to be upgraded; it does not cover in-use features {notCovered.SelectMany(v => v).Distinct().Delimited(", ")}", b.ToRedactedString(),
-                    IssueSeverity.Warning));
+                    IssueSeverity.Error));
             }
             return success;
         }
@@ -189,9 +189,9 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 return false;
             }
 
-            if (HasLicenseBegun(details)) {
+            if (!HasLicenseBegun(details)) {
                 permanentIssues.AcceptIssue(new Issue(
-                    "License " + details.Id + " was issued in the future; check system clock ", b.ToRedactedString(),
+                    "License " + details.Id + " was issued in the future; check system clock.", b.ToRedactedString(),
                     IssueSeverity.Error));
                 return false;
             }
