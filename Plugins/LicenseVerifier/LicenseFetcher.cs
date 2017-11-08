@@ -193,7 +193,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 error.IntervalTicks += (long) Math.Round(new Random().NextDouble() * clock.TicksPerSecond / 2.0);
             }
             if (error.IntervalTicks > LicenseFetchIntervalSeconds * clock.TicksPerSecond) {
-                error.IntervalTicks = InitialErrorIntervalSeconds * clock.TicksPerSecond;
+                error.IntervalTicks = LicenseFetchIntervalSeconds * clock.TicksPerSecond;
             }
         }
 
