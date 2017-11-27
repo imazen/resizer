@@ -21,6 +21,8 @@ using ImageResizer.Plugins;
 using System.Globalization;
 using ImageResizer.ExtensionMethods;
 using System.Web.Hosting;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ImageResizer
 {
@@ -34,6 +36,12 @@ namespace ImageResizer
         /// Shouldn't be used except to make a factory instance.
         /// </summary>
         protected ImageBuilder() { }
+
+
+        public int? MaxConcurrentJobs { get; } = null;
+
+        private SemaphoreSlim semaphore;
+
         protected IEncoderProvider _encoderProvider = null;
         /// <summary>
         /// Handles the encoder selection and provision process.
@@ -77,6 +85,26 @@ namespace ImageResizer
         }
 
         /// <summary>
+        /// Create a new instance of ImageBuilder using the specified extensions, encoder provider, file provider, and settings filter. Extension methods will be fired in the order they exist in the collection.
+        /// </summary>
+        /// <param name="extensions"></param>
+        /// <param name="encoderProvider"></param>
+        /// <param name="settingsModifier"></param>
+        /// <param name="virtualFileProvider"></param>
+        public ImageBuilder(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider, IVirtualImageProvider virtualFileProvider, ISettingsModifier settingsModifier, int? maxConcurrentJobs)
+            : base(extensions)
+        {
+            this._encoderProvider = encoderProvider;
+            this._virtualFileProvider = virtualFileProvider;
+            this._settingsModifier = settingsModifier;
+            MaxConcurrentJobs = maxConcurrentJobs;
+            if (maxConcurrentJobs.HasValue && maxConcurrentJobs.Value > 0)
+            {
+                semaphore = new SemaphoreSlim(maxConcurrentJobs.Value);
+            }
+        }
+
+        /// <summary>
         /// Creates another instance of the class using the specified extensions. Subclasses should override this and point to their own constructor.
         /// </summary>
         /// <param name="extensions"></param>
@@ -92,7 +120,7 @@ namespace ImageResizer
         /// </summary>
         /// <returns></returns>
         public virtual ImageBuilder Copy(){
-            return new ImageBuilder(this.exts,this._encoderProvider, this._virtualFileProvider,this._settingsModifier);
+            return new ImageBuilder(this.exts,this._encoderProvider, this._virtualFileProvider,this._settingsModifier, MaxConcurrentJobs);
         }
 
 
@@ -397,12 +425,71 @@ namespace ImageResizer
         }
         #endregion
 
+        internal async Task<ImageJob> BuildAsync(ImageJob job, int maxQueuingMilliseconds, CancellationToken cancel)
+        {
+            if (semaphore != null)
+            {
+                if (await semaphore.WaitAsync(maxQueuingMilliseconds, cancel))
+                {
+                    try
+                    {
+                        return await Task.Factory.StartNew(() => BuildInternal(job),
+                                                    cancel,
+                                                    TaskCreationOptions.None,
+                                                    TaskScheduler.FromCurrentSynchronizationContext());
+                    }
+                    finally{
+                        semaphore.Release();
+                    }
+                }
+                else
+                {
+                    throw new ImageProcessingException("Job timed out waiting in queue (max {MaxConcurrentJobs} concurrent jobs, max {maxQueuingMilliscones}ms queue wait time).");
+                }
+            } else
+            {
+                return await Task.Factory.StartNew(() => BuildInternal(job),
+                                                    cancel,
+                                                    TaskCreationOptions.None,
+                                                    TaskScheduler.FromCurrentSynchronizationContext());
+            }
+        }
         /// <summary>
         /// The most flexible method for processing an image
         /// </summary>
         /// <param name="job"></param>
         /// <returns></returns>
         public virtual ImageJob Build(ImageJob job) {
+            return BuildInQueue(job, true, int.MaxValue, CancellationToken.None);
+        }
+
+        internal ImageJob BuildInQueue(ImageJob job, bool useSemaphore, int maxQueuingMilliseconds, CancellationToken cancel)
+        {
+            if (useSemaphore && semaphore != null)
+            {
+                if (!semaphore.Wait(maxQueuingMilliseconds, cancel)){
+                    throw new ImageProcessingException("Job timed out waiting in queue (max {MaxConcurrentJobs} concurrent jobs, max {maxQueuingMilliscones}ms queue wait time).");
+                }
+                else
+                {
+                    try
+                    {
+                        return BuildInternal(job);
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                }
+            }
+            else
+            {
+                return BuildInternal(job);
+            }
+        }
+
+        internal ImageJob BuildInternal(ImageJob job)
+        {
             if (job == null) throw new ArgumentNullException("job", "ImageJob parameter null. Cannot Build a null ImageJob instance");
             Stopwatch totalTicks = Stopwatch.StartNew();
             //Clone and filter settings FIRST, before calling plugins.
@@ -410,7 +497,8 @@ namespace ImageResizer
             if (SettingsModifier != null) s = SettingsModifier.Modify(s);
             job.Settings = s;
 
-            try {
+            try
+            {
                 //Allow everything else to be overridden
                 if (BuildJob(job) != RequestedAction.Cancel) throw new ImageProcessingException("Nobody did the job");
                 EndBuildJob(job);
@@ -419,13 +507,14 @@ namespace ImageResizer
                 (SettingsModifier as IPipelineConfig)?.FireHeartbeat();
                 Configuration.Performance.GlobalPerf.Singleton.JobComplete(this, job);
                 return job;
-            } finally {
+            }
+            finally
+            {
                 //Follow the dispose requests
                 if (job.DisposeSourceObject && job.Source is IDisposable && job.Source != null) ((IDisposable)job.Source).Dispose();
                 if (job.DisposeDestinationStream && job.Dest is IDisposable && job.Dest != null) ((IDisposable)job.Dest).Dispose();
             }
         }
-
 
 
         protected override RequestedAction BuildJob(ImageJob job) {

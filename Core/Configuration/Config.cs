@@ -131,7 +131,7 @@ namespace ImageResizer.Configuration {
                 if (_imageBuilder == null)
                     lock (_imageBuilderSync)
                         if (_imageBuilder == null)
-                            _imageBuilder = new ImageBuilder(plugins.ImageBuilderExtensions,plugins,pipeline, pipeline);
+                            _imageBuilder = new ImageBuilder(plugins.ImageBuilderExtensions,plugins,pipeline, pipeline, pipeline?.MaxConcurrentJobs);
 
                 return _imageBuilder;
             }

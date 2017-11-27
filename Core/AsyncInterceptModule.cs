@@ -204,17 +204,7 @@ namespace ImageResizer
                     }
                     else
                     {
-                        //Handle I/O portions of work asynchronously. 
-                        var j = new ImageJob();
-                        j.Instructions = new Instructions(settings);
-                        j.SourcePathData = vf != null ? vf.VirtualPath : ra.RewrittenVirtualPath;
-
-                        
-                        var outBuffer = new MemoryStream(32 * 1024);
-                        j.Dest = outBuffer;
-
                         MemoryStream inBuffer = null;
-
                         using (var sourceStream = vf != null ? await vf.OpenAsync() : File.Open(ra.RewrittenMappedPath, FileMode.Open, FileAccess.Read, FileShare.Read))
                         {
                             inBuffer = new MemoryStream(sourceStream.CanSeek ? (int)sourceStream.Length : 128 * 1024);
@@ -222,12 +212,19 @@ namespace ImageResizer
                         }
                         inBuffer.Seek(0, SeekOrigin.Begin);
 
-                        j.Source = inBuffer;
-                        
-                        await Task.Factory.StartNew(() => conf.GetImageBuilder().Build(j), 
-                                                    CancellationToken.None,
-                                                    TaskCreationOptions.None,
-                                                    TaskScheduler.FromCurrentSynchronizationContext());
+                        var outBuffer = new MemoryStream(32 * 1024);
+
+                        //Handle I/O portions of work asynchronously. 
+                        var j = new ImageJob
+                        {
+                            Instructions = new Instructions(settings),
+                            SourcePathData = vf != null ? vf.VirtualPath : ra.RewrittenVirtualPath,
+                            Dest = outBuffer,
+                            Source = inBuffer
+                        };
+
+                        await conf.GetImageBuilder().BuildAsync(j, int.MaxValue, CancellationToken.None);
+
                         outBuffer.Seek(0, SeekOrigin.Begin);
                         await outBuffer.CopyToAsync(stream);
                     }
