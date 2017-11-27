@@ -76,11 +76,12 @@ namespace ImageResizer.Plugins.Faces {
         /// <param name="image"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public List<Face> GetFacesFromImage(object image, NameValueCollection settings) {
+        public List<Face> GetFacesFromImage(object image, NameValueCollection settings)
+        {
             using (var b = c.CurrentImageBuilder.LoadImage(image, new ResizeSettings(settings))) {
-                using (var detector = ConfigureDetection(settings)) {
-                    return detector.DetectFeatures(b);
-                }
+                var detector = ConfigureDetection(settings);
+                return detector.DetectFeatures(b);
+
             }
         }
 
@@ -94,13 +95,16 @@ namespace ImageResizer.Plugins.Faces {
 
             //Perform face detection for either (or both) situations
             if (showFaces || focusFaces) {
-                using (var detector = ConfigureDetection(s.settings)) {
-                    //Store faces
-                    s.Data["faces"] = faces = detector.DetectFeatures(s.sourceBitmap);
-                }
+                var detector = ConfigureDetection(s.settings);
+                //Store faces
+                s.Data["faces"] = faces = detector.DetectFeatures(s.sourceBitmap);
+
                 //Store points
                 List<PointF> points = new List<PointF>();
-                foreach (Face r in faces) { points.Add(new PointF(r.X, r.Y)); points.Add(new PointF(r.X2, r.Y2)); }
+                foreach (Face r in faces) {
+                    points.Add(new PointF(r.X, r.Y));
+                    points.Add(new PointF(r.X2, r.Y2));
+                }
                 s.layout.AddInvisiblePolygon("faces", points.ToArray());
             }
 
@@ -153,7 +157,7 @@ namespace ImageResizer.Plugins.Faces {
             var d = new DetectionResponse<Face>();
             try {
                 //Only detect faces if it was requested.
-                if (detect) using (var detector =ConfigureDetection(s.settings)) d.features = detector.DetectFeatures(s.sourceBitmap);
+                if (detect) d.features = ConfigureDetection(s.settings).DetectFeatures(s.sourceBitmap);
             } catch (TypeInitializationException e) {
                 throw e;
             } catch (Exception e) {

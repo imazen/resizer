@@ -104,7 +104,7 @@ namespace ImageResizer.Plugins.RedEye {
 
             //Detect faces
             Stopwatch watch = Stopwatch.StartNew();
-            CvAvgComp[] faces = Cv.HaarDetectObjects(img, Cascades["FaceCascade"], storage, 1.0850, 2, 0, new CvSize(30, 30), new CvSize(0, 0)).ToArrayAndDispose();
+            CvAvgComp[] faces = BorrowCascade("FaceCascade", c => Cv.HaarDetectObjects(img, c, storage, 1.0850, 2, 0, new CvSize(30, 30), new CvSize(0, 0)).ToArrayAndDispose());
             watch.Stop();
             Debug.WriteLine("face detection time = " + watch.ElapsedMilliseconds);
 
@@ -112,7 +112,7 @@ namespace ImageResizer.Plugins.RedEye {
 
             //If there are no faces, look for large eye pairs
             if (faces.Length == 0) {
-                CvAvgComp[] pairs = Cv.HaarDetectObjects(img, Cascades["EyePair45"], storage, 1.0850, 2, 0, new CvSize(img.Width / 4, img.Width / 20), new CvSize(0, 0)).ToArrayAndDispose();
+                CvAvgComp[] pairs = BorrowCascade("EyePair45", c => Cv.HaarDetectObjects(img,c, storage, 1.0850, 2, 0, new CvSize(img.Width / 4, img.Width / 20), new CvSize(0, 0)).ToArrayAndDispose());
                 if (pairs.Length > 0) {
                     //TODO!!! Uncomment and test now that CompareByNeighbors sorts correctly
                     //Array.Sort<CvAvgComp>(pairs, CompareByNeighbors); 
@@ -145,7 +145,7 @@ namespace ImageResizer.Plugins.RedEye {
             img.SetROI(r);
 
             //Look for pairs there
-            CvAvgComp[] pairs = Cv.HaarDetectObjects(img, Cascades["EyePair22"], storage, 1.0850, 2, 0, new CvSize(r.Width < 50 ? 11 : 22, r.Width < 50 ? 3 : 5), new CvSize(0, 0)).ToArrayAndDispose();
+            CvAvgComp[] pairs = BorrowCascade("EyePair22", c => Cv.HaarDetectObjects(img, c, storage, 1.0850, 2, 0, new CvSize(r.Width < 50 ? 11 : 22, r.Width < 50 ? 3 : 5), new CvSize(0, 0)).ToArrayAndDispose());
             //Array.Sort<CvAvgComp>(pairs, CompareByNeighbors);
 
             //Look for individual eyes if no pairs were found
@@ -235,7 +235,7 @@ namespace ImageResizer.Plugins.RedEye {
                     //Search for eyes
                     storage.Clear();
                     img.SetROI(left);
-                    CvAvgComp[] leyes = Cv.HaarDetectObjects(img, (int)vals[0] == 0 ? Cascades["RightEyeCascade"] : Cascades["Eye"], storage, 1.0850, (int)vals[1], 0, minEyeSize, new CvSize(0, 0)).ToArrayAndDispose();
+                    CvAvgComp[] leyes = BorrowCascade((int)vals[0] == 0 ? ("RightEyeCascade") : ("Eye"), c => Cv.HaarDetectObjects(img, c, storage, 1.0850, (int)vals[1], 0, minEyeSize, new CvSize(0, 0)).ToArrayAndDispose());
                     //Array.Sort<CvAvgComp>(leyes, CompareByNeighbors);
 
                     if (leyes.Length > 0) {
@@ -249,7 +249,7 @@ namespace ImageResizer.Plugins.RedEye {
                 if (!foundRight) {
                     storage.Clear();
                     img.SetROI(right);
-                    CvAvgComp[] reyes = Cv.HaarDetectObjects(img, (int)vals[0] == 0 ? Cascades["LeftEyeCascade"] : Cascades["Eye"], storage, 1.0850, (int)vals[1], 0, minEyeSize, new CvSize(0, 0)).ToArrayAndDispose();
+                    CvAvgComp[] reyes = BorrowCascade((int)vals[0] == 0 ? ("LeftEyeCascade") : ("Eye"), c => Cv.HaarDetectObjects(img,c, storage, 1.0850, (int)vals[1], 0, minEyeSize, new CvSize(0, 0)).ToArrayAndDispose());
                     //Array.Sort<CvAvgComp>(reyes, CompareByNeighbors);
 
                     if (reyes.Length > 0) {

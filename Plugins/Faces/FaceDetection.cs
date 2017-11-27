@@ -69,7 +69,7 @@ namespace ImageResizer.Plugins.Faces {
             ExpandX = 0;
             ExpandY = 0;
             fileNames = new Dictionary<string, string>(){ 
-            {"FaceCascade",@"haarcascade_frontalface_default.xml"} };
+            {"FaceCascade",@"haarcascade_frontalface_default.xml"}, {"FaceCascadeAlt",@"haarcascade_frontalface_alt.xml"} };
         }
         /// <summary>
         /// The minimum number of faces expected
@@ -115,13 +115,16 @@ namespace ImageResizer.Plugins.Faces {
         /// <param name="storage"></param>
         /// <returns></returns>
         protected override List<Face> DetectFeatures(IplImage img, CvMemStorage storage) {
+            
             //Determine minimum face size
             var minSize = (int)Math.Round((double)MinSizePercent / 100.0 * Math.Min(img.Width, img.Height));
 
             
             //Detect faces (frontal). TODO: side
             Stopwatch watch = Stopwatch.StartNew();
-            CvAvgComp[] faces = Cv.HaarDetectObjects(img, Cascades["FaceCascade"], storage, 1.0850, MinConfidenceLevel, 0, new CvSize(minSize, minSize), new CvSize(0,0)).ToArrayAndDispose();
+            // HaarDetectionType.DoCannyPruning | HaarDetectionType.ScaleImage
+
+            CvAvgComp[] faces = BorrowCascade("FaceCascade", c => Cv.HaarDetectObjects(img, c, storage, 1.0850, MinConfidenceLevel, HaarDetectionType.Zero, new CvSize(minSize, minSize), new CvSize(0,0)).ToArrayAndDispose());
             watch.Stop();
             Debug.WriteLine("Face detection time = " + watch.ElapsedMilliseconds);
 

@@ -5,7 +5,8 @@
 // Commercial licenses available at http://imageresizing.net/
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+ using System.Diagnostics;
+ using System.Linq;
 using System.Text;
 using System.Drawing;
 using OpenCvSharp;
@@ -17,9 +18,10 @@ namespace ImageResizer.Plugins.Faces {
             return new RectangleF(rect.X, rect.Y, rect.Width, rect.Height);
         }
         public static CvAvgComp[] ToArrayAndDispose(this CvSeq<CvAvgComp> seq) {
-            CvAvgComp[] arr = seq.ToArray();
-            seq.Dispose();
-            return arr;
+            using (seq)
+            {
+                return seq.ToArray();
+            }
         }
 
         public static CvRect Offset(this CvRect rect, CvPoint offset) {
@@ -52,55 +54,28 @@ namespace ImageResizer.Plugins.Faces {
     /// Not thread safe. 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class FeatureDetectionBase<T> : IDisposable where T : IFeature {
+    public abstract class FeatureDetectionBase<T>  where T : IFeature {
         /// <summary>
         /// Creates new instance of FeatureDetectionBase.
         /// </summary>
-        public FeatureDetectionBase() {
-            var a = this.GetType().Assembly;
-            //Use CodeBase if it is physical; this means we don't re-download each time we recycle. 
-            //If it's a URL, we fall back to Location, which is often the shadow-copied version.
-            var searchFolder = a.CodeBase.StartsWith("file:///", StringComparison.OrdinalIgnoreCase)
-                                ? a.CodeBase
-                                : a.Location;
-            //Convert UNC paths 
-            searchFolder = Path.GetDirectoryName(searchFolder.Replace("file:///", "").Replace("/", "\\"));
-
-            searchFolders.Add(searchFolder);
-            //searchFolders.Add(@"C:\Users\Administrator\Documents\resizer\Plugins\Libs\OpenCV");
-        }
-        public FeatureDetectionBase(string xmlFolder):this() {
-            if (xmlFolder != null) searchFolders.Insert(0,xmlFolder);
+        public FeatureDetectionBase()
+        {
         }
 
-        protected List<string> searchFolders = new List<string>() { };
-
-        protected Dictionary<string, string> fileNames = new Dictionary<string,string>(){ };
-
-        protected Dictionary<string, string> Files = null;
-        protected Dictionary<string, CvHaarClassifierCascade> Cascades = null;
-        private void LoadFiles() {
-            if (Files != null) return;
-
-            var f = new Dictionary<string, string>();
-            Cascades = new Dictionary<string, CvHaarClassifierCascade>();
-            foreach (string key in fileNames.Keys) {
-                string resolvedPath = null;
-                foreach (string basePath in searchFolders) {
-                    string full = basePath.TrimEnd('\\') + '\\' + fileNames[key];
-                    if (File.Exists(Path.GetFullPath(full))) {
-                        resolvedPath = Path.GetFullPath(full);
-                        //An ExecutionException will occur here if multiple OpenCv instances are loaded
-                        Cascades[key] = Cv.Load<CvHaarClassifierCascade>(resolvedPath);
-                        break;
-                    }
+        protected Dictionary<string, string> fileNames;
+        
+        protected TR BorrowCascade<TR>(string fileNameKey, Func<CvHaarClassifierCascade, TR> operation)
+        {
+            if (fileNames != null && fileNames.TryGetValue(fileNameKey, out var name) == true) {
+                if (name != null) {
+                    return CascadePool.Shared.Borrow(name, operation, 10000);
                 }
-                if (resolvedPath == null) throw new ImageResizer.ImageProcessingException("Failed to find " + fileNames[key] + " in any of the search directories. Verify the XML files have been copied to the same folder as ImageResizer.dll.");
-                f[key] = resolvedPath;
             }
-
-            Files = f;
+            throw new ImageProcessingException(
+                "Failed to find a file name associated with key " + fileNameKey);
         }
+
+      
 
         /// <summary>
         /// Large images will be scaled down to less than scaledBounds X scaledBounds for feature detection.
@@ -109,43 +84,60 @@ namespace ImageResizer.Plugins.Faces {
         protected int scaledBounds = 1000;
 
         public List<T> DetectFeatures(Bitmap b) {
-            LoadFiles();
+            
             List<T> features;
+
             //Type Initializer Exception occurs if you reuse an appdomain. Always restart the server.
-            using (IplImage orig = OpenCvSharp.Extensions.BitmapConverter.ToIplImage(b))
-            using (IplImage gray = new IplImage(orig.Size, BitDepth.U8, 1)) {
-
+            
+            IplImage orig = null;
+            IplImage gray = null;
+            IplImage small = null;
+            try {
+                
+                orig = OpenCvSharp.Extensions.BitmapConverter.ToIplImage(b);
+                
+                
+                gray = new IplImage(orig.Size, BitDepth.U8, 1);
                 //Make grayscale version
-                Cv.CvtColor(orig, gray, ColorConversion.BgrToGray);
+                Cv.CvtColor(orig, gray, ColorConversion.BgrToGray); //TODO, try a different color space
+                
+                var w = orig.Width;
+                var h = orig.Height;
+                Cv.ReleaseImage(orig);
+                orig = null;
 
-                int w = orig.Width; int h = orig.Height;
-                double ratio = (double)w / (double)h;
+
+                var ratio =  w /  h;
                 double scale = 1;
-                if (ratio > 1) scale = (double)w / (double)scaledBounds;
-                if (ratio <= 1) scale = (double)h / (double)scaledBounds;
+                if (ratio > 1) scale = w / (double) scaledBounds;
+                if (ratio <= 1) scale =  h / (double) scaledBounds;
                 scale = Math.Min(1, 1 / scale);
 
 
-                using (IplImage small = new IplImage(new CvSize(Cv.Round(w * scale), Cv.Round(h * scale)), BitDepth.U8, 1)) {
-                    //Resize to smaller version
-                    Cv.Resize(gray, small, Interpolation.Area);
-                    //Equalize histogram
-                    Cv.EqualizeHist(gray, gray);
+                small = new IplImage(new CvSize(Cv.Round(w * scale), Cv.Round(h * scale)), BitDepth.U8, 1);
+                
+                //Resize to smaller version
+                Cv.Resize(gray, small, Interpolation.Area); //TODO: try a better algorithm
+                Cv.ReleaseImage(gray);
+                gray = null;
 
-                    using (CvMemStorage storage = new CvMemStorage()) {
-                        storage.Clear();
-                        features = DetectFeatures(small, storage);
-                    }
-                }
+                features = StoragePool.Shared.Borrow("features", s =>
+                {
+                    s.Clear();
+                    return DetectFeatures(small, s);
+                }, 3000);
+
                 //Scale all rectangles by factor to restore to original resolution
-                for (int i = 0; i < features.Count; i++) {
-                    IFeature e = features[i];
-                    e.Y = (float)Math.Min(h, e.Y / scale);
-                    e.X = (float)Math.Min(w, e.X / scale);
-                    e.Y2 = (float)Math.Min(h, e.Y2 / scale);
-                    e.X2 = (float)Math.Min(w, e.X2 / scale);
-                    
+                foreach (IFeature e in features) {
+                    e.Y = (float) Math.Min(h, e.Y / scale);
+                    e.X = (float) Math.Min(w, e.X / scale);
+                    e.Y2 = (float) Math.Min(h, e.Y2 / scale);
+                    e.X2 = (float) Math.Min(w, e.X2 / scale);
                 }
+            } finally {
+                if (gray != null) Cv.ReleaseImage(gray);
+                if (orig != null) Cv.ReleaseImage(orig);
+                if (small != null) Cv.ReleaseImage(small);
             }
             return features;
         }
@@ -156,16 +148,6 @@ namespace ImageResizer.Plugins.Faces {
             return b.Neighbors.CompareTo(a.Neighbors);
         }
 
-        /// <summary>
-        /// Disposes all loaded cascades
-        /// </summary>
-        public void Dispose() {
-            foreach (string s in Cascades.Keys.ToArray()) {
-                if (Cascades[s] != null) {
-                    Cascades[s].Dispose();
-                    Cascades[s] = null;
-                }
-            }
-        }
+      
     }
 }
