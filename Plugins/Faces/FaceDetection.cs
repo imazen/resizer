@@ -126,7 +126,7 @@ namespace ImageResizer.Plugins.Faces {
 
             CvAvgComp[] faces = BorrowCascade("FaceCascade", c => Cv.HaarDetectObjects(img, c, storage, 1.0850, MinConfidenceLevel, HaarDetectionType.Zero, new CvSize(minSize, minSize), new CvSize(0,0)).ToArrayAndDispose());
             watch.Stop();
-            Debug.WriteLine("Face detection time = " + watch.ElapsedMilliseconds);
+            Debug.WriteLine($"Face detection time: {watch.ElapsedMilliseconds}ms");
 
             //Sort by accuracy
             Array.Sort<CvAvgComp>(faces, CompareByNeighbors);

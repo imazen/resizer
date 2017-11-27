@@ -83,8 +83,9 @@ namespace ImageResizer.Plugins.Faces {
         /// </summary>
         protected int scaledBounds = 1000;
 
-        public List<T> DetectFeatures(Bitmap b) {
-            
+        public List<T> DetectFeatures(Bitmap b)
+        {
+            var watch = Stopwatch.StartNew();
             List<T> features;
 
             //Type Initializer Exception occurs if you reuse an appdomain. Always restart the server.
@@ -124,7 +125,10 @@ namespace ImageResizer.Plugins.Faces {
                 features = StoragePool.Shared.Borrow("features", s =>
                 {
                     s.Clear();
-                    return DetectFeatures(small, s);
+                    watch.Stop();
+                    var f =  DetectFeatures(small, s);
+                    watch.Start();
+                    return f;
                 }, 3000);
 
                 //Scale all rectangles by factor to restore to original resolution
@@ -139,6 +143,9 @@ namespace ImageResizer.Plugins.Faces {
                 if (orig != null) Cv.ReleaseImage(orig);
                 if (small != null) Cv.ReleaseImage(small);
             }
+            watch.Stop();
+            Debug.WriteLine($"Face detection prep time: {watch.ElapsedMilliseconds}ms");
+
             return features;
         }
 
