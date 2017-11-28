@@ -52,9 +52,12 @@ namespace ImageResizer.Configuration {
         #endregion
 
 
-        public Config():this(new ResizerSection()){
+        public Config():this(new ResizerSection(), false){
         }
-        public Config(ResizerSection config) {
+
+        public Config(ResizerSection config):this(config, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath != null) { }
+
+        public Config(ResizerSection config, bool addAspNetPlugins) {
 
             this.configuration = config;
 
@@ -69,14 +72,14 @@ namespace ImageResizer.Configuration {
             //Relies on plugins, must init second
             pipeline = new PipelineConfig(this);
 
-            bool isAspNet = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath != null;
+            
             //Load default plugins
             new ImageResizer.Plugins.Basic.DefaultEncoder().Install(this);
             new ImageResizer.Plugins.Basic.NoCache().Install(this);
             new ImageResizer.Plugins.Basic.ClientCache().Install(this);
             new ImageResizer.Plugins.Basic.WebConfigLicenseReader().Install(this);
 
-            if (isAspNet)
+            if (addAspNetPlugins)
             {
                 new ImageResizer.Plugins.Basic.Diagnostic().Install(this); //2017-04-04 - this plugin only sets the HTTP handler; adds no other functionality.
                 new ImageResizer.Plugins.Basic.SizeLimiting().Install(this);
