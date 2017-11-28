@@ -81,7 +81,7 @@ namespace ImageResizer.Plugins.Faces {
         /// Large images will be scaled down to less than scaledBounds X scaledBounds for feature detection.
         /// Defaults to 1000
         /// </summary>
-        protected int scaledBounds = 1000;
+        protected int scaledBounds = 800;
 
         public List<T> DetectFeatures(Bitmap b)
         {
@@ -92,6 +92,7 @@ namespace ImageResizer.Plugins.Faces {
             
             IplImage orig = null;
             IplImage gray = null;
+            IplImage gray2 = null;
             IplImage small = null;
             try {
                 
@@ -99,9 +100,12 @@ namespace ImageResizer.Plugins.Faces {
                 
                 
                 gray = new IplImage(orig.Size, BitDepth.U8, 1);
+                //gray2 = new IplImage(orig.Size, BitDepth.U8, 1);
+
                 //Make grayscale version
                 Cv.CvtColor(orig, gray, ColorConversion.BgrToGray); //TODO, try a different color space
-                
+                //Cv.EqualizeHist(gray, gray2);
+
                 var w = orig.Width;
                 var h = orig.Height;
                 Cv.ReleaseImage(orig);
@@ -140,6 +144,7 @@ namespace ImageResizer.Plugins.Faces {
                 }
             } finally {
                 if (gray != null) Cv.ReleaseImage(gray);
+                if (gray2 != null) Cv.ReleaseImage(gray2);
                 if (orig != null) Cv.ReleaseImage(orig);
                 if (small != null) Cv.ReleaseImage(small);
             }

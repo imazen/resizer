@@ -140,7 +140,10 @@ namespace ImageResizer.Plugins.Faces {
 
                     g.DrawRectangle(Pens.Green, new Rectangle((int)x1, (int)y1, (int)(x2 - x1), (int)(y2 - y1)));
                 }
+
+                g.DrawString((newPoints.Length / 2).ToString(), new Font(FontFamily.GenericSansSerif, 24.0f, FontStyle.Bold), new SolidBrush(Color.Green),0.0f,24.0f);
             }
+            
 
 
             return RequestedAction.None;
@@ -187,10 +190,7 @@ namespace ImageResizer.Plugins.Faces {
 
             //Parse min/max faces
             int[] count = s.GetList<int>("f.faces",null,1,2);
-            if (count == null) {
-                f.MinFaces = 1;
-                f.MaxFaces = 8;
-            }else if (count.Length > 0){
+            if (count != null && count.Length > 0){
                 f.MinFaces = f.MaxFaces = count[0];
                 if (count.Length > 1) f.MaxFaces = count[1];
             }
