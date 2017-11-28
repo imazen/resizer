@@ -151,9 +151,7 @@
     <None Include="packages.config" />
     <None Include="readme.md" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Faces2\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

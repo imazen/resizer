@@ -66,7 +66,8 @@ namespace ImageResizer.Plugins.Faces {
         
         protected TR BorrowCascade<TR>(string fileNameKey, Func<CvHaarClassifierCascade, TR> operation)
         {
-            if (fileNames != null && fileNames.TryGetValue(fileNameKey, out var name) == true) {
+            string name;
+            if (fileNames != null && fileNames.TryGetValue(fileNameKey, out name) == true) {
                 if (name != null) {
                     return CascadePool.Shared.Borrow(name, operation, 10000);
                 }

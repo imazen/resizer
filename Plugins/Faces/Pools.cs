@@ -107,7 +107,8 @@ namespace ImageResizer.Plugins.Faces
         TR BorrowItemInternal<TR>(string key, Func<T, TR> operation)
         {
             var bag = pool.GetOrAdd(key, name => new ConcurrentBag<T>());
-            if (bag.TryTake(out var c))
+            T c;
+            if (bag.TryTake(out c))
             {
                 return RunAndReturnToBag(bag, c, operation);
             }
