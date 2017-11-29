@@ -88,7 +88,8 @@ namespace ImageResizer.Plugins.Faces {
         protected override RequestedAction PostPrepareSourceBitmap(ImageState s) {
             if (s.sourceBitmap == null) return RequestedAction.None;
 
-            bool focusFaces = ("faces".Equals(s.settings["c.focus"], StringComparison.OrdinalIgnoreCase));
+            bool focusFaces = "faces".Equals(s.settings["c.focus"], StringComparison.OrdinalIgnoreCase) ||
+                               "faces".Equals(s.settings["c.salientareas"], StringComparison.OrdinalIgnoreCase);
             bool showFaces = "true".Equals(s.settings["f.show"], StringComparison.OrdinalIgnoreCase);
 
             List<Face> faces = null;
@@ -112,8 +113,12 @@ namespace ImageResizer.Plugins.Faces {
             if (focusFaces) {
                 //Write the face points as focus values
                 List<double> focusPoints = new List<double>();
-                foreach (Face r in faces) { focusPoints.Add(r.X); focusPoints.Add(r.Y); focusPoints.Add(r.X2); focusPoints.Add(r.Y2); }
+                foreach (var r in faces) { focusPoints.Add(r.X); focusPoints.Add(r.Y); focusPoints.Add(r.X2); focusPoints.Add(r.Y2); }
                 s.settings.SetList<double>("c.focus", focusPoints.ToArray(), false);
+
+                focusPoints = new List<double>();
+                foreach (var r in faces) {focusPoints.Add(r.X); focusPoints.Add(r.Y); focusPoints.Add(r.X2); focusPoints.Add(r.Y2); focusPoints.Add(r.Accuracy); }
+                s.settings.SetList<double>("c.salientareas", focusPoints.ToArray(), false);
             }
             return RequestedAction.None;
         }
