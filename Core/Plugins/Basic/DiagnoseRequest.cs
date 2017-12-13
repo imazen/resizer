@@ -42,22 +42,30 @@ namespace ImageResizer.Plugins.Basic
             var log = new StringBuilder();
             s.Data["debug"] = log;
 
+            var alt = s.Job.SourceWidth == s.sourceBitmap.Width && s.Job.SourceHeight == s.sourceBitmap.Height
+                ? ""
+                : $" ({s.Job.SourceWidth}x{s.Job.SourceHeight})";
+            
             log.AppendLine(
-                $"Source image {s.sourceBitmap.Width}x{s.sourceBitmap.Height} {Normalize(s.sourceBitmap.RawFormat)} {s.sourceBitmap.PixelFormat.ToString()}");
+                $"{Normalize(s.sourceBitmap.RawFormat)} {s.sourceBitmap.Width}x{s.sourceBitmap.Height} {Normalize(s.sourceBitmap.PixelFormat)}{alt} {s.Job.DecodeTicks * 1000 / Stopwatch.Frequency}ms");
+            
 
             return RequestedAction.None;
         }
 
-
-        protected override RequestedAction PostRenderImage(ImageState s)
+        string Normalize(PixelFormat fmt)
         {
+            
+            var names = new Dictionary<PixelFormat, string>() {
 
+                {PixelFormat.Format24bppRgb, "bgr24"},
+                {PixelFormat.Format32bppRgb, "bgr32"},
+                {PixelFormat.Format32bppArgb, "bgra32"},
+            };
 
-
-
-
-            return RequestedAction.None;
+            return names.ContainsKey(fmt) ? names[fmt] : fmt.ToString().Replace("Format", " ");
         }
+
 
         string Normalize(ImageFormat fmt)
         {
@@ -68,10 +76,10 @@ namespace ImageResizer.Plugins.Basic
                 {ImageFormat.Exif.Guid, "exif"},
                 {ImageFormat.Gif.Guid, "gif"},
                 {ImageFormat.Icon.Guid, "icon"},
-                {ImageFormat.Jpeg.Guid, "jpeg"},
+                {ImageFormat.Jpeg.Guid, "jpg"},
                 {ImageFormat.MemoryBmp.Guid, "memorybmp"},
                 {ImageFormat.Png.Guid, "png"},
-                {ImageFormat.Tiff.Guid, "tiff"},
+                {ImageFormat.Tiff.Guid, "tif"},
                 {ImageFormat.Wmf.Guid, "wmf"}
             };
 
@@ -87,15 +95,15 @@ namespace ImageResizer.Plugins.Basic
             var kind = s.settings.Get("resizer.debug", DebugType.None);
 
             log?.AppendLine(
-                    $"SourcePathData: {s.Job.SourcePathData} Source {s.Job.SourceWidth}x{s.Job.SourceHeight}");
+                $"To {s.Job.ResultFileExtension} {s.destBitmap.Width}x{s.destBitmap.Height} {Normalize(s.destBitmap.PixelFormat)} ");
             log?.AppendLine(
-                $"Decoded in {s.Job.DecodeTicks * 1000 / Stopwatch.Frequency}ms");
-        
+                $"{DateTime.UtcNow:u}");
+            log?.AppendLine($"RawUrl: {HttpContext.Current.Request.RawUrl}");
+            log?.AppendLine(
+                $"Settings: {s.settings}");
+            log?.AppendLine(
+                $"PathData: {s.Job.SourcePathData}");
 
-            log?.AppendLine(
-                $"PostRenderImage settings: {s.settings.ToString()}");
-            log?.AppendLine(
-                $"Request.RawUrl: {HttpContext.Current.Request.RawUrl}");
             log?.AppendLine(
                 $"Requester: {HttpContext.Current.Request.UserHostName} {HttpContext.Current.Request.UserHostAddress} {HttpContext.Current.Request.UserAgent}");
             log.AppendLine();
@@ -107,9 +115,9 @@ namespace ImageResizer.Plugins.Basic
                     fmt.Alignment = StringAlignment.Near;
                     fmt.LineAlignment = StringAlignment.Center;
                     fmt.Trimming = StringTrimming.None;
-                    var font = new Font(FontFamily.GenericSansSerif, 18.0f, FontStyle.Bold);
-                    s.destGraphics?.DrawString(log.ToString(), font, new SolidBrush(Color.DarkGray), new RectangleF(9, 9, s.destBitmap.Width - 19, s.destBitmap.Height - 19), StringFormat.GenericTypographic);
-                    s.destGraphics?.DrawString(log.ToString(), font, new SolidBrush(Color.DarkGray), new RectangleF(11, 11, s.destBitmap.Width - 21, s.destBitmap.Height - 21), StringFormat.GenericTypographic);
+                    var font = new Font(FontFamily.GenericSansSerif, 10.0f, FontStyle.Regular);
+                    s.destGraphics?.DrawString(log.ToString(), font, new SolidBrush(Color.DarkGray), new RectangleF(9, 9, s.destBitmap.Width - 20, s.destBitmap.Height - 20), StringFormat.GenericTypographic);
+                    s.destGraphics?.DrawString(log.ToString(), font, new SolidBrush(Color.DarkGray), new RectangleF(11, 11, s.destBitmap.Width - 20, s.destBitmap.Height - 20), StringFormat.GenericTypographic);
                     s.destGraphics?.DrawString(log.ToString(),font, new SolidBrush(Color.White), new RectangleF(10,10,s.destBitmap.Width - 20, s.destBitmap.Height - 20), StringFormat.GenericTypographic);
                     break;
                 case DebugType.Text:
