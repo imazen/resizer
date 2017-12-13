@@ -82,7 +82,8 @@ namespace ImageResizer.Plugins.Basic
         {
             
             if (!s.Data.ContainsKey("debug")) return RequestedAction.None;
-            if (!(s.Data["debug"] is StringBuilder log)) return RequestedAction.None;
+            var log = s.Data["debug"] as StringBuilder;
+            if (log == null) return RequestedAction.None;
             var kind = s.settings.Get("resizer.debug", DebugType.None);
 
             log?.AppendLine(
