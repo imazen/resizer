@@ -44,9 +44,7 @@ namespace ImageResizer.Configuration.Performance
                                              .Where(p => p != null);
 
 
-
-
-        internal string Generate()
+        internal string Header()
         {
             //Get loaded assemblies for later use
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -66,8 +64,17 @@ namespace ImageResizer.Configuration.Performance
                                              .Distinct()
                                              .ToArray();
 
+
+            return $"Diagnostics for ImageResizer {distinctVersions.Delimited(", ")} {distinctCommits.Delimited(", ")} at {httpContext?.Request.Url.DnsSafeHost} generated {now} UTC";
+        }
+
+        internal string Generate()
+        {
+            //Get loaded assemblies for later use
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
             var sb = new StringBuilder(8096);
-            sb.AppendLine($"Diagnostics for ImageResizer {distinctVersions.Delimited(", ")} {distinctCommits.Delimited(", ")} at {httpContext?.Request.Url.DnsSafeHost} generated {now}");
+            sb.AppendLine(Header());
             sb.AppendLine("Please remember to provide this page when contacting support.");
             sb.AppendLine();
 
