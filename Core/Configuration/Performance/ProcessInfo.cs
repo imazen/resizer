@@ -17,6 +17,8 @@ namespace ImageResizer.Configuration.Performance
     {
         public static Guid ProcessGuid { get; } = Guid.NewGuid();
 
+        public static int ProcessId { get; } = System.Diagnostics.Process.GetCurrentProcess().Id;
+
         public bool Process64Bit { get; } = Environment.Is64BitProcess;
 
         public string DotNetVersionInstalled { get; } = Get45PlusFromRegistry();
@@ -41,6 +43,7 @@ namespace ImageResizer.Configuration.Performance
             q.Add("sys_dotnet", DotNetVersionInstalled);
             q.Add("iis", IisVer);
             q.Add("integrated_pipeline", IntegratedPipeline);
+            q.Add("id_hash", Utilities.Sha256TruncatedBase64(ProcessId.ToString(), 6));
 
             q.Add("asyncmodule", Config.Current.Pipeline.UsingAsyncMode);
             q.Add("default_commands", Config.Current.get("pipeline.defaultCommands", null));
