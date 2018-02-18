@@ -111,6 +111,12 @@ namespace ImageResizer.Plugins
             }
         }
 
+
+        internal DateTime? GetWriteTimeUtc(string key)
+        {
+            return store.TryGetLastWriteTimeUtc(FilenameKeyFor(key));
+        }
+
         public IEnumerable<IIssue> GetIssues()
         {
             return ((IIssueProvider)sink).GetIssues();
@@ -144,6 +150,11 @@ namespace ImageResizer.Plugins
         public IEnumerable<IIssue> GetIssues()
         {
             return cache.GetIssues();
+        }
+
+        public DateTime? GetWriteTimeUtc(string key)
+        {
+            return cache.GetWriteTimeUtc(key);
         }
     }
 }

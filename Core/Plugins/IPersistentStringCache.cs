@@ -32,5 +32,8 @@ namespace ImageResizer.Plugins
     {
         StringCachePutResult TryPut(string key, string value);
         string Get(string key);
+
+
+        DateTime? GetWriteTimeUtc(string key);
     }
 }
