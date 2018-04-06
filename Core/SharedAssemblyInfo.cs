@@ -24,8 +24,8 @@ using ImageResizer.Util;
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:/*
 [assembly: AssemblyVersion("4.0.0.0")]
-[assembly: AssemblyFileVersion("4.1.3.745")]
-[assembly: AssemblyInformationalVersion("4.1.3-prerelease.745")]
+[assembly: AssemblyFileVersion("4.2.5.0")]
+[assembly: AssemblyInformationalVersion("4.2.5")]
 
 [assembly: Commit("2c64c3100e64c944222e04388a6d44b2909d4115")]
 

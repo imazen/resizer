@@ -266,8 +266,8 @@ namespace ImageResizer.Configuration.Performance
         {
             var q = new QueryAccumulator().Object;
             var timeThis = Stopwatch.StartNew();
-            // Increment when we break the schema
-            q.Add("reporting_version", 3);
+            // Increment when we break the schema (or, as in v4, reduce the frequency)
+            q.Add("reporting_version", 4);
 
             Process.Value.SetModules(httpModules);
             Process.Value.Add(q);
