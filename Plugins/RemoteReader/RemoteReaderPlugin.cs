@@ -336,6 +336,7 @@ namespace ImageResizer.Plugins.RemoteReader {
             HttpWebResponse response = null;
             try {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+                request.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
                 request.Timeout = 15000; //Default to 15 seconds. Browser timeout is usually 30.
                 request.UserAgent = "ImageResizer";
                 
