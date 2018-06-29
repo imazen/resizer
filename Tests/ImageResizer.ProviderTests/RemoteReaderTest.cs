@@ -2,16 +2,34 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.IO;
-using System.Web;
+using System.Threading.Tasks;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.RemoteReader;
 using Xunit;
 
 namespace ImageResizer.ProviderTests {
+    public abstract class RemoteReaderTestBase {
+        /// <summary>
+        /// A GUID that can be used to represent a file that does not exist.
+        /// </summary>
+        protected static readonly Guid dummyDatabaseRecordId = Guid.NewGuid();
+        
+        protected static readonly string pathPrefix = "/remote/farm7.static.flickr.com/6021/";
+        
+        /// <summary>
+        /// Gets a settings object for a  <see cref="RemoteReaderPlugin"/>.
+        /// </summary>
+        protected NameValueCollection Settings {
+            get {
+                return new NameValueCollection();
+            }
+        }
+    }
+
     /// <summary>
     /// Test the functionality of the <see cref="RemoteReaderPlugin"/> class.
     /// </summary>
@@ -20,14 +38,7 @@ namespace ImageResizer.ProviderTests {
     /// implemented by <see cref="RemoteReaderPlugin"/>. Also The methods 
     /// implementations of <see cref="IVirtualFile"/>.
     /// </remarks>
-    public class RemoteReaderTest {
-        /// <summary>
-        /// A GUID that can be used to represent a file that does not exist.
-        /// </summary>
-        private static Guid dummyDatabaseRecordId = Guid.NewGuid();
-
-        private static string pathPrefix = "/remote/farm7.static.flickr.com/6021/";
-
+    public class RemoteReaderTest : RemoteReaderTestBase {
         /// <summary>
         /// Instantiate a new  <see cref="RemoteReaderPlugin"/> object and test for success.
         /// </summary>
@@ -333,15 +344,57 @@ namespace ImageResizer.ProviderTests {
             Assert.NotNull(actual);
             Assert.IsType<FileNotFoundException>(actual);
         }
+    }
+
+    /// <summary>
+    /// Test the functionality of the <see cref="RemoteReaderPlugin"/> class.
+    /// </summary>
+    /// <remarks>
+    /// These tests exercise the methods from <see cref="IVirtualImageProviderAsync"/> as
+    /// implemented by <see cref="RemoteReaderPlugin"/>. Also The methods 
+    /// implementations of <see cref="IVirtualFileAsync"/>.
+    /// </remarks>
+    public class RemoteReaderAsyncTest : RemoteReaderTestBase {
+        /// <summary>
+        /// Call the GetFile method with the virtual path prefix omitted. 
+        /// </summary>
+        [Fact]
+        public Task GetFileWithoutVirtualPathPrefix() {
+            // Arrange
+            string virtualPath = dummyDatabaseRecordId.ToString("B");
+            IVirtualImageProviderAsync target = new RemoteReaderPlugin();
+
+            // Act / Assert
+            return Assert.ThrowsAsync<FileNotFoundException>(() => target.GetFileAsync(virtualPath, new NameValueCollection()));
+        }
 
         /// <summary>
-        /// Gets a settings object for a  <see cref="RemoteReaderPlugin"/>.
+        /// Call the Open method with a virtualPath to a file that 
+        /// does exist.
         /// </summary>
-        private NameValueCollection Settings {
-            get {
-                var settings = new NameValueCollection();
-                return settings;
-            }
+        /// <remarks>
+        /// Requires a file to be present at http://farm7.static.flickr.com/6021/5959854178_1c2ec6bd77_b.jpg
+        /// </remarks>
+        [Fact]
+        public async Task OpenAsync() {
+            // Arrange
+            string virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
+            IVirtualImageProviderAsync reader = new RemoteReaderPlugin();
+            var rs = new ResizerSection("<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"true\" /></resizer>");
+            var c = new Config(rs);
+            ((RemoteReaderPlugin)reader).Install(c);
+            var settings = this.Settings;
+            settings["hmac"] = "k_RU-UFkOaA";
+            settings["urlb64"] = "aHR0cDovL2Zhcm03LnN0YXRpYy5mbGlja3IuY29tLzYwMjEvNTk1OTg1NDE3OF8xYzJlYzZiZDc3X2IuanBn";
+            var target = await reader.GetFileAsync(virtualPath, settings);
+
+            // Act
+            var actual = await target.OpenAsync();
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.IsAssignableFrom<Stream>(actual);
+            Assert.Equal<string>(virtualPath, target.VirtualPath);
         }
     }
 }
