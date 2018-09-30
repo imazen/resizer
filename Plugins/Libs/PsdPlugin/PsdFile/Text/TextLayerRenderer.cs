@@ -142,6 +142,9 @@ namespace PhotoshopFile.Text
                     fontName = new Regex("\\-(Bold|Italic|BoldItalic)$", RegexOptions.IgnoreCase | RegexOptions.IgnoreCase).Replace(fontName, "");
                     //Remove PS
                     if (fontName.EndsWith("PS")) fontName = fontName.Substring(0, fontName.Length - 2);
+                    //Convert camel case fontName to spaced font name
+                    fontName = Regex.Replace(fontName, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
+
                     //Find font family
                     try {
                         fontFamily = new FontFamily(fontName);

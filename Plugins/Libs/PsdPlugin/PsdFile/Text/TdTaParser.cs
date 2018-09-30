@@ -54,7 +54,7 @@ namespace PhotoshopFile.Text
             if (m != null && m.Success)
             {
                 string key = m.Groups["key"].Value;
-                return query(((Dictionary<string,object>)tree)[key], selector.Substring(m.Length));
+                return ((Dictionary<string, object>)tree).ContainsKey(key) ? query(((Dictionary<string,object>)tree)[key], selector.Substring(m.Length)) : false;
             }
 
             //Check for array notation
