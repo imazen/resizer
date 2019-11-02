@@ -51,7 +51,7 @@ environment:
     imageserver_mail:
       secure: jM22KTaopLkZQS0SMkU+g9O9AYH6grGoN0v67bLYpUQ=
     imageserver_token:
-      secure: jLhYKGNOkjcYl1uaWjQkmNS/VP2PoTHHW3eu7WKJEwIjJ6sg6t8JfufbIjI61+qH
+      secure: koPsP9KtdkZ+WFJFfKiet2wKd3yI53jryA5QOHQLpPLbid0AgjIjY093+pPtwBid
 
   #This build has no license key enforcement. For verified AGPL and paid customers.
   - license_keys: false
