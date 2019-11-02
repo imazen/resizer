@@ -36,7 +36,7 @@ environment:
     #nuget.org for releases
     fb_nuget_rel_url: https://nuget.org/api/v2/package
     fb_nuget_rel_key:
-      secure: G164XNiqMhyX+Y/174fE4iWP0ZboBfg2SQp5V8h19pP08hcVQp0dHK8fQg+qqNaX
+      secure: vkbNt9ZMSzbgYawGC+H3CHIQn08tD31C8a3poMZANH/pyPsvqv88v2dZBqFPjsNy
 
 
     fb_pub_url: https://s3.amazonaws.com/imazen-nightlies
