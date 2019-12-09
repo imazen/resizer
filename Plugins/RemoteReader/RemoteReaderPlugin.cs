@@ -50,6 +50,13 @@ namespace ImageResizer.Plugins.RemoteReader {
         /// </summary>
         public bool SkipUriValidation { get; set; }
 
+        /// <summary>
+        /// Set the UserAgent header for HTTP requests.
+        /// </summary>
+        public string UserAgent { get; set; } = "ImageResizer";
+
+
+
         protected string remotePrefix = "~/remote";
         Config c;
 
@@ -73,8 +80,9 @@ namespace ImageResizer.Plugins.RemoteReader {
             c.Pipeline.PostAuthorizeRequestStart += Pipeline_PostAuthorizeRequestStart;
             c.Pipeline.RewriteDefaults += Pipeline_RewriteDefaults;
             c.Pipeline.PostRewrite += Pipeline_PostRewrite;
-            AllowedRedirects = c.get("remoteReader.allowedRedirects",AllowedRedirects);
+            AllowedRedirects = c.get("remoteReader.allowedRedirects", AllowedRedirects);
             SkipUriValidation = c.get("remoteReader.skipUriValidation", SkipUriValidation);
+            UserAgent = c.get("remoteReader.userAgent", UserAgent);
 
             return this;
         }
@@ -373,7 +381,7 @@ namespace ImageResizer.Plugins.RemoteReader {
             request.Timeout = 15000; //Default to 15 seconds. Browser timeout is usually 30.
             request.AllowAutoRedirect = maxRedirects != 0;
             request.MaximumAutomaticRedirections = maxRedirects > 0 ? maxRedirects : 0;
-            request.UserAgent = "ImageResizer";
+            request.UserAgent = UserAgent;
             return request;
         }
 
