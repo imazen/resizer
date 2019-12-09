@@ -1,9 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <files>
-  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/cascades/haarcascade_frontalface_default.xml" name="haarcascade_frontalface_default.xml"  fileBytes="1254733" />
 
-  
-  
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/cascades/haarcascade_frontalface_alt.xml" name="haarcascade_frontalface_alt.xml"  fileBytes="919871" />
+  <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/cascades/haarcascade_eye.xml" name="haarcascade_eye.xml"  fileBytes="506314" />
+
+
   <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x86/opencv_legacy2410.dll" name="opencv_legacy2410.dll" bitness="32" fileBytes="1239040" />
   <file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x86/opencv_ml2410.dll" name="opencv_ml2410.dll" bitness="32" fileBytes="507904" />
   <!--<file url="https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/x86/opencv_ts2410.dll" name="opencv_ts2410.dll" bitness="32" fileBytes="567296" />-->

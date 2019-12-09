@@ -36,7 +36,7 @@ environment:
     #nuget.org for releases
     fb_nuget_rel_url: https://nuget.org/api/v2/package
     fb_nuget_rel_key:
-      secure: G164XNiqMhyX+Y/174fE4iWP0ZboBfg2SQp5V8h19pP08hcVQp0dHK8fQg+qqNaX
+      secure: AZ2O7RR0HT/kX2M6xcLNw03grcPQbVRljPdbuh8v5k9rKeacvSrgARZ/k4UZqC17
 
 
     fb_pub_url: https://s3.amazonaws.com/imazen-nightlies
@@ -47,11 +47,11 @@ environment:
     # should be set to master when resizer-images is updated
     fb_imageserver_rel_branch: master
 
-    imageserver_user: resizer-bot
+    imageserver_user: imazen-bot
     imageserver_mail:
-      secure: Ki6EM9c3O3ioPTfrbWZMtQ==
+      secure: jM22KTaopLkZQS0SMkU+g9O9AYH6grGoN0v67bLYpUQ=
     imageserver_token:
-      secure: ShmRBY5OrRHdAfze81bt2iqFr+6JHh0FAnApuB4d+bGgksdicVa/BJinCQyS/92B
+      secure: koPsP9KtdkZ+WFJFfKiet2wKd3yI53jryA5QOHQLpPLbid0AgjIjY093+pPtwBid
 
   #This build has no license key enforcement. For verified AGPL and paid customers.
   - license_keys: false

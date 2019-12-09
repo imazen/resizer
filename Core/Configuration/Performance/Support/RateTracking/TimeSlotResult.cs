@@ -12,30 +12,19 @@ namespace ImageResizer.Configuration.Performance
     {
         public TimeSlotResult(long result, long slotBeginTicks)
         {
-            this.value = result;
-            this.SlotBeginTicks = slotBeginTicks;
+            Value = result;
+            SlotBeginTicks = slotBeginTicks;
         }
 
+
         public long SlotBeginTicks { get; }
+        public long Value { get; }
 
-        readonly long value;
-        public long? Value => SlotBeginTicks > 0 ? value : (long?)null;
-
-        public bool IsEmpty => SlotBeginTicks == 0;
-
-        /// <summary>
-        /// Empty does not denote a result of any kind; this is like null. 
-        /// </summary>
-        public static readonly TimeSlotResult Empty = new TimeSlotResult();
-
-        /// <summary>
+            /// <summary>
         /// A zero result is a value of zero, not to be confused with Empty
         /// </summary>
         public static readonly TimeSlotResult ResultZero = new TimeSlotResult(0, 1);
 
-        public override string ToString()
-        {
-            return IsEmpty ? "(empty)" : $"[{value}] at {SlotBeginTicks}";
-        }
+        public override string ToString() =>  $"[{Value}] at {SlotBeginTicks}";
     }
 }

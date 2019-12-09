@@ -168,7 +168,7 @@ namespace ImageResizer.Plugins
                 foreach (var dest in candidateFolders.Except(badReadLocations))
                 {
                     var path = Path.Combine(dest, filename);
-                    if (File.Exists(path) && !badReadLocations.Contains(path))
+                    if (!badReadLocations.Contains(path) && File.Exists(path))
                     {
                         try
                         {
@@ -192,6 +192,43 @@ namespace ImageResizer.Plugins
             }
             return null;
         }
-
+        /// <summary>
+        /// Returns null if the file is missing or the read failed.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        public DateTime? TryGetLastWriteTimeUtc(string filename)
+        {
+            bool readFailed = false; //To tell non-existent files apart from I/O errors
+            try
+            {
+                filesystem.EnterReadLock();
+                foreach (var dest in candidateFolders.Except(badReadLocations))
+                {
+                    var path = Path.Combine(dest, filename);
+                    if (!badReadLocations.Contains(path) && File.Exists(path))
+                    {
+                        try
+                        {
+                            return File.GetLastWriteTimeUtc(path);
+                        }
+                        catch (Exception e)
+                        {
+                            readFailed = true;
+                            AddBadReadLocation(path, new Issue(this.issueSource, "Failed to read write time of " + dataKind + " from location " + path, e.ToString(), IssueSeverity.Warning));
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                filesystem.ExitReadLock();
+            }
+            if (readFailed)
+            {
+                sink.AcceptIssue(new Issue(this.issueSource, "Unable to read write time of " + dataKind + " from disk despite its existence.", null, IssueSeverity.Error));
+            }
+            return null;
+        }
     }
 }

@@ -76,31 +76,36 @@ namespace ImageResizer.Plugins.Faces {
         /// <param name="image"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public List<Face> GetFacesFromImage(object image, NameValueCollection settings) {
+        public List<Face> GetFacesFromImage(object image, NameValueCollection settings)
+        {
             using (var b = c.CurrentImageBuilder.LoadImage(image, new ResizeSettings(settings))) {
-                using (var detector = ConfigureDetection(settings)) {
-                    return detector.DetectFeatures(b);
-                }
+                var detector = ConfigureDetection(settings);
+                return detector.DetectFeatures(b);
+
             }
         }
 
         protected override RequestedAction PostPrepareSourceBitmap(ImageState s) {
             if (s.sourceBitmap == null) return RequestedAction.None;
 
-            bool focusFaces = ("faces".Equals(s.settings["c.focus"], StringComparison.OrdinalIgnoreCase));
+            bool focusFaces = "faces".Equals(s.settings["c.focus"], StringComparison.OrdinalIgnoreCase) ||
+                               "faces".Equals(s.settings["c.salientareas"], StringComparison.OrdinalIgnoreCase);
             bool showFaces = "true".Equals(s.settings["f.show"], StringComparison.OrdinalIgnoreCase);
 
             List<Face> faces = null;
 
             //Perform face detection for either (or both) situations
             if (showFaces || focusFaces) {
-                using (var detector = ConfigureDetection(s.settings)) {
-                    //Store faces
-                    s.Data["faces"] = faces = detector.DetectFeatures(s.sourceBitmap);
-                }
+                var detector = ConfigureDetection(s.settings);
+                //Store faces
+                s.Data["faces"] = faces = detector.DetectFeatures(s.sourceBitmap);
+
                 //Store points
                 List<PointF> points = new List<PointF>();
-                foreach (Face r in faces) { points.Add(new PointF(r.X, r.Y)); points.Add(new PointF(r.X2, r.Y2)); }
+                foreach (Face r in faces) {
+                    points.Add(new PointF(r.X, r.Y));
+                    points.Add(new PointF(r.X2, r.Y2));
+                }
                 s.layout.AddInvisiblePolygon("faces", points.ToArray());
             }
 
@@ -108,8 +113,12 @@ namespace ImageResizer.Plugins.Faces {
             if (focusFaces) {
                 //Write the face points as focus values
                 List<double> focusPoints = new List<double>();
-                foreach (Face r in faces) { focusPoints.Add(r.X); focusPoints.Add(r.Y); focusPoints.Add(r.X2); focusPoints.Add(r.Y2); }
+                foreach (var r in faces) { focusPoints.Add(r.X); focusPoints.Add(r.Y); focusPoints.Add(r.X2); focusPoints.Add(r.Y2); }
                 s.settings.SetList<double>("c.focus", focusPoints.ToArray(), false);
+
+                focusPoints = new List<double>();
+                foreach (var r in faces) {focusPoints.Add(r.X); focusPoints.Add(r.Y); focusPoints.Add(r.X2); focusPoints.Add(r.Y2); focusPoints.Add(r.Accuracy); }
+                s.settings.SetList<double>("c.salientareas", focusPoints.ToArray(), false);
             }
             return RequestedAction.None;
         }
@@ -136,7 +145,10 @@ namespace ImageResizer.Plugins.Faces {
 
                     g.DrawRectangle(Pens.Green, new Rectangle((int)x1, (int)y1, (int)(x2 - x1), (int)(y2 - y1)));
                 }
+
+                g.DrawString((newPoints.Length / 2).ToString(), new Font(FontFamily.GenericSansSerif, 24.0f, FontStyle.Bold), new SolidBrush(Color.Green),0.0f,24.0f);
             }
+            
 
 
             return RequestedAction.None;
@@ -153,7 +165,7 @@ namespace ImageResizer.Plugins.Faces {
             var d = new DetectionResponse<Face>();
             try {
                 //Only detect faces if it was requested.
-                if (detect) using (var detector =ConfigureDetection(s.settings)) d.features = detector.DetectFeatures(s.sourceBitmap);
+                if (detect) d.features = ConfigureDetection(s.settings).DetectFeatures(s.sourceBitmap);
             } catch (TypeInitializationException e) {
                 throw e;
             } catch (Exception e) {
@@ -183,10 +195,7 @@ namespace ImageResizer.Plugins.Faces {
 
             //Parse min/max faces
             int[] count = s.GetList<int>("f.faces",null,1,2);
-            if (count == null) {
-                f.MinFaces = 1;
-                f.MaxFaces = 8;
-            }else if (count.Length > 0){
+            if (count != null && count.Length > 0){
                 f.MinFaces = f.MaxFaces = count[0];
                 if (count.Length > 1) f.MaxFaces = count[1];
             }

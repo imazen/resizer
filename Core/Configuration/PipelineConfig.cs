@@ -320,6 +320,24 @@ namespace ImageResizer.Configuration {
         }
 
         /// <summary>
+        /// The maximum number of concurrent jobs that can be executing at one time.
+        /// </summary>
+        public int? MaxConcurrentJobs
+        {
+            get
+            {
+                if ("auto".Equals(c.get("pipeline.maxConcurrentJobs", ""), StringComparison.OrdinalIgnoreCase))
+                {
+                    return Environment.ProcessorCount + 1;
+                }
+                var count = c.get<int>("pipeline.maxConcurrentJobs", 0);
+                return count < 1 ? (int?)null : count;
+            }
+        }
+
+        
+
+        /// <summary>
         /// Returns an IVirtualFileAsync instance if the specified file can be provided by an async provider 
         /// </summary>
         /// <param name="virtualPath"></param>

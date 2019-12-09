@@ -19,6 +19,7 @@ $plugins$
 		<tags>ImageResizer TinyCache</tags>
 		<dependencies>
 		  <dependency id="ImageResizer" version="[$version$,)" />
+		  <dependency id="protobuf-net" version="[2.0.0.668,3)" />
 		</dependencies>
 	</metadata>
   	<files>

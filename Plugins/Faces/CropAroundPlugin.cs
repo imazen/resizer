@@ -13,6 +13,71 @@ using ImageResizer.ExtensionMethods;
 using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.CropAround {
+
+    static class Extensions
+    {
+        public static IEnumerable<List<T>> SplitList<T>(this List<T> locations, int nSize = 30)
+        {
+            for (var i = 0; i < locations.Count; i += nSize)
+            {
+                yield return locations.GetRange(i, Math.Min(nSize, locations.Count - i));
+            }
+        }
+    }
+
+    struct SalientArea
+    {
+        public RectangleF Area { get; set; }
+        public float Weight { get; set; }
+
+
+
+        public static SalientArea[] FromQuery(ResizeSettings s)
+        {
+            var salientareas = s.GetList<float>("c.salientareas", null);
+            if (salientareas != null) {
+                if (salientareas.Length % 5 != 0) {
+                    throw new ImageProcessingException(400,
+                        "Incorrent number of values provided in c.salientareas (must be multiple of 5). Usage: &c.salientareas=x1,y1,x2,y2,weight,x1,y1,x2,y2,weight");
+                }
+
+                return salientareas.ToList()
+                                   .SplitList(5)
+                                   .Select(v => new SalientArea {
+                                       Area = new RectangleF(v[0], v[1], v[2] - v[0], v[3] - v[1]),
+                                       Weight = v[4]
+                                   })
+                                   .ToArray();
+            }
+
+            var focus = s.GetList<float>("c.focus", null);
+            if (focus != null && focus.Length == 2) {
+                return new[] {new SalientArea {Area = new RectangleF(focus[0], focus[1], 0, 0), Weight = 1}};
+            }
+
+            if (focus != null && focus.Length > 2 && focus.Length % 4 == 0) {
+                return focus.ToList()
+                            .SplitList(4)
+                            .Select(v => new SalientArea {
+                                Area = new RectangleF(v[0], v[1], v[2] - v[0], v[3] - v[1]),
+                                Weight = 1
+                            })
+                            .ToArray();
+            }
+            return new SalientArea[0];
+        }
+
+        public static double IntersectVolume(RectangleF window, SalientArea[] regions)
+        {
+            double volume = 0;
+            foreach (var r in regions) {
+                var size = RectangleF.Intersect(r.Area, window).Size;
+                volume += size.Width * size.Height * r.Weight;
+            }
+            return volume;
+        }
+    }
+
     /// <summary>
     /// Enables cropping based on a set of rectangles to preserve
     /// </summary>
@@ -43,57 +108,136 @@ namespace ImageResizer.Plugins.CropAround {
         /// </summary>
         /// <returns></returns>
         public IEnumerable<string> GetSupportedQuerystringKeys() {
-            return new string[] { "c.focus", "c.zoom", "c.finalmode" };
+            return new string[] { "c.focus", "c.salientareas", "c.zoom", "c.finalmode"};
         }
 
         protected override RequestedAction LayoutImage(ImageState s) {
             //Only activated if both width and height are specified, and mode=crop.
             if (s.settings.Mode != FitMode.Crop || s.settings.Width < 0 || s.settings.Height < 0) return RequestedAction.None;
 
-            //Calculate bounding box for all coordinates specified.
-            double[] focus = s.settings.GetList<double>("c.focus", null, 2, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72);
-            if (focus == null) return RequestedAction.None;
-            RectangleF box = PolygonMath.GetBoundingBox(focus);
+            var finalMode = s.settings.Get("c.finalmode", FitMode.Pad);
 
-            var bounds = new RectangleF(new PointF(0,0),s.originalSize);
-            //Clip box to original image bounds
-            box = PolygonMath.ClipRectangle(box, bounds);
+            var regions = SalientArea.FromQuery(s.settings);
+            if (regions.Length == 0) return RequestedAction.None;
 
-            var targetSize = new SizeF(s.settings.Width,s.settings.Height);
 
-            SizeF copySize;
+            var a = new Aligner {
+                Regions = regions,
+                ImageSize = s.originalSize,
+                TargetSize = new Size(s.settings.Width, s.settings.Height),
+                NeverCropSalientArea = finalMode != FitMode.Crop,
+                Zoom = regions[0].Area.Width > 0 && regions[0].Area.Height > 0 && s.settings.Get("c.zoom", false)
+            };
 
-            //Now, we can either crop as closely as possible or as loosely as possible. 
-            if (s.settings.Get<bool>("c.zoom", false) && box.Width > 0 && box.Height > 0) {
-                //Crop close
-                copySize = PolygonMath.ScaleOutside(box.Size, targetSize);
-            } else {
-                //Crop minimally
-                copySize = PolygonMath.ScaleInside(targetSize, bounds.Size);
-                //Ensure it's outside the box
-                if (!PolygonMath.FitsInside(box.Size,copySize)) copySize = PolygonMath.ScaleOutside(box.Size, copySize);
+            s.copyRect = a.GetCrop();
 
-            }
-            //Clip to bounds.
-            box = PolygonMath.ClipRectangle(PolygonMath.ExpandTo(box, copySize), bounds);
-
-            s.copyRect = box;
-            
-            //What is the vertical and horizontal aspect ratio different in result pixels?
-            var padding = PolygonMath.ScaleInside(box.Size, targetSize);
-            padding = new SizeF(targetSize.Width - padding.Width, targetSize.Height - padding.Height);
-
+            s.ValidateCropping();
 
             //So, if we haven't met the aspect ratio yet, what mode will we pass on?
-            var finalmode = s.settings.Get<FitMode>("c.finalmode", FitMode.Pad);
-
-            //Crop off 1 or 2 pixels instead of padding without worrying too much
-            if (finalmode == FitMode.Pad && padding.Width + padding.Height < 3) finalmode = FitMode.Crop;
-
-            s.settings.Mode = finalmode;
+            s.settings.Mode = finalMode;
 
             return RequestedAction.None;
         }
         
+    }
+
+
+    class Aligner
+    {
+        /// Zoom cannot be true unless 1 or more focus regions have positive area
+        internal bool Zoom { get; set; }
+
+        /// Prevent cropping of any salient region, even if it prevents us from meeting the TargetSize aspect ratio.
+        internal bool NeverCropSalientArea { get; set; }
+
+        // Salient regions ordered by priority
+        internal SalientArea[] Regions { get; set; }
+
+        internal Size TargetSize { get; set; }
+
+        internal Size ImageSize { get; set; }
+
+        RectangleF SalientBoundingBox()
+        {
+            return PolygonMath.GetBoundingBox(Regions
+                .SelectMany(r => new[] { r.Area.Location, new PointF(r.Area.Right, r.Area.Bottom) })
+                .ToArray());
+        }
+
+        RectangleF GetZoomCrop()
+        {
+            RectangleF box = SalientBoundingBox();
+
+            var bounds = new RectangleF(new PointF(0, 0), ImageSize);
+            //Clip box to original image bounds
+            box = PolygonMath.ClipRectangle(box, bounds);
+            
+            //Crop close
+            var copySize = PolygonMath.ScaleOutside(box.Size, TargetSize);
+            //Clip to bounds.
+            return PolygonMath.ClipRectangle(PolygonMath.ExpandTo(box, copySize), bounds);
+        }
+
+        internal RectangleF GetCrop()
+        {
+            if (Zoom) return GetZoomCrop();
+
+
+            var salientBounds = SalientBoundingBox();
+
+            var idealCropSize = PolygonMath.ScaleInside(TargetSize, ImageSize);
+            
+            var fits = PolygonMath.FitsInside(salientBounds.Size, idealCropSize);
+
+            // If there's no need to crop out a salient region, then center on the salient bounding box and align within the image bounds.
+            if (fits) {
+                return PolygonMath.AlignWithin(new RectangleF(PointF.Empty, idealCropSize),
+                    new RectangleF(PointF.Empty, ImageSize), PolygonMath.Midpoint(salientBounds));
+            }
+
+            if (NeverCropSalientArea) {
+                var compromiseCrop = new SizeF(Math.Max(salientBounds.Width, idealCropSize.Width),
+                    Math.Max(salientBounds.Height, idealCropSize.Height));
+
+                // Don't worry about 3 pixels or less, that's just annoying.
+                if (compromiseCrop.Width - idealCropSize.Width <= 3 &&
+                    compromiseCrop.Height - idealCropSize.Height <= 3) {
+                    compromiseCrop = idealCropSize;
+                }
+
+                return PolygonMath.AlignWithin(new RectangleF(PointF.Empty, compromiseCrop),
+                    new RectangleF(PointF.Empty, ImageSize), PolygonMath.Midpoint(salientBounds));
+
+            } 
+
+            // Find the least bad crop (brute force)
+            var vertical = salientBounds.Height > idealCropSize.Height;
+
+            var choiceCount = vertical
+                ? salientBounds.Height - idealCropSize.Height
+                : salientBounds.Width - idealCropSize.Width;
+
+            var searchArea = new RectangleF(vertical ? 0 : salientBounds.X, vertical ? salientBounds.Y : 0, vertical ? idealCropSize.Width : salientBounds.Width, vertical ? salientBounds.Height : idealCropSize.Height);
+
+            var initialWindow = PolygonMath.AlignWith(new RectangleF(PointF.Empty, idealCropSize), searchArea,
+                ContentAlignment.TopLeft);
+
+            double bestVolume = 0;
+            var bestCrop = initialWindow;
+           
+            for (var i = 0; i < choiceCount; i++) {
+                var window = initialWindow;
+                window.Offset(vertical ? 0 : i, vertical ? i : 0);
+
+                var volume = SalientArea.IntersectVolume(window, Regions);
+                if (volume > bestVolume) {
+                    bestVolume = volume;
+                    bestCrop = window;
+                }
+            }
+            return bestCrop;
+
+        }
+
     }
 }

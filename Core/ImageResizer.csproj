@@ -113,6 +113,7 @@
     <Compile Include="ExtensionMethods\Dictionary.cs" />
     <Compile Include="ExtensionMethods\GenericExtensions.cs" />
     <Compile Include="PluginLoadingHints.cs" />
+    <Compile Include="Plugins\Basic\DiagnoseRequest.cs" />
     <Compile Include="Plugins\Basic\EndpointPlugin.cs" />
     <Compile Include="Plugins\Basic\IDiagnosticsProvider.cs" />
     <Compile Include="Plugins\Basic\LicenseDisplay.cs" />

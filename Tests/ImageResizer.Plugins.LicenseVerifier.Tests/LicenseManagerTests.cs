@@ -59,6 +59,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test, clock) {
                     Cache = cache
                 };
+                mgr.SkipHeartbeatsIfDiskCacheIsFresh = 0;
                 MockHttpHelpers.MockRemoteLicenseException(mgr, WebExceptionStatus.NameResolutionFailure);
 
                 var conf = new Config();
@@ -84,6 +85,84 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 }
             }
         }
+
+
+        [Fact]
+        public void Test_Caching_With_Write_Delay()
+        {
+            if (Environment.GetEnvironmentVariable("APPVEYOR") == "True")
+            {
+                return;
+            }
+
+            var clock = new OffsetClock("2017-04-25", "2017-04-25");
+            var cache = new StringCacheMem();
+
+            // Populate cache
+            {
+                var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test, clock)
+                {
+                    Cache = cache
+                };
+                MockHttpHelpers.MockRemoteLicense(mgr, HttpStatusCode.OK, LicenseStrings.EliteSubscriptionRemote,
+                    null);
+
+                var conf = new Config();
+                conf.Plugins.LicenseScope = LicenseAccess.Local;
+                conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R_Elite", "R4Elite"));
+                conf.Plugins.AddLicense(LicenseStrings.EliteSubscriptionPlaceholder);
+
+                Assert.Equal(1, mgr.WaitForTasks());
+
+                var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock, true);
+                Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
+
+                Assert.Empty(mgr.GetIssues());
+                Assert.NotNull(conf.GetLicensesPage());
+            }
+
+            // Use cache
+            {
+                var mgr = new LicenseManagerSingleton(ImazenPublicKeys.Test, clock)
+                {
+                    Cache = cache
+                };
+
+                var conf = new Config();
+
+                conf.Plugins.LicenseScope = LicenseAccess.Local;
+                conf.Plugins.Install(new LicensedPlugin(mgr, clock, "R_Elite", "R4Elite"));
+                conf.Plugins.AddLicense(LicenseStrings.EliteSubscriptionPlaceholder);
+
+                mgr.Heartbeat();
+                Assert.Equal(0, mgr.WaitForTasks());
+
+                var result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock, true);
+                Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
+
+
+                Assert.NotNull(conf.GetDiagnosticsPage());
+                Assert.NotNull(conf.GetLicensesPage());
+
+                Assert.Equal(0, mgr.GetIssues().Count());
+
+                MockHttpHelpers.MockRemoteLicenseException(mgr, WebExceptionStatus.NameResolutionFailure);
+
+                while (!mgr.AllowFetching())
+                {
+                    mgr.Heartbeat();
+                }
+
+                mgr.WaitForTasks();
+
+                result = new Computation(conf, ImazenPublicKeys.Test, mgr, mgr, clock, true);
+                Assert.True(result.LicensedForRequestUrl(new Uri("http://anydomain")));
+                Assert.Equal(1, mgr.GetIssues().Count());
+
+
+            }
+        }
+
 
         [Fact]
         public void Test_GlobalCache()

@@ -56,6 +56,52 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
 
         public long HeartbeatCount { get; private set; }
+
+        /// <summary>
+        /// Hearbeats remaining to skip before fetching
+        /// </summary>
+        private long SkipHeartbeats { get; set; } = 0;
+        /// <summary>
+        /// How many initial heartbeats to skip if the last modified date of the disk cached license is recent (under 60m old)
+        /// </summary>
+        public long SkipHeartbeatsIfDiskCacheIsFresh { get;  set; } = 10;
+
+        /// <summary>
+        /// License chains consult this method before firing heartbeat events on fetchers
+        /// </summary>
+        /// <returns></returns>
+        public bool AllowFetching()
+        {
+            if (SkipHeartbeats > 0)
+            {
+                return false;
+            }
+            if (HeartbeatCount > SkipHeartbeatsIfDiskCacheIsFresh && 
+                SkipHeartbeats < 1)
+            {
+                return true;
+            }
+            if (SkipHeartbeatsIfDiskCacheIsFresh < 1)
+            {
+                return true; 
+            }
+            var fetcherCount = chains.Values.Count(c => c.IsRemote);
+            if (fetcherCount > 0)
+            {
+                var now = DateTime.UtcNow;
+                var oldestWrite = chains.Values.Where(c => c.IsRemote).Select(c => Cache.GetWriteTimeUtc(c.CacheKey)).Min();
+                if (oldestWrite.HasValue && now.Subtract(oldestWrite.Value) < TimeSpan.FromMinutes(60))
+                {
+                    SkipHeartbeats = SkipHeartbeatsIfDiskCacheIsFresh;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public Guid? ManagerGuid { get; private set; }
 
         /// <summary>
@@ -92,16 +138,27 @@ namespace ImageResizer.Plugins.LicenseVerifier
 
         public DateTimeOffset? FirstHeartbeat { get; private set; }
 
+
         public void Heartbeat()
         {
-            if (FirstHeartbeat == null) {
+            if (FirstHeartbeat == null)
+            {
                 FirstHeartbeat = Clock.GetUtcNow();
             }
-            if (ManagerGuid == null) {
+            if (ManagerGuid == null)
+            {
                 ManagerGuid = Guid.NewGuid();
             }
+ 
             HeartbeatCount++;
-            foreach (var chain in chains.Values) {
+
+            if (SkipHeartbeats > 0)
+            {
+                SkipHeartbeats--;
+            }
+
+            foreach (var chain in chains.Values)
+            {
                 chain.Heartbeat();
             }
         }

@@ -38,6 +38,8 @@ namespace ImageResizer.Plugins.Basic {
 
         public VirtualFolder(NameValueCollection args)
             : base() {
+            if (string.IsNullOrWhiteSpace(args["virtualPath"])) throw new ArgumentException("missing virtualPath attribute on <add name='VirtualPath' ... element");
+            if (string.IsNullOrWhiteSpace(args["physicalPath"])) throw new ArgumentException("missing physicalPath attribute on <add name='VirtualPath' ... element");
             this.VirtualPath = args["virtualPath"];
             this.PhysicalPath = args["physicalPath"];
             this.RegisterAsVpp = args.Get("vpp", true);
