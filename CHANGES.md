@@ -1200,7 +1200,7 @@ Make sure you perform the following step before upgrading to 3.0.13, as `ImageRe
 
 The bugs that nobody has probably ever encountered, but were turned up by comprehensive unit testing.
 
-* Core: Fixed NotImplemetedException when &borderWidth is negative
+* Core: Fixed NotImplementedException when &borderWidth is negative
 * Core: Fixed exception when &paddingColor is specified but &paddingWidth is not used.
 * Core: Fixed bug where &margin= would not be applied unless other commands were present.
 * AdvancedFilters: Fixed: &sharpen and &blur were not taking effect unless used with other commands. 
