@@ -940,7 +940,7 @@ If you are still using the FriendlyUrls plugin, [you need to rename it in Web.co
 
 ## Cool new features in the ImageResizer.dll core project
 
-* `mode=max|pad|crop|stretch|carve` provides a single command to control how aspect ratio changes are handled. It doesn't introduce new features, but is easier to remember than `maxwidth` vs `width`, `crop=auto`, `stretch=fill`, and `carve=true`. Although, as always, everything is fully backwards-compatible. Example: `?maxwith=10&maxheight=10` is equivalent to `?width=10&height=10&mode=max`. 
+* `mode=max|pad|crop|stretch|carve` provides a single command to control how aspect ratio changes are handled. It doesn't introduce new features, but is easier to remember than `maxwidth` vs `width`, `crop=auto`, `stretch=fill`, and `carve=true`. Although, as always, everything is fully backwards-compatible. Example: `?maxwidth=10&maxheight=10` is equivalent to `?width=10&height=10&mode=max`. 
 * Control how images are cropped or padded (when the aspect ratio is being modified) using the `anchor` command:  &anchor=topleft|bottomright|middlecenter... 
 * You can now rotate the source image in 90 degree intervals using `sRotate`. This is useful if you'd like to rotate prior to doing a manual crop.
 * The new `ImageBuilder.Build(Job job)` overload allows you more control over how streams are handled - you can even choose to dispose the destination stream when the job is complete, or restore the position of the original stream.
