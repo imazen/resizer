@@ -178,7 +178,7 @@ This release introduces [the new S3Reader2 plugin](/plugins/s3reader2), which in
 
 ## New plugins
 
-* [The S3Reader2 plugin](/plugins/s3reader2) introduces support for the rewritten AWSSDK 2.0. You must explicitly set the S3 bucket region if you're not using the  Virginia or Northern Californa datacenters.
+* [The S3Reader2 plugin](/plugins/s3reader2) introduces support for the rewritten AWSSDK 2.0. You must explicitly set the S3 bucket region if you're not using the  Virginia or Northern California datacenters.
 
 ## Fixed bugs
 
