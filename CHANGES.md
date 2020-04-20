@@ -631,7 +631,7 @@ These plugins are not yet alpha, and will be changing before their final release
 
 ## AdvancedFilters
 
-* Changed the way blur/a.blur, sharpen/a.sharpen, a.removnoise, and a.oilpainting values are interpreted - With this release, your existing images may become slightly blurrier or sharper if you use these commands. This change was only made after consulting all registered users of the plugin. This change makes the specified radius values percentages of the image size. This will allow &blur=5 to have the same effect regardless of the image size, as expected. To be exact, the value will be interpreted as 1/1000ths of the smaller of the image width and height. This provides both granularity and very good consistency.
+* Changed the way blur/a.blur, sharpen/a.sharpen, a.removenoise, and a.oilpainting values are interpreted - With this release, your existing images may become slightly blurrier or sharper if you use these commands. This change was only made after consulting all registered users of the plugin. This change makes the specified radius values percentages of the image size. This will allow &blur=5 to have the same effect regardless of the image size, as expected. To be exact, the value will be interpreted as 1/1000ths of the smaller of the image width and height. This provides both granularity and very good consistency.
 
 ## AzureReader
 
