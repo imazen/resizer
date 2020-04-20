@@ -210,7 +210,7 @@ typedef struct {
     float *Weights;/* Normalized weights of neighboring pixels */
     int Left;      /* Bounds of source pixels window */
     int Right;
-} PixelContributions;/* Contirbution information for a single pixel */
+} PixelContributions;/* Contribution information for a single pixel */
 
 typedef struct {
     PixelContributions *ContribRow; /* Row (or column) of contribution weights */
