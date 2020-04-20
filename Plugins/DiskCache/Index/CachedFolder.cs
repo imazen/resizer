@@ -155,7 +155,7 @@ namespace ImageResizer.Plugins.DiskCache {
         }
         /// <summary>
         /// Verifies the file exists before returning the cached data. 
-        /// Discrepancies in file existence result in OnFileDisappeard being fired.
+        /// Discrepancies in file existence result in OnFileDisappeared being fired.
         /// </summary>
         /// <param name="relativePath"></param>
         /// <param name="physicalPath"></param>
