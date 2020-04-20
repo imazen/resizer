@@ -44,7 +44,7 @@ namespace ImageResizer.ProviderTests {
         /// Initializes a new instance of the <see cref="SqlReaderTest"/> class.
         /// </summary>
         public SqlReaderTest() {
-            // In unit tests the DataDirecry path used by connection strings is
+            // In unit tests the DataDirectory path used by connection strings is
             // null. We set the path here to ensure that connection strings 
             // that use DataDirectory function as expected.
             AppDomain.CurrentDomain.SetData(
