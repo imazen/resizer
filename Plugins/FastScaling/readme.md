@@ -99,7 +99,7 @@ As you can tell, scaling in a linear light (left) preserves more of the snowflak
 FastScaling can make a range of adjustments to favor speed or quality on very large images. These typically set default values for the filter type/size and for averaging optimizations. 
 
 Averaging optimization: If you're downscaling an image to 1/20th of its size, FastScaling will use an averaging filter to scale it to 1/6th, then scale the remaining 1/3.333 using a high-quality filter. Since no filters use a window larger than ~3x the scale filter, this does not measurably affect quality. 
-You can make this optimization more agressive by increasing the speed value, or reduce it by specifying a negative value. 
+You can make this optimization more aggressive by increasing the speed value, or reduce it by specifying a negative value. 
 
 * `&down.speed = -2..4` (default 0)  -2 disables averaging optimizations. 
 * `&up.speed = 0..2` (default 0)
