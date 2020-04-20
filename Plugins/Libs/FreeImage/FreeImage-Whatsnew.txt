@@ -921,7 +921,7 @@ December 2th 2000 - 1.4.4
 
 November 7th 2000 - 1.4.3
 * fixed FreeImage_SavePNG crash bug
-* fixed slighly corrupt size filter in FreeImage_Combine
+* fixed slightly corrupt size filter in FreeImage_Combine
 * fixed FreeImage_SaveTIFF not saving 4-bit images
 * [Herve Drolon] fixed bug in FreeImage_LoadTIFF
 * [Herve Drolon] fixed bug in FreeImage_GetColorType
