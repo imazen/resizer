@@ -18,7 +18,7 @@ lowercase filename extensions should be used.
 Extract background worker to class.
 ResizeMode should use an enumeration instead of magic numbers
 Region areas should be removed - they're counterproductive, and make it harder to read code. Generally, they're a sign that the class needs to be broken down into smaller pieces.
-Remove all uneeded dependencies.
+Remove all unnecessary dependencies.
 
 # Design
 
