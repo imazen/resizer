@@ -149,7 +149,7 @@ typedef struct RenderDetailsStruct {
     float minimum_sample_window_to_interposharpen;
 
 
-    // If possible to do correctly, halve the image until it is [interpolate_last_percent] times larger than needed. 3 or greater reccomended. Specify -1 to disable halving.
+    // If possible to do correctly, halve the image until it is [interpolate_last_percent] times larger than needed. 3 or greater recommended. Specify -1 to disable halving.
     float interpolate_last_percent;
 
     //The number of pixels (in target canvas coordinates) that it is acceptable to discard for better halving performance
