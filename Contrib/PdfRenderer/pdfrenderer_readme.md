@@ -41,7 +41,7 @@ It uses the `width` and `height` commands to optimize the PDF rendering to the d
 
 * Width/height - Choose the dimensions of the output image. The pdf will be rendered within the box, and padded to fit. You can use &mode=crop to crop the pdf to a specific aspect ratio, or &mode=max to just allow the output image to match the aspect ratio of the PDF.
 * Pdfwidth/pdfheight - You can use pdfwidth and pdfheight to specify alternate rendering dimensions for the PDF, causing it to be resized after it is generated. This is useful for making high-quality thumbnails, as rendering a PDF to an 80x80px square can be too aliased. Specifying &width=80&pdfwidth=240 can often provide much better results than &width=80 by itself. (3.1.5+)
-* page=X - (defailt - page 1) Choose the page you wish to render.
+* page=X - (default - page 1) Choose the page you wish to render.
 * gridfit=true|false (default - false) When true, uses TrueType grid fitting for glyph rendering.
 * subpixels=true|false (default - false) When true, fonts are rendered to a subpixel grid instead of the pixel great.
 
