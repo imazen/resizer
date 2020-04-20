@@ -153,7 +153,7 @@ namespace ImageResizer{
 					}
 
                     //TODO: permit it to work with increments of 90 rotation
-                    //Write polygon math method to determin the angle of the target area.
+                    //Write polygon math method to determine the angle of the target area.
                     RectangleF targetBox = ImageResizer::Util::PolygonMath::GetBoundingBox (targetArea);
                     if (targetBox.Location != targetArea[0] || targetArea[1].Y != targetArea[0].Y || targetArea[2].X != targetArea[0].X){
                         return RequestedAction::None;
