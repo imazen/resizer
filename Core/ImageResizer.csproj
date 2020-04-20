@@ -134,7 +134,7 @@
     <Compile Include="Plugins\IVirtualImageProviderVpp.cs" />
     <Compile Include="Plugins\IVirtualImageProviderVppCaching.cs" />
     <Compile Include="Plugins\MultiFolderStorage.cs" />
-    <Compile Include="Plugins\PeristentGlobalStringCache.cs" />
+    <Compile Include="Plugins\PersistentGlobalStringCache.cs" />
     <Compile Include="Plugins\CommonStaticStorage.cs" />
     <Compile Include="Plugins\StaticLicenseProvider.cs" />
     <Compile Include="Plugins\VirtualFileShim.cs" />

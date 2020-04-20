@@ -177,8 +177,8 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             var cacheInstance = cacheCtor.Invoke(new object[] {unique_prefix});
 
 
-            var c = new PeristentGlobalStringCache();
-            var cacheField = typeof(PeristentGlobalStringCache)
+            var c = new PersistentGlobalStringCache();
+            var cacheField = typeof(PersistentGlobalStringCache)
                 .GetField("cache", BindingFlags.NonPublic | BindingFlags.Instance);
             Debug.Assert(cacheField != null, "cacheField != null");
             cacheField.SetValue(c, cacheInstance);

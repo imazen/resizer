@@ -118,7 +118,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         }
 
 
-        internal LicenseManagerSingleton(IReadOnlyCollection<RSADecryptPublic> trustedKeys, ILicenseClock clock): this(trustedKeys,clock, new PeristentGlobalStringCache()) { }
+        internal LicenseManagerSingleton(IReadOnlyCollection<RSADecryptPublic> trustedKeys, ILicenseClock clock): this(trustedKeys,clock, new PersistentGlobalStringCache()) { }
         internal LicenseManagerSingleton(IReadOnlyCollection<RSADecryptPublic> trustedKeys, ILicenseClock clock, IPersistentStringCache cache)
         {
             TrustedKeys = trustedKeys;
