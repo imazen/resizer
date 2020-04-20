@@ -1359,7 +1359,7 @@ FullFile: http://downloads.imageresizing.net/Resizer3-alpha-8-full-Jun-02-2011.z
 * Fixed configuration bug: Setting ImageIdType would incorrectly throw an exception.
 * Behavior change: Now throws FileNotFoundException when an image doesn't exist, instead of causing a NullReferenceException later on.
 
-## Samples and Documenation
+## Samples and Documentation
 
 * Added JCropExample ([read the article](http://nathanaeljones.com/573/combining-jcrop-and-server-side-image-resizing/))
 * Added SqlReaderSample - Shows how to use the SqlReader plugin to resize and upload images to SQL.
