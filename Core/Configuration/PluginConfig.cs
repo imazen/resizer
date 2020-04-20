@@ -631,7 +631,7 @@ namespace ImageResizer.Configuration {
 
         /// <summary>
         /// For use only by plugins during .Uninstall.
-        /// Removes the specified plugin from AllPlugins, QuerystringPlugins, CachingSystems, ImageEncoders, and ImageBuiderExtensions, based
+        /// Removes the specified plugin from AllPlugins, QuerystringPlugins, CachingSystems, ImageEncoders, and ImageBuilderExtensions, based
         /// on which interfaces the instance implements.
         /// Plugins may register event handlers and modify settings - thus you should use the plugin's method to uninstall them vs. using this method.
         /// </summary>
@@ -652,7 +652,7 @@ namespace ImageResizer.Configuration {
 
         /// <summary>
         /// Only for use by plugins during IPlugin.Install. Call Plugin.Install instead of this method, since plugins often must perform other initialization actions.
-        /// Adds the specified plugin to AllPlugins, QuerystringPlugins, CachingSystems, ImageEncoders, and ImageBuiderExtensions, based
+        /// Adds the specified plugin to AllPlugins, QuerystringPlugins, CachingSystems, ImageEncoders, and ImageBuilderExtensions, based
         /// on which interfaces the instance implements. For ICache and IEncoder, the plugin is inserted at the beginning of CachingSystems and ImageEncoders respectively.
         /// To reiterate, plugins may register event handlers and modify settings - thus you should use the plugin's method to uninstall them vs. using this method.
         /// Will not register a plugin that is already installed, unless it implements IMultiInstancePlugin.
