@@ -336,7 +336,7 @@ FullFile: http://downloads.imageresizing.net/Resizer3-3-1-full-Dec-20-2012.zip
 
 This is a `beta` quality release.
 
-## Notice for users of downalodNativeDependencies=true
+## Notice for users of downloadNativeDependencies=true
 
 To ensure all dependencies get downloaded before ASP.NET starts locking them, call `Config.Current.Plugins.LoadPlugins()` from `Application_Start` in `Global.asax.cs` 
 
@@ -373,7 +373,7 @@ The following bugs were not discovered in time to be fixed for this release. The
 * When using auto-cropping (mode=crop), scale=down may sometimes be ignored, acting as if scale=both was set.
 * Attempting to use `srotate` on **CMYK**(not RGB) Jpegs on *Server 2008 R2 or higher* will cause a "ArgumentException: Parameter is not valid.". 
 * Changes to watermark settings in Web.config may require cache-breaking (or clearing) to take effect.
-* Under concurrent traffic, ASP.NET may lock partially-downloaded assemblies (for plugins with `downalodNativeDependencies=true` set) when running the application the first time on a new server. Call `Config.Current.Plugins.LoadPlugins()` from `App_Start` in `Global.asax.cs` to ensure this doesn't occur.
+* Under concurrent traffic, ASP.NET may lock partially-downloaded assemblies (for plugins with `downloadNativeDependencies=true` set) when running the application the first time on a new server. Call `Config.Current.Plugins.LoadPlugins()` from `App_Start` in `Global.asax.cs` to ensure this doesn't occur.
 
 The November 2012 release of the Azure SDK 2.0 completely broke backwards compatibility with V1.7, meaning we can't upgrade AzureReader to support 2.0 without breaking things for existing users (which would be especially bad for NuGet users). 
 
