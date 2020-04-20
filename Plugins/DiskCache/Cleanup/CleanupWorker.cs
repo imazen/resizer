@@ -68,7 +68,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <summary>
         /// When true, indicates that another process is managing cleanup operations - this thread is idle, waiting for the other process to end before it can pick up work.
         /// </summary>
-        public bool ExteralProcessCleaning { get { return this.otherProcessManagingCleanup; } }
+        public bool ExternalProcessCleaning { get { return this.otherProcessManagingCleanup; } }
         /// <summary>
         /// When true, indicates that another process is managing cleanup operations - this thread is idle, waiting for the other process to end before it can pick up work.
         /// </summary>
@@ -190,7 +190,7 @@ namespace ImageResizer.Plugins.DiskCache {
 
         public override IEnumerable<IIssue> GetIssues() {
             List<IIssue> issues = new List<IIssue>(base.GetIssues());
-            if (ExteralProcessCleaning) 
+            if (ExternalProcessCleaning) 
                 issues.Add(new Issue("An external process indicates it is managing cleanup of the disk cache. " + 
                 "This process is not currently managing disk cache cleanup. If configured as a web garden, keep in mind that the negligible performance gains are likely to be outweighed by the loss of cache optimization quality.", IssueSeverity.Warning));
             lock (_timesLock) {
