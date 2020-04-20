@@ -43,7 +43,7 @@ namespace ImageResizerGUI.Code
         {
             var batchItems = new List<BatchInfo>();
 
-            // duplicate item to avoid mutiple threads accessing to the same object.
+            // duplicate item to avoid multiple threads accessing to the same object.
             foreach (var item in items)
                 batchItems.Add(new BatchInfo(item));
 
