@@ -83,7 +83,7 @@ namespace ImageResizer.Plugins.AnimatedGifs
             // 1 enables transparency
             // 8 clears to bgcolor after each frame.
             // 25 (8 + 16) = restore to previous data (doesn't work in FF)
-            result[3] = (byte)(8 | (enableTransparency ? 1 : 0)); //Tansparent, clear to bgcolor (works good for transparent animations
+            result[3] = (byte)(8 | (enableTransparency ? 1 : 0)); //Transparent, clear to bgcolor (works good for transparent animations
 
             // Split the delay into high- and lowbyte
             result[4] = (byte)(delay % 256); //Duration - lsb
