@@ -53,7 +53,7 @@ goto exit
   echo builder ^<command^>
   echo builder ^<command^>;[command];[command];...
   echo.
-  echo A single fake call will be used for the multi-command intarface
+  echo A single fake call will be used for the multi-command interface
   echo Multi-command calls can't use help/prepare
   echo.
   echo Commands:
