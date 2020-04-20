@@ -119,7 +119,7 @@ typedef double (*detailed_interpolation_method)(const struct InterpolationDetail
 typedef struct InterpolationDetailsStruct {
     //1 is the default; near-zero overlapping between windows. 2 overlaps 50% on each side.
     double window;
-    //Coefficients for bucubic weighting
+    //Coefficients for bicubic weighting
     double p1, p2, p3, q1, q2, q3, q4;
     //Blurring factor when > 1, sharpening factor when < 1. Applied to weights.
     double blur;
