@@ -252,7 +252,7 @@ namespace ImageResizer.Plugins.DiskCache {
                         // - (and hashmodified is true), then it's another process writing to the file, and we can serve the file afterwards
                         // - (and hashmodified is false), then it could either be an IIS read lock or another process writing to the file. Correct behavior is to kill the request here, as we can't guarantee accurate image data.
                         // I.e, hashmodified=true is the only supported setting for multi-process environments.
-                        //TODO: Catch UnathorizedAccessException and log issue about file permissions.
+                        //TODO: Catch UnauthorizedAccessException and log issue about file permissions.
                         //... If we can wait for a read handle for a specified timeout.
 
                         IOException locked_exception = null;
