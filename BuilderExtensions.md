@@ -71,7 +71,7 @@ begins.  At present, no extensions override this method.
 >### `protected virtual RequestedAction BuildJob(ImageResizer.ImageJob job)`
 
 Called (by `ImageBuilder.Build()`) to start the image processing pipeline.
-If overriden, replaces the default `ImageBuilder` handing of the pipeline.
+If overridden, replaces the default `ImageBuilder` handing of the pipeline.
 FreeImage, WIC, and WPF provide override implementations that take over if the
 job settings include their value for the `builder` key.
 
@@ -86,7 +86,7 @@ The AnimatedGifs extension overrides to provide support for multi-frame
 >### `protected virtual Bitmap buildToBitmap(Bitmap source, ResizeSettings settings, bool transparencySupported)`
 
 Called to create the output `Bitmap` based on the source `Bitmap` and the
-settings.  Only overriden by `ImageBuilder` in order to call `Process()` and
+settings.  Only overridden by `ImageBuilder` in order to call `Process()` and
 begin the default resizing pipeline.
 
 ## Low-level Image Resizing
