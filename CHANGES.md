@@ -281,7 +281,7 @@ FullFile: http://downloads.imageresizing.net/Resizer3-4-0-full-Oct-17-2013.zip
 
 ### Changes to RemoteReader
 
-* Fixed bug in RemoteReader - extension correction was still failing to work (causing PNG images to be rencoded as jpegs when no format was explicitly specified).
+* Fixed bug in RemoteReader - extension correction was still failing to work (causing PNG images to be re-encoded as jpegs when no format was explicitly specified).
 
 # v3-3-3
 Date: March 2 2013
