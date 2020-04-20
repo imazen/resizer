@@ -47,7 +47,7 @@ namespace Sample04
             // Was a file selected
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                // Format is stored in 'format' on successfull load.
+                // Format is stored in 'format' on successful load.
                 FREE_IMAGE_FORMAT format = FREE_IMAGE_FORMAT.FIF_UNKNOWN;
 
                 // Try loading the file
