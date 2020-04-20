@@ -6,7 +6,7 @@ See /LICENSE.md for alternate license options and information about files outsid
 
 The AGPL V3.0 is not your only license option. 
 
-Imazen sells a variety of commerical licenses to fit every need - including SaaS usage and OEM redistribution. Visit http://imageresizing.net/ for more impormation.
+Imazen sells a variety of commercial licenses to fit every need - including SaaS usage and OEM redistribution. Visit http://imageresizing.net/ for more impormation.
 
 
 Copyright (c) 2010-2015 Imazen LLC

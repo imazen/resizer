@@ -41,11 +41,11 @@ These plugins are dual-licensed (you pick) under the  [Apache 2](#apache-2-licen
 
 Niche development tooling is a shrinking and (financially) unprofitable industry. We ask that you honor the terms of our licenses, and pay for what you use. 
 
-Our full-time development on this project is funded by purchases of our fantastic commerical licenses and support contracts. Commercial licenses are very permissive, allowing modification, circumstantial redistribution, and certain types of sub-licensing. Read more: http://imageresizing.net/licenses/
+Our full-time development on this project is funded by purchases of our fantastic commercial licenses and support contracts. Commercial licenses are very permissive, allowing modification, circumstantial redistribution, and certain types of sub-licensing. Read more: http://imageresizing.net/licenses/
 
 -------------------------------------------------------------------------------
 
-The following directories contain software provided under (you pick) commerical or *copyleft* licenses only. These are NOT available under a *permissive* open-source license.
+The following directories contain software provided under (you pick) commercial or *copyleft* licenses only. These are NOT available under a *permissive* open-source license.
     
     /Plugins/BatchZipper
     /Plugins/DiskCache
