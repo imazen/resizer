@@ -11,5 +11,5 @@ ul {border-bottom: 2px solid #ccc; padding:10px 0 10px 20px; margin:0;}
 ul {margin:0; padding:0; list-style:none;}
 li {margin:5px 0; padding:0;}
 
-/* YAY IE6 awsomeness */
+/* YAY IE6 awesomeness */
 *html h3 a {zoom:1;}
