@@ -228,7 +228,7 @@ FullFile: http://downloads.imageresizing.net/Resizer3-4-0-full-Oct-17-2013.zip
 * Use the `Instructions` class instead of `ResizeSettings` whenever possible. `ResizeSettings` will eventually be removed.
 * If you use any plugins with native dependencies, call `ImageResizer.Configuration.Config.Current.Plugins.LoadPlugins()` during Application_Start. 
 * Don't work directly with Bitmap instances. Methods that return a Bitmap instance are now marked obsolete due to the high probability of memory leaks and encoding bugs in user code.
-* Unit tests now require .NET 4.5 to run. The core library and most plugins can still be compilied under Visual Studio 2010 or higher. Run `PM> Update-Package -Reinstall` if your nuget packages aren't automatically restored.
+* Unit tests now require .NET 4.5 to run. The core library and most plugins can still be compiled under Visual Studio 2010 or higher. Run `PM> Update-Package -Reinstall` if your nuget packages aren't automatically restored.
 * Does your plugin need to pass additional information back to the ImageJob? Use ImageJob.ResultInfo.
 * If you have more than 2 cores, consider using an IIS Web Garden or our [WIC pipeline](/plugins/wic) to get optimal throughput.
 
