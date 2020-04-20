@@ -40,7 +40,7 @@ namespace ImageResizer.Plugins.Basic {
     /// querystring values in the image querystring.  For example,
     /// <c>&lt;image404 propertyImageDefault="~/images/nophoto.png?format=png" /&gt;</c>
     /// in the config file and
-    /// <c>&lt;img src="missingimage.jpg?format=jpg&amp;404=propertImageDefault&amp;width=200" /&gt;</c>
+    /// <c>&lt;img src="missingimage.jpg?format=jpg&amp;404=propertyImageDefault&amp;width=200" /&gt;</c>
     /// will result in a redirect to <c>~/images/nophoto.png?format=png&amp;width=200</c>.
     /// </para>
     /// </example>
