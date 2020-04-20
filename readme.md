@@ -19,7 +19,7 @@ ImageResizer has a very simple (and powerful) URL API.
 
 ![Fit modes](http://z.zr.io/rw/diagrams/resizing-modes.png)
 
-For more informaiton, [check out our website](http://www.imageresizing.net). To contribute, see [CONTRIBUTING](https://github.com/imazen/resizer/blob/develop/CONTRIBUTING.md).
+For more information, [check out our website](http://www.imageresizing.net). To contribute, see [CONTRIBUTING](https://github.com/imazen/resizer/blob/develop/CONTRIBUTING.md).
 
 #### Changes
 
