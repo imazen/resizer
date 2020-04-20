@@ -190,7 +190,7 @@ namespace ImageResizer.Plugins.RemoteReader {
         public string SignData(string data) {
 
             string key = c.get("remoteReader.signingKey", String.Empty);
-            if (string.IsNullOrEmpty(key)) throw new ImageResizer.ImageProcessingException("You are required to set a passphrase for securing remote URLs. <resizer><remotereader signingKey=\"put a long and randam passphrase here\" /> </resizer>");
+            if (string.IsNullOrEmpty(key)) throw new ImageResizer.ImageProcessingException("You are required to set a passphrase for securing remote URLs. <resizer><remotereader signingKey=\"put a long and random passphrase here\" /> </resizer>");
             return SignDataWithKey(data, key);
         }
         public string SignDataWithKey(string data, string key) {
@@ -324,7 +324,7 @@ namespace ImageResizer.Plugins.RemoteReader {
             List<IIssue> issues = new List<IIssue>();
             string key = c.get("remoteReader.signingKey", String.Empty);
             if (string.IsNullOrEmpty(key))
-                issues.Add(new Issue("You are required to set a passphrase for securing remote URLs. Example: <resizer><remotereader signingKey=\"put a long and randam passphrase here\" /> </resizer>"));
+                issues.Add(new Issue("You are required to set a passphrase for securing remote URLs. Example: <resizer><remotereader signingKey=\"put a long and random passphrase here\" /> </resizer>"));
             return issues;
 
         }
