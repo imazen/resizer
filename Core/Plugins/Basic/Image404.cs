@@ -116,7 +116,7 @@ namespace ImageResizer.Plugins.Basic {
                     !string.Equals(value, "auto", StringComparison.OrdinalIgnoreCase); }),
 
             new Matcher("cropxunits"),
-            new Matcher("cropyyunits"),
+            new Matcher("cropyunits"),
             new Matcher("trim.threshold"),
             new Matcher("trim.percentpadding"),
 
