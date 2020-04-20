@@ -293,7 +293,7 @@ bool BitmapFloat_pivoting_composite_linear_over_srgb(Context * context, BitmapFl
         return false;
     }
 
-    //Tiling does not appear to show benefits when benchmarking - only breifly investigated
+    //Tiling does not appear to show benefits when benchmarking - only briefly investigated
     bool tile_when_transposing = false;
 
     if (transpose && tile_when_transposing) {
