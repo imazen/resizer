@@ -85,7 +85,7 @@ B) Comply with the [GNU Affero General Public License V3.0](#agpl-v3), which typ
 
 TO BE CLEAR; **nothing** in this repository is *exclusively* AGPL, and we ONLY accept contributions that are Apache-compliant. Commercial licenses can apply to everything in this repository &mdash; a simple 1-2 page license that covers everything.
 
-> Exception: If you use Ghostscript and PdfRender *together*, either the AGPL (Ghostscript 9.07+) or the GPL (Ghostscript < 9.07) will apply to the combined work. Commercial licenses are available from Artifex software. We have not observed Ghostscript to be very stable in an ASP.NET environement, so its use is currently discouraged.
+> Exception: If you use Ghostscript and PdfRender *together*, either the AGPL (Ghostscript 9.07+) or the GPL (Ghostscript < 9.07) will apply to the combined work. Commercial licenses are available from Artifex software. We have not observed Ghostscript to be very stable in an ASP.NET environment, so its use is currently discouraged.
 
 Development, testing, and evaluation use is always free under the terms of the [Resizer Trial license](#resizer-trial-license)
 
