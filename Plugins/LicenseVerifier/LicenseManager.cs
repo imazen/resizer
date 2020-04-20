@@ -58,7 +58,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
         public long HeartbeatCount { get; private set; }
 
         /// <summary>
-        /// Hearbeats remaining to skip before fetching
+        /// Heartbeats remaining to skip before fetching
         /// </summary>
         private long SkipHeartbeats { get; set; } = 0;
         /// <summary>

@@ -325,14 +325,14 @@ namespace ImageResizer.Plugins.LicenseVerifier
             var netBeats = beatCount - lastBeatCount;
             lastBeatCount = beatCount;
 
-            var firstHearbeat = (long)(parent.FirstHeartbeat.GetValueOrDefault() -
+            var firstHeartbeat = (long)(parent.FirstHeartbeat.GetValueOrDefault() -
                                         new DateTimeOffset(1970, 1, 1, 0, 0, 0, 0, TimeSpan.Zero)).TotalSeconds;
 
             var q = GlobalPerf.Singleton.GetReportPairs();
             var prepending = q.WithPrepend(true);
             prepending.Add("total_heartbeats", beatCount.ToString());
             prepending.Add("new_heartbeats", netBeats.ToString());
-            prepending.Add("first_heartbeat", firstHearbeat.ToString());
+            prepending.Add("first_heartbeat", firstHeartbeat.ToString());
             prepending.Add("manager_id", parent.ManagerGuid?.ToString("D"));
             return q;
         }
