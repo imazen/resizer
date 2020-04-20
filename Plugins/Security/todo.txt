@@ -2,6 +2,6 @@
 
 1) Encrypted - Encrypted URLs
 2) Signed - Signed URLs
-3) RequestLimting - Limit request counts
+3) RequestLimiting - Limit request counts
 4) ThroughputLimiting
 
