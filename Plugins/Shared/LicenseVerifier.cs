@@ -175,7 +175,7 @@ namespace ImageResizer.Licensing {
         private Dictionary<string, List<Guid>> pendingFeatures = new Dictionary<string, List<Guid>>(StringComparer.OrdinalIgnoreCase);
         private object lockFeatures = new object();
         /// <summary>
-        /// Plugins should use Methods.NotifyUse instead of directly using ILicenseServce, as it includes basic integrity verification
+        /// Plugins should use Methods.NotifyUse instead of directly using ILicenseService, as it includes basic integrity verification
         /// </summary>
         /// <param name="domain"></param>
         /// <param name="feature"></param>
