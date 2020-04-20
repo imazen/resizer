@@ -697,7 +697,7 @@ These plugins are not yet alpha, and will be changing before their final release
 
 ## WhitespaceTrimmer
 
-* Eliminated use of AForge.UnamangedImage, which seems to have solved some memory consistency issues.
+* Eliminated use of AForge.UnmanagedImage, which seems to have solved some memory consistency issues.
 * Got hotfix from AForge author to solve AccessViolationExceptions.
 
 ### PdfRenderer
@@ -720,7 +720,7 @@ These bugs were discovered several weeks after release. Please contact support@i
 
 * [Fixed in hotfix] - The WIC plugins are exhibiting a garbage collection bug causing some image requests to fail.
 * [Fixed in hotfix] - Watermark plugin: InvalidOperationException: Object is currently in use elsewhere.
-* [Fixed in hotfix] - Fixed reliability issues with WhitespaceTrimmer by eliminating use of AForge.UnamangedImage.
+* [Fixed in hotfix] - Fixed reliability issues with WhitespaceTrimmer by eliminating use of AForge.UnmanagedImage.
 * [Fixed in hotfix] - False alarm on /resizer.debug page: System.ArgumentException: Virtual path outside of the current application is not supported.
 * [Fixed in hotfix] - IMultiInstancePlugin wasn't applied to SqlReader, S3Reader, AzureReader, or MongoReader, preventing them from having multiple instances.
 * [Fixed in hotfix] - SqlReader plugin now assumes datas are UTC instead of server-local. Fixes ArgumentOutOfRangeException in certain time zones for recently-updated images.
