@@ -6,7 +6,7 @@ provide resizing and image manipulation functionality.
 
 All extensions to the resizing process derive from the `BuilderExtension` base
 class, which in turn derives from `AbstractImageProcessor`.  The
-`AbtractImageProcessor` class serves two purposes:
+`AbstractImageProcessor` class serves two purposes:
 
  1. It defines 53 virtual methods which indvidual extensions can override as
     needed.  9 of these methods are for acquiring or beginning the overall
