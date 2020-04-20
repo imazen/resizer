@@ -48,7 +48,7 @@ RenderDetails * RenderDetails_create(Context * context)
     d->enable_profiling=false;
     d->halving_divisor = 0;
     d->interpolate_last_percent = 3;
-    d->havling_acceptable_pixel_loss = 0;
+    d->halving_acceptable_pixel_loss = 0;
     d->minimum_sample_window_to_interposharpen = 1.5;
     d->apply_color_matrix = false;
     return d;
@@ -152,7 +152,7 @@ static int Renderer_determine_divisor(Renderer * r)
     divisor_max = divisor_max / r->details->interpolate_last_percent;
 
     int divisor = (int)floor(divisor_max);
-    while (divisor > 0 && Renderer_percent_loss (r->source->w, width, r->source->h, height, divisor) > r->details->havling_acceptable_pixel_loss) {
+    while (divisor > 0 && Renderer_percent_loss (r->source->w, width, r->source->h, height, divisor) > r->details->halving_acceptable_pixel_loss) {
         divisor--;
     }
     return int_min(16, int_max(1, divisor));

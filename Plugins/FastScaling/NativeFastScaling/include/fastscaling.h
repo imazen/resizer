@@ -153,7 +153,7 @@ typedef struct RenderDetailsStruct {
     float interpolate_last_percent;
 
     //The number of pixels (in target canvas coordinates) that it is acceptable to discard for better halving performance
-    float havling_acceptable_pixel_loss;
+    float halving_acceptable_pixel_loss;
 
     //The actual halving factor to use.
     uint32_t halving_divisor;
