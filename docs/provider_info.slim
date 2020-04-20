@@ -3,7 +3,7 @@ layout: false
 
 div.markdown-body
   markdown:
-    * `bool .CheckForModifiedFiles` (XML: `checkForModifiedFiles="false"`) - Causes the modified date of the source file to be retreived. If the modified date has changed, the image will be re-downloaded and re-processed. Affects performance, as it causes a roundtrip to occur even when an image is cached. Metadata caching can minimize the request count. 
+    * `bool .CheckForModifiedFiles` (XML: `checkForModifiedFiles="false"`) - Causes the modified date of the source file to be retrieved. If the modified date has changed, the image will be re-downloaded and re-processed. Affects performance, as it causes a roundtrip to occur even when an image is cached. Metadata caching can minimize the request count. 
     * `bool .LazyExistenceCheck` (XML: `lazyExistenceCheck="true`") - If false (the default), does not check for the existence of a file until .Open() is called. Reduces network roundtrips.
     * `bool .CacheMetadata` (XML: `cacheMetadata="true"`) - Enables metadata caching to minimize roundtrips (defaults to true).
     * `IMetadataCache .MetadataCache` - The metadata cache to use. Defaults to StandardMetadataCache, which caches metadata for up to an hour after it was last accessed or used (sliding expiration). 
