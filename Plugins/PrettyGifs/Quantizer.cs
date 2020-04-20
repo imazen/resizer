@@ -26,7 +26,7 @@ namespace ImageResizer.Plugins.PrettyGifs
 {
     /// <summary>
     /// Abstract Quantizer class - handles the messy, algorithm-independent details of quantization. 
-    /// Subclasses must implement InitialQuantizePixel, GetPallete(), and QuantizePixel. Not thread-safe!
+    /// Subclasses must implement InitialQuantizePixel, GetPalette(), and QuantizePixel. Not thread-safe!
     /// </summary>
     public abstract class Quantizer
     {
