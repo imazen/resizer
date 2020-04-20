@@ -26,7 +26,7 @@ The diagnostics page should list the domain license you have installed - or, if 
 
 ### What about staging and development? 
 
-`<maphost from="" to="" />` allows you to tell ImageResizer to treat requests to a local hostname or IP addresse specified in `from` as if they were arriving with the HOST header specified in `to`. This lets you accurately verify licensing is working prior to deployment.
+`<maphost from="" to="" />` allows you to tell ImageResizer to treat requests to a local hostname or IP address specified in `from` as if they were arriving with the HOST header specified in `to`. This lets you accurately verify licensing is working prior to deployment.
 
 ### What if I use a license-enabled .dll without a license?
 
