@@ -441,7 +441,7 @@ FullFile: http://downloads.imageresizing.net/Resizer3-2-4-full-Aug-6-2012.zip
 * Fixed S3Reader CryptographicException concurrency bug with accessing private buckets. 
 * Fixed loophole-permitting requests to execute while plugin loading is taking place. Should fix failed S3/Azure/Remote requests during a cold start.
 * Fixed bug with [Guassian Sharpen for large kernel values](http://code.google.com/p/aforge/issues/detail?id=307&q=GaussianSharpen&colspec=ID%20Stars%20Type%20Status%20Priority%20Project%20Milestone%20Owner%20Summary).
-* Fixed NullReferenceExcpetion in RemoteReader when no URLs are whitelisted.
+* Fixed NullReferenceException in RemoteReader when no URLs are whitelisted.
 * Fixed bug in ImageBuilder.TranslatePoints() that causes incorrect result coordinates when the image is being cropped. This method is infrequently used, and this bug would not affect image results.
 * Fixed potential bug in ImageBuilder.Build - underlyingStream.Dispose() is called after bitmap.Dispose() now. No known effects reported, but this should ensure there are no issues if bitmap.Dispose() (for any reason) requires access to the underlying stream.
 * YARSMTF (Yet Another RackSpace Medium Trust fix): Diagnostics page no longer crashes while trying to report OS bitness - if RackSpace prevents access, it will skip the test.
