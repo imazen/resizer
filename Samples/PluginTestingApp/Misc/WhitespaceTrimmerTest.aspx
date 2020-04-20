@@ -11,7 +11,7 @@
     <div>
     <h1>WhitespaceTrimmer test</h1>
     <p>In the Samples\Images directory, create a subdirectory called 'private' and paste all the images you want to test with WhitespaceTrimmer into that folder.
-    <br />You can adjust the whitespace sensitivity and paddin gin WhitespaceTrimmerTest.aspx.cs</p>
+    <br />You can adjust the whitespace sensitivity and padding in WhitespaceTrimmerTest.aspx.cs</p>
     <p>Original images are displayed on the left, trimmed images on the right</p>
     <asp:Literal ID="lit" runat="server" />
     </div>
