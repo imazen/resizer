@@ -551,7 +551,7 @@ namespace ImageResizer.Licensing {
         private object lockTracker = new object();
        
         /// <summary>
-        /// Verifies the authenticty of this ILicenseService witht the caller
+        /// Verifies the authenticity of this ILicenseService witht the caller
         /// </summary>
         /// <param name="feature"></param>
         /// <returns></returns>
