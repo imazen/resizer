@@ -22,7 +22,7 @@ namespace ImageResizer.Configuration.Performance
         {
             public long TotalBytes;
             public long AvailableBytes;
-            public string Filesytem;
+            public string Filesystem;
         }
         public string MachineDigest { get; }
         // Excludes other processor groups that aren't available to the CLR
@@ -57,7 +57,7 @@ namespace ImageResizer.Configuration.Performance
             NetworkDrives = allDrives.Count(d => d.DriveType == DriveType.Network);
             OtherDrives = allDrives.Count(d => d.DriveType != DriveType.Network && d.DriveType != DriveType.Fixed);
             FixedDrives = allDrives.Where(d => d.DriveType == DriveType.Fixed && d.IsReady)
-                .Select(d => new FixedDriveInfo { Filesytem = d.DriveFormat + (d.Name == appDriveRoot ? "*" : ""), TotalBytes = d.TotalSize, AvailableBytes = d.AvailableFreeSpace }).ToArray();
+                .Select(d => new FixedDriveInfo { Filesystem = d.DriveFormat + (d.Name == appDriveRoot ? "*" : ""), TotalBytes = d.TotalSize, AvailableBytes = d.AvailableFreeSpace }).ToArray();
 
             // TODO: cpu feature support
         }
@@ -77,7 +77,7 @@ namespace ImageResizer.Configuration.Performance
             {
 
                 q.Add("fixed_drive",
-                    $"{drive.Filesytem},{drive.AvailableBytes / 1000000000},{drive.TotalBytes / 1000000000}");
+                    $"{drive.Filesystem},{drive.AvailableBytes / 1000000000},{drive.TotalBytes / 1000000000}");
             }
         }
     }
