@@ -293,7 +293,7 @@ sepia, edge detection, etc.  The RedEye plugin implements `PostRenderImage()`
 in order to draw the red-eye reduction effects to the destination image.
 <span style="color:red">_**(Seems to draw a rectangle?)**_</span>
 The Faces plugin implements `PostRenderImage()` in order to show the bounds
-of the caclulated face rectangles if the "f.show" setting is "true".
+of the calculated face rectangles if the "f.show" setting is "true".
 
 After the plugins get a chance to handle `RenderImage()`, `ImageBuilder`'s
 implementation draws either the `preRenderBitmap` (if it exists) or source
