@@ -144,7 +144,7 @@ typedef struct ConvolutionKernelStruct {
 typedef struct RenderDetailsStruct {
     //Interpolation and scaling details
     InterpolationDetails * interpolation;
-    //How large the interoplation window needs to be before we even attempt to apply a sharpening
+    //How large the interpolation window needs to be before we even attempt to apply a sharpening
     //percentage to the given filter
     float minimum_sample_window_to_interposharpen;
 
