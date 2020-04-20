@@ -132,7 +132,7 @@ Deprecated functionality now removed:
 * Drop long-time deprecated StreamUtils class.
 * Drop long-time deprecated UrlHasher class.
 * Delete stub WPF plugin. WPF support is a sub-par goal considering it's poor image quality and other options available.
-* Drop misspelled, obsolete, duplicate CropRectange property from Instructions class.
+* Drop misspelled, obsolete, duplicate CropRectangle property from Instructions class.
 * Drop ImageResizer.Collections.ReadOnlyDictionary (unused)
 * Drop Builder and BuildTools; we now use FAKE and FakeBuilder instead
 * Delete WicCop; we never used it.
@@ -608,7 +608,7 @@ Be the first to report a given bug to support@imageresizing.net and claim the bo
 * PolygonMath.GetShortestPair(poly)
 * PolygonMath.NormalizeTo90Intervals
 * PolygonMath.CombineFlipAndRotate
-* PolygonMath.GetCroppingRectange
+* PolygonMath.GetCroppingRectangle
 * Introduced ImageResizer.Util.ParseUtils as a replacement for certain Obsolete Utils methods. 
 * Added Plugins.GetOrInstall<T>()
 * Added Plugins/ImageStudio stub project.
