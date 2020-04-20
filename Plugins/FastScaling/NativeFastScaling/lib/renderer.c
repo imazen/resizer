@@ -586,7 +586,7 @@ bool Renderer_perform_render(Context * context, Renderer * r)
         return false;
     }
 
-    //Create transposition byffer
+    //Create transposition buffer
     //p->Start("allocate temp image(sy x dx)", false);
 
     /* Scale horizontally  */
