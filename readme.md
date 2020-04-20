@@ -384,7 +384,7 @@ The following is a basic, typical configuration of v4.
     </configSections>
 
     <resizer>
-      <!-- Unless you (a) use Integrated mode, or (b) map all reqeusts to ASP.NET, 
+      <!-- Unless you (a) use Integrated mode, or (b) map all requests to ASP.NET, 
            you'll need to add .ashx to your image URLs: image.jpg.ashx?width=200&height=20 
            Optional - this is the default setting -->
       <pipeline fakeExtensions=".ashx" defaultCommands="autorotate.default=true" />

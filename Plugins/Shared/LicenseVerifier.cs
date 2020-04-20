@@ -316,7 +316,7 @@ namespace ImageResizer.Licensing {
             Guid appId = new Guid(appStr);
 
             XmlDocument doc = new XmlDocument();
-            var root = doc.CreateElement("licenseReqeust");
+            var root = doc.CreateElement("licenseRequest");
             doc.AppendChild(root);
             var appIdElement = doc.CreateElement("appId");
             appIdElement.AppendChild(doc.CreateTextNode( appId.ToString()));
