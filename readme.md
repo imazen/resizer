@@ -163,7 +163,7 @@ The following is a list of all plugins currently available on ImageResizer, and 
 * [AzureReader plugin](http://www.imageresizing.net/plugins/azurereader) - Allows blobstore images to be resized and served. (Azure 1.X compatible) *Deprecated in favore of AzureReader2.* Available at the Performance level.
 * [S3Reader plugin](http://www.imageresizing.net/plugins/s3reader) - Process and resize images located on a remote Amazon S3 bucket. A VirtualPathProvider. Works best when combined with DiskCache. *Deprecated in favor of S3Reader2.* Available at the Performance level.
 * [PsdReader plugin](http://www.imageresizing.net/plugins/psdreader) - Adds support for PSD source files. *Deprecated in favor of FreeImageDecoder and PsdComposer.* Available at the Elite level.
-* [AutoRotate plugin](http://www.imageresizing.net/plugins/autorotate) - Use the EXIF rotation data from the camera to auto-rotate your images. Now inlcuded in Core, not a plugin.
+* [AutoRotate plugin](http://www.imageresizing.net/plugins/autorotate) - Use the EXIF rotation data from the camera to auto-rotate your images. Now included in Core, not a plugin.
 
 
 <a name="full_command"></a>
