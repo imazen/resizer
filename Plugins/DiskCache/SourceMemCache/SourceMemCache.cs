@@ -127,8 +127,8 @@ namespace ImageResizer.Plugins.SourceMemCache {
 
         public System.IO.Stream Open() {
             if (checkIntegrity) {
-                if (originalHash == -1) originalHash = CaluclateHash();
-                else if (originalHash != CaluclateHash()) throw new AccessViolationException("A read-only memory stream was somehow modified.");
+                if (originalHash == -1) originalHash = CalculateHash();
+                else if (originalHash != CalculateHash()) throw new AccessViolationException("A read-only memory stream was somehow modified.");
             }
 
             return new MemoryStream(data, false);
@@ -142,7 +142,7 @@ namespace ImageResizer.Plugins.SourceMemCache {
         }
 
         protected int originalHash = -1;
-        protected int CaluclateHash() {
+        protected int CalculateHash() {
             unchecked {
                 const int p = 16777619;
                 int hash = (int)2166136261;
