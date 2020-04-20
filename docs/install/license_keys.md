@@ -4,7 +4,7 @@
 
 License keys are only used for paid/AGPL plugins, such as those exclusive to Performance, Creative, or Elite editions.
 
-Publicly available binaries (such as those on nuget.org) require license keys. Confirmed AGPL compliant users, Elite and Support Contact customers can access binaries (via myget) that have no license key enforcment. 
+Publicly available binaries (such as those on nuget.org) require license keys. Confirmed AGPL compliant users, Elite and Support Contact customers can access binaries (via myget) that have no license key enforcement. 
 
 After adding your license key to web.config, visit the diagnostics page, /resizer.debug on your web app to ensure it has been accepted. License key validation is done offline using public-key cryptography; it does not use the network.
 
