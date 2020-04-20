@@ -1284,7 +1284,7 @@ FullFile: http://downloads.imageresizing.net/Resizer3-alpha-9-full-Jun-8-2011.zi
 * Content-type "image/jpeg" would be sent for PNG and GIF images when 'format' was not specified.
 * Visiting the resizer.debug page would result in a NullReferenceException when the DiskCache was installed and autoClean=false or enabled=false was configured.
 * ResizeSettings: Setting CropTopLeft and CropTopRight had no effect, the values weren't saved. (Setting ["crop"] always worked).
-* Incorrect behavior when invalid (non-numeric) values were used for width, height, maxwidth, maxheight, shadowWidth, andgle, and rotate. The intended behavior was to interpret invalid values as 'unspecified'. Instead, they were interpreted as '0'. 
+* Incorrect behavior when invalid (non-numeric) values were used for width, height, maxwidth, maxheight, shadowWidth, angle, and rotate. The intended behavior was to interpret invalid values as 'unspecified'. Instead, they were interpreted as '0'. 
 * Fixed potential NullReferenceException masking an ImageCorruptedException in LoadImage (wrong exception thrown).
 * ResizeSettings: Rotate no longer rounds values to the nearest integer.
 * ResizeSettings: Setting the BackgroundColor, PaddingColor, or BorderColor properties would cause the alpha portion of the assigned color to be ignored. Reading these properties when the underlying string values were invalid (like "ghhaggee") could have caused an Exception to be thrown instead of returning Color.Transparent. 
