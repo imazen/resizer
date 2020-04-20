@@ -94,7 +94,7 @@
       title="With ?rotate=45&width=200&height=200&crop=auto&bgcolor=black"/>
       
     <h2>Flipping</h2>
-    <p>You can horizontally or verically flip an image, as well as both. <strong>&amp;flip=h|v|both</strong></p>
+    <p>You can horizontally or vertically flip an image, as well as both. <strong>&amp;flip=h|v|both</strong></p>
     <img src="tractor.jpg?flip=v&crop=(60,200,250,400)" runat="server" 
     title="Using ?flip=v&crop=(60,200,250,400)"
     />
