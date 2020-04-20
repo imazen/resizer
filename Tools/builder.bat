@@ -27,7 +27,7 @@ goto exit
 
   nuget restore ..\Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln
 
-  echo - Fetching extra packaeges...
+  echo - Fetching extra packages...
   nuget restore FakeBuilder\packages.config
 
   echo - Fetching packages for build
