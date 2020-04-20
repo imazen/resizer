@@ -27,7 +27,7 @@ namespace ImageResizer.Caching {
         HttpCacheability CacheControl { get; set; }
         /// <summary>
         /// The UTC time at which the cached data should expire. 
-        /// Browsers generally don't re-request resources until the they have expired (unlike modififeddate).
+        /// Browsers generally don't re-request resources until the they have expired (unlike modifieddate).
         /// If MinValue, will be ignored.
         /// </summary>
         DateTime Expires { get; set; }
