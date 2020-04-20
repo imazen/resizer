@@ -128,7 +128,7 @@ namespace ImageResizer.Plugins.Watermark {
         private string _relativeTo = "image";
 
         /// <summary>
-        /// Specifies the container that the position values (top,left,right,bottom,width,heght) are relative to. 
+        /// Specifies the container that the position values (top,left,right,bottom,width,height) are relative to. 
         /// The default is 'image' (the innermost square, which contains the original photo). Additional valid values include 'imageArea' (includes whitespace added to preserve aspect ratio), 'padding', 'border', 'margin', and 'canvas'. 
         /// </summary>
         public string RelativeTo {
