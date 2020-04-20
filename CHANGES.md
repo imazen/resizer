@@ -234,7 +234,7 @@ FullFile: http://downloads.imageresizing.net/Resizer3-4-0-full-Oct-17-2013.zip
 
 ## Bug fixes in core
 
-* Fixed: Combining manual cropping and sourcerotation (`crop=0,10,30,30&srotate=90`) causes distorion. Bug introduced in 3.3.2 with CMYK fix. (#51)
+* Fixed: Combining manual cropping and sourcerotation (`crop=0,10,30,30&srotate=90`) causes distortion. Bug introduced in 3.3.2 with CMYK fix. (#51)
 * Fixed: DefaultSettings plugin doesn't work with w/h abbreviation (#45) 
 * Fixed: Improved I/O predictability through explicit Flush calls for all I/O operations. (Breaking change in .NET 4 - closing a FileStream does not always flush it).
 * Fixed: Instructions.CropRectangle is now spelled correctly. Mispelling will also remain functional until the next major release.
