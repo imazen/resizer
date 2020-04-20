@@ -175,7 +175,7 @@ namespace ImageResizer.Configuration {
         private volatile ResizerSection configuration;
         private object configurationLock = new object();
         /// <summary>
-        /// The ResizeConfigrationSection is not thread safe, and should not be modified
+        /// The ResizeConfigurationSection is not thread safe, and should not be modified
         /// Dynamically loads the ResizerSection from web.config when accessed for the first time. 
         /// If the resizer node doesn't exist, an empty configuration object is created with just the root resizer node.
         /// </summary>
