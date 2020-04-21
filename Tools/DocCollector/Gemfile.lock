@@ -27,10 +27,10 @@ GEM
     erubis (2.7.0)
     github-markdown (0.6.9)
     hub (1.12.4)
-    mini_portile2 (2.1.0)
+    mini_portile2 (2.4.0)
     mustermann (1.0.0)
-    nokogiri (1.7.2)
-      mini_portile2 (~> 2.1.0)
+    nokogiri (1.10.8)
+      mini_portile2 (~> 2.4.0)
     rack (2.0.8)
     rack-protection (2.0.0)
       rack
