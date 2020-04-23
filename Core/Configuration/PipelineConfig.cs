@@ -96,7 +96,7 @@ namespace ImageResizer.Configuration {
             }
 
 
-            //Now check the imagebuider instance
+            //Now check the imagebuilder instance
             ImageBuilder b = c.CurrentImageBuilder;
             if (b != null) {
                 vals = b.GetSupportedFileExtensions();

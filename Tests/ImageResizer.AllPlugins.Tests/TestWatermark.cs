@@ -24,7 +24,7 @@ namespace ImageResizer.Plugins.Watermark.Tests {
             w.hideIfTooSmall = false;
             w.keepAspectRatio = true;
             w.valuesPercentages = true;
-            w.watermarkDir = "~/"; //Where the watermark plugin looks for the image specifed in the querystring ?watermark=file.png
+            w.watermarkDir = "~/"; //Where the watermark plugin looks for the image specified in the querystring ?watermark=file.png
             w.bottomRightPadding = new System.Drawing.SizeF(0, 0);
             w.topLeftPadding = new System.Drawing.SizeF(0, 0);
             w.watermarkSize = new System.Drawing.SizeF(1, 1); //The desired size of the watermark, maximum dimensions (aspect ratio maintained if keepAspectRatio = true)

@@ -493,7 +493,7 @@ namespace ImageResizer.ProviderTests {
         /// <summary>
         /// Call the GetFile method with a virtualPath that does include
         /// the PathPrefix and a record id that does exist. Do check
-        /// the database. The connection string should generate a StorageExcetion.
+        /// the database. The connection string should generate a StorageException.
         /// </summary>
         [Fact]
         public void GetFileInvalidNotFastModeStorageException() {
@@ -562,7 +562,7 @@ namespace ImageResizer.ProviderTests {
         /// <summary>
         /// Call the GetFile method with a virtualPath that does include
         /// the PathPrefix and a record id that does exist. Do check
-        /// the database. The connection string should generate a StorageExcetion.
+        /// the database. The connection string should generate a StorageException.
         /// </summary>
         [Fact]
         public void GetFileValidNotFastModeStorageException() {

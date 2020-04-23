@@ -136,7 +136,7 @@ namespace Imazen.Profiling
         }
 
         /// <summary>
-        /// Traverses the tree and grabs a set of maching subtrees with the given segment name. Returns null if the segment cannot be found.
+        /// Traverses the tree and grabs a set of matching subtrees with the given segment name. Returns null if the segment cannot be found.
         /// </summary>
         /// <param name="tree"></param>
         /// <param name="name"></param>

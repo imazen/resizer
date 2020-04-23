@@ -2,8 +2,8 @@
 #define STATUS_CODE_NAME StatusCode
 #endif
 
-#ifndef FLOATSSPACE_NAME
-#define FLOATSSPACE_NAME WorkingFloatspace
+#ifndef FLOATSPACE_NAME
+#define FLOATSPACE_NAME WorkingFloatspace
 #endif
 
 
@@ -102,7 +102,7 @@ ENUM_END (BitmapCompositingMode)
 #ifdef FASTSCALING_ENUMS_MANAGED
 [ImageResizer::ExtensionMethods::EnumRemovePrefixAttribute ("Floatspace_")]
 #endif
-ENUM_START (FLOATSSPACE_NAME, _WorkingFloatspace)
+ENUM_START (FLOATSPACE_NAME, _WorkingFloatspace)
     Floatspace_srgb = 0,
     Floatspace_as_is = 0,
     Floatspace_linear = 1,
@@ -119,7 +119,7 @@ ENUM_START (FLOATSSPACE_NAME, _WorkingFloatspace)
     Floatspace_gamma_sigmoid_3 = 22,//4 | 16 | 2,
 #endif
 
-ENUM_END (FLOATSSPACE_NAME)
+ENUM_END (FLOATSPACE_NAME)
 
 #undef ENUM_START
 #undef ENUM_END

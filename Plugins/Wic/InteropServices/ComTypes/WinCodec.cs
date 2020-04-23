@@ -2456,8 +2456,8 @@ namespace ImageResizer.Plugins.Wic.InteropServices.ComTypes
     public enum WICGifApplicationExtensionProperties : uint
     {
         WICGifApplicationExtensionApplication = 0x0001,
-        WICGifApplciationExtensionData,
-        WICGifApplciationExtensionMax
+        WICGifApplicationExtensionData,
+        WICGifApplicationExtensionMax
     };
 
     [Guid("DAAC296F-7AA5-4dbf-8D15-225C5976F891")]

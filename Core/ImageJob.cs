@@ -312,7 +312,7 @@ namespace ImageResizer {
         /// Applies the AddFileExtension setting using the 'ext' variable.
         /// Supplies the guid, settings.*, filename, path, and originalExt variables. 
         /// The resolver method should supply 'ext', 'width', and 'height' (all of which refer to the final image).
-        /// If AllowDestinationPathVariables=False, only AddFileExtenson will be processed.
+        /// If AllowDestinationPathVariables=False, only AddFileExtension will be processed.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="resolver"></param>

@@ -42,11 +42,11 @@ namespace ImageResizer.Plugins.RedEye {
         }
 
 
-        public static int[,] Scale(int[,] k, int postiveFactor, int negativeFactor) {
+        public static int[,] Scale(int[,] k, int positiveFactor, int negativeFactor) {
             int[,] k2 = new int[k.GetLength(0), k.GetLength(1)];
             for (int i = 0; i < k.GetLength(0); i++)
                 for (int j = 0; j < k.GetLength(1); j++)
-                    k2[i, j] = k[i, j] > 0 ? k[i, j] * postiveFactor : k[i, j] * negativeFactor;
+                    k2[i, j] = k[i, j] > 0 ? k[i, j] * positiveFactor : k[i, j] * negativeFactor;
             return k2;
         }
 

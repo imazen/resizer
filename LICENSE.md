@@ -41,11 +41,11 @@ These plugins are dual-licensed (you pick) under the  [Apache 2](#apache-2-licen
 
 Niche development tooling is a shrinking and (financially) unprofitable industry. We ask that you honor the terms of our licenses, and pay for what you use. 
 
-Our full-time development on this project is funded by purchases of our fantastic commerical licenses and support contracts. Commercial licenses are very permissive, allowing modification, circumstantial redistribution, and certain types of sub-licensing. Read more: http://imageresizing.net/licenses/
+Our full-time development on this project is funded by purchases of our fantastic commercial licenses and support contracts. Commercial licenses are very permissive, allowing modification, circumstantial redistribution, and certain types of sub-licensing. Read more: http://imageresizing.net/licenses/
 
 -------------------------------------------------------------------------------
 
-The following directories contain software provided under (you pick) commerical or *copyleft* licenses only. These are NOT available under a *permissive* open-source license.
+The following directories contain software provided under (you pick) commercial or *copyleft* licenses only. These are NOT available under a *permissive* open-source license.
     
     /Plugins/BatchZipper
     /Plugins/DiskCache
@@ -85,7 +85,7 @@ B) Comply with the [GNU Affero General Public License V3.0](#agpl-v3), which typ
 
 TO BE CLEAR; **nothing** in this repository is *exclusively* AGPL, and we ONLY accept contributions that are Apache-compliant. Commercial licenses can apply to everything in this repository &mdash; a simple 1-2 page license that covers everything.
 
-> Exception: If you use Ghostscript and PdfRender *together*, either the AGPL (Ghostscript 9.07+) or the GPL (Ghostscript < 9.07) will apply to the combined work. Commercial licenses are available from Artifex software. We have not observed Ghostscript to be very stable in an ASP.NET environement, so its use is currently discouraged.
+> Exception: If you use Ghostscript and PdfRender *together*, either the AGPL (Ghostscript 9.07+) or the GPL (Ghostscript < 9.07) will apply to the combined work. Commercial licenses are available from Artifex software. We have not observed Ghostscript to be very stable in an ASP.NET environment, so its use is currently discouraged.
 
 Development, testing, and evaluation use is always free under the terms of the [Resizer Trial license](#resizer-trial-license)
 

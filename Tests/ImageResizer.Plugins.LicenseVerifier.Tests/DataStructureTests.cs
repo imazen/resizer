@@ -53,7 +53,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             // but we need to record a value that is 4 intervals after the last to cause all to dequeue 
             Assert.Equal(new[] {1L, 2, 3, 4, 5, 0}, b.DequeueValues());
 
-            // Bucekts 21..30 are skipped
+            // Buckets 21..30 are skipped
 
             // Buckets 31,32,33
             Assert.True(b.Record(311, 1));

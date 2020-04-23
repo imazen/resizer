@@ -243,11 +243,11 @@ bool check_region(Context * context, int edgeTRBL, float x_1_percent, float x_2_
     const uint32_t window_height = umin(h, info->buff_size / window_width);
 
     const uint32_t vertical_windows = (uint32_t)ceil((float)h / (float)window_height);
-    const uint32_t horizantal_windows = (uint32_t)ceil((float)w / (float)window_width);
+    const uint32_t horizontal_windows = (uint32_t)ceil((float)w / (float)window_width);
 
 
     for (uint32_t window_row = 0; window_row < vertical_windows; window_row++) {
-        for (uint32_t window_column = 0; window_column < horizantal_windows; window_column++) {
+        for (uint32_t window_column = 0; window_column < horizontal_windows; window_column++) {
 
 
             info->buf_x = x1 + (window_width * window_column);

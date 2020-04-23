@@ -126,13 +126,13 @@ namespace ImageResizer.Plugins
     /// <summary>
     /// Not for you. Don't use this. It creates a separate file for every key. Wraps a singleton
     /// </summary>
-    public class PeristentGlobalStringCache : IPersistentStringCache, IIssueProvider
+    public class PersistentGlobalStringCache : IPersistentStringCache, IIssueProvider
     {
         static WriteThroughCache processCache = new WriteThroughCache();
 
 
         WriteThroughCache cache;
-        public PeristentGlobalStringCache()
+        public PersistentGlobalStringCache()
         {
             cache = processCache;
         }

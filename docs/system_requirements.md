@@ -37,7 +37,7 @@ Visual Studio 2012 or higher is required for opening the sample projects and sou
 
 Any hosting provider offering full trust will work. All dedicated and virtual servers should support Full Trust. Shared hosting plans may not; we suggest avoiding these.
 
-Microsoft ASP.NET has dropped support for Medium and Partual trust environments, and ImageResizer has as well. Microsoft [considers Medium Trust obsolete](http://stackoverflow.com/questions/16849801/is-trying-to-develop-for-medium-trust-a-lost-cause) and [advises all hosters to migrate to proper OS-level isolation instead](https://support.microsoft.com/en-us/kb/2698981).
+Microsoft ASP.NET has dropped support for Medium and Partial trust environments, and ImageResizer has as well. Microsoft [considers Medium Trust obsolete](http://stackoverflow.com/questions/16849801/is-trying-to-develop-for-medium-trust-a-lost-cause) and [advises all hosters to migrate to proper OS-level isolation instead](https://support.microsoft.com/en-us/kb/2698981).
 
 Some hosting providers (such as DiscountASP and WebHost4Life) restrict (or don't provide enough) bandwidth, making image serving unbearably slow. 
 

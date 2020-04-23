@@ -65,7 +65,7 @@ namespace ImageResizer{
 
                     property array<array<float, 1>^, 1>^ ColorMatrix;
 
-                    // If possible to do correctly, halve the image until it is [halve_until] times larger than needed. 3 or greater reccomended. Specify -1 to disable halving.
+                    // If possible to do correctly, halve the image until it is [halve_until] times larger than needed. 3 or greater recommended. Specify -1 to disable halving.
                     property double InterpolateLastPercent;
 
                      property float HalvingAcceptablePixelLoss;

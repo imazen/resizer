@@ -27,7 +27,7 @@ namespace BenchLegacyTiming
 
         public void Start()
         {
-            if (HasRunningPredeccessor) throw new InvalidOperationException("You cannot start a child node unless its earlier siblings are finished. ");
+            if (HasRunningPredecessor) throw new InvalidOperationException("You cannot start a child node unless its earlier siblings are finished. ");
             if (HasStoppedParent) throw new InvalidOperationException("You cannot start a child node unless its ancestors are running.");
 
             start = DateTime.UtcNow;
@@ -40,7 +40,7 @@ namespace BenchLegacyTiming
             if (HasRunningChildren) throw new InvalidOperationException("You cannot stop a parent TimingNode until all children have been stopped;");
         }
 
-        public bool HasRunningPredeccessor
+        public bool HasRunningPredecessor
         {
             get
             {
@@ -49,7 +49,7 @@ namespace BenchLegacyTiming
                 //Check for running predecessor
                 if (parent.children.Take(parent.children.IndexOf(this)).Any((s) => s.IsRunning)) return true;
                 //Check parent
-                return parent.HasRunningPredeccessor;
+                return parent.HasRunningPredecessor;
             }
         }
 

@@ -119,7 +119,7 @@ typedef double (*detailed_interpolation_method)(const struct InterpolationDetail
 typedef struct InterpolationDetailsStruct {
     //1 is the default; near-zero overlapping between windows. 2 overlaps 50% on each side.
     double window;
-    //Coefficients for bucubic weighting
+    //Coefficients for bicubic weighting
     double p1, p2, p3, q1, q2, q3, q4;
     //Blurring factor when > 1, sharpening factor when < 1. Applied to weights.
     double blur;
@@ -144,16 +144,16 @@ typedef struct ConvolutionKernelStruct {
 typedef struct RenderDetailsStruct {
     //Interpolation and scaling details
     InterpolationDetails * interpolation;
-    //How large the interoplation window needs to be before we even attempt to apply a sharpening
+    //How large the interpolation window needs to be before we even attempt to apply a sharpening
     //percentage to the given filter
     float minimum_sample_window_to_interposharpen;
 
 
-    // If possible to do correctly, halve the image until it is [interpolate_last_percent] times larger than needed. 3 or greater reccomended. Specify -1 to disable halving.
+    // If possible to do correctly, halve the image until it is [interpolate_last_percent] times larger than needed. 3 or greater recommended. Specify -1 to disable halving.
     float interpolate_last_percent;
 
     //The number of pixels (in target canvas coordinates) that it is acceptable to discard for better halving performance
-    float havling_acceptable_pixel_loss;
+    float halving_acceptable_pixel_loss;
 
     //The actual halving factor to use.
     uint32_t halving_divisor;
@@ -210,7 +210,7 @@ typedef struct {
     float *Weights;/* Normalized weights of neighboring pixels */
     int Left;      /* Bounds of source pixels window */
     int Right;
-} PixelContributions;/* Contirbution information for a single pixel */
+} PixelContributions;/* Contribution information for a single pixel */
 
 typedef struct {
     PixelContributions *ContribRow; /* Row (or column) of contribution weights */

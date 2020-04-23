@@ -13,7 +13,7 @@ Plugins are very easy to make and register. Here's a simple one that does nothin
 
           public bool Uninstall(Configuration.Config c) {
               c.Plugins.remove_plugin(this);
-              return true; //True for successfull uninstallation, false if we couldn't do a clean job of it.
+              return true; //True for successful uninstallation, false if we couldn't do a clean job of it.
           }
       }
     }

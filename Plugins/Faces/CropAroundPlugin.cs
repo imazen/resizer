@@ -38,7 +38,7 @@ namespace ImageResizer.Plugins.CropAround {
             if (salientareas != null) {
                 if (salientareas.Length % 5 != 0) {
                     throw new ImageProcessingException(400,
-                        "Incorrent number of values provided in c.salientareas (must be multiple of 5). Usage: &c.salientareas=x1,y1,x2,y2,weight,x1,y1,x2,y2,weight");
+                        "Incorrect number of values provided in c.salientareas (must be multiple of 5). Usage: &c.salientareas=x1,y1,x2,y2,weight,x1,y1,x2,y2,weight");
                 }
 
                 return salientareas.ToList()

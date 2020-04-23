@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ImageResizer.Configuration.Performance
 {
-    public static class InfoAccumuatorExtensions
+    public static class InfoAccumulatorExtensions
     {
 
         public static void Add(this IInfoAccumulator a, string key, Guid value)

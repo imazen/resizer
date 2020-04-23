@@ -407,7 +407,7 @@ namespace Bench
             runner.ThrowawayRuns = runMultiplier * 2;
 
 
-            Console.Write("Running {0} warmup (t={1}), {2} parallel (t={3}), {4} sequenetial\n", runner.ThrowawayRuns * runner.ThrowawayThreads, runner.ThrowawayThreads,
+            Console.Write("Running {0} warmup (t={1}), {2} parallel (t={3}), {4} sequential\n", runner.ThrowawayRuns * runner.ThrowawayThreads, runner.ThrowawayThreads,
                 runner.ParallelRuns * runner.ParallelThreads, runner.ParallelThreads,
                 runner.SequentialRuns);
             var results = runner.Benchmark();

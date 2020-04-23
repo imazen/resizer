@@ -4,7 +4,7 @@
 	<add name="Faces" downloadNativeDependencies="true" />
 
 This plugin can detect frontal faces in images. It can display these with green rectangles, return a JSON result, or be called from managed code via the FaceDetection class.
-It also watches for "c.focus=faces" and replaces 'faces' with a comma-delimtied list of points. 
+It also watches for "c.focus=faces" and replaces 'faces' with a comma-delimited list of points. 
 
 ### Commands
 

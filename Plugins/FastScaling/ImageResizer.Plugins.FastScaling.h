@@ -21,17 +21,17 @@ namespace ImageResizer{
 
 #undef FASTSCALING_ENUMS_MANAGED
 #undef STATUS_CODE_NAME
-#undef FLOATSSPACE_NAME
+#undef FLOATSPACE_NAME
 
 #define FASTSCALING_ENUMS_MANAGED
 #define STATUS_CODE_NAME FastScalingResult
-#define FLOATSSPACE_NAME Workingspace
+#define FLOATSPACE_NAME Workingspace
 
 #include "fastscaling_enums.h"
 
 #undef FASTSCALING_ENUMS_MANAGED
 #undef STATUS_CODE_NAME
-#undef FLOATSSPACE_NAME
+#undef FLOATSPACE_NAME
 
                 public enum struct  Rotate{
                     RotateNone = 0,

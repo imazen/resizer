@@ -25,7 +25,7 @@ namespace Imazen.Profiling
         public T DeltaRatio { get { return (dynamic)Delta / (dynamic)Min; } }
 
         /// <summary>
-        /// A suffix to use when foratting the output (like ms or %)
+        /// A suffix to use when formatting the output (like ms or %)
         /// </summary>
         public string Units { get; private set; }
 

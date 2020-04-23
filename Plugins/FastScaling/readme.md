@@ -99,7 +99,7 @@ As you can tell, scaling in a linear light (left) preserves more of the snowflak
 FastScaling can make a range of adjustments to favor speed or quality on very large images. These typically set default values for the filter type/size and for averaging optimizations. 
 
 Averaging optimization: If you're downscaling an image to 1/20th of its size, FastScaling will use an averaging filter to scale it to 1/6th, then scale the remaining 1/3.333 using a high-quality filter. Since no filters use a window larger than ~3x the scale filter, this does not measurably affect quality. 
-You can make this optimization more agressive by increasing the speed value, or reduce it by specifying a negative value. 
+You can make this optimization more aggressive by increasing the speed value, or reduce it by specifying a negative value. 
 
 * `&down.speed = -2..4` (default 0)  -2 disables averaging optimizations. 
 * `&up.speed = 0..2` (default 0)
@@ -123,7 +123,7 @@ FastScaling exposes 2 'advanced-only' parameters that can allow you to blur, sha
 * `&down.blur=0.5..2` Default: 1. Values smaller than 1 will create a psuedo-sharpening effect, by interpreting input pixels as being closer to the support window center than they actually are. Positive values do the opposite, and create an inaccurate blur effect.
 * `&down.window=0.5..3` Default 1..3, depends on filter. This describes the support window (input pixel set) size relative to the output pixel's corresponding input area. Values of 1 will involve only corresponding pixels. Values of 2 will involve the corresponding area, plus half again on each side. Values of three will triple the number of input pixels. True sharpening requires values above ~1.6, as sharpening requires negative weighting of neighboring pixels. FastScaling will switch to independent sharpening if the window is not large enough. 
 
-up.blur, down.blur, up.window, and down.window may be disabled in future versions of FastScaling. Different fitlers have different defaults for these values, so it's advisable to use `&down.filter`, `&down.speed`, and `&f.sharpen` instead of these.  
+up.blur, down.blur, up.window, and down.window may be disabled in future versions of FastScaling. Different filters have different defaults for these values, so it's advisable to use `&down.filter`, `&down.speed`, and `&f.sharpen` instead of these.  
 
 
 

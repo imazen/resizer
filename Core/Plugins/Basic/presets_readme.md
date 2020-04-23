@@ -25,7 +25,7 @@ A named preset can specify default settings (these can be overridden in the URL)
       <presets onlyAllowPresets="false">
         <preset name="thumb-defs" defaults="width=100;height=100" />
         <preset name="thumb" settings="width=100;height=100" />
-        <preset name="thumb-width" defaults="height=100" settings="width=100" /><!-- The height can be overriden, but not the width -->
+        <preset name="thumb-width" defaults="height=100" settings="width=100" /><!-- The height can be overridden, but not the width -->
       </presets>
     ...
     </resizer>

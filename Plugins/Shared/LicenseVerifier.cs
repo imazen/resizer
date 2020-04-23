@@ -175,7 +175,7 @@ namespace ImageResizer.Licensing {
         private Dictionary<string, List<Guid>> pendingFeatures = new Dictionary<string, List<Guid>>(StringComparer.OrdinalIgnoreCase);
         private object lockFeatures = new object();
         /// <summary>
-        /// Plugins should use Methods.NotifyUse instead of directly using ILicenseServce, as it includes basic integrity verification
+        /// Plugins should use Methods.NotifyUse instead of directly using ILicenseService, as it includes basic integrity verification
         /// </summary>
         /// <param name="domain"></param>
         /// <param name="feature"></param>
@@ -316,7 +316,7 @@ namespace ImageResizer.Licensing {
             Guid appId = new Guid(appStr);
 
             XmlDocument doc = new XmlDocument();
-            var root = doc.CreateElement("licenseReqeust");
+            var root = doc.CreateElement("licenseRequest");
             doc.AppendChild(root);
             var appIdElement = doc.CreateElement("appId");
             appIdElement.AppendChild(doc.CreateTextNode( appId.ToString()));
@@ -551,7 +551,7 @@ namespace ImageResizer.Licensing {
         private object lockTracker = new object();
        
         /// <summary>
-        /// Verifies the authenticty of this ILicenseService witht the caller
+        /// Verifies the authenticity of this ILicenseService witht the caller
         /// </summary>
         /// <param name="feature"></param>
         /// <returns></returns>

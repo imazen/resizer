@@ -57,7 +57,7 @@ namespace ImageResizer.Plugins.TinyCache {
 
 
         /// <summary>
-        /// Returns a number between 0 and 1, where 1 is the highest preservation reccomendation
+        /// Returns a number between 0 and 1, where 1 is the highest preservation recommendation
         /// </summary>
         /// <returns></returns>
         public float GetPreservationPriority() {

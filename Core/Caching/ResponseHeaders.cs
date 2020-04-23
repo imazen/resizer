@@ -52,7 +52,7 @@ namespace ImageResizer.Caching {
             if (headers.ContentType != null) context.Response.ContentType = headers.ContentType;
             //Sets the Expires: header
             if (headers.Expires != DateTime.MinValue) context.Response.Cache.SetExpires(headers.Expires);
-            //Sets the Last-Modifed: header
+            //Sets the Last-Modified: header
             if (utc != null) context.Response.Cache.SetLastModified(utc.Value);
             //Valid until expires (I.e, ignore refresh requests)
             context.Response.Cache.SetValidUntilExpires(headers.ValidUntilExpires);

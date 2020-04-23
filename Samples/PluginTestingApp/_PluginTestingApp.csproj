@@ -75,7 +75,7 @@
     <Content Include="Global.asax" />
     <Content Include="Misc\diagnostic-300x400.png" />
     <Content Include="Misc\diagnostic-31x23.png" />
-    <Content Include="Misc\DiagnoticJson.htm" />
+    <Content Include="Misc\DiagnosticJson.htm" />
     <Content Include="Misc\UrlAuthorizationTests.aspx" />
     <Content Include="Misc\UrlEncryption.aspx" />
     <Content Include="Plugins.htm" />

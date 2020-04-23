@@ -81,7 +81,7 @@ namespace ImageResizer.Plugins.AnimatedGifs
             for (int i = 0; i < 7; i++)
                 m_ScreenDescriptor.Add(gifData[i]);
             gifData.RemoveRange(0, 7);
-            // if the first bit of the fifth byte is set the GlobelColorTable follows this block
+            // if the first bit of the fifth byte is set the GlobalColorTable follows this block
             bool globalColorTableFollows = (m_ScreenDescriptor[4] & 0x80) != 0;
             if (globalColorTableFollows)
             {
