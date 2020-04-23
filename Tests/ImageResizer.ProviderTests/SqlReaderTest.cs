@@ -592,7 +592,7 @@ namespace ImageResizer.ProviderTests {
         /// SQL Server as we do have sa privileges.
         /// </remarks>
         private void CreateDatabase() {
-            using (SqlConnection conn = new SqlConnection(@"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;")) {
+            using (SqlConnection conn = new SqlConnection(@"Server=(local)\SQL2017;User ID=sa;Password=Password12!;")) {
                 conn.Open();
 
                 using (SqlCommand sc = new SqlCommand(
