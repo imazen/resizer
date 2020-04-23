@@ -529,7 +529,7 @@ namespace ImageResizer.ProviderTests {
 
 
             if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
-                p.ConnectionString = @"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Database=Resizer;";
+                p.ConnectionString = @"Server=(local)\SQL2017;User ID=sa;Password=Password12!;Database=Resizer;";
             }
 
             return p;
