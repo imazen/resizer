@@ -187,7 +187,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 else if (results.All(r => r.LikelyNetworkFailure))
                 {
                     // Network failure. Make sure the server can access the remote server
-                    parent.AcceptIssue(fetcher.FirewallIssue(licenseName));
+                    parent.AcceptIssue(fetcher.FirewallIssue(licenseName, results.FirstOrDefault()));
                     LastTimeout = parent.Clock.GetUtcNow();
                 }
                 else

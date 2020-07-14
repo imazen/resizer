@@ -172,11 +172,15 @@ namespace ImageResizer.Plugins.LicenseVerifier
             InvokeResultCallback(null, results);
         }
 
-        public IIssue FirewallIssue(string licenseName)
+        public IIssue FirewallIssue(string licenseName) => FirewallIssue(licenseName, null);
+
+        public IIssue FirewallIssue(string licenseName, FetchResult r)
         {
+            string resultMessage = r != null ? $"\n\nHTTP={r.HttpCode}. Exception status={r.FailureKind}. Exception: {r.FetchError}" : "";
             return new Issue("Check firewall; cannot reach Amazon S3 to validate license " + licenseName,
                 "Check https://status.aws.amazon.com, and ensure the following URLs can be reached from this server: " +
-                string.Join("\n", baseUrls.Select(s => s + "*")), IssueSeverity.Error);
+                string.Join("\n", baseUrls.Select(s => s + "*")) + resultMessage
+                , IssueSeverity.Error);
         }
 
         void EnsureErrorDebounce()
