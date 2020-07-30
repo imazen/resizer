@@ -158,14 +158,20 @@ namespace ImageResizer.Plugins.DiskCache {
                                     
                                     swio.Start();
                                     //We want this to run synchronously, since it's in a background thread already.
-                                    if (!TryWriteFile(null, job.PhysicalPath, job.Key, delegate(Stream s) { ((MemoryStream)job.GetReadonlyStream()).CopyToAsync(s); return Task.FromResult(true); }, timeoutMs, true).Result)
+                                    if (!TryWriteFile(null, job.PhysicalPath, job.Key,
+                                            delegate (Stream s)
+                                            {
+                                                return ((MemoryStream)job.GetReadonlyStream()).CopyToAsync(s);
+                                            }, timeoutMs, true).Result)
                                     {
                                         swio.Stop();
                                         //We failed to lock the file.
-                                        if (lp.Logger != null) 
-                                            lp.Logger.Warn("Failed to flush async write, timeout exceeded after {1}ms - {0}",  result.RelativePath, swio.ElapsedMilliseconds);
-                                        
-                                    } else {
+                                        if (lp.Logger != null)
+                                            lp.Logger.Warn("Failed to flush async write, timeout exceeded after {1}ms - {0}", result.RelativePath, swio.ElapsedMilliseconds);
+
+                                    }
+                                    else
+                                    {
                                         swio.Stop();
                                         if (lp.Logger != null)
                                             lp.Logger.Trace("{0}ms: Async write started {1}ms after enqueue for {2}", swio.ElapsedMilliseconds.ToString().PadLeft(4), DateTime.UtcNow.Subtract(w.JobCreatedAt).Subtract(swio.Elapsed).TotalMilliseconds, result.RelativePath);
@@ -271,6 +277,10 @@ namespace ImageResizer.Plugins.DiskCache {
                                     await writeCallback(fs); //Can throw any number of exceptions.
                                     await fs.FlushAsync();
                                     fs.Flush(true);
+                                    if (fs.Position == 0)
+                                    {
+                                        throw new InvalidOperationException("Disk cache wrote zero bytes to file");
+                                    }
                                     finished = true;
                                 }
                             }
