@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins.DiskCache.Async {
     public class AsyncWriteCollection {
@@ -71,15 +72,17 @@ namespace ImageResizer.Plugins.DiskCache.Async {
             lock (_sync) {
                 if (GetQueuedBufferBytes() + w.GetBufferLength() > MaxQueueBytes) return false; //Because we would use too much ram.
                 if (c.ContainsKey(w.Key)) return false; //We already have a queued write for this data.
-                if (!ThreadPool.QueueUserWorkItem(delegate(object state){
-                    AsyncWrite job = state as AsyncWrite;
-                    writerDelegate(job);
-                }, w)) return false; //thread pool refused
+                c.Add(w.Key, w);
+                Task.Run(
+                    async () => {
+                        await writerDelegate(w);
+                        Remove(w);
+                    }).ConfigureAwait(false);
                 return true;
             }
         }
 
-        public delegate void WriterDelegate(AsyncWrite w);
+        public delegate Task WriterDelegate(AsyncWrite w);
 
     }
 }

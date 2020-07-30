@@ -152,17 +152,18 @@ namespace ImageResizer.Plugins.DiskCache {
                             ms.Position = 0;
 
                             AsyncWrite w = new AsyncWrite(CurrentWrites,ms, physicalPath, relativePath);
-                            if (CurrentWrites.Queue(w, delegate(AsyncWrite job) {
+                            if (CurrentWrites.Queue(w, async delegate(AsyncWrite job) {
                                 try {
                                     Stopwatch swio = new Stopwatch();
                                     
                                     swio.Start();
                                     //We want this to run synchronously, since it's in a background thread already.
-                                    if (!TryWriteFile(null, job.PhysicalPath, job.Key,
+                                    if (!await TryWriteFile(null, job.PhysicalPath, job.Key,
                                             delegate (Stream s)
                                             {
-                                                return ((MemoryStream)job.GetReadonlyStream()).CopyToAsync(s);
-                                            }, timeoutMs, true).Result)
+                                                var fromStream = job.GetReadonlyStream();
+                                                return fromStream.CopyToAsync(s);
+                                            }, timeoutMs, true))
                                     {
                                         swio.Stop();
                                         //We failed to lock the file.
