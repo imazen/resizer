@@ -10,10 +10,6 @@ using ImageResizer.Util;
 [assembly: AssemblyDescription("PDFium-based plugin for PDF support.")]
 
 
-
-//Inform NativeDependencyManager where to find the download manifest
-[assembly: NativeDependencies("Native.xml")]
-
 #if DEBUG
 [assembly: AssemblyConfiguration("DEBUG")]
 #else
