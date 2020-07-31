@@ -37,9 +37,9 @@
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Trial|AnyCPU'">
-    <OutputPath>..\..\dlls\trial\</OutputPath>
+    <OutputPath>..\..\dlls\release\</OutputPath>
     <DefineConstants>TRACE;TRIAL</DefineConstants>
-    <DocumentationFile>..\..\dlls\trial\ImageResizer.Plugins.RemoteReader.XML</DocumentationFile>
+    <DocumentationFile>..\..\dlls\release\ImageResizer.Plugins.RemoteReader.XML</DocumentationFile>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -65,6 +65,9 @@
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="readme.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

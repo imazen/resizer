@@ -152,7 +152,7 @@ namespace ImageResizer {
             return this.IsOneSpecified(keys);
         }
         /// <summary>
-        /// ["rotate"] The degress to rotate the image clockwise. -360 to 360.
+        /// ["rotate"] The degrees to rotate the image clockwise. -360 to 360.
         /// </summary>
         public double Rotate                        { get { 
             return get("rotate", 0.0d);               } set {   
@@ -264,7 +264,7 @@ namespace ImageResizer {
         }
 
         /// <summary>
-        /// ["crop"]=([x1],[y1],x2,y2). Sets x1 and y21, the top-right corner of the crop rectangle. If 0 or greater, the coordinate is relative to the top-left corner of the image.
+        /// ["crop"]=([x1],[y1],x2,y2). Sets x1 and y21, the top-left corner of the crop rectangle. If 0 or greater, the coordinate is relative to the top-left corner of the image.
         /// If less than 0, the value is relative to the bottom-right corner. This allows for easy trimming: crop=(10,10,-10,-10).
         /// Set ["cropxunits"] and ["cropyunits"] to the width/height of the rectangle your coordinates are relative to, if different from the original image size.
         /// </summary>
@@ -349,9 +349,9 @@ namespace ImageResizer {
 
         /// <summary>
         /// Like this["format"]. 
-        /// Gets or sets the output file format to use. "png", "jpg", and "gif" are valid values.
-        /// Returns null if unspecified. When format is not specified, the original format of the image is used (unless it is not a web safe format  - jpeg is the fallback in that scenario).
-        /// <remarks>Also checks the 'thumbnail' value for V2 compatibility. When set, 'thumnail' is removed and only 'format' is used.
+        /// Gets or sets the output file format to use. 'png', 'jpg', and 'gif' are valid values.
+        /// Returns null if unspecified. When format is not specified, the original format of the image is used (unless it is not a web safe format  - JPEG is the fallback in that scenario).
+        /// <remarks>Also checks the 'thumbnail' value for V2 compatibility. When set, 'thumbnail' is removed and only 'format' is used.
         /// </remarks>
         /// </summary>
         public string Format {

@@ -1,13 +1,15 @@
 @echo off
 pushd %~dp0
 
-set fake=..\Packages\FAKE.3.11.0\tools\Fake
+set fake=.\FakeBuilder\packages\FAKE\tools\Fake
 set fsx=FakeBuilder\Build.fsx
+
+
 
 
 if [%1]==[] goto help
 if [%1]==[help] goto help
-if [%1]==[update] goto update
+if [%1]==[prepare] goto prepare
 set target=%*
 
 set target=%target:rebuild=clean;build%
@@ -18,14 +20,30 @@ set target=%target:pack_all=pack_nuget;pack_zips;print_stats%
 goto exit
 
 
-:update
-  echo - Fetching Submodules...
-  git submodule init
-  git submodule update
+:prepare
+
   echo - Running Restore...
   nuget restore ..\AppVeyor.sln
-  echo - Fetching extra packaeges...
+
+  nuget restore ..\Plugins\FastScaling\ImageResizer.Plugins.FastScaling.sln
+
+  echo - Fetching extra packages...
   nuget restore FakeBuilder\packages.config
+
+  echo - Fetching packages for build
+  ..\.paket\paket.bootstrapper.exe
+  if errorlevel 1 (
+    exit /b %errorlevel%
+  )
+
+  cd .\FakeBuilder
+  ..\..\.paket\paket.exe restore
+
+  if errorlevel 1 (
+    cd ..
+    exit /b %errorlevel%
+  )
+  cd ..
   goto exit
 
 
@@ -35,12 +53,12 @@ goto exit
   echo builder ^<command^>
   echo builder ^<command^>;[command];[command];...
   echo.
-  echo A single fake call will be used for the multi-command intarface
-  echo Multi-command calls can't use help/update
+  echo A single fake call will be used for the multi-command interface
+  echo Multi-command calls can't use help/prepare
   echo.
   echo Commands:
   echo.
-  echo update              - fetches git submodules, nuget packages, fake
+  echo prepare              - fetches  nuget packages, fake
   echo help                - shows this message
   echo clean
   echo build

@@ -1,10 +1,10 @@
 ﻿
-#ImageResizer.Plugins.Faces
+# ImageResizer.Plugins.Faces
 
 	<add name="Faces" downloadNativeDependencies="true" />
 
 This plugin can detect frontal faces in images. It can display these with green rectangles, return a JSON result, or be called from managed code via the FaceDetection class.
-It also watches for "c.focus=faces" and replaces 'faces' with a comma-delimtied list of points. 
+It also watches for "c.focus=faces" and replaces 'faces' with a comma-delimited list of points. 
 
 ### Commands
 
@@ -19,7 +19,7 @@ It also watches for "c.focus=faces" and replaces 'faces' with a comma-delimtied 
 * f.minsize=3.0 //You can require that detected faces be a minimum percentage of the image size. Defaults to 3% (3.0)
 * f.expand=0.1,0.4 //The percentage to expand the faces for buffering
 
-#ImageResizer.Plugins.CropAround
+# ImageResizer.Plugins.CropAround
 
 	<add name="CropAround" />
 

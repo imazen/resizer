@@ -22,7 +22,7 @@ For each &lt;element> in the following XML, look for the corresponding element i
 		<resizer>
 			<!-- Unless you (a) use Integrated mode, or (b) map all requests to ASP.NET, 
 			     you'll need to add .ashx to your image URLs: image.jpg.ashx?width=200&height=20 -->
-			<pipeline fakeExtensions=".ashx" />
+			<pipeline fakeExtensions=".ashx" defaultCommands="autorotate.default=true"/>
 
 			<plugins>
 				<add name="MvcRoutingShim" />
@@ -33,7 +33,7 @@ For each &lt;element> in the following XML, look for the corresponding element i
 
 		<system.web>
 			<httpModules>
-				<!-- This is for IIS5, IIS6, and IIS7 Classic, and Cassini/VS Web Server-->
+				<!-- This is for IIS7/8 Classic Mode and Cassini-->
 				<add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
 			</httpModules>
 		</system.web>

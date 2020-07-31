@@ -552,7 +552,7 @@ namespace ImageResizerGUI
 
 
         /// <summary>
-        /// Check in and image is arready inserted.
+        /// Check in and image is already inserted.
         /// </summary>
         /// <param name="imageFullPath"> Image path. </param>
         /// <returns> Returns true if the image is already inserted, false i.o.c. </returns>

@@ -18,7 +18,6 @@
 using namespace System;
 using namespace System::Drawing;
 using namespace System::Drawing::Imaging;
-using namespace ImageResizer::Resizing;
 using namespace System::Diagnostics;
 using namespace System::Collections::Specialized;
 using namespace System::Runtime::InteropServices;
@@ -69,7 +68,7 @@ namespace ImageResizer{
                         to->post_transpose = from->RequiresTransposeStep;
                         to->post_flip_x = from->RequiresHorizontalFlipStep;
                         to->post_flip_y = from->RequiresVerticalFlipStep;
-                        to->havling_acceptable_pixel_loss = from->HalvingAcceptablePixelLoss;
+                        to->halving_acceptable_pixel_loss = from->HalvingAcceptablePixelLoss;
                         to->sharpen_percent_goal = from->SharpeningPercentGoal;
 
                         to->kernel_a = from->KernelA_Struct != nullptr ? from->KernelA_Struct :

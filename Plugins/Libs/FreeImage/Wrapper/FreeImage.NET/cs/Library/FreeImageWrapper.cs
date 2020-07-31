@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -163,9 +163,9 @@ namespace FreeImageAPI
         /// <c>true</c>, otherwise.</returns>
         /// <remarks>
         /// The FreeImage.NET library is a wrapper for the native C++ library
-        /// (FreeImage.dll ... dont mix ist up with this library FreeImageNet.dll).
+        /// (FreeImage.dll ... don't mix it up with this library FreeImageNet.dll).
         /// The native library <b>must</b> be either in the same folder as the program's
-        /// executable or in a folder contained in the envirent variable <i>PATH</i>
+        /// executable or in a folder contained in the environment variable <i>PATH</i>
         /// (for example %WINDIR%\System32).<para/>
         /// Further more must both libraries, including the program itself,
         /// be the same architecture (x86 or x64).
@@ -258,7 +258,7 @@ namespace FreeImageAPI
         /// palletized images. So, for an 8-bit image, the length is 256, for an 4-bit image it is 16
         /// and it is 2 for a 1-bit image. In other words, this function does not support partial palettes.
         /// <para/>
-        /// However, specifying a palette is not necesarily needed, even for palletized images. This
+        /// However, specifying a palette is not necessarily needed, even for palletized images. This
         /// function is capable of implicitly creating a palette, if <paramref name="palette"/> is <c>null</c>.
         /// If the specified background color is a greyscale value (red = green = blue) or if option
         /// <see cref="FREE_IMAGE_COLOR_OPTIONS.FICO_ALPHA_IS_INDEX"/> is specified, a greyscale palette
@@ -324,7 +324,7 @@ namespace FreeImageAPI
         /// palletized images. So, for an 8-bit image, the length is 256, for an 4-bit image it is 16
         /// and it is 2 for a 1-bit image. In other words, this function does not support partial palettes.
         /// <para/>
-        /// However, specifying a palette is not necesarily needed, even for palletized images. This
+        /// However, specifying a palette is not necessarily needed, even for palletized images. This
         /// function is capable of implicitly creating a palette, if <paramref name="palette"/> is <c>null</c>.
         /// If the specified background color is a greyscale value (red = green = blue) or if option
         /// <see cref="FREE_IMAGE_COLOR_OPTIONS.FICO_ALPHA_IS_INDEX"/> is specified, a greyscale palette
@@ -412,7 +412,7 @@ namespace FreeImageAPI
         /// So, for an 8-bit image, this length is 256, for an 4-bit image it is 16 and it is
         /// 2 for a 1-bit image. In other words, this function does not support partial palettes.
         /// <para/>
-        /// However, specifying a palette is not necesarily needed, even for palletized images. This
+        /// However, specifying a palette is not necessarily needed, even for palletized images. This
         /// function is capable of implicitly creating a palette, if <paramref name="palette"/> is <c>null</c>.
         /// If the specified background color is a greyscale value (red = green = blue) or if option
         /// <see cref="FREE_IMAGE_COLOR_OPTIONS.FICO_ALPHA_IS_INDEX"/> is specified, a greyscale palette
@@ -482,7 +482,7 @@ namespace FreeImageAPI
         /// So, for an 8-bit image, this length is 256, for an 4-bit image it is 16 and it is
         /// 2 for a 1-bit image. In other words, this function does not support partial palettes.
         /// <para/>
-        /// However, specifying a palette is not necesarily needed, even for palletized images. This
+        /// However, specifying a palette is not necessarily needed, even for palletized images. This
         /// function is capable of implicitly creating a palette, if <paramref name="palette"/> is <c>null</c>.
         /// If the specified background color is a greyscale value (red = green = blue) or if option
         /// <see cref="FREE_IMAGE_COLOR_OPTIONS.FICO_ALPHA_IS_INDEX"/> is specified, a greyscale palette
@@ -585,7 +585,7 @@ namespace FreeImageAPI
             if (GetPalette(dib) != IntPtr.Zero) {
                 // Get the bitmaps palette to apply changes
                 ColorPalette palette = result.Palette;
-                // Get the orgininal palette
+                // Get the original palette
                 Color[] colorPalette = new Palette(dib).ColorData;
                 // Get the maximum number of palette entries to copy
                 int entriesToCopy = Math.Min(colorPalette.Length, palette.Entries.Length);
@@ -599,7 +599,7 @@ namespace FreeImageAPI
                     for (; i < maxEntriesWithTrans; i++) {
                         palette.Entries[i] = Color.FromArgb(transTable[i], colorPalette[i]);
                     }
-                    // Copy palette entries and that have no transparancy
+                    // Copy palette entries and that have no transparency
                     for (; i < entriesToCopy; i++) {
                         palette.Entries[i] = Color.FromArgb(0xFF, colorPalette[i]);
                     }
@@ -706,7 +706,7 @@ namespace FreeImageAPI
         /// <exception cref="ArgumentNullException">
         /// <paramref name="bitmap"/> is null.</exception>
         /// <exception cref="ArgumentException">
-        /// The bitmaps pixelformat is invalid.</exception>
+        /// The bitmap's pixelformat is invalid.</exception>
         public static FIBITMAP CreateFromBitmap(Bitmap bitmap)
         {
             return CreateFromBitmap(bitmap, false);
@@ -723,7 +723,7 @@ namespace FreeImageAPI
         /// <exception cref="ArgumentNullException">
         /// <paramref name="bitmap"/> is null.</exception>
         /// <exception cref="ArgumentException">
-        /// The bitmaps pixelformat is invalid.</exception>
+        /// The bitmap's pixelformat is invalid.</exception>
         internal static FIBITMAP CreateFromBitmap(Bitmap bitmap, bool copyMetadata)
         {
             if (bitmap == null)
@@ -734,7 +734,7 @@ namespace FreeImageAPI
             FREE_IMAGE_TYPE type;
             if (!GetFormatParameters(bitmap.PixelFormat, out type, out bpp, out red_mask, out green_mask, out blue_mask))
             {
-                throw new ArgumentException("The bitmaps pixelformat is invalid.");
+                throw new ArgumentException("The bitmap's pixelformat is invalid.");
             }
 
             // Locking the complete bitmap in readonly mode
@@ -906,7 +906,7 @@ namespace FreeImageAPI
         /// <exception cref="ArgumentNullException">
         /// <paramref name="bitmap"/> or <paramref name="filename"/> is null.</exception>
         /// <exception cref="ArgumentException">
-        /// The bitmaps pixelformat is invalid.</exception>
+        /// The bitmap's pixelformat is invalid.</exception>
         public static bool SaveBitmap(Bitmap bitmap, string filename)
         {
             return SaveBitmap(
@@ -926,7 +926,7 @@ namespace FreeImageAPI
         /// <exception cref="ArgumentNullException">
         /// <paramref name="bitmap"/> or <paramref name="filename"/> is null.</exception>
         /// <exception cref="ArgumentException">
-        /// The bitmaps pixelformat is invalid.</exception>
+        /// The bitmap's pixelformat is invalid.</exception>
         public static bool SaveBitmap(Bitmap bitmap, string filename, FREE_IMAGE_SAVE_FLAGS flags)
         {
             return SaveBitmap(
@@ -948,7 +948,7 @@ namespace FreeImageAPI
         /// <exception cref="ArgumentNullException">
         /// <paramref name="bitmap"/> or <paramref name="filename"/> is null.</exception>
         /// <exception cref="ArgumentException">
-        /// The bitmaps pixelformat is invalid.</exception>
+        /// The bitmap's pixelformat is invalid.</exception>
         public static bool SaveBitmap(
             Bitmap bitmap,
             string filename,
@@ -3992,7 +3992,7 @@ namespace FreeImageAPI
         /// Returns the comment of a JPEG, PNG or GIF image.
         /// </summary>
         /// <param name="dib">Handle to a FreeImage bitmap.</param>
-        /// <returns>Comment of the FreeImage bitmp, or null in case no comment exists.</returns>
+        /// <returns>Comment of the FreeImage bitmap, or null in case no comment exists.</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="dib"/> is null.</exception>
         public static string GetImageComment(FIBITMAP dib)
@@ -4207,7 +4207,7 @@ namespace FreeImageAPI
         /// <typeparam name="T">The type of the color to use as background.</typeparam>
         /// <param name="dib">Handle to a FreeImage bitmap.</param>
         /// <param name="angle">The angle of rotation.</param>
-        /// <param name="backgroundColor">The color used used to fill the bitmap's background.</param>
+        /// <param name="backgroundColor">The color used to fill the bitmap's background.</param>
         /// <returns>Handle to a FreeImage bitmap.</returns>
         public static FIBITMAP Rotate<T>(FIBITMAP dib, double angle, T? backgroundColor) where T : struct
         {
@@ -4699,7 +4699,7 @@ namespace FreeImageAPI
 
                 if (colorDepth != FREE_IMAGE_COLOR_DEPTH.FICD_AUTO)
                 {
-                    // A fix colordepth was chosen
+                    // A fix color depth was chosen
                     if (FIFSupportsExportBPP(format, targetBpp))
                     {
                         dibToSave = ConvertColorDepth(dibToSave, colorDepth, false);

@@ -69,25 +69,25 @@ namespace PhotoshopFile
     Thumbnail2 = 1036,
     GlobalAngle = 1037,
     ColorSamplers = 1038,
-    ICCProfile = 1039, //The raw bytes of an ICC format profile, see the ICC34.pdf and ICC34.h files from the Internation Color Consortium located in the documentation section
+    ICCProfile = 1039, //The raw bytes of an ICC format profile, see the ICC34.pdf and ICC34.h files from the International Color Consortium located in the documentation section
     Watermark = 1040,
     ICCUntagged = 1041, //1 byte that disables any assumed profile handling when opening the file. 1 = intentionally untagged.
     EffectsVisible = 1042, //1 byte global flag to show/hide all the effects layer. Only present when they are hidden.
     SpotHalftone = 1043, // 4 bytes for version, 4 bytes for length, and the variable length data.
     DocumentSpecific = 1044,
-    UnicodeAlphaNames = 1045, // 4 bytes for length and the string as a unicode string
+    UnicodeAlphaNames = 1045, // 4 bytes for length and the string as a Unicode string
     IndexedColorTableCount = 1046, // 2 bytes for the number of colors in table that are actually defined
     TransparentIndex = 1047,
     GlobalAltitude = 1049,  // 4 byte entry for altitude
     Slices = 1050,
-    WorkflowURL = 1051, //Unicode string, 4 bytes of length followed by unicode string
+    WorkflowURL = 1051, //Unicode string, 4 bytes of length followed by Unicode string
     JumpToXPEP = 1052, //2 bytes major version, 2 bytes minor version,
     //4 bytes count. Following is repeated for count: 4 bytes block size,
     //4 bytes key, if key = 'jtDd' then next is a Boolean for the dirty flag
     //otherwise it’s a 4 byte entry for the mod date
     AlphaIdentifiers = 1053, //4 bytes of length, followed by 4 bytes each for every alpha identifier.
-    URLList = 1054, //4 byte count of URLs, followed by 4 byte long, 4 byte ID, and unicode string for each count.
-    VersionInfo = 1057, //4 byte version, 1 byte HasRealMergedData, unicode string of writer name, unicode string of reader name, 4 bytes of file version.
+    URLList = 1054, //4 byte count of URLs, followed by 4 byte long, 4 byte ID, and Unicode string for each count.
+    VersionInfo = 1057, //4 byte version, 1 byte HasRealMergedData, Unicode string of writer name, Unicode string of reader name, 4 bytes of file version.
     Unknown4 = 1058, //pretty long, 302 bytes in one file. Holds creation date, maybe Photoshop license number
     XMLInfo = 1060, //some kind of XML definition of file. The xpacket tag seems to hold binary data
     Unknown = 1061, //seems to be common!

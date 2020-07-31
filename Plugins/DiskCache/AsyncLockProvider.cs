@@ -49,7 +49,7 @@ namespace ImageResizer.Plugins.DiskCache {
 
         /// <summary>
         /// Attempts to execute the 'success' callback inside a lock based on 'key'.  If successful, returns true.
-        /// If the lock cannot be acquired within 'timoutMs', returns false
+        /// If the lock cannot be acquired within 'timeoutMs', returns false
         /// In a worst-case scenario, it could take up to twice as long as 'timeoutMs' to return false.
         /// </summary>
         /// <param name="key"></param>
@@ -68,7 +68,7 @@ namespace ImageResizer.Plugins.DiskCache {
             try {
                 //We have to loop until we get a valid lock and it stays valid until we lock it.
                 do {
-                    // 1) Creation/aquire phase
+                    // 1) Creation/acquire phase
                     lock (createLock) {
                         // We have to lock on dictionary writes, since otherwise 
                         // two locks for the same file could be created and assigned
@@ -87,7 +87,7 @@ namespace ImageResizer.Plugins.DiskCache {
                         try {
                             // May take minutes to acquire this lock. 
 
-                            // Trying to detect an occurence of loophole above
+                            // Trying to detect an occurrence of loophole above
                             // Check that itemLock still exists and matches the dictionary
                             lock (createLock) {
                                 SemaphoreSlim newLock = null;

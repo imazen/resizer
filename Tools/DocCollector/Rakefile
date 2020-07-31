@@ -1,0 +1,10 @@
+require 'bundler/setup'
+Bundler.require(:default)
+require "doc_collector"
+
+task :resizer do
+ coll = DocCollector::Collector.for_working_copy("../..")
+ coll.load_branches_yaml
+ coll.read_from_branches
+ coll.write_output_to("./resizer-web/content")
+end

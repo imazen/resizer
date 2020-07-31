@@ -37,7 +37,7 @@
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Trial|AnyCPU'">
-    <OutputPath>..\..\dlls\trial\</OutputPath>
+    <OutputPath>..\..\dlls\release\</OutputPath>
     <DefineConstants>TRACE;TRIAL</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -45,7 +45,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
-    <DocumentationFile>..\..\dlls\trial\ImageResizer.Plugins.SeamCarving.XML</DocumentationFile>
+    <DocumentationFile>..\..\dlls\release\ImageResizer.Plugins.SeamCarving.XML</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
@@ -97,6 +97,14 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="pthreadVSE2.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="readme.md" />
+    <None Include="Web.config.transform" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="GPL.txt" />
+    <Content Include="ReadMe.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

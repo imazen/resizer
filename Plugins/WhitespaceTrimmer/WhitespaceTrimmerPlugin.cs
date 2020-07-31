@@ -36,10 +36,13 @@ namespace ImageResizer.Plugins.WhitespaceTrimmer {
                 Rectangle box = new BoundingBoxFinder().FindBoxSobel(s.sourceBitmap, new Rectangle(0, 0, s.sourceBitmap.Width, s.sourceBitmap.Height), (byte)threshold);
                 //Add padding
                 int paddingPixels = (int)Math.Ceiling(percentpadding * (box.Width + box.Height) / 2);
-                box.X = Math.Max(0, box.X - paddingPixels);
-                box.Y= Math.Max(0, box.Y - paddingPixels);
-                box.Width = Math.Min(s.sourceBitmap.Width, box.Width + paddingPixels * 2);
-                box.Height = Math.Min(s.sourceBitmap.Height, box.Height + paddingPixels * 2);
+
+                int leftPadding = Math.Min(paddingPixels, box.X);
+                int topPadding = Math.Min(paddingPixels, box.Y);
+                box.X = box.X - leftPadding;
+                box.Y = box.Y - topPadding;
+                box.Width = Math.Min(s.sourceBitmap.Width - box.X, box.Width + paddingPixels + leftPadding);
+                box.Height = Math.Min(s.sourceBitmap.Height - box.Y, box.Height + paddingPixels + topPadding);
 
                 //Adjust s.originalSize so the layout occurs properly.
                 s.originalSize = box.Size;

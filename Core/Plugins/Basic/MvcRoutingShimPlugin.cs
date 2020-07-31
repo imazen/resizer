@@ -13,14 +13,18 @@ namespace ImageResizer.Plugins.Basic {
         StopRoutingRoute route = null;
         public IPlugin Install(Configuration.Config c) {
             c.Plugins.add_plugin(this);
-            route = new StopRoutingRoute(c.Pipeline.StopRoutingKey);   
-            RouteTable.Routes.Insert(0, route);
+            route = new StopRoutingRoute(c.Pipeline.StopRoutingKey);
+            using (RouteTable.Routes.GetWriteLock()) {
+                RouteTable.Routes.Insert(0, route);
+            }
             return this;
         }
 
         public bool Uninstall(Configuration.Config c) {
             c.Plugins.remove_plugin(this);
-            RouteTable.Routes.Remove(route);
+            using (RouteTable.Routes.GetWriteLock()) {
+                RouteTable.Routes.Remove(route);
+            }
             return true;
         }
 
@@ -43,7 +47,7 @@ namespace ImageResizer.Plugins.Basic {
                     if (httpContext.Items[_contextItemsFlag] != null)
                         return new RouteData(this, new StopRoutingHandler());
                 }
-                catch (NotImplementedException) { } //For compatibility with Kendo UI and unit test/mocks which dont' implement .Items
+                catch (NotImplementedException) { } //For compatibility with Kendo UI and unit test/mocks which don't implement .Items
 
                 return null;
             }

@@ -177,6 +177,18 @@ namespace ImageResizer {
         public string ResultMimeType { get { return ResultInfo.Get<string>("result.mime", null); } }
 
 
+        /// <summary>
+        /// Ticks elapsed during Job processing. Divide by Stopwatch.Frequency to get seconds.
+        /// </summary>
+        public long TotalTicks { get; set; }
+        /// <summary>
+        /// Ticks elapsed during read and decode (not all engines populate this). Divide by Stopwatch.Frequency to get seconds.
+        /// </summary>
+        public long DecodeTicks { get; set; }
+        /// <summary>
+        /// Ticks elapsed during encode and write (not all engines populate this). Divide by Stopwatch.Frequency to get seconds.
+        /// </summary>
+        public long EncodeTicks { get; set; }
 
         /// <summary>
         /// The image processing settings
@@ -250,7 +262,7 @@ namespace ImageResizer {
 
         private string _sourcePathData = null;
         /// <summary>
-        /// If 'source' contains any path-related data, it is copied into this member for use by format detetction code, so decoding can be optimized.
+        /// If 'source' contains any path-related data, it is copied into this member for use by format detection code, so decoding can be optimized.
         /// May be a physical or virtual path, or just a file name.
         /// </summary>
         public string SourcePathData {
@@ -296,11 +308,11 @@ namespace ImageResizer {
         }
         /// <summary>
         /// Internal use only.
-        /// Resolves the specified (potenetially templated) path into a physical path. 
+        /// Resolves the specified (potentially templated) path into a physical path.
         /// Applies the AddFileExtension setting using the 'ext' variable.
         /// Supplies the guid, settings.*, filename, path, and originalExt variables. 
         /// The resolver method should supply 'ext', 'width', and 'height' (all of which refer to the final image).
-        /// If AllowDestinationPathVariables=False, only AddFileExtenson will be processed.
+        /// If AllowDestinationPathVariables=False, only AddFileExtension will be processed.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="resolver"></param>

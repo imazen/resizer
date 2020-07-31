@@ -16,7 +16,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
 
     public enum HistogramThresholdAlgorithm {
         /// <summary>
-        /// Simple upper and lower usage thresholds are applied to the values in each channel's histogram to determine the input start/stop points for each individual channel. The start/stop points are used to calcualte the scale factor and offset for the channel.
+        /// Simple upper and lower usage thresholds are applied to the values in each channel's histogram to determine the input start/stop points for each individual channel. The start/stop points are used to calculate the scale factor and offset for the channel.
         /// </summary>
         Simple,
         /// <summary>
@@ -112,7 +112,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             if (image.PixelFormat == PixelFormat.Format8bppIndexed) {
                 // grayscale image
                 byte* ptr = (byte*)image.ImageData.ToPointer();
-                // allign pointer to the first pixel to process
+                // align pointer to the first pixel to process
                 ptr += (startY * stride + startX);
 
                 // calculate histogram
@@ -129,7 +129,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
 
                 // update pixels' intensities
                 ptr = (byte*)image.ImageData.ToPointer();
-                // allign pointer to the first pixel to process
+                // align pointer to the first pixel to process
                 ptr += (startY * stride + startX);
 
                 for (int y = startY; y < stopY; y++) {
@@ -141,7 +141,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
             } else {
                 // color image
                 byte* ptr = (byte*)image.ImageData.ToPointer();
-                // allign pointer to the first pixel to process
+                // align pointer to the first pixel to process
                 ptr += (startY * stride + startX * pixelSize);
 
                 // calculate histogram
@@ -165,7 +165,7 @@ namespace ImageResizer.Plugins.AdvancedFilters {
 
                 // update pixels' intensities
                 ptr = (byte*)image.ImageData.ToPointer();
-                // allign pointer to the first pixel to process
+                // align pointer to the first pixel to process
                 ptr += (startY * stride + startX * pixelSize);
 
                 for (int y = startY; y < stopY; y++) {

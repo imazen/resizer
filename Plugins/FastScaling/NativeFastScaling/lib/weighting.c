@@ -251,7 +251,7 @@ static InterpolationDetails * InterpolationDetails_create_from_internal(Context 
 
 
     case Filter_CubicFast:
-        return ex ? truePtr : InterpolationDetails_create_custom(context, 1, 1, filter_bicubic_fast);
+        return ex ? truePtr : InterpolationDetails_create_custom(context, 2, 1, filter_bicubic_fast);
     case Filter_Cubic:
         return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 1, 0,1);
     case Filter_CubicSharp:
@@ -263,13 +263,13 @@ static InterpolationDetails * InterpolationDetails_create_from_internal(Context 
     case Filter_CatmullRomFastSharp:
         return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 1, 13.0 / 16.0, 0, 0.5);
     case Filter_Mitchell:
-        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 7.0 / 8.0, 1.0 / 3.0, 1.0 / 3.0);
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 1., 1.0 / 3.0, 1.0 / 3.0);
     case Filter_MitchellFast:
-        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom (context, 1, 7.0 / 8.0, 1.0 / 3.0, 1.0 / 3.0);
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom (context, 1, 1., 1.0 / 3.0, 1.0 / 3.0);
 
 
     case Filter_Robidoux:
-        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 1. / 1.1685777620836932,
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 1.,
                 0.37821575509399867, 0.31089212245300067);
     case Filter_Fastest:
         return ex ? truePtr : InterpolationDetails_create_bicubic_custom (context,0.74, 0.74,
@@ -277,10 +277,10 @@ static InterpolationDetails * InterpolationDetails_create_from_internal(Context 
 
 
     case Filter_RobidouxFast:
-        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom (context, 1.05, 1. / 1.1685777620836932,
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom (context, 1.05, 1.,
             0.37821575509399867, 0.31089212245300067);
     case Filter_RobidouxSharp:
-        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 1. / 1.105822933719019,
+        return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 2, 1.,
                 0.2620145123990142, 0.3689927438004929);
     case Filter_Hermite:
         return ex ? truePtr :  InterpolationDetails_create_bicubic_custom(context, 1, 1, 0, 0);
@@ -296,7 +296,14 @@ static InterpolationDetails * InterpolationDetails_create_from_internal(Context 
 
 
     case Filter_Jinc:
-        return ex ? truePtr :  InterpolationDetails_create_custom (context, 3, 1.0 / 1.2196698912665045, filter_jinc);
+        return ex ? truePtr :  InterpolationDetails_create_custom (context, 6, 1., filter_jinc);
+
+    case Filter_NCubic:
+        return ex ? truePtr : InterpolationDetails_create_bicubic_custom(
+            context, 2.5, 1. / 1.1685777620836932, 0.37821575509399867, 0.31089212245300067);
+    case Filter_NCubicSharp:
+        return ex ? truePtr : InterpolationDetails_create_bicubic_custom(
+            context, 2.5, 1. / 1.105822933719019, 0.2620145123990142, 0.3689927438004929);
 
     }
     if (!checkExistenceOnly){
@@ -362,15 +369,10 @@ LineContributions *LineContributions_create(Context * context,  const uint32_t o
 {
     const double sharpen_ratio =  InterpolationDetails_percent_negative_weight(details);
     const double desired_sharpen_ratio = details->sharpen_percent_goal / 100.0;
-    const double extra_negative_weight = sharpen_ratio > 0 && desired_sharpen_ratio > 0 ?
-                                         (desired_sharpen_ratio + sharpen_ratio) / sharpen_ratio :
-                                         0;
-
-
     const double scale_factor = (double)output_line_size / (double)input_line_size;
     const double downscale_factor = fmin(1.0, scale_factor);
-    const double half_source_window = details->window * 0.5 / downscale_factor;
-
+    const double half_source_window = (details->window + 0.5) / downscale_factor;
+   
     const uint32_t allocated_window_size = (int)ceil(2 * (half_source_window - TONY)) + 1;
     uint32_t u, ix;
     LineContributions *res = LineContributions_alloc(context, output_line_size, allocated_window_size);
@@ -378,19 +380,22 @@ LineContributions *LineContributions_create(Context * context,  const uint32_t o
         CONTEXT_add_to_callstack (context);
         return NULL;
     }
+
+    
     double negative_area = 0;
     double positive_area = 0;
 
     for (u = 0; u < output_line_size; u++) {
         const double center_src_pixel = ((double)u + 0.5) / scale_factor - 0.5;
 
-        const int left_edge = (int)ceil(center_src_pixel - half_source_window - 0.5 + TONY);
-        const int right_edge = (int)floor(center_src_pixel + half_source_window + 0.5 - TONY);
+        const int left_edge = (int)floor(center_src_pixel) - ((allocated_window_size - 1) / 2);
+        const int right_edge = left_edge + allocated_window_size - 1;
 
-        const uint32_t left_src_pixel = (uint32_t)max(0, left_edge);
-        const uint32_t right_src_pixel = (uint32_t)min(right_edge, (int)input_line_size - 1);
+        const uint32_t left_src_pixel = (uint32_t)int_max(0, left_edge);
+        const uint32_t right_src_pixel = (uint32_t)int_min(right_edge, (int)input_line_size - 1);
 
         double total_weight = 0.0;
+        double total_negative_weight = 0.0;
 
         const uint32_t source_pixel_count = right_src_pixel - left_src_pixel + 1;
 
@@ -406,34 +411,56 @@ LineContributions *LineContributions_create(Context * context,  const uint32_t o
 
         float *weights = res->ContribRow[u].Weights;
 
-        //commented: additional weight for edges (doesn't seem to be too effective)
-        //for (ix = left_edge; ix <= right_edge; ix++) {
         for (ix = left_src_pixel; ix <= right_src_pixel; ix++) {
             int tx = ix - left_src_pixel;
-            //int tx = min(max(ix, left_src_pixel), right_src_pixel) - left_src_pixel;
-            double add = (*details->filter)(details, downscale_factor * ((double)ix - center_src_pixel));
-            if (add < 0 && extra_negative_weight != 0) {
-                add *= extra_negative_weight;
+            double add = (*details->filter)(details, downscale_factor *((double)ix - center_src_pixel));
+            if (fabs(add) <= 0.00000002) {
+                add = 0.0;
+                // Weights below a certain threshold make consistent x-plat
+                // integration test results impossible. pos/neg zero, etc.
+                // They should be rounded down to zero at the threshold at which results are consistent.
             }
             weights[tx] = (float)add;
             total_weight += add;
+            total_negative_weight -= fmin(0, add);
         }
 
-        if (total_weight <= TONY) {
-            LineContributions_destroy(context, res);
-            CONTEXT_error (context, Invalid_internal_state);
-            return NULL;
+        float neg_factor, pos_factor;
+        if (total_weight <= 0 || desired_sharpen_ratio > sharpen_ratio) {
+            float total_positive_weight = total_weight + total_negative_weight;
+            float target_negative_weight = desired_sharpen_ratio * total_positive_weight;
+            pos_factor = 1;
+            neg_factor = target_negative_weight / total_negative_weight;
         }
-
-
-        const float total_factor = (float)(1.0f / total_weight);
+        else {
+            neg_factor = pos_factor = (float)(1.0f / total_weight);
+        }
         for (ix = 0; ix < source_pixel_count; ix++) {
-            weights[ix] *= total_factor;
             if (weights[ix] < 0) {
+                weights[ix] *= neg_factor;
                 negative_area -= weights[ix];
-            } else {
+            }
+            else {
+                weights[ix] *= pos_factor;
                 positive_area += weights[ix];
             }
+        }
+
+        // Shrink to improve perf & result consistency
+        int32_t iix;
+        // Shrink region from the right
+        for (iix = source_pixel_count - 1; iix >= 0; iix--) {
+            if (weights[iix] != 0)
+                break;
+            res->ContribRow[u].Right--;
+        }
+        // Shrink region from the left
+        for (iix = 0; iix < (int32_t)source_pixel_count; iix++) {
+            if (weights[0] != 0)
+                break;
+            res->ContribRow[u].Weights++;
+            weights++;
+            res->ContribRow[u].Left++;
         }
     }
     res->percent_negative = negative_area / positive_area;

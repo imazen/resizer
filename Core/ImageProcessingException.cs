@@ -9,7 +9,7 @@ using System.Web;
 
 namespace ImageResizer {
     /// <summary>
-    /// Represents an non-recoverable exception that occured while processing the image. 
+    /// Represents a non-recoverable exception that occurred while processing the image.
     /// Possible causes are: a corrupted source file, cache resource timeout (such as a locked file in imagecache),
     /// unusable configuration (for example, no registered encoders or caches), invalid syntax, or a size limit was exceeded and the request was stopped by the SizeLimiting extension.
     /// May also be caused by a missing source file/resource, in the form of the ImageMissingException subclass.
@@ -27,20 +27,16 @@ namespace ImageResizer {
         }
         public ImageProcessingException(int httpCode, string message, string safeMessage)
             : base(httpCode, message) {
-                this.publicSafeMessage = safeMessage;
+            PublicSafeMessage = safeMessage;
         }
         public ImageProcessingException(int httpCode, string message, string safeMessage, Exception innerException)
             : base(httpCode, message,innerException) {
-                this.publicSafeMessage = safeMessage;
+            PublicSafeMessage = safeMessage;
         }
-        private string publicSafeMessage = null;
         /// <summary>
         /// This error message is safe to display to the public (should not contain any sensitive information)
         /// </summary>
-        protected string PublicSafeMessage {
-            get { return publicSafeMessage; }
-            set { publicSafeMessage = value; }
-        }
+        protected string PublicSafeMessage { get; set; }
     }
 
     /// <summary>
@@ -64,4 +60,14 @@ namespace ImageResizer {
             : base(404, message, safeMessage, innerException) {
         }
     }
+
+    /// <summary>
+    /// A source file was corrupted
+    /// </summary>
+    public class LicenseException : ImageProcessingException
+    {
+        public LicenseException(string message) : base(402, message, message) { }
+        public LicenseException(string message, Exception innerException) : base(402, message, message, innerException) { }
+    }
+
 }

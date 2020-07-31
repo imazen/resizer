@@ -2,8 +2,8 @@
 #define STATUS_CODE_NAME StatusCode
 #endif
 
-#ifndef FLOATSSPACE_NAME
-#define FLOATSSPACE_NAME WorkingFloatspace
+#ifndef FLOATSPACE_NAME
+#define FLOATSPACE_NAME WorkingFloatspace
 #endif
 
 
@@ -42,35 +42,38 @@ ENUM_START (InterpolationFilter, _InterpolationFilter)
 Filter_RobidouxFast = 1,
 Filter_Robidoux = 2,
 Filter_RobidouxSharp = 3,
-Filter_Ginseng,
-Filter_GinsengSharp,
-Filter_Lanczos,
-Filter_LanczosSharp,
-Filter_Lanczos2,
-Filter_Lanczos2Sharp,
-Filter_CubicFast,
-Filter_Cubic,
-Filter_CubicSharp,
-Filter_CatmullRom,
-Filter_Mitchell,
+Filter_Ginseng = 4,
+Filter_GinsengSharp = 5,
+Filter_Lanczos = 6,
+Filter_LanczosSharp = 7,
+Filter_Lanczos2 = 8,
+Filter_Lanczos2Sharp = 9,
+Filter_CubicFast = 10,
+Filter_Cubic = 11,
+Filter_CubicSharp = 12,
+Filter_CatmullRom = 13,
+Filter_Mitchell = 14,
 
 
-Filter_CubicBSpline,
-Filter_Hermite,
-Filter_Jinc,
-Filter_RawLanczos3,
-Filter_RawLanczos3Sharp,
-Filter_RawLanczos2,
-Filter_RawLanczos2Sharp,
-Filter_Triangle,
-Filter_Linear,
-Filter_Box,
-Filter_CatmullRomFast,
-Filter_CatmullRomFastSharp,
+Filter_CubicBSpline = 15,
+Filter_Hermite = 16,
+Filter_Jinc = 17,
+Filter_RawLanczos3 = 18,
+Filter_RawLanczos3Sharp = 19,
+Filter_RawLanczos2 = 20,
+Filter_RawLanczos2Sharp = 21,
+Filter_Triangle = 22,
+Filter_Linear = 23,
+Filter_Box = 24,
+Filter_CatmullRomFast = 25,
+Filter_CatmullRomFastSharp = 26,
 
-Filter_Fastest,
+Filter_Fastest = 27,
 
-Filter_MitchellFast
+Filter_MitchellFast = 28,
+Filter_NCubic = 29,
+Filter_NCubicSharp = 30
+
 ENUM_END (InterpolationFilter)
 
 ENUM_START (ProfilingEntryFlags, _ProfilingEntryFlags)
@@ -99,7 +102,7 @@ ENUM_END (BitmapCompositingMode)
 #ifdef FASTSCALING_ENUMS_MANAGED
 [ImageResizer::ExtensionMethods::EnumRemovePrefixAttribute ("Floatspace_")]
 #endif
-ENUM_START (FLOATSSPACE_NAME, _WorkingFloatspace)
+ENUM_START (FLOATSPACE_NAME, _WorkingFloatspace)
     Floatspace_srgb = 0,
     Floatspace_as_is = 0,
     Floatspace_linear = 1,
@@ -116,7 +119,7 @@ ENUM_START (FLOATSSPACE_NAME, _WorkingFloatspace)
     Floatspace_gamma_sigmoid_3 = 22,//4 | 16 | 2,
 #endif
 
-ENUM_END (FLOATSSPACE_NAME)
+ENUM_END (FLOATSPACE_NAME)
 
 #undef ENUM_START
 #undef ENUM_END

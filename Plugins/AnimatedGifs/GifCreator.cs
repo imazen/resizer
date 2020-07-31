@@ -17,7 +17,7 @@ namespace ImageResizer.Plugins.AnimatedGifs
         Trailer = 0x3B
     }
     /// <summary>
-    /// Provides methods for creating application and graphics blocks needed to write a animated Gif.
+    /// Provides methods for creating application and graphics blocks needed to write a animated GIF.
     /// </summary>
     public class GifCreator
     {
@@ -58,6 +58,16 @@ namespace ImageResizer.Plugins.AnimatedGifs
         /// <returns></returns>
         public static byte[] CreateGraphicControlExtensionBlock(int delay, byte transparentColorIndex)
         {
+            return CreateGraphicControlExtensionBlock(delay, transparentColorIndex, true);
+        }
+        /// <summary>
+        /// Written before each frame - specifies the frame's delay and the index of the transparent color
+        /// </summary>
+        /// <param name="delay"></param>
+        /// <param name="transparentColorIndex"></param>
+        /// <param name="enableTransparency"></param>
+        public static byte[] CreateGraphicControlExtensionBlock(int delay, byte transparentColorIndex, bool enableTransparency)
+        {
             /*320:   21 F9 04                Graphic Control Extension frame #1
             323:   08                       - no transparency
             324:   09 00                    - 0.09 sec duration
@@ -73,7 +83,7 @@ namespace ImageResizer.Plugins.AnimatedGifs
             // 1 enables transparency
             // 8 clears to bgcolor after each frame.
             // 25 (8 + 16) = restore to previous data (doesn't work in FF)
-            result[3] = 9; //Tansparent, clear to bgcolor (works good for transparent animaions
+            result[3] = (byte)(8 | (enableTransparency ? 1 : 0)); //Transparent, clear to bgcolor (works good for transparent animations
 
             // Split the delay into high- and lowbyte
             result[4] = (byte)(delay % 256); //Duration - lsb
@@ -83,7 +93,7 @@ namespace ImageResizer.Plugins.AnimatedGifs
             return result;
         }
         /// <summary>
-        /// Creates a Loop Block (Netscape appliation extension) for infinite looping. Written after the last frame's image data
+        /// Creates a Loop Block (Netscape application extension) for infinite looping. Written after the last frame's image data
         /// </summary>
         /// <returns></returns>
         public static byte[] CreateLoopBlock()

@@ -2,11 +2,20 @@ Aliases: /plugins/pdfrenderer
 Tags: Plugin
 Bundle: free
 Edition: free
-Tagline: Render PDFs to images dynamically, then crop or process them as an image.
+Tagline: Obsolete. See PdfiumRenderer. 
 
-# PdfRenderer (New in V3.1.3)
+# PdfRenderer
 
-Note: The PdfRenderer plugin uses the Ghostscript library, **which is under the GPLv3**. As such, any binaries using that library **are also under the GPL v3**. [Click here for the full licensing details on this](/licenses/pdfrenderer). The PdfRenderer plugin was written by Jason Morse. I have reviewed, vetted, and tested his code.
+*PLEASE NOTE*
+* **This plugin has been deprecated in favor of PdfiumRenderer**
+* **This plugin uses the Ghostscript library, which is under the GPLv3. As such, any binaries using that library are also under the GPL v3. [Click here for the full licensing details on this](/licenses/pdfrenderer).**
+* **This plugin is not forwards-compatible. Avoid usage for maximum compatibility with Imageflow and future major ImageResizer releases.**
+* **Do NOT use with untrusted data. This plugin passes source files to potentially vulnerable software (Ghostscript).**
+* **Using this plugin with malicious PDFs could result in a remote code execution vulnerability.**
+* You can find [recent Ghostscript vulnerabilities here](https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=ghostscript)
+
+
+Jason Morse is the original author of this plugin. 
 
 The PdfRenderer plugin renders PDF files to the dimensions specified by the `width` and `height` commands. You may use the `mode` command to pad, crop, stretch, or seam carve the result to match your desired aspect ratio. All resizer commands can be used in combination with the plugin.
 
@@ -18,7 +27,6 @@ Ex. `/docs.pdf?format=png&width=400`.
 
 ### Requirements
 
-* .NET 3.5 or higher
 * gsdll32.dll or gsdll64.dll in the /bin directory, depending on application bitness. Including both is a good idea, in case you need to change the bitness unexpectedly.
 
 ### Configuration
@@ -33,7 +41,7 @@ It uses the `width` and `height` commands to optimize the PDF rendering to the d
 
 * Width/height - Choose the dimensions of the output image. The pdf will be rendered within the box, and padded to fit. You can use &mode=crop to crop the pdf to a specific aspect ratio, or &mode=max to just allow the output image to match the aspect ratio of the PDF.
 * Pdfwidth/pdfheight - You can use pdfwidth and pdfheight to specify alternate rendering dimensions for the PDF, causing it to be resized after it is generated. This is useful for making high-quality thumbnails, as rendering a PDF to an 80x80px square can be too aliased. Specifying &width=80&pdfwidth=240 can often provide much better results than &width=80 by itself. (3.1.5+)
-* page=X - (defailt - page 1) Choose the page you wish to render.
+* page=X - (default - page 1) Choose the page you wish to render.
 * gridfit=true|false (default - false) When true, uses TrueType grid fitting for glyph rendering.
 * subpixels=true|false (default - false) When true, fonts are rendered to a subpixel grid instead of the pixel great.
 

@@ -9,6 +9,14 @@ With [slimmage.js, you can use WebP for supporting browsers - without breaking t
 
 We [have a guide for using Slimmage and ImageResizer together](http://imageresizing.net/blog/2013/effortless-responsive-images).
 
+
+## Security note
+
+* Do NOT use this plugin with untrusted data. This plugin is a thin wrapper over `libwebp`, which is written in C, and has not yet reached version 1.0.
+* Specifically, it is a thin wrapper over this set of bindings:  https://github.com/imazen/libwebp-net
+* **You are responsible for locating and using the latest version of `libwebp.dll`. The included copy is most likely out of date, and may not contain the latest security fixes.** ImageResizer 4.1.0 uses libwebp 0.6.0.
+* You can [monitor libwebp releases are here](https://github.com/webmproject/libwebp/releases) and [search CVEs for the keyword webp](https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=webp).
+
 ## Installation
 
 1. Either run `Install-Package ImageResizer.Plugins.WebP` in the NuGet package manager, or add `ImageResizer.Plugins.WebP.dll` to your project.
@@ -19,16 +27,16 @@ We [have a guide for using Slimmage and ImageResizer together](http://imageresiz
 
 Simply reference a .webp file as you would a .jpg
 
-  image.webp?width=100&format=jpg
+    image.webp?width=100&format=jpg
 
-A 100px wide jpeg will be returned. 
+A 100px wide JPEG will be returned.
 
-If the extension is not .webp, you can add `&decoder=webp` to force webp decoding first, instead of waiting for the fallback path.
+If the extension is not .webp, you can add `&decoder=webp` to force WebP decoding first, instead of waiting for the fallback path.
 
 
 ## WebPEncoder
 
-Add `&format=webp` to any URL to encode the result in webp format instead of jpg/png
+Add `&format=webp` to any URL to encode the result in WebP format instead of JPEG/PNG
 
 ### Parameters
 
@@ -37,11 +45,11 @@ Add `&format=webp` to any URL to encode the result in webp format instead of jpg
 * NoAlpha=true/false (defaults false)
 
 
-### Rule of thumb for converting jpeg quality values to webp
+### Rule of thumb for converting JPEG quality values to WebP
 
-In general, webp achieves the same visual quality with a much lower  `quality` parameter. 
+In general, WebP achieves the same visual quality with a much lower `quality` parameter.
 
-The first value is the jpeg quality, second is webp quality for same visual clarity.
+The first value is the JPEG quality, second is WebP quality for same visual clarity.
 
 * 90->78
 * 80->65 

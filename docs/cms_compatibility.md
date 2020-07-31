@@ -1,6 +1,6 @@
 Aliases: /docs/workswith/dotnetnuke /docs/workswith/ektron /docs/workswith/episerver /docs/workswith/umbraco /docs/workswith/sitecore /docs/workswith/sitefinity /docs/workswith/orchard /docs/cms_compatibility
 
-#CMS Compatibility
+# CMS Compatibility
 
 ImageResizer can be installed side-by-side with the following content management systems - no additional steps are required.
 
@@ -33,7 +33,7 @@ Follow standard installation instructions. If you get an assembly binding error,
 
 Standard installation steps work with SiteCore, but you *cannot use the jpg.ashx syntax* - so ensure you're using IIS integrated mode. All functionality should be accessible with the normal, non-suffixed syntax (`/resizer.debug`, `/image.jpg?width=100`).
 
-##Sitefinity and ImageResizer
+## Sitefinity and ImageResizer
 
 Sitefinity 3.X and earlier versions require no additional steps.
 

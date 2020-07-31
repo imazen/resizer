@@ -9,7 +9,7 @@ using System.Drawing;
 
 namespace ImageResizer.Plugins.CustomOverlay {
     /// <summary>
-    /// Specifies a image to overlay, the overlay paralellogram, the alignemnt, and (optionally) a pair of weird scaling factors. 
+    /// Specifies a image to overlay, the overlay paralellogram, the alignment, and (optionally) a pair of weird scaling factors. 
     /// </summary>
     public class Overlay {
         public Overlay() {

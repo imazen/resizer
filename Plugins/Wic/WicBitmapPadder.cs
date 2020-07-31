@@ -77,7 +77,7 @@ namespace ImageResizer.Plugins.Wic {
             s.CopyPalette(pIPalette);
         }
 
-        //Caching prebuilt arrays of the background color dramatically increases performance manyfold.
+        //Caching prebuilt arrays of the background color dramatically increases performance manifold.
         byte[] cachedLeftPadding = null;
         byte[] cachedRightPadding = null;
         byte[] cachedRowPadding = null;
@@ -144,7 +144,7 @@ namespace ImageResizer.Plugins.Wic {
 
 
             //Ok, now it's time to start work.
-            //Manually build a padding stride for left, top/bottom, and right, then use Array.Copy to do it more efficienctly. 
+            //Manually build a padding stride for left, top/bottom, and right, then use Array.Copy to do it more efficiently.
 
             //Favor doing complete row - don't let left/right overlap with top/bottom.
             if (left > 0 && h > (top + bottom)) {

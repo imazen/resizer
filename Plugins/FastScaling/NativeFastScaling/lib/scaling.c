@@ -426,7 +426,10 @@ static bool HALVE_INTERNAL_NAME (
 
 bool Halve(Context * context, const BitmapBgra * from, BitmapBgra * to, int divisor)
 {
-
+    if (divisor > 16) {
+        CONTEXT_error(context, Invalid_argument);
+        return false;
+    }
     bool r = false;
     if (context->colorspace.floatspace == Floatspace_as_is){
         r = HalveInternal (context, from, to, to->w, to->h, to->stride, divisor);
@@ -442,6 +445,10 @@ bool Halve(Context * context, const BitmapBgra * from, BitmapBgra * to, int divi
 
 bool HalveInPlace(Context * context, BitmapBgra * from, int divisor)
 {
+    if (divisor > 16) {
+        CONTEXT_error(context, Invalid_argument);
+        return false;
+    }
     int to_w = from->w / divisor;
     int to_h = from->h / divisor;
     int to_stride = to_w * BitmapPixelFormat_bytes_per_pixel (from->fmt);

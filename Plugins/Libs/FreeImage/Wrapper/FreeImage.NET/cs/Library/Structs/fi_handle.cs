@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -58,7 +58,7 @@ namespace FreeImageAPI.IO
     /// Therefor we use a <see cref="GCHandle"/> to receive a unique pointer that we can
     /// convert back into a .NET object.
     /// When the <b>fi_handle</b> instance is no longer needed the instance must be disposed
-    /// by the creater manually! It is recommended to use the <c>using</c> statement to
+    /// by the creator manually! It is recommended to use the <c>using</c> statement to
     /// be sure the instance is always disposed:
     /// 
     /// <code>
@@ -70,8 +70,8 @@ namespace FreeImageAPI.IO
     /// 
     /// What does that mean?
     /// If we get a <b>fi_handle</b> from unmanaged code we get a pointer to unmanaged
-    /// memory that we do not have to care about, and just pass ist back to FreeImage.
-    /// If we have to create a handle our own we use the standard constructur
+    /// memory that we do not have to care about, and just pass it back to FreeImage.
+    /// If we have to create a handle our own we use the standard constructor
     /// that fills the <see cref="IntPtr"/> with an pointer that represents the given object.
     /// With calling <see cref="GetObject"/> the <see cref="IntPtr"/> is used to retrieve the original
     /// object we passed through the constructor.

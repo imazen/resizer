@@ -523,6 +523,7 @@ namespace ImageResizer.Plugins.Wic.InteropServices.ComTypes
         WICBitmapInterpolationModeLinear = 0x00000001,
         WICBitmapInterpolationModeCubic = 0x00000002,
         WICBitmapInterpolationModeFant = 0x00000003,
+        WICBitmapInterpolationModeHighQualityCubic = 0x00000004
     };
 
     public enum WICBitmapPaletteType : uint
@@ -2455,8 +2456,8 @@ namespace ImageResizer.Plugins.Wic.InteropServices.ComTypes
     public enum WICGifApplicationExtensionProperties : uint
     {
         WICGifApplicationExtensionApplication = 0x0001,
-        WICGifApplciationExtensionData,
-        WICGifApplciationExtensionMax
+        WICGifApplicationExtensionData,
+        WICGifApplicationExtensionMax
     };
 
     [Guid("DAAC296F-7AA5-4dbf-8D15-225C5976F891")]

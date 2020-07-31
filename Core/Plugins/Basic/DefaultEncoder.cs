@@ -17,7 +17,7 @@ using System.Globalization;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
-    /// Provides basic encoding functionality for Jpeg, png, and gif output. Allows adjustable Jpeg compression, but doesn't implement indexed PNG files or quantized GIF files.
+    /// Provides basic encoding functionality for JPEG, PNG, and GIF output. Allows adjustable JPEG compression, but doesn't implement indexed PNG files or quantized GIF files.
     /// </summary>
     public class DefaultEncoder :IEncoder, IQuerystringPlugin, IPlugin, IFileSignatureProvider {
 
@@ -34,7 +34,7 @@ namespace ImageResizer.Plugins.Basic {
         public DefaultEncoder(ResizeSettings settings, object original) {
             //What format was the image originally (used as a fallback).
             ImageFormat originalFormat = GetOriginalFormat(original);
-            if (!IsValidOutputFormat(originalFormat)) originalFormat = ImageFormat.Jpeg;//No valid info available about the original format. Use Jpeg.
+            if (!IsValidOutputFormat(originalFormat)) originalFormat = ImageFormat.Jpeg;//No valid info available about the original format. Use JPEG.
 
             //What format was specified?
             ImageFormat requestedFormat = GetRequestedFormat(settings.Format, originalFormat); //fallback to originalFormat if not specified.
@@ -60,7 +60,7 @@ namespace ImageResizer.Plugins.Basic {
 
         private ImageFormat _outputFormat = ImageFormat.Jpeg;
         /// <summary>
-        /// If you set this to anything other than Gif, Png, or Jpeg, it will throw an exception. Defaults to Jpeg
+        /// If you set this to anything other than 'Gif', 'Png', or 'Jpeg', it will throw an exception. Defaults to 'Jpeg'.
         /// </summary>
         public ImageFormat OutputFormat {
             get { return _outputFormat; }
@@ -81,7 +81,7 @@ namespace ImageResizer.Plugins.Basic {
 
         private int quality = 90;
         /// <summary>
-        /// 0..100 value. The Jpeg compression quality. 90 is the best setting. Not relevant in Png or Gif compression
+        /// 0..100 value. The JPEG compression quality. 90 is the best setting. Not relevant in PNG or GIF compression.
         /// </summary>
         public int Quality {
             get { return quality; }
@@ -115,7 +115,7 @@ namespace ImageResizer.Plugins.Basic {
             get { return DefaultEncoder.GetContentTypeFromImageFormat(OutputFormat); }
         }
         /// <summary>
-        /// Returns the default file extesnion for OutputFormat
+        /// Returns the default file extension for OutputFormat
         /// </summary>
         public string Extension {
             get { return DefaultEncoder.GetExtensionFromImageFormat(OutputFormat); }
@@ -126,7 +126,7 @@ namespace ImageResizer.Plugins.Basic {
         #region Static methods
         /// <summary>
         /// Tries to parse an ImageFormat from the settings.Format value.
-        /// If an unrecogized format is specified, returns null.
+        /// If an unrecognized format is specified, returns null.
         /// If an unsupported format is specified, it is returned.
         /// If *no* format is specified, returns defaultValue.
         /// </summary>
@@ -164,7 +164,7 @@ namespace ImageResizer.Plugins.Basic {
                 ImageFormat f = DefaultEncoder.GetImageFormatFromPhysicalPath(path);
                 if (f != null) return f; //From the path
             }
-            //Ok, I guess it there (a) wasn't a path, or (b), it didn't have a recognizeable extension
+            //Ok, I guess if there (a) wasn't a path, or (b), it didn't have a recognizable extension
             if (original is Image) return ((Image)original).RawFormat;
             return null;
         }
@@ -180,7 +180,7 @@ namespace ImageResizer.Plugins.Basic {
         }
 
         /// <summary>
-        /// Returns an string instance from the specfied ImageFormat. First matching entry in imageExtensions is used.
+        /// Returns an string instance from the specified ImageFormat. First matching entry in imageExtensions is used.
         /// Returns null if not recognized.
         /// </summary>
         /// <param name="format"></param>
@@ -227,7 +227,7 @@ namespace ImageResizer.Plugins.Basic {
         }
 
         /// <summary>
-        /// Returns an ImageFormat instance from the specfied file extension. Extensions lie sometimes, just a guess.
+        /// Returns an ImageFormat instance from the specified file extension. Extensions lie sometimes, just a guess.
         /// returns null if not recognized.
         /// </summary>
         /// <param name="ext"></param>
@@ -258,7 +258,7 @@ namespace ImageResizer.Plugins.Basic {
         }
 
         /// <summary>
-        /// Supports Png, Jpeg, Gif, Bmp, and Tiff. Throws a ArgumentOutOfRangeException if not png, jpeg, gif, bmp, or tiff
+        /// Supports PNG, JPEG, GIF, BMP, and TIFF. Throws a ArgumentOutOfRangeException if not 'Png', 'Jpeg', 'Gif', 'Bmp', or 'Tiff'.
         /// </summary>
         /// <param name="format"></param>
         /// <returns></returns>
@@ -297,7 +297,7 @@ namespace ImageResizer.Plugins.Basic {
 
 
         /// <summary>
-        /// Saves the specified image to the specified stream using jpeg compression of the specified quality.
+        /// Saves the specified image to the specified stream using JPEG compression of the specified quality.
         /// </summary>
         /// <param name="b"></param>
         /// <param name="quality">A number between 0 and 100. Defaults to 90 if passed a negative number. Numbers over 100 are truncated to 100. 
@@ -305,7 +305,7 @@ namespace ImageResizer.Plugins.Basic {
         /// </param>
         /// <param name="target"></param>
         public static void SaveJpeg(Image b, Stream target, int quality) {
-            #region Encoder paramater notes
+            #region Encoder parameter notes
             //image/jpeg
             //  The parameter list requires 172 bytes.
             //  There are 4 EncoderParameter objects in the array.
@@ -335,7 +335,7 @@ namespace ImageResizer.Plugins.Basic {
             //Validate quality
             if (quality < 0) quality = 90; //90 is a very good default to stick with.
             if (quality > 100) quality = 100;
-            //Prepare paramater for encoder
+            //Prepare parameter for encoder
             using (EncoderParameters p = new EncoderParameters(1)) {
                 using (var ep = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, (long)quality))
                 {
@@ -347,7 +347,7 @@ namespace ImageResizer.Plugins.Basic {
         }
         
          /// <summary>
-        /// Saves the image in png form. If Stream 'target' is not seekable, a temporary MemoryStream will be used to buffer the image data into the stream
+        /// Saves the image in PNG form. If Stream 'target' is not seekable, a temporary MemoryStream will be used to buffer the image data into the stream.
         /// </summary>
         /// <param name="img"></param>
         /// <param name="target"></param>
@@ -403,7 +403,7 @@ namespace ImageResizer.Plugins.Basic {
         }
 
         /// <summary>
-        /// Returns signatures for jpeg, bmp, gif, png, wmf, ico, and tif
+        /// Returns signatures for JPEG, BMP, GIF, PNG, WMF, ICO, and TIFF
         /// </summary>
         /// <returns></returns>
         public IEnumerable<FileSignature> GetSignatures()

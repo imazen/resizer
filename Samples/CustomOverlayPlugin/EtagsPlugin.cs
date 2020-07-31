@@ -27,7 +27,7 @@ namespace ImageResizer.Plugins.Etags {
         public bool CanProcess(System.Web.HttpContext current, IResponseArgs e) {
             string match = GetUnquotedEtag(current);
             
-            string eTag = CalcualteETag(e);
+            string eTag = CalculateETag(e);
             string quotedTag = "\"" + eTag + "\"";
             e.ResponseHeaders.Headers["X-ETag"] = quotedTag;
             e.ResponseHeaders.Headers["ETag"] = quotedTag;
@@ -38,7 +38,7 @@ namespace ImageResizer.Plugins.Etags {
             current.RemapHandler(new Return304Handler(e));
         }
 
-        public static string CalcualteETag(IResponseArgs e) {
+        public static string CalculateETag(IResponseArgs e) {
             return e.RequestKey.GetHashCode().ToString("x");
         }
 

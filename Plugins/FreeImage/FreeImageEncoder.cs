@@ -15,7 +15,7 @@ using System.Globalization;
 
 namespace ImageResizer.Plugins.FreeImageEncoder {
     /// <summary>
-    /// FreeImageEncoder can encode jpegs 2-3x as fast as GDI can, and offers more encoding options.
+    /// FreeImageEncoder can encode JPEGs 2-3x as fast as GDI can, and offers more encoding options.
     /// </summary>
     public class FreeImageEncoderPlugin : IPlugin, IEncoder {
 

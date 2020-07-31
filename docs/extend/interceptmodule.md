@@ -27,7 +27,7 @@ This is where most of the work takes place.
 8. Call UrlAuthorizationModule.CheckUrlAccessForPrincipal() to verify that the final rewrite path is still authorized for access by the current user.
 9. Call Pipeline.AuthorizeImage, where handlers can deny or override the CheckUrlAccessForPrincipal() result. If the event args come back negative, throw an 403 HttpException.
 10. Check if the file exists physically (unless vppMode=Always)
-11. If the file doesn't exist physically (or if vppMode=Always), then get an IVirutalFile instance for the specified path, using (a) IVirtualImageProvider plugins, and (b) the VirtualPathProvider system.
+11. If the file doesn't exist physically (or if vppMode=Always), then get an IVirtualFile instance for the specified path, using (a) IVirtualImageProvider plugins, and (b) the VirtualPathProvider system.
 12. If the file is missing, fire Pipeline.ImageMissing and exit, having modified nothing (although a plugin could perform a redirect in the event).
 13. If the file exists virtually or physically, we continue to part 2. If a FileNotFoundException occurs during part 2, we follow #12.
 

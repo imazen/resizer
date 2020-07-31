@@ -293,7 +293,7 @@ bool BitmapFloat_pivoting_composite_linear_over_srgb(Context * context, BitmapFl
         return false;
     }
 
-    //Tiling does not appear to show benefits when benchmarking - only breifly investigated
+    //Tiling does not appear to show benefits when benchmarking - only briefly investigated
     bool tile_when_transposing = false;
 
     if (transpose && tile_when_transposing) {
@@ -301,7 +301,7 @@ bool BitmapFloat_pivoting_composite_linear_over_srgb(Context * context, BitmapFl
         //Let's try to tile within 2kb, get some cache coherency
         const float dest_opt_rows = 2048.0f / (float)dest->stride;
 
-        const int tile_width = max(4, (int)dest_opt_rows);
+        const int tile_width = int_max(4, (int)dest_opt_rows);
         const int tiles = src->w / tile_width;
 
         if (can_compose) {

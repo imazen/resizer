@@ -1,5 +1,5 @@
 ﻿1) Locate the ProgramFiles\\ImageResizingNet\\v3 folder.
-2) List the Dlls alongside this .exe file, plus non-duplicates in ..\release if the parent folder is named 'trial'.
+2) List the DLLs alongside this .exe file, plus non-duplicates in ..\release if the parent folder is named 'trial'.
 
 
 3) Check the registry to see what is installed

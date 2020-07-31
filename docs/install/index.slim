@@ -10,9 +10,9 @@ markdown:
 
     &nbsp;
 
-    If you answered "no" to #1 and "yes" to #2, [see our non-web installation guide](/docs/v3/install/non-web). Console, WPF, WCF, WinForms, and Classic ASP users sometimes choose to only use the Managed API. 
+    If you answered "no" to #1 and "yes" to #2, [see our non-web installation guide](/docs/v4/install/non-web). Console, WPF, WCF, WinForms, and Classic ASP users sometimes choose to only use the Managed API. 
 
-    If you answered "yes" to #1, and "no" to #2, you might consider [using ImageResizer as a standalone image server](/docs/v3/install/standalone). PHP, Ruby, and Python users might consider this, as well as users with dozens of terabytes of images.
+    If you answered "yes" to #1, and "no" to #2, you might consider [using ImageResizer as a standalone image server](/docs/v4/install/standalone). PHP, Ruby, and Python users might consider this, as well as users with dozens of terabytes of images.
 
     Note: If you want to modify Web.config yourself, substitute `ImageResizer.Mvc` for `ImageResizer.MvcWebConfig` below. MvcWebConfig will only add - never delete - elements in Web.config. 
 
@@ -22,7 +22,7 @@ markdown:
 
 
 pre: code 
-  | PM> Install-Package ImageResizer.MvcWebConfig
+  | PM> Install-Package ImageResizer.WebConfig
     PM> Install-Package ImageResizer.Plugins.DiskCache
     PM> Install-Package ImageResizer.Plugins.PrettyGifs
     PM> Install-Package ImageResizer.Plugins.SimpleFilters
@@ -40,7 +40,7 @@ p: a href="http://nuget.org/packages?q=Imazen" View available packages on NuGet
 h2 Manual Installation (option 3)
 
 markdown:
-    1. [Download and unzip the package](/download). Add `ImageResizer.dll`, `ImageResizer.Mvc.dll`, `ImageResizer.Plugins.DiskCache.dll`, and any other plugin dlls you wish to use to the `/bin` folder of the website. If you're using Visual Studio, right click your project and choose "Add Reference" for each of these files instead.
+    1. [Download and unzip the package](/download). Add `ImageResizer.dll`, `ImageResizer.Plugins.DiskCache.dll`, and any other plugin dlls you wish to use to the `/bin` folder of the website. If you're using Visual Studio, right click your project and choose "Add Reference" for each of these files instead.
 
     2. Modify or create the /Web.Config file for your site. Make sure all these elements are added correctly (You may wish to make a backup of Web.config first).
 
@@ -53,10 +53,9 @@ markdown:
               <resizer>
                 <!-- Unless you (a) use Integrated mode, or (b) map all requests to ASP.NET, 
                      you'll need to add .ashx to your image URLs: image.jpg.ashx?width=200&height=20 -->
-                <pipeline fakeExtensions=".ashx" />
+                <pipeline fakeExtensions=".ashx" defaultCommands="autorotate.default=true"/>
 
                 <plugins>
-                  <add name="MvcRoutingShim" />
                   <add name="DiskCache" />
                   <!-- <add name="PrettyGifs" /> -->
                   <!-- <add name="SimpleFilters" /> -->
@@ -66,7 +65,7 @@ markdown:
 
               <system.web>
                 <httpModules>
-                  <!-- This is for IIS5, IIS6, and IIS7 Classic, and Cassini/VS Web Server-->
+                  <!-- This is for IIS7/8 Classic Mode and Cassini-->
                   <add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
                 </httpModules>
               </system.web>
@@ -74,7 +73,7 @@ markdown:
               <system.webServer>
                 <validation validateIntegratedModeConfiguration="false"/>
                 <modules>
-                  <!-- This is for IIS7+ Integrated mode -->
+                  <!-- This is for IIS7/8 Integrated mode -->
                   <add name="ImageResizingModule" type="ImageResizer.InterceptModule"/>
                 </modules>
               </system.webServer>

@@ -32,12 +32,24 @@ namespace ImageResizer.Plugins
 
         }
 
+        /// <summary>
+        /// Converts relative and app-relative paths to domain-relative virtual paths.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        protected string normalizeVirtualPath(string path)
+        {
+            if (!path.StartsWith("/")) path = HostingEnvironment.ApplicationVirtualPath.TrimEnd('/') + '/' + (path.StartsWith("~") ? path.Substring(1) : path).TrimStart('/');
+            return path;
+        }
+
         protected IVirtualImageProviderVpp GetVIP(string virtualPath)
         {
+            var path = normalizeVirtualPath(virtualPath); //Because *sometimes* ASP.NET likes to send us app-relative paths, just for the heck of it.
             var qs = new NameValueCollection();
             foreach (IVirtualImageProviderVpp p in c.Plugins.GetAll<IVirtualImageProviderVpp>())
             {
-                if (p.VppExposeFile(virtualPath) && p.FileExists(virtualPath, qs)) return p;
+                if (p.VppExposeFile(path) && p.FileExists(path, qs)) return p;
             }
             return null;
         }
@@ -51,10 +63,11 @@ namespace ImageResizer.Plugins
 
         public override VirtualFile GetFile(string virtualPath)
         {
-            var p = GetVIP(virtualPath);
+            var path = normalizeVirtualPath(virtualPath); //Because *sometimes* ASP.NET likes to send us app-relative paths, just for the heck of it.
+            var p = GetVIP(path);
             if (p != null)
             {
-                var f = p.GetFile(virtualPath, new NameValueCollection());
+                var f = p.GetFile(path, new NameValueCollection());
                 if (f != null) return new VirtualFileShim(f);
             }
             return Previous.GetFile(virtualPath);
@@ -70,10 +83,12 @@ namespace ImageResizer.Plugins
 
         public override string GetFileHash(string virtualPath, IEnumerable virtualPathDependencies)
         {
-            var p = GetVIP(virtualPath) as IVirtualImageProviderVppCaching;
+            var path = normalizeVirtualPath(virtualPath); //Because *sometimes* ASP.NET likes to send us app-relative paths, just for the heck of it.
+
+            var p = GetVIP(path) as IVirtualImageProviderVppCaching;
         
-            var hash = p != null ? p.VppGetFileHash(virtualPath, virtualPathDependencies) : null;
-            return hash ?? base.GetFileHash(virtualPath, virtualPathDependencies);
+            var hash = p != null ? p.VppGetFileHash(path, virtualPathDependencies) : null;
+            return hash ?? base.GetFileHash(path, virtualPathDependencies);
         }
 
         public override CacheDependency GetCacheDependency(
@@ -81,10 +96,11 @@ namespace ImageResizer.Plugins
           IEnumerable virtualPathDependencies,
           DateTime utcStart)
         {
-            var p = GetVIP(virtualPath);
+            var path = normalizeVirtualPath(virtualPath); //Because *sometimes* ASP.NET likes to send us app-relative paths, just for the heck of it.
+            var p = GetVIP(path);
             if (p is IVirtualImageProviderVppCaching){
                 var pc = p as IVirtualImageProviderVppCaching;
-                var dep = pc == null ? null : pc.VppGetCacheDependency(virtualPath, virtualPathDependencies, utcStart);
+                var dep = pc == null ? null : pc.VppGetCacheDependency(path, virtualPathDependencies, utcStart);
                 return dep ?? new EmptyCacheDependency();
             }else{
                 return Previous.GetCacheDependency(virtualPath, virtualPathDependencies, utcStart);

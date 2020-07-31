@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -320,7 +320,7 @@ namespace FreeImageAPI
         /// Loads a bitmap from an arbitrary source.
         /// </summary>
         /// <param name="fif">Type of the bitmap.</param>
-        /// <param name="io">A FreeImageIO structure with functionpointers to handle the source.</param>
+        /// <param name="io">A FreeImageIO structure with function pointers to handle the source.</param>
         /// <param name="handle">A handle to the source.</param>
         /// <param name="flags">Flags to enable or disable plugin-features.</param>
         /// <returns>Handle to a FreeImage bitmap.</returns>
@@ -328,7 +328,7 @@ namespace FreeImageAPI
         public static extern FIBITMAP LoadFromHandle(FREE_IMAGE_FORMAT fif, ref FreeImageIO io, fi_handle handle, FREE_IMAGE_LOAD_FLAGS flags);
 
         /// <summary>
-        /// Saves a previosly loaded FIBITMAP to a file.
+        /// Saves a previously loaded FIBITMAP to a file.
         /// </summary>
         /// <param name="fif">Type of the bitmap.</param>
         /// <param name="dib">Handle to a FreeImage bitmap.</param>
@@ -339,7 +339,7 @@ namespace FreeImageAPI
         public static extern bool Save(FREE_IMAGE_FORMAT fif, FIBITMAP dib, string filename, FREE_IMAGE_SAVE_FLAGS flags);
 
         /// <summary>
-        /// Saves a previosly loaded FIBITMAP to a file.
+        /// Saves a previously loaded FIBITMAP to a file.
         /// The filename supports UNICODE.
         /// </summary>
         /// <param name="fif">Type of the bitmap.</param>
@@ -355,7 +355,7 @@ namespace FreeImageAPI
         /// </summary>
         /// <param name="fif">Type of the bitmap.</param>
         /// <param name="dib">Handle to a FreeImage bitmap.</param>
-        /// <param name="io">A FreeImageIO structure with functionpointers to handle the source.</param>
+        /// <param name="io">A FreeImageIO structure with function pointers to handle the source.</param>
         /// <param name="handle">A handle to the source.</param>
         /// <param name="flags">Flags to enable or disable plugin-features.</param>
         /// <returns>Returns true on success, false on failure.</returns>
@@ -397,7 +397,7 @@ namespace FreeImageAPI
         public static extern FIBITMAP LoadFromMemory(FREE_IMAGE_FORMAT fif, FIMEMORY stream, FREE_IMAGE_LOAD_FLAGS flags);
 
         /// <summary>
-        /// Saves a previosly loaded FIBITMAP to a stream.
+        /// Saves a previously loaded FIBITMAP to a stream.
         /// </summary>
         /// <param name="fif">Type of the bitmap.</param>
         /// <param name="dib">Handle to a FreeImage bitmap.</param>
@@ -481,23 +481,23 @@ namespace FreeImageAPI
         /// <param name="proc_address">Pointer to the function that initialises the plugin.</param>
         /// <param name="format">A string describing the format of the plugin.</param>
         /// <param name="description">A string describing the plugin.</param>
-        /// <param name="extension">A string witha comma sperated list of extensions. f.e: "pl,pl2,pl4"</param>
+        /// <param name="extension">A string with a comma-separated list of extensions. f.e: "pl,pl2,pl4"</param>
         /// <param name="regexpr">A regular expression used to identify the bitmap.</param>
-        /// <returns>The format idientifier assigned by FreeImage.</returns>
+        /// <returns>The format identifier assigned by FreeImage.</returns>
         [DllImport(FreeImageLibrary, CharSet = CharSet.Ansi, EntryPoint = "FreeImage_RegisterLocalPlugin")]
         public static extern FREE_IMAGE_FORMAT RegisterLocalPlugin(InitProc proc_address,
             string format, string description, string extension, string regexpr);
 
         /// <summary>
         /// Registers a new plugin to be used in FreeImage. The plugin is residing in a DLL.
-        /// The Init function must be called �Init� and must use the stdcall calling convention.
+        /// The Init function must be called 'Init' and must use the stdcall calling convention.
         /// </summary>
-        /// <param name="path">Complete path to the dll file hosting the plugin.</param>
+        /// <param name="path">Complete path to the DLL file hosting the plugin.</param>
         /// <param name="format">A string describing the format of the plugin.</param>
         /// <param name="description">A string describing the plugin.</param>
-        /// <param name="extension">A string witha comma sperated list of extensions. f.e: "pl,pl2,pl4"</param>
+        /// <param name="extension">A string with a comma-separated list of extensions. f.e: "pl,pl2,pl4"</param>
         /// <param name="regexpr">A regular expression used to identify the bitmap.</param>
-        /// <returns>The format idientifier assigned by FreeImage.</returns>
+        /// <returns>The format identifier assigned by FreeImage.</returns>
         [DllImport(FreeImageLibrary, CharSet = CharSet.Ansi, EntryPoint = "FreeImage_RegisterExternalPlugin")]
         public static extern FREE_IMAGE_FORMAT RegisterExternalPlugin(string path,
             string format, string description, string extension, string regexpr);
@@ -803,7 +803,7 @@ namespace FreeImageAPI
         /// Uses the <see cref="FreeImageIO"/> structure as described in the topic bitmap management functions
         /// to identify a bitmap type.
         /// </summary>
-        /// <param name="io">A <see cref="FreeImageIO"/> structure with functionpointers to handle the source.</param>
+        /// <param name="io">A <see cref="FreeImageIO"/> structure with function pointers to handle the source.</param>
         /// <param name="handle">A handle to the source.</param>
         /// <param name="size">Size in bytes of the source.</param>
         /// <returns>Type of the bitmap.</returns>
@@ -826,7 +826,7 @@ namespace FreeImageAPI
         /// <summary>
         /// Returns whether the platform is using Little Endian.
         /// </summary>
-        /// <returns>Returns true if the platform is using Litte Endian, else false.</returns>
+        /// <returns>Returns true if the platform is using Little Endian, else false.</returns>
         [DllImport(FreeImageLibrary, EntryPoint = "FreeImage_IsLittleEndian")]
         public static extern bool IsLittleEndian();
 
@@ -874,7 +874,7 @@ namespace FreeImageAPI
         public static extern IntPtr GetScanLine(FIBITMAP dib, int scanline);
 
         /// <summary>
-        /// Get the pixel index of a palettized image at position (x, y), including range check (slow access).
+        /// Get the pixel index of a palletized image at position (x, y), including range check (slow access).
         /// </summary>
         /// <param name="dib">Handle to a FreeImage bitmap.</param>
         /// <param name="x">Pixel position in horizontal direction.</param>
@@ -896,7 +896,7 @@ namespace FreeImageAPI
         public static extern bool GetPixelColor(FIBITMAP dib, uint x, uint y, out RGBQUAD value);
 
         /// <summary>
-        /// Set the pixel index of a palettized image at position (x, y), including range check (slow access).
+        /// Set the pixel index of a palletized image at position (x, y), including range check (slow access).
         /// </summary>
         /// <param name="dib">Handle to a FreeImage bitmap.</param>
         /// <param name="x">Pixel position in horizontal direction.</param>
@@ -933,7 +933,7 @@ namespace FreeImageAPI
         /// Returns the number of colors used in a bitmap.
         /// </summary>
         /// <param name="dib">Handle to a FreeImage bitmap.</param>
-        /// <returns>Palette-size for palletised bitmaps, and 0 for high-colour bitmaps.</returns>
+        /// <returns>Palette-size for palletized bitmaps, and 0 for high-colour bitmaps.</returns>
         [DllImport(FreeImageLibrary, EntryPoint = "FreeImage_GetColorsUsed")]
         public static extern uint GetColorsUsed(FIBITMAP dib);
 
@@ -1030,7 +1030,7 @@ namespace FreeImageAPI
         /// Returns a pointer to the <see cref="BITMAPINFOHEADER"/> of the DIB-element in a FIBITMAP.
         /// </summary>
         /// <param name="dib">Handle to a FreeImage bitmap.</param>
-        /// <returns>Poiter to the header of the bitmap.</returns>
+        /// <returns>Pointer to the header of the bitmap.</returns>
         [DllImport(FreeImageLibrary, EntryPoint = "FreeImage_GetInfoHeader")]
         public static extern IntPtr GetInfoHeader(FIBITMAP dib);
 
@@ -1188,7 +1188,7 @@ namespace FreeImageAPI
 
         /// <summary>
         /// Returns the palette entry used as transparent color for the image specified.
-        /// Works for palletised images only and returns -1 for high color
+        /// Works for palletized images only and returns -1 for high color
         /// images or if the image has no color set to be transparent.
         /// </summary>
         /// <param name="dib">Handle to a FreeImage bitmap.</param>
@@ -1247,7 +1247,7 @@ namespace FreeImageAPI
         /// Converts a bitmap to 4 bits.
         /// If the bitmap was a high-color bitmap (16, 24 or 32-bit) or if it was a
         /// monochrome or greyscale bitmap (1 or 8-bit), the end result will be a
-        /// greyscale bitmap, otherwise (1-bit palletised bitmaps) it will be a palletised bitmap.
+        /// greyscale bitmap, otherwise (1-bit palletized bitmaps) it will be a palletized bitmap.
         /// </summary>
         /// <param name="dib">Handle to a FreeImage bitmap.</param>
         /// <returns>Handle to a FreeImage bitmap.</returns>
@@ -1257,7 +1257,7 @@ namespace FreeImageAPI
         /// <summary>
         /// Converts a bitmap to 8 bits. If the bitmap was a high-color bitmap (16, 24 or 32-bit)
         /// or if it was a monochrome or greyscale bitmap (1 or 4-bit), the end result will be a
-        /// greyscale bitmap, otherwise (1 or 4-bit palletised bitmaps) it will be a palletised bitmap.
+        /// greyscale bitmap, otherwise (1 or 4-bit palletized bitmaps) it will be a palletized bitmap.
         /// </summary>
         /// <param name="dib">Handle to a FreeImage bitmap.</param>
         /// <returns>Handle to a FreeImage bitmap.</returns>
@@ -1480,8 +1480,8 @@ namespace FreeImageAPI
         /// </summary>
         /// <param name="dib">Handle to a FreeImage bitmap.</param>
         /// <param name="tmo">The tone mapping operator to be used.</param>
-        /// <param name="first_param">Parmeter depending on the used algorithm</param>
-        /// <param name="second_param">Parmeter depending on the used algorithm</param>
+        /// <param name="first_param">Parameter depending on the used algorithm</param>
+        /// <param name="second_param">Parameter depending on the used algorithm</param>
         /// <returns>Handle to a FreeImage bitmap.</returns>
         [DllImport(FreeImageLibrary, EntryPoint = "FreeImage_ToneMapping")]
         public static extern FIBITMAP ToneMapping(FIBITMAP dib, FREE_IMAGE_TMO tmo, double first_param, double second_param);
@@ -1514,7 +1514,7 @@ namespace FreeImageAPI
         /// </summary>
         /// <param name="src">Handle to a FreeImage bitmap.</param>
         /// <param name="color_saturation">Color saturation (s parameter in the paper) in [0.4..0.6]</param>
-        /// <param name="attenuation">Atenuation factor (beta parameter in the paper) in [0.8..0.9]</param>
+        /// <param name="attenuation">Attenuation factor (beta parameter in the paper) in [0.8..0.9]</param>
         /// <returns>Handle to a FreeImage bitmap.</returns>
         [DllImport(FreeImageLibrary, EntryPoint = "FreeImage_TmoFattal02")]
         public static extern FIBITMAP TmoFattal02(FIBITMAP src, double color_saturation, double attenuation);
@@ -1914,7 +1914,7 @@ namespace FreeImageAPI
         /// </summary>
         /// <param name="dib">Handle to a FreeImage bitmap.</param>
         /// <param name="max_pixel_size">Thumbnail square size.</param>
-        /// <param name="convert">When true HDR images are transperantly converted to standard images.</param>
+        /// <param name="convert">When true HDR images are transparently converted to standard images.</param>
         /// <returns>Handle to a FreeImage bitmap.</returns>
         [DllImport(FreeImageLibrary, EntryPoint = "FreeImage_MakeThumbnail")]
         public static extern FIBITMAP MakeThumbnail(FIBITMAP dib, int max_pixel_size, bool convert);
@@ -2103,7 +2103,7 @@ namespace FreeImageAPI
 
         /// <summary>
         /// Applies the alpha value of each pixel to its color components.
-        /// The aplha value stays unchanged.
+        /// The alpha value stays unchanged.
         /// Only works with 32-bits color depth.
         /// </summary>
         /// <param name="dib">Handle to a FreeImage bitmap.</param>

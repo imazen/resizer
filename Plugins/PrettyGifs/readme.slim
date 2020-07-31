@@ -7,8 +7,13 @@ Aliases: /plugins/prettygifs
 
 
 h1 PrettyGifs plugin
+
 p Replaces .NET's disgusting default GIF encoding algorithm with Octree quantization and dithering, and allows 8-bit PNG creation. Compatible with all plugins.
 
+markdown: 
+  	**The `colors`, `dither`, and `preservePalette` querystring commands supported by this plugin are unlikely to be supported in Imageflow and future major ImageResizer releases.**
+	
+	We reserve the right to replace the quantization algorithm used here; **do not expect pixel-identical results between versions or products**. If you're not using this plugin, different versions of Windows will produce different results.
 
 - image_width = 600
 - image_thumb_width = 100
@@ -76,7 +81,7 @@ h2
     
 p A) On an informal test, it was 10x slower than the Octree algorithm on a 256x256 PNG. I.e, 1900ms vs 195ms. It also took 80MB of ram, while Octree took kilobytes.
 p
-  | B) It intrinsically requires 50MB ((32^4)x(6x8)=50,331,648 bytes) of ram per encode *just to store the histogram information for any size file*. This is an intrinsic limitation of
+  | B) It intrinsically requires 50MB ((32^4)x(6x8)=50,331,648 bytes) of ram per encode *just to store the histogram information for any size file*. This is an intrinsic limitation of 
   a href="http://www.ece.mcmaster.ca/~xwu/cq.c" Versus kilobytes for the Octree algorithm.
 p C) Only works for PNG files, it's designed for a multi-bit alpha channel. I could fix that, though.
 p D) The nQuant implementation also makes excessive copies of the image, making it scale poorly. For example, on a 1300x840 PNG, nuQuant took 18.8 seconds and 110-130MB of ram, while Octree took 0.3 seconds and 4-8MB of RAM. This is also fixable, I believe.
@@ -86,7 +91,7 @@ a href="http://members.ozemail.com.au/~dekker/NEUQUANT.HTML"
 p
   a id="note1"
     | [1]
-  | : Default GIF: .NET Default GIF behaviour simulated with the 216 color web pallette in Adobe Photoshop. Results may differ depending upon your operating system. Pre-2009 versions of windows use a fixed pallette, while WS2008R2 and later use a different (although still poor) quantization system. 
+  | : Default GIF: .NET Default GIF behaviour simulated with the 216 color web palette in Adobe Photoshop. Results may differ depending upon your operating system. Pre-2009 versions of windows use a fixed palette, while WS2008R2 and later use a different (although still poor) quantization system.
 p
   a id="note2"
     | [2]

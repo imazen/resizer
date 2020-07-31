@@ -4,12 +4,13 @@ Tagline: Automatically trims whitespace off an image using smart edge detection.
 Libs: twentytwenty
 Icon: cogs
 Aliases: /plugins/whitespacetrimmer
-
+Textclass: none
 
 
 h1 WhitespaceTrimmer plugin
-p 
-  | Trims whitespace (even smooth gradients) from around images automatically using edge detection filters. Requires Full Trust, uses unmanaged code.
+.markdown-body
+  p 
+    | Trims whitespace (even smooth gradients) from around images automatically using edge detection filters. The current version does not work well with existing transparency. 
 
 
 - image_width = 600
@@ -48,18 +49,18 @@ p
 
 - example_images.each do | img |
   img style="display:none;" src="#{img}?#{trimmed_query}"
+.markdown-body
+  markdown: 
 
-markdown: 
+    ## Usage
 
-  ## Usage
+    Add `&trim.threshold=80` to an image URL. You'll probably also want to restore a bit of padding with `&trim.percentpadding=0.5` since it's ugly to trim completely to the edge of the object.
+    
+    The threshold value can usually go all the way up to 255 without cutting off any part of the image. The percentpadding value can be anywhere between 0 and 50, but 0.5-2 is usually the best.
 
-  Add `&trim.threshold=80` to an image URL. You'll probably also want to restore a bit of padding with `&trim.percentpadding=0.5` since it's ugly to trim completely to the edge of the object.
-  
-  The threshold value can usually go all the way up to 255 without cutting off any part of the image. The percentpadding value can be anywhere between 0 and 50, but 0.5-2 is usually the best.
+    ## Installation
 
-  ## Installation
-
-  Either run  `Install-Package ImageResizer.Plugins.WhitespaceTrimmer` in the NuGet package manager, or:
-  
-  1. Add ImageResizer.Plugins.WhitespaceTrimmer.dll to your project. Make sure AForge.dll, AForge.Math.dll, and AForge.Imaging.dll are copied also, although they do not need to be referenced directly.
-  2.  Add `<add name="WhitespaceTrimmer" />` inside   `<resizer><plugins></plugins></resizer>` in Web.config.
+    Either run  `Install-Package ImageResizer.Plugins.WhitespaceTrimmer` in the NuGet package manager, or:
+    
+    1. Add ImageResizer.Plugins.WhitespaceTrimmer.dll to your project. Make sure AForge.dll, AForge.Math.dll, and AForge.Imaging.dll are copied also, although they do not need to be referenced directly.
+    2.  Add `<add name="WhitespaceTrimmer" />` inside   `<resizer><plugins></plugins></resizer>` in Web.config.

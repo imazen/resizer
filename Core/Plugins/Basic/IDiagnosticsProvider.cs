@@ -10,4 +10,22 @@ namespace ImageResizer.Plugins.Basic
     {
          string ProvideDiagnostics();
     }
+    public interface IDiagnosticsHeaderProvider
+    {
+        string ProvideDiagnosticsHeader();
+    }
+    public interface IDiagnosticsFooterProvider
+    {
+        string ProvideDiagnosticsFooter();
+    }
+
+    public interface ILicenseDiagnosticsProvider
+    {
+        string ProvidePublicText();
+    }
+
+    public interface IDiagnosticsProviderFactory
+    {
+        object GetDiagnosticsProvider();
+    }
 }

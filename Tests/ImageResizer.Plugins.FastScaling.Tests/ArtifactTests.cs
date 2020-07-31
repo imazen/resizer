@@ -88,12 +88,13 @@ namespace ImageResizer.Plugins.FastScaling.Tests
         [Fact]
         public void CheckForBlurredEdges()
         {
-            var  background = Color.FromArgb(255, 0, 5, 0);
+            var  background = Color.FromArgb(255, 0, 5, 40);
             var inner = Color.FromArgb(255, 240, 189, 35);
 
-            var b = CreateRingedBitmap(200, 86, background, inner, 6);
-
-            using (var result = BuildWithFastScaling(b, new Instructions() { Width = 50 }))
+            var b = CreateRingedBitmap(200, 86, background, inner, 12);
+            var i = new Instructions() { Width = 50 };
+            i["down.filter"] = "catrom";
+            using (var result = BuildWithFastScaling(b,i))
             {
                 AssertBorderColor(background, result);
             }
@@ -146,6 +147,33 @@ namespace ImageResizer.Plugins.FastScaling.Tests
             {
                 AssertBorderColor(border, result,toCheck);
                 AssertBorderColor(background, result, 3, 3, result.Width - 7, result.Height - 7, toCheck);
+            }
+        }
+
+
+        [Fact]
+        public void CheckForRoundingErrorsSimple()
+        {
+
+            var b = new Bitmap(200, 200);
+            var i = new Instructions("?maxwidth=100");
+            using (var result = BuildWithFastScaling(b, i))
+            {
+
+            }
+        }
+        [Theory]
+        [InlineData(1310,1041, "?maxwidth=1200&maxheight=1200&crop=80,77.33333,488.480,464&cropxunits=584&cropyunits=464")]
+        //[InlineData(255,197, "?crop=12,-2.842170943040401e-14,169.60000000000002,197&cropxunits=255&cropyunits=197&maxHeight=126&maxWidth=146")]
+        //[InlineData(256, 197, "?crop=12,-2.842170943040401e-14,169.60000000000002,197&cropxunits=255&cropyunits=197&maxHeight=126&maxWidth=146")]
+        public void CheckForRoundingErrors(int w, int h, string query)
+        {
+
+            var b = new Bitmap(w, h);
+            var i = new Instructions(query);
+            using (var result = BuildWithFastScaling(b, i))
+            {
+                
             }
         }
 
@@ -213,7 +241,7 @@ namespace ImageResizer.Plugins.FastScaling.Tests
                             error.Item2 < threshold.Item2 &&
                             error.Item3 < threshold.Item3 &&
                             error.Item4 < threshold.Item4,
-                            String.Format("Mismatch within region ({0},{1}) ({2},{3}). Root mean squared error ({4}) excceeds threshold {5}", x1, y1, x2, y2, error, threshold));
+                            String.Format("Mismatch within region ({0},{1}) ({2},{3}). Root mean squared error ({4}) exceeds threshold {5}", x1, y1, x2, y2, error, threshold));
             }
         }
 

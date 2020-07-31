@@ -30,7 +30,7 @@ namespace Imazen.Profiling
         public double DeltaSignificantPercent { get; set; }
 
         /// <summary>
-        /// When the delta for exclusive time (betwen min/max) exceeds this percent, show all runtimes.
+        /// When the delta for exclusive time (between min/max) exceeds this percent, show all runtimes.
         /// </summary>
         public double DeltaAbnormalPercent { get; set; }
 

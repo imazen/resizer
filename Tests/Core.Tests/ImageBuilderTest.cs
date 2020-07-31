@@ -203,7 +203,7 @@ namespace ImageResizer.Tests {
 
 
         [Theory]
-        [MemberData("Combine5", new[] { true, false }, new[] { true, false }, new[] { true, false }, new[] { true, false }, new[] { true, false })]
+        [MemberData("Combine5", new object[] { true, false }, new object[] { true, false }, new object[] { true, false }, new object[] { true, false }, new object[] { true, false })]
         public void TestSourceBitmapDisposed(bool dispose,
                                             bool useDestinationStream,
                                             bool useCorruptedSource,

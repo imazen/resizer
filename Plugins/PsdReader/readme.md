@@ -1,9 +1,13 @@
 Tags: plugin
 Aliases: /plugins/psd /plugins/psdr.. /plugins/psdreader
 Edition: elite
-Tagline: Adds support for PSD source files.
+Tagline: Adds support for PSD source files (reads embedded preview).
 
 # PsdReader plugin
+
+*PLEASE NOTE*
+* **Do not use with untrusted PSD files. This plugin has not undergone security testing.**
+
 
 Adds support for .PSD source files. No configuration required.
 
@@ -20,11 +24,11 @@ Either run `Install-Package ImageResizer.Plugins.PsdReader` in the NuGet package
 
 Simply reference a .psd file as you would a .jpg
 
-  image.psd?width=100
+    image.psd?width=100
 
-A 100px wide jpeg will be returned. 
+A 100px wide JPEG will be returned.
 
 You can also simply convert the image to another format.
 
-  image.psd?format=png
-  image.psd?format=jpg
+    image.psd?format=png
+    image.psd?format=jpg

@@ -44,7 +44,7 @@ namespace ImageResizer.Plugins.FFmpeg
         public Stream Result { get; set; }
 
         /// <summary>
-        /// If true, frames will be energy-anlayzed to verify they're not blank. 
+        /// If true, frames will be energy-analyzed to verify they're not blank.
         /// </summary>
         public bool? SkipBlankFrames { get; set; }
 

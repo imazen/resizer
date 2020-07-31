@@ -11,7 +11,7 @@
 		<iconUrl>$iconurl$</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 <description>
-Enables ImageResizer to access and process images from Azure. Supports Azure Storage Client 2.0. 
+Enables ImageResizer to access and process images from Azure. 
 
 Docs: http://imageresizing.net/plugins/azurereader2
 Support: http://imageresizing.net/support
@@ -26,7 +26,9 @@ $plugins$
 		<dependencies>
 		  <dependency id="ImageResizer" version="[$version$,)" />
 		  <dependency id="ImageResizer.Storage" version="[$version$,)" />
-		  <dependency id="WindowsAzure.Storage" version="[2,]" />
+		  <dependency id="WindowsAzure.Storage" version="[6.0,)" />
+    		  <dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="[3.1.0,4.0)" />
+     		 <dependency id="Newtonsoft.Json" version="[7.0.1,)"/>
 		</dependencies>
 	</metadata>
   	<files>

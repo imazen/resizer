@@ -10,10 +10,8 @@ Using ImageResizer in standalone mode and embedded mode is nearly identical - th
 
 ImageResizer.dll offers both Client and Server APIs. The server APIs are only enabled via Web.config. You can use ImageResizer.dll as a client in one app, and as the server in another. The REST API is human-writable, so the client API is quite optional.
 
-ImageResizer requires a .NET capable webserver like Windows+IIS, \*nix+apache+mono, or \*nix+ngix+mono. Image quality is poorer on *nix platforms due to Mono, so we suggest a separate Windows server instead. 
-
-If you're already using Windows, you can just set up a separate Application and Application Pool in IIS. We suggest using a subdomain, so you can reassign the subdomain to a cluster or CDN as your needs grow. 
+If you're already using Windows, you can just set up a separate Application and Application Pool in IIS. We suggest using a subdomain, so you can reassign the subdomain to a cluster or CDN as your needs grow. If your app is not hosted on Windows, you can install ImageResizer on a separate Windows server. 
 
 Any installation method can be used to set up a standalone server; this is the simplest installation scenario. 
 
-[Proceed to ImageResizer for IIS Administrators](/docs/v3/install/administrators).
+[Proceed to ImageResizer for IIS Administrators](/docs/v4/install/administrators).

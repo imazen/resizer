@@ -21,6 +21,8 @@ using ImageResizer.Plugins;
 using System.Globalization;
 using ImageResizer.ExtensionMethods;
 using System.Web.Hosting;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ImageResizer
 {
@@ -34,9 +36,15 @@ namespace ImageResizer
         /// Shouldn't be used except to make a factory instance.
         /// </summary>
         protected ImageBuilder() { }
+
+
+        public int? MaxConcurrentJobs { get; } = null;
+
+        private SemaphoreSlim semaphore;
+
         protected IEncoderProvider _encoderProvider = null;
         /// <summary>
-        /// Handles the encoder selection and provision proccess.
+        /// Handles the encoder selection and provision process.
         /// </summary>
         public IEncoderProvider EncoderProvider { get { return _encoderProvider; } }
 
@@ -77,6 +85,26 @@ namespace ImageResizer
         }
 
         /// <summary>
+        /// Create a new instance of ImageBuilder using the specified extensions, encoder provider, file provider, and settings filter. Extension methods will be fired in the order they exist in the collection.
+        /// </summary>
+        /// <param name="extensions"></param>
+        /// <param name="encoderProvider"></param>
+        /// <param name="settingsModifier"></param>
+        /// <param name="virtualFileProvider"></param>
+        public ImageBuilder(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider, IVirtualImageProvider virtualFileProvider, ISettingsModifier settingsModifier, int? maxConcurrentJobs)
+            : base(extensions)
+        {
+            this._encoderProvider = encoderProvider;
+            this._virtualFileProvider = virtualFileProvider;
+            this._settingsModifier = settingsModifier;
+            MaxConcurrentJobs = maxConcurrentJobs;
+            if (maxConcurrentJobs.HasValue && maxConcurrentJobs.Value > 0)
+            {
+                semaphore = new SemaphoreSlim(maxConcurrentJobs.Value);
+            }
+        }
+
+        /// <summary>
         /// Creates another instance of the class using the specified extensions. Subclasses should override this and point to their own constructor.
         /// </summary>
         /// <param name="extensions"></param>
@@ -92,13 +120,13 @@ namespace ImageResizer
         /// </summary>
         /// <returns></returns>
         public virtual ImageBuilder Copy(){
-            return new ImageBuilder(this.exts,this._encoderProvider, this._virtualFileProvider,this._settingsModifier);
+            return new ImageBuilder(this.exts,this._encoderProvider, this._virtualFileProvider,this._settingsModifier, MaxConcurrentJobs);
         }
 
 
 
         /// <summary>
-        /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag in a BitmapTag instance. The Bitmap.Tag.Path value may be a virtual, relative, UNC, windows, or unix path. 
+        /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag in a BitmapTag instance. The Bitmap.Tag.Path value may be a virtual, relative, UNC, Windows, or UNIX path.
         /// Does not dispose 'source' if it is a Stream or Image instance - that's the responsibility of the calling code.
         /// </summary>
         /// <param name="source">May  be an instance of string, VirtualFile, IVirtualFile IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.  If passed an Image instance, the image will be cloned, which will cause metadata, indexed state, and any additional frames to be lost. Accepts physical paths and application relative paths. (C:\... and ~/path) </param>
@@ -120,7 +148,7 @@ namespace ImageResizer
         }
 
         /// <summary>
-        /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag in a BitmapTag instance. The Bitmap.Tag.Path value may be a virtual, relative, UNC, windows, or unix path. 
+        /// Loads a Bitmap from the specified source. If a filename is available, it will be attached to bitmap.Tag in a BitmapTag instance. The Bitmap.Tag.Path value may be a virtual, relative, UNC, Windows, or UNIX path.
         /// Does not dispose 'source' if it is a Stream or Image instance - that's the responsibility of the calling code.
         /// </summary>
         /// <param name="source">May  be an instance of string, VirtualFile, IVirtualFile IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.  If passed an Image instance, the image will be cloned, which will cause metadata, indexed state, and any additional frames to be lost. Accepts physical paths and application relative paths. (C:\... and ~/path) </param>
@@ -165,7 +193,7 @@ namespace ImageResizer
                 try {
                     //First try DecodeStream
                     b = this.DecodeStream(s, settings, path);
-                    //Let the fallbacks work. (Only happens when a plugin overrides DecodeStream and retuns null)
+                    //Let the fallbacks work. (Only happens when a plugin overrides DecodeStream and returns null)
                     if (b == null) throw new ImageCorruptedException("Failed to decode image. Plugin made DecodeStream return null.", null);
                 } catch (Exception e) {
                     //if (Debugger.IsAttached) throw e;
@@ -228,7 +256,7 @@ namespace ImageResizer
         /// <summary>
         /// For plugin use only. 
         /// Returns a stream instance from the specified source object and settings object. 
-        /// To exend this method, override GetStream.
+        /// To extend this method, override GetStream.
         /// </summary>
         /// <param name="source">The physical or app-relative path, or a VirtualFile, IVirtualFile, Stream, HttpPostedFile, or HttpPostedFileBase instance.</param>
         /// <param name="settings">Querystring settings to pass to the VirtualFileProvider</param>
@@ -315,12 +343,12 @@ namespace ImageResizer
         /// Resizes and processes the specified source image and returns a bitmap of the result.
         /// Note! 
         /// This method assumes that transparency will be supported in the final output format, and therefore does not apply a matte color. Use &amp;bgcolor to specify a background color
-        /// if you use this method with a non-transparent format such as Jpeg.
+        /// if you use this method with a non-transparent format such as JPEG.
         /// If passed a source Stream, Bitmap, or Image instance, it will be disposed after use. Use disposeSource=False to disable that behavior. 
         /// </summary>
         /// <param name="source">May be an instance of string (a physical path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.</param>
         /// <param name="settings">Resizing and processing command to apply to the.</param>
-        [Obsolete("Use ImageJob with dest=typeof(Bitmap) instead - but only as a last resort. This method returns an umanaged, un-garbage collected object that can kill your server. Use Build(source,dest, instructions) instead of handing the Bitmap instance yourself.")]
+        [Obsolete("Use ImageJob with dest=typeof(Bitmap) instead - but only as a last resort. This method returns an unmanaged, non-garbage collected object that can kill your server. Use Build(source, dest, instructions) instead of handling the Bitmap instance yourself.")]
         public virtual Bitmap Build(object source, ResizeSettings settings) {
             return Build(source, settings, true);
         }
@@ -328,14 +356,14 @@ namespace ImageResizer
         /// Resizes and processes the specified source image and returns a bitmap of the result.
         /// Note! 
         /// This method assumes that transparency will be supported in the final output format, and therefore does not apply a matte color. Use &amp;bgcolor to specify a background color
-        /// if you use this method with a non-transparent format such as Jpeg.
+        /// if you use this method with a non-transparent format such as JPEG.
         /// 
         /// If passed a source Stream, Bitmap, or Image instance, it will not be disposed unless disposeSource=true.
         /// </summary>
         /// <param name="source">May be an instance of string (a physical path), VirtualFile, IVirtualBitmapFile, HttpPostedFile, Bitmap, Image, or Stream.</param>
         /// <param name="settings">Resizing and processing command to apply to the.</param>
         /// <param name="disposeSource">If false, 'source' will not be disposed. </param>
-        [Obsolete("Use ImageJob with dest=typeof(Bitmap) instead - but only as a last resort. This method returns an umanaged, un-garbage collected object that can kill your server. Use Build(source,dest) instead of handing the Bitmap instance yourself.")]
+        [Obsolete("Use ImageJob with dest=typeof(Bitmap) instead - but only as a last resort. This method returns an unmanaged, non-garbage collected object that can kill your server. Use Build(source, dest) instead of handling the Bitmap instance yourself.")]
         public virtual Bitmap Build(object source, ResizeSettings settings, bool disposeSource) {
             ImageJob j = new ImageJob(source, typeof(Bitmap), settings, disposeSource, false);
             Build(j);
@@ -397,31 +425,96 @@ namespace ImageResizer
         }
         #endregion
 
+        internal async Task<ImageJob> BuildAsync(ImageJob job, int maxQueuingMilliseconds, CancellationToken cancel)
+        {
+            if (semaphore != null)
+            {
+                if (await semaphore.WaitAsync(maxQueuingMilliseconds, cancel))
+                {
+                    try
+                    {
+                        return await Task.Factory.StartNew(() => BuildInternal(job),
+                                                    cancel,
+                                                    TaskCreationOptions.None,
+                                                    TaskScheduler.FromCurrentSynchronizationContext());
+                    }
+                    finally{
+                        semaphore.Release();
+                    }
+                }
+                else
+                {
+                    throw new ImageProcessingException("Job timed out waiting in queue (max {MaxConcurrentJobs} concurrent jobs, max {maxQueuingMilliscones}ms queue wait time).");
+                }
+            } else
+            {
+                return await Task.Factory.StartNew(() => BuildInternal(job),
+                                                    cancel,
+                                                    TaskCreationOptions.None,
+                                                    TaskScheduler.FromCurrentSynchronizationContext());
+            }
+        }
         /// <summary>
         /// The most flexible method for processing an image
         /// </summary>
         /// <param name="job"></param>
         /// <returns></returns>
         public virtual ImageJob Build(ImageJob job) {
-            if (job == null) throw new ArgumentNullException("job", "ImageJob parameter null. Cannot Build a null ImageJob instance");
+            return BuildInQueue(job, true, int.MaxValue, CancellationToken.None);
+        }
 
+        internal ImageJob BuildInQueue(ImageJob job, bool useSemaphore, int maxQueuingMilliseconds, CancellationToken cancel)
+        {
+            if (useSemaphore && semaphore != null)
+            {
+                if (!semaphore.Wait(maxQueuingMilliseconds, cancel)){
+                    throw new ImageProcessingException("Job timed out waiting in queue (max {MaxConcurrentJobs} concurrent jobs, max {maxQueuingMilliscones}ms queue wait time).");
+                }
+                else
+                {
+                    try
+                    {
+                        return BuildInternal(job);
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                }
+            }
+            else
+            {
+                return BuildInternal(job);
+            }
+        }
+
+        internal ImageJob BuildInternal(ImageJob job)
+        {
+            if (job == null) throw new ArgumentNullException("job", "ImageJob parameter null. Cannot Build a null ImageJob instance");
+            Stopwatch totalTicks = Stopwatch.StartNew();
             //Clone and filter settings FIRST, before calling plugins.
             ResizeSettings s = job.Settings == null ? new ResizeSettings() : new ResizeSettings(job.Settings);
             if (SettingsModifier != null) s = SettingsModifier.Modify(s);
             job.Settings = s;
 
-            try {
-                //Allow everything else to be overriden
+            try
+            {
+                //Allow everything else to be overridden
                 if (BuildJob(job) != RequestedAction.Cancel) throw new ImageProcessingException("Nobody did the job");
                 EndBuildJob(job);
+                totalTicks.Stop();
+                job.TotalTicks = totalTicks.ElapsedTicks;
+                (SettingsModifier as IPipelineConfig)?.FireHeartbeat();
+                Configuration.Performance.GlobalPerf.Singleton.JobComplete(this, job);
                 return job;
-            } finally {
+            }
+            finally
+            {
                 //Follow the dispose requests
                 if (job.DisposeSourceObject && job.Source is IDisposable && job.Source != null) ((IDisposable)job.Source).Dispose();
                 if (job.DisposeDestinationStream && job.Dest is IDisposable && job.Dest != null) ((IDisposable)job.Dest).Dispose();
             }
         }
-
 
 
         protected override RequestedAction BuildJob(ImageJob job) {
@@ -432,7 +525,10 @@ namespace ImageResizer
                 ResizeSettings s = job.Settings;
 
                 //Load image
+                var decodeTime = Stopwatch.StartNew();
                 b = LoadImage(job.Source, s, job.ResetSourceStream);
+                decodeTime.Stop();
+                job.DecodeTicks = decodeTime.ElapsedTicks;
 
                 //Save source path info
                 job.SourcePathData = (b != null && b.Tag != null && b.Tag is BitmapTag) ? ((BitmapTag)b.Tag).Path : job.SourcePathData;
@@ -440,7 +536,7 @@ namespace ImageResizer
                 job.ResultInfo["source.width"] = b.Width;
                 job.ResultInfo["source.height"] = b.Height;
 
-                //Calucalte the appropriate file extension and mime type
+                //Calculate the appropriate file extension and mime type
                 if (job.Dest != typeof(Bitmap)){
                     IEncoder e = this.EncoderProvider.GetEncoder(s, b);
                     if (e != null)
@@ -509,10 +605,10 @@ namespace ImageResizer
                 Stream underlyingStream = null;
                 if (b != null && b.Tag != null && b.Tag is BitmapTag) underlyingStream = ((BitmapTag)b.Tag).Source;
 
-                //Close the source bitamp's underlying stream unless it is the same stream (EDIT: or bitmap) we were passed.
+                //Close the source bitmap's underlying stream unless it is the same stream (EDIT: or bitmap) we were passed.
                 var closeUnderlyingStream = (b != job.Source && underlyingStream != job.Source && underlyingStream != null);
 
-                //Dispose the bitmap unless we were passed it. We check for 'null' in case an ImageCorruptedException occured. 
+                //Dispose the bitmap unless we were passed it. We check for 'null' in case an ImageCorruptedException occurred.
                 if (b != null && b != job.Source) b.Dispose();
 
                 //Dispose the underlying stream after disposing the bitmap
@@ -538,7 +634,10 @@ namespace ImageResizer
             {//Determines output format, includes code for saving in a variety of formats.
                 //Save to stream
                 BeforeEncode(job);
+                var s = Stopwatch.StartNew();
                 e.Write(b, dest);
+                s.Stop();
+                job.EncodeTicks = s.ElapsedTicks;
             }
             return RequestedAction.None;
         }
@@ -572,7 +671,7 @@ namespace ImageResizer
 
         /// <summary>
         /// Processes an ImageState instance. Used by Build, GetFinalSize, and TranslatePoint. 
-        /// Can be overriden by a plugin with the OnProcess method
+        /// Can be overridden by a plugin with the OnProcess method
         /// </summary>
         /// <param name="s"></param>
         public virtual void Process(ImageState s){
@@ -689,9 +788,44 @@ namespace ImageResizer
             return RequestedAction.None;
         }
 
-       
 
-  
+
+        protected override RequestedAction PostDecodeStream(ref Bitmap b, ResizeSettings settings)
+        {
+
+            bool autorotate = settings.Get<bool>("autorotate", settings.Get<bool>("autorotate.default", false));
+
+            if (!autorotate) return RequestedAction.None;
+
+            int propertyId = 0x0112;
+            PropertyItem pi;
+            try
+            {
+                pi = b.GetPropertyItem(propertyId);
+            }
+            catch (ArgumentException)
+            {
+                return RequestedAction.None;
+            }
+            if (pi == null) return RequestedAction.None;
+
+            int total = 0;
+
+            foreach (byte by in pi.Value) total += by; //Does not handle values larger than 255, but it doesn't need to, and is endian-agnostic.
+
+            if (total == 8) b.RotateFlip(RotateFlipType.Rotate270FlipNone);
+            if (total == 3) b.RotateFlip(RotateFlipType.Rotate180FlipNone);
+            if (total == 6) b.RotateFlip(RotateFlipType.Rotate90FlipNone);
+
+            if (total == 2) b.RotateFlip(RotateFlipType.RotateNoneFlipX);
+            if (total == 4) b.RotateFlip(RotateFlipType.Rotate180FlipX);
+            if (total == 5) b.RotateFlip(RotateFlipType.Rotate270FlipY);
+            if (total == 7) b.RotateFlip(RotateFlipType.Rotate90FlipY);
+
+            b.RemovePropertyItem(propertyId);
+
+            return RequestedAction.None;
+        }
 
         protected override RequestedAction LayoutPadding(ImageState s) {
             if (base.LayoutPadding(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
@@ -760,7 +894,7 @@ namespace ImageResizer
         }
 
         /// <summary>
-        /// Creates a bitmap of s.destSize dimensions, intializes a graphics object for it, and configures all the default settings.
+        /// Creates a bitmap of s.destSize dimensions, initializes a graphics object for it, and configures all the default settings.
         /// </summary>
         /// <param name="s"></param>
         protected override RequestedAction  PrepareDestinationBitmap(ImageState s)
@@ -776,11 +910,15 @@ namespace ImageResizer
             //Create graphics handle
             Graphics g = s.destGraphics = Graphics.FromImage(s.destBitmap);
 
-            //High quality everthing
+            //Use the highest quality downsampling filter GDI+ offers. It's like cubic b=0, c=1
             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+            //Vector quality
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
-            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+            //Do math to the center of pixels to reduce edge errors
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+            //Blend alpha with gamma awareness
+            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.GammaCorrected;
+            //Composite instead of copy
             g.CompositingMode = CompositingMode.SourceOver;
             return RequestedAction.None;
         }
@@ -877,8 +1015,21 @@ namespace ImageResizer
                 ia.SetWrapMode(WrapMode.TileFlipXY);
             
                 if (colorMatrix != null) ia.SetColorMatrix(new ColorMatrix(colorMatrix));
+
+                bool parallel_to_canvas = targetArea[0].X == targetArea[1].X || targetArea[0].Y == targetArea[1].Y;
+
+                if (source.PixelFormat == PixelFormat.Format24bppRgb &&
+                    parallel_to_canvas && colorMatrix==null)
+                {
+                    //If it starts out 24-bit, doesn't have a color matrix, and only has parallel edges
+                    //... then compositing isn't in play.
+                    state.destGraphics.CompositingQuality = CompositingQuality.AssumeLinear;
+                    state.destGraphics.CompositingMode = CompositingMode.SourceCopy;
+                }
                 state.destGraphics.DrawImage(source, targetArea, sourceArea, GraphicsUnit.Pixel, ia);
-            
+                state.destGraphics.CompositingQuality = CompositingQuality.GammaCorrected;
+                state.destGraphics.CompositingMode = CompositingMode.SourceOver;
+
             }
             return RequestedAction.Cancel;
         }
@@ -1000,184 +1151,17 @@ namespace ImageResizer
         protected override RequestedAction LayoutImage(ImageState s) {
             if (base.LayoutImage(s) == RequestedAction.Cancel) return RequestedAction.Cancel; //Call extensions
 
-            if (s.copyRect.IsEmpty) {
-                //Use the crop size if present.
-                s.copyRect = new RectangleF(new PointF(0, 0), s.originalSize);
-                if (s.settings.GetList<double>("crop", 0, 4) != null) {
-                    s.copyRect = PolygonMath.ToRectangle(s.settings.getCustomCropSourceRect(s.originalSize)); //Round the custom crop rectangle coordinates
-                    if (s.copyRect.Size.IsEmpty) throw new Exception("You must specify a custom crop rectange if crop=custom");
-                }
-            }
-            //Save the manual crop size.
-            SizeF manualCropSize = s.copySize;
-            RectangleF manualCropRect = s.copyRect;
-
-            FitMode fit = s.settings.Mode;
-            //Determine fit mode to use if both vertical and horizontal limits are used.
-            if (fit == FitMode.None){
-                if (s.settings.Width != -1 || s.settings.Height != -1){
-
-                    if ("fill".Equals(s.settings["stretch"], StringComparison.OrdinalIgnoreCase)) fit = FitMode.Stretch;
-                    else if ("auto".Equals(s.settings["crop"], StringComparison.OrdinalIgnoreCase)) fit = FitMode.Crop;
-                    else if (!string.IsNullOrEmpty(s.settings["carve"]) 
-                        && !"false".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase)
-                        && !"none".Equals(s.settings["carve"], StringComparison.OrdinalIgnoreCase)) fit = FitMode.Carve;
-                    else fit = FitMode.Pad;
-                }else{
-                    fit = FitMode.Max;
-                }
-
-            }
-            
-
-
-
-            //Aspect ratio of the image
-            double imageRatio = s.copySize.Width / s.copySize.Height;
-
-            //Zoom factor
-            double zoom = s.settings.Get<double>("zoom", 1);
-
-            //The target size for the image 
-            SizeF targetSize = new SizeF(-1, -1);
-            //Target area for the image
-            SizeF areaSize = new SizeF(-1, -1);
-            //If any dimensions are specified, calculate. Otherwise, use original image dimensions
-            if (s.settings.Width != -1 || s.settings.Height != -1 || s.settings.MaxHeight != -1 || s.settings.MaxWidth != -1) {
-                //A dimension was specified. 
-                //We first calculate the largest size the image can be under the width/height/maxwidth/maxheight restrictions.
-                //- pretending stretch=fill and scale=both
-
-                //Temp vars - results stored in targetSize and areaSize
-                double width = s.settings.Width;
-                double height = s.settings.Height;
-                double maxwidth = s.settings.MaxWidth;
-                double maxheight = s.settings.MaxHeight;
-
-                //Eliminate cases where both a value and a max value are specified: use the smaller value for the width/height 
-                if (maxwidth > 0 && width > 0) {   width = Math.Min(maxwidth, width);    maxwidth = -1;  }
-                if (maxheight > 0 && height > 0) { height = Math.Min(maxheight, height); maxheight = -1; }
-
-                //Handle cases of width/maxheight and height/maxwidth as in legacy versions. 
-                if (width != -1 && maxheight != -1) maxheight = Math.Min(maxheight, (width / imageRatio));
-                if (height != -1 && maxwidth != -1) maxwidth = Math.Min(maxwidth, (height * imageRatio));
-
-
-                //Move max values to width/height. FitMode should already reflect the mode we are using, and we've already resolved mixed modes above.
-                width = Math.Max(width, maxwidth);
-                height = Math.Max(height, maxheight);
-
-                //Calculate missing value (a missing value is handled the same everywhere). 
-                if (width > 0 && height <= 0) height = width/ imageRatio;
-                else if (height > 0 && width <= 0) width = height * imageRatio;
-
-                //We now have width & height, our target size. It will only be a different aspect ratio from the image if both 'width' and 'height' are specified.
-
-                //FitMode.Max
-                if (fit == FitMode.Max) {
-                    areaSize = targetSize = PolygonMath.ScaleInside(manualCropSize, new SizeF((float)width, (float)height));
-                //FitMode.Pad
-                } else if (fit == FitMode.Pad) {
-                    areaSize = new SizeF((float)width, (float)height);
-                    targetSize = PolygonMath.ScaleInside(manualCropSize, areaSize);
-                //FitMode.crop
-                } else if (fit == FitMode.Crop) {
-                    //We autocrop - so both target and area match the requested size
-                    areaSize = targetSize = new SizeF((float)width, (float)height);
-                    RectangleF copyRect;
-                    
-                    ScaleMode scale = s.settings.Scale;
-                    bool cropWidthSmaller = manualCropSize.Width <= (float)width;
-                    bool cropHeightSmaller = manualCropSize.Height <= (float)height;
-
-                    // With both DownscaleOnly (where only one dimension is smaller than
-                    // requested) and UpscaleCanvas, we will have a targetSize based on the
-                    // minWidth & minHeight.
-                    // TODO: what happens if mode=crop;scale=down but the target is larger than the source?
-                    if ((scale == ScaleMode.DownscaleOnly && (cropWidthSmaller != cropHeightSmaller)) ||
-                        (scale == ScaleMode.UpscaleCanvas))
-                    {
-                        var minWidth = Math.Min(manualCropSize.Width, (float)width);
-                        var minHeight = Math.Min(manualCropSize.Height, (float)height);
-
-                        targetSize = new SizeF(minWidth, minHeight);
-                        copyRect = manualCropRect = new RectangleF(0, 0, minWidth, minHeight);
-
-                        // For DownscaleOnly, the areaSize is adjusted to the new targetSize as well.
-                        if (scale == ScaleMode.DownscaleOnly)
-                        {
-                            areaSize = targetSize;
-                        }
-                    }
-                    else
-                    {
-                        //Determine the size of the area we are copying
-                        Size sourceSize = PolygonMath.RoundPoints(PolygonMath.ScaleInside(areaSize, manualCropSize));
-                        //Center the portion we are copying within the manualCropSize
-                        copyRect = new RectangleF(0, 0, sourceSize.Width, sourceSize.Height);
-                    }
-
-                    // Align the actual source-copy rectangle inside the available
-                    // space based on the anchor.
-                    s.copyRect = PolygonMath.ToRectangle(PolygonMath.AlignWith(copyRect, s.copyRect, s.settings.Anchor));
-
-                } else { //Stretch and carve both act like stretching, so do that:
-                    areaSize = targetSize = new SizeF((float)width, (float)height);
-                }
-
-
-            }else{
-                //No dimensions specified, no fit mode needed. Use manual crop dimensions
-                areaSize = targetSize = manualCropSize; 
-            }
-
-            //Multiply both areaSize and targetSize by zoom. 
-            areaSize.Width *= (float)zoom;
-            areaSize.Height *= (float)zoom;
-            targetSize.Width *= (float)zoom;
-            targetSize.Height *= (float)zoom;
-            
-            //Todo: automatic crop is permitted to break the scaling rules. Fix!!
-
-            //Now do upscale/downscale checks. If they take effect, set targetSize to imageSize
-            if (s.settings.Scale == ScaleMode.DownscaleOnly) {
-                if (PolygonMath.FitsInside(manualCropSize, targetSize)) {
-                    //The image is smaller or equal to its target polygon. Use original image coordinates instead.
-                    areaSize = targetSize = manualCropSize;
-                    s.copyRect = manualCropRect;
-                }
-            } else if (s.settings.Scale == ScaleMode.UpscaleOnly) {
-                if (!PolygonMath.FitsInside(manualCropSize, targetSize)) {
-                    //The image is larger than its target. Use original image coordintes instead
-                    areaSize = targetSize = manualCropSize;
-                    s.copyRect = manualCropRect;
-                }
-            } else if (s.settings.Scale == ScaleMode.UpscaleCanvas) {
-                //Same as downscaleonly, except areaSize isn't changed.
-                if (PolygonMath.FitsInside(manualCropSize, targetSize)) {
-                    //The image is smaller or equal to its target polygon. 
-                    
-                    //Use manual copy rect/size instead.
-
-                    targetSize = manualCropSize;
-                    s.copyRect = manualCropRect;
-                }
-            }
-
-
-            //May 12: require max dimension and round values to minimize rounding differences later.
-            areaSize.Width = Math.Max(1, (float)Math.Round(areaSize.Width));
-            areaSize.Height = Math.Max(1, (float)Math.Round(areaSize.Height));
-            targetSize.Width = Math.Max(1, (float)Math.Round(targetSize.Width));
-            targetSize.Height = Math.Max(1, (float)Math.Round(targetSize.Height));
-            
+            var ile = new ImageLayoutEngine(s.originalSize, s.copyRect);
+            ile.ApplySettings(s.settings);
+            s.copyRect = ile.CopyFrom;
+            s.ValidateCropping();
 
             //Translate and scale all existing rings
-            s.layout.Shift(s.copyRect, new RectangleF(new Point(0, 0), targetSize));
+            s.layout.Shift(s.copyRect, new RectangleF(new Point(0, 0), ile.CopyToSize));
 
-            s.layout.AddRing("image", PolygonMath.ToPoly(new RectangleF(new PointF(0, 0), targetSize)));
+            s.layout.AddRing("image", PolygonMath.ToPoly(new RectangleF(new PointF(0, 0), ile.CopyToSize)));
 
-            s.layout.AddRing("imageArea",PolygonMath.ToPoly(new RectangleF(new PointF(0, 0), areaSize)));
+            s.layout.AddRing("imageArea",PolygonMath.ToPoly(new RectangleF(new PointF(0, 0), ile.CanvasSize)));
 
             //Center imageArea around 'image'
             s.layout["imageArea"] = PolygonMath.AlignWith(s.layout["imageArea"], s.layout["image"], s.settings.Anchor);
@@ -1214,8 +1198,8 @@ namespace ImageResizer
                 "crop", "page", "bgcolor",
                 "rotate", "flip", "sourceFlip", "sFlip", "sRotate", "borderWidth",
                 "borderColor", "paddingWidth", "paddingColor",
-                "ignoreicc", "frame", "useresizingpipeline", 
-                "cache", "process", "margin", "anchor","dpi", "zoom"};
+                 "frame", "useresizingpipeline", 
+                "cache", "process", "margin", "dpi", "zoom", "autorotate"};
 
         /// <summary>
         /// Returns a list of the querystring commands ImageBuilder can parse by default. Plugins can implement IQuerystringPlugin to add new ones.

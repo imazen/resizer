@@ -22,6 +22,7 @@ using System.Web.Hosting;
 using System.Web.Security;
 using ImageResizer.ExtensionMethods;
 using System.Globalization;
+﻿using System.Threading;
 
 namespace ImageResizer
 {
@@ -61,110 +62,72 @@ namespace ImageResizer
         {
             //Skip requests if the Request object isn't populated
             HttpApplication app = sender as HttpApplication;
-            if (app == null) return;
-            if (app.Context == null) return;
-            if (app.Context.Request == null) return;
-
-            conf.FirePostAuthorizeRequest(this, app.Context);
+            if (app == null || app.Context == null || app.Context.Request == null) return;
 
 
+            var ra = new HttpModuleRequestAssistant(app.Context, conf, this);
 
-            //Allow handlers of the above event to change filePath/pathinfo so we can successfull test the extension
-            string originalPath = conf.PreRewritePath;
+            var result = ra.PostAuthorize();
 
-            //Trim fake extensions so IsAcceptedImageType will work properly
-            string filePath = conf.TrimFakeExtensions(originalPath);
-
-
-            //Is this an image request? Checks the file extension for .jpg, .png, .tiff, etc.
-            if (conf.SkipFileTypeCheck || conf.IsAcceptedImageType(filePath))
+            if (result == HttpModuleRequestAssistant.PostAuthorizeResult.UnrelatedFileType)
             {
-                //Copy the querystring so we can mod it to death without messing up other stuff.
-                NameValueCollection q = conf.ModifiedQueryString;
+                return; //Exit early, not our scene
+            }
 
-                //Call URL rewriting events
-                UrlEventArgs ue = new UrlEventArgs(filePath, q);
-                conf.FireRewritingEvents(this, app.Context, ue);
+            if (result == HttpModuleRequestAssistant.PostAuthorizeResult.AccessDenied403)
+            {
+                ra.FireAccessDenied();
+                throw new ImageProcessingException(403, "Access denied", "Access denied");
+            }
 
-                //Pull data back out of event object, resolving app-relative paths
-                string virtualPath = PathUtils.ResolveAppRelativeAssumeAppRelative(ue.VirtualPath);
-                q = ue.QueryString;
+            if (result == HttpModuleRequestAssistant.PostAuthorizeResult.Complete)
+            {
 
-                //Store the modified querystring in request for use by VirtualPathProviders
-                conf.ModifiedQueryString = q; // app.Context.Items["modifiedQueryString"] = q;
-
-                //See if resizing is wanted (i.e. one of the querystring commands is present).
-                //Called after processPath so processPath can add them if needed.
-                //Checks for thumnail, format, width, height, maxwidth, maxheight and a lot more
-                if (conf.HasPipelineDirective(q) || conf.AuthorizeAllImages)
+                //Does the file exist physically? (false if VppUsage=always or file is missing)
+                bool existsPhysically = (conf.VppUsage != VppUsageOption.Always);
+                if (existsPhysically)
                 {
-                    //Who's the user
-                    IPrincipal user = app.Context.User as IPrincipal;
-
-                    // no user (must be anonymous...).. Or authentication doesn't work for this suffix. Whatever, just avoid a nullref in the UrlAuthorizationModule
-                    if (user == null)
-                        user = new GenericPrincipal(new GenericIdentity(string.Empty, string.Empty), new string[0]);
-
-                    //Do we have permission to call UrlAuthorizationModule.CheckUrlAccessForPrincipal?
-                    bool canCheckUrl = System.Security.SecurityManager.IsGranted(new System.Security.Permissions.SecurityPermission(System.Security.Permissions.PermissionState.Unrestricted));
-
-
-                    //Run the rewritten path past the auth system again, using the result as the default "AllowAccess" value
-                    bool isAllowed = true;
-                    if (canCheckUrl && !app.Context.SkipAuthorization) try
-                        {
-                            isAllowed = UrlAuthorizationModule.CheckUrlAccessForPrincipal(virtualPath, user, "GET");
-                        }
-                        catch (NotImplementedException) { } //For MONO support
-
-
-                    IUrlAuthorizationEventArgs authEvent = new UrlAuthorizationEventArgs(virtualPath, new NameValueCollection(q), isAllowed);
-
-                    //Allow user code to deny access, but not modify the url or querystring.
-                    conf.FireAuthorizeImage(this, app.Context, authEvent);
-
-                    if (!authEvent.AllowAccess) throw new ImageProcessingException(403, "Access denied", "Access denied");
+                    existsPhysically = File.Exists(ra.RewrittenMappedPath);
                 }
 
-                if (conf.HasPipelineDirective(q))
+                //If not present physically (and VppUsage!=never), try to get the virtual file. Null indicates a missing file
+                IVirtualFileAsync vf = null;
+
+                if (conf.VppUsage != VppUsageOption.Never && !existsPhysically)
                 {
-                    
-                    //Does the file exist physically? (false if VppUsage=always or file is missing)
-                    bool existsPhysically = (conf.VppUsage != VppUsageOption.Always);
-                    if (existsPhysically){
-                        existsPhysically = File.Exists(HostingEnvironment.MapPath(virtualPath));
-                   }
-
-                    //If not present physically (and VppUsage!=never), try to get the virtual file. Null indicates a missing file
-                    IVirtualFileAsync vf = null;
-                    
-                    if (conf.VppUsage != VppUsageOption.Never && !existsPhysically){
-                        vf = await conf.GetFileAsync(virtualPath,q);
-                    }
-                    
-                    //Only process files that exist
-                    if (existsPhysically || vf != null)
-                    {
-                        try
-                        {
-                            await HandleRequest(app.Context, virtualPath, q, vf);
-                            //Catch not found exceptions
-                        }
-                        catch (System.IO.FileNotFoundException notFound)
-                        { //Some VPPs are optimisitic , or could be a race condition
-                            FileMissing(app.Context, virtualPath, q);
-                            throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
-                        }
-                        catch (System.IO.DirectoryNotFoundException notFound)
-                        {
-                            FileMissing(app.Context, virtualPath, q);
-                            throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
-                        }
-                    }
-                    else
-                        FileMissing(app.Context, virtualPath, q);
-
+                    vf = await conf.GetFileAsync(ra.RewrittenVirtualPath, ra.RewrittenQuery);
                 }
+
+                //Only process files that exist
+                if (!existsPhysically  && vf == null){
+                    ra.FireMissing();
+                    return;
+                }
+
+                try
+                {
+                    await HandleRequest(app.Context, ra, vf);
+                    //Catch not found exceptions
+                    ra.FirePostAuthorizeSuccess();
+                }
+                catch (System.IO.FileNotFoundException notFound)
+                { //Some VPPs are optimistic, or could be a race condition
+                    if (notFound.Message.Contains(" assembly ")) throw; //If an assembly is missing, it should be a 500, not a 404
+                    ra.FireMissing();
+                    throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
+                }
+                catch (System.IO.DirectoryNotFoundException notFound)
+                {
+                    ra.FireMissing();
+                    throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
+                }
+                catch (Exception ex)
+                {
+                    ra.FirePostAuthorizeRequestException(ex);
+                    throw;
+                }
+
+
             }
         }
 
@@ -175,92 +138,54 @@ namespace ImageResizer
         /// Called during PostAuthorizeRequest
         /// </summary>
         /// <param name="context"></param>
-        /// <param name="virtualPath"></param>
-        /// <param name="queryString"></param>
+        /// <param name="ra"></param>
         /// <param name="vf"></param>
-        protected virtual async Task HandleRequest(HttpContext context, string virtualPath, NameValueCollection queryString, IVirtualFileAsync vf)
+        protected virtual async Task HandleRequest(HttpContext context, HttpModuleRequestAssistant ra, IVirtualFileAsync vf)
         {
-            Stopwatch s = new Stopwatch();
-            s.Start();
 
-
-            ResizeSettings settings = new ResizeSettings(queryString);
-
-            bool isCaching = settings.Cache == ServerCacheMode.Always;
-            bool isProcessing = settings.Process == ProcessWhen.Always;
-
-            //By default, we process it if is both (a) a recognized image extension, and (b) has a resizing directive (not just 'cache').
-            if (settings.Process == ProcessWhen.Default)
+            if (!ra.CachingIndicated && !ra.ProcessingIndicated)
             {
-                //Check for resize directive by removing ('non-resizing' items from the current querystring) 
-                NameValueCollection copy = new NameValueCollection(queryString);
-                copy.Remove("cache"); copy.Remove("process"); copy.Remove("useresizingpipeline"); copy.Remove("404");
-                copy.Remove("404.filterMode"); copy.Remove("404.except");
-                //If the 'copy' still has directives, and it's an image request, then let's process it.
-                isProcessing = conf.IsAcceptedImageType(virtualPath) && conf.HasPipelineDirective(copy);
+                ra.ApplyRewrittenPath(); //This is needed for both physical and virtual files; only makes changes if needed.
+                if (vf != null)
+                {
+                    ra.AssignSFH(); //Virtual files are not served in .NET 4.
+                }
+                return;
             }
 
-            //By default, we only cache it if we're processing it. 
-            if (settings.Cache == ServerCacheMode.Default && isProcessing)
-                isCaching = true;
-
-            //Resolve the 'cache' setting to 'no' unless we want it cache.
-            if (!isCaching) settings.Cache = ServerCacheMode.No;
-
-
-            //If we are neither processing nor caching, don't do anything more with the request
-            if (!isProcessing && !isCaching) return;
-            context.Items[conf.ResponseArgsKey] = ""; //We are handling the requests
-
+            
             //Communicate to the MVC plugin this request should not be affected by the UrlRoutingModule.
             context.Items[conf.StopRoutingKey] = true;
+            context.Items[conf.ResponseArgsKey] = ""; //We are handling the request
 
 
-            IEncoder guessedEncoder = null;
-            //Only use an encoder to determine extension/mime-type when it's an image extension or when we've set process = always.
-            if (isProcessing)
-            {
-                guessedEncoder = conf.GetImageBuilder().EncoderProvider.GetEncoder(settings, virtualPath);
-                if (guessedEncoder == null) throw new ImageProcessingException("Image Resizer: No image encoder was found for the request.");
-            }
+            ra.EstimateResponseInfo();
 
-            //Determine the file extenson for the caching system to use if we aren't processing the image
-            //Use the exsiting one if is an image extension. If not, use "unknown". 
-            // We don't want to suggest writing .exe or .aspx files to the cache! 
-            string fallbackExtension = PathUtils.GetFullExtension(virtualPath).TrimStart('.');
-            if (!conf.IsAcceptedImageType(virtualPath)) fallbackExtension = "unknown";
 
-            //Determine the mime-type if we aren't processing the image.
-            string fallbackContentType = "application/octet-stream";
-            //Support jpeg, png, gif, bmp, tiff mime-types. Otherwise use "application/octet-stream". 
-            //We can't set it to null - it will default to text/html
-            System.Drawing.Imaging.ImageFormat recognizedExtension = DefaultEncoder.GetImageFormatFromExtension(fallbackExtension);
-            if (recognizedExtension != null) fallbackContentType = DefaultEncoder.GetContentTypeFromImageFormat(recognizedExtension);
 
 
             //Build CacheEventArgs
             var e = new AsyncResponsePlan();
-            e.RequestCachingKey = virtualPath + PathUtils.BuildQueryString(queryString);
-
-            //Add the modified date to the request key, if present.
-            var modDate = (vf == null) ? System.IO.File.GetLastWriteTimeUtc(HostingEnvironment.MapPath(virtualPath)) :
+            
+            var modDate = (vf == null) ? System.IO.File.GetLastWriteTimeUtc(ra.RewrittenMappedPath) :
                 (vf is IVirtualFileWithModifiedDateAsync ? await ((IVirtualFileWithModifiedDateAsync)vf).GetModifiedDateUTCAsync() : DateTime.MinValue);
 
-            if (modDate != DateTime.MinValue && modDate != DateTime.MaxValue)
-            {
-                e.RequestCachingKey += "|" + modDate.Ticks.ToString(NumberFormatInfo.InvariantInfo);
-            };
+            e.RequestCachingKey = ra.GenerateRequestCachingKey(modDate);
 
+            var settings = new ResizeSettings(ra.RewrittenInstructions);
 
             e.RewrittenQuerystring = settings;
-            e.EstimatedContentType = isProcessing ? guessedEncoder.MimeType : fallbackContentType;
-            e.EstimatedFileExtension = isProcessing ? guessedEncoder.Extension : fallbackExtension;
+            e.EstimatedContentType = ra.EstimatedContentType;
+            e.EstimatedFileExtension = ra.EstimatedFileExtension;
+
+
+
 
 
             //A delegate for accessing the source file
             e.OpenSourceStreamAsync = async delegate()
             {
-                return (vf != null) ? await vf.OpenAsync() : File.Open(HostingEnvironment.MapPath(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read);
+                return (vf != null) ? await vf.OpenAsync() : File.Open(ra.RewrittenMappedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
             };
 
             //Add delegate for writing the data stream
@@ -270,7 +195,7 @@ namespace ImageResizer
                 //than one thread at a time for the specified cache key
                 try
                 {
-                    if (!isProcessing)
+                    if (!ra.ProcessingIndicated)
                     {
                         //Just duplicate the data
                         using (Stream source = await e.OpenSourceStreamAsync())
@@ -278,47 +203,64 @@ namespace ImageResizer
 
                     }
                     else
-                    {   
-                        var j = new ImageJob();
-                        j.Instructions = new Instructions(settings);
-                        j.SourcePathData = vf != null ? vf.VirtualPath : virtualPath;
-
+                    {
                         MemoryStream inBuffer = null;
-                        MemoryStream outBuffer = new MemoryStream(32 * 1024);
-                        using(var sourceStream = vf != null ? await vf.OpenAsync() : File.Open(HostingEnvironment.MapPath(virtualPath), FileMode.Open, FileAccess.Read, FileShare.Read)){
+                        using (var sourceStream = vf != null ? await vf.OpenAsync() : File.Open(ra.RewrittenMappedPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        {
                             inBuffer = new MemoryStream(sourceStream.CanSeek ? (int)sourceStream.Length : 128 * 1024);
                             await sourceStream.CopyToAsync(inBuffer);
                         }
                         inBuffer.Seek(0, SeekOrigin.Begin);
 
-                        j.Source = inBuffer;
-                        j.Dest = outBuffer;
-                        
-                        await Task.Run( delegate(){ conf.GetImageBuilder().Build(j);});
-                        outBuffer.Seek(0,  SeekOrigin.Begin);
+                        var outBuffer = new MemoryStream(32 * 1024);
+
+                        //Handle I/O portions of work asynchronously. 
+                        var j = new ImageJob
+                        {
+                            Instructions = new Instructions(settings),
+                            SourcePathData = vf != null ? vf.VirtualPath : ra.RewrittenVirtualPath,
+                            Dest = outBuffer,
+                            Source = inBuffer
+                        };
+
+                        await conf.GetImageBuilder().BuildAsync(j, int.MaxValue, CancellationToken.None);
+
+                        outBuffer.Seek(0, SeekOrigin.Begin);
                         await outBuffer.CopyToAsync(stream);
                     }
+                    ra.FireJobSuccess();
                     //Catch not found exceptions
                 }
                 catch (System.IO.FileNotFoundException notFound)
                 {
+                    if (notFound.Message.Contains(" assembly ")) throw; //If an assembly is missing, it should be a 500, not a 404
+
                     //This will be called later, if at all. 
-                    FileMissing(context, virtualPath, queryString);
+                    ra.FireMissing();
                     throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
+
                 }
                 catch (System.IO.DirectoryNotFoundException notFound)
                 {
-                    FileMissing(context, virtualPath, queryString);
+                    ra.FireMissing();
                     throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
                 }
+                catch (Exception ex)
+                {
+                    ra.FireJobException(ex);
+                    throw;
+                }
             };
+
+
+
 
 
             //All bad from here down....
             context.Items[conf.ResponseArgsKey] = e; //store in context items
 
             //Fire events (for client-side caching plugins)
-            //conf.FirePreHandleImage(this, context, e);
+            conf.FirePreHandleImageAsync(this, context, e);
 
             //Pass the rest of the work off to the caching module. It will handle rewriting/redirecting and everything. 
             //We handle request headers based on what is found in context.Items
@@ -330,9 +272,6 @@ namespace ImageResizer
             await cache.ProcessAsync(context, e);
 
 
-
-            s.Stop();
-            context.Items["ResizingTime"] = s.ElapsedMilliseconds;
 
         }
 

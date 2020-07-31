@@ -22,6 +22,7 @@ namespace ImageResizer.ProviderTests {
     /// implemented by <see cref="MongoReaderPlugin"/>. Also The methods 
     /// implementations of <see cref="IVirtualFile"/>.
     /// </remarks>
+    [Trait("requiresmongo","true")]
     public class MongoReaderTest {
         /// <summary>
         /// A GUID that can be used to represent a file that does not exist.
@@ -413,8 +414,8 @@ namespace ImageResizer.ProviderTests {
                 var mongodb = Environment.GetEnvironmentVariable("resizer_test_mongo_db");
                 
                 settings["prefix"] = "/gridfs/";
-                if(mongodb == null)
-                    settings["connectionString"] = "mongodb://test:test@staff.mongohq.com:10040/resizer2";
+                if (mongodb == null)
+                    throw new Exception("The environment variable resizer_test_mongo_db was not defined");
                 else
                     settings["connectionString"] = mongodb;
 

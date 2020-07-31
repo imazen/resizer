@@ -17,7 +17,7 @@ namespace ImageResizer.Plugins.Basic {
     /// <summary>
     /// Causes IE6 and earlier to use GIF versions of PNG files. 
     /// By default, only fixes requests with ?iefix=true in the querystring. 
-    /// When catchall is enabled, it will filter all png images, unless iefix=false on those requests.
+    /// When catchall is enabled, it will filter all PNG images, unless iefix=false on those requests.
     /// Not compatible with CDNs or proxy servers, as they do not allow varying by user agent reliably.
     /// </summary>
     public class IEPngFix :IPlugin, IQuerystringPlugin {

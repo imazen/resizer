@@ -1,21 +1,20 @@
 Tags: plugin
 Bundle: free
-Edition: free
 Tagline: Allows logging through NLog
 Aliases: /plugins/logging
 
 
-# Logging plugin (v3.1+)
+# Logging plugin
 
 The Logging plugin allows the Image Resizer to perform logging (to disk, SQL, e-mail, whatever you configure).
 
 It is a wrapper for NLog, and as such, requires NLog.dll
 
+This plugin is not officially supported, as it relies on the process-wide NLog singleton, and very few of our users have been able to get NLog to work.
+
 ## Installation
 
-Either run `Install-Package ImageResizer.Plugins.Logging` in the NuGet package manager, or:
-
-1. Add ImageResizer.Plugins.Logging.dll to your project. NLog.dll is also needed, but doesn't have to be referenced directly - it should be automatically copied if you are using Visual Studio. If not, copy it to the /bin folder as well
+1. Add ImageResizer.Plugins.Logging.dll to your project or run `Install-Package ImageResizer.Plugins.Logging`. NLog.dll is also needed, but doesn't have to be referenced directly - it should be automatically copied if you are using Visual Studio. If not, copy it to the /bin folder as well
 2. Add `<add name="Logging" />` inside `<plugins></plugins>` in Web.config.
 
 

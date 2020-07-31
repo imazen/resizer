@@ -4,13 +4,15 @@ Edition: free
 Tagline: Automatically serve GIF versions of PNG files to IE6 and below clients. Opt-in or opt-out, very configurable.
 Aliases: /plugins/iepngfix
 
-# IEPngFix plugin (New in V3.1.3)
+# IEPngFix plugin (deprecated)
+
+*PLEASE NOTE*
+* **This plugin will be removed in a future major release, as there are no known users.**
+* **For forwards-compatibility with ImageResizer and Imageflow, avoid use.**
 
 This plugin automatically redirects PNG file requests from Internet Explorer 6 and below to GIF versions of the images. For best results, use with the PrettyGifs plugin, as the default .NET GIF encoding is very poor.
 
 Does not work well with Amazon CloudFront, CDNs, or caching proxies. 
-
-Introduced in V3.1.3
 
 ## Installation
 
@@ -31,7 +33,7 @@ If redirect="true" (the default), the requests from IE will be HTTP redirected t
 If false, the GIF will be silently served instead of the PNG, without any redirection.
 A CDN or caching proxy will mess things up regardless, but using redirection ensures that the CDN/proxy never caches the GIF version instead of the PNG.
 
-##Syntax
+## Syntax
 
 * When `catchAll=false`, the behavior is opt-in. You must add `&iefix=true` to enable the browser detection and redirection behavior for the URL.
 * When `catchAll=true`, the behavior is opt-out. You must add `&iefix=false` to disable the browser detection and redirection behavior for the URL.

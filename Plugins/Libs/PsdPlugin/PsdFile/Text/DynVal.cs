@@ -167,7 +167,7 @@ namespace PhotoshopFile
         }
 
         /// <summary>
-        /// A peculiar type of ascii string frequently used throughout the Descriptor data structure.
+        /// A peculiar type of ASCII string frequently used throughout the Descriptor data structure.
         /// First 4 bytes are length (in bytes), followed by string. If length is 0, length is assumed to be 4. No idea why they did this... RLE compression?
         /// </summary>
         /// <param name="r"></param>

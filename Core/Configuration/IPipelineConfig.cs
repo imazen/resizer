@@ -24,8 +24,9 @@ namespace ImageResizer.Configuration {
     public delegate void UrlEventHandler(IHttpModule sender, HttpContext context, IUrlEventArgs e);
     public delegate void UrlAuthorizationEventHandler(IHttpModule sender, HttpContext context, IUrlAuthorizationEventArgs e);
     public delegate void PreHandleImageEventHandler(IHttpModule sender, HttpContext context, IResponseArgs e);
+    public delegate void PreHandleImageAsyncEventHandler(IHttpModule sender, HttpContext context, IAsyncResponsePlan e);
     public delegate void CacheSelectionHandler(object sender, ICacheSelectionEventArgs e);
-
+    public delegate void HeartbeatHandler(IPipelineConfig sender, Config c);
 
     public interface IPipelineConfig:IVirtualImageProvider {
         /// <summary>
@@ -159,9 +160,11 @@ namespace ImageResizer.Configuration {
 
         void FirePreHandleImage(IHttpModule sender, System.Web.HttpContext context, IResponseArgs e);
 
+        void FirePreHandleImageAsync(IHttpModule sender, System.Web.HttpContext context, IAsyncResponsePlan e);
 
         void FireImageMissing(IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs urlEventArgs);
 
+        void FireHeartbeat();
 
         NameValueCollection ModifiedQueryString { get; set; }
 

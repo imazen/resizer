@@ -6,9 +6,11 @@ Aliases: /plugins/watermark
 
 # Watermark plugin
 
-The Watermark plugin in  v3.1+ is fully XML configurable, and supports named watermark configurations, multiple image and text layers, layer groups, and background (as well as overlay) layers. The positioning system is per-layer, permits flexible pixel and percent layout, anchoring, and container selection.
+The Watermark plugin in is fully XML configurable, and supports named watermark configurations, 
+multiple image and text layers, layer groups, and background (as well as overlay) layers. 
+The positioning system is per-layer, permits flexible pixel and percent layout, anchoring, and container selection.
 
-It is also binary compatible with the old (pre v3.1) plugin, so you can transition slowly.
+*Imageflow and future versions of ImageResizer are unlikely to support text layers. For best forwards compatibility, stick to image layers.*
 
 ## Installation
 
@@ -91,6 +93,8 @@ Like the old version, you can also specify watermark images by name, which will 
 
 ## TextLayer specific attributes
 
+**Imageflow and future versions of ImageResizer are unlikely to support text layers. For best forwards compatibility, avoid their use.**
+
 * **text** - The text to display. May contain querystring-specified values, referenced like this: "Hello #{name}" - `image.jpg?watermark=hi&name=Nathanael`.
 * **vertical** - True to display the text vertically. May also be achieved with Angle, but rendering may be slightly better.
 * **color** - A 3, 6, or 8-digit hex color reference, or a named color.
@@ -172,7 +176,7 @@ Here is an example Global.asax.cs file
         w.hideIfTooSmall = true;
         w.keepAspectRatio = true; //Maintains the aspect ratio of the watermark itself.
         w.valuesPercentages = false; //When true .bottomRightPadding, .topLeftPadding, and .watermarkSize are all percentages of the primary image size. Percentages are 0..1, not 0..100.
-        w.watermarkDir = "~/watermarks/"; //Where the watermark plugin looks for the image specifed in the querystring ?watermark=file.png
+        w.watermarkDir = "~/watermarks/"; //Where the watermark plugin looks for the image specified in the querystring ?watermark=file.png
         w.bottomRightPadding = new System.Drawing.SizeF(20, 20); //Padding between the bottom and right edges of the watermark and the primary image
         w.topLeftPadding = new System.Drawing.SizeF(20, 20); //Padding between the top  and left edges of the watermark and the primary image
         w.watermarkSize = new System.Drawing.SizeF(30, 30); //The desired size of the watermark, maximum dimensions (aspect ratio maintained if keepAspectRatio = true)

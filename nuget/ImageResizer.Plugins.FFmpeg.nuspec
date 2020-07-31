@@ -23,6 +23,8 @@ $plugins$</description>
 		<tags>ImageResizer FFmpeg video Imazen Resizer imaging</tags>
 		<dependencies>
 		  <dependency id="ImageResizer" version="[$version$,)" />
+		  <dependency id="AForge" version="[2.2.5,)" />
+		  <dependency id="AForge.Imaging" version="[2.2.5,)" />
 		</dependencies>
 	</metadata>
   	<files>

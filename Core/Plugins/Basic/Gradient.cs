@@ -12,19 +12,29 @@ using ImageResizer.Util;
 using System.IO;
 using System.Drawing.Imaging;
 using ImageResizer.ExtensionMethods;
+using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins.Basic {
     /// <summary>
     /// Allows gradients to be dynamically generated like so:
     /// /gradient.png?color1=white&amp;color2=black&amp;angle=40&amp;width=20&amp;height=100
     /// </summary>
-    public class Gradient: IPlugin, IQuerystringPlugin, IVirtualImageProvider {
+    public class Gradient: IPlugin, IQuerystringPlugin, IVirtualImageProvider, IVirtualImageProviderAsync {
         public bool FileExists(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
             return (virtualPath.EndsWith("/gradient.png", StringComparison.OrdinalIgnoreCase));
         }
 
         public IVirtualFile GetFile(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) {
             return new GradientVirtualFile(queryString);
+        }
+        public Task<bool> FileExistsAsync(string virtualPath, NameValueCollection queryString)
+        {
+            return Task.FromResult(FileExists(virtualPath, queryString));
+        }
+
+        public Task<IVirtualFileAsync> GetFileAsync(string virtualPath, NameValueCollection queryString)
+        {
+            return Task.FromResult <IVirtualFileAsync>(new GradientVirtualFile(queryString));
         }
 
         public IEnumerable<string> GetSupportedQuerystringKeys() {
@@ -42,7 +52,7 @@ namespace ImageResizer.Plugins.Basic {
         }
 
 
-        public class GradientVirtualFile : IVirtualFile, IVirtualBitmapFile, IVirtualFileSourceCacheKey {
+        public class GradientVirtualFile : IVirtualFile, IVirtualBitmapFile, IVirtualFileSourceCacheKey, IVirtualFileAsync {
             public GradientVirtualFile(NameValueCollection query) { this.query = new ResizeSettings(query); }
             public string VirtualPath {
                 get { return "gradient.png"; }
@@ -58,6 +68,11 @@ namespace ImageResizer.Plugins.Basic {
                 ms.Seek(0, SeekOrigin.Begin);
                 return ms;
             }
+            public Task<Stream> OpenAsync()
+            {
+                return Task.FromResult<Stream>(Open());
+            }
+
 
             public System.Drawing.Bitmap GetBitmap() {
                 Bitmap b = null;
@@ -83,6 +98,10 @@ namespace ImageResizer.Plugins.Basic {
             public string GetCacheKey(bool includeModifiedDate) {
                 return VirtualPath + PathUtils.BuildQueryString(query.Keep("width", "height", "w", "h", "maxwidth", "maxheight", "angle", "color1", "color2"));
             }
+
+
         }
+
+ 
     }
 }

@@ -145,27 +145,34 @@ namespace ImageResizer.Plugins.DiskCache {
                         {
 
                             result.Result = CacheQueryResult.Miss;
-                            //Still a miss, we even rechecked the filesystem. Write to memory.
-                            MemoryStream ms = new MemoryStream(4096);  //4K initial capacity is minimal, but this array will get copied around alot, better to underestimate.
+                            //Still a miss, we even rechecked the file system. Write to memory.
+                            MemoryStream ms = new MemoryStream(4096);  //4K initial capacity is minimal, but this array will get copied around a lot, better to underestimate.
                             //Read, resize, process, and encode the image. Lots of exceptions thrown here.
                             await writeCallback(ms);
                             ms.Position = 0;
 
                             AsyncWrite w = new AsyncWrite(CurrentWrites,ms, physicalPath, relativePath);
-                            if (CurrentWrites.Queue(w, delegate(AsyncWrite job) {
+                            if (CurrentWrites.QueueAsync(w, async delegate(AsyncWrite job) {
                                 try {
                                     Stopwatch swio = new Stopwatch();
                                     
                                     swio.Start();
                                     //We want this to run synchronously, since it's in a background thread already.
-                                    if (!TryWriteFile(null, job.PhysicalPath, job.Key, delegate(Stream s) { ((MemoryStream)job.GetReadonlyStream()).CopyToAsync(s); return Task.FromResult(true); }, timeoutMs, true).Result)
+                                    if (!await TryWriteFile(null, job.PhysicalPath, job.Key,
+                                            delegate (Stream s)
+                                            {
+                                                var fromStream = job.GetReadonlyStream();
+                                                return fromStream.CopyToAsync(s);
+                                            }, timeoutMs, true))
                                     {
                                         swio.Stop();
                                         //We failed to lock the file.
-                                        if (lp.Logger != null) 
-                                            lp.Logger.Warn("Failed to flush async write, timeout exceeded after {1}ms - {0}",  result.RelativePath, swio.ElapsedMilliseconds);
-                                        
-                                    } else {
+                                        if (lp.Logger != null)
+                                            lp.Logger.Warn("Failed to flush async write, timeout exceeded after {1}ms - {0}", result.RelativePath, swio.ElapsedMilliseconds);
+
+                                    }
+                                    else
+                                    {
                                         swio.Stop();
                                         if (lp.Logger != null)
                                             lp.Logger.Trace("{0}ms: Async write started {1}ms after enqueue for {2}", swio.ElapsedMilliseconds.ToString().PadLeft(4), DateTime.UtcNow.Subtract(w.JobCreatedAt).Subtract(swio.Elapsed).TotalMilliseconds, result.RelativePath);
@@ -252,7 +259,7 @@ namespace ImageResizer.Plugins.DiskCache {
                         // - (and hashmodified is true), then it's another process writing to the file, and we can serve the file afterwards
                         // - (and hashmodified is false), then it could either be an IIS read lock or another process writing to the file. Correct behavior is to kill the request here, as we can't guarantee accurate image data.
                         // I.e, hashmodified=true is the only supported setting for multi-process environments.
-                        //TODO: Catch UnathorizedAccessException and log issue about file permissions.
+                        //TODO: Catch UnauthorizedAccessException and log issue about file permissions.
                         //... If we can wait for a read handle for a specified timeout.
 
                         IOException locked_exception = null;
@@ -271,6 +278,10 @@ namespace ImageResizer.Plugins.DiskCache {
                                     await writeCallback(fs); //Can throw any number of exceptions.
                                     await fs.FlushAsync();
                                     fs.Flush(true);
+                                    if (fs.Position == 0)
+                                    {
+                                        throw new InvalidOperationException("Disk cache wrote zero bytes to file");
+                                    }
                                     finished = true;
                                 }
                             }

@@ -14,7 +14,7 @@ using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.CloudFront {
     /// <summary>
-    /// Allows querystrings to be expressed with '/' or ';' instead of '?', allow the querystring to survive the cloudfront guillotine. 
+    /// Allows querystrings to be expressed with '/' or ';' instead of '?', allow the querystring to survive the CloudFront guillotine.
     /// Since IIS can't stand ampersand symbols in the path, you have to replace both '?' and '&amp;' with ';'
     /// Later I hope to include control adapters to automate the process.
     /// </summary>
@@ -46,7 +46,7 @@ namespace ImageResizer.Plugins.CloudFront {
 
         void Pipeline_PostAuthorizeRequestStart(System.Web.IHttpModule sender, System.Web.HttpContext context) {
             if (redirectThrough != null && c.Pipeline.ModifiedQueryString.Count > 0) {
-                //It wasn't a cloudfront URL - it had a normal querystring
+                //It wasn't a CloudFront URL - it had a normal querystring
                 context.Items[c.Pipeline.ModifiedPathKey + ".hadquery"] = true;
             }
             //Transform semicolon querystrings into the normal collection

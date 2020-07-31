@@ -54,8 +54,8 @@ namespace ImageResizer.Plugins.SourceMemCache {
     }
 
     /// <summary>
-    /// Maintains a dictionary of keys to counters. Counters track how many events have occured during the last X minutes/seconds/ticks for the given item.
-    /// Can enforce size limits and cleanup empty counters on an inverval.
+    /// Maintains a dictionary of keys to counters. Counters track how many events have occurred during the last X minutes/seconds/ticks for the given item.
+    /// Can enforce size limits and cleanup empty counters on an interval.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     internal class EventCountingDictionary<T> {
@@ -81,7 +81,7 @@ namespace ImageResizer.Plugins.SourceMemCache {
 
         private TimeSpan _trackingDuration;
         /// <summary>
-        /// The duration for which to track events. For example, 5 minutes will keep a rolling value of how many events have occured in the last 5 minutes
+        /// The duration for which to track events. For example, 5 minutes will keep a rolling value of how many events have occurred in the last 5 minutes
         /// </summary>
         public TimeSpan TrackingDuration {
             get { return _trackingDuration; }
@@ -116,7 +116,7 @@ namespace ImageResizer.Plugins.SourceMemCache {
         /// </summary>
         private object sortLock = new object();
         /// <summary>
-        /// Lock to prevent concurrent cleanups from occuring
+        /// Lock to prevent concurrent cleanups from occurring
         /// </summary>
         private object cleanupLock = new object();
 
@@ -143,7 +143,7 @@ namespace ImageResizer.Plugins.SourceMemCache {
 
         private enum CleanupMode { MakeRoom, Maintenance }
         /// <summary>
-        /// Performs cleanup on the dictionaries in either MakeRoom or Maintenance mode. Returns true if the goal was achieved, false if the cleanup was canceled because another cleanup was executing conurrently.
+        /// Performs cleanup on the dictionaries in either MakeRoom or Maintenance mode. Returns true if the goal was achieved, false if the cleanup was canceled because another cleanup was executing concurrently.
         /// </summary>
         /// <param name="mode"></param>
         private bool Cleanup(CleanupMode mode) {
@@ -155,7 +155,7 @@ namespace ImageResizer.Plugins.SourceMemCache {
             //We have to weak lock method-level, because otherwise a background thread could be cleaning when GetOrAdd is called, and we could have a deadlock
             //With syncLock locked in GetOrAdd, waiting on cleanupLock, and Cleanup locked on cleanupLock, waiting on GetOrAdd.
             //If we didn't have any method-level lock, we'd waste resources with simultaneous cleanup runs.
-            //sortLock is redundant with cleanupLock, but remains in case I decide to pullt the method level lock
+            //sortLock is redundant with cleanupLock, but remains in case I decide to pull the method level lock
             if (!Monitor.TryEnter(cleanupLock)) return false; //Failed to lock, another thread is cleaning.
             try {
                 //In high precision, we lock the entire long-running process
@@ -165,7 +165,7 @@ namespace ImageResizer.Plugins.SourceMemCache {
                     //In fast mode, only lock for the copy and delete. We can sort outside after taking a snapshot. 
                     //We wont remove newly added ones, but thats ok. 
                     lock (syncLock) {
-                        if (mode == CleanupMode.MakeRoom && bytesUsed < byteCeiling) return true; //Nothing to do, there is stil room
+                        if (mode == CleanupMode.MakeRoom && bytesUsed < byteCeiling) return true; //Nothing to do, there is still room
                         counters = new EventCounter[countersToKeys.Count];
                         countersToKeys.Keys.CopyTo(counters, 0); //Clone 
                     }
@@ -175,7 +175,7 @@ namespace ImageResizer.Plugins.SourceMemCache {
                         for (int i = 0; i < counters.Length; i++) {
                             counters[i].sortValue = counters[i].GetValue();
                         }
-                        //Sort lowest counters to the top using quicksort
+                        //Sort lowest counters to the top using Quicksort
                         Array.Sort<EventCounter>(counters, delegate(EventCounter a, EventCounter b) {
                             return a.sortValue - b.sortValue;
                         });
@@ -189,7 +189,7 @@ namespace ImageResizer.Plugins.SourceMemCache {
                             EventCounter c = counters[i];
                             if (mode == CleanupMode.MakeRoom && removedBytes >= goal) return true; //Done, we hit our goal!
                             if (mode == CleanupMode.Maintenance && c.sortValue > 0) return true; //Done, We hit the end of the zeros
-                            if (mode == CleanupMode.Maintenance && c.GetValue() > 0) continue; //Skip counters that incremeted while we were working.
+                            if (mode == CleanupMode.Maintenance && c.GetValue() > 0) continue; //Skip counters that incremented while we were working.
                             //Look up key
                             T key;
                             countersToKeys.TryGetValue(c, out key);
@@ -303,7 +303,7 @@ namespace ImageResizer.Plugins.SourceMemCache {
 
         public void Increment(long ticks) {
             int index = (int)((ticks - started / ticksPer) % arraySize);
-            data[index]++; // Peformance > Precision
+            data[index]++; // Performance > Precision
             //For Precision, use Interlocked.Increment(ref data[index]);
         }
         public void IncrementExact(long ticks) {
@@ -323,7 +323,7 @@ namespace ImageResizer.Plugins.SourceMemCache {
             return sum;
         }
         /// <summary>
-        /// Warning! Not synchronized or updated. Use must be externally synchromized and value set externally
+        /// Warning! Not synchronized or updated. Use must be externally synchronized and value set externally
         /// </summary>
         internal int sortValue;
     }

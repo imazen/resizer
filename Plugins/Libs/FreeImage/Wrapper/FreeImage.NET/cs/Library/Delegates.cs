@@ -9,7 +9,7 @@
 // Contributors:
 // - David Boland (davidboland@vodafone.ie)
 //
-// Main reference : MSDN Knowlede Base
+// Main reference : MSDN Knowledge Base
 //
 // This file is part of FreeImage 3
 //
@@ -46,8 +46,8 @@ namespace FreeImageAPI
     /// Delegate for capturing FreeImage error messages.
     /// </summary>
     /// <param name="fif">The format of the image.</param>
-    /// <param name="message">The errormessage.</param>
-    // DLL_API is missing in the definition of the callbackfuntion.
+    /// <param name="message">The error message.</param>
+    // DLL_API is missing in the definition of the callback funtion.
     [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi, ThrowOnUnmappableChar = false)]
     public delegate void OutputMessageFunction(FREE_IMAGE_FORMAT fif, string message);
 }
@@ -112,14 +112,14 @@ namespace FreeImageAPI.Plugins
     public delegate string DescriptionProc();
 
     /// <summary>
-    /// Delegate to a function that returns a comma seperated list
+    /// Delegate to a function that returns a comma separated list
     /// of file extensions the plugin can read or write.
     /// </summary>
     public delegate string ExtensionListProc();
 
     /// <summary>
     /// Delegate to a function that returns a regular expression that
-    /// can be used to idientify whether a file can be handled by the plugin.
+    /// can be used to identify whether a file can be handled by the plugin.
     /// </summary>
     public delegate string RegExprProc();
 
@@ -129,7 +129,7 @@ namespace FreeImageAPI.Plugins
     public delegate IntPtr OpenProc(ref FreeImageIO io, fi_handle handle, bool read);
 
     /// <summary>
-    /// Delegate to a function that closes a previosly opened file.
+    /// Delegate to a function that closes a previously opened file.
     /// </summary>
     public delegate void CloseProc(ref FreeImageIO io, fi_handle handle, IntPtr data);
 

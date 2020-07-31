@@ -1,17 +1,25 @@
 Tags: plugin
 Bundle: free
 Edition: free
-Tagline: Use the EXIF rotation data from the camera to auto-rotate your images.
+Tagline: Use the Exif rotation data from the camera to auto-rotate your images.
 Aliases: /plugins/autorotate
 
-# AutoRotate plugin (v3.1+)
+# Rotate images by Exif data
 
-Automatically rotates images based on the EXIF Orientation flag embedded by the camera. 
+Automatically rotate images based on the Exif Orientation flag embedded by the camera.
 
-## Installation
+## Enable autorotation for all images by default via Web.config
 
-1. Add `<add name="AutoRotate" />` to the `<plugins />` section.
+            <pipeline defaultCommands="autorotate.default=true" />
 
-## Syntax
 
-Add `&autorotate=true` to any image url.
+The default is "false"
+
+## Via URL 
+
+`&autorotate=false` or `&autorotate=true` will override the default. 
+
+
+### Historical note
+
+ImageResizer v4 has subsumed AutoRotate into the core; it is no longer a plugin. 

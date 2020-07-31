@@ -5,8 +5,6 @@ Bundle: free
 
 # Custom Overlay plugin
 
-New in V3.2
-
 This is an example plugin. It is useful as a starting point, but is not subject to the same standards of maintenance and backwards-compatibility that normal plugins are. It does not have a NuGet package or precompiled binaries.
 
 This plugin is for drawing image overlays using pre-determined x1,y1,x2,y2,x3,y3,x4,y4 coordinates that are relative to the base file's width and height. It supports any parallelogram, and can use any virtual path for loading the overlay image. 
@@ -24,6 +22,7 @@ See Samples\CustomOverlaySample for an example
 
 1. Add a project reference to Samples/CustomOverlayPlugin. You may want to copy it to your directory.
 2. In the plugins section, add the following
+
     `<add name="CustomOverlay" 
       provider="MyNamespace.MyOverlayProviderClass, MyAssembly" 
       arg1="value1" arg2="value2.." ignoreMissingFiles="false" />`
@@ -38,16 +37,18 @@ See Samples\CustomOverlaySample for an example
 
 1. Add a project reference to Samples/CustomOverlayPlugin. You may want to copy it to your directory.
 2. In the plugins section, add the following
-    <add name="CustomOverlay" 
+
+    `<add name="CustomOverlay" 
       provider="ImageResizer.Plugins.CustomOverlay.QuerystringOverlayProvider, ImageResizer.Plugins.CustomOverlay"
-      overlayFolder="~/images/overlays/" ignoreMissingFiles="false"  />
+      overlayFolder="~/images/overlays/" ignoreMissingFiles="false"  />`
 
 
 ## Installation using CachedOverlayProvider
 
 1. Add a project reference to Samples/CustomOverlayPlugin. You may want to copy it to your directory.
 2. In the plugins section, add the following
-    <add name="CustomOverlay" 
+
+    `<add name="CustomOverlay" 
       provider="ImageResizer.Plugins.CustomOverlay.CachedOverlayProvider, ImageResizer.Plugins.CustomOverlay" 
       connectionStringName="database" sqlDependencyName="dpdb" overlayBasePath="~/images/foldertooverlays"
       ignoreMissingFiles="false" />`
@@ -71,18 +72,18 @@ Second, you'll need to set up Web.config. Make sure you have a connection string
 Pay particular attention that the 'name' value below ("dpdb") matches the sqlDependencyName value from above, and that the connectionStringName matches the connectionStringName from above.
 
 
-  <connectionStrings>
-    <clear/>
-    <add name="database" 
-        connectionString="Data Source=REA_ANDREW-PC\SQLEXPRESSADV;Initial Catalog=Forum; 
-        Integrated Security=true;" providerName="System.Data.SqlClient"/>
-  </connectionStrings>
-  <system.web>
-    <caching>
-        <sqlCacheDependency pollTime="1000" enabled="true">
-        <databases>
-          <add connectionStringName="database" name="dpdb"/>
-        </databases>
-        </sqlCacheDependency>
-    </caching>
-  </system.web>
+    <connectionStrings>
+      <clear/>
+      <add name="database" 
+          connectionString="Data Source=REA_ANDREW-PC\SQLEXPRESSADV;Initial Catalog=Forum; 
+          Integrated Security=true;" providerName="System.Data.SqlClient"/>
+    </connectionStrings>
+    <system.web>
+      <caching>
+          <sqlCacheDependency pollTime="1000" enabled="true">
+          <databases>
+            <add connectionStringName="database" name="dpdb"/>
+          </databases>
+          </sqlCacheDependency>
+      </caching>
+    </system.web>

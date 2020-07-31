@@ -56,7 +56,7 @@ namespace ImageResizer.Plugins.FFmpeg
         }
 
         /// <summary>
-        /// Returns a virtual file instance for the specified specified file and querystring, if they indicate a PSD composition request. 
+        /// Returns a virtual file instance for the specified file and querystring, if they indicate a PSD composition request.
         /// Otherwise, null is returned.
         /// </summary>
         /// <param name="virtualPath"></param>

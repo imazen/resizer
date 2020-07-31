@@ -16,6 +16,8 @@ using ImageResizer.ExtensionMethods;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Azure;
+using System.Configuration;
+using System.Diagnostics;
 
 namespace ImageResizer.Plugins.AzureReader2 {
 
@@ -31,29 +33,23 @@ namespace ImageResizer.Plugins.AzureReader2 {
         public AzureReader2Plugin()
             : base()
         {
+            this.VirtualFilesystemPrefix = "~/azure";
 
         }
-        public AzureReader2Plugin(NameValueCollection args):base() {
+        public AzureReader2Plugin(NameValueCollection args):this() {
             LoadConfiguration(args);
             blobStorageConnection = args["connectionstring"];
             blobStorageEndpoint = args.GetAsString("blobstorageendpoint", args.GetAsString("endpoint",null));
-       }
+            RedirectToBlobIfUnmodified = args.Get<bool>("redirectToBlobIfUnmodified", true);
+
+        }
 
 
         protected Task<ICloudBlob> GetBlobRefAsync(string virtualPath)
         {
             string subPath = StripPrefix(virtualPath).Trim('/', '\\');
 
-            string containerName = subPath.TrimStart(new char[] { '/', '\\' });
-
-            //Split off the container name
-            //int keyStartsAt = containerName.IndexOf('/');
-            //if (keyStartsAt < 0) throw new InvalidOperationException(string.Format("No container found in the Azure blob path '{0}'",subPath));
-            //containerName = containerName.Substring(0, keyStartsAt);
-
-
             string relativeBlobURL = string.Format("{0}/{1}", CloudBlobClient.BaseUri.OriginalString.TrimEnd('/', '\\'), subPath);
-
 
             return CloudBlobClient.GetBlobReferenceFromServerAsync(new Uri(relativeBlobURL));
         }
@@ -88,13 +84,13 @@ namespace ImageResizer.Plugins.AzureReader2 {
 
         public override async Task<Stream> OpenAsync(string virtualPath, NameValueCollection queryString)
         {
-
+            var time = Stopwatch.StartNew();
             MemoryStream ms = new MemoryStream(4096); // 4kb is a good starting point.
 
             // Synchronously download
             try
             {
-                var cloudBlob = await GetBlobRefAsync(virtualPath);
+                var cloudBlob = await GetBlobRefAsync(virtualPath); //TODO: Skip a round trip and skip getting the blob reference.
                 await cloudBlob.DownloadToStreamAsync(ms);
             }
             catch (StorageException e)
@@ -108,6 +104,8 @@ namespace ImageResizer.Plugins.AzureReader2 {
             }
 
             ms.Seek(0, SeekOrigin.Begin); // Reset to beginning
+            time.Stop();
+            this.ReportReadTicks(time.ElapsedTicks, ms.Length);
             return ms;
         }
 
@@ -116,8 +114,13 @@ namespace ImageResizer.Plugins.AzureReader2 {
                 throw new InvalidOperationException("AzureReader2 requires a named connection string or a connection string to be specified with the 'connectionString' attribute.");
 
             // Setup the connection to Windows Azure Storage
-            //Lookup named connection string first, then fall back.
+            // for compatibility, look up the appSetting first.
             var connectionString = CloudConfigurationManager.GetSetting(blobStorageConnection);
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                connectionString = ConfigurationManager.ConnectionStrings[blobStorageConnection]?.ConnectionString;
+            }
+
             if (string.IsNullOrEmpty(connectionString)) { connectionString = blobStorageConnection; }
             
 
@@ -162,12 +165,13 @@ namespace ImageResizer.Plugins.AzureReader2 {
             string prefix = VirtualFilesystemPrefix;
 
             // Check if prefix is within virtual file system and if there is no querystring
-            if (RedirectToBlobIfUnmodified && Belongs(e.VirtualPath) && e.QueryString.Count == 0) {
+            if (RedirectToBlobIfUnmodified && Belongs(e.VirtualPath) && !c.Pipeline.HasPipelineDirective(e.QueryString)) {
 
                 // Strip prefix from virtual path; keep container and blob
                 string relativeBlobURL = e.VirtualPath.Substring(prefix.Length).TrimStart('/', '\\');
 
                 // Redirect to blob
+                //TODO: Add shared access signature if enabled
                 context.Response.Redirect(blobStorageEndpoint + relativeBlobURL);
             }
         }

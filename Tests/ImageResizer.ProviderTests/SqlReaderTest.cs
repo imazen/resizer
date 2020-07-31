@@ -44,7 +44,7 @@ namespace ImageResizer.ProviderTests {
         /// Initializes a new instance of the <see cref="SqlReaderTest"/> class.
         /// </summary>
         public SqlReaderTest() {
-            // In unit tests the DataDirecry path used by connection strings is
+            // In unit tests the DataDirectory path used by connection strings is
             // null. We set the path here to ensure that connection strings 
             // that use DataDirectory function as expected.
             AppDomain.CurrentDomain.SetData(
@@ -529,7 +529,7 @@ namespace ImageResizer.ProviderTests {
 
 
             if (Environment.GetEnvironmentVariable("APPVEYOR") == "True") {
-                p.ConnectionString = @"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;Database=Resizer;";
+                p.ConnectionString = @"Server=(local)\SQL2017;User ID=sa;Password=Password12!;Database=Resizer;";
             }
 
             return p;
@@ -592,7 +592,7 @@ namespace ImageResizer.ProviderTests {
         /// SQL Server as we do have sa privileges.
         /// </remarks>
         private void CreateDatabase() {
-            using (SqlConnection conn = new SqlConnection(@"Server=(local)\SQL2012SP1;User ID=sa;Password=Password12!;")) {
+            using (SqlConnection conn = new SqlConnection(@"Server=(local)\SQL2017;User ID=sa;Password=Password12!;")) {
                 conn.Open();
 
                 using (SqlCommand sc = new SqlCommand(

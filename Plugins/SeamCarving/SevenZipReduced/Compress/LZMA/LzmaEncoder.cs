@@ -19,7 +19,7 @@ namespace SevenZipReduced.Compression.LZMA
             BT4,
         };
 
-        const UInt32 kIfinityPrice = 0xFFFFFFF;
+        const UInt32 kInfinityPrice = 0xFFFFFFF;
 
         static Byte[] g_FastPos = new Byte[1 << 11];
 
@@ -644,7 +644,7 @@ namespace SevenZipReduced.Compression.LZMA
 
             UInt32 len = lenEnd;
             do
-                _optimum[len--].Price = kIfinityPrice;
+                _optimum[len--].Price = kInfinityPrice;
             while (len >= 2);
 
             for (i = 0; i < Base.kNumRepDistances; i++)
@@ -865,7 +865,7 @@ namespace SevenZipReduced.Compression.LZMA
                         {
                             UInt32 offset = cur + 1 + lenTest2;
                             while (lenEnd < offset)
-                                _optimum[++lenEnd].Price = kIfinityPrice;
+                                _optimum[++lenEnd].Price = kInfinityPrice;
                             UInt32 curAndLenPrice = nextRepMatchPrice + GetRepPrice(
                                 0, lenTest2, state2, posStateNext);
                             Optimal optimum = _optimum[offset];
@@ -892,7 +892,7 @@ namespace SevenZipReduced.Compression.LZMA
                     do
                     {
                         while (lenEnd < cur + lenTest)
-                            _optimum[++lenEnd].Price = kIfinityPrice;
+                            _optimum[++lenEnd].Price = kInfinityPrice;
                         UInt32 curAndLenPrice = repMatchPrice + GetRepPrice(repIndex, lenTest, state, posState);
                         Optimal optimum = _optimum[cur + lenTest];
                         if (curAndLenPrice < optimum.Price)
@@ -935,7 +935,7 @@ namespace SevenZipReduced.Compression.LZMA
                             {
                                 UInt32 offset = lenTest + 1 + lenTest2;
                                 while(lenEnd < cur + offset)
-                                    _optimum[++lenEnd].Price = kIfinityPrice;
+                                    _optimum[++lenEnd].Price = kInfinityPrice;
                                 UInt32 curAndLenPrice = nextRepMatchPrice + GetRepPrice(0, lenTest2, state2, posStateNext);
                                 Optimal optimum = _optimum[cur + offset];
                                 if (curAndLenPrice < optimum.Price) 
@@ -964,7 +964,7 @@ namespace SevenZipReduced.Compression.LZMA
                 {
                     normalMatchPrice = matchPrice + _isRep[state.Index].GetPrice0();
                     while (lenEnd < cur + newLen)
-                        _optimum[++lenEnd].Price = kIfinityPrice;
+                        _optimum[++lenEnd].Price = kInfinityPrice;
 
                     UInt32 offs = 0;
                     while (startLen > _matchDistances[offs])
@@ -1008,7 +1008,7 @@ namespace SevenZipReduced.Compression.LZMA
 
                                     UInt32 offset = lenTest + 1 + lenTest2;
                                     while (lenEnd < cur + offset)
-                                        _optimum[++lenEnd].Price = kIfinityPrice;
+                                        _optimum[++lenEnd].Price = kInfinityPrice;
                                     curAndLenPrice = nextRepMatchPrice + GetRepPrice(0, lenTest2, state2, posStateNext);
                                     optimum = _optimum[cur + offset];
                                     if (curAndLenPrice < optimum.Price)

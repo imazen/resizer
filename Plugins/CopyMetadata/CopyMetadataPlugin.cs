@@ -83,7 +83,7 @@ namespace ImageResizer.Plugins.CopyMetadata
                     list.Add(0x0101);   // PropertyTagImageHeight
                     list.Add(0x0102);   // PropertyTagBitsPerSample
                     list.Add(0x0103);   // PropertyTagCompression
-                    list.Add(0x0106);   // pixel composition (EXIF 2.2, not documented on MSDN)
+                    list.Add(0x0106);   // pixel composition (Exif 2.2, not documented on MSDN)
                     list.Add(0x0108);   // PropertyTagCellWidth
                     list.Add(0x0109);   // PropertyTagCellHeight
                     list.Add(0x010A);   // PropertyTagFillOrder

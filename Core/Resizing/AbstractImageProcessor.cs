@@ -29,9 +29,9 @@ namespace ImageResizer.Resizing {
     /// <summary>
     /// Not for external use. Inherit from BuilderExtension instead.
     /// Dual-purpose base class for both ImageBuilder and BuilderExtension
-    ///  Extensions can inherit and override certain methods.
+    /// Extensions can inherit and override certain methods.
     /// ImageBuilder inherits this method to utilize its extension invocation code. 
-    /// Each method of AbstractImageProcessor loops through all extensions and executes the same method on each. Provides a sort of multiple-inheritance mechanisim.
+    /// Each method of AbstractImageProcessor loops through all extensions and executes the same method on each. Provides a sort of multiple-inheritance mechanism.
     /// </summary>
     public class AbstractImageProcessor {
         /// <summary>

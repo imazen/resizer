@@ -1,24 +1,18 @@
 ﻿// This file is licensed CC0, and can be considered 'insignificant'
 // Apply whichever license you like
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System;
-using ImageResizer.Util;
+
 using System.Reflection;
+using ImageResizer.Util;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-#if TRIAL
-[assembly: BuildType("trial")]
-[assembly: AssemblyProduct("Image Resizer Plugin - requires license key")]
-#else
+
 [assembly: AssemblyProduct("Image Resizer")]
-#endif
 
 [assembly: AssemblyCompany("Imazen LLC")]
-[assembly: AssemblyCopyright("Copyright © 2015 Imazen LLC")]
+[assembly: AssemblyCopyright("Copyright © 2017 Imazen LLC")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -30,14 +24,10 @@ using System.Reflection;
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:/*
 [assembly: AssemblyVersion("4.0.0.0")]
-[assembly: AssemblyFileVersion("4.0.0.591")]
-[assembly: AssemblyInformationalVersion("4.0.0-prerelease.591")]
+[assembly: AssemblyFileVersion("4.2.5.0")]
+[assembly: AssemblyInformationalVersion("4.2.5")]
 
-[assembly: Commit("331d72ae9881981a0cce986083afee8b934f6eae")]
+[assembly: Commit("2c64c3100e64c944222e04388a6d44b2909d4115")]
 
 
-
-// These commented out settings are for the build script to access
-// [assembly: PackageName("Resizer")]
-// [assembly: NugetVersion("4.0.0-prerelease")]
-// [assembly: DownloadServer("http://downloads.imageresizing.net/")]
+[assembly: BuildDate("2017-05-05T12:13:13.1434691+00:00")]

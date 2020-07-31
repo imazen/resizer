@@ -37,7 +37,7 @@
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Trial|AnyCPU'">
-    <OutputPath>..\..\dlls\trial\</OutputPath>
+    <OutputPath>..\..\dlls\release\</OutputPath>
     <DefineConstants>TRACE;TRIAL</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -45,24 +45,46 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
-    <DocumentationFile>..\..\dlls\trial\ImageResizer.Plugins.DiskCache.XML</DocumentationFile>
+    <DocumentationFile>..\..\dlls\release\ImageResizer.Plugins.DiskCache.XML</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
-      <Link>SharedAssemblyInfo.cs</Link>
+      <Link>Shared\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\LicenseVerifier\LicenseService.cs">
-      <Link>LicenseService.cs</Link>
+    <Compile Include="..\LicenseVerifier\Computation.cs">
+      <Link>Shared\Computation.cs</Link>
     </Compile>
-    <Compile Include="..\LicenseVerifier\LicenseVerifier.cs">
-      <Link>LicenseVerifier.cs</Link>
+    <Compile Include="..\LicenseVerifier\DomainLookup.cs">
+      <Link>Shared\DomainLookup.cs</Link>
+    </Compile>
+    <Compile Include="..\LicenseVerifier\LicenseChain.cs">
+      <Link>Shared\LicenseChain.cs</Link>
+    </Compile>
+    <Compile Include="..\LicenseVerifier\LicenseEnforcerPlugin.cs">
+      <Link>Shared\LicenseEnforcerPlugin.cs</Link>
+    </Compile>
+    <Compile Include="..\LicenseVerifier\LicenseFetcher.cs">
+      <Link>Shared\LicenseFetcher.cs</Link>
+    </Compile>
+    <Compile Include="..\LicenseVerifier\LicenseManager.cs">
+      <Link>Shared\LicenseManager.cs</Link>
+    </Compile>
+    <Compile Include="..\LicenseVerifier\LicenseParsing.cs">
+      <Link>Shared\LicenseParsing.cs</Link>
+    </Compile>
+    <Compile Include="..\LicenseVerifier\LicensingOn.cs">
+      <Link>Shared\LicensingOn.cs</Link>
+    </Compile>
+    <Compile Include="..\LicenseVerifier\LicensingSupport.cs">
+      <Link>Shared\LicensingSupport.cs</Link>
     </Compile>
     <Compile Include="Async\AsyncWriteCollection.cs" />
     <Compile Include="Async\AsyncWrite.cs" />
@@ -103,6 +125,10 @@
     <Content Include="configuration.txt" />
     <Content Include="LastAccessedUtc.txt" />
     <Content Include="todo.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="readme.md" />
+    <None Include="Web.config.transform" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -3,7 +3,7 @@
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the GNU Affero General Public License, Version 3.0.
 // Commercial licenses available at http://imageresizing.net/
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using ImageResizer.Resizing;
@@ -23,13 +23,21 @@ using System.Runtime.InteropServices.ComTypes;
 using ImageResizer.Plugins.WicEncoder;
 using System.Globalization;
 using ImageResizer.ExtensionMethods;
+using System.Collections.Specialized;
 
 namespace ImageResizer.Plugins.WicBuilder {
 
     [Obsolete("This plugin uses Windows Imaging Components, which is buggy and closed-source; see FastScaling for a better alternative.")]
     public class WicBuilderPlugin : BuilderExtension, IPlugin, IIssueProvider, IFileExtensionPlugin {
 
-        public WicBuilderPlugin() {
+
+        public bool EnableHighQualityCubic { get; set; }
+        public WicBuilderPlugin()
+        {
+            EnableHighQualityCubic = false;
+        }
+        public WicBuilderPlugin(NameValueCollection args) {
+            EnableHighQualityCubic =  args.Get<bool>("enableHighQualityCubic", false);
         }
 
         Config c;
@@ -73,7 +81,7 @@ namespace ImageResizer.Plugins.WicBuilder {
                 if (job.ResetSourceStream) restoreStreamPosition = true;
                 job.SourcePathData = path;
 
-                //Save the original stream positione
+                //Save the original stream position
                 originalPosition = (restoreStreamPosition) ? s.Position : -1;
 
                 data = s.CopyOrReturnBuffer( out lData,false, 0x1000);
@@ -95,7 +103,7 @@ namespace ImageResizer.Plugins.WicBuilder {
         }
 
         /// <summary>
-        /// Decodes the image in byte[] data, performs the image proccessing, and encodes it to job.Dest
+        /// Decodes the image in byte[] data, performs the image processing, and encodes it to job.Dest
         /// </summary>
         /// <param name="data">The buffer containing the encoded image file</param>
         /// <param name="lData">The number of bytes to read</param>
@@ -142,16 +150,28 @@ namespace ImageResizer.Plugins.WicBuilder {
 
                 
 
-                WICBitmapInterpolationMode interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeFant;
+                WICBitmapInterpolationMode interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeHighQualityCubic;
                 if ("nearest".Equals(settings["w.filter"], StringComparison.OrdinalIgnoreCase)) interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeNearestNeighbor;
                 if ("bicubic".Equals(settings["w.filter"], StringComparison.OrdinalIgnoreCase)) interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeCubic;
                 if ("linear".Equals(settings["w.filter"], StringComparison.OrdinalIgnoreCase)) interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeLinear;
                 if ("nearestneighbor".Equals(settings["w.filter"], StringComparison.OrdinalIgnoreCase)) interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeLinear;
-                
+                if ("highqualitycubic".Equals(settings["w.filter"], StringComparison.OrdinalIgnoreCase)) interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeHighQualityCubic;
+
+                //Fall back to fant if EnableHighQualityCubic=false
+                if (!EnableHighQualityCubic && interpolationMode == WICBitmapInterpolationMode.WICBitmapInterpolationModeHighQualityCubic)
+                {
+                    interpolationMode = WICBitmapInterpolationMode.WICBitmapInterpolationModeFant;
+                }
+
                 //Find the original image size
                 uint origWidth, origHeight;
                 frame.GetSize(out origWidth,out origHeight);
                 Size orig = new Size((int)origWidth,(int)origHeight);
+
+            
+                job.ResultInfo["source.width"] = (int)origWidth;
+                job.ResultInfo["source.height"] = (int)origHeight;
+                
 
                 Guid pixelFormat;
                 frame.GetPixelFormat(out pixelFormat);
@@ -234,6 +254,8 @@ namespace ImageResizer.Plugins.WicBuilder {
             //Create the IStream/MemoryStream
             var outputStream = new MemoryIStream();
 
+            job.ResultInfo["final.width"] = imageSize.Width;
+            job.ResultInfo["final.height"] = imageSize.Height;
 
             encoder.EncodeToStream(factory, data, imageSize, outputStream);
 

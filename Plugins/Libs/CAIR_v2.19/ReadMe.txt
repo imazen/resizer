@@ -101,7 +101,7 @@ Depends on: CAIR_CML.h
 Types defined:
 -- CAIR_NUM_THREADS - The number of default threads that will be used for Grayscale, Edge, and Add/Remove operations.
 -- CAIR_direction - An enumeration for CAIR_Removal() with the values of AUTO,
-                    VERTICAL, and HORIZONTAL. AUTO lets CAIR_Remvoal() determine
+                    VERTICAL, and HORIZONTAL. AUTO lets CAIR_Removal() determine
                     the best direction to remove seams. VERTICAL and HORIZONTAL
                     force the function to remove from their respective directions.
 -- CAIR_convolution - An enumeration for all CAIR operations. It defines the available

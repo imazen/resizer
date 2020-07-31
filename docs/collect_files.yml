@@ -14,12 +14,10 @@ files:
 - from: Plugins/AnimatedGifs/readme.slim #slim
   to: plugins/animatedgifs.slim
   append: edition_info
-- from: Plugins/AzureReader/readme.md
-  to: plugins/azurereader.md
   append: edition_info
 - from: Plugins/AzureReader2/readme.md
   to: plugins/AzureReader2.md
-  append: edition_info
+  append: provider_info
 - from: Plugins/BatchZipper/readme.md
   to: plugins/batchzipper.md
   append: edition_info
@@ -46,7 +44,7 @@ files:
   append: edition_info
 - from: Plugins/MongoReader/readme.md
   to: plugins/mongoreader.md
-  append: edition_info
+  append: provider_info
 - from: Plugins/PrettyGifs/readme.slim #slim
   to: plugins/prettygifs.slim
   append: edition_info
@@ -62,12 +60,10 @@ files:
 - from: Plugins/RemoteReader/readme.md
   to: plugins/remotereader.md
   append: edition_info
-- from: Plugins/S3Reader/readme.md
-  to: plugins/s3reader.md
-  append: edition_info
+
 - from: Plugins/S3Reader2/readme.md
   to: plugins/s3reader2.md
-  append: edition_info
+  append: provider_info
 - from: Plugins/SeamCarving/readme.md
   to: plugins/seamcarving.md
   append: edition_info
@@ -76,7 +72,7 @@ files:
   append: edition_info
 - from: Plugins/SqlReader/readme.md
   to: plugins/sqlreader.md
-  append: edition_info
+  append: provider_info
 - from: Plugins/Watermark/readme.md
   to: plugins/watermark.md
   append: edition_info
@@ -95,13 +91,24 @@ files:
 - from: Plugins/Faces/croparound_readme.md
   to: plugins/croparound.md
   append: edition_info
+- from: Plugins/FastScaling/readme.md
+  to: plugins/fastscaling.md
+  append: edition_info
+- from: Plugins/TinyCache/readme.md
+  to: plugins/tinycache.md
+  append: edition_info
 
+- from: Plugins/ImageResizer.Storage/readme.md
+  to: plugins/blobprovider.md
+  append: provider_info
 #Plugin documentation from plugins in other folders
 
 - from: Contrib/PdfRenderer/pdfrenderer_readme.md
   to: plugins/pdfrenderer.md
   append: edition_info
-
+- from: Contrib/PdfiumRenderer/readme.md
+  to: plugins/pdfiumrenderer.md
+  append: edition_info
 - from: Samples/CustomOverlayPlugin/readme.md
   to: plugins/customoverlay.md
   append: edition_info
@@ -154,6 +161,8 @@ files:
   to: plugins/virtualfolder.md
   append: edition_info
 
+
+
 # This was in Core.Mvc, but moves to Core in v4.
 - from: Core/Plugins/Basic/mvcroutingshim_readme.md
   to: plugins/mvcroutingshim.md
@@ -173,6 +182,9 @@ files:
   to: plugins/edition_info.slim
   verbatim: true
 
+- from: docs/provider_info.slim
+  to: plugins/provider_info.slim
+  verbatim: true
 
 #Documentation from versioned readme file
 - from: readme.md

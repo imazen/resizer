@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins.DiskCache.Async {
     public class AsyncWriteCollection {
@@ -21,7 +22,7 @@ namespace ImageResizer.Plugins.DiskCache.Async {
         private Dictionary<string, AsyncWrite> c = new Dictionary<string, AsyncWrite>();
 
         /// <summary>
-        /// How many bytes of buffered file data to hold in memory before refusing futher queue requests and forcing them to be executed synchronously.
+        /// How many bytes of buffered file data to hold in memory before refusing further queue requests and forcing them to be executed synchronously.
         /// </summary>
         public long MaxQueueBytes { get; set; }
 
@@ -67,19 +68,55 @@ namespace ImageResizer.Plugins.DiskCache.Async {
         /// <param name="w"></param>
         /// <param name="writerDelegate"></param>
         /// <returns></returns>
-        public bool Queue(AsyncWrite w,WriterDelegate writerDelegate ){
-            lock (_sync) {
+        public bool Queue(AsyncWrite w, WriterDelegate writerDelegate)
+        {
+            lock (_sync)
+            {
                 if (GetQueuedBufferBytes() + w.GetBufferLength() > MaxQueueBytes) return false; //Because we would use too much ram.
                 if (c.ContainsKey(w.Key)) return false; //We already have a queued write for this data.
-                if (!ThreadPool.QueueUserWorkItem(delegate(object state){
+                c.Add(w.Key, w);
+                if (!ThreadPool.QueueUserWorkItem(delegate (object state) {
                     AsyncWrite job = state as AsyncWrite;
                     writerDelegate(job);
+                    Remove(job);
                 }, w)) return false; //thread pool refused
                 return true;
             }
         }
 
+        /// <summary>
+        /// A callback that will write the given AsyncWrite to disk synchronously
+        /// </summary>
+        /// <param name="w"></param>
+        /// <returns></returns>
         public delegate void WriterDelegate(AsyncWrite w);
+
+        /// <summary>
+        /// Returns false when (a) the specified AsyncWrite value already exists or (b) the queue is full
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="writerDelegate"></param>
+        /// <returns></returns>
+        public bool QueueAsync(AsyncWrite w, AsyncWriterDelegate writerDelegate ){
+            lock (_sync) {
+                if (GetQueuedBufferBytes() + w.GetBufferLength() > MaxQueueBytes) return false; //Because we would use too much ram.
+                if (c.ContainsKey(w.Key)) return false; //We already have a queued write for this data.
+                c.Add(w.Key, w);
+                Task.Run(
+                    async () => {
+                        await writerDelegate(w);
+                        Remove(w);
+                    }).ConfigureAwait(false);
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// A callback that will write the given AsyncWrite to disk in an async manner
+        /// </summary>
+        /// <param name="w"></param>
+        /// <returns></returns>
+        public delegate Task AsyncWriterDelegate(AsyncWrite w);
 
     }
 }

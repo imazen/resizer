@@ -23,7 +23,7 @@ namespace COMInstaller {
             }
         }
         /// <summary>
-        /// Deletes the target dll, pdb, and xml, then copies the source dll, pdb (if present), and xml (if present). 
+        /// Deletes the target DLL, PDB, and XML, then copies the source DLL, PDB (if present), and XML (if present).
         /// </summary>
         /// <param name="destFolder"></param>
         public void CopyAllTo(string destFolder) {
@@ -100,14 +100,14 @@ namespace COMInstaller {
             get{
                 if (path.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)) {
                     return path.Substring(0, path.Length - 4) + ".pdb";
-                } else throw new Exception("Dll must end in .dll: " + path);
+                } else throw new Exception("DLL must end in .dll: " + path);
             }
         }
         public string XmlPath {
             get {
                 if (path.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)) {
                     return path.Substring(0, path.Length - 4) + ".xml";
-                } else throw new Exception("Dll must end in .dll: " + path);
+                } else throw new Exception("DLL must end in .dll: " + path);
             }
         }
 
@@ -147,7 +147,7 @@ namespace COMInstaller {
         }
 
         /// <summary>
-        /// Returns 1 if the current dll is newer than other, returns -1 of 'other' is newer, and 0 if the file version numbers are identical.
+        /// Returns 1 if the current DLL is newer than other, returns -1 of 'other' is newer, and 0 if the file version numbers are identical.
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>

@@ -41,7 +41,7 @@ namespace ImageResizer.Tests {
 
         [Theory]
         [InlineData("preset=p;width=50;height=50", "width=50;height=100", "width=100", "height=100")]
-        public void TestModifiySettings(string original, string expected, string defaults, string overrides) {
+        public void TestModifySettings(string original, string expected, string defaults, string overrides) {
             var defs = new Dictionary<string, ResizeSettings>();
             defs.Add("p", new ResizeSettings(defaults));
             var sets = new Dictionary<string, ResizeSettings>();

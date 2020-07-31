@@ -15,7 +15,7 @@ If `Web.config` already exists in the target website or application, go to the n
 
 ## Installing the HttpModule into an existing web site
 
-1. Copy `ImageResizer.dll`, `ImageResizer.Mvc.dll`, and `ImageResizer.pdb` [from the .zip download](/download) into the 'bin' folder of the website, creating it if it doesn't exist.
+1. Copy `ImageResizer.dll` and `ImageResizer.pdb` [from the .zip download](/download) into the 'bin' folder of the website, creating it if it doesn't exist.
 3. Save [this file](/attachments/Web.config.txt) into the root of the website and rename it to "Web.config". If a Web.config fie already exists, [you will need to edit it](/docs/install/web-config).
 4. Browse to the web site and type '/resizer.debug.ashx' directly after the domain or IP address. You should get a page of diagnostic information if everything is working. If you need help, [just ask](/support)!
 
@@ -30,11 +30,11 @@ So given 'http://localhost/image.jpg', you could resize the image to 40px wide b
 
 ## If you're not using IIS
 
-If you're not hosting your website on a Windows server, consider having a secondary server or VM, and pointing a subdomain (like `images.mydomain.com`) to an IIS site to host your images. You can even do this on the same server, if (for example), you use Windows/Apache instead of Windows/IIS, or have an IIS website that is somehow incompatible with the Image Resizer (although that hasn't happened yet).
+If you're not hosting your website on a Windows server, consider having a secondary server or VM, and pointing a subdomain (like `images.mydomain.com`) to an IIS site to host your images.
 
-## Notes on IIS5, IIS6, and IIS7 Classic Mode
+## Notes on  IIS7/8 Classic Mode
 
-* By default, the aforementioned platforms do not allow the ImageResizer to interact with requests that don't end in ".ashx". So [without some more configuration](/docs/cleanurls), you will need to use the 'image.jpg.ashx?width=100' instead of the 'image.jpg?width=100' syntax. IIS7 or higher in Integrated mode doesn't have this problem.
+* Classic Mode does not allow ImageResizer to interact with requests that don't end in ".ashx". So [without some more configuration](/docs/cleanurls), you will need to use the 'image.jpg.ashx?width=100' instead of the 'image.jpg?width=100' syntax. Integrated mode (the default) doesn't have this problem.
 
 ## Notes on nested applications
 

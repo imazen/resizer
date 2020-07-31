@@ -18,6 +18,7 @@ using System.Web;
 using ImageResizer.Collections;
 using System.IO;
 using System.Globalization;
+using ImageResizer.Configuration.Performance;
 
 
 namespace ImageResizer.Configuration {
@@ -51,9 +52,12 @@ namespace ImageResizer.Configuration {
         #endregion
 
 
-        public Config():this(new ResizerSection()){
+        public Config():this(new ResizerSection(), false){
         }
-        public Config(ResizerSection config) {
+
+        public Config(ResizerSection config):this(config, System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath != null) { }
+
+        public Config(ResizerSection config, bool addAspNetPlugins) {
 
             this.configuration = config;
 
@@ -68,22 +72,25 @@ namespace ImageResizer.Configuration {
             //Relies on plugins, must init second
             pipeline = new PipelineConfig(this);
 
-            bool isAspNet = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath != null;
+            
             //Load default plugins
             new ImageResizer.Plugins.Basic.DefaultEncoder().Install(this);
             new ImageResizer.Plugins.Basic.NoCache().Install(this);
             new ImageResizer.Plugins.Basic.ClientCache().Install(this);
-            new ImageResizer.Plugins.Basic.Diagnostic().Install(this);
-            
-            if (isAspNet)
+            new ImageResizer.Plugins.Basic.WebConfigLicenseReader().Install(this);
+
+            if (addAspNetPlugins)
             {
-                new ImageResizer.Plugins.Basic.WebConfigLicenseReader().Install(this);
+                new ImageResizer.Plugins.Basic.Diagnostic().Install(this); //2017-04-04 - this plugin only sets the HTTP handler; adds no other functionality.
                 new ImageResizer.Plugins.Basic.SizeLimiting().Install(this);
                 new ImageResizer.Plugins.Basic.MvcRoutingShimPlugin().Install(this);
+                new ImageResizer.Plugins.Basic.LicenseDisplay().Install(this);
             }
 
             //Load plugins immediately. Lazy plugin loading causes problems.
             plugins.LoadPlugins();
+
+            pipeline.FireHeartbeat();
         }
 
         
@@ -98,7 +105,7 @@ namespace ImageResizer.Configuration {
 
         private PipelineConfig pipeline = null;
         /// <summary>
-        /// Access and modify settings related to the HttpModule pipline. Register URL rewriting hooks, etc.
+        /// Access and modify settings related to the HttpModule pipeline. Register URL rewriting hooks, etc.
         /// </summary>
         public PipelineConfig Pipeline {
             get { return pipeline; }
@@ -127,7 +134,7 @@ namespace ImageResizer.Configuration {
                 if (_imageBuilder == null)
                     lock (_imageBuilderSync)
                         if (_imageBuilder == null)
-                            _imageBuilder = new ImageBuilder(plugins.ImageBuilderExtensions,plugins,pipeline, pipeline);
+                            _imageBuilder = new ImageBuilder(plugins.ImageBuilderExtensions,plugins,pipeline, pipeline, pipeline?.MaxConcurrentJobs);
 
                 return _imageBuilder;
             }
@@ -139,7 +146,7 @@ namespace ImageResizer.Configuration {
         }
 
         /// <summary>
-        /// Shortuct to CurrentImageBuilder.Build (Useful for COM clients). Also creates a destination folder if needed, unlike the normal .Build() call.
+        /// Shortcut to CurrentImageBuilder.Build (Useful for COM clients). Also creates a destination folder if needed, unlike the normal .Build() call.
         /// 
         /// </summary>
         /// <param name="source"></param>
@@ -168,7 +175,7 @@ namespace ImageResizer.Configuration {
         private volatile ResizerSection configuration;
         private object configurationLock = new object();
         /// <summary>
-        /// The ResizeConfigrationSection is not thread safe, and should not be modified
+        /// The ResizeConfigurationSection is not thread safe, and should not be modified
         /// Dynamically loads the ResizerSection from web.config when accessed for the first time. 
         /// If the resizer node doesn't exist, an empty configuration object is created with just the root resizer node.
         /// </summary>
@@ -281,7 +288,15 @@ namespace ImageResizer.Configuration {
         /// </summary>
         /// <returns></returns>
         public string GetDiagnosticsPage() {
-            return new ImageResizer.Plugins.Basic.DiagnosticPageHandler(this).GenerateOutput(HttpContext.Current, this);
+            return new DiagnosticsReport(this, HttpContext.Current).Generate();
+        }
+        /// <summary>
+        /// Returns a string of the public licenses page
+        /// </summary>
+        /// <returns></returns>
+        public string GetLicensesPage()
+        {
+            return ImageResizer.Plugins.Basic.LicenseDisplay.GetPageText(this);
         }
     }
 }

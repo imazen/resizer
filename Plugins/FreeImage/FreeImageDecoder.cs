@@ -88,7 +88,8 @@ namespace ImageResizer.Plugins.FreeImageDecoder {
         public Bitmap Decode(Stream s, ResizeSettings settings) {
             return (Bitmap)DecodeAndCall(s, settings, delegate(ref FIBITMAP b, bool MayDispose) {
                  bool usethumb = ("true".Equals(settings["usepreview"], StringComparison.OrdinalIgnoreCase));
-                bool autorotate = ("true".Equals(settings["autorotate"], StringComparison.OrdinalIgnoreCase));
+                 bool autorotate = settings.Get<bool>("autorotate", settings.Get<bool>("autorotate.default", false));
+
 
                 return Convert(b, autorotate && !usethumb); //because usepreview prevents autorotate from working at the freeimage level
             });

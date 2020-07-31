@@ -289,7 +289,7 @@ namespace ImageResizer.Util
 
         /// <summary>
         /// Moves element 4 to spot 3 and truncates to 3 elements.
-        /// For compatiblity with Graphics.DrawImage
+        /// For compatibility with Graphics.DrawImage
         /// </summary>
         /// <param name="quad"></param>
         /// <returns></returns>
@@ -303,7 +303,7 @@ namespace ImageResizer.Util
         }
 
         /// <summary>
-        /// Determines the width and height of the paralellogram.
+        /// Determines the width and height of the parallelogram.
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
@@ -328,7 +328,7 @@ namespace ImageResizer.Util
             return sub;
         }
         /// <summary>
-        /// Approximates a radial brush using a high-rez PathGradientBrush.
+        /// Approximates a radial brush using a high-res PathGradientBrush.
         /// </summary>
         /// <param name="inner"></param>
         /// <param name="outer"></param>
@@ -428,7 +428,7 @@ namespace ImageResizer.Util
             return true;
         }
         /// <summary>
-        /// Returns an array of parallelograms. These parallelgrams are the 'corners' outside each vertex in 'poly'.
+        /// Returns an array of parallelograms. These parallelograms are the 'corners' outside each vertex in 'poly'.
         /// The adjacent edges are perpendicular to 'poly'. Point 1 of each parallelogram will match the respective point in 'poly'
         /// Points are clockwise.
         ///
@@ -446,12 +446,12 @@ namespace ImageResizer.Util
             return GetCorners(poly,widths);
         }
         /// <summary>
-        /// Returns an array of parallelograms. These parallelgrams are the 'corners' outside each vertex in 'poly'.
+        /// Returns an array of parallelograms. These parallelograms are the 'corners' outside each vertex in 'poly'.
         /// The adjacent edges are perpendicular to 'poly'. Point 1 of each parallelogram will match the respective point in 'poly'
         /// Points are clockwise.
         /// 
         /// Each float in widths[] corresponds to the point in poly[]. This is the distance to go perpendicularly from 
-        /// the line beween poly[i] and poly[i +1].
+        /// the line between poly[i] and poly[i +1].
         /// 
         /// </summary>
         /// <param name="poly"></param>
@@ -495,7 +495,7 @@ namespace ImageResizer.Util
             return corners;
         }
         /// <summary>
-        /// Returns an array of parallelograms. These parallelgrams are the 'sides' bounding the polygon.
+        /// Returns an array of parallelograms. These parallelograms are the 'sides' bounding the polygon.
         /// Points are clockwise. Point 1 is the top-left outer point, point 2 the top-right, point 3 the bottom-right, and point 4 the bottom-left.
         /// </summary>
         /// <param name="poly"></param>
@@ -584,13 +584,13 @@ namespace ImageResizer.Util
         /// <returns></returns>
         public static Rectangle ToRectangle(RectangleF r)
         {
-            return new Rectangle((int)Math.Round(r.X), (int)Math.Round(r.Y), (int)Math.Round(r.Width), (int)Math.Round(r.Height));
-
+            //As of 2016-01-31: Avoids turning (0.5,0.5,2.5,2.5) into (1,1,4,4) 
+            return new Rectangle((int)Math.Round(r.X), (int)Math.Round(r.Y), (int)Math.Round(r.Right) - (int)Math.Round(r.X), (int)Math.Round(r.Bottom) - (int)Math.Round(r.Y));
 
         }
 
         /// <summary>
-        /// Round a floating-point rectangle by apply ceil to x/y and floor to width/height
+        /// Round a floating-point rectangle by applying ceil to x/y and floor to width/height
         /// </summary>
         /// <param name="r"></param>
         /// <returns></returns>
@@ -628,6 +628,43 @@ namespace ImageResizer.Util
 
             return obj;
         }
+
+        /// <summary>
+        /// Minimally move the rectangle 'obj' to be within the bounds of 'container'. Behavior only defined if obj size &lt;= container size.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="container"></param>
+        /// <returns></returns>
+        public static RectangleF MoveInBounds(RectangleF obj, RectangleF container)
+        {
+            if (obj.Right > container.Right) obj.X += (container.Right - obj.Right);
+            if (obj.Bottom > container.Bottom) obj.Y += (container.Bottom - obj.Bottom);
+            if (obj.X < container.X) obj.X = container.X;
+            if (obj.Y < container.Y) obj.Y = container.Y;
+            return obj;
+        }
+
+        /// <summary>
+        /// Aligns the specified rectangle object with its reference ('container') rectangle using the specified alignment.
+        /// If the container is large enough to contain 'obj', then obj will be adjusted within bounds. 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="container"></param>
+        /// <param name="align"></param>
+        /// <returns></returns>
+        public static RectangleF AlignWithin(RectangleF obj, RectangleF container, PointF centerAt)
+        {
+            var centered = CenterInside(obj.Size, new RectangleF(centerAt, SizeF.Empty));
+            return FitsInside(obj.Size, container.Size) ? MoveInBounds(centered, container) : centered;
+        }
+
+        /// <returns></returns>
+        public static PointF Midpoint(RectangleF obj)
+        {
+            return new PointF(obj.X + (obj.Width / 2), obj.Y + obj.Height / 2);
+        }
+
+
         /// <summary>
         /// Aligns the specified polygon with its container (reference) polygon using the specified alignment. The container can be smaller than 'obj'.
         /// </summary>
@@ -642,7 +679,7 @@ namespace ImageResizer.Util
         }
 
         /// <summary>
-        /// Returns a point equidistant beweteen A and B
+        /// Returns a point equidistant between A and B
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
@@ -819,7 +856,7 @@ namespace ImageResizer.Util
         }
 
         /// <summary>
-        /// Expands the given rectangle to be the given size while keeping it centered.
+        /// Expands/shrinks the given rectangle to be the given size while keeping it centered.
         /// </summary>
         /// <param name="box"></param>
         /// <param name="copySize"></param>

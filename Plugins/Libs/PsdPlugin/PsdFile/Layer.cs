@@ -768,7 +768,7 @@ namespace PhotoshopFile
     /// <term>hLit</term><description>hard light</description>
     /// <term>sLit</term><description>soft light</description>
     /// <term>diff</term><description>difference</description>
-    /// <term>smud</term><description>exlusion</description>
+    /// <term>smud</term><description>exclusion</description>
     /// <term>div </term><description>color dodge</description>
     /// <term>idiv</term><description>color burn</description>
     /// </list>

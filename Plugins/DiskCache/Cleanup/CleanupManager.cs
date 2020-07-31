@@ -29,7 +29,7 @@ namespace ImageResizer.Plugins.DiskCache {
                 else
                     this.BeLazy();
             };
-            //Called when the filesystem changes unexpectedly.
+            //Called when the file system changes unexpectedly.
             cache.Index.FileDisappeared += delegate(string relativePath, string physicalPath) {
                 if (lp.Logger != null) lp.Logger.Warn("File disappeared from the cache unexpectedly - reindexing entire cache. File name: {0}", relativePath);
                 //Stop everything ASAP and start a brand new cleaning run.
@@ -45,7 +45,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <summary>
         /// When true, indicates that another process is managing cleanup operations - this thread is idle, waiting for the other process to end before it can pick up work.
         /// </summary>
-        public bool ExteralProcessCleaning { get {   return worker != null ? worker.ExteralProcessCleaning : false; } }
+        public bool ExternalProcessCleaning { get {   return worker != null ? worker.ExternalProcessCleaning : false; } }
 
         /// <summary>
         /// Notifies the CleanupManager that a request is in process. Helps CleanupManager optimize background work so it doesn't interfere with request processing.

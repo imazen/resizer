@@ -7,7 +7,6 @@
 using namespace System;
 using namespace System::Drawing;
 using namespace System::Drawing::Imaging;
-using namespace ImageResizer::Resizing;
 using namespace System::Diagnostics;
 using namespace System::Collections::Specialized;
 using namespace System::Runtime::InteropServices;

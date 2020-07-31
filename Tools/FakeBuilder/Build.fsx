@@ -2,9 +2,11 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-#r @"..\..\packages\FAKE.3.11.0\tools\FakeLib.dll"
-#r @"..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll"
-#r @"..\..\packages\AWSSDK.2.2.4.0\lib\net45\AWSSDK.dll"
+#r @"packages/FAKE/tools/FakeLib.dll"
+#r @"packages/SharpZipLib/lib/20/ICSharpCode.SharpZipLib.dll"
+// #r @"packages/AWSSDK.S3/lib/net45/AWSSDK.dll"
+#r @"packages/AWSSDK.Core/lib/net45/AWSSDK.Core.dll"
+#r @"packages/AWSSDK.S3/lib/net45/AWSSDK.S3.dll"
 
 #load "AssemblyPatcher.fs"
 #load "FsQuery.fs"
@@ -34,24 +36,33 @@ open System.IO
 open System.Text
 open System.Text.RegularExpressions
 
-
+printfn "Build.fsx starting.."
 // Settings
 
 let variableList = ["fb_nuget_url"; "fb_nuget_key";
                     "fb_s3_bucket"; "fb_s3_id"; "fb_s3_key"; "fb_pub_url";
                     "fb_nuget_rel_url"; "fb_nuget_rel_key";
-                    "fb_s3_rel_bucket"; "fb_s3_rel_id"; "fb_s3_rel_key";
+                    "fb_s3_rel_bucket"; "fb_s3_rel_id"; "fb_s3_rel_key"; "license_keys";
                     "fb_imageserver_repo"; "fb_imageserver_branch"; "fb_imageserver_rel_branch"; "fb_imageserver_path";]
 
 let mutable settings = seq {for x in variableList -> x, (environVar x)} |> Map.ofSeq
 
 
-let rootDir = Path.GetFullPath(__SOURCE_DIRECTORY__ + "/../..") + "\\"
-let coreDir = rootDir + "Core/"
+printfn "Values present for configuration keys %A\n"   (variableList |>  Seq.filter(fun x -> x |> environVar |> isNullOrEmpty |> not))
+
+printfn "Missing or emtpy value for keys %A\n" (variableList |>  Seq.filter(fun x -> x |> environVar |> isNullOrEmpty))
+
+
+
+let fixSlashes (s) = 
+  Regex("[\\\\/]").Replace(s, System.IO.Path.DirectorySeparatorChar.ToString())
+
+let rootDir = fixSlashes(Path.GetFullPath(__SOURCE_DIRECTORY__ + "/../..") + "\\")
+let coreDir = fixSlashes(rootDir + "Core/")
 let mainSolution = rootDir + "AppVeyor.sln"
-let fastScaleSln = rootDir + "Plugins/FastScaling/ImageResizer.Plugins.FastScaling.sln"
+let fastScaleSln = rootDir + fixSlashes("Plugins/FastScaling/ImageResizer.Plugins.FastScaling.sln")
 let assemblyInfoFile = coreDir + "SharedAssemblyInfo.cs"
-let assemblyInfoCppFile = rootDir + "Plugins/FastScaling/AssemblyInfo.cpp"
+let assemblyInfoCppFile = rootDir + fixSlashes("Plugins/FastScaling/AssemblyInfo.cpp")
 
 let isAutoBuild =
     if isNotNullOrEmpty (environVar "APPVEYOR") then true
@@ -76,15 +87,33 @@ version <-
 let mutable isRelease = false
 let mutable releaseVersionString = ""
 
-let ok,msg,errors = runGitCommand "" "describe --tags --exact-match --abbrev=0"
-if ok && msg.Count > 0 then
-    if isValidSemVer msg.[0] then
-        releaseVersionString <- msg.[0]
-        version <- parse releaseVersionString
-        isRelease <- true
-    else
-        printf "Warning: git tag is not a valid semver; not processing as a release\n"
+type System.String with
+    member s1.icompare(s2: string) =
+      System.String.Equals(s1, s2, System.StringComparison.CurrentCultureIgnoreCase);;
 
+let trimV (s) = 
+    Regex("^v").Replace(s, "")
+    
+let git_tag = 
+  if isAutoBuild && "True".icompare(environVar "APPVEYOR_REPO_TAG") then 
+    Some(environVar "APPVEYOR_REPO_TAG_NAME")
+  else 
+    let ok,msg,errors = runGitCommand "" "describe --tags --exact-match --abbrev=0"
+    if ok && msg.Count > 0 then
+      Some(msg.[0])
+    else
+      None
+
+match git_tag with
+| Some(s) when isValidSemVer(trimV s) -> 
+  isRelease <- true
+  releaseVersionString <- trimV s
+  version <- parse(trimV(s))
+  printf "Using git tag %s as the release version\n" s
+| Some(s) -> printf "Warning: git tag '%s' is not a valid semver; not processing as a release\n" s
+| None -> printf "No git tag found on this commit.\n"
+
+ 
 let nugetVer = { version with Build = "" }
 
 
@@ -112,34 +141,34 @@ MSBuildDefaults <- setParams MSBuildDefaults
 Target "clean" (fun _ ->
     MSBuild "" "Clean" ["Configuration","Release"] [mainSolution] |> ignore
     MSBuild "" "Clean" ["Configuration","Debug"] [mainSolution] |> ignore
-    MSBuild "" "Clean" ["Configuration","Trial"] [mainSolution] |> ignore
     
     MSBuild "" "Clean" ["Configuration","Release"; "Platform","Win32"] [fastScaleSln] |> ignore
     MSBuild "" "Clean" ["Configuration","Debug"; "Platform","Win32"] [fastScaleSln] |> ignore
     MSBuild "" "Clean" ["Configuration","Release"; "Platform","x64"] [fastScaleSln] |> ignore
     MSBuild "" "Clean" ["Configuration","Debug"; "Platform","x64"] [fastScaleSln] |> ignore
     
-    CleanDirs [rootDir + "dlls/release"]
-    CleanDirs [rootDir + "dlls/debug"]
-    CleanDirs [rootDir + "dlls/trial"]
+    CleanDirs [rootDir + fixSlashes("dlls/release")]
+    CleanDirs [rootDir + fixSlashes("dlls/debug")]
 )
 
 Target "build" (fun _ ->
+
     MSBuild "" "Build" ["Configuration","Release"] [mainSolution] |> ignore
-    MSBuild "" "Build" ["Configuration","Debug"] [mainSolution] |> ignore
-    MSBuild "" "Build" ["Configuration","Trial"] [mainSolution] |> ignore
-    
     MSBuild "" "Build" ["Configuration","Release"; "Platform","Win32"] [fastScaleSln] |> ignore
-    MSBuild "" "Build" ["Configuration","Debug"; "Platform","Win32"] [fastScaleSln] |> ignore
     MSBuild "" "Build" ["Configuration","Release"; "Platform","x64"] [fastScaleSln] |> ignore
-    MSBuild "" "Build" ["Configuration","Debug"; "Platform","x64"] [fastScaleSln] |> ignore
-)
+    )
 
 Target "patch_commit" (fun _ ->
     let commit = Git.Information.getCurrentSHA1 ".."
     if commit <> null then
         AssemblyPatcher.setInfo assemblyInfoFile ["Commit", commit]
         AssemblyPatcher.setInfo assemblyInfoCppFile ["CommitAttribute", commit]
+)
+
+Target "patch_date" (fun _ ->
+    let date = DateTimeOffset.UtcNow.ToString("o")
+    AssemblyPatcher.setInfo assemblyInfoFile ["BuildDate", date]
+    AssemblyPatcher.setInfo assemblyInfoCppFile ["BuildDateAttribute", date]
 )
 
 Target "patch_ver" (fun _ ->
@@ -160,19 +189,18 @@ Target "patch_ver" (fun _ ->
     AssemblyPatcher.setInfo assemblyInfoFile [
         "AssemblyVersion", asmVer.ToString()+".0";
         "AssemblyFileVersion", fileVer.ToString()+"."+buildNo;
-        "AssemblyInformationalVersion", version.ToString();
-        "NugetVersion", nugetVer.ToString()]
+        "AssemblyInformationalVersion", version.ToString()]
 
     AssemblyPatcher.setInfo assemblyInfoCppFile [
         "AssemblyVersionAttribute", asmVer.ToString()+".0";
         "AssemblyFileVersionAttribute", fileVer.ToString()+"."+buildNo;
-        "AssemblyInformationalVersionAttribute", version.ToString();
-        "NugetVersionAttribute", nugetVer.ToString()]
+        "AssemblyInformationalVersionAttribute", version.ToString()]
 )
 
 Target "patch_info" (fun _ ->
     Run "patch_commit"
     Run "patch_ver"
+    Run "patch_date"
 )
 
 Target "test" (fun _ ->
@@ -182,19 +210,17 @@ Target "test" (fun _ ->
     !! (rootDir + "Tests/binaries/release/*Tests.dll")
         //++ (rootDir + "Tests/binaries/release/x64/*Tests.dll")
         ++ (rootDir + "Tests/binaries/release/x64/ImageResizer.Plugins.FastScaling.Tests.dll")
-        -- (rootDir + "**/ImageResizer.Plugins.LicenseVerifier.Tests.dll")
         -- (rootDir + "**/ImageResizer.CoreFSharp.Tests.dll")
-            |> xUnit (fun p -> {p with ToolPath = xunit})
+            |> xUnit2 (fun p -> {p with ToolPath = xunit; ExcludeTraits = Some("requiresmongo","true")})
             
     !! (rootDir + "Tests/binaries/release/*Tests.dll")
         //++ (rootDir + "Tests/binaries/release/x86/*Tests.dll")
         ++ (rootDir + "Tests/binaries/release/x86/ImageResizer.Plugins.FastScaling.Tests.dll")
-        -- (rootDir + "**/ImageResizer.Plugins.LicenseVerifier.Tests.dll")
         -- (rootDir + "**/ImageResizer.CoreFSharp.Tests.dll")
         -- (rootDir + "**/ImageResizer.AllPlugins.Tests.dll")
         -- (rootDir + "**/ImageResizer.CopyMetadata.Tests.dll")
         -- (rootDir + "**/ImageResizer.Plugins.TinyCache.Tests.dll")
-            |> xUnit (fun p -> {p with ToolPath = xunit32})
+            |> xUnit2 (fun p -> {p with ToolPath = xunit32; ExcludeTraits = Some("requiresmongo","true")})
 )
 
 Target "pack_nuget" (fun _ ->
@@ -207,7 +233,7 @@ Target "pack_nuget" (fun _ ->
     
     let nvc = ["author", "Nathanael Jones, Imazen";
            "owners", "nathanaeljones, imazen";
-           "pluginsdlldir", (rootDir+"dlls/trial");
+           "pluginsdlldir", (rootDir+"dlls/release");
            "coredlldir", (rootDir+"dlls/release");
            "iconurl", "http://imageresizing.net/images/logos/ImageIconPSD100.png";
            "plugins", "## 30+ plugins available\n\n" + 
@@ -223,16 +249,9 @@ Target "pack_nuget" (fun _ ->
     for nuSpec in Directory.GetFiles(rootDir + "nuget", "*.nuspec") do
         Nuget.fillVariables nuSpec (rootDir+"tmp/"+Path.GetFileName(nuSpec)) nvc
     
-    // process symbol packages first (as they need to be renamed)
-    for nuSpec in Directory.GetFiles(rootDir + "tmp", "*.symbols.nuspec") do
-        Nuget.pack nuSpec ver (rootDir + "Releases/nuget-packages")
-        let baseName = rootDir + "Releases/nuget-packages/" + Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(nuSpec)) + "." + ver
-        File.Move(baseName + ".nupkg", baseName + ".symbols.nupkg")
-    
     // process regular packages
     for nuSpec in Directory.GetFiles(rootDir + "tmp", "*.nuspec") do
-        if not (nuSpec.Contains(".symbols.nuspec")) then
-            Nuget.pack nuSpec ver (rootDir + "Releases/nuget-packages")
+        Nuget.pack nuSpec ver (rootDir + "Releases/nuget-packages")
     
     // remove any mess
     DeleteDir (rootDir + "tmp")
@@ -250,13 +269,14 @@ Target "pack_zips" (fun _ ->
         ".(DS_Store|pch|opensdf|sdf|sbr|unsuccessfulbuild|coverage|tlog|metagen|lastbuildstate|res|log|ilk|Cache|cache|bak|tlh|tlb|suo|ncb|vspscc|vssscc|aps|user|obj|coverage|user|userprefs)$"]))
     
     query <- query.exclude(["/(Newtonsoft.Json|DotNetZip|Aforge|LitS3|Ionic|NLog|MongoDB|Microsoft.|AWSSDK)*.(xml|pdb)$";
-        "/(OpenCvSharp|FreeImageNet)*.xml$"; "/(FreeImage|gsdll32|gsdll64).dll$";
+        "/(OpenCvSharp|FreeImageNet)*.xml$"; "/(FreeImage|gsdll32|gsdll64|pdfium).dll$";
         "/ImageResizerGUI.exe$";
         "_ReSharper";
         "^/Contrib/*/(bin|obj|imagecache|uploads|results)/*";
         "^/(Tests|Plugins|Samples)/*/(bin|obj|imagecache|uploads|hidden|results)/";
         "^/Core(.Mvc)?/obj/";
         "^/Tests/binaries";
+        "^/Plugins/FastScaling/*.(lib|dll|xml|pdb|exe).?*";
         "^/Tests/LibDevCassini";
         "^/Tests/ComparisonBenchmark/Images";
         "^/Samples/SqlReaderSampleVarChar";
@@ -294,15 +314,15 @@ Target "pack_zips" (fun _ ->
     
     
     // packmin
-    let minfiles = toZipEntries query ["^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$";
-        "^/Core/license.txt$"; "^/readme.txt$"; "^/Web.config$"] "" "" true
-    CreateZip rootDir (makeName "min") "" 5 false minfiles
+    //let minfiles = toZipEntries query ["^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$";
+    //    "^/Core/license.txt$"; "^/readme.txt$"; "^/Web.config$"] "" "" true
+    //CreateZip rootDir (makeName "min") "" 5 false minfiles
     
     
     // packbin
-    let mutable binfiles = toZipEntries query ["^/[^/]+.txt$"] "" "" true
-    binfiles <- List.append binfiles (toZipEntries query ["^/dlls/release/*.(dll|pdb)$"] (rootDir+"dlls\\release\\") "" false)
-    CreateZip rootDir (makeName "allbinaries") "" 5 false binfiles
+    //let mutable binfiles = toZipEntries query ["^/[^/]+.txt$"] "" "" true
+    //binfiles <- List.append binfiles (toZipEntries query ["^/dlls/release/*.(dll|pdb)$"] (rootDir+"dlls\\release\\") "" false)
+    //CreateZip rootDir (makeName "allbinaries") "" 5 false binfiles
     
     
     // packfull
@@ -315,13 +335,13 @@ Target "pack_zips" (fun _ ->
     
     
     // packstandard
-    query <- query.exclude("^/Core/[^/]+.sln")
-    let mutable standard = toZipEntries query ["^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"] "" "" true
-    standard <- List.append standard (toZipEntries query ["^/dlls/(debug|release)/"; "^/(core|samples)/";
-        "^/[^/]+.txt$"; "^/Web.config$"] rootDir "" false)
-    standard <- List.append standard (toZipEntries query ["^/submodules/studiojs"] (rootDir+"submodules\\studiojs") "StudioJS" false)
-    CreateZip rootDir (makeName "standard") "" 5 false standard
-    
+    // query <- query.exclude("^/Core/[^/]+.sln")
+    //let mutable standard = toZipEntries query ["^/dlls/release/ImageResizer.(Mvc.)?(dll|pdb|xml)$"] "" "" true
+    // standard <- List.append standard (toZipEntries query ["^/dlls/(debug|release)/"; "^/(core|samples)/";
+    //"^/[^/]+.txt$"; "^/Web.config$"] rootDir "" false)
+    // standard <- List.append standard (toZipEntries query ["^/submodules/studiojs"] (rootDir+"submodules\\studiojs") "StudioJS" false)
+    //CreateZip rootDir (makeName "standard") "" 5 false standard
+
     ()
 )
 
@@ -333,16 +353,12 @@ Target "push_nuget" (fun _ ->
     if isNullOrEmpty nuget_key then
         printf "No nuget information present, skipping push\n"
     else
-        
-        let symbolServ =
-            if nuget_url.Contains("myget.org") then "http://nuget.gw.SymbolSource.org/MyGet/"
-            else ""
-        
-        for nuPkg in Directory.GetFiles(rootDir + "Releases/nuget-packages", "*.nupkg") do
-            if not (nuPkg.Contains(".symbols.nupkg")) then
-                Nuget.push nuPkg nuget_url nuget_key
-            elif symbolServ <> "" then
-                Nuget.push nuPkg symbolServ nuget_key
+        Paket.Push (fun p -> 
+            { p with 
+                ToolPath = "../.paket/paket.exe" 
+                PublishUrl = nuget_url 
+                WorkingDir = rootDir + "Releases/nuget-packages" 
+                ApiKey = nuget_key}) 
 )
 
 Target "push_zips" (fun _ ->
@@ -362,16 +378,17 @@ Target "push_zips" (fun _ ->
         
         for zipPkg in Directory.GetFiles(rootDir + "Releases", "*.zip") do
             let mutable tries = 3
+            let drm_free = (settings.["license_keys"] = "false")
             let request = new TransferUtilityUploadRequest()
-            request.CannedACL <- Amazon.S3.S3CannedACL.PublicRead
+            request.CannedACL <- if drm_free then  Amazon.S3.S3CannedACL.Private else Amazon.S3.S3CannedACL.PublicRead
             request.BucketName <- s3_bucket
             request.ContentType <- "application/zip"
-            request.Key <- Path.GetFileName(zipPkg)
+            request.Key <- Path.GetFileName(zipPkg).Replace(".zip", if drm_free then "-drm-free.zip" else ".zip")
             request.FilePath <- zipPkg
             
             while tries > 0 do
                 try
-                    printf "Uploading %s to S3/%s...\n" (Path.GetFileName(zipPkg)) s3_bucket
+                    printf "Uploading %s to S3/%s...\n" (request.Key) s3_bucket
                     s3.Upload(request)
                     tries <- 0
                 with exn ->
@@ -418,8 +435,8 @@ Target "update_imageserv" (fun _ ->
                         WriteToFile true "paket.dependencies" ["nuget " + pkg + " " + ver]
                         WriteToFile true "paket.references" [pkg]
         
-        Shell.Exec (".paket\\paket.bootstrapper.exe")
-        Shell.Exec (".paket\\paket.exe", "update --redirects --force")
+        Shell.Exec (fixSlashes(".paket\\paket.bootstrapper.exe")) |> ignore
+        Shell.Exec (fixSlashes(".paket\\paket.exe"), "update --redirects --force") |> ignore
         
         gitCommand "." ("add .")
         gitCommand "." ("commit -m \"AutoCommit: CI build "+ver+"\"")
@@ -459,7 +476,7 @@ Target "unmess" (fun _ ->
 
 Target "print_stats" (fun _ ->
     for zipPkg in Directory.GetFiles(rootDir + "Releases", "*.zip") do
-        printf "\nLarge files in %s:\n" (Path.GetFileName(zipPkg))
+        printf "\nLarge files in %s %dk:\n" (Path.GetFileName(zipPkg)) (FileInfo(zipPkg).Length / 1024L)
         let zip = new ZipInputStream(File.OpenRead(zipPkg))
         let mutable entry = zip.GetNextEntry()
         while entry <> null do
@@ -478,22 +495,25 @@ Target "custom" (fun _ ->
     let targets = getBuildParamOrDefault "targets" ""
     let cliVersionString = ref ""
     
-    let targetList = List.map (fun x -> (
-                        let parts = (split ' ' x)
-                        if parts.[0] = "release" then
-                            cliVersionString := parts.[1]
-                        parts.[0])) (split ';' targets)
-    
-    if (targets.Contains("push") || targets.Contains("do_all")) && isRelease && not isAutoBuild && releaseVersionString <> !cliVersionString then
+    let filterList = 
+      fun x -> 
+          let parts = (split ' ' x)
+          if parts.[0] = "release" then
+              cliVersionString := parts.[1]
+          parts.[0]
+
+    let targetList = List.map(filterList)  (split ';' targets)
+
+    let user_is_pushing = targets.Contains "push" || targets.Contains "do_all"
+
+    if user_is_pushing && isRelease && (not isAutoBuild) && releaseVersionString <> !cliVersionString then
         if !cliVersionString = "" then
             failwith "Error: pushing of releases disabled from cli. To continue add 'release <semver>' to the target list that matches git tag."
         else
             failwith (sprintf "Error: git tag doesn't match cli release input (git: %s, cli: %s)" releaseVersionString !cliVersionString)
     
-    elif targetList.Length > 0 then
-        for i=0 to targetList.Length-1 do
-            if targetList.[i] <> "release" then
-                Run targetList.[i]
+    for target in List.filter(fun name -> name <> "release") targetList do
+        Run target
 )
 
 Target "do_all" (fun _ ->
@@ -506,6 +526,7 @@ Target "do_all" (fun _ ->
     ==> "push"
     ==> "update_imageserv"
     ==> "print_stats"
+    
     
     Run "print_stats"
 )

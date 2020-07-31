@@ -1,13 +1,22 @@
 Tags: plugin
 Edition: elite
-Tagline: "Extract frames from videos by time or percentage. Includes basic blank frame avoidance. Based on ffmpeg."
+Tagline: "Extract frames from videos by time or percentage. Includes basic blank frame avoidance. Wrapper for ffmpeg."
 Aliases: /plugins/ffmpeg
 
 
 # FFmpeg Plugin
 
 
-Dynamically extract frames from videos by time or percentage. Includes basic blank frame avoidance. Based on ffmpeg.
+*PLEASE NOTE*
+* **This plugin is not forwards-compatible. Avoid usage for maximum compatibility with Imageflow and future major ImageResizer releases.**
+* **Do NOT use with untrusted data. This plugin passes source files to ffmpeg.exe, which (like all software with embedded codecs), has a history of vulnerabilities.**
+* **Using this plugin with malicious files could result in a remote code execution vulnerability.**
+* **We only provide a the version of FFMpeg we used for development. You should locate and use the latest release of ffmpeg for optimal security.**
+* You can view [recently reported vulnerabilities here](https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=ffmpeg) and [here](https://web.nvd.nist.gov/view/vuln/search-results?query=ffmpeg&search_type=all&cves=on)
+
+
+
+Dynamically extract frames from videos by time or percentage. Includes basic blank frame avoidance. Wrapper for ffmpeg.
 
 ## Installation
 

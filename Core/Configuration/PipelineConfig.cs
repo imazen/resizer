@@ -42,7 +42,7 @@ namespace ImageResizer.Configuration {
             if (this.HasPipelineDirective(pipelineDefaults))
             {
                 var intersection = String.Join(", ", PipelineDirectivesPresent(pipelineDefaults));
-                c.configurationSectionIssues.AcceptIssue(new Issue("You have specified default commands (" + intersection + ") that will cause all image requests to be proccessed; even those that do not need ImageResizer.", pipelineNode != null ? pipelineNode.ToString() : "", IssueSeverity.ConfigurationError));
+                c.configurationSectionIssues.AcceptIssue(new Issue("You have specified default commands (" + intersection + ") that will cause all image requests to be processed; even those that do not need ImageResizer.", pipelineNode != null ? pipelineNode.ToString() : "", IssueSeverity.ConfigurationError));
             }
             if (pipelineDefaults.Count > 0)
             {
@@ -96,7 +96,7 @@ namespace ImageResizer.Configuration {
             }
 
 
-            //Now check the imagebuider instance
+            //Now check the imagebuilder instance
             ImageBuilder b = c.CurrentImageBuilder;
             if (b != null) {
                 vals = b.GetSupportedFileExtensions();
@@ -127,7 +127,7 @@ namespace ImageResizer.Configuration {
             }
         }
         /// <summary>
-        /// Returns a unqiue copy of the image extensions supported by the pipeline. Performs a cached query to all registered IQuerystringPlugin instances.
+        /// Returns a unique copy of the image extensions supported by the pipeline. Performs a cached query to all registered IQuerystringPlugin instances.
         /// Use IsAcceptedImageType for better performance.
         /// </summary>
         public ICollection<string> AcceptedImageExtensions {
@@ -136,7 +136,7 @@ namespace ImageResizer.Configuration {
             }
         }
         /// <summary>
-        /// Returns a unqiue copy of all querystring keys supported by the pipeline. Performs a cached query to all registered IQuerystringPlugin instances.
+        /// Returns a unique copy of all querystring keys supported by the pipeline. Performs a cached query to all registered IQuerystringPlugin instances.
         /// Use HasPipelineDirective for better performance. (binary search)
         /// </summary>
         public ICollection<string> SupportedQuerystringKeys {
@@ -211,7 +211,7 @@ namespace ImageResizer.Configuration {
             }
         }
         /// <summary>
-        /// Removes the first fake extensionm detected at the end of 'path'
+        /// Removes the first fake extension detected at the end of 'path'
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -320,6 +320,24 @@ namespace ImageResizer.Configuration {
         }
 
         /// <summary>
+        /// The maximum number of concurrent jobs that can be executing at one time.
+        /// </summary>
+        public int? MaxConcurrentJobs
+        {
+            get
+            {
+                if ("auto".Equals(c.get("pipeline.maxConcurrentJobs", ""), StringComparison.OrdinalIgnoreCase))
+                {
+                    return Environment.ProcessorCount + 1;
+                }
+                var count = c.get<int>("pipeline.maxConcurrentJobs", 0);
+                return count < 1 ? (int?)null : count;
+            }
+        }
+
+        
+
+        /// <summary>
         /// Returns an IVirtualFileAsync instance if the specified file can be provided by an async provider 
         /// </summary>
         /// <param name="virtualPath"></param>
@@ -330,11 +348,13 @@ namespace ImageResizer.Configuration {
             IVirtualFileAsync f = null;
             foreach (IVirtualImageProviderAsync p in c.Plugins.GetAll<IVirtualImageProviderAsync>())
             {
-                if (await p.FileExistsAsync(virtualPath, queryString)){
+                if (await p.FileExistsAsync(virtualPath, queryString))
+                {
                     f = await p.GetFileAsync(virtualPath, queryString);
                     break;
                 }
             }
+            if (f == null) return null;
             try
             {
                 //Now we have a reference to the real virtual file, let's see if it is source-cached.
@@ -439,7 +459,7 @@ namespace ImageResizer.Configuration {
         /// Fired during PostAuthorizeRequest, after ResizeExtension has been removed.
         /// On fired on requests with extensions that match supported image types.
         /// <para> 
-        /// You can add additonal supported image extentions by registering a plugin that implementes IQuerystringPlugin, or you can add an 
+        /// You can add additional supported image extensions by registering a plugin that implements IQuerystringPlugin, or you can add an
         /// extra extension in the URL and remove it here. Example: .psd.jpg</para>
         /// </summary>
         public event UrlRewritingEventHandler Rewrite;
@@ -457,7 +477,7 @@ namespace ImageResizer.Configuration {
         /// <summary>
         /// Fired after all rewriting is finished.
         /// e.AllowAccess defaults to the result of the UrlAuthorization module's verdict. It can be changed. 
-        /// Set e.AllowAccess to true to cause and 403 Access Dened result.
+        /// Set e.AllowAccess to true to cause and 403 Access Denied result.
         /// </summary>
         public event UrlAuthorizationEventHandler AuthorizeImage;
 
@@ -469,12 +489,23 @@ namespace ImageResizer.Configuration {
         public event UrlEventHandler ImageMissing;
 
         /// <summary>
-        /// Fired immediately before the image request is sent off to the caching system for proccessing.
+        /// (Sync Intercept Module only) Fired immediately before the image request is sent off to the caching system for processing.
         /// Allows modification of response headers, caching arguments, and callbacks.
         /// </summary>
         public event PreHandleImageEventHandler PreHandleImage;
 
+        /// <summary>
+        /// (ASYNC Intercept Module only) Fired immediately before the image request is sent off to the caching system for processing.
+        /// Allows modification of response headers, caching arguments, and callbacks.
+        /// </summary>
+        public event PreHandleImageAsyncEventHandler PreHandleImageAsync;
+
         public event CacheSelectionHandler SelectCachingSystem;
+
+        /// <summary>
+        /// An event that fires for most image requests, but does not guarantee an httpcontext.
+        /// </summary>
+        public event HeartbeatHandler Heartbeat;
 
         [CLSCompliant(false)]
         protected volatile bool firedFirstRequest = false;
@@ -524,8 +555,35 @@ namespace ImageResizer.Configuration {
             if (PostRewrite != null) PostRewrite(sender,context, e);
         }
 
+        public void FireHeartbeat()
+        {
+            Heartbeat?.Invoke(this, c);
+        }
+
+        public void FireHeartbeatViaAspNetCache(int intervalSeconds)
+        {
+            HttpRuntime.Cache.Insert("FireHeartbeat_for_PipelineConfig_" + GetHashCode(), intervalSeconds, null,
+                DateTime.Now.AddSeconds(intervalSeconds), System.Web.Caching.Cache.NoSlidingExpiration,
+                System.Web.Caching.CacheItemPriority.NotRemovable, (k, v, r) =>
+                {
+                    var seconds = Convert.ToInt32(v);
+                    if (seconds <= 0) {
+                        return;
+                    }
+                    FireHeartbeat();
+                    FireHeartbeatViaAspNetCache(seconds);
+                });
+        }
+
+
         public void FireAuthorizeImage(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlAuthorizationEventArgs e) {
             if (AuthorizeImage != null) AuthorizeImage(sender, context, e);
+        }
+
+        public void FirePreHandleImageAsync(IHttpModule sender, HttpContext context, IAsyncResponsePlan e)
+        {
+            System.Threading.Interlocked.Increment(ref processedCount);
+            if (PreHandleImageAsync != null) PreHandleImageAsync(sender, context, e);
         }
 
         public void FireImageMissing(System.Web.IHttpModule sender, System.Web.HttpContext context, IUrlEventArgs e) {
@@ -626,7 +684,7 @@ namespace ImageResizer.Configuration {
             get
             {
                 if (_authorizeAllImages == null) {
-                    _authorizeAllImages = c.get("pipeline.authorizeAllImages", false);
+                    _authorizeAllImages = c.get("pipeline.authorizeAllImages", true);
                 }
                 return _authorizeAllImages.Value;
             }

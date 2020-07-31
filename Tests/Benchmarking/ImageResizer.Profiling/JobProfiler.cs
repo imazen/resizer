@@ -41,6 +41,10 @@ namespace Bench
             }
         }
 
+        public static void ResetBarriers(){
+            startBarriers.Clear();
+            stopBarriers.Clear();
+        }
 
         private static ConcurrentDictionary<string, Barrier> startBarriers = new ConcurrentDictionary<string, Barrier>(8, 128, StringComparer.Ordinal);
         private static ConcurrentDictionary<string, Barrier> stopBarriers = new ConcurrentDictionary<string, Barrier>(8, 128, StringComparer.Ordinal);

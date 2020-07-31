@@ -1,32 +1,34 @@
 Tags: plugin
 Edition: performance
-Tagline: Allows blobstore images to be resized and served. (Azure 2.0 compatible).
+Tagline: Allows Azure Blob Storage images to be resized and served. 
 Aliases: /plugins/azurereader2
-
 
 # AzureReader2 plugin
 
-**AzureReader2 supports the Azure SDK V2.0 and requires .NET 4.0 instead of .NET 3.5. Many thanks to Marcus Briggs for his invaluable help in getting this released quickly.**
+Allows images located in [Azure Blob Storage](https://azure.microsoft.com/en-us/documentation/services/storage/) to be read, processed, resized, and served. Requests for unmodified images can be redirected to the blobstore itself.
 
-Also, Chris Skardon has [posted a nice walkthrough on using AzureReader2](http://geekswithblogs.net/cskardon/archive/2013/02/26/imageresizer-azurereader2-and-wellhellip-azure-duh.aspx), and Ben Foster has [written a great article](http://benfoster.io/blog/high-performance-image-processing-with-image-resizer-and-azure) on getting the most out of ImageResizer and Azure together.
-
-Allows images located in an Azure Blobstore to be read, processed, resized, and served. Requests for unmodified images get redirected to the blobstore itself.
+Ben Foster has [written a great walkthrough](http://benfoster.io/blog/high-performance-image-processing-with-image-resizer-and-azure) on using ImageResizer and AzureReader2; it provides screenshots and more detail than our reference guide here.
 
 ## Installation
 
 1. Install the Azure SDK
-2. Add ImageResizer.Plugins.AzureReader2.dll to the project or /bin.
-3. In the `<plugins />` section, insert `<add name="AzureReader2" connectionString="DefaultEndpointsProtocol=http;AccountName=myAccountName;AccountKey=myAccountKey" endpoint="http://<account>.blob.core.windows.net/" />`
+2. Add ImageResizer.Plugins.AzureReader2.dll to the project or /bin. Or, `Install-Package ImageResizer.Plugins.AzureReader2`
+3. In the `<plugins />` section, insert one of the following, depending on your scenario.
 
+Prior to V4.1, only appSettings was consulted for locating a connectionString by name - connectionStrings were not checked. For backwards compatibility, a match in appSettings is used before a match in connectionStrings.
 
+```
+<add name="AzureReader2" prefix="~/azure" connectionString="NamedConnectionString" />
+
+<add name="AzureReader2" prefix="~/azure" connectionString="DefaultEndpointsProtocol=http;AccountName=myAccountName;AccountKey=myAccountKey" />
+
+<add name="AzureReader2" prefix="~/azure" connectionString="UseDevelopmentStorage=true" />
+```
 
 ## Configuration reference
 
-* connectionString - The actual connection string
-* endpoint - The server address to perform redirects to when we don't need to modify the blob. Ex. "http://<account>.blob.core.windows.net/" or "http://127.0.0.1:10000/account/"
-* vpp - True(default): Installs the plugin as a VirtualPathProvider, so any ASP.NET software can access/execute the file. False only permits the ImageResizer to access the file.
-* lazyExistenceChceck: False(default) Verifies the blob exists before trying to access it (slower). True assumes that it exists, failing later on if the file is missing.
-* prefix - The subfolder of the site that is used to access azure files. Default: "~/azure/"
+AzureReader2 uses a prefix="~/azure/" by default.
 
-
-
+* `connectionString` - The name of a connection string or the actual connection string
+* `endpoint` - The server address to perform redirects to when we don't need to modify the blob. Ex. "http://<account>.blob.core.windows.net/" or "http://127.0.0.1:10000/account/" Automatically populated based on the connectionString.
+* `redirectToBlobIfUnmodified="true"` If true, AzureReader2 will 302 redirect to the original blob. If false, it will be proxied and possibly cached.

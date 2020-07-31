@@ -155,7 +155,7 @@ namespace ImageResizer.Plugins.SqlReader
                 SqlDataReader sdr = await sc.ExecuteReaderAsync();
                 using (sdr)
                 {
-                    if (!await sdr.ReadAsync()) throw new FileNotFoundException("Failed to find the specified image " + id + " in the database"); //0 rows
+                    if ((!await sdr.ReadAsync()) || sdr.IsDBNull(0)) throw new FileNotFoundException("Failed to find the specified image " + id + " in the database"); //0 rows
 
                     return sdr.GetSqlBytes(0).Stream; //No connection required for the stream, all cloned in memory.
                 }
@@ -163,7 +163,7 @@ namespace ImageResizer.Plugins.SqlReader
         }
 
         /// <summary>
-        /// Creates a SQL paramater of the correct type for the row id
+        /// Creates a SQL parameter of the correct type for the row id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -207,7 +207,7 @@ namespace ImageResizer.Plugins.SqlReader
                         {
                             DateTime val = (DateTime)sdr.GetValue(i);
                             if (val.Kind == DateTimeKind.Unspecified) val = DateTime.SpecifyKind(val, DateTimeKind.Utc);
-                            //Return the first non-null datetime instance in the row. Regardless of value.
+                            //Return the first non-null DateTime instance in the row. Regardless of value.
                             return new BlobMetadata(){ LastModifiedDateUtc = val, Exists = true};
                         }
                     }
@@ -305,7 +305,7 @@ namespace ImageResizer.Plugins.SqlReader
             }
             else
             {
-                throw new ImageProcessingException("Only Integer, String, and GUID identifiers are suported by SqlReader");
+                throw new ImageProcessingException("Only Integer, String, and GUID identifiers are supported by SqlReader");
             }
 
             return id;

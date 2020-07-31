@@ -13,7 +13,7 @@ namespace ImageResizer {
     /// </summary>
     public enum OutputFormat {
         /// <summary>
-        /// Jpeg - the best format for photographs and thumbnails
+        /// JPEG - the best format for photographs and thumbnails
         /// </summary>
         [EnumString("jpg",true)]
         [EnumString("jpe")]
@@ -148,7 +148,7 @@ namespace ImageResizer {
     [Obsolete("Obsolete. Use Mode=Crop to specify automatic cropping. Set CropTopLeft and CropTopRight to specify custom coordinates. Will be removed in V3.5 or V4.")]
     public enum CropMode {
         /// <summary>
-        /// Default. No cropping - uses letterboxing if strecth=proportionally and both width and height are specified.
+        /// Default. No cropping - uses letterboxing if stretch=proportionally and both width and height are specified.
         /// </summary>
         None,
         /// <summary>
@@ -157,7 +157,7 @@ namespace ImageResizer {
         [Obsolete("Use Mode=Crop instead.")]
         Auto,
         /// <summary>
-        /// Crops using the custom crop rectangle. Letterboxes if stretch=proportionally and both widht and height are specified.
+        /// Crops using the custom crop rectangle. Letterboxes if stretch=proportionally and both width and height are specified.
         /// </summary>
         Custom
     }
@@ -222,7 +222,7 @@ namespace ImageResizer {
         TopRight = 4,
         
         /// <summary>
-        /// Content is vertically aligned in the middle, and horizontally aligned onthe left.
+        /// Content is vertically aligned in the middle, and horizontally aligned on the left.
         /// </summary>
         MiddleLeft = 16,
         
@@ -242,7 +242,7 @@ namespace ImageResizer {
         BottomLeft = 256,
         
         /// <summary>
-        /// Content is vertically aligned at the bottom, and horizontally aligned at  the center.
+        /// Content is vertically aligned at the bottom, and horizontally aligned at the center.
         /// </summary>
         BottomCenter = 512,
 
@@ -253,13 +253,13 @@ namespace ImageResizer {
     }
 
     /// <summary>
-    /// Modes of converting the image to Grayscale. GrayscaleMode.Y usually produces the best resuts
+    /// Modes of converting the image to grayscale. GrayscaleMode.Y usually produces the best results.
     /// </summary>
     public enum GrayscaleMode {
         [EnumString("false")]
         None = 0,
         /// <summary>
-        /// The reccomended value. Y and NTSC are identical.
+        /// The recommended value. Y and NTSC are identical.
         /// </summary>
         [EnumString("true")]
         Y = 1,
@@ -274,7 +274,7 @@ namespace ImageResizer {
         Flat = 4
     }
     /// <summary>
-    /// The Jpeg subsampling mode to use. Requires FreeImageEncoder, FreeImageBuilder, WicEncoder, or WicBuilder.
+    /// The JPEG subsampling mode to use. Requires FreeImageEncoder, FreeImageBuilder, WicEncoder, or WicBuilder.
     /// </summary>
     public enum JpegSubsamplingMode {
         /// <summary>

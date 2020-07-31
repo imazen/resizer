@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.FastScaling.Tests", "ImageResizer.Plugins.FastScaling.Tests.csproj", "{77263155-750D-4A46-90A5-CBFC2D5E9A35}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{77263155-750D-4A46-90A5-CBFC2D5E9A35}.Debug|x64.ActiveCfg = Debug|x64
+		{77263155-750D-4A46-90A5-CBFC2D5E9A35}.Debug|x64.Build.0 = Debug|x64
+		{77263155-750D-4A46-90A5-CBFC2D5E9A35}.Debug|x86.ActiveCfg = Debug|x86
+		{77263155-750D-4A46-90A5-CBFC2D5E9A35}.Debug|x86.Build.0 = Debug|x86
+		{77263155-750D-4A46-90A5-CBFC2D5E9A35}.Release|x64.ActiveCfg = Release|x64
+		{77263155-750D-4A46-90A5-CBFC2D5E9A35}.Release|x64.Build.0 = Release|x64
+		{77263155-750D-4A46-90A5-CBFC2D5E9A35}.Release|x86.ActiveCfg = Release|x86
+		{77263155-750D-4A46-90A5-CBFC2D5E9A35}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
