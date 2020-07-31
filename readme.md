@@ -1,13 +1,11 @@
 <a name="top"></a>
 
 ## [ImageResizer](http://imageresizing.net) - The Flexible Image Server
-[![Build status - develop](https://ci.appveyor.com/api/projects/status/77a52n4hd0y36ybs/branch/develop?svg=true&passingText=develop%20-%20passing&failingText=develop%20-%20failed)](https://ci.appveyor.com/project/imazen/resizer/branch/develop) [![valgrind-develop](https://img.shields.io/travis/imazen/resizer/develop.svg?label=valgrind%20-%20develop)](https://travis-ci.org/imazen/resizer/builds) &nbsp; View ReadMe for [latest (develop)](https://github.com/imazen/resizer/tree/develop#top), [stable (master)](https://github.com/imazen/resizer/tree/master#top), [v2](https://github.com/imazen/resizer/tree/support/v2#top), [v3]( https://github.com/imazen/resizer/tree/support/v3#top) and [v4](https://github.com/imazen/resizer/tree/support/v4#top).
+[![Build status - develop](https://ci.appveyor.com/api/projects/status/77a52n4hd0y36ybs/branch/develop?svg=true&passingText=develop%20-%20passing&failingText=develop%20-%20failed)](https://ci.appveyor.com/project/imazen/resizer/branch/develop) &nbsp; View ReadMe for [latest (develop)](https://github.com/imazen/resizer/tree/develop#top), [stable (master)](https://github.com/imazen/resizer/tree/master#top), [v2](https://github.com/imazen/resizer/tree/support/v2#top), [v3]( https://github.com/imazen/resizer/tree/support/v3#top) and [v4](https://github.com/imazen/resizer/tree/support/v4#top).
 
-![Latest NuGet version](http://img.shields.io/nuget/vpre/ImageResizer.svg) ![Issue Count](http://img.shields.io/github/issues/imazen/resizer.svg) [![Issues ready for work](https://badge.waffle.io/imazen/resizer.png?label=ready&title=up%20for%20grabs&svg=true)](https://waffle.io/imazen/resizer)
+![Latest NuGet version](http://img.shields.io/nuget/vpre/ImageResizer.svg) ![Issue Count](http://img.shields.io/github/issues/imazen/resizer.svg) 
 
-https://github.com/imazen/resizer
-
-ImageResizer is in maintenance-only mode for the next 10 months as we focus on [Imageflow](https://www.imageflow.io/imageresizer/), which will serve as the new underlying engine for future ImageResizer releases. Imageflow includes both a DLL (which ImageResizer will use) and a standalone image server and command-line tool.
+If you're looking for a .NET Core version, check out [Imageflow.NET Server](https://github.com/imazen/imageflow-dotnet-server)
 
 # What is it?
 
@@ -47,7 +45,7 @@ Over half of ImageResizer's plugins are available under the Apache 2.0 license. 
   2. [Getting Detailed Error Messages](#error_messages)
   3. [What Might be Wrong](#troubleshooting_guide)
 4. [Everything Else](#everything_else)
-  1. [Licensing and Support Contract Information](#licensing_and_contract_info)
+  1. [Licensing and Support Information](#licensing_and_contract_info)
   3. [Contact Us](#contact)
 
 <a name="getting_started"></a>
@@ -747,14 +745,10 @@ By default, ImageResizer limits the output size of images to 3200x3200. This can
 
 The short version: ImageResizer has several license packages that have different tiers of access to our plugins, including free packages in our [essential](http://imageresizing.net/plugins/editions/free) and [trial](http://imageresizing.net/licenses/trial) packages. To find out about our license packages, [visit our website](http://imageresizing.net/licenses).
 
-## Support Contracts
-
-For those times when (not if) everything breaks all at once, it's good to have us in your corner. Our support contracts come with architecture planning, hot-fixes, guaranteed rapid-response, emergency telephone numbers, and lots of other cool stuff. Furthermore, you can customize your plan to get just the right amount of support that you need. Remember: contracts can *save money* in the long-term, and we do our best to make sure our support contract customers get maximum bang for minimal buck.
-
-All ImageResizer support contracts come with a non-expiring Elite license, and free major upgrades for the duration of the contract. To see the different options available, check out [our support contracts page](http://www.imageresizing.net/support/contracts).
+We also offer email support plans and custom support contracts. Contact us at sales@imazen.io to learn more. 
 
 <a name="contact"></a>
 
 ## Contact Us
 
-We can be reached at support@imageresizing.net. We usually respond within 2 or 3 business days. Of course, you could also leave comments on our [website](http://www.imageresizing.net), tag issues, or send smoke signals (Note: We do not actually advise sending smoke signals. Terrible waste of firewood, and bad for asthmatics to boot).
+We can be reached at support@imazen.io. We usually respond within 2 or 3 business days. Of course, you could also check out StackOverflow, where over [500 ImageResizer questions have been answered](http://stackoverflow.com/questions/tagged/imageresizer).
