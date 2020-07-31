@@ -68,7 +68,36 @@ namespace ImageResizer.Plugins.DiskCache.Async {
         /// <param name="w"></param>
         /// <param name="writerDelegate"></param>
         /// <returns></returns>
-        public bool Queue(AsyncWrite w,WriterDelegate writerDelegate ){
+        public bool Queue(AsyncWrite w, WriterDelegate writerDelegate)
+        {
+            lock (_sync)
+            {
+                if (GetQueuedBufferBytes() + w.GetBufferLength() > MaxQueueBytes) return false; //Because we would use too much ram.
+                if (c.ContainsKey(w.Key)) return false; //We already have a queued write for this data.
+                c.Add(w.Key, w);
+                if (!ThreadPool.QueueUserWorkItem(delegate (object state) {
+                    AsyncWrite job = state as AsyncWrite;
+                    writerDelegate(job);
+                    Remove(job);
+                }, w)) return false; //thread pool refused
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// A callback that will write the given AsyncWrite to disk synchronously
+        /// </summary>
+        /// <param name="w"></param>
+        /// <returns></returns>
+        public delegate void WriterDelegate(AsyncWrite w);
+
+        /// <summary>
+        /// Returns false when (a) the specified AsyncWrite value already exists or (b) the queue is full
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="writerDelegate"></param>
+        /// <returns></returns>
+        public bool QueueAsync(AsyncWrite w, AsyncWriterDelegate writerDelegate ){
             lock (_sync) {
                 if (GetQueuedBufferBytes() + w.GetBufferLength() > MaxQueueBytes) return false; //Because we would use too much ram.
                 if (c.ContainsKey(w.Key)) return false; //We already have a queued write for this data.
@@ -82,7 +111,12 @@ namespace ImageResizer.Plugins.DiskCache.Async {
             }
         }
 
-        public delegate Task WriterDelegate(AsyncWrite w);
+        /// <summary>
+        /// A callback that will write the given AsyncWrite to disk in an async manner
+        /// </summary>
+        /// <param name="w"></param>
+        /// <returns></returns>
+        public delegate Task AsyncWriterDelegate(AsyncWrite w);
 
     }
 }

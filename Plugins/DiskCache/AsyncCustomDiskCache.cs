@@ -152,7 +152,7 @@ namespace ImageResizer.Plugins.DiskCache {
                             ms.Position = 0;
 
                             AsyncWrite w = new AsyncWrite(CurrentWrites,ms, physicalPath, relativePath);
-                            if (CurrentWrites.Queue(w, async delegate(AsyncWrite job) {
+                            if (CurrentWrites.QueueAsync(w, async delegate(AsyncWrite job) {
                                 try {
                                     Stopwatch swio = new Stopwatch();
                                     
