@@ -17,7 +17,7 @@ if [ "${TRAVIS_BRANCH}" = "" ]; then
 fi
 
 # TRAVIS_PULL_REQUEST should be unset
-if [ ! "${TRAVIS_PULL_REQUEST}" = "" ]; then
+if [ "${TRAVIS_PULL_REQUEST}" != "" ]; then
   echo "This won't run on PRs"
   exit 0
 fi
