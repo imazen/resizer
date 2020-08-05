@@ -44,9 +44,7 @@ namespace ImageResizer.Configuration.Performance
                                              .Where(p => p != null);
 
 
-
-
-        internal string Generate()
+        internal string Header()
         {
             //Get loaded assemblies for later use
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -66,8 +64,17 @@ namespace ImageResizer.Configuration.Performance
                                              .Distinct()
                                              .ToArray();
 
+
+            return $"Diagnostics for ImageResizer {distinctVersions.Delimited(", ")} {distinctCommits.Delimited(", ")} at {httpContext?.Request.Url.DnsSafeHost} generated {now} UTC";
+        }
+
+        internal string Generate()
+        {
+            //Get loaded assemblies for later use
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
             var sb = new StringBuilder(8096);
-            sb.AppendLine($"Diagnostics for ImageResizer {distinctVersions.Delimited(", ")} {distinctCommits.Delimited(", ")} at {httpContext?.Request.Url.DnsSafeHost} generated {now}");
+            sb.AppendLine(Header());
             sb.AppendLine("Please remember to provide this page when contacting support.");
             sb.AppendLine();
 
@@ -226,7 +233,7 @@ namespace ImageResizer.Configuration.Performance
         Dictionary<string, List<string>> GetImageResizerVersions(Assembly[] assemblies)
         {
 
-            //Verify we're using the same general version of all ImageResizer assemblies.
+            //Verify we're using the same file version of all ImageResizer assemblies.
             var versions = new Dictionary<string, List<string>>();
             foreach (var a in assemblies) {
                 var is_imazen_assembly = a.GetFirstAttribute<AssemblyCopyrightAttribute>()?.Copyright?.Contains("Imazen") == true;
@@ -235,7 +242,7 @@ namespace ImageResizer.Configuration.Performance
                 if (!an.Name.StartsWith("ImageResizer", StringComparison.OrdinalIgnoreCase) || !is_imazen_assembly) {
                     continue;
                 }
-                var key = an.Version.Major + "." + an.Version.Minor + "." + an.Version.Build;
+                var key = a.GetFileVersion() ?? an.Version.Major + "." + an.Version.Minor + "." + an.Version.Build;
                 if (!versions.ContainsKey(key)) versions[key] = new List<string>();
                 versions[key].Add(an.Name);
             }

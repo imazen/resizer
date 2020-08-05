@@ -15,7 +15,7 @@ This is a full reference showing how to use each setting. You should *never* cop
 		</configSections>
 
 		<resizer>
-			<!-- Unless you (a) use Integrated mode, or (b) map all reqeusts to ASP.NET,
+			<!-- Unless you (a) use Integrated mode, or (b) map all requests to ASP.NET,
 					 you'll need to add .ashx to your image URLs: image.jpg.ashx?width=200&height=20
 					 vppUsage defaults to 'Fallback', which means VirtualPathProviders are used if the
 					 physical file doesn't exist.
@@ -36,7 +36,7 @@ This is a full reference showing how to use each setting. You should *never* cop
 				<preset name="thumb-defs" defaults="width=100;height=100" />
 				<preset name="thumb" settings="width=100;height=100" />
 				<preset name="thumb-width" defaults="height=100" settings="width=100" />
-				<!-- The height can be overriden above, but not the width -->
+				<!-- The height can be overridden above, but not the width -->
 			</presets>
 
 			<!-- Overrides the 'custom errors' setting. Enables the /resizer.debug page for the specified clients.

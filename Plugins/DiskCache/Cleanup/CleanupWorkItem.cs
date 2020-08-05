@@ -15,7 +15,7 @@ namespace ImageResizer.Plugins.DiskCache {
 
     
         /// <summary>
-        /// Should be a delegate a CleanupWorkItem instance (which doesn't have LazyProvider value, but has RelativePath and PhyscialPath values). May return null
+        /// Should be a delegate a CleanupWorkItem instance (which doesn't have LazyProvider value, but has RelativePath and PhysicalPath values). May return null
         /// </summary>
         public LazyTaskProvider LazyProvider {get;  set;}
         

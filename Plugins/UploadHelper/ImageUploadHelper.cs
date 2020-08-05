@@ -102,7 +102,7 @@ namespace ImageResizer
 
             if (sigExt != null && IsExtensionWhitelisted(sigExt,whitelistedFormats)) return sigExt;
 
-            //Falback to untrusted ppath
+            //Fallback to untrusted ppath
             if (originalPath != null){
                 string ext = NormalizeExtension(GetExtension(originalPath));
 

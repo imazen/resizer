@@ -48,7 +48,7 @@ namespace ImageResizer.Plugins.Basic {
         }
 
 
-        string DisabledNotice(Config c)
+        public static string DisabledNotice(Config c)
         {
             var sb = new StringBuilder();
 
@@ -95,7 +95,7 @@ namespace ImageResizer.Plugins.Basic {
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public bool AllowResponse(HttpContext context, Config c) {
+        public static bool AllowResponse(HttpContext context, Config c) {
             switch (c.get("diagnostics.enableFor", context.IsCustomErrorEnabled ? DiagnosticMode.None : DiagnosticMode.AllHosts)) {
                 case DiagnosticMode.AllHosts:
                     return true;

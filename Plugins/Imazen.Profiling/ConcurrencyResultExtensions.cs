@@ -53,7 +53,7 @@ namespace Imazen.Profiling
             return r.SequentialRuns.Invocations().Combine(r.ParallelRuns.Invocations());
         }
         /// <summary>
-        /// Traverses the tree and grabs a set of maching subtrees with the given segment name.
+        /// Traverses the tree and grabs a set of matching subtrees with the given segment name.
         /// </summary>
         /// <param name="tree"></param>
         /// <param name="name"></param>

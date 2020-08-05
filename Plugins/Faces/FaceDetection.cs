@@ -62,14 +62,20 @@ namespace ImageResizer.Plugins.Faces {
         public FaceDetection():base(){
             MinFaces = 1;
             MaxFaces = 10;
-            MinSizePercent = 3;
-            ConfidenceLevelThreshold = 2;
-            MinConfidenceLevel = 1;
+            MinSizePercent = 4;
+            ConfidenceLevelThreshold = 5;
+            MinConfidenceLevel = 3;
 
             ExpandX = 0;
             ExpandY = 0;
             fileNames = new Dictionary<string, string>(){ 
-            {"FaceCascade",@"haarcascade_frontalface_default.xml"} };
+            {"FaceCascade",@"haarcascade_frontalface_default.xml"},
+                { "FaceCascadeAlt",@"haarcascade_frontalface_alt.xml"},
+                { "FaceCascadeAlt2",@"haarcascade_frontalface_alt2.xml"},
+                {"FaceCascadeAltTree",@"haarcascade_frontalface_alt_tree.xml"},
+                {"FaceProfile",@"haarcascade_profileface.xml"},
+                {"Eye",@"haarcascade_eye.xml"},
+            };
         }
         /// <summary>
         /// The minimum number of faces expected
@@ -106,8 +112,9 @@ namespace ImageResizer.Plugins.Faces {
         /// The percentage by which to expand each face rectangle vertically after detection. To expand 20% on the top and bottom, set to 0.4
         /// </summary>
         public double ExpandY { get; set; }
-        
-       
+
+        static long totalTime = 0;
+        static long count = 0;
         /// <summary>
         /// Detects features on a grayscale image.
         /// </summary>
@@ -115,25 +122,59 @@ namespace ImageResizer.Plugins.Faces {
         /// <param name="storage"></param>
         /// <returns></returns>
         protected override List<Face> DetectFeatures(IplImage img, CvMemStorage storage) {
+            
             //Determine minimum face size
-            var minSize = (int)Math.Round((double)MinSizePercent / 100.0 * Math.Min(img.Width, img.Height));
+            var minSize = Math.Max(12, (int)Math.Round((double)MinSizePercent / 100.0 * Math.Min(img.Width, img.Height)));
 
             
-            //Detect faces (frontal). TODO: side
+            //Detect faces (frontal). 
             Stopwatch watch = Stopwatch.StartNew();
-            CvAvgComp[] faces = Cv.HaarDetectObjects(img, Cascades["FaceCascade"], storage, 1.0850, MinConfidenceLevel, 0, new CvSize(minSize, minSize), new CvSize(0,0)).ToArrayAndDispose();
-            watch.Stop();
-            Debug.WriteLine("Face detection time = " + watch.ElapsedMilliseconds);
+            
 
+            CvAvgComp[] faces = BorrowCascade("FaceCascadeAlt", c => Cv.HaarDetectObjects(img, c, storage, 1.0850, MinConfidenceLevel, HaarDetectionType.DoCannyPruning, new CvSize(minSize, minSize), new CvSize(0,0)).ToArrayAndDispose());
+            
             //Sort by accuracy
             Array.Sort<CvAvgComp>(faces, CompareByNeighbors);
 
             //Convert into feature objects list
             List<Face> features = new List<Face>(faces.Length);
             foreach (CvAvgComp face in faces) features.Add(new Face(PolygonMath.ScaleRect(face.Rect.ToRectangleF(),ExpandX,ExpandY), face.Neighbors));
+
+            // Doesn't add much, and would have to be deduplicated.
+            //CvAvgComp[] profiles = BorrowCascade("FaceProfile", c => Cv.HaarDetectObjects(img, c, storage, 1.2, MinConfidenceLevel + 2, HaarDetectionType.FindBiggestObject | HaarDetectionType.DoRoughSearch | HaarDetectionType.DoCannyPruning, new CvSize(img.Width / 8, img.Height / 8), new CvSize(0, 0)).ToArrayAndDispose());
+            //foreach (CvAvgComp face in profiles) features.Add(new Face(PolygonMath.ScaleRect(face.Rect.ToRectangleF(), ExpandX, ExpandY), face.Neighbors));
+
+
+            // Test for eyes, if faces > 20 pixels
+            foreach (var face in features) {
+                var w = (int) (face.X2 - face.X);
+                var h = (int) ((face.Y2 - face.Y) * 0.6);
+                if (w > 20) {
+                    img.SetROI((int) face.X, (int) face.Y, w, h);
+                    storage.Clear(); 
+                    CvAvgComp[] eyes = BorrowCascade("Eye",
+                        c => Cv.HaarDetectObjects(img, c, storage, 1.0850, 4, HaarDetectionType.FindBiggestObject | HaarDetectionType.DoRoughSearch,
+                                   new CvSize(4, 4), new CvSize(img.Width / 2, img.Height / 2))
+                               .ToArrayAndDispose());
+                    if (eyes.Length == 0) {
+                        // Halve the estimated accuracy if there are no eyes detected
+                        face.Accuracy = face.Accuracy / 2;
+                        // We never want to boost accuracy, because the walls have eyes
+                    }
+                }
+            }
+
             
+
+
             //Unless we're below MinFaces, filter out the low confidence matches.
             while (features.Count > MinFaces && features[features.Count - 1].Accuracy < ConfidenceLevelThreshold) features.RemoveAt(features.Count - 1);
+
+
+            watch.Stop();
+            totalTime += watch.ElapsedMilliseconds;
+            count++;
+            Debug.WriteLine($"Face detection time: {watch.ElapsedMilliseconds}ms  (avg {totalTime / count}ms)");
 
 
             //Never return more than [MaxFaces]

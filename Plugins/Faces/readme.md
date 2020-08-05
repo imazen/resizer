@@ -52,13 +52,13 @@ All tuning parameters are identical between the URL and Managed API.
 
 ## Tuning
 
-`f.minsize=0..100` (defaults to 3). The smallest face to detect, as a percentage of the image size.
+`f.minsize=0..100` (defaults to 4). The smallest face to detect, as a percentage of the image size.
 
-`f.faces=min-count,maxcount` Defaults to 1,8. The minimum and maximum number of faces to detect in the image. 
+`f.faces=min-count,maxcount` Defaults to 1,10. The minimum and maximum number of faces to detect in the image. 
 
 `f.expand=percent|xpercent,ypercent` Defaults to 0,0. The percent (0..100) to expand the face rectangles in each orientation. If ypercent is omitted, the value from xpercent will be used.
 
-`f.threshold=value|minvalue,value` The confidence threshold required to consider a face detected. Defaults to 1,2. 'minvalue' is used if we have not reached the quote specified in `f.faces`.
+`f.threshold=value|minvalue,value` The confidence threshold required to consider a face detected. Defaults to 3,5. 'minvalue' is used if we have not reached the quote specified in `f.faces`.
 
 
 ## Installation. 
@@ -106,45 +106,25 @@ Each item in the 'features' array contains the following members
 
 For RedEye results, only rectangles where Feature=0 are eyes. Feature=1 means Eye Pair, Feature = 2 means face.
 
-
-
-
-## Managed Dependencies
-
-* ImageResizer.dll
-* AForge.dll
-* AForge.Math.dll
-* AForge.Imaging.dll
-* AForge.Imaging.Formats.dll 
-* OpenCvSharp.dll
-* OpenCvSharp.dll.config
-* Newtonsoft.Json.dll
-
-
 ## Feature classification files
 
-[You can download all the XML files](http://downloads.imageresizing.net/OpenCV-2.3.1-all-cascades.zip) in a single .ZIP file. You only need to copy the following into the /bin folder.
+https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/cascades/haarcascade_frontalface_alt.xml
+https://d3ndcb4i803ljg.cloudfront.net/opencv/2.4.10/cascades/haarcascade_eye.xml
 
-* haarcascade\_frontalface\_default.xml
-
-## Using the 2.3.1 pre-compiled binaries
-
-All DLLs must match in bitness. All DLLs are bitness specific. You can't run OpenCV x86 on an x64 app pool or vice versa.
-
-* [Download 32-bit DLLs](http://downloads.imageresizing.net/OpenCv-min-2.3.1-x86.zip).
-* [Download 64-bit DLLs](http://downloads.imageresizing.net/OpenCv-min-2.3.1-x64.zip).
 
 ## Manually getting the binaries
 
-The provided binaries are for OpenCV 2.3.1. If a newer version is released, you can get it yourself. 
+The provided binaries are for OpenCV 2.4.10 If a newer version is released, you can get it yourself. 
 
-1. Download either the [x86](http://code.google.com/p/opencvsharp/downloads/detail?name=OpenCvSharp-2.3.1-x86-20120218.zip&can=2&q=) or [x64](http://code.google.com/p/opencvsharp/downloads/detail?name=OpenCvSharp-2.3.1-x64-20120218.zip&can=2&q=) build of OpenCvSharp.
+1. Download either [OpenCvSharp](https://github.com/shimat/opencvsharp/releases/tag/2.4.10.20170126).
 2. Extract to a folder, and copy OpenCvSharp.dll and OpenCvSharp.dll.config. The x86 and x64 builds are actually identical. 
 3. Go to SourceForge, the opencvlibrary project, the Files section, the opencv-win folder \[[Link](http://sourceforge.net/projects/opencvlibrary/files/opencv-win/)\].
 4. Select the latest version and download the OpenCV-[Version]-win-superpack.exe file. 
 5. Extract it somewhere (you'll want to delete it later, it's over 1GB uncompressed)
 
-### Files to copy from extracted OpenCV-2.3.1-win-superpack package
+### Files to copy from extracted package
+
+(version numbers may differ - 231 or 2410, and vc9 or vc12, etc)
 
 * tbb.dll (From opencv\build\common\tbb\ia32\vc9 or opencv\build\common\tbb\intel64\vc9
 * opencv\_calib3d231.dll (From opencv\build\x64\vc9\bin or opencv\build\x86\vc9\bin)

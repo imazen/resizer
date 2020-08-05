@@ -96,7 +96,7 @@ namespace ImageResizer.Plugins.LicenseVerifier
                 if (string.IsNullOrEmpty(from) || string.IsNullOrEmpty(to)) {
                     sink.AcceptIssue(new Issue($"Both from= and to= attributes are required on maphost, found {from} and {to}",
                         IssueSeverity.ConfigurationError));
-                } else if (from.Replace(".local", "").IndexOf('.') > -1) {
+                } else if (!from.EndsWith(".local") && from.IndexOf('.') > -1) {
                     sink.AcceptIssue(new Issue(
                         $"You can only map non-public hostnames to arbitrary licenses. Skipping {from}",
                         IssueSeverity.ConfigurationError));

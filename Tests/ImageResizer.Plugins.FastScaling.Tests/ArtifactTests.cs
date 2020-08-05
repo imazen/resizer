@@ -241,7 +241,7 @@ namespace ImageResizer.Plugins.FastScaling.Tests
                             error.Item2 < threshold.Item2 &&
                             error.Item3 < threshold.Item3 &&
                             error.Item4 < threshold.Item4,
-                            String.Format("Mismatch within region ({0},{1}) ({2},{3}). Root mean squared error ({4}) excceeds threshold {5}", x1, y1, x2, y2, error, threshold));
+                            String.Format("Mismatch within region ({0},{1}) ({2},{3}). Root mean squared error ({4}) exceeds threshold {5}", x1, y1, x2, y2, error, threshold));
             }
         }
 

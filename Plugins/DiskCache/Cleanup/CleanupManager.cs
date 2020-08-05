@@ -45,7 +45,7 @@ namespace ImageResizer.Plugins.DiskCache {
         /// <summary>
         /// When true, indicates that another process is managing cleanup operations - this thread is idle, waiting for the other process to end before it can pick up work.
         /// </summary>
-        public bool ExteralProcessCleaning { get {   return worker != null ? worker.ExteralProcessCleaning : false; } }
+        public bool ExternalProcessCleaning { get {   return worker != null ? worker.ExternalProcessCleaning : false; } }
 
         /// <summary>
         /// Notifies the CleanupManager that a request is in process. Helps CleanupManager optimize background work so it doesn't interfere with request processing.

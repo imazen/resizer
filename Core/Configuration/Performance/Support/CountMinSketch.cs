@@ -31,7 +31,7 @@ namespace ImageResizer.Configuration.Performance
         
         public void InterlockedAdd(uint value, int count)
         {
-            //var indicies = hashes.Select(h => h.ComputeHash(value) % bucketCount).ToArray();
+            //var indices = hashes.Select(h => h.ComputeHash(value) % bucketCount).ToArray();
 
             for (var i = 0; i < hashAlgCount; i++)
             {
@@ -41,7 +41,7 @@ namespace ImageResizer.Configuration.Performance
         }
         public void Add(uint value, int count)
         {
-            //var indicies = hashes.Select(h => h.ComputeHash(value) % bucketCount).ToArray();
+            //var indices = hashes.Select(h => h.ComputeHash(value) % bucketCount).ToArray();
 
             for (var i = 0; i < hashAlgCount; i++)
             {
@@ -53,7 +53,7 @@ namespace ImageResizer.Configuration.Performance
         public long Estimate(uint value)
         {
             // var hashValues = hashes.Select((hash, hashIndex) => hash.ComputeHash(value)).ToArray();
-            // var indicies = hashes.Select((hash, hashIndex) => hash.ComputeHash(value) % bucketCount).ToArray();
+            // var indices = hashes.Select((hash, hashIndex) => hash.ComputeHash(value) % bucketCount).ToArray();
             // var values = hashes.Select((hash, hashIndex) => table[hashIndex, hash.ComputeHash(value) % bucketCount]).ToArray();
 
             int result = int.MaxValue;

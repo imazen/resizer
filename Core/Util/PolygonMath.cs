@@ -628,6 +628,43 @@ namespace ImageResizer.Util
 
             return obj;
         }
+
+        /// <summary>
+        /// Minimally move the rectangle 'obj' to be within the bounds of 'container'. Behavior only defined if obj size &lt;= container size.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="container"></param>
+        /// <returns></returns>
+        public static RectangleF MoveInBounds(RectangleF obj, RectangleF container)
+        {
+            if (obj.Right > container.Right) obj.X += (container.Right - obj.Right);
+            if (obj.Bottom > container.Bottom) obj.Y += (container.Bottom - obj.Bottom);
+            if (obj.X < container.X) obj.X = container.X;
+            if (obj.Y < container.Y) obj.Y = container.Y;
+            return obj;
+        }
+
+        /// <summary>
+        /// Aligns the specified rectangle object with its reference ('container') rectangle using the specified alignment.
+        /// If the container is large enough to contain 'obj', then obj will be adjusted within bounds. 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="container"></param>
+        /// <param name="align"></param>
+        /// <returns></returns>
+        public static RectangleF AlignWithin(RectangleF obj, RectangleF container, PointF centerAt)
+        {
+            var centered = CenterInside(obj.Size, new RectangleF(centerAt, SizeF.Empty));
+            return FitsInside(obj.Size, container.Size) ? MoveInBounds(centered, container) : centered;
+        }
+
+        /// <returns></returns>
+        public static PointF Midpoint(RectangleF obj)
+        {
+            return new PointF(obj.X + (obj.Width / 2), obj.Y + obj.Height / 2);
+        }
+
+
         /// <summary>
         /// Aligns the specified polygon with its container (reference) polygon using the specified alignment. The container can be smaller than 'obj'.
         /// </summary>
@@ -819,7 +856,7 @@ namespace ImageResizer.Util
         }
 
         /// <summary>
-        /// Expands the given rectangle to be the given size while keeping it centered.
+        /// Expands/shrinks the given rectangle to be the given size while keeping it centered.
         /// </summary>
         /// <param name="box"></param>
         /// <param name="copySize"></param>

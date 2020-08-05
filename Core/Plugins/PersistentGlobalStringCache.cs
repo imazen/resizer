@@ -111,6 +111,12 @@ namespace ImageResizer.Plugins
             }
         }
 
+
+        internal DateTime? GetWriteTimeUtc(string key)
+        {
+            return store.TryGetLastWriteTimeUtc(FilenameKeyFor(key));
+        }
+
         public IEnumerable<IIssue> GetIssues()
         {
             return ((IIssueProvider)sink).GetIssues();
@@ -120,13 +126,13 @@ namespace ImageResizer.Plugins
     /// <summary>
     /// Not for you. Don't use this. It creates a separate file for every key. Wraps a singleton
     /// </summary>
-    public class PeristentGlobalStringCache : IPersistentStringCache, IIssueProvider
+    public class PersistentGlobalStringCache : IPersistentStringCache, IIssueProvider
     {
         static WriteThroughCache processCache = new WriteThroughCache();
 
 
         WriteThroughCache cache;
-        public PeristentGlobalStringCache()
+        public PersistentGlobalStringCache()
         {
             cache = processCache;
         }
@@ -144,6 +150,11 @@ namespace ImageResizer.Plugins
         public IEnumerable<IIssue> GetIssues()
         {
             return cache.GetIssues();
+        }
+
+        public DateTime? GetWriteTimeUtc(string key)
+        {
+            return cache.GetWriteTimeUtc(key);
         }
     }
 }

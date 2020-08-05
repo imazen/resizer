@@ -58,7 +58,7 @@ namespace ImageResizer.Configuration
             
 
             //All plugins found in ImageResizer.dll under the ImageResizer.Plugins.Basic namespace
-            foreach (string basic in new []{"AutoRotate", "LicenseDisplay", "ClientCache", "DefaultEncoder", "DefaultSettings", "Diagnostic", "DropShadow",
+            foreach (string basic in new []{"AutoRotate", "LicenseDisplay", "ClientCache", "DefaultEncoder", "DefaultSettings", "Diagnostic", "DropShadow", "DiagnoseRequest",
                             "FolderResizeSyntax", "Gradient", "IEPngFix", "Image404", "ImageHandlerSyntax", "ImageInfoAPI", 
                              "NoCache", "Presets", "SizeLimiting", "SpeedOrQuality", "Trial", "VirtualFolder", "WebConfigLicenseReader"})
                 AddHint(basic, "ImageResizer.Plugins.Basic." + basic + ", ImageResizer");

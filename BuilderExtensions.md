@@ -6,9 +6,9 @@ provide resizing and image manipulation functionality.
 
 All extensions to the resizing process derive from the `BuilderExtension` base
 class, which in turn derives from `AbstractImageProcessor`.  The
-`AbtractImageProcessor` class serves two purposes:
+`AbstractImageProcessor` class serves two purposes:
 
- 1. It defines 53 virtual methods which indvidual extensions can override as
+ 1. It defines 53 virtual methods which individual extensions can override as
     needed.  9 of these methods are for acquiring or beginning the overall
     process, and the remaining 44 are individual steps of the resizing
     process.
@@ -71,7 +71,7 @@ begins.  At present, no extensions override this method.
 >### `protected virtual RequestedAction BuildJob(ImageResizer.ImageJob job)`
 
 Called (by `ImageBuilder.Build()`) to start the image processing pipeline.
-If overriden, replaces the default `ImageBuilder` handing of the pipeline.
+If overridden, replaces the default `ImageBuilder` handing of the pipeline.
 FreeImage, WIC, and WPF provide override implementations that take over if the
 job settings include their value for the `builder` key.
 
@@ -86,7 +86,7 @@ The AnimatedGifs extension overrides to provide support for multi-frame
 >### `protected virtual Bitmap buildToBitmap(Bitmap source, ResizeSettings settings, bool transparencySupported)`
 
 Called to create the output `Bitmap` based on the source `Bitmap` and the
-settings.  Only overriden by `ImageBuilder` in order to call `Process()` and
+settings.  Only overridden by `ImageBuilder` in order to call `Process()` and
 begin the default resizing pipeline.
 
 ## Low-level Image Resizing
@@ -293,7 +293,7 @@ sepia, edge detection, etc.  The RedEye plugin implements `PostRenderImage()`
 in order to draw the red-eye reduction effects to the destination image.
 <span style="color:red">_**(Seems to draw a rectangle?)**_</span>
 The Faces plugin implements `PostRenderImage()` in order to show the bounds
-of the caclulated face rectangles if the "f.show" setting is "true".
+of the calculated face rectangles if the "f.show" setting is "true".
 
 After the plugins get a chance to handle `RenderImage()`, `ImageBuilder`'s
 implementation draws either the `preRenderBitmap` (if it exists) or source

@@ -2,7 +2,7 @@ Aliases: /docs/wrappers /docs/contribute /docs/community
 Icon: github-alt
 
 
-# Communuty plugins and articles
+# Community plugins and articles
 
 
 

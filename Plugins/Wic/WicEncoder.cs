@@ -181,7 +181,7 @@ namespace ImageResizer.Plugins.WicEncoder {
                     propBag.Write(1, qualityOption, new object[] { ((float)Math.Max(0,Math.Min(100,Quality))) / 100 });
 
                     WICJpegYCrCbSubsamplingOption subsampling = WICJpegYCrCbSubsamplingOption.WICJpegYCrCbSubsamplingDefault;
-                    //411 NOT SUPPPORTED BY WIC - only by freeimage
+                    //411 NOT SUPPORTED BY WIC - only by freeimage
                     if ("420".Equals(Subsampling)) subsampling = WICJpegYCrCbSubsamplingOption.WICJpegYCrCbSubsampling420;
                     if ("422".Equals(Subsampling)) subsampling = WICJpegYCrCbSubsamplingOption.WICJpegYCrCbSubsampling422;
                     if ("444".Equals(Subsampling)) subsampling = WICJpegYCrCbSubsamplingOption.WICJpegYCrCbSubsampling444;

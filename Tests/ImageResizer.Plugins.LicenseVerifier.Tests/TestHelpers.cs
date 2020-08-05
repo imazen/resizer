@@ -40,9 +40,36 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         public DateTimeOffset? GetBuildDate() => built;
         public DateTimeOffset? GetAssemblyWriteDate() => built;
     }
+
+    /// <summary>
+    /// Time advances normally, but starting from the givien date instead of now
+    /// </summary>
+    class OffsetClock : ILicenseClock
+    {
+        TimeSpan offset;
+        long ticksOffset;
+        readonly DateTimeOffset built;
+
+        public OffsetClock(string date, string buildDate)
+        {
+            offset = DateTimeOffset.UtcNow - DateTimeOffset.Parse(date);
+            ticksOffset = Stopwatch.GetTimestamp() - 1;
+            built = DateTimeOffset.Parse(buildDate);
+        }
+
+        public void AdvanceSeconds(int seconds) { offset = offset + new TimeSpan(0,0, seconds); }
+        public DateTimeOffset GetUtcNow() => DateTimeOffset.UtcNow - offset;
+        public long GetTimestampTicks() => Stopwatch.GetTimestamp() - ticksOffset;
+        public long TicksPerSecond { get; } = Stopwatch.Frequency;
+        public DateTimeOffset? GetBuildDate() => built;
+        public DateTimeOffset? GetAssemblyWriteDate() => built;
+    }
+
     class StringCacheEmpty : IPersistentStringCache
     {
         public string Get(string key) => null;
+
+        public DateTime? GetWriteTimeUtc(string key) => null;
 
         public StringCachePutResult TryPut(string key, string value) => StringCachePutResult.WriteFailed;
     }
@@ -50,6 +77,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
     class StringCacheMem : IPersistentStringCache
     {
         readonly ConcurrentDictionary<string, string> cache = new ConcurrentDictionary<string, string>();
+        readonly ConcurrentDictionary<string, DateTime> cacheWrite = new ConcurrentDictionary<string, DateTime>();
 
         public StringCachePutResult TryPut(string key, string value)
         {
@@ -58,6 +86,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
                 return StringCachePutResult.Duplicate;
             }
             cache[key] = value;
+            cacheWrite[key] = DateTime.UtcNow;
             return StringCachePutResult.WriteComplete;
         }
 
@@ -65,6 +94,16 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
         {
             string current;
             if (cache.TryGetValue(key, out current)) {
+                return current;
+            }
+            return null;
+        }
+
+        public DateTime? GetWriteTimeUtc(string key)
+        {
+            DateTime current;
+            if (cacheWrite.TryGetValue(key, out current))
+            {
                 return current;
             }
             return null;

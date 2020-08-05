@@ -13,7 +13,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ComplexWebApplication</RootNamespace>
     <AssemblyName>ComplexWebApplication</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <UseIISExpress>true</UseIISExpress>
     <TargetFrameworkProfile />
     <JSLintSkip>\griddata.js</JSLintSkip>
@@ -26,6 +26,8 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <Use64BitIISExpress />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -75,7 +77,7 @@
     <Content Include="Global.asax" />
     <Content Include="Misc\diagnostic-300x400.png" />
     <Content Include="Misc\diagnostic-31x23.png" />
-    <Content Include="Misc\DiagnoticJson.htm" />
+    <Content Include="Misc\DiagnosticJson.htm" />
     <Content Include="Misc\UrlAuthorizationTests.aspx" />
     <Content Include="Misc\UrlEncryption.aspx" />
     <Content Include="Plugins.htm" />

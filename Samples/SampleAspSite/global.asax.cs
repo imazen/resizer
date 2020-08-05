@@ -19,7 +19,7 @@ namespace App {
               w.hideIfTooSmall = true;
               w.keepAspectRatio = true;
               w.valuesPercentages = false;
-              w.watermarkDir = "~/watermarks/"; //Where the watermark plugin looks for the image specifed in the querystring ?watermark=file.png
+              w.watermarkDir = "~/watermarks/"; //Where the watermark plugin looks for the image specified in the querystring ?watermark=file.png
               w.bottomRightPadding = new System.Drawing.SizeF(20, 20);
               w.topLeftPadding = new System.Drawing.SizeF(20, 20);
               w.watermarkSize = new System.Drawing.SizeF(30, 30); //The desired size of the watermark, maximum dimensions (aspect ratio maintained if keepAspectRatio = true)

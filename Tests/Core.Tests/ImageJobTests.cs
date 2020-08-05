@@ -51,7 +51,7 @@ namespace ImageResizer.Core.Tests
 
 
         [Fact]
-        public void TestReplaceFileInPalce()
+        public void TestReplaceFileInPlace()
         {
             var path = Path.GetTempFileName();
             ImageBuilderTest.GetBitmap(100, 200).Save(path,ImageFormat.Jpeg);

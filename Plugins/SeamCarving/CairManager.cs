@@ -145,7 +145,7 @@ namespace ImageResizer.Plugins.SeamCarving {
                           Removal: 5
                           CAIR_HD: 6
                           Default: CAIR
-                      -C <convoluton_type>
+                      -C <convolution_type>
                           Prewitt: 0
                           V1: 1
                           V_SQUARE: 2

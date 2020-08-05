@@ -164,7 +164,7 @@ void Print_Usage()
 	cout << "      Removal: 5" << endl;
 	cout << "      CAIR_HD: 6" << endl;
 	cout << "      Default: CAIR" << endl;
-	cout << "  -C <convoluton_type>" << endl;
+	cout << "  -C <convolution_type>" << endl;
 	cout << "      Prewitt: 0" << endl;
 	cout << "      V1: 1" << endl;
 	cout << "      V_SQUARE: 2" << endl;

@@ -19,7 +19,7 @@
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -113,6 +113,7 @@
     <Compile Include="ExtensionMethods\Dictionary.cs" />
     <Compile Include="ExtensionMethods\GenericExtensions.cs" />
     <Compile Include="PluginLoadingHints.cs" />
+    <Compile Include="Plugins\Basic\DiagnoseRequest.cs" />
     <Compile Include="Plugins\Basic\EndpointPlugin.cs" />
     <Compile Include="Plugins\Basic\IDiagnosticsProvider.cs" />
     <Compile Include="Plugins\Basic\LicenseDisplay.cs" />
@@ -133,7 +134,7 @@
     <Compile Include="Plugins\IVirtualImageProviderVpp.cs" />
     <Compile Include="Plugins\IVirtualImageProviderVppCaching.cs" />
     <Compile Include="Plugins\MultiFolderStorage.cs" />
-    <Compile Include="Plugins\PeristentGlobalStringCache.cs" />
+    <Compile Include="Plugins\PersistentGlobalStringCache.cs" />
     <Compile Include="Plugins\CommonStaticStorage.cs" />
     <Compile Include="Plugins\StaticLicenseProvider.cs" />
     <Compile Include="Plugins\VirtualFileShim.cs" />

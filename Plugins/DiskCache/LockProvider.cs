@@ -43,7 +43,7 @@ namespace ImageResizer.Plugins.DiskCache {
 
         /// <summary>
         /// Attempts to execute the 'success' callback inside a lock based on 'key'.  If successful, returns true.
-        /// If the lock cannot be acquired within 'timoutMs', returns false
+        /// If the lock cannot be acquired within 'timeoutMs', returns false
         /// In a worst-case scenario, it could take up to twice as long as 'timeoutMs' to return false.
         /// </summary>
         /// <param name="key"></param>

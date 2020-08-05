@@ -5,6 +5,8 @@ using System.Linq;
 using ImageResizer.Configuration.Performance;
 using Xunit;
 using Xunit.Abstractions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins.LicenseVerifier.Tests
 {
@@ -51,7 +53,7 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             // but we need to record a value that is 4 intervals after the last to cause all to dequeue 
             Assert.Equal(new[] {1L, 2, 3, 4, 5, 0}, b.DequeueValues());
 
-            // Bucekts 21..30 are skipped
+            // Buckets 21..30 are skipped
 
             // Buckets 31,32,33
             Assert.True(b.Record(311, 1));
@@ -71,6 +73,22 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             var results = b.DequeueValues();
             Assert.Equal(23, results.Count());
             Assert.Equal(new[] {0L, 1, 2, 3}, results.Take(4));
+        }
+        
+        [Fact]
+        public void MultiIntervalTest()
+        {
+            NamedInterval[] Intervals  = {
+                new NamedInterval { Unit = "second", Name = "Per Second", TicksDuration = Stopwatch.Frequency },
+                    new NamedInterval { Unit = "minute", Name = "Per Minute", TicksDuration = Stopwatch.Frequency * 60 },
+                    new NamedInterval { Unit = "15_mins", Name = "Per 15 Minutes", TicksDuration = Stopwatch.Frequency * 60 * 15 },
+                    new NamedInterval { Unit = "hour", Name = "Per Hour", TicksDuration = Stopwatch.Frequency * 60 * 60 },
+                };
+            var s = new MultiIntervalStats(Intervals);
+            for (long i = Stopwatch.Frequency * -1000; i < Stopwatch.Frequency * 5000; i += Stopwatch.Frequency / 2)
+            {
+                s.Record(i, 1);
+            }
         }
 
         [Fact]
@@ -259,6 +277,51 @@ namespace ImageResizer.Plugins.LicenseVerifier.Tests
             Assert.Equal(150, s.GetPercentile(0.11f));
 
             Assert.Equal(100, s.GetPercentile(0.0f));
+        }
+
+
+        [Fact]
+        public void TestInterlocked()
+        {
+            long v = 1;
+            Assert.Equal(1, Interlocked.CompareExchange(ref v, 3, 0));
+            Assert.Equal(1, Interlocked.CompareExchange(ref v, 0, 0));
+            Assert.Equal(1, Interlocked.CompareExchange(ref v, 0, 1));
+
+            Assert.Equal(0, Interlocked.CompareExchange(ref v, 0, 0));
+
+            Assert.Equal(0, Interlocked.CompareExchange(ref v, 4, 0));
+
+            Assert.Equal(4, Interlocked.CompareExchange(ref v, 0, 4));
+        }
+        [Fact]
+        public void TestInterlockedMax()
+        {
+            long v = 0;
+            var tasks = Enumerable.Repeat(0, 30).Select((j) => Task.Run(() =>
+             {
+                 for (var i = 0; i < 100000; i++)
+                 {
+                     Utilities.InterlockedMax(ref v, v + 1);
+                 }
+             })).ToArray();
+
+            Task.WaitAll(tasks);
+        }
+
+        [Fact]
+        public void TestInterlockedMin()
+        {
+            long v = 0;
+            var tasks = Enumerable.Repeat(0, 30).Select((j) => Task.Run(() =>
+            {
+                for (var i = 0; i < 100000; i++)
+                {
+                    Utilities.InterlockedMin(ref v, v - 1);
+                }
+            })).ToArray();
+
+            Task.WaitAll(tasks);
         }
     }
 }

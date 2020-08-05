@@ -40,7 +40,7 @@ namespace ImageResizer.Plugins.Basic {
     /// querystring values in the image querystring.  For example,
     /// <c>&lt;image404 propertyImageDefault="~/images/nophoto.png?format=png" /&gt;</c>
     /// in the config file and
-    /// <c>&lt;img src="missingimage.jpg?format=jpg&amp;404=propertImageDefault&amp;width=200" /&gt;</c>
+    /// <c>&lt;img src="missingimage.jpg?format=jpg&amp;404=propertyImageDefault&amp;width=200" /&gt;</c>
     /// will result in a redirect to <c>~/images/nophoto.png?format=png&amp;width=200</c>.
     /// </para>
     /// </example>
@@ -116,7 +116,7 @@ namespace ImageResizer.Plugins.Basic {
                     !string.Equals(value, "auto", StringComparison.OrdinalIgnoreCase); }),
 
             new Matcher("cropxunits"),
-            new Matcher("cropyyunits"),
+            new Matcher("cropyunits"),
             new Matcher("trim.threshold"),
             new Matcher("trim.percentpadding"),
 
@@ -258,7 +258,7 @@ namespace ImageResizer.Plugins.Basic {
 
         protected string resolve404Path(string path) {
             //1 If it starts with 'http(s)://' throw an exception.
-            if (path.StartsWith("http", StringComparison.OrdinalIgnoreCase)) throw new ImageProcessingException("Image 404 redirects must be server-local. Received " + path);
+            if (path.StartsWith("http", StringComparison.OrdinalIgnoreCase) || path.StartsWith("//")) throw new ImageProcessingException("Image 404 redirects must be server-local. Received " + path);
 
             //2 If it starts with a slash, use as-is
             if (path.StartsWith("/", StringComparison.OrdinalIgnoreCase)) return path;

@@ -54,8 +54,8 @@ namespace SevenZipReduced.Compression.LZ
                 if (numReadBytes == 0)
                 {
                     _posLimit = _streamPos;
-                    UInt32 pointerToPostion = _bufferOffset + _posLimit;
-                    if (pointerToPostion > _pointerToLastSafePosition)
+                    UInt32 pointerToPosition = _bufferOffset + _posLimit;
+                    if (pointerToPosition > _pointerToLastSafePosition)
                         _posLimit = (UInt32)(_pointerToLastSafePosition - _bufferOffset);
 
                     _streamEndWasReached = true;
@@ -100,8 +100,8 @@ namespace SevenZipReduced.Compression.LZ
             _pos++;
             if (_pos > _posLimit)
             {
-                UInt32 pointerToPostion = _bufferOffset + _pos;
-                if (pointerToPostion > _pointerToLastSafePosition)
+                UInt32 pointerToPosition = _bufferOffset + _pos;
+                if (pointerToPosition > _pointerToLastSafePosition)
                     MoveBlock();
                 ReadBlock();
             }

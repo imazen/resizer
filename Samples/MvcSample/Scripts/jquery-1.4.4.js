@@ -5743,7 +5743,7 @@ jQuery.extend({
 		password: null,
 		traditional: false,
 		*/
-		// This function can be overriden by calling jQuery.ajaxSetup
+		// This function can be overridden by calling jQuery.ajaxSetup
 		xhr: function() {
 			return new window.XMLHttpRequest();
 		},

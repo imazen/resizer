@@ -181,12 +181,12 @@ namespace ImageResizer.Plugins.AdvancedFilters {
                 sp.ApplyInPlace(b, areaOfEffect); 
             }
 
-            //Pixellate doesn't support 32-bit images, only 24-bit
+            //Pixelate doesn't support 32-bit images, only 24-bit
             //str = s.settings["a.pixelate"]; //number of colors to merge
             //if (!string.IsNullOrEmpty(str) && int.TryParse(str, out i)){
             //     if (i < 2) i = 2; 
             //    if (i > 32) i = 32;
-            //    new Pixellate(i).ApplyInPlace(s.destBitmap); 
+            //    new Pixelate(i).ApplyInPlace(s.destBitmap); 
             //}
             
 

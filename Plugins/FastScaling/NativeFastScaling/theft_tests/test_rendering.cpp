@@ -104,11 +104,11 @@ void bitmapbgra_free(void * details, void * unused)
 }
 /*
 InterpolationDetails * interpolation;
-    //How large the interoplation window needs to be before we even attempt to apply a sharpening
+    //How large the interpolation window needs to be before we even attempt to apply a sharpening
     //percentage to the given filter
     float minimum_sample_window_to_interposharpen;
 
-    // If ossible to do correctly, halve the image until it is [interpolate_last_percent] times larger than needed. 3 or greater reccomended. Specify -1 to disable halving.
+    // If ossible to do correctly, halve the image until it is [interpolate_last_percent] times larger than needed. 3 or greater recommended. Specify -1 to disable halving.
     float interpolate_last_percent;
 
     //If true, only halve when both dimensions are multiples of the halving factor

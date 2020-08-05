@@ -51,7 +51,7 @@ If you need to invalidate a cached file sooner than 24 hours, you must change th
 
 ## Automatic redirection of standard (`image.jpg?width=..`) URLs back to the CDN.
 
-The CloudFront plugin can be configured to HTTP redirect image requests arriving in quersytring (`?key=value1` format) to use the CloudFront distribution instead of directly serving the request. 
+The CloudFront plugin can be configured to HTTP redirect image requests arriving in querystring (`?key=value1` format) to use the CloudFront distribution instead of directly serving the request. 
 
 We don't suggest this except to reduce server load in an emergency. Redirects make your site load more slowly in client browsers.
 

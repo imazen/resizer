@@ -431,11 +431,11 @@ namespace ImageResizer.Plugins.DiskCache
             string physicalCache = PhysicalCacheDir;
             if (!string.IsNullOrEmpty(physicalCache))
             {
-                return physicalCache.StartsWith("\\\\") || GetCacheDrive().DriveType == DriveType.Network;
+                return physicalCache.StartsWith("\\\\") || GetCacheDrive()?.DriveType == DriveType.Network;
             }
             return false;
         }
-
+        
         DriveInfo GetCacheDrive()
         {
             try

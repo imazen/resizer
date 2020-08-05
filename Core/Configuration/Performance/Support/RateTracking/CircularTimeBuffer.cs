@@ -58,7 +58,10 @@ namespace ImageResizer.Configuration.Performance
                     var virtualDequeueCount = (toBucketIndexExclusive - fromBucketIndex);
                     var localDequeueCount = Math.Min(virtualDequeueCount,buckets);
                     Utilities.InterlockedMax(ref skippedResults, 0);
-                    Interlocked.Add(ref skippedResults, virtualDequeueCount - localDequeueCount);
+                    if (virtualDequeueCount > localDequeueCount)
+                    {
+                        Interlocked.Add(ref skippedResults, virtualDequeueCount - localDequeueCount);
+                    }
                     for (int toDeque = 0; toDeque < localDequeueCount; toDeque++)
                     {
                         var bucketIndex = fromBucketIndex + toDeque;
@@ -105,7 +108,7 @@ namespace ImageResizer.Configuration.Performance
         {
             var enumerableResults = DequeueResults();
             // ReSharper disable once PossibleUnintendedReferenceComparison
-            return enumerableResults == Enumerable.Empty<TimeSlotResult>() ? Enumerable.Empty<long>() : enumerableResults.Select(r => r.Value.Value);
+            return enumerableResults == Enumerable.Empty<TimeSlotResult>() ? Enumerable.Empty<long>() : enumerableResults.Select(r => r.Value);
         }
 
         public override string ToString()
@@ -116,6 +119,8 @@ namespace ImageResizer.Configuration.Performance
 
         public bool Record(long ticks, long count)
         {
+            if (ticks < 0) return false;
+
             var newIndex = (ticks / ticksPerBucket);
 
             Utilities.InterlockedMin(ref initialTail, newIndex);

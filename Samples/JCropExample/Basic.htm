@@ -22,7 +22,7 @@
 	            var update = function (coords) {
 	                if (parseInt(coords.w) <= 0 || parseInt(coords.h) <= 0) return; //Require valid width and height
 
-	                //Build the URL based on the coordiantes. The resizing module will handle everything else.
+	                //Build the URL based on the coordinates. The resizing module will handle everything else.
 	                var url = path + '?crop=(' + coords.x + ',' + coords.y + ',' + coords.x2 + ',' + coords.y2 + 
                     ')&cropxunits=' + image.width() + '&cropyunits=' + image.height()
 
