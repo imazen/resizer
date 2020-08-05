@@ -29,9 +29,9 @@ if [ "$(git config user.email)" = "" ]; then
 fi
 
 cd "${TRAVIS_BUILD_DIR}/Tools/DocCollector" || exit
-git clone "https://${GITHUB_TOKEN}@github.com/imazen/resizer-web.git"
+git clone "https://imazen-bot:${GITHUB_TOKEN}@github.com/imazen/resizer-web.git"
 cd "${TRAVIS_BUILD_DIR}/Tools/DocCollector/resizer-web" || exit
-git remote add pr "https://${GITHUB_TOKEN}@github.com/imazen-bot/resizer-web.git"
+git remote add pr "https://imazen-bot:${GITHUB_TOKEN}@github.com/imazen-bot/resizer-web.git"
 git checkout -f production
 git pull
 cd "${TRAVIS_BUILD_DIR}/Tools/DocCollector" || exit
