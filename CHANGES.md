@@ -1,3 +1,10 @@
+# v5-0-0
+
+### .NET 4.7.2 is now required
+
+- This allows us to update our dependencies to the latest, safest versions. 
+
+
 # v4-0-0
 
 ## Image scaling and image sharpening are up to 30x faster than in v3 - and have higher quality output.  
