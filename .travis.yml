@@ -1,8 +1,5 @@
 language:
-  - cpp
-
-compiler:
-  - gcc
+  - ruby
 
 env:
   global:
