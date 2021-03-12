@@ -69,21 +69,22 @@ The defaults are good - you don't actually need to specify any configuration.
 
 The following is what the default settings look like. Only specify what you need to change.
 
-  <diskCache dir="~/imagecache" autoClean="false" enabled="true"
+```
+<diskCache dir="~/imagecache" autoClean="false" enabled="true"
    subfolders="8192" cacheAccessTimeout="15000" asyncWrites="false" asyncBufferSize="10485760" />
   
-  <cleanupStrategy startupDelay="00:05" minDelay="00:00:20" maxDelay="00:05" 
+<cleanupStrategy startupDelay="00:05" minDelay="00:00:20" maxDelay="00:05" 
     optimalWorkSegmentLength="00:00:04" 
     targetItemsPerFolder="400" maximumItemsPerFolder="1000" 
     avoidRemovalIfCreatedWithin="24:00" avoidRemovalIfUsedWithin="4.00:00" 
     prohibitRemovalIfUsedWithin="00:05" prohibitRemovalIfCreatedWithin="00:10" />
-  
+```
 
 ### dir
 
 Where to store the images. This can specify an IIS virtual directory if you want to cache images outside the site folder.
 
-Should be in virtual path form, like /vdir/cache or ~/imagecache.
+Should be in virtual path form, like `/vdir/cache` or `~/imagecache`.
 
 ### autoClean
 
@@ -121,10 +122,10 @@ If this value would be exceeded, the disk cache switches to synchronous mode unt
 
 ## CleanupStrategy
 
-Controls how the background thread determines which files to 'clean up'. Not used unless autoClean='true'
+Controls how the background thread determines which files to 'clean up'. Not used unless `autoClean='true'`
 
-Changing the 'cleanupStrategy' settings may void your warranty - it's tricky business.
+Changing the `cleanupStrategy` settings may void your warranty - it's tricky business.
 
-Times are parsed in the following format:  { s \| d.hh:mm[:ss[.ff]] \| hh:mm[:ss[.ff]] }. If you just enter a number, it's considered seconds.
+Times are parsed in the following format:  `{ s \| d.hh:mm[:ss[.ff]] \| hh:mm[:ss[.ff]] }`. If you just enter a number, it's considered seconds.
 
 
