@@ -56,36 +56,6 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
-      <Link>Shared\SharedAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\LicenseVerifier\Computation.cs">
-      <Link>Shared\Computation.cs</Link>
-    </Compile>
-    <Compile Include="..\LicenseVerifier\DomainLookup.cs">
-      <Link>Shared\DomainLookup.cs</Link>
-    </Compile>
-    <Compile Include="..\LicenseVerifier\LicenseChain.cs">
-      <Link>Shared\LicenseChain.cs</Link>
-    </Compile>
-    <Compile Include="..\LicenseVerifier\LicenseEnforcerPlugin.cs">
-      <Link>Shared\LicenseEnforcerPlugin.cs</Link>
-    </Compile>
-    <Compile Include="..\LicenseVerifier\LicenseFetcher.cs">
-      <Link>Shared\LicenseFetcher.cs</Link>
-    </Compile>
-    <Compile Include="..\LicenseVerifier\LicenseManager.cs">
-      <Link>Shared\LicenseManager.cs</Link>
-    </Compile>
-    <Compile Include="..\LicenseVerifier\LicenseParsing.cs">
-      <Link>Shared\LicenseParsing.cs</Link>
-    </Compile>
-    <Compile Include="..\LicenseVerifier\LicensingOn.cs">
-      <Link>Shared\LicensingOn.cs</Link>
-    </Compile>
-    <Compile Include="..\LicenseVerifier\LicensingSupport.cs">
-      <Link>Shared\LicensingSupport.cs</Link>
-    </Compile>
     <Compile Include="Async\AsyncWriteCollection.cs" />
     <Compile Include="Async\AsyncWrite.cs" />
     <Compile Include="AsyncCustomDiskCache.cs" />
