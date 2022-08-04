@@ -12,9 +12,9 @@ namespace ImageResizer.ExtensionMethods
 {
     internal static class DictionaryExtensions
     {
-        internal static K Get<K>(this IDictionary<string, object> d, string key, K defaultValue)
+        internal static TK Get<TK>(this IDictionary<string, object> d, string key, TK defaultValue)
         {
-            return d.ContainsKey(key) ? (K)d[key] : defaultValue;
+            return d.ContainsKey(key) ? (TK)d[key] : defaultValue;
         }
     }
 }
