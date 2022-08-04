@@ -1,0 +1,43 @@
+# The name used in the GitHub UI for the workflow
+name: '.net version sweeper'
+
+# When to run this action:
+# - Scheduled on the first of every month
+# - Manually runable from the GitHub UI with a reason
+on:
+  schedule:
+  - cron: '0 0 1 * *'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'The reason for running the workflow'
+        required: true
+        default: 'Manual run'
+
+# Run on the latest version of Ubuntu
+jobs:
+  version-sweep:
+    runs-on: ubuntu-latest
+
+    # Checkout the repo into the workspace within the VM
+    steps:
+    - uses: actions/checkout@v2
+
+    # If triggered manually, print the reason why
+    - name: 'Print manual run reason'
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      run: |
+        echo "Reason: ${{ github.event.inputs.reason }}"
+
+    # Run the .NET version sweeper
+    # Issues will be automatically created for any non-ignored projects that are targeting non-LTS versions
+    - name: .NET version sweeper
+      id: dotnet-version-sweeper
+      uses: dotnet/versionsweeper@v1.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        owner: ${{ github.repository_owner }}
+        name: ${{ github.repository }}
+        branch: ${{ github.ref }}
+        sdkCompliance: true
