@@ -19,14 +19,19 @@
   <component name="ChangeListManager">
     <list default="true" id="c8e6b228-17c9-4a0e-8196-26dc04c9cbd2" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.gitattributes" beforeDir="false" afterPath="$PROJECT_DIR$/.gitattributes" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.AppVeyor/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.AppVeyor/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.AppVeyor/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.AppVeyor/.idea/indexLayout.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.AppVeyor/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/AppVeyor.sln" beforeDir="false" afterPath="$PROJECT_DIR$/ImageResizer.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.AppVeyor/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.AppVeyor/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CHANGES.md" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGES.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/AsyncInterceptModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Core/AsyncInterceptModule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/ImageResizer.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Core/ImageResizer.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ImageResizer.sln" beforeDir="false" afterPath="$PROJECT_DIR$/ImageResizer.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Plugins/AzureReader2/ImageResizer.Plugins.AzureReader2.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/AzureReader2/ImageResizer.Plugins.AzureReader2.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Plugins/ImageResizer.Plugins.HybridCache/ImageResizer.Plugins.HybridCache.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/ImageResizer.Plugins.HybridCache/ImageResizer.Plugins.HybridCache.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Plugins/ImageResizer.Plugins.Imageflow/ImageResizer.Plugins.Imageflow.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/ImageResizer.Plugins.Imageflow/ImageResizer.Plugins.Imageflow.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Plugins/ImageResizer.Plugins.Imageflow/ImageflowBuilderPlugin.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/ImageResizer.Plugins.Imageflow/ImageflowBuilderPlugin.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tests/Core.Tests/ImageResizer.Core.Tests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/Core.Tests/ImageResizer.Core.Tests.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tests/ImageResizer.AllPlugins.Tests/ImageResizer.AllPlugins.Tests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/ImageResizer.AllPlugins.Tests/ImageResizer.AllPlugins.Tests.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tests/ImageResizer.ProviderTests/ImageResizer.ProviderTests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/ImageResizer.ProviderTests/ImageResizer.ProviderTests.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tests/Imazen.Profiling.Tests/Imazen.Profiling.Tests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Tests/Imazen.Profiling.Tests/Imazen.Profiling.Tests.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -297,7 +302,7 @@
       <updated>1651433643662</updated>
       <workItem from="1651433655089" duration="2853000" />
       <workItem from="1659475614599" duration="972000" />
-      <workItem from="1659649372174" duration="4687000" />
+      <workItem from="1659649372174" duration="6233000" />
     </task>
     <servers />
   </component>

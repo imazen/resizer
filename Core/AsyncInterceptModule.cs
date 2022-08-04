@@ -51,13 +51,14 @@ namespace ImageResizer
         }
         public void Dispose()
         {
-            
+            // Todo: Call StopAsync on services like HybridCache to avoid leaving files open
         }
 
         public void Init(HttpApplication context)
         {
             var helper = new EventHandlerTaskAsyncHelper(CheckRequest_PostAuthorizeRequest_Async);
             context.AddOnPostAuthorizeRequestAsync(helper.BeginEventHandler, helper.EndEventHandler);
+         
             conf.ModuleInstalled = true;
         }
 

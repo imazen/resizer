@@ -31,6 +31,7 @@
 *.fs eol=lf
 *.fsx eol=lf
 *.hs eol=lf
+*.sh text eol=lf
 
 *.csproj eol=crlf
 *.vbproj eol=crlf

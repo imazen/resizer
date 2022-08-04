@@ -1,0 +1,13 @@
+﻿* Fix response headers system under async
+
+* Figure out graceful shutdown (Dispose on httpmodule?)
+
+* Implement watermark config translation
+
+* Unify RemoteReader and encrypted/signed URL system.
+
+* Create ImageResizer.Imageflow plugin
+
+* Create HybridCache plugin
+
+* Integrated licensing from Imazen.Common and migrate just the enforcer tests

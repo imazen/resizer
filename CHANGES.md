@@ -3,6 +3,9 @@
 ### .NET 4.7.2 is now required
 
 - This allows us to update our dependencies to the latest, safest versions. 
+- The functionality from most plugins has been integrated into the core, drastically simplifying maintenance for the most common features
+- If you are still using packages.config instead of PackageReference, you'll need to reference another NuGet package
+
 
 
 # v4-0-0
