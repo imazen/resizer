@@ -1,10 +1,12 @@
 /Samples/Images/
+/Samples/PluginTestingApp/App_Data
 /docs/docu/
 /docs/doxygen
 Tests/*/Results
 Packages/
 packages/
 Tools/FakeBuilder/paket-files/
+Tools/DocCollector/resizer-web
 
 #Folders for binaries and caches
 bin/
@@ -72,6 +74,5 @@ ipch/
 *.lastbuildstate
 *.res
 .vs/
-/Samples/PluginTestingApp/App_Data
 *.opendb
 *.db

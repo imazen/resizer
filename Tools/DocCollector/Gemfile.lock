@@ -11,7 +11,7 @@ GIT
 
 GIT
   remote: https://github.com/imazen/doc_collector.git
-  revision: a6cd7b4b0d2b04765b70468b2c659dd7f2f787a6
+  revision: fca06069ca57fa94035b2225fef91eb6425903f1
   specs:
     doc_collector (0.0.1)
       erubis
@@ -27,21 +27,25 @@ GEM
     erubis (2.7.0)
     github-markdown (0.6.9)
     hub (1.12.4)
-    mini_portile2 (2.4.0)
-    mustermann (1.0.0)
-    nokogiri (1.10.8)
-      mini_portile2 (~> 2.4.0)
-    rack (2.2.3)
-    rack-protection (2.0.0)
+    mini_portile2 (2.8.0)
+    mustermann (2.0.2)
+      ruby2_keywords (~> 0.0.1)
+    nokogiri (1.13.8)
+      mini_portile2 (~> 2.8.0)
+      racc (~> 1.4)
+    racc (1.6.0)
+    rack (2.2.4)
+    rack-protection (2.2.2)
       rack
     rake (13.0.1)
+    ruby2_keywords (0.0.5)
     rugged (0.25.1.1)
-    sinatra (2.0.0)
-      mustermann (~> 1.0)
-      rack (~> 2.0)
-      rack-protection (= 2.0.0)
+    sinatra (2.2.2)
+      mustermann (~> 2.0)
+      rack (~> 2.2)
+      rack-protection (= 2.2.2)
       tilt (~> 2.0)
-    tilt (2.0.7)
+    tilt (2.0.11)
 
 PLATFORMS
   ruby

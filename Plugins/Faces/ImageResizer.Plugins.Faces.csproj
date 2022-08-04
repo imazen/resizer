@@ -127,7 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>7.0.1</Version>
+      <Version>13.0.1</Version>
     </PackageReference>
     <PackageReference Include="OpenCvSharp-WithoutDll">
       <Version>2.4.10.20150820</Version>
