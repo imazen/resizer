@@ -1,4 +1,5 @@
-﻿using System.Collections.Specialized;
+﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using ImageResizer.Configuration;
 using ImageResizer.Configuration.Issues;
 using ImageResizer.ExtensionMethods;
@@ -30,6 +31,14 @@ namespace ImageResizer.Plugins.Imageflow
         }
 
 
-        
+        public IEnumerable<IIssue> GetIssues()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IEnumerable<string> GetSupportedFileExtensions()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
