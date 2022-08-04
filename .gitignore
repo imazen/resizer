@@ -3,6 +3,7 @@
 /docs/doxygen
 Tests/*/Results
 Packages/
+packages/
 Tools/FakeBuilder/paket-files/
 
 #Folders for binaries and caches
@@ -11,6 +12,7 @@ obj/
 Debug/
 imagecache/
 dlls/
+Dlls/
 
 #any image binaries
 *.jpg
