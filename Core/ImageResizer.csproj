@@ -241,6 +241,7 @@
     <Compile Include="Util\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Plugins\Basic\VirtualFolder.cs" />
+    <Content Include="TODO_V5.txt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

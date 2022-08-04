@@ -12,7 +12,7 @@ using ImageResizer.Util;
 [assembly: AssemblyProduct("Image Resizer")]
 
 [assembly: AssemblyCompany("Imazen LLC")]
-[assembly: AssemblyCopyright("Copyright © 2017 Imazen LLC")]
+[assembly: AssemblyCopyright("Copyright © 2022 Imazen LLC")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -23,9 +23,9 @@ using ImageResizer.Util;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:/*
-[assembly: AssemblyVersion("4.0.0.0")]
-[assembly: AssemblyFileVersion("4.2.5.0")]
-[assembly: AssemblyInformationalVersion("4.2.5")]
+[assembly: AssemblyVersion("5.0.0.0")]
+[assembly: AssemblyFileVersion("5.0.0.0")]
+[assembly: AssemblyInformationalVersion("5.0.0")]
 
 [assembly: Commit("2c64c3100e64c944222e04388a6d44b2909d4115")]
 
