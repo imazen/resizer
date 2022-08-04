@@ -11,7 +11,7 @@ GIT
 
 GIT
   remote: https://github.com/imazen/doc_collector.git
-  revision: a6cd7b4b0d2b04765b70468b2c659dd7f2f787a6
+  revision: fca06069ca57fa94035b2225fef91eb6425903f1
   specs:
     doc_collector (0.0.1)
       erubis

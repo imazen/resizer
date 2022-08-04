@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6BEFD728-E3C5-43CC-BA9E-292B7CA4429D}"
 	ProjectSection(SolutionItems) = preProject
@@ -111,8 +111,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.LicenseVerifier", "Plugins\LicenseVerifier\ImageResizer.Plugins.LicenseVerifier.csproj", "{8E9FF7E1-D94B-4F94-86DF-71F16C58615F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.LicenseVerifier.Tests", "Tests\ImageResizer.Plugins.LicenseVerifier.Tests\ImageResizer.Plugins.LicenseVerifier.Tests.csproj", "{081F4843-C4A2-4C7D-A869-03DD15982A8D}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ImageResizer.CoreFSharp.Tests", "Tests\ImageResizer.TestFSharp\ImageResizer.CoreFSharp.Tests.fsproj", "{841B8ED5-5994-46C9-B81A-74973FB9DE0E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.ProviderTests", "Tests\ImageResizer.ProviderTests\ImageResizer.ProviderTests.csproj", "{CB2E151D-2E19-4E85-97FD-D0577AD335FE}"
 EndProject
@@ -334,10 +332,6 @@ Global
 		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{841B8ED5-5994-46C9-B81A-74973FB9DE0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{841B8ED5-5994-46C9-B81A-74973FB9DE0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{841B8ED5-5994-46C9-B81A-74973FB9DE0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{841B8ED5-5994-46C9-B81A-74973FB9DE0E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CB2E151D-2E19-4E85-97FD-D0577AD335FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CB2E151D-2E19-4E85-97FD-D0577AD335FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CB2E151D-2E19-4E85-97FD-D0577AD335FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -369,5 +363,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2845FD9A-7157-4DCF-8782-19CB3B8A6A39}
 	EndGlobalSection
 EndGlobal
