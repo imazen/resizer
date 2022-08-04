@@ -40,7 +40,6 @@ namespace ImageResizer.AllPlugins.Tests {
             new DropShadow().Install(c);
             new VirtualFolder("/images", "..\\..\\..\\Samples\\Images",false).Install(c);
      
-            new ImageResizer.Plugins.SourceMemCache.SourceMemCachePlugin().Install(c);
             
             //s3reader
             //sqlreader
