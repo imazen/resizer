@@ -2,7 +2,7 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using ImageResizer.Caching;
+using ImageResizer.Caching;
 using ImageResizer.Configuration;
 using ImageResizer.Encoding;
 using ImageResizer.Plugins;
@@ -22,10 +22,16 @@ using System.Web.Hosting;
 using System.Web.Security;
 using ImageResizer.ExtensionMethods;
 using System.Globalization;
-﻿using System.Threading;
+using System.Threading;
 
 namespace ImageResizer
 {
+    
+    /// <summary>
+    /// An alias for AsyncInterceptModule as of v5. Monitors incoming image requests to determine if resizing (or other processing) is being requested.
+    /// </summary>
+    public class InterceptModule : AsyncInterceptModule {}
+    
     public class AsyncInterceptModule : IHttpModule
     {
 
