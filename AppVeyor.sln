@@ -20,8 +20,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Remote
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.AllPlugins.Tests", "Tests\ImageResizer.AllPlugins.Tests\ImageResizer.AllPlugins.Tests.csproj", "{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.Logging", "Plugins\Logging\ImageResizer.Plugins.Logging.csproj", "{10E04BAD-889B-4C01-BA0B-FAC7EF63B859}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarking", "Tests\Benchmarking\Benchmarking.csproj", "{7D496099-EE56-4875-9A96-7036698F5D26}"
 	ProjectSection(ProjectDependencies) = postProject
 		{FA5EF673-A6A4-498D-AA24-C025CC5267AF} = {FA5EF673-A6A4-498D-AA24-C025CC5267AF}
@@ -38,8 +36,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.S3Reader2", "Plugins\S3Reader2\ImageResizer.Plugins.S3Reader2.csproj", "{AC318404-15F2-4187-A7B1-AFE4E2798DE6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.UploadHelper", "Plugins\UploadHelper\ImageResizer.Plugins.UploadHelper.csproj", "{67F0982D-5851-4D3B-B29D-40B6760879DC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.Plugins.DiagnosticJson", "Plugins\DiagnosticJson\ImageResizer.Plugins.DiagnosticJson.csproj", "{DF78DF74-D71E-470D-8BE2-D827498E8AF8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageResizer.LicensingTests", "Tests\ImageResizer.Plugins.LicenseVerifier.Tests\ImageResizer.LicensingTests.csproj", "{081F4843-C4A2-4C7D-A869-03DD15982A8D}"
 EndProject
@@ -102,10 +98,6 @@ Global
 		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3732EF6-EAA7-44F4-A481-2B1E37CEC2E2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{10E04BAD-889B-4C01-BA0B-FAC7EF63B859}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{10E04BAD-889B-4C01-BA0B-FAC7EF63B859}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{10E04BAD-889B-4C01-BA0B-FAC7EF63B859}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{10E04BAD-889B-4C01-BA0B-FAC7EF63B859}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7D496099-EE56-4875-9A96-7036698F5D26}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{7D496099-EE56-4875-9A96-7036698F5D26}.Debug|Any CPU.Build.0 = Debug|x86
 		{7D496099-EE56-4875-9A96-7036698F5D26}.Release|Any CPU.ActiveCfg = Release|x86
@@ -134,10 +126,6 @@ Global
 		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67F0982D-5851-4D3B-B29D-40B6760879DC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DF78DF74-D71E-470D-8BE2-D827498E8AF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DF78DF74-D71E-470D-8BE2-D827498E8AF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DF78DF74-D71E-470D-8BE2-D827498E8AF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DF78DF74-D71E-470D-8BE2-D827498E8AF8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{081F4843-C4A2-4C7D-A869-03DD15982A8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
