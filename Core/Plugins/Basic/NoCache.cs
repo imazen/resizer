@@ -16,7 +16,7 @@ namespace ImageResizer.Plugins.Basic {
     /// Useful for debugging purposes but unsuited for production use, and will use large quantities of RAM. (Scales to fewer than 5 concurrent requests).
     /// Serves content directly to the client from memory.
     /// </summary>
-    public class NoCache :IAsyncTyrantCache,ICache, IPlugin {
+    public class NoCache :IAsyncTyrantCache, IPlugin {
         /// <summary>
         /// Installs the caching system as the first choice.
         /// </summary>

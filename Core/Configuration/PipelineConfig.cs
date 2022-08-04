@@ -496,7 +496,6 @@ namespace ImageResizer.Configuration {
         /// </summary>
         public event PreHandleImageAsyncEventHandler PreHandleImageAsync;
 
-        public event CacheSelectionHandler SelectCachingSystem;
 
         /// <summary>
         /// An event that fires for most image requests, but does not guarantee an httpcontext.
@@ -600,30 +599,6 @@ namespace ImageResizer.Configuration {
             System.Threading.Interlocked.Increment(ref processedCount);
             if (PreHandleImage != null) PreHandleImage(sender, context, e);
         }
-
-        /// <summary>
-        /// Cache selection occurs as follows: (1) The first registered CachingSystem that returns  true from .CanProcess() is the default
-        /// (2) The SelectCachingSystem event is fired, allowing handlers to modify the selected cache. 
-        /// This method may return null. 
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        public ICache GetCachingSystem(System.Web.HttpContext context, IResponseArgs args) {
-            ICache defaultCache = null;
-            //Grab the first cache that claims it can process the request.
-            foreach (ICache cache in c.Plugins.CachingSystems) {
-                if (cache.CanProcess(context, args)) {
-                    defaultCache = cache;
-                    break;
-                }
-            }
-
-            CacheSelectionEventArgs e = new CacheSelectionEventArgs(context, args, defaultCache);
-            if (SelectCachingSystem != null) SelectCachingSystem(this, e);
-            return e.SelectedCache;
-        }
-
 
 
 

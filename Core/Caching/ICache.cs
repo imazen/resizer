@@ -13,6 +13,7 @@ namespace ImageResizer.Caching {
     /// <summary>
     /// Provides caching behavior
     /// </summary>
+    [Obsolete("Use IAsyncTyrantCache")]
     public interface ICache {
         /// <summary>
         /// Returns false if the cache is unable to process the request. If false, the caller should fall back to a different cache

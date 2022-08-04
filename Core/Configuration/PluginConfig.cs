@@ -43,7 +43,7 @@ namespace ImageResizer.Configuration {
             this.c = c;
             imageBuilderExtensions = new SafeList<BuilderExtension>();
             imageEncoders = new SafeList<IEncoder>();
-            cachingSystems = new SafeList<ICache>();
+            cachingSystems = new SafeList<IAsyncTyrantCache>();
             querystringPlugins = new SafeList<IQuerystringPlugin>();
             fileExtensionPlugins = new SafeList<IFileExtensionPlugin>();
             allPlugins = new SafeList<IPlugin>();
@@ -242,11 +242,11 @@ namespace ImageResizer.Configuration {
         /// </summary>
         public SafeList<IEncoder> ImageEncoders { get { return imageEncoders; } }
 
-        protected SafeList<ICache> cachingSystems = null;
+        protected SafeList<IAsyncTyrantCache> cachingSystems = null;
         /// <summary>
         /// Currently registered ICache instances
         /// </summary>
-        public SafeList<ICache> CachingSystems { get { return cachingSystems; } }
+        public SafeList<IAsyncTyrantCache> CachingSystems { get { return cachingSystems; } }
 
         protected SafeList<IQuerystringPlugin> querystringPlugins = null;
         /// <summary>
@@ -357,7 +357,7 @@ namespace ImageResizer.Configuration {
         protected void clear_plugins_by_type(string type) {
             Type t = null;
             if ("encoders".Equals(type, StringComparison.OrdinalIgnoreCase)) t = typeof(IEncoder);
-            if ("caches".Equals(type, StringComparison.OrdinalIgnoreCase)) t = typeof(ICache);
+            if ("caches".Equals(type, StringComparison.OrdinalIgnoreCase)) t = typeof(IAsyncTyrantCache);
             if ("extensions".Equals(type, StringComparison.OrdinalIgnoreCase)) t = typeof(BuilderExtension);
             if ("all".Equals(type, StringComparison.OrdinalIgnoreCase) || type == null) t = typeof(IPlugin);
             if (t == null) this.AcceptIssue(new Issue("Unrecognized type value \"" + type + "\" in <clear type=\"" + type + "\" />.", IssueSeverity.ConfigurationError));
@@ -640,7 +640,7 @@ namespace ImageResizer.Configuration {
             if (plugin is IPlugin) AllPlugins.Remove(plugin as IPlugin);
             if (plugin is IQuerystringPlugin) QuerystringPlugins.Remove(plugin as IQuerystringPlugin);
             if (plugin is IFileExtensionPlugin) FileExtensionPlugins.Remove(plugin as IFileExtensionPlugin);
-            if (plugin is ICache) CachingSystems.Remove(plugin as ICache);
+            if (plugin is IAsyncTyrantCache) CachingSystems.Remove(plugin as IAsyncTyrantCache);
             if (plugin is IEncoder) ImageEncoders.Remove(plugin as IEncoder);
             if (plugin is BuilderExtension) ImageBuilderExtensions.Remove(plugin as BuilderExtension);
             if (plugin is IVirtualImageProvider) VirtualProviderPlugins.Remove(plugin as IVirtualImageProvider);
@@ -668,7 +668,7 @@ namespace ImageResizer.Configuration {
             AllPlugins.Add(plugin);
             if (plugin is IQuerystringPlugin) QuerystringPlugins.Add(plugin as IQuerystringPlugin);
             if (plugin is IFileExtensionPlugin) FileExtensionPlugins.Add(plugin as IFileExtensionPlugin);
-            if (plugin is ICache) CachingSystems.AddFirst(plugin as ICache);
+            if (plugin is IAsyncTyrantCache) CachingSystems.AddFirst(plugin as IAsyncTyrantCache);
             if (plugin is IEncoder) ImageEncoders.AddFirst(plugin as IEncoder);
             if (plugin is BuilderExtension) ImageBuilderExtensions.Add(plugin as BuilderExtension);
             if (plugin is IVirtualImageProvider) VirtualProviderPlugins.Add(plugin as IVirtualImageProvider);

@@ -78,7 +78,7 @@ namespace ImageResizer.Tests {
         [Theory]
         [InlineData("<add name='defaultencoder' /><add name='nocache' /><add name='nocache' />", typeof(IPlugin), 2)]
         [InlineData("<add name='defaultencoder' /><add name='nocache' />", typeof(IEncoder), 1)]
-        [InlineData("<add name='defaultencoder' /><add name='nocache' />", typeof(ICache), 1)]
+        [InlineData("<add name='defaultencoder' /><add name='nocache' />", typeof(IAsyncTyrantCache), 1)]
         [InlineData("<add name='SizeLimiting' />", typeof(BuilderExtension), 1)]
         public void GetPluginsByType(string startingXML, Type kind, int expectedCount) {
             PluginConfig pc = new Config(new ResizerSection("<resizer><plugins>" + startingXML + "</plugins></resizer>")).Plugins;
