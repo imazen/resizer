@@ -105,11 +105,6 @@ namespace ImageResizer.Configuration {
         /// <returns></returns>
         ImageBuilder GetImageBuilder();
 
-        /// <summary>
-        /// Returns a ICacheProvider instance that provides caching system selection and creation.
-        /// </summary>
-        /// <returns></returns>
-        ICacheProvider GetCacheProvider();
 
         IAsyncTyrantCache GetAsyncCacheFor(HttpContext context, IAsyncResponsePlan plan);
 

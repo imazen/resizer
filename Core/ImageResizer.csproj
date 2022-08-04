@@ -167,7 +167,6 @@
     <Compile Include="Plugins\Basic\ImageInfoAPI.cs" />
     <Compile Include="Plugins\Basic\NoCacheHandler.cs" />
     <Compile Include="Caching\ResponseArgs.cs" />
-    <Compile Include="Caching\ICacheProvider.cs" />
     <Compile Include="Caching\IResponseHeaders.cs" />
     <Compile Include="Plugins\Basic\NoCache.cs" />
     <Compile Include="Caching\ResponseHeaders.cs" />

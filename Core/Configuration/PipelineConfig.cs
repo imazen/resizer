@@ -25,7 +25,7 @@ using ImageResizer.ExtensionMethods;
 using System.IO;
 
 namespace ImageResizer.Configuration {
-    public class PipelineConfig : IPipelineConfig, ICacheProvider, ISettingsModifier{
+    public class PipelineConfig : IPipelineConfig, ISettingsModifier{
         protected Config c;
         public PipelineConfig(Config c) {
             this.ModuleInstalled = false;
@@ -439,10 +439,6 @@ namespace ImageResizer.Configuration {
 
         public ImageBuilder GetImageBuilder() {
             return c.CurrentImageBuilder;
-        }
-
-        public ICacheProvider GetCacheProvider() {
-            return this;
         }
 
         /// <summary>
