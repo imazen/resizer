@@ -59,11 +59,9 @@
   <ItemGroup>
     <Compile Include="AzureReaderTest.cs" />
     <Compile Include="CloudStorageEmulatorShepherd.cs" />
-    <Compile Include="MongoReaderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteReaderTest.cs" />
     <Compile Include="S3ReaderTest.cs" />
-    <Compile Include="SqlReaderTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -81,10 +79,6 @@
       <Project>{80bb303c-8f55-410c-ba91-342ecc435101}</Project>
       <Name>ImageResizer.Storage</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\MongoReader\ImageResizer.Plugins.MongoReader.csproj">
-      <Project>{c8d43f4e-103e-4cd7-b0d9-e97d9f708003}</Project>
-      <Name>ImageResizer.Plugins.MongoReader</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\RemoteReader\ImageResizer.Plugins.RemoteReader.csproj">
       <Project>{0e6be1a7-c754-4e33-a8ac-75a8549fc68b}</Project>
       <Name>ImageResizer.Plugins.RemoteReader</Name>
@@ -93,24 +87,11 @@
       <Project>{ac318404-15f2-4187-a7b1-afe4e2798de6}</Project>
       <Name>ImageResizer.Plugins.S3Reader2</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\SqlReader\ImageResizer.Plugins.SqlReader.csproj">
-      <Project>{2ab0fc98-8ad5-4d2a-bf06-0ea4dcf8764d}</Project>
-      <Name>ImageResizer.Plugins.SqlReader</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\..\Samples\Images\rose-leaf.jpg">
       <Link>rose-leaf.jpg</Link>
     </EmbeddedResource>
-    <Content Include="..\..\samples\sqlreadersample\app_data\database.mdf">
-      <Link>App_Data\database.mdf</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\samples\sqlreadersample\app_data\database_log.ldf">
-      <Link>App_Data\database_log.ldf</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>database.mdf</DependentUpon>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAzure.ConfigurationManager">

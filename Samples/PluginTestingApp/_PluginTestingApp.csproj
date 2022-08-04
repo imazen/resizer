@@ -26,7 +26,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
-    <Use64BitIISExpress />
+    <Use64BitIISExpress>true</Use64BitIISExpress>
     <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -138,33 +138,13 @@
     <Content Include="Misc\Protected\Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Contrib\PdfRenderer\PdfRenderer\ImageResizer.Plugins.PdfRenderer.csproj">
-      <Project>{7c8a13f7-5c00-4074-b16e-45d0e231b70d}</Project>
-      <Name>ImageResizer.Plugins.PdfRenderer</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
       <Project>{fa5ef673-a6a4-498d-aa24-c025cc5267af}</Project>
       <Name>ImageResizer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\AdvancedFilters\ImageResizer.Plugins.AdvancedFilters.csproj">
-      <Project>{961a7785-80e0-4ab9-a406-fd7e2a9fa9d9}</Project>
-      <Name>ImageResizer.Plugins.AdvancedFilters</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\AnimatedGifs\ImageResizer.Plugins.AnimatedGifs.csproj">
-      <Project>{d97ea32a-0845-4e00-9c4d-68c5b93a1869}</Project>
-      <Name>ImageResizer.Plugins.AnimatedGifs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\AzureReader2\ImageResizer.Plugins.AzureReader2.csproj">
       <Project>{3a7c958a-626d-43ea-bdad-42943e192af8}</Project>
       <Name>ImageResizer.Plugins.AzureReader2</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\BatchZipper\ImageResizer.Plugins.BatchZipper.csproj">
-      <Project>{cda9a53d-c190-4460-b5af-f73132f56bfb}</Project>
-      <Name>ImageResizer.Plugins.BatchZipper</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\CloudFront\ImageResizer.Plugins.CloudFront.csproj">
-      <Project>{9bfca7fb-eafb-4e89-b388-774cea6cd466}</Project>
-      <Name>ImageResizer.Plugins.CloudFront</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\DiagnosticJson\ImageResizer.Plugins.DiagnosticJson.csproj">
       <Project>{df78df74-d71e-470d-8be2-d827498e8af8}</Project>
@@ -174,45 +154,9 @@
       <Project>{c3b00cd1-39ee-4ba8-bdc0-02e346f20694}</Project>
       <Name>ImageResizer.Plugins.DiskCache</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\Faces\ImageResizer.Plugins.Faces.csproj">
-      <Project>{144686d8-7820-4bee-9325-60c4e998c2b0}</Project>
-      <Name>ImageResizer.Plugins.Faces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\FFmpeg\ImageResizer.Plugins.FFmpeg.csproj">
-      <Project>{41e1fb1a-826b-4c35-9034-8c44d2402941}</Project>
-      <Name>ImageResizer.Plugins.FFmpeg</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\FreeImage\ImageResizer.Plugins.FreeImage.csproj">
-      <Project>{8e863afe-b4cf-46aa-8382-0c3547c0ede9}</Project>
-      <Name>ImageResizer.Plugins.FreeImage</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\Libs\FreeImage\Wrapper\FreeImage.NET\cs\Library\WrapperFreeImage.NET.csproj">
-      <Project>{6598a7cd-8f27-4d3f-a675-5ae63113a7c3}</Project>
-      <Name>WrapperFreeImage.NET</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Logging\ImageResizer.Plugins.Logging.csproj">
       <Project>{10e04bad-889b-4c01-ba0b-fac7ef63b859}</Project>
       <Name>ImageResizer.Plugins.Logging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\MongoReader\ImageResizer.Plugins.MongoReader.csproj">
-      <Project>{c8d43f4e-103e-4cd7-b0d9-e97d9f708003}</Project>
-      <Name>ImageResizer.Plugins.MongoReader</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\PrettyGifs\ImageResizer.Plugins.PrettyGifs.csproj">
-      <Project>{bb8eeb97-6550-4780-97b2-b0f2fcd80970}</Project>
-      <Name>ImageResizer.Plugins.PrettyGifs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\PsdComposer\ImageResizer.Plugins.PsdComposer.csproj">
-      <Project>{bc40ddce-96bb-41af-9d3c-6cf4861e3408}</Project>
-      <Name>ImageResizer.Plugins.PsdComposer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\PsdReader\ImageResizer.Plugins.PsdReader.csproj">
-      <Project>{bcf28da2-af29-4c09-b37d-059f40fc9b95}</Project>
-      <Name>ImageResizer.Plugins.PsdReader</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\RedEye\ImageResizer.Plugins.RedEye.csproj">
-      <Project>{054d5d5d-1041-4f03-b5e4-bff0441586fa}</Project>
-      <Name>ImageResizer.Plugins.RedEye</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\RemoteReader\ImageResizer.Plugins.RemoteReader.csproj">
       <Project>{0e6be1a7-c754-4e33-a8ac-75a8549fc68b}</Project>
@@ -222,45 +166,9 @@
       <Project>{ac318404-15f2-4187-a7b1-afe4e2798de6}</Project>
       <Name>ImageResizer.Plugins.S3Reader2</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\SeamCarving\ImageResizer.Plugins.SeamCarving.csproj">
-      <Project>{7aefb877-a720-4929-880c-1090a71c83eb}</Project>
-      <Name>ImageResizer.Plugins.SeamCarving</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Security\ImageResizer.Plugins.Security.csproj">
       <Project>{6fdae8bf-8629-47a8-86f6-67774b78c3fa}</Project>
       <Name>ImageResizer.Plugins.Security</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\SimpleFilters\ImageResizer.Plugins.SimpleFilters.csproj">
-      <Project>{2a7d72f6-6dcb-4260-a921-6c7a6fc77812}</Project>
-      <Name>ImageResizer.Plugins.SimpleFilters</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\SqlReader\ImageResizer.Plugins.SqlReader.csproj">
-      <Project>{2ab0fc98-8ad5-4d2a-bf06-0ea4dcf8764d}</Project>
-      <Name>ImageResizer.Plugins.SqlReader</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\TinyCache\ImageResizer.Plugins.TinyCache.csproj">
-      <Project>{e879e2dd-cdbf-4749-88b7-6d15de4e7c11}</Project>
-      <Name>ImageResizer.Plugins.TinyCache</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\Watermark\ImageResizer.Plugins.Watermark.csproj">
-      <Project>{2b21b3e4-559c-45cb-a25c-09df02ab63bc}</Project>
-      <Name>ImageResizer.Plugins.Watermark</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\WebP\ImageResizer.Plugins.WebP.csproj">
-      <Project>{e7637d84-d86b-4d37-9835-8df374539693}</Project>
-      <Name>ImageResizer.Plugins.WebP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\WhitespaceTrimmer\ImageResizer.Plugins.WhitespaceTrimmer.csproj">
-      <Project>{167b88af-e3ee-4005-a266-f4d712b3bc62}</Project>
-      <Name>ImageResizer.Plugins.WhitespaceTrimmer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\Wic\ImageResizer.Plugins.Wic.csproj">
-      <Project>{4a55b40d-1e0d-4d1f-8d96-25f624847e53}</Project>
-      <Name>ImageResizer.Plugins.Wic</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CustomOverlayPlugin\ImageResizer.Plugins.CustomOverlay.csproj">
-      <Project>{589abebc-e5ee-47bf-8360-c799f714ba7f}</Project>
-      <Name>ImageResizer.Plugins.CustomOverlay</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

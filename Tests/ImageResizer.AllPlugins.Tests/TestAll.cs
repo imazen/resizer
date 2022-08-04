@@ -8,14 +8,7 @@ using System.Text;
 using Xunit;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins.Basic;
-using ImageResizer.Plugins.Watermark;
-using ImageResizer.Plugins.PrettyGifs;
-using ImageResizer.Plugins.AnimatedGifs;
-using ImageResizer.Plugins.AdvancedFilters;
 using ImageResizer.Plugins.RemoteReader;
-using ImageResizer.Plugins.SeamCarving;
-using ImageResizer.Plugins.SimpleFilters;
-using ImageResizer.Plugins.WhitespaceTrimmer;
 using System.Drawing;
 using System.IO;
 
@@ -26,7 +19,7 @@ namespace ImageResizer.AllPlugins.Tests {
         public static Config GetConfig() {
             Config c = new Config();
             //c.Pipeline.s
-            WatermarkPlugin w = new ImageResizer.Plugins.Watermark.WatermarkPlugin();
+          /*  WatermarkPlugin w = new ImageResizer.Plugins.Watermark.WatermarkPlugin();
             w.align = System.Drawing.ContentAlignment.BottomLeft;
             w.hideIfTooSmall = false;
             w.keepAspectRatio = true;
@@ -36,21 +29,15 @@ namespace ImageResizer.AllPlugins.Tests {
             w.topLeftPadding = new System.Drawing.SizeF(0, 0);
             w.watermarkSize = new System.Drawing.SizeF(1, 1); //The desired size of the watermark, maximum dimensions (aspect ratio maintained if keepAspectRatio = true)
             //Install the plugin
-            w.Install(c);
+            w.Install(c);*/
 
             new Gradient().Install(c);
-            new PrettyGifs().Install(c);
-            new AnimatedGifs().Install(c);
-            new AdvancedFilters().Install(c);
             RemoteReaderPlugin rrp = new RemoteReaderPlugin(); rrp.Install(c);
             rrp.AllowRemoteRequest += delegate(object sender, RemoteRequestEventArgs args) {
                 args.DenyRequest = false;
             }; //Doesn't support non-ASP.NET usage yet.
 
-            new SeamCarvingPlugin().Install(c);
-            new SimpleFilters().Install(c);
             new DropShadow().Install(c);
-            new WhitespaceTrimmerPlugin().Install(c);
             new VirtualFolder("/images", "..\\..\\..\\Samples\\Images",false).Install(c);
      
             new ImageResizer.Plugins.SourceMemCache.SourceMemCachePlugin().Install(c);
