@@ -5,7 +5,7 @@
 
 ![Latest NuGet version](http://img.shields.io/nuget/vpre/ImageResizer.svg) ![Issue Count](http://img.shields.io/github/issues/imazen/resizer.svg) 
 
-If you're looking for a .NET Core version, check out [Imageflow.NET Server](https://github.com/imazen/imageflow-dotnet-server)
+If you're looking for a .NET Core 5/6+ version, check out [Imageflow.NET Server](https://github.com/imazen/imageflow-dotnet-server)
 
 # What is it?
 

@@ -150,10 +150,6 @@
       <Project>{df78df74-d71e-470d-8be2-d827498e8af8}</Project>
       <Name>ImageResizer.Plugins.DiagnosticJson</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\DiskCache\ImageResizer.Plugins.DiskCache.csproj">
-      <Project>{c3b00cd1-39ee-4ba8-bdc0-02e346f20694}</Project>
-      <Name>ImageResizer.Plugins.DiskCache</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Logging\ImageResizer.Plugins.Logging.csproj">
       <Project>{10e04bad-889b-4c01-ba0b-fac7ef63b859}</Project>
       <Name>ImageResizer.Plugins.Logging</Name>
