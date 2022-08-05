@@ -157,7 +157,6 @@
     <Compile Include="Plugins\Basic\AutoRotate.cs" />
     <Compile Include="Plugins\Basic\DefaultSettings.cs" />
     <Compile Include="Plugins\Basic\FolderResizeSyntax.cs" />
-    <Compile Include="Plugins\Basic\IEPngFix.cs" />
     <Compile Include="Plugins\Basic\ImageHandlerSyntax.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -280,7 +279,6 @@
     <None Include="Plugins\Basic\dropshadow_readme.md" />
     <None Include="Plugins\Basic\folderresizesyntax_readme.md" />
     <None Include="Plugins\Basic\gradient_readme.md" />
-    <None Include="Plugins\Basic\iepngfix_readme.md" />
     <None Include="Plugins\Basic\image404_readme.md" />
     <None Include="Plugins\Basic\imagehandlersyntax_readme.md" />
     <None Include="Plugins\Basic\mvcroutingshim_readme.md" />
