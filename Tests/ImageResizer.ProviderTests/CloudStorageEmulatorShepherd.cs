@@ -35,22 +35,49 @@ namespace ImageResizer.ProviderTests
             }
             catch (StorageException)
             {
-                var path = @"C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator";
-                var filenames =
-                    new string[] { "AzureStorageEmulator.exe", "WAStorageEmulator.exe" }.Select(name =>
-                        Path.Combine(path, name));
-
-                var filename = filenames.First(n => File.Exists(n));
-
-                var processStartInfo = new ProcessStartInfo()
+                var azuritePath = new string[]
                 {
-                    FileName = filename,
-                    Arguments = @"start"
-                };
+                    @"C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\Extensions\Microsoft\Azure Storage Emulator\azurite.exe",
+                    @"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Azure Storage Emulator\azurite.exe"
+                }.FirstOrDefault(File.Exists);
 
-                using (var process = Process.Start(processStartInfo))
+
+                if (azuritePath != null)
                 {
-                    process.WaitForExit();
+                    var storageDir = Path.Combine(Path.GetTempPath(), "azurite-resizer");
+                    if (!Directory.Exists(storageDir)) Directory.CreateDirectory(storageDir);
+                    var processStartInfo = new ProcessStartInfo()
+                    {
+                        FileName = azuritePath,
+                        Arguments = $"--silent --location \"{storageDir}\" --debug \"{storageDir}\\debug.log\" &"
+                    };
+
+                    using (var process = Process.Start(processStartInfo))
+                    {
+                        process?.WaitForExit();
+                    }
+
+                }
+                else
+                {
+
+                    var path = @"C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator";
+                    var filenames =
+                        new string[] { "AzureStorageEmulator.exe", "WAStorageEmulator.exe" }.Select(name =>
+                            Path.Combine(path, name));
+
+                    var filename = filenames.First(n => File.Exists(n));
+
+                    var processStartInfo = new ProcessStartInfo()
+                    {
+                        FileName = filename,
+                        Arguments = @"start"
+                    };
+
+                    using (var process = Process.Start(processStartInfo))
+                    {
+                        process?.WaitForExit();
+                    }
                 }
             }
         }
