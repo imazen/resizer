@@ -54,9 +54,14 @@ Over half of ImageResizer's plugins are available under the Apache 2.0 license. 
 
 Below is a basic installation guide, although a more comprehensive one can be found [on our website](http://www.imageresizing.net/docs/install).
 
-#### Want the Source?
+Starting with ImageResizer v5, you'll want to avoid nuget.packages and use the ProjectReference format instead in your projects. 
 
-We use submodules - clone with `git clone -b develop --recursive https://github.com/imazen/resizer` or run `git submodule update --init --recursive` afterwards. Make sure to add a project reference.
+If you can't use ProjectReference, you'll have to install these in each of your final exeuctable/test/web project(s).
+
+```
+PM> Install-Package Imageflow.NativeRuntime.win-x86 -pre
+PM> Install-Package Imageflow.NativeRuntime.win-x86_64 -pre
+```
 
 <a name="installation"></a>
 
@@ -64,14 +69,16 @@ We use submodules - clone with `git clone -b develop --recursive https://github.
 
 #### Install from NuGet
 
-Nearly all [ImageResizer plugins are on NuGet (33+)](https://www.nuget.org/packages?q=nathanaeljones). [You can enable source symbols from symbolsource.org](http://www.symbolsource.org/Public/Home/VisualStudio) for an enhanced debugging experience.
+In V5, ImageResizer rolled the vast majority of plugin features into ImageResizer.Plugins.Imageflow. That's why so many plugins are deprecated; they're duplicating Imageflow functionality. 
+
+Nearly all [ImageResizer plugins are on NuGet](https://www.nuget.org/packages?q=imazen). [You can enable source symbols from symbolsource.org](http://www.symbolsource.org/Public/Home/VisualStudio) for an enhanced debugging experience.
 
 Get the basics:
 
 ```
 PM> Install-Package ImageResizer.WebConfig
-PM> Install-Package ImageResizer.Plugins.DiskCache
-PM> Install-Package ImageResizer.Plugins.PrettyGifs
+PM> Install-Package ImageResizer.Plugins.Imageflow
+PM> Install-Package ImageResizer.Plugins.HybridCache
 ```
 
 <a name="install_plugin"></a>
