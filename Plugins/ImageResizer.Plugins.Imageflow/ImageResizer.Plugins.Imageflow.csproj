@@ -35,6 +35,9 @@
       <PackageReference Include="Imageflow.AllPlatforms">
         <Version>0.8.3</Version>
       </PackageReference>
+      <PackageReference Include="Imageflow.Net">
+        <Version>0.8.3</Version>
+      </PackageReference>
     </ItemGroup>
     <ItemGroup>
       <Compile Include="ImageflowBuilderPlugin.cs" />

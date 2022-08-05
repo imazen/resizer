@@ -11,6 +11,8 @@ using ImageResizer.Plugins.Basic;
 using ImageResizer.Plugins.RemoteReader;
 using System.Drawing;
 using System.IO;
+ using System.Web.UI;
+ using ImageResizer.Plugins.ImageflowPlugin;
 
 namespace ImageResizer.AllPlugins.Tests {
  
@@ -37,6 +39,8 @@ namespace ImageResizer.AllPlugins.Tests {
                 args.DenyRequest = false;
             }; //Doesn't support non-ASP.NET usage yet.
 
+
+            new ImageflowBuilderPlugin().Install(c);
             new DropShadow().Install(c);
             new VirtualFolder("/images", "..\\..\\..\\Samples\\Images",false).Install(c);
      
@@ -86,6 +90,7 @@ namespace ImageResizer.AllPlugins.Tests {
             data.Add("sourceflip", new string[]{"h","v","hv","both","none"});
             data.Add("blur", new string[] { "0", "1", "5" });
             data.Add("sharpen", new string[] { "0", "1", "5" });
+            data.Add("builder", new string[]{"default", "imageflow"});
             //TODO: add watermark, advanced filter, S3reader, sqlreader, remotereader
             //gradient.png: "color1","color2", "angle", "width", "height" 
             return data;
@@ -119,17 +124,9 @@ namespace ImageResizer.AllPlugins.Tests {
 
         static Dictionary<string, Bitmap> cachedImages = new Dictionary<string, Bitmap>();
 
-        public void UseCachedImage(string key, Config c, Func<Bitmap, object> callback) {
-            if (!cachedImages.ContainsKey(key))
-                cachedImages[key] = c.CurrentImageBuilder.LoadImage(key, new ResizeSettings());
-            lock (cachedImages[key])
-            {
-                callback(cachedImages[key]);
-            }
-        }
 
         int counter = 0;
-        [Theory(Skip="Disabled for CI builds by default")]
+        [Theory()]
         [MemberData("RandomCombinations")]
         public void RandomTest(object source, string query) {
             Config c = GetConfig();

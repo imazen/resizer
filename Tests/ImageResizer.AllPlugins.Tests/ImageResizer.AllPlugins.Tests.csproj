@@ -68,6 +68,10 @@
       <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Plugins\ImageResizer.Plugins.Imageflow\ImageResizer.Plugins.Imageflow.csproj">
+      <Project>{e4f97836-bc33-4bad-b474-f6fa5acc71d3}</Project>
+      <Name>ImageResizer.Plugins.Imageflow</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\RemoteReader\ImageResizer.Plugins.RemoteReader.csproj">
       <Project>{0e6be1a7-c754-4e33-a8ac-75a8549fc68b}</Project>
       <Name>ImageResizer.Plugins.RemoteReader</Name>
