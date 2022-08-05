@@ -6,6 +6,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using ImageResizer;
 using ImageResizer.Configuration;
 
 namespace ConsoleApplication
@@ -16,11 +17,10 @@ namespace ConsoleApplication
 
         private static void Main(string[] args)
         {
-            var
-                c = new Config(); //new Config(new ResizerSection("<resizer><plugins><add name=\"Imageflow\"/></plugins></resizer>"));
+            var c = new Config(new ResizerSection("<resizer><plugins><add name=\"Imageflow\"/></plugins></resizer>"));
             c.Plugins.LoadPlugins();
             var s = c.GetDiagnosticsPage();
-            Debug.Assert(c.Plugins.AllPlugins.Any((p) => p.ToString().EndsWith("PrettyGifs")));
+            Debug.Assert(c.Plugins.AllPlugins.Any((p) => p.ToString().Contains("Imageflow")));
 
             c.BuildImage(imageDir + "quality-original.jpg", "grass.gif",
                 "rotate=90&width=600&format=gif&watermark=Sun_256.png");
