@@ -143,12 +143,6 @@
     <Compile Include="Caching\ResponseHeaders.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\Issues\IssueGatherer.cs" />
-    <Compile Include="Configuration\Issues\IIssue.cs" />
-    <Compile Include="Configuration\Issues\IIssueProvider.cs" />
-    <Compile Include="Configuration\Issues\IIssueReceiver.cs" />
-    <Compile Include="Configuration\Issues\Issue.cs" />
-    <Compile Include="Configuration\Issues\IssueSeverity.cs" />
-    <Compile Include="Configuration\Issues\IssueSink.cs" />
     <Compile Include="Configuration\IUrlEventArgs.cs" />
     <Compile Include="Configuration\PipelineConfig.cs" />
     <Compile Include="Configuration\IPipelineConfig.cs" />

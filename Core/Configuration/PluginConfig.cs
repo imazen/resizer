@@ -14,7 +14,7 @@ using System.Reflection;
 using System.Security;
 using System.Text;
 using ImageResizer.Collections;
-using ImageResizer.Configuration.Issues;
+using Imazen.Common.Issues;
 using ImageResizer.Configuration.Logging;
 using ImageResizer.Configuration.Plugins;
 using ImageResizer.Encoding;

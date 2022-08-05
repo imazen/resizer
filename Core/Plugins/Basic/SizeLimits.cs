@@ -6,7 +6,7 @@
 using System;
 using System.Drawing;
 using ImageResizer.Configuration;
-using ImageResizer.Configuration.Issues;
+using Imazen.Common.Issues;
 
 namespace ImageResizer.Plugins.Basic
 {

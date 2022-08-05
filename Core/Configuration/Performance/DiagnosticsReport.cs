@@ -11,7 +11,7 @@ using System.Reflection;
 using System.Security;
 using System.Text;
 using System.Web;
-using ImageResizer.Configuration.Issues;
+using Imazen.Common.Issues;
 using ImageResizer.ExtensionMethods;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.Basic;

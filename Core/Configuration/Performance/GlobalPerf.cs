@@ -5,7 +5,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Web;
-using ImageResizer.Configuration.Issues;
+using Imazen.Common.Issues;
 using ImageResizer.Plugins;
 using ImageResizer.Util;
 using Imazen.Common.Instrumentation.Support;

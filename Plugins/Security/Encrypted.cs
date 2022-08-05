@@ -8,7 +8,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Web;
 using ImageResizer.Configuration;
-using ImageResizer.Configuration.Issues;
+using Imazen.Common.Issues;
 using ImageResizer.Plugins.Security;
 using ImageResizer.Plugins.Security.Cryptography;
 using ImageResizer.Util;

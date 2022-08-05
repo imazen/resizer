@@ -5,7 +5,7 @@ using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading;
-using ImageResizer.Configuration.Issues;
+using Imazen.Common.Issues;
 
 namespace ImageResizer.Plugins
 {

@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using System.Web.Caching;
 using System.Web.Hosting;
 using ImageResizer.Configuration;
-using ImageResizer.Configuration.Issues;
+using Imazen.Common.Issues;
 using ImageResizer.ExtensionMethods;
 
 namespace ImageResizer.Plugins.Basic

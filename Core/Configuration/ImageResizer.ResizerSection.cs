@@ -6,7 +6,7 @@
 using System;
 using System.Configuration;
 using System.Xml;
-using ImageResizer.Configuration.Issues;
+using Imazen.Common.Issues;
 using ImageResizer.Configuration.Xml;
 
 namespace ImageResizer

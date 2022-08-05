@@ -7,7 +7,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web.Hosting;
-using ImageResizer.Configuration.Issues;
+using Imazen.Common.Issues;
 
 namespace ImageResizer.Plugins
 {

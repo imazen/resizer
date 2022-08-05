@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using ImageResizer.Configuration;
-using ImageResizer.Configuration.Issues;
+using Imazen.Common.Issues;
 using ImageResizer.Encoding;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.Basic;

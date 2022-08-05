@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ImageResizer.Configuration;
-using ImageResizer.Configuration.Issues;
+using Imazen.Common.Issues;
 
 namespace ImageResizer.Plugins.Licensing
 {

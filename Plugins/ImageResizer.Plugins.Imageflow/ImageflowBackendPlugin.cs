@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using Imageflow.Fluent;
 using ImageResizer.Configuration;
-using ImageResizer.Configuration.Issues;
+using Imazen.Common.Issues;
 using ImageResizer.ExtensionMethods;
 using ImageResizer.Resizing;
 

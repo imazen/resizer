@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Web;
 using ImageResizer.Configuration;
-using ImageResizer.Configuration.Issues;
+using Imazen.Common.Issues;
 using ImageResizer.Configuration.Xml;
 using ImageResizer.ExtensionMethods;
 

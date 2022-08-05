@@ -15,7 +15,7 @@ using System.Text;
 using System.Threading;
 using System.Xml;
 using ImageResizer.Collections;
-using ImageResizer.Configuration.Issues;
+using Imazen.Common.Issues;
 using ImageResizer.Configuration.Xml;
 using ImageResizer.Util;
 

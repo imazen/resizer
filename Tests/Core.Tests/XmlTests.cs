@@ -4,7 +4,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 using System.Diagnostics;
-using ImageResizer.Configuration.Issues;
+using Imazen.Common.Issues;
 using Xunit;
 
 namespace ImageResizer.Configuration.Xml

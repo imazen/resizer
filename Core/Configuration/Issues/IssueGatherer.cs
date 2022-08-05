@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using Imazen.Common.Issues;
 
 namespace ImageResizer.Configuration.Issues
 {

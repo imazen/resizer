@@ -12,7 +12,7 @@ using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
 using ImageResizer.Configuration;
-using ImageResizer.Configuration.Issues;
+using Imazen.Common.Issues;
 using ImageResizer.Configuration.Xml;
 using ImageResizer.ExtensionMethods;
 using ImageResizer.Storage;
