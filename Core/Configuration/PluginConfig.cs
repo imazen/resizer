@@ -967,7 +967,7 @@ namespace ImageResizer.Configuration
         /// </summary>
         Watermark = 0,
 
-        /// <summary
+        /// <summary>
         ///     Raises an exception with http status code
         /// 4
         /// 0

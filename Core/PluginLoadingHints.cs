@@ -50,6 +50,9 @@ namespace ImageResizer.Configuration
 
         private void LoadHints()
         {
+            
+            AddHint("Imageflow", "ImageResizer.Plugins.Imageflow.ImageflowBackendPlugin, ImageResizer.Plugins.Imageflow");
+
             //All plugins found in ImageResizer.dll under the ImageResizer.Plugins.Basic namespace
             foreach (var basic in new[]
                      {

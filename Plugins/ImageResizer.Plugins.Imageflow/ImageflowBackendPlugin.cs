@@ -9,20 +9,20 @@ using ImageResizer.Configuration.Issues;
 using ImageResizer.ExtensionMethods;
 using ImageResizer.Resizing;
 
-namespace ImageResizer.Plugins.ImageflowPlugin
+namespace ImageResizer.Plugins.Imageflow
 {
-    public class ImageflowBuilderPlugin : BuilderExtension, IPlugin, IIssueProvider, IFileExtensionPlugin
+    public class ImageflowBackendPlugin : BuilderExtension, IPlugin, IIssueProvider, IFileExtensionPlugin
     {
         private readonly ICollection<string> _supportedBuilderStrings =
             new List<string>(new[] { "wic", "freeimage", "imageflow" });
 
         private readonly bool _defaultBuilder = true;
 
-        public ImageflowBuilderPlugin()
+        public ImageflowBackendPlugin()
         {
         }
 
-        public ImageflowBuilderPlugin(NameValueCollection args)
+        public ImageflowBackendPlugin(NameValueCollection args)
         {
             _defaultBuilder = args.Get<bool>("defaultBuilder", true);
             _supportedBuilderStrings = args.GetAsString("builderStrings", "imageflow,wic,freeimage")
@@ -93,7 +93,7 @@ namespace ImageResizer.Plugins.ImageflowPlugin
             var commandString = job.Settings.ToString();
 
 
-            using (var imageflowJob = new Imageflow.Fluent.ImageJob())
+            using (var imageflowJob = new global::Imageflow.Fluent.ImageJob())
             {
                 var jobResult = imageflowJob.BuildCommandString(
                         new StreamSource(source, false),

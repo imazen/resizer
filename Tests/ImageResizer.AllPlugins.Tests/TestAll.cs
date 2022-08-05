@@ -9,7 +9,7 @@ using System.Drawing;
 using System.IO;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins.Basic;
-using ImageResizer.Plugins.ImageflowPlugin;
+using ImageResizer.Plugins.Imageflow;
 using ImageResizer.Plugins.RemoteReader;
 using ImageResizer.Util;
 using Xunit;
@@ -43,7 +43,7 @@ namespace ImageResizer.AllPlugins.Tests
             }; //Doesn't support non-ASP.NET usage yet.
 
 
-            new ImageflowBuilderPlugin().Install(c);
+            new ImageflowBackendPlugin().Install(c);
             new DropShadow().Install(c);
             new VirtualFolder("/images", "..\\..\\..\\Samples\\Images", false).Install(c);
 
