@@ -165,7 +165,6 @@
     <Compile Include="Plugins\Basic\Gradient.cs" />
     <Compile Include="Plugins\Basic\Image404.cs" />
     <Compile Include="Plugins\Basic\ImageInfoAPI.cs" />
-    <Compile Include="Plugins\Basic\NoCacheHandler.cs" />
     <Compile Include="Caching\ResponseArgs.cs" />
     <Compile Include="Caching\IResponseHeaders.cs" />
     <Compile Include="Plugins\Basic\NoCache.cs" />

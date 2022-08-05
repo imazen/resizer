@@ -39,25 +39,7 @@ namespace ImageResizer.Plugins.Basic
             c.Plugins.remove_plugin(this);
             return true;
         }
-
-        /// <summary>
-        ///     Sends the response directly to the client with no caching logic.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="e"></param>
-        public void Process(HttpContext context, IResponseArgs e)
-        {
-            context.RemapHandler(new NoCacheHandler(e));
-            // The following line of code does nothing. I don't think there is any way to make this work before .NET 2.0 SP2
-            //context.Handler = new NoCacheHandler(e); 
-        }
-
-
-        public bool CanProcess(HttpContext current, IResponseArgs e)
-        {
-            return true;
-        }
-
+        
         public bool CanProcess(HttpContext current, IAsyncResponsePlan e)
         {
             return true;
