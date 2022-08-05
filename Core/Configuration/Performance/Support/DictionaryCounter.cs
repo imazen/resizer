@@ -107,8 +107,6 @@ namespace ImageResizer.Configuration.Performance
                 }
             }
 
-            // TODO: remove
-            throw new Exception();
             // When 
             return otherCount;
         }
