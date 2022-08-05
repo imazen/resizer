@@ -1,13 +1,26 @@
-﻿* Fix response headers system under async
+﻿
+* Create HybridCache plugin
 
-* Figure out graceful shutdown (Dispose on httpmodule?)
+
+
+
+
+
+LATER
+
+* Create migration guide
+
+* Fix response headers system under async
+
+* Figure out graceful shutdown for HybridCache (Dispose on httpmodule?)
 
 * Implement watermark config translation
 
 * Unify RemoteReader and encrypted/signed URL system.
 
-* Create ImageResizer.Imageflow plugin
+* Integrate licensing from Imazen.Common and migrate just the enforcer tests
 
-* Create HybridCache plugin
 
-* Integrated licensing from Imazen.Common and migrate just the enforcer tests
+
+
+* Write script to update package description and status for everything that is deprecated
