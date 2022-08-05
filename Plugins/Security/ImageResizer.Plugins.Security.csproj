@@ -56,8 +56,6 @@
     <Compile Include="Cryptography\IKeyProvider.cs" />
     <Compile Include="Cryptography\VolatileKeyProvider.cs" />
     <Compile Include="Encrypted.cs" />
-    <Compile Include="Limit.cs" />
-    <Compile Include="RequestLimiting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleSecureEncryption.cs" />
   </ItemGroup>
