@@ -2,10 +2,15 @@ name: Build project
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - develop
+      - v5
   pull_request:
-    branches: [ main ]
-
+    branches:
+      - main
+      - develop
+      - v5
 jobs:
   build:
     runs-on: windows-latest
