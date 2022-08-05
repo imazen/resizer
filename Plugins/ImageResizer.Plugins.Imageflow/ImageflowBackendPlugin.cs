@@ -169,7 +169,7 @@ namespace ImageResizer.Plugins.Imageflow
             try
             {
                 //Get a Stream instance for the job
-                s = c.CurrentImageBuilder.GetStreamFromSource(job.Source, job.Settings, ref disposeStream, out var path,
+                s = c.CurrentImageBuilder.GetStreamFromSource(job.Source, new ResizeSettings(job.Instructions), ref disposeStream, out var path,
                     out restoreStreamPosition);
                 if (s == null) return RequestedAction.None; //We don't support the source object!
 
