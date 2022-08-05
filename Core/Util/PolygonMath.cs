@@ -684,7 +684,7 @@ namespace ImageResizer.Util
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="container"></param>
-        /// <param name="align"></param>
+        /// <param name="centerAt"></param>
         /// <returns></returns>
         public static RectangleF AlignWithin(RectangleF obj, RectangleF container, PointF centerAt)
         {

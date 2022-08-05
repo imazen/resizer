@@ -97,6 +97,7 @@ namespace ImageResizer
         /// <param name="encoderProvider"></param>
         /// <param name="settingsModifier"></param>
         /// <param name="virtualFileProvider"></param>
+        /// <param name="maxConcurrentJobs"></param>
         public ImageBuilder(IEnumerable<BuilderExtension> extensions, IEncoderProvider encoderProvider,
             IVirtualImageProvider virtualFileProvider, ISettingsModifier settingsModifier, int? maxConcurrentJobs)
             : base(extensions)

@@ -93,6 +93,7 @@ namespace ImageResizer.Plugins.Basic
         ///     If unspecified, uses the same behavior as ASP.NET Custom Errors.
         /// </summary>
         /// <param name="context"></param>
+        /// <param name="c"></param>
         /// <returns></returns>
         public static bool AllowResponse(HttpContext context, Config c)
         {

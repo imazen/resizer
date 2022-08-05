@@ -90,8 +90,7 @@ namespace ImageResizer.Plugins.Imageflow
             //To the actual output, that we wrap it in StreamDestination
 
             // The command string we're passing to Imageflow
-            var commandString = job.Settings.ToString();
-
+            var commandString = job.Instructions.ToString();
 
             using (var imageflowJob = new global::Imageflow.Fluent.ImageJob())
             {
@@ -155,7 +154,7 @@ namespace ImageResizer.Plugins.Imageflow
         protected override RequestedAction BuildJob(ImageJob job)
         {
             //Don't get involved if we're specifically not wanted.
-            var builderString = job.Settings["builder"];
+            var builderString = job.Instructions["builder"];
             if (!ShouldBuild(builderString)) return RequestedAction.None;
 
             var weCanOutputThis = job.Dest is Stream || job.Dest is string;
