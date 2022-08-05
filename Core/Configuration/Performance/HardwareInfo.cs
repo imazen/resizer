@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Web.Hosting;
 using ImageResizer.Configuration.Issues;
+using Imazen.Common.Instrumentation.Support;
+using Imazen.Common.Instrumentation.Support.InfoAccumulators;
 
 namespace ImageResizer.Configuration.Performance
 {

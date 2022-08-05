@@ -16,6 +16,8 @@ using ImageResizer.ExtensionMethods;
 using ImageResizer.Plugins;
 using ImageResizer.Plugins.Basic;
 using ImageResizer.Util;
+using Imazen.Common.Instrumentation.Support;
+using Imazen.Common.Instrumentation.Support.InfoAccumulators;
 
 namespace ImageResizer.Configuration.Performance
 {

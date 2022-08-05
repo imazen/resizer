@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Imazen.Common.Instrumentation.Support;
 
 namespace ImageResizer.Configuration.Performance
 {

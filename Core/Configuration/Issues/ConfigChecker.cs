@@ -12,6 +12,7 @@ using System.Web.Hosting;
 using System.Web.Security;
 using ImageResizer.Configuration.Performance;
 using ImageResizer.Plugins.Basic;
+using Imazen.Common.Instrumentation.Support;
 
 namespace ImageResizer.Configuration.Issues
 {

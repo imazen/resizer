@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using ImageResizer.Plugins;
+using Imazen.Common.Instrumentation.Support;
+using Imazen.Common.Instrumentation.Support.InfoAccumulators;
 
 namespace ImageResizer.Configuration.Performance
 {

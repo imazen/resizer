@@ -8,6 +8,8 @@ using System.Security;
 using System.Web;
 using System.Web.Hosting;
 using Microsoft.Win32;
+using Imazen.Common.Instrumentation.Support;
+using Imazen.Common.Instrumentation.Support.InfoAccumulators;
 
 namespace ImageResizer.Configuration.Performance
 {

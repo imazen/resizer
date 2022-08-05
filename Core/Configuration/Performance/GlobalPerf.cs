@@ -8,6 +8,11 @@ using System.Web;
 using ImageResizer.Configuration.Issues;
 using ImageResizer.Plugins;
 using ImageResizer.Util;
+using Imazen.Common.Instrumentation.Support;
+using Imazen.Common.Instrumentation.Support.InfoAccumulators;
+using Imazen.Common.Instrumentation.Support.PercentileSinks;
+using Imazen.Common.Instrumentation.Support.RateTracking;
+
 
 namespace ImageResizer.Configuration.Performance
 {
