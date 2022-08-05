@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-
 
 namespace ImageResizer.Configuration.Performance
 {
-
-    class SegmentClamping
+    internal class SegmentClamping
     {
         public long MaxPossibleValues { get; set; } = 100000;
         public long MinValue { get; set; } = 0;
@@ -16,7 +13,8 @@ namespace ImageResizer.Configuration.Performance
 
         public void Sort()
         {
-            if (this.Segments == null) throw new ArgumentNullException("Segments","Segments field is null. Finish configuration!");
+            if (Segments == null)
+                throw new ArgumentNullException("Segments", "Segments field is null. Finish configuration!");
 
             Segments = Segments.OrderByDescending(p => p.Above).ToArray();
         }
@@ -24,39 +22,36 @@ namespace ImageResizer.Configuration.Performance
         public void Validate()
         {
             Sort();
-            if ((MaxValue % Segments[0].Loss) > 0)
-            {
+            if (MaxValue % Segments[0].Loss > 0)
                 throw new ArgumentException("MaxValue must be a multiple of the greatest Loss value");
-            }
-            if ((MinValue < Segments.Last().Above))
-            {
+            if (MinValue < Segments.Last().Above)
                 throw new ArgumentException("MinValue must be >= the smallest Above value");
-            }
             var count = SegmentsPossibleValuesCountInternal().Sum();
             if (count > MaxPossibleValues)
-            {
-                throw new ArgumentException("This clamping function produces over " + count + " unique values, which exceeds your configured MaxPossibleValues limit");
-            }
+                throw new ArgumentException("This clamping function produces over " + count +
+                                            " unique values, which exceeds your configured MaxPossibleValues limit");
             hasValidated = true;
         }
-        bool hasValidated = false;
+
+        private bool hasValidated = false;
+
         public void EnsureValidates()
         {
             if (!hasValidated) Validate();
         }
+
         public long Clamp(long value)
         {
             EnsureValidates();
 
             var bounded = Math.Max(Math.Min(value, MaxValue), MinValue);
             for (var ix = 0; ix < Segments.Length; ix++)
-            {
                 if (bounded >= Segments[ix].Above)
                 {
                     var loss = Segments[ix].Loss;
-                    return ((bounded + loss - 1) / loss) * loss;
+                    return (bounded + loss - 1) / loss * loss;
                 }
-            }
+
             throw new ArgumentException("Invalid PrecisionClamping state");
         }
 
@@ -66,7 +61,8 @@ namespace ImageResizer.Configuration.Performance
 
             return SegmentsPossibleValuesCountInternal();
         }
-        IEnumerable<long> SegmentsPossibleValuesCountInternal()
+
+        private IEnumerable<long> SegmentsPossibleValuesCountInternal()
         {
             for (var ix = 0; ix < Segments.Length; ix++)
             {
@@ -83,13 +79,8 @@ namespace ImageResizer.Configuration.Performance
             {
                 var stopBefore = ix == 0 ? MaxValue : Segments[ix - 1].Above;
                 var step = Segments[ix].Loss;
-                for (var v = Segments[ix].Above; v < stopBefore; v += step)
-                {
-                    yield return v;
-                }
+                for (var v = Segments[ix].Above; v < stopBefore; v += step) yield return v;
             }
         }
     }
-  
-
 }

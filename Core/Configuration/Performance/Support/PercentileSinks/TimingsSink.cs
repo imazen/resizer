@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ImageResizer.Configuration.Performance
 {
     /// <summary>
-    /// Lifetime timing percentiles
-    /// 
-    /// Fixed-lifetime timing percentiles
-    /// 
-    /// Defaults to a 20kb backing table
+    ///     Lifetime timing percentiles
+    ///     Fixed-lifetime timing percentiles
+    ///     Defaults to a 20kb backing table
     /// </summary>
-    class TimingsSink : IPercentileProviderSink
+    internal class TimingsSink : IPercentileProviderSink
     {
-        readonly DurationClamping clamp = DurationClamping.Default600Seconds();
-        readonly CountMinSketch<AddMulModHash> table = new CountMinSketch<AddMulModHash>(1279, 4, AddMulModHash.DeterministicDefault());
+        private readonly DurationClamping clamp = DurationClamping.Default600Seconds();
+
+        private readonly CountMinSketch<AddMulModHash> table =
+            new CountMinSketch<AddMulModHash>(1279, 4, AddMulModHash.DeterministicDefault());
 
         public void Report(long ticks)
         {
@@ -44,7 +43,5 @@ namespace ImageResizer.Configuration.Performance
         {
             return table.DebugTable();
         }
-
     }
 }
-

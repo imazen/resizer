@@ -2,20 +2,21 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace ImageResizer.Plugins {
+using System.Drawing;
+
+namespace ImageResizer.Plugins
+{
     /// <summary>
-    /// For virtual files who want to provide their data in Bitmap form (like a PSD reader or gradient generator). Plugins should never assume this interface will be used, .Open() must also be implemented.
+    ///     For virtual files who want to provide their data in Bitmap form (like a PSD reader or gradient generator). Plugins
+    ///     should never assume this interface will be used, .Open() must also be implemented.
     /// </summary>
-    public interface IVirtualBitmapFile:IVirtualFile {
+    public interface IVirtualBitmapFile : IVirtualFile
+    {
         /// <summary>
-        /// Returns a Bitmap instance of the file's contents
+        ///     Returns a Bitmap instance of the file's contents
         /// </summary>
         /// <returns></returns>
-        System.Drawing.Bitmap GetBitmap();
+        Bitmap GetBitmap();
     }
 }

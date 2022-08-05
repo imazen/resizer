@@ -3,25 +3,24 @@ using System.Diagnostics;
 
 namespace ImageResizer.Configuration.Performance
 {
-
     /// <summary>
-    /// 4 overlapping windows are used
+    ///     4 overlapping windows are used
     /// </summary>
-    class PerIntervalSampling
+    internal class PerIntervalSampling
     {
-        readonly CircularTimeBuffer[] rings;
-        readonly long[] offsets;
-        const int RingCount = 4;
-        readonly Action<long> resultCallback;
-        readonly Func<long> getTimestampNow;
+        private readonly CircularTimeBuffer[] rings;
+        private readonly long[] offsets;
+        private const int RingCount = 4;
+        private readonly Action<long> resultCallback;
+        private readonly Func<long> getTimestampNow;
 
         public NamedInterval Interval { get; }
-        readonly long intervalTicks;
+        private readonly long intervalTicks;
 
         public PerIntervalSampling(NamedInterval interval, Action<long> resultCallback, Func<long> getTimestampNow)
         {
-            this.Interval = interval;
-            this.intervalTicks = interval.TicksDuration;
+            Interval = interval;
+            intervalTicks = interval.TicksDuration;
             this.getTimestampNow = getTimestampNow;
 
             offsets = new long[RingCount];
@@ -41,32 +40,21 @@ namespace ImageResizer.Configuration.Performance
         public void FireCallbackEvents()
         {
             for (var ix = 0; ix < RingCount; ix++)
-            {
-                foreach(var result in rings[ix].DequeueValues())
-                {
+                foreach (var result in rings[ix].DequeueValues())
                     resultCallback(result);
-                }
-            }
         }
 
         public bool Record(long timestamp, long count)
         {
-            if (timestamp - intervalTicks > this.getTimestampNow())
-            {
-                return false; //Too far future, would break current values 
-            }
+            if (timestamp - intervalTicks >
+                getTimestampNow()) return false; //Too far future, would break current values 
 
             var success = true;
             for (var ix = 0; ix < RingCount; ix++)
-            {
                 if (!rings[ix].Record(timestamp + offsets[ix], count))
-                {
                     success = false;
-                }
-            }
             FireCallbackEvents();
             return success;
         }
     }
-
 }

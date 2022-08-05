@@ -2,6 +2,7 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
+
 using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -12,7 +13,8 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("ImageResizer.Core")]
-[assembly: AssemblyDescription("The core HttpModule - Allows server-side resizing, cropping, and manipulation of images")]
+[assembly:
+    AssemblyDescription("The core HttpModule - Allows server-side resizing, cropping, and manipulation of images")]
 
 
 [assembly: CLSCompliant(false)]

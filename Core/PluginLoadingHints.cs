@@ -2,11 +2,10 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ImageResizer.Configuration
 {
@@ -23,13 +22,10 @@ namespace ImageResizer.Configuration
         private void AddHint(string name, string expansion)
         {
             List<string> options = null;
-            if (!hints.TryGetValue(name, out options) || options == null)
-            {
-                hints[name] = options = new List<string>();
-            }
+            if (!hints.TryGetValue(name, out options) || options == null) hints[name] = options = new List<string>();
             options.Add(expansion);
-
         }
+
         public IEnumerable<string> GetExpansions(string name)
         {
             List<string> options = null;
@@ -40,66 +36,82 @@ namespace ImageResizer.Configuration
         public IDictionary<string, string> GetReverseHints()
         {
             var dict = new Dictionary<string, string>();
-            foreach(var pair in hints.SelectMany(p => p.Value.Select(v => new KeyValuePair<string,string>(v, p.Key))))
+            foreach (var pair in hints.SelectMany(p => p.Value.Select(v => new KeyValuePair<string, string>(v, p.Key))))
             {
                 var key = pair.Key;
                 //Truncate the assembly name
                 var comma = key.IndexOf(',');
                 if (comma > -1) key = key.Substring(0, comma);
-                if (!dict.ContainsKey(key))
-                {
-                    dict[key] = pair.Value;
-                }
+                if (!dict.ContainsKey(key)) dict[key] = pair.Value;
             }
+
             return dict;
         }
 
-        private void LoadHints(){
-            
-
+        private void LoadHints()
+        {
             //All plugins found in ImageResizer.dll under the ImageResizer.Plugins.Basic namespace
-            foreach (string basic in new []{"AutoRotate", "LicenseDisplay", "ClientCache", "DefaultEncoder", "DefaultSettings", "Diagnostic", "DropShadow", "DiagnoseRequest",
-                            "FolderResizeSyntax", "Gradient", "IEPngFix", "Image404", "ImageHandlerSyntax", "ImageInfoAPI", 
-                             "NoCache", "Presets", "SizeLimiting", "SpeedOrQuality", "Trial", "VirtualFolder", "WebConfigLicenseReader"})
+            foreach (var basic in new[]
+                     {
+                         "AutoRotate", "LicenseDisplay", "ClientCache", "DefaultEncoder", "DefaultSettings",
+                         "Diagnostic", "DropShadow", "DiagnoseRequest",
+                         "FolderResizeSyntax", "Gradient", "IEPngFix", "Image404", "ImageHandlerSyntax", "ImageInfoAPI",
+                         "NoCache", "Presets", "SizeLimiting", "SpeedOrQuality", "Trial", "VirtualFolder",
+                         "WebConfigLicenseReader"
+                     })
                 AddHint(basic, "ImageResizer.Plugins.Basic." + basic + ", ImageResizer");
-            
+
 
             //Except this one
             AddHint("MvcRoutingShim", "ImageResizer.Plugins.Basic.MvcRoutingShimPlugin, ImageResizer");
             //Plugins that don't use the Plugin class name suffix.
-            foreach (string normalNoSuffix in new[] { "AdvancedFilters", "AnimatedGifs", "DiskCache", "PrettyGifs", "PsdReader", 
-                "S3Reader2","SimpleFilters", })
-                AddHint(normalNoSuffix, "ImageResizer.Plugins." + normalNoSuffix + "." + normalNoSuffix + ", ImageResizer.Plugins." + normalNoSuffix);
-            
+            foreach (var normalNoSuffix in new[]
+                     {
+                         "AdvancedFilters", "AnimatedGifs", "DiskCache", "PrettyGifs", "PsdReader",
+                         "S3Reader2", "SimpleFilters"
+                     })
+                AddHint(normalNoSuffix,
+                    "ImageResizer.Plugins." + normalNoSuffix + "." + normalNoSuffix + ", ImageResizer.Plugins." +
+                    normalNoSuffix);
+
             //Plugins that use the Plugin suffix in the class name.
-            foreach (string normalWithSuffix in new[] { "AzureReader2", "CloudFront", "CopyMetadata","CustomOverlay", "DiagnosticJson",
-                "Faces", "FFmpeg", "Logging", "MongoReader", "PdfRenderer", "PdfiumRenderer", "PsdComposer", "RedEye","RemoteReader", "SeamCarving",
-                "SqlReader", "TinyCache", "Watermark", "WhitespaceTrimmer", "FastScaling"})
-                AddHint(normalWithSuffix, "ImageResizer.Plugins." + normalWithSuffix + "." + normalWithSuffix + "Plugin, ImageResizer.Plugins." + normalWithSuffix);
+            foreach (var normalWithSuffix in new[]
+                     {
+                         "AzureReader2", "CloudFront", "CopyMetadata", "CustomOverlay", "DiagnosticJson",
+                         "Faces", "FFmpeg", "Logging", "MongoReader", "PdfRenderer", "PdfiumRenderer", "PsdComposer",
+                         "RedEye", "RemoteReader", "SeamCarving",
+                         "SqlReader", "TinyCache", "Watermark", "WhitespaceTrimmer", "FastScaling"
+                     })
+                AddHint(normalWithSuffix,
+                    "ImageResizer.Plugins." + normalWithSuffix + "." + normalWithSuffix +
+                    "Plugin, ImageResizer.Plugins." + normalWithSuffix);
 
             //Add 3 other plugins inside DiskCache
-            foreach (string s in new[] { "SourceDiskCache", "SourceMemCache", "MemCache" })
+            foreach (var s in new[] { "SourceDiskCache", "SourceMemCache", "MemCache" })
                 AddHint(s, "ImageResizer.Plugins." + s + "." + s + "Plugin, ImageResizer.Plugins.DiskCache");
 
             //Etags is in CustomOverlay still
             AddHint("Etags", "ImageResizer.Plugins.Etags.EtagsPlugin, ImageResizer.Plugins.CustomOverlay");
-            
+
             //CropAround is inside Faces
             AddHint("CropAround", "ImageResizer.Plugins.CropAround.CropAroundPlugin, ImageResizer.Plugins.Faces");
 
             //Add 5 plugins inside FreeImage
-            foreach (string s in new[] { "FreeImageBuilder", "FreeImageDecoder","FreeImageEncoder","FreeImageScaler", "FreeImageScaling", "FreeImageResizer" })
+            foreach (var s in new[]
+                     {
+                         "FreeImageBuilder", "FreeImageDecoder", "FreeImageEncoder", "FreeImageScaler",
+                         "FreeImageScaling", "FreeImageResizer"
+                     })
                 AddHint(s, "ImageResizer.Plugins." + s + "." + s + "Plugin, ImageResizer.Plugins.FreeImage");
 
             //Add 2 plugins inside WebP
-            foreach (string s in new[] { "WebPDecoder", "WebPEncoder" })
+            foreach (var s in new[] { "WebPDecoder", "WebPEncoder" })
                 AddHint(s, "ImageResizer.Plugins." + s + "." + s + "Plugin, ImageResizer.Plugins.WebP");
             //Add 3 plugins inside WIC
-            foreach (string s in new[] { "WicBuilder", "WicEncoder", "WicDecoder" })
+            foreach (var s in new[] { "WicBuilder", "WicEncoder", "WicDecoder" })
                 AddHint(s, "ImageResizer.Plugins." + s + "." + s + "Plugin, ImageResizer.Plugins.WIC");
 
             AddHint("Encrypted", "ImageResizer.Plugins.Encrypted.EncryptedPlugin, ImageResizer.Plugins.Security");
-
         }
     }
 }

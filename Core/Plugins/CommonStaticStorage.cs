@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ImageResizer.Plugins
 {
     /// <summary>
-    /// For when plugins need communal static storage 
+    ///     For when plugins need communal static storage
     /// </summary>
     public class CommonStaticStorage
     {
-        static ConcurrentDictionary<string, object> dict = new ConcurrentDictionary<string, object>();
+        private static ConcurrentDictionary<string, object> dict = new ConcurrentDictionary<string, object>();
+
         /// <summary>
-        /// Returns the actual value (may not be your factory's result, even if it ran). 
+        ///     Returns the actual value (may not be your factory's result, even if it ran).
         /// </summary>
         /// <param name="key"></param>
         /// <param name="factory"></param>
@@ -25,7 +22,7 @@ namespace ImageResizer.Plugins
         }
 
         /// <summary>
-        /// Tries to get the value. Returns false if no value exists.
+        ///     Tries to get the value. Returns false if no value exists.
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
@@ -36,7 +33,7 @@ namespace ImageResizer.Plugins
         }
 
         /// <summary>
-        /// Updates the value (may not be your factory's result, even if it is run). 
+        ///     Updates the value (may not be your factory's result, even if it is run).
         /// </summary>
         /// <param name="key"></param>
         /// <param name="factory"></param>

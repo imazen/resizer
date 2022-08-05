@@ -2,21 +2,16 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Imazen.Profiling
 {
-
     public class ProfilingResultNode
     {
-        public ProfilingResultNode(string name, long invocations, long exclusive, long inclusive, long firstStart, long lastStop, IList<ProfilingResultNode> children)
+        public ProfilingResultNode(string name, long invocations, long exclusive, long inclusive, long firstStart,
+            long lastStop, IList<ProfilingResultNode> children)
         {
             SegmentName = name;
             TicksExclusiveTotal = exclusive;
@@ -26,6 +21,7 @@ namespace Imazen.Profiling
             LastStopAt = lastStop;
             Children = children;
         }
+
         public string SegmentName { get; private set; }
 
 
@@ -38,22 +34,19 @@ namespace Imazen.Profiling
 
         public IList<ProfilingResultNode> Children { get; private set; }
 
-        public bool HasChildren
-        {
-            get { return Children != null && Children.Count() > 0; }
-        }
+        public bool HasChildren => Children != null && Children.Count() > 0;
 
         public IEnumerable<string> GetSegmentNamesRecursive()
         {
-            var self =Enumerable.Repeat(SegmentName,1);
+            var self = Enumerable.Repeat(SegmentName, 1);
             return HasChildren ? Enumerable.Concat(self, Children.SelectMany(n => n.GetSegmentNamesRecursive())) : self;
         }
 
         public ProfilingResultNode WithStartStopTime(long startTicks, long stopTicks)
         {
-            return new ProfilingResultNode(SegmentName, Invocations, TicksExclusiveTotal, TicksInclusiveTotal, startTicks, stopTicks, Children.ToList());
+            return new ProfilingResultNode(SegmentName, Invocations, TicksExclusiveTotal, TicksInclusiveTotal,
+                startTicks, stopTicks, Children.ToList());
         }
         //TODO - add revalidation of inclusive/exclusive times
     }
-
 }

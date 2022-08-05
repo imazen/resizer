@@ -2,8 +2,9 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
+
+using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -25,7 +26,7 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("771c2f95-bcd3-45ea-89cb-d67beb5ec9e6")]
-[assembly: System.CLSCompliant(true)]
+[assembly: CLSCompliant(true)]
 
 // Version information for an assembly consists of the following four values:
 //

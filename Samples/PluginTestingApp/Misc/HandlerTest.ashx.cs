@@ -2,20 +2,14 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System;
-using System.Collections.Generic;
-using System.Web;
-using System.Collections.Specialized;
-using System.Drawing;
-using ImageResizer;
 
+using System.Web;
+using ImageResizer;
 
 namespace SampleProject
 {
-   
     public class HandlerTest : IHttpHandler
     {
-
         public void ProcessRequest(HttpContext context)
         {
             /*
@@ -29,21 +23,15 @@ namespace SampleProject
              * Implementing a HTTP handler that supports range requests, 401, 200, etc, is very complicated.
              * Read "Image Resizing Pitfalls" on nathanaeljones.com for more reasons why a handler is not a good solution (such as memory saturation)
              */
-            ResizeSettings settings =  new ResizeSettings("?maxwidth=80&maxheight=80&format=png");
+            var settings = new ResizeSettings("?maxwidth=80&maxheight=80&format=png");
 
             //Set the mime-type
-            context.Response.ContentType = ImageBuilder.Current.EncoderProvider.GetEncoder(settings,"~/grass.jpg").MimeType;
+            context.Response.ContentType =
+                ImageBuilder.Current.EncoderProvider.GetEncoder(settings, "~/grass.jpg").MimeType;
             //Send result to output stream. 
             ImageBuilder.Current.Build("~/grass.jpg", context.Response.OutputStream, settings);
-
         }
 
-        public bool IsReusable
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool IsReusable => false;
     }
 }

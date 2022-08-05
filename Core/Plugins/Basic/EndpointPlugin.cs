@@ -1,20 +1,15 @@
-﻿using ImageResizer.Configuration;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web;
+using ImageResizer.Configuration;
 
 namespace ImageResizer.Plugins.Basic
 {
-
-
     public class EndpointPlugin : IPlugin
     {
-        Config c;
+        private Config c;
 
-        public IPlugin Install(Configuration.Config c)
+        public IPlugin Install(Config c)
         {
             // Only Config.Current ever receives PostAuthorizeRequestStart. 
             // No need for deduplication here
@@ -34,11 +29,15 @@ namespace ImageResizer.Plugins.Basic
             FilePathMatchesOrdinal
         }
 
-        protected  virtual string GenerateOutput(HttpContext context, Config c) { return ""; }
+        protected virtual string GenerateOutput(HttpContext context, Config c)
+        {
+            return "";
+        }
 
         protected virtual bool HandlesRequest(HttpContext context, Config c)
         {
-            switch (EndpointMatchMethod) {
+            switch (EndpointMatchMethod)
+            {
                 case EndpointMatching.FilePathEndsWithOrdinalIgnoreCase:
                     return Endpoints.Any(v => context.Request.FilePath.EndsWith(v, StringComparison.OrdinalIgnoreCase));
                 case EndpointMatching.FilePathMatchesOrdinal:
@@ -50,7 +49,6 @@ namespace ImageResizer.Plugins.Basic
 
         protected virtual void ProcessRequest(HttpContext context)
         {
-
             context.Response.StatusCode = 200;
             context.Response.ContentType = "text/plain";
             context.Response.Cache.SetCacheability(HttpCacheability.NoCache);
@@ -59,9 +57,10 @@ namespace ImageResizer.Plugins.Basic
         }
 
 
-        void Pipeline_PostAuthorizeRequestStart(System.Web.IHttpModule sender, System.Web.HttpContext context)
+        private void Pipeline_PostAuthorizeRequestStart(IHttpModule sender, HttpContext context)
         {
-            if (HandlesRequest(context, c)) {
+            if (HandlesRequest(context, c))
+            {
                 //Communicate to the MVC plugin this request should not be affected by the UrlRoutingModule.
                 context.Items[c.Pipeline.StopRoutingKey] = true;
                 //Provide the request handler
@@ -69,22 +68,28 @@ namespace ImageResizer.Plugins.Basic
             }
         }
 
-        public bool Uninstall(Configuration.Config c)
+        public bool Uninstall(Config c)
         {
             c.Plugins.remove_plugin(this);
             c.Pipeline.PostAuthorizeRequestStart -= Pipeline_PostAuthorizeRequestStart;
             return true;
         }
 
-        class EndpointPluginPageHandler : IHttpHandler
+        private class EndpointPluginPageHandler : IHttpHandler
         {
-            readonly Action<HttpContext> respond;
-            public EndpointPluginPageHandler(Action<HttpContext> respond) { this.respond = respond; }
+            private readonly Action<HttpContext> respond;
+
+            public EndpointPluginPageHandler(Action<HttpContext> respond)
+            {
+                this.respond = respond;
+            }
 
             public bool IsReusable => false;
 
-            public void ProcessRequest(HttpContext context) { respond(context); }
+            public void ProcessRequest(HttpContext context)
+            {
+                respond(context);
+            }
         }
-
     }
 }

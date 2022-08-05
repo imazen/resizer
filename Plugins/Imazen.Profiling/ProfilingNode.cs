@@ -2,18 +2,16 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System;
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Imazen.Profiling
 {
     public class ProfilingNode
     {
-
         public long StartTicks { get; set; }
         public long StopTicks { get; set; }
 
@@ -25,19 +23,14 @@ namespace Imazen.Profiling
             }
         }
 
-        public long ElapsedTicks
-        {
-            get
-            {
-                return StopTicks - StartTicks;
-            }
-        }
-        public long TicksInclusive { get { return ElapsedTicks; } }
+        public long ElapsedTicks => StopTicks - StartTicks;
+        public long TicksInclusive => ElapsedTicks;
 
         public void Start()
         {
             StartTicks = Stopwatch.GetTimestamp();
         }
+
         public void Stop()
         {
             StopAt(-1);
@@ -48,13 +41,14 @@ namespace Imazen.Profiling
             StopTicks = ticks > 0 ? ticks : Stopwatch.GetTimestamp();
             if (StopTicks < StartTicks) StopTicks = StartTicks;
         }
-        /// <summary>
-        /// Indicates that child profiling operations should be isolated (permits controlled recursion)
-        /// </summary>
-        public bool Isolate{ get; set; }
 
         /// <summary>
-        /// Indicates that this node and its child nodes should be discarded.
+        ///     Indicates that child profiling operations should be isolated (permits controlled recursion)
+        /// </summary>
+        public bool Isolate { get; set; }
+
+        /// <summary>
+        ///     Indicates that this node and its child nodes should be discarded.
         /// </summary>
         public bool Drop { get; set; }
 
@@ -64,6 +58,7 @@ namespace Imazen.Profiling
         {
             return StartNewAt(name, -1);
         }
+
         public static ProfilingNode StartNewAt(string name, long ticks)
         {
             var n = new ProfilingNode();
@@ -73,27 +68,25 @@ namespace Imazen.Profiling
                 n.Drop = true;
                 name = name.Replace("[drop]", "");
             }
+
             if (name.IndexOf("[isolate]", StringComparison.OrdinalIgnoreCase) > -1)
             {
                 n.Isolate = true;
                 name = name.Replace("[isolate]", "");
             }
+
             n.SegmentName = name.Trim();
             if (ticks > 0)
-            {
                 n.StartTicks = ticks;
-            }
-            else { 
+            else
                 n.Start();
-            }
             return n;
         }
 
-        public static string NormalizeNodeName(string name){
+        public static string NormalizeNodeName(string name)
+        {
             if (name.IndexOf("[", StringComparison.OrdinalIgnoreCase) > -1)
-            {
                 name = name.Replace("[drop]", "").Replace("[isolate]", "").Trim();
-            }
             return name;
         }
 
@@ -105,13 +98,7 @@ namespace Imazen.Profiling
             CompletedChildren.Add(n);
         }
 
-        public bool HasChildren
-        {
-            get
-            {
-                return (CompletedChildren != null && CompletedChildren.Count() > 0);
-            }
-        }
+        public bool HasChildren => CompletedChildren != null && CompletedChildren.Count() > 0;
 
         public List<ProfilingNode> CompletedChildren { get; set; }
 
@@ -127,8 +114,10 @@ namespace Imazen.Profiling
         public static ProfilingResultNode CollapseInvocations(IEnumerable<ProfilingNode> invocations)
         {
             var names = invocations.Select(n => n.SegmentName).Distinct();
-            if (names.Count() > 1) throw new ArgumentException("All invocations must be for the same segment name.", "invocations");
-            else if (names.Count() < 1) throw new ArgumentException("One or more invocations is required.", "invocations");
+            if (names.Count() > 1)
+                throw new ArgumentException("All invocations must be for the same segment name.", "invocations");
+            else if (names.Count() < 1)
+                throw new ArgumentException("One or more invocations is required.", "invocations");
 
 
             return new ProfilingResultNode(
@@ -138,8 +127,9 @@ namespace Imazen.Profiling
                 invocations.Aggregate<ProfilingNode, long>(0, (d, n) => d + n.TicksInclusive),
                 invocations.Select(n => n.StartTicks).Min(),
                 invocations.Select(n => n.StopTicks).Max(),
-                invocations.SelectMany(n => n.NonNullChildren).GroupBy(n => n.SegmentName).Select(group => CollapseInvocations(group)).ToList()
-                );
+                invocations.SelectMany(n => n.NonNullChildren).GroupBy(n => n.SegmentName)
+                    .Select(group => CollapseInvocations(group)).ToList()
+            );
         }
 
         public ProfilingResultNode ToProfilingResultNode()
@@ -149,9 +139,8 @@ namespace Imazen.Profiling
 
         public override string ToString()
         {
-            return string.Format("{0} {1}ms ({2})", SegmentName, ElapsedTicks / Stopwatch.Frequency, 
+            return string.Format("{0} {1}ms ({2})", SegmentName, ElapsedTicks / Stopwatch.Frequency,
                 string.Join(" ", NonNullChildren.Select(c => c.ToString())));
         }
     }
-
 }

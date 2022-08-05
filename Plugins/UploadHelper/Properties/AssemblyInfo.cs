@@ -3,8 +3,8 @@
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the GNU Affero General Public License, Version 3.0.
 // Commercial licenses available at http://imageresizing.net/
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
+
+using System.Reflection;
 using System.Runtime.InteropServices;
 using ImageResizer.Util;
 
@@ -19,4 +19,3 @@ using ImageResizer.Util;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("3d977d1e-cc6e-41d1-aa0d-a9ddfc5b1b9a")]
-

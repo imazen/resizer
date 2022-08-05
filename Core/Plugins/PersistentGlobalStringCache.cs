@@ -1,79 +1,79 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ImageResizer.Configuration;
-using System.IO;
 using System.Collections.Concurrent;
-using ImageResizer.Configuration.Issues;
-using System.Security.Cryptography;
+using System.Collections.Generic;
 using System.Globalization;
-using System.Threading;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Web.Hosting;
+using ImageResizer.Configuration.Issues;
 
 namespace ImageResizer.Plugins
 {
     /// <summary>
-    /// Provides a disk-persisted (hopefully, if it can successfully write/read) cache for a tiny number of keys. (one file per key/value). 
-    /// Provides no consistency or guarantees whatsoever. You hope something gets written to disk, and that it can be read after app reboot. In the meantime you have a ConcurrentDictionary that doesn't sync to disk. 
-    /// Errors reported via IIssueProvider, not exceptions.
-    /// Designed for license files
+    ///     Provides a disk-persisted (hopefully, if it can successfully write/read) cache for a tiny number of keys. (one file
+    ///     per key/value).
+    ///     Provides no consistency or guarantees whatsoever. You hope something gets written to disk, and that it can be read
+    ///     after app reboot. In the meantime you have a ConcurrentDictionary that doesn't sync to disk.
+    ///     Errors reported via IIssueProvider, not exceptions.
+    ///     Designed for license files
     /// </summary>
-    class WriteThroughCache : IIssueProvider
+    internal class WriteThroughCache : IIssueProvider
     {
+        private string prefix = "resizer_key_";
+        private string sinkSource = "LicenseCache";
+        private string dataKind = "license";
 
-        string prefix = "resizer_key_";
-        string sinkSource = "LicenseCache";
-        string dataKind = "license";
 
-        
-        IIssueReceiver sink;
-        MultiFolderStorage store;
-        ConcurrentDictionary<string, string> cache = new ConcurrentDictionary<string, string>();
+        private IIssueReceiver sink;
+        private MultiFolderStorage store;
+        private ConcurrentDictionary<string, string> cache = new ConcurrentDictionary<string, string>();
 
-        internal WriteThroughCache() : this(null) { }
+        internal WriteThroughCache() : this(null)
+        {
+        }
 
         internal WriteThroughCache(string keyPrefix)
         {
-            this.prefix = keyPrefix ?? prefix;
+            prefix = keyPrefix ?? prefix;
 
 
             sink = new IssueSink(sinkSource);
 
-            var appPath = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
-            var candidates = ((appPath != null) ? 
-                new string[] { Path.Combine(appPath, "imagecache"),
-                    Path.Combine(appPath, "App_Data"), Path.GetTempPath() } 
+            var appPath = HostingEnvironment.ApplicationPhysicalPath;
+            var candidates = (appPath != null
+                ? new string[]
+                {
+                    Path.Combine(appPath, "imagecache"),
+                    Path.Combine(appPath, "App_Data"), Path.GetTempPath()
+                }
                 : new string[] { Path.GetTempPath() }).ToArray();
 
             store = new MultiFolderStorage(sinkSource, dataKind, sink, candidates, FolderOptions.Default);
         }
-        
-        string hashToBase16(string data)
+
+        private string hashToBase16(string data)
         {
-            byte[] bytes = SHA256.Create().ComputeHash(new UTF8Encoding().GetBytes(data));
-            StringBuilder sb = new StringBuilder(bytes.Length * 2);
-            foreach (byte b in bytes)
+            var bytes = SHA256.Create().ComputeHash(new UTF8Encoding().GetBytes(data));
+            var sb = new StringBuilder(bytes.Length * 2);
+            foreach (var b in bytes)
                 sb.Append(b.ToString("x", NumberFormatInfo.InvariantInfo).PadLeft(2, '0'));
             return sb.ToString();
         }
 
 
-        string FilenameKeyFor(string key)
+        private string FilenameKeyFor(string key)
         {
-            if (key.Any(c => !Char.IsLetterOrDigit(c) && c != '_') || key.Length + prefix.Length > 200)
-            {
-                return this.prefix + hashToBase16(key) + ".txt";
-            }
+            if (key.Any(c => !char.IsLetterOrDigit(c) && c != '_') || key.Length + prefix.Length > 200)
+                return prefix + hashToBase16(key) + ".txt";
             else
-            {
-                return this.prefix + key + ".txt";
-            }
+                return prefix + key + ".txt";
         }
 
-        
+
         /// <summary>
-        /// Write-through mem cache
+        ///     Write-through mem cache
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
@@ -81,16 +81,15 @@ namespace ImageResizer.Plugins
         internal StringCachePutResult TryPut(string key, string value)
         {
             string current;
-            if (cache.TryGetValue(key, out current) && current == value)
-            {
-                return StringCachePutResult.Duplicate;
-            }
+            if (cache.TryGetValue(key, out current) && current == value) return StringCachePutResult.Duplicate;
             cache[key] = value;
-            return store.TryDiskWrite(FilenameKeyFor(key), value) ? StringCachePutResult.WriteComplete : StringCachePutResult.WriteFailed;
+            return store.TryDiskWrite(FilenameKeyFor(key), value)
+                ? StringCachePutResult.WriteComplete
+                : StringCachePutResult.WriteFailed;
         }
 
         /// <summary>
-        /// Read-through mem cache
+        ///     Read-through mem cache
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
@@ -100,13 +99,11 @@ namespace ImageResizer.Plugins
             if (cache.TryGetValue(key, out current))
             {
                 return current;
-            }else
+            }
+            else
             {
                 var disk = store.TryDiskRead(FilenameKeyFor(key));
-                if (disk != null)
-                {
-                    cache[key] = disk;
-                }
+                if (disk != null) cache[key] = disk;
                 return disk;
             }
         }
@@ -124,14 +121,15 @@ namespace ImageResizer.Plugins
     }
 
     /// <summary>
-    /// Not for you. Don't use this. It creates a separate file for every key. Wraps a singleton
+    ///     Not for you. Don't use this. It creates a separate file for every key. Wraps a singleton
     /// </summary>
     public class PersistentGlobalStringCache : IPersistentStringCache, IIssueProvider
     {
-        static WriteThroughCache processCache = new WriteThroughCache();
+        private static WriteThroughCache processCache = new WriteThroughCache();
 
 
-        WriteThroughCache cache;
+        private WriteThroughCache cache;
+
         public PersistentGlobalStringCache()
         {
             cache = processCache;

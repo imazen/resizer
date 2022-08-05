@@ -2,15 +2,11 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using System;
 
 namespace Imazen.Profiling
 {
-
     public class SegmentStats
     {
         public string SegmentName { get; set; }
@@ -31,34 +27,28 @@ namespace Imazen.Profiling
             {
                 var avgDiff = ParallelMs.Sum / (double)ParallelMs.Count - SequentialMs.Sum / (double)SequentialMs.Count;
                 var count = Math.Min(ParallelMs.Count, SequentialMs.Count);
-                return new Profiling.Stat<double>(ParallelMs.Min - SequentialMs.Min, ParallelMs.Max - SequentialMs.Max,
+                return new Stat<double>(ParallelMs.Min - SequentialMs.Min, ParallelMs.Max - SequentialMs.Max,
                     avgDiff * (double)count, count, "ms", "F");
             }
         }
 
         /// <summary>
-        /// On average, how much longer does each task take to complete in Parallel?
+        ///     On average, how much longer does each task take to complete in Parallel?
         /// </summary>
-        public double ParallelLatencyPercentAvg
-        {
-            get
-            {
-                return (ParallelMs.Avg - SequentialMs.Avg) / SequentialMs.Avg * 100;
-            }
-        }
+        public double ParallelLatencyPercentAvg => (ParallelMs.Avg - SequentialMs.Avg) / SequentialMs.Avg * 100;
 
         public double ParallelThroughputIncreasePercent
         {
             get
             {
-                var samplingFactor = ((double)SequentialMs.Count / (double)ParallelMs.Count);
+                var samplingFactor = (double)SequentialMs.Count / (double)ParallelMs.Count;
                 return (SequentialMs.Sum - ParallelRealMs * samplingFactor) / SequentialMs.Sum * 100;
             }
         }
 
         /// <summary>
-        /// 0% represents serialized execution with no overhead. -15% means parallel is 15% slower than serialized execution.
-        /// 100% means parallel executions takes perfect advantage of cores provided with no overhead.
+        ///     0% represents serialized execution with no overhead. -15% means parallel is 15% slower than serialized execution.
+        ///     100% means parallel executions takes perfect advantage of cores provided with no overhead.
         /// </summary>
         public double ParallelConcurrencyPercent
         {
@@ -74,11 +64,8 @@ namespace Imazen.Profiling
                 var serialized = sequentialTime * degree;
 
                 return 100 * (serialized - parallelTime) /
-                        (serialized - (parallelTime <= serialized ? sequentialTime : 0));
+                       (serialized - (parallelTime <= serialized ? sequentialTime : 0));
             }
         }
-
-
     }
-
 }

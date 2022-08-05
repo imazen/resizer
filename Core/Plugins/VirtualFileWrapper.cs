@@ -2,36 +2,38 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+
+using System.IO;
 using System.Web.Hosting;
 
-namespace ImageResizer.Plugins {
+namespace ImageResizer.Plugins
+{
     /// <summary>
-    /// Wraps a standard ASP.NET VirtualFile instance in an IVirtualFile-compatible wrapper.
+    ///     Wraps a standard ASP.NET VirtualFile instance in an IVirtualFile-compatible wrapper.
     /// </summary>
-    public class VirtualFileWrapper:IVirtualFile {
+    public class VirtualFileWrapper : IVirtualFile
+    {
         private VirtualFile _underlyingFile = null;
+
         /// <summary>
-        /// The VirtualFile instance this class is wrapping
+        ///     The VirtualFile instance this class is wrapping
         /// </summary>
-        public VirtualFile UnderlyingFile {
-            get { return _underlyingFile; }
-            set { _underlyingFile = value; }
+        public VirtualFile UnderlyingFile
+        {
+            get => _underlyingFile;
+            set => _underlyingFile = value;
         }
 
-        public VirtualFileWrapper(VirtualFile fileToWrap) {
-            this.UnderlyingFile = fileToWrap;
+        public VirtualFileWrapper(VirtualFile fileToWrap)
+        {
+            UnderlyingFile = fileToWrap;
         }
 
 
+        public string VirtualPath => UnderlyingFile.VirtualPath;
 
-        public string VirtualPath {
-            get { return UnderlyingFile.VirtualPath; }
-        }
-
-        public System.IO.Stream Open() {
+        public Stream Open()
+        {
             return UnderlyingFile.Open();
         }
     }

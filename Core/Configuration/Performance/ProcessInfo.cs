@@ -1,39 +1,40 @@
-﻿using ImageResizer.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Hosting;
-using Microsoft.Win32;
-using System.Web;
 using System.Reflection;
 using System.Security;
+using System.Web;
+using System.Web.Hosting;
+using Microsoft.Win32;
 
 namespace ImageResizer.Configuration.Performance
 {
-    class ProcessInfo
+    internal class ProcessInfo
     {
         public static Guid ProcessGuid { get; } = Guid.NewGuid();
 
-        public static int ProcessId { get; } = System.Diagnostics.Process.GetCurrentProcess().Id;
+        public static int ProcessId { get; } = Process.GetCurrentProcess().Id;
 
         public bool Process64Bit { get; } = Environment.Is64BitProcess;
 
         public string DotNetVersionInstalled { get; } = Get45PlusFromRegistry();
 
-        string IisVer { get; } = GetIisVerStringFromRegistry();
+        private string IisVer { get; } = GetIisVerStringFromRegistry();
 
-        bool IntegratedPipeline { get; } = HttpRuntime.UsingIntegratedPipeline;
+        private bool IntegratedPipeline { get; } = HttpRuntime.UsingIntegratedPipeline;
 
-        IEnumerable<string> HttpModules { get; set; }
+        private IEnumerable<string> HttpModules { get; set; }
 
         public void SetModules(HttpModuleCollection col)
         {
             HttpModules = col != null ? GetHttpModules(col) : HttpModules;
         }
-        public ProcessInfo() { }
+
+        public ProcessInfo()
+        {
+        }
 
         public void Add(IInfoAccumulator query)
         {
@@ -48,136 +49,110 @@ namespace ImageResizer.Configuration.Performance
             q.Add("asyncmodule", Config.Current.Pipeline.UsingAsyncMode);
             q.Add("default_commands", Config.Current.get("pipeline.defaultCommands", null));
             q.Add("working_set_mb", Environment.WorkingSet / 1000000);
-            q.Add("git_commit", Assembly.GetAssembly(this.GetType()).GetShortCommit());
-            q.Add("info_version", Assembly.GetAssembly(this.GetType()).GetInformationalVersion());
-            q.Add("file_version", Assembly.GetAssembly(this.GetType()).GetFileVersion());
+            q.Add("git_commit", Assembly.GetAssembly(GetType()).GetShortCommit());
+            q.Add("info_version", Assembly.GetAssembly(GetType()).GetInformationalVersion());
+            q.Add("file_version", Assembly.GetAssembly(GetType()).GetFileVersion());
 
             if (HostingEnvironment.ApplicationPhysicalPath != null)
-            {
                 q.Add("apppath_hash", Utilities.Sha256TruncatedBase64(HostingEnvironment.ApplicationPhysicalPath, 6));
-            }
 
             // Add HttpModule class names without prefixing
             SetModules(HttpContext.Current?.ApplicationInstance?.Modules);
             if (HttpModules != null)
-            {
                 foreach (var name in HttpModules)
-                {
                     query.Add("mod", name);
-                }
-            }
-            
 
 
             // TODO: check for mismatched assemblies?
         }
 
-        static Tuple<int?, int?> GetIisVerFromRegistry()
+        private static Tuple<int?, int?> GetIisVerFromRegistry()
         {
             try
             {
                 const string subkey = @"SOFTWARE\Microsoft\InetStp\";
                 using (var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default)
-                    .OpenSubKey(subkey))
-                { 
+                           .OpenSubKey(subkey))
+                {
                     //SetupString
-                    return new Tuple<int?, int?>(ndpKey?.GetValue("MajorVersion") as int?, ndpKey?.GetValue("MinorVersion") as int?);
+                    return new Tuple<int?, int?>(ndpKey?.GetValue("MajorVersion") as int?,
+                        ndpKey?.GetValue("MinorVersion") as int?);
                 }
             }
-            catch { }
+            catch
+            {
+            }
+
             return null;
         }
 
-        static string GetIisVerStringFromRegistry()
+        private static string GetIisVerStringFromRegistry()
         {
             var pair = GetIisVerFromRegistry();
-            if (pair?.Item1 != null && pair.Item2 != null)
-            {
-                return $"{pair.Item1}.{pair.Item2}";
-            }
+            if (pair?.Item1 != null && pair.Item2 != null) return $"{pair.Item1}.{pair.Item2}";
             return null;
         }
 
-        static string Get45PlusFromRegistry()
+        private static string Get45PlusFromRegistry()
         {
             try
             {
                 const string subkey = @"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\";
-                using (var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(subkey))
+                using (var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
+                           .OpenSubKey(subkey))
                 {
                     // Version
                     if (ndpKey?.GetValue("Release") != null)
-                    {
                         return CheckFor45PlusVersion((int)ndpKey.GetValue("Release"));
-                    }
                 }
             }
-            catch { }
+            catch
+            {
+            }
+
             return null;
         }
 
         // Checking the version using >= will enable forward compatibility.
-        static string CheckFor45PlusVersion(int releaseKey)
+        private static string CheckFor45PlusVersion(int releaseKey)
         {
-            if (releaseKey >= 460798)
-            {
-                return "4.7 or later";
-            }
-            if (releaseKey >= 394802)
-            {
-                return "4.6.2";
-            }
-            if (releaseKey >= 394254)
-            {
-                return "4.6.1";
-            }
-            if (releaseKey >= 393295)
-            {
-                return "4.6";
-            }
-            if ((releaseKey >= 379893))
-            {
-                return "4.5.2";
-            }
-            if ((releaseKey >= 378675))
-            {
-                return "4.5.1";
-            }
-            if ((releaseKey >= 378389))
-            {
-                return "4.5";
-            }
+            if (releaseKey >= 460798) return "4.7 or later";
+            if (releaseKey >= 394802) return "4.6.2";
+            if (releaseKey >= 394254) return "4.6.1";
+            if (releaseKey >= 393295) return "4.6";
+            if (releaseKey >= 379893) return "4.5.2";
+            if (releaseKey >= 378675) return "4.5.1";
+            if (releaseKey >= 378389) return "4.5";
             // This code should never execute. A non-null release key should mean
             // that 4.5 or later is installed.
             return "No 4.5 or later version detected";
         }
 
-        static IEnumerable<string> GetHttpModules(HttpModuleCollection modules)
+        private static IEnumerable<string> GetHttpModules(HttpModuleCollection modules)
         {
             if (modules != null)
-            {
-                return modules.AllKeys.Select(key => 
-                modules.Get(key).GetType().FullName
-                .Replace("System.Web.Security", "").Replace("System.Web", ""))
-                .ToArray();
-            }
+                return modules.AllKeys.Select(key =>
+                        modules.Get(key).GetType().FullName
+                            .Replace("System.Web.Security", "").Replace("System.Web", ""))
+                    .ToArray();
             return Enumerable.Empty<string>();
         }
 
         /// <summary>
-        /// Returns the ASP.NET trust level
+        ///     Returns the ASP.NET trust level
         /// </summary>
         /// <returns></returns>
         public static AspNetHostingPermissionLevel GetCurrentTrustLevel()
         {
-            foreach (AspNetHostingPermissionLevel trustLevel in
-                new[] {
-                    AspNetHostingPermissionLevel.Unrestricted,
-                    AspNetHostingPermissionLevel.High,
-                    AspNetHostingPermissionLevel.Medium,
-                    AspNetHostingPermissionLevel.Low,
-                    AspNetHostingPermissionLevel.Minimal
-                })
+            foreach (var trustLevel in
+                     new[]
+                     {
+                         AspNetHostingPermissionLevel.Unrestricted,
+                         AspNetHostingPermissionLevel.High,
+                         AspNetHostingPermissionLevel.Medium,
+                         AspNetHostingPermissionLevel.Low,
+                         AspNetHostingPermissionLevel.Minimal
+                     })
             {
                 try
                 {
@@ -198,7 +173,7 @@ namespace ImageResizer.Configuration.Performance
         {
             try
             {
-                return System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+                return Process.GetCurrentProcess().MainModule.FileName;
             }
             catch (Win32Exception)
             {
@@ -213,9 +188,11 @@ namespace ImageResizer.Configuration.Performance
                 new AspNetHostingPermission(AspNetHostingPermissionLevel.Unrestricted).Demand();
                 return true;
             }
-            catch (SecurityException) { }
+            catch (SecurityException)
+            {
+            }
+
             return false;
         }
     }
 }
-

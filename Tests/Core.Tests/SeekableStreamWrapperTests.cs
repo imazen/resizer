@@ -2,19 +2,13 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-using ImageResizer.Util;
 
+using System.IO;
+using ImageResizer.Util;
+using Xunit;
 
 namespace ImageResizer.Core.Tests
 {
-  
     public class SeekableStreamWrapperTests
     {
         [Fact]
@@ -44,13 +38,14 @@ namespace ImageResizer.Core.Tests
         private class TestStream : MemoryStream
         {
             private bool seekable;
+
             public TestStream(bool seekable, string data)
-                : base(UTF8Encoding.UTF8.GetBytes(data), false)
+                : base(System.Text.Encoding.UTF8.GetBytes(data), false)
             {
                 this.seekable = seekable;
             }
 
-            public override bool CanSeek { get { return this.seekable; } }
+            public override bool CanSeek => seekable;
         }
     }
 }

@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ImageResizer.Configuration.Performance
 {
-
     public class SignificantDigitsClamping
     {
         public long MinValue { get; set; } = 0;
@@ -27,6 +22,7 @@ namespace ImageResizer.Configuration.Performance
             return (long)RoundPositiveValueToDigits(bounded, SignificantDigits);
         }
     }
+
     public class SignificantDigitsClampingFloat
     {
         public float MinValue { get; set; } = 0;

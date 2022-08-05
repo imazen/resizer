@@ -2,12 +2,10 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+
+using System;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Imazen.Profiling
 {
@@ -19,36 +17,34 @@ namespace Imazen.Profiling
             DeltaSignificantRatio = .5;
             ExclusiveTimeSignificantMs = 5;
             Indentation = "  ";
-
         }
 
         /// <summary>
-        /// If the delta between executions exceeds this percentage (0..1), min/max values will be displayed instead of just min values.
+        ///     If the delta between executions exceeds this percentage (0..1), min/max values will be displayed instead of just
+        ///     min values.
         /// </summary>
         public double DeltaSignificantRatio { get; set; }
 
         /// <summary>
-        /// When the delta for exclusive time (between min/max) exceeds this percent, show all runtimes.
+        ///     When the delta for exclusive time (between min/max) exceeds this percent, show all runtimes.
         /// </summary>
         public double DeltaAbnormalRatio { get; set; }
 
         /// <summary>
-        /// Segments with less exclusive time than this will not be rendered
+        ///     Segments with less exclusive time than this will not be rendered
         /// </summary>
         public double ExclusiveTimeSignificantMs { get; set; }
 
         public string Indentation { get; set; }
 
 
-
         /// <summary>
-        /// Returns a anonymous timing string for the given set of nodes (non-recursive)
+        ///     Returns a anonymous timing string for the given set of nodes (non-recursive)
         /// </summary>
         /// <param name="runs"></param>
         /// <returns></returns>
         public string GetTimingInfo(IConcurrencyResults r)
         {
-
             var sincl = r.SequentialRuns.InclusiveMs();
             var sexcl = r.SequentialRuns.ExclusiveMs();
             var pincl = r.ParallelRuns.InclusiveMs();
@@ -59,9 +55,11 @@ namespace Imazen.Profiling
 
             if (sexcl.DeltaRatio > DeltaAbnormalRatio)
             {
-                var runTimes = r.AllRuns().Select(n => n.TicksExclusiveTotal).ToMilliseconds().Select(m => Math.Round(m));
-                return string.Format("runs exclusive: {1} {0}", suffix, String.Join("  ", runTimes ));
-            } else if (r.SequentialRuns.First().HasChildren)
+                var runTimes = r.AllRuns().Select(n => n.TicksExclusiveTotal).ToMilliseconds()
+                    .Select(m => Math.Round(m));
+                return string.Format("runs exclusive: {1} {0}", suffix, string.Join("  ", runTimes));
+            }
+            else if (r.SequentialRuns.First().HasChildren)
             {
                 return string.Format("exclusive: {0} ||{1}||   inclusive: {2} ||{3} {4}",
                     sexcl.ToString(DeltaSignificantRatio),
@@ -71,10 +69,11 @@ namespace Imazen.Profiling
             }
             else
             {
-                return string.Format("{0} ||{1} {2}", sincl.ToString(DeltaSignificantRatio), pincl.ToString(DeltaSignificantRatio), suffix); ;
+                return string.Format("{0} ||{1} {2}", sincl.ToString(DeltaSignificantRatio),
+                    pincl.ToString(DeltaSignificantRatio), suffix);
+                ;
             }
         }
-
 
 
         public string PrintCallTree(IConcurrencyResults r)
@@ -94,10 +93,11 @@ namespace Imazen.Profiling
             }
             else
             {
-                sb.Append(string.Join("", r.CollectChildSets().Select(s => PrintStats(s, prefix + r.SegmentName + ">"))));
+                sb.Append(
+                    string.Join("", r.CollectChildSets().Select(s => PrintStats(s, prefix + r.SegmentName + ">"))));
             }
+
             return sb.ToString();
         }
-
     }
 }

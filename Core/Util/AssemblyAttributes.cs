@@ -2,48 +2,61 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace ImageResizer.Util {
+using System;
+using System.Globalization;
 
+namespace ImageResizer.Util
+{
     [AttributeUsage(AttributeTargets.Assembly)]
-    public class CommitAttribute : Attribute {
-          
-       string guid;
-       public CommitAttribute() { guid = string.Empty; }
-       public CommitAttribute(string txt) { guid = txt; }
+    public class CommitAttribute : Attribute
+    {
+        private string guid;
 
-       public string Value { get { return guid; } }
-       public override string ToString() {
-           return guid;
-       }
-        
+        public CommitAttribute()
+        {
+            guid = string.Empty;
+        }
+
+        public CommitAttribute(string txt)
+        {
+            guid = txt;
+        }
+
+        public string Value => guid;
+
+        public override string ToString()
+        {
+            return guid;
+        }
     }
 
     [AttributeUsage(AttributeTargets.Assembly)]
     public class BuildDateAttribute : Attribute
     {
+        private string str;
 
-        string str;
-        public BuildDateAttribute() { str = string.Empty; }
-        public BuildDateAttribute(string txt) { str = txt; }
+        public BuildDateAttribute()
+        {
+            str = string.Empty;
+        }
 
-        public string Value { get { return str; } }
+        public BuildDateAttribute(string txt)
+        {
+            str = txt;
+        }
+
+        public string Value => str;
 
         public DateTimeOffset? ValueDate
         {
             get
             {
                 DateTimeOffset v;
-                if (DateTimeOffset.TryParse(str, null, System.Globalization.DateTimeStyles.RoundtripKind, out v))
-                {
+                if (DateTimeOffset.TryParse(str, null, DateTimeStyles.RoundtripKind, out v))
                     return v;
-                }else
-                {
+                else
                     return null;
-                }
             }
         }
 
@@ -51,37 +64,26 @@ namespace ImageResizer.Util {
         {
             return str;
         }
-
     }
 
 
-
-
-
     [AttributeUsage(AttributeTargets.Assembly)]
-    public class NativeDependenciesAttribute : Attribute {
-
-        string type;
-        public NativeDependenciesAttribute() { type = string.Empty; }
-        public NativeDependenciesAttribute(string txt) { type = txt; }
-
-        public string Value { get { return type; } }
-        public override string ToString() {
-            return type;
-        }
-    }
-
-
-
-    [AttributeUsage(AttributeTargets.Assembly)]
-    public class EditionAttribute : Attribute
+    public class NativeDependenciesAttribute : Attribute
     {
+        private string type;
 
-        string type;
-        public EditionAttribute() { type = string.Empty; }
-        public EditionAttribute(string txt) { type = txt; }
+        public NativeDependenciesAttribute()
+        {
+            type = string.Empty;
+        }
 
-        public string Value { get { return type; } }
+        public NativeDependenciesAttribute(string txt)
+        {
+            type = txt;
+        }
+
+        public string Value => type;
+
         public override string ToString()
         {
             return type;
@@ -89,20 +91,50 @@ namespace ImageResizer.Util {
     }
 
 
-
     [AttributeUsage(AttributeTargets.Assembly)]
-    public class BuildTypeAttribute : Attribute {
+    public class EditionAttribute : Attribute
+    {
+        private string type;
 
-        string type;
-        public BuildTypeAttribute() { type = string.Empty; }
-        public BuildTypeAttribute(string txt) { type = txt; }
-
-        public string Value { get { return type; } }
-        public override string ToString() {
-            return type;
+        public EditionAttribute()
+        {
+            type = string.Empty;
         }
 
+        public EditionAttribute(string txt)
+        {
+            type = txt;
+        }
+
+        public string Value => type;
+
+        public override string ToString()
+        {
+            return type;
+        }
     }
 
 
+    [AttributeUsage(AttributeTargets.Assembly)]
+    public class BuildTypeAttribute : Attribute
+    {
+        private string type;
+
+        public BuildTypeAttribute()
+        {
+            type = string.Empty;
+        }
+
+        public BuildTypeAttribute(string txt)
+        {
+            type = txt;
+        }
+
+        public string Value => type;
+
+        public override string ToString()
+        {
+            return type;
+        }
+    }
 }

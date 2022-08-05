@@ -3,9 +3,8 @@
 namespace ImageResizer.Configuration.Performance
 {
     /// <summary>
-    /// 
     /// </summary>
-    class ResolutionsSink: IPercentileProviderSink
+    internal class ResolutionsSink : IPercentileProviderSink
     {
         public ResolutionsSink()
         {
@@ -24,22 +23,24 @@ namespace ImageResizer.Configuration.Performance
             clamp.Validate();
         }
 
-        readonly SegmentClamping clamp;
-        readonly CountMinSketch<AddMulModHash> table = new CountMinSketch<AddMulModHash>(379, 2, AddMulModHash.DeterministicDefault());
+        private readonly SegmentClamping clamp;
+
+        private readonly CountMinSketch<AddMulModHash> table =
+            new CountMinSketch<AddMulModHash>(379, 2, AddMulModHash.DeterministicDefault());
 
         public void Report(long value)
         {
             table.InterlockedAdd((uint)clamp.Clamp(value), 1);
         }
+
         public long[] GetPercentiles(IEnumerable<float> percentiles)
         {
             return table.GetPercentiles(percentiles, clamp);
         }
+
         public long GetPercentile(float percentile)
         {
             return table.GetPercentile(percentile, clamp);
         }
-
     }
-    
 }

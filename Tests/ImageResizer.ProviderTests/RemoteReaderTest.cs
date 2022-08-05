@@ -2,6 +2,7 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
+
 using System;
 using System.Collections.Specialized;
 using System.IO;
@@ -11,39 +12,39 @@ using ImageResizer.Plugins;
 using ImageResizer.Plugins.RemoteReader;
 using Xunit;
 
-namespace ImageResizer.ProviderTests {
-    public abstract class RemoteReaderTestBase {
+namespace ImageResizer.ProviderTests
+{
+    public abstract class RemoteReaderTestBase
+    {
         /// <summary>
-        /// A GUID that can be used to represent a file that does not exist.
+        ///     A GUID that can be used to represent a file that does not exist.
         /// </summary>
         protected static readonly Guid dummyDatabaseRecordId = Guid.NewGuid();
-        
+
         protected static readonly string pathPrefix = "/remote/farm7.static.flickr.com/6021/";
-        
+
         /// <summary>
-        /// Gets a settings object for a  <see cref="RemoteReaderPlugin"/>.
+        ///     Gets a settings object for a  <see cref="RemoteReaderPlugin" />.
         /// </summary>
-        protected NameValueCollection Settings {
-            get {
-                return new NameValueCollection();
-            }
-        }
+        protected NameValueCollection Settings => new NameValueCollection();
     }
 
     /// <summary>
-    /// Test the functionality of the <see cref="RemoteReaderPlugin"/> class.
+    ///     Test the functionality of the <see cref="RemoteReaderPlugin" /> class.
     /// </summary>
     /// <remarks>
-    /// These tests exercise the methods from <see cref="IVirtualImageProvider"/> as
-    /// implemented by <see cref="RemoteReaderPlugin"/>. Also The methods 
-    /// implementations of <see cref="IVirtualFile"/>.
+    ///     These tests exercise the methods from <see cref="IVirtualImageProvider" /> as
+    ///     implemented by <see cref="RemoteReaderPlugin" />. Also The methods
+    ///     implementations of <see cref="IVirtualFile" />.
     /// </remarks>
-    public class RemoteReaderTest : RemoteReaderTestBase {
+    public class RemoteReaderTest : RemoteReaderTestBase
+    {
         /// <summary>
-        /// Instantiate a new  <see cref="RemoteReaderPlugin"/> object and test for success.
+        ///     Instantiate a new  <see cref="RemoteReaderPlugin" /> object and test for success.
         /// </summary>
         [Fact]
-        public void DefaultConstructor() {
+        public void DefaultConstructor()
+        {
             // Arrange
 
             // Act
@@ -55,30 +56,32 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the FileExists method with a null value for the queryString parameter.
+        ///     Call the FileExists method with a null value for the queryString parameter.
         /// </summary>
         /// <remarks>
-        /// The queryString parameter is not used. The value passed should not affect the method outcome.
+        ///     The queryString parameter is not used. The value passed should not affect the method outcome.
         /// </remarks>
         [Fact]
-        public void FileExistsWithNullQueryString() {
+        public void FileExistsWithNullQueryString()
+        {
             // Arrange
-            bool expected = true;
-            string virtualPath = Path.Combine(pathPrefix, dummyDatabaseRecordId.ToString("B"));
+            var expected = true;
+            var virtualPath = Path.Combine(pathPrefix, dummyDatabaseRecordId.ToString("B"));
             IVirtualImageProvider target = RemoteReaderPlugin.Current;
 
             // Act
-            bool actual = target.FileExists(virtualPath, null);
+            var actual = target.FileExists(virtualPath, null);
 
             // Assert
             Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
-        /// Call the FileExists method with a null value for the virtualPath parameter.
+        ///     Call the FileExists method with a null value for the virtualPath parameter.
         /// </summary>
         [Fact]
-        public void FileExistsWithNullVirtualPath() {
+        public void FileExistsWithNullVirtualPath()
+        {
             // Arrange
             IVirtualImageProvider target = new RemoteReaderPlugin();
 
@@ -91,12 +94,13 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the FileExists method with an empty string for the virtualPath parameter.
+        ///     Call the FileExists method with an empty string for the virtualPath parameter.
         /// </summary>
         [Fact]
-        public void FileExistsWithEmptyVirtualPath() {
+        public void FileExistsWithEmptyVirtualPath()
+        {
             // Arrange
-            bool expected = false;
+            var expected = false;
             IVirtualImageProvider target = new RemoteReaderPlugin();
 
             // Act
@@ -107,34 +111,36 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the FileExists method with a virtualPath that does not include
-        /// the PathPrefix.
+        ///     Call the FileExists method with a virtualPath that does not include
+        ///     the PathPrefix.
         /// </summary>
         [Fact]
-        public void FileExistsWithoutVirtualPath() {
+        public void FileExistsWithoutVirtualPath()
+        {
             // Arrange
-            bool expected = false;
-            string virtualPath = dummyDatabaseRecordId.ToString("B");
+            var expected = false;
+            var virtualPath = dummyDatabaseRecordId.ToString("B");
             IVirtualImageProvider target = new RemoteReaderPlugin();
 
             // Act
-            bool actual = target.FileExists(virtualPath, null);
+            var actual = target.FileExists(virtualPath, null);
 
             // Assert
             Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
-        /// Call the GetFile method without any signing data. 
+        ///     Call the GetFile method without any signing data.
         /// </summary>
         [Fact]
-        public void GetFileNotSigned() {
+        public void GetFileNotSigned()
+        {
             // Arrange
-            string virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
+            var virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
             IVirtualImageProvider target = new RemoteReaderPlugin();
             var c = Config.Current;
             ((IPlugin)target).Install(c);
-            var settings = this.Settings;
+            var settings = Settings;
 
             // Act
             var actual = Assert.Throws<ImageProcessingException>(() => target.GetFile(virtualPath, settings));
@@ -145,21 +151,24 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the GetFile method without any signing data. With added domain 
-        /// in the white-list. 
+        ///     Call the GetFile method without any signing data. With added domain
+        ///     in the white-list.
         /// </summary>
         [Fact]
-        public void GetFileNotSignedWhitelisted() {
+        public void GetFileNotSignedWhitelisted()
+        {
             // Arrange
-            string virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
-            var rs = new ResizerSection("<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"false\"><allow domain=\"farm7.static.flickr.com\" /></remotereader></resizer>");
+            var virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
+            var rs = new ResizerSection(
+                "<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"false\"><allow domain=\"farm7.static.flickr.com\" /></remotereader></resizer>");
             var c = new Config(rs);
-            RemoteReaderPlugin target = new RemoteReaderPlugin();
+            var target = new RemoteReaderPlugin();
             target.Install(c);
-            target.AllowRemoteRequest += delegate(object sender, RemoteRequestEventArgs args) {
+            target.AllowRemoteRequest += delegate(object sender, RemoteRequestEventArgs args)
+            {
                 args.DenyRequest = false;
             };
-            var settings = this.Settings;
+            var settings = Settings;
 
             // Act
             var actual = ((IVirtualImageProvider)target).GetFile(virtualPath, settings);
@@ -171,20 +180,22 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the GetFile method without any signing data. With added event 
-        /// handler to allow the call. 
+        ///     Call the GetFile method without any signing data. With added event
+        ///     handler to allow the call.
         /// </summary>
         [Fact]
-        public void GetFileNotSignedAllowRemoteRequest() {
+        public void GetFileNotSignedAllowRemoteRequest()
+        {
             // Arrange
-            string virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
+            var virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
             var c = new Config();
-            RemoteReaderPlugin target = new RemoteReaderPlugin();
+            var target = new RemoteReaderPlugin();
             target.Install(c);
-            target.AllowRemoteRequest += delegate(object sender, RemoteRequestEventArgs args) {
+            target.AllowRemoteRequest += delegate(object sender, RemoteRequestEventArgs args)
+            {
                 args.DenyRequest = false;
             };
-            var settings = this.Settings;
+            var settings = Settings;
 
             // Act
             var actual = ((IVirtualImageProvider)target).GetFile(virtualPath, settings);
@@ -196,17 +207,19 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the GetFile method with full signing data. 
+        ///     Call the GetFile method with full signing data.
         /// </summary>
         [Fact]
-        public void GetFileSigned() {
+        public void GetFileSigned()
+        {
             // Arrange
-            string virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
+            var virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
             IVirtualImageProvider target = new RemoteReaderPlugin();
-            var rs = new ResizerSection("<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"true\" /></resizer>");
+            var rs = new ResizerSection(
+                "<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"true\" /></resizer>");
             var c = new Config(rs);
             ((IPlugin)target).Install(c);
-            var settings = this.Settings;
+            var settings = Settings;
             settings["hmac"] = "k_RU-UFkOaA";
             settings["urlb64"] = "aHR0cDovL2Zhcm03LnN0YXRpYy5mbGlja3IuY29tLzYwMjEvNTk1OTg1NDE3OF8xYzJlYzZiZDc3X2IuanBn";
 
@@ -220,17 +233,19 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the GetFile method with full signing data, but the signing key omitted. 
+        ///     Call the GetFile method with full signing data, but the signing key omitted.
         /// </summary>
         [Fact]
-        public void GetFileSignedWithoutSigningKey() {
+        public void GetFileSignedWithoutSigningKey()
+        {
             // Arrange
-            string virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
+            var virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
             IVirtualImageProvider target = new RemoteReaderPlugin();
-            var rs = new ResizerSection("<resizer><remotereader signingKey=\"\" allowAllSignedRequests=\"true\" /></resizer>");
+            var rs = new ResizerSection(
+                "<resizer><remotereader signingKey=\"\" allowAllSignedRequests=\"true\" /></resizer>");
             var c = new Config(rs);
             ((IPlugin)target).Install(c);
-            var settings = this.Settings;
+            var settings = Settings;
             settings["hmac"] = "k_RU-UFkOaA";
             settings["urlb64"] = "aHR0cDovL2Zhcm03LnN0YXRpYy5mbGlja3IuY29tLzYwMjEvNTk1OTg1NDE3OF8xYzJlYzZiZDc3X2IuanBn";
 
@@ -243,16 +258,18 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the GetFile method with the virtual path prefix omitted. 
+        ///     Call the GetFile method with the virtual path prefix omitted.
         /// </summary>
         [Fact]
-        public void GetFileWithoutVirtualPathPrefix() {
+        public void GetFileWithoutVirtualPathPrefix()
+        {
             // Arrange
-            string virtualPath = dummyDatabaseRecordId.ToString("B");
+            var virtualPath = dummyDatabaseRecordId.ToString("B");
             IVirtualImageProvider target = new RemoteReaderPlugin();
 
             // Act
-            var actual = Assert.Throws<FileNotFoundException>(() => target.GetFile(virtualPath, new NameValueCollection()));
+            var actual =
+                Assert.Throws<FileNotFoundException>(() => target.GetFile(virtualPath, new NameValueCollection()));
 
             // Assert
             Assert.NotNull(actual);
@@ -260,10 +277,11 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the GetFile method without any path data. 
+        ///     Call the GetFile method without any path data.
         /// </summary>
         [Fact]
-        public void GetFileWithNullVirtualPath() {
+        public void GetFileWithNullVirtualPath()
+        {
             // Arrange
             IVirtualImageProvider target = new RemoteReaderPlugin();
 
@@ -276,15 +294,17 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the GetFile method without any path data. 
+        ///     Call the GetFile method without any path data.
         /// </summary>
         [Fact]
-        public void GetFileWithEmptyVirtualPath() {
+        public void GetFileWithEmptyVirtualPath()
+        {
             // Arrange
             IVirtualImageProvider target = new RemoteReaderPlugin();
 
             // Act
-            var actual = Assert.Throws<FileNotFoundException>(() => target.GetFile(string.Empty, new NameValueCollection()));
+            var actual =
+                Assert.Throws<FileNotFoundException>(() => target.GetFile(string.Empty, new NameValueCollection()));
 
             // Assert
             Assert.NotNull(actual);
@@ -292,21 +312,23 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the Open method with a virtualPath to a file that 
-        /// does exist.
+        ///     Call the Open method with a virtualPath to a file that
+        ///     does exist.
         /// </summary>
         /// <remarks>
-        /// Requires a file to be present at http://farm7.static.flickr.com/6021/5959854178_1c2ec6bd77_b.jpg
+        ///     Requires a file to be present at http://farm7.static.flickr.com/6021/5959854178_1c2ec6bd77_b.jpg
         /// </remarks>
         [Fact]
-        public void Open() {
+        public void Open()
+        {
             // Arrange
-            string virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
+            var virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
             IVirtualImageProvider reader = new RemoteReaderPlugin();
-            var rs = new ResizerSection("<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"true\" /></resizer>");
+            var rs = new ResizerSection(
+                "<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"true\" /></resizer>");
             var c = new Config(rs);
             ((RemoteReaderPlugin)reader).Install(c);
-            var settings = this.Settings;
+            var settings = Settings;
             settings["hmac"] = "k_RU-UFkOaA";
             settings["urlb64"] = "aHR0cDovL2Zhcm03LnN0YXRpYy5mbGlja3IuY29tLzYwMjEvNTk1OTg1NDE3OF8xYzJlYzZiZDc3X2IuanBn";
             var target = reader.GetFile(virtualPath, settings);
@@ -321,18 +343,20 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the Open method with a virtualPath to a file that 
-        /// does not exist.
+        ///     Call the Open method with a virtualPath to a file that
+        ///     does not exist.
         /// </summary>
         [Fact]
-        public void OpenInvalidId() {
+        public void OpenInvalidId()
+        {
             // Arrange
-            string virtualPath = pathPrefix + "NoFileExists.jpg";
+            var virtualPath = pathPrefix + "NoFileExists.jpg";
             IVirtualImageProvider reader = new RemoteReaderPlugin();
-            var rs = new ResizerSection("<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"true\" /></resizer>");
+            var rs = new ResizerSection(
+                "<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"true\" /></resizer>");
             var c = new Config(rs);
             ((RemoteReaderPlugin)reader).Install(c);
-            var settings = this.Settings;
+            var settings = Settings;
             settings["hmac"] = "1uiNwp7bpsk";
             settings["urlb64"] = "aHR0cDovL2Zhcm03LnN0YXRpYy5mbGlja3IuY29tLzYwMjEvTm9GaWxlRXhpc3RzLmpwZw";
             var target = reader.GetFile(virtualPath, settings);
@@ -347,43 +371,48 @@ namespace ImageResizer.ProviderTests {
     }
 
     /// <summary>
-    /// Test the functionality of the <see cref="RemoteReaderPlugin"/> class.
+    ///     Test the functionality of the <see cref="RemoteReaderPlugin" /> class.
     /// </summary>
     /// <remarks>
-    /// These tests exercise the methods from <see cref="IVirtualImageProviderAsync"/> as
-    /// implemented by <see cref="RemoteReaderPlugin"/>. Also The methods 
-    /// implementations of <see cref="IVirtualFileAsync"/>.
+    ///     These tests exercise the methods from <see cref="IVirtualImageProviderAsync" /> as
+    ///     implemented by <see cref="RemoteReaderPlugin" />. Also The methods
+    ///     implementations of <see cref="IVirtualFileAsync" />.
     /// </remarks>
-    public class RemoteReaderAsyncTest : RemoteReaderTestBase {
+    public class RemoteReaderAsyncTest : RemoteReaderTestBase
+    {
         /// <summary>
-        /// Call the GetFile method with the virtual path prefix omitted. 
+        ///     Call the GetFile method with the virtual path prefix omitted.
         /// </summary>
         [Fact]
-        public Task GetFileWithoutVirtualPathPrefix() {
+        public Task GetFileWithoutVirtualPathPrefix()
+        {
             // Arrange
-            string virtualPath = dummyDatabaseRecordId.ToString("B");
+            var virtualPath = dummyDatabaseRecordId.ToString("B");
             IVirtualImageProviderAsync target = new RemoteReaderPlugin();
 
             // Act / Assert
-            return Assert.ThrowsAsync<FileNotFoundException>(() => target.GetFileAsync(virtualPath, new NameValueCollection()));
+            return Assert.ThrowsAsync<FileNotFoundException>(() =>
+                target.GetFileAsync(virtualPath, new NameValueCollection()));
         }
 
         /// <summary>
-        /// Call the Open method with a virtualPath to a file that 
-        /// does exist.
+        ///     Call the Open method with a virtualPath to a file that
+        ///     does exist.
         /// </summary>
         /// <remarks>
-        /// Requires a file to be present at http://farm7.static.flickr.com/6021/5959854178_1c2ec6bd77_b.jpg
+        ///     Requires a file to be present at http://farm7.static.flickr.com/6021/5959854178_1c2ec6bd77_b.jpg
         /// </remarks>
         [Fact]
-        public async Task OpenAsync() {
+        public async Task OpenAsync()
+        {
             // Arrange
-            string virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
+            var virtualPath = pathPrefix + "5959854178_1c2ec6bd77_b.jpg";
             IVirtualImageProviderAsync reader = new RemoteReaderPlugin();
-            var rs = new ResizerSection("<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"true\" /></resizer>");
+            var rs = new ResizerSection(
+                "<resizer><remotereader signingKey=\"ag383ht23sag#laf#lafF#oyfafqewt;2twfqw\" allowAllSignedRequests=\"true\" /></resizer>");
             var c = new Config(rs);
             ((RemoteReaderPlugin)reader).Install(c);
-            var settings = this.Settings;
+            var settings = Settings;
             settings["hmac"] = "k_RU-UFkOaA";
             settings["urlb64"] = "aHR0cDovL2Zhcm03LnN0YXRpYy5mbGlja3IuY29tLzYwMjEvNTk1OTg1NDE3OF8xYzJlYzZiZDc3X2IuanBn";
             var target = await reader.GetFileAsync(virtualPath, settings);

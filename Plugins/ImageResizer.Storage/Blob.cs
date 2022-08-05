@@ -3,19 +3,18 @@
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the GNU Affero General Public License, Version 3.0.
 // Commercial licenses available at http://imageresizing.net/
-﻿using ImageResizer.Plugins;
-using ImageResizer.Util;
+
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using ImageResizer.Plugins;
+using ImageResizer.Util;
 
 namespace ImageResizer.Storage
 {
-    public class Blob : IVirtualFile, IVirtualFileAsync, IVirtualFileSourceCacheKey, IVirtualFileWithModifiedDate, IVirtualFileWithModifiedDateAsync   
+    public class Blob : IVirtualFile, IVirtualFileAsync, IVirtualFileSourceCacheKey, IVirtualFileWithModifiedDate,
+        IVirtualFileWithModifiedDateAsync
     {
         public Blob(BlobProviderBase provider, string virtualPath, NameValueCollection queryString)
         {
@@ -25,16 +24,8 @@ namespace ImageResizer.Storage
         }
 
         public BlobProviderBase Provider { get; private set; }
-        public string VirtualPath
-        {
-            get;
-            protected set;
-        }
-        public NameValueCollection Query
-        {
-            get;
-            protected set;
-        }
+        public string VirtualPath { get; protected set; }
+        public NameValueCollection Query { get; protected set; }
 
         public Stream Open()
         {
@@ -43,12 +34,13 @@ namespace ImageResizer.Storage
 
         public string GetCacheKey(bool includeModifiedDate)
         {
-            return VirtualPath + (includeModifiedDate ? ("_" + ModifiedDateUTC.Ticks.ToString()) : "");
+            return VirtualPath + (includeModifiedDate ? "_" + ModifiedDateUTC.Ticks.ToString() : "");
         }
 
         public DateTime ModifiedDateUTC
         {
-            get {
+            get
+            {
                 if (!Provider.CheckForModifiedFiles) return DateTime.MinValue;
                 return AsyncUtils.RunSync<DateTime>(() => GetModifiedDateUTCAsync());
             }
@@ -66,7 +58,7 @@ namespace ImageResizer.Storage
             return date != null ? date.Value : DateTime.MinValue;
         }
 
-        public Task<System.IO.Stream> OpenAsync()
+        public Task<Stream> OpenAsync()
         {
             return Provider.OpenAsync(VirtualPath, Query);
         }

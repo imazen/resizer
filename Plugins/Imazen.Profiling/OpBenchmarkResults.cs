@@ -2,11 +2,8 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System;
+
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
 
 namespace Imazen.Profiling
@@ -23,40 +20,35 @@ namespace Imazen.Profiling
         public IEnumerable<ProfilingResultNode> SequentialRuns { get; set; }
 
         /// <summary>
-        /// Includes houskeeping, setup, teardown, GC.Collect() and Thread.Sleep
+        ///     Includes houskeeping, setup, teardown, GC.Collect() and Thread.Sleep
         /// </summary>
         public long SequentialWallTicks { get; set; }
 
-        public double SequentialWallMs { get {return SequentialWallTicks * 1000 / (double)Stopwatch.Frequency;} }
+        public double SequentialWallMs => SequentialWallTicks * 1000 / (double)Stopwatch.Frequency;
 
-        public double SequentialHouskeepingMs{get{ return SequentialWallMs - SequentialRuns.ExclusiveMs().Sum;}}
+        public double SequentialHouskeepingMs => SequentialWallMs - SequentialRuns.ExclusiveMs().Sum;
 
         public IEnumerable<ProfilingResultNode> ParallelRuns { get; set; }
 
         public long ParallelWallTicks { get; set; }
 
-        public double ParallelWallMs { get {return ParallelWallTicks * 1000 / (double)Stopwatch.Frequency;} }
+        public double ParallelWallMs => ParallelWallTicks * 1000 / (double)Stopwatch.Frequency;
 
-        public long ParallelUniqueTicks{get;set;}
+        public long ParallelUniqueTicks { get; set; }
 
-        public double ParallelUniqueMs { get {return ParallelUniqueTicks * 1000 / (double)Stopwatch.Frequency;} }
+        public double ParallelUniqueMs => ParallelUniqueTicks * 1000 / (double)Stopwatch.Frequency;
 
 
-        public double ParallelHouskeepingMs{get{ return ParallelWallMs - ParallelUniqueMs;}}
+        public double ParallelHouskeepingMs => ParallelWallMs - ParallelUniqueMs;
 
 
         /// <summary>
-        /// Number of virtual cores on the machine
+        ///     Number of virtual cores on the machine
         /// </summary>
         public int CoreCount { get; set; }
 
 
-
-
-
-
         public string SegmentName { get; set; }
-
 
 
         public long PrivateBytesBefore { get; set; }

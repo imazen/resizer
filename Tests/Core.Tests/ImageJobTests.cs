@@ -2,24 +2,19 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System.Collections.Generic;
-using System.Text;
-using Xunit;
-using ImageResizer.Configuration;
-using System.Drawing;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Drawing.Imaging;
-using System.Net;
-using ImageResizer.Tests;
 
+using System.Drawing.Imaging;
+using System.IO;
+using ImageResizer.Configuration;
+using ImageResizer.Tests;
+using Xunit;
 
 namespace ImageResizer.Core.Tests
 {
-
     public class ImageJobTests
     {
-        Config c = new Config();
+        private Config c = new Config();
+
         public ImageJobTests()
         {
         }
@@ -34,19 +29,17 @@ namespace ImageResizer.Core.Tests
             Assert.Equal(j.SourceHeight, 200);
             Assert.Equal(j.ResultFileExtension, "jpg");
             Assert.Equal(j.ResultMimeType, "image/jpeg");
-
-
         }
 
         [Fact]
         public void TestImageInfo()
         {
-           var j = new ImageJob(ImageBuilderTest.GetBitmap(100, 200), null);
-           c.CurrentImageBuilder.Build(j);
-           Assert.Equal(j.SourceWidth, 100);
-           Assert.Equal(j.SourceHeight, 200);
-           Assert.Equal(j.ResultFileExtension, "jpg");
-           Assert.Equal(j.ResultMimeType, "image/jpeg");
+            var j = new ImageJob(ImageBuilderTest.GetBitmap(100, 200), null);
+            c.CurrentImageBuilder.Build(j);
+            Assert.Equal(j.SourceWidth, 100);
+            Assert.Equal(j.SourceHeight, 200);
+            Assert.Equal(j.ResultFileExtension, "jpg");
+            Assert.Equal(j.ResultMimeType, "image/jpeg");
         }
 
 
@@ -54,12 +47,10 @@ namespace ImageResizer.Core.Tests
         public void TestReplaceFileInPlace()
         {
             var path = Path.GetTempFileName();
-            ImageBuilderTest.GetBitmap(100, 200).Save(path,ImageFormat.Jpeg);
+            ImageBuilderTest.GetBitmap(100, 200).Save(path, ImageFormat.Jpeg);
 
-            var j = new ImageJob(path,path, new Instructions("width=50;format=jpg"));
+            var j = new ImageJob(path, path, new Instructions("width=50;format=jpg"));
             c.CurrentImageBuilder.Build(j);
-            
         }
-
     }
 }

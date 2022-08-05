@@ -2,41 +2,30 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-using ImageResizer.Caching;
-using ImageResizer.Configuration;
-using ImageResizer.Encoding;
-using ImageResizer.Plugins;
-using ImageResizer.Plugins.Basic;
-using ImageResizer.Util;
+
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web.Hosting;
-using System.Web.Security;
-using ImageResizer.ExtensionMethods;
-using System.Globalization;
-using System.Threading;
+using ImageResizer.Configuration;
+using ImageResizer.Plugins;
 
 namespace ImageResizer
 {
-    
     /// <summary>
-    /// An alias for AsyncInterceptModule as of v5. Monitors incoming image requests to determine if resizing (or other processing) is being requested.
+    ///     An alias for AsyncInterceptModule as of v5. Monitors incoming image requests to determine if resizing (or other
+    ///     processing) is being requested.
     /// </summary>
-    public class InterceptModule : AsyncInterceptModule {}
-    
+    public class InterceptModule : AsyncInterceptModule
+    {
+    }
+
     public class AsyncInterceptModule : IHttpModule
     {
-
-        public class AsyncResponsePlan:IAsyncResponsePlan{
-
+        public class AsyncResponsePlan : IAsyncResponsePlan
+        {
             public string EstimatedContentType { get; set; }
 
             public string EstimatedFileExtension { get; set; }
@@ -45,10 +34,11 @@ namespace ImageResizer
 
             public NameValueCollection RewrittenQuerystring { get; set; }
 
-            public ReadStreamAsyncDelegate OpenSourceStreamAsync{get;set;}
+            public ReadStreamAsyncDelegate OpenSourceStreamAsync { get; set; }
 
-            public WriteResultAsyncDelegate CreateAndWriteResultAsync{get;set;}
+            public WriteResultAsyncDelegate CreateAndWriteResultAsync { get; set; }
         }
+
         public void Dispose()
         {
             // Todo: Call StopAsync on services like HybridCache to avoid leaving files open
@@ -58,17 +48,17 @@ namespace ImageResizer
         {
             var helper = new EventHandlerTaskAsyncHelper(CheckRequest_PostAuthorizeRequest_Async);
             context.AddOnPostAuthorizeRequestAsync(helper.BeginEventHandler, helper.EndEventHandler);
-         
+
             conf.ModuleInstalled = true;
         }
 
-        protected IPipelineConfig conf { get { return Config.Current.Pipeline; } }
+        protected IPipelineConfig conf => Config.Current.Pipeline;
 
 
         protected async Task CheckRequest_PostAuthorizeRequest_Async(object sender, EventArgs e)
         {
             //Skip requests if the Request object isn't populated
-            HttpApplication app = sender as HttpApplication;
+            var app = sender as HttpApplication;
             if (app == null || app.Context == null || app.Context.Request == null) return;
 
 
@@ -76,10 +66,8 @@ namespace ImageResizer
 
             var result = ra.PostAuthorize();
 
-            if (result == HttpModuleRequestAssistant.PostAuthorizeResult.UnrelatedFileType)
-            {
-                return; //Exit early, not our scene
-            }
+            if (result == HttpModuleRequestAssistant.PostAuthorizeResult
+                    .UnrelatedFileType) return; //Exit early, not our scene
 
             if (result == HttpModuleRequestAssistant.PostAuthorizeResult.AccessDenied403)
             {
@@ -89,24 +77,19 @@ namespace ImageResizer
 
             if (result == HttpModuleRequestAssistant.PostAuthorizeResult.Complete)
             {
-
                 //Does the file exist physically? (false if VppUsage=always or file is missing)
-                bool existsPhysically = (conf.VppUsage != VppUsageOption.Always);
-                if (existsPhysically)
-                {
-                    existsPhysically = File.Exists(ra.RewrittenMappedPath);
-                }
+                var existsPhysically = conf.VppUsage != VppUsageOption.Always;
+                if (existsPhysically) existsPhysically = File.Exists(ra.RewrittenMappedPath);
 
                 //If not present physically (and VppUsage!=never), try to get the virtual file. Null indicates a missing file
                 IVirtualFileAsync vf = null;
 
                 if (conf.VppUsage != VppUsageOption.Never && !existsPhysically)
-                {
                     vf = await conf.GetFileAsync(ra.RewrittenVirtualPath, ra.RewrittenQuery);
-                }
 
                 //Only process files that exist
-                if (!existsPhysically  && vf == null){
+                if (!existsPhysically && vf == null)
+                {
                     ra.FireMissing();
                     return;
                 }
@@ -117,50 +100,49 @@ namespace ImageResizer
                     //Catch not found exceptions
                     ra.FirePostAuthorizeSuccess();
                 }
-                catch (System.IO.FileNotFoundException notFound)
-                { //Some VPPs are optimistic, or could be a race condition
-                    if (notFound.Message.Contains(" assembly ")) throw; //If an assembly is missing, it should be a 500, not a 404
+                catch (FileNotFoundException notFound)
+                {
+                    //Some VPPs are optimistic, or could be a race condition
+                    if (notFound.Message.Contains(" assembly "))
+                        throw; //If an assembly is missing, it should be a 500, not a 404
                     ra.FireMissing();
-                    throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
+                    throw new ImageMissingException("The specified resource could not be located", "File not found",
+                        notFound);
                 }
-                catch (System.IO.DirectoryNotFoundException notFound)
+                catch (DirectoryNotFoundException notFound)
                 {
                     ra.FireMissing();
-                    throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
+                    throw new ImageMissingException("The specified resource could not be located", "File not found",
+                        notFound);
                 }
                 catch (Exception ex)
                 {
                     ra.FirePostAuthorizeRequestException(ex);
                     throw;
                 }
-
-
             }
         }
 
 
         /// <summary>
-        /// Generates the resized image to disk (if needed), then rewrites the request to that location.
-        /// Perform 404 checking before calling this method. Assumes file exists.
-        /// Called during PostAuthorizeRequest
+        ///     Generates the resized image to disk (if needed), then rewrites the request to that location.
+        ///     Perform 404 checking before calling this method. Assumes file exists.
+        ///     Called during PostAuthorizeRequest
         /// </summary>
         /// <param name="context"></param>
         /// <param name="ra"></param>
         /// <param name="vf"></param>
-        protected virtual async Task HandleRequest(HttpContext context, HttpModuleRequestAssistant ra, IVirtualFileAsync vf)
+        protected virtual async Task HandleRequest(HttpContext context, HttpModuleRequestAssistant ra,
+            IVirtualFileAsync vf)
         {
-
             if (!ra.CachingIndicated && !ra.ProcessingIndicated)
             {
                 ra.ApplyRewrittenPath(); //This is needed for both physical and virtual files; only makes changes if needed.
-                if (vf != null)
-                {
-                    ra.AssignSFH(); //Virtual files are not served in .NET 4.
-                }
+                if (vf != null) ra.AssignSFH(); //Virtual files are not served in .NET 4.
                 return;
             }
 
-            
+
             //Communicate to the MVC plugin this request should not be affected by the UrlRoutingModule.
             context.Items[conf.StopRoutingKey] = true;
             context.Items[conf.ResponseArgsKey] = ""; //We are handling the request
@@ -169,13 +151,16 @@ namespace ImageResizer
             ra.EstimateResponseInfo();
 
 
-
-
             //Build CacheEventArgs
             var e = new AsyncResponsePlan();
-            
-            var modDate = (vf == null) ? System.IO.File.GetLastWriteTimeUtc(ra.RewrittenMappedPath) :
-                (vf is IVirtualFileWithModifiedDateAsync ? await ((IVirtualFileWithModifiedDateAsync)vf).GetModifiedDateUTCAsync() : DateTime.MinValue);
+
+            var modDate = vf == null
+                ? File.GetLastWriteTimeUtc(ra.RewrittenMappedPath)
+                :
+                vf is IVirtualFileWithModifiedDateAsync
+                    ?
+                    await ((IVirtualFileWithModifiedDateAsync)vf).GetModifiedDateUTCAsync()
+                    : DateTime.MinValue;
 
             e.RequestCachingKey = ra.GenerateRequestCachingKey(modDate);
 
@@ -186,17 +171,16 @@ namespace ImageResizer
             e.EstimatedFileExtension = ra.EstimatedFileExtension;
 
 
-
-
-
             //A delegate for accessing the source file
             e.OpenSourceStreamAsync = async delegate()
             {
-                return (vf != null) ? await vf.OpenAsync() : File.Open(ra.RewrittenMappedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                return vf != null
+                    ? await vf.OpenAsync()
+                    : File.Open(ra.RewrittenMappedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
             };
 
             //Add delegate for writing the data stream
-            e.CreateAndWriteResultAsync = async delegate(System.IO.Stream stream, IAsyncResponsePlan plan)
+            e.CreateAndWriteResultAsync = async delegate(Stream stream, IAsyncResponsePlan plan)
             {
                 //This runs on a cache miss or cache invalid. This delegate is preventing from running in more
                 //than one thread at a time for the specified cache key
@@ -205,18 +189,22 @@ namespace ImageResizer
                     if (!ra.ProcessingIndicated)
                     {
                         //Just duplicate the data
-                        using (Stream source = await e.OpenSourceStreamAsync())
+                        using (var source = await e.OpenSourceStreamAsync())
+                        {
                             await source.CopyToAsync(stream); //4KiB buffer
-
+                        }
                     }
                     else
                     {
                         MemoryStream inBuffer = null;
-                        using (var sourceStream = vf != null ? await vf.OpenAsync() : File.Open(ra.RewrittenMappedPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        using (var sourceStream = vf != null
+                                   ? await vf.OpenAsync()
+                                   : File.Open(ra.RewrittenMappedPath, FileMode.Open, FileAccess.Read, FileShare.Read))
                         {
                             inBuffer = new MemoryStream(sourceStream.CanSeek ? (int)sourceStream.Length : 128 * 1024);
                             await sourceStream.CopyToAsync(inBuffer);
                         }
+
                         inBuffer.Seek(0, SeekOrigin.Begin);
 
                         var outBuffer = new MemoryStream(32 * 1024);
@@ -235,22 +223,25 @@ namespace ImageResizer
                         outBuffer.Seek(0, SeekOrigin.Begin);
                         await outBuffer.CopyToAsync(stream);
                     }
+
                     ra.FireJobSuccess();
                     //Catch not found exceptions
                 }
-                catch (System.IO.FileNotFoundException notFound)
+                catch (FileNotFoundException notFound)
                 {
-                    if (notFound.Message.Contains(" assembly ")) throw; //If an assembly is missing, it should be a 500, not a 404
+                    if (notFound.Message.Contains(" assembly "))
+                        throw; //If an assembly is missing, it should be a 500, not a 404
 
                     //This will be called later, if at all. 
                     ra.FireMissing();
-                    throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
-
+                    throw new ImageMissingException("The specified resource could not be located", "File not found",
+                        notFound);
                 }
-                catch (System.IO.DirectoryNotFoundException notFound)
+                catch (DirectoryNotFoundException notFound)
                 {
                     ra.FireMissing();
-                    throw new ImageMissingException("The specified resource could not be located", "File not found", notFound);
+                    throw new ImageMissingException("The specified resource could not be located", "File not found",
+                        notFound);
                 }
                 catch (Exception ex)
                 {
@@ -258,9 +249,6 @@ namespace ImageResizer
                     throw;
                 }
             };
-
-
-
 
 
             //All bad from here down....
@@ -271,15 +259,13 @@ namespace ImageResizer
 
             //Pass the rest of the work off to the caching module. It will handle rewriting/redirecting and everything. 
             //We handle request headers based on what is found in context.Items
-            IAsyncTyrantCache cache = conf.GetAsyncCacheFor(context, e);
+            var cache = conf.GetAsyncCacheFor(context, e);
 
             //Verify we have a caching system
-            if (cache == null) throw new ImageProcessingException("Image Resizer: No async caching plugin was found for the request");
+            if (cache == null)
+                throw new ImageProcessingException("Image Resizer: No async caching plugin was found for the request");
 
             await cache.ProcessAsync(context, e);
-
-
-
         }
 
 

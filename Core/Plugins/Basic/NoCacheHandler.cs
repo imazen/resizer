@@ -2,30 +2,29 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.Licensed under the Apache License, Version 2.0.
-﻿
-using System;
-using System.Collections.Generic;
-using System.Text;
+
+using System.IO;
 using System.Web;
 using ImageResizer.Caching;
-using System.IO;
 
-namespace ImageResizer.Plugins.Basic {
+namespace ImageResizer.Plugins.Basic
+{
     /// <summary>
-    /// Implements IHttpHandler, serves content for the NoCache plugin
+    ///     Implements IHttpHandler, serves content for the NoCache plugin
     /// </summary>
-    public class NoCacheHandler :IHttpHandler{
+    public class NoCacheHandler : IHttpHandler
+    {
         private IResponseArgs e;
 
-        public NoCacheHandler(IResponseArgs e) {
+        public NoCacheHandler(IResponseArgs e)
+        {
             this.e = e;
         }
 
-        public bool IsReusable {
-            get { return false; }
-        }
+        public bool IsReusable => false;
 
-        public void ProcessRequest(HttpContext context) {
+        public void ProcessRequest(HttpContext context)
+        {
             context.Response.StatusCode = 200;
             context.Response.BufferOutput = true; //Same as .Buffer. Allows bitmaps to be disposed quicker.
 
@@ -35,7 +34,7 @@ namespace ImageResizer.Plugins.Basic {
 
             e.ResponseHeaders.ApplyDuringPreSendRequestHeaders = false;
             e.ResponseHeaders.ApplyToResponse(e.ResponseHeaders, context);
-            MemoryStream ms = new MemoryStream();
+            var ms = new MemoryStream();
             e.ResizeImageToStream(ms);
             ms.Seek(0, SeekOrigin.Begin);
             ms.CopyTo(context.Response.OutputStream);

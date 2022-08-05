@@ -1,26 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ImageResizer.Configuration.Performance
 {
-    class CpuInfo
+    internal class CpuInfo
     {
-        public CpuInfo() { }
+        public CpuInfo()
+        {
+        }
 
         public static byte[] Invoke(int level)
         {
             var codePointer = IntPtr.Zero;
-            try {
+            try
+            {
                 // compile
-                byte[] codeBytes = IntPtr.Size == 4 ? X86CodeBytes : X64CodeBytes;
+                var codeBytes = IntPtr.Size == 4 ? X86CodeBytes : X64CodeBytes;
 
                 codePointer = VirtualAlloc(
                     IntPtr.Zero,
-                    new UIntPtr((uint) codeBytes.Length),
+                    new UIntPtr((uint)codeBytes.Length),
                     AllocationType.Commit | AllocationType.Reserve,
                     MemoryProtection.ExecuteReadwrite
                 );
@@ -28,24 +27,28 @@ namespace ImageResizer.Configuration.Performance
                 Marshal.Copy(codeBytes, 0, codePointer, codeBytes.Length);
 
                 var cpuIdDelg =
-                    (CpuIdDelegate) Marshal.GetDelegateForFunctionPointer(codePointer, typeof(CpuIdDelegate));
+                    (CpuIdDelegate)Marshal.GetDelegateForFunctionPointer(codePointer, typeof(CpuIdDelegate));
 
                 // invoke
                 var handle = default(GCHandle);
                 var buffer = new byte[16];
 
-                try {
+                try
+                {
                     handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
                     cpuIdDelg(level, buffer);
-                } finally {
-                    if (handle != default(GCHandle)) {
-                        handle.Free();
-                    }
+                }
+                finally
+                {
+                    if (handle != default) handle.Free();
                 }
 
                 return buffer;
-            } finally {
-                if (codePointer != IntPtr.Zero) {
+            }
+            finally
+            {
+                if (codePointer != IntPtr.Zero)
+                {
                     VirtualFree(codePointer, 0, 0x8000);
                     codePointer = IntPtr.Zero;
                 }
@@ -53,17 +56,17 @@ namespace ImageResizer.Configuration.Performance
         }
 
         [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
-        delegate void CpuIdDelegate(int level, byte[] buffer);
+        private delegate void CpuIdDelegate(int level, byte[] buffer);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        static extern IntPtr VirtualAlloc(IntPtr lpAddress, UIntPtr dwSize, AllocationType flAllocationType,
-                                          MemoryProtection flProtect);
+        private static extern IntPtr VirtualAlloc(IntPtr lpAddress, UIntPtr dwSize, AllocationType flAllocationType,
+            MemoryProtection flProtect);
 
         [DllImport("kernel32")]
-        static extern bool VirtualFree(IntPtr lpAddress, UInt32 dwSize, UInt32 dwFreeType);
+        private static extern bool VirtualFree(IntPtr lpAddress, uint dwSize, uint dwFreeType);
 
         [Flags()]
-        enum AllocationType : uint
+        private enum AllocationType : uint
         {
             Commit = 0x1000,
             Reserve = 0x2000,
@@ -75,7 +78,7 @@ namespace ImageResizer.Configuration.Performance
         }
 
         [Flags()]
-        enum MemoryProtection : uint
+        private enum MemoryProtection : uint
         {
             Execute = 0x10,
             ExecuteRead = 0x20,
@@ -101,7 +104,8 @@ namespace ImageResizer.Configuration.Performance
         //    buffer[12] = edx
         // }
 
-        static readonly byte[] X86CodeBytes = {
+        private static readonly byte[] X86CodeBytes =
+        {
             0x55, // push        ebp  
             0x8B, 0xEC, // mov         ebp,esp
             0x53, // push        ebx  
@@ -123,7 +127,8 @@ namespace ImageResizer.Configuration.Performance
             0xc3 // ret
         };
 
-        static readonly byte[] X64CodeBytes = {
+        private static readonly byte[] X64CodeBytes =
+        {
             0x53, // push rbx    this gets clobbered by cpuid
 
             // rcx is level

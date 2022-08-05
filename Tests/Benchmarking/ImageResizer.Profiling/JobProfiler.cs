@@ -2,31 +2,29 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using Imazen.Profiling;
-using ImageResizer.Plugins;
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Threading;
+using ImageResizer.Plugins;
+using Imazen.Profiling;
 
 namespace Bench
 {
-    public class JobProfiler:Profiler, IProfiler
+    public class JobProfiler : Profiler, IProfiler
     {
-        public JobProfiler() { 
-
+        public JobProfiler()
+        {
         }
-        
+
 
         public override void Start(string segmentName, bool allowRecursion = false)
         {
-            int threadsTotal = 0;
-            if (JoinThreadsBeforeSegmentsStart != null && JoinThreadsBeforeSegmentsStart.TryGetValue(segmentName, out threadsTotal)){
+            var threadsTotal = 0;
+            if (JoinThreadsBeforeSegmentsStart != null &&
+                JoinThreadsBeforeSegmentsStart.TryGetValue(segmentName, out threadsTotal))
                 WaitStart(segmentName, threadsTotal);
-            }
             base.Start(segmentName, allowRecursion);
         }
 
@@ -34,20 +32,24 @@ namespace Bench
         {
             base.Stop(segmentName, assertStarted, stopChildren);
 
-            int threadsTotal = 0;
-            if (JoinThreadsAfterSegmentsEnd != null && JoinThreadsAfterSegmentsEnd.TryGetValue(segmentName, out threadsTotal))
-            {
+            var threadsTotal = 0;
+            if (JoinThreadsAfterSegmentsEnd != null &&
+                JoinThreadsAfterSegmentsEnd.TryGetValue(segmentName, out threadsTotal))
                 WaitStop(segmentName, threadsTotal);
-            }
         }
 
-        public static void ResetBarriers(){
+        public static void ResetBarriers()
+        {
             startBarriers.Clear();
             stopBarriers.Clear();
         }
 
-        private static ConcurrentDictionary<string, Barrier> startBarriers = new ConcurrentDictionary<string, Barrier>(8, 128, StringComparer.Ordinal);
-        private static ConcurrentDictionary<string, Barrier> stopBarriers = new ConcurrentDictionary<string, Barrier>(8, 128, StringComparer.Ordinal);
+        private static ConcurrentDictionary<string, Barrier> startBarriers =
+            new ConcurrentDictionary<string, Barrier>(8, 128, StringComparer.Ordinal);
+
+        private static ConcurrentDictionary<string, Barrier> stopBarriers =
+            new ConcurrentDictionary<string, Barrier>(8, 128, StringComparer.Ordinal);
+
         private void WaitStart(string key, int threads)
         {
             if (threads < 2) return;
@@ -68,7 +70,7 @@ namespace Bench
             if (JoinThreadsBeforeSegmentsStart == null)
                 JoinThreadsBeforeSegmentsStart = new Dictionary<string, int>(StringComparer.Ordinal);
 
-            JoinThreadsBeforeSegmentsStart.Add(name,threadCount);
+            JoinThreadsBeforeSegmentsStart.Add(name, threadCount);
 
             if (JoinThreadsAfterSegmentsEnd == null)
                 JoinThreadsAfterSegmentsEnd = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -79,9 +81,11 @@ namespace Bench
 
         private Dictionary<string, int> JoinThreadsBeforeSegmentsStart;
 
-        private Dictionary<string,int> JoinThreadsAfterSegmentsEnd;
+        private Dictionary<string, int> JoinThreadsAfterSegmentsEnd;
 
-        public JobProfiler(string rootNodeName):base(rootNodeName){}
+        public JobProfiler(string rootNodeName) : base(rootNodeName)
+        {
+        }
 
         public override IProfilingAdapter Create(string rootNodeName)
         {

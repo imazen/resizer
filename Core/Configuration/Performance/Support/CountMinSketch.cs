@@ -6,12 +6,12 @@ using System.Threading;
 
 namespace ImageResizer.Configuration.Performance
 {
-    class CountMinSketch<T> where T: struct, IHash
+    internal class CountMinSketch<T> where T : struct, IHash
     {
-        readonly int[,] table;
-        readonly uint bucketCount;
-        readonly uint hashAlgCount;
-        readonly T[] hashes;
+        private readonly int[,] table;
+        private readonly uint bucketCount;
+        private readonly uint hashAlgCount;
+        private readonly T[] hashes;
 
         public CountMinSketch(uint bucketCount, uint hashAlgCount, T hasher)
         {
@@ -28,7 +28,7 @@ namespace ImageResizer.Configuration.Performance
 
             table = new int[hashAlgCount, bucketCount];
         }
-        
+
         public void InterlockedAdd(uint value, int count)
         {
             //var indices = hashes.Select(h => h.ComputeHash(value) % bucketCount).ToArray();
@@ -39,6 +39,7 @@ namespace ImageResizer.Configuration.Performance
                 Interlocked.Add(ref table[i, ix], count);
             }
         }
+
         public void Add(uint value, int count)
         {
             //var indices = hashes.Select(h => h.ComputeHash(value) % bucketCount).ToArray();
@@ -56,12 +57,13 @@ namespace ImageResizer.Configuration.Performance
             // var indices = hashes.Select((hash, hashIndex) => hash.ComputeHash(value) % bucketCount).ToArray();
             // var values = hashes.Select((hash, hashIndex) => table[hashIndex, hash.ComputeHash(value) % bucketCount]).ToArray();
 
-            int result = int.MaxValue;
+            var result = int.MaxValue;
             for (var i = 0; i < hashAlgCount; i++)
             {
                 var cell = table[i, hashes[i].ComputeHash(value) % bucketCount];
                 result = cell < result ? cell : result;
             }
+
             return result;
             //return hashes.Select((hash, hashIndex) => table[hashIndex, hash.ComputeHash(value) % bucketCount]).Min();
         }
@@ -77,13 +79,11 @@ namespace ImageResizer.Configuration.Performance
                     //Print the bucket index
                     sb.AppendFormat("[{0,-5}]  ", b);
 
-                    foreach (var cell in row)
-                    {
-                        sb.AppendFormat("{0,10} ", cell);
-                    }
+                    foreach (var cell in row) sb.AppendFormat("{0,10} ", cell);
                     sb.AppendLine();
                 }
             }
+
             return sb.ToString();
         }
 
@@ -93,28 +93,28 @@ namespace ImageResizer.Configuration.Performance
         }
 
         /// <summary>
-        /// Gets a sorted list of all values that have been recorded 
-        /// (and, of course, some that haven't, due to hash collisions)
-        /// values recorded multiple times will appear multiple times;
+        ///     Gets a sorted list of all values that have been recorded
+        ///     (and, of course, some that haven't, due to hash collisions)
+        ///     values recorded multiple times will appear multiple times;
         /// </summary>
         /// <param name="clamp"></param>
         /// <returns></returns>
         public long[] GetAllValues(SegmentClamping clamp)
         {
             return clamp.PossibleValues()
-                                 .SelectMany(v => Enumerable.Repeat(v, (int)Estimate((uint)v)))
-                                 .OrderBy(n => n).ToArray();
+                .SelectMany(v => Enumerable.Repeat(v, (int)Estimate((uint)v)))
+                .OrderBy(n => n).ToArray();
         }
 
         public long GetPercentile(float percentile, SegmentClamping clamp)
         {
             return GetAllValues(clamp).GetPercentile(percentile);
         }
+
         public long[] GetPercentiles(IEnumerable<float> percentiles, SegmentClamping clamp)
         {
             var set = GetAllValues(clamp);
             return percentiles.Select(p => set.GetPercentile(p)).ToArray();
         }
     }
-
 }

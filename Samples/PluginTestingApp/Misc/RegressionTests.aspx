@@ -1,4 +1,5 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true"  %>
+<%@ Import Namespace="ImageResizer.Plugins.RemoteReader" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -88,7 +89,7 @@
         <img src="red-leaf.jpg?width=250&borderWidth=40&borderColor=green" />
 
         <h2>Testing signed URLs</h2>
-    <img src='<%=ImageResizer.Plugins.RemoteReader.RemoteReaderPlugin.Current.CreateSignedUrl("http://farm7.static.flickr.com/6021/5959854178_1c2ec6bd77_b.jpg","width=300") %>' />
+    <img src='<%= RemoteReaderPlugin.Current.CreateSignedUrl("http://farm7.static.flickr.com/6021/5959854178_1c2ec6bd77_b.jpg", "width=300") %>' />
     <h2>Testing human-friendly URLs and animated gif compatibility with RemoteReaderPlugin</h2>
     <img id="Img1" src="~/remote/img.imageresizing.net/2_computers.gif?width=50" runat="server" />
 

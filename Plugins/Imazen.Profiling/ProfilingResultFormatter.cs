@@ -2,17 +2,14 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System;
+
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-
 
 namespace Imazen.Profiling
 {
-
     public class ProfilingResultFormatter
     {
         public ProfilingResultFormatter()
@@ -21,30 +18,29 @@ namespace Imazen.Profiling
             DeltaSignificantPercent = 5;
             ExclusiveTimeSignificantMs = 5;
             Indentation = "  ";
-
         }
 
         /// <summary>
-        /// If the delta between executions exceeds this percentage (0..100), min/max values will be displayed instead of just min values.
+        ///     If the delta between executions exceeds this percentage (0..100), min/max values will be displayed instead of just
+        ///     min values.
         /// </summary>
         public double DeltaSignificantPercent { get; set; }
 
         /// <summary>
-        /// When the delta for exclusive time (between min/max) exceeds this percent, show all runtimes.
+        ///     When the delta for exclusive time (between min/max) exceeds this percent, show all runtimes.
         /// </summary>
         public double DeltaAbnormalPercent { get; set; }
 
         /// <summary>
-        /// Segments with less exclusive time than this will not be rendered
+        ///     Segments with less exclusive time than this will not be rendered
         /// </summary>
         public double ExclusiveTimeSignificantMs { get; set; }
 
         public string Indentation { get; set; }
 
 
-
         /// <summary>
-        /// Returns a anonymous timing string for the given set of nodes (non-recursive)
+        ///     Returns a anonymous timing string for the given set of nodes (non-recursive)
         /// </summary>
         /// <param name="runs"></param>
         /// <returns></returns>
@@ -53,7 +49,7 @@ namespace Imazen.Profiling
             runs.ValidateSet("");
 
 
-            double f = (double)Stopwatch.Frequency / 1000.0;
+            var f = (double)Stopwatch.Frequency / 1000.0;
 
             var iMin = runs.Min(n => n.TicksInclusiveTotal) / f;
             var iMax = runs.Max(n => n.TicksInclusiveTotal) / f;
@@ -63,15 +59,20 @@ namespace Imazen.Profiling
             var eMax = runs.Max(n => n.TicksExclusiveTotal) / f;
             var eDelta = (eMax - eMin) * 100 / eMin;
 
-            var invocations = runs.First().Invocations > 1 ? string.Format(" calls: {0}", runs.First().Invocations) : "";
+            var invocations = runs.First().Invocations > 1
+                ? string.Format(" calls: {0}", runs.First().Invocations)
+                : "";
 
             if (eDelta > DeltaAbnormalPercent)
-            {
-                return string.Format("runs exclusive: {1} {0}", invocations, String.Join("  ", runs.Select(n => n.TicksExclusiveTotal * 1000 / Stopwatch.Frequency)));
-            }
+                return string.Format("runs exclusive: {1} {0}", invocations,
+                    string.Join("  ", runs.Select(n => n.TicksExclusiveTotal * 1000 / Stopwatch.Frequency)));
 
-            string exclusive = eDelta > DeltaSignificantPercent ? string.Format("{0:F} .. {1:F}ms", eMin, eMax) : string.Format("{0:F}ms", eMin);
-            string inclusive = iDelta > DeltaSignificantPercent ? string.Format("{0:F} .. {1:F}ms", iMin, iMax) : string.Format("{0:F}ms", iMin);
+            var exclusive = eDelta > DeltaSignificantPercent
+                ? string.Format("{0:F} .. {1:F}ms", eMin, eMax)
+                : string.Format("{0:F}ms", eMin);
+            var inclusive = iDelta > DeltaSignificantPercent
+                ? string.Format("{0:F} .. {1:F}ms", iMin, iMax)
+                : string.Format("{0:F}ms", iMin);
 
 
             if (runs.First().HasChildren)
@@ -80,10 +81,10 @@ namespace Imazen.Profiling
             }
             else
             {
-                return string.Format("{0} {1}", inclusive, invocations); ;
+                return string.Format("{0} {1}", inclusive, invocations);
+                ;
             }
         }
-
 
 
         public string PrintCallTree(IEnumerable<ProfilingResultNode> runs)
@@ -103,10 +104,11 @@ namespace Imazen.Profiling
             }
             else
             {
-                sb.Append(string.Join("", runs.CollectChildSets().Select(s => PrintStats(s, prefix + runs.First().SegmentName + ">"))));
+                sb.Append(string.Join("",
+                    runs.CollectChildSets().Select(s => PrintStats(s, prefix + runs.First().SegmentName + ">"))));
             }
+
             return sb.ToString();
         }
-
     }
 }

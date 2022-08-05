@@ -2,99 +2,129 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System;
+
 using System.Collections.Generic;
-using System.Text;
-using ImageResizer.Configuration;
-using ImageResizer.Caching;
-using System.IO;
 using System.Collections.Specialized;
 using System.Drawing;
+using System.IO;
+using System.Text;
+using System.Web;
+using ImageResizer.Caching;
+using ImageResizer.Configuration;
 
-namespace ImageResizer.Plugins.Basic {
-    public class ImageInfoAPI : IPlugin, IQuerystringPlugin {
-        Config c;
-        public IPlugin Install(Configuration.Config c) {
+namespace ImageResizer.Plugins.Basic
+{
+    public class ImageInfoAPI : IPlugin, IQuerystringPlugin
+    {
+        private Config c;
+
+        public IPlugin Install(Config c)
+        {
             c.Plugins.add_plugin(this);
             c.Pipeline.PreHandleImage += Pipeline_PreHandleImage;
             this.c = c;
             return this;
         }
 
-        void Pipeline_PreHandleImage(System.Web.IHttpModule sender, System.Web.HttpContext context, Caching.IResponseArgs e) {
-            string info = e.RewrittenQuerystring["getinfo"];
+        private void Pipeline_PreHandleImage(IHttpModule sender, HttpContext context, IResponseArgs e)
+        {
+            var info = e.RewrittenQuerystring["getinfo"];
             if (string.IsNullOrEmpty(info)) return;
 
-            ResponseArgs ra = e as ResponseArgs;
+            var ra = e as ResponseArgs;
             e.ResponseHeaders.ContentType = "application/json; charset=utf-8";
 
-            NameValueCollection d = new NameValueCollection();
-            ra.ResizeImageToStream = new ResizeImageDelegate(delegate(Stream s) {
-                try {
-                    using (Stream src = ra.GetSourceImage()) {
-                        
-                        bool attemptFastMode = src.CanSeek;
-                        long orig = attemptFastMode ? src.Position : 0;
-                        bool trySlowMode = !attemptFastMode;
-                        if (attemptFastMode) {
-                            try {
-                                using (Image i = System.Drawing.Image.FromStream(src, false, false)) {
+            var d = new NameValueCollection();
+            ra.ResizeImageToStream = new ResizeImageDelegate(delegate(Stream s)
+            {
+                try
+                {
+                    using (var src = ra.GetSourceImage())
+                    {
+                        var attemptFastMode = src.CanSeek;
+                        var orig = attemptFastMode ? src.Position : 0;
+                        var trySlowMode = !attemptFastMode;
+                        if (attemptFastMode)
+                            try
+                            {
+                                using (var i = Image.FromStream(src, false, false))
+                                {
                                     d["width"] = i.Width.ToString();
                                     d["height"] = i.Height.ToString();
                                 }
-                            } catch {
-                                trySlowMode = true;
-
                             }
-                        }
-                        if (trySlowMode){
+                            catch
+                            {
+                                trySlowMode = true;
+                            }
+
+                        if (trySlowMode)
+                        {
                             if (attemptFastMode) src.Seek(orig, SeekOrigin.Begin);
-                            using (Bitmap b = c.CurrentImageBuilder.LoadImage(src,new ResizeSettings(ra.RewrittenQuerystring))){
+                            using (var b = c.CurrentImageBuilder.LoadImage(src,
+                                       new ResizeSettings(ra.RewrittenQuerystring)))
+                            {
                                 d["width"] = b.Width.ToString();
                                 d["height"] = b.Height.ToString();
                             }
                         }
+
                         SimpleJson(s, d, e.RewrittenQuerystring["jsonp"]);
                     }
-                } catch (FileNotFoundException) {
+                }
+                catch (FileNotFoundException)
+                {
                     d["result"] = "404";
-                    SimpleJson(s,d,e.RewrittenQuerystring["jsonp"]);
+                    SimpleJson(s, d, e.RewrittenQuerystring["jsonp"]);
                 }
             });
         }
 
-        private void SimpleJson(Stream target, NameValueCollection data, string callbackName) {
-            StreamWriter sw = new StreamWriter(target,System.Text.Encoding.UTF8);
-          
-            StringBuilder sb = new StringBuilder();
+        private void SimpleJson(Stream target, NameValueCollection data, string callbackName)
+        {
+            var sw = new StreamWriter(target, System.Text.Encoding.UTF8);
 
-            if (!string.IsNullOrEmpty(callbackName)){ sb.Append(callbackName); sb.Append('(');};
+            var sb = new StringBuilder();
+
+            if (!string.IsNullOrEmpty(callbackName))
+            {
+                sb.Append(callbackName);
+                sb.Append('(');
+            }
+
+            ;
 
             sb.Append('{');
 
-            foreach (string key in data) {
+            foreach (string key in data)
+            {
                 if (data[key] == null) continue;
-                sb.Append('\''); sb.Append(key.Replace('\'', '_')); sb.Append("':'");
-                sb.Append(data[key]); sb.AppendLine("',");
+                sb.Append('\'');
+                sb.Append(key.Replace('\'', '_'));
+                sb.Append("':'");
+                sb.Append(data[key]);
+                sb.AppendLine("',");
             }
 
             sb.Append('}');
 
-            if (!string.IsNullOrEmpty(callbackName)) { sb.Append(");"); };
+            if (!string.IsNullOrEmpty(callbackName)) sb.Append(");");
+            ;
 
             sw.Write(sb.ToString());
             sw.Flush();
-            
         }
 
-        public bool Uninstall(Configuration.Config c) {
+        public bool Uninstall(Config c)
+        {
             c.Plugins.remove_plugin(this);
             c.Pipeline.PreHandleImage -= Pipeline_PreHandleImage;
             return true;
         }
 
-        public IEnumerable<string> GetSupportedQuerystringKeys() {
-            return  new string[] { "getinfo" };
+        public IEnumerable<string> GetSupportedQuerystringKeys()
+        {
+            return new string[] { "getinfo" };
         }
     }
 }

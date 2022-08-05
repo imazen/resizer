@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ImageResizer.Plugins.Basic
+﻿namespace ImageResizer.Plugins.Basic
 {
     public interface IDiagnosticsProvider
     {
-         string ProvideDiagnostics();
+        string ProvideDiagnostics();
     }
+
     public interface IDiagnosticsHeaderProvider
     {
         string ProvideDiagnosticsHeader();
     }
+
     public interface IDiagnosticsFooterProvider
     {
         string ProvideDiagnosticsFooter();

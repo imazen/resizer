@@ -2,36 +2,37 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System;
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Imazen.Profiling
 {
     public static class ConcurrencyResultExtensions
     {
-
         public static IEnumerable<double> ToMilliseconds(this IEnumerable<long> ticks)
         {
             return ticks.Select(t => t * 1000.0 / (double)Stopwatch.Frequency);
         }
 
-        public static IEnumerable<Tuple<IConcurrencyResults, SegmentStats>> GetSegmentStatsRecursively(this IConcurrencyResults r)
+        public static IEnumerable<Tuple<IConcurrencyResults, SegmentStats>> GetSegmentStatsRecursively(
+            this IConcurrencyResults r)
         {
             return r.Traverse(true).Select(n => new Tuple<IConcurrencyResults, SegmentStats>(n, n.GetStats()));
         }
+
         public static IConcurrencyResults FindLeastConcurrentSegment(this IConcurrencyResults r)
         {
-            return r.GetSegmentStatsRecursively().OrderByDescending(p => 
-                        p.Item2.ParallelConcurrencyPercent).First().Item1;
+            return r.GetSegmentStatsRecursively().OrderByDescending(p =>
+                p.Item2.ParallelConcurrencyPercent).First().Item1;
         }
+
         public static IConcurrencyResults FindSlowestSegment(this IConcurrencyResults r)
         {
             return r.GetSegmentStatsRecursively().OrderByDescending(p =>
-                        p.Item2.ParallelExclusiveMs.Avg).First().Item1;
+                p.Item2.ParallelExclusiveMs.Avg).First().Item1;
         }
 
         public static bool HasRuns(this IConcurrencyResults r)
@@ -44,7 +45,8 @@ namespace Imazen.Profiling
             return Enumerable.Concat(r.SequentialRuns, r.ParallelRuns);
         }
 
-        public static double MaxExclusiveMs(this IConcurrencyResults r){
+        public static double MaxExclusiveMs(this IConcurrencyResults r)
+        {
             return r.AllRuns().Max(n => n.TicksExclusiveTotal) * 1000.0 / (double)Stopwatch.Frequency;
         }
 
@@ -52,29 +54,32 @@ namespace Imazen.Profiling
         {
             return r.SequentialRuns.Invocations().Combine(r.ParallelRuns.Invocations());
         }
+
         /// <summary>
-        /// Traverses the tree and grabs a set of matching subtrees with the given segment name.
+        ///     Traverses the tree and grabs a set of matching subtrees with the given segment name.
         /// </summary>
         /// <param name="tree"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static IConcurrencyResults FindSet(this IConcurrencyResults r, string segmentName = "op", bool expectOnlyOne = true)
+        public static IConcurrencyResults FindSet(this IConcurrencyResults r, string segmentName = "op",
+            bool expectOnlyOne = true)
         {
             var results = FindSets(r, segmentName);
-            if (results.Count() > 1) throw new ArgumentOutOfRangeException("tree", "More than one matching set found in tree");
+            if (results.Count() > 1)
+                throw new ArgumentOutOfRangeException("tree", "More than one matching set found in tree");
             return results.First();
         }
 
 
-
-        public static IEnumerable<IConcurrencyResults> FindSets(this IConcurrencyResults tree, string segmentName = "op")
+        public static IEnumerable<IConcurrencyResults> FindSets(this IConcurrencyResults tree,
+            string segmentName = "op")
         {
             return tree.TraverseTree(n => n.CollectChildSets(), c => c.SegmentName == segmentName, true);
         }
 
 
         /// <summary>
-        /// Provides an enumerator which traverses the tree (either depth-first or breadth-first)
+        ///     Provides an enumerator which traverses the tree (either depth-first or breadth-first)
         /// </summary>
         /// <param name="tree"></param>
         /// <param name="breadthFirst"></param>
@@ -124,16 +129,18 @@ namespace Imazen.Profiling
         }
 
 
-
         public static IEnumerable<IConcurrencyResults> CollectChildSets(this IConcurrencyResults r)
         {
             var all = r.AllRuns().ToArray();
-            List<IConcurrencyResults> childSets = new List<IConcurrencyResults>();
+            var childSets = new List<IConcurrencyResults>();
             if (!all.Any(n => n.HasChildren)) return childSets; //Return empty set when there are no children;
             var setCount = all.Max(n => n.Children.Count());
             for (var i = 0; i < setCount; i++)
             {
-                if (all.Any(ins => ins.Children.Count() != setCount)) throw new ArgumentOutOfRangeException("All run trees must have identical structure - mismatched children within segment" + r.SegmentName, "runs");
+                if (all.Any(ins => ins.Children.Count() != setCount))
+                    throw new ArgumentOutOfRangeException(
+                        "All run trees must have identical structure - mismatched children within segment" +
+                        r.SegmentName, "runs");
 
                 var childSeq = r.SequentialRuns.Select(instance => instance.Children[i]).ToArray();
                 var childPar = r.ParallelRuns.Select(instance => instance.Children[i]).ToArray();
@@ -145,17 +152,18 @@ namespace Imazen.Profiling
 
                 childSets.Add(child);
             }
+
             return childSets;
         }
 
 
         public static string DebugPrintTree(this IConcurrencyResults r)
         {
-            var f = new ConcurrencyResultFormatter() { DeltaAbnormalRatio = 100, DeltaSignificantRatio = 0, ExclusiveTimeSignificantMs = 0 };
+            var f = new ConcurrencyResultFormatter()
+                { DeltaAbnormalRatio = 100, DeltaSignificantRatio = 0, ExclusiveTimeSignificantMs = 0 };
             var s = f.PrintCallTree(r);
             Debug.Write(s);
             return s;
         }
-
     }
 }

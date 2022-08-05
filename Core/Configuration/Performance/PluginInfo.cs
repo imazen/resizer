@@ -1,37 +1,39 @@
-﻿using ImageResizer.Plugins;
-using System;
-using System.Collections.Concurrent;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ImageResizer.Plugins;
 
 namespace ImageResizer.Configuration.Performance
 {
-    class PluginInfo
+    internal class PluginInfo
     {
+        public PluginInfo()
+        {
+        }
 
-        public PluginInfo() { }
+        private PluginUsage pluginUsage = new PluginUsage();
 
-        PluginUsage pluginUsage = new PluginUsage();
-        Lazy<IDictionary<string, string>> pluginShorthand
+        private Lazy<IDictionary<string, string>> pluginShorthand
             = new Lazy<IDictionary<string, string>>(() => new PluginLoadingHints().GetReverseHints());
 
-        IEnumerable<string> GetPluginsUsedShorthand()
+        private IEnumerable<string> GetPluginsUsedShorthand()
         {
             var shorthandPlugins = pluginUsage.GetPluginsInstalled().Select(t => t.FullName)
-                .Select(s => pluginShorthand.Value.ContainsKey(s) ? pluginShorthand.Value[s] : s).Where(s => !s.Contains("LicenseEnforcer")).Distinct();
-            var ignorePlugins = new string[] {"LicenseDisplay", "DefaultEncoder", "NoCache", "ClientCache", "Diagnostic", "WebConfigLicenseReader", "MvcRoutingShim" };
+                .Select(s => pluginShorthand.Value.ContainsKey(s) ? pluginShorthand.Value[s] : s)
+                .Where(s => !s.Contains("LicenseEnforcer")).Distinct();
+            var ignorePlugins = new string[]
+            {
+                "LicenseDisplay", "DefaultEncoder", "NoCache", "ClientCache", "Diagnostic", "WebConfigLicenseReader",
+                "MvcRoutingShim"
+            };
             return shorthandPlugins.Except(ignorePlugins);
         }
 
         public void Add(IInfoAccumulator q)
         {
-            foreach(var s in GetPluginsUsedShorthand())
-            {
-                q.Add("p", s);
-            }
+            foreach (var s in GetPluginsUsedShorthand()) q.Add("p", s);
         }
+
         public void Notify(PluginConfig plugins)
         {
             pluginUsage.Notify(plugins);
@@ -39,26 +41,27 @@ namespace ImageResizer.Configuration.Performance
     }
 
 
-    class PluginUsage
+    internal class PluginUsage
     {
-        List<Type> pluginTypes = new List<Type>();
+        private List<Type> pluginTypes = new List<Type>();
 
-        List<KeyValuePair<string, string>> queryRelevancies = null;
-        
+        private List<KeyValuePair<string, string>> queryRelevancies = null;
+
         public PluginUsage()
         {
             queryRelevancies = new List<KeyValuePair<string, string>>(30);
             //TODO: Add defaults
         }
+
         public void Notify(PluginConfig plugins)
         {
             Check(plugins);
             CheckCurrent();
         }
 
-        int singletonPluginCount = 0;
+        private int singletonPluginCount = 0;
 
-        void CheckCurrent()
+        private void CheckCurrent()
         {
             var all = Config.Current.Plugins.AllPlugins;
             // Accuracy is optional
@@ -68,8 +71,8 @@ namespace ImageResizer.Configuration.Performance
                 Check(Config.Current.Plugins);
             }
         }
-        
-        void Check(PluginConfig plugins)
+
+        private void Check(PluginConfig plugins)
         {
             List<Type> newList = null;
             List<KeyValuePair<string, string>> newPairs = null;
@@ -84,22 +87,21 @@ namespace ImageResizer.Configuration.Performance
                         newList = new List<Type>(pluginTypes.Count + 8);
                         newList.AddRange(pluginTypes);
                     }
+
                     newList.Add(type);
 
                     // Record querystring relevancies
                     var info = p as IPluginInfo;
                     if (info != null)
-                    {
                         if (newPairs == null)
                         {
                             newPairs = new List<KeyValuePair<string, string>>(queryRelevancies.Count + 8);
                             newPairs.AddRange(queryRelevancies);
                         }
-                        //newPairs.AddRange(info.GetRelevantQueryPairs());
-                    }
-                    
+                    //newPairs.AddRange(info.GetRelevantQueryPairs());
                 }
             }
+
             //We don't care about race conditions. Non-blocking is more important
             if (newList != null) pluginTypes = newList.Distinct().ToList();
             if (newPairs != null) queryRelevancies = newPairs.Distinct().ToList();
@@ -111,10 +113,9 @@ namespace ImageResizer.Configuration.Performance
             return pluginTypes;
         }
 
-        public IEnumerable<KeyValuePair<string,string>> GetRelevantQueryPairs()
+        public IEnumerable<KeyValuePair<string, string>> GetRelevantQueryPairs()
         {
             return queryRelevancies;
         }
-
     }
 }

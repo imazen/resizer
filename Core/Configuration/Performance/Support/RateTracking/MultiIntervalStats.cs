@@ -2,24 +2,23 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ImageResizer.Configuration.Performance
 {
-
-    class MultiIntervalStats
+    internal class MultiIntervalStats
     {
-        readonly PerIntervalSampling[] set;
-        readonly long[] max;
-        readonly long[] min;
-        readonly long[] total;
-        readonly long[] callbackCount;
+        private readonly PerIntervalSampling[] set;
+        private readonly long[] max;
+        private readonly long[] min;
+        private readonly long[] total;
+        private readonly long[] callbackCount;
 
-        long recordedTotal;
+        private long recordedTotal;
 
-        public MultiIntervalStats(IReadOnlyList<NamedInterval> intervals): this(intervals, Stopwatch.GetTimestamp) { }
+        public MultiIntervalStats(IReadOnlyList<NamedInterval> intervals) : this(intervals, Stopwatch.GetTimestamp)
+        {
+        }
 
         public MultiIntervalStats(IReadOnlyList<NamedInterval> intervals, Func<long> getTimestampNow)
         {
@@ -31,10 +30,12 @@ namespace ImageResizer.Configuration.Performance
             for (var i = 0; i < intervals.Count; i++)
             {
                 var index = i;
-                set[index] = new PerIntervalSampling(intervals[index], count => OnResult(index, count), getTimestampNow);
+                set[index] =
+                    new PerIntervalSampling(intervals[index], count => OnResult(index, count), getTimestampNow);
             }
         }
-        void OnResult(int intervalIndex, long count)
+
+        private void OnResult(int intervalIndex, long count)
         {
             Utilities.InterlockedMax(ref max[intervalIndex], count);
             Utilities.InterlockedMin(ref min[intervalIndex], count);
@@ -48,12 +49,8 @@ namespace ImageResizer.Configuration.Performance
             var success = true;
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var i = 0; i < set.Length; i++)
-            {
                 if (!set[i].Record(timestamp, count))
-                {
                     success = false;
-                }
-            }
             return success;
         }
 
@@ -67,6 +64,7 @@ namespace ImageResizer.Configuration.Performance
                 Avg = callbackCount[i] > 0 ? total[i] / callbackCount[i] : 0
             });
         }
+
         public long RecordedTotal => Interlocked.Read(ref recordedTotal);
     }
 }

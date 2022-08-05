@@ -1,20 +1,23 @@
 ﻿/* Copyright (c) 2014 Imazen See license.txt */
+
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Drawing.Imaging;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
-using System.Globalization;
+using ImageResizer;
+using ImageResizer.Configuration;
+using ImageResizer.Encoding;
+using ImageResizer.Plugins;
 
 namespace ImageResizerSamples
 {
     /// <summary>
-    /// Provides basic encoding functionality for Jpeg, png, and gif output. Allows adjustable Jpeg compression, but doesn't implement indexed PNG files or quantized GIF files.
+    ///     Provides basic encoding functionality for Jpeg, png, and gif output. Allows adjustable Jpeg compression, but
+    ///     doesn't implement indexed PNG files or quantized GIF files.
     /// </summary>
-    public class BmpEncoder : ImageResizer.Encoding.IEncoder, ImageResizer.Plugins.IPlugin
+    public class BmpEncoder : IEncoder, IPlugin
     {
-        public ImageResizer.Encoding.IEncoder CreateIfSuitable(ImageResizer.ResizeSettings settings, object original)
+        public IEncoder CreateIfSuitable(ResizeSettings settings, object original)
         {
             if ("bmp".Equals(settings.Format, StringComparison.OrdinalIgnoreCase)) return new BmpEncoder();
             return null;
@@ -25,28 +28,19 @@ namespace ImageResizerSamples
             i.Save(s, ImageFormat.Bmp);
         }
 
-        public bool SupportsTransparency
-        {
-            get { return true; }
-        }
+        public bool SupportsTransparency => true;
 
-        public string MimeType
-        {
-            get { return "image/bmp"; }
-        }
+        public string MimeType => "image/bmp";
 
-        public string Extension
-        {
-            get { return "bmp"; }
-        }
+        public string Extension => "bmp";
 
-        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c)
+        public IPlugin Install(Config c)
         {
             c.Plugins.add_plugin(this);
             return this;
         }
 
-        public bool Uninstall(ImageResizer.Configuration.Config c)
+        public bool Uninstall(Config c)
         {
             c.Plugins.remove_plugin(this);
             return true;

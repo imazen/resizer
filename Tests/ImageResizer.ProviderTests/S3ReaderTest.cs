@@ -2,7 +2,8 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿using System;
+
+using System;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.IO;
@@ -14,43 +15,48 @@ using ImageResizer.Storage;
 using NSubstitute;
 using Xunit;
 
-namespace ImageResizer.ProviderTests {
+namespace ImageResizer.ProviderTests
+{
     /// <summary>
-    /// Test the functionality of the <see cref="S3Reader2"/> class.
+    ///     Test the functionality of the <see cref="S3Reader2" /> class.
     /// </summary>
     /// <remarks>
-    /// These tests exercise the methods from <see cref="IVirtualImageProvider"/> as
-    /// implemented by <see cref="S3VirtualPathProvider"/>. Also The method 
-    /// implementations of <see cref="IVirtualFile"/>.
+    ///     These tests exercise the methods from <see cref="IVirtualImageProvider" /> as
+    ///     implemented by <see cref="S3VirtualPathProvider" />. Also The method
+    ///     implementations of <see cref="IVirtualFile" />.
     /// </remarks>
-    public class S3ReaderTest {
+    public class S3ReaderTest
+    {
         private IMetadataCache model;
 
         private const string PathPrefix = "~/s3/";
 
         private const string Filename = "resizer-downloads/examples/fountain-small.jpg";
 
-        private const string Settings = "<resizer><plugins><add name=\"S3Reader2\" buckets=\"resizer-downloads,resizer-images,resizer-web\" vpp=\"false\" /></plugins></resizer>";
+        private const string Settings =
+            "<resizer><plugins><add name=\"S3Reader2\" buckets=\"resizer-downloads,resizer-images,resizer-web\" vpp=\"false\" /></plugins></resizer>";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="S3ReaderTest"/> class.
+        ///     Initializes a new instance of the <see cref="S3ReaderTest" /> class.
         /// </summary>
-        public S3ReaderTest() {
+        public S3ReaderTest()
+        {
             HttpContext.Current = new HttpContext(
                 new HttpRequest(string.Empty, "http://tempuri.org", string.Empty),
                 new HttpResponse(new StringWriter(CultureInfo.InvariantCulture)));
 
             object cachedValue = null;
-            this.model = Substitute.For<IMetadataCache>();
-            this.model.Get(Arg.Any<string>()).Returns(x => cachedValue);
-            this.model.When(x => x.Put(Arg.Any<string>(), Arg.Any<object>())).Do(x => cachedValue = x[1]);
+            model = Substitute.For<IMetadataCache>();
+            model.Get(Arg.Any<string>()).Returns(x => cachedValue);
+            model.When(x => x.Put(Arg.Any<string>(), Arg.Any<object>())).Do(x => cachedValue = x[1]);
         }
 
         /// <summary>
-        /// Instantiate a new  <see cref="S3Reader2"/> object and test for success.
+        ///     Instantiate a new  <see cref="S3Reader2" /> object and test for success.
         /// </summary>
         [Fact]
-        public void SettingsConstructor() {
+        public void SettingsConstructor()
+        {
             // Arrange
 
             // Act
@@ -62,36 +68,38 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the FileExists method with a null value for the queryString parameter.
+        ///     Call the FileExists method with a null value for the queryString parameter.
         /// </summary>
         /// <remarks>
-        /// The queryString parameter is not used. The value passed should not affect the method outcome.
+        ///     The queryString parameter is not used. The value passed should not affect the method outcome.
         /// </remarks>
         [Fact]
-        public void FileExistsWithNullQueryString() {
+        public void FileExistsWithNullQueryString()
+        {
             // Arrange
-            bool expected = true;
+            var expected = true;
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            string virtualPath = Path.Combine(PathPrefix, Filename);
+            var target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            var virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
-            bool actual = target.FileExists(virtualPath, null);
+            var actual = target.FileExists(virtualPath, null);
 
             // Assert
             Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
-        /// Call the FileExists method with a null value for the virtualPath parameter.
+        ///     Call the FileExists method with a null value for the virtualPath parameter.
         /// </summary>
         [Fact]
-        public void FileExistsWithNullVirtualPath() {
+        public void FileExistsWithNullVirtualPath()
+        {
             // Arrange
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            var target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
 
             // Act
             var actual = Assert.Throws<NullReferenceException>(() => target.FileExists(null, null));
@@ -102,15 +110,16 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the FileExists method with an empty string for the virtualPath parameter.
+        ///     Call the FileExists method with an empty string for the virtualPath parameter.
         /// </summary>
         [Fact]
-        public void FileExistsWithEmptyVirtualPath() {
+        public void FileExistsWithEmptyVirtualPath()
+        {
             // Arrange
-            bool expected = false;
+            var expected = false;
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            var target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
 
             // Act
             var actual = target.FileExists(string.Empty, null);
@@ -120,112 +129,117 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the FileExists method with a virtualPath that does not include
-        /// the PathPrefix.
+        ///     Call the FileExists method with a virtualPath that does not include
+        ///     the PathPrefix.
         /// </summary>
         [Fact]
-        public void FileExistsWithoutVirtualPath() {
+        public void FileExistsWithoutVirtualPath()
+        {
             // Arrange
-            bool expected = false;
+            var expected = false;
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            string virtualPath = Filename;
+            var target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            var virtualPath = Filename;
 
             // Act
-            bool actual = target.FileExists(virtualPath, null);
+            var actual = target.FileExists(virtualPath, null);
 
             // Assert
             Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
-        /// Call the FileExists method with a virtualPath that does include
-        /// the PathPrefix and a record id that does not exist. The call is
-        /// forced to check the database.
+        ///     Call the FileExists method with a virtualPath that does include
+        ///     the PathPrefix and a record id that does not exist. The call is
+        ///     forced to check the database.
         /// </summary>
         [Fact]
-        public void FileExistNotFastModeFileNotExisting() {
+        public void FileExistNotFastModeFileNotExisting()
+        {
             // Arrange
-            bool expected = false;
+            var expected = false;
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            var target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
             ((S3Reader2)target).LazyExistenceCheck = false;
             ((S3Reader2)target).MetadataCache = model;
-            string virtualPath = Path.Combine(PathPrefix, "resizer-downloads/examples/fountain-xxxx.jpg");
+            var virtualPath = Path.Combine(PathPrefix, "resizer-downloads/examples/fountain-xxxx.jpg");
 
             // Act
-            bool actual = target.FileExists(virtualPath, null);
+            var actual = target.FileExists(virtualPath, null);
 
             // Assert
             Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
-        /// Call the FileExists method with a virtualPath that does include
-        /// the PathPrefix and a record id that does exist. The call is
-        /// forced to check the database.
+        ///     Call the FileExists method with a virtualPath that does include
+        ///     the PathPrefix and a record id that does exist. The call is
+        ///     forced to check the database.
         /// </summary>
         [Fact]
-        public void FileExistsNotFastModeFileExisting() {
+        public void FileExistsNotFastModeFileExisting()
+        {
             // Arrange
-            bool expected = true;
+            var expected = true;
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            var target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
             ((S3Reader2)target).LazyExistenceCheck = false;
             ((S3Reader2)target).MetadataCache = model;
-            string virtualPath = Path.Combine(PathPrefix, Filename);
+            var virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
-            bool actual = target.FileExists(virtualPath, null);
+            var actual = target.FileExists(virtualPath, null);
 
             // Assert
             Assert.Equal<bool>(expected, actual);
         }
 
         /// <summary>
-        /// Call the FileExists method with a virtualPath that does include
-        /// the PathPrefix and a record id that does exist. The call is
-        /// forced to check the database. Check Caching.
+        ///     Call the FileExists method with a virtualPath that does include
+        ///     the PathPrefix and a record id that does exist. The call is
+        ///     forced to check the database. Check Caching.
         /// </summary>
         [Fact]
-        public void FileExistsNotFastModeFileExistingCheckCaching() {
+        public void FileExistsNotFastModeFileExistingCheckCaching()
+        {
             // Arrange
-            bool expected = true;
+            var expected = true;
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            var target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
             var targetAsVpp = (S3Reader2)target;
             targetAsVpp.LazyExistenceCheck = false;
             targetAsVpp.MetadataCache = model;
-            string virtualPath = Path.Combine(PathPrefix, Filename);
+            var virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Ask for a file to be put in the cache.
-            bool dummy = target.FileExists(virtualPath, null);
+            var dummy = target.FileExists(virtualPath, null);
 
             // Act
-            bool actual = target.FileExists(virtualPath, null);
+            var actual = target.FileExists(virtualPath, null);
 
             // Assert
             Assert.Equal<bool>(expected, actual);
-            this.model.Received(2).Get(Arg.Is<string>(x => x == virtualPath));
-            this.model.Received(1).Put(Arg.Is<string>(x => x == virtualPath), Arg.Any<object>());
+            model.Received(2).Get(Arg.Is<string>(x => x == virtualPath));
+            model.Received(1).Put(Arg.Is<string>(x => x == virtualPath), Arg.Any<object>());
         }
 
         /// <summary>
-        /// Call the GetFile method with a virtualPath that does include
-        /// the PathPrefix and a record id that does not exist. Do not 
-        /// check the database.
+        ///     Call the GetFile method with a virtualPath that does include
+        ///     the PathPrefix and a record id that does not exist. Do not
+        ///     check the database.
         /// </summary>
         [Fact]
-        public void GetFileInvalidFastMode() {
+        public void GetFileInvalidFastMode()
+        {
             // Arrange
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            string virtualPath = Path.Combine(PathPrefix, "resizer-downloads/examples/fountain-xxxx.jpg");
+            var target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            var virtualPath = Path.Combine(PathPrefix, "resizer-downloads/examples/fountain-xxxx.jpg");
 
             // Act
             var actual = target.GetFile(virtualPath, null);
@@ -236,19 +250,20 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the GetFile method with a virtualPath that does include
-        /// the PathPrefix and a record id that does not exist. Do  
-        /// check the database.
+        ///     Call the GetFile method with a virtualPath that does include
+        ///     the PathPrefix and a record id that does not exist. Do
+        ///     check the database.
         /// </summary>
         [Fact]
-        public void GetFileInvalidNotFastMode() {
+        public void GetFileInvalidNotFastMode()
+        {
             // Arrange
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            var target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
             ((S3Reader2)target).LazyExistenceCheck = false;
             ((S3Reader2)target).MetadataCache = model;
-            string virtualPath = Path.Combine(PathPrefix, "resizer-downloads/examples/fountain-xxxx.jpg");
+            var virtualPath = Path.Combine(PathPrefix, "resizer-downloads/examples/fountain-xxxx.jpg");
 
             // Act
             var actual = target.GetFile(virtualPath, null);
@@ -258,17 +273,18 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the GetFile method with a virtualPath that does include
-        /// the PathPrefix and a record id that does exist. Do not check
-        /// the database.
+        ///     Call the GetFile method with a virtualPath that does include
+        ///     the PathPrefix and a record id that does exist. Do not check
+        ///     the database.
         /// </summary>
         [Fact]
-        public void GetFileValidFastMode() {
+        public void GetFileValidFastMode()
+        {
             // Arrange
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            string virtualPath = Path.Combine(PathPrefix, Filename);
+            var target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            var virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
             var actual = target.GetFile(virtualPath, null);
@@ -279,19 +295,20 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the GetFile method with a virtualPath that does include
-        /// the PathPrefix and a record id that does exist. Do check
-        /// the database.
+        ///     Call the GetFile method with a virtualPath that does include
+        ///     the PathPrefix and a record id that does exist. Do check
+        ///     the database.
         /// </summary>
         [Fact]
-        public void GetFileValidNotFastMode() {
+        public void GetFileValidNotFastMode()
+        {
             // Arrange
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            var target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
             ((S3Reader2)target).LazyExistenceCheck = false;
             ((S3Reader2)target).MetadataCache = model;
-            string virtualPath = Path.Combine(PathPrefix, Filename);
+            var virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
             var actual = target.GetFile(virtualPath, null);
@@ -302,16 +319,17 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the GetFile method with a virtualPath that does not include
-        /// the PathPrefix and a record id that does not exist. 
+        ///     Call the GetFile method with a virtualPath that does not include
+        ///     the PathPrefix and a record id that does not exist.
         /// </summary>
         [Fact]
-        public void GetFileWithoutVirtualPathPrefix() {
+        public void GetFileWithoutVirtualPathPrefix()
+        {
             // Arrange
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            string virtualPath = Filename;
+            var target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            var virtualPath = Filename;
 
             // Act
             var actual = target.GetFile(virtualPath, null);
@@ -321,15 +339,16 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the GetFile method with a null value for the virtualPath parameter.
+        ///     Call the GetFile method with a null value for the virtualPath parameter.
         /// </summary>
         [Fact]
-        public void GetFileWithNullVirtualPath() {
+        public void GetFileWithNullVirtualPath()
+        {
             // Arrange
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            string virtualPath = Path.Combine(PathPrefix, Filename);
+            var target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            var virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
             var actual = Assert.Throws<NullReferenceException>(() => target.GetFile(null, null));
@@ -340,15 +359,16 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the GetFile method with an empty string for the virtualPath parameter. 
+        ///     Call the GetFile method with an empty string for the virtualPath parameter.
         /// </summary>
         [Fact]
-        public void GetFileWithEmptyVirtualPath() {
+        public void GetFileWithEmptyVirtualPath()
+        {
             // Arrange
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
-            IVirtualImageProvider target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            string virtualPath = Path.Combine(PathPrefix, Filename);
+            var target = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            var virtualPath = Path.Combine(PathPrefix, Filename);
 
             // Act
             var actual = target.GetFile(string.Empty, null);
@@ -358,16 +378,17 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the Open method with a virtualPath to a database record that 
-        /// does exist.
+        ///     Call the Open method with a virtualPath to a database record that
+        ///     does exist.
         /// </summary>
         [Fact]
-        public void OpenValidId() {
+        public void OpenValidId()
+        {
             // Arrange
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
-            IVirtualImageProvider reader = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            string virtualPath = Path.Combine(PathPrefix, Filename);
+            var reader = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            var virtualPath = Path.Combine(PathPrefix, Filename);
             var target = reader.GetFile(virtualPath, null);
 
             // Act
@@ -379,16 +400,17 @@ namespace ImageResizer.ProviderTests {
         }
 
         /// <summary>
-        /// Call the Open method with a virtualPath to a database record that 
-        /// does not exist.
+        ///     Call the Open method with a virtualPath to a database record that
+        ///     does not exist.
         /// </summary>
         [Fact]
-        public void OpenInvalidId() {
+        public void OpenInvalidId()
+        {
             // Arrange
             var rs = new ResizerSection(Settings);
             var c = new Config(rs);
-            IVirtualImageProvider reader = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
-            string virtualPath = Path.Combine(PathPrefix, "resizer-downloads/examples/fountain-xxxx.jpg");
+            var reader = (IVirtualImageProvider)c.Plugins.VirtualProviderPlugins.First;
+            var virtualPath = Path.Combine(PathPrefix, "resizer-downloads/examples/fountain-xxxx.jpg");
             var target = reader.GetFile(virtualPath, null);
 
             // Act

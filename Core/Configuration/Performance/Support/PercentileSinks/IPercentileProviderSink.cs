@@ -2,7 +2,7 @@
 
 namespace ImageResizer.Configuration.Performance
 {
-    interface IPercentileProviderSink
+    internal interface IPercentileProviderSink
     {
         void Report(long value);
         long GetPercentile(float percentile);

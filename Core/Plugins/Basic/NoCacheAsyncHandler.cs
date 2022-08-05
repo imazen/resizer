@@ -2,20 +2,15 @@
 // No part of this project, including this file, may be copied, modified,
 // propagated, or distributed except as permitted in COPYRIGHT.txt.
 // Licensed under the Apache License, Version 2.0.
-﻿
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Web;
-using ImageResizer.Caching;
+
 using System.Threading.Tasks;
-using System.Threading;
+using System.Web;
 using ImageResizer.Util;
 
 namespace ImageResizer.Plugins.Basic
 {
     /// <summary>
-    /// Implements IHttpHandler, serves content for the NoCache plugin
+    ///     Implements IHttpHandler, serves content for the NoCache plugin
     /// </summary>
     public class NoCacheAsyncHandler : AsyncUtils.AsyncHttpHandlerBase
     {
@@ -26,12 +21,12 @@ namespace ImageResizer.Plugins.Basic
             this.e = e;
         }
 
-         public override Task ProcessRequestAsync(HttpContext context){
+        public override Task ProcessRequestAsync(HttpContext context)
+        {
             context.Response.StatusCode = 200;
             context.Response.BufferOutput = true; //Same as .Buffer. Allows bitmaps to be disposed quicker.
             context.Response.ContentType = e.EstimatedContentType;
-            return  e.CreateAndWriteResultAsync(context.Response.OutputStream, e);
+            return e.CreateAndWriteResultAsync(context.Response.OutputStream, e);
         }
-
     }
 }
