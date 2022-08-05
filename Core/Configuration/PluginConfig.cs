@@ -330,9 +330,9 @@ namespace ImageResizer.Configuration
             }
         }
 
-        public delegate void LoggingAvaialableEvent(ILogManager logger);
+        public delegate void LoggingAvailableEvent(ILogManager logger);
 
-        public LoggingAvaialableEvent LoggingAvailable;
+        public LoggingAvailableEvent LoggingAvailable;
 
         /// <summary>
         ///     Returns an instance of the first encoder that claims to be able to handle the specified settings.
