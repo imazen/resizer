@@ -187,7 +187,6 @@
     <Compile Include="Configuration\Xml\Selector.cs" />
     <Compile Include="Plugins\Basic\DropShadow.cs" />
     <Compile Include="Plugins\Basic\Presets.cs" />
-    <Compile Include="Plugins\Basic\SpeedOrQuality.cs" />
     <Compile Include="Plugins\ICurrentConfigProvider.cs" />
     <Compile Include="Plugins\ILicenseProvider.cs" />
     <Compile Include="Plugins\IRedactDiagnostics.cs" />
@@ -287,7 +286,6 @@
     <None Include="Plugins\Basic\mvcroutingshim_readme.md" />
     <None Include="Plugins\Basic\presets_readme.md" />
     <None Include="Plugins\Basic\sizelimiting_readme.md" />
-    <None Include="Plugins\Basic\speedorquality_readme.md" />
     <None Include="Plugins\Basic\virtualfolder_readme.md" />
   </ItemGroup>
   <ItemGroup>
