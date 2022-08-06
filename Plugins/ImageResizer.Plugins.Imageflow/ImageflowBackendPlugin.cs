@@ -11,7 +11,7 @@ using ImageResizer.Resizing;
 
 namespace ImageResizer.Plugins.Imageflow
 {
-    public class ImageflowBackendPlugin : BuilderExtension, IPlugin, IIssueProvider, IFileExtensionPlugin
+    public class ImageflowBackendPlugin : BuilderExtension, IPlugin, IIssueProvider, IFileExtensionPlugin, IQuerystringPlugin
     {
         private readonly ICollection<string> _supportedBuilderStrings =
             new List<string>(new[] { "wic", "freeimage", "imageflow" });
@@ -108,7 +108,8 @@ namespace ImageResizer.Plugins.Imageflow
                 job.ResultInfo["result.mime"] = firstEncodeResult.PreferredMimeType;
                 job.ResultInfo["source.width"] = firstDecodeResult.Width;
                 job.ResultInfo["source.height"] = firstDecodeResult.Height;
-
+                job.ResultInfo["final.width"] = firstEncodeResult.Width;
+                job.ResultInfo["final.height"] = firstEncodeResult.Height;
 
                 var encodeBytesObject = firstEncodeResult.TryGetBytes();
                 if (encodeBytesObject?.Array == null)
@@ -188,6 +189,20 @@ namespace ImageResizer.Plugins.Imageflow
                 if (s != null && restoreStreamPosition && s.CanSeek) s.Seek(originalPosition, SeekOrigin.Begin);
                 if (disposeStream && s != null) s.Dispose();
             }
+        }
+
+        
+        public IEnumerable<string> GetSupportedQuerystringKeys()
+        {
+            return new string[] {"mode", "anchor", "flip", "sflip",
+                "quality", "zoom", "dpr", "crop", "cropxunits", "cropyunits",
+                "w", "h", "width", "height", "maxwidth", "maxheight", "format",
+                "srotate", "rotate", "stretch", "webp.lossless", "webp.quality",
+                "f.sharpen", "f.sharpen_when", "down.colorspace", "bgcolor", 
+                "jpeg_idct_downscale_linear", "watermark", "s.invert", "s.sepia", 
+                "s.grayscale", "s.alpha", "s.brightness", "s.contrast", "s.saturation", 
+                "trim.threshold", "trim.percentpadding", "a.balancewhite",  "jpeg.progressive",
+                "decoder.min_precise_scaling_ratio", "scale", "preset", "s.roundcorners", "ignoreicc" };
         }
     }
 }
