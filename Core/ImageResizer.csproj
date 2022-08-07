@@ -1,12 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <PackageId>ImageResizer</PackageId>
+    <PackageVersion>0.1</PackageVersion>
+    <Title></Title>
+    <Description>Lightweight HttpModule, REST API, and managed API for *safe* and highly-optimized server-side image processing.</Description>
+    <PackageDescription>Lightweight HttpModule, REST API, and managed API for *safe* and highly-optimized server-side image processing.</PackageDescription>
+  </PropertyGroup>
+
+  <Import Project="..\nuget\NugetPackages.targets" />
+
+  
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</ProjectGuid>
-    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ImageResizer</RootNamespace>
     <AssemblyName>ImageResizer</AssemblyName>
@@ -35,6 +48,7 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <RepositoryUrl>https://github.com/imazen/resizer</RepositoryUrl>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -77,7 +91,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\Issues\InterfaceCopies.cs" />
     <Compile Include="InternalsVisibleTo.cs" />
+    <Compile Include="Issues\ConfigChecker.cs" />
+    <Compile Include="Issues\IssueGatherer.cs" />
     <Compile Include="StreamResponseHandler.cs" />
     <Compile Include="AsyncInterceptModule.cs" />
     <Compile Include="BoxEdges.cs" />
@@ -121,7 +138,6 @@
     <Compile Include="Plugins\VirtualPathProvderShim.cs" />
     <Compile Include="Plugins\FileSignature.cs" />
     <Compile Include="Plugins\IFileSignatureProvider.cs" />
-    <Compile Include="Configuration\Issues\ConfigChecker.cs" />
     <Compile Include="Configuration\IUrlAuthorizationEventArgs.cs" />
     <Compile Include="Configuration\Logging\ILogger.cs" />
     <Compile Include="Configuration\Logging\ILoggerProvider.cs" />
@@ -148,7 +164,6 @@
     <Compile Include="Plugins\Basic\NoCache.cs" />
     <Compile Include="Caching\ResponseHeaders.cs" />
     <Compile Include="Configuration\Config.cs" />
-    <Compile Include="Configuration\Issues\IssueGatherer.cs" />
     <Compile Include="Configuration\IUrlEventArgs.cs" />
     <Compile Include="Configuration\PipelineConfig.cs" />
     <Compile Include="Configuration\IPipelineConfig.cs" />

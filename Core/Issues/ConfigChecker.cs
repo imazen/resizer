@@ -10,11 +10,12 @@ using System.Reflection;
 using System.Security.Principal;
 using System.Web.Hosting;
 using System.Web.Security;
+using ImageResizer.Configuration;
 using ImageResizer.Plugins.Basic;
 using Imazen.Common.Instrumentation.Support;
 using Imazen.Common.Issues;
 
-namespace ImageResizer.Configuration.Issues
+namespace ImageResizer.Issues
 {
     public class ConfigChecker : IIssueProvider
     {

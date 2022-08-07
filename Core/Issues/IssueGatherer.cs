@@ -5,12 +5,15 @@
 
 using System;
 using System.Collections.Generic;
+using ImageResizer.Configuration;
 using Imazen.Common.Issues;
 
-namespace ImageResizer.Configuration.Issues
-{
-    public class IssueGatherer : IIssueProvider
+
+namespace ImageResizer.Issues
     {
+        public class IssueGatherer : IIssueProvider{
+            
+            
         private Config c = null;
 
         /// <summary>

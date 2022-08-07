@@ -10,10 +10,10 @@ using System.IO;
 using System.Web;
 using System.Web.Hosting;
 using ImageResizer.Collections;
-using ImageResizer.Configuration.Issues;
 using Imazen.Common.Issues;
 using ImageResizer.Configuration.Performance;
 using ImageResizer.Configuration.Xml;
+using ImageResizer.Issues;
 using ImageResizer.Plugins.Basic;
 using ImageResizer.Resizing;
 

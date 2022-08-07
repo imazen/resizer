@@ -1,0 +1,30 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+
+        <Copyright>(c) 2022 Imazen LLC</Copyright>
+        <PackageProjectUrl>https://github.com/imazen/resizer</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/imazen/resizer</RepositoryUrl>
+        <RepositoryBranch>develop</RepositoryBranch>
+        <PackageTags>Image;Resize;Optimize;Crop;Gif;Jpg;Jpeg;Bitmap;Png;Core;WebP;ImageResizer;Imageflow;Rotate;Imaging;Crunch</PackageTags>
+        <Authors>lilith;imazen</Authors>
+        <Company>Imazen LLC</Company>
+        <RepositoryType>git</RepositoryType>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+      <!--  <PackageIcon>icon.png</PackageIcon> -->
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(CI)' == 'True'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(CI)' == 'true'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+
+<!--    <ItemGroup>
+        <None Include="..\icon.png" Pack="true" PackagePath=""/>
+    </ItemGroup>-->
+</Project>
