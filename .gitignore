@@ -8,6 +8,13 @@ packages/
 Tools/FakeBuilder/paket-files/
 Tools/DocCollector/resizer-web
 
+ImageResizer.XML
+*.suo
+*.csproj.user
+ImageResizer.dll
+ImageResizer.pdb
+
+
 #Folders for binaries and caches
 bin/
 obj/
