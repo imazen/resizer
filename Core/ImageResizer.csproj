@@ -213,7 +213,6 @@
     <Compile Include="Resizing\BitmapTag.cs" />
     <Content Include="BREAKING.txt" />
     <Content Include="COPYRIGHT.txt" />
-    <Content Include="Resizing\UnitR.cs.txt" />
     <Compile Include="SharedAssemblyInfo.cs" />
     <Compile Include="Util\AssemblyAttributes.cs" />
     <Compile Include="Util\AsyncUtils.cs" />
