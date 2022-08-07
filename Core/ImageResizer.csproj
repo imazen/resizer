@@ -65,6 +65,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Buffers">
+      <HintPath>..\..\..\.nuget\packages\system.buffers\4.5.1\ref\net45\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.configuration" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
@@ -74,6 +77,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InternalsVisibleTo.cs" />
+    <Compile Include="StreamResponseHandler.cs" />
     <Compile Include="AsyncInterceptModule.cs" />
     <Compile Include="BoxEdges.cs" />
     <Compile Include="Collections\QuerystringBase.cs" />
@@ -86,6 +91,7 @@
     <Compile Include="Configuration\Performance\ProcessInfo.cs" />
     <Compile Include="ExtensionMethods\Dictionary.cs" />
     <Compile Include="ExtensionMethods\GenericExtensions.cs" />
+    <Compile Include="NewModuleHelpers.cs" />
     <Compile Include="PluginLoadingHints.cs" />
     <Compile Include="Plugins\Basic\DiagnoseRequest.cs" />
     <Compile Include="Plugins\Basic\EndpointPlugin.cs" />
@@ -190,6 +196,7 @@
     <Compile Include="Resizing\LayoutBuilder.cs" />
     <Compile Include="Plugins\Basic\SizeLimits.cs" />
     <Compile Include="Resizing\BitmapTag.cs" />
+    <Content Include="BREAKING.txt" />
     <Content Include="COPYRIGHT.txt" />
     <Content Include="Resizing\UnitR.cs.txt" />
     <Compile Include="SharedAssemblyInfo.cs" />
@@ -253,8 +260,14 @@
     <None Include="Plugins\Basic\virtualfolder_readme.md" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Imageflow.Net">
+      <Version>0.8.4</Version>
+    </PackageReference>
     <PackageReference Include="Imazen.Common">
-      <Version>0.6.7</Version>
+      <Version>0.7.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Buffers">
+      <Version>4.5.1</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

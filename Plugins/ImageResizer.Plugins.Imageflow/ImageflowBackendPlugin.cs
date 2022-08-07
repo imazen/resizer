@@ -90,7 +90,7 @@ namespace ImageResizer.Plugins.Imageflow
             //To the actual output, that we wrap it in StreamDestination
 
             // The command string we're passing to Imageflow
-            var commandString = job.Instructions.ToString();
+            var commandString = job.Instructions.ToQueryString().Trim('?');
 
             using (var imageflowJob = new global::Imageflow.Fluent.ImageJob())
             {

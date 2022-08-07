@@ -6,6 +6,7 @@ using System.Web.Hosting;
 using ImageResizer.Configuration.Performance;
 using ImageResizer.Encoding;
 using ImageResizer.ExtensionMethods;
+using ImageResizer.Plugins;
 using ImageResizer.Plugins.Basic;
 using ImageResizer.Util;
 
@@ -144,7 +145,8 @@ namespace ImageResizer.Configuration
 
         public string EstimatedContentType { get; private set; }
         public string EstimatedFileExtension { get; private set; }
-
+        public IVirtualFileAsync VirtualFile { get; set; }
+        public bool IsVirtualFile => VirtualFile != null;
 
         public void EstimateResponseInfo()
         {
