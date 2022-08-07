@@ -3,6 +3,7 @@
 
 
 
+IResponseArgs ?
 
 
 
@@ -10,17 +11,24 @@ LATER
 
 * Create migration guide
 
-* Fix response headers system under async
+* Unify storage providers and add support for proxying static non-image files
+* Add support for caching source blobs under certain circumstances
+* Auto-select builder based on unsupported command keys (and maybe watermarks)
+* Obsolete ResizeSettings members that Imageflow doesn't support
+* Figure out AWS credential delay
+* Address weakness in letting cache=no and process=no happen from querystring; 
 
 * Figure out graceful shutdown for HybridCache (Dispose on httpmodule?)
 
 * Implement watermark config translation
 
-* Unify RemoteReader and encrypted/signed URL system.
-
 * Integrate licensing from Imazen.Common and migrate just the enforcer tests
 
-
-
-
 * Write script to update package description and status for everything that is deprecated
+
+IN V6:
+
+* Add direct support for Imazen.Common.Storage.IBlobProvider
+* Fix response headers system under async
+* Unify RemoteReader and encrypted/signed URL system.
+* Unify SizeLimiting and JobSecurity 

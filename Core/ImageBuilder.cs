@@ -1399,6 +1399,7 @@ namespace ImageResizer
             return RequestedAction.None;
         }
 
+        //TODO: these aren't accurate for Imageflow backend
         private readonly string[] _supportedFileExtensions = new string[]
             { "bmp", "gif", "exif", "png", "tif", "tiff", "tff", "jpg", "jpeg", "jpe", "jif", "jfif", "jfi" };
 
@@ -1412,6 +1413,7 @@ namespace ImageResizer
             return _supportedFileExtensions;
         }
 
+        //TODO: these keys are outdated and need updating I think
         private readonly string[] _supportedQuerystringKeys = new string[]
         {
             "format", "thumbnail", "maxwidth", "maxheight",

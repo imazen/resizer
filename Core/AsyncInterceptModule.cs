@@ -39,18 +39,26 @@ namespace ImageResizer
             public WriteResultAsyncDelegate CreateAndWriteResultAsync { get; set; }
         }
 
-        public void Dispose()
-        {
-            // Todo: Call StopAsync on services like HybridCache to avoid leaving files open
-        }
+        private static int moduleInstancesActiveSharedCounter = 0;
 
         public void Init(HttpApplication context)
         {
+            Interlocked.Increment(ref moduleInstancesActiveSharedCounter);
+                
             var helper = new EventHandlerTaskAsyncHelper(CheckRequest_PostAuthorizeRequest_Async);
             context.AddOnPostAuthorizeRequestAsync(helper.BeginEventHandler, helper.EndEventHandler);
 
             conf.ModuleInstalled = true;
         }
+        public void Dispose()
+        {
+            if (Interlocked.Decrement(ref moduleInstancesActiveSharedCounter) == 0)
+            {
+                //The last instance of the module is being disposed, now we can tear down shared services.
+                // Todo: Call StopAsync on services like HybridCache to avoid leaving files open
+            }
+        }
+
 
         protected IPipelineConfig conf => Config.Current.Pipeline;
 
@@ -59,7 +67,7 @@ namespace ImageResizer
         {
             //Skip requests if the Request object isn't populated
             var app = sender as HttpApplication;
-            if (app == null || app.Context == null || app.Context.Request == null) return;
+            if (app?.Context?.Request == null) return;
 
 
             var ra = new HttpModuleRequestAssistant(app.Context, conf, this);
@@ -82,13 +90,11 @@ namespace ImageResizer
                 if (existsPhysically) existsPhysically = File.Exists(ra.RewrittenMappedPath);
 
                 //If not present physically (and VppUsage!=never), try to get the virtual file. Null indicates a missing file
-                IVirtualFileAsync vf = null;
-
                 if (conf.VppUsage != VppUsageOption.Never && !existsPhysically)
-                    vf = await conf.GetFileAsync(ra.RewrittenVirtualPath, ra.RewrittenQuery);
+                    ra.VirtualFile = await conf.GetFileAsync(ra.RewrittenVirtualPath, ra.RewrittenQuery);
 
                 //Only process files that exist
-                if (!existsPhysically && vf == null)
+                if (!existsPhysically && ra.VirtualFile == null)
                 {
                     ra.FireMissing();
                     return;
@@ -96,7 +102,7 @@ namespace ImageResizer
 
                 try
                 {
-                    await HandleRequest(app.Context, ra, vf);
+                    await HandleRequest(app.Context, ra);
                     //Catch not found exceptions
                     ra.FirePostAuthorizeSuccess();
                 }
@@ -132,17 +138,18 @@ namespace ImageResizer
         /// <param name="context"></param>
         /// <param name="ra"></param>
         /// <param name="vf"></param>
-        protected virtual async Task HandleRequest(HttpContext context, HttpModuleRequestAssistant ra,
-            IVirtualFileAsync vf)
+        protected virtual async Task HandleRequest(HttpContext context, HttpModuleRequestAssistant ra)
         {
             if (!ra.CachingIndicated && !ra.ProcessingIndicated)
             {
                 ra.ApplyRewrittenPath(); //This is needed for both physical and virtual files; only makes changes if needed.
-                if (vf != null) ra.AssignSFH(); //Virtual files are not served in .NET 4.
-                return;
+                if (!ra.IsVirtualFile)
+                {
+                    ra.AssignSFH(); //
+                    return;
+                }
             }
-
-
+            
             //Communicate to the MVC plugin this request should not be affected by the UrlRoutingModule.
             context.Items[conf.StopRoutingKey] = true;
             context.Items[conf.ResponseArgsKey] = ""; //We are handling the request
@@ -154,12 +161,12 @@ namespace ImageResizer
             //Build CacheEventArgs
             var e = new AsyncResponsePlan();
 
-            var modDate = vf == null
+            var modDate = ra.VirtualFile == null
                 ? File.GetLastWriteTimeUtc(ra.RewrittenMappedPath)
                 :
-                vf is IVirtualFileWithModifiedDateAsync
+                ra.VirtualFile is IVirtualFileWithModifiedDateAsync
                     ?
-                    await ((IVirtualFileWithModifiedDateAsync)vf).GetModifiedDateUTCAsync()
+                    await ((IVirtualFileWithModifiedDateAsync)ra.VirtualFile).GetModifiedDateUTCAsync()
                     : DateTime.MinValue;
 
             e.RequestCachingKey = ra.GenerateRequestCachingKey(modDate);
@@ -170,7 +177,7 @@ namespace ImageResizer
             e.EstimatedContentType = ra.EstimatedContentType;
             e.EstimatedFileExtension = ra.EstimatedFileExtension;
 
-
+            var vf = ra.VirtualFile;
             //A delegate for accessing the source file
             e.OpenSourceStreamAsync = async delegate()
             {

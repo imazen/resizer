@@ -29,7 +29,7 @@ namespace ImageResizer
          * a.oilpainting, a.sobel,  a.threshold, a.canny, a.equalize, a.posterize - Commands have neither been finalized nor confirmed.
          * fi.scale - Specific to two very infrequently used plugins: FreeImageBuilder and FreeImageResizer
          * preservePalette - Specific to the PrettyGifs plugin, and not well tested. *TODO*
-         * progressive - Specific to the FreeImage pipeline - not supported by GDI, WIC, or WPF
+         * jpeg.progressive - Supported by Imageflow, but not GDI, WIC, or WPF
          * shadow* - I'm hoping to retire/replace the DropShadow plugin sometime. I think it is very infrequently used.
          * memcache - This feature is pre-alpha
          * dpi - This feature is only useful if the user downloads the image before printing it. Lots of confusion around DPI, need to find a way to make it obvious. Perhaps naming it PrintDPI?
@@ -180,8 +180,10 @@ namespace ImageResizer
         }
 
         /// <summary>
+        /// Obsolete - not supported with Imageflow backend
         ///     The frame of the animated GIF to display. 1-based
         /// </summary>
+        [Obsolete("This command is not supported with Imageflow - animated gifs are supported ")]
         public int? Frame
         {
             get => Get<int>("frame");
@@ -189,8 +191,11 @@ namespace ImageResizer
         }
 
         /// <summary>
-        ///     The page of the TIFF file to display. 1-based
+        /// Obsolete
+        ///
+        /// The page of the TIFF file to display. 1-based
         /// </summary>
+        [Obsolete("TIFF support is not provided by most backends")]
         public int? Page
         {
             get => Get<int>("page");
@@ -218,10 +223,9 @@ namespace ImageResizer
 
 
         /// <summary>
-        ///     Maps to 'colors'. Sets the palette size for the final PNG or GIF image (not relevant for JPEGs).
-        ///     Set to 'null' to use the largest palette size available in the format.
-        ///     Requires the PrettyGifs or WicEncoder plugin.
+        /// Ignored; handled automatically by modern backends.
         /// </summary>
+        [Obsolete("Ignored by all modern backends as they manage this automatically")]
         public byte? PaletteSize
         {
             get => Get<byte>("colors");
@@ -270,7 +274,9 @@ namespace ImageResizer
 
 
         /// <summary>
-        ///     Automatically rotates images based on gravity sensor data embedded in Exif. Requires the AutoRotate plugin
+        /// Automatically rotates images based on gravity sensor data embedded in Exif.
+        /// Defaults to true in V5 but not V4 (Also, ignored by Imageflow backend as images are always autortated there)
+        /// 
         /// </summary>
         public bool? AutoRotate
         {
@@ -288,7 +294,7 @@ namespace ImageResizer
         }
 
         /// <summary>
-        ///     Maps to 'rotate'. Rotates the image during rendering. Arbitrary angles are supported.
+        /// Must be multiple of 90 degrees.  Rotates the image during rendering.
         /// </summary>
         public double? Rotate
         {
@@ -324,8 +330,7 @@ namespace ImageResizer
         }
 
         /// <summary>
-        ///     If true, the ICC profile will be discarded instead of being evaluated server side (which typically causes
-        ///     inconsistent and unexpected effects).
+        /// If true, the image's ICC profile will be discarded instead of being evaluated. 
         /// </summary>
         public bool? IgnoreICC
         {
@@ -357,6 +362,7 @@ namespace ImageResizer
         /// <summary>
         ///     Defaults to 'bgcolor'. Allows a separate color to be used for padding areas vs. margins.
         /// </summary>
+        [Obsolete("Use CSS to add padding, margins, borders to image; these are no longer supported due to little usage")]
         public string PaddingColor
         {
             get => this["paddingcolor"];
@@ -366,6 +372,7 @@ namespace ImageResizer
         /// <summary>
         ///     The color to draw the border with, if a border width is specified.
         /// </summary>
+        [Obsolete("Use CSS to add margins and borders to image; these are no longer supported due to little usage")]
         public string BorderColor
         {
             get => this["bordercolor"];
@@ -485,6 +492,7 @@ namespace ImageResizer
         /// <summary>
         ///     Gaussian Blur. Requires the AdvancedFilters plugin.
         /// </summary>
+        [Obsolete("AdvancedFilters is no longer supported")]
         public double? Blur
         {
             get => Get<double>("a.blur");
@@ -494,6 +502,7 @@ namespace ImageResizer
         /// <summary>
         ///     Unsharp Mask. Requires the AdvancedFilters plugin.
         /// </summary>
+        [Obsolete("AdvancedFilters is no longer supported; use f.sharpen instead of a.sharpen for a performant alternative")]
         public double? Sharpen
         {
             get => Get<double>("a.sharpen");
@@ -503,6 +512,7 @@ namespace ImageResizer
         /// <summary>
         ///     Safe noise removal. Requires the AdvancedFilters plugin.
         /// </summary>
+        [Obsolete("AdvancedFilters is no longer supported")]
         public double? RemoveNoise
         {
             get => Get<double>("a.removenoise");
@@ -510,9 +520,9 @@ namespace ImageResizer
         }
 
         /// <summary>
-        ///     Controls dithering when rendering to an 8-bit PNG or GIF image. Requires PrettyGifs or WicEncoder. Accepted values
-        ///     for PrettyGifs: true|false|4pass|30|50|79|[percentage]. Accepted values for WicEncoder: true|false.
+        /// Ignored; all modern backends handle this automatically
         /// </summary>
+        [Obsolete("Ignored by all backends; dithering is always enabled with the Imageflow backend and not implemented in GDI")]
         public string Dither
         {
             get => this["dither"];
@@ -526,6 +536,7 @@ namespace ImageResizer
         ///     FreeImage offers faster jpeg encoding, while WIC offers faster PNG and GIF encoding. Both, however, require full
         ///     trust.
         /// </summary>
+        [Obsolete("Ignored")]
         public string Encoder
         {
             get => this["encoder"];
@@ -538,6 +549,7 @@ namespace ImageResizer
         ///     fails, all other decoders try, in order of declaration in Web.config.
         ///     Requires the matching FreeImageDecoder, WicDecoder, or PsdReader plugin to be installed.
         /// </summary>
+        [Obsolete("Ignored")]
         public string Decoder
         {
             get => this["decoder"];
@@ -545,12 +557,7 @@ namespace ImageResizer
         }
 
         /// <summary>
-        ///     Specify the image processing pipeline to use. Defaults to 'gdi'. If FreeImageBuilder or WicBuilder is installed,
-        ///     you can specify 'freeimage' or 'wic' to use that pipeline instead.
-        ///     The WIC pipeline offers a 2-8X performance increase of GDI, at the expense of slightly reduced image quality, the
-        ///     full trust requirement, and support for only basic resize and crop commands.
-        ///     FreeImage offers *nix-level image support, and handles many images that GDI and WIC can't deal with. It is also
-        ///     restricted to a subset of the full command series.
+        ///     Specify the image processing pipeline to use. Defaults to 'imageflow' if that backend is installed, otherwise uses 'gdi'.
         /// </summary>
         public string Builder
         {
@@ -559,6 +566,8 @@ namespace ImageResizer
         }
 
         /// <summary>
+        /// Requires the Imageflow backend.
+        /// 
         ///     Gets or sets a 1 or 4-element array defining corner radii. If the array is 1 element, it applies to all corners. If
         ///     it is 4 elements, each corner gets an individual radius. Values are percentages of the image width or height,
         ///     whichever is smaller.
@@ -574,6 +583,7 @@ namespace ImageResizer
         /// <summary>
         ///     ["paddingWidth"]: Gets/sets the width(s) of padding inside the image border.
         /// </summary>
+        [Obsolete("Use CSS to add margins and borders to image; these are no longer supported due to little usage")]
         public BoxEdges Padding
         {
             get => BoxEdges.Parse(this["paddingWidth"], null);
@@ -583,6 +593,7 @@ namespace ImageResizer
         /// <summary>
         ///     ["margin"]: Gets/sets the width(s) of the margin outside the image border and effects.
         /// </summary>
+        [Obsolete("Use CSS to add margins and borders to image; these are no longer supported due to little usage")]
         public BoxEdges Margin
         {
             get => BoxEdges.Parse(this["margin"], null);
@@ -592,6 +603,7 @@ namespace ImageResizer
         /// <summary>
         ///     Friendly get/set accessor for the ["borderWidth"] value. Returns null when unspecified.
         /// </summary>
+        [Obsolete("Use CSS to add margins and borders to image; these are no longer supported due to little usage")]
         public BoxEdges Border
         {
             get => BoxEdges.Parse(this["borderWidth"], null);
