@@ -59,13 +59,13 @@ jobs:
         run: dotnet test -c Release ImageResizer.sln
 
       - name: Run ImageResizer.Core.Tests
-        run: vstest.console.exe .\bin\Debug\net472\ImageResizer.Core.Tests.dll
+        run: vstest.console.exe .\bin\Release\net472\ImageResizer.Core.Tests.dll
 
       - name: Run ImageResizer.AllPlugins.Tests
-        run: vstest.console.exe .\bin\Debug\net472\ImageResizer.AllPlugins.Tests.dll
+        run: vstest.console.exe .\bin\Release\net472\ImageResizer.AllPlugins.Tests.dll
         
       - name: Run ImageResizer.ProviderTests
-        run: vstest.console.exe .\bin\Debug\net472\ImageResizer.ProviderTests.dll
+        run: vstest.console.exe .\bin\Release\net472\ImageResizer.ProviderTests.dll
         
       - name: Pack
         run: dotnet pack ImageResizer.sln -c Release
