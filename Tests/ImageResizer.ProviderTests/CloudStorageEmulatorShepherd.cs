@@ -13,12 +13,29 @@ using Microsoft.WindowsAzure.Storage.RetryPolicies;
 
 namespace ImageResizer.ProviderTests
 {
-    public static class CloudStorageEmulatorShepherd
+    internal sealed class CloudStorageEmulatorShepherd
     {
+        private static Process cloudStorageEmulatorProcess;
+        
+        private static CloudStorageEmulatorShepherd keepAlive = new CloudStorageEmulatorShepherd(true);
+        private readonly bool disposeShared = false;
+
+        internal CloudStorageEmulatorShepherd(bool disposeShared = false)
+        {
+            this.disposeShared = disposeShared;
+        }
+        ~CloudStorageEmulatorShepherd()
+        {
+            if (!disposeShared) return;
+            cloudStorageEmulatorProcess?.Kill();
+            cloudStorageEmulatorProcess?.Dispose();
+            cloudStorageEmulatorProcess = null;
+        }
+  
         /// <summary>
         ///     Start the developer azure service if it is not started already.
         /// </summary>
-        public static void Start()
+        public void Start()
         {
             try
             {
@@ -49,14 +66,13 @@ namespace ImageResizer.ProviderTests
                     var processStartInfo = new ProcessStartInfo()
                     {
                         FileName = azuritePath,
-                        Arguments = $"--silent --location \"{storageDir}\" --debug \"{storageDir}\\debug.log\" &"
+                        Arguments = $" --silent --location \"{storageDir}\" --debug \"{storageDir}\\debug.log\"",
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        UseShellExecute = false
                     };
 
-                    using (var process = Process.Start(processStartInfo))
-                    {
-                        process?.WaitForExit();
-                    }
-
+                    cloudStorageEmulatorProcess = Process.Start(processStartInfo);
+                    cloudStorageEmulatorProcess?.WaitForExit(100);
                 }
                 else
                 {

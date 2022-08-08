@@ -51,7 +51,7 @@ namespace ImageResizer.ProviderTests
         /// </summary>
         public AzureReaderTest()
         {
-            CloudStorageEmulatorShepherd.Start();
+            new CloudStorageEmulatorShepherd().Start();
             CreateFileInDatabase();
 
             model = Substitute.For<IMetadataCache>();
