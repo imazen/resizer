@@ -1,5 +1,6 @@
 name: Build project
 
+# lOOK INTO ADDING RELEASE DRAFTER action
 on:
   push:
     branches:
@@ -11,6 +12,9 @@ on:
       - main
       - develop
       - v5
+  release:
+    types: [ published ]
+
 jobs:
   build:
     runs-on: windows-latest
@@ -18,6 +22,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - uses: nowsprinting/check-version-format-action@v3
+        id: version
+        with:
+          prefix: 'v'
+
+      - name: Set the release version
+        run: echo "TAGGED_VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
+        shell: bash
+        if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release'
+        
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
 
@@ -34,17 +48,39 @@ jobs:
         run: cd $GITHUB_WORKSPACE
 
       - name: Restore Packages
-        run: nuget restore ImageResizer.sln
+        run: dotnet restore ImageResizer.sln
 
       - name: Build Solution
-        run: |
-          msbuild.exe ImageResizer.sln /p:platform="Any CPU" /p:configuration="Release"
+        run: 
+          dotnet build -c Release ImageResizer.sln
+
+
+      - name: Test Solution
+        run: dotnet test -c Release ImageResizer.sln
 
       - name: Run ImageResizer.Core.Tests
-        run: vstest.console.exe .\tests\bin\Release\ImageResizer.Core.Tests.dll
+        run: vstest.console.exe .\bin\Debug\net472\ImageResizer.Core.Tests.dll
 
       - name: Run ImageResizer.AllPlugins.Tests
-        run: vstest.console.exe .\tests\bin\Release\ImageResizer.AllPlugins.Tests.dll
+        run: vstest.console.exe .\bin\Debug\net472\ImageResizer.AllPlugins.Tests.dll
         
       - name: Run ImageResizer.ProviderTests
-        run: vstest.console.exe .\tests\bin\Release\ImageResizer.ProviderTests.dll
+        run: vstest.console.exe .\bin\Debug\net472\ImageResizer.ProviderTests.dll
+        
+      - name: Pack
+        run: dotnet pack ImageResizer.sln -c Release
+        
+    
+      - name: Add Github Nuget source
+        run: dotnet nuget add source --username USERNAME --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/OWNER/index.json"
+        
+      - name: Publish nuget packages to GitHub packages
+        if: steps.version.outputs.is_valid == 'true' && github.event_name == 'release'
+        run: |
+          dotnet nuget push bin/Release/net472/ImageResizer.nupkg --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
+          dotnet nuget push bin/Release/net472/ImageResizer.Storage.nupkg --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
+          dotnet nuget push bin/Release/net472/ImageResizer.Plugins.AzureReader2.nupkg --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
+          dotnet nuget push bin/Release/net472/ImageResizer.Plugins.Imageflow --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
+          dotnet nuget push bin/Release/net472/ImageResizer.Plugins.HybridCache --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
+          dotnet nuget push bin/Release/net472/ImageResizer.Plugins.S3Reader2 --api-key ${{ secrets.GITHUB_TOKEN }}  --source "github"
+
