@@ -1,20 +1,30 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
 
-        <Copyright>(c) 2022 Imazen LLC</Copyright>
+        <Copyright>Copyright © 2022 Imazen LLC</Copyright>
         <PackageProjectUrl>https://github.com/imazen/resizer</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/imazen/resizer</RepositoryUrl>
-        <RepositoryBranch>develop</RepositoryBranch>
+        <RepositoryUrl Condition="'$(GITHUB_REPOSITORY)' != ''">$(GITHUB_SERVER_URL)/$(GITHUB_REPOSITORY)</RepositoryUrl>
+        <SourceRevisionId Condition="'$(SourceRevisionId)' == ''">$(GITHUB_SHA)</SourceRevisionId>
+        
         <PackageTags>Image;Resize;Optimize;Crop;Gif;Jpg;Jpeg;Bitmap;Png;Core;WebP;ImageResizer;Imageflow;Rotate;Imaging;Crunch</PackageTags>
-        <Authors>lilith;imazen</Authors>
-        <Company>Imazen LLC</Company>
+        <Authors>imazen,lilith</Authors>
+        <Owners>imazen,lilith</Owners>
+        <Company>Imazen</Company>
+        <CompanyName>Imazen</CompanyName>
+        <Product>ImageResizer</Product>
         <RepositoryType>git</RepositoryType>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+
+        <!-- We're grabbing the TAGGED_VERSION env var -->
+        <Version Condition="'$(Version)' == ''">$(TAGGED_VERSION)</Version>
+        <VersionPrefix>0.1.0</VersionPrefix>
+        <VersionSuffix>-notset</VersionSuffix>
       <!--  <PackageIcon>icon.png</PackageIcon> -->
+
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(CI)' == 'True'">
@@ -23,6 +33,7 @@
     <PropertyGroup Condition="'$(CI)' == 'true'">
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
+
 
 <!--    <ItemGroup>
         <None Include="..\icon.png" Pack="true" PackagePath=""/>

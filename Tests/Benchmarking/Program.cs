@@ -51,15 +51,18 @@ namespace Bench
 
             //CompareFastScaling("bit");
 
+
+            //CompareImageflowToDefault();
+
             //CompareFastScalingToDefaultHQ("bit");
 
             //CompareFastScalingSpeeds("bit");
             //CompareFastScalingToDefault("bit");
 
-            Console.WriteLine("Just rendering");
-            CompareFastScalingByThreading("bit");
-            Console.WriteLine("Including decoding and encoding");
-            CompareFastScalingByThreading("op");
+            // Console.WriteLine("Just rendering");
+            // CompareFastScalingByThreading("bit");
+            // Console.WriteLine("Including decoding and encoding");
+            // CompareFastScalingByThreading("op");
 
             Console.Write("Done\n");
             Console.ReadKey();
@@ -521,12 +524,12 @@ namespace Bench
         }
 
 
-        public static void CompareFastScalingToDefault(string segment = "op")
+        public static void CompareImageflowToDefault(string segment = "op")
         {
             var settings = BenchmarkingDefaults();
             settings.Images.AddBlankImages(
                 new Tuple<int, int, string>[]
-                    { new Tuple<int, int, string>(4000, 3000, "jpg"), new Tuple<int, int, string>(1600, 800, "png") });
+                    { new Tuple<int, int, string>(4000, 3000, "jpg"), new Tuple<int, int, string>(1600, 800, "jpg") });
             settings.SharedInstructions = new Instructions[]
             {
                 new Instructions(
@@ -541,13 +544,9 @@ namespace Bench
                 new Tuple<Config, Instructions, string>(ConfigWithPlugins(), null, "System.Drawing"),
                 new Tuple<Config, Instructions, string>(
                     ConfigWithPlugins(
-                        "ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),
-                    new Instructions("fastscale=true;&down.speed=5&f.ignorealpha=true"),
-                    "FastScaling speed prioritized"),
-                new Tuple<Config, Instructions, string>(
-                    ConfigWithPlugins(
-                        "ImageResizer.Plugins.FastScaling.FastScalingPlugin, ImageResizer.Plugins.FastScaling"),
-                    new Instructions("fastscale=true"), "FastScaling quality optimized")
+                        "ImageResizer.Plugins.Imageflow.ImageflowBackendPlugin, ImageResizer.Plugins.Imageflow"),
+                    null,
+                    "Imageflow")
             };
 
             Compare(settings, configs.Reverse());

@@ -1,77 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{AC318404-15F2-4187-A7B1-AFE4E2798DE6}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ImageResizer.Plugins.S3Reader2</RootNamespace>
-    <AssemblyName>ImageResizer.Plugins.S3Reader2</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
-    <TargetFrameworkProfile />
+    <TargetFramework>net472</TargetFramework>
+    <PackageId>ImageResizer.Plugins.S3Reader2</PackageId>
+    <AssemblyTitle>ImageResizer plugin for resizing images from S3</AssemblyTitle>
+    <Description>ImageResizer plugin for resizing images from S3</Description>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\dlls\debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\..\dlls\debug\ImageResizer.Plugins.S3Reader2.xml</DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\dlls\release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\..\dlls\release\ImageResizer.Plugins.S3Reader2.xml</DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
-    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Trial|AnyCPU'">
-    <OutputPath>..\..\dlls\release\</OutputPath>
-    <DefineConstants>TRACE;TRIAL</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <DocumentationFile>..\..\dlls\release\ImageResizer.Plugins.S3Reader2.xml</DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
+
+  <Import Project="..\..\nuget\NugetPackages.targets" />
+
+
   <ItemGroup>
-    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Web" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\..\Core\SharedAssemblyInfo.cs">
-      <Link>SharedAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="ImageUploadHelperExtensions.cs" />
-    <Compile Include="S3PathEventArgs.cs" />
-    <Compile Include="S3Reader.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ImageResizer.csproj">
-      <Project>{FA5EF673-A6A4-498D-AA24-C025CC5267AF}</Project>
       <Name>ImageResizer</Name>
     </ProjectReference>
     <ProjectReference Include="..\ImageResizer.Storage\ImageResizer.Storage.csproj">
-      <Project>{80bb303c-8f55-410c-ba91-342ecc435101}</Project>
       <Name>ImageResizer.Storage</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="readme.md" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.Core">
@@ -81,12 +33,4 @@
       <Version>3.1.3.1</Version>
     </PackageReference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

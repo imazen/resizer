@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using ImageResizer.Configuration;
 using Imazen.Common.Issues;
 using ImageResizer.Encoding;
@@ -16,6 +17,7 @@ using ImageResizer.Plugins.PluginC;
 using ImageResizer.Resizing;
 using SampleNamespace;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace ImageResizer.Plugins
 {
@@ -49,6 +51,12 @@ namespace ImageResizer.Tests
 {
     public class PluginConfigTests
     {
+        private readonly ITestOutputHelper output;
+        
+        public PluginConfigTests(ITestOutputHelper output)
+        {
+            this.output = output;
+        }
         [Theory]
         [InlineData("DefaultEncoder", typeof(DefaultEncoder))]
         [InlineData("ImageResizer.Plugins.Basic.DefaultEncoder", typeof(DefaultEncoder))]
@@ -84,12 +92,11 @@ namespace ImageResizer.Tests
             pc.LoadPlugins();
             var issues = new List<IIssue>(pc.GetIssues());
             var problems = false;
-            foreach (var i in issues)
-                if (!oldIssues.Contains(i))
-                {
-                    Debug.WriteLine(i.ToString());
-                    problems = true;
-                }
+            foreach (var i in issues.Where(i => !oldIssues.Contains(i) && !i.Summary.Contains("cannot scale to production use")))
+            {
+                output.WriteLine(i.ToString());
+                problems = true;
+            }
 
             Assert.False(problems, "There were errors processing the xml plugin configuration");
         }
