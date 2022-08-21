@@ -65,15 +65,15 @@ jobs:
       - name: Navigate to Workspace
         run: cd $GITHUB_WORKSPACE
 
-      - name: Restore Packages
-        run: dotnet restore ImageResizer.sln
+#      - name: Restore Packages
+#        run: dotnet restore ImageResizer.sln
 
       - name: Build Solution
         run: 
           dotnet build -c Release ImageResizer.sln
 
       - name: Test Solution (except azure)
-        run: dotnet test --filter "FullyQualifiedName!~Azure" ImageResizer.sln
+        run: dotnet test  -c Release  --filter "FullyQualifiedName!~Azure" ImageResizer.sln
 
       - name: Pack
         run: dotnet pack ImageResizer.sln -c Release
