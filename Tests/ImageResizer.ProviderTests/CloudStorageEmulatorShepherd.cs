@@ -52,11 +52,12 @@ namespace ImageResizer.ProviderTests
             }
             catch (StorageException)
             {
-                var azuritePath = new string[]
+                var azuritePaths = new string[]
                 {
                     @"C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\Extensions\Microsoft\Azure Storage Emulator\azurite.exe",
                     @"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Azure Storage Emulator\azurite.exe"
-                }.FirstOrDefault(File.Exists);
+                };
+                var azuritePath = azuritePaths.FirstOrDefault(File.Exists);
 
 
                 if (azuritePath != null)
@@ -80,10 +81,19 @@ namespace ImageResizer.ProviderTests
                     var path = @"C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator";
                     var filenames =
                         new string[] { "AzureStorageEmulator.exe", "WAStorageEmulator.exe" }.Select(name =>
-                            Path.Combine(path, name));
+                            Path.Combine(path, name)).ToArray();
 
-                    var filename = filenames.First(n => File.Exists(n));
+                    var filename = filenames.FirstOrDefault(File.Exists);
 
+                    if (filename == null)
+                    {
+                        Console.WriteLine("Failed to find Azure Storage Emulator in the following locations:");
+                        foreach (var pathTried in azuritePaths.Concat(filenames))
+                        {
+                            Console.WriteLine(pathTried);
+                        }
+                    }
+        
                     var processStartInfo = new ProcessStartInfo()
                     {
                         FileName = filename,
