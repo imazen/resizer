@@ -44,6 +44,18 @@ jobs:
       - name: Setup VSTest
         uses: darenm/Setup-VSTest@v1
 
+
+      - name: Install NPM
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - run: npm install -g azurite
+        
+      - name: Start Azurite Blob Emulator
+        shell: cmd
+        run: start /B azurite-blob
+        
+        
       - name: Navigate to Workspace
         run: cd $GITHUB_WORKSPACE
 
@@ -60,7 +72,8 @@ jobs:
       - name: Pack
         run: dotnet pack ImageResizer.sln -c Release
         
-
+#https://github.com/dotnet/sdk/issues/27320
+      
       - name: Add Github Nuget source
         run: dotnet nuget add source --username USERNAME --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/OWNER/index.json"
         
