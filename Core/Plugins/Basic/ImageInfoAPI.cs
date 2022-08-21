@@ -11,6 +11,7 @@ using System.Text;
 using System.Web;
 using ImageResizer.Caching;
 using ImageResizer.Configuration;
+using Imazen.Common.Storage;
 
 namespace ImageResizer.Plugins.Basic
 {
@@ -73,6 +74,11 @@ namespace ImageResizer.Plugins.Basic
                     }
                 }
                 catch (FileNotFoundException)
+                {
+                    d["result"] = "404";
+                    SimpleJson(s, d, e.RewrittenQuerystring["jsonp"]);
+                }
+                catch (BlobMissingException)
                 {
                     d["result"] = "404";
                     SimpleJson(s, d, e.RewrittenQuerystring["jsonp"]);

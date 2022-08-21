@@ -20,6 +20,7 @@ using ImageResizer.Collections;
 using Imazen.Common.Issues;
 using ImageResizer.ExtensionMethods;
 using ImageResizer.Plugins;
+using Imazen.Common.Storage;
 
 namespace ImageResizer.Configuration
 {
@@ -379,6 +380,10 @@ namespace ImageResizer.Configuration
                 //IVirtualFileCache instances will .Open() and read the original IVirtualFile instance. 
                 return null;
             }
+            catch (BlobMissingException)
+            {
+                return null;
+            }
 
             return f;
         }
@@ -426,6 +431,11 @@ namespace ImageResizer.Configuration
                 //We must abstract the differences in thrown exception as much as possible.  Start with FileNotFound & DirectoryNotFound
                 return null;
             }
+            catch (BlobMissingException)
+            {
+                return null;
+            }
+
             catch (DirectoryNotFoundException)
             {
                 return null;

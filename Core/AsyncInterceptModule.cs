@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Web;
 using ImageResizer.Configuration;
 using ImageResizer.Plugins;
+using Imazen.Common.Storage;
 
 namespace ImageResizer
 {
@@ -105,6 +106,12 @@ namespace ImageResizer
                     await HandleRequest(app.Context, ra);
                     //Catch not found exceptions
                     ra.FirePostAuthorizeSuccess();
+                }
+                catch (BlobMissingException notFound)
+                {
+                    ra.FireMissing();
+                    throw new ImageMissingException("The specified resource could not be located", "File not found",
+                        notFound);
                 }
                 catch (FileNotFoundException notFound)
                 {
@@ -233,6 +240,13 @@ namespace ImageResizer
 
                     ra.FireJobSuccess();
                     //Catch not found exceptions
+                }
+                catch (BlobMissingException notFound)
+                {
+                    //This will be called later, if at all. 
+                    ra.FireMissing();
+                    throw new ImageMissingException("The specified resource could not be located", "File not found",
+                        notFound);
                 }
                 catch (FileNotFoundException notFound)
                 {
