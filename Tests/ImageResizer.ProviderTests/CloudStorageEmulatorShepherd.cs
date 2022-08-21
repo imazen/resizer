@@ -92,6 +92,8 @@ namespace ImageResizer.ProviderTests
                         {
                             Console.WriteLine(pathTried);
                         }
+                        // We failed to fix the issue, so we can't continue.
+                        throw;   
                     }
         
                     var processStartInfo = new ProcessStartInfo()
