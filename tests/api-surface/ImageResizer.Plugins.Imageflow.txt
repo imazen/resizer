@@ -1,0 +1,16 @@
+[assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "")]
+[assembly: System.Runtime.Versioning.TargetFramework(".NETFramework,Version=v4.7.2", FrameworkDisplayName=".NET Framework 4.7.2")]
+namespace ImageResizer.Plugins.Imageflow
+{
+    public class ImageflowBackendPlugin : ImageResizer.Resizing.BuilderExtension, ImageResizer.Plugins.IFileExtensionPlugin, ImageResizer.Plugins.IPlugin, ImageResizer.Plugins.IQuerystringPlugin, Imazen.Common.Issues.IIssueProvider
+    {
+        public ImageflowBackendPlugin() { }
+        public ImageflowBackendPlugin(System.Collections.Specialized.NameValueCollection args) { }
+        protected override ImageResizer.Resizing.RequestedAction BuildJob(ImageResizer.ImageJob job) { }
+        public System.Collections.Generic.IEnumerable<Imazen.Common.Issues.IIssue> GetIssues() { }
+        public System.Collections.Generic.IEnumerable<string> GetSupportedFileExtensions() { }
+        public System.Collections.Generic.IEnumerable<string> GetSupportedQuerystringKeys() { }
+        public ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public bool Uninstall(ImageResizer.Configuration.Config c) { }
+    }
+}

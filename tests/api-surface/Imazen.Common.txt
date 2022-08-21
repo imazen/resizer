@@ -1,0 +1,258 @@
+[assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "https://github.com/imazen/imageflow-dotnet-server.git")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ImageResizer")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ImageResizer.LicensingTests")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Imageflow.Server")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Imageflow.Server.Tests")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Imazen.Common.Tests")]
+[assembly: System.Runtime.Versioning.TargetFramework(".NETStandard,Version=v2.0", FrameworkDisplayName="")]
+namespace Imazen.Common.Collections
+{
+    public class ReverseEnumerable<T> : System.Collections.Generic.IEnumerable<T>, System.Collections.IEnumerable
+    {
+        public ReverseEnumerable(System.Collections.ObjectModel.ReadOnlyCollection<T> collection) { }
+        public System.Collections.Generic.IEnumerator<T> GetEnumerator() { }
+    }
+    public class ReverseEnumerator<T> : System.Collections.Generic.IEnumerator<T>, System.Collections.IEnumerator, System.IDisposable
+    {
+        public ReverseEnumerator(System.Collections.ObjectModel.ReadOnlyCollection<T> collection) { }
+        public T Current { get; }
+        public bool MoveNext() { }
+        public void Reset() { }
+    }
+}
+namespace Imazen.Common.Concurrency
+{
+    public class AsyncLockProvider
+    {
+        public AsyncLockProvider() { }
+        public bool MayBeLocked(string key) { }
+        public System.Threading.Tasks.Task<bool> TryExecuteAsync(string key, int timeoutMs, System.Threading.CancellationToken cancellationToken, System.Func<System.Threading.Tasks.Task> success) { }
+        public bool TryExecuteSynchronous(string key, int timeoutMs, System.Threading.CancellationToken cancellationToken, System.Action success) { }
+    }
+    public sealed class BasicAsyncLock
+    {
+        public BasicAsyncLock() { }
+        public System.Threading.Tasks.Task<System.IDisposable> LockAsync() { }
+    }
+}
+namespace Imazen.Common.Extensibility.ClassicDiskCache
+{
+    public delegate System.Threading.Tasks.Task AsyncWriteResult(System.IO.Stream output);
+    public enum CacheQueryResult
+    {
+        Failed = 0,
+        Miss = 1,
+        Hit = 2,
+    }
+    public interface ICacheResult
+    {
+        System.IO.Stream Data { get; set; }
+        string PhysicalPath { get; }
+        string RelativePath { get; }
+        Imazen.Common.Extensibility.ClassicDiskCache.CacheQueryResult Result { get; set; }
+    }
+    public interface IClassicDiskCache : Imazen.Common.Issues.IIssueProvider, Microsoft.Extensions.Hosting.IHostedService
+    {
+        System.Threading.Tasks.Task<Imazen.Common.Extensibility.ClassicDiskCache.ICacheResult> GetOrCreate(string key, string fileExtension, Imazen.Common.Extensibility.ClassicDiskCache.AsyncWriteResult writeCallback);
+    }
+}
+namespace Imazen.Common.Extensibility.StreamCache
+{
+    public delegate System.Threading.Tasks.Task<Imazen.Common.Extensibility.StreamCache.IStreamCacheInput> AsyncBytesResult(System.Threading.CancellationToken cancellationToken);
+    public interface IStreamCache : Imazen.Common.Issues.IIssueProvider, Microsoft.Extensions.Hosting.IHostedService
+    {
+        System.Threading.Tasks.Task<Imazen.Common.Extensibility.StreamCache.IStreamCacheResult> GetOrCreateBytes(byte[] key, Imazen.Common.Extensibility.StreamCache.AsyncBytesResult dataProviderCallback, System.Threading.CancellationToken cancellationToken, bool retrieveContentType);
+    }
+    public interface IStreamCacheInput
+    {
+        System.ArraySegment<byte> Bytes { get; }
+        string ContentType { get; }
+    }
+    public interface IStreamCacheResult
+    {
+        string ContentType { get; }
+        System.IO.Stream Data { get; }
+        string Status { get; }
+    }
+    public class StreamCacheInput : Imazen.Common.Extensibility.StreamCache.IStreamCacheInput
+    {
+        public StreamCacheInput(string contentType, System.ArraySegment<byte> bytes) { }
+        public System.ArraySegment<byte> Bytes { get; }
+        public string ContentType { get; }
+        public Imazen.Common.Extensibility.StreamCache.IStreamCacheInput ToIStreamCacheInput() { }
+    }
+}
+namespace Imazen.Common.ExtensionMethods
+{
+    public static class DateTimeExtensions
+    {
+        public static long ToUnixTimeUtc(this System.DateTime dateTime) { }
+        public static System.DateTime UnixTimeUtcIntoDateTime(this long unixValue) { }
+    }
+}
+namespace Imazen.Common.Helpers
+{
+    public static class EncodingUtils
+    {
+        public static byte[] FromBase64UToBytes(string data) { }
+        public static string FromBase64UToString(string data) { }
+        public static string ToBase64U(byte[] data) { }
+        public static string ToBase64U(string data) { }
+    }
+    public static class Signatures
+    {
+        public static string NormalizePathAndQueryForSigning(string pathAndQuery) { }
+        public static string SignRequest(string pathAndQuery, string key) { }
+        public static string SignString(string data, string key, int signatureLengthInBytes) { }
+    }
+}
+namespace Imazen.Common.Instrumentation.Support.Clamping
+{
+    public class SignificantDigitsClampingFloat
+    {
+        public SignificantDigitsClampingFloat() { }
+        public float MaxValue { get; set; }
+        public float MinValue { get; set; }
+        public int SignificantDigits { get; set; }
+        public float Clamp(float value) { }
+        public double RoundPositiveValueToDigits(double n, int count) { }
+    }
+}
+namespace Imazen.Common.Instrumentation.Support.InfoAccumulators
+{
+    public interface IInfoAccumulator
+    {
+        void AddString(string key, string value);
+        System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>> GetInfo();
+        Imazen.Common.Instrumentation.Support.InfoAccumulators.IInfoAccumulator WithPrefix(string prefix);
+        Imazen.Common.Instrumentation.Support.InfoAccumulators.IInfoAccumulator WithPrepend(bool prepend);
+    }
+    public interface IInfoProvider
+    {
+        void Add(Imazen.Common.Instrumentation.Support.InfoAccumulators.IInfoAccumulator accumulator);
+    }
+    public static class InfoAccumulatorExtensions
+    {
+        public static void Add(this Imazen.Common.Instrumentation.Support.InfoAccumulators.IInfoAccumulator a, System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>> items) { }
+        public static void Add(this Imazen.Common.Instrumentation.Support.InfoAccumulators.IInfoAccumulator a, string key, System.Guid value) { }
+        public static void Add(this Imazen.Common.Instrumentation.Support.InfoAccumulators.IInfoAccumulator a, string key, string value) { }
+        public static void Add(this Imazen.Common.Instrumentation.Support.InfoAccumulators.IInfoAccumulator a, string key, bool? value) { }
+        public static void Add(this Imazen.Common.Instrumentation.Support.InfoAccumulators.IInfoAccumulator a, string key, long? value) { }
+        public static string ToQueryString(this Imazen.Common.Instrumentation.Support.InfoAccumulators.IInfoAccumulator a, int characterLimit) { }
+    }
+}
+namespace Imazen.Common.Issues
+{
+    public interface IIssue
+    {
+        string Details { get; }
+        Imazen.Common.Issues.IssueSeverity Severity { get; }
+        string Source { get; }
+        string Summary { get; }
+        int Hash();
+    }
+    public interface IIssueProvider
+    {
+        System.Collections.Generic.IEnumerable<Imazen.Common.Issues.IIssue> GetIssues();
+    }
+    public interface IIssueReceiver
+    {
+        void AcceptIssue(Imazen.Common.Issues.IIssue i);
+    }
+    public class Issue : Imazen.Common.Issues.IIssue
+    {
+        public Issue() { }
+        public Issue(string message) { }
+        public Issue(string message, Imazen.Common.Issues.IssueSeverity severity) { }
+        public Issue(string message, string details, Imazen.Common.Issues.IssueSeverity severity) { }
+        public Issue(string source, string message, string details, Imazen.Common.Issues.IssueSeverity severity) { }
+        public string Details { get; }
+        public Imazen.Common.Issues.IssueSeverity Severity { get; }
+        public string Source { get; set; }
+        public string Summary { get; }
+        public int Hash() { }
+        public override string ToString() { }
+    }
+    public enum IssueSeverity
+    {
+        Critical = 0,
+        Error = 1,
+        ConfigurationError = 2,
+        Warning = 3,
+    }
+    public class IssueSink : Imazen.Common.Issues.IIssueProvider, Imazen.Common.Issues.IIssueReceiver
+    {
+        public IssueSink(string defaultSource) { }
+        public virtual void AcceptIssue(Imazen.Common.Issues.IIssue i) { }
+        public virtual System.Collections.Generic.IEnumerable<Imazen.Common.Issues.IIssue> GetIssues() { }
+    }
+}
+namespace Imazen.Common.Licensing
+{
+    [System.AttributeUsage(System.AttributeTargets.Assembly)]
+    public class BuildDateAttribute : System.Attribute
+    {
+        public BuildDateAttribute() { }
+        public BuildDateAttribute(string txt) { }
+        public string Value { get; }
+        public System.DateTimeOffset? ValueDate { get; }
+        public override string ToString() { }
+    }
+    public interface ILicenseBlob
+    {
+        byte[] Data { get; }
+        Imazen.Common.Licensing.ILicenseDetails Fields { get; }
+        string Original { get; }
+        byte[] Signature { get; }
+    }
+    public interface ILicenseChain
+    {
+        string Id { get; }
+        bool IsRemote { get; }
+        bool Shared { get; }
+        Imazen.Common.Licensing.ILicenseBlob CachedLicense();
+        Imazen.Common.Licensing.ILicenseBlob FetchedLicense();
+        string LastFetchUrl();
+        System.Collections.Generic.IEnumerable<Imazen.Common.Licensing.ILicenseBlob> Licenses();
+        string ToPublicString();
+    }
+    public interface ILicenseClock
+    {
+        long TicksPerSecond { get; }
+        System.DateTimeOffset? GetAssemblyWriteDate();
+        System.DateTimeOffset? GetBuildDate();
+        long GetTimestampTicks();
+        System.DateTimeOffset GetUtcNow();
+    }
+    public interface ILicenseDetails
+    {
+        System.DateTimeOffset? Expires { get; }
+        string Id { get; }
+        System.DateTimeOffset? ImageflowExpires { get; }
+        System.DateTimeOffset? Issued { get; }
+        System.Collections.Generic.IReadOnlyDictionary<string, string> Pairs { get; }
+        System.DateTimeOffset? SubscriptionExpirationDate { get; }
+        string Get(string key);
+    }
+}
+namespace Imazen.Common.Storage
+{
+    public class BlobMissingException : System.Exception
+    {
+        public BlobMissingException() { }
+        public BlobMissingException(string message) { }
+        public BlobMissingException(string message, System.Exception inner) { }
+    }
+    public interface IBlobData : System.IDisposable
+    {
+        bool? Exists { get; }
+        System.DateTime? LastModifiedDateUtc { get; }
+        System.IO.Stream OpenRead();
+    }
+    public interface IBlobProvider
+    {
+        System.Threading.Tasks.Task<Imazen.Common.Storage.IBlobData> Fetch(string virtualPath);
+        System.Collections.Generic.IEnumerable<string> GetPrefixes();
+        bool SupportsPath(string virtualPath);
+    }
+}

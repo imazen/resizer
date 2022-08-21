@@ -1,0 +1,15 @@
+[assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "https://github.com/imazen/resizer.git")]
+[assembly: System.Runtime.Versioning.TargetFramework(".NETFramework,Version=v4.7.2", FrameworkDisplayName=".NET Framework 4.7.2")]
+namespace ImageResizer.Plugins.AzureReader2
+{
+    public class AzureReader2Plugin : ImageResizer.Storage.BlobProviderBase, ImageResizer.Plugins.IMultiInstancePlugin
+    {
+        public AzureReader2Plugin() { }
+        public AzureReader2Plugin(System.Collections.Specialized.NameValueCollection args) { }
+        public bool RedirectToBlobIfUnmodified { get; set; }
+        public override System.Threading.Tasks.Task<ImageResizer.Storage.IBlobMetadata> FetchMetadataAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public override ImageResizer.Plugins.IPlugin Install(ImageResizer.Configuration.Config c) { }
+        public override System.Threading.Tasks.Task<System.IO.Stream> OpenAsync(string virtualPath, System.Collections.Specialized.NameValueCollection queryString) { }
+        public override bool Uninstall(ImageResizer.Configuration.Config c) { }
+    }
+}
