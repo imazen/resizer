@@ -54,23 +54,13 @@ jobs:
         run: 
           dotnet build -c Release ImageResizer.sln
 
-
       - name: Test Solution
         run: dotnet test -c Release ImageResizer.sln
 
-      - name: Run ImageResizer.Core.Tests
-        run: vstest.console.exe .\bin\Release\net472\ImageResizer.Core.Tests.dll
-
-      - name: Run ImageResizer.AllPlugins.Tests
-        run: vstest.console.exe .\bin\Release\net472\ImageResizer.AllPlugins.Tests.dll
-        
-      - name: Run ImageResizer.ProviderTests
-        run: vstest.console.exe .\bin\Release\net472\ImageResizer.ProviderTests.dll
-        
       - name: Pack
         run: dotnet pack ImageResizer.sln -c Release
         
-    
+
       - name: Add Github Nuget source
         run: dotnet nuget add source --username USERNAME --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/OWNER/index.json"
         

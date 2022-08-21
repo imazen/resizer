@@ -33,9 +33,11 @@
     <PropertyGroup Condition="'$(CI)' == 'true'">
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
-
-    <PropertyGroup>
+    <PropertyGroup Condition="!$(MSBuildProjectName.EndsWith('Tests'))">
         <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
+    </PropertyGroup>    
+    <PropertyGroup>
+
         <IntermediateOutputPath>$(SolutionDir)/obj/$(Configuration)</IntermediateOutputPath>
         <OutputPath>$(SolutionDir)/bin/$(Configuration)</OutputPath>
 
