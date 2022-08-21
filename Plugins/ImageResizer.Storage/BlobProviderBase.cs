@@ -23,8 +23,8 @@ namespace ImageResizer.Storage
 {
     public interface IBlobMetadata
     {
-        bool? Exists { get; set; }
-        DateTime? LastModifiedDateUtc { get; set; }
+        bool? Exists { get; }
+        DateTime? LastModifiedDateUtc { get; }
     }
 
     public class BlobMetadata : IBlobMetadata
